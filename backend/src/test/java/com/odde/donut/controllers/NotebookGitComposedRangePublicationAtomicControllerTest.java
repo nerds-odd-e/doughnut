@@ -52,7 +52,7 @@ class NotebookGitComposedRangePublicationAtomicControllerTest
   @Test
   void lateBindingSaveFailureRollsBackMixedMoveDeleteAddRangeLeavingAcceptedStateA()
       throws Exception {
-    Notebook notebook = createGitBackedNotebook();
+    Notebook notebook = createProductLfsNotebook();
     Note moved =
         makeMe.aNote().notebook(notebook).title("Original").content(MOVED_ORIGINAL).please();
     Note deleted =
@@ -118,18 +118,24 @@ class NotebookGitComposedRangePublicationAtomicControllerTest
           commitOnTopOf(
               repository,
               List.of(acceptedHeadId),
-              List.of(
-                  new NotebookGitProposalFile("Renamed.md", MOVED_ORIGINAL),
-                  new NotebookGitProposalFile("Companion.md", COMPANION_EDITED)),
+              withAcceptedMetadata(
+                  repository,
+                  acceptedHeadId,
+                  List.of(
+                      new NotebookGitProposalFile("Renamed.md", MOVED_ORIGINAL),
+                      new NotebookGitProposalFile("Companion.md", COMPANION_EDITED))),
               "Exact rename, delete learned note, edit companion");
       ObjectId tip =
           commitOnTopOf(
               repository,
               List.of(afterMoveDeleteAndCompanionEdit),
-              List.of(
-                  new NotebookGitProposalFile("Renamed.md", MOVED_EDITED),
-                  new NotebookGitProposalFile("Companion.md", COMPANION_EDITED),
-                  new NotebookGitProposalFile("Added.md", ADDED_CONTENT)),
+              withAcceptedMetadata(
+                  repository,
+                  acceptedHeadId,
+                  List.of(
+                      new NotebookGitProposalFile("Renamed.md", MOVED_EDITED),
+                      new NotebookGitProposalFile("Companion.md", COMPANION_EDITED),
+                      new NotebookGitProposalFile("Added.md", ADDED_CONTENT))),
               "Edit moved note and add unrelated note");
       proposal = bundleBytesForHead(repository, tip);
     }

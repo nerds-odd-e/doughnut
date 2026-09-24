@@ -148,13 +148,20 @@ slice 5's grep. `pointerFor` lives in `NotebookGitWebContentControllerTestBase`.
 ### 4. Proposals carrying attachments send LFS pointers
 
 Type: Structure
-Status: planned
+Status: done
 Proof: ProposalFolderRelocationAttachment, PublicationAtomic,
 AttachmentIndependence and AttachmentLocalChange green.
 
 Change: these classes create the product LFS notebook and propose pointers
 (payload stored through the shared `pointerFor`) instead of raw bytes. Enables
 slice 5.
+Accepted: `NotebookGit*` backend tests green (428). Learnings for slice 5:
+`pointerFor`, `committedOnLfs(notebook, tree)` and `isAttachment` (the
+product's note/marker/metadata rule) live in `NotebookGitControllerTestBase`;
+convert static payload trees with `committedOnLfs` when the test runs and wrap
+`commitOnTopOf` chains in `withAcceptedMetadata`. Tip content without metadata:
+`AcceptedTip.content()` or `readTreeEntries`. On LFS a raw non-Markdown blob is
+refused, so any remaining raw `.json`/`.png` proposal fails with that refusal.
 
 ### 5. The default backend Git fixture is the product LFS notebook
 

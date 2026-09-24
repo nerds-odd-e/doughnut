@@ -30,12 +30,13 @@ class NotebookGitProposalFolderRelocationAttachmentControllerTest
 
   @Test
   void localFolderRenameRetainsLearnedNoteIdentityAndCarriesItsAttachment() throws Exception {
-    Notebook notebook = createGitBackedNotebook();
+    Notebook notebook = createProductLfsNotebook();
+    byte[] forceDiagram = pointerFor(notebook, FORCE_DIAGRAM);
     NotebookGitBinding empty = snapshotCurrentPortableTree(notebook);
     List<NotebookGitProposalFile> physicsTree =
         List.of(
             new NotebookGitProposalFile("physics/Particle.md", NOTE),
-            new NotebookGitProposalFile("physics/diagrams/force.png", FORCE_DIAGRAM));
+            new NotebookGitProposalFile("physics/diagrams/force.png", forceDiagram));
     controller.publishNotebookGitProposal(
         notebook.getId(), empty.getAcceptedGitObjectId(), proposalBundleBytes(empty, physicsTree));
     Note particle = noteRepository.findAllByNotebookIdOrderByIdAsc(notebook.getId()).getFirst();
@@ -53,7 +54,7 @@ class NotebookGitProposalFolderRelocationAttachmentControllerTest
     List<NotebookGitProposalFile> mechanicsTree =
         List.of(
             new NotebookGitProposalFile("mechanics/Particle.md", NOTE),
-            new NotebookGitProposalFile("mechanics/diagrams/force.png", FORCE_DIAGRAM));
+            new NotebookGitProposalFile("mechanics/diagrams/force.png", forceDiagram));
     controller.publishNotebookGitProposal(
         notebook.getId(),
         accepted.getAcceptedGitObjectId(),
@@ -68,9 +69,9 @@ class NotebookGitProposalFolderRelocationAttachmentControllerTest
     List<PortableTreeEntry> expectedTree =
         List.of(
             PortableTreeEntry.ofText("mechanics/Particle.md", NOTE),
-            new PortableTreeEntry("mechanics/diagrams/force.png", FORCE_DIAGRAM));
+            new PortableTreeEntry("mechanics/diagrams/force.png", forceDiagram));
     assertThat(
-        GitBundleTestReader.fetchTipTreeEntries(acceptedBundleBytes(notebook)),
+        GitBundleTestReader.fetchAcceptedTip(acceptedBundleBytes(notebook)).content(),
         equalTo(expectedTree));
     assertThat(
         NotebookLiveProjectionTestReader.attachmentTree(

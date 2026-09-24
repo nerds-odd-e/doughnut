@@ -133,7 +133,7 @@ class NotebookGitAttachmentIndependenceControllerTest
    * publication boundary.
    */
   private Fixture publishRootFilesOverNotesAndFolders() throws Exception {
-    Notebook notebook = createGitBackedNotebook();
+    Notebook notebook = createProductLfsNotebook();
     Folder biology =
         makeMe.aFolder().notebook(notebook).name("Biology").readmeContent("readme").please();
     Folder study =
@@ -145,12 +145,12 @@ class NotebookGitAttachmentIndependenceControllerTest
 
     List<PortableTreeEntry> withRootFiles =
         new ArrayList<>(GitBundleTestReader.fetchTipTreeEntries(acceptedBundleBytes(notebook)));
-    withRootFiles.addAll(ROOT_FILES);
+    withRootFiles.addAll(committedOnLfs(notebook, ROOT_FILES));
     controller.publishNotebookGitProposal(
         notebook.getId(),
         markdownOnly.getAcceptedGitObjectId(),
         proposalBundleBytes(markdownOnly, NotebookGitProposalFile.asProposal(withRootFiles)));
-    assertThat(committedRootAttachments(notebook), equalTo(ROOT_FILES));
+    assertThat(committedRootAttachments(notebook), equalTo(committedOnLfs(notebook, ROOT_FILES)));
 
     return new Fixture(notebook, biology, study, cells, reading, tracker);
   }
@@ -161,6 +161,7 @@ class NotebookGitAttachmentIndependenceControllerTest
    * with the same bytes.
    */
   private void assertRootFilesSurvived(Notebook notebook, ObjectId parentHead) throws Exception {
+    List<PortableTreeEntry> rootFiles = committedOnLfs(notebook, ROOT_FILES);
     try (InMemoryRepository repository = new InMemoryRepository(new DfsRepositoryDescription());
         RevWalk revWalk = new RevWalk(repository)) {
       RevCommit head =
@@ -168,16 +169,12 @@ class NotebookGitAttachmentIndependenceControllerTest
               GitBundleTestReader.fetchHead(repository, acceptedBundleBytes(notebook)));
       assertThat(head.getParent(0).getId(), equalTo(parentHead));
       assertThat(
-          filesAmong(GitBundleTestReader.readTreeEntries(repository, head)), equalTo(ROOT_FILES));
+          GitBundleTestReader.readTreeEntries(repository, head).stream()
+              .filter(NotebookGitControllerTestBase::isAttachment)
+              .toList(),
+          equalTo(rootFiles));
     }
-    assertThat(committedRootAttachments(notebook), equalTo(ROOT_FILES));
-  }
-
-  /** Every entry that is not Markdown and not an empty-folder marker, at whatever depth. */
-  private static List<PortableTreeEntry> filesAmong(List<PortableTreeEntry> entries) {
-    return entries.stream()
-        .filter(entry -> !entry.path().endsWith(".md") && !entry.path().endsWith("/.keep"))
-        .toList();
+    assertThat(committedRootAttachments(notebook), equalTo(rootFiles));
   }
 
   private static List<PortableTreeEntry> movePath(

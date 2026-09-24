@@ -1,7 +1,10 @@
 package com.odde.donut.controllers;
 
+import static com.odde.donut.services.notebookAttachment.VerifiedNotebookAttachmentBytes.sha256Hex;
 import static com.odde.donut.testability.CommittedTransactionTestSupport.inCommittedTransaction;
 import static com.odde.donut.testability.CommittedUserCleanup.deleteByUserExternalIdentifierLike;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
 
 import com.odde.donut.controllers.dto.NotebookCreationRequest;
 import com.odde.donut.controllers.dto.NotebookRealm;
@@ -11,14 +14,20 @@ import com.odde.donut.entities.NotebookGitAttachmentRepresentation;
 import com.odde.donut.entities.NotebookGitBinding;
 import com.odde.donut.entities.User;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
+import com.odde.donut.services.notebookAttachment.NotebookAttachmentContent;
+import com.odde.donut.services.notebookGit.NotebookGitAttributes;
 import com.odde.donut.services.notebookGit.NotebookGitCommitBuilder;
 import com.odde.donut.services.notebookGit.NotebookGitCutoverService;
+import com.odde.donut.services.notebookGit.NotebookGitLfsPointer;
 import com.odde.donut.services.notebookGit.NotebookGitTreeContent;
 import com.odde.donut.services.notebookTree.PortableTreeEntry;
 import com.odde.donut.testability.GitBundleTestReader;
 import com.odde.donut.testability.GitBundleTestReader.AcceptedHistory;
 import com.odde.donut.testability.NotebookGitAcceptedHistoryFixture;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import javax.sql.DataSource;
@@ -42,6 +51,7 @@ abstract class NotebookGitControllerTestBase extends NotebookGitCommitFixtureTes
   @Autowired NotebookGitCutoverService notebookGitCutoverService;
   @Autowired PlatformTransactionManager transactionManager;
   @Autowired DataSource dataSource;
+  @Autowired NotebookAttachmentContent notebookAttachmentContent;
 
   private String testFixturePrefix;
 
@@ -100,6 +110,41 @@ abstract class NotebookGitControllerTestBase extends NotebookGitCommitFixtureTes
     request.setNewTitle(title);
     NotebookRealm response = controller.createNotebook(request);
     return notebookRepository.findById(response.notebook().getId()).orElseThrow();
+  }
+
+  /** Stores {@code payload} in the notebook's content store and returns its LFS pointer. */
+  byte[] pointerFor(Notebook notebook, byte[] payload) throws IOException {
+    String oid = sha256Hex(payload);
+    assertThat(
+        notebookAttachmentContent.store(
+            notebook.getId(), oid, payload.length, new ByteArrayInputStream(payload)),
+        is(true));
+    return NotebookGitLfsPointer.format(oid, payload.length);
+  }
+
+  /**
+   * {@code tree} as an LFS notebook commits it: each attachment's payload stored in the content
+   * store and replaced by its pointer; notes, empty-folder markers, and Git metadata stay as they
+   * are.
+   */
+  List<PortableTreeEntry> committedOnLfs(Notebook notebook, List<PortableTreeEntry> tree)
+      throws IOException {
+    List<PortableTreeEntry> committed = new ArrayList<>();
+    for (PortableTreeEntry entry : tree) {
+      committed.add(
+          isAttachment(entry)
+              ? new PortableTreeEntry(entry.path(), pointerFor(notebook, entry.content()))
+              : entry);
+    }
+    return committed;
+  }
+
+  /** Neither Markdown, an empty-folder marker, nor reserved Git metadata, at whatever depth. */
+  static boolean isAttachment(PortableTreeEntry entry) {
+    String path = entry.path();
+    return !path.endsWith(".md")
+        && !path.endsWith("/.keep")
+        && !NotebookGitAttributes.isMetadataPath(path);
   }
 
   Notebook demoteToLegacyRawBinding(Notebook notebook) {

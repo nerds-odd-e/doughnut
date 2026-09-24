@@ -139,7 +139,12 @@ public final class GitBundleTestReader {
   }
 
   public record AcceptedTip(
-      ObjectId head, List<ObjectId> ancestry, List<PortableTreeEntry> entries) {}
+      ObjectId head, List<ObjectId> ancestry, List<PortableTreeEntry> entries) {
+    /** The notebook content at the tip, without reserved Git metadata. */
+    public List<PortableTreeEntry> content() {
+      return withoutMetadata(entries);
+    }
+  }
 
   /**
    * The accepted history a bundle carries: every commit reachable from {@code refs/heads/main},
