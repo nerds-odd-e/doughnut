@@ -13,22 +13,21 @@ import { runSystemGitOrThrow } from './systemGit.js'
  * local Git config (never authored content) from the CLI's current login, then fills in only
  * the current checkout's files via `git lfs fetch` and `git lfs checkout`. Returns whether
  * the fill-in ran. A placeholder remote satisfies Git LFS's remote argument while transfers
- * use `lfs.url`. Failures tell the owner to rerun `rerunCommand`.
+ * use `lfs.url`. Failures end with the caller's `nextStep` (e.g. `rerun "donut notebook pull"`).
  */
 export function fillInCurrentLfsFilesIfNeeded(
   checkoutDir: string,
   notebookId: number,
-  rerunCommand: 'clone' | 'pull'
+  nextStep: string
 ): boolean {
   if (!checkoutUsesLfs(checkoutDir)) {
     return false
   }
-  const rerun = `rerun "donut notebook ${rerunCommand}"`
   requireGitLfs(
     (detail, status) =>
       `Git LFS is required to receive this notebook's attachments${
         detail ? `: ${detail}` : ` (exit code ${status})`
-      }. Install Git LFS, then ${rerun}.`
+      }. Install Git LFS, then ${nextStep}.`
   )
   const noPrompt = {
     env: { ...smudgeSkippedGitOptions().env, GIT_TERMINAL_PROMPT: '0' },
@@ -48,7 +47,7 @@ export function fillInCurrentLfsFilesIfNeeded(
     (verb: string) => (detail: string | undefined, status: number | null) =>
       `Notebook attachments are incomplete: failed to ${verb} current notebook attachments via Git LFS${
         detail ? `: ${detail}` : ` (exit code ${status})`
-      }. Fix authorization or connectivity, then ${rerun}.`
+      }. Fix authorization or connectivity, then ${nextStep}.`
   runSystemGitOrThrow(
     ['-C', checkoutDir, 'lfs', 'fetch', 'origin'],
     incomplete('download'),

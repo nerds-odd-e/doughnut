@@ -158,7 +158,15 @@ async function completeNotebookPull(notebookArgs: string[]): Promise<void> {
     const { notebookId } = resolveNotebookBinding(directory)
     assertLocalMainIsReadyToReceive(directory)
     result = await receiveAcceptedNotebookHead(directory, Number(notebookId))
-    fillInCurrentLfsFilesIfNeeded(directory, Number(notebookId), 'pull')
+    const rerunPull = 'rerun "donut notebook pull"'
+    // Pull refuses during an active rebase, so a paused pull is rerun only after the rebase ends.
+    fillInCurrentLfsFilesIfNeeded(
+      directory,
+      Number(notebookId),
+      result.kind === 'paused'
+        ? `finish ("git rebase --continue") or abort ("git rebase --abort") the rebase, then ${rerunPull}`
+        : rerunPull
+    )
   } catch (e) {
     // A paused conflict stays visible even when filling in attachments fails afterwards.
     const conflictGuidance =

@@ -138,7 +138,13 @@ export async function acquireNotebookGitCheckout(
 
     recordLocalNotebookBinding(checkoutDir, notebookId, apiBaseUrl)
     removeOriginRemote(checkoutDir)
-    if (fillInCurrentLfsFilesIfNeeded(checkoutDir, notebookId, 'clone')) {
+    if (
+      fillInCurrentLfsFilesIfNeeded(
+        checkoutDir,
+        notebookId,
+        'rerun "donut notebook clone"'
+      )
+    ) {
       removeOriginRemote(checkoutDir)
     }
     moveCheckoutIntoDestination(checkoutDir, destinationPath)

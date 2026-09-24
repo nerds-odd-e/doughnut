@@ -6,6 +6,7 @@ import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
 import { getApiConfig } from 'donut-api'
 import { run } from '../src/run.js'
 import { ProcessExitForTest, runGit } from './notebookClone.testHelpers.js'
+import { continuePausedRebaseWithChosenBytes } from './notebookPull.conflict.testHelpers.js'
 import {
   OID_A,
   OID_B,
@@ -226,7 +227,7 @@ describe('notebook pull (LFS checkout fill-in)', () => {
     )
   })
 
-  test('a failed download during a conflict pause still shows the conflict guidance', async () => {
+  test('a failed download during a conflict pause names finishing the rebase before the rerun, which then fills in', async () => {
     const { source, directory } = lfsCheckout(ctx.getWorkDir())
     commitPortableFile(source, 'note.md', '# web\n', 'web note')
     commitPortableFile(directory, 'note.md', '# local\n', 'local')
@@ -239,10 +240,25 @@ describe('notebook pull (LFS checkout fill-in)', () => {
 
     expect(ctx.getErrorSpy()).toHaveBeenCalledWith(
       expect.stringMatching(
-        /^donut: Git paused a rebase with a conflict in "note\.md"\..*git add -- 'note\.md'.*git rebase --continue.*git rebase --abort.*\nNotebook attachments are incomplete: .*rerun "donut notebook pull"\.$/s
+        /^donut: Git paused a rebase with a conflict in "note\.md"\..*git add -- 'note\.md'.*git rebase --continue.*git rebase --abort.*\nNotebook attachments are incomplete: .*finish \("git rebase --continue"\) or abort \("git rebase --abort"\) the rebase, then rerun "donut notebook pull"\.$/s
       )
     )
-    expect(runGit(['ls-files', '-u'], directory)).toContain('note.md')
+
+    continuePausedRebaseWithChosenBytes(directory, {
+      path: 'note.md',
+      content: '# chosen\n',
+    })
+    interceptGitLfs()
+    await run(['notebook', 'pull', directory])
+
+    expect(fs.readFileSync(join(directory, 'a.bin'), 'utf8')).toBe(
+      filled(OID_A)
+    )
+    expect(ctx.getLogSpy()).toHaveBeenCalledWith(
+      expect.stringContaining(
+        'Unpublished local commit is already based on the accepted history.'
+      )
+    )
   })
 
   test('a legacy checkout pulls without Git LFS', async () => {

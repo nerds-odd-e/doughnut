@@ -83,7 +83,7 @@ identity override in `unpublishedCommitAuthor` (low impact).
 
 ### 1. Paused conflict with failed download names a working next step
 Type: Behavior
-Status: planned
+Status: done
 
 Behavior: LFS checkout, rebase pauses on `note.md`, `git lfs fetch` fails →
 pull's error shows the conflict guidance and says to finish or abort the rebase
@@ -161,6 +161,16 @@ Sizing: ~6 min.
   arguments do not reach vitest).
 - C-focused: `CURSOR_DEV=true nix develop -c pnpm -C cli exec vitest run <test file>`.
 
-No product tests have run for this plan.
+Execution: Story Branch Mode, worktree `.claude/worktrees/pull-recovery-guidance`,
+branch `story/pull-recovery-guidance`, claim `fa219c1e26` on trunk.
+
+Accepted proof:
+- Slice 1: `CURSOR_DEV=true nix develop -c pnpm -C cli exec vitest run tests/notebookPull.lfs.test.ts`
+  8/8 ("a failed download during a conflict pause names finishing the rebase before
+  the rerun, which then fills in"); clone consumer `tests/notebookAcquisition.lfs.test.ts` 3/3.
 
 ## Learnings
+
+- Slice 1: `fillInCurrentLfsFilesIfNeeded` takes the caller's whole `nextStep`
+  text; pull builds it from the receive outcome. No test asserts clone's
+  `rerun "donut notebook clone"` text (pre-existing gap, unchanged wording).
