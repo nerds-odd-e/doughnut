@@ -82,6 +82,9 @@ fast-forward update. Local rebase may change unpublished commit IDs; Donut
 preserves the submitted IDs when accepting the result. Already accepted commits
 are never rebased, amended, or replaced. Local branches are possible, but only
 the resulting linear fast-forward history can be published to accepted `main`.
+`donut notebook pull` performs this in the same checkout: it keeps a linear
+run of unpublished commits, refuses local merge commits, and for LFS notebooks
+then fills in current attachment files.
 
 For example, web history `A → W` and local history `A → L` become a local
 proposal `A → W → L′` after local rebase. Donut accepts `L′` only if `W` is

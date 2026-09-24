@@ -130,10 +130,8 @@ class NotebookGitTestabilityController {
     binding.setAttachmentRepresentation(NotebookGitAttachmentRepresentation.LFS);
     notebookGitBindingRepository.save(binding);
 
-    String obsoleteOid = null;
     if (request.getObsoletePayload() != null) {
-      byte[] obsolete = request.getObsoletePayload().getBytes(StandardCharsets.UTF_8);
-      obsoleteOid = storePayload(notebook.getId(), obsolete);
+      storePayload(notebook.getId(), request.getObsoletePayload().getBytes(StandardCharsets.UTF_8));
     }
     byte[] payload = request.getPayload().getBytes(StandardCharsets.UTF_8);
     String oid = storePayload(notebook.getId(), payload);
@@ -156,7 +154,6 @@ class NotebookGitTestabilityController {
     AcceptLfsAttachmentTipResponse response = new AcceptLfsAttachmentTipResponse();
     response.setOid(oid);
     response.setSize(payload.length);
-    response.setObsoleteOid(obsoleteOid);
     return response;
   }
 
@@ -218,7 +215,6 @@ class NotebookGitTestabilityController {
   static class AcceptLfsAttachmentTipResponse {
     private String oid;
     private long size;
-    private String obsoleteOid;
   }
 
   @Schema(name = "InspectNotebookLfsAttachmentRequest")

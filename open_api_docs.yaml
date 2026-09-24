@@ -3920,8 +3920,6 @@ components:
         size:
           type: integer
           format: int64
-        obsoleteOid:
-          type: string
     SubscriptionDTO:
       type: object
       properties:

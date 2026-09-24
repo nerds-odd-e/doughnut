@@ -182,7 +182,6 @@ export type AcceptLfsAttachmentTipRequest = {
 export type AcceptLfsAttachmentTipResponse = {
     oid?: string;
     size?: number;
-    obsoleteOid?: string;
 };
 
 export type SubscriptionDto = {

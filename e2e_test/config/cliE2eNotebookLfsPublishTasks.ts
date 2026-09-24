@@ -72,13 +72,22 @@ export function createCliE2eNotebookLfsPublishTasks() {
       byteLength,
       fillByte,
       message,
+      noteEdit,
     }: {
       checkoutDir: string
       relativePath: string
       byteLength: number
       fillByte: number
       message?: string
+      noteEdit?: { relativePath: string; content: string }
     }): LfsCommitResult {
+      if (noteEdit) {
+        writeFileSync(
+          join(checkoutDir, noteEdit.relativePath),
+          noteEdit.content
+        )
+        runOrThrow('git', ['add', '--', noteEdit.relativePath], checkoutDir)
+      }
       return commitLfsAttachmentBytes(
         checkoutDir,
         relativePath,

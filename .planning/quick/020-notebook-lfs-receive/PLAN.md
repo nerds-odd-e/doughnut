@@ -138,7 +138,7 @@ gone.
 
 ### 4. Installed-CLI journey: same-checkout pull with local notes and files
 Type: Behavior
-Status: planned
+Status: done
 
 Behavior: clone a product-created LFS notebook with the installed CLI, commit a
 new note and then an image plus an edit in two commits, edit another note on the
@@ -158,6 +158,17 @@ Update the durable docs that describe the interim refusal: the North Star
 "Deliver usable increments" item 2 and `docs/notebook-git-lfs.md` /
 `docs/notebook-git-synchronization.md` wording, if present.
 Sizing: ~8 min plus E2E wait (external-wait exception).
+
+Accepted proof (2026-09-24): Command E 10/10 scenarios pass (rerun after
+refactor), including "Same-checkout pull keeps a local note and image over a
+web save, then publishes" (`Overview.md` exact text after pull; `photo.png`
+filled with 1024 bytes — pull's smudge-skipped rebase leaves a pointer, so this
+observes the fill-in; LFS cache exactly the photo digest; publish reports the
+rebased local head as accepted; web note "Shopping list" shows "Milk and
+eggs"). Command R 3/3 pass. North Star item 2, `docs/notebook-git-lfs.md`,
+`docs/notebook-git-synchronization.md`, clone guidance and publish usage now
+describe same-checkout pull and publishing single-parent commits. Command C's
+only failures were the pre-existing staging-directory flake noted below.
 
 ## Proof ownership
 
@@ -183,6 +194,10 @@ Pre-existing flake (not owned): `cli/tests/notebookAcquisition.test.ts`
 "binary download failure … cleans staging" compares global temp staging
 directories and failed 5 then 2 cases on the untouched baseline (eb89d93e1d)
 while other processes shared the temp directory; it passed in later runs.
+Later runs traced it to `notebookAcquisition.test.ts` and
+`notebookAcquisition.lfs.test.ts` comparing the same shared
+`donut-notebook-clone-*` temp prefix while vitest runs files in parallel; each
+file passes alone and CI stayed green.
 
 ## Learnings
 

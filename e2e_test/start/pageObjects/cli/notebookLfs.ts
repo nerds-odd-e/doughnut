@@ -23,7 +23,7 @@ export function notebookLfs() {
       obsoletePayload: string
     ) {
       return cy
-        .request<{ oid: string; size: number; obsoleteOid?: string }>({
+        .request<{ oid: string; size: number }>({
           method: 'POST',
           url: `${e2eAppBaseUrl()}/api/testability/accept_lfs_attachment_tip_for_testability`,
           body: {
@@ -37,7 +37,6 @@ export function notebookLfs() {
           expect(response.status).to.eq(200)
           expect(response.body.oid).to.match(/^[a-f0-9]{64}$/)
           cy.wrap(response.body.oid).as('lfsTipOid')
-          cy.wrap(response.body.obsoleteOid).as('lfsObsoleteOid')
         })
     },
     uploadDownloadAndVerifyExactDigest(payload: string) {
@@ -101,25 +100,6 @@ export function notebookLfs() {
         'cliCloneDestination',
         relativePath,
         text
-      )
-    },
-    expectClonedCheckoutLfsCacheHoldsOnlyTip() {
-      return cy.get<string>('@cliCloneDestination').then((checkoutDir) =>
-        cy.get<string>('@lfsTipOid').then((tipOid) =>
-          cy.get<string>('@lfsObsoleteOid').then((obsoleteOid) =>
-            cy
-              .task<string[]>(
-                'listCliNotebookCheckoutLfsObjectOids',
-                checkoutDir
-              )
-              .then((oids) => {
-                expect(oids, 'LFS object cache oids').to.deep.equal([tipOid])
-                expect(oids, 'obsolete oid must not be cached').to.not.include(
-                  obsoleteOid
-                )
-              })
-          )
-        )
       )
     },
     expectClonedCheckoutDoesNotTrackCredentials() {

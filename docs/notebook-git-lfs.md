@@ -58,7 +58,7 @@ become part of content preservation. Delivery is incremental, under the
 
 ## Recovering a published attachment version
 
-Ordinary clone hydrates only the current tip. Previously published attachment
+Ordinary clone and `donut notebook pull` hydrate only the current tip. Previously published attachment
 bytes stay reachable from retained accepted history. Recover them with the
 standard Git LFS client (verified with Git LFS 3.7.1 against Donut's notebook
 endpoint). There is no Donut history UI or Donut-specific history command.

@@ -2,6 +2,7 @@
  * Page-object observations for publishing LFS attachments from a CLI checkout
  * and verifying accepted tip / fresh-clone size proof.
  */
+import type { CliNotebookCloneDestinationAlias } from './notebookCloneCheckoutDestination'
 import { notebookLfsHistoricalFetch } from './notebookLfsHistoricalFetch'
 import { inspectNotebookLfsAttachment } from './notebookLfsInspect'
 
@@ -11,7 +12,8 @@ export function notebookLfsPublish() {
       relativePath: string,
       byteLength: number,
       fillByteHex: string,
-      alias: string
+      alias: string,
+      noteEdit?: { relativePath: string; content: string }
     ) {
       const fillByte = Number.parseInt(fillByteHex.replace(/^0x/i, ''), 16)
       expect(fillByte, `fill byte ${fillByteHex}`).to.be.within(0, 255)
@@ -28,6 +30,7 @@ export function notebookLfsPublish() {
             relativePath,
             byteLength,
             fillByte,
+            noteEdit,
           })
           .then((result) => {
             expect(
@@ -85,26 +88,36 @@ export function notebookLfsPublish() {
         )
       )
     },
-    expectFreshCloneFileFilledBytes(
+    expectCheckoutFileFilledBytes(
+      destinationAlias: CliNotebookCloneDestinationAlias,
       relativePath: string,
       byteLength: number,
       fillByteHex: string
     ) {
       const fillByte = Number.parseInt(fillByteHex.replace(/^0x/i, ''), 16)
-      return cy.get<string>('@cliCloneFreshDestination').then((checkoutDir) =>
+      return cy.get<string>(`@${destinationAlias}`).then((checkoutDir) =>
         cy
           .task<{ length: number; firstByte: number }>(
             'readCheckoutFileFilledSummary',
             { checkoutDir, relativePath }
           )
           .then((summary) => {
-            expect(summary.length, 'fresh clone file length').to.equal(
-              byteLength
-            )
-            expect(summary.firstByte, 'fresh clone fill byte').to.equal(
-              fillByte
-            )
+            expect(summary.length, 'checkout file length').to.equal(byteLength)
+            expect(summary.firstByte, 'checkout fill byte').to.equal(fillByte)
           })
+      )
+    },
+    expectCheckoutLfsCacheHoldsOnlyTip(
+      destinationAlias: CliNotebookCloneDestinationAlias
+    ) {
+      return cy.get<string>(`@${destinationAlias}`).then((checkoutDir) =>
+        cy.get<string>('@lfsTipOid').then((tipOid) =>
+          cy
+            .task<string[]>('listCliNotebookCheckoutLfsObjectOids', checkoutDir)
+            .then((oids) => {
+              expect(oids, 'LFS object cache oids').to.deep.equal([tipOid])
+            })
+        )
       )
     },
     expectMysqlAcceptedGitContentIsTipPointer(
@@ -157,17 +170,6 @@ export function notebookLfsPublish() {
         }).then((response) => {
           expect(response.body.objectStored).to.equal(stored)
         })
-      )
-    },
-    expectFreshCloneLfsCacheHoldsOnlyTip() {
-      return cy.get<string>('@cliCloneFreshDestination').then((checkoutDir) =>
-        cy.get<string>('@lfsTipOid').then((tipOid) =>
-          cy
-            .task<string[]>('listCliNotebookCheckoutLfsObjectOids', checkoutDir)
-            .then((oids) => {
-              expect(oids, 'fresh clone LFS cache').to.deep.equal([tipOid])
-            })
-        )
       )
     },
     expectSizeProofTraffic(versionAliases: string[]) {

@@ -11,7 +11,7 @@ import {
   hexFromUtf8Text,
 } from '../../../config/spacedHexBytes'
 
-type CliNotebookCloneDestinationAlias =
+export type CliNotebookCloneDestinationAlias =
   | 'cliCloneDestination'
   | 'cliCloneReceiverDestination'
   | 'cliCloneFreshDestination'

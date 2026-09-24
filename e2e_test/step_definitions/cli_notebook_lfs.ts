@@ -84,7 +84,7 @@ Then(
 Then(
   'the cloned checkout LFS object cache holds only the tip digest for {string}',
   (_relativePath: string) => {
-    cli.notebookLfs().expectClonedCheckoutLfsCacheHoldsOnlyTip()
+    cli.notebookLfs().expectCheckoutLfsCacheHoldsOnlyTip('cliCloneDestination')
   }
 )
 
@@ -134,12 +134,50 @@ Then(
   }
 )
 
+When(
+  'I commit the LFS attachment {string} filled with {int} bytes of {string} and the following edit to {string} as {string}:',
+  (
+    relativePath: string,
+    byteLength: number,
+    fillByteHex: string,
+    noteRelativePath: string,
+    alias: string,
+    content: string
+  ) => {
+    cli
+      .notebookLfs()
+      .commitLfsFilledAttachment(relativePath, byteLength, fillByteHex, alias, {
+        relativePath: noteRelativePath,
+        content,
+      })
+  }
+)
+
 Then(
   'the fresh clone file {string} is filled with {int} bytes of {string}',
   (relativePath: string, byteLength: number, fillByteHex: string) => {
     cli
       .notebookLfs()
-      .expectFreshCloneFileFilledBytes(relativePath, byteLength, fillByteHex)
+      .expectCheckoutFileFilledBytes(
+        'cliCloneFreshDestination',
+        relativePath,
+        byteLength,
+        fillByteHex
+      )
+  }
+)
+
+Then(
+  'the cloned checkout file {string} is filled with {int} bytes of {string}',
+  (relativePath: string, byteLength: number, fillByteHex: string) => {
+    cli
+      .notebookLfs()
+      .expectCheckoutFileFilledBytes(
+        'cliCloneDestination',
+        relativePath,
+        byteLength,
+        fillByteHex
+      )
   }
 )
 
@@ -180,7 +218,9 @@ Then(
 )
 
 Then('the fresh clone LFS object cache holds only the tip digest', () => {
-  cli.notebookLfs().expectFreshCloneLfsCacheHoldsOnlyTip()
+  cli
+    .notebookLfs()
+    .expectCheckoutLfsCacheHoldsOnlyTip('cliCloneFreshDestination')
 })
 
 Then(
