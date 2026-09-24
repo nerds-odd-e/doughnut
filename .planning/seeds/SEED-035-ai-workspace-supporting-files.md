@@ -123,9 +123,11 @@ No executable plan or implementation is authorized by this seed.
   current files; reconcile a supported unpublished note edit across web changes
   without losing files or work. Failed hydration followed by equal-head retry
   completes files rather than falsely reporting unchanged success.
-- **Value now:** Completes frequent parallel local/web work. Fresh acquisition
-  remains a usable fallback, so this follows web retrieval in the queue rather
-  than automatically inheriting the old story's first place.
+- **Value now:** Completes frequent parallel local/web work. Every web change
+  to an LFS notebook currently forces a fresh clone and moving unpublished work
+  by hand, which costs more on each switch than the missing web file browser
+  costs when no checkout is at hand; the owner placed it ahead of web browsing
+  (2026-09-24).
 - **Effort hypothesis:** M (1–2 hours), low confidence pending failure/recovery
   examples. Three provisional leaves may consolidate during refinement.
 - **Depends on:** Delivered CLI publish and fresh-clone LFS acquisition. Browsing is not a technical prerequisite.
@@ -202,20 +204,65 @@ No executable plan or implementation is authorized by this seed.
 
 <a id="story-1"></a>
 
-### Browse and download local supporting files in Web Donut
+### Browse and download notebook files in Web Donut
+```json dough-story-state
+{"schemaVersion":1,"refinement":"refined","approach":"unselected"}
+```
 
 - **Identity:** SEED-035#story-1
-- **Goal:** Owners away from a checkout can find and retrieve its non-Markdown
-  supporting files without acquiring the entire repository.
-- **Evaluation:** Given accepted attachments, including nested JSON and image
-  files, browse their folder locations and download the exact accepted bytes.
-  A folder containing only attachments remains discoverable.
-- **Scope / value:** One find-and-retrieve journey for attachments regardless
-  of origin. Compliant Markdown guidance uses existing note/Readme presentation.
-  No attachment text editor, image preview, or dedicated IDE screen is promised.
-- **Effort hypothesis:** M, medium confidence assuming existing folder navigation.
-- **Depends on:** Stories 6 and 9; the promised browsing includes nested files.
-- **Safe stopping point:** Web retrieval works while file management stays local.
+- **Goal:** Anyone reading a notebook in Web Donut sees the non-Markdown files
+  it holds, where they are, and can download any of them. Today these files
+  are accepted, stored and carried through web folder operations, yet the web
+  shows none of them: a folder holding only a PDF looks empty, and a permanent
+  folder deletion removes files the owner cannot see. Visibility is the primary
+  value; downloading without a checkout (another device, no CLI) is the second.
+- **Scope:**
+  - Files appear in the notebook sidebar tree at their folder location or the
+    notebook root, alongside notes and subfolders.
+  - Selecting a file opens its attachment page showing its filename and size,
+    with a download of the exact accepted bytes under the exact filename,
+    whichever way the notebook stores them (raw Git content or Git LFS).
+  - Access follows the notebook's existing read authorization: whoever can read
+    the notebook can browse and download its files. No owner-only rule.
+  - Every non-Markdown file is an ordinary file of unknown format here, with no
+    special case: `.keep` (usually empty), `.gitattributes`, and any other
+    dot-file are listed and downloadable like the rest.
+  - Files in a trashed folder behave the same as files anywhere else.
+  - Downloads are always served as a download, never rendered inline in Donut's
+    origin, so an uploaded SVG or HTML file cannot run script in the page.
+  - If the bytes behind an accepted LFS pointer are unavailable, the download
+    fails loudly with a clear error ([ADR 0006](../../docs/adrs/0006-failure-handling-accepted.md));
+    the pointer text is never served as if it were the file.
+- **Deferred promises:** image, PDF or text preview; a file editor; upload,
+  rename, move and delete (story 2 owns delete); earlier file versions; folder
+  ZIP download (notebook export already exists); file search; showing files in
+  places other than the sidebar and attachment page.
+- **Key examples:**
+  - `physics/force.png` and `physics/data/run.json` are accepted, and `physics`
+    has one note. The sidebar under `physics` shows the note, `force.png` and a
+    `data` folder; expanding `data` shows `run.json`. Selecting `run.json` opens
+    its page; downloading gives the accepted bytes named `run.json`.
+  - `refs/` holds only `paper.pdf`. The sidebar shows `refs` with `paper.pdf`
+    inside, not an empty folder.
+  - A new LFS notebook has `diagram.png` at its root. The download returns the
+    image bytes (matching the pointer's SHA-256), not the pointer text.
+  - A subscriber to a Bazaar notebook sees and downloads its files just as they
+    read its notes; a user without read access to the notebook gets neither.
+  - `drawing.svg` is downloaded as a file; opening its download link does not
+    render it inside Donut.
+  - A root `.keep` of zero bytes and the root `.gitattributes` both appear and
+    download like any other file.
+- **Architecture note:** `.gitattributes` is preserved as reserved Git metadata
+  outside the attachment rows today ([North Star](../NORTH-STAR.md#use-standard-git-lfs-end-to-end)).
+  Browsing and downloading it leaves it unchanged, so this story does not
+  conflict; deleting it from the web (story 2) would, and needs an owner
+  decision there.
+- **Effort hypothesis:** M, medium confidence; the sidebar listing cache and
+  the two byte representations are the main unknowns.
+- **Depends on:** Delivered root and nested attachment continuity and the
+  delivered LFS content store.
+- **Safe stopping point:** Files are visible and retrievable on the web while
+  file management stays local.
 
 <a id="story-5"></a>
 
@@ -359,8 +406,8 @@ No executable plan or implementation is authorized by this seed.
 The [product backlog](../PRODUCT-BACKLOG.md) owns global order. The size boundary
 comes first because it protects accepted storage independently of the later
 architecture. Story 13 follows for prevention through an automated publish/fresh-clone
-loop. Resplit story 15 follows browsing: existing-checkout continuity strongly
-supports parallel AI work, while fresh cloning is a safe interim receive path.
+loop. Resplit story 15 precedes browsing: existing-checkout continuity is paid
+for on every local/web switch, while browsing matters only away from a checkout.
 Candidate story 14 applies the completed workflow to existing notebooks and
 should precede their image conversion when queued.
 This is delivery order, not a reason to withhold browsing from already supported
