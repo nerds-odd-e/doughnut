@@ -13,6 +13,13 @@ import {
   stubFetchForSubmission,
 } from './notebookPublish.testHelpers.js'
 
+/** Requires the calling test file to `vi.mock('node:child_process')` with a `vi.fn` spawnSync. */
+export const realSpawnSync = (
+  await vi.importActual<typeof import('node:child_process')>(
+    'node:child_process'
+  )
+).spawnSync
+
 export const LFS_ATTRIBUTES = `* filter=lfs diff=lfs merge=lfs -text
 *.md !filter !diff !merge text
 .gitattributes !filter !diff !merge text

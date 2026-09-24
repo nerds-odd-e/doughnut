@@ -51,19 +51,19 @@ function attachmentBlobIds(
   commitId: string
 ): Map<string, string> {
   const raw = runSystemGitOrThrow(
-    ['-C', directory, 'ls-tree', '-r', commitId],
+    ['-C', directory, 'ls-tree', '-r', '-z', commitId],
     (detail, status) =>
       `failed to list tree at ${commitId}${
         detail ? `: ${detail}` : ` (exit code ${status})`
       }`
   )
   const blobs = new Map<string, string>()
-  for (const line of raw.split('\n')) {
-    if (line === '') continue
-    const tab = line.indexOf('\t')
+  for (const entry of raw.split('\0')) {
+    if (entry === '') continue
+    const tab = entry.indexOf('\t')
     if (tab < 0) continue
-    const meta = line.slice(0, tab)
-    const filePath = line.slice(tab + 1)
+    const meta = entry.slice(0, tab)
+    const filePath = entry.slice(tab + 1)
     if (!isAttachment(filePath)) continue
     const parts = meta.split(' ')
     if (parts.length < 3 || parts[1] !== 'blob') continue

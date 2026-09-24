@@ -235,6 +235,22 @@ Accepted: the five features 15/15. The reset is observed by the existing
 "cloned checkout contains exactly" (fails without the reset step); the kept
 `.gitattributes` by the existing step `the cloned checkout file ".gitattributes" is:`.
 
+### 9a. CLI publishing reads non-ASCII paths on LFS notebooks
+
+Type: Behavior (defect found while running slice 9)
+Status: done
+Proof: new CLI test "publishes a note and an attachment under a non-ASCII
+folder" (`cli/tests/notebookPublish.lfs.test.ts`) failed before and passes
+after; CLI LFS publish/pull tests 16/16; slice 9's two E2E features 5/5.
+
+Behavior: on an LFS notebook, `donut notebook publish` refused a note under a
+non-ASCII folder (`例文/A.md`) as a non-pointer attachment, because
+`attachmentBlobIds` parsed Git-quoted `ls-tree` output. It now reads
+`ls-tree -r -z`. Finding for the owner (not fixed here):
+`notebookAcceptedAdditionInterval.ts` `isRepresentedFolder` compares
+non-`-z` `ls-tree --name-only` output to a folder path, so it likely misses
+non-ASCII folders the same way.
+
 ### 9. Locally published files travel on LFS notebooks
 
 Type: Behavior

@@ -10,6 +10,7 @@ import {
   OID_A,
   OID_B,
   commitPointerAttachment,
+  realSpawnSync,
 } from './notebookPublish.lfs.testHelpers.js'
 import {
   buildSourceRepo,
@@ -24,7 +25,6 @@ import {
   filled,
   interceptGitLfs,
   lfsCheckout,
-  realSpawnSync,
 } from './notebookPull.lfs.testHelpers.js'
 
 vi.mock('node:child_process', async () => {

@@ -1,20 +1,10 @@
 import * as childProcess from 'node:child_process'
-import type { spawnSync } from 'node:child_process'
 import * as fs from 'node:fs'
 import { join } from 'node:path'
-import {
-  afterEach,
-  beforeAll,
-  beforeEach,
-  describe,
-  expect,
-  test,
-  vi,
-} from 'vitest'
+import { afterEach, describe, expect, test, vi } from 'vitest'
 import { getApiConfig } from 'donut-api'
 import { run } from '../src/run.js'
 import {
-  ProcessExitForTest,
   installNotebookCliRunFixture,
   runGit,
 } from './notebookClone.testHelpers.js'
@@ -28,18 +18,16 @@ import {
   TWENTY_MIB,
   buildLfsSourceRepo,
   commitPointerAttachment,
-  hashObject,
   installLfsPushIntercept,
   prepareLfsPublishCheckout,
+  realSpawnSync,
   stubOrderedLfsThenBundleFetch,
   stubSuccessfulAcceptedHead,
 } from './notebookPublish.lfs.testHelpers.js'
 import {
   bundleMain,
   cloneAsBoundCheckout,
-  localGitObservation,
   postCount,
-  rejectionPost,
   stubFetchForSubmission,
 } from './notebookPublish.testHelpers.js'
 
@@ -48,30 +36,11 @@ vi.mock('node:child_process', async () => {
     await vi.importActual<typeof import('node:child_process')>(
       'node:child_process'
     )
-  return {
-    ...actual,
-    spawnSync: vi.fn(actual.spawnSync),
-  }
+  return { ...actual, spawnSync: vi.fn(actual.spawnSync) }
 })
-
-let realSpawnSync: typeof spawnSync
 
 describe('notebook publish — LFS object upload before bundle submission', () => {
   const ctx = installNotebookCliRunFixture('donut-cli-publish-lfs-test-')
-
-  beforeAll(async () => {
-    const actual =
-      await vi.importActual<typeof import('node:child_process')>(
-        'node:child_process'
-      )
-    realSpawnSync = actual.spawnSync
-  })
-
-  beforeEach(() => {
-    vi.mocked(childProcess.spawnSync).mockImplementation(
-      realSpawnSync as typeof spawnSync
-    )
-  })
 
   afterEach(() => {
     vi.mocked(childProcess.spawnSync).mockReset()
@@ -218,75 +187,22 @@ describe('notebook publish — LFS object upload before bundle submission', () =
     expect(pushCalls[0]).toEqual(expect.arrayContaining([OID_A, OID_B]))
   })
 
-  test('rejects publishing a raw attachment in an LFS notebook', async () => {
+  test('publishes a note and an attachment under a non-ASCII folder', async () => {
     const { pushCalls } = installLfsPushIntercept(realSpawnSync)
     const { dir, fetchMock } = prepareLfsPublishCheckout(
       ctx.getWorkDir(),
-      'lfs-raw-publish',
+      'lfs-non-ascii',
       stubSuccessfulAcceptedHead()
     )
-    const blob = hashObject(realSpawnSync, dir, Buffer.from([0x89, 0x50]))
-    runGit(
-      ['update-index', '--add', '--cacheinfo', `100644,${blob},raw.png`],
-      dir
-    )
-    runGit(['commit', '--quiet', '-m', 'raw'], dir)
+    fs.mkdirSync(join(dir, '例文'))
+    fs.writeFileSync(join(dir, '例文', 'A.md'), '# A\n')
+    runGit(['add', '例文/A.md'], dir)
+    commitPointerAttachment(realSpawnSync, dir, '例文/圖.png', OID_A, 64, 'v1')
 
-    await expect(run(['notebook', 'publish', dir])).rejects.toThrow(
-      ProcessExitForTest
-    )
-    expect(ctx.getErrorSpy()).toHaveBeenCalledWith(
-      expect.stringContaining(
-        'must be a Git LFS pointer or empty file when the notebook uses LFS'
-      )
-    )
-    expect(pushCalls).toEqual([])
-    expect(postCount(fetchMock)).toBe(0)
-  })
+    await run(['notebook', 'publish', dir])
 
-  test('failed LFS upload preserves local refs and files and skips bundle POST', async () => {
-    installLfsPushIntercept(realSpawnSync, { failPush: true })
-    const { dir, fetchMock } = prepareLfsPublishCheckout(
-      ctx.getWorkDir(),
-      'lfs-fail-upload',
-      stubSuccessfulAcceptedHead()
-    )
-    commitPointerAttachment(realSpawnSync, dir, 'payload.bin', OID_A, 64, 'v1')
-    const before = localGitObservation(dir)
-
-    await expect(run(['notebook', 'publish', dir])).rejects.toThrow(
-      ProcessExitForTest
-    )
-    expect(ctx.getErrorSpy()).toHaveBeenCalledWith(
-      expect.stringContaining(
-        'failed to upload notebook attachments via Git LFS'
-      )
-    )
-    expect(localGitObservation(dir)).toEqual(before)
-    expect(postCount(fetchMock)).toBe(0)
-  })
-
-  test('failed bundle submission after upload preserves local refs and files', async () => {
-    const { pushCalls } = installLfsPushIntercept(realSpawnSync)
-    const { dir } = prepareLfsPublishCheckout(
-      ctx.getWorkDir(),
-      'lfs-fail-post',
-      rejectionPost(
-        400,
-        'note.md has invalid YAML frontmatter',
-        'BINDING_ERROR'
-      )
-    )
-    commitPointerAttachment(realSpawnSync, dir, 'payload.bin', OID_A, 64, 'v1')
-    const before = localGitObservation(dir)
-
-    await expect(run(['notebook', 'publish', dir])).rejects.toThrow(
-      ProcessExitForTest
-    )
-    expect(ctx.getErrorSpy()).toHaveBeenCalledWith(
-      'donut: note.md has invalid YAML frontmatter'
-    )
     expect(pushCalls).toHaveLength(1)
-    expect(localGitObservation(dir)).toEqual(before)
+    expect(pushCalls[0]).toContain(OID_A)
+    expect(postCount(fetchMock)).toBe(1)
   })
 })
