@@ -10,8 +10,6 @@ and deletable in Web Donut.
 
 ## Taken
 
-- [Keep Markdown image embeds when a note is edited on the web](seeds/SEED-035-ai-workspace-supporting-files.md#story-16) — SEED-035#story-16
-
 ## Backlog list
 
 - [See locally added image files in Web Donut notes](seeds/SEED-035-ai-workspace-supporting-files.md#story-3) — SEED-035#story-3

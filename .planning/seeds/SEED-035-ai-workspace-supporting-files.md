@@ -233,40 +233,6 @@ No executable plan or implementation is authorized by this seed.
   note's notebook; conversion must keep that read rule for legacy rows that
   remain.
 
-<a id="story-16"></a>
-
-### Keep Markdown image embeds when a note is edited on the web
-```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"planless","assessment":"ready","reasons":[],"basis":{"document":"39e95f678642e099ac37d32b490323fe84c7ca2d63d55cea0f6d072ecc6929e6"}}
-```
-
-- **Identity:** SEED-035#story-16
-- **Kind:** Bug, queued first priority by the owner (2026-09-24).
-- **Goal:** An owner who embeds a picture in a note body locally
-  (`![](force-diagram.png)`) does not lose that line because the note was later
-  edited in Web Donut's rich editor and then pulled.
-- **Expected:** A web edit changes only what the user changed; other authored
-  body content, including image embeds, survives the save.
-- **Actual (2026-09-24):** The body is shown in Quill, whose allowed formats
-  (`frontend/src/components/form/QuillEditor.vue`) exclude `image`, so the
-  `<img>` produced by `marked` is dropped. The first rich-mode edit rebuilds the
-  whole body from Quill HTML (`RichMarkdownEditor.vue` `htmlValueUpdated`), so
-  `![...](...)` is removed and published; `pull` then deletes it locally.
-  Viewing alone writes nothing, and Markdown (textarea) mode keeps text verbatim.
-  Applies to any body image, including remote URLs.
-- **Scope:** Preserve the embed through a rich-mode edit. Showing the picture
-  is not promised here (story 3 covers frontmatter `image:` only; body image
-  display needs its own story), so a preserved but invisible embed is acceptable.
-- **Key examples:**
-  1. Body `Intro\n\n![force](force-diagram.png)\n\nMore` → the owner edits
-     "More" to "More text" on the web → the saved body still contains
-     `![force](force-diagram.png)` in the same place.
-  2. A note without images saves exactly as before.
-- **Effort hypothesis:** S–M, low confidence until the editor round trip is
-  inspected; route through dough-bug-fixing.
-- **Depends on:** none.
-- **Safe stopping point:** Authored embeds are no longer lost; display unchanged.
-
 <a id="story-3"></a>
 
 ### See locally added image files in Web Donut notes
@@ -293,8 +259,7 @@ No executable plan or implementation is authorized by this seed.
 - **Deferred promises (not built or verified here):**
   - Markdown body images (`![](force-diagram.png)`). They are the natural IDE
     form, but showing them is new display behavior in the editor; it needs its
-    own story. The bug that deletes them on a web edit is
-    [story 16](#story-16), queued first.
+    own story. A web edit already keeps them in the body.
   - SVG inline display: an SVG opened directly can run scripts.
   - Paths starting with `/` (easily confused with legacy
     `/attachments/images/` paths), paths leaving the notebook, and remote URLs.
