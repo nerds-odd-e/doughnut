@@ -12,10 +12,13 @@ and deletable in Web Donut.
 
 ## Backlog list
 
+- [Store existing notebooks' files through LFS like new notebooks](seeds/SEED-035-ai-workspace-supporting-files.md#story-14) — SEED-035#story-14
+- [Remove the legacy raw file storage](seeds/SEED-035-ai-workspace-supporting-files.md#story-19) — SEED-035#story-19
 - [Use newly web-uploaded note images from a local checkout](seeds/SEED-035-ai-workspace-supporting-files.md#story-4) — SEED-035#story-4
-- [Access existing note images as notebook folder files](seeds/SEED-035-ai-workspace-supporting-files.md#story-5) — SEED-035#story-5
+- [Move existing uploaded note pictures into their notebooks](seeds/SEED-035-ai-workspace-supporting-files.md#story-5) — SEED-035#story-5
+- [Keep a Book's source file as an ordinary notebook file](seeds/SEED-035-ai-workspace-supporting-files.md#story-17) — SEED-035#story-17
+- [Remove the legacy picture and Book storage](seeds/SEED-035-ai-workspace-supporting-files.md#story-18) — SEED-035#story-18
 - [Delete unwanted supporting files from Web Donut](seeds/SEED-035-ai-workspace-supporting-files.md#story-2) — SEED-035#story-2
 - [Dissolve and merge folders that contain files](seeds/SEED-035-ai-workspace-supporting-files.md#story-11) — SEED-035#story-11
 - [Carry a folder's files along when it moves to another notebook](seeds/SEED-035-ai-workspace-supporting-files.md#story-10) — SEED-035#story-10
-- [Skip common AI guidance folders during assimilation](seeds/SEED-035-ai-workspace-supporting-files.md#story-8) — SEED-035#story-8
 - [Use conversations and memory-tracker review without embedding the full note page](seeds/SEED-033-simplify-note-presentation.md#story-2) — SEED-033#story-2

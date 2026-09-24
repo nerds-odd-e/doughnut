@@ -5,8 +5,9 @@
 Model notebook content directly: folders contain notes, attachments, and child
 folders; the notebook root can contain the same content. Notes retain their
 learning identities. Attachments own named file content independently of note
-references; images add presentation to that same attachment model. Share folder
-placement without forcing these concepts into a universal file entity.
+references; images add presentation to that same attachment model, and a Book
+adds private reading structure to it. Share folder placement without forcing
+these concepts into a universal file entity.
 See the [domain vocabulary](../docs/adrs/0001-ubiquitous-language.md#notebook--note-structure).
 
 ## One format boundary
@@ -30,79 +31,111 @@ attachment store of truth or synchronization path.
 See [ADR 0002](../docs/adrs/0002-git-native-portable-notebook-synchronization-accepted.md)
 and [domain operation ownership](../docs/notebook-git-synchronization.md#domain-operation-ownership).
 
-## Attachment storage transition
+## One attachment content model
 
-[Git LFS attachment storage](../docs/notebook-git-lfs.md) details the accepted
-contract under ADRs 0002 and 0004. The direction below stages its implementation;
-acceptance of the architecture does not imply that these capabilities are delivered.
+This governs every attachment story: LFS conversion, web picture upload,
+picture migration, Books, legacy retirement, and the later browsing, deletion
+and folder operations. [Git LFS attachment storage](../docs/notebook-git-lfs.md)
+holds the accepted details under ADRs 0002 and 0004; this section decides how
+the remaining work grows. Acceptance of the architecture does not mean the
+capabilities are delivered.
 
-### Use standard Git LFS end to end
+### One store for file bytes
 
-Require the standard client for local attachment work. Reuse its filters,
-object cache, and transfer protocol rather than writing Donut equivalents.
-Keep the existing Donut CLI and Git-bundle transport: bundle creation does not
-run Git's pre-push hook, so publish must explicitly upload required LFS objects
-before submitting commits. Acquisition configures an authenticated notebook LFS
-endpoint in local Git configuration before hydrating the selected checkout;
-pull and local rebase use the same LFS configuration. A hydration failure is
-reported as incomplete acquisition with a retry path, never success with a
-pointer masquerading as an image. Direct Git hosting is not a prerequisite.
+Every non-Markdown file of a notebook is one Attachment: a row placed in a
+folder whose bytes are one immutable Git LFS object in the notebook's private
+GCS content store, keyed by SHA-256 and verified for size and digest when
+stored. Git holds only the pointer; accepted history selects exact versions.
+This holds whether the file was published locally, uploaded on the web, or is
+a Book's source. When the moves below are complete, no other byte store remains:
+the `image` table, `attachment_blob`, and the separate Book storage retire.
 
-Expose the standard LFS Batch/Basic API through Donut's existing authorization.
-Start with authenticated transfers streamed through the backend into private
-GCS, checking byte counts and SHA-256 on upload. This keeps verification and
-access in one place; signed direct transfers can follow measured need. Use
-notebook-scoped object keys containing the digest, avoiding cross-notebook
-deduplication and its authorization/lifetime bookkeeping initially. Web reads,
-LFS transfers, and accepted projections refer to the same immutable content.
-Reuse the existing GCS integration where suitable; Book ownership and deletion
-remain distinct from attachment history retention.
+Roles refer to an Attachment and never own bytes:
 
-Treat `.gitattributes` as reserved Git metadata and preserve it across web
-changes. It tracks non-Markdown attachments through LFS, exempts Markdown and
-Git metadata, and preserves structural markers and standard empty-file behavior.
-Server validation owns admission even if a client's filters are absent or its
-attributes are overridden. Do not trust a small pointer's declared size without
-checking the referenced bytes, or silently transform raw blobs on acceptance.
-Endpoint and credential configuration stay outside authored content.
+- A note's picture is the authored `image:` value, a path relative to the
+  note's folder; `image_mask:` stays presentation on the note.
+- A Book is private reading structure (layout, blocks, reading progress) over
+  one source Attachment. Like learning history, it stays server-side.
+- Attachment references are not semantic Wiki links
+  ([ADR 0005](../docs/adrs/0005-web-routes-accepted.md)).
 
-### Deliver usable increments
+### Every notebook uses LFS
 
-1. Story 12 applies the attachment size boundary through current ingress paths.
-   The initial limit is 10 MiB (10,485,760 bytes), inclusive. Apply it to new
-   payloads throughout submitted history; retain already accepted oversized
-   content without allowing it to bypass the rule for new content. Books keep
-   their separate limits. Aggregate quotas remain outside this increment.
-2. New notebooks use LFS. Owners publish with the Donut CLI and receive web or
-   remote changes into the same checkout with `donut notebook pull`: it rebases
-   linear unpublished commits (local merge commits are refused) and, for LFS
-   checkouts, then fills in current attachment files. Bundle growth and object
-   traffic stay separate measurements. Note-only web saves must neither load
-   unchanged payloads nor contact GCS to rewrite them. Preserve every
-   successfully published snapshot, but allow new oversized payloads found only
-   in unpublished intermediate LFS commits to remain unavailable when the tip is
-   valid. This enables correction by a later commit. Keep within-limit
-   intermediate content and previously accepted payloads. Story 12 stays strict
-   while attachments remain raw Git blobs.
-3. Story 14 transitions existing notebooks without rewriting their accepted
-   history or losing file access. Keep the legacy representation readable during
-   rollout; once converted, require pointers for newly introduced attachments.
-   Move legacy Git attachment payload storage to GCS while retaining their
-   original Git object IDs and bytes for historical bundle reconstruction.
-   Remove database payload copies only after verification and durable switch.
-4. Existing browsing, image-authoring/migration, and deletion stories consume
-   this common attachment content. Their user outcomes remain separate. Old
-   uploaded images join it through story 5; a PDF file does not become a Book.
+There is one representation, so no code asks how a notebook stores its files.
+Notebooks created before LFS reach it through one forward conversion commit
+that adds `.gitattributes` and replaces each current file with its pointer.
+After all notebooks are converted, the per-notebook representation marker and
+the raw-Git paths are removed. Bytes already in raw accepted history stay
+readable where they are, in the accepted Git object store; they are neither
+moved nor rewritten. No rollout resets history or changes accepted commit IDs,
+so existing local checkouts keep working with `donut notebook pull`.
 
-Each transition keeps one authoritative accepted version. Legacy current-tree
-writes end at conversion; historical raw blobs remain readable for as long as
-their commits are retained. There are no permanent duplicate payload writes.
-Never delete an object merely because its current attachment row disappeared.
-Defer automatic object garbage collection initially; retained-history references
-and pending uploads must be understood before reclamation is enabled.
+### One way in
 
-Converting the current tree cannot shrink an existing full-history bundle's
-legacy binary portion. Moving those bytes to GCS reduces MySQL storage only.
-New LFS history avoids adding that cost; already-large full-clone downloads need
-a separate owner decision about history rewriting or reduced-history transport.
-No rollout step silently resets a notebook or changes accepted commit IDs.
+- Every addition of file bytes — local publish, web upload, Book attach,
+  conversion, migration — stores the verified object first, then accepts the
+  pointer together with the references that use it in one accepted change,
+  through the existing domain-operation and publication owners.
+- A web action that adds a file for a role writes the file and its reference
+  (for example `image:` or the Book's source) in the same accepted change.
+  It never leaves an unreferenced intermediate commit.
+- Changes Donut makes on its own (conversion, migration) are ordinary forward
+  commits by the Donut System identity. Owners receive them with
+  `donut notebook pull`, which rebases their unpublished local commits.
+- When Donut chooses a filename itself, it takes a free name in the target
+  folder rather than overwriting or refusing, because it writes the only
+  reference at the same moment. Operations that move files the user placed keep
+  the refuse-on-clash rule.
+- New payloads are limited to 10 MiB (10,485,760 bytes), inclusive. A Book's
+  source file is the one exception and keeps the Book upload limit (currently
+  100 MB). Content already accepted is never judged again.
+- Web saves that change only notes neither load unchanged file bytes nor
+  contact GCS.
+
+### One way out
+
+One reader (`NotebookAttachmentFile`) serves the file download, note pictures,
+and Book reading, under the notebook read rule. Clone and pull fill in every
+current attachment. "Available in a local checkout" is therefore a property of
+the model, and each story proves it with a pull rather than building it.
+
+### Standard Git LFS end to end
+
+Require the standard client for local attachment work and reuse its filters,
+object cache, and transfer protocol. Keep the Donut CLI and Git-bundle
+transport: publish uploads required LFS objects before submitting commits,
+because bundle creation does not run Git's pre-push hook. Acquisition configures
+the authenticated notebook LFS endpoint before filling in the checkout; a
+failure is reported as incomplete acquisition with a retry path, never as
+success with a pointer in place of the file. Transfers stream through the
+backend's authorization into private GCS under notebook-scoped keys; no
+cross-notebook deduplication. `.gitattributes` is reserved Git metadata,
+preserved across web changes; server validation owns admission even when a
+client's filters are missing or overridden.
+
+### Moving and retiring
+
+- Moves run per notebook, resume after interruption, and skip content already
+  moved, so running them again is safe.
+- Keep the old copy until the new one is accepted and verified. Delete old
+  stores and their code in a later release, after the move is confirmed in
+  production — never in the release that moves the bytes.
+- Never delete an object because its current attachment row disappeared.
+  Automatic object garbage collection stays deferred until retained history
+  and pending uploads are understood.
+
+### Order
+
+The [product backlog](PRODUCT-BACKLOG.md) owns global order. Within this model:
+
+1. Convert every notebook to LFS first, so each later write path has one
+   representation.
+2. Web picture uploads become attachments, so no new legacy pictures appear.
+3. Existing uploaded pictures move into their notebooks.
+4. Book source files become attachments, for new and existing Books.
+5. Retire the legacy picture and Book storage and their code.
+
+Browsing, deletion and folder operations consume the same model; a PDF file
+does not become a Book by itself. Conversion stops old notebooks' bundles from
+growing with new files but cannot shrink what their history already holds;
+shrinking that would need a separate decision about rewriting history.

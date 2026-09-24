@@ -19,13 +19,10 @@ The owner clarified that there is no special Markdown category for IDE guidance.
 `AGENTS.md`, `SKILL.md`, and other Markdown use ordinary note/Readme behavior.
 Invalid Markdown remains a publication error. Existing web-save normalization,
 reserved Readme behavior, and valid unknown concept types remain unchanged.
-AI guidance can use ordinary note refinement without special treatment. A
-separate selected story will identify common guidance folders and skip their
-contents during assimilation; its exact folder/ignore policy awaits refinement.
+AI guidance can use ordinary note refinement without special treatment.
 Private learning history stays server-side and remains associated with notes.
 
-The benefit is less manual copying between local authoring and web use, and
-keeping guidance out of study sessions. No time-saving or learning-improvement
+The benefit is less manual copying between local authoring and web use. No time-saving or learning-improvement
 measurements were supplied.
 The priority remains a value hypothesis, not proof that all users need the same
 workflow. Compliant Markdown guidance already has the ordinary note path;
@@ -40,9 +37,8 @@ non-Markdown acceptance is the remaining file-support gap selected here.
   maintain the supporting context separately.
 - **Add a special Markdown attachment classifier:** rejected by owner direction.
   Purpose, IDE name, and file history do not exempt Markdown from current rules.
-- **Recommended:** retain the cohesive Markdown behavior, add non-Markdown
-  attachment continuity, and separate folder-based assimilation selection from
-  note format and refinement.
+- **Recommended:** retain the cohesive Markdown behavior and add non-Markdown
+  attachment continuity.
   Then deliver web retrieval and visual-authoring journeys through one file model.
 
 The strongest workaround is a separate repository plus manual image downloads.
@@ -78,18 +74,17 @@ those files with the notebook, not because later stories need infrastructure.
 The [North Star](../NORTH-STAR.md) owns the concise direction and the
 [synchronization contract](../../docs/notebook-git-synchronization.md#attachments-in-the-portable-tree)
 owns details. Ordinary local rebase reconciles unpublished work against the
-latest accepted history; the remote never merges or rebases. Story 8 owns the
-selected folder-based assimilation outcome; its detailed behavior is not decided here.
+latest accepted history; the remote never merges or rebases.
 
 The accepted [Git LFS storage contract](../../docs/notebook-git-lfs.md), linked
 from ADRs 0002 and 0004, specifies standard Git LFS, its client and protocol, and
 immutable GCS payloads; accepted Git pointers select exact file versions. The
-[North Star](../NORTH-STAR.md#attachment-storage-transition) owns initial
-transport, size-policy, and rollout choices. Architecture acceptance does not
-mean implementation is complete. Stories 13 and 14 separate new
-notebook adoption from migration; browsing and image behavior keep their own
-outcomes. Accepted history is preserved, so old binaries remain in historical
-bundles even after their physical storage moves out of MySQL.
+North Star's [one attachment content model](../NORTH-STAR.md#one-attachment-content-model)
+governs every remaining story here: one byte store, every notebook on LFS, one
+way in and one way out, roles (note picture, Book) that refer to Attachments,
+and moving before retiring. Architecture acceptance does not mean
+implementation is complete. Accepted history is preserved, so old binaries stay
+in historical bundles.
 
 ## Story Decomposition
 
@@ -102,162 +97,232 @@ No executable plan or implementation is authorized by this seed.
 
 <a id="story-14"></a>
 
-### Move existing notebook attachments out of MySQL while preserving access and history
+### Store existing notebooks' files through LFS like new notebooks
+```json dough-story-state
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../quick/025-convert-raw-notebooks-to-lfs/PLAN.md","assessment":"not-ready","reasons":["Slice 3 relies on an unobserved CLI path (fast-forward with LFS smudge skipped, then fill-in); if pull fails a CLI change is needed and slicing must be revisited."],"basis":{"document":"e3aad3a6310fc6c4af8bfd22f40118c823193d089117d21bc0ca045c30534202","plan":"ba4918b8ea26a5b51676e47700345ef1bf3c2b21f26ccc9ea55d94524a7f0545"}}
+```
+
+- **Identity:** SEED-035#story-14
+- **Slice plan:** [Store existing notebooks' files through LFS](../quick/025-convert-raw-notebooks-to-lfs/PLAN.md)
+- **Goal:** Owners of notebooks created before LFS get the same file behaviour
+  as new notebooks, without re-cloning or losing history: current files are
+  stored in GCS, a newly added file publishes as an LFS pointer, and the
+  notebook's bundle no longer grows with each binary version. Once production
+  shows no raw notebook left, story 19 can remove the second representation.
+- **Scope (refined 2026-09-24; owner decision: forward conversion, option A):**
+  - After the application starts, Donut converts every notebook whose binding
+    is still raw, one notebook per transaction. Each conversion is one forward
+    commit by the Donut System identity. It adds `.gitattributes` with the
+    standard content that new notebooks get, and replaces each current
+    non-empty file with its LFS pointer. Each file's bytes are stored in the
+    notebook's GCS content store before the commit is accepted. The attachment
+    rows then hold the pointers, and the binding becomes LFS.
+  - Notebooks that are already LFS are left alone, so running the conversion
+    again changes nothing. An interruption resumes with the notebooks still
+    raw. A failure on one notebook is logged with its id; the other notebooks
+    still convert and the application keeps running (ADR 0006: the catch keeps
+    the business outcome for the rest).
+  - Every existing binding is converted, including those of notebooks in the
+    trash, because the representation must become uniform.
+  - History is not rewritten. Raw bytes in earlier commits stay where they are
+    in the accepted Git object store, and full-history bundles still contain
+    them.
+  - The CLI needs no change. A pull that receives `.gitattributes` configures
+    LFS and fills in the current files, as for new notebooks. Standard Git LFS
+    is required, as it already is for new notebooks.
+- **Key examples:**
+  1. A raw notebook has `physics/diagram.png` (an earlier version is in history)
+     and `refs/paper.pdf`. After conversion, the accepted head has one new commit
+     whose parent is the previous head. It adds `.gitattributes`, and both files
+     are pointers. The web download of each file returns identical bytes. The
+     earlier commit IDs are unchanged, and the earlier `diagram.png` bytes are
+     still in that commit.
+  2. A raw notebook without files → the conversion commit adds only
+     `.gitattributes`.
+  3. An owner has a clean clone of the notebook in example 1. `donut notebook
+     pull` fast-forwards: the files have identical bytes and `.gitattributes`
+     is present. A picture then added locally is published, and its web
+     download returns its bytes.
+  4. Running the conversion again, or on an LFS notebook, creates no commit.
+- **Boundaries (existing behaviour, not new work):**
+  - A checkout without Git LFS: the pull fast-forwards, then reports that Git
+    LFS is required; after installing it, the next pull fills in the files.
+  - An unpublished local commit that added a raw file before the conversion:
+    after the rebase, publishing it is refused with the existing "must be a Git
+    LFS pointer" message, and the owner re-adds the file.
+  - A raw notebook whose accepted `.gitattributes` was published by the owner:
+    the conversion replaces it with the standard content; the earlier version
+    stays in history. None is expected in production.
+- **Deferred promises:** Removing the marker and the raw code paths (story 19);
+  moving old-history bytes out of MySQL (dropped); shrinking bundles; any web
+  display of the conversion.
+- **Effort hypothesis:** M, medium confidence after refinement.
+- **Safe stopping point:** Converted and unconverted notebooks both stay
+  readable and publishable, because the raw paths remain until story 19.
+
+<a id="story-19"></a>
+
+### Remove the legacy raw file storage
 ```json dough-story-state
 {"schemaVersion":1,"refinement":"not-refined","approach":"unselected"}
 ```
 
-- **Identity:** SEED-035#story-14
-- **Goal:** Existing notebook owners retain their files, local workflow, and
-  history while operators remove attachment payloads from MySQL and stop new
-  binary versions enlarging their Git bundles.
-- **Evaluation:** Convert a notebook with several historical versions of a PDF
-  and image. Current files hydrate with identical bytes, existing web access
-  still works, and all earlier commit IDs and historical file bytes remain
-  retrievable. A subsequent file update adds a pointer to Git and bytes to GCS;
-  no current or historical attachment payload copy remains in MySQL.
-- **Scope / value:** Migrate generic attachments by forward conversion of the
-  current tree, keep old raw Git blobs readable from GCS under their original
-  Git object IDs, and verify copies before removing database payloads. Handle
-  interruption and existing local checkouts without losing unpublished work.
-  Do not rewrite accepted commits or promise that their full bundles shrink.
-  Legacy uploaded-image conversion remains story 5's separate outcome.
-- **Depends on:** Stories 13 and 15 for storage and existing-checkout continuity.
-- **Effort hypothesis:** L, low confidence until fleet size, migration recovery,
-  and historical storage access are understood; resplit if larger than L.
-- **Safe stopping point:** Converted notebooks use one LFS write model;
-  unconverted notebooks and historical commits remain readable throughout the
-  transition. Retain the only accessible copy until verified replacement exists.
-- **Refinement remaining:** Confirm migration batching, rollback/retry proof,
-  verification of grandfathered files against accepted bytes (never a client
-  exemption), and stale-checkout upgrade examples. This is
-  an unqueued migration candidate; the backlog still contains the two selected
-  size-limit and new-notebook stories.
-
-<a id="story-8"></a>
-
-### Skip common AI guidance folders during assimilation
-
-- **Identity:** SEED-035#story-8
-- **Goal:** Learners can keep AI guidance in their notebook without that guidance
-  being offered in the assimilation sequence simply because it is Markdown.
-- **Scope direction:** Identify the most common AI guidance folders and skip
-  their contents during assimilation. The owner explicitly defers how: ignoring
-  an entire folder is one possibility, not a chosen implementation or policy.
-  Guidance remains ordinary Markdown and can be refined normally.
-- **Evaluation:** A notebook contains guidance in a recognized folder alongside
-  ordinary study notes. During assimilation, guidance from that folder is skipped
-  and the ordinary eligible study notes remain available.
-- **Value / why now:** Protects the learner's attention as local IDE material
-  joins the notebook. The [product backlog](../PRODUCT-BACKLOG.md) owns its
-  position; an earlier explicit second place was superseded there.
-- **Effort hypothesis:** M, low confidence until folder identification and the
-  intended meaning of ignoring/skipping are refined.
-- **Depends on:** No attachment story; compliant Markdown already uses the
-  existing notebook path.
-- **Safe stopping point:** Learners can retain AI guidance while continuing
-  ordinary assimilation. This story does not require special refinement behavior
-  or silently deleting authored content or learning history.
-- **Open decisions for refinement:** Which folder conventions are common enough
-  to recognize? How do nesting, user control, and already-assimilated content
-  behave? Is the exclusion limited to assimilation, or does the owner intend a
-  broader folder-ignore rule? Decide those boundaries before planning; do not
-  turn examples into a fixed IDE list or choose an ignore mechanism now.
+- **Identity:** SEED-035#story-19
+- **Goal:** Maintainers keep one notebook file representation: after story 14
+  has converted every notebook in production, the representation marker, the
+  raw-Git branches, and the tests and E2E fixtures that demote notebooks to raw
+  are removed.
+- **Evaluation:** With no raw binding left in production, the size check on
+  publish, the file reader, and binding creation (including the lazily created
+  binding on history reset) have a single LFS path. The
+  `attachment_representation` column is dropped by a migration that refuses
+  while any raw binding remains. Backend Git fixtures and the E2E scenarios
+  that used "legacy raw Git attachment storage" run on product LFS notebooks.
+- **Scope / value:** Removes code and fixture steps; no new behaviour. It is a
+  release after story 14, once production confirms zero raw bindings.
+- **Depends on:** Story 14 delivered and confirmed in production.
+- **Effort hypothesis:** M–L, low confidence: most backend Git fixtures and
+  about 24 E2E scenario steps demote to raw today; resplit if the fixture move
+  exceeds L.
+- **Safe stopping point:** Until it runs, the unused raw paths remain harmless.
 
 <a id="story-5"></a>
 
-### Access existing note images as notebook folder files
+### Move existing uploaded note pictures into their notebooks
 ```json dough-story-state
 {"schemaVersion":1,"refinement":"not-refined","approach":"unselected"}
 ```
 
 - **Identity:** SEED-035#story-5
-- **Goal:** Existing notebook owners use accumulated visual knowledge locally
-  without downloading and reattaching each image manually.
-- **Evaluation:** Acquire a notebook with existing uploaded note images: their
-  referenced bytes are ordinary folder files usable with the notes locally,
-  while existing web display and note learning identities remain intact.
-- **Scope / value:** Existing notebook-owned uploaded images gain the common
-  attachment behavior, benefiting current content immediately. Represent the
-  transition as new accepted content without rewriting history. Remote image
-  URLs and Books are not implicitly copied or converted.
-- **Effort hypothesis:** L, low confidence until ownership/sharing/reference
-  cases are understood; do not presume a fleet conversion fits this estimate.
-- **Depends on:** A converted `image:` uses the note-relative spelling Web
-  Donut already displays
-  ([attachment references](../../docs/notebook-git-attachments.md#classification-and-references));
-  story 4 stops new uploads recreating legacy images. Converting before it
-  repeats or pre-empts its work.
-- **Safe stopping point:** Existing images work locally and on the web even if
-  later image-authoring flows are deferred. Preserve the only accessible copy
-  throughout transition; avoid a separate permanent image-file model.
-
-#### Interim refinement (2026-09-24, not yet refined)
-
-- **Current state:** An uploaded image is an `image` row owned by exactly one
+- **Goal:** Owners use their accumulated pictures in a local checkout without
+  downloading and reattaching each one. Every picture then lives in the one
+  attachment model, which allows the legacy picture storage to be removed
+  (story 18).
+- **Evaluation:** A notebook has notes with web-uploaded pictures
+  (`image: /attachments/images/{id}/{name}`). After the move, pull gives each
+  picture as a file in its note's folder. Each note's `image:` names that file,
+  and `image_mask:` is unchanged. The web shows the same pictures, and the notes
+  keep their learning identities. Running the move again changes nothing.
+- **Scope / value (owner direction 2026-09-24):** A one-time move for every
+  notebook, not triggered by the owner. There is one Donut System commit per
+  notebook that has pictures. It follows the North Star's
+  [one attachment content model](../NORTH-STAR.md#one-attachment-content-model):
+  LFS objects, Donut-chosen free filenames, and legacy rows kept until story 18.
+  History is not rewritten. Remote URLs and Books are not converted.
+- **Current state:** An uploaded picture is an `image` row owned by exactly one
   note, with its bytes in MySQL (`attachment_blob`), unrelated to
-  `notebook_attachment`. The note refers to it only through frontmatter
-  `image: /attachments/images/{id}/{name}`, optionally with `image_mask:`
-  rectangles. Export writes the note unchanged and no image bytes, so every
-  uploaded image is a broken server path in a local checkout. Display is only
-  `NoteShow` (note page, recall, conversations); no AI feature uses images.
-- **Value challenge:** Only owners who have uploaded images and work on those
-  notebooks locally benefit; how many images and notebooks are affected is
-  unknown. Images stay safe and visible on the web meanwhile, so deferral
-  loses nothing. The benefit is a complete local notebook, not a new capability
-  for AI work.
-- **Ordering (owner, 2026-09-24):** Placed after story 4 in the product
-  backlog.
-- **Candidate narrow scope (proposal, undecided):** Conversion is triggered
-  by the owner per notebook as one accepted commit, not a fleet migration.
-  It covers `image` rows of that notebook's notes that the note's `image:`
-  currently references. The file is placed in the note's folder and `image:`
-  is rewritten to it; `image_mask:` is unchanged. Legacy rows and the
-  `/attachments/images/...` endpoint are kept.
-- **Candidate exclusions:** remote URLs; one note referencing another note's
-  image; notebooks the user does not own; automatic conversion of new uploads
-  (story 4); local mask presentation; removing the `image` table.
-- **Open decisions:**
-  - Raw-representation notebooks: the North Star places story 14 (LFS
-    migration, unqueued) before image conversion. Either limit this story to
-    LFS notebooks, queue story 14 first, or accept image bytes entering raw
-    Git history.
-  - Owner-triggered per notebook, or automatic?
-  - Filename clash when two notes in one folder share an image filename, or
-    the folder already has that file: rename or refuse? Refusing blocks
-    conversion permanently.
-  - Legacy `image` row cleanup: orphan cleanup
-    (`NoteService.deleteOrphanImagesForPersistedContent`) deletes a note's
-    legacy rows only when `image:` is blank or an `/attachments/images/...`
-    path; a note-relative value is classed `InvalidPathPresent` and skips
-    cleanup. Rewriting `image:` to the note-relative spelling therefore
-    leaves the old row in place: decide whether conversion keeps it
-    deliberately or cleans it up, and rename that classification if the
-    relative spelling stays out of cleanup.
-  - An owner with unpublished local work will find `pull` refusing over the
-    web attachment change; acceptable, or does conversion need guidance?
-- **Related constraint:** the legacy image endpoint
-  (`/attachments/images/{id}/{fileName}`) serves images only to readers of the
-  note's notebook; conversion must keep that read rule for legacy rows that
-  remain.
+  `notebook_attachment`. The note refers to it only through frontmatter `image:`,
+  optionally with `image_mask:` rectangles. Export writes no picture bytes, so
+  each uploaded picture is a broken server path in a local checkout. Display is
+  only `NoteShow` (note page, recall, conversations).
+- **Depends on:** Story 14, so the move writes LFS only. Story 4, so no new
+  legacy pictures appear once the move has run. A moved `image:` uses the
+  note-relative spelling Web Donut already displays
+  ([attachment references](../../docs/notebook-git-attachments.md#classification-and-references)).
+- **Effort hypothesis:** L, low confidence until the counts and edge cases are
+  known.
+- **Safe stopping point:** Moved and not-yet-moved pictures both display; the
+  only copy of each picture is kept until its move is accepted.
+- **Open decisions:** A note whose `image:` points at another note's upload.
+  `image` rows that no `image:` refers to any more. Owners with unpublished
+  local edits to the same note's frontmatter get an ordinary rebase conflict;
+  is that acceptable? The legacy address keeps the notebook read rule while it
+  remains.
+- **Legacy row cleanup:** Orphan cleanup
+  (`NoteService.deleteOrphanImagesForPersistedContent`) deletes a note's legacy
+  rows only when `image:` is blank or an `/attachments/images/...` path; a
+  note-relative value is classed `InvalidPathPresent` and skips cleanup. So
+  rewriting `image:` leaves the old row in place, which story 18 relies on to
+  keep the backup copy until removal. Rename that classification if the
+  relative spelling stays out of cleanup.
+
+<a id="story-17"></a>
+
+### Keep a Book's source file as an ordinary notebook file
+```json dough-story-state
+{"schemaVersion":1,"refinement":"not-refined","approach":"unselected"}
+```
+
+- **Identity:** SEED-035#story-17
+- **Goal:** Owners who read a PDF or EPUB Book in Donut also have its source
+  file in the notebook: browsable and downloadable on the web, and present in
+  a local checkout. Books stop needing their own file storage.
+- **Evaluation:** Attach a Book on the web, then pull: the source file is in the
+  notebook, and Book reading on the web is unchanged. An existing Book is moved
+  the same way, keeping its layout and reading progress.
+- **Scope / value (owner direction 2026-09-24):** A Book is private reading
+  structure over one source Attachment (see the North Star). New Book attach
+  writes the Attachment and the Book's reference in one accepted change, and
+  existing Books are moved once. The Book source file is the one exception to
+  the 10 MiB limit and keeps the Book upload limit (currently 100 MB).
+- **Current state:** `book.source_file_ref` names bytes in the separate Book
+  storage: GCS in production (`GcsBookStorage`), and `attachment_blob`
+  elsewhere (`DbBookStorage`).
+- **Depends on:** Story 14.
+- **Effort hypothesis:** L, low confidence; split new-attach from moving
+  existing Books if refinement finds it larger.
+- **Safe stopping point:** Books read correctly from either store during the
+  move; the old copy stays until the move is verified.
+- **Open decisions:** Where the file is placed and named. What happens when the
+  owner renames, deletes or replaces the Book's file locally (the Book's layout
+  depends on those exact bytes). How the size exception is recognised when the
+  file arrives through a local publish.
+
+<a id="story-18"></a>
+
+### Remove the legacy picture and Book storage
+```json dough-story-state
+{"schemaVersion":1,"refinement":"not-refined","approach":"unselected"}
+```
+
+- **Identity:** SEED-035#story-18
+- **Goal:** Maintainers keep one attachment implementation. Owners keep every
+  picture and Book, because each one already works through notebook files.
+- **Evaluation:** After stories 5 and 17 are confirmed in production, the
+  following are gone: the `image` table, `attachment_blob`, the
+  `/attachments/images/...` address, the separate Book storage, and the code that
+  used them. All pictures and Books still display.
+- **Scope / value:** Deletes code and tables; no new behaviour. Runs in a
+  release after the moves are verified, never in the release that moves the
+  bytes.
+- **Depends on:** Stories 5 and 17 delivered and verified in production.
+- **Effort hypothesis:** S–M, medium confidence.
+- **Safe stopping point:** Until it runs, the legacy stores are unused leftovers
+  that still hold a backup copy.
 
 <a id="story-4"></a>
 
 ### Use newly web-uploaded note images from a local checkout
+```json dough-story-state
+{"schemaVersion":1,"refinement":"not-refined","approach":"unselected"}
+```
 
 - **Identity:** SEED-035#story-4
-- **Goal:** Owners continue locally with newly web-authored visual material
-  without a separate download-and-relink task.
-- **Evaluation:** Upload a note image using an existing web authoring flow, then
-  receive the accepted result locally: the note references an available image
-  file and its web display still works.
-- **Scope / value:** File and note reference appear in one accepted result using
-  the same attachment model. Prevent new uploads from recreating the portability
-  gap; generic web file upload and new authoring features are not promised.
-- **Effort hypothesis:** M, low confidence pending existing upload-flow inventory.
-- **Depends on:** Story 6. Earlier image stories reduce uncertainty and effort;
-  neither publication direction is inherently prerequisite to the other.
-- **Safe stopping point:** New images work in both contexts with common management.
+- **Goal:** Owners continue locally with pictures uploaded on the web, without
+  downloading and relinking them. It also stops new uploads adding to the
+  legacy pictures that story 5 must move and story 18 must remove.
+- **Evaluation:** Upload a picture with the note's `image` property on the web,
+  then pull: the picture is a file in the note's folder, `image:` names it, and
+  the web still shows it.
+- **Scope direction:** The one existing upload (the "Choose image…" button of
+  the frontmatter `image` property, `POST /api/notes/{note}/images`) stores the
+  upload as an Attachment in the note's folder and sets `image:` to it. Both
+  happen in one server-side accepted change, following the North Star's
+  [one attachment content model](../NORTH-STAR.md#one-attachment-content-model):
+  an LFS object, a free Donut-chosen filename, and the 10 MiB limit. New uploads
+  no longer create `image` rows. There is no other web upload path: nothing
+  pastes or drops pictures into the body, and nothing uploads pictures for AI.
+- **Deferred promises:** Body images, uploading other file types, SVG, removing
+  the previous file when a picture is replaced (story 2 owns deletion), and
+  converting old pictures (story 5).
+- **Effort hypothesis:** M, medium confidence; this is the first web action that
+  adds file bytes to a notebook.
+- **Depends on:** Story 14 (a single LFS write path). The note-relative
+  `image:` spelling and its web display are delivered.
+- **Safe stopping point:** New pictures work on the web and locally; old
+  pictures keep working as before.
+- **Refinement remaining:** Key examples, including a filename clash, a note in
+  the notebook root, and an owner with unpublished local commits.
 
 <a id="story-2"></a>
 
@@ -341,54 +406,45 @@ No executable plan or implementation is authorized by this seed.
 
 ## Ordering and Scope Reduction
 
-The [product backlog](../PRODUCT-BACKLOG.md) owns global order. The size boundary
-comes first because it protects accepted storage independently of the later
-architecture. Story 13 follows for prevention through an automated publish/fresh-clone
-loop. Candidate story 14 applies the completed workflow to existing notebooks and
-should precede their image conversion when queued.
-This is delivery order, not a reason to withhold browsing from already supported
-legacy content. Delivered nested attachment continuity
-then enables the browsing journey that requires nested files. Web browsing and
-download are delivered. The remaining attachment order covers guidance-folder
-assimilation, local visual authoring, new web-image portability, existing-image
-conversion (after the two image flows it relies on), web cleanup,
-and last the two conveniences whose absence loses nothing: dissolve/merge with
-files (story 11), then the rarer cross-notebook folder move (story 10). Root
-attachment continuity is also delivered.
+The [product backlog](../PRODUCT-BACKLOG.md) owns global order. Root and nested
+file continuity, the size boundary, LFS for new notebooks, and web browsing and
+download are delivered.
 
-The split is by usable placement, not backend/frontend layers or equal slice
-counts. Reject a publish-now/preserve-on-web-later split: it would expose accepted
-files to loss. Root continuity includes its complete web/checkout loop and
-existing snapshot consumers. Nested support stays safe because operations that
-would rehome files currently refuse instead of discarding contents. Both use
-the same attachment concept.
+The owner's end state (2026-09-24) is one attachment model for every file:
+existing and new pictures and Book files as LFS notebook files, the legacy
+stores removed, and every file present after clone or pull. The order that
+avoids a chicken-and-egg problem is:
 
-Image stories retain their existing goals and can use delivered root or nested
-file placement. All original promises have an owner in the slice redistribution
-recorded in the delivered root-attachment plan
-(`.planning/quick/002-notebook-attachment-continuity/PLAN.md` at `6b906462dd`,
-section "Redistribution of the original 15 slices").
+1. Story 14: every notebook converted to LFS; then story 19 removes the raw
+   representation after production confirms none is left.
+2. Story 4: new uploads become files, so the set of legacy pictures stops growing.
+3. Story 5: move existing pictures.
+4. Story 17: Book files.
+5. Story 18: remove the legacy stores, after production verification.
+
+"Present after clone or pull" is not a story: it is how each of these stories
+is proven. Web deletion (story 2), then dissolve/merge (story 11) and the rarer
+cross-notebook move (story 10) follow; the last two are conveniences whose
+absence loses nothing.
+
+The split is by usable outcome, not backend/frontend layers. Reject a
+publish-now/preserve-on-web-later split: it would expose accepted files to
+loss. Operations that would rehome files refuse until their story delivers.
 
 ## Open Refinement Details
 
-- Stories 12–15 carry the size, bundle, receive, and migration outcomes under the accepted
-  Git LFS storage contract. Client/protocol and history policy are decided;
-  detailed sizing and examples remain story refinement work.
+- Stories 14, 5 and 17 each need key examples and their move/retry behaviour
+  before planning; story 4 needs key examples.
 - Story 11 needs story refinement and plan realignment before slice
   refinement/execution.
-- Story 8 owns common guidance folder identification and assimilation/ignore
-  behavior; the owner deferred those decisions until its refinement.
-- Image stories must establish existing ownership, sharing, and current
-  presentation contexts before promising a conversion scope; the note-relative
-  frontmatter `image:` spelling is already displayed on the web.
 - File deletion needs an observable outcome for remaining references; warning,
   refusal, dangling-reference presentation, and Trash are different promises.
 
 ## When to Surface
 
 Now, under the revised near-future direction. No implementation is authorized.
-Ready-made AI skills, arbitrary document previews, Books, file editors, and new
-Git integration need their own selected outcomes.
+Ready-made AI skills, arbitrary document previews, file editors, and new Git
+integration need their own selected outcomes.
 
 ## Breadcrumbs
 
@@ -396,8 +452,7 @@ Git integration need their own selected outcomes.
   and image files; web browsing, download, and deletion.
 - Owner clarification: all Markdown retains the existing cohesive behavior,
   with no guidance exception or refinement changes. Remove the format-guarantee
-  story; place skipping common guidance folders during assimilation second and
-  defer folder/ignore policy to its refinement.
+  story.
 - Owner direction, 2026-09-23: cap attachments at approximately 10 MB, keep
   attachment payloads out of MySQL and ordinary Git history, reduce bundle size,
   and store payloads in bucket-backed object storage. Git commits use a
@@ -405,7 +460,15 @@ Git integration need their own selected outcomes.
   standard Git LFS and the preserved-history transition, directing concise rules
   into existing ADRs and the Git LFS details into a regular document. Rollout
   belongs in the North Star and stories; implementation remains separate work.
+- Owner direction, 2026-09-24: the end state is (1) existing pictures moved to
+  LFS/GCS in the new structure, (2) new uploads on the same path, (3) the old
+  implementation removed, and (4) files present on clone and pull. Convert
+  existing notebooks by forward commit (option A); do not reset history, and do
+  not move old-history bytes. Drop the story for skipping AI guidance folders
+  during assimilation entirely: it is not important and kept drawing attention.
+  Books become ordinary attachments, and their
+  source file is the one exception to the 10 MiB limit. One cohesive
+  architecture governs these stories (North Star).
 - [Near-future direction](../PRODUCT-BACKLOG.md#near-future-direction).
 - [SEED-009](SEED-009-git-backed-local-notebook-workflow.md): prior local/web note
-  workflow. This seed owns non-Markdown attachment continuity and guidance-folder
-  assimilation selection.
+  workflow. This seed owns non-Markdown attachment continuity.

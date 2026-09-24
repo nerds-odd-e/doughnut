@@ -133,8 +133,7 @@ and LFS configuration are allowed. Check the resulting hydrated mixed-tree
 profile against OKF before claiming compatibility for the entire tree.
 
 AI guidance uses ordinary note refinement, with no refinement changes required
-by this direction. Skipping common AI guidance folders during assimilation is a
-separate backlog outcome whose folder rules and ignore behavior await refinement.
+by this direction.
 
 A note's frontmatter `image:` may name a notebook file by a path relative to the
 note's own folder (`force-diagram.png`, `images/force.png`), so the same authored

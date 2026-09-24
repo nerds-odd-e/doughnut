@@ -54,7 +54,7 @@ Local attachment work requires Git LFS and object access; already hydrated files
 remain usable offline. Pointer-only history stays small as binary versions grow,
 although acquiring a file still transfers its bytes. GCS durability and retention
 become part of content preservation. Delivery is incremental, under the
-[North Star](../.planning/NORTH-STAR.md#attachment-storage-transition).
+[North Star](../.planning/NORTH-STAR.md#one-attachment-content-model).
 
 `donut notebook pull` receives into the same checkout. Its own Git operations
 skip LFS smudging; after every outcome, including a rebase paused on a
