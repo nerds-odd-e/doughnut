@@ -93,7 +93,7 @@ abstract class NotebookGitWebContentControllerTestBase extends NotebookGitContro
   }
 
   Map<String, ObjectId> acceptedBlobIds(Notebook notebook) throws Exception {
-    return NotebookGitTreeContent.of(acceptedHistory(notebook).tipContent()).blobIds();
+    return NotebookGitTreeContent.of(acceptedHistory(notebook).exactTree()).blobIds();
   }
 
   /** The queries {@code operation} alone executed. */

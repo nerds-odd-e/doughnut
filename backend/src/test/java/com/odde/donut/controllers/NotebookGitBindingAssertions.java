@@ -45,7 +45,7 @@ final class NotebookGitBindingAssertions {
         RevCommit commit = revWalk.parseCommit(headObjectId);
         assertThat(commit.getParentCount(), equalTo(0));
         assertThat(
-            GitBundleTestReader.readTreeEntriesWithMetadata(readBack, commit),
+            GitBundleTestReader.readExactTree(readBack, commit),
             contains(
                 PortableTreeEntry.ofText(
                     NotebookGitAttributes.PATH, NotebookGitAttributes.INITIAL_CONTENT)));

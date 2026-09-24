@@ -27,6 +27,10 @@ import org.eclipse.jgit.treewalk.TreeWalk;
  * Fetches an accepted Git binding's bundle bytes into a scratch in-memory repository so a test can
  * inspect {@code refs/heads/main} with JGit. Shared by every test that reads back a persisted
  * {@code NotebookGitBinding}.
+ *
+ * <p>Reader naming rule: a {@code content} reader returns the notebook content without reserved Git
+ * metadata such as {@code .gitattributes}; an {@code exactTree} reader returns every blob in the
+ * tree, including that metadata.
  */
 public final class GitBundleTestReader {
 
@@ -70,19 +74,16 @@ public final class GitBundleTestReader {
   /** The notebook content paths of a commit's tree, without reserved Git metadata. */
   public static List<String> pathsIn(Repository repository, ObjectId commitId) throws IOException {
     try (RevWalk revWalk = new RevWalk(repository)) {
-      return readTreeEntries(repository, revWalk.parseCommit(commitId)).stream()
+      return readContent(repository, revWalk.parseCommit(commitId)).stream()
           .map(PortableTreeEntry::path)
           .toList();
     }
   }
 
-  /**
-   * The notebook content of a commit's tree as Portable tree entries (path plus exact bytes),
-   * without reserved Git metadata such as {@code .gitattributes}.
-   */
-  public static List<PortableTreeEntry> readTreeEntries(Repository repository, RevCommit commit)
+  /** The notebook content of a commit's tree as Portable tree entries (path plus exact bytes). */
+  public static List<PortableTreeEntry> readContent(Repository repository, RevCommit commit)
       throws IOException {
-    return withoutMetadata(readTreeEntriesWithMetadata(repository, commit));
+    return withoutMetadata(readExactTree(repository, commit));
   }
 
   private static List<PortableTreeEntry> withoutMetadata(List<PortableTreeEntry> entries) {
@@ -92,11 +93,11 @@ public final class GitBundleTestReader {
   }
 
   /**
-   * Every blob reachable from a commit's tree as a Portable tree entry, including reserved Git
-   * metadata, for tests whose subject is the exact tree or the metadata itself.
+   * The exact tree of a commit as Portable tree entries, for tests whose subject is the exact tree
+   * or the metadata itself.
    */
-  public static List<PortableTreeEntry> readTreeEntriesWithMetadata(
-      Repository repository, RevCommit commit) throws IOException {
+  public static List<PortableTreeEntry> readExactTree(Repository repository, RevCommit commit)
+      throws IOException {
     List<PortableTreeEntry> entries = new ArrayList<>();
     try (TreeWalk treeWalk = new TreeWalk(repository)) {
       treeWalk.addTree(commit.getTree());
@@ -109,21 +110,7 @@ public final class GitBundleTestReader {
     return entries;
   }
 
-  /**
-   * The Portable tree entries at the tip of a persisted binding's bundle, read through a scratch
-   * in-memory repository. Tests that also need the tip identity or first-parent ancestry use {@link
-   * #fetchAcceptedTip(byte[])}.
-   */
-  public static List<PortableTreeEntry> fetchTipTreeEntries(byte[] bundleBytes)
-      throws IOException, URISyntaxException {
-    try (InMemoryRepository repository = new InMemoryRepository(new DfsRepositoryDescription());
-        RevWalk revWalk = new RevWalk(repository)) {
-      return readTreeEntriesWithMetadata(
-          repository, revWalk.parseCommit(fetchHead(repository, bundleBytes)));
-    }
-  }
-
-  /** The accepted tip, its first-parent ancestry, and its exact Portable tree content. */
+  /** The accepted tip, its first-parent ancestry, and its exact tree. */
   public static AcceptedTip fetchAcceptedTip(byte[] bundleBytes)
       throws IOException, URISyntaxException {
     try (InMemoryRepository repository = new InMemoryRepository(new DfsRepositoryDescription());
@@ -134,42 +121,41 @@ public final class GitBundleTestReader {
         walked = revWalk.parseCommit(walked.getParent(0));
         ancestry.add(walked.getId());
       }
-      return new AcceptedTip(head.getId(), ancestry, readTreeEntriesWithMetadata(repository, head));
+      return new AcceptedTip(head.getId(), ancestry, readExactTree(repository, head));
     }
   }
 
   public record AcceptedTip(
-      ObjectId head, List<ObjectId> ancestry, List<PortableTreeEntry> entries) {
+      ObjectId head, List<ObjectId> ancestry, List<PortableTreeEntry> exactTree) {
     /** The notebook content at the tip, without reserved Git metadata. */
     public List<PortableTreeEntry> content() {
-      return withoutMetadata(entries);
+      return withoutMetadata(exactTree);
     }
   }
 
   /**
    * The accepted history a bundle carries: every commit reachable from {@code refs/heads/main},
-   * oldest last, plus the exact Portable content at the tip. Two snapshots are equal exactly when
-   * the accepted history is unchanged. Serialized bundle bytes cannot answer that question: two
-   * downloads of one unchanged history are re-serialized independently and need not be identical
-   * byte for byte.
+   * oldest last, plus the exact tree at the tip. Two snapshots are equal exactly when the accepted
+   * history is unchanged. Serialized bundle bytes cannot answer that question: two downloads of one
+   * unchanged history are re-serialized independently and need not be identical byte for byte.
    */
   public static AcceptedHistory fetchAcceptedHistory(byte[] bundleBytes)
       throws IOException, URISyntaxException {
     try (InMemoryRepository repository = new InMemoryRepository(new DfsRepositoryDescription());
         RevWalk revWalk = new RevWalk(repository)) {
       RevCommit tip = revWalk.parseCommit(fetchHead(repository, bundleBytes));
-      List<PortableTreeEntry> tipContent = readTreeEntriesWithMetadata(repository, tip);
+      List<PortableTreeEntry> exactTree = readExactTree(repository, tip);
       revWalk.markStart(tip);
       List<String> commits = new ArrayList<>();
       for (RevCommit commit : revWalk) {
         commits.add(commit.name());
       }
-      return new AcceptedHistory(commits, tipContent, tip.getTree().getId());
+      return new AcceptedHistory(commits, exactTree, tip.getTree().getId());
     }
   }
 
   public record AcceptedHistory(
-      List<String> commits, List<PortableTreeEntry> tipContent, ObjectId tipTreeId) {
+      List<String> commits, List<PortableTreeEntry> exactTree, ObjectId tipTreeId) {
     /** The parents this history advanced from: every commit but the newest. */
     public List<String> parents() {
       return commits.subList(1, commits.size());
@@ -177,7 +163,7 @@ public final class GitBundleTestReader {
 
     /** The notebook content at the tip, without reserved Git metadata. */
     public List<PortableTreeEntry> content() {
-      return withoutMetadata(tipContent);
+      return withoutMetadata(exactTree);
     }
 
     /** The notebook content paths at the tip, without reserved Git metadata. */

@@ -49,7 +49,7 @@ class NotebookGitAttachmentSizeAdmissionLfsHistoryControllerTest
 
     assertThat(publishedHead, equalTo(range.tip().getName()));
     assertThat(
-        acceptedTipEntries(notebook),
+        acceptedHistory(notebook).exactTree(),
         containsInAnyOrder(
             PortableTreeEntry.ofText(
                 NotebookGitAttributes.PATH, NotebookGitAttributes.INITIAL_CONTENT),
@@ -109,7 +109,7 @@ class NotebookGitAttachmentSizeAdmissionLfsHistoryControllerTest
 
     assertThat(publishedHead, equalTo(range.tip().getName()));
     assertThat(
-        acceptedTipEntries(notebook),
+        acceptedHistory(notebook).exactTree(),
         containsInAnyOrder(
             PortableTreeEntry.ofText(
                 NotebookGitAttributes.PATH, NotebookGitAttributes.INITIAL_CONTENT),
@@ -188,7 +188,7 @@ class NotebookGitAttachmentSizeAdmissionLfsHistoryControllerTest
                 new NotebookGitProposalFile("restored.bin", pointer))));
 
     assertThat(
-        acceptedTipEntries(notebook),
+        acceptedHistory(notebook).exactTree(),
         containsInAnyOrder(
             PortableTreeEntry.ofText(
                 NotebookGitAttributes.PATH, NotebookGitAttributes.INITIAL_CONTENT),

@@ -38,7 +38,7 @@ class NotebookGitAttachmentCreationControllerTest
 
     assertThat(binding.getAttachmentRepresentation(), is(NotebookGitAttachmentRepresentation.LFS));
     assertThat(
-        acceptedHistory(notebook).tipContent(),
+        acceptedHistory(notebook).exactTree(),
         contains(
             PortableTreeEntry.ofText(
                 NotebookGitAttributes.PATH, NotebookGitAttributes.INITIAL_CONTENT)));
@@ -50,9 +50,9 @@ class NotebookGitAttachmentCreationControllerTest
     NotebookGitBinding binding = reloadCommittedBinding(notebook.getId());
 
     assertThat(binding.getAttachmentRepresentation(), is(NotebookGitAttachmentRepresentation.RAW));
-    assertThat(acceptedHistory(notebook).tipContent(), empty());
+    assertThat(acceptedHistory(notebook).exactTree(), empty());
     assertThat(
-        acceptedHistory(notebook).tipContent().stream().map(PortableTreeEntry::path).toList(),
+        acceptedHistory(notebook).exactTree().stream().map(PortableTreeEntry::path).toList(),
         not(contains(NotebookGitAttributes.PATH)));
   }
 
@@ -74,7 +74,7 @@ class NotebookGitAttachmentCreationControllerTest
     assertThat(
         afterReset.getAttachmentRepresentation(), is(NotebookGitAttachmentRepresentation.LFS));
     assertThat(
-        acceptedHistory(notebook).tipContent(),
+        acceptedHistory(notebook).exactTree(),
         contains(
             PortableTreeEntry.ofText(
                 NotebookGitAttributes.PATH, NotebookGitAttributes.INITIAL_CONTENT),
@@ -108,7 +108,7 @@ class NotebookGitAttachmentCreationControllerTest
     assertThat(exception.getReason(), containsString("must be a Git LFS pointer"));
     assertThat(notebookAttachmentRepository.findByNotebook_Id(notebook.getId()), empty());
     assertThat(
-        acceptedHistory(notebook).tipContent(),
+        acceptedHistory(notebook).exactTree(),
         contains(
             PortableTreeEntry.ofText(
                 NotebookGitAttributes.PATH, NotebookGitAttributes.INITIAL_CONTENT)));

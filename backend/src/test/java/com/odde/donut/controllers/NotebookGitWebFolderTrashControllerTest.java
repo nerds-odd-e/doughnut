@@ -133,10 +133,10 @@ class NotebookGitWebFolderTrashControllerTest extends NotebookGitWebContentContr
         RevWalk revWalk = new RevWalk(repo)) {
       ObjectId recoveredHead = GitBundleTestReader.fetchHead(repo, downloadedBundle(notebook));
       assertThat(
-          GitBundleTestReader.readTreeEntries(repo, revWalk.parseCommit(trashedHead)),
+          GitBundleTestReader.readContent(repo, revWalk.parseCommit(trashedHead)),
           hasItem(new PortableTreeEntry("_trash/physics/diagrams/force.png", forcePointer)));
       assertThat(
-          GitBundleTestReader.readTreeEntries(repo, revWalk.parseCommit(recoveredHead)),
+          GitBundleTestReader.readContent(repo, revWalk.parseCommit(recoveredHead)),
           hasItem(new PortableTreeEntry("physics/diagrams/force.png", forcePointer)));
     }
   }

@@ -72,7 +72,7 @@ abstract class NotebookGitCommitFixtureTestSupport extends NoteDependentRowsCont
     try (RevWalk revWalk = new RevWalk(repository)) {
       return Stream.concat(
               NotebookGitAttributes.selectFrom(
-                      GitBundleTestReader.readTreeEntriesWithMetadata(
+                      GitBundleTestReader.readExactTree(
                           repository, revWalk.parseCommit(acceptedHead)))
                   .stream()
                   .filter(entry -> !named.contains(entry.path()))

@@ -84,7 +84,7 @@ class NotebookGitHistoryResetControllerTest extends NotebookGitControllerTestBas
       revWalk.forEach(history::add);
       assertThat(history, hasSize(1));
       assertThat(
-          GitBundleTestReader.readTreeEntries(repository, resetCommit),
+          GitBundleTestReader.readContent(repository, resetCommit),
           contains(
               ofText("note.md", ACCEPTED_CONTENT), ofText("outside.md", OUTSIDE_HISTORY_CONTENT)));
 
@@ -123,7 +123,7 @@ class NotebookGitHistoryResetControllerTest extends NotebookGitControllerTestBas
         reloadCommittedBinding(notebook.getId()).getAttachmentRepresentation(),
         equalTo(NotebookGitAttachmentRepresentation.LFS));
     assertThat(
-        acceptedHistory(notebook).tipContent(),
+        acceptedHistory(notebook).exactTree(),
         contains(ofText(NotebookGitAttributes.PATH, NotebookGitAttributes.INITIAL_CONTENT)));
   }
 
@@ -152,7 +152,7 @@ class NotebookGitHistoryResetControllerTest extends NotebookGitControllerTestBas
     makeMe.aNote("Overview").notebook(notebook).content(OVERVIEW_CONTENT).please();
     NotebookGitBinding markdownOnly = snapshotCurrentPortableTree(notebook);
     List<PortableTreeEntry> tipWithRootFiles =
-        new ArrayList<>(GitBundleTestReader.fetchTipTreeEntries(acceptedBundleBytes(notebook)));
+        new ArrayList<>(acceptedHistory(notebook).exactTree());
     List<PortableTreeEntry> rootFiles =
         committedOnLfs(
             notebook,
@@ -174,7 +174,7 @@ class NotebookGitHistoryResetControllerTest extends NotebookGitControllerTestBas
               GitBundleTestReader.fetchHead(repository, acceptedBundleBytes(notebook)));
       assertThat(resetCommit.getParentCount(), equalTo(0));
       assertThat(
-          GitBundleTestReader.readTreeEntries(repository, resetCommit),
+          GitBundleTestReader.readContent(repository, resetCommit),
           contains(rootFiles.get(0), ofText("Overview.md", OVERVIEW_CONTENT), rootFiles.get(1)));
     }
   }

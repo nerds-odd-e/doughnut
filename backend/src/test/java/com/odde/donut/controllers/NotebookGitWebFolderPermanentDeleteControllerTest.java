@@ -68,7 +68,7 @@ class NotebookGitWebFolderPermanentDeleteControllerTest
           GitBundleTestReader.pathsIn(repo, downloadedHead),
           containsInAnyOrder("_trash/Sibling/Atoms.md"));
       assertThat(
-          GitBundleTestReader.readTreeEntries(repo, revWalk.parseCommit(acceptedA)),
+          GitBundleTestReader.readContent(repo, revWalk.parseCommit(acceptedA)),
           hasItem(new PortableTreeEntry("_trash/Topic/a.pdf", attachment.getAcceptedGitContent())));
     }
     assertThat(notebookAttachmentRepository.findById(attachment.getId()).isPresent(), is(false));

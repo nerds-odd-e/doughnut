@@ -200,7 +200,7 @@ class NotebookGitJdbcObjectStoreTest {
       throws IOException {
     try (RevWalk walk = new RevWalk(repo)) {
       assertThat(
-          GitBundleTestReader.readTreeEntries(repo, walk.parseCommit(commitId)),
+          GitBundleTestReader.readContent(repo, walk.parseCommit(commitId)),
           equalTo(expectedEntries));
     }
   }

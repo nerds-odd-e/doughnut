@@ -6,22 +6,14 @@ import static org.hamcrest.Matchers.containsString;
 
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.services.notebookTree.PortableTreeEntry;
-import com.odde.donut.testability.GitBundleTestReader;
 import java.util.Arrays;
 import java.util.List;
-import org.eclipse.jgit.internal.storage.dfs.DfsRepositoryDescription;
-import org.eclipse.jgit.internal.storage.dfs.InMemoryRepository;
 import org.eclipse.jgit.lib.Constants;
 import org.eclipse.jgit.lib.ObjectId;
 import org.eclipse.jgit.lib.ObjectInserter;
-import org.eclipse.jgit.revwalk.RevCommit;
-import org.eclipse.jgit.revwalk.RevWalk;
 import org.springframework.web.server.ResponseStatusException;
 
-/**
- * Shared limit, payload, tip-download, and refusal helpers for attachment-size admission controller
- * proof.
- */
+/** Shared limit, payload, and refusal helpers for attachment-size admission controller proof. */
 abstract class NotebookGitAttachmentSizeAdmissionTestSupport
     extends NotebookGitWebContentControllerTestBase {
 
@@ -42,18 +34,6 @@ abstract class NotebookGitAttachmentSizeAdmissionTestSupport
   List<PortableTreeEntry> committedRootAttachments(Notebook notebook) {
     return NotebookLiveProjectionTestReader.rootAttachments(
         transactionManager, notebookAttachmentRepository, notebook.getId());
-  }
-
-  List<PortableTreeEntry> acceptedTipEntries(Notebook notebook) throws Exception {
-    byte[] downloaded =
-        controller
-            .downloadNotebookGitBundle(notebookRepository.findById(notebook.getId()).orElseThrow())
-            .getBody();
-    try (InMemoryRepository repository = new InMemoryRepository(new DfsRepositoryDescription());
-        RevWalk revWalk = new RevWalk(repository)) {
-      RevCommit commit = revWalk.parseCommit(GitBundleTestReader.fetchHead(repository, downloaded));
-      return GitBundleTestReader.readTreeEntriesWithMetadata(repository, commit);
-    }
   }
 
   boolean nativeObjectPresent(Integer bindingId, ObjectId objectId) {

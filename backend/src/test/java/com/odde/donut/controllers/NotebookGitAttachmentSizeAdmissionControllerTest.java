@@ -38,7 +38,7 @@ class NotebookGitAttachmentSizeAdmissionControllerTest
         empty.getAcceptedGitObjectId(),
         proposalBundleBytes(empty, List.of(new NotebookGitProposalFile(path, exact))));
 
-    assertThat(acceptedTipEntries(notebook), contains(new PortableTreeEntry(path, exact)));
+    assertThat(acceptedHistory(notebook).exactTree(), contains(new PortableTreeEntry(path, exact)));
   }
 
   @ParameterizedTest
@@ -120,7 +120,7 @@ class NotebookGitAttachmentSizeAdmissionControllerTest
                 new NotebookGitProposalFile("legacy.bin", oversized))));
     NotebookGitBinding kept = reloadCommittedBinding(notebook.getId());
     assertThat(
-        acceptedTipEntries(notebook),
+        acceptedHistory(notebook).exactTree(),
         contains(
             PortableTreeEntry.ofText("Root Note.md", NOTE_MARKDOWN),
             new PortableTreeEntry("legacy.bin", oversized)));
@@ -135,7 +135,7 @@ class NotebookGitAttachmentSizeAdmissionControllerTest
                 new NotebookGitProposalFile("renamed.bin", oversized))));
     NotebookGitBinding renamed = reloadCommittedBinding(notebook.getId());
     assertThat(
-        acceptedTipEntries(notebook),
+        acceptedHistory(notebook).exactTree(),
         contains(
             PortableTreeEntry.ofText("Root Note.md", NOTE_MARKDOWN),
             new PortableTreeEntry("renamed.bin", oversized)));
@@ -157,7 +157,7 @@ class NotebookGitAttachmentSizeAdmissionControllerTest
                 new NotebookGitProposalFile("restored.bin", oversized))));
 
     assertThat(
-        acceptedTipEntries(notebook),
+        acceptedHistory(notebook).exactTree(),
         contains(
             PortableTreeEntry.ofText("Root Note.md", NOTE_MARKDOWN),
             new PortableTreeEntry("restored.bin", oversized)));
@@ -173,7 +173,7 @@ class NotebookGitAttachmentSizeAdmissionControllerTest
     textContentController.updateNoteContent(note, contentDto(EDITED_CONTENT));
 
     assertThat(
-        acceptedTipEntries(notebook),
+        acceptedHistory(notebook).exactTree(),
         contains(
             PortableTreeEntry.ofText("Root Note.md", EDITED_CONTENT),
             new PortableTreeEntry("legacy.bin", oversized)));
@@ -221,7 +221,7 @@ class NotebookGitAttachmentSizeAdmissionControllerTest
 
     assertOversizedRefusal(exception, "other.bin", LIMIT + 1);
     assertThat(
-        acceptedTipEntries(notebook),
+        acceptedHistory(notebook).exactTree(),
         contains(
             PortableTreeEntry.ofText("Root Note.md", NOTE_MARKDOWN),
             new PortableTreeEntry("legacy.bin", grandfathered)));

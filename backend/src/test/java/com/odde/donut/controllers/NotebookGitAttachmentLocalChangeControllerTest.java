@@ -198,7 +198,7 @@ class NotebookGitAttachmentLocalChangeControllerTest extends NotebookGitControll
             .filter(name -> !surviving.contains(name))
             .toList();
     assertThat(
-        published.entries().stream()
+        published.exactTree().stream()
             .map(PortableTreeEntry::path)
             .filter(removed::contains)
             .toList(),

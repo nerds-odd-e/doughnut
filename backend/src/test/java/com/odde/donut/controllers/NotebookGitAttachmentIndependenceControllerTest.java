@@ -61,9 +61,7 @@ class NotebookGitAttachmentIndependenceControllerTest
     NotebookGitBinding accepted = reloadCommittedBinding(fixture.notebook().getId());
     List<PortableTreeEntry> relocated =
         movePath(
-            GitBundleTestReader.fetchTipTreeEntries(acceptedBundleBytes(fixture.notebook())),
-            "Biology/Cells.md",
-            "Study/Cells.md");
+            acceptedHistory(fixture.notebook()).exactTree(), "Biology/Cells.md", "Study/Cells.md");
 
     controller.publishNotebookGitProposal(
         fixture.notebook().getId(),
@@ -143,8 +141,7 @@ class NotebookGitAttachmentIndependenceControllerTest
     MemoryTracker tracker = learnedTracker(cells, 0.5f, 1);
     NotebookGitBinding markdownOnly = snapshotCurrentPortableTree(notebook);
 
-    List<PortableTreeEntry> withRootFiles =
-        new ArrayList<>(GitBundleTestReader.fetchTipTreeEntries(acceptedBundleBytes(notebook)));
+    List<PortableTreeEntry> withRootFiles = new ArrayList<>(acceptedHistory(notebook).exactTree());
     withRootFiles.addAll(committedOnLfs(notebook, ROOT_FILES));
     controller.publishNotebookGitProposal(
         notebook.getId(),
@@ -169,7 +166,7 @@ class NotebookGitAttachmentIndependenceControllerTest
               GitBundleTestReader.fetchHead(repository, acceptedBundleBytes(notebook)));
       assertThat(head.getParent(0).getId(), equalTo(parentHead));
       assertThat(
-          GitBundleTestReader.readTreeEntries(repository, head).stream()
+          GitBundleTestReader.readContent(repository, head).stream()
               .filter(NotebookGitControllerTestBase::isAttachment)
               .toList(),
           equalTo(rootFiles));

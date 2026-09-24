@@ -70,7 +70,7 @@ class NotebookGitLfsConversionControllerTest extends NotebookGitWebContentContro
 
     AcceptedHistory converted = acceptedHistory(notebook);
     assertThat(
-        converted.tipContent(),
+        converted.exactTree(),
         equalTo(
             List.of(
                 NotebookGitAttributes.initialEntry(),
@@ -96,7 +96,7 @@ class NotebookGitLfsConversionControllerTest extends NotebookGitWebContentContro
         RevWalk revWalk = new RevWalk(repository)) {
       GitBundleTestReader.fetchHead(repository, acceptedBundleBytes(notebook));
       assertThat(
-          GitBundleTestReader.readTreeEntries(
+          GitBundleTestReader.readContent(
               repository, revWalk.parseCommit(ObjectId.fromString(firstPublication))),
           hasItem(new PortableTreeEntry("physics/diagram.png", DIAGRAM_V1)));
     }
@@ -109,7 +109,7 @@ class NotebookGitLfsConversionControllerTest extends NotebookGitWebContentContro
     makeMe.aNote().notebook(notebook).title("note").content(NOTE_CONTENT).please();
     String previousHead = snapshotCurrentPortableTree(notebook).getAcceptedGitObjectId();
     List<PortableTreeEntry> expectedEntries =
-        new ArrayList<>(acceptedHistory(notebook).tipContent());
+        new ArrayList<>(acceptedHistory(notebook).exactTree());
     expectedEntries.add(0, NotebookGitAttributes.initialEntry());
 
     conversionService.convert(notebook.getId(), Instant.now());
@@ -129,8 +129,7 @@ class NotebookGitLfsConversionControllerTest extends NotebookGitWebContentContro
           equalTo(NotebookGitCutoverService.SYSTEM_AUTHOR_EMAIL));
       assertThat(conversion.getFullMessage(), equalTo("Store notebook files with Git LFS"));
       assertThat(
-          GitBundleTestReader.readTreeEntriesWithMetadata(repository, conversion),
-          equalTo(expectedEntries));
+          GitBundleTestReader.readExactTree(repository, conversion), equalTo(expectedEntries));
     }
   }
 

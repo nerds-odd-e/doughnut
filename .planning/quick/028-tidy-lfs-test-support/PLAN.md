@@ -100,7 +100,8 @@ so the E2E seeding no longer needs to pass the metadata.
 - **Naming rule:** `content` = notebook content without reserved Git metadata;
   `exactTree` = every blob, including metadata. Renames:
   `readTreeEntries` → `readContent`, `readTreeEntriesWithMetadata` →
-  `readExactTree`, `fetchTipTreeEntries` → `fetchTipExactTree`,
+  `readExactTree`, `fetchTipTreeEntries` → `fetchTipExactTree` (later removed
+  as a duplicate of `acceptedHistory(notebook).exactTree()`),
   `AcceptedTip.entries` → `exactTree`, `AcceptedHistory.tipContent` →
   `exactTree`. `content()`, `pathsIn` and `tipPaths` already follow the rule
   and keep their names. This is a rename only: every call site keeps the
@@ -148,7 +149,13 @@ Weakness removed: story 19 can no longer break LFS seeding by deleting
 ### 2. Test Git readers say whether they include reserved metadata
 
 Type: Structure (retrospective correction F4)
-Status: planned
+Status: done
+Accepted: `NotebookGit*` 428 tests and `services.notebookGit.*` 17 tests,
+0 failures; old/new name counts match one-to-one. Refactor then deleted
+`fetchTipExactTree` and the size-admission `acceptedTipEntries`: both
+duplicated `acceptedHistory(notebook).exactTree()` (same reload, same
+metadata-inclusive tree), so their callers use that. Remaining `tipContent`
+hits are unrelated local String parameters.
 Proof: backend `NotebookGit*` green, then `--tests 'com.odde.donut.services.notebookGit.*'`
 green; grep of the backend tests for `readTreeEntries`,
 `fetchTipTreeEntries` and `tipContent` returns nothing. `AcceptedTip` has no

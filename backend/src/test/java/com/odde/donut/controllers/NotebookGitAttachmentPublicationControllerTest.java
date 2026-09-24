@@ -58,7 +58,7 @@ class NotebookGitAttachmentPublicationControllerTest
     AcceptedTip published = acceptedTip(notebook);
     assertThat(published.ancestry().getFirst(), is(initialHead));
     assertThat(
-        published.entries(),
+        published.exactTree(),
         contains(
             new PortableTreeEntry("Diagram.png", CAPITALIZED_DIAGRAM),
             PortableTreeEntry.ofText("Root Note.md", NOTE_MARKDOWN),
@@ -71,7 +71,7 @@ class NotebookGitAttachmentPublicationControllerTest
     AcceptedTip afterWebSave = acceptedTip(notebook);
     assertThat(afterWebSave.ancestry().getFirst(), is(published.head()));
     assertThat(
-        afterWebSave.entries(),
+        afterWebSave.exactTree(),
         contains(
             new PortableTreeEntry("Diagram.png", CAPITALIZED_DIAGRAM),
             PortableTreeEntry.ofText("Root Note.md", EDITED_CONTENT),
@@ -94,7 +94,7 @@ class NotebookGitAttachmentPublicationControllerTest
             empty, List.of(new NotebookGitProposalFile("reference.json", REFERENCE_JSON))));
 
     assertThat(
-        acceptedTip(notebook).entries(),
+        acceptedTip(notebook).exactTree(),
         contains(PortableTreeEntry.ofText("reference.json", REFERENCE_JSON)));
     assertThat(committedNoteIds(notebook), empty());
     assertThat(countFoldersForNotebook(notebook.getId()), is(0L));
@@ -113,7 +113,7 @@ class NotebookGitAttachmentPublicationControllerTest
             empty, List.of(new NotebookGitProposalFile(attachmentPath, REFERENCE_JSON))));
 
     assertThat(
-        acceptedTip(notebook).entries(),
+        acceptedTip(notebook).exactTree(),
         contains(PortableTreeEntry.ofText(attachmentPath, REFERENCE_JSON)));
     List<Folder> folders = folderRepository.findByNotebookIdOrderByIdAsc(notebook.getId());
     assertThat(folders, hasSize(2));
@@ -183,7 +183,7 @@ class NotebookGitAttachmentPublicationControllerTest
 
     AcceptedTip published = acceptedTip(notebook);
     assertThat(
-        published.entries(),
+        published.exactTree(),
         contains(
             PortableTreeEntry.ofText("Root Note.md", NOTE_MARKDOWN),
             PortableTreeEntry.ofText("physics/diagrams/Force.md", NOTE_MARKDOWN),
@@ -197,7 +197,7 @@ class NotebookGitAttachmentPublicationControllerTest
     textContentController.updateNoteContent(force, contentDto(EDITED_CONTENT));
 
     assertThat(
-        acceptedTip(notebook).entries(),
+        acceptedTip(notebook).exactTree(),
         contains(
             PortableTreeEntry.ofText("Root Note.md", NOTE_MARKDOWN),
             PortableTreeEntry.ofText("physics/diagrams/Force.md", EDITED_CONTENT),

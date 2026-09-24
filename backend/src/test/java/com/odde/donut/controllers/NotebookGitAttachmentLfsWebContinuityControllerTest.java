@@ -54,7 +54,7 @@ class NotebookGitAttachmentLfsWebContinuityControllerTest
     folderController.renameFolder(notebook, photos, renameTo("Pictures"));
 
     assertThat(
-        acceptedHistory(notebook).tipContent(),
+        acceptedHistory(notebook).exactTree(),
         containsInAnyOrder(
             PortableTreeEntry.ofText(
                 NotebookGitAttributes.PATH, NotebookGitAttributes.INITIAL_CONTENT),

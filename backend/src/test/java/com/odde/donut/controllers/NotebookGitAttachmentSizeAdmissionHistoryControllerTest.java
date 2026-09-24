@@ -140,7 +140,7 @@ class NotebookGitAttachmentSizeAdmissionHistoryControllerTest
 
     assertThat(publishedHead, equalTo(range.tip().getName()));
     assertThat(
-        acceptedTipEntries(notebook),
+        acceptedHistory(notebook).exactTree(),
         contains(PortableTreeEntry.ofText("Root Note.md", NOTE_MARKDOWN)));
     byte[] downloaded = controller.downloadNotebookGitBundle(notebook).getBody();
     try (InMemoryRepository acceptedRepo = new InMemoryRepository(new DfsRepositoryDescription());
@@ -177,7 +177,7 @@ class NotebookGitAttachmentSizeAdmissionHistoryControllerTest
                 new NotebookGitProposalFile("b.bin", other))));
 
     assertThat(
-        acceptedTipEntries(notebook),
+        acceptedHistory(notebook).exactTree(),
         contains(new PortableTreeEntry("a.bin", HALF_PLUS), new PortableTreeEntry("b.bin", other)));
   }
 

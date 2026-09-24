@@ -45,7 +45,7 @@ class NotebookGitAttachmentMetadataControllerTest extends NotebookGitWebContentC
                 new NotebookGitProposalFile("diagram.png", new byte[] {1, 2, 3}))));
 
     assertThat(
-        acceptedHistory(notebook).tipContent(),
+        acceptedHistory(notebook).exactTree(),
         contains(
             PortableTreeEntry.ofText(".gitattributes", AUTHORED_ATTRIBUTES),
             PortableTreeEntry.ofText("Note.md", NOTE),
@@ -61,14 +61,14 @@ class NotebookGitAttachmentMetadataControllerTest extends NotebookGitWebContentC
         contentDto("---\ntype: Note\n---\nedited\n"));
 
     assertThat(
-        acceptedHistory(notebook).tipContent().stream()
+        acceptedHistory(notebook).exactTree().stream()
             .filter(entry -> entry.path().equals(".gitattributes"))
             .map(entry -> new String(entry.content(), StandardCharsets.UTF_8))
             .toList(),
         contains(AUTHORED_ATTRIBUTES));
     assertAcceptedTreeMatchesTheFullAssembly(notebook);
     assertThat(
-        acceptedHistory(notebook).tipContent().stream()
+        acceptedHistory(notebook).exactTree().stream()
             .filter(entry -> entry.path().equals(".gitattributes"))
             .map(entry -> new String(entry.content(), StandardCharsets.UTF_8))
             .toList(),
@@ -90,7 +90,7 @@ class NotebookGitAttachmentMetadataControllerTest extends NotebookGitWebContentC
         reloadCommittedBinding(notebook.getId()).getAttachmentRepresentation(),
         is(NotebookGitAttachmentRepresentation.RAW));
     assertThat(
-        acceptedHistory(notebook).tipContent(),
+        acceptedHistory(notebook).exactTree(),
         contains(new PortableTreeEntry("legacy.bin", pointerLooking)));
   }
 

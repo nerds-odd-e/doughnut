@@ -47,7 +47,7 @@ class NotebookGitCommitBuilderTest {
         assertThat(commit.getFullMessage(), equalTo("Snapshot import"));
 
         assertThat(
-            GitBundleTestReader.readTreeEntries(repository, commit),
+            GitBundleTestReader.readContent(repository, commit),
             contains(
                 ofText("Parent Folder/Child Folder/Nested note.md", "Nested body"),
                 ofText("Parent Folder/README.md", "Parent readme")));
@@ -117,7 +117,7 @@ class NotebookGitCommitBuilderTest {
                 Instant.parse("2026-09-04T10:15:30Z"));
         RevWalk revWalk = new RevWalk(repository)) {
       assertThat(
-          GitBundleTestReader.readTreeEntries(
+          GitBundleTestReader.readContent(
                   repository, revWalk.parseCommit(repository.resolve("refs/heads/main")))
               .stream()
               .map(PortableTreeEntry::path)

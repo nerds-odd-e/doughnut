@@ -53,7 +53,7 @@ class NotebookGitAttachmentLfsPublicationControllerTest
 
     AcceptedTip published = acceptedTip(notebook);
     assertThat(
-        published.entries(),
+        published.exactTree(),
         containsInAnyOrder(
             PortableTreeEntry.ofText(
                 NotebookGitAttributes.PATH, NotebookGitAttributes.INITIAL_CONTENT),
@@ -83,7 +83,7 @@ class NotebookGitAttachmentLfsPublicationControllerTest
         proposalBundleBytes(empty, List.of(new NotebookGitProposalFile("payload.bin", pointer))));
 
     assertThat(
-        acceptedTip(notebook).entries(),
+        acceptedTip(notebook).exactTree(),
         containsInAnyOrder(
             PortableTreeEntry.ofText(
                 NotebookGitAttributes.PATH, NotebookGitAttributes.INITIAL_CONTENT),
@@ -123,7 +123,7 @@ class NotebookGitAttachmentLfsPublicationControllerTest
             .findFirst()
             .orElseThrow();
     MemoryTracker tracker = learnedTracker(note, 4.5f, 2);
-    List<PortableTreeEntry> tipBefore = acceptedTip(notebook).entries();
+    List<PortableTreeEntry> tipBefore = acceptedTip(notebook).exactTree();
     List<PortableTreeEntry> projectionBefore =
         NotebookLiveProjectionTestReader.rootAttachments(
             transactionManager, notebookAttachmentRepository, notebook.getId());
@@ -184,7 +184,7 @@ class NotebookGitAttachmentLfsPublicationControllerTest
     assertThat(corruptException.getReason(), containsString("corrupt"));
 
     assertShownContentAndRetainedLearning(note, tracker, NOTE_MARKDOWN);
-    assertThat(acceptedTip(notebook).entries(), equalTo(tipBefore));
+    assertThat(acceptedTip(notebook).exactTree(), equalTo(tipBefore));
     assertThat(
         NotebookLiveProjectionTestReader.rootAttachments(
             transactionManager, notebookAttachmentRepository, notebook.getId()),

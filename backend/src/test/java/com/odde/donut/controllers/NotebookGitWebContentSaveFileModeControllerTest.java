@@ -48,6 +48,6 @@ class NotebookGitWebContentSaveFileModeControllerTest
     textContentController.updateNoteContent(note, contentDto(EDITED_CONTENT));
     AcceptedHistory saved = acceptedHistory(notebook);
     assertThat(saved.commits(), hasSize(2));
-    assertThat(saved.tipContent(), contains(ofText("Root Note.md", EDITED_CONTENT)));
+    assertThat(saved.exactTree(), contains(ofText("Root Note.md", EDITED_CONTENT)));
   }
 }

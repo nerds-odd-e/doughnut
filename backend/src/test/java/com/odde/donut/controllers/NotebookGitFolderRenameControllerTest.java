@@ -57,7 +57,7 @@ class NotebookGitFolderRenameControllerTest extends NotebookGitWebContentControl
         RevWalk revWalk = new RevWalk(repo)) {
       ObjectId acceptedHead = GitBundleTestReader.fetchHead(repo, acceptedBundleBytes(notebook));
       assertThat(
-          GitBundleTestReader.readTreeEntries(repo, revWalk.parseCommit(acceptedHead)),
+          GitBundleTestReader.readContent(repo, revWalk.parseCommit(acceptedHead)),
           equalTo(
               List.of(
                   ofText("mechanics/diagrams/Force.md", CELLS_BODY),

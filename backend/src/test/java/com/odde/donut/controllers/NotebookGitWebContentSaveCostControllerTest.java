@@ -98,7 +98,7 @@ class NotebookGitWebContentSaveCostControllerTest extends NotebookGitWebContentS
     AcceptedHistory after = acceptedHistory(notebook);
     assertThat(after.parents(), equalTo(acceptedBefore.commits()));
     assertThat(
-        after.tipContent().stream()
+        after.exactTree().stream()
             .filter(entry -> entry.path().equals("diagram.png"))
             .map(entry -> entry.content())
             .findFirst()
