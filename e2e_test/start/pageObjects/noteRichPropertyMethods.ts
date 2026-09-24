@@ -69,22 +69,6 @@ export const noteRichPropertyMethods = () => ({
     })
     return this
   },
-  expectRichNoteImagePropertyAttachmentPath(key: string) {
-    findNoteContentRegion().within(() => {
-      cy.get(richNotePropertyRow(key)).within(() => {
-        cy.get('[data-testid="rich-note-property-row-value-input"]').should(
-          ($input) => {
-            const actual = String($input.val() ?? '').trim()
-            expect(
-              actual,
-              `Expected rich note property "${key}" to be an attachment image path (/attachments/images/...), but found ${JSON.stringify(actual)}`
-            ).to.match(/^\/attachments\/images\/\d+\/.+/)
-          }
-        )
-      })
-    })
-    return this
-  },
   expectRichNotePropertyAbsent(key: string) {
     findNoteContentRegion().within(() => {
       cy.get(richNotePropertyRow(key)).should('not.exist')

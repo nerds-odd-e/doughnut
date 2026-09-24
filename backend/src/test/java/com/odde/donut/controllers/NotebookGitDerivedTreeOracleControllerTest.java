@@ -9,6 +9,7 @@ import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.not;
 
 import com.odde.donut.controllers.dto.NoteCreationDTO;
+import com.odde.donut.controllers.dto.NoteImageUploadDTO;
 import com.odde.donut.controllers.dto.NoteUpdateTitleDTO;
 import com.odde.donut.controllers.dto.TitleRenameReferenceHandling;
 import com.odde.donut.entities.Folder;
@@ -38,6 +39,21 @@ class NotebookGitDerivedTreeOracleControllerTest extends NotebookGitWebContentCo
 
     textContentController.updateNoteContent(note, contentDto(EDITED_CONTENT));
 
+    assertAcceptedTreeMatchesTheFullAssembly(notebook);
+  }
+
+  @Test
+  void uploadingANotePictureAddsItsFileAndMatchesTheFullAssembly() throws Exception {
+    Notebook notebook = createGitBackedNotebook();
+    Folder physics = makeMe.aFolder().notebook(notebook).name("physics").please();
+    Note moon = makeMe.aNote("Moon").folder(physics).content(ACCEPTED_CONTENT).please();
+    storeFolderAttachmentAndSnapshot(notebook, physics, "picture.bin", new byte[64]);
+    NoteImageUploadDTO upload = new NoteImageUploadDTO();
+    upload.setUploadImage(makeMe.anUploadedImage().toMultiplePartFilePlease());
+
+    noteController.uploadNoteImage(noteRepository.findById(moon.getId()).orElseThrow(), upload);
+
+    assertThat(acceptedHistory(notebook).tipPaths(), hasItem("physics/my.png"));
     assertAcceptedTreeMatchesTheFullAssembly(notebook);
   }
 

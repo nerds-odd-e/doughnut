@@ -62,11 +62,15 @@ the pointer, and a raw notebook serves its content unchanged. `.gitattributes`
 and nested `.keep` markers are not rows, so, like `.git`, they are not shown on
 the web.
 
-Images uploaded to a note through the web image upload are served inline at
-`/attachments/images/{id}/{fileName}` under the same notebook read rule:
-owners, subscribers, and Bazaar readers (even logged out) receive them; another
-user is refused, and an anonymous request for a private notebook's image must
-log in.
+A picture uploaded with a note's `image` property on the web becomes a file in
+the note's folder under its uploaded name, with its original bytes: the bytes are
+stored in the notebook's content store first, then the LFS pointer and the
+note's `image: <filename>` are accepted together in one web commit. A notebook
+without an LFS binding refuses the upload. Legacy uploaded pictures (from before
+this change) remain served inline at `/attachments/images/{id}/{fileName}` under
+the same notebook read rule: owners, subscribers, and Bazaar readers (even
+logged out) receive them; another user is refused, and an anonymous request for
+a private notebook's image must log in. No new picture is stored there.
 
 Publication admits each newly introduced raw-Git attachment blob against an
 inclusive 10 MiB (10,485,760 byte) limit across the contiguous first-parent

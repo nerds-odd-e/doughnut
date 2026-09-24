@@ -423,7 +423,7 @@ export type NoteImageUploadDto = {
 
 export type NoteImageUploadResult = {
     /**
-     * Path suitable for the note frontmatter `image:` scalar (e.g. /attachments/images/{id}/{filename}).
+     * The filename the upload wrote into the note's frontmatter `image:`; the picture is a file of that name in the note's folder.
      */
     imagePath: string;
 };

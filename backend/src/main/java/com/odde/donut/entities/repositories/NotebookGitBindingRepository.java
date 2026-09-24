@@ -14,6 +14,14 @@ public interface NotebookGitBindingRepository extends CrudRepository<NotebookGit
 
   Optional<NotebookGitBinding> findByNotebook_Id(Integer notebookId);
 
+  /** Whether the notebook's accepted Git stores its files as LFS pointers. */
+  default boolean storesAttachmentsAsLfs(Integer notebookId) {
+    return findByNotebook_Id(notebookId)
+        .map(NotebookGitBinding::getAttachmentRepresentation)
+        .filter(NotebookGitAttachmentRepresentation.LFS::equals)
+        .isPresent();
+  }
+
   @Lock(LockModeType.PESSIMISTIC_WRITE)
   @Query("SELECT binding FROM NotebookGitBinding binding WHERE binding.notebook.id = :notebookId")
   Optional<NotebookGitBinding> findByNotebookIdForUpdate(@Param("notebookId") Integer notebookId);

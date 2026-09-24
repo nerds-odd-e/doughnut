@@ -137,6 +137,11 @@ public final class NoteContentMarkdown {
         .map(s -> new LeadingFrontmatter(s.frontmatter(), s.body()));
   }
 
+  /** Sets the leading frontmatter's {@code image:} scalar, leaving every other property as is. */
+  public static String withNoteImage(String content, String image) {
+    return setLeadingFrontmatterProperty(content, NOTE_IMAGE_KEY, image);
+  }
+
   /**
    * Updates or removes {@code image:} and {@code image_mask:} scalar lines in the first leading
    * YAML frontmatter block so note display can read a single source of truth from {@code
@@ -198,14 +203,14 @@ public final class NoteContentMarkdown {
     String resolvedKey =
         PropertyKeyNaming.nextAvailablePropertyKeyForBase(basePropertyKey, existingKeys);
     return new AddPropertyWithAvailableKeyResult(
-        addPropertyToLeadingFrontmatter(content, resolvedKey, value), resolvedKey);
+        setLeadingFrontmatterProperty(content, resolvedKey, value), resolvedKey);
   }
 
   /**
-   * Appends a scalar property to the first leading YAML frontmatter block, or creates one when
-   * absent. Caller must ensure {@code key} is not already present (case-insensitive).
+   * Sets a scalar property in the first leading YAML frontmatter block, replacing an existing
+   * {@code key} (case-insensitive) in place or appending it, and creates the block when absent.
    */
-  public static String addPropertyToLeadingFrontmatter(String content, String key, String value) {
+  public static String setLeadingFrontmatterProperty(String content, String key, String value) {
     if (content == null) {
       content = "";
     }

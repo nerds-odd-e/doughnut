@@ -15,12 +15,12 @@ Feature: Note header image from frontmatter
       """
     Then I should see note "shown" has an image
 
-  Scenario: Uploaded image sets attachment path on the image property
+  Scenario: Uploaded image becomes a file the image property names
     When I upload an image from fixture "moon.jpg" to the note "shown"
     And I reload the current page for note "shown"
-    Then the rich note property "image" should show an attachment image path
+    Then I should see note "shown" shows its picture
     When I open the note content markdown editor
-    Then the note content markdown source should contain "image: /attachments/images/"
+    Then the note content markdown source should contain "image: moon.jpg"
 
   Scenario: Image property URL shows as the note header image
     When I set rich note image property URL "https://example.com/a.png" on note "shown"

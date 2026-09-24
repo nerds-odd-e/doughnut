@@ -3,6 +3,7 @@ package com.odde.donut.testability.builders;
 import com.odde.donut.entities.AttachmentBlob;
 import com.odde.donut.entities.Image;
 import com.odde.donut.entities.Note;
+import com.odde.donut.entities.User;
 import com.odde.donut.testability.EntityBuilder;
 import com.odde.donut.testability.MakeMe;
 
@@ -13,6 +14,11 @@ public class ImageBuilder extends EntityBuilder<Image> {
 
   public ImageBuilder forNote(Note note) {
     entity.setNote(note);
+    return this;
+  }
+
+  public ImageBuilder by(User user) {
+    entity.setUser(user);
     return this;
   }
 

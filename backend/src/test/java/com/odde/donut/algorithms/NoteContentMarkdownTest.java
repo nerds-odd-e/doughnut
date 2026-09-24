@@ -188,11 +188,11 @@ class NoteContentMarkdownTest {
   }
 
   @Test
-  void addPropertyToLeadingFrontmatter_appends_to_existing_frontmatter() {
+  void setLeadingFrontmatterProperty_appends_to_existing_frontmatter() {
     String content = "---\nsource: \"[[Moon]]\"\n---\nBody";
 
     String result =
-        NoteContentMarkdown.addPropertyToLeadingFrontmatter(content, "a part of", "[[Earth]]");
+        NoteContentMarkdown.setLeadingFrontmatterProperty(content, "a part of", "[[Earth]]");
 
     assertThat(
         result,
@@ -200,11 +200,11 @@ class NoteContentMarkdownTest {
   }
 
   @Test
-  void addPropertyToLeadingFrontmatter_creates_frontmatter_when_none() {
+  void setLeadingFrontmatterProperty_creates_frontmatter_when_none() {
     String content = "Hello";
 
     String result =
-        NoteContentMarkdown.addPropertyToLeadingFrontmatter(content, "a part of", "[[Earth]]");
+        NoteContentMarkdown.setLeadingFrontmatterProperty(content, "a part of", "[[Earth]]");
 
     assertThat(result, equalTo("---\n" + "a part of: '[[Earth]]'\n" + "---\n" + "Hello"));
   }

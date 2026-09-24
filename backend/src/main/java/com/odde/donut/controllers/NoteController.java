@@ -18,6 +18,8 @@ import com.odde.donut.services.focusContext.FocusContextMarkdownRenderer;
 import com.odde.donut.services.focusContext.FocusContextResult;
 import com.odde.donut.services.focusContext.FocusContextRetrievalService;
 import com.odde.donut.services.focusContext.RetrievalConfig;
+import com.odde.donut.services.notebookGit.WebNoteImageUploadService;
+import com.odde.donut.testability.TestabilitySettings;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
@@ -47,6 +49,8 @@ class NoteController {
   private final NoteMotionService noteMotionService;
   private final NoteTrashService noteTrashService;
   private final NoteTrashUndoService noteTrashUndoService;
+  private final WebNoteImageUploadService webNoteImageUploadService;
+  private final TestabilitySettings testabilitySettings;
 
   public NoteController(
       EntityPersister entityPersister,
@@ -61,7 +65,9 @@ class NoteController {
       PortablePathAuthoring portablePathAuthoring,
       NoteMotionService noteMotionService,
       NoteTrashService noteTrashService,
-      NoteTrashUndoService noteTrashUndoService) {
+      NoteTrashUndoService noteTrashUndoService,
+      WebNoteImageUploadService webNoteImageUploadService,
+      TestabilitySettings testabilitySettings) {
     this.entityPersister = entityPersister;
     this.noteService = noteService;
     this.authorizationService = authorizationService;
@@ -75,6 +81,8 @@ class NoteController {
     this.noteMotionService = noteMotionService;
     this.noteTrashService = noteTrashService;
     this.noteTrashUndoService = noteTrashUndoService;
+    this.webNoteImageUploadService = webNoteImageUploadService;
+    this.testabilitySettings = testabilitySettings;
   }
 
   @GetMapping("/{note}")
@@ -92,8 +100,11 @@ class NoteController {
       @Valid @ModelAttribute NoteImageUploadDTO noteImageUploadDTO)
       throws UnexpectedNoAccessRightException, IOException {
     authorizationService.assertAuthorization(note);
-    return noteService.uploadNoteImage(
-        note, noteImageUploadDTO, authorizationService.getCurrentUser());
+    return new NoteImageUploadResult(
+        webNoteImageUploadService.upload(
+            note,
+            noteImageUploadDTO.getUploadImage(),
+            testabilitySettings.getCurrentUTCTimestamp()));
   }
 
   @GetMapping("/{note}/note-info")

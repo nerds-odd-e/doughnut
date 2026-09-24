@@ -1,8 +1,6 @@
 package com.odde.donut.services;
 
 import com.odde.donut.algorithms.NoteContentMarkdown;
-import com.odde.donut.controllers.dto.NoteImageUploadDTO;
-import com.odde.donut.controllers.dto.NoteImageUploadResult;
 import com.odde.donut.controllers.dto.NoteTrashReferenceHandling;
 import com.odde.donut.entities.Image;
 import com.odde.donut.entities.Note;
@@ -11,9 +9,7 @@ import com.odde.donut.entities.repositories.MemoryTrackerRepository;
 import com.odde.donut.entities.repositories.NoteRepository;
 import com.odde.donut.factoryServices.EntityPersister;
 import com.odde.donut.testability.TestabilitySettings;
-import com.odde.donut.utils.ImageBuilder;
 import jakarta.persistence.FlushModeType;
-import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -206,16 +202,5 @@ public class NoteService {
         .setFlushMode(FlushModeType.COMMIT)
         .getResultList()
         .forEach(entityPersister::remove);
-  }
-
-  public NoteImageUploadResult uploadNoteImage(
-      Note note, NoteImageUploadDTO noteImageUploadDTO, User user) throws IOException {
-    Image image =
-        new ImageBuilder().buildImageFromUploadedImage(user, noteImageUploadDTO.getUploadImage());
-    image.setNote(note);
-    entityPersister.save(image);
-    entityPersister.flush();
-    String imagePath = "/attachments/images/" + image.getId() + "/" + image.getName();
-    return new NoteImageUploadResult(imagePath);
   }
 }

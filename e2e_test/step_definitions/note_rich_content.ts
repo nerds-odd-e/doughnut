@@ -70,13 +70,6 @@ Then(
   }
 )
 
-Then(
-  'the rich note property {string} should show an attachment image path',
-  (key: string) => {
-    start.assumeNotePage().expectRichNoteImagePropertyAttachmentPath(key)
-  }
-)
-
 Then('I should not see rich note property {string}', (key: string) => {
   start.assumeNotePage().expectRichNotePropertyAbsent(key)
 })

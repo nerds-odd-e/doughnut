@@ -97,7 +97,13 @@ yet. Enables slice 3.
 
 ### 3. A web-uploaded picture is a file in the note's folder
 Type: Behavior
-Status: planned
+Status: done
+Accepted proof: `NoteControllerUploadNoteImageTests` (one new commit with pointer at
+`physics/my.png` and `image: my.png`, bytes in the content store, no `image` row, root
+note, mask and legacy row kept, original bytes via `NoteAttachmentImageController`,
+raw notebook throws), `NotebookGitDerivedTreeOracleControllerTest` upload case, full
+backend suite, E2E `note_frontmatter_image.feature` 4/4. Upload lives in
+`WebNoteImageUploadService`; no name clash check yet (slice 5).
 Proof: `NoteControllerUploadNoteImageTests` and the
 `NotebookGitDerivedTreeOracleControllerTest` upload case (table above); E2E
 `note_frontmatter_image.feature` "Uploaded image sets attachment path on the

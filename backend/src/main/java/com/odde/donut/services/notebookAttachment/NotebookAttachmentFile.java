@@ -1,8 +1,6 @@
 package com.odde.donut.services.notebookAttachment;
 
 import com.odde.donut.entities.NotebookAttachment;
-import com.odde.donut.entities.NotebookGitAttachmentRepresentation;
-import com.odde.donut.entities.NotebookGitBinding;
 import com.odde.donut.entities.repositories.NotebookGitBindingRepository;
 import com.odde.donut.services.notebookGit.NotebookGitLfsPointer;
 import java.util.Optional;
@@ -47,11 +45,10 @@ public class NotebookAttachmentFile {
   /** The row's pointer when its notebook stores attachments as LFS and the file is not empty. */
   private Optional<NotebookGitLfsPointer.Parsed> lfsPointer(NotebookAttachment attachment) {
     byte[] content = attachment.getAcceptedGitContent();
-    if (NotebookGitLfsPointer.isEmptyFile(content)) return Optional.empty();
-    return notebookGitBindingRepository
-        .findByNotebook_Id(attachment.getNotebook().getId())
-        .map(NotebookGitBinding::getAttachmentRepresentation)
-        .filter(NotebookGitAttachmentRepresentation.LFS::equals)
-        .map(lfs -> NotebookGitLfsPointer.parse(content).orElseThrow());
+    if (NotebookGitLfsPointer.isEmptyFile(content)
+        || !notebookGitBindingRepository.storesAttachmentsAsLfs(attachment.getNotebook().getId())) {
+      return Optional.empty();
+    }
+    return Optional.of(NotebookGitLfsPointer.parse(content).orElseThrow());
   }
 }

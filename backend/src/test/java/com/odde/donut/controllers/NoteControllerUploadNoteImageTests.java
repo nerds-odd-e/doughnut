@@ -6,67 +6,117 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.odde.donut.controllers.dto.NoteImageUploadDTO;
 import com.odde.donut.controllers.dto.NoteImageUploadResult;
+import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.Image;
 import com.odde.donut.entities.Note;
+import com.odde.donut.entities.Notebook;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
-import com.odde.donut.services.httpQuery.HttpClientAdapter;
-import jakarta.persistence.EntityManager;
+import com.odde.donut.services.notebookAttachment.VerifiedNotebookAttachmentBytes;
+import com.odde.donut.services.notebookGit.NotebookGitLfsPointer;
+import com.odde.donut.services.notebookTree.PortableTreeEntry;
+import com.odde.donut.testability.GitBundleTestReader.AcceptedHistory;
 import jakarta.validation.Validation;
-import java.io.IOException;
-import org.junit.jupiter.api.BeforeEach;
+import java.nio.charset.StandardCharsets;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.web.multipart.MultipartFile;
 
-class NoteControllerUploadNoteImageTests extends ControllerTestBase {
-  @Autowired EntityManager entityManager;
-  @Autowired NoteController controller;
-  @Autowired AttachmentController attachmentController;
-  @MockitoBean HttpClientAdapter httpClientAdapter;
+class NoteControllerUploadNoteImageTests extends NotebookGitWebContentControllerTestBase {
+  @Autowired NoteAttachmentImageController noteAttachmentImageController;
 
-  @BeforeEach
-  void setup() {
-    currentUser.setUser(makeMe.aUser().please());
+  @Test
+  void theUploadedPictureIsAFileInTheNotesFolderNamedByItsImageInOneAcceptedCommit()
+      throws Exception {
+    Notebook notebook = createGitBackedNotebook();
+    Folder physics = makeMe.aFolder().notebook(notebook).name("physics").please();
+    Note moon = makeMe.aNote("Moon").folder(physics).content(ACCEPTED_CONTENT).please();
+    snapshotCurrentPortableTree(notebook);
+    List<String> commitsBefore = acceptedHistory(notebook).commits();
+    MultipartFile picture = makeMe.anUploadedImage().toMultiplePartFilePlease();
+
+    NoteImageUploadResult result = upload(moon, picture);
+
+    assertThat(result.imagePath(), equalTo("my.png"));
+    AcceptedHistory after = acceptedHistory(notebook);
+    assertThat(after.parents(), equalTo(commitsBefore));
+    assertThat(
+        tipContent(after, "physics/my.png"), equalTo(lfsPointerStoredFor(notebook, picture)));
+    assertThat(
+        tipText(after, "physics/Moon.md"),
+        equalTo("---\ntype: Note\nimage: my.png\n---\naccepted content"));
+    assertThat(legacyImageCount(moon), equalTo(0L));
   }
 
   @Test
-  void shouldReturnImagePathAndPersistImageLinkedToNote()
-      throws UnexpectedNoAccessRightException, IOException {
-    Note note = makeMe.aNote("n").notebookOwnedBy(currentUser.getUser()).please();
-    NoteImageUploadDTO dto = new NoteImageUploadDTO();
-    dto.setUploadImage(makeMe.anUploadedImage().toMultiplePartFilePlease());
+  void aRootNotesPictureIsAFileAtTheNotebookRoot() throws Exception {
+    Notebook notebook = createGitBackedNotebook();
+    Note moon = makeMe.aNote("Moon").notebook(notebook).content("no frontmatter").please();
+    snapshotCurrentPortableTree(notebook);
+    MultipartFile picture = makeMe.anUploadedImage().toMultiplePartFilePlease();
 
-    NoteImageUploadResult result = controller.uploadNoteImage(note, dto);
+    upload(moon, picture);
 
-    assertThat(result.imagePath(), matchesPattern("/attachments/images/\\d+/my\\.png"));
-    assertThat(savedImage(result).getNote().getId(), equalTo(note.getId()));
+    AcceptedHistory after = acceptedHistory(notebook);
+    assertThat(tipContent(after, "my.png"), equalTo(lfsPointerStoredFor(notebook, picture)));
+    assertThat(tipText(after, "Moon.md"), equalTo("---\nimage: my.png\n---\nno frontmatter"));
   }
 
   @Test
-  void shouldKeepTheOriginalBytesOfAPictureWiderThan2000Pixels()
-      throws UnexpectedNoAccessRightException, IOException {
-    Note note = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).please();
-    NoteImageUploadDTO dto = new NoteImageUploadDTO();
-    dto.setUploadImage(makeMe.anUploadedImage().metrics(2001, 2).toMultiplePartFilePlease());
+  void replacingALegacyPictureKeepsItsMaskAndItsRow() throws Exception {
+    Notebook notebook = createGitBackedNotebook();
+    Note moon = makeMe.aNote("Moon").notebook(notebook).please();
+    Image legacy = makeMe.anImage().forNote(moon).by(currentUser.getUser()).please();
+    authorReferencingContentCommitted(
+        moon,
+        "---\nimage: /attachments/images/"
+            + legacy.getId()
+            + "/example.png\nimage_mask: 10 10 20 20\n---\nbody");
+    snapshotCurrentPortableTree(notebook);
 
-    NoteImageUploadResult result = controller.uploadNoteImage(note, dto);
+    upload(moon, makeMe.anUploadedImage().toMultiplePartFilePlease());
 
     assertThat(
-        attachmentController.showImage(savedImage(result), "my.png").getBody(),
-        equalTo(dto.getUploadImage().getBytes()));
+        tipText(acceptedHistory(notebook), "Moon.md"),
+        equalTo("---\nimage: my.png\nimage_mask: 10 10 20 20\n---\nbody"));
+    assertThat(legacyImageCount(moon), equalTo(1L));
   }
 
-  private Image savedImage(NoteImageUploadResult result) {
-    return entityManager.find(Image.class, Integer.parseInt(result.imagePath().split("/")[3]));
+  @Test
+  void shouldKeepTheOriginalBytesOfAPictureWiderThan2000Pixels() throws Exception {
+    Notebook notebook = createGitBackedNotebook();
+    Note moon = makeMe.aNote("Moon").notebook(notebook).please();
+    MultipartFile picture = makeMe.anUploadedImage().metrics(2001, 2).toMultiplePartFilePlease();
+
+    upload(moon, picture);
+
+    assertThat(
+        noteAttachmentImageController
+            .showAttachmentImage(noteRepository.findById(moon.getId()).orElseThrow(), "my.png")
+            .getBody(),
+        equalTo(picture.getBytes()));
+  }
+
+  @Test
+  void aNotebookWithoutLfsFilesRefusesTheUploadLoudly() throws Exception {
+    Notebook notebook = createLegacyRawNotebook();
+    Note moon = makeMe.aNote("Moon").notebook(notebook).please();
+    List<String> commitsBefore = acceptedHistory(notebook).commits();
+
+    assertThrows(
+        IllegalStateException.class,
+        () -> upload(moon, makeMe.anUploadedImage().toMultiplePartFilePlease()));
+
+    assertThat(acceptedHistory(notebook).commits(), equalTo(commitsBefore));
   }
 
   @Test
   void shouldNotAllowUploadForNoteBelongingToAnotherUser() {
-    Note note = makeMe.aNote().notebookOwnedBy(makeMe.aUser().please()).please();
+    Note note = makeMe.aNote().notebookOwnedBy(createFixtureUser()).please();
     assertThrows(
         UnexpectedNoAccessRightException.class,
-        () -> controller.uploadNoteImage(note, new NoteImageUploadDTO()));
+        () -> noteController.uploadNoteImage(note, new NoteImageUploadDTO()));
   }
 
   @Test
@@ -99,5 +149,39 @@ class NoteControllerUploadNoteImageTests extends ControllerTestBase {
               "uploadImage", "over.png", "image/png", new byte[10 * 1024 * 1024 + 1]));
       assertThat(factory.getValidator().validate(dto), is(not(empty())));
     }
+  }
+
+  private NoteImageUploadResult upload(Note note, MultipartFile picture) throws Exception {
+    NoteImageUploadDTO dto = new NoteImageUploadDTO();
+    dto.setUploadImage(picture);
+    return noteController.uploadNoteImage(noteRepository.findById(note.getId()).orElseThrow(), dto);
+  }
+
+  /** The pointer for {@code picture}, after checking the content store holds its exact bytes. */
+  private byte[] lfsPointerStoredFor(Notebook notebook, MultipartFile picture) throws Exception {
+    byte[] bytes = picture.getBytes();
+    String digest = VerifiedNotebookAttachmentBytes.sha256Hex(bytes);
+    assertThat(
+        notebookAttachmentContent.get(notebook.getId(), digest).orElseThrow(), equalTo(bytes));
+    return NotebookGitLfsPointer.format(digest, bytes.length);
+  }
+
+  private static byte[] tipContent(AcceptedHistory history, String path) {
+    return history.content().stream()
+        .filter(entry -> entry.path().equals(path))
+        .map(PortableTreeEntry::content)
+        .findFirst()
+        .orElseThrow(() -> new AssertionError(path + " not in " + history.tipPaths()));
+  }
+
+  private static String tipText(AcceptedHistory history, String path) {
+    return new String(tipContent(history, path), StandardCharsets.UTF_8);
+  }
+
+  private long legacyImageCount(Note note) {
+    return entityManager
+        .createQuery("SELECT COUNT(i) FROM Image i WHERE i.note.id = :noteId", Long.class)
+        .setParameter("noteId", note.getId())
+        .getSingleResult();
   }
 }
