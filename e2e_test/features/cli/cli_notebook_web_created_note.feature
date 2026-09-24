@@ -26,7 +26,6 @@ Feature: CLI notebook web note changes
       Boil water
       """
     And the notebook "CLI Clone Notebook" has a readme-only folder "Kitchen" with readme "Kitchen landing"
-    And the notebook "CLI Clone Notebook" uses legacy raw Git attachment storage
     And the notebook "CLI Clone Notebook"'s Git binding reflects its current content
     And I have a valid Donut Access Token with label "E2E CLI Clone Token"
 

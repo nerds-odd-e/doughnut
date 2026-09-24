@@ -26,7 +26,6 @@ Feature: CLI notebook web note renames
       Boil water
       """
     And the notebook "CLI Clone Notebook" has a readme-only folder "Kitchen" with readme "Kitchen landing"
-    And the notebook "CLI Clone Notebook" uses legacy raw Git attachment storage
     And the notebook "CLI Clone Notebook"'s Git binding reflects its current content
     And I have a valid Donut Access Token with label "E2E CLI Clone Token"
 
@@ -43,7 +42,6 @@ Feature: CLI notebook web note renames
       Membranes
       """
     And I assimilate the note "Cells"
-    And the notebook "CLI Clone Notebook" uses legacy raw Git attachment storage
     And the notebook "CLI Clone Notebook"'s Git binding reflects its current content
     When I clone the notebook "CLI Clone Notebook" into a temporary destination using the installed CLI
     And I update note title "Cells" to become "Cell structure"
@@ -84,7 +82,6 @@ Feature: CLI notebook web note renames
       ---
       See [[Cells]].
       """
-    And the notebook "CLI Clone Notebook" uses legacy raw Git attachment storage
     And the notebook "CLI Clone Notebook"'s Git binding reflects its current content
     When I clone the notebook "CLI Clone Notebook" into a temporary destination using the installed CLI
     And I route to the note "Cells"

@@ -206,7 +206,7 @@ clone) needs its own assertion. E2E wrapper overhead is about 35s per run.
 ### 7. Web note journeys pull into LFS checkouts
 
 Type: Behavior
-Status: planned
+Status: done
 Proof: `cli_notebook_web_note_renames`, `cli_notebook_existing_note_edits`,
 `cli_notebook_web_created_note` (including the publication profiles),
 `cli_notebook_web_local_reconciliation`, `cli_notebook_web_note_moves` green.
@@ -214,6 +214,11 @@ Proof: `cli_notebook_web_note_renames`, `cli_notebook_existing_note_edits`,
 Behavior: an owner's checkout of a notebook created by the product → web note
 edits, creations, renames and moves → pull and local publishing work as before.
 Remove the demotion step from these files.
+Accepted: the five features 17/17 in one `pnpm cy:run --spec` run; the
+`@publicationProfile*` scenarios (excluded from ordinary runs) 5/5 via
+`scripts/profiling/run-notebook-publication-profile.mjs` with
+`PUBLICATION_PROFILE_TAGS`. Recorded, not tuned: LFS adds about 1–2s per profile
+scenario (whole profile run 41s vs 35s raw, single noisy runs).
 
 ### 8. Folder, trash, clone and reset journeys run on LFS notebooks
 
