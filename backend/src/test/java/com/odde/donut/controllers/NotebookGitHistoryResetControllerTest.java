@@ -12,9 +12,11 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
+import com.odde.donut.entities.NotebookGitAttachmentRepresentation;
 import com.odde.donut.entities.NotebookGitBinding;
 import com.odde.donut.entities.User;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
+import com.odde.donut.services.notebookGit.NotebookGitAttributes;
 import com.odde.donut.services.notebookTree.PortableTreeEntry;
 import com.odde.donut.testability.GitBundleTestReader;
 import java.util.ArrayList;
@@ -106,6 +108,23 @@ class NotebookGitHistoryResetControllerTest extends NotebookGitControllerTestBas
             transactionManager,
             () -> noteRepository.findById(accepted.getId()).orElseThrow().getContent()),
         equalTo(EDITED_CONTENT));
+  }
+
+  @Test
+  void resetOfANotebookWithoutBindingCreatesAnLfsBindingWithInitialAttributes() throws Exception {
+    Notebook notebook =
+        inCommittedTransaction(
+            transactionManager,
+            () -> makeMe.aNotebook().creatorAndOwner(currentUser.getUser()).please());
+
+    controller.resetNotebookGitHistory(notebook);
+
+    assertThat(
+        reloadCommittedBinding(notebook.getId()).getAttachmentRepresentation(),
+        equalTo(NotebookGitAttachmentRepresentation.LFS));
+    assertThat(
+        acceptedHistory(notebook).tipContent(),
+        contains(ofText(NotebookGitAttributes.PATH, NotebookGitAttributes.INITIAL_CONTENT)));
   }
 
   @Test

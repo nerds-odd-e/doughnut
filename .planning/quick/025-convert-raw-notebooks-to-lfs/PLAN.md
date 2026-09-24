@@ -210,7 +210,7 @@ Untested: the log line, and the `ApplicationReadyEvent` wiring.
 ### 5. A history reset never creates a raw binding
 
 Type: Behavior
-Status: planned
+Status: done
 Source: owner-accepted scope added to story 14 on 2026-09-24 (key example 5,
 "No path creates a raw binding any more").
 Proof: backend test beside `NotebookGitHistoryResetControllerTest` (or in it).
@@ -223,6 +223,14 @@ which takes the entity default RAW (`NotebookGitBinding.java:39`). Prefer
 making LFS the only default at creation (entity default or the creation site)
 over special-casing the reset; resetting a notebook that already has a raw
 binding keeps its representation (conversion owns that).
+
+Delivered: `NotebookGitBinding` now defaults to LFS, so every binding Donut
+creates is LFS; a raw binding exists only where set explicitly (test helper,
+force-raw testability, legacy rows). `resetHistory` on a notebook without a
+binding creates one with the initial `.gitattributes`. Accepted proof:
+`NotebookGitHistoryResetControllerTest.resetOfANotebookWithoutBindingCreatesAnLfsBindingWithInitialAttributes`
+(fails without the change); full backend suite 2668 passed after the default
+change.
 
 ## Remaining concerns
 
