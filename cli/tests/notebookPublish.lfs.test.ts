@@ -20,6 +20,7 @@ import {
 } from './notebookClone.testHelpers.js'
 import { configureTestGitIdentity } from './notebookGit.testHelpers.js'
 import {
+  LFS_ATTRIBUTES,
   OID_A,
   OID_B,
   OID_OVER,
@@ -27,6 +28,7 @@ import {
   TWENTY_MIB,
   buildLfsSourceRepo,
   commitPointerAttachment,
+  hashObject,
   installLfsPushIntercept,
   prepareLfsPublishCheckout,
   stubOrderedLfsThenBundleFetch,
@@ -173,6 +175,73 @@ describe('notebook publish — LFS object upload before bundle submission', () =
     expect(pushCalls).toHaveLength(1)
     expect(pushCalls[0]).toContain(OID_B)
     expect(pushCalls[0]).not.toContain(OID_OVER)
+  })
+
+  test('accepted raw history converted to LFS does not block publishing a pointer', async () => {
+    const { pushCalls } = installLfsPushIntercept(realSpawnSync)
+    const workDir = ctx.getWorkDir()
+    const sourceRepoDir = join(workDir, 'converted-source')
+    fs.mkdirSync(sourceRepoDir)
+    runGit(['init', '--quiet', '-b', 'main'], sourceRepoDir)
+    configureTestGitIdentity(sourceRepoDir)
+    fs.writeFileSync(join(sourceRepoDir, 'note.md'), '# raw\n')
+    fs.writeFileSync(
+      join(sourceRepoDir, 'first.png'),
+      Buffer.from([0x89, 0x50])
+    )
+    runGit(['add', 'note.md', 'first.png'], sourceRepoDir)
+    runGit(['commit', '--quiet', '-m', 'raw'], sourceRepoDir)
+    fs.writeFileSync(join(sourceRepoDir, '.gitattributes'), LFS_ATTRIBUTES)
+    runGit(['add', '.gitattributes'], sourceRepoDir)
+    commitPointerAttachment(
+      realSpawnSync,
+      sourceRepoDir,
+      'first.png',
+      OID_A,
+      2,
+      'convert to LFS'
+    )
+    const bundleFile = join(workDir, 'accepted.bundle')
+    bundleMain(sourceRepoDir, bundleFile)
+    stubFetchForSubmission(bundleFile, stubSuccessfulAcceptedHead())
+    const dir = cloneAsBoundCheckout(
+      workDir,
+      sourceRepoDir,
+      getApiConfig().apiBaseUrl,
+      'converted-checkout'
+    )
+    commitPointerAttachment(realSpawnSync, dir, 'second.png', OID_B, 64, 'v2')
+
+    await run(['notebook', 'publish', dir])
+
+    expect(pushCalls).toHaveLength(1)
+    expect(pushCalls[0]).toEqual(expect.arrayContaining([OID_A, OID_B]))
+  })
+
+  test('rejects publishing a raw attachment in an LFS notebook', async () => {
+    const { pushCalls } = installLfsPushIntercept(realSpawnSync)
+    const { dir, fetchMock } = prepareLfsPublishCheckout(
+      ctx.getWorkDir(),
+      'lfs-raw-publish',
+      stubSuccessfulAcceptedHead()
+    )
+    const blob = hashObject(realSpawnSync, dir, Buffer.from([0x89, 0x50]))
+    runGit(
+      ['update-index', '--add', '--cacheinfo', `100644,${blob},raw.png`],
+      dir
+    )
+    runGit(['commit', '--quiet', '-m', 'raw'], dir)
+
+    await expect(run(['notebook', 'publish', dir])).rejects.toThrow(
+      ProcessExitForTest
+    )
+    expect(ctx.getErrorSpy()).toHaveBeenCalledWith(
+      expect.stringContaining(
+        'must be a Git LFS pointer or empty file when the notebook uses LFS'
+      )
+    )
+    expect(pushCalls).toEqual([])
+    expect(postCount(fetchMock)).toBe(0)
   })
 
   test('failed LFS upload preserves local refs and files and skips bundle POST', async () => {

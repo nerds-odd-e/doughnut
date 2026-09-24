@@ -22,6 +22,11 @@ Given(
   (notebookName: string) => cli.notebookClone().forceRawGitBinding(notebookName)
 )
 
+When(
+  'the notebook {string} is converted to Git LFS storage',
+  (notebookName: string) => cli.notebookClone().convertToLfs(notebookName)
+)
+
 Given(
   "the notebook {string}'s Git binding reflects its current content",
   (notebookName: string) =>

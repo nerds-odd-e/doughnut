@@ -1,6 +1,8 @@
+import { execFileSync } from 'node:child_process'
 import * as fs from 'node:fs'
 import { join } from 'node:path'
 import { vi } from 'vitest'
+import { smudgeSkippedGitOptions } from '../src/commands/notebook/notebookLfsLocal.js'
 import { runGit } from './notebookClone.testHelpers.js'
 import {
   bindNotebookCheckout,
@@ -157,6 +159,7 @@ export function bundleMain(sourceRepoDir: string, bundleFile: string): void {
 
 // Clones `sourceRepoDir` so the checkout's main head is an identical commit object to the
 // accepted bundle built from that same source state, then binds it like `notebook clone` would.
+// Like `notebook clone`, LFS pointers stay pointers, so a global LFS filter cannot smudge them.
 export function cloneAsBoundCheckout(
   workDir: string,
   sourceRepoDir: string,
@@ -165,7 +168,10 @@ export function cloneAsBoundCheckout(
   options?: { configureIdentity?: boolean }
 ): string {
   const dir = join(workDir, name)
-  runGit(['clone', '--quiet', sourceRepoDir, dir], workDir)
+  execFileSync('git', ['clone', '--quiet', sourceRepoDir, dir], {
+    cwd: workDir,
+    ...smudgeSkippedGitOptions(),
+  })
   bindNotebookCheckout(dir, apiOrigin)
   if (options?.configureIdentity !== false) {
     configureTestGitIdentity(dir)

@@ -37,7 +37,7 @@ public class NotebookGitBinding extends EntityIdentifiedByIdOnly {
   @Getter
   @Setter
   private NotebookGitAttachmentRepresentation attachmentRepresentation =
-      NotebookGitAttachmentRepresentation.RAW;
+      NotebookGitAttachmentRepresentation.LFS;
 
   @Column(name = "created_at", nullable = false)
   @Getter

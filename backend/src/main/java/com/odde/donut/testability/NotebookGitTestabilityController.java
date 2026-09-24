@@ -9,7 +9,9 @@ import com.odde.donut.entities.repositories.NotebookAttachmentRepository;
 import com.odde.donut.entities.repositories.NotebookGitBindingRepository;
 import com.odde.donut.entities.repositories.NotebookRepository;
 import com.odde.donut.services.notebookGit.NotebookGitCutoverService;
+import com.odde.donut.services.notebookGit.NotebookGitLfsConversionService;
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.time.Instant;
 import java.util.Base64;
 import java.util.List;
 import lombok.Getter;
@@ -34,11 +36,12 @@ class NotebookGitTestabilityController {
   @Autowired TestabilitySettings testabilitySettings;
   @Autowired NotebookGitCutoverService notebookGitCutoverService;
   @Autowired InjectNotesWorker injectNotesWorker;
+  @Autowired NotebookGitLfsConversionService notebookGitLfsConversionService;
 
-  @Schema(name = "ResnapshotNotebookGitBindingRequest")
+  @Schema(name = "NotebookNameRequest")
   @Getter
   @Setter
-  static class ResnapshotNotebookGitBindingRequest {
+  static class NotebookNameRequest {
     @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
     private String notebookName;
   }
@@ -67,7 +70,7 @@ class NotebookGitTestabilityController {
   @PostMapping("/resnapshot_notebook_git_binding_for_testability")
   @Transactional
   public String resnapshotNotebookGitBindingForTestability(
-      @RequestBody ResnapshotNotebookGitBindingRequest request) {
+      @RequestBody NotebookNameRequest request) {
     if (Strings.isEmpty(request.getNotebookName())) {
       throw new IllegalArgumentException("notebookName is required and cannot be empty");
     }
@@ -109,8 +112,7 @@ class NotebookGitTestabilityController {
    */
   @PostMapping("/force_raw_notebook_git_binding_for_testability")
   @Transactional
-  public String forceRawNotebookGitBindingForTestability(
-      @RequestBody ResnapshotNotebookGitBindingRequest request) {
+  public String forceRawNotebookGitBindingForTestability(@RequestBody NotebookNameRequest request) {
     if (Strings.isEmpty(request.getNotebookName())) {
       throw new IllegalArgumentException("notebookName is required and cannot be empty");
     }
@@ -123,6 +125,17 @@ class NotebookGitTestabilityController {
     notebookGitBindingRepository.save(binding);
     notebookGitCutoverService.resetHistory(
         notebook, testabilitySettings.getCurrentUTCTimestamp().toInstant(), List.of());
+    return "OK";
+  }
+
+  /**
+   * Testability-only: runs the startup conversion of a legacy RAW notebook to LFS on demand, so a
+   * scenario can observe an existing checkout pulling the conversion commit.
+   */
+  @PostMapping("/convert_raw_notebook_to_lfs_for_testability")
+  public String convertRawNotebookToLfsForTestability(@RequestBody NotebookNameRequest request) {
+    notebookGitLfsConversionService.convert(
+        requireNotebook(request.getNotebookName()).getId(), Instant.now());
     return "OK";
   }
 

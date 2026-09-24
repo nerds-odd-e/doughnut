@@ -1,7 +1,6 @@
 package com.odde.donut.services.notebookGit;
 
 import com.odde.donut.entities.Notebook;
-import com.odde.donut.entities.NotebookGitAttachmentRepresentation;
 import com.odde.donut.entities.NotebookGitBinding;
 import com.odde.donut.entities.repositories.NotebookGitBindingRepository;
 import com.odde.donut.services.notebookTree.PortableTreeEntry;
@@ -23,8 +22,9 @@ import org.springframework.transaction.annotation.Transactional;
  * <p>{@code NotebookService} calls {@link #createBindingForNotebook} at creation time so every
  * notebook starts Git-backed from an empty content tree with LFS representation and initial {@code
  * .gitattributes}; {@link #resetHistory} writes the same kind of root commit over a binding a
- * notebook already has, preserving that binding's representation and accepted metadata. The caller
- * supplies the commit time, and a tree failure propagates before a binding is persisted.
+ * notebook already has, preserving that binding's representation and accepted metadata (or, for a
+ * notebook without one, creating it as at creation time). The caller supplies the commit time, and
+ * a tree failure propagates before a binding is persisted.
  */
 @Service
 public class NotebookGitCutoverService {
@@ -53,9 +53,7 @@ public class NotebookGitCutoverService {
   }
 
   public NotebookGitBinding createBindingForNotebook(Notebook notebook, Instant cutoverTime) {
-    NotebookGitBinding binding = new NotebookGitBinding();
-    binding.setNotebook(notebook);
-    binding.setAttachmentRepresentation(NotebookGitAttachmentRepresentation.LFS);
+    NotebookGitBinding binding = newBinding(notebook);
     try (Repository repository =
         buildRepository(
             notebook,
@@ -71,12 +69,21 @@ public class NotebookGitCutoverService {
    * Restarts {@code notebook}'s accepted Git history: one parentless commit of the notebook's
    * current content replaces whatever the binding held, so the notebook can be cloned and published
    * again whatever state its history was in. Accepted Git metadata such as {@code .gitattributes}
-   * is preserved exactly rather than regenerated from defaults.
+   * is preserved exactly rather than regenerated from defaults; a notebook without a binding gets a
+   * new LFS binding with initial {@code .gitattributes}, as at creation.
    */
   @Transactional
   public NotebookGitBinding resetHistory(Notebook notebook, Instant resetTime) {
-    NotebookGitBinding binding = findOrCreateBinding(notebook);
-    return resetHistory(notebook, binding, resetTime, acceptedMetadata(binding));
+    return notebookGitBindingRepository
+        .findByNotebookIdForUpdate(notebook.getId())
+        .map(binding -> resetHistory(notebook, binding, resetTime, acceptedMetadata(binding)))
+        .orElseGet(
+            () ->
+                resetHistory(
+                    notebook,
+                    newBinding(notebook),
+                    resetTime,
+                    NotebookGitAttributes.initialMetadata()));
   }
 
   /**
@@ -93,12 +100,13 @@ public class NotebookGitCutoverService {
   private NotebookGitBinding findOrCreateBinding(Notebook notebook) {
     return notebookGitBindingRepository
         .findByNotebookIdForUpdate(notebook.getId())
-        .orElseGet(
-            () -> {
-              NotebookGitBinding created = new NotebookGitBinding();
-              created.setNotebook(notebook);
-              return created;
-            });
+        .orElseGet(() -> newBinding(notebook));
+  }
+
+  private NotebookGitBinding newBinding(Notebook notebook) {
+    NotebookGitBinding binding = new NotebookGitBinding();
+    binding.setNotebook(notebook);
+    return binding;
   }
 
   private NotebookGitBinding resetHistory(
@@ -114,9 +122,6 @@ public class NotebookGitCutoverService {
   }
 
   private List<PortableTreeEntry> acceptedMetadata(NotebookGitBinding binding) {
-    if (binding.getId() == null || binding.getAcceptedGitObjectId() == null) {
-      return List.of();
-    }
     try (NotebookGitAcceptedRepositoryStore.OpenedAcceptedRepository opened =
         repositoryStore.open(binding)) {
       return NotebookGitAcceptedTree.metadataEntries(opened.repository(), opened.head());

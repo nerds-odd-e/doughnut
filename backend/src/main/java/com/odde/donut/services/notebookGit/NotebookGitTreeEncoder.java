@@ -17,9 +17,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Stream;
-import org.eclipse.jgit.lib.Constants;
 import org.eclipse.jgit.lib.ObjectId;
-import org.eclipse.jgit.lib.ObjectInserter;
 import org.eclipse.jgit.lib.ObjectReader;
 import org.eclipse.jgit.lib.Repository;
 import org.springframework.stereotype.Component;
@@ -179,13 +177,14 @@ class NotebookGitTreeEncoder {
     Set<String> directories = new LinkedHashSet<>(touchedDirectories);
     files.forEach(
         file -> {
-          put(file, tree, blobs);
+          NotebookGitTreeContent.putEntry(file, tree, blobs);
           directories.add(NotebookGitPortablePath.directoryOf(file.path()));
         });
     readmeContents.forEach(
         (prefix, content) -> {
           tree.removeFile(PortableTreeEntry.readmePath(prefix));
-          PortableTreeEntry.ofReadme(prefix, content).ifPresent(entry -> put(entry, tree, blobs));
+          PortableTreeEntry.ofReadme(prefix, content)
+              .ifPresent(entry -> NotebookGitTreeContent.putEntry(entry, tree, blobs));
           directories.add(prefix);
         });
     directories.stream().filter(directory -> !directory.isEmpty()).forEach(tree::ensureDirectory);
@@ -205,7 +204,8 @@ class NotebookGitTreeEncoder {
         .forEach(
             directory -> {
               if (tree.isEmptyAsideFromKeep(directory)) {
-                put(PortableTreeEntry.ofText(directory + ".keep", ""), tree, blobs);
+                NotebookGitTreeContent.putEntry(
+                    PortableTreeEntry.ofText(directory + ".keep", ""), tree, blobs);
               } else {
                 tree.removeFile(directory + ".keep");
               }
@@ -230,12 +230,5 @@ class NotebookGitTreeEncoder {
                 contents.put(
                     "", notebookRepository.findById(row.id()).orElseThrow().getReadmeContent()));
     return contents;
-  }
-
-  private static void put(
-      PortableTreeEntry entry, NotebookGitDirectoryTree tree, Map<ObjectId, byte[]> blobs) {
-    ObjectId blobId = new ObjectInserter.Formatter().idFor(Constants.OBJ_BLOB, entry.content());
-    blobs.put(blobId, entry.content());
-    tree.putFile(entry.path(), blobId);
   }
 }

@@ -1,6 +1,10 @@
 import { spawnSync } from 'node:child_process'
 import { exceptionText } from '../../exceptionText.js'
-import { isEmptyLfsFile, parseLfsPointer } from './notebookLfsPointer.js'
+import {
+  isEmptyLfsFile,
+  type ParsedLfsPointer,
+  parseLfsPointer,
+} from './notebookLfsPointer.js'
 import { runSystemGitOrThrow } from './systemGit.js'
 
 /** Inclusive attachment size limit; must match NotebookGitAttachmentSizeAdmission.LIMIT_BYTES. */
@@ -68,25 +72,35 @@ function attachmentBlobIds(
   return blobs
 }
 
-function attachmentPayloadDigestsAt(
+type AttachmentAt = { filePath: string; pointer: ParsedLfsPointer | undefined }
+
+/** Non-empty attachments at a commit, with their LFS pointer when the blob is one. */
+function nonEmptyAttachmentsAt(
   directory: string,
   commitId: string
-): Map<string, number> {
-  const digests = new Map<string, number>()
-  for (const [, blobId] of attachmentBlobIds(directory, commitId)) {
+): AttachmentAt[] {
+  const attachments: AttachmentAt[] = []
+  for (const [filePath, blobId] of attachmentBlobIds(directory, commitId)) {
     const bytes = readBlobBytes(directory, blobId)
     if (isEmptyLfsFile(bytes)) continue
-    const parsed = parseLfsPointer(bytes)
-    if (!parsed) {
-      throw new Error(
-        `Attachment at ${commitId} must be a Git LFS pointer or empty file when the notebook uses LFS.`
-      )
-    }
-    digests.set(parsed.sha256Hex, parsed.size)
+    attachments.push({ filePath, pointer: parseLfsPointer(bytes) })
   }
-  return digests
+  return attachments
 }
 
+function requireLfsPointer({
+  filePath,
+  pointer,
+}: AttachmentAt): ParsedLfsPointer {
+  if (!pointer) {
+    throw new Error(
+      `Attachment "${filePath}" must be a Git LFS pointer or empty file when the notebook uses LFS.`
+    )
+  }
+  return pointer
+}
+
+/** Accepted history may hold raw blobs from before the notebook was converted to LFS. */
 function attachmentPayloadDigestsInHistory(
   directory: string,
   head: string
@@ -102,11 +116,8 @@ function attachmentPayloadDigestsInHistory(
     .split('\n')
     .filter((line) => line !== '')
   for (const commitId of commits) {
-    for (const digest of attachmentPayloadDigestsAt(
-      directory,
-      commitId
-    ).keys()) {
-      digests.add(digest)
+    for (const { pointer } of nonEmptyAttachmentsAt(directory, commitId)) {
+      if (pointer) digests.add(pointer.sha256Hex)
     }
   }
   return digests
@@ -159,7 +170,9 @@ export function selectRequiredLfsObjectIds(
     acceptedHead
   )
   const tipDigests = new Set(
-    attachmentPayloadDigestsAt(directory, proposedHead).keys()
+    nonEmptyAttachmentsAt(directory, proposedHead).map(
+      (attachment) => requireLfsPointer(attachment).sha256Hex
+    )
   )
   const inspectedSizes = new Map<string, number>()
   const required: string[] = []
@@ -168,20 +181,13 @@ export function selectRequiredLfsObjectIds(
     acceptedHead,
     proposedHead
   )) {
-    for (const [filePath, blobId] of attachmentBlobIds(directory, commitId)) {
-      const bytes = readBlobBytes(directory, blobId)
-      if (isEmptyLfsFile(bytes)) continue
-      const parsed = parseLfsPointer(bytes)
-      if (!parsed) {
-        throw new Error(
-          `Attachment "${filePath}" must be a Git LFS pointer or empty file when the notebook uses LFS.`
-        )
-      }
+    for (const attachment of nonEmptyAttachmentsAt(directory, commitId)) {
+      const parsed = requireLfsPointer(attachment)
       const seenSize = inspectedSizes.get(parsed.sha256Hex)
       if (seenSize !== undefined) {
         if (seenSize !== parsed.size) {
           throw new Error(
-            `Attachment "${filePath}" references corrupt LFS object sha256:${parsed.sha256Hex}.`
+            `Attachment "${attachment.filePath}" references corrupt LFS object sha256:${parsed.sha256Hex}.`
           )
         }
         continue

@@ -10,8 +10,6 @@ and deletable in Web Donut.
 
 ## Taken
 
-- [Store existing notebooks' files through LFS like new notebooks](seeds/SEED-035-ai-workspace-supporting-files.md#story-14) — SEED-035#story-14 ([plan](quick/025-convert-raw-notebooks-to-lfs/PLAN.md))
-
 ## Backlog list
 
 - [Test file journeys on LFS notebooks as production has them](seeds/SEED-035-ai-workspace-supporting-files.md#story-20) — SEED-035#story-20

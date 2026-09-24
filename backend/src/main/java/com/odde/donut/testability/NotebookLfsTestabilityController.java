@@ -9,14 +9,13 @@ import com.odde.donut.entities.repositories.NotebookAttachmentRepository;
 import com.odde.donut.entities.repositories.NotebookGitBindingRepository;
 import com.odde.donut.entities.repositories.NotebookRepository;
 import com.odde.donut.services.notebookAttachment.NotebookAttachmentContent;
+import com.odde.donut.services.notebookAttachment.VerifiedNotebookAttachmentBytes;
 import com.odde.donut.services.notebookGit.NotebookGitAttributes;
 import com.odde.donut.services.notebookGit.NotebookGitCutoverService;
 import com.odde.donut.services.notebookGit.NotebookGitLfsPointer;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.io.ByteArrayInputStream;
 import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.util.HexFormat;
 import java.util.Optional;
 import lombok.Getter;
 import lombok.Setter;
@@ -151,7 +150,7 @@ class NotebookLfsTestabilityController {
   }
 
   private String storePayload(Integer notebookId, byte[] payload) throws Exception {
-    String oid = HexFormat.of().formatHex(MessageDigest.getInstance("SHA-256").digest(payload));
+    String oid = VerifiedNotebookAttachmentBytes.sha256Hex(payload);
     if (!notebookAttachmentContent.store(
         notebookId, oid, payload.length, new ByteArrayInputStream(payload))) {
       throw new IllegalStateException("Failed to store LFS payload for testability");

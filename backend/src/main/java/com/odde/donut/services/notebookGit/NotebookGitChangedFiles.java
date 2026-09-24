@@ -81,9 +81,8 @@ final class NotebookGitChangedFiles {
     if (row.kind() == Note.class) {
       return NotebookGitPortablePath.ofNote(noteRepository.findById(row.id()).orElseThrow());
     }
-    var attachment = notebookAttachmentRepository.findById(row.id()).orElseThrow();
     return NotebookGitPortablePath.ofAttachment(
-        NotebookGitPortablePath.folderPath(attachment.getFolder()), attachment.getFilename());
+        notebookAttachmentRepository.findById(row.id()).orElseThrow());
   }
 
   private static boolean isFile(Class<?> kind) {

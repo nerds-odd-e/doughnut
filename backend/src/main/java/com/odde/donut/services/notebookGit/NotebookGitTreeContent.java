@@ -21,15 +21,20 @@ public record NotebookGitTreeContent(
 
   /** Hashes every entry and builds the native root from those path blobs. */
   public static NotebookGitTreeContent of(List<PortableTreeEntry> entries) {
-    ObjectInserter.Formatter formatter = new ObjectInserter.Formatter();
     NotebookGitDirectoryTree root = new NotebookGitDirectoryTree();
     Map<ObjectId, byte[]> blobs = new HashMap<>();
-    for (PortableTreeEntry entry : entries) {
-      ObjectId blobId = formatter.idFor(Constants.OBJ_BLOB, entry.content());
-      blobs.put(blobId, entry.content());
-      root.putFile(entry.path(), blobId);
-    }
+    entries.forEach(entry -> putEntry(entry, root, blobs));
     return fromDirectory(root, blobs);
+  }
+
+  /**
+   * Places {@code entry} at its path in {@code tree}, recording its blob bytes in {@code blobs}.
+   */
+  static void putEntry(
+      PortableTreeEntry entry, NotebookGitDirectoryTree tree, Map<ObjectId, byte[]> blobs) {
+    ObjectId blobId = new ObjectInserter.Formatter().idFor(Constants.OBJ_BLOB, entry.content());
+    blobs.put(blobId, entry.content());
+    tree.putFile(entry.path(), blobId);
   }
 
   /**
