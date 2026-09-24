@@ -124,7 +124,7 @@ export async function acquireNotebookGitCheckout(
   }
 
   const stagingDir = fs.mkdtempSync(
-    path.join(os.tmpdir(), 'donut-notebook-clone-')
+    path.join(os.tmpdir(), `donut-notebook-clone-${process.pid}-`)
   )
   try {
     const bundleFile = path.join(stagingDir, 'notebook.bundle')

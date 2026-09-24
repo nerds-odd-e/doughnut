@@ -21,16 +21,12 @@ export function runGit(args: string[], cwd: string): string {
 export function stagingDirsUnderTmp(): string[] {
   return fs
     .readdirSync(tmpdir())
-    .filter((name) => name.startsWith('donut-notebook-clone-'))
+    .filter((name) => name.startsWith(`donut-notebook-clone-${process.pid}-`))
 }
 
 /**
  * Asserts the run under test left no orphaned acquisition staging directory
- * behind. Compares one-directionally (only dirs present now but absent from
- * `before`) rather than snapshot equality: other CLI test files scan and
- * clean up the same shared os.tmpdir() prefix concurrently, so a directory
- * disappearing between the two snapshots reflects another file's timing, not
- * a leak from this run.
+ * behind (only dirs present now but absent from `before`).
  */
 export function expectNoNewStagingDirsSince(before: string[]): void {
   const after = stagingDirsUnderTmp()
@@ -55,11 +51,6 @@ export function installNotebookCliRunFixture(workDirPrefix: string) {
     configDir = tempConfigWithToken()
     process.env.DONUT_CONFIG_DIR = configDir
 
-    // Prefix deliberately does not start with the acquisition staging-dir
-    // prefix ('donut-notebook-clone-', see notebookAcquisition.ts) so this
-    // fixture's own scratch directory never shows up in stagingDirsUnderTmp()
-    // — tests in this file run alongside other test files whose scratch dirs
-    // can briefly coexist under the same os.tmpdir().
     workDir = fs.mkdtempSync(join(tmpdir(), workDirPrefix))
 
     errorSpy = vi.spyOn(console, 'error').mockImplementation(() => undefined)

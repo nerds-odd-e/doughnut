@@ -135,7 +135,7 @@ Sizing: ~5 min.
 
 ### 5. Retire redundant pull cases and the shared-prefix flake
 Type: Structure
-Status: planned
+Status: done
 
 Remove the redundant suites/rows in finding 6 (keep the non-linear row, moved
 to `structuralHistory`), fix the stale comment, and give clone staging a
@@ -175,6 +175,11 @@ Accepted proof:
   (`notebookPull.testHelpers.ts`), clone and publish-ancestry `stringContaining` checks.
 - Slice 4: `CURSOR_DEV=true nix develop -c pnpm cli:test` 464/464; after refactor
   the three LFS files (`notebookPull.lfs`, `notebookAcquisition.lfs`, `notebookPublish.lfs`) 16/16.
+- CI repair (`9cf73a0c92`): E2E page object `notebookCloneCheckoutRebase.ts` expected the old
+  rebased report; `pnpm cy:run --spec` on `cli_notebook_existing_note_edits` and
+  `cli_notebook_web_local_reconciliation` 7/7.
+- Slice 5: `CURSOR_DEV=true nix develop -c pnpm cli:test` twice, 461/461 each, no staging
+  failures; after refactor `vitest run tests/notebookPull.test.ts tests/notebookClone.failures.test.ts tests/notebookAcquisition.test.ts` 107/107.
 
 ## Learnings
 
@@ -197,3 +202,11 @@ Accepted proof:
   pull then refuses and gives the clone-fresh route — one extra hop, accepted.
 - Slice 4: `prepareAuthenticatedLfsCheckout` (in `notebookLfsLocal.ts`) owns the
   shared setup; callers pass `'receive' | 'publish'` and their next step.
+- Slice 5: clone staging is `donut-notebook-clone-<pid>-`; the moved non-linear
+  accepted-merge refusal lives in `structuralHistory`; the batch helper is now
+  `notebookPull.contentBatch.testHelpers.ts`. −200 lines of tests.
+- Not owned, not fixed: CI run 35950331042 timed out "receives compatible remote
+  creation-then-second-addition while retaining the local edit"
+  (`notebookPull.structuralHistory.creationFollowOn.suite.ts`) at 8.1 s vs the 5 s limit;
+  identical code passed CI on `09ba9cd364` and locally (3/3, under 300 ms). Intermittent
+  CI timing flake, pre-existing.

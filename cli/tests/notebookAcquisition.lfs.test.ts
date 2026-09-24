@@ -6,10 +6,10 @@ import { getApiConfig } from 'donut-api'
 import { acquireNotebookGitCheckout } from '../src/commands/notebook/notebookAcquisition.js'
 import {
   installAcquireNotebookGitCheckoutTest,
-  stagingDirsUnderTmp,
   stubBundleFetch,
   writeLfsCheckoutPointer,
 } from './notebookAcquisition.testHelpers.js'
+import { stagingDirsUnderTmp } from './notebookClone.testHelpers.js'
 
 vi.mock('node:child_process', () => ({
   spawnSync: vi.fn(),

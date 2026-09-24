@@ -31,16 +31,9 @@ const DEFAULT_BASE_FILES: FileChange[] = [
 ]
 
 // The one unpublished local commit's file changes for the canonical root-and-nested batch.
-export const CANONICAL_LOCAL_CHANGES: FileChange[] = [
+const CANONICAL_LOCAL_CHANGES: FileChange[] = [
   { path: 'note.md', content: LOCAL_ROOT_NOTE },
   { path: 'Nested/Cell.md', content: LOCAL_NESTED_NOTE },
-]
-
-// A three-path local batch: the canonical two edits plus a third path that already carries the
-// accepted third-note's bytes (used both for the batch-size refusal and the already-based case).
-export const THREE_NOTE_LOCAL_CHANGES: FileChange[] = [
-  ...CANONICAL_LOCAL_CHANGES,
-  { path: 'gamma.md', content: ACCEPTED_THIRD_NOTE },
 ]
 
 // The default single-commit accepted interval: one disjoint third-note save.
@@ -48,13 +41,12 @@ const DEFAULT_ACCEPTED_CHANGE_SETS: FileChange[][] = [
   [{ path: 'gamma.md', content: ACCEPTED_THIRD_NOTE }],
 ]
 
-export function prepareTwoNoteBatchDivergence(
+export function prepareContentBatchDivergence(
   workDir: string,
   options?: {
     baseFiles?: FileChange[]
     localChanges?: FileChange[]
     acceptedChangeSets?: FileChange[][]
-    remote?: (source: string) => void
   }
 ): {
   directory: string
@@ -76,17 +68,13 @@ export function prepareTwoNoteBatchDivergence(
   commitFileChangeSet(
     directory,
     options?.localChanges ?? CANONICAL_LOCAL_CHANGES,
-    'unpublished two-note batch'
+    'unpublished content batch'
   )
   const localTip = runGit(['rev-parse', 'HEAD'], directory)
 
-  if (options?.remote !== undefined) {
-    options.remote(source)
-  } else {
-    for (const changeSet of options?.acceptedChangeSets ??
-      DEFAULT_ACCEPTED_CHANGE_SETS) {
-      commitFileChangeSet(source, changeSet, 'accepted save')
-    }
+  for (const changeSet of options?.acceptedChangeSets ??
+    DEFAULT_ACCEPTED_CHANGE_SETS) {
+    commitFileChangeSet(source, changeSet, 'accepted save')
   }
 
   return {

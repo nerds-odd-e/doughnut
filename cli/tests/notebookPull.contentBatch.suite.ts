@@ -17,8 +17,8 @@ import {
   ACCEPTED_THIRD_NOTE,
   LOCAL_NESTED_NOTE,
   LOCAL_ROOT_NOTE,
-  prepareTwoNoteBatchDivergence,
-} from './notebookPull.twoNoteBatch.testHelpers.js'
+  prepareContentBatchDivergence,
+} from './notebookPull.contentBatch.testHelpers.js'
 import {
   buildSourceRepo,
   cloneAsBoundCheckout,
@@ -93,7 +93,7 @@ export function describeNotebookPullContentBatch(): void {
     test.each(BATCH_SHAPES)(
       'retains a three-path local batch as one unpublished child over $shape',
       async ({ shape, baseFiles, acceptedChangeSets }) => {
-        const setup = prepareTwoNoteBatchDivergence(ctx.getWorkDir(), {
+        const setup = prepareContentBatchDivergence(ctx.getWorkDir(), {
           baseFiles,
           // Independent ordering: nested first, then root, then the redundant third path.
           localChanges: [
@@ -211,7 +211,7 @@ export function describeNotebookPullContentBatch(): void {
     })
 
     test('pauses on a two-file overlap and continues with an untouched companion edit intact', async () => {
-      const setup = prepareTwoNoteBatchDivergence(ctx.getWorkDir(), {
+      const setup = prepareContentBatchDivergence(ctx.getWorkDir(), {
         localChanges: [
           { path: 'note.md', content: LOCAL_ROOT_NOTE },
           { path: 'Nested/Cell.md', content: LOCAL_NESTED_NOTE },
@@ -274,7 +274,7 @@ export function describeNotebookPullContentBatch(): void {
     })
 
     test('aborting a two-file overlap pause restores the entire original batch', async () => {
-      const setup = prepareTwoNoteBatchDivergence(ctx.getWorkDir(), {
+      const setup = prepareContentBatchDivergence(ctx.getWorkDir(), {
         localChanges: [
           { path: 'note.md', content: LOCAL_ROOT_NOTE },
           { path: 'Nested/Cell.md', content: LOCAL_NESTED_NOTE },
@@ -329,7 +329,7 @@ export function describeNotebookPullContentBatch(): void {
         '---\ntype: Note\n---\n# Note\n\nSame authored body.\n'
       const withoutFinalLf =
         '---\ntype: Note\n---\n# Note\n\nSame authored body.'
-      const setup = prepareTwoNoteBatchDivergence(ctx.getWorkDir(), {
+      const setup = prepareContentBatchDivergence(ctx.getWorkDir(), {
         baseFiles: [
           { path: 'note.md', content: '---\ntype: Note\n---\n' },
           {
@@ -368,7 +368,7 @@ export function describeNotebookPullContentBatch(): void {
         '---\ntype: Note\n---\n# Nested\n\nSame nested body.\n'
       const nestedWithoutLf =
         '---\ntype: Note\n---\n# Nested\n\nSame nested body.'
-      const setup = prepareTwoNoteBatchDivergence(ctx.getWorkDir(), {
+      const setup = prepareContentBatchDivergence(ctx.getWorkDir(), {
         baseFiles: [
           { path: 'note.md', content: '---\ntype: Note\n---\n' },
           { path: 'Nested/Cell.md', content: '---\ntype: Note\n---\n' },

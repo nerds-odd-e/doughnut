@@ -5,6 +5,7 @@ import { run } from '../src/run.js'
 import { ProcessExitForTest, runGit } from './notebookClone.testHelpers.js'
 import { acceptedHistoryStagingDirsUnderTmp } from './notebookAcceptedHistory.testHelpers.js'
 import {
+  LOCAL_WORK_PRESERVED_GUIDANCE,
   checkoutState,
   commitPortableFile,
   installNotebookPullAcceptedHistoryTest,
@@ -126,6 +127,52 @@ export function describeNotebookPullStructuralHistory(): void {
         expect(acceptedHistoryStagingDirsUnderTmp()).toEqual(stagingBefore)
       }
     )
+
+    test('refuses a non-linear accepted merge of content saves and leaves the checkout unchanged', async () => {
+      const { directory, source } = cloneWithLocalNoteAndRemoteOther(
+        ctx.getWorkDir(),
+        (seedSource) =>
+          commitPortableFile(
+            seedSource,
+            'gamma.md',
+            '---\ntype: Note\n---\n# Gamma\n\nOriginal.\n',
+            'add gamma note'
+          )
+      )
+      // Two accepted branches (each an ordinary content save) merged back into accepted main:
+      // a merge commit, not a contiguous single-parent chain.
+      runGit(['checkout', '--quiet', '-b', 'accepted-branch'], source)
+      commitPortableFile(
+        source,
+        'gamma.md',
+        '---\ntype: Note\n---\n# Gamma\n\nBranch edit.\n',
+        'branch save'
+      )
+      runGit(['checkout', '--quiet', 'main'], source)
+      commitPortableFile(
+        source,
+        'other.md',
+        '---\ntype: Note\n---\n# Other\n\nMain edit.\n',
+        'main save'
+      )
+      runGit(
+        ['merge', '--quiet', '--no-ff', '-m', 'merge', 'accepted-branch'],
+        source
+      )
+      serveAcceptedBundle(ctx, source, 'structural-non-linear')
+      const before = checkoutState(directory)
+      const stagingBefore = acceptedHistoryStagingDirsUnderTmp()
+
+      await expect(run(['notebook', 'pull', directory])).rejects.toThrow(
+        ProcessExitForTest
+      )
+
+      expect(ctx.getErrorSpy()).toHaveBeenCalledWith(
+        `donut: Local main cannot receive the accepted history because the accepted history since the local parent is not one contiguous chain of saves. ${LOCAL_WORK_PRESERVED_GUIDANCE}`
+      )
+      expect(checkoutState(directory)).toEqual(before)
+      expect(acceptedHistoryStagingDirsUnderTmp()).toEqual(stagingBefore)
+    })
 
     // These two shapes compose only compatible per-edge operations (an addition at an
     // already-represented root plus a save of a different pre-existing note; two root
