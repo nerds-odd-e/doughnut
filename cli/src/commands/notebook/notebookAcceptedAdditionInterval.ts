@@ -19,13 +19,14 @@ function isRepresentedFolder(
       'ls-tree',
       '-d',
       '--name-only',
+      '-z',
       commit,
       '--',
       folderPath,
     ],
     inspectAncestryFailure
-  ).trim()
-  return listed === folderPath
+  )
+  return listed === `${folderPath}\0`
 }
 
 function destinationParentIsRootOrRepresented(
