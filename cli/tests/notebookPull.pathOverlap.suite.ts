@@ -19,6 +19,8 @@ const SHARED_NOTE =
   '---\ntype: Note\n---\n# Note\n\nShared opening.\n\nShared closing.\n'
 const LOCAL_OPENING_NOTE =
   '---\ntype: Note\n---\n# Note\n\nLocal opening.\n\nShared closing.\n'
+const LOCAL_DRAFT_OPENING_NOTE =
+  '---\ntype: Note\n---\n# Note\n\nLocal draft opening.\n\nShared closing.\n'
 const REMOTE_CLOSING_NOTE =
   '---\ntype: Note\n---\n# Note\n\nShared opening.\n\nRemote closing.\n'
 const COMBINED_NOTE =
@@ -47,11 +49,13 @@ export function describeNotebookPullPathOverlap(): void {
       'donut-cli-pull-path-overlap-test-'
     )
 
-    test('rebases disjoint same-note paragraph edits onto accepted history', async () => {
+    test('rebases two local commits of disjoint same-note paragraph edits onto accepted history', async () => {
       const setup = cloneWithLocalNoteEdit(
         ctx.getWorkDir(),
         SHARED_NOTE,
-        LOCAL_OPENING_NOTE
+        LOCAL_OPENING_NOTE,
+        'note.md',
+        { path: 'note.md', content: LOCAL_DRAFT_OPENING_NOTE }
       )
       commitPortableFile(
         setup.source,
@@ -73,7 +77,9 @@ export function describeNotebookPullPathOverlap(): void {
       await run(['notebook', 'pull', setup.directory])
 
       const localHead = runGit(['rev-parse', 'HEAD'], setup.directory)
-      expect(runGit(['rev-parse', 'HEAD^'], setup.directory)).toBe(acceptedHead)
+      expect(runGit(['rev-parse', 'HEAD~2'], setup.directory)).toBe(
+        acceptedHead
+      )
       expect(runGit(['rev-parse', acceptedHead], setup.directory)).toBe(
         acceptedHead
       )

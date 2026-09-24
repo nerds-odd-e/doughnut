@@ -6,7 +6,10 @@ import { run } from '../src/run.js'
 import { runGit } from './notebookClone.testHelpers.js'
 import {
   buildSourceRepo,
+  bundleMain,
   cloneAsBoundCheckout,
+  postCount,
+  stubFetchWithBundleFile,
 } from './notebookPublish.testHelpers.js'
 import { acceptedHistoryStagingDirsUnderTmp } from './notebookAcceptedHistory.testHelpers.js'
 import {
@@ -27,9 +30,10 @@ export function describeNotebookPullRebase(): void {
       'donut-cli-pull-rebase-test-'
     )
 
-    test('rebases one local note edit over one accepted other-note commit', async () => {
+    test('rebases two local note-edit commits over one accepted other-note commit, then publishes', async () => {
       const setup = prepareEligibleDivergence(ctx.getWorkDir(), {
         remoteEdits: 1,
+        localEdits: 2,
       })
       serveAcceptedBundle(ctx, setup.source, 'rebase-one')
       const stagingBefore = acceptedHistoryStagingDirsUnderTmp()
@@ -45,7 +49,7 @@ export function describeNotebookPullRebase(): void {
       await run(['notebook', 'pull', setup.directory])
 
       const localHead = runGit(['rev-parse', 'HEAD'], setup.directory)
-      expect(runGit(['rev-parse', 'HEAD^'], setup.directory)).toBe(
+      expect(runGit(['rev-parse', 'HEAD~2'], setup.directory)).toBe(
         setup.acceptedHead
       )
       expect(runGit(['rev-parse', setup.acceptedHead], setup.directory)).toBe(
@@ -91,6 +95,14 @@ export function describeNotebookPullRebase(): void {
         `Rebased onto the accepted history. Unpublished local commit: ${localHead}. Accepted head: ${setup.acceptedHead}. Inspect the result, then run "donut notebook publish ${setup.directory}".`
       )
       expect(acceptedHistoryStagingDirsUnderTmp()).toEqual(stagingBefore)
+
+      const acceptedBundle = join(ctx.getWorkDir(), 'accepted.bundle')
+      bundleMain(setup.source, acceptedBundle)
+      const fetchMock = stubFetchWithBundleFile(acceptedBundle)
+
+      await run(['notebook', 'publish', setup.directory])
+
+      expect(postCount(fetchMock)).toBe(1)
     })
 
     test('keeps several accepted other-note commits unchanged under one rebased local child', async () => {

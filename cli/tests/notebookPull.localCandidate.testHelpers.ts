@@ -8,14 +8,7 @@ import { cloneAsBoundCheckout } from './notebookPublish.testHelpers.js'
 export function prepareUnsupportedLocalHistory(
   workDir: string,
   source: string,
-  shape:
-    | 'unrelated'
-    | 'multiple-commits'
-    | 'merge'
-    | 'add'
-    | 'rename'
-    | 'readme'
-    | 'mode'
+  shape: 'unrelated' | 'merge' | 'add' | 'rename' | 'readme' | 'mode'
 ): string {
   if (shape === 'unrelated') {
     return initBoundCheckout(workDir, getApiConfig().apiBaseUrl)
@@ -46,20 +39,6 @@ export function prepareUnsupportedLocalHistory(
   )
 
   switch (shape) {
-    case 'multiple-commits':
-      commitPortableNote(
-        directory,
-        'note.md',
-        '---\ntype: Note\n---\n# First\n\nOne.\n',
-        'first unpublished edit'
-      )
-      commitPortableNote(
-        directory,
-        'note.md',
-        '---\ntype: Note\n---\n# Second\n\nTwo.\n',
-        'second unpublished edit'
-      )
-      return directory
     case 'merge': {
       const tree = runGit(['rev-parse', 'HEAD^{tree}'], directory)
       const head = runGit(['rev-parse', 'HEAD'], directory)

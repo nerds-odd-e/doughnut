@@ -3,7 +3,7 @@ import { withDownloadedAcceptedNotebookHistory } from './notebookAcceptedHistory
 import { assertLocalMainIsReadyToReceive } from './notebookCheckoutReadiness.js'
 import { buildExactSubtreeMoveReplayCommit } from './notebookExactSubtreeMoveReplay.js'
 import { inspectUnpublishedLocalHistory } from './notebookLocalCandidate.js'
-import { rebaseUnpublishedCommit } from './notebookPullRebase.js'
+import { rebaseUnpublishedCommits } from './notebookPullRebase.js'
 import { runSystemGitOrThrow } from './systemGit.js'
 
 const RECEIVE_CHECKOUT_CHANGED =
@@ -35,10 +35,10 @@ function assertCheckoutStillReady(
 
 /**
  * Downloads accepted history and advances an unchanged, clean local main: equal heads stay
- * unchanged, an eligible already-based unpublished commit stays unpublished, eligible
- * content-only divergence over a contiguous single-parent chain of accepted content saves,
- * one ordinary-note addition, or that addition plus one content save of the same note
- * rebases (an empty remaining patch leaves local main at the accepted head), one local
+ * unchanged, eligible already-based unpublished commits stay unpublished, eligible
+ * content-only local commits rebase over a contiguous single-parent chain of accepted
+ * content saves, one ordinary-note addition, or that addition plus one content save of
+ * the same note (an empty remaining patch leaves local main at the accepted head), one local
  * descendant content edit across one accepted exact same-name subtree relocation replays
  * onto the mapped path, and ancestor checkouts fast-forward. Imported objects do not
  * install a remote or a persistent remote ref.
@@ -129,10 +129,10 @@ export async function receiveAcceptedNotebookHead(
         }
       }
       if (localHistory.kind === 'rebase') {
-        rebaseUnpublishedCommit(
+        rebaseUnpublishedCommits(
           directory,
           acceptedHead,
-          localHistory.localParent
+          localHistory.mergeBase
         )
         const localHead = readHead(directory)
         return {

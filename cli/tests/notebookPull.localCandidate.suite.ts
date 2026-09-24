@@ -26,14 +26,9 @@ export function describeNotebookPullLocalCandidate(): void {
           'Local main cannot receive the accepted history because it does not share Git history with the accepted notebook. Clone the notebook with "donut notebook clone", then try again.',
       },
       {
-        shape: 'multiple-commits',
-        message:
-          'Local main cannot receive the accepted history because it contains more than one unpublished commit. Reduce local work to one unpublished commit that edits one existing ordinary Markdown note, then try again.',
-      },
-      {
         shape: 'merge',
         message:
-          'Local main cannot receive the accepted history because the unpublished commit is a merge. Recreate the change as one ordinary commit that edits one existing ordinary Markdown note, then try again.',
+          'Local main cannot receive the accepted history because an unpublished commit is a merge. Recreate the local work as ordinary commits, then try again.',
       },
       {
         shape: 'add',

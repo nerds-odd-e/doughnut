@@ -49,7 +49,7 @@ merging, Donut-assisted conflict resolution.
 
 ### 1. Receive web changes over several local note-edit commits
 Type: Behavior
-Status: planned
+Status: done
 
 Behavior: a legacy checkout has two unpublished commits editing existing notes,
 and the web saved another note → `donut notebook pull` → both local commits sit
@@ -64,6 +64,18 @@ multiple-commits case turns from refusal into rebase; `notebookPull.rebase`,
 `alreadyBased`, `conflict`, `pathOverlap` suites gain the two-commit cases;
 merge refusal kept). Command C.
 Sizing: ~5 min.
+
+Accepted proof (2026-09-24, Command C full run, 459 tests pass):
+`notebookPull.rebase.suite.ts` "rebases two local note-edit commits over one
+accepted other-note commit, then publishes" (HEAD~2 is accepted head, log line
+names local head, publish posts once); `notebookPull.alreadyBased.suite.ts`
+"reports two eligible local-ahead commits as already based…";
+`notebookPull.localCandidate.suite.ts` merge row (checkout unchanged);
+`notebookPull.conflict.suite.ts` "absorbs a final-LF-only conflict in the second
+local commit…" and "names a nested YAML-key conflict in the second local
+commit…" (path named, unmerged stage kept); `notebookPull.pathOverlap.suite.ts`
+two-commit same-note case. The per-shape content-edit check now runs once over
+the combined `mergeBase..localHead` diff; slice 2 removes it.
 
 ### 2. Keep local work that adds, renames or deletes notes and files
 Type: Behavior
@@ -141,7 +153,10 @@ Sizing: ~8 min plus E2E wait (external-wait exception).
 - E: `CURSOR_DEV=true nix develop -c pnpm cy:run --spec e2e_test/features/cli/cli_notebook_lfs.feature`.
 - R: `CURSOR_DEV=true nix develop -c pnpm cy:run --spec e2e_test/features/cli/cli_notebook_web_local_reconciliation.feature`.
 
-No product tests have run for this plan; no inherited passing evidence.
+Pre-existing flake (not owned): `cli/tests/notebookAcquisition.test.ts`
+"binary download failure … cleans staging" compares global temp staging
+directories and failed 5 then 2 cases on the untouched baseline (eb89d93e1d)
+while other processes shared the temp directory; it passed in later runs.
 
 ## Learnings
 

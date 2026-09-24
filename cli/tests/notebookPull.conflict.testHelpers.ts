@@ -15,6 +15,10 @@ export const BODY_ACCEPTED =
   '---\ntype: Note\n---\n# Note\n\nAccepted sentence.\n'
 export const BODY_CHOSEN = '---\ntype: Note\n---\n# Note\n\nChosen sentence.\n'
 export const NESTED_YAML_PATH = 'Nested/Cell.md'
+export const EARLIER_LOCAL_EDIT = {
+  path: 'note.md',
+  content: '---\ntype: Note\n---\n# Note\n\nEarlier local edit.\n',
+} as const
 export const YAML_BASE =
   '---\ntype: Note\nauthored: original\n---\n# Nested\n\nShared body.\n'
 export const YAML_LOCAL =
@@ -29,13 +33,15 @@ export function prepareConflictingSameNote(
   relativePath: string,
   baseBytes: string,
   localBytes: string,
-  acceptedBytes: string
+  acceptedBytes: string,
+  earlierLocalEdit?: FileChange
 ) {
   const setup = cloneWithLocalNoteEdit(
     workDir,
     baseBytes,
     localBytes,
-    relativePath
+    relativePath,
+    earlierLocalEdit
   )
   commitPortableFile(
     setup.source,

@@ -54,7 +54,7 @@ export function listCommits(
 
 export function inspectAcceptedInterval(
   acceptedRepoDir: string,
-  localParent: string,
+  mergeBase: string,
   acceptedHead: string
 ): AcceptedIntervalInspection {
   const interval = listCommits(
@@ -62,17 +62,17 @@ export function inspectAcceptedInterval(
     '--reverse',
     acceptedHead,
     '--not',
-    localParent
+    mergeBase
   )
   if (
-    isEligibleAcceptedAdditionInterval(acceptedRepoDir, localParent, interval)
+    isEligibleAcceptedAdditionInterval(acceptedRepoDir, mergeBase, interval)
   ) {
     return { kind: 'rebaseable' }
   }
 
   const structuralPath = firstNonContentChangePath(acceptedRepoDir, interval)
   if (structuralPath === undefined) {
-    if (!isContiguousSingleParentChain(interval, localParent, acceptedHead)) {
+    if (!isContiguousSingleParentChain(interval, mergeBase, acceptedHead)) {
       return { kind: 'non-linear' }
     }
     return { kind: 'rebaseable' }
@@ -80,7 +80,7 @@ export function inspectAcceptedInterval(
 
   const mapping = exactSubtreeMappingForSingleEdge(
     acceptedRepoDir,
-    localParent,
+    mergeBase,
     interval
   )
   if (mapping !== undefined) {
@@ -95,32 +95,32 @@ export function inspectAcceptedInterval(
 
 function exactSubtreeMappingForSingleEdge(
   acceptedRepoDir: string,
-  localParent: string,
+  mergeBase: string,
   interval: { sha: string; parents: string[] }[]
 ): ExactAcceptedSubtreeMapping | undefined {
   if (interval.length !== 1) return undefined
   const [commit] = interval
-  if (commit === undefined || !hasSingleParent(commit, localParent)) {
+  if (commit === undefined || !hasSingleParent(commit, mergeBase)) {
     return undefined
   }
-  return exactAcceptedSubtreeMapping(acceptedRepoDir, localParent, commit.sha)
+  return exactAcceptedSubtreeMapping(acceptedRepoDir, mergeBase, commit.sha)
 }
 
 /**
  * A content-only accepted interval is only eligible when it forms one
- * contiguous single-parent chain from `localParent` to `acceptedHead`: each
+ * contiguous single-parent chain from `mergeBase` to `acceptedHead`: each
  * commit has exactly one parent, that parent is the previous commit in the
- * chain (the first commit's parent is `localParent`), and the chain's last
+ * chain (the first commit's parent is `mergeBase`), and the chain's last
  * commit is `acceptedHead`. This rejects a merge or any other non-linear
  * shape reachable from `acceptedHead` that a per-edge content-only check
  * alone cannot distinguish from a genuine linear save history.
  */
 function isContiguousSingleParentChain(
   interval: { sha: string; parents: string[] }[],
-  localParent: string,
+  mergeBase: string,
   acceptedHead: string
 ): boolean {
-  let expectedParent = localParent
+  let expectedParent = mergeBase
   for (const commit of interval) {
     if (!hasSingleParent(commit, expectedParent)) {
       return false

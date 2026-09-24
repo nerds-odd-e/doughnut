@@ -45,7 +45,7 @@ function destinationParentIsRootOrRepresented(
 /**
  * An accepted interval is eligible through this addition path when every edge
  * (each commit against the accepted tree immediately before it in this same
- * interval, starting from `localParent`) contains only ordinary note
+ * interval, starting from `mergeBase`) contains only ordinary note
  * additions at a destination already represented at that point, and ordinary
  * content-only saves. A destination folder created by an earlier addition in
  * this same interval counts as represented, since it is already committed to
@@ -59,10 +59,10 @@ function destinationParentIsRootOrRepresented(
  */
 export function isEligibleAcceptedAdditionInterval(
   acceptedRepoDir: string,
-  localParent: string,
+  mergeBase: string,
   interval: { sha: string; parents: string[] }[]
 ): boolean {
-  let precedingTree = localParent
+  let precedingTree = mergeBase
   let hasAddition = false
   for (const commit of interval) {
     if (!hasSingleParent(commit, precedingTree)) {

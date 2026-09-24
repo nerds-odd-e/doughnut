@@ -165,7 +165,8 @@ export function cloneWithLocalNoteEdit(
   workDir: string,
   baseBytes: string,
   localBytes: string,
-  relativePath = 'note.md'
+  relativePath = 'note.md',
+  earlierLocalEdit?: FileChange
 ): {
   directory: string
   source: string
@@ -179,6 +180,13 @@ export function cloneWithLocalNoteEdit(
     getApiConfig().apiBaseUrl,
     'checkout'
   )
+  if (earlierLocalEdit) {
+    commitFileChangeSet(
+      directory,
+      [earlierLocalEdit],
+      'earlier unpublished note edit'
+    )
+  }
   commitPortableFile(
     directory,
     relativePath,

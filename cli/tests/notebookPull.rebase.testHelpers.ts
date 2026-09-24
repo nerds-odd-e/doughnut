@@ -61,7 +61,11 @@ export async function withNoAmbientGitIdentityOrEditor(
 
 export function prepareEligibleDivergence(
   workDir: string,
-  options: { remoteEdits: number; oneShotCommitIdentity?: boolean }
+  options: {
+    remoteEdits: number
+    localEdits?: number
+    oneShotCommitIdentity?: boolean
+  }
 ): {
   directory: string
   source: string
@@ -82,18 +86,26 @@ export function prepareEligibleDivergence(
     'checkout',
     { configureIdentity: !options.oneShotCommitIdentity }
   )
-  fs.writeFileSync(join(directory, 'note.md'), LOCAL_NOTE)
-  runGit(['add', 'note.md'], directory)
-  runGit(
-    [
-      ...(options.oneShotCommitIdentity ? ONE_SHOT_COMMIT_IDENTITY : []),
-      'commit',
-      '--quiet',
-      '-m',
-      'unpublished note edit',
-    ],
-    directory
-  )
+  const localEdits = options.localEdits ?? 1
+  for (let i = 1; i <= localEdits; i += 1) {
+    fs.writeFileSync(
+      join(directory, 'note.md'),
+      i === localEdits
+        ? LOCAL_NOTE
+        : `---\ntype: Note\n---\n# Local\n\nLocal edit ${i}.\n`
+    )
+    runGit(['add', 'note.md'], directory)
+    runGit(
+      [
+        ...(options.oneShotCommitIdentity ? ONE_SHOT_COMMIT_IDENTITY : []),
+        'commit',
+        '--quiet',
+        '-m',
+        `unpublished note edit ${i}`,
+      ],
+      directory
+    )
+  }
   if (options.oneShotCommitIdentity) {
     runGit(['config', '--local', 'user.useConfigOnly', 'true'], directory)
   }

@@ -8,6 +8,7 @@ import {
   BODY_ACCEPTED,
   BODY_BASE,
   BODY_LOCAL,
+  EARLIER_LOCAL_EDIT,
   NESTED_YAML_PATH,
   SPACED_NOTE_PATH,
   YAML_ACCEPTED,
@@ -128,13 +129,14 @@ export function describeNotebookPullConflict(): void {
       expect(acceptedHistoryStagingDirsUnderTmp()).toEqual(stagingBefore)
     })
 
-    test('names a nested YAML-key conflict in the same pause guidance', async () => {
+    test('names a nested YAML-key conflict in the second local commit in the same pause guidance', async () => {
       const setup = prepareConflictingSameNote(
         ctx.getWorkDir(),
         NESTED_YAML_PATH,
         YAML_BASE,
         YAML_LOCAL,
-        YAML_ACCEPTED
+        YAML_ACCEPTED,
+        EARLIER_LOCAL_EDIT
       )
       serveAcceptedBundle(ctx, setup.source, 'nested-yaml-conflict')
 
@@ -145,6 +147,37 @@ export function describeNotebookPullConflict(): void {
       const error = String(ctx.getErrorSpy().mock.calls[0]?.[0])
       expect(error).toContain(`"${NESTED_YAML_PATH}"`)
       expect(error).toContain(quotedGitAdd(NESTED_YAML_PATH))
+      expect(runGit(['rev-parse', 'HEAD^'], setup.directory)).toBe(
+        setup.acceptedHead
+      )
+      expect(runGit(['ls-files', '-u'], setup.directory)).toContain(
+        NESTED_YAML_PATH
+      )
+    })
+
+    test('absorbs a final-LF-only conflict in the second local commit and finishes the rebase', async () => {
+      const setup = prepareConflictingSameNote(
+        ctx.getWorkDir(),
+        SPACED_NOTE_PATH,
+        BODY_BASE,
+        BODY_LOCAL,
+        BODY_LOCAL.trimEnd(),
+        EARLIER_LOCAL_EDIT
+      )
+      serveAcceptedBundle(ctx, setup.source, 'second-commit-final-lf')
+
+      await run(['notebook', 'pull', setup.directory])
+
+      expect(runGit(['rev-parse', 'HEAD^'], setup.directory)).toBe(
+        setup.acceptedHead
+      )
+      expect(runGit(['status', '--porcelain=v1'], setup.directory)).toBe('')
+      expect(
+        fs.readFileSync(join(setup.directory, SPACED_NOTE_PATH), 'utf8')
+      ).toBe(BODY_LOCAL.trimEnd())
+      expect(fs.readFileSync(join(setup.directory, 'note.md'), 'utf8')).toBe(
+        EARLIER_LOCAL_EDIT.content
+      )
     })
 
     test('keeps the rebase cause when Git did not pause with unmerged stages', async () => {
@@ -170,7 +203,7 @@ export function describeNotebookPullConflict(): void {
 
       const error = String(ctx.getErrorSpy().mock.calls[0]?.[0])
       expect(error).toContain(
-        'failed to rebase the unpublished local commit onto the accepted head'
+        'failed to rebase the unpublished local commits onto the accepted head'
       )
       expect(error).toContain('hook-stopped-rebase')
       expect(error).not.toContain('git rebase --continue')

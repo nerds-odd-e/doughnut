@@ -132,61 +132,52 @@ function stagedChangeSurvivesOntoPoint(directory: string): boolean {
 }
 
 /**
- * Rebases the single unpublished local commit onto acceptedHead, preserving
- * the unpublished author identity. Surfaces a paused conflict with recovery
- * guidance when Git stops mid-rebase.
+ * Rebases the unpublished local commits since mergeBase onto acceptedHead,
+ * preserving their author identity. Each pause whose conflicts are only an
+ * optional final LF is absorbed; a real conflict surfaces with recovery
+ * guidance.
  */
-export function rebaseUnpublishedCommit(
+export function rebaseUnpublishedCommits(
   directory: string,
   acceptedHead: string,
-  localParent: string
+  mergeBase: string
 ): void {
   const { name, email } = unpublishedCommitAuthor(directory)
-  try {
-    runSystemGitOrThrow(
-      [
-        '-C',
-        directory,
-        '-c',
-        `user.name=${name}`,
-        '-c',
-        `user.email=${email}`,
-        'rebase',
-        '--onto',
-        acceptedHead,
-        localParent,
-      ],
-      (detail, status) =>
-        `failed to rebase the unpublished local commit onto the accepted head${detail ? `: ${detail}` : ` (exit code ${status})`}`,
-      {
-        env: {
-          ...process.env,
-          ...REBASE_EDITOR_ENV,
-        },
-      }
-    )
-  } catch (e) {
-    const conflictPaths = pausedRebaseConflictPaths(directory)
-    if (conflictPaths === undefined) throw e
-    const remainingConflictPaths = conflictPaths.filter(
-      (relativePath) =>
-        !tryAbsorbFinalLfOnlyConflictPath(directory, relativePath)
-    )
-    if (remainingConflictPaths.length > 0) {
-      const cause = e instanceof Error ? e.message : String(e)
-      throw new Error(
-        `${describePausedRebaseConflict(directory, remainingConflictPaths)}\n${cause}`
+  let step = ['rebase', '--onto', acceptedHead, mergeBase]
+  for (;;) {
+    try {
+      runSystemGitOrThrow(
+        [
+          '-C',
+          directory,
+          '-c',
+          `user.name=${name}`,
+          '-c',
+          `user.email=${email}`,
+          ...step,
+        ],
+        (detail, status) =>
+          `failed to rebase the unpublished local commits onto the accepted head${detail ? `: ${detail}` : ` (exit code ${status})`}`,
+        { env: { ...process.env, ...REBASE_EDITOR_ENV } }
       )
+      return
+    } catch (e) {
+      const conflictPaths = pausedRebaseConflictPaths(directory)
+      if (conflictPaths === undefined) throw e
+      const remainingConflictPaths = conflictPaths.filter(
+        (relativePath) =>
+          !tryAbsorbFinalLfOnlyConflictPath(directory, relativePath)
+      )
+      if (remainingConflictPaths.length > 0) {
+        const cause = e instanceof Error ? e.message : String(e)
+        throw new Error(
+          `${describePausedRebaseConflict(directory, remainingConflictPaths)}\n${cause}`
+        )
+      }
+      step = [
+        'rebase',
+        stagedChangeSurvivesOntoPoint(directory) ? '--continue' : '--skip',
+      ]
     }
-    const action = stagedChangeSurvivesOntoPoint(directory)
-      ? 'continue'
-      : 'skip'
-    runSystemGitOrThrow(
-      ['-C', directory, 'rebase', `--${action}`],
-      (detail, status) =>
-        `failed to ${action === 'continue' ? 'continue the rebase after absorbing a final-LF-only conflict' : 'discard the redundant local replay after absorbing a final-LF-only conflict'}${detail ? `: ${detail}` : ` (exit code ${status})`}`,
-      { env: { ...process.env, ...REBASE_EDITOR_ENV } }
-    )
-    return
   }
 }
