@@ -56,6 +56,15 @@ although acquiring a file still transfers its bytes. GCS durability and retentio
 become part of content preservation. Delivery is incremental, under the
 [North Star](../.planning/NORTH-STAR.md#attachment-storage-transition).
 
+`donut notebook pull` receives into the same checkout. Its own Git operations
+skip LFS smudging; after every outcome, including a rebase paused on a
+conflict, it refreshes the checkout's LFS endpoint and token from the CLI's
+current login and fills in current attachment files. A failed download is
+reported as incomplete attachments; rerunning pull once history is current
+fills them in before it reports the notebook unchanged. A conflicting
+attachment is resolved by choosing a side with Git; Donut does not merge binary
+content.
+
 ## Recovering a published attachment version
 
 Ordinary clone and `donut notebook pull` hydrate only the current tip. Previously published attachment

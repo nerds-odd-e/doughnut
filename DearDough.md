@@ -117,6 +117,7 @@ Four delivered revisions had real successful runs but remained unproved in obser
 ### Occurrences
 
 - Execution: SEED-035 story 1 / quick/148-cohesive-accepted-web-folder-changes / ea903668bb; Timestamp: unknown; Tool: Claude Code; Model: claude-sonnet-5; Open Dough release: unknown.
+- Execution: SEED-035 story 15 / quick/020-notebook-lfs-receive / 2dc0ce9478; Timestamp: 2026-09-24T09:50+08:00 (completion wait for f6b4578a15); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.33. `complete-revision` timed out with all four registered revisions `undiscovered` while `gh run list` showed each completed `success`.
 
 ## ODF-090 — Coordinator implemented a planned slice locally during multi-slice execution
 
@@ -136,8 +137,19 @@ Three ordinary slice commits used coordinator self-review instead of a fresh ref
 
 - Execution: quick/008-remove-zip-export / 38b5e1ef69; Timestamp: 2026-09-21T22:08:41+08:00; Tool: Cursor; Model: Cursor Grok 4.7; Open Dough release: 0.3.27.
 
+## DD-107 — Managed increment delivery left the first Claude Code publication unobserved because no guidance names the session identity it needs
+
+`execution-increment-delivery.mjs deliver` returned `pendingCi: unobserved` ("host session identity is required to verify the notification bridge") although the Claude Code hook bridge was ready. The references document `--session-json` only in the usage line; recovery needed a manual probe, observer start, and `register-push`.
+
+### Occurrences
+
+- Execution: SEED-035 story 15 / quick/020-notebook-lfs-receive / 2dc0ce9478; Timestamp: 2026-09-24T08:49+08:00 (slice 1 delivery; its CI run was created 00:49:45Z); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.33.
+  - Evidence: slice 1 delivery receipt `observation.reason`; later deliveries passing `--session-json '{"session_id":…}'` (from the session transcript path) reported `observation.state: reused`.
+  - Observed effect: slice 1's SHA was registered by hand after its CI run already existed (`CI_DISCOVERY_DELAYED`); no coverage was lost afterwards.
+  - Inference: the coordinator must discover its own session id outside guidance; a host without an obvious transcript path could leave every increment unobserved.
+
 ## Retention
 
-- Highest allocated local number: 106
+- Highest allocated local number: 107
 - Recovery: `33939aa45a17c08f5e6f8076178ce96437fdfbe8:DearDough.md` contains the complete pre-compaction log and earlier recovery references; `b0b385a184e96ecf8b0f6fc5572eaaab69bc8dad` preserves later history.
 - Occurrence history is partial; full observations, effects, inference and historical provenance remain in that snapshot and the upstream catalog.
