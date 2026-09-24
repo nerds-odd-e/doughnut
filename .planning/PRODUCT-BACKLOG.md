@@ -14,8 +14,9 @@ and deletable in Web Donut.
 
 ## Backlog list
 
-- [Remove the legacy raw file storage](seeds/SEED-035-ai-workspace-supporting-files.md#story-19) — SEED-035#story-19
+- [Test file journeys on LFS notebooks as production has them](seeds/SEED-035-ai-workspace-supporting-files.md#story-20) — SEED-035#story-20
 - [Use newly web-uploaded note images from a local checkout](seeds/SEED-035-ai-workspace-supporting-files.md#story-4) — SEED-035#story-4
+- [Remove the legacy raw file storage](seeds/SEED-035-ai-workspace-supporting-files.md#story-19) — SEED-035#story-19
 - [Move existing uploaded note pictures into their notebooks](seeds/SEED-035-ai-workspace-supporting-files.md#story-5) — SEED-035#story-5
 - [Keep a Book's source file as an ordinary notebook file](seeds/SEED-035-ai-workspace-supporting-files.md#story-17) — SEED-035#story-17
 - [Remove the legacy picture and Book storage](seeds/SEED-035-ai-workspace-supporting-files.md#story-18) — SEED-035#story-18

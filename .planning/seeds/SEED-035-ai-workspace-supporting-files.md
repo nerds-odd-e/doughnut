@@ -99,7 +99,7 @@ No executable plan or implementation is authorized by this seed.
 
 ### Store existing notebooks' files through LFS like new notebooks
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../quick/025-convert-raw-notebooks-to-lfs/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"e3aad3a6310fc6c4af8bfd22f40118c823193d089117d21bc0ca045c30534202","plan":"ae389db853f85e62d995e0e694fc50e749207eda5f9a7dc3105348956736047c"}}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../quick/025-convert-raw-notebooks-to-lfs/PLAN.md"}
 ```
 
 - **Identity:** SEED-035#story-14
@@ -130,6 +130,11 @@ No executable plan or implementation is authorized by this seed.
   - The CLI needs no change. A pull that receives `.gitattributes` configures
     LFS and fills in the current files, as for new notebooks. Standard Git LFS
     is required, as it already is for new notebooks.
+  - No path creates a raw binding any more (added 2026-09-24, owner accepted).
+    Today a history reset on a notebook without a binding creates one with the
+    entity default, raw. Every binding Donut creates is LFS, so "no raw notebook
+    left" stays true after the conversion instead of being cleaned up at each
+    restart.
 - **Key examples:**
   1. A raw notebook has `physics/diagram.png` (an earlier version is in history)
      and `refs/paper.pdf`. After conversion, the accepted head has one new commit
@@ -144,6 +149,8 @@ No executable plan or implementation is authorized by this seed.
      is present. A picture then added locally is published, and its web
      download returns its bytes.
   4. Running the conversion again, or on an LFS notebook, creates no commit.
+  5. A notebook has no binding. Its owner resets its Git history → the binding
+     created is LFS, and the new commit has the standard `.gitattributes`.
 - **Boundaries (existing behaviour, not new work):**
   - A checkout without Git LFS: the pull fast-forwards, then reports that Git
     LFS is required; after installing it, the next pull fills in the files.
@@ -153,37 +160,101 @@ No executable plan or implementation is authorized by this seed.
   - A raw notebook whose accepted `.gitattributes` was published by the owner:
     the conversion replaces it with the standard content; the earlier version
     stays in history. None is expected in production.
-- **Deferred promises:** Removing the marker and the raw code paths (story 19);
-  moving old-history bytes out of MySQL (dropped); shrinking bundles; any web
-  display of the conversion.
+- **Deferred promises:** Moving the test fixtures off raw (story 20); removing
+  the marker, the raw code paths and this conversion (story 19); moving
+  old-history bytes out of MySQL (dropped); shrinking bundles; any web display
+  of the conversion.
 - **Effort hypothesis:** M, medium confidence after refinement.
 - **Safe stopping point:** Converted and unconverted notebooks both stay
   readable and publishable, because the raw paths remain until story 19.
+
+<a id="story-20"></a>
+
+### Test file journeys on LFS notebooks as production has them
+```json dough-story-state
+{"schemaVersion":1,"refinement":"refined","approach":"unselected"}
+```
+
+- **Identity:** SEED-035#story-20
+- **Goal:** Maintainers' tests prove the file path production uses. After
+  story 14 no production notebook is raw, yet most web and local file journeys
+  in E2E and the backend Git tests still demote their notebook to raw. Those
+  tests then cover a path users no longer take, and miss the one they do.
+- **Scope (refined 2026-09-24, owner accepted):**
+  - Remove the "uses legacy raw Git attachment storage" step from each E2E
+    scenario that uses it (25 steps in 14 feature files; 13 of those files
+    involve files). The notebook stays LFS as the product creates it.
+  - Keep a scenario only when it proves something the existing LFS scenarios
+    do not; otherwise delete it rather than convert it. These scenarios were
+    demoted only to keep them passing when new notebooks moved to LFS, so
+    several are expected to repeat covered LFS journeys.
+  - Backend Git tests use the product LFS notebook fixture by default. The raw
+    fixture stays only for tests of raw-only behaviour (the conversion and the
+    raw branches), which story 19 deletes.
+  - Afterwards the raw demotion is used only by story 14's conversion tests.
+- **Key examples:**
+  1. A web note move carries a picture to another folder. Without the
+     demotion the notebook is LFS: the owner pulls, and the picture is in the
+     new folder with identical bytes.
+  2. A scenario that differs from an existing LFS scenario only in being raw is
+     deleted, not converted.
+  3. The raw size-refusal scenario in `cli_notebook_attachment_size_admission`
+     is replaced by, or merged into, the LFS size refusal; one scenario proves
+     the limit.
+- **Deferred promises:** Removing raw production code (story 19); E2E speed
+  work beyond what the move needs; new coverage.
+- **Depends on:** Story 14 merged to main. Production confirmation is not
+  needed.
+- **Effort hypothesis:** M, low confidence: LFS transfers can make some
+  scenarios slower; resplit if the move exceeds L.
+- **Safe stopping point:** Each feature file moves on its own; scenarios not
+  yet moved still pass on raw because the raw paths remain until story 19.
 
 <a id="story-19"></a>
 
 ### Remove the legacy raw file storage
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"not-refined","approach":"unselected"}
+{"schemaVersion":1,"refinement":"refined","approach":"unselected"}
 ```
 
 - **Identity:** SEED-035#story-19
-- **Goal:** Maintainers keep one notebook file representation: after story 14
-  has converted every notebook in production, the representation marker, the
-  raw-Git branches, and the tests and E2E fixtures that demote notebooks to raw
-  are removed.
-- **Evaluation:** With no raw binding left in production, the size check on
-  publish, the file reader, and binding creation (including the lazily created
-  binding on history reset) have a single LFS path. The
-  `attachment_representation` column is dropped by a migration that refuses
-  while any raw binding remains. Backend Git fixtures and the E2E scenarios
-  that used "legacy raw Git attachment storage" run on product LFS notebooks.
-- **Scope / value:** Removes code and fixture steps; no new behaviour. It is a
-  release after story 14, once production confirms zero raw bindings.
-- **Depends on:** Story 14 delivered and confirmed in production.
-- **Effort hypothesis:** M–L, low confidence: most backend Git fixtures and
-  about 24 E2E scenario steps demote to raw today; resplit if the fixture move
-  exceeds L.
+- **Goal:** Maintainers keep one file representation in code. Once production
+  has no raw binding, no code asks how a notebook stores its files. This is
+  maintainer value only, so it follows the user-visible picture work
+  (story 4).
+- **Scope (refined 2026-09-24, owner accepted):**
+  - The size check on publish, the file reader, and the publisher have a
+    single LFS path. The `RAW` value, the entity default and the
+    `attachment_representation` column go. The column is dropped by a
+    migration that refuses while any raw binding remains. The check is a plain
+    part of that migration, not a gate left behind.
+  - Delete story 14's startup conversion (its service, trigger and tests); it
+    exists only for raw notebooks. Delete the raw demotion endpoint, its E2E
+    step and the raw backend fixture.
+  - Keep: raw blobs already in accepted history, from before a notebook's
+    conversion, stay valid. Cloning or pulling full history still works and an
+    old commit still reads its raw bytes. The publish checks that walk
+    history (server size admission and the CLI's LFS selection) keep accepting
+    them. The removal is of raw *bindings*, not of raw history.
+  - Confirmation: this ships in a release after the one that ran story 14's
+    conversion in production. The refusing migration is the check: if a raw
+    binding remains, the deploy fails loudly (ADR 0006) and nothing is
+    dropped.
+- **Key examples:**
+  1. No raw binding in production → the deploy succeeds and the column is
+     gone. Publishing a picture to any notebook uses the LFS size check, and
+     the web download reads through the pointer.
+  2. One raw binding remains → the migration fails, naming the notebook ids,
+     and the deploy stops with nothing dropped.
+  3. A converted notebook whose history holds raw `physics/diagram.png` from
+     before the conversion: a fresh clone succeeds, the old commit still has
+     the raw bytes, and publishing a new picture is accepted.
+- **Deferred promises:** Legacy picture, `attachment_blob` and Book storage
+  (story 18); shrinking bundles; rewriting history.
+- **Depends on:** Story 14 released and its conversion run in production;
+  story 20, so no test needs raw notebooks.
+- **Effort hypothesis:** S–M, medium confidence now that the fixture move is
+  story 20.
 - **Safe stopping point:** Until it runs, the unused raw paths remain harmless.
 
 <a id="story-5"></a>
@@ -415,9 +486,11 @@ existing and new pictures and Book files as LFS notebook files, the legacy
 stores removed, and every file present after clone or pull. The order that
 avoids a chicken-and-egg problem is:
 
-1. Story 14: every notebook converted to LFS; then story 19 removes the raw
-   representation after production confirms none is left.
+1. Story 14: every notebook converted to LFS, and no path creates a raw one;
+   then story 20 moves the tests to LFS notebooks.
 2. Story 4: new uploads become files, so the set of legacy pictures stops growing.
+   Story 19 removes the raw representation after production confirms none is
+   left; it gives maintainer value only, so it follows story 4.
 3. Story 5: move existing pictures.
 4. Story 17: Book files.
 5. Story 18: remove the legacy stores, after production verification.
