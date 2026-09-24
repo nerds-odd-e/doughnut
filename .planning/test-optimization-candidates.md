@@ -67,7 +67,8 @@ Consequences for future profiling passes:
   message, and blobs of HEAD and its parent) before and after the pull, ~350ms
   per pull step across ~41 pull steps — unique protection: supplies the
   original/rebased heads later ancestry and rebase assertions compare — not yet
-  attempted; plan 031 (`.planning/quick/031-faster-cli-e2e-feedback/`) stopped
+  attempted; the 2026-09-24 CLI E2E pass (profile and evidence recoverable at
+  `0db3c60f2d:.planning/quick/031-faster-cli-e2e-feedback/PLAN.md`) stopped
   after retiring redundant journeys and making the CLI readiness check one
   `git` call. Candidate experiment: read only the heads the pull step needs and
   let the assertions read what they observe — no decision needed.
