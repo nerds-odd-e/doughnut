@@ -85,7 +85,7 @@ export function createCliE2eNotebookCloneTasks() {
       }
       return git(checkoutDir, 'show', `${parent}:${relativePath}`)
     },
-    /** Relative file paths of the checkout, excluding `.git`, for canonical-tree assertions. */
+    /** Relative file paths of the checkout, excluding reserved Git entries, for canonical-tree assertions. */
     listNotebookCheckoutEntries(checkoutDir: string): string[] {
       return listCheckoutFilesRecursively(checkoutDir, checkoutDir).sort()
     },

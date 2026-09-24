@@ -27,13 +27,16 @@ const TEST_OWNED_REBASE_EDITOR_ENV = {
   GIT_SEQUENCE_EDITOR: 'true',
 } as const
 
+/** Git's own entries, not notebook content: the repository directory and `.gitattributes` (the product's `NotebookGitAttributes.isMetadataPath`). */
+const RESERVED_GIT_ENTRY_NAMES = new Set(['.git', '.gitattributes'])
+
 export function listCheckoutFilesRecursively(
   dir: string,
   base: string
 ): string[] {
   return readdirSync(dir, { withFileTypes: true }).flatMap((entry) => {
     const entryPath = join(dir, entry.name)
-    if (entry.name === '.git') return []
+    if (RESERVED_GIT_ENTRY_NAMES.has(entry.name)) return []
     if (entry.isDirectory())
       return listCheckoutFilesRecursively(entryPath, base)
     return [relative(base, entryPath)]

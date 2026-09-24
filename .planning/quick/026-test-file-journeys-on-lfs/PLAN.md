@@ -192,11 +192,16 @@ Learning for E2E: raw `.json`/`.png` published into an LFS notebook is refused
 ### 6. E2E checkout listings skip reserved Git metadata
 
 Type: Structure
-Status: planned
+Status: done
 Proof: `cli_notebook_clone.feature` green (still raw, so unchanged).
 
 Change: `listCheckoutFilesRecursively` (`e2e_test/config/cliE2eNotebookCloneGit.ts`)
 skips `.gitattributes` beside `.git`. Enables slices 7–9.
+Accepted: `cli_notebook_clone.feature` 4/4 green. Learnings: the demotion step
+is `the notebook "<name>" uses legacy raw Git attachment storage`
+(`e2e_test/step_definitions/cli_notebook_clone.ts`); "contains exactly" tables
+no longer need `.gitattributes` rows, so a presence check (slice 8's reset
+clone) needs its own assertion. E2E wrapper overhead is about 35s per run.
 
 ### 7. Web note journeys pull into LFS checkouts
 
