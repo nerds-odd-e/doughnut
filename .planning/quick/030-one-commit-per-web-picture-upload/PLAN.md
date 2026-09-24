@@ -2,7 +2,7 @@
 
 **Identity:** quick/030-one-commit-per-web-picture-upload/PLAN.md
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"PLAN.md","assessment":"not-ready","reasons":["Slice 1 sizing: how the editor flushes pending text before an upload is unverified, and the slice spans backend, API client and frontend","Slice 2: reading whether a note-relative path exists in the notebook's current portable tree is an assumed seam; an existing reader is not yet identified"],"basis":{"document":"c86a452fd1bd87d2c45fc03dc42224ea545e4ef16922c8a00638934d662301f9"}}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"0aff2a0bc468f98f968785c5350b097493ef066b5f8e2e89cdc24c207f0005a7"}}
 ```
 
 ## Source
@@ -72,36 +72,53 @@ build a `NotebookAttachment` row; image placeholder wording; legacy pictures
 
 | Promise | Slice | Observable proof |
 | --- | --- | --- |
-| Upload is one commit end to end | 1 | Frontend `RichMarkdownEditor.propertyImage.spec.ts`: after upload the editor shows the returned content and no content save is sent (mock expects a filename, finding 4); pending edits are saved before the upload request. Controller test: uploaded content is prepared like any save (`type:` present for a note without one). E2E `cli_notebook_lfs.feature` scenario keeps its exact text. |
-| Name used by a note or folder is refused | 2 | `NoteControllerUploadNoteImageTests`: `force.md` beside note `force`, and `sub` beside folder `physics/sub`, refused naming the path, nothing changed |
-| One rule sets `image:`; no redundant test | 3 | Backend tests seeding `imageUrl`/`imageMask` through `NotesTestData` and E2E `note_frontmatter_image.feature` stay green; `mergeNoteImageScalarsIntoContent`, its tests, the resize-era test and unused `UploadedImageBuilder.metrics` are gone |
+| Upload response carries the prepared note | 1 | `NoteControllerUploadNoteImageTests`: uploaded content is prepared like any save (`type:` present for a note without one) and the response carries that note realm; still exactly one accepted commit |
+| Upload is one commit end to end | 2 | Frontend `RichMarkdownEditor.propertyImage.spec.ts`: pending edits are saved before the upload request; after upload the editor shows the returned content and no content save is sent (mock returns a note realm with a filename `image:`, finding 4). Frontend typecheck. E2E `cli_notebook_lfs.feature` scenario keeps its exact text. |
+| Name used by a note or folder is refused | 3 | `NoteControllerUploadNoteImageTests`: `force.md` beside note `force`, and `sub` beside folder `physics/sub`, refused naming the path, nothing changed |
+| One rule sets `image:`; no redundant test | 4 | Backend tests seeding `imageUrl`/`imageMask` through `NotesTestData` and E2E `note_frontmatter_image.feature` stay green; `mergeNoteImageScalarsIntoContent`, its tests, the resize-era test and unused `UploadedImageBuilder.metrics` are gone |
 
 ## Slices
 
-### 1. A web picture upload is one commit
+### 1. The upload response carries the prepared note
 Type: Behavior
 Status: planned
-Proof: see table row 1. Frontend proof also runs the frontend typecheck
-(`frontend` skill "Frontend proof").
+Proof: see table row 1.
 
-Behavior: a note open in the editor (with or without unsaved text) → the owner
-uploads a picture → pending text is saved first, the upload accepts file and
-`image:` in one commit with the ordinary save preparation, the response carries
-the note's resulting content, and the editor adopts it without another save.
-Choose the smallest response change (for example the note's content beside
-`imagePath`, or the existing note realm) and regenerate the API client.
+Behavior: note without `type:` → owner uploads a picture → the one accepted commit
+holds the file and content prepared like any save
+(`AuthoredNoteContent.prepareDocumentForSave` on `withNoteImage`'s result), and the
+response is the note's `NoteRealm` instead of `NoteImageUploadResult` (delete that DTO
+if unused). Regenerate the API client; keep the frontend compiling by reading
+`image:` from the returned realm's content only where `imagePath` was read (behavior
+there changes in slice 2).
 
-### 2. A name used by a note or folder in the folder is refused
+### 2. A web picture upload is one commit
 Type: Behavior
 Status: planned
 Proof: see table row 2.
 
-Behavior: note `force` in `physics` → upload named `force.md` (or the name of a
-subfolder) → refused like a taken file, nothing stored or accepted. Prefer one
-check of whether the note-relative path exists in the notebook's current
-portable tree over adding note and folder lookups beside `NoteFolderAttachment.at`.
+Behavior: a note open in the editor (with or without unsaved text) → the owner
+uploads a picture → `closeAndFlushNoteContentMutations(noteId)`
+(`composables/noteContentMutationBarrier.ts`, as `useNoteRemovalFlow` uses it) saves
+pending text before the upload request, then reopens admission; the returned realm
+goes through `NoteStorage.refreshNoteRealm`, whose content the autosave adopts via
+`syncFromExternal` without saving. `RichFrontmatterImagePropertyValue` no longer
+emits `update:modelValue` and `commit` after upload.
 
-### 3. One rule sets a note's `image:`
+### 3. A name used by a note or folder in the folder is refused
+Type: Behavior
+Status: planned
+Proof: see table row 3.
+
+Behavior: note `force` in `physics` → upload named `force.md` (or the name of a
+subfolder) → refused like a taken file, nothing stored or accepted. Replace the
+`NoteFolderAttachment.at` check in `requireFreePlainFilename` with one check of the
+notebook's accepted tree: the note-relative path
+(`NotebookGitPortablePath.folderPath(note.getFolder()) + filename`) is taken when it
+is a key of `NotebookGitAcceptedTree.blobIds` at the accepted head or a folder
+prefix of one (the `representedInTree` test).
+
+### 4. One rule sets a note's `image:`
 Type: Structure
 Status: planned
 Proof: see table row 3.
@@ -119,4 +136,7 @@ redundant test (retrospective correction; no new behavior).
 
 ## Learnings
 
-None yet.
+- Refinement 2026-09-25: the flush seam (`closeAndFlushNoteContentMutations`), the
+  adopt-without-save seam (`refreshNoteRealm` + `syncFromExternal`), and the path
+  reader (`NotebookGitAcceptedTree.blobIds`) exist; old slice 1 split into a backend
+  and a frontend proof loop.
