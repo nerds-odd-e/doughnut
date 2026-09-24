@@ -100,74 +100,6 @@ dissolve/merge and cross-notebook operations that the delivered behavior
 refuses for now. The [product backlog](../PRODUCT-BACKLOG.md) owns global order.
 No executable plan or implementation is authorized by this seed.
 
-<a id="story-15"></a>
-
-### Keep working in the same checkout after web changes
-```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../quick/020-notebook-lfs-receive/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"b3c200aac8ccb863a4247fd966d45aaaa3e6175de90ebc7215d3f4f3e6998c05","plan":"764f7253fb2b783ab6bc3a132868807f38c5f23364ff5926a604091773e10066"}}
-```
-
-- **Identity:** SEED-035#story-15
-- **Slice plan:** [Keep working in the same checkout after web changes](../quick/020-notebook-lfs-receive/PLAN.md).
-- **Resplit trace:** Receives the receive portion of the completed fresh-checkout
-  plan (`0b532162accef12392c4070423eb255215264fb0:.planning/quick/019-notebook-lfs-continuity/PLAN.md`).
-- **Goal:** An owner doing AI IDE work in a local checkout receives web changes
-  into that same checkout, with real file bytes and their own unpublished notes,
-  files and commits kept, then publishes. Today two things force a second
-  clone: pull refuses every LFS checkout, and for any notebook pull keeps local
-  work only when it is one commit editing existing notes, which ordinary AI IDE
-  work (new notes, new images, several commits) rarely is. Owner decision
-  2026-09-24: include the wider local work in this story.
-- **Scope:**
-  - Pull accepts any linear unpublished local history on `main`: any number of
-    commits that add, edit, rename or delete notes and files. It rebases that
-    history onto the accepted head with ordinary Git, as the
-    [synchronization contract](../../docs/notebook-git-synchronization.md)
-    already describes. One rule for LFS and legacy raw notebooks. Publication
-    validation still decides what is accepted afterwards.
-  - Conflicts pause the native rebase with today's guidance; the owner resolves
-    them with Git. A conflicting non-Markdown file is resolved by choosing a
-    side with Git; Donut adds no binary merge.
-  - LFS checkouts are no longer refused. Whenever pull hands the checkout back
-    (unchanged, already based, fast-forward, rebased, absorbed, replayed, or
-    paused on a conflict), the files at current paths hold their real bytes;
-    only current versions are downloaded.
-  - A download failure is reported as incomplete files with the rerun
-    instruction; rerunning pull completes them even though history is already
-    current, never reporting "unchanged" over pointer text.
-  - Pull downloads with the CLI's current login and refreshes the checkout's
-    stored LFS token, as publish already does.
-  - The fresh-clone refusal message and the "refuse pull until in-place receive
-    ships" usage line are removed.
-- **Rejection constraints kept:** local merge commits (Donut accepts only
-  linear history, and a rebase would silently drop the merge), unrelated
-  histories, active Git operations, dirty checkouts and non-`main` branches, as
-  today. Accepted-side limits are unchanged: web structural changes in the
-  received history are still refused except the existing exact folder-move
-  replay, which stays limited to one local note edit.
-- **Deferred promises:** plain `git pull`; old attachment versions; converting
-  legacy notebooks (story 14); accepting further web structural changes;
-  Donut-assisted conflict resolution.
-- **Key examples:**
-  - Web adds `diagram.png` to an LFS notebook. The owner, with no local work,
-    pulls: `diagram.png` has its real bytes and the checkout is clean.
-  - Locally the owner commits a new note `ideas.md`, then commits `sketch.png`
-    and an edit to `Pasta.md`. Meanwhile the web edits `Shopping list.md`.
-    Pull rebases both local commits onto the web change; all files are present
-    with real bytes, and publish then succeeds.
-  - The same, but the web also edited `Pasta.md` on the same line: pull stops
-    in a paused rebase naming `Pasta.md`, other files have real bytes, and
-    `git rebase --continue` after resolving completes the history.
-  - The LFS download fails during a fast-forward: pull reports the files as
-    incomplete and says to rerun; rerunning pull downloads them and succeeds.
-  - A local merge commit: pull refuses with today's message and changes
-    nothing.
-- **Effort hypothesis:** L (2–4 hours), medium confidence: widening mostly
-  removes local-shape checks; LFS filling-in reuses clone's hydration.
-- **Depends on:** Delivered CLI publish and fresh-clone LFS acquisition.
-- **Safe stopping point:** Wider local work works for legacy notebooks before
-  LFS receive; LFS receive then joins the same rule.
-
 <a id="story-14"></a>
 
 ### Move existing notebook attachments out of MySQL while preserving access and history
@@ -436,9 +368,7 @@ No executable plan or implementation is authorized by this seed.
 The [product backlog](../PRODUCT-BACKLOG.md) owns global order. The size boundary
 comes first because it protects accepted storage independently of the later
 architecture. Story 13 follows for prevention through an automated publish/fresh-clone
-loop. Resplit story 15 precedes browsing: existing-checkout continuity is paid
-for on every local/web switch, while browsing matters only away from a checkout.
-Candidate story 14 applies the completed workflow to existing notebooks and
+loop. Candidate story 14 applies the completed workflow to existing notebooks and
 should precede their image conversion when queued.
 This is delivery order, not a reason to withhold browsing from already supported
 legacy content. Delivered nested attachment continuity

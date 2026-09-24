@@ -10,8 +10,6 @@ and deletable in Web Donut.
 
 ## Taken
 
-- [Keep working in the same checkout after web changes](seeds/SEED-035-ai-workspace-supporting-files.md#story-15) — SEED-035#story-15 ([plan](quick/020-notebook-lfs-receive/PLAN.md))
-
 ## Backlog list
 
 - [Pull and publish tell owners a recovery path that works](quick/021-pull-recovery-guidance/PLAN.md) — quick/021-pull-recovery-guidance

@@ -4,7 +4,7 @@
 
 - Kind: bounded retrospective correction (no seed required).
 - Provenance: execution of SEED-035#story-15 "Keep working in the same
-  checkout after web changes" (plan `quick/020-notebook-lfs-receive`), commits
+  checkout after web changes" (plan `05a8572262:.planning/quick/020-notebook-lfs-receive/PLAN.md`), commits
   `2dc0ce9478`, `5b66ecfb16`, `27573feddd`, `f6b4578a15` on
   `story/notebook-lfs-receive` (base `eb89d93e1d`). Retrospective 2026-09-24.
 - Beneficiary: a notebook owner using the Donut CLI (or an AI IDE reading its
