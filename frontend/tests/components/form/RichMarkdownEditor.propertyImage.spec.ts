@@ -1,6 +1,7 @@
 import { NoteController } from "@generated/donut-backend-api/sdk.gen"
 import { flushPromises } from "@vue/test-utils"
 import { mockSdkService } from "@tests/helpers"
+import makeMe from "donut-test-fixtures/makeMe"
 import { vi } from "vitest"
 import { createRichMarkdownEditorTestHarness } from "./richMarkdownEditorTestHarness"
 
@@ -9,9 +10,13 @@ describe("RichMarkdownEditor image property value and upload", () => {
   let uploadSpy: ReturnType<typeof mockSdkService>
 
   beforeEach(() => {
-    uploadSpy = mockSdkService(NoteController, "uploadNoteImage", {
-      imagePath: "/attachments/images/99/e2e.png",
-    })
+    uploadSpy = mockSdkService(
+      NoteController,
+      "uploadNoteImage",
+      makeMe.aNoteRealm
+        .content("---\nimage: /attachments/images/99/e2e.png\n---\n\n# Hi")
+        .please()
+    )
   })
 
   afterEach(() => {

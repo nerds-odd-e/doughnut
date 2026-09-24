@@ -81,7 +81,11 @@ build a `NotebookAttachment` row; image placeholder wording; legacy pictures
 
 ### 1. The upload response carries the prepared note
 Type: Behavior
-Status: planned
+Status: done
+Accepted proof: `NoteControllerUploadNoteImageTests.aRootNotesPictureIsAFileAtTheNotebookRootAndItsContentIsPreparedLikeAnySave`
+(realm content and tip `Moon.md` are `type: Note` + `image:`; one new commit); the
+legacy-mask test now expects `type: Note` first. The frontend still reads `image:`
+from the returned realm and commits (slice 2 replaces this).
 Proof: see table row 1.
 
 Behavior: note without `type:` → owner uploads a picture → the one accepted commit

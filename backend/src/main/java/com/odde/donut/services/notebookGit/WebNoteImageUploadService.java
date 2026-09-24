@@ -1,6 +1,5 @@
 package com.odde.donut.services.notebookGit;
 
-import com.odde.donut.algorithms.AuthoredNoteDocument;
 import com.odde.donut.algorithms.CanonicalDonutOrigin;
 import com.odde.donut.algorithms.NoteContentMarkdown;
 import com.odde.donut.controllers.dto.ApiError;
@@ -12,6 +11,7 @@ import com.odde.donut.exceptions.ApiException;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.donut.services.AuthoredNoteDocumentPersistence;
 import com.odde.donut.services.notebookAttachment.NotebookAttachmentContent;
+import com.odde.donut.validators.AuthoredNoteContent;
 import java.io.IOException;
 import java.sql.Timestamp;
 import org.springframework.stereotype.Service;
@@ -21,7 +21,8 @@ import org.springframework.web.multipart.MultipartFile;
  * A picture uploaded for a note's {@code image} property becomes a file in the note's folder under
  * its uploaded name. A name that is not a plain filename, or is already taken there, is refused
  * before anything is stored; nothing is renamed or overwritten. Otherwise its bytes are stored
- * first, then the pointer and the note's {@code image:} are accepted together as one web change.
+ * first, then the pointer and the note's {@code image:} are accepted together as one web change,
+ * with the content prepared like any ordinary content save.
  */
 @Service
 public class WebNoteImageUploadService {
@@ -50,29 +51,28 @@ public class WebNoteImageUploadService {
     this.noteFolderAttachment = noteFolderAttachment;
   }
 
-  /** Returns the filename written into the note's {@code image:}. */
-  public String upload(Note note, MultipartFile picture, Timestamp updatedAt)
+  /** Returns the saved note. */
+  public Note upload(Note note, MultipartFile picture, Timestamp updatedAt)
       throws IOException, UnexpectedNoAccessRightException {
     Integer notebookId = note.getNotebook().getId();
     requireLfs(notebookId);
     String filename = picture.getOriginalFilename();
     requireFreePlainFilename(note, filename);
     byte[] pointer = attachmentContent.storeAsLfsPointer(notebookId, picture.getBytes());
-    webNoteEditService.edit(
+    return webNoteEditService.edit(
         note.getId(),
         notebookId,
         editing -> {
           addFile(editing, filename, pointer);
           authoredNoteDocumentPersistence.persist(
               editing,
-              AuthoredNoteDocument.fromContent(
+              AuthoredNoteContent.prepareDocumentForSave(
                   NoteContentMarkdown.withNoteImage(editing.getContent(), filename),
                   canonicalDonutOrigin),
               updatedAt);
         },
         editing -> "Upload note image: " + filename,
         updatedAt);
-    return filename;
   }
 
   private void requireLfs(Integer notebookId) {

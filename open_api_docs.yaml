@@ -939,7 +939,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: "#/components/schemas/NoteImageUploadResult"
+                $ref: "#/components/schemas/NoteRealm"
   /api/notes/semantic-search:
     post:
       tags:
@@ -4518,15 +4518,6 @@ components:
           format: binary
       required:
       - uploadImage
-    NoteImageUploadResult:
-      type: object
-      properties:
-        imagePath:
-          type: string
-          description: The filename the upload wrote into the note's frontmatter `image:`;
-            the picture is a file of that name in the note's folder.
-      required:
-      - imagePath
     NotebookUpdateRequest:
       type: object
       properties:

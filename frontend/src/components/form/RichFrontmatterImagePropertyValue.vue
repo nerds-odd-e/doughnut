@@ -53,6 +53,7 @@ import { ref } from "vue"
 import RichFrontmatterPropertyExternalLink from "@/components/form/RichFrontmatterPropertyExternalLink.vue"
 import { NoteController } from "@generated/donut-backend-api/sdk.gen"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
+import { noteImageScalarsFromMarkdown } from "@/utils/noteContentFrontmatterParse"
 
 const props = withDefaults(
   defineProps<{
@@ -103,8 +104,12 @@ async function onImageFileSelected(event: Event) {
         body: { uploadImage: file },
       })
     )
-    if (!error && data?.imagePath) {
-      emit("update:modelValue", data.imagePath)
+    const uploadedImage =
+      !error && data
+        ? noteImageScalarsFromMarkdown(data.note.content ?? "").noteImage
+        : undefined
+    if (uploadedImage) {
+      emit("update:modelValue", uploadedImage)
       emit("commit")
     }
   } finally {

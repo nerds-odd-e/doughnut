@@ -421,13 +421,6 @@ export type NoteImageUploadDto = {
     uploadImage: Blob | File;
 };
 
-export type NoteImageUploadResult = {
-    /**
-     * The filename the upload wrote into the note's frontmatter `image:`; the picture is a file of that name in the note's folder.
-     */
-    imagePath: string;
-};
-
 export type NotebookUpdateRequest = {
     skipMemoryTrackingEntirely?: boolean;
     description?: string;
@@ -2164,7 +2157,7 @@ export type UploadNoteImageResponses = {
     /**
      * OK
      */
-    200: NoteImageUploadResult;
+    200: NoteRealm;
 };
 
 export type UploadNoteImageResponse = UploadNoteImageResponses[keyof UploadNoteImageResponses];
