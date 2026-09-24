@@ -10,9 +10,10 @@ and deletable in Web Donut.
 
 ## Taken
 
+- [Test file journeys on LFS notebooks as production has them](seeds/SEED-035-ai-workspace-supporting-files.md#story-20) — SEED-035#story-20 ([plan](quick/026-test-file-journeys-on-lfs/PLAN.md))
+
 ## Backlog list
 
-- [Test file journeys on LFS notebooks as production has them](seeds/SEED-035-ai-workspace-supporting-files.md#story-20) — SEED-035#story-20
 - [Use newly web-uploaded note images from a local checkout](seeds/SEED-035-ai-workspace-supporting-files.md#story-4) — SEED-035#story-4
 - [Remove the legacy raw file storage](seeds/SEED-035-ai-workspace-supporting-files.md#story-19) — SEED-035#story-19
 - [Move existing uploaded note pictures into their notebooks](seeds/SEED-035-ai-workspace-supporting-files.md#story-5) — SEED-035#story-5
