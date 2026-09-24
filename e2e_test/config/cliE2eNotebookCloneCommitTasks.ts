@@ -28,10 +28,10 @@ export function createCliE2eNotebookCloneCommitTasks() {
       return commitCheckout(checkoutDir, 'Change cloned notebook note')
     },
     /**
-     * One commit carrying a UTF-8 text root file and a root file whose exact
-     * bytes are given as spaced hex.
+     * One commit carrying a UTF-8 text file and a file whose exact bytes are
+     * given as spaced hex.
      */
-    commitCliNotebookCheckoutRootFiles({
+    commitCliNotebookCheckoutTextAndBinaryFiles({
       checkoutDir,
       textRelativePath,
       content,
@@ -48,7 +48,10 @@ export function createCliE2eNotebookCloneCommitTasks() {
         { relativePath: textRelativePath, content },
       ])
       stageExactBytes(checkoutDir, binaryRelativePath, bytes)
-      return commitCheckout(checkoutDir, 'Add cloned notebook root files')
+      return commitCheckout(
+        checkoutDir,
+        'Add cloned notebook text and binary files'
+      )
     },
     /** One unpublished commit adding a filled attachment of exact byte length. */
     commitCliNotebookCheckoutFilledAttachment({

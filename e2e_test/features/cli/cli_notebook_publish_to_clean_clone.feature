@@ -24,7 +24,6 @@ Feature: CLI notebook publish received by a clean clone
       Boil water
       """
     And the notebook "CLI Clone Notebook" has a readme-only folder "Kitchen" with readme "Kitchen landing"
-    And the notebook "CLI Clone Notebook" uses legacy raw Git attachment storage
     And the notebook "CLI Clone Notebook"'s Git binding reflects its current content
     And I have a valid Donut Access Token with label "E2E CLI Clone Token"
 
@@ -159,68 +158,11 @@ Feature: CLI notebook publish received by a clean clone
       """
     And I open the original note route
     And the note content on the current page should be "Simmer until al dente and salt the water"
-  Scenario: Published root files reach another checkout byte for byte
-    When I clone the notebook "CLI Clone Notebook" into a temporary destination using the installed CLI
-    And I clone the notebook "CLI Clone Notebook" into a second temporary destination using the installed CLI
-    And I commit the root file "reference.json" and the root file "diagram.png" holding the bytes "89 FF FE 00" together in the cloned checkout:
-      """
-      {"kind":"reference","pages":3}
-      """
-    And I publish the cloned checkout using the installed CLI
-    Then the installed CLI reports the committed change as the accepted head
-    When I update note "Overview" with content "Reviewed on the web"
-    And I pull the second cloned checkout using the installed CLI
-    Then the second cloned checkout contains exactly:
-      | README.md          |
-      | Overview.md        |
-      | diagram.png        |
-      | reference.json     |
-      | Kitchen/README.md  |
-      | Recipes/README.md  |
-      | Recipes/Pasta.md   |
-    And the second cloned checkout retains its original head as an ancestor
-    And the second cloned checkout is a clean checkout of the notebook "CLI Clone Notebook" accepted head
-    And the second cloned checkout file "diagram.png" holds the bytes "89 FF FE 00"
-    And the second cloned checkout file "reference.json" holds exactly:
-      """
-      {"kind":"reference","pages":3}
-
-      """
-    And the second cloned checkout file "Overview.md" is:
-      """
-      ---
-      type: Note
-      ---
-      Reviewed on the web
-      """
-    When I pull the cloned checkout using the installed CLI
-    And I commit the following edit to "reference.json" in the cloned checkout:
-      """
-      {"kind":"reference","pages":4}
-      """
-    And I publish the cloned checkout using the installed CLI
-    Then the installed CLI reports the committed change as the accepted head
-    When I clone the notebook "CLI Clone Notebook" into a fresh temporary destination using the installed CLI
-    Then the fresh clone contains exactly:
-      | README.md          |
-      | Overview.md        |
-      | diagram.png        |
-      | reference.json     |
-      | Kitchen/README.md  |
-      | Recipes/README.md  |
-      | Recipes/Pasta.md   |
-    And the fresh clone is a clean checkout of the accepted head
-    And the fresh clone file "diagram.png" holds the bytes "89 FF FE 00"
-    And the fresh clone file "reference.json" holds exactly:
-      """
-      {"kind":"reference","pages":4}
-
-      """
 
   Scenario: Nested attachments follow a web folder rename into a clean clone
     When I clone the notebook "CLI Clone Notebook" into a temporary destination using the installed CLI
     And I clone the notebook "CLI Clone Notebook" into a second temporary destination using the installed CLI
-    And I commit the root file "References/reference.json" and the root file "References/diagram.png" holding the bytes "89 FF FE 00" together in the cloned checkout:
+    And I commit the file "References/reference.json" and the file "References/diagram.png" holding the bytes "89 FF FE 00" together in the cloned checkout:
       """
       {"kind":"reference","pages":3}
       """

@@ -254,13 +254,17 @@ non-ASCII folders the same way.
 ### 9. Locally published files travel on LFS notebooks
 
 Type: Behavior
-Status: planned
+Status: done
 Proof: `cli_notebook_publish_to_clean_clone` and
 `cli_notebook_attachment_size_admission` green (key examples 1–3).
 
 Behavior: remove the demotion; delete "Published root files reach another
 checkout byte for byte"; keep the nested web folder rename scenario and the
 oversized tip refusal with recovery by amending, now on LFS.
+Accepted: both features 5/5 (after 9a). Key example 1 observed by
+`the second cloned checkout file "Research/diagram.png" holds the bytes …`;
+key example 3 by the unchanged refusal text and amend recovery. The deleted
+scenario's only step (`the fresh clone file … holds exactly:`) went with it.
 
 ### 10. Web pictures and file pages are served from LFS files
 

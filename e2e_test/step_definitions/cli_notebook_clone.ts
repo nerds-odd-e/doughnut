@@ -182,14 +182,6 @@ Then('the fresh clone is a clean checkout of the accepted head', () =>
 )
 
 Then(
-  'the fresh clone file {string} holds exactly:',
-  (relativePath: string, text: string) =>
-    cli
-      .notebookCloneCheckout()
-      .expectFreshCloneFileExactText(relativePath, text)
-)
-
-Then(
   'the fresh clone file {string} holds the bytes {string}',
   (relativePath: string, bytes: string) =>
     cli.notebookCloneCheckout().expectFreshCloneFileBytes(relativePath, bytes)

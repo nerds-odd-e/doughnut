@@ -5,7 +5,6 @@
 import {
   expectCanonicalTreeAt,
   expectCheckoutFileBytesAt,
-  expectCheckoutFileExactTextAt,
   expectCleanAcceptedHeadAt,
 } from './notebookCloneCheckoutDestination'
 
@@ -18,16 +17,6 @@ function notebookCloneCheckoutFresh() {
     },
     expectFreshCloneAtAcceptedHead(): Cypress.Chainable<null> {
       return expectCleanAcceptedHeadAt('cliCloneFreshDestination')
-    },
-    expectFreshCloneFileExactText(
-      relativePath: string,
-      text: string
-    ): Cypress.Chainable<null> {
-      return expectCheckoutFileExactTextAt(
-        'cliCloneFreshDestination',
-        relativePath,
-        text
-      )
     },
     expectFreshCloneFileBytes(
       relativePath: string,

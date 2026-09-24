@@ -63,7 +63,7 @@ When(
 )
 
 When(
-  'I commit the root file {string} and the root file {string} holding the bytes {string} together in the cloned checkout:',
+  'I commit the file {string} and the file {string} holding the bytes {string} together in the cloned checkout:',
   (
     textRelativePath: string,
     binaryRelativePath: string,
@@ -72,7 +72,12 @@ When(
   ) =>
     cli
       .notebookCloneCheckout()
-      .commitRootFiles(textRelativePath, content, binaryRelativePath, bytes)
+      .commitTextAndBinaryFiles(
+        textRelativePath,
+        content,
+        binaryRelativePath,
+        bytes
+      )
 )
 
 When(

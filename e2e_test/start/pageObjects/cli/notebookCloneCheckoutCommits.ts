@@ -11,7 +11,7 @@ type PrimaryCheckoutCommitTask =
   | 'commitCliNotebookCheckoutNoteRenameAndEdit'
   | 'commitCliNotebookCheckoutNoteRenameAndEmptyKeep'
   | 'commitCliNotebookCheckoutNoteRenameAndRemoval'
-  | 'commitCliNotebookCheckoutRootFiles'
+  | 'commitCliNotebookCheckoutTextAndBinaryFiles'
   | 'commitCliNotebookCheckoutFilledAttachment'
   | 'amendCliNotebookCheckoutExactBytes'
 
@@ -54,19 +54,22 @@ function notebookCloneCheckoutCommits() {
         }))
       )
     },
-    /** One commit adding a UTF-8 text root file and an exact-byte root file. */
-    commitRootFiles(
+    /** One commit adding a UTF-8 text file and an exact-byte file. */
+    commitTextAndBinaryFiles(
       textRelativePath: string,
       content: string,
       binaryRelativePath: string,
       bytes: string
     ): Cypress.Chainable<null> {
-      return commitPrimaryCheckoutWith('commitCliNotebookCheckoutRootFiles', {
-        textRelativePath,
-        content,
-        binaryRelativePath,
-        bytes,
-      })
+      return commitPrimaryCheckoutWith(
+        'commitCliNotebookCheckoutTextAndBinaryFiles',
+        {
+          textRelativePath,
+          content,
+          binaryRelativePath,
+          bytes,
+        }
+      )
     },
     /**
      * One unpublished commit adding a filled attachment of exact length; records
