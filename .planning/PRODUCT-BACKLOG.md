@@ -10,8 +10,6 @@ and deletable in Web Donut.
 
 ## Taken
 
-- [Tidy LFS test support into one vocabulary](quick/028-tidy-lfs-test-support/PLAN.md) — quick/028-tidy-lfs-test-support
-
 ## Backlog list
 
 - [Use newly web-uploaded note images from a local checkout](seeds/SEED-035-ai-workspace-supporting-files.md#story-4) — SEED-035#story-4
