@@ -17,12 +17,8 @@ const LOCAL_MERGE =
   'Local main cannot receive the accepted history because an unpublished commit is a merge. ' +
   'Recreate the local work as ordinary commits, then try again.'
 
-const LOCAL_NOT_CONTENT_EDIT =
-  'Local main cannot receive the accepted history because the unpublished commit is not one existing-note content edit. ' +
-  'Recreate it as one unpublished commit that edits one existing ordinary Markdown note at an unchanged path, then try again.'
-
 export const LOCAL_WORK_PRESERVED_BEFORE_PUBLICATION =
-  'Local work is preserved; reconcile or recreate it as one supported commit directly on accepted history before publication.'
+  'Local work is preserved; reconcile or recreate it as commits directly on accepted history before publication.'
 
 const LOCAL_NON_LINEAR_ACCEPTED =
   'Local main cannot receive the accepted history because the accepted history since the local parent is not one contiguous chain of saves. ' +
@@ -48,20 +44,19 @@ export type UnpublishedLocalHistoryDecision =
 
 /**
  * Returns fast-forward when local main is already an ancestor of accepted.
- * Unpublished history must be a linear chain of single-parent commits.
- * Nonempty ordinary-content-edit unpublished work whose merge base is
- * accepted main stays as-is, independent of its commit or path count.
- * Nonempty ordinary-content-edit unpublished work rebases over a
- * contiguous single-parent chain of accepted content-only edits, independent
- * of local path count, accepted commit count, or accepted path count per
- * commit; and over a contiguous chain in which each accepted commit contains
- * only ordinary-note content saves and/or ordinary note additions at the
- * root or a folder already represented in that commit's preceding accepted
- * tree, independent of how many additions or saves each commit carries or
- * how they are grouped across commits.
- * One eligible local commit editing one descendant note under one accepted exact
- * same-name subtree relocation replays onto the mapped path; more local
- * commits or paths do not use that replay.
+ * Unpublished history must be a linear chain of single-parent commits; what
+ * those commits change is left to publication validation.
+ * Unpublished work whose merge base is accepted main stays as-is.
+ * Unpublished work rebases over a contiguous single-parent chain of accepted
+ * content-only edits, independent of accepted commit count or accepted path
+ * count per commit; and over a contiguous chain in which each accepted commit
+ * contains only ordinary-note content saves and/or ordinary note additions at
+ * the root or a folder already represented in that commit's preceding
+ * accepted tree, independent of how many additions or saves each commit
+ * carries or how they are grouped across commits.
+ * One local commit editing one descendant note under one accepted exact
+ * same-name subtree relocation replays onto the mapped path; any other local
+ * work refuses that accepted history as structural.
  */
 export function inspectUnpublishedLocalHistory(
   acceptedRepoDir: string,
@@ -87,14 +82,6 @@ export function inspectUnpublishedLocalHistory(
     ['-C', acceptedRepoDir, 'merge-base', localHead, acceptedHead],
     inspectAncestryFailure
   ).trim()
-  const localPaths = ordinaryNoteContentEditPaths(
-    acceptedRepoDir,
-    mergeBase,
-    localHead
-  )
-  if (localPaths === undefined) {
-    return { kind: 'reject', message: LOCAL_NOT_CONTENT_EDIT }
-  }
   if (mergeBase === acceptedHead) {
     return { kind: 'already-based' }
   }
@@ -108,10 +95,13 @@ export function inspectUnpublishedLocalHistory(
     return { kind: 'reject', message: LOCAL_NON_LINEAR_ACCEPTED }
   }
   if (acceptedInterval.kind === 'exact-subtree-move') {
-    const [localPath] = localPaths
+    const localPath = singleNoteContentEditPath(
+      acceptedRepoDir,
+      mergeBase,
+      localHead
+    )
     if (
       unpublished.length !== 1 ||
-      localPaths.length !== 1 ||
       localPath === undefined ||
       mapPathUnderExactSubtree(localPath, acceptedInterval.mapping) ===
         undefined
@@ -136,19 +126,14 @@ export function inspectUnpublishedLocalHistory(
   return { kind: 'rebase', mergeBase }
 }
 
-function ordinaryNoteContentEditPaths(
+function singleNoteContentEditPath(
   acceptedRepoDir: string,
   parent: string,
   commit: string
-): string[] | undefined {
-  const changes = listCommitChanges(acceptedRepoDir, parent, commit)
-  if (
-    changes.length === 0 ||
-    !changes.every((change) => isOrdinaryNoteContentChange(change))
-  ) {
-    return undefined
-  }
-  return changes.map((change) => change.path)
+): string | undefined {
+  const [change, ...others] = listCommitChanges(acceptedRepoDir, parent, commit)
+  if (change === undefined || others.length > 0) return undefined
+  return isOrdinaryNoteContentChange(change) ? change.path : undefined
 }
 
 function commitCount(acceptedRepoDir: string, ...revs: string[]): number {

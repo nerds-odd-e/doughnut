@@ -35,8 +35,8 @@ function assertCheckoutStillReady(
 
 /**
  * Downloads accepted history and advances an unchanged, clean local main: equal heads stay
- * unchanged, eligible already-based unpublished commits stay unpublished, eligible
- * content-only local commits rebase over a contiguous single-parent chain of accepted
+ * unchanged, already-based linear unpublished commits stay unpublished, linear
+ * unpublished commits rebase over a contiguous single-parent chain of accepted
  * content saves, one ordinary-note addition, or that addition plus one content save of
  * the same note (an empty remaining patch leaves local main at the accepted head), one local
  * descendant content edit across one accepted exact same-name subtree relocation replays

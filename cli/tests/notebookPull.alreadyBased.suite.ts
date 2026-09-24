@@ -37,7 +37,7 @@ export function describeNotebookPullAlreadyBased(): void {
       'donut-cli-pull-already-based-test-'
     )
 
-    test('reports two eligible local-ahead commits as already based without rewriting them', async () => {
+    test('reports two local-ahead commits as already based without rewriting them', async () => {
       const setup = prepareEligibleDivergence(ctx.getWorkDir(), {
         remoteEdits: 0,
         localEdits: 2,

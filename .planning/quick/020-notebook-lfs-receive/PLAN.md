@@ -79,7 +79,7 @@ the combined `mergeBase..localHead` diff; slice 2 removes it.
 
 ### 2. Keep local work that adds, renames or deletes notes and files
 Type: Behavior
-Status: planned
+Status: done
 
 Behavior: a legacy checkout's unpublished commits add a note, add and change a
 non-Markdown file, and rename or delete a note, while the web saved another
@@ -91,6 +91,16 @@ Proof: CLI `run` suites (`localCandidate` add/other shapes become rebase cases;
 remove the "not one existing-note content edit" message and its helper;
 `exactSubtreeMove.refusal` keeps the structural case). Command C.
 Sizing: ~5 min.
+
+Accepted proof (2026-09-24, Command C full run, 457 tests pass):
+`notebookPull.localCandidate.suite.ts` "rebases local commits that add, change,
+rename and delete notes and files" (HEAD~3 is accepted head; files exactly
+`Added.md`, `Renamed.md`, `data.bin`, `other.md`; `data.bin` second version;
+web bytes present); unrelated and merge refusal rows kept;
+`notebookPull.exactSubtreeMove.refusal.suite.ts` "refuses $case without
+changing the checkout" (outside edit; more than one local note edit). Pull's
+next-step guidance and the preserved-work message no longer describe a
+one-commit local rule.
 
 ### 3. Pull fills in current LFS files in an existing checkout
 Type: Behavior
@@ -128,6 +138,10 @@ Proof: repurpose the `cli_notebook_lfs.feature` scenario "Product-created LFS
 notebook publishes and a fresh clone receives current bytes after a web save"
 into this same-checkout journey (fresh clone after a web save stays covered by
 the two-version scenario). Run E and R (raw reconciliation regression).
+Also align the clone guidance "Publishing currently accepts one new commit …"
+and the publish usage line "Publishes one unpublished commit based on the
+accepted main." with publish's actual contiguous single-parent range, if still
+narrower (found in slice 2's refactor).
 Update the durable docs that describe the interim refusal: the North Star
 "Deliver usable increments" item 2 and `docs/notebook-git-lfs.md` /
 `docs/notebook-git-synchronization.md` wording, if present.

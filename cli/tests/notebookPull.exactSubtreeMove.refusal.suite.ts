@@ -29,30 +29,45 @@ export function describeNotebookPullExactSubtreeMoveRefusal(): void {
       'donut-cli-pull-exact-subtree-move-refusal-test-'
     )
 
-    test('refuses a local edit outside the moved subtree without changing the checkout', async () => {
-      const setup = prepareExactSubtreeMoveWithLocalDescendantEdit(
-        ctx.getWorkDir(),
-        {
-          localEditPath: 'outside.md',
-          localBytes:
-            '---\ntype: Note\n---\n# Outside\n\nLocal outside edit.\n',
-          move: { from: 'Recipes', to: 'Kitchen/Recipes' },
+    test.each([
+      { case: 'an edit outside the moved subtree', secondEdit: false },
+      { case: 'more than one local note edit', secondEdit: true },
+    ])(
+      'refuses $case without changing the checkout',
+      async ({ secondEdit }) => {
+        const setup = prepareExactSubtreeMoveWithLocalDescendantEdit(
+          ctx.getWorkDir(),
+          {
+            localEditPath: secondEdit ? 'Recipes/Pasta.md' : 'outside.md',
+            localBytes: secondEdit
+              ? PASTA_LOCAL
+              : '---\ntype: Note\n---\n# Outside\n\nLocal outside edit.\n',
+            move: { from: 'Recipes', to: 'Kitchen/Recipes' },
+          }
+        )
+        if (secondEdit) {
+          commitPortableFile(
+            setup.directory,
+            'outside.md',
+            '---\ntype: Note\n---\n# Outside\n\nSecond local edit.\n',
+            'second unpublished edit'
+          )
         }
-      )
-      serveAcceptedBundle(ctx, setup.source, 'exact-move-outside-edit')
-      const before = checkoutState(setup.directory)
-      const stagingBefore = acceptedHistoryStagingDirsUnderTmp()
+        serveAcceptedBundle(ctx, setup.source, 'exact-move-local-refusal')
+        const before = checkoutState(setup.directory)
+        const stagingBefore = acceptedHistoryStagingDirsUnderTmp()
 
-      await expect(run(['notebook', 'pull', setup.directory])).rejects.toThrow(
-        ProcessExitForTest
-      )
+        await expect(
+          run(['notebook', 'pull', setup.directory])
+        ).rejects.toThrow(ProcessExitForTest)
 
-      expect(ctx.getErrorSpy()).toHaveBeenCalledWith(
-        expect.stringMatching(STRUCTURAL_CHANGE_REFUSAL)
-      )
-      expect(checkoutState(setup.directory)).toEqual(before)
-      expect(acceptedHistoryStagingDirsUnderTmp()).toEqual(stagingBefore)
-    })
+        expect(ctx.getErrorSpy()).toHaveBeenCalledWith(
+          expect.stringMatching(STRUCTURAL_CHANGE_REFUSAL)
+        )
+        expect(checkoutState(setup.directory)).toEqual(before)
+        expect(acceptedHistoryStagingDirsUnderTmp()).toEqual(stagingBefore)
+      }
+    )
 
     test.each([
       {
