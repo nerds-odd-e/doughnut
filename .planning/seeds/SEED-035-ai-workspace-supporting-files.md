@@ -99,7 +99,7 @@ No executable plan or implementation is authorized by this seed.
 
 ### Remove the legacy raw file storage
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"unselected"}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../quick/029-remove-raw-file-storage/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"c224384cca953aab08c932872cbc49eea95bda93ae7f11dae56a7a883d3d0ee8","plan":"799f7852c9fbe2647650922e299c1aafb687ff732df5cedfced0302cf9977115"}}
 ```
 
 - **Identity:** SEED-035#story-19
@@ -110,8 +110,11 @@ No executable plan or implementation is authorized by this seed.
 - **Scope (refined 2026-09-24, owner accepted):**
   - The size check on publish, the file reader, and the publisher have a
     single LFS path. The `RAW` value, the entity default and the
-    `attachment_representation` column go. The column is dropped by a
-    migration that refuses while any raw binding remains. The check is a plain
+    `attachment_representation` column go, over two releases (db-migration
+    release safety: migrations run after the new instance serves). The first
+    release removes the raw code and stops mapping the column; its migration
+    refuses while any raw binding remains, otherwise it makes the column
+    default `LFS`. The next release drops the column. The check is a plain
     part of that migration, not a gate left behind.
   - Delete story 14's startup conversion (`NotebookGitLfsConversionService`,
     the `NotebookGitLfsConversionOnStartup` trigger, and their tests); it
@@ -127,11 +130,11 @@ No executable plan or implementation is authorized by this seed.
     history (server size admission and the CLI's LFS selection) keep accepting
     them. The removal is of raw *bindings*, not of raw history.
   - Confirmation: this ships in a release after the one that ran story 14's
-    conversion in production. The refusing migration is the check: if a raw
-    binding remains, the deploy fails loudly (ADR 0006) and nothing is
-    dropped.
+    conversion in production (`v1.3.23`). The refusing migration is the check:
+    if a raw binding remains, the deploy fails loudly (ADR 0006) and nothing
+    is changed.
 - **Key examples:**
-  1. No raw binding in production → the deploy succeeds and the column is
+  1. No raw binding in production → both deploys succeed and the column is
      gone. Publishing a picture to any notebook uses the LFS size check, and
      the web download reads through the pointer.
   2. One raw binding remains → the migration fails, naming the notebook ids,
