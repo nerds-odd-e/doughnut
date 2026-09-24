@@ -232,9 +232,14 @@ No executable plan or implementation is authorized by this seed.
     `attachment_representation` column go. The column is dropped by a
     migration that refuses while any raw binding remains. The check is a plain
     part of that migration, not a gate left behind.
-  - Delete story 14's startup conversion (its service, trigger and tests); it
-    exists only for raw notebooks. Delete the raw demotion endpoint, its E2E
-    step and the raw backend fixture.
+  - Delete story 14's startup conversion (`NotebookGitLfsConversionService`,
+    the `NotebookGitLfsConversionOnStartup` trigger, and their tests); it
+    exists only for raw notebooks. With it go the
+    `convert_raw_notebook_to_lfs_for_testability` endpoint (generated client,
+    E2E step, page object and scenario), the repository query
+    `findNotebookIdsByAttachmentRepresentation`, and the `@Order` on
+    `FlyWayFreeVersionRealMigration` that only orders it after migration.
+    Delete the raw demotion endpoint, its E2E step and the raw backend fixture.
   - Keep: raw blobs already in accepted history, from before a notebook's
     conversion, stay valid. Cloning or pulling full history still works and an
     old commit still reads its raw bytes. The publish checks that walk
