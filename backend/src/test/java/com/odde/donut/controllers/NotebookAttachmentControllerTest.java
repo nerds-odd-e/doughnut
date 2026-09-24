@@ -175,12 +175,11 @@ class NotebookAttachmentControllerTest extends ControllerTestBase {
 
     @Test
     void missingBytesFailLoudlyNamingTheFile() {
-      ResponseStatusException error =
+      IllegalStateException error =
           assertThrows(
-              ResponseStatusException.class,
-              () -> controller.downloadAttachment(notebook, diagram));
+              IllegalStateException.class, () -> controller.downloadAttachment(notebook, diagram));
 
-      assertThat(error.getReason(), equalTo("File content unavailable: diagram.png"));
+      assertThat(error.getMessage(), equalTo("File content unavailable: diagram.png"));
     }
 
     @Test

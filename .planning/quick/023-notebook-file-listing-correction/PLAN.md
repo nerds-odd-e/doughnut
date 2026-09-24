@@ -80,7 +80,7 @@ features; changing the folder page's own payload.
 
 ### 1. Lost LFS content is a reported failure
 Type: Behavior
-Status: planned
+Status: done
 
 Behavior: LFS notebook, `diagram.png` pointer row, store lacks the object →
 download fails with an unhandled exception naming `diagram.png` as unavailable
@@ -89,6 +89,9 @@ is served. The page still shows the pointer's size.
 Proof: `NotebookAttachmentControllerTest.LfsNotebook.missingBytesFailLoudlyNamingTheFile`
 updated to the new exception type and message. Command B-focused.
 Sizing: ~3 min.
+Accepted: B-focused on `NotebookAttachmentControllerTest` passed (14 tests);
+`missingBytesFailLoudlyNamingTheFile` asserts `IllegalStateException` with
+"File content unavailable: diagram.png"; the pointer-size page test still passes.
 
 ### 2. Sidebar listing reads only id and filename
 Type: Structure
@@ -136,7 +139,7 @@ Sizing: ~4 min.
 - G: `CURSOR_DEV=true nix develop -c pnpm generateTypeScript`.
 - E: `CURSOR_DEV=true nix develop -c pnpm cy:run --spec e2e_test/features/notebooks/notebook_files.feature`.
 
-No product tests have run for this plan.
+Slice 1 proof ran; later slices not yet run.
 
 ## Learnings
 
