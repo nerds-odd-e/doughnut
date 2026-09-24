@@ -136,8 +136,18 @@ AI guidance uses ordinary note refinement, with no refinement changes required
 by this direction. Skipping common AI guidance folders during assimilation is a
 separate backlog outcome whose folder rules and ignore behavior await refinement.
 
-Before image delivery, settle attachment-reference spelling so the same authored
-destination works locally and in web presentation without private server IDs.
+A note's frontmatter `image:` may name a notebook file by a path relative to the
+note's own folder (`force-diagram.png`, `images/force.png`), so the same authored
+value works locally and on the web without private server IDs. Web Donut serves
+it at `/api/notes/{note}/attachment-image?path=<image value>` under the notebook
+read rule: the file whose path equals the note's folder prefix plus the value,
+taken literally with no normalization, so `..`, `./` or a leading `/` never
+match and the picture stays visibly broken (404). Only PNG, JPEG, GIF and WebP,
+chosen by filename extension and never sniffed, are served inline with
+`nosniff`; any other type, including SVG, is refused (415). Values starting with
+`/` (such as `/attachments/images/...`) or carrying a URL scheme are used as-is,
+and `image_mask:` is unchanged. Markdown body image embeds are kept on web edits
+but not yet rendered from notebook files.
 This does not change semantic Wiki-link or property-reference rules. Existing
 image ownership, sharing, and references must be established before migration;
 preserve image access and note learning identity throughout the transition.

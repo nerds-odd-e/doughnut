@@ -119,6 +119,7 @@ Four delivered revisions had real successful runs but remained unproved in obser
 - Execution: SEED-035 story 1 / quick/148-cohesive-accepted-web-folder-changes / ea903668bb; Timestamp: unknown; Tool: Claude Code; Model: claude-sonnet-5; Open Dough release: unknown.
 - Execution: SEED-035 story 15 / quick/020-notebook-lfs-receive / 2dc0ce9478; Timestamp: 2026-09-24T09:50+08:00 (completion wait for f6b4578a15); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.33. `complete-revision` timed out with all four registered revisions `undiscovered` while `gh run list` showed each completed `success`.
 - Execution: SEED-035 story 1 / quick/022-browse-download-notebook-files / 70b3b67313; Timestamp: 2026-09-24T12:20+08:00 (completion wait for a0ee337e40); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.33. `complete-revision` on `story/browse-download-notebook-files` timed out with `70b3b67313`, `f41c291823`, `a0ee337e40` all `undiscovered`; `gh run list` showed runs 35951607689, 35953015884, 35953621136 completed `success`. The story-branch observer was started by hand (DD-107) after the first push.
+- Execution: SEED-035 story 3 / quick/024-note-local-picture-file / f0cc15be6a; Timestamp: 2026-09-24T14:40+08:00 (completion wait for f0cc15be6a); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.37. `complete-revision` on `story/local-image-display` timed out with `f0cc15be6a` `undiscovered` (shutdown confirmed); `gh run list --commit` showed run 35964391742 completed `success`.
 
 ## ODF-090 — Coordinator implemented a planned slice locally during multi-slice execution
 
@@ -151,6 +152,9 @@ Three ordinary slice commits used coordinator self-review instead of a fresh ref
 - Execution: SEED-035 story 1 / quick/022-browse-download-notebook-files / 70b3b67313; Timestamp: 2026-09-24T11:28+08:00 (slice 1 delivery); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.33.
   - Evidence: slice 1 receipt `observation.reason` "host session identity is required to verify the notification bridge"; recovered by `ci-mailbox.mjs probe` (hook added `CI_MONITOR_READY`), `start --execution … story/browse-download-notebook-files`, and `register-push`; slices 2 and 3 then reported `observation.state: reused` without `--session-json`.
   - Observed effect: slice 1's CI run was found late (`CI_DISCOVERY_DELAYED`); three extra coordinator calls; no later coverage loss.
+- Execution: SEED-035 story 3 / quick/024-note-local-picture-file / f0cc15be6a; Timestamp: 2026-09-24T14:25+08:00 (slice 1 delivery); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.37.
+  - Evidence: slice 1 receipt `observation.reason` "host session identity is required to verify the notification bridge" (background Claude Code job); recovered by `ci-mailbox.mjs probe` (`CI_MONITOR_READY`), `start --execution nerds-odd-e/doughnut story/local-image-display`, and `register-push` for f0cc15be6a.
+  - Observed effect: same three-call manual recovery; the release update from 0.3.33 to 0.3.37 did not change this.
 
 ## DD-108 — Queued startup receipt embeds the whole Git index and overflows the coordinator's tool output
 
@@ -162,6 +166,9 @@ Three ordinary slice commits used coordinator self-review instead of a fresh ref
   - Evidence: startup call output "Output too large (811.3KB)"; preview shows `beforeMaintenance.result: deferred`, `reason: unclear-ownership`, then `index: "100644 … .agents/agent-map.md\n…"`.
   - Observed effect: the exact receipt the skill requires preserving was not fully visible in context; later fields (for example refresh results after the index) were unread.
   - Inference: a maintenance diagnostic that lists every tracked file scales with repository size; a count or digest would keep the receipt usable.
+- Execution: SEED-035 story 3 / quick/024-note-local-picture-file / f0cc15be6a; Timestamp: 2026-09-24T14:10+08:00 (queued startup); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.37.
+  - Evidence: startup call output "Output too large (814.6KB)"; `beforeMaintenance.index` holds the full index listing.
+  - Observed effect: the coordinator needed an extra `python3` call to read the receipt's later fields (`afterMaintenance: advanced`, `projectSetupRequired: true`).
 
 ## Retention
 

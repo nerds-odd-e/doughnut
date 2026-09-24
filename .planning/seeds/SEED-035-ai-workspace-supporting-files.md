@@ -183,9 +183,11 @@ No executable plan or implementation is authorized by this seed.
   URLs and Books are not implicitly copied or converted.
 - **Effort hypothesis:** L, low confidence until ownership/sharing/reference
   cases are understood; do not presume a fleet conversion fits this estimate.
-- **Depends on:** Story 3 settles the reference spelling and web display that
-  a converted `image:` must use; story 4 stops new uploads recreating legacy
-  images. Converting before either repeats or pre-empts their work.
+- **Depends on:** A converted `image:` uses the note-relative spelling Web
+  Donut already displays
+  ([attachment references](../../docs/notebook-git-attachments.md#classification-and-references));
+  story 4 stops new uploads recreating legacy images. Converting before it
+  repeats or pre-empts its work.
 - **Safe stopping point:** Existing images work locally and on the web even if
   later image-authoring flows are deferred. Preserve the only accessible copy
   throughout transition; avoid a separate permanent image-file model.
@@ -204,8 +206,8 @@ No executable plan or implementation is authorized by this seed.
   unknown. Images stay safe and visible on the web meanwhile, so deferral
   loses nothing. The benefit is a complete local notebook, not a new capability
   for AI work.
-- **Ordering (owner, 2026-09-24):** Placed after stories 3 and 4 in the
-  product backlog.
+- **Ordering (owner, 2026-09-24):** Placed after story 4 in the product
+  backlog.
 - **Candidate narrow scope (proposal, undecided):** Conversion is triggered
   by the owner per notebook as one accepted commit, not a fleet migration.
   It covers `image` rows of that notebook's notes that the note's `image:`
@@ -224,8 +226,14 @@ No executable plan or implementation is authorized by this seed.
   - Filename clash when two notes in one folder share an image filename, or
     the folder already has that file: rename or refuse? Refusing blocks
     conversion permanently.
-  - Reference spelling (note-relative or notebook-root-relative) is shared
-    with story 3.
+  - Legacy `image` row cleanup: orphan cleanup
+    (`NoteService.deleteOrphanImagesForPersistedContent`) deletes a note's
+    legacy rows only when `image:` is blank or an `/attachments/images/...`
+    path; a note-relative value is classed `InvalidPathPresent` and skips
+    cleanup. Rewriting `image:` to the note-relative spelling therefore
+    leaves the old row in place: decide whether conversion keeps it
+    deliberately or cleans it up, and rename that classification if the
+    relative spelling stays out of cleanup.
   - An owner with unpublished local work will find `pull` refusing over the
     web attachment change; acceptable, or does conversion need guidance?
 - **Related constraint:** the legacy image endpoint
