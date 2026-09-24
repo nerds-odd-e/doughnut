@@ -189,6 +189,11 @@ history converted to LFS does not block publishing a pointer" and "rejects
 publishing a raw attachment in an LFS notebook") and
 `e2e_test/features/cli/cli_notebook_lfs.feature` (11, including "An existing
 checkout of a raw notebook pulls its conversion to LFS and continues on LFS").
+CI repair (runs 35974797130, 35975568223): the new CLI test failed only where
+git-lfs is configured globally, because the `cloneAsBoundCheckout` test helper
+smudged its fake pointer; the helper now clones with `smudgeSkippedGitOptions()`
+like `notebook clone` (7/7 with and without a global LFS filter; CLI suite
+463/463 under it).
 
 ### 4. One notebook's failure does not stop the others
 
