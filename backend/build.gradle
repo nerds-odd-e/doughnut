@@ -73,7 +73,7 @@ dependencies {
   implementation platform('com.google.cloud:libraries-bom:26.88.1')
   implementation 'com.google.cloud:google-cloud-storage:2.73.0'
   implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-  implementation 'com.fasterxml.jackson.datatype:jackson-datatype-hibernate7:2.22.2'
+  implementation 'com.fasterxml.jackson.datatype:jackson-datatype-hibernate7:2.22.3'
   implementation 'org.springframework.boot:spring-boot-starter-web'
   implementation 'org.springframework.boot:spring-boot-starter-websocket'
   implementation 'org.springframework.boot:spring-boot-starter-data-redis'
