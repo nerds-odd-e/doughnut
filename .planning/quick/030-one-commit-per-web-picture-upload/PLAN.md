@@ -8,9 +8,10 @@
 ## Source
 
 - Kind: bounded retrospective correction; no seed.
-- Corrects the execution of SEED-035#story-4
-  ([story](../../seeds/SEED-035-ai-workspace-supporting-files.md#story-4),
-  plan `quick/027-web-uploaded-pictures-as-notebook-files`). Reviewed commits on
+- Corrects the execution of SEED-035#story-4 (story and plan recoverable at
+  `87ec6e1f36:.planning/seeds/SEED-035-ai-workspace-supporting-files.md` and
+  `87ec6e1f36:.planning/quick/027-web-uploaded-pictures-as-notebook-files/PLAN.md`;
+  the delivered behavior is in `docs/notebook-git-attachments.md`). Reviewed commits on
   `main`: `4250de93e1` (no resize), `a061808c28` (web commits carry files),
   `682259779a` (upload becomes an LFS folder file), `0e760d4933` (CLI clone
   proof), `f4d1ec8d5c` (taken/non-plain name refusal). Retrospective 2026-09-24.

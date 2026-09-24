@@ -10,8 +10,6 @@ and deletable in Web Donut.
 
 ## Taken
 
-- [Use newly web-uploaded note images from a local checkout](seeds/SEED-035-ai-workspace-supporting-files.md#story-4) — SEED-035#story-4 ([plan](quick/027-web-uploaded-pictures-as-notebook-files/PLAN.md))
-
 ## Backlog list
 
 - [Make one web picture upload one commit and refuse names a note or folder uses](quick/030-one-commit-per-web-picture-upload/PLAN.md)
