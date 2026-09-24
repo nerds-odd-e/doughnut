@@ -70,8 +70,8 @@ repositories {
 def jdkUnsafeMemoryAccessJvmArgs = ['--sun-misc-unsafe-memory-access=allow']
 
 dependencies {
-  implementation platform('com.google.cloud:libraries-bom:26.88.1')
-  implementation 'com.google.cloud:google-cloud-storage:2.73.0'
+  implementation platform('com.google.cloud:libraries-bom:26.89.0')
+  implementation 'com.google.cloud:google-cloud-storage:2.74.0'
   implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
   implementation 'com.fasterxml.jackson.datatype:jackson-datatype-hibernate7:2.22.3'
   implementation 'org.springframework.boot:spring-boot-starter-web'
