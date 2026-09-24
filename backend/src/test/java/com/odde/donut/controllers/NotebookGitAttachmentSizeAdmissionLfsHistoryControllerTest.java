@@ -10,6 +10,7 @@ import com.odde.donut.entities.NotebookGitBinding;
 import com.odde.donut.services.notebookGit.NotebookGitAttributes;
 import com.odde.donut.services.notebookGit.NotebookGitLfsPointer;
 import com.odde.donut.services.notebookTree.PortableTreeEntry;
+import java.util.List;
 import java.util.Optional;
 import org.eclipse.jgit.lib.ObjectId;
 import org.junit.jupiter.api.Test;
@@ -30,7 +31,7 @@ class NotebookGitAttachmentSizeAdmissionLfsHistoryControllerTest
   @Test
   void lfsAcceptsWithinLimitMultiVersionHistoryPreservingEarlierPayloadsAndCommitIds()
       throws Exception {
-    Notebook notebook = enableLfs(createGitBackedNotebook());
+    Notebook notebook = createProductLfsNotebook();
     NotebookGitBinding empty = snapshotCurrentPortableTree(notebook);
     byte[] first = filledBytes(256, (byte) 0x71);
     byte[] second = filledBytes(512, (byte) 0x72);
@@ -63,13 +64,13 @@ class NotebookGitAttachmentSizeAdmissionLfsHistoryControllerTest
 
   @Test
   void lfsUnchangedTipHistoryStillRequiresWithinLimitIntermediatePayload() throws Exception {
-    Notebook notebook = enableLfs(createGitBackedNotebook());
+    Notebook notebook = createProductLfsNotebook();
     NotebookGitBinding empty = snapshotCurrentPortableTree(notebook);
     controller.publishNotebookGitProposal(
         notebook.getId(),
         empty.getAcceptedGitObjectId(),
         proposalBundleBytes(
-            empty, withAttributes(new NotebookGitProposalFile("Root Note.md", NOTE_MARKDOWN))));
+            empty, List.of(new NotebookGitProposalFile("Root Note.md", NOTE_MARKDOWN))));
     NotebookGitBinding accepted = reloadCommittedBinding(notebook.getId());
     ObjectId acceptedHead = ObjectId.fromString(accepted.getAcceptedGitObjectId());
     byte[] temporary = filledBytes(384, (byte) 0x73);
@@ -90,7 +91,7 @@ class NotebookGitAttachmentSizeAdmissionLfsHistoryControllerTest
 
   @Test
   void lfsAllowsOmittedOversizedIntermediateWhenTipCorrectionIsValid() throws Exception {
-    Notebook notebook = enableLfs(createGitBackedNotebook());
+    Notebook notebook = createProductLfsNotebook();
     NotebookGitBinding empty = snapshotCurrentPortableTree(notebook);
     byte[] over = filledBytes(TWENTY_MIB, (byte) 0x74);
     byte[] tipPayload = filledBytes(THREE_MIB, (byte) 0x75);
@@ -123,7 +124,7 @@ class NotebookGitAttachmentSizeAdmissionLfsHistoryControllerTest
 
   @Test
   void lfsRefusesMissingWithinLimitIntermediateHistoryEvenWhenTipIsValid() throws Exception {
-    Notebook notebook = enableLfs(createGitBackedNotebook());
+    Notebook notebook = createProductLfsNotebook();
     NotebookGitBinding empty = snapshotCurrentPortableTree(notebook);
     byte[] missingIntermediate = filledBytes(320, (byte) 0x76);
     byte[] tipPayload = filledBytes(400, (byte) 0x77);
@@ -152,7 +153,7 @@ class NotebookGitAttachmentSizeAdmissionLfsHistoryControllerTest
   @Test
   void lfsTrustedHistoryGrandfathersPreviouslyAcceptedOversizedPayload() throws Exception {
     byte[] oversized = filledBytes(LIMIT + 1, (byte) 0x78);
-    Notebook notebook = enableLfs(createGitBackedNotebook());
+    Notebook notebook = createProductLfsNotebook();
     makeMe.aNote("Root Note").notebook(notebook).content(NOTE_MARKDOWN).please();
     byte[] pointer = pointerFor(notebook, oversized);
     storeFolderAttachmentAndSnapshot(notebook, null, "legacy.bin", pointer);
@@ -163,7 +164,7 @@ class NotebookGitAttachmentSizeAdmissionLfsHistoryControllerTest
         withLegacy.getAcceptedGitObjectId(),
         proposalBundleBytes(
             withLegacy,
-            withAttributes(
+            List.of(
                 new NotebookGitProposalFile("Root Note.md", NOTE_MARKDOWN),
                 new NotebookGitProposalFile("legacy.bin", pointer))));
     NotebookGitBinding kept = reloadCommittedBinding(notebook.getId());
@@ -172,7 +173,7 @@ class NotebookGitAttachmentSizeAdmissionLfsHistoryControllerTest
         notebook.getId(),
         kept.getAcceptedGitObjectId(),
         proposalBundleBytes(
-            kept, withAttributes(new NotebookGitProposalFile("Root Note.md", NOTE_MARKDOWN))));
+            kept, List.of(new NotebookGitProposalFile("Root Note.md", NOTE_MARKDOWN))));
     NotebookGitBinding withoutAttachment = reloadCommittedBinding(notebook.getId());
 
     controller.publishNotebookGitProposal(
@@ -180,7 +181,7 @@ class NotebookGitAttachmentSizeAdmissionLfsHistoryControllerTest
         withoutAttachment.getAcceptedGitObjectId(),
         proposalBundleBytes(
             withoutAttachment,
-            withAttributes(
+            List.of(
                 new NotebookGitProposalFile("Root Note.md", NOTE_MARKDOWN),
                 new NotebookGitProposalFile("restored.bin", pointer))));
 

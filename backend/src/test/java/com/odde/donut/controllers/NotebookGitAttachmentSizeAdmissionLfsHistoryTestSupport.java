@@ -4,9 +4,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 
 import com.odde.donut.entities.Notebook;
-import com.odde.donut.services.notebookGit.NotebookGitAttributes;
 import com.odde.donut.testability.GitBundleTestReader;
-import java.util.ArrayList;
 import java.util.List;
 import org.eclipse.jgit.internal.storage.dfs.DfsRepositoryDescription;
 import org.eclipse.jgit.internal.storage.dfs.InMemoryRepository;
@@ -32,13 +30,19 @@ abstract class NotebookGitAttachmentSizeAdmissionLfsHistoryTestSupport
           commitOnTopOf(
               repository,
               List.of(baseHead),
-              withAttributes(new NotebookGitProposalFile("version.bin", firstPointer)),
+              withAcceptedMetadata(
+                  repository,
+                  baseHead,
+                  List.of(new NotebookGitProposalFile("version.bin", firstPointer))),
               "First LFS version");
       ObjectId tip =
           commitOnTopOf(
               repository,
               List.of(afterFirst),
-              withAttributes(new NotebookGitProposalFile("version.bin", tipPointer)),
+              withAcceptedMetadata(
+                  repository,
+                  afterFirst,
+                  List.of(new NotebookGitProposalFile("version.bin", tipPointer))),
               "Corrected LFS tip");
       return new LfsHistoryRange(afterFirst, tip, bundleBytesForHead(repository, tip));
     }
@@ -53,11 +57,17 @@ abstract class NotebookGitAttachmentSizeAdmissionLfsHistoryTestSupport
           commitOnTopOf(
               repository,
               List.of(baseHead),
-              withAttributes(note, new NotebookGitProposalFile("temporary.bin", temporaryPointer)),
+              withAcceptedMetadata(
+                  repository,
+                  baseHead,
+                  List.of(note, new NotebookGitProposalFile("temporary.bin", temporaryPointer))),
               "Temporary LFS attachment");
       ObjectId tip =
           commitOnTopOf(
-              repository, List.of(afterFirst), withAttributes(note), "Remove temporary attachment");
+              repository,
+              List.of(afterFirst),
+              withAcceptedMetadata(repository, afterFirst, List.of(note)),
+              "Remove temporary attachment");
       return new LfsHistoryRange(afterFirst, tip, bundleBytesForHead(repository, tip));
     }
   }
@@ -76,14 +86,5 @@ abstract class NotebookGitAttachmentSizeAdmissionLfsHistoryTestSupport
       RevCommit middle = walk.parseCommit(afterFirst);
       assertThat(middle.getParent(0), equalTo(acceptedHead));
     }
-  }
-
-  static List<NotebookGitProposalFile> withAttributes(NotebookGitProposalFile... files) {
-    List<NotebookGitProposalFile> result = new ArrayList<>();
-    result.add(
-        new NotebookGitProposalFile(
-            NotebookGitAttributes.PATH, NotebookGitAttributes.INITIAL_CONTENT));
-    result.addAll(List.of(files));
-    return result;
   }
 }

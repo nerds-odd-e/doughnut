@@ -1,5 +1,6 @@
 package com.odde.donut.controllers;
 
+import com.odde.donut.services.notebookGit.NotebookGitAttributes;
 import com.odde.donut.services.notebookTree.PortableTreeEntry;
 import com.odde.donut.testability.GitBundleTestReader;
 import java.io.ByteArrayOutputStream;
@@ -9,6 +10,9 @@ import java.time.Instant;
 import java.time.ZoneOffset;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.eclipse.jgit.dircache.DirCache;
 import org.eclipse.jgit.dircache.DirCacheBuilder;
 import org.eclipse.jgit.dircache.DirCacheEntry;
@@ -22,6 +26,7 @@ import org.eclipse.jgit.lib.ObjectInserter;
 import org.eclipse.jgit.lib.PersonIdent;
 import org.eclipse.jgit.lib.RefUpdate;
 import org.eclipse.jgit.lib.Repository;
+import org.eclipse.jgit.revwalk.RevWalk;
 import org.eclipse.jgit.transport.BundleWriter;
 
 /**
@@ -35,14 +40,39 @@ abstract class NotebookGitCommitFixtureTestSupport extends NoteDependentRowsCont
 
   /**
    * A bundle whose {@code main} is a single-parent child of the tip in {@code currentBundle}, with
-   * exactly {@code files} as its tree.
+   * {@code files} as its tree plus the tip's reserved Git metadata that {@code files} do not name,
+   * as a local checkout would keep it.
    */
   static byte[] proposalBundleBytes(byte[] currentBundle, List<NotebookGitProposalFile> files)
       throws IOException, URISyntaxException {
     try (InMemoryRepository repository = new InMemoryRepository(new DfsRepositoryDescription())) {
       ObjectId acceptedHead = GitBundleTestReader.fetchHead(repository, currentBundle);
-      ObjectId childCommit = commitOnTopOf(repository, List.of(acceptedHead), files, "Proposal");
+      ObjectId childCommit =
+          commitOnTopOf(
+              repository,
+              List.of(acceptedHead),
+              withAcceptedMetadata(repository, acceptedHead, files),
+              "Proposal");
       return bundleBytesForHead(repository, childCommit);
+    }
+  }
+
+  /** {@code files} plus the reserved Git metadata of {@code acceptedHead} they do not name. */
+  static List<NotebookGitProposalFile> withAcceptedMetadata(
+      Repository repository, ObjectId acceptedHead, List<NotebookGitProposalFile> files)
+      throws IOException {
+    Set<String> named =
+        files.stream().map(NotebookGitProposalFile::path).collect(Collectors.toSet());
+    try (RevWalk revWalk = new RevWalk(repository)) {
+      return Stream.concat(
+              NotebookGitAttributes.selectFrom(
+                      GitBundleTestReader.readTreeEntries(
+                          repository, revWalk.parseCommit(acceptedHead)))
+                  .stream()
+                  .filter(entry -> !named.contains(entry.path()))
+                  .map(entry -> new NotebookGitProposalFile(entry.path(), entry.content())),
+              files.stream())
+          .toList();
     }
   }
 

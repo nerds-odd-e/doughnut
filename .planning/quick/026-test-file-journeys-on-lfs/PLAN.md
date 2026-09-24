@@ -89,9 +89,16 @@ external wait). Each slice ends green.
 ### 1. Proposal fixtures keep the accepted Git metadata
 
 Type: Structure
-Status: planned
+Status: done
 Proof: backend Git controller tests green; `withAttributes`
 (`NotebookGitAttachmentSizeAdmissionLfsHistoryTestSupport`) removed.
+Accepted: `pnpm backend:test:worktree --tests 'com.odde.donut.controllers.NotebookGit*'`
+(428 tests) and `NotebookFollowsFolderContainmentMigrationTest` green.
+Learnings: the shared rule is `NotebookGitCommitFixtureTestSupport.withAcceptedMetadata`,
+also used by the multi-commit LFS history helpers. The LFS history controller
+test moved to `createProductLfsNotebook()` here (a demoted notebook has no
+accepted `.gitattributes`). Tests building chains directly with `commitOnTopOf`
+(e.g. Composed* range tests) bypass it; check them in slice 5.
 
 Change: `proposalBundleBytes` adds the accepted tip's `.gitattributes` entries
 when the listed files do not name them. Raw notebooks have none, so their
@@ -107,6 +114,8 @@ switch to the including reader.
 Change: `GitBundleTestReader.pathsIn` / `readTreeEntries` / `tipPaths` skip
 `NotebookGitAttributes.isMetadataPath`; metadata tests use an explicit
 including variant. Enables slice 5.
+`withAcceptedMetadata` must keep reading through the including variant, or
+proposals silently drop `.gitattributes` again.
 
 ### 3. Folder-attachment seeding stores LFS files
 
