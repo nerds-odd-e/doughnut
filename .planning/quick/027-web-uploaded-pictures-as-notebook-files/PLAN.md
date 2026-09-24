@@ -11,10 +11,9 @@
   the reference that uses it in one accepted change, through the existing
   accepted-change owner. A web upload keeps the user's filename and refuses
   when it is taken.
-- **Start condition:** story 20 delivered (plan recoverable at
-  `4e0e684f1a:.planning/quick/026-test-file-journeys-on-lfs/PLAN.md`). Its slice 10 edits `note_frontmatter_image.feature` and its slices
-  move backend fixtures to LFS; this plan edits the same scenario and relies on
-  LFS test notebooks.
+- **Start condition:** met. Story 20 was delivered (`dc09d60f0e`) with its
+  test-support correction (`115b281976`): backend fixtures and the upload
+  scenario's notebooks are LFS notebooks.
 
 ## Goal and scope
 
@@ -28,7 +27,7 @@ identical file, deleting a replaced file (story 2), moving legacy pictures
 (story 5), removing `/attachments/images` and the `image` table (story 18), any
 raw-notebook write path (story 19 removes raw).
 
-Assumptions (checked on main 2026-09-24):
+Assumptions (rechecked on main `115b281976`, 2026-09-24):
 - The upload today is `NoteController.uploadNoteImage` → `NoteService.uploadNoteImage`
   → `utils/ImageBuilder` (resize via `algorithms/ImageUtils`, JDK ImageIO only,
   no build dependency) → `image` + `attachment_blob` rows. It returns
@@ -43,9 +42,9 @@ Assumptions (checked on main 2026-09-24):
   attachment row would be missing from the commit today.
 - Reuse: `WebNoteEditService.edit` (accepted change), `NoteFolderAttachment.at`
   (the file a note-relative path names — also the clash check),
-  `VerifiedNotebookAttachmentBytes.sha256Hex` + `NotebookAttachmentContent.store`
-  + `NotebookGitLfsPointer.format` (as `NotebookGitLfsConversionService` does),
-  `AuthoredNoteDocumentPersistence.persist` for the new content.
+  `NotebookAttachmentContent.storeAsLfsPointer` (stores the verified bytes and
+  returns the pointer; used by `NotebookGitLfsConversionService` and the LFS test
+  seeding), `AuthoredNoteDocumentPersistence.persist` for the new content.
   `NoteContentMarkdown.mergeNoteImageScalarsIntoContent` exists (testability
   only); use it or `Frontmatter.set`, keeping `image_mask:` as it was.
 - API errors carrying a `message` already show as a toast

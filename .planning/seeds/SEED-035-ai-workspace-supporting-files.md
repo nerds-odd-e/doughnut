@@ -255,7 +255,7 @@ No executable plan or implementation is authorized by this seed.
 
 ### Use newly web-uploaded note images from a local checkout
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../quick/027-web-uploaded-pictures-as-notebook-files/PLAN.md","assessment":"not-ready","reasons":["Waits for story 20 (SEED-035#story-20) to be delivered: its last slice edits the same upload scenario and its fixture moves give the LFS test notebooks this plan relies on."],"basis":{"document":"3d2250296bcd6aae8bf70a8b042d6848d3902470b5e81cb5fd6e0a14d0f0abef","plan":"232a9107a2b8346efce1a304d5bc2add55928d46f53ee1210170f7a2e9556210"}}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../quick/027-web-uploaded-pictures-as-notebook-files/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"ae4fa93d09d18c7eac54959b2860dd3b5ee84a908ed74c4fab0751c1c5ba426d","plan":"c45f1c7b015f48bc8cbffd88f5f84f8a1456c28d1c5fefb9a172930c35b0d450"}}
 ```
 
 - **Identity:** SEED-035#story-4
