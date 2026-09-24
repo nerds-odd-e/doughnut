@@ -89,7 +89,7 @@ conversion.
 ### 1. A raw notebook without files becomes LFS in one forward commit
 
 Type: Behavior
-Status: planned
+Status: done
 Proof: new backend test beside `NotebookGitHistoryResetControllerTest`, using
 `NotebookGitControllerTestBase.createGitBackedNotebook` (raw) and
 `createProductLfsNotebook`.
@@ -100,6 +100,16 @@ tree adds `.gitattributes` with the initial content, the note's blob is
 unchanged, and the binding is LFS. Running it again, or on an LFS notebook,
 leaves the head unchanged. Includes the service, the trigger component, and the
 loop.
+
+Delivered: `NotebookGitLfsConversionService.convert(notebookId, time)` (one
+transaction: lock + re-check, append the commit on the accepted tree edited in
+place, flip the binding, store) and `NotebookGitLfsConversionOnStartup` (the
+loop; `FlyWayFreeVersionRealMigration` now has `@Order(HIGHEST_PRECEDENCE)` so
+migration runs first). Tree entries are placed with
+`NotebookGitTreeContent.putEntry`, which slice 2 reuses for pointers.
+Accepted proof: `NotebookGitLfsConversionControllerTest` (3 tests), plus the
+derived-tree oracle tests after the `putEntry` extraction. The trigger loop is
+compile-checked only; slice 4 tests it.
 
 ### 2. Current files become pointers with identical web bytes
 
