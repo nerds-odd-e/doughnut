@@ -68,6 +68,14 @@ exact checked commit. `outcome` is one of `pending`, `success`, `failure`, or
 `incomplete`; use `incomplete` when a finished check supplies neither success nor
 failure proof, such as a cancelled check. `url` and `time` are optional.
 
+The first discovery after the observer starts is its startup snapshot. From it
+the observer keeps unfinished attempts and only the newest completed attempt by
+`time`; older completed attempts are history and are never reported, even when
+they reappear later. A new attempt, including a new `attemptId` for a known
+`runId`, is still observed. Without `time` on completed attempts, the observer
+cannot tell history from current results and treats every returned attempt as
+current, so supply `time` when the query returns retained older attempts.
+
 When a discovered attempt fails, the observer makes a separate diagnostic request:
 
 ```json

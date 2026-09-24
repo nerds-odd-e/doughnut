@@ -75,3 +75,13 @@ export function readPlan(values) {
   }
   return values.plan;
 }
+
+// The basis a preparation record was read from, when the caller states one.
+export function readExpectedBasis(values) {
+  if (
+    values["expect-document"] === undefined &&
+    values["expect-plan"] === undefined
+  )
+    return undefined;
+  return { document: values["expect-document"], plan: values["expect-plan"] };
+}

@@ -54,7 +54,9 @@ complete removes one identified entry from whichever active list holds it,
 applying a completion the caller has already decided. It never decides whether
 work is complete, and it never deletes a story or plan file: closing those
 canonical homes stays with the caller's wrap-up. Removal happens only on this
-explicit request naming the identity.
+explicit request naming the identity. It also removes the agent profile under
+agents/ beside the backlog that names the same identity, releasing that agent
+name; include that removal in the same commit as the backlog change.
 
 refresh updates what one listed entry says about itself — its title, the
 canonical document it links, or the active plan it links — after that document

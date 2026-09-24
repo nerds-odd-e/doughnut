@@ -113,16 +113,22 @@ For authorized queued Story Branch or Trunk Mode work, invoke the installed
 checkout, owned workspace path and branch, selected identity, stable execution
 publisher ID, mode (`trunk` or `story-branch`), actual remote and trunk branch,
 and the established `--push-authorized --workspace-authorized` flags. Supply
+your own `--host` (`claude`, `codex`, or `cursor`) and `--model`; omit either
+you cannot state rather than guess. Supply
 `--plan` as a path relative to the backlog directory when explicitly selected;
 the command also resolves the canonical
 published plan. Supply `--declared-owner` and matching `--requester` only when
 default-checkout access has actually been established. Missing declarations
 do not prevent a safe automatic refresh. The command fetches
 trunk, checks the published selected source and preparation, selects or reuses
-the workspace, commits an isolated Take, confirms its publication on remote
-trunk, and reports local refresh separately. Preserve its exact receipt in the
-existing execution context. A refusal or unconfirmed receipt stops before
-implementation; a deferred local refresh does not erase accepted publication.
+the workspace, names you as an agent, commits an isolated Take that publishes
+your agent profile, makes that agent the author of your workspace commits
+(a `workspaceAuthorship: "not-configured"` receipt means only the Take commit
+names the agent), confirms publication on remote trunk, and reports local
+refresh separately.
+Preserve its exact receipt in the existing execution context. A refusal or
+unconfirmed receipt stops before implementation; a deferred local refresh does
+not erase accepted publication.
 If publication is interrupted, invoke the same installed command with the
 retained workspace, branch, publisher ID, identity, `--starting-revision` and
 `--candidate-sha` from the last receipt or confirmed pre-push candidate. Use

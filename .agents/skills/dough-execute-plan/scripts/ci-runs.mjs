@@ -43,6 +43,31 @@ export function startupCiRuns(runs) {
   );
 }
 
+// Startup-snapshot rule shared by every run acquisition: the first poll keeps
+// the newest completed attempt and unfinished attempts; the older completed
+// attempts it drops are history and never resurface on later polls, while a
+// newer attempt of the same run does.
+export function createStartupRunFilter() {
+  let startupDiscovery = true;
+  const historyAttempts = new Map();
+  return (runs) => {
+    if (!startupDiscovery)
+      return runs.filter(
+        (run) =>
+          run.status !== "completed" ||
+          !historyAttempts.get(run.databaseId)?.has(run.attempt),
+      );
+    startupDiscovery = false;
+    const current = startupCiRuns(runs);
+    for (const run of runs) {
+      if (current.includes(run)) continue;
+      const attempts = historyAttempts.get(run.databaseId) ?? new Set();
+      historyAttempts.set(run.databaseId, attempts.add(run.attempt));
+    }
+    return current;
+  };
+}
+
 export function listRunsArguments({
   repo,
   branch,
@@ -115,9 +140,8 @@ export function createGitHubRunAcquisition({
   gh = readGitHubActions,
 }) {
   const trackedRuns = new Map();
-  const observedRunIds = new Set();
-  const startupAttempts = new Map();
   const startupBoundary = `<=${new Date(startedAt).toISOString()}`;
+  const currentRuns = createStartupRunFilter();
   let startupDiscovery = true;
 
   return async (signal) => {
@@ -131,21 +155,7 @@ export function createGitHubRunAcquisition({
       }),
       signal,
     );
-    let matching = matchingCiRuns(runs, { branch });
-    if (startupDiscovery) {
-      for (const run of matching)
-        startupAttempts.set(run.databaseId, run.attempt);
-      matching = startupCiRuns(matching);
-    } else {
-      matching = matching.filter(
-        (run) =>
-          observedRunIds.has(run.databaseId) ||
-          !startupAttempts.has(run.databaseId) ||
-          run.status !== "completed" ||
-          run.attempt > startupAttempts.get(run.databaseId),
-      );
-    }
-    for (const run of matching) observedRunIds.add(run.databaseId);
+    const matching = currentRuns(matchingCiRuns(runs, { branch }));
     startupDiscovery = false;
 
     const visibleRunIds = new Set(matching.map((run) => run.databaseId));

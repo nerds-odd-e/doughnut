@@ -17,6 +17,7 @@ import {
   recordDeliveryProgress,
   receiptPrefix,
 } from "./ci-mailbox.mjs";
+import { checkoutIdentity } from "./ci-mailbox-location.mjs";
 import { readMailboxTerminal } from "./ci-mailbox-match.mjs";
 import { isDirectCliEntry } from "./ci-direct-entry.mjs";
 
@@ -53,7 +54,7 @@ export function selectCiEvents(
   if (!session) return emptySelection();
   const owner = hash(
     JSON.stringify([
-      root,
+      checkoutIdentity(root),
       host,
       session,
       input.agent_id ?? input.subagent_id ?? "",

@@ -7,7 +7,10 @@ import { dirname } from "node:path";
 import { parseArgs } from "node:util";
 import { addQueueEntry } from "./product-backlog-add.mjs";
 import { adoptIdentities } from "./product-backlog-adopt.mjs";
-import { completeEntry } from "./product-backlog-complete.mjs";
+import {
+  completeEntry,
+  releaseAgentProfiles,
+} from "./product-backlog-complete.mjs";
 import { setDirection } from "./product-backlog-direction.mjs";
 import { mergeBacklogs } from "./product-backlog-merge.mjs";
 import { placeEntry } from "./product-backlog-place.mjs";
@@ -15,6 +18,7 @@ import { refreshEntry } from "./product-backlog-refresh.mjs";
 import { BacklogError } from "./product-backlog-refusal.mjs";
 import {
   options,
+  readExpectedBasis,
   readPlacement,
   readPlan,
   resolvePath,
@@ -94,8 +98,8 @@ async function complete(file, values) {
   const outcome = await applyReportedChange(file, (source) =>
     completeEntry(source, { identity: values.identity }),
   );
-
-  console.log(reportComplete(outcome, values.file));
+  const released = releaseAgentProfiles(dirname(file), outcome.entry.identity);
+  console.log(reportComplete({ ...outcome, released }, values.file));
 }
 
 // Dropping a reference is not on offer, so a caller who asks for it is told
@@ -170,14 +174,6 @@ async function merge(file, values) {
 }
 
 async function recordState(file, values) {
-  const expectedBasis =
-    values["expect-document"] === undefined &&
-    values["expect-plan"] === undefined
-      ? undefined
-      : {
-          document: values["expect-document"],
-          plan: values["expect-plan"],
-        };
   const outcome = await recordPreparation(dirname(file), {
     identity: values.identity,
     href: values.link,
@@ -186,7 +182,7 @@ async function recordState(file, values) {
     plan: values.plan,
     assessment: values.assessment,
     reasons: values.reason,
-    expectedBasis,
+    expectedBasis: readExpectedBasis(values),
   });
   console.log(reportRecordState(outcome));
 }

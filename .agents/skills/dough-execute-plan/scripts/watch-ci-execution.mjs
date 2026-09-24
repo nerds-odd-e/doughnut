@@ -88,6 +88,9 @@ export async function watchCiExecution({
           signal: observationSignal,
         });
   let consecutiveErrors = 0;
+  // A failure whose diagnostic is still unavailable stays known across polls,
+  // so losing observation by any path still delivers it before the loss.
+  let knownFailureEvent;
 
   const unavailable = (reason) => ({
     type: "CI_MONITOR_UNAVAILABLE",
@@ -96,6 +99,10 @@ export async function watchCiExecution({
     ...(adapter ? {} : { workflow: ciWorkflowFile }),
     reason: String(reason).slice(0, 600),
   });
+  const reportObservationLoss = async (reason) => {
+    if (knownFailureEvent) await emit(knownFailureEvent);
+    await emit(unavailable(reason));
+  };
 
   try {
     while (now() - startedAt < maxDurationMs) {
@@ -154,12 +161,10 @@ export async function watchCiExecution({
       if (event) {
         await emit(event);
       }
+      knownFailureEvent = deferredFailureEvent;
       if (observationError) {
         consecutiveErrors += 1;
-        if (consecutiveErrors === 3) {
-          if (deferredFailureEvent) await emit(deferredFailureEvent);
-          throw new Error(observationError);
-        }
+        if (consecutiveErrors === 3) throw new Error(observationError);
       } else {
         consecutiveErrors = 0;
       }
@@ -188,14 +193,12 @@ export async function watchCiExecution({
       }
       await sleep(pollMs, undefined, { signal: observationSignal });
     }
-    await emit(
-      unavailable(
-        `Execution observation budget expired after ${maxDurationMs} ms.`,
-      ),
+    await reportObservationLoss(
+      `Execution observation budget expired after ${maxDurationMs} ms.`,
     );
   } catch (error) {
     if (observationSignal.aborted) return;
-    await emit(unavailable(error instanceof Error ? error.message : error));
+    await reportObservationLoss(error instanceof Error ? error.message : error);
   } finally {
     signal?.removeEventListener("abort", stopObservation);
     observationAbort.abort();

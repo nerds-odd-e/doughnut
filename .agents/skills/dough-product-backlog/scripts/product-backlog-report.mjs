@@ -33,9 +33,12 @@ export function reportTake(outcome, file) {
 
 export function reportComplete(outcome, file) {
   const { identity, list, href } = outcome.entry;
+  const released = outcome.released.map(
+    (path) => ` Released agent profile ${path} beside the backlog.`,
+  );
   return (
     `Removed "${identity}" from "## ${list}" in ${file}. ` +
-    `Its canonical home ${href} was not changed.`
+    `Its canonical home ${href} was not changed.${released.join("")}`
   );
 }
 

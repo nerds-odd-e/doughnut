@@ -154,7 +154,9 @@ Mode before-cleanup publication — delete the selected work's spent history und
   when the plan was retained at execution completion;
 - its canonical story section when one exists, and its seed only when every
   remaining section is spent;
-- its **Taken** or **Backlog list** entry when one exists; and
+- its **Taken** or **Backlog list** entry when one exists, through the
+  [dough-product-backlog](../dough-product-backlog/SKILL.md) `complete` command,
+  which also deletes that work's agent profile, an owned closure change; and
 - links whose sole purpose is preserving that history.
 
 Remove empty directories belonging to the spent work, including untracked ones.

@@ -122,6 +122,11 @@ retrospective; returning cancelled work requires an explicit backlog decision.
   when the human asks only for backlog maintenance. The applicable seed, plan,
   and proof remain available for later story wrap-up.
 
+Either path removes the entry with the installed `scripts/product-backlog.mjs
+complete` operation. It also deletes the agent profile under `agents/` beside
+the backlog that names the same identity, releasing that agent name; commit that
+deletion with the backlog change.
+
 ## Direct edits may be denied in Claude Code, Codex, or Cursor
 
 An installed Claude Code project may deny a direct `Edit`/`Write`/

@@ -21,28 +21,24 @@ export const receiptPrefix = "CI_OBSERVER ";
 function gitCommonDir(root) {
   try {
     const checkout = realpathSync(root);
-    const toplevel = execFileSync(
+    const [toplevel, common] = execFileSync(
       "git",
-      ["-C", checkout, "rev-parse", "--show-toplevel"],
+      ["-C", checkout, "rev-parse", "--show-toplevel", "--git-common-dir"],
       { encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] },
-    ).trim();
+    )
+      .trim()
+      .split("\n");
     if (realpathSync(toplevel) !== checkout) return;
-    const common = execFileSync(
-      "git",
-      ["-C", checkout, "rev-parse", "--git-common-dir"],
-      { encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] },
-    ).trim();
     return realpathSync(resolve(checkout, common));
   } catch {
     return;
   }
 }
 
-function sameRepositoryCheckout(requestRoot, hookRoot) {
-  if (resolve(requestRoot) === resolve(hookRoot)) return true;
-  const requestCommon = gitCommonDir(requestRoot);
-  const hookCommon = gitCommonDir(hookRoot);
-  return Boolean(requestCommon && hookCommon && requestCommon === hookCommon);
+// A checkout that is its Git toplevel is identified by its repository, so
+// worktrees of one repository share an identity; any other root is itself.
+export function checkoutIdentity(root) {
+  return gitCommonDir(root) ?? resolve(root);
 }
 
 export function readMailbox(
@@ -59,7 +55,7 @@ export function readMailbox(
   const request = JSON.parse(
     readFileSync(join(directory, "request.json"), "utf8"),
   );
-  if (!sameRepositoryCheckout(request.root, root))
+  if (checkoutIdentity(request.root) !== checkoutIdentity(root))
     throw new Error("CI mailbox belongs to another checkout");
   return request;
 }

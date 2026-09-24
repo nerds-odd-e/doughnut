@@ -1,5 +1,4 @@
 // Authoritative queued-start orchestration. The CLI adapter stays in execution-start.mjs.
-import { resolve } from "node:path";
 import { git, lsRemoteSha, revParse } from "./publication-git.mjs";
 import { maintenance } from "./execution-start-maintenance.mjs";
 import { readPublishedExecutionSource } from "./execution-source.mjs";
@@ -9,6 +8,14 @@ import {
   sameSelectedSource,
 } from "./execution-start-recovery.mjs";
 import { acceptedReceipt } from "./execution-start-receipt.mjs";
+import { agentIdentity } from "../../dough-product-backlog/scripts/product-backlog-agent-profile.mjs";
+import { startRequest } from "./execution-start-request.mjs";
+import {
+  receiptAgent,
+  reselectClaimAgent,
+  resumeClaimAgent,
+  selectClaimAgent,
+} from "./execution-start-agent.mjs";
 import {
   commitWorkspaceClaim,
   selectOwnedWorkspace,
@@ -26,49 +33,9 @@ import {
 } from "./workspace-publication-ownership.mjs";
 
 export async function startQueuedExecution(requestInput) {
-  const required = [
-    "integration",
-    "workspace",
-    "branch",
-    "identity",
-    "publisherId",
-    "mode",
-    "target",
-  ];
-  for (const field of required)
-    if (!requestInput[field])
-      return stopped("invalid-request", { error: `missing ${field}` });
-  const request = {
-    ...requestInput,
-    integration: resolve(requestInput.integration),
-    workspace: resolve(requestInput.workspace),
-  };
-  if (request.startingRevision || request.candidateSha) {
-    if (!request.startingRevision || !request.candidateSha)
-      return stopped("invalid-request", {
-        error: "resume requires starting revision and candidate SHA",
-      });
-    request.retained = {
-      workspace: request.workspace,
-      branch: request.branch,
-      startingRevision: request.startingRevision,
-      candidateSha: request.candidateSha,
-    };
-  }
-  if (
-    !["trunk", "story-branch"].includes(request.mode) ||
-    request.pushAuthorized !== true ||
-    request.workspaceAuthorized !== true
-  ) {
-    return stopped("authority-required", {
-      error:
-        "mode, workspace and trunk publication authority must be established",
-    });
-  }
-  if (resolve(request.integration) === resolve(request.workspace))
-    return stopped("invalid-request", {
-      error: "queued work requires a separate owned workspace",
-    });
+  const started = startRequest(requestInput);
+  if (!started.ok) return started;
+  const { request } = started;
   const remote = remoteOf(request);
   const ref = `${remote}/${request.target}`;
   let selectedSource, fetched, origin;
@@ -92,9 +59,26 @@ export async function startQueuedExecution(requestInput) {
   } catch (error) {
     return stopped("source-refused", { error: error.stderr || error.message });
   }
+  let agent;
+  if (!request.retained) {
+    const chosen = await selectClaimAgent(request, ref, backlogPath, {
+      fetched,
+    });
+    if (!chosen.ok) return chosen;
+    agent = chosen.agent;
+  }
   const beforeMaintenance = await maintenance(request);
   const selected = await selectOwnedWorkspace({ ...request, origin });
   if (!selected.ok) return { ...selected, fetched, beforeMaintenance };
+  // Trunk can move between the source fetch and the workspace's base; the
+  // claim names the rotation's next agent on the trunk it is built on.
+  if (agent && selected.startingRevision !== fetched) {
+    const { startingRevision: base, workspace, branch } = selected;
+    const stop = { fetched, workspace, branch, beforeMaintenance };
+    const chosen = await selectClaimAgent(request, base, backlogPath, stop);
+    if (!chosen.ok) return chosen;
+    agent = chosen.agent;
+  }
   const claimRequest = {
     ...request,
     ...selected,
@@ -126,6 +110,15 @@ export async function startQueuedExecution(requestInput) {
         publishedSha: checked.provenance.sha,
         candidateSha: request.retained.candidateSha,
         created: false,
+        ...(await receiptAgent(
+          selected.workspace,
+          await resumeClaimAgent(
+            selected.workspace,
+            checked.provenance.sha,
+            request.identity,
+            backlogPath,
+          ),
+        )),
       },
       beforeMaintenance,
       afterMaintenance,
@@ -148,7 +141,7 @@ export async function startQueuedExecution(requestInput) {
   try {
     committed = request.retained
       ? await retainedCandidate(request, selected)
-      : await commitWorkspaceClaim(claimRequest);
+      : await commitWorkspaceClaim({ ...claimRequest, agent });
   } catch (error) {
     return stopped("claim-failed", {
       workspace: selected.workspace,
@@ -170,6 +163,11 @@ export async function startQueuedExecution(requestInput) {
         );
       }
     },
+    reselectClaim:
+      agent &&
+      reselectClaimAgent(claimRequest, agent, (next) => {
+        agent = next;
+      }),
   });
   if (!published.ok)
     return {
@@ -230,6 +228,17 @@ export async function startQueuedExecution(requestInput) {
     {
       ...published,
       created: selected.created,
+      ...(await receiptAgent(
+        selected.workspace,
+        agent
+          ? agentIdentity(agent.name).agent
+          : await resumeClaimAgent(
+              selected.workspace,
+              published.publishedSha,
+              request.identity,
+              backlogPath,
+            ),
+      )),
     },
     beforeMaintenance,
     afterMaintenance,

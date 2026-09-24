@@ -98,6 +98,13 @@ export function conflictResult(request, ownership, provenance, candidateSha) {
 
 export async function publishClaimSha(request) {
   let sha = request.candidateSha;
+  // Every stop leaves the current candidate in this workspace for resume.
+  const recoveryAt = (details) => ({
+    workspace: request.workspace,
+    branch: request.branch,
+    candidateSha: sha,
+    ...details,
+  });
   let pushError;
   try {
     await pushExactRef(
@@ -115,12 +122,9 @@ export async function publishClaimSha(request) {
       checked = await claimMembership({ ...request, candidateSha: sha });
     } catch (error) {
       return stopped("unpublished", {
-        recovery: {
-          workspace: request.workspace,
-          branch: request.branch,
-          candidateSha: sha,
+        recovery: recoveryAt({
           error: `push and verification failed: ${pushError.message}; ${error.message}`,
-        },
+        }),
       });
     }
     if (checked.ownership === "owned") {
@@ -145,12 +149,7 @@ export async function publishClaimSha(request) {
     const text = `${pushError.message}\n${pushError.stderr ?? ""}`;
     if (!/rejected|non-fast-forward/.test(text)) {
       return stopped("unpublished", {
-        recovery: {
-          workspace: request.workspace,
-          branch: request.branch,
-          candidateSha: sha,
-          error: text,
-        },
+        recovery: recoveryAt({ error: text }),
       });
     }
     if (request.recheckSource) {
@@ -158,26 +157,31 @@ export async function publishClaimSha(request) {
         await request.recheckSource();
       } catch (error) {
         return stopped("source-refused", {
-          recovery: {
-            workspace: request.workspace,
-            branch: request.branch,
-            candidateSha: sha,
-            error: error.stderr || error.message,
-          },
+          recovery: recoveryAt({ error: error.stderr || error.message }),
         });
       }
     }
     const onto = await revParse(request.workspace, remoteRef(request));
-    const replay = await replaySuffix(request, onto);
+    // Startup may rebuild its Take on newer trunk instead of replaying it,
+    // for example when a rival now holds the agent name it selected.
+    let reselected;
+    if (request.reselectClaim) {
+      try {
+        reselected = await request.reselectClaim({ onto, candidateSha: sha });
+      } catch (error) {
+        reselected = stopped("unpublished", {
+          recovery: { error: error.stderr || error.message },
+        });
+      }
+      if (reselected && !reselected.ok) {
+        return { ...reselected, recovery: recoveryAt(reselected.recovery) };
+      }
+    }
+    const replay = reselected ? { code: 0 } : await replaySuffix(request, onto);
     if (replay.code !== 0) {
       return stopped("conflict", {
         ownership: "replay-failed",
-        recovery: {
-          workspace: request.workspace,
-          branch: request.branch,
-          candidateSha: sha,
-          replay,
-        },
+        recovery: recoveryAt({ replay }),
       });
     }
     sha = await revParse(request.workspace, "HEAD");
@@ -192,12 +196,9 @@ export async function publishClaimSha(request) {
       // A second race is outside the one-retry bound. The rewritten candidate
       // stays in this workspace for a later explicit resume.
       return stopped("unpublished", {
-        recovery: {
-          workspace: request.workspace,
-          branch: request.branch,
-          candidateSha: sha,
+        recovery: recoveryAt({
           error: `${error.message}\n${error.stderr ?? ""}`,
-        },
+        }),
       });
     }
   }
@@ -211,22 +212,13 @@ export async function publishClaimSha(request) {
     present = sha === tip || (await isAncestor(request.workspace, sha, tip));
   } catch (error) {
     return stopped("unpublished", {
-      recovery: {
-        workspace: request.workspace,
-        branch: request.branch,
-        candidateSha: sha,
+      recovery: recoveryAt({
         error: `push result could not be verified: ${error.message}`,
-      },
+      }),
     });
   }
   if (!present) {
-    return stopped("unpublished", {
-      recovery: {
-        workspace: request.workspace,
-        branch: request.branch,
-        candidateSha: sha,
-      },
-    });
+    return stopped("unpublished", { recovery: recoveryAt() });
   }
   return {
     ok: true,
