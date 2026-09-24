@@ -107,9 +107,17 @@ behaviour is unchanged. Enables slice 5.
 ### 2. Tip listings compare notebook content, not reserved Git metadata
 
 Type: Structure
-Status: planned
+Status: done
 Proof: backend Git controller tests green, including the metadata tests that
 switch to the including reader.
+Accepted: `pnpm backend:test:worktree --tests 'com.odde.donut.controllers.NotebookGit*'`
+and `--tests 'com.odde.donut.services.notebookGit.*'` green.
+Learnings: the including reader is `GitBundleTestReader.readTreeEntriesWithMetadata`.
+`AcceptedHistory.tipContent()` and `AcceptedTip.entries()` still return the
+exact tree (only `tipPaths` skips metadata), so notes-only `tipContent` /
+`entries` assertions will see `.gitattributes` once their notebook is LFS
+(known: WebContentSaveFileMode, AttachmentCreation's `empty()` tip,
+DerivedFolderTreeOracle; slice 4's classes). Decide per subject in slices 3–5.
 
 Change: `GitBundleTestReader.pathsIn` / `readTreeEntries` / `tipPaths` skip
 `NotebookGitAttributes.isMetadataPath`; metadata tests use an explicit

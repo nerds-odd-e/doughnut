@@ -52,7 +52,7 @@ abstract class NotebookGitAttachmentSizeAdmissionTestSupport
     try (InMemoryRepository repository = new InMemoryRepository(new DfsRepositoryDescription());
         RevWalk revWalk = new RevWalk(repository)) {
       RevCommit commit = revWalk.parseCommit(GitBundleTestReader.fetchHead(repository, downloaded));
-      return GitBundleTestReader.readTreeEntries(repository, commit);
+      return GitBundleTestReader.readTreeEntriesWithMetadata(repository, commit);
     }
   }
 

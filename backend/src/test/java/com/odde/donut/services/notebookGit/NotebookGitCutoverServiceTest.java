@@ -87,7 +87,7 @@ class NotebookGitCutoverServiceTest {
         assertThat(commit.getAuthorIdent().getEmailAddress(), equalTo("system@donut.local"));
 
         List<PortableTreeEntry> foundEntries =
-            GitBundleTestReader.readTreeEntries(readBack, commit);
+            GitBundleTestReader.readTreeEntriesWithMetadata(readBack, commit);
 
         assertThat(foundEntries, contains(expectedEntries.toArray(new PortableTreeEntry[0])));
 
@@ -152,7 +152,7 @@ class NotebookGitCutoverServiceTest {
         RevCommit commit = revWalk.parseCommit(headObjectId);
 
         List<PortableTreeEntry> foundEntries =
-            GitBundleTestReader.readTreeEntries(readBack, commit);
+            GitBundleTestReader.readTreeEntriesWithMetadata(readBack, commit);
 
         assertThat(foundEntries, contains(expectedEntries.toArray(new PortableTreeEntry[0])));
       }

@@ -1,5 +1,6 @@
 package com.odde.donut.testability;
 
+import com.odde.donut.services.notebookGit.NotebookGitAttributes;
 import com.odde.donut.services.notebookTree.PortableTreeEntry;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -66,25 +67,36 @@ public final class GitBundleTestReader {
     }
   }
 
+  /** The notebook content paths of a commit's tree, without reserved Git metadata. */
   public static List<String> pathsIn(Repository repository, ObjectId commitId) throws IOException {
-    try (RevWalk revWalk = new RevWalk(repository);
-        TreeWalk treeWalk = new TreeWalk(repository)) {
-      treeWalk.addTree(revWalk.parseCommit(commitId).getTree());
-      treeWalk.setRecursive(true);
-      List<String> paths = new ArrayList<>();
-      while (treeWalk.next()) {
-        paths.add(treeWalk.getPathString());
-      }
-      return paths;
+    try (RevWalk revWalk = new RevWalk(repository)) {
+      return readTreeEntries(repository, revWalk.parseCommit(commitId)).stream()
+          .map(PortableTreeEntry::path)
+          .toList();
     }
   }
 
   /**
-   * Reads every blob reachable from a commit's tree as a Portable tree entry (path plus exact
-   * bytes), for tests comparing a read-back Git tree against expected Portable-tree content.
+   * The notebook content of a commit's tree as Portable tree entries (path plus exact bytes),
+   * without reserved Git metadata such as {@code .gitattributes}.
    */
   public static List<PortableTreeEntry> readTreeEntries(Repository repository, RevCommit commit)
       throws IOException {
+    return withoutMetadata(readTreeEntriesWithMetadata(repository, commit));
+  }
+
+  private static List<PortableTreeEntry> withoutMetadata(List<PortableTreeEntry> entries) {
+    return entries.stream()
+        .filter(entry -> !NotebookGitAttributes.isMetadataPath(entry.path()))
+        .toList();
+  }
+
+  /**
+   * Every blob reachable from a commit's tree as a Portable tree entry, including reserved Git
+   * metadata, for tests whose subject is the exact tree or the metadata itself.
+   */
+  public static List<PortableTreeEntry> readTreeEntriesWithMetadata(
+      Repository repository, RevCommit commit) throws IOException {
     List<PortableTreeEntry> entries = new ArrayList<>();
     try (TreeWalk treeWalk = new TreeWalk(repository)) {
       treeWalk.addTree(commit.getTree());
@@ -106,7 +118,8 @@ public final class GitBundleTestReader {
       throws IOException, URISyntaxException {
     try (InMemoryRepository repository = new InMemoryRepository(new DfsRepositoryDescription());
         RevWalk revWalk = new RevWalk(repository)) {
-      return readTreeEntries(repository, revWalk.parseCommit(fetchHead(repository, bundleBytes)));
+      return readTreeEntriesWithMetadata(
+          repository, revWalk.parseCommit(fetchHead(repository, bundleBytes)));
     }
   }
 
@@ -121,7 +134,7 @@ public final class GitBundleTestReader {
         walked = revWalk.parseCommit(walked.getParent(0));
         ancestry.add(walked.getId());
       }
-      return new AcceptedTip(head.getId(), ancestry, readTreeEntries(repository, head));
+      return new AcceptedTip(head.getId(), ancestry, readTreeEntriesWithMetadata(repository, head));
     }
   }
 
@@ -140,7 +153,7 @@ public final class GitBundleTestReader {
     try (InMemoryRepository repository = new InMemoryRepository(new DfsRepositoryDescription());
         RevWalk revWalk = new RevWalk(repository)) {
       RevCommit tip = revWalk.parseCommit(fetchHead(repository, bundleBytes));
-      List<PortableTreeEntry> tipContent = readTreeEntries(repository, tip);
+      List<PortableTreeEntry> tipContent = readTreeEntriesWithMetadata(repository, tip);
       revWalk.markStart(tip);
       List<String> commits = new ArrayList<>();
       for (RevCommit commit : revWalk) {
@@ -157,8 +170,9 @@ public final class GitBundleTestReader {
       return commits.subList(1, commits.size());
     }
 
+    /** The notebook content paths at the tip, without reserved Git metadata. */
     public List<String> tipPaths() {
-      return tipContent.stream().map(PortableTreeEntry::path).toList();
+      return withoutMetadata(tipContent).stream().map(PortableTreeEntry::path).toList();
     }
   }
 

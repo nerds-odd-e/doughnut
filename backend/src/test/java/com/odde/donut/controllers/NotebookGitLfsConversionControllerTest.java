@@ -129,7 +129,8 @@ class NotebookGitLfsConversionControllerTest extends NotebookGitWebContentContro
           equalTo(NotebookGitCutoverService.SYSTEM_AUTHOR_EMAIL));
       assertThat(conversion.getFullMessage(), equalTo("Store notebook files with Git LFS"));
       assertThat(
-          GitBundleTestReader.readTreeEntries(repository, conversion), equalTo(expectedEntries));
+          GitBundleTestReader.readTreeEntriesWithMetadata(repository, conversion),
+          equalTo(expectedEntries));
     }
   }
 
