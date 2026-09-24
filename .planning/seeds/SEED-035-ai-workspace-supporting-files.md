@@ -228,10 +228,10 @@ No executable plan or implementation is authorized by this seed.
     with story 3.
   - An owner with unpublished local work will find `pull` refusing over the
     web attachment change; acceptable, or does conversion need guidance?
-- **Related finding:** the public legacy image endpoint is queued first as
-  [SEED-040 story 1](SEED-040-private-note-images.md#story-1) (owner,
-  2026-09-24); this story's conversion would not remove the exposure while
-  legacy rows remain.
+- **Related constraint:** the legacy image endpoint
+  (`/attachments/images/{id}/{fileName}`) serves images only to readers of the
+  note's notebook; conversion must keep that read rule for legacy rows that
+  remain.
 
 <a id="story-16"></a>
 
@@ -301,9 +301,7 @@ No executable plan or implementation is authorized by this seed.
   - Rewriting references when a file is renamed or moved (same stance as
     story 11), and any special display for a missing file: a broken reference
     stays visibly broken, as today.
-  - New web uploads (story 4), converting old images (story 5), and closing
-    the public legacy image endpoint
-    ([SEED-040 story 1](SEED-040-private-note-images.md#story-1)).
+  - New web uploads (story 4) and converting old images (story 5).
 - **Current state (2026-09-24):** `image: force-diagram.png` is stored as-is
   and rendered as `<img src="force-diagram.png">`, which resolves against the
   web page URL and shows broken. The file download
