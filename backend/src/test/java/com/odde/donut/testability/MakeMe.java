@@ -88,6 +88,14 @@ public class MakeMe extends MakeMeWithoutDB {
     return new FolderBuilder(this, null);
   }
 
+  public NotebookAttachmentBuilder anAttachment(String filename) {
+    return new NotebookAttachmentBuilder(this, filename);
+  }
+
+  public NotebookGitBindingBuilder aGitBindingFor(Notebook notebook) {
+    return new NotebookGitBindingBuilder(this, notebook);
+  }
+
   public FolderBuilder theFolder(Folder folder) {
     return new FolderBuilder(this, folder);
   }

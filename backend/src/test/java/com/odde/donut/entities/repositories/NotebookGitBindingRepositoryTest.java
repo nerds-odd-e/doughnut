@@ -7,7 +7,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.NotebookGitBinding;
 import com.odde.donut.testability.MakeMe;
-import java.sql.Timestamp;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -25,15 +24,8 @@ class NotebookGitBindingRepositoryTest {
   @Autowired NotebookGitBindingRepository repository;
   @Autowired JdbcTemplate jdbcTemplate;
 
-  /** A persisted binding with the minimum every column requires. */
   private NotebookGitBinding persistBinding(Notebook notebook) {
-    NotebookGitBinding binding = new NotebookGitBinding();
-    binding.setNotebook(notebook);
-    binding.setAcceptedGitObjectId("a".repeat(40));
-    Timestamp now = makeMe.aTimestamp().please();
-    binding.setCreatedAt(now);
-    binding.setUpdatedAt(now);
-    NotebookGitBinding saved = repository.save(binding);
+    NotebookGitBinding saved = makeMe.aGitBindingFor(notebook).please();
     makeMe.entityPersister.flushAndClear();
     return saved;
   }

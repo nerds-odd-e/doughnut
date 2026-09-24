@@ -34,4 +34,17 @@ export const notebookGitTestabilityMethods = {
       { log: false }
     )
   },
+
+  /** Stores a file at a slash-separated notebook path (creating folders), then resnapshots. */
+  putNotebookFileForTestability(
+    notebookName: string,
+    path: string,
+    content: string
+  ) {
+    return cy.then(() =>
+      NotebookGitTestabilityController.putNotebookFileForTestability({
+        body: { notebookName, path, content },
+      })
+    )
+  },
 }

@@ -12,6 +12,11 @@
         :active-note-topology="activeNoteTopology"
         :aria-level="currentLevel"
       />
+      <SidebarAttachmentItem
+        v-else-if="row.kind === 'attachment'"
+        :notebook-id="notebookId"
+        :attachment="row.attachment"
+      />
       <SidebarFolderItem
         v-else
         v-bind="{
@@ -35,6 +40,7 @@ import type {
   NoteTopology,
   Folder,
 } from "@generated/donut-backend-api"
+import SidebarAttachmentItem from "./SidebarAttachmentItem.vue"
 import SidebarFolderItem from "./SidebarFolderItem.vue"
 import SidebarNoteItem from "./SidebarNoteItem.vue"
 import { sidebarStructuralRefreshKey } from "./sidebarStructuralRefresh"
@@ -57,6 +63,9 @@ function folderNumericId(folder: Folder): number | undefined {
 function rowKey(row: SidebarStructuralRow): string {
   if (row.kind === "note") {
     return `n-${row.noteTopology.id}`
+  }
+  if (row.kind === "attachment") {
+    return `a-${row.attachment.id}`
   }
   const fid = folderNumericId(row.folder)
   return `f-${fid ?? "unknown"}`
@@ -93,7 +102,11 @@ const displayRows = computed(() =>
 
 function applyListing(listing: FolderListing) {
   const noteTopologies = listing.noteTopologies ?? []
-  rawRows.value = buildUnsortedStructuralRows(noteTopologies, listing.folders)
+  rawRows.value = buildUnsortedStructuralRows(
+    noteTopologies,
+    listing.folders,
+    listing.attachments
+  )
   props.onStructuralPeerCount?.(rawRows.value.length)
 }
 

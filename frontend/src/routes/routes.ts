@@ -14,6 +14,7 @@ import CirclesPage from "@/pages/CirclesPage.vue"
 import MemoryTrackerPage from "@/pages/MemoryTrackerPage.vue"
 import NotebookPage from "@/pages/NotebookPage.vue"
 import FolderPage from "@/pages/FolderPage.vue"
+import AttachmentPage from "@/pages/AttachmentPage.vue"
 import NotebookGroupPage from "@/pages/NotebookGroupPage.vue"
 import BookReadingPage from "@/pages/BookReadingPage.vue"
 import SettingsPage from "@/pages/SettingsPage.vue"
@@ -47,6 +48,7 @@ const componentMap: Record<string, RouteComponent> = {
   memoryTrackerShow: MemoryTrackerPage,
   notebookPage: NotebookPage,
   folderPage: FolderPage,
+  attachmentPage: AttachmentPage,
   bookReading: BookReadingPage,
 }
 

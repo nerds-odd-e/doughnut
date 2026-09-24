@@ -68,6 +68,11 @@ ordinary Markdown notes; a web attachment change with unpublished local work is
 refused, so attachment conflicts do not arise. Donut does not merge binary
 content.
 
+Web Donut downloads an LFS file's stored bytes and shows the pointer's size on
+the file's page. When the stored object is missing, the download fails with an
+error naming the file as unavailable; the pointer text is never served as the
+file. A zero-byte file is served empty.
+
 ## Recovering a published attachment version
 
 Ordinary clone and `donut notebook pull` hydrate only the current tip. Previously published attachment

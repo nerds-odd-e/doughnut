@@ -118,6 +118,12 @@ export type Randomization = {
     seed?: number;
 };
 
+export type PutNotebookFileRequest = {
+    notebookName: string;
+    path: string;
+    content: string;
+};
+
 export type InspectNotebookLfsAttachmentRequest = {
     notebookName: string;
     filename: string;
@@ -1181,17 +1187,43 @@ export type SubscriptionForNotebooksListing = {
 };
 
 /**
- * Note topologies and child folders in a structural listing scope (e.g. notebook root or a folder).
+ * Note topologies, child folders, and files in a structural listing scope (e.g. notebook root or a folder).
  */
 export type FolderListing = {
     noteTopologies?: Array<NoteTopology>;
     folders?: Array<Folder>;
+    attachments?: Array<NotebookAttachment>;
+};
+
+export type NotebookAttachment = {
+    id: number;
+    filename: string;
 };
 
 export type BookUserLastReadPosition = {
     id: number;
     locator: ContentLocatorFull;
     selectedBookBlockId?: number | null;
+};
+
+/**
+ * Notebook chrome plus one file for loading the file page: the shared realm sidebar with the folder trail from notebook root through the file's folder, the file row, and its size in bytes.
+ */
+export type NotebookAttachmentRealm = {
+    /**
+     * Notebook chrome: entity plus optional catalog hints and optional notebook readme content.
+     */
+    notebookRealm: NotebookRealm;
+    /**
+     * Folders from notebook root outward; see each realm for trail semantics.
+     */
+    ancestorFolders?: Array<Folder>;
+    /**
+     * Full markdown of the container readme that supplies the nearest non-blank title_pattern (inner scope toward notebook root). Omitted when none applies.
+     */
+    scopedReadmeContent?: string;
+    attachment: NotebookAttachment;
+    size: number;
 };
 
 export type ThresholdExceededResult = {
@@ -1600,6 +1632,22 @@ export type RandomizerResponses = {
 };
 
 export type RandomizerResponse = RandomizerResponses[keyof RandomizerResponses];
+
+export type PutNotebookFileForTestabilityData = {
+    body: PutNotebookFileRequest;
+    path?: never;
+    query?: never;
+    url: '/api/testability/put_notebook_file_for_testability';
+};
+
+export type PutNotebookFileForTestabilityResponses = {
+    /**
+     * OK
+     */
+    200: string;
+};
+
+export type PutNotebookFileForTestabilityResponse = PutNotebookFileForTestabilityResponses[keyof PutNotebookFileForTestabilityResponses];
 
 export type SetOpenAiTokenData = {
     body?: {
@@ -3892,6 +3940,44 @@ export type GetBookFileResponses = {
 };
 
 export type GetBookFileResponse = GetBookFileResponses[keyof GetBookFileResponses];
+
+export type GetAttachmentPageData = {
+    body?: never;
+    path: {
+        notebook: number;
+        attachment: number;
+    };
+    query?: never;
+    url: '/api/notebooks/{notebook}/attachments/{attachment}';
+};
+
+export type GetAttachmentPageResponses = {
+    /**
+     * OK
+     */
+    200: NotebookAttachmentRealm;
+};
+
+export type GetAttachmentPageResponse = GetAttachmentPageResponses[keyof GetAttachmentPageResponses];
+
+export type DownloadAttachmentData = {
+    body?: never;
+    path: {
+        notebook: number;
+        attachment: number;
+    };
+    query?: never;
+    url: '/api/notebooks/{notebook}/attachments/{attachment}/content';
+};
+
+export type DownloadAttachmentResponses = {
+    /**
+     * OK
+     */
+    200: string;
+};
+
+export type DownloadAttachmentResponse = DownloadAttachmentResponses[keyof DownloadAttachmentResponses];
 
 export type DeleteData = {
     body?: never;

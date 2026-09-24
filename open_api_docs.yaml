@@ -317,6 +317,24 @@ paths:
               schema:
                 type: array
                 items: {}
+  /api/testability/put_notebook_file_for_testability:
+    post:
+      tags:
+      - notebook-git-testability-controller
+      operationId: putNotebookFileForTestability
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PutNotebookFileRequest"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: string
   /api/testability/open_ai_token:
     post:
       tags:
@@ -335,7 +353,7 @@ paths:
   /api/testability/inspect_notebook_lfs_attachment_for_testability:
     post:
       tags:
-      - notebook-git-testability-controller
+      - notebook-lfs-testability-controller
       operationId: inspectNotebookLfsAttachmentForTestability
       requestBody:
         content:
@@ -476,7 +494,7 @@ paths:
   /api/testability/accept_lfs_attachment_tip_for_testability:
     post:
       tags:
-      - notebook-git-testability-controller
+      - notebook-lfs-testability-controller
       operationId: acceptLfsAttachmentTipForTestability
       requestBody:
         content:
@@ -2908,10 +2926,12 @@ paths:
     get:
       tags:
       - notebook-folder-controller
-      summary: List notes and folders at notebook root or under a parent folder
-      description: "Without parent: notes with no folder assignment and top-level\
-        \ folders (notebook root scope). With parent: notes assigned to that folder\
-        \ and its immediate child folders. The parent folder must belong to the notebook."
+      summary: "List notes, folders, and files at notebook root or under a parent\
+        \ folder"
+      description: "Without parent: notes and files with no folder assignment and\
+        \ top-level folders (notebook root scope). With parent: notes and files in\
+        \ that folder and its immediate child folders. The parent folder must belong\
+        \ to the notebook."
       operationId: listNotebookFolderListing
       parameters:
       - name: notebook
@@ -3004,6 +3024,59 @@ paths:
                 type: string
                 format: byte
             application/epub+zip:
+              schema:
+                type: string
+                format: byte
+  /api/notebooks/{notebook}/attachments/{attachment}:
+    get:
+      tags:
+      - notebook-attachment-controller
+      summary: Get file page payload
+      description: "Notebook chrome, folder trail through the file's folder, filename,\
+        \ and size."
+      operationId: getAttachmentPage
+      parameters:
+      - name: notebook
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: attachment
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/NotebookAttachmentRealm"
+  /api/notebooks/{notebook}/attachments/{attachment}/content:
+    get:
+      tags:
+      - notebook-attachment-controller
+      summary: Download a file's exact bytes
+      description: Always an attachment download under the file's name; never rendered
+        inline.
+      operationId: downloadAttachment
+      parameters:
+      - name: notebook
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: attachment
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        "200":
+          description: OK
+          content:
+            application/octet-stream:
               schema:
                 type: string
                 format: byte
@@ -3792,6 +3865,19 @@ components:
         seed:
           type: integer
           format: int32
+    PutNotebookFileRequest:
+      type: object
+      properties:
+        notebookName:
+          type: string
+        path:
+          type: string
+        content:
+          type: string
+      required:
+      - content
+      - notebookName
+      - path
     InspectNotebookLfsAttachmentRequest:
       type: object
       properties:
@@ -5852,8 +5938,8 @@ components:
       - notebook
     FolderListing:
       type: object
-      description: Note topologies and child folders in a structural listing scope
-        (e.g. notebook root or a folder).
+      description: "Note topologies, child folders, and files in a structural listing\
+        \ scope (e.g. notebook root or a folder)."
       properties:
         noteTopologies:
           type: array
@@ -5863,6 +5949,21 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/Folder"
+        attachments:
+          type: array
+          items:
+            $ref: "#/components/schemas/NotebookAttachment"
+    NotebookAttachment:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+        filename:
+          type: string
+      required:
+      - filename
+      - id
     BookUserLastReadPosition:
       type: object
       properties:
@@ -5879,6 +5980,36 @@ components:
       required:
       - id
       - locator
+    NotebookAttachmentRealm:
+      type: object
+      description: "Notebook chrome plus one file for loading the file page: the shared\
+        \ realm sidebar with the folder trail from notebook root through the file's\
+        \ folder, the file row, and its size in bytes."
+      properties:
+        notebookRealm:
+          $ref: "#/components/schemas/NotebookRealm"
+          description: "Notebook chrome: entity plus optional catalog hints and optional\
+            \ notebook readme content."
+        ancestorFolders:
+          type: array
+          description: Folders from notebook root outward; see each realm for trail
+            semantics.
+          items:
+            $ref: "#/components/schemas/Folder"
+        scopedReadmeContent:
+          type: string
+          description: Full markdown of the container readme that supplies the nearest
+            non-blank title_pattern (inner scope toward notebook root). Omitted when
+            none applies.
+        attachment:
+          $ref: "#/components/schemas/NotebookAttachment"
+        size:
+          type: integer
+          format: int64
+      required:
+      - attachment
+      - notebookRealm
+      - size
     ThresholdExceededResult:
       type: object
       properties:

@@ -81,7 +81,7 @@ class InjectNotesWorker {
     }
   }
 
-  private Folder resolveOrCreateFolderPath(Notebook notebook, String folderPath, Timestamp now) {
+  Folder resolveOrCreateFolderPath(Notebook notebook, String folderPath, Timestamp now) {
     Folder parent = null;
     for (String rawSegment : folderPath.split("/")) {
       String name = rawSegment.trim();

@@ -62,8 +62,12 @@ Use this for endpoint lookup; open `sdk.gen.ts` or `types.gen.ts` only for exact
 ## Notebook Git Testability Controller
 
 - `resnapshotNotebookGitBindingForTestability`: POST `/api/testability/resnapshot_notebook_git_binding_for_testability` -> `ResnapshotNotebookGitBindingForTestabilityResponse` (request: `ResnapshotNotebookGitBindingForTestabilityData`; body: ResnapshotNotebookGitBindingRequest; response body: string)
-- `inspectNotebookLfsAttachmentForTestability`: POST `/api/testability/inspect_notebook_lfs_attachment_for_testability` -> `InspectNotebookLfsAttachmentForTestabilityResponse` (request: `InspectNotebookLfsAttachmentForTestabilityData`; body: InspectNotebookLfsAttachmentRequest; response body: InspectNotebookLfsAttachmentResponse)
+- `putNotebookFileForTestability`: POST `/api/testability/put_notebook_file_for_testability` -> `PutNotebookFileForTestabilityResponse` (request: `PutNotebookFileForTestabilityData`; body: PutNotebookFileRequest; response body: string)
 - `forceRawNotebookGitBindingForTestability`: POST `/api/testability/force_raw_notebook_git_binding_for_testability` -> `ForceRawNotebookGitBindingForTestabilityResponse` (request: `ForceRawNotebookGitBindingForTestabilityData`; body: ResnapshotNotebookGitBindingRequest; response body: string)
+
+## Notebook Lfs Testability Controller
+
+- `inspectNotebookLfsAttachmentForTestability`: POST `/api/testability/inspect_notebook_lfs_attachment_for_testability` -> `InspectNotebookLfsAttachmentForTestabilityResponse` (request: `InspectNotebookLfsAttachmentForTestabilityData`; body: InspectNotebookLfsAttachmentRequest; response body: InspectNotebookLfsAttachmentResponse)
 - `acceptLfsAttachmentTipForTestability`: POST `/api/testability/accept_lfs_attachment_tip_for_testability` -> `AcceptLfsAttachmentTipForTestabilityResponse` (request: `AcceptLfsAttachmentTipForTestabilityData`; body: AcceptLfsAttachmentTipRequest; response body: AcceptLfsAttachmentTipResponse)
 
 ## Subscription Controller
@@ -274,6 +278,11 @@ Use this for endpoint lookup; open `sdk.gen.ts` or `types.gen.ts` only for exact
 
 - `recalling`: GET `/api/recalls/recalling` -> `RecallingResponse` (request: `RecallingData`; query: timezone, dueindays; response body: DueMemoryTrackers)
 - `previouslyAnswered`: GET `/api/recalls/previously-answered` -> `PreviouslyAnsweredResponse` (request: `PreviouslyAnsweredData`; query: timezone; response body: Array<AnsweredQuestion>)
+
+## Notebook Attachment Controller
+
+- `getAttachmentPage`: GET `/api/notebooks/{notebook}/attachments/{attachment}` -> `GetAttachmentPageResponse` (request: `GetAttachmentPageData`; path: notebook, attachment; response body: NotebookAttachmentRealm)
+- `downloadAttachment`: GET `/api/notebooks/{notebook}/attachments/{attachment}/content` -> `DownloadAttachmentResponse` (request: `DownloadAttachmentData`; path: notebook, attachment; response body: string)
 
 ## Health Check Controller
 

@@ -11,6 +11,7 @@ import com.odde.donut.controllers.dto.NoteTopology;
 import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
+import com.odde.donut.entities.NotebookAttachment;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
 import java.util.List;
 import java.util.Objects;
@@ -61,6 +62,29 @@ class NotebookFolderListingControllerTest extends NotebookControllerTestBase {
     FolderListing underParent = folderController.listNotebookFolderListing(nb, parent.getId());
     assertEquals(1, underParent.folders().size());
     assertEquals("Nested", underParent.folders().getFirst().getName());
+  }
+
+  @Test
+  void listsFilesAtRootAndInsideFolderOnlyInTheirOwnScope() throws Exception {
+    Notebook nb = ownedNotebook();
+    Folder physics = ownedFolder(nb, "physics");
+    Folder data = makeMe.aFolder().parentFolder(physics).name("data").please();
+    makeMe.anAttachment(".keep").atRootOf(nb).please();
+    makeMe.anAttachment("force.png").in(physics).please();
+    makeMe.anAttachment("run.json").in(data).please();
+    makeMe.anAttachment("elsewhere.png").atRootOf(ownedNotebook()).please();
+
+    assertEquals(List.of(".keep"), filenames(folderController.listNotebookFolderListing(nb, null)));
+    assertEquals(
+        List.of("force.png"),
+        filenames(folderController.listNotebookFolderListing(nb, physics.getId())));
+    assertEquals(
+        List.of("run.json"),
+        filenames(folderController.listNotebookFolderListing(nb, data.getId())));
+  }
+
+  private static List<String> filenames(FolderListing listing) {
+    return listing.attachments().stream().map(NotebookAttachment::getFilename).toList();
   }
 
   @Test
