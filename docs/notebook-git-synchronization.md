@@ -84,7 +84,10 @@ are never rebased, amended, or replaced. Local branches are possible, but only
 the resulting linear fast-forward history can be published to accepted `main`.
 `donut notebook pull` performs this in the same checkout: it keeps a linear
 run of unpublished commits, refuses local merge commits, and for LFS notebooks
-then fills in current attachment files.
+then fills in current attachment files. Publish points a diverged checkout to
+pull. When pull refuses accepted history it cannot rebase over, the local work
+stays in place and reaches publication only by cloning fresh elsewhere and
+moving it across as new commits.
 
 For example, web history `A → W` and local history `A → L` become a local
 proposal `A → W → L′` after local rebase. Donut accepts `L′` only if `W` is
