@@ -1,9 +1,13 @@
 import { waitUntilAppIsNotBusy } from '../pageBase'
+import { attachmentPage } from './attachmentPage'
 import noteCreationForm from './forms/noteCreationForm'
 import {
+  openFolderPageAtPath,
+  openFolderPageByLabel,
   openFolderPageForOrganize,
   openFolderPageForOrganizeUnderParent,
-} from './folderOrganizeNav'
+  openFolderPageUnderOpenParent,
+} from './sidebarFolderPageNav'
 import {
   sidebarAddFolderButton,
   sidebarAddNoteButton,
@@ -64,6 +68,16 @@ export const noteSidebar = () => {
       )
     },
 
+    openFile(folderLabels: string[], filename: string) {
+      expandFolderPath(folderLabels)
+      childTreeitems(folderTreeitemAtPath(folderLabels))
+        .filter(`[aria-label="${filename}"]`)
+        .find('.sidebar-attachment-label')
+        .click()
+      waitUntilAppIsNotBusy()
+      return attachmentPage()
+    },
+
     expectOrderedNotes(expectedNotes: Record<string, string>[]) {
       waitUntilAppIsNotBusy()
       const expectedTitles = expectedNotes.map((note) => note['note-title'])
@@ -111,30 +125,9 @@ export const noteSidebar = () => {
       waitUntilAppIsNotBusy()
     },
 
-    openFolderPageByLabel(folderLabel: string) {
-      waitUntilAppIsNotBusy()
-      folderRowControls(folderTreitemByLabel(folderLabel))
-        .find('[data-testid="sidebar-folder-open-page-link"]')
-        .click()
-      waitUntilAppIsNotBusy()
-    },
-
-    openFolderPageUnderOpenParent(parentLabel: string, childLabel: string) {
-      waitUntilAppIsNotBusy()
-      folderRowControls(folderTreitemUnderOpenParent(parentLabel, childLabel))
-        .find('[data-testid="sidebar-folder-open-page-link"]')
-        .click()
-      waitUntilAppIsNotBusy()
-    },
-
-    openFolderPageAtPath(folderLabels: string[]) {
-      waitUntilAppIsNotBusy()
-      folderRowControls(folderTreeitemAtPath(folderLabels))
-        .find('[data-testid="sidebar-folder-open-page-link"]')
-        .click()
-      waitUntilAppIsNotBusy()
-    },
-
+    openFolderPageByLabel,
+    openFolderPageUnderOpenParent,
+    openFolderPageAtPath,
     openFolderPageForOrganize,
     openFolderPageForOrganizeUnderParent,
 

@@ -29,3 +29,10 @@ Feature: Notebook files
       | run.json |
     And I should see these rows in sidebar folder "refs":
       | paper.pdf |
+
+  Scenario: Open a file and download its exact bytes
+    When I jump to the notebook "Lab Notebook"
+    And I open the file "run.json" in sidebar folder path "physics/data"
+    Then I should see the file page for "run.json" of 12 bytes
+    And after reloading, the sidebar is open at folder "data" showing "run.json"
+    And downloading the file gives '{"speed": 3}' named "run.json"

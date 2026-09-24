@@ -3027,6 +3027,59 @@ paths:
               schema:
                 type: string
                 format: byte
+  /api/notebooks/{notebook}/attachments/{attachment}:
+    get:
+      tags:
+      - notebook-attachment-controller
+      summary: Get file page payload
+      description: "Notebook chrome, folder trail through the file's folder, filename,\
+        \ and size."
+      operationId: getAttachmentPage
+      parameters:
+      - name: notebook
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: attachment
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/NotebookAttachmentRealm"
+  /api/notebooks/{notebook}/attachments/{attachment}/content:
+    get:
+      tags:
+      - notebook-attachment-controller
+      summary: Download a file's exact bytes
+      description: Always an attachment download under the file's name; never rendered
+        inline.
+      operationId: downloadAttachment
+      parameters:
+      - name: notebook
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: attachment
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        "200":
+          description: OK
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: byte
   /api/memory-trackers/{memoryTracker}:
     get:
       tags:
@@ -5927,6 +5980,36 @@ components:
       required:
       - id
       - locator
+    NotebookAttachmentRealm:
+      type: object
+      description: "Notebook chrome plus one file for loading the file page: the shared\
+        \ realm sidebar with the folder trail from notebook root through the file's\
+        \ folder, the file row, and its size in bytes."
+      properties:
+        notebookRealm:
+          $ref: "#/components/schemas/NotebookRealm"
+          description: "Notebook chrome: entity plus optional catalog hints and optional\
+            \ notebook readme content."
+        ancestorFolders:
+          type: array
+          description: Folders from notebook root outward; see each realm for trail
+            semantics.
+          items:
+            $ref: "#/components/schemas/Folder"
+        scopedReadmeContent:
+          type: string
+          description: Full markdown of the container readme that supplies the nearest
+            non-blank title_pattern (inner scope toward notebook root). Omitted when
+            none applies.
+        attachment:
+          $ref: "#/components/schemas/NotebookAttachment"
+        size:
+          type: integer
+          format: int64
+      required:
+      - attachment
+      - notebookRealm
+      - size
     ThresholdExceededResult:
       type: object
       properties:

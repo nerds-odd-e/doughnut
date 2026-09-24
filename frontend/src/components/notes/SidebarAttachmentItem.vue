@@ -2,7 +2,18 @@
   <li class="sidebar-attachment-li" role="treeitem" :aria-label="attachment.filename">
     <div class="attachment-row">
       <File class="shrink-0" :size="14" aria-hidden="true" />
-      <span class="sidebar-attachment-label">{{ attachment.filename }}</span>
+      <RouterLink
+        class="sidebar-attachment-label"
+        :to="{
+          name: 'attachmentPage',
+          params: {
+            notebookId: String(notebookId),
+            attachmentId: String(attachment.id),
+          },
+        }"
+      >
+        {{ attachment.filename }}
+      </RouterLink>
     </div>
   </li>
 </template>
@@ -10,8 +21,9 @@
 <script setup lang="ts">
 import type { NotebookAttachment } from "@generated/donut-backend-api"
 import { File } from "@lucide/vue"
+import { RouterLink } from "vue-router"
 
-defineProps<{ attachment: NotebookAttachment }>()
+defineProps<{ notebookId: number; attachment: NotebookAttachment }>()
 </script>
 
 <style lang="scss" scoped>

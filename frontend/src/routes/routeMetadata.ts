@@ -54,6 +54,10 @@ export const routeMetadata: RouteMetadata[] = [
     }),
   },
   {
+    path: "/notebooks/:notebookId(\\d+)/attachments/:attachmentId(\\d+)",
+    name: "attachmentPage",
+  },
+  {
     path: "/notebooks/:notebookId(\\d+)",
     name: "notebookPage",
     props: (route: RouteLocation) => ({

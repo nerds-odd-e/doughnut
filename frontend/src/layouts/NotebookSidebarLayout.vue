@@ -94,13 +94,18 @@ const currentUser = inject<Ref<User | undefined>>("currentUser")
 
 const activeNoteRealm = useStickyActiveNoteRealmForRoute(route, storageAccessor)
 
-const { activeNotebookRealm, activeFolderRealm, routeViewProps } =
-  useNotebookSidebarRouteRealms(route)
+const {
+  activeNotebookRealm,
+  activeFolderRealm,
+  activeAttachmentRealm,
+  routeViewProps,
+} = useNotebookSidebarRouteRealms(route)
 
 const breadcrumbFolders = computed(
   (): Folder[] =>
     activeNoteRealm.value?.ancestorFolders ??
     activeFolderRealm.value?.ancestorFolders ??
+    activeAttachmentRealm.value?.ancestorFolders ??
     []
 )
 
@@ -108,7 +113,8 @@ const currentNotebookRealm = computed(
   (): NotebookRealm | undefined =>
     activeNotebookRealm.value ??
     activeNoteRealm.value?.notebookRealm ??
-    activeFolderRealm.value?.notebookRealm
+    activeFolderRealm.value?.notebookRealm ??
+    activeAttachmentRealm.value?.notebookRealm
 )
 
 const currentNotebookId = ref<number | undefined>(undefined)

@@ -16,11 +16,7 @@ public final class FolderTrailSegments {
   }
 
   public static List<Folder> fromRootToContainingFolder(Note note) {
-    Folder folder = note.getFolder();
-    if (folder == null) {
-      return List.of();
-    }
-    return fromRootToFolder(folder);
+    return fromRootToFolder(note.getFolder());
   }
 
   /** Outer-most folder name first (empty when the note has no folder). */
@@ -28,7 +24,10 @@ public final class FolderTrailSegments {
     return fromRootToContainingFolder(note).stream().map(Folder::getName).toList();
   }
 
-  /** Outermost folder first, from notebook root through {@code folder} (inclusive). */
+  /**
+   * Outermost folder first, from notebook root through {@code folder} (inclusive). Empty when
+   * {@code folder} is null (notebook root).
+   */
   public static List<Folder> fromRootToFolder(Folder folder) {
     List<Folder> leafToRoot = new ArrayList<>();
     for (Folder f = folder; f != null; f = f.getParentFolder()) {

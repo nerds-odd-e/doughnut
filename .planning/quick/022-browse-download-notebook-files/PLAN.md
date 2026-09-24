@@ -114,7 +114,7 @@ Sizing: ~8 min (one listing field end to end plus E2E wait).
 
 ### 2. Open a file's page and download its exact bytes
 Type: Behavior
-Status: planned
+Status: done
 
 Behavior: slice 1's notebook → select `run.json` in the sidebar → its page
 shows `run.json` and its size in bytes, with the sidebar expanded to `data`; the
@@ -193,3 +193,9 @@ Sizing: ~6 min.
 - Slice 1 proof: `NotebookFolderListingControllerTest.listsFilesAtRootAndInsideFolderOnlyInTheirOwnScope`,
   `SidebarPeerSort.spec.ts` "lists files with notes after folders…", E2E
   "Files appear in the sidebar where they live".
+- Slice 2: size and bytes have one owner, `services/notebookAttachment/NotebookAttachmentFile`
+  (raw only so far; slice 3 adds the LFS branch there, so the page and download stay
+  unchanged). Page payload `NotebookAttachmentRealm.of`; route path must stay under
+  `/notebooks/:notebookId(\d+)/` to sit in the sidebar layout. Proof:
+  `NotebookAttachmentControllerTest` (FilePage/Download/Access), `AttachmentPage.spec.ts`,
+  E2E "Open a file and download its exact bytes".

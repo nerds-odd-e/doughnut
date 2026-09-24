@@ -38,6 +38,13 @@ declare module 'vue-router/auto-routes' {
       Record<never, never>,
       | never
     >,
+    '/AttachmentPage': RouteRecordInfo<
+      '/AttachmentPage',
+      '/AttachmentPage',
+      Record<never, never>,
+      Record<never, never>,
+      | never
+    >,
     '/BazaarPage': RouteRecordInfo<
       '/BazaarPage',
       '/BazaarPage',
@@ -243,6 +250,14 @@ declare module 'vue-router/auto-routes' {
     'src/pages/AdminDashboardPage.vue': {
       routes:
         | '/AdminDashboardPage'
+      views:
+        | never
+      pathParamNames:
+        | never
+    }
+    'src/pages/AttachmentPage.vue': {
+      routes:
+        | '/AttachmentPage'
       views:
         | never
       pathParamNames:

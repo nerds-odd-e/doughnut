@@ -11,6 +11,8 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 
 /**
  * One non-Markdown file kept in a notebook's Portable tree: its complete filename, extension
@@ -73,5 +75,12 @@ public class NotebookAttachment extends EntityIdentifiedByIdOnly {
   /** JPA property for column {@code content}; prefer {@link #setAcceptedGitContent(byte[])}. */
   public void setContent(byte[] content) {
     setAcceptedGitContent(content);
+  }
+
+  @JsonIgnore
+  public void requireInNotebook(Notebook notebook) {
+    if (!getNotebook().getId().equals(notebook.getId())) {
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "File not in notebook.");
+    }
   }
 }

@@ -32,4 +32,9 @@ public class NotebookAttachmentBuilder extends EntityBuilder<NotebookAttachment>
     entity.setFolder(folder);
     return this;
   }
+
+  public NotebookAttachmentBuilder content(byte[] content) {
+    entity.setAcceptedGitContent(content);
+    return this;
+  }
 }

@@ -14,6 +14,7 @@
       />
       <SidebarAttachmentItem
         v-else-if="row.kind === 'attachment'"
+        :notebook-id="notebookId"
         :attachment="row.attachment"
       />
       <SidebarFolderItem

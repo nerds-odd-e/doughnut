@@ -1206,6 +1206,26 @@ export type BookUserLastReadPosition = {
     selectedBookBlockId?: number | null;
 };
 
+/**
+ * Notebook chrome plus one file for loading the file page: the shared realm sidebar with the folder trail from notebook root through the file's folder, the file row, and its size in bytes.
+ */
+export type NotebookAttachmentRealm = {
+    /**
+     * Notebook chrome: entity plus optional catalog hints and optional notebook readme content.
+     */
+    notebookRealm: NotebookRealm;
+    /**
+     * Folders from notebook root outward; see each realm for trail semantics.
+     */
+    ancestorFolders?: Array<Folder>;
+    /**
+     * Full markdown of the container readme that supplies the nearest non-blank title_pattern (inner scope toward notebook root). Omitted when none applies.
+     */
+    scopedReadmeContent?: string;
+    attachment: NotebookAttachment;
+    size: number;
+};
+
 export type ThresholdExceededResult = {
     thresholdExceeded?: boolean;
     wrongCount?: number;
@@ -3920,6 +3940,44 @@ export type GetBookFileResponses = {
 };
 
 export type GetBookFileResponse = GetBookFileResponses[keyof GetBookFileResponses];
+
+export type GetAttachmentPageData = {
+    body?: never;
+    path: {
+        notebook: number;
+        attachment: number;
+    };
+    query?: never;
+    url: '/api/notebooks/{notebook}/attachments/{attachment}';
+};
+
+export type GetAttachmentPageResponses = {
+    /**
+     * OK
+     */
+    200: NotebookAttachmentRealm;
+};
+
+export type GetAttachmentPageResponse = GetAttachmentPageResponses[keyof GetAttachmentPageResponses];
+
+export type DownloadAttachmentData = {
+    body?: never;
+    path: {
+        notebook: number;
+        attachment: number;
+    };
+    query?: never;
+    url: '/api/notebooks/{notebook}/attachments/{attachment}/content';
+};
+
+export type DownloadAttachmentResponses = {
+    /**
+     * OK
+     */
+    200: string;
+};
+
+export type DownloadAttachmentResponse = DownloadAttachmentResponses[keyof DownloadAttachmentResponses];
 
 export type DeleteData = {
     body?: never;
