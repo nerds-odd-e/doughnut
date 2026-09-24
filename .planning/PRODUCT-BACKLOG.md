@@ -10,9 +10,10 @@ and deletable in Web Donut.
 
 ## Taken
 
+- [Store existing notebooks' files through LFS like new notebooks](seeds/SEED-035-ai-workspace-supporting-files.md#story-14) — SEED-035#story-14 ([plan](quick/025-convert-raw-notebooks-to-lfs/PLAN.md))
+
 ## Backlog list
 
-- [Store existing notebooks' files through LFS like new notebooks](seeds/SEED-035-ai-workspace-supporting-files.md#story-14) — SEED-035#story-14
 - [Remove the legacy raw file storage](seeds/SEED-035-ai-workspace-supporting-files.md#story-19) — SEED-035#story-19
 - [Use newly web-uploaded note images from a local checkout](seeds/SEED-035-ai-workspace-supporting-files.md#story-4) — SEED-035#story-4
 - [Move existing uploaded note pictures into their notebooks](seeds/SEED-035-ai-workspace-supporting-files.md#story-5) — SEED-035#story-5
