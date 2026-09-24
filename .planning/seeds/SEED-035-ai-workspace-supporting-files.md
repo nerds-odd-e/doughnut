@@ -172,10 +172,11 @@ No executable plan or implementation is authorized by this seed.
 
 ### Test file journeys on LFS notebooks as production has them
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"unselected"}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../quick/026-test-file-journeys-on-lfs/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"12dc00f195fb6b3272e28399bef3dbbe19e1297e21c2db963bd5440dc0db8fe2","plan":"e9e7f05ed78e5551a3e646c3a1abeb7591104cff3369d40da378615e4beaa4a1"}}
 ```
 
 - **Identity:** SEED-035#story-20
+- **Slice plan:** [Test file journeys on LFS notebooks](../quick/026-test-file-journeys-on-lfs/PLAN.md)
 - **Goal:** Maintainers' tests prove the file path production uses. After
   story 14 no production notebook is raw, yet most web and local file journeys
   in E2E and the backend Git tests still demote their notebook to raw. Those
@@ -205,8 +206,10 @@ No executable plan or implementation is authorized by this seed.
   work beyond what the move needs; new coverage.
 - **Depends on:** Story 14 merged to main. Production confirmation is not
   needed.
-- **Effort hypothesis:** M, low confidence: LFS transfers can make some
-  scenarios slower; resplit if the move exceeds L.
+- **Effort hypothesis:** L, medium confidence after planning: about 118
+  backend test classes get raw only through one shared fixture, and three
+  shared helpers need to follow LFS first; E2E changes are mostly removing a
+  step.
 - **Safe stopping point:** Each feature file moves on its own; scenarios not
   yet moved still pass on raw because the raw paths remain until story 19.
 
