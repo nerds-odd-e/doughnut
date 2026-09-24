@@ -128,7 +128,9 @@ that scenario asserts the legacy path; splitting them would leave CI red.
 
 ### 4. The owner's checkout receives the web-uploaded picture
 Type: Behavior
-Status: planned
+Status: done
+Accepted proof: `cli_notebook_lfs.feature` "A picture uploaded on the web arrives in the
+owner's clone beside its note" (12/12); no product change was needed.
 Proof: one new `cli_notebook_lfs.feature` scenario (its Background has the
 token): upload `moon.jpg` on the web to a note in folder `physics`, clone with
 the installed CLI → `physics/moon.jpg` equals the fixture's bytes and the note

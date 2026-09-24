@@ -4,7 +4,10 @@
  */
 import { e2eAppBaseUrl } from '../../../support/e2eAppUrl'
 import testability from '../../testability'
-import { expectCheckoutFileExactTextAt } from './notebookCloneCheckoutDestination'
+import {
+  expectCheckoutFileExactTextAt,
+  expectCheckoutFileFixtureBytesAt,
+} from './notebookCloneCheckoutDestination'
 import { notebookLfsPublish } from './notebookLfsPublish'
 
 export function notebookLfs() {
@@ -95,6 +98,16 @@ export function notebookLfs() {
         'cliCloneDestination',
         relativePath,
         text
+      )
+    },
+    expectClonedCheckoutFileHasFixtureBytes(
+      relativePath: string,
+      fixturePath: string
+    ) {
+      return expectCheckoutFileFixtureBytesAt(
+        'cliCloneDestination',
+        relativePath,
+        fixturePath
       )
     },
     expectClonedCheckoutDoesNotTrackCredentials() {

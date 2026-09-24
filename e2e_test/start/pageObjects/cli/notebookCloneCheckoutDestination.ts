@@ -7,6 +7,7 @@
  */
 import type { CliNotebookCheckoutState } from '../../../config/cliE2eNotebookCloneTasks'
 import {
+  hexFromBase64,
   hexFromSpacedHex,
   hexFromUtf8Text,
 } from '../../../config/spacedHexBytes'
@@ -98,6 +99,23 @@ function expectCheckoutFileExactTextAt(
   )
 }
 
+/** The same on-disk byte read, for a file whose exact bytes are a Cypress fixture. */
+function expectCheckoutFileFixtureBytesAt(
+  destinationAlias: CliNotebookCloneDestinationAlias,
+  relativePath: string,
+  fixturePath: string
+): Cypress.Chainable<null> {
+  return cy
+    .fixture(fixturePath, 'base64')
+    .then((base64: string) =>
+      expectCheckoutFileBytesAt(
+        destinationAlias,
+        relativePath,
+        hexFromBase64(base64)
+      )
+    )
+}
+
 function readCheckoutStateAt(
   destinationAlias: CliNotebookCloneDestinationAlias
 ): Cypress.Chainable<CliNotebookCheckoutState> {
@@ -179,6 +197,7 @@ export {
   expectCheckoutFileAt,
   expectCheckoutFileBytesAt,
   expectCheckoutFileExactTextAt,
+  expectCheckoutFileFixtureBytesAt,
   expectCleanAcceptedHeadAt,
   expectCleanNotebookAcceptedHeadAt,
   readCheckoutStateAt,
