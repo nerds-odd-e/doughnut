@@ -11,10 +11,10 @@ and deletable in Web Donut.
 ## Taken
 
 - [Pull and publish tell owners a recovery path that works](quick/021-pull-recovery-guidance/PLAN.md) — quick/021-pull-recovery-guidance
+- [Browse and download notebook files in Web Donut](seeds/SEED-035-ai-workspace-supporting-files.md#story-1) — SEED-035#story-1 ([plan](quick/022-browse-download-notebook-files/PLAN.md))
 
 ## Backlog list
 
-- [Browse and download notebook files in Web Donut](seeds/SEED-035-ai-workspace-supporting-files.md#story-1) — SEED-035#story-1
 - [Access existing note images as notebook folder files](seeds/SEED-035-ai-workspace-supporting-files.md#story-5) — SEED-035#story-5
 - [Skip common AI guidance folders during assimilation](seeds/SEED-035-ai-workspace-supporting-files.md#story-8) — SEED-035#story-8
 - [See locally added image files in Web Donut notes](seeds/SEED-035-ai-workspace-supporting-files.md#story-3) — SEED-035#story-3
