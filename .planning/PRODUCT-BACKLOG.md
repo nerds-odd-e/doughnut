@@ -10,9 +10,10 @@ and deletable in Web Donut.
 
 ## Taken
 
+- [Pull receives web notes under non-ASCII folders like any other folder](seeds/SEED-041-pull-non-ascii-folders.md#story-1) — SEED-041#story-1
+
 ## Backlog list
 
-- [Pull receives web notes under non-ASCII folders like any other folder](seeds/SEED-041-pull-non-ascii-folders.md#story-1) — SEED-041#story-1
 - [Tidy LFS test support into one vocabulary](quick/028-tidy-lfs-test-support/PLAN.md)
 - [Use newly web-uploaded note images from a local checkout](seeds/SEED-035-ai-workspace-supporting-files.md#story-4) — SEED-035#story-4
 - [Remove the legacy raw file storage](seeds/SEED-035-ai-workspace-supporting-files.md#story-19) — SEED-035#story-19
