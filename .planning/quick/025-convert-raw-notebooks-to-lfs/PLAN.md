@@ -126,10 +126,16 @@ published through the CLI, and is cloned → conversion → `donut notebook pull
 → the picture has identical bytes and `.gitattributes` exists. A second
 picture is added and published → its web download returns its bytes.
 
-Execution note: the CLI is expected to work unchanged. The seam is the
-fast-forward under `GIT_LFS_SKIP_SMUDGE=1` followed by
-`fillInCurrentLfsFilesIfNeeded`, and this was inferred from code, not observed.
-If the pull fails, stop and replan; do not patch the CLI inside this slice.
+Execution note: the CLI works unchanged. Observed on 2026-09-24 with real git
+2.50.1 and git-lfs 3.7.1, replaying the CLI's command sequence (`lfs.url` was a
+`file://` URL rather than the HTTP endpoint): the raw clone passes the clean-checkout
+check, the fast-forward under `GIT_LFS_SKIP_SMUDGE=1` leaves pointer text with a
+clean status, `checkoutUsesLfs` then sees `.gitattributes`, and
+`fillInCurrentLfsFilesIfNeeded` (`lfs fetch` + `lfs checkout` over every LFS path
+at HEAD) restores identical bytes with a clean status. A new picture is committed
+as a pointer. No CLI or E2E test yet covers a pull whose incoming commit first
+introduces `.gitattributes`; this scenario is that coverage. If the pull still
+fails over HTTP, stop and replan; do not patch the CLI inside this slice.
 
 ### 4. One notebook's failure does not stop the others
 
@@ -144,6 +150,5 @@ broken one raw, with its id logged. The run does not throw.
 
 ## Remaining concerns
 
-- Slice 3 rests on an inferred CLI path (fast-forward with smudge skipped, then
-  filling in the files). If it is wrong, a CLI change is needed, and slicing
-  should be revisited before continuing.
+None blocking. The slice 3 CLI path was observed to work (see its execution
+note); only the HTTP LFS endpoint remains to be exercised, by slice 3 itself.

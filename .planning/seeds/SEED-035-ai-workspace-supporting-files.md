@@ -99,7 +99,7 @@ No executable plan or implementation is authorized by this seed.
 
 ### Store existing notebooks' files through LFS like new notebooks
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../quick/025-convert-raw-notebooks-to-lfs/PLAN.md","assessment":"not-ready","reasons":["Slice 3 relies on an unobserved CLI path (fast-forward with LFS smudge skipped, then fill-in); if pull fails a CLI change is needed and slicing must be revisited."],"basis":{"document":"e3aad3a6310fc6c4af8bfd22f40118c823193d089117d21bc0ca045c30534202","plan":"ba4918b8ea26a5b51676e47700345ef1bf3c2b21f26ccc9ea55d94524a7f0545"}}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../quick/025-convert-raw-notebooks-to-lfs/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"e3aad3a6310fc6c4af8bfd22f40118c823193d089117d21bc0ca045c30534202","plan":"ae389db853f85e62d995e0e694fc50e749207eda5f9a7dc3105348956736047c"}}
 ```
 
 - **Identity:** SEED-035#story-14
