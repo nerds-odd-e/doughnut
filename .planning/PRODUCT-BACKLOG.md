@@ -10,8 +10,6 @@ and deletable in Web Donut.
 
 ## Taken
 
-- [Finish the single attachment representation](quick/031-finish-single-attachment-representation/PLAN.md)
-
 ## Backlog list
 
 - [Give end-to-end test contributors clear, consistent authoring rules](seeds/SEED-040-e2e-test-guidance.md#story-1) — SEED-040#story-1
