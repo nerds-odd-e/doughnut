@@ -166,8 +166,11 @@ of the old path, so it needs no separate rule.
 
 ### 6. Existing Books move into their notebooks at startup
 Type: Behavior
-Status: planned
-Proof: slice 6 row above.
+Status: done
+Proof: slice 6 row above. Accepted: `--tests '*LegacyBookSourceFileMove*'`
+(2 pass), `'*Book*'` (139 pass); `LegacyBookSourceFileMoveControllerTest`.
+Code: `services/book/LegacyBookSourceFileMove`, `configs/LegacyBookSourceFileMoveOnStartup`
+(story 21 deletes both with their test).
 
 Behavior: Book without `sourceFilePath` → the move runs → bytes from the old
 store are stored as an LFS object, then one `apply` per notebook adds the root
