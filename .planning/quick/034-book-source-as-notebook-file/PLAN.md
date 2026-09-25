@@ -127,8 +127,11 @@ still refuses before anything is stored.
 
 ### 3. A Book's file takes a free, plain name
 Type: Behavior
-Status: planned
-Proof: slice 3 row above.
+Status: done
+Proof: slice 3 row above. Accepted: `--tests '*Book*'` (139 pass),
+`'*NotebookGit*'`, `'*LegacyNotePictureMove*'`, `'*UploadNoteImage*'`;
+`NotebookBooksAttachNotebookFileControllerTest.aTakenNameIsNumberedAndTheExistingFileIsUntouched`
+and `aBookNameThatIsNotAPlainFilenameGetsADonutChosenName`.
 
 Behavior: root name taken or book name not a plain filename → attach →
 `firstAvailableFilename` over `takenPaths` gives the name; a non-plain book
@@ -200,9 +203,11 @@ attach-book call and the picture move's fixture comparison step.
 - Attach lives in `AttachBookService.attach` (store first, then `apply` that
   persists the Book and calls `BookSourceFilePlacement.place`, both in
   `services/book`). The file extension comes from `BookFormat.bookFileExtension()`.
-  `NotebookGitAcceptedTree.takenPaths` and `NotebookGitPortablePath.isPlainFilename`
-  are still package-private in `services/notebookGit`; slice 3 must make them
-  public to use them from `services/book`.
+  Naming is `notebookGit/NotebookRootFreeFilename.choose(notebookId, preferred,
+  fallback)` (public; the helpers stay package-private). A notebook without a
+  Git binding has no taken names. Occupancy of the accepted tree is
+  `NotebookGitAcceptedRepositoryStore.takenPaths(binding)`, shared with the
+  picture upload and the picture move.
 - Git-backed proof helpers (`createGitBackedNotebook`, `acceptedHistory`,
   `lfsPointerStoredFor`, `assertAcceptedTreeMatchesTheFullAssembly`) live in
   `NotebookGitWebContentControllerTestBase`; `CommittedUserCleanup` now clears

@@ -71,9 +71,40 @@ class NotebookBooksAttachNotebookFileControllerTest
     assertThat(booksController.getBookFile(webRequest(), notebook).getBody(), equalTo(pdfBytes));
   }
 
+  @Test
+  void aTakenNameIsNumberedAndTheExistingFileIsUntouched() throws Exception {
+    Notebook notebook = createGitBackedNotebook();
+    byte[] existing = {0x01, 0x02};
+    storeFolderAttachmentAndSnapshot(notebook, null, "Physics Primer.pdf", existing);
+
+    booksController.attachBook(notebook, physicsPrimer(), pdfFile(new byte[] {0x25, 0x50}));
+
+    AcceptedHistory after = acceptedHistory(notebook);
+    assertThat(
+        bookRepository.findByNotebook_Id(notebook.getId()).orElseThrow().getSourceFilePath(),
+        equalTo("Physics Primer (2).pdf"));
+    assertThat(
+        tipContent(after, "Physics Primer.pdf"), equalTo(lfsPointerStoredFor(notebook, existing)));
+  }
+
+  @Test
+  void aBookNameThatIsNotAPlainFilenameGetsADonutChosenName() throws Exception {
+    Notebook notebook = createGitBackedNotebook();
+
+    booksController.attachBook(notebook, bookNamed("a/b"), pdfFile(new byte[] {0x25, 0x50}));
+
+    assertThat(
+        bookRepository.findByNotebook_Id(notebook.getId()).orElseThrow().getSourceFilePath(),
+        equalTo("book.pdf"));
+  }
+
   private static AttachBookRequest physicsPrimer() {
+    return bookNamed("Physics Primer");
+  }
+
+  private static AttachBookRequest bookNamed(String bookName) {
     AttachBookRequest request = attachRequest(node("Chapter 1"));
-    request.setBookName("Physics Primer");
+    request.setBookName(bookName);
     return request;
   }
 }
