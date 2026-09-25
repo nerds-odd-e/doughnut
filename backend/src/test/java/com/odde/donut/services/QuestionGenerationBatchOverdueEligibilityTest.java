@@ -7,7 +7,7 @@ import static org.hamcrest.Matchers.empty;
 import com.odde.donut.entities.MemoryTracker;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.User;
-import com.odde.donut.testability.MakeMe;
+import com.odde.donut.testability.SpringTestBase;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -18,16 +18,8 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.transaction.annotation.Transactional;
 
-@SpringBootTest
-@ActiveProfiles("test")
-@Transactional
-class QuestionGenerationBatchOverdueEligibilityTest {
-
-  @Autowired MakeMe makeMe;
+class QuestionGenerationBatchOverdueEligibilityTest extends SpringTestBase {
   @Autowired QuestionGenerationBatchPlanningService planningService;
 
   User user;

@@ -2,6 +2,7 @@ package com.odde.donut.configs;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.odde.donut.testability.SpringTestBase;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -10,20 +11,13 @@ import java.util.Map;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Guards hard-delete roots: every foreign key reachable via CASCADE from a declared root must not
  * use NO ACTION / RESTRICT (unless explicitly allowlisted). SET NULL terminates a branch.
  */
-@SpringBootTest
-@ActiveProfiles("test")
-@Transactional
-class DeletableEntityFkClosureTest {
-
+class DeletableEntityFkClosureTest extends SpringTestBase {
   private static final List<String> HARD_DELETABLE_ROOTS = List.of("memory_tracker", "note");
 
   /**

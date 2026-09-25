@@ -17,7 +17,6 @@ import com.odde.donut.services.ai.NoteRefinementLayout;
 import com.odde.donut.services.ai.NoteRefinementLayoutItems;
 import com.odde.donut.services.ai.NoteRefinementLayoutValidator;
 import com.odde.donut.testability.OpenAiStructuredResponseMock;
-import com.openai.client.OpenAIClient;
 import com.openai.models.responses.ResponseTextConfig;
 import com.openai.models.responses.StructuredResponseCreateParams;
 import java.util.List;
@@ -31,14 +30,10 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.ArgumentCaptor;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.web.server.ResponseStatusException;
 
 class AiControllerNoteRefinementTest extends ControllerTestBase {
   @Autowired AiController controller;
-
-  @MockitoBean(name = "officialOpenAiClient")
-  OpenAIClient officialClient;
 
   OpenAiStructuredResponseMock openAiStructuredResponseMock;
   Note testNote;

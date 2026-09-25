@@ -1,10 +1,8 @@
 package com.odde.donut.services;
 
+import static com.odde.donut.services.QuestionGenerationBatchOutputCollectionTestSupport.stubCompletedOpenAiBatch;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.when;
 
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.QuestionGenerationBatch;
@@ -12,30 +10,19 @@ import com.odde.donut.entities.QuestionGenerationBatchRequest;
 import com.odde.donut.entities.User;
 import com.odde.donut.entities.repositories.QuestionGenerationBatchRepository;
 import com.odde.donut.entities.repositories.QuestionGenerationBatchRequestRepository;
-import com.odde.donut.services.ai.GeneratedMcq;
-import com.odde.donut.services.openAiApis.OpenAiApiHandler;
-import com.odde.donut.testability.MakeMe;
-import com.openai.models.batches.Batch;
+import com.odde.donut.testability.OpenAiBatchApiMock;
+import com.odde.donut.testability.SpringTestBase;
 import io.micrometer.core.instrument.MeterRegistry;
 import java.sql.Timestamp;
-import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.transaction.annotation.Transactional;
 
-@SpringBootTest
-@ActiveProfiles("test")
-@Transactional
-class QuestionGenerationBatchMetricsTest {
+class QuestionGenerationBatchMetricsTest extends SpringTestBase {
 
-  @MockitoBean OpenAiApiHandler openAiApiHandler;
+  OpenAiBatchApiMock openAiBatches;
 
-  @Autowired MakeMe makeMe;
   @Autowired MeterRegistry meterRegistry;
   @Autowired QuestionGenerationBatchPlanningService planningService;
   @Autowired QuestionGenerationBatchSubmissionService submissionService;
@@ -55,6 +42,7 @@ class QuestionGenerationBatchMetricsTest {
 
   @BeforeEach
   void setup() {
+    openAiBatches = new OpenAiBatchApiMock(officialClient);
     user = makeMe.aUser().please();
     currentTime = makeMe.aTimestamp().please();
     globalSettingsService
@@ -76,40 +64,24 @@ class QuestionGenerationBatchMetricsTest {
 
     QuestionGenerationBatch plannedBatch =
         planningService.planLocalBatchForUser(user, currentTime).orElseThrow();
-    when(openAiApiHandler.uploadBatchInputFile(any())).thenReturn("file-abc");
-    when(openAiApiHandler.createResponsesBatch("file-abc")).thenReturn("batch-openai-1");
+    openAiBatches.stubUpload("file-abc");
+    openAiBatches.stubBatchCreation("file-abc", "batch-openai-1");
     submissionService.submitPlannedBatch(plannedBatch, currentTime);
 
     QuestionGenerationBatchRequest request =
         batchRequestRepository.findByBatch_Id(plannedBatch.getId()).getFirst();
     String customId = request.getCustomId();
 
-    when(openAiApiHandler.retrieveBatch("batch-openai-1"))
-        .thenReturn(
-            Batch.builder()
-                .id("batch-openai-1")
-                .completionWindow("24h")
-                .createdAt(1L)
-                .endpoint("/v1/responses")
-                .inputFileId("file-abc")
-                .outputFileId("file-output")
-                .errorFileId("file-error")
-                .status(Batch.Status.COMPLETED)
-                .build());
+    stubCompletedOpenAiBatch(
+        openAiBatches,
+        """
+        {"id":"batch_req_1","custom_id":"%s","response":null,"error":{"message":"row failed"}}
+        """
+            .formatted(customId),
+        "");
     pollingService.pollSubmittedBatches();
-
-    when(openAiApiHandler.downloadFileContent("file-output"))
-        .thenReturn(
-            """
-            {"id":"batch_req_1","custom_id":"%s","response":null,"error":{"message":"row failed"}}
-            """
-                .formatted(customId));
-    when(openAiApiHandler.downloadFileContent("file-error")).thenReturn("");
     outputCollectionService.collectOutputForCompletedBatches(currentTime);
 
-    GeneratedMcq generatedMcq = makeMe.aGeneratedMcq().please();
-    when(openAiApiHandler.parseStructuredOutputFromBatchSuccessLine(anyString(), any(Class.class)))
-        .thenReturn(Optional.of(generatedMcq));
     batchImportService.importCompletedBatches(currentTime);
 
     assertThat(counter("question_generation_batch.submitted") - submittedBaseline, is(1.0));

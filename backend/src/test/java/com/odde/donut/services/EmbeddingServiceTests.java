@@ -8,8 +8,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 import com.odde.donut.entities.Note;
-import com.odde.donut.testability.MakeMe;
-import com.openai.client.OpenAIClient;
+import com.odde.donut.testability.SpringTestBase;
 import com.openai.models.embeddings.CreateEmbeddingResponse;
 import com.openai.models.embeddings.Embedding;
 import com.openai.models.embeddings.EmbeddingCreateParams;
@@ -17,20 +16,8 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.transaction.annotation.Transactional;
 
-@SpringBootTest
-@ActiveProfiles("test")
-@Transactional
-class EmbeddingServiceTests {
-
-  @MockitoBean(name = "officialOpenAiClient")
-  OpenAIClient officialClient;
-
-  @Autowired MakeMe makeMe;
+class EmbeddingServiceTests extends SpringTestBase {
   @Autowired EmbeddingService service;
 
   private void stubEmbeddings(List<Embedding> embeddings) {

@@ -9,7 +9,6 @@ import com.odde.donut.controllers.dto.AudioUploadDTO;
 import com.odde.donut.services.ai.NoteContentCompletion;
 import com.odde.donut.services.ai.TextFromAudioWithCallInfo;
 import com.odde.donut.testability.OpenAiStructuredResponseMock;
-import com.openai.client.OpenAIClient;
 import com.openai.models.audio.transcriptions.Transcription;
 import com.openai.models.audio.transcriptions.TranscriptionCreateParams;
 import com.openai.models.audio.transcriptions.TranscriptionCreateResponse;
@@ -26,13 +25,9 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 class AiAudioControllerTests extends ControllerTestBase {
   @Autowired AiAudioController controller;
-
-  @MockitoBean(name = "officialOpenAiClient")
-  OpenAIClient officialClient;
 
   OpenAiStructuredResponseMock openAiStructuredResponseMock;
 

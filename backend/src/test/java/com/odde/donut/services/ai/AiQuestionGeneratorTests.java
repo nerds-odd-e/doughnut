@@ -7,31 +7,16 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import com.odde.donut.entities.Mcq;
 import com.odde.donut.entities.Note;
 import com.odde.donut.exceptions.OpenAiNotAvailableException;
-import com.odde.donut.testability.MakeMe;
 import com.odde.donut.testability.OpenAiStructuredResponseMock;
-import com.odde.donut.testability.TestabilitySettings;
-import com.openai.client.OpenAIClient;
+import com.odde.donut.testability.SpringTestBase;
 import java.util.Map;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.transaction.annotation.Transactional;
 
-@SpringBootTest
-@ActiveProfiles("test")
-@Transactional
-class AiQuestionGeneratorTests {
-
-  @MockitoBean(name = "officialOpenAiClient")
-  OpenAIClient officialClient;
-
-  @Autowired MakeMe makeMe;
+class AiQuestionGeneratorTests extends SpringTestBase {
   @Autowired AiQuestionGenerator aiQuestionGenerator;
-  @Autowired TestabilitySettings testabilitySettings;
   OpenAiStructuredResponseMock openAiStructuredResponseMock;
 
   @BeforeEach
@@ -43,7 +28,6 @@ class AiQuestionGeneratorTests {
   @AfterEach
   void cleanup() {
     testabilitySettings.replaceServiceUrls(Map.of("openAi", "https://api.openai.com/v1/"));
-    testabilitySettings.setOpenAiTokenOverride(null);
   }
 
   private Note noteReadyForQuestionGeneration() {

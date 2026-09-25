@@ -8,29 +8,16 @@ import com.odde.donut.entities.Mcq;
 import com.odde.donut.entities.Note;
 import com.odde.donut.services.ai.AiQuestionGenerator;
 import com.odde.donut.services.ai.QuestionEvaluation;
-import com.odde.donut.testability.MakeMe;
 import com.odde.donut.testability.OpenAiStructuredResponseMock;
-import com.openai.client.OpenAIClient;
+import com.odde.donut.testability.SpringTestBase;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.transaction.annotation.Transactional;
 
-@SpringBootTest
-@ActiveProfiles("test")
-@Transactional
-class AiOpenAiAssistantFactoryWithDBTest {
-
+class AiOpenAiAssistantFactoryWithDBTest extends SpringTestBase {
   @Autowired AiQuestionGenerator aiQuestionGenerator;
 
-  @MockitoBean(name = "officialOpenAiClient")
-  private OpenAIClient officialClient;
-
-  @Autowired MakeMe makeMe;
   private OpenAiStructuredResponseMock openAiStructuredResponseMock;
 
   @BeforeEach

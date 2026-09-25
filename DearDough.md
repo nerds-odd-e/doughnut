@@ -184,6 +184,11 @@ Former local code: DD-107.
   - Observed effect: one refused call and two script reads before the only delivery; no coverage lost, because the refused call published nothing.
   - Inference: the `candidate-mismatch` was likely caused by the abbreviated SHA, which the usage line does not rule out. The coordinator read the ODF-092 occurrences only after delivery, so the logged fix did not reach it beforehand.
 
+- Execution: quick/037-share-backend-test-context / c7ea84e3a7; Timestamp: unknown (first delivery after the plan commit 2026-09-25 23:24:51+08:00; last publication after db643ef844 at 2026-09-26 00:09:04+08:00); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.38.
+  - Evidence: coordinator summary handed to the execution retrospective (no transcript): the first `deliver` returned `candidate-mismatch` because an abbreviated SHA was passed to `--validated-candidate`, and a retry with the full SHA was accepted; every publication (0f8709dfc1, c7ea84e3a7, 7cb7c300b1, 6455811f4d, 5bf185ba0d, db643ef844) reported "host session identity is required to verify the notification bridge".
+  - Observed effect: CI on `story/037-share-backend-test-context` was never observed during execution; the retrospective started with CI unknown.
+  - Inference: both the abbreviated-SHA refusal and the missing session identity recurred about an hour after the same pair was recorded for `quick/037-fold-picture-attach-step-into-upload` on main, which this execution's base (5c8bb75741) did not contain. Whether a recovery was attempted is not in the summary.
+
 ## ODF-099 — Queued startup receipt embeds the whole Git index and overflows the coordinator's tool output
 
 Former local code: DD-108.
@@ -333,8 +338,19 @@ The execution retrospective for SEED-035 story 18 created and queued the correct
   - Observed effect: about seven extra calls (reading `execution-source.mjs` and `record-preparation.md`) and one extra commit on main; an execution coordinator performed a preparation assessment, as in DD-114.
   - Inference: the retrospective's correction-planning path goes through slice planning, which says to record readiness, but that step was skipped or not reached for a plan that is its own home. Recording the assessment when the retrospective writes the plan would remove the refusal.
 
+## DD-118 — Two concurrent executions allocated the same quick-plan number from different bases
+
+Slice planning takes the number after the highest plan entry in the checkout that writes the plan and rechecks only that path. A plan written in an execution worktree whose base predates a plan already on main got the same number, so two different executions are both "037".
+
+### Occurrences
+
+- Execution: quick/037-share-backend-test-context / c7ea84e3a7; Timestamp: 2026-09-25T23:24:51+08:00 (plan commit 0f8709dfc1); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.38.
+  - Evidence: base 5c8bb75741 (22:09:45+08:00) lists quick/007, 035, 036; main's db601a2e42 (23:06:25+08:00) had already added `.planning/quick/037-fold-picture-attach-step-into-upload/PLAN.md`; 0f8709dfc1 added `.planning/quick/037-share-backend-test-context/PLAN.md`. Number 116 and 117 of this log were likewise allocated on main after the base, so this entry uses 118.
+  - Observed effect: DearDough rows and `.planning/test-optimization-candidates.md` ("plan 037 cut the suite…") refer to "037" for two different executions once both plans are deleted at wrap-up; the retrospective's correction plan had to reword the candidate record.
+  - Inference: the same stale-base allocation applies to DD numbers in this log, so a merge can also produce duplicate finding codes. Whether the coordinator fetched `origin/main` before planning is not recorded.
+
 ## Retention
 
-- Highest allocated local number: 117
+- Highest allocated local number: 118
 - Recovery: `33939aa45a17c08f5e6f8076178ce96437fdfbe8:DearDough.md` contains the complete pre-compaction log and earlier recovery references; `b0b385a184e96ecf8b0f6fc5572eaaab69bc8dad` preserves later history.
 - Occurrence history is partial; full observations, effects, inference and historical provenance remain in that snapshot and the upstream catalog.

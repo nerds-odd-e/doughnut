@@ -10,19 +10,16 @@ import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.repositories.NoteRepository;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
-import com.odde.donut.services.httpQuery.HttpClientAdapter;
 import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 class NoteControllerShowTests extends ControllerTestBase {
   @Autowired NoteController controller;
   @Autowired TextContentController textContentController;
   @Autowired NoteRepository noteRepository;
   @Autowired EntityManager entityManager;
-  @MockitoBean HttpClientAdapter httpClientAdapter;
 
   @BeforeEach
   void setup() {

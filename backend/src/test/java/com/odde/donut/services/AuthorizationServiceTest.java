@@ -6,22 +6,13 @@ import com.odde.donut.entities.Circle;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.User;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
-import com.odde.donut.testability.MakeMe;
+import com.odde.donut.testability.SpringTestBase;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
-@SpringBootTest
-@ActiveProfiles("test")
-@Transactional
-class AuthorizationServiceTest {
-  @Autowired MakeMe makeMe;
-  @Autowired AuthorizationService authorizationService;
+class AuthorizationServiceTest extends SpringTestBase {
   User user;
 
   @BeforeEach

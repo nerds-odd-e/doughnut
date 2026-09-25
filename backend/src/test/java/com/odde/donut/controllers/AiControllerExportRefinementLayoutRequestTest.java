@@ -7,20 +7,15 @@ import static org.mockito.Mockito.verifyNoInteractions;
 import com.odde.donut.controllers.dto.NoteRefinementQuestionContextDTO;
 import com.odde.donut.entities.Note;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
-import com.openai.client.OpenAIClient;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 class AiControllerExportRefinementLayoutRequestTest extends ControllerTestBase {
   @Autowired AiController controller;
-
-  @MockitoBean(name = "officialOpenAiClient")
-  OpenAIClient officialClient;
 
   @BeforeEach
   void setup() {

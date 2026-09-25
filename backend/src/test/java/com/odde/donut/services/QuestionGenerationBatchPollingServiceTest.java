@@ -6,7 +6,6 @@ import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -18,8 +17,8 @@ import com.odde.donut.entities.QuestionGenerationBatchStatus;
 import com.odde.donut.entities.User;
 import com.odde.donut.entities.repositories.QuestionGenerationBatchRepository;
 import com.odde.donut.entities.repositories.QuestionGenerationBatchRequestRepository;
-import com.odde.donut.services.openAiApis.OpenAiApiHandler;
-import com.odde.donut.testability.MakeMe;
+import com.odde.donut.testability.OpenAiBatchApiMock;
+import com.odde.donut.testability.SpringTestBase;
 import com.openai.models.batches.Batch;
 import com.openai.models.batches.BatchError;
 import io.micrometer.core.instrument.MeterRegistry;
@@ -30,19 +29,11 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.transaction.annotation.Transactional;
 
-@SpringBootTest
-@ActiveProfiles("test")
-@Transactional
-class QuestionGenerationBatchPollingServiceTest {
+class QuestionGenerationBatchPollingServiceTest extends SpringTestBase {
 
-  @MockitoBean OpenAiApiHandler openAiApiHandler;
+  OpenAiBatchApiMock openAiBatches;
 
-  @Autowired MakeMe makeMe;
   @Autowired QuestionGenerationBatchPlanningService planningService;
   @Autowired QuestionGenerationBatchSubmissionService submissionService;
   @Autowired QuestionGenerationBatchPollingService pollingService;
@@ -59,6 +50,7 @@ class QuestionGenerationBatchPollingServiceTest {
 
   @BeforeEach
   void setup() {
+    openAiBatches = new OpenAiBatchApiMock(officialClient);
     user = makeMe.aUser().please();
     currentTime = makeMe.aTimestamp().please();
     globalSettingsService
@@ -73,8 +65,8 @@ class QuestionGenerationBatchPollingServiceTest {
 
     QuestionGenerationBatch plannedBatch =
         planningService.planLocalBatchForUser(user, currentTime).orElseThrow();
-    when(openAiApiHandler.uploadBatchInputFile(any())).thenReturn("file-abc");
-    when(openAiApiHandler.createResponsesBatch("file-abc")).thenReturn("batch-openai-1");
+    openAiBatches.stubUpload("file-abc");
+    openAiBatches.stubBatchCreation("file-abc", "batch-openai-1");
     submissionService.submitPlannedBatch(plannedBatch, currentTime);
     submittedBatch = batchRepository.findById(plannedBatch.getId()).orElseThrow();
     failedBaseline = counter("question_generation_batch.failed");
@@ -89,25 +81,23 @@ class QuestionGenerationBatchPollingServiceTest {
   class OpenAiStatusUpdates {
     @Test
     void inProgressLeavesBatchSubmitted() {
-      when(openAiApiHandler.retrieveBatch("batch-openai-1"))
-          .thenReturn(openAiBatchWithStatus(Batch.Status.IN_PROGRESS));
+      openAiBatches.stubRetrieve(openAiBatchWithStatus(Batch.Status.IN_PROGRESS));
 
       pollingService.pollSubmittedBatches();
 
       QuestionGenerationBatch batch =
           batchRepository.findById(submittedBatch.getId()).orElseThrow();
       assertThat(batch.getStatus(), is(QuestionGenerationBatchStatus.SUBMITTED));
-      verify(openAiApiHandler).retrieveBatch("batch-openai-1");
+      verify(openAiBatches.batches()).retrieve("batch-openai-1");
     }
 
     @Test
     void completedUpdatesLocalBatchAndPersistsFileIds() {
-      when(openAiApiHandler.retrieveBatch("batch-openai-1"))
-          .thenReturn(
-              openAiBatchWithStatus(Batch.Status.COMPLETED).toBuilder()
-                  .outputFileId("file-output")
-                  .errorFileId("file-error")
-                  .build());
+      openAiBatches.stubRetrieve(
+          openAiBatchWithStatus(Batch.Status.COMPLETED).toBuilder()
+              .outputFileId("file-output")
+              .errorFileId("file-error")
+              .build());
 
       pollingService.pollSubmittedBatches();
 
@@ -120,18 +110,15 @@ class QuestionGenerationBatchPollingServiceTest {
 
     @Test
     void failedUpdatesLocalBatch() {
-      when(openAiApiHandler.retrieveBatch("batch-openai-1"))
-          .thenReturn(
-              openAiBatchWithStatus(Batch.Status.FAILED).toBuilder()
-                  .errors(
-                      Batch.Errors.builder()
-                          .data(
-                              List.of(
-                                  BatchError.builder()
-                                      .message("Cannot find file file-abc")
-                                      .build()))
-                          .build())
-                  .build());
+      openAiBatches.stubRetrieve(
+          openAiBatchWithStatus(Batch.Status.FAILED).toBuilder()
+              .errors(
+                  Batch.Errors.builder()
+                      .data(
+                          List.of(
+                              BatchError.builder().message("Cannot find file file-abc").build()))
+                      .build())
+              .build());
 
       RuntimeException thrown =
           assertThrows(RuntimeException.class, () -> pollingService.pollSubmittedBatches());
@@ -149,8 +136,7 @@ class QuestionGenerationBatchPollingServiceTest {
 
     @Test
     void failedWithoutOpenAiErrorsUsesGenericMessage() {
-      when(openAiApiHandler.retrieveBatch("batch-openai-1"))
-          .thenReturn(openAiBatchWithStatus(Batch.Status.FAILED));
+      openAiBatches.stubRetrieve(openAiBatchWithStatus(Batch.Status.FAILED));
 
       RuntimeException thrown =
           assertThrows(RuntimeException.class, () -> pollingService.pollSubmittedBatches());
@@ -162,8 +148,7 @@ class QuestionGenerationBatchPollingServiceTest {
 
     @Test
     void expiredUpdatesLocalBatch() {
-      when(openAiApiHandler.retrieveBatch("batch-openai-1"))
-          .thenReturn(openAiBatchWithStatus(Batch.Status.EXPIRED));
+      openAiBatches.stubRetrieve(openAiBatchWithStatus(Batch.Status.EXPIRED));
 
       pollingService.pollSubmittedBatches();
 
@@ -182,7 +167,7 @@ class QuestionGenerationBatchPollingServiceTest {
   class OpenAiRetrieveFailure {
     @Test
     void surfacesTheOpenAiErrorInsteadOfSwallowingIt() {
-      when(openAiApiHandler.retrieveBatch("batch-openai-1"))
+      when(openAiBatches.batches().retrieve("batch-openai-1"))
           .thenThrow(new RuntimeException("cannot access valid purpose=batch input file_id"));
 
       RuntimeException thrown =

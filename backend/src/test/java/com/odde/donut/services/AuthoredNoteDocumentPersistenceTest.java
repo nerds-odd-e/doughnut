@@ -8,22 +8,14 @@ import com.odde.donut.algorithms.CanonicalDonutOrigin;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.User;
 import com.odde.donut.entities.repositories.NoteRepository;
-import com.odde.donut.testability.MakeMe;
+import com.odde.donut.testability.SpringTestBase;
 import com.odde.donut.validators.AuthoredNoteContent;
 import jakarta.persistence.EntityManager;
 import java.sql.Timestamp;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.transaction.annotation.Transactional;
 
-@SpringBootTest
-@ActiveProfiles("test")
-@Transactional
-class AuthoredNoteDocumentPersistenceTest {
-
-  @Autowired MakeMe makeMe;
+class AuthoredNoteDocumentPersistenceTest extends SpringTestBase {
   @Autowired AuthoredNoteDocumentPersistence authoredNoteDocumentPersistence;
   @Autowired NoteRepository noteRepository;
   @Autowired CanonicalDonutOrigin canonicalDonutOrigin;

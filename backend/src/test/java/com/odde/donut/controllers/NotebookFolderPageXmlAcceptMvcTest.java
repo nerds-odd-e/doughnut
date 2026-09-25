@@ -11,11 +11,9 @@ import com.odde.donut.entities.repositories.UserRepository;
 import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.PlatformTransactionManager;
 
-@AutoConfigureMockMvc
 class NotebookFolderPageXmlAcceptMvcTest extends NotebookControllerTestBase {
   @Autowired private MockMvc mockMvc;
   @Autowired private EntityManager entityManager;

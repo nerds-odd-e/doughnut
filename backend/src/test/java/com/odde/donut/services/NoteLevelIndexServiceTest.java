@@ -8,7 +8,7 @@ import static org.hamcrest.Matchers.hasSize;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.NoteLevelIndex;
 import com.odde.donut.entities.repositories.NoteLevelIndexRepository;
-import com.odde.donut.testability.MakeMe;
+import com.odde.donut.testability.SpringTestBase;
 import java.util.List;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.Nested;
@@ -17,16 +17,8 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.transaction.annotation.Transactional;
 
-@SpringBootTest
-@ActiveProfiles("test")
-@Transactional
-class NoteLevelIndexServiceTest {
-
-  @Autowired MakeMe makeMe;
+class NoteLevelIndexServiceTest extends SpringTestBase {
   @Autowired NoteLevelIndexService noteLevelIndexService;
   @Autowired NoteLevelIndexRepository noteLevelIndexRepository;
 

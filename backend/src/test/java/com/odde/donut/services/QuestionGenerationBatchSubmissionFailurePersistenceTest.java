@@ -18,9 +18,11 @@ import com.odde.donut.entities.QuestionGenerationBatchStatus;
 import com.odde.donut.entities.User;
 import com.odde.donut.entities.repositories.QuestionGenerationBatchRepository;
 import com.odde.donut.entities.repositories.QuestionGenerationBatchRequestRepository;
-import com.odde.donut.services.openAiApis.OpenAiApiHandler;
 import com.odde.donut.testability.CommittedUserCleanup;
-import com.odde.donut.testability.MakeMe;
+import com.odde.donut.testability.OpenAiBatchApiMock;
+import com.odde.donut.testability.SpringTestBase;
+import com.openai.models.batches.BatchCreateParams;
+import com.openai.models.files.FileCreateParams;
 import io.micrometer.core.instrument.MeterRegistry;
 import jakarta.persistence.EntityManager;
 import java.sql.Timestamp;
@@ -32,24 +34,16 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionDefinition;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionTemplate;
 
-@SpringBootTest
-@ActiveProfiles("test")
-@Transactional
-class QuestionGenerationBatchSubmissionFailurePersistenceTest {
+class QuestionGenerationBatchSubmissionFailurePersistenceTest extends SpringTestBase {
 
   static final String COMMITTED_USER_PREFIX = "batch-submit-fail-";
 
-  @MockitoBean OpenAiApiHandler openAiApiHandler;
+  OpenAiBatchApiMock openAiBatches;
 
-  @Autowired MakeMe makeMe;
   @Autowired MeterRegistry meterRegistry;
   @Autowired QuestionGenerationBatchPlanningService planningService;
   @Autowired QuestionGenerationBatchSubmissionService submissionService;
@@ -67,6 +61,7 @@ class QuestionGenerationBatchSubmissionFailurePersistenceTest {
 
   @BeforeEach
   void setup() {
+    openAiBatches = new OpenAiBatchApiMock(officialClient);
     submittedBaseline = counter("question_generation_batch.submitted");
     failedBaseline = counter("question_generation_batch.failed");
     currentTime = makeMe.aTimestamp().please();
@@ -88,8 +83,8 @@ class QuestionGenerationBatchSubmissionFailurePersistenceTest {
   class FirstTimeFailedSubmission {
     @BeforeEach
     void failBatchCreation() {
-      when(openAiApiHandler.uploadBatchInputFile(any())).thenReturn("file-abc");
-      when(openAiApiHandler.createResponsesBatch("file-abc"))
+      openAiBatches.stubUpload("file-abc");
+      when(openAiBatches.batches().create(any(BatchCreateParams.class)))
           .thenThrow(new RuntimeException("batch create failed"));
     }
 
@@ -142,7 +137,7 @@ class QuestionGenerationBatchSubmissionFailurePersistenceTest {
 
     @Test
     void uploadFailureMarksBatchFailedWithoutUpdatingLatestSubmittedAt() {
-      when(openAiApiHandler.uploadBatchInputFile(any()))
+      when(openAiBatches.files().create(any(FileCreateParams.class)))
           .thenThrow(new RuntimeException("upload failed"));
 
       assertThrows(

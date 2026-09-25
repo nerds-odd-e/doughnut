@@ -8,7 +8,6 @@ import static org.mockito.ArgumentMatchers.any;
 import com.odde.donut.controllers.dto.*;
 import com.odde.donut.entities.*;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
-import com.odde.donut.services.httpQuery.HttpClientAdapter;
 import com.odde.donut.testability.GitBundleTestReader;
 import com.odde.donut.testability.GitBundleTestReader.AcceptedHistory;
 import com.odde.donut.testability.MakeMeWithoutDB;
@@ -21,12 +20,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.Mockito;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.validation.BindException;
 
 class NotebookRootNoteCreationWithWikidataTests extends NotebookControllerTestBase {
-  @MockitoBean HttpClientAdapter httpClientAdapter;
-
   private void mockWikidataEntity(String wikidataId, String label)
       throws IOException, InterruptedException {
     if (Strings.isEmpty(wikidataId) || Strings.isEmpty(label)) {

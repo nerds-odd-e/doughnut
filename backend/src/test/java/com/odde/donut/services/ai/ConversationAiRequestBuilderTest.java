@@ -8,24 +8,15 @@ import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.User;
 import com.odde.donut.services.focusContext.FocusContextConstants;
-import com.odde.donut.testability.MakeMe;
+import com.odde.donut.testability.SpringTestBase;
 import com.openai.models.responses.EasyInputMessage;
 import com.openai.models.responses.ResponseInputItem;
 import java.util.List;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.transaction.annotation.Transactional;
 
-@SpringBootTest
-@ActiveProfiles("test")
-@Transactional
-class ConversationAiRequestBuilderTest {
-
-  @Autowired MakeMe makeMe;
-
+class ConversationAiRequestBuilderTest extends SpringTestBase {
   @Autowired
   com.odde.donut.services.focusContext.FocusContextRetrievalService focusContextRetrievalService;
 

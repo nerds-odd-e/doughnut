@@ -6,21 +6,13 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.NotebookGitBinding;
-import com.odde.donut.testability.MakeMe;
+import com.odde.donut.testability.SpringTestBase;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.transaction.annotation.Transactional;
 
-@SpringBootTest
-@ActiveProfiles("test")
-@Transactional
-class NotebookGitBindingRepositoryTest {
-
-  @Autowired MakeMe makeMe;
+class NotebookGitBindingRepositoryTest extends SpringTestBase {
   @Autowired NotebookGitBindingRepository repository;
   @Autowired JdbcTemplate jdbcTemplate;
 

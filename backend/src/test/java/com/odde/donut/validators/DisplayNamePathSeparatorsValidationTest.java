@@ -10,6 +10,7 @@ import static org.hamcrest.Matchers.hasToString;
 import com.odde.donut.controllers.dto.FolderCreationRequest;
 import com.odde.donut.controllers.dto.NoteUpdateTitleDTO;
 import com.odde.donut.controllers.dto.NotebookUpdateRequest;
+import com.odde.donut.testability.SpringTestBase;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
 import java.util.Set;
@@ -17,15 +18,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.transaction.annotation.Transactional;
 
-@SpringBootTest
-@ActiveProfiles("test")
-@Transactional
-class DisplayNamePathSeparatorsValidationTest {
-
+class DisplayNamePathSeparatorsValidationTest extends SpringTestBase {
   @Autowired private Validator validator;
 
   @ParameterizedTest

@@ -1,13 +1,11 @@
 package com.odde.donut.services;
 
-import static com.odde.donut.services.QuestionGenerationBatchOutputCollectionTestSupport.completedOpenAiBatch;
-import static com.odde.donut.services.QuestionGenerationBatchOutputCollectionTestSupport.successLine;
+import static com.odde.donut.services.QuestionGenerationBatchImportPayloadSupport.batchSuccessLine;
+import static com.odde.donut.services.QuestionGenerationBatchOutputCollectionTestSupport.stubCompletedOpenAiBatch;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.when;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.odde.donut.entities.MemoryTracker;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.QuestionGenerationBatch;
@@ -20,28 +18,19 @@ import com.odde.donut.entities.repositories.QuestionGenerationBatchRepository;
 import com.odde.donut.entities.repositories.QuestionGenerationBatchRequestRepository;
 import com.odde.donut.entities.repositories.RecallPromptRepository;
 import com.odde.donut.services.ai.GeneratedMcq;
-import com.odde.donut.services.openAiApis.OpenAiApiHandler;
-import com.odde.donut.testability.MakeMe;
+import com.odde.donut.testability.OpenAiBatchApiMock;
+import com.odde.donut.testability.SpringTestBase;
 import java.sql.Timestamp;
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.transaction.annotation.Transactional;
 
-@SpringBootTest
-@ActiveProfiles("test")
-@Transactional
-class QuestionGenerationBatchMaintenanceServiceTest {
+class QuestionGenerationBatchMaintenanceServiceTest extends SpringTestBase {
 
-  @MockitoBean OpenAiApiHandler openAiApiHandler;
+  OpenAiBatchApiMock openAiBatches;
 
-  @Autowired MakeMe makeMe;
   @Autowired QuestionGenerationBatchMaintenanceService maintenanceService;
   @Autowired QuestionGenerationBatchRepository batchRepository;
   @Autowired QuestionGenerationBatchRequestRepository batchRequestRepository;
@@ -52,7 +41,8 @@ class QuestionGenerationBatchMaintenanceServiceTest {
   QuestionGenerationBatchRequest request;
 
   @BeforeEach
-  void setup() {
+  void setup() throws JsonProcessingException {
+    openAiBatches = new OpenAiBatchApiMock(officialClient);
     User user = makeMe.aUser().please();
     currentTime = makeMe.aTimestamp().please();
 
@@ -83,12 +73,8 @@ class QuestionGenerationBatchMaintenanceServiceTest {
 
     GeneratedMcq generatedMcq = makeMe.aGeneratedMcq().please();
 
-    when(openAiApiHandler.retrieveBatch("batch-openai-1")).thenReturn(completedOpenAiBatch());
-    when(openAiApiHandler.downloadFileContent("file-output"))
-        .thenReturn(successLine(request.getCustomId()));
-    when(openAiApiHandler.downloadFileContent("file-error")).thenReturn("");
-    when(openAiApiHandler.parseStructuredOutputFromBatchSuccessLine(anyString(), any(Class.class)))
-        .thenReturn(Optional.of(generatedMcq));
+    stubCompletedOpenAiBatch(
+        openAiBatches, batchSuccessLine(request.getCustomId(), generatedMcq), "");
   }
 
   @Test

@@ -11,7 +11,6 @@ import com.odde.donut.entities.User;
 import com.odde.donut.entities.repositories.AuthoredNoteReferenceRowTestSupport;
 import com.odde.donut.entities.repositories.NoteRepository;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
-import com.odde.donut.services.AuthorizationService;
 import com.odde.donut.services.NoteRealmService;
 import com.odde.donut.testability.model.NotesTestData;
 import com.odde.donut.testability.model.NotesTestData.NoteTestData;
@@ -21,19 +20,10 @@ import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.transaction.annotation.Transactional;
 
-@SpringBootTest
-@ActiveProfiles("test")
-@Transactional
-class TestabilityInjectNotesFolderPlacementTest {
-
+class TestabilityInjectNotesFolderPlacementTest extends SpringTestBase {
   @Autowired TestabilityRestController testabilityRestController;
   @Autowired NoteRepository noteRepository;
-  @Autowired MakeMe makeMe;
-  @Autowired AuthorizationService authorizationService;
   @Autowired NoteRealmService noteRealmService;
   @Autowired EntityManager entityManager;
 

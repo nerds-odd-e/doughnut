@@ -14,7 +14,7 @@ import com.odde.donut.entities.repositories.NotebookGitBindingRepository;
 import com.odde.donut.services.notebookTree.PortableTreeEntry;
 import com.odde.donut.services.notebookTree.PortableTreeReadmeMarkdown;
 import com.odde.donut.testability.GitBundleTestReader;
-import com.odde.donut.testability.MakeMe;
+import com.odde.donut.testability.SpringTestBase;
 import java.time.Instant;
 import java.util.List;
 import org.eclipse.jgit.internal.storage.dfs.DfsRepositoryDescription;
@@ -24,15 +24,8 @@ import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.revwalk.RevWalk;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.transaction.annotation.Transactional;
 
-@SpringBootTest
-@ActiveProfiles("test")
-@Transactional
-class NotebookGitCutoverServiceTest {
-  @Autowired MakeMe makeMe;
+class NotebookGitCutoverServiceTest extends SpringTestBase {
   @Autowired NotebookGitCutoverService notebookGitCutoverService;
   @Autowired NotebookGitBindingRepository notebookGitBindingRepository;
   @Autowired FolderRepository folderRepository;

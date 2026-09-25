@@ -11,7 +11,6 @@ import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.donut.services.ai.NoteExtractionResult;
 import com.odde.donut.services.ai.NoteRefinementLayout;
 import com.odde.donut.testability.OpenAiStructuredResponseMock;
-import com.openai.client.OpenAIClient;
 import com.openai.models.responses.StructuredResponseCreateParams;
 import java.util.List;
 import java.util.Optional;
@@ -20,14 +19,10 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 class AiControllerExtractNotePreviewTest extends ControllerTestBase {
   @Autowired AiController controller;
   @Autowired NoteRepository noteRepository;
-
-  @MockitoBean(name = "officialOpenAiClient")
-  OpenAIClient officialClient;
 
   OpenAiStructuredResponseMock openAiStructuredResponseMock;
 

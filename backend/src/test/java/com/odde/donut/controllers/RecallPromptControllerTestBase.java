@@ -8,15 +8,10 @@ import com.odde.donut.entities.Note;
 import com.odde.donut.entities.RecallPrompt;
 import com.odde.donut.services.ai.QuestionEvaluation;
 import com.odde.donut.testability.OpenAiStructuredResponseMock;
-import com.openai.client.OpenAIClient;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 abstract class RecallPromptControllerTestBase extends ControllerTestBase {
-  @MockitoBean(name = "officialOpenAiClient")
-  OpenAIClient officialClient;
-
   @Autowired RecallPromptController controller;
   @Autowired MemoryTrackerController memoryTrackerController;
 

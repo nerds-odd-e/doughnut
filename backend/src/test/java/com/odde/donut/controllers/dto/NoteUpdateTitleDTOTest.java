@@ -3,8 +3,8 @@ package com.odde.donut.controllers.dto;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.odde.donut.controllers.ControllerTestBase;
 import com.odde.donut.entities.Note;
-import com.odde.donut.testability.MakeMe;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
 import java.util.Set;
@@ -13,16 +13,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.transaction.annotation.Transactional;
 
-@SpringBootTest
-@ActiveProfiles("test")
-@Transactional
-class NoteUpdateTitleDTOTest {
-
-  @Autowired private MakeMe makeMe;
+class NoteUpdateTitleDTOTest extends ControllerTestBase {
   @Autowired private Validator validator;
 
   private NoteUpdateTitleDTO dto;

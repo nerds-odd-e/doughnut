@@ -7,6 +7,7 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 
 import com.odde.donut.configs.ShedLockConfig;
+import com.odde.donut.testability.SpringTestBase;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Optional;
@@ -28,11 +29,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-@ExtendWith(SpringExtension.class)
-@SpringBootTest
-@ActiveProfiles("test")
-class QuestionGenerationBatchMaintenanceConcurrencyTest {
-
+class QuestionGenerationBatchMaintenanceConcurrencyTest extends SpringTestBase {
   @Autowired JdbcTemplate jdbcTemplate;
 
   @Test

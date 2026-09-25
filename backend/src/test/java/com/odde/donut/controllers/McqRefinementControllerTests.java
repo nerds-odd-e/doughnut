@@ -14,7 +14,6 @@ import com.odde.donut.entities.Note;
 import com.odde.donut.exceptions.OpenAiNotAvailableException;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.donut.testability.OpenAiStructuredResponseMock;
-import com.openai.client.OpenAIClient;
 import com.openai.models.responses.StructuredResponseCreateParams;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -22,13 +21,8 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 class McqRefinementControllerTests extends ControllerTestBase {
-
-  @MockitoBean(name = "officialOpenAiClient")
-  OpenAIClient officialClient;
-
   @Autowired McqController controller;
   OpenAiStructuredResponseMock openAiStructuredResponseMock;
   Note note;

@@ -9,23 +9,15 @@ import com.odde.donut.algorithms.NoteReferenceResolution;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.User;
-import com.odde.donut.testability.MakeMe;
+import com.odde.donut.testability.SpringTestBase;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.transaction.annotation.Transactional;
 
 /**
  * The domain-stable {@link WikiLinkResolver#resolveReference} entry point: one resolution result
  * for both wiki Portable-path and note-ID URL authored references.
  */
-@SpringBootTest
-@ActiveProfiles("test")
-@Transactional
-class WikiLinkResolverReferenceResolutionTest {
-
-  @Autowired MakeMe makeMe;
+class WikiLinkResolverReferenceResolutionTest extends SpringTestBase {
   @Autowired WikiLinkResolver wikiLinkResolver;
 
   @Test

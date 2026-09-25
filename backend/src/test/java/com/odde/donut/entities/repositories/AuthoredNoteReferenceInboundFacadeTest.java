@@ -8,13 +8,10 @@ import com.odde.donut.algorithms.AuthoredNoteDocument;
 import com.odde.donut.algorithms.AuthoredNoteReference;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.User;
-import com.odde.donut.testability.MakeMe;
+import com.odde.donut.testability.SpringTestBase;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.transaction.annotation.Transactional;
 
 /**
  * {@link AuthoredNoteReferenceInboundFacade}: live inbound-candidate selection and resolution
@@ -22,12 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
  * com.odde.donut.services.NoteRealmService} for {@link
  * com.odde.donut.controllers.dto.NoteRealm#getReferences()}.
  */
-@SpringBootTest
-@ActiveProfiles("test")
-@Transactional
-class AuthoredNoteReferenceInboundFacadeTest {
-
-  @Autowired MakeMe makeMe;
+class AuthoredNoteReferenceInboundFacadeTest extends SpringTestBase {
   @Autowired AuthoredNoteReferenceInboundFacade authoredNoteReferenceInboundFacade;
 
   @Test

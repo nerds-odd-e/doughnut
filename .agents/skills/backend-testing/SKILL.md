@@ -27,7 +27,11 @@ Always run all backend unit tests instead of a selected file or test case.
 For `dough-test-optimization`, use `backend:test_only` as both the ordinary
 feedback measurement and profiling run. Per-test timings are the `time`
 attributes in `backend/build/test-results/test/TEST-*.xml`; keep any derived raw
-profile outside committed files.
+profile outside committed files. To count Spring context boots, temporarily add
+`logging.level.org.springframework.test.context.cache=DEBUG` to
+`backend/src/test/resources/application.properties` (a `logback-test.xml`
+logger is overridden by the test profile's `logging.level.root=OFF`); each rise
+in the logged `missCount` is one boot. Revert it afterwards.
 
 ## Core Principles
 
@@ -48,7 +52,7 @@ void shouldBeAbleToSaveNoteWhenValid() throws UnexpectedNoAccessRightException {
 }
 ```
 
-Prefer injecting the controller on `ControllerTestBase` (as above). Do not add `@AutoConfigureMockMvc` or extra `@MockitoBean` / `@TestBean` on a subclass unless that **exact** annotation mix already exists — each unique mix caches another ApplicationContext and Hikari pool; CI MySQL then fails with `Too many connections` while a local run still passes. To observe a package-private persistence table, query through `EntityManager` rather than opening a new MockMvc context.
+Prefer injecting the controller on `ControllerTestBase` (as above). Every Spring test of the `test` profile extends `SpringTestBase` (`testability` package), directly or through `ControllerTestBase`, so the suite shares one application context. Do not add `@AutoConfigureMockMvc` or extra `@MockitoBean` / `@TestBean` on a subclass unless that **exact** annotation mix already exists — each unique mix caches another ApplicationContext and Hikari pool; CI MySQL then fails with `Too many connections` while a local run still passes. To observe a package-private persistence table, query through `EntityManager` rather than opening a new MockMvc context.
 
 Independent algorithm example:
 

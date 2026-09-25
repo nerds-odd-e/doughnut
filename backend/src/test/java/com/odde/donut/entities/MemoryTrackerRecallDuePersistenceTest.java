@@ -4,24 +4,16 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.equalToIgnoringCase;
 
-import com.odde.donut.testability.MakeMe;
+import com.odde.donut.testability.SpringTestBase;
 import com.odde.donut.utils.TimestampOperations;
 import java.sql.Timestamp;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.transaction.annotation.Transactional;
 
-@SpringBootTest
-@ActiveProfiles("test")
-@Transactional
-class MemoryTrackerRecallDuePersistenceTest {
-
-  @Autowired MakeMe makeMe;
+class MemoryTrackerRecallDuePersistenceTest extends SpringTestBase {
   @Autowired JdbcTemplate jdbcTemplate;
 
   @ParameterizedTest

@@ -1,22 +1,28 @@
 package com.odde.donut.services;
 
+import com.odde.donut.testability.OpenAiBatchApiMock;
 import com.openai.models.batches.Batch;
 
 final class QuestionGenerationBatchOutputCollectionTestSupport {
 
   private QuestionGenerationBatchOutputCollectionTestSupport() {}
 
-  static Batch completedOpenAiBatch() {
-    return Batch.builder()
-        .id("batch-openai-1")
-        .completionWindow("24h")
-        .createdAt(1L)
-        .endpoint("/v1/responses")
-        .inputFileId("file-abc")
-        .outputFileId("file-output")
-        .errorFileId("file-error")
-        .status(Batch.Status.COMPLETED)
-        .build();
+  /** Stubs OpenAI reporting batch-openai-1 completed with the given output and error files. */
+  static void stubCompletedOpenAiBatch(
+      OpenAiBatchApiMock openAiBatches, String outputLines, String errorLines) {
+    openAiBatches.stubRetrieve(
+        Batch.builder()
+            .id("batch-openai-1")
+            .completionWindow("24h")
+            .createdAt(1L)
+            .endpoint("/v1/responses")
+            .inputFileId("file-abc")
+            .outputFileId("file-output")
+            .errorFileId("file-error")
+            .status(Batch.Status.COMPLETED)
+            .build());
+    openAiBatches.stubFileContent("file-output", outputLines);
+    openAiBatches.stubFileContent("file-error", errorLines);
   }
 
   static String successLine(String customId) {

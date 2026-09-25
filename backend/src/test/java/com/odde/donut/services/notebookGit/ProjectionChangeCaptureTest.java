@@ -11,19 +11,11 @@ import com.odde.donut.factoryServices.EntityPersister;
 import com.odde.donut.services.notebookGit.ProjectionChangeCapture.NotebookProjectionChange;
 import com.odde.donut.services.notebookGit.ProjectionChangeCapture.ProjectionChange;
 import com.odde.donut.services.notebookGit.ProjectionChangeCapture.ProjectionRow;
-import com.odde.donut.testability.MakeMe;
+import com.odde.donut.testability.SpringTestBase;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.transaction.annotation.Transactional;
 
-@SpringBootTest
-@ActiveProfiles("test")
-@Transactional
-class ProjectionChangeCaptureTest {
-
-  @Autowired MakeMe makeMe;
+class ProjectionChangeCaptureTest extends SpringTestBase {
   @Autowired EntityPersister entityPersister;
   @Autowired ProjectionChangeCapture capture;
 

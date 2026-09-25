@@ -7,13 +7,12 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.donut.configs.ObjectMapperConfig;
-import com.odde.donut.controllers.currentUser.CurrentUser;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.User;
 import com.odde.donut.services.GlobalSettingsService;
 import com.odde.donut.services.QuestionGenerationRequestBuilder;
 import com.odde.donut.services.ai.GeneratedMcq;
-import com.odde.donut.testability.MakeMe;
+import com.odde.donut.testability.SpringTestBase;
 import com.openai.models.responses.StructuredResponseCreateParams;
 import java.lang.reflect.Method;
 import java.sql.Timestamp;
@@ -25,29 +24,14 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.bean.override.convention.TestBean;
-import org.springframework.transaction.annotation.Transactional;
 
-@SpringBootTest
-@ActiveProfiles("test")
-@Transactional
-class StructuredResponseCreateParamsSerializerTest {
-
-  @Autowired MakeMe makeMe;
+class StructuredResponseCreateParamsSerializerTest extends SpringTestBase {
   @Autowired QuestionGenerationRequestBuilder requestBuilder;
   @Autowired GlobalSettingsService globalSettingsService;
   @Autowired StructuredResponseCreateParamsSerializer paramsSerializer;
 
-  @TestBean CurrentUser currentUser;
-
   private final ObjectMapper objectMapper = new ObjectMapperConfig().objectMapper();
   private User user;
-
-  static CurrentUser currentUser() {
-    return new CurrentUser();
-  }
 
   @BeforeEach
   void setup() {

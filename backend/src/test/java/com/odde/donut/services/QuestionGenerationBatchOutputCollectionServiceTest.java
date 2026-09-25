@@ -1,12 +1,11 @@
 package com.odde.donut.services;
 
-import static com.odde.donut.services.QuestionGenerationBatchOutputCollectionTestSupport.completedOpenAiBatch;
 import static com.odde.donut.services.QuestionGenerationBatchOutputCollectionTestSupport.errorLine;
+import static com.odde.donut.services.QuestionGenerationBatchOutputCollectionTestSupport.stubCompletedOpenAiBatch;
 import static com.odde.donut.services.QuestionGenerationBatchOutputCollectionTestSupport.successLine;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
-import static org.mockito.Mockito.when;
 
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.QuestionGenerationBatch;
@@ -16,8 +15,8 @@ import com.odde.donut.entities.QuestionGenerationBatchStatus;
 import com.odde.donut.entities.User;
 import com.odde.donut.entities.repositories.QuestionGenerationBatchRepository;
 import com.odde.donut.entities.repositories.QuestionGenerationBatchRequestRepository;
-import com.odde.donut.services.openAiApis.OpenAiApiHandler;
-import com.odde.donut.testability.MakeMe;
+import com.odde.donut.testability.OpenAiBatchApiMock;
+import com.odde.donut.testability.SpringTestBase;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -25,19 +24,11 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.transaction.annotation.Transactional;
 
-@SpringBootTest
-@ActiveProfiles("test")
-@Transactional
-class QuestionGenerationBatchOutputCollectionServiceTest {
+class QuestionGenerationBatchOutputCollectionServiceTest extends SpringTestBase {
 
-  @MockitoBean OpenAiApiHandler openAiApiHandler;
+  OpenAiBatchApiMock openAiBatches;
 
-  @Autowired MakeMe makeMe;
   @Autowired QuestionGenerationBatchPlanningService planningService;
   @Autowired QuestionGenerationBatchSubmissionService submissionService;
   @Autowired QuestionGenerationBatchOutputCollectionService outputCollectionService;
@@ -53,6 +44,7 @@ class QuestionGenerationBatchOutputCollectionServiceTest {
 
   @BeforeEach
   void setup() {
+    openAiBatches = new OpenAiBatchApiMock(officialClient);
     user = makeMe.aUser().please();
     currentTime = makeMe.aTimestamp().please();
     globalSettingsService
@@ -72,9 +64,8 @@ class QuestionGenerationBatchOutputCollectionServiceTest {
 
     QuestionGenerationBatch plannedBatch =
         planningService.planLocalBatchForUser(user, currentTime).orElseThrow();
-    when(openAiApiHandler.uploadBatchInputFile(org.mockito.ArgumentMatchers.any()))
-        .thenReturn("file-abc");
-    when(openAiApiHandler.createResponsesBatch("file-abc")).thenReturn("batch-openai-1");
+    openAiBatches.stubUpload("file-abc");
+    openAiBatches.stubBatchCreation("file-abc", "batch-openai-1");
     submissionService.submitPlannedBatch(plannedBatch, currentTime);
 
     completedBatch = batchRepository.findById(plannedBatch.getId()).orElseThrow();
@@ -91,13 +82,10 @@ class QuestionGenerationBatchOutputCollectionServiceTest {
   class OutputMapping {
     @Test
     void mapsUnorderedOutputLinesToRequestRows() {
-      when(openAiApiHandler.retrieveBatch("batch-openai-1")).thenReturn(completedOpenAiBatch());
-      when(openAiApiHandler.downloadFileContent("file-output"))
-          .thenReturn(
-              successLine(secondRequest.getCustomId())
-                  + "\n"
-                  + successLine(firstRequest.getCustomId()));
-      when(openAiApiHandler.downloadFileContent("file-error")).thenReturn("");
+      stubCompletedOpenAiBatch(
+          openAiBatches,
+          successLine(secondRequest.getCustomId()) + "\n" + successLine(firstRequest.getCustomId()),
+          "");
 
       outputCollectionService.collectOutputForCompletedBatches(currentTime);
 
@@ -123,11 +111,10 @@ class QuestionGenerationBatchOutputCollectionServiceTest {
 
     @Test
     void mapsErrorFileRowsToFailedRequests() {
-      when(openAiApiHandler.retrieveBatch("batch-openai-1")).thenReturn(completedOpenAiBatch());
-      when(openAiApiHandler.downloadFileContent("file-output"))
-          .thenReturn(successLine(firstRequest.getCustomId()));
-      when(openAiApiHandler.downloadFileContent("file-error"))
-          .thenReturn(errorLine(secondRequest.getCustomId(), "model unavailable"));
+      stubCompletedOpenAiBatch(
+          openAiBatches,
+          successLine(firstRequest.getCustomId()),
+          errorLine(secondRequest.getCustomId(), "model unavailable"));
 
       outputCollectionService.collectOutputForCompletedBatches(currentTime);
 

@@ -18,22 +18,15 @@ import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.User;
 import com.odde.donut.entities.repositories.NoteRepository;
 import com.odde.donut.services.NotebookHealthService;
-import com.odde.donut.testability.MakeMe;
+import com.odde.donut.testability.SpringTestBase;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.transaction.annotation.Transactional;
 
-@SpringBootTest
-@ActiveProfiles("test")
-@Transactional
-class DeadWikiLinkHealthRuleTest {
+class DeadWikiLinkHealthRuleTest extends SpringTestBase {
   @Autowired NotebookHealthService notebookHealthService;
   @Autowired NoteRepository noteRepository;
-  @Autowired MakeMe makeMe;
 
   private User owner;
   private Notebook notebook;

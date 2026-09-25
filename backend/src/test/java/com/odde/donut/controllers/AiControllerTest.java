@@ -11,7 +11,6 @@ import com.odde.donut.exceptions.OpenAiNotAvailableException;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.donut.services.ai.TitleReplacement;
 import com.odde.donut.testability.OpenAiStructuredResponseMock;
-import com.openai.client.OpenAIClient;
 import com.openai.models.responses.ResponseTextConfig;
 import com.openai.models.responses.StructuredResponseCreateParams;
 import org.junit.jupiter.api.BeforeEach;
@@ -19,14 +18,10 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.web.server.ResponseStatusException;
 
 class AiControllerTest extends ControllerTestBase {
   @Autowired AiController controller;
-
-  @MockitoBean(name = "officialOpenAiClient")
-  OpenAIClient officialClient;
 
   @BeforeEach
   void setup() {

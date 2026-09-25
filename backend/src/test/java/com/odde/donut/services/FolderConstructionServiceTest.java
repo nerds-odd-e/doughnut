@@ -4,16 +4,16 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 
-import com.odde.donut.controllers.ControllerTestBase;
 import com.odde.donut.controllers.dto.FolderTrailSegments;
 import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.repositories.FolderRepository;
+import com.odde.donut.testability.SpringTestBase;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-class FolderConstructionServiceTest extends ControllerTestBase {
+class FolderConstructionServiceTest extends SpringTestBase {
 
   @Autowired private FolderConstructionService folderConstructionService;
   @Autowired private FolderRepository folderRepository;

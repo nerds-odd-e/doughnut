@@ -13,7 +13,7 @@ import com.odde.donut.entities.QuestionGenerationBatchRequest;
 import com.odde.donut.entities.QuestionGenerationBatchStatus;
 import com.odde.donut.entities.User;
 import com.odde.donut.entities.repositories.QuestionGenerationBatchRequestRepository;
-import com.odde.donut.testability.MakeMe;
+import com.odde.donut.testability.SpringTestBase;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.Optional;
@@ -21,16 +21,8 @@ import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.transaction.annotation.Transactional;
 
-@SpringBootTest
-@ActiveProfiles("test")
-@Transactional
-class QuestionGenerationBatchLocalPlanningTest {
-
-  @Autowired MakeMe makeMe;
+class QuestionGenerationBatchLocalPlanningTest extends SpringTestBase {
   @Autowired QuestionGenerationBatchPlanningService planningService;
   @Autowired QuestionGenerationBatchRequestRepository batchRequestRepository;
 

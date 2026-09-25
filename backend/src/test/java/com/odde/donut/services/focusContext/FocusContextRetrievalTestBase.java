@@ -1,17 +1,10 @@
 package com.odde.donut.services.focusContext;
 
-import com.odde.donut.testability.MakeMe;
+import com.odde.donut.testability.SpringTestBase;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.transaction.annotation.Transactional;
 
-@SpringBootTest
-@ActiveProfiles("test")
-@Transactional
-abstract class FocusContextRetrievalTestBase {
-
+abstract class FocusContextRetrievalTestBase extends SpringTestBase {
   /**
    * Combined content budget that leaves the post-focus remainder below {@link
    * FocusContextConstants#MIN_RELATED_TOKENS_FOR_FOLDER_PEER_CONTEXT}, so folder peers are omitted
@@ -20,7 +13,6 @@ abstract class FocusContextRetrievalTestBase {
   static final int CONTENT_BUDGET_WITHOUT_FOLDER_PEERS =
       FocusContextConstants.MIN_RELATED_TOKENS_FOR_FOLDER_PEER_CONTEXT - 1;
 
-  @Autowired MakeMe makeMe;
   @Autowired FocusContextRetrievalService service;
 
   /** Folder peer: retrieval path ends at the anchor ({@code size == depth}). */

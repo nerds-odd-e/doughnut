@@ -11,23 +11,16 @@ import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.User;
 import com.odde.donut.entities.repositories.FolderRepository;
 import com.odde.donut.services.NotebookHealthService;
-import com.odde.donut.testability.MakeMe;
+import com.odde.donut.testability.SpringTestBase;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.transaction.annotation.Transactional;
 
-@SpringBootTest
-@ActiveProfiles("test")
-@Transactional
-class EmptyFolderBulkPurgeTest {
+class EmptyFolderBulkPurgeTest extends SpringTestBase {
   @Autowired NotebookHealthService notebookHealthService;
   @Autowired FolderRepository folderRepository;
-  @Autowired MakeMe makeMe;
 
   private User owner;
   private Notebook notebook;

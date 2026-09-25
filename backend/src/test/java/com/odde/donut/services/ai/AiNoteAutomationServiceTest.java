@@ -9,40 +9,24 @@ import com.odde.donut.services.GlobalSettingsService;
 import com.odde.donut.services.focusContext.FocusContextMarkdownRenderer;
 import com.odde.donut.services.focusContext.FocusContextRetrievalService;
 import com.odde.donut.services.openAiApis.OpenAiApiHandler;
-import com.odde.donut.testability.MakeMe;
 import com.odde.donut.testability.OpenAiStructuredResponseMock;
-import com.odde.donut.testability.TestabilitySettings;
-import com.openai.client.OpenAIClient;
+import com.odde.donut.testability.SpringTestBase;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.transaction.annotation.Transactional;
 
-@SpringBootTest
-@ActiveProfiles("test")
-@Transactional
-class AiNoteAutomationServiceTest {
-
-  @MockitoBean(name = "officialOpenAiClient")
-  OpenAIClient officialClient;
-
-  @Autowired MakeMe makeMe;
+class AiNoteAutomationServiceTest extends SpringTestBase {
   @Autowired GlobalSettingsService globalSettingsService;
   @Autowired FocusContextRetrievalService focusContextRetrievalService;
   @Autowired FocusContextMarkdownRenderer focusContextMarkdownRenderer;
   @Autowired OpenAiApiHandler openAiApiHandler;
-  @Autowired TestabilitySettings testabilitySettings;
   OpenAiStructuredResponseMock openAiStructuredResponseMock;
   private AiNoteAutomationService service;
 
   @BeforeEach
   void setup() {
-    testabilitySettings.setOpenAiTokenOverride(null);
     openAiStructuredResponseMock = new OpenAiStructuredResponseMock(officialClient);
 
     Note testNote = makeMe.aNote().content("description long enough.").please();

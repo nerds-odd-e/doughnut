@@ -10,7 +10,7 @@ import com.odde.donut.entities.Note;
 import com.odde.donut.entities.NoteLevelIndex;
 import com.odde.donut.entities.User;
 import com.odde.donut.entities.repositories.NoteLevelIndexRepository;
-import com.odde.donut.testability.MakeMe;
+import com.odde.donut.testability.SpringTestBase;
 import jakarta.persistence.EntityManager;
 import java.util.List;
 import java.util.UUID;
@@ -22,8 +22,6 @@ import java.util.concurrent.Future;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,14 +31,10 @@ import org.springframework.transaction.annotation.Transactional;
  * concurrently while no {@code note_level_index} row exists yet, proving the create path is
  * race-safe rather than a check-then-insert.
  */
-@SpringBootTest
-@ActiveProfiles("test")
 @Transactional(propagation = Propagation.NOT_SUPPORTED)
-class NoteLevelIndexServiceConcurrencyTest {
-
+class NoteLevelIndexServiceConcurrencyTest extends SpringTestBase {
   private static final String FIXTURE_PREFIX = "note-level-index-concurrency-";
 
-  @Autowired MakeMe makeMe;
   @Autowired NoteLevelIndexService noteLevelIndexService;
   @Autowired NoteLevelIndexRepository noteLevelIndexRepository;
   @Autowired PlatformTransactionManager transactionManager;

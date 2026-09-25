@@ -7,24 +7,16 @@ import static org.hamcrest.Matchers.is;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.repositories.NoteEmbeddingRepository;
-import com.odde.donut.testability.MakeMe;
+import com.odde.donut.testability.SpringTestBase;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.transaction.annotation.Transactional;
 
-@SpringBootTest
-@ActiveProfiles("test")
-@Transactional
-class NoteEmbeddingServiceTests {
-
+class NoteEmbeddingServiceTests extends SpringTestBase {
   @Autowired NoteEmbeddingRepository noteEmbeddingRepository;
   @Autowired NoteEmbeddingService service;
-  @Autowired MakeMe makeMe;
 
   Note note;
   Notebook notebook;

@@ -10,30 +10,16 @@ import com.odde.donut.entities.repositories.McqRepository;
 import com.odde.donut.services.McqService;
 import com.odde.donut.services.ai.GeneratedMcq;
 import com.odde.donut.services.ai.QuestionEvaluation;
-import com.odde.donut.testability.MakeMe;
 import com.odde.donut.testability.OpenAiStructuredResponseMock;
-import com.odde.donut.testability.TestabilitySettings;
-import com.openai.client.OpenAIClient;
+import com.odde.donut.testability.SpringTestBase;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.transaction.annotation.Transactional;
 
-@SpringBootTest
-@ActiveProfiles("test")
-@Transactional
-class McqTest {
-  @MockitoBean(name = "officialOpenAiClient")
-  OpenAIClient officialClient;
-
-  @Autowired MakeMe makeMe;
+class McqTest extends SpringTestBase {
   @Autowired McqService mcqService;
   @Autowired McqRepository mcqRepository;
-  @Autowired TestabilitySettings testabilitySettings;
 
   OpenAiStructuredResponseMock openAiStructuredResponseMock;
 

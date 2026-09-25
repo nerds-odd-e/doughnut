@@ -10,19 +10,13 @@ import com.odde.donut.entities.ConversationMessage;
 import com.odde.donut.entities.Note;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.donut.testability.OpenAiResponseStreamMocker;
-import com.openai.client.OpenAIClient;
 import org.apache.coyote.BadRequestException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 class ConversationAiReplyControllerTest extends ConversationMessageControllerTestBase {
-
-  @MockitoBean(name = "officialOpenAiClient")
-  OpenAIClient officialClient;
-
   @Nested
   class GetAiReply {
     Conversation conversation;

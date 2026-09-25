@@ -4,11 +4,11 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.lessThan;
 
-import com.odde.donut.controllers.ControllerTestBase;
 import com.odde.donut.controllers.dto.RecallStatsDTO;
 import com.odde.donut.entities.MemoryTracker;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.User;
+import com.odde.donut.testability.SpringTestBase;
 import jakarta.persistence.EntityManager;
 import java.sql.Timestamp;
 import java.time.ZoneId;
@@ -24,7 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * SELECT rp.*) and time out in production. The projection fix must keep the prepared-statement
  * count bounded regardless of history size.
  */
-class RecallStatsPerformanceTest extends ControllerTestBase {
+class RecallStatsPerformanceTest extends SpringTestBase {
   @Autowired RecallStatsService recallStatsService;
   @Autowired EntityManager em;
 

@@ -3,28 +3,55 @@ package com.odde.donut.services;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
-import static org.mockito.Mockito.doReturn;
 
 import com.odde.donut.controllers.dto.QuestionGenerationBatchSubmissionSummaryDTO;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.User;
+import com.odde.donut.entities.repositories.QuestionGenerationBatchRepository;
+import com.odde.donut.testability.CommittedUserCleanup;
+import com.odde.donut.testability.SpringTestBase;
+import jakarta.persistence.EntityManager;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
-import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.Isolated;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionDefinition;
+import org.springframework.transaction.support.TransactionTemplate;
 
 @Isolated
-class QuestionGenerationBatchSubmitDueUsersTest
-    extends QuestionGenerationBatchSubmitDueUsersTestBase {
+class QuestionGenerationBatchSubmitDueUsersTest extends SpringTestBase {
+
+  static final String COMMITTED_USER_PREFIX = "batch-due-";
+
+  @Autowired QuestionGenerationBatchSubmitDueUsersService submitDueUsersService;
+  @Autowired QuestionGenerationBatchRepository batchRepository;
+  @Autowired EntityManager entityManager;
+  @Autowired PlatformTransactionManager transactionManager;
+
+  final Timestamp cronTime = Timestamp.valueOf(LocalDateTime.of(2024, 8, 3, 16, 45));
+
+  @BeforeEach
+  void cleanupStaleCommittedFixtures() {
+    inCommittedTransaction(this::deleteCommittedDueUserFixtures);
+  }
+
+  @AfterEach
+  void cleanupCommittedState() {
+    inCommittedTransaction(this::deleteCommittedDueUserFixtures);
+  }
 
   @Test
   void skipsDueUserWithNoCandidateTrackersWithoutSubmittedBatch() {
     User[] dueUser = new User[1];
     inCommittedTransaction(
         () -> {
-          dueUser[0] = uniqueUser();
+          dueUser[0] = makeMe.aUser(COMMITTED_USER_PREFIX + UUID.randomUUID()).please();
 
           Note note = makeMe.aNote().notebookOwnedBy(dueUser[0]).please();
           var tracker =
@@ -42,10 +69,6 @@ class QuestionGenerationBatchSubmitDueUsersTest
               .please();
           makeMe.aRecallPrompt().withMcqForNote(note).forMemoryTracker(tracker).please();
         });
-
-    doReturn(List.of(dueUser[0]))
-        .when(planningService)
-        .findUsersEligibleForBatchSubmission(cronTime);
 
     QuestionGenerationBatchSubmissionSummaryDTO[] summary =
         new QuestionGenerationBatchSubmissionSummaryDTO[1];
@@ -66,5 +89,16 @@ class QuestionGenerationBatchSubmitDueUsersTest
               batchRepository.findLatestSubmittedAtByUser_Id(dueUser[0].getId()).isPresent(),
               is(false));
         });
+  }
+
+  private void inCommittedTransaction(Runnable action) {
+    TransactionTemplate template = new TransactionTemplate(transactionManager);
+    template.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
+    template.executeWithoutResult(status -> action.run());
+  }
+
+  private void deleteCommittedDueUserFixtures() {
+    CommittedUserCleanup.deleteByUserExternalIdentifierLike(
+        entityManager, COMMITTED_USER_PREFIX + "%");
   }
 }

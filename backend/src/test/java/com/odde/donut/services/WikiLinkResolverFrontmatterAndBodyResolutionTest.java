@@ -7,20 +7,12 @@ import com.odde.donut.algorithms.AuthoredNoteReferences;
 import com.odde.donut.algorithms.NoteReferenceResolution;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.User;
-import com.odde.donut.testability.MakeMe;
+import com.odde.donut.testability.SpringTestBase;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.transaction.annotation.Transactional;
 
-@SpringBootTest
-@ActiveProfiles("test")
-@Transactional
-class WikiLinkResolverFrontmatterAndBodyResolutionTest {
-
-  @Autowired MakeMe makeMe;
+class WikiLinkResolverFrontmatterAndBodyResolutionTest extends SpringTestBase {
   @Autowired WikiLinkResolver wikiLinkResolver;
 
   @Test

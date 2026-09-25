@@ -9,8 +9,8 @@ import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.User;
-import com.odde.donut.testability.MakeMe;
 import com.odde.donut.testability.RelationshipLiteralSearchHits;
+import com.odde.donut.testability.SpringTestBase;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -18,15 +18,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.transaction.annotation.Transactional;
 
-@SpringBootTest
-@ActiveProfiles("test")
-@Transactional
-class NoteSearchServiceExactMatchTest {
-  @Autowired MakeMe makeMe;
+class NoteSearchServiceExactMatchTest extends SpringTestBase {
   @Autowired NoteSearchService noteSearchService;
   User user;
   Notebook searchNotebook;
