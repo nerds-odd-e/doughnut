@@ -69,8 +69,15 @@ tests and E2E of pictures as notebook files.
 
 ### 1. No legacy picture row can delete a note
 Type: Structure
-Status: planned
-Proof: slice 1 row above.
+Status: done
+Proof: slice 1 row above. Accepted: `pnpm backend:test:worktree --tests
+'com.odde.donut.controllers.TextContentControllerUpdateNoteContentTests'`
+migrated the worktree test DB to `300000345` (12 tests pass; no
+`note.image_id` in `information_schema`); `DONUT_ERD_SCHEMA=<worktree test
+schema> pnpm export:database-erd` removed only the two `image_id` lines.
+Learning: in a worktree, regenerate the ERD with `DONUT_ERD_SCHEMA` set to the
+worktree test schema (from `.worktree.local.json`); otherwise the exporter
+reads `doughnut_development`, which is not migrated with the branch.
 
 Change: `V300000345__drop_note_image_id.sql` drops `fk_note_image_id`, its
 index and `note.image_id`. Regenerate `docs/database-erd.md` (database-erd

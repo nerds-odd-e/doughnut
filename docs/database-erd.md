@@ -19,7 +19,6 @@ erDiagram
     folder ||--o{ folder : "parent_folder_id ON DELETE CASCADE"
     folder ||--o{ "note" : "folder_id ON DELETE RESTRICT"
     folder ||--o{ notebook_attachment : "folder_id ON DELETE CASCADE"
-    image ||--o{ "note" : "image_id ON DELETE CASCADE"
     mcq ||--o{ recall_prompt : "mcq_id ON DELETE CASCADE"
     memory_tracker ||--o{ question_generation_batch_request : "memory_tracker_id ON DELETE CASCADE"
     memory_tracker ||--o{ recall_log : "memory_tracker_id ON DELETE CASCADE"
@@ -159,7 +158,6 @@ erDiagram
     }
     "note" {
         int id PK
-        int image_id FK
         int notebook_id FK
         int folder_id FK
     }
