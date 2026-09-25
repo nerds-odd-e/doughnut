@@ -10,8 +10,6 @@ and deletable in Web Donut.
 
 ## Taken
 
-- [Make production application logs findable from the GCP docs](seeds/SEED-035-ai-workspace-supporting-files.md#story-22) — SEED-035#story-22
-
 ## Backlog list
 
 - [Fold the picture attach step back into the upload](quick/037-fold-picture-attach-step-into-upload/PLAN.md)
