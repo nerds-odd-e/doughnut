@@ -90,7 +90,12 @@ whose move fails is logged and left unchanged, the others still move, and the
 next startup retries it. Running the move again changes nothing. A reference to
 another notebook's upload or to an upload without a note is left unchanged and
 counted in a startup warning; a reference to a missing upload is left
-unchanged. The legacy rows stay, still served inline under the notebook read
+unchanged. Trashed notes move like any other note, and recall and memory-tracker
+state are untouched. Moved pictures are existing content, so the 10 MiB limit
+for new payloads does not apply to them. Another notebook's upload is never
+copied, because that would place one notebook's possibly private bytes in
+another notebook's history. Legacy orphan cleanup skips a note-relative
+`image:` value, so a moved note's row stays as the backup. The legacy rows stay, still served inline under the notebook read
 rule (owners, subscribers, and Bazaar readers, even logged out; another user is
 refused, and an anonymous request for a private notebook's image must log in),
 until they are retired. No new picture is stored there.

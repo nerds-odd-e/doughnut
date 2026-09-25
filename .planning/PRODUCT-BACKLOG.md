@@ -11,7 +11,6 @@ and deletable in Web Donut.
 ## Taken
 
 - [Finish the single attachment representation](quick/031-finish-single-attachment-representation/PLAN.md)
-- [Move existing uploaded note pictures into their notebooks](seeds/SEED-035-ai-workspace-supporting-files.md#story-5) — SEED-035#story-5 ([plan](quick/033-move-legacy-note-pictures/PLAN.md))
 
 ## Backlog list
 
