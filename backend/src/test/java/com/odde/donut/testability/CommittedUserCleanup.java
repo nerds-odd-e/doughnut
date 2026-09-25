@@ -69,6 +69,17 @@ public final class CommittedUserCleanup {
         .executeUpdate();
     entityManager
         .createNativeQuery(
+            "DELETE bcb FROM book_content_block bcb "
+                + "INNER JOIN book_block bb ON bcb.book_block_id = bb.id "
+                + "INNER JOIN book b ON bb.book_id = b.id "
+                + "INNER JOIN notebook nb ON b.notebook_id = nb.id "
+                + "INNER JOIN ownership o ON nb.ownership_id = o.id "
+                + "INNER JOIN user u ON o.user_id = u.id "
+                + "WHERE u.external_identifier LIKE :like")
+        .setParameter("like", externalIdentifierLike)
+        .executeUpdate();
+    entityManager
+        .createNativeQuery(
             "DELETE nb FROM notebook nb "
                 + "INNER JOIN ownership o ON nb.ownership_id = o.id "
                 + "INNER JOIN user u ON o.user_id = u.id "

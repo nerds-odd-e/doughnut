@@ -168,6 +168,10 @@ Former local code: DD-107.
   - Evidence: slice 1 receipt `observation.reason` "host session identity is required to verify the notification bridge" (background Claude Code job, Story Branch Mode, bridge probe already `CI_MONITOR_READY`); a re-run passing the original base was refused ("rebase left the pre-rebase SHA as the candidate"); a re-run with the accepted SHA as base and `--session-json` from `CLAUDE_CODE_SESSION_ID` reported `observation.state: reused`.
   - Observed effect: three extra calls (one refused) plus a `grep` of the delivery scripts to learn the flag's shape; later deliveries passing `--session-json` reported `reused`.
 
+- Execution: SEED-035 story 17 / quick/034-book-source-as-notebook-file / 36eb15caaa; Timestamp: 2026-09-25, ~15:55+08:00 (slice 1 delivery; commit 15:55:12+08:00); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.38.
+  - Evidence: slice 1 and slice 7 (96c756d531) receipts `observation.reason` "host session identity is required to verify the notification bridge" (background Claude Code job, Story Branch Mode); recovered after slice 1 by `ci-mailbox.mjs probe` (`CI_MONITOR_READY`), `start --execution nerds-odd-e/doughnut story/book-source-as-notebook-file`, and `register-push` for 36eb15caaa; slices 2-6 reported `reused`.
+  - Observed effect: the same three-call manual recovery; after the observer ended (see DD-115) the slice 7 delivery could not reattach without the session identity and stayed unobserved.
+
 ## ODF-099 — Queued startup receipt embeds the whole Git index and overflows the coordinator's tool output
 
 Former local code: DD-108.
@@ -199,6 +203,10 @@ Former local code: DD-108.
 - Execution: SEED-035 story 5 / quick/033-move-legacy-note-pictures / 4dad58408f; Timestamp: 2026-09-25, ~14:19+08:00 (queued startup, Take commit 269a569079); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.38.
   - Evidence: startup call output "Output too large (816.6KB)"; `beforeMaintenance.index` holds the full index listing.
   - Observed effect: an extra `node` call was needed to read `afterMaintenance` and `projectSetupRequired`.
+
+- Execution: SEED-035 story 17 / quick/034-book-source-as-notebook-file / 36eb15caaa; Timestamp: 2026-09-25, ~15:45+08:00 (queued startup, Take commit 6926d8a1a1); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.38.
+  - Evidence: startup call output "Output too large (817.3KB)"; `beforeMaintenance.index` and `afterMaintenance.index` hold the full index listing.
+  - Observed effect: an extra `python3` call was needed to read `afterMaintenance` and `projectSetupRequired`.
 
 ## ODF-110 — A readiness replay observed only the plan's named seam, not the rest of the slice's journey
 
@@ -269,8 +277,30 @@ An implementation agent reported a full-suite heap exhaustion as "also on the ba
   - Observed effect: the first stop report told the owner the failure was pre-existing and out of scope; the correction came only after the CI check.
   - Inference: "pre-existing" needs a baseline from before this execution's first change (claim revision or last green CI), not the prior slice.
 
+## DD-114 — A not-ready assessment whose only reason was a satisfied start condition blocked queued startup
+
+The plan's recorded assessment was `not-ready` solely because its start condition (the story it builds on being on main) was unmet. That story was later merged and wrapped up without re-assessing dependents, so `execution-start.mjs start` refused with "published preparation is needs-reassessment". The coordinator checked the reused names on main, recorded `ready`, and published a separate readiness commit on main before the Take.
+
+### Occurrences
+
+- Execution: SEED-035 story 17 / quick/034-book-source-as-notebook-file / 36eb15caaa; Timestamp: 2026-09-25, ~15:43+08:00 (refusal, then readiness commit 741dbf31ba); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.38.
+  - Evidence: `read-state` reasons "Start condition unmet: reuses naming helpers and the startup-move shape from the picture move (quick/033, SEED-035#story-5), not yet on main."; story 5 merged at 72021b8efe; start receipt `{"status":"source-refused","error":"published preparation is needs-reassessment"}`; readiness recorded and pushed as 741dbf31ba.
+  - Observed effect: about six extra calls and one extra commit on main; an execution coordinator performed a preparation assessment.
+  - Inference: when a start condition names another story, that story's wrap-up (or the start command) could re-check dependents whose only blocking reason it resolves.
+
+## DD-115 — One transient GitHub TLS timeout ended CI observation for the rest of the execution
+
+During slice 7, the observer emitted `CI_MONITOR_UNAVAILABLE` for a single `gh run list` call that failed with "net/http: TLS handshake timeout". Observation then stopped, so the slice 6 run already in progress and the slice 7 publication had no notification coverage; the coordinator had to check `gh run list` directly.
+
+### Occurrences
+
+- Execution: SEED-035 story 17 / quick/034-book-source-as-notebook-file / 36eb15caaa; Timestamp: unknown (event delivered between slice 6 commit 2026-09-25 16:44:12 +0800 and slice 7 commit 2026-09-25 16:58:36 +0800); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.38.
+  - Evidence: hook context `{"type":"CI_MONITOR_UNAVAILABLE",…,"reason":"Command failed: gh run list … TLS handshake timeout"}` for observer /tmp/dough-ci-501/watch-WnDwf2; slice 7 receipt `observation.state: unobserved`.
+  - Observed effect: lost coverage for db13a2d99c and 96c756d531; manual CI checks replaced notifications.
+  - Inference: a bounded retry for a transient network error before declaring the observer unavailable would likely have kept coverage.
+
 ## Retention
 
-- Highest allocated local number: 113
+- Highest allocated local number: 115
 - Recovery: `33939aa45a17c08f5e6f8076178ce96437fdfbe8:DearDough.md` contains the complete pre-compaction log and earlier recovery references; `b0b385a184e96ecf8b0f6fc5572eaaab69bc8dad` preserves later history.
 - Occurrence history is partial; full observations, effects, inference and historical provenance remain in that snapshot and the upstream catalog.

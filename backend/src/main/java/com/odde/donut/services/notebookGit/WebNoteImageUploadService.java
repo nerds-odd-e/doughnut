@@ -6,7 +6,6 @@ import com.odde.donut.entities.repositories.NotebookGitBindingRepository;
 import com.odde.donut.exceptions.ApiException;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.donut.services.notebookAttachment.NotebookAttachmentContent;
-import com.odde.donut.services.notebookGit.NotebookGitAcceptedRepositoryStore.OpenedAcceptedRepository;
 import java.io.IOException;
 import java.sql.Timestamp;
 import org.springframework.stereotype.Service;
@@ -72,10 +71,9 @@ public class WebNoteImageUploadService {
   }
 
   private boolean acceptedTreeHas(Integer notebookId, String path) {
-    try (OpenedAcceptedRepository accepted =
-        repositoryStore.open(bindingRepository.findByNotebook_Id(notebookId).orElseThrow())) {
-      return NotebookGitAcceptedTree.takenPaths(accepted.repository(), accepted.head()).test(path);
-    }
+    return repositoryStore
+        .takenPaths(bindingRepository.findByNotebook_Id(notebookId).orElseThrow())
+        .test(path);
   }
 
   private static ApiException refused(String path, String reason, ApiError.ErrorType type) {

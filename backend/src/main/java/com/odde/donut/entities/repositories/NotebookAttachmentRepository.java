@@ -6,6 +6,7 @@ import com.odde.donut.services.notebookGit.NotebookAttachmentPlacement;
 import com.odde.donut.services.notebookTree.PortableTreeAttachmentRow;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
@@ -22,6 +23,9 @@ public interface NotebookAttachmentRepository extends CrudRepository<NotebookAtt
       @Param("notebookId") Integer notebookId);
 
   List<NotebookAttachment> findByNotebook_Id(Integer notebookId);
+
+  Optional<NotebookAttachment> findByNotebook_IdAndFolderIsNullAndFilename(
+      Integer notebookId, String filename);
 
   @Query(
       """

@@ -144,7 +144,7 @@ from that checkout's allocation, not 5173.
 
 ## 7. Book PDF storage (GCS, prod)
 
-Attached notebook PDFs are stored in GCS when the backend runs with Spring profile **`prod`** (`GcsBookStorage` + VM **Application Default Credentials**). Production uses bucket **`doughnut-book-pdf-carbon-syntax-298809`** (the short name **`books`** is not available globally on GCS). Prod sets **`donut.book-pdf.gcs.bucket`** in [`backend/src/main/resources/application.yml`](../../backend/src/main/resources/application.yml) (prod profile). Optional **`donut.book-pdf.gcs.object-prefix`** is unset by default.
+New Books store their source file as an ordinary notebook file (see [attachment synchronization](../notebook-git-attachments.md)); this separate bucket only keeps the copies of Books attached before that, moved into their notebooks at startup, until it is retired. It is used when the backend runs with Spring profile **`prod`** (`GcsBookStorage` + VM **Application Default Credentials**). Production uses bucket **`doughnut-book-pdf-carbon-syntax-298809`** (the short name **`books`** is not available globally on GCS). Prod sets **`donut.book-pdf.gcs.bucket`** in [`backend/src/main/resources/application.yml`](../../backend/src/main/resources/application.yml) (prod profile). Optional **`donut.book-pdf.gcs.object-prefix`** is unset by default.
 
 **Global names:** GCS bucket names are globally unique. If you recreate this environment in another project, pick a unique bucket name and keep **`application.yml`** and this section in sync.
 
@@ -178,7 +178,7 @@ gcloud storage buckets add-iam-policy-binding gs://doughnut-book-pdf-carbon-synt
 
 **Upload limit:** Book attach uses Spring **`spring.servlet.multipart.max-file-size`** (100MB in [`application.yml`](../../backend/src/main/resources/application.yml)); oversize requests get HTTP **413** with an **`ApiError`** JSON body (same shape as other API errors).
 
-**GCS orphans:** Deleting or replacing a **Book** row does **not** remove the object in GCS; orphan object cleanup is **not** implemented yet.
+**GCS orphans:** Deleting a **Book** row does **not** remove its object in this bucket; the bucket is kept as a backup until it is retired.
 
 Operational note: creating a Cloud SQL VECTOR index may fail with
 "Vector index: not enough data to train" if the table has too few embeddings.

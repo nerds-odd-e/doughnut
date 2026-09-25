@@ -9,7 +9,6 @@ import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.donut.factoryServices.EntityPersister;
 import com.odde.donut.services.NumberedNameSelection;
 import com.odde.donut.services.notebookAttachment.NotebookAttachmentContent;
-import com.odde.donut.services.notebookGit.NotebookGitAcceptedRepositoryStore.OpenedAcceptedRepository;
 import com.odde.donut.testability.TestabilitySettings;
 import java.io.IOException;
 import java.util.HashMap;
@@ -142,24 +141,21 @@ public class LegacyNotePictureMove {
   private Map<Note, String> freeFilenames(Integer notebookId, Map<Note, Image> pictures) {
     Set<String> chosenPaths = new HashSet<>();
     Map<Note, String> filenames = new HashMap<>();
-    try (OpenedAcceptedRepository accepted =
-        repositoryStore.open(bindingRepository.findByNotebook_Id(notebookId).orElseThrow())) {
-      Predicate<String> acceptedTaken =
-          NotebookGitAcceptedTree.takenPaths(accepted.repository(), accepted.head());
-      pictures.forEach(
-          (note, image) -> {
-            String folderPath = NotebookGitPortablePath.folderPath(note.getFolder());
-            String filename =
-                NumberedNameSelection.firstAvailableFilename(
-                    plainFilename(image.getName()),
-                    candidate -> {
-                      String path = NotebookGitPortablePath.ofAttachment(folderPath, candidate);
-                      return chosenPaths.contains(path) || acceptedTaken.test(path);
-                    });
-            chosenPaths.add(NotebookGitPortablePath.ofAttachment(folderPath, filename));
-            filenames.put(note, filename);
-          });
-    }
+    Predicate<String> acceptedTaken =
+        repositoryStore.takenPaths(bindingRepository.findByNotebook_Id(notebookId).orElseThrow());
+    pictures.forEach(
+        (note, image) -> {
+          String folderPath = NotebookGitPortablePath.folderPath(note.getFolder());
+          String filename =
+              NumberedNameSelection.firstAvailableFilename(
+                  plainFilename(image.getName()),
+                  candidate -> {
+                    String path = NotebookGitPortablePath.ofAttachment(folderPath, candidate);
+                    return chosenPaths.contains(path) || acceptedTaken.test(path);
+                  });
+          chosenPaths.add(NotebookGitPortablePath.ofAttachment(folderPath, filename));
+          filenames.put(note, filename);
+        });
     return filenames;
   }
 

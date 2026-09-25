@@ -7,6 +7,4 @@ public interface BookStorage {
   String put(byte[] data, String format);
 
   Optional<byte[]> get(String ref);
-
-  void delete(String ref);
 }

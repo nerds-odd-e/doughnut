@@ -41,7 +41,6 @@ class NotebookBooksAttachControllerTest extends NotebookBooksControllerTestBase 
       assertThat(created, notNullValue());
       assertThat(created.getId(), notNullValue());
       assertThat(created.getBookName(), equalTo("Linear Algebra"));
-      assertThat(created.getSourceFileRef(), not(blankOrNullString()));
       assertThat(created.getBlocks(), hasSize(3));
 
       BookBlock outRoot = rootBlocksSorted(created).getFirst();

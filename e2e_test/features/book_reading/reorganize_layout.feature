@@ -6,8 +6,8 @@ Feature: Reorganize book layout
   Rule: Change depth with keyboard
 
     Background:
-      Given I have a notebook "Refactoring read" with a note "Code Refactoring Book"
-      And I attach a fake blank pdf book with book layout of "refactoring" to the notebook "Code Refactoring Book"
+      Given I have a notebook "Refactoring read"
+      And I attach a fake blank pdf book with book layout of "refactoring" to the notebook "Refactoring read"
       And I open the book attached to notebook "Refactoring read"
 
     Scenario Outline: Indent a book block with Tab
@@ -35,8 +35,8 @@ Feature: Reorganize book layout
   Rule: Content block bbox overlays
 
     Background:
-      Given I have a notebook "Refactoring read" with a note "Code Refactoring Book"
-      And I attach a fake blank pdf book with book layout of "refactoring" to the notebook "Code Refactoring Book"
+      Given I have a notebook "Refactoring read"
+      And I attach a fake blank pdf book with book layout of "refactoring" to the notebook "Refactoring read"
       And I open the book attached to notebook "Refactoring read"
 
     @mockBrowserTime
@@ -65,8 +65,8 @@ Feature: Reorganize book layout
   Rule: Change depth of a block with its descendants or cancel a block
 
     Background:
-      Given I have a notebook "Subtree read" with a note "Subtree Book"
-      And I attach a fake blank pdf book with book layout of "subtree_indent" to the notebook "Subtree Book"
+      Given I have a notebook "Subtree read"
+      And I attach a fake blank pdf book with book layout of "subtree_indent" to the notebook "Subtree read"
       And I open the book attached to notebook "Subtree read"
 
     Scenario: Indent a block and its children together

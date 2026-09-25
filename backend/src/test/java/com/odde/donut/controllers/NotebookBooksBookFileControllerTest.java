@@ -60,6 +60,22 @@ class NotebookBooksBookFileControllerTest extends NotebookBooksControllerTestBas
     }
 
     @Test
+    void returnsTheNotebookFileWhenSourcePathNamesARootAttachment()
+        throws UnexpectedNoAccessRightException {
+      Notebook nb = notebookWithBook();
+      byte[] pdfBytes = new byte[] {0x25, 0x50, 0x44, 0x46, 0x2d};
+      makeMe.anAttachment("Linear Algebra.pdf").atRootOf(nb).content(pdfBytes).please();
+      Book book = bookOf(nb);
+      book.setSourceFilePath("Linear Algebra.pdf");
+      makeMe.entityPersister.save(book);
+      makeMe.entityPersister.flush();
+
+      ResponseEntity<byte[]> res = controller.getBookFile(webRequest(), nb);
+
+      assertThat(res.getBody(), equalTo(pdfBytes));
+    }
+
+    @Test
     void returnsEpubZipWhenBookFormatIsEpub() throws UnexpectedNoAccessRightException {
       Notebook nb = notebookWithBook();
       Book book = bookOf(nb);
@@ -116,36 +132,6 @@ class NotebookBooksBookFileControllerTest extends NotebookBooksControllerTestBas
 
   @Nested
   class DeleteBook {
-    @Test
-    void removesBookRowAndStoredBytes() throws UnexpectedNoAccessRightException {
-      Notebook nb = notebookWithBook();
-      String ref = bookOf(nb).getSourceFileRef();
-
-      controller.deleteBook(nb);
-
-      assertThat(bookRepository.findByNotebook_Id(nb.getId()).isEmpty(), equalTo(true));
-      assertThat(bookStorage.get(ref).isEmpty(), equalTo(true));
-      assertThrows(ResponseStatusException.class, () -> controller.getBook(nb));
-      assertThrows(ResponseStatusException.class, () -> controller.getBookFile(webRequest(), nb));
-    }
-
-    @Test
-    void removesEpubBookRowAndStoredBytes() throws UnexpectedNoAccessRightException {
-      Notebook nb = notebookWithBook();
-      Book book = bookOf(nb);
-      byte[] epubBytes = new byte[] {0x50, 0x4b, 0x03, 0x04};
-      String ref = bookStorage.put(epubBytes, BookReadingWireConstants.BOOK_FORMAT_EPUB);
-      book.setFormat(BookReadingWireConstants.BOOK_FORMAT_EPUB);
-      book.setSourceFileRef(ref);
-      makeMe.entityPersister.save(book);
-      makeMe.entityPersister.flush();
-
-      controller.deleteBook(nb);
-
-      assertThat(bookRepository.findByNotebook_Id(nb.getId()).isEmpty(), equalTo(true));
-      assertThat(bookStorage.get(ref).isEmpty(), equalTo(true));
-    }
-
     @Test
     void returns404WhenNotebookHasNoBook() throws UnexpectedNoAccessRightException {
       Notebook nb = myNotebook();

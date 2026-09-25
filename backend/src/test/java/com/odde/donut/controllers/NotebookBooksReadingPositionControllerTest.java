@@ -80,21 +80,6 @@ class NotebookBooksReadingPositionControllerTest extends NotebookBooksController
     }
 
     @Test
-    void removesPositionWhenBookDeleted() throws UnexpectedNoAccessRightException {
-      Notebook nb = notebookWithBook();
-      int bookId = bookOf(nb).getId();
-      controller.patchReadingPosition(nb, lastReadBody(1, 500));
-
-      controller.deleteBook(nb);
-
-      assertThat(
-          bookUserLastReadPositionRepository
-              .findByUser_IdAndBook_Id(currentUser.getUser().getId(), bookId)
-              .isEmpty(),
-          equalTo(true));
-    }
-
-    @Test
     void persistsSelectedBookBlockId() throws Exception {
       Notebook nb = myNotebook();
       controller.attachBook(

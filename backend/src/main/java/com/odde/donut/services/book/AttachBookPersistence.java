@@ -25,7 +25,7 @@ final class AttachBookPersistence {
 
   private AttachBookPersistence() {}
 
-  static Book persistNewEpubBook(BookService.PersistContext ctx) {
+  static Book persistNewEpubBook(AttachBookService.PersistContext ctx) {
     EntityPersister entityPersister = ctx.entityPersister();
     ObjectMapper objectMapper = ctx.objectMapper();
     byte[] epubBytes = ctx.fileBytes();
@@ -55,7 +55,7 @@ final class AttachBookPersistence {
     return book;
   }
 
-  static Book persistNewPdfBook(BookService.PersistContext ctx) {
+  static Book persistNewPdfBook(AttachBookService.PersistContext ctx) {
     EntityPersister entityPersister = ctx.entityPersister();
 
     var book = newBook(ctx, BOOK_FORMAT_PDF);
@@ -81,14 +81,13 @@ final class AttachBookPersistence {
     return book;
   }
 
-  private static Book newBook(BookService.PersistContext ctx, String format) {
+  private static Book newBook(AttachBookService.PersistContext ctx, String format) {
     AttachBookRequest request = ctx.request();
     TestabilitySettings testabilitySettings = ctx.testabilitySettings();
     var book = new Book();
     book.setNotebook(ctx.notebook());
     book.setBookName(BookService.trimmedMax(request.getBookName(), 512));
     book.setFormat(format);
-    book.setSourceFileRef(ctx.sourceFileRef());
     var now = testabilitySettings.getCurrentUTCTimestamp();
     book.setCreatedAt(now);
     book.setUpdatedAt(now);
@@ -134,7 +133,7 @@ final class AttachBookPersistence {
   }
 
   private static void persistContentBlocks(
-      BookService.PersistContext ctx, BookBlock block, List<Map<String, Object>> cbs) {
+      AttachBookService.PersistContext ctx, BookBlock block, List<Map<String, Object>> cbs) {
     EntityPersister entityPersister = ctx.entityPersister();
     ObjectMapper objectMapper = ctx.objectMapper();
     for (int i = 0; i < cbs.size(); i++) {

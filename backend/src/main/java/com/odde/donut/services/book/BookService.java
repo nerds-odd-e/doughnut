@@ -1,10 +1,6 @@
 package com.odde.donut.services.book;
 
-import static com.odde.donut.services.book.BookReadingWireConstants.BOOK_FORMAT_EPUB;
-import static com.odde.donut.services.book.BookReadingWireConstants.BOOK_FORMAT_PDF;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.odde.donut.controllers.dto.ApiError;
 import com.odde.donut.controllers.dto.AttachBookRequest;
 import com.odde.donut.controllers.dto.BookBlockReadingRecordListItem;
 import com.odde.donut.controllers.dto.BookLastReadPositionRequest;
@@ -19,11 +15,12 @@ import com.odde.donut.entities.repositories.BookBlockRepository;
 import com.odde.donut.entities.repositories.BookContentBlockRepository;
 import com.odde.donut.entities.repositories.BookRepository;
 import com.odde.donut.entities.repositories.BookUserLastReadPositionRepository;
-import com.odde.donut.exceptions.ApiException;
+import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.donut.factoryServices.EntityPersister;
 import com.odde.donut.services.GlobalSettingsService;
 import com.odde.donut.services.openAiApis.OpenAiApiHandler;
 import com.odde.donut.testability.TestabilitySettings;
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.http.CacheControl;
@@ -38,24 +35,14 @@ public class BookService {
 
   public record CancelBlockResult(Book book, int predecessorBlockId) {}
 
-  public record PersistContext(
-      Notebook notebook,
-      AttachBookRequest request,
-      String sourceFileRef,
-      byte[] fileBytes,
-      EntityPersister entityPersister,
-      ObjectMapper objectMapper,
-      TestabilitySettings testabilitySettings) {}
-
   private final BookRepository bookRepository;
   private final BookUserLastReadPositionRepository bookUserLastReadPositionRepository;
-  private final BookStorage bookStorage;
   private final EntityPersister entityPersister;
-  private final TestabilitySettings testabilitySettings;
-  private final ObjectMapper objectMapper;
   private final BookLayoutReorganizer layoutReorganizer;
   private final BookReadingProgress readingProgress;
   private final BookOutlineEditor outlineEditor;
+  private final BookSourceFile bookSourceFile;
+  private final AttachBookService attachBookService;
 
   public BookService(
       BookRepository bookRepository,
@@ -65,16 +52,16 @@ public class BookService {
       BookBlockReadingRecordRepository bookBlockReadingRecordRepository,
       EntityPersister entityPersister,
       TestabilitySettings testabilitySettings,
-      BookStorage bookStorage,
       ObjectMapper objectMapper,
       OpenAiApiHandler openAiApiHandler,
-      GlobalSettingsService globalSettingsService) {
+      GlobalSettingsService globalSettingsService,
+      BookSourceFile bookSourceFile,
+      AttachBookService attachBookService) {
+    this.bookSourceFile = bookSourceFile;
+    this.attachBookService = attachBookService;
     this.bookRepository = bookRepository;
     this.bookUserLastReadPositionRepository = bookUserLastReadPositionRepository;
-    this.bookStorage = bookStorage;
     this.entityPersister = entityPersister;
-    this.testabilitySettings = testabilitySettings;
-    this.objectMapper = objectMapper;
     this.layoutReorganizer =
         new BookLayoutReorganizer(
             objectMapper, openAiApiHandler, globalSettingsService, entityPersister);
@@ -91,27 +78,9 @@ public class BookService {
             bookContentBlockRepository, entityPersister, testabilitySettings, objectMapper);
   }
 
-  @Transactional
-  public Book attachBook(Notebook notebook, AttachBookRequest request, byte[] fileBytes) {
-    validateAttachRequest(request);
-    assertNotebookHasNoBook(notebook);
-    if (BOOK_FORMAT_EPUB.equals(request.getFormat())) {
-      EpubAttachValidator.validateAttachableEpub(fileBytes);
-    }
-    String ref = bookStorage.put(fileBytes, request.getFormat());
-    var ctx =
-        new PersistContext(
-            notebook, request, ref, fileBytes, entityPersister, objectMapper, testabilitySettings);
-    return BookFormat.fromString(request.getFormat()).persistNewBook(ctx);
-  }
-
-  private void assertNotebookHasNoBook(Notebook notebook) {
-    if (bookRepository.findByNotebook_Id(notebook.getId()).isPresent()) {
-      throw new ApiException(
-          "This notebook already has a book attached",
-          ApiError.ErrorType.RESOURCE_CONFLICT,
-          "This notebook already has a book attached");
-    }
+  public Book attachBook(Notebook notebook, AttachBookRequest request, byte[] fileBytes)
+      throws IOException, UnexpectedNoAccessRightException {
+    return attachBookService.attach(notebook, request, fileBytes);
   }
 
   @Transactional(readOnly = true)
@@ -192,10 +161,8 @@ public class BookService {
             .findByNotebook_Id(notebook.getId())
             .orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Resource not found"));
-    String ref = book.getSourceFileRef();
     bookUserLastReadPositionRepository.deleteByBook_Id(book.getId());
     bookRepository.delete(book);
-    bookStorage.delete(ref);
   }
 
   @Transactional(readOnly = true)
@@ -205,22 +172,11 @@ public class BookService {
 
   @Transactional(readOnly = true)
   public NotebookBookFile notebookBookFileFromBook(Book book) {
-    return NotebookBookFile.fromBook(book, bookStorage);
+    return bookSourceFile.read(book);
   }
 
   public ResponseEntity<byte[]> streamBookFile(NotebookBookFile file, CacheControl cacheControl) {
     return file.stream(cacheControl);
-  }
-
-  private void validateAttachRequest(AttachBookRequest request) {
-    String format = request.getFormat();
-    if (!BOOK_FORMAT_PDF.equals(format) && !BOOK_FORMAT_EPUB.equals(format)) {
-      throw new ApiException(
-          "format must be \"pdf\" or \"epub\"",
-          ApiError.ErrorType.BINDING_ERROR,
-          "format must be \"pdf\" or \"epub\"");
-    }
-    BookFormat.fromString(format).validateAttachRequest(request);
   }
 
   static String trimmedMax(String s, int max) {

@@ -46,13 +46,25 @@ public class Book extends EntityIdentifiedByIdOnly {
   @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
   private String format;
 
-  @Column(name = "source_file_ref", nullable = false, length = 1024)
+  @Column(name = "source_file_ref", length = 1024)
   @Setter
   private String sourceFileRef;
 
   @JsonIgnore
   public String getSourceFileRef() {
     return sourceFileRef;
+  }
+
+  /**
+   * Notebook-root path of the attachment this Book reads from; null while it reads the old store.
+   */
+  @Column(name = "source_file_path", length = 1024)
+  @Setter
+  private String sourceFilePath;
+
+  @JsonIgnore
+  public String getSourceFilePath() {
+    return sourceFilePath;
   }
 
   @Column(name = "created_at", nullable = false)

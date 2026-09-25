@@ -10,8 +10,6 @@ and deletable in Web Donut.
 
 ## Taken
 
-- [Keep a Book's source file as an ordinary notebook file](seeds/SEED-035-ai-workspace-supporting-files.md#story-17) — SEED-035#story-17 ([plan](quick/034-book-source-as-notebook-file/PLAN.md))
-
 ## Backlog list
 
 - [Remove the legacy picture storage](seeds/SEED-035-ai-workspace-supporting-files.md#story-18) — SEED-035#story-18
