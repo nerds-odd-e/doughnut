@@ -12,8 +12,8 @@ and deletable in Web Donut.
 
 ## Backlog list
 
-- [Move each notebook's own legacy pictures beside its notes](seeds/SEED-035-ai-workspace-supporting-files.md#story-22) — SEED-035#story-22
 - [Remove the legacy picture storage](seeds/SEED-035-ai-workspace-supporting-files.md#story-18) — SEED-035#story-18
+- [Make startup moves report their failures readably in production](seeds/SEED-035-ai-workspace-supporting-files.md#story-22) — SEED-035#story-22
 - [Remove the separate Book storage](seeds/SEED-035-ai-workspace-supporting-files.md#story-21) — SEED-035#story-21
 - [Delete unwanted supporting files from Web Donut](seeds/SEED-035-ai-workspace-supporting-files.md#story-2) — SEED-035#story-2
 - [Dissolve and merge folders that contain files](seeds/SEED-035-ai-workspace-supporting-files.md#story-11) — SEED-035#story-11
