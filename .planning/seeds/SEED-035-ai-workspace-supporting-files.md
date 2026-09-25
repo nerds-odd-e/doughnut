@@ -95,64 +95,6 @@ dissolve/merge and cross-notebook operations that the delivered behavior
 refuses for now. The [product backlog](../PRODUCT-BACKLOG.md) owns global order.
 No executable plan or implementation is authorized by this seed.
 
-<a id="story-19"></a>
-
-### Remove the legacy raw file storage
-```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../quick/029-remove-raw-file-storage/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"8540ff502bdff2da0d7d495e8c2bdfebd84f29af1ab79035694033e7a68c8ef0","plan":"356d4251bd2d303c41989deebcf158db1c628a59dbc6f28e51abfb7e15f3b01c"}}
-```
-
-- **Identity:** SEED-035#story-19
-- **Goal:** Maintainers keep one file representation in code. Once production
-  has no raw binding, no code asks how a notebook stores its files. This is
-  maintainer value only, so it follows the user-visible picture work
-  (story 4).
-- **Scope (refined 2026-09-24, owner accepted):**
-  - The size check on publish, the file reader, and the publisher have a
-    single LFS path. The `RAW` value, the entity default and the
-    `attachment_representation` column go, over two releases (db-migration
-    release safety: migrations run after the new instance serves). The first
-    release removes the raw code and stops mapping the column; its migration
-    refuses while any raw binding remains, otherwise it makes the column
-    default `LFS`. The next release drops the column. The check is a plain
-    part of that migration, not a gate left behind.
-  - Delete story 14's startup conversion (`NotebookGitLfsConversionService`,
-    the `NotebookGitLfsConversionOnStartup` trigger, and their tests); it
-    exists only for raw notebooks. With it go the
-    `convert_raw_notebook_to_lfs_for_testability` endpoint (generated client,
-    E2E step, page object and scenario), the repository query
-    `findNotebookIdsByAttachmentRepresentation`, and the `@Order` on
-    `FlyWayFreeVersionRealMigration` that only orders it after migration.
-    Delete the raw demotion endpoint, its E2E step and the raw backend fixture.
-  - Keep: raw blobs already in accepted history, from before a notebook's
-    conversion, stay valid. Cloning or pulling full history still works and an
-    old commit still reads its raw bytes. The publish checks that walk
-    history (server size admission and the CLI's LFS selection) keep accepting
-    them. The removal is of raw *bindings*, not of raw history.
-  - Confirmation: this ships in a release after the one that ran story 14's
-    conversion in production (`v1.3.23`). Before deploying the raw-free code,
-    check production for `RAW` bindings and defer the release until none remain.
-    The refusing migration rechecks during deployment: if a raw binding appears,
-    the deploy fails loudly (ADR 0006) without changing the column. This matters
-    because that migration runs after the new instance becomes ready.
-- **Key examples:**
-  1. No raw binding in production → both deploys succeed and the column is
-     gone. Publishing a picture to any notebook uses the LFS size check, and
-     the web download reads through the pointer.
-  2. One raw binding remains at the pre-deploy check → defer the raw-free
-     release. If one remains at migration time, the migration fails, naming
-     the notebook ids, with nothing dropped.
-  3. A converted notebook whose history holds raw `physics/diagram.png` from
-     before the conversion: a fresh clone succeeds, the old commit still has
-     the raw bytes, and publishing a new picture is accepted.
-- **Deferred promises:** Legacy picture, `attachment_blob` and Book storage
-  (story 18); shrinking bundles; rewriting history.
-- **Depends on:** Story 14 released and its conversion run in production;
-  story 20, so no test needs raw notebooks.
-- **Effort hypothesis:** S–M, medium confidence now that the fixture move is
-  story 20.
-- **Safe stopping point:** Until it runs, the unused raw paths remain harmless.
-
 <a id="story-5"></a>
 
 ### Move existing uploaded note pictures into their notebooks
@@ -351,8 +293,6 @@ avoids a chicken-and-egg problem is:
 1. Story 14: every notebook converted to LFS, and no path creates a raw one;
    then story 20 moves the tests to LFS notebooks.
 2. Story 4: new uploads become files, so the set of legacy pictures stops growing.
-   Story 19 removes the raw representation after production confirms none is
-   left; it gives maintainer value only, so it follows story 4.
 3. Story 5: move existing pictures.
 4. Story 17: Book files.
 5. Story 18: remove the legacy stores, after production verification.

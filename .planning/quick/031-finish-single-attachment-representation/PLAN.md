@@ -9,8 +9,9 @@
 
 - Kind: bounded retrospective correction; no seed.
 - Corrects the execution of SEED-035#story-19 ("Remove the legacy raw file
-  storage"), plan `.planning/quick/029-remove-raw-file-storage/PLAN.md`
-  (the story and plan stay recoverable from Git once wrapped up). Reviewed
+  storage"), plan `.planning/quick/029-remove-raw-file-storage/PLAN.md` and
+  story section `.planning/seeds/SEED-035-ai-workspace-supporting-files.md#story-19`,
+  both recoverable at commit `88b9ebd387`. Reviewed
   commits on `story/remove-raw-file-storage`: `0284ea7f52`, `0d84006f7d`,
   `9ad0b9bf9f`, `e9cbbc6547`, `6b9c39cb3d`, `aba0dc2509`.
 - Governing direction: North Star

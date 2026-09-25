@@ -10,8 +10,6 @@ and deletable in Web Donut.
 
 ## Taken
 
-- [Remove the legacy raw file storage](seeds/SEED-035-ai-workspace-supporting-files.md#story-19) — SEED-035#story-19 ([plan](quick/029-remove-raw-file-storage/PLAN.md))
-
 ## Backlog list
 
 - [Finish the single attachment representation](quick/031-finish-single-attachment-representation/PLAN.md)
