@@ -164,6 +164,9 @@ Former local code: DD-107.
 - Execution: SEED-035 story 19 / quick/029-remove-raw-file-storage / 0284ea7f52; Timestamp: 2026-09-25T09:21+08:00 (slice 1 delivery); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.38.
   - Evidence: slice 1 receipt `observation.reason` "host session identity is required to verify the notification bridge" (background Claude Code job, Story Branch Mode); recovered by `ci-mailbox.mjs probe` (`CI_MONITOR_READY`) and re-running `deliver` for the accepted SHA with `--session-json '{"session_id":…}'`, which reported `observation.state: attached`.
   - Observed effect: two extra calls; a simpler recovery than `start` plus `register-push`, still discovered only by reading the receipt.
+- Execution: SEED-035 story 5 / quick/033-move-legacy-note-pictures / 4dad58408f; Timestamp: 2026-09-25, ~14:23+08:00 (slice 1 delivery; commit 14:23:10+08:00); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.38.
+  - Evidence: slice 1 receipt `observation.reason` "host session identity is required to verify the notification bridge" (background Claude Code job, Story Branch Mode, bridge probe already `CI_MONITOR_READY`); a re-run passing the original base was refused ("rebase left the pre-rebase SHA as the candidate"); a re-run with the accepted SHA as base and `--session-json` from `CLAUDE_CODE_SESSION_ID` reported `observation.state: reused`.
+  - Observed effect: three extra calls (one refused) plus a `grep` of the delivery scripts to learn the flag's shape; later deliveries passing `--session-json` reported `reused`.
 
 ## ODF-099 — Queued startup receipt embeds the whole Git index and overflows the coordinator's tool output
 
@@ -192,6 +195,9 @@ Former local code: DD-108.
 
 - Execution: SEED-035 story 19 / quick/029-remove-raw-file-storage / 0284ea7f52; Timestamp: 2026-09-25T09:02+08:00 (queued startup; Take commit 09:01:48+08:00); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.38.
   - Evidence: startup call output "Output too large (817.8KB)"; `beforeMaintenance.index` holds the full index listing.
+  - Observed effect: an extra `node` call was needed to read `afterMaintenance` and `projectSetupRequired`.
+- Execution: SEED-035 story 5 / quick/033-move-legacy-note-pictures / 4dad58408f; Timestamp: 2026-09-25, ~14:19+08:00 (queued startup, Take commit 269a569079); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.38.
+  - Evidence: startup call output "Output too large (816.6KB)"; `beforeMaintenance.index` holds the full index listing.
   - Observed effect: an extra `node` call was needed to read `afterMaintenance` and `projectSetupRequired`.
 
 ## ODF-110 — A readiness replay observed only the plan's named seam, not the rest of the slice's journey

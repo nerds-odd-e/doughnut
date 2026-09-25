@@ -1,14 +1,23 @@
 package com.odde.donut.testability;
 
+import com.odde.donut.algorithms.NoteContentMarkdown;
+import com.odde.donut.entities.AttachmentBlob;
 import com.odde.donut.entities.DisplayName;
+import com.odde.donut.entities.Image;
+import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.NotebookAttachment;
+import com.odde.donut.entities.repositories.NoteRepository;
 import com.odde.donut.entities.repositories.NotebookAttachmentRepository;
 import com.odde.donut.entities.repositories.NotebookRepository;
+import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
+import com.odde.donut.factoryServices.EntityPersister;
 import com.odde.donut.services.notebookAttachment.NotebookAttachmentContent;
+import com.odde.donut.services.notebookGit.LegacyNotePictureMove;
 import com.odde.donut.services.notebookGit.NotebookGitCutoverService;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.io.IOException;
+import java.net.URLConnection;
 import java.util.Base64;
 import lombok.Getter;
 import lombok.Setter;
@@ -32,6 +41,9 @@ class NotebookGitTestabilityController {
   @Autowired NotebookGitCutoverService notebookGitCutoverService;
   @Autowired InjectNotesWorker injectNotesWorker;
   @Autowired NotebookAttachmentContent notebookAttachmentContent;
+  @Autowired NoteRepository noteRepository;
+  @Autowired EntityPersister entityPersister;
+  @Autowired LegacyNotePictureMove legacyNotePictureMove;
 
   @Schema(name = "NotebookNameRequest")
   @Getter
@@ -53,6 +65,24 @@ class NotebookGitTestabilityController {
     private String path;
 
     /** The file's exact bytes, base64-encoded. */
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
+    private String contentBase64;
+  }
+
+  @Schema(name = "SeedLegacyNotePictureRequest")
+  @Getter
+  @Setter
+  static class SeedLegacyNotePictureRequest {
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
+    private String notebookName;
+
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
+    private String noteTitle;
+
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
+    private String filename;
+
+    /** The picture's exact bytes, base64-encoded. */
     @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
     private String contentBase64;
   }
@@ -102,6 +132,51 @@ class NotebookGitTestabilityController {
     notebookAttachmentRepository.save(attachment);
     notebookGitCutoverService.resetHistory(
         notebook, testabilitySettings.getCurrentUTCTimestamp().toInstant());
+    return "OK";
+  }
+
+  /**
+   * Testability-only: gives a note a picture uploaded the legacy way (an {@code image} row holding
+   * the bytes) and points the note's {@code image:} at its legacy address, then resnapshots the
+   * accepted Git binding.
+   */
+  @PostMapping("/seed_legacy_note_picture_for_testability")
+  @Transactional
+  public String seedLegacyNotePictureForTestability(
+      @RequestBody SeedLegacyNotePictureRequest request) {
+    Note note =
+        noteRepository
+            .findByNotebookNameAndNoteTitleOrderByIdAsc(
+                request.getNotebookName(), request.getNoteTitle())
+            .getFirst();
+    Notebook notebook = note.getNotebook();
+    AttachmentBlob blob = new AttachmentBlob();
+    blob.setData(Base64.getDecoder().decode(request.getContentBase64()));
+    Image image = new Image();
+    image.setNote(note);
+    image.setUser(notebook.getCreator());
+    image.setName(request.getFilename());
+    image.setContentType(URLConnection.guessContentTypeFromName(request.getFilename()));
+    image.setBlob(blob);
+    entityPersister.save(image);
+    note.setContent(
+        NoteContentMarkdown.withNoteImage(
+            note.getContent(),
+            "/attachments/images/" + image.getId() + "/" + request.getFilename()));
+    entityPersister.save(note);
+    notebookGitCutoverService.resetHistory(
+        notebook, testabilitySettings.getCurrentUTCTimestamp().toInstant());
+    return "OK";
+  }
+
+  /**
+   * Testability-only: runs the startup move of legacy note pictures for one notebook (the E2E
+   * backend starts before any legacy picture is seeded, so its own startup move finds nothing).
+   */
+  @PostMapping("/move_legacy_note_pictures_for_testability")
+  public String moveLegacyNotePicturesForTestability(@RequestBody NotebookNameRequest request)
+      throws IOException, UnexpectedNoAccessRightException {
+    legacyNotePictureMove.move(requireNotebook(request.getNotebookName()).getId());
     return "OK";
   }
 

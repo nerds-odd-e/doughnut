@@ -52,6 +52,29 @@ export const notebookGitTestabilityMethods = {
     )
   },
 
+  /** Gives a note a picture uploaded the legacy way and points its `image:` at the legacy address. */
+  seedLegacyNotePictureForTestability(
+    notebookName: string,
+    noteTitle: string,
+    filename: string,
+    contentBase64: string
+  ) {
+    return cy.then(() =>
+      NotebookGitTestabilityController.seedLegacyNotePictureForTestability({
+        body: { notebookName, noteTitle, filename, contentBase64 },
+      })
+    )
+  },
+
+  /** Runs the startup move of legacy note pictures for one notebook. */
+  moveLegacyNotePicturesForTestability(notebookName: string) {
+    return cy.then(() =>
+      NotebookGitTestabilityController.moveLegacyNotePicturesForTestability({
+        body: { notebookName },
+      })
+    )
+  },
+
   /**
    * Stores an accepted LFS file at the notebook root, keeping the notebook's accepted Git
    * metadata, and yields its tip oid. An obsolete payload, when given, is stored first as an unreferenced LFS object.

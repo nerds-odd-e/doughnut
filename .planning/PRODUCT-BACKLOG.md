@@ -10,8 +10,6 @@ and deletable in Web Donut.
 
 ## Taken
 
-- [Move existing uploaded note pictures into their notebooks](seeds/SEED-035-ai-workspace-supporting-files.md#story-5) — SEED-035#story-5 ([plan](quick/033-move-legacy-note-pictures/PLAN.md))
-
 ## Backlog list
 
 - [Keep a Book's source file as an ordinary notebook file](seeds/SEED-035-ai-workspace-supporting-files.md#story-17) — SEED-035#story-17

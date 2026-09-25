@@ -19,8 +19,13 @@ import com.odde.donut.entities.NotebookGitBinding;
 import com.odde.donut.entities.repositories.MemoryTrackerRepository;
 import com.odde.donut.entities.repositories.NotebookAttachmentRepository;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
+import com.odde.donut.services.notebookAttachment.VerifiedNotebookAttachmentBytes;
+import com.odde.donut.services.notebookGit.NotebookGitLfsPointer;
 import com.odde.donut.services.notebookGit.NotebookGitTreeContent;
+import com.odde.donut.services.notebookTree.PortableTreeEntry;
+import com.odde.donut.testability.GitBundleTestReader.AcceptedHistory;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 import org.eclipse.jgit.lib.ObjectId;
@@ -152,5 +157,32 @@ abstract class NotebookGitWebContentControllerTestBase extends NotebookGitContro
                 .setParameter("id", trackerId)
                 .getSingleResult())
         .longValue();
+  }
+
+  /** The pointer for {@code bytes}, after checking the content store holds them exactly. */
+  byte[] lfsPointerStoredFor(Notebook notebook, byte[] bytes) {
+    String digest = VerifiedNotebookAttachmentBytes.sha256Hex(bytes);
+    assertThat(
+        notebookAttachmentContent.get(notebook.getId(), digest).orElseThrow(), equalTo(bytes));
+    return NotebookGitLfsPointer.format(digest, bytes.length);
+  }
+
+  static byte[] tipContent(AcceptedHistory history, String path) {
+    return history.content().stream()
+        .filter(entry -> entry.path().equals(path))
+        .map(PortableTreeEntry::content)
+        .findFirst()
+        .orElseThrow(() -> new AssertionError(path + " not in " + history.tipPaths()));
+  }
+
+  static String tipText(AcceptedHistory history, String path) {
+    return new String(tipContent(history, path), StandardCharsets.UTF_8);
+  }
+
+  long legacyImageCount(Note note) {
+    return entityManager
+        .createQuery("SELECT COUNT(i) FROM Image i WHERE i.note.id = :noteId", Long.class)
+        .setParameter("noteId", note.getId())
+        .getSingleResult();
   }
 }

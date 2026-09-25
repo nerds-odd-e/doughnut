@@ -17,6 +17,11 @@ public class ImageBuilder extends EntityBuilder<Image> {
     return this;
   }
 
+  public ImageBuilder named(String name) {
+    entity.setName(name);
+    return this;
+  }
+
   public ImageBuilder by(User user) {
     entity.setUser(user);
     return this;

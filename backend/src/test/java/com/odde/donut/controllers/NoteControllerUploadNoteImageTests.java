@@ -13,11 +13,8 @@ import com.odde.donut.entities.Notebook;
 import com.odde.donut.exceptions.ApiException;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.donut.services.notebookAttachment.VerifiedNotebookAttachmentBytes;
-import com.odde.donut.services.notebookGit.NotebookGitLfsPointer;
-import com.odde.donut.services.notebookTree.PortableTreeEntry;
 import com.odde.donut.testability.GitBundleTestReader.AcceptedHistory;
 import jakarta.validation.Validation;
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
@@ -42,7 +39,8 @@ class NoteControllerUploadNoteImageTests extends NotebookGitWebContentController
     AcceptedHistory after = acceptedHistory(notebook);
     assertThat(after.parents(), equalTo(commitsBefore));
     assertThat(
-        tipContent(after, "physics/my.png"), equalTo(lfsPointerStoredFor(notebook, picture)));
+        tipContent(after, "physics/my.png"),
+        equalTo(lfsPointerStoredFor(notebook, picture.getBytes())));
     assertThat(
         tipText(after, "physics/Moon.md"),
         equalTo("---\ntype: Note\nimage: my.png\n---\naccepted content"));
@@ -64,7 +62,8 @@ class NoteControllerUploadNoteImageTests extends NotebookGitWebContentController
     assertThat(realm.getNote().getContent(), equalTo(prepared));
     AcceptedHistory after = acceptedHistory(notebook);
     assertThat(after.parents(), equalTo(commitsBefore));
-    assertThat(tipContent(after, "my.png"), equalTo(lfsPointerStoredFor(notebook, picture)));
+    assertThat(
+        tipContent(after, "my.png"), equalTo(lfsPointerStoredFor(notebook, picture.getBytes())));
     assertThat(tipText(after, "Moon.md"), equalTo(prepared));
   }
 
@@ -197,33 +196,5 @@ class NoteControllerUploadNoteImageTests extends NotebookGitWebContentController
     NoteImageUploadDTO dto = new NoteImageUploadDTO();
     dto.setUploadImage(picture);
     return noteController.uploadNoteImage(noteRepository.findById(note.getId()).orElseThrow(), dto);
-  }
-
-  /** The pointer for {@code picture}, after checking the content store holds its exact bytes. */
-  private byte[] lfsPointerStoredFor(Notebook notebook, MultipartFile picture) throws Exception {
-    byte[] bytes = picture.getBytes();
-    String digest = VerifiedNotebookAttachmentBytes.sha256Hex(bytes);
-    assertThat(
-        notebookAttachmentContent.get(notebook.getId(), digest).orElseThrow(), equalTo(bytes));
-    return NotebookGitLfsPointer.format(digest, bytes.length);
-  }
-
-  private static byte[] tipContent(AcceptedHistory history, String path) {
-    return history.content().stream()
-        .filter(entry -> entry.path().equals(path))
-        .map(PortableTreeEntry::content)
-        .findFirst()
-        .orElseThrow(() -> new AssertionError(path + " not in " + history.tipPaths()));
-  }
-
-  private static String tipText(AcceptedHistory history, String path) {
-    return new String(tipContent(history, path), StandardCharsets.UTF_8);
-  }
-
-  private long legacyImageCount(Note note) {
-    return entityManager
-        .createQuery("SELECT COUNT(i) FROM Image i WHERE i.note.id = :noteId", Long.class)
-        .setParameter("noteId", note.getId())
-        .getSingleResult();
   }
 }

@@ -95,99 +95,6 @@ dissolve/merge and cross-notebook operations that the delivered behavior
 refuses for now. The [product backlog](../PRODUCT-BACKLOG.md) owns global order.
 No executable plan or implementation is authorized by this seed.
 
-<a id="story-5"></a>
-
-### Move existing uploaded note pictures into their notebooks
-```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../quick/033-move-legacy-note-pictures/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"65fc87ce405bdd382d2ee0c5e50dd6b30f2475ea4c42b7af801bc19f88faabf2","plan":"1d227b2c5363c8b25cea9f8a31fd2e1e62b7f7ef35d5dfbf9bfcb86f34dc0cf9"}}
-```
-
-- **Identity:** SEED-035#story-5
-- **Goal:** Owners who work on a notebook in a local checkout see the pictures
-  they uploaded before web uploads became files, without downloading and
-  reattaching each one. The main driver is the North Star's one byte store:
-  once every referenced picture is a notebook file, the picture half of the
-  legacy storage can be removed (story 18). The owner value is a hypothesis;
-  no production counts were supplied.
-- **Current state:** An uploaded picture from before story 4 is an `image`
-  row owned by one note, with its bytes in MySQL (`attachment_blob`). The note
-  refers to it only through frontmatter `image: /attachments/images/{id}/{name}`,
-  optionally with `image_mask:` rectangles. Export writes no bytes for it, so it
-  is a broken server path in a local checkout. No code creates `image` rows
-  since story 4, so the set is final.
-- **Scope (owner decisions 2026-09-24 and 2026-09-25):**
-  - A one-time move Donut runs by itself for every notebook, following the
-    precedent of story 14's startup conversion: no owner action, button, or
-    progress display.
-  - A note is moved when its `image:` is `/attachments/images/{id}/…` and row
-    `{id}` belongs to a note in the same notebook, whether that is the note
-    itself or another note. Trashed notes are moved like any other: trash is
-    an ordinary folder.
-  - The move stores the picture bytes as a verified LFS object in the
-    notebook's content store, then accepts, in one Donut System commit per
-    notebook, a file in each moved note's folder and that note's `image:`
-    rewritten to the file name. `image_mask:` and the rest of the note are
-    unchanged.
-  - The file takes the row's stored name when it is a plain filename that
-    nothing in the folder uses; otherwise Donut takes a free name derived from
-    it (North Star: Donut-chosen names never overwrite or refuse).
-  - Moved pictures are not held to the 10 MiB limit: the limit is for new
-    payloads, and this is existing content.
-  - Running the move again, after success or interruption, changes only notes
-    still holding a movable legacy value. A notebook whose move fails is
-    reported loudly and does not stop the others; its pictures keep
-    displaying from the legacy store.
-  - Recall state, memory trackers, and the note's last-updated time stay as
-    they were; the move is not an owner edit.
-  - The legacy `image` rows and bytes stay as the backup copy until story 18.
-- **Rejection constraint:** A note whose `image:` names a row owned by a note
-  in *another* notebook is left unchanged and counted in the move's report.
-  Copying would place bytes from one notebook, possibly private, into another
-  notebook's history (owner decision 2026-09-25).
-- **Deferred:** Unreferenced `image` rows (story 18 drops them with the
-  table). `image:` values whose row no longer exists (nothing to move). Legacy
-  addresses in note body text rather than `image:`. Remote URLs. Books (story
-  17). Any history rewrite.
-- **Key examples:**
-  1. Note "Tokyo Tower" in folder `travel/` has
-     `image: /attachments/images/7/tower.jpg` and `image_mask: 10 10 20 20`.
-     After the move, `travel/tower.jpg` is an LFS file with the original bytes,
-     the note has `image: tower.jpg` and the same mask, and the web shows the
-     same picture with the same mask. The owner runs `donut notebook pull` and
-     finds `travel/tower.jpg` beside the note, with those bytes. The notebook
-     gained one Donut System commit.
-  2. `travel/` already holds a file or note named `tower.jpg`: the picture
-     takes the next free name under the product's existing numbering rule,
-     such as `tower (2).jpg`, which `image:` names; the existing file is
-     untouched. A stored name that is not a plain filename
-     (empty, containing `/`, starting with `.`) also gets a Donut-chosen plain
-     name.
-  3. Notes "A" and "B" in the same notebook both refer to A's upload: each
-     note gets a file in its own folder naming the same bytes, stored once.
-  4. A note refers to an upload owned by a note in another notebook: the note
-     is unchanged and still displays the picture from the legacy store while
-     it remains.
-  5. The move runs a second time: no commit is added to any notebook. It was
-     interrupted after some notebooks: the rest move and the finished ones
-     are untouched.
-  6. A notebook with no legacy picture references gains no commit.
-  7. The owner has an unpublished local edit to the same note's frontmatter:
-     `donut notebook pull` reports an ordinary rebase conflict, which the owner
-     resolves as usual (accepted by the owner).
-- **Depends on:** Story 14 (every notebook uses LFS) and story 4 (no new
-  legacy pictures), both delivered. A moved `image:` uses the note-relative
-  spelling Web Donut already displays
-  ([attachment references](../../docs/notebook-git-attachments.md#classification-and-references)).
-- **Effort hypothesis:** L, low confidence until production counts are known.
-- **Safe stopping point:** Moved and not-yet-moved pictures both display; the
-  only copy of each picture is kept until its move is accepted.
-- **Legacy row cleanup:** Orphan cleanup
-  (`NoteService.deleteOrphanImagesForPersistedContent`) deletes a note's legacy
-  rows only when `image:` is blank or an `/attachments/images/...` path; a
-  note-relative value is classed `InvalidPathPresent` and skips cleanup. So
-  rewriting `image:` leaves the old row in place as the backup story 18
-  removes.
-
 <a id="story-17"></a>
 
 ### Keep a Book's source file as an ordinary notebook file
@@ -285,7 +192,7 @@ No executable plan or implementation is authorized by this seed.
   `attachment_blob` itself stays for the non-production Book storage until
   story 21. Split from the combined legacy-removal story (owner direction
   2026-09-25) so the picture half need not wait for Books.
-- **Depends on:** Story 5 delivered and verified in production.
+- **Depends on:** Story 5 (delivered) verified in production.
 - **Effort hypothesis:** S–M, medium confidence.
 - **Safe stopping point:** Until it runs, the legacy picture store is an unused
   leftover that still holds a backup copy.
