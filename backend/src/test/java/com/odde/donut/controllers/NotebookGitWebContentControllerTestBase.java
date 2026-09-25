@@ -178,11 +178,4 @@ abstract class NotebookGitWebContentControllerTestBase extends NotebookGitContro
   static String tipText(AcceptedHistory history, String path) {
     return new String(tipContent(history, path), StandardCharsets.UTF_8);
   }
-
-  long legacyImageCount(Note note) {
-    return entityManager
-        .createQuery("SELECT COUNT(i) FROM Image i WHERE i.note.id = :noteId", Long.class)
-        .setParameter("noteId", note.getId())
-        .getSingleResult();
-  }
 }

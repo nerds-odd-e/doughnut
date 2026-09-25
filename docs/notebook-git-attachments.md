@@ -73,11 +73,9 @@ is not a plain filename (empty, containing `/`, or starting with `.`), is
 refused with a message naming the path; nothing is renamed or overwritten. A notebook without an LFS binding refuses the
 upload.
 
-Legacy uploaded pictures (the `image` table, addressed as
-`/attachments/images/{id}/{fileName}`) were moved into their notebooks as files
-beside their notes, and the legacy store is retired: no new picture is stored
-there.
-
+Pictures uploaded before pictures became notebook files were moved into their
+notebooks as files beside their notes; their old table and
+`/attachments/images/...` address no longer exist.
 
 A Book's source file (PDF or EPUB) is an ordinary file at the notebook root.
 Attaching a Book on the web stores the bytes in the notebook's content store

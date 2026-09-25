@@ -155,10 +155,6 @@ public class MakeMe extends MakeMeWithoutDB {
     return new CircleBuilder(circle, this);
   }
 
-  public ImageBuilder anImage() {
-    return new ImageBuilder(new Image(), this);
-  }
-
   public SubscriptionBuilder aSubscription() {
     return new SubscriptionBuilder(this, new Subscription());
   }

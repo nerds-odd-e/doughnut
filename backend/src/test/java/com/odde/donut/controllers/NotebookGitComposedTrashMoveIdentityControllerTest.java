@@ -121,7 +121,6 @@ class NotebookGitComposedTrashMoveIdentityControllerTest
               .forMemoryTracker(memoryTrackerRepository.findById(tracker.getId()).orElseThrow())
               .withMcqForNote(reloaded)
               .please();
-          makeMe.anImage().forNote(reloaded).please();
           makeMe.aConversation().forANote(reloaded).please();
         });
     NotebookGitBinding binding = snapshotCurrentPortableTree(notebook);

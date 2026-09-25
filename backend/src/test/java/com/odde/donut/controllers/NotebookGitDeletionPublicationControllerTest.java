@@ -49,7 +49,7 @@ class NotebookGitDeletionPublicationControllerTest extends NotebookGitController
         makeMe.aNote().notebook(notebook).title("DeletedB").content(ORIGINAL_CONTENT).please();
     Note retained =
         makeMe.aNote().notebook(notebook).title("Retained").content(ORIGINAL_CONTENT).please();
-    // Learned shape for deletedA: memory_tracker + recall_prompt + mcq, plus image + conversation.
+    // Learned shape for deletedA: memory_tracker + recall_prompt + mcq, plus conversation.
     MemoryTracker deletedATracker = learnedTracker(deletedA, 7f);
     inCommittedTransaction(
         transactionManager,
@@ -61,22 +61,14 @@ class NotebookGitDeletionPublicationControllerTest extends NotebookGitController
               .withMcqForNote(noteRepository.findById(deletedA.getId()).orElseThrow())
               .please();
           makeMe
-              .anImage()
-              .forNote(noteRepository.findById(deletedA.getId()).orElseThrow())
-              .please();
-          makeMe
               .aConversation()
               .forANote(noteRepository.findById(deletedA.getId()).orElseThrow())
               .please();
         });
-    // Unlearned shape for deletedB: image + conversation, no memory_tracker.
+    // Unlearned shape for deletedB: conversation, no memory_tracker.
     inCommittedTransaction(
         transactionManager,
         () -> {
-          makeMe
-              .anImage()
-              .forNote(noteRepository.findById(deletedB.getId()).orElseThrow())
-              .please();
           makeMe
               .aConversation()
               .forANote(noteRepository.findById(deletedB.getId()).orElseThrow())
@@ -211,7 +203,6 @@ class NotebookGitDeletionPublicationControllerTest extends NotebookGitController
           assertThat(noteRepository.findById(note.getId()).isPresent(), equalTo(false));
           assertThat(countRowsByNoteId("memory_tracker", note.getId()), equalTo(0L));
           assertThat(countRowsByNoteId("mcq", note.getId()), equalTo(0L));
-          assertThat(countRowsByNoteId("image", note.getId()), equalTo(0L));
           assertThat(countRowsByNoteId("conversation", note.getId()), equalTo(0L));
           assertThat(countRecallPromptsByNoteId(note.getId()), equalTo(0L));
           if (tracker != null) {

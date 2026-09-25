@@ -104,7 +104,6 @@ class NotebookGitIdempotentPublishControllerTest extends NotebookGitWebContentCo
                   memoryTrackerRepository.findById(deletedTracker.getId()).orElseThrow())
               .withMcqForNote(noteRepository.findById(deleted.getId()).orElseThrow())
               .please();
-          makeMe.anImage().forNote(noteRepository.findById(deleted.getId()).orElseThrow()).please();
           makeMe
               .aConversation()
               .forANote(noteRepository.findById(deleted.getId()).orElseThrow())

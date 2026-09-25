@@ -50,7 +50,6 @@ abstract class NoteDependentRowsControllerTestBase extends NotebookControllerTes
         countRowsByNoteId("memory_tracker", note.getId()),
         countRecallPromptsByNoteId(note.getId()),
         countRowsByNoteId("mcq", note.getId()),
-        countRowsByNoteId("image", note.getId()),
         countRowsByNoteId("conversation", note.getId()),
         countConversationMessagesByNoteId(note.getId()));
   }
@@ -60,11 +59,10 @@ abstract class NoteDependentRowsControllerTestBase extends NotebookControllerTes
       long memoryTracker,
       long recallPrompt,
       long mcq,
-      long image,
       long conversation,
       long conversationMessage) {
     static DependentCounts allAbsent() {
-      return new DependentCounts(0, 0, 0, 0, 0, 0);
+      return new DependentCounts(0, 0, 0, 0, 0);
     }
   }
 }

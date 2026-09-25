@@ -7,7 +7,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import com.odde.donut.controllers.dto.NoteImageUploadDTO;
 import com.odde.donut.controllers.dto.NoteRealm;
 import com.odde.donut.entities.Folder;
-import com.odde.donut.entities.Image;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.exceptions.ApiException;
@@ -44,7 +43,6 @@ class NoteControllerUploadNoteImageTests extends NotebookGitWebContentController
     assertThat(
         tipText(after, "physics/Moon.md"),
         equalTo("---\ntype: Note\nimage: my.png\n---\naccepted content"));
-    assertThat(legacyImageCount(moon), equalTo(0L));
   }
 
   @Test
@@ -68,23 +66,22 @@ class NoteControllerUploadNoteImageTests extends NotebookGitWebContentController
   }
 
   @Test
-  void replacingALegacyPictureKeepsItsMaskAndItsRow() throws Exception {
+  void replacingAPictureKeepsItsMask() throws Exception {
     Notebook notebook = createGitBackedNotebook();
-    Note moon = makeMe.aNote("Moon").notebook(notebook).please();
-    Image legacy = makeMe.anImage().forNote(moon).by(currentUser.getUser()).please();
-    authorReferencingContentCommitted(
-        moon,
-        "---\nimage: /attachments/images/"
-            + legacy.getId()
-            + "/example.png\nimage_mask: 10 10 20 20\n---\nbody");
-    snapshotCurrentPortableTree(notebook);
+    Folder physics = makeMe.aFolder().notebook(notebook).name("physics").please();
+    Note moon =
+        makeMe
+            .aNote("Moon")
+            .folder(physics)
+            .content("---\nimage: earlier.png\nimage_mask: 10 10 20 20\n---\nbody")
+            .please();
+    storeFolderAttachmentAndSnapshot(notebook, physics, "earlier.png", "earlier".getBytes());
 
     upload(moon, makeMe.anUploadedImage().toMultiplePartFilePlease());
 
     assertThat(
-        tipText(acceptedHistory(notebook), "Moon.md"),
+        tipText(acceptedHistory(notebook), "physics/Moon.md"),
         equalTo("---\ntype: Note\nimage: my.png\nimage_mask: 10 10 20 20\n---\nbody"));
-    assertThat(legacyImageCount(moon), equalTo(1L));
   }
 
   @Test

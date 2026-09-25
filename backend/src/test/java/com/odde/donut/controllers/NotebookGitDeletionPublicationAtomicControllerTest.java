@@ -45,7 +45,7 @@ class NotebookGitDeletionPublicationAtomicControllerTest extends NotebookGitCont
         makeMe.aNote().notebook(notebook).title("DeletedB").content(ORIGINAL_CONTENT).please();
     Note retained =
         makeMe.aNote().notebook(notebook).title("Retained").content(ORIGINAL_CONTENT).please();
-    // Learned shape for deletedA: memory_tracker + recall_prompt + mcq + image + conversation.
+    // Learned shape for deletedA: memory_tracker + recall_prompt + mcq + conversation.
     MemoryTracker deletedATracker =
         inCommittedTransaction(
             transactionManager,
@@ -64,22 +64,14 @@ class NotebookGitDeletionPublicationAtomicControllerTest extends NotebookGitCont
               .withMcqForNote(noteRepository.findById(deletedA.getId()).orElseThrow())
               .please();
           makeMe
-              .anImage()
-              .forNote(noteRepository.findById(deletedA.getId()).orElseThrow())
-              .please();
-          makeMe
               .aConversation()
               .forANote(noteRepository.findById(deletedA.getId()).orElseThrow())
               .please();
         });
-    // Unlearned shape for deletedB: image + conversation, no memory_tracker.
+    // Unlearned shape for deletedB: conversation, no memory_tracker.
     inCommittedTransaction(
         transactionManager,
         () -> {
-          makeMe
-              .anImage()
-              .forNote(noteRepository.findById(deletedB.getId()).orElseThrow())
-              .please();
           makeMe
               .aConversation()
               .forANote(noteRepository.findById(deletedB.getId()).orElseThrow())
@@ -145,7 +137,7 @@ class NotebookGitDeletionPublicationAtomicControllerTest extends NotebookGitCont
           assertThat(
               reloadedTracker.getRemovedFromTracking(),
               equalTo(deletedATracker.getRemovedFromTracking()));
-          // The complete dependent closure (recall_prompt, mcq, image, conversation + messages)
+          // The complete dependent closure (recall_prompt, mcq, conversation + messages)
           // was CASCADE-deleted inside the publication transaction and restored by its rollback.
           assertThat(dependentCounts(deletedA), equalTo(deletedADependentsBefore));
           assertThat(dependentCounts(deletedB), equalTo(deletedBDependentsBefore));

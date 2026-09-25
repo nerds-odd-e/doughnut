@@ -35,7 +35,7 @@ class NotebookGitDeletionPublicationRetryControllerTest extends NotebookGitContr
     Note retained =
         makeMe.aNote().notebook(notebook).title("Retained").content(ORIGINAL_CONTENT).please();
     // Complete dependent fixture on the Target note: memory_tracker + recall_prompt + mcq +
-    // image + conversation, so the retry can prove the whole closure stays absent (no second
+    // conversation, so the retry can prove the whole closure stays absent (no second
     // deletion runs, nothing resurrects).
     MemoryTracker targetTracker =
         inCommittedTransaction(
@@ -54,7 +54,6 @@ class NotebookGitDeletionPublicationRetryControllerTest extends NotebookGitContr
                   memoryTrackerRepository.findById(targetTracker.getId()).orElseThrow())
               .withMcqForNote(noteRepository.findById(target.getId()).orElseThrow())
               .please();
-          makeMe.anImage().forNote(noteRepository.findById(target.getId()).orElseThrow()).please();
           makeMe
               .aConversation()
               .forANote(noteRepository.findById(target.getId()).orElseThrow())

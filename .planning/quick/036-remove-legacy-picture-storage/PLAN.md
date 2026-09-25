@@ -169,8 +169,17 @@ absolute path.
 
 ### 5. The legacy picture table is gone
 Type: Behavior
-Status: planned
-Proof: slice 5 rows above.
+Status: done
+Proof: slice 5 rows above. Accepted: `pnpm backend:test:worktree --tests
+'com.odde.donut.*'` — 2,615 tests, 0 failures (`NoteControllerUploadNoteImageTests`
+15, incl. `replacingAPictureKeepsItsMask`); worktree schema shows no `image`,
+`attachment_blob` present, Flyway at `300000346`; `pnpm cy:run --spec
+e2e_test/features/cli/cli_notebook_lfs.feature,e2e_test/features/note_view/note_frontmatter_image.feature`
+12/12 and 4/4; `pnpm frontend:test tests/notes/NoteShow.spec.ts` 11/11.
+`Attachment` (the mapped superclass of `Image` only) went too, and
+`NoteDependentRowsControllerTestBase.DependentCounts` lost its `image` count.
+Learning: dependent-row test helpers count tables by raw SQL name, so a
+dropped table breaks them only at runtime; grep table-name strings too.
 
 Behavior: after the migration, notes, their learning history, moved picture
 files and Books are unchanged; `image` no longer exists; `attachment_blob`

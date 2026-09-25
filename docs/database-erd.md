@@ -6,7 +6,6 @@ Entity-relationship view of the application database: foreign keys as relationsh
 erDiagram
     answer ||--o{ recall_log : "answer_id ON DELETE SET NULL"
     answer ||--o{ recall_prompt : "answer_id ON DELETE NO ACTION"
-    attachment_blob ||--o{ image : "attachment_blob_id ON DELETE CASCADE"
     authored_note_reference ||--o{ note_property_index : "authored_note_reference_id ON DELETE SET NULL"
     book ||--o{ book_block : "book_id ON DELETE CASCADE"
     book ||--o{ book_user_last_read_position : "book_id ON DELETE CASCADE"
@@ -26,7 +25,6 @@ erDiagram
     "note" ||--o{ assimilation_sequence_skip : "note_id ON DELETE CASCADE"
     "note" ||--o{ authored_note_reference : "source_note_id ON DELETE CASCADE"
     "note" ||--o{ conversation : "note_id ON DELETE CASCADE"
-    "note" ||--o{ image : "note_id ON DELETE CASCADE"
     "note" ||--o{ mcq : "note_id ON DELETE CASCADE"
     "note" ||--o{ memory_tracker : "note_id ON DELETE CASCADE"
     "note" ||--o{ note_alias_index : "note_id ON DELETE CASCADE"
@@ -55,7 +53,6 @@ erDiagram
     "user" ||--o{ conversation : "conversation_initiator_id ON DELETE NO ACTION"
     "user" ||--o{ conversation_message : "sender ON DELETE CASCADE"
     "user" ||--o{ daily_probe : "user_id ON DELETE CASCADE"
-    "user" ||--o{ image : "user_id ON DELETE CASCADE"
     "user" ||--o{ memory_tracker : "user_id ON DELETE CASCADE"
     "user" ||--o{ note_creator : "user_id ON DELETE CASCADE"
     "user" ||--o{ notebook : "creator_id ON DELETE CASCADE"
@@ -140,12 +137,6 @@ erDiagram
     }
     global_settings {
         int id PK
-    }
-    image {
-        int id PK
-        int user_id FK
-        int attachment_blob_id FK
-        int note_id FK
     }
     mcq {
         int id PK
