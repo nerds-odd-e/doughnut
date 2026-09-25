@@ -110,7 +110,9 @@ calling it with its own timestamp. Enables slice 2; no behavior change.
 
 ### 2. A notebook's own legacy pictures become files beside their notes
 Type: Behavior
-Status: planned
+Status: done — `LegacyNotePictureMove.move(notebookId)`; accepted proof:
+`LegacyNotePictureMoveControllerTest` (3: own picture moved in one Donut System
+commit, rerun adds no commit, notebook without legacy references gains none).
 Proof: new `LegacyNotePictureMoveControllerTest` (extends
 `NotebookGitWebContentControllerTestBase`): the slice 2 rows of the proof
 table.
@@ -197,3 +199,9 @@ an external wait.
 
 - Slice 2 calls `NoteImageFileAttachment.attach` (package `services.notebookGit`)
   inside its own `AcceptedWebChangeService.apply` mutation.
+- `assertAcceptedTreeMatchesTheFullAssembly` resets accepted history
+  (`snapshotCurrentPortableTree`), so "run again adds no commit" is its own test.
+- `ownLegacyPictures` reads `image.getNote().getNotebook()`; slice 4 must decide
+  the case of a legacy row without a note (treat as not in this notebook).
+- Shared test helpers (`lfsPointerStoredFor`, `tipContent`, `tipText`,
+  `legacyImageCount`) live in `NotebookGitWebContentControllerTestBase`.
