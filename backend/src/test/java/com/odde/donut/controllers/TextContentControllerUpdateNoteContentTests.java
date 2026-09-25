@@ -5,13 +5,9 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.notNullValue;
-import static org.hamcrest.Matchers.nullValue;
 
 import com.odde.donut.controllers.dto.NoteRealm;
 import com.odde.donut.controllers.dto.WikiLink;
-import com.odde.donut.entities.AttachmentBlob;
-import com.odde.donut.entities.Image;
 import com.odde.donut.entities.Note;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
 import jakarta.persistence.EntityManager;
@@ -97,54 +93,6 @@ class TextContentControllerUpdateNoteContentTests extends TextContentControllerT
 
     assertThat(response.getWikiLinks(), empty());
     assertThat(rowsFor(entityManager, carrier), empty());
-  }
-
-  @Test
-  void deletesOrphanImagesWhenContentReferencesSingleAttachmentPath()
-      throws UnexpectedNoAccessRightException {
-    Image kept = makeMe.anImage().forNote(note).please();
-    Image orphan = makeMe.anImage().forNote(note).please();
-    Image otherNoteImage = makeMe.anImage().forNote(makeMe.aNote().please()).please();
-
-    controller.updateNoteContent(
-        note,
-        contentDto(
-            "---\nimage: /attachments/images/"
-                + kept.getId()
-                + "/"
-                + kept.getName()
-                + "\n---\nbody"));
-
-    assertThat(entityManager.find(Image.class, kept.getId()), notNullValue());
-    assertThat(entityManager.find(Image.class, orphan.getId()), nullValue());
-    assertThat(entityManager.find(AttachmentBlob.class, orphan.getBlob().getId()), nullValue());
-    assertThat(entityManager.find(AttachmentBlob.class, kept.getBlob().getId()), notNullValue());
-    assertThat(entityManager.find(Image.class, otherNoteImage.getId()), notNullValue());
-  }
-
-  @Test
-  void deletesAllNoteImagesWhenFrontmatterHasNoImageScalar()
-      throws UnexpectedNoAccessRightException {
-    Image first = makeMe.anImage().forNote(note).please();
-    Image second = makeMe.anImage().forNote(note).please();
-
-    controller.updateNoteContent(note, contentDto("just markdown"));
-
-    assertThat(entityManager.find(Image.class, first.getId()), nullValue());
-    assertThat(entityManager.find(Image.class, second.getId()), nullValue());
-  }
-
-  @Test
-  void skipsOrphanCleanupWhenImageScalarIsNotCanonicalAttachmentPath()
-      throws UnexpectedNoAccessRightException {
-    Image first = makeMe.anImage().forNote(note).please();
-    Image second = makeMe.anImage().forNote(note).please();
-
-    controller.updateNoteContent(
-        note, contentDto("---\nimage: https://example.com/a.png\n---\nbody"));
-
-    assertThat(entityManager.find(Image.class, first.getId()), notNullValue());
-    assertThat(entityManager.find(Image.class, second.getId()), notNullValue());
   }
 
   @Test

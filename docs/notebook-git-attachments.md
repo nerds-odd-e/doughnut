@@ -76,9 +76,8 @@ upload.
 Legacy uploaded pictures (the `image` table, addressed as
 `/attachments/images/{id}/{fileName}`) were moved into their notebooks as files
 beside their notes, and the legacy store is retired: no new picture is stored
-there. Until its removal is finished, legacy orphan cleanup skips a
-note-relative `image:` value, and the remaining rows are still served inline
-under the notebook read rule (owners, subscribers, and Bazaar readers, even
+there. Until its removal is finished, the remaining rows are still served
+inline under the notebook read rule (owners, subscribers, and Bazaar readers, even
 logged out; another user is refused, and an anonymous request for a private
 notebook's image must log in).
 

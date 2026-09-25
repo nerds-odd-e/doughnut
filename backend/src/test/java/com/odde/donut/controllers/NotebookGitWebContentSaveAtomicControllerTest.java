@@ -6,12 +6,9 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.odde.donut.controllers.dto.NoteUpdateContentDTO;
-import com.odde.donut.entities.AttachmentBlob;
-import com.odde.donut.entities.Image;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.NotebookGitBinding;
@@ -29,7 +26,7 @@ import org.springframework.test.context.ActiveProfiles;
 
 /**
  * Verifies that a web note-content save failing after note projection, at the accepted binding
- * save, leaves the note, its references, its attachments and the accepted Git state unchanged.
+ * save, leaves the note, its references and the accepted Git state unchanged.
  */
 @ActiveProfiles({"test", "notebook-git-publication-atomic-test"})
 @Import(NotebookGitPublicationAtomicTestSupport.FailingBindingSaveConfig.class)
@@ -75,15 +72,6 @@ class NotebookGitWebContentSaveAtomicControllerTest extends NotebookGitControlle
         inCommittedTransaction(
             transactionManager,
             () -> noteRepository.findById(note.getId()).orElseThrow().getUpdatedAt());
-    Image orphan =
-        inCommittedTransaction(
-            transactionManager,
-            () ->
-                makeMe
-                    .anImage()
-                    .forNote(noteRepository.findById(note.getId()).orElseThrow())
-                    .please());
-
     triggerFailingContentUpdate(note, PROPOSED_CONTENT);
 
     inCommittedTransaction(
@@ -95,9 +83,6 @@ class NotebookGitWebContentSaveAtomicControllerTest extends NotebookGitControlle
           assertThat(reloadedNote.getContent(), is(ACCEPTED_CONTENT));
           assertThat(reloadedNote.getUpdatedAt(), is(noteUpdatedAt));
           assertThat(rowsFor(entityManager, reloadedNote), empty());
-          assertThat(entityManager.find(Image.class, orphan.getId()), notNullValue());
-          assertThat(
-              entityManager.find(AttachmentBlob.class, orphan.getBlob().getId()), notNullValue());
           assertThat(reloadedBinding.getAcceptedGitObjectId(), is(acceptedHead));
           assertThat(reloadedBinding.getUpdatedAt(), is(bindingUpdatedAt));
         });

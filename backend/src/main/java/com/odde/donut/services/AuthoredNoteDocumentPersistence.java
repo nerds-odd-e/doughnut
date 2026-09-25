@@ -10,15 +10,11 @@ import org.springframework.stereotype.Service;
 @Service
 public class AuthoredNoteDocumentPersistence {
   private final EntityPersister entityPersister;
-  private final NoteService noteService;
   private final NoteReferenceService noteReferenceService;
 
   public AuthoredNoteDocumentPersistence(
-      EntityPersister entityPersister,
-      NoteService noteService,
-      NoteReferenceService noteReferenceService) {
+      EntityPersister entityPersister, NoteReferenceService noteReferenceService) {
     this.entityPersister = entityPersister;
-    this.noteService = noteService;
     this.noteReferenceService = noteReferenceService;
   }
 
@@ -30,7 +26,6 @@ public class AuthoredNoteDocumentPersistence {
     // reference here throws EntityExistsException from a still-detached note (e.g. one loaded
     // via a Spring MVC @PathVariable converter outside this method's transaction).
     Note managed = entityPersister.save(note);
-    noteService.deleteOrphanImagesForPersistedContent(managed);
     noteReferenceService.refreshDerivedIndexesForNote(managed);
   }
 }

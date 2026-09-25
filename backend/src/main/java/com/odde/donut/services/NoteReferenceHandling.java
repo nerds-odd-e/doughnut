@@ -15,7 +15,6 @@ import java.sql.Timestamp;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.Consumer;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -33,21 +32,18 @@ final class NoteReferenceHandling {
   private final WikiLinkResolver wikiLinkResolver;
   private final AuthorizationService authorizationService;
   private final EntityPersister entityPersister;
-  private final Consumer<Note> deleteOrphanImages;
 
   NoteReferenceHandling(
       MemoryTrackerRepository memoryTrackerRepository,
       NoteReferenceService noteReferenceService,
       WikiLinkResolver wikiLinkResolver,
       AuthorizationService authorizationService,
-      EntityPersister entityPersister,
-      Consumer<Note> deleteOrphanImages) {
+      EntityPersister entityPersister) {
     this.memoryTrackerRepository = memoryTrackerRepository;
     this.noteReferenceService = noteReferenceService;
     this.wikiLinkResolver = wikiLinkResolver;
     this.authorizationService = authorizationService;
     this.entityPersister = entityPersister;
-    this.deleteOrphanImages = deleteOrphanImages;
   }
 
   /**
@@ -153,7 +149,6 @@ final class NoteReferenceHandling {
             markdown, wikiLinkResolver.canonicalDonutOrigin()));
     note.setUpdatedAt(updatedAt);
     entityPersister.merge(note);
-    deleteOrphanImages.accept(note);
     noteReferenceService.refreshDerivedIndexesForNote(note);
   }
 

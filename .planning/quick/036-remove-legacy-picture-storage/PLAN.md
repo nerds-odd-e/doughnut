@@ -123,8 +123,14 @@ store is retired.
 
 ### 3. Saving a note does no legacy picture work
 Type: Behavior
-Status: planned
-Proof: slice 3 row above.
+Status: done
+Proof: slice 3 row above. Accepted: `pnpm backend:test:worktree --tests
+'com.odde.donut.*'` — full backend suite 2,619 tests, 0 failures
+(`TextContentControllerUpdateNoteContentTests` 9,
+`NotebookGitWebContentSaveAtomicControllerTest` 2, `NoteContentMarkdownTest`
+10). `AuthoredNoteDocumentPersistence` and `NoteConstructionService` no longer
+depend on `NoteService`. The applied migration `V300000325` keeps a
+historical comment naming the removed method.
 
 Behavior: an owner saves a note, from the web or through publication → no
 `image` row is looked up or deleted.

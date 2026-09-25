@@ -1,15 +1,12 @@
 package com.odde.donut.services;
 
-import com.odde.donut.algorithms.NoteContentMarkdown;
 import com.odde.donut.controllers.dto.NoteTrashReferenceHandling;
-import com.odde.donut.entities.Image;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.User;
 import com.odde.donut.entities.repositories.MemoryTrackerRepository;
 import com.odde.donut.entities.repositories.NoteRepository;
 import com.odde.donut.factoryServices.EntityPersister;
 import com.odde.donut.testability.TestabilitySettings;
-import jakarta.persistence.FlushModeType;
 import java.sql.Timestamp;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -45,8 +42,7 @@ public class NoteService {
             noteReferenceService,
             wikiLinkResolver,
             authorizationService,
-            entityPersister,
-            this::deleteOrphanImagesForPersistedContent);
+            entityPersister);
   }
 
   public List<Note> findRecentNotesByUser(Integer userId) {
@@ -173,34 +169,5 @@ public class NoteService {
     if (referenceHandling == NoteTrashReferenceHandling.REMOVE_FROM_PROPERTIES) {
       noteReferenceHandling.removeNoteLinksFromReferrerProperties(note, viewer, updatedAt);
     }
-  }
-
-  /**
-   * Deletes {@link Image} rows for this note that are not referenced by the saved {@code image:}
-   * scalar in {@link Note#getContent()}, within the current transaction. Skips entirely when the
-   * scalar is present but not a canonical attachment path.
-   */
-  public void deleteOrphanImagesForPersistedContent(Note note) {
-    if (note == null || note.getId() == null) {
-      return;
-    }
-    NoteContentMarkdown.LeadingFrontmatterImageReference ref =
-        NoteContentMarkdown.leadingFrontmatterImageReference(note.getContent());
-    if (ref instanceof NoteContentMarkdown.LeadingFrontmatterImageReference.InvalidPathPresent) {
-      return;
-    }
-    Integer keepId =
-        ref instanceof NoteContentMarkdown.LeadingFrontmatterImageReference.Referenced referenced
-            ? referenced.imageId()
-            : null;
-    entityPersister
-        .createQuery(
-            "FROM Image i WHERE i.note = :note AND (:keepId IS NULL OR i.id <> :keepId)",
-            Image.class)
-        .setParameter("note", note)
-        .setParameter("keepId", keepId)
-        .setFlushMode(FlushModeType.COMMIT)
-        .getResultList()
-        .forEach(entityPersister::remove);
   }
 }

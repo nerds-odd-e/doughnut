@@ -31,7 +31,6 @@ public class NoteConstructionService {
   private final EntityPersister entityPersister;
   private final NoteRealmService noteRealmService;
   private final NoteReferenceService noteReferenceService;
-  private final NoteService noteService;
   private final NoteFactory noteFactory;
   private final CanonicalDonutOrigin canonicalDonutOrigin;
   private final AuthoredNoteDocumentPersistence authoredNoteDocumentPersistence;
@@ -44,7 +43,6 @@ public class NoteConstructionService {
       EntityPersister entityPersister,
       NoteRealmService noteRealmService,
       NoteReferenceService noteReferenceService,
-      NoteService noteService,
       NoteFactory noteFactory,
       CanonicalDonutOrigin canonicalDonutOrigin,
       AuthoredNoteDocumentPersistence authoredNoteDocumentPersistence) {
@@ -54,7 +52,6 @@ public class NoteConstructionService {
     this.entityPersister = entityPersister;
     this.noteRealmService = noteRealmService;
     this.noteReferenceService = noteReferenceService;
-    this.noteService = noteService;
     this.noteFactory = noteFactory;
     this.canonicalDonutOrigin = canonicalDonutOrigin;
     this.authoredNoteDocumentPersistence = authoredNoteDocumentPersistence;
@@ -95,11 +92,10 @@ public class NoteConstructionService {
     return note;
   }
 
-  /** Final refresh, image cleanup, reference indexing and response construction. */
+  /** Final refresh, reference indexing and response construction. */
   private NoteRealm finalizeAndRespond(Note note, User user) {
     entityPersister.flush();
     entityPersister.refresh(note);
-    noteService.deleteOrphanImagesForPersistedContent(note);
     noteReferenceService.refreshDerivedIndexesForNote(note);
     return noteRealmService.build(note, user);
   }
