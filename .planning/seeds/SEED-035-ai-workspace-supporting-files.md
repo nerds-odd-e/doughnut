@@ -97,53 +97,47 @@ No executable plan or implementation is authorized by this seed.
 
 <a id="story-22"></a>
 
-### Make startup moves report their failures readably in production
+### Make production application logs findable from the GCP docs
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"unselected","assessment":"not-ready","reasons":["The picture move's startup failure cause is unconfirmed, so no execution approach is selected."],"basis":{"document":"86f97a16f3d2dc368a76d420033556b71f965aafb921ac9052059a3b3dfd20df"}}
+{"schemaVersion":1,"refinement":"refined","approach":"planless","assessment":"ready","reasons":[],"basis":{"document":"72069d1b61c05e0bcdaf986c3390938202551e020b8a903bc2ad8001ebfd42de"}}
 ```
 
 - **Identity:** SEED-035#story-22
-- **Goal:** Maintainers releasing a startup move learn from production whether
-  it worked, and why not, instead of finding out by querying the database.
-  The next such move is the Book source-file move from story 17, on main and
-  not yet released; it uses the same per-notebook, log-and-continue pattern as
-  the picture move that failed silently.
-- **Scope (reduced 2026-09-25 after the production check):**
-  - Make the application's startup output, at least its errors, readable in
-    production, and correct the GCP troubleshooting docs that point to the
-    absent `/var/log/doughnut-app.log`.
-  - Find why the picture move's startup run changed no notebook while the
-    owner's manual trigger succeeded. Fix that cause only where it also
-    affects the Book startup move; the picture move itself is deleted (read
-    its code at `0d57de8778^`).
+- **Goal:** A maintainer checking a production release, such as the one that
+  carries the Book source-file move, finds the application's log by following
+  the GCP docs, instead of chasing paths and services that do not exist.
+- **Scope (reduced 2026-09-25 after the production check):** correct the GCP
+  logging docs. The `prod` profile already writes
+  `/logs/donut-prod.log` (logback's `${user.dir}/logs`, and the startup
+  script's working directory is `/`), rolling three 5 MB files. The docs point
+  to the absent `/var/log/doughnut-app.log` and claim stdout reaches Cloud
+  Logging automatically, but no logging agent is installed. State that the
+  file lives on the instance's boot disk, so a deploy, autohealing repair, or
+  other recreate loses it: read a release's startup output before the next
+  one.
 - **Excluded:**
-  - Moving pictures: done. On 2026-09-25 the startup run plus the owner's
-    manual trigger moved every notebook's own pictures.
-  - Two notes (notebooks 17 and 207) whose `image:` still names an upload
-    whose `image` row is gone; the owner fixes them manually.
-  - Log retention, alerting, and dashboards.
+  - Finding why the picture move's first startup runs changed nothing. Every
+    instance that ran them was deleted or recreated, so their logs are gone.
+    Those runs all preceded the 20:11 (+0800) switch to the new production
+    database, and the run after it succeeded with no code change; the
+    unconfirmed explanation is that they moved pictures in the old database
+    before its data was copied. The picture move is already deleted.
+  - Forwarding logs to Cloud Logging (an Ops Agent in the image); not
+    requested.
+  - A move summary line, log retention, alerting, dashboards.
 - **Key examples:**
-  1. A release whose startup move fails for a notebook → following the GCP
-     troubleshooting docs, a maintainer finds that notebook's failure and its
-     cause.
-  2. The release carrying the Book source-file move starts once in
-     production → its per-notebook result is readable the same way, without a
-     database query.
-- **Evidence:** v1.3.26 (`72021b8efe`) ran `LegacyNotePictureMoveOnStartup`
-  and moved none of 804 own-notebook references in 74 notebooks. App stdout is
-  not in Cloud Logging, `/var/log/doughnut-app.log` is absent, and
-  `journalctl -u google-startup-scripts.service` has no Spring output, so the
-  logged `Notebook {} keeps its legacy pictures` errors could not be read.
-  Unconfirmed candidates in `LegacyNotePictureMove.move`: missing Git binding
-  in `freeFilenames`, `storeAsLfsPointer` against production GCS, or
-  `acceptedWebChangeService.apply`. The production database was switched to a
-  new instance the same day, which may have been involved.
-- **Depends on:** none. Best delivered before the release that carries the
-  Book source-file move; otherwise verify that move by database query and
-  trigger it manually if needed.
-- **Effort hypothesis:** M, low confidence until the failure cause is known.
-- **Safe stopping point:** Readable startup errors alone are useful even if
-  the picture move's cause stays unknown.
+  1. A maintainer following the GCP troubleshooting docs after a release →
+     reads `/logs/donut-prod.log` on the running instance and sees the
+     startup errors, such as `Notebook 12 keeps its Book in the old storage`.
+  2. The docs no longer send anyone to `/var/log/doughnut-app.log` or to
+     Cloud Logging for application output.
+- **Evidence:** v1.3.26 ran the picture move on instances created from 17:06
+  (+0800) on 2026-09-25; all were deleted by 19:44. Instance `jc41` (created
+  19:58) was reset at 21:06 and 21:38 and each time recreated by autohealing,
+  which replaced its disk. The owner's "manual trigger" was those resets.
+- **Depends on:** none. The Book source-file move no longer waits for it; after
+  that release, verify it by database query as the picture move was.
+- **Effort hypothesis:** S, docs only.
 
 <a id="story-21"></a>
 
@@ -166,8 +160,8 @@ No executable plan or implementation is authorized by this seed.
   dropping the table removes them, so picture and Book bytes leave MySQL
   together. Decide here whether the `/attachments/` development proxy and GCP
   route go too; no backend handler serves that address any more.
-- **Depends on:** Story 17 delivered and verified in production (after
-  story 22, its startup result is readable).
+- **Depends on:** Story 17 delivered and verified in production by database
+  query.
 - **Effort hypothesis:** S–M, medium confidence.
 - **Safe stopping point:** Until it runs, the separate Book storage is an
   unused leftover that still holds a backup copy.
@@ -304,8 +298,9 @@ avoids a chicken-and-egg problem is:
    the owner's manual trigger completed it (verified 2026-09-25).
 4. Story 17: Book files.
 5. The legacy picture storage is removed (its bytes stay in `attachment_blob`);
-   story 22: readable startup-move failures, before the Book move's release;
-   story 21: remove the separate Book storage, after story 17 is verified.
+   story 21: remove the separate Book storage, after story 17 is verified by
+   database query in production. Story 22 only corrects the production log
+   docs.
 
 "Present after clone or pull" is not a story: it is how each of these stories
 is proven. Web deletion (story 2), then dissolve/merge (story 11) and the rarer
@@ -365,6 +360,10 @@ integration need their own selected outcomes.
   check is a read-only database query, not the startup log; story 22 shrinks
   to readable startup-move failures ahead of the Book move; the two notes
   with dead picture links are fixed manually, outside any story.
+- Owner decisions, 2026-09-25 (story 22 refinement): the first runs' logs
+  are gone with their instances, so drop the cause search; shrink story 22 to
+  correcting the GCP log docs and execute it directly; no Cloud Logging
+  forwarding story.
 - Owner decisions, 2026-09-25 (story 2 refinement): the purpose is only to
   remove the file; deleting a file a note's `image:` names is allowed and
   leaves a broken picture; delete outright with no web Trash; keep the
