@@ -67,6 +67,7 @@
           pnpmPkg
           lsof
           fzf
+          git
           git-secret
           git-lfs
           gitleaks
