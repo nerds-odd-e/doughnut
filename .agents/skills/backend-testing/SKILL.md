@@ -27,7 +27,11 @@ Always run all backend unit tests instead of a selected file or test case.
 For `dough-test-optimization`, use `backend:test_only` as both the ordinary
 feedback measurement and profiling run. Per-test timings are the `time`
 attributes in `backend/build/test-results/test/TEST-*.xml`; keep any derived raw
-profile outside committed files.
+profile outside committed files. To count Spring context boots, temporarily add
+`logging.level.org.springframework.test.context.cache=DEBUG` to
+`backend/src/test/resources/application.properties` (a `logback-test.xml`
+logger is overridden by the test profile's `logging.level.root=OFF`); each rise
+in the logged `missCount` is one boot. Revert it afterwards.
 
 ## Core Principles
 
