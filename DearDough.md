@@ -100,15 +100,6 @@ A missing .claude skill alias concealed an already-tracked same-checkout .agents
 - Execution: SEED-036 story 1 / quick/149-permanent-deletion-loose-ends / a3856444de; Timestamp: 2026-09-19T10:33+08:00 (during this execution's retrospective; the original miss happened at CI-observer setup, before slice 1); Tool: Claude Code; Model: claude-sonnet-5; Open Dough release: unknown.
 - Execution: SEED-035 story 1 / quick/260922-paste-without-formatting / 0c5e5725a0; Timestamp: unknown (2026-09-20, during this execution's initial CI-observer setup, before the first slice was delegated); Tool: Claude Code; Model: claude-sonnet-5; Open Dough release: unknown.
 
-## ODF-086 — The product backlog moved on the shared integration branch between the coordinator's read and its queue claim
-
-Former local code: DD-075.
-A concurrent Taken claim invalidated an earlier backlog read. Re-reading and asserting the exact move preserved both claims. Native startup acceptance is Taken upstream; no lost claim was observed.
-
-### Occurrences
-
-- Execution: SEED-034 story 1 / quick/146-permanently-delete-trashed-content / 6f2a2ff1d8; Timestamp: 2026-09-18T17:05:27+08:00; Tool: Claude Code; Model: claude-opus-5; Open Dough release: unknown.
-
 ## ODF-069 — The CI observer's fixed discovery-poll bound reports lost coverage for revisions whose CI run exists and later succeeds
 
 Former local code: DD-076.
@@ -142,7 +133,9 @@ Three ordinary slice commits used coordinator self-review instead of a fresh ref
 
 - Execution: quick/008-remove-zip-export / 38b5e1ef69; Timestamp: 2026-09-21T22:08:41+08:00; Tool: Cursor; Model: Cursor Grok 4.7; Open Dough release: 0.3.27.
 
-## DD-107 — Managed increment delivery left the first Claude Code publication unobserved because no guidance names the session identity it needs
+## ODF-092 — Managed increment delivery left the first Claude Code publication unobserved because no guidance names the session identity it needs
+
+Former local code: DD-107.
 
 `execution-increment-delivery.mjs deliver` returned `pendingCi: unobserved` ("host session identity is required to verify the notification bridge") although the Claude Code hook bridge was ready. The references document `--session-json` only in the usage line; recovery needed a manual probe, observer start, and `register-push`.
 
@@ -172,7 +165,9 @@ Three ordinary slice commits used coordinator self-review instead of a fresh ref
   - Evidence: slice 1 receipt `observation.reason` "host session identity is required to verify the notification bridge" (background Claude Code job, Story Branch Mode); recovered by `ci-mailbox.mjs probe` (`CI_MONITOR_READY`) and re-running `deliver` for the accepted SHA with `--session-json '{"session_id":…}'`, which reported `observation.state: attached`.
   - Observed effect: two extra calls; a simpler recovery than `start` plus `register-push`, still discovered only by reading the receipt.
 
-## DD-108 — Queued startup receipt embeds the whole Git index and overflows the coordinator's tool output
+## ODF-099 — Queued startup receipt embeds the whole Git index and overflows the coordinator's tool output
+
+Former local code: DD-108.
 
 `execution-start.mjs start` prints `beforeMaintenance.index` (the full staged index listing of the default checkout) inside its one-line JSON receipt. On this repository the receipt was 811 KB, so the host saved it to a file and showed only a 2 KB preview; the fields the coordinator must retain (`publishedSha`, `workspace`, `preparation`) happened to be in that preview.
 
@@ -199,7 +194,9 @@ Three ordinary slice commits used coordinator self-review instead of a fresh ref
   - Evidence: startup call output "Output too large (817.8KB)"; `beforeMaintenance.index` holds the full index listing.
   - Observed effect: an extra `node` call was needed to read `afterMaintenance` and `projectSetupRequired`.
 
-## DD-109 — A readiness replay observed only the plan's named seam, not the rest of the slice's journey
+## ODF-110 — A readiness replay observed only the plan's named seam, not the rest of the slice's journey
+
+Former local code: DD-109.
 
 A plan was recorded not-ready because slice 3 relied on an inferred CLI path. The coordinator's disposable replay reproduced exactly the named seam (fast-forward with LFS smudge skipped, then fill-in) and recorded ready. The slice's own journey continued with a publish after the pull, and that publish failed in the CLI, forcing a mid-execution stop and an owner scope decision.
 
@@ -210,7 +207,9 @@ A plan was recorded not-ready because slice 3 relied on an inferred CLI path. Th
   - Observed effect: one human round-trip and a scope change (CLI change, option A) that preparation could have surfaced before Take.
   - Inference: when resolving a readiness concern by observation, replay the slice's full promised journey (here pull, then publish), not only the mechanism the concern names; the replay's own "not covered" list was the signal.
 
-## DD-110 — Increment delivery reports the default-checkout refresh as deferred without a reason
+## ODF-104 — Increment delivery reports the default-checkout refresh as deferred without a reason
+
+Former local code: DD-110.
 
 `execution-increment-delivery.mjs deliver` returned `maintenance: "deferred"` on every Trunk Mode publication with no reason or remote/head fields, while the startup receipt reports its maintenance result with `reason`, `remoteSha` and `head`.
 
@@ -224,7 +223,9 @@ A plan was recorded not-ready because slice 3 relied on an inferred CLI path. Th
   - Evidence: delivery receipts for 4250de93e1, a061808c28, 682259779a, 0e760d4933 and f4d1ec8d5c each show only `maintenance: deferred`, while startup's `afterMaintenance` had advanced the default checkout.
   - Observed effect: same as before; the coordinator could not tell why the default checkout was left behind trunk.
 
-## DD-111 — Refactor re-proof covered fewer consumers than the shared helper it changed
+## ODF-111 — Refactor re-proof covered fewer consumers than the shared helper it changed
+
+Former local code: DD-111.
 
 A post-change refactor moved the backend test base's `pointerFor` and the LFS conversion service onto a new production method (`NotebookAttachmentContent.storeAsLfsPointer`) but reran only four backend test classes, although `pointerFor` is inherited by most `NotebookGit*` controller tests.
 
@@ -235,7 +236,9 @@ A post-change refactor moved the backend test base's `pointerFor` and the LFS co
   - Observed effect: one extra full-suite run by the coordinator; no defect found.
   - Inference: the refactor contract's caller analysis was applied to production callers but not to inherited test-support consumers. A similar broad refactor in slice 5 took about 35 minutes against a 10-minute slice limit; it was valuable cleanup but was not escalated.
 
-## DD-112 — The CI observer delivered no failure for failed story-branch runs, so later slices were built on a red branch
+## ODF-112 — The CI observer delivered no failure for failed story-branch runs, so later slices were built on a red branch
+
+Former local code: DD-112.
 
 The attached Story Branch observer recorded only one `CI_DISCOVERY_DELAYED` event while two later registered revisions failed CI. The failures were found only by a manual `gh run list` at the planned stop boundary.
 
@@ -247,7 +250,9 @@ The attached Story Branch observer recorded only one `CI_DISCOVERY_DELAYED` even
   - Later evidence: at completion, `complete-revision` for aba0dc2509 returned `unresolvedReason: timeout` with the revision still `undiscovered`, while `gh run list` showed that run `completed success`.
   - Inference: cause unverified (discovery after the delay advisory, per-revision registration, or hook delivery); a manual `gh run list` check before each delegation would have caught it one slice later.
 
-## DD-113 — A failure was called pre-existing by comparing against a revision that already contained this execution's earlier slices
+## ODF-113 — A failure was called pre-existing by comparing against a revision that already contained this execution's earlier slices
+
+Former local code: DD-113.
 
 An implementation agent reported a full-suite heap exhaustion as "also on the base commit", using the previous slice's tip rather than a known-green revision; the coordinator repeated that label to the owner before CI history showed slice 1 and main were green.
 
