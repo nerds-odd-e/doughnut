@@ -1,6 +1,5 @@
 package com.odde.donut.services.notebookGit;
 
-import com.odde.donut.entities.NotebookGitAttachmentRepresentation;
 import com.odde.donut.services.notebookAttachment.NotebookAttachmentContent;
 import com.odde.donut.services.notebookAttachment.VerifiedNotebookAttachmentBytes;
 import java.io.IOException;
@@ -12,7 +11,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import org.eclipse.jgit.lib.ObjectId;
-import org.eclipse.jgit.lib.ObjectLoader;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.revwalk.RevWalk;
@@ -21,8 +19,9 @@ import org.springframework.web.server.ResponseStatusException;
 
 /**
  * Admits attachment payloads across a proposal's first-parent range against the inclusive size
- * limit. Raw measures blob bytes; LFS verifies digest, size, and durability, and may omit only new
- * oversized intermediate-only payloads when the tip is valid (ADR 0002; ADR 0004; ADR 0006).
+ * limit. Each payload must be an LFS pointer (or empty file) whose digest, size and durability are
+ * verified; only new oversized intermediate-only payloads may be omitted when the tip is valid (ADR
+ * 0002; ADR 0004; ADR 0006).
  */
 final class NotebookGitAttachmentSizeAdmission {
 
@@ -31,51 +30,10 @@ final class NotebookGitAttachmentSizeAdmission {
   private NotebookGitAttachmentSizeAdmission() {}
 
   /**
-   * Refuses newly introduced attachments over {@link #LIMIT_BYTES}. Both representations inspect
-   * the first-parent range from {@code acceptedHead} (exclusive) through {@code proposedHead}.
+   * Refuses newly introduced attachments over {@link #LIMIT_BYTES} in the first-parent range from
+   * {@code acceptedHead} (exclusive) through {@code proposedHead}.
    */
   static void admit(
-      Repository proposalRepository,
-      ObjectId proposedHead,
-      Repository acceptedRepository,
-      ObjectId acceptedHead,
-      NotebookGitAttachmentRepresentation representation,
-      Integer notebookId,
-      NotebookAttachmentContent content) {
-    if (representation == NotebookGitAttachmentRepresentation.LFS) {
-      admitLfsRange(
-          proposalRepository, proposedHead, acceptedRepository, acceptedHead, notebookId, content);
-      return;
-    }
-    admitRawRange(proposalRepository, proposedHead, acceptedRepository, acceptedHead);
-  }
-
-  private static void admitRawRange(
-      Repository proposalRepository,
-      ObjectId proposedHead,
-      Repository acceptedRepository,
-      ObjectId acceptedHead) {
-    Set<ObjectId> grandfathered = attachmentObjectIdsInHistory(acceptedRepository, acceptedHead);
-    Set<ObjectId> inspected = new HashSet<>();
-    List<ObjectId> range =
-        NotebookGitProposalAncestry.firstParentRange(
-            proposalRepository, acceptedHead, proposedHead);
-    for (ObjectId commitId : range.subList(1, range.size())) {
-      for (Map.Entry<String, ObjectId> blob :
-          attachmentBlobIds(proposalRepository, commitId).entrySet()) {
-        ObjectId blobId = blob.getValue();
-        if (grandfathered.contains(blobId) || !inspected.add(blobId)) {
-          continue;
-        }
-        long size = objectLength(proposalRepository, blobId);
-        if (size > LIMIT_BYTES) {
-          throw oversizedRefusal(blob.getKey(), size);
-        }
-      }
-    }
-  }
-
-  private static void admitLfsRange(
       Repository proposalRepository,
       ObjectId proposedHead,
       Repository acceptedRepository,
@@ -132,21 +90,6 @@ final class NotebookGitAttachmentSizeAdmission {
     return claimedSize > LIMIT_BYTES && !previouslyAccepted && !referencedAtTip;
   }
 
-  private static Set<ObjectId> attachmentObjectIdsInHistory(
-      Repository repository, ObjectId acceptedHead) {
-    Set<ObjectId> attachmentObjectIds = new HashSet<>();
-    try (RevWalk walk = new RevWalk(repository)) {
-      walk.markStart(walk.parseCommit(acceptedHead));
-      for (RevCommit commit : walk) {
-        attachmentObjectIds.addAll(attachmentBlobIds(repository, commit.getId()).values());
-      }
-    } catch (IOException e) {
-      throw new UncheckedIOException(
-          "Could not inspect accepted attachment history for size admission", e);
-    }
-    return attachmentObjectIds;
-  }
-
   private static Set<String> attachmentPayloadDigestsInHistory(
       Repository repository, ObjectId acceptedHead) {
     Set<String> digests = new HashSet<>();
@@ -183,15 +126,6 @@ final class NotebookGitAttachmentSizeAdmission {
       }
     }
     return attachments;
-  }
-
-  private static long objectLength(Repository repository, ObjectId blobId) {
-    try {
-      ObjectLoader loader = repository.open(blobId);
-      return loader.getSize();
-    } catch (IOException e) {
-      throw new UncheckedIOException("Could not inspect attachment object length", e);
-    }
   }
 
   private static byte[] objectBytes(Repository repository, ObjectId blobId) {

@@ -68,7 +68,7 @@ Assumptions (checked on `origin/main` `a061808c28`, 2026-09-24):
 | Promise (seed example) | Slice | Observable proof |
 | --- | --- | --- |
 | Converted notebook with raw history: fresh clone has the old raw bytes, a new picture publishes (3) | 1 | New controller test on a product LFS notebook whose accepted history is seeded as raw `physics/diagram.png` then its LFS pointer: publishing a new picture is accepted, the bundle's first commit still reads the raw bytes, web download of the current file gives the current bytes. CLI unit test above stays green. |
-| Publishing to any notebook uses the LFS size check; web download reads through the pointer (1) | 2, 3 | Existing LFS tests stay green: `NotebookGitAttachmentSizeAdmissionLfsHistoryControllerTest`, `NotebookGitAttachmentLfsPublicationControllerTest`, `NotebookAttachmentControllerTest` LFS download; no test builds a raw binding |
+| Publishing to any notebook uses the LFS size check; web download reads through the pointer (1) | 2, 3 | Existing LFS tests stay green: `NotebookGitAttachmentSizeAdmissionHistoryControllerTest`, `NotebookGitAttachmentLfsPublicationControllerTest`, `NotebookAttachmentControllerTest` LFS download; no test builds a raw binding |
 | One raw binding remains → defer deployment at the pre-deploy check; if present at migration time, migration fails naming the notebook ids without changing the column (2) | 4 | Read-only production query before release; migration test (JDBC, `backend/src/test/java/db/migration`, like `NotebookGitAcceptedHistoryCompletenessTest`): a binding set to `RAW` makes the check throw a message naming its notebook id; the column default is unchanged |
 | No raw binding → new bindings store LFS without code writing it (1) | 4 | Same migration test: with no `RAW` row the migration succeeds and the column default is `LFS`; `NotebookGitBindingAssertions` no longer reads a representation |
 | The column is gone (1) | 5 | Migration test or schema check: after migration `notebook_git_binding` has no `attachment_representation` column; full backend suite green |
@@ -104,8 +104,15 @@ backend raw fixture as the only way to build a raw binding.
 
 ### 2. Publishing checks every file size on the LFS path
 Type: Structure
-Status: planned
-Proof: `NotebookGitAttachmentSizeAdmissionLfsHistoryControllerTest`,
+Status: done
+Accepted proof: `./backend/gradlew -p backend test --tests
+'com.odde.donut.controllers.NotebookGitAttachmentSizeAdmission*' --tests
+'com.odde.donut.controllers.NotebookGitAttachmentLfs*'` green (12 tests). The
+raw-only history rules (an oversized intermediate refused even when the tip is
+corrected) were deleted: LFS deliberately allows that case. Two uncovered
+promises moved onto LFS notebooks in `NotebookGitAttachmentSizeAdmissionControllerTest`;
+the former LFS history test now carries the plain `...SizeAdmissionHistory...` name.
+Proof: `NotebookGitAttachmentSizeAdmissionHistoryControllerTest`,
 `NotebookGitAttachmentLfsPublicationControllerTest` and the slice 1
 raw-history test green; `NotebookGitAttachmentSizeAdmission*Test` no longer
 uses `createLegacyRawNotebook`.
@@ -159,7 +166,8 @@ naming every notebook id with a `RAW` binding and leaving the column unchanged;
 otherwise it sets the column default to `'LFS'` → the entity
 no longer maps `attachment_representation`, the enum,
 `findNotebookIdsByAttachmentRepresentation` and the builder's
-`representation(...)` are gone, and a newly created binding stores `LFS` from
+`representation(...)` are gone, the `rawPayloadRefusal` message drops its now
+stale "when the notebook uses LFS" clause, and a newly created binding stores `LFS` from
 the column default. The old instance still writes the column during the
 rolling deploy, which the kept column allows.
 
