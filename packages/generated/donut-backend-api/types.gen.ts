@@ -109,6 +109,13 @@ export type ShareToBazaarRequest = {
     notebookName: string;
 };
 
+export type SeedLegacyNotePictureRequest = {
+    notebookName: string;
+    noteTitle: string;
+    filename: string;
+    contentBase64: string;
+};
+
 export type NotebookNameRequest = {
     notebookName: string;
 };
@@ -1578,6 +1585,22 @@ export type ShareToBazaarResponses = {
 
 export type ShareToBazaarResponse = ShareToBazaarResponses[keyof ShareToBazaarResponses];
 
+export type SeedLegacyNotePictureForTestabilityData = {
+    body: SeedLegacyNotePictureRequest;
+    path?: never;
+    query?: never;
+    url: '/api/testability/seed_legacy_note_picture_for_testability';
+};
+
+export type SeedLegacyNotePictureForTestabilityResponses = {
+    /**
+     * OK
+     */
+    200: string;
+};
+
+export type SeedLegacyNotePictureForTestabilityResponse = SeedLegacyNotePictureForTestabilityResponses[keyof SeedLegacyNotePictureForTestabilityResponses];
+
 export type ResnapshotNotebookGitBindingForTestabilityData = {
     body: NotebookNameRequest;
     path?: never;
@@ -1657,6 +1680,22 @@ export type SetOpenAiTokenResponses = {
      */
     200: unknown;
 };
+
+export type MoveLegacyNotePicturesForTestabilityData = {
+    body: NotebookNameRequest;
+    path?: never;
+    query?: never;
+    url: '/api/testability/move_legacy_note_pictures_for_testability';
+};
+
+export type MoveLegacyNotePicturesForTestabilityResponses = {
+    /**
+     * OK
+     */
+    200: string;
+};
+
+export type MoveLegacyNotePicturesForTestabilityResponse = MoveLegacyNotePicturesForTestabilityResponses[keyof MoveLegacyNotePicturesForTestabilityResponses];
 
 export type InspectNotebookLfsAttachmentForTestabilityData = {
     body: InspectNotebookLfsAttachmentRequest;

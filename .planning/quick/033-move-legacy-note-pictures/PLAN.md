@@ -182,7 +182,11 @@ picture code.
 
 ### 6. The owner's clone receives a moved picture beside its note
 Type: Behavior
-Status: planned
+Status: done — testability endpoints `seed_legacy_note_picture_for_testability`
+and `move_legacy_note_pictures_for_testability` (per-notebook `move`; the
+startup listener is not loaded under the e2e profile); accepted proof:
+`cli_notebook_lfs.feature` 12/12 incl. "A picture uploaded the legacy way
+arrives in the owner's clone beside its note after the move".
 Proof: slice 6 row of the proof table.
 
 Add a scenario to `cli_notebook_lfs.feature` next to "A picture uploaded on

@@ -174,6 +174,26 @@ Feature: Notebook Git LFS authenticated transfer
       """
 
   @bundleCliE2eInstall @withCliConfig
+  Scenario: A picture uploaded the legacy way arrives in the owner's clone beside its note after the move
+    Given the backend is serving the CLI and install script
+    And the CLI is installed from localhost
+    And I have a notebook "LFS Transfer Notebook" with notes:
+      | Title | Folder  | Content   |
+      | force | physics | Body text |
+    And the note "force" in the notebook "LFS Transfer Notebook" has a legacy uploaded picture from fixture "moon.jpg"
+    When the legacy uploaded pictures of the notebook "LFS Transfer Notebook" are moved into the notebook
+    And I clone the notebook "LFS Transfer Notebook" into a temporary destination using the installed CLI
+    Then the cloned checkout file "physics/moon.jpg" has the bytes of fixture "moon.jpg"
+    And the cloned checkout file "physics/force.md" is:
+      """
+      ---
+      type: Note
+      image: moon.jpg
+      ---
+      Body text
+      """
+
+  @bundleCliE2eInstall @withCliConfig
   Scenario: Explicit Git LFS fetch of an omitted oversized intermediate reports unavailable
     Given the backend is serving the CLI and install script
     And the CLI is installed from localhost
