@@ -55,7 +55,7 @@ authority, the example only illustrates it.
 
 ### 1. Backend test guidance shows only the shared Spring context
 Type: Structure
-Status: planned
+Status: done
 Proof: `git grep -n "@SpringBootTest" -- .agents/skills docs` returns only
 explanations of the base, not an example to copy for a `test`-profile test;
 `git grep -n "RestNoteControllerTests\|plan 037"` returns nothing under
@@ -65,6 +65,13 @@ needed because no code changes.
 
 Change: removes the documentation weakness that contradicts the shared-context
 rule (Structure owning a retrospective correction; no product behavior).
+
+Accepted proof (2026-09-26): `@SpringBootTest` under `.agents/skills` and
+`docs` appears only in `docs/cloud_agent_backend_testing.md` explaining the
+shared base; the `RestNoteControllerTests|plan 037` grep is empty; named
+examples `TextContentValidatorTest`, `NoteControllerShowTests`,
+`SpringTestBase`, `ControllerTestBase` exist. Also fixed the dead
+`RestNoteControllerTests` link in `docs/idea.md`.
 
 ## Current decisions
 

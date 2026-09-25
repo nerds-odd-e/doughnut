@@ -84,6 +84,7 @@ Consequences for future profiling passes:
   `prod` profile (`ShedLockConfigProdTest`), and the failure-injection profiles
   `notebook-git-publication-atomic-test` and `batch-row-import-atomic-test`;
   every other `test`-profile Spring test shares `testability/SpringTestBase`
-  (plan 037 cut the suite from 21 context boots to 5) — unique protection:
-  profile-specific configuration and injected persistence failures — not
-  attempted — no decision needed.
+  (sharing one Spring context across backend tests on 2026-09-26 cut the
+  suite from 21 context boots to 5) — unique protection: profile-specific
+  configuration and injected persistence failures — not attempted — no
+  decision needed.

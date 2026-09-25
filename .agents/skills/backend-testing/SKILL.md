@@ -71,16 +71,20 @@ void clozeDescription(String title, String markdown, String expectedClozeDescrip
 
 ## Database Tests
 
-- Tests use actual database interactions with `@Transactional`.
+- Tests use actual database interactions inside the transaction that `SpringTestBase` rolls back after each test.
 - This gives confidence in database operations and repository behavior.
 - A `@Formula` field (for example `Note.trashedInDatabase`) is hydrated only when Hibernate loads the row from the database. An entity persisted or moved earlier in the same persistence context still carries the Java default, so a test that reads such a field through a loaded collection must `makeMe.refresh(entity)` first. Query-level predicates (`Note.JPA_AVAILABLE`) evaluate in SQL and need no refresh.
 
+Example (`TextContentValidatorTest`): no restated Spring annotations; `makeMe` comes from the base.
+
 ```java
-@SpringBootTest
-@ActiveProfiles("test")
-@Transactional
-class RestNoteControllerTests {
-  // ...
+class TextContentValidatorTest extends SpringTestBase {
+  @Autowired Validator validator;
+
+  @Test
+  void defaultNoteIsValid() {
+    assertThat(validator.validate(makeMe.aNote().inMemoryPlease()), is(empty()));
+  }
 }
 ```
 

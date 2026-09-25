@@ -86,7 +86,7 @@ The backend has **unit tests** only (written in the "small test" style — `unit
 
 1. **No database** — Use `MakeMeWithoutDB` for test data; can run without MySQL. Example: `QuestionEvaluationTest`.
 
-2. **With database** — Use `@SpringBootTest` and `@Transactional`; require MySQL; use `MakeMe` (autowired). Example: `TextContentValidatorTest`, `RestNoteControllerTests`.
+2. **With database** — Extend `SpringTestBase` (or `ControllerTestBase` for controllers), which supplies the shared Spring context, the transaction, and `makeMe`; require MySQL. Example: `TextContentValidatorTest`, `NoteControllerShowTests`.
 
 ## Comparison: Local vs Cloud Agent
 
@@ -158,7 +158,7 @@ whoami  # Should show "ubuntu" or similar non-root user
 - **Azul Zulu JDK 25**: Chosen for compatibility and reliability
 - **MySQL 8.4 Community**: Latest stable version with good performance
 - **Gradle**: Uses project's wrapper (ensures consistent Gradle version)
-- **Spring Boot Test**: runs unit tests with a real database (`@SpringBootTest`, `@Transactional`)
+- **Spring Boot Test**: runs unit tests with a real database through the shared `SpringTestBase` (`@SpringBootTest`, `@Transactional`)
 
 ### File Locations
 
