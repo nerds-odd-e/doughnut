@@ -276,7 +276,7 @@ IDE-style renames only.
 
 ### 7. Publishing from any checkout takes the Git LFS path
 Type: Behavior
-Status: planned
+Status: done
 Pre-condition: a bound checkout whose tip has no LFS `.gitattributes`.
 Trigger: `donut notebook publish`.
 Postcondition: publish prepares the authenticated LFS checkout (Git LFS

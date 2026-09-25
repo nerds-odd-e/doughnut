@@ -47,38 +47,6 @@ describe('notebook publish — LFS object upload before bundle submission', () =
     vi.unstubAllGlobals()
   })
 
-  test('raw checkout publishes without Git LFS upload', async () => {
-    const { pushCalls } = installLfsPushIntercept(realSpawnSync)
-    const workDir = ctx.getWorkDir()
-    const sourceRepoDir = join(workDir, 'raw-source')
-    fs.mkdirSync(sourceRepoDir)
-    runGit(['init', '--quiet', '-b', 'main'], sourceRepoDir)
-    configureTestGitIdentity(sourceRepoDir)
-    fs.writeFileSync(join(sourceRepoDir, 'note.md'), '# raw\n')
-    runGit(['add', 'note.md'], sourceRepoDir)
-    runGit(['commit', '--quiet', '-m', 'raw'], sourceRepoDir)
-    const bundleFile = join(workDir, 'accepted.bundle')
-    bundleMain(sourceRepoDir, bundleFile)
-    const fetchMock = stubFetchForSubmission(
-      bundleFile,
-      stubSuccessfulAcceptedHead()
-    )
-    const dir = cloneAsBoundCheckout(
-      workDir,
-      sourceRepoDir,
-      getApiConfig().apiBaseUrl,
-      'raw-checkout'
-    )
-    fs.writeFileSync(join(dir, 'note.md'), '# edited\n')
-    runGit(['add', 'note.md'], dir)
-    runGit(['commit', '--quiet', '-m', 'edit'], dir)
-
-    await run(['notebook', 'publish', dir])
-
-    expect(pushCalls).toEqual([])
-    expect(postCount(fetchMock)).toBe(1)
-  })
-
   test('uploads required in-limit objects before submitting the bundle', async () => {
     const callOrder: string[] = []
     const { pushCalls } = installLfsPushIntercept(realSpawnSync, {
