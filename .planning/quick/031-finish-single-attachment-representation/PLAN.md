@@ -195,7 +195,7 @@ projection … awaiting that transition" sentence. Keep every other statement.
 
 ### 2. History reset has one entry point and no raw comments remain
 Type: Structure
-Status: planned
+Status: done
 Proof: backend compiles;
 `NotebookGitCutoverServiceTest`, `NotebookGitHistoryResetControllerTest`,
 `NotebookGitLfsPointerTest`, `NotebookCrudControllerTest` and
