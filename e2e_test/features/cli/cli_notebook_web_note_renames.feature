@@ -70,7 +70,7 @@ Feature: CLI notebook web note renames
       """
       ---
       type: Note
-      related: '[[Cell structure|Cells]]'
+      related: "[[Cell structure|Cells]]"
       ---
       See [[Cell structure|Cells]].
       """
