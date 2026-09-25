@@ -5,6 +5,7 @@ import type {
   CliNotebookCheckoutConflictState,
   CliNotebookCheckoutState,
 } from '../../../config/cliE2eNotebookCloneTasks'
+import { expectSameBlobAt } from './notebookCloneCheckoutDestination'
 import { nonInteractiveOutput } from './outputAssertions'
 
 function originalAndChildCheckout(childAlias: string): Cypress.Chainable<{
@@ -107,11 +108,13 @@ function notebookCloneCheckoutRebaseObservations() {
       return originalAndRebasedCheckout().then(({ original, rebased }) => {
         expect(rebased.author).to.equal(original.author)
         expect(rebased.message).to.equal(original.message)
-        expect(
-          rebased.blobs[relativePath],
+        return expectSameBlobAt(
+          'cliCloneDestination',
+          relativePath,
+          rebased.head,
+          original.head,
           `blob for ${relativePath} should retain L’s patch`
-        ).to.equal(original.blobs[relativePath])
-        return cy.wrap(null)
+        )
       })
     },
     expectResolvedLocalCommitFor(
@@ -134,13 +137,15 @@ function notebookCloneCheckoutRebaseObservations() {
     ): Cypress.Chainable<null> {
       return cy
         .get<CliNotebookCheckoutState>('@cliNotebookRebasedCheckout')
-        .then((rebased) => {
-          expect(
-            rebased.blobs[relativePath],
+        .then((rebased) =>
+          expectSameBlobAt(
+            'cliCloneDestination',
+            relativePath,
+            rebased.head,
+            rebased.parent,
             `${relativePath} at L′ should match accepted parent B`
-          ).to.equal(rebased.parentBlobs[relativePath])
-          return cy.wrap(null)
-        })
+          )
+        )
     },
   }
 }

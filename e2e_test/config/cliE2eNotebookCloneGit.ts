@@ -184,22 +184,14 @@ export function firstParent(checkoutDir: string, treeish = 'HEAD'): string {
   return parts[1] ?? ''
 }
 
-export function blobsAt(
+/** The blob id at `relativePath` in `treeish`, or '' when the path is absent there. */
+export function blobAt(
   checkoutDir: string,
-  treeish: string
-): Record<string, string> {
-  const output = git(checkoutDir, 'ls-tree', '-r', treeish)
-  if (!output) return {}
-  return Object.fromEntries(
-    output.split('\n').map((line) => {
-      const tab = line.indexOf('\t')
-      if (tab < 0) {
-        throw new Error(`unexpected git ls-tree line: ${line}`)
-      }
-      const hash = line.slice(0, tab).split(' ')[2] ?? ''
-      return [line.slice(tab + 1), hash]
-    })
-  )
+  treeish: string,
+  relativePath: string
+): string {
+  const line = git(checkoutDir, 'ls-tree', treeish, '--', relativePath)
+  return line.split('\t')[0]?.split(' ')[2] ?? ''
 }
 
 export function rebaseMergeExists(checkoutDir: string): boolean {

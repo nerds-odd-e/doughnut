@@ -7,6 +7,7 @@ import testability from '../../testability'
 import {
   expectCheckoutFileExactTextAt,
   expectCheckoutFileFixtureBytesAt,
+  readCheckoutBranchStateAt,
 } from './notebookCloneCheckoutDestination'
 import { notebookLfsPublish } from './notebookLfsPublish'
 
@@ -81,17 +82,10 @@ export function notebookLfs() {
       )
     },
     expectClonedCheckoutCleanMain() {
-      return cy.get<string>('@cliCloneDestination').then((checkoutDir) =>
-        cy
-          .task<{
-            branch: string
-            status: string
-          }>('readCliNotebookCheckoutState', checkoutDir)
-          .then((state) => {
-            expect(state.branch, 'cloned branch').to.equal('main')
-            expect(state.status, 'cloned checkout should be clean').to.equal('')
-          })
-      )
+      return readCheckoutBranchStateAt('cliCloneDestination').then((state) => {
+        expect(state.branch, 'cloned branch').to.equal('main')
+        expect(state.status, 'cloned checkout should be clean').to.equal('')
+      })
     },
     expectClonedCheckoutFileExact(relativePath: string, text: string) {
       return expectCheckoutFileExactTextAt(

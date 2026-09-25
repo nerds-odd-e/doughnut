@@ -5,7 +5,10 @@
  * per-destination page object names its own methods in terms of these, so the
  * same checkout knowledge is not restated once per destination.
  */
-import type { CliNotebookCheckoutState } from '../../../config/cliE2eNotebookCloneTasks'
+import type {
+  CliNotebookCheckoutBranchState,
+  CliNotebookCheckoutState,
+} from '../../../config/cliE2eNotebookCloneTasks'
 import {
   hexFromBase64,
   hexFromSpacedHex,
@@ -129,6 +132,52 @@ function readCheckoutStateAt(
     )
 }
 
+/**
+ * `relativePath` holds the same blob in commit `treeish` as in commit
+ * `expectedTreeish` — commit ids stay readable after a rebase rewrites HEAD.
+ */
+function expectSameBlobAt(
+  destinationAlias: CliNotebookCloneDestinationAlias,
+  relativePath: string,
+  treeish: string,
+  expectedTreeish: string,
+  description: string
+): Cypress.Chainable<null> {
+  return cy.get<string>(`@${destinationAlias}`).then((checkoutDir) =>
+    cy
+      .task<string>('readCliNotebookCheckoutBlob', {
+        checkoutDir,
+        treeish: expectedTreeish,
+        relativePath,
+      })
+      .then((expected) =>
+        cy
+          .task<string>('readCliNotebookCheckoutBlob', {
+            checkoutDir,
+            treeish,
+            relativePath,
+          })
+          .then((actual) => {
+            expect(actual, description).to.equal(expected)
+            return cy.wrap(null)
+          })
+      )
+  )
+}
+
+function readCheckoutBranchStateAt(
+  destinationAlias: CliNotebookCloneDestinationAlias
+): Cypress.Chainable<CliNotebookCheckoutBranchState> {
+  return cy
+    .get<string>(`@${destinationAlias}`)
+    .then((checkoutDir) =>
+      cy.task<CliNotebookCheckoutBranchState>(
+        'readCliNotebookCheckoutBranchState',
+        checkoutDir
+      )
+    )
+}
+
 function expectCleanCheckoutAtHead(
   destinationAlias: CliNotebookCloneDestinationAlias,
   acceptedHead: string
@@ -200,6 +249,8 @@ export {
   expectCheckoutFileFixtureBytesAt,
   expectCleanAcceptedHeadAt,
   expectCleanNotebookAcceptedHeadAt,
+  expectSameBlobAt,
+  readCheckoutBranchStateAt,
   readCheckoutStateAt,
   runInstalledOn,
 }

@@ -10,7 +10,7 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { createCliE2eNotebookCloneCommitTasks } from './cliE2eNotebookCloneCommitTasks'
 import {
-  blobsAt,
+  blobAt,
   checkoutFilledBytesMatch,
   continueRebaseNoninteractively,
   firstParent,
@@ -20,17 +20,21 @@ import {
   rebaseMergeExists,
 } from './cliE2eNotebookCloneGit'
 
+/** HEAD's first-parent chain, its author and subject, and the porcelain status: two `git` calls. */
 export interface CliNotebookCheckoutState {
   head: string
   parent: string
   grandparent: string
-  branch: string
-  rootCommitCount: string
   status: string
   author: string
   message: string
-  blobs: Record<string, string>
-  parentBlobs: Record<string, string>
+}
+
+/** The checked-out branch, its parentless-commit count, and the porcelain status. */
+export interface CliNotebookCheckoutBranchState {
+  branch: string
+  rootCommitCount: string
+  status: string
 }
 
 export interface CliNotebookCheckoutConflictState {
@@ -52,11 +56,28 @@ export function createCliE2eNotebookCloneTasks() {
     readCliNotebookCheckoutState(
       checkoutDir: string
     ): CliNotebookCheckoutState {
-      const parent = firstParent(checkoutDir)
+      const [head, parent, grandparent] = git(
+        checkoutDir,
+        'log',
+        '-3',
+        '--first-parent',
+        '--format=%H%x1f%an <%ae>%x1f%s'
+      )
+        .split('\n')
+        .map((line) => line.split('\x1f'))
       return {
-        head: git(checkoutDir, 'rev-parse', 'HEAD'),
-        parent,
-        grandparent: parent ? firstParent(checkoutDir, parent) : '',
+        head: head?.[0] ?? '',
+        parent: parent?.[0] ?? '',
+        grandparent: grandparent?.[0] ?? '',
+        status: git(checkoutDir, 'status', '--porcelain'),
+        author: head?.[1] ?? '',
+        message: head?.[2] ?? '',
+      }
+    },
+    readCliNotebookCheckoutBranchState(
+      checkoutDir: string
+    ): CliNotebookCheckoutBranchState {
+      return {
         branch: git(checkoutDir, 'rev-parse', '--abbrev-ref', 'HEAD'),
         rootCommitCount: git(
           checkoutDir,
@@ -66,11 +87,19 @@ export function createCliE2eNotebookCloneTasks() {
           'HEAD'
         ),
         status: git(checkoutDir, 'status', '--porcelain'),
-        author: git(checkoutDir, 'log', '-1', '--format=%an <%ae>'),
-        message: git(checkoutDir, 'log', '-1', '--format=%s'),
-        blobs: blobsAt(checkoutDir, 'HEAD'),
-        parentBlobs: parent ? blobsAt(checkoutDir, parent) : {},
       }
+    },
+    /** Blob id of `relativePath` in commit `treeish`, or '' when absent there. */
+    readCliNotebookCheckoutBlob({
+      checkoutDir,
+      treeish,
+      relativePath,
+    }: {
+      checkoutDir: string
+      treeish: string
+      relativePath: string
+    }): string {
+      return blobAt(checkoutDir, treeish, relativePath)
     },
     readCliNotebookCheckoutParentFile({
       checkoutDir,

@@ -4,13 +4,10 @@
 import type { CliNotebookCheckoutState } from '../../../config/cliE2eNotebookCloneTasks'
 import {
   expectCanonicalTreeAt,
-  readCheckoutStateAt,
+  expectSameBlobAt,
+  readCheckoutBranchStateAt,
 } from './notebookCloneCheckoutDestination'
 import { nonInteractiveOutput } from './outputAssertions'
-
-function readCheckoutState(): Cypress.Chainable<CliNotebookCheckoutState> {
-  return readCheckoutStateAt('cliCloneDestination')
-}
 
 function expectAncestorOfCheckoutHead(
   checkoutDir: string,
@@ -33,13 +30,13 @@ function notebookCloneCheckoutObservations() {
     expectCheckoutFileUnchangedFromParent(
       relativePath: string
     ): Cypress.Chainable<null> {
-      return readCheckoutState().then((state) => {
-        expect(
-          state.blobs[relativePath],
-          `${relativePath} should retain its accepted-parent blob`
-        ).to.equal(state.parentBlobs[relativePath])
-        return cy.wrap(null)
-      })
+      return expectSameBlobAt(
+        'cliCloneDestination',
+        relativePath,
+        'HEAD',
+        'HEAD^',
+        `${relativePath} should retain its accepted-parent blob`
+      )
     },
     expectCleanAppendOnlyChainFromOriginalHead(): Cypress.Chainable<null> {
       return cy
@@ -159,7 +156,7 @@ function notebookCloneCheckoutObservations() {
     expectCleanSingleCommitCheckoutOnBranch(
       branch: string
     ): Cypress.Chainable<null> {
-      return readCheckoutState().then((state) => {
+      return readCheckoutBranchStateAt('cliCloneDestination').then((state) => {
         expect(state.branch).to.equal(branch)
         expect(state.rootCommitCount).to.equal('1')
         expect(state.status).to.equal('')

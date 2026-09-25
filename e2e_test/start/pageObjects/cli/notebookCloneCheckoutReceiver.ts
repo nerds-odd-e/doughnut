@@ -3,7 +3,6 @@
  * the receiver. Shared, destination-addressed checkout plumbing lives in
  * `notebookCloneCheckoutDestination.ts`.
  */
-import type { CliNotebookCheckoutState } from '../../../config/cliE2eNotebookCloneTasks'
 import {
   commitNoteChangesAt,
   expectCanonicalTreeAt,
@@ -44,33 +43,23 @@ function notebookCloneCheckoutReceiver() {
      * primary-checkout pull path) for publish acceptance.
      */
     pullReceiver(): Cypress.Chainable<null> {
-      return cy
-        .get<string>('@cliCloneReceiverDestination')
-        .then((checkoutDir) =>
-          cy
-            .task<CliNotebookCheckoutState>(
-              'readCliNotebookCheckoutState',
-              checkoutDir
+      return readCheckoutStateAt('cliCloneReceiverDestination').then(
+        (original) => {
+          cy.wrap(original.head).as('cliCloneReceiverOriginalHead')
+          return runInstalledOn(
+            'cliCloneReceiverDestination',
+            'pull',
+            'runInstalledCli'
+          ).then(() =>
+            readCheckoutStateAt('cliCloneReceiverDestination').then(
+              (rebased) => {
+                cy.wrap(rebased).as('cliNotebookRebasedCheckout')
+                return cy.wrap(null)
+              }
             )
-            .then((original) => {
-              cy.wrap(original.head).as('cliCloneReceiverOriginalHead')
-              return runInstalledOn(
-                'cliCloneReceiverDestination',
-                'pull',
-                'runInstalledCli'
-              ).then(() =>
-                cy
-                  .task<CliNotebookCheckoutState>(
-                    'readCliNotebookCheckoutState',
-                    checkoutDir
-                  )
-                  .then((rebased) => {
-                    cy.wrap(rebased).as('cliNotebookRebasedCheckout')
-                    return cy.wrap(null)
-                  })
-              )
-            })
-        )
+          )
+        }
+      )
     },
     expectReceiverCanonicalTreeFor(
       seededEntries: string[]

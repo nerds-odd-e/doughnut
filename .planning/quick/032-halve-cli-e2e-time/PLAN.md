@@ -93,10 +93,18 @@ Known gap: a publish that uploads nothing no longer adds the placeholder
 
 ### 4. Harness reads only the checkout facts a step observes
 Type: Structure
-Status: planned
+Status: done
 Expected: ~−10s. Candidate from plan 031
 (`e2e_test/start/pageObjects/cli/notebookCloneCheckout.ts` `pull()` reads full
 state twice).
+
+Result: one checkout-state read is 2 git calls (one `git log -3 --first-parent`
++ `status`) instead of 10; blobs are read by the assertion that compares them
+(`expectSameBlobAt`); branch and root count only for the two clean-branch
+assertions. Harness git calls per pull step 20 → 4. "Unchanged from its parent"
+now fails loudly when HEAD has no parent. Proof: 14 CLI features 45/45; after
+refactor the 7 affected features 31/31 (one environmental browser crash at load
+59, rerun).
 
 ### 5. CLI features act and observe through the API where the web UI is not the subject
 Type: Structure
