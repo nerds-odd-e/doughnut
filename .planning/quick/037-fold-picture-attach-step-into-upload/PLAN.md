@@ -63,7 +63,7 @@ is stored; replacing a picture keeps `image_mask:`.
 
 ### 1. The upload service owns its attach step again
 Type: Structure
-Status: planned
+Status: done
 Proof: both rows above. Command: `pnpm backend:test:worktree --tests
 'com.odde.donut.controllers.NoteControllerUploadNoteImage*'` (one `--tests`
 pattern per run; local MySQL must be running).
@@ -73,6 +73,12 @@ the edit lambda, whichever reads best), take over its dependencies, and
 delete `NoteImageFileAttachment.java`. No test edits are expected.
 
 Sizing: one file inlined and one deleted; well under five minutes.
+
+Accepted proof: `attach` is a private method of `WebNoteImageUploadService`,
+called from the edit lambda with an unchanged body; `NoteImageFileAttachment.java`
+deleted. `NoteControllerUploadNoteImageTests` 15/15 green with no test edits;
+`git grep NoteImageFileAttachment -- backend` empty. The refactor pass found
+nothing further. The file deletion was not blocked this time.
 
 ## Current decisions
 
