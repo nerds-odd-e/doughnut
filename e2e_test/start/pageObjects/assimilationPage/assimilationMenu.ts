@@ -1,6 +1,6 @@
 import { UserController } from '@generated/donut-backend-api/sdk.gen'
 import type { MenuDataDto } from '@generated/donut-backend-api'
-import { waitUntilAppIsNotBusy } from '../../pageBase'
+import { waitUntilAppIsNotBusy, withinMainMenuItem } from '../../pageBase'
 import {
   assimilationDueFromTriple,
   assimilationToastMessages,
@@ -10,7 +10,7 @@ import {
 export const assimilation = () => {
   const getAssimilateListItemInSidebar = (
     fn: ($el: Cypress.Chainable<JQuery<HTMLElement>>) => void
-  ) => cy.get('.main-menu').within(() => fn(cy.get('li[title="Assimilate"]')))
+  ) => withinMainMenuItem('Assimilate', fn)
 
   const clickAssimilateListItemInSidebar = () => {
     getAssimilateListItemInSidebar(($el) => {

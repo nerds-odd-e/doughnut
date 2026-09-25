@@ -1,5 +1,5 @@
 import { assumeMessageCenterPage } from './messageCenterPage'
-import { waitUntilAppIsNotBusy } from '../pageBase'
+import { waitUntilAppIsNotBusy, withinMainMenuItem } from '../pageBase'
 
 export function waitForMenuDataUnreadCount() {
   cy.intercept('GET', '**/api/user/menu-data**').as('menuDataForUnreadCount')
@@ -8,7 +8,7 @@ export function waitForMenuDataUnreadCount() {
 export function messageCenterIndicator() {
   const getMessageInSidebar = (
     fn: ($el: Cypress.Chainable<JQuery<HTMLElement>>) => void
-  ) => cy.get('.main-menu').within(() => fn(cy.get('li[title="Messages"]')))
+  ) => withinMainMenuItem('Messages', fn)
 
   return {
     expectCount(unreadMessageCount: number) {

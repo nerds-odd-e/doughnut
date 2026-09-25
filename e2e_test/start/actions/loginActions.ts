@@ -37,7 +37,8 @@ export const loginActions = {
       if (username === 'none') {
         return
       }
-      router().visitNamed('notebooks')
+      // The first web step opens the app otherwise.
+      router().reloadOpenApp()
     })
   },
 

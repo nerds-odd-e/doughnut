@@ -1,5 +1,6 @@
 import { Then, When } from '@badeball/cypress-cucumber-preprocessor'
 import mock_services from '../start/mock_services/index'
+import router from '../start/router'
 import start from '../start'
 import { waitForMenuDataUnreadCount } from '../start/pageObjects/messageCenterIndicator'
 import type { DataTable } from '@cucumber/cucumber'
@@ -74,6 +75,7 @@ Then(
   (user: string, unreadMessageCount: number) => {
     waitForMenuDataUnreadCount()
     start.reloginAs(user)
+    router().openApp()
     cy.wait('@menuDataForUnreadCount')
     start.messageCenterIndicator().expectCount(unreadMessageCount)
   }
