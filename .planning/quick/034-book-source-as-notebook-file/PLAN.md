@@ -151,8 +151,11 @@ the old store (unmoved bytes are dropped with that store in story 21).
 
 ### 5. A local publish cannot remove or change a Book's file
 Type: Behavior
-Status: planned
-Proof: slice 5 row above.
+Status: done
+Proof: slice 5 row above. Accepted: `--tests '*NotebookGitBookSourceFileProtection*'`
+(2 pass, red-checked), `'*NotebookGit*'` (425 pass, includes the oversized
+refusals), `'*Book*'` (137 pass). Rule: `NotebookGitBookSourceFileProtection.refuseChanging`,
+called from `NotebookGitProposalPublisher.publish` after size admission.
 
 Behavior: notebook whose Book names `Physics Primer.pdf` → publish a proposal
 whose inspected files show that path removed or with a different blob →
