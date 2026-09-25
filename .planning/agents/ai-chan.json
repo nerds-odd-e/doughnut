@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "agent": "Ai-chan",
+  "email": "ai-chan@example.org",
+  "identity": "SEED-035#story-5",
+  "mode": "story-branch",
+  "branch": "story/move-legacy-note-pictures",
+  "host": "claude",
+  "model": "claude-opus-5-5"
+}

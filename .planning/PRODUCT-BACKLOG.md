@@ -11,10 +11,10 @@ and deletable in Web Donut.
 ## Taken
 
 - [Finish the single attachment representation](quick/031-finish-single-attachment-representation/PLAN.md)
+- [Move existing uploaded note pictures into their notebooks](seeds/SEED-035-ai-workspace-supporting-files.md#story-5) — SEED-035#story-5 ([plan](quick/033-move-legacy-note-pictures/PLAN.md))
 
 ## Backlog list
 
-- [Move existing uploaded note pictures into their notebooks](seeds/SEED-035-ai-workspace-supporting-files.md#story-5) — SEED-035#story-5
 - [Keep a Book's source file as an ordinary notebook file](seeds/SEED-035-ai-workspace-supporting-files.md#story-17) — SEED-035#story-17
 - [Remove the legacy picture storage](seeds/SEED-035-ai-workspace-supporting-files.md#story-18) — SEED-035#story-18
 - [Remove the separate Book storage](seeds/SEED-035-ai-workspace-supporting-files.md#story-21) — SEED-035#story-21
