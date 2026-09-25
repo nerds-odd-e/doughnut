@@ -114,8 +114,8 @@ No executable plan or implementation is authorized by this seed.
     absent `/var/log/doughnut-app.log`.
   - Find why the picture move's startup run changed no notebook while the
     owner's manual trigger succeeded. Fix that cause only where it also
-    affects the Book startup move; the picture move itself is deleted by
-    story 18.
+    affects the Book startup move; the picture move itself is deleted (read
+    its code at `0d57de8778^`).
 - **Excluded:**
   - Moving pictures: done. On 2026-09-25 the startup run plus the owner's
     manual trigger moved every notebook's own pictures.
@@ -145,89 +145,6 @@ No executable plan or implementation is authorized by this seed.
 - **Safe stopping point:** Readable startup errors alone are useful even if
   the picture move's cause stays unknown.
 
-<a id="story-18"></a>
-
-### Remove the legacy picture storage
-```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../quick/036-remove-legacy-picture-storage/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"da3cd26aaba2d32b77d843efcdabefd0dca794131e327f5bab233097b2407e10","plan":"6bbbe334c0530bc54a354dd2b3c2942e6d54d73113ed005a787d64d513c88a51"}}
-```
-
-- **Identity:** SEED-035#story-18
-- **Slice plan:** [Remove the legacy picture storage](../quick/036-remove-legacy-picture-storage/PLAN.md)
-- **Goal:** Maintainers keep one way to store and serve note pictures, and
-  note saves and application startup stop doing legacy picture work. Owners
-  keep every moved picture, because each one already works as a notebook
-  file. Picture bytes leave MySQL with story 21, which drops
-  `attachment_blob`.
-- **Production check (done 2026-09-25):** Every notebook's own pictures are
-  moved: the startup run of story 5's move changed nothing, and the owner's
-  manual trigger completed it. A read-only query of production found no note
-  that still names its own notebook's legacy upload, and none that names
-  another notebook's upload or an upload without a note. Two notes (notebooks
-  17 and 207) name uploads whose `image` rows are already gone; the owner
-  fixes them manually. Left: 863 `image` rows, 863 `attachment_blob` rows
-  (161 MiB, all picture bytes), 357 notes with `note.image_id`. Dropping the
-  table deletes the backup copy of every moved picture and cannot be undone;
-  the production database backup is the only safety net, and no special
-  export is made.
-- **Why now:** Until this runs, every note save can still delete a note's
-  legacy picture rows, and with them the backup bytes; three rows
-  disappeared on 2026-09-25 alone. Every startup still runs the move. And
-  because `note.image_id` cascades on delete, an owner who clears a moved
-  note's `image:` line and saves makes the cleanup delete that note's
-  `image` row, which deletes the note (357 production notes name their own
-  picture this way).
-- **Scope:** No new behaviour. Remove, in one release (code and table
-  together):
-  - the `image` table, through a new Flyway migration. Its key to
-    `attachment_blob` cascades only from blob to image, so dropping `image`
-    leaves the picture bytes in `attachment_blob`; they stay for story 21;
-  - the dead `note.image_id` column and its `fk_note_image_id` foreign key
-    (no code uses them). This is required, not optional: that key is
-    `ON DELETE CASCADE`, so the column and key are dropped before `image`, and
-    the removal never deletes `image` rows one by one;
-  - the `/attachments/images/...` address and its controller;
-  - the legacy orphan-picture cleanup on note save and its call sites, and the
-    legacy path parsing that only it and the move use;
-  - story 5's startup move, and the testability seeding and move endpoints
-    that exist only for legacy pictures;
-  - tests and the end-to-end scenario that exist only for legacy pictures;
-    tests that only use legacy pictures as fixtures keep their purpose without
-    them;
-  - the legacy picture rules in the attachment documentation.
-- **Excluded:**
-  - `attachment_blob`, its entity, and the picture bytes in it stay:
-    non-production Book storage still uses them, and story 21 drops the
-    whole table. Deleting the picture rows here would be an extra bulk
-    delete for no lasting gain (owner decision 2026-09-25).
-  - The `/attachments/` development proxy and GCP route stay; they are
-    harmless and go with story 21 or not at all.
-  - `image:` values the move left unchanged (another notebook's upload, an
-    upload without a note, a missing upload) and `/attachments/images/...`
-    links in note bodies are not rewritten or cleared (owner decision
-    2026-09-25). They show as a broken picture. Copying another notebook's
-    upload stays rejected because it would put one notebook's possibly
-    private bytes into another notebook's history.
-- **Key examples:**
-  1. A note whose picture story 5 moved beside it → after the removal, the
-     picture still displays on the web and arrives on `donut notebook clone`
-     and `pull`.
-  2. A note whose `image:` still names a legacy upload (production has two,
-     whose uploads are already gone) → after the removal, it shows a broken
-     picture; the note, its content and its learning history are unchanged.
-  3. A note that still has a `note.image_id` value → the migration drops the
-     column and the note is still there with its learning history.
-  4. An owner saves a note → no legacy picture cleanup runs. The application
-     starts → no legacy picture move runs.
-  5. An `image:` value that is an external `https://` address → still
-     displays as before.
-- **Depends on:** none; the production check above is done.
-- **Effort hypothesis:** S–M, medium confidence; mostly deletion (about 8
-  whole files and small edits in about 20), with test fixture edits as the
-  main cost.
-- **Safe stopping point:** Until it runs, the legacy picture store is an unused
-  leftover that still holds a backup copy.
-
 <a id="story-21"></a>
 
 ### Remove the separate Book storage
@@ -242,14 +159,15 @@ No executable plan or implementation is authorized by this seed.
   storage (`GcsBookStorage`, `DbBookStorage`), `attachment_blob`, and the code
   that used them are gone. All Books still read and keep their progress.
 - **Scope / value:** Deletes code and tables; no new behaviour. Runs in a
-  release after the Book move is verified. Split from story 18 (owner
-  direction 2026-09-25).
-- **Picture bytes:** Story 18 leaves the legacy picture bytes (161 MiB in
-  production on 2026-09-25) in `attachment_blob`; dropping the table removes
-  them, so picture and Book bytes leave MySQL together.
+  release after the Book move is verified. Split from the legacy picture
+  removal (owner direction 2026-09-25).
+- **Picture bytes:** The legacy picture store is removed except its bytes
+  (161 MiB in production on 2026-09-25), which stay in `attachment_blob`;
+  dropping the table removes them, so picture and Book bytes leave MySQL
+  together. Decide here whether the `/attachments/` development proxy and GCP
+  route go too; no backend handler serves that address any more.
 - **Depends on:** Story 17 delivered and verified in production (after
-  story 22, its startup result is readable); story 18, so no code still reads
-  picture bytes from `attachment_blob` when it is dropped.
+  story 22, its startup result is readable).
 - **Effort hypothesis:** S–M, medium confidence.
 - **Safe stopping point:** Until it runs, the separate Book storage is an
   unused leftover that still holds a backup copy.
@@ -385,9 +303,9 @@ avoids a chicken-and-egg problem is:
 3. Story 5: move existing pictures. Its startup run in v1.3.26 moved nothing;
    the owner's manual trigger completed it (verified 2026-09-25).
 4. Story 17: Book files.
-5. Story 18: remove the legacy picture storage (ready to start); story 22:
-   readable startup-move failures, before the Book move's release; story 21:
-   remove the separate Book storage, after story 17 is verified.
+5. The legacy picture storage is removed (its bytes stay in `attachment_blob`);
+   story 22: readable startup-move failures, before the Book move's release;
+   story 21: remove the separate Book storage, after story 17 is verified.
 
 "Present after clone or pull" is not a story: it is how each of these stories
 is proven. Web deletion (story 2), then dissolve/merge (story 11) and the rarer
@@ -440,15 +358,10 @@ integration need their own selected outcomes.
   the notebook that owns it; leave other-notebook references unchanged; accept
   an ordinary rebase conflict for unpublished local frontmatter edits; keep
   learning state and last-updated time; split legacy removal into pictures
-  (story 18) and Books (story 21).
-- Owner decisions, 2026-09-25 (story 18 refinement): leave unmoved legacy
-  references as broken pictures; verify story 5 in production (no failed
-  notebook, recorded left-over count, one moved picture displays and clones)
-  before starting; remove code and the `image` table in one release; dropping
-  the dead `note.image_id` column is important.
+  (now done) and Books (story 21).
 - Owner decisions, 2026-09-25 (after the production check of the picture
-  move): the manual trigger completed the move, so story 18 proceeds first;
-  it leaves picture bytes in `attachment_blob` for story 21; the production
+  move): the manual trigger completed the move; the picture removal leaves
+  picture bytes in `attachment_blob` for story 21; the production
   check is a read-only database query, not the startup log; story 22 shrinks
   to readable startup-move failures ahead of the Book move; the two notes
   with dead picture links are fixed manually, outside any story.

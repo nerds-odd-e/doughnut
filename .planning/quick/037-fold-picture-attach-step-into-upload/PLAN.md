@@ -7,7 +7,7 @@
 - Kind: bounded retrospective correction; no seed.
 - Corrects the execution of SEED-035#story-18 ("Remove the legacy picture
   storage"), plan `.planning/quick/036-remove-legacy-picture-storage/PLAN.md`
-  (recoverable from Git once wrapped up). Reviewed commits on
+  at commit `db601a2e42` (deleted at wrap-up). Reviewed commits on
   `story/036-remove-legacy-picture-storage`: `89e3f8a67e`, `0d57de8778`,
   `be34f48347`, `c9c8c4a17b`, `a90c95cc92`.
 - Provenance of the residue: `4dad58408f` (SEED-035#story-5, plan

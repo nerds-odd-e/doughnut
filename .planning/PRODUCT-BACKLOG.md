@@ -10,8 +10,6 @@ and deletable in Web Donut.
 
 ## Taken
 
-- [Remove the legacy picture storage](seeds/SEED-035-ai-workspace-supporting-files.md#story-18) — SEED-035#story-18 ([plan](quick/036-remove-legacy-picture-storage/PLAN.md))
-
 ## Backlog list
 
 - [Fold the picture attach step back into the upload](quick/037-fold-picture-attach-step-into-upload/PLAN.md)
