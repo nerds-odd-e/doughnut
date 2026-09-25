@@ -95,11 +95,61 @@ dissolve/merge and cross-notebook operations that the delivered behavior
 refuses for now. The [product backlog](../PRODUCT-BACKLOG.md) owns global order.
 No executable plan or implementation is authorized by this seed.
 
+<a id="story-22"></a>
+
+### Move each notebook's own legacy pictures beside its notes
+```json dough-story-state
+{"schemaVersion":1,"refinement":"refined","approach":"unselected","assessment":"not-ready","reasons":["The production failure cause is unconfirmed, so no execution approach is selected."],"basis":{"document":"e5f5b1c004927c450ee930a4956dc062675734f5160c34e11409f56f1a619fd8"}}
+```
+
+- **Identity:** SEED-035#story-22
+- **Goal:** After one production startup, every notebook's own legacy uploaded
+  pictures are files beside their notes. Owners see those pictures on the web
+  and receive them on `donut notebook clone`. Learning state and each note's
+  last-updated time stay as they were.
+- **Scope:** Find why story 5's startup move left every production notebook
+  unchanged, and make that move succeed. One Donut System forward commit per
+  notebook. Rewrite `image:` from `/attachments/images/<id>/<name>` to a path
+  relative to the note's folder. Store the bytes as a Git LFS object in that
+  notebook's content store. A failing notebook stays unchanged and is retried
+  next startup; it must not block the others. Startup errors for this move
+  must be readable in production. Keep the legacy `image` rows and
+  `attachment_blob` bytes.
+- **Excluded:**
+  - References to another notebook's upload stay unchanged.
+  - Deleting the legacy `image` table and `attachment_blob` bytes is story 18.
+  - Rewriting Git history.
+- **Key examples:**
+  1. Production, after a release containing this story has started once: the
+     leftover query returns no `OWN NOTEBOOK - should have moved` rows. Before
+     the fix that query counted 804 notes in 74 notebooks (ids in the bug
+     report of 2026-09-25), with 0 other-notebook references, 0 uploads without
+     a note, and 0 missing uploads.
+  2. One of those moved pictures displays on the web and arrives on
+     `donut notebook clone`.
+  3. A notebook whose move throws is logged with the failure, left unchanged,
+     and does not stop the other notebooks. The next startup retries it.
+- **Evidence:** v1.3.26 (`72021b8efe`, healthcheck commit
+  `72021b8efed43aa6b84455ff073befc42bcfc3e4`) ran
+  `LegacyNotePictureMoveOnStartup` and moved nothing. App stdout is not in
+  Cloud Logging, `/var/log/doughnut-app.log` is absent, and
+  `journalctl -u google-startup-scripts.service` has no Spring output, so the
+  logged `Notebook {} keeps its legacy pictures` errors cannot be read.
+  Unconfirmed candidates in `LegacyNotePictureMove.move`: missing Git binding
+  in `freeFilenames`, `storeAsLfsPointer` against production GCS, or
+  `acceptedWebChangeService.apply`.
+- **Depends on:** none. Story 5 is already on main and in v1.3.26; this story
+  is the production repair of that move.
+- **Effort hypothesis:** L, low confidence until the production failure is
+  reproduced. Includes making the startup error readable.
+- **Safe stopping point:** Legacy rows remain the backup. A partial run leaves
+  failed notebooks unchanged for the next startup.
+
 <a id="story-18"></a>
 
 ### Remove the legacy picture storage
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"unselected","assessment":"not-ready","reasons":["Waiting for a release containing story 5 and its verification in production","No execution approach selected yet"],"basis":{"document":"2441cebb0a1cfb4a0618af77298fb91f5725ebbd65fdadb9ab36cffc79e4853a"}}
+{"schemaVersion":1,"refinement":"refined","approach":"unselected","assessment":"not-ready","reasons":["Waiting for story 22 to be verified in production.","No execution approach selected yet."],"basis":{"document":"e5f5b1c004927c450ee930a4956dc062675734f5160c34e11409f56f1a619fd8"}}
 ```
 
 - **Identity:** SEED-035#story-18
@@ -108,14 +158,13 @@ No executable plan or implementation is authorized by this seed.
   keep every moved picture, because each one already works as a notebook
   file. Picture bytes leave MySQL, as the
   [Git LFS contract](../../docs/notebook-git-lfs.md) requires.
-- **Why it waits:** Story 5 (the picture move) is done on main but not yet in
-  a release. This story starts only after a release containing story 5 has
-  run in production and the move is verified: the startup log shows no
-  notebook whose move failed, the count of left-over references in the
-  startup warning is recorded here, and one moved picture displays on the web
-  and arrives on clone. Dropping the table deletes the backup copy of every
-  moved picture and cannot be undone; the production database backup is the
-  only safety net, and no special export is made.
+- **Why it waits:** Story 5 shipped in v1.3.26 and moved nothing in
+  production. This story starts only after story 22 has run in production and
+  the move is verified: the leftover query returns no own-notebook rows, and
+  one moved picture displays on the web and arrives on clone. Dropping the
+  table deletes the backup copy of every moved picture and cannot be undone;
+  the production database backup is the only safety net, and no special
+  export is made.
 - **Scope:** No new behaviour. Remove, in one release (code and table
   together):
   - the `image` table, with its picture bytes in `attachment_blob`, through a
@@ -157,8 +206,7 @@ No executable plan or implementation is authorized by this seed.
      starts → no legacy picture move runs.
   5. An `image:` value that is an external `https://` address → still
      displays as before.
-- **Depends on:** Story 5 (delivered on main) released and verified in
-  production as above.
+- **Depends on:** Story 22 released and verified in production as above.
 - **Effort hypothesis:** S–M, medium confidence; mostly deletion (about 8
   whole files and small edits in about 20), with test fixture edits as the
   main cost.
@@ -315,7 +363,7 @@ avoids a chicken-and-egg problem is:
 1. Story 14: every notebook converted to LFS, and no path creates a raw one;
    then story 20 moves the tests to LFS notebooks.
 2. Story 4: new uploads become files, so the set of legacy pictures stops growing.
-3. Story 5: move existing pictures.
+3. Story 5 shipped in v1.3.26 and moved nothing; story 22 repairs that move.
 4. Story 17: Book files.
 5. Story 18: remove the legacy picture storage, after story 5 is verified in
    production; story 21: remove the separate Book storage, after story 17 is
