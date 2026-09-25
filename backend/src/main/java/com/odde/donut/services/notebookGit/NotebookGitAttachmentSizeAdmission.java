@@ -145,9 +145,9 @@ final class NotebookGitAttachmentSizeAdmission {
             + size
             + " bytes, which exceeds the "
             + LIMIT_BYTES
-            + "-byte limit. Amend or rebase the unpublished proposal so this oversized payload is"
-            + " gone before publishing. Do not rewrite already accepted commits; a later tip"
-            + " deletion alone does not clear an oversized payload from unpublished history.");
+            + "-byte limit in the proposal's latest commit. Remove or shrink it in the unpublished"
+            + " commits (amending or adding a commit both work), then publish again. Do not"
+            + " rewrite already accepted commits.");
   }
 
   private static ResponseStatusException missingObjectRefusal(String path, String sha256Hex) {

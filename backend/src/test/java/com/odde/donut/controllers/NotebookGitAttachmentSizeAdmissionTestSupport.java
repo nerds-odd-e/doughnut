@@ -1,7 +1,7 @@
 package com.odde.donut.controllers;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.equalTo;
 
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.services.notebookTree.PortableTreeEntry;
@@ -17,13 +17,18 @@ abstract class NotebookGitAttachmentSizeAdmissionTestSupport
   static final String NOTE_MARKDOWN = "---\ntype: Note\n---\naccepted content";
 
   static void assertOversizedRefusal(ResponseStatusException exception, String path, long size) {
-    String reason = exception.getReason();
-    assertThat(reason, containsString("\"" + path + "\""));
-    assertThat(reason, containsString(Long.toString(size)));
-    assertThat(reason, containsString(Long.toString(LIMIT)));
-    assertThat(reason, containsString("Amend or rebase the unpublished proposal"));
-    assertThat(reason, containsString("Do not rewrite already accepted commits"));
-    assertThat(reason, containsString("tip deletion alone"));
+    assertThat(
+        exception.getReason(),
+        equalTo(
+            "Attachment \""
+                + path
+                + "\" is "
+                + size
+                + " bytes, which exceeds the "
+                + LIMIT
+                + "-byte limit in the proposal's latest commit. Remove or shrink it in the"
+                + " unpublished commits (amending or adding a commit both work), then publish"
+                + " again. Do not rewrite already accepted commits."));
   }
 
   List<PortableTreeEntry> committedRootAttachments(Notebook notebook) {
