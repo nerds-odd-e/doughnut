@@ -99,28 +99,56 @@ No executable plan or implementation is authorized by this seed.
 
 ### Remove the separate Book storage
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"not-refined","approach":"unselected"}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../quick/040-remove-separate-book-storage/PLAN.md","assessment":"not-ready","reasons":["Execution gate open: the release with story 17's Book move is not yet deployed and the production query (no Book without a path) has not run."],"basis":{"document":"42d96cbf0c28da231614054ca85a1bbd25609c6e59df03476c5c57d77a71b85d","plan":"e74fb0498e45b7f1952766c9de18d2a61bb68c75bf8c4887147ef1689a56d90b"}}
 ```
 
 - **Identity:** SEED-035#story-21
-- **Goal:** Maintainers keep one attachment implementation. Owners keep every
-  Book, because each one already reads from a notebook file.
-- **Evaluation:** After story 17 is confirmed in production, the separate Book
-  storage (`GcsBookStorage`, `DbBookStorage`), `attachment_blob`, and the code
-  that used them are gone. All Books still read and keep their progress.
-- **Scope / value:** Deletes code and tables; no new behaviour. Runs in a
-  release after the Book move is verified. Split from the legacy picture
-  removal (owner direction 2026-09-25).
-- **Picture bytes:** The legacy picture store is removed except its bytes
-  (161 MiB in production on 2026-09-25), which stay in `attachment_blob`;
-  dropping the table removes them, so picture and Book bytes leave MySQL
-  together. Decide here whether the `/attachments/` development proxy and GCP
-  route go too; no backend handler serves that address any more.
-- **Depends on:** Story 17 delivered and verified in production by database
-  query.
+- **Goal:** Maintainers keep one attachment implementation and one place for
+  file bytes: every Book reads only from its notebook file, and nothing is left
+  of the old Book storage, the old picture bytes, or the old picture address.
+  Owners notice nothing; every Book keeps reading with its progress.
+- **Depends on:** the release carrying story 17's Book move is deployed, and a
+  read-only production query shows no Book without a notebook path
+  (`SELECT COUNT(*) FROM book WHERE source_file_path IS NULL` returns 0).
+  Until then the story cannot start; nothing else waits on it.
+- **Scope:**
+  - Remove the old Book storage and everything that only served it: the
+    storage interface and its GCS and database implementations with their
+    configuration, the startup move of old Books, the read from old storage
+    when a Book has no path, the Book's old storage reference, and their tests
+    and configuration properties.
+  - A Book always has a notebook path; the schema requires it.
+  - Drop `attachment_blob` outright, with no backup. In production it holds only
+    the old pictures' leftover bytes (161 MiB on 2026-09-25), since the picture
+    move is verified (owner decision 2026-09-26).
+  - Remove the `/attachments/` address: the development proxy and the
+    production path-routing entry and its test. Nothing serves it since the
+    legacy picture removal. The notebook file page
+    `/notebooks/:notebookId/attachments/:attachmentId` is unaffected.
+  - Delete the production bucket `doughnut-book-pdf-carbon-syntax-298809` and
+    its access bindings, and remove its setup from the operations docs. The
+    notebook LFS bucket and the production storage client it uses stay.
+- **Excluded:** any change to how Books are attached, read, laid out, or
+  limited (the 100 MB Book upload limit stays); any backup or export of the
+  removed bytes.
+- **Key examples:**
+  - A production Book attached before story 17 opens after this release,
+    reading from its notebook file, and resumes at its saved reading position.
+  - Attaching a new Book in development or test works with no
+    `attachment_blob` table.
+  - Cloning a notebook with a Book still delivers the Book's source file.
+  - A request to `/attachments/...` is no longer sent to the backend.
+  - After the bucket deletion, listing the Book bucket reports it does not
+    exist, and notebook pictures and Book files still download.
+- **Bucket deletion timing:** it cannot be undone, so it runs as the story's
+  last step, after the production query above, with the owner confirming the
+  command at that moment. Code that still refers to the bucket reads it only for
+  a Book without a path, which the query has ruled out.
+- **Order:** independent of story 2; either may go first (owner kept the
+  backlog order, 2026-09-26).
 - **Effort hypothesis:** S–M, medium confidence.
-- **Safe stopping point:** Until it runs, the separate Book storage is an
-  unused leftover that still holds a backup copy.
+- **Safe stopping point:** after the code and table removal is released, the
+  bucket is an unused leftover; deleting it is a separate, small step.
 
 <a id="story-2"></a>
 
@@ -254,7 +282,8 @@ avoids a chicken-and-egg problem is:
    the owner's manual trigger completed it (verified 2026-09-25).
 4. Story 17: Book files.
 5. The legacy picture storage is removed (its bytes stay in `attachment_blob`);
-   story 21: remove the separate Book storage, after story 17 is verified by
+   story 21: remove the separate Book storage, `attachment_blob`, the
+   `/attachments/` address and the Book bucket, after story 17 is verified by
    database query in production.
 
 "Present after clone or pull" is not a story: it is how each of these stories
@@ -318,6 +347,10 @@ integration need their own selected outcomes.
   remove the file; deleting a file a note's `image:` names is allowed and
   leaves a broken picture; delete outright with no web Trash; keep the
   backlog order.
+- Owner decisions, 2026-09-26 (story 21 refinement): release story 17's Book
+  move first; keep the backlog order, since stories 2 and 21 are independent;
+  drop `attachment_blob` outright with no backup; remove the `/attachments/`
+  address; delete the Book GCS bucket within this story.
 - [Near-future direction](../PRODUCT-BACKLOG.md#near-future-direction).
 - [SEED-009](SEED-009-git-backed-local-notebook-workflow.md): prior local/web note
   workflow. This seed owns non-Markdown attachment continuity.
