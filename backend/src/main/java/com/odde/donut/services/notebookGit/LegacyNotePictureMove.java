@@ -27,7 +27,9 @@ import org.springframework.transaction.annotation.Transactional;
  * A note whose {@code image:} names a legacy upload owned by a note in the same notebook gets that
  * picture as a file in its own folder under the next free name, and {@code image:} names the file.
  * The pictures' bytes are stored first, then all of a notebook's moved pictures are accepted as one
- * web change. The legacy rows stay as the backup.
+ * web change. The legacy rows stay as the backup. A reference to an upload not owned in this
+ * notebook (another notebook's, or a row without a note) is left unchanged and counted; a reference
+ * to a missing row is left unchanged.
  */
 @Service
 public class LegacyNotePictureMove {
@@ -56,11 +58,22 @@ public class LegacyNotePictureMove {
     this.repositoryStore = repositoryStore;
   }
 
+  /**
+   * @return how many references to an upload not owned in this notebook were left unchanged
+   */
   @Transactional(rollbackFor = Exception.class)
-  public void move(Integer notebookId) throws IOException, UnexpectedNoAccessRightException {
-    Map<Note, Image> pictures = ownLegacyPictures(notebookId);
+  public int move(Integer notebookId) throws IOException, UnexpectedNoAccessRightException {
+    Map<Note, Image> referenced = referencedLegacyPictures(notebookId);
+    Map<Note, Image> pictures = new LinkedHashMap<>();
+    referenced.forEach(
+        (note, image) -> {
+          if (ownedIn(notebookId, image)) {
+            pictures.put(note, image);
+          }
+        });
+    int skippedReferences = referenced.size() - pictures.size();
     if (pictures.isEmpty()) {
-      return;
+      return skippedReferences;
     }
     Map<Note, String> filenames = freeFilenames(notebookId, pictures);
     Map<Image, byte[]> pointers = new HashMap<>();
@@ -84,9 +97,14 @@ public class LegacyNotePictureMove {
         },
         ignored -> "Move uploaded pictures into the notebook",
         testabilitySettings.getCurrentUTCTimestamp());
+    return skippedReferences;
   }
 
-  private Map<Note, Image> ownLegacyPictures(Integer notebookId) {
+  private static boolean ownedIn(Integer notebookId, Image image) {
+    return image.getNote() != null && image.getNote().getNotebook().getId().equals(notebookId);
+  }
+
+  private Map<Note, Image> referencedLegacyPictures(Integer notebookId) {
     List<Note> notes =
         entityPersister
             .createQuery(
@@ -99,7 +117,6 @@ public class LegacyNotePictureMove {
     for (Note note : notes) {
       legacyImageId(note)
           .map(id -> entityPersister.find(Image.class, id))
-          .filter(image -> image.getNote().getNotebook().getId().equals(notebookId))
           .ifPresent(image -> pictures.put(note, image));
     }
     return pictures;

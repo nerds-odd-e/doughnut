@@ -150,7 +150,8 @@ behavior.
 
 ### 4. Only a picture from the same notebook is moved, and skipped references are reported
 Type: Behavior
-Status: planned
+Status: done — `move` returns the skipped-reference count (`ownedIn` rule);
+accepted proof: `LegacyNotePictureMoveControllerTest` (10).
 Proof: slice 4 row of the proof table.
 
 Slice 2's rule already gives each referring note in the notebook its own file
@@ -213,3 +214,6 @@ an external wait.
   `legacyImageCount`) live in `NotebookGitWebContentControllerTestBase`.
 - `image.note_id` is nullable; `image.name` is `varchar(255)`, so a numbered
   moved name always fits `notebook_attachment.filename` (`varchar(512)`).
+- A legacy row without a note counts as not owned in the notebook: left
+  unchanged and counted with other-notebook references; a missing row is left
+  unchanged and not counted.

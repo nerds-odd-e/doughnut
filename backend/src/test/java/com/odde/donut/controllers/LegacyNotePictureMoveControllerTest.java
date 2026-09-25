@@ -134,6 +134,71 @@ class LegacyNotePictureMoveControllerTest extends NotebookGitWebContentControlle
         equalTo("---\ntype: Note\nimage: picture.png\n---\nbody"));
   }
 
+  @Test
+  void anotherNotesUploadInTheSameNotebookBecomesTheReferringNotesOwnCopy() throws Exception {
+    Notebook notebook = createGitBackedNotebook();
+    Folder physics = makeMe.aFolder().notebook(notebook).name("physics").please();
+    Folder chemistry = makeMe.aFolder().notebook(notebook).name("chemistry").please();
+    Note force = makeMe.aNote("force").folder(physics).please();
+    Note mass = makeMe.aNote("mass").folder(chemistry).please();
+    Image legacy = makeMe.anImage().forNote(force).by(currentUser.getUser()).please();
+    String reference =
+        "---\nimage: /attachments/images/" + legacy.getId() + "/example.png\n---\nbody";
+    authorReferencingContentCommitted(force, reference);
+    authorReferencingContentCommitted(mass, reference);
+    snapshotCurrentPortableTree(notebook);
+
+    int skippedReferences = legacyNotePictureMove.move(notebook.getId());
+
+    AcceptedHistory after = acceptedHistory(notebook);
+    byte[] pointer = lfsPointerStoredFor(notebook, "DEADBEEF".getBytes());
+    assertThat(tipContent(after, "physics/example.png"), equalTo(pointer));
+    assertThat(tipContent(after, "chemistry/example.png"), equalTo(pointer));
+    assertThat(
+        tipText(after, "chemistry/mass.md"),
+        equalTo("---\ntype: Note\nimage: example.png\n---\nbody"));
+    assertThat(skippedReferences, equalTo(0));
+    assertAcceptedTreeMatchesTheFullAssembly(notebook);
+  }
+
+  @Test
+  void anotherNotebooksUploadIsLeftUnchangedAndCounted() throws Exception {
+    Image elsewhere =
+        makeMe
+            .anImage()
+            .forNote(makeMe.aNote("elsewhere").please())
+            .by(currentUser.getUser())
+            .please();
+    assertReferenceLeftUnchanged(elsewhere.getId(), 1);
+  }
+
+  @Test
+  void anUploadWithoutANoteIsLeftUnchangedAndCounted() throws Exception {
+    Image orphan = makeMe.anImage().by(currentUser.getUser()).please();
+    assertReferenceLeftUnchanged(orphan.getId(), 1);
+  }
+
+  @Test
+  void aReferenceToAMissingUploadIsLeftUnchanged() throws Exception {
+    assertReferenceLeftUnchanged(Integer.MAX_VALUE, 0);
+  }
+
+  private void assertReferenceLeftUnchanged(Integer imageId, int expectedCount) throws Exception {
+    Notebook notebook = createGitBackedNotebook();
+    Note force = makeMe.aNote("force").notebook(notebook).please();
+    authorReferencingContentCommitted(
+        force, "---\nimage: /attachments/images/" + imageId + "/example.png\n---\nbody");
+    snapshotCurrentPortableTree(notebook);
+    List<String> commitsBefore = acceptedHistory(notebook).commits();
+    String contentBefore = reloaded(force).getContent();
+
+    int skippedReferences = legacyNotePictureMove.move(notebook.getId());
+
+    assertThat(acceptedHistory(notebook).commits(), equalTo(commitsBefore));
+    assertThat(reloaded(force).getContent(), equalTo(contentBefore));
+    assertThat(skippedReferences, equalTo(expectedCount));
+  }
+
   private Note legacyPictureNote(Folder folder, String title, String storedName) {
     Note note = makeMe.aNote(title).folder(folder).please();
     Image legacy =
