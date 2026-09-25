@@ -132,7 +132,12 @@ prefix of one (the `representedInTree` test).
 
 ### 4. One rule sets a note's `image:`
 Type: Structure
-Status: planned
+Status: done
+Accepted proof: `NoteContentMarkdownTest`, `NoteControllerUploadNoteImageTests`,
+`com.odde.donut.testability.*`; E2E `note_frontmatter_image`, `assimilation_page_types`
+and five features seeding frontmatter without an image stay green. Seeds now set
+`image:` / `image_mask:` through `withNoteImage` / `withNoteImageMask` and are
+otherwise stored as written.
 Proof: see table row 3.
 
 Internal change: `NotesTestData.buildNote` sets `image` and `image_mask` through

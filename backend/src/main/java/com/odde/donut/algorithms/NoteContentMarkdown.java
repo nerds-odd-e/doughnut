@@ -17,9 +17,6 @@ public final class NoteContentMarkdown {
   private static final String NOTE_IMAGE_KEY = "image";
   private static final String NOTE_IMAGE_MASK_KEY = "image_mask";
 
-  private static final Set<String> NOTE_IMAGE_MAPPING_KEYS =
-      Set.of(NOTE_IMAGE_KEY, NOTE_IMAGE_MASK_KEY);
-
   private static final Pattern ATTACHMENT_IMAGE_PATH_PREFIX =
       Pattern.compile("^/attachments/images/(\\d+)/");
 
@@ -142,36 +139,9 @@ public final class NoteContentMarkdown {
     return setLeadingFrontmatterProperty(content, NOTE_IMAGE_KEY, image);
   }
 
-  /**
-   * Updates or removes {@code image:} and {@code image_mask:} scalar lines in the first leading
-   * YAML frontmatter block so note display can read a single source of truth from {@code
-   * note.content}. When {@code hasImage} is false, both lines are removed if present.
-   */
-  public static String mergeNoteImageScalarsIntoContent(
-      String content, boolean hasImage, String imageUrl, String imageMask) {
-    if (content == null) {
-      content = "";
-    }
-    Optional<LeadingFrontmatter> split = splitLeadingFrontmatter(content);
-    if (split.isEmpty()) {
-      if (!hasImage) {
-        return content;
-      }
-      Frontmatter fm = Frontmatter.empty().set(NOTE_IMAGE_KEY, trimOrNull(imageUrl));
-      if (imageMask != null && !imageMask.isBlank()) {
-        fm = fm.set(NOTE_IMAGE_MASK_KEY, imageMask.trim());
-      }
-      return fm.fenced(content);
-    }
-    LeadingFrontmatter lf = split.get();
-    Frontmatter fm = lf.frontmatter().remove(NOTE_IMAGE_MAPPING_KEYS);
-    if (hasImage && imageUrl != null && !imageUrl.isBlank()) {
-      fm = fm.set(NOTE_IMAGE_KEY, imageUrl.trim());
-      if (imageMask != null && !imageMask.isBlank()) {
-        fm = fm.set(NOTE_IMAGE_MASK_KEY, imageMask.trim());
-      }
-    }
-    return fm.fenced(lf.body());
+  /** Sets the leading frontmatter's {@code image_mask:} scalar, leaving other properties as is. */
+  public static String withNoteImageMask(String content, String imageMask) {
+    return setLeadingFrontmatterProperty(content, NOTE_IMAGE_MASK_KEY, imageMask);
   }
 
   public static Optional<String> removeWikiLinksFromLeadingFrontmatterProperties(
@@ -220,9 +190,5 @@ public final class NoteContentMarkdown {
       return lf.frontmatter().set(key, value).fenced(lf.body());
     }
     return Frontmatter.empty().set(key, value).fenced(content);
-  }
-
-  private static String trimOrNull(String s) {
-    return s == null ? null : s.trim();
   }
 }

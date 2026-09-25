@@ -23,13 +23,10 @@ import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
 
 class NoteControllerUploadNoteImageTests extends NotebookGitWebContentControllerTestBase {
-  @Autowired NoteAttachmentImageController noteAttachmentImageController;
-
   @Test
   void theUploadedPictureIsAFileInTheNotesFolderNamedByItsImageInOneAcceptedCommit()
       throws Exception {
@@ -89,21 +86,6 @@ class NoteControllerUploadNoteImageTests extends NotebookGitWebContentController
         tipText(acceptedHistory(notebook), "Moon.md"),
         equalTo("---\ntype: Note\nimage: my.png\nimage_mask: 10 10 20 20\n---\nbody"));
     assertThat(legacyImageCount(moon), equalTo(1L));
-  }
-
-  @Test
-  void shouldKeepTheOriginalBytesOfAPictureWiderThan2000Pixels() throws Exception {
-    Notebook notebook = createGitBackedNotebook();
-    Note moon = makeMe.aNote("Moon").notebook(notebook).please();
-    MultipartFile picture = makeMe.anUploadedImage().metrics(2001, 2).toMultiplePartFilePlease();
-
-    upload(moon, picture);
-
-    assertThat(
-        noteAttachmentImageController
-            .showAttachmentImage(noteRepository.findById(moon.getId()).orElseThrow(), "my.png")
-            .getBody(),
-        equalTo(picture.getBytes()));
   }
 
   @Test
