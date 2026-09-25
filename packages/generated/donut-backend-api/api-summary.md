@@ -61,10 +61,8 @@ Use this for endpoint lookup; open `sdk.gen.ts` or `types.gen.ts` only for exact
 
 ## Notebook Git Testability Controller
 
-- `seedLegacyNotePictureForTestability`: POST `/api/testability/seed_legacy_note_picture_for_testability` -> `SeedLegacyNotePictureForTestabilityResponse` (request: `SeedLegacyNotePictureForTestabilityData`; body: SeedLegacyNotePictureRequest; response body: string)
 - `resnapshotNotebookGitBindingForTestability`: POST `/api/testability/resnapshot_notebook_git_binding_for_testability` -> `ResnapshotNotebookGitBindingForTestabilityResponse` (request: `ResnapshotNotebookGitBindingForTestabilityData`; body: NotebookNameRequest; response body: string)
 - `putNotebookFileForTestability`: POST `/api/testability/put_notebook_file_for_testability` -> `PutNotebookFileForTestabilityResponse` (request: `PutNotebookFileForTestabilityData`; body: PutNotebookFileRequest; response body: string)
-- `moveLegacyNotePicturesForTestability`: POST `/api/testability/move_legacy_note_pictures_for_testability` -> `MoveLegacyNotePicturesForTestabilityResponse` (request: `MoveLegacyNotePicturesForTestabilityData`; body: NotebookNameRequest; response body: string)
 
 ## Notebook Lfs Testability Controller
 

@@ -91,8 +91,20 @@ alone.
 
 ### 2. Startup no longer moves legacy pictures
 Type: Behavior
-Status: planned
-Proof: slice 2 row above.
+Status: done
+Proof: slice 2 row above. Accepted: `pnpm generateTypeScript`;
+`pnpm backend:test:worktree --tests
+'com.odde.donut.controllers.NoteControllerUploadNoteImage*'` (main and test
+compile, 15 pass); `pnpm cy:run --spec
+e2e_test/features/cli/cli_notebook_lfs.feature` 12/12 without the legacy
+scenario. The doc keeps the orphan-cleanup and "rows still served" sentences
+for slices 3 and 4.
+Deferred refactor (owner decision): `NoteImageFileAttachment` was split out of
+`WebNoteImageUploadService` only to share it with the move; its sole caller is
+now the upload service, so it could be inlined back and deleted. The refactor
+agent's file deletion was blocked by the permission classifier, so it was not
+done here.
+Learning: `pnpm backend:test:worktree` takes exactly one `--tests` pattern.
 
 Behavior: the application starts → no legacy picture move runs, and
 testability offers no legacy seeding or move.

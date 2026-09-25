@@ -33,29 +33,6 @@ Given(
   }
 )
 
-Given(
-  'the note {string} in the notebook {string} has a legacy uploaded picture from fixture {string}',
-  (noteTitle: string, notebookName: string, fixture: string) => {
-    cy.fixture(fixture, 'base64').then((contentBase64: string) =>
-      start
-        .testability()
-        .seedLegacyNotePictureForTestability(
-          notebookName,
-          noteTitle,
-          fixture.split('/').pop()!,
-          contentBase64
-        )
-    )
-  }
-)
-
-When(
-  'the legacy uploaded pictures of the notebook {string} are moved into the notebook',
-  (notebookName: string) => {
-    start.testability().moveLegacyNotePicturesForTestability(notebookName)
-  }
-)
-
 When(
   'I open the file {string} in sidebar folder path {string}',
   (filename: string, folderPath: string) => {

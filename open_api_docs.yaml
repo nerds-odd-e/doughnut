@@ -264,24 +264,6 @@ paths:
             '*/*':
               schema:
                 type: string
-  /api/testability/seed_legacy_note_picture_for_testability:
-    post:
-      tags:
-      - notebook-git-testability-controller
-      operationId: seedLegacyNotePictureForTestability
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/SeedLegacyNotePictureRequest"
-        required: true
-      responses:
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                type: string
   /api/testability/resnapshot_notebook_git_binding_for_testability:
     post:
       tags:
@@ -368,24 +350,6 @@ paths:
       responses:
         "200":
           description: OK
-  /api/testability/move_legacy_note_pictures_for_testability:
-    post:
-      tags:
-      - notebook-git-testability-controller
-      operationId: moveLegacyNotePicturesForTestability
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/NotebookNameRequest"
-        required: true
-      responses:
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                type: string
   /api/testability/inspect_notebook_lfs_attachment_for_testability:
     post:
       tags:
@@ -3902,22 +3866,6 @@ components:
         notebookName:
           type: string
       required:
-      - notebookName
-    SeedLegacyNotePictureRequest:
-      type: object
-      properties:
-        notebookName:
-          type: string
-        noteTitle:
-          type: string
-        filename:
-          type: string
-        contentBase64:
-          type: string
-      required:
-      - contentBase64
-      - filename
-      - noteTitle
       - notebookName
     NotebookNameRequest:
       type: object

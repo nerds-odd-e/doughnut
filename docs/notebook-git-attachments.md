@@ -74,30 +74,13 @@ refused with a message naming the path; nothing is renamed or overwritten. A not
 upload.
 
 Legacy uploaded pictures (the `image` table, addressed as
-`/attachments/images/{id}/{fileName}`) are moved into their notebooks at
-application startup, after Flyway's migration. For each notebook with a note
-whose content mentions that address, a note whose frontmatter `image:` names an
-upload owned by a note in the same notebook gets the picture's bytes stored
-first and then a file beside the note, and `image:` names that file; the
-`image_mask:`, body and last-updated time are unchanged. The file uses the
-stored name's last segment (`picture` is prefixed to a hidden or empty one) and,
-when the folder already uses it or another moved picture chose it, the next
-free numbered name before the extension (`example (2).png`). Each note referring
-to the same upload gets its own copy. All of a notebook's moved pictures are one
-Donut System commit. Each notebook moves in its own transaction: a notebook
-whose move fails is logged and left unchanged, the others still move, and the
-next startup retries it. Running the move again changes nothing. A reference to
-another notebook's upload or to an upload without a note is left unchanged and
-counted in a startup warning; a reference to a missing upload is left
-unchanged. Trashed notes move like any other note, and recall and memory-tracker
-state are untouched. Moved pictures are existing content, so the 10 MiB limit
-for new payloads does not apply to them. Another notebook's upload is never
-copied, because that would place one notebook's possibly private bytes in
-another notebook's history. Legacy orphan cleanup skips a note-relative
-`image:` value, so a moved note's row stays as the backup. The legacy rows stay, still served inline under the notebook read
-rule (owners, subscribers, and Bazaar readers, even logged out; another user is
-refused, and an anonymous request for a private notebook's image must log in),
-until they are retired. No new picture is stored there.
+`/attachments/images/{id}/{fileName}`) were moved into their notebooks as files
+beside their notes, and the legacy store is retired: no new picture is stored
+there. Until its removal is finished, legacy orphan cleanup skips a
+note-relative `image:` value, and the remaining rows are still served inline
+under the notebook read rule (owners, subscribers, and Bazaar readers, even
+logged out; another user is refused, and an anonymous request for a private
+notebook's image must log in).
 
 
 A Book's source file (PDF or EPUB) is an ordinary file at the notebook root.
