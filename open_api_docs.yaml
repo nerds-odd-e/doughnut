@@ -429,24 +429,6 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/Mcq"
-  /api/testability/force_raw_notebook_git_binding_for_testability:
-    post:
-      tags:
-      - notebook-git-testability-controller
-      operationId: forceRawNotebookGitBindingForTestability
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/NotebookNameRequest"
-        required: true
-      responses:
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                type: string
   /api/testability/feature_toggle:
     get:
       tags:
@@ -479,24 +461,6 @@ paths:
               schema:
                 type: array
                 items: {}
-  /api/testability/convert_raw_notebook_to_lfs_for_testability:
-    post:
-      tags:
-      - notebook-git-testability-controller
-      operationId: convertRawNotebookToLfsForTestability
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/NotebookNameRequest"
-        required: true
-      responses:
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                type: string
   /api/testability/clean_db_and_reset_testability_settings:
     post:
       tags:

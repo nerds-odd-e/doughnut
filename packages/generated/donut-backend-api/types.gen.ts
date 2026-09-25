@@ -1726,22 +1726,6 @@ export type InjectMcqResponses = {
 
 export type InjectMcqResponse = InjectMcqResponses[keyof InjectMcqResponses];
 
-export type ForceRawNotebookGitBindingForTestabilityData = {
-    body: NotebookNameRequest;
-    path?: never;
-    query?: never;
-    url: '/api/testability/force_raw_notebook_git_binding_for_testability';
-};
-
-export type ForceRawNotebookGitBindingForTestabilityResponses = {
-    /**
-     * OK
-     */
-    200: string;
-};
-
-export type ForceRawNotebookGitBindingForTestabilityResponse = ForceRawNotebookGitBindingForTestabilityResponses[keyof ForceRawNotebookGitBindingForTestabilityResponses];
-
 export type GetFeatureToggleData = {
     body?: never;
     path?: never;
@@ -1775,22 +1759,6 @@ export type EnableFeatureToggleResponses = {
 };
 
 export type EnableFeatureToggleResponse = EnableFeatureToggleResponses[keyof EnableFeatureToggleResponses];
-
-export type ConvertRawNotebookToLfsForTestabilityData = {
-    body: NotebookNameRequest;
-    path?: never;
-    query?: never;
-    url: '/api/testability/convert_raw_notebook_to_lfs_for_testability';
-};
-
-export type ConvertRawNotebookToLfsForTestabilityResponses = {
-    /**
-     * OK
-     */
-    200: string;
-};
-
-export type ConvertRawNotebookToLfsForTestabilityResponse = ConvertRawNotebookToLfsForTestabilityResponses[keyof ConvertRawNotebookToLfsForTestabilityResponses];
 
 export type ResetDbAndTestabilitySettingsData = {
     body?: never;

@@ -72,21 +72,6 @@ function notebookClone() {
     },
 
     /**
-     * Explicit legacy-raw fixture: demotes product-created LFS notebooks so pull-based scenarios
-     * keep proving the raw journey rather than silently becoming LFS.
-     */
-    forceRawGitBinding(notebookName: string) {
-      return testability().forceRawNotebookGitBindingForTestability(
-        notebookName
-      )
-    },
-
-    /** Runs the one-time conversion of a legacy raw notebook to LFS storage. */
-    convertToLfs(notebookName: string) {
-      return testability().convertRawNotebookToLfsForTestability(notebookName)
-    },
-
-    /**
      * Resolves the notebook's numeric id, writes the owner's saved access token into the
      * isolated `@cliConfigDir`, then runs the installed CLI's non-interactive clone command
      * into a fresh test-owned destination (aliased `@cliCloneDestination`).

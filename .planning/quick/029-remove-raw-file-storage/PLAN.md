@@ -77,7 +77,14 @@ Assumptions (checked on `origin/main` `a061808c28`, 2026-09-24):
 
 ### 1. Raw history stays usable without the startup conversion
 Type: Structure
-Status: planned
+Status: done
+Accepted proof: `NotebookGitAttachmentLfsRawHistoryControllerTest`
+(`rawHistoryStaysReadableWhileANewPictureIsPublished`) green before and after
+the deletions, with the LFS publication, web continuity, LFS size-history and
+`NotebookAttachmentControllerTest` classes; `cli/tests/notebookPublish.lfs.test.ts`
+green; `cli_notebook_lfs.feature` 11/11; API client regenerated, frontend
+`vue-tsc` clean. `findNotebookIdsByAttachmentRepresentation` was deleted here
+(no other user).
 Proof: new raw-history controller test (example 3) green before and after the
 deletions; `cli/tests/notebookPublish.lfs.test.ts` green;
 `pnpm cypress run --spec e2e_test/features/cli/cli_notebook_lfs.feature` green
@@ -196,4 +203,6 @@ gone, keeping the drop assertion.
 
 ## Learnings
 
-(none yet)
+- The existing `commitOnTopOf`/`seedAcceptedHistory` helpers express a
+  raw-then-LFS accepted history; slices 2 and 3 can rely on the slice 1 test
+  when they remove the raw branches.

@@ -25,31 +25,6 @@ export const notebookGitTestabilityMethods = {
     )
   },
 
-  /**
-   * Demotes a product-created LFS notebook to legacy RAW so pull-based fixtures keep proving
-   * the raw journey explicitly.
-   */
-  forceRawNotebookGitBindingForTestability(notebookName: string) {
-    return cy.wrap(
-      NotebookGitTestabilityController.forceRawNotebookGitBindingForTestability(
-        {
-          body: { notebookName },
-        }
-      ),
-      { log: false }
-    )
-  },
-
-  /** Runs the startup conversion of a legacy RAW notebook to LFS on demand. */
-  convertRawNotebookToLfsForTestability(notebookName: string) {
-    return cy.wrap(
-      NotebookGitTestabilityController.convertRawNotebookToLfsForTestability({
-        body: { notebookName },
-      }),
-      { log: false }
-    )
-  },
-
   /** Stores text as a file at a slash-separated notebook path (creating folders), then resnapshots. */
   putNotebookFileForTestability(
     notebookName: string,

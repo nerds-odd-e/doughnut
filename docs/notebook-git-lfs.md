@@ -74,24 +74,18 @@ error naming the file as unavailable and is recorded as a server failure,
 because a missing tip object is lost content; the pointer text is never served
 as the file. A zero-byte file is served empty.
 
-## Converting existing notebooks
+## Notebooks converted from raw storage
 
 Every notebook Git binding Donut creates is LFS, including one created by a
-history reset. After the application starts (every profile except `test`),
-each notebook whose binding is still raw is converted in its own transaction:
-one forward commit by Donut System, "Store notebook files with Git LFS", sets
-`.gitattributes` to the standard content and replaces each current non-empty
-file with its pointer after storing the bytes in the notebook's content store.
-Empty files stay empty, and earlier commits keep their raw bytes. A notebook
-whose conversion fails is logged with its id and stays raw until the next
-start; the others still convert. An existing checkout receives the commit
-with `donut notebook pull`.
+history reset. Notebooks that once stored files raw were converted by one
+forward commit by Donut System, "Store notebook files with Git LFS", which set
+`.gitattributes` to the standard content and replaced each current non-empty
+file with its pointer. Earlier commits keep their raw bytes: a clone still
+reads them, and publishing and web download work on the current pointers.
 
 When publishing, the CLI checks every attachment in the commits being
 published is a pointer or empty, but ignores raw blobs in accepted history
-from before the conversion. CLI releases older than that rule refuse to
-publish a converted notebook, so release the CLI before an application
-release that converts notebooks.
+from before the conversion.
 
 ## Recovering a published attachment version
 

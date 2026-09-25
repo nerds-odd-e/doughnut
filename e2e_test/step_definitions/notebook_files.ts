@@ -40,10 +40,6 @@ When(
   }
 )
 
-When('I open the root file {string} in the sidebar', (filename: string) => {
-  start.noteSidebar().openFile([], filename)
-})
-
 Then(
   'I should see the file page for {string} of {int} bytes',
   (filename: string, size: number) => {
