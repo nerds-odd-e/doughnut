@@ -123,9 +123,24 @@ stay in the UI. Refactor removed two caller-less steps and moved notebook
 structure setup to `testabilityNotebookStructure.ts`. Proof: 14 CLI features
 45/45; message center and semantic search 8/8.
 
+### 7. The CLI starts git-lfs only when LFS has work
+Type: Structure (CLI behavior-neutral speedup)
+Status: done
+Proof: `pnpm -C cli test` 468 pass (new "a Markdown-only checkout is not filled
+in through Git LFS"); 14 CLI features 45/45, Cypress 2:03, wall 2:34 at load
+~10–15.
+
+Change: fill-in skips `git lfs pull` when `git ls-files -- ':(attr:filter=lfs)'`
+is empty (preparation still runs so later attachments become pointers);
+`git lfs install --local --skip-repo` installs filters without the git-lfs
+hooks (Donut uses neither LFS locking nor `git push`); one `runGitLfsOrThrow`
+reports a missing Git LFS. Markdown-only checkout: pull 2 git-lfs starts → 0
+(~550ms → ~245ms), `git commit` ~213ms → ~15ms. Limit: git-lfs reinstalls its
+hooks the first time a real LFS command runs in a checkout with attachments.
+
 ### 6. Re-profile against the target
 Type: Structure
-Status: in progress
+Status: done
 
 A/B under heavy external load (a VM at ~560% CPU; load 22–101), ABBA order,
 baseline worktree at `e552481e71` vs this branch after slices 1–3 and 5:
@@ -157,12 +172,31 @@ Fixed startup outside Cypress is ~40s of wall (backend itself starts in ~9s;
 the rest is Gradle compile, mocks, Vite and Cypress launch), shared by all E2E
 batches.
 
+Quiet machine (owner paused the CI containers), ABBA after slices 1–5, 45/45
+each: baseline 4:28 / 4:11 wall (mean 4:20, summed 226s); candidate 2:49 / 2:52
+(mean 2:51, summed 138s): −34% wall, −39% summed. After slice 7: 2:34 wall,
+Cypress 2:03 at load ~10–15 (single run): ~−41% wall vs the quiet baseline.
+
+Remaining cost: ~33s fixed (SUT 13.5s incl. ~9s backend boot, Cypress launch
+2.7s, ~1.2s per spec load × 14); first page load per web-using scenario
+~0.7–1s under the Vite dev server.
+
 ## Current decisions
 
 - Local E2E keeps the Vite dev server (HMR promise); not changed here.
+- Owner decision 2026-09-25: stop at ~2:34 (≈ −41%) and land; keep the Vite
+  dev server for local `cy:run` (serving a production build was the next lever,
+  ~15–25s, at the cost of local HMR).
 - Slice 5 boundary: owner chose API for incidental setup and checks, web UI only
   where a web edit reaching the CLI is the scenario's subject.
 
 ## Learnings
 
-(none yet)
+- Inside the Nix dev shell `/usr/bin/git` (Apple shim) costs ~17ms per call vs
+  ~5ms for a real git; git-lfs spawns git internally, so the cost compounds.
+- The CLI's business (backend HTTP) was 3.8s of the suite; process spawning was
+  the tax.
+- The shared login step's SPA load is safe to defer only if main-menu page
+  objects open the app themselves (13 whole-suite failures before that).
+- External load (a Colima VM at ~700% CPU) made timings vary 2–3×; only
+  interleaved A/B runs on a quiet machine are trustworthy.

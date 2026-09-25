@@ -72,7 +72,6 @@ describe('acquireNotebookGitCheckout — LFS tip fill-in', () => {
           'donut.api-origin',
           apiBaseUrl,
         ],
-        ['lfs', 'version'],
         ['-C', checkoutDir, 'config', '--local', 'lfs.url', lfsUrl],
         [
           '-C',
@@ -82,7 +81,7 @@ describe('acquireNotebookGitCheckout — LFS tip fill-in', () => {
           'http.extraHeader',
           'Authorization: Bearer fake-bearer',
         ],
-        ['-C', checkoutDir, 'lfs', 'install', '--local'],
+        ['-C', checkoutDir, 'lfs', 'install', '--local', '--skip-repo'],
         ['-C', checkoutDir, 'lfs', 'pull', 'origin'],
         ['-C', checkoutDir, 'remote', 'remove', 'origin'],
       ])
@@ -117,8 +116,7 @@ describe('acquireNotebookGitCheckout — LFS tip fill-in', () => {
         )
         return { stdout: '', stderr: '', status: 0, error: undefined }
       }
-      const lfsIndex = argv.indexOf('lfs')
-      if (lfsIndex >= 0 && argv[lfsIndex + 1] === 'version') {
+      if (argv.includes('lfs')) {
         return {
           stdout: '',
           stderr: 'git: lfs is not a git command',

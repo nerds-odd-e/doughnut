@@ -32,6 +32,17 @@ export function checkoutUsesLfs(checkoutDir: string): boolean {
   return fs.readFileSync(attributesPath, 'utf8').includes('filter=lfs')
 }
 
+/** True when the checkout's current tree has a file stored through the LFS filter. */
+export function checkoutHasLfsFiles(checkoutDir: string): boolean {
+  return (
+    runSystemGitOrThrow(
+      ['-C', checkoutDir, 'ls-files', '--', ':(attr:filter=lfs)'],
+      (detail, status) =>
+        `failed to list Git LFS files${detail ? `: ${detail}` : ` (exit code ${status})`}`
+    ) !== ''
+  )
+}
+
 /** The checkout's local Git config, keyed as Git prints it (section and name lowercased). */
 function readLocalGitConfig(checkoutDir: string): Map<string, string> {
   const raw = runSystemGitOrThrow(
@@ -79,19 +90,16 @@ function requireGitLfs(purpose: 'receive' | 'publish', nextStep: string): void {
 /**
  * Prepares an LFS checkout for authenticated transfers: records the notebook LFS endpoint and
  * the CLI's current login in local Git config (never authored content), behind a placeholder
- * `origin` when the checkout has none, and installs the local LFS filters. Only what is missing
- * or changed is written. A checkout without the LFS filters first requires Git LFS
- * ({@link requireGitLfs}).
+ * `origin` when the checkout has none, and installs the local LFS filters without Git LFS hooks.
+ * Only what is missing or changed is written.
  */
-function prepareAuthenticatedLfsCheckout(
+export function prepareAuthenticatedLfsCheckout(
   checkoutDir: string,
   notebookId: number,
   purpose: 'receive' | 'publish',
   nextStep: string
 ): void {
   const config = readLocalGitConfig(checkoutDir)
-  const lfsInstalled = config.has('filter.lfs.process')
-  if (!lfsInstalled) requireGitLfs(purpose, nextStep)
   const { apiBaseUrl, token } = loadAuthenticatedFetchContext()
   if (!config.has('remote.origin.url')) {
     runSystemGitOrThrow(
@@ -122,32 +130,32 @@ function prepareAuthenticatedLfsCheckout(
       'authorization'
     )
   }
-  if (!lfsInstalled) {
-    runSystemGitOrThrow(
-      ['-C', checkoutDir, 'lfs', 'install', '--local'],
+  if (!config.has('filter.lfs.process')) {
+    runGitLfsOrThrow(
+      checkoutDir,
+      purpose,
+      nextStep,
+      ['install', '--local', '--skip-repo'],
       (detail, status) =>
         `failed to configure Git LFS in the checkout${
           detail ? `: ${detail}` : ` (exit code ${status})`
-        }`,
-      { env: { ...process.env, GIT_TERMINAL_PROMPT: '0' } }
+        }`
     )
   }
 }
 
 /**
- * Runs one Git LFS transfer (`git lfs <lfsArgs>`) against the notebook endpoint with the CLI's
- * current login, after {@link prepareAuthenticatedLfsCheckout}. Transfers never prompt and never
- * smudge. A failure reports a missing Git LFS as required, otherwise `describeFailure`'s message.
+ * Runs `git lfs <lfsArgs>` in the checkout; transfers use the notebook endpoint and login recorded
+ * by {@link prepareAuthenticatedLfsCheckout}. Git LFS never prompts and never smudges here. A
+ * failure reports a missing Git LFS as required, otherwise `describeFailure`'s message.
  */
-export function runAuthenticatedLfsTransfer(
+export function runGitLfsOrThrow(
   checkoutDir: string,
-  notebookId: number,
   purpose: 'receive' | 'publish',
   nextStep: string,
   lfsArgs: readonly string[],
   describeFailure: (detail: string | undefined, status: number | null) => string
 ): void {
-  prepareAuthenticatedLfsCheckout(checkoutDir, notebookId, purpose, nextStep)
   runSystemGitOrThrow(
     ['-C', checkoutDir, 'lfs', ...lfsArgs],
     (detail, status) => {

@@ -1,6 +1,7 @@
 import {
   checkoutUsesLfs,
-  runAuthenticatedLfsTransfer,
+  prepareAuthenticatedLfsCheckout,
+  runGitLfsOrThrow,
 } from './notebookLfsLocal.js'
 import { selectRequiredLfsObjectIds } from './notebookPublishLfsSelection.js'
 import { runSystemGitOrThrow } from './systemGit.js'
@@ -32,9 +33,9 @@ export function uploadRequiredLfsObjectsBeforeProposal(
     return
   }
   const retry = 'retry "donut notebook publish"'
-  runAuthenticatedLfsTransfer(
+  prepareAuthenticatedLfsCheckout(directory, notebookId, 'publish', retry)
+  runGitLfsOrThrow(
     directory,
-    notebookId,
     'publish',
     retry,
     ['push', '--object-id', 'origin', ...objectIds],

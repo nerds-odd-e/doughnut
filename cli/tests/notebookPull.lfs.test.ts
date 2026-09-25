@@ -9,6 +9,7 @@ import { continuePausedRebaseWithChosenBytes } from './notebookPull.conflict.tes
 import {
   OID_A,
   OID_B,
+  buildLfsSourceRepo,
   commitPointerAttachment,
   realSpawnSync,
 } from './notebookPublish.lfs.testHelpers.js'
@@ -104,7 +105,7 @@ describe('notebook pull (LFS checkout fill-in)', () => {
       expect(fs.readFileSync(join(directory, 'a.bin'), 'utf8')).toBe(
         filled(web.includes('a.bin') ? OID_B : OID_A)
       )
-      expect(lfs.lfsSteps()).toEqual(['version', 'install', 'pull'])
+      expect(lfs.lfsSteps()).toEqual(['install', 'pull'])
       expect(lfs.worktreeOpsSkipSmudge().every((v) => v === '1')).toBe(true)
       expect(lfs.worktreeOpsSkipSmudge().length > 0).toBe(web.length > 0)
       expect(runGit(['config', 'lfs.url'], directory)).toBe(
@@ -151,6 +152,26 @@ describe('notebook pull (LFS checkout fill-in)', () => {
     expect(fs.readFileSync(join(directory, 'a.bin'), 'utf8')).toBe(
       filled(OID_A)
     )
+  })
+
+  test('a Markdown-only checkout is not filled in through Git LFS', async () => {
+    const source = buildLfsSourceRepo(ctx.getWorkDir())
+    const directory = cloneAsBoundCheckout(
+      ctx.getWorkDir(),
+      source,
+      getApiConfig().apiBaseUrl,
+      'checkout'
+    )
+    commitPortableFile(source, 'physics/.keep', '', 'web folder')
+    serveAcceptedBundle(ctx, source, 'markdown')
+    const lfs = interceptGitLfs()
+
+    await run(['notebook', 'pull', directory])
+
+    expect(runGit(['rev-parse', 'HEAD'], directory)).toBe(
+      runGit(['rev-parse', 'main'], source)
+    )
+    expect(lfs.lfsSteps()).toEqual(['install'])
   })
 
   test('a failed download reports incomplete attachments; the rerun fills them in, then reports unchanged', async () => {
