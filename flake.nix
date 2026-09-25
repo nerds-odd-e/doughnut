@@ -67,6 +67,8 @@
           pnpmPkg
           lsof
           fzf
+          # A real git: Apple's /usr/bin/git shim costs ~17ms per call under this
+          # shell's DEVELOPER_DIR/SDKROOT, and the CLI and git-lfs spawn git often.
           git
           git-secret
           git-lfs

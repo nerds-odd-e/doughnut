@@ -60,15 +60,22 @@ Consequences for future profiling passes:
   worth a sweep across the 51 `fetchHead` callers, or whether the local idiom is
   preferred.
 
-- `e2e_test/start/pageObjects/cli/notebookCloneCheckout.ts` `pull()` and
-  `readCliNotebookCheckoutState` in `e2e_test/config/cliE2eNotebookCloneTasks.ts`
-  (measured 2026-09-24) — every CLI pull step reads the whole checkout state
-  (~10 `git` spawns: head, parents, branch, root count, status, author,
-  message, and blobs of HEAD and its parent) before and after the pull, ~350ms
-  per pull step across ~41 pull steps — unique protection: supplies the
-  original/rebased heads later ancestry and rebase assertions compare — not yet
-  attempted; the 2026-09-24 CLI E2E pass (profile and evidence recoverable at
-  `0db3c60f2d:.planning/quick/031-faster-cli-e2e-feedback/PLAN.md`) stopped
-  after retiring redundant journeys and making the CLI readiness check one
-  `git` call. Candidate experiment: read only the heads the pull step needs and
-  let the assertions read what they observe — no decision needed.
+- Local `pnpm cy:run` serves the frontend through the Vite dev server
+  (measured 2026-09-25) — the first page load of each web-using scenario costs
+  ~0.7–1s; serving a production build during `cy:run` (as CI does) was
+  estimated at ~15–25s on the 14 CLI features and more on the whole suite —
+  unique protection: local E2E batches keep frontend HMR, which the
+  `e2e-authoring` skill promises — not attempted; the owner declined it on
+  2026-09-25 when stopping the CLI E2E pass at ~−41% (evidence recoverable at
+  `e2f9929fe9:.planning/quick/032-halve-cli-e2e-time/PLAN.md`) — decision
+  needed: whether local `cy:run` may trade HMR for a built frontend.
+- Fixed E2E batch startup (measured 2026-09-25) — ~33s per `cy:run` batch:
+  SUT 13.5s (backend boot ~9s, Gradle compile check, mocks, Vite), Cypress
+  launch 2.7s, ~1.2s per spec load — unique protection: fresh owned stack per
+  batch — not attempted — no decision needed.
+- git-lfs reinstalls its hooks (measured 2026-09-25) — the CLI installs LFS
+  filters with `--skip-repo`, but the first real git-lfs command in a checkout
+  with attachments puts `post-checkout`/`post-commit`/`post-merge`/`pre-push`
+  back, so commits there cost ~213ms instead of ~15ms — unique protection:
+  none (Donut uses neither LFS locking nor `git push`) — not attempted; the
+  installed git-lfs 3.7.1 has no setting found to stop it — no decision needed.
