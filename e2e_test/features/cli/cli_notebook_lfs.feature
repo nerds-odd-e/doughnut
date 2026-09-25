@@ -195,6 +195,15 @@ Feature: Notebook Git LFS authenticated transfer
       """
 
   @bundleCliE2eInstall @withCliConfig
+  Scenario: A Book attached to a notebook arrives in the owner's clone as its source file
+    Given the backend is serving the CLI and install script
+    And the CLI is installed from localhost
+    And I have a notebook "LFS Transfer Notebook"
+    And I attach a fake blank pdf book with book layout of "refactoring" to the notebook "LFS Transfer Notebook"
+    When I clone the notebook "LFS Transfer Notebook" into a temporary destination using the installed CLI
+    Then the cloned checkout file "refactoring.pdf" has the bytes of fixture "book_reading/blank_5_pages.pdf"
+
+  @bundleCliE2eInstall @withCliConfig
   Scenario: Explicit Git LFS fetch of an omitted oversized intermediate reports unavailable
     Given the backend is serving the CLI and install script
     And the CLI is installed from localhost

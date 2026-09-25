@@ -2,11 +2,8 @@
  * Book layout reorganize / new-block scenarios: thin glue to `bookReadingPage`.
  */
 import { Given, Then, When } from '@badeball/cypress-cucumber-preprocessor'
-import type { BookFull, NoteRealm } from '@generated/donut-backend-api'
-import {
-  NoteController,
-  NotebookBooksController,
-} from '@generated/donut-backend-api/sdk.gen'
+import type { BookFull } from '@generated/donut-backend-api'
+import { NotebookBooksController } from '@generated/donut-backend-api/sdk.gen'
 import bookReadingPage from '../start/pageObjects/bookReadingPage'
 import { mock_services } from '../start'
 import testability from '../start/testability'
@@ -17,16 +14,8 @@ Given(
   // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
   (blockTitle: string, notebookName: string) => {
     return testability()
-      .getInjectedNoteIdByTitle(notebookName)
-      .then((noteId) =>
-        cy.wrap(NoteController.showNote({ path: { note: noteId } }), {
-          log: false,
-        })
-      )
-      .then((showResponse) => {
-        const realm = unwrapData<NoteRealm>(showResponse)
-        const notebookId = realm.notebookRealm.notebook.id
-        expect(notebookId, 'note must belong to a notebook').to.be.a('number')
+      .getNotebookIdByName(notebookName)
+      .then((notebookId) => {
         return cy
           .wrap(
             NotebookBooksController.getBook({ path: { notebook: notebookId } }),

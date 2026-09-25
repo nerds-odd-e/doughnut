@@ -182,8 +182,12 @@ picture move so story 21 can delete it on its own.
 
 ### 7. A cloned notebook has its Book's file
 Type: Behavior
-Status: planned
-Proof: slice 7 row above.
+Status: done
+Proof: slice 7 row above. Accepted: `pnpm cy:run --spec` over
+`cli/cli_notebook_lfs.feature` and `book_reading/{ai_reorganize_layout,book_browsing,reading_record,reorganize_layout}.feature`
+(33/33); scenario "A Book attached to a notebook arrives in the owner's clone
+as its source file". `epub_book.feature` is not runnable in an isolated
+worktree and does not use the changed steps; CI covers it.
 
 Behavior: notebook with an attached PDF Book → `donut notebook clone` → the
 checkout has the Book's file with the fixture's bytes. Reuses the testability
@@ -223,3 +227,5 @@ attach-book call and the picture move's fixture comparison step.
   `book_content_block` rows for committed EPUB Books.
 - Slice 2 took about 8 minutes: the Git-backed test base and the committed
   cleanup cost more than planned.
+- The E2E Book attach and OpenAI layout steps now take the real notebook
+  name (`testabilityBook.ts`, `getNotebookIdByName`) instead of a note title.
