@@ -227,7 +227,7 @@ its repeated `.gitattributes` assertion (keep `assertAcceptedTreeMatchesTheFullA
 
 ### 4. Attachment admission rules live in one test class
 Type: Structure
-Status: planned
+Status: done
 Proof: `NotebookGitAttachmentSizeAdmissionControllerTest` green, asserting the
 over-limit (`assertOversizedRefusal` or path + size), missing, corrupt and
 "must be a Git LFS pointer" refusals and the exact-limit acceptance.
