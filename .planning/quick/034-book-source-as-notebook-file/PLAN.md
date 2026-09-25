@@ -110,8 +110,12 @@ the attachment's pointer content), otherwise the old store. Enables slice 2.
 
 ### 2. Attaching a Book adds its file at the notebook root
 Type: Behavior
-Status: planned
-Proof: slice 2 rows above.
+Status: done
+Proof: slice 2 rows above. Accepted: `--tests '*Book*'` (137 pass) and
+`--tests '*NotebookGit*'` (423 pass); observations in
+`NotebookBooksAttachNotebookFileControllerTest` (Git-backed base: one commit,
+tip pointer, root row, path set and ref null, bytes read back, full-assembly
+match; EPUB `.epub`; 11 MiB PDF).
 
 Behavior: notebook without a Book → attach a PDF or EPUB → one accepted
 change holds the root LFS file `<book name>.<format>` and the Book, whose
@@ -193,3 +197,15 @@ attach-book call and the picture move's fixture comparison step.
   `NotebookAttachmentRepository.findByNotebook_IdAndFolderIsNullAndFilename`.
 - `backend:test:worktree` takes one `--tests` pattern; `'*Book*'` covers the
   Book controller and service tests.
+- Attach lives in `AttachBookService.attach` (store first, then `apply` that
+  persists the Book and calls `BookSourceFilePlacement.place`, both in
+  `services/book`). The file extension comes from `BookFormat.bookFileExtension()`.
+  `NotebookGitAcceptedTree.takenPaths` and `NotebookGitPortablePath.isPlainFilename`
+  are still package-private in `services/notebookGit`; slice 3 must make them
+  public to use them from `services/book`.
+- Git-backed proof helpers (`createGitBackedNotebook`, `acceptedHistory`,
+  `lfsPointerStoredFor`, `assertAcceptedTreeMatchesTheFullAssembly`) live in
+  `NotebookGitWebContentControllerTestBase`; `CommittedUserCleanup` now clears
+  `book_content_block` rows for committed EPUB Books.
+- Slice 2 took about 8 minutes: the Git-backed test base and the committed
+  cleanup cost more than planned.

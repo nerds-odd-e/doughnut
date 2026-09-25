@@ -133,7 +133,7 @@ class NotebookBooksRetrievalControllerTest extends NotebookBooksControllerTestBa
     }
 
     @Test
-    void epubFixtureAttachPersistsFormatStorageRefOutlineAndContentLocators() throws Exception {
+    void epubFixtureAttachPersistsFormatOutlineAndContentLocators() throws Exception {
       Notebook nb = myNotebook();
       ResponseEntity<Book> attached =
           controller.attachBook(
@@ -143,7 +143,6 @@ class NotebookBooksRetrievalControllerTest extends NotebookBooksControllerTestBa
       assertThat(created, notNullValue());
       assertThat(created.getFormat(), equalTo(BookReadingWireConstants.BOOK_FORMAT_EPUB));
       assertThat(created.getBookName(), equalTo("Minimal EPUB"));
-      assertThat(created.getSourceFileRef(), not(blankOrNullString()));
       List<BookBlock> createdPreorder = blocksByLayoutOrder(created);
       assertThat(
           createdPreorder.stream().map(BookBlock::getStructuralTitle).toList(),
