@@ -2,7 +2,7 @@
 
 **Identity:** quick/031-finish-single-attachment-representation/PLAN.md
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"d6b64813e8f8271baeb867cffbd6a62cb573b7d89a0323c489b0cb0b210eb705"}}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"d3c890437e6284bb9fa0cf02b2d933392f99b6f4d1b457c9c3c713242009e303"}}
 ```
 
 ## Source
