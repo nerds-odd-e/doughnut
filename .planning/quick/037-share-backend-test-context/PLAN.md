@@ -205,7 +205,21 @@ that reads as simply as today; otherwise stop and record them as a candidate.
 
 ### 5. Re-profile the suite
 Type: Structure
-Status: planned
+Status: done
+Result (2026-09-26, interleaved runs at load ~3.5–5.8; baseline runs in the
+main checkout, which had meanwhile advanced to `30d987e177` with 2620 cases,
+so the baseline did slightly *less* work):
+
+| Run | Wall | Test phase | Cases | Context boots |
+| --- | --- | --- | --- | --- |
+| final1 (`5bf185ba0d`) | 61.8s | 40.5s | 2,650 | 5 (exact, cache-DEBUG run) |
+| base3 | 81.7s | 56.3s | 2,620 | 20 |
+| final2 | 61.4s | 40.7s | 2,650 | 5 |
+| base4 | 79.1s | 56.3s | 2,620 | 20 |
+
+Measured: wall ~80s → ~62s (−23%), test phase 56.3s → 40.6s (−28%). Case
+bodies unchanged (~30.7s both). Remaining boots are the shared context and the
+four on-purpose contexts (~4s).
 Proof: two comparable full runs of `backend:test_only` from the worktree, with
 wall time, test phase, cases and context boots recorded against the baseline;
 a temporary cache-DEBUG run confirms the final miss count.
@@ -218,4 +232,14 @@ a temporary cache-DEBUG run confirms the final miss count.
 
 ## Learnings
 
-(none yet)
+- Most extra contexts came from restating the base configuration, not from
+  real differences: 77 plain `test`-profile classes had their own
+  `@SpringBootTest` mix. One shared base (`testability/SpringTestBase`) with the
+  external-service mocks declared once removed 16 of 21 boots.
+- Two internal-collaborator mocks (`EmbeddingService`, `OpenAiApiHandler`) were
+  either dead (the embeddings stub was never reached) or replaceable by
+  stubbing the external client, which also exercises more real code.
+- Shared context means shared non-mock state: reset `TestabilitySettings`
+  changes (now including `useRealGithub`) in `SpringTestBase`'s `@AfterEach`.
+- Remaining cost not investigated in this pass: test-case bodies ~31s and
+  Gradle startup/compile ~20s of the ~62s wall.

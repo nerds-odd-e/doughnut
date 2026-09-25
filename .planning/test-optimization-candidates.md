@@ -79,3 +79,11 @@ Consequences for future profiling passes:
   back, so commits there cost ~213ms instead of ~15ms — unique protection:
   none (Donut uses neither LFS locking nor `git push`) — not attempted; the
   installed git-lfs 3.7.1 has no setting found to stop it — no decision needed.
+- Backend Spring contexts that differ on purpose (measured 2026-09-26) — ~1s
+  boot each for the `dev` profile (`DevelopmentAuthenticationConfigurationTest`),
+  `prod` profile (`ShedLockConfigProdTest`), and the failure-injection profiles
+  `notebook-git-publication-atomic-test` and `batch-row-import-atomic-test`;
+  every other `test`-profile Spring test shares `testability/SpringTestBase`
+  (plan 037 cut the suite from 21 context boots to 5) — unique protection:
+  profile-specific configuration and injected persistence failures — not
+  attempted — no decision needed.
