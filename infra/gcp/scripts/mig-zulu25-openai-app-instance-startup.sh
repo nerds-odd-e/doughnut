@@ -141,8 +141,7 @@ export JAVA_OPTS="-XX:InitialRAMPercentage=40.0 \
         -Duser.timezone=UTC"
 
 # Start Spring Boot app
-# Write directly to stdout/stderr - Cloud Logging agent automatically captures these
-# Background the process but keep stdout/stderr connected
+# The application log is /logs/donut-prod.log (see docs/gcp/troubleshooting-springboot-logs.md)
 bash -c "java ${JAVA_OPTS} \
         -Dspring-boot.run.profiles=prod \
         -Dspring.profiles.active=prod \

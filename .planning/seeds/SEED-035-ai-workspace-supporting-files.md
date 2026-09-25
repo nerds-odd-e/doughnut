@@ -95,50 +95,6 @@ dissolve/merge and cross-notebook operations that the delivered behavior
 refuses for now. The [product backlog](../PRODUCT-BACKLOG.md) owns global order.
 No executable plan or implementation is authorized by this seed.
 
-<a id="story-22"></a>
-
-### Make production application logs findable from the GCP docs
-```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"planless","assessment":"ready","reasons":[],"basis":{"document":"72069d1b61c05e0bcdaf986c3390938202551e020b8a903bc2ad8001ebfd42de"}}
-```
-
-- **Identity:** SEED-035#story-22
-- **Goal:** A maintainer checking a production release, such as the one that
-  carries the Book source-file move, finds the application's log by following
-  the GCP docs, instead of chasing paths and services that do not exist.
-- **Scope (reduced 2026-09-25 after the production check):** correct the GCP
-  logging docs. The `prod` profile already writes
-  `/logs/donut-prod.log` (logback's `${user.dir}/logs`, and the startup
-  script's working directory is `/`), rolling three 5 MB files. The docs point
-  to the absent `/var/log/doughnut-app.log` and claim stdout reaches Cloud
-  Logging automatically, but no logging agent is installed. State that the
-  file lives on the instance's boot disk, so a deploy, autohealing repair, or
-  other recreate loses it: read a release's startup output before the next
-  one.
-- **Excluded:**
-  - Finding why the picture move's first startup runs changed nothing. Every
-    instance that ran them was deleted or recreated, so their logs are gone.
-    Those runs all preceded the 20:11 (+0800) switch to the new production
-    database, and the run after it succeeded with no code change; the
-    unconfirmed explanation is that they moved pictures in the old database
-    before its data was copied. The picture move is already deleted.
-  - Forwarding logs to Cloud Logging (an Ops Agent in the image); not
-    requested.
-  - A move summary line, log retention, alerting, dashboards.
-- **Key examples:**
-  1. A maintainer following the GCP troubleshooting docs after a release →
-     reads `/logs/donut-prod.log` on the running instance and sees the
-     startup errors, such as `Notebook 12 keeps its Book in the old storage`.
-  2. The docs no longer send anyone to `/var/log/doughnut-app.log` or to
-     Cloud Logging for application output.
-- **Evidence:** v1.3.26 ran the picture move on instances created from 17:06
-  (+0800) on 2026-09-25; all were deleted by 19:44. Instance `jc41` (created
-  19:58) was reset at 21:06 and 21:38 and each time recreated by autohealing,
-  which replaced its disk. The owner's "manual trigger" was those resets.
-- **Depends on:** none. The Book source-file move no longer waits for it; after
-  that release, verify it by database query as the picture move was.
-- **Effort hypothesis:** S, docs only.
-
 <a id="story-21"></a>
 
 ### Remove the separate Book storage
@@ -299,8 +255,7 @@ avoids a chicken-and-egg problem is:
 4. Story 17: Book files.
 5. The legacy picture storage is removed (its bytes stay in `attachment_blob`);
    story 21: remove the separate Book storage, after story 17 is verified by
-   database query in production. Story 22 only corrects the production log
-   docs.
+   database query in production.
 
 "Present after clone or pull" is not a story: it is how each of these stories
 is proven. Web deletion (story 2), then dissolve/merge (story 11) and the rarer
@@ -357,13 +312,8 @@ integration need their own selected outcomes.
 - Owner decisions, 2026-09-25 (after the production check of the picture
   move): the manual trigger completed the move; the picture removal leaves
   picture bytes in `attachment_blob` for story 21; the production
-  check is a read-only database query, not the startup log; story 22 shrinks
-  to readable startup-move failures ahead of the Book move; the two notes
+  check is a read-only database query, not the startup log; the two notes
   with dead picture links are fixed manually, outside any story.
-- Owner decisions, 2026-09-25 (story 22 refinement): the first runs' logs
-  are gone with their instances, so drop the cause search; shrink story 22 to
-  correcting the GCP log docs and execute it directly; no Cloud Logging
-  forwarding story.
 - Owner decisions, 2026-09-25 (story 2 refinement): the purpose is only to
   remove the file; deleting a file a note's `image:` names is allowed and
   leaves a broken picture; delete outright with no web Trash; keep the
