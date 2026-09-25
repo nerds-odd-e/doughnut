@@ -10,9 +10,10 @@ and deletable in Web Donut.
 
 ## Taken
 
+- [Teach the shared Spring test context in backend test guidance](quick/039-teach-shared-spring-test-context/PLAN.md)
+
 ## Backlog list
 
-- [Teach the shared Spring test context in backend test guidance](quick/039-teach-shared-spring-test-context/PLAN.md)
 - [Remove the separate Book storage](seeds/SEED-035-ai-workspace-supporting-files.md#story-21) — SEED-035#story-21
 - [Delete unwanted supporting files from Web Donut](seeds/SEED-035-ai-workspace-supporting-files.md#story-2) — SEED-035#story-2
 - [Dissolve and merge folders that contain files](seeds/SEED-035-ai-workspace-supporting-files.md#story-11) — SEED-035#story-11
