@@ -2,8 +2,6 @@ package com.odde.donut.controllers;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -17,14 +15,10 @@ import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.repositories.FolderRepository;
 import com.odde.donut.entities.repositories.NoteRepository;
 import com.odde.donut.entities.repositories.NotebookRepository;
-import com.odde.donut.services.EmbeddingService;
-import java.util.List;
-import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
@@ -36,21 +30,8 @@ class DisplayNameNormalizationMvcTest extends ControllerTestBase {
   @Autowired private FolderRepository folderRepository;
   @Autowired private NotebookRepository notebookRepository;
 
-  @MockitoBean private EmbeddingService embeddingService;
-
   @BeforeEach
   void setup() {
-    when(embeddingService.streamEmbeddingsForNoteList(any()))
-        .thenAnswer(
-            invocation -> {
-              @SuppressWarnings("unchecked")
-              List<Note> notes = (List<Note>) invocation.getArgument(0);
-              return notes.stream()
-                  .map(
-                      n ->
-                          new EmbeddingService.EmbeddingForNote(
-                              n, Optional.of(List.of(1.0f, 2.0f, 3.0f))));
-            });
     currentUser.setUser(makeMe.aUser().please());
   }
 

@@ -134,7 +134,13 @@ local field references as needed). Enables slices 2 and 3.
 
 ### 2. Notebook controller tests stub the OpenAI embeddings boundary, not `EmbeddingService`
 Type: Structure
-Status: planned
+Status: done
+Result: boots ~15 → ~14 (the other two targets already merged in slice 1).
+2650 cases, 0 failures, 2 skipped. The blanket `EmbeddingService` stub was
+dead: no test in the family reaches embeddings, so it was deleted (−39 lines)
+and no boundary stub was needed. Embeddings stay proven by
+`services/NotebookReindexingServiceTests`, `EmbeddingServiceTests`,
+`EmbeddingMaintenanceJobTests` and `SearchControllerSemanticTests`.
 Expected: −3 boots (the ~200-class `NotebookControllerTestBase` family,
 `DisplayNameNormalizationMvcTest`, `NotebookRootNoteCreationWithWikidataTests`
 join the shared context).
