@@ -19,10 +19,7 @@ public class V300000342__DefaultNotebookGitBindingAttachmentRepresentationToLfs
 
   @Override
   public void migrate(Context context) throws SQLException {
-    defaultToLfsUnlessAnyBindingIsRaw(context.getConnection());
-  }
-
-  static void defaultToLfsUnlessAnyBindingIsRaw(Connection connection) throws SQLException {
+    Connection connection = context.getConnection();
     List<String> rawNotebookIds = new ArrayList<>();
     try (Statement statement = connection.createStatement();
         ResultSet rows =

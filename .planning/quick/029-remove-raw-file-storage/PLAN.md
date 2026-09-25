@@ -192,7 +192,12 @@ After this slice, stop. The owner releases it; slice 5 waits for that release.
 
 ### 5. The representation column is dropped (next release)
 Type: Behavior
-Status: planned
+Status: done
+Start condition met: `v1.3.25` (contains slice 4) released 2026-09-25.
+Accepted proof: `NotebookGitBindingSchemaTest.noLongerRecordsHowANotebookStoresFiles`
+(no `attachment_representation` column after migration) and full backend suite
+green in one run (2638 tests). `V300000342`'s migration-only test is removed;
+the migration itself stays (applied in production).
 Proof: after migration the column is absent (migration test or schema
 assertion); full backend suite green.
 
