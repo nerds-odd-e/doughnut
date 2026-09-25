@@ -6,7 +6,6 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 import com.google.cloud.storage.Blob;
@@ -85,21 +84,5 @@ class GcsBookStorageTest {
     GcsBookStorage cut = new GcsBookStorage(storage, "b", prefix);
     assertTrue(cut.get(ref).isEmpty());
     verifyNoInteractions(storage);
-  }
-
-  @ParameterizedTest
-  @CsvSource({
-    "pre/, pre/obj.pdf, true",
-    "safe/, safe/../evil, false",
-  })
-  void delete_respectsRefPrefix(String prefix, String ref, boolean callsStorage) {
-    GcsBookStorage cut = new GcsBookStorage(storage, "b", prefix);
-    cut.delete(ref);
-    if (callsStorage) {
-      verify(storage).delete(BlobId.of("b", ref));
-      verifyNoMoreInteractions(storage);
-    } else {
-      verifyNoInteractions(storage);
-    }
   }
 }

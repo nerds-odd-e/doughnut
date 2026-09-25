@@ -37,7 +37,6 @@ public class BookService {
 
   private final BookRepository bookRepository;
   private final BookUserLastReadPositionRepository bookUserLastReadPositionRepository;
-  private final BookStorage bookStorage;
   private final EntityPersister entityPersister;
   private final BookLayoutReorganizer layoutReorganizer;
   private final BookReadingProgress readingProgress;
@@ -53,7 +52,6 @@ public class BookService {
       BookBlockReadingRecordRepository bookBlockReadingRecordRepository,
       EntityPersister entityPersister,
       TestabilitySettings testabilitySettings,
-      BookStorage bookStorage,
       ObjectMapper objectMapper,
       OpenAiApiHandler openAiApiHandler,
       GlobalSettingsService globalSettingsService,
@@ -63,7 +61,6 @@ public class BookService {
     this.attachBookService = attachBookService;
     this.bookRepository = bookRepository;
     this.bookUserLastReadPositionRepository = bookUserLastReadPositionRepository;
-    this.bookStorage = bookStorage;
     this.entityPersister = entityPersister;
     this.layoutReorganizer =
         new BookLayoutReorganizer(
@@ -164,10 +161,8 @@ public class BookService {
             .findByNotebook_Id(notebook.getId())
             .orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Resource not found"));
-    String ref = book.getSourceFileRef();
     bookUserLastReadPositionRepository.deleteByBook_Id(book.getId());
     bookRepository.delete(book);
-    bookStorage.delete(ref);
   }
 
   @Transactional(readOnly = true)

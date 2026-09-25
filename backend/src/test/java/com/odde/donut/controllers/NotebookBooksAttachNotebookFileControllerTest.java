@@ -3,18 +3,23 @@ package com.odde.donut.controllers;
 import static com.odde.donut.controllers.NotebookBooksControllerTestBase.attachRequest;
 import static com.odde.donut.controllers.NotebookBooksControllerTestBase.epubAttachRequest;
 import static com.odde.donut.controllers.NotebookBooksControllerTestBase.epubFile;
+import static com.odde.donut.controllers.NotebookBooksControllerTestBase.lastReadBody;
 import static com.odde.donut.controllers.NotebookBooksControllerTestBase.node;
 import static com.odde.donut.controllers.NotebookBooksControllerTestBase.pdfFile;
 import static com.odde.donut.controllers.NotebookBooksControllerTestBase.readFixtureEpubValidMinimal;
+import static com.odde.donut.controllers.NotebookBooksControllerTestBase.rootBlocksSorted;
 import static com.odde.donut.controllers.NotebookBooksControllerTestBase.webRequest;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.nullValue;
 
 import com.odde.donut.controllers.dto.AttachBookRequest;
 import com.odde.donut.entities.Book;
 import com.odde.donut.entities.Notebook;
+import com.odde.donut.entities.repositories.BookBlockReadingRecordRepository;
 import com.odde.donut.entities.repositories.BookRepository;
+import com.odde.donut.entities.repositories.BookUserLastReadPositionRepository;
 import com.odde.donut.testability.GitBundleTestReader.AcceptedHistory;
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -24,6 +29,8 @@ class NotebookBooksAttachNotebookFileControllerTest
     extends NotebookGitWebContentControllerTestBase {
   @Autowired NotebookBooksController booksController;
   @Autowired BookRepository bookRepository;
+  @Autowired BookUserLastReadPositionRepository bookUserLastReadPositionRepository;
+  @Autowired BookBlockReadingRecordRepository bookBlockReadingRecordRepository;
 
   @Test
   void theBookAndItsFileAtTheNotebookRootAreAcceptedInOneCommit() throws Exception {
@@ -96,6 +103,37 @@ class NotebookBooksAttachNotebookFileControllerTest
     assertThat(
         bookRepository.findByNotebook_Id(notebook.getId()).orElseThrow().getSourceFilePath(),
         equalTo("book.pdf"));
+  }
+
+  @Test
+  void removingTheBookLeavesItsFileInTheNotebook() throws Exception {
+    Notebook notebook = createGitBackedNotebook();
+    byte[] pdfBytes = new byte[] {0x25, 0x50, 0x44, 0x46};
+    booksController.attachBook(notebook, physicsPrimer(), pdfFile(pdfBytes));
+    Book book = bookRepository.findByNotebook_Id(notebook.getId()).orElseThrow();
+    booksController.patchReadingPosition(notebook, lastReadBody(1, 200));
+    booksController.putBlockReadingRecord(notebook, rootBlocksSorted(book).getFirst(), null);
+    AcceptedHistory before = acceptedHistory(notebook);
+
+    booksController.deleteBook(notebook);
+
+    assertThat(bookRepository.findByNotebook_Id(notebook.getId()).isEmpty(), equalTo(true));
+    Integer userId = currentUser.getUser().getId();
+    assertThat(
+        bookUserLastReadPositionRepository.findByUser_IdAndBook_Id(userId, book.getId()).isEmpty(),
+        equalTo(true));
+    assertThat(
+        bookBlockReadingRecordRepository.findAllByUser_IdAndBookBlock_Book_Id(userId, book.getId()),
+        empty());
+    AcceptedHistory after = acceptedHistory(notebook);
+    assertThat(after.commits(), equalTo(before.commits()));
+    assertThat(
+        tipContent(after, "Physics Primer.pdf"), equalTo(lfsPointerStoredFor(notebook, pdfBytes)));
+    assertThat(
+        notebookAttachmentRepository
+            .findByNotebook_IdAndFolderIsNullAndFilename(notebook.getId(), "Physics Primer.pdf")
+            .isPresent(),
+        equalTo(true));
   }
 
   private static AttachBookRequest physicsPrimer() {

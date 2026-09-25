@@ -139,8 +139,11 @@ name falls back to `book.<format>` before numbering.
 
 ### 4. Removing a Book leaves its file
 Type: Behavior
-Status: planned
-Proof: slice 4 row above.
+Status: done
+Proof: slice 4 row above. Accepted: `--tests '*Book*'` (136 pass),
+`'*NotebookBooks*ControllerTest'` (98 pass);
+`NotebookBooksAttachNotebookFileControllerTest.removingTheBookLeavesItsFileInTheNotebook`.
+`BookStorage.delete` is gone (no other caller).
 
 Behavior: Book with a notebook file → `DELETE …/book` → Book and reading data
 removed, file and tree unchanged. `deleteBookForNotebook` stops deleting from
