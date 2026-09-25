@@ -210,7 +210,7 @@ representation"). No behavior change; weakness removed: dead demotion API.
 
 ### 3. One reset test proves files, content objects and authored metadata survive
 Type: Structure
-Status: planned
+Status: done
 Proof: `NotebookGitHistoryResetControllerTest` and
 `NotebookGitAttachmentMetadataControllerTest` green; the reset example in the
 proof table is asserted in one test.

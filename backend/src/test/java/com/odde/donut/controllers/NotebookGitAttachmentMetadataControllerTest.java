@@ -18,7 +18,7 @@ class NotebookGitAttachmentMetadataControllerTest extends NotebookGitWebContentC
   private static final String AUTHORED_ATTRIBUTES = "* filter=lfs -text\nauthored !filter\n";
 
   @Test
-  void gitattributesAreReservedMetadataNotAttachmentsAndSurviveWebSaveAndReset() throws Exception {
+  void gitattributesAreReservedMetadataNotAttachmentsAndSurviveWebSave() throws Exception {
     Notebook notebook = createGitBackedNotebook();
     NotebookGitBinding empty = snapshotCurrentPortableTree(notebook);
     byte[] diagram = pointerFor(notebook, new byte[] {1, 2, 3});
@@ -56,11 +56,5 @@ class NotebookGitAttachmentMetadataControllerTest extends NotebookGitWebContentC
             .toList(),
         contains(AUTHORED_ATTRIBUTES));
     assertAcceptedTreeMatchesTheFullAssembly(notebook);
-    assertThat(
-        acceptedHistory(notebook).exactTree().stream()
-            .filter(entry -> entry.path().equals(".gitattributes"))
-            .map(entry -> new String(entry.content(), StandardCharsets.UTF_8))
-            .toList(),
-        contains(AUTHORED_ATTRIBUTES));
   }
 }
