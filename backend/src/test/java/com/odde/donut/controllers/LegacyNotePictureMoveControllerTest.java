@@ -81,6 +81,68 @@ class LegacyNotePictureMoveControllerTest extends NotebookGitWebContentControlle
     assertThat(acceptedHistory(notebook).commits(), equalTo(commitsBefore));
   }
 
+  @Test
+  void aTakenNameIsNumberedBeforeTheExtension() throws Exception {
+    Notebook notebook = createGitBackedNotebook();
+    Folder physics = makeMe.aFolder().notebook(notebook).name("physics").please();
+    makeMe.anAttachment("example.png").in(physics).please();
+    legacyPictureNote(physics, "force", "example.png");
+    snapshotCurrentPortableTree(notebook);
+
+    legacyNotePictureMove.move(notebook.getId());
+
+    AcceptedHistory after = acceptedHistory(notebook);
+    assertThat(
+        tipContent(after, "physics/example (2).png"),
+        equalTo(lfsPointerStoredFor(notebook, "DEADBEEF".getBytes())));
+    assertThat(
+        tipText(after, "physics/force.md"),
+        equalTo("---\ntype: Note\nimage: example (2).png\n---\nbody"));
+  }
+
+  @Test
+  void twoNotesInOneFolderGetDistinctNames() throws Exception {
+    Notebook notebook = createGitBackedNotebook();
+    Folder physics = makeMe.aFolder().notebook(notebook).name("physics").please();
+    legacyPictureNote(physics, "force", "example.png");
+    legacyPictureNote(physics, "mass", "example.png");
+    snapshotCurrentPortableTree(notebook);
+
+    legacyNotePictureMove.move(notebook.getId());
+
+    AcceptedHistory after = acceptedHistory(notebook);
+    assertThat(
+        tipText(after, "physics/force.md"),
+        equalTo("---\ntype: Note\nimage: example.png\n---\nbody"));
+    assertThat(
+        tipText(after, "physics/mass.md"),
+        equalTo("---\ntype: Note\nimage: example (2).png\n---\nbody"));
+    assertAcceptedTreeMatchesTheFullAssembly(notebook);
+  }
+
+  @Test
+  void aHiddenStoredNameBecomesAPictureName() throws Exception {
+    Notebook notebook = createGitBackedNotebook();
+    Folder physics = makeMe.aFolder().notebook(notebook).name("physics").please();
+    legacyPictureNote(physics, "force", ".png");
+    snapshotCurrentPortableTree(notebook);
+
+    legacyNotePictureMove.move(notebook.getId());
+
+    assertThat(
+        tipText(acceptedHistory(notebook), "physics/force.md"),
+        equalTo("---\ntype: Note\nimage: picture.png\n---\nbody"));
+  }
+
+  private Note legacyPictureNote(Folder folder, String title, String storedName) {
+    Note note = makeMe.aNote(title).folder(folder).please();
+    Image legacy =
+        makeMe.anImage().forNote(note).named(storedName).by(currentUser.getUser()).please();
+    authorReferencingContentCommitted(
+        note, "---\nimage: /attachments/images/" + legacy.getId() + "/example.png\n---\nbody");
+    return note;
+  }
+
   private Note reloaded(Note note) {
     return noteRepository.findById(note.getId()).orElseThrow();
   }

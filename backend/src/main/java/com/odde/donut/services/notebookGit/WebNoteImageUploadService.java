@@ -55,15 +55,12 @@ public class WebNoteImageUploadService {
         updatedAt);
   }
 
-  /**
-   * A leading dot would be hidden or reserved Git metadata such as {@code .gitattributes}. A name
-   * is taken when the accepted tree has a file, note or folder at that path.
-   */
+  /** A name is taken when the accepted tree has a file, note or folder at that path. */
   private void requireFreePlainFilename(Note note, String filename) {
     String path =
         NotebookGitPortablePath.ofAttachment(
             NotebookGitPortablePath.folderPath(note.getFolder()), filename);
-    if (filename.isEmpty() || filename.contains("/") || filename.startsWith(".")) {
+    if (!NotebookGitPortablePath.isPlainFilename(filename)) {
       throw refused(path, "is not a plain filename", ApiError.ErrorType.BINDING_ERROR);
     }
     if (acceptedTreeHas(note.getNotebook().getId(), path)) {
@@ -77,7 +74,7 @@ public class WebNoteImageUploadService {
   private boolean acceptedTreeHas(Integer notebookId, String path) {
     try (OpenedAcceptedRepository accepted =
         repositoryStore.open(bindingRepository.findByNotebook_Id(notebookId).orElseThrow())) {
-      return NotebookGitAcceptedTree.hasPath(accepted.repository(), accepted.head(), path);
+      return NotebookGitAcceptedTree.takenPaths(accepted.repository(), accepted.head()).test(path);
     }
   }
 

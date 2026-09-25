@@ -130,7 +130,13 @@ slice the stored name is used as is.
 
 ### 3. A taken or non-plain name gets the next free numbered name
 Type: Behavior
-Status: planned
+Status: done — `NumberedNameSelection.firstAvailableFilename`,
+`NotebookGitAcceptedTree.takenPaths`, `NotebookGitPortablePath.isPlainFilename`
+(shared with the upload); accepted proof: `LegacyNotePictureMoveControllerTest`
+(6), `NoteControllerUploadNoteImageTests` (15), numbering callers
+(`NoteMotionServicePlacementTest`, `NoteControllerTrashTests`,
+`NotebookFolderTrashControllerTest`, `NotebookGitWebFolderTrashCollisionControllerTest`,
+`NotebookFolderMoveControllerTest`) green.
 Proof: slice 3 rows of the proof table, in `LegacyNotePictureMoveControllerTest`;
 existing `NumberedNameSelection` callers' tests (folder and note title
 numbering) green.
@@ -205,3 +211,5 @@ an external wait.
   the case of a legacy row without a note (treat as not in this notebook).
 - Shared test helpers (`lfsPointerStoredFor`, `tipContent`, `tipText`,
   `legacyImageCount`) live in `NotebookGitWebContentControllerTestBase`.
+- `image.note_id` is nullable; `image.name` is `varchar(255)`, so a numbered
+  moved name always fits `notebook_attachment.filename` (`varchar(512)`).

@@ -36,6 +36,14 @@ final class NotebookGitPortablePath {
     return folderPrefix + filename;
   }
 
+  /**
+   * A single path segment that is not hidden: a leading dot would be hidden or reserved Git
+   * metadata such as {@code .gitattributes}.
+   */
+  static boolean isPlainFilename(String filename) {
+    return !filename.isEmpty() && !filename.contains("/") && !filename.startsWith(".");
+  }
+
   /** A folder's prefix under its container's prefix. */
   static String ofFolder(String parentPrefix, String name) {
     return parentPrefix + name + "/";

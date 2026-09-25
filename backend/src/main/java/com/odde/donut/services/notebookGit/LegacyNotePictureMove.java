@@ -4,24 +4,30 @@ import com.odde.donut.algorithms.NoteContentMarkdown;
 import com.odde.donut.algorithms.NoteContentMarkdown.LeadingFrontmatterImageReference.Referenced;
 import com.odde.donut.entities.Image;
 import com.odde.donut.entities.Note;
+import com.odde.donut.entities.repositories.NotebookGitBindingRepository;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.donut.factoryServices.EntityPersister;
+import com.odde.donut.services.NumberedNameSelection;
 import com.odde.donut.services.notebookAttachment.NotebookAttachmentContent;
+import com.odde.donut.services.notebookGit.NotebookGitAcceptedRepositoryStore.OpenedAcceptedRepository;
 import com.odde.donut.testability.TestabilitySettings;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
+import java.util.function.Predicate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
  * A note whose {@code image:} names a legacy upload owned by a note in the same notebook gets that
- * picture as a file in its own folder, and {@code image:} names the file. The pictures' bytes are
- * stored first, then all of a notebook's moved pictures are accepted as one web change. The legacy
- * rows stay as the backup.
+ * picture as a file in its own folder under the next free name, and {@code image:} names the file.
+ * The pictures' bytes are stored first, then all of a notebook's moved pictures are accepted as one
+ * web change. The legacy rows stay as the backup.
  */
 @Service
 public class LegacyNotePictureMove {
@@ -30,18 +36,24 @@ public class LegacyNotePictureMove {
   private final AcceptedWebChangeService acceptedWebChangeService;
   private final NoteImageFileAttachment noteImageFileAttachment;
   private final TestabilitySettings testabilitySettings;
+  private final NotebookGitBindingRepository bindingRepository;
+  private final NotebookGitAcceptedRepositoryStore repositoryStore;
 
   public LegacyNotePictureMove(
       EntityPersister entityPersister,
       NotebookAttachmentContent attachmentContent,
       AcceptedWebChangeService acceptedWebChangeService,
       NoteImageFileAttachment noteImageFileAttachment,
-      TestabilitySettings testabilitySettings) {
+      TestabilitySettings testabilitySettings,
+      NotebookGitBindingRepository bindingRepository,
+      NotebookGitAcceptedRepositoryStore repositoryStore) {
     this.entityPersister = entityPersister;
     this.attachmentContent = attachmentContent;
     this.acceptedWebChangeService = acceptedWebChangeService;
     this.noteImageFileAttachment = noteImageFileAttachment;
     this.testabilitySettings = testabilitySettings;
+    this.bindingRepository = bindingRepository;
+    this.repositoryStore = repositoryStore;
   }
 
   @Transactional(rollbackFor = Exception.class)
@@ -50,6 +62,7 @@ public class LegacyNotePictureMove {
     if (pictures.isEmpty()) {
       return;
     }
+    Map<Note, String> filenames = freeFilenames(notebookId, pictures);
     Map<Image, byte[]> pointers = new HashMap<>();
     for (Image image : pictures.values()) {
       if (!pointers.containsKey(image)) {
@@ -64,7 +77,7 @@ public class LegacyNotePictureMove {
               (note, image) -> {
                 if (legacyImageId(note).equals(Optional.of(image.getId()))) {
                   noteImageFileAttachment.attach(
-                      note, image.getName(), pointers.get(image), note.getUpdatedAt());
+                      note, filenames.get(note), pointers.get(image), note.getUpdatedAt());
                 }
               });
           return null;
@@ -90,6 +103,40 @@ public class LegacyNotePictureMove {
           .ifPresent(image -> pictures.put(note, image));
     }
     return pictures;
+  }
+
+  /**
+   * A name is taken when the accepted tree has a file, note or folder at that path, or this move
+   * already chose it.
+   */
+  private Map<Note, String> freeFilenames(Integer notebookId, Map<Note, Image> pictures) {
+    Set<String> chosenPaths = new HashSet<>();
+    Map<Note, String> filenames = new HashMap<>();
+    try (OpenedAcceptedRepository accepted =
+        repositoryStore.open(bindingRepository.findByNotebook_Id(notebookId).orElseThrow())) {
+      Predicate<String> acceptedTaken =
+          NotebookGitAcceptedTree.takenPaths(accepted.repository(), accepted.head());
+      pictures.forEach(
+          (note, image) -> {
+            String folderPath = NotebookGitPortablePath.folderPath(note.getFolder());
+            String filename =
+                NumberedNameSelection.firstAvailableFilename(
+                    plainFilename(image.getName()),
+                    candidate -> {
+                      String path = NotebookGitPortablePath.ofAttachment(folderPath, candidate);
+                      return chosenPaths.contains(path) || acceptedTaken.test(path);
+                    });
+            chosenPaths.add(NotebookGitPortablePath.ofAttachment(folderPath, filename));
+            filenames.put(note, filename);
+          });
+    }
+    return filenames;
+  }
+
+  /** The stored name's last segment; a hidden or empty one becomes {@code picture.png}-like. */
+  private static String plainFilename(String storedName) {
+    String name = storedName.substring(storedName.lastIndexOf('/') + 1);
+    return NotebookGitPortablePath.isPlainFilename(name) ? name : "picture" + name;
   }
 
   private static Optional<Integer> legacyImageId(Note note) {
