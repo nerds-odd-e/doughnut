@@ -190,23 +190,55 @@ No executable plan or implementation is authorized by this seed.
 <a id="story-2"></a>
 
 ### Delete unwanted supporting files from Web Donut
+```json dough-story-state
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../quick/035-delete-notebook-file-on-web/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"4c8942258612c8380199d2f435e59896760e7d1b21ca854a870b249a8ff36e23","plan":"5cf6095fe5a2976be1518213f536bdf73366f5cd3d5b2f0d063fe7e4c8bbefb7"}}
+```
 
 - **Identity:** SEED-035#story-2
-- **Goal:** Owners away from a checkout remove obsolete non-Markdown attachments
-  without switching tools. Markdown guidance retains ordinary note operations.
-- **Evaluation:** Delete an attachment from its web folder, then receive the
-  accepted result locally: it is absent, with unrelated notes, files, and
-  learning histories intact.
-- **Scope / value:** One deletion behavior covers image and other attachments.
-  Local deletion is an available workaround, so web convenience follows the
-  authoring handoffs. Removal from the current tree is not Git history erasure.
-- **Effort hypothesis:** M, low confidence until referenced-file behavior is chosen.
-  A Book's source file is one referenced file: local publish already refuses
-  deleting it and asks the owner to remove the Book on the web first.
-- **Depends on:** Stories 6 and 1; specialized image display is not required.
-- **Safe stopping point:** Current-tree cleanup works without deleting referring
-  notes or learning data. No new Trash, restoration, or automatic reference
-  rewriting is assumed.
+- **Slice plan:** [Delete a notebook file on the web](../quick/035-delete-notebook-file-on-web/PLAN.md)
+- **Goal:** An owner removes a non-Markdown file from a notebook on the web.
+  Today only a local checkout can delete a file; the web can only open and
+  download it.
+- **Scope:**
+  - A **Delete** action on the file's page, with a confirmation. The same
+    behavior for every file type.
+  - Delete removes the file outright, through the existing accepted-change
+    boundary; after `donut notebook pull` the file is gone from the checkout.
+    Notes, other files and learning history are untouched.
+  - Deleting a file that a note's `image:` names is allowed: the note shows a
+    broken picture and its `image:` value stays as it was. Local publish
+    behaves the same way (owner decision 2026-09-25).
+  - Deleting a Book's source file is refused with the same message local
+    publish gives, and nothing changes. A Book reads from that file
+    ([story 17 decision](#breadcrumbs): refuse changes to a Book's file).
+  - Who may delete follows the existing notebook edit rule.
+- **Excluded:**
+  - No web Trash or restore for files (owner decision 2026-09-25). Earlier
+    versions stay in accepted Git history.
+  - Stored file contents (LFS objects in GCS) are not deleted; the North
+    Star defers object garbage collection. Git history is not rewritten.
+  - No automatic removal of the old file when a note's picture is replaced
+    or cleared on the web, and no rewriting or clearing of `image:` values.
+  - Deleting several files at once, a delete action in the sidebar, and
+    renaming or moving files.
+  - Markdown files: they already have ordinary note operations.
+- **Key examples:**
+  1. `physics/` holds the note `Force` and `sketch.png`. The owner opens
+     `sketch.png` on the web, chooses Delete and confirms → `sketch.png` is no
+     longer in the folder. After pull, `physics/sketch.png` is absent and
+     `physics/Force.md` and its learning history are unchanged.
+  2. The note `Force` has `image: force.png`. The owner deletes `force.png` →
+     the delete succeeds; `Force` shows a broken picture and still says
+     `image: force.png`.
+  3. `paper.pdf` is a Book's source file. The owner tries to delete it → the
+     delete is refused, saying the file is the source of that Book and to
+     remove the Book on the web first; the file stays.
+- **Effort hypothesis:** S–M, medium confidence. Building the accepted commit
+  already drops the path of a removed file row; the work is an endpoint, the
+  Book check, the page action and tests.
+- **Depends on:** Delivered web file browsing and the Book source file.
+- **Safe stopping point:** If never delivered, files are still deleted
+  locally.
 
 <a id="story-11"></a>
 
@@ -302,8 +334,6 @@ loss. Operations that would rehome files refuse until their story delivers.
 
 - Story 11 needs story refinement and plan realignment before slice
   refinement/execution.
-- File deletion needs an observable outcome for remaining references; warning,
-  refusal, dangling-reference presentation, and Trash are different promises.
 
 ## When to Surface
 
@@ -348,6 +378,10 @@ integration need their own selected outcomes.
   notebook, recorded left-over count, one moved picture displays and clones)
   before starting; remove code and the `image` table in one release; dropping
   the dead `note.image_id` column is important.
+- Owner decisions, 2026-09-25 (story 2 refinement): the purpose is only to
+  remove the file; deleting a file a note's `image:` names is allowed and
+  leaves a broken picture; delete outright with no web Trash; keep the
+  backlog order.
 - [Near-future direction](../PRODUCT-BACKLOG.md#near-future-direction).
 - [SEED-009](SEED-009-git-backed-local-notebook-workflow.md): prior local/web note
   workflow. This seed owns non-Markdown attachment continuity.
