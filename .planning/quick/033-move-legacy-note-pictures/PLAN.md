@@ -96,7 +96,9 @@ CURSOR_DEV=true nix develop -c pnpm cy:run --spec e2e_test/features/cli/cli_note
 
 ### 1. The upload and the move share one "attach a picture file to a note" step
 Type: Structure
-Status: planned
+Status: done — `NoteImageFileAttachment.attach(note, filename, pointer, updatedAt)`;
+accepted proof: `NoteControllerUploadNoteImageTests` (15) and
+`NotebookGitDerivedTreeOracleControllerTest` (7) green, unchanged.
 Proof: `NoteControllerUploadNoteImageTests` and
 `NotebookGitDerivedTreeOracleControllerTest` green, unchanged.
 
@@ -193,4 +195,5 @@ an external wait.
 
 ## Learnings
 
-None yet.
+- Slice 2 calls `NoteImageFileAttachment.attach` (package `services.notebookGit`)
+  inside its own `AcceptedWebChangeService.apply` mutation.
