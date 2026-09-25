@@ -115,6 +115,8 @@ Four delivered revisions had real successful runs but remained unproved in obser
 - Execution: SEED-035 story 20 / quick/026-test-file-journeys-on-lfs / 5859e6d663; Timestamp: 2026-09-24T19:10+08:00 (completion wait for 47a3bdd0ab); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.37. `complete-revision` on `main` timed out with all twelve registered revisions `undiscovered` (shutdown confirmed) after an early `CI_DISCOVERY_DELAYED`; `gh run list --branch main` showed "donut CI" push runs completed `success` for each checked revision, including 47a3bdd0ab (created 10:58:15Z).
 - Execution: SEED-035 story 4 / quick/027-web-uploaded-pictures-as-notebook-files / 4250de93e1; Timestamp: 2026-09-24T22:25+08:00 (completion wait for f4d1ec8d5c); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.38. `complete-revision` on `main` timed out with all six registered revisions `undiscovered` (shutdown confirmed) after an early `CI_DISCOVERY_DELAYED`; `gh run list --branch main` showed "donut CI" runs completed `success` for 4250de93e1, a061808c28, 682259779a, 0e760d4933 and f4d1ec8d5c (created 14:02:40Z); the planning-only claim 09a299b665 had no run of its own.
 
+- Execution: quick/037-fold-picture-attach-step-into-upload / 1b822a6bf7; Timestamp: 2026-09-25T23:37+08:00 (completion wait for 1b822a6bf7); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.38. `complete-revision` on `story/037-fold-picture-attach-step-into-upload` timed out with `1b822a6bf7` `undiscovered` (shutdown confirmed; `CI_DISCOVERY_DELAYED` delivered afterwards); `gh run list --branch` showed "donut CI" run 36154138303 (created 15:26:06Z) completed `success`.
+
 ## ODF-090 — Coordinator implemented a planned slice locally during multi-slice execution
 
 Former local code: DD-097.
@@ -176,6 +178,11 @@ Former local code: DD-107.
   - Evidence: coordinator said before delivery "Managed delivery sets up CI observation itself, so no manual observer start is needed"; slice 1 receipt `observation.reason` "host session identity is required to verify the notification bridge"; recovered by a `grep` of the delivery scripts for the flag, `ci-mailbox.mjs probe`, a re-run with `--session-json` refused ("rebase left the pre-rebase SHA as the candidate"), `start --execution nerds-odd-e/doughnut story/036-remove-legacy-picture-storage` (observer watch-2ENnNk), and `register-push` for 89e3f8a67e; slices 2-5 passed `--session-json` and reported `reused`.
   - Observed effect: five extra calls (one refused) and a `CI_DISCOVERY_DELAYED` advisory for early revisions; no later coverage loss seen before the completion wait.
   - Inference: the same refused re-run as the story 5 occurrence recurred, so the recovery path is still rediscovered per execution.
+
+- Execution: quick/037-fold-picture-attach-step-into-upload / 1b822a6bf7; Timestamp: 2026-09-25, ~23:30+08:00 (slice 1 delivery); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.38.
+  - Evidence: first `deliver` call (no `--session-json`, abbreviated `--validated-candidate 1b822a6bf7`) returned `candidate-mismatch` with `observation.reason` "host session identity is required to verify the notification bridge"; the coordinator then read `execution-increment-observation.mjs` and `ci-host-bridge.mjs` for the flag's shape; a re-run with the full SHA and `--session-json` built from the session transcript path reported `observation.state: attached` (watch-fa5IXa).
+  - Observed effect: one refused call and two script reads before the only delivery; no coverage lost, because the refused call published nothing.
+  - Inference: the `candidate-mismatch` was likely caused by the abbreviated SHA, which the usage line does not rule out. The coordinator read the ODF-092 occurrences only after delivery, so the logged fix did not reach it beforehand.
 
 ## ODF-099 — Queued startup receipt embeds the whole Git index and overflows the coordinator's tool output
 
@@ -315,8 +322,19 @@ The fresh refactor pass found that a helper class existed only to share a step w
   - Observed effect: `NoteImageFileAttachment` shipped with one caller; one extra correction plan instead of a finished refactor. The owner was not asked during execution; the decision waits for wrap-up.
   - Inference: implementer agents in slices 2, 4 and 5 deleted files without a block, so the refusal likely depended on the command's shape (inline edit plus `git rm` together), not on deletion as such. The story's plan listed the legacy code to delete but not the seam story 5 created for it, which is why the residue was found only at refactor time. Qualified: the refactor agent's own transcript was not available.
 
+## DD-117 — A correction plan written by a retrospective had no readiness record, so queued startup refused it
+
+The execution retrospective for SEED-035 story 18 created and queued the correction plan without recording its preparation (`read-state` reported `not-recorded`). `execution-start.mjs start` refused with "selected canonical preparation or identity is unresolved". The coordinator reviewed the plan, recorded `ready` with `record-state`, and published a separate readiness commit on main before the Take. A second start then refused `--plan` ("requested plan disagrees with published preparation") because a whole-document correction's plan is its own canonical home, so the flag has to be left out.
+
+### Occurrences
+
+- Execution: quick/037-fold-picture-attach-step-into-upload / 1b822a6bf7; Timestamp: 2026-09-25, ~23:20+08:00 (refusals, then readiness commit d9f95b830e); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.38.
+  - Evidence: plan queued by db601a2e42 with no story-state block; start receipts `{"status":"source-refused","error":"selected canonical preparation or identity is unresolved"}` and `"requested plan disagrees with published preparation"`; readiness pushed as d9f95b830e; Take 256cdb3d08.
+  - Observed effect: about seven extra calls (reading `execution-source.mjs` and `record-preparation.md`) and one extra commit on main; an execution coordinator performed a preparation assessment, as in DD-114.
+  - Inference: the retrospective's correction-planning path goes through slice planning, which says to record readiness, but that step was skipped or not reached for a plan that is its own home. Recording the assessment when the retrospective writes the plan would remove the refusal.
+
 ## Retention
 
-- Highest allocated local number: 116
+- Highest allocated local number: 117
 - Recovery: `33939aa45a17c08f5e6f8076178ce96437fdfbe8:DearDough.md` contains the complete pre-compaction log and earlier recovery references; `b0b385a184e96ecf8b0f6fc5572eaaab69bc8dad` preserves later history.
 - Occurrence history is partial; full observations, effects, inference and historical provenance remain in that snapshot and the upstream catalog.
