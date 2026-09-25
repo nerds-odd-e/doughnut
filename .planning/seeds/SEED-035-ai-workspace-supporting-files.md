@@ -99,7 +99,7 @@ No executable plan or implementation is authorized by this seed.
 
 ### Keep a Book's source file as an ordinary notebook file
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../quick/034-book-source-as-notebook-file/PLAN.md","assessment":"not-ready","reasons":["Start condition unmet: reuses naming helpers and the startup-move shape from the picture move (quick/033, SEED-035#story-5), not yet on main."],"basis":{"document":"196ceb32886fc98b17c9cd62b875bd1c7acd320b842971f03e564fdd1f8f3927","plan":"aed569850f55fd2e84240db3cd293116ad7b64af2cb77c36cefef8d0ede27235"}}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../quick/034-book-source-as-notebook-file/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"6b062cb7514d647ba7859941df5c0d0ccc28aaff583afe376afad6a60e3761bf","plan":"aed569850f55fd2e84240db3cd293116ad7b64af2cb77c36cefef8d0ede27235"}}
 ```
 
 - **Identity:** SEED-035#story-17
