@@ -99,7 +99,7 @@ No executable plan or implementation is authorized by this seed.
 
 ### Remove the legacy raw file storage
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../quick/029-remove-raw-file-storage/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"c224384cca953aab08c932872cbc49eea95bda93ae7f11dae56a7a883d3d0ee8","plan":"799f7852c9fbe2647650922e299c1aafb687ff732df5cedfced0302cf9977115"}}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../quick/029-remove-raw-file-storage/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"8540ff502bdff2da0d7d495e8c2bdfebd84f29af1ab79035694033e7a68c8ef0","plan":"356d4251bd2d303c41989deebcf158db1c628a59dbc6f28e51abfb7e15f3b01c"}}
 ```
 
 - **Identity:** SEED-035#story-19
@@ -130,15 +130,18 @@ No executable plan or implementation is authorized by this seed.
     history (server size admission and the CLI's LFS selection) keep accepting
     them. The removal is of raw *bindings*, not of raw history.
   - Confirmation: this ships in a release after the one that ran story 14's
-    conversion in production (`v1.3.23`). The refusing migration is the check:
-    if a raw binding remains, the deploy fails loudly (ADR 0006) and nothing
-    is changed.
+    conversion in production (`v1.3.23`). Before deploying the raw-free code,
+    check production for `RAW` bindings and defer the release until none remain.
+    The refusing migration rechecks during deployment: if a raw binding appears,
+    the deploy fails loudly (ADR 0006) without changing the column. This matters
+    because that migration runs after the new instance becomes ready.
 - **Key examples:**
   1. No raw binding in production → both deploys succeed and the column is
      gone. Publishing a picture to any notebook uses the LFS size check, and
      the web download reads through the pointer.
-  2. One raw binding remains → the migration fails, naming the notebook ids,
-     and the deploy stops with nothing dropped.
+  2. One raw binding remains at the pre-deploy check → defer the raw-free
+     release. If one remains at migration time, the migration fails, naming
+     the notebook ids, with nothing dropped.
   3. A converted notebook whose history holds raw `physics/diagram.png` from
      before the conversion: a fresh clone succeeds, the old commit still has
      the raw bytes, and publishing a new picture is accepted.

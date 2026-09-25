@@ -56,6 +56,10 @@ Assumptions (checked on `origin/main` `a061808c28`, 2026-09-24):
   while the other instance still runs the old code (db-migration skill,
   "Release safety"). The `bundle_bytes` precedent unmapped the column in
   `v1.3.15` (`b8480476f4`) and dropped it in `v1.3.16` (`ea65f212ce`).
+- Story 14's startup conversion catches per-notebook failures and leaves those
+  bindings `RAW`, so a successful deployment of `v1.3.23` alone does not prove
+  that production has no raw bindings. The first raw-free release needs a
+  read-only production check before deployment as well as its migration check.
 - Next Flyway versions: `300000342`, `300000343` (newest is `300000341`;
   `300000339` is retired).
 
@@ -65,7 +69,7 @@ Assumptions (checked on `origin/main` `a061808c28`, 2026-09-24):
 | --- | --- | --- |
 | Converted notebook with raw history: fresh clone has the old raw bytes, a new picture publishes (3) | 1 | New controller test on a product LFS notebook whose accepted history is seeded as raw `physics/diagram.png` then its LFS pointer: publishing a new picture is accepted, the bundle's first commit still reads the raw bytes, web download of the current file gives the current bytes. CLI unit test above stays green. |
 | Publishing to any notebook uses the LFS size check; web download reads through the pointer (1) | 2, 3 | Existing LFS tests stay green: `NotebookGitAttachmentSizeAdmissionLfsHistoryControllerTest`, `NotebookGitAttachmentLfsPublicationControllerTest`, `NotebookAttachmentControllerTest` LFS download; no test builds a raw binding |
-| One raw binding remains → the migration fails naming the notebook ids; nothing changes (2) | 4 | Migration test (JDBC, `backend/src/test/java/db/migration`, like `NotebookGitAcceptedHistoryCompletenessTest`): a binding set to `RAW` makes the check throw a message naming its notebook id; the column default is unchanged |
+| One raw binding remains → defer deployment at the pre-deploy check; if present at migration time, migration fails naming the notebook ids without changing the column (2) | 4 | Read-only production query before release; migration test (JDBC, `backend/src/test/java/db/migration`, like `NotebookGitAcceptedHistoryCompletenessTest`): a binding set to `RAW` makes the check throw a message naming its notebook id; the column default is unchanged |
 | No raw binding → new bindings store LFS without code writing it (1) | 4 | Same migration test: with no `RAW` row the migration succeeds and the column default is `LFS`; `NotebookGitBindingAssertions` no longer reads a representation |
 | The column is gone (1) | 5 | Migration test or schema check: after migration `notebook_git_binding` has no `attachment_representation` column; full backend suite green |
 
@@ -132,9 +136,20 @@ Type: Behavior
 Status: planned
 Proof: migration test for examples 2 and 1 above; full backend suite green.
 
+Release gate: before deploying the raw-free code, run a read-only production
+query and require no rows:
+
+```sql
+SELECT notebook_id FROM notebook_git_binding WHERE attachment_representation = 'RAW';
+```
+
+If any remain, leave the raw-capable release running and resolve those
+notebooks before deployment. A successful `v1.3.23` deploy alone is not this
+check: the startup converter logs individual failures and leaves them raw.
+
 Behavior: production deploys this release → migration `V300000342` refuses,
-naming every notebook id with a `RAW` binding and changing nothing, before
-anything else; otherwise it sets the column default to `'LFS'` → the entity
+naming every notebook id with a `RAW` binding and leaving the column unchanged;
+otherwise it sets the column default to `'LFS'` → the entity
 no longer maps `attachment_representation`, the enum,
 `findNotebookIdsByAttachmentRepresentation` and the builder's
 `representation(...)` are gone, and a newly created binding stores `LFS` from
@@ -167,9 +182,10 @@ gone, keeping the drop assertion.
   drop a column the still-running old instance maps. Following the
   db-migration skill's release-safety rule and the `bundle_bytes` precedent,
   the refusal and default change ship with the code removal (slice 4), and the
-  drop ships in the next release (slice 5). The refusal runs at the first
-  moment the raw-free code runs in production, which is the earliest point
-  the check can be made.
+  drop ships in the next release (slice 5). Check for remaining raw bindings
+  before deploying slice 4. The migration rechecks after the new instance is
+  ready; it cannot by itself prevent a brief interval of raw-free serving if
+  an unconverted binding appears between the pre-deploy check and migration.
 - A binding created in the seconds between the new instance becoming ready
   and `V300000342` running would get the old `'RAW'` default and make the
   migration refuse. The deploy then fails loudly (ADR 0006); the fix is to set
