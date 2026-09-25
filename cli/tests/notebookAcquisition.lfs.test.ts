@@ -82,19 +82,13 @@ describe('acquireNotebookGitCheckout — LFS tip fill-in', () => {
           'Authorization: Bearer fake-bearer',
         ],
         ['-C', checkoutDir, 'lfs', 'install', '--local', '--skip-repo'],
-        ['-C', checkoutDir, 'lfs', 'pull', 'origin'],
+        ['-C', checkoutDir, 'lfs', 'pull'],
         ['-C', checkoutDir, 'remote', 'remove', 'origin'],
       ])
     )
-    expect(
-      calls.filter(
-        (argv) =>
-          argv[0] === '-C' &&
-          argv[2] === 'remote' &&
-          argv[3] === 'remove' &&
-          argv[4] === 'origin'
-      )
-    ).toHaveLength(1)
+    expect(calls.filter((argv) => argv[2] === 'remote')).toEqual([
+      ['-C', checkoutDir, 'remote', 'remove', 'origin'],
+    ])
     expect(fs.readFileSync(join(destinationPath, 'payload.bin'), 'utf8')).toBe(
       'abcd'
     )

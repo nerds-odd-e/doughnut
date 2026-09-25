@@ -80,7 +80,7 @@ publish choose what to transfer.
 
 ### 1. The documented historical recovery works in any CLI LFS checkout
 Type: Behavior
-Status: planned
+Status: done
 Proof: `CURSOR_DEV=true nix develop -c pnpm -C cli test`; then
 `CURSOR_DEV=true nix develop -c pnpm cy:run --spec e2e_test/features/cli/cli_notebook_lfs.feature`
 and the clone/publish CLI features that touch LFS
@@ -106,6 +106,12 @@ test expectations (`notebookAcquisition.lfs.test.ts`,
   code and keeps a clone free of a fake remote.
 
 ## Learnings
+
+- Delivered: no placeholder remote; fill-in `git lfs pull`, publish
+  `git lfs push --object-id <lfs.url>`; docs and the historical-fetch task use
+  `git lfs fetch "$(git config lfs.url)" <commit>`; the replacement/deletion
+  LFS scenario asserts "the cloned checkout names no Git remote". Proof:
+  `pnpm -C cli test` 468; LFS/size-admission/clone E2E 17/17.
 
 - Infrastructure assumption checked 2026-09-25 with git-lfs 3.8.0 (commands in
   finding 3). Authenticated behavior against Donut's endpoint is proven by the

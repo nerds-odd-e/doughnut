@@ -1,6 +1,7 @@
 /**
- * Cypress tasks for recovering a published LFS version via standard
- * `git lfs fetch origin <ref>` after clearing the local object cache.
+ * Cypress tasks for recovering a published LFS version via the documented
+ * `git lfs fetch "$(git config lfs.url)" <ref>` after clearing the local
+ * object cache.
  */
 
 import { existsSync, readFileSync } from 'node:fs'
@@ -16,7 +17,7 @@ import {
 export function createCliE2eNotebookLfsHistoricalFetchTasks() {
   return {
     /**
-     * Removes `.git/lfs/objects` so a later `git lfs fetch <remote> <ref>` must
+     * Removes `.git/lfs/objects` so a later `git lfs fetch <endpoint> <ref>` must
      * re-download from the notebook LFS endpoint (Git LFS 3.7.1 has no
      * `fetch --object-id`).
      */
@@ -24,9 +25,15 @@ export function createCliE2eNotebookLfsHistoricalFetchTasks() {
       clearLfsObjectCache(checkoutDir)
       return null
     },
+    listCliNotebookCheckoutRemotes(checkoutDir: string): string[] {
+      return runOrThrow('git', ['remote'], checkoutDir)
+        .split('\n')
+        .filter((name) => name.length > 0)
+    },
     /**
-     * Standard historical fetch: `git lfs fetch origin <ref>` using the
-     * checkout's configured `lfs.url` and `http.extraHeader`.
+     * Documented historical fetch: `git lfs fetch <lfs.url> <ref>`, naming the
+     * checkout's configured endpoint (no remote needed) and authorized by its
+     * `http.extraHeader`.
      */
     fetchCliNotebookCheckoutLfsRef({
       checkoutDir,
@@ -35,7 +42,12 @@ export function createCliE2eNotebookLfsHistoricalFetchTasks() {
       checkoutDir: string
       ref: string
     }): { status: number | null; output: string } {
-      const result = spawnSync('git', ['lfs', 'fetch', 'origin', ref], {
+      const lfsUrl = runOrThrow(
+        'git',
+        ['config', 'lfs.url'],
+        checkoutDir
+      ).trim()
+      const result = spawnSync('git', ['lfs', 'fetch', lfsUrl, ref], {
         cwd: checkoutDir,
         encoding: 'utf8',
       })

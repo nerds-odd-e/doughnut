@@ -106,11 +106,12 @@ describe('notebook publish — LFS object upload before bundle submission', () =
         'lfs',
         'push',
         '--object-id',
-        'origin',
+        `${getApiConfig().apiBaseUrl}/api/notebooks/42/lfs`,
         OID_A,
         OID_B,
       ])
     )
+    expect(runGit(['remote'], dir)).toBe('')
     expect(callOrder).toEqual(['lfs-push', 'bundle-post'])
     expect(postCount(fetchMock)).toBe(1)
   })

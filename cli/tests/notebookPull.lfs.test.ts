@@ -36,6 +36,8 @@ vi.mock('node:child_process', async () => {
   return { ...actual, spawnSync: vi.fn(actual.spawnSync) }
 })
 
+const notebookLfsUrl = () => `${getApiConfig().apiBaseUrl}/api/notebooks/42/lfs`
+
 describe('notebook pull (LFS checkout fill-in)', () => {
   const ctx = installNotebookPullAcceptedHistoryTest('donut-cli-pull-lfs-test-')
 
@@ -106,11 +108,10 @@ describe('notebook pull (LFS checkout fill-in)', () => {
         filled(web.includes('a.bin') ? OID_B : OID_A)
       )
       expect(lfs.lfsSteps()).toEqual(['install', 'pull'])
+      expect(runGit(['remote'], directory)).toBe('')
       expect(lfs.worktreeOpsSkipSmudge().every((v) => v === '1')).toBe(true)
       expect(lfs.worktreeOpsSkipSmudge().length > 0).toBe(web.length > 0)
-      expect(runGit(['config', 'lfs.url'], directory)).toBe(
-        `${getApiConfig().apiBaseUrl}/api/notebooks/42/lfs`
-      )
+      expect(runGit(['config', 'lfs.url'], directory)).toBe(notebookLfsUrl())
       expect(runGit(['config', 'http.extraHeader'], directory)).toBe(
         'Authorization: Bearer fake-bearer'
       )
@@ -127,19 +128,12 @@ describe('notebook pull (LFS checkout fill-in)', () => {
 
   test('a configured checkout only refreshes a rotated login before filling in', async () => {
     const { source, directory } = lfsCheckout(ctx.getWorkDir())
-    runGit(
-      [
-        'config',
-        'lfs.url',
-        `${getApiConfig().apiBaseUrl}/api/notebooks/42/lfs`,
-      ],
-      directory
-    )
-    runGit(
-      ['config', 'filter.lfs.process', 'git-lfs filter-process'],
-      directory
-    )
-    runGit(['remote', 'add', 'origin', 'https://example.com/n.git'], directory)
+    for (const [key, value] of [
+      ['lfs.url', notebookLfsUrl()],
+      ['filter.lfs.process', 'git-lfs filter-process'],
+    ]) {
+      runGit(['config', key, value], directory)
+    }
     serveAcceptedBundle(ctx, source, 'lfs')
     const lfs = interceptGitLfs()
 
@@ -154,25 +148,35 @@ describe('notebook pull (LFS checkout fill-in)', () => {
     )
   })
 
-  test('a Markdown-only checkout is not filled in through Git LFS', async () => {
-    const source = buildLfsSourceRepo(ctx.getWorkDir())
-    const directory = cloneAsBoundCheckout(
-      ctx.getWorkDir(),
-      source,
-      getApiConfig().apiBaseUrl,
-      'checkout'
-    )
-    commitPortableFile(source, 'physics/.keep', '', 'web folder')
-    serveAcceptedBundle(ctx, source, 'markdown')
-    const lfs = interceptGitLfs()
+  test.each([
+    {
+      checkout: 'markdown',
+      buildSource: buildLfsSourceRepo,
+      lfsSteps: ['install'],
+    },
+    { checkout: 'legacy', buildSource: buildSourceRepo, lfsSteps: [] },
+  ] as const)(
+    'a $checkout checkout pulls without a Git LFS fill-in',
+    async ({ checkout, buildSource, lfsSteps }) => {
+      const source = buildSource(ctx.getWorkDir())
+      const directory = cloneAsBoundCheckout(
+        ctx.getWorkDir(),
+        source,
+        getApiConfig().apiBaseUrl,
+        'checkout'
+      )
+      commitPortableFile(source, 'physics/.keep', '', 'web folder')
+      serveAcceptedBundle(ctx, source, checkout)
+      const lfs = interceptGitLfs()
 
-    await run(['notebook', 'pull', directory])
+      await run(['notebook', 'pull', directory])
 
-    expect(runGit(['rev-parse', 'HEAD'], directory)).toBe(
-      runGit(['rev-parse', 'main'], source)
-    )
-    expect(lfs.lfsSteps()).toEqual(['install'])
-  })
+      expect(runGit(['rev-parse', 'HEAD'], directory)).toBe(
+        runGit(['rev-parse', 'main'], source)
+      )
+      expect(lfs.lfsSteps()).toEqual(lfsSteps)
+    }
+  )
 
   test('a failed download reports incomplete attachments; the rerun fills them in, then reports unchanged', async () => {
     const { source, directory } = lfsCheckout(ctx.getWorkDir())
@@ -236,25 +240,5 @@ describe('notebook pull (LFS checkout fill-in)', () => {
         'Unpublished local work is already based on the accepted history.'
       )
     )
-  })
-
-  test('a legacy checkout pulls without Git LFS', async () => {
-    const source = buildSourceRepo(ctx.getWorkDir())
-    const directory = cloneAsBoundCheckout(
-      ctx.getWorkDir(),
-      source,
-      getApiConfig().apiBaseUrl,
-      'checkout'
-    )
-    commitPortableFile(source, 'note.md', '# web\n', 'web note')
-    serveAcceptedBundle(ctx, source, 'legacy')
-    const lfs = interceptGitLfs()
-
-    await run(['notebook', 'pull', directory])
-
-    expect(runGit(['rev-parse', 'HEAD'], directory)).toBe(
-      runGit(['rev-parse', 'main'], source)
-    )
-    expect(lfs.lfsSteps()).toEqual([])
   })
 })

@@ -1,5 +1,6 @@
 /**
- * Explicit historical recovery via standard `git lfs fetch origin <ref>`
+ * Explicit historical recovery via the documented
+ * `git lfs fetch "$(git config lfs.url)" <ref>`
  * after clearing the local object cache.
  */
 import { inspectNotebookLfsAttachment } from './notebookLfsInspect'
@@ -20,7 +21,7 @@ function runHistoricalLfsFetch(
           if (requireSuccess) {
             expect(
               result.status,
-              `git lfs fetch origin ${version.head}\n${result.output}`
+              `git lfs fetch <lfs.url> ${version.head}\n${result.output}`
             ).to.equal(0)
           }
           cy.wrap(result).as(alias)
@@ -44,6 +45,15 @@ export function notebookLfsHistoricalFetch() {
           'current attachment row must be gone'
         ).to.equal(false)
       })
+    },
+    expectClonedCheckoutNamesNoGitRemote() {
+      return cy
+        .get<string>('@cliCloneDestination')
+        .then((checkoutDir) =>
+          cy
+            .task<string[]>('listCliNotebookCheckoutRemotes', checkoutDir)
+            .should('deep.equal', [])
+        )
     },
     clearClonedCheckoutLfsObjectCache() {
       return cy

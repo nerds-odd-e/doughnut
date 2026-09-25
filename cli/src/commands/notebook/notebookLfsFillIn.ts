@@ -26,7 +26,7 @@ export function fillInCurrentLfsFilesIfNeeded(
     checkoutDir,
     'receive',
     nextStep,
-    ['pull', 'origin'],
+    ['pull'],
     (detail, status) =>
       `Notebook attachments are incomplete: failed to download current notebook attachments via Git LFS${
         detail ? `: ${detail}` : ` (exit code ${status})`

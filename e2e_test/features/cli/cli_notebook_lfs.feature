@@ -106,6 +106,7 @@ Feature: Notebook Git LFS authenticated transfer
     And I publish the cloned checkout using the installed CLI
     Then the installed CLI reports the committed change as the accepted head
     And the LFS commit "lfsVersionA" remains an ancestor of "lfsVersionB"
+    And the cloned checkout names no Git remote
     When I clear the cloned checkout LFS object cache
     And I fetch LFS objects for commit "lfsVersionA" with the standard Git LFS client
     Then the cloned checkout LFS object cache holds the digest for "lfsVersionA"

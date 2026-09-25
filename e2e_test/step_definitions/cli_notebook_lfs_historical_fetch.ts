@@ -55,3 +55,7 @@ Then(
     cli.notebookLfs().expectHistoricalFetchReportsUnavailable()
   }
 )
+
+Then('the cloned checkout names no Git remote', () => {
+  cli.notebookLfs().expectClonedCheckoutNamesNoGitRemote()
+})

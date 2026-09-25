@@ -73,8 +73,7 @@ function recordLocalNotebookBinding(
 
 /**
  * Removes the `origin` remote that `git clone <bundle-file> <target>` points at the (deleted)
- * temporary local bundle file, so a finished checkout has no dangling remote. Until then it
- * names the remote for the LFS fill-in, whose transfers use the recorded LFS endpoint.
+ * temporary local bundle file, so a finished checkout has no dangling remote.
  */
 function removeOriginRemote(checkoutDir: string): void {
   runSystemGitOrThrow(

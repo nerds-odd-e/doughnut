@@ -101,7 +101,8 @@ standard Git LFS client (verified with Git LFS 3.7.1 against Donut's notebook
 endpoint). There is no Donut history UI or Donut-specific history command.
 
 Configure the notebook endpoint and bearer token in local Git config (clone
-already does this; transfers use `lfs.url`, not the placeholder `origin` URL):
+already does this; a CLI checkout needs no Git remote, because transfers name
+the `lfs.url` endpoint):
 
 ```bash
 git config lfs.url http://127.0.0.1:<port>/api/notebooks/<notebook-id>/lfs
@@ -113,7 +114,7 @@ Clear the local object cache when you need a fresh download (Git LFS 3.7.1 has
 
 ```bash
 rm -rf .git/lfs/objects
-git lfs fetch origin <published-commit>
+git lfs fetch "$(git config lfs.url)" <published-commit>
 ```
 
 The requested digest's exact bytes land under `.git/lfs/objects/<aa>/<bb>/<oid>`.

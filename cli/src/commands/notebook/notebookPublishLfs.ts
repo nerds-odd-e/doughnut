@@ -33,12 +33,17 @@ export function uploadRequiredLfsObjectsBeforeProposal(
     return
   }
   const retry = 'retry "donut notebook publish"'
-  prepareAuthenticatedLfsCheckout(directory, notebookId, 'publish', retry)
+  const lfsUrl = prepareAuthenticatedLfsCheckout(
+    directory,
+    notebookId,
+    'publish',
+    retry
+  )
   runGitLfsOrThrow(
     directory,
     'publish',
     retry,
-    ['push', '--object-id', 'origin', ...objectIds],
+    ['push', '--object-id', lfsUrl, ...objectIds],
     (detail, status) =>
       `failed to upload notebook attachments via Git LFS${
         detail ? `: ${detail}` : ` (exit code ${status})`

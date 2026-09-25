@@ -11,10 +11,6 @@ function notebookLfsEndpoint(apiBaseUrl: string, notebookId: number): string {
   return `${stripTrailingSlash(apiBaseUrl)}/api/notebooks/${notebookId}/lfs`
 }
 
-function placeholderNotebookRemoteUrl(apiBaseUrl: string): string {
-  return `${stripTrailingSlash(apiBaseUrl)}/donut-notebook.git`
-}
-
 /**
  * Options for worktree-changing Git operations: LFS pointers stay pointers until the
  * authenticated fill-in downloads the current files once.
@@ -89,34 +85,18 @@ function requireGitLfs(purpose: 'receive' | 'publish', nextStep: string): void {
 
 /**
  * Prepares an LFS checkout for authenticated transfers: records the notebook LFS endpoint and
- * the CLI's current login in local Git config (never authored content), behind a placeholder
- * `origin` when the checkout has none, and installs the local LFS filters without Git LFS hooks.
- * Only what is missing or changed is written.
+ * the CLI's current login in local Git config (never authored content), and installs the local
+ * LFS filters without Git LFS hooks. Only what is missing or changed is written. Returns the
+ * endpoint, which transfers name instead of a remote.
  */
 export function prepareAuthenticatedLfsCheckout(
   checkoutDir: string,
   notebookId: number,
   purpose: 'receive' | 'publish',
   nextStep: string
-): void {
+): string {
   const config = readLocalGitConfig(checkoutDir)
   const { apiBaseUrl, token } = loadAuthenticatedFetchContext()
-  if (!config.has('remote.origin.url')) {
-    runSystemGitOrThrow(
-      [
-        '-C',
-        checkoutDir,
-        'remote',
-        'add',
-        'origin',
-        placeholderNotebookRemoteUrl(apiBaseUrl),
-      ],
-      (detail, status) =>
-        `failed to add placeholder origin for Git LFS${
-          detail ? `: ${detail}` : ` (exit code ${status})`
-        }`
-    )
-  }
   const lfsUrl = notebookLfsEndpoint(apiBaseUrl, notebookId)
   if (config.get('lfs.url') !== lfsUrl) {
     recordLocalGitConfig(checkoutDir, 'lfs.url', lfsUrl, 'endpoint')
@@ -142,6 +122,7 @@ export function prepareAuthenticatedLfsCheckout(
         }`
     )
   }
+  return lfsUrl
 }
 
 /**
