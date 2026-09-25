@@ -10,9 +10,10 @@ and deletable in Web Donut.
 
 ## Taken
 
+- [Finish the single attachment representation](quick/031-finish-single-attachment-representation/PLAN.md)
+
 ## Backlog list
 
-- [Finish the single attachment representation](quick/031-finish-single-attachment-representation/PLAN.md)
 - [Give end-to-end test contributors clear, consistent authoring rules](seeds/SEED-040-e2e-test-guidance.md#story-1) — SEED-040#story-1
 - [Move existing uploaded note pictures into their notebooks](seeds/SEED-035-ai-workspace-supporting-files.md#story-5) — SEED-035#story-5
 - [Keep a Book's source file as an ordinary notebook file](seeds/SEED-035-ai-workspace-supporting-files.md#story-17) — SEED-035#story-17
