@@ -51,9 +51,11 @@
 <script setup lang="ts">
 import { ref } from "vue"
 import RichFrontmatterPropertyExternalLink from "@/components/form/RichFrontmatterPropertyExternalLink.vue"
-import { NoteController } from "@generated/donut-backend-api/sdk.gen"
-import { apiCallWithLoading } from "@/managedApi/clientSetup"
-import { noteImageScalarsFromMarkdown } from "@/utils/noteContentFrontmatterParse"
+import { useStorageAccessor } from "@/composables/useStorageAccessor"
+import {
+  closeAndFlushNoteContentMutations,
+  reopenNoteContentMutations,
+} from "@/composables/noteContentMutationBarrier"
 
 const props = withDefaults(
   defineProps<{
@@ -75,6 +77,8 @@ const emit = defineEmits<{
   commit: []
   "image-upload-state": [inProgress: boolean]
 }>()
+
+const storageAccessor = useStorageAccessor()
 
 const valueInputRef = ref<HTMLInputElement | null>(null)
 const imageFileInputRef = ref<HTMLInputElement | null>(null)
@@ -98,19 +102,11 @@ async function onImageFileSelected(event: Event) {
   emit("image-upload-state", true)
   imageUploading.value = true
   try {
-    const { data, error } = await apiCallWithLoading(() =>
-      NoteController.uploadNoteImage({
-        path: { note: noteId },
-        body: { uploadImage: file },
-      })
-    )
-    const uploadedImage =
-      !error && data
-        ? noteImageScalarsFromMarkdown(data.note.content ?? "").noteImage
-        : undefined
-    if (uploadedImage) {
-      emit("update:modelValue", uploadedImage)
-      emit("commit")
+    if (!(await closeAndFlushNoteContentMutations(noteId))) return
+    try {
+      await storageAccessor.value.storedApi().uploadNoteImage(noteId, file)
+    } finally {
+      reopenNoteContentMutations(noteId)
     }
   } finally {
     imageUploading.value = false

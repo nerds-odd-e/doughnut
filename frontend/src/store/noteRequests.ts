@@ -202,3 +202,17 @@ export async function reduceRelationNoteToSourcePropertyRequest(
   if (error || !sourceRealm) return undefined
   return sourceRealm
 }
+
+export async function uploadNoteImageRequest(
+  noteId: Donut.ID,
+  file: File
+): Promise<NoteRealm | undefined> {
+  const { data: noteRealm, error } = await apiCallWithLoading(() =>
+    NoteController.uploadNoteImage({
+      path: { note: noteId },
+      body: { uploadImage: file },
+    })
+  )
+  if (error || !noteRealm) return undefined
+  return noteRealm
+}

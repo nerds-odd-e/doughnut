@@ -98,7 +98,11 @@ there changes in slice 2).
 
 ### 2. A web picture upload is one commit
 Type: Behavior
-Status: planned
+Status: done
+Accepted proof: `frontend/tests/pages/NoteShowPage.imageUpload.spec.ts` (request order
+save → upload; after upload the image row shows `e2e.png` and no content save);
+`cli_notebook_lfs.feature` and `note_frontmatter_image.feature` pass unchanged. The
+editor-level spec cannot show save ordering, so upload proof lives at the note page.
 Proof: see table row 2.
 
 Behavior: a note open in the editor (with or without unsaved text) → the owner
