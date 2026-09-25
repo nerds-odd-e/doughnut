@@ -8,8 +8,7 @@ import java.util.regex.Pattern;
 /**
  * Standard Git LFS v1 pointer classification for accepted Git attachment content. An empty byte
  * array is the standard empty-file representation (passed through LFS unchanged); it is not a
- * textual pointer. Detecting pointer shape does not by itself enable LFS for a notebook: raw
- * bindings keep pointer-looking bytes as legacy payload.
+ * textual pointer.
  */
 public final class NotebookGitLfsPointer {
 

@@ -1,5 +1,3 @@
-import * as fs from 'node:fs'
-import * as path from 'node:path'
 import { loadAuthenticatedFetchContext } from '../../backendApi/donutBackendClient.js'
 import { runSystemGitOrThrow } from './systemGit.js'
 
@@ -17,15 +15,6 @@ function notebookLfsEndpoint(apiBaseUrl: string, notebookId: number): string {
  */
 export function smudgeSkippedGitOptions(): { env: NodeJS.ProcessEnv } {
   return { env: { ...process.env, GIT_LFS_SKIP_SMUDGE: '1' } }
-}
-
-/** True when the checkout's `.gitattributes` enables the standard LFS filter. */
-export function checkoutUsesLfs(checkoutDir: string): boolean {
-  const attributesPath = path.join(checkoutDir, '.gitattributes')
-  if (!fs.existsSync(attributesPath)) {
-    return false
-  }
-  return fs.readFileSync(attributesPath, 'utf8').includes('filter=lfs')
 }
 
 /** True when the checkout's current tree has a file stored through the LFS filter. */
@@ -84,7 +73,7 @@ function requireGitLfs(purpose: 'receive' | 'publish', nextStep: string): void {
 }
 
 /**
- * Prepares an LFS checkout for authenticated transfers: records the notebook LFS endpoint and
+ * Prepares the checkout for authenticated Git LFS transfers: records the notebook LFS endpoint and
  * the CLI's current login in local Git config (never authored content), and installs the local
  * LFS filters without Git LFS hooks. Only what is missing or changed is written. Returns the
  * endpoint, which transfers name instead of a remote.

@@ -1,5 +1,4 @@
 import {
-  checkoutUsesLfs,
   prepareAuthenticatedLfsCheckout,
   runGitLfsOrThrow,
 } from './notebookLfsLocal.js'
@@ -7,8 +6,8 @@ import { selectRequiredLfsObjectIds } from './notebookPublishLfsSelection.js'
 import { runSystemGitOrThrow } from './systemGit.js'
 
 /**
- * For an LFS checkout, uploads required unpublished objects with standard Git LFS
- * before the caller submits the Git bundle. Raw checkouts are untouched. Does not
+ * Uploads required unpublished objects with standard Git LFS before the caller
+ * submits the Git bundle; with none required, Git LFS is not used. Does not
  * mutate refs or working files; a failed upload throws and leaves local state as-is.
  */
 export function uploadRequiredLfsObjectsBeforeProposal(
@@ -16,9 +15,6 @@ export function uploadRequiredLfsObjectsBeforeProposal(
   notebookId: number,
   acceptedHead: string
 ): void {
-  if (!checkoutUsesLfs(directory)) {
-    return
-  }
   const proposedHead = runSystemGitOrThrow(
     ['-C', directory, 'rev-parse', 'main'],
     (detail, status) =>

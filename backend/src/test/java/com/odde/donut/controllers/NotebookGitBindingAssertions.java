@@ -18,8 +18,8 @@ import org.eclipse.jgit.revwalk.RevWalk;
 
 /**
  * Asserts that a freshly created notebook already has its accepted Git binding: one root commit on
- * {@code refs/heads/main} with no parents, LFS representation, and initial {@code .gitattributes}.
- * The accepted history is read through the notebook's own Git-bundle download endpoint.
+ * {@code refs/heads/main} with no parents and the initial LFS {@code .gitattributes}. The accepted
+ * history is read through the notebook's own Git-bundle download endpoint.
  */
 final class NotebookGitBindingAssertions {
 

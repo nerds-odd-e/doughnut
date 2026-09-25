@@ -1,23 +1,18 @@
 import {
   checkoutHasLfsFiles,
-  checkoutUsesLfs,
   prepareAuthenticatedLfsCheckout,
   runGitLfsOrThrow,
 } from './notebookLfsLocal.js'
 
 /**
- * When the checkout enables Git LFS, prepares it for authenticated transfers and fills in the
- * current checkout's LFS files via `git lfs pull`; a checkout without LFS files skips the
- * download. Failures end with the caller's `nextStep` (e.g. `rerun "donut notebook pull"`).
+ * Prepares the checkout for authenticated Git LFS transfers and fills in the current
+ * checkout's LFS files via `git lfs pull`; a checkout without LFS files skips the download. Failures end with the caller's `nextStep` (e.g. `rerun "donut notebook pull"`).
  */
-export function fillInCurrentLfsFilesIfNeeded(
+export function fillInCurrentLfsFiles(
   checkoutDir: string,
   notebookId: number,
   nextStep: string
 ): void {
-  if (!checkoutUsesLfs(checkoutDir)) {
-    return
-  }
   prepareAuthenticatedLfsCheckout(checkoutDir, notebookId, 'receive', nextStep)
   if (!checkoutHasLfsFiles(checkoutDir)) {
     return

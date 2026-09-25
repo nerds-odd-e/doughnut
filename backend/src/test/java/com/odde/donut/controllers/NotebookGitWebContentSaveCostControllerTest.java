@@ -27,7 +27,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 class NotebookGitWebContentSaveCostControllerTest extends NotebookGitWebContentSaveCostTestSupport {
 
   @Test
-  void noteSaveInALargeLfsNotebookLeavesAttachmentsUntouched() throws Throwable {
+  void noteSaveInANotebookWithManyFilesLeavesAttachmentsUntouched() throws Throwable {
     Notebook large = createGitBackedNotebook("Large");
     Note note = makeMe.aNote().notebook(large).content(ACCEPTED_CONTENT).please();
     for (int i = 0; i < 30; i++) {

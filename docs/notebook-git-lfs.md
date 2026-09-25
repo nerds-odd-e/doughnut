@@ -22,7 +22,8 @@ local files with compact Git history and one attachment model, including images.
   URLs or credentials. Markdown remains ordinary Git content; `.gitattributes`
   is Git metadata, and structural markers retain their existing role. Follow
   the standard empty-file representation.
-- **Clients:** Require standard Git LFS for supported local attachment workflows.
+- **Clients:** The CLI requires standard Git LFS: clone always configures it in
+  the checkout, and pull and publish use it whenever attachments move.
   Donut coordinates existing Git-bundle transport with standard LFS transfers;
   it does not implement another local cache, pointer format, or sync protocol.
   Working files and authored references retain their original paths and bytes.
@@ -50,8 +51,8 @@ local files with compact Git history and one attachment model, including images.
 
 ## Consequences
 
-Local attachment work requires Git LFS and object access; already hydrated files
-remain usable offline. Pointer-only history stays small as binary versions grow,
+Cloning a notebook with the CLI requires Git LFS, and attachment work also
+needs object access. Already hydrated files remain usable offline. Pointer-only history stays small as binary versions grow,
 although acquiring a file still transfers its bytes. GCS durability and retention
 become part of content preservation. Delivery is incremental, under the
 [North Star](../.planning/NORTH-STAR.md#one-attachment-content-model).

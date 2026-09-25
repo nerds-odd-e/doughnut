@@ -20,11 +20,11 @@ import org.springframework.transaction.annotation.Transactional;
  * Donut system identity, and persists the accepted binding.
  *
  * <p>{@code NotebookService} calls {@link #createBindingForNotebook} at creation time so every
- * notebook starts Git-backed from an empty content tree with LFS representation and initial {@code
+ * notebook starts Git-backed from an empty content tree with the initial LFS {@code
  * .gitattributes}; {@link #resetHistory} writes the same kind of root commit over a binding a
- * notebook already has, preserving that binding's representation and accepted metadata (or, for a
- * notebook without one, creating it as at creation time). The caller supplies the commit time, and
- * a tree failure propagates before a binding is persisted.
+ * notebook already has, preserving that binding's accepted metadata (or, for a notebook without
+ * one, creating it as at creation time). The caller supplies the commit time, and a tree failure
+ * propagates before a binding is persisted.
  */
 @Service
 public class NotebookGitCutoverService {
@@ -70,7 +70,7 @@ public class NotebookGitCutoverService {
    * current content replaces whatever the binding held, so the notebook can be cloned and published
    * again whatever state its history was in. Accepted Git metadata such as {@code .gitattributes}
    * is preserved exactly rather than regenerated from defaults; a notebook without a binding gets a
-   * new LFS binding with initial {@code .gitattributes}, as at creation.
+   * new binding with the initial LFS {@code .gitattributes}, as at creation.
    */
   @Transactional
   public NotebookGitBinding resetHistory(Notebook notebook, Instant resetTime) {
@@ -84,23 +84,6 @@ public class NotebookGitCutoverService {
                     newBinding(notebook),
                     resetTime,
                     NotebookGitAttributes.initialMetadata()));
-  }
-
-  /**
-   * Like {@link #resetHistory(Notebook, Instant)}, but installs the supplied metadata entries (for
-   * example none, when demoting a notebook to raw) into the new tip instead of preserving the
-   * previous tip's metadata.
-   */
-  @Transactional
-  public NotebookGitBinding resetHistory(
-      Notebook notebook, Instant resetTime, List<PortableTreeEntry> metadata) {
-    return resetHistory(notebook, findOrCreateBinding(notebook), resetTime, metadata);
-  }
-
-  private NotebookGitBinding findOrCreateBinding(Notebook notebook) {
-    return notebookGitBindingRepository
-        .findByNotebookIdForUpdate(notebook.getId())
-        .orElseGet(() -> newBinding(notebook));
   }
 
   private NotebookGitBinding newBinding(Notebook notebook) {

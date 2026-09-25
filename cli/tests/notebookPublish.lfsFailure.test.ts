@@ -39,7 +39,7 @@ describe('notebook publish — LFS refusals and failures keep local state', () =
     vi.unstubAllGlobals()
   })
 
-  test('rejects publishing a raw attachment in an LFS notebook', async () => {
+  test('rejects publishing a raw attachment', async () => {
     const { pushCalls } = installLfsPushIntercept(realSpawnSync)
     const { dir, fetchMock } = prepareLfsPublishCheckout(
       ctx.getWorkDir(),
@@ -58,7 +58,7 @@ describe('notebook publish — LFS refusals and failures keep local state', () =
     )
     expect(ctx.getErrorSpy()).toHaveBeenCalledWith(
       expect.stringContaining(
-        'must be a Git LFS pointer or empty file when the notebook uses LFS'
+        'Attachment "raw.png" must be a Git LFS pointer or empty file.'
       )
     )
     expect(pushCalls).toEqual([])

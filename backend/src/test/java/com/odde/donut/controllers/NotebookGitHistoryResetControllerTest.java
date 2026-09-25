@@ -1,5 +1,6 @@
 package com.odde.donut.controllers;
 
+import static com.odde.donut.services.notebookAttachment.VerifiedNotebookAttachmentBytes.sha256Hex;
 import static com.odde.donut.services.notebookTree.PortableTreeEntry.ofText;
 import static com.odde.donut.testability.CommittedTransactionTestSupport.inCommittedTransaction;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -14,6 +15,7 @@ import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.NotebookGitBinding;
 import com.odde.donut.entities.User;
+import com.odde.donut.entities.repositories.NotebookAttachmentRepository;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.donut.services.notebookGit.NotebookGitAttributes;
 import com.odde.donut.services.notebookTree.PortableTreeEntry;
@@ -27,13 +29,14 @@ import org.eclipse.jgit.lib.ObjectId;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.revwalk.RevWalk;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
 /**
  * Verifies that resetting a notebook's Git history restarts it from the notebook's current content
- * - including the root files it currently holds - and that only someone who can edit the notebook
- * may do so.
+ * - including the root files and authored Git metadata it currently holds - and that only someone
+ * who can edit the notebook may do so.
  */
 class NotebookGitHistoryResetControllerTest extends NotebookGitControllerTestBase {
 
@@ -43,8 +46,11 @@ class NotebookGitHistoryResetControllerTest extends NotebookGitControllerTestBas
   private static final String EDITED_CONTENT = "---\ntype: Note\n---\nedited content";
   private static final String OVERVIEW_CONTENT = "---\ntype: Note\n---\nsee Diagram.png";
   private static final String REFERENCE_JSON = "{\"schema\": \"donut\"}\n";
+  private static final String AUTHORED_ATTRIBUTES = "* filter=lfs -text\nauthored !filter\n";
   // Deliberately not valid UTF-8, so nothing on the reset path may decode these bytes.
   private static final byte[] DIAGRAM_BYTES = {(byte) 0x89, (byte) 0xFF, (byte) 0xFE, 0x00};
+
+  @Autowired NotebookAttachmentRepository notebookAttachmentRepository;
 
   @Test
   void resetRestartsHistoryFromTheCurrentNotebookSoAPlainEditPublishesAgain() throws Exception {
@@ -147,19 +153,17 @@ class NotebookGitHistoryResetControllerTest extends NotebookGitControllerTestBas
     Notebook notebook = createGitBackedNotebook();
     makeMe.aNote("Overview").notebook(notebook).content(OVERVIEW_CONTENT).please();
     NotebookGitBinding markdownOnly = snapshotCurrentPortableTree(notebook);
-    List<PortableTreeEntry> tipWithRootFiles =
-        new ArrayList<>(acceptedHistory(notebook).exactTree());
-    List<PortableTreeEntry> rootFiles =
-        committedOnLfs(
-            notebook,
-            List.of(
-                new PortableTreeEntry("Diagram.png", DIAGRAM_BYTES),
-                ofText("reference.json", REFERENCE_JSON)));
-    tipWithRootFiles.addAll(rootFiles);
+    List<PortableTreeEntry> current =
+        List.of(
+            ofText(NotebookGitAttributes.PATH, AUTHORED_ATTRIBUTES),
+            new PortableTreeEntry("Diagram.png", DIAGRAM_BYTES),
+            ofText("Overview.md", OVERVIEW_CONTENT),
+            ofText("reference.json", REFERENCE_JSON));
+    List<PortableTreeEntry> tip = asCommitted(notebook, current);
     controller.publishNotebookGitProposal(
         notebook.getId(),
         markdownOnly.getAcceptedGitObjectId(),
-        proposalBundleBytes(markdownOnly, NotebookGitProposalFile.asProposal(tipWithRootFiles)));
+        proposalBundleBytes(markdownOnly, NotebookGitProposalFile.asProposal(tip)));
 
     controller.resetNotebookGitHistory(notebookRepository.findById(notebook.getId()).orElseThrow());
 
@@ -169,9 +173,17 @@ class NotebookGitHistoryResetControllerTest extends NotebookGitControllerTestBas
           revWalk.parseCommit(
               GitBundleTestReader.fetchHead(repository, acceptedBundleBytes(notebook)));
       assertThat(resetCommit.getParentCount(), equalTo(0));
-      assertThat(
-          GitBundleTestReader.readContent(repository, resetCommit),
-          contains(rootFiles.get(0), ofText("Overview.md", OVERVIEW_CONTENT), rootFiles.get(1)));
+      assertThat(GitBundleTestReader.readExactTree(repository, resetCommit), equalTo(tip));
     }
+    for (PortableTreeEntry file :
+        current.stream().filter(NotebookGitControllerTestBase::isAttachment).toList()) {
+      assertThat(
+          notebookAttachmentContent.get(notebook.getId(), sha256Hex(file.content())).orElseThrow(),
+          equalTo(file.content()));
+    }
+    assertThat(
+        NotebookLiveProjectionTestReader.rootAttachments(
+            transactionManager, notebookAttachmentRepository, notebook.getId()),
+        equalTo(tip.stream().filter(NotebookGitControllerTestBase::isAttachment).toList()));
   }
 }

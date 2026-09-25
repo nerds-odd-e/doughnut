@@ -142,12 +142,12 @@ class NotebookGitAttachmentIndependenceControllerTest
     NotebookGitBinding markdownOnly = snapshotCurrentPortableTree(notebook);
 
     List<PortableTreeEntry> withRootFiles = new ArrayList<>(acceptedHistory(notebook).exactTree());
-    withRootFiles.addAll(committedOnLfs(notebook, ROOT_FILES));
+    withRootFiles.addAll(asCommitted(notebook, ROOT_FILES));
     controller.publishNotebookGitProposal(
         notebook.getId(),
         markdownOnly.getAcceptedGitObjectId(),
         proposalBundleBytes(markdownOnly, NotebookGitProposalFile.asProposal(withRootFiles)));
-    assertThat(committedRootAttachments(notebook), equalTo(committedOnLfs(notebook, ROOT_FILES)));
+    assertThat(committedRootAttachments(notebook), equalTo(asCommitted(notebook, ROOT_FILES)));
 
     return new Fixture(notebook, biology, study, cells, reading, tracker);
   }
@@ -158,7 +158,7 @@ class NotebookGitAttachmentIndependenceControllerTest
    * with the same bytes.
    */
   private void assertRootFilesSurvived(Notebook notebook, ObjectId parentHead) throws Exception {
-    List<PortableTreeEntry> rootFiles = committedOnLfs(notebook, ROOT_FILES);
+    List<PortableTreeEntry> rootFiles = asCommitted(notebook, ROOT_FILES);
     try (InMemoryRepository repository = new InMemoryRepository(new DfsRepositoryDescription());
         RevWalk revWalk = new RevWalk(repository)) {
       RevCommit head =

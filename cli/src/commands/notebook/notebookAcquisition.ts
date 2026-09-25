@@ -7,7 +7,7 @@ import {
 } from '../../backendApi/donutBackendClient.js'
 import { exceptionText } from '../../exceptionText.js'
 import { errnoCode } from '../../errnoCode.js'
-import { fillInCurrentLfsFilesIfNeeded } from './notebookLfsFillIn.js'
+import { fillInCurrentLfsFiles } from './notebookLfsFillIn.js'
 import { smudgeSkippedGitOptions } from './notebookLfsLocal.js'
 import { runSystemGitOrThrow } from './systemGit.js'
 
@@ -109,9 +109,8 @@ function moveCheckoutIntoDestination(
  * Downloads the notebook's accepted Git bundle and produces a clean local checkout at
  * `destinationPath`, with a local-only (untracked) Git config binding
  * ({@link recordLocalNotebookBinding}) recording the source notebook id and API origin, and
- * with the bundle-pointing `origin` remote removed ({@link removeOriginRemote}). When the tip
- * enables Git LFS, fills in the current checkout's files ({@link fillInCurrentLfsFilesIfNeeded})
- * before install. `destinationPath` is only ever touched by the final
+ * with the bundle-pointing `origin` remote removed ({@link removeOriginRemote}). Fills in the current
+ * checkout's files through Git LFS ({@link fillInCurrentLfsFiles}) before install. `destinationPath` is only ever touched by the final
  * atomic move, and only once staging fully succeeds. Staging is always removed afterward,
  * success or failure.
  */
@@ -137,7 +136,7 @@ export async function acquireNotebookGitCheckout(
     cloneBundleWithSystemGit(bundleFile, checkoutDir)
 
     recordLocalNotebookBinding(checkoutDir, notebookId, apiBaseUrl)
-    fillInCurrentLfsFilesIfNeeded(
+    fillInCurrentLfsFiles(
       checkoutDir,
       notebookId,
       'rerun "donut notebook clone"'

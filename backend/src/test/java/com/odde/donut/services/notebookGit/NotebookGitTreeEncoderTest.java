@@ -92,7 +92,7 @@ class NotebookGitTreeEncoderTest {
   }
 
   @Test
-  void lfsInitializationIncludesAttributesExemptingMarkdownAndStructuralMarkers() {
+  void initializationIncludesLfsAttributesExemptingMarkdownAndStructuralMarkers() {
     byte[] pointer = NotebookGitLfsPointer.format(POINTER_OID, 12345);
 
     NotebookGitTreeContent tree =

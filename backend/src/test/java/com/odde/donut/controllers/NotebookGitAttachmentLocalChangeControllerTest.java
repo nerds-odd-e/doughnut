@@ -71,7 +71,7 @@ class NotebookGitAttachmentLocalChangeControllerTest extends NotebookGitControll
     controller.publishNotebookGitProposal(
         notebook.getId(),
         accepted.getAcceptedGitObjectId(),
-        proposalBundleBytes(accepted, proposedOnLfs(notebook, change.finalTree())));
+        proposalBundleBytes(accepted, asProposed(notebook, change.finalTree())));
 
     assertFinalRootFileSet(notebook, acceptedTip(notebook), change.finalTree());
   }
@@ -93,14 +93,14 @@ class NotebookGitAttachmentLocalChangeControllerTest extends NotebookGitControll
           localCommitOnTopOf(
               repository,
               acceptedHead,
-              proposedOnLfs(
+              asProposed(
                   notebook, List.of(DIAGRAM, NOTE, TWIN, ofText("interim.json", REFERENCE_JSON))),
               "Rename the reference file");
       edit =
           localCommitOnTopOf(
               repository,
               firstRename,
-              proposedOnLfs(
+              asProposed(
                   notebook,
                   List.of(DIAGRAM, NOTE, TWIN, ofText("interim.json", CHANGED_REFERENCE_JSON))),
               "Edit the renamed file");
@@ -108,7 +108,7 @@ class NotebookGitAttachmentLocalChangeControllerTest extends NotebookGitControll
           localCommitOnTopOf(
               repository,
               edit,
-              proposedOnLfs(notebook, finalTree),
+              asProposed(notebook, finalTree),
               "Rename again and drop the identical-byte copy");
       proposalBytes = bundleBytesForHead(repository, tip);
     }
@@ -131,7 +131,7 @@ class NotebookGitAttachmentLocalChangeControllerTest extends NotebookGitControll
     Notebook notebook = createGitBackedNotebook();
     NotebookGitBinding empty = snapshotCurrentPortableTree(notebook);
     List<PortableTreeEntry> nested =
-        committedOnLfs(
+        asCommitted(
             notebook,
             List.of(
                 new PortableTreeEntry("physics/diagrams/force.png", DIAGRAM_BYTES),
@@ -142,7 +142,7 @@ class NotebookGitAttachmentLocalChangeControllerTest extends NotebookGitControll
         proposalBundleBytes(empty, NotebookGitProposalFile.asProposal(nested)));
 
     List<PortableTreeEntry> editedAndRenamed =
-        committedOnLfs(
+        asCommitted(
             notebook,
             List.of(
                 new PortableTreeEntry("physics/diagrams/free-body.png", DIAGRAM_BYTES),
@@ -176,8 +176,8 @@ class NotebookGitAttachmentLocalChangeControllerTest extends NotebookGitControll
     controller.publishNotebookGitProposal(
         notebook.getId(),
         empty.getAcceptedGitObjectId(),
-        proposalBundleBytes(empty, proposedOnLfs(notebook, BASELINE)));
-    assertThat(acceptedTip(notebook).content(), equalTo(committedOnLfs(notebook, BASELINE)));
+        proposalBundleBytes(empty, asProposed(notebook, BASELINE)));
+    assertThat(acceptedTip(notebook).content(), equalTo(asCommitted(notebook, BASELINE)));
     return reloadCommittedBinding(notebook.getId());
   }
 
@@ -185,7 +185,7 @@ class NotebookGitAttachmentLocalChangeControllerTest extends NotebookGitControll
   private void assertFinalRootFileSet(
       Notebook notebook, AcceptedTip published, List<PortableTreeEntry> finalTree)
       throws IOException {
-    List<PortableTreeEntry> committed = committedOnLfs(notebook, finalTree);
+    List<PortableTreeEntry> committed = asCommitted(notebook, finalTree);
     assertThat(published.content(), equalTo(committed));
     assertThat(
         committedRootAttachments(notebook),
@@ -231,9 +231,9 @@ class NotebookGitAttachmentLocalChangeControllerTest extends NotebookGitControll
   }
 
   /** {@code tree} as a local LFS checkout stages it. */
-  private List<NotebookGitProposalFile> proposedOnLfs(
-      Notebook notebook, List<PortableTreeEntry> tree) throws IOException {
-    return NotebookGitProposalFile.asProposal(committedOnLfs(notebook, tree));
+  private List<NotebookGitProposalFile> asProposed(Notebook notebook, List<PortableTreeEntry> tree)
+      throws IOException {
+    return NotebookGitProposalFile.asProposal(asCommitted(notebook, tree));
   }
 
   private AcceptedTip acceptedTip(Notebook notebook) throws Exception {

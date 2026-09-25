@@ -94,7 +94,7 @@ function requireLfsPointer({
 }: AttachmentAt): ParsedLfsPointer {
   if (!pointer) {
     throw new Error(
-      `Attachment "${filePath}" must be a Git LFS pointer or empty file when the notebook uses LFS.`
+      `Attachment "${filePath}" must be a Git LFS pointer or empty file.`
     )
   }
   return pointer

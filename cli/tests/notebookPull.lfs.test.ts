@@ -13,10 +13,7 @@ import {
   commitPointerAttachment,
   realSpawnSync,
 } from './notebookPublish.lfs.testHelpers.js'
-import {
-  buildSourceRepo,
-  cloneAsBoundCheckout,
-} from './notebookPublish.testHelpers.js'
+import { cloneAsBoundCheckout } from './notebookPublish.testHelpers.js'
 import {
   commitPortableFile,
   installNotebookPullAcceptedHistoryTest,
@@ -148,35 +145,25 @@ describe('notebook pull (LFS checkout fill-in)', () => {
     )
   })
 
-  test.each([
-    {
-      checkout: 'markdown',
-      buildSource: buildLfsSourceRepo,
-      lfsSteps: ['install'],
-    },
-    { checkout: 'legacy', buildSource: buildSourceRepo, lfsSteps: [] },
-  ] as const)(
-    'a $checkout checkout pulls without a Git LFS fill-in',
-    async ({ checkout, buildSource, lfsSteps }) => {
-      const source = buildSource(ctx.getWorkDir())
-      const directory = cloneAsBoundCheckout(
-        ctx.getWorkDir(),
-        source,
-        getApiConfig().apiBaseUrl,
-        'checkout'
-      )
-      commitPortableFile(source, 'physics/.keep', '', 'web folder')
-      serveAcceptedBundle(ctx, source, checkout)
-      const lfs = interceptGitLfs()
+  test('a markdown checkout pulls without a Git LFS fill-in', async () => {
+    const source = buildLfsSourceRepo(ctx.getWorkDir())
+    const directory = cloneAsBoundCheckout(
+      ctx.getWorkDir(),
+      source,
+      getApiConfig().apiBaseUrl,
+      'checkout'
+    )
+    commitPortableFile(source, 'physics/.keep', '', 'web folder')
+    serveAcceptedBundle(ctx, source, 'markdown')
+    const lfs = interceptGitLfs()
 
-      await run(['notebook', 'pull', directory])
+    await run(['notebook', 'pull', directory])
 
-      expect(runGit(['rev-parse', 'HEAD'], directory)).toBe(
-        runGit(['rev-parse', 'main'], source)
-      )
-      expect(lfs.lfsSteps()).toEqual(lfsSteps)
-    }
-  )
+    expect(runGit(['rev-parse', 'HEAD'], directory)).toBe(
+      runGit(['rev-parse', 'main'], source)
+    )
+    expect(lfs.lfsSteps()).toEqual(['install'])
+  })
 
   test('a failed download reports incomplete attachments; the rerun fills them in, then reports unchanged', async () => {
     const { source, directory } = lfsCheckout(ctx.getWorkDir())

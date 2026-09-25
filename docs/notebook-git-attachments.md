@@ -9,9 +9,8 @@ implemented, as **Attachments today** below records; the rest of this document i
 an architectural contract rather than a claim that those parts are already
 implemented.
 
-[Git LFS attachment storage](./notebook-git-lfs.md) defines the accepted target
-for external immutable payloads and their Git pointers. The database-byte
-projection below describes the current implementation awaiting that transition.
+[Git LFS attachment storage](./notebook-git-lfs.md) defines how attachment
+bytes are stored outside Git and referenced by Git pointers.
 
 ## Attachments today
 
@@ -20,8 +19,8 @@ carries a complete filename, extension included, and exact bytes, and it has no
 note identity, title or learning history.
 
 `notebook_attachment` holds each file's notebook, nullable folder, filename and
-accepted Git content: the file's bytes in a raw notebook, or its Git LFS pointer
-in an LFS notebook. It is a projection of accepted Git content, not a second authority, and
+accepted Git content: the file's Git LFS pointer, or empty content for an empty
+file. It is a projection of accepted Git content, not a second authority, and
 it is deleted with its notebook or folder. Filenames are unique within their
 notebook-root or folder location under a binary collation, so paths differing
 only in case remain distinct files exactly as Git treats them.
@@ -56,9 +55,9 @@ sorted with notes by filename. A file's page (`/notebooks/:notebookId/attachment
 shows its filename and size and downloads its exact bytes under its exact
 filename, always as `Content-Disposition: attachment` with
 `application/octet-stream` and `nosniff`, so an SVG or HTML file never renders
-in Donut's origin. The notebook's attachment representation, never the bytes,
-decides how a row is read: an LFS notebook serves the stored object named by
-the pointer, and a raw notebook serves its content unchanged. `.gitattributes`
+in Donut's origin. The download serves the stored object named by the row's
+pointer; [Git LFS attachment storage](./notebook-git-lfs.md#consequences) gives
+the rules for a missing object and an empty file. `.gitattributes`
 and nested `.keep` markers are not rows, so, like `.git`, they are not shown on
 the web.
 
@@ -77,18 +76,16 @@ the same notebook read rule: owners, subscribers, and Bazaar readers (even
 logged out) receive them; another user is refused, and an anonymous request for
 a private notebook's image must log in. No new picture is stored there.
 
-Publication admits each newly introduced raw-Git attachment blob against an
-inclusive 10 MiB (10,485,760 byte) limit across the contiguous first-parent
-proposal range, not only the tip. Classification uses the ordinary attachment
+Publication checks every attachment in the contiguous first-parent proposal
+range, not only the tip, by the
+[Git LFS acceptance rule](./notebook-git-lfs.md#decision), including its
+object-availability exception for oversized intermediate-only payloads: each
+one must be a Git LFS pointer or an empty file, and a new payload may be at most
+10 MiB (10,485,760 bytes, inclusive). Classification uses the ordinary attachment
 rule at each historical path, so a later rename to Markdown does not hide an
 earlier oversized attachment. Payloads already accepted as attachments in the
-same notebook's retained history remain reusable by content identity. Removing
-or shrinking the tip is not enough while an oversized unpublished blob remains
-in that range; rewrite only unpublished commits. While attachments remain raw
-Git blobs, that intermediate refusal stays in force. The accepted Git LFS
-contract is intended to replace it by omitting new oversized unpublished
-intermediate LFS payloads when the tip is valid; that exception is not part of
-the current raw-Git admission.
+same notebook's retained history remain reusable by content identity. To fix a
+refused proposal, rewrite only unpublished commits.
 
 ## Placement and ownership
 
