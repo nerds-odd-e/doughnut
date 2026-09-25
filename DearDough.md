@@ -172,6 +172,11 @@ Former local code: DD-107.
   - Evidence: slice 1 and slice 7 (96c756d531) receipts `observation.reason` "host session identity is required to verify the notification bridge" (background Claude Code job, Story Branch Mode); recovered after slice 1 by `ci-mailbox.mjs probe` (`CI_MONITOR_READY`), `start --execution nerds-odd-e/doughnut story/book-source-as-notebook-file`, and `register-push` for 36eb15caaa; slices 2-6 reported `reused`.
   - Observed effect: the same three-call manual recovery; after the observer ended (see DD-115) the slice 7 delivery could not reattach without the session identity and stayed unobserved.
 
+- Execution: SEED-035 story 18 / quick/036-remove-legacy-picture-storage / 89e3f8a67e; Timestamp: 2026-09-25T22:14:43+08:00 (slice 1 delivery receipt); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.38.
+  - Evidence: coordinator said before delivery "Managed delivery sets up CI observation itself, so no manual observer start is needed"; slice 1 receipt `observation.reason` "host session identity is required to verify the notification bridge"; recovered by a `grep` of the delivery scripts for the flag, `ci-mailbox.mjs probe`, a re-run with `--session-json` refused ("rebase left the pre-rebase SHA as the candidate"), `start --execution nerds-odd-e/doughnut story/036-remove-legacy-picture-storage` (observer watch-2ENnNk), and `register-push` for 89e3f8a67e; slices 2-5 passed `--session-json` and reported `reused`.
+  - Observed effect: five extra calls (one refused) and a `CI_DISCOVERY_DELAYED` advisory for early revisions; no later coverage loss seen before the completion wait.
+  - Inference: the same refused re-run as the story 5 occurrence recurred, so the recovery path is still rediscovered per execution.
+
 ## ODF-099 — Queued startup receipt embeds the whole Git index and overflows the coordinator's tool output
 
 Former local code: DD-108.
@@ -299,8 +304,19 @@ During slice 7, the observer emitted `CI_MONITOR_UNAVAILABLE` for a single `gh r
   - Observed effect: lost coverage for db13a2d99c and 96c756d531; manual CI checks replaced notifications.
   - Inference: a bounded retry for a transient network error before declaring the observer unavailable would likely have kept coverage.
 
+## DD-116 — A host permission block on a refactor agent's file deletion left known refactor residue in the delivered story
+
+The fresh refactor pass found that a helper class existed only to share a step with the code the slice deleted, and tried to fold it back and delete its file in one command. The host permission check refused the command. Under the "do not work around a blocked deletion" rule the agent and the coordinator stopped, and the coordinator recorded the cleanup as a deferred owner decision in the plan. The story was delivered with the residue, and a retrospective correction plan now carries it.
+
+### Occurrences
+
+- Execution: SEED-035 story 18 / quick/036-remove-legacy-picture-storage / 89e3f8a67e; Timestamp: 2026-09-25T22:22:47+08:00 (slice 2 refactor hand-back); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.38.
+  - Evidence: slice 2 refactor hand-back ("The auto-mode classifier refused the command because it deletes a file"); plan 036 slice 2 "Deferred refactor (owner decision)"; `NoteImageFileAttachment` was split out in 4dad58408f "between the upload and the coming legacy picture move"; correction plan `.planning/quick/037-fold-picture-attach-step-into-upload/PLAN.md`.
+  - Observed effect: `NoteImageFileAttachment` shipped with one caller; one extra correction plan instead of a finished refactor. The owner was not asked during execution; the decision waits for wrap-up.
+  - Inference: implementer agents in slices 2, 4 and 5 deleted files without a block, so the refusal likely depended on the command's shape (inline edit plus `git rm` together), not on deletion as such. The story's plan listed the legacy code to delete but not the seam story 5 created for it, which is why the residue was found only at refactor time. Qualified: the refactor agent's own transcript was not available.
+
 ## Retention
 
-- Highest allocated local number: 115
+- Highest allocated local number: 116
 - Recovery: `33939aa45a17c08f5e6f8076178ce96437fdfbe8:DearDough.md` contains the complete pre-compaction log and earlier recovery references; `b0b385a184e96ecf8b0f6fc5572eaaab69bc8dad` preserves later history.
 - Occurrence history is partial; full observations, effects, inference and historical provenance remain in that snapshot and the upstream catalog.
