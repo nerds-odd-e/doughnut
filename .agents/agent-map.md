@@ -101,7 +101,7 @@ frontend auto-reload.
 
 - Human propose / discuss / approve: `docs/adrs/README.md`
 - Current recommendations: `docs/adrs/*-accepted.md` (read explicitly — under `docs/`)
-- Skill pointer: `.agents/skills/architecture-decisions/SKILL.md`
+- Skill pointer: `.agents/skills/dough-adr-awareness/SKILL.md`
 
 ## Ignored Reference Material
 
