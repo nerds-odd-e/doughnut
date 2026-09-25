@@ -56,6 +56,7 @@ public class BookService {
   private final BookLayoutReorganizer layoutReorganizer;
   private final BookReadingProgress readingProgress;
   private final BookOutlineEditor outlineEditor;
+  private final BookSourceFile bookSourceFile;
 
   public BookService(
       BookRepository bookRepository,
@@ -68,7 +69,9 @@ public class BookService {
       BookStorage bookStorage,
       ObjectMapper objectMapper,
       OpenAiApiHandler openAiApiHandler,
-      GlobalSettingsService globalSettingsService) {
+      GlobalSettingsService globalSettingsService,
+      BookSourceFile bookSourceFile) {
+    this.bookSourceFile = bookSourceFile;
     this.bookRepository = bookRepository;
     this.bookUserLastReadPositionRepository = bookUserLastReadPositionRepository;
     this.bookStorage = bookStorage;
@@ -205,7 +208,7 @@ public class BookService {
 
   @Transactional(readOnly = true)
   public NotebookBookFile notebookBookFileFromBook(Book book) {
-    return NotebookBookFile.fromBook(book, bookStorage);
+    return bookSourceFile.read(book);
   }
 
   public ResponseEntity<byte[]> streamBookFile(NotebookBookFile file, CacheControl cacheControl) {

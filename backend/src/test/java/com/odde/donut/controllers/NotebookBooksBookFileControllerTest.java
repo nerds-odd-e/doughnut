@@ -60,6 +60,22 @@ class NotebookBooksBookFileControllerTest extends NotebookBooksControllerTestBas
     }
 
     @Test
+    void returnsTheNotebookFileWhenSourcePathNamesARootAttachment()
+        throws UnexpectedNoAccessRightException {
+      Notebook nb = notebookWithBook();
+      byte[] pdfBytes = new byte[] {0x25, 0x50, 0x44, 0x46, 0x2d};
+      makeMe.anAttachment("Linear Algebra.pdf").atRootOf(nb).content(pdfBytes).please();
+      Book book = bookOf(nb);
+      book.setSourceFilePath("Linear Algebra.pdf");
+      makeMe.entityPersister.save(book);
+      makeMe.entityPersister.flush();
+
+      ResponseEntity<byte[]> res = controller.getBookFile(webRequest(), nb);
+
+      assertThat(res.getBody(), equalTo(pdfBytes));
+    }
+
+    @Test
     void returnsEpubZipWhenBookFormatIsEpub() throws UnexpectedNoAccessRightException {
       Notebook nb = notebookWithBook();
       Book book = bookOf(nb);

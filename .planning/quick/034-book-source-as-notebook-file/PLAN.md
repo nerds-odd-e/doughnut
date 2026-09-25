@@ -96,8 +96,11 @@ attachment path, and a publish rule that protects it.
 
 ### 1. A Book can read from a file in its notebook
 Type: Structure
-Status: planned
-Proof: slice 1 row above.
+Status: done
+Proof: slice 1 row above. Accepted: `pnpm backend:test:worktree --tests '*Book*'`
+(134 pass); `NotebookBooksBookFileControllerTest.GetBookFile.returnsTheNotebookFileWhenSourcePathNamesARootAttachment`
+stores different bytes in the old store and the root attachment and reads the
+attachment's.
 
 Change: migration `V300000344__book_source_file_path.sql` adds nullable
 `book.source_file_path` and makes `source_file_ref` nullable. `Book` gets
@@ -184,4 +187,9 @@ attach-book call and the picture move's fixture comparison step.
 
 ## Learnings
 
-None yet.
+- `BookSourceFile.read(book)` owns where a Book's bytes come from (root
+  attachment by `sourceFilePath`, else the old store); `NotebookBookFile` only
+  shapes bytes. Root lookup is
+  `NotebookAttachmentRepository.findByNotebook_IdAndFolderIsNullAndFilename`.
+- `backend:test:worktree` takes one `--tests` pattern; `'*Book*'` covers the
+  Book controller and service tests.

@@ -4,7 +4,6 @@ import static com.odde.donut.services.book.BookReadingWireConstants.BOOK_FORMAT_
 import static com.odde.donut.services.book.BookReadingWireConstants.BOOK_FORMAT_PDF;
 
 import com.odde.donut.entities.Book;
-import java.nio.charset.StandardCharsets;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.CacheControl;
@@ -15,13 +14,8 @@ import org.springframework.web.server.ResponseStatusException;
 
 public record NotebookBookFile(byte[] bytes, String baseName, String etag, BookFormat format) {
 
-  static NotebookBookFile fromBook(Book book, BookStorage bookStorage) {
-    String ref = book.getSourceFileRef();
-    byte[] fileBytes =
-        bookStorage
-            .get(ref)
-            .orElseThrow(
-                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Resource not found"));
+  /** The Book's file with {@code etagSource} identifying these exact bytes. */
+  static NotebookBookFile of(Book book, byte[] fileBytes, byte[] etagSource) {
     String format = book.getFormat();
     if (!BOOK_FORMAT_PDF.equals(format) && !BOOK_FORMAT_EPUB.equals(format)) {
       throw new ResponseStatusException(
@@ -30,7 +24,7 @@ public record NotebookBookFile(byte[] bytes, String baseName, String etag, BookF
     return new NotebookBookFile(
         fileBytes,
         sanitizeFileName(book.getBookName()),
-        etagForSourceRef(ref),
+        etagFor(etagSource),
         BookFormat.fromString(format));
   }
 
@@ -42,8 +36,8 @@ public record NotebookBookFile(byte[] bytes, String baseName, String etag, BookF
         .body(body.getByteArray());
   }
 
-  private static String etagForSourceRef(String ref) {
-    return "\"" + DigestUtils.md5DigestAsHex(ref.getBytes(StandardCharsets.UTF_8)) + "\"";
+  private static String etagFor(byte[] etagSource) {
+    return "\"" + DigestUtils.md5DigestAsHex(etagSource) + "\"";
   }
 
   private static String sanitizeFileName(String fileName) {
