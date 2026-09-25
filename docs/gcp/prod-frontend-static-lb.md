@@ -99,7 +99,7 @@ Send to the **backend service (MIG)** at least:
 | Path prefix / pattern | Why |
 |----------------------|-----|
 | `/api/*` | REST API |
-| `/attachments/*` | [`AttachmentController`](../../backend/src/main/java/com/odde/donut/controllers/AttachmentController.java) |
+| `/attachments/*` | Former legacy picture address; no backend handler serves it since the legacy picture store was retired (the backend answers 404). The route stays until removed separately. |
 | `/logout` | Spring Security logout ([`CommonConfiguration`](../../backend/src/main/java/com/odde/donut/configs/CommonConfiguration.java)) |
 | `/login/continue` | Prod auth bounce ([`ApplicationController`](../../backend/src/main/java/com/odde/donut/controllers/ApplicationController.java)) |
 | `/install` | CLI install script ([`InstallController`](../../backend/src/main/java/com/odde/donut/controllers/InstallController.java)) |

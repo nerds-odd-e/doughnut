@@ -148,8 +148,14 @@ atomicity assertions). Remove the cleanup's sentences from
 
 ### 4. The legacy picture address is gone
 Type: Behavior
-Status: planned
-Proof: slice 4 row above.
+Status: done
+Proof: slice 4 row above. Accepted: `pnpm backend:test:worktree --tests
+'com.odde.donut.*'` — 2,615 tests, 0 failures; no backend handler maps
+`/attachments` any more. `generateTypeScript` changed nothing (the handler was
+outside the OpenAPI spec). `Attachment.getResponseEntity` went with it. The
+GCP routing doc keeps the `/attachments/*` row (route excluded) but no longer
+links the deleted controller. `Attachment` now has only `Image` as a subclass
+and no production caller; slice 5 decides its fate with `Image`.
 
 Behavior: a note whose `image:` still names `/attachments/images/<id>/<name>`
 → the address answers 404, so the web shows a broken picture; the note is

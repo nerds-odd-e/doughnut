@@ -76,10 +76,7 @@ upload.
 Legacy uploaded pictures (the `image` table, addressed as
 `/attachments/images/{id}/{fileName}`) were moved into their notebooks as files
 beside their notes, and the legacy store is retired: no new picture is stored
-there. Until its removal is finished, the remaining rows are still served
-inline under the notebook read rule (owners, subscribers, and Bazaar readers, even
-logged out; another user is refused, and an anonymous request for a private
-notebook's image must log in).
+there.
 
 
 A Book's source file (PDF or EPUB) is an ordinary file at the notebook root.
@@ -185,7 +182,7 @@ taken literally with no normalization, so `..`, `./` or a leading `/` never
 match and the picture stays visibly broken (404). Only PNG, JPEG, GIF and WebP,
 chosen by filename extension and never sniffed, are served inline with
 `nosniff`; any other type, including SVG, is refused (415). Values starting with
-`/` (such as `/attachments/images/...`) or carrying a URL scheme are used as-is,
+`/` (such as `/pictures/example.png`) or carrying a URL scheme are used as-is,
 and `image_mask:` is unchanged. Markdown body image embeds are kept on web edits
 but not yet rendered from notebook files.
 This does not change semantic Wiki-link or property-reference rules. Existing
