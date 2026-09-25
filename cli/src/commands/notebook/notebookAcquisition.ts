@@ -73,7 +73,8 @@ function recordLocalNotebookBinding(
 
 /**
  * Removes the `origin` remote that `git clone <bundle-file> <target>` points at the (deleted)
- * temporary local bundle file, so a finished checkout has no dangling remote.
+ * temporary local bundle file, so a finished checkout has no dangling remote. Until then it
+ * names the remote for the LFS fill-in, whose transfers use the recorded LFS endpoint.
  */
 function removeOriginRemote(checkoutDir: string): void {
   runSystemGitOrThrow(
@@ -137,16 +138,12 @@ export async function acquireNotebookGitCheckout(
     cloneBundleWithSystemGit(bundleFile, checkoutDir)
 
     recordLocalNotebookBinding(checkoutDir, notebookId, apiBaseUrl)
+    fillInCurrentLfsFilesIfNeeded(
+      checkoutDir,
+      notebookId,
+      'rerun "donut notebook clone"'
+    )
     removeOriginRemote(checkoutDir)
-    if (
-      fillInCurrentLfsFilesIfNeeded(
-        checkoutDir,
-        notebookId,
-        'rerun "donut notebook clone"'
-      )
-    ) {
-      removeOriginRemote(checkoutDir)
-    }
     moveCheckoutIntoDestination(checkoutDir, destinationPath)
   } finally {
     fs.rmSync(stagingDir, { recursive: true, force: true })

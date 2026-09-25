@@ -16,8 +16,8 @@ import { cloneAsBoundCheckout } from './notebookPublish.testHelpers.js'
 
 type SpawnOptions = Parameters<typeof spawnSync>[2]
 
-/** Real Git for history; Git LFS itself is stubbed, and `lfs checkout` marks the current pointer filled. */
-export function interceptGitLfs(options: { failFetch?: boolean } = {}) {
+/** Real Git for history; Git LFS itself is stubbed, and `lfs pull` marks the current pointer filled. */
+export function interceptGitLfs(options: { failPull?: boolean } = {}) {
   const calls: { argv: string[]; env?: NodeJS.ProcessEnv }[] = []
   vi.mocked(childProcess.spawnSync).mockImplementation(((
     command: string,
@@ -29,10 +29,10 @@ export function interceptGitLfs(options: { failFetch?: boolean } = {}) {
     const lfs = argv.indexOf('lfs')
     if (lfs < 0) return realSpawnSync(command, argv, spawnOptions)
     const ok = { status: 0, stdout: '', stderr: '', error: undefined }
-    if (argv[lfs + 1] === 'fetch' && options.failFetch) {
+    if (argv[lfs + 1] === 'pull' && options.failPull) {
       return { ...ok, status: 2, stderr: 'batch: Authentication required' }
     }
-    if (argv[lfs + 1] === 'checkout') {
+    if (argv[lfs + 1] === 'pull') {
       const file = join(argv[1] as string, 'a.bin')
       fs.writeFileSync(file, `filled\n${fs.readFileSync(file, 'utf8')}`)
     }
@@ -43,10 +43,10 @@ export function interceptGitLfs(options: { failFetch?: boolean } = {}) {
       calls
         .filter((c) => c.argv.includes('lfs'))
         .map((c) => c.argv[c.argv.indexOf('lfs') + 1]),
-    lfsCheckoutOrder: () =>
+    lfsPullOrder: () =>
       vi.mocked(childProcess.spawnSync).mock.invocationCallOrder[
         calls.findIndex(
-          (c) => c.argv.includes('lfs') && c.argv.includes('checkout')
+          (c) => c.argv.includes('lfs') && c.argv.includes('pull')
         )
       ],
     worktreeOpsSkipSmudge: () =>

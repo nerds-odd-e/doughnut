@@ -32,80 +32,41 @@ export function checkoutUsesLfs(checkoutDir: string): boolean {
   return fs.readFileSync(attributesPath, 'utf8').includes('filter=lfs')
 }
 
-/** Adds `origin` when missing so `git lfs push` / `fetch` has a remote name. */
-function ensurePlaceholderOrigin(
-  checkoutDir: string,
-  apiBaseUrl: string
-): void {
-  const existing = runSystemGitOrThrow(
-    ['-C', checkoutDir, 'remote'],
+/** The checkout's local Git config, keyed as Git prints it (section and name lowercased). */
+function readLocalGitConfig(checkoutDir: string): Map<string, string> {
+  const raw = runSystemGitOrThrow(
+    ['-C', checkoutDir, 'config', '--local', '--list', '-z'],
     (detail, status) =>
-      `failed to list remotes${detail ? `: ${detail}` : ` (exit code ${status})`}`
+      `failed to read local Git config${detail ? `: ${detail}` : ` (exit code ${status})`}`
   )
-  if (
-    existing
-      .split('\n')
-      .map((line) => line.trim())
-      .includes('origin')
-  ) {
-    return
+  const config = new Map<string, string>()
+  for (const entry of raw.split('\0')) {
+    if (entry === '') continue
+    const newline = entry.indexOf('\n')
+    if (newline < 0) config.set(entry, '')
+    else config.set(entry.slice(0, newline), entry.slice(newline + 1))
   }
-  runSystemGitOrThrow(
-    [
-      '-C',
-      checkoutDir,
-      'remote',
-      'add',
-      'origin',
-      placeholderNotebookRemoteUrl(apiBaseUrl),
-    ],
-    (detail, status) =>
-      `failed to add placeholder origin for Git LFS${
-        detail ? `: ${detail}` : ` (exit code ${status})`
-      }`
-  )
+  return config
 }
 
-function configureLocalLfsEndpointAndAuth(
+function recordLocalGitConfig(
   checkoutDir: string,
-  notebookId: number,
-  apiBaseUrl: string,
-  token: string
+  key: string,
+  value: string,
+  what: string
 ): void {
-  const lfsUrl = notebookLfsEndpoint(apiBaseUrl, notebookId)
   runSystemGitOrThrow(
-    ['-C', checkoutDir, 'config', '--local', 'lfs.url', lfsUrl],
+    ['-C', checkoutDir, 'config', '--local', key, value],
     (detail, status) =>
-      `failed to record local Git LFS endpoint${detail ? `: ${detail}` : ` (exit code ${status})`}`
-  )
-  runSystemGitOrThrow(
-    [
-      '-C',
-      checkoutDir,
-      'config',
-      '--local',
-      'http.extraHeader',
-      `Authorization: Bearer ${token}`,
-    ],
-    (detail, status) =>
-      `failed to record local Git LFS authorization${
-        detail ? `: ${detail}` : ` (exit code ${status})`
-      }`
+      `failed to record local Git LFS ${what}${detail ? `: ${detail}` : ` (exit code ${status})`}`
   )
 }
 
 /**
- * Prepares an LFS checkout for authenticated transfers: requires Git LFS, then records the
- * notebook LFS endpoint and the CLI's current login in local Git config (never authored
- * content) behind a placeholder `origin`, and installs the local LFS filters. A missing Git
- * LFS reports that it is needed to `purpose` the attachments, then names `nextStep`.
+ * Throws the "Git LFS is required" failure, naming `purpose` and `nextStep`, when the `git lfs`
+ * command is unavailable.
  */
-export function prepareAuthenticatedLfsCheckout(
-  checkoutDir: string,
-  notebookId: number,
-  purpose: 'receive' | 'publish',
-  nextStep: string
-): void {
+function requireGitLfs(purpose: 'receive' | 'publish', nextStep: string): void {
   runSystemGitOrThrow(
     ['lfs', 'version'],
     (detail, status) =>
@@ -113,15 +74,86 @@ export function prepareAuthenticatedLfsCheckout(
         detail ? `: ${detail}` : ` (exit code ${status})`
       }. Install Git LFS, then ${nextStep}.`
   )
+}
+
+/**
+ * Prepares an LFS checkout for authenticated transfers: records the notebook LFS endpoint and
+ * the CLI's current login in local Git config (never authored content), behind a placeholder
+ * `origin` when the checkout has none, and installs the local LFS filters. Only what is missing
+ * or changed is written. A checkout without the LFS filters first requires Git LFS
+ * ({@link requireGitLfs}).
+ */
+function prepareAuthenticatedLfsCheckout(
+  checkoutDir: string,
+  notebookId: number,
+  purpose: 'receive' | 'publish',
+  nextStep: string
+): void {
+  const config = readLocalGitConfig(checkoutDir)
+  const lfsInstalled = config.has('filter.lfs.process')
+  if (!lfsInstalled) requireGitLfs(purpose, nextStep)
   const { apiBaseUrl, token } = loadAuthenticatedFetchContext()
-  ensurePlaceholderOrigin(checkoutDir, apiBaseUrl)
-  configureLocalLfsEndpointAndAuth(checkoutDir, notebookId, apiBaseUrl, token)
+  if (!config.has('remote.origin.url')) {
+    runSystemGitOrThrow(
+      [
+        '-C',
+        checkoutDir,
+        'remote',
+        'add',
+        'origin',
+        placeholderNotebookRemoteUrl(apiBaseUrl),
+      ],
+      (detail, status) =>
+        `failed to add placeholder origin for Git LFS${
+          detail ? `: ${detail}` : ` (exit code ${status})`
+        }`
+    )
+  }
+  const lfsUrl = notebookLfsEndpoint(apiBaseUrl, notebookId)
+  if (config.get('lfs.url') !== lfsUrl) {
+    recordLocalGitConfig(checkoutDir, 'lfs.url', lfsUrl, 'endpoint')
+  }
+  const authorization = `Authorization: Bearer ${token}`
+  if (config.get('http.extraheader') !== authorization) {
+    recordLocalGitConfig(
+      checkoutDir,
+      'http.extraHeader',
+      authorization,
+      'authorization'
+    )
+  }
+  if (!lfsInstalled) {
+    runSystemGitOrThrow(
+      ['-C', checkoutDir, 'lfs', 'install', '--local'],
+      (detail, status) =>
+        `failed to configure Git LFS in the checkout${
+          detail ? `: ${detail}` : ` (exit code ${status})`
+        }`,
+      { env: { ...process.env, GIT_TERMINAL_PROMPT: '0' } }
+    )
+  }
+}
+
+/**
+ * Runs one Git LFS transfer (`git lfs <lfsArgs>`) against the notebook endpoint with the CLI's
+ * current login, after {@link prepareAuthenticatedLfsCheckout}. Transfers never prompt and never
+ * smudge. A failure reports a missing Git LFS as required, otherwise `describeFailure`'s message.
+ */
+export function runAuthenticatedLfsTransfer(
+  checkoutDir: string,
+  notebookId: number,
+  purpose: 'receive' | 'publish',
+  nextStep: string,
+  lfsArgs: readonly string[],
+  describeFailure: (detail: string | undefined, status: number | null) => string
+): void {
+  prepareAuthenticatedLfsCheckout(checkoutDir, notebookId, purpose, nextStep)
   runSystemGitOrThrow(
-    ['-C', checkoutDir, 'lfs', 'install', '--local'],
-    (detail, status) =>
-      `failed to configure Git LFS in the checkout${
-        detail ? `: ${detail}` : ` (exit code ${status})`
-      }`,
-    { env: { ...process.env, GIT_TERMINAL_PROMPT: '0' } }
+    ['-C', checkoutDir, 'lfs', ...lfsArgs],
+    (detail, status) => {
+      requireGitLfs(purpose, nextStep)
+      return describeFailure(detail, status)
+    },
+    { env: { ...smudgeSkippedGitOptions().env, GIT_TERMINAL_PROMPT: '0' } }
   )
 }

@@ -104,12 +104,7 @@ describe('notebook pull (LFS checkout fill-in)', () => {
       expect(fs.readFileSync(join(directory, 'a.bin'), 'utf8')).toBe(
         filled(web.includes('a.bin') ? OID_B : OID_A)
       )
-      expect(lfs.lfsSteps()).toEqual([
-        'version',
-        'install',
-        'fetch',
-        'checkout',
-      ])
+      expect(lfs.lfsSteps()).toEqual(['version', 'install', 'pull'])
       expect(lfs.worktreeOpsSkipSmudge().every((v) => v === '1')).toBe(true)
       expect(lfs.worktreeOpsSkipSmudge().length > 0).toBe(web.length > 0)
       expect(runGit(['config', 'lfs.url'], directory)).toBe(
@@ -123,17 +118,46 @@ describe('notebook pull (LFS checkout fill-in)', () => {
       if (paused) {
         expect(runGit(['ls-files', '-u'], directory)).toContain('note.md')
         expect(reportSpy.mock.invocationCallOrder[0]).toBeGreaterThan(
-          lfs.lfsCheckoutOrder() as number
+          lfs.lfsPullOrder() as number
         )
       }
     }
   )
 
+  test('a configured checkout only refreshes a rotated login before filling in', async () => {
+    const { source, directory } = lfsCheckout(ctx.getWorkDir())
+    runGit(
+      [
+        'config',
+        'lfs.url',
+        `${getApiConfig().apiBaseUrl}/api/notebooks/42/lfs`,
+      ],
+      directory
+    )
+    runGit(
+      ['config', 'filter.lfs.process', 'git-lfs filter-process'],
+      directory
+    )
+    runGit(['remote', 'add', 'origin', 'https://example.com/n.git'], directory)
+    serveAcceptedBundle(ctx, source, 'lfs')
+    const lfs = interceptGitLfs()
+
+    await run(['notebook', 'pull', directory])
+
+    expect(lfs.lfsSteps()).toEqual(['pull'])
+    expect(runGit(['config', 'http.extraHeader'], directory)).toBe(
+      'Authorization: Bearer fake-bearer'
+    )
+    expect(fs.readFileSync(join(directory, 'a.bin'), 'utf8')).toBe(
+      filled(OID_A)
+    )
+  })
+
   test('a failed download reports incomplete attachments; the rerun fills them in, then reports unchanged', async () => {
     const { source, directory } = lfsCheckout(ctx.getWorkDir())
     commitPointerAttachment(realSpawnSync, source, 'a.bin', OID_B, 4, 'web')
     serveAcceptedBundle(ctx, source, 'lfs')
-    interceptGitLfs({ failFetch: true })
+    interceptGitLfs({ failPull: true })
 
     await expect(run(['notebook', 'pull', directory])).rejects.toThrow(
       ProcessExitForTest
@@ -164,7 +188,7 @@ describe('notebook pull (LFS checkout fill-in)', () => {
     commitPortableFile(source, 'note.md', '# web\n', 'web note')
     commitPortableFile(directory, 'note.md', '# local\n', 'local')
     serveAcceptedBundle(ctx, source, 'lfs')
-    interceptGitLfs({ failFetch: true })
+    interceptGitLfs({ failPull: true })
 
     await expect(run(['notebook', 'pull', directory])).rejects.toThrow(
       ProcessExitForTest

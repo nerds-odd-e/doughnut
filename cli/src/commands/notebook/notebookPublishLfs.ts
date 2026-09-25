@@ -1,6 +1,6 @@
 import {
   checkoutUsesLfs,
-  prepareAuthenticatedLfsCheckout,
+  runAuthenticatedLfsTransfer,
 } from './notebookLfsLocal.js'
 import { selectRequiredLfsObjectIds } from './notebookPublishLfsSelection.js'
 import { runSystemGitOrThrow } from './systemGit.js'
@@ -18,13 +18,6 @@ export function uploadRequiredLfsObjectsBeforeProposal(
   if (!checkoutUsesLfs(directory)) {
     return
   }
-  prepareAuthenticatedLfsCheckout(
-    directory,
-    notebookId,
-    'publish',
-    'retry "donut notebook publish"'
-  )
-
   const proposedHead = runSystemGitOrThrow(
     ['-C', directory, 'rev-parse', 'main'],
     (detail, status) =>
@@ -38,12 +31,16 @@ export function uploadRequiredLfsObjectsBeforeProposal(
   if (objectIds.length === 0) {
     return
   }
-  runSystemGitOrThrow(
-    ['-C', directory, 'lfs', 'push', '--object-id', 'origin', ...objectIds],
+  const retry = 'retry "donut notebook publish"'
+  runAuthenticatedLfsTransfer(
+    directory,
+    notebookId,
+    'publish',
+    retry,
+    ['push', '--object-id', 'origin', ...objectIds],
     (detail, status) =>
       `failed to upload notebook attachments via Git LFS${
         detail ? `: ${detail}` : ` (exit code ${status})`
-      }. Fix authorization or connectivity, then retry "donut notebook publish". Local refs and files were not changed.`,
-    { env: { ...process.env, GIT_TERMINAL_PROMPT: '0' } }
+      }. Fix authorization or connectivity, then ${retry}. Local refs and files were not changed.`
   )
 }

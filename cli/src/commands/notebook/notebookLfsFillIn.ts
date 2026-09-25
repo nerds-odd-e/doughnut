@@ -1,14 +1,12 @@
 import {
   checkoutUsesLfs,
-  prepareAuthenticatedLfsCheckout,
-  smudgeSkippedGitOptions,
+  runAuthenticatedLfsTransfer,
 } from './notebookLfsLocal.js'
-import { runSystemGitOrThrow } from './systemGit.js'
 
 /**
- * When the checkout enables Git LFS, prepares authenticated LFS transfers, then fills in only
- * the current checkout's files via `git lfs fetch` and `git lfs checkout`. Returns whether
- * the fill-in ran. Failures end with the caller's `nextStep` (e.g. `rerun "donut notebook pull"`).
+ * When the checkout enables Git LFS, fills in only the current checkout's files via an
+ * authenticated `git lfs pull`. Returns whether the fill-in ran. Failures end with the caller's
+ * `nextStep` (e.g. `rerun "donut notebook pull"`).
  */
 export function fillInCurrentLfsFilesIfNeeded(
   checkoutDir: string,
@@ -18,24 +16,16 @@ export function fillInCurrentLfsFilesIfNeeded(
   if (!checkoutUsesLfs(checkoutDir)) {
     return false
   }
-  prepareAuthenticatedLfsCheckout(checkoutDir, notebookId, 'receive', nextStep)
-  const noPrompt = {
-    env: { ...smudgeSkippedGitOptions().env, GIT_TERMINAL_PROMPT: '0' },
-  }
-  const incomplete =
-    (verb: string) => (detail: string | undefined, status: number | null) =>
-      `Notebook attachments are incomplete: failed to ${verb} current notebook attachments via Git LFS${
+  runAuthenticatedLfsTransfer(
+    checkoutDir,
+    notebookId,
+    'receive',
+    nextStep,
+    ['pull', 'origin'],
+    (detail, status) =>
+      `Notebook attachments are incomplete: failed to download current notebook attachments via Git LFS${
         detail ? `: ${detail}` : ` (exit code ${status})`
       }. Fix authorization or connectivity, then ${nextStep}.`
-  runSystemGitOrThrow(
-    ['-C', checkoutDir, 'lfs', 'fetch', 'origin'],
-    incomplete('download'),
-    noPrompt
-  )
-  runSystemGitOrThrow(
-    ['-C', checkoutDir, 'lfs', 'checkout'],
-    incomplete('materialize'),
-    noPrompt
   )
   return true
 }
