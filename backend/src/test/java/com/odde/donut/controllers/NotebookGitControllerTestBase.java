@@ -7,7 +7,6 @@ import com.odde.donut.controllers.dto.NotebookCreationRequest;
 import com.odde.donut.controllers.dto.NotebookRealm;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
-import com.odde.donut.entities.NotebookGitAttachmentRepresentation;
 import com.odde.donut.entities.NotebookGitBinding;
 import com.odde.donut.entities.User;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
@@ -79,20 +78,6 @@ abstract class NotebookGitControllerTestBase extends NotebookGitAcceptedObjectSt
     return createGitBackedNotebook("Git Backed Notebook");
   }
 
-  /** Product creation demoted to legacy RAW, only for tests whose subject is raw behaviour. */
-  Notebook createLegacyRawNotebook() throws UnexpectedNoAccessRightException {
-    return createLegacyRawNotebook("Git Backed Notebook");
-  }
-
-  Notebook createLegacyRawNotebook(String title) throws UnexpectedNoAccessRightException {
-    Notebook notebook = createGitBackedNotebook(title);
-    NotebookGitBinding binding = reloadCommittedBinding(notebook.getId());
-    binding.setAttachmentRepresentation(NotebookGitAttachmentRepresentation.RAW);
-    notebookGitBindingRepository.save(binding);
-    notebookGitCutoverService.resetHistory(notebook, Instant.now(), List.of());
-    return notebook;
-  }
-
   Notebook createGitBackedNotebook(String title) throws UnexpectedNoAccessRightException {
     NotebookCreationRequest request = new NotebookCreationRequest();
     request.setNewTitle(title);
@@ -106,9 +91,8 @@ abstract class NotebookGitControllerTestBase extends NotebookGitAcceptedObjectSt
   }
 
   /**
-   * {@code tree} as an LFS notebook commits it: each attachment's payload stored in the content
-   * store and replaced by its pointer; notes, empty-folder markers, and Git metadata stay as they
-   * are.
+   * {@code tree} as the product commits it: each attachment's payload stored in the content store
+   * and replaced by its pointer; notes, empty-folder markers, and Git metadata stay as they are.
    */
   List<PortableTreeEntry> committedOnLfs(Notebook notebook, List<PortableTreeEntry> tree)
       throws IOException {

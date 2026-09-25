@@ -189,30 +189,3 @@ Feature: Notebook Git LFS authenticated transfer
     And I attempt to fetch LFS objects for commit "lfsOversizedIntermediate" with the standard Git LFS client
     Then the standard Git LFS historical fetch reports the object unavailable
     And the notebook "LFS Transfer Notebook" content store lacks object for "lfsOversizedIntermediate" under attachment "payload.bin"
-
-  @bundleCliE2eInstall @withCliConfig
-  Scenario: An existing checkout of a raw notebook pulls its conversion to LFS and continues on LFS
-    Given the backend is serving the CLI and install script
-    And the CLI is installed from localhost
-    And the notebook "LFS Transfer Notebook" uses legacy raw Git attachment storage
-    When I clone the notebook "LFS Transfer Notebook" into a temporary destination using the installed CLI
-    And I commit the attachment "picture.png" filled with 1024 bytes of "0x11" in the cloned checkout
-    And I publish the cloned checkout using the installed CLI
-    Then the installed CLI reports the committed change as the accepted head
-    When the notebook "LFS Transfer Notebook" is converted to Git LFS storage
-    And I pull the cloned checkout using the installed CLI
-    Then the cloned checkout is a clean main branch
-    And the cloned checkout file "picture.png" is filled with 1024 bytes of "0x11"
-    And the cloned checkout file ".gitattributes" is:
-      """
-      * filter=lfs diff=lfs merge=lfs -text
-      *.md !filter !diff !merge text
-      .gitattributes !filter !diff !merge text
-      .keep !filter !diff !merge text
-      **/.keep !filter !diff !merge text
-
-      """
-    When I commit the LFS attachment "second.png" filled with 4 bytes of "0x41" as "secondPicture"
-    And I publish the cloned checkout using the installed CLI
-    Then the installed CLI reports the committed change as the accepted head
-    And the notebook "LFS Transfer Notebook" in Donut should serve the root file "second.png" as "AAAA"

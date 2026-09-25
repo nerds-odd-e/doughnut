@@ -85,12 +85,13 @@ public class NotesTestData {
       note.setContent(content);
       note.setUpdatedAt(currentUTCTimestamp);
 
-      String url = imageUrl != null ? imageUrl.trim() : "";
-      boolean hasImage = !Strings.isBlank(url);
-      String mask = imageMask != null ? imageMask : "";
-      note.setContent(
-          NoteContentMarkdown.mergeNoteImageScalarsIntoContent(
-              note.getContent() != null ? note.getContent() : "", hasImage, url, mask));
+      if (!Strings.isBlank(imageUrl)) {
+        note.setContent(NoteContentMarkdown.withNoteImage(content, imageUrl.trim()));
+        if (!Strings.isBlank(imageMask)) {
+          note.setContent(
+              NoteContentMarkdown.withNoteImageMask(note.getContent(), imageMask.trim()));
+        }
+      }
 
       note.setUpdatedAt(currentUTCTimestamp);
       return note;

@@ -16,12 +16,12 @@ import org.eclipse.jgit.revwalk.RevWalk;
  * Multi-commit LFS proposal fixtures and first-parent preservation checks for attachment-size
  * history admission.
  */
-abstract class NotebookGitAttachmentSizeAdmissionLfsHistoryTestSupport
+abstract class NotebookGitAttachmentSizeAdmissionHistoryTestSupport
     extends NotebookGitAttachmentSizeAdmissionTestSupport {
 
-  record LfsHistoryRange(ObjectId afterFirst, ObjectId tip, byte[] proposalBytes) {}
+  record HistoryRange(ObjectId afterFirst, ObjectId tip, byte[] proposalBytes) {}
 
-  LfsHistoryRange lfsReplaceThenKeepTipRange(
+  HistoryRange replaceThenKeepTipRange(
       byte[] baseBundleBytes, ObjectId baseHead, byte[] firstPointer, byte[] tipPointer)
       throws Exception {
     try (InMemoryRepository repository = new InMemoryRepository(new DfsRepositoryDescription())) {
@@ -38,11 +38,11 @@ abstract class NotebookGitAttachmentSizeAdmissionLfsHistoryTestSupport
               afterFirst,
               List.of(new NotebookGitProposalFile("version.bin", tipPointer)),
               "Corrected LFS tip");
-      return new LfsHistoryRange(afterFirst, tip, bundleBytesForHead(repository, tip));
+      return new HistoryRange(afterFirst, tip, bundleBytesForHead(repository, tip));
     }
   }
 
-  LfsHistoryRange lfsIntroduceThenRemoveKeepingNote(
+  HistoryRange introduceThenRemoveKeepingNote(
       byte[] baseBundleBytes, ObjectId baseHead, byte[] temporaryPointer) throws Exception {
     NotebookGitProposalFile note = new NotebookGitProposalFile("Root Note.md", NOTE_MARKDOWN);
     try (InMemoryRepository repository = new InMemoryRepository(new DfsRepositoryDescription())) {
@@ -55,7 +55,7 @@ abstract class NotebookGitAttachmentSizeAdmissionLfsHistoryTestSupport
               "Temporary LFS attachment");
       ObjectId tip =
           localCommitOnTopOf(repository, afterFirst, List.of(note), "Remove temporary attachment");
-      return new LfsHistoryRange(afterFirst, tip, bundleBytesForHead(repository, tip));
+      return new HistoryRange(afterFirst, tip, bundleBytesForHead(repository, tip));
     }
   }
 

@@ -99,7 +99,6 @@ public class NotebookGitProposalPublisher {
           proposal.mainHead(),
           accepted.repository(),
           acceptedHead,
-          binding.getAttachmentRepresentation(),
           notebook.getId(),
           notebookAttachmentContent);
     }

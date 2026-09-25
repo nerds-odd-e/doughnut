@@ -19,9 +19,9 @@ import org.springframework.web.server.ResponseStatusException;
  * unique among sibling attachments under a binary collation, so distinct Git paths stay distinct
  * rows. Deleted along with its notebook or containing folder.
  *
- * <p>The {@code content} column holds accepted Git blob bytes only: legacy raw payload bytes, or
- * standard Git LFS pointer bytes. It never stores hydrated LFS object payloads. Digest and size
- * live in the pointer when representation is LFS; this row does not duplicate them.
+ * <p>The {@code content} column holds accepted Git blob bytes only: a non-empty file's standard Git
+ * LFS pointer, or nothing for an empty file. It never stores hydrated LFS object payloads. Digest
+ * and size live in the pointer; this row does not duplicate them.
  */
 @Entity
 @Table(name = "notebook_attachment")
@@ -49,8 +49,8 @@ public class NotebookAttachment extends EntityIdentifiedByIdOnly {
   private byte[] content;
 
   /**
-   * Accepted Git blob bytes for this attachment: legacy raw payload, or a standard Git LFS pointer.
-   * Never hydrated LFS object bytes.
+   * Accepted Git blob bytes for this attachment: its standard Git LFS pointer, or empty for an
+   * empty file. Never hydrated LFS object bytes.
    */
   public byte[] getAcceptedGitContent() {
     return content;

@@ -118,7 +118,7 @@ Feature: CLI notebook web note moves
       """
       ---
       type: Note
-      related: '[[Study/Cells|shown]]'
+      related: "[[Study/Cells|shown]]"
       ---
       See [[Study/Cells|shown]] for details.
       """

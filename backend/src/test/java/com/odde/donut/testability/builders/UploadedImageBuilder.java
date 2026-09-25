@@ -9,8 +9,6 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
 
 public class UploadedImageBuilder {
-  private int width = 2;
-  private int height = 2;
   private String name = "file";
   private String originalFilename = "my.png";
   private String contentType = "image/png";
@@ -29,14 +27,8 @@ public class UploadedImageBuilder {
     return this;
   }
 
-  public UploadedImageBuilder metrics(int width, int height) {
-    this.width = width;
-    this.height = height;
-    return this;
-  }
-
   private ByteArrayOutputStream buildImage() throws IOException {
-    BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+    BufferedImage image = new BufferedImage(2, 2, BufferedImage.TYPE_INT_RGB);
     Graphics2D g2 = image.createGraphics();
     g2.drawString("Welcome to img", 0, 0);
     ByteArrayOutputStream stream = new ByteArrayOutputStream();

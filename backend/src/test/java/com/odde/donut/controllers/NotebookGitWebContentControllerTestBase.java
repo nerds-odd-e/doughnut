@@ -45,18 +45,11 @@ abstract class NotebookGitWebContentControllerTestBase extends NotebookGitContro
   /** Seeds an attachment as the product stores it: payload in the content store, pointer row. */
   NotebookAttachment storeFolderAttachmentAndSnapshot(
       Notebook notebook, Folder folder, String filename, byte[] payload) throws IOException {
-    return storeAcceptedAttachmentAndSnapshot(
-        notebook, folder, filename, pointerFor(notebook, payload));
-  }
-
-  /** Seeds the given accepted bytes; the caller chooses pointer or raw bytes. */
-  NotebookAttachment storeAcceptedAttachmentAndSnapshot(
-      Notebook notebook, Folder folder, String filename, byte[] content) {
     NotebookAttachment attachment = new NotebookAttachment();
     attachment.setNotebook(notebook);
     attachment.setFolder(folder);
     attachment.setFilename(filename);
-    attachment.setAcceptedGitContent(content);
+    attachment.setAcceptedGitContent(pointerFor(notebook, payload));
     notebookAttachmentRepository.save(attachment);
     snapshotCurrentPortableTree(notebook);
     return attachment;

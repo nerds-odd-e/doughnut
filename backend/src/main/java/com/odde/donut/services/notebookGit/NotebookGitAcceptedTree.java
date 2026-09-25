@@ -63,6 +63,12 @@ final class NotebookGitAcceptedTree {
     }
   }
 
+  /** True when the tree at {@code commitId} has a file, or a folder of files, at {@code path}. */
+  static boolean hasPath(Repository repository, ObjectId commitId, String path) {
+    return blobIds(repository, commitId).keySet().stream()
+        .anyMatch(taken -> taken.equals(path) || taken.startsWith(path + "/"));
+  }
+
   static boolean representedInTree(String folderPath, List<PortableTreeEntry> entries) {
     return representedInTree(folderPath, entries, path -> false);
   }

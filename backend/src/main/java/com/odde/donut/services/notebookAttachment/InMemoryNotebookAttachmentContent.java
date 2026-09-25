@@ -49,4 +49,9 @@ public class InMemoryNotebookAttachmentContent implements NotebookAttachmentCont
     getCalls.set(0);
     storeCalls.set(0);
   }
+
+  /** Forgets all stored content, as when the database behind it is reset. */
+  public void clear() {
+    verified.clear();
+  }
 }

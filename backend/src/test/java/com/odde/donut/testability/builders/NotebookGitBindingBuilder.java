@@ -1,7 +1,6 @@
 package com.odde.donut.testability.builders;
 
 import com.odde.donut.entities.Notebook;
-import com.odde.donut.entities.NotebookGitAttachmentRepresentation;
 import com.odde.donut.entities.NotebookGitBinding;
 import com.odde.donut.testability.EntityBuilder;
 import com.odde.donut.testability.MakeMe;
@@ -21,10 +20,4 @@ public class NotebookGitBindingBuilder extends EntityBuilder<NotebookGitBinding>
 
   @Override
   protected void beforeCreate(boolean needPersist) {}
-
-  public NotebookGitBindingBuilder representation(
-      NotebookGitAttachmentRepresentation representation) {
-    entity.setAttachmentRepresentation(representation);
-    return this;
-  }
 }

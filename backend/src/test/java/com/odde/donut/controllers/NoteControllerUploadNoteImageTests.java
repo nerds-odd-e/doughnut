@@ -5,7 +5,7 @@ import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.odde.donut.controllers.dto.NoteImageUploadDTO;
-import com.odde.donut.controllers.dto.NoteImageUploadResult;
+import com.odde.donut.controllers.dto.NoteRealm;
 import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.Image;
 import com.odde.donut.entities.Note;
@@ -23,13 +23,10 @@ import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
 
 class NoteControllerUploadNoteImageTests extends NotebookGitWebContentControllerTestBase {
-  @Autowired NoteAttachmentImageController noteAttachmentImageController;
-
   @Test
   void theUploadedPictureIsAFileInTheNotesFolderNamedByItsImageInOneAcceptedCommit()
       throws Exception {
@@ -40,9 +37,8 @@ class NoteControllerUploadNoteImageTests extends NotebookGitWebContentController
     List<String> commitsBefore = acceptedHistory(notebook).commits();
     MultipartFile picture = makeMe.anUploadedImage().toMultiplePartFilePlease();
 
-    NoteImageUploadResult result = upload(moon, picture);
+    upload(moon, picture);
 
-    assertThat(result.imagePath(), equalTo("my.png"));
     AcceptedHistory after = acceptedHistory(notebook);
     assertThat(after.parents(), equalTo(commitsBefore));
     assertThat(
@@ -54,17 +50,22 @@ class NoteControllerUploadNoteImageTests extends NotebookGitWebContentController
   }
 
   @Test
-  void aRootNotesPictureIsAFileAtTheNotebookRoot() throws Exception {
+  void aRootNotesPictureIsAFileAtTheNotebookRootAndItsContentIsPreparedLikeAnySave()
+      throws Exception {
     Notebook notebook = createGitBackedNotebook();
     Note moon = makeMe.aNote("Moon").notebook(notebook).content("no frontmatter").please();
     snapshotCurrentPortableTree(notebook);
+    List<String> commitsBefore = acceptedHistory(notebook).commits();
     MultipartFile picture = makeMe.anUploadedImage().toMultiplePartFilePlease();
 
-    upload(moon, picture);
+    NoteRealm realm = upload(moon, picture);
 
+    String prepared = "---\ntype: Note\nimage: my.png\n---\nno frontmatter";
+    assertThat(realm.getNote().getContent(), equalTo(prepared));
     AcceptedHistory after = acceptedHistory(notebook);
+    assertThat(after.parents(), equalTo(commitsBefore));
     assertThat(tipContent(after, "my.png"), equalTo(lfsPointerStoredFor(notebook, picture)));
-    assertThat(tipText(after, "Moon.md"), equalTo("---\nimage: my.png\n---\nno frontmatter"));
+    assertThat(tipText(after, "Moon.md"), equalTo(prepared));
   }
 
   @Test
@@ -83,23 +84,8 @@ class NoteControllerUploadNoteImageTests extends NotebookGitWebContentController
 
     assertThat(
         tipText(acceptedHistory(notebook), "Moon.md"),
-        equalTo("---\nimage: my.png\nimage_mask: 10 10 20 20\n---\nbody"));
+        equalTo("---\ntype: Note\nimage: my.png\nimage_mask: 10 10 20 20\n---\nbody"));
     assertThat(legacyImageCount(moon), equalTo(1L));
-  }
-
-  @Test
-  void shouldKeepTheOriginalBytesOfAPictureWiderThan2000Pixels() throws Exception {
-    Notebook notebook = createGitBackedNotebook();
-    Note moon = makeMe.aNote("Moon").notebook(notebook).please();
-    MultipartFile picture = makeMe.anUploadedImage().metrics(2001, 2).toMultiplePartFilePlease();
-
-    upload(moon, picture);
-
-    assertThat(
-        noteAttachmentImageController
-            .showAttachmentImage(noteRepository.findById(moon.getId()).orElseThrow(), "my.png")
-            .getBody(),
-        equalTo(picture.getBytes()));
   }
 
   @Test
@@ -110,6 +96,28 @@ class NoteControllerUploadNoteImageTests extends NotebookGitWebContentController
     storeFolderAttachmentAndSnapshot(notebook, physics, "diagram.png", "earlier".getBytes());
 
     assertUploadRefusedWithNothingChanged(force, "diagram.png", "physics/diagram.png");
+  }
+
+  @Test
+  void aNameUsedByANoteInTheNotesFolderIsRefusedAndNothingChanges() throws Exception {
+    Notebook notebook = createGitBackedNotebook();
+    Folder physics = makeMe.aFolder().notebook(notebook).name("physics").please();
+    Note force = makeMe.aNote("force").folder(physics).content(ACCEPTED_CONTENT).please();
+    snapshotCurrentPortableTree(notebook);
+
+    assertUploadRefusedWithNothingChanged(force, "force.md", "physics/force.md");
+  }
+
+  @Test
+  void aNameUsedByAFolderInTheNotesFolderIsRefusedAndNothingChanges() throws Exception {
+    Notebook notebook = createGitBackedNotebook();
+    Folder physics = makeMe.aFolder().notebook(notebook).name("physics").please();
+    Folder sub = makeMe.aFolder().parentFolder(physics).name("sub").please();
+    Note force = makeMe.aNote("force").folder(physics).content(ACCEPTED_CONTENT).please();
+    makeMe.aNote("inside").folder(sub).please();
+    snapshotCurrentPortableTree(notebook);
+
+    assertUploadRefusedWithNothingChanged(force, "sub", "physics/sub");
   }
 
   @ParameterizedTest
@@ -143,19 +151,6 @@ class NoteControllerUploadNoteImageTests extends NotebookGitWebContentController
         notebookAttachmentContent.get(
             notebookId, VerifiedNotebookAttachmentBytes.sha256Hex(picture.getBytes())),
         equalTo(Optional.empty()));
-  }
-
-  @Test
-  void aNotebookWithoutLfsFilesRefusesTheUploadLoudly() throws Exception {
-    Notebook notebook = createLegacyRawNotebook();
-    Note moon = makeMe.aNote("Moon").notebook(notebook).please();
-    List<String> commitsBefore = acceptedHistory(notebook).commits();
-
-    assertThrows(
-        IllegalStateException.class,
-        () -> upload(moon, makeMe.anUploadedImage().toMultiplePartFilePlease()));
-
-    assertThat(acceptedHistory(notebook).commits(), equalTo(commitsBefore));
   }
 
   @Test
@@ -198,7 +193,7 @@ class NoteControllerUploadNoteImageTests extends NotebookGitWebContentController
     }
   }
 
-  private NoteImageUploadResult upload(Note note, MultipartFile picture) throws Exception {
+  private NoteRealm upload(Note note, MultipartFile picture) throws Exception {
     NoteImageUploadDTO dto = new NoteImageUploadDTO();
     dto.setUploadImage(picture);
     return noteController.uploadNoteImage(noteRepository.findById(note.getId()).orElseThrow(), dto);

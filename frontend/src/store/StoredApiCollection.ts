@@ -20,6 +20,7 @@ import {
   undoTrashNoteRequest,
   permanentlyDeleteNoteRequest,
   reduceRelationNoteToSourcePropertyRequest,
+  uploadNoteImageRequest,
 } from "./noteRequests"
 
 export type NoteTrashReferenceHandling = NoteTrashDto["referenceHandling"]
@@ -205,6 +206,12 @@ export default class StoredApiCollection {
     }
 
     await this.updateTextField(noteId, "edit content", value.content)
+  }
+
+  /** Uploads a picture as a file beside the note; the returned realm carries the note's new `image:`. */
+  async uploadNoteImage(noteId: Donut.ID, file: File) {
+    const noteRealm = await uploadNoteImageRequest(noteId, file)
+    if (noteRealm) this.storage.refreshNoteRealm(noteRealm)
   }
 
   /** PATCH note content with current stored body so the backend rebuilds the resolved wiki-link index. */

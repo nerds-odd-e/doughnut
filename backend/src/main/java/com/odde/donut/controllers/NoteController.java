@@ -95,16 +95,17 @@ class NoteController {
 
   @PostMapping(value = "/{note}/images", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
   @Transactional
-  public NoteImageUploadResult uploadNoteImage(
+  public NoteRealm uploadNoteImage(
       @PathVariable("note") @Schema(type = "integer") Note note,
       @Valid @ModelAttribute NoteImageUploadDTO noteImageUploadDTO)
       throws UnexpectedNoAccessRightException, IOException {
     authorizationService.assertAuthorization(note);
-    return new NoteImageUploadResult(
+    Note savedNote =
         webNoteImageUploadService.upload(
             note,
             noteImageUploadDTO.getUploadImage(),
-            testabilitySettings.getCurrentUTCTimestamp()));
+            testabilitySettings.getCurrentUTCTimestamp());
+    return noteRealmService.build(savedNote, authorizationService.getCurrentUser());
   }
 
   @GetMapping("/{note}/note-info")

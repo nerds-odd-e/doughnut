@@ -11,7 +11,6 @@ import {
   NotebookController,
   NotebookFolderController,
 } from '@generated/donut-backend-api/sdk.gen'
-import { e2eAppBaseUrl } from '../support/e2eAppUrl'
 import testability from './testability'
 import { unwrapData } from './unwrapApi'
 
@@ -154,29 +153,6 @@ export const donutNotebookContent = {
           `readme of "${pathText(containerPath)}" in Donut (frontmatter excluded)`
         ).to.equal(expectedBody)
       )
-    })
-    return this
-  },
-
-  expectRootFileDownload(
-    notebookName: string,
-    filename: string,
-    content: string
-  ) {
-    locateContainer([notebookName]).then(({ notebookId, listing }) => {
-      const file = listing.attachments?.find((a) => a.filename === filename)
-      expect(
-        file,
-        `root file "${filename}" in Donut notebook "${notebookName}"; found ${JSON.stringify(listing.attachments?.map((a) => a.filename) ?? [])}`
-      ).to.exist
-      cy.request(
-        `${e2eAppBaseUrl()}/api/notebooks/${notebookId}/attachments/${file!.id}/content`
-      ).then((response) => {
-        expect(response.body, 'downloaded bytes').to.equal(content)
-        expect(response.headers['content-disposition']).to.contain(
-          `attachment; filename="${filename}"`
-        )
-      })
     })
     return this
   },

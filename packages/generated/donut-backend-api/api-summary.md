@@ -63,8 +63,6 @@ Use this for endpoint lookup; open `sdk.gen.ts` or `types.gen.ts` only for exact
 
 - `resnapshotNotebookGitBindingForTestability`: POST `/api/testability/resnapshot_notebook_git_binding_for_testability` -> `ResnapshotNotebookGitBindingForTestabilityResponse` (request: `ResnapshotNotebookGitBindingForTestabilityData`; body: NotebookNameRequest; response body: string)
 - `putNotebookFileForTestability`: POST `/api/testability/put_notebook_file_for_testability` -> `PutNotebookFileForTestabilityResponse` (request: `PutNotebookFileForTestabilityData`; body: PutNotebookFileRequest; response body: string)
-- `forceRawNotebookGitBindingForTestability`: POST `/api/testability/force_raw_notebook_git_binding_for_testability` -> `ForceRawNotebookGitBindingForTestabilityResponse` (request: `ForceRawNotebookGitBindingForTestabilityData`; body: NotebookNameRequest; response body: string)
-- `convertRawNotebookToLfsForTestability`: POST `/api/testability/convert_raw_notebook_to_lfs_for_testability` -> `ConvertRawNotebookToLfsForTestabilityResponse` (request: `ConvertRawNotebookToLfsForTestabilityData`; body: NotebookNameRequest; response body: string)
 
 ## Notebook Lfs Testability Controller
 
@@ -102,7 +100,7 @@ Use this for endpoint lookup; open `sdk.gen.ts` or `types.gen.ts` only for exact
 - `verifySpelling`: POST `/api/notes/{note}/verify-spelling` -> `VerifySpellingResponse` (request: `VerifySpellingData`; path: note; body: AnswerSpellingDto; response body: SpellingVerificationResult)
 - `trashNote`: POST `/api/notes/{note}/trash` -> `TrashNoteResponse` (request: `TrashNoteData`; path: note; body: NoteTrashDto; response body: NoteRealm)
 - `permanentlyDeleteNote`: POST `/api/notes/{note}/permanently-delete` -> `PermanentlyDeleteNoteResponse` (request: `PermanentlyDeleteNoteData`; path: note; response body: void)
-- `uploadNoteImage`: POST `/api/notes/{note}/images` -> `UploadNoteImageResponse` (request: `UploadNoteImageData`; path: note; body: NoteImageUploadDto; response body: NoteImageUploadResult)
+- `uploadNoteImage`: POST `/api/notes/{note}/images` -> `UploadNoteImageResponse` (request: `UploadNoteImageData`; path: note; body: NoteImageUploadDto; response body: NoteRealm)
 - `undoTrashNote`: PATCH `/api/notes/{note}/undo-trash` -> `UndoTrashNoteResponse` (request: `UndoTrashNoteData`; path: note; body: NoteTrashUndoDto; response body: NoteRealm)
 - `showNote`: GET `/api/notes/{note}` -> `ShowNoteResponse` (request: `ShowNoteData`; path: note; response body: NoteRealm)
 - `getNoteInfo`: GET `/api/notes/{note}/note-info` -> `GetNoteInfoResponse` (request: `GetNoteInfoData`; path: note; response body: NoteRecallInfo)

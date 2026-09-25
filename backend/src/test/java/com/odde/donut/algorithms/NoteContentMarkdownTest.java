@@ -130,64 +130,6 @@ class NoteContentMarkdownTest {
   }
 
   @Test
-  void mergeNoteImageScalarsIntoContent_prepends_frontmatter_when_none() {
-    assertThat(
-        NoteContentMarkdown.mergeNoteImageScalarsIntoContent(
-            "Hello", true, "/attachments/images/9/a.png", ""),
-        equalTo("---\nimage: /attachments/images/9/a.png\n---\nHello"));
-  }
-
-  @Test
-  void mergeNoteImageScalarsIntoContent_adds_mask_when_present() {
-    assertThat(
-        NoteContentMarkdown.mergeNoteImageScalarsIntoContent(
-            "Body", true, "/attachments/images/1/x.jpg", "0 0 10 10"),
-        equalTo(
-            "---\n"
-                + "image: /attachments/images/1/x.jpg\n"
-                + "image_mask: 0 0 10 10\n"
-                + "---\n"
-                + "Body"));
-  }
-
-  static Stream<Arguments> existingFrontmatterImageUpdates() {
-    return Stream.of(
-        Arguments.of(
-            "---\nimage: /old\nwikidata_id: Q1\n---\nB",
-            true,
-            "/attachments/images/2/n.png",
-            "",
-            "---\nwikidata_id: Q1\nimage: /attachments/images/2/n.png\n---\nB"),
-        Arguments.of(
-            "---\nimage: /x\ntopic: t\n---\nBody", false, "", "", "---\ntopic: t\n---\nBody"),
-        Arguments.of("---\nimage: /x\nimage_mask: 1 2 3 4\n---\nBody", false, "", "", "Body"));
-  }
-
-  @ParameterizedTest
-  @MethodSource("existingFrontmatterImageUpdates")
-  void mergeNoteImageScalarsIntoContent_updates_existing_frontmatter(
-      String input, boolean hasImage, String imageUrl, String imageMask, String expected) {
-    assertThat(
-        NoteContentMarkdown.mergeNoteImageScalarsIntoContent(input, hasImage, imageUrl, imageMask),
-        equalTo(expected));
-  }
-
-  @Test
-  void mergeNoteImageScalarsIntoContent_url_with_colon_is_plain() {
-    assertThat(
-        NoteContentMarkdown.mergeNoteImageScalarsIntoContent(
-            "Hi", true, "https://example.com/a.png", ""),
-        equalTo("---\n" + "image: https://example.com/a.png\n" + "---\n" + "Hi"));
-  }
-
-  @Test
-  void mergeNoteImageScalarsIntoContent_plain_body_unchanged_when_clearing_without_frontmatter() {
-    String plain = "No frontmatter";
-    assertThat(
-        NoteContentMarkdown.mergeNoteImageScalarsIntoContent(plain, false, "", ""), equalTo(plain));
-  }
-
-  @Test
   void setLeadingFrontmatterProperty_appends_to_existing_frontmatter() {
     String content = "---\nsource: \"[[Moon]]\"\n---\nBody";
 

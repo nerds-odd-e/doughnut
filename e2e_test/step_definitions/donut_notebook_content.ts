@@ -19,14 +19,3 @@ Then(
     start.donutNotebookContent.expectReadme(containerPath.path, expectedReadme)
   }
 )
-
-Then(
-  'the notebook {string} in Donut should serve the root file {string} as {string}',
-  (notebookName: string, filename: string, content: string) => {
-    start.donutNotebookContent.expectRootFileDownload(
-      notebookName,
-      filename,
-      content
-    )
-  }
-)

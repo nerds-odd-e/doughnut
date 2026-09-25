@@ -12,7 +12,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
-import com.odde.donut.entities.NotebookGitAttachmentRepresentation;
 import com.odde.donut.entities.NotebookGitBinding;
 import com.odde.donut.entities.User;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
@@ -111,7 +110,7 @@ class NotebookGitHistoryResetControllerTest extends NotebookGitControllerTestBas
   }
 
   @Test
-  void resetOfANotebookWithoutBindingCreatesAnLfsBindingWithInitialAttributes() throws Exception {
+  void resetOfANotebookWithoutBindingCreatesABindingWithInitialLfsAttributes() throws Exception {
     Notebook notebook =
         inCommittedTransaction(
             transactionManager,
@@ -119,9 +118,6 @@ class NotebookGitHistoryResetControllerTest extends NotebookGitControllerTestBas
 
     controller.resetNotebookGitHistory(notebook);
 
-    assertThat(
-        reloadCommittedBinding(notebook.getId()).getAttachmentRepresentation(),
-        equalTo(NotebookGitAttachmentRepresentation.LFS));
     assertThat(
         acceptedHistory(notebook).exactTree(),
         contains(ofText(NotebookGitAttributes.PATH, NotebookGitAttributes.INITIAL_CONTENT)));

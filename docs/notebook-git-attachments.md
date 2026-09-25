@@ -65,10 +65,13 @@ the web.
 A picture uploaded with a note's `image` property on the web becomes a file in
 the note's folder under its uploaded name, with its original bytes: the bytes are
 stored in the notebook's content store first, then the LFS pointer and the
-note's `image: <filename>` are accepted together in one web commit. A name that
-a file in that folder already uses, or one that is not a plain filename (empty,
-containing `/`, or starting with `.`), is refused with a message naming the path;
-nothing is renamed or overwritten. A notebook without an LFS binding refuses the
+note's `image: <filename>` are accepted together in one web commit, with the
+note content prepared like any other content save. The editor saves pending
+text before sending the upload and then shows the returned note without saving
+it again, so one upload is exactly one commit. A name that a file, note or
+folder in the notebook's accepted tree already uses in that folder, or one that
+is not a plain filename (empty, containing `/`, or starting with `.`), is
+refused with a message naming the path; nothing is renamed or overwritten. A notebook without an LFS binding refuses the
 upload. Legacy uploaded pictures in the `image` table remain served inline at `/attachments/images/{id}/{fileName}` under
 the same notebook read rule: owners, subscribers, and Bazaar readers (even
 logged out) receive them; another user is refused, and an anonymous request for

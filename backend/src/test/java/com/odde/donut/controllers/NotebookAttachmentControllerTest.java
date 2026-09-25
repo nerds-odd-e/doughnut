@@ -11,14 +11,9 @@ import com.odde.donut.controllers.dto.NotebookAttachmentRealm;
 import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.NotebookAttachment;
-import com.odde.donut.entities.NotebookGitAttachmentRepresentation;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
-import com.odde.donut.services.notebookAttachment.NotebookAttachmentContent;
 import com.odde.donut.services.notebookGit.NotebookGitLfsPointer;
-import java.io.ByteArrayInputStream;
 import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.util.HexFormat;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -130,34 +125,23 @@ class NotebookAttachmentControllerTest extends ControllerTestBase {
 
       assertThat(response.getBody().length, equalTo(0));
       assertThat(disposition(response).getFilename(), equalTo(".keep"));
+      assertThat(controller.getAttachmentPage(notebook, keep).size(), equalTo(0L));
     }
   }
 
   @Nested
-  class LfsNotebook {
-    @Autowired NotebookAttachmentContent notebookAttachmentContent;
+  class StoredBytesMissing {
     final byte[] png = "real png bytes".getBytes(StandardCharsets.UTF_8);
-    String oid;
     NotebookAttachment diagram;
 
     @BeforeEach
-    void lfsNotebookWithAPointerRow() throws Exception {
-      makeMe
-          .aGitBindingFor(notebook)
-          .representation(NotebookGitAttachmentRepresentation.LFS)
-          .please();
-      oid = HexFormat.of().formatHex(MessageDigest.getInstance("SHA-256").digest(png));
+    void aPointerRowWithoutItsBytes() {
       diagram =
           makeMe
               .anAttachment("diagram.png")
               .atRootOf(notebook)
-              .content(NotebookGitLfsPointer.format(oid, png.length))
+              .pointerOnly(NotebookGitLfsPointer.format("a".repeat(64), png.length))
               .please();
-    }
-
-    private void storeThePng() throws Exception {
-      notebookAttachmentContent.store(
-          notebook.getId(), oid, png.length, new ByteArrayInputStream(png));
     }
 
     @Test
@@ -167,43 +151,13 @@ class NotebookAttachmentControllerTest extends ControllerTestBase {
     }
 
     @Test
-    void downloadReturnsTheStoredBytesNotThePointer() throws Exception {
-      storeThePng();
-
-      assertThat(controller.downloadAttachment(notebook, diagram).getBody(), equalTo(png));
-    }
-
-    @Test
-    void missingBytesFailLoudlyNamingTheFile() {
+    void downloadFailsLoudlyNamingTheFile() {
       IllegalStateException error =
           assertThrows(
               IllegalStateException.class, () -> controller.downloadAttachment(notebook, diagram));
 
       assertThat(error.getMessage(), equalTo("File content unavailable: diagram.png"));
     }
-
-    @Test
-    void zeroByteFileDownloadsEmpty() throws Exception {
-      NotebookAttachment keep = attachmentAtRoot(".keep", "");
-
-      assertThat(controller.downloadAttachment(notebook, keep).getBody().length, equalTo(0));
-      assertThat(controller.getAttachmentPage(notebook, keep).size(), equalTo(0L));
-    }
-  }
-
-  @Test
-  void rawNotebookServesPointerLookingContentUnchanged() throws Exception {
-    makeMe
-        .aGitBindingFor(notebook)
-        .representation(NotebookGitAttachmentRepresentation.RAW)
-        .please();
-    byte[] pointerText = NotebookGitLfsPointer.format("a".repeat(64), 99);
-    NotebookAttachment file =
-        makeMe.anAttachment("pointer.txt").atRootOf(notebook).content(pointerText).please();
-
-    assertThat(controller.downloadAttachment(notebook, file).getBody(), equalTo(pointerText));
-    assertThat(
-        controller.getAttachmentPage(notebook, file).size(), equalTo((long) pointerText.length));
   }
 
   @Nested

@@ -2,35 +2,26 @@ package com.odde.donut.controllers;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.is;
 
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.NotebookAttachment;
-import com.odde.donut.entities.NotebookGitAttachmentRepresentation;
 import com.odde.donut.entities.NotebookGitBinding;
-import com.odde.donut.services.notebookGit.NotebookGitLfsPointer;
 import com.odde.donut.services.notebookTree.PortableTreeEntry;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 
-/**
- * Reserved Git metadata and accepted Git attachment content through publication and derived-tree
- * preservation. Raw-subject cases use the legacy RAW fixture; the rest run on the product LFS
- * notebook.
- */
+/** Reserved Git metadata through publication and derived-tree preservation. */
 class NotebookGitAttachmentMetadataControllerTest extends NotebookGitWebContentControllerTestBase {
 
   private static final String NOTE = "---\ntype: Note\n---\nbody\n";
-  private static final String POINTER_OID =
-      "4d7a214614ab2935c943f9e0ff69d22eadbb8f32b1258daaa5e2ca24d17e2393";
   private static final String AUTHORED_ATTRIBUTES = "* filter=lfs -text\nauthored !filter\n";
 
   @Test
   void gitattributesAreReservedMetadataNotAttachmentsAndSurviveWebSaveAndReset() throws Exception {
-    Notebook notebook = createLegacyRawNotebook();
+    Notebook notebook = createGitBackedNotebook();
     NotebookGitBinding empty = snapshotCurrentPortableTree(notebook);
+    byte[] diagram = pointerFor(notebook, new byte[] {1, 2, 3});
 
     controller.publishNotebookGitProposal(
         notebook.getId(),
@@ -40,14 +31,14 @@ class NotebookGitAttachmentMetadataControllerTest extends NotebookGitWebContentC
             List.of(
                 new NotebookGitProposalFile("Note.md", NOTE),
                 new NotebookGitProposalFile(".gitattributes", AUTHORED_ATTRIBUTES),
-                new NotebookGitProposalFile("diagram.png", new byte[] {1, 2, 3}))));
+                new NotebookGitProposalFile("diagram.png", diagram))));
 
     assertThat(
         acceptedHistory(notebook).exactTree(),
         contains(
             PortableTreeEntry.ofText(".gitattributes", AUTHORED_ATTRIBUTES),
             PortableTreeEntry.ofText("Note.md", NOTE),
-            new PortableTreeEntry("diagram.png", new byte[] {1, 2, 3})));
+            new PortableTreeEntry("diagram.png", diagram)));
     assertThat(
         notebookAttachmentRepository.findByNotebook_Id(notebook.getId()).stream()
             .map(NotebookAttachment::getFilename)
@@ -71,24 +62,5 @@ class NotebookGitAttachmentMetadataControllerTest extends NotebookGitWebContentC
             .map(entry -> new String(entry.content(), StandardCharsets.UTF_8))
             .toList(),
         contains(AUTHORED_ATTRIBUTES));
-    assertThat(
-        reloadCommittedBinding(notebook.getId()).getAttachmentRepresentation(),
-        is(NotebookGitAttachmentRepresentation.RAW));
-  }
-
-  @Test
-  void legacyPointerLookingPayloadsRemainLegacyBytesOnRawNotebooks() throws Exception {
-    byte[] pointerLooking = NotebookGitLfsPointer.format(POINTER_OID, 7);
-    Notebook notebook = createLegacyRawNotebook();
-    NotebookAttachment attachment =
-        storeAcceptedAttachmentAndSnapshot(notebook, null, "legacy.bin", pointerLooking);
-
-    assertThat(attachment.getAcceptedGitContent(), equalTo(pointerLooking));
-    assertThat(
-        reloadCommittedBinding(notebook.getId()).getAttachmentRepresentation(),
-        is(NotebookGitAttachmentRepresentation.RAW));
-    assertThat(
-        acceptedHistory(notebook).exactTree(),
-        contains(new PortableTreeEntry("legacy.bin", pointerLooking)));
   }
 }

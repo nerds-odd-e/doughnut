@@ -429,24 +429,6 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/Mcq"
-  /api/testability/force_raw_notebook_git_binding_for_testability:
-    post:
-      tags:
-      - notebook-git-testability-controller
-      operationId: forceRawNotebookGitBindingForTestability
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/NotebookNameRequest"
-        required: true
-      responses:
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                type: string
   /api/testability/feature_toggle:
     get:
       tags:
@@ -479,24 +461,6 @@ paths:
               schema:
                 type: array
                 items: {}
-  /api/testability/convert_raw_notebook_to_lfs_for_testability:
-    post:
-      tags:
-      - notebook-git-testability-controller
-      operationId: convertRawNotebookToLfsForTestability
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/NotebookNameRequest"
-        required: true
-      responses:
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                type: string
   /api/testability/clean_db_and_reset_testability_settings:
     post:
       tags:
@@ -939,7 +903,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: "#/components/schemas/NoteImageUploadResult"
+                $ref: "#/components/schemas/NoteRealm"
   /api/notes/semantic-search:
     post:
       tags:
@@ -4518,15 +4482,6 @@ components:
           format: binary
       required:
       - uploadImage
-    NoteImageUploadResult:
-      type: object
-      properties:
-        imagePath:
-          type: string
-          description: The filename the upload wrote into the note's frontmatter `image:`;
-            the picture is a file of that name in the note's folder.
-      required:
-      - imagePath
     NotebookUpdateRequest:
       type: object
       properties:
