@@ -236,6 +236,8 @@ No executable plan or implementation is authorized by this seed.
   Local deletion is an available workaround, so web convenience follows the
   authoring handoffs. Removal from the current tree is not Git history erasure.
 - **Effort hypothesis:** M, low confidence until referenced-file behavior is chosen.
+  A Book's source file is one referenced file: local publish already refuses
+  deleting it and asks the owner to remove the Book on the web first.
 - **Depends on:** Stories 6 and 1; specialized image display is not required.
 - **Safe stopping point:** Current-tree cleanup works without deleting referring
   notes or learning data. No new Trash, restoration, or automatic reference

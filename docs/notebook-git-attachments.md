@@ -99,6 +99,32 @@ rule (owners, subscribers, and Bazaar readers, even logged out; another user is
 refused, and an anonymous request for a private notebook's image must log in),
 until they are retired. No new picture is stored there.
 
+
+A Book's source file (PDF or EPUB) is an ordinary file at the notebook root.
+Attaching a Book on the web stores the bytes in the notebook's content store
+first, then accepts the file's LFS pointer together with the Book in one web
+commit ("Attach book: <name>"). Donut chooses the name: `<book name>.pdf` or
+`<book name>.epub`, or `book.<format>` when the book name is not a plain
+filename, then the next free numbered name before the extension when a file,
+note or folder at the root of the accepted tree already uses it
+(`Physics Primer (2).pdf`). The Book refers to that root-relative path
+(`book.source_file_path`), and Book reading serves the file through the one
+attachment reader. The Book size limit (100 MB) applies instead of the 10 MiB
+limit for new payloads. A notebook without a Git binding saves the file row and
+the Book without a commit. Removing the Book removes its reading structure and
+progress but leaves the file, and the accepted tree, unchanged.
+
+Books attached before this existed are moved into their notebooks at application
+startup: each Book without a path has its bytes copied from the separate Book
+storage into the content store and placed under the same naming rule in one
+Donut System commit per notebook ("Move the book's source file into the
+notebook"). Its layout, blocks, reading progress and last-updated time are
+unchanged, and the separate Book storage keeps its copy until it is retired.
+Each notebook moves in its own transaction; a notebook whose move fails is
+logged and left for the next startup, and the others still move. Running the
+move again changes nothing. Until a Book is moved it keeps reading from the
+separate Book storage.
+
 Publication checks every attachment in the contiguous first-parent proposal
 range, not only the tip, by the
 [Git LFS acceptance rule](./notebook-git-lfs.md#decision), including its
@@ -109,6 +135,10 @@ rule at each historical path, so a later rename to Markdown does not hide an
 earlier oversized attachment. Payloads already accepted as attachments in the
 same notebook's retained history remain reusable by content identity. To fix a
 refused proposal, rewrite only unpublished commits.
+
+Publication also refuses (409) a proposal that deletes, renames or changes the
+file a Book reads from, naming the file and the Book: the owner removes the
+Book on the web first. A rename counts as removing the old path.
 
 ## Placement and ownership
 
