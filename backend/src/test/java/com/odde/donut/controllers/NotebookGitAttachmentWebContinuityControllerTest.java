@@ -18,13 +18,13 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /** Web note and folder edits keep LFS attributes, pointer identity, and learning. */
-class NotebookGitAttachmentLfsWebContinuityControllerTest
+class NotebookGitAttachmentWebContinuityControllerTest
     extends NotebookGitAttachmentSizeAdmissionTestSupport {
 
   @Autowired FolderRepository folderRepository;
 
   @Test
-  void lfsWebEditsAndFolderOpsPreserveAttributesFileIdentityAndLearning() throws Exception {
+  void webEditsAndFolderOpsPreserveAttributesFileIdentityAndLearning() throws Exception {
     Notebook notebook = createGitBackedNotebook();
     NotebookGitBinding empty = snapshotCurrentPortableTree(notebook);
     byte[] payload = {(byte) 0xAB, (byte) 0xCD};

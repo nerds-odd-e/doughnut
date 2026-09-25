@@ -159,7 +159,7 @@ class NotebookGitHistoryResetControllerTest extends NotebookGitControllerTestBas
             new PortableTreeEntry("Diagram.png", DIAGRAM_BYTES),
             ofText("Overview.md", OVERVIEW_CONTENT),
             ofText("reference.json", REFERENCE_JSON));
-    List<PortableTreeEntry> tip = committedOnLfs(notebook, current);
+    List<PortableTreeEntry> tip = asCommitted(notebook, current);
     controller.publishNotebookGitProposal(
         notebook.getId(),
         markdownOnly.getAcceptedGitObjectId(),

@@ -258,7 +258,7 @@ the next web note save. Drop the redundant `reference.json`. Delete
 
 ### 6. Test names no longer mention a representation choice
 Type: Structure
-Status: planned
+Status: done
 Proof: all `NotebookGitAttachment*ControllerTest`,
 `NotebookGitHistoryResetControllerTest` and
 `NotebookGitWebContentSaveCostControllerTest` green;

@@ -73,7 +73,7 @@ abstract class NotebookGitControllerTestBase extends NotebookGitAcceptedObjectSt
     return makeMe.aUser(testFixturePrefix + "additional-user").please();
   }
 
-  /** Real product creation: LFS representation and initial {@code .gitattributes}. */
+  /** Real product creation, including the initial {@code .gitattributes}. */
   Notebook createGitBackedNotebook() throws UnexpectedNoAccessRightException {
     return createGitBackedNotebook("Git Backed Notebook");
   }
@@ -94,7 +94,7 @@ abstract class NotebookGitControllerTestBase extends NotebookGitAcceptedObjectSt
    * {@code tree} as the product commits it: each attachment's payload stored in the content store
    * and replaced by its pointer; notes, empty-folder markers, and Git metadata stay as they are.
    */
-  List<PortableTreeEntry> committedOnLfs(Notebook notebook, List<PortableTreeEntry> tree)
+  List<PortableTreeEntry> asCommitted(Notebook notebook, List<PortableTreeEntry> tree)
       throws IOException {
     List<PortableTreeEntry> committed = new ArrayList<>();
     for (PortableTreeEntry entry : tree) {

@@ -22,10 +22,10 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
- * An LFS notebook whose accepted history still holds a raw file from before it moved to LFS keeps
- * that history readable and keeps accepting new pictures.
+ * A notebook whose accepted history still holds a raw file from before attachments became pointers
+ * keeps that history readable and keeps accepting new pictures.
  */
-class NotebookGitAttachmentLfsRawHistoryControllerTest
+class NotebookGitAttachmentRawHistoryControllerTest
     extends NotebookGitWebContentControllerTestBase {
 
   private static final byte[] DIAGRAM = {(byte) 0x89, 'P', 'N', 'G', 1};
