@@ -7,7 +7,6 @@ import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.not;
 
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.NotebookAttachment;
@@ -42,18 +41,6 @@ class NotebookGitAttachmentCreationControllerTest
         contains(
             PortableTreeEntry.ofText(
                 NotebookGitAttributes.PATH, NotebookGitAttributes.INITIAL_CONTENT)));
-  }
-
-  @Test
-  void demotedExistingNotebooksStayRawWithoutAttributesIncludingNeverCloned() throws Exception {
-    Notebook notebook = createLegacyRawNotebook();
-    NotebookGitBinding binding = reloadCommittedBinding(notebook.getId());
-
-    assertThat(binding.getAttachmentRepresentation(), is(NotebookGitAttachmentRepresentation.RAW));
-    assertThat(acceptedHistory(notebook).exactTree(), empty());
-    assertThat(
-        acceptedHistory(notebook).exactTree().stream().map(PortableTreeEntry::path).toList(),
-        not(contains(NotebookGitAttributes.PATH)));
   }
 
   @Test

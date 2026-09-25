@@ -56,7 +56,6 @@ public class WebNoteImageUploadService {
   public Note upload(Note note, MultipartFile picture, Timestamp updatedAt)
       throws IOException, UnexpectedNoAccessRightException {
     Integer notebookId = note.getNotebook().getId();
-    requireLfs(notebookId);
     String filename = picture.getOriginalFilename();
     requireFreePlainFilename(note, filename);
     byte[] pointer = attachmentContent.storeAsLfsPointer(notebookId, picture.getBytes());
@@ -74,13 +73,6 @@ public class WebNoteImageUploadService {
         },
         editing -> "Upload note image: " + filename,
         updatedAt);
-  }
-
-  private void requireLfs(Integer notebookId) {
-    if (!bindingRepository.storesAttachmentsAsLfs(notebookId)) {
-      throw new IllegalStateException(
-          "Notebook " + notebookId + " does not store its files as Git LFS");
-    }
   }
 
   /**

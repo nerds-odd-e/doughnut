@@ -7,14 +7,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
-import com.odde.donut.entities.NotebookGitAttachmentRepresentation;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
-import com.odde.donut.services.notebookAttachment.NotebookAttachmentContent;
-import com.odde.donut.services.notebookGit.NotebookGitLfsPointer;
-import java.io.ByteArrayInputStream;
 import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.util.HexFormat;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -28,7 +22,6 @@ import org.springframework.web.server.ResponseStatusException;
 
 class NoteAttachmentImageControllerTest extends ControllerTestBase {
   @Autowired NoteAttachmentImageController controller;
-  @Autowired NotebookAttachmentContent notebookAttachmentContent;
   final byte[] png = "png bytes".getBytes(StandardCharsets.UTF_8);
   Notebook notebook;
   Folder physics;
@@ -97,20 +90,6 @@ class NoteAttachmentImageControllerTest extends ControllerTestBase {
     makeMe.anAttachment("x.png").atRootOf(notebook).content(png).please();
 
     assertThat(refusal(path), equalTo(HttpStatus.NOT_FOUND));
-  }
-
-  @Test
-  void lfsNotebookServesTheStoredBytesNotThePointer() throws Exception {
-    makeMe
-        .aGitBindingFor(notebook)
-        .representation(NotebookGitAttachmentRepresentation.LFS)
-        .please();
-    String oid = HexFormat.of().formatHex(MessageDigest.getInstance("SHA-256").digest(png));
-    file(physics, "force-diagram.png", NotebookGitLfsPointer.format(oid, png.length));
-    notebookAttachmentContent.store(
-        notebook.getId(), oid, png.length, new ByteArrayInputStream(png));
-
-    assertThat(controller.showAttachmentImage(force, "force-diagram.png").getBody(), equalTo(png));
   }
 
   @Nested

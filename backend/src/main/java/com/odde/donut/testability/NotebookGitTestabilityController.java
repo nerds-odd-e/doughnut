@@ -76,9 +76,9 @@ class NotebookGitTestabilityController {
   }
 
   /**
-   * Testability-only: stores a file at a notebook path as the product does on an LFS notebook
-   * (payload in the content store, pointer in the accepted tree), creating missing folders, then
-   * resnapshots the accepted Git binding so the file is part of the accepted tree.
+   * Testability-only: stores a file at a notebook path as the product does (payload in the content
+   * store, pointer in the accepted tree), creating missing folders, then resnapshots the accepted
+   * Git binding so the file is part of the accepted tree.
    */
   @PostMapping("/put_notebook_file_for_testability")
   @Transactional

@@ -130,7 +130,15 @@ publish. Enables slice 3.
 
 ### 3. Reading a file no longer asks how its notebook stores files
 Type: Structure
-Status: planned
+Status: done
+Accepted proof: focused controller run (`NotebookAttachmentControllerTest`,
+`NoteAttachmentImageControllerTest`, `NotebookGitAttachment*`,
+`NoteControllerUploadNoteImageTests`, `NotebookFolderListingControllerTest`,
+`NotebookGitWeb*`, `NotebookGitHistoryResetControllerTest`) 159 tests green;
+`git grep 'createLegacyRawNotebook\|Representation.RAW\|storesAttachmentsAsLfs' backend/src`
+empty. Story 4's non-LFS upload refusal and `storesAttachmentsAsLfs` are gone;
+`NotebookAttachmentBuilder` now stores content through the content store and
+keeps a pointer in the row (`pointerOnly` for missing-bytes cases).
 Proof: `NotebookAttachmentControllerTest`, `NoteAttachmentImageControllerTest`,
 `NotebookGitAttachmentLfsWebContinuityControllerTest` and the slice 1 test
 green; `git grep -n 'createLegacyRawNotebook\|Representation.RAW' backend/src`
@@ -158,7 +166,9 @@ SELECT notebook_id FROM notebook_git_binding WHERE attachment_representation = '
 ```
 
 If any remain, leave the raw-capable release running and resolve those
-notebooks before deployment. A successful `v1.3.23` deploy alone is not this
+notebooks before deployment. The gate covers the whole raw-free release, not only
+slice 4: from slice 3 on, reads treat every non-empty row as an LFS pointer, so
+a remaining raw row would fail to download. Slices 1–4 ship together. A successful `v1.3.23` deploy alone is not this
 check: the startup converter logs individual failures and leaves them raw.
 
 Behavior: production deploys this release → migration `V300000342` refuses,
@@ -211,6 +221,8 @@ gone, keeping the drop assertion.
 
 ## Learnings
 
+- From slice 3, a raw row fails loudly on download; the pre-deploy RAW query
+  gates the release carrying slices 1–4 together.
 - The existing `commitOnTopOf`/`seedAcceptedHistory` helpers express a
   raw-then-LFS accepted history; slices 2 and 3 can rely on the slice 1 test
   when they remove the raw branches.

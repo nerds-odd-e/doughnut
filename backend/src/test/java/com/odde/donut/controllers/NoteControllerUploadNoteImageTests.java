@@ -154,19 +154,6 @@ class NoteControllerUploadNoteImageTests extends NotebookGitWebContentController
   }
 
   @Test
-  void aNotebookWithoutLfsFilesRefusesTheUploadLoudly() throws Exception {
-    Notebook notebook = createLegacyRawNotebook();
-    Note moon = makeMe.aNote("Moon").notebook(notebook).please();
-    List<String> commitsBefore = acceptedHistory(notebook).commits();
-
-    assertThrows(
-        IllegalStateException.class,
-        () -> upload(moon, makeMe.anUploadedImage().toMultiplePartFilePlease()));
-
-    assertThat(acceptedHistory(notebook).commits(), equalTo(commitsBefore));
-  }
-
-  @Test
   void shouldNotAllowUploadForNoteBelongingToAnotherUser() {
     Note note = makeMe.aNote().notebookOwnedBy(createFixtureUser()).please();
     assertThrows(

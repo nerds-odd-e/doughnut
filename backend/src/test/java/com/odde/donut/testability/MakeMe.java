@@ -9,6 +9,7 @@ import com.odde.donut.services.NoteAliasIndexService;
 import com.odde.donut.services.NoteEmbeddingService;
 import com.odde.donut.services.NoteLevelIndexService;
 import com.odde.donut.services.book.BookStorage;
+import com.odde.donut.services.notebookAttachment.NotebookAttachmentContent;
 import com.odde.donut.testability.builders.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -20,6 +21,7 @@ public class MakeMe extends MakeMeWithoutDB {
   @Autowired public NoteAliasIndexService noteAliasIndexService;
   @Autowired public NoteLevelIndexService noteLevelIndexService;
   @Autowired public BookStorage bookStorage;
+  @Autowired public NotebookAttachmentContent notebookAttachmentContent;
   @Autowired public TestabilitySettings testabilitySettings;
 
   private MakeMe() {}

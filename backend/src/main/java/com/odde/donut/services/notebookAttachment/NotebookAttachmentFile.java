@@ -1,25 +1,19 @@
 package com.odde.donut.services.notebookAttachment;
 
 import com.odde.donut.entities.NotebookAttachment;
-import com.odde.donut.entities.repositories.NotebookGitBindingRepository;
 import com.odde.donut.services.notebookGit.NotebookGitLfsPointer;
 import java.util.Optional;
 import org.springframework.stereotype.Service;
 
 /**
- * The file a notebook attachment row stands for: its size and exact bytes. The notebook's
- * attachment representation decides how the row's accepted Git content is read; in an LFS notebook
- * a non-empty row is a pointer whose bytes live in the content store.
+ * The file a notebook attachment row stands for: its size and exact bytes. A non-empty row is an
+ * LFS pointer whose bytes live in the content store.
  */
 @Service
 public class NotebookAttachmentFile {
-  private final NotebookGitBindingRepository notebookGitBindingRepository;
   private final NotebookAttachmentContent notebookAttachmentContent;
 
-  public NotebookAttachmentFile(
-      NotebookGitBindingRepository notebookGitBindingRepository,
-      NotebookAttachmentContent notebookAttachmentContent) {
-    this.notebookGitBindingRepository = notebookGitBindingRepository;
+  public NotebookAttachmentFile(NotebookAttachmentContent notebookAttachmentContent) {
     this.notebookAttachmentContent = notebookAttachmentContent;
   }
 
@@ -42,11 +36,10 @@ public class NotebookAttachmentFile {
         .orElse(attachment.getAcceptedGitContent());
   }
 
-  /** The row's pointer when its notebook stores attachments as LFS and the file is not empty. */
+  /** The row's pointer when the file is not empty. */
   private Optional<NotebookGitLfsPointer.Parsed> lfsPointer(NotebookAttachment attachment) {
     byte[] content = attachment.getAcceptedGitContent();
-    if (NotebookGitLfsPointer.isEmptyFile(content)
-        || !notebookGitBindingRepository.storesAttachmentsAsLfs(attachment.getNotebook().getId())) {
+    if (NotebookGitLfsPointer.isEmptyFile(content)) {
       return Optional.empty();
     }
     return Optional.of(NotebookGitLfsPointer.parse(content).orElseThrow());
