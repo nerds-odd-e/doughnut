@@ -228,6 +228,9 @@ gone, keeping the drop assertion.
 
 ## Learnings
 
+- CI repair after slices 2–3: the non-prod in-memory attachment content store
+  kept every test's LFS payloads for the whole run and the backend suite ran out
+  of heap; `ControllerTestBase`'s `@AfterEach` now clears it.
 - From slice 3, a raw row fails loudly on download; the pre-deploy RAW query
   gates the release carrying slices 1–4 together.
 - The existing `commitOnTopOf`/`seedAcceptedHistory` helpers express a

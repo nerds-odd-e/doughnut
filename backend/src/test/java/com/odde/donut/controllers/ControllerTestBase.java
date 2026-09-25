@@ -10,6 +10,7 @@ import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.Note;
 import com.odde.donut.services.AuthorizationService;
 import com.odde.donut.services.GithubService;
+import com.odde.donut.services.notebookAttachment.InMemoryNotebookAttachmentContent;
 import com.odde.donut.services.notebookGit.SqlStatementCallLogDataSourceConfig;
 import com.odde.donut.testability.MakeMe;
 import com.odde.donut.testability.TestabilitySettings;
@@ -39,9 +40,10 @@ public abstract class ControllerTestBase {
   }
 
   @AfterEach
-  void cleanupTestabilitySettings() {
+  void cleanupSharedTestState() {
     testabilitySettings.timeTravelTo(null);
     testabilitySettings.setOpenAiTokenOverride(null);
+    ((InMemoryNotebookAttachmentContent) makeMe.notebookAttachmentContent).clear();
   }
 
   /** See {@link MakeMe#authorReferencingContent(Note, String)}. */
