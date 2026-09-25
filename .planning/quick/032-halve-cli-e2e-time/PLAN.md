@@ -140,6 +140,23 @@ baseline worktree at `e552481e71` vs this branch after slices 1–3 and 5:
 Mean wall 9:29 → 4:53 (−48%); summed scenario time −40%. Needs a quiet-machine
 confirmation against the 4:09 baseline.
 
+After slice 4 (all five slices), same A/B, 1-minute load at start:
+
+| Run | Load | Wall | Cypress | Summed | Cases |
+|---|---|---|---|---|---|
+| A1 base | 84 | 12:37 | 9:26 | 565.2s | 45 |
+| B1 new | 30 | 4:56 | 3:44 | 223.9s | 45 |
+| B2 new | 29 | 3:11 | 2:33 | 153.3s | 45 |
+| A2 base | 11 | 4:35 | 4:04 | 243.8s | 45 |
+| B3 new | 14→22 | 4:07 | 3:25 | 204.5s | 45 |
+
+Inconclusive against the halving target: candidate runs vary 153–224s summed
+under the same code (every feature slower in B3 than B2), so external load
+dominates. Best like-for-like pair (A2 vs B2/B3): −16% to −37% summed.
+Fixed startup outside Cypress is ~40s of wall (backend itself starts in ~9s;
+the rest is Gradle compile, mocks, Vite and Cypress launch), shared by all E2E
+batches.
+
 ## Current decisions
 
 - Local E2E keeps the Vite dev server (HMR promise); not changed here.
