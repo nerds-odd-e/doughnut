@@ -244,7 +244,7 @@ moved tests from `NotebookGitAttachmentLfsPublicationControllerTest`.
 
 ### 5. One publication test proves the exact accepted tree
 Type: Structure
-Status: planned
+Status: done
 Proof: `NotebookGitAttachmentPublicationControllerTest` green; the publication
 example in the proof table is asserted in one test.
 
