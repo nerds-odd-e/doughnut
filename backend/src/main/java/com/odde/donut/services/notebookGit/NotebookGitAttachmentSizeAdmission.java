@@ -173,8 +173,6 @@ final class NotebookGitAttachmentSizeAdmission {
   private static ResponseStatusException rawPayloadRefusal(String path) {
     return new ResponseStatusException(
         HttpStatus.BAD_REQUEST,
-        "Attachment \""
-            + path
-            + "\" must be a Git LFS pointer or empty file when the notebook uses LFS.");
+        "Attachment \"" + path + "\" must be a Git LFS pointer or empty file.");
   }
 }

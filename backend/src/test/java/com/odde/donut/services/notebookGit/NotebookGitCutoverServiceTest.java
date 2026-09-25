@@ -8,7 +8,6 @@ import static org.hamcrest.Matchers.not;
 
 import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.Notebook;
-import com.odde.donut.entities.NotebookGitAttachmentRepresentation;
 import com.odde.donut.entities.NotebookGitBinding;
 import com.odde.donut.entities.repositories.FolderRepository;
 import com.odde.donut.entities.repositories.NotebookGitBindingRepository;
@@ -60,8 +59,6 @@ class NotebookGitCutoverServiceTest {
 
     NotebookGitBinding binding =
         notebookGitBindingRepository.findByNotebook_Id(notebook.getId()).orElseThrow();
-    assertThat(
-        binding.getAttachmentRepresentation(), equalTo(NotebookGitAttachmentRepresentation.LFS));
 
     List<PortableTreeEntry> expectedEntries =
         List.of(
@@ -131,8 +128,6 @@ class NotebookGitCutoverServiceTest {
         notebookGitBindingRepository.findByNotebook_Id(notebook.getId()).orElseThrow();
     assertThat(binding.getId(), equalTo(initialBindingId));
     assertThat(binding.getAcceptedGitObjectId(), not(equalTo(initialGitObjectId)));
-    assertThat(
-        binding.getAttachmentRepresentation(), equalTo(NotebookGitAttachmentRepresentation.LFS));
 
     List<PortableTreeEntry> expectedEntries =
         List.of(

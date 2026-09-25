@@ -155,7 +155,14 @@ save. Enables slice 4: no code reads the representation.
 
 ### 4. Bindings no longer record a representation (first release)
 Type: Behavior
-Status: planned
+Status: done
+Accepted proof: `V300000342DefaultNotebookGitBindingAttachmentRepresentationToLfsTest`
+(`aRawBindingRefusesNamingItsNotebookAndLeavesTheDefault`,
+`withoutRawBindingsNewBindingsStoreLfsFromTheDefault`) green; full backend
+suite green as two package groups (2640 tests; a single `pnpm backend:test`
+run runs out of test-worker heap locally, also on the base commit). The CLI's
+own copy of the raw-payload refusal (`cli/src/commands/notebook/notebookPublishLfsSelection.ts`)
+still says "when the notebook uses LFS"; left as is.
 Proof: migration test for examples 2 and 1 above; full backend suite green.
 
 Release gate: before deploying the raw-free code, run a read-only production

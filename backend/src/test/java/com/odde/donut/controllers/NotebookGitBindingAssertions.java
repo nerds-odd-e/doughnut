@@ -3,10 +3,8 @@ package com.odde.donut.controllers;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.is;
 
 import com.odde.donut.entities.Notebook;
-import com.odde.donut.entities.NotebookGitAttachmentRepresentation;
 import com.odde.donut.entities.NotebookGitBinding;
 import com.odde.donut.entities.repositories.NotebookGitBindingRepository;
 import com.odde.donut.services.notebookGit.NotebookGitAttributes;
@@ -34,7 +32,6 @@ final class NotebookGitBindingAssertions {
       throws Exception {
     NotebookGitBinding binding =
         notebookGitBindingRepository.findByNotebook_Id(notebook.getId()).orElseThrow();
-    assertThat(binding.getAttachmentRepresentation(), is(NotebookGitAttachmentRepresentation.LFS));
     byte[] acceptedBundle = notebookController.downloadNotebookGitBundle(notebook).getBody();
 
     try (InMemoryRepository readBack = new InMemoryRepository(new DfsRepositoryDescription())) {
