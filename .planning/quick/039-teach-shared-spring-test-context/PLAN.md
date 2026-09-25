@@ -2,7 +2,7 @@
 
 **Identity:** quick/039-teach-shared-spring-test-context/PLAN.md
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"400f64523b23560ca9a6deb23a3f4c9578298d2ff9dee102c14d7dcfd5550fec"}}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"f609c9148f18788e71b02c02669dc63030ab79c7acf8ce62125807b6f519f7c2"}}
 ```
 
 ## Source
@@ -10,8 +10,8 @@
 - Kind: bounded retrospective correction; no seed.
 - Corrects the execution of the owner's 2026-09-25 request
   `/dough-test-optimization backend unit test` (no story or backlog identity),
-  plan `.planning/quick/038-share-backend-test-context/PLAN.md` at `db643ef844`
-  (deleted at wrap-up). Reviewed commits on `story/037-share-backend-test-context`
+  plan recoverable at
+  `ecc680a90e:.planning/quick/038-share-backend-test-context/PLAN.md`. Reviewed commits on `story/037-share-backend-test-context`
   (base `5c8bb75741`): `0f8709dfc1` (plan), `c7ea84e3a7`, `7cb7c300b1`,
   `6455811f4d`, `5bf185ba0d`, `db643ef844`.
 - Findings re-verified at `db643ef844` (2026-09-26):
