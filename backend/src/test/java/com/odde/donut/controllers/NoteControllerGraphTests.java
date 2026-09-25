@@ -7,15 +7,12 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import com.odde.donut.entities.Note;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.donut.services.focusContext.FocusContextResult;
-import com.odde.donut.services.httpQuery.HttpClientAdapter;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 class NoteControllerGraphTests extends ControllerTestBase {
   @Autowired NoteController controller;
-  @MockitoBean HttpClientAdapter httpClientAdapter;
 
   Note rootNote;
 

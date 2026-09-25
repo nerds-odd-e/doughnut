@@ -8,7 +8,6 @@ import static org.mockito.Mockito.when;
 
 import com.odde.donut.entities.Note;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
-import com.openai.client.OpenAIClient;
 import com.openai.models.embeddings.CreateEmbeddingResponse;
 import com.openai.models.embeddings.EmbeddingCreateParams;
 import com.openai.services.blocking.EmbeddingService;
@@ -18,12 +17,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mockito;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 class SearchControllerSemanticTests extends SearchControllerTestBase {
-  @MockitoBean(name = "officialOpenAiClient")
-  OpenAIClient officialClient;
-
   Note referenceNote;
 
   @BeforeEach

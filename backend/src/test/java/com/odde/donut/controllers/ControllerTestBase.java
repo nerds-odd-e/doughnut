@@ -10,13 +10,16 @@ import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.Note;
 import com.odde.donut.services.AuthorizationService;
 import com.odde.donut.services.GithubService;
+import com.odde.donut.services.httpQuery.HttpClientAdapter;
 import com.odde.donut.services.notebookAttachment.InMemoryNotebookAttachmentContent;
 import com.odde.donut.services.notebookGit.SqlStatementCallLogDataSourceConfig;
 import com.odde.donut.testability.MakeMe;
 import com.odde.donut.testability.TestabilitySettings;
+import com.openai.client.OpenAIClient;
 import org.junit.jupiter.api.AfterEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.convention.TestBean;
@@ -24,6 +27,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.transaction.annotation.Transactional;
 
 @SpringBootTest
+@AutoConfigureMockMvc
 @ActiveProfiles("test")
 @Transactional
 @Import(SqlStatementCallLogDataSourceConfig.class)
@@ -34,6 +38,10 @@ public abstract class ControllerTestBase {
 
   @TestBean protected CurrentUser currentUser;
   @MockitoBean protected GithubService githubService;
+  @MockitoBean protected HttpClientAdapter httpClientAdapter;
+
+  @MockitoBean(name = "officialOpenAiClient")
+  protected OpenAIClient officialClient;
 
   static CurrentUser currentUser() {
     return new ThreadLocalCurrentUser();

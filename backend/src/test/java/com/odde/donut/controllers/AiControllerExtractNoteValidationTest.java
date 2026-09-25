@@ -7,7 +7,6 @@ import com.odde.donut.entities.Note;
 import com.odde.donut.services.ai.NoteRefinementLayout;
 import com.odde.donut.services.ai.NoteRefinementLayoutItems;
 import com.odde.donut.testability.OpenAiStructuredResponseMock;
-import com.openai.client.OpenAIClient;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -16,14 +15,10 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.web.server.ResponseStatusException;
 
 class AiControllerExtractNoteValidationTest extends ControllerTestBase {
   @Autowired AiController controller;
-
-  @MockitoBean(name = "officialOpenAiClient")
-  OpenAIClient officialClient;
 
   @BeforeEach
   void setup() {

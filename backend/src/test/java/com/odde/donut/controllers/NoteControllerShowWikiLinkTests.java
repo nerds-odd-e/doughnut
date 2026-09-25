@@ -7,18 +7,14 @@ import com.odde.donut.controllers.dto.NoteRealm;
 import com.odde.donut.controllers.dto.WikiLink;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
-import com.odde.donut.entities.User;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
-import com.odde.donut.services.httpQuery.HttpClientAdapter;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 class NoteControllerShowWikiLinkTests extends ControllerTestBase {
   @Autowired NoteController controller;
-  @MockitoBean HttpClientAdapter httpClientAdapter;
 
   @BeforeEach
   void setup() {
@@ -127,32 +123,6 @@ class NoteControllerShowWikiLinkTests extends ControllerTestBase {
     assertThat(
         wikiLinks.stream().map(WikiLink::getDestinationNoteId).toList(),
         contains(hiragana.getId(), katakana.getId()));
-  }
-
-  @Test
-  void shouldSkipUnreadableLowestIdAliasCandidateForReadableTarget()
-      throws UnexpectedNoAccessRightException {
-    User secretOwner = makeMe.aUser().please();
-    String sharedNotebookName = "Shared Notebook";
-    Notebook secretNotebook =
-        makeMe.aNotebook().creatorAndOwner(secretOwner).name(sharedNotebookName).please();
-    makeMe.aNote().title("hidden").notebook(secretNotebook).aliases("term").please();
-
-    Notebook readableNotebook =
-        makeMe.aNotebook().creatorAndOwner(currentUser.getUser()).name(sharedNotebookName).please();
-    makeMe.aBazaarNotebook(readableNotebook).please();
-    Note readableTarget =
-        makeMe.aNote().title("visible").notebook(readableNotebook).aliases("term").please();
-
-    Note viewerNote =
-        makeMe
-            .aNote()
-            .notebookOwnedBy(currentUser.getUser())
-            .content("Text [[" + sharedNotebookName + ":term]].")
-            .please();
-    assertThat(
-        showWithWikiTitles(viewerNote).getWikiLinks().get(0).getDestinationNoteId(),
-        equalTo(readableTarget.getId()));
   }
 
   @Test

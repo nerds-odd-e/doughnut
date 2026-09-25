@@ -18,7 +18,6 @@ import com.odde.donut.services.book.BookStorage;
 import com.odde.donut.services.book.EpubLocator;
 import com.odde.donut.services.book.PdfLocator;
 import com.odde.donut.testability.OpenAiStructuredResponseMock;
-import com.openai.client.OpenAIClient;
 import jakarta.persistence.EntityManager;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -31,16 +30,12 @@ import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.multipart.MultipartFile;
 
 abstract class NotebookBooksControllerTestBase extends ControllerTestBase {
 
   static final byte[] STUB_PDF_BYTES = new byte[] {1};
-
-  @MockitoBean(name = "officialOpenAiClient")
-  OpenAIClient officialOpenAiClient;
 
   @Autowired NotebookBooksController controller;
   @Autowired BookRepository bookRepository;
@@ -56,7 +51,7 @@ abstract class NotebookBooksControllerTestBase extends ControllerTestBase {
   @BeforeEach
   void setup() {
     currentUser.setUser(makeMe.aUser().please());
-    openAiStructuredResponseMock = new OpenAiStructuredResponseMock(officialOpenAiClient);
+    openAiStructuredResponseMock = new OpenAiStructuredResponseMock(officialClient);
   }
 
   Notebook myNotebook() {

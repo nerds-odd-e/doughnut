@@ -7,17 +7,14 @@ import com.odde.donut.controllers.dto.AnswerSpellingDTO;
 import com.odde.donut.controllers.dto.SpellingVerificationResult;
 import com.odde.donut.entities.Note;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
-import com.odde.donut.services.httpQuery.HttpClientAdapter;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 class NoteControllerVerifySpellingTests extends ControllerTestBase {
   @Autowired NoteController controller;
-  @MockitoBean HttpClientAdapter httpClientAdapter;
 
   @BeforeEach
   void setup() {

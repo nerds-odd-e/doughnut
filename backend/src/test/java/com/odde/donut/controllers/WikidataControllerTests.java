@@ -10,7 +10,6 @@ import static org.mockito.ArgumentMatchers.any;
 import com.odde.donut.controllers.dto.WikidataEntityData;
 import com.odde.donut.controllers.dto.WikidataSearchEntity;
 import com.odde.donut.exceptions.WikidataServiceErrorException;
-import com.odde.donut.services.httpQuery.HttpClientAdapter;
 import com.odde.donut.testability.MakeMeWithoutDB;
 import java.io.IOException;
 import java.net.URI;
@@ -22,12 +21,10 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.platform.commons.util.StringUtils;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.validation.BindException;
 
 class WikidataControllerTests extends ControllerTestBase {
   @Autowired WikidataController controller;
-  @MockitoBean HttpClientAdapter httpClientAdapter;
 
   MakeMeWithoutDB wikidataJson = new MakeMeWithoutDB();
 

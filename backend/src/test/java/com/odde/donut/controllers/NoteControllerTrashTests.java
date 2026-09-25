@@ -15,18 +15,15 @@ import com.odde.donut.entities.Note;
 import com.odde.donut.entities.repositories.MemoryTrackerRepository;
 import com.odde.donut.exceptions.ApiException;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
-import com.odde.donut.services.httpQuery.HttpClientAdapter;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 class NoteControllerTrashTests extends ControllerTestBase {
   @Autowired NoteController controller;
   @Autowired MemoryTrackerController memoryTrackerController;
   @Autowired MemoryTrackerRepository memoryTrackerRepository;
   @Autowired TextContentController textContentController;
-  @MockitoBean HttpClientAdapter httpClientAdapter;
 
   @BeforeEach
   void setup() {

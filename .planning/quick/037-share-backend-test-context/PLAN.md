@@ -112,9 +112,17 @@ and must stub `officialClient.embeddings()` instead.
 
 ### 1. Controller tests share the external-service mocks and MockMvc
 Type: Structure
-Status: planned
+Status: done
 Expected: −3 boots (OpenAIClient, HttpClientAdapter, MockMvc variants merge
 into the base context).
+Result: boots ~21 → ~15 (two more than expected:
+`NotebookRootNoteCreationWithWikidataTests` and `DisplayNameNormalizationMvcTest`
+now match `NotebookControllerTestBase`'s context). 2650 cases, 0 failures,
+2 skipped; wall 73.5s / test phase 52.0s at lower load (not a clean time
+comparison). 27 subclasses dropped their own declarations (+35/−134 lines,
+including the refactor pass moving one test from `NoteControllerShowWikiLinkTests`
+to `NoteControllerShowWikiLinkAmbiguityTests` to bring the file under 250
+lines). No test needed new stubbing.
 Proof: full `backend:test_only` passes with 2,650 cases (2 skipped); boot
 count drops by 3.
 
