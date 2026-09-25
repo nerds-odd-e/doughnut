@@ -330,7 +330,7 @@ workflows require Git LFS.
 
 ### 9. The CLI refuses a raw attachment in the server's words
 Type: Behavior
-Status: planned
+Status: done
 Pre-condition: a checkout with an unpublished commit adding a raw (non-pointer)
 attachment.
 Trigger: `donut notebook publish`.
