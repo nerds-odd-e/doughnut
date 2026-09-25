@@ -1,6 +1,9 @@
 # Fold the picture attach step back into the upload
 
 **Identity:** quick/037-fold-picture-attach-step-into-upload/PLAN.md
+```json dough-story-state
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"d045b2a91e1be7b25dfde50574a85c128496baa674574a3a6af4d6cc04d19723"}}
+```
 
 ## Source
 
