@@ -57,7 +57,7 @@ Feature: CLI notebook web and local reconciliation
       """
     And I publish the cloned checkout using the installed CLI
     Then the installed CLI reports the committed change as the accepted head
-    And I should see note "CLI Clone Notebook/Shopping list" has content "Milk, eggs, and bread"
+    And the note "CLI Clone Notebook/Shopping list" in Donut should have content "Milk, eggs, and bread"
 
   Scenario: Pulling a web-created then saved Shopping list while retaining a local Pasta edit then publishing
     When I clone the notebook "CLI Clone Notebook" into a temporary destination using the installed CLI
@@ -99,8 +99,8 @@ Feature: CLI notebook web and local reconciliation
       Simmer until al dente
 
       """
-    And note "Pasta" should have content "Boil water"
+    And the note "CLI Clone Notebook/Recipes/Pasta" in Donut should have content "Boil water"
     When I publish the cloned checkout using the installed CLI
     Then the installed CLI reports the rebased local head as the accepted head
-    And I should see note "CLI Clone Notebook/Recipes/Pasta" has content "Simmer until al dente"
-    And I should see note "CLI Clone Notebook/Shopping list" has content "Milk and eggs"
+    And the note "CLI Clone Notebook/Recipes/Pasta" in Donut should have content "Simmer until al dente"
+    And the note "CLI Clone Notebook/Shopping list" in Donut should have content "Milk and eggs"

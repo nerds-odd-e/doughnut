@@ -26,7 +26,7 @@ Feature: CLI notebook web trash
 
       Membranes
       """
-    And I assimilate the note "Cells"
+    And I assimilated one note "Cells" at the current time
     And the notebook "CLI Web Trash Notebook"'s Git binding reflects its current content
     And I capture the note id of "Cells"
     When I clone the notebook "CLI Web Trash Notebook" into a temporary destination using the installed CLI
@@ -47,14 +47,8 @@ Feature: CLI notebook web trash
 
       Membranes
       """
-    When I jump to the notebook "CLI Web Trash Notebook"
-    And I reload the notebook page
-    And I expand the children of note "_trash" in the sidebar
-    And I open the folder page for "Biology" under open parent "_trash"
-    And I open the note "Cells" from the sidebar
-    Then I should see the current note is in trash
-    And the note content should include "Membranes"
-    When I move the current note under folder "Biology" in notebook "CLI Web Trash Notebook"
+    When I route to the note "Cells"
+    And I move the current note under folder "Biology" in notebook "CLI Web Trash Notebook"
     And I pull the cloned checkout using the installed CLI
     Then the cloned checkout retains its original head as an ancestor and is clean at the accepted head
     And the cloned checkout contains exactly:
@@ -71,9 +65,13 @@ Feature: CLI notebook web trash
 
       Membranes
       """
-    When I open the original note route
-    Then I should see the current note is not in trash
-    And the note content should include "Membranes"
+    Then the original note in Donut should be "CLI Web Trash Notebook/Biology/Cells" with content:
+      """
+      Cells
+      =====
+
+      Membranes
+      """
 
   @mockBrowserTime
   Scenario: Publishing a local recovery after pulling a web trash
@@ -90,7 +88,7 @@ Feature: CLI notebook web trash
 
       Membranes
       """
-    And I assimilate the note "Cells"
+    And I assimilated one note "Cells" at the current time
     And the notebook "CLI Web Trash Notebook"'s Git binding reflects its current content
     And I capture the note id of "Cells"
     When I clone the notebook "CLI Web Trash Notebook" into a temporary destination using the installed CLI
@@ -103,6 +101,10 @@ Feature: CLI notebook web trash
     When I commit a rename of "_trash/Biology/Cells.md" to "Biology/Cells.md" and a removal of "Biology/.keep" together in the cloned checkout
     And I publish the cloned checkout using the installed CLI
     Then the installed CLI reports the committed change as the accepted head
-    When I open the original note route
-    Then I should see the current note is not in trash
-    And the note content should include "Membranes"
+    Then the original note in Donut should be "CLI Web Trash Notebook/Biology/Cells" with content:
+      """
+      Cells
+      =====
+
+      Membranes
+      """

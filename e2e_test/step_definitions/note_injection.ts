@@ -2,12 +2,7 @@
 /// <reference types="../support" />
 // @ts-check
 
-import {
-  type DataTable,
-  Given,
-  Then,
-  When,
-} from '@badeball/cypress-cucumber-preprocessor'
+import { type DataTable, Given } from '@badeball/cypress-cucumber-preprocessor'
 import start from '../start'
 
 function omitBlankOptionalInjectionFields(rows: Record<string, string>[]) {
@@ -100,24 +95,6 @@ Given('note {string} has content:', (noteTitle: string, content: string) => {
   start.testability().setInjectedNoteContent(noteTitle, content)
 })
 
-/** A change made in Donut itself, as opposed to one made in an exported markdown file. */
-When(
-  'the note {string} is changed in Donut to {string}',
-  (noteTitle: string, content: string) => {
-    start.testability().setInjectedNoteContent(noteTitle, content)
-  }
-)
-
-Then(
-  'the note {string} in Donut should still hold {string}',
-  (noteTitle: string, expected: string) => {
-    start
-      .testability()
-      .getInjectedNoteContent(noteTitle)
-      .should('equal', expected)
-  }
-)
-
 Given(
   'the notebook {string} has an empty folder {string}',
   (notebookName: string, folderName: string) => {
@@ -138,6 +115,13 @@ Given(
   'the notebook {string} has a readme-only folder {string} with readme {string}',
   (notebookName: string, folderName: string, readme: string) => {
     start.testability().createReadmeOnlyFolder(notebookName, folderName, readme)
+  }
+)
+
+Given(
+  'the notebook {string} has its folder {string} with readme {string}',
+  (notebookName: string, folderName: string, readme: string) => {
+    start.testability().setFolderReadmeContent(notebookName, folderName, readme)
   }
 )
 

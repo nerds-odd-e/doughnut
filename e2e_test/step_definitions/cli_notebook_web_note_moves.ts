@@ -1,10 +1,9 @@
 /**
- * CLI notebook web note move journey: capture the original note identity before
- * the web move and reopen the same note route after CLI publication. Steps stay
- * one-line glue to `e2e_test/start` (testability + named router helpers, ADR 0005).
+ * Note identity across CLI journeys: capture the original note id before a move, trash, or
+ * rename, then check that the same Donut note holds the published result.
  */
-import { Given, When } from '@badeball/cypress-cucumber-preprocessor'
-import router from '../start/router'
+import { Given, Then } from '@badeball/cypress-cucumber-preprocessor'
+import type NotePath from '../support/NotePath'
 import start from '../start'
 
 Given('I capture the note id of {string}', (noteTitle: string) => {
@@ -16,9 +15,15 @@ Given('I capture the note id of {string}', (noteTitle: string) => {
     })
 })
 
-When('I open the original note route', () => {
-  cy.get<number>('@capturedOriginalNoteId').then((noteId) => {
-    router().visitNamed('noteShow', { noteId })
-  })
-  start.waitUntilAppIsNotBusy()
-})
+Then(
+  'the original note in Donut should be {notepath} with content:',
+  (notePath: NotePath, expectedContent: string) => {
+    cy.get<number>('@capturedOriginalNoteId').then((noteId) => {
+      start.donutNotebookContent.expectNoteByIdAt(
+        noteId,
+        notePath.path,
+        expectedContent.trim()
+      )
+    })
+  }
+)

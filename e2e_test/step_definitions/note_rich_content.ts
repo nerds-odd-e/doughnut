@@ -8,18 +8,7 @@ import {
   Then,
   When,
 } from '@badeball/cypress-cucumber-preprocessor'
-import type NotePath from '../support/NotePath'
 import start from '../start'
-
-Then(
-  'I should see note {notepath} has content {string}',
-  (notePath: NotePath, expectedContent: string) => {
-    start
-      .navigateToNotebooksPage()
-      .navigateToPath(notePath)
-      .findNoteContent(expectedContent)
-  }
-)
 
 Then(
   'note {string} should have content {string}',

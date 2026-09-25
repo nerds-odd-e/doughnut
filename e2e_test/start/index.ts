@@ -7,6 +7,7 @@ import type NotePath from '../support/NotePath'
 import { navigateToNoteFromPath as openNoteFromPath } from './navigateNotePath'
 import testability from './testability'
 import mcpApi from './mcpApi'
+import { donutNotebookContent } from './donutNotebookContent'
 
 // === Actions ===
 import { loginActions } from './actions/loginActions'
@@ -87,6 +88,7 @@ const start = {
   form,
   questionGenerationService,
   testability,
+  donutNotebookContent,
   mcpApi,
   userController: () => UserController,
 

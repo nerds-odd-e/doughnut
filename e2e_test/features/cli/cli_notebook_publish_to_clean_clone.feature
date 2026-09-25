@@ -29,7 +29,7 @@ Feature: CLI notebook publish received by a clean clone
 
   Scenario: Publishing a folder README and notes together is received by a clean clone
     When I clone the notebook "CLI Clone Notebook" into a temporary destination using the installed CLI
-    And I create a title-only root note titled "Shopping list" in the notebook "CLI Clone Notebook"
+    And a title-only root note "Shopping list" was created in the notebook "CLI Clone Notebook"
     And I pull the cloned checkout using the installed CLI
     And I clone the notebook "CLI Clone Notebook" into a second temporary destination using the installed CLI
     And I commit the following document changes together in the cloned checkout:
@@ -156,8 +156,10 @@ Feature: CLI notebook publish received by a clean clone
       Simmer until al dente and salt the water
 
       """
-    And I open the original note route
-    And the note content on the current page should be "Simmer until al dente and salt the water"
+    And the original note in Donut should be "CLI Clone Notebook/Recipes/Pasta basics" with content:
+      """
+      Simmer until al dente and salt the water
+      """
 
   Scenario: Nested attachments follow a web folder rename into a clean clone
     When I clone the notebook "CLI Clone Notebook" into a temporary destination using the installed CLI

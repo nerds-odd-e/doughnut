@@ -90,7 +90,7 @@ Feature: CLI notebook web note changes
       """
     And I publish the cloned checkout using the installed CLI
     Then the installed CLI reports the committed change as the accepted head
-    And I should see note "CLI Clone Notebook/Biology/Cells" has content "Cells have membranes"
+    And the note "CLI Clone Notebook/Biology/Cells" in Donut should have content "Cells have membranes"
     And the cloned checkout file "Chemistry/.keep" is unchanged from its parent
 
   Scenario: Pulling nested web authoring with one pull

@@ -2,7 +2,7 @@
 /// <reference types="../support" />
 // @ts-check
 
-import { Then, When } from '@badeball/cypress-cucumber-preprocessor'
+import { Given, Then, When } from '@badeball/cypress-cucumber-preprocessor'
 import start from '../start'
 import mock_services from '../start/mock_services'
 
@@ -72,6 +72,13 @@ When(
       .addingNewNoteFromToolbar()
       .createNoteWithTitle(title)
     start.assumeNotePage(title)
+  }
+)
+
+Given(
+  'a title-only root note {string} was created in the notebook {string}',
+  (title: string, notebook: string) => {
+    start.testability().createTitleOnlyRootNote(notebook, title)
   }
 )
 

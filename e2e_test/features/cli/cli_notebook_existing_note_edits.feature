@@ -49,8 +49,8 @@ Feature: CLI notebook existing-note edits
       | Recipes/Pasta.md | ---\ntype: Note\nauthor: Marcella Hazan\n---\nSimmer until al dente |
     And I publish the cloned checkout using the installed CLI
     Then the installed CLI reports the committed change as the accepted head
-    And I should see note "CLI Clone Notebook/Overview" has content "Weekly meal plan"
-    And I should see note "CLI Clone Notebook/Recipes/Pasta" has content "Simmer until al dente"
+    And the note "CLI Clone Notebook/Overview" in Donut should have content "Weekly meal plan"
+    And the note "CLI Clone Notebook/Recipes/Pasta" in Donut should have content "Simmer until al dente"
     When I pull the second cloned checkout using the installed CLI
     Then the second cloned checkout is a clean checkout of the accepted head
     And the second cloned checkout preserves the publisher's A to C history
@@ -110,13 +110,13 @@ Feature: CLI notebook existing-note edits
       ---
       Milk and eggs
       """
-    And note "Overview" should have content "Original overview"
-    And note "Pasta" should have content "Boil water"
+    And the note "CLI Clone Notebook/Overview" in Donut should have content "Original overview"
+    And the note "CLI Clone Notebook/Recipes/Pasta" in Donut should have content "Boil water"
     When I publish the cloned checkout using the installed CLI
     Then the installed CLI reports the rebased local head as the accepted head
-    And I should see note "CLI Clone Notebook/Overview" has content "Weekly meal plan"
-    And I should see note "CLI Clone Notebook/Recipes/Pasta" has content "Simmer until al dente"
-    And I should see note "CLI Clone Notebook/Shopping list" has content "Milk and eggs"
+    And the note "CLI Clone Notebook/Overview" in Donut should have content "Weekly meal plan"
+    And the note "CLI Clone Notebook/Recipes/Pasta" in Donut should have content "Simmer until al dente"
+    And the note "CLI Clone Notebook/Shopping list" in Donut should have content "Milk and eggs"
 
   Scenario: Pulling successive web saves retains both accepted revisions
     When I clone the notebook "CLI Clone Notebook" into a temporary destination using the installed CLI
@@ -159,7 +159,7 @@ Feature: CLI notebook existing-note edits
     And I should see "Recipes/Pasta.md" in the non-interactive output
     And I should see "git rebase --continue" in the non-interactive output
     And the cloned checkout has a paused rebase conflict for "Recipes/Pasta.md"
-    And note "Pasta" should have content "Salt the water first"
+    And the note "CLI Clone Notebook/Recipes/Pasta" in Donut should have content "Salt the water first"
     When I write, stage, and continue the cloned checkout rebase with the following edit to "Recipes/Pasta.md":
       """
       ---
@@ -179,7 +179,7 @@ Feature: CLI notebook existing-note edits
       Finish in the sauce
 
       """
-    And note "Pasta" should have content "Salt the water first"
+    And the note "CLI Clone Notebook/Recipes/Pasta" in Donut should have content "Salt the water first"
     When I publish the cloned checkout using the installed CLI
     Then the installed CLI reports the resolved local head as the accepted head
-    And I should see note "CLI Clone Notebook/Recipes/Pasta" has content "Finish in the sauce"
+    And the note "CLI Clone Notebook/Recipes/Pasta" in Donut should have content "Finish in the sauce"

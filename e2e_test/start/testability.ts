@@ -6,18 +6,13 @@ import type { NoteTestData } from '@generated/donut-backend-api'
 import type { McqsTestData } from '@generated/donut-backend-api'
 import type {
   AttachBookRequestFull,
-  Folder,
-  FolderCreationRequest,
   NoteRealm,
-  NotebooksViewedByUser,
 } from '@generated/donut-backend-api'
 import type { NotesTestDataWritable } from '@generated/donut-backend-api'
 import {
   ConversationMessageController,
   NoteController,
   NotebookBooksController,
-  NotebookController,
-  NotebookFolderController,
   TestabilityRestController,
   TextContentController,
 } from '@generated/donut-backend-api/sdk.gen'
@@ -26,6 +21,7 @@ import { noteIdFromUrl } from './noteIdFromUrl'
 import { assimilateTestabilityMethods } from './testabilityAssimilate'
 import { bazaarTestabilityMethods } from './testabilityBazaar'
 import { notebookGitTestabilityMethods } from './testabilityNotebookGit'
+import { notebookStructureTestabilityMethods } from './testabilityNotebookStructure'
 import { recallTestabilityMethods } from './testabilityRecall'
 import { timeTravelTestabilityMethods } from './testabilityTimeTravel'
 import { unwrapData } from './unwrapApi'
@@ -397,112 +393,6 @@ const testability = () => {
         })
     },
 
-    getNotebookIdByName(notebookName: string) {
-      return cy
-        .wrap(NotebookController.myNotebooks(), { log: false })
-        .then((response) => {
-          const data = unwrapData<NotebooksViewedByUser>(response)
-          const notebookRealm = data.notebooks.find(
-            (realm) => realm.notebook.name === notebookName
-          )
-          expect(
-            notebookRealm,
-            `notebook "${notebookName}" was not found for the current user`
-          ).to.not.be.undefined
-          return notebookRealm!.notebook.id
-        })
-    },
-
-    getFolderIdInNotebook(notebookId: number, folderName: string) {
-      return cy
-        .wrap(
-          NotebookFolderController.listNotebookFolderIndex({
-            path: { notebook: notebookId },
-          }),
-          { log: false }
-        )
-        .then((response) => {
-          const folders = unwrapData<Folder[]>(response)
-          const folder = folders.find((f) => f.name === folderName)
-          expect(
-            folder,
-            `folder "${folderName}" was not found in notebook id ${notebookId}`
-          ).to.exist
-          return folder!.id
-        })
-    },
-
-    updateNotebookIndex(notebookName: string) {
-      return this.getNotebookIdByName(notebookName).then((notebookId) =>
-        cy.wrap(
-          NotebookController.updateNotebookIndex({
-            path: { notebook: notebookId },
-          }),
-          { log: false }
-        )
-      )
-    },
-
-    createEmptyFolder(
-      notebookName: string,
-      folderName: string,
-      underNoteTitle?: string
-    ) {
-      return this.getNotebookIdByName(notebookName).then((notebookId) => {
-        const body: FolderCreationRequest = { name: folderName }
-        const createFolder = () =>
-          cy.wrap(
-            NotebookFolderController.createFolder({
-              path: { notebook: notebookId },
-              body,
-            }),
-            { log: false }
-          )
-        if (underNoteTitle) {
-          return this.getInjectedNoteIdByTitle(underNoteTitle).then(
-            (noteId) => {
-              body.underNoteId = noteId
-              return createFolder()
-            }
-          )
-        }
-        return createFolder()
-      })
-    },
-
-    createReadmeOnlyFolder(
-      notebookName: string,
-      folderName: string,
-      readme: string
-    ) {
-      return this.createEmptyFolder(notebookName, folderName).then(
-        (response) => {
-          const folder = unwrapData<Folder>(response)
-          return this.getNotebookIdByName(notebookName).then((notebookId) =>
-            cy.wrap(
-              NotebookFolderController.updateFolderReadmeContent({
-                path: { notebook: notebookId, folder: folder.id },
-                body: { content: readme },
-              }),
-              { log: false }
-            )
-          )
-        }
-      )
-    },
-
-    setNotebookReadmeContent(notebookName: string, content: string) {
-      return this.getNotebookIdByName(notebookName).then((notebookId) =>
-        cy.wrap(
-          NotebookController.updateNotebookReadmeContent({
-            path: { notebook: notebookId },
-            body: { content },
-          }),
-          { log: false }
-        )
-      )
-    },
-
     setInjectedNoteContent(noteTitle: string, content: string) {
       return this.getInjectedNoteIdByTitle(noteTitle).then((noteId) =>
         cy.wrap(
@@ -512,17 +402,6 @@ const testability = () => {
           }),
           { log: false }
         )
-      )
-    },
-
-    /** The note's current content in Donut itself, not an exported markdown file. */
-    getInjectedNoteContent(noteTitle: string) {
-      return this.getInjectedNoteIdByTitle(noteTitle).then((noteId) =>
-        cy
-          .wrap(NoteController.showNote({ path: { note: noteId } }), {
-            log: false,
-          })
-          .then((response) => unwrapData<NoteRealm>(response).note.content)
       )
     },
 
@@ -546,6 +425,7 @@ const testability = () => {
     ...assimilateTestabilityMethods,
     ...bazaarTestabilityMethods,
     ...notebookGitTestabilityMethods,
+    ...notebookStructureTestabilityMethods,
     ...recallTestabilityMethods,
     ...timeTravelTestabilityMethods,
 

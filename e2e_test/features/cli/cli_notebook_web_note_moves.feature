@@ -34,7 +34,7 @@ Feature: CLI notebook web note moves
 
       Membranes
       """
-    And I assimilate the note "Cells"
+    And I assimilated one note "Cells" at the current time
     And the notebook "CLI Clone Notebook"'s Git binding reflects its current content
     And I capture the note id of "Cells"
     When I clone the notebook "CLI Clone Notebook" into a temporary destination using the installed CLI
@@ -72,8 +72,13 @@ Feature: CLI notebook web note moves
       """
     And I publish the cloned checkout using the installed CLI
     Then the installed CLI reports the committed change as the accepted head
-    And I open the original note route
-    And the note content on the current page should be "Membranes and walls"
+    And the original note in Donut should be "CLI Clone Notebook/Study/Cells" with content:
+      """
+      Cells
+      =====
+
+      Membranes and walls
+      """
 
   @mockBrowserTime
   Scenario: Pulling a linked note move receives the rewritten in-notebook reference
@@ -134,7 +139,7 @@ Feature: CLI notebook web note moves
 
       Membranes
       """
-    And I assimilate the note "Cells"
+    And I assimilated one note "Cells" at the current time
     And the notebook "CLI Empty Folder Move Notebook"'s Git binding reflects its current content
     And I capture the note id of "Cells"
     When I clone the notebook "CLI Empty Folder Move Notebook" into a temporary destination using the installed CLI
@@ -158,5 +163,10 @@ Feature: CLI notebook web note moves
       """
     And I publish the cloned checkout using the installed CLI
     Then the installed CLI reports the committed change as the accepted head
-    And I open the original note route
-    And the note content on the current page should be "Membranes and walls"
+    And the original note in Donut should be "CLI Empty Folder Move Notebook/Study/Cells" with content:
+      """
+      Cells
+      =====
+
+      Membranes and walls
+      """

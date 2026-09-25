@@ -46,7 +46,7 @@ Feature: CLI notebook folder relocation
     When I pull the second cloned checkout using the installed CLI
     And I publish the second cloned checkout using the installed CLI
     Then the installed CLI reports the rebased local head as the accepted head
-    And I should see note "CLI Clone Notebook/Kitchen/Recipes/Pasta" has content "Simmer until al dente"
+    And the note "CLI Clone Notebook/Kitchen/Recipes/Pasta" in Donut should have content "Simmer until al dente"
 
   Scenario: Publishing relocate then descendant edit and add commits retains identities and history
     When I clone the notebook "CLI Clone Notebook" into a temporary destination using the installed CLI
@@ -58,8 +58,8 @@ Feature: CLI notebook folder relocation
       | Kitchen/Recipes/Sauce.md     | ---\ntype: Note\n---\nTomato base |
     And I publish the cloned checkout using the installed CLI
     Then the installed CLI reports the committed change as the accepted head
-    And I should see note "CLI Clone Notebook/Kitchen/Recipes/Pasta" has content "Simmer until al dente"
-    And I should see note "CLI Clone Notebook/Kitchen/Recipes/Sauce" has content "Tomato base"
+    And the note "CLI Clone Notebook/Kitchen/Recipes/Pasta" in Donut should have content "Simmer until al dente"
+    And the note "CLI Clone Notebook/Kitchen/Recipes/Sauce" in Donut should have content "Tomato base"
     When I pull the second cloned checkout using the installed CLI
     Then the second cloned checkout preserves the publisher's A to C history
     And the second cloned checkout contains exactly:
@@ -108,8 +108,8 @@ Feature: CLI notebook folder relocation
     When I commit a rename of "_trash/Recipes" to "Recipes" and an empty keep at "_trash/.keep" together in the cloned checkout
     And I publish the cloned checkout using the installed CLI
     Then the installed CLI reports the committed change as the accepted head
-    And I should see note "CLI Folder Trash Notebook/Recipes/Pasta" has content "Boil water"
-    And I should see note "CLI Folder Trash Notebook/Recipes/Sauce" has content "Tomato base"
+    And the note "CLI Folder Trash Notebook/Recipes/Pasta" in Donut should have content "Boil water"
+    And the note "CLI Folder Trash Notebook/Recipes/Sauce" in Donut should have content "Tomato base"
     When I pull the second cloned checkout using the installed CLI
     Then the second cloned checkout contains exactly:
       | Recipes/README.md     |

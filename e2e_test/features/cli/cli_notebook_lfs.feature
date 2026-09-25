@@ -152,7 +152,7 @@ Feature: Notebook Git LFS authenticated transfer
     And the cloned checkout LFS object cache holds only the tip digest for "photo.png"
     When I publish the cloned checkout using the installed CLI
     Then the installed CLI reports the rebased local head as the accepted head
-    And I should see note "LFS Transfer Notebook/Shopping list" has content "Milk and eggs"
+    And the note "LFS Transfer Notebook/Shopping list" in Donut should have content "Milk and eggs"
 
   @bundleCliE2eInstall @withCliConfig
   Scenario: A picture uploaded on the web arrives in the owner's clone beside its note
@@ -214,6 +214,4 @@ Feature: Notebook Git LFS authenticated transfer
     When I commit the LFS attachment "second.png" filled with 4 bytes of "0x41" as "secondPicture"
     And I publish the cloned checkout using the installed CLI
     Then the installed CLI reports the committed change as the accepted head
-    When I jump to the notebook "LFS Transfer Notebook"
-    And I open the root file "second.png" in the sidebar
-    Then downloading the file gives "AAAA" named "second.png"
+    And the notebook "LFS Transfer Notebook" in Donut should serve the root file "second.png" as "AAAA"

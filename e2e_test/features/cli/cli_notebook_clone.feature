@@ -46,8 +46,7 @@ Feature: CLI notebook clone
       | Kitchen/README.md  |
       | Recipes/README.md  |
       | Recipes/Pasta.md   |
-    When I open the notebook "CLI Clone Notebook" from the notebook catalog
-    Then the notebook readme body includes "Notebook landing"
+    And the readme of "CLI Clone Notebook" in Donut should be "Notebook landing"
 
   Scenario: Publishing an initial nested tree round-trips the authored checkout
     Given I have a notebook "CLI Initial Tree Notebook"
@@ -114,10 +113,8 @@ Feature: CLI notebook clone
       | Recipes/README.md | ---\ntype: Readme\nauthor: owner\n---\nUpdated folder landing        |
     And I publish the cloned checkout using the installed CLI
     Then the installed CLI reports the committed change as the accepted head
-    When I open the notebook "CLI Clone Notebook" from the notebook catalog
-    Then the notebook readme body includes "Updated notebook landing"
-    And I open the folder page for "Recipes" from the sidebar
-    Then the folder readme should contain "Updated folder landing"
+    And the readme of "CLI Clone Notebook" in Donut should be "Updated notebook landing"
+    And the readme of "CLI Clone Notebook/Recipes" in Donut should be "Updated folder landing"
     When I pull the second cloned checkout using the installed CLI
     Then the second cloned checkout is a clean checkout of the accepted head
     And the second cloned checkout file "README.md" is:
