@@ -10,9 +10,10 @@ and deletable in Web Donut.
 
 ## Taken
 
+- [Keep a Book's source file as an ordinary notebook file](seeds/SEED-035-ai-workspace-supporting-files.md#story-17) — SEED-035#story-17 ([plan](quick/034-book-source-as-notebook-file/PLAN.md))
+
 ## Backlog list
 
-- [Keep a Book's source file as an ordinary notebook file](seeds/SEED-035-ai-workspace-supporting-files.md#story-17) — SEED-035#story-17
 - [Remove the legacy picture storage](seeds/SEED-035-ai-workspace-supporting-files.md#story-18) — SEED-035#story-18
 - [Remove the separate Book storage](seeds/SEED-035-ai-workspace-supporting-files.md#story-21) — SEED-035#story-21
 - [Delete unwanted supporting files from Web Donut](seeds/SEED-035-ai-workspace-supporting-files.md#story-2) — SEED-035#story-2
