@@ -11,11 +11,14 @@
 
 ### 2. View/tail GCP VM instance logs
 
+For the application log, see [Reading production application logs](troubleshooting-springboot-logs.md).
+The commands below show the serial console (boot and startup script output).
+
 ```bash
 gcloud auth login
 gcloud config set project carbon-syntax-298809
 # Query GCP MIG instance/s health state and grep instance id of each GCP VM in MIG
-infra/scripts/check-mig-doughnut-app-service-health.sh
+./infra/gcp/scripts/check-mig-doughnut-app-service-health.sh
 # Expected output
 # ❯ ./check-mig-doughnut-app-service-health.sh
 # ---
@@ -32,11 +35,11 @@ infra/scripts/check-mig-doughnut-app-service-health.sh
 #    port: 8081
 #  kind: compute#backendServiceGroupHealth
 
-# View instance logs - Take/use one of the above healthcheck report instance id for next command (e.g. doughnut-app-group-2j9f)
-infra/scripts/view-mig-doughnut-app-instance-logs.sh doughnut-app-group-2j9f
+# View instance serial console - Take/use one of the above healthcheck report instance id for next command (e.g. doughnut-app-group-2j9f)
+./infra/gcp/scripts/view-mig-doughnut-app-instance-logs.sh doughnut-app-group-2j9f
 
-# Tail instance logs - Take/use one of the above healthcheck report instance id for next command (e.g. doughnut-app-group-2j9f)
-infra/scripts/tail-mig-doughnut-app-instance-logs.sh doughnut-app-group-2j9f
+# Tail instance serial console - Take/use one of the above healthcheck report instance id for next command (e.g. doughnut-app-group-2j9f)
+./infra/gcp/scripts/tail-mig-doughnut-app-instance-logs.sh doughnut-app-group-2j9f
 ```
 
 ### 3. Building/refreshing doughnut-app MIG VM instance/s base image with Packer + GoogleCompute builder

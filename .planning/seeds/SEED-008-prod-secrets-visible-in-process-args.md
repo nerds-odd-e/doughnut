@@ -13,7 +13,7 @@ scope: medium
 
 `infra/gcp/scripts/mig-zulu25-openai-app-instance-startup.sh` launches the Spring Boot app with the DB password, GitHub token, and OpenAI API key passed as `-D` JVM system properties on the `java` command line (lines ~96-105: `-Dspring.datasource.password=${MYSQL_PASSWORD}`, `-Dspring.github_for_issues.token=${GITHUB_FOR_ISSUES_API_TOKEN}`, `-Dspring.openai.token=${OPENAI_API_TOKEN}`). Command-line arguments are visible to any user able to run `ps aux` (or read `/proc/<pid>/cmdline`) on the instance — this was observed directly while diagnosing an unrelated deploy issue, where a routine `ps aux | grep java` for log-debugging purposes printed all three secrets in plaintext.
 
-The existing troubleshooting docs (`docs/gcp/troubleshooting-springboot-logs.md`, `docs/gcp/finding-springboot-logs-in-cloud-logging.md`) instruct running `ps aux | grep java` as a normal diagnostic step, so this exposure is trivially hit by anyone following the documented playbook, not just an attacker. `docs/secrets_management.md` only covers git-secret/GnuPG for encrypting secret files in the repo and does not address runtime process-argument exposure.
+The troubleshooting docs used to instruct running `ps aux | grep java` as a normal diagnostic step; they no longer do, but the habit makes this exposure easy to hit by accident, not just by an attacker. `docs/secrets_management.md` only covers git-secret/GnuPG for encrypting secret files in the repo and does not address runtime process-argument exposure.
 
 ## When to Surface
 
@@ -26,7 +26,6 @@ The existing troubleshooting docs (`docs/gcp/troubleshooting-springboot-logs.md`
 ## Breadcrumbs
 
 - `infra/gcp/scripts/mig-zulu25-openai-app-instance-startup.sh` — the `java ${JAVA_OPTS} ... -jar` command with secrets as `-D` args
-- `docs/gcp/troubleshooting-springboot-logs.md`, `docs/gcp/finding-springboot-logs-in-cloud-logging.md` — recommend `ps aux | grep java`, which surfaces the leak
 - `docs/secrets_management.md` — existing secrets doc; doesn't cover this vector
 
 ## Notes

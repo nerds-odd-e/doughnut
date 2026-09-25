@@ -72,18 +72,10 @@ gcloud compute instance-groups managed rolling-action replace doughnut-app-group
 
 After deployment, verify the new startup script is working:
 
-1. **Check logs are being written:**
-   ```bash
-   # SSH into an instance and check
-   tail -f /var/log/doughnut-app.log
-   ```
+1. **Check the application log:** see
+   [Reading production application logs](troubleshooting-springboot-logs.md).
 
-2. **Check logs in GCP Cloud Logging:**
-   - Go to Cloud Logging → Logs Explorer
-   - Filter: `logName=~"doughnut-app"`
-   - You should see Spring Boot application logs
-
-3. **Verify application is running:**
+2. **Verify application is running:**
    ```bash
    # Check health endpoint
    curl https://dough.odd-e.com/api/healthcheck
@@ -136,11 +128,4 @@ If new instances fail to start:
 2. Verify startup script has correct permissions
 3. Check that all required secrets are accessible
 4. Verify network connectivity to database
-
-### Logs Not Appearing
-
-If logs don't appear in Cloud Logging:
-1. Verify service account has logging permissions: `./infra/gcp/scripts/grant-logging-permission-to-service-account.sh`
-2. Check log file exists: `tail -f /var/log/doughnut-app.log` (SSH into instance)
-3. Verify Cloud Logging agent is running: `systemctl status google-cloud-ops-agent`
 
