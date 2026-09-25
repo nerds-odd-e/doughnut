@@ -192,33 +192,79 @@ No executable plan or implementation is authorized by this seed.
 
 ### Keep a Book's source file as an ordinary notebook file
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"not-refined","approach":"unselected"}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../quick/034-book-source-as-notebook-file/PLAN.md","assessment":"not-ready","reasons":["Start condition unmet: reuses naming helpers and the startup-move shape from the picture move (quick/033, SEED-035#story-5), not yet on main."],"basis":{"document":"196ceb32886fc98b17c9cd62b875bd1c7acd320b842971f03e564fdd1f8f3927","plan":"aed569850f55fd2e84240db3cd293116ad7b64af2cb77c36cefef8d0ede27235"}}
 ```
 
 - **Identity:** SEED-035#story-17
 - **Goal:** Owners who read a PDF or EPUB Book in Donut also have its source
-  file in the notebook: browsable and downloadable on the web, and present in
-  a local checkout. Books stop needing their own file storage.
-- **Evaluation:** Attach a Book on the web, then pull: the source file is in the
-  notebook, and Book reading on the web is unchanged. An existing Book is moved
-  the same way, keeping its layout and reading progress.
-- **Scope / value (owner direction 2026-09-24):** A Book is private reading
-  structure over one source Attachment (see the North Star). New Book attach
-  writes the Attachment and the Book's reference in one accepted change, and
-  existing Books are moved once. The Book source file is the one exception to
-  the 10 MiB limit and keeps the Book upload limit (currently 100 MB).
-- **Current state:** `book.source_file_ref` names bytes in the separate Book
-  storage: GCS in production (`GcsBookStorage`), and `attachment_blob`
-  elsewhere (`DbBookStorage`).
-- **Depends on:** Story 14.
-- **Effort hypothesis:** L, low confidence; split new-attach from moving
-  existing Books if refinement finds it larger.
+  file in the notebook: listed and downloadable on the web, and present after
+  `donut notebook pull`, for example for an AI IDE working beside the notes.
+  The main driver is the North Star's one byte store: once every Book reads
+  from a notebook file, the separate Book storage can be removed (story 21).
+  The owner benefit is modest, since the CLI attaches a PDF the owner already
+  has locally; the owner kept the priority (2026-09-25).
+- **Current state:** At most one Book per notebook (unique key); no replace,
+  only remove and attach again. `book.source_file_ref` names bytes in the
+  separate Book storage: GCS in production (`GcsBookStorage`), and
+  `attachment_blob` elsewhere (`DbBookStorage`). Books appear nowhere in the
+  notebook's Git tree, export or clone. PDFs are attached through the CLI
+  `/attach` (MinerU layout with page numbers and boxes, so the layout depends
+  on those exact bytes); the web attaches EPUB only. Production holds three
+  or four Books (owner, 2026-09-25).
+- **Scope (owner decisions 2026-09-25):**
+  - The Book refers to its source file by its path in the notebook, like an
+    `image:` value, not to hidden stored content. Book reading goes through
+    the one attachment reader.
+  - Attaching a Book (CLI or web) stores the verified LFS object first, then
+    accepts, in one accepted change, the file at the notebook root and the
+    Book that refers to it (North Star "one way in").
+  - Donut chooses the name: `<book name>.<pdf|epub>`, or the next free name
+    under the existing numbering rule when taken; a book name that is not a
+    plain filename gets a Donut-chosen plain name.
+  - Existing Books move once, on their own at startup, following story 5's
+    pattern: one Donut System commit per notebook, layout and reading
+    progress unchanged, safe to run again, a failing notebook reported
+    loudly without stopping the others. The old copy stays until story 21.
+  - The existing web "Remove" of a Book removes the Book and its reading
+    data and leaves the file in the notebook. Deleting the file is story 2's
+    job or a local change.
+  - The 100 MB Book limit applies only to attaching a Book. Local publish
+    keeps the 10 MiB limit for every new file.
+- **Rejection constraint (owner decision 2026-09-25, consistency):** A local
+  publish that deletes, renames or changes the file a Book refers to is
+  refused, naming the path and saying to remove the Book on the web first;
+  nothing is accepted. The Book's layout depends on those exact bytes, so
+  accepting the change would leave a Book that silently points at the wrong
+  pages or at nothing.
+- **Deferred:** Following a local rename. Replacing a Book in place. Making a
+  PDF already in the notebook into a Book, or CLI `/attach` reusing a file in
+  the checkout. PDF attach on the web. Streaming or range requests for large
+  files (whole-file reads, as today). Any history rewrite.
+- **Key examples:**
+  1. The owner attaches "Physics Primer" (PDF) to notebook `physics` with the
+     CLI. The notebook gains one accepted change: root `Physics Primer.pdf`
+     as an LFS file and the Book referring to it. Reading on the web is
+     unchanged; the file is listed and downloadable in the web root folder;
+     after `donut notebook pull` the checkout has `Physics Primer.pdf` with
+     the same bytes.
+  2. The root already holds `Physics Primer.pdf`: the Book's file becomes
+     `Physics Primer (2).pdf`, and the existing file is untouched.
+  3. A 60 MB PDF is accepted through attach. The same 60 MB PDF added and
+     published from a local checkout is refused by the 10 MiB limit.
+  4. An existing Book at startup: its file appears at the notebook root in
+     one Donut System commit; its layout, reading records and last-read
+     position are unchanged. Running again adds no commit.
+  5. The owner removes the Book on the web: the Book and its reading data are
+     gone; `Physics Primer.pdf` stays in the notebook.
+  6. The owner deletes `Physics Primer.pdf` locally while the Book
+     exists and publishes: refused, naming `Physics Primer.pdf`.
+- **Depends on:** Story 14 (delivered).
+- **Effort hypothesis:** M–L, low confidence. Not split: with three or four
+  Books, moving the existing ones is small and reuses story 5's move.
 - **Safe stopping point:** Books read correctly from either store during the
-  move; the old copy stays until the move is verified.
-- **Open decisions:** Where the file is placed and named. What happens when the
-  owner renames, deletes or replaces the Book's file locally (the Book's layout
-  depends on those exact bytes). How the size exception is recognised when the
-  file arrives through a local publish.
+  move; the old copy stays until the move is verified in production.
+- **Note for story 2:** Web deletion of a file a Book refers to follows the
+  same rule as example 6.
 
 <a id="story-18"></a>
 
@@ -380,7 +426,6 @@ loss. Operations that would rehome files refuse until their story delivers.
 
 ## Open Refinement Details
 
-- Story 17 needs key examples and its move/retry behaviour before planning.
 - Story 11 needs story refinement and plan realignment before slice
   refinement/execution.
 - File deletion needs an observable outcome for remaining references; warning,
@@ -415,6 +460,10 @@ integration need their own selected outcomes.
   Books become ordinary attachments, and their
   source file is the one exception to the 10 MiB limit. One cohesive
   architecture governs these stories (North Star).
+- Owner decisions, 2026-09-25 (story 17 refinement): keep the priority; the
+  Book refers to its file by path; removing a Book leaves the file; refuse a
+  local publish that deletes, renames or changes a Book's file; three or four
+  production Books, so moving them stays in the story.
 - Owner decisions, 2026-09-25 (story 5 refinement): move a picture only into
   the notebook that owns it; leave other-notebook references unchanged; accept
   an ordinary rebase conflict for unpublished local frontmatter edits; keep
