@@ -33,6 +33,7 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Service
 public class LegacyNotePictureMove {
+  private static final String LEGACY_ADDRESS_PATTERN = "'%/attachments/images/%'";
   private final EntityPersister entityPersister;
   private final NotebookAttachmentContent attachmentContent;
   private final AcceptedWebChangeService acceptedWebChangeService;
@@ -56,6 +57,17 @@ public class LegacyNotePictureMove {
     this.testabilitySettings = testabilitySettings;
     this.bindingRepository = bindingRepository;
     this.repositoryStore = repositoryStore;
+  }
+
+  /** The notebooks holding a note whose content mentions a legacy upload address. */
+  public List<Integer> notebookIdsWithLegacyReferences() {
+    return entityPersister
+        .createQuery(
+            "SELECT DISTINCT n.notebook.id FROM Note n WHERE n.content LIKE "
+                + LEGACY_ADDRESS_PATTERN
+                + " ORDER BY n.notebook.id",
+            Integer.class)
+        .getResultList();
   }
 
   /**
@@ -108,8 +120,9 @@ public class LegacyNotePictureMove {
     List<Note> notes =
         entityPersister
             .createQuery(
-                "FROM Note n WHERE n.notebook.id = :notebookId"
-                    + " AND n.content LIKE '%/attachments/images/%' ORDER BY n.id",
+                "FROM Note n WHERE n.notebook.id = :notebookId AND n.content LIKE "
+                    + LEGACY_ADDRESS_PATTERN
+                    + " ORDER BY n.id",
                 Note.class)
             .setParameter("notebookId", notebookId)
             .getResultList();

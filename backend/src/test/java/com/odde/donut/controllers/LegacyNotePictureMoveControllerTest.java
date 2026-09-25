@@ -3,10 +3,12 @@ package com.odde.donut.controllers;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 
+import com.odde.donut.configs.LegacyNotePictureMoveOnStartup;
 import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.Image;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
+import com.odde.donut.entities.NotebookGitBinding;
 import com.odde.donut.services.notebookGit.LegacyNotePictureMove;
 import com.odde.donut.services.notebookGit.NotebookGitCutoverService;
 import com.odde.donut.testability.GitBundleTestReader;
@@ -51,22 +53,6 @@ class LegacyNotePictureMoveControllerTest extends NotebookGitWebContentControlle
     assertThat(reloaded(force).getUpdatedAt(), equalTo(updatedAtBefore));
     assertThat(legacyImageCount(force), equalTo(1L));
     assertAcceptedTreeMatchesTheFullAssembly(notebook);
-  }
-
-  @Test
-  void runningTheMoveAgainAddsNoCommit() throws Exception {
-    Notebook notebook = createGitBackedNotebook();
-    Note force = makeMe.aNote("force").notebook(notebook).please();
-    Image legacy = makeMe.anImage().forNote(force).by(currentUser.getUser()).please();
-    authorReferencingContentCommitted(
-        force, "---\nimage: /attachments/images/" + legacy.getId() + "/example.png\n---\nbody");
-    snapshotCurrentPortableTree(notebook);
-    legacyNotePictureMove.move(notebook.getId());
-    List<String> commitsAfterFirstMove = acceptedHistory(notebook).commits();
-
-    legacyNotePictureMove.move(notebook.getId());
-
-    assertThat(acceptedHistory(notebook).commits(), equalTo(commitsAfterFirstMove));
   }
 
   @Test
@@ -181,6 +167,37 @@ class LegacyNotePictureMoveControllerTest extends NotebookGitWebContentControlle
   @Test
   void aReferenceToAMissingUploadIsLeftUnchanged() throws Exception {
     assertReferenceLeftUnchanged(Integer.MAX_VALUE, 0);
+  }
+
+  @Test
+  void startupMovesEveryNotebookLeavingAFailingOneUnchangedAndMovesNothingMoreWhenRerun()
+      throws Exception {
+    Notebook broken = createGitBackedNotebook("Broken");
+    Note brokenNote =
+        legacyPictureNote(
+            makeMe.aFolder().notebook(broken).name("a").please(), "force", "example.png");
+    NotebookGitBinding brokenBinding = snapshotCurrentPortableTree(broken);
+    deleteNativeObjectStoreRow(brokenBinding.getId(), brokenBinding.getAcceptedGitObjectId());
+    String brokenContentBefore = reloaded(brokenNote).getContent();
+    Notebook healthy = createGitBackedNotebook("Healthy");
+    legacyPictureNote(
+        makeMe.aFolder().notebook(healthy).name("physics").please(), "force", "example.png");
+    snapshotCurrentPortableTree(healthy);
+    LegacyNotePictureMoveOnStartup onStartup =
+        new LegacyNotePictureMoveOnStartup(legacyNotePictureMove);
+
+    onStartup.moveLegacyPictures();
+
+    assertThat(reloaded(brokenNote).getContent(), equalTo(brokenContentBefore));
+    assertThat(
+        tipText(acceptedHistory(healthy), "physics/force.md"),
+        equalTo("---\ntype: Note\nimage: example.png\n---\nbody"));
+    List<String> healthyCommitsAfterFirstRun = acceptedHistory(healthy).commits();
+
+    onStartup.moveLegacyPictures();
+
+    assertThat(acceptedHistory(healthy).commits(), equalTo(healthyCommitsAfterFirstRun));
+    assertThat(reloaded(brokenNote).getContent(), equalTo(brokenContentBefore));
   }
 
   private void assertReferenceLeftUnchanged(Integer imageId, int expectedCount) throws Exception {

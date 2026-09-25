@@ -162,7 +162,10 @@ Rejection justified by the owner decision (2026-09-25) recorded in the seed.
 
 ### 5. The move runs once at startup for every notebook and isolates failures
 Type: Behavior
-Status: planned
+Status: done — `LegacyNotePictureMoveOnStartup`, Flyway `@Order` restored, docs
+updated; accepted proof: `LegacyNotePictureMoveControllerTest` (10, incl.
+`startupMovesEveryNotebookLeavingAFailingOneUnchangedAndMovesNothingMoreWhenRerun`,
+which also proves the rerun). Gap: Flyway ordering is untested (as in story 14).
 Proof: slice 5 row of the proof table; `docs/notebook-git-attachments.md`
 describes the move.
 
@@ -217,3 +220,6 @@ an external wait.
 - A legacy row without a note counts as not owned in the notebook: left
   unchanged and counted with other-notebook references; a missing row is left
   unchanged and not counted.
+- Slice 6's testability endpoint can call `LegacyNotePictureMoveOnStartup`'s
+  `moveLegacyPictures()` logic via `LegacyNotePictureMove`
+  (`notebookIdsWithLegacyReferences()` + `move`).
