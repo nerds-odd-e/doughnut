@@ -10,8 +10,6 @@ and deletable in Web Donut.
 
 ## Taken
 
-- [Fold the picture attach step back into the upload](quick/037-fold-picture-attach-step-into-upload/PLAN.md)
-
 ## Backlog list
 
 - [Remove the separate Book storage](seeds/SEED-035-ai-workspace-supporting-files.md#story-21) — SEED-035#story-21
