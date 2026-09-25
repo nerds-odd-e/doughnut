@@ -179,7 +179,7 @@ needs no server, and the existing real-Git pull and clone tests stay offline.
 
 ### 1. Attachment docs describe one pointer representation
 Type: Structure
-Status: planned
+Status: done
 Proof: `grep -nE "raw notebook|raw-Git|attachment representation|awaiting that transition" docs/notebook-git-attachments.md`
 returns nothing; each rewritten passage matches the code named in finding 1.
 
@@ -363,6 +363,16 @@ a raw attachment" and assert the new sentence.
   `.gitattributes` from the existing LFS acquisition fixture, and the existing
   publish, pull and clone suites already use checkouts without it.
 
+## Execution
+
+Story Branch Mode: worktree `.claude/worktrees/finish-single-attachment-representation`,
+branch `story/finish-single-attachment-representation`, claim `42ef5d8ff2` on
+`origin/main`.
+
 ## Learnings
 
-None yet.
+- `NotebookGitAttachmentSizeAdmission.oversizedRefusal` still ends "a later
+  tip deletion alone does not clear an oversized payload from unpublished
+  history", which the intermediate-only exception makes misleading; it is
+  asserted by `cli_notebook_attachment_size_admission.feature:38`, so changing
+  it is an E2E change outside this correction (candidate follow-up).
