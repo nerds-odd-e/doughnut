@@ -172,6 +172,11 @@ Former local code: DD-107.
   - Evidence: slice 1 and slice 7 (96c756d531) receipts `observation.reason` "host session identity is required to verify the notification bridge" (background Claude Code job, Story Branch Mode); recovered after slice 1 by `ci-mailbox.mjs probe` (`CI_MONITOR_READY`), `start --execution nerds-odd-e/doughnut story/book-source-as-notebook-file`, and `register-push` for 36eb15caaa; slices 2-6 reported `reused`.
   - Observed effect: the same three-call manual recovery; after the observer ended (see DD-115) the slice 7 delivery could not reattach without the session identity and stayed unobserved.
 
+- Execution: quick/037-share-backend-test-context / c7ea84e3a7; Timestamp: unknown (first delivery after the plan commit 2026-09-25 23:24:51+08:00; last publication after db643ef844 at 2026-09-26 00:09:04+08:00); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.38.
+  - Evidence: coordinator summary handed to the execution retrospective (no transcript): the first `deliver` returned `candidate-mismatch` because an abbreviated SHA was passed to `--validated-candidate`, and a retry with the full SHA was accepted; every publication (0f8709dfc1, c7ea84e3a7, 7cb7c300b1, 6455811f4d, 5bf185ba0d, db643ef844) reported "host session identity is required to verify the notification bridge".
+  - Observed effect: CI on `story/037-share-backend-test-context` was never observed during execution; the retrospective started with CI unknown.
+  - Inference: both the abbreviated-SHA refusal and the missing session identity recurred about an hour after the same pair was recorded for `quick/037-fold-picture-attach-step-into-upload` on main, which this execution's base (5c8bb75741) did not contain. Whether a recovery was attempted is not in the summary.
+
 ## ODF-099 — Queued startup receipt embeds the whole Git index and overflows the coordinator's tool output
 
 Former local code: DD-108.
@@ -299,8 +304,19 @@ During slice 7, the observer emitted `CI_MONITOR_UNAVAILABLE` for a single `gh r
   - Observed effect: lost coverage for db13a2d99c and 96c756d531; manual CI checks replaced notifications.
   - Inference: a bounded retry for a transient network error before declaring the observer unavailable would likely have kept coverage.
 
+## DD-118 — Two concurrent executions allocated the same quick-plan number from different bases
+
+Slice planning takes the number after the highest plan entry in the checkout that writes the plan and rechecks only that path. A plan written in an execution worktree whose base predates a plan already on main got the same number, so two different executions are both "037".
+
+### Occurrences
+
+- Execution: quick/037-share-backend-test-context / c7ea84e3a7; Timestamp: 2026-09-25T23:24:51+08:00 (plan commit 0f8709dfc1); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.38.
+  - Evidence: base 5c8bb75741 (22:09:45+08:00) lists quick/007, 035, 036; main's db601a2e42 (23:06:25+08:00) had already added `.planning/quick/037-fold-picture-attach-step-into-upload/PLAN.md`; 0f8709dfc1 added `.planning/quick/037-share-backend-test-context/PLAN.md`. Number 116 and 117 of this log were likewise allocated on main after the base, so this entry uses 118.
+  - Observed effect: DearDough rows and `.planning/test-optimization-candidates.md` ("plan 037 cut the suite…") refer to "037" for two different executions once both plans are deleted at wrap-up; the retrospective's correction plan had to reword the candidate record.
+  - Inference: the same stale-base allocation applies to DD numbers in this log, so a merge can also produce duplicate finding codes. Whether the coordinator fetched `origin/main` before planning is not recorded.
+
 ## Retention
 
-- Highest allocated local number: 115
+- Highest allocated local number: 118
 - Recovery: `33939aa45a17c08f5e6f8076178ce96437fdfbe8:DearDough.md` contains the complete pre-compaction log and earlier recovery references; `b0b385a184e96ecf8b0f6fc5572eaaab69bc8dad` preserves later history.
 - Occurrence history is partial; full observations, effects, inference and historical provenance remain in that snapshot and the upstream catalog.
