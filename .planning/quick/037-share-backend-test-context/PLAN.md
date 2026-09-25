@@ -183,7 +183,17 @@ one, otherwise keep its fixture bean and record it.
 
 ### 4. Question-generation batch tests stub the OpenAI client, not `OpenAiApiHandler`
 Type: Structure
-Status: planned
+Status: done
+Result: boots ~6 → ~4; test phase 41.1s, wall 61.9s (load ~4). 2650 cases,
+0 failures, 2 skipped. New `testability/OpenAiBatchApiMock` stubs the client's
+Files/Batches APIs; the handler's parsing and file decoding now run for real
+(the maintenance test feeds a real batch success line). The spy and
+`@DirtiesContext` base was folded into `QuestionGenerationBatchSubmitDueUsersTest`,
+which now uses the real eligibility query; it assumes no other committed user
+is due in its fixed 2024-08-03 window (it is `@Isolated` and cleans its own
+prefix). Only weakening: the failing batch-creation stub no longer matches the
+uploaded file id. Refactor added `stubCompletedOpenAiBatch` for a sequence
+repeated in six places.
 Expected: −2 boots, and removal of `@DirtiesContext` and the planning-service
 spy if they only exist to isolate those mocks.
 Proof: full `backend:test_only` passes with the same case count.

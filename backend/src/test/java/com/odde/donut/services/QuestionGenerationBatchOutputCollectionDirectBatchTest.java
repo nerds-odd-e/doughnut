@@ -1,6 +1,6 @@
 package com.odde.donut.services;
 
-import static com.odde.donut.services.QuestionGenerationBatchOutputCollectionTestSupport.completedOpenAiBatch;
+import static com.odde.donut.services.QuestionGenerationBatchOutputCollectionTestSupport.stubCompletedOpenAiBatch;
 import static com.odde.donut.services.QuestionGenerationBatchOutputCollectionTestSupport.successLine;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
@@ -8,7 +8,6 @@ import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 import com.odde.donut.entities.MemoryTracker;
 import com.odde.donut.entities.Note;
@@ -19,27 +18,19 @@ import com.odde.donut.entities.QuestionGenerationBatchStatus;
 import com.odde.donut.entities.User;
 import com.odde.donut.entities.repositories.QuestionGenerationBatchRepository;
 import com.odde.donut.entities.repositories.QuestionGenerationBatchRequestRepository;
-import com.odde.donut.services.openAiApis.OpenAiApiHandler;
-import com.odde.donut.testability.MakeMe;
+import com.odde.donut.testability.OpenAiBatchApiMock;
+import com.odde.donut.testability.SpringTestBase;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.transaction.annotation.Transactional;
 
-@SpringBootTest
-@ActiveProfiles("test")
-@Transactional
-class QuestionGenerationBatchOutputCollectionDirectBatchTest {
+class QuestionGenerationBatchOutputCollectionDirectBatchTest extends SpringTestBase {
 
-  @MockitoBean OpenAiApiHandler openAiApiHandler;
+  OpenAiBatchApiMock openAiBatches;
 
-  @Autowired MakeMe makeMe;
   @Autowired QuestionGenerationBatchOutputCollectionService outputCollectionService;
   @Autowired QuestionGenerationBatchRepository batchRepository;
   @Autowired QuestionGenerationBatchRequestRepository batchRequestRepository;
@@ -52,6 +43,7 @@ class QuestionGenerationBatchOutputCollectionDirectBatchTest {
 
   @BeforeEach
   void setup() {
+    openAiBatches = new OpenAiBatchApiMock(officialClient);
     user = makeMe.aUser().please();
     currentTime = makeMe.aTimestamp().please();
 
@@ -95,10 +87,7 @@ class QuestionGenerationBatchOutputCollectionDirectBatchTest {
 
   @Test
   void marksMissingOutputLinesAsFailed() {
-    when(openAiApiHandler.retrieveBatch("batch-openai-1")).thenReturn(completedOpenAiBatch());
-    when(openAiApiHandler.downloadFileContent("file-output"))
-        .thenReturn(successLine(firstRequest.getCustomId()));
-    when(openAiApiHandler.downloadFileContent("file-error")).thenReturn("");
+    stubCompletedOpenAiBatch(openAiBatches, successLine(firstRequest.getCustomId()), "");
 
     outputCollectionService.collectOutputForCompletedBatches(currentTime);
 
@@ -110,14 +99,13 @@ class QuestionGenerationBatchOutputCollectionDirectBatchTest {
 
   @Test
   void ignoresMalformedOutputLinesWithoutFailingOtherRows() {
-    when(openAiApiHandler.retrieveBatch("batch-openai-1")).thenReturn(completedOpenAiBatch());
-    when(openAiApiHandler.downloadFileContent("file-output"))
-        .thenReturn(
-            "not-json\n"
-                + successLine(firstRequest.getCustomId())
-                + "\n"
-                + "{\"response\":{\"status_code\":200}}");
-    when(openAiApiHandler.downloadFileContent("file-error")).thenReturn("");
+    stubCompletedOpenAiBatch(
+        openAiBatches,
+        "not-json\n"
+            + successLine(firstRequest.getCustomId())
+            + "\n"
+            + "{\"response\":{\"status_code\":200}}",
+        "");
 
     outputCollectionService.collectOutputForCompletedBatches(currentTime);
 
@@ -134,10 +122,7 @@ class QuestionGenerationBatchOutputCollectionDirectBatchTest {
 
   @Test
   void ignoresErrorLinesWithMissingCustomId() {
-    when(openAiApiHandler.retrieveBatch("batch-openai-1")).thenReturn(completedOpenAiBatch());
-    when(openAiApiHandler.downloadFileContent("file-output")).thenReturn("");
-    when(openAiApiHandler.downloadFileContent("file-error"))
-        .thenReturn("{\"error\":{\"message\":\"batch failed\"}}");
+    stubCompletedOpenAiBatch(openAiBatches, "", "{\"error\":{\"message\":\"batch failed\"}}");
 
     outputCollectionService.collectOutputForCompletedBatches(currentTime);
 
@@ -158,15 +143,13 @@ class QuestionGenerationBatchOutputCollectionDirectBatchTest {
     completedBatch.setOpenaiErrorFileId("file-error");
     batchRepository.saveAndFlush(completedBatch);
 
-    when(openAiApiHandler.downloadFileContent("file-output"))
-        .thenReturn(
-            successLine(secondRequest.getCustomId())
-                + "\n"
-                + successLine(firstRequest.getCustomId()));
-    when(openAiApiHandler.downloadFileContent("file-error")).thenReturn("");
+    openAiBatches.stubFileContent(
+        "file-output",
+        successLine(secondRequest.getCustomId()) + "\n" + successLine(firstRequest.getCustomId()));
+    openAiBatches.stubFileContent("file-error", "");
 
     outputCollectionService.collectOutputForCompletedBatches(currentTime);
 
-    verify(openAiApiHandler, never()).retrieveBatch(anyString());
+    verify(openAiBatches.batches(), never()).retrieve(anyString());
   }
 }

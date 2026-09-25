@@ -9,25 +9,17 @@ import com.odde.donut.entities.QuestionGenerationBatch;
 import com.odde.donut.entities.QuestionGenerationBatchStatus;
 import com.odde.donut.entities.User;
 import com.odde.donut.entities.repositories.QuestionGenerationBatchRepository;
-import com.odde.donut.services.openAiApis.OpenAiApiHandler;
-import com.odde.donut.testability.MakeMe;
+import com.odde.donut.testability.OpenAiBatchApiMock;
+import com.odde.donut.testability.SpringTestBase;
 import java.sql.Timestamp;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.transaction.annotation.Transactional;
 
-@SpringBootTest
-@ActiveProfiles("test")
-@Transactional
-class QuestionGenerationBatchOutputCollectionScopeTest {
+class QuestionGenerationBatchOutputCollectionScopeTest extends SpringTestBase {
 
-  @MockitoBean OpenAiApiHandler openAiApiHandler;
+  OpenAiBatchApiMock openAiBatches;
 
-  @Autowired MakeMe makeMe;
   @Autowired QuestionGenerationBatchOutputCollectionService outputCollectionService;
   @Autowired QuestionGenerationBatchRepository batchRepository;
 
@@ -36,6 +28,7 @@ class QuestionGenerationBatchOutputCollectionScopeTest {
 
   @BeforeEach
   void setup() {
+    openAiBatches = new OpenAiBatchApiMock(officialClient);
     user = makeMe.aUser().please();
     currentTime = makeMe.aTimestamp().please();
   }
@@ -48,7 +41,7 @@ class QuestionGenerationBatchOutputCollectionScopeTest {
 
     outputCollectionService.collectOutputForCompletedBatches(currentTime);
 
-    verify(openAiApiHandler, never()).retrieveBatch(anyString());
+    verify(openAiBatches.batches(), never()).retrieve(anyString());
   }
 
   @Test
@@ -59,7 +52,7 @@ class QuestionGenerationBatchOutputCollectionScopeTest {
 
     outputCollectionService.collectOutputForCompletedBatches(currentTime);
 
-    verify(openAiApiHandler, never()).retrieveBatch(eq("batch-openai-1"));
+    verify(openAiBatches.batches(), never()).retrieve(eq("batch-openai-1"));
   }
 
   private QuestionGenerationBatch saveCompletedBatch() {

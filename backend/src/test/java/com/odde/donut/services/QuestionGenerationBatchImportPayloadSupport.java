@@ -38,6 +38,6 @@ final class QuestionGenerationBatchImportPayloadSupport {
 
     return """
         {"id":"batch_req_1","custom_id":"%s","response":{"status_code":200,"body":%s},"error":null}"""
-        .formatted(customId, responseBody);
+        .formatted(customId, OBJECT_MAPPER.readTree(responseBody));
   }
 }
