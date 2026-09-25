@@ -2,20 +2,12 @@ package com.odde.donut.entities;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
-import com.odde.donut.testability.MakeMe;
+import com.odde.donut.testability.SpringTestBase;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.transaction.annotation.Transactional;
 
-@SpringBootTest
-@ActiveProfiles("test")
-@Transactional
-class NotebookTest {
-  @Autowired MakeMe makeMe;
+class NotebookTest extends SpringTestBase {
   Notebook notebook;
 
   @BeforeEach

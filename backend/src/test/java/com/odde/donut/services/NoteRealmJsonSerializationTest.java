@@ -5,19 +5,12 @@ import com.odde.donut.configs.ObjectMapperConfig;
 import com.odde.donut.controllers.dto.NoteRealm;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.User;
+import com.odde.donut.testability.SpringTestBase;
 import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.transaction.annotation.Transactional;
 
-@SpringBootTest
-@ActiveProfiles("test")
-@Transactional
-class NoteRealmJsonSerializationTest {
-
-  @Autowired com.odde.donut.testability.MakeMe makeMe;
+class NoteRealmJsonSerializationTest extends SpringTestBase {
   @Autowired NoteRealmService noteRealmService;
   @Autowired EntityManager entityManager;
 

@@ -6,19 +6,15 @@ import static org.hamcrest.Matchers.is;
 
 import com.odde.donut.services.ai.GeneratedMcq;
 import com.odde.donut.services.openAiApis.OpenAiApiHandler;
+import com.odde.donut.testability.SpringTestBase;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.test.context.ActiveProfiles;
 
 /** Regression test for OpenAI batch success-line parsing using the semantic MCQ contract. */
-@SpringBootTest
-@ActiveProfiles("test")
-class QuestionGenerationBatchOutputFixtureTest {
-
+class QuestionGenerationBatchOutputFixtureTest extends SpringTestBase {
   @Autowired OpenAiApiHandler openAiApiHandler;
 
   @Test

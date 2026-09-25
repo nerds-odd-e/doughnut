@@ -11,21 +11,13 @@ import com.odde.donut.services.QuestionGenerationBatchMaintenanceJob;
 import com.odde.donut.services.QuestionGenerationBatchMaintenanceRunService;
 import com.odde.donut.services.QuestionGenerationBatchMaintenanceService;
 import com.odde.donut.services.QuestionGenerationBatchSubmitDueUsersService;
-import com.odde.donut.testability.MakeMe;
+import com.odde.donut.testability.SpringTestBase;
 import com.odde.donut.testability.TestabilitySettings;
 import java.sql.Timestamp;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.transaction.annotation.Transactional;
 
-@SpringBootTest
-@ActiveProfiles("test")
-@Transactional
-class QuestionGenerationBatchMaintenanceRunRepositoryTest {
-
-  @Autowired MakeMe makeMe;
+class QuestionGenerationBatchMaintenanceRunRepositoryTest extends SpringTestBase {
   @Autowired QuestionGenerationBatchMaintenanceRunRepository repository;
   @Autowired QuestionGenerationBatchMaintenanceRunService maintenanceRunService;
   @Autowired QuestionGenerationBatchMaintenanceService maintenanceService;

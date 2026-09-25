@@ -157,7 +157,17 @@ tests that never reach them.
 
 ### 3. Standalone Spring tests use the shared context
 Type: Structure
-Status: planned
+Status: done
+Result: boots ~14 → ~6; test phase 43.0s / 42.7s, wall 66.5s / 65.6s (two
+runs, load ~5). 2650 cases, 0 failures, 2 skipped. 77 plain "test"-profile
+classes (about 60 more than first listed) joined; +173/−891 lines. Refactor
+extracted the shared context into `testability/SpringTestBase` (non-controller
+tests extend it; `ControllerTestBase` extends it with only controller helpers)
+and moved the `useRealGithub` reset into its `@AfterEach` because
+`TestabilityDbResetTest`'s `init()` would otherwise leak `false`.
+`UserDTOTest` runs without Spring; `HealthCheckControllerTest` asserts the
+real build-info commit. `FailureReportFactoryTest` keeps its `doReturn(null)`
+stub (a Mockito `Integer` answer is 0, not null).
 Expected: −7 boots.
 Proof: full `backend:test_only` passes with the same case count.
 

@@ -3,6 +3,7 @@ package com.odde.donut.configs;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
+import com.odde.donut.testability.SpringTestBase;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
@@ -10,16 +11,9 @@ import java.sql.Timestamp;
 import javax.sql.DataSource;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.datasource.DataSourceUtils;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.transaction.annotation.Transactional;
 
-@SpringBootTest
-@ActiveProfiles("test")
-@Transactional
-class DatabaseTimeZoneTest {
-
+class DatabaseTimeZoneTest extends SpringTestBase {
   @Autowired DataSource dataSource;
 
   @Test

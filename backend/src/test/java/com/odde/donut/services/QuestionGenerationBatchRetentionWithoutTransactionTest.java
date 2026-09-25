@@ -12,7 +12,7 @@ import com.odde.donut.entities.QuestionGenerationBatchStatus;
 import com.odde.donut.entities.User;
 import com.odde.donut.entities.repositories.QuestionGenerationBatchRepository;
 import com.odde.donut.testability.CommittedUserCleanup;
-import com.odde.donut.testability.MakeMe;
+import com.odde.donut.testability.SpringTestBase;
 import jakarta.persistence.EntityManager;
 import java.sql.Timestamp;
 import java.util.UUID;
@@ -21,22 +21,16 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionTemplate;
 
-@SpringBootTest
-@ActiveProfiles("test")
 @Transactional(propagation = Propagation.NOT_SUPPORTED)
-class QuestionGenerationBatchRetentionWithoutTransactionTest {
-
+class QuestionGenerationBatchRetentionWithoutTransactionTest extends SpringTestBase {
   private static final String FIXTURE_PREFIX = "batch-prune-committed-";
 
-  @Autowired MakeMe makeMe;
   @Autowired QuestionGenerationBatchRepository batchRepository;
   @Autowired QuestionGenerationBatchRetentionService retentionService;
   @Autowired PlatformTransactionManager transactionManager;

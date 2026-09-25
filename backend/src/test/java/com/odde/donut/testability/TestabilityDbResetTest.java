@@ -7,10 +7,7 @@ import com.odde.donut.services.notebookGit.NotebookGitCutoverService;
 import java.time.Instant;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Calls the real E2E reset, whose {@code TRUNCATE}s commit implicitly: this test really empties the
@@ -18,14 +15,9 @@ import org.springframework.transaction.annotation.Transactional;
  * no test depends on another test's committed data; enabling parallel test execution must isolate
  * this class first.
  */
-@SpringBootTest
-@ActiveProfiles("test")
-@Transactional
-class TestabilityDbResetTest {
-
+class TestabilityDbResetTest extends SpringTestBase {
   @Autowired TestabilityRestController testabilityRestController;
   @Autowired NotebookGitCutoverService notebookGitCutoverService;
-  @Autowired MakeMe makeMe;
   @Autowired JdbcTemplate jdbcTemplate;
 
   @Test

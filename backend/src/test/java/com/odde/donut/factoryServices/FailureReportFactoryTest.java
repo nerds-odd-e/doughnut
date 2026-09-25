@@ -16,10 +16,8 @@ import com.odde.donut.entities.FailureReport;
 import com.odde.donut.entities.User;
 import com.odde.donut.entities.repositories.FailureReportRepository;
 import com.odde.donut.entities.repositories.UserRepository;
-import com.odde.donut.services.GithubService;
 import com.odde.donut.services.UserService;
-import com.odde.donut.testability.MakeMe;
-import com.odde.donut.testability.TestabilitySettings;
+import com.odde.donut.testability.SpringTestBase;
 import com.odde.donut.utils.TimestampOperations;
 import java.io.IOException;
 import java.sql.Timestamp;
@@ -27,41 +25,21 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.StreamSupport;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.mock.web.MockHttpServletRequest;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.transaction.annotation.Transactional;
 
-@SpringBootTest
-@ActiveProfiles("test")
-@Transactional
-@ExtendWith(MockitoExtension.class)
-class FailureReportFactoryTest {
-
+class FailureReportFactoryTest extends SpringTestBase {
   @Autowired FailureReportRepository failureReportRepository;
   @Autowired UserRepository userRepository;
   @Autowired UserService userService;
-  @Autowired MakeMe makeMe;
-  @Autowired TestabilitySettings testabilitySettings;
-  @Mock GithubService githubService;
 
   MockHttpServletRequest request = new MockHttpServletRequest();
 
   @BeforeEach
   void setUp() throws IOException, InterruptedException {
     doReturn(null).when(githubService).createGithubIssue(any());
-  }
-
-  @AfterEach
-  void resetTimeTravel() {
-    testabilitySettings.timeTravelTo(null);
   }
 
   @Test

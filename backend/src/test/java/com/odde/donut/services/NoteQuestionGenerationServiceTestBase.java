@@ -2,27 +2,14 @@ package com.odde.donut.services;
 
 import com.odde.donut.entities.Note;
 import com.odde.donut.services.ai.GeneratedMcq;
-import com.odde.donut.testability.MakeMe;
 import com.odde.donut.testability.OpenAiStructuredResponseMock;
-import com.openai.client.OpenAIClient;
+import com.odde.donut.testability.SpringTestBase;
 import com.openai.models.responses.StructuredResponseCreateParams;
 import org.junit.jupiter.api.BeforeEach;
 import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.transaction.annotation.Transactional;
 
-@SpringBootTest
-@ActiveProfiles("test")
-@Transactional
-abstract class NoteQuestionGenerationServiceTestBase {
-
-  @MockitoBean(name = "officialOpenAiClient")
-  OpenAIClient officialClient;
-
-  @Autowired MakeMe makeMe;
+abstract class NoteQuestionGenerationServiceTestBase extends SpringTestBase {
   @Autowired GlobalSettingsService globalSettingsService;
   @Autowired NoteQuestionGenerationService service;
   OpenAiStructuredResponseMock openAiStructuredResponseMock;

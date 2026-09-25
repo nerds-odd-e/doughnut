@@ -10,8 +10,8 @@ import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.User;
-import com.odde.donut.testability.MakeMe;
 import com.odde.donut.testability.RelationshipNoteMarkdown;
+import com.odde.donut.testability.SpringTestBase;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -19,16 +19,8 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.transaction.annotation.Transactional;
 
-@SpringBootTest
-@ActiveProfiles("test")
-@Transactional
-class NoteRealmServiceTest {
-
-  @Autowired MakeMe makeMe;
+class NoteRealmServiceTest extends SpringTestBase {
   @Autowired NoteRealmService noteRealmService;
 
   User user;

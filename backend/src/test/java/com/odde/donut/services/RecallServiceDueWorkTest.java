@@ -7,7 +7,7 @@ import static org.hamcrest.Matchers.nullValue;
 import com.odde.donut.entities.MemoryTracker;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.User;
-import com.odde.donut.testability.MakeMe;
+import com.odde.donut.testability.SpringTestBase;
 import com.odde.donut.utils.TimestampOperations;
 import java.sql.Timestamp;
 import java.time.ZoneId;
@@ -17,15 +17,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.transaction.annotation.Transactional;
 
-@SpringBootTest
-@ActiveProfiles("test")
-@Transactional
-public class RecallServiceDueWorkTest {
-  @Autowired MakeMe makeMe;
+public class RecallServiceDueWorkTest extends SpringTestBase {
   @Autowired UserService userService;
   User user;
   User anotherUser;

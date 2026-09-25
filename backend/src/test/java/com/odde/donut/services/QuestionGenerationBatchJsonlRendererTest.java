@@ -15,7 +15,7 @@ import com.odde.donut.entities.User;
 import com.odde.donut.entities.repositories.QuestionGenerationBatchRequestRepository;
 import com.odde.donut.services.ai.GeneratedMcq;
 import com.odde.donut.services.openAiApis.StructuredResponseCreateParamsSerializer;
-import com.odde.donut.testability.MakeMe;
+import com.odde.donut.testability.SpringTestBase;
 import com.openai.models.responses.StructuredResponseCreateParams;
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -27,16 +27,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.transaction.annotation.Transactional;
 
-@SpringBootTest
-@ActiveProfiles("test")
-@Transactional
-class QuestionGenerationBatchJsonlRendererTest {
-
-  @Autowired MakeMe makeMe;
+class QuestionGenerationBatchJsonlRendererTest extends SpringTestBase {
   @Autowired QuestionGenerationBatchJsonlRenderer jsonlRenderer;
   @Autowired QuestionGenerationBatchRequestRepository batchRequestRepository;
   @Autowired QuestionGenerationRequestBuilder requestBuilder;

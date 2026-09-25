@@ -4,37 +4,22 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.not;
 
-import com.odde.donut.controllers.currentUser.CurrentUser;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.User;
 import com.odde.donut.services.ai.GeneratedMcq;
 import com.odde.donut.services.focusContext.FocusContextConstants;
 import com.odde.donut.services.focusContext.FocusContextMarkdownAugmenter;
-import com.odde.donut.testability.MakeMe;
+import com.odde.donut.testability.SpringTestBase;
 import com.openai.models.responses.StructuredResponseCreateParams;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.bean.override.convention.TestBean;
-import org.springframework.transaction.annotation.Transactional;
 
-@SpringBootTest
-@ActiveProfiles("test")
-@Transactional
-class QuestionGenerationRequestBuilderTests {
-
-  @Autowired MakeMe makeMe;
+class QuestionGenerationRequestBuilderTests extends SpringTestBase {
   @Autowired NoteQuestionGenerationService noteQuestionGenerationService;
   @Autowired QuestionGenerationRequestBuilder questionGenerationRequestBuilder;
-  @TestBean CurrentUser currentUser;
 
   private User user;
-
-  static CurrentUser currentUser() {
-    return new CurrentUser();
-  }
 
   @BeforeEach
   void setup() {

@@ -4,16 +4,14 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.hasSize;
 
+import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 
-@SpringBootTest
 class UserDTOTest {
 
-  @Autowired private Validator validator;
+  private final Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
   UserDTO userDTO = new UserDTO();
 
   @BeforeEach

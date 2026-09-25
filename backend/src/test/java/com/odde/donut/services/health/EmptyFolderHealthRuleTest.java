@@ -13,20 +13,13 @@ import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.User;
 import com.odde.donut.services.NotebookHealthService;
-import com.odde.donut.testability.MakeMe;
+import com.odde.donut.testability.SpringTestBase;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.transaction.annotation.Transactional;
 
-@SpringBootTest
-@ActiveProfiles("test")
-@Transactional
-class EmptyFolderHealthRuleTest {
+class EmptyFolderHealthRuleTest extends SpringTestBase {
   @Autowired NotebookHealthService notebookHealthService;
-  @Autowired MakeMe makeMe;
 
   private User owner;
   private Notebook notebook;

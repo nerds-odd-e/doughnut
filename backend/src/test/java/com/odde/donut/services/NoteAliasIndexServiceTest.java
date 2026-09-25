@@ -12,21 +12,13 @@ import com.odde.donut.entities.Note;
 import com.odde.donut.entities.NoteAliasIndex;
 import com.odde.donut.entities.User;
 import com.odde.donut.entities.repositories.NoteAliasIndexRepository;
-import com.odde.donut.testability.MakeMe;
+import com.odde.donut.testability.SpringTestBase;
 import java.util.List;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.transaction.annotation.Transactional;
 
-@SpringBootTest
-@ActiveProfiles("test")
-@Transactional
-class NoteAliasIndexServiceTest {
-
-  @Autowired MakeMe makeMe;
+class NoteAliasIndexServiceTest extends SpringTestBase {
   @Autowired NoteAliasIndexService noteAliasIndexService;
   @Autowired NoteAliasIndexRepository noteAliasIndexRepository;
 

@@ -11,22 +11,14 @@ import com.odde.donut.entities.NotePropertyIndex;
 import com.odde.donut.entities.User;
 import com.odde.donut.entities.repositories.NotePropertyIndexRepository;
 import com.odde.donut.entities.repositories.NoteRepository;
-import com.odde.donut.testability.MakeMe;
+import com.odde.donut.testability.SpringTestBase;
 import jakarta.persistence.EntityManager;
 import java.util.List;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.transaction.annotation.Transactional;
 
-@SpringBootTest
-@ActiveProfiles("test")
-@Transactional
-class NotePropertyIndexServiceTest {
-
-  @Autowired MakeMe makeMe;
+class NotePropertyIndexServiceTest extends SpringTestBase {
   @Autowired NotePropertyIndexService notePropertyIndexService;
   @Autowired NotePropertyIndexRepository notePropertyIndexRepository;
   @Autowired NoteRepository noteRepository;

@@ -2,20 +2,13 @@ package com.odde.donut.services;
 
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.User;
-import com.odde.donut.testability.MakeMe;
+import com.odde.donut.testability.SpringTestBase;
 import java.sql.Timestamp;
 import java.time.ZoneId;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.transaction.annotation.Transactional;
 
-@SpringBootTest
-@ActiveProfiles("test")
-@Transactional
-abstract class AssimilationServiceTestBase {
-  @Autowired MakeMe makeMe;
+abstract class AssimilationServiceTestBase extends SpringTestBase {
   @Autowired SubscriptionService subscriptionService;
   @Autowired UserService userService;
   @Autowired AssimilationServiceFactory assimilationServiceFactory;

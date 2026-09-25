@@ -4,28 +4,20 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
+import com.odde.donut.controllers.ControllerTestBase;
 import com.odde.donut.entities.User;
 import com.odde.donut.entities.repositories.UserRepository;
 import com.odde.donut.services.UserService;
-import com.odde.donut.testability.MakeMe;
 import com.odde.donut.testability.TestAccessTokenResolver;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.mock.web.MockHttpServletRequest;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.transaction.annotation.Transactional;
 
-@SpringBootTest
-@ActiveProfiles("test")
-@Transactional
-class CurrentUserFetcherFromRequestTest {
-
+class CurrentUserFetcherFromRequestTest extends ControllerTestBase {
   @Autowired UserRepository userRepository;
   @Autowired UserService userService;
   @Autowired TestAccessTokenResolver testAccessTokenResolver;
-  @Autowired MakeMe makeMe;
 
   CurrentUserFetcherFromRequest fetcherWith(MockHttpServletRequest request, boolean withResolver) {
     Optional<TestAccessTokenResolver> resolver =

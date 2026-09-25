@@ -8,21 +8,13 @@ import static org.hamcrest.Matchers.nullValue;
 import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
-import com.odde.donut.testability.MakeMe;
+import com.odde.donut.testability.SpringTestBase;
 import jakarta.persistence.EntityManager;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.transaction.annotation.Transactional;
 
-@SpringBootTest
-@ActiveProfiles("test")
-@Transactional
-class FolderRepositoryTest {
-
-  @Autowired MakeMe makeMe;
+class FolderRepositoryTest extends SpringTestBase {
   @Autowired FolderRepository folderRepository;
   @Autowired NoteRepository noteRepository;
   @Autowired EntityManager entityManager;
