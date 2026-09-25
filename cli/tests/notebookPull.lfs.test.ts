@@ -13,10 +13,6 @@ import {
   realSpawnSync,
 } from './notebookPublish.lfs.testHelpers.js'
 import {
-  buildSourceRepo,
-  cloneAsBoundCheckout,
-} from './notebookPublish.testHelpers.js'
-import {
   commitPortableFile,
   installNotebookPullAcceptedHistoryTest,
   serveAcceptedBundle,
@@ -191,25 +187,5 @@ describe('notebook pull (LFS checkout fill-in)', () => {
         'Unpublished local work is already based on the accepted history.'
       )
     )
-  })
-
-  test('a legacy checkout pulls without Git LFS', async () => {
-    const source = buildSourceRepo(ctx.getWorkDir())
-    const directory = cloneAsBoundCheckout(
-      ctx.getWorkDir(),
-      source,
-      getApiConfig().apiBaseUrl,
-      'checkout'
-    )
-    commitPortableFile(source, 'note.md', '# web\n', 'web note')
-    serveAcceptedBundle(ctx, source, 'legacy')
-    const lfs = interceptGitLfs()
-
-    await run(['notebook', 'pull', directory])
-
-    expect(runGit(['rev-parse', 'HEAD'], directory)).toBe(
-      runGit(['rev-parse', 'main'], source)
-    )
-    expect(lfs.lfsSteps()).toEqual([])
   })
 })

@@ -49,14 +49,11 @@ export function stubBundleFetch(): void {
   )
 }
 
-export const LFS_ATTRIBUTES = '* filter=lfs diff=lfs merge=lfs -text\n'
-
 export function writeLfsCheckoutPointer(
   checkoutDir: string,
   filename: string,
   pointerBody: string
 ): void {
   fs.mkdirSync(checkoutDir, { recursive: true })
-  fs.writeFileSync(join(checkoutDir, '.gitattributes'), LFS_ATTRIBUTES)
   fs.writeFileSync(join(checkoutDir, filename), pointerBody)
 }

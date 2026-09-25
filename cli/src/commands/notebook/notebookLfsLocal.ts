@@ -1,5 +1,3 @@
-import * as fs from 'node:fs'
-import * as path from 'node:path'
 import { loadAuthenticatedFetchContext } from '../../backendApi/donutBackendClient.js'
 import { runSystemGitOrThrow } from './systemGit.js'
 
@@ -21,15 +19,6 @@ function placeholderNotebookRemoteUrl(apiBaseUrl: string): string {
  */
 export function smudgeSkippedGitOptions(): { env: NodeJS.ProcessEnv } {
   return { env: { ...process.env, GIT_LFS_SKIP_SMUDGE: '1' } }
-}
-
-/** True when the checkout's `.gitattributes` enables the standard LFS filter. */
-export function checkoutUsesLfs(checkoutDir: string): boolean {
-  const attributesPath = path.join(checkoutDir, '.gitattributes')
-  if (!fs.existsSync(attributesPath)) {
-    return false
-  }
-  return fs.readFileSync(attributesPath, 'utf8').includes('filter=lfs')
 }
 
 /** Adds `origin` when missing so `git lfs push` / `fetch` has a remote name. */
@@ -95,7 +84,7 @@ function configureLocalLfsEndpointAndAuth(
 }
 
 /**
- * Prepares an LFS checkout for authenticated transfers: requires Git LFS, then records the
+ * Prepares the checkout for authenticated Git LFS transfers: requires Git LFS, then records the
  * notebook LFS endpoint and the CLI's current login in local Git config (never authored
  * content) behind a placeholder `origin`, and installs the local LFS filters. A missing Git
  * LFS reports that it is needed to `purpose` the attachments, then names `nextStep`.

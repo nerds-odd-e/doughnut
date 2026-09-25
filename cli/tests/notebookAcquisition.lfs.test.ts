@@ -20,10 +20,10 @@ vi.mock('node:fs', async () => {
   return { ...actual, renameSync: vi.fn(actual.renameSync) }
 })
 
-describe('acquireNotebookGitCheckout — LFS tip fill-in', () => {
+describe('acquireNotebookGitCheckout — Git LFS fill-in', () => {
   const ctx = installAcquireNotebookGitCheckoutTest()
 
-  test('LFS tip configures the endpoint, fills in current files, then installs', async () => {
+  test('configures the LFS endpoint, fills in current files, then installs', async () => {
     const destinationPath = ctx.getDestinationPath()
     stubBundleFetch()
     let checkoutDir = ''

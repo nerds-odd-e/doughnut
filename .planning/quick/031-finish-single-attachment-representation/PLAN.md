@@ -297,7 +297,7 @@ a pointer". `checkoutUsesLfs` stays for fill-in until slice 8.
 
 ### 8. Clone and pull fill in every checkout through Git LFS
 Type: Behavior
-Status: planned
+Status: done
 Pre-condition: a clone staging checkout or bound checkout whose tip has no
 LFS `.gitattributes`.
 Trigger: `donut notebook clone` or `donut notebook pull`.

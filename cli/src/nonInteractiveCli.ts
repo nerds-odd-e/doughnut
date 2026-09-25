@@ -11,7 +11,7 @@ import {
 import { assertLocalMainFollowsAcceptedHistory } from './commands/notebook/notebookPublishAncestry.js'
 import { uploadRequiredLfsObjectsBeforeProposal } from './commands/notebook/notebookPublishLfs.js'
 import { submitNotebookGitProposal } from './commands/notebook/notebookPublishSubmission.js'
-import { fillInCurrentLfsFilesIfNeeded } from './commands/notebook/notebookLfsFillIn.js'
+import { fillInCurrentLfsFiles } from './commands/notebook/notebookLfsFillIn.js'
 import { receiveAcceptedNotebookHead } from './commands/notebook/notebookPull.js'
 
 /**
@@ -160,7 +160,7 @@ async function completeNotebookPull(notebookArgs: string[]): Promise<void> {
     result = await receiveAcceptedNotebookHead(directory, Number(notebookId))
     const rerunPull = 'rerun "donut notebook pull"'
     // Pull refuses during an active rebase, so a paused pull is rerun only after the rebase ends.
-    fillInCurrentLfsFilesIfNeeded(
+    fillInCurrentLfsFiles(
       directory,
       Number(notebookId),
       result.kind === 'paused'

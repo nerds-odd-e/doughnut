@@ -23,7 +23,7 @@ live in ordinary Git configuration or the normal credential store. Git tree
 object IDs supply tree integrity checks; the commit graph supplies common
 ancestors. Do not introduce a custom tree digest, sync envelope, delta format,
 or three-way merge protocol. Standard Git LFS metadata and its local object
-cache are allowed; local attachment workflows require Git LFS. The
+cache are allowed; local notebook workflows require Git LFS. The
 [attachment storage contract](./notebook-git-lfs.md) owns object transfer,
 verification, authorization, and retention.
 

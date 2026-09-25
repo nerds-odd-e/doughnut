@@ -1,23 +1,18 @@
 import {
-  checkoutUsesLfs,
   prepareAuthenticatedLfsCheckout,
   smudgeSkippedGitOptions,
 } from './notebookLfsLocal.js'
 import { runSystemGitOrThrow } from './systemGit.js'
 
 /**
- * When the checkout enables Git LFS, prepares authenticated LFS transfers, then fills in only
- * the current checkout's files via `git lfs fetch` and `git lfs checkout`. Returns whether
- * the fill-in ran. Failures end with the caller's `nextStep` (e.g. `rerun "donut notebook pull"`).
+ * Prepares authenticated LFS transfers, then fills in only the current checkout's files via
+ * `git lfs fetch` and `git lfs checkout`. Failures end with the caller's `nextStep` (e.g. `rerun "donut notebook pull"`).
  */
-export function fillInCurrentLfsFilesIfNeeded(
+export function fillInCurrentLfsFiles(
   checkoutDir: string,
   notebookId: number,
   nextStep: string
-): boolean {
-  if (!checkoutUsesLfs(checkoutDir)) {
-    return false
-  }
+): void {
   prepareAuthenticatedLfsCheckout(checkoutDir, notebookId, 'receive', nextStep)
   const noPrompt = {
     env: { ...smudgeSkippedGitOptions().env, GIT_TERMINAL_PROMPT: '0' },
@@ -37,5 +32,4 @@ export function fillInCurrentLfsFilesIfNeeded(
     incomplete('materialize'),
     noPrompt
   )
-  return true
 }

@@ -7,7 +7,7 @@ import {
 } from '../../backendApi/donutBackendClient.js'
 import { exceptionText } from '../../exceptionText.js'
 import { errnoCode } from '../../errnoCode.js'
-import { fillInCurrentLfsFilesIfNeeded } from './notebookLfsFillIn.js'
+import { fillInCurrentLfsFiles } from './notebookLfsFillIn.js'
 import { smudgeSkippedGitOptions } from './notebookLfsLocal.js'
 import { runSystemGitOrThrow } from './systemGit.js'
 
@@ -72,8 +72,8 @@ function recordLocalNotebookBinding(
 }
 
 /**
- * Removes the `origin` remote that `git clone <bundle-file> <target>` points at the (deleted)
- * temporary local bundle file, so a finished checkout has no dangling remote.
+ * Removes `origin`: first the one `git clone <bundle-file> <target>` points at the temporary
+ * bundle file, then the placeholder fill-in adds, so a finished checkout has no remote.
  */
 function removeOriginRemote(checkoutDir: string): void {
   runSystemGitOrThrow(
@@ -109,11 +109,10 @@ function moveCheckoutIntoDestination(
  * Downloads the notebook's accepted Git bundle and produces a clean local checkout at
  * `destinationPath`, with a local-only (untracked) Git config binding
  * ({@link recordLocalNotebookBinding}) recording the source notebook id and API origin, and
- * with the bundle-pointing `origin` remote removed ({@link removeOriginRemote}). When the tip
- * enables Git LFS, fills in the current checkout's files ({@link fillInCurrentLfsFilesIfNeeded})
- * before install. `destinationPath` is only ever touched by the final
- * atomic move, and only once staging fully succeeds. Staging is always removed afterward,
- * success or failure.
+ * no `origin` remote ({@link removeOriginRemote}). Fills in the current checkout's files through
+ * Git LFS ({@link fillInCurrentLfsFiles}) before install. `destinationPath` is only ever touched
+ * by the final atomic move, and only once staging fully succeeds. Staging is always removed
+ * afterward, success or failure.
  */
 export async function acquireNotebookGitCheckout(
   notebookId: number,
@@ -138,15 +137,12 @@ export async function acquireNotebookGitCheckout(
 
     recordLocalNotebookBinding(checkoutDir, notebookId, apiBaseUrl)
     removeOriginRemote(checkoutDir)
-    if (
-      fillInCurrentLfsFilesIfNeeded(
-        checkoutDir,
-        notebookId,
-        'rerun "donut notebook clone"'
-      )
-    ) {
-      removeOriginRemote(checkoutDir)
-    }
+    fillInCurrentLfsFiles(
+      checkoutDir,
+      notebookId,
+      'rerun "donut notebook clone"'
+    )
+    removeOriginRemote(checkoutDir)
     moveCheckoutIntoDestination(checkoutDir, destinationPath)
   } finally {
     fs.rmSync(stagingDir, { recursive: true, force: true })
