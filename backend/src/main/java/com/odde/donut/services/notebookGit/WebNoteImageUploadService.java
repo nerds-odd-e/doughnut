@@ -11,6 +11,7 @@ import com.odde.donut.exceptions.ApiException;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.donut.services.AuthoredNoteDocumentPersistence;
 import com.odde.donut.services.notebookAttachment.NotebookAttachmentContent;
+import com.odde.donut.services.notebookGit.NotebookGitAcceptedRepositoryStore.OpenedAcceptedRepository;
 import com.odde.donut.validators.AuthoredNoteContent;
 import java.io.IOException;
 import java.sql.Timestamp;
@@ -32,7 +33,7 @@ public class WebNoteImageUploadService {
   private final NotebookAttachmentRepository attachmentRepository;
   private final AuthoredNoteDocumentPersistence authoredNoteDocumentPersistence;
   private final CanonicalDonutOrigin canonicalDonutOrigin;
-  private final NoteFolderAttachment noteFolderAttachment;
+  private final NotebookGitAcceptedRepositoryStore repositoryStore;
 
   public WebNoteImageUploadService(
       WebNoteEditService webNoteEditService,
@@ -41,14 +42,14 @@ public class WebNoteImageUploadService {
       NotebookAttachmentRepository attachmentRepository,
       AuthoredNoteDocumentPersistence authoredNoteDocumentPersistence,
       CanonicalDonutOrigin canonicalDonutOrigin,
-      NoteFolderAttachment noteFolderAttachment) {
+      NotebookGitAcceptedRepositoryStore repositoryStore) {
     this.webNoteEditService = webNoteEditService;
     this.bindingRepository = bindingRepository;
     this.attachmentContent = attachmentContent;
     this.attachmentRepository = attachmentRepository;
     this.authoredNoteDocumentPersistence = authoredNoteDocumentPersistence;
     this.canonicalDonutOrigin = canonicalDonutOrigin;
-    this.noteFolderAttachment = noteFolderAttachment;
+    this.repositoryStore = repositoryStore;
   }
 
   /** Returns the saved note. */
@@ -82,7 +83,10 @@ public class WebNoteImageUploadService {
     }
   }
 
-  /** A leading dot would be hidden or reserved Git metadata such as {@code .gitattributes}. */
+  /**
+   * A leading dot would be hidden or reserved Git metadata such as {@code .gitattributes}. A name
+   * is taken when the accepted tree has a file, note or folder at that path.
+   */
   private void requireFreePlainFilename(Note note, String filename) {
     String path =
         NotebookGitPortablePath.ofAttachment(
@@ -90,11 +94,18 @@ public class WebNoteImageUploadService {
     if (filename.isEmpty() || filename.contains("/") || filename.startsWith(".")) {
       throw refused(path, "is not a plain filename", ApiError.ErrorType.BINDING_ERROR);
     }
-    if (noteFolderAttachment.at(note, filename).isPresent()) {
+    if (acceptedTreeHas(note.getNotebook().getId(), path)) {
       throw refused(
           path,
           "already exists; rename the picture and upload it again",
           ApiError.ErrorType.RESOURCE_CONFLICT);
+    }
+  }
+
+  private boolean acceptedTreeHas(Integer notebookId, String path) {
+    try (OpenedAcceptedRepository accepted =
+        repositoryStore.open(bindingRepository.findByNotebook_Id(notebookId).orElseThrow())) {
+      return NotebookGitAcceptedTree.hasPath(accepted.repository(), accepted.head(), path);
     }
   }
 

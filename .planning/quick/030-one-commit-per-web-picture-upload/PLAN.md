@@ -115,7 +115,11 @@ emits `update:modelValue` and `commit` after upload.
 
 ### 3. A name used by a note or folder in the folder is refused
 Type: Behavior
-Status: planned
+Status: done
+Accepted proof: `NoteControllerUploadNoteImageTests.aNameUsedByANoteInTheNotesFolderIsRefusedAndNothingChanges`
+and `aNameUsedByAFolderInTheNotesFolderIsRefusedAndNothingChanges`; the check is
+`NotebookGitAcceptedTree.hasPath` (an empty folder is not in the accepted tree, so
+it does not block a name).
 Proof: see table row 3.
 
 Behavior: note `force` in `physics` → upload named `force.md` (or the name of a

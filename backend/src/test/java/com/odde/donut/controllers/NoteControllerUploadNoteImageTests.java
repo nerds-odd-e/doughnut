@@ -116,6 +116,28 @@ class NoteControllerUploadNoteImageTests extends NotebookGitWebContentController
     assertUploadRefusedWithNothingChanged(force, "diagram.png", "physics/diagram.png");
   }
 
+  @Test
+  void aNameUsedByANoteInTheNotesFolderIsRefusedAndNothingChanges() throws Exception {
+    Notebook notebook = createGitBackedNotebook();
+    Folder physics = makeMe.aFolder().notebook(notebook).name("physics").please();
+    Note force = makeMe.aNote("force").folder(physics).content(ACCEPTED_CONTENT).please();
+    snapshotCurrentPortableTree(notebook);
+
+    assertUploadRefusedWithNothingChanged(force, "force.md", "physics/force.md");
+  }
+
+  @Test
+  void aNameUsedByAFolderInTheNotesFolderIsRefusedAndNothingChanges() throws Exception {
+    Notebook notebook = createGitBackedNotebook();
+    Folder physics = makeMe.aFolder().notebook(notebook).name("physics").please();
+    Folder sub = makeMe.aFolder().parentFolder(physics).name("sub").please();
+    Note force = makeMe.aNote("force").folder(physics).content(ACCEPTED_CONTENT).please();
+    makeMe.aNote("inside").folder(sub).please();
+    snapshotCurrentPortableTree(notebook);
+
+    assertUploadRefusedWithNothingChanged(force, "sub", "physics/sub");
+  }
+
   @ParameterizedTest
   @ValueSource(strings = {"", ".", "..", "a/b.png", ".keep.png"})
   void aNameThatIsNotAPlainFilenameIsRefusedAndNothingChanges(String name) throws Exception {
