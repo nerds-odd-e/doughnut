@@ -177,28 +177,71 @@ No executable plan or implementation is authorized by this seed.
 
 ### Remove the legacy picture storage
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"not-refined","approach":"unselected"}
+{"schemaVersion":1,"refinement":"refined","approach":"unselected","assessment":"not-ready","reasons":["Waiting for a release containing story 5 and its verification in production","No execution approach selected yet"],"basis":{"document":"2441cebb0a1cfb4a0618af77298fb91f5725ebbd65fdadb9ab36cffc79e4853a"}}
 ```
 
 - **Identity:** SEED-035#story-18
-- **Goal:** Maintainers keep one way to store and serve note pictures. Owners
-  keep every moved picture, because each one already works as a notebook file.
-- **Evaluation:** After story 5 is confirmed in production, the following are
-  gone: the `image` table and its bytes in `attachment_blob`, the
-  `/attachments/images/...` address, legacy-picture orphan cleanup, story 5's
-  startup move, and the code that used them. All moved pictures still display.
-- **Scope / value:** Deletes code and data; no new behaviour. Runs in a release
-  after the move is verified, never in the release that moves the bytes.
-  `attachment_blob` itself stays for the non-production Book storage until
-  story 21. Split from the combined legacy-removal story (owner direction
-  2026-09-25) so the picture half need not wait for Books.
-- **Depends on:** Story 5 (delivered) verified in production.
-- **Effort hypothesis:** S–M, medium confidence.
+- **Goal:** Maintainers keep one way to store and serve note pictures, and
+  note saves and application startup stop doing legacy picture work. Owners
+  keep every moved picture, because each one already works as a notebook
+  file. Picture bytes leave MySQL, as the
+  [Git LFS contract](../../docs/notebook-git-lfs.md) requires.
+- **Why it waits:** Story 5 (the picture move) is done on main but not yet in
+  a release. This story starts only after a release containing story 5 has
+  run in production and the move is verified: the startup log shows no
+  notebook whose move failed, the count of left-over references in the
+  startup warning is recorded here, and one moved picture displays on the web
+  and arrives on clone. Dropping the table deletes the backup copy of every
+  moved picture and cannot be undone; the production database backup is the
+  only safety net, and no special export is made.
+- **Scope:** No new behaviour. Remove, in one release (code and table
+  together):
+  - the `image` table, with its picture bytes in `attachment_blob`, through a
+    new Flyway migration;
+  - the dead `note.image_id` column and its `fk_note_image_id` foreign key
+    (no code uses them). This is required, not optional: that key is
+    `ON DELETE CASCADE`, so the column and key are dropped before `image`, and
+    the removal never deletes `image` rows one by one;
+  - the `/attachments/images/...` address and its controller;
+  - the legacy orphan-picture cleanup on note save and its call sites, and the
+    legacy path parsing that only it and the move use;
+  - story 5's startup move, and the testability seeding and move endpoints
+    that exist only for legacy pictures;
+  - tests and the end-to-end scenario that exist only for legacy pictures;
+    tests that only use legacy pictures as fixtures keep their purpose without
+    them;
+  - the legacy picture rules in the attachment documentation.
+- **Excluded:**
+  - `attachment_blob` itself and its entity stay: non-production Book storage
+    still uses them until story 21.
+  - The `/attachments/` development proxy and GCP route stay; they are
+    harmless and go with story 21 or not at all.
+  - `image:` values the move left unchanged (another notebook's upload, an
+    upload without a note, a missing upload) and `/attachments/images/...`
+    links in note bodies are not rewritten or cleared (owner decision
+    2026-09-25). They show as a broken picture. Copying another notebook's
+    upload stays rejected because it would put one notebook's possibly
+    private bytes into another notebook's history.
+- **Key examples:**
+  1. A note whose picture story 5 moved beside it → after the removal, the
+     picture still displays on the web and arrives on `donut notebook clone`
+     and `pull`.
+  2. A note whose `image:` still names another notebook's legacy upload →
+     after the removal, it shows a broken picture; the note, its content and
+     its learning history are unchanged.
+  3. A note that still has a `note.image_id` value → the migration drops the
+     column and the note is still there with its learning history.
+  4. An owner saves a note → no legacy picture cleanup runs. The application
+     starts → no legacy picture move runs.
+  5. An `image:` value that is an external `https://` address → still
+     displays as before.
+- **Depends on:** Story 5 (delivered on main) released and verified in
+  production as above.
+- **Effort hypothesis:** S–M, medium confidence; mostly deletion (about 8
+  whole files and small edits in about 20), with test fixture edits as the
+  main cost.
 - **Safe stopping point:** Until it runs, the legacy picture store is an unused
   leftover that still holds a backup copy.
-- **Open decisions:** What owners see for the `image:` values story 5 leaves
-  unchanged (another notebook's upload, or a row already gone) once the
-  address is removed.
 
 <a id="story-21"></a>
 
@@ -376,6 +419,11 @@ integration need their own selected outcomes.
   an ordinary rebase conflict for unpublished local frontmatter edits; keep
   learning state and last-updated time; split legacy removal into pictures
   (story 18) and Books (story 21).
+- Owner decisions, 2026-09-25 (story 18 refinement): leave unmoved legacy
+  references as broken pictures; verify story 5 in production (no failed
+  notebook, recorded left-over count, one moved picture displays and clones)
+  before starting; remove code and the `image` table in one release; dropping
+  the dead `note.image_id` column is important.
 - [Near-future direction](../PRODUCT-BACKLOG.md#near-future-direction).
 - [SEED-009](SEED-009-git-backed-local-notebook-workflow.md): prior local/web note
   workflow. This seed owns non-Markdown attachment continuity.
