@@ -1,6 +1,7 @@
 package com.odde.donut.controllers;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -10,6 +11,7 @@ import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.NotebookAttachment;
 import com.odde.donut.entities.repositories.FolderRepository;
+import com.odde.donut.testability.GitBundleTestReader.AcceptedHistory;
 import org.eclipse.jgit.lib.ObjectId;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -102,5 +104,86 @@ class NotebookGitWebFolderCrossNotebookMoveControllerTest
     assertThat(
         ObjectId.fromString(binding(destination).getAcceptedGitObjectId()),
         equalTo(destinationHead));
+  }
+
+  @Test
+  void movingAFolderToAnotherNotebookCommitsOnceInEach() throws Exception {
+    Notebook science = createGitBackedNotebook("Science");
+    Folder physics = seedPhysicsWithSoundAndSnapshot(science);
+    Notebook engineering = createGitBackedNotebook("Engineering");
+    snapshotCurrentPortableTree(engineering);
+    AcceptedHistory scienceBefore = acceptedHistory(science);
+    AcceptedHistory engineeringBefore = acceptedHistory(engineering);
+
+    folderController.moveFolder(science, physics, moveTo(engineering, false));
+
+    AcceptedHistory scienceAfter = acceptedHistory(science);
+    AcceptedHistory engineeringAfter = acceptedHistory(engineering);
+    assertThat(scienceAfter.parents(), equalTo(scienceBefore.commits()));
+    assertThat(engineeringAfter.parents(), equalTo(engineeringBefore.commits()));
+    assertThat(scienceAfter.tipPaths(), containsInAnyOrder("Energy.md"));
+    assertThat(engineeringAfter.tipPaths(), containsInAnyOrder("physics/waves/Sound.md"));
+    assertAcceptedTreeMatchesTheFullAssembly(science);
+    assertAcceptedTreeMatchesTheFullAssembly(engineering);
+  }
+
+  @Test
+  void mergingAFolderIntoAnotherNotebookCommitsOnceInEach() throws Exception {
+    Notebook science = createGitBackedNotebook("Science");
+    Folder physics = seedPhysicsWithSoundAndSnapshot(science);
+    Notebook engineering = createGitBackedNotebook("Engineering");
+    Folder engineeringPhysics = makeMe.aFolder().notebook(engineering).name("physics").please();
+    makeMe.aNote("Force").folder(engineeringPhysics).please();
+    snapshotCurrentPortableTree(engineering);
+
+    folderController.moveFolder(science, physics, moveTo(engineering, true));
+
+    assertThat(acceptedHistory(science).tipPaths(), containsInAnyOrder("Energy.md"));
+    assertThat(
+        acceptedHistory(engineering).tipPaths(),
+        containsInAnyOrder("physics/Force.md", "physics/waves/Sound.md"));
+    assertAcceptedTreeMatchesTheFullAssembly(science);
+    assertAcceptedTreeMatchesTheFullAssembly(engineering);
+  }
+
+  @Test
+  void movingAFolderBackAsUndoRestoresBothNotebooks() throws Exception {
+    Notebook science = createGitBackedNotebook("Science");
+    Folder physics = seedPhysicsWithSoundAndSnapshot(science);
+    Notebook engineering = createGitBackedNotebook("Engineering");
+    snapshotCurrentPortableTree(engineering);
+    AcceptedHistory engineeringBefore = acceptedHistory(engineering);
+    folderController.moveFolder(science, physics, moveTo(engineering, false));
+
+    folderController.moveFolder(
+        engineering,
+        folderRepository.findById(physics.getId()).orElseThrow(),
+        moveTo(science, false));
+
+    assertThat(
+        acceptedHistory(engineering).commits().size(),
+        equalTo(engineeringBefore.commits().size() + 2));
+    assertThat(
+        acceptedHistory(science).tipPaths(),
+        containsInAnyOrder("Energy.md", "physics/waves/Sound.md"));
+    assertThat(acceptedHistory(engineering).tipPaths(), containsInAnyOrder());
+    assertAcceptedTreeMatchesTheFullAssembly(science);
+    assertAcceptedTreeMatchesTheFullAssembly(engineering);
+  }
+
+  private Folder seedPhysicsWithSoundAndSnapshot(Notebook science) throws Exception {
+    Folder physics = makeMe.aFolder().notebook(science).name("physics").please();
+    Folder waves = makeMe.aFolder().parentFolder(physics).name("waves").please();
+    makeMe.aNote("Sound").folder(waves).please();
+    makeMe.aNote("Energy").notebook(science).please();
+    snapshotCurrentPortableTree(science);
+    return physics;
+  }
+
+  private static FolderMoveRequest moveTo(Notebook destination, boolean merge) {
+    FolderMoveRequest request = new FolderMoveRequest();
+    request.setDestinationNotebookId(destination.getId());
+    request.setMerge(merge);
+    return request;
   }
 }

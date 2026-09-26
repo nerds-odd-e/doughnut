@@ -107,13 +107,9 @@ class NotebookFolderController extends NotebookFolderQuerySupport {
       @Valid @RequestBody(required = false) FolderMoveRequest request)
       throws UnexpectedNoAccessRightException {
     authorizationService().assertAuthorization(notebook);
-    Notebook destinationNotebook = resolveDestinationNotebookForFolderMove(request);
-    User user = authorizationService().getCurrentUser();
-    if (destinationNotebook != null && !destinationNotebook.getId().equals(notebook.getId())) {
-      return folderRelocationService.moveFolder(
-          notebook, folder, request, destinationNotebook, user);
-    }
-    return folderRelocationService.moveFolderWithinNotebook(notebook, folder, request, user);
+    Notebook destinationNotebook = resolveDestinationNotebookForFolderMove(notebook, request);
+    return folderRelocationService.moveFolder(
+        notebook, folder, request, destinationNotebook, authorizationService().getCurrentUser());
   }
 
   @Operation(
@@ -215,10 +211,10 @@ class NotebookFolderController extends NotebookFolderQuerySupport {
         testabilitySettings.getCurrentUTCTimestamp());
   }
 
-  private Notebook resolveDestinationNotebookForFolderMove(FolderMoveRequest request)
-      throws UnexpectedNoAccessRightException {
+  private Notebook resolveDestinationNotebookForFolderMove(
+      Notebook notebook, FolderMoveRequest request) throws UnexpectedNoAccessRightException {
     if (request == null || request.getDestinationNotebookId() == null) {
-      return null;
+      return notebook;
     }
     Notebook destinationNotebook =
         notebookRepository

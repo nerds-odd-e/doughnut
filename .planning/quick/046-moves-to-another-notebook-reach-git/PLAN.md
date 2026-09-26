@@ -71,8 +71,10 @@ the cross-notebook steps and the change capture are as this plan describes
   this, so it gets no test of its own.
 - **Complexity:** this removes the two plain `@Transactional` cross-notebook
   entry points and the `NoteMoveService` javadoc sentence saying they are not
-  Git-synchronized. It adds one capture rule and no new classes. Report the
-  net line delta at the end.
+  Git-synchronized. It adds one capture rule and no new classes. Delivered
+  delta: main code +129/−81 (net +48: capture rule +12, note move +26, folder
+  move +8), tests +171. The folder controller's same/cross branch and
+  `moveFolderWithinNotebook` are gone.
 
 ## Key examples → proof
 
@@ -142,7 +144,13 @@ javadoc.
 
 ### 3. A folder moved to another notebook reaches both notebooks' Git
 Type: Behavior
-Status: planned
+Status: done
+Accepted proof: `NotebookGitWebFolderCrossNotebookMoveControllerTest` 5/5
+(the 3 new cases failed with the old move code; the undo case asserts
+Engineering's history grew by two commits); `*Folder*` and neighbouring
+suites 348 tests green; the three E2E features 15/15 scenarios. Same- and
+cross-notebook folder moves now share one path through the owner. Main code
+net +8 lines.
 Proof: `NotebookGitWebFolderCrossNotebookMoveControllerTest` (existing
 refusal cases stay green), new cases through `NotebookFolderController.moveFolder`:
 - `physics/` holding `waves/Sound.md` is moved to `Engineering`'s root. Each

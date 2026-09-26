@@ -200,10 +200,11 @@ once and append one accepted commit per changed locked notebook in the same
 transaction, each derived from that notebook's own captured rows.
 
 Existing coverage includes ordinary note content/title edits, creation and
-movement, same-notebook folder creation, rename, move and dissolve, and
-relationship reduction over its touched-notebook set. Cross-notebook move and
-cross-notebook referrer rewrites remain outside this owner until selected for
-delivery; this contract does not claim that all callers have been integrated.
+movement, same-notebook folder creation, rename, move and dissolve, note and
+folder moves to another notebook over {source, destination}, and relationship
+reduction over its touched-notebook set. Link rewrites in notebooks outside the
+changed set remain outside this owner until selected for delivery; this
+contract does not claim that all callers have been integrated.
 
 Git publication accumulates one final correspondence between tree content and
 private identities and applies that result once through the existing domain
