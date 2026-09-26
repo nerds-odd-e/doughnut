@@ -46,12 +46,17 @@ function divergedCheckout(
     getApiConfig().apiBaseUrl,
     'checkout'
   )
+  const sharedBase = runGit(['rev-parse', 'HEAD'], directory)
   shape.local(directory)
   shape.accepted(source)
   return {
     source,
     directory,
     localTip: runGit(['rev-parse', 'HEAD'], directory),
+    localCommitCount: runGit(
+      ['rev-list', '--count', `${sharedBase}..HEAD`],
+      directory
+    ),
     acceptedHead: runGit(['rev-parse', 'main'], source),
   }
 }
@@ -142,17 +147,26 @@ export function describeNotebookPullAcceptedChanges(): void {
         absent: [],
       },
       {
-        shape: 'a local edit of a note inside a folder renamed elsewhere',
+        shape: 'a local edit and a new note inside a folder renamed elsewhere',
         base: [{ path: 'Old/a.md', content: note('Original.') }],
         accepted: (source: string) =>
           commitGit(source, ['mv', 'Old', 'New'], 'web rename'),
-        local: (directory: string) =>
+        local: (directory: string) => {
           commitFileChangeSet(
             directory,
             [{ path: 'Old/a.md', content: note('Local edit.') }],
             'local edit'
-          ),
-        present: { 'New/a.md': note('Local edit.') },
+          )
+          commitFileChangeSet(
+            directory,
+            [{ path: 'Old/b.md', content: note('New local note.') }],
+            'local note'
+          )
+        },
+        present: {
+          'New/a.md': note('Local edit.'),
+          'New/b.md': note('New local note.'),
+        },
         absent: ['Old'],
       },
     ])(
@@ -167,9 +181,12 @@ export function describeNotebookPullAcceptedChanges(): void {
 
         await run(['notebook', 'pull', setup.directory])
 
-        expect(runGit(['rev-parse', 'HEAD^'], setup.directory)).toBe(
-          setup.acceptedHead
-        )
+        expect(
+          runGit(
+            ['rev-parse', `HEAD~${setup.localCommitCount}`],
+            setup.directory
+          )
+        ).toBe(setup.acceptedHead)
         expect(runGit(['status', '--porcelain=v1'], setup.directory)).toBe('')
         for (const [path, content] of Object.entries(present)) {
           expect(fs.readFileSync(join(setup.directory, path), 'utf8')).toBe(

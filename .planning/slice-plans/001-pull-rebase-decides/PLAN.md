@@ -33,7 +33,7 @@ Entry point: `run(['notebook', 'pull', …])` CLI suites under `cli/tests/`
 | 2 local note addition over another checkout's root `d2.bin` | slice 1 suite |
 | 3 local root file addition over a folder rename elsewhere | slice 1 suite |
 | 4 local note + file over another checkout's note + file | slice 1 suite |
-| local edit of a note inside a renamed folder | slice 1 suite; e2e `cli_notebook_folder_relocation.feature` scenario 1 unchanged |
+| local edit of a note inside a renamed folder | slice 2 suite (example 5 row); e2e `cli_notebook_folder_relocation.feature` scenario 1 unchanged |
 | 5 local edit of `Old/a.md` and new `Old/b.md` over `Old` → `New` | slice 2 suite |
 | 6 web deletes a note the local work edited → paused, abort restores | slice 1 suite; same-line conflict already covered by `notebookPull.conflict.suite.ts` |
 
@@ -90,7 +90,7 @@ pointers without a stub); LFS fill-in after a rebase stays proven by
 ### 2. New local notes and files follow an accepted folder rename
 
 Type: Behavior
-Status: planned
+Status: done
 Proof: example 5 case added to `notebookPull.acceptedChanges.suite.ts`, green
 in `pnpm cli:test`.
 
@@ -100,6 +100,14 @@ Behavior: two unpublished commits — an edit of `Old/a.md` and a new
 
 Change: pass `-c merge.directoryRenames=true` to the pull rebase in
 `notebookPullRebase.ts` (Git's default, `conflict`, pauses this case).
+
+Accepted proof (2026-09-26): `CURSOR_DEV=true nix develop -c pnpm cli:test`
+67 files / 441 tests, then `pnpm -C cli exec vitest run tests/notebookPull.test.ts`
+69/69 after the refactor merged slice 1's single-edit renamed-folder row into
+this one; `rebases a local edit and a new note inside a folder renamed
+elsewhere, then publishes` asserts HEAD~2 is the accepted head, clean status,
+`New/a.md` and `New/b.md` content, `Old` gone, one publish POST. The row
+failed (pull paused) without the option.
 
 ### 3. Pull help and notebook docs state the one rule
 
