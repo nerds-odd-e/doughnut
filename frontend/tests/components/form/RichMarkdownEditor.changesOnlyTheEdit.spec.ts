@@ -1,4 +1,8 @@
-import { propertyRows } from "./propertiesTestDom"
+import {
+  expandPropertyPanelAndClickRemove,
+  propertyRowSelector,
+  propertyRows,
+} from "./propertiesTestDom"
 import { createRichMarkdownEditorTestHarness } from "./richMarkdownEditorTestHarness"
 
 describe("RichMarkdownEditor changes only what the user edited", () => {
@@ -75,5 +79,40 @@ describe("RichMarkdownEditor changes only what the user edited", () => {
     expect(
       propertyRows(wrapper.element).map((row) => row.dataset.propertyKey)
     ).toEqual(["name", "description", "type", "tags"])
+  })
+  describe("property panel edits", () => {
+    const note = [
+      "---",
+      "name: demo",
+      "# a comment",
+      'description: "Quoted: value"',
+      "tags: [x, y]",
+      "---",
+      "",
+      "Body",
+    ].join("\n")
+
+    it("changes only the changed property's line", async () => {
+      const wrapper = await h.mountEditor(note)
+      const valueInput = wrapper.find(
+        `${propertyRowSelector("description")} [data-testid="rich-note-property-row-value-input"]`
+      )
+      await h.setPropertyValueField(valueInput, "New text")
+      await valueInput.trigger("blur")
+
+      expect(h.lastEmittedMarkdown()).toBe(
+        note.replace('description: "Quoted: value"', "description: New text")
+      )
+    })
+
+    it("removes only the removed property's line", async () => {
+      const wrapper = await h.mountEditor(note)
+      await expandPropertyPanelAndClickRemove(
+        wrapper,
+        propertyRowSelector("tags")
+      )
+
+      expect(h.lastEmittedMarkdown()).toBe(note.replace("tags: [x, y]\n", ""))
+    })
   })
 })

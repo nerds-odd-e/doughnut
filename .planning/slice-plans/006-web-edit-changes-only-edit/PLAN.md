@@ -111,7 +111,8 @@ tests' expected order only.
 ### 4. Changing or removing one property changes only its lines
 
 Type: Behavior
-Status: planned
+Status: done — same spec, "property panel edits": changed `description` and
+removed `tags` (whole Markdown `toBe`); full frontend suite green
 Proof: example 2 and "remove `tags`" from example 3 in the new spec.
 
 Behavior: a panel change of one property's value → only that entry's text is
@@ -207,13 +208,18 @@ owner (rewrite values, then remove emptied keys) instead of
   `quillHtmlToMarkdown.ts` holds the only one, and its escaped-emphasis rules
   read the delimiters from its options.
 - Slice 2: the in-place edit is `composeNoteContentInPlace(authored, rows,
-  body)` in `noteContentPropertyRows.ts` (re-exported from
-  `noteContentFrontmatter.ts`; placing it there avoids an import cycle). When
-  the rows differ from the parsed properties it still falls back to
-  `composeNoteContentFromPropertyRows` — slices 4 and 5 replace that fallback
-  with splicing inside `split.prefix`. Turndown drops the body's final
+  body)`, re-exported from `noteContentFrontmatter.ts`. Turndown drops the body's final
   newline (unchanged, body-side, outside this story's promises).
 - Slice 3: rows come from `propertyRowsFromNoteProperties` (unused
   `propertyRowsFromRecord` removed). Page tests can depend on row order
   silently (`NoteShowPage.imageUpload` read the first row); include
   `NoteShowPage` in focused runs for panel changes.
+- Slice 4: the in-place edit lives in `noteContentInPlaceEdit.ts`
+  (`frontmatterWithEditedEntries`); `verbatimFrontmatterPrefixAndBody` now
+  returns `yamlStart`/`yamlEnd` (closing fence position) for splicing. Added
+  and renamed keys still fall back to the full re-dump (marked "for now");
+  removing the last property keeps the re-dump so the block is dropped.
+  For slice 5: append `entry\n` at `yamlEnd`; a rename is an edited key absent
+  from the authored keys at the index of a vanished authored key — replace only
+  `pair.key.range`. `appendWikiLinkPropertyRow` could then use the in-place
+  edit too.

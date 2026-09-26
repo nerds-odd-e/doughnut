@@ -56,7 +56,6 @@ import { richEditorKeepsBody } from "./richEditorKeepsBody"
 import type { WikiLink } from "@generated/donut-backend-api"
 import { replaceWikiLinksInHtml } from "./replaceWikiLinksInHtml"
 import {
-  composeNoteContentFromPropertyRows,
   composeNoteContentInPlace,
   parseNoteContentMarkdown,
   type PropertyRow,
@@ -184,11 +183,8 @@ const onPropertiesChanged = (rows: PropertyRow[]) => {
   const p = parsedContent.value
   if (!p.ok) return
   const prevFull = props.modelValue ?? ""
-  const bodyMarkdown =
-    currentIntervalBodyMarkdown !== undefined
-      ? currentIntervalBodyMarkdown
-      : p.body
-  const composed = composeNoteContentFromPropertyRows(rows, bodyMarkdown)
+  const bodyMarkdown = currentIntervalBodyMarkdown ?? p.body
+  const composed = composeNoteContentInPlace(prevFull, rows, bodyMarkdown)
   if (composed === prevFull) return
   emits("update:modelValue", composed)
   nextTick(() => {

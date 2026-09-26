@@ -1,9 +1,5 @@
-import { isEqual } from "es-toolkit"
 import { composeNoteContentMarkdown } from "@/utils/noteContentFrontmatter"
-import {
-  parseNoteContentMarkdown,
-  verbatimFrontmatterPrefixAndBody,
-} from "@/utils/noteContentFrontmatterParse"
+import { parseNoteContentMarkdown } from "@/utils/noteContentFrontmatterParse"
 import { findPropertyRowIndexByExactKey } from "@/utils/noteContentPropertyKeys"
 import {
   authoredListPropertyValidationErrorForPropertyRow,
@@ -62,30 +58,6 @@ export function composeNoteContentFromPropertyRows(
     properties: notePropertiesFromPropertyRows(rows),
     body,
   })
-}
-
-/**
- * Composes `body` after the authored frontmatter text and separator of `authored`,
- * keeping that text as written when the property rows leave it unchanged.
- */
-export function composeNoteContentInPlace(
-  authored: string,
-  rows: readonly PropertyRow[],
-  body: string
-): string {
-  const split = verbatimFrontmatterPrefixAndBody(authored)
-  const parsed = parseNoteContentMarkdown(authored)
-  if (
-    split === null ||
-    (parsed.ok &&
-      !isEqual(parsed.properties, notePropertiesFromPropertyRows(rows)))
-  ) {
-    return composeNoteContentFromPropertyRows(rows, body)
-  }
-  const newline = split.prefix.includes("\r\n") ? "\r\n" : "\n"
-  const fenceEnd = split.prefix.endsWith("\n") || body === "" ? "" : newline
-  const blankLines = split.body.match(/^(?:\r?\n)*/)![0]
-  return split.prefix + fenceEnd + blankLines + body
 }
 
 /** Trims scalar row values; list values are preserved as-is. */

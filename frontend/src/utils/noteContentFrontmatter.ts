@@ -38,7 +38,6 @@ export {
   appendValueToPropertyRow,
   appendWikiLinkPropertyRow,
   composeNoteContentFromPropertyRows,
-  composeNoteContentInPlace,
   insertPropertyRowAt,
   normalizePropertyRowForCommit,
   notePropertiesFromPropertyRows,
@@ -51,6 +50,7 @@ export {
   propertyRowsFromNoteProperties,
   validatePropertyRowsForRichEdit,
 } from "@/utils/noteContentPropertyRows"
+export { composeNoteContentInPlace } from "@/utils/noteContentInPlaceEdit"
 
 export {
   type NoteProperties,

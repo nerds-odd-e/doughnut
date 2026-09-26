@@ -33,11 +33,15 @@ function stripBom(s: string): string {
   return s.charCodeAt(0) === 0xfeff ? s.slice(1) : s
 }
 
-function splitLeadingFrontmatter(
-  markdown: string
-):
+function splitLeadingFrontmatter(markdown: string):
   | { kind: "none" }
-  | { kind: "parsed"; yamlRaw: string; body: string; verbatimPrefix: string }
+  | {
+      kind: "parsed"
+      yamlRaw: string
+      yamlEnd: number
+      body: string
+      verbatimPrefix: string
+    }
   | { kind: "invalid"; message: string } {
   const text = stripBom(markdown)
   const lines = text.split(/(?<=\n)/)
@@ -51,7 +55,8 @@ function splitLeadingFrontmatter(
       const yamlRaw = lines.slice(1, i).join("")
       const body = lines.slice(i + 1).join("")
       const verbatimPrefix = markdown.slice(0, markdown.length - body.length)
-      return { kind: "parsed", yamlRaw, body, verbatimPrefix }
+      const yamlEnd = verbatimPrefix.length - lines[i]!.length
+      return { kind: "parsed", yamlRaw, yamlEnd, body, verbatimPrefix }
     }
   }
 
@@ -62,13 +67,12 @@ function splitLeadingFrontmatter(
   }
 }
 
-/** Leading `---` … `---` block including fences, or null when absent or malformed. */
-export function verbatimFrontmatterPrefixAndBody(
-  markdown: string
-): { prefix: string; body: string } | null {
+/** Leading `---` … `---` block with fences, its YAML text's range, and the body; null when absent or malformed. */
+export function verbatimFrontmatterPrefixAndBody(markdown: string) {
   const split = splitLeadingFrontmatter(markdown)
   if (split.kind !== "parsed") return null
-  return { prefix: split.verbatimPrefix, body: split.body }
+  const { verbatimPrefix: prefix, yamlRaw, yamlEnd, body } = split
+  return { prefix, yamlStart: yamlEnd - yamlRaw.length, yamlEnd, body }
 }
 
 /** First `key: value` scalar in a YAML block (line-based; case-insensitive key; trim; strip matching outer quotes). */
