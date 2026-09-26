@@ -123,7 +123,17 @@ No new handling.
 ### 3. Existing CRLF notes are normalized with one commit per notebook
 
 Type: Behavior
-Status: planned
+Status: done
+Accepted proof: `NoteLineEndingNormalizationTest.crlfNotesBecomeLfInOneDonutSystemCommitPerNotebookAndARerunAddsNothing`
+(one new Donut System commit changing only the two CRLF files, LF in the
+database and tip blob, LF notebook untouched, rerun adds nothing).
+`NoteLineEndingNormalization` exposes `notebookIdsWithCrlfNotes()` and
+`normalize(notebookId)`; `apply` rolls a failing notebook back on its own and
+commits only a changed tree, so slice 4 just loops with per-notebook logging.
+CI note: run 36252336168 on slice 2 failed only
+`record_live_audio_with_real_open_ai_service.feature` (real OpenAI
+transcription timeout); its mocked twin and the other note-editing specs
+passed, so no repair commit.
 Proof: new backend test (service level, `NoteLineEndingNormalization…`):
 a notebook with an accepted binding and two notes whose content was set raw
 with CRLF (fixture `setContent`), plus a second notebook with LF notes → after
