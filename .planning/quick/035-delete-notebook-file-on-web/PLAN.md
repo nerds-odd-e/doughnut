@@ -28,7 +28,7 @@ history, cleaning up old files when a picture is replaced, rewriting
 `image:` values, deleting several files at once, a sidebar delete action,
 renaming or moving files, Markdown files.
 
-Assumptions (checked on main `ecf5c531a1`, 2026-09-25):
+Assumptions (checked on main `ecf5c531a1`, 2026-09-25; rechecked on `a4e27f4a22`, 2026-09-26):
 
 - `NotebookAttachmentController` (`/api/notebooks/{notebook}/attachments/{attachment}`)
   has only the page `GET` and the `…/content` download. `NotebookAttachment.requireInNotebook`
@@ -86,8 +86,8 @@ Change: `DELETE /api/notebooks/{notebook}/attachments/{attachment}` in
 `AcceptedWebChangeService.apply` with the live-reload pattern, removes the
 row, and commits "Delete file: <path>". Regenerate the API client. Delete
 button on `AttachmentPage.vue` (hidden when `notebookRealm.readonly`), with
-`popups.confirm`. Check during the slice whether the sidebar listing needs an
-explicit refresh after the delete; reuse the refresh folder operations use.
+`popups.confirm` asking plainly "Delete <filename>?". Check during the slice
+whether the sidebar listing needs an explicit refresh after the delete; reuse the refresh folder operations use.
 
 Sizing: at the upper end of one slice (endpoint, API regeneration, page
 action, one E2E scenario), but one proof loop; splitting by layer would not
@@ -111,6 +111,11 @@ existing API error display.
 ## Current decisions
 
 - Delete removes the row outright; no Trash, no LFS object deletion.
+- The confirmation is plain ("Delete <filename>?") and says nothing about
+  history (owner, 2026-09-26).
+- Delete stays visible on a Book's source file; the refusal comes from the
+  delete request (owner, 2026-09-26).
+- Slice 1 stays whole; if it overruns, split off the sidebar refresh first.
 - No check for notes whose `image:` names the file, matching local publish.
 - Proof of "gone after pull" is the downloaded bundle in a backend test, not a
   CLI E2E scenario.

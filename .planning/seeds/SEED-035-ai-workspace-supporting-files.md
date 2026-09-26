@@ -99,7 +99,7 @@ No executable plan or implementation is authorized by this seed.
 
 ### Remove the separate Book storage
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../quick/040-remove-separate-book-storage/PLAN.md","assessment":"not-ready","reasons":["Execution gate open: the release with story 17's Book move is not yet deployed and the production query (no Book without a path) has not run."],"basis":{"document":"42d96cbf0c28da231614054ca85a1bbd25609c6e59df03476c5c57d77a71b85d","plan":"e74fb0498e45b7f1952766c9de18d2a61bb68c75bf8c4887147ef1689a56d90b"}}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../quick/040-remove-separate-book-storage/PLAN.md","assessment":"not-ready","reasons":["Execution gate open: the release with story 17's Book move is not yet deployed and the production query (no Book without a path) has not run."],"basis":{"document":"627ac528518d10abcb66fa29337e993531392fde866f113b9a71f33cc8fe939a","plan":"e74fb0498e45b7f1952766c9de18d2a61bb68c75bf8c4887147ef1689a56d90b"}}
 ```
 
 - **Identity:** SEED-035#story-21
@@ -154,7 +154,7 @@ No executable plan or implementation is authorized by this seed.
 
 ### Delete unwanted supporting files from Web Donut
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../quick/035-delete-notebook-file-on-web/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"4c8942258612c8380199d2f435e59896760e7d1b21ca854a870b249a8ff36e23","plan":"5cf6095fe5a2976be1518213f536bdf73366f5cd3d5b2f0d063fe7e4c8bbefb7"}}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../quick/035-delete-notebook-file-on-web/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"627ac528518d10abcb66fa29337e993531392fde866f113b9a71f33cc8fe939a","plan":"e9eb6a56dc80e0cb677ecaedf539420d4fb86e2d77da5321242f88fc3fa2c556"}}
 ```
 
 - **Identity:** SEED-035#story-2
@@ -163,16 +163,18 @@ No executable plan or implementation is authorized by this seed.
   Today only a local checkout can delete a file; the web can only open and
   download it.
 - **Scope:**
-  - A **Delete** action on the file's page, with a confirmation. The same
-    behavior for every file type.
+  - A **Delete** action on the file's page, with a plain confirmation that
+    names the file (for example "Delete sketch.png?"); it does not mention
+    history (owner decision 2026-09-26). The same behavior for every file type.
   - Delete removes the file outright, through the existing accepted-change
     boundary; after `donut notebook pull` the file is gone from the checkout.
     Notes, other files and learning history are untouched.
   - Deleting a file that a note's `image:` names is allowed: the note shows a
     broken picture and its `image:` value stays as it was. Local publish
     behaves the same way (owner decision 2026-09-25).
-  - Deleting a Book's source file is refused with the same message local
-    publish gives, and nothing changes. A Book reads from that file
+  - Deleting a Book's source file is refused after Delete is chosen, with the
+    same message local publish gives, and nothing changes; the page does not
+    hide Delete for it (owner decision 2026-09-26). A Book reads from that file
     ([story 17 decision](#breadcrumbs): refuse changes to a Book's file).
   - Who may delete follows the existing notebook edit rule.
 - **Excluded:**
@@ -351,6 +353,11 @@ integration need their own selected outcomes.
   move first; keep the backlog order, since stories 2 and 21 are independent;
   drop `attachment_blob` outright with no backup; remove the `/attachments/`
   address; delete the Book GCS bucket within this story.
+- Owner decisions, 2026-09-26 (story 2 review): the confirmation is plain and
+  does not mention that earlier versions stay in history, since most users do
+  not need to know; refuse a Book's source file after Delete is chosen rather
+  than hiding Delete; keep the plan's first slice whole and let execution
+  escalate if it overruns.
 - [Near-future direction](../PRODUCT-BACKLOG.md#near-future-direction).
 - [SEED-009](SEED-009-git-backed-local-notebook-workflow.md): prior local/web note
   workflow. This seed owns non-Markdown attachment continuity.
