@@ -384,17 +384,6 @@ A refactor agent cited a 250-line file limit. The coordinator grepped `SKILL.md`
   - Observed effect: two extra refactor agents (~125k subagent tokens) and one failed commit; a plan learning had to be rewritten.
   - Inference: a negative claim about guidance needs a search of the whole skill tree, references included, before it is broadcast to agents.
 
-## DD-121 — Parallel slices in one execution checkout made each commit's hook fail on the other slices' unfinished files
-
-Three file-disjoint slices ran at once in one worktree. The pre-commit hook runs `lint:changed`, which checks the whole frontend working tree (Biome and `vue-tsc`), not only staged files. Committing a finished slice failed twice: once on another slice's unformatted file, once on type errors in a slice still being refactored. Slices were committed only after every agent in the checkout had stopped.
-
-### Occurrences
-
-- Execution: SEED-039 story 4 / quick/041-faster-frontend-unit-tests / c9347a9ee3; Timestamp: 2026-09-26, ~09:00+08:00 (failed slice 3 commits before 8d4739bd0b 09:08+08:00); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.38.
-  - Evidence: hook output "Found 1 error" (Biome format in `RichMarkdownEditor.propertyEntry.spec.ts`, not staged) and `TS2305 … has no exported member 'mountMarkdownTextarea'` in `NoteEditableContent.debouncedSave.spec.ts`, not staged.
-  - Observed effect: delivery of finished slices waited for unrelated agents; parallelism saved implementation time but serialized delivery.
-  - Inference: `execute-plan` allows concurrent slices with disjoint files, but this project's working-tree-wide hook makes a shared checkout unsafe for concurrent commits; per-slice worktrees or committing only at quiet points would avoid it. Qualified: the slices' implementation overlap still saved wall time.
-
 ## DD-122 — Interim "agent has not reported yet" notifications repeatedly woke the coordinator with nothing to decide
 
 A delegated implementation agent started its tests in the background and ended its turn while it waited. Each time it stopped, the host sent the coordinator a completed-task notification whose result said the report was still pending. The coordinator woke, answered "still waiting", and went idle again.

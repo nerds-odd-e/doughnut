@@ -5,56 +5,68 @@ Findings about shared Open Dough skills, supporting guidelines, and skill script
 remain in [DearDough.md](DearDough.md), including those observed in this project.
 Existing finding identifiers and occurrence evidence are preserved when moved.
 
-## Review — 2026-09-25
+## Review — 2026-09-26
 
-No unresolved project-specific findings remain in this file. Reviewed both
-finding logs at `42ef5d8ff2396536cdd01d6b0816b60305ee6637`.
-Ownership follows the failing responsibility, not the repository in which it
-was observed. None of the current DearDough entries warrants moving here.
+Reviewed both finding logs at `7b05bb9df8`. Ownership follows the failing
+responsibility, not the repository in which it was observed.
+
+### Moved from DearDough
+
+DD-121 moved here. The shared rule only permits concurrent slices with disjoint
+file changes. The failing responsibility is Donut’s commit gate:
+`scripts/git-hooks/pre-commit` runs `pnpm lint:changed`, and
+`scripts/quality_changed.sh` picks components from staged files but then runs
+each component’s whole-tree lint (for the frontend, Biome and `vue-tsc`), so
+unstaged files from another slice decide whether a commit passes. Neither
+script has changed since `1e6e69cc64` (2026-09-04), which predates the
+occurrence, so the finding is unresolved.
 
 ### Shared findings retained in DearDough
 
 | Responsibility | Findings | Ownership evidence |
 | --- | --- | --- |
 | Measurement scope | ODF-030 | Disposable profiling versus durable delivery scope is shared execution feedback. |
-| CI observation and host/runtime integration | ODF-034, ODF-069, ODF-085, DD-107, DD-112 | Published [CI observation guidance](https://github.com/terryyin/open-dough/blob/v0.3.38/src/skills/dough-execute-plan/references/ci-monitor.md) owns target selection, observer coverage, runtime binding, and managed attachment. Donut workflow details are occurrence evidence. |
-| Delegation, proof, and failure attribution | ODF-042, ODF-051, ODF-059, ODF-082, ODF-090, ODF-091, DD-109, DD-111, DD-113 | Published [delivery and proof guidance](https://github.com/terryyin/open-dough/blob/v0.3.38/src/skills/dough-execute-plan/references/wrap-up.md) owns report verification, consumer coverage, independent refactoring, and failure diagnosis. Specific CLI/backend tests do not make these process failures project-owned. |
-| Execution workspace, claims, and maintenance receipts | ODF-081, ODF-083, ODF-084, ODF-086, DD-108, DD-110 | Shared startup, backlog claim, and increment-delivery responsibilities; published [delivery guidance](https://github.com/terryyin/open-dough/blob/v0.3.38/src/skills/dough-execute-plan/references/wrap-up.md) delegates checkout preservation and maintenance to the shared runtime. |
+| CI observation and host/runtime integration | ODF-034, ODF-069, ODF-085, ODF-092, ODF-104, ODF-112, DD-115 | Published [CI observation guidance](https://github.com/terryyin/open-dough/blob/v0.3.38/src/skills/dough-execute-plan/references/ci-monitor.md) and the shared delivery scripts own target selection, observer coverage, retry, runtime binding, and managed attachment. Donut workflow details are occurrence evidence. |
+| Delegation, proof, and failure attribution | ODF-042, ODF-051, ODF-059, ODF-082, ODF-090, ODF-091, ODF-110, ODF-111, ODF-113, DD-116, DD-120, DD-122, DD-123 | Published [delivery and proof guidance](https://github.com/terryyin/open-dough/blob/v0.3.38/src/skills/dough-execute-plan/references/wrap-up.md) owns report verification, consumer coverage, independent refactoring, readiness replay, failure baselines, and coordinator waiting. Specific CLI/backend tests and host permission or notification behavior do not make these process failures project-owned. |
+| Execution workspace, claims, preparation, and maintenance receipts | ODF-081, ODF-083, ODF-084, ODF-099, DD-114, DD-117, DD-118, DD-119, DD-124 | Shared startup, readiness recording, plan-number allocation, backlog claim, and increment-delivery responsibilities. Donut’s plan-numbering reset changes only the starting number, not the allocation procedure. |
 
-The published [finding registry](https://github.com/terryyin/open-dough/blob/v0.3.38/docs/maintainer/finding-names.md)
-provides the ODF identities. Newer DD entries retain their existing identifiers;
-this review does not allocate or rename upstream findings. Repeated CI discovery
-and session-attachment failures remain shared feedback even after an attempted
-shared fix; recurrence alone does not transfer ownership to Donut.
+ODF-085 stays shared although Donut does not track `.claude/skills`: the
+failure was guidance that pointed at that alias instead of the already-tracked
+`.agents` runtime, and its follow-up is queued upstream.
 
-### Resolved project finding removed
+### Previously resolved project findings
 
-Removed DD-103 (parallel Gradle processes racing on local batch E2E startup).
-Correction `d86864023c2bbf2dcb39e787cd6c70cb486f4ab4` is an ancestor of the
-reviewed revision. Current `scripts/e2e-runner.mjs` passes
-`backendReload: false` for batches and `true` for interactive sessions;
-`scripts/sut-services.mjs` selects `backend:sut:ci` for the batch path.
-The launch-path regression cases remain in
-`scripts/e2e-runner-backend-reload.cases.mjs`; the recorded correction includes
-successful clean-build, successive-source-edit, invalid-source, and interactive
-reload checks. No subsequent change to the runner or those regression cases,
-or later occurrence in either finding log, contradicts that resolution.
-This review inspected the retained evidence and current code; it did not rerun
-E2E. The obsolete DD-103 record and its original occurrences are recoverable at
-`42ef5d8ff2396536cdd01d6b0816b60305ee6637:DonutRetrospectiveFindings.md`.
-Current behavior is documented in [End-to-end Testing](docs/end-to-end-testing.md).
+No new occurrence in either log contradicts an earlier resolution:
+DD-073 (frontend proof now typechecks, `7b1d80b4e8`), DD-103 (E2E runner
+backend race, `d86864023c`), and DD-065/DD-074 (returned to shared ownership as
+ODF-085). DD-121 involves a type error at the commit gate, but in another
+slice’s unstaged file; it is not a DD-073 recurrence, because the committing
+slice’s own proof had typechecked.
 
-### Backlog decision
+### Grouping and backlog decision
 
-There are zero unresolved project findings in these logs, so there are no two
-supported project stories to rank by frequency and impact. The
-[product backlog](.planning/PRODUCT-BACKLOG.md) is unchanged. The existing
-[attachment-representation correction](.planning/quick/031-finish-single-attachment-representation/PLAN.md)
-already owns its separate product findings and is in Taken; do not duplicate it.
-The E2E-authoring guidance story is already queued, but DD-103 concerns runner
-startup and supplies no evidence of an authoring-guidance recurrence.
+| Priority | Group | Findings | Frequency | Impact | Backlog story |
+| --- | --- | --- | --- | --- | --- |
+| 1 | Commit gate in a shared execution checkout | [DD-121](#dd-121) | One execution, two failed commits | Finished slices could not be delivered until every other agent in the checkout stopped, so parallel implementation ended in serialized delivery | [Commit a finished slice while other slices are still in progress](.planning/seeds/SEED-043-commit-gate-checks-committed-changes.md#story-1) |
+
+DD-121 is the only unresolved project finding, so only one story is queued
+first; there is no second project problem to rank. No existing queued or taken
+story covers it.
 
 Reopen a project finding when a new occurrence contradicts its actual correction,
 link that evidence to the existing story or correction if still active, and
 otherwise queue a bounded recurrence story. A previously recorded resolution
 without supporting correction evidence is insufficient to close a finding.
+
+<a id="dd-121"></a>
+
+## DD-121 — Parallel slices in one execution checkout made each commit's hook fail on the other slices' unfinished files
+
+Three file-disjoint slices ran at once in one worktree. The pre-commit hook runs `lint:changed`, which checks the whole frontend working tree (Biome and `vue-tsc`), not only staged files. Committing a finished slice failed twice: once on another slice's unformatted file, once on type errors in a slice still being refactored. Slices were committed only after every agent in the checkout had stopped.
+
+### Occurrences
+
+- Execution: SEED-039 story 4 / quick/041-faster-frontend-unit-tests / c9347a9ee3; Timestamp: 2026-09-26, ~09:00+08:00 (failed slice 3 commits before 8d4739bd0b 09:08+08:00); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.38.
+  - Evidence: hook output "Found 1 error" (Biome format in `RichMarkdownEditor.propertyEntry.spec.ts`, not staged) and `TS2305 … has no exported member 'mountMarkdownTextarea'` in `NoteEditableContent.debouncedSave.spec.ts`, not staged.
+  - Observed effect: delivery of finished slices waited for unrelated agents; parallelism saved implementation time but serialized delivery.
+  - Inference: `execute-plan` allows concurrent slices with disjoint files, but this project's working-tree-wide hook makes a shared checkout unsafe for concurrent commits; per-slice worktrees or committing only at quiet points would avoid it. Qualified: the slices' implementation overlap still saved wall time.
