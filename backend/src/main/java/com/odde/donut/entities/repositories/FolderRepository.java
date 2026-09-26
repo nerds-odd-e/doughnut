@@ -114,4 +114,16 @@ public interface FolderRepository extends CrudRepository<Folder, Integer> {
       ORDER BY f.id ASC
       """)
   List<Folder> findByNotebookIdOrderByIdAsc(@Param("notebookId") Integer notebookId);
+
+  @Query(
+      """
+      SELECT f FROM Folder f WHERE f.notebook.id = :notebookId AND LOWER(f.name) = LOWER(:name)
+      AND ((:parentFolderId IS NULL AND f.parentFolder IS NULL)
+           OR (f.parentFolder IS NOT NULL AND f.parentFolder.id = :parentFolderId))
+      ORDER BY f.id ASC
+      """)
+  List<Folder> findChildFoldersNamedIgnoringCase(
+      @Param("notebookId") Integer notebookId,
+      @Param("parentFolderId") Integer parentFolderId,
+      @Param("name") String name);
 }

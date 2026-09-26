@@ -56,4 +56,17 @@ public interface NotebookAttachmentRepository extends CrudRepository<NotebookAtt
   boolean existsByFolder_IdIn(Collection<Integer> folderIds);
 
   List<NotebookAttachment> findByFolder_IdIn(Collection<Integer> folderIds);
+
+  @Query(
+      """
+      SELECT a.filename FROM NotebookAttachment a WHERE a.notebook.id = :notebookId
+      AND LOWER(a.filename) = LOWER(:entryName)
+      AND ((:parentFolderId IS NULL AND a.folder IS NULL)
+           OR (a.folder IS NOT NULL AND a.folder.id = :parentFolderId))
+      ORDER BY a.id ASC
+      """)
+  List<String> findFilenamesNamedIgnoringCase(
+      @Param("notebookId") Integer notebookId,
+      @Param("parentFolderId") Integer parentFolderId,
+      @Param("entryName") String entryName);
 }

@@ -184,10 +184,8 @@ public class FolderRelocationService {
     if (displayName.value().equals(oldName)) {
       return folder;
     }
-    Integer parentFolderId =
-        folder.getParentFolder() == null ? null : folder.getParentFolder().getId();
-    folderSiblingNameValidation.requireNoConflictingSibling(
-        notebook.getId(), parentFolderId, displayName, folder.getId());
+    folderSiblingNameValidation.requireFolderNameFree(
+        notebook, folder.getParentFolder(), displayName, Set.of(folder.getId()));
     Set<Integer> noteIdsInSubtree = subtree.collectNoteIdsInSubtree(folder);
     Map<Integer, Map<Integer, List<String>>> inboundReferencesByNoteId =
         wikiLinkRewriteService.captureLiveResolvedInboundReferencesByNoteId(

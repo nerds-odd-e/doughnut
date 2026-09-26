@@ -39,8 +39,12 @@ public class FolderConstructionService {
   }
 
   public Folder createFolder(Notebook notebook, FolderCreationRequest request) {
-    String name = request.getName();
+    return createFolder(
+        notebook, parentFolderFor(notebook, request), new DisplayName(request.getName()));
+  }
 
+  /** The folder a creation request places into; the notebook root when null. */
+  public Folder parentFolderFor(Notebook notebook, FolderCreationRequest request) {
     Folder parentFolder = null;
     Integer underFolderId = request.getUnderFolderId();
     if (underFolderId != null) {
@@ -67,8 +71,7 @@ public class FolderConstructionService {
         parentFolder = contextNote.getFolder();
       }
     }
-
-    return createFolder(notebook, parentFolder, new DisplayName(name));
+    return parentFolder;
   }
 
   public Folder ensureTrashParentFor(Notebook notebook, List<Folder> sourceFolders) {

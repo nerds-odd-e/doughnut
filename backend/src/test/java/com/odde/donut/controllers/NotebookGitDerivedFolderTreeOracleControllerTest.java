@@ -6,8 +6,10 @@ import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.everyItem;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.startsWith;
 
 import com.odde.donut.controllers.dto.FolderCreationRequest;
 import com.odde.donut.controllers.dto.NoteUpdateContentDTO;
@@ -56,7 +58,10 @@ class NotebookGitDerivedFolderTreeOracleControllerTest
                     entry -> entry.getKey().replaceFirst("^Photos/", "Pictures/"),
                     Map.Entry::getValue));
     assertThat(acceptedBlobIds(notebook), equalTo(relocated));
-    assertThat(queries, not(hasItem(containsString("NotebookAttachment"))));
+    assertThat(
+        "only the name check reads attachment rows, and only their filenames",
+        queries.stream().filter(query -> query.contains("NotebookAttachment")).toList(),
+        everyItem(startsWith("SELECT a.filename FROM NotebookAttachment a")));
     assertAcceptedTreeMatchesTheFullAssembly(notebook);
   }
 

@@ -119,7 +119,16 @@ forgot to move fails loudly instead of disappearing.
 
 ### 3. One set of names per folder for folder create and rename
 Type: Behavior
-Status: planned
+Status: done
+Accepted proof: `NotebookFolder*ControllerTest` (83, incl.
+`NotebookFolderCreateControllerTest.rejectsAFolderNamedLikeAFileHereIgnoringCase`,
+`rejectsAFolderNamedLikeANoteFileHereIgnoringCase`,
+`rejectsACaseVariantOfASiblingFolderAsAFolderNameConflict`,
+`NotebookFolderRenameControllerTest.rejectsRenamingToAFileNameHereIgnoringCase`),
+`*Folder*` (317) and `*NotebookGitProposal*` (148) pass. The owner API is
+`FolderSiblingNameValidation.entryHolding` → `TakenEntry(kind, path)` and
+`requireFolderNameFree`; the all-entries free-name picker is left to slice 4,
+its first user.
 Proof: `NotebookFolderCreateControllerTest` — creating folder `force.png` in
 `physics/`, which holds `Force.png`, is refused with `RESOURCE_CONFLICT` naming
 `physics/Force.png`; a folder `energy.md` beside note `Energy` likewise; a
@@ -242,6 +251,10 @@ rule.
 
 ## Learnings
 
+- `FolderConstructionService.createFolder(notebook, request)` is shared by
+  web and local-publish folder creation, and `createFolder(notebook, parent,
+  name)` by trash; web-only naming rules go in `WebFolderCreationService`
+  (via `parentFolderFor`), not in `FolderConstructionService`.
 - `fk_note_folder` was already `ON DELETE RESTRICT` (since `V300000329`);
   `V300000348` restricts only the attachment and parent-folder keys. The
   unique key `uk_folder_notebook_parent_name` rules out "unlink parents, then

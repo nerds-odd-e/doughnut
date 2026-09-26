@@ -232,4 +232,17 @@ public interface NoteRepository extends CrudRepository<Note, Integer>, NoteStruc
 
   @Query(value = "SELECT MAX(nc.note.createdAt) FROM NoteCreator nc WHERE nc.user.id = :userId")
   java.sql.Timestamp findLastNoteTimeByCreator(@Param("userId") Integer userId);
+
+  @Query(
+      """
+      SELECT n FROM Note n WHERE n.notebook.id = :notebookId
+      AND LOWER(CONCAT(n.title, '.md')) = LOWER(:entryName)
+      AND ((:parentFolderId IS NULL AND n.folder IS NULL)
+           OR (n.folder IS NOT NULL AND n.folder.id = :parentFolderId))
+      ORDER BY n.id ASC
+      """)
+  List<Note> findNotesWhoseFileIsNamedIgnoringCase(
+      @Param("notebookId") Integer notebookId,
+      @Param("parentFolderId") Integer parentFolderId,
+      @Param("entryName") String entryName);
 }

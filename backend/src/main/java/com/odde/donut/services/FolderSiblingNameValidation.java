@@ -3,8 +3,12 @@ package com.odde.donut.services;
 import com.odde.donut.controllers.dto.ApiError;
 import com.odde.donut.entities.DisplayName;
 import com.odde.donut.entities.Folder;
+import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.repositories.FolderRepository;
+import com.odde.donut.entities.repositories.NoteRepository;
+import com.odde.donut.entities.repositories.NotebookAttachmentRepository;
 import com.odde.donut.exceptions.ApiException;
+import com.odde.donut.services.notebookGit.NotebookGitPortablePath;
 import java.util.Optional;
 import java.util.Set;
 import org.springframework.stereotype.Service;
@@ -23,13 +27,95 @@ public class FolderSiblingNameValidation {
     throw new ApiException(new ApiError(message, ApiError.ErrorType.FOLDER_NAME_CONFLICT));
   }
 
-  private final FolderRepository folderRepository;
-
-  public FolderSiblingNameValidation(FolderRepository folderRepository) {
-    this.folderRepository = folderRepository;
+  private static String entryNameTakenAt(String path) {
+    return "This name is already used here by " + path;
   }
 
-  /** New folder: no existing sibling may use {@code name}. */
+  /** An existing entry of a folder (or the notebook root) and its path in the notebook. */
+  public record TakenEntry(Kind kind, String path) {
+    public enum Kind {
+      FOLDER,
+      NOTE,
+      FILE
+    }
+  }
+
+  private final FolderRepository folderRepository;
+  private final NoteRepository noteRepository;
+  private final NotebookAttachmentRepository notebookAttachmentRepository;
+
+  public FolderSiblingNameValidation(
+      FolderRepository folderRepository,
+      NoteRepository noteRepository,
+      NotebookAttachmentRepository notebookAttachmentRepository) {
+    this.folderRepository = folderRepository;
+    this.noteRepository = noteRepository;
+    this.notebookAttachmentRepository = notebookAttachmentRepository;
+  }
+
+  /**
+   * The entry in {@code parentOrNull} (notebook root when null) whose name is {@code entryName},
+   * ignoring letter case: a folder, a note as {@code Title.md}, or a file. Folders whose ids are in
+   * {@code excludedFolderIds} do not count.
+   */
+  public Optional<TakenEntry> entryHolding(
+      Notebook notebook, Folder parentOrNull, String entryName, Set<Integer> excludedFolderIds) {
+    Integer parentFolderId = parentOrNull == null ? null : parentOrNull.getId();
+    String prefix = NotebookGitPortablePath.folderPath(parentOrNull);
+    return folderRepository
+        .findChildFoldersNamedIgnoringCase(notebook.getId(), parentFolderId, entryName)
+        .stream()
+        .filter(f -> !excludedFolderIds.contains(f.getId()))
+        .findFirst()
+        .map(
+            f ->
+                new TakenEntry(
+                    TakenEntry.Kind.FOLDER, NotebookGitPortablePath.ofFolder(prefix, f.getName())))
+        .or(
+            () ->
+                noteRepository
+                    .findNotesWhoseFileIsNamedIgnoringCase(
+                        notebook.getId(), parentFolderId, entryName)
+                    .stream()
+                    .findFirst()
+                    .map(
+                        note ->
+                            new TakenEntry(
+                                TakenEntry.Kind.NOTE,
+                                NotebookGitPortablePath.ofNote(prefix, note.getTitle()))))
+        .or(
+            () ->
+                notebookAttachmentRepository
+                    .findFilenamesNamedIgnoringCase(notebook.getId(), parentFolderId, entryName)
+                    .stream()
+                    .findFirst()
+                    .map(
+                        filename ->
+                            new TakenEntry(
+                                TakenEntry.Kind.FILE,
+                                NotebookGitPortablePath.ofAttachment(prefix, filename))));
+  }
+
+  /**
+   * A folder may take {@code name} in {@code parentOrNull} only when no entry there holds it. A
+   * folder holding it is {@code FOLDER_NAME_CONFLICT}; a note or file is {@code RESOURCE_CONFLICT}
+   * naming its path.
+   */
+  public void requireFolderNameFree(
+      Notebook notebook, Folder parentOrNull, DisplayName name, Set<Integer> excludedFolderIds) {
+    entryHolding(notebook, parentOrNull, name.value(), excludedFolderIds)
+        .ifPresent(
+            taken -> {
+              if (taken.kind() == TakenEntry.Kind.FOLDER) {
+                throwFolderNameConflict(DUPLICATE_SIBLING_NAME_HERE);
+              }
+              throw new ApiException(
+                  new ApiError(
+                      entryNameTakenAt(taken.path()), ApiError.ErrorType.RESOURCE_CONFLICT));
+            });
+  }
+
+  /** New folder: no existing sibling folder may use {@code name}. */
   public void requireNoConflictingSibling(
       Integer notebookId, Integer parentFolderId, DisplayName name) {
     requireNoConflictingSibling(

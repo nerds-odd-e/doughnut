@@ -1,6 +1,7 @@
 package com.odde.donut.controllers;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -63,6 +64,47 @@ class NotebookFolderCreateControllerTest extends NotebookFolderManagementControl
         assertThrows(
             ApiException.class, () -> folderController.createFolder(nb, folderCreate("Same")));
     assertThat(ex.getErrorBody().getErrorType(), equalTo(ApiError.ErrorType.FOLDER_NAME_CONFLICT));
+  }
+
+  @Test
+  void rejectsAFolderNamedLikeAFileHereIgnoringCase() {
+    Notebook nb = ownedNotebook();
+    Folder physics = makeMe.aFolder().notebook(nb).name("physics").please();
+    makeMe.anAttachment("Force.png").in(physics).please();
+
+    assertResourceConflictNaming(nb, physics, "force.png", "physics/Force.png");
+  }
+
+  @Test
+  void rejectsAFolderNamedLikeANoteFileHereIgnoringCase() {
+    Notebook nb = ownedNotebook();
+    Folder physics = makeMe.aFolder().notebook(nb).name("physics").please();
+    makeMe.aNote("Energy").folder(physics).please();
+
+    assertResourceConflictNaming(nb, physics, "energy.md", "physics/Energy.md");
+  }
+
+  @Test
+  void rejectsACaseVariantOfASiblingFolderAsAFolderNameConflict() {
+    Notebook nb = ownedNotebook();
+    makeMe.aFolder().notebook(nb).name("physics").please();
+
+    ApiException ex =
+        assertThrows(
+            ApiException.class, () -> folderController.createFolder(nb, folderCreate("Physics")));
+    assertThat(ex.getErrorBody().getErrorType(), equalTo(ApiError.ErrorType.FOLDER_NAME_CONFLICT));
+    assertThat(
+        ex.getErrorBody().getMessage(), equalTo("A folder with this name already exists here."));
+  }
+
+  private void assertResourceConflictNaming(
+      Notebook nb, Folder parent, String name, String takenPath) {
+    FolderCreationRequest req = folderCreate(name);
+    req.setUnderFolderId(parent.getId());
+    ApiException ex =
+        assertThrows(ApiException.class, () -> folderController.createFolder(nb, req));
+    assertThat(ex.getErrorBody().getErrorType(), equalTo(ApiError.ErrorType.RESOURCE_CONFLICT));
+    assertThat(ex.getErrorBody().getMessage(), containsString(takenPath));
   }
 
   @Test
