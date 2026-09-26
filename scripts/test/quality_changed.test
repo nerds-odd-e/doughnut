@@ -27,7 +27,12 @@ git -C "$work" config user.name "Test User"
 mkdir -p "$work/fake-bin"
 cat >"$work/fake-bin/pnpm" <<'PNPM'
 #!/usr/bin/env bash
-printf 'pnpm %s\n' "$*"
+if [[ "$1" == -C ]]; then
+  printf '%s\n' "$2" >"$(dirname "$0")/lint-directory"
+  printf 'pnpm %s in copy with example.ts: %s\n' "${*:3}" "$(cat "$2/example.ts")"
+else
+  printf 'pnpm %s\n' "$*"
+fi
 PNPM
 chmod +x "$work/fake-bin/pnpm"
 
@@ -67,9 +72,21 @@ case "$DONUT_TEST_SCENARIO" in
     git -C "$work" add mcp-server/example.ts \
       packages/donut-test-fixtures/example.ts
     ;;
+  staged-frontend)
+    mkdir -p "$work/frontend"
+    printf 'const original = true\n' >"$work/frontend/example.ts"
+    git -C "$work" add .
+    git -C "$work" commit -qm initial
+
+    printf 'const staged = true\n' >"$work/frontend/example.ts"
+    git -C "$work" add frontend/example.ts
+    printf 'const unstaged = true\n' >"$work/frontend/example.ts"
+    ;;
   shared-biome-config)
+    mkdir -p "$work/frontend"
+    printf 'const original = true\n' >"$work/frontend/example.ts"
     printf '{}\n' >"$work/biome.json"
-    git -C "$work" add biome.json
+    git -C "$work" add biome.json frontend/example.ts
     git -C "$work" commit -qm initial
     printf '{ "formatter": { "enabled": true } }\n' >"$work/biome.json"
     git -C "$work" add biome.json
@@ -90,6 +107,10 @@ esac
 cd "$work"
 PATH="$work/fake-bin:$PATH" \
   "$DONUT_TEST_REPO_ROOT/scripts/${DONUT_TEST_MODE}_changed.sh"
+if [[ -f "$work/fake-bin/lint-directory" ]] &&
+  [[ -e "$(cat "$work/fake-bin/lint-directory")" ]]; then
+  echo 'index copy left behind'
+fi
 EOF
 }
 
@@ -111,12 +132,21 @@ test-lint-selects-only-staged-components() {
     "$output"
 }
 
+test-lint-checks-frontend-in-a-removed-copy-of-the-index() {
+  local output
+  output="$(run-in-temporary-repository lint staged-frontend)"
+
+  @assert-equals \
+    $'pnpm --frozen-lockfile --silent recursive install\npnpm lint in copy with example.ts: const staged = true' \
+    "$output"
+}
+
 test-shared-biome-config-selects-every-affected-component() {
   local output
   output="$(run-in-temporary-repository lint shared-biome-config)"
 
   @assert-equals \
-    $'pnpm frontend:lint\npnpm mcp-server:lint\npnpm cli:lint\npnpm test-fixtures:lint\npnpm cy:lint' \
+    $'pnpm --frozen-lockfile --silent recursive install\npnpm lint in copy with example.ts: const original = true\npnpm mcp-server:lint\npnpm cli:lint\npnpm test-fixtures:lint\npnpm cy:lint' \
     "$output"
 }
 

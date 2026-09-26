@@ -115,8 +115,11 @@ Sizing: two one-line edits and one run; under five minutes.
 
 - The hook stays check-only and always uses the index copy for the frontend;
   about 15–20 s more per frontend commit is accepted (owner, 2026-09-26).
-- No permanent automated test is added for the hook: it has none today, CI
-  does not run it, and each case needs a real `vue-tsc` run of ~20 s. The
-  proof is the recorded demonstration above. The owner may ask for a test.
+- The real `vue-tsc` cases stay a recorded demonstration (~20 s each). The
+  planning premise that the hook had no test was wrong:
+  `scripts/test/quality_changed.test` (CI "Run script unit tests") covers
+  selection with a fake `pnpm`. CI run 36228685291 failed it on slice 1; the
+  repair extended it to observe that frontend lint runs in a removed copy
+  holding the staged, not the unstaged, content.
 - The copy is the whole index, not only `frontend/`: the frontend reads the
   root `biome.json` and `tsconfig` files, and copying everything took 0.8 s.
