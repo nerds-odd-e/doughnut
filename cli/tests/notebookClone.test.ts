@@ -70,51 +70,13 @@ describe('notebook clone (CLI routing, real Git checkout)', () => {
 
     expect(runGit(['remote'], destinationPath)).toBe('')
 
-    expect(ctx.getLogSpy()).toHaveBeenCalledWith(
-      expect.stringContaining(
-        'including notes whose paths imply a new Folder under an already represented Folder without a Folder README'
-      )
-    )
-    expect(ctx.getLogSpy()).toHaveBeenCalledWith(
-      expect.stringContaining(
-        'a new folder README alone or together with ordinary notes in that folder'
-      )
-    )
-    expect(ctx.getLogSpy()).toHaveBeenCalledWith(
-      expect.stringContaining(
-        'Any non-Markdown file is an attachment and may be added, changed, or deleted.'
-      )
-    )
-    expect(ctx.getLogSpy()).toHaveBeenCalledWith(
-      expect.stringContaining(
-        'A Folder that contains concepts does not require a README.md; an empty Folder is represented by a .keep file'
-      )
-    )
-    expect(ctx.getLogSpy()).toHaveBeenCalledWith(
-      expect.stringContaining(
-        'one or more Markdown note deletions alone or together with same-path edits that leave existing links authored'
-      )
-    )
-    expect(ctx.getLogSpy()).toHaveBeenCalledWith(
-      expect.stringContaining(
-        'one or more uniquely matched unchanged-content Markdown note moves that may change folder and/or filename together with compatible same-path edits and either additions or deletions'
-      )
-    )
-    expect(ctx.getLogSpy()).toHaveBeenCalledWith(
-      expect.stringContaining(
-        'Overwriting an existing note and changed-content moves are not supported yet'
-      )
-    )
-    expect(ctx.getLogSpy()).toHaveBeenCalledWith(
-      expect.stringContaining(
-        'Separate identity-uncertain additions or moves from deletions; do not delete and recreate the note'
-      )
-    )
-    expect(ctx.getLogSpy()).toHaveBeenCalledWith(
-      expect.stringContaining(
-        `Run "donut notebook pull ${destinationPath}" to receive newer accepted history. Pull rebases your linear unpublished commits onto accepted history, and Git pauses only on a real conflict`
-      )
-    )
+    const output = ctx.getLogSpy().mock.calls.flat().join('\n')
+    expect(output).toContain(`Cloned notebook 42 into ${destinationPath}.`)
+    expect(output).toContain('commit')
+    expect(output).toContain(`donut notebook publish ${destinationPath}`)
+    expect(output).toContain(`donut notebook pull ${destinationPath}`)
+    expect(output).not.toContain('Publishing currently accepts')
+    expect(output).not.toContain('rebases')
   })
 
   test('clone checks out "main" even when the machine defaults to a different branch name', async () => {

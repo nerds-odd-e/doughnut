@@ -10,12 +10,12 @@ and deletable in Web Donut.
 
 ## Taken
 
-- [Notebook CLI commands say briefly what happened and what to do next](seeds/SEED-046-notebook-files-and-git-findings.md#story-3) — SEED-046#story-3 ([plan](slice-plans/003-clone-and-publish-name-next-step/PLAN.md))
 - [Uploading a picture on the web explains refusals and shows the new file](seeds/SEED-046-notebook-files-and-git-findings.md#story-4) — SEED-046#story-4 ([plan](slice-plans/004-picture-upload-explains-and-shows/PLAN.md))
 - [The rich editor never silently loses content](seeds/SEED-046-notebook-files-and-git-findings.md#story-10) — SEED-046#story-10 ([plan](slice-plans/005-rich-editor-keeps-content/PLAN.md))
 
 ## Backlog list
 
+- [Clone test states the clone output instead of what it no longer says](seeds/SEED-046-notebook-files-and-git-findings.md#story-11) — SEED-046#story-11
 - [A web edit changes only what the user edited](seeds/SEED-046-notebook-files-and-git-findings.md#story-5) — SEED-046#story-5
 - [Cloning a notebook with many notes stays within 5 seconds](seeds/SEED-046-notebook-files-and-git-findings.md#story-8) — SEED-046#story-8
 - [File pages and file responses read cleanly](seeds/SEED-046-notebook-files-and-git-findings.md#story-9) — SEED-046#story-9

@@ -89,7 +89,7 @@ public class NotebookGitProposalPublisher {
     if (!expectedHead.equals(binding.getAcceptedGitObjectId())) {
       throw new ResponseStatusException(
           HttpStatus.CONFLICT,
-          "expectedHead no longer matches the notebook's current accepted head.");
+          "The notebook changed since this publish started. Run \"donut notebook pull\", then publish again.");
     }
     NotebookGitProposalAncestry.assertFollowsAcceptedHead(
         proposal.repository(), proposal.mainHead(), acceptedHead);

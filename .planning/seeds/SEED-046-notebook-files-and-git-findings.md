@@ -58,66 +58,6 @@ Owner decisions on 2026-09-26 that removed candidates:
 S = 30–60 minutes, M = 1–2 hours, L = 2–4 hours. These are hypotheses
 including delivery, not commitments.
 
-<a id="story-3"></a>
-
-### 3. Notebook CLI commands say briefly what happened and what to do next
-
-**Identity:** SEED-046#story-3
-```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/003-clone-and-publish-name-next-step/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"945f97ea998695477866e2c909bc58802b0c3941612ab0e6cbb9a527c3ec9f82","plan":"a20d0e1ce4709ecc91fdd532758eec78ee2fbd01157ca3ec819193032238f5ee"}}
-```
-
-- **Goal:** Owners working on a notebook from a local checkout read the clone
-  result, and the refusal they get when their checkout is behind the notebook,
-  at a glance, and the next step it names works. Each publish rule is
-  explained by the refusal that applies it, not listed in advance.
-- **Scope:**
-  - **Clone success:** a few short lines: which notebook was cloned where,
-    then the next commands — edit and commit with any Git tool,
-    `donut notebook publish <dir>`, `donut notebook pull <dir>` — each with
-    the actual directory. It lists no publish or pull rules (owner decision
-    2026-09-26); publish refusals already name the rule and paths they apply.
-  - **Checkout behind the notebook:** publish gives one short message naming
-    the recovery — run `donut notebook pull <dir>`, then publish again —
-    whether its own check finds local main behind the accepted history or the
-    server finds another publish or web save got in first. Today these print
-    "only a contiguous single-parent commit range…" and "expectedHead no
-    longer matches the notebook's current accepted head." with no next step.
-  - **Assumption:** written against the code after story 2, which deletes the
-    pull refusals behind the other findings and rewrites the pull help text.
-  - **Excluded (owner decision 2026-09-26):** pull help text (story 2 owns
-    it); which path a pull refusal names (story 2 deletes that refusal); the
-    size-limit wording for a changed Book source (story 1 reworks that check;
-    requeue only if it survives story 1); the clone message when the server
-    has lost a file's content (rare data loss no local step fixes; clone
-    already exits 1 and removes the partial checkout); any other CLI wording.
-  - **Preserved:** the messages that already read well — dirty checkout,
-    size limit, invalid Markdown — and every publish and pull refusal's
-    decision.
-- **Key examples:**
-  1. `donut notebook clone 7 notes` succeeds → the output says notebook 7 was
-     cloned into `notes`, then lists editing and committing,
-     `donut notebook publish notes` and `donut notebook pull notes`; no rule
-     list, a few lines instead of about 300 words.
-  2. The owner commits a note edit in `notes`; meanwhile a web save is
-     accepted; `donut notebook publish notes` → local main is not based on
-     the notebook's latest accepted history; run `donut notebook pull notes`,
-     then publish again. Doing so publishes the edit.
-  3. Another checkout publishes after `notes` checked the accepted history but
-     before its submission arrives → the server's refusal names the same
-     recovery: run `donut notebook pull`, then publish again.
-  4. Boundary: publish of a local merge commit still sends the owner to pull,
-     whose existing refusal names the actual next step (recreate the work as
-     ordinary commits); this story does not reword it.
-  5. Boundary: a publish that breaks a publish rule (for example an unmatched
-     note deletion mixed with additions) is refused with today's message
-     naming the rule and paths — the guidance the clone message no longer
-     lists in advance.
-- **Depends on:** story 2 (it removes refusals and rewrites the pull help
-  text); story 1 only for the excluded Book-source wording.
-- **Effort hypothesis:** S — medium confidence.
-- **Safe stopping point:** Each improved message stands alone.
-
 <a id="story-10"></a>
 
 ### 4a. The rich editor never silently loses content
@@ -410,10 +350,26 @@ including delivery, not commitments.
 - **Depends on:** none.
 - **Safe stopping point:** Each change stands alone.
 
+<a id="story-11"></a>
+
+### 8. Clone test states the clone output instead of what it no longer says
+
+**Identity:** SEED-046#story-11
+```json dough-story-state
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/007-clone-test-states-output/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"3d5b7ba486bc570c71e2a46bd9c95d00e69a8c92a4a98f5411027355c61dbb5c","plan":"c58a45ad26fa340e8cbd0a5694d2dba225e8a2231b3027ed7e29e2d3f8599f0d"}}
+```
+
+- **Goal:** Developers reading the clone test see the exact clone message
+  that owners get, with no assertion naming text that was deleted
+  (retrospective correction of SEED-046#story-3).
+- **Scope:** Only the first test in `cli/tests/notebookClone.test.ts`: replace
+  its `toContain` / `not.toContain` checks on the log output with one exact
+  assertion of the four-line message. No product change.
+- **Plan:** [007-clone-test-states-output](../slice-plans/007-clone-test-states-output/PLAN.md)
+
 ## Ordering and Scope Reduction
 
-Story 3 carries the owner's explicit clone-message request. Stories
-4a, 4b and 5 fix web problems. Story 4a (silent content loss in the rich
+Stories 4a, 4b and 5 fix web problems. Story 4a (silent content loss in the rich
 editor) comes first: it damages locally authored notes permanently, and the
 owner split it out of story 4b on 2026-09-26 and ranked it first. Story 4b's
 whole-file rewrites come next because they hurt parallel local and web work,
