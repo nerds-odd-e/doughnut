@@ -1,6 +1,6 @@
 # Dissolve and merge folders that contain files
 
-Status: **planned**.
+Status: **in progress** (Story Branch Mode, branch `story/dissolve-merge-folders-with-files`, claim `fb2b68dc1d`).
 Work item: **SEED-035#story-11**.
 Source: [refined story](../../seeds/SEED-035-ai-workspace-supporting-files.md#story-11)
 (owner decisions 2026-09-26).
@@ -75,7 +75,12 @@ any other health-fix change.
 
 ### 1. Health checks count files as occupying a folder
 Type: Behavior
-Status: planned
+Status: done
+Accepted proof: `NotebookHealthControllerTest` (13, incl.
+`LintHealth.folderHoldingOnlyAFileIsNotReportedEmpty`,
+`FixHealth.fixLeavesAFolderHoldingOnlyAFileAndItsFileInPlace`) and
+`com.odde.donut.services.health.*` (35) pass; the single source is
+`FolderRepository.findOccupiedFolderIdsByNotebookId`.
 Proof: `NotebookHealthControllerTest` — a notebook whose `refs/` holds only
 `paper.pdf`: the health report no longer lists `refs/` as empty, and fixing
 health leaves the folder and its attachment rows in place. Existing
@@ -234,6 +239,8 @@ rule.
 
 ## Learnings
 
+- `pnpm backend:test:worktree` takes a single `--tests` pattern; use a
+  package wildcard (e.g. `'com.odde.donut.services.health.*'`) for several classes.
 - Rechecked on main `7f1bc6d440` (2026-09-26): the only product-code change
   since the previous recheck is `63fdb9134e` (path wiki links survive a
   same-notebook merge move). It turns both `FolderMoveRelocation` moves into one

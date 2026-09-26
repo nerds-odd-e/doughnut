@@ -9,7 +9,6 @@ import com.odde.donut.services.AssimilationUnit;
 import com.odde.donut.services.notebookTree.PortableTreeNoteRow;
 import com.odde.donut.utils.SearchTitleNormalizer;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Stream;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
@@ -102,14 +101,6 @@ public interface NoteRepository extends CrudRepository<Note, Integer>, NoteStruc
 
   @Query(value = selectFromNote + " WHERE n.folder.id = :folderId" + " ORDER BY n.id ASC")
   List<Note> findNotesInFolderOrderByIdAsc(@Param("folderId") Integer folderId);
-
-  @Query(
-      """
-      SELECT DISTINCT n.folder.id FROM Note n
-      WHERE n.notebook.id = :notebookId
-        AND n.folder IS NOT NULL
-      """)
-  Set<Integer> findOccupiedFolderIdsByNotebookId(@Param("notebookId") Integer notebookId);
 
   @Query(
       """
