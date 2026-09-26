@@ -137,7 +137,7 @@ authorizes no implementation, profiling run, or executable slice plan.
 
 **Identity:** SEED-039#story-4
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"not-refined","approach":"unselected"}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../quick/041-faster-frontend-unit-tests/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"f797d1632c5dcb322f90e8d01b26f5d8e4b7b6414a9e42132d649e0cc4045d88","plan":"45f5cf5fdb48b32e65c62d8d4f621a7527bcb2418556ba30f34a75d7603804dc"}}
 ```
 
 - **For / why:** Contributors get faster trustworthy feedback from the frontend
