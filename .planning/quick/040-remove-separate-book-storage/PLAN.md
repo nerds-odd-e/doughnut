@@ -173,4 +173,12 @@ reads it only for a Book without a path, which the gate ruled out.
 
 ## Learnings
 
-(none yet)
+- Execution gate met 2026-09-26: Application Release `v1.3.27` (run
+  36202449200, success) is deployed — production health reports commit
+  `450bd49f21`, the tag's SHA, which contains `ecf5c531a1`. The owner ran
+  `SELECT COUNT(*) AS unmoved FROM book WHERE source_file_path IS NULL` on
+  production (from the app VM against `db-server`); result `0`.
+- Production facts for later slices: the Cloud SQL instance is `doughnut-db`
+  (not `doughnut-db-instance` as `docs/gcp/prod_env.md` §4 says); the app VM
+  is recreated by the MIG under the same instance ID, so SSH may first need
+  its stale host key removed.

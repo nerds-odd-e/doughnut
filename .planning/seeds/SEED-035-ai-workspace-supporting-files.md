@@ -99,7 +99,7 @@ No executable plan or implementation is authorized by this seed.
 
 ### Remove the separate Book storage
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../quick/040-remove-separate-book-storage/PLAN.md","assessment":"not-ready","reasons":["Execution gate open: the release with story 17's Book move is not yet deployed and the production query (no Book without a path) has not run."],"basis":{"document":"627ac528518d10abcb66fa29337e993531392fde866f113b9a71f33cc8fe939a","plan":"e74fb0498e45b7f1952766c9de18d2a61bb68c75bf8c4887147ef1689a56d90b"}}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../quick/040-remove-separate-book-storage/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"627ac528518d10abcb66fa29337e993531392fde866f113b9a71f33cc8fe939a","plan":"04d3969ca688e22975a564818c8893abbd4a7705f2be99c8e2df7af5c8b32393"}}
 ```
 
 - **Identity:** SEED-035#story-21
