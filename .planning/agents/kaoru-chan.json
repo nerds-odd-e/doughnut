@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "agent": "Kaoru-chan",
+  "email": "kaoru-chan@example.org",
+  "identity": "SEED-046#story-10",
+  "mode": "story-branch",
+  "branch": "exec/005-rich-editor-keeps-content",
+  "host": "claude",
+  "model": "claude-opus-5-5"
+}
