@@ -14,8 +14,8 @@ destination first and refuse naming the first clash. Folder contents are never
 removed by a database cascade.
 
 Excluded (see the story): moves and merges into another notebook (story 10;
-their refusal stays), renaming on clash, rewriting file references, the path
-wiki-link rewrite on a same-notebook merge move (SEED-042#story-1),
+their refusal stays), renaming on clash, rewriting file references (the path
+wiki-link rewrite on a same-notebook merge move is already delivered),
 local-publish acceptance using the shared rule, notebook-level cascades, and
 any other health-fix change.
 
@@ -176,8 +176,8 @@ Behavior: the destination check of slice 5 includes files, and
 `FolderSubtree.dissolveInto` / `mergeInto` rehome files exactly as notes (row
 and bytes kept; only the folder changes). `requireSubtreeHasNoAttachments`
 leaves these operations; the cross-notebook refusal moves into
-`FolderMoveRelocation.moveFolderToAnotherNotebook`, covering its plain and merge
-branches.
+`FolderMoveRelocation.moveFolderToAnotherNotebook` once, before its
+merge-or-reassign branch, covering both.
 
 ### 7. Note move, undo and trash use the same set of names
 Type: Behavior
@@ -234,6 +234,12 @@ rule.
 
 ## Learnings
 
+- Rechecked on main `7f1bc6d440` (2026-09-26): the only product-code change
+  since the previous recheck is `63fdb9134e` (path wiki links survive a
+  same-notebook merge move). It turns both `FolderMoveRelocation` moves into one
+  merge-or-place branch followed by the wiki-link rewrite; slices 4–6 still fit
+  it, and slice 6's cross-notebook refusal now sits before that single branch.
+  Every other named class, test and migration number is unchanged.
 - Rechecked on main `b36d89a999` (2026-09-26), after the Book storage removal:
   every class and test the slices name still exists, and the folder, naming,
   health, move and dissolve code is unchanged since planning. Only the

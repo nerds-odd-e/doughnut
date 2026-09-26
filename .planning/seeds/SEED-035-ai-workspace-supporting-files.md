@@ -155,7 +155,7 @@ No executable plan or implementation is authorized by this seed.
 
 ### Dissolve and merge folders that contain files
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../quick/007-dissolve-merge-folders-with-files/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"f56f518ff5be94d51942a67c8ac4c56e19e81c5f5690648c06c85c7bfe3e0e6a","plan":"d2a7c22986bf05eba4e92090fbde67457669e9a049ac75f240fd6462e82b1fb9"}}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../quick/007-dissolve-merge-folders-with-files/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"79dd0d8f920fd295ffbb56f61c30b48c0e7ce0321e691b7a6836a638a97ca2ea","plan":"9d272e09ff8bc64411aa4f5f44ee607916938ed587e6c6f3ee71dfc136908151"}}
 ```
 
 - **Identity:** SEED-035#story-11
@@ -210,8 +210,6 @@ No executable plan or implementation is authorized by this seed.
     `image: old/sketch.png`) shows a broken picture afterwards, as story 2
     accepted for deletion. Web uploads always place a picture in its note's own
     folder, so only locally written references can cross folders.
-  - Rewriting path wiki links on a same-notebook merge move: that existing bug
-    is [SEED-042#story-1](SEED-042-folder-merge-keeps-path-wiki-links.md#story-1).
   - Local-publish acceptance keeps its own validation; the shared name rule is
     for web placements. A Git tree cannot hold a file and a folder on one path.
   - Notebook-level cascades (notebook to folder, file, Book): notebooks are
