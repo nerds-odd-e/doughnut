@@ -68,9 +68,6 @@ erDiagram
         int user_id FK
         int note_id FK
     }
-    attachment_blob {
-        int id PK
-    }
     authored_note_reference {
         int id PK
         int source_note_id FK

@@ -27,12 +27,10 @@ import org.springframework.transaction.annotation.Transactional;
 public class AttachBookService {
 
   public record PersistContext(
-      Notebook notebook,
       AttachBookRequest request,
       byte[] fileBytes,
       EntityPersister entityPersister,
-      ObjectMapper objectMapper,
-      TestabilitySettings testabilitySettings) {}
+      ObjectMapper objectMapper) {}
 
   private final BookRepository bookRepository;
   private final EntityPersister entityPersister;
@@ -68,18 +66,28 @@ public class AttachBookService {
       EpubAttachValidator.validateAttachableEpub(fileBytes);
     }
     byte[] pointer = attachmentContent.storeAsLfsPointer(notebook.getId(), fileBytes);
-    var ctx =
-        new PersistContext(
-            notebook, request, fileBytes, entityPersister, objectMapper, testabilitySettings);
+    var ctx = new PersistContext(request, fileBytes, entityPersister, objectMapper);
     return acceptedWebChangeService.apply(
         notebook.getId(),
         () -> {
-          Book book = BookFormat.fromString(request.getFormat()).persistNewBook(ctx);
+          Book book = newBook(notebook, request);
           bookSourceFilePlacement.place(book, pointer);
+          BookFormat.fromString(request.getFormat()).persistNewBook(ctx, book);
           return book;
         },
         book -> "Attach book: " + book.getBookName(),
         testabilitySettings.getCurrentUTCTimestamp());
+  }
+
+  private Book newBook(Notebook notebook, AttachBookRequest request) {
+    var book = new Book();
+    book.setNotebook(notebook);
+    book.setBookName(BookService.trimmedMax(request.getBookName(), 512));
+    book.setFormat(request.getFormat());
+    var now = testabilitySettings.getCurrentUTCTimestamp();
+    book.setCreatedAt(now);
+    book.setUpdatedAt(now);
+    return book;
   }
 
   private void assertNotebookHasNoBook(Notebook notebook) {

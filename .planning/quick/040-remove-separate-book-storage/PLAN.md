@@ -132,7 +132,13 @@ to the path, and drop the `getSourceFileRef()` assertion in
 
 ### 3. The database keeps no Book or picture bytes
 Type: Behavior
-Status: planned
+Status: done
+Accepted proof: `V300000347__drop_book_and_picture_bytes.sql` applied to the
+worktree test DB; information_schema shows no `attachment_blob`, no
+`book.source_file_ref`, `book.source_file_path` NOT NULL. Book attach/read
+tests (146) and full backend suite (2608) pass. NOT NULL exposed that attach
+saved the Book before placing its file; attach now builds the Book, places
+its file (sets the path), then saves (`AttachBookService`).
 Proof: slice 3 row above.
 
 Behavior: a fresh or migrated database → attach and read a Book → works with

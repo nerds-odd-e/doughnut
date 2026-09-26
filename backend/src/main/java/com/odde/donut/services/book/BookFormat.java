@@ -31,8 +31,8 @@ public enum BookFormat {
     }
 
     @Override
-    public Book persistNewBook(AttachBookService.PersistContext ctx) {
-      return AttachBookPersistence.persistNewPdfBook(ctx);
+    public void persistNewBook(AttachBookService.PersistContext ctx, Book book) {
+      AttachBookPersistence.persistNewPdfBook(ctx, book);
     }
 
     @Override
@@ -76,8 +76,8 @@ public enum BookFormat {
     }
 
     @Override
-    public Book persistNewBook(AttachBookService.PersistContext ctx) {
-      return AttachBookPersistence.persistNewEpubBook(ctx);
+    public void persistNewBook(AttachBookService.PersistContext ctx, Book book) {
+      AttachBookPersistence.persistNewEpubBook(ctx, book);
     }
 
     @Override
@@ -120,7 +120,7 @@ public enum BookFormat {
 
   public abstract void validateAttachRequest(AttachBookRequest request);
 
-  public abstract Book persistNewBook(AttachBookService.PersistContext ctx);
+  public abstract void persistNewBook(AttachBookService.PersistContext ctx, Book book);
 
   public abstract MediaType bookFileMediaType();
 
