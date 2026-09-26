@@ -189,7 +189,7 @@ public class FolderSiblingNameValidation {
    * Returns a same-name sibling under {@code parentFolderId} in {@code notebookId}, excluding
    * folders whose ids are in {@code excludedFolderIds}.
    */
-  public Optional<Folder> findConflictingSibling(
+  private Optional<Folder> findConflictingSibling(
       Integer notebookId,
       Integer parentFolderId,
       DisplayName name,

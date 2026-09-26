@@ -108,9 +108,8 @@ public class FolderConstructionService {
 
   private Folder findOrCreateFolder(
       Notebook notebook, Folder parentFolder, DisplayName displayName) {
-    Integer parentFolderId = parentFolder == null ? null : parentFolder.getId();
     return folderSiblingNameValidation
-        .findConflictingSibling(notebook.getId(), parentFolderId, displayName, Set.of())
+        .folderHolding(notebook, parentFolder, displayName.value(), Set.of())
         .orElseGet(() -> createFolder(notebook, parentFolder, displayName));
   }
 }

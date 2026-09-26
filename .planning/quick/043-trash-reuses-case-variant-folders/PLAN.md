@@ -61,7 +61,7 @@ cross-notebook merges (story exclusions; story 10); the `_trash` root lookup.
 
 ### 1. Trash reuses a case-variant mirrored folder
 Type: Behavior
-Status: planned
+Status: done
 Proof: a new note-trash controller test for the key example above fails first,
 then passes; `*Trash*` and `NotebookFolderTrashControllerTest` stay green.
 
@@ -73,6 +73,13 @@ folder lookup (`FolderSiblingNameValidation.folderHolding`) instead of the exact
 `findConflictingSibling`. Folder trash shares the method, so it gets the same
 behavior. `findConflictingSibling` keeps its local-publish and cross-notebook
 callers.
+
+Accepted proof: `NoteControllerTrashTests.trashReusesACaseVariantFolderAlreadyInTrash`
+(setup: `_trash/Physics` plus root `physics/Energy`; asserts the trashed note's
+folder is the existing `_trash/Physics`) failed first (a new folder was
+created), then passed. `CURSOR_DEV=true nix develop -c ./backend/gradlew -p backend test -Dspring.profiles.active=test --build-cache --tests '*Trash*' --tests 'com.odde.donut.controllers.NotebookFolderTrashControllerTest'`
+passes (40 tests). Refactor made `findConflictingSibling` private; it has no
+caller outside `FolderSiblingNameValidation`.
 
 ## Current decisions
 
