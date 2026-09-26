@@ -140,6 +140,11 @@ including delivery, not commitments.
   no note content containing CRLF (`content LIKE '%\r\n%'` returns 0). If the
   query finds notes, read the startup log for the failing notebooks instead of
   removing the code.
+- **Known facts (2026-09-27, before the release):** production held 257 notes
+  with CRLF in 96 notebooks, so the release should add up to 96 `Normalize
+  note line endings` commits. Query through the Cloud SQL Auth Proxy as `root`
+  (`mysql_root_password`); the `doughnut` user only accepts the app's private
+  network.
 - **Key examples:**
   1. After removal, the backend starts with no line-ending startup work, and
      the save test for CRLF-to-LF content still passes.
