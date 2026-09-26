@@ -16,9 +16,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 /** Walks a folder tree and applies subtree reassignment, merge, dissolve and removal. */
 @Service
@@ -87,7 +85,6 @@ final class FolderSubtree {
 
   void reassignToNotebook(
       List<Folder> subtreeFolders, Notebook destinationNotebook, Timestamp now) {
-    requireSubtreeHasNoAttachments(subtreeFolders.getFirst());
     for (Folder subtreeFolder : subtreeFolders) {
       subtreeFolder.setNotebook(destinationNotebook);
       subtreeFolder.setUpdatedAt(now);
@@ -105,7 +102,6 @@ final class FolderSubtree {
    * (ignoring case) is merged into it when {@code merge} is set, and refused otherwise.
    */
   void dissolveInto(Folder folder, boolean merge, Timestamp now) {
-    requireSubtreeHasNoAttachments(folder);
     Folder destination = folder.getParentFolder();
     Set<Integer> excluded = Set.of(folder.getId());
     contentsPlacementCheck.requireContentsFit(folder, destination, merge, excluded);
@@ -122,7 +118,6 @@ final class FolderSubtree {
   }
 
   void mergeInto(Folder source, Folder target, Timestamp now) {
-    requireSubtreeHasNoAttachments(source);
     moveContentsInto(source, target, target.getNotebook(), Set.of(), now);
     target.setUpdatedAt(now);
     entityPersister.merge(target);
@@ -131,8 +126,8 @@ final class FolderSubtree {
   }
 
   /**
-   * Places {@code source}'s subfolders and notes in {@code destinationOrNull}; a subfolder whose
-   * name a folder there holds (ignoring case) is merged into it.
+   * Places {@code source}'s subfolders, notes and files in {@code destinationOrNull}; a subfolder
+   * whose name a folder there holds (ignoring case) is merged into it.
    */
   private void moveContentsInto(
       Folder source,
@@ -164,14 +159,9 @@ final class FolderSubtree {
       }
       entityPersister.merge(note);
     }
-  }
-
-  private void requireSubtreeHasNoAttachments(Folder source) {
-    List<Integer> folderIds = collectFolders(source).stream().map(Folder::getId).toList();
-    if (notebookAttachmentRepository.existsByFolder_IdIn(folderIds)) {
-      throw new ResponseStatusException(
-          HttpStatus.BAD_REQUEST,
-          "Folders containing files cannot be dissolved, merged, or moved to another notebook yet.");
+    for (NotebookAttachment attachment : collectAttachments(List.of(source))) {
+      attachment.setFolder(destinationOrNull);
+      entityPersister.merge(attachment);
     }
   }
 }

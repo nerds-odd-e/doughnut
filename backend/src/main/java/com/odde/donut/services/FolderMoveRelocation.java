@@ -133,6 +133,11 @@ public class FolderMoveRelocation {
       requireNewParentInNotebook(newParent, destinationNotebook);
     }
 
+    if (!subtree.collectAttachments(subtreeFolders).isEmpty()) {
+      throw new ResponseStatusException(
+          HttpStatus.BAD_REQUEST,
+          "Folders containing files cannot be moved to another notebook yet.");
+    }
     Integer destParentId = newParent == null ? null : newParent.getId();
     Optional<Folder> mergeTarget =
         folderSiblingNameValidation.mergeTargetOrRejectConflict(

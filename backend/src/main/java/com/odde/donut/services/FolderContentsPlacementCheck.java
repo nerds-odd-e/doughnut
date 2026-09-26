@@ -3,10 +3,13 @@ package com.odde.donut.services;
 import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
+import com.odde.donut.entities.NotebookAttachment;
 import com.odde.donut.entities.repositories.FolderRepository;
 import com.odde.donut.entities.repositories.NoteRepository;
+import com.odde.donut.entities.repositories.NotebookAttachmentRepository;
 import com.odde.donut.services.FolderSiblingNameValidation.TakenEntry;
 import com.odde.donut.services.notebookGit.NotebookGitPortablePath;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import org.springframework.stereotype.Service;
@@ -20,14 +23,17 @@ import org.springframework.stereotype.Service;
 final class FolderContentsPlacementCheck {
   private final FolderRepository folderRepository;
   private final NoteRepository noteRepository;
+  private final NotebookAttachmentRepository notebookAttachmentRepository;
   private final FolderSiblingNameValidation folderSiblingNameValidation;
 
   FolderContentsPlacementCheck(
       FolderRepository folderRepository,
       NoteRepository noteRepository,
+      NotebookAttachmentRepository notebookAttachmentRepository,
       FolderSiblingNameValidation folderSiblingNameValidation) {
     this.folderRepository = folderRepository;
     this.noteRepository = noteRepository;
+    this.notebookAttachmentRepository = notebookAttachmentRepository;
     this.folderSiblingNameValidation = folderSiblingNameValidation;
   }
 
@@ -49,8 +55,8 @@ final class FolderContentsPlacementCheck {
   }
 
   /**
-   * Refuses the first clash other than a folder meeting a folder and returns the first direct
-   * subfolder of {@code source} that meets a folder.
+   * Refuses the first clash (subfolders, then notes, then files) other than a folder meeting a
+   * folder, and returns the first direct subfolder of {@code source} that meets a folder.
    */
   private Optional<Folder> firstFolderMeetingAFolder(
       Folder source, Folder destinationOrNull, Set<Integer> excludedFolderIds) {
@@ -75,6 +81,11 @@ final class FolderContentsPlacementCheck {
               destinationOrNull,
               NotebookGitPortablePath.ofNote("", note.getTitle()),
               excludedFolderIds)
+          .ifPresent(FolderSiblingNameValidation::refuseTaken);
+    }
+    for (NotebookAttachment attachment :
+        notebookAttachmentRepository.findByFolder_IdIn(List.of(source.getId()))) {
+      takenBy(notebook, destinationOrNull, attachment.getFilename(), excludedFolderIds)
           .ifPresent(FolderSiblingNameValidation::refuseTaken);
     }
     return first;

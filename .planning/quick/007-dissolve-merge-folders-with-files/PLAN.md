@@ -193,7 +193,17 @@ refused here (the guard stays until slice 6).
 
 ### 6. Dissolve and merge carry files
 Type: Behavior
-Status: planned
+Status: done
+Accepted proof: `*NotebookGit*Folder*ControllerTest` (114, incl.
+`NotebookGitFolderDissolveControllerTest.dissolveCarriesAFileIntoTheParentWithTheSameBytes`,
+`dissolveWithMergeCarriesAFileIntoTheSameNamedFolder`,
+`NotebookGitWebFolderMoveControllerTest.mergeMoveCarriesAFileBesideTheDestinationFolderContent`,
+`NotebookGitFolderDissolveGuardControllerTest.dissolveOntoATakenFileNameIsRefusedNamingItAndChangesNothing`,
+`NotebookGitWebFolderCrossNotebookMoveControllerTest.folderContainingAFileCannotMergeIntoAnotherNotebook`),
+`*Folder*` (326), `*Dissolve*` (31), `*Merge*` (19), `*Attachment*` (63)
+pass. The cross-notebook refusal now reads "Folders containing files cannot
+be moved to another notebook yet." (the seed still quotes the old temporary
+wording — for story wrap-up).
 Proof: `NotebookGitFolderDissolveControllerTest` — dissolving `old` holding
 `sketch.png` leaves a pulled tree with `physics/sketch.png`, same bytes, and no
 `old/`; dissolve with merge brings `physics/old/diagrams/b.png` beside
