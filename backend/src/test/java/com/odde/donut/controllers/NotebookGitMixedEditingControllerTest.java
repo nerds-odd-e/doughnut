@@ -22,7 +22,7 @@ class NotebookGitMixedEditingControllerTest extends NotebookGitWebContentControl
 
   private static final String NOTE_PATH = "Mixed Note.md";
   private static final String CREATED_PREFIX =
-      "---\r\ntype: Note\r\n# Author annotation\r\ncustom:\r\n  source: 'local'\r\n---\r\n";
+      "---\ntype: Note\n# Author annotation\ncustom:\n  source: 'local'\n---\n";
   private static final String CREATED_CONTENT = CREATED_PREFIX + "created locally";
   private static final String FIRST_WEB_CONTENT = "---\ntype: Note\n---\nfirst web edit";
   private static final String LOCAL_CONTENT = "---\ntype: Note\n---\nlocal edit";

@@ -10,6 +10,7 @@ import java.sql.Timestamp;
 import javax.sql.DataSource;
 import org.eclipse.jgit.lib.ObjectId;
 import org.eclipse.jgit.lib.ObjectInserter;
+import org.eclipse.jgit.lib.ObjectReader;
 import org.eclipse.jgit.lib.Repository;
 import org.springframework.jdbc.datasource.DataSourceUtils;
 import org.springframework.stereotype.Service;
@@ -40,7 +41,10 @@ class NotebookGitAcceptedRepositoryStore {
    * connection must never be closed directly.
    */
   record OpenedAcceptedRepository(
-      Repository repository, ObjectId head, DataSource dataSource, Connection connection)
+      JdbcNotebookGitRepository repository,
+      ObjectId head,
+      DataSource dataSource,
+      Connection connection)
       implements AutoCloseable {
     @Override
     public void close() {
@@ -58,7 +62,8 @@ class NotebookGitAcceptedRepositoryStore {
    */
   OpenedAcceptedRepository open(NotebookGitBinding binding) {
     Connection connection = DataSourceUtils.getConnection(dataSource);
-    Repository repository = new JdbcNotebookGitRepository(binding.getId(), connection);
+    JdbcNotebookGitRepository repository =
+        new JdbcNotebookGitRepository(binding.getId(), connection);
     ObjectId head = ObjectId.fromString(binding.getAcceptedGitObjectId());
     return new OpenedAcceptedRepository(repository, head, dataSource, connection);
   }
@@ -103,11 +108,16 @@ class NotebookGitAcceptedRepositoryStore {
   /**
    * Opens {@code binding}'s accepted repository and re-serializes its {@code main} head into a
    * fresh, complete, cloneable bundle for transport download. The download's transport contract is
-   * a reachable, cloneable bundle, not byte-for-byte equality with any earlier serialization.
+   * a reachable, cloneable bundle, not byte-for-byte equality with any earlier serialization. The
+   * objects are read in one bulk query for this download only; the head still comes from the
+   * binding.
    */
   byte[] downloadableBundle(NotebookGitBinding binding) {
-    try (OpenedAcceptedRepository accepted = open(binding)) {
-      return NotebookGitBundleWriter.write(accepted.repository());
+    try (OpenedAcceptedRepository accepted = open(binding);
+        ObjectReader reader = accepted.repository().newWholeHistoryReader()) {
+      return NotebookGitBundleWriter.write(accepted.repository(), reader);
+    } catch (IOException e) {
+      throw new UncheckedIOException(e);
     }
   }
 }

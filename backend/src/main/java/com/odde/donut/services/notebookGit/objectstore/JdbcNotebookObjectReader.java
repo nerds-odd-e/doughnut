@@ -17,14 +17,15 @@ import org.eclipse.jgit.lib.ObjectReader;
 /**
  * Reads objects straight from {@code notebook_git_accepted_object} through the shared connection -
  * no process-local cache, so a reader always sees exactly what its connection's current transaction
- * sees. When constructed from an {@link JdbcNotebookObjectInserter} session, it also checks that
- * inserter's still-unflushed buffer first, so recently inserted objects are readable before {@code
- * flush()} as JGit's {@code ObjectInserter#newReader()} contract requires.
+ * sees. It first checks any objects it was constructed with in memory: an {@link
+ * JdbcNotebookObjectInserter} session's still-unflushed buffer, so recently inserted objects are
+ * readable before {@code flush()} as JGit's {@code ObjectInserter#newReader()} contract requires,
+ * or a whole-history preload for a bundle download.
  */
 final class JdbcNotebookObjectReader extends ObjectReader {
 
   private final JdbcNotebookObjectDatabase database;
-  private final Map<ObjectId, JdbcNotebookObjectInserter.BufferedObject> buffered;
+  private final Map<ObjectId, JdbcNotebookObjectDatabase.ObjectContent> inMemory;
 
   JdbcNotebookObjectReader(JdbcNotebookObjectDatabase database) {
     this(database, Map.of());
@@ -32,20 +33,20 @@ final class JdbcNotebookObjectReader extends ObjectReader {
 
   JdbcNotebookObjectReader(
       JdbcNotebookObjectDatabase database,
-      Map<ObjectId, JdbcNotebookObjectInserter.BufferedObject> buffered) {
+      Map<ObjectId, JdbcNotebookObjectDatabase.ObjectContent> inMemory) {
     this.database = database;
-    this.buffered = buffered;
+    this.inMemory = inMemory;
   }
 
   @Override
   public ObjectReader newReader() {
-    return new JdbcNotebookObjectReader(database, buffered);
+    return new JdbcNotebookObjectReader(database, inMemory);
   }
 
   @Override
   public Collection<ObjectId> resolve(AbbreviatedObjectId id) throws IOException {
     Set<ObjectId> matches = new HashSet<>();
-    for (ObjectId candidate : buffered.keySet()) {
+    for (ObjectId candidate : inMemory.keySet()) {
       if (id.prefixCompare(candidate) == 0) {
         matches.add(candidate);
       }
@@ -58,11 +59,11 @@ final class JdbcNotebookObjectReader extends ObjectReader {
   public ObjectLoader open(AnyObjectId objectId, int typeHint)
       throws MissingObjectException, IncorrectObjectTypeException, IOException {
     ObjectId id = objectId.copy();
-    JdbcNotebookObjectInserter.BufferedObject inFlight = buffered.get(id);
-    if (inFlight != null) {
-      return checkType(id, inFlight.type(), inFlight.data(), typeHint);
+    JdbcNotebookObjectDatabase.ObjectContent held = inMemory.get(id);
+    if (held != null) {
+      return checkType(id, held.type(), held.data(), typeHint);
     }
-    Optional<JdbcNotebookObjectDatabase.StoredObject> stored = database.find(id);
+    Optional<JdbcNotebookObjectDatabase.ObjectContent> stored = database.find(id);
     if (stored.isEmpty()) {
       throw typeHint == OBJ_ANY
           ? new MissingObjectException(id, "unknown")

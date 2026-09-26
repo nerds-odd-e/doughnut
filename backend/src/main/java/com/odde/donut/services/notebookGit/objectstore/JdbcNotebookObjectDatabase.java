@@ -8,6 +8,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -40,7 +41,8 @@ final class JdbcNotebookObjectDatabase extends ObjectDatabase {
     this.connection = connection;
   }
 
-  record StoredObject(int type, byte[] data) {}
+  /** One Git object's type and raw bytes, whether stored, preloaded, or awaiting flush. */
+  record ObjectContent(int type, byte[] data) {}
 
   @Override
   public JdbcNotebookObjectInserter newInserter() {
@@ -72,7 +74,31 @@ final class JdbcNotebookObjectDatabase extends ObjectDatabase {
     }
   }
 
-  Optional<StoredObject> find(ObjectId id) throws IOException {
+  /**
+   * A reader served from one bulk read of every object this binding stores, for a caller that walks
+   * the whole history (a bundle download). The loaded objects live only as long as that reader.
+   */
+  JdbcNotebookObjectReader newWholeHistoryReader() throws IOException {
+    String sql =
+        "SELECT object_type, object_bytes, git_object_id FROM notebook_git_accepted_object "
+            + "WHERE notebook_git_binding_id = ?";
+    try (PreparedStatement statement = connection.prepareStatement(sql)) {
+      statement.setInt(1, notebookGitBindingId);
+      try (ResultSet resultSet = statement.executeQuery()) {
+        Map<ObjectId, ObjectContent> loaded = new HashMap<>();
+        while (resultSet.next()) {
+          loaded.put(
+              ObjectId.fromString(resultSet.getString(3)),
+              new ObjectContent(resultSet.getInt(1), resultSet.getBytes(2)));
+        }
+        return new JdbcNotebookObjectReader(this, loaded);
+      }
+    } catch (SQLException e) {
+      throw new IOException(e);
+    }
+  }
+
+  Optional<ObjectContent> find(ObjectId id) throws IOException {
     String sql =
         "SELECT object_type, object_bytes FROM notebook_git_accepted_object "
             + "WHERE notebook_git_binding_id = ? AND git_object_id = ?";
@@ -83,7 +109,7 @@ final class JdbcNotebookObjectDatabase extends ObjectDatabase {
         if (!resultSet.next()) {
           return Optional.empty();
         }
-        return Optional.of(new StoredObject(resultSet.getInt(1), resultSet.getBytes(2)));
+        return Optional.of(new ObjectContent(resultSet.getInt(1), resultSet.getBytes(2)));
       }
     } catch (SQLException e) {
       throw new IOException(e);
@@ -116,8 +142,7 @@ final class JdbcNotebookObjectDatabase extends ObjectDatabase {
    * every tree in the hierarchy, not just the changed path - from costing one SQL round trip per
    * attempted object.
    */
-  void insertMissing(Map<ObjectId, JdbcNotebookObjectInserter.BufferedObject> buffered)
-      throws IOException {
+  void insertMissing(Map<ObjectId, ObjectContent> buffered) throws IOException {
     if (buffered.isEmpty()) {
       return;
     }
@@ -157,8 +182,7 @@ final class JdbcNotebookObjectDatabase extends ObjectDatabase {
     }
   }
 
-  private void insertRows(
-      List<ObjectId> ids, Map<ObjectId, JdbcNotebookObjectInserter.BufferedObject> buffered)
+  private void insertRows(List<ObjectId> ids, Map<ObjectId, ObjectContent> buffered)
       throws IOException {
     if (ids.isEmpty()) {
       return;
@@ -171,7 +195,7 @@ final class JdbcNotebookObjectDatabase extends ObjectDatabase {
     try (PreparedStatement statement = connection.prepareStatement(sql)) {
       int index = 1;
       for (ObjectId id : ids) {
-        JdbcNotebookObjectInserter.BufferedObject object = buffered.get(id);
+        ObjectContent object = buffered.get(id);
         statement.setInt(index++, notebookGitBindingId);
         statement.setString(index++, id.name());
         statement.setInt(index++, object.type());

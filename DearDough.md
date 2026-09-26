@@ -463,8 +463,19 @@ Slice 2's plan named `markdownToQuillHtml` as the renderer for judging meaning a
   - Observed effect: slice 2 ran close to the 10-minute hard limit; the plan's Change text no longer describes the code and is corrected only by its Learnings.
   - Inference: a plan that names the exact function or hook for a new check should name it as a suggestion unless a quick probe confirmed it; here a one-line call of `markdownToQuillHtml` on `**a** *b*` versus `**ab**` would have shown the problem. Qualified: the deviation was handled well and cost one slice's margin, not a retry.
 
+## DD-131 — The coordinator sent a plan edit and the slice commit as parallel tool calls, so the commit ran without the failed edit
+
+During delivery the coordinator sent the plan-status Edit and the `git add -A && git commit` Bash call in one parallel batch. The Edit was refused (file not yet read in the session), but the commit still ran, so the slice commit lacked its plan evidence and had to be amended before publication.
+
+### Occurrences
+
+- Execution: SEED-046 story 8 / `.planning/slice-plans/008-history-download-and-clean-clone/PLAN.md` / 9acf38c5b6; Timestamp: 2026-09-26T23:24:19+08:00 (author time of the original slice 1 commit); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.41.
+  - Evidence: slice 1 delivery — Edit error "File has not been read yet", commit c73c8039a0 without PLAN.md, amended to 9acf38c5b6 before the first increment push.
+  - Observed effect: one extra amend and hook lint run; nothing wrong was published.
+  - Inference: delivery steps 5–7 are ordered dependencies; sending them in parallel lets a failed earlier step go unnoticed. Qualified: a one-off coordinator slip with small cost; it would have published a slice without plan evidence had the amend been missed.
+
 ## Retention
 
-- Highest allocated local number: 130
+- Highest allocated local number: 131
 - Recovery: `33939aa45a17c08f5e6f8076178ce96437fdfbe8:DearDough.md` contains the complete pre-compaction log and earlier recovery references; `b0b385a184e96ecf8b0f6fc5572eaaab69bc8dad` preserves later history.
 - Occurrence history is partial; full observations, effects, inference and historical provenance remain in that snapshot and the upstream catalog.

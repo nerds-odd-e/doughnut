@@ -139,6 +139,25 @@ class NotebookGitWebContentSaveControllerTest extends NotebookGitWebContentContr
   }
 
   @Test
+  void savedContentIsStoredAndCommittedWithLfLineEndings() throws Exception {
+    Notebook notebook = createGitBackedNotebook();
+    Note note =
+        makeMe.aNote().notebook(notebook).title("Root Note").content(ACCEPTED_CONTENT).please();
+    snapshotCurrentPortableTree(notebook);
+    String lfContent = "---\ntype: Note\n---\nline one\nline two";
+
+    textContentController.updateNoteContent(
+        note, contentDto("---\r\ntype: Note\r\n---\r\nline one\r\nline two"));
+
+    assertThat(noteRepository.findById(note.getId()).orElseThrow().getContent(), is(lfContent));
+    try (InMemoryRepository repository = new InMemoryRepository(new DfsRepositoryDescription())) {
+      ObjectId head = GitBundleTestReader.fetchHead(repository, acceptedBundleBytes(notebook));
+      assertThat(
+          NotebookGitProposalBlobText.readUtf8(repository, head, "Root Note.md"), is(lfContent));
+    }
+  }
+
+  @Test
   void preExistingPortableDriftIsNeitherBlockingTheWebSaveNorAdoptedByIt() throws Exception {
     Notebook notebook = createGitBackedNotebook();
     Note note =
