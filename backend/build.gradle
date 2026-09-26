@@ -16,7 +16,7 @@ plugins {
   id 'java'
   id 'org.springframework.boot' version '4.1.1'
   // Spotless for the code style
-  id "com.diffplug.spotless" version "8.10.2"
+  id "com.diffplug.spotless" version "8.10.3"
   id "io.github.ben-manes.versions" version "0.64.0"
 }
 
@@ -85,7 +85,7 @@ dependencies {
   implementation 'org.springframework.boot:spring-boot-starter-security'
   implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
   implementation 'org.springdoc:springdoc-openapi-starter-webmvc-api:3.1.1'
-  implementation 'com.openai:openai-java:4.69.0'
+  implementation 'com.openai:openai-java:4.69.3'
   implementation 'org.yaml:snakeyaml:2.7'
   // RxJava2 for Flowable streaming support
   implementation 'io.reactivex.rxjava2:rxjava:2.2.21'
