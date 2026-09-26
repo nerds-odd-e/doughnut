@@ -145,7 +145,15 @@ caller keeps a folders-only check.
 
 ### 4. Folder move and trash use the same set of names
 Type: Behavior
-Status: planned
+Status: done
+Accepted proof: `*Folder*` (319, incl.
+`NotebookFolderMoveNameClashControllerTest.refusesMovingOntoAFileNameIgnoringCaseWithoutOfferingMerge`,
+`mergesIntoACaseVariantDestinationFolderKeepingItsName` and
+`NotebookFolderTrashControllerTest.usesFirstFreeSiblingNameIgnoringCaseWithoutChangingEarlierTrash`),
+`*Trash*` (74) and `*NotebookGitProposal*` (148) pass. A within-notebook move
+onto a case-variant folder merges into it (top-level lookup only; nested
+merge lookups stay exact until slice 5). Cross-notebook moves still use
+`mergeTargetOrRejectConflict`.
 Proof: `NotebookFolderMoveControllerTest` — moving folder `force.png` into a
 folder holding file `Force.png` is refused with `RESOURCE_CONFLICT` (never
 `FOLDER_NAME_CONFLICT`) and nothing changes; moving onto a same-named folder
@@ -251,6 +259,9 @@ rule.
 
 ## Learnings
 
+- Every web placement asking the shared rule now reads attachment filenames;
+  `NotebookGitDerivedFolderTreeOracleControllerTest` assertions allow only
+  `SELECT a.filename FROM NotebookAttachment a…` queries there.
 - `FolderConstructionService.createFolder(notebook, request)` is shared by
   web and local-publish folder creation, and `createFolder(notebook, parent,
   name)` by trash; web-only naming rules go in `WebFolderCreationService`

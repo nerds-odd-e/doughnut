@@ -8,7 +8,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import com.odde.donut.controllers.dto.ApiError;
 import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.MemoryTracker;
 import com.odde.donut.entities.Note;
@@ -118,21 +117,6 @@ class NotebookFolderMoveControllerTest extends NotebookFolderManagementControlle
   }
 
   @Test
-  void rejectsDuplicateNameAtDestination() {
-    Notebook nb = ownedNotebook();
-    ownedFolder(nb, "Dup");
-    Folder holder = ownedFolder(nb, "Holder");
-    Folder nestedDup = makeMe.aFolder().parentFolder(holder).name("Dup").please();
-
-    ApiException ex =
-        assertThrows(
-            ApiException.class, () -> folderController.moveFolder(nb, nestedDup, folderMove(null)));
-    assertThat(ex.getErrorBody().getErrorType(), equalTo(ApiError.ErrorType.FOLDER_NAME_CONFLICT));
-    assertThat(
-        ex.getErrorBody().getMessage(), equalTo("A folder with this name already exists here."));
-  }
-
-  @Test
   void moveConflictLeavesTrashedSubtreeRecoverable() throws UnexpectedNoAccessRightException {
     Notebook notebook = ownedNotebook();
     Folder trash = ownedFolder(notebook, "_trash");
@@ -195,42 +179,5 @@ class NotebookFolderMoveControllerTest extends NotebookFolderManagementControlle
             ResponseStatusException.class,
             () -> folderController.moveFolder(nbA, folder, folderMove(parentInB.getId())));
     assertThat(ex.getReason(), equalTo("Parent folder not in notebook."));
-  }
-
-  @Test
-  void mergesIntoSameNameDestinationWhenMergeRequested() throws UnexpectedNoAccessRightException {
-    Notebook nb = ownedNotebook();
-    Folder target = ownedFolder(nb, "Dup");
-    makeMe.aNote("NoteInTarget").folder(target).please();
-    Folder holder = ownedFolder(nb, "Holder");
-    Folder source = makeMe.aFolder().parentFolder(holder).name("Dup").please();
-    Note noteInSource = makeMe.aNote("NoteInSource").folder(source).please();
-
-    Folder result = folderController.moveFolder(nb, source, folderMerge(null));
-
-    assertThat(result.getId(), equalTo(target.getId()));
-    makeMe.refresh(noteInSource);
-    assertThat(noteInSource.getFolder().getId(), equalTo(target.getId()));
-    assertTrue(listingHasFolder(nb, null, target));
-    assertThat(listingHasFolder(nb, null, source), equalTo(false));
-  }
-
-  @Test
-  void mergesRecursivelyOnNestedNameClash() throws UnexpectedNoAccessRightException {
-    Notebook nb = ownedNotebook();
-    Folder target = ownedFolder(nb, "Dup");
-    Folder innerTarget = makeMe.aFolder().parentFolder(target).name("Inner").please();
-    Note deepNoteInTarget = makeMe.aNote("DeepTarget").folder(innerTarget).please();
-    Folder holder = ownedFolder(nb, "Holder");
-    Folder source = makeMe.aFolder().parentFolder(holder).name("Dup").please();
-    Folder innerSource = makeMe.aFolder().parentFolder(source).name("Inner").please();
-    Note deepNoteInSource = makeMe.aNote("DeepSource").folder(innerSource).please();
-
-    folderController.moveFolder(nb, source, folderMerge(null));
-
-    makeMe.refresh(deepNoteInTarget);
-    makeMe.refresh(deepNoteInSource);
-    assertThat(deepNoteInTarget.getFolder().getId(), equalTo(innerTarget.getId()));
-    assertThat(deepNoteInSource.getFolder().getId(), equalTo(innerTarget.getId()));
   }
 }

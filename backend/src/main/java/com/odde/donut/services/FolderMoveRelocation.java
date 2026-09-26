@@ -91,8 +91,8 @@ public class FolderMoveRelocation {
     requireNewParentInNotebook(newParent, notebook);
     FolderMoveDestinationRules.requireNotMovingIntoSelfOrDescendant(folder, newParent);
     DisplayName availableName =
-        folderSiblingNameValidation.firstAvailableSiblingName(
-            notebook.getId(), newParent.getId(), new DisplayName(folder.getName()), folder.getId());
+        folderSiblingNameValidation.firstFreeFolderName(
+            notebook, newParent, new DisplayName(folder.getName()), folder.getId());
     return persistFolderPlacement(folder, newParent, availableName, now);
   }
 
@@ -102,9 +102,7 @@ public class FolderMoveRelocation {
       requireNewParentInNotebook(newParent, notebook);
     }
     FolderMoveDestinationRules.requireNotMovingIntoSelfOrDescendant(folder, newParent);
-    Integer destParentId = newParent == null ? null : newParent.getId();
-    return folderSiblingNameValidation.mergeTargetOrRejectConflict(
-        notebook.getId(), destParentId, folder, merge);
+    return folderSiblingNameValidation.mergeTargetOrRefuse(notebook, newParent, folder, merge);
   }
 
   private Folder persistFolderPlacement(

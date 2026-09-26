@@ -62,11 +62,7 @@ public class FolderSiblingNameValidation {
       Notebook notebook, Folder parentOrNull, String entryName, Set<Integer> excludedFolderIds) {
     Integer parentFolderId = parentOrNull == null ? null : parentOrNull.getId();
     String prefix = NotebookGitPortablePath.folderPath(parentOrNull);
-    return folderRepository
-        .findChildFoldersNamedIgnoringCase(notebook.getId(), parentFolderId, entryName)
-        .stream()
-        .filter(f -> !excludedFolderIds.contains(f.getId()))
-        .findFirst()
+    return folderHolding(notebook, parentOrNull, entryName, excludedFolderIds)
         .map(
             f ->
                 new TakenEntry(
@@ -96,6 +92,16 @@ public class FolderSiblingNameValidation {
                                 NotebookGitPortablePath.ofAttachment(prefix, filename))));
   }
 
+  private Optional<Folder> folderHolding(
+      Notebook notebook, Folder parentOrNull, String entryName, Set<Integer> excludedFolderIds) {
+    return folderRepository
+        .findChildFoldersNamedIgnoringCase(
+            notebook.getId(), parentOrNull == null ? null : parentOrNull.getId(), entryName)
+        .stream()
+        .filter(f -> !excludedFolderIds.contains(f.getId()))
+        .findFirst();
+  }
+
   /**
    * A folder may take {@code name} in {@code parentOrNull} only when no entry there holds it. A
    * folder holding it is {@code FOLDER_NAME_CONFLICT}; a note or file is {@code RESOURCE_CONFLICT}
@@ -106,13 +112,47 @@ public class FolderSiblingNameValidation {
     entryHolding(notebook, parentOrNull, name.value(), excludedFolderIds)
         .ifPresent(
             taken -> {
-              if (taken.kind() == TakenEntry.Kind.FOLDER) {
-                throwFolderNameConflict(DUPLICATE_SIBLING_NAME_HERE);
-              }
-              throw new ApiException(
-                  new ApiError(
-                      entryNameTakenAt(taken.path()), ApiError.ErrorType.RESOURCE_CONFLICT));
+              requireHeldByAFolder(taken);
+              throwFolderNameConflict(DUPLICATE_SIBLING_NAME_HERE);
             });
+  }
+
+  /**
+   * Moving {@code folder} into {@code parentOrNull}: empty when its name is free there. A folder
+   * holding the name (ignoring case) is returned when {@code merge} is true, otherwise {@code
+   * FOLDER_NAME_CONFLICT}; a note or file holding it is {@code RESOURCE_CONFLICT} naming its path.
+   */
+  public Optional<Folder> mergeTargetOrRefuse(
+      Notebook notebook, Folder parentOrNull, Folder folder, boolean merge) {
+    Set<Integer> excluded = Set.of(folder.getId());
+    Optional<TakenEntry> taken = entryHolding(notebook, parentOrNull, folder.getName(), excluded);
+    if (taken.isEmpty()) {
+      return Optional.empty();
+    }
+    requireHeldByAFolder(taken.get());
+    if (!merge) {
+      throwFolderNameConflict(DUPLICATE_SIBLING_NAME_HERE);
+    }
+    return folderHolding(notebook, parentOrNull, folder.getName(), excluded);
+  }
+
+  /** The first name from {@code requestedName} that no entry in {@code parentOrNull} holds. */
+  public DisplayName firstFreeFolderName(
+      Notebook notebook, Folder parentOrNull, DisplayName requestedName, int excludedFolderId) {
+    return new DisplayName(
+        NumberedNameSelection.firstAvailable(
+            requestedName.value(),
+            Folder.MAX_NAME_LENGTH,
+            candidate ->
+                entryHolding(notebook, parentOrNull, candidate, Set.of(excludedFolderId))
+                    .isPresent()));
+  }
+
+  private static void requireHeldByAFolder(TakenEntry taken) {
+    if (taken.kind() != TakenEntry.Kind.FOLDER) {
+      throw new ApiException(
+          new ApiError(entryNameTakenAt(taken.path()), ApiError.ErrorType.RESOURCE_CONFLICT));
+    }
   }
 
   /** New folder: no existing sibling folder may use {@code name}. */
@@ -143,18 +183,6 @@ public class FolderSiblingNameValidation {
   public Optional<Folder> findConflictingSibling(
       Integer notebookId, Integer parentFolderId, DisplayName name, int excludedFolderId) {
     return findConflictingSibling(notebookId, parentFolderId, name, Set.of(excludedFolderId));
-  }
-
-  public DisplayName firstAvailableSiblingName(
-      Integer notebookId, Integer parentFolderId, DisplayName requestedName, int excludedFolderId) {
-    return new DisplayName(
-        NumberedNameSelection.firstAvailable(
-            requestedName.value(),
-            Folder.MAX_NAME_LENGTH,
-            candidate ->
-                findConflictingSibling(
-                        notebookId, parentFolderId, new DisplayName(candidate), excludedFolderId)
-                    .isPresent()));
   }
 
   /**

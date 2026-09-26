@@ -7,8 +7,6 @@ import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.everyItem;
-import static org.hamcrest.Matchers.hasItem;
-import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.startsWith;
 
 import com.odde.donut.controllers.dto.FolderCreationRequest;
@@ -102,7 +100,10 @@ class NotebookGitDerivedFolderTreeOracleControllerTest
     assertThat(
         trashed.get("_trash/Research/Biology/cell.png"),
         equalTo(before.get("Research/Biology/cell.png")));
-    assertThat(queries, not(hasItem(containsString("NotebookAttachment"))));
+    assertThat(
+        "only the free-name check reads attachment rows, and only their filenames",
+        queries.stream().filter(query -> query.contains("NotebookAttachment")).toList(),
+        everyItem(startsWith("SELECT a.filename FROM NotebookAttachment a")));
     assertAcceptedTreeMatchesTheFullAssembly(notebook);
 
     folderController.moveFolder(notebook, biology, folderMove(research.getId()));
