@@ -57,3 +57,8 @@ path (`composeNoteContentFromPropertyRows`) and cover it with example 1.
 - Clearing every rich body line of a note whose body ended in a newline now
   saves just that newline (after any frontmatter); no example covers it.
 - `\r\n` final newlines are kept by the code but not tested.
+
+## Execution complete
+
+Product advice: no backlog change. Story wrap-up should add the kept final
+newline to "Rich body editing" in `docs/note-content-saving.md`.
