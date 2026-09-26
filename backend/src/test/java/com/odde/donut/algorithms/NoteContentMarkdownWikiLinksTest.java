@@ -35,7 +35,7 @@ class NoteContentMarkdownWikiLinksTest {
     assertThat(
         NoteContentMarkdown.removeWikiLinksFromLeadingFrontmatterProperties(
             content, Set.of("Target")),
-        equalTo(Optional.of("---\nsource: '[[Source]]'\n---\nBody")));
+        equalTo(Optional.of("---\nsource: \"[[Source]]\"\n---\nBody")));
   }
 
   @Test
@@ -70,6 +70,16 @@ class NoteContentMarkdownWikiLinksTest {
         NoteContentMarkdown.removeWikiLinksFromLeadingFrontmatterProperties(
             content, Set.of("Only")),
         equalTo(Optional.of(Frontmatter.parse("example of:\n  - keep\n").fenced(""))));
+  }
+
+  @Test
+  void removeWikiLinksFromLeadingFrontmatterProperties_cutsOnlyTheEmptiedFlowListItem() {
+    String content = "---\ntags: [a, \"[[Only]]\"]\n---\nBody";
+
+    assertThat(
+        NoteContentMarkdown.removeWikiLinksFromLeadingFrontmatterProperties(
+            content, Set.of("Only")),
+        equalTo(Optional.of("---\ntags: [a]\n---\nBody")));
   }
 
   @Test

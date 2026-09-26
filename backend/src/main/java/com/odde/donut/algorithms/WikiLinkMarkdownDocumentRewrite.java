@@ -40,7 +40,7 @@ public final class WikiLinkMarkdownDocumentRewrite {
     }
     NoteLeadingFrontmatter.VerbatimSplit split = frontmatter.get();
     String yaml =
-        FrontmatterInPlaceEdit.rewriteSupportedScalars(
+        FrontmatterInPlaceEdit.rewriteSupportedValues(
             split.yamlRaw(), value -> replaceInMarkdown(value, oldInnerTrimmed, newInner));
     String body = replaceInMarkdown(split.body(), oldInnerTrimmed, newInner);
     if (yaml.equals(split.yamlRaw()) && body.equals(split.body())) {

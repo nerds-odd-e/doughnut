@@ -140,7 +140,7 @@ Change: extend the same edit to added and renamed keys. No new owner.
 ### 6. The server has one in-place frontmatter edit
 
 Type: Structure
-Status: done — `FrontmatterInPlaceEdit.rewriteSupportedScalars` (private
+Status: done — `FrontmatterInPlaceEdit.rewriteSupportedValues` (private
 `splice`); `NoteContentMarkdown*`, `WikiLinkMarkdownTest`, title-rename and
 note-move referrer tests green unchanged. Set/append/remove operations were
 left to slices 7 and 8, which test them
@@ -178,7 +178,10 @@ owner instead of `Frontmatter.set(...).fenced(...)`. That covers
 ### 8. Removing a trashed note's links from properties changes only those values
 
 Type: Behavior
-Status: planned
+Status: done — `NoteControllerTrashTests.trashAppliesRemoveFromPropertiesReferenceChoice`
+(whole referrer content `equalTo`); `NoteContentMarkdownWikiLinksTest`
+emptied-property, emptied-list, emptied-frontmatter and flow-list cases;
+trash, linking-notebook and inbound-rename controller tests green
 Proof: `NoteControllerTrashTests` with `removeFromProperties()` (example 7).
 The referrer's content equals the original with only the `see also` value
 changed. `NoteContentMarkdownWikiLinksTest` keeps its emptied-property and
@@ -239,3 +242,8 @@ owner (rewrite values, then remove emptied keys) instead of
   newline). Upload test contents need `type: Note` so `ensureTypeKey` adds no
   line. `NoteContentMarkdown.LeadingFrontmatter` duplicates
   `NoteLeadingFrontmatter.Split` (pre-existing, ~15 files; not merged here).
+- Slice 8: `FrontmatterInPlaceEdit.rewriteSupportedValues` is the one walk of
+  supported values (top-level scalars, all-scalar lists) for both wiki-link
+  rename and trash link removal: an entry whose values all become blank is
+  removed, emptied list items are cut, other changed scalars are rewritten.
+  `Frontmatter.mapStringValues` is gone.

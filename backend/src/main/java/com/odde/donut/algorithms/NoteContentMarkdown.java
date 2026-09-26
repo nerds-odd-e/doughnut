@@ -2,6 +2,7 @@ package com.odde.donut.algorithms;
 
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.UnaryOperator;
 
 /**
  * Note content helpers for the leading YAML block: orchestrates fence parsing ({@link
@@ -81,13 +82,19 @@ public final class NoteContentMarkdown {
     if (linkTexts.isEmpty()) {
       return Optional.empty();
     }
-    return splitLeadingFrontmatter(content)
+    UnaryOperator<String> removeLinks =
+        v -> linkTexts.stream().reduce(v, (s, t) -> s.replace("[[" + t + "]]", ""));
+    return NoteLeadingFrontmatter.splitVerbatim(content)
         .flatMap(
-            lf ->
-                lf.frontmatter()
-                    .mapStringValues(
-                        v -> linkTexts.stream().reduce(v, (s, t) -> s.replace("[[" + t + "]]", "")))
-                    .map(updated -> updated.isEmpty() ? lf.body() : updated.fenced(lf.body())));
+            split -> {
+              String yaml =
+                  FrontmatterInPlaceEdit.rewriteSupportedValues(split.yamlRaw(), removeLinks);
+              if (yaml.equals(split.yamlRaw())) {
+                return Optional.empty();
+              }
+              return Optional.of(
+                  Frontmatter.parse(yaml).isEmpty() ? split.body() : split.rebuild(yaml));
+            });
   }
 
   public record AddPropertyWithAvailableKeyResult(String content, String resolvedKey) {}

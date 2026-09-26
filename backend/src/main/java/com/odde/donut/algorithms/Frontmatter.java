@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.UnaryOperator;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
 
@@ -179,63 +178,6 @@ public final class Frontmatter {
       }
     }
     return new Frontmatter(copy);
-  }
-
-  /**
-   * Applies {@code transform} to every supported scalar or list-item string. Entries whose
-   * transformed scalar is blank, or list properties with no remaining items, are dropped.
-   * Unsupported values are left unchanged. Returns empty if nothing changed.
-   */
-  public Optional<Frontmatter> mapStringValues(UnaryOperator<String> transform) {
-    LinkedHashMap<String, Object> copy = new LinkedHashMap<>();
-    boolean changed = false;
-    for (Map.Entry<String, Object> entry : data.entrySet()) {
-      Object original = entry.getValue();
-      Optional<FrontmatterPropertyValue> parsed =
-          FrontmatterPropertyValues.fromYamlObject(original);
-      if (parsed.isEmpty()) {
-        copy.put(entry.getKey(), original);
-        continue;
-      }
-      FrontmatterPropertyValue propertyValue = parsed.get();
-      if (propertyValue instanceof FrontmatterPropertyValue.Scalar scalar) {
-        String transformed = transform.apply(scalar.value());
-        if (!transformed.equals(scalar.value())) {
-          changed = true;
-          if (!transformed.isBlank()) {
-            copy.put(entry.getKey(), transformed);
-          }
-        } else {
-          copy.put(entry.getKey(), original);
-        }
-      } else if (propertyValue instanceof FrontmatterPropertyValue.ListItems listItems) {
-        List<String> newItems = new ArrayList<>();
-        boolean listChanged = false;
-        for (String item : listItems.items()) {
-          String transformed = transform.apply(item);
-          if (!transformed.equals(item)) {
-            listChanged = true;
-          }
-          if (!transformed.isBlank()) {
-            newItems.add(transformed);
-          } else if (!item.isBlank()) {
-            listChanged = true;
-          }
-        }
-        if (listChanged) {
-          changed = true;
-          if (!newItems.isEmpty()) {
-            copy.put(entry.getKey(), new ArrayList<>(newItems));
-          }
-        } else {
-          copy.put(entry.getKey(), original);
-        }
-      }
-    }
-    if (!changed) {
-      return Optional.empty();
-    }
-    return Optional.of(new Frontmatter(copy));
   }
 
   /**

@@ -181,12 +181,16 @@ class NoteControllerTrashTests extends ControllerTestBase {
     Note target = makeMe.aNote("Target").notebookOwnedBy(currentUser.getUser()).please();
     Note referrer = makeMe.aNote("Referrer").underSameNotebookAs(target).please();
     NoteUpdateContentDTO content = new NoteUpdateContentDTO();
-    content.setContent("---\ntarget: \"[[Target]]\"\n---\nBody");
+    content.setContent(
+        "---\ntype: Note\n# related\nsee also: \"[[Target]] and [[Other]]\"\nsource: 'kept'\n---\nBody");
     textContentController.updateNoteContent(referrer, content);
 
     controller.trashNote(target, removeFromProperties());
 
-    assertThat(referrer.getContent(), equalTo("---\ntype: Note\n---\nBody"));
+    assertThat(
+        referrer.getContent(),
+        equalTo(
+            "---\ntype: Note\n# related\nsee also: \" and [[Other]]\"\nsource: 'kept'\n---\nBody"));
     assertThat(target.isTrashed(), equalTo(true));
   }
 }
