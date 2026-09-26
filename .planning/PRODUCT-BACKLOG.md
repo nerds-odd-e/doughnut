@@ -10,8 +10,6 @@ and deletable in Web Donut.
 
 ## Taken
 
-- [Remove the separate Book storage](seeds/SEED-035-ai-workspace-supporting-files.md#story-21) — SEED-035#story-21 ([plan](quick/040-remove-separate-book-storage/PLAN.md))
-
 ## Backlog list
 
 - [Delete unwanted supporting files from Web Donut](seeds/SEED-035-ai-workspace-supporting-files.md#story-2) — SEED-035#story-2
