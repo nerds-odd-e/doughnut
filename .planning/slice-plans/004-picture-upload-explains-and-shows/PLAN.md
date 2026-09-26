@@ -115,3 +115,13 @@ Change: `StoredApiCollection.uploadNoteImage` calls
   publish's `NotebookGitAttachmentSizeAdmission.LIMIT_BYTES` here, because the
   Taken story SEED-046#story-1 is reworking that class; merging is a candidate
   follow-up once it lands.
+
+## Execution complete
+
+Product advice: no backlog change. At wrap-up, add to the upload paragraph of
+`docs/notebook-git-attachments.md` that upload admits a picture by its file
+extension from the display list (declared type ignored) up to 10 MiB, naming
+the allowed types when refused, and that the new file appears in the sidebar at
+once. Merging `PictureFile.LIMIT_BYTES` with
+`NotebookGitAttachmentSizeAdmission.LIMIT_BYTES` remains a candidate follow-up
+once SEED-046#story-1 lands.
