@@ -101,7 +101,8 @@ notebook…") to say a moved note carries its picture file.
 
 ### 2. A taken name gives the picture the first free name
 Type: Behavior
-Status: planned
+Status: done (accepted proof: `backend:test:worktree --tests
+'*NotebookGitWebNoteMove*'`)
 Proof: `NotebookGitWebNoteMovePictureControllerTest`: `mechanics/` holds
 `Force.png`. Moving `Force` gives `mechanics/force (2).png` with the same
 pointer and `mechanics/Force.md` saying `image: force (2).png`;
@@ -141,4 +142,7 @@ file row with the same pointer bytes is placed instead of moving the row.
   skips it (comparing folder ids, since a lazy proxy may not equal the loaded
   folder), or the name check would find the picture itself
   (`aSamePlaceMoveKeepsThePicture`).
+- The `image:` rewrite uses `AuthoredNoteDocument.fromContent` (as the
+  wiki-link rewrite on move does), not upload's save preparation, so only
+  `image:` changes and no validation newly refuses a move.
 - `backend:test:worktree` takes one `--tests` pattern per run.

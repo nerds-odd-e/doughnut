@@ -1,5 +1,7 @@
 package com.odde.donut.services;
 
+import com.odde.donut.algorithms.AuthoredNoteDocument;
+import com.odde.donut.algorithms.CanonicalDonutOrigin;
 import com.odde.donut.algorithms.NoteContentMarkdown;
 import com.odde.donut.controllers.dto.NoteRealm;
 import com.odde.donut.entities.Folder;
@@ -26,10 +28,10 @@ import org.springframework.transaction.annotation.Transactional;
 /**
  * Web note-move orchestration: capture inbound references, place the note via {@link
  * NoteMotionService}, then rewrite wiki links. A same-notebook move also carries the note's picture
- * file to its new folder. Same-notebook moves run through {@code WebNoteEditService.edit} so the
- * moved tree appends to accepted history; the {@link Consumer} factories here supply the
- * capture-place-rewrite recipe for that boundary. Cross-notebook moves keep a separate
- * DEFAULT-isolation transaction and are not Git-synchronized in the current slice.
+ * file to its new folder under the first free name there. Same-notebook moves run through {@code
+ * WebNoteEditService.edit} so the moved tree appends to accepted history; the {@link Consumer}
+ * factories here supply the capture-place-rewrite recipe for that boundary. Cross-notebook moves
+ * keep a separate DEFAULT-isolation transaction and are not Git-synchronized in the current slice.
  */
 @Service
 public class NoteMoveService {
@@ -43,6 +45,8 @@ public class NoteMoveService {
   private final NoteFolderAttachment noteFolderAttachment;
   private final FolderSiblingNameValidation folderSiblingNameValidation;
   private final EntityPersister entityPersister;
+  private final AuthoredNoteDocumentPersistence authoredNoteDocumentPersistence;
+  private final CanonicalDonutOrigin canonicalDonutOrigin;
 
   public NoteMoveService(
       NoteMotionService noteMotionService,
@@ -54,7 +58,9 @@ public class NoteMoveService {
       FolderRepository folderRepository,
       NoteFolderAttachment noteFolderAttachment,
       FolderSiblingNameValidation folderSiblingNameValidation,
-      EntityPersister entityPersister) {
+      EntityPersister entityPersister,
+      AuthoredNoteDocumentPersistence authoredNoteDocumentPersistence,
+      CanonicalDonutOrigin canonicalDonutOrigin) {
     this.noteMotionService = noteMotionService;
     this.noteRealmService = noteRealmService;
     this.wikiLinkRewriteService = wikiLinkRewriteService;
@@ -65,6 +71,8 @@ public class NoteMoveService {
     this.noteFolderAttachment = noteFolderAttachment;
     this.folderSiblingNameValidation = folderSiblingNameValidation;
     this.entityPersister = entityPersister;
+    this.authoredNoteDocumentPersistence = authoredNoteDocumentPersistence;
+    this.canonicalDonutOrigin = canonicalDonutOrigin;
   }
 
   /**
@@ -80,7 +88,7 @@ public class NoteMoveService {
       Folder targetFolder = folderRepository.findById(targetFolderId).orElseThrow();
       Optional<NotebookAttachment> picture = pictureToCarry(note, targetFolder);
       noteMotionService.executeMoveIntoFolder(note, targetFolder);
-      picture.ifPresent(file -> carry(file, targetFolder));
+      picture.ifPresent(file -> carry(note, file, targetFolder, now));
       wikiLinkRelocationRewrite.rewriteInboundWikiLinksForLocationChange(
           note, now, inboundReferences);
     };
@@ -97,7 +105,7 @@ public class NoteMoveService {
           wikiLinkRewriteService.captureLiveResolvedInboundReferences(note, user);
       Optional<NotebookAttachment> picture = pictureToCarry(note, null);
       noteMotionService.executeMoveToNotebookRoot(note);
-      picture.ifPresent(file -> carry(file, null));
+      picture.ifPresent(file -> carry(note, file, null, now));
       wikiLinkRelocationRewrite.rewriteInboundWikiLinksForLocationChange(
           note, now, inboundReferences);
     };
@@ -105,26 +113,37 @@ public class NoteMoveService {
 
   /**
    * The file the note's {@code image:} names in its own folder, which moves with the note to {@code
-   * destinationOrNull}; refused when an entry there already holds its name.
+   * destinationOrNull}.
    */
   private Optional<NotebookAttachment> pictureToCarry(Note note, Folder destinationOrNull) {
     if (Objects.equals(folderId(note.getFolder()), folderId(destinationOrNull))) {
       return Optional.empty();
     }
-    Optional<NotebookAttachment> picture =
-        NoteContentMarkdown.noteImage(note.getContent())
-            .filter(NotebookGitPortablePath::isPlainFilename)
-            .flatMap(image -> noteFolderAttachment.at(note, image));
-    picture
-        .flatMap(
-            file ->
-                folderSiblingNameValidation.entryHolding(
-                    note.getNotebook(), destinationOrNull, file.getFilename(), Set.of()))
-        .ifPresent(FolderSiblingNameValidation::refuseTaken);
-    return picture;
+    return NoteContentMarkdown.noteImage(note.getContent())
+        .filter(NotebookGitPortablePath::isPlainFilename)
+        .flatMap(image -> noteFolderAttachment.at(note, image));
   }
 
-  private void carry(NotebookAttachment file, Folder destinationOrNull) {
+  /**
+   * Moves {@code file} into the placed note's folder under the first name no entry there holds
+   * (ignoring case), rewriting the note's {@code image:} when that name differs.
+   */
+  private void carry(Note note, NotebookAttachment file, Folder destinationOrNull, Timestamp now) {
+    String filename =
+        NumberedNameSelection.firstAvailableFilename(
+            file.getFilename(),
+            candidate ->
+                folderSiblingNameValidation
+                    .entryHolding(note.getNotebook(), destinationOrNull, candidate, Set.of())
+                    .isPresent());
+    if (!filename.equals(file.getFilename())) {
+      file.setFilename(filename);
+      authoredNoteDocumentPersistence.persist(
+          note,
+          AuthoredNoteDocument.fromContent(
+              NoteContentMarkdown.withNoteImage(note.getContent(), filename), canonicalDonutOrigin),
+          now);
+    }
     file.setFolder(destinationOrNull);
     entityPersister.merge(file);
   }

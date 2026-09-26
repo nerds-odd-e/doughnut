@@ -2,16 +2,12 @@ package com.odde.donut.controllers;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import com.odde.donut.controllers.dto.ApiError;
 import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.NotebookAttachment;
-import com.odde.donut.exceptions.ApiException;
 import com.odde.donut.testability.GitBundleTestReader.AcceptedHistory;
 import java.sql.Timestamp;
 import org.junit.jupiter.api.BeforeEach;
@@ -77,21 +73,27 @@ class NotebookGitWebNoteMovePictureControllerTest extends NotebookGitWebNoteMove
   }
 
   @Test
-  void aDestinationEntryHoldingThePictureNameRefusesTheMoveAndChangesNothing() throws Exception {
-    storeFolderAttachmentAndSnapshot(notebook, mechanics, "Force.png", new byte[] {9});
-    String acceptedBefore = binding(notebook).getAcceptedGitObjectId();
+  void aTakenNameGivesThePictureTheFirstFreeNameAndRewritesItsImage() throws Exception {
+    NotebookAttachment taken =
+        storeFolderAttachmentAndSnapshot(notebook, mechanics, "Force.png", new byte[] {9});
+    AcceptedHistory before = acceptedHistory(notebook);
 
-    ApiException conflict =
-        assertThrows(
-            ApiException.class, () -> relationController.moveNoteToFolder(force, mechanics));
+    relationController.moveNoteToFolder(force, mechanics);
 
-    ApiError error = conflict.getErrorBody();
-    assertThat(error.getErrorType(), equalTo(ApiError.ErrorType.RESOURCE_CONFLICT));
-    assertThat(error.getMessage(), containsString("mechanics/Force.png"));
-    assertThat(binding(notebook).getAcceptedGitObjectId(), equalTo(acceptedBefore));
-    assertThat(reloadNote(force).getFolder().getId(), equalTo(physics.getId()));
+    AcceptedHistory after = acceptedHistory(notebook);
+    assertThat(after.parents(), equalTo(before.commits()));
     assertThat(
-        notebookAttachmentRepository.findById(picture.getId()).orElseThrow().getFolder().getId(),
-        equalTo(physics.getId()));
+        after.tipPaths(),
+        containsInAnyOrder(
+            "physics/.keep",
+            "mechanics/Force.md",
+            "mechanics/Force.png",
+            "mechanics/force (2).png"));
+    assertThat(
+        tipText(after, "mechanics/Force.md"),
+        equalTo("---\nimage: force (2).png\n---\nforce body"));
+    assertThat(tipContent(after, "mechanics/force (2).png"), equalTo(pointer));
+    assertThat(tipContent(after, "mechanics/Force.png"), equalTo(taken.getAcceptedGitContent()));
+    assertAcceptedTreeMatchesTheFullAssembly(notebook);
   }
 }
