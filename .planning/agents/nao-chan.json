@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "agent": "Nao-chan",
+  "email": "nao-chan@example.org",
+  "identity": "SEED-046#story-11",
+  "mode": "story-branch",
+  "branch": "exec/007-clone-test-states-output",
+  "host": "claude",
+  "model": "claude-opus-5-5"
+}
