@@ -7,7 +7,7 @@ describe("markdownizer htmlToMarkdown", () => {
       markdownizer.htmlToMarkdown(
         "<h1>Hello World</h1><p>This is <em>markdown</em>.</p>"
       )
-    ).toBe("Hello World\n===========\n\nThis is _markdown_.")
+    ).toBe("# Hello World\n\nThis is *markdown*.")
   })
 
   it("converts empty lines with br", () => {
@@ -21,7 +21,7 @@ describe("markdownizer htmlToMarkdown", () => {
       markdownizer.htmlToMarkdown(
         "<ol><li data-list='bullet'>item1</li><li data-list='bullet'>item2</li></ol>"
       )
-    ).toBe("* item1\n* item2")
+    ).toBe("- item1\n- item2")
   })
 
   it("converts nested Quill list to markdown", () => {
@@ -29,21 +29,21 @@ describe("markdownizer htmlToMarkdown", () => {
       markdownizer.htmlToMarkdown(
         "<ol><li data-list='bullet'>item1</li><li data-list='bullet' class='ql-indent-1'>item1.1</li></ol>"
       )
-    ).toBe("* item1\n  * item1.1")
+    ).toBe("- item1\n  - item1.1")
   })
 
   it("converts nested h1 tags to single header", () => {
     const markdown = markdownizer.htmlToMarkdown(
       '<p class="p1"><span class="s1"><h1><b>✅<span class="Apple-converted-space"> </span></b></h1><h1><b>Conclusion</b></h1></span></p>'
     )
-    expect(markdown.match(/={3,}$/gm)?.length).toBe(1)
+    expect(markdown.match(/^# /gm)?.length).toBe(1)
   })
 
   it("keeps separate h1 tags as separate headers", () => {
     const markdown = markdownizer.htmlToMarkdown(
       "<h1>Chapter 1</h1><h1>Chapter 2</h1>"
     )
-    expect(markdown.match(/={3,}$/gm)?.length).toBe(2)
+    expect(markdown.match(/^# /gm)?.length).toBe(2)
   })
 
   describe("code block conversions", () => {

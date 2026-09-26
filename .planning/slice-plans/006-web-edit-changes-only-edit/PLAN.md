@@ -54,7 +54,9 @@ Commands:
 ### 1. The rich editor writes the common Markdown forms
 
 Type: Behavior
-Status: planned
+Status: done — `RichMarkdownEditor.changesOnlyTheEdit.spec.ts` examples 4 and 8
+(whole emitted Markdown, `toBe`); the spec's `typeAtStart(body, word)` helper
+is reusable for later slices
 Proof: examples 4 and 8 in the new spec. Update the few converter tests that
 assert the old forms (`markdownizer.htmlToMarkdown.spec.ts` has about three)
 to the new ones; do not add tests for them.
@@ -199,4 +201,6 @@ owner (rewrite values, then remove emptied keys) instead of
 
 ## Learnings
 
-None yet.
+- Slice 1: `markdownizer.ts`'s own Turndown instance was unused and is gone;
+  `quillHtmlToMarkdown.ts` holds the only one, and its escaped-emphasis rules
+  read the delimiters from its options.
