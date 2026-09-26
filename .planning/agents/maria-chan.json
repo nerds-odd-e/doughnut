@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 1,
+  "agent": "Maria-chan",
+  "email": "maria-chan@example.org",
+  "activity": "preparation",
+  "identity": "SEED-035#story-11",
+  "host": "claude",
+  "model": "claude-opus-5-5"
+}
