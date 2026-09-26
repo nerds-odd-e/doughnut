@@ -57,8 +57,8 @@ describe("RichMarkdownEditor", () => {
       `<p class="p1">Intro</p><ul><li><span class="s1"><b>Japan</b></span><ul><li>correct: circle</li><li>incorrect: cross</li></ul></li></ul>`
     )
     const markdown = h.lastEmittedMarkdown()
-    expect(markdown).toMatch(/\n {2,}\* +correct: circle/)
-    expect(markdown).toMatch(/\n {2,}\* +incorrect: cross/)
+    expect(markdown).toMatch(/\n {2,}- +correct: circle/)
+    expect(markdown).toMatch(/\n {2,}- +incorrect: cross/)
     expect(
       Array.from(h.quillEditorEl().querySelectorAll("li")).map((li) => ({
         text: li.textContent?.trim(),

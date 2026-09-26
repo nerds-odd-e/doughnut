@@ -116,6 +116,29 @@ class RelationControllerReduceToSourcePropertyTests extends ControllerTestBase {
   }
 
   @Test
+  void appendsOnlyTheNewPropertyLineToTheSourceFrontmatter()
+      throws UnexpectedNoAccessRightException {
+    String authored =
+        "---\ntags: [x, y]\n# a comment\ndescription: \"Quoted: value\"\ntype: Note\n---\nbody";
+    Note source =
+        makeMe.aNote("Moon").notebookOwnedBy(currentUser.getUser()).content(authored).please();
+    Note target = makeMe.aNote("Earth").underSameNotebookAs(source).please();
+    Note relation =
+        makeMe
+            .aNote()
+            .underSameNotebookAs(source)
+            .asRelationship("a part of", source, target)
+            .please();
+    noteReferenceService.refreshDerivedIndexesForNote(relation);
+
+    controller.reduceToSourceProperty(relation);
+
+    assertThat(
+        source.getContent(),
+        equalTo(authored.replace("type: Note\n", "type: Note\na part of: '[[Earth]]'\n")));
+  }
+
+  @Test
   void movesEveryLearnersUnderstandingTrackerAndDropsTheSpellingTracker()
       throws UnexpectedNoAccessRightException {
     Note source = makeMe.aNote("Moon").notebookOwnedBy(currentUser.getUser()).please();

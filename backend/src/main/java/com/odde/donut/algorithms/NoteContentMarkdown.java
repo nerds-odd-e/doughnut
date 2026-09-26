@@ -2,10 +2,12 @@ package com.odde.donut.algorithms;
 
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.UnaryOperator;
 
 /**
  * Note content helpers for the leading YAML block: orchestrates fence parsing ({@link
- * NoteLeadingFrontmatter}) and frontmatter manipulation ({@link Frontmatter}).
+ * NoteLeadingFrontmatter}), parsed properties ({@link Frontmatter}) and in-place property writes
+ * ({@link FrontmatterInPlaceEdit}).
  */
 public final class NoteContentMarkdown {
 
@@ -80,13 +82,19 @@ public final class NoteContentMarkdown {
     if (linkTexts.isEmpty()) {
       return Optional.empty();
     }
-    return splitLeadingFrontmatter(content)
+    UnaryOperator<String> removeLinks =
+        v -> linkTexts.stream().reduce(v, (s, t) -> s.replace("[[" + t + "]]", ""));
+    return NoteLeadingFrontmatter.splitVerbatim(content)
         .flatMap(
-            lf ->
-                lf.frontmatter()
-                    .mapStringValues(
-                        v -> linkTexts.stream().reduce(v, (s, t) -> s.replace("[[" + t + "]]", "")))
-                    .map(updated -> updated.isEmpty() ? lf.body() : updated.fenced(lf.body())));
+            split -> {
+              String yaml =
+                  FrontmatterInPlaceEdit.rewriteSupportedValues(split.yamlRaw(), removeLinks);
+              if (yaml.equals(split.yamlRaw())) {
+                return Optional.empty();
+              }
+              return Optional.of(
+                  Frontmatter.parse(yaml).isEmpty() ? split.body() : split.rebuild(yaml));
+            });
   }
 
   public record AddPropertyWithAvailableKeyResult(String content, String resolvedKey) {}
@@ -112,14 +120,12 @@ public final class NoteContentMarkdown {
    * {@code key} (case-insensitive) in place or appending it, and creates the block when absent.
    */
   public static String setLeadingFrontmatterProperty(String content, String key, String value) {
-    if (content == null) {
-      content = "";
-    }
-    Optional<LeadingFrontmatter> split = splitLeadingFrontmatter(content);
-    if (split.isPresent()) {
-      LeadingFrontmatter lf = split.get();
-      return lf.frontmatter().set(key, value).fenced(lf.body());
-    }
-    return Frontmatter.empty().set(key, value).fenced(content);
+    String text = content == null ? "" : content;
+    return NoteLeadingFrontmatter.splitVerbatim(text)
+        .map(
+            split ->
+                split.rebuild(
+                    FrontmatterInPlaceEdit.setTopLevelScalar(split.yamlRaw(), key, value)))
+        .orElseGet(() -> Frontmatter.empty().set(key, value).fenced(text));
   }
 }

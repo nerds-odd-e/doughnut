@@ -47,10 +47,10 @@ export {
   removePropertyRowAt,
   renamePropertyRowKeyAt,
   scalarStringFromPropertyRow,
-  sortedPropertyRowsFromNoteProperties,
-  sortedPropertyRowsFromRecord,
+  propertyRowsFromNoteProperties,
   validatePropertyRowsForRichEdit,
 } from "@/utils/noteContentPropertyRows"
+export { composeNoteContentInPlace } from "@/utils/noteContentInPlaceEdit"
 
 export {
   type NoteProperties,

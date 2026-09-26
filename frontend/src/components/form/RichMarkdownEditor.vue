@@ -56,7 +56,7 @@ import { richEditorKeepsBody } from "./richEditorKeepsBody"
 import type { WikiLink } from "@generated/donut-backend-api"
 import { replaceWikiLinksInHtml } from "./replaceWikiLinksInHtml"
 import {
-  composeNoteContentFromPropertyRows,
+  composeNoteContentInPlace,
   parseNoteContentMarkdown,
   type PropertyRow,
 } from "@/utils/noteContentFrontmatter"
@@ -160,22 +160,12 @@ const htmlValue = computed(() => {
   )
 })
 
-const composeBodyMarkdown = (bodyMarkdown: string) => {
-  const p = parsedContent.value
-  if (!p.ok && p.reason === "nested_metadata") {
-    const separator =
-      bodyMarkdown && !p.prefix.endsWith("\n")
-        ? p.prefix.includes("\r\n")
-          ? "\r\n"
-          : "\n"
-        : ""
-    return p.prefix + separator + bodyMarkdown
-  }
-  return composeNoteContentFromPropertyRows(
+const composeBodyMarkdown = (bodyMarkdown: string) =>
+  composeNoteContentInPlace(
+    props.modelValue ?? "",
     frontmatterPropertiesRef.value?.getPropertyRows() ?? [],
     bodyMarkdown
   )
-}
 
 const htmlValueUpdated = (newHtmlValue: string) => {
   if (effectiveReadonly.value) return
@@ -193,11 +183,8 @@ const onPropertiesChanged = (rows: PropertyRow[]) => {
   const p = parsedContent.value
   if (!p.ok) return
   const prevFull = props.modelValue ?? ""
-  const bodyMarkdown =
-    currentIntervalBodyMarkdown !== undefined
-      ? currentIntervalBodyMarkdown
-      : p.body
-  const composed = composeNoteContentFromPropertyRows(rows, bodyMarkdown)
+  const bodyMarkdown = currentIntervalBodyMarkdown ?? p.body
+  const composed = composeNoteContentInPlace(prevFull, rows, bodyMarkdown)
   if (composed === prevFull) return
   emits("update:modelValue", composed)
   nextTick(() => {

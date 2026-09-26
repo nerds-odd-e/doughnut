@@ -8,8 +8,12 @@ import {
 import { isWikiLinkAnchor } from "@/utils/wikiLinkDomMarkers"
 import { wikiAnchorToMarkdownToken } from "@/utils/wikiLinkMarkup"
 
-export const turndownService = new TurndownService({
+const turndownService = new TurndownService({
   br: "<br>",
+  headingStyle: "atx",
+  bulletListMarker: "-",
+  emDelimiter: "*",
+  hr: "---",
 })
 
 turndownService.use(gfm)
@@ -148,8 +152,9 @@ turndownService.addRule("boldWithEscapedEntities", {
     if (node.nodeName !== "B" && node.nodeName !== "STRONG") return false
     return hasTextNodesWithHtmlTags(node as HTMLElement)
   },
-  replacement(_content, node) {
-    return `**${escapeHtmlTagsInTextNodes(node as HTMLElement)}**`
+  replacement(_content, node, options) {
+    const delimiter = options.strongDelimiter
+    return `${delimiter}${escapeHtmlTagsInTextNodes(node as HTMLElement)}${delimiter}`
   },
 })
 
@@ -159,8 +164,9 @@ turndownService.addRule("italicWithEscapedEntities", {
     if (node.nodeName !== "I" && node.nodeName !== "EM") return false
     return hasTextNodesWithHtmlTags(node as HTMLElement)
   },
-  replacement(_content, node) {
-    return `*${escapeHtmlTagsInTextNodes(node as HTMLElement)}*`
+  replacement(_content, node, options) {
+    const delimiter = options.emDelimiter
+    return `${delimiter}${escapeHtmlTagsInTextNodes(node as HTMLElement)}${delimiter}`
   },
 })
 

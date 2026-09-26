@@ -8,7 +8,7 @@ import {
   removePropertyRowAt,
   renamePropertyRowKeyAt,
   scalarRecordFromNoteProperties,
-  sortedPropertyRowsFromNoteProperties,
+  propertyRowsFromNoteProperties,
 } from "@/utils/noteContentFrontmatter"
 
 describe("property rows compose / mutate", () => {
@@ -36,7 +36,7 @@ describe("property rows compose / mutate", () => {
     )
     expect(parsed.ok).toBe(true)
     if (!parsed.ok) return
-    let rows = sortedPropertyRowsFromNoteProperties(parsed.properties)
+    let rows = propertyRowsFromNoteProperties(parsed.properties)
     rows = renamePropertyRowKeyAt(rows, 0, "alphaRenamed")
     const md = composeNoteContentFromPropertyRows(rows, parsed.body)
     const again = parseNoteContentMarkdown(md)
@@ -52,7 +52,7 @@ describe("property rows compose / mutate", () => {
     const parsed = parseNoteContentMarkdown("---\na: 1\nb: 2\n---\nRest\n")
     expect(parsed.ok).toBe(true)
     if (!parsed.ok) return
-    let rows = sortedPropertyRowsFromNoteProperties(parsed.properties)
+    let rows = propertyRowsFromNoteProperties(parsed.properties)
     rows = removePropertyRowAt(rows, 0)
     const md = composeNoteContentFromPropertyRows(rows, parsed.body)
     const again = parseNoteContentMarkdown(md)
@@ -61,11 +61,11 @@ describe("property rows compose / mutate", () => {
     ).toEqual({ b: "2" })
   })
 
-  it("remove: dropping second sorted row keeps first key only", () => {
+  it("remove: dropping second row keeps first key only", () => {
     const parsed = parseNoteContentMarkdown("---\na: 1\nb: 2\n---\nRest\n")
     expect(parsed.ok).toBe(true)
     if (!parsed.ok) return
-    let rows = sortedPropertyRowsFromNoteProperties(parsed.properties)
+    let rows = propertyRowsFromNoteProperties(parsed.properties)
     rows = removePropertyRowAt(rows, 1)
     const md = composeNoteContentFromPropertyRows(rows, parsed.body)
     const again = parseNoteContentMarkdown(md)
@@ -78,7 +78,7 @@ describe("property rows compose / mutate", () => {
     const parsed = parseNoteContentMarkdown("---\na: 1\nb: 2\n---\nRest\n")
     expect(parsed.ok).toBe(true)
     if (!parsed.ok) return
-    let rows = sortedPropertyRowsFromNoteProperties(parsed.properties)
+    let rows = propertyRowsFromNoteProperties(parsed.properties)
     rows = removePropertyRowAt(rows, 0)
     rows = removePropertyRowAt(rows, 0)
     const md = composeNoteContentFromPropertyRows(rows, parsed.body)
@@ -94,7 +94,7 @@ describe("property rows compose / mutate", () => {
     const parsed = parseNoteContentMarkdown("---\nonly: x\n---\nParagraph.\n")
     expect(parsed.ok).toBe(true)
     if (!parsed.ok) return
-    let rows = sortedPropertyRowsFromNoteProperties(parsed.properties)
+    let rows = propertyRowsFromNoteProperties(parsed.properties)
     rows = removePropertyRowAt(rows, 0)
     const md = composeNoteContentFromPropertyRows(rows, parsed.body)
     expect(md).toBe("Paragraph.\n")
@@ -120,7 +120,7 @@ describe("property rows compose / mutate", () => {
     })
   })
 
-  it("sortedPropertyRowsFromNoteProperties includes list values", () => {
+  it("propertyRowsFromNoteProperties includes list values", () => {
     const parsed = parseNoteContentMarkdown(`---
 tags:
   - a
@@ -130,7 +130,7 @@ topic: x
 Body`)
     expect(parsed.ok).toBe(true)
     if (!parsed.ok) return
-    const rows = sortedPropertyRowsFromNoteProperties(parsed.properties)
+    const rows = propertyRowsFromNoteProperties(parsed.properties)
     expect(rows).toHaveLength(2)
     expect(rows.find((r) => r.key === "tags")?.value).toEqual(
       listPropertyValue(["a", "b"])
