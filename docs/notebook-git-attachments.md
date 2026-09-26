@@ -35,8 +35,12 @@ no note, container README or `.keep`; its folder ancestry remains visible in the
 web projection.
 
 Web rename, move within the notebook, trash and recovery carry a folder's files
-through the same folder placement. Dissolving a folder, or merging it into a
-same-named folder within the notebook, carries its files exactly as its notes:
+through the same folder placement. A note moved within the notebook on the web
+carries the file its `image:` names as a plain filename in the note's folder
+into its new folder, in the same accepted change; a destination entry already
+holding that name refuses the move. Trashing a note leaves that file where it
+is. Dissolving a folder, or merging it into a same-named folder within the
+notebook, carries its files exactly as its notes:
 each file keeps its row and bytes and only its folder changes. File references
 are not rewritten: a note outside the dissolved or merged folder whose `image:`
 points into it shows a broken picture afterwards. Permanent folder

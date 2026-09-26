@@ -175,6 +175,22 @@ class NotebookGitWebTrashControllerTest extends NotebookGitWebContentControllerT
     }
   }
 
+  @Test
+  void trashLeavesTheFileTheNoteImageNames() throws Exception {
+    Notebook notebook = createGitBackedNotebook();
+    Folder physics = makeMe.aFolder().notebook(notebook).name("physics").please();
+    Note force =
+        makeMe.aNote("Force").folder(physics).content("---\nimage: force.png\n---\n").please();
+    storeFolderAttachmentAndSnapshot(notebook, physics, "force.png", new byte[] {7});
+    testabilitySettings.timeTravelTo(Timestamp.from(TRASH_AT));
+
+    noteController.trashNote(force, leaveDeadLinks());
+
+    assertThat(
+        acceptedHistory(notebook).tipPaths(),
+        containsInAnyOrder("physics/force.png", "_trash/physics/Force.md"));
+  }
+
   LearnedTrashFixture seedLearnedCellsInBiologyOnlyWithoutTrash()
       throws UnexpectedNoAccessRightException {
     Notebook notebook = createGitBackedNotebook();

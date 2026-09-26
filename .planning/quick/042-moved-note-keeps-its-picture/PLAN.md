@@ -75,7 +75,8 @@ finds no file, so the existing move tests cover it.
 
 ### 1. A moved note's picture moves with it
 Type: Behavior
-Status: planned
+Status: done (accepted proof: `backend:test:worktree --tests
+'*NotebookGitWebNoteMove*'`, `'*NotebookGitWebTrashControllerTest*'`)
 Proof: new `NotebookGitWebNoteMovePictureControllerTest` (on
 `NotebookGitWebNoteMoveTestBase`, seeding the file with
 `storeFolderAttachmentAndSnapshot`):
@@ -136,4 +137,8 @@ file row with the same pointer bytes is placed instead of moving the row.
 
 ## Learnings
 
-None yet.
+- A move into the note's own folder also runs these steps; `pictureToCarry`
+  skips it (comparing folder ids, since a lazy proxy may not equal the loaded
+  folder), or the name check would find the picture itself
+  (`aSamePlaceMoveKeepsThePicture`).
+- `backend:test:worktree` takes one `--tests` pattern per run.
