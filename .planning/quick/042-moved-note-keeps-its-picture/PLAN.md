@@ -18,13 +18,12 @@ and undo-trash, `image:` values that are URLs, absolute paths, paths into other
 folders or missing files, references from other folders, `..` support on the
 web, and any other `image:` rewrite.
 
-Assumption: folder dissolve and merge with the one set of names per folder
-is delivered first (it is). Its shared owner of entry names per folder (evolved from
-`FolderSiblingNameValidation`, reading live note, folder and file rows without
-letter case, with `NumberedNameSelection` for free names) answers "is this
-filename taken in the destination" and "the first free filename". If it is not
-on main when execution starts, stop and resequence instead of adding a second
-name check.
+The one set of names per folder is on main (checked 2026-09-26 before
+execution): `FolderSiblingNameValidation.entryHolding` answers "is this
+filename taken in the destination" (live note, folder and file rows, ignoring
+letter case) and `NumberedNameSelection.firstAvailableFilename` gives the first
+free filename (Book file placement already combines the two). Use them; add no
+second name check.
 
 ## Architecture
 
@@ -39,6 +38,9 @@ name check.
   - `NoteFolderAttachment.at(note, image)` already finds the file an `image:`
     names. Call it before placement, while the note is still in its old folder.
     Only a plain filename (`NotebookGitPortablePath.isPlainFilename`) qualifies.
+  - Folder dissolve and merge already carry a file by changing its row's folder
+    and merging it (`FolderSubtree`); the picture carry moves its row the same
+    way.
   - `NoteContentMarkdown.withNoteImage` plus
     `AuthoredNoteDocumentPersistence.persist` already rewrite `image:`, as
     picture upload does. Add a reading counterpart beside `withNoteImage`
@@ -84,7 +86,8 @@ Proof: new `NotebookGitWebNoteMovePictureControllerTest` (on
   assembly.
 - A move to the notebook root does the same.
 - When `mechanics/` already has an entry named `force.png` (any letter case),
-  the move is refused, naming that path, and nothing changes. This is an
+  the move is refused with the existing `RESOURCE_CONFLICT` naming that path
+  (`FolderSiblingNameValidation.refuseTaken`), and nothing changes. This is an
   interim refusal from the shared name rule; slice 2 replaces it.
 
 `NotebookGitWebTrashControllerTest`: trashing `Force` keeps
@@ -104,7 +107,8 @@ pointer and `mechanics/Force.md` saying `image: force (2).png`;
 `mechanics/Force.png` is unchanged, in one accepted commit matching the full
 assembly. This replaces slice 1's refusal case.
 
-Behavior: the carry asks the shared name rule for the first free filename and,
+Behavior: the carry asks `NumberedNameSelection.firstAvailableFilename` over
+`FolderSiblingNameValidation.entryHolding` for the first free filename and,
 when it differs, rewrites `image:` through `withNoteImage` and the authored
 document persistence in the same change.
 

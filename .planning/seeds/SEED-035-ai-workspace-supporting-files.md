@@ -100,7 +100,7 @@ No executable plan or implementation is authorized by this seed.
 
 ### A moved note keeps its picture
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../quick/042-moved-note-keeps-its-picture/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"5ad8e0c37e930ebdcbde4f413906bcfaa516d3e17ae5dd8607335bd7a3027b91","plan":"da326236c8b3fdd950b6e8d1938ac1c75920b7e9cb0d6f7a656f051aa41766c7"}}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../quick/042-moved-note-keeps-its-picture/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"ac9aeee78cc21c710ad70eeb47dd30548beeb32e7c9c52d7fd39ca09b2e91362","plan":"82deb1d0e49f2c3796a260034ed0ffd43df1610bce2ae4ab3c7dc9449fc15916"}}
 ```
 
 - **Identity:** SEED-035#story-23
