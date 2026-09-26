@@ -58,104 +58,6 @@ Owner decisions on 2026-09-26 that removed candidates:
 S = 30–60 minutes, M = 1–2 hours, L = 2–4 hours. These are hypotheses
 including delivery, not commitments.
 
-<a id="story-1"></a>
-
-### 1. Publishing a small change stays fast however much a notebook holds
-
-**Identity:** SEED-046#story-1
-```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/002-publish-cost-follows-change/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"33fbe806b732dd4ba706a79badb8ebbcbf158301373d0df9ed0e3f70f864ce82","plan":"70c0ab06ae088a2d0e2c87e47239c4445cbaefbc114c8343c961c0307232f5e5"}}
-```
-
-- **Goal:** Owners who publish from a local checkout of a notebook with files,
-  often from an AI IDE, get a publish whose cost follows the size of the
-  change, not the length of accepted history or the number and size of files
-  the change does not touch. Local publishing stays usable as work history
-  grows, which the near-future direction of parallel local and web work
-  depends on.
-- **Scope:**
-  - **Required:** neither the CLI nor the server repeats work over accepted
-    history or over unchanged files when publishing. Evidence is publish time
-    and the number of stored-file content reads per publish, both on the local
-    Development stack.
-  - **Approach constraint (standing owner expectation):** profile first, then
-    remove the measured dominant cost through a simpler, more cohesive design
-    with less code; no caches, background precomputation, or special modes. If
-    only a more complex fast path is found, surface it as a decision.
-  - **Preserved:** every current admission and refusal rule: the size limit
-    for new files, Book source protection, Markdown validation, forward-only
-    history, and size and digest verification of newly published file content.
-    A notebook whose current files include an accepted over-limit Book source
-    keeps publishing.
-  - **Not promised either way (owner decision 2026-09-26, not the center of
-    the problem):** how an over-limit file accepted earlier is recognized, and
-    whether an over-limit file added and removed again within unpublished
-    commits must be uploaded.
-  - **Excluded:** real GCS and production measurement (owner decision
-    2026-09-26: the slowness reproduces without it; content reads are counted
-    instead); network transfer time of new file bytes; clone (story 6); pull
-    (story 2); CLI messages (story 3).
-  - **Deferred unless profiling shows it dominant after the above:** sending
-    the whole Git history as a bundle in each direction; per-file overhead
-    when publishing many new files at once.
-- **Key examples** (local Development stack, owner's 5 s limit):
-  1. A notebook with about 100 MB of files (12 files) and about 40 accepted
-     commits; the owner publishes a one-line note edit → it takes about as
-     long as the same edit in a notebook without files (0.5–0.8 s), not
-     7–12 s, and no stored file content is read.
-  2. A notebook with about 1,036 files, 300 MB and 47 commits; a one-line
-     note edit → the same as example 1 (111.7 s today).
-  3. The notebook from example 1; the owner adds 12 new files totalling
-     100 MB → publish takes about as long as a first publish of those files to
-     a fresh notebook (1.4–1.7 s), not 8–26 s, and only the 12 new files'
-     content is read.
-  4. The notebook from example 1; the owner changes one 8.5 MB file → only
-     that file's new content is read (5.0–8.2 s today).
-  5. Boundary: a new file over the size limit is still refused with today's
-     size-limit message; a note edit in a notebook holding a 60 MB Book source
-     still publishes.
-- **Known facts (2026-09-26):**
-
-  | Notebook | Publish | Time |
-  | --- | --- | --- |
-  | No files, 5–30+ commits | one-line edit | 0.5–0.8 s, flat |
-  | 100 MB, fresh | 100 MB first publish | 1.4–1.7 s |
-  | 100 MB unchanged files, ~5 commits | one-line edit | 1.45–1.56 s |
-  | same, after 30 more note-only commits (one publish) | 30 commits | 7.4 s |
-  | same, ~38 commits | one-line edit | 6.9–11.9 s |
-  | same, ~40 commits | +100 MB (12 files) | 7.98 s, later 25.6 s |
-  | 100 MB, ~25 commits incl. 5 versions of one 8.5 MB file | changed 8.5 MB file | 5.0–8.2 s |
-  | 500 files × 200 KB (98 MB), fresh | first publish | 13.15 s |
-  | same, +500 files | +100 MB | 48.9 s |
-  | ~1,000 files / 200 MB, ~6 commits | add one note, then one-line edits | 69.6 s, 96.9 s, 94.3 s |
-  | ~1,036 files / 300 MB, ~47 commits | one-line edit | 111.7 s |
-
-  - Most of the time is CLI CPU: 94.3 s run = user 35 s + sys 40 s; 111.7 s
-    run = user 49 s + sys 44 s; 6.5 s run = user 1.5 s + sys 1.6 s.
-  - Backend garbage collection did not run during slow publishes (checked with
-    `jstat`), so the in-memory byte store is not the cause.
-  - Code reading during refinement (not yet profiled): on every publish the
-    CLI walks every accepted commit and starts one `git cat-file` process per
-    file per commit to collect earlier-accepted file digests
-    (`attachmentPayloadDigestsInHistory` in
-    `cli/src/commands/notebook/notebookPublishLfsSelection.ts`); the server
-    walks the same history and then reads and re-hashes the stored content of
-    every file present in each new commit, changed or not
-    (`NotebookGitAttachmentSizeAdmission.admit`). Both history walks exist
-    only for the over-limit rule that this story does not promise to keep.
-  - For contrast, within the limit: clone 0.9–2.1 s (two early 100 MB runs of
-    5.4–5.7 s were not reproducible); pull 0.5–2.9 s; web note save 0.12–0.20 s;
-    web folder rename, move and trash about 0.1 s; dissolving a 500-file folder
-    1.8 s; attaching a 60 MB Book 0.9 s.
-- **Value / learning:** Removes the largest barrier to working on notebooks
-  with files locally; tests the assumption that publish repeats work over
-  accepted history and unchanged files that it does not need.
-- **Effort hypothesis:** M — medium confidence; the likely cause is located,
-  profiling still has to confirm it is dominant.
-- **Depends on:** none.
-- **Safe stopping point:** Publish keeps every current admission and refusal
-  rule listed under Preserved.
-
 <a id="story-3"></a>
 
 ### 3. Notebook CLI commands say briefly what happened and what to do next
@@ -353,9 +255,11 @@ including delivery, not commitments.
   learning" notebook (id 1, 51 commits, 11,222 tracked files — notes and
   folder `.keep` markers, 5.4 MB `.git`) cloned in 5.18, 5.36 and 5.12 s. A
   no-op pull of it took 0.3–0.5 s.
-- **Value / learning:** Tests whether per-entry cost remains after story 1.
-- **Effort hypothesis:** S–M — low confidence; may already be fixed by story 1.
-- **Depends on:** story 1, whose profiling may remove the same cost.
+- **Value / learning:** Finds the per-entry cost in clone. Publishing now
+  checks only the files the published commits change; clone was not part of
+  that work.
+- **Effort hypothesis:** S–M — low confidence.
+- **Depends on:** none.
 - **Safe stopping point:** Clone still fills in every current file.
 
 <a id="story-9"></a>
@@ -383,12 +287,11 @@ including delivery, not commitments.
 
 ## Ordering and Scope Reduction
 
-Story 1 is first by owner decision and because it most limits the near-future
-direction. Story 3 carries the owner's explicit clone-message request. Stories 4
+Story 3 carries the owner's explicit clone-message request. Stories 4
 and 5 fix visible web problems; the web edit story comes first (owner decision
 2026-09-26) because whole-file rewrites hurt parallel local and web work, while
-picture upload is a web-only path the near-future direction does not name. Story 6 may be absorbed by story 1. Story 7 is
-polish. Drop first: 7, then 6 (if story 1 absorbed it).
+picture upload is a web-only path the near-future direction does not name. Story 7 is
+polish. Drop first: 7, then 6.
 
 Story numbers are local order; identities keep their original anchors.
 
