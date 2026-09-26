@@ -80,10 +80,12 @@ before an asynchronous property edit emits its content.
 ## Rich body editing
 
 A rich body edit keeps the authored frontmatter text and the blank lines
-after it exactly as written. The rich editor writes `#` headings, `-` bullets,
-`*` emphasis (`**` strong) and `---` rules, so a body already using those forms
-changes only where it was edited; other forms (such as `+` bullets, `_`
-emphasis or setext headings) are rewritten to them.
+after it exactly as written, and ends the body with the newlines the authored
+body ended with (`\n` or `\r\n`), or none when it had none. The rich editor
+writes `#` headings, `-` bullets, `*` emphasis (`**` strong) and `---` rules,
+so a body already using those forms changes only where it was edited; other
+forms (such as `+` bullets, `_` emphasis or setext headings) are rewritten to
+them.
 
 The rich editor rebuilds the Markdown body from its content on each edit, so it
 keeps body image embeds (`![alt](src)`) through an edit to other text. Showing
