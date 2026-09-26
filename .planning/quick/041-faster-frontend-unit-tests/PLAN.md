@@ -151,11 +151,24 @@ pairs (11 vs 5 files): 8.18/5.18s, 5.58/4.27s, 8.16/5.10s.
 
 ### 4. NoteEditableContent specs share one setup
 Type: Structure
-Status: planned
+Status: done
 Proof: as slice 1.
 
 Merge the 9 `NoteEditableContent*` files by responsibility (paste and paste
 choice; debounced save; content properties and normalization).
+
+Accepted proof: 10 files → 6 (`NoteEditableContent.spec.ts` switching notes;
+`.debouncedSave`; `.saveResponse`; `.paste`; `.pasteChoice`;
+`.pasteChoiceActionBar`), all ≤250 lines; one async mount helper and shared
+`mountAndPaste`/`choiceShown`/`useOriginalText` replace per-file copies.
+48 → 44 tests, each removal with a named survivor (in-flight "persists a newer
+ordinary edit…"; "should auto-save … without blur" gained the not-before-
+debounce assertion; `it.each` dismissal "…on explicitDismissal"; the two
+rich-mode replace tests merged keeping all assertions). Alternating focused
+runs (10 vs 5–6 files): 5.50/5.30/5.57s vs 4.45/4.36/4.26s.
+`cd frontend && CURSOR_DEV=true nix develop -c pnpm exec vitest run --browser=chromium --browser.headless tests/notes/NoteEditableContent*.spec.ts`
+→ 6 files, 44 tests pass; `pnpm -C frontend exec vue-tsc --noEmit` passes.
+Full `pnpm frontend:test` over slices 1–4: 323 files, 1929 tests pass.
 
 ### 5. Mid-size sibling families share one setup
 Type: Structure
