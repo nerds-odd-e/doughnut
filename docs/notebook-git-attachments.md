@@ -111,7 +111,9 @@ it again, so one upload is exactly one commit. A name that a file, note or
 folder in that folder already uses (ignoring case, under the one set of names),
 or one that is not a plain filename (empty, containing `/`, or starting with
 `.`), is refused with a message naming the path; nothing is renamed or
-overwritten. A notebook without an LFS binding refuses the upload.
+overwritten. A notebook without an LFS binding refuses the upload. Uploading a
+replacement picture leaves the previous file in the folder: it stays part of the
+notebook and its Git history until someone deletes it.
 
 Pictures uploaded before pictures became notebook files were moved into their
 notebooks as files beside their notes; their old table and
