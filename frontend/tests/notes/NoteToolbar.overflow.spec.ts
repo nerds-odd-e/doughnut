@@ -1,3 +1,4 @@
+import makeMe from "donut-test-fixtures/makeMe"
 import {
   allMoreOptionsFitNavWidth,
   deleteOverflowNavWidth,
@@ -5,6 +6,7 @@ import {
   exportOverflowNavWidth,
   installMockResizeObserver,
   layoutNoteToolbar,
+  overflowTogglesNavWidth,
   remainingMoreOptionsNavWidth,
   restoreNoteToolbarWidthMocks,
 } from "@tests/helpers/mockNoteToolbarNavWidth"
@@ -13,8 +15,10 @@ import {
   noteToolbarEditTitles,
 } from "@/components/notes/widgets/noteMoreOptionsTitles"
 import {
+  mountNoteToolbar,
   mountOverflowToolbar,
   noteToolbarAction,
+  noteToolbarProps,
   openNoteToolbarOverflowMenu,
   overflowMenuItem,
   resetNoteToolbarTestState,
@@ -113,5 +117,37 @@ describe("NoteToolbar more-options overflow", () => {
     await flushPromises()
 
     expect(wrapper.emitted("edit-as-markdown")).toEqual([[true]])
+  })
+
+  it("pins audio on a narrow toolbar then returns it to overflow when turned off", async () => {
+    wrapper = await mountNoteToolbar(makeMe.aNoteRealm.please())
+    await layoutNoteToolbar(wrapper, overflowTogglesNavWidth())
+
+    await openNoteToolbarOverflowMenu(wrapper)
+    overflowMenuItem(titles.audio)!.click()
+    await flushPromises()
+    expect(noteToolbarAction(wrapper, titles.audio).exists()).toBe(true)
+
+    await noteToolbarAction(wrapper, titles.audio).trigger("click")
+    await flushPromises()
+
+    await openNoteToolbarOverflowMenu(wrapper)
+    expect(overflowMenuItem(titles.audio)).not.toBeNull()
+  })
+
+  it("closes more options dialog when note id changes", async () => {
+    wrapper = await mountNoteToolbar(makeMe.aNoteRealm.please())
+    await layoutNoteToolbar(wrapper, overflowTogglesNavWidth())
+
+    await openNoteToolbarOverflowMenu(wrapper)
+    expect(
+      document.querySelector("[data-dropdown-portal-panel]")
+    ).not.toBeNull()
+
+    await wrapper.setProps(noteToolbarProps(makeMe.aNoteRealm.please()))
+    await flushPromises()
+
+    const details = wrapper.find("[data-auto-collapse-dropdown]")
+    expect((details.element as HTMLDetailsElement).open).toBe(false)
   })
 })

@@ -1,5 +1,6 @@
 import {
   AiAudioController,
+  AiController,
   TextContentController,
 } from "@generated/donut-backend-api/sdk.gen"
 import makeMe from "donut-test-fixtures/makeMe"
@@ -38,9 +39,19 @@ useNoteAudioToolsTestLifecycle()
 
 describe("NoteAudioTools audio processing", () => {
   let wrapper: NoteAudioToolsWrapper
+  let audioToTextMock: ReturnType<typeof mockSdkService>
   const note = makeMe.aNote.please()
+  const textResponse = (content: string, endTimestamp = "00:00:37,270") => ({
+    completionFromAudio: { content },
+    endTimestamp,
+  })
 
   beforeEach(() => {
+    audioToTextMock = mockSdkService(
+      AiAudioController,
+      "audioToText",
+      textResponse("text")
+    )
     wrapper = mountNoteAudioTools(note)
   })
 
@@ -48,74 +59,46 @@ describe("NoteAudioTools audio processing", () => {
     wrapper?.unmount()
   })
 
-  describe("thread context", () => {
-    let audioToTextMock: ReturnType<typeof mockSdkService>
+  it("reuses previous note content between calls", async () => {
+    audioToTextMock
+      .mockResolvedValueOnce(wrapSdkResponse(textResponse("text1")))
+      .mockResolvedValueOnce(
+        wrapSdkResponse(textResponse("text2", "00:00:47,270"))
+      )
 
-    beforeEach(() => {
-      audioToTextMock = mockSdkService(AiAudioController, "audioToText", {
-        completionFromAudio: { content: "text" },
-        endTimestamp: "00:00:37,270",
-      })
+    await processAudio(wrapper)
+    expect(audioToTextMock).toHaveBeenLastCalledWith({
+      body: expect.objectContaining({
+        previousNoteContentToAppendTo: note.content,
+      }),
     })
 
-    it("reuses previous note content between calls", async () => {
-      audioToTextMock
-        .mockResolvedValueOnce(
-          wrapSdkResponse({
-            completionFromAudio: { content: "text1" },
-            endTimestamp: "00:00:37,270",
-          })
-        )
-        .mockResolvedValueOnce(
-          wrapSdkResponse({
-            completionFromAudio: { content: "text2" },
-            endTimestamp: "00:00:47,270",
-          })
-        )
-
-      await processAudio(wrapper)
-      expect(audioToTextMock).toHaveBeenLastCalledWith({
-        body: expect.objectContaining({
-          previousNoteContentToAppendTo: note.content,
-        }),
-      })
-
-      await processAudio(wrapper)
-      expect(audioToTextMock).toHaveBeenLastCalledWith({
-        body: expect.objectContaining({
-          previousNoteContentToAppendTo: note.content,
-        }),
-      })
+    await processAudio(wrapper)
+    expect(audioToTextMock).toHaveBeenLastCalledWith({
+      body: expect.objectContaining({
+        previousNoteContentToAppendTo: note.content,
+      }),
     })
+  })
 
-    it("keeps previous content after an API error", async () => {
-      const ok = {
-        completionFromAudio: { content: "text1" },
-        endTimestamp: "00:00:37,270",
-      }
-      audioToTextMock
-        .mockResolvedValueOnce(wrapSdkResponse(ok))
-        .mockResolvedValueOnce(wrapSdkError("API Error"))
-        .mockResolvedValueOnce(wrapSdkResponse(ok))
+  it("keeps previous content after an API error", async () => {
+    audioToTextMock
+      .mockResolvedValueOnce(wrapSdkResponse(textResponse("text1")))
+      .mockResolvedValueOnce(wrapSdkError("API Error"))
+      .mockResolvedValueOnce(wrapSdkResponse(textResponse("text1")))
 
-      await processAudio(wrapper)
-      await processAudio(wrapper)
-      await processAudio(wrapper)
+    await processAudio(wrapper)
+    await processAudio(wrapper)
+    await processAudio(wrapper)
 
-      expect(audioToTextMock).toHaveBeenLastCalledWith({
-        body: expect.objectContaining({
-          previousNoteContentToAppendTo: note.content,
-        }),
-      })
+    expect(audioToTextMock).toHaveBeenLastCalledWith({
+      body: expect.objectContaining({
+        previousNoteContentToAppendTo: note.content,
+      }),
     })
   })
 
   it("passes isMidSpeech for timer-triggered chunks", async () => {
-    const audioToTextMock = mockSdkService(AiAudioController, "audioToText", {
-      completionFromAudio: { content: "text" },
-      endTimestamp: "00:00:37,270",
-    })
-
     await processAudio(
       wrapper,
       midSpeechChunk(new File(["test2"], "test.webm"))
@@ -130,12 +113,9 @@ describe("NoteAudioTools audio processing", () => {
   })
 
   it("returns endTimestamp from audio processing", async () => {
-    mockSdkService(AiAudioController, "audioToText", {
-      completionFromAudio: {
-        content: "--- a\n+++ b\n@@ -0,0 +1 @@\n+text\n",
-      },
-      endTimestamp: "00:00:37,270",
-    })
+    audioToTextMock.mockResolvedValue(
+      wrapSdkResponse(textResponse("--- a\n+++ b\n@@ -0,0 +1 @@\n+text\n"))
+    )
     mockSdkService(
       TextContentController,
       "updateNoteContent",
@@ -150,55 +130,66 @@ describe("NoteAudioTools audio processing", () => {
     expect(result).toBe("00:00:37,270")
   })
 
-  describe("previous content truncation", () => {
-    let audioToTextMock: ReturnType<typeof mockSdkService>
+  it.each([
+    { when: "under 500 chars", content: "Short", sent: "Short" },
+    {
+      when: "over 500 chars",
+      content: "a".repeat(600),
+      sent: `...${"a".repeat(500)}`,
+    },
+    { when: "undefined", content: undefined, sent: "" },
+  ])(
+    "sends previous content, truncated with ellipsis, when $when",
+    async ({ content, sent }) => {
+      wrapper.unmount()
+      wrapper = mountNoteAudioTools(makeMe.aNote.content(content).please())
+
+      await processAudio(wrapper, midSpeechChunk())
+
+      expect(audioToTextMock).toHaveBeenCalledWith({
+        body: expect.objectContaining({ previousNoteContentToAppendTo: sent }),
+      })
+    }
+  )
+
+  describe("title suggestion", () => {
+    let updateNoteTitleSpy: ReturnType<typeof mockSdkService>
 
     beforeEach(() => {
-      audioToTextMock = mockSdkService(AiAudioController, "audioToText", {
-        completionFromAudio: { content: "text" },
-        endTimestamp: "00:00:37,270",
-      })
+      updateNoteTitleSpy = mockSdkService(
+        TextContentController,
+        "updateNoteTitle",
+        {} as never
+      )
+      mockSdkService(
+        TextContentController,
+        "updateNoteContent",
+        makeMe.aNoteRealm.please()
+      )
     })
 
-    it("sends full content when under 500 characters", async () => {
-      const shortContent = "Short content"
-      wrapper.unmount()
-      wrapper = mountNoteAudioTools(makeMe.aNote.content(shortContent).please())
-
-      await processAudio(wrapper, midSpeechChunk())
-
-      expect(audioToTextMock).toHaveBeenCalledWith({
-        body: expect.objectContaining({
-          previousNoteContentToAppendTo: shortContent,
-        }),
+    it("suggests title on power-of-2 audio processes", async () => {
+      const suggestTitleSpy = mockSdkService(AiController, "suggestTitle", {
+        title: "Suggested Title",
       })
+
+      for (let i = 0; i < 9; i++) {
+        await processAudio(wrapper)
+      }
+
+      expect(suggestTitleSpy).toHaveBeenCalledTimes(4)
+      expect(updateNoteTitleSpy).toHaveBeenCalledTimes(4)
     })
 
-    it("truncates content over 500 characters with ellipsis", async () => {
-      const longContent = "a".repeat(600)
-      wrapper.unmount()
-      wrapper = mountNoteAudioTools(makeMe.aNote.content(longContent).please())
-
-      await processAudio(wrapper, midSpeechChunk())
-
-      expect(audioToTextMock).toHaveBeenCalledWith({
-        body: expect.objectContaining({
-          previousNoteContentToAppendTo: `...${"a".repeat(500)}`,
-        }),
+    it("does not update title when suggestion is empty", async () => {
+      const suggestTitleSpy = mockSdkService(AiController, "suggestTitle", {
+        title: "",
       })
-    })
 
-    it("sends empty string when note content is undefined", async () => {
-      wrapper.unmount()
-      wrapper = mountNoteAudioTools(makeMe.aNote.content(undefined).please())
+      await processAudio(wrapper)
 
-      await processAudio(wrapper, midSpeechChunk())
-
-      expect(audioToTextMock).toHaveBeenCalledWith({
-        body: expect.objectContaining({
-          previousNoteContentToAppendTo: "",
-        }),
-      })
+      expect(suggestTitleSpy).toHaveBeenCalled()
+      expect(updateNoteTitleSpy).not.toHaveBeenCalled()
     })
   })
 })
