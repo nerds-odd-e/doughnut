@@ -198,6 +198,9 @@ Former local code: DD-107.
   - Evidence: coordinator summary handed to the execution retrospective (no transcript): the first managed delivery failed because the target ref lacked the `refs/heads/` prefix, then `candidate-mismatch` for an abbreviated SHA and a missing host session identity (`--session-json`); later deliveries succeeded and the observer /tmp/dough-ci-501/watch-HC7nuY covers `refs/heads/story/delete-notebook-file-on-web`.
   - Observed effect: at least two refused delivery calls before slice 1 was published; the release update from 0.3.38 to 0.3.40 did not remove either earlier cause.
   - Inference: the `refs/heads/` requirement is a new third argument-shape refusal on the same first delivery; the three are rediscovered one refusal at a time. The exact call count is not in the summary.
+- Execution: SEED-043 story 1 / quick/045-commit-gate-checks-committed-content / 574d61b52c; Timestamp: 2026-09-26, ~16:04+08:00 (slice 1 delivery; commit 16:03:40+08:00); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.40.
+  - Evidence: slice 1 receipt `observation.reason` "host session identity is required to verify the notification bridge" (background Claude Code job, Story Branch Mode); recovered by `ci-mailbox.mjs probe` (`CI_MONITOR_READY`), `start --execution nerds-odd-e/doughnut story/045-commit-gate-checks-committed-content`, and `register-push` for 574d61b52c; later deliveries passing `--session-json '{"session_id":…}'` reported `observation.state: reused`.
+  - Observed effect: four extra coordinator calls, including a `grep` of `ci-host-bridge.mjs` for the flag's shape; the recovered observer then delivered slice 1's CI failure (DD-125).
 
 ## ODF-099 — Queued startup receipt embeds the whole Git index and overflows the coordinator's tool output
 
@@ -417,8 +420,19 @@ A story's readiness basis is a digest of its whole seed document. Wrapping up an
   - Observed effect: one refused start, a reassessment, one extra commit on main and a retry; an execution coordinator performed a preparation assessment, as in DD-114.
   - Inference: every story in a multi-story seed is invalidated by any sibling's wrap-up. A digest of the story's own section (plus shared seed context) would keep unrelated closures from forcing reassessment. Qualified: the number of extra calls is not in the summary.
 
+## DD-125 — A plan said the changed script had no test, and nobody searched for one before delivery, so CI caught the stale test
+
+The plan for the commit-gate change recorded "No permanent automated test is added for the hook: it has none today, CI does not run it". `scripts/test/quality_changed.test` already tested `scripts/quality_changed.sh` with a fake `pnpm`, and CI runs it in "Run script unit tests". The implementer, the refactor agent and the coordinator's proof acceptance all relied on the plan's claim; the path-scoped `script` skill, which covers tests under `scripts/`, was not named in delegation and attached only after the first slice.
+
+### Occurrences
+
+- Execution: SEED-043 story 1 / quick/045-commit-gate-checks-committed-content / 574d61b52c; Timestamp: 2026-09-26T16:06:02+08:00 (CI step failure); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.40.
+  - Evidence: plan "Current decisions" before 120753a097; CI run 36228685291 job "Other Unit Tests" failed `quality_changed.test` ("shared biome config selects every affected component": expected `pnpm frontend:lint`, got the install line after `ln` failed); repair 120753a097 updated and extended the test.
+  - Observed effect: one red story-branch CI run, a stash/repair/restore cycle around slice 2, and two extra agents (repair ~49k and refactor ~48k subagent tokens).
+  - Inference: a negative claim that code has no test needs a search of the test tree (here `grep -rl quality_changed scripts/test`) at planning or delegation; naming the stack skill for `scripts/` in the delegation would likely have surfaced it.
+
 ## Retention
 
-- Highest allocated local number: 124
+- Highest allocated local number: 125
 - Recovery: `33939aa45a17c08f5e6f8076178ce96437fdfbe8:DearDough.md` contains the complete pre-compaction log and earlier recovery references; `b0b385a184e96ecf8b0f6fc5572eaaab69bc8dad` preserves later history.
 - Occurrence history is partial; full observations, effects, inference and historical provenance remain in that snapshot and the upstream catalog.

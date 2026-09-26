@@ -116,6 +116,13 @@ frontend skill's "Frontend proof", reuse typecheck evidence from a `lint` or
 
 Sizing: two one-line edits and one run; under five minutes.
 
+## Execution complete
+
+Product advice: no new product work. Both DD-121 failures are removed at the
+commit gate and at `format:changed`; story wrap-up can mark DD-121 addressed.
+The slow root-component lint on agent-profile commits stays out of scope, as
+the seed recorded.
+
 ## Current decisions
 
 - The hook stays check-only and always uses the index copy for the frontend;
