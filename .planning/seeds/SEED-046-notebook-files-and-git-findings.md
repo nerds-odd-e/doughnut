@@ -289,7 +289,7 @@ including delivery, not commitments.
 
 **Identity:** SEED-046#story-11
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/007-clone-test-states-output/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"3d5b7ba486bc570c71e2a46bd9c95d00e69a8c92a4a98f5411027355c61dbb5c","plan":"c58a45ad26fa340e8cbd0a5694d2dba225e8a2231b3027ed7e29e2d3f8599f0d"}}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/007-clone-test-states-output/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"4895a0836d89935a2a8427efcad8af5ff68c561540b01b54b61c653d2941012e","plan":"c58a45ad26fa340e8cbd0a5694d2dba225e8a2231b3027ed7e29e2d3f8599f0d"}}
 ```
 
 - **Goal:** Developers reading the clone test see the exact clone message
