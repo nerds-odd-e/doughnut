@@ -48,20 +48,26 @@ dissolve and file delete keep landing where they do now.
 
 | Promise | Slice | Observable proof |
 | --- | --- | --- |
-| Note trash and permanent delete land as before | 1 | `frontend/tests/store/storedApi.trashNote.spec.ts`, `frontend/tests/notes/NoteMoreOptionsForm.permanentlyDeleteNote.spec.ts` green, unchanged |
-| Folder and file removals land as before | 1 | `frontend/tests/pages/FolderPage.trash.spec.ts`, `FolderPage.permanentlyDelete.spec.ts`, `frontend/tests/pages/AttachmentPage.spec.ts` green, unchanged |
+| Note trash and permanent delete land as before | 1 | `frontend/tests/store/storedApi.trashNote.spec.ts` (folder case now expects string params), `frontend/tests/notes/NoteMoreOptionsForm.permanentlyDeleteNote.spec.ts` green |
+| Folder and file removals land as before | 1 | `frontend/tests/pages/FolderPage.removal.spec.ts`, `FolderPage.spec.ts`, `frontend/tests/pages/AttachmentPage.spec.ts` green, unchanged |
 | One home | 1 | `git grep -n "function containingLocation" frontend/src` finds only `routes/containingLocation.ts`; `vue-tsc` clean |
 
 ## Slices
 
 ### 1. Note removal lands through the shared containing location
 Type: Structure
-Status: planned
+Status: done
 Proof: all rows above. Command: `CURSOR_DEV=true nix develop -c pnpm
 frontend:test tests/store/storedApi.trashNote.spec.ts
 tests/notes/NoteMoreOptionsForm.permanentlyDeleteNote.spec.ts
-tests/pages/FolderPage.trash.spec.ts tests/pages/FolderPage.permanentlyDelete.spec.ts
-tests/pages/AttachmentPage.spec.ts`.
+tests/pages/FolderPage.removal.spec.ts tests/pages/FolderPage.spec.ts
+tests/pages/AttachmentPage.spec.ts` — 5 files, 30 tests pass; `vue-tsc`
+clean; the grep finds only `routes/containingLocation.ts`.
+
+Learnings: the planned `FolderPage.trash`/`FolderPage.permanentlyDelete`
+spec paths do not exist; folder removal landing is observed in
+`FolderPage.removal.spec.ts`. The trash spec's folder case asserted numeric
+params; it now expects the string params the shared rule produces.
 
 Change: replace the two `containingLocation(...)` calls in
 `StoredApiCollection.ts` with `containingLocationOf(cachedRealm)` and delete
