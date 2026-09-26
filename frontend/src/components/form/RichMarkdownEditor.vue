@@ -57,6 +57,7 @@ import type { WikiLink } from "@generated/donut-backend-api"
 import { replaceWikiLinksInHtml } from "./replaceWikiLinksInHtml"
 import {
   composeNoteContentFromPropertyRows,
+  composeNoteContentInPlace,
   parseNoteContentMarkdown,
   type PropertyRow,
 } from "@/utils/noteContentFrontmatter"
@@ -160,22 +161,12 @@ const htmlValue = computed(() => {
   )
 })
 
-const composeBodyMarkdown = (bodyMarkdown: string) => {
-  const p = parsedContent.value
-  if (!p.ok && p.reason === "nested_metadata") {
-    const separator =
-      bodyMarkdown && !p.prefix.endsWith("\n")
-        ? p.prefix.includes("\r\n")
-          ? "\r\n"
-          : "\n"
-        : ""
-    return p.prefix + separator + bodyMarkdown
-  }
-  return composeNoteContentFromPropertyRows(
+const composeBodyMarkdown = (bodyMarkdown: string) =>
+  composeNoteContentInPlace(
+    props.modelValue ?? "",
     frontmatterPropertiesRef.value?.getPropertyRows() ?? [],
     bodyMarkdown
   )
-}
 
 const htmlValueUpdated = (newHtmlValue: string) => {
   if (effectiveReadonly.value) return

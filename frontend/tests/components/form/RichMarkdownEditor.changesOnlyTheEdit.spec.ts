@@ -41,4 +41,28 @@ describe("RichMarkdownEditor changes only what the user edited", () => {
       ["An Intro", "", "- item", "- other", "", "Some *em* text."].join("\n")
     )
   })
+
+  it("keeps the authored frontmatter and blank line on a body edit", async () => {
+    const note =
+      "---\nname: demo2\ndescription: Second skill\ntype: note\ntags: [x]\n---\n\n# Demo2\n"
+
+    expect(await typeAtStart(note, "My ")).toBe(
+      note.replace("# Demo2\n", "# My Demo2")
+    )
+  })
+
+  it("keeps comments, quoting and flow lists in unsorted frontmatter byte for byte", async () => {
+    const frontmatter = [
+      "---",
+      "zeta: 'quoted value'",
+      "# author comment",
+      "alpha: [b, a]",
+      "---",
+      "",
+    ].join("\n")
+
+    expect(await typeAtStart(`${frontmatter}Body`, "The ")).toBe(
+      `${frontmatter}The Body`
+    )
+  })
 })

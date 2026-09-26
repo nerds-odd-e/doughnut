@@ -73,7 +73,8 @@ or remove that instance if nothing uses it.
 ### 2. A body edit keeps the frontmatter text as written
 
 Type: Behavior
-Status: planned
+Status: done — same spec, example 1 and the comment/quoted/flow-list case;
+nested-metadata cases in `RichMarkdownEditor.frontmatter.spec.ts` green
 Proof: example 1 in the new spec, and a frontmatter holding a comment, a
 quoted value and a flow list, unsorted, surviving a body edit byte for byte.
 Existing nested-metadata tests stay green.
@@ -204,3 +205,10 @@ owner (rewrite values, then remove emptied keys) instead of
 - Slice 1: `markdownizer.ts`'s own Turndown instance was unused and is gone;
   `quillHtmlToMarkdown.ts` holds the only one, and its escaped-emphasis rules
   read the delimiters from its options.
+- Slice 2: the in-place edit is `composeNoteContentInPlace(authored, rows,
+  body)` in `noteContentPropertyRows.ts` (re-exported from
+  `noteContentFrontmatter.ts`; placing it there avoids an import cycle). When
+  the rows differ from the parsed properties it still falls back to
+  `composeNoteContentFromPropertyRows` — slices 4 and 5 replace that fallback
+  with splicing inside `split.prefix`. Turndown drops the body's final
+  newline (unchanged, body-side, outside this story's promises).

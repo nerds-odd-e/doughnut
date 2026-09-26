@@ -38,6 +38,7 @@ export {
   appendValueToPropertyRow,
   appendWikiLinkPropertyRow,
   composeNoteContentFromPropertyRows,
+  composeNoteContentInPlace,
   insertPropertyRowAt,
   normalizePropertyRowForCommit,
   notePropertiesFromPropertyRows,
