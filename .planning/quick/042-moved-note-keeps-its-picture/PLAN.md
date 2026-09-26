@@ -127,6 +127,12 @@ full assembly.
 Behavior: when another note in the source folder names the same file, a new
 file row with the same pointer bytes is placed instead of moving the row.
 
+## Execution complete
+
+Product advice: no backlog change. Story 24 (moves to another notebook reach
+Git) keeps its open decision on a picture note moved to another notebook;
+`MovedNotePicture` is where story 10 would extend picture carrying.
+
 ## Current decisions
 
 - Only notes in the source folder count as other users of the file. Trashed

@@ -198,6 +198,10 @@ Former local code: DD-107.
   - Evidence: coordinator summary handed to the execution retrospective (no transcript): the first managed delivery failed because the target ref lacked the `refs/heads/` prefix, then `candidate-mismatch` for an abbreviated SHA and a missing host session identity (`--session-json`); later deliveries succeeded and the observer /tmp/dough-ci-501/watch-HC7nuY covers `refs/heads/story/delete-notebook-file-on-web`.
   - Observed effect: at least two refused delivery calls before slice 1 was published; the release update from 0.3.38 to 0.3.40 did not remove either earlier cause.
   - Inference: the `refs/heads/` requirement is a new third argument-shape refusal on the same first delivery; the three are rediscovered one refusal at a time. The exact call count is not in the summary.
+- Execution: SEED-035 story 23 / quick/042-moved-note-keeps-its-picture / 96186af758; Timestamp: 2026-09-26, ~16:30+08:00 (slice 1 delivery); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.40.
+  - Evidence: all three slice receipts (96186af758, 5db1d2beb4, e22c4c1c9a on `refs/heads/story/042-moved-note-keeps-its-picture`) reported `observation.state: unobserved`, "host session identity is required to verify the notification bridge"; the coordinator noted the gap after slice 1 and deferred it to completion instead of passing `--session-json` (`CLAUDE_CODE_SESSION_ID` was set) on slices 2 and 3.
+  - Observed effect: no increment was observed during execution; the retrospective started with CI unknown for three pushes.
+  - Inference: the coordinator read the ODF-092 occurrences only during the retrospective, so the logged recovery again did not reach delivery.
 
 ## ODF-110 — A readiness replay observed only the plan's named seam, not the rest of the slice's journey
 
