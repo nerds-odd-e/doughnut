@@ -12,7 +12,6 @@ and deletable in Web Donut.
 
 - [Publishing a small change stays fast however much a notebook holds](seeds/SEED-046-notebook-files-and-git-findings.md#story-1) — SEED-046#story-1 ([plan](slice-plans/002-publish-cost-follows-change/PLAN.md))
 - [Notebook CLI commands say briefly what happened and what to do next](seeds/SEED-046-notebook-files-and-git-findings.md#story-3) — SEED-046#story-3 ([plan](slice-plans/003-clone-and-publish-name-next-step/PLAN.md))
-- [Uploading a picture on the web explains refusals and shows the new file](seeds/SEED-046-notebook-files-and-git-findings.md#story-4) — SEED-046#story-4 ([plan](slice-plans/004-picture-upload-explains-and-shows/PLAN.md))
 
 ## Backlog list
 
