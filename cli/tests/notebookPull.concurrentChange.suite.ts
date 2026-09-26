@@ -15,7 +15,7 @@ import {
   checkoutState,
   installNotebookPullAcceptedHistoryTest,
 } from './notebookPull.testHelpers.js'
-import { prepareEligibleDivergence } from './notebookPull.rebase.testHelpers.js'
+import { prepareOtherNoteDivergence } from './notebookPull.rebase.testHelpers.js'
 
 function mergeHeadPath(directory: string) {
   return join(
@@ -107,9 +107,9 @@ const histories = [
     prepare: prepareFastForwardAhead,
   },
   {
-    history: 'eligible other-note divergence',
+    history: 'other-note divergence',
     prepare(workDir: string) {
-      const setup = prepareEligibleDivergence(workDir, { remoteEdits: 1 })
+      const setup = prepareOtherNoteDivergence(workDir, { remoteEdits: 1 })
       return { directory: setup.directory, source: setup.source }
     },
   },

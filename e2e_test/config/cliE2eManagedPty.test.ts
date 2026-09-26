@@ -24,11 +24,11 @@ describe('waitForPtyExit', () => {
           0,
           1000,
           () =>
-            'donut: Local main cannot receive the accepted history because accepted history includes a structural change at "README.md".\n'
+            'donut: Local main cannot receive the accepted history because an unpublished commit is a merge.\n'
         ),
       {
         message:
-          'CLI exited with code 1 (signal 0)\n\nCLI output:\ndonut: Local main cannot receive the accepted history because accepted history includes a structural change at "README.md".',
+          'CLI exited with code 1 (signal 0)\n\nCLI output:\ndonut: Local main cannot receive the accepted history because an unpublished commit is a merge.',
       }
     )
   })

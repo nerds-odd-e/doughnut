@@ -45,7 +45,7 @@ Commands: `CURSOR_DEV=true nix develop -c pnpm cli:test`;
 ### 1. Pull rebases over any accepted file or folder change
 
 Type: Behavior
-Status: planned
+Status: done
 Proof: new `cli/tests/notebookPull.acceptedChanges.suite.ts` (examples 1–4,
 local edit in a renamed folder, note modify/delete pause and abort) green in
 `pnpm cli:test`; e2e folder relocation feature green unchanged.
@@ -75,6 +75,17 @@ Change:
 Sizing: above the 5-minute target, mostly mechanical deletion; kept as one
 slice because the allowlist cannot be partly removed without keeping its
 classifier.
+
+Accepted proof (2026-09-26): `CURSOR_DEV=true nix develop -c pnpm cli:test`
+67 files / 440 tests; `notebook pull (any accepted file or folder change)` →
+`rebases $shape, then publishes` (five shapes: HEAD^ is the accepted head,
+clean status, expected paths present/absent, one publish POST) and
+`pauses when accepted history deletes a note the local work edited, and abort
+restores the local work`. `cy:run --spec
+e2e_test/features/cli/cli_notebook_folder_relocation.feature` 3/3 unchanged.
+The suite's attachments are empty files (publish would LFS-push non-empty
+pointers without a stub); LFS fill-in after a rebase stays proven by
+`notebookPull.lfs.test.ts` `fills in current files after rebased …`.
 
 ### 2. New local notes and files follow an accepted folder rename
 
@@ -125,3 +136,7 @@ Change:
   `Old/b.md`. `git -c merge.directoryRenames=true rebase --onto <accepted>
   <base>` succeeds with `New/a.md` (edited) and `New/b.md`; without the option
   Git pauses on the `b.md` commit ("Could not apply … add").
+- Slice 1 (2026-09-26): full `pnpm cli:test` runs under shared-machine load
+  occasionally hit vitest's 5000 ms timeout in untouched pull suites (e.g.
+  `notebookPull.resolvedContinuation.suite.ts` "an explicit skip of the
+  accepted-side pause…"); the pull suite alone passed 69/69 three times.

@@ -21,18 +21,18 @@ import {
   LOCAL_NOTE,
   NESTED_NOTE,
   OTHER_NOTE,
-  prepareEligibleDivergence,
+  prepareOtherNoteDivergence,
   withNoAmbientGitIdentityOrEditor,
 } from './notebookPull.rebase.testHelpers.js'
 
 export function describeNotebookPullRebase(): void {
-  describe('notebook pull (eligible other-note rebase)', () => {
+  describe('notebook pull (other-note rebase)', () => {
     const ctx = installNotebookPullAcceptedHistoryTest(
       'donut-cli-pull-rebase-test-'
     )
 
     test('rebases two local note-edit commits over one accepted other-note commit, then publishes', async () => {
-      const setup = prepareEligibleDivergence(ctx.getWorkDir(), {
+      const setup = prepareOtherNoteDivergence(ctx.getWorkDir(), {
         remoteEdits: 1,
         localEdits: 2,
       })
@@ -107,7 +107,7 @@ export function describeNotebookPullRebase(): void {
     })
 
     test('keeps several accepted other-note commits unchanged under one rebased local child', async () => {
-      const setup = prepareEligibleDivergence(ctx.getWorkDir(), {
+      const setup = prepareOtherNoteDivergence(ctx.getWorkDir(), {
         remoteEdits: 3,
       })
       serveAcceptedBundle(ctx, setup.source, 'rebase-several')
@@ -128,7 +128,7 @@ export function describeNotebookPullRebase(): void {
 
     test('rebases a one-shot-identity unpublished commit without stored identity or an editor', async () => {
       await withNoAmbientGitIdentityOrEditor(async () => {
-        const setup = prepareEligibleDivergence(ctx.getWorkDir(), {
+        const setup = prepareOtherNoteDivergence(ctx.getWorkDir(), {
           remoteEdits: 1,
           oneShotCommitIdentity: true,
         })
