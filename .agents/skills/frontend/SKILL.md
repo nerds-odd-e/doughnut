@@ -30,7 +30,7 @@ API types:
 CURSOR_DEV=true nix develop -c pnpm -C frontend exec vue-tsc --noEmit
 ```
 
-Reuse existing typecheck evidence from a `lint`/`format`/`build` run on
+Reuse existing typecheck evidence from a `lint` or `build` run on
 identical content instead of repeating it. This requirement applies at proof
 acceptance, not to every focused Vitest run while iterating on one file.
 

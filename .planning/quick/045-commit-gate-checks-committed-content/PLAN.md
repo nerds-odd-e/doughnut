@@ -97,7 +97,12 @@ are not separable from the change; accepted.
 
 ### 2. Formatting no longer type-checks the frontend
 Type: Behavior
-Status: planned
+Status: done
+Accepted proof (2026-09-26): untracked scratch spec with a type error and a
+Biome-fixable line → `./scripts/run.sh pnpm format:changed` exit 0, "Fixed 1
+file", no `vue-tsc`; `./scripts/run.sh pnpm frontend:lint` exit 2 with the
+`vue-tsc` error; exit 0 after removing the scratch spec. No other guidance
+claimed that `format` typechecks.
 Proof: the "2 (format)" row; `frontend/package.json` `format` is
 `biome check --write .`.
 
