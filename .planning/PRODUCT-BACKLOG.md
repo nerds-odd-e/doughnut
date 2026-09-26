@@ -10,8 +10,6 @@ and deletable in Web Donut.
 
 ## Taken
 
-- [Commit a finished slice while other slices are still in progress](seeds/SEED-043-commit-gate-checks-committed-changes.md#story-1) — SEED-043#story-1 ([plan](quick/045-commit-gate-checks-committed-content/PLAN.md))
-
 ## Backlog list
 
 - [A moved note keeps its picture](seeds/SEED-035-ai-workspace-supporting-files.md#story-23) — SEED-035#story-23
