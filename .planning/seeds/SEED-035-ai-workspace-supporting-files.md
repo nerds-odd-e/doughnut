@@ -90,85 +90,11 @@ in historical bundles.
 
 S = 30–60 minutes, M = 1–2 hours, L = 2–4 hours, including delivery. Estimates
 are hypotheses; refine/split work that exceeds L before execution planning.
-Root-file and nested-file continuity, web file deletion, and folder dissolve
-and merge are delivered. Story 23 fixes the picture a note move leaves behind; stories 24 and 10
-own moves to another notebook, which the delivered behavior does not publish
+Root-file and nested-file continuity, web file deletion, folder dissolve
+and merge, and a note moved within its notebook carrying its picture are
+delivered. Stories 24 and 10 own moves to another notebook, which the delivered behavior does not publish
 (24) or refuses for folders with files (10). The [product backlog](../PRODUCT-BACKLOG.md) owns global order.
 No executable plan or implementation is authorized by this seed.
-
-<a id="story-23"></a>
-
-### A moved note keeps its picture
-```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../quick/042-moved-note-keeps-its-picture/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"ac9aeee78cc21c710ad70eeb47dd30548beeb32e7c9c52d7fd39ca09b2e91362","plan":"82deb1d0e49f2c3796a260034ed0ffd43df1610bce2ae4ab3c7dc9449fc15916"}}
-```
-
-- **Identity:** SEED-035#story-23
-- **Slice plan:** [A moved note keeps its picture](../quick/042-moved-note-keeps-its-picture/PLAN.md)
-- **Goal:** An owner who moves a picture note to another folder on the web
-  still sees its picture. Since web-uploaded and migrated pictures became
-  files in their note's folder, a move leaves the file behind: `image:` is
-  resolved relative to the note's folder, so the moved note shows a broken
-  picture. Before that change a picture belonged to its note and moved with it,
-  so this is a regression on an everyday action, not a new capability.
-- **Scope:**
-  - A web note move within the same notebook — into a folder or to the
-    notebook root — carries the file the note's `image:` names when that file
-    is directly in the note's folder. The file and the note land in the
-    destination in the same accepted change, and `image:` stays as it was
-    (owner decision 2026-09-26, option A).
-  - When the destination folder already has an entry with that filename
-    (compared without letter case, under the
-    [one set of names per folder](../../docs/notebook-git-attachments.md#one-set-of-names-per-folder)), the file takes the first free name (`force (2).png`) and the
-    note's `image:` is rewritten to it in the same change. Donut chooses this
-    name and writes the only reference at the same moment, so it takes a free
-    name rather than refusing
-    ([North Star: one way in](../NORTH-STAR.md#one-way-in)).
-  - When another note in the source folder also names the same file, that note
-    keeps it: the file stays and the moved note gets its own copy in the
-    destination. The copy reuses the same stored bytes; nothing is uploaded.
-  - After `donut notebook pull`, the note and its picture are in the new folder
-    and the old folder no longer holds the file (unless another note kept it).
-    Learning history and `image_mask:` are unchanged.
-- **Excluded:**
-  - Moving a note to another notebook (story 24 makes it reach Git; story 10
-    carries its picture). Folder moves already carry their files.
-  - Trash and undo-trash: they move the note into and out of `_trash` and
-    leave the file where it is, so undo finds it again. A trashed note may show
-    a broken picture while in trash.
-  - `image:` values that are a URL or an absolute path, or that name a file in
-    another folder (`diagrams/force.png`, `../x.png`), and a missing file: the
-    note moves and `image:` is untouched. Only locally written values reach
-    other folders; web uploads always sit beside their note.
-  - Other notes elsewhere in the notebook whose locally written `image:`
-    points into the source folder: not searched, as folder dissolve and merge
-    already accept.
-  - Showing `image:` values with `..` on the web, and rewriting `image:` for
-    anything but the free-name case.
-- **Key examples:**
-  1. `physics/Force.md` has `image: force.png`; `physics/force.png` exists and
-     `mechanics/` has no `force.png`. The owner moves `Force` into `mechanics`
-     → the web shows the picture; after pull, `mechanics/Force.md` still says
-     `image: force.png`, `mechanics/force.png` has the same bytes, and
-     `physics/force.png` is gone.
-  2. The same, but `mechanics/` already holds `Force.png` → the moved file
-     becomes `mechanics/force (2).png`, `Force` says `image: force (2).png`,
-     and `mechanics/Force.png` is unchanged.
-  3. `physics/Energy.md` also says `image: force.png` → after moving `Force`,
-     `physics/force.png` stays for `Energy` and `mechanics/force.png` is a
-     copy for `Force`; both notes show the picture.
-  4. `Force` says `image: https://example.com/f.png` → it moves as today; no
-     file changes.
-  5. `Force` is trashed → `physics/force.png` stays; undo puts `Force` back
-     beside it with its picture.
-- **Effort hypothesis:** M, medium confidence. The move owner already writes
-  one accepted change; it adds a file placement (or copy) and, rarely, a
-  one-field frontmatter rewrite. The delivered one set of names per folder
-  supplies the name rule.
-- **Depends on:** nothing outstanding (the one set of names per folder,
-  including files, is delivered).
-- **Safe stopping point:** if never delivered, moving picture notes keeps
-  breaking their picture, as today; nothing is lost and a local move fixes it.
 
 <a id="story-24"></a>
 
@@ -225,7 +151,8 @@ No executable plan or implementation is authorized by this seed.
   object is copied into the destination notebook's store before the change is
   accepted. A moved folder carries all nested subfolders; moving several
   folders at once stays out (owner decision 2026-09-26). The picture of a note
-  moved to another notebook follows story 23's rules.
+  moved to another notebook follows the within-notebook picture rules in the
+  [attachment contract](../../docs/notebook-git-attachments.md).
 - **Proposed exclusions:** a folder holding a Book's source file is refused
   (the Book belongs to the source notebook; [story 17 decision](#breadcrumbs));
   references from outside the moved folder break, as folder dissolve and
@@ -260,8 +187,8 @@ avoids a chicken-and-egg problem is:
    the `/attachments/` address and the Book bucket are removed.
 
 "Present after clone or pull" is not a story: it is how each of these stories
-is proven. Web deletion and dissolve/merge are delivered; then a note move keeping
-its picture (story 23, a regression fix), moves to another notebook reaching Git
+is proven. Web deletion, dissolve/merge and a note move keeping its picture within the
+notebook are delivered; then moves to another notebook reaching Git
 (story 24, a correctness fix) and the rarer cross-notebook move of files
 (story 10, a convenience whose absence loses nothing).
 
@@ -316,7 +243,7 @@ integration need their own selected outcomes.
   split it: story 24 makes those moves reach Git, story 10 keeps carrying
   files, both queued after folder dissolve and merge. A moved folder carries its nested
   subfolders; no multi-folder move. A note move leaving its picture behind is
-  in scope of this refinement as story 23: the file moves with the note
+  in scope of this refinement: the file moves with the note
   (option A), rather than pointing `image:` back (the web does not resolve
   `..`) or accepting the broken picture.
 - [Near-future direction](../PRODUCT-BACKLOG.md#near-future-direction).
