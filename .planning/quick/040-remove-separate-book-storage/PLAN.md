@@ -168,7 +168,17 @@ proxy in `frontend/vite.config.ts`; remove the `/attachments/*` row and the
 
 ### 5. The Book bucket is deleted
 Type: Behavior
-Status: planned
+Status: done
+Accepted proof: before deletion, `gcloud storage buckets describe` showed the
+bucket (~57 MB of old Book copies) and prod config names only
+`doughnut-notebook-lfs-carbon-syntax-298809`. After owner confirmation
+(2026-09-26) the owner ran `gcloud storage rm --recursive
+gs://doughnut-book-pdf-carbon-syntax-298809`; its output removed every object
+and the bucket. The coordinator's post-deletion `describe` was blocked by the
+session permission classifier, so "not found" and the owner opening a Book in
+production remain unobserved here. `prod_env.md` §7 is removed (the vector
+index note moved to §4, instance name fixed to `doughnut-db`); the 100 MB
+limit detail lives in `docs/notebook-git-attachments.md`.
 Proof: slice 5 row above.
 
 Behavior: the production Book bucket → deleted → it no longer exists; the

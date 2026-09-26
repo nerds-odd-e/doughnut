@@ -87,7 +87,9 @@ note or folder at the root of the accepted tree already uses it
 (`Physics Primer (2).pdf`). The Book refers to that root-relative path
 (`book.source_file_path`), and Book reading serves the file through the one
 attachment reader. The Book size limit (100 MB) applies instead of the 10 MiB
-limit for new payloads. A notebook without a Git binding saves the file row and
+limit for new payloads; it is Spring's `spring.servlet.multipart.max-file-size`
+in `backend/src/main/resources/application.yml`, and an oversize upload gets
+HTTP 413 with an `ApiError` JSON body. A notebook without a Git binding saves the file row and
 the Book without a commit. Removing the Book removes its reading structure and
 progress but leaves the file, and the accepted tree, unchanged.
 

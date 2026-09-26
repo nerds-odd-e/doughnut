@@ -69,18 +69,22 @@ Expect to see following log line towards end of Packer build stdout log:
 
 ## 4. Production Database (Cloud SQL for MySQL)
 
-- Instance: `doughnut-db-instance` (Cloud SQL, MySQL 8.4)
+- Instance: `doughnut-db` (Cloud SQL, MySQL 8.4)
 - Private DNS target for app: `db-server` (maps to the instance's private IP)
 - Vector support: enabled via Cloud SQL flag `cloudsql_vector=on`
 
 Enable/verify vector flag:
 
 ```bash
-gcloud sql instances patch doughnut-db-instance \
+gcloud sql instances patch doughnut-db \
   --database-flags=cloudsql_vector=on
-gcloud sql instances describe doughnut-db-instance \
+gcloud sql instances describe doughnut-db \
   --format="table(settings.databaseFlags[].name, settings.databaseFlags[].value)"
 ```
+
+Operational note: creating a Cloud SQL VECTOR index may fail with
+"Vector index: not enough data to train" if the table has too few embeddings.
+Run index creation after sufficient data exists.
 
 ## 5. Version-tag releases and conditional backend deploy
 
@@ -144,45 +148,3 @@ from that checkout's allocation, not 5173.
 **Starting the stack:** **`pnpm cy:run --spec <feature>`** starts all services in the background, waits until healthy (up to 120 s, configurable via `SUT_TIMEOUT_MS`), then runs Cypress. On failure it exits 1 with diagnostics and a tail of **`sut.log`** (repo root, gitignored). In an unconfigured primary checkout, re-running **`pnpm cy:run`** reclaims the idle live owner on 5173/5174/9081. Isolated checkouts ask the verified live owner to stop its own children and start again on the recorded allocation; a busy Cypress runner or unverifiable owner is refused without signalling listeners.
 
 **Verify the stack:** internal **`sut-healthcheck.mjs`** module (e.g. `node scripts/sut-healthcheck.mjs`). With Nix (typical local agent): **`CURSOR_DEV=true nix develop -c node scripts/sut-healthcheck.mjs`** — see **`CLAUDE.md`**. Isolated health checks the live owning stack on the recorded ports, not a foreign listener.
-
-## 7. Book PDF storage (GCS, prod)
-
-New Books store their source file as an ordinary notebook file (see [attachment synchronization](../notebook-git-attachments.md)); this separate bucket only keeps the copies of Books attached before that, moved into their notebooks at startup, until it is retired. It is used when the backend runs with Spring profile **`prod`** (`GcsBookStorage` + VM **Application Default Credentials**). Production uses bucket **`doughnut-book-pdf-carbon-syntax-298809`** (the short name **`books`** is not available globally on GCS). Prod sets **`donut.book-pdf.gcs.bucket`** in [`backend/src/main/resources/application.yml`](../../backend/src/main/resources/application.yml) (prod profile). Optional **`donut.book-pdf.gcs.object-prefix`** is unset by default.
-
-**Global names:** GCS bucket names are globally unique. If you recreate this environment in another project, pick a unique bucket name and keep **`application.yml`** and this section in sync.
-
-**Create the bucket** (project **`carbon-syntax-298809`**, region aligned with the MIG in **`us-east1`**):
-
-```bash
-gcloud config set project carbon-syntax-298809
-gcloud storage buckets create gs://doughnut-book-pdf-carbon-syntax-298809 \
-  --project=carbon-syntax-298809 \
-  --location=us-east1 \
-  --uniform-bucket-level-access
-```
-
-**IAM:** Grant **`roles/storage.objectAdmin`** on the bucket to whichever **service account the prod backend uses for Application Default Credentials**—usually the **VM’s attached service account**. That is often the instance default **Compute Engine** account `220715781008-compute@developer.gserviceaccount.com` (pattern: `PROJECT_NUMBER-compute@developer.gserviceaccount.com`), but if the MIG/VM is attached to a **custom** account (e.g. **`doughnut-gcp-svc-acct@carbon-syntax-298809.iam.gserviceaccount.com`**), bind that member instead; otherwise uploads fail with **`storage.objects.create` denied**.
-
-```bash
-gcloud storage buckets add-iam-policy-binding gs://doughnut-book-pdf-carbon-syntax-298809 \
-  --project=carbon-syntax-298809 \
-  --member="serviceAccount:220715781008-compute@developer.gserviceaccount.com" \
-  --role="roles/storage.objectAdmin"
-```
-
-Example for a custom VM service account (adjust if yours differs):
-
-```bash
-gcloud storage buckets add-iam-policy-binding gs://doughnut-book-pdf-carbon-syntax-298809 \
-  --project=carbon-syntax-298809 \
-  --member="serviceAccount:doughnut-gcp-svc-acct@carbon-syntax-298809.iam.gserviceaccount.com" \
-  --role="roles/storage.objectAdmin"
-```
-
-**Upload limit:** Book attach uses Spring **`spring.servlet.multipart.max-file-size`** (100MB in [`application.yml`](../../backend/src/main/resources/application.yml)); oversize requests get HTTP **413** with an **`ApiError`** JSON body (same shape as other API errors).
-
-**GCS orphans:** Deleting a **Book** row does **not** remove its object in this bucket; the bucket is kept as a backup until it is retired.
-
-Operational note: creating a Cloud SQL VECTOR index may fail with
-"Vector index: not enough data to train" if the table has too few embeddings.
-Run index creation after sufficient data exists.
