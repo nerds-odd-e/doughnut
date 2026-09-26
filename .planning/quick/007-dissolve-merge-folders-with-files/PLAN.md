@@ -90,7 +90,8 @@ purge goes, since occupied folders are never purged.
 ### 2. Folder contents are removed in code, never by the database
 Type: Structure
 Status: planned
-Proof: migration `V300000347` changes the three foreign keys to plain
+Proof: migration `V300000348` (the next free number; the Book storage
+removal took `V300000347`) changes the three foreign keys to plain
 restricting keys. `NotebookGitWebFolderPermanentDeleteControllerTest`,
 `NotebookFolderPermanentDeleteControllerTest` and
 `NotebookGitProposalInitialNotebookStructureControllerTest` stay green; then
@@ -211,9 +212,11 @@ plus `force.png` beside `Force.png` is refused.
 `NotebookBooksAttachNotebookFileControllerTest.aTakenNameIsNumberedAndTheExistingFileIsUntouched`
 stays green, plus a case-variant name is also numbered.
 
-Behavior: picture upload refuses, and Book source placement picks a free name,
-through the shared rule on live rows instead of the accepted tree.
-`NotebookGitAcceptedTree.takenPaths` and its store method go. Update
+Behavior: picture upload (`WebNoteImageUploadService`) refuses, and
+`BookSourceFilePlacement` picks a free root filename, through the shared rule on
+live rows instead of the accepted tree. `NotebookRootFreeFilename` (its only
+caller is `BookSourceFilePlacement`), `NotebookGitAcceptedTree.takenPaths` and
+its store method go. Update
 `docs/notebook-git-attachments.md` for the folder operations and the one name
 rule.
 
@@ -231,6 +234,15 @@ rule.
 
 ## Learnings
 
+- Rechecked on main `b36d89a999` (2026-09-26), after the Book storage removal:
+  every class and test the slices name still exists, and the folder, naming,
+  health, move and dissolve code is unchanged since planning. Only the
+  migration number (slice 2) and the Book placement caller (slice 9) moved.
+- Parallel with SEED-035#story-2 (web file delete): that plan adds a delete
+  endpoint, the Book-source refusal and the file page action, with no
+  migration and no folder or naming code. Its only file in common with this
+  plan is `folderAdminMutations.ts`, which this plan relies on unchanged.
+  Removing one attachment row is unaffected by slice 2's restricting keys.
 - Independent plan review (2026-09-26) confirmed the Git derivation already
   handles attachments whose folder changes and attachments removed explicitly
   inside a deleted folder; no derivation change is planned.

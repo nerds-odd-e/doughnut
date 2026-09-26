@@ -154,7 +154,7 @@ No executable plan or implementation is authorized by this seed.
 
 ### Dissolve and merge folders that contain files
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../quick/007-dissolve-merge-folders-with-files/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"2bbe69530ee4d3f43b503cb3c17572fd1d0043ecdb771bcc51a339a45d309d35","plan":"5bf4d7947c2bda7e3d1618482ec9873fb6cd4897eb28a126c7fdea00cbecce54"}}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../quick/007-dissolve-merge-folders-with-files/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"f56f518ff5be94d51942a67c8ac4c56e19e81c5f5690648c06c85c7bfe3e0e6a","plan":"d2a7c22986bf05eba4e92090fbde67457669e9a049ac75f240fd6462e82b1fb9"}}
 ```
 
 - **Identity:** SEED-035#story-11
