@@ -48,8 +48,7 @@ export {
   removePropertyRowAt,
   renamePropertyRowKeyAt,
   scalarStringFromPropertyRow,
-  sortedPropertyRowsFromNoteProperties,
-  sortedPropertyRowsFromRecord,
+  propertyRowsFromNoteProperties,
   validatePropertyRowsForRichEdit,
 } from "@/utils/noteContentPropertyRows"
 

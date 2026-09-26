@@ -113,7 +113,7 @@ import { useRichFrontmatterPropertyEditing } from "@/composables/useRichFrontmat
 import { useWikidataPropertyDialog } from "@/composables/useWikidataPropertyDialog"
 import {
   parseNoteContentMarkdown,
-  sortedPropertyRowsFromNoteProperties,
+  propertyRowsFromNoteProperties,
   type PropertyRow,
 } from "@/utils/noteContentFrontmatter"
 import type { DeadWikiLinkPayload } from "@/utils/wikiLinkMarkup"
@@ -228,7 +228,7 @@ watch(
   (properties, previousProperties) => {
     if (isEqual(properties, previousProperties)) return
     propertyRows.value = properties
-      ? sortedPropertyRowsFromNoteProperties(properties)
+      ? propertyRowsFromNoteProperties(properties)
       : []
     insertOpen.value = false
     draftKey.value = ""

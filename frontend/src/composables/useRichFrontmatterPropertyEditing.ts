@@ -17,7 +17,7 @@ import {
   propertyRowsAfterAppendingValueToExactKey,
   removePropertyRowAt,
   scalarStringFromPropertyRow,
-  sortedPropertyRowsFromNoteProperties,
+  propertyRowsFromNoteProperties,
   validatePropertyRowsForRichEdit,
   type PropertyRow,
 } from "@/utils/noteContentFrontmatter"
@@ -65,7 +65,7 @@ export function useRichFrontmatterPropertyEditing(options: {
       options.propertyRows.value
     )
     properties[row.key] = row.value
-    return sortedPropertyRowsFromNoteProperties(properties)
+    return propertyRowsFromNoteProperties(properties)
   }
 
   async function openPropertyInsert() {

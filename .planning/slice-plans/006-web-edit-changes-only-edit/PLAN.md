@@ -96,7 +96,8 @@ today.
 ### 3. The property panel lists properties in file order
 
 Type: Behavior
-Status: planned
+Status: done — same spec, "lists properties in the order the file has them"
+(rendered row keys)
 Proof: in the new spec, an unsorted frontmatter (`name`, `description`,
 `type`, `tags`) → the panel's row keys appear in that order.
 
@@ -212,3 +213,7 @@ owner (rewrite values, then remove emptied keys) instead of
   `composeNoteContentFromPropertyRows` — slices 4 and 5 replace that fallback
   with splicing inside `split.prefix`. Turndown drops the body's final
   newline (unchanged, body-side, outside this story's promises).
+- Slice 3: rows come from `propertyRowsFromNoteProperties` (unused
+  `propertyRowsFromRecord` removed). Page tests can depend on row order
+  silently (`NoteShowPage.imageUpload` read the first row); include
+  `NoteShowPage` in focused runs for panel changes.

@@ -1,3 +1,4 @@
+import { propertyRows } from "./propertiesTestDom"
 import { createRichMarkdownEditorTestHarness } from "./richMarkdownEditorTestHarness"
 
 describe("RichMarkdownEditor changes only what the user edited", () => {
@@ -64,5 +65,15 @@ describe("RichMarkdownEditor changes only what the user edited", () => {
     expect(await typeAtStart(`${frontmatter}Body`, "The ")).toBe(
       `${frontmatter}The Body`
     )
+  })
+
+  it("lists properties in the order the file has them", async () => {
+    const wrapper = await h.mountEditor(
+      "---\nname: demo2\ndescription: Second skill\ntype: note\ntags: [x]\n---\n\n# Demo2\n"
+    )
+
+    expect(
+      propertyRows(wrapper.element).map((row) => row.dataset.propertyKey)
+    ).toEqual(["name", "description", "type", "tags"])
   })
 })

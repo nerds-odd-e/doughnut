@@ -14,7 +14,6 @@ import {
   type NoteProperties,
   type PropertyValue,
   listPropertyValue,
-  notePropertiesFromScalarRecord,
   propertyValueHasContent,
   scalarPropertyValue,
   scalarStringFromPropertyValue,
@@ -47,24 +46,11 @@ export function notePropertiesFromPropertyRows(
   return properties
 }
 
-/** Maps parsed properties into sorted rows for stable UI state. */
-export function sortedPropertyRowsFromNoteProperties(
+/** Maps parsed properties into rows in their authored order. */
+export function propertyRowsFromNoteProperties(
   properties: NoteProperties
 ): PropertyRow[] {
-  const keys = Object.keys(properties)
-  if (keys.length === 0) return []
-  return keys
-    .sort((a, b) => a.localeCompare(b))
-    .map((key) => ({ key, value: properties[key]! }))
-}
-
-/** Maps legacy scalar property records into sorted rows for stable UI state. */
-export function sortedPropertyRowsFromRecord(
-  properties: Record<string, string>
-): PropertyRow[] {
-  return sortedPropertyRowsFromNoteProperties(
-    notePropertiesFromScalarRecord(properties)
-  )
+  return Object.entries(properties).map(([key, value]) => ({ key, value }))
 }
 
 /** Composes content from ordered rows; duplicate keys keep the last occurrence. */
@@ -231,7 +217,7 @@ export function appendWikiLinkPropertyRow(
   const parsed = parseNoteContentMarkdown(content ?? "")
   if (!parsed.ok) return
   const rows = [
-    ...sortedPropertyRowsFromNoteProperties(parsed.properties),
+    ...propertyRowsFromNoteProperties(parsed.properties),
     propertyRowWithScalar("", linkText),
   ]
   if (!validatePropertyRowsForRichEdit(rows).ok) return

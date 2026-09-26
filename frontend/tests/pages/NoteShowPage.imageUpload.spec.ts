@@ -122,7 +122,7 @@ describe("note show picture upload", () => {
     await flushPromises()
 
     const imageValue = document.querySelector(
-      '[data-testid="rich-note-property-row-value-input"]'
+      '[data-property-key="image"] [data-testid="rich-note-property-row-value-input"]'
     ) as HTMLInputElement
     expect(imageValue.value).toBe("e2e.png")
     expect(saveSpy).not.toHaveBeenCalled()
