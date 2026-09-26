@@ -58,3 +58,13 @@ before an asynchronous property edit emits its content.
 The rich editor rebuilds the Markdown body from its content on each edit, so it
 keeps body image embeds (`![alt](src)`) through an edit to other text. Showing
 those pictures in the editor is not promised.
+
+When a note's body holds content the rich editor cannot carry through an edit,
+the rich editor shows it read-only and asks the owner to switch to Markdown
+mode. It renders the authored body and the Markdown it would save from what it
+loaded, and compares the two HTML renderings, treating whitespace in text as a
+browser displays it and keeping whitespace inside code exact. Style-only
+differences such as heading or bullet style, emphasis markers, reference links
+and line wrapping stay editable; raw HTML, task lists, hard line breaks, tagged
+code blocks and loose lists do not. Read-only viewers see no warning.
+Markdown mode edits the text as typed.
