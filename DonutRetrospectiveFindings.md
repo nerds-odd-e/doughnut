@@ -66,7 +66,7 @@ Current behavior is in the linting skill's "Format vs Lint".
 
 ### Occurrences
 
-- Execution: SEED-039 story 4 / quick/041-faster-frontend-unit-tests / c9347a9ee3; Timestamp: 2026-09-26, ~09:00+08:00 (failed slice 3 commits before 8d4739bd0b 09:08+08:00); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.38.
+- Execution: SEED-039 story 4 / slice-plans/041-faster-frontend-unit-tests / c9347a9ee3; Timestamp: 2026-09-26, ~09:00+08:00 (failed slice 3 commits before 8d4739bd0b 09:08+08:00); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.38.
   - Evidence: hook output "Found 1 error" (Biome format in `RichMarkdownEditor.propertyEntry.spec.ts`, not staged) and `TS2305 … has no exported member 'mountMarkdownTextarea'` in `NoteEditableContent.debouncedSave.spec.ts`, not staged.
   - Observed effect: delivery of finished slices waited for unrelated agents; parallelism saved implementation time but serialized delivery.
   - Inference: `execute-plan` allows concurrent slices with disjoint files, but this project's working-tree-wide hook makes a shared checkout unsafe for concurrent commits; per-slice worktrees or committing only at quiet points would avoid it. Qualified: the slices' implementation overlap still saved wall time.

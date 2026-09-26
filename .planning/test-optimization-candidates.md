@@ -77,7 +77,7 @@ Consequences for future profiling passes:
   unique protection: local E2E batches keep frontend HMR, which the
   `e2e-authoring` skill promises — not attempted; the owner declined it on
   2026-09-25 when stopping the CLI E2E pass at ~−41% (evidence recoverable at
-  `e2f9929fe9:.planning/quick/032-halve-cli-e2e-time/PLAN.md`) — decision
+  plan `032-halve-cli-e2e-time` in `e2f9929fe9`) — decision
   needed: whether local `cy:run` may trade HMR for a built frontend.
 - Fixed E2E batch startup (measured 2026-09-25) — ~33s per `cy:run` batch:
   SUT 13.5s (backend boot ~9s, Gradle compile check, mocks, Vite), Cypress

@@ -105,4 +105,4 @@ frontend auto-reload.
 
 ## Ignored Reference Material
 
-`docs/` and leftover `ongoing/` files are excluded from default indexing to reduce retrieval noise. Active planning lives in `.planning/`: `PRODUCT-BACKLOG.md`, `seeds/`, `quick/`, and `NORTH-STAR.md`. Test-optimization candidates: `.planning/test-optimization-candidates.md`. Read `docs/` explicitly when the user asks for docs, a rule points to a document, or an ADR check is required (`docs/adrs/`).
+`docs/` and leftover `ongoing/` files are excluded from default indexing to reduce retrieval noise. Active planning lives in `.planning/`: `PRODUCT-BACKLOG.md`, `seeds/`, `slice-plans/`, and `NORTH-STAR.md`. Test-optimization candidates: `.planning/test-optimization-candidates.md`. Read `docs/` explicitly when the user asks for docs, a rule points to a document, or an ADR check is required (`docs/adrs/`).

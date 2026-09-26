@@ -20,8 +20,8 @@ Excluded (see the story): repairing notebooks already out of step; notebook
 rename; automatic drift repair; any change to which links are rewritten or how
 their text changes.
 
-Moves to another notebook already reach Git (plan recoverable at
-`9b887b6204:.planning/quick/046-moves-to-another-notebook-reach-git/PLAN.md`):
+Moves to another notebook already reach Git (plan `046-moves-to-another-notebook-reach-git` recoverable at
+`9b887b6204`):
 note moves run through `RelationController.webMove` →
 `WebNoteEditService.edit(…, Set<Integer> notebookIds, …)` over {source,
 destination}; folder moves, same- and cross-notebook, share

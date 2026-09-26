@@ -30,9 +30,9 @@ Portable digest (details live in the cited skills — keep `AGENTS.md` and `CLAU
 
 ## Planning and slice delivery
 
-- **Plan numbering:** The owner reset `.planning/quick/` numbering to `001` on 2026-09-20. Use three-digit sequential numbers from this reset (`001`, `002`, …); ignore pre-reset allocations in Git history. Story/seed identities are unchanged.
+- **Plan numbering:** The owner reset `.planning/slice-plans/` numbering to `001` on 2026-09-20. Use three-digit sequential numbers from this reset (`001`, `002`, …); ignore pre-reset allocations in Git history. Story/seed identities are unchanged.
 
-- **Layout:** non-executable story decompositions under `.planning/seeds/`; executable plans under `.planning/quick/NNN-slug/`; the ordered story queue in `.planning/PRODUCT-BACKLOG.md`; short-term architectural direction in `.planning/NORTH-STAR.md`. See `.agents/skills/dough-story-refinement/references/planning.md`.
+- **Layout:** non-executable story decompositions under `.planning/seeds/`; executable plans under `.planning/slice-plans/NNN-slug/`; the ordered story queue in `.planning/PRODUCT-BACKLOG.md`; short-term architectural direction in `.planning/NORTH-STAR.md`. See `.agents/skills/dough-story-refinement/references/planning.md`.
 - **Hard decomposition grammar:** problem → 3V story → Behavior/Structure execution leaf; stop-safe, one evaluable outcome at the current resolution (`.agents/skills/dough-story-decomposition/references/problem-decomposition.md`).
 - **Time budget (self-enforced):** story hypotheses are roughly 30 minutes to a few hours; execution leaves target ~5 min including tests; >5 min → scrutinize; >10 min → hard finer-decompose unless a stated good reason (`.agents/skills/dough-story-decomposition/references/problem-decomposition.md`).
 - **History:** keep resume-useful planning artifacts while a plan is in progress; **clean up** spent history when the plan is fully executed into code/permanent docs.
@@ -41,8 +41,8 @@ Portable digest (details live in the cited skills — keep `AGENTS.md` and `CLAU
 - **Story refinement:** use `.agents/skills/dough-story-refinement/SKILL.md` to clarify selected stories' goal, scope, and key examples in their home seeds before slice planning. Apply conservative scope and post-implementation cleanup from `.agents/skills/dough-story-refinement/references/planning.md`.
 - **Plan refinement:** use **dough-slice-plan-refinement** in place when an existing PLAN is complex, sizing confidence is low, or execution overruns. Skip the extra pass when dough-slice-planning already produced clear commit-sized leaves.
 - **Execution retrospective:** review a completed or in-progress plan with **dough-execution-retrospective**; it may plan bounded corrections but never executes them. Close completed story history afterward with **dough-story-wrap-up**.
-- **Selected story delivery:** use **dough-slice-planning** → optional **dough-slice-plan-refinement** → **dough-execute-plan** under `.planning/quick/`.
-- **Test optimization:** `dough-test-optimization` — use the public Open Dough workflow; plans live under `.planning/quick/` and run via dough-execute-plan. Donut-specific commands and profile exclusions live in `.agents/agent-map.md` and the applicable stack testing skills.
+- **Selected story delivery:** use **dough-slice-planning** → optional **dough-slice-plan-refinement** → **dough-execute-plan** under `.planning/slice-plans/`.
+- **Test optimization:** `dough-test-optimization` — use the public Open Dough workflow; plans live under `.planning/slice-plans/` and run via dough-execute-plan. Donut-specific commands and profile exclusions live in `.agents/agent-map.md` and the applicable stack testing skills.
 
 ## Cursor Cloud specific instructions
 

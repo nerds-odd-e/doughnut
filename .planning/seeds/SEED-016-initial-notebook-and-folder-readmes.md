@@ -23,7 +23,7 @@ outside this scope.
 
 ### 1. Publish the initial notebook README with one README-only folder
 
-**Status:** delivered. Recover quick/079 from `034be9f99d`.
+**Status:** delivered. Recover plan 079 from `034be9f99d`.
 
 - **Goal:** A notebook owner can publish one useful initial container tree from
   a local checkout: the notebook Readme and one README-only root Folder, kept
@@ -37,14 +37,14 @@ outside this scope.
   an already non-empty notebook (including existing empty folders), README
   edits to existing containers, multiple unpublished commits, stale/divergent
   history, attachments, and bulk import.
-  Empty-notebook eligibility correction: quick/080.
+  Empty-notebook eligibility correction: plan 080.
 
 <a id="story-2"></a>
 
 ### 2. Publish one initial note inside the new README-backed folder
 
-**Status:** delivered. Recover quick/081 from its merge onto main;
-ordinary-Note third-path eligibility via quick/082.
+**Status:** delivered. Recover plan 081 from its merge onto main;
+ordinary-Note third-path eligibility via plan 082.
 
 - **Goal:** A notebook owner can publish the smallest useful initial notebook
   that contains knowledge: the notebook Readme, one new root Folder with its
@@ -65,7 +65,7 @@ ordinary-Note third-path eligibility via quick/082.
 
 ### 3. Publish the initial notebook README by itself
 
-**Status:** delivered. Recover quick/083 from its merge onto main.
+**Status:** delivered. Recover plan 083 from its merge onto main.
 
 - **Goal:** A notebook owner can publish the smallest
   local tree: the notebook's root Readme as the first and only file.
@@ -81,7 +81,7 @@ ordinary-Note third-path eligibility via quick/082.
 
 ### 4. Publish a minimal initial container with one note
 
-**Status:** delivered. Recover quick/085 from its merge onto main.
+**Status:** delivered. Recover plan 085 from its merge onto main.
 
 - **Goal:** A notebook owner can publish either smallest two-file initial
   container-and-note tree without splitting the authored commit, while a
@@ -107,8 +107,8 @@ ordinary-Note third-path eligibility via quick/082.
 
 ### 5. Publish the next small initial Readme-and-Note trees
 
-**Status:** delivered via quick/087 (`33b2b34ebc`); exact root-Note eligibility
-corrected by quick/091 (`5d2c5b3d9d`).
+**Status:** delivered via plan 087 (`33b2b34ebc`); exact root-Note eligibility
+corrected by plan 091 (`5d2c5b3d9d`).
 
 - **Goal:** A notebook owner can publish the next six small, valid initial
   Readme-and-Note tree shapes as one authored commit instead of restructuring
@@ -134,7 +134,7 @@ corrected by quick/091 (`5d2c5b3d9d`).
 
 ### 6. Publish three small initial layouts exposed by the jap1 failure
 
-**Status:** delivered via quick/092.
+**Status:** delivered via plan 092.
 
 - **Goal:** A notebook owner can publish a small initial notebook as one authored
   commit in each of the three layouts identified during the jap1 investigation,
@@ -161,7 +161,7 @@ corrected by quick/091 (`5d2c5b3d9d`).
 
 ### 7. Publish two notes and their relationship together
 
-**Status:** delivered via quick/094.
+**Status:** delivered via plan 094.
 
 - **Goal:** A notebook owner can publish a minimal connected set of knowledge
   from a local checkout in one commit: two Notes and their Relationship,

@@ -6,7 +6,7 @@ The index-maintenance simplification is delivered. Its execution comparison
 measured **29,746.720 → 10,308.043 ms**, a **65.35% reduction**, with 10 fewer
 formatted production lines and all 2,404 backend tests passing. The original
 prototype investigation remains below; the delivered comparison is recoverable
-in `.planning/quick/108-publish-notebook-edits-faster/PLAN.md` at commit
+in plan `108-publish-notebook-edits-faster` at commit
 `1e2aef020c`.
 
 Attachment cleanup now selects each note's orphan images directly with a
