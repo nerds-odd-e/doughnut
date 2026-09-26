@@ -156,149 +156,69 @@ including delivery, not commitments.
 - **Safe stopping point:** Publish keeps every current admission and refusal
   rule listed under Preserved.
 
-<a id="story-2"></a>
-
-### 2. Pull rebases unpublished local work unless Git finds a real conflict
-
-**Identity:** SEED-046#story-2
-```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/001-pull-rebase-decides/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"59c0d602a9e71babcfecb0b27155dda2326fb012dcbde303d48ac1310115f0c6","plan":"a1da39890eac2d6d0e6aec6b8e980d1aa0b4064d15caa60cd2456993daf25230"}}
-```
-
-- **Goal:** An owner with unpublished local commits, often from an AI IDE,
-  receives any accepted change with `donut notebook pull` and then publishes,
-  instead of re-cloning and moving the work by hand whenever a file is added
-  or deleted, or a folder renamed or moved, anywhere in the notebook. This is
-  the parallel local/web work the near-future direction and the accepted
-  synchronization contract describe
-  ([Git synchronization](../../docs/notebook-git-synchronization.md)).
-- **Decision (owner, 2026-09-26):** `git rebase` decides. Pull no longer
-  classifies accepted history into rebaseable and "structural" shapes; that
-  hand-grown allowlist is removed, not extended by change kind. Removed code
-  and tests are simply deleted.
-- **Scope:**
-  - Pull rebases a linear run of unpublished local commits over any accepted
-    history. Only a real Git conflict stops it, leaving the rebase paused with
-    the existing resolve-or-abort guidance.
-  - Git follows an accepted folder rename or move: local edits of notes in
-    that folder, and notes or files the local work added to it, land under
-    the new path.
-  - After rebasing, pull fills in current attachment files as it does today,
-    and publish accepts the result under its unchanged validation.
-  - Refusals that stay, because accepted history is forward-only and linear
-    ([ADR 0002](../../docs/adrs/0002-git-native-portable-notebook-synchronization-accepted.md)):
-    an unpublished merge commit, and local history unrelated to the notebook.
-- **Deferred / not promised:**
-  - Overlaps Git cannot see stay as publish validation or ordinary broken
-    links treat them: a local note whose `image:` names a file the web
-    deleted; a local link to a path a web folder rename changed (web link
-    rewrites do not reach unpublished work).
-  - Clearer conflict and refusal wording stays in story 3.
-  - No web or server change.
-- **Key examples** (from the 2026-09-26 manual test, each refused today with
-  "accepted history includes a structural change at …"):
-  1. Local note edit; the web deletes unrelated root file `fake.png` → pull
-     rebases, `fake.png` is gone locally, publish accepts the edit.
-  2. Local note addition; another checkout publishes root file `d2.bin` →
-     pull rebases and fills in `d2.bin`; publish accepts the note.
-  3. Local commit adding a root file; the web renames a folder elsewhere,
-     leaving `Renamed/inner/doc.pdf` → pull rebases, the checkout
-     shows the renamed folder, publish accepts the file.
-  4. Local note and file addition; another checkout publishes a note and a
-     file → pull rebases; publish accepts.
-  5. Local edit of `Old/a.md` plus a new `Old/b.md`, over two local commits;
-     the web renames `Old` to `New` → after pull both are under `New/`, and
-     publish accepts them with `a.md` keeping its learning identity.
-  6. Boundary: local and web change the same line of one note, or the web
-     deletes a note the local work edited → Git pauses with the existing
-     conflict guidance; `git rebase --abort` restores the local work
-     unchanged.
-- **Known facts (2026-09-26):** pull runs a real `git rebase --onto`, which
-  already pauses on conflicts with guidance, but first refuses any accepted
-  commit outside an allowlist (note edits, note additions in existing
-  folders, one exact folder move under a single local note edit). The
-  allowlist grew one shape per commit between 2026-09-07 and 09-24. A local
-  file addition over an accepted note-only addition already rebases.
-- **Effort hypothesis:** M — medium confidence; mostly deletion.
-- **Depends on:** none.
-- **Safe stopping point:** Anything Git cannot rebase stays paused or refused
-  with the local work preserved.
-
 <a id="story-3"></a>
 
 ### 3. Notebook CLI commands say briefly what happened and what to do next
 
 **Identity:** SEED-046#story-3
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"not-refined","approach":"unselected"}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/003-clone-and-publish-name-next-step/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"945f97ea998695477866e2c909bc58802b0c3941612ab0e6cbb9a527c3ec9f82","plan":"a20d0e1ce4709ecc91fdd532758eec78ee2fbd01157ca3ec819193032238f5ee"}}
 ```
 
-- **For / why:** CLI users get a very long clone success message and refusals
-  that use internal terms, name the wrong path, or send them in circles.
-- **Evaluation:** The owner can read each message at a glance, and every next
-  step it suggests works.
-- **Known facts (2026-09-26):**
-  - Clone success prints one paragraph of about 300 words listing every
-    supported publish shape. The owner wants it much shorter and better
-    formatted.
-  - Losing a publish race prints "expectedHead no longer matches the notebook's
-    current accepted head." with no next step.
-  - After pull refuses, publish says "Run donut notebook pull to base your
-    local commits on the accepted history", which refuses again.
-  - When another checkout published a note and a file together, the pull
-    refusal named the note (`FromA.md`) instead of the file that blocked it.
-  - Changing a Book's 60 MB source file locally is refused with the size-limit
-    message ("Remove or shrink it"), not with "remove the Book first", which a
-    rename of the same file does get.
-  - When the server no longer has a file's content, clone reports "Notebook
-    attachments are incomplete" with each missing object, then says "Fix
-    authorization or connectivity, then rerun". Clone does exit 1 and removes
-    the partial directory, so the rerun works.
-  - Messages that already read well: the dirty-checkout refusal, the size-limit
-    refusal (path, size, limit), and the invalid-Markdown refusal.
-- **Value / learning:** Owner-requested; cheap and immediately visible.
-- **Effort hypothesis:** M — medium confidence.
-- **Depends on:** none; story 2 removes some refusals, so refine this after it
-  to avoid polishing messages that disappear.
+- **Goal:** Owners working on a notebook from a local checkout read the clone
+  result, and the refusal they get when their checkout is behind the notebook,
+  at a glance, and the next step it names works. Each publish rule is
+  explained by the refusal that applies it, not listed in advance.
+- **Scope:**
+  - **Clone success:** a few short lines: which notebook was cloned where,
+    then the next commands — edit and commit with any Git tool,
+    `donut notebook publish <dir>`, `donut notebook pull <dir>` — each with
+    the actual directory. It lists no publish or pull rules (owner decision
+    2026-09-26); publish refusals already name the rule and paths they apply.
+  - **Checkout behind the notebook:** publish gives one short message naming
+    the recovery — run `donut notebook pull <dir>`, then publish again —
+    whether its own check finds local main behind the accepted history or the
+    server finds another publish or web save got in first. Today these print
+    "only a contiguous single-parent commit range…" and "expectedHead no
+    longer matches the notebook's current accepted head." with no next step.
+  - **Assumption:** written against the code after story 2, which deletes the
+    pull refusals behind the other findings and rewrites the pull help text.
+  - **Excluded (owner decision 2026-09-26):** pull help text (story 2 owns
+    it); which path a pull refusal names (story 2 deletes that refusal); the
+    size-limit wording for a changed Book source (story 1 reworks that check;
+    requeue only if it survives story 1); the clone message when the server
+    has lost a file's content (rare data loss no local step fixes; clone
+    already exits 1 and removes the partial checkout); any other CLI wording.
+  - **Preserved:** the messages that already read well — dirty checkout,
+    size limit, invalid Markdown — and every publish and pull refusal's
+    decision.
+- **Key examples:**
+  1. `donut notebook clone 7 notes` succeeds → the output says notebook 7 was
+     cloned into `notes`, then lists editing and committing,
+     `donut notebook publish notes` and `donut notebook pull notes`; no rule
+     list, a few lines instead of about 300 words.
+  2. The owner commits a note edit in `notes`; meanwhile a web save is
+     accepted; `donut notebook publish notes` → local main is not based on
+     the notebook's latest accepted history; run `donut notebook pull notes`,
+     then publish again. Doing so publishes the edit.
+  3. Another checkout publishes after `notes` checked the accepted history but
+     before its submission arrives → the server's refusal names the same
+     recovery: run `donut notebook pull`, then publish again.
+  4. Boundary: publish of a local merge commit still sends the owner to pull,
+     whose existing refusal names the actual next step (recreate the work as
+     ordinary commits); this story does not reword it.
+  5. Boundary: a publish that breaks a publish rule (for example an unmatched
+     note deletion mixed with additions) is refused with today's message
+     naming the rule and paths — the guidance the clone message no longer
+     lists in advance.
+- **Depends on:** story 2 (it removes refusals and rewrites the pull help
+  text); story 1 only for the excluded Book-source wording.
+- **Effort hypothesis:** S — medium confidence.
 - **Safe stopping point:** Each improved message stands alone.
-
-<a id="story-4"></a>
-
-### 4. Uploading a picture on the web explains refusals and shows the new file
-
-**Identity:** SEED-046#story-4
-```json dough-story-state
-{"schemaVersion":1,"refinement":"not-refined","approach":"unselected"}
-```
-
-- **For / why:** Web users uploading a picture see "binding error" for a wrong
-  type or an over-limit size, can upload a picture that will never display, and
-  do not see the new file in the sidebar until they reload.
-- **Evaluation:** An unsupported type or an over-limit file is refused with a
-  message naming the allowed types or the size and limit; an upload the note
-  could not display is refused; an accepted upload appears in the sidebar
-  immediately.
-- **Known facts (2026-09-26):**
-  - "binding error" (HTTP 400, shown as the web toast) for: an SVG; a
-    10,485,761-byte PNG; a PNG sent as `application/octet-stream`.
-  - A 10,485,760-byte PNG is accepted.
-  - PNG bytes named `notes.txt` are accepted and written as
-    `image: notes.txt`, but the picture then fails with 415. SVG bytes named
-    `fake.png` sent as `image/png` are accepted and served as `image/png`.
-    Upload trusts the declared content type; display goes by the name.
-  - After uploading `Blue.PNG` from the note page, the picture shows, but the
-    sidebar lists it only after a page reload.
-  - Name clashes (ignoring case, against files, notes and folders) and
-    dot-names are already refused with clear messages.
-- **Value / learning:** Makes the one web way to add files trustworthy.
-- **Effort hypothesis:** S–M — medium confidence.
-- **Depends on:** none.
-- **Safe stopping point:** Accepted uploads keep today's single-commit
-  behavior and keep the previous picture file.
 
 <a id="story-5"></a>
 
-### 5. A web edit changes only what the user edited
+### 4. A web edit changes only what the user edited
 
 **Identity:** SEED-046#story-5
 ```json dough-story-state
@@ -350,6 +270,73 @@ including delivery, not commitments.
 - **Open for refinement:** whether `type: note` → `Note` canonicalization
   should stay.
 
+<a id="story-4"></a>
+
+### 5. Uploading a picture on the web explains refusals and shows the new file
+
+**Identity:** SEED-046#story-4
+```json dough-story-state
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/004-picture-upload-explains-and-shows/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"9266ce9b5c53b99b64163f591b17fbef283052d1d553b65b34dc7263bc360049","plan":"aa465c2c7fbb617d08e6374034ba08db719771a8a215a68378e870ab74fd6c98"}}
+```
+
+- **Goal:** Web users adding a picture to a note learn from the refusal why it
+  was refused, never end up with a picture that cannot display, and see the new
+  file in the sidebar at once. It makes the one web way to add files
+  trustworthy. Any web form refused by request validation also shows the reason
+  instead of "binding error".
+- **Scope:**
+  - **Required (app-wide, owner decision 2026-09-26):** a request refused by
+    field validation carries the field's own message as its message, so the web
+    toast shows it. "binding error" disappears everywhere, not only for upload.
+    Fields that already show their message next to the input keep doing so.
+  - **Required:** upload accepts a picture by its file extension, from the one
+    list display uses (png, jpg, jpeg, gif, webp, ignoring letter case), and
+    ignores the content type the browser declares (owner decision 2026-09-26).
+    Any other extension is refused with a message naming the allowed types, so
+    every accepted upload can display.
+  - **Required:** an accepted upload appears in the sidebar without a reload.
+  - **Preserved:** the 10 MiB limit (10,485,760 bytes, inclusive) and its
+    refusal naming the limit; one accepted change writing the file and
+    `image:`; the previous picture file stays
+    ([attachments](../../docs/notebook-git-attachments.md)); name-clash and
+    dot-name refusals.
+  - **Excluded:** checking that the bytes really are a picture (a mislabelled
+    file only fails to display, it cannot run); SVG or HEIC support; limiting
+    the file picker to the allowed types (owner decision 2026-09-26: the
+    refusal is what is promised); a size check in the browser before sending;
+    the 100 MB request limit and its error; `image:` values published from a
+    local checkout (a bad one shows as a broken picture, like a broken link);
+    Book upload, which has its own validation.
+- **Key examples:**
+  1. Upload a 10,485,761-byte `big.png` → refused; the toast says the file
+     exceeds the 10,485,760-byte limit, not "binding error"; the note is
+     unchanged.
+  2. Upload `drawing.svg` → refused; the toast names png, jpg, jpeg, gif and
+     webp.
+  3. Upload PNG bytes named `notes.txt` → refused the same way; `image:` is
+     unchanged (today accepted, then 415 on display).
+  4. Upload `photo.png` that the browser sends as `application/octet-stream`
+     → accepted and displays (today refused).
+  5. Upload `Blue.PNG` from the note page → the picture shows and the sidebar
+     lists `Blue.PNG` without a reload.
+  6. A web form whose field fails request validation → the toast shows that
+     field's message instead of "binding error".
+  7. Boundary: a 10,485,760-byte PNG is accepted; SVG bytes named `fake.png`
+     are accepted as today and simply do not display.
+- **Architecture:** one owner answers "which file names are pictures" for both
+  upload admission and picture display, replacing today's separate upload
+  content-type list and display extension map.
+- **Known facts (2026-09-26):** the validator already writes "Invalid file
+  type … Allowed types are …" and "File size exceeds the limit: 10485760
+  bytes."; the two request-validation handlers set the message to the literal
+  "binding error" and put those texts only in the per-field errors, which the
+  toast ignores. Nothing depends on the literal. The sidebar has one refresh
+  call that other structural web actions use and upload does not.
+- **Effort hypothesis:** S — medium confidence.
+- **Depends on:** none.
+- **Safe stopping point:** Accepted uploads keep today's single-commit
+  behavior and keep the previous picture file.
+
 <a id="story-8"></a>
 
 ### 6. Cloning a notebook with many notes stays within 5 seconds
@@ -397,10 +384,10 @@ including delivery, not commitments.
 ## Ordering and Scope Reduction
 
 Story 1 is first by owner decision and because it most limits the near-future
-direction. Story 2 follows: it removes the forced re-clone that parallel work
-hits most often. Story 3 carries the owner's explicit clone-message request;
-it follows story 2 so it does not polish messages story 2 removes. Stories 4
-and 5 fix visible web problems. Story 6 may be absorbed by story 1. Story 7 is
+direction. Story 3 carries the owner's explicit clone-message request. Stories 4
+and 5 fix visible web problems; the web edit story comes first (owner decision
+2026-09-26) because whole-file rewrites hurt parallel local and web work, while
+picture upload is a web-only path the near-future direction does not name. Story 6 may be absorbed by story 1. Story 7 is
 polish. Drop first: 7, then 6 (if story 1 absorbed it).
 
 Story numbers are local order; identities keep their original anchors.

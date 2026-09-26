@@ -14,9 +14,6 @@ import {
   cloneAsBoundCheckout,
 } from './notebookPublish.testHelpers.js'
 
-export const LOCAL_WORK_PRESERVED_GUIDANCE =
-  'Local work is preserved, but it cannot be published from this checkout. To publish it, clone the notebook fresh elsewhere ("donut notebook clone") and move the unpublished work across as new commits there.'
-
 export function rebasedReport(
   directory: string,
   localHead: string,
@@ -32,17 +29,6 @@ export function alreadyBasedReport(
 ): string {
   return `Unpublished local work is already based on the accepted history. Local head: ${localHead}. Accepted head: ${acceptedHead}. Inspect the result, then run "donut notebook publish ${directory}".`
 }
-
-export function structuralChangeRefusal(changedPath: string): string {
-  return (
-    `Local main cannot receive the accepted history because accepted history includes a structural change at "${changedPath}". ` +
-    LOCAL_WORK_PRESERVED_GUIDANCE
-  )
-}
-
-export const STRUCTURAL_CHANGE_REFUSAL = new RegExp(
-  `^donut: Local main cannot receive the accepted history because accepted history includes a structural change at ".+"\\. ${LOCAL_WORK_PRESERVED_GUIDANCE.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`
-)
 
 export const GIT_BUNDLE_GET = [
   `${getApiConfig().apiBaseUrl}/api/notebooks/42/git-bundle`,

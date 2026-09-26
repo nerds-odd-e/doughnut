@@ -1,7 +1,6 @@
 import * as path from 'node:path'
 import { withDownloadedAcceptedNotebookHistory } from './notebookAcceptedHistory.js'
 import { assertLocalMainIsReadyToReceive } from './notebookCheckoutReadiness.js'
-import { buildExactSubtreeMoveReplayCommit } from './notebookExactSubtreeMoveReplay.js'
 import { inspectUnpublishedLocalHistory } from './notebookLocalCandidate.js'
 import { smudgeSkippedGitOptions } from './notebookLfsLocal.js'
 import { rebaseUnpublishedCommits } from './notebookPullRebase.js'
@@ -44,13 +43,11 @@ function assertCheckoutStillReady(
 
 /**
  * Downloads accepted history and advances an unchanged, clean local main: equal heads stay
- * unchanged, already-based linear unpublished commits stay unpublished, linear
- * unpublished commits rebase over a contiguous single-parent chain of accepted
- * content saves, one ordinary-note addition, or that addition plus one content save of
- * the same note (an empty remaining patch leaves local main at the accepted head), one local
- * descendant content edit across one accepted exact same-name subtree relocation replays
- * onto the mapped path, and ancestor checkouts fast-forward. Imported objects do not
- * install a remote or a persistent remote ref.
+ * unchanged, already-based linear unpublished commits stay unpublished, other linear
+ * unpublished commits rebase over the accepted history with Git deciding what replays (an
+ * empty remaining patch leaves local main at the accepted head, a real conflict pauses),
+ * and ancestor checkouts fast-forward. Imported objects do not install a remote or a
+ * persistent remote ref.
  */
 export async function receiveAcceptedNotebookHead(
   directory: string,
@@ -98,17 +95,6 @@ export async function receiveAcceptedNotebookHead(
         }
       }
 
-      const installCommit =
-        localHistory.kind === 'exact-subtree-move-replay'
-          ? buildExactSubtreeMoveReplayCommit(
-              acceptedRepoDir,
-              acceptedHead,
-              capturedHead,
-              localHistory.localPath,
-              localHistory.mapping
-            )
-          : acceptedHead
-
       runSystemGitOrThrow(
         [
           '-C',
@@ -118,26 +104,13 @@ export async function receiveAcceptedNotebookHead(
           '--no-tags',
           '--no-write-fetch-head',
           acceptedRepoDir,
-          installCommit,
+          acceptedHead,
         ],
         (detail, status) =>
           `failed to import accepted notebook history${detail ? `: ${detail}` : ` (exit code ${status})`}`
       )
 
       assertCheckoutStillReady(directory, capturedHead)
-      if (localHistory.kind === 'exact-subtree-move-replay') {
-        runSystemGitOrThrow(
-          ['-C', directory, 'reset', '--hard', '--quiet', installCommit],
-          (detail, status) =>
-            `failed to install the replayed unpublished local commit onto the accepted folder move${detail ? `: ${detail}` : ` (exit code ${status})`}`,
-          smudgeSkippedGitOptions()
-        )
-        return {
-          kind: 'rebased',
-          acceptedHead,
-          localHead: readHead(directory),
-        }
-      }
       if (localHistory.kind === 'rebase') {
         const conflictGuidance = rebaseUnpublishedCommits(
           directory,

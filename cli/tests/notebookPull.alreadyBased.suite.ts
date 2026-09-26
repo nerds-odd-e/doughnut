@@ -15,7 +15,7 @@ import {
 import {
   LATER_OTHER_NOTE,
   LOCAL_NOTE,
-  prepareEligibleDivergence,
+  prepareOtherNoteDivergence,
 } from './notebookPull.rebase.testHelpers.js'
 
 export function describeNotebookPullAlreadyBased(): void {
@@ -25,7 +25,7 @@ export function describeNotebookPullAlreadyBased(): void {
     )
 
     test('reports two local-ahead commits as already based without rewriting them', async () => {
-      const setup = prepareEligibleDivergence(ctx.getWorkDir(), {
+      const setup = prepareOtherNoteDivergence(ctx.getWorkDir(), {
         remoteEdits: 0,
         localEdits: 2,
       })
@@ -47,7 +47,7 @@ export function describeNotebookPullAlreadyBased(): void {
     })
 
     test('repeat pull leaves the rebased unpublished commit unchanged', async () => {
-      const setup = prepareEligibleDivergence(ctx.getWorkDir(), {
+      const setup = prepareOtherNoteDivergence(ctx.getWorkDir(), {
         remoteEdits: 1,
       })
       serveAcceptedBundle(ctx, setup.source, 'rebase-repeat')
@@ -84,8 +84,8 @@ export function describeNotebookPullAlreadyBased(): void {
       ])
     })
 
-    test('later eligible other-note advance rebases the same local patch once more', async () => {
-      const setup = prepareEligibleDivergence(ctx.getWorkDir(), {
+    test('later other-note advance rebases the same local patch once more', async () => {
+      const setup = prepareOtherNoteDivergence(ctx.getWorkDir(), {
         remoteEdits: 1,
       })
       serveAcceptedBundle(ctx, setup.source, 'rebase-later-first')

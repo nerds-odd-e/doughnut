@@ -10,13 +10,12 @@ and deletable in Web Donut.
 
 ## Taken
 
-- [Pull rebases unpublished local work unless Git finds a real conflict](seeds/SEED-046-notebook-files-and-git-findings.md#story-2) — SEED-046#story-2 ([plan](slice-plans/001-pull-rebase-decides/PLAN.md))
 - [Publishing a small change stays fast however much a notebook holds](seeds/SEED-046-notebook-files-and-git-findings.md#story-1) — SEED-046#story-1 ([plan](slice-plans/002-publish-cost-follows-change/PLAN.md))
+- [Notebook CLI commands say briefly what happened and what to do next](seeds/SEED-046-notebook-files-and-git-findings.md#story-3) — SEED-046#story-3 ([plan](slice-plans/003-clone-and-publish-name-next-step/PLAN.md))
+- [Uploading a picture on the web explains refusals and shows the new file](seeds/SEED-046-notebook-files-and-git-findings.md#story-4) — SEED-046#story-4 ([plan](slice-plans/004-picture-upload-explains-and-shows/PLAN.md))
 
 ## Backlog list
 
-- [Notebook CLI commands say briefly what happened and what to do next](seeds/SEED-046-notebook-files-and-git-findings.md#story-3) — SEED-046#story-3
-- [Uploading a picture on the web explains refusals and shows the new file](seeds/SEED-046-notebook-files-and-git-findings.md#story-4) — SEED-046#story-4
 - [A web edit changes only what the user edited](seeds/SEED-046-notebook-files-and-git-findings.md#story-5) — SEED-046#story-5
 - [Cloning a notebook with many notes stays within 5 seconds](seeds/SEED-046-notebook-files-and-git-findings.md#story-8) — SEED-046#story-8
 - [File pages and file responses read cleanly](seeds/SEED-046-notebook-files-and-git-findings.md#story-9) — SEED-046#story-9

@@ -1,13 +1,4 @@
 import { runSystemGitOrThrow } from './systemGit.js'
-import {
-  inspectAcceptedInterval,
-  inspectAncestryFailure,
-  isOrdinaryNoteContentChange,
-  listCommitChanges,
-  listCommits,
-  type ExactAcceptedSubtreeMapping,
-} from './notebookAcceptedInterval.js'
-import { mapPathUnderExactSubtree } from './notebookAcceptedExactSubtreeMapping.js'
 
 const LOCAL_UNRELATED =
   'Local main cannot receive the accepted history because it does not share Git history with the accepted notebook. ' +
@@ -17,46 +8,44 @@ const LOCAL_MERGE =
   'Local main cannot receive the accepted history because an unpublished commit is a merge. ' +
   'Recreate the local work as ordinary commits, then try again.'
 
-const LOCAL_WORK_PRESERVED_BEFORE_PUBLICATION =
-  'Local work is preserved, but it cannot be published from this checkout. To publish it, clone the notebook fresh elsewhere ("donut notebook clone") and move the unpublished work across as new commits there.'
-
-const LOCAL_NON_LINEAR_ACCEPTED =
-  'Local main cannot receive the accepted history because the accepted history since the local parent is not one contiguous chain of saves. ' +
-  LOCAL_WORK_PRESERVED_BEFORE_PUBLICATION
-
-function structuralChangeError(changedPath: string): string {
-  return (
-    `Local main cannot receive the accepted history because accepted history includes a structural change at "${changedPath}". ` +
-    LOCAL_WORK_PRESERVED_BEFORE_PUBLICATION
-  )
-}
-
 export type UnpublishedLocalHistoryDecision =
   | { kind: 'fast-forward' }
   | { kind: 'already-based' }
   | { kind: 'rebase'; mergeBase: string }
-  | {
-      kind: 'exact-subtree-move-replay'
-      mapping: ExactAcceptedSubtreeMapping
-      localPath: string
-    }
   | { kind: 'reject'; message: string }
 
+function inspectAncestryFailure(
+  detail: string | undefined,
+  status: number | null
+): string {
+  return `failed to inspect local main's ancestry${detail ? `: ${detail}` : ` (exit code ${status})`}`
+}
+
+function listCommits(
+  acceptedRepoDir: string,
+  ...revListArgs: string[]
+): { sha: string; parents: string[] }[] {
+  const text = runSystemGitOrThrow(
+    ['-C', acceptedRepoDir, 'rev-list', '--parents', ...revListArgs],
+    inspectAncestryFailure
+  ).trim()
+  if (text === '') return []
+  return text.split('\n').map((line) => {
+    const [sha, ...parents] = line.split(/\s+/).filter((part) => part !== '')
+    if (!sha) {
+      throw new Error("failed to inspect local main's ancestry")
+    }
+    return { sha, parents }
+  })
+}
+
 /**
- * Returns fast-forward when local main is already an ancestor of accepted.
- * Unpublished history must be a linear chain of single-parent commits; what
- * those commits change is left to publication validation.
- * Unpublished work whose merge base is accepted main stays as-is.
- * Unpublished work rebases over a contiguous single-parent chain of accepted
- * content-only edits, independent of accepted commit count or accepted path
- * count per commit; and over a contiguous chain in which each accepted commit
- * contains only ordinary-note content saves and/or ordinary note additions at
- * the root or a folder already represented in that commit's preceding
- * accepted tree, independent of how many additions or saves each commit
- * carries or how they are grouped across commits.
- * One local commit editing one descendant note under one accepted exact
- * same-name subtree relocation replays onto the mapped path; any other local
- * work refuses that accepted history as structural.
+ * Local main that shares history with accepted main fast-forwards when it has
+ * nothing unpublished, stays as-is when its unpublished work is already based
+ * on accepted main, and otherwise rebases its unpublished commits over the
+ * accepted history, leaving Git to decide what replays. Unpublished history
+ * must be a linear chain of single-parent commits; what those commits change
+ * is left to publication validation.
  */
 export function inspectUnpublishedLocalHistory(
   acceptedRepoDir: string,
@@ -85,55 +74,7 @@ export function inspectUnpublishedLocalHistory(
   if (mergeBase === acceptedHead) {
     return { kind: 'already-based' }
   }
-
-  const acceptedInterval = inspectAcceptedInterval(
-    acceptedRepoDir,
-    mergeBase,
-    acceptedHead
-  )
-  if (acceptedInterval.kind === 'non-linear') {
-    return { kind: 'reject', message: LOCAL_NON_LINEAR_ACCEPTED }
-  }
-  if (acceptedInterval.kind === 'exact-subtree-move') {
-    const localPath = singleNoteContentEditPath(
-      acceptedRepoDir,
-      mergeBase,
-      localHead
-    )
-    if (
-      unpublished.length !== 1 ||
-      localPath === undefined ||
-      mapPathUnderExactSubtree(localPath, acceptedInterval.mapping) ===
-        undefined
-    ) {
-      return {
-        kind: 'reject',
-        message: structuralChangeError(acceptedInterval.structuralPath),
-      }
-    }
-    return {
-      kind: 'exact-subtree-move-replay',
-      mapping: acceptedInterval.mapping,
-      localPath,
-    }
-  }
-  if (acceptedInterval.kind !== 'rebaseable') {
-    return {
-      kind: 'reject',
-      message: structuralChangeError(acceptedInterval.path),
-    }
-  }
   return { kind: 'rebase', mergeBase }
-}
-
-function singleNoteContentEditPath(
-  acceptedRepoDir: string,
-  parent: string,
-  commit: string
-): string | undefined {
-  const [change, ...others] = listCommitChanges(acceptedRepoDir, parent, commit)
-  if (change === undefined || others.length > 0) return undefined
-  return isOrdinaryNoteContentChange(change) ? change.path : undefined
 }
 
 function commitCount(acceptedRepoDir: string, ...revs: string[]): number {

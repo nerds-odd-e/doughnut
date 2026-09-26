@@ -63,10 +63,10 @@ current login and fills in current attachment files. A failed download is
 reported as incomplete attachments; rerunning pull once history is current
 fills them in before it reports the notebook unchanged. When the rebase is
 paused, pull says to finish or abort it first, because pull refuses while a Git
-operation is active. Pull rebases local work only over web history that changes
-ordinary Markdown notes; a web attachment change with unpublished local work is
-refused, so attachment conflicts do not arise. Donut does not merge binary
-content.
+operation is active. A web attachment change rebases like any other accepted
+change. When both sides change the same attachment, Git pauses with a conflict
+on its pointer, which you resolve by choosing one side; Donut does not merge
+binary content.
 
 Web Donut downloads an LFS file's stored bytes and shows the pointer's size on
 the file's page. When the stored object is missing, the download fails with an

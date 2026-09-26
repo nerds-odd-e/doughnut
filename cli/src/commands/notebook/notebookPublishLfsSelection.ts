@@ -1,9 +1,5 @@
 import { spawnSync } from 'node:child_process'
 import { exceptionText } from '../../exceptionText.js'
-import {
-  type CommitChange,
-  parseRawChangesZ,
-} from './notebookAcceptedCommitChanges.js'
 import { isEmptyLfsFile, parseLfsPointer } from './notebookLfsPointer.js'
 import { runSystemGitOrThrow } from './systemGit.js'
 
@@ -16,12 +12,25 @@ function isAttachment(path: string): boolean {
   return true
 }
 
+type ChangedFile = { status: string; dstBlob: string; path: string }
+
+/** Path/change pairs of `git log --raw -z --format=` (or `diff-tree`) output. */
+function parseRawChangesZ(output: string): ChangedFile[] {
+  const parts = output.split('\0')
+  const changes: ChangedFile[] = []
+  for (let i = 0; i + 1 < parts.length; i += 2) {
+    const [, , , dstBlob, status] = parts[i]!.slice(1).split(' ')
+    changes.push({ status: status!, dstBlob: dstBlob!, path: parts[i + 1]! })
+  }
+  return changes
+}
+
 /** Attachment changes the first-parent unpublished commits add or modify. */
 function changedAttachments(
   directory: string,
   acceptedHead: string,
   proposedHead: string
-): CommitChange[] {
+): ChangedFile[] {
   return parseRawChangesZ(
     runSystemGitOrThrow(
       [

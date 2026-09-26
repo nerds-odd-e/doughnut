@@ -151,6 +151,8 @@ export function rebaseUnpublishedCommits(
           `user.name=${name}`,
           '-c',
           `user.email=${email}`,
+          '-c',
+          'merge.directoryRenames=true',
           ...step,
         ],
         (detail, status) =>
