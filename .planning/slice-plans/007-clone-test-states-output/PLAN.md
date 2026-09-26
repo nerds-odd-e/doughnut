@@ -38,3 +38,8 @@ Accepted proof: `cli/tests/notebookClone.test.ts` first test now asserts
 (`cli/src/nonInteractiveCli.ts`); `CURSOR_DEV=true nix develop -c pnpm cli:test`
 passed 67 files / 442 tests; a one-character change to an expected line failed
 that test.
+
+## Execution complete
+
+Product advice: no change — the correction closes a test-only finding and
+teaches nothing new about product priorities; keep the current queue order.
