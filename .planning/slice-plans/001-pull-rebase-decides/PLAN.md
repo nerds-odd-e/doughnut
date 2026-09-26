@@ -136,6 +136,17 @@ success assert "Pull rebases your linear unpublished commits onto accepted
 history, and Git pauses only on a real conflict …". The sentence also absorbed
 the old auto-merge sentence; `notebookPullNextSteps` is no longer exported.
 
+## Execution complete
+
+Product advice:
+- SEED-046#story-3 (CLI messages) is now ready to refine; the refusals it
+  would have polished are gone.
+- Hypothesis for SEED-046#story-1 (publish speed): publish runs `git lfs push`
+  for every non-empty attachment in the tip tree, not only new ones; confirm
+  when refining story 1.
+- Full `cli:test` runs under machine load occasionally hit vitest's 5000 ms
+  timeout in untouched pull suites; a possible test-optimization candidate.
+
 ## Current decisions
 
 - Owner, 2026-09-26: Git decides; the allowlist is deleted, not extended.
