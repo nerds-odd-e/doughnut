@@ -17,6 +17,7 @@ import com.odde.donut.services.NoteTitleNameRule;
 import com.odde.donut.services.WikiLinkRewriteService;
 import java.sql.Timestamp;
 import java.util.Objects;
+import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import org.springframework.http.HttpStatus;
@@ -113,8 +114,24 @@ public class WebNoteEditService {
       Function<Note, String> commitMessage,
       Timestamp updatedAt)
       throws UnexpectedNoAccessRightException {
+    return edit(noteId, notebookId, Set.of(notebookId), mutation, commitMessage, updatedAt);
+  }
+
+  /**
+   * Like {@link #edit(Integer, Integer, Consumer, Function, Timestamp)}, committing to every
+   * notebook in {@code notebookIds}; the note must still be in {@code notebookId} when the mutation
+   * starts.
+   */
+  public Note edit(
+      Integer noteId,
+      Integer notebookId,
+      Set<Integer> notebookIds,
+      Consumer<Note> mutation,
+      Function<Note, String> commitMessage,
+      Timestamp updatedAt)
+      throws UnexpectedNoAccessRightException {
     return acceptedWebChangeService.apply(
-        notebookId,
+        notebookIds,
         () -> {
           Note note = requireNote(noteId);
           if (!notebookId.equals(note.getNotebook().getId())) {

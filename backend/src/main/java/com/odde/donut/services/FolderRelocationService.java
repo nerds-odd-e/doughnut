@@ -20,9 +20,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 @Service
@@ -71,25 +72,26 @@ public class FolderRelocationService {
     this.noteService = noteService;
   }
 
-  @Transactional
   public Folder moveFolder(
       Notebook notebook,
       Folder folder,
       FolderMoveRequest request,
       Notebook destinationNotebook,
-      User viewer) {
-    return folderMoveRelocation.moveFolder(notebook, folder, request, destinationNotebook, viewer);
-  }
-
-  public Folder moveFolderWithinNotebook(
-      Notebook notebook, Folder folder, FolderMoveRequest request, User viewer)
+      User viewer)
       throws UnexpectedNoAccessRightException {
+    Integer destinationId = destinationNotebook.getId();
     return applyLiveFolderChange(
+        Stream.of(notebook.getId(), destinationId).collect(Collectors.toUnmodifiableSet()),
         notebook,
         folder,
         result -> "Move folder: " + result.getName(),
         (liveNotebook, liveFolder, now) ->
-            folderMoveRelocation.moveFolder(liveNotebook, liveFolder, request, null, viewer));
+            folderMoveRelocation.moveFolder(
+                liveNotebook,
+                liveFolder,
+                request,
+                notebookRepository.findById(destinationId).orElseThrow(),
+                viewer));
   }
 
   public Folder trashFolderWithinNotebook(Notebook notebook, Folder folder)
@@ -141,10 +143,21 @@ public class FolderRelocationService {
       Function<Folder, String> commitMessage,
       LiveFolderMutation mutation)
       throws UnexpectedNoAccessRightException {
+    return applyLiveFolderChange(
+        Set.of(notebook.getId()), notebook, folder, commitMessage, mutation);
+  }
+
+  private Folder applyLiveFolderChange(
+      Set<Integer> notebookIds,
+      Notebook notebook,
+      Folder folder,
+      Function<Folder, String> commitMessage,
+      LiveFolderMutation mutation)
+      throws UnexpectedNoAccessRightException {
     Integer folderId = folder.getId();
     Timestamp now = testabilitySettings.getCurrentUTCTimestamp();
     return acceptedWebChangeService.apply(
-        notebook.getId(),
+        notebookIds,
         () -> {
           Notebook liveNotebook = notebookRepository.findById(notebook.getId()).orElseThrow();
           Folder liveFolder =

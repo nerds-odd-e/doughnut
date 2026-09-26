@@ -205,6 +205,10 @@ Former local code: DD-107.
 - Execution: SEED-043 story 1 / quick/045-commit-gate-checks-committed-content / 574d61b52c; Timestamp: 2026-09-26, ~16:04+08:00 (slice 1 delivery; commit 16:03:40+08:00); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.40.
   - Evidence: slice 1 receipt `observation.reason` "host session identity is required to verify the notification bridge" (background Claude Code job, Story Branch Mode); recovered by `ci-mailbox.mjs probe` (`CI_MONITOR_READY`), `start --execution nerds-odd-e/doughnut story/045-commit-gate-checks-committed-content`, and `register-push` for 574d61b52c; later deliveries passing `--session-json '{"session_id":…}'` reported `observation.state: reused`.
   - Observed effect: four extra coordinator calls, including a `grep` of `ci-host-bridge.mjs` for the flag's shape; the recovered observer then delivered slice 1's CI failure (DD-126).
+- Execution: SEED-035 story 24 / quick/046-moves-to-another-notebook-reach-git / bc9a0ab229; Timestamp: 2026-09-26, ~17:05+08:00 (slice 1 delivery); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.40.
+  - Evidence: slice 1 receipt `observation.reason` "host session identity is required to verify the notification bridge" (background Claude Code job, Story Branch Mode); the coordinator found the flag's shape by grepping `ci-host-bridge.mjs` and `CLAUDE_CODE_SESSION_ID` via `env`; re-running `deliver` with `--session-json` for the already-pushed SHA was refused ("rebase left the pre-rebase SHA as the candidate"); slices 2 and 3 with `--session-json` reported `observation.state: reused` (`/tmp/dough-ci-501/watch-xFqwGh`).
+  - Observed effect: five extra coordinator calls; slice 1 was never registered by hand, and the observer started by the refused call picked up later pushes.
+  - Inference: the fix recorded in earlier rows (pass `--session-json` from `CLAUDE_CODE_SESSION_ID` on the first delivery) is still not in the delivery guidance, so each execution rediscovers it.
 
 ## ODF-110 — A readiness replay observed only the plan's named seam, not the rest of the slice's journey
 
@@ -378,6 +382,10 @@ A story's readiness basis is a digest of its whole seed document. Wrapping up an
   - Evidence: bfb3d92154 (09:06:00+08:00) closed SEED-035's Book storage story, removing 70 lines of `SEED-035-ai-workspace-supporting-files.md`; 7b949a9246 changed only `basis.document` (627ac528… → f56f518f…) while `basis.plan` stayed e9eb6a56…; the story-2 section and plan were unchanged. Main's 2921f4d44b re-recorded SEED-035#story-11 as ready after the same removal.
   - Observed effect: one refused start, a reassessment, one extra commit on main and a retry; an execution coordinator performed a preparation assessment, as in DD-114.
   - Inference: every story in a multi-story seed is invalidated by any sibling's wrap-up. A digest of the story's own section (plus shared seed context) would keep unrelated closures from forcing reassessment. Qualified: the number of extra calls is not in the summary.
+- Execution: SEED-035 story 24 / quick/046-moves-to-another-notebook-reach-git / bc9a0ab229; Timestamp: 2026-09-26, ~16:55+08:00 (readiness re-record before Take); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.40.
+  - Evidence: c040694118 (16:46:01+08:00) closed SEED-035 story 23, removing its section; `read-state` for story 24 then reported `needs-reassessment` (basis.document c5063546… → f8d817e5…) while the story-24 section was unchanged; the coordinator re-recorded ready in f68e4235cf together with a plan note that story 23 had landed.
+  - Observed effect: the owner asked for an up-to-date check anyway, so the reassessment was wanted work here; the digest mismatch itself carried no information about story 24.
+  - Inference: when the plan also depends on the closed sibling (here "start after story 23 lands"), the reassessment is useful; the refusal cannot tell that case from an unrelated closure.
 
 ## DD-126 — A plan said the changed script had no test, and nobody searched for one before delivery, so CI caught the stale test
 
@@ -390,8 +398,19 @@ The plan for the commit-gate change recorded "No permanent automated test is add
   - Observed effect: one red story-branch CI run, a stash/repair/restore cycle around slice 2, and two extra agents (repair ~49k and refactor ~48k subagent tokens).
   - Inference: a negative claim that code has no test needs a search of the test tree (here `grep -rl quality_changed scripts/test`) at planning or delegation; naming the stack skill for `scripts/` in the delegation would likely have surfaced it.
 
+## DD-127 — An implementer reasoned that a new test would fail instead of running it red, and one of its tests could not fail
+
+The slice 3 implementer skipped the red run, arguing that before the change the cross-notebook path made no commit, so the `parents == previous commits` assertions could not pass. The undo test had no such assertion: without the fix neither move committed, so both notebooks stayed at their starting tree and the test passed. The coordinator found this by restoring the old main code and running the new tests (2 of 3 failed), then added a commit-count assertion (3 of 3 failed, then 5 of 5 passed with the fix).
+
+### Occurrences
+
+- Execution: SEED-035 story 24 / quick/046-moves-to-another-notebook-reach-git / bc9a0ab229; Timestamp: 2026-09-26, ~17:30+08:00 (coordinator red check before slice 3 refactor); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.40.
+  - Evidence: slice 3 return ("I did not run the new tests red first"); red run with `NotebookFolderController` and `FolderRelocationService` reset to HEAD: `movingAFolderBackAsUndoRestoresBothNotebooks` passed; `NotebookGitWebFolderCrossNotebookMoveControllerTest` in 3d5c1bf394 asserts Engineering's history grew by two commits.
+  - Observed effect: two extra focused test runs by the coordinator; the delivered undo test now fails without the fix.
+  - Inference: a round-trip test whose end state equals its start state passes when nothing happens; "red first if practical" in the delegation let the agent substitute reasoning for observation. Slice 2's implementer ran red and its undo test was meaningful.
+
 ## Retention
 
-- Highest allocated local number: 126
+- Highest allocated local number: 127
 - Recovery: `33939aa45a17c08f5e6f8076178ce96437fdfbe8:DearDough.md` contains the complete pre-compaction log and earlier recovery references; `b0b385a184e96ecf8b0f6fc5572eaaab69bc8dad` preserves later history.
 - Occurrence history is partial; full observations, effects, inference and historical provenance remain in that snapshot and the upstream catalog.

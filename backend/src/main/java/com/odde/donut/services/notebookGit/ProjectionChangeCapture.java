@@ -22,9 +22,10 @@ import org.springframework.stereotype.Component;
 /**
  * Records, while a capture window is open on the current thread, which projection rows (notes,
  * folders, attachments, notebook readmes) the flushed changes inserted, updated or deleted, grouped
- * by notebook. Updates keep the first-seen previous path fields so a later flush cannot lose the
- * original path; deletes keep the path the row had, since the entity is gone. Attachment bytes are
- * never read. The window is not reentrant: opening one replaces any window already open on the
+ * by notebook. A row whose notebook changed is deleted from the previous notebook and inserted into
+ * the current one. Updates keep the first-seen previous path fields so a later flush cannot lose
+ * the original path; deletes keep the path the row had, since the entity is gone. Attachment bytes
+ * are never read. The window is not reentrant: opening one replaces any window already open on the
  * thread, so the accepted-change owner must not re-enter itself.
  */
 @Component
@@ -95,11 +96,22 @@ class ProjectionChangeCapture implements Interceptor, HibernatePropertiesCustomi
   public boolean onFlushDirty(
       Object entity, Object id, Object[] current, Object[] previous, String[] names, Type[] types) {
     NotebookProjectionChange change = changeFor(entity, previous, names);
-    if (change != null) {
-      RowPath previousPath = previousPath(entity, current, previous, names);
-      if (previousPath != null) change.updated.putIfAbsent(row(entity, id), previousPath);
-    }
+    if (change == null) return false;
+    ProjectionRow row = row(entity, id);
+    RowPath previousPath = previousPath(entity, current, previous, names);
+    if (leftNotebook(entity, current, previous, names)) {
+      RowPath firstSeen = change.updated.remove(row);
+      change.deleted.put(row, Objects.requireNonNullElse(firstSeen, previousPath));
+      changeFor(entity, current, names).inserted.add(entity);
+    } else if (previousPath != null) change.updated.putIfAbsent(row, previousPath);
     return false;
+  }
+
+  /** A moved row leaves its previous notebook and arrives in its current one. */
+  private static boolean leftNotebook(
+      Object entity, Object[] current, Object[] previous, String[] names) {
+    return !(entity instanceof Notebook)
+        && !Objects.equals(idAt(previous, names, "notebook"), idAt(current, names, "notebook"));
   }
 
   /** The window's record for the entity's notebook; null when no window is open or not tracked. */

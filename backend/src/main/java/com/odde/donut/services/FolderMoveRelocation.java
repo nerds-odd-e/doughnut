@@ -53,8 +53,7 @@ public class FolderMoveRelocation {
       FolderMoveRequest request,
       Notebook destinationNotebook,
       User viewer) {
-    folder.requireInNotebook(notebook);
-    if (destinationNotebook != null && !destinationNotebook.getId().equals(notebook.getId())) {
+    if (!destinationNotebook.getId().equals(notebook.getId())) {
       return moveFolderToAnotherNotebook(folder, request, destinationNotebook, viewer);
     }
     return moveFolderWithinNotebook(notebook, folder, request, viewer);
