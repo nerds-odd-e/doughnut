@@ -424,8 +424,30 @@ The story said link rewriting stays unchanged, yet its key examples stated rewri
   - Observed effect: one owner-visible promise was dropped during execution by a plan note, without an owner decision or a seed edit. No extra slice was needed. The seed still promises the folder-rename case at closure.
   - Inference: when a story says an existing rule stays unchanged, check each key example's expected text against that rule (its code or tests) at refinement. Also, a promise dropped because it conflicts with an exclusion should reach the owner at completion, not only the plan. Qualified: the coordinator summary is the only process record, so how long the discovery took is unknown.
 
+## DD-129 — The "stays editable" boundary examples were all one-line bodies, so a check that refuses wrapped text shipped
+
+Story-10's style-only boundary (key example 5) and every editable test case used bodies with no line wrapped inside a paragraph or list item. The plan asserted that comparing renderings lets style-only changes pass "without special cases" without trying a hard-wrapped body. The implementer, the coordinator's extra probe (wiki links, tables, images, CJK) and the refactor agent never tried one either. The retrospective's first probe of `line one\nline two` found it refused, although the editor's save renders the same.
+
+### Occurrences
+
+- Execution: SEED-046 story 10 / `.planning/slice-plans/005-rich-editor-keeps-content/PLAN.md` / c5338213d0; Timestamp: 2026-09-26T22:19:00+08:00 (retrospective probe); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.41.
+  - Evidence: plan "Current decisions" (planning, rendered-HTML comparison); `RichMarkdownEditor.bodyItCannotKeep.spec.ts` editable cases at 0e36045508; `richEditorKeepsBody.ts` normalizes only `/>\s*\n\s*</`; correction plan `008-hard-wrapped-note-stays-editable`.
+  - Observed effect: a regression against the story's own style-only promise reached the published story branch; a correction story and plan were needed before integration.
+  - Inference: when a story's promise is "ordinary content keeps working", its boundary examples need a realistic sample of that content (here, a hard-wrapped paragraph such as any file in this repo), not only minimal constructs. The seed's value note already asked how many real notes the editor cannot carry.
+
+## DD-130 — The plan prescribed a comparison renderer and a trigger point that the implementer had to replace
+
+Slice 2's plan named `markdownToQuillHtml` as the renderer for judging meaning and a change of `markdownForRichDisplay` as the moment to check. Neither was tried at planning. `markdownToQuillHtml` removes whitespace between tags and drops task checkboxes, so it hides the losses the story is about. A watcher with `nextTick` ran before Quill had taken in the HTML. The implementer switched to plain `marked` and a new `QuillEditor` `modelLoaded` event, and reported both deviations.
+
+### Occurrences
+
+- Execution: SEED-046 story 10 / `.planning/slice-plans/005-rich-editor-keeps-content/PLAN.md` / c5338213d0; Timestamp: 2026-09-26T22:16:23+08:00 (slice 2 commit 0e36045508); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.41.
+  - Evidence: plan slice 2 "Change" and "Learnings" at 0e36045508; slice 2 implementer return (~579 s, ~102k subagent tokens).
+  - Observed effect: slice 2 ran close to the 10-minute hard limit; the plan's Change text no longer describes the code and is corrected only by its Learnings.
+  - Inference: a plan that names the exact function or hook for a new check should name it as a suggestion unless a quick probe confirmed it; here a one-line call of `markdownToQuillHtml` on `**a** *b*` versus `**ab**` would have shown the problem. Qualified: the deviation was handled well and cost one slice's margin, not a retry.
+
 ## Retention
 
-- Highest allocated local number: 128
+- Highest allocated local number: 130
 - Recovery: `33939aa45a17c08f5e6f8076178ce96437fdfbe8:DearDough.md` contains the complete pre-compaction log and earlier recovery references; `b0b385a184e96ecf8b0f6fc5572eaaab69bc8dad` preserves later history.
 - Occurrence history is partial; full observations, effects, inference and historical provenance remain in that snapshot and the upstream catalog.

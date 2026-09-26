@@ -282,6 +282,25 @@ including delivery, not commitments.
 - **Safe stopping point:** Notes the rich editor can carry edit exactly as
   today.
 
+<a id="story-12"></a>
+
+### 4a-fix. A hard-wrapped note stays editable in the rich editor
+
+**Identity:** SEED-046#story-12
+```json dough-story-state
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/008-hard-wrapped-note-stays-editable/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"4f6a6b634ca602f806eef5b37ce88deceb539ddb7af20ee5654084aefc6fdbab","plan":"93ed128c5f3716974de6f40260cf4c1f5ed42b05f78f95a9cff1375ce15ffe16"}}
+```
+
+- **Goal:** Owners whose notes wrap paragraphs or list items across lines — the
+  usual shape of locally and AI-written Markdown — keep rich editing on the
+  web. Retrospective correction of SEED-046#story-10, whose check refuses
+  these notes although their round trip changes only style.
+- **Scope:** Only the rendered comparison in
+  `frontend/src/components/form/richEditorKeepsBody.ts`: whitespace inside
+  text compares as rendered, while code keeps its exact whitespace. No
+  per-construct rules; every body story-10 refuses stays refused.
+- **Plan:** [008-hard-wrapped-note-stays-editable](../slice-plans/008-hard-wrapped-note-stays-editable/PLAN.md)
+
 <a id="story-5"></a>
 
 ### 4b. A web edit changes only what the user edited

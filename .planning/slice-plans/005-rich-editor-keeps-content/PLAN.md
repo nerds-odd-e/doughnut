@@ -92,6 +92,15 @@ Change (in `frontend/src/components/form/`):
   holds, because Quill itself drops some constructs `marked` produced; the
   result becomes the second source of slice 1's reason.
 
+## Execution complete
+
+Product advice: take correction SEED-046#story-12 (plan 008) before
+integrating this story. Hard-wrapped notes, the usual shape of locally and
+AI-written Markdown, open read-only today. Then measure how many real notes
+still refuse (loose lists saved tight are the likely next source) before
+deciding whether that needs its own story. Story-5 touches the same component;
+whichever lands second rebases.
+
 ## Current decisions
 
 - Refinement, 2026-09-26: the fallback is read-only plus a warning, following
