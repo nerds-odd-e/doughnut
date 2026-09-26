@@ -22,17 +22,12 @@ import { describeNotebookPullAlreadyBased } from './notebookPull.alreadyBased.su
 import { describeNotebookPullLocalCandidate } from './notebookPull.localCandidate.suite.js'
 import { describeNotebookPullAbsorbed } from './notebookPull.absorbed.suite.js'
 import { describeNotebookPullPathOverlap } from './notebookPull.pathOverlap.suite.js'
-import { describeNotebookPullStructuralHistory } from './notebookPull.structuralHistory.suite.js'
-import { describeNotebookPullCreationFollowOnComposition } from './notebookPull.structuralHistory.creationFollowOn.suite.js'
 import { describeNotebookPullRebase } from './notebookPull.rebase.suite.js'
-import { describeNotebookPullAddition } from './notebookPull.addition.suite.js'
-import { describeNotebookPullAdditionComposition } from './notebookPull.additionComposition.suite.js'
+import { describeNotebookPullAcceptedChanges } from './notebookPull.acceptedChanges.suite.js'
 import { describeNotebookPullConflict } from './notebookPull.conflict.suite.js'
 import { describeNotebookPullResolvedContinuation } from './notebookPull.resolvedContinuation.suite.js'
 import { describeNotebookPullAbort } from './notebookPull.abort.suite.js'
 import { describeNotebookPullContentBatch } from './notebookPull.contentBatch.suite.js'
-import { describeNotebookPullExactSubtreeMove } from './notebookPull.exactSubtreeMove.suite.js'
-import { describeNotebookPullExactSubtreeMoveRefusal } from './notebookPull.exactSubtreeMove.refusal.suite.js'
 
 export function describeNotebookPullAcceptedHistory(): void {
   describe('notebook pull (downloaded accepted history)', () => {
@@ -125,14 +120,9 @@ export function describeNotebookPullAcceptedHistory(): void {
   describeNotebookPullLocalCandidate()
   describeNotebookPullPathOverlap()
   describeNotebookPullAbsorbed()
-  describeNotebookPullStructuralHistory()
-  describeNotebookPullCreationFollowOnComposition()
-  describeNotebookPullExactSubtreeMove()
-  describeNotebookPullExactSubtreeMoveRefusal()
   describeNotebookPullRebase()
   describeNotebookPullContentBatch()
-  describeNotebookPullAddition()
-  describeNotebookPullAdditionComposition()
+  describeNotebookPullAcceptedChanges()
   describeNotebookPullConflict()
   describeNotebookPullResolvedContinuation()
   describeNotebookPullAbort()

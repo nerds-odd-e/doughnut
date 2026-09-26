@@ -1,4 +1,3 @@
-import { notebookPullNextSteps } from '../src/nonInteractiveCli.js'
 import { describe, test, expect, vi } from 'vitest'
 import * as fs from 'node:fs'
 import { join } from 'node:path'
@@ -113,7 +112,7 @@ describe('notebook clone (CLI routing, real Git checkout)', () => {
     )
     expect(ctx.getLogSpy()).toHaveBeenCalledWith(
       expect.stringContaining(
-        `Run "donut notebook pull ${destinationPath}" to receive newer accepted history. ${notebookPullNextSteps(destinationPath)}`
+        `Run "donut notebook pull ${destinationPath}" to receive newer accepted history. Pull rebases your linear unpublished commits onto accepted history, and Git pauses only on a real conflict`
       )
     )
   })

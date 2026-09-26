@@ -20,7 +20,7 @@ import {
   LATER_OTHER_NOTE,
   LOCAL_NOTE,
   OTHER_NOTE,
-  prepareEligibleDivergence,
+  prepareOtherNoteDivergence,
 } from './notebookPull.rebase.testHelpers.js'
 import { acceptedHistoryStagingDirsUnderTmp } from './notebookAcceptedHistory.testHelpers.js'
 
@@ -37,7 +37,7 @@ function rebasedWork(directory: string) {
   }
 }
 
-async function pullEligibleRebase(workDir: string): Promise<{
+async function pullOtherNoteRebase(workDir: string): Promise<{
   directory: string
   source: string
   acceptedBundle: string
@@ -45,7 +45,7 @@ async function pullEligibleRebase(workDir: string): Promise<{
   acceptedHead: string
   rebasedHead: string
 }> {
-  const setup = prepareEligibleDivergence(workDir, { remoteEdits: 1 })
+  const setup = prepareOtherNoteDivergence(workDir, { remoteEdits: 1 })
   const acceptedBundle = join(workDir, 'accepted-B.bundle')
   bundleMain(setup.source, acceptedBundle)
   vi.stubGlobal(
@@ -72,7 +72,7 @@ export function describeNotebookPublishRebasedRejection(): void {
 
     test('a stale expected-head after submitting a rebased child reports the conflict and leaves L′ intact', async () => {
       const workDir = ctx.getWorkDir()
-      const pulled = await pullEligibleRebase(workDir)
+      const pulled = await pullOtherNoteRebase(workDir)
       const fetchMock = stubFetchForSubmission(
         pulled.acceptedBundle,
         rejectionPost(409, STALE_HEAD_MESSAGE, 'RESOURCE_CONFLICT')
@@ -103,7 +103,7 @@ export function describeNotebookPublishRebasedRejection(): void {
 
     test('remote advancement before ancestry download rejects without posting', async () => {
       const workDir = ctx.getWorkDir()
-      const pulled = await pullEligibleRebase(workDir)
+      const pulled = await pullOtherNoteRebase(workDir)
       fs.writeFileSync(join(pulled.source, 'other.md'), LATER_OTHER_NOTE)
       runGit(['add', 'other.md'], pulled.source)
       runGit(
@@ -128,7 +128,7 @@ export function describeNotebookPublishRebasedRejection(): void {
     })
 
     test('a projection-drift rejection reports the drift', async () => {
-      const pulled = await pullEligibleRebase(ctx.getWorkDir())
+      const pulled = await pullOtherNoteRebase(ctx.getWorkDir())
       stubFetchForSubmission(
         pulled.acceptedBundle,
         rejectionPost(409, DRIFT_MESSAGE, 'RESOURCE_CONFLICT')

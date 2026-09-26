@@ -59,7 +59,7 @@ export async function withNoAmbientGitIdentityOrEditor(
   }
 }
 
-export function prepareEligibleDivergence(
+export function prepareOtherNoteDivergence(
   workDir: string,
   options: {
     remoteEdits: number
