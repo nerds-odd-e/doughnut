@@ -9,7 +9,6 @@ import com.odde.donut.services.AssimilationUnit;
 import com.odde.donut.services.notebookTree.PortableTreeNoteRow;
 import com.odde.donut.utils.SearchTitleNormalizer;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Stream;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
@@ -102,14 +101,6 @@ public interface NoteRepository extends CrudRepository<Note, Integer>, NoteStruc
 
   @Query(value = selectFromNote + " WHERE n.folder.id = :folderId" + " ORDER BY n.id ASC")
   List<Note> findNotesInFolderOrderByIdAsc(@Param("folderId") Integer folderId);
-
-  @Query(
-      """
-      SELECT DISTINCT n.folder.id FROM Note n
-      WHERE n.notebook.id = :notebookId
-        AND n.folder IS NOT NULL
-      """)
-  Set<Integer> findOccupiedFolderIdsByNotebookId(@Param("notebookId") Integer notebookId);
 
   @Query(
       """
@@ -241,4 +232,17 @@ public interface NoteRepository extends CrudRepository<Note, Integer>, NoteStruc
 
   @Query(value = "SELECT MAX(nc.note.createdAt) FROM NoteCreator nc WHERE nc.user.id = :userId")
   java.sql.Timestamp findLastNoteTimeByCreator(@Param("userId") Integer userId);
+
+  @Query(
+      """
+      SELECT n FROM Note n WHERE n.notebook.id = :notebookId
+      AND LOWER(CONCAT(n.title, '.md')) = LOWER(:entryName)
+      AND ((:parentFolderId IS NULL AND n.folder IS NULL)
+           OR (n.folder IS NOT NULL AND n.folder.id = :parentFolderId))
+      ORDER BY n.id ASC
+      """)
+  List<Note> findNotesWhoseFileIsNamedIgnoringCase(
+      @Param("notebookId") Integer notebookId,
+      @Param("parentFolderId") Integer parentFolderId,
+      @Param("entryName") String entryName);
 }

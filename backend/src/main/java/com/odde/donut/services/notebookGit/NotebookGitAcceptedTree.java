@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.function.Predicate;
 import org.eclipse.jgit.lib.ObjectId;
 import org.eclipse.jgit.lib.Repository;
@@ -62,16 +61,6 @@ final class NotebookGitAcceptedTree {
     } catch (IOException e) {
       throw new UncheckedIOException("Could not inspect accepted Portable tree", e);
     }
-  }
-
-  /**
-   * Whether the tree at {@code commitId} has a file, or a folder of files, at a path. The tree is
-   * read once, so one result can check many candidate paths.
-   */
-  static Predicate<String> takenPaths(Repository repository, ObjectId commitId) {
-    Set<String> blobPaths = blobIds(repository, commitId).keySet();
-    return path ->
-        blobPaths.stream().anyMatch(taken -> taken.equals(path) || taken.startsWith(path + "/"));
   }
 
   static boolean representedInTree(String folderPath, List<PortableTreeEntry> entries) {

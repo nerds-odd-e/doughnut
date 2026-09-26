@@ -1,9 +1,9 @@
 package com.odde.donut.services;
 
-import com.odde.donut.entities.DisplayName;
 import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
+import com.odde.donut.entities.NotebookAttachment;
 import com.odde.donut.entities.repositories.FolderRepository;
 import com.odde.donut.entities.repositories.NoteRepository;
 import com.odde.donut.entities.repositories.NotebookAttachmentRepository;
@@ -16,9 +16,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 /** Walks a folder tree and applies subtree reassignment, merge, dissolve and removal. */
 @Service
@@ -27,6 +25,7 @@ final class FolderSubtree {
   private final NoteRepository noteRepository;
   private final NotebookAttachmentRepository notebookAttachmentRepository;
   private final FolderSiblingNameValidation folderSiblingNameValidation;
+  private final FolderContentsPlacementCheck contentsPlacementCheck;
   private final EntityPersister entityPersister;
 
   FolderSubtree(
@@ -34,11 +33,13 @@ final class FolderSubtree {
       NoteRepository noteRepository,
       NotebookAttachmentRepository notebookAttachmentRepository,
       FolderSiblingNameValidation folderSiblingNameValidation,
+      FolderContentsPlacementCheck contentsPlacementCheck,
       EntityPersister entityPersister) {
     this.folderRepository = folderRepository;
     this.noteRepository = noteRepository;
     this.notebookAttachmentRepository = notebookAttachmentRepository;
     this.folderSiblingNameValidation = folderSiblingNameValidation;
+    this.contentsPlacementCheck = contentsPlacementCheck;
     this.entityPersister = entityPersister;
   }
 
@@ -48,6 +49,11 @@ final class FolderSubtree {
       notes.addAll(noteRepository.findNotesInFolderOrderByIdAsc(subtreeFolder.getId()));
     }
     return notes;
+  }
+
+  List<NotebookAttachment> collectAttachments(List<Folder> subtreeFolders) {
+    return notebookAttachmentRepository.findByFolder_IdIn(
+        subtreeFolders.stream().map(Folder::getId).toList());
   }
 
   Set<Integer> collectNoteIds(List<Folder> subtreeFolders) {
@@ -79,7 +85,6 @@ final class FolderSubtree {
 
   void reassignToNotebook(
       List<Folder> subtreeFolders, Notebook destinationNotebook, Timestamp now) {
-    requireSubtreeHasNoAttachments(subtreeFolders.getFirst());
     for (Folder subtreeFolder : subtreeFolders) {
       subtreeFolder.setNotebook(destinationNotebook);
       subtreeFolder.setUpdatedAt(now);
@@ -92,102 +97,71 @@ final class FolderSubtree {
   }
 
   /**
-   * Reassigns {@code folder}'s direct subfolders and notes to its parent and removes the folder
-   * itself. A subfolder whose name already exists at the destination is merged into that sibling
-   * when {@code merge} is set, and refused otherwise.
+   * Moves {@code folder}'s contents to its parent and removes the folder itself, after checking
+   * every entry it would create there. A subfolder whose name a folder at the destination holds
+   * (ignoring case) is merged into it when {@code merge} is set, and refused otherwise.
    */
   void dissolveInto(Folder folder, boolean merge, Timestamp now) {
-    requireSubtreeHasNoAttachments(folder);
     Folder destination = folder.getParentFolder();
-    Integer destinationId = destination == null ? null : destination.getId();
-
-    List<Folder> directSubfolders =
-        folderRepository.findChildFoldersByParentFolderIdOrderByIdAsc(folder.getId());
-
-    for (Folder child : directSubfolders) {
-      Optional<Folder> existingSibling =
-          folderSiblingNameValidation.findConflictingSibling(
-              folder.getNotebook().getId(),
-              destinationId,
-              new DisplayName(child.getName()),
-              folder.getId());
-      if (existingSibling.isEmpty()) {
-        continue;
-      }
-      if (merge) {
-        mergeInto(child, existingSibling.get(), now);
-      } else {
-        FolderSiblingNameValidation.throwFolderNameConflict(
-            FolderSiblingNameValidation.dissolveSiblingClashAtDestination(child.getName()));
-      }
-    }
-
-    List<Folder> remainingSubfolders =
-        folderRepository.findChildFoldersByParentFolderIdOrderByIdAsc(folder.getId());
-    for (Folder child : remainingSubfolders) {
-      child.setParentFolder(destination);
-      child.setUpdatedAt(now);
-      entityPersister.merge(child);
-    }
-
-    List<Note> directNotes = noteRepository.findNotesInFolderOrderByIdAsc(folder.getId());
-    for (Note note : directNotes) {
-      note.setFolder(destination);
-      entityPersister.merge(note);
-    }
-
+    Set<Integer> excluded = Set.of(folder.getId());
+    contentsPlacementCheck.requireContentsFit(folder, destination, merge, excluded);
+    moveContentsInto(folder, destination, folder.getNotebook(), excluded, now);
     entityPersister.flush();
     entityPersister.remove(folder);
     entityPersister.flush();
   }
 
+  /** Merges {@code source} into {@code target} in the same notebook, after checking every entry. */
+  void mergeWithinNotebook(Folder source, Folder target, Timestamp now) {
+    contentsPlacementCheck.requireContentsFit(source, target, true, Set.of());
+    mergeInto(source, target, now);
+  }
+
   void mergeInto(Folder source, Folder target, Timestamp now) {
-    requireSubtreeHasNoAttachments(source);
-    Notebook destinationNotebook = target.getNotebook();
-    boolean crossNotebook = !source.getNotebook().getId().equals(destinationNotebook.getId());
-
-    List<Folder> srcSubfolders =
-        folderRepository.findChildFoldersByParentFolderIdOrderByIdAsc(source.getId());
-    for (Folder srcChild : srcSubfolders) {
-      Optional<Folder> tgtChild =
-          folderRepository
-              .findCandidateChildContainers(
-                  destinationNotebook.getId(), target.getId(), new DisplayName(srcChild.getName()))
-              .stream()
-              .findFirst();
-      if (tgtChild.isPresent()) {
-        mergeInto(srcChild, tgtChild.get(), now);
-      } else {
-        srcChild.setParentFolder(target);
-        srcChild.setUpdatedAt(now);
-        if (crossNotebook) {
-          reassignToNotebook(collectFolders(srcChild), destinationNotebook, now);
-        }
-        entityPersister.merge(srcChild);
-      }
-    }
-
-    List<Note> srcNotes = noteRepository.findNotesInFolderOrderByIdAsc(source.getId());
-    for (Note note : srcNotes) {
-      note.setFolder(target);
-      if (crossNotebook) {
-        note.assignNotebook(destinationNotebook);
-      }
-      entityPersister.merge(note);
-    }
-
+    moveContentsInto(source, target, target.getNotebook(), Set.of(), now);
     target.setUpdatedAt(now);
     entityPersister.merge(target);
     entityPersister.flush();
     entityPersister.remove(source);
   }
 
-  private void requireSubtreeHasNoAttachments(Folder source) {
-    List<Integer> folderIds = collectFolders(source).stream().map(Folder::getId).toList();
-    if (notebookAttachmentRepository.existsByFolder_IdIn(folderIds)) {
-      throw new ResponseStatusException(
-          HttpStatus.BAD_REQUEST,
-          "Folders containing files cannot be dissolved, merged, or moved to another notebook yet.");
+  /**
+   * Places {@code source}'s subfolders, notes and files in {@code destinationOrNull}; a subfolder
+   * whose name a folder there holds (ignoring case) is merged into it.
+   */
+  private void moveContentsInto(
+      Folder source,
+      Folder destinationOrNull,
+      Notebook destinationNotebook,
+      Set<Integer> excludedFolderIds,
+      Timestamp now) {
+    boolean crossNotebook = !source.getNotebook().getId().equals(destinationNotebook.getId());
+    for (Folder child :
+        folderRepository.findChildFoldersByParentFolderIdOrderByIdAsc(source.getId())) {
+      Optional<Folder> existing =
+          folderSiblingNameValidation.folderHolding(
+              destinationNotebook, destinationOrNull, child.getName(), excludedFolderIds);
+      if (existing.isPresent()) {
+        mergeInto(child, existing.get(), now);
+      } else {
+        child.setParentFolder(destinationOrNull);
+        child.setUpdatedAt(now);
+        if (crossNotebook) {
+          reassignToNotebook(collectFolders(child), destinationNotebook, now);
+        }
+        entityPersister.merge(child);
+      }
+    }
+    for (Note note : noteRepository.findNotesInFolderOrderByIdAsc(source.getId())) {
+      note.setFolder(destinationOrNull);
+      if (crossNotebook) {
+        note.assignNotebook(destinationNotebook);
+      }
+      entityPersister.merge(note);
+    }
+    for (NotebookAttachment attachment : collectAttachments(List.of(source))) {
+      attachment.setFolder(destinationOrNull);
+      entityPersister.merge(attachment);
     }
   }
 }

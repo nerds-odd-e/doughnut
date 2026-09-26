@@ -3,12 +3,12 @@ package com.odde.donut.controllers;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.nullValue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.odde.donut.controllers.dto.ApiError;
 import com.odde.donut.controllers.dto.FolderMoveRequest;
 import com.odde.donut.entities.Folder;
+import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.NotebookAttachment;
 import com.odde.donut.entities.User;
@@ -17,6 +17,8 @@ import com.odde.donut.exceptions.ApiException;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
 import org.eclipse.jgit.lib.ObjectId;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -24,68 +26,98 @@ class NotebookGitFolderDissolveGuardControllerTest extends NotebookGitWebContent
 
   @Autowired FolderRepository folderRepository;
 
-  @Test
-  void folderContainingAFileCannotBeDissolved() throws Exception {
+  @ParameterizedTest
+  @ValueSource(bytes = {1, 9})
+  void dissolveOntoATakenFileNameIsRefusedNamingItAndChangesNothing(byte oldPayload)
+      throws Exception {
     Notebook notebook = createGitBackedNotebook();
     Folder physics = makeMe.aFolder().notebook(notebook).name("physics").please();
+    storeFolderAttachmentAndSnapshot(notebook, physics, "force.png", new byte[] {1});
     Folder old = makeMe.aFolder().parentFolder(physics).name("old").please();
-    NotebookAttachment sketch =
-        storeFolderAttachmentAndSnapshot(notebook, old, "sketch.png", new byte[] {1, 2, 3});
+    NotebookAttachment oldForce =
+        storeFolderAttachmentAndSnapshot(notebook, old, "force.png", new byte[] {oldPayload});
     ObjectId acceptedA = ObjectId.fromString(binding(notebook).getAcceptedGitObjectId());
 
-    ResponseStatusException exception =
+    ApiException conflict =
         assertThrows(
-            ResponseStatusException.class,
-            () -> folderController.dissolveFolder(notebook, old, false));
+            ApiException.class, () -> folderController.dissolveFolder(notebook, old, false));
 
     assertThat(
-        exception.getReason(),
-        equalTo(
-            "Folders containing files cannot be dissolved, merged, or moved to another notebook"
-                + " yet."));
+        conflict.getErrorBody().getErrorType(), equalTo(ApiError.ErrorType.RESOURCE_CONFLICT));
+    assertThat(
+        conflict.getErrorBody().getMessage(),
+        equalTo("This name is already used here by physics/force.png"));
     assertThat(
         folderRepository.findById(old.getId()).orElseThrow().getParentFolder().getId(),
         equalTo(physics.getId()));
     assertThat(
-        notebookAttachmentRepository.findById(sketch.getId()).orElseThrow().getFolder().getId(),
+        notebookAttachmentRepository.findById(oldForce.getId()).orElseThrow().getFolder().getId(),
         equalTo(old.getId()));
     assertThat(ObjectId.fromString(binding(notebook).getAcceptedGitObjectId()), equalTo(acceptedA));
   }
 
   @Test
-  void folderContainingAFileCannotBeMerged() throws Exception {
+  void dissolveOntoANoteNameTakenIgnoringCaseIsRefusedNamingItAndChangesNothing() throws Exception {
+    Notebook notebook = createGitBackedNotebook();
+    Folder physics = makeMe.aFolder().notebook(notebook).name("physics").please();
+    makeMe.aNote("Energy").folder(physics).please();
+    Folder old = makeMe.aFolder().parentFolder(physics).name("old").please();
+    Note energy = makeMe.aNote("energy").folder(old).please();
+    snapshotCurrentPortableTree(notebook);
+    ObjectId acceptedA = ObjectId.fromString(binding(notebook).getAcceptedGitObjectId());
+
+    ApiException conflict =
+        assertThrows(
+            ApiException.class, () -> folderController.dissolveFolder(notebook, old, false));
+
+    assertThat(
+        conflict.getErrorBody().getErrorType(), equalTo(ApiError.ErrorType.RESOURCE_CONFLICT));
+    assertThat(
+        conflict.getErrorBody().getMessage(),
+        equalTo("This name is already used here by physics/Energy.md"));
+    assertThat(
+        folderRepository.findById(old.getId()).orElseThrow().getParentFolder().getId(),
+        equalTo(physics.getId()));
+    assertThat(
+        noteRepository.findById(energy.getId()).orElseThrow().getFolder().getId(),
+        equalTo(old.getId()));
+    assertThat(ObjectId.fromString(binding(notebook).getAcceptedGitObjectId()), equalTo(acceptedA));
+  }
+
+  @Test
+  void mergeMoveOntoANestedNoteNameTakenIgnoringCaseIsRefusedNamingItAndChangesNothing()
+      throws Exception {
     Notebook notebook = createGitBackedNotebook();
     Folder target = makeMe.aFolder().notebook(notebook).name("physics").please();
+    Folder targetDiagrams = makeMe.aFolder().parentFolder(target).name("diagrams").please();
+    makeMe.aNote("Energy").folder(targetDiagrams).please();
     Folder holder = makeMe.aFolder().notebook(notebook).name("holder").please();
     Folder source = makeMe.aFolder().parentFolder(holder).name("physics").please();
-    Folder old = makeMe.aFolder().parentFolder(source).name("old").please();
-    NotebookAttachment sketch =
-        storeFolderAttachmentAndSnapshot(notebook, old, "sketch.png", new byte[] {1, 2, 3});
+    Folder sourceDiagrams = makeMe.aFolder().parentFolder(source).name("Diagrams").please();
+    Note energy = makeMe.aNote("energy").folder(sourceDiagrams).please();
+    snapshotCurrentPortableTree(notebook);
     ObjectId acceptedA = ObjectId.fromString(binding(notebook).getAcceptedGitObjectId());
     FolderMoveRequest mergeAtRoot = new FolderMoveRequest();
     mergeAtRoot.setMerge(true);
 
-    ResponseStatusException exception =
+    ApiException conflict =
         assertThrows(
-            ResponseStatusException.class,
-            () -> folderController.moveFolder(notebook, source, mergeAtRoot));
+            ApiException.class, () -> folderController.moveFolder(notebook, source, mergeAtRoot));
 
     assertThat(
-        exception.getReason(),
-        equalTo(
-            "Folders containing files cannot be dissolved, merged, or moved to another notebook"
-                + " yet."));
+        conflict.getErrorBody().getErrorType(), equalTo(ApiError.ErrorType.RESOURCE_CONFLICT));
     assertThat(
-        folderRepository.findById(target.getId()).orElseThrow().getParentFolder(), nullValue());
+        conflict.getErrorBody().getMessage(),
+        equalTo("This name is already used here by physics/diagrams/Energy.md"));
     assertThat(
         folderRepository.findById(source.getId()).orElseThrow().getParentFolder().getId(),
         equalTo(holder.getId()));
     assertThat(
-        folderRepository.findById(old.getId()).orElseThrow().getParentFolder().getId(),
+        folderRepository.findById(sourceDiagrams.getId()).orElseThrow().getParentFolder().getId(),
         equalTo(source.getId()));
     assertThat(
-        notebookAttachmentRepository.findById(sketch.getId()).orElseThrow().getFolder().getId(),
-        equalTo(old.getId()));
+        noteRepository.findById(energy.getId()).orElseThrow().getFolder().getId(),
+        equalTo(sourceDiagrams.getId()));
     assertThat(ObjectId.fromString(binding(notebook).getAcceptedGitObjectId()), equalTo(acceptedA));
   }
 

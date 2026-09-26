@@ -2,6 +2,7 @@ package com.odde.donut.configs;
 
 import com.odde.donut.controllers.dto.ApiError;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
+import com.odde.donut.services.NoteTitleNameRule;
 import org.hibernate.exception.ConstraintViolationException;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.core.Ordered;
@@ -71,11 +72,7 @@ public class CustomRestExceptionHandler extends ResponseEntityExceptionHandler {
   }
 
   private static ResponseEntity<ApiError> duplicateNoteTitleConflictResponse() {
-    String message =
-        "A note with this title already exists in this notebook (folder or top level).";
-    ApiError apiError = new ApiError(message, ApiError.ErrorType.RESOURCE_CONFLICT);
-    apiError.add("newTitle", message);
-    return ResponseEntity.status(HttpStatus.CONFLICT).body(apiError);
+    return ResponseEntity.status(HttpStatus.CONFLICT).body(NoteTitleNameRule.titleHeldByANote());
   }
 
   private static boolean isDuplicateNoteTitleInNotebookFolder(Throwable ex) {

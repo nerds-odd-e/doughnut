@@ -93,6 +93,18 @@ class NotebookBooksAttachNotebookFileControllerTest
   }
 
   @Test
+  void aNameTakenIgnoringCaseIsAlsoNumbered() throws Exception {
+    Notebook notebook = createGitBackedNotebook();
+    storeFolderAttachmentAndSnapshot(notebook, null, "physics primer.pdf", new byte[] {0x01});
+
+    booksController.attachBook(notebook, physicsPrimer(), pdfFile(new byte[] {0x25, 0x50}));
+
+    assertThat(
+        bookRepository.findByNotebook_Id(notebook.getId()).orElseThrow().getSourceFilePath(),
+        equalTo("Physics Primer (2).pdf"));
+  }
+
+  @Test
   void aBookNameThatIsNotAPlainFilenameGetsADonutChosenName() throws Exception {
     Notebook notebook = createGitBackedNotebook();
 

@@ -18,8 +18,8 @@ and undo-trash, `image:` values that are URLs, absolute paths, paths into other
 folders or missing files, references from other folders, `..` support on the
 web, and any other `image:` rewrite.
 
-Assumption: story 11 ([plan 007](../007-dissolve-merge-folders-with-files/PLAN.md))
-is delivered first. Its shared owner of entry names per folder (evolved from
+Assumption: folder dissolve and merge with the one set of names per folder
+is delivered first (it is). Its shared owner of entry names per folder (evolved from
 `FolderSiblingNameValidation`, reading live note, folder and file rows without
 letter case, with `NumberedNameSelection` for free names) answers "is this
 filename taken in the destination" and "the first free filename". If it is not

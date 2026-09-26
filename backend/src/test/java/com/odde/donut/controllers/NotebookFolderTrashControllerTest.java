@@ -107,7 +107,7 @@ class NotebookFolderTrashControllerTest extends NotebookControllerTestBase {
   }
 
   @Test
-  void usesFirstFreeSiblingNameWithExistingCaseRulesWithoutChangingEarlierTrash()
+  void usesFirstFreeSiblingNameIgnoringCaseWithoutChangingEarlierTrash()
       throws UnexpectedNoAccessRightException {
     Notebook notebook = ownedNotebook();
     Folder trash = ownedFolder(notebook, "_trash");
@@ -126,7 +126,7 @@ class NotebookFolderTrashControllerTest extends NotebookControllerTestBase {
     makeMe.refresh(laterNote);
     makeMe.refresh(incomingNote);
     assertThat(result.getId(), equalTo(incomingId));
-    assertThat(result.getName(), equalTo("Biology (2)"));
+    assertThat(result.getName(), equalTo("Biology (4)"));
     assertThat(result.getParentFolder().getId(), equalTo(trash.getId()));
     assertThat(incomingNote.getFolder().getId(), equalTo(incoming.getId()));
     assertThat(earlierNote.getFolder().getId(), equalTo(earlier.getId()));

@@ -45,9 +45,7 @@ class NotebookGitWebFolderCrossNotebookMoveControllerTest
 
     assertThat(
         exception.getReason(),
-        equalTo(
-            "Folders containing files cannot be dissolved, merged, or moved to another notebook"
-                + " yet."));
+        equalTo("Folders containing files cannot be moved to another notebook yet."));
     assertThat(
         folderRepository.findById(refs.getId()).orElseThrow().getNotebook().getId(),
         equalTo(source.getId()));
@@ -65,6 +63,41 @@ class NotebookGitWebFolderCrossNotebookMoveControllerTest
     assertThat(
         notebookAttachmentRepository.findById(existing.getId()).orElseThrow().getFolder().getId(),
         equalTo(library.getId()));
+    assertThat(ObjectId.fromString(binding(source).getAcceptedGitObjectId()), equalTo(sourceHead));
+    assertThat(
+        ObjectId.fromString(binding(destination).getAcceptedGitObjectId()),
+        equalTo(destinationHead));
+  }
+
+  @Test
+  void folderContainingAFileCannotMergeIntoAnotherNotebook() throws Exception {
+    Notebook source = createGitBackedNotebook("Source");
+    Folder refs = makeMe.aFolder().notebook(source).name("refs").please();
+    NotebookAttachment paper =
+        storeFolderAttachmentAndSnapshot(source, refs, "paper.pdf", new byte[] {1, 2, 3});
+    ObjectId sourceHead = ObjectId.fromString(binding(source).getAcceptedGitObjectId());
+
+    Notebook destination = createGitBackedNotebook("Destination");
+    Folder destinationRefs = makeMe.aFolder().notebook(destination).name("refs").please();
+    storeFolderAttachmentAndSnapshot(
+        destination, destinationRefs, "existing.pdf", new byte[] {4, 5, 6});
+    ObjectId destinationHead = ObjectId.fromString(binding(destination).getAcceptedGitObjectId());
+    FolderMoveRequest mergeAtDestinationRoot = new FolderMoveRequest();
+    mergeAtDestinationRoot.setDestinationNotebookId(destination.getId());
+    mergeAtDestinationRoot.setMerge(true);
+
+    ResponseStatusException exception =
+        assertThrows(
+            ResponseStatusException.class,
+            () -> folderController.moveFolder(source, refs, mergeAtDestinationRoot));
+
+    assertThat(
+        exception.getReason(),
+        equalTo("Folders containing files cannot be moved to another notebook yet."));
+    assertThat(folderRepository.findById(refs.getId()).isPresent(), equalTo(true));
+    assertThat(
+        notebookAttachmentRepository.findById(paper.getId()).orElseThrow().getFolder().getId(),
+        equalTo(refs.getId()));
     assertThat(ObjectId.fromString(binding(source).getAcceptedGitObjectId()), equalTo(sourceHead));
     assertThat(
         ObjectId.fromString(binding(destination).getAcceptedGitObjectId()),

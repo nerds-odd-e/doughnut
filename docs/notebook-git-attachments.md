@@ -21,7 +21,8 @@ note identity, title or learning history.
 `notebook_attachment` holds each file's notebook, nullable folder, filename and
 accepted Git content: the file's Git LFS pointer, or empty content for an empty
 file. It is a projection of accepted Git content, not a second authority, and
-it is deleted with its notebook or folder. Filenames are unique within their
+it is deleted with its notebook; a folder's files are removed in code before the
+folder, never by a database cascade. Filenames are unique within their
 notebook-root or folder location under a binary collation, so paths differing
 only in case remain distinct files exactly as Git treats them.
 
@@ -34,10 +35,30 @@ no note, container README or `.keep`; its folder ancestry remains visible in the
 web projection.
 
 Web rename, move within the notebook, trash and recovery carry a folder's files
-through the same folder placement. Permanent folder deletion deletes its files.
-As an interim safety boundary, dissolving or merging a folder whose subtree
-contains a file, or moving that folder to another notebook, is refused without
-changing either the accepted tree or its projection.
+through the same folder placement. Dissolving a folder, or merging it into a
+same-named folder within the notebook, carries its files exactly as its notes:
+each file keeps its row and bytes and only its folder changes. File references
+are not rewritten: a note outside the dissolved or merged folder whose `image:`
+points into it shows a broken picture afterwards. Permanent folder
+deletion removes its files. Moving a folder whose subtree contains a file to
+another notebook is refused without changing either the accepted tree or its
+projection. Notebook health counts a file as occupying its folder, so a folder
+holding only files is neither reported nor purged as empty.
+
+### One set of names per folder
+
+On the web, the entries of one folder (or the notebook root) share one set of
+names: a note occupies `Title.md`, a folder its name and a file its filename,
+compared without letter case. Every web placement — note create, rename, move,
+undo and trash; folder create, rename, move, trash, dissolve and merge; picture
+upload; Book file naming — asks this one rule over live rows
+(`FolderSiblingNameValidation`). A name held by another folder is
+`FOLDER_NAME_CONFLICT` (where merging is offered); one held by a note or file
+is `RESOURCE_CONFLICT` naming its path. Dissolve and merge check every
+destination entry before any change and merge case-variant folders into the
+existing one. Existing content is not judged again. The case-sensitive
+database unique keys stay as the last safety net, and local publish is not
+governed by this rule.
 
 Every consumer of a notebook's live Portable content — ZIP export, Git cutover
 and history reset, accepted web changes, and projection-drift detection — reads
@@ -68,10 +89,10 @@ note's `image: <filename>` are accepted together in one web commit, with the
 note content prepared like any other content save. The editor saves pending
 text before sending the upload and then shows the returned note without saving
 it again, so one upload is exactly one commit. A name that a file, note or
-folder in the notebook's accepted tree already uses in that folder, or one that
-is not a plain filename (empty, containing `/`, or starting with `.`), is
-refused with a message naming the path; nothing is renamed or overwritten. A notebook without an LFS binding refuses the
-upload.
+folder in that folder already uses (ignoring case, under the one set of names),
+or one that is not a plain filename (empty, containing `/`, or starting with
+`.`), is refused with a message naming the path; nothing is renamed or
+overwritten. A notebook without an LFS binding refuses the upload.
 
 Pictures uploaded before pictures became notebook files were moved into their
 notebooks as files beside their notes; their old table and
@@ -83,7 +104,7 @@ first, then accepts the file's LFS pointer together with the Book in one web
 commit ("Attach book: <name>"). Donut chooses the name: `<book name>.pdf` or
 `<book name>.epub`, or `book.<format>` when the book name is not a plain
 filename, then the next free numbered name before the extension when a file,
-note or folder at the root of the accepted tree already uses it
+note or folder at the notebook root already uses it, ignoring case
 (`Physics Primer (2).pdf`). The Book refers to that root-relative path
 (`book.source_file_path`), and Book reading serves the file through the one
 attachment reader. The Book size limit (100 MB) applies instead of the 10 MiB

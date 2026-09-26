@@ -71,7 +71,7 @@ public class FolderMoveRelocation {
     Map<Integer, Map<Integer, List<String>>> inboundReferencesByNoteId =
         wikiLinkRewriteService.captureLiveResolvedInboundReferencesByNoteId(movedNoteIds, viewer);
     if (mergeTarget.isPresent()) {
-      subtree.mergeInto(folder, mergeTarget.get(), now);
+      subtree.mergeWithinNotebook(folder, mergeTarget.get(), now);
     } else {
       persistFolderPlacement(folder, newParent, new DisplayName(folder.getName()), now);
     }
@@ -91,8 +91,8 @@ public class FolderMoveRelocation {
     requireNewParentInNotebook(newParent, notebook);
     FolderMoveDestinationRules.requireNotMovingIntoSelfOrDescendant(folder, newParent);
     DisplayName availableName =
-        folderSiblingNameValidation.firstAvailableSiblingName(
-            notebook.getId(), newParent.getId(), new DisplayName(folder.getName()), folder.getId());
+        folderSiblingNameValidation.firstFreeFolderName(
+            notebook, newParent, new DisplayName(folder.getName()), folder.getId());
     return persistFolderPlacement(folder, newParent, availableName, now);
   }
 
@@ -102,9 +102,7 @@ public class FolderMoveRelocation {
       requireNewParentInNotebook(newParent, notebook);
     }
     FolderMoveDestinationRules.requireNotMovingIntoSelfOrDescendant(folder, newParent);
-    Integer destParentId = newParent == null ? null : newParent.getId();
-    return folderSiblingNameValidation.mergeTargetOrRejectConflict(
-        notebook.getId(), destParentId, folder, merge);
+    return folderSiblingNameValidation.mergeTargetOrRefuse(notebook, newParent, folder, merge);
   }
 
   private Folder persistFolderPlacement(
@@ -135,6 +133,11 @@ public class FolderMoveRelocation {
       requireNewParentInNotebook(newParent, destinationNotebook);
     }
 
+    if (!subtree.collectAttachments(subtreeFolders).isEmpty()) {
+      throw new ResponseStatusException(
+          HttpStatus.BAD_REQUEST,
+          "Folders containing files cannot be moved to another notebook yet.");
+    }
     Integer destParentId = newParent == null ? null : newParent.getId();
     Optional<Folder> mergeTarget =
         folderSiblingNameValidation.mergeTargetOrRejectConflict(
