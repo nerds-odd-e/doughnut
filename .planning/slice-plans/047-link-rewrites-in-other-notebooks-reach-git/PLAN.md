@@ -203,6 +203,20 @@ lock. In `docs/notebook-git-synchronization.md` (domain operation ownership),
 remove "cross-notebook referrer rewrites remain outside this owner" and state
 that the owner refuses a change to a bound notebook it did not lock.
 
+## Execution complete
+
+Product advice:
+- Seed key examples 2 and 4 need correcting at wrap-up (no backlog item):
+  folder move and dissolve rewrite the linking note, folder rename does not;
+  dissolve yields `[[Science:/Force]]`; a move to another notebook yields
+  `[[Physics:Force|Science:Force]]`.
+- Owner to confirm dropping the folder-rename promise (decided by plan note
+  under the story's "which links are rewritten" exclusion) and decide whether
+  a small story should make folder rename rewrite notebook-qualified links
+  (`PortablePath.withRenamedFolder`), which today go stale in other notebooks
+  and in the same notebook. Not queued.
+- No other backlog change.
+
 ## Current decisions
 
 - No new end-to-end scenario: the frontend is unchanged, and the controller
