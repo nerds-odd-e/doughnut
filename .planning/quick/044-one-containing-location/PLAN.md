@@ -7,7 +7,8 @@
 - Kind: bounded retrospective correction; no seed.
 - Corrects the execution of SEED-035#story-2 ("Delete unwanted supporting
   files from Web Donut"), plan
-  `.planning/quick/035-delete-notebook-file-on-web/PLAN.md`. Reviewed commits
+  `.planning/quick/035-delete-notebook-file-on-web/PLAN.md` at `c35f7d3956`
+  (removed at wrap-up). Reviewed commits
   on `story/delete-notebook-file-on-web`: `20968e7810`, `e5e4057848`
   (claim `d2cf105398`).
 - Finding (re-verified at `e5e4057848`, 2026-09-26): slice 1 moved the folder

@@ -90,66 +90,11 @@ in historical bundles.
 
 S = 30–60 minutes, M = 1–2 hours, L = 2–4 hours, including delivery. Estimates
 are hypotheses; refine/split work that exceeds L before execution planning.
-Root-file and nested-file continuity, and folder dissolve and merge, are
-delivered. Story 23 fixes the picture a note move leaves behind; stories 24 and 10
+Root-file and nested-file continuity, web file deletion, and folder dissolve
+and merge are delivered. Story 23 fixes the picture a note move leaves behind; stories 24 and 10
 own moves to another notebook, which the delivered behavior does not publish
 (24) or refuses for folders with files (10). The [product backlog](../PRODUCT-BACKLOG.md) owns global order.
 No executable plan or implementation is authorized by this seed.
-
-<a id="story-2"></a>
-
-### Delete unwanted supporting files from Web Donut
-```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../quick/035-delete-notebook-file-on-web/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"f56f518ff5be94d51942a67c8ac4c56e19e81c5f5690648c06c85c7bfe3e0e6a","plan":"e9eb6a56dc80e0cb677ecaedf539420d4fb86e2d77da5321242f88fc3fa2c556"}}
-```
-
-- **Identity:** SEED-035#story-2
-- **Slice plan:** [Delete a notebook file on the web](../quick/035-delete-notebook-file-on-web/PLAN.md)
-- **Goal:** An owner removes a non-Markdown file from a notebook on the web.
-  Today only a local checkout can delete a file; the web can only open and
-  download it.
-- **Scope:**
-  - A **Delete** action on the file's page, with a plain confirmation that
-    names the file (for example "Delete sketch.png?"); it does not mention
-    history (owner decision 2026-09-26). The same behavior for every file type.
-  - Delete removes the file outright, through the existing accepted-change
-    boundary; after `donut notebook pull` the file is gone from the checkout.
-    Notes, other files and learning history are untouched.
-  - Deleting a file that a note's `image:` names is allowed: the note shows a
-    broken picture and its `image:` value stays as it was. Local publish
-    behaves the same way (owner decision 2026-09-25).
-  - Deleting a Book's source file is refused after Delete is chosen, with the
-    same message local publish gives, and nothing changes; the page does not
-    hide Delete for it (owner decision 2026-09-26). A Book reads from that file
-    ([story 17 decision](#breadcrumbs): refuse changes to a Book's file).
-  - Who may delete follows the existing notebook edit rule.
-- **Excluded:**
-  - No web Trash or restore for files (owner decision 2026-09-25). Earlier
-    versions stay in accepted Git history.
-  - Stored file contents (LFS objects in GCS) are not deleted; the North
-    Star defers object garbage collection. Git history is not rewritten.
-  - No automatic removal of the old file when a note's picture is replaced
-    or cleared on the web, and no rewriting or clearing of `image:` values.
-  - Deleting several files at once, a delete action in the sidebar, and
-    renaming or moving files.
-  - Markdown files: they already have ordinary note operations.
-- **Key examples:**
-  1. `physics/` holds the note `Force` and `sketch.png`. The owner opens
-     `sketch.png` on the web, chooses Delete and confirms → `sketch.png` is no
-     longer in the folder. After pull, `physics/sketch.png` is absent and
-     `physics/Force.md` and its learning history are unchanged.
-  2. The note `Force` has `image: force.png`. The owner deletes `force.png` →
-     the delete succeeds; `Force` shows a broken picture and still says
-     `image: force.png`.
-  3. `paper.pdf` is a Book's source file. The owner tries to delete it → the
-     delete is refused, saying the file is the source of that Book and to
-     remove the Book on the web first; the file stays.
-- **Effort hypothesis:** S–M, medium confidence. Building the accepted commit
-  already drops the path of a removed file row; the work is an endpoint, the
-  Book check, the page action and tests.
-- **Depends on:** Delivered web file browsing and the Book source file.
-- **Safe stopping point:** If never delivered, files are still deleted
-  locally.
 
 <a id="story-23"></a>
 
@@ -315,7 +260,7 @@ avoids a chicken-and-egg problem is:
    the `/attachments/` address and the Book bucket are removed.
 
 "Present after clone or pull" is not a story: it is how each of these stories
-is proven. Web deletion (story 2), then dissolve/merge (delivered), then a note move keeping
+is proven. Web deletion and dissolve/merge are delivered; then a note move keeping
 its picture (story 23, a regression fix), moves to another notebook reaching Git
 (story 24, a correctness fix) and the rarer cross-notebook move of files
 (story 10, a convenience whose absence loses nothing).
@@ -366,15 +311,6 @@ integration need their own selected outcomes.
   move): the manual trigger completed the move; the production
   check is a read-only database query, not the startup log; the two notes
   with dead picture links are fixed manually, outside any story.
-- Owner decisions, 2026-09-25 (story 2 refinement): the purpose is only to
-  remove the file; deleting a file a note's `image:` names is allowed and
-  leaves a broken picture; delete outright with no web Trash; keep the
-  backlog order.
-- Owner decisions, 2026-09-26 (story 2 review): the confirmation is plain and
-  does not mention that earlier versions stay in history, since most users do
-  not need to know; refuse a Book's source file after Delete is chosen rather
-  than hiding Delete; keep the plan's first slice whole and let execution
-  escalate if it overruns.
 - Owner decisions, 2026-09-26 (story 10 refinement): story 10's premise was
   wrong — moves to another notebook never reach either notebook's Git — so
   split it: story 24 makes those moves reach Git, story 10 keeps carrying

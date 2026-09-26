@@ -10,7 +10,6 @@ and deletable in Web Donut.
 
 ## Taken
 
-- [Delete unwanted supporting files from Web Donut](seeds/SEED-035-ai-workspace-supporting-files.md#story-2) — SEED-035#story-2 ([plan](quick/035-delete-notebook-file-on-web/PLAN.md))
 - [Trash reuses a case-variant folder in _trash](quick/043-trash-reuses-case-variant-folders/PLAN.md)
 
 ## Backlog list
