@@ -41,7 +41,9 @@ Commands: `CURSOR_DEV=true nix develop -c pnpm cli:test`;
 ### 1. Clone success names where the notebook went and the next commands
 
 Type: Behavior
-Status: planned
+Status: done — accepted: `notebookClone.test.ts` first test asserts the four
+lines and absence of rules; `pnpm cli:test` 440 green. Refactor inlined the
+now single-use `notebookPullNextSteps` into pull usage.
 Proof: the first clone test in `cli/tests/notebookClone.test.ts` asserts the
 printed lines (notebook id and destination; commit, `donut notebook publish
 <dir>`, `donut notebook pull <dir>`) and that no rule sentence appears; green
