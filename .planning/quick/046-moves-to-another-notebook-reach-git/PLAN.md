@@ -19,9 +19,10 @@ Excluded (see the story): commits for linking notes in a third notebook
 source); repairing notebooks already out of step; moving several folders at
 once.
 
-Start execution after story 23 (plan 042, recoverable at `77ceb41056:.planning/quick/042-moved-note-keeps-its-picture/PLAN.md`)
-lands on main: both change the note move code, and the decision below depends
-on its result.
+Story 23 (a note moved within its notebook carries its picture) is on main.
+It added `MovedNotePicture.placeWithPicture` to the same-notebook steps only;
+the cross-notebook steps and the change capture are as this plan describes
+(checked 2026-09-26).
 
 ## Architecture
 
@@ -56,7 +57,8 @@ on its result.
     third-notebook referrers get no commit because those notebooks are not
     opened (story 25).
 - **Keep the cross-notebook steps separate from the same-notebook steps.**
-  After story 23 the same-notebook steps carry the picture file.
+  The same-notebook steps carry the picture file
+  (`MovedNotePicture.placeWithPicture`).
   Carrying it to another notebook is story 10, because LFS objects are scoped
   to one notebook and would have to be copied. Share only the transaction
   owner, not the move steps.
