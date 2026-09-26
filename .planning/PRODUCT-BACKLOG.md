@@ -15,6 +15,7 @@ and deletable in Web Donut.
 
 ## Backlog list
 
+- [Land on the containing folder from one place](quick/042-one-containing-location/PLAN.md)
 - [Dissolve and merge folders that contain files](seeds/SEED-035-ai-workspace-supporting-files.md#story-11) — SEED-035#story-11
 - [Keep path wiki links working when a folder merges into a same-named folder](seeds/SEED-042-folder-merge-keeps-path-wiki-links.md#story-1) — SEED-042#story-1
 - [Carry a folder's files along when it moves to another notebook](seeds/SEED-035-ai-workspace-supporting-files.md#story-10) — SEED-035#story-10

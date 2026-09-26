@@ -61,6 +61,15 @@ the rules for a missing object and an empty file. `.gitattributes`
 and nested `.keep` markers are not rows, so, like `.git`, they are not shown on
 the web.
 
+Whoever can edit the notebook can delete a file from its page after a plain
+confirmation ("Delete <filename>?"). The delete removes the row as one accepted
+web change ("Delete file: <path>"), so the next pull no longer has the file;
+notes, other files and learning history are untouched, and the reader lands on
+the containing folder or notebook page. The LFS object stays, since earlier
+history still names it, and there is no web Trash for files. A note whose
+`image` names the deleted file keeps that value and shows a broken picture, as
+after the same delete through local publish.
+
 A picture uploaded with a note's `image` property on the web becomes a file in
 the note's folder under its uploaded name, with its original bytes: the bytes are
 stored in the notebook's content store first, then the LFS pointer and the
@@ -106,7 +115,8 @@ refused proposal, rewrite only unpublished commits.
 
 Publication also refuses (409) a proposal that deletes, renames or changes the
 file a Book reads from, naming the file and the Book: the owner removes the
-Book on the web first. A rename counts as removing the old path.
+Book on the web first. A rename counts as removing the old path. Deleting that
+file on the web is refused with the same message.
 
 ## Placement and ownership
 
