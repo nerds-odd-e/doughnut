@@ -14,5 +14,4 @@ and deletable in Web Donut.
 
 ## Backlog list
 
-- [Carry a folder's files along when it moves to another notebook](seeds/SEED-035-ai-workspace-supporting-files.md#story-10) — SEED-035#story-10
 - [Use conversations and memory-tracker review without embedding the full note page](seeds/SEED-033-simplify-note-presentation.md#story-2) — SEED-033#story-2

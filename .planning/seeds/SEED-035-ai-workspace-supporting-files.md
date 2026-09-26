@@ -93,8 +93,8 @@ are hypotheses; refine/split work that exceeds L before execution planning.
 Root-file and nested-file continuity, web file deletion, folder dissolve
 and merge, a note moved within its notebook carrying its picture, and note and
 folder moves to another notebook reaching both notebooks' Git are delivered.
-Story 10 carries files along in a move to another notebook, which is still
-refused for folders with files. Story 25 makes link rewrites in other notebooks reach their Git. The
+Moving a folder that holds files to another notebook stays refused; carrying
+files along was dropped. Story 25 makes link rewrites in other notebooks reach their Git. The
 [product backlog](../PRODUCT-BACKLOG.md) owns global order.
 No executable plan or implementation is authorized by this seed.
 
@@ -166,42 +166,6 @@ No executable plan or implementation is authorized by this seed.
   note linked from another notebook keeps blocking that notebook's local
   publishing.
 
-<a id="story-10"></a>
-
-### Carry a folder's files along when it moves to another notebook
-```json dough-story-state
-{"schemaVersion":1,"refinement":"not-refined","approach":"unselected"}
-```
-
-- **Identity:** SEED-035#story-10
-- **Goal:** An owner reorganizing notebooks on the web can move a folder that
-  contains supporting files, or a picture note, to another notebook, instead of
-  first removing or relocating those files locally.
-- **Evaluation:** Folder `refs/` holds a note and `paper.pdf`. The owner moves
-  `refs` to another notebook on the web, then pulls both notebooks: the source no
-  longer has `refs/`, the destination has `refs/paper.pdf` with the same bytes,
-  and the note keeps its learning identity.
-- **Candidate scope (not refined):** replaces the refusal; moves to another
-  notebook already reach both notebooks' Git. Stored bytes are notebook-scoped
-  (`notebook/{id}/lfs/{sha}`, no cross-notebook deduplication), so each file's
-  object is copied into the destination notebook's store before the change is
-  accepted. A moved folder carries all nested subfolders; moving several
-  folders at once stays out (owner decision 2026-09-26). The picture of a note
-  moved to another notebook follows the within-notebook picture rules in the
-  [attachment contract](../../docs/notebook-git-attachments.md).
-- **Proposed exclusions:** a folder holding a Book's source file is refused
-  (the Book belongs to the source notebook; [story 17 decision](#breadcrumbs));
-  references from outside the moved folder break, as folder dissolve and
-  merge accept;
-  source objects are not deleted (garbage collection stays deferred). A merge
-  into a same-named destination folder only if the delivered merge rules (every
-  destination checked first) make it free; otherwise it stays refused.
-- **Value:** the refusal loses nothing and a local workaround exists (copy the
-  files between two checkouts), so this is a convenience ranked after story 25.
-- **Effort hypothesis:** M, low confidence.
-- **Depends on:** nothing outstanding.
-- **Safe stopping point:** If never delivered, the refusal stays safe and clear.
-
 ## Ordering and Scope Reduction
 
 The [product backlog](../PRODUCT-BACKLOG.md) owns global order. Root and nested
@@ -226,8 +190,7 @@ avoids a chicken-and-egg problem is:
 is proven. Web deletion, dissolve/merge, a note move keeping its picture
 within the notebook and moves to another notebook reaching Git are delivered;
 then link rewrites in other notebooks reaching Git
-(story 25, the same correctness fix for renames and moves) and the rarer
-cross-notebook move of files (story 10, a convenience whose absence loses nothing).
+(story 25, the same correctness fix for renames and moves).
 
 The split is by usable outcome, not backend/frontend layers. Reject a
 publish-now/preserve-on-web-later split: it would expose accepted files to
@@ -275,12 +238,11 @@ integration need their own selected outcomes.
   move): the manual trigger completed the move; the production
   check is a read-only database query, not the startup log; the two notes
   with dead picture links are fixed manually, outside any story.
-- Owner decisions, 2026-09-26 (story 10 refinement): story 10's premise was
-  wrong — moves to another notebook never reach either notebook's Git — so
-  split it: a separate story made those moves reach Git, story 10 keeps carrying
-  files, both queued after folder dissolve and merge. A moved folder carries its nested
-  subfolders; no multi-folder move. A note move leaving its picture behind is
-  in scope of this refinement: the file moves with the note
+- Owner decisions, 2026-09-26 (refinement of carrying files in moves to
+  another notebook): the premise was wrong — moves to another notebook never
+  reached either notebook's Git — so a separate story made those moves reach
+  Git, queued after folder dissolve and merge. A note moved within its
+  notebook leaving its picture behind was fixed: the file moves with the note
   (option A), rather than pointing `image:` back (the web does not resolve
   `..`) or accepting the broken picture.
 - Owner decisions, 2026-09-26 (refinement of moves to another notebook
@@ -292,6 +254,11 @@ integration need their own selected outcomes.
   completeness although it rarely happens, and do not measure it; execute
   it after moves to another notebook reach Git. Stop changing notes in notebooks the user cannot edit
   instead of committing to someone else's notebook.
+- Owner decision, 2026-09-26: drop carrying a folder's files along in a move
+  to another notebook, from the backlog and this seed, rather than parking it.
+  The move is refused as a whole with a clear message and nothing changes, so
+  the visible refusal is good enough; a single picture note moved to another
+  notebook still leaves its picture behind, as decided earlier.
 - [Near-future direction](../PRODUCT-BACKLOG.md#near-future-direction).
 - [SEED-009](SEED-009-git-backed-local-notebook-workflow.md): prior local/web note
   workflow. This seed owns non-Markdown attachment continuity.

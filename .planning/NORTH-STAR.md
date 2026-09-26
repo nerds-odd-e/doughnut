@@ -21,8 +21,9 @@ free one. Operations that rehome several entries check every destination
 before changing anything. Folder contents are removed or moved by code, never
 by a database cascade, so every removal passes the accepted-change capture and
 a forgotten one fails loudly (owner decisions 2026-09-26). Web placements
-follow it ([one set of names per folder](../docs/notebook-git-attachments.md#one-set-of-names-per-folder));
-remaining work: cross-notebook moves (SEED-035 story 10).
+follow it ([one set of names per folder](../docs/notebook-git-attachments.md#one-set-of-names-per-folder)).
+Moving a folder that holds files to another notebook stays visibly refused
+(owner decision 2026-09-26).
 
 ## One format boundary
 
