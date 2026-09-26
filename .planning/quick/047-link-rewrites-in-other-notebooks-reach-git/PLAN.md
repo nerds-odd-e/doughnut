@@ -20,12 +20,14 @@ Excluded (see the story): repairing notebooks already out of step; notebook
 rename; automatic drift repair; any change to which links are rewritten or how
 their text changes.
 
-**Starts after story 24** ([plan 046](../046-moves-to-another-notebook-reach-git/PLAN.md))
-lands: it puts the moves to another notebook under the accepted-change owner
-over {source, destination}, extends `FolderRelocationService.applyLiveFolderChange`
-to a notebook set, and fixes change capture for rows that change notebook.
-Recheck those three facts before slice 1; if story 24 changed shape, update this
-plan first.
+Moves to another notebook already reach Git (plan recoverable at
+`9b887b6204:.planning/quick/046-moves-to-another-notebook-reach-git/PLAN.md`):
+note moves run through `RelationController.webMove` →
+`WebNoteEditService.edit(…, Set<Integer> notebookIds, …)` over {source,
+destination}; folder moves, same- and cross-notebook, share
+`FolderRelocationService.moveFolder` → the set form of `applyLiveFolderChange`;
+`ProjectionChangeCapture` records a row that changes notebook as deleted in
+the old notebook and inserted in the new one.
 
 ## Architecture
 
@@ -88,7 +90,7 @@ comparison as the local publish check (`NotebookGitProjection.requireMatchingAcc
 | Same-notebook note move: `Bridge` says `[[Science:physics/Force]]`; move `Force` to `mechanics` → `Engineering` commit with the new path, trees match | 2 | same test |
 | 3. `Bridge` has `uses: "[[Science:Force]]"`; trash `Force` with "remove from properties" → `Engineering` commit without that link, trees match | 2 | same test |
 | 2. `Bridge` says `[[Science:physics/Force]]`; rename folder `physics`, move it within `Science`, or dissolve it → `Engineering` commit with the new path, trees match | 3 | same test (folder cases) |
-| 4. Move `Force` to notebook `Physics` → `Engineering` commit with `[[Physics:Force]]`, beside story 24's two commits; all three trees match | 4 | same test |
+| 4. Move `Force` to notebook `Physics` → `Engineering` commit with `[[Physics:Force]]`, beside the move's two commits; all three trees match | 4 | same test |
 | A web action whose operation changes a bound notebook it did not lock is refused and no notebook gets a commit | 5 | focused `AcceptedWebChangeService` test |
 
 ## Slices
@@ -143,7 +145,7 @@ Proof: same test, key example 4: `Engineering` gets one commit with
 match the full assembly. `NotebookGitWebNoteCrossNotebookMoveControllerTest`
 and `NotebookGitWebFolderCrossNotebookMoveControllerTest` stay green.
 
-Behavior: story 24's note and folder moves to another notebook add the moved
+Behavior: the note and folder moves to another notebook add the moved
 notes' editable linking notebooks to {source, destination}.
 
 ### 5. The owner refuses a change to a notebook it did not lock

@@ -10,8 +10,6 @@ and deletable in Web Donut.
 
 ## Taken
 
-- [Moves to another notebook reach both notebooks' Git](seeds/SEED-035-ai-workspace-supporting-files.md#story-24) — SEED-035#story-24 ([plan](quick/046-moves-to-another-notebook-reach-git/PLAN.md))
-
 ## Backlog list
 
 - [Link rewrites in other notebooks reach their Git](seeds/SEED-035-ai-workspace-supporting-files.md#story-25) — SEED-035#story-25
