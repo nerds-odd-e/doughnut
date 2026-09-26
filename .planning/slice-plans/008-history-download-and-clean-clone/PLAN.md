@@ -156,7 +156,11 @@ last-updated time and learning data alone).
 ### 4. The normalization runs once at startup
 
 Type: Behavior
-Status: planned
+Status: done — after-landing Development-stack check pending
+Accepted: `NoteLineEndingNormalizationOnStartup` (`@Profile("!test")`,
+default-ordered `ApplicationReadyEvent` listener; Flyway's startup migration
+already runs first at `HIGHEST_PRECEDENCE`) compiles and `*NoteLineEnding*`
+stays green. The live check below still owes key examples 1, 2 and 4.
 Proof: after landing, restart the Development stack (`pnpm dev:restart`)
 and run the after-landing measurement: notebook 1's history has one new
 `Normalize note line endings` commit, a fresh clone shows an empty
