@@ -90,7 +90,10 @@ the cross-notebook steps and the change capture are as this plan describes
 
 ### 1. Change capture records a move to another notebook as leaving and arriving
 Type: Structure
-Status: planned
+Status: done
+Accepted proof: the four named classes plus
+`NotebookGitWebFolderCrossNotebookMoveControllerTest` and
+`ProjectionChangeCaptureTest` green (7/6/5/6/2/1).
 Proof: existing behavior stays green:
 `NotebookGitDerivedTreeOracleControllerTest`,
 `NotebookGitDerivedFolderTreeOracleControllerTest`,
@@ -170,4 +173,11 @@ notebooks outside the changed set remain outside.
 
 ## Learnings
 
-None yet.
+- `AcceptedWebChangeService.apply(Set<Integer>, …)` opens one capture window
+  for the whole operation and commits each bound notebook from
+  `change.of(notebookId)`.
+- A moved row flushed again after its notebook change (a later title or folder
+  change in the same operation) is also recorded as updated in the new
+  notebook, next to its insertion, with a new-notebook previous path. If
+  slice 2 or 3 shows a wrong tree from this, skip the update when the row is
+  already inserted in that notebook.
