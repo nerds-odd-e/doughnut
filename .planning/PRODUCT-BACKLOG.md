@@ -10,8 +10,6 @@ and deletable in Web Donut.
 
 ## Taken
 
-- [Land on the containing folder from one place](quick/044-one-containing-location/PLAN.md)
-
 ## Backlog list
 
 - [Commit a finished slice while other slices are still in progress](seeds/SEED-043-commit-gate-checks-committed-changes.md#story-1) — SEED-043#story-1

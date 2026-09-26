@@ -6,6 +6,7 @@ import type {
   NoteUpdateTitleDto,
 } from "@generated/donut-backend-api"
 import { noteShowLocation } from "@/routes/noteShowLocation"
+import { containingLocationOf } from "@/routes/containingLocation"
 import { refreshSidebarStructuralListings } from "@/components/notes/sidebarStructuralRefresh"
 import { realmLeafFolder } from "@/components/notes/useNoteSidebarTree"
 import type { Router } from "vue-router"
@@ -35,13 +36,6 @@ export type TitleRenameReferenceHandling = NonNullable<
 
 function noteReferenceHandlingBody(options: NoteTrashOptions): NoteTrashDto {
   return { referenceHandling: options.referenceHandling }
-}
-
-/** Where a note's reader lands once the note itself is gone. */
-function containingLocation(notebookId: number, folderId: number | null) {
-  return folderId != null
-    ? { name: "folderPage", params: { notebookId, folderId } }
-    : { name: "notebookPage", params: { notebookId } }
 }
 
 export default class StoredApiCollection {
@@ -316,14 +310,13 @@ export default class StoredApiCollection {
     const trashedRealm = await trashNoteRequest(noteId, body)
     if (!trashedRealm) return
 
-    const notebookId = cachedRealm.notebookRealm.notebook.id
     const originalFolderId = realmLeafFolder(cachedRealm)?.id ?? null
     this.noteEditingHistory.trashNote(
       noteId,
       cachedRealm.note.noteTopology.title,
       originalFolderId
     )
-    await router.replace(containingLocation(notebookId, originalFolderId))
+    await router.replace(containingLocationOf(cachedRealm))
     this.storage.refreshNoteRealm(trashedRealm)
     refreshSidebarStructuralListings()
     return trashedRealm
@@ -340,12 +333,7 @@ export default class StoredApiCollection {
     if (!ok) return
 
     this.noteNoLongerExists(noteId)
-    await router.replace(
-      containingLocation(
-        cachedRealm.notebookRealm.notebook.id,
-        realmLeafFolder(cachedRealm)?.id ?? null
-      )
-    )
+    await router.replace(containingLocationOf(cachedRealm))
     refreshSidebarStructuralListings()
   }
 

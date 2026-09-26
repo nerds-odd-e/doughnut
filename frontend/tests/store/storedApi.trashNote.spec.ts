@@ -36,7 +36,10 @@ describe("storedApiCollection trash note", () => {
         realm: ReturnType<typeof makeMe.aNoteRealm.please>
       ) => ({
         name: "folderPage",
-        params: { notebookId: realm.notebookRealm.notebook.id, folderId: 901 },
+        params: {
+          notebookId: String(realm.notebookRealm.notebook.id),
+          folderId: "901",
+        },
       }),
       originalFolderId: 901,
     },
