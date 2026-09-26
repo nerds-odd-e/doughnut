@@ -20,8 +20,11 @@ name the user chose is refused when taken, a name Donut chooses is the first
 free one. Operations that rehome several entries check every destination
 before changing anything. Folder contents are removed or moved by code, never
 by a database cascade, so every removal passes the accepted-change capture and
-a forgotten one fails loudly. Evidence and affected work: SEED-035 story 11
-(owner decisions 2026-09-26); story 10 reuses the same rule.
+a forgotten one fails loudly (owner decisions 2026-09-26). Web placements
+follow it ([one set of names per folder](../docs/notebook-git-attachments.md#one-set-of-names-per-folder));
+remaining work: cross-notebook moves (SEED-035 story 10) and the `_trash`
+mirrored-folder lookup
+([quick/043](quick/043-trash-reuses-case-variant-folders/PLAN.md)).
 
 ## One format boundary
 

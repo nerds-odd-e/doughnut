@@ -37,7 +37,9 @@ web projection.
 Web rename, move within the notebook, trash and recovery carry a folder's files
 through the same folder placement. Dissolving a folder, or merging it into a
 same-named folder within the notebook, carries its files exactly as its notes:
-each file keeps its row and bytes and only its folder changes. Permanent folder
+each file keeps its row and bytes and only its folder changes. File references
+are not rewritten: a note outside the dissolved or merged folder whose `image:`
+points into it shows a broken picture afterwards. Permanent folder
 deletion removes its files. Moving a folder whose subtree contains a file to
 another notebook is refused without changing either the accepted tree or its
 projection. Notebook health counts a file as occupying its folder, so a folder

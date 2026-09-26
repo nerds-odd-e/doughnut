@@ -15,6 +15,7 @@ and deletable in Web Donut.
 
 ## Backlog list
 
+- [Trash reuses a case-variant folder in _trash](quick/043-trash-reuses-case-variant-folders/PLAN.md)
 - [A moved note keeps its picture](seeds/SEED-035-ai-workspace-supporting-files.md#story-23) — SEED-035#story-23
 - [Moves to another notebook reach both notebooks' Git](seeds/SEED-035-ai-workspace-supporting-files.md#story-24) — SEED-035#story-24
 - [Carry a folder's files along when it moves to another notebook](seeds/SEED-035-ai-workspace-supporting-files.md#story-10) — SEED-035#story-10
