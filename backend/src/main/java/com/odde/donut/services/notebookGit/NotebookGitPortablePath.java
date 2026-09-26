@@ -40,7 +40,7 @@ public final class NotebookGitPortablePath {
    * A single path segment that is not hidden: a leading dot would be hidden or reserved Git
    * metadata such as {@code .gitattributes}.
    */
-  static boolean isPlainFilename(String filename) {
+  public static boolean isPlainFilename(String filename) {
     return !filename.isEmpty() && !filename.contains("/") && !filename.startsWith(".");
   }
 

@@ -1,6 +1,6 @@
 # Dissolve and merge folders that contain files
 
-Status: **in progress** (Story Branch Mode, branch `story/dissolve-merge-folders-with-files`, claim `fb2b68dc1d`).
+Status: **all slices done** (Story Branch Mode, branch `story/dissolve-merge-folders-with-files`, claim `fb2b68dc1d`).
 Work item: **SEED-035#story-11**.
 Source: [refined story](../../seeds/SEED-035-ai-workspace-supporting-files.md#story-11)
 (owner decisions 2026-09-26).
@@ -268,7 +268,16 @@ database unique key stays as the last safety net.
 
 ### 9. Picture upload and Book files use the same set of names
 Type: Behavior
-Status: planned
+Status: done
+Accepted proof: `NoteControllerUploadNoteImageTests` (17, incl.
+`aNameTakenInTheNotesFolderIgnoringCaseIsRefusedAndNothingChanges`,
+`aNotebookWithoutAGitBindingRefusesTheUploadAndStoresNothing`),
+`NotebookBooksAttachNotebookFileControllerTest` (7, incl.
+`aNameTakenIgnoringCaseIsAlsoNumbered`), `*Upload*` (28), `*Book*` (127),
+`*Attachment*` (63), `*NotebookGit*` (432) pass. `NotebookRootFreeFilename`
+and both `takenPaths` are gone. The documented no-binding upload refusal, which
+the accepted-tree lookup used to enforce implicitly, is now explicit
+(`NotebookGitBindingMissing`, shared with bundle download and publish).
 Proof: `NoteControllerUploadNoteImageTests` — its four refusal cases stay green,
 plus `force.png` beside `Force.png` is refused.
 `NotebookBooksAttachNotebookFileControllerTest.aTakenNameIsNumberedAndTheExistingFileIsUntouched`

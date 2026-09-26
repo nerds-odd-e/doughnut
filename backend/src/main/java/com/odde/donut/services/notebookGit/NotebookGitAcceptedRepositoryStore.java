@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.sql.Connection;
 import java.sql.Timestamp;
-import java.util.function.Predicate;
 import javax.sql.DataSource;
 import org.eclipse.jgit.lib.ObjectId;
 import org.eclipse.jgit.lib.ObjectInserter;
@@ -109,16 +108,6 @@ class NotebookGitAcceptedRepositoryStore {
   byte[] downloadableBundle(NotebookGitBinding binding) {
     try (OpenedAcceptedRepository accepted = open(binding)) {
       return NotebookGitBundleWriter.write(accepted.repository());
-    }
-  }
-
-  /**
-   * Whether {@code binding}'s accepted tree has a file, note or folder at a path. The tree is read
-   * once, so the result can check many candidate paths.
-   */
-  Predicate<String> takenPaths(NotebookGitBinding binding) {
-    try (OpenedAcceptedRepository accepted = open(binding)) {
-      return NotebookGitAcceptedTree.takenPaths(accepted.repository(), accepted.head());
     }
   }
 }
