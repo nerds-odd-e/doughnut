@@ -64,7 +64,7 @@ including delivery, not commitments.
 
 **Identity:** SEED-046#story-5
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/006-web-edit-changes-only-edit/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"f658172ca79107b7e3666796491a3346f8ac5762b8cef65630a6a3fb75b57b5b","plan":"8bc0a3b8e34b39f6fa6e98dee0e6a17894804f59e1e1de6d84a03c4c51fedffe"}}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/006-web-edit-changes-only-edit/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"ad173d6e995ccaa48f13977ff9b0c52ad49ee318114d831d9496397aef096b21","plan":"8bc0a3b8e34b39f6fa6e98dee0e6a17894804f59e1e1de6d84a03c4c51fedffe"}}
 ```
 
 - **Goal:** Owners who edit a notebook both locally (often with an AI IDE) and
