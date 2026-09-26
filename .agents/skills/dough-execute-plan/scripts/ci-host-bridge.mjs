@@ -9,6 +9,20 @@ const defaultHook = fileURLToPath(
   new URL("./ci-host-hook.mjs", import.meta.url),
 );
 
+// Explicit session input is authoritative, metadata included. Without it, a
+// Claude Code coordinator is identified by its documented session variable
+// from the supplied environment; other hosts never use that variable.
+export function resolveHostSession({ host, session, env = process.env }) {
+  if (session !== undefined && session !== null) return session;
+  const claudeSession = host === "claude" && env?.CLAUDE_CODE_SESSION_ID;
+  return claudeSession ? { session_id: claudeSession } : session;
+}
+
+const missingIdentityReason = {
+  claude:
+    "Claude Code session identity is unavailable: CLAUDE_CODE_SESSION_ID is unset and no --session-json was supplied; run deliver from the coordinator's own Bash tool or pass --session-json with its session_id",
+};
+
 function hookInput(host, session, receipt = "") {
   return {
     session_id: session.session_id ?? session.conversation_id,
@@ -93,6 +107,7 @@ export async function verifyHostBridge({
     return {
       ready: false,
       reason:
+        missingIdentityReason[host] ??
         "host session identity is required to verify the notification bridge",
     };
   }

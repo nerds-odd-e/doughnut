@@ -17,6 +17,7 @@ import {
   pathOf,
   remoteOf,
   remoteRef,
+  sourceStopped,
   stopped,
   targetOf,
 } from "./workspace-publication-ownership.mjs";
@@ -154,9 +155,9 @@ export async function publishClaimSha(request) {
     }
     if (request.recheckSource) {
       try {
-        await request.recheckSource();
+        await request.recheckSource({ candidateSha: sha });
       } catch (error) {
-        return stopped("source-refused", {
+        return sourceStopped(error, {
           recovery: recoveryAt({ error: error.stderr || error.message }),
         });
       }

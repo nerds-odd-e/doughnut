@@ -1,4 +1,6 @@
-// Authoritative queued-start orchestration. The CLI adapter stays in execution-start.mjs.
+// Authoritative startup orchestration for queued work and for admission of
+// accepted work no backlog list holds yet. The CLI adapter stays in
+// execution-start.mjs.
 import { git, lsRemoteSha, revParse } from "./publication-git.mjs";
 import {
   maintenance,
@@ -10,14 +12,13 @@ import {
   retainedCandidate,
   sameSelectedSource,
 } from "./execution-start-recovery.mjs";
+import { existingClaim, startSource } from "./execution-start-source.mjs";
 import { acceptedReceipt } from "./execution-start-receipt.mjs";
-import { agentIdentity } from "../../dough-product-backlog/scripts/product-backlog-agent-profile.mjs";
 import { startRequest } from "./execution-start-request.mjs";
+import { selectAgent } from "./agent-assignments.mjs";
 import {
-  receiptAgent,
+  claimReceiptAgent,
   reselectClaimAgent,
-  resumeClaimAgent,
-  selectClaimAgent,
 } from "./execution-start-agent.mjs";
 import {
   commitWorkspaceClaim,
@@ -33,15 +34,18 @@ import {
   claimProvenance,
   isAncestor,
   remoteOf,
+  remoteRef,
+  sourceStopped,
   stopped,
 } from "./workspace-publication-ownership.mjs";
 
-export async function startQueuedExecution(requestInput) {
+export async function startExecution(requestInput) {
   const started = startRequest(requestInput);
   if (!started.ok) return started;
   const { request } = started;
   const remote = remoteOf(request);
-  const ref = `${remote}/${request.target}`;
+  const ref = remoteRef(request);
+  const source = startSource(request);
   let selectedSource, fetched, origin;
   try {
     origin = (
@@ -49,8 +53,8 @@ export async function startQueuedExecution(requestInput) {
     ).stdout.trim();
     await git(request.integration, "fetch", remote);
     fetched = await revParse(request.integration, ref);
-    selectedSource = await readPublishedExecutionSource(request, ref);
-    if (request.retained) {
+    selectedSource = await source.read(request, ref);
+    if (request.retained && !source.admitting) {
       const original = await readPublishedExecutionSource(
         request,
         request.retained.startingRevision,
@@ -61,13 +65,15 @@ export async function startQueuedExecution(requestInput) {
         );
     }
   } catch (error) {
-    return stopped("source-refused", { error: error.stderr || error.message });
+    return sourceStopped(error, { error: error.stderr || error.message });
   }
+  if (selectedSource.existing && !request.retained)
+    return existingClaim(request, ref, selectedSource);
+  // The rotation is read in the integration checkout, which fetched trunk.
+  const selection = { ...request, cwd: request.integration };
   let agent;
   if (!request.retained) {
-    const chosen = await selectClaimAgent(request, ref, backlogPath, {
-      fetched,
-    });
+    const chosen = await selectAgent(selection, ref, backlogPath, { fetched });
     if (!chosen.ok) return chosen;
     agent = chosen.agent;
   }
@@ -81,7 +87,7 @@ export async function startQueuedExecution(requestInput) {
   if (agent && selected.startingRevision !== fetched) {
     const { startingRevision: base, workspace, branch } = selected;
     const stop = { fetched, workspace, branch, ...stopMaintenance };
-    const chosen = await selectClaimAgent(request, base, backlogPath, stop);
+    const chosen = await selectAgent(selection, base, backlogPath, stop);
     if (!chosen.ok) return chosen;
     agent = chosen.agent;
   }
@@ -90,6 +96,7 @@ export async function startQueuedExecution(requestInput) {
     ...selected,
     origin,
     plan: selectedSource.planTarget,
+    admission: selectedSource.admission,
     backlogPath,
     candidateSha: request.retained?.candidateSha,
   };
@@ -117,14 +124,10 @@ export async function startQueuedExecution(requestInput) {
         publishedSha: checked.provenance.sha,
         candidateSha: request.retained.candidateSha,
         created: false,
-        ...(await receiptAgent(
-          selected.workspace,
-          await resumeClaimAgent(
-            selected.workspace,
-            checked.provenance.sha,
-            request.identity,
-            backlogPath,
-          ),
+        ...(await claimReceiptAgent(
+          claimRequest,
+          agent,
+          checked.provenance.sha,
         )),
       },
       beforeMaintenance,
@@ -161,20 +164,27 @@ export async function startQueuedExecution(requestInput) {
   const published = await publishClaimSha({
     ...claimRequest,
     candidateSha: committed.candidateSha,
-    async recheckSource() {
+    async recheckSource({ candidateSha }) {
       await git(request.integration, "fetch", remote);
-      const refreshed = await readPublishedExecutionSource(request, ref);
-      if (!sameSelectedSource(refreshed, selectedSource)) {
+      const refreshed = await source.read(request, ref, candidateSha);
+      if (source.changed(refreshed, selectedSource)) {
         throw new Error(
           "selected published source changed during claim publication",
         );
       }
+      // The candidate's admission, reconciled again onto newer trunk.
+      if (source.admitting) selectedSource = refreshed;
     },
     reselectClaim:
-      agent &&
-      reselectClaimAgent(claimRequest, agent, (next) => {
-        agent = next;
-      }),
+      (agent || source.admitting) &&
+      reselectClaimAgent(
+        claimRequest,
+        agent,
+        (next) => {
+          agent = next;
+        },
+        source.admitting && (() => selectedSource.admission),
+      ),
   });
   if (!published.ok)
     return {
@@ -208,15 +218,8 @@ export async function startQueuedExecution(requestInput) {
       !contained ||
       provenance?.publisher !== request.publisherId ||
       provenance?.identity !== request.identity
-    ) {
-      return stopped("unpublished", {
-        workspace: selected.workspace,
-        candidateSha: published.candidateSha,
-        recovery: recovery(request, selected, published.candidateSha),
-        ...stopMaintenance,
-        error: "remote containment or claim ownership is unconfirmed",
-      });
-    }
+    )
+      throw new Error("remote containment or claim ownership is unconfirmed");
     await publishStoryBranch(claimRequest, published.publishedSha);
   } catch (error) {
     return stopped("unpublished", {
@@ -235,17 +238,7 @@ export async function startQueuedExecution(requestInput) {
     {
       ...published,
       created: selected.created,
-      ...(await receiptAgent(
-        selected.workspace,
-        agent
-          ? agentIdentity(agent.name).agent
-          : await resumeClaimAgent(
-              selected.workspace,
-              published.publishedSha,
-              request.identity,
-              backlogPath,
-            ),
-      )),
+      ...(await claimReceiptAgent(claimRequest, agent, published.publishedSha)),
     },
     beforeMaintenance,
     afterMaintenance,

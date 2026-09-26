@@ -7,9 +7,10 @@ reference starts, keeps, and ends that assignment. It applies inside
 paths and target recorded in its
 [Select or reuse the workspace](preparation-workspace.md#select-or-reuse-the-workspace),
 and inside [decide, publish, or discard the written
-result](preparation-disposition.md). Run every command below from this
-project's installed `dough-story-refinement` skill directory (normally under
-`.agents/skills/` or `.claude/skills/`).
+result](preparation-disposition.md). In the commands below, `<installed>` is
+this project's installed `dough-story-refinement` skill directory (normally
+under `.agents/skills/` or `.claude/skills/`); each command names every
+checkout it acts on, so run it as written with that path.
 
 ## Announce the preparation assignment
 
@@ -61,15 +62,20 @@ Keep the receipt with this session and act on its `status`:
   abandon that preparation first.
   `agent-unavailable`: every name is held; report its `occupied` list (each
   profile's agent, story, activity, and allocation, or why a file is
-  unrecognized) so developers can see who holds what. Never remove, reclaim,
-  or wait out another developer's profile: its age, or no process running
-  for it on this machine, does not free it. `not-queued`: the story is not
-  queued on the fetched target.
+  unrecognized) so developers can see who holds what. Do not remove,
+  reclaim, or wait out a profile on your own judgment: its age, its silence,
+  no process running for it on this machine, or a missing workspace does not
+  free it. Only a developer's confirmation that one exact preparation
+  assignment is abandoned releases it, under
+  [Release a lost workspace's assignment](#release-a-lost-workspaces-assignment).
+  `not-queued`: the story is not queued on the fetched target.
 
 The workspace remembers which announcement is its own. Later `start`,
 `release`, and `abandon` commands identify the assignment from it, never from
 the agent name, story, or tool and model alone, so keep every later command
-for this assignment in the same workspace.
+for this assignment in the same workspace. If that workspace is lost before
+the assignment ends, see
+[Release a lost workspace's assignment](#release-a-lost-workspaces-assignment).
 
 An explicit developer instruction not to publish or commit means: do not run
 `start`; report that no Preparing assignment was published, so others cannot
@@ -103,6 +109,29 @@ it. The story stays queued, and its refinement, approach, and readiness are
 what the
 [preparation recorder](../../dough-product-backlog/references/record-preparation.md)
 wrote, never something the release implies.
+
+`story-left-queue` means another developer took, completed, or removed the
+story on the fetched target since this preparation began. Nothing was staged;
+the draft, the workspace's commits, and the assignment stay as they were.
+`story` says where it is now: `place: "taken"` with `owners`, the execution
+assignments naming it (agent, mode, branch), or `place: "absent"`. Do not
+land, retry until it passes, or reinterpret the story's new state, for example
+by re-queuing it, folding the draft into the new owner's work, or treating a
+completed story as kept. Report the receipt and hand the decision to the
+developer or coordinator; its `choices` make none of them:
+
+- `abandon`: end this assignment under
+  [Abandon the preparation](#abandon-the-preparation); the draft stays;
+- `discard`: discard the draft under
+  [Discard an identified draft](preparation-disposition.md#discard-an-identified-draft);
+- `separate-work`: take the draft's content up as separate work with the
+  story's current owner.
+
+Rerunning `release` without that decision gives the same stop. One limit
+remains: the story can still leave the queue after `release` succeeds and
+before the landing's push, because the landing reconciles with trunk without
+rechecking the queue. Report that plainly if it happens rather than undoing
+the landing yourself.
 
 When the landing stopped before the remote target accepted it, or its push
 ended without a clear answer, rerun `release`, which reads trunk again, before
@@ -153,6 +182,8 @@ and commits exactly as they were. The story stays queued. Act on `status`:
   as such, and rerun the same command when the remote is reachable; it rereads
   trunk and never ends anything twice.
 - `no-assignment`: this workspace holds no published assignment for the story.
+  When the workspace that announced it is gone, use
+  [Release a lost workspace's assignment](#release-a-lost-workspaces-assignment).
 
 Afterwards, the draft stays in the workspace for a later keep or discard
 decision. A keep then lands without an assignment: `release` reports
@@ -160,3 +191,60 @@ decision. A keep then lands without an assignment: `release` reports
 workspace. The workspace may be retired under
 [Close or retain the workspace](preparation-workspace.md#close-or-retain-the-workspace)
 once a disposition for its draft is confirmed.
+
+### Release a lost workspace's assignment
+
+When the workspace that announced a preparation assignment no longer exists,
+nothing can abandon it by workspace. Releasing it is then the developer's
+decision about one exact assignment: its profile path plus its allocation,
+the commit that added that profile. Apply this only when a developer asks to
+release such an assignment and publishing to the recorded target is
+authorized, as for the abandonment above. Only that developer's explicit
+confirmation that this exact assignment is abandoned releases it. Its age,
+its silence, no process running for it, a lost workspace, a full rotation, or
+your own inference is never that confirmation. Without it, report the
+assignment and leave it published.
+
+Read the assignment first. The allocation appears in an `agent-unavailable`
+receipt's `occupied` entry, in the `announced` receipt, or in this command's
+own refusal. Name the project's integration checkout (its established
+checkout for ordinary work, never another preparation workspace) and the
+authorized remote target; when either is unknown, ask rather than guess. Run,
+without confirmation:
+
+```text
+node <installed>/scripts/preparation-assignment.mjs abandon \
+  --integration <integration checkout> --profile <profile path> \
+  --remote <remote> --target <trunk branch> --push-authorized
+```
+
+`<profile path>` is the repository path a receipt reports as `profile`, such
+as `.planning/agents/yui-chan.json`. This publishes nothing and stops with
+`confirmation-required`, reporting the assignment trunk holds: `agent`,
+`identity` (the story), `activity`, and `allocation`. Show those to the
+developer and ask whether that exact assignment is abandoned. Only when they
+confirm it, rerun with `--allocation <allocation> --confirmed-abandoned`
+added, using the allocation from that receipt, never one you assume. Act on
+`status`:
+
+- `abandoned`: remote trunk accepted a commit at `publishedSha` that only
+  removes that profile. The story stays queued, and `refresh` reports the
+  integration checkout as for the announcement; that checkout's files,
+  index, and branch are otherwise untouched.
+- `already-released`: trunk had already ended that allocation (`endedBy`);
+  nothing was published. A `successor` is a later allocation of the same
+  name, possibly for the same story, and stays.
+- `allocation-mismatch`: trunk holds a different allocation at that profile
+  than the one supplied; nothing was published. The receipt reports the
+  current one. It is a different assignment, so it needs its own
+  confirmation.
+- `not-preparation`: the profile records execution, or is not a readable
+  preparation assignment; nothing was published. Only completing its Taken
+  story releases an execution assignment.
+- `unpublished` or `unconfirmed`: as for the abandonment above; rerun the
+  same confirmed command once the remote is reachable.
+- `no-assignment`: trunk holds no assignment at that profile that the
+  supplied allocation could have added; nothing was published.
+
+Any draft the lost workspace held is gone with it; this release decides
+nothing about content. Preparing the story again announces anew.

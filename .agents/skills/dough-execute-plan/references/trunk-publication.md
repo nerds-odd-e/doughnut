@@ -10,8 +10,8 @@ armed from the execution checkout against the authorized target branch.
 
 ## Publish a queue claim
 
-For queued Story Branch and Trunk Mode, [Take queued work](../SKILL.md#take-queued-work)
-uses the installed startup operation to publish and confirm the claim on remote
+For queued Story Branch and Trunk Mode, [Take queued work](../SKILL.md#take-queued-work),
+including [admission](admit-accepted-work.md) of accepted unlisted work, uses the installed startup operation to publish and confirm the claim on remote
 trunk before implementation. Retain the published SHA and recovery
 coordinates from its compact result and register that SHA after the observer
 is armed. Later environment preparation does
@@ -82,6 +82,17 @@ operation owns runtime resolution, observer establish/reuse, the
 sequence, and exact-revision registration. A claim uses the execution workspace
 selected before its commit; other publications retain theirs. Do not invent a
 second publication sequence or a manual `register-push` after managed delivery.
+
+Run `deliver` through the coordinator's own Bash or Shell tool so the observer
+belongs to the session that will receive CI events. On Claude Code,
+`--host claude` takes that coordinator's identity from its
+`CLAUDE_CODE_SESSION_ID`; do not probe, start, or build session JSON for it.
+An explicit `--session-json` stays authoritative when a caller must name a
+different owner, and malformed session JSON stops delivery instead of falling
+back to another identity. If no identity is available, the receipt reports an
+unobserved coverage gap naming the missing source while publication acceptance
+stands; the next `deliver` from the coordinator's own tool, or with its
+`--session-json`, attaches observation without a manual observer start.
 A pre-rebase unpublished SHA is not the receipt. After confirmation of a
 publication whose target is remote trunk, attempt a refresh under
 [Refresh eligibility](maintain-default-checkout.md#refresh-eligibility).

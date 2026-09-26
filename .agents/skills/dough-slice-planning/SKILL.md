@@ -34,30 +34,32 @@ story's goal, scope, or examples are unresolved. Use
 [dough-story-decomposition](../dough-story-decomposition/SKILL.md) when the
 parent problem, candidate selection, or story ordering is unresolved. Never
 turn a decomposition seed directly into an execution plan. An understood
-instruction may be the source without a story.
+instruction may be the source without a story. When its mission was
+[admitted](../dough-execute-plan/references/admit-accepted-work.md), plan that
+admitted story instead: the plan attaches to it, never to another story.
 
 For a correction handed off by
 [dough-execution-retrospective](../dough-execution-retrospective/SKILL.md#reconcile-findings-with-current-truth),
 use its evidenced current findings, one bounded correction outcome, affected
 concepts, preserved product promises and constraints, and evaluable proof as the
 planning input. Cite the original story and reviewed commits for provenance;
-do not invent a new feature story or require the correction to fit the old
+do not invent a feature promise or require the correction to fit the old
 story's implementation footprint. The retrospective owns current-truth checks,
 constraint disputes, and whether to amend an unfinished plan or create a
 follow-up. Missing correction scope or proof stops this planning path.
 
-Write the resulting correction plan with the authoritative correction input
-defined by
+For a new follow-up, write its minimal story and then its plan as
 [planning scope and lifecycle](../dough-story-refinement/references/planning.md#choose-the-planning-level)
-so later refinement and execution do not need a seed.
+defines; record preparation on that story. An amended plan or a plan-homed
+correction keeps its existing home and identity.
 
 ## Resolve execution context
 
 Before writing, identify from the user's instructions and this project's guidance:
 
 - the selected story and its seed, when one exists, the retrospective
-  correction input and its source execution, or the understood remaining-work
-  instruction and any retained execution identity;
+  correction input, its source execution, and the seed hosting its story, or
+  the understood remaining-work instruction and any retained execution identity;
 - the executable-plan root, filename layout, format additions, status
   vocabulary, and lifecycle;
 - any supplied slice target and hard limit, including their permitted

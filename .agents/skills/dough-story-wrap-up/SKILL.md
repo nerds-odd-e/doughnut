@@ -20,11 +20,11 @@ records, or a requirement for another conversation.
 
 ## Resolve this project's context
 
-Require one selected work identity. Use a canonical feature story only when it
-is explicitly supplied as that work's active home. Otherwise use the bounded
-correction plan itself when it satisfies the correction-input contract defined by
-[planning scope and lifecycle](../dough-story-refinement/references/planning.md#choose-the-planning-level).
-Do not require or create a seed for that correction. When the source is neither
+Require one selected work identity. Use a canonical story — a feature story, or
+a correction's minimal story linked to its plan — when it is that work's active
+home. A plan-homed correction uses its plan when it satisfies the correction-input
+contract in [planning scope and lifecycle](../dough-story-refinement/references/planning.md#choose-the-planning-level);
+do not require or create a seed for it. When the source is neither
 a story nor a correction plan, use a contextual instruction with retained
 execution identity, changes, and proof; do not require or create a story, plan,
 or queue entry. Name any missing required field, leave the affected work intact,
@@ -62,8 +62,8 @@ action instead of reconstructing or guessing it after plan deletion.
 Judge completion from the selected work and available execution evidence.
 
 - Planned work is complete when every slice is done.
-- Planless work is complete when the supplied story or instruction, changes, and
-  execution results show the promised outcome, including evidenced no-change.
+- Work without a plan, including an investigation whose approach stayed unselected, is
+  complete when its story or instruction, changes, and execution results show the promised outcome, including evidenced no-change.
 - Incomplete implementation leaves the affected active work intact. Report the
   unfinished implementation and stop. Do not delete an unfinished correction
   plan to manufacture a wrap-up.
@@ -94,10 +94,10 @@ retrospective advice is absent.
 
 Resolve one canonical active home under [dough-product-backlog](../dough-product-backlog/SKILL.md#canonical-active-homes):
 
-- If a canonical follow-up story is supplied, keep that story in its seed and
-  link the plan there. Queue the story; do not duplicate it as a plan entry.
-- Otherwise queue the existing correction plan directly. The plan is its
-  canonical active home; do not create or recover a seed solely for queueing.
+- Queue a follow-up's story, which every new correction has, under its
+  identity with the plan linked in its seed; do not also queue the plan.
+- Queue a plan-homed follow-up through its plan, its canonical active home; do
+  not create or recover a seed for it.
 - If required correction input is missing, name the missing field and do not
   guess or queue the addition. Keep the follow-up plan and any other needed
   active-work context, report the gap, and stop before deleting the completed
@@ -116,7 +116,7 @@ conversation, as in a fresh session, use the plan's recorded product advice; a
 recorded skip is a skipped review. Explicit human input wins over either advice.
 
 Supported changes: relevant reorder, queue membership, understood new-story
-addition, understood bounded-correction plan addition, and canonical-detail
+addition, understood bounded-correction addition, and canonical-detail
 edits. Apply the backlog skill's canonical-home admission rules to every new
 entry. Keep existing follow-up work first unless a later explicit human
 instruction changes that priority. Preserve unrelated content, still-needed

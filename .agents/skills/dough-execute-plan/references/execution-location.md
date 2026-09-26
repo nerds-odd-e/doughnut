@@ -9,8 +9,9 @@ current branch instead. Story Branch and Trunk Mode select or reuse the owned
 workspace and publish the claim through that installed startup operation.
 Caller-selected current-branch
 work commits its claim on the current checkout, which is never published.
-When no claim applies, including authorized contextual planless work,
-use verified current HEAD and create no story, plan, or queue entry; still
+An accepted independent mission, including contextual planless work, is
+[admitted](admit-accepted-work.md) through that same startup operation.
+When no claim applies, use verified current HEAD and create no story, plan, or queue entry; still
 create the local execution workspace from that HEAD unless the caller selected
 the current branch. When that HEAD is the default checkout, verify it first under
 [Refresh eligibility](maintain-default-checkout.md#refresh-eligibility).
@@ -28,7 +29,7 @@ base it supplies:
   with the accepted claim SHA and recovery coordinates for the workspace you
   supplied. A conflicting or ambiguous claim stops
   implementation; identical **Taken** text alone proves no ownership.
-- Contextual planless work with no claim supplies verified current HEAD, after
+- Work with no claim to publish supplies verified current HEAD, after
   the default-checkout freshness check above when that HEAD is the default
   checkout. Create no story, plan, or queue entry.
 - Caller-selected current-branch work records that checkout and creates no

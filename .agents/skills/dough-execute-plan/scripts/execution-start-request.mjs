@@ -1,4 +1,5 @@
-// Validates and normalizes a queued-start request before any Git work.
+// Validates and normalizes a queued-start or admission request before any
+// Git work.
 import { resolve } from "node:path";
 import {
   agentModes,
@@ -37,6 +38,12 @@ export function startRequest(requestInput) {
       candidateSha: request.candidateSha,
     };
   }
+  if (request.admit === true)
+    for (const field of ["link", "title"])
+      if (!request[field])
+        return stopped("invalid-request", {
+          error: `admission requires ${field}`,
+        });
   const reportError = agentReportError(request);
   if (reportError) return stopped("invalid-request", { error: reportError });
   if (

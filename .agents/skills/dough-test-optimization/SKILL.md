@@ -26,6 +26,14 @@ Default mode profiles, plans, experiments, and re-profiles. A profile-only reque
 ends with findings. For `--resolve`, follow only
 [candidate resolution](references/resolving-candidates.md).
 
+An independently requested pass in any mode is an accepted mission:
+[admit it](../dough-execute-plan/references/admit-accepted-work.md) before
+profiling or triage, with its story in a relevant existing seed when one fits
+and approach `unselected`. A pass requested as a step of an active story
+continues under that story. Findings with no worthwhile change, in profiling
+or resolve-only triage,
+[finish the mission](../dough-execute-plan/references/admit-accepted-work.md#finish-the-mission).
+
 Before assessing tests, read the shared
 [behavioral test guidance](../dough-post-change-refactor/references/refactor-checks.md#tests-as-behavioral-documentation).
 Apply it across the authorized optimization scope, not just the current diff.
@@ -72,6 +80,12 @@ removed cases, and focused verification/timing command. Include final re-profili
 
 In resolve-only mode, reuse recorded evidence and plan any missing baseline as a
 prerequisite for later execution; do not run it now.
+
+For an admitted pass, this plan attaches to the same story: record and publish
+its preparation and continue that claim as
+[continue into implementation](../dough-execute-plan/references/admit-accepted-work.md#continue-into-implementation)
+describes. This changes neither this skill's measurement rules nor whether a
+created plan continues into execution.
 
 ## Experiment, learn, and reassess
 

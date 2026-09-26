@@ -9,8 +9,11 @@ import { git } from "./publication-git.mjs";
 
 export const backlogPath = ".planning/PRODUCT-BACKLOG.md";
 
-export function claimCommitMessage(identity, publisherId) {
-  return `Take queued work: ${identity}\n\nClaim-Identity: ${identity}\nClaim-Publisher: ${publisherId}\n`;
+// An admission claims accepted work that was never queued; its trailers are
+// the same, so ownership is read the same way.
+export function claimCommitMessage(identity, publisherId, admitted = false) {
+  const subject = admitted ? "Admit accepted work" : "Take queued work";
+  return `${subject}: ${identity}\n\nClaim-Identity: ${identity}\nClaim-Publisher: ${publisherId}\n`;
 }
 
 export function trailers(message) {
@@ -91,4 +94,14 @@ export const pathOf = (request) => request.backlogPath ?? backlogPath;
 
 export function stopped(status, fields) {
   return { ok: false, status, implemented: false, ...fields };
+}
+
+// A stop for a source read that refused the selected work: the error names
+// its own stop status and fields, such as a reconciliation conflict, or is
+// an ordinary source refusal.
+export function sourceStopped(error, fields) {
+  return stopped(error.status ?? "source-refused", {
+    ...error.fields,
+    ...fields,
+  });
 }

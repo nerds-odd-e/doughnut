@@ -68,7 +68,7 @@ export function agentIdentity(name) {
 
 // The rotation name whose agent (as a profile or Git author spells it, such as
 // "Yui-chan") is `agent`, or undefined when `agent` is not in the rotation.
-export function agentNameOf(agent) {
+function agentNameOf(agent) {
   return agentNames.find((name) => agentIdentity(name).agent === agent);
 }
 

@@ -7,9 +7,12 @@ uses it. Do not restate a competing allocation rule elsewhere.
 ## The contract
 
 1. **A work item has exactly one identity, allocated once.** Take it from the
-   work item's canonical home: a feature story's seed ID with the story's
-   anchor, or a bounded correction's plan path when the project has no story
-   for it. Never invent a number, keep a registry, or renumber.
+   work item's canonical home: a story's seed ID with the story's anchor,
+   including a new correction's story. A correction whose plan was already its
+   home keeps the plan-path identity it recorded. Never give new work a
+   plan-path identity to replace later, invent a number, keep a registry, or
+   renumber. A story's plan records that story's identity and is never listed
+   as work of its own.
 2. **The identity is recorded, not derived.** Record it in the canonical home
    and write it in the backlog entry in full, beside the link. An entry that
    records nothing is still identified by the link it carries, until its
@@ -32,7 +35,7 @@ uses it. Do not restate a competing allocation rule elsewhere.
 
 The identity and the plan link are each written only when the work item has
 one. Omit the identity when the link already spells it exactly, which is the
-ordinary case for a bounded correction still living at the path it was
+ordinary case for a plan-homed correction still living at the path it was
 identified by.
 
 An older entry may carry only a seed ID where the identity now goes. It still

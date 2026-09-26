@@ -28,6 +28,12 @@ needed; do not guess credentials.
 If oracle, budget, or needed environment or access is missing, name it and
 stop; do not invent them.
 
+A standalone session the developer accepts is a mission:
+[admit it](../dough-execute-plan/references/admit-accepted-work.md) before
+setup or exploration, approach `unselected`. Observation required by an active
+plan slice or story continues under that story. Admission changes none of the
+testing-only limits here.
+
 ## Plan
 
 Before acting, list coverage areas and journeys, risks or questions, and
@@ -72,4 +78,6 @@ root-cause, or permanent test changes.
 
 On normal completion, close a session-created workspace through the shared
 [exploration workspace lifecycle](references/exploration-workspace.md). It owns
-safe cleanup and exact retention when cleanup is unsafe.
+safe cleanup and exact retention when cleanup is unsafe. An admitted session,
+including one reporting `Good.`, then follows
+[finish the mission](../dough-execute-plan/references/admit-accepted-work.md#finish-the-mission).

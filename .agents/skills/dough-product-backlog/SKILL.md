@@ -12,8 +12,8 @@ Before editing, identify from human instructions or repository guidance:
 - Repository root and canonical backlog path.
 - Canonical seed locations, seed IDs, and heading or stable-anchor conventions
   when feature-story entries are affected.
-- Canonical executable-plan locations for bounded-correction entries or taken
-  planned stories when they are affected.
+- Canonical executable-plan locations for plan-homed correction entries or
+  taken planned stories when they are affected.
 - [Work item identity](references/identity.md), which is the single contract
   for what identifies an entry and what only navigates to it.
 - [Record preparation facts](references/record-preparation.md), when
@@ -26,7 +26,7 @@ Before editing, identify from human instructions or repository guidance:
 
 If the backlog or the canonical home required by an affected entry cannot be
 identified, ask for the missing context and stop before editing. Do not require
-seed conventions when every affected entry is a bounded correction plan. If a
+seed conventions when every affected entry is a plan-homed correction. If a
 required workflow is unavailable, stop that activity and ask for its guidance.
 
 ## File layout
@@ -39,9 +39,9 @@ required workflow is unavailable, stop that activity and ask for its guidance.
   newly taken entry.
 - In **Taken** and **Backlog list**, include only each exact work title linked to
   its canonical active home and its recorded identity, as
-  [work item identity](references/identity.md) defines them. A bounded
-  correction without a supplied story links directly to its existing plan.
-  Taken planned stories also link directly to their slice plans. Keep details,
+  [work item identity](references/identity.md) defines them. A plan-homed
+  correction links directly to its existing plan. Taken planned stories,
+  including correction stories, also link directly to their slice plans. Keep details,
   estimates, dependencies, and status in the canonical home.
 - Select work for the backlog list; do not inventory every candidate or turn
   the list into a roadmap or execution plan.
@@ -61,13 +61,15 @@ required workflow is unavailable, stop that activity and ask for its guidance.
 ## Canonical active homes
 
 - Keep a feature story in one canonical section within its seed.
-- Keep a bounded retrospective correction in its existing plan when no
-  canonical story is supplied. Do not create or recover a seed solely to queue
-  it. Require the plan to satisfy the correction-input contract in
+- A new bounded retrospective correction's canonical home is its minimal
+  story, linked to its plan, under the correction-input contract in
   [planning scope and lifecycle](../dough-story-refinement/references/planning.md#choose-the-planning-level).
-- When a canonical story is supplied for planned work, queue that story and link
-  its plan there. Do not also queue the plan. Treat references to either home as
-  the same work when checking repetition and duplicates.
+- A correction whose plan was already its canonical home stays there under its
+  recorded identity. Do not migrate it or create a seed to queue it.
+- For planned work with a story, queue that story and link its plan there. Do
+  not also queue the plan. Treat references to either home as the same work
+  when checking repetition and duplicates; `add` and `take` refuse a plan
+  listed as separate work.
 
 ## Maintain the backlog list
 
@@ -84,8 +86,9 @@ required workflow is unavailable, stop that activity and ask for its guidance.
 - Add a feature story only with a named beneficiary and evaluable outcome. If
   either is unresolved, use this project's decomposition workflow and route
   selected-story detail to refinement, then slice planning. Add a bounded
-  correction only when its plan satisfies the correction-input contract above;
-  otherwise name the missing field and leave the plan and queue unchanged. Do
+  correction only when its story and plan, or its plan-homed record, satisfy the
+  correction-input contract above; otherwise name the missing field and leave
+  the story, plan, and queue unchanged. Do
   not use decomposition to fabricate a story. Carry the direction into
   applicable workflows as the primary input for scope decisions.
 - Place unfinished prerequisites before dependent work. If this conflicts with
@@ -105,7 +108,7 @@ for readiness; Take and resume neither record nor infer it.
 
 Preserve the title, canonical link, and identity. A planned story requires its
 resolvable slice-plan link, including on resume. Quick stories need no plan;
-corrections need no duplicate plan link.
+plan-homed corrections need no duplicate plan link.
 
 Move the entry to the end of **Taken** once. On resume, do not duplicate or
 reorder it. Refuse an absent or ambiguous entry instead of fabricating one.

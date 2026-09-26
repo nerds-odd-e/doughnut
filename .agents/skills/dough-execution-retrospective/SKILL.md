@@ -50,7 +50,7 @@ Resolve project navigation, focused tests, cleanup lifecycle, relevant plan/stor
 statuses, and direction; backlog conventions only for dependent product recommendations.
 Missing decision-relevant context stops that path with a named gap, not invented conventions.
 Preserve worktree changes. Separate report artifacts require a request; allowed writes are
-correction plans and process recording below. A complete correction plan needs no seed.
+correction plans, a new correction's minimal story, and process recording below.
 Quick inputs follow the recovery rules below.
 
 ### Write only in an owned checkout
@@ -61,7 +61,7 @@ completion commit. Otherwise, immediately before the first write, select or reus
 [prepare records in an owned workspace](../dough-story-refinement/references/preparation-workspace.md),
 write there, and report the written result's pending disposition. Do not write in the checkout the review
 started from unless it is that supplied execution checkout. A review that writes nothing creates no
-workspace. Resolve the process-log path and correction-plan location in the chosen checkout.
+workspace. Resolve the process-log path and correction story and plan locations in the chosen checkout.
 
 Before residue assessment, read [refactoring](../dough-post-change-refactor/SKILL.md) and its
 checks; use the smell definitions on the aggregate result without editing. For needed correction
@@ -152,12 +152,15 @@ require replacement unit coverage before narrowing/removing E2E tests. Plan clea
   Original unfinished work is not yet a completed-execution correction; reconstruct no plan or
   create a correction destination until the completed execution boundary is established.
 - **Completed execution:** create one follow-up through slice planning in the established location:
+  its minimal story in a suitable seed, linked to the plan under the
+  [correction input](../dough-story-refinement/references/planning.md#choose-the-planning-level);
   original contract/manifest as provenance; current findings as scope/evidence; bounded outcome,
   concepts, impact, preserved behavior, and focused proof. Keep historical promises/attribution intact.
   Changing promises/constraints or findings that cannot form one bounded correction need user decision.
 
 Only the designated writer changes the plan when two authorized reviews cover one execution;
-the other returns evidence. Continue enabled reviews; a separate request executes the correction, and [dough-execute-plan](../dough-execute-plan/SKILL.md) publishes it through [increment and repair publication](../dough-execute-plan/references/trunk-publication.md#publish-an-execution-increment-or-repair). This review does not publish.
+the other returns evidence. Continue enabled reviews; writing the follow-up neither queues nor
+authorizes it; a separate request executes the correction, and [dough-execute-plan](../dough-execute-plan/SKILL.md) publishes it through [increment and repair publication](../dough-execute-plan/references/trunk-publication.md#publish-an-execution-increment-or-repair). This review does not publish.
 
 ## Review process only from a real record
 
@@ -199,8 +202,9 @@ Leave disputed goals/scope, conflicting priorities, and unknown beneficiaries/ou
 
 Report work identity/completion, provenance, manifest/boundary, impact-ordered findings or `none`,
 and evidence limits. Classify planning as amended, new, read-only, unchanged, or unavailable pending
-execution-boundary evidence. Report enabled process proposals and product advice/reasoned no-change;
-unresolved process selection reports its error only. Distinguish evidence from hypotheses and
+execution-boundary evidence, with a new follow-up's story and plan links. Report enabled
+process proposals and product advice/reasoned no-change; unresolved process selection reports
+its error only. Distinguish evidence from hypotheses and
 recommendations from proposals/unresolved choices. When CI is pending, report its retained target
 and revision as pending and make no success claim. End with
 `## EXECUTION RETROSPECTIVE COMPLETE`; this marker completes review, not the
