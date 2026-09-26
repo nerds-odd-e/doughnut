@@ -1,33 +1,16 @@
-import {
-  MemoryTrackerController,
-  NoteController,
-  TextContentController,
-} from "@generated/donut-backend-api/sdk.gen"
+import { TextContentController } from "@generated/donut-backend-api/sdk.gen"
 import NoteEditableContent from "@/components/notes/core/NoteEditableContent.vue"
-import type { UpdateNoteContentData } from "@generated/donut-backend-api"
 import usePopups from "@/components/commons/Popups/usePopups"
 import { flushPromises, type VueWrapper } from "@vue/test-utils"
 import type { ComponentPublicInstance } from "vue"
 import type Quill from "quill"
 import type { Range as QuillRange } from "quill"
 import makeMe from "donut-test-fixtures/makeMe"
-import helper, { mockSdkService, wrapSdkResponse } from "@tests/helpers"
+import helper, { mockSdkService } from "@tests/helpers"
 import { vi } from "vitest"
 
-export const markdownTextareaDefaults = {
-  readonly: false,
-  asMarkdown: true,
-  wikiLinks: [] as string[],
-}
-
-export const trackedPropertyNoteId = 42
-export const trackedPropertyMarkdown = `---
-topic: training
----
-
-Workshop body.`
-
-export function mountNoteEditableContent(
+/** Mounts an editable note (Markdown mode unless overridden) and lets it settle. */
+export async function mountNoteEditableContent(
   props: {
     noteId: number
     noteContent?: string
@@ -35,23 +18,14 @@ export function mountNoteEditableContent(
     asMarkdown?: boolean
     wikiLinks?: string[]
   },
-  options?: { attachTo?: HTMLElement }
+  options: { attachTo?: HTMLElement } = {}
 ) {
-  const chain = helper
+  const wrapper = helper
     .component(NoteEditableContent)
     .withCleanStorage()
     .withRouter()
-    .withProps({ ...markdownTextareaDefaults, ...props })
-  return options?.attachTo
-    ? chain.mount({ attachTo: options.attachTo })
-    : chain.mount()
-}
-
-export async function mountMarkdownTextarea(props: {
-  noteId: number
-  noteContent: string
-}) {
-  const wrapper = mountNoteEditableContent(props)
+    .withProps({ readonly: false, asMarkdown: true, wikiLinks: [], ...props })
+    .mount(options)
   await flushPromises()
   return wrapper
 }
@@ -78,20 +52,52 @@ export async function blurTextarea(
   await flushPromises()
 }
 
-export function createClipboardEvent(
+/** Dispatches a real textarea paste of `html` (and optional `text/plain`). */
+export async function pasteIntoTextarea(
+  textarea: HTMLTextAreaElement,
   html: string,
   plainText?: string
-): ClipboardEvent {
-  const event = new ClipboardEvent("paste", {
-    bubbles: true,
-    cancelable: true,
-    clipboardData: new DataTransfer(),
-  })
-  event.clipboardData?.setData("text/html", html)
-  if (plainText !== undefined) {
-    event.clipboardData?.setData("text/plain", plainText)
-  }
-  return event
+) {
+  const clipboardData = new DataTransfer()
+  clipboardData.setData("text/html", html)
+  if (plainText !== undefined) clipboardData.setData("text/plain", plainText)
+  textarea.dispatchEvent(
+    new ClipboardEvent("paste", {
+      bubbles: true,
+      cancelable: true,
+      clipboardData,
+    })
+  )
+  await flushPromises()
+}
+
+/** Mounts note 1 in Markdown mode, selects `selection` (default: the end),
+ * and pastes into its textarea. */
+export async function mountAndPaste(
+  noteContent: string,
+  html: string,
+  options: { plainText?: string; selection?: [number, number] } = {}
+) {
+  const wrapper = await mountNoteEditableContent(
+    { noteId: 1, noteContent },
+    { attachTo: document.body }
+  )
+  const textarea = textareaEl(wrapper)
+  if (options.selection) textarea.setSelectionRange(...options.selection)
+  await pasteIntoTextarea(textarea, html, options.plainText)
+  return { wrapper, textarea }
+}
+
+export function choiceShown(wrapper: VueWrapper<ComponentPublicInstance>) {
+  return wrapper.find('[data-testid="paste-choice"]').exists()
+}
+
+/** Applies the pending paste choice's "Use original text" action. */
+export async function useOriginalText(
+  wrapper: VueWrapper<ComponentPublicInstance>
+) {
+  await wrapper.find('[data-testid="paste-choice-action"]').trigger("click")
+  await flushPromises()
 }
 
 export function richQuillEditorEl(
@@ -153,15 +159,6 @@ export async function dispatchRichPaste(
   getSelectionSpy.mockRestore()
 }
 
-export function emitRichEditorPasteComplete(
-  wrapper: VueWrapper<ComponentPublicInstance>,
-  newContent: string
-) {
-  const richEditor = wrapper.findComponent({ name: "RichMarkdownEditor" })
-  richEditor.vm.$emit("update:modelValue", newContent)
-  richEditor.vm.$emit("pasteComplete", newContent)
-}
-
 export function setupUpdateNoteContentMock() {
   return mockSdkService(
     TextContentController,
@@ -187,60 +184,4 @@ export function setupPopupsMock(
       peek: vi.fn(),
     },
   })
-}
-
-export function setupMemoryTrackerSdkMocks() {
-  const getNoteInfoSpy = mockSdkService(NoteController, "getNoteInfo", {
-    memoryTrackers: [],
-  })
-  const deleteSpy = mockSdkService(MemoryTrackerController, "delete", undefined)
-  const updatePropertyKeySpy = mockSdkService(
-    MemoryTrackerController,
-    "updatePropertyKey",
-    undefined
-  )
-  return { getNoteInfoSpy, deleteSpy, updatePropertyKeySpy }
-}
-
-export function mockNoteInfoWithPropertyTracker(
-  getNoteInfoSpy: ReturnType<typeof mockSdkService>,
-  key: string,
-  id: number
-) {
-  const tracker = makeMe.aMemoryTracker.id(id).withPropertyKey(key).please()
-  getNoteInfoSpy.mockResolvedValue(
-    wrapSdkResponse(makeMe.aNoteRecallInfo.memoryTrackers([tracker]).please())
-  )
-  return tracker
-}
-
-export function mockDelayedFirstSave(
-  updateNoteContentSpy: ReturnType<typeof mockSdkService>,
-  noteId: number
-) {
-  let resolveFirstSave: (() => void) | undefined
-  const firstSavePromise = new Promise<void>((resolve) => {
-    resolveFirstSave = resolve
-  })
-
-  updateNoteContentSpy.mockImplementation((async (
-    options: UpdateNoteContentData
-  ) => {
-    if (options.body?.content === "First edit") {
-      await firstSavePromise
-    }
-    return wrapSdkResponse({
-      id: noteId,
-      note: {
-        id: noteId,
-        content: options.body?.content,
-        noteTopology: { id: noteId, title: "Test Note" },
-      },
-    })
-    // biome-ignore lint/suspicious/noExplicitAny: Vitest mock typing requires any for implementation functions
-  }) as any)
-
-  return () => {
-    resolveFirstSave!()
-  }
 }

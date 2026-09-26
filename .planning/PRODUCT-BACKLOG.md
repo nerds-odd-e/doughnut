@@ -10,7 +10,6 @@ and deletable in Web Donut.
 
 ## Taken
 
-- [Run frontend unit tests faster through cohesive test design](seeds/SEED-039-faster-ci-feedback.md#story-4) — SEED-039#story-4 ([plan](quick/041-faster-frontend-unit-tests/PLAN.md))
 - [Delete unwanted supporting files from Web Donut](seeds/SEED-035-ai-workspace-supporting-files.md#story-2) — SEED-035#story-2 ([plan](quick/035-delete-notebook-file-on-web/PLAN.md))
 
 ## Backlog list

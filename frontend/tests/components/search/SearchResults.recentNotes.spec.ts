@@ -11,33 +11,39 @@ import {
   searchResult,
   setupDelayedSearchMocks,
   setupSearchMocks,
+  setupSearchResultsTests,
   waitForDebounce,
 } from "./searchResultsTestSupport"
 
+setupSearchResultsTests()
+
 describe("SearchResults recent notes", () => {
-  it("shows recently updated notes when search key is empty", async () => {
-    const getRecentNotesSpy = mockSdkService(
-      NoteController,
-      "getRecentNotes",
-      recentNotes
-    )
-    setupSearchMocks()
+  it.each([
+    { context: "standalone search", props: { isDropdown: false } },
+    {
+      context: "relationship target search with noteId",
+      props: { isDropdown: true, noteId: 999 },
+    },
+  ])(
+    "loads recently updated notes once on mount for $context",
+    async ({ props }) => {
+      const getRecentNotesSpy = mockSdkService(
+        NoteController,
+        "getRecentNotes",
+        recentNotes
+      )
 
-    const wrapper = mountSearchResults({
-      inputSearchKey: "",
-      isDropdown: false,
-    })
-    await flushPromises()
+      const wrapper = mountSearchResults({ inputSearchKey: "", ...props })
+      await flushPromises()
 
-    expect(getRecentNotesSpy).toHaveBeenCalled()
-    expect(wrapper.text()).toContain("Recently updated notes")
-    expect(wrapper.text()).toContain("Recent Note 1")
-    expect(wrapper.text()).toContain("Recent Note 2")
-  })
+      expect(getRecentNotesSpy).toHaveBeenCalledTimes(1)
+      expect(wrapper.text()).toContain("Recently updated notes")
+      expect(wrapper.text()).toContain("Recent Note 1")
+      expect(wrapper.text()).toContain("Recent Note 2")
+    }
+  )
 
   it("shows empty message when no recent notes available with noteId", async () => {
-    mockSdkService(NoteController, "getRecentNotes", [])
-
     const wrapper = mountSearchResults({
       inputSearchKey: "",
       noteId: 1,
@@ -48,43 +54,54 @@ describe("SearchResults recent notes", () => {
     expect(wrapper.text()).toContain("No recent notes found.")
   })
 
-  it("shows 'Search result' title when search completes (even if empty)", async () => {
-    vi.useFakeTimers()
-    setupSearchMocks()
+  it("excludes current node from recent notes", async () => {
+    const recentNotesWithCurrent: NoteSearchResult[] = [
+      makeMe.aNoteSearchResult
+        .id(999)
+        .title("Current Note")
+        .distance(null)
+        .please(),
+      ...recentNotes,
+    ]
+    mockSdkService(NoteController, "getRecentNotes", recentNotesWithCurrent)
 
     const wrapper = mountSearchResults({
-      inputSearchKey: "test",
-      isDropdown: false,
+      inputSearchKey: "",
+      noteId: 999,
+      isDropdown: true,
     })
-    await waitForDebounce()
+    await flushPromises()
 
-    expect(wrapper.text()).toContain("Search result")
-    expect(wrapper.text()).toContain("No matching notes found.")
-    expect(wrapper.text()).not.toContain("Recently updated notes")
-
-    vi.useRealTimers()
+    expect(wrapper.text()).toContain("Recent Note 1")
+    expect(wrapper.text()).not.toContain("Current Note")
   })
 
-  it("shows 'Search result' title when results are found", async () => {
-    vi.useFakeTimers()
-    setupSearchMocks([searchResult(3, "Search Result")])
-    mockSdkService(NoteController, "getRecentNotes", [])
+  it.each([
+    { found: "nothing", results: [], shows: "No matching notes found." },
+    {
+      found: "results",
+      results: [searchResult(3, "Search Result")],
+      shows: "Search Result",
+    },
+  ])(
+    "replaces recent notes with the 'Search result' title when search finds $found",
+    async ({ results, shows }) => {
+      setupSearchMocks(results)
+      mockSdkService(NoteController, "getRecentNotes", recentNotes)
 
-    const wrapper = mountSearchResults({
-      inputSearchKey: "test",
-      isDropdown: false,
-    })
-    await waitForDebounce()
+      const wrapper = mountSearchResults({
+        inputSearchKey: "test",
+        isDropdown: false,
+      })
+      await waitForDebounce()
 
-    expect(wrapper.text()).toContain("Search result")
-    expect(wrapper.text()).toContain("Search Result")
-    expect(wrapper.text()).not.toContain("Recently updated notes")
-
-    vi.useRealTimers()
-  })
+      expect(wrapper.text()).toContain("Search result")
+      expect(wrapper.text()).toContain(shows)
+      expect(wrapper.text()).not.toContain("Recently updated notes")
+    }
+  )
 
   it("shows recent notes while waiting for first search", async () => {
-    vi.useFakeTimers()
     setupDelayedSearchMocks()
     mockSdkService(NoteController, "getRecentNotes", recentNotes)
 
@@ -103,46 +120,9 @@ describe("SearchResults recent notes", () => {
     expect(wrapper.text()).toContain("Recently updated notes")
     expect(wrapper.text()).toContain("Recent Note 1")
     expect(wrapper.text()).not.toContain("Search result")
-
-    vi.useRealTimers()
-  })
-
-  it("calls getRecentNotes only once on mount", async () => {
-    const getRecentNotesSpy = mockSdkService(
-      NoteController,
-      "getRecentNotes",
-      recentNotes
-    )
-    setupSearchMocks()
-    getRecentNotesSpy.mockClear()
-
-    mountSearchResults({ inputSearchKey: "", isDropdown: false })
-    await flushPromises()
-
-    expect(getRecentNotesSpy).toHaveBeenCalledTimes(1)
-  })
-
-  it("calls getRecentNotes only once on mount when isDropdown is true and noteId is set (like in NoteNewForm)", async () => {
-    const getRecentNotesSpy = mockSdkService(
-      NoteController,
-      "getRecentNotes",
-      recentNotes
-    )
-    setupSearchMocks()
-    getRecentNotesSpy.mockClear()
-
-    mountSearchResults({
-      inputSearchKey: "",
-      isDropdown: true,
-      noteId: 999,
-    })
-    await flushPromises()
-
-    expect(getRecentNotesSpy).toHaveBeenCalledTimes(1)
   })
 
   it("switches back to recent notes when search key is cleared", async () => {
-    vi.useFakeTimers()
     setupSearchMocks([searchResult(3, "Search Result")])
     mockSdkService(NoteController, "getRecentNotes", recentNotes)
 
@@ -152,7 +132,6 @@ describe("SearchResults recent notes", () => {
     })
     await waitForDebounce()
 
-    expect(wrapper.text()).toContain("Search result")
     expect(wrapper.text()).toContain("Search Result")
 
     await wrapper.setProps({ inputSearchKey: "" })
@@ -161,51 +140,5 @@ describe("SearchResults recent notes", () => {
     expect(wrapper.text()).toContain("Recently updated notes")
     expect(wrapper.text()).not.toContain("Search result")
     expect(wrapper.text()).toContain("Recent Note 1")
-
-    vi.useRealTimers()
-  })
-
-  it("shows recent notes for relationship target search with noteId", async () => {
-    const getRecentNotesSpy = mockSdkService(
-      NoteController,
-      "getRecentNotes",
-      recentNotes
-    )
-    setupSearchMocks()
-
-    const wrapper = mountSearchResults({
-      inputSearchKey: "",
-      noteId: 999,
-      isDropdown: true,
-    })
-    await flushPromises()
-
-    expect(getRecentNotesSpy).toHaveBeenCalled()
-    expect(wrapper.text()).toContain("Recently updated notes")
-    expect(wrapper.text()).toContain("Recent Note 1")
-  })
-
-  it("excludes current node from recent notes", async () => {
-    const recentNotesWithCurrent: NoteSearchResult[] = [
-      makeMe.aNoteSearchResult
-        .id(999)
-        .title("Current Note")
-        .distance(null)
-        .please(),
-      ...recentNotes,
-    ]
-
-    mockSdkService(NoteController, "getRecentNotes", recentNotesWithCurrent)
-    setupSearchMocks()
-
-    const wrapper = mountSearchResults({
-      inputSearchKey: "",
-      noteId: 999,
-      isDropdown: true,
-    })
-    await flushPromises()
-
-    expect(wrapper.text()).toContain("Recent Note 1")
-    expect(wrapper.text()).not.toContain("Current Note")
   })
 })

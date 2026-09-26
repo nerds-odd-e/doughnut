@@ -116,6 +116,9 @@ Four delivered revisions had real successful runs but remained unproved in obser
 - Execution: SEED-035 story 4 / quick/027-web-uploaded-pictures-as-notebook-files / 4250de93e1; Timestamp: 2026-09-24T22:25+08:00 (completion wait for f4d1ec8d5c); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.38. `complete-revision` on `main` timed out with all six registered revisions `undiscovered` (shutdown confirmed) after an early `CI_DISCOVERY_DELAYED`; `gh run list --branch main` showed "donut CI" runs completed `success` for 4250de93e1, a061808c28, 682259779a, 0e760d4933 and f4d1ec8d5c (created 14:02:40Z); the planning-only claim 09a299b665 had no run of its own.
 
 - Execution: quick/037-fold-picture-attach-step-into-upload / 1b822a6bf7; Timestamp: 2026-09-25T23:37+08:00 (completion wait for 1b822a6bf7); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.38. `complete-revision` on `story/037-fold-picture-attach-step-into-upload` timed out with `1b822a6bf7` `undiscovered` (shutdown confirmed; `CI_DISCOVERY_DELAYED` delivered afterwards); `gh run list --branch` showed "donut CI" run 36154138303 (created 15:26:06Z) completed `success`.
+- Execution: SEED-039 story 4 / quick/041-faster-frontend-unit-tests / c9347a9ee3; Timestamp: 2026-09-26, completion check started ~09:45+08:00; Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.38.
+  - Evidence: `complete-revision` for fe990eff58 on observer /tmp/dough-ci-501/watch-UaGJbW returned `unresolvedReason: timeout` with 70dd09501d, 8df4a87262 and fe990eff58 all `undiscovered`; `gh run list --branch story/faster-frontend-unit-tests` shows `donut CI` success for 8df4a87262 (run 36208396723, created 01:25:55Z), 70dd09501d (36207506131) and c9347a9ee3 (36206320436); fe990eff58 touches only `.planning/**`, which the workflow ignores.
+  - Observed effect: a ten-minute wait ended without a verdict although every applicable run had already succeeded; the coordinator confirmed green with `gh run list`.
 
 ## ODF-090 — Coordinator implemented a planned slice locally during multi-slice execution
 
@@ -188,6 +191,9 @@ Former local code: DD-107.
   - Evidence: coordinator summary handed to the execution retrospective (no transcript): the first `deliver` returned `candidate-mismatch` because an abbreviated SHA was passed to `--validated-candidate`, and a retry with the full SHA was accepted; every publication (0f8709dfc1, c7ea84e3a7, 7cb7c300b1, 6455811f4d, 5bf185ba0d, db643ef844) reported "host session identity is required to verify the notification bridge".
   - Observed effect: CI on `story/037-share-backend-test-context` was never observed during execution; the retrospective started with CI unknown.
   - Inference: both the abbreviated-SHA refusal and the missing session identity recurred about an hour after the same pair was recorded for `quick/037-fold-picture-attach-step-into-upload` on main, which this execution's base (5c8bb75741) did not contain. Whether a recovery was attempted is not in the summary.
+- Execution: SEED-039 story 4 / quick/041-faster-frontend-unit-tests / c9347a9ee3; Timestamp: 2026-09-26T08:50+08:00 (slice 1 delivery); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.38.
+  - Evidence: slice 1 receipt `observation.reason: host session identity is required to verify the notification bridge`; a re-run with `--session-json` refused ("rebase left the pre-rebase SHA as the candidate") because nothing new was left to publish; later deliveries with `--session-json` reported `observation.state: reused`.
+  - Observed effect: c9347a9ee3 stayed unobserved; the coordinator found `--session-json` again only from the usage line and `ci-host-bridge.mjs`.
 
 ## ODF-099 — Queued startup receipt embeds the whole Git index and overflows the coordinator's tool output
 
@@ -224,6 +230,9 @@ Former local code: DD-108.
 - Execution: SEED-035 story 17 / quick/034-book-source-as-notebook-file / 36eb15caaa; Timestamp: 2026-09-25, ~15:45+08:00 (queued startup, Take commit 6926d8a1a1); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.38.
   - Evidence: startup call output "Output too large (817.3KB)"; `beforeMaintenance.index` and `afterMaintenance.index` hold the full index listing.
   - Observed effect: an extra `python3` call was needed to read `afterMaintenance` and `projectSetupRequired`.
+- Execution: SEED-039 story 4 / quick/041-faster-frontend-unit-tests / c9347a9ee3; Timestamp: 2026-09-26T08:24+08:00 (queued startup); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.38.
+  - Evidence: startup call output "Output too large (819.2KB)"; the coordinator parsed the saved file with a script to read `publishedSha`, `workspace`, and the maintenance results.
+  - Observed effect: one extra call to recover the receipt fields.
 
 ## ODF-110 — A readiness replay observed only the plan's named seam, not the rest of the slice's journey
 
@@ -349,8 +358,41 @@ Slice planning takes the number after the highest plan entry in the checkout tha
   - Observed effect: DearDough rows and `.planning/test-optimization-candidates.md` ("plan 037 cut the suite…") refer to "037" for two different executions once both plans are deleted at wrap-up; the retrospective's correction plan had to reword the candidate record.
   - Inference: the same stale-base allocation applies to DD numbers in this log, so a merge can also produce duplicate finding codes. Whether the coordinator fetched `origin/main` before planning is not recorded.
 
+## DD-119 — A story whose owner deferred planning to execution could not be started until the coordinator planned and published it separately
+
+The story said "The owner chose to skip story refinement; the plan is made during execution" and was queued with `approach: unselected`. `execution-start.mjs start` accepts only a published `planned`+`ready` or `planless` preparation, so it refused. The coordinator created a worktree, profiled, wrote the plan, recorded `refined`/`planned`/`ready`, pushed that plan straight to main, and then ran startup again against the same worktree.
+
+### Occurrences
+
+- Execution: SEED-039 story 4 / quick/041-faster-frontend-unit-tests / c9347a9ee3; Timestamp: 2026-09-26T08:14+08:00 (first refusal); plan commit 43149dd7ef 08:23+08:00; Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.38.
+  - Evidence: receipt `{"status":"source-refused","error":"queued planless authority or plan link is inconsistent"}`; `execution-source.mjs` requires `approach.kind` planned or planless; plan 43149dd7ef then Take 44738a145a.
+  - Observed effect: about ten extra calls reading `execution-source.mjs`, `preparation-disposition.md`, `preparation-workspace.md`, and `record-preparation.md`; a planning commit reached main without a separate keep decision.
+  - Inference: the coordinator treated the story's own text plus `/dough-execute-plan` as keep authority. No guidance names a "plan during execution" path, so either queued stories need a planned approach before queueing or startup needs a documented plan-first step.
+
+## DD-120 — The coordinator told parallel agents a guidance rule did not exist after searching only SKILL.md files
+
+A refactor agent cited a 250-line file limit. The coordinator grepped `SKILL.md` files and lint scripts, found nothing, and messaged two running implementers and one refactor agent that the limit did not exist. The rule is in `dough-post-change-refactor/references/refactor-checks.md` ("File size"). One refactor then produced a 400-line spec and another a 268-line spec, and the coordinator had to retract the claim and send two follow-up refactors.
+
+### Occurrences
+
+- Execution: SEED-039 story 4 / quick/041-faster-frontend-unit-tests / c9347a9ee3; Timestamp: 2026-09-26, between 08:50 and 09:08+08:00 (between slice 1 and slice 3 commits); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.38.
+  - Evidence: grep over `.agents/skills/*/SKILL.md` returned nothing; `refactor-checks.md:128` "Shorten or split every checked file exceeding **250 lines**"; follow-up refactors split `RecallPage.answering.spec.ts` (400 → 225 + 221) and shortened `RichMarkdownEditor.propertyEntry.spec.ts` (268 → 242).
+  - Observed effect: two extra refactor agents (~125k subagent tokens) and one failed commit; a plan learning had to be rewritten.
+  - Inference: a negative claim about guidance needs a search of the whole skill tree, references included, before it is broadcast to agents.
+
+## DD-121 — Parallel slices in one execution checkout made each commit's hook fail on the other slices' unfinished files
+
+Three file-disjoint slices ran at once in one worktree. The pre-commit hook runs `lint:changed`, which checks the whole frontend working tree (Biome and `vue-tsc`), not only staged files. Committing a finished slice failed twice: once on another slice's unformatted file, once on type errors in a slice still being refactored. Slices were committed only after every agent in the checkout had stopped.
+
+### Occurrences
+
+- Execution: SEED-039 story 4 / quick/041-faster-frontend-unit-tests / c9347a9ee3; Timestamp: 2026-09-26, ~09:00+08:00 (failed slice 3 commits before 8d4739bd0b 09:08+08:00); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.38.
+  - Evidence: hook output "Found 1 error" (Biome format in `RichMarkdownEditor.propertyEntry.spec.ts`, not staged) and `TS2305 … has no exported member 'mountMarkdownTextarea'` in `NoteEditableContent.debouncedSave.spec.ts`, not staged.
+  - Observed effect: delivery of finished slices waited for unrelated agents; parallelism saved implementation time but serialized delivery.
+  - Inference: `execute-plan` allows concurrent slices with disjoint files, but this project's working-tree-wide hook makes a shared checkout unsafe for concurrent commits; per-slice worktrees or committing only at quiet points would avoid it. Qualified: the slices' implementation overlap still saved wall time.
+
 ## Retention
 
-- Highest allocated local number: 118
+- Highest allocated local number: 121
 - Recovery: `33939aa45a17c08f5e6f8076178ce96437fdfbe8:DearDough.md` contains the complete pre-compaction log and earlier recovery references; `b0b385a184e96ecf8b0f6fc5572eaaab69bc8dad` preserves later history.
 - Occurrence history is partial; full observations, effects, inference and historical provenance remain in that snapshot and the upstream catalog.

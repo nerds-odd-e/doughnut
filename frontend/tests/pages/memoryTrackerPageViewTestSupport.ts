@@ -135,7 +135,7 @@ export async function resolveConfirmPopup(confirmed: boolean) {
   await flushPromises()
 }
 
-function recallPromptWithAnswer(answerOverrides: Omit<Answer, "id">) {
+export function recallPromptWithAnswer(answerOverrides: Omit<Answer, "id">) {
   return makeMe.aRecallPromptHistoryItem
     .withQuestionStem("Test question")
     .withChoices(["A", "B", "C"])
@@ -146,25 +146,6 @@ function recallPromptWithAnswer(answerOverrides: Omit<Answer, "id">) {
       ...answerOverrides,
     })
     .please()
-}
-
-export function recallPromptWithThinkingTime(thinkingTimeMs: number) {
-  return recallPromptWithAnswer({ thinkingTimeMs })
-}
-
-export function recallPromptWithAwayTime(awayMs: number, awayCount: number) {
-  return recallPromptWithAnswer({ awayMs, awayCount })
-}
-
-export function recallPromptWithDetourTime(
-  detourMs: number,
-  detourCount: number
-) {
-  return recallPromptWithAnswer({ detourMs, detourCount })
-}
-
-export function recallPromptWithIdleTime(idleMs: number) {
-  return recallPromptWithAnswer({ idleMs })
 }
 
 export function noteUnderQuestionSections(wrapper: VueWrapper) {
