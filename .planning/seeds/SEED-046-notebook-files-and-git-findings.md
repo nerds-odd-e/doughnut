@@ -64,7 +64,7 @@ including delivery, not commitments.
 
 **Identity:** SEED-046#story-1
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"unselected"}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/002-publish-cost-follows-change/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"33fbe806b732dd4ba706a79badb8ebbcbf158301373d0df9ed0e3f70f864ce82","plan":"70c0ab06ae088a2d0e2c87e47239c4445cbaefbc114c8343c961c0307232f5e5"}}
 ```
 
 - **Goal:** Owners who publish from a local checkout of a notebook with files,
