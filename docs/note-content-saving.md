@@ -42,6 +42,18 @@ history, identity and publication guarantees.
 
 ## Rich property editing
 
+The property panel lists properties in the order the file has them. A panel
+edit changes only the affected entry's lines: a changed value rewrites that
+`key: value`, a removal deletes its lines, a new property is appended before
+the closing fence, and a rename changes only the key text (quoted when YAML
+needs it). Comments, key order, quoting and flow lists elsewhere stay as
+written. Removing the last property drops the block. Server-side property
+writes — setting a picture or image mask, reducing a relationship note to a
+source property, and removing a trashed note's links from other notes'
+properties — edit the frontmatter in place the same way; a value left empty
+by link removal loses its entry, and a note without frontmatter gets a new
+block.
+
 Property drafts synchronize when incoming parsed properties change, rather
 than when only the Markdown body or YAML formatting changes. This preserves
 an in-progress rename and newer value across an unrelated body refresh.
@@ -54,6 +66,12 @@ not use this blocking guard. This prevents the rich editor from being unmounted
 before an asynchronous property edit emits its content.
 
 ## Rich body editing
+
+A rich body edit keeps the authored frontmatter text and the blank lines
+after it exactly as written. The rich editor writes `#` headings, `-` bullets,
+`*` emphasis (`**` strong) and `---` rules, so a body already using those forms
+changes only where it was edited; other forms (such as `+` bullets, `_`
+emphasis or setext headings) are rewritten to them.
 
 The rich editor rebuilds the Markdown body from its content on each edit, so it
 keeps body image embeds (`![alt](src)`) through an edit to other text. Showing
