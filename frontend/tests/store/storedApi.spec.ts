@@ -8,7 +8,7 @@ import { noteShowLocation } from "@/routes/noteShowLocation"
 import createNoteStorage from "@/store/createNoteStorage"
 import NoteEditingHistory from "@/store/NoteEditingHistory"
 import makeMe from "donut-test-fixtures/makeMe"
-import { mockSdkService } from "@tests/helpers"
+import { mockSdkService, wrapSdkError } from "@tests/helpers"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
 import { sidebarStructuralRefreshKey } from "@/components/notes/sidebarStructuralRefresh"
 import { describe, it, expect, vi, beforeEach } from "vitest"
@@ -164,6 +164,28 @@ describe("storedApiCollection", () => {
       const sa = storageAccessor.value.storedApi()
       await sa.moveNoteToNotebookRoot(note.id, note.notebookRealm.notebook.id)
       expect(sidebarStructuralRefreshKey.value).toBe(before + 1)
+    })
+  })
+
+  describe("upload note image", () => {
+    const file = new File(["png"], "Blue.PNG", { type: "image/png" })
+
+    it("refreshes sidebar structural listings after an accepted upload", async () => {
+      mockSdkService(NoteController, "uploadNoteImage", note)
+      const before = sidebarStructuralRefreshKey.value
+      const sa = storageAccessor.value.storedApi()
+      await sa.uploadNoteImage(note.id, file)
+      expect(sidebarStructuralRefreshKey.value).toBe(before + 1)
+    })
+
+    it("leaves sidebar structural listings alone after a refused upload", async () => {
+      vi.spyOn(NoteController, "uploadNoteImage").mockResolvedValue(
+        wrapSdkError("refused")
+      )
+      const before = sidebarStructuralRefreshKey.value
+      const sa = storageAccessor.value.storedApi()
+      await sa.uploadNoteImage(note.id, file)
+      expect(sidebarStructuralRefreshKey.value).toBe(before)
     })
   })
 

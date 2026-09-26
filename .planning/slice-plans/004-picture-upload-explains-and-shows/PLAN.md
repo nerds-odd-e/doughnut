@@ -90,7 +90,8 @@ the API client if the DTO schema changes.
 ### 3. An accepted upload appears in the sidebar at once
 
 Type: Behavior
-Status: planned
+Status: done — `storedApi.spec.ts` "upload note image" (accepted advances
+the key by one; a refused upload leaves it) passes.
 Proof: `frontend/tests/store/storedApi.spec.ts` — `uploadNoteImage` with a
 mocked `uploadNoteImage` response advances `sidebarStructuralRefreshKey` by
 one, like the existing move tests; a refused upload (no realm) does not.

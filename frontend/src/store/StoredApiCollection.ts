@@ -205,7 +205,9 @@ export default class StoredApiCollection {
   /** Uploads a picture as a file beside the note; the returned realm carries the note's new `image:`. */
   async uploadNoteImage(noteId: Donut.ID, file: File) {
     const noteRealm = await uploadNoteImageRequest(noteId, file)
-    if (noteRealm) this.storage.refreshNoteRealm(noteRealm)
+    if (!noteRealm) return
+    this.storage.refreshNoteRealm(noteRealm)
+    refreshSidebarStructuralListings()
   }
 
   /** PATCH note content with current stored body so the backend rebuilds the resolved wiki-link index. */
