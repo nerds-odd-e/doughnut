@@ -16,6 +16,7 @@ and deletable in Web Donut.
 
 ## Backlog list
 
+- [The rich editor never silently loses content](seeds/SEED-046-notebook-files-and-git-findings.md#story-10) — SEED-046#story-10
 - [A web edit changes only what the user edited](seeds/SEED-046-notebook-files-and-git-findings.md#story-5) — SEED-046#story-5
 - [Cloning a notebook with many notes stays within 5 seconds](seeds/SEED-046-notebook-files-and-git-findings.md#story-8) — SEED-046#story-8
 - [File pages and file responses read cleanly](seeds/SEED-046-notebook-files-and-git-findings.md#story-9) — SEED-046#story-9
