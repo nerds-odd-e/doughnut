@@ -64,9 +64,7 @@ Still body`
     const wrapper = await h.mountEditor(markdown)
 
     expect(wrapper.find("section").exists()).toBe(false)
-    const alert = wrapper.find(
-      '[data-testid="rich-note-frontmatter-parse-error"]'
-    )
+    const alert = wrapper.find('[data-testid="rich-note-unavailable-warning"]')
     expect(alert.text()).toContain("Markdown mode")
 
     expect(h.quillReadonly()).toBe(true)

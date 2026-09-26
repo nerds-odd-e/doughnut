@@ -61,7 +61,13 @@ or a second read-only rule.
 ### 2. A body the rich editor cannot keep opens read-only with the warning
 
 Type: Behavior
-Status: planned
+Status: done — accepted proof: the command above, 20 files / 156 tests green
+(new spec: 5 refused bodies read-only with the warning; setext/`*`/reference
+link, `#`/`-`/inline link, and wiki-link bodies editable with the typed word
+emitted); `pnpm frontend:test QuillEditor NoteShow RecallPage.spelling
+noteRouteFamily FolderPage NotebookPage NoteNewForm` 17 files / 99 green;
+`vue-tsc --noEmit` exit 0. A disposable probe also kept tables, images,
+ordered lists with a quote, CJK underscores, and untagged code editable.
 Proof: new `RichMarkdownEditor.bodyItCannotKeep.spec.ts` — examples 1–4 as one
 parametrized case each asserting read-only and a warning that names Markdown
 mode; example 5 asserting editable and that the emitted Markdown contains the
@@ -105,4 +111,19 @@ Change (in `frontend/src/components/form/`):
 
 - Slice 1: the warning block still carries
   `data-testid="rich-note-frontmatter-parse-error"`; slice 2 decides whether
-  the now-general warning needs a general test id.
+  the now-general warning needs a general test id. Slice 2 renamed it
+  `rich-note-unavailable-warning`.
+- Slice 2: `markdownToQuillHtml` cannot judge meaning — it strips whitespace
+  between tags (`**a** *b*` equals `**ab**`) and drops task checkboxes itself.
+  `richEditorKeepsBody.ts` renders both sides with plain `marked` (GFM),
+  normalizing only newline whitespace between tags; still no per-construct
+  rules. The saved side goes through `markdownizer.htmlToMarkdown`.
+- Slice 2: a watcher on `markdownForRichDisplay` runs before Quill has taken
+  in the loaded HTML. `QuillEditor` now emits `modelLoaded` from the microtask
+  that ends its model sync, and `RichMarkdownEditor` checks there, skipping its
+  own emissions and read-only viewers (who cannot edit, so no warning).
+- Slice 2 refactor: Quill options moved to `donutQuillOptions.ts` and paste
+  interception to `quillPasteContext.ts`, bringing `QuillEditor.vue` under 250
+  lines. `RichMarkdownEditor.vue` sits at exactly 250 lines.
+- Loose lists saved tight still refuse; how common that is in real notes was
+  not measured.
