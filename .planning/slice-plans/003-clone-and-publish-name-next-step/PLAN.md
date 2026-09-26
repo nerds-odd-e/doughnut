@@ -60,7 +60,9 @@ appending `notebookPullNextSteps` there (pull usage keeps it).
 ### 2. Publish of a checkout behind the notebook names pull, then publish again
 
 Type: Behavior
-Status: planned
+Status: done — accepted: ancestry, ancestryTip, rebasedRejection and
+resolvedContinuationRejection suites assert `ancestryRefusal(dir)` (commands
+quoted with double quotes, as in clone); `pnpm cli:test` 440 green.
 Proof: `notebookPublish.ancestry.suite.ts` and `notebookPublish.ancestryTip.suite.ts`
 assert the new wording with the directory; green in `pnpm cli:test`.
 

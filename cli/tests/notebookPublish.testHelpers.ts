@@ -13,6 +13,10 @@ import {
 export const STALE_HEAD_MESSAGE =
   "expectedHead no longer matches the notebook's current accepted head."
 
+export function ancestryRefusal(directory: string): string {
+  return `Local main is not based on the notebook's latest accepted history. Run "donut notebook pull ${directory}", then publish again.`
+}
+
 export function commitFileChange(
   dir: string,
   contents: string,

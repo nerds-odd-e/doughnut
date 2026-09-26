@@ -15,6 +15,7 @@ import {
   rejectionPost,
   stubFetchForSubmission,
   stubFetchWithBundleFile,
+  ancestryRefusal,
 } from './notebookPublish.testHelpers.js'
 import {
   LATER_OTHER_NOTE,
@@ -120,7 +121,7 @@ export function describeNotebookPublishRebasedRejection(): void {
       ).rejects.toThrow(ProcessExitForTest)
 
       expect(ctx.getErrorSpy()).toHaveBeenCalledWith(
-        expect.stringContaining('contiguous single-parent commit range')
+        expect.stringContaining(ancestryRefusal(pulled.directory))
       )
       expect(postCount(fetchMock)).toBe(0)
       expect(fetchMock.mock.calls).toHaveLength(1)
