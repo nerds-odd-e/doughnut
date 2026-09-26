@@ -91,17 +91,6 @@ limit for new payloads. A notebook without a Git binding saves the file row and
 the Book without a commit. Removing the Book removes its reading structure and
 progress but leaves the file, and the accepted tree, unchanged.
 
-Books attached before this existed are moved into their notebooks at application
-startup: each Book without a path has its bytes copied from the separate Book
-storage into the content store and placed under the same naming rule in one
-Donut System commit per notebook ("Move the book's source file into the
-notebook"). Its layout, blocks, reading progress and last-updated time are
-unchanged, and the separate Book storage keeps its copy until it is retired.
-Each notebook moves in its own transaction; a notebook whose move fails is
-logged and left for the next startup, and the others still move. Running the
-move again changes nothing. Until a Book is moved it keeps reading from the
-separate Book storage.
-
 Publication checks every attachment in the contiguous first-parent proposal
 range, not only the tip, by the
 [Git LFS acceptance rule](./notebook-git-lfs.md#decision), including its

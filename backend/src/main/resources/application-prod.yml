@@ -69,10 +69,6 @@ question:
   regeneration:
     times: 0
 donut:
-  # prod: book PDF bytes live in this bucket (GcsBookStorage). Non-prod uses DB storage instead.
-  book-pdf:
-    gcs:
-      bucket: doughnut-book-pdf-carbon-syntax-298809
   # prod: immutable notebook LFS payloads (GcsNotebookAttachmentContent). Non-prod uses in-memory.
   notebook-attachment:
     gcs:

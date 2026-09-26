@@ -9,7 +9,7 @@ import com.odde.donut.testability.MakeMe;
 import java.sql.Timestamp;
 
 public class NotebookBuilder extends EntityBuilder<Notebook> {
-  private BookBuilder bookAttachment;
+  private BookBuilder book;
 
   public NotebookBuilder(Notebook notebook, MakeMe makeMe) {
     super(makeMe, notebook != null ? notebook : new Notebook());
@@ -37,14 +37,14 @@ public class NotebookBuilder extends EntityBuilder<Notebook> {
 
   @Override
   protected void afterCreate(boolean needPersist) {
-    if (bookAttachment != null) {
-      bookAttachment.notebook(entity);
-      bookAttachment.please(needPersist);
+    if (book != null) {
+      book.notebook(entity);
+      book.please(needPersist);
     }
   }
 
   public NotebookBuilder withBook(String name) {
-    this.bookAttachment = makeMe.aBook().bookName(name);
+    this.book = makeMe.aBook().bookName(name);
     return this;
   }
 

@@ -103,7 +103,13 @@ client in production.
 
 ### 2. Every Book reads only from its notebook file
 Type: Behavior
-Status: planned
+Status: done
+Accepted proof: `BookSourceFile.read` has one path (notebook-root file or
+404); `NotebookBooksBookFileControllerTest$GetBookFile` and
+`BooksControllerTest$GetBookFileByBook` PDF/EPUB/304 cases rebuilt on
+notebook files via `BookBuilder`; full backend suite 2608 pass. The clone
+promise rests on `cli_notebook_lfs.feature` in CI (`cli_notebook_clone.feature`
+does not name Books).
 Proof: slice 2 rows above.
 
 Behavior: a Book whose source path names a notebook-root file → it is read →

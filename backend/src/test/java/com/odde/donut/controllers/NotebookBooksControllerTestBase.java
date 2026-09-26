@@ -14,7 +14,6 @@ import com.odde.donut.entities.repositories.BookContentBlockRepository;
 import com.odde.donut.entities.repositories.BookRepository;
 import com.odde.donut.entities.repositories.BookUserLastReadPositionRepository;
 import com.odde.donut.services.book.BookReadingWireConstants;
-import com.odde.donut.services.book.BookStorage;
 import com.odde.donut.services.book.EpubLocator;
 import com.odde.donut.services.book.PdfLocator;
 import com.odde.donut.testability.OpenAiStructuredResponseMock;
@@ -42,7 +41,6 @@ abstract class NotebookBooksControllerTestBase extends ControllerTestBase {
   @Autowired BookUserLastReadPositionRepository bookUserLastReadPositionRepository;
   @Autowired BookBlockReadingRecordRepository bookBlockReadingRecordRepository;
   @Autowired BookContentBlockRepository bookContentBlockRepository;
-  @Autowired BookStorage bookStorage;
   @Autowired ObjectMapper objectMapper;
   @Autowired EntityManager entityManager;
 
@@ -70,11 +68,10 @@ abstract class NotebookBooksControllerTestBase extends ControllerTestBase {
     return bookRepository.findByNotebook_Id(nb.getId()).orElseThrow();
   }
 
-  void setSourceFileRef(Notebook nb, String ref) {
-    Book book = bookOf(nb);
-    book.setSourceFileRef(ref);
-    makeMe.entityPersister.save(book);
-    makeMe.entityPersister.flush();
+  Notebook notebookWithBookFile(String bookName, String format, byte[] fileBytes) {
+    Notebook nb = myNotebook();
+    makeMe.aBook().notebook(nb).bookName(bookName).format(format).fileBytes(fileBytes).please();
+    return nb;
   }
 
   Notebook otherUsersNotebook() {
