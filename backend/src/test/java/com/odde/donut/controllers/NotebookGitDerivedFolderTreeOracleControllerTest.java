@@ -124,7 +124,10 @@ class NotebookGitDerivedFolderTreeOracleControllerTest
         queriesOf(() -> folderController.permanentlyDeleteFolder(notebook, trashedTopic));
 
     assertThat(acceptedHistory(notebook).tipPaths(), contains("_trash/.keep"));
-    assertThat(queries, not(hasItem(containsString("NotebookAttachment"))));
+    assertThat(
+        "only the removal reads the subtree's attachment rows",
+        queries.stream().filter(query -> query.contains("NotebookAttachment")).toList(),
+        contains(containsString("folder.id IN :folderIds")));
     assertAcceptedTreeMatchesTheFullAssembly(notebook);
   }
 

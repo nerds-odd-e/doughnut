@@ -4,6 +4,7 @@ import com.odde.donut.entities.DisplayName;
 import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
+import com.odde.donut.entities.NotebookAttachment;
 import com.odde.donut.entities.repositories.FolderRepository;
 import com.odde.donut.entities.repositories.NoteRepository;
 import com.odde.donut.entities.repositories.NotebookAttachmentRepository;
@@ -48,6 +49,11 @@ final class FolderSubtree {
       notes.addAll(noteRepository.findNotesInFolderOrderByIdAsc(subtreeFolder.getId()));
     }
     return notes;
+  }
+
+  List<NotebookAttachment> collectAttachments(List<Folder> subtreeFolders) {
+    return notebookAttachmentRepository.findByFolder_IdIn(
+        subtreeFolders.stream().map(Folder::getId).toList());
   }
 
   Set<Integer> collectNoteIds(List<Folder> subtreeFolders) {

@@ -24,7 +24,7 @@ public class EmptyFolderBulkPurge {
         folderRepository.findOccupiedFolderIdsByNotebookId(notebook.getId());
 
     for (Folder folder :
-        FolderSubtreeOccupancy.cascadeSafeFullyEmptyFolders(folders, occupiedFolderIds)) {
+        FolderSubtreeOccupancy.fullyEmptyFoldersDeepestFirst(folders, occupiedFolderIds)) {
       entityPersister.remove(folder);
     }
   }

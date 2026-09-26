@@ -54,4 +54,6 @@ public interface NotebookAttachmentRepository extends CrudRepository<NotebookAtt
       @Param("notebookId") Integer notebookId, @Param("filename") String filename);
 
   boolean existsByFolder_IdIn(Collection<Integer> folderIds);
+
+  List<NotebookAttachment> findByFolder_IdIn(Collection<Integer> folderIds);
 }

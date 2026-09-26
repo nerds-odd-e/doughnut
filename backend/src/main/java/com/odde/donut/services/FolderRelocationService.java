@@ -123,12 +123,11 @@ public class FolderRelocationService {
           }
           List<Folder> subtreeFolders = subtree.collectFolders(liveFolder);
           User viewer = authorizationService.getCurrentUser();
-          // Every note goes first: fk_note_folder is ON DELETE SET NULL, so a note left behind
-          // would resurface at the notebook root once its folder row is gone.
           for (Note note : subtree.collectNotes(subtreeFolders)) {
             noteService.permanentlyRemove(
                 note, NoteTrashReferenceHandling.LEAVE_DEAD_LINKS, viewer);
           }
+          subtree.collectAttachments(subtreeFolders).forEach(entityPersister::remove);
           for (Folder descendantFirst : subtreeFolders.reversed()) {
             entityPersister.remove(descendantFirst);
           }

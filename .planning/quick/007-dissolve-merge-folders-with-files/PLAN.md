@@ -94,7 +94,10 @@ purge goes, since occupied folders are never purged.
 
 ### 2. Folder contents are removed in code, never by the database
 Type: Structure
-Status: planned
+Status: done
+Accepted proof: `*FolderPermanentDelete*` (5, incl.
+`NotebookGitWebFolderPermanentDeleteControllerTest.permanentDeleteOfATrashedFolderAppendsOneAcceptedChildWithoutTheSubtree`)
+and the full backend suite (2611, 0 failures) pass after `V300000348`.
 Proof: migration `V300000348` (the next free number; the Book storage
 removal took `V300000347`) changes the three foreign keys to plain
 restricting keys. `NotebookGitWebFolderPermanentDeleteControllerTest`,
@@ -239,6 +242,10 @@ rule.
 
 ## Learnings
 
+- `fk_note_folder` was already `ON DELETE RESTRICT` (since `V300000329`);
+  `V300000348` restricts only the attachment and parent-folder keys. The
+  unique key `uk_folder_notebook_parent_name` rules out "unlink parents, then
+  bulk delete" — folder removal must go children first.
 - `pnpm backend:test:worktree` takes a single `--tests` pattern; use a
   package wildcard (e.g. `'com.odde.donut.services.health.*'`) for several classes.
 - Rechecked on main `7f1bc6d440` (2026-09-26): the only product-code change
