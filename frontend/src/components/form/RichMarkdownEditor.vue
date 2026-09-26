@@ -18,15 +18,15 @@
       Edit metadata in Markdown.
     </p>
     <div
-      v-if="frontmatterParseErrorMessage !== null"
+      v-if="richEditingUnavailableReason"
       role="alert"
       aria-live="polite"
-      data-testid="rich-note-frontmatter-parse-error"
+      data-testid="rich-note-unavailable-warning"
       class="daisy-alert daisy-alert-warning mb-3 text-sm"
     >
-      <span>{{ frontmatterParseErrorMessage }}</span>
+      <span>{{ richEditingUnavailableReason.message }}</span>
       <span class="block mt-1 text-xs opacity-90">
-        Switch to Markdown mode to fix the frontmatter.
+        {{ richEditingUnavailableReason.hint }}
       </span>
     </div>
     <QuillEditor
@@ -41,6 +41,7 @@
       @blur="$emit('blur')"
       @paste-complete="onPasteComplete"
       @dead-wiki-link-click="$emit('deadWikiLinkClick', $event)"
+      @model-loaded="checkBodyItCannotKeep"
     />
   </div>
 </template>
@@ -51,6 +52,7 @@ import QuillEditor from "./QuillEditor.vue"
 import type { QuillPasteContext } from "./quillPasteContext"
 import RichFrontmatterProperties from "./RichFrontmatterProperties.vue"
 import markdownizer from "./markdownizer"
+import { richEditorKeepsBody } from "./richEditorKeepsBody"
 import type { WikiLink } from "@generated/donut-backend-api"
 import { replaceWikiLinksInHtml } from "./replaceWikiLinksInHtml"
 import {
@@ -102,9 +104,21 @@ const parsedContent = computed(() =>
   parseNoteContentMarkdown(props.modelValue ?? "")
 )
 
-const frontmatterParseErrorMessage = computed(() => {
+const bodyItCannotKeep = ref(false)
+
+const richEditingUnavailableReason = computed(() => {
   const p = parsedContent.value
-  return p.ok || p.reason === "nested_metadata" ? null : p.message
+  if (!p.ok && p.reason !== "nested_metadata")
+    return {
+      message: p.message,
+      hint: "Switch to Markdown mode to fix the frontmatter.",
+    }
+  if (bodyItCannotKeep.value)
+    return {
+      message: "This note has content the rich editor cannot keep.",
+      hint: "Switch to Markdown mode to edit it.",
+    }
+  return null
 })
 
 const hasNestedMetadata = computed(() => {
@@ -115,7 +129,7 @@ const hasNestedMetadata = computed(() => {
 const effectiveReadonly = computed(
   () =>
     Boolean(props.readonly) ||
-    frontmatterParseErrorMessage.value !== null ||
+    richEditingUnavailableReason.value !== null ||
     imageUploadInProgress.value
 )
 
@@ -124,6 +138,12 @@ const markdownForRichDisplay = computed(() => {
   if (p.ok || p.reason === "nested_metadata") return p.body
   return props.modelValue ?? ""
 })
+
+const checkBodyItCannotKeep = (heldHtml: string) => {
+  const body = markdownForRichDisplay.value
+  if (props.readonly || body === currentIntervalBodyMarkdown) return
+  bodyItCannotKeep.value = !richEditorKeepsBody(body, heldHtml)
+}
 
 const htmlWithWikiLinks = (html: string) =>
   replaceWikiLinksInHtml(html, props.wikiLinks, props.lastSavedMarkdown)

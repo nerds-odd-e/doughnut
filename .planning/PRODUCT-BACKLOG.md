@@ -10,7 +10,6 @@ and deletable in Web Donut.
 
 ## Taken
 
-- [The rich editor never silently loses content](seeds/SEED-046-notebook-files-and-git-findings.md#story-10) — SEED-046#story-10 ([plan](slice-plans/005-rich-editor-keeps-content/PLAN.md))
 - [Clone test states the clone output instead of what it no longer says](seeds/SEED-046-notebook-files-and-git-findings.md#story-11) — SEED-046#story-11 ([plan](slice-plans/007-clone-test-states-output/PLAN.md))
 
 ## Backlog list

@@ -56,7 +56,7 @@ example of:
     await flushPromises()
 
     expect(
-      wrapper.find('[data-testid="rich-note-frontmatter-parse-error"]').exists()
+      wrapper.find('[data-testid="rich-note-unavailable-warning"]').exists()
     ).toBe(false)
     expect(propertyRows(wrapper.element)).toHaveLength(2)
     expect(propertyRowListValue(wrapper, "tags").text()).toContain("alpha")

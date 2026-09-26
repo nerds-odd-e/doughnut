@@ -5,19 +5,16 @@
 <script setup lang="ts">
 import { getCurrentInstance, nextTick, ref, onMounted, watch } from "vue"
 import type { Router } from "vue-router"
-import Quill, { Delta, type QuillOptions, type Range } from "quill"
+import Quill, { Delta } from "quill"
 import "quill/dist/quill.bubble.css"
-import markdownizer from "./markdownizer"
-import {
-  donutQuillBrMatcher,
-  registerDonutQuillBlots,
-} from "./registerDonutQuillBlots"
+import { registerDonutQuillBlots } from "./registerDonutQuillBlots"
+import { donutQuillOptions } from "./donutQuillOptions"
 import {
   handleRichContentAnchorClick,
   type DeadWikiLinkPayload,
 } from "@/utils/wikiLinkMarkup"
 import { DEAD_WIKI_LINK_CLASS } from "@/utils/wikiLinkDomMarkers"
-import type { QuillPasteContext } from "./quillPasteContext"
+import { interceptRichPaste, type QuillPasteContext } from "./quillPasteContext"
 import {
   toPasteChoiceAnchorRect,
   type PasteChoiceAnchorRect,
@@ -36,6 +33,8 @@ const emits = defineEmits<{
   blur: []
   pasteComplete: [content: string, quillContext: QuillPasteContext | null]
   deadWikiLinkClick: [payload: DeadWikiLinkPayload]
+  /** The HTML Quill holds after taking in a model value, which the next edit saves from. */
+  modelLoaded: [html: string]
 }>()
 
 const router = getCurrentInstance()?.appContext.config.globalProperties
@@ -61,70 +60,16 @@ const syncQuillFromModel = () => {
   quill.value.root.innerHTML = html
   queueMicrotask(() => {
     syncingModel = false
+    emits("modelLoaded", quill.value!.root.innerHTML)
   })
-}
-
-// Shift+Enter handler for soft line breaks
-const shiftEnterHandler = function (
-  this: { quill: Quill },
-  range: Range | null
-) {
-  if (!range) return
-  this.quill.insertEmbed(range.index, "softbreak", true, Quill.sources.USER)
-  this.quill.insertText(range.index + 1, "\u200B", Quill.sources.USER)
-  this.quill.setSelection(range.index + 1, Quill.sources.SILENT)
-}
-
-const toolbarRows = [
-  ["bold", "italic", "underline", "code"],
-  [{ header: 1 }, { header: 2 }],
-  ["blockquote", "code-block"],
-  [{ list: "ordered" }, { list: "bullet" }],
-  ["link"],
-]
-
-const options: QuillOptions = {
-  modules: {
-    toolbar: props.readonly ? false : toolbarRows,
-    keyboard: {
-      bindings: {
-        shiftEnter: {
-          key: "Enter",
-          shiftKey: true,
-          handler: shiftEnterHandler,
-        },
-      },
-    },
-    clipboard: {
-      matchers: [["BR", donutQuillBrMatcher]],
-      matchVisual: false,
-    },
-  },
-  formats: [
-    "bold",
-    "italic",
-    "underline",
-    "code",
-    "header",
-    "blockquote",
-    "code-block",
-    "list",
-    "indent",
-    "link",
-    "image",
-    "mark",
-    "softbreak",
-    "horizontalrule",
-    "table",
-  ],
-  placeholder: props.readonly ? "" : props.placeholder,
-  readOnly: props.readonly,
-  theme: "bubble",
 }
 
 onMounted(async () => {
   if (editor.value) {
-    quill.value = new Quill(editor.value, options)
+    quill.value = new Quill(
+      editor.value,
+      donutQuillOptions(props.readonly, props.placeholder)
+    )
 
     syncQuillFromModel()
 
@@ -135,40 +80,7 @@ onMounted(async () => {
         "paste",
         (event: ClipboardEvent) => {
           if (!event.clipboardData) return
-
-          const originalGetData = event.clipboardData.getData.bind(
-            event.clipboardData
-          )
-
-          // Quill's own getSelection() can throw when the browser's native
-          // selection doesn't map onto a blot (e.g. no real caret was ever
-          // placed); when that happens there is simply no paste context to
-          // capture, matching the existing insertTextAtCursor precedent below.
-          let range: Range | null = null
-          try {
-            range = quill.value?.getSelection(true) ?? null
-          } catch {
-            range = null
-          }
-          pendingPaste = range
-            ? {
-                originalText: originalGetData("text/plain"),
-                range: { index: range.index, length: range.length },
-              }
-            : null
-
-          event.clipboardData.getData = (format: string) => {
-            if (format === "text/html") {
-              const htmlData = originalGetData(format)
-              if (htmlData) {
-                const markdown = markdownizer.htmlToMarkdown(htmlData)
-                return markdownizer.markdownToHtml(markdown, {
-                  preserve_pre: true,
-                })
-              }
-            }
-            return originalGetData(format)
-          }
+          pendingPaste = interceptRichPaste(quill.value!, event.clipboardData)
 
           // Mark paste in progress; emit after Quill updates content
           isPasting.value = true
