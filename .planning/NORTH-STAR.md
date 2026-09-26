@@ -10,6 +10,19 @@ adds private reading structure to it. Share folder placement without forcing
 these concepts into a universal file entity.
 See the [domain vocabulary](../docs/adrs/0001-ubiquitous-language.md#notebook--note-structure).
 
+## One set of names per folder
+
+Each folder, and the notebook root, has one set of entry names: a note's
+`Title.md`, a subfolder's name and a file's filename, compared without letter
+case so a checkout on a case-insensitive file system matches the web. One owner
+answers whether a name is taken, from live rows, for every web placement: a
+name the user chose is refused when taken, a name Donut chooses is the first
+free one. Operations that rehome several entries check every destination
+before changing anything. Folder contents are removed or moved by code, never
+by a database cascade, so every removal passes the accepted-change capture and
+a forgotten one fails loudly. Evidence and affected work: SEED-035 story 11
+(owner decisions 2026-09-26); story 10 reuses the same rule.
+
 ## One format boundary
 
 One classification and codec owner maps the complete tree to domain concepts.

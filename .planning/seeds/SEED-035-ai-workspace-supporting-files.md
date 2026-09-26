@@ -208,38 +208,96 @@ No executable plan or implementation is authorized by this seed.
 <a id="story-11"></a>
 
 ### Dissolve and merge folders that contain files
+```json dough-story-state
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../quick/007-dissolve-merge-folders-with-files/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"2bbe69530ee4d3f43b503cb3c17572fd1d0043ecdb771bcc51a339a45d309d35","plan":"5bf4d7947c2bda7e3d1618482ec9873fb6cd4897eb28a126c7fdea00cbecce54"}}
+```
 
 - **Identity:** SEED-035#story-11
-- **Slice plan:** [Mapped dissolve and merge with files](../quick/007-dissolve-merge-folders-with-files/PLAN.md)
-  — awaiting story refinement; not ready for slice-plan refinement or execution.
-- **Resplit trace:** Receives the dissolve, merge and filename-clash scope from
-  the delivered nested-attachment work (owner-requested resplit, 2026-09-21).
-  Nothing was implemented for this story.
+- **Slice plan:** [Dissolve and merge folders that contain files](../quick/007-dissolve-merge-folders-with-files/PLAN.md)
 - **Goal:** An owner tidying folders on the web can dissolve or merge a folder
-  that contains supporting files, instead of being refused and having to
-  reorganize in a local checkout.
-- **Evaluation:** `physics/old/` holds `sketch.png` and `physics/` has no
-  `sketch.png`. The owner dissolves `old` on the web and pulls →
-  `physics/sketch.png`, same bytes. With different pictures at
-  `physics/force.png` and `physics/old/force.png`, the dissolve is refused,
-  naming `physics/force.png`, and nothing changes.
-- **Scope / value:** Replaces the current dissolve/merge refusal: files move
-  with the notes, including files of merged same-name subfolders. A convenience
-  — the refusal loses nothing and a local workaround exists.
-- **Clash rule (owner decision 2026-09-21):** When a web dissolve or merge
-  would put a file on a path that is already taken, refuse the whole operation,
-  name the clashing path, and change nothing. This is a Web Donut folder
-  operation, not a Git merge: Git content merges stay the local user's problem
-  because Donut accepts only forward linear history. Overwriting would lose a
-  file; renaming would break local references while reference rewriting is
-  deferred. Known related gap, not this story's to fix: dissolve and merge do
-  not check note-title clashes today, although a single-note move does.
-- **Effort hypothesis:** S–M, medium confidence; the clash rule is decided.
-- **Depends on:** Delivered nested attachment continuity.
-- **Safe stopping point:** If never delivered, the current refusal stays safe.
-- **Refinement needed:** Confirm key examples for merge arrangements (dissolve
-  with merge, move with merge) and whether the refusal message lists every
-  clashing path or the first.
+  that contains files; the files move with the notes instead of the operation
+  being refused. Since web-uploaded and migrated pictures became files in
+  their notes' folders, the refusal blocks any folder holding a picture note.
+  Along the way no web operation may silently lose a file or put two entries on
+  one path, so a clone or pull on any operating system matches what the web
+  shows.
+- **Scope:**
+  - Dissolve, dissolve with merge of same-named subfolders, and a same-notebook
+    folder move with merge carry every file of the moved folders, exactly as
+    they carry notes. The temporary "Folders containing files cannot be
+    dissolved, merged, or moved to another notebook yet" refusal goes away for
+    these operations.
+  - **One set of names per folder** (and at the notebook root): a note's
+    `Title.md`, a subfolder's name and a file's filename share one set of
+    entry names, compared without regard to letter case. Every web placement
+    asks this one rule, reading live rows: a name the user chose is refused
+    when taken (note create, rename and move; folder create, rename and move;
+    picture upload; dissolve and merge); a name Donut chooses is the first free
+    one (note and folder trash, a Book's source file). This follows the North
+    Star rule that Donut-chosen names take a free name and user-placed ones
+    refuse, and replaces today's separate per-kind checks.
+  - **Dissolve and merge check first, then change.** They work out every
+    destination path before changing anything: same-named folders merge (a
+    case variant such as `Diagrams` merges into the existing `diagrams`); any
+    other taken path — file against file, note against note, or one kind
+    against another, even with identical bytes — refuses the whole operation,
+    names the first clashing path, and changes nothing (owner decision
+    2026-09-21; first path only, 2026-09-26). This also closes the known gap
+    that dissolve and merge never checked note titles.
+  - **No database cascade on folder contents** (owner direction 2026-09-26):
+    the foreign keys from a file to its folder (`CASCADE`), a folder to its
+    parent folder (`CASCADE`) and a note to its folder (`SET NULL`) stop acting
+    on delete. Code that means to remove a folder's contents removes them
+    explicitly, so the accepted-change capture sees every removal; a forgotten
+    file fails loudly ([ADR 0006](../../docs/adrs/0006-failure-handling-accepted.md))
+    instead of vanishing. This covers permanently deleting a trashed folder,
+    local-publish acceptance removing a folder, and the "remove empty folders"
+    health fix, which today counts only notes and so deletes a folder holding
+    only files, together with those files.
+  - Existing content is never judged again; the rule applies to new placements.
+- **Excluded:**
+  - Moving or merging into another notebook (story 10). That refusal stays,
+    including a merge into another notebook's same-named folder, which today
+    reaches the same merge code.
+  - Renaming on a clash, and rewriting file references. A note outside the
+    dissolved folder whose `image:` points into it (`physics/intro.md` with
+    `image: old/sketch.png`) shows a broken picture afterwards, as story 2
+    accepted for deletion. Web uploads always place a picture in its note's own
+    folder, so only locally written references can cross folders.
+  - Rewriting path wiki links on a same-notebook merge move: that existing bug
+    is [SEED-042#story-1](SEED-042-folder-merge-keeps-path-wiki-links.md#story-1).
+  - Local-publish acceptance keeps its own validation; the shared name rule is
+    for web placements. A Git tree cannot hold a file and a folder on one path.
+  - Notebook-level cascades (notebook to folder, file, Book): notebooks are
+    only soft-deleted and nothing triggers them.
+  - Any other change to the health fix, such as committing its folder removal
+    to accepted history.
+- **Key examples:**
+  - `physics/old/` holds `sketch.png`; `physics/` has no `sketch.png`. The owner
+    dissolves `old` and pulls → `physics/sketch.png`, same bytes, no `old/`.
+  - `physics/diagrams/a.png` and `physics/old/diagrams/b.png`: dissolving `old`
+    with merge → both files in `physics/diagrams/`.
+  - `archive/diagrams/c.png` moved into `physics/`, which has `diagrams/`, with
+    merge → `physics/diagrams/c.png`.
+  - `physics/force.png` and `physics/old/force.png` (different or identical
+    bytes): dissolving `old` is refused naming `physics/force.png`; folders,
+    notes, files and the accepted head are unchanged.
+  - `physics/Energy.md` and `physics/old/energy.md`: dissolving `old` is
+    refused naming `physics/Energy.md`, instead of today's generic conflict.
+  - `physics/` holds `Force.png`: creating a folder `force.png` in `physics/`
+    is refused naming `physics/Force.png`.
+  - `refs/` holds only `paper.pdf`: "remove empty folders" keeps `refs/` and
+    the file.
+  - A trashed folder holding `paper.pdf` is permanently deleted → the file is
+    gone after pull, now removed explicitly rather than by the database.
+  - Moving `refs/` holding a file into another notebook's `refs/` with merge is
+    still refused.
+- **Effort hypothesis:** L (nine planned slices), medium confidence. A natural
+  later split, if execution overruns: (a) no cascade plus one set of names per
+  folder, then (b) dissolve and merge carry files.
+- **Depends on:** delivered nested attachment continuity.
+- **Safe stopping point:** if never delivered, the current refusal stays safe.
+  The name rule and cascade removal each leave the product safer on their own.
 
 <a id="story-10"></a>
 
@@ -297,11 +355,6 @@ The split is by usable outcome, not backend/frontend layers. Reject a
 publish-now/preserve-on-web-later split: it would expose accepted files to
 loss. Operations that would rehome files refuse until their story delivers.
 
-## Open Refinement Details
-
-- Story 11 needs story refinement and plan realignment before slice
-  refinement/execution.
-
 ## When to Surface
 
 Now, under the revised near-future direction. No implementation is authorized.
@@ -358,6 +411,13 @@ integration need their own selected outcomes.
   not need to know; refuse a Book's source file after Delete is chosen rather
   than hiding Delete; keep the plan's first slice whole and let execution
   escalate if it overruns.
+- Owner decisions, 2026-09-26 (story 11 refinement): widen the story into a
+  cohesive fix — one set of entry names per folder, compared without letter
+  case, for every web placement; dissolve and merge check first and refuse
+  naming the first clash; no database cascade on folder contents, with code
+  removing contents explicitly. Local-publish acceptance keeps its own
+  validation; notebook-level cascades stay. The same-notebook merge move's
+  stale path wiki links become their own story, queued right after story 11.
 - [Near-future direction](../PRODUCT-BACKLOG.md#near-future-direction).
 - [SEED-009](SEED-009-git-backed-local-notebook-workflow.md): prior local/web note
   workflow. This seed owns non-Markdown attachment continuity.

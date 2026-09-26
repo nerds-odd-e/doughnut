@@ -1,71 +1,238 @@
 # Dissolve and merge folders that contain files
 
-Status: **awaiting story refinement — not ready for slice-plan refinement or execution**.
+Status: **planned**.
 Work item: **SEED-035#story-11**.
-Source: [mapped story](../../seeds/SEED-035-ai-workspace-supporting-files.md#story-11).
-Depends on delivered nested attachment continuity. Its deleted story and plan
-history are recoverable from commit
-`653f5ce5a7365a4296c3206dcdf554bdccd28fb0`; no implementation or completed
-evidence is carried into this plan.
+Source: [refined story](../../seeds/SEED-035-ai-workspace-supporting-files.md#story-11)
+(owner decisions 2026-09-26).
 
-## Mapped outcome and boundaries
+## Goal and scope
 
-An owner can dissolve or merge a folder that contains files on the web: the
-files move with the notes, and a filename clash refuses the whole operation.
-This replaces the current temporary dissolve/merge refusal.
+An owner can dissolve or merge a folder that contains files on the web: files
+move with the notes. Every web placement shares one set of entry names per
+folder, compared without letter case; dissolve and merge check every
+destination first and refuse naming the first clash. Folder contents are never
+removed by a database cascade.
 
-It adds no cross-notebook behavior (SEED-035#story-10), web file controls,
-renaming on clash, or reference rewriting.
+Excluded (see the story): moves and merges into another notebook (story 10;
+their refusal stays), renaming on clash, rewriting file references, the path
+wiki-link rewrite on a same-notebook merge move (SEED-042#story-1),
+local-publish acceptance using the shared rule, notebook-level cascades, and
+any other health-fix change.
 
-## Resume requirement
+## Architecture
 
-Run `dough-story-refinement` on story 11 to settle its goal, scope and key
-examples — especially the merge arrangements (dissolve with merge, move with
-merge) and what the refusal message lists. Realign this plan to that
-understanding before `dough-slice-plan-refinement` or execution. The inputs
-below are **provisional mapped inputs**, not dispatchable leaves; their earlier
-readiness does not carry across the split.
+- **One set of names per folder** — see the North Star topic
+  [One set of names per folder](../../NORTH-STAR.md#one-set-of-names-per-folder).
+  PFE: today's checks are `FolderSiblingNameValidation` (folders only, case
+  sensitive), `NoteTitlePlacementRules` (notes only, case insensitive),
+  `NotebookGitAcceptedTree.takenPaths` (accepted tree, for picture upload and
+  `NotebookRootFreeFilename`), and the database unique keys for note create and
+  rename. Evolve `FolderSiblingNameValidation` into the single owner of entry
+  names in a folder, reading live `note`, `folder` and `notebook_attachment`
+  rows, keeping `NumberedNameSelection` for free names. The other checks and
+  `takenPaths` retire as their callers move. The database unique keys stay as
+  the last safety net.
+- **Error codes:** `FOLDER_NAME_CONFLICT` keeps exactly one meaning — a
+  *folder* already holds the name — with its current messages; the frontend
+  answers it with the "Merge?" prompt on move and dissolve
+  (`folderAdminMutations.ts`) and shows it inline on folder create and rename.
+  A name held by a note or a file is `RESOURCE_CONFLICT` with a message naming
+  the path (note forms keep their `newTitle` field error), which the frontend
+  already shows. It must never be `FOLDER_NAME_CONFLICT`, or the frontend
+  would offer to merge into a file. No frontend change.
+- **Case-variant folders are the same folder:** when a merge meets `diagrams`
+  and `Diagrams`, they merge into the existing destination folder, keeping its
+  name; merge lookups use the shared rule instead of the exact-match
+  `FolderRepository.findCandidateChildContainers`.
+- **Local publish is not a caller:** `NotebookGitProposalFolderPlacement` keeps
+  a folders-only check with today's behavior (story exclusion).
+- **No cascade on folder contents:** `fk_notebook_attachment_folder`,
+  `fk_folder_parent` and `fk_note_folder` lose their `ON DELETE` action.
+  Every place that removes a folder first removes or moves its contents in
+  code, children first. Files removed in code pass through
+  `ProjectionChangeCapture`, so the Git derivation learns of them directly.
 
-## Architecture carried forward
+## Key examples → proof
 
-Follow the delivered model: a file refers to its folder the way a note does,
-and `FolderSubtree.dissolveInto` / `mergeInto` own rehoming. Add one rehome rule
-used by both, which refuses an occupied destination path before any mutation.
-No second attachment representation and no per-operation file copier.
+| Promise (story key example or decision) | Slice | Proof |
+| --- | --- | --- |
+| `refs/` with only `paper.pdf` is neither reported nor purged as empty | 1 | `NotebookHealthControllerTest` |
+| Trashed folder with `paper.pdf` permanently deleted → gone after pull | 2 | `NotebookGitWebFolderPermanentDeleteControllerTest` |
+| Folder `force.png` beside `Force.png` refused naming `physics/Force.png` | 3 | `NotebookFolderCreateControllerTest` |
+| Moving a folder onto a name a file uses → `RESOURCE_CONFLICT`, no merge offer | 4 | `NotebookFolderMoveControllerTest` |
+| Dissolve with `Energy.md`/`energy.md` refused naming `physics/Energy.md` | 5 | `NotebookGitFolderDissolveGuardControllerTest` |
+| Case-variant subfolders merge into the existing one | 5 | `NotebookFolderDissolveControllerTest` |
+| Dissolve `old` with `sketch.png` → `physics/sketch.png`, same bytes | 6 | `NotebookGitFolderDissolveControllerTest` |
+| Dissolve with merge → `physics/diagrams/{a,b}.png` | 6 | `NotebookGitFolderDissolveControllerTest` |
+| Move `archive/diagrams` into `physics/` with merge → `physics/diagrams/c.png` | 6 | `NotebookGitWebFolderMoveControllerTest` |
+| `force.png` clash (different or identical bytes) refused, nothing changes | 6 | `NotebookGitFolderDissolveGuardControllerTest` |
+| Cross-notebook merge of a folder with a file still refused | 6 | `NotebookGitWebFolderCrossNotebookMoveControllerTest` |
+| Note moved beside folder `energy.md` as `Energy` refused | 7 | `NotebookGitWebNoteMoveGuardControllerTest` |
+| Note created or renamed `Energy` beside folder `energy.md` refused | 8 | `NotebookNoteCreateControllerTest`, `TextContentControllerUpdateNoteTitleTests` |
+| Picture `force.png` beside `Force.png` refused; Book name case variant numbered | 9 | `NoteControllerUploadNoteImageTests`, `NotebookBooksAttachNotebookFileControllerTest` |
 
-Owner decision (2026-09-21): on a filename clash, refuse the whole dissolve or
-merge, name the clashing path, and change nothing.
+## Slices
 
-## Provisional mapped inputs
+### 1. Health checks count files as occupying a folder
+Type: Behavior
+Status: planned
+Proof: `NotebookHealthControllerTest` — a notebook whose `refs/` holds only
+`paper.pdf`: the health report no longer lists `refs/` as empty, and fixing
+health leaves the folder and its attachment rows in place. Existing
+`EmptyFolderBulkPurgeTest` and health-rule tests stay green.
 
-### 1. Dissolving a folder moves its files up
-Mapped from the 14-slice draft's slice 4. Given `physics/old/sketch.png` and no
-`physics/sketch.png`, dissolving `old` yields `physics/sketch.png`, same bytes,
-and no `old`. Dissolving a top-level folder places its files at the root.
-Proof location proposed: `NotebookGitFolderDissolveControllerTest`.
+Behavior: one occupied-folders source (folders holding notes or files)
+replaces `NoteRepository.findOccupiedFolderIdsByNotebookId` for its three
+callers — `EmptyFolderBulkPurge`, `EmptyFolderHealthRule` and
+`ReadmeOnlyFolderHealthRule`. The defensive `detachNotesFromFolder` in the
+purge goes, since occupied folders are never purged.
 
-### 2. Merging folders brings the source folder's files along
-Mapped from slice 5. Given `physics/diagrams/a.png` and
-`physics/old/diagrams/b.png`, dissolving `old` with merge yields both files in
-`physics/diagrams/`. The same rehome rule as input 1.
+### 2. Folder contents are removed in code, never by the database
+Type: Structure
+Status: planned
+Proof: migration `V300000347` changes the three foreign keys to plain
+restricting keys. `NotebookGitWebFolderPermanentDeleteControllerTest`,
+`NotebookFolderPermanentDeleteControllerTest` and
+`NotebookGitProposalInitialNotebookStructureControllerTest` stay green; then
+the full backend suite, because the committed-fixture cleanup every Git
+controller test uses changes. The full suite is this slice's stated sizing
+exception.
 
-### 3. A filename clash refuses the whole dissolve or merge
-Mapped from slice 6. Different pictures at `physics/force.png` and
-`physics/old/force.png`: dissolving `old` is refused, naming `physics/force.png`;
-folders, files and the accepted head are unchanged. Likewise through a merge.
-One rule, not one per arrangement. Proof location proposed:
-`NotebookGitFolderDissolveGuardControllerTest`.
+Internal change: permanent delete of a trashed folder removes the subtree's
+attachments before its folders. `testability/CommittedUserCleanup` removes
+attachments, then folders children first, before notebooks (the notebook
+cascades now meet restricting keys). Local-publish acceptance already removes
+files and notes before unrepresented folders, children first; a live note can
+never sit in an unrepresented folder, because its own path represents the
+folder, so it needs no change and a violation there would be a legitimate loud
+failure. Unchanged external behavior; it enables slice 6, where a file the code
+forgot to move fails loudly instead of disappearing.
 
-### 4. Remove the temporary dissolve/merge refusal
-New from the split. The refusal and its two guard cases go away in the same
-change that makes input 1 work, never before; the cross-notebook refusal stays
-until SEED-035#story-10. Decide during refinement whether this is its own leaf
-or part of input 1.
+### 3. One set of names per folder for folder create and rename
+Type: Behavior
+Status: planned
+Proof: `NotebookFolderCreateControllerTest` — creating folder `force.png` in
+`physics/`, which holds `Force.png`, is refused with `RESOURCE_CONFLICT` naming
+`physics/Force.png`; a folder `energy.md` beside note `Energy` likewise; a
+folder `Physics` beside folder `physics` keeps `FOLDER_NAME_CONFLICT` and its
+message. `NotebookFolderRenameControllerTest` — renaming to a file's name is
+refused the same way. Existing `rejectsDuplicateSiblingFolderName` and
+`rejectsDuplicateSiblingName` stay green.
 
-## Evidence, priority and safety
+Behavior: `FolderSiblingNameValidation` evolves into the owner of entry names
+in a folder: it answers whether a name is taken across notes (`Title.md`),
+folders and files from live rows without case, and picks free names with
+`NumberedNameSelection`. Folder create and rename use it. The local-publish
+caller keeps a folders-only check.
 
-The completed predecessor's "Resplit mapping" table at commit
-`653f5ce5a7365a4296c3206dcdf554bdccd28fb0` accounts for every slice of the
-earlier 14-slice draft. No product tests were run and no slices are done. Queued
-after the attachment journeys and before the cross-notebook move: the refusal
-it replaces loses nothing and a local workaround exists.
+### 4. Folder move and trash use the same set of names
+Type: Behavior
+Status: planned
+Proof: `NotebookFolderMoveControllerTest` — moving folder `force.png` into a
+folder holding file `Force.png` is refused with `RESOURCE_CONFLICT` (never
+`FOLDER_NAME_CONFLICT`) and nothing changes; moving onto a same-named folder
+still returns `FOLDER_NAME_CONFLICT` and merges when requested.
+`NotebookFolderTrashControllerTest.usesFirstFreeSiblingNameWithExistingCaseRulesWithoutChangingEarlierTrash`
+is updated to the case-insensitive rule. Existing move, merge and trash-collision
+tests stay green.
+
+Behavior: folder move asks the shared rule; a folder-held name offers merge, any
+other taken name refuses. Folder trash takes the first free name from the same
+rule.
+
+### 5. Dissolve and merge check every destination first
+Type: Behavior
+Status: planned
+Proof: `NotebookGitFolderDissolveGuardControllerTest` — `physics/Energy.md`
+against `physics/old/energy.md`: dissolving `old` is refused naming
+`physics/Energy.md`; folders, notes and the accepted head are unchanged; the
+same through a merge move. `NotebookFolderDissolveControllerTest` — subfolder
+`Diagrams` of `old` merges into `physics/diagrams` when merge is requested.
+Existing dissolve and merge tests stay green.
+
+Behavior: dissolve and merge first list every destination entry they would
+create and check each with the shared rule; same-named folders (ignoring case)
+merge, or without merge keep today's `FOLDER_NAME_CONFLICT` prompt; any other
+taken name refuses with `RESOURCE_CONFLICT` naming the first one, before any
+row changes. Merge lookups use the shared rule. Folders with files are still
+refused here (the guard stays until slice 6).
+
+### 6. Dissolve and merge carry files
+Type: Behavior
+Status: planned
+Proof: `NotebookGitFolderDissolveControllerTest` — dissolving `old` holding
+`sketch.png` leaves a pulled tree with `physics/sketch.png`, same bytes, and no
+`old/`; dissolve with merge brings `physics/old/diagrams/b.png` beside
+`physics/diagrams/a.png`. `NotebookGitWebFolderMoveControllerTest` — moving
+`archive/diagrams` into `physics/` with merge yields `physics/diagrams/c.png`.
+`NotebookGitFolderDissolveGuardControllerTest` — different or identical
+`force.png` at `physics/` and `physics/old/`: dissolving `old` is refused naming
+`physics/force.png` and nothing changes (replacing its two file-refusal cases).
+`NotebookGitWebFolderCrossNotebookMoveControllerTest` — a cross-notebook merge
+of a folder with a file is still refused.
+
+Behavior: the destination check of slice 5 includes files, and
+`FolderSubtree.dissolveInto` / `mergeInto` rehome files exactly as notes (row
+and bytes kept; only the folder changes). `requireSubtreeHasNoAttachments`
+leaves these operations; the cross-notebook refusal moves into
+`FolderMoveRelocation.moveFolderToAnotherNotebook`, covering its plain and merge
+branches.
+
+### 7. Note move, undo and trash use the same set of names
+Type: Behavior
+Status: planned
+Proof: `NotebookGitWebNoteMoveGuardControllerTest` — moving note `Energy` into
+`physics/`, which holds folder `energy.md`, is refused naming
+`physics/energy.md`, and nothing changes. Existing move-collision, undo
+(`NotebookGitWebTrashGuardControllerTest`) and trash free-title tests stay
+green.
+
+Behavior: `NoteMotionService` placement asks the shared rule for `Title.md`
+(refuse) and for trash (first free title). `NoteTitlePlacementRules` retires
+into it, keeping the `newTitle` field error.
+
+### 8. Note create and rename use the same set of names
+Type: Behavior
+Status: planned
+Proof: `NotebookNoteCreateControllerTest` — creating note `Energy` in `physics/`,
+which holds folder `energy.md`, is refused with the `newTitle` field error
+naming `physics/energy.md`; `TextContentControllerUpdateNoteTitleTests` —
+renaming a note to that title likewise. Existing duplicate-title tests stay
+green.
+
+Behavior: note create and rename gain the shared check they lacked; the
+database unique key stays as the last safety net.
+
+### 9. Picture upload and Book files use the same set of names
+Type: Behavior
+Status: planned
+Proof: `NoteControllerUploadNoteImageTests` — its four refusal cases stay green,
+plus `force.png` beside `Force.png` is refused.
+`NotebookBooksAttachNotebookFileControllerTest.aTakenNameIsNumberedAndTheExistingFileIsUntouched`
+stays green, plus a case-variant name is also numbered.
+
+Behavior: picture upload refuses, and Book source placement picks a free name,
+through the shared rule on live rows instead of the accepted tree.
+`NotebookGitAcceptedTree.takenPaths` and its store method go. Update
+`docs/notebook-git-attachments.md` for the folder operations and the one name
+rule.
+
+## Current decisions
+
+- First clashing path only in the refusal message (owner, 2026-09-26).
+- Existing content is never judged again; the rule governs new placements.
+- The database unique keys stay unchanged as a last safety net; the
+  case-sensitive folder and file keys are not widened.
+- Case-variant folders merge into the existing one (planner decision under the
+  owner's case-insensitive rule).
+- Slices 5 before 6: the file guard stays until dissolve and merge check every
+  destination, so a case-variant file clash can never slip past the
+  case-sensitive database key.
+
+## Learnings
+
+- Independent plan review (2026-09-26) confirmed the Git derivation already
+  handles attachments whose folder changes and attachments removed explicitly
+  inside a deleted folder; no derivation change is planned.
+- The earlier 14-slice draft and the resplit mapping remain recoverable from
+  commit `653f5ce5a7365a4296c3206dcdf554bdccd28fb0`; none of it is carried.
