@@ -112,46 +112,71 @@ including delivery, not commitments.
 
 <a id="story-2"></a>
 
-### 2. Pull keeps unpublished local work over unrelated file and folder changes
+### 2. Pull rebases unpublished local work unless Git finds a real conflict
 
 **Identity:** SEED-046#story-2
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"not-refined","approach":"unselected"}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/001-pull-rebase-decides/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"59c0d602a9e71babcfecb0b27155dda2326fb012dcbde303d48ac1310115f0c6","plan":"a1da39890eac2d6d0e6aec6b8e980d1aa0b4064d15caa60cd2456993daf25230"}}
 ```
 
-- **For / why:** An owner with unpublished local work must re-clone and move
-  the work by hand whenever anyone deletes or adds a file, or renames or moves a
-  folder, anywhere in the notebook — common once several people or tools work
-  in parallel. The accepted synchronization direction expects local work to
-  rebase over independent web changes
+- **Goal:** An owner with unpublished local commits, often from an AI IDE,
+  receives any accepted change with `donut notebook pull` and then publishes,
+  instead of re-cloning and moving the work by hand whenever a file is added
+  or deleted, or a folder renamed or moved, anywhere in the notebook. This is
+  the parallel local/web work the near-future direction and the accepted
+  synchronization contract describe
   ([Git synchronization](../../docs/notebook-git-synchronization.md)).
-- **Evaluation:** Local unpublished commits that add or edit notes survive a
-  pull over an accepted web file delete, a file published from another
-  checkout, and a web folder rename elsewhere in the notebook; pull rebases
-  them and they then publish. A change that really overlaps the local work
-  still stops with a clear, working next step.
-- **Known facts (2026-09-26):** each case below refused pull with "Local main
-  cannot receive the accepted history because accepted history includes a
-  structural change at …", then told the owner to clone fresh elsewhere:
-  - a local note edit, then a web delete of an unrelated root file (`fake.png`);
-  - a local note addition, then another checkout published a new root file
-    (`d2.bin`);
-  - a local commit adding a root file, then a web folder rename elsewhere
-    (`Renamed/inner/doc.pdf`);
-  - a local note and file addition, then another checkout published a note and
-    a file.
-
-  A local file addition over an accepted note-only addition rebased fine.
-- **Value / learning:** Delivers the parallel local/web work the accepted
-  synchronization direction describes; tests which accepted changes can be
-  replayed under local work safely.
-- **Effort hypothesis:** L — low confidence; split by change kind (file changes
-  first, folder changes next) if refinement confirms two outcomes.
+- **Decision (owner, 2026-09-26):** `git rebase` decides. Pull no longer
+  classifies accepted history into rebaseable and "structural" shapes; that
+  hand-grown allowlist is removed, not extended by change kind. Removed code
+  and tests are simply deleted.
+- **Scope:**
+  - Pull rebases a linear run of unpublished local commits over any accepted
+    history. Only a real Git conflict stops it, leaving the rebase paused with
+    the existing resolve-or-abort guidance.
+  - Git follows an accepted folder rename or move: local edits of notes in
+    that folder, and notes or files the local work added to it, land under
+    the new path.
+  - After rebasing, pull fills in current attachment files as it does today,
+    and publish accepts the result under its unchanged validation.
+  - Refusals that stay, because accepted history is forward-only and linear
+    ([ADR 0002](../../docs/adrs/0002-git-native-portable-notebook-synchronization-accepted.md)):
+    an unpublished merge commit, and local history unrelated to the notebook.
+- **Deferred / not promised:**
+  - Overlaps Git cannot see stay as publish validation or ordinary broken
+    links treat them: a local note whose `image:` names a file the web
+    deleted; a local link to a path a web folder rename changed (web link
+    rewrites do not reach unpublished work).
+  - Clearer conflict and refusal wording stays in story 3.
+  - No web or server change.
+- **Key examples** (from the 2026-09-26 manual test, each refused today with
+  "accepted history includes a structural change at …"):
+  1. Local note edit; the web deletes unrelated root file `fake.png` → pull
+     rebases, `fake.png` is gone locally, publish accepts the edit.
+  2. Local note addition; another checkout publishes root file `d2.bin` →
+     pull rebases and fills in `d2.bin`; publish accepts the note.
+  3. Local commit adding a root file; the web renames a folder elsewhere,
+     leaving `Renamed/inner/doc.pdf` → pull rebases, the checkout
+     shows the renamed folder, publish accepts the file.
+  4. Local note and file addition; another checkout publishes a note and a
+     file → pull rebases; publish accepts.
+  5. Local edit of `Old/a.md` plus a new `Old/b.md`, over two local commits;
+     the web renames `Old` to `New` → after pull both are under `New/`, and
+     publish accepts them with `a.md` keeping its learning identity.
+  6. Boundary: local and web change the same line of one note, or the web
+     deletes a note the local work edited → Git pauses with the existing
+     conflict guidance; `git rebase --abort` restores the local work
+     unchanged.
+- **Known facts (2026-09-26):** pull runs a real `git rebase --onto`, which
+  already pauses on conflicts with guidance, but first refuses any accepted
+  commit outside an allowlist (note edits, note additions in existing
+  folders, one exact folder move under a single local note edit). The
+  allowlist grew one shape per commit between 2026-09-07 and 09-24. A local
+  file addition over an accepted note-only addition already rebases.
+- **Effort hypothesis:** M — medium confidence; mostly deletion.
 - **Depends on:** none.
-- **Safe stopping point:** Anything not rebased is still refused with the local
-  work preserved, as today.
-- **Open for refinement:** what counts as overlapping (same path, same folder
-  moved, a picture the local note refers to).
+- **Safe stopping point:** Anything Git cannot rebase stays paused or refused
+  with the local work preserved.
 
 <a id="story-3"></a>
 

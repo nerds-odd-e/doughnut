@@ -40,8 +40,10 @@ and the [integration details](../docs/notebook-git-attachments.md#classification
 Integrate attachments through the existing domain-operation and Git publication
 owners. Accept complete content/reference changes atomically and project the
 final tree once. Git owns Portable content; private learning data stays
-server-side. Local tools rebase unpublished divergence; Donut accepts only
-forward linear history. Extend these owners rather than creating a separate
+server-side. Local tools rebase unpublished divergence, and Git's rebase
+alone decides what replays: only a real conflict stops it, never a
+classification of accepted change kinds. Donut accepts only forward linear
+history. Extend these owners rather than creating a separate
 attachment store of truth or synchronization path.
 See [ADR 0002](../docs/adrs/0002-git-native-portable-notebook-synchronization-accepted.md)
 and [domain operation ownership](../docs/notebook-git-synchronization.md#domain-operation-ownership).
