@@ -34,7 +34,7 @@ Also surface when adding scheduling columns, changing JDBC timezone, or revisiti
 
 ## Notes
 
-Quick/071 added `notebook_git_binding.amendment_last_changed_at` in
+Plan 071 added `notebook_git_binding.amendment_last_changed_at` in
 `V300000321`; include it when this deferred schema-wide work is selected.
 Its fractional-second precision has been corrected separately. Preserve null/frozen
 eligibility, UTC round-tripping, and the exact ten-minute comparison when

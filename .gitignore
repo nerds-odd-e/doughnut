@@ -1,6 +1,6 @@
 # local raw test profiles (dough-test-optimization evidence; never commit)
 .planning/*-profile-results.json
-.planning/quick/**/*-profile-results.json
+.planning/slice-plans/**/*-profile-results.json
 
 # Miscellaneous
 .donut-pnpm-lock.sha256

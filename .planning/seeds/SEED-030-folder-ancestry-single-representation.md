@@ -11,9 +11,9 @@ scope: M
 
 > Both planned stories are delivered. Their plans, diagnoses and evidence are
 > recoverable from commit `92af81eadab9b509ffcdf5d1f0c52e51516c3aaf`
-> (`.planning/quick/142-live-folder-ancestry-materialization/PLAN.md`) and
+> (plan `142-live-folder-ancestry-materialization`) and
 > commit `feac68c8b7befc601392278b6154408cfc274724`
-> (`.planning/quick/145-reset-notebook-git-history/PLAN.md`).
+> (plan `145-reset-notebook-git-history`).
 
 ## Why This Matters
 

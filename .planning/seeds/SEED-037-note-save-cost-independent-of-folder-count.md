@@ -23,7 +23,7 @@ cost attribution was not measured; the owner reported roughly one-second saves
 after the repair and now considers that good enough. The pre-change investigation and
 the local measurement are in commit `458496764f931f05b0d46d955e1bbbebf04beefc`,
 at `.planning/seeds/SEED-037-note-save-cost-independent-of-folder-count.md` and
-`.planning/quick/012-path-scoped-note-save/PLAN.md`.
+plan `012-path-scoped-note-save`.
 
 ## Alternatives and Decision
 

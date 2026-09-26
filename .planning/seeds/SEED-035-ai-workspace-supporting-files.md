@@ -102,7 +102,7 @@ No executable plan or implementation is authorized by this seed.
 
 ### Moves to another notebook reach both notebooks' Git
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../quick/046-moves-to-another-notebook-reach-git/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"f8d817e575b0ee5a3e948d14145646aa7c6cbff8fe681264292fed7d0da8fa07","plan":"1ea09a9ca7d6b1830a9724f536763b4b88e7d737a186dcba2d44abffb679251a"}}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/046-moves-to-another-notebook-reach-git/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"f8d817e575b0ee5a3e948d14145646aa7c6cbff8fe681264292fed7d0da8fa07","plan":"1ea09a9ca7d6b1830a9724f536763b4b88e7d737a186dcba2d44abffb679251a"}}
 ```
 
 - **Identity:** SEED-035#story-24
@@ -180,7 +180,7 @@ No executable plan or implementation is authorized by this seed.
 
 ### Link rewrites in other notebooks reach their Git
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../quick/047-link-rewrites-in-other-notebooks-reach-git/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"382c0802436488bf1014e22921d44a3f2d3380b397128d4cc203ad8638d309ea","plan":"28f80315b540518e5661e2e0b6b4b6f5881927a1a4b3def2cf68b99547d6e492"}}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/047-link-rewrites-in-other-notebooks-reach-git/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"382c0802436488bf1014e22921d44a3f2d3380b397128d4cc203ad8638d309ea","plan":"28f80315b540518e5661e2e0b6b4b6f5881927a1a4b3def2cf68b99547d6e492"}}
 ```
 
 - **Identity:** SEED-035#story-25
