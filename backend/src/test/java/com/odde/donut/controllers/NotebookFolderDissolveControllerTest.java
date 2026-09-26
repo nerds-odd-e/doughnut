@@ -132,4 +132,21 @@ class NotebookFolderDissolveControllerTest extends NotebookFolderManagementContr
     assertThat(listingHasFolder(nb, outer.getId(), unique), equalTo(true));
     assertThat(listingHasFolder(nb, outer.getId(), clash), equalTo(false));
   }
+
+  @Test
+  void dissolveMergesACaseVariantSubfolderIntoTheExistingOne()
+      throws UnexpectedNoAccessRightException {
+    Notebook nb = ownedNotebook();
+    Folder physics = makeMe.aFolder().notebook(nb).name("physics").please();
+    Folder diagrams = makeMe.aFolder().parentFolder(physics).name("diagrams").please();
+    Folder old = makeMe.aFolder().parentFolder(physics).name("old").please();
+    Folder oldDiagrams = makeMe.aFolder().parentFolder(old).name("Diagrams").please();
+    Note sketch = makeMe.aNote("Sketch").folder(oldDiagrams).please();
+
+    folderController.dissolveFolder(nb, old, true);
+
+    makeMe.refresh(sketch);
+    assertThat(sketch.getFolder().getId(), equalTo(diagrams.getId()));
+    assertThat(listingHasFolder(nb, physics.getId(), oldDiagrams), equalTo(false));
+  }
 }

@@ -168,7 +168,15 @@ rule.
 
 ### 5. Dissolve and merge check every destination first
 Type: Behavior
-Status: planned
+Status: done
+Accepted proof: `*FolderDissolve*ControllerTest` (23, incl.
+`NotebookGitFolderDissolveGuardControllerTest.dissolveOntoANoteNameTakenIgnoringCaseIsRefusedNamingItAndChangesNothing`,
+`mergeMoveOntoANestedNoteNameTakenIgnoringCaseIsRefusedNamingItAndChangesNothing`,
+`NotebookFolderDissolveControllerTest.dissolveMergesACaseVariantSubfolderIntoTheExistingOne`),
+`*Folder*` (322), `*Dissolve*` (29) and `*Merge*` (18) pass. The check is
+`FolderContentsPlacementCheck.requireContentsFit` (subfolders then notes,
+depth-first; slice 6 adds the source's files there); dissolve and merge share
+`FolderSubtree.moveContentsInto`, where slice 6 adds carrying files.
 Proof: `NotebookGitFolderDissolveGuardControllerTest` — `physics/Energy.md`
 against `physics/old/energy.md`: dissolving `old` is refused naming
 `physics/Energy.md`; folders, notes and the accepted head are unchanged; the
@@ -259,6 +267,14 @@ rule.
 
 ## Learnings
 
+- Nested merge lookups are shared with cross-notebook merge moves, so those now
+  merge case-variant nested folders too (coordinator decision, consistent with
+  "case-variant folders are the same folder"). Cross-notebook merges still run
+  no destination pre-check: a nested note clash fails loudly on
+  `uk_note_notebook_folder_title`, as an exact clash already did — story 10
+  territory.
+- Git controller tests are non-transactional: use repository `findById`, not
+  `makeMe.refresh`.
 - Every web placement asking the shared rule now reads attachment filenames;
   `NotebookGitDerivedFolderTreeOracleControllerTest` assertions allow only
   `SELECT a.filename FROM NotebookAttachment a…` queries there.

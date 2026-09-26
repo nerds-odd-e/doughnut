@@ -92,7 +92,8 @@ public class FolderSiblingNameValidation {
                                 NotebookGitPortablePath.ofAttachment(prefix, filename))));
   }
 
-  private Optional<Folder> folderHolding(
+  /** The folder in {@code parentOrNull} named {@code entryName}, ignoring letter case. */
+  Optional<Folder> folderHolding(
       Notebook notebook, Folder parentOrNull, String entryName, Set<Integer> excludedFolderIds) {
     return folderRepository
         .findChildFoldersNamedIgnoringCase(
@@ -150,9 +151,14 @@ public class FolderSiblingNameValidation {
 
   private static void requireHeldByAFolder(TakenEntry taken) {
     if (taken.kind() != TakenEntry.Kind.FOLDER) {
-      throw new ApiException(
-          new ApiError(entryNameTakenAt(taken.path()), ApiError.ErrorType.RESOURCE_CONFLICT));
+      refuseTaken(taken);
     }
+  }
+
+  /** {@code RESOURCE_CONFLICT} naming the path of the entry that holds the name. */
+  static void refuseTaken(TakenEntry taken) {
+    throw new ApiException(
+        new ApiError(entryNameTakenAt(taken.path()), ApiError.ErrorType.RESOURCE_CONFLICT));
   }
 
   /** New folder: no existing sibling folder may use {@code name}. */

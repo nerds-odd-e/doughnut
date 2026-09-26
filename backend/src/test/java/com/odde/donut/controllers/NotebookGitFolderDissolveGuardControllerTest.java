@@ -9,6 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import com.odde.donut.controllers.dto.ApiError;
 import com.odde.donut.controllers.dto.FolderMoveRequest;
 import com.odde.donut.entities.Folder;
+import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.NotebookAttachment;
 import com.odde.donut.entities.User;
@@ -86,6 +87,71 @@ class NotebookGitFolderDissolveGuardControllerTest extends NotebookGitWebContent
     assertThat(
         notebookAttachmentRepository.findById(sketch.getId()).orElseThrow().getFolder().getId(),
         equalTo(old.getId()));
+    assertThat(ObjectId.fromString(binding(notebook).getAcceptedGitObjectId()), equalTo(acceptedA));
+  }
+
+  @Test
+  void dissolveOntoANoteNameTakenIgnoringCaseIsRefusedNamingItAndChangesNothing() throws Exception {
+    Notebook notebook = createGitBackedNotebook();
+    Folder physics = makeMe.aFolder().notebook(notebook).name("physics").please();
+    makeMe.aNote("Energy").folder(physics).please();
+    Folder old = makeMe.aFolder().parentFolder(physics).name("old").please();
+    Note energy = makeMe.aNote("energy").folder(old).please();
+    snapshotCurrentPortableTree(notebook);
+    ObjectId acceptedA = ObjectId.fromString(binding(notebook).getAcceptedGitObjectId());
+
+    ApiException conflict =
+        assertThrows(
+            ApiException.class, () -> folderController.dissolveFolder(notebook, old, false));
+
+    assertThat(
+        conflict.getErrorBody().getErrorType(), equalTo(ApiError.ErrorType.RESOURCE_CONFLICT));
+    assertThat(
+        conflict.getErrorBody().getMessage(),
+        equalTo("This name is already used here by physics/Energy.md"));
+    assertThat(
+        folderRepository.findById(old.getId()).orElseThrow().getParentFolder().getId(),
+        equalTo(physics.getId()));
+    assertThat(
+        noteRepository.findById(energy.getId()).orElseThrow().getFolder().getId(),
+        equalTo(old.getId()));
+    assertThat(ObjectId.fromString(binding(notebook).getAcceptedGitObjectId()), equalTo(acceptedA));
+  }
+
+  @Test
+  void mergeMoveOntoANestedNoteNameTakenIgnoringCaseIsRefusedNamingItAndChangesNothing()
+      throws Exception {
+    Notebook notebook = createGitBackedNotebook();
+    Folder target = makeMe.aFolder().notebook(notebook).name("physics").please();
+    Folder targetDiagrams = makeMe.aFolder().parentFolder(target).name("diagrams").please();
+    makeMe.aNote("Energy").folder(targetDiagrams).please();
+    Folder holder = makeMe.aFolder().notebook(notebook).name("holder").please();
+    Folder source = makeMe.aFolder().parentFolder(holder).name("physics").please();
+    Folder sourceDiagrams = makeMe.aFolder().parentFolder(source).name("Diagrams").please();
+    Note energy = makeMe.aNote("energy").folder(sourceDiagrams).please();
+    snapshotCurrentPortableTree(notebook);
+    ObjectId acceptedA = ObjectId.fromString(binding(notebook).getAcceptedGitObjectId());
+    FolderMoveRequest mergeAtRoot = new FolderMoveRequest();
+    mergeAtRoot.setMerge(true);
+
+    ApiException conflict =
+        assertThrows(
+            ApiException.class, () -> folderController.moveFolder(notebook, source, mergeAtRoot));
+
+    assertThat(
+        conflict.getErrorBody().getErrorType(), equalTo(ApiError.ErrorType.RESOURCE_CONFLICT));
+    assertThat(
+        conflict.getErrorBody().getMessage(),
+        equalTo("This name is already used here by physics/diagrams/Energy.md"));
+    assertThat(
+        folderRepository.findById(source.getId()).orElseThrow().getParentFolder().getId(),
+        equalTo(holder.getId()));
+    assertThat(
+        folderRepository.findById(sourceDiagrams.getId()).orElseThrow().getParentFolder().getId(),
+        equalTo(source.getId()));
+    assertThat(
+        noteRepository.findById(energy.getId()).orElseThrow().getFolder().getId(),
+        equalTo(sourceDiagrams.getId()));
     assertThat(ObjectId.fromString(binding(notebook).getAcceptedGitObjectId()), equalTo(acceptedA));
   }
 
