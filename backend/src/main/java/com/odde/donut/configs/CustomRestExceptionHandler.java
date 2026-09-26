@@ -3,6 +3,7 @@ package com.odde.donut.configs;
 import com.odde.donut.controllers.dto.ApiError;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.donut.services.NoteTitleNameRule;
+import java.util.stream.Collectors;
 import org.hibernate.exception.ConstraintViolationException;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.core.Ordered;
@@ -13,6 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindException;
+import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -88,14 +90,7 @@ public class CustomRestExceptionHandler extends ResponseEntityExceptionHandler {
   @ExceptionHandler({BindException.class})
   public ResponseEntity<Object> handleBindException(
       final BindException ex, final WebRequest request) {
-    final ApiError apiError = new ApiError("binding error", ApiError.ErrorType.BINDING_ERROR);
-    for (final FieldError error : ex.getBindingResult().getFieldErrors()) {
-      apiError.add(error.getField(), error.getDefaultMessage());
-    }
-    for (final ObjectError error : ex.getBindingResult().getGlobalErrors()) {
-      apiError.add(error.getObjectName(), error.getDefaultMessage());
-    }
-    return new ResponseEntity<>(apiError, new HttpHeaders(), HttpStatus.BAD_REQUEST);
+    return bindingErrorResponse(ex.getBindingResult());
   }
 
   @Override
@@ -104,11 +99,20 @@ public class CustomRestExceptionHandler extends ResponseEntityExceptionHandler {
       @NotNull HttpHeaders headers,
       @NotNull HttpStatusCode status,
       @NotNull WebRequest request) {
-    final ApiError apiError = new ApiError("binding error", ApiError.ErrorType.BINDING_ERROR);
-    for (final FieldError error : ex.getBindingResult().getFieldErrors()) {
+    return bindingErrorResponse(ex.getBindingResult());
+  }
+
+  private static ResponseEntity<Object> bindingErrorResponse(BindingResult result) {
+    final ApiError apiError =
+        new ApiError(
+            result.getAllErrors().stream()
+                .map(ObjectError::getDefaultMessage)
+                .collect(Collectors.joining("; ")),
+            ApiError.ErrorType.BINDING_ERROR);
+    for (final FieldError error : result.getFieldErrors()) {
       apiError.add(error.getField(), error.getDefaultMessage());
     }
-    for (final ObjectError error : ex.getBindingResult().getGlobalErrors()) {
+    for (final ObjectError error : result.getGlobalErrors()) {
       apiError.add(error.getObjectName(), error.getDefaultMessage());
     }
     return new ResponseEntity<>(apiError, new HttpHeaders(), HttpStatus.BAD_REQUEST);

@@ -41,7 +41,10 @@ Commands:
 ### 1. A request refused by field validation says why
 
 Type: Behavior
-Status: planned
+Status: done — `CustomRestExceptionHandlerBindingErrorTest`
+(`bindExceptionMessageIsTheFieldMessage`,
+`methodArgumentNotValidJoinsSeveralFieldMessages`) passes with the existing
+duplicate-title tests; both handlers share `bindingErrorResponse`.
 Proof: a test beside `CustomRestExceptionHandlerDuplicateTitleTest` feeds a
 `BindException` with one field error (and a `MethodArgumentNotValidException`
 with two) to the handler → 400, `BINDING_ERROR`, the message is the field
