@@ -95,6 +95,13 @@ Change: the message in `NotebookGitProposalPublisher` (the git-bundle endpoint
 serves only CLI publish). The directory is not named because the server does
 not know it.
 
+## Execution complete
+
+Product advice: no priority change. The delivered messages close the story;
+the retrospective planned one small test correction, SEED-046#story-10
+([plan 005](../005-clone-test-states-output/PLAN.md)), for wrap-up to queue or
+drop.
+
 ## Current decisions
 
 - Owner, 2026-09-26: the clone message lists no rules; refusals explain them.

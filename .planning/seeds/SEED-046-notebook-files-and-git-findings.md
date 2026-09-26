@@ -348,6 +348,23 @@ including delivery, not commitments.
 - **Depends on:** none.
 - **Safe stopping point:** Each change stands alone.
 
+<a id="story-10"></a>
+
+### 8. Clone test states the clone output instead of what it no longer says
+
+**Identity:** SEED-046#story-10
+```json dough-story-state
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/005-clone-test-states-output/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"a515ec994ea7b66b865680d0c3257c834fd75e580bb59961b0c1fce2ed54c48b","plan":"3890d0ad2a1bda686f40b7b3182822a4a744c17d083a7ebf64f7f564b5a3ead9"}}
+```
+
+- **Goal:** Developers reading the clone test see the exact clone message
+  that owners get, with no assertion naming text that was deleted
+  (retrospective correction of SEED-046#story-3).
+- **Scope:** Only the first test in `cli/tests/notebookClone.test.ts`: replace
+  its `toContain` / `not.toContain` checks on the log output with one exact
+  assertion of the four-line message. No product change.
+- **Plan:** [005-clone-test-states-output](../slice-plans/005-clone-test-states-output/PLAN.md)
+
 ## Ordering and Scope Reduction
 
 Story 1 is first by owner decision and because it most limits the near-future
