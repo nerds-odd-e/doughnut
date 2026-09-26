@@ -67,22 +67,20 @@ class NoteControllerUploadNoteImageTests extends NotebookGitWebContentController
   }
 
   @Test
-  void replacingAPictureKeepsItsMask() throws Exception {
+  void replacingAPictureChangesOnlyItsImageLine() throws Exception {
     Notebook notebook = createGitBackedNotebook();
     Folder physics = makeMe.aFolder().notebook(notebook).name("physics").please();
-    Note moon =
-        makeMe
-            .aNote("Moon")
-            .folder(physics)
-            .content("---\nimage: earlier.png\nimage_mask: 10 10 20 20\n---\nbody")
-            .please();
+    String authored =
+        "---\ntags: [x, y]\n# a comment\ndescription: \"Quoted: value\"\n"
+            + "image: earlier.png\nimage_mask: 10 10 20 20\ntype: Note\n---\nbody";
+    Note moon = makeMe.aNote("Moon").folder(physics).content(authored).please();
     storeFolderAttachmentAndSnapshot(notebook, physics, "earlier.png", "earlier".getBytes());
 
     upload(moon, makeMe.anUploadedImage().toMultiplePartFilePlease());
 
     assertThat(
         tipText(acceptedHistory(notebook), "physics/Moon.md"),
-        equalTo("---\ntype: Note\nimage: my.png\nimage_mask: 10 10 20 20\n---\nbody"));
+        equalTo(authored.replace("image: earlier.png", "image: my.png")));
   }
 
   @Test

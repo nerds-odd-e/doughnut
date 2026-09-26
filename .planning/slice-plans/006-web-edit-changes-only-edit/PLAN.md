@@ -158,7 +158,11 @@ second splicer.
 ### 7. Setting a picture, an image mask or a reduced link property changes only that line
 
 Type: Behavior
-Status: planned
+Status: done — `NoteControllerUploadNoteImageTests.replacingAPictureChangesOnlyItsImageLine`,
+`RelationControllerReduceToSourcePropertyTests.appendsOnlyTheNewPropertyLineToTheSourceFrontmatter`,
+`NoteContentMarkdownTest.withNoteImageMask_replaces_only_the_mask_line`
+(whole content `equalTo`); picture-move, reduce, trash and attachment-delete
+controller tests green
 Proof: `NoteControllerUploadNoteImageTests` (example 5) and
 `RelationControllerReduceToSourcePropertyTests` (example 6). Each asserts the
 note content equals the original with only the one line added or replaced.
@@ -229,3 +233,9 @@ owner (rewrite values, then remove emptied keys) instead of
   behavior is observed through `WikiLinkMarkdownTest` and the inbound
   reference controller tests. Mark indexes count code points — convert with
   `offsetByCodePoints`. `Frontmatter.set` matches keys case-insensitively.
+- Slice 7: `FrontmatterInPlaceEdit.setTopLevelScalar` (shared `splice`,
+  `offset`) behind `NoteContentMarkdown.setLeadingFrontmatterProperty`, via
+  `NoteLeadingFrontmatter.splitVerbatim`/`rebuild` (rebuild adds the final
+  newline). Upload test contents need `type: Note` so `ensureTypeKey` adds no
+  line. `NoteContentMarkdown.LeadingFrontmatter` duplicates
+  `NoteLeadingFrontmatter.Split` (pre-existing, ~15 files; not merged here).

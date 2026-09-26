@@ -4,11 +4,14 @@ import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.function.UnaryOperator;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
+import org.yaml.snakeyaml.error.Mark;
 import org.yaml.snakeyaml.nodes.MappingNode;
 import org.yaml.snakeyaml.nodes.Node;
+import org.yaml.snakeyaml.nodes.NodeTuple;
 import org.yaml.snakeyaml.nodes.ScalarNode;
 import org.yaml.snakeyaml.nodes.SequenceNode;
 
@@ -36,8 +39,8 @@ public final class FrontmatterInPlaceEdit {
       if (transformed.equals(scalar.getValue())) {
         continue;
       }
-      int start = yamlRaw.offsetByCodePoints(0, scalar.getStartMark().getIndex());
-      int end = yamlRaw.offsetByCodePoints(0, scalar.getEndMark().getIndex());
+      int start = offset(yamlRaw, scalar.getStartMark());
+      int end = offset(yamlRaw, scalar.getEndMark());
       String source = yamlRaw.substring(start, end);
       String rewrittenSource = rewrite.apply(source);
       if (scalar.getScalarStyle() == DumperOptions.ScalarStyle.DOUBLE_QUOTED
@@ -47,6 +50,32 @@ public final class FrontmatterInPlaceEdit {
       replacements.add(new Replacement(start, end, rewrittenSource));
     }
     return splice(yamlRaw, replacements);
+  }
+
+  /**
+   * Sets a top-level {@code key} (matched case-insensitively) to the scalar {@code value}: the
+   * existing entry's text is replaced, otherwise the entry is appended after the last line.
+   */
+  public static String setTopLevelScalar(String yamlRaw, String key, String value) {
+    String entry = dumpEntry(key, value);
+    Node document = new Yaml().compose(new StringReader(yamlRaw));
+    if (document instanceof MappingNode mapping) {
+      for (NodeTuple tuple : mapping.getValue()) {
+        if (tuple.getKeyNode() instanceof ScalarNode keyNode
+            && keyNode.getValue().equalsIgnoreCase(key)) {
+          int start = offset(yamlRaw, keyNode.getStartMark());
+          int end = offset(yamlRaw, tuple.getValueNode().getEndMark());
+          return splice(yamlRaw, List.of(new Replacement(start, end, entry)));
+        }
+      }
+    }
+    return yamlRaw.isEmpty() ? entry : yamlRaw + "\n" + entry;
+  }
+
+  private static String dumpEntry(String key, String value) {
+    DumperOptions options = new DumperOptions();
+    options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
+    return stripTrailingNewline(new Yaml(options).dump(Map.of(key, value)));
   }
 
   private static List<ScalarNode> supportedScalars(MappingNode mapping) {
@@ -66,6 +95,11 @@ public final class FrontmatterInPlaceEdit {
     return scalars;
   }
 
+  /** SnakeYAML marks count code points; {@link String} offsets count UTF-16 chars. */
+  private static int offset(String yamlRaw, Mark mark) {
+    return yamlRaw.offsetByCodePoints(0, mark.getIndex());
+  }
+
   private static String splice(String yamlRaw, List<Replacement> replacements) {
     StringBuilder rewritten = new StringBuilder(yamlRaw);
     replacements.stream()
@@ -78,7 +112,10 @@ public final class FrontmatterInPlaceEdit {
     DumperOptions options = new DumperOptions();
     options.setDefaultScalarStyle(style);
     options.setSplitLines(false);
-    String dumped = new Yaml(options).dump(value);
+    return stripTrailingNewline(new Yaml(options).dump(value));
+  }
+
+  private static String stripTrailingNewline(String dumped) {
     return dumped.endsWith("\n") ? dumped.substring(0, dumped.length() - 1) : dumped;
   }
 

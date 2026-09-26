@@ -72,7 +72,18 @@ class NoteContentMarkdownTest {
 
     assertThat(
         result,
-        equalTo("---\n" + "source: '[[Moon]]'\n" + "a part of: '[[Earth]]'\n" + "---\n" + "Body"));
+        equalTo(
+            "---\n" + "source: \"[[Moon]]\"\n" + "a part of: '[[Earth]]'\n" + "---\n" + "Body"));
+  }
+
+  @Test
+  void withNoteImageMask_replaces_only_the_mask_line() {
+    String content =
+        "---\n# a comment\nimage_mask: 1 1 2 2\ntags: [x, y]\ndescription: \"Quoted: value\"\n---\nBody";
+
+    assertThat(
+        NoteContentMarkdown.withNoteImageMask(content, "10 10 20 20"),
+        equalTo(content.replace("image_mask: 1 1 2 2", "image_mask: 10 10 20 20")));
   }
 
   @Test
