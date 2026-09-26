@@ -28,6 +28,8 @@ describe("RichMarkdownEditor with a body it cannot keep", () => {
     "# Heading\n\n- one\n- two\n\nSee [the site](https://example.com).",
     "Heading\n=======\n\n* one\n* two\n\nSee [the site][site].\n\n[site]: https://example.com",
     "See [[Some Note]] and [[Other|alias]].",
+    "line one\nline two",
+    "- item that wraps\n  onto a second line\n- two",
   ])("keeps a body with only style differences editable: %j", async (body) => {
     await h.mountEditor(body)
 

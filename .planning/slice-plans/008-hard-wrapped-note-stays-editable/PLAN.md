@@ -55,7 +55,10 @@ plus `CURSOR_DEV=true nix develop -c pnpm -C frontend exec vue-tsc --noEmit`.
 ### 1. Wrapped text compares as rendered
 
 Type: Behavior
-Status: planned
+Status: done — red run: both wrapped cases failed at `quillReadonly()`; after
+the fix the command above passed 20 files / 158 tests and `vue-tsc --noEmit`
+exited 0. `rendered` collapses whitespace runs to one space outside `<pre>`
+after removing newline whitespace between tags.
 Proof: add the two wrapped bodies to the spec's editable cases (red first:
 both fail at `0e36045508`); the existing refused cases stay green; then the
 command above.
@@ -63,6 +66,11 @@ command above.
 Change: in `richEditorKeepsBody.ts`, normalize runs of whitespace in text to
 one space outside `<pre>` before comparing, so the comparison follows how HTML
 renders. Keep it one normalization, not a rule per construct.
+
+## Execution complete
+
+Product advice: no change beyond plan 005's advice — measure how many real
+notes still refuse (loose lists saved tight) before deciding on a story.
 
 ## Current decisions
 
