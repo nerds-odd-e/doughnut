@@ -163,14 +163,6 @@ export async function createNoteFromExtractionPreview(
   await flushPromises()
 }
 
-export async function clickExtractionPreviewBack(
-  wrapper: ReturnType<typeof mountNoteRefinement>
-) {
-  await wrapper
-    .find('[data-test-id="extraction-preview-back"]')
-    .trigger("click")
-}
-
 export async function clickRetryExtractionPreview(
   wrapper: ReturnType<typeof mountNoteRefinement>
 ) {
@@ -211,5 +203,5 @@ export async function mountNoteRefinementPendingExtractionPreview(
   await selectRefinementLayoutItem(wrapper, itemId)
   await clickExtractRefinementLayout(wrapper)
   await nextTick()
-  return { wrapper, resolve, gate, extractSpy }
+  return { wrapper, resolve, extractSpy }
 }

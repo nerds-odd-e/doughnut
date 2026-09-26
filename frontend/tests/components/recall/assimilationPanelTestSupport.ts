@@ -5,7 +5,7 @@ import {
   NoteController,
 } from "@generated/donut-backend-api/sdk.gen"
 import AssimilationPanel from "@/components/recall/AssimilationPanel.vue"
-import { flushPromises } from "@vue/test-utils"
+import { flushPromises, type VueWrapper } from "@vue/test-utils"
 import makeMe from "donut-test-fixtures/makeMe"
 import helper, { mockSdkService } from "@tests/helpers"
 import RenderingHelper from "@tests/helpers/RenderingHelper"
@@ -19,34 +19,54 @@ import { afterEach, beforeEach, vi } from "vitest"
 import { mockedGoToNextAssimilation } from "./assimilationPanelMocks"
 import { refinementLayoutItems } from "./noteRefinementTestSupport"
 
-export {
-  assimilateAsCommissionedButtonEl,
-  assimilateAsCommissionedButtonSelector,
-  assimilateButtonEl,
-  assimilateButtonSelector,
-  clickAssimilate,
-  clickAssimilateAsCommissioned,
-  clickRememberSpelling,
-  clickReturnToSequence,
-  clickSkipAndConfirm,
-  commissionedStatusEl,
-  commissionedStatusSelector,
-  rememberSpellingButtonEl,
-  rememberSpellingButtonSelector,
-  returnToSequenceButtonEl,
-  returnToSequenceButtonSelector,
-  skipButtonEl,
-  skipButtonSelector,
-  spellingStatusEl,
-  spellingStatusSelector,
-  understandingStatusSelector,
-} from "./assimilationPanelControlTestSupport"
+export const assimilateButtonSelector =
+  '[data-test="assimilate-UNDERSTANDING"]' as const
+export const assimilateAsCommissionedButtonSelector =
+  '[data-test="assimilate-COMMISSIONED"]' as const
+export const rememberSpellingButtonSelector =
+  '[data-test="assimilate-SPELLING"]' as const
+export const commissionedStatusSelector =
+  '[data-test="assimilation-status-COMMISSIONED"]' as const
+export const spellingStatusSelector =
+  '[data-test="assimilation-status-SPELLING"]' as const
+export const understandingStatusSelector =
+  '[data-test="assimilation-status-UNDERSTANDING"]' as const
 
-export const noteRealm = makeMe.aNoteRealm.please()
-export const memoryTracker = makeMe.aMemoryTracker.ofNote(noteRealm).please()
-export const { note } = memoryTracker
+const buttonEl = (wrapper: VueWrapper, selector: string) =>
+  wrapper.element.querySelector(selector) as HTMLInputElement | null
 
-export let renderer: RenderingHelper<typeof AssimilationPanel>
+export const assimilateButtonEl = (wrapper: VueWrapper) =>
+  buttonEl(wrapper, assimilateButtonSelector)
+export const skipButtonEl = (wrapper: VueWrapper) =>
+  buttonEl(wrapper, '[data-test="skip"]')
+export const returnToSequenceButtonEl = (wrapper: VueWrapper) =>
+  buttonEl(wrapper, '[data-test="return-to-sequence"]')
+
+async function clickAndSettle(button: HTMLElement | null) {
+  button!.click()
+  await flushPromises()
+}
+
+export const clickAssimilate = (wrapper: VueWrapper) =>
+  clickAndSettle(assimilateButtonEl(wrapper))
+export const clickReturnToSequence = (wrapper: VueWrapper) =>
+  clickAndSettle(returnToSequenceButtonEl(wrapper))
+export const clickAssimilateAsCommissioned = (wrapper: VueWrapper) =>
+  clickAndSettle(buttonEl(wrapper, assimilateAsCommissionedButtonSelector))
+export const clickRememberSpelling = (wrapper: VueWrapper) =>
+  clickAndSettle(buttonEl(wrapper, rememberSpellingButtonSelector))
+
+export async function clickSkipAndConfirm(wrapper: VueWrapper) {
+  skipButtonEl(wrapper)!.click()
+  usePopups().popups.done(true)
+  await flushPromises()
+}
+
+export const { note } = makeMe.aMemoryTracker
+  .ofNote(makeMe.aNoteRealm.please())
+  .please()
+
+let renderer: RenderingHelper<typeof AssimilationPanel>
 export let assimilateSpy: ReturnType<typeof mockSdkService>
 export let skipSequenceSpy: ReturnType<typeof mockSdkService>
 
@@ -129,26 +149,12 @@ export function spellingVerificationPopupEl() {
   ) as HTMLElement | null
 }
 
-export function verifySpellingButtonEl() {
-  return document.body.querySelector(
-    '[data-test="verify-spelling"]'
-  ) as HTMLElement | null
-}
-
-export function mountAssimilationPanel(overrides?: { note?: typeof note }) {
-  return renderer
+export async function mountAssimilationPanelReady() {
+  const wrapper = renderer
     .withCleanStorage()
-    .withProps({
-      note: overrides?.note ?? note,
-    })
+    .withProps({ note })
     .withRouter()
     .mount()
-}
-
-export async function mountAssimilationPanelReady(overrides?: {
-  note?: typeof note
-}) {
-  const wrapper = mountAssimilationPanel(overrides)
   await flushPromises()
   return wrapper
 }
@@ -158,7 +164,7 @@ export async function closeSpellingVerificationPopup() {
   await flushPromises()
 }
 
-export async function clickVerifySpelling() {
-  verifySpellingButtonEl()!.click()
-  await flushPromises()
-}
+export const clickVerifySpelling = () =>
+  clickAndSettle(
+    document.body.querySelector('[data-test="verify-spelling"]') as HTMLElement
+  )

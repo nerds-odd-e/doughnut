@@ -172,12 +172,31 @@ Full `pnpm frontend:test` over slices 1–4: 323 files, 1929 tests pass.
 
 ### 5. Mid-size sibling families share one setup
 Type: Structure
-Status: planned
+Status: done
 Proof: as slice 1, per family.
 
 Apply the same merge to the 4–6-file families listed in the family analysis.
 If this exceeds the slice budget, deliver it in two halves (page-level
 families, then component-level families).
+
+Delivered in three parallel, file-disjoint parts (pages; notes and toolbars;
+components). Accepted proof, all files ≤250 lines, every removed test naming
+its survivor or folded into an `it.each` row with exact per-row assertions:
+
+- Pages: FolderPage 6 → 3, MemoryTrackerPageView 5 → 3, BookReadingPage 7 → 5
+  (18 → 11 files, 106 → 101 tests). Alternating focused runs 5.86/5.35/5.26s
+  → 5.37/4.49/4.49s. `readingControlPanel.*` stay apart (together >250 lines);
+  `BookReadingPage.snap.spec.ts` (404 lines) was already over the limit and is
+  untouched.
+- Notes and toolbars: NoteToolbar 6 → 3, NoteAudioTools 5 → 3, NoteNewForm
+  4 → 2, MainMenu 4 → 3 (19 → 11 specs plus one support file, 92 → 91 tests).
+  Alternating runs 6.66/6.53/8.01s → 5.20/5.30/5.06s.
+- Components: NoteRefinement 11 → 5, AssimilationPanel 4 → 3, SearchResults
+  5 → 2, DiffView 4 → 1 (24 → 11 specs plus two support files, 96 → 73
+  tests). NoteRefinement alternating runs 6.16/4.88/5.13s → 4.78/3.73/3.63s.
+
+Focused commands: `cd frontend && CURSOR_DEV=true nix develop -c pnpm exec vitest run --browser=chromium --browser.headless <family globs>`;
+`pnpm -C frontend exec vue-tsc --noEmit` passes.
 
 ### 6. Re-profile and record the outcome
 Type: Structure
@@ -209,4 +228,8 @@ remaining candidate.
   runs; separate runs varied by more than 2s.
 - A file's timer mode (real vs fake) is part of its shared setup; RecallPage
   loading tests need real timers.
+- A module-level `vi.mock` decides which files can merge: files that need the
+  real module (e.g. `AssimilationPanel.loadingModal`) stay apart.
+- Once default SDK mocks move into a shared `beforeEach`, add
+  `vi.restoreAllMocks()` in `afterEach` so tests can assert exact call counts.
 - zsh does not split an unquoted `$F` file list; use brace expansion or `${=F}`.

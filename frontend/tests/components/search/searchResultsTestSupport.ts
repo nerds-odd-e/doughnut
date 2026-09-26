@@ -2,10 +2,14 @@ import type {
   NoteSearchResult,
   RelationshipLiteralSearchHit,
 } from "@generated/donut-backend-api"
-import { SearchController } from "@generated/donut-backend-api/sdk.gen"
+import {
+  NoteController,
+  SearchController,
+} from "@generated/donut-backend-api/sdk.gen"
 import SearchResults from "@/components/search/SearchResults.vue"
 import helper, { mockSdkService, wrapSdkResponse } from "@tests/helpers"
 import makeMe from "donut-test-fixtures/makeMe"
+import { afterEach, beforeEach, vi } from "vitest"
 
 export { advanceSearchDebounce as waitForDebounce } from "@tests/helpers/searchDebounceTestSupport"
 
@@ -36,6 +40,19 @@ export function setupSearchMocks(
   mockSdkService(SearchController, "semanticSearch", semanticResults)
   mockSdkService(SearchController, "searchForRelationshipTargetWithin", literal)
   mockSdkService(SearchController, "semanticSearchWithin", semanticResults)
+}
+
+/** Fake timers drive the search debounce; every search returns nothing until a test says otherwise. */
+export function setupSearchResultsTests() {
+  beforeEach(() => {
+    vi.useFakeTimers()
+    setupSearchMocks()
+    mockSdkService(NoteController, "getRecentNotes", [])
+  })
+  afterEach(() => {
+    vi.useRealTimers()
+    vi.restoreAllMocks()
+  })
 }
 
 export function setupDelayedSearchMocks() {

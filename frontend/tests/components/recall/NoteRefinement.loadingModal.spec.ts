@@ -1,5 +1,6 @@
 import { AiController } from "@generated/donut-backend-api/sdk.gen"
 import { flushPromises } from "@vue/test-utils"
+import { screen } from "@testing-library/vue"
 import { nextTick } from "vue"
 import { describe, expect, it } from "vitest"
 import makeMe from "donut-test-fixtures/makeMe"
@@ -19,9 +20,12 @@ import {
   createDeferredGate,
   loadingModalMask,
 } from "./noteRefinementLayoutLoadingTestSupport"
+import { clickRemoveRefinementLayout } from "./noteRefinementRemoveTestSupport"
 import {
   clickExtractRefinementLayout,
   mountNoteRefinementReady,
+  mountNoteRefinementWithFirstItemSelected,
+  refinementLayoutItems,
   sampleExtractionPreview,
   selectRefinementLayoutItem,
   setupNoteRefinementTests,
@@ -29,7 +33,7 @@ import {
 
 setupNoteRefinementTests()
 
-describe("NoteRefinement extract note loading", () => {
+describe("NoteRefinement extract note loading modal", () => {
   it("shows preview LoadingModal through initial success and retry failure", async () => {
     const initialPreviewGate = createDeferredGate()
     const retryPreviewGate = createDeferredGate()
@@ -90,5 +94,56 @@ describe("NoteRefinement extract note loading", () => {
     createGate.resolve()
     await flushPromises()
     expect(loadingModalMask()).toBeNull()
+  })
+})
+
+describe("NoteRefinement remove layout loading modal", () => {
+  it("shows LoadingModal while removing refinement layout items and hides on failure", async () => {
+    const wrapper = await mountNoteRefinementWithFirstItemSelected(["Point 1"])
+
+    const failureGate = createDeferredGate()
+    mockSdkServiceWithImplementation(
+      AiController,
+      "removeRefinementSuggestion",
+      async () => {
+        await failureGate.gate
+        return wrapSdkError("API Error")
+      }
+    )
+    await clickRemoveRefinementLayout(wrapper)
+
+    expect(loadingModalMask()).toBeTruthy()
+    expect(document.body.textContent).toContain("AI is removing content...")
+    failureGate.resolve()
+    await flushPromises()
+    expect(loadingModalMask()).toBeNull()
+  })
+
+  it("keeps remove continuous blocker noncancelable while nested layout regenerates", async () => {
+    const layoutGate = createDeferredGate()
+    const wrapper = await mountNoteRefinementWithFirstItemSelected(["Point 1"])
+    mockSdkServiceWithImplementation(
+      AiController,
+      "generateRefinementSuggestions",
+      async () => {
+        await layoutGate.gate
+        return { items: refinementLayoutItems(["Point 1"]) }
+      }
+    )
+    await clickRemoveRefinementLayout(wrapper)
+
+    expect(loadingModalMask()).toBeTruthy()
+    expect(document.body.textContent).toContain("AI is removing content...")
+    expect(screen.queryByText("Cancel")).toBeNull()
+    expect(document.body.textContent).not.toContain(
+      "AI is generating refinement layout..."
+    )
+
+    layoutGate.resolve()
+    await flushPromises()
+    expect(loadingModalMask()).toBeNull()
+    expect(wrapper.find('[data-test-id="refinement-layout"]').exists()).toBe(
+      true
+    )
   })
 })
