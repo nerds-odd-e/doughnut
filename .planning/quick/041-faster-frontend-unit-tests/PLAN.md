@@ -200,13 +200,26 @@ Focused commands: `cd frontend && CURSOR_DEV=true nix develop -c pnpm exec vites
 
 ### 6. Re-profile and record the outcome
 Type: Structure
-Status: planned
+Status: done
 Proof: two whole-suite runs under baseline conditions; before/after files,
 tests, and duration recorded here.
 
 Update the frontend profiling note in
 `.planning/test-optimization-candidates.md` with the measured result and any
 remaining candidate.
+
+Accepted proof: throwaway worktree at `8d79d96a09` vs story branch at
+`8df4a87262`, alternating `CURSOR_DEV=true nix develop -c pnpm frontend:test`,
+load average 4.6–12.4:
+
+| Round | Old (346 files, 1937 tests) | New (295 files, 1900 tests) |
+| --- | --- | --- |
+| 1 | 47.28s | 37.49s |
+| 2 | 46.61s | 42.24s |
+| 3 | 55.84s | 39.58s |
+
+Mean Vitest duration 49.9s → 39.8s (~20%); all runs pass. The candidates
+note records the result and the unpicked opportunities; no new candidate.
 
 ## Current decisions
 
