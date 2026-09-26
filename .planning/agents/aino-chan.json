@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "agent": "Aino-chan",
+  "email": "aino-chan@example.org",
+  "identity": "SEED-046#story-5",
+  "mode": "story-branch",
+  "branch": "exec/006-web-edit-changes-only-edit",
+  "host": "claude",
+  "model": "claude-opus-5-5"
+}
