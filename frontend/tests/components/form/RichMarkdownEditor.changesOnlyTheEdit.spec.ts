@@ -1,4 +1,5 @@
 import {
+  attemptRenamePropertyKey,
   expandPropertyPanelAndClickRemove,
   propertyRowSelector,
   propertyRows,
@@ -113,6 +114,33 @@ describe("RichMarkdownEditor changes only what the user edited", () => {
       )
 
       expect(h.lastEmittedMarkdown()).toBe(note.replace("tags: [x, y]\n", ""))
+    })
+
+    it("adds only the added property's line before the closing fence", async () => {
+      await h.mountEditor(note)
+      await h.commitInsertProperty("source", "web")
+
+      expect(h.lastEmittedMarkdown()).toBe(
+        note.replace("tags: [x, y]\n", "tags: [x, y]\nsource: web\n")
+      )
+    })
+
+    it("renames only the renamed property's key", async () => {
+      const wrapper = await h.mountEditor(note)
+      await attemptRenamePropertyKey(wrapper, 0, "title")
+
+      expect(h.lastEmittedMarkdown()).toBe(
+        note.replace("name: demo", "title: demo")
+      )
+    })
+
+    it("quotes a renamed key that YAML needs quoted", async () => {
+      const wrapper = await h.mountEditor(note)
+      await attemptRenamePropertyKey(wrapper, 0, "a: b")
+
+      expect(h.lastEmittedMarkdown()).toBe(
+        note.replace("name: demo", '"a: b": demo')
+      )
     })
   })
 })

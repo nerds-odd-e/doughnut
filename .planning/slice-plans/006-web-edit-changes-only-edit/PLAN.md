@@ -127,7 +127,8 @@ splice.
 ### 5. Adding or renaming one property changes only its lines
 
 Type: Behavior
-Status: planned
+Status: done — same spec: added `source`, renamed `name` to `title`, and a
+renamed key that YAML needs quoted (whole Markdown `toBe`)
 Proof: "add `source`" from example 3, and renaming `name` to `title` keeps
 the comment above it and the entry's position.
 
@@ -214,12 +215,10 @@ owner (rewrite values, then remove emptied keys) instead of
   `propertyRowsFromRecord` removed). Page tests can depend on row order
   silently (`NoteShowPage.imageUpload` read the first row); include
   `NoteShowPage` in focused runs for panel changes.
-- Slice 4: the in-place edit lives in `noteContentInPlaceEdit.ts`
-  (`frontmatterWithEditedEntries`); `verbatimFrontmatterPrefixAndBody` now
-  returns `yamlStart`/`yamlEnd` (closing fence position) for splicing. Added
-  and renamed keys still fall back to the full re-dump (marked "for now");
-  removing the last property keeps the re-dump so the block is dropped.
-  For slice 5: append `entry\n` at `yamlEnd`; a rename is an edited key absent
-  from the authored keys at the index of a vanished authored key — replace only
-  `pair.key.range`. `appendWikiLinkPropertyRow` could then use the in-place
-  edit too.
+- Slices 4–5: the frontend's one in-place edit lives in
+  `noteContentInPlaceEdit.ts` (`frontmatterWithEditedEntries`), splicing by
+  `yaml` source range inside `verbatimFrontmatterPrefixAndBody`'s
+  `yamlStart`/`yamlEnd`. Renames are detected by row index (rows keep file
+  order); a renamed key is written through the YAML writer so it is quoted
+  when needed. Removing the last property still re-dumps (drops the block).
+  `appendWikiLinkPropertyRow` uses the same edit.

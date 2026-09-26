@@ -1,4 +1,7 @@
-import { composeNoteContentMarkdown } from "@/utils/noteContentFrontmatter"
+import {
+  composeNoteContentInPlace,
+  composeNoteContentMarkdown,
+} from "@/utils/noteContentFrontmatter"
 import { parseNoteContentMarkdown } from "@/utils/noteContentFrontmatterParse"
 import { findPropertyRowIndexByExactKey } from "@/utils/noteContentPropertyKeys"
 import {
@@ -193,5 +196,5 @@ export function appendWikiLinkPropertyRow(
     propertyRowWithScalar("", linkText),
   ]
   if (!validatePropertyRowsForRichEdit(rows).ok) return
-  return composeNoteContentFromPropertyRows(rows, parsed.body)
+  return composeNoteContentInPlace(content, rows, parsed.body)
 }
