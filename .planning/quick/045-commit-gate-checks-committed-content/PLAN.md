@@ -68,7 +68,13 @@ remains in the temporary directory (example 6).
 
 ### 1. The commit gate checks the frontend content being committed
 Type: Behavior
-Status: planned
+Status: done
+Accepted proof (2026-09-26): examples 1–6 through `./scripts/git-hooks/pre-commit`
+behaved as tabled (passes 1, 2 exit 0; 3a/4/5 exit 2 with `TS2322`/`TS2459`/`TS2307`;
+3b exit 1 Biome), status and cached-diff digests unchanged, no
+`donut-frontend-index.*` copy left; `pnpm frontend:lint` passes. Kept
+`pnpm -C <copy>/frontend lint` (works, reuses the frontend `lint` script).
+Learning: nix's GNU `mktemp` needs an explicit `XXXXXX` template.
 Proof: examples 1–6 through `./scripts/git-hooks/pre-commit`, as in the table,
 run through `./scripts/run.sh`; then `./scripts/run.sh pnpm frontend:lint`
 passes on the clean checkout.
