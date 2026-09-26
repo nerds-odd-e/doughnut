@@ -90,9 +90,10 @@ in historical bundles.
 
 S = 30–60 minutes, M = 1–2 hours, L = 2–4 hours, including delivery. Estimates
 are hypotheses; refine/split work that exceeds L before execution planning.
-Root-file and nested-file continuity are delivered. Stories 11 and 10 own the
-dissolve/merge and cross-notebook operations that the delivered behavior
-refuses for now. The [product backlog](../PRODUCT-BACKLOG.md) owns global order.
+Root-file and nested-file continuity are delivered. Story 11 owns dissolve and
+merge; story 23 fixes the picture a note move leaves behind; stories 24 and 10
+own moves to another notebook, which the delivered behavior does not publish
+(24) or refuses for folders with files (10). The [product backlog](../PRODUCT-BACKLOG.md) owns global order.
 No executable plan or implementation is authorized by this seed.
 
 <a id="story-2"></a>
@@ -244,30 +245,144 @@ No executable plan or implementation is authorized by this seed.
 - **Safe stopping point:** if never delivered, the current refusal stays safe.
   The name rule and cascade removal each leave the product safer on their own.
 
+<a id="story-23"></a>
+
+### A moved note keeps its picture
+```json dough-story-state
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../quick/042-moved-note-keeps-its-picture/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"f1cb2be5b3fa63de2c155a9199e02f418e77aa141ddaa4a6ce05e514f030498b","plan":"b7de56b768b196d212af698f2f489e8660b6a5d3e7e1708beebdffd98ab06875"}}
+```
+
+- **Identity:** SEED-035#story-23
+- **Slice plan:** [A moved note keeps its picture](../quick/042-moved-note-keeps-its-picture/PLAN.md)
+- **Goal:** An owner who moves a picture note to another folder on the web
+  still sees its picture. Since web-uploaded and migrated pictures became
+  files in their note's folder, a move leaves the file behind: `image:` is
+  resolved relative to the note's folder, so the moved note shows a broken
+  picture. Before that change a picture belonged to its note and moved with it,
+  so this is a regression on an everyday action, not a new capability.
+- **Scope:**
+  - A web note move within the same notebook — into a folder or to the
+    notebook root — carries the file the note's `image:` names when that file
+    is directly in the note's folder. The file and the note land in the
+    destination in the same accepted change, and `image:` stays as it was
+    (owner decision 2026-09-26, option A).
+  - When the destination folder already has an entry with that filename
+    (compared without letter case, under story 11's one set of names per
+    folder), the file takes the first free name (`force (2).png`) and the
+    note's `image:` is rewritten to it in the same change. Donut chooses this
+    name and writes the only reference at the same moment, so it takes a free
+    name rather than refusing
+    ([North Star: one way in](../NORTH-STAR.md#one-way-in)).
+  - When another note in the source folder also names the same file, that note
+    keeps it: the file stays and the moved note gets its own copy in the
+    destination. The copy reuses the same stored bytes; nothing is uploaded.
+  - After `donut notebook pull`, the note and its picture are in the new folder
+    and the old folder no longer holds the file (unless another note kept it).
+    Learning history and `image_mask:` are unchanged.
+- **Excluded:**
+  - Moving a note to another notebook (story 24 makes it reach Git; story 10
+    carries its picture). Folder moves already carry their files.
+  - Trash and undo-trash: they move the note into and out of `_trash` and
+    leave the file where it is, so undo finds it again. A trashed note may show
+    a broken picture while in trash.
+  - `image:` values that are a URL or an absolute path, or that name a file in
+    another folder (`diagrams/force.png`, `../x.png`), and a missing file: the
+    note moves and `image:` is untouched. Only locally written values reach
+    other folders; web uploads always sit beside their note.
+  - Other notes elsewhere in the notebook whose locally written `image:`
+    points into the source folder: not searched, as story 11 accepted for
+    folder operations.
+  - Showing `image:` values with `..` on the web, and rewriting `image:` for
+    anything but the free-name case.
+- **Key examples:**
+  1. `physics/Force.md` has `image: force.png`; `physics/force.png` exists and
+     `mechanics/` has no `force.png`. The owner moves `Force` into `mechanics`
+     → the web shows the picture; after pull, `mechanics/Force.md` still says
+     `image: force.png`, `mechanics/force.png` has the same bytes, and
+     `physics/force.png` is gone.
+  2. The same, but `mechanics/` already holds `Force.png` → the moved file
+     becomes `mechanics/force (2).png`, `Force` says `image: force (2).png`,
+     and `mechanics/Force.png` is unchanged.
+  3. `physics/Energy.md` also says `image: force.png` → after moving `Force`,
+     `physics/force.png` stays for `Energy` and `mechanics/force.png` is a
+     copy for `Force`; both notes show the picture.
+  4. `Force` says `image: https://example.com/f.png` → it moves as today; no
+     file changes.
+  5. `Force` is trashed → `physics/force.png` stays; undo puts `Force` back
+     beside it with its picture.
+- **Effort hypothesis:** M, medium confidence. The move owner already writes
+  one accepted change; it adds a file placement (or copy) and, rarely, a
+  one-field frontmatter rewrite. Story 11 supplies the name rule.
+- **Depends on:** story 11 (one set of names per folder, including files).
+- **Safe stopping point:** if never delivered, moving picture notes keeps
+  breaking their picture, as today; nothing is lost and a local move fixes it.
+
+<a id="story-24"></a>
+
+### Moves to another notebook reach both notebooks' Git
+```json dough-story-state
+{"schemaVersion":1,"refinement":"not-refined","approach":"unselected"}
+```
+
+- **Identity:** SEED-035#story-24
+- **Goal:** An owner who moves a note or a folder to another notebook on the
+  web finds the same result in both local checkouts after pull. Today such a
+  move changes only the database: neither notebook's accepted history records
+  it, so a pull of the source brings the note back and the destination never
+  receives it
+  ([synchronization contract](../../docs/notebook-git-synchronization.md#domain-operation-ownership):
+  "Cross-notebook move and cross-notebook referrer rewrites remain outside this
+  owner"). This silent divergence undercuts the near-future direction of
+  working in local checkouts alongside the web.
+- **Candidate scope (not refined):** the web note move and folder move to
+  another notebook, including a folder's nested subfolders, run through the
+  existing multi-notebook accepted-change owner (as relationship reduction
+  does): one accepted commit per changed notebook, in one transaction. Folders
+  containing files keep today's refusal (story 10). Moving several folders at
+  once stays out (owner decision 2026-09-26).
+- **Open decisions for refinement:** whether wiki-link rewrites in third
+  notebooks belong here; whether a picture note moved to another notebook is
+  refused until story 10 (the seed rule that operations which would rehome
+  files refuse until their story delivers) or moves with a broken picture as
+  today.
+- **Effort hypothesis:** M, low confidence.
+- **Depends on:** story 11 (queued after it by owner decision 2026-09-26).
+- **Safe stopping point:** if never delivered, web moves to another notebook
+  keep diverging from local checkouts.
+
 <a id="story-10"></a>
 
 ### Carry a folder's files along when it moves to another notebook
+```json dough-story-state
+{"schemaVersion":1,"refinement":"not-refined","approach":"unselected"}
+```
 
 - **Identity:** SEED-035#story-10
 - **Goal:** An owner reorganizing notebooks on the web can move a folder that
-  contains supporting files to another notebook, instead of first removing or
-  relocating those files locally.
+  contains supporting files, or a picture note, to another notebook, instead of
+  first removing or relocating those files locally.
 - **Evaluation:** Folder `refs/` holds a note and `paper.pdf`. The owner moves
   `refs` to another notebook on the web, then pulls both notebooks: the source no
   longer has `refs/`, the destination has `refs/paper.pdf` with the same bytes,
   and the note keeps its learning identity.
-- **Scope / value:** Replaces the current refusal with the move notes already get.
-  Both notebooks' accepted trees change through the existing accepted-change
-  boundary. The refusal loses nothing and a local workaround exists (copy the
-  files between two checkouts), so this is a convenience, ranked after the
-  retrieval, image and deletion journeys.
-- **Effort hypothesis:** S–M, low confidence until the existing cross-notebook
-  note move's publication path is inspected.
-- **Depends on:** Delivered nested attachment continuity.
+- **Candidate scope (not refined):** replaces the refusal once story 24 has
+  made moves to another notebook reach Git. Stored bytes are notebook-scoped
+  (`notebook/{id}/lfs/{sha}`, no cross-notebook deduplication), so each file's
+  object is copied into the destination notebook's store before the change is
+  accepted. A moved folder carries all nested subfolders; moving several
+  folders at once stays out (owner decision 2026-09-26). The picture of a note
+  moved to another notebook follows story 23's rules.
+- **Proposed exclusions:** a folder holding a Book's source file is refused
+  (the Book belongs to the source notebook; [story 17 decision](#breadcrumbs));
+  references from outside the moved folder break, as story 11 accepted;
+  source objects are not deleted (garbage collection stays deferred). A merge
+  into a same-named destination folder only if story 11's merge rules make it
+  free; otherwise it stays refused.
+- **Value:** the refusal loses nothing and a local workaround exists (copy the
+  files between two checkouts), so this is a convenience ranked after story 24.
+- **Effort hypothesis:** M, low confidence.
+- **Depends on:** story 24.
 - **Safe stopping point:** If never delivered, the refusal stays safe and clear.
-- **Open decisions for refinement:** Destination filename clashes follow the
-  clash rule recorded in story 11. Confirm whether a cross-notebook merge needs anything
-  beyond the plain move.
 
 ## Ordering and Scope Reduction
 
@@ -290,9 +405,10 @@ avoids a chicken-and-egg problem is:
    the `/attachments/` address and the Book bucket are removed.
 
 "Present after clone or pull" is not a story: it is how each of these stories
-is proven. Web deletion (story 2), then dissolve/merge (story 11) and the rarer
-cross-notebook move (story 10) follow; the last two are conveniences whose
-absence loses nothing.
+is proven. Web deletion (story 2), then dissolve/merge (story 11), then a note move keeping
+its picture (story 23, a regression fix), moves to another notebook reaching Git
+(story 24, a correctness fix) and the rarer cross-notebook move of files
+(story 10, a convenience whose absence loses nothing).
 
 The split is by usable outcome, not backend/frontend layers. Reject a
 publish-now/preserve-on-web-later split: it would expose accepted files to
@@ -356,6 +472,14 @@ integration need their own selected outcomes.
   removing contents explicitly. Local-publish acceptance keeps its own
   validation; notebook-level cascades stay. The same-notebook merge move's
   stale path wiki links become their own story, queued right after story 11.
+- Owner decisions, 2026-09-26 (story 10 refinement): story 10's premise was
+  wrong — moves to another notebook never reach either notebook's Git — so
+  split it: story 24 makes those moves reach Git, story 10 keeps carrying
+  files, both queued after story 11. A moved folder carries its nested
+  subfolders; no multi-folder move. A note move leaving its picture behind is
+  in scope of this refinement as story 23: the file moves with the note
+  (option A), rather than pointing `image:` back (the web does not resolve
+  `..`) or accepting the broken picture.
 - [Near-future direction](../PRODUCT-BACKLOG.md#near-future-direction).
 - [SEED-009](SEED-009-git-backed-local-notebook-workflow.md): prior local/web note
   workflow. This seed owns non-Markdown attachment continuity.
