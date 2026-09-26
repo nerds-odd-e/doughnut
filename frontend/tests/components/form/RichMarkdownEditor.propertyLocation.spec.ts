@@ -13,12 +13,10 @@ import {
   PROPERTY_PANEL_NOTE_ID,
 } from "./propertyValueDialogTestDom"
 import {
-  attemptRemovePropertyRow,
   attemptRenamePropertyKey,
-} from "./propertiesTestSupport"
-import {
   collapsePropertyPanel,
   expandPropertyPanel,
+  expandPropertyPanelAndClickRemove,
   expectPropertyPanelClosed,
   expectPropertyPanelOpen,
   propertyRowSelector,
@@ -218,7 +216,10 @@ Workshop body.`
       })
       const { router, replaceSpy, pushSpy } = spyOnRouter(wrapper)
 
-      await attemptRemovePropertyRow(wrapper, "topic")
+      await expandPropertyPanelAndClickRemove(
+        wrapper,
+        propertyRowSelector("topic")
+      )
 
       expect(pushSpy).not.toHaveBeenCalled()
       expect(replaceSpy).toHaveBeenCalled()

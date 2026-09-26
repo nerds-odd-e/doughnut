@@ -117,12 +117,21 @@ passed (338 files, 1937 tests) before the refactor pass.
 
 ### 2. RichMarkdownEditor property-value specs share one setup
 Type: Structure
-Status: planned
+Status: done
 Proof: as slice 1.
 
 Merge the remaining `RichMarkdownEditor.*` files (value kinds: image, wiki
 links, relation image index, aliases, overlaps, lists, nested metadata,
 properties, memory tracking; base and guarded mode switch) by responsibility.
+
+Accepted proof: 11 files → 6 (`RichMarkdownEditor.spec.ts` body and mode
+switch; `.frontmatter`; `.listProperties` with aliases/overlaps as `it.each`;
+`.propertyWikiLinks`; `.propertyRowEditing`; `.propertyMemoryTracking`), all
+≤250 lines; five one-caller support files removed. 65 → 63 tests: four compose
+tests became one `it.each` (scalar/list) keeping every assertion. Back-to-back
+focused pairs (11 vs 6 files): 6.53/4.72s, 5.62/4.89s.
+`cd frontend && CURSOR_DEV=true nix develop -c pnpm exec vitest run --browser=chromium --browser.headless tests/components/form/RichMarkdownEditor*.spec.ts`
+→ 9 files, 88 tests pass; `pnpm -C frontend exec vue-tsc --noEmit` passes.
 
 ### 3. RecallPage specs share one setup
 Type: Structure

@@ -1,7 +1,14 @@
 import { NoteController } from "@generated/donut-backend-api/sdk.gen"
 import { mockSdkService, wrapSdkResponse } from "@tests/helpers"
+import { advanceAnimationFrame } from "@tests/helpers/focusTargetTestSupport"
+import { mockCoarsePointer } from "@tests/helpers/mockCoarsePointer"
+import {
+  mountSoftKeyboardPrimer,
+  softKeyboardPrimerElement,
+} from "@tests/helpers/softKeyboardPrimerTestSupport"
 import { flushPromises } from "@vue/test-utils"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
+import { nextTick } from "vue"
 import { noteShowLocation } from "@/routes/noteShowLocation"
 import {
   listPropertyValue,
@@ -10,26 +17,35 @@ import {
 } from "@/utils/noteContentFrontmatter"
 import { propertyRowWithScalar } from "@/utils/noteContentPropertyRows"
 import {
-  advanceAnimationFrame,
-  assertPresetOptionsVisible,
-  focusKeyInput,
-  INSERT_KEY_INPUT,
-  keyInputValue,
-  ROW_KEY_INPUT,
+  attemptRenamePropertyKey,
+  expectPresetOptions,
   selectPresetKey,
-} from "./propertyKeyPresetsTestDom"
-import {
-  addPropertyTapCases,
-  existingPropertyValueMarkdown,
-  expectElementFocused,
-  mountTouchFocusEditor,
-  PROPERTY_KEY_INPUT,
-  PROPERTY_VALUE_INPUT,
-} from "./propertyTouchFocusTestSupport"
+} from "./propertiesTestDom"
 import { createRichMarkdownEditorTestHarness } from "./richMarkdownEditorTestHarness"
+
+const INSERT_KEY_INPUT = '[data-testid="rich-note-property-key"]'
+const ROW_KEY_INPUT = '[data-testid="rich-note-property-row-key-input"]'
+const ROW_VALUE_INPUT = '[data-testid="rich-note-property-row-value-input"]'
+
+function inputEl(selector: string): HTMLInputElement {
+  const el = document.querySelector(selector) as HTMLInputElement | null
+  expect(el).not.toBeNull()
+  return el!
+}
+
+function expectElementFocused(selector: string) {
+  expect(document.activeElement).toBe(inputEl(selector))
+}
 
 describe("RichMarkdownEditor property entry", () => {
   const h = createRichMarkdownEditorTestHarness()
+
+  async function mountTouchFocusEditor(markdown: string, coarse: boolean) {
+    mockCoarsePointer(coarse)
+    mountSoftKeyboardPrimer()
+    await h.mountEditor(markdown, { attachToBody: true })
+    return softKeyboardPrimerElement()
+  }
 
   beforeEach(() => {
     vi.useFakeTimers({ toFake: ["requestAnimationFrame"] })
@@ -47,9 +63,7 @@ describe("RichMarkdownEditor property entry", () => {
       await h.openAddProperty()
       await advanceAnimationFrame()
 
-      const keyInput = h
-        .getWrapper()
-        .find('[data-testid="rich-note-property-key"]')
+      const keyInput = h.getWrapper().find(INSERT_KEY_INPUT)
       const valInput = h
         .getWrapper()
         .find('[data-testid="rich-note-property-value"]')
@@ -98,33 +112,31 @@ image: /x.png
 # Body`,
         { attachToBody: true }
       )
-      await focusKeyInput(ROW_KEY_INPUT)
-      assertPresetOptionsVisible(
+      const existingKeyInput = inputEl(ROW_KEY_INPUT)
+      existingKeyInput.focus()
+      await nextTick()
+      await flushPromises()
+      expectPresetOptions(
         richModeKeyDropdownPresetKeysForPropertyRows(false, [
           propertyRowWithScalar("custom", "workshop"),
           propertyRowWithScalar("image", "/x.png"),
         ])
       )
 
-      const existingKeyInput = h
-        .getWrapper()
-        .find(`[data-testid="${ROW_KEY_INPUT}"]`)
       await selectPresetKey("url")
-      expect((existingKeyInput.element as HTMLInputElement).value).toBe("url")
-      expectElementFocused(
-        '[data-property-key="url"] [data-testid="rich-note-property-row-value-input"]'
-      )
+      expect(existingKeyInput.value).toBe("url")
+      expectElementFocused(`[data-property-key="url"] ${ROW_VALUE_INPUT}`)
 
       await h.openAddProperty()
       await advanceAnimationFrame()
-      assertPresetOptionsVisible(
+      expectPresetOptions(
         richModeKeyDropdownPresetKeysForPropertyRows(false, [
           propertyRowWithScalar("image", "/x.png"),
           propertyRowWithScalar("url", "workshop"),
         ])
       )
       await selectPresetKey("wikidata_id")
-      expect(keyInputValue(INSERT_KEY_INPUT)).toBe("wikidata_id")
+      expect(inputEl(INSERT_KEY_INPUT).value).toBe("wikidata_id")
       expectElementFocused(
         '[data-testid="rich-note-wikidata-property-insert-edit"]'
       )
@@ -132,10 +144,13 @@ image: /x.png
   })
 
   describe("touch focus", () => {
-    it.each(addPropertyTapCases)(
+    it.each([
+      { case: "no existing rows", markdown: "# Hello Body" },
+      { case: "existing rows", markdown: "---\nstatus: ok\n---\n\n# Body" },
+    ])(
       "Add property on touch focuses primer then property key with $case",
       async ({ markdown }) => {
-        const primer = await mountTouchFocusEditor(h, markdown, true)
+        const primer = await mountTouchFocusEditor(markdown, true)
         expect(primer).toBeTruthy()
 
         h.tapAddProperty()
@@ -143,22 +158,21 @@ image: /x.png
 
         await flushPromises()
         await advanceAnimationFrame()
-        expectElementFocused(PROPERTY_KEY_INPUT)
+        expectElementFocused(INSERT_KEY_INPUT)
       }
     )
 
     it("does not focus primer on Add property when pointer is not coarse", async () => {
-      const primer = await mountTouchFocusEditor(h, "# Hello Body", false)
+      const primer = await mountTouchFocusEditor("# Hello Body", false)
 
       await h.openAddProperty()
       await advanceAnimationFrame()
       expect(document.activeElement).not.toBe(primer)
-      expectElementFocused(PROPERTY_KEY_INPUT)
+      expectElementFocused(INSERT_KEY_INPUT)
     })
 
     it("focuses primer then existing value field on touch; skips primer for dead wiki link", async () => {
       const primer = await mountTouchFocusEditor(
-        h,
         `---
 plain: training
 wiki: "[[Missing Note]]"
@@ -173,13 +187,11 @@ Workshop body.`,
       expect(document.activeElement).toBe(primer)
 
       h.completePropertyValueFieldTap()
-      expectElementFocused(PROPERTY_VALUE_INPUT)
+      expectElementFocused(ROW_VALUE_INPUT)
 
       const deadLink = h
         .getWrapper()
-        .element.querySelector(
-          '[data-testid="rich-note-property-row-value-input"] a.dead-wiki-link'
-        )
+        .element.querySelector(`${ROW_VALUE_INPUT} a.dead-wiki-link`)
       expect(deadLink).toBeTruthy()
       deadLink!.dispatchEvent(
         new PointerEvent("pointerdown", { bubbles: true })
@@ -189,8 +201,7 @@ Workshop body.`,
 
     it("does not focus primer on an existing value field when pointer is not coarse", async () => {
       const primer = await mountTouchFocusEditor(
-        h,
-        existingPropertyValueMarkdown,
+        "---\ntopic: training\n---\n\nWorkshop body.",
         false
       )
 
@@ -198,7 +209,7 @@ Workshop body.`,
       h.completePropertyValueFieldTap()
 
       expect(document.activeElement).not.toBe(primer)
-      expectElementFocused(PROPERTY_VALUE_INPUT)
+      expectElementFocused(ROW_VALUE_INPUT)
     })
   })
 
@@ -215,15 +226,9 @@ Workshop body.`,
       noteId: 42,
       route: noteShowLocation(42),
     })
-    const key = wrapper.find('[data-testid="rich-note-property-row-key-input"]')
-    await key.trigger("focus")
-    await key.setValue("domain")
-    await key.trigger("blur")
+    await attemptRenamePropertyKey(wrapper, 0, "domain")
     expect(getNoteInfo).toHaveBeenCalled()
-    await h.setPropertyValueField(
-      wrapper.find('[data-testid="rich-note-property-row-value-input"]'),
-      "newer value"
-    )
+    await h.setPropertyValueField(wrapper.find(ROW_VALUE_INPUT), "newer value")
     await wrapper.setProps({
       modelValue: '---\ntopic: "wiki"\n---\n\nRefreshed body.',
     })
