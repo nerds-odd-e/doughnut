@@ -216,91 +216,6 @@ including delivery, not commitments.
 - **Effort hypothesis:** S — medium confidence.
 - **Safe stopping point:** Each improved message stands alone.
 
-<a id="story-10"></a>
-
-### 4a. The rich editor never silently loses content
-
-**Identity:** SEED-046#story-10
-```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/005-rich-editor-keeps-content/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"21dc6b21669ba30f2dc4ef45679acc28bf1ea4dd0943bae247d451497ab4b4a4","plan":"1f688f88051c815e45e8c61f8979268e0f3ae0fea0355391f1bc070dff8f831a"}}
-```
-
-- **Goal:** Owners whose notes carry Markdown the web's rich editor cannot
-  represent — often notes written locally or by an AI IDE — never lose part of
-  a note by editing it on the web. Today a one-word rich edit deletes raw HTML,
-  task checkboxes, line breaks and more, and saves the loss into the accepted
-  history without warning. Safe web editing of locally authored notes is a
-  precondition for parallel local and web work.
-- **Scope:**
-  - **Required:** when the rich editor opens a note whose body it cannot
-    carry through an edit unchanged in meaning, it shows the note read-only
-    with a warning that tells the owner to switch to Markdown mode to edit it,
-    as it already does for frontmatter it cannot parse. "Unchanged in
-    meaning" is judged by how the body renders: the body the editor would save
-    must render the same as the authored body, so one check covers every
-    construct, including ones not listed below.
-  - **Required:** a body whose round trip changes only style — heading or
-    bullet style, emphasis marker, list numbering, blank-line count, reference
-    links written inline — stays editable in rich mode. Style churn belongs to
-    story 4b.
-  - **Preserved:** Markdown mode edits the text exactly as typed; the existing
-    read-only warning for frontmatter the rich editor cannot parse; how the
-    rich editor displays a note.
-  - **Excluded:** making the rich editor support more constructs (each would
-    be its own story); frontmatter (story 4b keeps it verbatim outside the
-    edited property); restoring content already lost by earlier web edits (it
-    is in the notebook's Git history); automatically switching the page to
-    Markdown mode; content pasted into the rich editor during an edit.
-- **Key examples** (a one-word edit in rich mode unless stated; measured on
-  2026-09-26 by driving the real editor):
-  1. A note whose body holds `<details><summary>S</summary>Inner</details>`
-     → the rich editor is read-only and warns to use Markdown mode (today the
-     whole body except the typed word is saved away).
-  2. A task list `- [ ] todo` / `- [x] done` → read-only with the warning
-     (today the checkboxes disappear).
-  3. `line one␠␠` / `line two` (a hard line break), or `**a** *b*` (two
-     formatted words separated by a space) → read-only with the warning (today
-     the words run together: `line oneline two`, `**ab**`).
-  4. Two fenced code blocks, one tagged `ts` → read-only with the warning
-     (today they merge into one untagged block).
-  5. Boundary: `# Heading`, `- item` bullets and a paragraph with a link → rich
-     editing works as today; the edit is saved (in today's style until story 4b).
-  6. Boundary: the note from example 1 in Markdown mode → edits save exactly
-     as typed.
-- **Known facts (2026-09-26):** also lost or changed in meaning today: nested
-  and multi-line block quotes, footnotes, `$$` math blocks, `3)` ordered
-  lists, nested ordered lists (indent drops from 3 to 2 spaces), intraword
-  `2*3*4`. Tables, wiki links, images, quoted YAML values and plain paragraphs
-  survive. The body goes Markdown → HTML (`marked`) → Quill → HTML → Markdown
-  (Turndown). Frontmatter the rich editor cannot parse already makes it
-  read-only with "Switch to Markdown mode to fix the frontmatter."
-- **Value / learning:** Stops silent content loss for every construct at once
-  instead of patching the converters construct by construct; shows how many
-  real notes the rich editor cannot carry.
-- **Effort hypothesis:** S — medium confidence.
-- **Depends on:** none.
-- **Safe stopping point:** Notes the rich editor can carry edit exactly as
-  today.
-
-<a id="story-12"></a>
-
-### 4a-fix. A hard-wrapped note stays editable in the rich editor
-
-**Identity:** SEED-046#story-12
-```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/008-hard-wrapped-note-stays-editable/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"4f6a6b634ca602f806eef5b37ce88deceb539ddb7af20ee5654084aefc6fdbab","plan":"93ed128c5f3716974de6f40260cf4c1f5ed42b05f78f95a9cff1375ce15ffe16"}}
-```
-
-- **Goal:** Owners whose notes wrap paragraphs or list items across lines — the
-  usual shape of locally and AI-written Markdown — keep rich editing on the
-  web. Retrospective correction of SEED-046#story-10, whose check refuses
-  these notes although their round trip changes only style.
-- **Scope:** Only the rendered comparison in
-  `frontend/src/components/form/richEditorKeepsBody.ts`: whitespace inside
-  text compares as rendered, while code keeps its exact whitespace. No
-  per-construct rules; every body story-10 refuses stays refused.
-- **Plan:** [008-hard-wrapped-note-stays-editable](../slice-plans/008-hard-wrapped-note-stays-editable/PLAN.md)
-
 <a id="story-5"></a>
 
 ### 4b. A web edit changes only what the user edited
@@ -328,7 +243,8 @@ including delivery, not commitments.
     web editor and in the server's rewrites for setting a picture and for
     adding or removing a wiki link property.
   - Kept: `type: note` → `type: Note` (ADR 0004; one line, once).
-  - Content the rich editor loses is story 4a, not this story.
+  - Content the rich editor cannot keep is out of scope: the rich editor
+    already opens such a note read-only.
 - **Known facts (2026-09-26):** a published file
 
   ```markdown
@@ -370,7 +286,7 @@ including delivery, not commitments.
 - **Value / learning:** Tests whether web edits can touch only the edited
   frontmatter line while the body keeps the common local styles.
 - **Effort hypothesis:** M — low confidence.
-- **Depends on:** none; it lets more notes pass story 4a's check.
+- **Depends on:** none; it lets more notes stay editable in the rich editor.
 - **Safe stopping point:** Author-owned and unknown frontmatter keys stay
   preserved, as ADR 0004 requires.
 
@@ -489,10 +405,8 @@ including delivery, not commitments.
 
 Story 1 is first by owner decision and because it most limits the near-future
 direction. Story 3 carries the owner's explicit clone-message request. Stories
-4a, 4b and 5 fix web problems. Story 4a (silent content loss in the rich
-editor) comes first: it damages locally authored notes permanently, and the
-owner split it out of story 4b on 2026-09-26 and ranked it first. Story 4b's
-whole-file rewrites come next because they hurt parallel local and web work,
+4b and 5 fix web problems. Story 4b's
+whole-file rewrites come first because they hurt parallel local and web work,
 while picture upload (story 5) is a web-only path the near-future direction
 does not name (owner decision 2026-09-26). Story 6 may be absorbed by story 1.
 Story 7 is polish. Drop first: 7, then 6 (if story 1 absorbed it).
