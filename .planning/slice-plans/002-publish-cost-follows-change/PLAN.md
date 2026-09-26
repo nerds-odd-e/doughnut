@@ -84,7 +84,7 @@ Commands:
 ### 1. The server checks only the attachments the published commits change
 
 Type: Behavior
-Status: planned
+Status: done
 Proof: new `NotebookGitPublishCostControllerTest` (examples 1, 3, 4 and the
 over-limit neighbour of 5) and the admission suites green; e2e LFS and size
 admission features green after the scenario removals below; baseline recorded
@@ -165,4 +165,30 @@ Change:
 
 ## Learnings
 
-(none yet)
+**Baseline (2026-09-26, pre-change revision on the dev stack, CLI bundle from
+this checkout; `measure-publish.sh`, run 20260926-204034):**
+
+| Publish | Wall s | CLI user+sys s | CLI git processes |
+| --- | --- | --- | --- |
+| A one-line edit (12 × 8.5 MB, 42 accepted commits) | 23.04 | 15.28 (3.95 + 11.33) | 580 |
+| B one-line edit (1,036 files, 47 accepted commits) | 556.52 | 469.29 (244.92 + 224.37) | 49,797 |
+| A +12 files (100 MB) | 8.08 | 6.02 (3.25 + 2.77) | 617 |
+| A one changed 8.5 MB file | 8.05 | 6.02 (3.27 + 2.75) | 642 |
+
+Profile gate passed: the git process count grows with accepted commits ×
+files (tens of thousands on B) and CLI user+sys is most of the wall time.
+Setup costs on the stack were also large: B's 45-commit note publish took
+~23 minutes (server re-reads every file of every new commit).
+
+**Slice 1 accepted proof:** `NotebookGitPublishCostControllerTest`
+(`noteEditReadsNoStoredContent` 0 reads beside an accepted `LIMIT + 1` file,
+`newFilesAreEachReadOnce` 3, `oneChangedFileIsReadOnce` 1,
+`newOversizedFileIsRefusedBeforeAnyContentRead` 0; red before the change at
+4/7/4/5) plus the size-admission, Book source, LFS transfer and web continuity
+suites (19 tests); full backend 2,660 green; e2e `cli_notebook_lfs.feature`
+10/10 and `cli_notebook_attachment_size_admission.feature` 1/1.
+
+**Measurement rerun location:** the Development stack runs only the primary
+checkout's backend, so the rerun from this story branch measures the CLI
+(slice 2) against the unchanged server; the server-side timing rerun happens
+after integration to main, when the dev backend reloads the change.

@@ -135,16 +135,17 @@ HTTP 413 with an `ApiError` JSON body. A notebook without a Git binding saves th
 the Book without a commit. Removing the Book removes its reading structure and
 progress but leaves the file, and the accepted tree, unchanged.
 
-Publication checks every attachment in the contiguous first-parent proposal
-range, not only the tip, by the
-[Git LFS acceptance rule](./notebook-git-lfs.md#decision), including its
-object-availability exception for oversized intermediate-only payloads: each
-one must be a Git LFS pointer or an empty file, and a new payload may be at most
-10 MiB (10,485,760 bytes, inclusive). Classification uses the ordinary attachment
-rule at each historical path, so a later rename to Markdown does not hide an
-earlier oversized attachment. Payloads already accepted as attachments in the
-same notebook's retained history remain reusable by content identity. To fix a
-refused proposal, rewrite only unpublished commits.
+Publication checks every attachment that a commit in the contiguous
+first-parent proposal range changes, not only the tip, by the
+[Git LFS acceptance rule](./notebook-git-lfs.md#decision): each one must be a
+Git LFS pointer or an empty file, and a payload may be at most 10 MiB
+(10,485,760 bytes, inclusive). Classification uses the ordinary attachment rule
+at each historical path, so a later rename to Markdown does not hide an earlier
+oversized attachment. An over-limit file is refused wherever the published
+commits introduce it, unless the accepted notebook's current tree already holds
+it, so an accepted over-limit file (a Book source, a legacy file) stays
+publishable when unchanged, moved or renamed. To fix a refused proposal, rewrite
+only unpublished commits.
 
 Publication also refuses (409) a proposal that deletes, renames or changes the
 file a Book reads from, naming the file and the Book: the owner removes the

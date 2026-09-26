@@ -19,15 +19,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
 /**
- * Attachment-size admission across unpublished first-parent history: within-limit intermediates
- * must be durable, new oversized intermediate-only payloads may be omitted when the tip is valid,
- * and previously accepted same-notebook digests are grandfathered.
+ * Attachment admission across unpublished first-parent history: every attachment an intermediate
+ * commit changes must be durable, not only the tip's.
  */
 class NotebookGitAttachmentSizeAdmissionHistoryControllerTest
     extends NotebookGitAttachmentSizeAdmissionHistoryTestSupport {
-
-  private static final long TWENTY_MIB = 20L * 1024 * 1024;
-  private static final long THREE_MIB = 3L * 1024 * 1024;
 
   @Test
   void acceptsWithinLimitMultiVersionHistoryPreservingEarlierPayloadsAndCommitIds()
@@ -91,39 +87,6 @@ class NotebookGitAttachmentSizeAdmissionHistoryControllerTest
   }
 
   @Test
-  void allowsOmittedOversizedIntermediateWhenTipCorrectionIsValid() throws Exception {
-    Notebook notebook = createGitBackedNotebook();
-    NotebookGitBinding empty = snapshotCurrentPortableTree(notebook);
-    byte[] over = filledBytes(TWENTY_MIB, (byte) 0x74);
-    byte[] tipPayload = filledBytes(THREE_MIB, (byte) 0x75);
-    byte[] overPointer = NotebookGitLfsPointer.format(sha256Hex(over), over.length);
-    byte[] tipPointer = pointerFor(notebook, tipPayload);
-    ObjectId acceptedHead = ObjectId.fromString(empty.getAcceptedGitObjectId());
-    HistoryRange range =
-        replaceThenKeepTipRange(
-            acceptedBundleBytes(notebook), acceptedHead, overPointer, tipPointer);
-
-    String publishedHead =
-        controller.publishNotebookGitProposal(
-            notebook.getId(), empty.getAcceptedGitObjectId(), range.proposalBytes());
-
-    assertThat(publishedHead, equalTo(range.tip().getName()));
-    assertThat(
-        acceptedHistory(notebook).exactTree(),
-        containsInAnyOrder(
-            PortableTreeEntry.ofText(
-                NotebookGitAttributes.PATH, NotebookGitAttributes.INITIAL_CONTENT),
-            new PortableTreeEntry("version.bin", tipPointer)));
-    assertThat(
-        notebookAttachmentContent.get(notebook.getId(), sha256Hex(over)),
-        equalTo(Optional.empty()));
-    assertThat(
-        notebookAttachmentContent.get(notebook.getId(), sha256Hex(tipPayload)).orElseThrow(),
-        equalTo(tipPayload));
-    assertPreservedFirstParentChain(notebook, acceptedHead, range.afterFirst(), range.tip());
-  }
-
-  @Test
   void refusesMissingWithinLimitIntermediateHistoryEvenWhenTipIsValid() throws Exception {
     Notebook notebook = createGitBackedNotebook();
     NotebookGitBinding empty = snapshotCurrentPortableTree(notebook);
@@ -149,53 +112,5 @@ class NotebookGitAttachmentSizeAdmissionHistoryControllerTest
     assertThat(
         notebookAttachmentContent.get(notebook.getId(), sha256Hex(missingIntermediate)),
         equalTo(Optional.empty()));
-  }
-
-  @Test
-  void trustedHistoryGrandfathersPreviouslyAcceptedOversizedPayload() throws Exception {
-    byte[] oversized = filledBytes(LIMIT + 1, (byte) 0x78);
-    Notebook notebook = createGitBackedNotebook();
-    makeMe.aNote("Root Note").notebook(notebook).content(NOTE_MARKDOWN).please();
-    byte[] pointer =
-        storeFolderAttachmentAndSnapshot(notebook, null, "legacy.bin", oversized)
-            .getAcceptedGitContent();
-    NotebookGitBinding withLegacy = reloadCommittedBinding(notebook.getId());
-
-    controller.publishNotebookGitProposal(
-        notebook.getId(),
-        withLegacy.getAcceptedGitObjectId(),
-        proposalBundleBytes(
-            withLegacy,
-            List.of(
-                new NotebookGitProposalFile("Root Note.md", NOTE_MARKDOWN),
-                new NotebookGitProposalFile("legacy.bin", pointer))));
-    NotebookGitBinding kept = reloadCommittedBinding(notebook.getId());
-
-    controller.publishNotebookGitProposal(
-        notebook.getId(),
-        kept.getAcceptedGitObjectId(),
-        proposalBundleBytes(
-            kept, List.of(new NotebookGitProposalFile("Root Note.md", NOTE_MARKDOWN))));
-    NotebookGitBinding withoutAttachment = reloadCommittedBinding(notebook.getId());
-
-    controller.publishNotebookGitProposal(
-        notebook.getId(),
-        withoutAttachment.getAcceptedGitObjectId(),
-        proposalBundleBytes(
-            withoutAttachment,
-            List.of(
-                new NotebookGitProposalFile("Root Note.md", NOTE_MARKDOWN),
-                new NotebookGitProposalFile("restored.bin", pointer))));
-
-    assertThat(
-        acceptedHistory(notebook).exactTree(),
-        containsInAnyOrder(
-            PortableTreeEntry.ofText(
-                NotebookGitAttributes.PATH, NotebookGitAttributes.INITIAL_CONTENT),
-            PortableTreeEntry.ofText("Root Note.md", NOTE_MARKDOWN),
-            new PortableTreeEntry("restored.bin", pointer)));
-    assertThat(
-        notebookAttachmentContent.get(notebook.getId(), sha256Hex(oversized)).orElseThrow(),
-        equalTo(oversized));
   }
 }

@@ -30,15 +30,14 @@ local files with compact Git history and one attachment model, including images.
   A Git bundle alone contains pointers, not a complete attachment backup.
 - **Acceptance:** Upload immutable objects and verify actual size and digest
   before atomically accepting the Git head and application projection. Validate
-  attachment representation and object availability across newly admitted
-  history, not only its tip. One exception: a new oversized payload that
-  appears only in unpublished intermediate commits, and not at a valid tip,
-  may be absent; it is never stored, and fetching it later reports the object
-  unavailable (see [Recovery](#recovering-a-published-attachment-version)).
-  Within-limit, previously accepted, and tip objects stay required. Missing
-  objects or raw attachment payloads reject publication without rewriting
-  submitted commits. Failed publications may leave unreferenced staged
-  objects, never partially accepted content.
+  the representation and object availability of every attachment each newly
+  admitted first-parent commit changes, not only the tip's; attachments a
+  commit leaves unchanged are not checked again. An over-limit payload is
+  refused wherever the published commits introduce it, unless the accepted
+  notebook's current tree already holds it. Missing objects or raw attachment
+  payloads reject publication without rewriting submitted commits. Failed
+  publications may leave unreferenced staged objects, never partially accepted
+  content.
 - **Access and lifetime:** Object access follows notebook authorization; knowing
   a hash grants no access. Keep objects reachable from retained accepted history,
   even after removing a current file. Backups include Git, referenced objects,
@@ -116,11 +115,6 @@ The requested digest's exact bytes land under `.git/lfs/objects/<aa>/<bb>/<oid>`
 Removing the current attachment row never deletes those retained objects; fetch
 of a historical commit that still references them continues to succeed.
 
-An oversized intermediate object that was omitted at publication (corrective tip
-only) is not stored. Fetching that intermediate commit reports the object
-unavailable (standard batch/object-not-found failure) and does not begin storing
-the omitted payload.
-
 ## Related
 
 - [Notebook Git synchronization](./notebook-git-synchronization.md) owns
@@ -132,4 +126,4 @@ the omitted payload.
   [Basic transfers](https://github.com/git-lfs/git-lfs/blob/main/docs/api/basic-transfers.md).
 - Feature proof of these commands:
   `e2e_test/features/cli/cli_notebook_lfs.feature` (explicit historical fetch
-  after replacement/deletion and omitted oversized intermediate).
+  after replacement/deletion).
