@@ -14,9 +14,11 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.function.Function;
 import org.eclipse.jgit.lib.ObjectId;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 @Service
 public class AcceptedWebChangeService {
@@ -69,14 +71,25 @@ public class AcceptedWebChangeService {
             .ifPresent(binding -> opened.add(open(binding)));
       }
       T result = operation.run();
+      entityPersister.flush();
+      refuseChangeToUnlockedBoundNotebook(change, notebookIds);
       if (!opened.isEmpty()) {
-        entityPersister.flush();
         String message = commitMessage.apply(result);
         opened.forEach(notebook -> commitIfChanged(notebook, change, message, updatedAt));
       }
       return result;
     } finally {
       opened.forEach(notebook -> notebook.accepted().close());
+    }
+  }
+
+  private void refuseChangeToUnlockedBoundNotebook(
+      ProjectionChange change, Set<Integer> lockedNotebookIds) {
+    if (change.notebookIds().stream()
+        .filter(id -> !lockedNotebookIds.contains(id))
+        .anyMatch(id -> bindingRepository.findByNotebook_Id(id).isPresent())) {
+      throw new ResponseStatusException(
+          HttpStatus.CONFLICT, "The change touched notes in another notebook; retry.");
     }
   }
 

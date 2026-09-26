@@ -20,8 +20,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -42,6 +40,7 @@ public class FolderRelocationService {
   private final FolderSubtree subtree;
   private final FolderMoveRelocation folderMoveRelocation;
   private final NoteService noteService;
+  private final NoteReferenceService noteReferenceService;
 
   public FolderRelocationService(
       FolderRepository folderRepository,
@@ -56,7 +55,8 @@ public class FolderRelocationService {
       AuthorizationService authorizationService,
       FolderSubtree subtree,
       FolderMoveRelocation folderMoveRelocation,
-      NoteService noteService) {
+      NoteService noteService,
+      NoteReferenceService noteReferenceService) {
     this.folderRepository = folderRepository;
     this.folderSiblingNameValidation = folderSiblingNameValidation;
     this.entityPersister = entityPersister;
@@ -70,6 +70,7 @@ public class FolderRelocationService {
     this.subtree = subtree;
     this.folderMoveRelocation = folderMoveRelocation;
     this.noteService = noteService;
+    this.noteReferenceService = noteReferenceService;
   }
 
   public Folder moveFolder(
@@ -81,7 +82,7 @@ public class FolderRelocationService {
       throws UnexpectedNoAccessRightException {
     Integer destinationId = destinationNotebook.getId();
     return applyLiveFolderChange(
-        Stream.of(notebook.getId(), destinationId).collect(Collectors.toUnmodifiableSet()),
+        notebooksToLock(folder, viewer, notebook.getId(), destinationId),
         notebook,
         folder,
         result -> "Move folder: " + result.getName(),
@@ -135,6 +136,11 @@ public class FolderRelocationService {
           }
           return liveFolder;
         });
+  }
+
+  private Set<Integer> notebooksToLock(Folder folder, User viewer, Integer... actionNotebookIds) {
+    return noteReferenceService.notebooksToLock(
+        subtree.collectNotes(subtree.collectFolders(folder)), viewer, actionNotebookIds);
   }
 
   private Folder applyLiveFolderChange(
@@ -216,6 +222,7 @@ public class FolderRelocationService {
   public void dissolveFolder(Notebook notebook, Folder folder, boolean merge, User viewer)
       throws UnexpectedNoAccessRightException {
     applyLiveFolderChange(
+        notebooksToLock(folder, viewer, notebook.getId()),
         notebook,
         folder,
         result -> "Dissolve folder: " + result.getName(),

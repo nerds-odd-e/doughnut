@@ -132,7 +132,7 @@ final class NoteReferenceHandling {
 
   void removeNoteLinksFromReferrerProperties(Note target, User viewer, Timestamp updatedAt) {
     for (AuthoredNoteReferenceInboundFacade.InboundReference inboundReference :
-        noteReferenceService.distinctInboundReferencesForViewer(target, viewer)) {
+        noteReferenceService.editableInboundReferencesForViewer(target, viewer)) {
       Note referrer = inboundReference.referrer();
       NoteContentMarkdown.removeWikiLinksFromLeadingFrontmatterProperties(
               referrer.getContent(), Set.copyOf(inboundReference.authoredLinkTexts()))

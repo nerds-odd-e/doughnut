@@ -92,79 +92,13 @@ S = 30–60 minutes, M = 1–2 hours, L = 2–4 hours, including delivery. Estim
 are hypotheses; refine/split work that exceeds L before execution planning.
 Root-file and nested-file continuity, web file deletion, folder dissolve
 and merge, a note moved within its notebook carrying its picture, and note and
-folder moves to another notebook reaching both notebooks' Git are delivered.
+folder moves to another notebook reaching both notebooks' Git, and link
+rewrites in other notebooks reaching their Git, are delivered.
 Moving a folder that holds files to another notebook stays refused; carrying
-files along was dropped. Story 25 makes link rewrites in other notebooks reach their Git. The
+files along was dropped. The
 [product backlog](../PRODUCT-BACKLOG.md) owns global order.
 No executable plan or implementation is authorized by this seed.
 
-<a id="story-25"></a>
-
-### Link rewrites in other notebooks reach their Git
-```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/047-link-rewrites-in-other-notebooks-reach-git/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"2fab3287c26552715e342bdf5419c6bb59175d7cd3bd4b12e93cf30e0924f59b","plan":"28979d168da3906af6cd240d625ed9447db823b005cfe11c1fb9bdb76aecd00f"}}
-```
-
-- **Identity:** SEED-035#story-25
-- **Goal:** An owner who renames, moves or trashes a note or folder on the web
-  can keep publishing, from a local checkout, every other notebook of theirs
-  whose notes link to it. Today those web actions change the linking notes in
-  the database only. The linking notebook gets no accepted commit, so its next
-  local publish fails the accepted-tree check ("…differs from accepted main;
-  refresh the checkout before publishing"), and only a history reset recovers
-  it ([synchronization contract](../../docs/notebook-git-synchronization.md#domain-operation-ownership):
-  "cross-notebook referrer rewrites remain outside this owner"). It rarely
-  happens: links between notebooks are uncommon. The owner wants it for
-  completeness (2026-09-26), so every web change reaches Git.
-- **Scope:**
-  - Every web action that changes notes in another notebook the user can edit
-    appends one accepted commit to that notebook, in the same transaction as
-    the action's own commit. It goes through the existing multi-notebook
-    accepted-change owner, as relationship reduction and moves to another notebook do. The
-    actions are note rename, note and folder moves within a notebook, folder
-    rename, folder dissolve, trashing a note with "remove from properties",
-    and a third notebook in a move to another notebook. This is one rule for which notebooks get a commit,
-    not a fix per action.
-  - Donut no longer changes notes in notebooks the user cannot edit, such as
-    a subscribed notebook owned by someone else. Their links keep the old
-    text, as a link that owner wrote would (owner decision 2026-09-26). Today
-    the rewrite edits them without checking edit rights. Notebooks the user
-    owns through a circle are editable and included.
-  - Link rewriting itself is unchanged: which links change and how their text
-    changes stay as delivered.
-- **Excluded:**
-  - Notebooks already out of step from earlier rewrites are not repaired;
-    `reset-git-history` remains the recovery.
-  - Notebook rename: it rewrites no links today, so no notebook goes out of
-    step; `[[OldName:…]]` links breaking is a separate problem.
-  - Repairing drift automatically on publish or on a later web change. The
-    North Star wants a missed change to fail loudly.
-- **Key examples:**
-  1. The owner's notebook `Science` has `Force`; their notebook `Engineering`
-     has `Bridge` saying `[[Science:Force]]`. The owner renames `Force` to
-     `Load` → after pull, `Engineering`'s `Bridge` says `[[Science:Load]]`,
-     and a local edit to `Engineering` publishes normally.
-  2. `Bridge` says `[[Science:physics/Force]]`. The owner renames folder
-     `physics` to `mechanics`, or dissolves it → after pull, `Bridge` in
-     `Engineering` points to the new path.
-  3. `Bridge` has property `uses: "[[Science:Force]]"`. The owner trashes
-     `Force` choosing "remove from properties" → after pull, `Bridge` in
-     `Engineering` no longer has that link.
-  4. The owner moves `Force` to notebook `Physics` → after pull, `Bridge` in
-     `Engineering` says `[[Physics:Force]]`, beside the move's commits to
-     `Science` and `Physics`.
-  5. Another user's notebook `Shared`, which the owner subscribes to, has a
-     note saying `[[Science:Force]]`. The owner renames `Force` → `Shared` is
-     unchanged and gets no commit; the owner's own linking notebooks are
-     rewritten as in example 1.
-- **Effort hypothesis:** M, medium confidence. The multi-notebook owner and
-  the change capture for moves to another notebook exist. The work is choosing the
-  notebook set before locking (the linking notebooks the user can edit) and
-  the edit-rights filter on referrers.
-- **Depends on:** nothing outstanding (moves to another notebook reach Git).
-- **Safe stopping point:** if never delivered, renaming, moving or trashing a
-  note linked from another notebook keeps blocking that notebook's local
-  publishing.
 
 ## Ordering and Scope Reduction
 
@@ -188,9 +122,8 @@ avoids a chicken-and-egg problem is:
 
 "Present after clone or pull" is not a story: it is how each of these stories
 is proven. Web deletion, dissolve/merge, a note move keeping its picture
-within the notebook and moves to another notebook reaching Git are delivered;
-then link rewrites in other notebooks reaching Git
-(story 25, the same correctness fix for renames and moves).
+within the notebook, moves to another notebook reaching Git and link rewrites
+in other notebooks reaching Git are delivered.
 
 The split is by usable outcome, not backend/frontend layers. Reject a
 publish-now/preserve-on-web-later split: it would expose accepted files to
@@ -248,12 +181,8 @@ integration need their own selected outcomes.
 - Owner decisions, 2026-09-26 (refinement of moves to another notebook
   reaching Git): keep its priority, because moving to another notebook is a
   required feature although rarely used. Split link rewrites in third notebooks
-  into story 25, which covers every operation and is queued right after it. A picture note moved to another
+  into a separate story covering every operation (now delivered). A picture note moved to another
   notebook moves with a broken picture, as today, and is not refused.
-- Owner decisions, 2026-09-26 (story 25 refinement): keep it for
-  completeness although it rarely happens, and do not measure it; execute
-  it after moves to another notebook reach Git. Stop changing notes in notebooks the user cannot edit
-  instead of committing to someone else's notebook.
 - Owner decision, 2026-09-26: drop carrying a folder's files along in a move
   to another notebook, from the backlog and this seed, rather than parking it.
   The move is refused as a whole with a clear message and nothing changes, so

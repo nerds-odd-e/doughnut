@@ -71,10 +71,11 @@ public class WikiLinkRewriteService {
 
   /**
    * Distinct authored link text(s) per referrer note id, whose authored reference live-resolves to
-   * {@code targetNote} for {@code viewer}, right now. Callers must capture this <em>before</em>
-   * relocating {@code targetNote} (or the folder/notebook it lives in) — referrers are authored
-   * against the pre-relocation identity, mirroring {@link TitleRenameWikiLinkRewrite}'s pre-rename
-   * capture.
+   * {@code targetNote} for {@code viewer}, right now — only referrers {@code viewer} may change
+   * (see {@link NoteReferenceService#editableInboundReferencesForViewer}). Callers must capture
+   * this <em>before</em> relocating {@code targetNote} (or the folder/notebook it lives in) —
+   * referrers are authored against the pre-relocation identity, mirroring {@link
+   * TitleRenameWikiLinkRewrite}'s pre-rename capture.
    */
   public Map<Integer, List<String>> captureLiveResolvedInboundReferences(
       Note targetNote, User viewer) {

@@ -32,12 +32,13 @@ class WikiLinkReferenceCapture {
 
   /**
    * Distinct authored link text(s) per referrer note id, whose authored reference live-resolves to
-   * {@code targetNote} for {@code viewer}, right now.
+   * {@code targetNote} for {@code viewer}, right now — only referrers {@code viewer} may change
+   * (see {@link NoteReferenceService#editableInboundReferencesForViewer}).
    */
   Map<Integer, List<String>> liveResolvedInboundReferences(Note targetNote, User viewer) {
     Map<Integer, List<String>> byReferrerId = new LinkedHashMap<>();
     for (AuthoredNoteReferenceInboundFacade.InboundReference inboundReference :
-        noteReferenceService.distinctInboundReferencesForViewer(targetNote, viewer)) {
+        noteReferenceService.editableInboundReferencesForViewer(targetNote, viewer)) {
       byReferrerId.put(inboundReference.referrer().getId(), inboundReference.authoredLinkTexts());
     }
     return byReferrerId;

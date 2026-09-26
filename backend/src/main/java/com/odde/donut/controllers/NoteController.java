@@ -139,8 +139,7 @@ class NoteController {
       throws UnexpectedNoAccessRightException {
     authorizationService.assertAuthorization(note);
     return noteRealmService.build(
-        noteTrashService.trash(
-            note.getId(), note.getNotebook().getId(), noteTrashDTO.getReferenceHandling()),
+        noteTrashService.trash(note, noteTrashDTO.getReferenceHandling()),
         authorizationService.getCurrentUser());
   }
 

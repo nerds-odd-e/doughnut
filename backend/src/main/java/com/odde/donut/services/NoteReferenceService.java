@@ -12,11 +12,14 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import java.util.zip.CRC32;
 import org.springframework.stereotype.Service;
 
@@ -120,13 +123,33 @@ public class NoteReferenceService {
   }
 
   /**
-   * One referrer note plus the distinct authored link text(s) it uses to refer to {@code target}.
+   * The inbound references to {@code target} that a web action by {@code viewer} may change: those
+   * whose referrer is in a notebook {@code viewer} owns. Display keeps every visible referrer.
    *
    * @see AuthoredNoteReferenceInboundFacade#distinctInboundReferencesForViewer
    */
   public List<AuthoredNoteReferenceInboundFacade.InboundReference>
-      distinctInboundReferencesForViewer(Note target, User viewer) {
-    return authoredNoteReferenceInboundFacade.distinctInboundReferencesForViewer(target, viewer);
+      editableInboundReferencesForViewer(Note target, User viewer) {
+    return authoredNoteReferenceInboundFacade
+        .distinctInboundReferencesForViewer(target, viewer)
+        .stream()
+        .filter(inbound -> viewer.owns(inbound.referrer().getNotebook()))
+        .toList();
+  }
+
+  /**
+   * The notebooks a web action by {@code viewer} locks when it rewrites or removes links to {@code
+   * targets}: {@code actionNotebookIds} plus the notebooks of their {@link
+   * #editableInboundReferencesForViewer editable referrers}.
+   */
+  public Set<Integer> notebooksToLock(
+      Collection<Note> targets, User viewer, Integer... actionNotebookIds) {
+    return Stream.concat(
+            Stream.of(actionNotebookIds),
+            targets.stream()
+                .flatMap(target -> editableInboundReferencesForViewer(target, viewer).stream())
+                .map(inbound -> inbound.referrer().getNotebook().getId()))
+        .collect(Collectors.toUnmodifiableSet());
   }
 
   /**

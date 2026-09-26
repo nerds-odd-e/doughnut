@@ -16,6 +16,7 @@ import com.odde.donut.services.NoteReferenceService;
 import com.odde.donut.services.NoteTitleNameRule;
 import com.odde.donut.services.WikiLinkRewriteService;
 import java.sql.Timestamp;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -57,9 +58,15 @@ public class WebNoteEditService {
   public Note saveTitle(
       Integer noteId, Integer notebookId, NoteUpdateTitleDTO titleDTO, Timestamp updatedAt)
       throws UnexpectedNoAccessRightException {
+    Set<Integer> notebookIds =
+        titleDTO.getReferenceHandling() == null
+            ? Set.of(notebookId)
+            : noteReferenceService.notebooksToLock(
+                List.of(requireNote(noteId)), authorizationService.getCurrentUser(), notebookId);
     return edit(
         noteId,
         notebookId,
+        notebookIds,
         note -> renameTitle(note, titleDTO, updatedAt),
         note -> "Edit note title: " + note.getTitle(),
         updatedAt);

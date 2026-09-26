@@ -386,6 +386,10 @@ A story's readiness basis is a digest of its whole seed document. Wrapping up an
   - Evidence: c040694118 (16:46:01+08:00) closed SEED-035 story 23, removing its section; `read-state` for story 24 then reported `needs-reassessment` (basis.document c5063546… → f8d817e5…) while the story-24 section was unchanged; the coordinator re-recorded ready in f68e4235cf together with a plan note that story 23 had landed.
   - Observed effect: the owner asked for an up-to-date check anyway, so the reassessment was wanted work here; the digest mismatch itself carried no information about story 24.
   - Inference: when the plan also depends on the closed sibling (here "start after story 23 lands"), the reassessment is useful; the refusal cannot tell that case from an unrelated closure.
+- Execution: SEED-035 story 25 / `.planning/slice-plans/047-link-rewrites-in-other-notebooks-reach-git/PLAN.md` at 0ef2828d32 / 9861bc80c2; Timestamp: 2026-09-26, before 17:53:07+08:00 (refusal; readiness commit df199a2190); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.41.
+  - Evidence: dfe13fa6ba (17:37:44+08:00) closed story 24 and on purpose restated the delivered moves in plan 047's text; start then refused with "published preparation is needs-reassessment"; df199a2190 changed only `basis.plan` (92dc2b80… → 28979d16…), `basis.document` unchanged.
+  - Observed effect: one refused start, a recheck of three plan facts, and one extra commit on main before the Take.
+  - Inference: this time the plan digest changed, not the seed digest. The wrap-up that edited the sibling's plan had just checked those facts, so it could have re-recorded the sibling's readiness in the same commit.
 
 ## DD-126 — A plan said the changed script had no test, and nobody searched for one before delivery, so CI caught the stale test
 
@@ -409,8 +413,19 @@ The slice 3 implementer skipped the red run, arguing that before the change the 
   - Observed effect: two extra focused test runs by the coordinator; the delivered undo test now fails without the fix.
   - Inference: a round-trip test whose end state equals its start state passes when nothing happens; "red first if practical" in the delegation let the agent substitute reasoning for observation. Slice 2's implementer ran red and its undo test was meaningful.
 
+## DD-128 — Refined key examples promised link-rewrite outcomes that the existing rewrite rules do not produce
+
+The story said link rewriting stays unchanged, yet its key examples stated rewrite results nobody checked against that code. Example 2 promised that renaming folder `physics` rewrites `[[Science:physics/Force]]` in another notebook; `PortablePath.withRenamedFolder` returns notebook-qualified links unchanged, so folder rename never touches another notebook. Examples 2 and 4 also gave shorthand results (`[[Science:Force]]`-style) where the rules produce `[[Science:/Force]]` (dissolve) and `[[Physics:Force|Science:Force]]` (move to another notebook). Slice 3 found the conflict. The coordinator kept the "rewriting unchanged" exclusion, dropped folder rename from example 2 in the plan's Current decisions, and left the seed promise as written.
+
+### Occurrences
+
+- Execution: SEED-035 story 25 / `.planning/slice-plans/047-link-rewrites-in-other-notebooks-reach-git/PLAN.md` at 0ef2828d32 / 9861bc80c2; Timestamp: 2026-09-26, ~18:27+08:00 (slice 3 commit f63760e183 records the decision); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.41.
+  - Evidence: refinement/plan 27673389c0 (seed key examples 2 and 4; plan slice 3 "Folder rename, move and dissolve"); `backend/src/main/java/com/odde/donut/algorithms/PortablePath.java` `withRenamedFolder` (early return when `notebookQualifier.isPresent()`); plan "Current decisions" in f63760e183; test expectations in `NotebookGitWebLinkingNotebookControllerTest` (`[[Science:/Force]]`, `[[Physics:Force|Science:Force]]`).
+  - Observed effect: one owner-visible promise was dropped during execution by a plan note, without an owner decision or a seed edit. No extra slice was needed. The seed still promises the folder-rename case at closure.
+  - Inference: when a story says an existing rule stays unchanged, check each key example's expected text against that rule (its code or tests) at refinement. Also, a promise dropped because it conflicts with an exclusion should reach the owner at completion, not only the plan. Qualified: the coordinator summary is the only process record, so how long the discovery took is unknown.
+
 ## Retention
 
-- Highest allocated local number: 127
+- Highest allocated local number: 128
 - Recovery: `33939aa45a17c08f5e6f8076178ce96437fdfbe8:DearDough.md` contains the complete pre-compaction log and earlier recovery references; `b0b385a184e96ecf8b0f6fc5572eaaab69bc8dad` preserves later history.
 - Occurrence history is partial; full observations, effects, inference and historical provenance remain in that snapshot and the upstream catalog.
