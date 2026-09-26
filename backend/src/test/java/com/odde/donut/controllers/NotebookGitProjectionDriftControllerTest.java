@@ -127,7 +127,8 @@ class NotebookGitProjectionDriftControllerTest extends NotebookGitControllerTest
         assertProposalRejectedWithoutMutatingBinding(
             notebook, binding.getAcceptedGitObjectId(), proposal, HttpStatus.CONFLICT);
 
-    assertThat(exception.getReason(), containsString("expectedHead no longer matches"));
+    assertThat(
+        exception.getReason(), containsString("The notebook changed since this publish started"));
     Note reloaded = noteRepository.findById(note.getId()).orElseThrow();
     assertThat(reloaded.getContent(), equalTo(update.getContent()));
     assertThat(

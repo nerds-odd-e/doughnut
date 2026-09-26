@@ -77,7 +77,11 @@ the directory, passed from the publish command.
 ### 3. Losing a publish race names pull, then publish again
 
 Type: Behavior
-Status: planned
+Status: done — accepted: `NotebookGitPublicationConcurrencyControllerTest`
+asserts the exact reason (`Run "donut notebook pull", then publish again.`);
+three sibling controller tests assert its opening fragment; CLI
+`STALE_HEAD_MESSAGE` echoes it. Backend `*NotebookGit*ControllerTest` 430
+green; `pnpm cli:test` 440 green.
 Proof: the four backend controller tests asserting "expectedHead no longer
 matches" and `STALE_HEAD_MESSAGE` in `cli/tests/notebookPublish.testHelpers.ts`
 use the new wording; backend command above and `pnpm cli:test` green.

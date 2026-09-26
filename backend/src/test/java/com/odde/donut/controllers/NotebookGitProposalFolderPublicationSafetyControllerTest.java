@@ -131,7 +131,8 @@ class NotebookGitProposalFolderPublicationSafetyControllerTest
             proposalBytes,
             HttpStatus.CONFLICT);
 
-    assertThat(exception.getReason(), containsString("expectedHead no longer matches"));
+    assertThat(
+        exception.getReason(), containsString("The notebook changed since this publish started"));
     assertThat(committedFootprint(fixture.notebook()), equalTo(afterWeb));
   }
 

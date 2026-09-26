@@ -2,7 +2,6 @@ package com.odde.donut.controllers;
 
 import static com.odde.donut.testability.CommittedTransactionTestSupport.inCommittedTransaction;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 
@@ -125,7 +124,9 @@ class NotebookGitPublicationConcurrencyControllerTest
     assertThat(race.second().acceptedHead(), is((String) null));
     assertThat(race.second().rejection().getStatusCode(), is(HttpStatus.CONFLICT));
     assertThat(
-        race.second().rejection().getReason(), containsString("expectedHead no longer matches"));
+        race.second().rejection().getReason(),
+        is(
+            "The notebook changed since this publish started. Run \"donut notebook pull\", then publish again."));
     assertAcceptedHistory(fixture, List.of(FIRST_WEB_CONTENT, ACCEPTED_CONTENT), FIRST_WEB_CONTENT);
   }
 

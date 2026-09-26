@@ -11,7 +11,7 @@ import {
 } from './notebookGit.testHelpers.js'
 
 export const STALE_HEAD_MESSAGE =
-  "expectedHead no longer matches the notebook's current accepted head."
+  'The notebook changed since this publish started. Run "donut notebook pull", then publish again.'
 
 export function ancestryRefusal(directory: string): string {
   return `Local main is not based on the notebook's latest accepted history. Run "donut notebook pull ${directory}", then publish again.`
