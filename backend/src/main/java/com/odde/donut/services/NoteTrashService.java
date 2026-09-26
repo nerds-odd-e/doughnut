@@ -8,6 +8,7 @@ import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.donut.services.notebookGit.WebNoteEditService;
 import com.odde.donut.testability.TestabilitySettings;
 import java.sql.Timestamp;
+import java.util.List;
 import java.util.Set;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -49,7 +50,7 @@ public class NoteTrashService {
         notebookId,
         referenceHandling == NoteTrashReferenceHandling.REMOVE_FROM_PROPERTIES
             ? noteReferenceService.notebooksToLock(
-                target, authorizationService.getCurrentUser(), notebookId)
+                List.of(target), authorizationService.getCurrentUser(), notebookId)
             : Set.of(notebookId),
         note -> {
           noteService.applyNoteReferenceHandling(

@@ -142,7 +142,14 @@ the editable linking notebooks of the note. Content saves pass nothing.
 
 ### 3. Folder rename, move and dissolve reach linking notebooks' Git
 Type: Behavior
-Status: planned
+Status: done
+Accepted proof: `NotebookGitWebLinkingNotebookControllerTest`
+(`folderMoveWithinTheNotebookCommitsTheRewrittenLinkInTheLinkingNotebook`,
+`folderDissolveCommitsTheRewrittenLinkInTheLinkingNotebook`) plus 70
+regression tests. `notebooksToLock` now takes `Collection<Note>`;
+`FolderRelocationService` passes the subtree's notes for move (same- and
+cross-notebook share `moveFolder`) and dissolve. Folder rename is unchanged:
+see Current decisions.
 Proof: same test, folder cases for key example 2 (rename, move within
 `Science`, dissolve): one commit in `Engineering` with the rewritten path, and
 all trees match the full assembly.
@@ -187,6 +194,14 @@ that the owner refuses a change to a bound notebook it did not lock.
 - The under-lock check comes last, after every rewriting caller passes its
   linking notebooks. Earlier, it would refuse actions that the later slices
   make correct.
+- Folder rename needs no extra lock: `PortablePath.withRenamedFolder` leaves
+  notebook-qualified links unchanged, and every link from another notebook is
+  qualified, so a folder rename never changes another notebook's notes (its
+  link goes stale but that notebook stays in step with its Git). Making it
+  rewrite them would change which links are rewritten, which the story
+  excludes. Key example 2 therefore holds for folder move and dissolve only.
+- Dissolving `physics` rewrites `[[Science:physics/Force]]` to
+  `[[Science:/Force]]` (existing exact-root rule), not `[[Science:Force]]`.
 - Rename's "linked from other notes" prompt still counts referrers in
   subscribed notebooks. Answering it then changes nothing there. That is
   harmless and needs no change.

@@ -113,7 +113,7 @@ class RelationController {
             sourceNote.getId(),
             sourceNotebookId,
             noteReferenceService.notebooksToLock(
-                sourceNote,
+                List.of(sourceNote),
                 authorizationService.getCurrentUser(),
                 sourceNotebookId,
                 targetNotebook.getId()),

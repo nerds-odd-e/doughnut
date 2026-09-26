@@ -71,6 +71,26 @@ class NotebookGitWebLinkingNotebookControllerTest extends NotebookGitWebContentC
     assertLinkingNotebookCommittedOnce(f, "---\ntype: Note\n---\nBody");
   }
 
+  @Test
+  void folderMoveWithinTheNotebookCommitsTheRewrittenLinkInTheLinkingNotebook() throws Exception {
+    LinkingFixture f = seedForceLinkedFrom("physics", "See [[Science:physics/Force]].");
+    Folder natural = makeMe.aFolder().notebook(f.science()).name("natural").please();
+    snapshotCurrentPortableTree(f.science());
+
+    folderController.moveFolder(f.science(), f.force().getFolder(), folderMove(natural.getId()));
+
+    assertLinkingNotebookCommittedOnce(f, "See [[Science:natural/physics/Force]].");
+  }
+
+  @Test
+  void folderDissolveCommitsTheRewrittenLinkInTheLinkingNotebook() throws Exception {
+    LinkingFixture f = seedForceLinkedFrom("physics", "See [[Science:physics/Force]].");
+
+    folderController.dissolveFolder(f.science(), f.force().getFolder(), false);
+
+    assertLinkingNotebookCommittedOnce(f, "See [[Science:/Force]].");
+  }
+
   void assertLinkingNotebookCommittedOnce(LinkingFixture f, String bridgeContent) throws Exception {
     AcceptedHistory engineeringAfter = acceptedHistory(f.engineering());
     assertThat(engineeringAfter.parents(), equalTo(f.engineeringBefore().commits()));

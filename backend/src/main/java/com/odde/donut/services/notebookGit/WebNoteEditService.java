@@ -16,6 +16,7 @@ import com.odde.donut.services.NoteReferenceService;
 import com.odde.donut.services.NoteTitleNameRule;
 import com.odde.donut.services.WikiLinkRewriteService;
 import java.sql.Timestamp;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -61,7 +62,7 @@ public class WebNoteEditService {
         titleDTO.getReferenceHandling() == null
             ? Set.of(notebookId)
             : noteReferenceService.notebooksToLock(
-                requireNote(noteId), authorizationService.getCurrentUser(), notebookId);
+                List.of(requireNote(noteId)), authorizationService.getCurrentUser(), notebookId);
     return edit(
         noteId,
         notebookId,

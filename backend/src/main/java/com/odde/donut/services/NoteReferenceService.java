@@ -12,6 +12,7 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -138,13 +139,15 @@ public class NoteReferenceService {
 
   /**
    * The notebooks a web action by {@code viewer} locks when it rewrites or removes links to {@code
-   * target}: {@code actionNotebookIds} plus the notebooks of the {@link
+   * targets}: {@code actionNotebookIds} plus the notebooks of their {@link
    * #editableInboundReferencesForViewer editable referrers}.
    */
-  public Set<Integer> notebooksToLock(Note target, User viewer, Integer... actionNotebookIds) {
+  public Set<Integer> notebooksToLock(
+      Collection<Note> targets, User viewer, Integer... actionNotebookIds) {
     return Stream.concat(
             Stream.of(actionNotebookIds),
-            editableInboundReferencesForViewer(target, viewer).stream()
+            targets.stream()
+                .flatMap(target -> editableInboundReferencesForViewer(target, viewer).stream())
                 .map(inbound -> inbound.referrer().getNotebook().getId()))
         .collect(Collectors.toUnmodifiableSet());
   }
