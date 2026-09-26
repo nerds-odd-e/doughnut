@@ -102,7 +102,7 @@ No executable plan or implementation is authorized by this seed.
 
 ### Link rewrites in other notebooks reach their Git
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/047-link-rewrites-in-other-notebooks-reach-git/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"2fab3287c26552715e342bdf5419c6bb59175d7cd3bd4b12e93cf30e0924f59b","plan":"92dc2b800dace40547120bb202cbf6c8adf798082f8a4fe41f24d5efe8c335c2"}}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/047-link-rewrites-in-other-notebooks-reach-git/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"2fab3287c26552715e342bdf5419c6bb59175d7cd3bd4b12e93cf30e0924f59b","plan":"28979d168da3906af6cd240d625ed9447db823b005cfe11c1fb9bdb76aecd00f"}}
 ```
 
 - **Identity:** SEED-035#story-25
