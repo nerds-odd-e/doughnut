@@ -1,54 +1,43 @@
 package com.odde.donut.services;
 
-import com.odde.donut.controllers.dto.NoteRealm;
 import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.User;
 import com.odde.donut.entities.repositories.FolderRepository;
-import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
-import com.odde.donut.testability.TestabilitySettings;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Web note-move orchestration: capture inbound references, place the note via {@link
  * NoteMotionService}, then rewrite wiki links. A same-notebook move also carries the note's picture
- * via {@link MovedNotePicture}. Same-notebook moves run through {@code WebNoteEditService.edit} so
- * the moved tree appends to accepted history; the {@link Consumer} factories here supply the
- * capture-place-rewrite recipe for that boundary. Cross-notebook moves keep a separate
- * DEFAULT-isolation transaction and are not Git-synchronized in the current slice.
+ * via {@link MovedNotePicture}. Moves run through {@code WebNoteEditService.edit} so the moved tree
+ * appends to accepted history (a cross-notebook move in both notebooks); the {@link Consumer}
+ * factories here supply the capture-place-rewrite recipe for that boundary.
  */
 @Service
 public class NoteMoveService {
   private final NoteMotionService noteMotionService;
-  private final NoteRealmService noteRealmService;
   private final WikiLinkRewriteService wikiLinkRewriteService;
   private final WikiLinkRelocationRewrite wikiLinkRelocationRewrite;
   private final AuthorizationService authorizationService;
-  private final TestabilitySettings testabilitySettings;
   private final FolderRepository folderRepository;
   private final MovedNotePicture movedNotePicture;
 
   public NoteMoveService(
       NoteMotionService noteMotionService,
-      NoteRealmService noteRealmService,
       WikiLinkRewriteService wikiLinkRewriteService,
       WikiLinkRelocationRewrite wikiLinkRelocationRewrite,
       AuthorizationService authorizationService,
-      TestabilitySettings testabilitySettings,
       FolderRepository folderRepository,
       MovedNotePicture movedNotePicture) {
     this.noteMotionService = noteMotionService;
-    this.noteRealmService = noteRealmService;
     this.wikiLinkRewriteService = wikiLinkRewriteService;
     this.wikiLinkRelocationRewrite = wikiLinkRelocationRewrite;
     this.authorizationService = authorizationService;
-    this.testabilitySettings = testabilitySettings;
     this.folderRepository = folderRepository;
     this.movedNotePicture = movedNotePicture;
   }
@@ -90,32 +79,41 @@ public class NoteMoveService {
     };
   }
 
-  @Transactional
-  public NoteRealm moveCrossNotebookToFolder(Note source, Folder targetFolder)
-      throws UnexpectedNoAccessRightException {
-    Notebook oldNotebook = source.getNotebook();
-    Notebook targetNotebook = targetFolder.getNotebook();
-    User user = authorizationService.getCurrentUser();
-    Map<Integer, List<String>> inboundReferences =
-        wikiLinkRewriteService.captureLiveResolvedInboundReferences(source, user);
-    noteMotionService.executeMoveIntoFolder(source, targetFolder);
-    Timestamp now = testabilitySettings.getCurrentUTCTimestamp();
-    wikiLinkRelocationRewrite.rewriteWikiLinksForCrossNotebookMove(
-        source, oldNotebook, targetNotebook, now, user, inboundReferences);
-    return noteRealmService.build(source, user);
+  /**
+   * Move into a folder of another notebook, as a mutation for an accepted change over both
+   * notebooks: the picture stays in the source notebook.
+   */
+  public Consumer<Note> crossNotebookMoveIntoFolder(
+      Integer targetFolderId, Notebook targetNotebook, Timestamp now) {
+    return note -> {
+      Folder targetFolder = folderRepository.findById(targetFolderId).orElseThrow();
+      targetFolder.requireInNotebook(targetNotebook);
+      moveCrossNotebook(
+          note,
+          targetNotebook,
+          now,
+          () -> noteMotionService.executeMoveIntoFolder(note, targetFolder));
+    };
   }
 
-  @Transactional
-  public NoteRealm moveCrossNotebookToNotebookRoot(Note source, Notebook targetNotebook)
-      throws UnexpectedNoAccessRightException {
-    Notebook oldNotebook = source.getNotebook();
+  /** Move to another notebook's root, as a mutation for an accepted change over both notebooks. */
+  public Consumer<Note> crossNotebookMoveToRoot(Notebook targetNotebook, Timestamp now) {
+    return note ->
+        moveCrossNotebook(
+            note,
+            targetNotebook,
+            now,
+            () -> noteMotionService.executeMoveToNotebookRoot(note, targetNotebook));
+  }
+
+  private void moveCrossNotebook(
+      Note note, Notebook targetNotebook, Timestamp now, Runnable place) {
+    Notebook oldNotebook = note.getNotebook();
     User user = authorizationService.getCurrentUser();
     Map<Integer, List<String>> inboundReferences =
-        wikiLinkRewriteService.captureLiveResolvedInboundReferences(source, user);
-    noteMotionService.executeMoveToNotebookRoot(source, targetNotebook);
-    Timestamp now = testabilitySettings.getCurrentUTCTimestamp();
+        wikiLinkRewriteService.captureLiveResolvedInboundReferences(note, user);
+    place.run();
     wikiLinkRelocationRewrite.rewriteWikiLinksForCrossNotebookMove(
-        source, oldNotebook, targetNotebook, now, user, inboundReferences);
-    return noteRealmService.build(source, user);
+        note, oldNotebook, targetNotebook, now, user, inboundReferences);
   }
 }

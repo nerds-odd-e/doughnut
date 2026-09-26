@@ -113,7 +113,11 @@ Enables slice 2.
 
 ### 2. A note moved to another notebook reaches both notebooks' Git
 Type: Behavior
-Status: planned
+Status: done
+Accepted proof: `NotebookGitWebNoteCrossNotebookMoveControllerTest` 3/3 (red
+3/3 before wiring); `RelationController*`, `*NoteMove*` and neighbouring
+suites green. The capture guard from the learnings was not needed. Main code
+net +26 lines.
 Proof: new `NotebookGitWebNoteCrossNotebookMoveControllerTest` (on
 `NotebookGitWebNoteMoveTestBase` or `NotebookGitWebContentControllerTestBase`,
 using `createGitBackedNotebook`, `storeFolderAttachmentAndSnapshot`,
@@ -180,4 +184,8 @@ notebooks outside the changed set remain outside.
   change in the same operation) is also recorded as updated in the new
   notebook, next to its insertion, with a new-notebook previous path. If
   slice 2 or 3 shows a wrong tree from this, skip the update when the row is
-  already inserted in that notebook.
+  already inserted in that notebook. (Not needed for note moves.)
+- Build the notebook set with `Stream.of(…).collect(toUnmodifiableSet())`:
+  `Set.of(a, b)` throws when a same-notebook move passes the same id twice.
+  Note moves pass their set through `WebNoteEditService.edit(…, Set<Integer>, …)`;
+  mirror that single/set pair for `applyLiveFolderChange`.

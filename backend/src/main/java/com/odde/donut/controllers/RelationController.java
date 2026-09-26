@@ -17,6 +17,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -52,15 +54,16 @@ class RelationController {
       @PathVariable @Schema(type = "integer") Note sourceNote,
       @PathVariable @Schema(type = "integer") Folder targetFolder)
       throws UnexpectedNoAccessRightException {
+    Notebook targetNotebook = targetFolder.getNotebook();
     authorizationService.assertAuthorization(sourceNote);
-    authorizationService.assertAuthorization(targetFolder.getNotebook());
-    if (Objects.equals(sourceNote.getNotebook().getId(), targetFolder.getNotebook().getId())) {
-      return List.of(
-          webMove(
-              sourceNote,
-              now -> noteMoveService.sameNotebookMoveIntoFolder(targetFolder.getId(), now)));
-    }
-    return List.of(noteMoveService.moveCrossNotebookToFolder(sourceNote, targetFolder));
+    authorizationService.assertAuthorization(targetNotebook);
+    Function<Timestamp, Consumer<Note>> move =
+        isSameNotebook(sourceNote, targetNotebook)
+            ? now -> noteMoveService.sameNotebookMoveIntoFolder(targetFolder.getId(), now)
+            : now ->
+                noteMoveService.crossNotebookMoveIntoFolder(
+                    targetFolder.getId(), targetNotebook, now);
+    return List.of(webMove(sourceNote, targetNotebook, move));
   }
 
   @PostMapping(value = "/move-to-notebook-root/{sourceNote}")
@@ -69,7 +72,8 @@ class RelationController {
       throws UnexpectedNoAccessRightException {
     authorizationService.assertAuthorization(sourceNote);
     authorizationService.assertAuthorization(sourceNote.getNotebook());
-    return List.of(webMove(sourceNote, noteMoveService::sameNotebookMoveToRoot));
+    return List.of(
+        webMove(sourceNote, sourceNote.getNotebook(), noteMoveService::sameNotebookMoveToRoot));
   }
 
   @PostMapping(value = "/move-to-notebook-root/{sourceNote}/{targetNotebook}")
@@ -79,10 +83,11 @@ class RelationController {
       throws UnexpectedNoAccessRightException {
     authorizationService.assertAuthorization(sourceNote);
     authorizationService.assertAuthorization(targetNotebook);
-    if (Objects.equals(sourceNote.getNotebook().getId(), targetNotebook.getId())) {
-      return List.of(webMove(sourceNote, noteMoveService::sameNotebookMoveToRoot));
-    }
-    return List.of(noteMoveService.moveCrossNotebookToNotebookRoot(sourceNote, targetNotebook));
+    Function<Timestamp, Consumer<Note>> move =
+        isSameNotebook(sourceNote, targetNotebook)
+            ? noteMoveService::sameNotebookMoveToRoot
+            : now -> noteMoveService.crossNotebookMoveToRoot(targetNotebook, now);
+    return List.of(webMove(sourceNote, targetNotebook, move));
   }
 
   @PostMapping(value = "/{relationNote}/reduce-to-source-property")
@@ -92,13 +97,21 @@ class RelationController {
     return relationReduceService.reduceToSourceProperty(relationNote);
   }
 
-  private NoteRealm webMove(Note sourceNote, Function<Timestamp, Consumer<Note>> mutationFactory)
+  private static boolean isSameNotebook(Note sourceNote, Notebook targetNotebook) {
+    return Objects.equals(sourceNote.getNotebook().getId(), targetNotebook.getId());
+  }
+
+  private NoteRealm webMove(
+      Note sourceNote, Notebook targetNotebook, Function<Timestamp, Consumer<Note>> mutationFactory)
       throws UnexpectedNoAccessRightException {
     Timestamp now = testabilitySettings.getCurrentUTCTimestamp();
+    Integer sourceNotebookId = sourceNote.getNotebook().getId();
     Note moved =
         webNoteEditService.edit(
             sourceNote.getId(),
-            sourceNote.getNotebook().getId(),
+            sourceNotebookId,
+            Stream.of(sourceNotebookId, targetNotebook.getId())
+                .collect(Collectors.toUnmodifiableSet()),
             mutationFactory.apply(now),
             note -> "Move note: " + note.getTitle(),
             now);
