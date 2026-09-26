@@ -1,7 +1,7 @@
 # DearDough Process Findings
 
 Compact open shared-process findings; project-only issues live in [DonutRetrospectiveFindings.md](DonutRetrospectiveFindings.md).
-Full evidence and response tracking: [Open Dough catalog](https://github.com/terryyin/open-dough/blob/9d72ec5/docs/maintainer/finding-names.md).
+Full evidence and response tracking: [Open Dough catalog](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/finding-names.md).
 Shipped responses are omitted locally; upstream effectiveness checks may remain open.
 Occurrence details are recoverable from the exact Git snapshot below. Missing provenance is unknown;
 current installed versions are not substituted for historical execution releases.
@@ -91,7 +91,7 @@ An active worktree and branch disappeared during delegation; the remover is unkn
 ## ODF-085 — The documented `.claude/skills` runtime path did not exist at all in a freshly created execution worktree
 
 Former local code: DD-074.
-A missing .claude skill alias concealed an already-tracked same-checkout .agents runtime, causing copies or false unavailability; one execution left ten pushes unobserved. CI-delivery follow-up is queued upstream.
+A missing .claude skill alias concealed an already-tracked same-checkout .agents runtime, causing copies or false unavailability; one execution left ten pushes unobserved. Response and remaining observation limits are tracked upstream.
 
 ### Occurrences
 
@@ -103,7 +103,7 @@ A missing .claude skill alias concealed an already-tracked same-checkout .agents
 ## ODF-069 — The CI observer's fixed discovery-poll bound reports lost coverage for revisions whose CI run exists and later succeeds
 
 Former local code: DD-076.
-Four delivered revisions had real successful runs but remained unproved in observer records. Later diagnosis disproves “discovery never retries”; bounded listing remains a qualified cause. CI-delivery follow-up is queued upstream.
+Four delivered revisions had real successful runs but remained unproved in observer records. Later diagnosis disproves “discovery never retries”; bounded listing remains a qualified cause. Response and remaining observation limits are tracked upstream.
 
 ### Occurrences
 
@@ -199,45 +199,6 @@ Former local code: DD-107.
   - Observed effect: at least two refused delivery calls before slice 1 was published; the release update from 0.3.38 to 0.3.40 did not remove either earlier cause.
   - Inference: the `refs/heads/` requirement is a new third argument-shape refusal on the same first delivery; the three are rediscovered one refusal at a time. The exact call count is not in the summary.
 
-## ODF-099 — Queued startup receipt embeds the whole Git index and overflows the coordinator's tool output
-
-Former local code: DD-108.
-
-`execution-start.mjs start` prints `beforeMaintenance.index` (the full staged index listing of the default checkout) inside its one-line JSON receipt. On this repository the receipt was 811 KB, so the host saved it to a file and showed only a 2 KB preview; the fields the coordinator must retain (`publishedSha`, `workspace`, `preparation`) happened to be in that preview.
-
-### Occurrences
-
-- Execution: SEED-035 story 1 / quick/022-browse-download-notebook-files / 70b3b67313; Timestamp: 2026-09-24T11:09+08:00 (queued startup); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.33.
-  - Evidence: startup call output "Output too large (811.3KB)"; preview shows `beforeMaintenance.result: deferred`, `reason: unclear-ownership`, then `index: "100644 … .agents/agent-map.md\n…"`.
-  - Observed effect: the exact receipt the skill requires preserving was not fully visible in context; later fields (for example refresh results after the index) were unread.
-  - Inference: a maintenance diagnostic that lists every tracked file scales with repository size; a count or digest would keep the receipt usable.
-- Execution: SEED-035 story 3 / quick/024-note-local-picture-file / f0cc15be6a; Timestamp: 2026-09-24T14:10+08:00 (queued startup); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.37.
-  - Evidence: startup call output "Output too large (814.6KB)"; `beforeMaintenance.index` holds the full index listing.
-  - Observed effect: the coordinator needed an extra `python3` call to read the receipt's later fields (`afterMaintenance: advanced`, `projectSetupRequired: true`).
-- Execution: SEED-035 story 14 / quick/025-convert-raw-notebooks-to-lfs / 071d0e0861; Timestamp: 2026-09-24, ~15:45+08:00 (queued startup, between readiness commit 47df9474c2 and slice 1); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.37.
-  - Evidence: startup call output "Output too large (815.7KB)"; `beforeMaintenance.index` holds the full index listing.
-  - Observed effect: an extra `python3` call was needed to read `afterMaintenance` and `projectSetupRequired`.
-- Execution: SEED-035 story 20 / quick/026-test-file-journeys-on-lfs / 5859e6d663; Timestamp: 2026-09-24, ~17:28+08:00 (queued startup); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.37.
-  - Evidence: startup call output "Output too large (816.5KB)"; `beforeMaintenance.index` and `afterMaintenance.index` hold the full index listing.
-  - Observed effect: an extra `python3` call was needed to read `afterMaintenance` and `projectSetupRequired`.
-- Execution: SEED-035 story 4 / quick/027-web-uploaded-pictures-as-notebook-files / 4250de93e1; Timestamp: 2026-09-24, ~21:17+08:00 (queued startup; Take commit 21:16:55+08:00); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.38.
-  - Evidence: startup call output "Output too large (817.8KB)"; `beforeMaintenance.index` and `afterMaintenance.index` hold the full index listing.
-  - Observed effect: an extra `python3` call was needed to read `afterMaintenance` and `projectSetupRequired`.
-
-- Execution: SEED-035 story 19 / quick/029-remove-raw-file-storage / 0284ea7f52; Timestamp: 2026-09-25T09:02+08:00 (queued startup; Take commit 09:01:48+08:00); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.38.
-  - Evidence: startup call output "Output too large (817.8KB)"; `beforeMaintenance.index` holds the full index listing.
-  - Observed effect: an extra `node` call was needed to read `afterMaintenance` and `projectSetupRequired`.
-- Execution: SEED-035 story 5 / quick/033-move-legacy-note-pictures / 4dad58408f; Timestamp: 2026-09-25, ~14:19+08:00 (queued startup, Take commit 269a569079); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.38.
-  - Evidence: startup call output "Output too large (816.6KB)"; `beforeMaintenance.index` holds the full index listing.
-  - Observed effect: an extra `node` call was needed to read `afterMaintenance` and `projectSetupRequired`.
-
-- Execution: SEED-035 story 17 / quick/034-book-source-as-notebook-file / 36eb15caaa; Timestamp: 2026-09-25, ~15:45+08:00 (queued startup, Take commit 6926d8a1a1); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.38.
-  - Evidence: startup call output "Output too large (817.3KB)"; `beforeMaintenance.index` and `afterMaintenance.index` hold the full index listing.
-  - Observed effect: an extra `python3` call was needed to read `afterMaintenance` and `projectSetupRequired`.
-- Execution: SEED-039 story 4 / quick/041-faster-frontend-unit-tests / c9347a9ee3; Timestamp: 2026-09-26T08:24+08:00 (queued startup); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.38.
-  - Evidence: startup call output "Output too large (819.2KB)"; the coordinator parsed the saved file with a script to read `publishedSha`, `workspace`, and the maintenance results.
-  - Observed effect: one extra call to recover the receipt fields.
-
 ## ODF-110 — A readiness replay observed only the plan's named seam, not the rest of the slice's journey
 
 Former local code: DD-109.
@@ -307,7 +268,9 @@ An implementation agent reported a full-suite heap exhaustion as "also on the ba
   - Observed effect: the first stop report told the owner the failure was pre-existing and out of scope; the correction came only after the CI check.
   - Inference: "pre-existing" needs a baseline from before this execution's first change (claim revision or last green CI), not the prior slice.
 
-## DD-114 — A not-ready assessment whose only reason was a satisfied start condition blocked queued startup
+## ODF-120 — A not-ready assessment whose only reason was a satisfied start condition blocked queued startup
+
+Former local code: DD-114.
 
 The plan's recorded assessment was `not-ready` solely because its start condition (the story it builds on being on main) was unmet. That story was later merged and wrapped up without re-assessing dependents, so `execution-start.mjs start` refused with "published preparation is needs-reassessment". The coordinator checked the reused names on main, recorded `ready`, and published a separate readiness commit on main before the Take.
 
@@ -318,7 +281,9 @@ The plan's recorded assessment was `not-ready` solely because its start conditio
   - Observed effect: about six extra calls and one extra commit on main; an execution coordinator performed a preparation assessment.
   - Inference: when a start condition names another story, that story's wrap-up (or the start command) could re-check dependents whose only blocking reason it resolves.
 
-## DD-115 — One transient GitHub TLS timeout ended CI observation for the rest of the execution
+## ODF-121 — One transient GitHub TLS timeout ended CI observation for the rest of the execution
+
+Former local code: DD-115.
 
 During slice 7, the observer emitted `CI_MONITOR_UNAVAILABLE` for a single `gh run list` call that failed with "net/http: TLS handshake timeout". Observation then stopped, so the slice 6 run already in progress and the slice 7 publication had no notification coverage; the coordinator had to check `gh run list` directly.
 
@@ -329,18 +294,9 @@ During slice 7, the observer emitted `CI_MONITOR_UNAVAILABLE` for a single `gh r
   - Observed effect: lost coverage for db13a2d99c and 96c756d531; manual CI checks replaced notifications.
   - Inference: a bounded retry for a transient network error before declaring the observer unavailable would likely have kept coverage.
 
-## DD-116 — A host permission block on a refactor agent's file deletion left known refactor residue in the delivered story
+## ODF-122 — A correction plan written by a retrospective had no readiness record, so queued startup refused it
 
-The fresh refactor pass found that a helper class existed only to share a step with the code the slice deleted, and tried to fold it back and delete its file in one command. The host permission check refused the command. Under the "do not work around a blocked deletion" rule the agent and the coordinator stopped, and the coordinator recorded the cleanup as a deferred owner decision in the plan. The story was delivered with the residue, and a retrospective correction plan now carries it.
-
-### Occurrences
-
-- Execution: SEED-035 story 18 / quick/036-remove-legacy-picture-storage / 89e3f8a67e; Timestamp: 2026-09-25T22:22:47+08:00 (slice 2 refactor hand-back); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.38.
-  - Evidence: slice 2 refactor hand-back ("The auto-mode classifier refused the command because it deletes a file"); plan 036 slice 2 "Deferred refactor (owner decision)"; `NoteImageFileAttachment` was split out in 4dad58408f "between the upload and the coming legacy picture move"; correction plan `b4d24a75ad:.planning/quick/037-fold-picture-attach-step-into-upload/PLAN.md`, executed as 1b822a6bf7 (the helper was folded back and its file deleted without a block).
-  - Observed effect: `NoteImageFileAttachment` shipped with one caller; one extra correction plan instead of a finished refactor. The owner was not asked during execution; the decision waits for wrap-up.
-  - Inference: implementer agents in slices 2, 4 and 5 deleted files without a block, so the refusal likely depended on the command's shape (inline edit plus `git rm` together), not on deletion as such. The story's plan listed the legacy code to delete but not the seam story 5 created for it, which is why the residue was found only at refactor time. Qualified: the refactor agent's own transcript was not available.
-
-## DD-117 — A correction plan written by a retrospective had no readiness record, so queued startup refused it
+Former local code: DD-117.
 
 The execution retrospective for SEED-035 story 18 created and queued the correction plan without recording its preparation (`read-state` reported `not-recorded`). `execution-start.mjs start` refused with "selected canonical preparation or identity is unresolved". The coordinator reviewed the plan, recorded `ready` with `record-state`, and published a separate readiness commit on main before the Take. A second start then refused `--plan` ("requested plan disagrees with published preparation") because a whole-document correction's plan is its own canonical home, so the flag has to be left out.
 
@@ -351,7 +307,9 @@ The execution retrospective for SEED-035 story 18 created and queued the correct
   - Observed effect: about seven extra calls (reading `execution-source.mjs` and `record-preparation.md`) and one extra commit on main; an execution coordinator performed a preparation assessment, as in DD-114.
   - Inference: the retrospective's correction-planning path goes through slice planning, which says to record readiness, but that step was skipped or not reached for a plan that is its own home. Recording the assessment when the retrospective writes the plan would remove the refusal.
 
-## DD-118 — Two concurrent executions allocated the same quick-plan number from different bases
+## ODF-106 — Two concurrent executions allocated the same quick-plan number from different bases
+
+Former local code: DD-118.
 
 Slice planning takes the number after the highest plan entry in the checkout that writes the plan and rechecks only that path. A plan written in an execution worktree whose base predates a plan already on main got the same number, so two different executions are both "037".
 
@@ -362,7 +320,9 @@ Slice planning takes the number after the highest plan entry in the checkout tha
   - Observed effect: DearDough rows and `.planning/test-optimization-candidates.md` ("plan 037 cut the suite…") refer to "037" for two different executions once both plans are deleted at wrap-up; the retrospective's correction plan had to reword the candidate record.
   - Inference: the same stale-base allocation applies to DD numbers in this log, so a merge can also produce duplicate finding codes. Whether the coordinator fetched `origin/main` before planning is not recorded.
 
-## DD-119 — A story whose owner deferred planning to execution could not be started until the coordinator planned and published it separately
+## ODF-123 — A story whose owner deferred planning to execution could not be started until the coordinator planned and published it separately
+
+Former local code: DD-119.
 
 The story said "The owner chose to skip story refinement; the plan is made during execution" and was queued with `approach: unselected`. `execution-start.mjs start` accepts only a published `planned`+`ready` or `planless` preparation, so it refused. The coordinator created a worktree, profiled, wrote the plan, recorded `refined`/`planned`/`ready`, pushed that plan straight to main, and then ran startup again against the same worktree.
 
@@ -373,7 +333,9 @@ The story said "The owner chose to skip story refinement; the plan is made durin
   - Observed effect: about ten extra calls reading `execution-source.mjs`, `preparation-disposition.md`, `preparation-workspace.md`, and `record-preparation.md`; a planning commit reached main without a separate keep decision.
   - Inference: the coordinator treated the story's own text plus `/dough-execute-plan` as keep authority. No guidance names a "plan during execution" path, so either queued stories need a planned approach before queueing or startup needs a documented plan-first step.
 
-## DD-120 — The coordinator told parallel agents a guidance rule did not exist after searching only SKILL.md files
+## ODF-124 — The coordinator told parallel agents a guidance rule did not exist after searching only SKILL.md files
+
+Former local code: DD-120.
 
 A refactor agent cited a 250-line file limit. The coordinator grepped `SKILL.md` files and lint scripts, found nothing, and messaged two running implementers and one refactor agent that the limit did not exist. The rule is in `dough-post-change-refactor/references/refactor-checks.md` ("File size"). One refactor then produced a 400-line spec and another a 268-line spec, and the coordinator had to retract the claim and send two follow-up refactors.
 
@@ -384,7 +346,9 @@ A refactor agent cited a 250-line file limit. The coordinator grepped `SKILL.md`
   - Observed effect: two extra refactor agents (~125k subagent tokens) and one failed commit; a plan learning had to be rewritten.
   - Inference: a negative claim about guidance needs a search of the whole skill tree, references included, before it is broadcast to agents.
 
-## DD-122 — Interim "agent has not reported yet" notifications repeatedly woke the coordinator with nothing to decide
+## ODF-125 — Interim "agent has not reported yet" notifications repeatedly woke the coordinator with nothing to decide
+
+Former local code: DD-122.
 
 A delegated implementation agent started its tests in the background and ended its turn while it waited. Each time it stopped, the host sent the coordinator a completed-task notification whose result said the report was still pending. The coordinator woke, answered "still waiting", and went idle again.
 
@@ -395,18 +359,9 @@ A delegated implementation agent started its tests in the background and ended i
   - Observed effect: about 2.6M cache-read tokens went on status-only turns. The final reports and the execution were unaffected.
   - Inference: asking delegated implementers to run focused tests in the foreground, or having the coordinator stay idle on an interim notification, would avoid this. Qualified: the host notification behavior is outside the project's control.
 
-## DD-123 — Implementers reported behavior changes beyond their slice, and the coordinator settled each one with a bounded addendum before refactoring (useful practice)
+## ODF-116 — Closing one story in a shared seed made a sibling story's ready assessment stale
 
-Two implementation agents finished their slice promises and also named a gap or side effect outside the slice. The coordinator judged each one against the plan goal and sent a focused addendum to the same agent, with a failing test first, before the fresh refactor pass.
-
-### Occurrences
-
-- Execution: SEED-035#story-11 / quick/007-dissolve-merge-folders-with-files / 1a8b7abff7; Timestamp: 2026-09-26T05:42:03Z (slice 8), 2026-09-26T06:01:06Z (slice 9); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.40.
-  - Evidence: slice 8 report flagged note creation from an AI-extracted suggestion as an unchecked web placement → addendum `AiControllerCreateExtractedNoteTest.aFolderHoldingTheNewNoteFileNameIgnoringCaseRefusesTheCreateNamingIt`. Slice 9 report flagged that removing the accepted-tree lookup silently dropped the documented no-binding upload refusal → addendum `aNotebookWithoutAGitBindingRefusesTheUploadAndStoresNothing` (commits 46f53bedbe, 97c1f73ef5).
-  - Observed effect: two gaps, one a regression, were closed inside their slices. Neither reached a later slice or the retrospective.
-  - Inference: the plan's removal of `takenPaths` did not name that it enforced a refusal implicitly. Asking implementers to report side effects caught what planning missed.
-
-## DD-124 — Closing one story in a shared seed made a sibling story's ready assessment stale
+Former local code: DD-124.
 
 A story's readiness basis is a digest of its whole seed document. Wrapping up another story in the same seed removed that story's section, which changed the digest, so `execution-start.mjs start` refused the unchanged, ready sibling with "published preparation is needs-reassessment". The coordinator rechecked the story text and plan assumptions, recorded `ready` again, and published a separate readiness commit on main before the Take.
 
