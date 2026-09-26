@@ -181,6 +181,18 @@ no note content contains `\r\n`), remove the hook and the slice 3 service
 entirely, as the picture move was retired (`0d57de8778`). Record the
 production count of affected notes before release.
 
+## Execution complete
+
+Product advice: no backlog change. At wrap-up, run the after-landing
+Development-stack measurement (clone and no-op pull timing, one
+`Normalize note line endings` commit, clean `git status`, pull "Notebook
+unchanged"), then retire the startup hook and service once production has
+run them. With the measured times in hand, revisit the owner's deferred
+head-only check for no-op pull and publish. Low priority: a publish whose
+`.md` blob keeps CRLF (only possible when an author overrides `*.md text`)
+is now refused with a "refresh the checkout" message that may not explain
+the cause.
+
 ## Current decisions
 
 - One-off data normalization runs as a retirable startup service, not a
