@@ -1,7 +1,6 @@
 package com.odde.donut.configs;
 
 import com.google.cloud.storage.Storage;
-import com.google.cloud.storage.StorageOptions;
 import com.odde.donut.entities.repositories.AttachmentBlobRepository;
 import com.odde.donut.services.book.BookStorage;
 import com.odde.donut.services.book.DbBookStorage;
@@ -16,17 +15,11 @@ public class BookStorageConfiguration {
 
   @Bean
   @Profile("prod")
-  Storage bookGcsClient() {
-    return StorageOptions.getDefaultInstance().getService();
-  }
-
-  @Bean
-  @Profile("prod")
   BookStorage gcsBookStorage(
-      Storage bookGcsClient,
+      Storage storage,
       @Value("${donut.book-pdf.gcs.bucket}") String bucket,
       @Value("${donut.book-pdf.gcs.object-prefix:}") String objectPrefix) {
-    return new GcsBookStorage(bookGcsClient, bucket, objectPrefix);
+    return new GcsBookStorage(storage, bucket, objectPrefix);
   }
 
   @Bean
