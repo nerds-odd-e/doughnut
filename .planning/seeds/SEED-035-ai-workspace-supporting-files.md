@@ -99,7 +99,7 @@ No executable plan or implementation is authorized by this seed.
 
 ### Delete unwanted supporting files from Web Donut
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../quick/035-delete-notebook-file-on-web/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"627ac528518d10abcb66fa29337e993531392fde866f113b9a71f33cc8fe939a","plan":"e9eb6a56dc80e0cb677ecaedf539420d4fb86e2d77da5321242f88fc3fa2c556"}}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../quick/035-delete-notebook-file-on-web/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"f56f518ff5be94d51942a67c8ac4c56e19e81c5f5690648c06c85c7bfe3e0e6a","plan":"e9eb6a56dc80e0cb677ecaedf539420d4fb86e2d77da5321242f88fc3fa2c556"}}
 ```
 
 - **Identity:** SEED-035#story-2
