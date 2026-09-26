@@ -48,12 +48,18 @@ describe("RichMarkdownEditor changes only what the user edited", () => {
     )
   })
 
+  it("keeps the body's final newline", async () => {
+    expect(await typeAtStart("First\n\nLast\n", "My ")).toBe(
+      "My First\n\nLast\n"
+    )
+  })
+
   it("keeps the authored frontmatter and blank line on a body edit", async () => {
     const note =
       "---\nname: demo2\ndescription: Second skill\ntype: note\ntags: [x]\n---\n\n# Demo2\n"
 
     expect(await typeAtStart(note, "My ")).toBe(
-      note.replace("# Demo2\n", "# My Demo2")
+      note.replace("# Demo2", "# My Demo2")
     )
   })
 

@@ -28,9 +28,15 @@ Command:
 ### 1. A rich body edit keeps the file's final newline
 
 Type: Behavior
-Status: planned
+Status: done
 Proof: the three examples above, whole emitted Markdown with `toBe`; run the
 new example 1 case red before the change.
+Accepted proof: red first (2 of 11 failed in the spec, final `\n` lost); then the
+command above passed, 30 files, 317 tests. Example 1 is "keeps the body's final
+newline" (no-frontmatter path through `composeNoteContentFromPropertyRows`);
+example 2 is "keeps the authored frontmatter and blank line on a body edit";
+example 3 is "keeps comments, quoting and flow lists in unsorted frontmatter
+byte for byte" and the property panel edit cases (bodies end `Body`).
 
 Behavior: the examples.
 
@@ -48,4 +54,6 @@ path (`composeNoteContentFromPropertyRows`) and cover it with example 1.
 
 ## Learnings
 
-None yet.
+- Clearing every rich body line of a note whose body ended in a newline now
+  saves just that newline (after any frontmatter); no example covers it.
+- `\r\n` final newlines are kept by the code but not tested.
