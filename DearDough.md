@@ -370,6 +370,11 @@ A delegated implementation agent started its tests in the background and ended i
   - Observed effect: about 2.6M cache-read tokens went on status-only turns. The final reports and the execution were unaffected.
   - Inference: asking delegated implementers to run focused tests in the foreground, or having the coordinator stay idle on an interim notification, would avoid this. Qualified: the host notification behavior is outside the project's control.
 
+- Execution: SEED-046#story-1 / slice-plans/002-publish-cost-follows-change / 78e337f12b; Timestamp: unknown (about 2026-09-26T20:40+08:00–21:30+08:00, from worktree file times and the measurement run id; slice 1); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: unknown.
+  - Evidence: coordinator conversation for this execution: about 12 task-notifications for the slice 1 implementer, each "stopped with background work of its own still running" / "has not reported yet"; its tool-use count stayed at 76 across most of them. A process check found no test or measurement still running, and the report arrived only after the coordinator sent a message asking for it.
+  - Observed effect: about 12 status-only coordinator turns, plus one inspection and one nudge. The report, proof and delivery were unaffected.
+  - Inference: this time the agent kept waiting after its background work had ended, so the notifications continued past the point where anything was running. A coordinator message asking for the report ended the wait. Qualified: token counts for these turns were not captured.
+
 ## ODF-116 — Closing one story in a shared seed made a sibling story's ready assessment stale
 
 Former local code: DD-124.

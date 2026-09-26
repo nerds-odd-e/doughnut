@@ -152,6 +152,17 @@ Change:
   keep "accepted raw history converted to LFS does not block publishing a
   pointer" green unchanged.
 
+## Execution complete
+
+Product advice:
+- Add to SEED-046#story-3's known facts: the oversized refusal still says the
+  file "exceeds the limit in the proposal's latest commit", which misleads when
+  the file is in an intermediate commit (the message was deliberately kept here).
+- After integration, rerun `REUSE_RUN=20260926-204034 measure-publish.sh` on the
+  Development stack for the server-side timing. Propose a new story only if the
+  whole-history bundle or projection checks then dominate B's remaining wall
+  time; otherwise no change.
+
 ## Considered and excluded
 
 - Caching accepted digests or precomputing them server-side: rejected by the
