@@ -103,7 +103,7 @@ public final class SqlStatementCallLog {
 
   private static boolean isObjectFetch(Execution execution) {
     return "executeQuery".equals(execution.method())
-        && containsAll(execution.sql(), "notebook_git_accepted_object", "git_object_id = ?");
+        && containsAll(execution.sql(), "notebook_git_accepted_object", "object_bytes");
   }
 
   private static boolean containsAll(String sql, String... requiredSubstrings) {

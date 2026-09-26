@@ -13,6 +13,7 @@ import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.NotebookGitBinding;
 import com.odde.donut.entities.User;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
+import com.odde.donut.services.notebookGit.SqlStatementCallLog;
 import com.odde.donut.testability.GitBundleTestReader;
 import java.util.concurrent.Callable;
 import org.eclipse.jgit.internal.storage.dfs.DfsRepositoryDescription;
@@ -45,6 +46,31 @@ class NotebookGitBundleDownloadControllerTest extends NotebookGitWebContentContr
             transactionManager,
             () -> notebookGitBindingRepository.findByNotebook_Id(notebook.getId()).orElseThrow());
     assertThat(after.getAcceptedGitObjectId(), equalTo(expectedHead));
+  }
+
+  @Test
+  void downloadReadsTheNotebooksStoredObjectsInOneFetch() throws Exception {
+    Notebook notebook = createGitBackedNotebook();
+    Note first =
+        makeMe.aNote().notebook(notebook).title("first").content(ACCEPTED_CONTENT).please();
+    makeMe.aNote().notebook(notebook).title("second").content(ACCEPTED_CONTENT).please();
+    makeMe.aNote().notebook(notebook).title("third").content(ACCEPTED_CONTENT).please();
+    snapshotCurrentPortableTree(notebook);
+    textContentController.updateNoteContent(first, contentDto(FIRST_WEB_CONTENT));
+    textContentController.updateNoteContent(first, contentDto(EDITED_CONTENT));
+    String expectedHead = binding(notebook).getAcceptedGitObjectId();
+
+    SqlStatementCallLog callLog = new SqlStatementCallLog();
+    ResponseEntity<byte[]> response;
+    try (AutoCloseable ignored = callLog.activate()) {
+      response = controller.downloadNotebookGitBundle(notebook);
+    }
+
+    try (InMemoryRepository repository = new InMemoryRepository(new DfsRepositoryDescription())) {
+      ObjectId head = GitBundleTestReader.fetchHead(repository, response.getBody());
+      assertThat(head.getName(), equalTo(expectedHead));
+    }
+    assertThat(callLog.countObjectFetches(), equalTo(1L));
   }
 
   @Test

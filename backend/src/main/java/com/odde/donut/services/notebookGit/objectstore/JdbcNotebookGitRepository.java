@@ -1,11 +1,13 @@
 package com.odde.donut.services.notebookGit.objectstore;
 
+import java.io.IOException;
 import java.sql.Connection;
 import java.util.Collections;
 import org.eclipse.jgit.attributes.AttributesNode;
 import org.eclipse.jgit.attributes.AttributesNodeProvider;
 import org.eclipse.jgit.attributes.AttributesRule;
 import org.eclipse.jgit.lib.BaseRepositoryBuilder;
+import org.eclipse.jgit.lib.ObjectReader;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.lib.StoredConfig;
 
@@ -57,6 +59,11 @@ public final class JdbcNotebookGitRepository extends Repository {
   @Override
   public JdbcNotebookObjectDatabase getObjectDatabase() {
     return objectDatabase;
+  }
+
+  /** A reader over every stored object, loaded in one query; see {@link #getObjectDatabase()}. */
+  public ObjectReader newWholeHistoryReader() throws IOException {
+    return objectDatabase.newWholeHistoryReader();
   }
 
   @Override

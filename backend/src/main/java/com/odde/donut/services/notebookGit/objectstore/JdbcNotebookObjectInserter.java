@@ -21,10 +21,9 @@ import org.eclipse.jgit.util.IO;
  */
 final class JdbcNotebookObjectInserter extends ObjectInserter {
 
-  record BufferedObject(int type, byte[] data) {}
-
   private final JdbcNotebookObjectDatabase database;
-  private final Map<ObjectId, BufferedObject> buffered = new LinkedHashMap<>();
+  private final Map<ObjectId, JdbcNotebookObjectDatabase.ObjectContent> buffered =
+      new LinkedHashMap<>();
 
   JdbcNotebookObjectInserter(JdbcNotebookObjectDatabase database) {
     this.database = database;
@@ -34,7 +33,7 @@ final class JdbcNotebookObjectInserter extends ObjectInserter {
   public ObjectId insert(int type, byte[] data, int off, int len) {
     byte[] copy = Arrays.copyOfRange(data, off, off + len);
     ObjectId id = idFor(type, copy);
-    buffered.putIfAbsent(id, new BufferedObject(type, copy));
+    buffered.putIfAbsent(id, new JdbcNotebookObjectDatabase.ObjectContent(type, copy));
     return id;
   }
 

@@ -52,7 +52,14 @@ Baseline 2026-09-26: clone 7.0 s (bundle download 4.8–5.3 s), no-op pull
 ### 1. A history download reads the notebook's objects in one query
 
 Type: Behavior
-Status: planned
+Status: done
+Accepted proof: `NotebookGitBundleDownloadControllerTest.downloadReadsTheNotebooksStoredObjectsInOneFetch`
+(3 notes, snapshot, two web edits; bundle head equals the binding's accepted
+head, `countObjectFetches()` is 1 — it was 27 before the change), with the
+existing download, object-store, save-cost and ancestry classes green (22
+tests) and `pnpm cli:test` green. `isObjectFetch` now matches any accepted
+object select that reads `object_bytes`. Learning: the stored, preloaded and
+awaiting-flush object shapes are one `ObjectContent` record.
 Proof: new case in `NotebookGitBundleDownloadControllerTest` (it already
 extends `NotebookGitWebContentControllerTestBase`, so `SqlStatementCallLog`
 is available): with a notebook holding several notes over several accepted
