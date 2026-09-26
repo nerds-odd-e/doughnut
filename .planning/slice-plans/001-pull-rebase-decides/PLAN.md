@@ -112,7 +112,7 @@ failed (pull paused) without the option.
 ### 3. Pull help and notebook docs state the one rule
 
 Type: Behavior
-Status: planned
+Status: done
 Proof: help-text assertions in `notebookPull.readiness.suite.ts` and
 `notebookClone.test.ts` updated and green in `pnpm cli:test`.
 
@@ -128,6 +128,13 @@ Change:
 - `docs/notebook-git-lfs.md`: a web attachment change now rebases; changing the
   same attachment on both sides pauses as a conflict on its pointer, resolved
   by choosing one side; Donut still does not merge binary content.
+
+Accepted proof (2026-09-26): `CURSOR_DEV=true nix develop -c pnpm cli:test`
+67 files / 440 tests; `notebookPull.readiness.suite.ts` "missing directory
+reports pull usage without making a request" and `notebookClone.test.ts` clone
+success assert "Pull rebases your linear unpublished commits onto accepted
+history, and Git pauses only on a real conflict …". The sentence also absorbed
+the old auto-merge sentence; `notebookPullNextSteps` is no longer exported.
 
 ## Current decisions
 

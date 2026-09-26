@@ -2,7 +2,6 @@ import * as fs from 'node:fs'
 import { join } from 'node:path'
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
 import { getApiConfig } from 'donut-api'
-import { notebookPullNextSteps } from '../src/nonInteractiveCli.js'
 import { run } from '../src/run.js'
 import {
   ProcessExitForTest,
@@ -36,8 +35,9 @@ export function describeNotebookPullReadiness(): void {
       )
 
       expect(ctx.getErrorSpy()).toHaveBeenCalledWith(
-        'donut: usage: donut notebook pull <directory>\nReceives accepted notebook history onto a clean local main and fills in current attachment files. ' +
-          notebookPullNextSteps('<directory>')
+        expect.stringMatching(
+          /^donut: usage: donut notebook pull <directory>\nReceives accepted notebook history onto a clean local main and fills in current attachment files\. Pull rebases your linear unpublished commits onto accepted history, and Git pauses only on a real conflict/
+        )
       )
       expect(fetchMock).not.toHaveBeenCalled()
     })
