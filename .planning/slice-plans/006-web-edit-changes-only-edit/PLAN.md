@@ -140,7 +140,10 @@ Change: extend the same edit to added and renamed keys. No new owner.
 ### 6. The server has one in-place frontmatter edit
 
 Type: Structure
-Status: planned
+Status: done — `FrontmatterInPlaceEdit.rewriteSupportedScalars` (private
+`splice`); `NoteContentMarkdown*`, `WikiLinkMarkdownTest`, title-rename and
+note-move referrer tests green unchanged. Set/append/remove operations were
+left to slices 7 and 8, which test them
 Proof: `WikiLinkMarkdownDocumentRewrite` and `NoteContentMarkdown` tests stay
 green unchanged.
 
@@ -222,3 +225,7 @@ owner (rewrite values, then remove emptied keys) instead of
   order); a renamed key is written through the YAML writer so it is quoted
   when needed. Removing the last property still re-dumps (drops the block).
   `appendWikiLinkPropertyRow` uses the same edit.
+- Slice 6: `*WikiLinkMarkdownDocumentRewrite*` matches no test class; its
+  behavior is observed through `WikiLinkMarkdownTest` and the inbound
+  reference controller tests. Mark indexes count code points — convert with
+  `offsetByCodePoints`. `Frontmatter.set` matches keys case-insensitively.
