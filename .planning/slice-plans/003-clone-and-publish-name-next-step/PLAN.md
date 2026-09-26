@@ -98,8 +98,8 @@ not know it.
 ## Execution complete
 
 Product advice: no priority change. The delivered messages close the story;
-the retrospective planned one small test correction, SEED-046#story-10
-([plan 005](../005-clone-test-states-output/PLAN.md)), for wrap-up to queue or
+the retrospective planned one small test correction, SEED-046#story-11
+([plan 007](../007-clone-test-states-output/PLAN.md)), for wrap-up to queue or
 drop.
 
 ## Current decisions

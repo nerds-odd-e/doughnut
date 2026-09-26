@@ -348,13 +348,13 @@ including delivery, not commitments.
 - **Depends on:** none.
 - **Safe stopping point:** Each change stands alone.
 
-<a id="story-10"></a>
+<a id="story-11"></a>
 
 ### 8. Clone test states the clone output instead of what it no longer says
 
-**Identity:** SEED-046#story-10
+**Identity:** SEED-046#story-11
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/005-clone-test-states-output/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"a515ec994ea7b66b865680d0c3257c834fd75e580bb59961b0c1fce2ed54c48b","plan":"3890d0ad2a1bda686f40b7b3182822a4a744c17d083a7ebf64f7f564b5a3ead9"}}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/007-clone-test-states-output/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"c5517f9a51e2e7085c482c0670ceccaa10f6d85a7290f026c87e599c6ca54250","plan":"7c4ddb99902f7bd60749c1cfdab5375424515db2bd198a99497e50f4a4e1af16"}}
 ```
 
 - **Goal:** Developers reading the clone test see the exact clone message
@@ -363,7 +363,7 @@ including delivery, not commitments.
 - **Scope:** Only the first test in `cli/tests/notebookClone.test.ts`: replace
   its `toContain` / `not.toContain` checks on the log output with one exact
   assertion of the four-line message. No product change.
-- **Plan:** [005-clone-test-states-output](../slice-plans/005-clone-test-states-output/PLAN.md)
+- **Plan:** [007-clone-test-states-output](../slice-plans/007-clone-test-states-output/PLAN.md)
 
 ## Ordering and Scope Reduction
 

@@ -2,8 +2,8 @@
 
 ## Source
 
-- Story: [SEED-046#story-10](../../seeds/SEED-046-notebook-files-and-git-findings.md#story-10)
-- **Identity:** SEED-046#story-10
+- Story: [SEED-046#story-11](../../seeds/SEED-046-notebook-files-and-git-findings.md#story-11)
+- **Identity:** SEED-046#story-11
 - Provenance: execution retrospective of SEED-046#story-3 (plan
   `003-clone-and-publish-name-next-step`), commit 6d807aa4ea.
 

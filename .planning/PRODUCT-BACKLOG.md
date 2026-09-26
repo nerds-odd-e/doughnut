@@ -15,6 +15,7 @@ and deletable in Web Donut.
 
 ## Backlog list
 
+- [Clone test states the clone output instead of what it no longer says](seeds/SEED-046-notebook-files-and-git-findings.md#story-11) — SEED-046#story-11
 - [Uploading a picture on the web explains refusals and shows the new file](seeds/SEED-046-notebook-files-and-git-findings.md#story-4) — SEED-046#story-4
 - [A web edit changes only what the user edited](seeds/SEED-046-notebook-files-and-git-findings.md#story-5) — SEED-046#story-5
 - [Cloning a notebook with many notes stays within 5 seconds](seeds/SEED-046-notebook-files-and-git-findings.md#story-8) — SEED-046#story-8
