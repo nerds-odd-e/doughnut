@@ -17,10 +17,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Web note-move orchestration: capture inbound references, place the note via {@link
- * NoteMotionService}, then rewrite wiki links. Same-notebook moves run through {@code
- * WebNoteEditService.edit} so the moved tree appends to accepted history; the {@link Consumer}
- * factories here supply the capture-place-rewrite recipe for that boundary. Cross-notebook moves
- * keep a separate DEFAULT-isolation transaction and are not Git-synchronized in the current slice.
+ * NoteMotionService}, then rewrite wiki links. A same-notebook move also carries the note's picture
+ * via {@link MovedNotePicture}. Same-notebook moves run through {@code WebNoteEditService.edit} so
+ * the moved tree appends to accepted history; the {@link Consumer} factories here supply the
+ * capture-place-rewrite recipe for that boundary. Cross-notebook moves keep a separate
+ * DEFAULT-isolation transaction and are not Git-synchronized in the current slice.
  */
 @Service
 public class NoteMoveService {
@@ -31,6 +32,7 @@ public class NoteMoveService {
   private final AuthorizationService authorizationService;
   private final TestabilitySettings testabilitySettings;
   private final FolderRepository folderRepository;
+  private final MovedNotePicture movedNotePicture;
 
   public NoteMoveService(
       NoteMotionService noteMotionService,
@@ -39,7 +41,8 @@ public class NoteMoveService {
       WikiLinkRelocationRewrite wikiLinkRelocationRewrite,
       AuthorizationService authorizationService,
       TestabilitySettings testabilitySettings,
-      FolderRepository folderRepository) {
+      FolderRepository folderRepository,
+      MovedNotePicture movedNotePicture) {
     this.noteMotionService = noteMotionService;
     this.noteRealmService = noteRealmService;
     this.wikiLinkRewriteService = wikiLinkRewriteService;
@@ -47,12 +50,13 @@ public class NoteMoveService {
     this.authorizationService = authorizationService;
     this.testabilitySettings = testabilitySettings;
     this.folderRepository = folderRepository;
+    this.movedNotePicture = movedNotePicture;
   }
 
   /**
    * Same-notebook move into an existing folder, as a mutation to run inside the accepted-history
-   * edit transaction: capture inbound references, reload the destination folder by id, place, then
-   * apply the same-notebook reference rewrite.
+   * edit transaction: capture inbound references, reload the destination folder by id, place and
+   * carry the picture, then apply the same-notebook reference rewrite.
    */
   public Consumer<Note> sameNotebookMoveIntoFolder(Integer targetFolderId, Timestamp now) {
     return note -> {
@@ -60,7 +64,11 @@ public class NoteMoveService {
       Map<Integer, List<String>> inboundReferences =
           wikiLinkRewriteService.captureLiveResolvedInboundReferences(note, user);
       Folder targetFolder = folderRepository.findById(targetFolderId).orElseThrow();
-      noteMotionService.executeMoveIntoFolder(note, targetFolder);
+      movedNotePicture.placeWithPicture(
+          note,
+          targetFolder,
+          now,
+          () -> noteMotionService.executeMoveIntoFolder(note, targetFolder));
       wikiLinkRelocationRewrite.rewriteInboundWikiLinksForLocationChange(
           note, now, inboundReferences);
     };
@@ -75,7 +83,8 @@ public class NoteMoveService {
       User user = authorizationService.getCurrentUser();
       Map<Integer, List<String>> inboundReferences =
           wikiLinkRewriteService.captureLiveResolvedInboundReferences(note, user);
-      noteMotionService.executeMoveToNotebookRoot(note);
+      movedNotePicture.placeWithPicture(
+          note, null, now, () -> noteMotionService.executeMoveToNotebookRoot(note));
       wikiLinkRelocationRewrite.rewriteInboundWikiLinksForLocationChange(
           note, now, inboundReferences);
     };

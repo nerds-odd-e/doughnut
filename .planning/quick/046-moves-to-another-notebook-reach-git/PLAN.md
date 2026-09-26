@@ -19,7 +19,7 @@ Excluded (see the story): commits for linking notes in a third notebook
 source); repairing notebooks already out of step; moving several folders at
 once.
 
-Start execution after story 23 ([plan 042](../042-moved-note-keeps-its-picture/PLAN.md))
+Start execution after story 23 (plan 042, recoverable at `77ceb41056:.planning/quick/042-moved-note-keeps-its-picture/PLAN.md`)
 lands on main: both change the note move code, and the decision below depends
 on its result.
 

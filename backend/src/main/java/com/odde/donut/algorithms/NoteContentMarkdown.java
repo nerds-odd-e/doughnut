@@ -59,6 +59,12 @@ public final class NoteContentMarkdown {
         .map(s -> new LeadingFrontmatter(s.frontmatter(), s.body()));
   }
 
+  /** The leading frontmatter's {@code image:} scalar, when present. */
+  public static Optional<String> noteImage(String content) {
+    return splitLeadingFrontmatter(content)
+        .flatMap(lf -> lf.frontmatter().getString(NOTE_IMAGE_KEY));
+  }
+
   /** Sets the leading frontmatter's {@code image:} scalar, leaving every other property as is. */
   public static String withNoteImage(String content, String image) {
     return setLeadingFrontmatterProperty(content, NOTE_IMAGE_KEY, image);
