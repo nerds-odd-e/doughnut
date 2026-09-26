@@ -93,7 +93,8 @@ are hypotheses; refine/split work that exceeds L before execution planning.
 Root-file and nested-file continuity, web file deletion, and folder dissolve
 and merge are delivered. Story 23 fixes the picture a note move leaves behind; stories 24 and 10
 own moves to another notebook, which the delivered behavior does not publish
-(24) or refuses for folders with files (10). The [product backlog](../PRODUCT-BACKLOG.md) owns global order.
+(24) or refuses for folders with files (10). Story 25 makes link rewrites in
+other notebooks reach their Git. The [product backlog](../PRODUCT-BACKLOG.md) owns global order.
 No executable plan or implementation is authorized by this seed.
 
 <a id="story-23"></a>
@@ -174,35 +175,109 @@ No executable plan or implementation is authorized by this seed.
 
 ### Moves to another notebook reach both notebooks' Git
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"not-refined","approach":"unselected"}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../quick/046-moves-to-another-notebook-reach-git/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"c50635468ff06f65f7ebef0646dced1c7df4eb37c30b133f020fa3b6e4229b84","plan":"78e102dc94ec010cc9e4ef4fe3cd492a8ce684dc3fa363c6c70ac3b989a34ce0"}}
 ```
 
 - **Identity:** SEED-035#story-24
 - **Goal:** An owner who moves a note or a folder to another notebook on the
-  web finds the same result in both local checkouts after pull. Today such a
-  move changes only the database: neither notebook's accepted history records
-  it, so a pull of the source brings the note back and the destination never
-  receives it
+  web can keep working on both notebooks in local checkouts. Today such a move
+  changes only the database. Neither notebook's accepted history records it
   ([synchronization contract](../../docs/notebook-git-synchronization.md#domain-operation-ownership):
   "Cross-notebook move and cross-notebook referrer rewrites remain outside this
-  owner"). This silent divergence undercuts the near-future direction of
-  working in local checkouts alongside the web.
-- **Candidate scope (not refined):** the web note move and folder move to
-  another notebook, including a folder's nested subfolders, run through the
-  existing multi-notebook accepted-change owner (as relationship reduction
-  does): one accepted commit per changed notebook, in one transaction. Folders
-  containing files keep today's refusal (story 10). Moving several folders at
-  once stays out (owner decision 2026-09-26).
-- **Open decisions for refinement:** whether wiki-link rewrites in third
-  notebooks belong here; whether a picture note moved to another notebook is
-  refused until story 10 (the seed rule that operations which would rehome
-  files refuse until their story delivers) or moves with a broken picture as
-  today.
-- **Effort hypothesis:** M, low confidence.
-- **Depends on:** nothing outstanding (queued after folder dissolve and merge
-  by owner decision 2026-09-26; that is delivered).
+  owner"). Every later local publish to either notebook then fails the
+  accepted-tree check ("…differs from accepted main; refresh the checkout
+  before publishing"), and refreshing cannot fix it. One web action therefore
+  stops two notebooks from syncing. Moves between notebooks are rare, but the
+  web move is the only way to move a note while keeping its learning history
+  (a local delete-and-create loses it), so it must be correct rather than
+  refused. The owner kept this priority on 2026-09-26: it is a required
+  feature even though it is rarely used.
+- **Scope:**
+  - A web note move to another notebook (into a folder or to its root) and a
+    web folder move to another notebook, including nested subfolders and the
+    existing merge into a same-named destination folder, append one accepted
+    commit to the source notebook and one to the destination in the same
+    transaction. They go through the existing multi-notebook accepted-change
+    owner, as relationship reduction does, instead of a separate path.
+  - Link rewrites the move already makes land in those two commits. The moved
+    notes' own links are qualified with the old notebook's name. Notes in the
+    source or destination notebook that link to a moved note are rewritten
+    there.
+  - Undo of a move sends the same move again, so it reaches Git the same way.
+  - Learning history, names and existing refusals are unchanged. Notes use
+    the destination's name rule and folders use the merge-or-conflict check.
+- **Excluded:**
+  - Notes in a third notebook that link to a moved note are rewritten in the
+    database as today but get no commit. [Story 25](#story-25) makes such
+    rewrites reach Git for every operation (owner decision 2026-09-26).
+  - A picture note moves as today: `image:` is unchanged and the file stays
+    in the source folder, so the picture shows broken until
+    [story 10](#story-10) carries it. It is not refused. Nothing is lost,
+    publication does not check `image:` targets, and a refusal would be code
+    that story 10 removes (owner decision 2026-09-26).
+  - Folders containing files keep today's refusal ([story 10](#story-10)).
+  - Notebooks already out of step from earlier moves are not repaired.
+  - Moving several folders at once (owner decision 2026-09-26).
+- **Key examples:**
+  1. Notebook `Science` has `physics/Force.md`. The owner moves `Force` into
+     folder `mechanics` of notebook `Engineering` → after pull, `Science` no
+     longer has `physics/Force.md` and `Engineering` has
+     `mechanics/Force.md`. A local edit to either notebook then publishes
+     normally, and `Force` keeps its learning history.
+  2. In example 1, `Science`'s `physics/Energy.md` says `[[Force]]` and
+     `Force` says `[[Energy]]` → after pull, `Energy` says
+     `[[Engineering:Force|Force]]` in `Science` and `Force` says
+     `[[Science:Energy|Energy]]` in `Engineering`.
+  3. Folder `physics/` holds `waves/Sound.md`. The owner moves `physics` to
+     `Engineering`'s root → after pull, `Science` has no `physics/` and
+     `Engineering` has `physics/waves/Sound.md`. With merge into an existing
+     `Engineering` folder `physics/`, `Sound` lands in that folder instead.
+  4. `Force` says `image: force.png`, beside `physics/force.png` → `Force` moves
+     as in example 1 with `image:` unchanged, `physics/force.png` stays in
+     `Science`, and both notebooks still publish.
+  5. Folder `refs/` holds `paper.pdf` → the move is refused as today and
+     neither notebook gets a commit.
+  6. The owner undoes the move in example 1 → after pull, `Force` is back in
+     `Science`'s `physics/` and gone from `Engineering`.
+- **Effort hypothesis:** M, medium confidence. The multi-notebook owner
+  exists. The move logic and link rewrites stay. The separate cross-notebook
+  transaction path goes away. The main risk is that change capture records an
+  updated row under its previous notebook, so the destination's commit must be
+  shown to include the arriving notes and folders.
+- **Depends on:** nothing outstanding. Start after story 23 lands, because
+  both change the note move code.
 - **Safe stopping point:** if never delivered, web moves to another notebook
-  keep diverging from local checkouts.
+  keep blocking local publishing of both notebooks.
+
+<a id="story-25"></a>
+
+### Link rewrites in other notebooks reach their Git
+```json dough-story-state
+{"schemaVersion":1,"refinement":"not-refined","approach":"unselected"}
+```
+
+- **Identity:** SEED-035#story-25
+- **Goal:** An owner who renames or moves a note or folder on the web can keep
+  publishing, from a local checkout, any other notebook whose notes link to
+  it. Web renames and moves rewrite those links (`[[Physics:Force]]`), but
+  only in the database: the linking notebook gets no accepted commit, so its
+  next local publish fails the accepted-tree check that
+  [story 24](#story-24) describes. Renames are probably more common than moves
+  between notebooks, so this gap may hit more often (not measured).
+- **Candidate scope (not refined):** every web operation that rewrites
+  links in other notebooks includes those notebooks in the accepted-change
+  set and appends one commit to each changed notebook. The operations are a
+  note title rename, note moves, folder rename and folder moves, including a
+  third notebook in a move to another notebook. This is one change in the
+  link-rewrite path, not a fix per operation.
+- **Open decisions for refinement:** whether links in notebooks the user only
+  subscribes to (read-only) should be rewritten at all; today the rewrite
+  may edit them.
+- **Effort hypothesis:** M, low confidence.
+- **Depends on:** story 24 for third notebooks in a move to another notebook;
+  renames and same-notebook moves depend on nothing.
+- **Safe stopping point:** if never delivered, renaming or moving linked-to
+  notes keeps blocking local publishing of the linking notebooks.
 
 <a id="story-10"></a>
 
@@ -262,8 +337,9 @@ avoids a chicken-and-egg problem is:
 "Present after clone or pull" is not a story: it is how each of these stories
 is proven. Web deletion and dissolve/merge are delivered; then a note move keeping
 its picture (story 23, a regression fix), moves to another notebook reaching Git
-(story 24, a correctness fix) and the rarer cross-notebook move of files
-(story 10, a convenience whose absence loses nothing).
+(story 24, a correctness fix), link rewrites in other notebooks reaching Git
+(story 25, the same correctness fix for renames and moves) and the rarer
+cross-notebook move of files (story 10, a convenience whose absence loses nothing).
 
 The split is by usable outcome, not backend/frontend layers. Reject a
 publish-now/preserve-on-web-later split: it would expose accepted files to
@@ -319,6 +395,11 @@ integration need their own selected outcomes.
   in scope of this refinement as story 23: the file moves with the note
   (option A), rather than pointing `image:` back (the web does not resolve
   `..`) or accepting the broken picture.
+- Owner decisions, 2026-09-26 (story 24 refinement): keep story 24's priority,
+  because moving to another notebook is a required feature although rarely
+  used. Split link rewrites in third notebooks into story 25, which covers every
+  operation and is queued right after story 24. A picture note moved to another
+  notebook moves with a broken picture, as today, and is not refused.
 - [Near-future direction](../PRODUCT-BACKLOG.md#near-future-direction).
 - [SEED-009](SEED-009-git-backed-local-notebook-workflow.md): prior local/web note
   workflow. This seed owns non-Markdown attachment continuity.
