@@ -8,14 +8,11 @@ const audioToolsPage = () => {
     },
     stopRecording() {
       cy.findByRole('button', { name: 'Stop Recording' }).click()
-      waitUntilAppIsNotBusy()
-      cy.findByRole('button', { name: 'Save Audio Locally' }).should(
-        'not.be.disabled'
-      )
-      return this
-    },
-    startToUploadAudioFile(fileName: string) {
-      cy.get('#note-uploadAudioFile').attachFile(fileName)
+      // Final transcription (audio-to-text) raises no busy marker; the saved file appears once it finishes.
+      cy.findByRole('button', {
+        name: 'Save Audio Locally',
+        timeout: 30000,
+      }).should('not.be.disabled')
       waitUntilAppIsNotBusy()
       return this
     },
