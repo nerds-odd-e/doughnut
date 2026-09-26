@@ -13,13 +13,13 @@ import com.odde.donut.exceptions.ApiException;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.donut.services.notebookAttachment.VerifiedNotebookAttachmentBytes;
 import com.odde.donut.testability.GitBundleTestReader.AcceptedHistory;
-import jakarta.validation.Validation;
 import java.util.List;
 import java.util.Optional;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -140,15 +140,19 @@ class NoteControllerUploadNoteImageTests extends NotebookGitWebContentController
 
   private void assertUploadRefusedWithNothingChanged(Note note, String name, String path)
       throws Exception {
+    assertUploadRefusedWithNothingChanged(
+        note, makeMe.anUploadedImage().originalFilename(name).toMultiplePartFilePlease(), path);
+  }
+
+  private void assertUploadRefusedWithNothingChanged(
+      Note note, MultipartFile picture, String messagePart) throws Exception {
     Integer notebookId = note.getNotebook().getId();
     List<String> commitsBefore = acceptedHistory(note.getNotebook()).commits();
     long attachmentsBefore = notebookAttachmentRepository.count();
-    MultipartFile picture =
-        makeMe.anUploadedImage().originalFilename(name).toMultiplePartFilePlease();
 
     ApiException refusal = assertThrows(ApiException.class, () -> upload(note, picture));
 
-    assertThat(refusal.getErrorBody().getMessage(), containsString(path));
+    assertThat(refusal.getErrorBody().getMessage(), containsString(messagePart));
     assertThat(acceptedHistory(note.getNotebook()).commits(), equalTo(commitsBefore));
     assertThat(
         noteRepository.findById(note.getId()).orElseThrow().getContent(),
@@ -158,6 +162,57 @@ class NoteControllerUploadNoteImageTests extends NotebookGitWebContentController
         notebookAttachmentContent.get(
             notebookId, VerifiedNotebookAttachmentBytes.sha256Hex(picture.getBytes())),
         equalTo(Optional.empty()));
+  }
+
+  @Nested
+  class AdmittedByNameUpToTheLimit {
+    private static final int LIMIT = 10 * 1024 * 1024;
+    private Note force;
+
+    @BeforeEach
+    void setup() throws Exception {
+      Notebook notebook = createGitBackedNotebook();
+      Folder physics = makeMe.aFolder().notebook(notebook).name("physics").please();
+      force = makeMe.aNote("force").folder(physics).content(ACCEPTED_CONTENT).please();
+      snapshotCurrentPortableTree(notebook);
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"notes.txt", "drawing.svg"})
+    void aNameThatIsNotAPictureIsRefusedNamingTheAllowedTypes(String name) throws Exception {
+      assertUploadRefusedWithNothingChanged(force, name, "png, jpg, jpeg, gif or webp");
+    }
+
+    @Test
+    void aPictureOverTheLimitIsRefused() throws Exception {
+      assertUploadRefusedWithNothingChanged(
+          force,
+          makeMe.anUploadedImage().bytes(new byte[LIMIT + 1]).toMultiplePartFilePlease(),
+          "File size exceeds the limit: 10485760 bytes.");
+    }
+
+    @Test
+    void aPictureAtTheLimitIsAccepted() throws Exception {
+      NoteRealm realm =
+          upload(force, makeMe.anUploadedImage().bytes(new byte[LIMIT]).toMultiplePartFilePlease());
+
+      assertThat(realm.getNote().getContent(), containsString("image: my.png"));
+    }
+
+    @Test
+    void theDeclaredContentTypeAndTheBytesAreNotChecked() throws Exception {
+      NoteRealm realm =
+          upload(
+              force,
+              makeMe
+                  .anUploadedImage()
+                  .originalFilename("photo.png")
+                  .contentType("application/octet-stream")
+                  .bytes("<svg xmlns=\"http://www.w3.org/2000/svg\"/>".getBytes())
+                  .toMultiplePartFilePlease());
+
+      assertThat(realm.getNote().getContent(), containsString("image: photo.png"));
+    }
   }
 
   @Test
@@ -182,38 +237,6 @@ class NoteControllerUploadNoteImageTests extends NotebookGitWebContentController
     assertThrows(
         UnexpectedNoAccessRightException.class,
         () -> noteController.uploadNoteImage(note, new NoteImageUploadDTO()));
-  }
-
-  @Test
-  void shouldRejectInvalidUploadContentType() {
-    try (var factory = Validation.buildDefaultValidatorFactory()) {
-      NoteImageUploadDTO dto = new NoteImageUploadDTO();
-      dto.setUploadImage(
-          new MockMultipartFile("uploadImage", "x.pdf", "application/pdf", "not-empty".getBytes()));
-      assertThat(factory.getValidator().validate(dto), is(not(empty())));
-    }
-  }
-
-  @Test
-  void shouldAcceptExactLimitImageUploadDtoThroughBeanValidation() {
-    try (var factory = Validation.buildDefaultValidatorFactory()) {
-      NoteImageUploadDTO dto = new NoteImageUploadDTO();
-      dto.setUploadImage(
-          new MockMultipartFile(
-              "uploadImage", "exact.png", "image/png", new byte[10 * 1024 * 1024]));
-      assertThat(factory.getValidator().validate(dto), is(empty()));
-    }
-  }
-
-  @Test
-  void shouldRejectOneByteOverImageUploadDtoThroughBeanValidation() {
-    try (var factory = Validation.buildDefaultValidatorFactory()) {
-      NoteImageUploadDTO dto = new NoteImageUploadDTO();
-      dto.setUploadImage(
-          new MockMultipartFile(
-              "uploadImage", "over.png", "image/png", new byte[10 * 1024 * 1024 + 1]));
-      assertThat(factory.getValidator().validate(dto), is(not(empty())));
-    }
   }
 
   private NoteRealm upload(Note note, MultipartFile picture) throws Exception {

@@ -62,7 +62,10 @@ literal "binding error". No frontend change.
 ### 2. Upload admits a picture by its name, from the list display uses
 
 Type: Behavior
-Status: planned
+Status: done — `PictureFile` owns the list, limit, and admission;
+`NoteControllerUploadNoteImageTests$AdmittedByNameUpToTheLimit` (5 tests;
+key examples 4 and 7b share `theDeclaredContentTypeAndTheBytesAreNotChecked`)
+and `NoteAttachmentImageControllerTest` pass; no API client change.
 Proof: in `NoteControllerUploadNoteImageTests`, through the controller `upload`
 helper: `notes.txt` (PNG bytes, `image/png`) and `drawing.svg` are refused with
 an `ApiException` whose message names png, jpg, jpeg, gif and webp, and nothing

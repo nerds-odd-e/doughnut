@@ -1,6 +1,5 @@
 package com.odde.donut.controllers.dto;
 
-import com.odde.donut.validators.ValidateMultipartFile;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
@@ -13,15 +12,6 @@ import org.springframework.web.multipart.MultipartFile;
 public class NoteImageUploadDTO {
 
   @NotNull
-  @ValidateMultipartFile(
-      maxSize = 10 * 1024 * 1024,
-      allowedTypes = {
-        "image/png",
-        "image/jpeg",
-        "image/jpg",
-        "image/gif",
-        "image/webp",
-      })
   @Schema(type = "string", format = "binary")
   private MultipartFile uploadImage;
 }

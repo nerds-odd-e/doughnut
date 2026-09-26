@@ -12,10 +12,12 @@ public class UploadedImageBuilder {
   private String name = "file";
   private String originalFilename = "my.png";
   private String contentType = "image/png";
+  private byte[] bytes;
 
   public MultipartFile toMultiplePartFilePlease() {
     try {
-      return new MockMultipartFile(name, originalFilename, contentType, buildImage().toByteArray());
+      return new MockMultipartFile(
+          name, originalFilename, contentType, bytes != null ? bytes : buildImage().toByteArray());
     } catch (IOException e) {
       e.printStackTrace();
       throw new RuntimeException("not likely to happen");
@@ -24,6 +26,16 @@ public class UploadedImageBuilder {
 
   public UploadedImageBuilder originalFilename(String originalFilename) {
     this.originalFilename = originalFilename;
+    return this;
+  }
+
+  public UploadedImageBuilder contentType(String contentType) {
+    this.contentType = contentType;
+    return this;
+  }
+
+  public UploadedImageBuilder bytes(byte[] bytes) {
+    this.bytes = bytes;
     return this;
   }
 
