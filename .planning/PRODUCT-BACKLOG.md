@@ -10,10 +10,11 @@ and deletable in Web Donut.
 
 ## Taken
 
+- [Pull rebases unpublished local work unless Git finds a real conflict](seeds/SEED-046-notebook-files-and-git-findings.md#story-2) — SEED-046#story-2 ([plan](slice-plans/001-pull-rebase-decides/PLAN.md))
+
 ## Backlog list
 
 - [Publishing a small change stays fast however much a notebook holds](seeds/SEED-046-notebook-files-and-git-findings.md#story-1) — SEED-046#story-1
-- [Pull rebases unpublished local work unless Git finds a real conflict](seeds/SEED-046-notebook-files-and-git-findings.md#story-2) — SEED-046#story-2
 - [Notebook CLI commands say briefly what happened and what to do next](seeds/SEED-046-notebook-files-and-git-findings.md#story-3) — SEED-046#story-3
 - [Uploading a picture on the web explains refusals and shows the new file](seeds/SEED-046-notebook-files-and-git-findings.md#story-4) — SEED-046#story-4
 - [A web edit changes only what the user edited](seeds/SEED-046-notebook-files-and-git-findings.md#story-5) — SEED-046#story-5
