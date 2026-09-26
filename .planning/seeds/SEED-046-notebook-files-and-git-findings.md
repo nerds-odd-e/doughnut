@@ -230,36 +230,58 @@ including delivery, not commitments.
 
 **Identity:** SEED-046#story-3
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"not-refined","approach":"unselected"}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/003-clone-and-publish-name-next-step/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"c4e317cdc551a5f995f9e53786684e55f7af5fbd3aba3752dd564981b569470f","plan":"a20d0e1ce4709ecc91fdd532758eec78ee2fbd01157ca3ec819193032238f5ee"}}
 ```
 
-- **For / why:** CLI users get a very long clone success message and refusals
-  that use internal terms, name the wrong path, or send them in circles.
-- **Evaluation:** The owner can read each message at a glance, and every next
-  step it suggests works.
-- **Known facts (2026-09-26):**
-  - Clone success prints one paragraph of about 300 words listing every
-    supported publish shape. The owner wants it much shorter and better
-    formatted.
-  - Losing a publish race prints "expectedHead no longer matches the notebook's
-    current accepted head." with no next step.
-  - After pull refuses, publish says "Run donut notebook pull to base your
-    local commits on the accepted history", which refuses again.
-  - When another checkout published a note and a file together, the pull
-    refusal named the note (`FromA.md`) instead of the file that blocked it.
-  - Changing a Book's 60 MB source file locally is refused with the size-limit
-    message ("Remove or shrink it"), not with "remove the Book first", which a
-    rename of the same file does get.
-  - When the server no longer has a file's content, clone reports "Notebook
-    attachments are incomplete" with each missing object, then says "Fix
-    authorization or connectivity, then rerun". Clone does exit 1 and removes
-    the partial directory, so the rerun works.
-  - Messages that already read well: the dirty-checkout refusal, the size-limit
-    refusal (path, size, limit), and the invalid-Markdown refusal.
-- **Value / learning:** Owner-requested; cheap and immediately visible.
-- **Effort hypothesis:** M — medium confidence.
-- **Depends on:** none; story 2 removes some refusals, so refine this after it
-  to avoid polishing messages that disappear.
+- **Goal:** Owners working on a notebook from a local checkout read the clone
+  result, and the refusal they get when their checkout is behind the notebook,
+  at a glance, and the next step it names works. Each publish rule is
+  explained by the refusal that applies it, not listed in advance.
+- **Scope:**
+  - **Clone success:** a few short lines: which notebook was cloned where,
+    then the next commands — edit and commit with any Git tool,
+    `donut notebook publish <dir>`, `donut notebook pull <dir>` — each with
+    the actual directory. It lists no publish or pull rules (owner decision
+    2026-09-26); publish refusals already name the rule and paths they apply.
+  - **Checkout behind the notebook:** publish gives one short message naming
+    the recovery — run `donut notebook pull <dir>`, then publish again —
+    whether its own check finds local main behind the accepted history or the
+    server finds another publish or web save got in first. Today these print
+    "only a contiguous single-parent commit range…" and "expectedHead no
+    longer matches the notebook's current accepted head." with no next step.
+  - **Assumption:** written against the code after story 2, which deletes the
+    pull refusals behind the other findings and rewrites the pull help text.
+  - **Excluded (owner decision 2026-09-26):** pull help text (story 2 owns
+    it); which path a pull refusal names (story 2 deletes that refusal); the
+    size-limit wording for a changed Book source (story 1 reworks that check;
+    requeue only if it survives story 1); the clone message when the server
+    has lost a file's content (rare data loss no local step fixes; clone
+    already exits 1 and removes the partial checkout); any other CLI wording.
+  - **Preserved:** the messages that already read well — dirty checkout,
+    size limit, invalid Markdown — and every publish and pull refusal's
+    decision.
+- **Key examples:**
+  1. `donut notebook clone 7 notes` succeeds → the output says notebook 7 was
+     cloned into `notes`, then lists editing and committing,
+     `donut notebook publish notes` and `donut notebook pull notes`; no rule
+     list, a few lines instead of about 300 words.
+  2. The owner commits a note edit in `notes`; meanwhile a web save is
+     accepted; `donut notebook publish notes` → local main is not based on
+     the notebook's latest accepted history; run `donut notebook pull notes`,
+     then publish again. Doing so publishes the edit.
+  3. Another checkout publishes after `notes` checked the accepted history but
+     before its submission arrives → the server's refusal names the same
+     recovery: run `donut notebook pull`, then publish again.
+  4. Boundary: publish of a local merge commit still sends the owner to pull,
+     whose existing refusal names the actual next step (recreate the work as
+     ordinary commits); this story does not reword it.
+  5. Boundary: a publish that breaks a publish rule (for example an unmatched
+     note deletion mixed with additions) is refused with today's message
+     naming the rule and paths — the guidance the clone message no longer
+     lists in advance.
+- **Depends on:** story 2 (it removes refusals and rewrites the pull help
+  text); story 1 only for the excluded Book-source wording.
+- **Effort hypothesis:** S — medium confidence.
 - **Safe stopping point:** Each improved message stands alone.
 
 <a id="story-4"></a>
