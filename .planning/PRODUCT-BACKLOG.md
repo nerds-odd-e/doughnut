@@ -10,8 +10,6 @@ and deletable in Web Donut.
 
 ## Taken
 
-- [Trash reuses a case-variant folder in _trash](quick/043-trash-reuses-case-variant-folders/PLAN.md)
-
 ## Backlog list
 
 - [Land on the containing folder from one place](quick/044-one-containing-location/PLAN.md)

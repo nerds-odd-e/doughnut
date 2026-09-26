@@ -56,7 +56,9 @@ upload; Book file naming — asks this one rule over live rows
 `FOLDER_NAME_CONFLICT` (where merging is offered); one held by a note or file
 is `RESOURCE_CONFLICT` naming its path. Dissolve and merge check every
 destination entry before any change and merge case-variant folders into the
-existing one. Existing content is not judged again. The case-sensitive
+existing one. Trash mirrors the item's folder path under `_trash/` and reuses a
+folder there whose name differs only in letter case, keeping its name. Existing
+content is not judged again. The case-sensitive
 database unique keys stay as the last safety net, and local publish is not
 governed by this rule.
 

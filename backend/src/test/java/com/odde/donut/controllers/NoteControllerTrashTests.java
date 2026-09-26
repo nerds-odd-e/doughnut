@@ -12,6 +12,7 @@ import com.odde.donut.controllers.dto.NoteUpdateContentDTO;
 import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.MemoryTracker;
 import com.odde.donut.entities.Note;
+import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.repositories.MemoryTrackerRepository;
 import com.odde.donut.exceptions.ApiException;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
@@ -122,6 +123,18 @@ class NoteControllerTrashTests extends ControllerTestBase {
     assertThat(replacement.getTitle(), equalTo("Reusable"));
     assertThat(replacement.getFolder(), nullValue());
     assertThat(earlier.isTrashed(), equalTo(true));
+  }
+
+  @Test
+  void trashReusesACaseVariantFolderAlreadyInTrash() throws UnexpectedNoAccessRightException {
+    Notebook notebook = makeMe.aNotebook().creatorAndOwner(currentUser.getUser()).please();
+    Folder trashedPhysics = makeMe.aFolder().inTrashOf(notebook).name("Physics").please();
+    Folder physics = makeMe.aFolder().notebook(notebook).name("physics").please();
+    Note note = makeMe.aNote("Energy").folder(physics).please();
+
+    controller.trashNote(note, leaveDeadLinks());
+
+    assertThat(note.getFolder().getId(), equalTo(trashedPhysics.getId()));
   }
 
   @Test
