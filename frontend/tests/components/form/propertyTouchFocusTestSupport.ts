@@ -44,11 +44,8 @@ export async function mountTouchFocusEditor(
   markdown: string,
   coarse: boolean
 ) {
-  const matchMediaSpy = mockCoarsePointer(coarse)
+  mockCoarsePointer(coarse)
   mountSoftKeyboardPrimer()
   await h.mountEditor(markdown, { attachToBody: true })
-  return {
-    matchMediaSpy,
-    primer: softKeyboardPrimerElement(),
-  }
+  return softKeyboardPrimerElement()
 }

@@ -93,7 +93,7 @@ readable as behavior; no `.only`/`.skip`.
 
 ### 1. RichMarkdownEditor property-panel interaction specs share one setup
 Type: Structure
-Status: planned
+Status: done
 Proof: focused family run before/after (files, tests, duration);
 `pnpm frontend:test` and frontend typecheck pass; whole-suite time vs baseline
 recorded for the reassessment.
@@ -104,6 +104,16 @@ location, rename/delete location, and draft refresh files
 `.propertyFocus`, `.propertyTouchFocus`, `.propertyPanelLocation`,
 `.propertyRenameLocation`, `.propertyDeleteLocation`, `.propertyDraftRefresh`)
 into responsibility-named files. Enables slice 2's decision.
+
+Accepted proof: 11 files → 3 (`RichMarkdownEditor.propertyValueDialog`,
+`.propertyLocation`, `.propertyEntry`); three one-caller support files removed.
+27 tests → 25: three panel open/close tests became one round-trip test keeping
+every assertion (route visit still covered by "visiting noteProperty").
+Focused before (11 files): 5.27s / 4.91s; after (3 files): 3.49s / 3.24s /
+3.19s — ~210ms per removed file, matching the profiling note.
+`cd frontend && CURSOR_DEV=true nix develop -c pnpm exec vitest run --browser=chromium --browser.headless tests/components/form/RichMarkdownEditor.property{ValueDialog,Location,Entry}.spec.ts`
+passes; `pnpm -C frontend exec vue-tsc --noEmit` passes; full `pnpm frontend:test`
+passed (338 files, 1937 tests) before the refactor pass.
 
 ### 2. RichMarkdownEditor property-value specs share one setup
 Type: Structure
@@ -155,4 +165,10 @@ remaining candidate.
 
 ## Learnings
 
-- None yet.
+- Slice 1 checkpoint: per-file saving is real (~210ms per removed file in the
+  focused run), so merging continues. Whole-suite timing is unreliable while
+  other sessions load the machine (load average 40–120 observed): check
+  `sysctl -n vm.loadavg` and measure the whole suite only when quiet.
+- Merging also exposes one-caller support helpers; fold them into the spec
+  rather than keep a helper file per old spec.
+- zsh does not split an unquoted `$F` file list; use brace expansion or `${=F}`.
