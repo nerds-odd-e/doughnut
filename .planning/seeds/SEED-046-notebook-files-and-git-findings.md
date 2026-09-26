@@ -58,42 +58,6 @@ Owner decisions on 2026-09-26 that removed candidates:
 S = 30–60 minutes, M = 1–2 hours, L = 2–4 hours. These are hypotheses
 including delivery, not commitments.
 
-<a id="story-14"></a>
-
-### 4c. A rich body edit keeps the file's final newline
-
-**Identity:** SEED-046#story-14
-```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/009-rich-edit-keeps-final-newline/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"cfea83d963044589dc89f1b251186048edc80697d4b03c1d0e9c1d3ab54a4d43","plan":"527bbe661a62a51c98e0100032a502a7e7f7f9511f1d088f82dc9cef6e87b22a"}}
-```
-
-- **Goal:** Correction of story 4b (SEED-046#story-5; provenance
-  `3d3a4d9b94:.planning/slice-plans/006-web-edit-changes-only-edit/PLAN.md`). Owners who
-  edit a note in the rich editor see the diff limited to the lines they
-  edited; today the file's last line also changes because its final newline
-  is dropped.
-- **Scope:**
-  - **Required:** a rich body edit keeps the authored body's trailing
-    newline run (`\n` or `\r\n`, as written); a body authored without one
-    stays without one.
-  - **Preserved:** the in-place web edits described in
-    [note content saving](../../docs/note-content-saving.md) (common Markdown
-    forms, frontmatter kept as written, property edits in place); Markdown mode.
-  - **Excluded:** blank-line runs inside the body (story 4b exclusion).
-- **Key examples:**
-  1. `First\n\nLast\n`; type `My ` at the start in rich mode → the emitted
-     Markdown is `My First\n\nLast\n` (today `My First\n\nLast`).
-  2. A file with frontmatter whose body ends `# Demo2\n`; a one-word body edit →
-     the saved file keeps `\n` after the edited line.
-  3. Boundary: `Body` with no final newline; a one-word edit → still no
-     final newline.
-- **Known facts (2026-09-27, retrospective of story 4b):** Turndown output
-  never ends with a newline, and neither `composeNoteContentInPlace` nor the
-  server adds one back; plan 006's example 1 test pins the lost newline
-  (`note.replace("# Demo2\n", "# My Demo2")`).
-- **Effort hypothesis:** S — high confidence.
-- **Depends on:** none (story 4b is delivered).
-
 <a id="story-9"></a>
 
 ### 7. File pages and file responses read cleanly

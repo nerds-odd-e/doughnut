@@ -493,7 +493,7 @@ Slice 2's implementer reported that a rich body edit drops the file's final newl
 ### Occurrences
 
 - Execution: SEED-046#story-5 / `.planning/slice-plans/006-web-edit-changes-only-edit/PLAN.md` at 2a8fd844b4 / 5f71d4d237; Timestamp: 2026-09-26, before 23:25:41+08:00 (slice 2 acceptance; commit 61d400007d); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.41.
-  - Evidence: slice 2 implementer return ("Gaps: Example 1's trailing newline is lost"); plan 006 Learnings "Slice 2" ("outside this story's promises"); retrospective probe output `"My First\n\nLast"`; correction `.planning/slice-plans/009-rich-edit-keeps-final-newline/PLAN.md` (SEED-046#story-14).
+  - Evidence: slice 2 implementer return ("Gaps: Example 1's trailing newline is lost"); plan 006 Learnings "Slice 2" ("outside this story's promises"); retrospective probe output `"My First\n\nLast"`; correction `4ba13d691c:.planning/slice-plans/009-rich-edit-keeps-final-newline/PLAN.md` (SEED-046#story-14).
   - Observed effect: a defect against the story's own goal reached the published story branch; a correction story and plan are needed before integration.
   - Inference: a reported gap should be checked against the story's goal and exclusions list before it is filed as out of scope; the fix at slice 2 would have been a few lines in the same function. Qualified: as in DD-129, the key example was a file whose edited line was also its last line, which hid the effect.
 
