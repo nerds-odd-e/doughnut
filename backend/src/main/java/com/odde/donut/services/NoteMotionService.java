@@ -1,29 +1,20 @@
 package com.odde.donut.services;
 
-import com.odde.donut.controllers.dto.ApiError;
 import com.odde.donut.entities.DisplayName;
 import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
-import com.odde.donut.exceptions.ApiException;
 import com.odde.donut.factoryServices.EntityPersister;
-import com.odde.donut.services.FolderSiblingNameValidation.TakenEntry;
-import com.odde.donut.services.notebookGit.NotebookGitPortablePath;
-import java.util.Optional;
 import org.springframework.stereotype.Service;
 
 @Service
 public class NoteMotionService {
-  static final String TITLE_CONFLICT_MESSAGE =
-      "A note with this title already exists in this notebook (folder or top level).";
-
   private final EntityPersister entityPersister;
-  private final FolderSiblingNameValidation folderSiblingNameValidation;
+  private final NoteTitleNameRule noteTitleNameRule;
 
-  public NoteMotionService(
-      EntityPersister entityPersister, FolderSiblingNameValidation folderSiblingNameValidation) {
+  public NoteMotionService(EntityPersister entityPersister, NoteTitleNameRule noteTitleNameRule) {
     this.entityPersister = entityPersister;
-    this.folderSiblingNameValidation = folderSiblingNameValidation;
+    this.noteTitleNameRule = noteTitleNameRule;
   }
 
   /** Places {@code source} in {@code targetFolder}. */
@@ -37,7 +28,9 @@ public class NoteMotionService {
             source.getTitle(),
             Note.MAX_TITLE_LENGTH,
             candidate ->
-                entryHoldingNoteFile(source, targetFolder.getNotebook(), targetFolder, candidate)
+                noteTitleNameRule
+                    .entryHoldingTitleOtherThan(
+                        source, targetFolder.getNotebook(), targetFolder, candidate)
                     .isPresent());
     executePlacement(source, targetFolder.getNotebook(), targetFolder, availableTitle);
   }
@@ -54,8 +47,7 @@ public class NoteMotionService {
 
   public void executePlacement(
       Note source, Notebook targetNotebook, Folder targetFolderOrNull, String targetTitle) {
-    entryHoldingNoteFile(source, targetNotebook, targetFolderOrNull, targetTitle)
-        .ifPresent(NoteMotionService::refuseTitle);
+    noteTitleNameRule.requireTitleFreeFor(source, targetNotebook, targetFolderOrNull, targetTitle);
     assignPlacement(source, targetNotebook, targetFolderOrNull, targetTitle);
     entityPersister.flush();
     entityPersister.merge(source);
@@ -67,21 +59,5 @@ public class NoteMotionService {
     source.setTitle(new DisplayName(targetTitle));
     source.assignNotebook(targetNotebook);
     source.setFolder(targetFolderOrNull);
-  }
-
-  private Optional<TakenEntry> entryHoldingNoteFile(
-      Note source, Notebook notebook, Folder folderOrNull, String title) {
-    return folderSiblingNameValidation.entryHoldingOtherThan(
-        source, notebook, folderOrNull, NotebookGitPortablePath.ofNote("", title));
-  }
-
-  private static void refuseTitle(TakenEntry taken) {
-    String message =
-        taken.kind() == TakenEntry.Kind.NOTE
-            ? TITLE_CONFLICT_MESSAGE
-            : FolderSiblingNameValidation.entryNameTakenAt(taken.path());
-    ApiError apiError = new ApiError(message, ApiError.ErrorType.RESOURCE_CONFLICT);
-    apiError.add("newTitle", message);
-    throw new ApiException(apiError);
   }
 }

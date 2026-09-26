@@ -245,7 +245,18 @@ into it, keeping the `newTitle` field error.
 
 ### 8. Note create and rename use the same set of names
 Type: Behavior
-Status: planned
+Status: done
+Accepted proof: `NotebookNoteCreateControllerTest` (17, incl.
+`aFolderHoldingTheNoteFileNameIgnoringCaseRefusesTheCreateNamingIt`),
+`TextContentControllerUpdateNoteTitleTests` (8, incl.
+`aFolderHoldingTheNoteFileNameIgnoringCaseRefusesTheRenameNamingIt`,
+`aCaseOnlyRenameOfTheSameNoteIsAllowed`),
+`AiControllerCreateExtractedNoteTest.aFolderHoldingTheNewNoteFileNameIgnoringCaseRefusesTheCreateNamingIt`,
+`*Note*Controller*` (787), `*AiController*` (39), `*TextContent*` (72),
+`*Guard*` (22), `*Oracle*` (13), `*Move*`, `*Trash*`, `*Undo*` pass. One
+note-name rule, `NoteTitleNameRule`, serves create (web and AI-extracted),
+rename, move, undo and trash; note-vs-note duplicates keep their HTTP
+response. Folder paths in the refusal end with `/` (`physics/energy.md/`).
 Proof: `NotebookNoteCreateControllerTest` — creating note `Energy` in `physics/`,
 which holds folder `energy.md`, is refused with the `newTitle` field error
 naming `physics/energy.md`; `TextContentControllerUpdateNoteTitleTests` —

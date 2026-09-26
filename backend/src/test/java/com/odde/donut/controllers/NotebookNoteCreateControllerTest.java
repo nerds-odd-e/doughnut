@@ -16,7 +16,6 @@ import com.odde.donut.entities.Notebook;
 import com.odde.donut.exceptions.ApiException;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
 import jakarta.persistence.EntityManager;
-import org.hibernate.exception.ConstraintViolationException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
@@ -30,6 +29,9 @@ class NotebookNoteCreateControllerTest extends NotebookControllerTestBase {
   @Autowired NoteController noteController;
   @Autowired TextContentController textContentController;
   @Autowired EntityManager entityManager;
+
+  private static final String DUPLICATE_TITLE_MESSAGE =
+      "A note with this title already exists in this notebook (folder or top level).";
 
   private NoteCreationDTO noteCreate(String title) {
     NoteCreationDTO dto = new NoteCreationDTO();
@@ -146,9 +148,11 @@ class NotebookNoteCreateControllerTest extends NotebookControllerTestBase {
   void rejectsDuplicateTitleAtNotebookRoot(String existingTitle, String newTitle) {
     Notebook nb = ownedNotebook();
     makeMe.aNote().notebook(nb).title(existingTitle).please();
-    assertThrows(
-        ConstraintViolationException.class,
-        () -> controller.createNoteAtNotebookRoot(nb, noteCreate(newTitle)));
+    ApiException ex =
+        assertThrows(
+            ApiException.class,
+            () -> controller.createNoteAtNotebookRoot(nb, noteCreate(newTitle)));
+    assertTitleRefused(ex, DUPLICATE_TITLE_MESSAGE);
   }
 
   @Test
@@ -156,9 +160,32 @@ class NotebookNoteCreateControllerTest extends NotebookControllerTestBase {
     Notebook nb = ownedNotebook();
     Folder folder = ownedFolder(nb, "F");
     makeMe.aNote().folder(folder).title("InFolder").please();
-    assertThrows(
-        ConstraintViolationException.class,
-        () -> controller.createNoteAtNotebookRoot(nb, noteCreateInFolder("InFolder", folder)));
+    ApiException ex =
+        assertThrows(
+            ApiException.class,
+            () -> controller.createNoteAtNotebookRoot(nb, noteCreateInFolder("InFolder", folder)));
+    assertTitleRefused(ex, DUPLICATE_TITLE_MESSAGE);
+  }
+
+  @Test
+  void aFolderHoldingTheNoteFileNameIgnoringCaseRefusesTheCreateNamingIt() {
+    Notebook nb = ownedNotebook();
+    Folder physics = ownedFolder(nb, "physics");
+    makeMe.aFolder().parentFolder(physics).name("energy.md").please();
+    long noteCountBefore = noteRepository.count();
+
+    ApiException ex =
+        assertThrows(
+            ApiException.class,
+            () -> controller.createNoteAtNotebookRoot(nb, noteCreateInFolder("Energy", physics)));
+
+    assertTitleRefused(ex, "This name is already used here by physics/energy.md/");
+    assertThat(noteRepository.count(), equalTo(noteCountBefore));
+  }
+
+  private static void assertTitleRefused(ApiException ex, String message) {
+    assertThat(ex.getErrorBody().getErrorType(), equalTo(ApiError.ErrorType.RESOURCE_CONFLICT));
+    assertThat(ex.getErrorBody().getErrors().get("newTitle"), equalTo(message));
   }
 
   @Test

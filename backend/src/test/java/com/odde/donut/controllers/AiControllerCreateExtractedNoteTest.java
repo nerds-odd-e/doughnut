@@ -52,6 +52,31 @@ class AiControllerCreateExtractedNoteTest extends ControllerTestBase {
     }
 
     @Test
+    void aFolderHoldingTheNewNoteFileNameIgnoringCaseRefusesTheCreateNamingIt() {
+      Folder physics =
+          makeMe.aFolder().notebookOwnedBy(currentUser.getUser()).name("physics").please();
+      makeMe.aFolder().parentFolder(physics).name("energy.md").please();
+      Note sourceNote =
+          makeMe.aNote().title("Work").folder(physics).content(EXTRACTABLE_CONTENT).please();
+      long noteCountBefore = noteRepository.count();
+
+      ApiException thrown =
+          assertThrows(
+              ApiException.class,
+              () ->
+                  controller.createExtractedNote(
+                      sourceNote, extractionResult("Energy", "Body.", "Updated parent.")));
+
+      assertThat(thrown.getErrorBody().getErrorType())
+          .isEqualTo(ApiError.ErrorType.RESOURCE_CONFLICT);
+      assertThat(thrown.getErrorBody().getErrors().get("newTitle"))
+          .isEqualTo("This name is already used here by physics/energy.md/");
+      assertThat(noteRepository.count()).isEqualTo(noteCountBefore);
+      makeMe.entityPersister.refresh(sourceNote);
+      assertThat(sourceNote.getContent()).isEqualTo(EXTRACTABLE_CONTENT);
+    }
+
+    @Test
     void shouldRejectInvalidAliasesInNewNoteContent() {
       Note testNote = newRootNoteWithExtractableContent(makeMe, currentUser.getUser());
 

@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.donut.configs.ObjectMapperConfig;
+import com.odde.donut.controllers.dto.ApiError;
 import com.odde.donut.controllers.dto.NoteRealm;
 import com.odde.donut.controllers.dto.NoteUpdateTitleDTO;
 import com.odde.donut.controllers.dto.TitleRenameReferenceHandling;
@@ -14,6 +15,7 @@ import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.MemoryTracker;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.repositories.MemoryTrackerRepository;
+import com.odde.donut.exceptions.ApiException;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -88,5 +90,40 @@ class TextContentControllerUpdateNoteTitleTests extends TextContentControllerTes
     assertThat(
         noteController.showNote(referrer).getWikiLinks().get(0).getResolution(),
         equalTo(WikiLink.Resolution.RESOLVED));
+  }
+
+  @Test
+  void aFolderHoldingTheNoteFileNameIgnoringCaseRefusesTheRenameNamingIt() {
+    Folder physics =
+        makeMe.aFolder().notebookOwnedBy(currentUser.getUser()).name("physics").please();
+    makeMe.aFolder().parentFolder(physics).name("energy.md").please();
+    Note work = makeMe.aNote().folder(physics).title("Work").please();
+
+    ApiException ex =
+        assertThrows(
+            ApiException.class, () -> controller.updateNoteTitle(work, titleDto("Energy")));
+
+    assertThat(ex.getErrorBody().getErrorType(), equalTo(ApiError.ErrorType.RESOURCE_CONFLICT));
+    assertThat(
+        ex.getErrorBody().getErrors().get("newTitle"),
+        equalTo("This name is already used here by physics/energy.md/"));
+  }
+
+  @Test
+  void anotherNoteHoldingTheTitleIgnoringCaseRefusesTheRename() {
+    makeMe.aNote().underSameNotebookAs(note).title("Taken").please();
+
+    ApiException ex =
+        assertThrows(ApiException.class, () -> controller.updateNoteTitle(note, titleDto("taken")));
+
+    assertThat(
+        ex.getErrorBody().getErrors().get("newTitle"),
+        equalTo("A note with this title already exists in this notebook (folder or top level)."));
+  }
+
+  @Test
+  void aCaseOnlyRenameOfTheSameNoteIsAllowed() throws UnexpectedNoAccessRightException {
+    assertThat(
+        controller.updateNoteTitle(note, titleDto("NEW")).getNote().getTitle(), equalTo("NEW"));
   }
 }

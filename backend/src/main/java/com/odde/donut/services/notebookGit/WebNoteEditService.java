@@ -13,6 +13,7 @@ import com.odde.donut.factoryServices.EntityPersister;
 import com.odde.donut.services.AuthoredNoteDocumentPersistence;
 import com.odde.donut.services.AuthorizationService;
 import com.odde.donut.services.NoteReferenceService;
+import com.odde.donut.services.NoteTitleNameRule;
 import com.odde.donut.services.WikiLinkRewriteService;
 import java.sql.Timestamp;
 import java.util.Objects;
@@ -31,6 +32,7 @@ public class WebNoteEditService {
   private final EntityPersister entityPersister;
   private final NoteReferenceService noteReferenceService;
   private final WikiLinkRewriteService wikiLinkRewriteService;
+  private final NoteTitleNameRule noteTitleNameRule;
 
   public WebNoteEditService(
       AcceptedWebChangeService acceptedWebChangeService,
@@ -39,7 +41,8 @@ public class WebNoteEditService {
       AuthoredNoteDocumentPersistence authoredNoteDocumentPersistence,
       EntityPersister entityPersister,
       NoteReferenceService noteReferenceService,
-      WikiLinkRewriteService wikiLinkRewriteService) {
+      WikiLinkRewriteService wikiLinkRewriteService,
+      NoteTitleNameRule noteTitleNameRule) {
     this.acceptedWebChangeService = acceptedWebChangeService;
     this.noteRepository = noteRepository;
     this.authorizationService = authorizationService;
@@ -47,6 +50,7 @@ public class WebNoteEditService {
     this.entityPersister = entityPersister;
     this.noteReferenceService = noteReferenceService;
     this.wikiLinkRewriteService = wikiLinkRewriteService;
+    this.noteTitleNameRule = noteTitleNameRule;
   }
 
   public Note saveTitle(
@@ -61,6 +65,8 @@ public class WebNoteEditService {
   }
 
   private void renameTitle(Note note, NoteUpdateTitleDTO titleDTO, Timestamp updatedAt) {
+    noteTitleNameRule.requireTitleFreeFor(
+        note, note.getNotebook(), note.getFolder(), titleDTO.getNewTitle());
     User viewer = authorizationService.getCurrentUser();
     assertReferencedTitleRenameIsUnambiguous(note, titleDTO, viewer);
     boolean titleChanged = !Objects.equals(note.getTitle(), titleDTO.getNewTitle());

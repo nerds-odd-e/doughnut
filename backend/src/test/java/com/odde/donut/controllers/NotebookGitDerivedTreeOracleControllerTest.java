@@ -3,10 +3,11 @@ package com.odde.donut.controllers;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.everyItem;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.startsWith;
 
 import com.odde.donut.controllers.dto.NoteCreationDTO;
 import com.odde.donut.controllers.dto.NoteImageUploadDTO;
@@ -112,7 +113,9 @@ class NotebookGitDerivedTreeOracleControllerTest extends NotebookGitWebContentCo
       assertThat(after.get(referrer), not(equalTo(before.get(referrer))));
     }
     assertThat(without(after, replaced), equalTo(without(before, replaced)));
-    assertThat(queries, not(hasItem(containsString("NotebookAttachment"))));
+    assertThat(
+        queries.stream().filter(query -> query.contains("NotebookAttachment")).toList(),
+        everyItem(startsWith("SELECT a.filename FROM NotebookAttachment a")));
     assertAcceptedTreeMatchesTheFullAssembly(notebook);
   }
 
