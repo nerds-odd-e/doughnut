@@ -5,7 +5,8 @@
 - Story: [SEED-046#story-11](../../seeds/SEED-046-notebook-files-and-git-findings.md#story-11)
 - **Identity:** SEED-046#story-11
 - Provenance: execution retrospective of SEED-046#story-3 (plan
-  `003-clone-and-publish-name-next-step`), commit 6d807aa4ea.
+  `.planning/slice-plans/003-clone-and-publish-name-next-step/PLAN.md` at
+  df5ba26eb0), commit 6d807aa4ea.
 
 ## Finding
 
