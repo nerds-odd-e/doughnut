@@ -391,8 +391,30 @@ Three file-disjoint slices ran at once in one worktree. The pre-commit hook runs
   - Observed effect: delivery of finished slices waited for unrelated agents; parallelism saved implementation time but serialized delivery.
   - Inference: `execute-plan` allows concurrent slices with disjoint files, but this project's working-tree-wide hook makes a shared checkout unsafe for concurrent commits; per-slice worktrees or committing only at quiet points would avoid it. Qualified: the slices' implementation overlap still saved wall time.
 
+## DD-122 — Interim "agent has not reported yet" notifications repeatedly woke the coordinator with nothing to decide
+
+A delegated implementation agent started its tests in the background and ended its turn while it waited. Each time it stopped, the host sent the coordinator a completed-task notification whose result said the report was still pending. The coordinator woke, answered "still waiting", and went idle again.
+
+### Occurrences
+
+- Execution: SEED-035#story-11 / quick/007-dissolve-merge-folders-with-files / 1a8b7abff7; Timestamp: 2026-09-26T05:32:17Z–05:37:01Z (10 notifications during slice 8), plus 2026-09-26T05:55:06Z (slice 9); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.40.
+  - Evidence: session `fe371aa9-…` task-notifications for "Implement slice 8 of plan 007", each with the note "stopped with background work of its own still running" and the result "This agent has not reported yet"; 11 coordinator turns, each reading about 235k–240k cached input tokens, output 19–37 tokens.
+  - Observed effect: about 2.6M cache-read tokens went on status-only turns. The final reports and the execution were unaffected.
+  - Inference: asking delegated implementers to run focused tests in the foreground, or having the coordinator stay idle on an interim notification, would avoid this. Qualified: the host notification behavior is outside the project's control.
+
+## DD-123 — Implementers reported behavior changes beyond their slice, and the coordinator settled each one with a bounded addendum before refactoring (useful practice)
+
+Two implementation agents finished their slice promises and also named a gap or side effect outside the slice. The coordinator judged each one against the plan goal and sent a focused addendum to the same agent, with a failing test first, before the fresh refactor pass.
+
+### Occurrences
+
+- Execution: SEED-035#story-11 / quick/007-dissolve-merge-folders-with-files / 1a8b7abff7; Timestamp: 2026-09-26T05:42:03Z (slice 8), 2026-09-26T06:01:06Z (slice 9); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.40.
+  - Evidence: slice 8 report flagged note creation from an AI-extracted suggestion as an unchecked web placement → addendum `AiControllerCreateExtractedNoteTest.aFolderHoldingTheNewNoteFileNameIgnoringCaseRefusesTheCreateNamingIt`. Slice 9 report flagged that removing the accepted-tree lookup silently dropped the documented no-binding upload refusal → addendum `aNotebookWithoutAGitBindingRefusesTheUploadAndStoresNothing` (commits 46f53bedbe, 97c1f73ef5).
+  - Observed effect: two gaps, one a regression, were closed inside their slices. Neither reached a later slice or the retrospective.
+  - Inference: the plan's removal of `takenPaths` did not name that it enforced a refusal implicitly. Asking implementers to report side effects caught what planning missed.
+
 ## Retention
 
-- Highest allocated local number: 121
+- Highest allocated local number: 123
 - Recovery: `33939aa45a17c08f5e6f8076178ce96437fdfbe8:DearDough.md` contains the complete pre-compaction log and earlier recovery references; `b0b385a184e96ecf8b0f6fc5572eaaab69bc8dad` preserves later history.
 - Occurrence history is partial; full observations, effects, inference and historical provenance remain in that snapshot and the upstream catalog.

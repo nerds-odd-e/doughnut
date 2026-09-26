@@ -291,6 +291,18 @@ its store method go. Update
 `docs/notebook-git-attachments.md` for the folder operations and the one name
 rule.
 
+## Execution complete
+
+Product advice: No reprioritization. Story 23 (a moved note keeps its picture)
+can reuse `FolderSiblingNameValidation.entryHolding` with
+`NumberedNameSelection.firstAvailableFilename` for its free filename; story 10
+must replace the exact-case, folders-only `mergeTargetOrRejectConflict` on
+cross-notebook moves with the shared rule and a check of every destination
+first. The optional small correction
+[`quick/043-trash-reuses-case-variant-folders`](../043-trash-reuses-case-variant-folders/PLAN.md)
+closes the remaining `_trash` case-variant gap. Conditional on the CI result
+for `97c1f73ef5` on `story/dissolve-merge-folders-with-files`.
+
 ## Current decisions
 
 - First clashing path only in the refusal message (owner, 2026-09-26).
