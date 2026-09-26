@@ -197,3 +197,11 @@ notebooks outside the changed set remain outside.
   `Set.of(a, b)` throws when a same-notebook move passes the same id twice.
   Note moves pass their set through `WebNoteEditService.edit(…, Set<Integer>, …)`;
   mirror that single/set pair for `applyLiveFolderChange`.
+
+## Execution complete
+
+Product advice: keep the backlog order. Story 25 (link rewrites in other
+notebooks reach their Git) can extend the notebook set these moves now pass
+to the accepted-change owner with the linking notebooks, instead of a fix per
+operation. Story 10 (carry a folder's files along when it moves to another
+notebook) is unblocked now that such moves reach Git.
