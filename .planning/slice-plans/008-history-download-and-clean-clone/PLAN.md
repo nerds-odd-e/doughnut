@@ -89,7 +89,16 @@ object of notebook 1 is reachable, so the load carries no orphan bulk there.
 ### 2. Donut stores note Markdown with LF line endings
 
 Type: Behavior
-Status: planned
+Status: done
+Accepted proof: `NotebookGitWebContentSaveControllerTest.savedContentIsStoredAndCommittedWithLfLineEndings`
+(CRLF save through `updateNoteContent` → stored content and the committed
+blob at the accepted head are LF); full backend suite green (2666 tests).
+`AuthoredNoteDocument.fromContent` normalizes. Learnings: fixtures
+(`makeMe…content`, the record's canonical constructor) bypass normalization,
+so slice 3 can seed raw CRLF; `NoteLeadingFrontmatter`'s CRLF handling stays
+reachable (raw proposal blobs, validation before `fromContent`) and is kept;
+`NotebookGitMixedEditingControllerTest`'s incidental CRLF fixture became LF
+(the accepted refusal of CRLF `.md` blobs).
 Proof: example 5 — save note content containing `\r\n` through an existing
 note content update endpoint test → the note's stored content and its blob in
 the accepted head contain no `\r`. Add the one case beside the existing
