@@ -3,7 +3,11 @@ import { promisify } from "node:util";
 
 const execFileAsync = promisify(execFile);
 export const ciWorkflowFile = process.env.DOUGH_CI_WORKFLOW ?? "ci.yml";
-const workflowName = process.env.DOUGH_CI_WORKFLOW_NAME ?? "CI";
+// Workflow identity is the `--workflow` selector every listing requests; the
+// display name is not a second, independent filter. An explicitly supplied
+// display name only confirms that selection: a selected run reporting another
+// name is inconsistent setup, rejected loudly instead of silently dropped.
+const expectedWorkflowName = process.env.DOUGH_CI_WORKFLOW_NAME || undefined;
 
 export async function readGitHubActions(args, signal) {
   const { stdout } = await execFileAsync("gh", args, {
@@ -16,11 +20,17 @@ export async function readGitHubActions(args, signal) {
 }
 
 export function matchingCiRuns(runs, { branch, sha }) {
+  const misnamed = expectedWorkflowName
+    ? runs.find(({ workflowName }) => workflowName !== expectedWorkflowName)
+    : undefined;
+  if (misnamed)
+    throw new Error(
+      `DOUGH_CI_WORKFLOW_NAME ${JSON.stringify(expectedWorkflowName)} does not match ${JSON.stringify(misnamed.workflowName)}, the display name GitHub reports for runs of the selected workflow ${ciWorkflowFile}; correct or unset DOUGH_CI_WORKFLOW_NAME.`,
+    );
   return runs.filter(
     (run) =>
       (!sha || run.headSha === sha) &&
       run.headBranch === branch &&
-      run.workflowName === workflowName &&
       run.event === "push",
   );
 }

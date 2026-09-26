@@ -123,9 +123,10 @@ retrospective; returning cancelled work requires an explicit backlog decision.
   and proof remain available for later story wrap-up.
 
 Either path removes the entry with the installed `scripts/product-backlog.mjs
-complete` operation. It also deletes the agent profile under `agents/` beside
-the backlog that names the same identity, releasing that agent name; commit that
-deletion with the backlog change.
+complete` operation. It also deletes the execution agent profile under
+`agents/` beside the backlog that names the same identity, releasing that agent
+name; commit that deletion with the backlog change. A preparation assignment
+profile stays until its own release.
 
 ## Direct edits may be denied in Claude Code, Codex, or Cursor
 

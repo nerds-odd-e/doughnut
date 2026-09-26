@@ -64,7 +64,9 @@ target.
 
 A calling skill that must land only its own record checks, before linking
 here, that the worktree holds nothing else. Dough Land does not pick paths out
-of a worktree.
+of a worktree. A preparation keep stages its assignment's release in the
+worktree before linking here, so it lands with the result; Dough Land itself
+never adds or removes an assignment profile.
 
 ## Publish
 

@@ -8,8 +8,9 @@
 // them can make an entry removable. It never deletes a story or plan file
 // either. Closing the work's canonical homes, with its seed, plan, and proof
 // cleanup, stays with the wrap-up workflow that calls this. The one other file
-// it removes is the agent profile that names the completed identity, so the
-// name that held the work is released in the same change.
+// it removes is the execution agent profile that names the completed identity,
+// so the name that held the work is released in the same change. A
+// preparation assignment is never ended by completing work.
 
 import { existsSync, readFileSync, readdirSync, rmSync } from "node:fs";
 import { join } from "node:path";
@@ -41,9 +42,10 @@ export function completeEntry(source, request) {
   return { source: renderBacklog(document), entry };
 }
 
-// Removes every readable agent profile beside the backlog whose identity is the
-// completed one, and returns the removed paths relative to that directory. An
-// unreadable profile names no identity, so it is left for a person to read.
+// Removes every readable execution agent profile beside the backlog whose
+// identity is the completed one, and returns the removed paths relative to
+// that directory. An unreadable profile names no identity, so it is left for a
+// person to read; a preparation profile ends only through its own release.
 export function releaseAgentProfiles(backlogDirectory, identity) {
   const directory = join(backlogDirectory, agentProfileDirectory);
   if (!existsSync(directory)) return [];
@@ -55,7 +57,11 @@ export function releaseAgentProfiles(backlogDirectory, identity) {
     const read = parseAgentProfile(
       readFileSync(join(backlogDirectory, path), "utf8"),
     );
-    if (read.ok && read.profile.identity === identity) {
+    if (
+      read.ok &&
+      read.profile.activity === "execution" &&
+      read.profile.identity === identity
+    ) {
       rmSync(join(backlogDirectory, path));
       released.push(path);
     }

@@ -2,9 +2,8 @@
 // One classification shared by execution and preparation. Installed guidance
 // is the agent's contract for recovery.
 import {
-  captureCheckout,
   git,
-  maintenanceFromInspection,
+  inspectDefaultCheckoutMaintenance,
   originTrackingRef,
   pushExactRef,
   revParse,
@@ -85,7 +84,7 @@ export async function resumeInterruptedPublication({
     );
     appendIdentity(publishedRevisions, candidateSha);
     const registration = registerIfBound(observer, candidateSha, targetRef);
-    const maintenance = await inspectMaintenance(
+    const maintenance = await inspectDefaultCheckoutMaintenance(
       ownedWorkspace,
       defaultCheckout,
       remote,
@@ -117,7 +116,7 @@ export async function resumeInterruptedPublication({
     await ownedCommitIdentity(ownedWorkspace),
   );
   const identityAppended = appendIdentity(publishedRevisions, candidateSha);
-  const maintenance = await inspectMaintenance(
+  const maintenance = await inspectDefaultCheckoutMaintenance(
     ownedWorkspace,
     defaultCheckout,
     remote,
@@ -171,24 +170,6 @@ function assertOwnedCommitsPreserved(before, after) {
   if (after.head !== before.head || after.count !== before.count) {
     throw new Error("resume duplicated or moved the owned commit");
   }
-}
-
-async function inspectMaintenance(
-  ownedWorkspace,
-  defaultCheckout,
-  remote,
-  targetRef,
-) {
-  if (!defaultCheckout) return null;
-  const remoteTip = await revParse(
-    ownedWorkspace,
-    originTrackingRef(targetRef, remote),
-  );
-  const checkout = await captureCheckout(defaultCheckout);
-  return maintenanceFromInspection(
-    { head: checkout.head, status: checkout.status },
-    remoteTip,
-  );
 }
 
 function registerIfBound(observer, sha, targetRef) {

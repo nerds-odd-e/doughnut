@@ -25,7 +25,8 @@ export function takenIdentities(source) {
     .map((entry) => entry.identity);
 }
 
-async function fileAt(cwd, rev, path) {
+// Text of `path` at `rev`, or null when `rev` holds no such file.
+export async function fileAt(cwd, rev, path) {
   try {
     return (await git(cwd, "show", `${rev}:${path}`)).stdout;
   } catch {

@@ -3,9 +3,9 @@
 // and has no declared competing writer. Installed guidance is the agent's contract.
 import { existsSync } from "node:fs";
 import {
-  captureCheckout,
   git,
   indexLockPath,
+  inspectCheckout,
   revParse,
 } from "./publication-git.mjs";
 
@@ -71,14 +71,8 @@ export async function refreshDefaultCheckout({
 }) {
   const ongoing = await ongoingOperation(checkout);
   const state = ongoing
-    ? {
-        head: await revParse(checkout, "HEAD"),
-        status: null,
-        staged: null,
-        unstaged: null,
-        index: null,
-      }
-    : await captureCheckout(checkout);
+    ? { head: await revParse(checkout, "HEAD"), status: null }
+    : await inspectCheckout(checkout);
 
   const ownerRefusal = singleOwner(declaredOwner)
     ? declaredOwnerRefusal(declaredOwner, requester)
@@ -91,7 +85,7 @@ export async function refreshDefaultCheckout({
   }
 
   await git(checkout, "fetch", remote);
-  const current = await captureCheckout(checkout);
+  const current = await inspectCheckout(checkout);
   const remoteRef = `${remote}/${integrationBranch}`;
   const remoteSha = await revParse(checkout, remoteRef);
   const branch = (
@@ -117,7 +111,7 @@ export async function refreshDefaultCheckout({
   }
   if (behind) {
     await git(checkout, "merge", "--ff-only", remoteRef);
-    const advanced = await captureCheckout(checkout);
+    const advanced = await inspectCheckout(checkout);
     if (advanced.head !== remoteSha || advanced.status !== "") {
       throw new Error(
         "fast-forward did not leave a clean checkout at fetched trunk",

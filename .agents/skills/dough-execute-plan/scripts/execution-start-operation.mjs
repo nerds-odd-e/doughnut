@@ -1,6 +1,9 @@
 // Authoritative queued-start orchestration. The CLI adapter stays in execution-start.mjs.
 import { git, lsRemoteSha, revParse } from "./publication-git.mjs";
-import { maintenance } from "./execution-start-maintenance.mjs";
+import {
+  maintenance,
+  reportedMaintenance,
+} from "./execution-start-maintenance.mjs";
 import { readPublishedExecutionSource } from "./execution-source.mjs";
 import {
   recovery,
@@ -23,6 +26,7 @@ import {
 import {
   claimMembership,
   publishClaimSha,
+  publishStoryBranch,
 } from "./workspace-publication-push.mjs";
 import {
   backlogPath,
@@ -68,13 +72,15 @@ export async function startQueuedExecution(requestInput) {
     agent = chosen.agent;
   }
   const beforeMaintenance = await maintenance(request);
+  // Stops report only this compact local outcome; acceptance reports both.
+  const stopMaintenance = reportedMaintenance(beforeMaintenance);
   const selected = await selectOwnedWorkspace({ ...request, origin });
-  if (!selected.ok) return { ...selected, fetched, beforeMaintenance };
+  if (!selected.ok) return { ...selected, fetched, ...stopMaintenance };
   // Trunk can move between the source fetch and the workspace's base; the
   // claim names the rotation's next agent on the trunk it is built on.
   if (agent && selected.startingRevision !== fetched) {
     const { startingRevision: base, workspace, branch } = selected;
-    const stop = { fetched, workspace, branch, beforeMaintenance };
+    const stop = { fetched, workspace, branch, ...stopMaintenance };
     const chosen = await selectClaimAgent(request, base, backlogPath, stop);
     if (!chosen.ok) return chosen;
     agent = chosen.agent;
@@ -90,11 +96,13 @@ export async function startQueuedExecution(requestInput) {
   let checked;
   try {
     checked = await claimMembership(claimRequest);
+    if (checked.ownership === "owned" && request.retained)
+      await publishStoryBranch(claimRequest, checked.provenance.sha);
   } catch (error) {
     return stopped("unpublished", {
       workspace: selected.workspace,
       branch: selected.branch,
-      beforeMaintenance,
+      ...stopMaintenance,
       error: error.stderr || error.message,
     });
   }
@@ -104,7 +112,6 @@ export async function startQueuedExecution(requestInput) {
       request,
       selected,
       selectedSource,
-      fetched,
       {
         status: "resumed",
         publishedSha: checked.provenance.sha,
@@ -129,7 +136,7 @@ export async function startQueuedExecution(requestInput) {
       ownership: checked.ownership,
       workspace: selected.workspace,
       branch: selected.branch,
-      beforeMaintenance,
+      ...stopMaintenance,
       provenance: checked.provenance,
       recovery: {
         ...recovery(request, selected, request.retained?.candidateSha),
@@ -146,11 +153,11 @@ export async function startQueuedExecution(requestInput) {
     return stopped("claim-failed", {
       workspace: selected.workspace,
       branch: selected.branch,
-      beforeMaintenance,
+      ...stopMaintenance,
       error: error.stderr || error.message,
     });
   }
-  if (!committed.ok) return { ...committed, beforeMaintenance };
+  if (!committed.ok) return { ...committed, ...stopMaintenance };
   const published = await publishClaimSha({
     ...claimRequest,
     candidateSha: committed.candidateSha,
@@ -172,7 +179,7 @@ export async function startQueuedExecution(requestInput) {
   if (!published.ok)
     return {
       ...published,
-      beforeMaintenance,
+      ...stopMaintenance,
       recovery: {
         ...recovery(
           request,
@@ -206,16 +213,17 @@ export async function startQueuedExecution(requestInput) {
         workspace: selected.workspace,
         candidateSha: published.candidateSha,
         recovery: recovery(request, selected, published.candidateSha),
-        beforeMaintenance,
+        ...stopMaintenance,
         error: "remote containment or claim ownership is unconfirmed",
       });
     }
+    await publishStoryBranch(claimRequest, published.publishedSha);
   } catch (error) {
     return stopped("unpublished", {
       workspace: selected.workspace,
       candidateSha: published.candidateSha,
       recovery: recovery(request, selected, published.candidateSha),
-      beforeMaintenance,
+      ...stopMaintenance,
       error: error.stderr || error.message,
     });
   }
@@ -224,7 +232,6 @@ export async function startQueuedExecution(requestInput) {
     request,
     selected,
     selectedSource,
-    fetched,
     {
       ...published,
       created: selected.created,

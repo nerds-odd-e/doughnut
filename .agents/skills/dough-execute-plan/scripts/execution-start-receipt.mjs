@@ -1,11 +1,13 @@
-// The installed start operation reports remote publication and local maintenance separately.
+// The accepted start result: publication and recovery coordinates, what the
+// command resolved beyond its invocation, and local maintenance reported
+// separately. Unchanged invocation context is not echoed back.
+import { reportedMaintenance } from "./execution-start-maintenance.mjs";
 import { remoteOf } from "./workspace-publication-ownership.mjs";
 
 export function acceptedReceipt(
   request,
   selected,
   source,
-  fetched,
   publication,
   beforeMaintenance,
   afterMaintenance,
@@ -13,28 +15,17 @@ export function acceptedReceipt(
   return {
     ok: true,
     status: publication.status,
-    mode: request.mode,
-    identity: request.identity,
-    publisherId: request.publisherId,
-    ...(publication.agent
-      ? {
-          agent: publication.agent,
-          workspaceAuthorship: publication.workspaceAuthorship,
-        }
-      : {}),
-    remote: remoteOf(request),
-    target: `refs/heads/${request.target}`,
-    fetched,
     publishedSha: publication.publishedSha,
-    candidateSha: publication.candidateSha,
-    workspace: selected.workspace,
-    branch: selected.branch,
+    // Resume flags take both SHAs, even when they match.
     startingRevision: selected.startingRevision,
+    candidateSha: publication.candidateSha,
+    ...(publication.agent ? { agent: publication.agent } : {}),
+    ...(publication.workspaceAuthorship === "not-configured"
+      ? { workspaceAuthorship: publication.workspaceAuthorship }
+      : {}),
+    ...(request.remote ? {} : { remote: remoteOf(request) }),
+    ...(request.plan || !source.planTarget ? {} : { plan: source.planTarget }),
     created: publication.created ?? selected.created,
-    plan: source.planTarget,
-    preparation: "ready",
-    beforeMaintenance,
-    afterMaintenance,
-    projectSetupRequired: true,
+    ...reportedMaintenance(afterMaintenance, beforeMaintenance),
   };
 }

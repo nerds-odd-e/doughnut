@@ -123,24 +123,37 @@ do not prevent a safe automatic refresh. The command fetches
 trunk, checks the published selected source and preparation, selects or reuses
 the workspace, names you as an agent, commits an isolated Take that publishes
 your agent profile, makes that agent the author of your workspace commits
-(a `workspaceAuthorship: "not-configured"` receipt means only the Take commit
-names the agent), confirms publication on remote trunk, and reports local
-refresh separately.
-Preserve its exact receipt in the existing execution context. A refusal or
-unconfirmed receipt stops before implementation; a deferred local refresh does
-not erase accepted publication.
+(`workspaceAuthorship: "not-configured"` means only the Take commit names the
+agent), confirms publication on remote trunk, publishes a Story Branch Mode
+execution branch at that Take so the branch the profile names exists on the
+remote, and reports local refresh separately.
+
+Use its compact one-line result directly; do not filter or fetch it again.
+Values you supplied stay in your execution context and are not echoed. An
+accepted result (`ok: true`, `status` `published` or `resumed`) carries
+`publishedSha`, `startingRevision`, `candidateSha`, `created`, `agent` when the
+claim names one, `plan` or `remote` when resolved rather than supplied, and the
+default checkout's `maintenance` (`result`, plus `reason` when not refreshed).
+Retain them; the first increment's managed delivery uses `publishedSha` as its
+previously published base. A deferred or stopped `maintenance` or an
+`earlierMaintenance` issue leaves accepted publication intact. A refusal or
+unconfirmed result (`ok: false`, non-zero exit) stops before implementation;
+report and act on its `status`, `error`, and any `recovery` or `provenance`.
+Inspect current Git state only when a reported reason needs it; never repeat a
+mutating command to obtain diagnostics.
 If publication is interrupted, invoke the same installed command with the
 retained workspace, branch, publisher ID, identity, `--starting-revision` and
-`--candidate-sha` from the last receipt or confirmed pre-push candidate. Use
-the latest candidate SHA after a replay. A `resumed` receipt confirms current
-ownership through remote ancestry, even when trunk has advanced; it may finish
-eligible local refresh without another Take or push. A rival or ambiguous
-provenance stops implementation. Preserve the stopped candidate and exact
-recovery fields on an uncertain result.
+`--candidate-sha` from the last result (or its `recovery`) or confirmed
+pre-push candidate. Use the latest candidate SHA after a replay. A `resumed`
+result confirms current ownership through remote ancestry, even when trunk has
+advanced; it may finish eligible local refresh without another Take or push. A
+rival or ambiguous provenance stops implementation. Preserve the stopped
+candidate and exact recovery fields on an uncertain result.
 
-Then run this project's checkout-bound setup and applicable command under
-[execution location](references/execution-location.md). Setup failure preserves
-the accepted claim and workspace. The separate product-backlog Take tool keeps
+Every accepted start, new or resumed, then requires this project's
+checkout-bound setup and applicable command under
+[execution location](references/execution-location.md) before implementation.
+Setup failure preserves the accepted claim and workspace. The separate product-backlog Take tool keeps
 its local domain purpose; a local Taken entry alone does not satisfy this
 startup boundary. Queued current-branch work keeps its existing local Take
 contract and gains no publication authority. Leave taken work through pauses,
@@ -223,6 +236,6 @@ before a dependent slice starts.
 
 ## Finish or stop
 
-Follow [finish or stop](references/finish-or-stop.md) for the completion
-operation, reporting and its markers, automatic retrospective invocation, and
-incomplete-work reporting.
+Follow [finish or stop](references/finish-or-stop.md) for the execution-complete
+record, the completion operation, reporting and its markers, automatic
+retrospective invocation, and incomplete-work reporting.

@@ -38,8 +38,7 @@ without promising notifications.
 
 The observer uses no AI calls. It emits failure, incomplete, and lost-coverage
 records incrementally; it never dispatches or retries a check, observes
-deployment, or changes the checkout. Use runtime-setup bounds when assessing
-coverage.
+deployment, or changes the checkout. Assess coverage with runtime-setup bounds.
 
 Within the startup snapshot, inspect the newest completed attempt and unfinished
 attempts. Preserve opaque run and attempt identities. Retain unfinished
@@ -90,11 +89,12 @@ When automatic retrospective is enabled, begin it as soon as implementation is
 delivered, even with applicable CI pending. Supply the observer, target,
 accepted revision, and pending state; delivered implementation, not an
 execution-completion banner, starts review. After review — or at execution
-completion with `--skip-retro` or another explicit review omission — invoke
-exactly one completion action. Wrap-up uses that same action for its final
-accepted closure or integrated SHA after registration. Before any path, follow
-[completion command and receipt mechanics](ci-completion-wait.md). At each safe
-boundary, handle any failure the observer has already delivered.
+completion with `--skip-retro` or another explicit review omission — publish the
+plan's [execution-complete record](finish-or-stop.md#record-execution-completion),
+then invoke exactly one completion action. Wrap-up uses that same action for its
+final accepted closure or integrated SHA after registration. Before any path,
+follow [completion command and receipt mechanics](ci-completion-wait.md). At
+each safe boundary, handle any failure the observer has already delivered.
 
 A successful receipt with confirmed shutdown satisfies this observation and ends
 that observer. Failure retains the observer and returns to

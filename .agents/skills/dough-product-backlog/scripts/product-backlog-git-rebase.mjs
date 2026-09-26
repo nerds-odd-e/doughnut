@@ -35,12 +35,12 @@ import {
 } from "./product-backlog-git-rebase-aggregate.mjs";
 import { acceptStaged } from "./product-backlog-git-candidate.mjs";
 import { runGitOperationCli } from "./product-backlog-git-cli.mjs";
+import { rebaseState } from "./product-backlog-git-operation-state.mjs";
 import {
   blockedStopMessage,
   ensureDriverRegistered,
   gitLine,
   gitOutcome,
-  rebaseState,
   repositoryRoot,
 } from "./product-backlog-git-repository.mjs";
 import { BacklogError } from "./product-backlog-refusal.mjs";

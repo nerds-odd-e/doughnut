@@ -12,7 +12,10 @@
 // before this was shared.
 import { resolve } from "node:path";
 import { parseArgs } from "node:util";
-import { repositoryRoot } from "./product-backlog-git-repository.mjs";
+import {
+  collectingGitDiagnostics,
+  repositoryRoot,
+} from "./product-backlog-git-repository.mjs";
 import { BacklogError } from "./product-backlog-refusal.mjs";
 import { defaultBacklogPath } from "./product-backlog-store.mjs";
 
@@ -40,7 +43,7 @@ async function dispatch({
   });
   if (values.help) {
     console.log(usage);
-    return;
+    return true;
   }
   const repoRoot = repositoryRoot(resolve(values.cwd));
   const named = positionals.length === 1 ? positionals[0] : "";
@@ -75,23 +78,30 @@ async function dispatch({
   }
 
   console.log(outcome.message ?? outcome.status);
-  if (failingStatuses.includes(outcome.status)) {
-    process.exit(1);
-  }
+  return !failingStatuses.includes(outcome.status);
 }
 
 // Runs one adapter's CLI to completion against real `process.argv`: this
 // adapter's own refusal is reported on stderr and exits nonzero; any other
 // error is rethrown unchanged — the same top-level handling each adapter's
-// own `main`/try-catch pair used to duplicate before this was shared.
+// own `main`/try-catch pair used to duplicate before this was shared. What
+// Git, the merge driver, and hooks wrote to stderr during the operation is
+// collected rather than forwarded: a successful operation shows only its
+// receipt, while every other outcome — a failing status, a refusal, or an
+// unexpected error — passes that collected text on to this process's stderr.
 export async function runGitOperationCli(config) {
-  try {
-    await dispatch(config);
-  } catch (error) {
-    if (error instanceof BacklogError) {
-      console.error(error.refusal);
-      process.exit(1);
-    }
-    throw error;
+  const run = await collectingGitDiagnostics(() => dispatch(config));
+  const succeeded = !run.threw && run.result;
+  if (succeeded) {
+    return;
   }
+  process.stderr.write(run.stderr);
+  process.exitCode = 1;
+  if (!run.threw) {
+    return;
+  }
+  if (!(run.error instanceof BacklogError)) {
+    throw run.error;
+  }
+  console.error(run.error.refusal);
 }

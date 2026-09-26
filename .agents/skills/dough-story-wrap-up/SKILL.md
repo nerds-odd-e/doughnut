@@ -40,7 +40,8 @@ Resolve from this project, not this skill's location:
   selected work's plan identity;
 - for planless work: the supplied story or instruction, its changes, available
   execution results, and retained execution identity;
-- optional retrospective advice when present, including an empty result;
+- optional retrospective advice when present, including an empty result, and
+  the product advice in the plan's [execution-complete record](../dough-execute-plan/references/finish-or-stop.md#record-execution-completion);
 - Git commit conventions used to preserve a recoverable revision;
 - selected mode and available originating checkout, execution checkout and
   branch, and integration-target identity;
@@ -66,10 +67,6 @@ Judge completion from the selected work and available execution evidence.
 - Incomplete implementation leaves the affected active work intact. Report the
   unfinished implementation and stop. Do not delete an unfinished correction
   plan to manufacture a wrap-up.
-
-Apply available retrospective advice under existing authority. Absent/empty advice
-still permits ordinary closure from work context, implementation results,
-maintained knowledge, existing follow-ups, and coordinator instructions.
 
 ## Assimilate lasting knowledge
 
@@ -112,10 +109,11 @@ not duplicate the follow-up or queue entry.
 
 ## Apply product-review decisions
 
-When retrospective product advice or additional human input is present, apply
-only authorized compatible backlog and canonical-home changes. Follow
-[dough-product-backlog](../dough-product-backlog/SKILL.md) for queue and
-active-home conventions. Explicit human input wins over advice.
+When product advice or additional human input is present, apply only authorized
+compatible backlog and canonical-home changes, following [dough-product-backlog](../dough-product-backlog/SKILL.md)
+queue and active-home conventions. Without retrospective advice in the
+conversation, as in a fresh session, use the plan's recorded product advice; a
+recorded skip is a skipped review. Explicit human input wins over either advice.
 
 Supported changes: relevant reorder, queue membership, understood new-story
 addition, understood bounded-correction plan addition, and canonical-detail
@@ -133,11 +131,13 @@ the choice; do not invent scope, launch discovery, or start another review.
 
 After supported follow-up queue changes and before deleting anything, make the
 current revision recoverable with this project's ordinary Git conventions.
-Commit all owned review and closure-input changes in that revision, including
+Commit all uncommitted owned review and closure-input changes in that revision:
 applicable retrospective edits to the process log in the execution checkout, an
 uncommitted active follow-up plan and its queue edit, assimilated product
-knowledge, and the spent material. Preserve unrelated changes and include only
-files or portions whose ownership is unambiguous. Resolve ownership of the
+knowledge, and the spent material. Records the execution already committed in its
+[completion commit](../dough-execute-plan/references/finish-or-stop.md#record-execution-completion)
+need no second commit. Preserve unrelated changes and include only files or
+portions whose ownership is unambiguous. Resolve ownership of the
 intended cleanup targets at this boundary too, before deleting any of them. Then
 record that revision as the before-cleanup commit, even when the current
 revision was already suitable. If commit conventions, ownership, or recovery
@@ -151,7 +151,7 @@ Mode before-cleanup publication — delete the selected work's spent history und
 [wrap-up cleanup](../dough-product-backlog/references/record-preparation.md#wrap-up-cleanup):
 
 - its executable plan and owned proof, evidence, and assessment records, even
-  when the plan was retained at execution completion;
+  when the plan was retained or carries its execution-complete record;
 - its canonical story section when one exists, and its seed only when every
   remaining section is spent;
 - its **Taken** or **Backlog list** entry when one exists, through the

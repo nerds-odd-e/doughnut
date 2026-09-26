@@ -59,6 +59,14 @@ onto this recorded target; see
 Preparation's continuation after this selection is the record write and that
 disposition. It does not apply execution mode or project-command readiness.
 
+## Announce the preparation assignment
+
+For an existing queued story, announce it as **Preparing** after selecting the
+workspace and before its first record write, and keep that assignment through
+pauses, under
+[Publish the preparation assignment](preparation-assignment.md). An explicit
+instruction not to publish or commit means announcing nothing.
+
 ## Continue related preparation
 
 Reuse the same workspace across decomposition, refinement, planning, and
@@ -134,7 +142,7 @@ below.
 
 ## Close or retain the workspace
 
-Cleanup runs only after one of this session's three decisions under [Decide
+Cleanup runs only after one of these decisions for this session's draft under [Decide
 what happens to the written result](preparation-disposition.md#decide-what-happens-to-the-written-result)
 is actually **confirmed**, never merely attempted or merely because the
 session is ending:
@@ -166,6 +174,12 @@ including a pending human edit on the default checkout. Pausing, going quiet,
 or ending the conversation before a decision is confirmed is never itself a
 trigger, exactly as it is never itself a keep or discard decision.
 
+A workspace whose assignment is still published is retained until the
+assignment ends, whatever else applies: it is what identifies that
+assignment, so keep it or
+[abandon the preparation](preparation-assignment.md#abandon-the-preparation)
+before retiring it.
+
 Once a confirmed disposition applies, retire the workspace under Dough Land's
 [Retire the worktree](../../dough-land/SKILL.md#retire-the-worktree): a keep
 already did so as part of its landing, and a confirmed discard or finished
@@ -177,15 +191,15 @@ session's in-progress work, and stays with its owner. State any retained
 workspace's path, branch, and reason alongside, not instead of, any
 disposition report already owed to the developer.
 
-Preparation work that never reached a confirmed keep — still
+Preparation content that never reached a confirmed keep — still
 isolated in an owned workspace, discarded, or left unpublished by a
 confirmed no-publish/session-finished instruction — has no presence in any
 progress view this project derives only from published remote state (an
 origin-only dashboard, where one exists): that view reflects what reached
-the authorized remote target, not what a preparation session still holds
-locally, exactly as an unpublished Taken claim stays invisible to it. Report
-that gap explicitly rather than letting local absence from such a view read
-as lost or completed work.
+the authorized remote target, such as a published preparation assignment, not
+what a preparation session still holds locally, exactly as an unpublished
+Taken claim stays invisible to it. Report that gap explicitly rather than
+letting local absence from such a view read as lost or completed work.
 
 This composes with, and does not replace or weaken, [own a temporary
 exploration workspace](../../dough-manual-testing/references/exploration-workspace.md)'s

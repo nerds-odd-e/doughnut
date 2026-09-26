@@ -19,9 +19,9 @@
 //   make either, so it is its own distinct, actionable status rather than
 //   folded into "conflict" (nothing to edit or `git add`) or "blocked" (this
 //   path's own step is exactly what stopped it).
+import { cherryPickState } from "./product-backlog-git-operation-state.mjs";
 import {
   blockedStopMessage,
-  cherryPickState,
   gitLine,
 } from "./product-backlog-git-repository.mjs";
 import { BacklogError } from "./product-backlog-refusal.mjs";

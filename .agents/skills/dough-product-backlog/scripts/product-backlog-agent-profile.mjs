@@ -1,6 +1,8 @@
-// Who holds Taken work: the agent name rotation, the agent's Git identity, and
-// its published profile under the backlog directory. Profile spelling has one
-// owner here. No filesystem, Git, or Node-only imports.
+// Who holds an assignment: the agent name rotation, the agent's Git identity,
+// and its published profile under the backlog directory. An assignment is
+// either Taken execution or preparation of a queued story; both share one
+// rotation. Profile spelling has one owner here. No filesystem, Git, or
+// Node-only imports.
 
 // Fixed rotation, in order. A prime count keeps the cycle even.
 export const agentNames = Object.freeze([
@@ -43,6 +45,11 @@ export const agentHosts = Object.freeze(
 export const agentModes = Object.freeze(
   /** @type {const} */ (["trunk", "story-branch"]),
 );
+// What an assignment is for. An execution profile written before activities
+// existed records none and reads as execution; only preparation is spelled.
+export const agentActivities = Object.freeze(
+  /** @type {const} */ (["execution", "preparation"]),
+);
 
 // Profiles live beside the backlog, one file per active agent.
 export const agentProfileDirectory = "agents";
@@ -57,6 +64,12 @@ export function agentIdentity(name) {
     email: `${lower}-chan@example.org`,
     path: `${agentProfileDirectory}/${lower}-chan.json`,
   };
+}
+
+// The rotation name whose agent (as a profile or Git author spells it, such as
+// "Yui-chan") is `agent`, or undefined when `agent` is not in the rotation.
+export function agentNameOf(agent) {
+  return agentNames.find((name) => agentIdentity(name).agent === agent);
 }
 
 // The rotation name a profile file belongs to, or undefined when the file name
@@ -91,42 +104,66 @@ export function agentReportError({ host, model }) {
 const nonEmptyText = (value) => typeof value === "string" && value !== "";
 
 // Why a profile's work facts cannot be recorded, or undefined when they can.
-// Rendering and reading a profile apply the same rules.
-function profileFactsError({ identity, mode, branch, host, model }) {
+// Rendering and reading a profile apply the same rules. Preparation records
+// no execution mode or branch: it has none to record.
+function profileFactsError({ identity, activity, mode, branch, host, model }) {
   if (!nonEmptyText(identity))
     return "agent profile requires a work item identity";
-  if (!agentModes.includes(mode)) return `unknown execution mode: ${mode}`;
-  if (!nonEmptyText(branch)) return "agent profile requires branch context";
+  if (!agentActivities.includes(activity))
+    return `unknown assignment activity: ${activity}`;
+  if (activity === "preparation") {
+    if (mode !== undefined || branch !== undefined)
+      return "preparation profile records no execution mode or branch";
+  } else {
+    if (!agentModes.includes(mode)) return `unknown execution mode: ${mode}`;
+    if (!nonEmptyText(branch)) return "agent profile requires branch context";
+  }
   return agentReportError({ host, model });
 }
 
+// Execution profiles keep their original spelling, without an activity field.
+/**
+ * @param {{ name: string, identity: string,
+ *   activity?: string | undefined, mode?: string | undefined,
+ *   branch?: string | undefined, host?: string | undefined,
+ *   model?: string | undefined }} facts
+ */
 export function renderAgentProfile({
   name,
   identity,
+  activity = "execution",
   mode,
   branch,
   host,
   model,
 }) {
   const { agent, email } = agentIdentity(name);
-  const factsError = profileFactsError({ identity, mode, branch, host, model });
+  const factsError = profileFactsError({
+    identity,
+    activity,
+    mode,
+    branch,
+    host,
+    model,
+  });
   if (factsError) throw new Error(factsError);
   const profile = {
     schemaVersion: 1,
     agent,
     email,
-    identity,
-    mode,
-    branch,
+    ...(activity === "preparation"
+      ? { activity, identity }
+      : { identity, mode, branch }),
     ...(host === undefined ? {} : { host }),
     ...(model === undefined ? {} : { model }),
   };
   return `${JSON.stringify(profile, null, 2)}\n`;
 }
 
-// Reads published profile text back into the facts renderAgentProfile takes.
-// Returns { ok: true, profile } or { ok: false, error } when the text is not a
-// readable profile; unrecorded host and model stay absent.
+// Reads published profile text back into the facts renderAgentProfile takes,
+// always naming the activity. Returns { ok: true, profile } or
+// { ok: false, error } when the text is not a readable profile; unrecorded
+// host and model, and preparation's absent mode and branch, stay absent.
 export function parseAgentProfile(text) {
   let data;
   try {
@@ -136,22 +173,21 @@ export function parseAgentProfile(text) {
   }
   if (data === null || typeof data !== "object" || data.schemaVersion !== 1)
     return { ok: false, error: "profile schemaVersion must be 1" };
-  const name = agentNames.find(
-    (each) => agentIdentity(each).agent === data.agent,
-  );
+  const name = agentNameOf(data.agent);
   if (!name) return { ok: false, error: `unknown agent: ${data.agent}` };
   if (data.email !== agentIdentity(name).email)
     return { ok: false, error: `email does not belong to ${data.agent}` };
-  const { identity, mode, branch, host, model } = data;
-  const factsError = profileFactsError({ identity, mode, branch, host, model });
+  const { identity, activity = "execution", mode, branch, host, model } = data;
+  const facts = { identity, activity, mode, branch, host, model };
+  const factsError = profileFactsError(facts);
   if (factsError) return { ok: false, error: factsError };
   return {
     ok: true,
     profile: {
       name,
       identity,
-      mode,
-      branch,
+      activity,
+      ...(activity === "preparation" ? {} : { mode, branch }),
       ...(host === undefined ? {} : { host }),
       ...(model === undefined ? {} : { model }),
     },

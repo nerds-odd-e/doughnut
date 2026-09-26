@@ -24,8 +24,9 @@ base it supplies:
 
 - Queued Story Branch and Trunk Mode supply the owned workspace path and
   authority to the installed startup operation. It uses fetched remote trunk
-  as the base, confirms the Taken claim there, and returns the selected
-  workspace and publication receipt. A conflicting or ambiguous claim stops
+  as the base, confirms the Taken claim there, and returns a compact result
+  with the accepted claim SHA and recovery coordinates for the workspace you
+  supplied. A conflicting or ambiguous claim stops
   implementation; identical **Taken** text alone proves no ownership.
 - Contextual planless work with no claim supplies verified current HEAD, after
   the default-checkout freshness check above when that HEAD is the default

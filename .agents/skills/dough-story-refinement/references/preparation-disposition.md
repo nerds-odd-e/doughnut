@@ -21,7 +21,7 @@ workspace for the developer's review by default. Do not commit it to a
 shared or host checkout or publish it merely because the write finished.
 Treat a "quick" or already-decided edit the same way — it is not
 authorization to skip this step.
-Three explicit developer decisions change that default:
+These explicit developer decisions change that default:
 
 - **An explicit instruction to keep this preparation's retained result**
   authorizes landing it from the owned workspace onto the authorized remote
@@ -32,14 +32,23 @@ Three explicit developer decisions change that default:
 - **An explicit instruction to leave the result unpublished** is preserved and
   overrides any default publication. The record stays in the owned workspace
   exactly as the developer left it; this reference performs no additional
-  commit or push.
+  commit or push. Like a pause, it keeps any published preparation assignment:
+  others still see the story as Preparing until a keep or an abandonment ends
+  it. Say so when reporting.
 - **An explicit instruction to discard an identified draft** removes that
   specific session-owned content, under
   [Discard an identified draft](#discard-an-identified-draft) below. The same
   rule that governs keep governs discard: only an explicit instruction that
   identifies what to discard counts. Continuing discussion, pausing, going
   quiet, or the session simply ending is never a discard decision, exactly as
-  none of those is ever a keep decision.
+  none of those is ever a keep decision. Discarding a draft does not by itself
+  end a published preparation assignment.
+- **An explicit instruction to abandon preparing the story** (stop preparing
+  it, give it up, or discard this preparation as a whole) ends this session's
+  published assignment under
+  [Abandon the preparation](preparation-assignment.md#abandon-the-preparation).
+  It keeps the story queued and the draft recoverable; discarding the draft
+  too needs its own identification, as above.
 
 Absent an explicit instruction, continue leaving the draft isolated: no
 commit, integration, publication, or removal happens under this reference.
@@ -76,10 +85,11 @@ already confirmed — that the keep instruction:
   disposable reproduction changes, or another session's work;
 - applies to an owned workspace that holds nothing else, committed or
   uncommitted, beyond the workspace's recorded starting revision and the
-  fetched authorized remote target. Landing commits and publishes everything
-  in that workspace, so other content there — another session's draft,
-  unrelated exploration content, or disposable reproduction changes — stops
-  the keep. Name that content; the developer removes it, discards it, or
+  fetched authorized remote target. This session's own preparation
+  announcement and its staged release belong to the result. Landing commits
+  and publishes everything in that workspace, so other content there —
+  another session's draft, unrelated exploration content, or disposable
+  reproduction changes — stops the keep. Name that content; the developer removes it, discards it, or
   confirms it belongs in the landing;
   and
 - has a known, unambiguous local checkout role and a separate target
@@ -95,7 +105,13 @@ guess a destination or assume "the usual place."
 
 ## Keep and publish the retained result
 
-After a validated explicit keep instruction, land the owned workspace through
+After a validated explicit keep instruction, when this session announced a
+preparation assignment, first stage its release in the owned workspace under
+[Release it with the kept result](preparation-assignment.md#release-it-with-the-kept-result).
+A stop there leaves the result and the assignment unchanged: report it and do
+not land.
+
+Then land the owned workspace through
 [Dough Land](../../dough-land/SKILL.md).
 Reuse the local checkout role and the target
 selection recorded in
@@ -111,8 +127,12 @@ refresh, and cleanup results as the keep's results.
 
 A keep is **confirmed** once the fetched authorized remote target contains the
 landed SHA, whatever the refresh result. A landing that stopped before that
-acceptance is not confirmed; rerun the same landing from the same workspace
-and recorded target, never a replacement.
+acceptance, or whose push ended without a clear answer, is not confirmed: the
+assignment stays published, and it is not reported as released. Rerun `release`
+first, under
+[Release it with the kept result](preparation-assignment.md#release-it-with-the-kept-result),
+then rerun the same landing from the same workspace and recorded target, never
+a replacement.
 
 **Conflicting scope change.** If resuming reveals that the human's story or
 plan scope changed in a way that conflicts with what was about to be
@@ -136,7 +156,9 @@ bug-triage record, or retrospective record. It does not:
   execution's own concern under
   [Own one observer](../../dough-execute-plan/references/ci-monitor.md#own-one-observer),
   not preparation's;
-- establish an execution identity, mode, or claim.
+- establish an execution identity, mode, or claim;
+- record or imply readiness: releasing the preparation assignment ends
+  Preparing only.
 
 This keeps "keep" a narrower operation than an execute-plan delivery: only the
 retained planning record reaches the authorized remote target. Planning-only

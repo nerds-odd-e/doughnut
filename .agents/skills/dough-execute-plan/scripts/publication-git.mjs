@@ -43,13 +43,13 @@ export async function indexLockPath(checkout) {
   return isAbsolute(printed) ? printed : join(checkout, printed);
 }
 
-export async function captureCheckout(checkout) {
+// The checkout facts maintenance decisions use: HEAD and porcelain status.
+// Full index and patch snapshots stay in test fixtures, which prove
+// preservation independently of this production inspection.
+export async function inspectCheckout(checkout) {
   return {
     head: await revParse(checkout, "HEAD"),
     status: (await git(checkout, "status", "--porcelain")).stdout,
-    staged: (await git(checkout, "diff", "--cached")).stdout,
-    unstaged: (await git(checkout, "diff")).stdout,
-    index: (await git(checkout, "ls-files", "-s")).stdout,
   };
 }
 
@@ -109,9 +109,8 @@ export async function inspectDefaultCheckoutMaintenance(
     workspace,
     originTrackingRef(targetRef, remote),
   );
-  const checkout = await captureCheckout(defaultCheckout);
   return maintenanceFromInspection(
-    { head: checkout.head, status: checkout.status },
+    await inspectCheckout(defaultCheckout),
     remoteTip,
   );
 }

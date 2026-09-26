@@ -46,8 +46,8 @@ import {
 import { acceptCleanPick } from "./product-backlog-git-cherry-pick-aggregate.mjs";
 import { interpretStop } from "./product-backlog-git-cherry-pick-stop.mjs";
 import { runGitOperationCli } from "./product-backlog-git-cli.mjs";
+import { cherryPickState } from "./product-backlog-git-operation-state.mjs";
 import {
-  cherryPickState,
   ensureDriverRegistered,
   gitLine,
   gitOutcome,

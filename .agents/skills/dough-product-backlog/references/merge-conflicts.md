@@ -53,6 +53,12 @@ Each of these self-registers Git's own merge driver for the backlog path in
 this checkout on first use, then performs the actual Git operation; it never
 selects a side, aborts, resets, or repairs a conflict on its own.
 
+On success an adapter prints only its receipt on stdout and nothing on stderr,
+even when Git or this project's hooks printed messages along the way. Any
+other outcome also passes on everything Git, the backlog merge driver, and the
+hooks wrote to stderr during that run, so their diagnostics stay available when
+the operation stops, refuses, or fails.
+
 ## A real conflict: resolve by hand, then continue through the same adapter
 
 A `conflict`, `refused`, `refused-before-commit`, or `blocked` result leaves

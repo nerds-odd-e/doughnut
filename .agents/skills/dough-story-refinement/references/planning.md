@@ -124,6 +124,13 @@ Keep execution, proof, review, and resume information:
 5. **Current decisions** — only choices constraining remaining work.
 6. **Learnings** — only discoveries changing assumptions or remaining slices.
 
+At execution completion, the executing agent adds one more element after the
+ordered slices: the
+[execution-complete record](../../dough-execute-plan/references/finish-or-stop.md#record-execution-completion),
+a `## Execution complete` section whose `Product advice:` entry is required.
+Do not write it while planning. The record is not a plan-level status line;
+plans define none.
+
 Once planned execution starts, keep durable resume state in this same plan:
 the established execution identity, current decisions, consequential learnings,
 and accepted proof that later work may reuse. For each retained proof, name its

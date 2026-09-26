@@ -54,9 +54,11 @@ boundary. Before revising boundaries, apply the shared
 ## Refine the plan
 
 Before writing to the plan, establish or reuse the required workspace under
-[preparation workspace](../dough-story-refinement/references/preparation-workspace.md);
+[preparation workspace](../dough-story-refinement/references/preparation-workspace.md),
+then, for a queued story,
+[announce the preparation assignment](../dough-story-refinement/references/preparation-assignment.md#announce-the-preparation-assignment);
 reading the plan and the code and tests needed to judge execution boundaries
-needs no workspace on its own. Read and apply:
+needs neither on its own. Read and apply:
 
 - [slice decomposition](../dough-story-decomposition/references/problem-decomposition.md#decompose-slices),
   including its cumulative design assessment, sizing, and escalation rules; and

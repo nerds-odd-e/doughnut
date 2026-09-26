@@ -229,3 +229,12 @@ export async function publishClaimSha(request) {
     candidateSha: sha,
   };
 }
+
+// The published profile names a Story Branch Mode execution's branch, so the
+// accepted claim also publishes that branch; one already published stays as is.
+export async function publishStoryBranch(request, sha) {
+  if (request.mode !== "story-branch") return;
+  const ref = `refs/heads/${request.branch}`;
+  if (await lsRemoteSha(request.origin, ref)) return;
+  await pushExactRef(request.workspace, sha, remoteOf(request), ref);
+}

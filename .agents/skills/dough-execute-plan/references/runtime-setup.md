@@ -41,7 +41,7 @@ change it during the observer's lifetime.
 
 - An absent `ciAdapter`, an absent file, or `ciAdapter: []` selects GitHub
   Actions. Verify the branch has a push-triggered workflow and verify the
-  workflow selector and display name below. This mode requires `gh`.
+  workflow selector below. This mode requires `gh`.
 - A nonempty `ciAdapter` argument array selects the project's command. Verify
   the command can run directly from the execution checkout and that its selected
   check observes pushes to the resolved repository and branch. Do not require
@@ -58,14 +58,18 @@ them in any project tooling wrapper):
 
 | Variable | Meaning |
 | --- | --- |
-| `DOUGH_CI_WORKFLOW` | GitHub default only: workflow filename or ID accepted by `gh run list --workflow`; default `ci.yml` must be verified |
-| `DOUGH_CI_WORKFLOW_NAME` | GitHub default only: exact workflow display name; default `CI` must be verified |
+| `DOUGH_CI_WORKFLOW` | GitHub default only: workflow filename or ID accepted by `gh run list --workflow`; it alone selects the observed workflow, whatever its display name; default `ci.yml` must be verified |
+| `DOUGH_CI_WORKFLOW_NAME` | GitHub default only, optional, no default: the selected workflow's exact display name, as a consistency check; a selected run reporting another name ends observation with `CI_MONITOR_UNAVAILABLE` |
 | `DOUGH_CI_MAILBOX_ROOT` | Optional private shared mailbox directory; default `/tmp/dough-ci-$UID` |
 
 The branch is a required positional argument for the authorized target, never
 an inferred `main` or the execution branch name.
-Record the selected source and, for GitHub, the verified workflow selector/name
-with the observer identity in the active plan for planned execution or in the
+Verify the GitHub selector with
+`gh run list --repo OWNER/REPO --workflow SELECTOR --branch BRANCH --event push --limit 1 --json workflowName`:
+an unknown selector fails, and a returned run shows the display name to use if
+you set `DOUGH_CI_WORKFLOW_NAME`. Record the selected source and, for GitHub,
+the verified workflow selector (and display name, when set) with the
+observer identity in the active plan for planned execution or in the
 conversation for quick execution.
 Do not create a plan or separate record for that quick context. A new
 coordinator must recover and close the old observer before replacing it.
@@ -75,7 +79,7 @@ launcher and hooks; a per-process `TMPDIR` does not establish shared identity.
 Example after resolving the values and applying this project's tooling wrapper if needed:
 
 ```sh
-DOUGH_CI_WORKFLOW=checks.yml DOUGH_CI_WORKFLOW_NAME='Project checks' \
+DOUGH_CI_WORKFLOW=checks.yml \
   node '/ABSOLUTE/RESOLVED/SKILL/scripts/ci-mailbox.mjs' \
   start --execution OWNER/REPO BRANCH
 ```
