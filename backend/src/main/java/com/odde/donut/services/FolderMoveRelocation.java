@@ -67,18 +67,17 @@ public class FolderMoveRelocation {
     Optional<Folder> mergeTarget =
         validateDestinationAndFindMergeTarget(
             notebook, folder, newParent, request != null && request.isMerge());
-    if (mergeTarget.isPresent()) {
-      subtree.mergeInto(folder, mergeTarget.get(), now);
-      return mergeTarget.get();
-    }
-
     Set<Integer> movedNoteIds = subtree.collectNoteIdsInSubtree(folder);
     Map<Integer, Map<Integer, List<String>>> inboundReferencesByNoteId =
         wikiLinkRewriteService.captureLiveResolvedInboundReferencesByNoteId(movedNoteIds, viewer);
-    persistFolderPlacement(folder, newParent, new DisplayName(folder.getName()), now);
+    if (mergeTarget.isPresent()) {
+      subtree.mergeInto(folder, mergeTarget.get(), now);
+    } else {
+      persistFolderPlacement(folder, newParent, new DisplayName(folder.getName()), now);
+    }
     wikiLinkRelocationRewrite.rewriteInboundWikiLinksForFolderReparent(
         movedNoteIds, now, inboundReferencesByNoteId);
-    return folder;
+    return mergeTarget.orElse(folder);
   }
 
   public void assignPlacement(Folder folder, Folder newParent, DisplayName name) {
@@ -145,42 +144,15 @@ public class FolderMoveRelocation {
             request != null && request.isMerge());
     if (mergeTarget.isPresent()) {
       subtree.mergeInto(folder, mergeTarget.get(), now);
-      rewriteAndRefreshWikiLinksForFolderNotebookMove(
-          movedNoteIds,
-          sourceNotebook,
-          destinationNotebook,
-          now,
-          viewer,
-          inboundReferencesByNoteId,
-          coMovedTargetsByAuthoredLinkByNoteId);
-      return mergeTarget.get();
+    } else {
+      subtree.reassignToNotebook(subtreeFolders, destinationNotebook, now);
+      persistFolderPlacement(folder, newParent, new DisplayName(folder.getName()), now);
     }
-
-    subtree.reassignToNotebook(subtreeFolders, destinationNotebook, now);
-    persistFolderPlacement(folder, newParent, new DisplayName(folder.getName()), now);
-    rewriteAndRefreshWikiLinksForFolderNotebookMove(
-        movedNoteIds,
-        sourceNotebook,
-        destinationNotebook,
-        now,
-        viewer,
-        inboundReferencesByNoteId,
-        coMovedTargetsByAuthoredLinkByNoteId);
-    return folder;
-  }
-
-  private void rewriteAndRefreshWikiLinksForFolderNotebookMove(
-      Set<Integer> movedNoteIds,
-      Notebook sourceNotebook,
-      Notebook destinationNotebook,
-      Timestamp now,
-      User viewer,
-      Map<Integer, Map<Integer, List<String>>> inboundReferencesByNoteId,
-      Map<Integer, Map<String, Note>> coMovedTargetsByAuthoredLinkByNoteId) {
     wikiLinkRelocationRewrite.rewriteInboundWikiLinksForFolderNotebookMove(
         movedNoteIds, destinationNotebook.getName(), now, inboundReferencesByNoteId);
     wikiLinkRelocationRewrite.rewriteOutgoingWikiLinksForFolderNotebookMove(
         movedNoteIds, sourceNotebook.getName(), now, viewer, coMovedTargetsByAuthoredLinkByNoteId);
+    return mergeTarget.orElse(folder);
   }
 
   private Folder resolveNewParentFolder(FolderMoveRequest request) {

@@ -20,6 +20,31 @@ class NotebookFolderMoveWikiLinkRewriteControllerTest
   @Autowired NoteReferenceService noteReferenceService;
 
   @Test
+  void mergeMove_rewritesInboundPathLinksToTheMergedFolderChain()
+      throws UnexpectedNoAccessRightException {
+    User owner = currentUser.getUser();
+    Notebook nb = ownedNotebook("Nb");
+    ownedFolder(nb, "Dup");
+    Folder holder = ownedFolder(nb, "Holder");
+    Folder source = makeMe.aFolder().parentFolder(holder).name("Dup").please();
+    Folder inner = makeMe.aFolder().parentFolder(source).name("Inner").please();
+    Note noteB = makeMe.aNote("B").folder(source).please();
+    Note noteC = makeMe.aNote("C").folder(inner).please();
+    Note referrer = makeMe.aNote("A").notebook(nb).please();
+    authorReferencingContent(referrer, "[[Holder/Dup/B]], [[Holder/Dup/Inner/C]] and [[B]]");
+
+    folderController.moveFolder(nb, source, folderMerge(null));
+
+    makeMe.refresh(referrer);
+    assertThat(referrer.getContent(), equalTo("[[Dup/B]], [[Dup/Inner/C]] and [[B]]"));
+    assertThat(
+        noteReferenceService.wikiLinksForViewer(referrer, owner).stream()
+            .map(WikiLink::getDestinationNoteId)
+            .toList(),
+        containsInAnyOrder(noteB.getId(), noteC.getId(), noteB.getId()));
+  }
+
+  @Test
   void crossNotebookFolderMove_rewritesInboundLinksFromOutsideReferrerOnly()
       throws UnexpectedNoAccessRightException {
     User owner = currentUser.getUser();
