@@ -1,12 +1,22 @@
+import CurrentBlockNavigationBar from "@/components/book-reading/CurrentBlockNavigationBar.vue"
 import PdfBookViewer from "@/components/book-reading/PdfBookViewer.vue"
 import { flushPromises } from "@vue/test-utils"
 import { beforeAll, beforeEach, describe, expect, it, vi } from "vitest"
-import { pdfScrollRestoreSpy } from "./bookReadingPagePdfViewerTestSupport"
+import {
+  clickBookBlockAndExpectSelection,
+  emitViewportAndSettleCurrentBlock,
+  expectCurrentSelection,
+} from "./bookReadingPageInteractionTestSupport"
+import {
+  pdfScrollRestoreSpy,
+  spyOnScrollToBookNavTarget,
+} from "./bookReadingPagePdfViewerTestSupport"
 import {
   mountPatchDebounceScenario,
   stubReadingPositionSnapshot,
 } from "./bookReadingPageReadingPositionTestSupport"
 import {
+  type BookReadingPageWrapper,
   LAST_READ_POSITION_PATCH_DEBOUNCE_MS,
   bookId,
   getTopMathsPdfBytes,
@@ -14,12 +24,39 @@ import {
   mockBookReadingPageDefaults,
   mockNotebookBookFilePdfOk,
   mountBookReadingPage,
+  mountLoadedBookWithBlocks,
   notebookId,
   stubGetBookPlain,
   stubGetBookWithTopMathsBlocks,
   waitForPdfViewer,
   withFakeTimers,
 } from "./bookReadingPageTestSupport"
+
+async function mountPlainPdfBookAndReportPagesReady() {
+  stubGetBookPlain(notebookId)
+  mockNotebookBookFilePdfOk(bookId, getTopMathsPdfBytes())
+  const wrapper = mountBookReadingPage(notebookId)
+  await waitForPdfViewer(wrapper)
+  const restore = pdfScrollRestoreSpy(wrapper)
+  restore.pdf.vm.$emit("pagesReady")
+  await flushPromises()
+  return restore
+}
+
+async function mountNavBarScenario(viewportMid: number) {
+  const wrapper = await mountLoadedBookWithBlocks(notebookId)
+  spyOnScrollToBookNavTarget(wrapper)
+  await clickBookBlockAndExpectSelection(wrapper, "Section 1")
+  await emitViewportAndSettleCurrentBlock(wrapper, {
+    anchorPageIndexZeroBased: 0,
+    viewport: { top: 0, mid: viewportMid, bottom: 1000 },
+    pagesCount: 10,
+  })
+  return wrapper
+}
+
+const currentBlockNavBar = (wrapper: BookReadingPageWrapper) =>
+  wrapper.find('[data-testid="current-block-navigation-bar"]')
 
 describe("BookReadingPage reading position", () => {
   beforeAll(async () => {
@@ -118,30 +155,14 @@ describe("BookReadingPage reading position", () => {
   })
 
   it("restores reading position from stored snapshot on open", async () => {
-    stubGetBookPlain(notebookId)
     stubReadingPositionSnapshot({ pageIndex: 2, bboxTop: 750 })
-    mockNotebookBookFilePdfOk(bookId, getTopMathsPdfBytes())
-
-    const wrapper = mountBookReadingPage(notebookId)
-    await waitForPdfViewer(wrapper)
-
-    const { pdf, spy } = pdfScrollRestoreSpy(wrapper)
-    pdf.vm.$emit("pagesReady")
-    await flushPromises()
+    const { spy } = await mountPlainPdfBookAndReportPagesReady()
 
     expect(spy).toHaveBeenCalledWith(2, 750)
   })
 
   it("does not restore reading position when no snapshot exists", async () => {
-    stubGetBookPlain(notebookId)
-    mockNotebookBookFilePdfOk(bookId, getTopMathsPdfBytes())
-
-    const wrapper = mountBookReadingPage(notebookId)
-    await waitForPdfViewer(wrapper)
-
-    const { pdf, spy } = pdfScrollRestoreSpy(wrapper)
-    pdf.vm.$emit("pagesReady")
-    await flushPromises()
+    const { spy } = await mountPlainPdfBookAndReportPagesReady()
 
     expect(spy).not.toHaveBeenCalled()
   })
@@ -157,5 +178,44 @@ describe("BookReadingPage reading position", () => {
     expect(wrapper.find('[data-current-selection="true"]').text()).toBe(
       "Section 2"
     )
+  })
+
+  describe("current block navigation bar", () => {
+    it("shows navigation bar when current block differs from selected block", async () => {
+      const wrapper = await mountNavBarScenario(500)
+
+      expect(currentBlockNavBar(wrapper).exists()).toBe(true)
+      expect(currentBlockNavBar(wrapper).text()).toContain("Section 2")
+    })
+
+    it("hides navigation bar when current block equals selected block", async () => {
+      const wrapper = await mountNavBarScenario(10)
+
+      expect(currentBlockNavBar(wrapper).exists()).toBe(false)
+    })
+
+    it("Read from here makes current block the selected block and hides nav bar", async () => {
+      const wrapper = await mountNavBarScenario(500)
+
+      await wrapper
+        .findComponent(CurrentBlockNavigationBar)
+        .vm.$emit("readFromHere")
+      await flushPromises()
+
+      expectCurrentSelection(wrapper, "Section 2")
+      expect(currentBlockNavBar(wrapper).exists()).toBe(false)
+    })
+
+    it("Back to selected scrolls to selected block and hides nav bar", async () => {
+      const wrapper = await mountNavBarScenario(500)
+
+      await wrapper
+        .findComponent(CurrentBlockNavigationBar)
+        .vm.$emit("backToSelected")
+      await flushPromises()
+
+      expect(currentBlockNavBar(wrapper).exists()).toBe(false)
+      expectCurrentSelection(wrapper, "Section 1")
+    })
   })
 })

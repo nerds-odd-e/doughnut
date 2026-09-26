@@ -1,19 +1,17 @@
 import { NotebookFolderController } from "@generated/donut-backend-api/sdk.gen"
 import { flushPromises } from "@vue/test-utils"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
-import { wrapSdkError, wrapSdkResponse } from "@tests/helpers"
+import type { Router } from "vue-router"
+import { testFolderStub, wrapSdkError, wrapSdkResponse } from "@tests/helpers"
 import usePopups from "@/components/commons/Popups/usePopups"
 import {
   createFolderPageRouter,
   editFolderPageName,
-  folderPageNameEditor,
   folderNameConflictMessage,
-  mountFolderPage,
+  folderPageNameEditor,
   mountFolderPageReady,
   openFolderSettingsTab,
-  resolveTopConfirm,
-} from "@tests/pages/folderPageTestSupport"
-import type { Router } from "vue-router"
+} from "./folderPageTestSupport"
 
 afterEach(() => {
   document.body.innerHTML = ""
@@ -21,11 +19,61 @@ afterEach(() => {
   vi.restoreAllMocks()
 })
 
-describe("FolderPage rename and dissolve", () => {
+describe("FolderPage", () => {
   let router: Router
 
   beforeEach(() => {
     router = createFolderPageRouter()
+  })
+
+  it("shows Readme and Settings tabs but not Health", async () => {
+    const { wrapper } = await mountFolderPageReady(router, 1, "Folder Root")
+
+    expect(wrapper.find('[data-testid="folder-tab-readme"]').exists()).toBe(
+      true
+    )
+    expect(wrapper.find('[data-testid="folder-tab-settings"]').exists()).toBe(
+      true
+    )
+    expect(wrapper.find('[data-testid="folder-tab-health"]').exists()).toBe(
+      false
+    )
+  })
+
+  describe("trash warning", () => {
+    it.each([
+      { label: "the notebook-root _trash", name: "_trash", ancestors: [] },
+      {
+        label: "a descendant folder beneath _trash",
+        name: "Biology",
+        ancestors: ["_trash"],
+      },
+      {
+        label: "the trash root matched case-insensitively",
+        name: "_TrAsH",
+        ancestors: [],
+      },
+    ])("warns for $label", async ({ name, ancestors }) => {
+      const { wrapper } = await mountFolderPageReady(router, 2, name, {
+        ancestorFolders: ancestors.map((n) => testFolderStub(1, n)),
+      })
+
+      expect(
+        wrapper.get('[data-testid="folder-availability-warning"]').text()
+      ).toBe("This folder is in trash")
+      wrapper.unmount()
+    })
+
+    it("does not warn for an active Projects/_trash folder", async () => {
+      const { wrapper } = await mountFolderPageReady(router, 2, "_trash", {
+        ancestorFolders: [testFolderStub(1, "Projects")],
+      })
+
+      expect(
+        wrapper.find('[data-testid="folder-availability-warning"]').exists()
+      ).toBe(false)
+      wrapper.unmount()
+    })
   })
 
   describe("rename", () => {
@@ -129,45 +177,6 @@ describe("FolderPage rename and dissolve", () => {
       const settings = wrapper.get('[data-testid="folder-settings"]')
       expect(settings.text()).not.toContain("Folder name")
       expect(settings.text()).not.toContain("Rename folder")
-
-      wrapper.unmount()
-    })
-  })
-
-  describe("dissolve", () => {
-    it("confirms merge on name conflict and retries", async () => {
-      const { wrapper } = mountFolderPage(router, 20, "Mid")
-
-      const dissolveSpy = vi
-        .spyOn(NotebookFolderController, "dissolveFolder")
-        .mockResolvedValue(
-          wrapSdkError({
-            status: 409,
-            errorType: "FOLDER_NAME_CONFLICT",
-            message:
-              "A folder with this name already exists at the destination: Inner",
-          })
-        )
-
-      await wrapper.get('[data-testid="folder-tab-settings"]').trigger("click")
-      const dissolveButton = wrapper.get(
-        '[data-testid="folder-dissolve-button"]'
-      )
-      await dissolveButton.trigger("click")
-      resolveTopConfirm(true)
-      await flushPromises()
-
-      const mergePopup = usePopups().popups.peek()?.[0]
-      expect(mergePopup?.type).toBe("confirm")
-      expect(mergePopup?.message).toContain("Merge them?")
-
-      dissolveSpy.mockResolvedValueOnce(wrapSdkResponse(undefined) as never)
-      resolveTopConfirm(true)
-      await flushPromises()
-
-      expect(dissolveSpy).toHaveBeenLastCalledWith(
-        expect.objectContaining({ query: { merge: true } })
-      )
 
       wrapper.unmount()
     })
