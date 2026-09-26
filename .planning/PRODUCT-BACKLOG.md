@@ -15,8 +15,8 @@ and deletable in Web Donut.
 
 ## Backlog list
 
-- [Uploading a picture on the web explains refusals and shows the new file](seeds/SEED-046-notebook-files-and-git-findings.md#story-4) — SEED-046#story-4
 - [A web edit changes only what the user edited](seeds/SEED-046-notebook-files-and-git-findings.md#story-5) — SEED-046#story-5
+- [Uploading a picture on the web explains refusals and shows the new file](seeds/SEED-046-notebook-files-and-git-findings.md#story-4) — SEED-046#story-4
 - [Cloning a notebook with many notes stays within 5 seconds](seeds/SEED-046-notebook-files-and-git-findings.md#story-8) — SEED-046#story-8
 - [File pages and file responses read cleanly](seeds/SEED-046-notebook-files-and-git-findings.md#story-9) — SEED-046#story-9
 - [Use conversations and memory-tracker review without embedding the full note page](seeds/SEED-033-simplify-note-presentation.md#story-2) — SEED-033#story-2

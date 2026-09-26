@@ -216,43 +216,9 @@ including delivery, not commitments.
 - **Effort hypothesis:** S — medium confidence.
 - **Safe stopping point:** Each improved message stands alone.
 
-<a id="story-4"></a>
-
-### 4. Uploading a picture on the web explains refusals and shows the new file
-
-**Identity:** SEED-046#story-4
-```json dough-story-state
-{"schemaVersion":1,"refinement":"not-refined","approach":"unselected"}
-```
-
-- **For / why:** Web users uploading a picture see "binding error" for a wrong
-  type or an over-limit size, can upload a picture that will never display, and
-  do not see the new file in the sidebar until they reload.
-- **Evaluation:** An unsupported type or an over-limit file is refused with a
-  message naming the allowed types or the size and limit; an upload the note
-  could not display is refused; an accepted upload appears in the sidebar
-  immediately.
-- **Known facts (2026-09-26):**
-  - "binding error" (HTTP 400, shown as the web toast) for: an SVG; a
-    10,485,761-byte PNG; a PNG sent as `application/octet-stream`.
-  - A 10,485,760-byte PNG is accepted.
-  - PNG bytes named `notes.txt` are accepted and written as
-    `image: notes.txt`, but the picture then fails with 415. SVG bytes named
-    `fake.png` sent as `image/png` are accepted and served as `image/png`.
-    Upload trusts the declared content type; display goes by the name.
-  - After uploading `Blue.PNG` from the note page, the picture shows, but the
-    sidebar lists it only after a page reload.
-  - Name clashes (ignoring case, against files, notes and folders) and
-    dot-names are already refused with clear messages.
-- **Value / learning:** Makes the one web way to add files trustworthy.
-- **Effort hypothesis:** S–M — medium confidence.
-- **Depends on:** none.
-- **Safe stopping point:** Accepted uploads keep today's single-commit
-  behavior and keep the previous picture file.
-
 <a id="story-5"></a>
 
-### 5. A web edit changes only what the user edited
+### 4. A web edit changes only what the user edited
 
 **Identity:** SEED-046#story-5
 ```json dough-story-state
@@ -304,6 +270,73 @@ including delivery, not commitments.
 - **Open for refinement:** whether `type: note` → `Note` canonicalization
   should stay.
 
+<a id="story-4"></a>
+
+### 5. Uploading a picture on the web explains refusals and shows the new file
+
+**Identity:** SEED-046#story-4
+```json dough-story-state
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/004-picture-upload-explains-and-shows/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"9266ce9b5c53b99b64163f591b17fbef283052d1d553b65b34dc7263bc360049","plan":"aa465c2c7fbb617d08e6374034ba08db719771a8a215a68378e870ab74fd6c98"}}
+```
+
+- **Goal:** Web users adding a picture to a note learn from the refusal why it
+  was refused, never end up with a picture that cannot display, and see the new
+  file in the sidebar at once. It makes the one web way to add files
+  trustworthy. Any web form refused by request validation also shows the reason
+  instead of "binding error".
+- **Scope:**
+  - **Required (app-wide, owner decision 2026-09-26):** a request refused by
+    field validation carries the field's own message as its message, so the web
+    toast shows it. "binding error" disappears everywhere, not only for upload.
+    Fields that already show their message next to the input keep doing so.
+  - **Required:** upload accepts a picture by its file extension, from the one
+    list display uses (png, jpg, jpeg, gif, webp, ignoring letter case), and
+    ignores the content type the browser declares (owner decision 2026-09-26).
+    Any other extension is refused with a message naming the allowed types, so
+    every accepted upload can display.
+  - **Required:** an accepted upload appears in the sidebar without a reload.
+  - **Preserved:** the 10 MiB limit (10,485,760 bytes, inclusive) and its
+    refusal naming the limit; one accepted change writing the file and
+    `image:`; the previous picture file stays
+    ([attachments](../../docs/notebook-git-attachments.md)); name-clash and
+    dot-name refusals.
+  - **Excluded:** checking that the bytes really are a picture (a mislabelled
+    file only fails to display, it cannot run); SVG or HEIC support; limiting
+    the file picker to the allowed types (owner decision 2026-09-26: the
+    refusal is what is promised); a size check in the browser before sending;
+    the 100 MB request limit and its error; `image:` values published from a
+    local checkout (a bad one shows as a broken picture, like a broken link);
+    Book upload, which has its own validation.
+- **Key examples:**
+  1. Upload a 10,485,761-byte `big.png` → refused; the toast says the file
+     exceeds the 10,485,760-byte limit, not "binding error"; the note is
+     unchanged.
+  2. Upload `drawing.svg` → refused; the toast names png, jpg, jpeg, gif and
+     webp.
+  3. Upload PNG bytes named `notes.txt` → refused the same way; `image:` is
+     unchanged (today accepted, then 415 on display).
+  4. Upload `photo.png` that the browser sends as `application/octet-stream`
+     → accepted and displays (today refused).
+  5. Upload `Blue.PNG` from the note page → the picture shows and the sidebar
+     lists `Blue.PNG` without a reload.
+  6. A web form whose field fails request validation → the toast shows that
+     field's message instead of "binding error".
+  7. Boundary: a 10,485,760-byte PNG is accepted; SVG bytes named `fake.png`
+     are accepted as today and simply do not display.
+- **Architecture:** one owner answers "which file names are pictures" for both
+  upload admission and picture display, replacing today's separate upload
+  content-type list and display extension map.
+- **Known facts (2026-09-26):** the validator already writes "Invalid file
+  type … Allowed types are …" and "File size exceeds the limit: 10485760
+  bytes."; the two request-validation handlers set the message to the literal
+  "binding error" and put those texts only in the per-field errors, which the
+  toast ignores. Nothing depends on the literal. The sidebar has one refresh
+  call that other structural web actions use and upload does not.
+- **Effort hypothesis:** S — medium confidence.
+- **Depends on:** none.
+- **Safe stopping point:** Accepted uploads keep today's single-commit
+  behavior and keep the previous picture file.
+
 <a id="story-8"></a>
 
 ### 6. Cloning a notebook with many notes stays within 5 seconds
@@ -352,7 +385,9 @@ including delivery, not commitments.
 
 Story 1 is first by owner decision and because it most limits the near-future
 direction. Story 3 carries the owner's explicit clone-message request. Stories 4
-and 5 fix visible web problems. Story 6 may be absorbed by story 1. Story 7 is
+and 5 fix visible web problems; the web edit story comes first (owner decision
+2026-09-26) because whole-file rewrites hurt parallel local and web work, while
+picture upload is a web-only path the near-future direction does not name. Story 6 may be absorbed by story 1. Story 7 is
 polish. Drop first: 7, then 6 (if story 1 absorbed it).
 
 Story numbers are local order; identities keep their original anchors.
