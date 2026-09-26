@@ -1,4 +1,6 @@
+import { advanceAnimationFrame } from "@tests/helpers/focusTargetTestSupport"
 import { flushPromises, type VueWrapper } from "@vue/test-utils"
+import { nextTick } from "vue"
 
 export function propertyRowSelector(key: string): string {
   return `[data-testid="rich-note-property-row"][data-property-key="${key}"]`
@@ -10,7 +12,7 @@ export function propertyRows(root: ParentNode): HTMLElement[] {
   ) as HTMLElement[]
 }
 
-export function propertyPanelToggleEl(row: ParentNode): HTMLButtonElement {
+function propertyPanelToggleEl(row: ParentNode): HTMLButtonElement {
   const el = row.querySelector(
     '[data-testid="rich-note-property-panel-toggle"]'
   ) as HTMLButtonElement | null
@@ -18,7 +20,7 @@ export function propertyPanelToggleEl(row: ParentNode): HTMLButtonElement {
   return el!
 }
 
-export function propertyPanelEl(row: ParentNode): HTMLElement | null {
+function propertyPanelEl(row: ParentNode): HTMLElement | null {
   return row.querySelector('[data-testid="rich-note-property-panel"]')
 }
 
@@ -79,14 +81,6 @@ export async function expandPropertyPanelAndClickRemove(
   await flushPromises()
 }
 
-export function propertyRowKeyInputEl(row: ParentNode): HTMLInputElement {
-  const el = row.querySelector(
-    '[data-testid="rich-note-property-row-key-input"]'
-  ) as HTMLInputElement | null
-  expect(el).not.toBeNull()
-  return el!
-}
-
 export function propertyValidationText(root: ParentNode): string {
   const el = root.querySelector('[data-testid="rich-note-property-validation"]')
   expect(el).not.toBeNull()
@@ -103,11 +97,9 @@ export async function triggerRowKeyBlurValidation(wrapper: VueWrapper) {
 }
 
 export function propertyRowListValue(wrapper: VueWrapper, key: string) {
-  const row = wrapper
-    .findAll('[data-testid="rich-note-property-row"]')
-    .find((r) => (r.element as HTMLElement).dataset.propertyKey === key)
-  expect(row).toBeDefined()
-  return row!.find('[data-testid="rich-note-property-row-list-value"]')
+  return wrapper.get(
+    `${propertyRowSelector(key)} [data-testid="rich-note-property-row-list-value"]`
+  )
 }
 
 export function deadWikiLinkInPropertyValueEl(
@@ -121,4 +113,44 @@ export function deadWikiLinkInPropertyValueEl(
   ) as HTMLAnchorElement | null
   expect(dead).not.toBeNull()
   return dead!
+}
+
+export async function attemptRenamePropertyKey(
+  wrapper: VueWrapper,
+  rowIndex: number,
+  newKey: string
+) {
+  const rows = wrapper.findAll('[data-testid="rich-note-property-row"]')
+  const keyInput = rows[rowIndex]!.find(
+    '[data-testid="rich-note-property-row-key-input"]'
+  )
+  await keyInput.trigger("focus")
+  await keyInput.setValue(newKey)
+  await keyInput.trigger("blur")
+  await flushPromises()
+}
+
+function presetOptionEls(): HTMLElement[] {
+  return Array.from(
+    document.querySelectorAll(
+      '[data-testid="rich-note-property-key-preset-option"]'
+    )
+  )
+}
+
+export function expectPresetOptions(expectedKeys: readonly string[]) {
+  expect(presetOptionEls().map((o) => o.dataset.presetKey)).toEqual(
+    expect.arrayContaining([...expectedKeys])
+  )
+  expect(presetOptionEls().length).toBe(expectedKeys.length)
+}
+
+export async function selectPresetKey(presetKey: string) {
+  const btn = presetOptionEls().find((o) => o.dataset.presetKey === presetKey)
+  expect(btn).toBeDefined()
+  btn!.dispatchEvent(new MouseEvent("mousedown", { bubbles: true }))
+  btn!.click()
+  await flushPromises()
+  await nextTick()
+  await advanceAnimationFrame()
 }

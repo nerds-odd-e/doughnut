@@ -21,13 +21,6 @@ import {
   useRecallPageSpecContext,
 } from "./recallPageTestSupport"
 
-function hasNoteShowLink(wrapper: VueWrapper, noteId: number) {
-  const expectedTo = JSON.stringify(noteShowLocation(noteId))
-  return wrapper
-    .findAll(".router-link")
-    .some((link) => link.attributes("to") === expectedTo)
-}
-
 vi.mock("@/composables/useRecallData")
 vi.mock("@/components/commons/Popups/usePopups")
 
@@ -40,33 +33,47 @@ vi.mock("vue-router", async (importOriginal) => {
   }
 })
 
-describe("RecallPage spelling quiz", () => {
-  const firstMemoryTrackerId = 123
-  const ctx = useRecallPageSpecContext({ fakeTimers: true })
+const memoryTrackerId = 123
+const ctx = useRecallPageSpecContext({ fakeTimers: true })
+let getRecallPromptSpy: ReturnType<typeof mockSdkService>
+let getThresholdExceededSpy: ReturnType<typeof mockSdkService>
 
+beforeEach(() => {
+  mockSdkService(
+    MemoryTrackerController,
+    "showMemoryTracker",
+    makeMe.aMemoryTracker.please()
+  )
+  getRecallPromptSpy = mockSdkService(
+    MemoryTrackerController,
+    "getRecallPrompt",
+    makeMe.aRecallPrompt.please()
+  )
+  getThresholdExceededSpy = mockSdkService(
+    MemoryTrackerController,
+    "getThresholdExceeded",
+    { thresholdExceeded: false }
+  )
+  vi.mocked(useRecallData).mockReturnValue(
+    createUseRecallDataMock({
+      toRepeat: [createMemoryTrackerLite(memoryTrackerId, true)],
+    })
+  )
+})
+
+function hasNoteShowLink(wrapper: VueWrapper, noteId: number) {
+  const expectedTo = JSON.stringify(noteShowLocation(noteId))
+  return wrapper
+    .findAll(".router-link")
+    .some((link) => link.attributes("to") === expectedTo)
+}
+
+describe("RecallPage spelling quiz", () => {
   const mountAttachedToBody = () =>
     ctx.renderer.currentRoute({ name: "recall" }).mount({
       attachTo: document.body,
       global: { directives: { focus: focusDirective } },
     })
-
-  beforeEach(() => {
-    mockSdkService(
-      MemoryTrackerController,
-      "showMemoryTracker",
-      makeMe.aMemoryTracker.please()
-    )
-    mockSdkService(
-      MemoryTrackerController,
-      "getRecallPrompt",
-      makeMe.aRecallPrompt.please()
-    )
-    vi.mocked(useRecallData).mockReturnValue(
-      createUseRecallDataMock({
-        toRepeat: [createMemoryTrackerLite(firstMemoryTrackerId, true)],
-      })
-    )
-  })
 
   it("should handle spelling questions correctly", async () => {
     const note = makeMe.aNote.id(42).please()
@@ -74,16 +81,13 @@ describe("RecallPage spelling quiz", () => {
       .withNote(note)
       .spelling()
       .withAnswer({ id: 1, correct: false, spellingAnswer: "test answer" })
-      .withMemoryTrackerId(123)
+      .withMemoryTrackerId(memoryTrackerId)
       .please()
     const mockedAnswerSpellingCall = mockSdkService(
       RecallPromptController,
       "answerSpelling",
       answerResult
     )
-    mockSdkService(MemoryTrackerController, "getThresholdExceeded", {
-      thresholdExceeded: false,
-    })
 
     const wrapper = await ctx.mountPage()
     await wrapper.find("input#memory_tracker-answer").setValue("test answer")
@@ -99,7 +103,7 @@ describe("RecallPage spelling quiz", () => {
       wrapper
         .findComponent({ name: "ViewMemoryTrackerLink" })
         .props("memoryTrackerId")
-    ).toBe(123)
+    ).toBe(memoryTrackerId)
   })
 
   it("focuses the spelling answer input when resuming recall", async () => {
@@ -113,7 +117,7 @@ describe("RecallPage spelling quiz", () => {
       wrapSdkResponse([previousQuestion])
     )
     const recallData = createUseRecallDataMock({
-      toRepeat: [createMemoryTrackerLite(firstMemoryTrackerId, true)],
+      toRepeat: [createMemoryTrackerLite(memoryTrackerId, true)],
     })
     vi.mocked(useRecallData).mockReturnValue(recallData)
 
@@ -153,21 +157,7 @@ describe("RecallPage spelling quiz", () => {
   })
 
   describe("answer overlapping another note", () => {
-    const memoryTrackerId = firstMemoryTrackerId
-    let getThresholdExceededSpy: ReturnType<typeof mockSdkService>
-    let getRecallPromptSpy: ReturnType<typeof mockSdkService>
-
     beforeEach(() => {
-      getRecallPromptSpy = mockSdkService(
-        MemoryTrackerController,
-        "getRecallPrompt",
-        makeMe.aRecallPrompt.withSpellingStem("Spell").please()
-      )
-      getThresholdExceededSpy = mockSdkService(
-        MemoryTrackerController,
-        "getThresholdExceeded",
-        { thresholdExceeded: false }
-      )
       vi.mocked(useRecallData).mockReturnValue(
         createUseRecallDataMock({
           toRepeat: [

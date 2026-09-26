@@ -11,10 +11,12 @@ import static org.hamcrest.Matchers.nullValue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.odde.donut.controllers.dto.ApiError;
+import com.odde.donut.controllers.dto.FolderMoveRequest;
 import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.MemoryTracker;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
+import com.odde.donut.entities.NotebookAttachment;
 import com.odde.donut.entities.repositories.FolderRepository;
 import com.odde.donut.exceptions.ApiException;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
@@ -111,6 +113,33 @@ class NotebookGitWebFolderMoveControllerTest extends NotebookGitWebContentContro
           NotebookGitProposalBlobText.readUtf8(repo, downloadedHead, "Reading.md"),
           equalTo(REFERRER_BODY_AFTER));
     }
+  }
+
+  @Test
+  void mergeMoveCarriesAFileBesideTheDestinationFolderContent() throws Exception {
+    Notebook notebook = createGitBackedNotebook();
+    Folder physics = makeMe.aFolder().notebook(notebook).name("physics").please();
+    Folder diagrams = makeMe.aFolder().parentFolder(physics).name("diagrams").please();
+    storeFolderAttachmentAndSnapshot(notebook, diagrams, "a.png", new byte[] {1});
+    Folder archive = makeMe.aFolder().notebook(notebook).name("archive").please();
+    Folder archivedDiagrams = makeMe.aFolder().parentFolder(archive).name("diagrams").please();
+    NotebookAttachment c =
+        storeFolderAttachmentAndSnapshot(notebook, archivedDiagrams, "c.png", new byte[] {3});
+    FolderMoveRequest mergeIntoPhysics = folderMove(physics.getId());
+    mergeIntoPhysics.setMerge(true);
+
+    folderController.moveFolder(notebook, archivedDiagrams, mergeIntoPhysics);
+
+    assertThat(
+        acceptedHistory(notebook).tipPaths(),
+        containsInAnyOrder("archive/.keep", "physics/diagrams/a.png", "physics/diagrams/c.png"));
+    assertThat(
+        acceptedBytesAt(notebook, "physics/diagrams/c.png"),
+        equalTo(
+            notebookAttachmentRepository
+                .findById(c.getId())
+                .orElseThrow()
+                .getAcceptedGitContent()));
   }
 
   @Test

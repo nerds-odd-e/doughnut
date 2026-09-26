@@ -21,6 +21,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 
 class NoteControllerUploadNoteImageTests extends NotebookGitWebContentControllerTestBase {
   @Test
@@ -95,6 +96,16 @@ class NoteControllerUploadNoteImageTests extends NotebookGitWebContentController
   }
 
   @Test
+  void aNameTakenInTheNotesFolderIgnoringCaseIsRefusedAndNothingChanges() throws Exception {
+    Notebook notebook = createGitBackedNotebook();
+    Folder physics = makeMe.aFolder().notebook(notebook).name("physics").please();
+    Note force = makeMe.aNote("force").folder(physics).content(ACCEPTED_CONTENT).please();
+    storeFolderAttachmentAndSnapshot(notebook, physics, "Force.png", "earlier".getBytes());
+
+    assertUploadRefusedWithNothingChanged(force, "force.png", "physics/force.png");
+  }
+
+  @Test
   void aNameUsedByANoteInTheNotesFolderIsRefusedAndNothingChanges() throws Exception {
     Notebook notebook = createGitBackedNotebook();
     Folder physics = makeMe.aFolder().notebook(notebook).name("physics").please();
@@ -147,6 +158,22 @@ class NoteControllerUploadNoteImageTests extends NotebookGitWebContentController
         notebookAttachmentContent.get(
             notebookId, VerifiedNotebookAttachmentBytes.sha256Hex(picture.getBytes())),
         equalTo(Optional.empty()));
+  }
+
+  @Test
+  void aNotebookWithoutAGitBindingRefusesTheUploadAndStoresNothing() {
+    Note moon = makeMe.aNote("Moon").notebookOwnedBy(currentUser.getUser()).please();
+    long attachmentsBefore = notebookAttachmentRepository.count();
+    MultipartFile picture = makeMe.anUploadedImage().toMultiplePartFilePlease();
+
+    ResponseStatusException refusal =
+        assertThrows(ResponseStatusException.class, () -> upload(moon, picture));
+
+    assertThat(refusal.getReason(), equalTo("Notebook has no Git binding."));
+    assertThat(notebookAttachmentRepository.count(), equalTo(attachmentsBefore));
+    assertThat(
+        noteRepository.findById(moon.getId()).orElseThrow().getContent(),
+        equalTo(moon.getContent()));
   }
 
   @Test

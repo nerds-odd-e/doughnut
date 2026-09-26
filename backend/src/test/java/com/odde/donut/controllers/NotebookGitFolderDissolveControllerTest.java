@@ -10,6 +10,7 @@ import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.MemoryTracker;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
+import com.odde.donut.entities.NotebookAttachment;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.donut.services.notebookGit.NotebookGitProposalBlobText;
 import com.odde.donut.testability.GitBundleTestReader;
@@ -86,6 +87,43 @@ class NotebookGitFolderDissolveControllerTest extends NotebookGitWebContentContr
           GitBundleTestReader.pathsIn(repo, downloadedHead),
           containsInAnyOrder("Outer/Same/MidNote.md"));
     }
+  }
+
+  @Test
+  void dissolveCarriesAFileIntoTheParentWithTheSameBytes() throws Exception {
+    Notebook notebook = createGitBackedNotebook();
+    Folder physics = makeMe.aFolder().notebook(notebook).name("physics").please();
+    Folder old = makeMe.aFolder().parentFolder(physics).name("old").please();
+    NotebookAttachment sketch =
+        storeFolderAttachmentAndSnapshot(notebook, old, "sketch.png", new byte[] {1, 2, 3});
+
+    folderController.dissolveFolder(notebook, old, false);
+
+    assertThat(acceptedHistory(notebook).tipPaths(), containsInAnyOrder("physics/sketch.png"));
+    assertThat(
+        acceptedBytesAt(notebook, "physics/sketch.png"),
+        equalTo(
+            notebookAttachmentRepository
+                .findById(sketch.getId())
+                .orElseThrow()
+                .getAcceptedGitContent()));
+  }
+
+  @Test
+  void dissolveWithMergeCarriesAFileIntoTheSameNamedFolder() throws Exception {
+    Notebook notebook = createGitBackedNotebook();
+    Folder physics = makeMe.aFolder().notebook(notebook).name("physics").please();
+    Folder diagrams = makeMe.aFolder().parentFolder(physics).name("diagrams").please();
+    storeFolderAttachmentAndSnapshot(notebook, diagrams, "a.png", new byte[] {1});
+    Folder old = makeMe.aFolder().parentFolder(physics).name("old").please();
+    Folder oldDiagrams = makeMe.aFolder().parentFolder(old).name("diagrams").please();
+    storeFolderAttachmentAndSnapshot(notebook, oldDiagrams, "b.png", new byte[] {2});
+
+    folderController.dissolveFolder(notebook, old, true);
+
+    assertThat(
+        acceptedHistory(notebook).tipPaths(),
+        containsInAnyOrder("physics/diagrams/a.png", "physics/diagrams/b.png"));
   }
 
   @Test

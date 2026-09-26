@@ -12,6 +12,7 @@ import com.odde.donut.controllers.dto.NotebookHealthLintReport;
 import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
+import com.odde.donut.entities.NotebookAttachment;
 import com.odde.donut.entities.repositories.FolderRepository;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.donut.services.health.HealthRuleIds;
@@ -145,6 +146,19 @@ class NotebookHealthControllerTest extends ControllerTestBase {
     }
 
     @Test
+    void folderHoldingOnlyAFileIsNotReportedEmpty() throws UnexpectedNoAccessRightException {
+      Notebook notebook = ownedNotebook();
+      Folder refs = makeMe.aFolder().notebook(notebook).name("refs").please();
+      makeMe.anAttachment("paper.pdf").in(refs).please();
+
+      assertThat(
+          emptyFoldersGroup(controller.lint(notebook)).getItems().stream()
+              .map(HealthFindingItem::getFolderId)
+              .toList(),
+          not(hasItem(refs.getId())));
+    }
+
+    @Test
     void rejectsForeignUser() {
       assertThrows(
           UnexpectedNoAccessRightException.class, () -> controller.lint(otherUsersNotebook()));
@@ -188,6 +202,22 @@ class NotebookHealthControllerTest extends ControllerTestBase {
       assertThat(folderIds(notebook), containsInAnyOrder(trashId, keptId));
       Note refound = makeMe.entityPersister.find(Note.class, storedNote.getId());
       assertThat(refound.getFolder().getId(), equalTo(keptId));
+    }
+
+    @Test
+    void fixLeavesAFolderHoldingOnlyAFileAndItsFileInPlace()
+        throws UnexpectedNoAccessRightException {
+      Notebook notebook = ownedNotebook();
+      Folder refs = makeMe.aFolder().notebook(notebook).name("refs").please();
+      NotebookAttachment paper = makeMe.anAttachment("paper.pdf").in(refs).please();
+
+      controller.fix(notebook, fixRequest(true));
+      makeMe.entityPersister.flushAndClear();
+
+      assertThat(folderIds(notebook), contains(refs.getId()));
+      NotebookAttachment refound =
+          makeMe.entityPersister.find(NotebookAttachment.class, paper.getId());
+      assertThat(refound.getFolder().getId(), equalTo(refs.getId()));
     }
 
     @ParameterizedTest

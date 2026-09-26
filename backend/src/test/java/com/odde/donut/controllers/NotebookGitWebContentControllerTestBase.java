@@ -60,6 +60,15 @@ abstract class NotebookGitWebContentControllerTestBase extends NotebookGitContro
     return attachment;
   }
 
+  /** The exact bytes at {@code path} in the notebook's accepted tip. */
+  byte[] acceptedBytesAt(Notebook notebook, String path) throws Exception {
+    return acceptedHistory(notebook).content().stream()
+        .filter(entry -> entry.path().equals(path))
+        .findFirst()
+        .orElseThrow()
+        .content();
+  }
+
   static NoteUpdateContentDTO contentDto(String content) {
     NoteUpdateContentDTO dto = new NoteUpdateContentDTO();
     dto.setContent(content);

@@ -17,7 +17,7 @@ import org.springframework.web.server.ResponseStatusException;
  * included, accepted Git content, and optional folder placement. A null folder means the notebook
  * root. This row projects accepted Git content; Git remains the content authority. Filenames are
  * unique among sibling attachments under a binary collation, so distinct Git paths stay distinct
- * rows. Deleted along with its notebook or containing folder.
+ * rows. Deleted along with its notebook; code removes it before removing its containing folder.
  *
  * <p>The {@code content} column holds accepted Git blob bytes only: a non-empty file's standard Git
  * LFS pointer, or nothing for an empty file. It never stores hydrated LFS object payloads. Digest

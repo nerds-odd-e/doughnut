@@ -142,6 +142,6 @@ Product advice: No backlog change. The story delivers "deletable in Web Donut"
 for non-Markdown files; nothing in the review changes priorities. The broken
 picture left when a note's `image:` names a deleted file was accepted by the
 owner. The optional cleanup correction
-[one containing location](../042-one-containing-location/PLAN.md) (its
+[one containing location](../044-one-containing-location/PLAN.md) (its
 readiness is not yet recorded) is for the owner to accept or decline at
 wrap-up.

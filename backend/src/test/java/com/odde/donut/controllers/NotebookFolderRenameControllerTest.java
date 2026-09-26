@@ -1,6 +1,7 @@
 package com.odde.donut.controllers;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -54,6 +55,21 @@ class NotebookFolderRenameControllerTest extends NotebookFolderManagementControl
     ApiException ex =
         assertThrows(ApiException.class, () -> folderController.renameFolder(nb, folder, req));
     assertThat(ex.getErrorBody().getErrorType(), equalTo(ApiError.ErrorType.FOLDER_NAME_CONFLICT));
+  }
+
+  @Test
+  void rejectsRenamingToAFileNameHereIgnoringCase() {
+    Notebook nb = ownedNotebook();
+    Folder physics = makeMe.aFolder().notebook(nb).name("physics").please();
+    makeMe.anAttachment("Force.png").in(physics).please();
+    Folder folder = makeMe.aFolder().parentFolder(physics).name("Renaming").please();
+
+    FolderRenameRequest req = new FolderRenameRequest();
+    req.setName("force.png");
+    ApiException ex =
+        assertThrows(ApiException.class, () -> folderController.renameFolder(nb, folder, req));
+    assertThat(ex.getErrorBody().getErrorType(), equalTo(ApiError.ErrorType.RESOURCE_CONFLICT));
+    assertThat(ex.getErrorBody().getMessage(), containsString("physics/Force.png"));
   }
 
   @Test

@@ -27,15 +27,15 @@ The project uses Flyway for database migrations, configured in Spring Boot.
 * SQL migrations: `backend/src/main/resources/db/migration/`
 * Java migrations: `backend/src/main/java/db/migration/`
 * Files follow the naming convention: `V{version}__{description}.sql` (or `.java`)
-    * Example: `V300000348__rename_a_column.sql` (version must exceed **`300000347`**)
+    * Example: `V300000349__rename_a_column.sql` (version must exceed **`300000348`**)
 
 ## Version Numbering
 
 * Versions use a numerical format
 
-The project uses versioned files named `V{number}__{description}.sql`. The current full application DDL is collapsed into **`V100000000__baseline.sql`**; the upgrade migrations after it run in order on every install, and **`V300000347__drop_book_and_picture_bytes.sql`** is the newest file. Versions **`300000330`** and **`300000339`** are retired — their migrations were deleted after production applied them — and stay reserved in `flyway_schema_history`.
+The project uses versioned files named `V{number}__{description}.sql`. The current full application DDL is collapsed into **`V100000000__baseline.sql`**; the upgrade migrations after it run in order on every install, and **`V300000348__restrict_folder_content_foreign_keys.sql`** is the newest file. Versions **`300000330`** and **`300000339`** are retired — their migrations were deleted after production applied them — and stay reserved in `flyway_schema_history`.
 
-New migrations need to use a **greater** version number than **`300000347`**.
+New migrations need to use a **greater** version number than **`300000348`**.
 
 ### Migration Process
 

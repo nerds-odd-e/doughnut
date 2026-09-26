@@ -10,12 +10,11 @@ import org.springframework.stereotype.Service;
 @Service
 public class NoteMotionService {
   private final EntityPersister entityPersister;
-  private final NoteTitlePlacementRules noteTitlePlacementRules;
+  private final NoteTitleNameRule noteTitleNameRule;
 
-  public NoteMotionService(
-      EntityPersister entityPersister, NoteTitlePlacementRules noteTitlePlacementRules) {
+  public NoteMotionService(EntityPersister entityPersister, NoteTitleNameRule noteTitleNameRule) {
     this.entityPersister = entityPersister;
-    this.noteTitlePlacementRules = noteTitlePlacementRules;
+    this.noteTitleNameRule = noteTitleNameRule;
   }
 
   /** Places {@code source} in {@code targetFolder}. */
@@ -25,8 +24,14 @@ public class NoteMotionService {
 
   public void executeMoveIntoFolderWithAvailableTitle(Note source, Folder targetFolder) {
     String availableTitle =
-        noteTitlePlacementRules.firstAvailableTitleAt(
-            targetFolder.getNotebook(), targetFolder, source.getTitle(), source.getId());
+        NumberedNameSelection.firstAvailable(
+            source.getTitle(),
+            Note.MAX_TITLE_LENGTH,
+            candidate ->
+                noteTitleNameRule
+                    .entryHoldingTitleOtherThan(
+                        source, targetFolder.getNotebook(), targetFolder, candidate)
+                    .isPresent());
     executePlacement(source, targetFolder.getNotebook(), targetFolder, availableTitle);
   }
 
@@ -42,8 +47,7 @@ public class NoteMotionService {
 
   public void executePlacement(
       Note source, Notebook targetNotebook, Folder targetFolderOrNull, String targetTitle) {
-    noteTitlePlacementRules.requireNoOtherNoteTitleAt(
-        targetNotebook, targetFolderOrNull, targetTitle, source.getId());
+    noteTitleNameRule.requireTitleFreeFor(source, targetNotebook, targetFolderOrNull, targetTitle);
     assignPlacement(source, targetNotebook, targetFolderOrNull, targetTitle);
     entityPersister.flush();
     entityPersister.merge(source);

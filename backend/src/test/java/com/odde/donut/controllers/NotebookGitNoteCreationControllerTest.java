@@ -25,7 +25,6 @@ import org.eclipse.jgit.internal.storage.dfs.InMemoryRepository;
 import org.eclipse.jgit.lib.ObjectId;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.revwalk.RevWalk;
-import org.hibernate.exception.ConstraintViolationException;
 import org.junit.jupiter.api.Test;
 
 class NotebookGitNoteCreationControllerTest extends NotebookGitNoteCreationControllerTestSupport {
@@ -154,7 +153,7 @@ class NotebookGitNoteCreationControllerTest extends NotebookGitNoteCreationContr
     AcceptedBinding accepted = acceptedBinding(notebook);
 
     assertThrows(
-        ConstraintViolationException.class,
+        ApiException.class,
         () -> controller.createNoteAtNotebookRoot(notebook, titleOnly("Taken")));
     assertBindingUnchanged(notebook, accepted);
   }

@@ -123,12 +123,11 @@ public class FolderRelocationService {
           }
           List<Folder> subtreeFolders = subtree.collectFolders(liveFolder);
           User viewer = authorizationService.getCurrentUser();
-          // Every note goes first: fk_note_folder is ON DELETE SET NULL, so a note left behind
-          // would resurface at the notebook root once its folder row is gone.
           for (Note note : subtree.collectNotes(subtreeFolders)) {
             noteService.permanentlyRemove(
                 note, NoteTrashReferenceHandling.LEAVE_DEAD_LINKS, viewer);
           }
+          subtree.collectAttachments(subtreeFolders).forEach(entityPersister::remove);
           for (Folder descendantFirst : subtreeFolders.reversed()) {
             entityPersister.remove(descendantFirst);
           }
@@ -185,10 +184,8 @@ public class FolderRelocationService {
     if (displayName.value().equals(oldName)) {
       return folder;
     }
-    Integer parentFolderId =
-        folder.getParentFolder() == null ? null : folder.getParentFolder().getId();
-    folderSiblingNameValidation.requireNoConflictingSibling(
-        notebook.getId(), parentFolderId, displayName, folder.getId());
+    folderSiblingNameValidation.requireFolderNameFree(
+        notebook, folder.getParentFolder(), displayName, Set.of(folder.getId()));
     Set<Integer> noteIdsInSubtree = subtree.collectNoteIdsInSubtree(folder);
     Map<Integer, Map<Integer, List<String>>> inboundReferencesByNoteId =
         wikiLinkRewriteService.captureLiveResolvedInboundReferencesByNoteId(

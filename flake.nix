@@ -46,7 +46,7 @@
 
         # Node 26 removed bundled corepack, and nixpkgs has no corepack_26.
         # Provide pnpm directly instead: pin the exact version from package.json's
-        # `packageManager`/`engines` (11.27.1) and run it under nodejs-slim_26 so the
+        # `packageManager`/`engines` (11.28.0) and run it under nodejs-slim_26 so the
         # engine check passes. See scripts/dev_setup.sh (no longer calls corepack).
         #
         # To bump the version: set `version` below, set `hash = lib.fakeHash;`,
@@ -54,10 +54,10 @@
         # copy the real hash from the "got:" line of the mismatch error into `hash`.
         # (Alternatively: `nix store prefetch-file <url>` prints the SRI hash directly.)
         pnpmPkg = (pkgs.pnpm.override { nodejs-slim = pkgs.nodejs-slim_26; }).overrideAttrs (_: rec {
-          version = "11.27.1";
+          version = "11.28.0";
           src = pkgs.fetchurl {
             url = "https://registry.npmjs.org/pnpm/-/pnpm-${version}.tgz";
-            hash = "sha256-1Q+IQeZ+8LHYLnyQskBlbHygTV8aoz8GEIAHyB/XZ2Y=";
+            hash = "sha256-uqicVi47xmYnZLOlR2QTfSaV4mg3BfLBjc/MnjFXehU=";
           };
         });
 

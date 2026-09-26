@@ -28,8 +28,7 @@ export const loadingModalMask = () =>
 export async function mountNoteRefinementPendingLayout(
   itemsWhenResolved: NoteRefinementLayoutItem[] = refinementLayoutItems([
     "Should not appear",
-  ]),
-  overrides?: { note?: typeof note }
+  ])
 ) {
   const { gate, resolve } = createDeferredGate()
   const generateSpy = mockSdkServiceWithImplementation(
@@ -40,14 +39,9 @@ export async function mountNoteRefinementPendingLayout(
       return { items: itemsWhenResolved }
     }
   )
-  const wrapper = renderer
-    .withCleanStorage()
-    .withProps({
-      note: overrides?.note ?? note,
-    })
-    .mount()
+  const wrapper = renderer.withCleanStorage().withProps({ note }).mount()
   await nextTick()
-  return { wrapper, resolve, gate, generateSpy }
+  return { wrapper, resolve, generateSpy }
 }
 
 export function clickLoadingModalCancel() {

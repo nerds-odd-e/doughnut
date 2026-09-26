@@ -75,10 +75,7 @@ public class NotebookGitProposalPublisher {
     NotebookGitStateLoader.LockedNotebookState state =
         notebookGitStateLoader
             .findByNotebookIdForUpdate(notebookId)
-            .orElseThrow(
-                () ->
-                    new ResponseStatusException(
-                        HttpStatus.NOT_FOUND, "Notebook has no Git binding."));
+            .orElseThrow(NotebookGitBindingMissing::refusal);
     NotebookGitBinding binding = state.binding();
     Notebook notebook = state.notebook();
     List<PortableTreeFolderRow> folders = state.folders();

@@ -10,13 +10,13 @@ and deletable in Web Donut.
 
 ## Taken
 
-- [Run frontend unit tests faster through cohesive test design](seeds/SEED-039-faster-ci-feedback.md#story-4) — SEED-039#story-4 ([plan](quick/041-faster-frontend-unit-tests/PLAN.md))
 - [Delete unwanted supporting files from Web Donut](seeds/SEED-035-ai-workspace-supporting-files.md#story-2) — SEED-035#story-2 ([plan](quick/035-delete-notebook-file-on-web/PLAN.md))
+- [Trash reuses a case-variant folder in _trash](quick/043-trash-reuses-case-variant-folders/PLAN.md)
 
 ## Backlog list
 
-- [Land on the containing folder from one place](quick/042-one-containing-location/PLAN.md)
-- [Dissolve and merge folders that contain files](seeds/SEED-035-ai-workspace-supporting-files.md#story-11) — SEED-035#story-11
-- [Keep path wiki links working when a folder merges into a same-named folder](seeds/SEED-042-folder-merge-keeps-path-wiki-links.md#story-1) — SEED-042#story-1
+- [Land on the containing folder from one place](quick/044-one-containing-location/PLAN.md)
+- [A moved note keeps its picture](seeds/SEED-035-ai-workspace-supporting-files.md#story-23) — SEED-035#story-23
+- [Moves to another notebook reach both notebooks' Git](seeds/SEED-035-ai-workspace-supporting-files.md#story-24) — SEED-035#story-24
 - [Carry a folder's files along when it moves to another notebook](seeds/SEED-035-ai-workspace-supporting-files.md#story-10) — SEED-035#story-10
 - [Use conversations and memory-tracker review without embedding the full note page](seeds/SEED-033-simplify-note-presentation.md#story-2) — SEED-033#story-2

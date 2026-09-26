@@ -12,7 +12,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /** Portable paths of live content and of projection rows, walked through folder ancestry. */
-final class NotebookGitPortablePath {
+public final class NotebookGitPortablePath {
 
   private NotebookGitPortablePath() {}
 
@@ -24,7 +24,7 @@ final class NotebookGitPortablePath {
     return ofNote(folderPath(folder), title);
   }
 
-  static String ofNote(String folderPrefix, String title) {
+  public static String ofNote(String folderPrefix, String title) {
     return folderPrefix + title + ".md";
   }
 
@@ -32,7 +32,7 @@ final class NotebookGitPortablePath {
     return ofAttachment(folderPath(attachment.getFolder()), attachment.getFilename());
   }
 
-  static String ofAttachment(String folderPrefix, String filename) {
+  public static String ofAttachment(String folderPrefix, String filename) {
     return folderPrefix + filename;
   }
 
@@ -40,17 +40,17 @@ final class NotebookGitPortablePath {
    * A single path segment that is not hidden: a leading dot would be hidden or reserved Git
    * metadata such as {@code .gitattributes}.
    */
-  static boolean isPlainFilename(String filename) {
+  public static boolean isPlainFilename(String filename) {
     return !filename.isEmpty() && !filename.contains("/") && !filename.startsWith(".");
   }
 
   /** A folder's prefix under its container's prefix. */
-  static String ofFolder(String parentPrefix, String name) {
+  public static String ofFolder(String parentPrefix, String name) {
     return parentPrefix + name + "/";
   }
 
   /** Notebook root ({@code folder == null}) has an empty prefix. */
-  static String folderPath(Folder folder) {
+  public static String folderPath(Folder folder) {
     return folder == null ? "" : ofFolder(folderPath(folder.getParentFolder()), folder.getName());
   }
 

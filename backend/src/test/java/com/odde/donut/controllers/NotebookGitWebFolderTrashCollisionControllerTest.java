@@ -30,7 +30,7 @@ class NotebookGitWebFolderTrashCollisionControllerTest
 
     Folder result = folderController.trashFolder(f.notebook(), f.incoming());
 
-    assertThat(result.getName(), equalTo("Biology (2)"));
+    assertThat(result.getName(), equalTo("Biology (4)"));
     try (InMemoryRepository repo = new InMemoryRepository(new DfsRepositoryDescription())) {
       ObjectId downloadedHead =
           GitBundleTestReader.fetchHead(
@@ -45,7 +45,7 @@ class NotebookGitWebFolderTrashCollisionControllerTest
               "_trash/Biology/Earlier.md",
               "_trash/biology (2)/.keep",
               "_trash/Biology (3)/Later.md",
-              "_trash/Biology (2)/Incoming.md"));
+              "_trash/Biology (4)/Incoming.md"));
       assertThat(
           NotebookGitProposalBlobText.readUtf8(repo, downloadedHead, "_trash/Biology/Earlier.md"),
           equalTo(EARLIER_BODY));
@@ -54,7 +54,7 @@ class NotebookGitWebFolderTrashCollisionControllerTest
           equalTo(LATER_BODY));
       assertThat(
           NotebookGitProposalBlobText.readUtf8(
-              repo, downloadedHead, "_trash/Biology (2)/Incoming.md"),
+              repo, downloadedHead, "_trash/Biology (4)/Incoming.md"),
           equalTo(INCOMING_BODY));
     }
   }

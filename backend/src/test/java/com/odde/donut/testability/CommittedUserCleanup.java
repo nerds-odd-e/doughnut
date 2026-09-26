@@ -80,6 +80,30 @@ public final class CommittedUserCleanup {
         .executeUpdate();
     entityManager
         .createNativeQuery(
+            "DELETE a FROM notebook_attachment a "
+                + "INNER JOIN notebook nb ON a.notebook_id = nb.id "
+                + "INNER JOIN ownership o ON nb.ownership_id = o.id "
+                + "INNER JOIN user u ON o.user_id = u.id "
+                + "WHERE u.external_identifier LIKE :like")
+        .setParameter("like", externalIdentifierLike)
+        .executeUpdate();
+    // fk_folder_parent restricts, so each pass removes only folders without child folders.
+    int removedFolders;
+    do {
+      removedFolders =
+          entityManager
+              .createNativeQuery(
+                  "DELETE f FROM folder f "
+                      + "LEFT JOIN folder child ON child.parent_folder_id = f.id "
+                      + "INNER JOIN notebook nb ON f.notebook_id = nb.id "
+                      + "INNER JOIN ownership o ON nb.ownership_id = o.id "
+                      + "INNER JOIN user u ON o.user_id = u.id "
+                      + "WHERE child.id IS NULL AND u.external_identifier LIKE :like")
+              .setParameter("like", externalIdentifierLike)
+              .executeUpdate();
+    } while (removedFolders > 0);
+    entityManager
+        .createNativeQuery(
             "DELETE nb FROM notebook nb "
                 + "INNER JOIN ownership o ON nb.ownership_id = o.id "
                 + "INNER JOIN user u ON o.user_id = u.id "

@@ -1,231 +1,193 @@
+import { MemoryTrackerController } from "@generated/donut-backend-api/sdk.gen"
+import { flushPromises } from "@vue/test-utils"
 import makeMe from "donut-test-fixtures/makeMe"
-import { describe, expect, it, beforeEach } from "vitest"
+import { mockSdkService } from "@tests/helpers"
+import { beforeEach, describe, expect, it } from "vitest"
 import {
+  answeredRecallPrompt,
+  clickDeleteUnanswered,
+  contestedRecallPrompt,
   defaultMemoryTracker,
+  defaultMemoryTrackerId,
+  deleteUnansweredButton,
   focusedPropertyIndicator,
   historyFromPrompts,
+  mockDeleteUnansweredRecallPrompts,
   mockMemoryTrackerPageViewDefaults,
   mountMemoryTrackerPageViewReady,
-  noteUnderQuestionSections,
-  recallPromptWithAwayTime,
-  recallPromptWithDetourTime,
-  recallPromptWithIdleTime,
-  recallPromptWithThinkingTime,
+  peekConfirmPopup,
+  removeFromRecallButton,
+  resolveConfirmPopup,
+  reviveButton,
+  skippedBannerText,
+  skippedMemoryTracker,
+  unansweredRecallPrompt,
 } from "./memoryTrackerPageViewTestSupport"
 
-describe("MemoryTrackerPageView display", () => {
+describe("MemoryTrackerPageView tracker", () => {
   beforeEach(() => {
     mockMemoryTrackerPageViewDefaults()
   })
 
-  it("shows focused property indicator for property memory trackers", async () => {
-    const wrapper = await mountMemoryTrackerPageViewReady({
-      recallHistory: [],
-      memoryTracker: makeMe.aMemoryTracker
-        .withPropertyKey("a part of")
-        .please(),
+  describe("details", () => {
+    it("shows focused property indicator for property memory trackers", async () => {
+      const wrapper = await mountMemoryTrackerPageViewReady({
+        memoryTracker: makeMe.aMemoryTracker
+          .withPropertyKey("a part of")
+          .please(),
+      })
+
+      expect(focusedPropertyIndicator(wrapper).exists()).toBe(true)
+      expect(wrapper.text()).toContain("Focused property: a part of")
     })
 
-    expect(focusedPropertyIndicator(wrapper).exists()).toBe(true)
-    expect(wrapper.text()).toContain("Focused property: a part of")
-  })
+    it("hides focused property indicator for note-level memory trackers", async () => {
+      const wrapper = await mountMemoryTrackerPageViewReady({
+        memoryTracker: defaultMemoryTracker(),
+      })
 
-  it("hides focused property indicator for note-level memory trackers", async () => {
-    const wrapper = await mountMemoryTrackerPageViewReady({
-      recallHistory: [],
-      memoryTracker: defaultMemoryTracker(),
+      expect(focusedPropertyIndicator(wrapper).exists()).toBe(false)
+      expect(wrapper.text()).not.toContain("Focused property:")
     })
 
-    expect(focusedPropertyIndicator(wrapper).exists()).toBe(false)
-    expect(wrapper.text()).not.toContain("Focused property:")
-  })
+    it.each([
+      {
+        label: "memory tracker type",
+        memoryTracker: makeMe.aMemoryTracker.spelling().please(),
+        expected: /Type:\s*SPELLING/,
+      },
+      {
+        label: "difficulty",
+        memoryTracker: makeMe.aMemoryTracker
+          .stability(72)
+          .difficulty(7)
+          .please(),
+        expected: /Difficulty:\s*7/,
+      },
+      {
+        label: "N/A when difficulty is unset",
+        memoryTracker: defaultMemoryTracker(),
+        expected: /Difficulty:\s*N\/A/,
+      },
+    ])("shows $label", async ({ memoryTracker, expected }) => {
+      const wrapper = await mountMemoryTrackerPageViewReady({ memoryTracker })
 
-  it("shows memory tracker type", async () => {
-    const wrapper = await mountMemoryTrackerPageViewReady({
-      recallHistory: [],
-      memoryTracker: makeMe.aMemoryTracker.spelling().please(),
+      expect(wrapper.text()).toMatch(expected)
     })
 
-    expect(wrapper.text()).toContain("Type:")
-    expect(wrapper.text()).toContain("SPELLING")
+    it("places Stability and Difficulty on the same row", async () => {
+      const wrapper = await mountMemoryTrackerPageViewReady(
+        {},
+        { attachToBody: true }
+      )
+
+      const labels = wrapper.findAll("span.font-semibold")
+      const texts = labels.map((label) => label.text())
+      const stabilityIndex = texts.indexOf("Stability:")
+      expect(texts[stabilityIndex + 1]).toBe("Difficulty:")
+      expect(labels[stabilityIndex]!.element.getBoundingClientRect().top).toBe(
+        labels[stabilityIndex + 1]!.element.getBoundingClientRect().top
+      )
+    })
   })
 
-  it("shows difficulty", async () => {
-    const wrapper = await mountMemoryTrackerPageViewReady({
-      recallHistory: [],
-      memoryTracker: makeMe.aMemoryTracker.stability(72).difficulty(7).please(),
+  describe("skipped tracker", () => {
+    const skippedWithPrompt = () =>
+      mountMemoryTrackerPageViewReady({
+        recallHistory: historyFromPrompts([
+          makeMe.aRecallPromptHistoryItem
+            .withQuestionStem("Test question")
+            .withChoices(["A", "B", "C"])
+            .please(),
+        ]),
+        memoryTracker: skippedMemoryTracker(),
+      })
+
+    it("shows skipped banner and revive, hides remove-from-recall, still shows prompts", async () => {
+      const wrapper = await skippedWithPrompt()
+
+      expect(wrapper.text()).toContain(skippedBannerText)
+      expect(reviveButton(wrapper).exists()).toBe(true)
+      expect(removeFromRecallButton(wrapper).exists()).toBe(false)
+      expect(wrapper.text()).toContain("Test question")
+      expect(wrapper.text()).toContain("A")
     })
 
-    expect(wrapper.text()).toMatch(/Difficulty:\s*7/)
-  })
+    it("calls re-enable and emits refresh when revive is clicked", async () => {
+      const reEnableSpy = mockSdkService(MemoryTrackerController, "reEnable", {
+        ...skippedMemoryTracker(),
+        removedFromTracking: false,
+      })
+      const wrapper = await skippedWithPrompt()
 
-  it("shows N/A when difficulty is unset", async () => {
-    const wrapper = await mountMemoryTrackerPageViewReady({
-      recallHistory: [],
+      await reviveButton(wrapper).trigger("click")
+      await flushPromises()
+
+      expect(reEnableSpy).toHaveBeenCalledWith({
+        path: { memoryTracker: defaultMemoryTrackerId },
+      })
+      expect(wrapper.emitted("refresh")).toHaveLength(1)
     })
-
-    expect(wrapper.text()).toMatch(/Difficulty:\s*N\/A/)
   })
 
-  it("places Stability and Difficulty on the same row", async () => {
-    const wrapper = await mountMemoryTrackerPageViewReady(
-      { recallHistory: [] },
-      { attachToBody: true }
+  describe("delete unanswered", () => {
+    it.each([
+      {
+        label: "unanswered prompts",
+        recallHistory: historyFromPrompts([unansweredRecallPrompt()]),
+        visible: true,
+      },
+      {
+        label: "all answered prompts",
+        recallHistory: historyFromPrompts([answeredRecallPrompt()]),
+        visible: false,
+      },
+      { label: "no prompts", recallHistory: [], visible: false },
+      {
+        label: "only contested unanswered prompts",
+        recallHistory: historyFromPrompts([contestedRecallPrompt()]),
+        visible: false,
+      },
+    ])(
+      "delete button visibility when $label",
+      async ({ recallHistory, visible }) => {
+        const wrapper = await mountMemoryTrackerPageViewReady({ recallHistory })
+
+        expect(deleteUnansweredButton(wrapper).exists()).toBe(visible)
+      }
     )
 
-    const labels = wrapper.findAll("span.font-semibold")
-    const texts = labels.map((label) => label.text())
-    const stabilityIndex = texts.indexOf("Stability:")
-    expect(texts[stabilityIndex + 1]).toBe("Difficulty:")
-    expect(labels[stabilityIndex]!.element.getBoundingClientRect().top).toBe(
-      labels[stabilityIndex + 1]!.element.getBoundingClientRect().top
-    )
-  })
-
-  it.each([
-    { thinkingTimeMs: 5234, expected: "Thinking time: 5.2s" },
-    { thinkingTimeMs: 500, expected: "Thinking time: 500ms" },
-    { thinkingTimeMs: 125000, expected: "Thinking time: 2m 5s" },
-  ])(
-    "formats thinking time as $expected",
-    async ({ thinkingTimeMs, expected }) => {
+    it("confirms with the unanswered prompt count and deletes when confirmed", async () => {
+      const deleteSpy = mockDeleteUnansweredRecallPrompts()
       const wrapper = await mountMemoryTrackerPageViewReady({
         recallHistory: historyFromPrompts([
-          recallPromptWithThinkingTime(thinkingTimeMs),
+          unansweredRecallPrompt(),
+          contestedRecallPrompt(),
         ]),
       })
 
-      expect(wrapper.text()).toContain(expected)
-    }
-  )
+      await clickDeleteUnanswered(wrapper)
+      expect(peekConfirmPopup()?.[0]?.message).toBe(
+        "Are you sure you want to delete 1 unanswered recall prompt?"
+      )
+      await resolveConfirmPopup(false)
 
-  it("shows away time and count beside thinking time", async () => {
-    const wrapper = await mountMemoryTrackerPageViewReady({
-      recallHistory: historyFromPrompts([recallPromptWithAwayTime(6500, 2)]),
+      await wrapper.setProps({
+        recallHistory: historyFromPrompts([
+          unansweredRecallPrompt(),
+          unansweredRecallPrompt(),
+        ]),
+      })
+      await clickDeleteUnanswered(wrapper)
+      expect(peekConfirmPopup()?.[0]?.message).toBe(
+        "Are you sure you want to delete 2 unanswered recall prompts?"
+      )
+      await resolveConfirmPopup(true)
+
+      expect(deleteSpy).toHaveBeenCalledWith({
+        path: { memoryTracker: defaultMemoryTrackerId },
+      })
+      expect(wrapper.emitted("refresh")).toHaveLength(1)
     })
-
-    expect(wrapper.text()).toContain("Away: 6.5s (2x)")
-  })
-
-  it("shows detour time and count beside thinking time", async () => {
-    const wrapper = await mountMemoryTrackerPageViewReady({
-      recallHistory: historyFromPrompts([recallPromptWithDetourTime(4200, 1)]),
-    })
-
-    expect(wrapper.text()).toContain("Detour: 4.2s (1x)")
-  })
-
-  it("shows idle time flagged beside thinking time", async () => {
-    const wrapper = await mountMemoryTrackerPageViewReady({
-      recallHistory: historyFromPrompts([recallPromptWithIdleTime(12000)]),
-    })
-
-    expect(wrapper.text()).toContain("Idle: 12.0s")
-  })
-
-  it("does not display any interruption when uninstrumented", async () => {
-    const wrapper = await mountMemoryTrackerPageViewReady({
-      recallHistory: historyFromPrompts([recallPromptWithThinkingTime(5234)]),
-    })
-
-    expect(wrapper.text()).not.toContain("Away:")
-    expect(wrapper.text()).not.toContain("Detour:")
-    expect(wrapper.text()).not.toContain("Idle:")
-  })
-
-  it("does not display thinking time for unanswered questions", async () => {
-    const wrapper = await mountMemoryTrackerPageViewReady({
-      recallHistory: historyFromPrompts([
-        makeMe.aRecallPromptHistoryItem
-          .withQuestionStem("Test question")
-          .withChoices(["A", "B", "C"])
-          .please(),
-      ]),
-    })
-
-    expect(wrapper.text()).not.toContain("Thinking time")
-  })
-
-  it("shows note under question only once", async () => {
-    const wrapper = await mountMemoryTrackerPageViewReady({
-      recallHistory: historyFromPrompts([
-        makeMe.aRecallPromptHistoryItem.please(),
-        makeMe.aRecallPromptHistoryItem.please(),
-      ]),
-    })
-
-    expect(noteUnderQuestionSections(wrapper)).toHaveLength(1)
-  })
-
-  it("shows question generated time", async () => {
-    const questionGeneratedTime = new Date("2024-01-01T10:00:00Z").toISOString()
-    const wrapper = await mountMemoryTrackerPageViewReady({
-      recallHistory: historyFromPrompts([
-        makeMe.aRecallPromptHistoryItem
-          .withQuestionGeneratedTime(questionGeneratedTime)
-          .please(),
-      ]),
-    })
-
-    expect(wrapper.text()).toContain("Generated:")
-    expect(wrapper.text()).toContain(
-      new Date(questionGeneratedTime).toLocaleString()
-    )
-  })
-
-  it("shows contested badge for contested questions", async () => {
-    const wrapper = await mountMemoryTrackerPageViewReady({
-      recallHistory: historyFromPrompts([
-        makeMe.aRecallPromptHistoryItem.withIsContested(true).please(),
-      ]),
-    })
-
-    expect(wrapper.text()).toContain("Contested")
-  })
-
-  it("shows tested focus from the answered MCQ", async () => {
-    const wrapper = await mountMemoryTrackerPageViewReady({
-      recallHistory: historyFromPrompts([
-        makeMe.aRecallPromptHistoryItem
-          .withMcq(
-            makeMe.anMcq
-              .withQuestionStem("What is the capital of France?")
-              .withChoices(["Paris", "London"])
-              .testedFocus("capital city")
-              .please()
-          )
-          .withAnswer({ id: 1, correct: true, choiceIndex: 0 })
-          .withAnswerTime(new Date().toISOString())
-          .please(),
-      ]),
-    })
-
-    expect(wrapper.text()).toContain("capital city")
-  })
-
-  it("shows answer time for answered questions", async () => {
-    const answerTime = new Date("2024-01-01T12:00:00Z").toISOString()
-    const wrapper = await mountMemoryTrackerPageViewReady({
-      recallHistory: historyFromPrompts([
-        makeMe.aRecallPromptHistoryItem
-          .withAnswerTime(answerTime)
-          .withAnswer({ id: 1, correct: true, choiceIndex: 0 })
-          .withMcq(makeMe.anMcq.please())
-          .please(),
-      ]),
-    })
-
-    expect(wrapper.text()).toContain("Answered:")
-    expect(wrapper.text()).toContain(new Date(answerTime).toLocaleString())
-  })
-
-  it("shows unanswered status for unanswered questions", async () => {
-    const wrapper = await mountMemoryTrackerPageViewReady({
-      recallHistory: historyFromPrompts([
-        makeMe.aRecallPromptHistoryItem.please(),
-      ]),
-    })
-
-    expect(wrapper.text()).toContain("Unanswered")
   })
 })

@@ -4,6 +4,7 @@ import com.odde.donut.entities.DisplayName;
 import com.odde.donut.entities.Folder;
 import com.odde.donut.services.notebookTree.PortableTreeFolderRow;
 import java.util.List;
+import java.util.Set;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
@@ -19,6 +20,16 @@ public interface FolderRepository extends CrudRepository<Folder, Integer> {
       """)
   List<PortableTreeFolderRow> findPortableTreeRowsByNotebookId(
       @Param("notebookId") Integer notebookId);
+
+  /** Folders directly holding a note or a file. */
+  @Query(
+      """
+      SELECT f.id FROM Folder f
+      WHERE f.notebook.id = :notebookId
+        AND (EXISTS (SELECT 1 FROM Note n WHERE n.folder = f)
+          OR EXISTS (SELECT 1 FROM NotebookAttachment a WHERE a.folder = f))
+      """)
+  Set<Integer> findOccupiedFolderIdsByNotebookId(@Param("notebookId") Integer notebookId);
 
   String FOLDER_SEARCHABLE = " AND f.notebook.deletedAt IS NULL AND f.trashedInDatabase = false ";
   String FOLDER_NAME_LIKE = " WHERE LOWER(f.name) LIKE LOWER(:pattern)" + FOLDER_SEARCHABLE;
@@ -103,4 +114,16 @@ public interface FolderRepository extends CrudRepository<Folder, Integer> {
       ORDER BY f.id ASC
       """)
   List<Folder> findByNotebookIdOrderByIdAsc(@Param("notebookId") Integer notebookId);
+
+  @Query(
+      """
+      SELECT f FROM Folder f WHERE f.notebook.id = :notebookId AND LOWER(f.name) = LOWER(:name)
+      AND ((:parentFolderId IS NULL AND f.parentFolder IS NULL)
+           OR (f.parentFolder IS NOT NULL AND f.parentFolder.id = :parentFolderId))
+      ORDER BY f.id ASC
+      """)
+  List<Folder> findChildFoldersNamedIgnoringCase(
+      @Param("notebookId") Integer notebookId,
+      @Param("parentFolderId") Integer parentFolderId,
+      @Param("name") String name);
 }

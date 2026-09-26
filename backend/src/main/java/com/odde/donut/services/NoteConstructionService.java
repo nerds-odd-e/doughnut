@@ -34,6 +34,7 @@ public class NoteConstructionService {
   private final NoteFactory noteFactory;
   private final CanonicalDonutOrigin canonicalDonutOrigin;
   private final AuthoredNoteDocumentPersistence authoredNoteDocumentPersistence;
+  private final NoteTitleNameRule noteTitleNameRule;
 
   @Autowired
   public NoteConstructionService(
@@ -45,7 +46,8 @@ public class NoteConstructionService {
       NoteReferenceService noteReferenceService,
       NoteFactory noteFactory,
       CanonicalDonutOrigin canonicalDonutOrigin,
-      AuthoredNoteDocumentPersistence authoredNoteDocumentPersistence) {
+      AuthoredNoteDocumentPersistence authoredNoteDocumentPersistence,
+      NoteTitleNameRule noteTitleNameRule) {
     this.authorizationService = authorizationService;
     this.testabilitySettings = testabilitySettings;
     this.folderRepository = folderRepository;
@@ -55,6 +57,7 @@ public class NoteConstructionService {
     this.noteFactory = noteFactory;
     this.canonicalDonutOrigin = canonicalDonutOrigin;
     this.authoredNoteDocumentPersistence = authoredNoteDocumentPersistence;
+    this.noteTitleNameRule = noteTitleNameRule;
   }
 
   private Note persistNoteContent(Note note, String content) {
@@ -85,6 +88,7 @@ public class NoteConstructionService {
                   () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Folder not found."));
       folder.requireInNotebook(notebook);
     }
+    noteTitleNameRule.requireTitleFree(notebook, folder, noteCreation.getNewTitle());
     Note note = noteFactory.create(notebook, folder, noteCreation.getNewTitle());
     if (noteCreation.getContent() != null) {
       persistNoteContent(note, noteCreation.getContent());
@@ -129,6 +133,8 @@ public class NoteConstructionService {
         NoteContentTitleHeading.withoutRepeatedTitleHeading(
             aiResult.newNoteTitle, aiResult.newNoteContent);
 
+    noteTitleNameRule.requireTitleFree(
+        originalNote.getNotebook(), originalNote.getFolder(), aiResult.newNoteTitle);
     Note newNote =
         noteFactory.create(
             originalNote.getNotebook(), originalNote.getFolder(), aiResult.newNoteTitle);

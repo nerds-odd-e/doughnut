@@ -10,10 +10,12 @@ import com.odde.donut.entities.repositories.NotebookGitBindingRepository;
 import com.odde.donut.exceptions.ApiException;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.donut.services.AuthoredNoteDocumentPersistence;
+import com.odde.donut.services.FolderSiblingNameValidation;
 import com.odde.donut.services.notebookAttachment.NotebookAttachmentContent;
 import com.odde.donut.validators.AuthoredNoteContent;
 import java.io.IOException;
 import java.sql.Timestamp;
+import java.util.Set;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -22,7 +24,8 @@ import org.springframework.web.multipart.MultipartFile;
  * its uploaded name. A name that is not a plain filename, or is already taken there, is refused
  * before anything is stored; nothing is renamed or overwritten. Otherwise its bytes are stored
  * first, then the pointer and the note's {@code image:} are accepted together as one web change,
- * with the content prepared like any ordinary content save.
+ * with the content prepared like any ordinary content save. A notebook without a Git binding
+ * refuses the upload.
  */
 @Service
 public class WebNoteImageUploadService {
@@ -32,7 +35,7 @@ public class WebNoteImageUploadService {
   private final NotebookAttachmentRepository attachmentRepository;
   private final AuthoredNoteDocumentPersistence authoredNoteDocumentPersistence;
   private final CanonicalDonutOrigin canonicalDonutOrigin;
-  private final NotebookGitAcceptedRepositoryStore repositoryStore;
+  private final FolderSiblingNameValidation folderSiblingNameValidation;
 
   public WebNoteImageUploadService(
       WebNoteEditService webNoteEditService,
@@ -41,14 +44,14 @@ public class WebNoteImageUploadService {
       NotebookAttachmentRepository attachmentRepository,
       AuthoredNoteDocumentPersistence authoredNoteDocumentPersistence,
       CanonicalDonutOrigin canonicalDonutOrigin,
-      NotebookGitAcceptedRepositoryStore repositoryStore) {
+      FolderSiblingNameValidation folderSiblingNameValidation) {
     this.webNoteEditService = webNoteEditService;
     this.bindingRepository = bindingRepository;
     this.attachmentContent = attachmentContent;
     this.attachmentRepository = attachmentRepository;
     this.authoredNoteDocumentPersistence = authoredNoteDocumentPersistence;
     this.canonicalDonutOrigin = canonicalDonutOrigin;
-    this.repositoryStore = repositoryStore;
+    this.folderSiblingNameValidation = folderSiblingNameValidation;
   }
 
   /** Returns the saved note. */
@@ -56,6 +59,9 @@ public class WebNoteImageUploadService {
       throws IOException, UnexpectedNoAccessRightException {
     Integer notebookId = note.getNotebook().getId();
     String filename = picture.getOriginalFilename();
+    if (bindingRepository.findByNotebook_Id(notebookId).isEmpty()) {
+      throw NotebookGitBindingMissing.refusal();
+    }
     requireFreePlainFilename(note, filename);
     byte[] pointer = attachmentContent.storeAsLfsPointer(notebookId, picture.getBytes());
     return webNoteEditService.edit(
@@ -80,7 +86,7 @@ public class WebNoteImageUploadService {
         updatedAt);
   }
 
-  /** A name is taken when the accepted tree has a file, note or folder at that path. */
+  /** A name is taken when a file, note or folder in the note's folder holds it, ignoring case. */
   private void requireFreePlainFilename(Note note, String filename) {
     String path =
         NotebookGitPortablePath.ofAttachment(
@@ -88,18 +94,14 @@ public class WebNoteImageUploadService {
     if (!NotebookGitPortablePath.isPlainFilename(filename)) {
       throw refused(path, "is not a plain filename", ApiError.ErrorType.BINDING_ERROR);
     }
-    if (acceptedTreeHas(note.getNotebook().getId(), path)) {
+    if (folderSiblingNameValidation
+        .entryHolding(note.getNotebook(), note.getFolder(), filename, Set.of())
+        .isPresent()) {
       throw refused(
           path,
           "already exists; rename the picture and upload it again",
           ApiError.ErrorType.RESOURCE_CONFLICT);
     }
-  }
-
-  private boolean acceptedTreeHas(Integer notebookId, String path) {
-    return repositoryStore
-        .takenPaths(bindingRepository.findByNotebook_Id(notebookId).orElseThrow())
-        .test(path);
   }
 
   private static ApiException refused(String path, String reason, ApiError.ErrorType type) {

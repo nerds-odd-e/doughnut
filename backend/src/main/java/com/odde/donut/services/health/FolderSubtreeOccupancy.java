@@ -72,7 +72,7 @@ final class FolderSubtreeOccupancy {
     return items;
   }
 
-  static List<Folder> cascadeSafeFullyEmptyFolders(
+  static List<Folder> fullyEmptyFoldersDeepestFirst(
       List<Folder> folders, Set<Integer> occupiedFolderIds) {
     Map<Integer, List<Folder>> childrenByParentId = childrenByParentId(folders);
     Set<Integer> emptyIds = fullyEmptyFolderIds(folders, occupiedFolderIds, childrenByParentId);

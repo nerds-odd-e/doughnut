@@ -50,14 +50,8 @@ describe("NoteAudioTools recording controls", () => {
     wrapper?.unmount()
   })
 
-  it("shows record and stop controls initially", () => {
+  it("shows Record initially, then hides it and enables Stop and Flush while recording", async () => {
     expect(findButtonByTitle(wrapper, "Record Audio")).toBeTruthy()
-    expect(findButtonByTitle(wrapper, "Stop Recording")).toBeTruthy()
-    expect(findButtonByTitle(wrapper, "Flush Audio")).toBeTruthy()
-    expect(findButtonByTitle(wrapper, "Save Audio Locally")).toBeTruthy()
-  })
-
-  it("hides Record and enables Stop and Flush while recording", async () => {
     expect(
       findButtonByTitle(wrapper, "Stop Recording")!.attributes("disabled")
     ).toBeDefined()
@@ -115,6 +109,30 @@ describe("NoteAudioTools recording controls", () => {
     expect(mockMediaStreamSource.disconnect).toHaveBeenCalled()
     expect(mockMediaStop).toHaveBeenCalled()
     expect(audioToolsVm(wrapper).wakeLocker.release).toHaveBeenCalled()
+  })
+
+  it("loads devices and switches selection while recording", async () => {
+    const { mockDevices, mockMediaDevices } = await import(
+      "@tests/notes/noteAudioToolsMocks"
+    )
+
+    await startRecording(wrapper)
+
+    const deviceSelect = wrapper.find(".device-select")
+    expect(deviceSelect.exists()).toBe(true)
+    expect(deviceSelect.findAll("option")).toHaveLength(mockDevices.length)
+    expect(mockMediaDevices.enumerateDevices).toHaveBeenCalled()
+
+    await deviceSelect.setValue("device2")
+    await flushPromises()
+    await wrapper.vm.$nextTick()
+
+    expect(
+      audioToolsVm(wrapper).audioRecorder.switchAudioDevice
+    ).toHaveBeenCalledWith("device2")
+    expect(mockMediaDevices.getUserMedia).toHaveBeenCalledWith({
+      audio: { deviceId: { exact: "device2" } },
+    })
   })
 
   it("can start a second recording after stop", async () => {
