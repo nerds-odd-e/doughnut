@@ -81,3 +81,7 @@ Sizing: one file, two call sites and one deletion; well under five minutes.
 
 - This correction is optional cleanup, not a defect. The owner may decline
   it; then close it without execution.
+
+## Execution complete
+
+Product advice: retrospective skipped
