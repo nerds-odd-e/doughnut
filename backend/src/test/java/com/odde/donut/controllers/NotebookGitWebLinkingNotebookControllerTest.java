@@ -2,6 +2,7 @@ package com.odde.donut.controllers;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.odde.donut.controllers.dto.NoteUpdateTitleDTO;
 import com.odde.donut.controllers.dto.TitleRenameReferenceHandling;
@@ -9,12 +10,47 @@ import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.User;
+import com.odde.donut.services.notebookGit.AcceptedWebChangeService;
 import com.odde.donut.testability.GitBundleTestReader.AcceptedHistory;
+import java.sql.Timestamp;
+import java.time.Instant;
+import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 
 class NotebookGitWebLinkingNotebookControllerTest extends NotebookGitWebContentControllerTestBase {
   @Autowired RelationController relationController;
+  @Autowired AcceptedWebChangeService acceptedWebChangeService;
+
+  @Test
+  void aChangeToABoundNotebookOutsideTheLockedSetIsRefusedAndNothingIsCommitted() throws Exception {
+    LinkingFixture f = seedForceLinkedFrom("See [[Science:Force]].");
+    AcceptedHistory scienceBefore = acceptedHistory(f.science());
+
+    ResponseStatusException refused =
+        assertThrows(
+            ResponseStatusException.class,
+            () ->
+                acceptedWebChangeService.apply(
+                    Set.of(f.science().getId()),
+                    () -> {
+                      noteRepository.findById(f.force().getId()).orElseThrow().setContent("Mass");
+                      noteRepository
+                          .findById(f.ownReferrer().getId())
+                          .orElseThrow()
+                          .setContent("See [[Science:Load]].");
+                      return null;
+                    },
+                    ignored -> "change",
+                    Timestamp.from(Instant.now())));
+
+    assertThat(refused.getStatusCode(), equalTo(HttpStatus.CONFLICT));
+    assertThat(acceptedHistory(f.science()).commits(), equalTo(scienceBefore.commits()));
+    assertThat(
+        acceptedHistory(f.engineering()).commits(), equalTo(f.engineeringBefore().commits()));
+  }
 
   @Test
   void renameCommitsTheRewrittenLinkInTheOwnLinkingNotebookButNotASubscribedOne() throws Exception {
@@ -130,7 +166,7 @@ class NotebookGitWebLinkingNotebookControllerTest extends NotebookGitWebContentC
     snapshotCurrentPortableTree(science);
     snapshotCurrentPortableTree(engineering);
     return new LinkingFixture(
-        science, engineering, acceptedHistory(engineering), force, sharedReferrer);
+        science, engineering, acceptedHistory(engineering), force, ownReferrer, sharedReferrer);
   }
 
   String contentOf(Note note) {
@@ -142,5 +178,6 @@ class NotebookGitWebLinkingNotebookControllerTest extends NotebookGitWebContentC
       Notebook engineering,
       AcceptedHistory engineeringBefore,
       Note force,
+      Note ownReferrer,
       Note sharedReferrer) {}
 }

@@ -180,7 +180,15 @@ notes' editable linking notebooks to {source, destination}.
 
 ### 5. The owner refuses a change to a notebook it did not lock
 Type: Behavior
-Status: planned
+Status: done
+Accepted proof: `aChangeToABoundNotebookOutsideTheLockedSetIsRefusedAndNothingIsCommitted`
+(red before, green after); full backend suite 2658 pass / 2 skipped; E2E
+`wiki_link_move.feature` 3/3 and `folder_organization.feature` 11/11. The
+owner now always flushes after the operation, then refuses. Refactor removed
+`RelationReduceService`'s own in-operation retry check (now the owner's). One
+untested timing difference: a note moved to an *unbound* notebook between set
+computation and lock is no longer refused for a reduce (unbound notebooks are
+not checked). Story production delta: +95 / −34 (net +61) over 12 files.
 Proof: focused `AcceptedWebChangeService` test: an operation that changes a
 note in a bound notebook outside the locked set is refused with 409, and no
 notebook gets a commit. Regression, because every web action now passes

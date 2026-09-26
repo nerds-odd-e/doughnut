@@ -13,9 +13,7 @@ import java.sql.Timestamp;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 /**
  * Reduces a relationship note into a property of its resolved source note, in one accepted web
@@ -65,12 +63,6 @@ public class RelationReduceService {
               Note note = webNoteEditService.requireNote(relationNoteId);
               authorizationService.assertAuthorization(note);
               Note sourceNote = noteService.reduceRelationNoteToSourceProperty(note, viewer, now);
-              if (!notebookIds.contains(note.getNotebook().getId())
-                  || !notebookIds.contains(sourceNote.getNotebook().getId())) {
-                throw new ResponseStatusException(
-                    HttpStatus.CONFLICT,
-                    "The relationship or its source note moved to another notebook; retry.");
-              }
               noteService.permanentlyRemove(
                   note, NoteTrashReferenceHandling.LEAVE_DEAD_LINKS, viewer);
               return sourceNote;

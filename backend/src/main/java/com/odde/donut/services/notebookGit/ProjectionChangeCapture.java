@@ -51,6 +51,10 @@ class ProjectionChangeCapture implements Interceptor, HibernatePropertiesCustomi
       return byNotebook.computeIfAbsent(notebookId, id -> new NotebookProjectionChange());
     }
 
+    Set<Integer> notebookIds() {
+      return byNotebook.keySet();
+    }
+
     @Override
     public void close() {
       window.remove();

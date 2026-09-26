@@ -202,9 +202,13 @@ transaction, each derived from that notebook's own captured rows.
 Existing coverage includes ordinary note content/title edits, creation and
 movement, same-notebook folder creation, rename, move and dissolve, note and
 folder moves to another notebook over {source, destination}, and relationship
-reduction over its touched-notebook set. Link rewrites in notebooks outside the
-changed set remain outside this owner until selected for delivery; this
-contract does not claim that all callers have been integrated.
+reduction over its touched-notebook set. Note rename, move and trash, and
+folder move and dissolve, also lock the editable notebooks whose links they
+rewrite. After the operation flushes, the owner refuses (409, retry) a change
+that touched a bound notebook it did not lock, so a caller that leaves a
+notebook out of its set fails loudly instead of leaving that notebook out of
+step with its Git. Changes to unbound notebooks outside the set are not
+checked.
 
 Git publication accumulates one final correspondence between tree content and
 private identities and applies that result once through the existing domain
