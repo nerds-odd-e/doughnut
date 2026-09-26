@@ -3,6 +3,7 @@ package com.odde.donut.services;
 import com.odde.donut.controllers.dto.ApiError;
 import com.odde.donut.entities.DisplayName;
 import com.odde.donut.entities.Folder;
+import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.repositories.FolderRepository;
 import com.odde.donut.entities.repositories.NoteRepository;
@@ -27,7 +28,7 @@ public class FolderSiblingNameValidation {
     throw new ApiException(new ApiError(message, ApiError.ErrorType.FOLDER_NAME_CONFLICT));
   }
 
-  private static String entryNameTakenAt(String path) {
+  static String entryNameTakenAt(String path) {
     return "This name is already used here by " + path;
   }
 
@@ -60,6 +61,21 @@ public class FolderSiblingNameValidation {
    */
   public Optional<TakenEntry> entryHolding(
       Notebook notebook, Folder parentOrNull, String entryName, Set<Integer> excludedFolderIds) {
+    return entryHolding(notebook, parentOrNull, entryName, excludedFolderIds, null);
+  }
+
+  /** As {@link #entryHolding}, where {@code note} itself does not count. */
+  public Optional<TakenEntry> entryHoldingOtherThan(
+      Note note, Notebook notebook, Folder parentOrNull, String entryName) {
+    return entryHolding(notebook, parentOrNull, entryName, Set.of(), note.getId());
+  }
+
+  private Optional<TakenEntry> entryHolding(
+      Notebook notebook,
+      Folder parentOrNull,
+      String entryName,
+      Set<Integer> excludedFolderIds,
+      Integer excludedNoteId) {
     Integer parentFolderId = parentOrNull == null ? null : parentOrNull.getId();
     String prefix = NotebookGitPortablePath.folderPath(parentOrNull);
     return folderHolding(notebook, parentOrNull, entryName, excludedFolderIds)
@@ -73,6 +89,7 @@ public class FolderSiblingNameValidation {
                     .findNotesWhoseFileIsNamedIgnoringCase(
                         notebook.getId(), parentFolderId, entryName)
                     .stream()
+                    .filter(note -> !note.getId().equals(excludedNoteId))
                     .findFirst()
                     .map(
                         note ->
@@ -183,15 +200,6 @@ public class FolderSiblingNameValidation {
   }
 
   /**
-   * Returns a same-name sibling under {@code parentFolderId} in {@code notebookId}, excluding
-   * {@code excludedFolderId}.
-   */
-  public Optional<Folder> findConflictingSibling(
-      Integer notebookId, Integer parentFolderId, DisplayName name, int excludedFolderId) {
-    return findConflictingSibling(notebookId, parentFolderId, name, Set.of(excludedFolderId));
-  }
-
-  /**
    * Move folder: destination siblings may not use the moved folder's name except the folder itself.
    */
   public void requireNoConflictingSibling(
@@ -208,7 +216,7 @@ public class FolderSiblingNameValidation {
       Integer notebookId, Integer destParentId, Folder folder, boolean merge) {
     Optional<Folder> existingSibling =
         findConflictingSibling(
-            notebookId, destParentId, new DisplayName(folder.getName()), folder.getId());
+            notebookId, destParentId, new DisplayName(folder.getName()), Set.of(folder.getId()));
     if (existingSibling.isEmpty()) {
       return Optional.empty();
     }

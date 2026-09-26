@@ -224,7 +224,15 @@ merge-or-reassign branch, covering both.
 
 ### 7. Note move, undo and trash use the same set of names
 Type: Behavior
-Status: planned
+Status: done
+Accepted proof: `NotebookGitWeb*Guard*` (9, incl.
+`NotebookGitWebNoteMoveGuardControllerTest.aFolderHoldingTheNoteFileNameIgnoringCaseRefusesTheMoveNamingItAndChangesNothing`),
+`*Move*` (113), `*Trash*` (74), `*Undo*` (8), `*NoteMotion*` (5),
+`*Oracle*` (13), `*Folder*` (327), `*NoteController*` (97), `*Relation*`
+(51) pass. `NoteTitlePlacementRules` is gone; the note-facing refusal
+(`RESOURCE_CONFLICT` + `newTitle`; note clash keeps its old message, folder or
+file clash names the path) is `NoteMotionService.refuseTitle`, over
+`FolderSiblingNameValidation.entryHoldingOtherThan(note, …)`.
 Proof: `NotebookGitWebNoteMoveGuardControllerTest` — moving note `Energy` into
 `physics/`, which holds folder `energy.md`, is refused naming
 `physics/energy.md`, and nothing changes. Existing move-collision, undo

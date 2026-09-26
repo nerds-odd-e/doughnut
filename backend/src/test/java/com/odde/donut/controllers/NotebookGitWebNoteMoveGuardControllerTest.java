@@ -1,6 +1,7 @@
 package com.odde.donut.controllers;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -41,6 +42,25 @@ class NotebookGitWebNoteMoveGuardControllerTest extends NotebookGitWebNoteMoveTe
     assertThat(cellsAfter.getFolder().getId(), equalTo(f.biology().getId()));
     assertThat(cellsAfter.getContent(), equalTo(CELLS_BODY));
     assertThat(occupierAfter.getFolder().getId(), equalTo(f.study().getId()));
+    assertThat(
+        ObjectId.fromString(binding(f.notebook()).getAcceptedGitObjectId()), equalTo(acceptedA));
+  }
+
+  @Test
+  void aFolderHoldingTheNoteFileNameIgnoringCaseRefusesTheMoveNamingItAndChangesNothing()
+      throws Exception {
+    LearnedMoveFixture f = seedLearnedCellsInBiologyWithStudyDestination();
+    ObjectId acceptedA = ObjectId.fromString(binding(f.notebook()).getAcceptedGitObjectId());
+    makeMe.aFolder().parentFolder(f.study()).name("cells.md").please();
+
+    ApiException conflict =
+        assertThrows(
+            ApiException.class, () -> relationController.moveNoteToFolder(f.cells(), f.study()));
+
+    ApiError error = conflict.getErrorBody();
+    assertThat(error.getErrorType(), equalTo(ApiError.ErrorType.RESOURCE_CONFLICT));
+    assertThat(error.getErrors().get("newTitle"), containsString("Study/cells.md"));
+    assertThat(reloadNote(f.cells()).getFolder().getId(), equalTo(f.biology().getId()));
     assertThat(
         ObjectId.fromString(binding(f.notebook()).getAcceptedGitObjectId()), equalTo(acceptedA));
   }
