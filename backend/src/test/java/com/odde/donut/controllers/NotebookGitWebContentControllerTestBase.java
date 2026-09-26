@@ -87,6 +87,13 @@ abstract class NotebookGitWebContentControllerTestBase extends NotebookGitContro
     return req;
   }
 
+  static FolderMoveRequest folderMoveTo(Notebook destination, boolean merge) {
+    FolderMoveRequest req = new FolderMoveRequest();
+    req.setDestinationNotebookId(destination.getId());
+    req.setMerge(merge);
+    return req;
+  }
+
   /**
    * The accepted head's tree, derived from the change, equals a full assembly of the stored
    * projection (the tree a history reset would produce), including native root tree id.

@@ -17,30 +17,7 @@ class NotebookGitWebLinkingNotebookControllerTest extends NotebookGitWebContentC
   @Autowired RelationController relationController;
 
   @Test
-  void renameRewritesOwnLinkingNotebookButNotASubscribedOne() throws Exception {
-    LinkingFixture f = seedForceLinkedFrom("See [[Science:Force]].");
-    NoteUpdateTitleDTO rename = titleDto("Load");
-    rename.setReferenceHandling(TitleRenameReferenceHandling.UPDATE_VISIBLE_TEXT);
-
-    textContentController.updateNoteTitle(f.force(), rename);
-
-    assertThat(contentOf(f.ownReferrer()), equalTo("See [[Science:Load]]."));
-    assertThat(contentOf(f.sharedReferrer()), equalTo("See [[Science:Force]]."));
-  }
-
-  @Test
-  void trashRemovingFromPropertiesKeepsTheLinkInASubscribedNotebook() throws Exception {
-    String linkingProperty = "---\ntype: Note\nuses: \"[[Science:Force]]\"\n---\nBody";
-    LinkingFixture f = seedForceLinkedFrom(linkingProperty);
-
-    noteController.trashNote(f.force(), removeFromProperties());
-
-    assertThat(contentOf(f.ownReferrer()), equalTo("---\ntype: Note\n---\nBody"));
-    assertThat(contentOf(f.sharedReferrer()), equalTo(linkingProperty));
-  }
-
-  @Test
-  void renameCommitsTheRewrittenLinkInTheLinkingNotebook() throws Exception {
+  void renameCommitsTheRewrittenLinkInTheOwnLinkingNotebookButNotASubscribedOne() throws Exception {
     LinkingFixture f = seedForceLinkedFrom("See [[Science:Force]].");
     NoteUpdateTitleDTO rename = titleDto("Load");
     rename.setReferenceHandling(TitleRenameReferenceHandling.UPDATE_VISIBLE_TEXT);
@@ -48,6 +25,7 @@ class NotebookGitWebLinkingNotebookControllerTest extends NotebookGitWebContentC
     textContentController.updateNoteTitle(f.force(), rename);
 
     assertLinkingNotebookCommittedOnce(f, "See [[Science:Load]].");
+    assertThat(contentOf(f.sharedReferrer()), equalTo("See [[Science:Force]]."));
   }
 
   @Test
@@ -62,13 +40,15 @@ class NotebookGitWebLinkingNotebookControllerTest extends NotebookGitWebContentC
   }
 
   @Test
-  void trashRemovingFromPropertiesCommitsTheLinkingNotebookWithoutTheLink() throws Exception {
-    LinkingFixture f =
-        seedForceLinkedFrom("---\ntype: Note\nuses: \"[[Science:Force]]\"\n---\nBody");
+  void trashRemovingFromPropertiesCommitsTheOwnLinkingNotebookButNotASubscribedOne()
+      throws Exception {
+    String linkingProperty = "---\ntype: Note\nuses: \"[[Science:Force]]\"\n---\nBody";
+    LinkingFixture f = seedForceLinkedFrom(linkingProperty);
 
     noteController.trashNote(f.force(), removeFromProperties());
 
     assertLinkingNotebookCommittedOnce(f, "---\ntype: Note\n---\nBody");
+    assertThat(contentOf(f.sharedReferrer()), equalTo(linkingProperty));
   }
 
   @Test
@@ -89,6 +69,30 @@ class NotebookGitWebLinkingNotebookControllerTest extends NotebookGitWebContentC
     folderController.dissolveFolder(f.science(), f.force().getFolder(), false);
 
     assertLinkingNotebookCommittedOnce(f, "See [[Science:/Force]].");
+  }
+
+  @Test
+  void moveToAnotherNotebookCommitsTheRewrittenLinkInTheLinkingNotebook() throws Exception {
+    LinkingFixture f = seedForceLinkedFrom("See [[Science:Force]].");
+    Notebook physics = createGitBackedNotebook("Physics");
+    snapshotCurrentPortableTree(physics);
+
+    relationController.moveNoteToNotebookRootInNotebook(f.force(), physics);
+
+    assertLinkingNotebookCommittedOnce(f, "See [[Physics:Force|Science:Force]].");
+    assertAcceptedTreeMatchesTheFullAssembly(physics);
+  }
+
+  @Test
+  void folderMoveToAnotherNotebookCommitsTheRewrittenLinkInTheLinkingNotebook() throws Exception {
+    LinkingFixture f = seedForceLinkedFrom("mechanics", "See [[Science:mechanics/Force]].");
+    Notebook physics = createGitBackedNotebook("Physics");
+    snapshotCurrentPortableTree(physics);
+
+    folderController.moveFolder(f.science(), f.force().getFolder(), folderMoveTo(physics, false));
+
+    assertLinkingNotebookCommittedOnce(f, "See [[Physics:Force|Science:mechanics/Force]].");
+    assertAcceptedTreeMatchesTheFullAssembly(physics);
   }
 
   void assertLinkingNotebookCommittedOnce(LinkingFixture f, String bridgeContent) throws Exception {
@@ -126,7 +130,7 @@ class NotebookGitWebLinkingNotebookControllerTest extends NotebookGitWebContentC
     snapshotCurrentPortableTree(science);
     snapshotCurrentPortableTree(engineering);
     return new LinkingFixture(
-        science, engineering, acceptedHistory(engineering), force, ownReferrer, sharedReferrer);
+        science, engineering, acceptedHistory(engineering), force, sharedReferrer);
   }
 
   String contentOf(Note note) {
@@ -138,6 +142,5 @@ class NotebookGitWebLinkingNotebookControllerTest extends NotebookGitWebContentC
       Notebook engineering,
       AcceptedHistory engineeringBefore,
       Note force,
-      Note ownReferrer,
       Note sharedReferrer) {}
 }

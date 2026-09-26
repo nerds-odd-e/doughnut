@@ -6,7 +6,6 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import com.odde.donut.controllers.dto.FolderMoveRequest;
 import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.NotebookAttachment;
@@ -37,13 +36,11 @@ class NotebookGitWebFolderCrossNotebookMoveControllerTest
         storeFolderAttachmentAndSnapshot(
             destination, library, "existing.pdf", new byte[] {4, 5, 6});
     ObjectId destinationHead = ObjectId.fromString(binding(destination).getAcceptedGitObjectId());
-    FolderMoveRequest moveToDestinationRoot = new FolderMoveRequest();
-    moveToDestinationRoot.setDestinationNotebookId(destination.getId());
 
     ResponseStatusException exception =
         assertThrows(
             ResponseStatusException.class,
-            () -> folderController.moveFolder(source, refs, moveToDestinationRoot));
+            () -> folderController.moveFolder(source, refs, folderMoveTo(destination, false)));
 
     assertThat(
         exception.getReason(),
@@ -84,14 +81,11 @@ class NotebookGitWebFolderCrossNotebookMoveControllerTest
     storeFolderAttachmentAndSnapshot(
         destination, destinationRefs, "existing.pdf", new byte[] {4, 5, 6});
     ObjectId destinationHead = ObjectId.fromString(binding(destination).getAcceptedGitObjectId());
-    FolderMoveRequest mergeAtDestinationRoot = new FolderMoveRequest();
-    mergeAtDestinationRoot.setDestinationNotebookId(destination.getId());
-    mergeAtDestinationRoot.setMerge(true);
 
     ResponseStatusException exception =
         assertThrows(
             ResponseStatusException.class,
-            () -> folderController.moveFolder(source, refs, mergeAtDestinationRoot));
+            () -> folderController.moveFolder(source, refs, folderMoveTo(destination, true)));
 
     assertThat(
         exception.getReason(),
@@ -115,7 +109,7 @@ class NotebookGitWebFolderCrossNotebookMoveControllerTest
     AcceptedHistory scienceBefore = acceptedHistory(science);
     AcceptedHistory engineeringBefore = acceptedHistory(engineering);
 
-    folderController.moveFolder(science, physics, moveTo(engineering, false));
+    folderController.moveFolder(science, physics, folderMoveTo(engineering, false));
 
     AcceptedHistory scienceAfter = acceptedHistory(science);
     AcceptedHistory engineeringAfter = acceptedHistory(engineering);
@@ -136,7 +130,7 @@ class NotebookGitWebFolderCrossNotebookMoveControllerTest
     makeMe.aNote("Force").folder(engineeringPhysics).please();
     snapshotCurrentPortableTree(engineering);
 
-    folderController.moveFolder(science, physics, moveTo(engineering, true));
+    folderController.moveFolder(science, physics, folderMoveTo(engineering, true));
 
     assertThat(acceptedHistory(science).tipPaths(), containsInAnyOrder("Energy.md"));
     assertThat(
@@ -153,12 +147,12 @@ class NotebookGitWebFolderCrossNotebookMoveControllerTest
     Notebook engineering = createGitBackedNotebook("Engineering");
     snapshotCurrentPortableTree(engineering);
     AcceptedHistory engineeringBefore = acceptedHistory(engineering);
-    folderController.moveFolder(science, physics, moveTo(engineering, false));
+    folderController.moveFolder(science, physics, folderMoveTo(engineering, false));
 
     folderController.moveFolder(
         engineering,
         folderRepository.findById(physics.getId()).orElseThrow(),
-        moveTo(science, false));
+        folderMoveTo(science, false));
 
     assertThat(
         acceptedHistory(engineering).commits().size(),
@@ -178,12 +172,5 @@ class NotebookGitWebFolderCrossNotebookMoveControllerTest
     makeMe.aNote("Energy").notebook(science).please();
     snapshotCurrentPortableTree(science);
     return physics;
-  }
-
-  private static FolderMoveRequest moveTo(Notebook destination, boolean merge) {
-    FolderMoveRequest request = new FolderMoveRequest();
-    request.setDestinationNotebookId(destination.getId());
-    request.setMerge(merge);
-    return request;
   }
 }

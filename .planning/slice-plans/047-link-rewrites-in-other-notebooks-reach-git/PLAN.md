@@ -161,7 +161,15 @@ leave dead links and add nothing.
 
 ### 4. Moves to another notebook reach third notebooks' Git
 Type: Behavior
-Status: planned
+Status: done
+Accepted proof: `NotebookGitWebLinkingNotebookControllerTest`
+(`moveToAnotherNotebookCommitsTheRewrittenLinkInTheLinkingNotebook`,
+`folderMoveToAnotherNotebookCommitsTheRewrittenLinkInTheLinkingNotebook`)
+plus the cross-notebook move and `*WikiLinkRewrite*` suites (28 tests). No
+production change: slices 2–3 already cover it through `webMove` and
+`moveFolder`. The rewritten link keeps the old text as alias:
+`[[Physics:Force|Science:Force]]` (existing move rewrite rule). The refactor
+merged the slice-1 database-only cases into the Git rename and trash cases.
 Proof: same test, key example 4: `Engineering` gets one commit with
 `[[Physics:Force]]`, and the trees of `Science`, `Physics` and `Engineering`
 match the full assembly. `NotebookGitWebNoteCrossNotebookMoveControllerTest`
