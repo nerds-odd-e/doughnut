@@ -7,7 +7,7 @@ Apply this rule in [dough-story-decomposition](../../dough-story-decomposition/S
 before any of them writes a seed, story, or plan record, including a small,
 already-decided correction.
 [dough-execution-retrospective](../../dough-execution-retrospective/SKILL.md#write-only-in-an-owned-checkout)
-applies it too before writing a process-finding or correction-plan record when
+applies it too before writing a process-finding or correction story and plan record when
 no invoking execution supplies its checkout. Reading, discussing, answering
 questions, or reviewing an existing record needs no workspace at all.
 
@@ -178,7 +178,9 @@ A workspace whose assignment is still published is retained until the
 assignment ends, whatever else applies: it is what identifies that
 assignment, so keep it or
 [abandon the preparation](preparation-assignment.md#abandon-the-preparation)
-before retiring it.
+before retiring it. If it was lost anyway, the assignment ends only as
+[Release a lost workspace's assignment](preparation-assignment.md#release-a-lost-workspaces-assignment)
+describes.
 
 Once a confirmed disposition applies, retire the workspace under Dough Land's
 [Retire the worktree](../../dough-land/SKILL.md#retire-the-worktree): a keep

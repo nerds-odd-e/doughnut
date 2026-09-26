@@ -30,6 +30,19 @@ contribution.
 Invoke this skill for an authorized discrepancy, defect, or regression, not
 because the instruction contains the word "fix".
 
+## Admit the accepted mission
+
+Asking questions to understand the report is not a mission. Once the
+instruction accepts diagnosing a report that is not known larger work (see
+[Route remaining work](#route-remaining-work)),
+[admit it](../dough-execute-plan/references/admit-accepted-work.md) before
+investigation; a discrepancy found inside an active story returns its evidence
+to that story's owner instead. Its story's Goal is resolving the reported
+discrepancy, its expectations are the gathered report below, and its approach
+is `planless` when the instruction also authorizes the bounded repair,
+otherwise `unselected`. That reference owns its checkout, refusals,
+continuation, and closure.
+
 ## Gather the report
 
 Collect what the report already supplies and name the gaps:
@@ -63,31 +76,30 @@ evidence needed to choose a supported disposition.
 
 If evidence shows that actual behavior already matches intended behavior, close
 any session-created workspace safely and return an explained-no-change
-disposition. Create no story, plan, or execution workspace for that result. If
-the report is known larger, or investigation is incomplete or inconclusive, use
-[Route remaining work](#route-remaining-work). If a repair is supported within
-the ten-minute attempt, first remove owned temporary investigation artifacts
-and safely close any session-created workspace, then invoke shared execution.
-If the lifecycle cannot close safely, return its retained-workspace handoff and
-do not begin repair.
+disposition. Create no plan or further workspace for that result. If the report
+is known larger, or investigation is incomplete or inconclusive, use [Route
+remaining work](#route-remaining-work). If a repair is supported within the
+ten-minute attempt, first remove owned temporary investigation artifacts and
+safely close any session-created workspace, then invoke shared execution. Report
+a repair the instruction did not authorize with its evidence instead. If the
+lifecycle cannot close safely, return its retained-workspace handoff and do not
+begin repair.
 
 ## Invoke shared execution for repair
-
-If the report is already known to be larger than a ten-minute bounded repair,
-skip this handoff and use [Route remaining work](#route-remaining-work).
 
 Only after exploration is complete and any session-created workspace has closed
 safely, invoke [dough-execute-plan](../dough-execute-plan/SKILL.md) as one
 planless contextual instruction from the applicable local `main` or other
 already integrated revision. Let execute-plan create its own execution branch
-and worktree; never reuse or nest the exploration workspace. If the established
-checkout already belongs to an active execute-plan repair, return the evidence
-to that owning execution instead of invoking a nested one. Pass `--no-replan`
-and a ten-minute hard limit. Carry the gathered expectation, actual behavior,
-evidence, and gaps. Do not plan, invent a story, or start a local
-implement-and-refactor loop. That execution publishes the validated repair
-through
-[increment and repair publication](../dough-execute-plan/references/trunk-publication.md#publish-an-execution-increment-or-repair).
+and worktree; never reuse or nest a session-created exploration workspace. For
+an admitted story, execution continues under its claim in the story's owned
+checkout. If the established checkout already belongs to an active execute-plan
+repair, return the evidence to that owning execution instead of invoking a
+nested one. Pass `--no-replan` and a ten-minute hard limit. Carry the gathered
+expectation, actual behavior, evidence, and gaps. Do not plan, invent another
+story, or start a local implement-and-refactor loop. That execution publishes
+the validated repair through [increment and repair
+publication](../dough-execute-plan/references/trunk-publication.md#publish-an-execution-increment-or-repair).
 Do not push the repair through a separate procedure.
 
 Debug with available knowledge as needed. Do not require a separate debugging
@@ -144,15 +156,16 @@ a checkout.
 
 Do not repeat execute-plan preservation, rollback, or retry. Link the
 execution-preserved evidence already written under this project's
-executable-plan root (see [refine an oversized
-slice](../dough-execute-plan/references/oversized-slice.md)
-and [resolve execution
-context](../dough-slice-planning/SKILL.md#resolve-execution-context)). Carry the
-gathered expectation, actual behavior, remaining uncertainty, and acceptance
-examples into the canonical story. For an inconclusive report, the story first
+executable-plan root (see [refine an oversized slice](../dough-execute-plan/references/oversized-slice.md)
+and [resolve execution context](../dough-slice-planning/SKILL.md#resolve-execution-context)).
+Carry the gathered expectation, actual behavior, remaining uncertainty, and
+acceptance examples into the canonical story. For an inconclusive report, the story first
 asks whether intended behavior is violated, then repairs a confirmed violation.
 
-Choose the canonical home:
+An admitted story is already that canonical home: carry the evidence into it
+and keep it Taken, without queueing it again or creating another story, unless
+the developer explicitly returns it to **Backlog list** with the product
+backlog's `place --return`. Otherwise choose the canonical home:
 
 - Reuse an existing owning story when moving it first in **Backlog list**
   preserves that story's scope.
@@ -170,8 +183,7 @@ move or interrupt **Taken** work; leave it running and in place, and report any
 contradiction with it to the coordinator.
 
 When the owned workspace contains an authorized canonical story, executable
-plan, backlog change, or other durable planning evidence, those records
-follow
+plan, backlog change, or other durable planning evidence, those records follow
 [preparation disposition](../dough-story-refinement/references/preparation-disposition.md).
 Remove the disposable reproduction with
 [retained-artifacts.mjs](scripts/retained-artifacts.mjs). Name the disposable
@@ -225,8 +237,9 @@ or which remaining-work route was taken.
 - **Recovery:** failed delivery or shutdown remains ordinary recovery. Do not
   claim resolution.
 - **Queued:** known larger work, an incomplete `--no-replan` attempt, or an
-  inconclusive report now has an actionable canonical story first in the queue.
-  Do not claim resolution or start that work.
+  inconclusive report now has an actionable canonical story first in the queue,
+  or its admitted story stays Taken with that evidence. Do not claim resolution
+  or start further work.
 - **Jidoka:** routing could not move an owning story safely. Name the
   scope-distortion or ownership decision and return it to the coordinator
   without a guessed queue entry. Do not claim resolution.

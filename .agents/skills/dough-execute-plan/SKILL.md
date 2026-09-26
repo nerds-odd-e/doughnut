@@ -6,11 +6,13 @@ description: >-
   or a contextual instruction, with independent refactoring, delivery, and
   asynchronous CI repair. Use to execute a plan, run slices, execute a canonical
   story when the caller explicitly skips slice planning, or execute a small
-  instruction from context without a story or plan. Does not decide story scope
-  or quick-path eligibility. `--trunk` selects Trunk Mode; omitted mode keeps
-  Story Branch Mode. `--skip-retro` skips the automatic planned-execution
-  retrospective. `--replan` and `--no-replan` choose whether an oversized attempt
-  may continue through planning.
+  instruction from context without a story or plan. Also admits an accepted
+  mission that no backlog list holds, such as a standalone review,
+  investigation, or maintenance request, into Taken before its work starts.
+  Does not decide story scope or quick-path eligibility. `--trunk` selects
+  Trunk Mode; omitted mode keeps Story Branch Mode. `--skip-retro` skips the
+  automatic planned-execution retrospective. `--replan` and `--no-replan` choose
+  whether an oversized attempt may continue through planning.
 ---
 
 # Execute planned or planless work
@@ -25,23 +27,23 @@ implementation agents return uncommitted changes.
 Identify the execution source before changing project state:
 
 - **Planned:** require an executable plan. For a feature story, read its seed section.
-  For a bounded correction, require the complete correction input in the plan under
-  [planning scope and lifecycle](../dough-story-refinement/references/planning.md#choose-the-planning-level);
-  do not require or create a seed.
+  For a bounded correction, require its complete correction input — its story and
+  plan, or a plan-homed correction's plan — under [planning scope and lifecycle](../dough-story-refinement/references/planning.md#choose-the-planning-level).
 - **Quick:** require an explicit current instruction that authorizes planless
   execution. The source is either a canonical feature story with understood goal,
   scope, key examples, and no blocking decision, plus the instruction to skip slice
   planning; or a contextual instruction that supplies the objective, known
   expectations, remaining uncertainty, and authority. A seed alone or apparent story
-  size cannot select this path. Corrections require plans. Do not fabricate a story,
-  plan, or queue entry when the instruction is otherwise sufficient.
+  size cannot select this path. Corrections require plans. In Story Branch or
+  Trunk Mode, first [admit](#admit-accepted-work-that-no-backlog-list-holds) an
+  accepted independent mission; otherwise create no story, plan, or queue entry.
 
 Name missing authority or source context and stop before backlog changes, delegation,
 or implementation. Successful quick execution keeps scope, decisions, progress, and
-proof in the conversation; create no plan, completion note, or substitute record.
-A contextual instruction may leave expectations unresolved. Carry its goal and
-uncertainty, resolve what a behavior change requires, and allow an evidenced
-no-change conclusion through the explained-empty-change path.
+proof in its story, when admitted, and the conversation; create no plan, completion
+note, or substitute record. A contextual instruction may leave expectations
+unresolved. Carry its goal and uncertainty, resolve what a behavior change requires,
+and allow an evidenced no-change conclusion through the explained-empty-change path.
 
 Use [planning level](../dough-story-refinement/references/planning.md#choose-the-planning-level)
 for source ownership, [proof ownership](../dough-story-refinement/references/planning.md#own-executable-proof)
@@ -102,11 +104,10 @@ After resolving execution source and authority, inspect the backlog before
 plan-status changes, observer startup, delegation, or implementation. Resolve
 the selective formatter and claim commit hook contract. An absent or understood
 check-only hook permits the transition; an unknown, mutating, failing, or
-disputed hook stops with the queue unchanged. Resolve
-[publication preconditions](references/trunk-publication.md#preconditions),
-including the authorized remote/trunk, before a Story Branch or Trunk Mode
-startup. Existing current-branch and host-owned checkout restrictions still
-apply.
+disputed hook stops with the queue unchanged. Resolve [publication
+preconditions](references/trunk-publication.md#preconditions), including the
+authorized remote/trunk, before a Story Branch or Trunk Mode startup. Existing
+current-branch and host-owned checkout restrictions still apply.
 
 For authorized queued Story Branch or Trunk Mode work, invoke the installed
 `scripts/execution-start.mjs start` once with the originating integration
@@ -114,15 +115,14 @@ checkout, owned workspace path and branch, selected identity, stable execution
 publisher ID, mode (`trunk` or `story-branch`), actual remote and trunk branch,
 and the established `--push-authorized --workspace-authorized` flags. Supply
 your own `--host` (`claude`, `codex`, or `cursor`) and `--model`; omit either
-you cannot state rather than guess. Supply
-`--plan` as a path relative to the backlog directory when explicitly selected;
-the command also resolves the canonical
-published plan. Supply `--declared-owner` and matching `--requester` only when
-default-checkout access has actually been established. Missing declarations
-do not prevent a safe automatic refresh. The command fetches
-trunk, checks the published selected source and preparation, selects or reuses
-the workspace, names you as an agent, commits an isolated Take that publishes
-your agent profile, makes that agent the author of your workspace commits
+you cannot state rather than guess. Supply `--plan` as a path relative to the
+backlog directory when explicitly selected; the command also resolves the
+canonical published plan. Supply `--declared-owner` and matching `--requester`
+only when default-checkout access has actually been established. Missing
+declarations do not prevent a safe automatic refresh. The command fetches trunk,
+checks the published selected source and preparation, selects or reuses the
+workspace, names you as an agent, commits an isolated Take that publishes your
+agent profile, makes that agent the author of your workspace commits
 (`workspaceAuthorship: "not-configured"` means only the Take commit names the
 agent), confirms publication on remote trunk, publishes a Story Branch Mode
 execution branch at that Take so the branch the profile names exists on the
@@ -135,29 +135,37 @@ accepted result (`ok: true`, `status` `published` or `resumed`) carries
 claim names one, `plan` or `remote` when resolved rather than supplied, and the
 default checkout's `maintenance` (`result`, plus `reason` when not refreshed).
 Retain them; the first increment's managed delivery uses `publishedSha` as its
-previously published base. A deferred or stopped `maintenance` or an
-`earlierMaintenance` issue leaves accepted publication intact. A refusal or
-unconfirmed result (`ok: false`, non-zero exit) stops before implementation;
-report and act on its `status`, `error`, and any `recovery` or `provenance`.
-Inspect current Git state only when a reported reason needs it; never repeat a
-mutating command to obtain diagnostics.
-If publication is interrupted, invoke the same installed command with the
-retained workspace, branch, publisher ID, identity, `--starting-revision` and
-`--candidate-sha` from the last result (or its `recovery`) or confirmed
-pre-push candidate. Use the latest candidate SHA after a replay. A `resumed`
-result confirms current ownership through remote ancestry, even when trunk has
+previously published base. `existing` (work already Taken under your claim)
+writes nothing and returns that claim's `publishedSha`. A deferred or stopped
+`maintenance` or an `earlierMaintenance` issue leaves accepted publication
+intact. A refusal or unconfirmed result (`ok: false`, non-zero exit) stops
+before implementation; report and act on its `status`, `error`, and any
+`recovery` or `provenance`. Inspect current Git state only when a reported
+reason needs it; never repeat a mutating command to obtain diagnostics. If
+publication is interrupted, invoke the same installed command with the retained
+workspace, branch, publisher ID, identity, `--starting-revision` and
+`--candidate-sha` from the last result (or its `recovery`) or confirmed pre-push
+candidate. Use the latest candidate SHA after a replay. A `resumed` result
+confirms current ownership through remote ancestry, even when trunk has
 advanced; it may finish eligible local refresh without another Take or push. A
 rival or ambiguous provenance stops implementation. Preserve the stopped
 candidate and exact recovery fields on an uncertain result.
 
 Every accepted start, new or resumed, then requires this project's
-checkout-bound setup and applicable command under
-[execution location](references/execution-location.md) before implementation.
-Setup failure preserves the accepted claim and workspace. The separate product-backlog Take tool keeps
-its local domain purpose; a local Taken entry alone does not satisfy this
-startup boundary. Queued current-branch work keeps its existing local Take
+checkout-bound setup and applicable command under [execution
+location](references/execution-location.md) before implementation. Setup failure
+preserves the accepted claim and workspace. The separate product-backlog Take
+tool keeps its local domain purpose; a local Taken entry alone does not satisfy
+this startup boundary. Queued current-branch work keeps its existing local Take
 contract and gains no publication authority. Leave taken work through pauses,
 failures, completion, and retrospective; wrap-up removes it.
+
+### Admit accepted work that no backlog list holds
+
+When the current instruction accepts a mission that no backlog list holds,
+follow [admit accepted work](references/admit-accepted-work.md) before its
+substantive work. It admits the story with this start command and `--admit`,
+and later continues that claim into authorized implementation.
 
 ## Choose the execution location
 

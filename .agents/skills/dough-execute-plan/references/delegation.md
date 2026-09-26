@@ -17,9 +17,10 @@ Give the agent:
   any relevant existing-solution finding and candidate evidence from the plan,
   plus new evidence that triggered a PFE revisit; a fresh agent does not repeat
   a still-valid search merely because delegation occurred. For a correction,
-  pass its complete plan-owned
-  [correction input](../../dough-story-refinement/references/planning.md#choose-the-planning-level)
-  rather than requiring a seed. For quick execution, pass the established
+  pass its complete
+  [correction input](../../dough-story-refinement/references/planning.md#choose-the-planning-level):
+  its minimal story and plan, or a plan-homed correction's plan alone. For
+  quick execution, pass the established
   source — the canonical story and skip-planning instruction, or the contextual
   instruction — plus relevant conversation context; require no plan, fabricated
   story, or substitute execution record. Omit unrelated plan or conversation

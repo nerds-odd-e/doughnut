@@ -1,4 +1,5 @@
-// Published queued source and local unpublished selected-source checks.
+// Published queued or continued Taken source and local unpublished
+// selected-source checks.
 import { readFileSync } from "node:fs";
 import { dirname, join, posix, relative, resolve, sep } from "node:path";
 import {
@@ -7,11 +8,16 @@ import {
   takenHeading,
 } from "../../dough-product-backlog/scripts/product-backlog-document.mjs";
 import { readHome } from "../../dough-product-backlog/scripts/product-backlog-home-reader.mjs";
+import { splitHref } from "../../dough-product-backlog/scripts/product-backlog-identity.mjs";
 import { readStoryState } from "../../dough-product-backlog/scripts/product-backlog-story-state.mjs";
+import { BacklogError } from "../../dough-product-backlog/scripts/product-backlog-refusal.mjs";
 import { git } from "./publication-git.mjs";
-import { backlogPath } from "./workspace-publication-ownership.mjs";
+import {
+  backlogPath,
+  claimProvenance,
+} from "./workspace-publication-ownership.mjs";
 
-async function show(cwd, rev, path) {
+export async function show(cwd, rev, path) {
   try {
     return (await git(cwd, "show", `${rev}:${path}`)).stdout;
   } catch {
@@ -27,7 +33,7 @@ function within(root, path) {
   return relative(project, absolute).split(sep).join("/");
 }
 
-function selectedRegion(source, href) {
+export function selectedRegion(source, href) {
   if (source === null) return null;
   const home = readHome(source, href);
   const lines = home.document.lines.slice(home.region.start, home.region.end);
@@ -37,25 +43,66 @@ function selectedRegion(source, href) {
   return lines.join("\n");
 }
 
-async function unpublishedSource(integration, remoteRef, path, href) {
-  const base = (
+// The originating checkout's working-tree copy, or null when it has none.
+export function worktreeSource(root, path) {
+  try {
+    return readFileSync(join(root, path), "utf8");
+  } catch {
+    return null;
+  }
+}
+
+export async function mergeBase(integration, remoteRef) {
+  return (
     await git(integration, "merge-base", "HEAD", remoteRef)
   ).stdout.trim();
-  const head = await show(integration, "HEAD", path);
-  const index = await show(integration, "", path);
-  let worktree;
+}
+
+// The project path of the canonical home a backlog link names.
+export function canonicalHomePath(integration, href) {
+  return within(
+    integration,
+    posix.join(dirname(backlogPath), splitHref(href).path),
+  );
+}
+
+// The project path of the plan a canonical home's preparation declares.
+export function declaredPlanPath(integration, homePath, plan) {
+  return within(integration, posix.join(dirname(homePath), plan));
+}
+
+// The selected region, or undefined when the source lacks that story.
+function regionOf(source, href) {
+  if (!href) return source;
   try {
-    worktree = readFileSync(join(integration, path), "utf8");
-  } catch {
-    worktree = null;
+    return selectedRegion(source, href);
+  } catch (error) {
+    if (error instanceof BacklogError) return undefined;
+    throw error;
   }
-  const versions = [await show(integration, base, path), head, index, worktree];
-  const selected = versions.map((source) =>
-    href ? selectedRegion(source, href) : source,
-  );
-  return selected.some(
-    (value, index) => index > 0 && value !== selected[index - 1],
-  );
+}
+
+// Whether the originating checkout's HEAD, index or worktree holds a version
+// of the selected source that was never published: one matching neither its
+// merge base, fetched trunk, nor a `published` revision such as the claim
+// that admitted it and left its draft there.
+async function unpublishedSource(
+  integration,
+  remoteRef,
+  path,
+  href,
+  published,
+) {
+  const base = await mergeBase(integration, remoteRef);
+  const known = new Set();
+  for (const rev of [base, remoteRef, ...published])
+    known.add(regionOf(await show(integration, rev, path), href));
+  const local = [
+    await show(integration, "HEAD", path),
+    await show(integration, "", path),
+    worktreeSource(integration, path),
+  ];
+  return local.some((source) => !known.has(regionOf(source, href)));
 }
 
 export async function readPublishedExecutionSource(request, remoteRef) {
@@ -64,17 +111,23 @@ export async function readPublishedExecutionSource(request, remoteRef) {
   const entry = parseBacklog(backlog).entries.find(
     (item) => item.identity === request.identity,
   );
-  if (
-    !entry ||
-    (entry.list !== queueHeading &&
-      !(request.retained && entry.list === takenHeading))
-  )
+  if (!entry || (entry.list !== queueHeading && entry.list !== takenHeading))
     throw new Error("selected identity is not queued on fetched trunk");
+  // Outside claim recovery, Taken work is a continuation: only the claim's
+  // own publisher continues it, and only from ready published preparation.
+  let claim;
+  if (entry.list === takenHeading && !request.retained) {
+    claim = await claimProvenance(
+      request.integration,
+      remoteRef,
+      request.identity,
+      backlogPath,
+    );
+    if (!claim?.publisher || claim.publisher !== request.publisherId)
+      return { existing: entry, claim };
+  }
   const backlogDir = dirname(backlogPath);
-  const homePath = within(
-    request.integration,
-    posix.join(backlogDir, entry.href.split("#")[0]),
-  );
+  const homePath = canonicalHomePath(request.integration, entry.href);
   const home = await show(request.integration, remoteRef, homePath);
   if (home === null)
     throw new Error("selected canonical home is absent on fetched trunk");
@@ -83,9 +136,10 @@ export async function readPublishedExecutionSource(request, remoteRef) {
     throw new Error("selected canonical preparation or identity is unresolved");
   let planPath, plan, planTarget;
   if (preview.approach.kind === "planned") {
-    planPath = within(
+    planPath = declaredPlanPath(
       request.integration,
-      posix.join(dirname(homePath), preview.approach.plan),
+      homePath,
+      preview.approach.plan,
     );
     plan = await show(request.integration, remoteRef, planPath);
     if (plan === null) throw new Error("published plan is absent");
@@ -96,6 +150,8 @@ export async function readPublishedExecutionSource(request, remoteRef) {
       throw new Error("queued plan link disagrees with preparation");
     if (request.plan && request.plan !== planHref)
       throw new Error("requested plan disagrees with published preparation");
+  } else if (preview.approach.kind === "unselected") {
+    throw new Error("published approach is unselected");
   } else if (
     preview.approach.kind !== "planless" ||
     request.plan ||
@@ -112,12 +168,14 @@ export async function readPublishedExecutionSource(request, remoteRef) {
     throw new Error(
       `published preparation is ${preparation.assessment.status}`,
     );
+  const published = claim ? [claim.sha] : [];
   if (
     await unpublishedSource(
       request.integration,
       remoteRef,
       homePath,
       entry.href,
+      published,
     )
   )
     throw new Error(
@@ -125,10 +183,17 @@ export async function readPublishedExecutionSource(request, remoteRef) {
     );
   if (
     planPath &&
-    (await unpublishedSource(request.integration, remoteRef, planPath, null))
+    (await unpublishedSource(
+      request.integration,
+      remoteRef,
+      planPath,
+      null,
+      published,
+    ))
   )
     throw new Error("unpublished selected plan in originating checkout");
   return {
+    ...(claim ? { existing: entry, claim } : {}),
     entry,
     homePath,
     planPath,

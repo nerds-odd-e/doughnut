@@ -3,9 +3,23 @@
 // retained result, so the landing that publishes the result also ends it.
 // Rerunning after a rejected or already accepted landing reports what trunk
 // shows, and refuses to land a removal that would end a later allocation.
+// A story that has left the queue on fetched trunk stops the keep before
+// anything is staged: where the story went is the developer's to weigh.
 import { existsSync } from "node:fs";
 import { join } from "node:path";
-import { git } from "../../dough-execute-plan/scripts/publication-git.mjs";
+import {
+  queueHeading,
+  takenHeading,
+} from "../../dough-product-backlog/scripts/product-backlog-document.mjs";
+import { occupiedAssignments } from "../../dough-execute-plan/scripts/agent-assignments.mjs";
+import {
+  git,
+  revParse,
+} from "../../dough-execute-plan/scripts/publication-git.mjs";
+import {
+  backlogPath,
+  remoteRef,
+} from "../../dough-execute-plan/scripts/workspace-publication-ownership.mjs";
 import {
   alreadyReleased,
   assignmentFields,
@@ -13,8 +27,53 @@ import {
   noAssignment,
   requestOf,
   stop,
+  storyListAt,
   workspaceAssignment,
 } from "./preparation-assignment-ownership.mjs";
+
+// The developer's choices when the prepared story has left the queue; the
+// command makes none of them.
+const leftQueueChoices = [
+  {
+    choice: "abandon",
+    effect:
+      "end this preparation assignment with abandon; the draft stays in the workspace",
+  },
+  { choice: "discard", effect: "discard the retained draft" },
+  {
+    choice: "separate-work",
+    effect:
+      "take the draft's content up as separate work with the story's current owner",
+  },
+];
+
+// The stop for keeping assignment `own` when its story is no longer queued on
+// trunk `ref`, or undefined while it still is. Reports where the story is
+// now: Taken, with the execution assignments naming it, or absent.
+async function storyLeftQueue(request, ref, own) {
+  const { workspace, identity } = request;
+  const list = await storyListAt(workspace, ref, identity);
+  if (list === queueHeading) return undefined;
+  let story = { place: "absent" };
+  let where = "no longer lists it";
+  if (list === takenHeading) {
+    const held = await occupiedAssignments(workspace, ref, backlogPath);
+    const owners = held.filter(
+      (each) => each.activity === "execution" && each.identity === identity,
+    );
+    story = { place: "taken", owners };
+    const named = owners.map((each) => each.agent).join(", ");
+    where = `lists it as Taken${named ? ` by ${named}` : ""}`;
+  }
+  return stop("story-left-queue", {
+    ...assignmentFields(request, own),
+    workspace,
+    fetched: await revParse(workspace, ref),
+    story,
+    choices: leftQueueChoices,
+    error: `${ref} ${where}, so ${identity} is no longer queued; nothing was staged and nothing will land. The developer or coordinator decides what happens to this preparation`,
+  });
+}
 
 async function tracked(workspace, ...args) {
   try {
@@ -38,8 +97,8 @@ export async function releasePreparation(input) {
   const requested = requestOf("release", input);
   if (!requested.ok) return requested;
   const { request } = requested;
-  const { workspace, remote, target } = request;
-  const ref = `${remote}/${target}`;
+  const { workspace, remote } = request;
+  const ref = remoteRef(request);
   try {
     await git(workspace, "fetch", "--quiet", remote);
   } catch (error) {
@@ -59,6 +118,8 @@ export async function releasePreparation(input) {
   }
   if (found.state !== "held")
     return noAssignment(request, ref, found, "staged");
+  const left = await storyLeftQueue(request, ref, found.own);
+  if (left) return left;
   const { path } = found.own;
   const held = await presence(workspace, path);
   let staged;

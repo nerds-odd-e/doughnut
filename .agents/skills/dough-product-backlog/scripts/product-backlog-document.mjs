@@ -114,15 +114,24 @@ function readSection(lines, section) {
   return entries;
 }
 
-// The backlog lists each work item once, by identity and by canonical home:
-// the invariant a parsed document already satisfies.
+// Whether one entry's plan link names the document another entry lists as its
+// canonical home: a plan attached to a story is part of that story's work, so
+// listing the plan again as a home of its own would list the work twice.
+function planOfOther(entry, other) {
+  return entry.plan?.target === other.href || other.plan?.target === entry.href;
+}
+
+// The backlog lists each work item once, by identity, by canonical home, and
+// by the plan a story links: the invariant a parsed document already satisfies.
 function requireDistinctWork(entries) {
   for (const entry of entries) {
     const clash = entries.find(
       (other) =>
         other !== entry &&
         other.index < entry.index &&
-        (other.identity === entry.identity || other.href === entry.href),
+        (other.identity === entry.identity ||
+          other.href === entry.href ||
+          planOfOther(entry, other)),
     );
     if (clash) {
       throw new BacklogError(
@@ -134,19 +143,52 @@ function requireDistinctWork(entries) {
   }
 }
 
+// An entry other than `carried`, the one an operation is writing, that
+// already lists what `listsIt` looks for.
+function otherEntry(document, carried, listsIt) {
+  return document.entries.find((other) => other !== carried && listsIt(other));
+}
+
 // The same invariant asked forwards, about a home an operation is about to
 // write: no other entry may already link it. Writing a new entry and
 // repointing an existing one both ask this; `carried` is the entry being
 // repointed, which never clashes with itself.
 export function requireUnlistedHome(document, href, carried) {
-  const listed = document.entries.find(
-    (other) => other !== carried && other.href === href,
-  );
+  const listed = otherEntry(document, carried, (other) => other.href === href);
   if (listed) {
     throw ambiguousHome(
       `the canonical home "${href}" is already listed in ` +
         `"## ${listed.list}" at line ${listed.index + 1} as identity ` +
         `"${listed.identity}".`,
+    );
+  }
+  const linking = otherEntry(
+    document,
+    carried,
+    (other) => other.plan?.target === href,
+  );
+  if (linking) {
+    throw ambiguousHome(
+      `"${href}" is already the plan of "${linking.identity}" in ` +
+        `"## ${linking.list}" at line ${linking.index + 1}; that entry ` +
+        `already lists this work.`,
+    );
+  }
+}
+
+// The same invariant asked of a plan link an operation is about to write: the
+// plan must not already be listed as another entry's canonical home.
+export function requireUnlistedPlan(document, target, carried) {
+  const listed = otherEntry(
+    document,
+    carried,
+    (other) => other.href === target,
+  );
+  if (listed) {
+    throw ambiguousHome(
+      `the plan "${target}" is already listed in "## ${listed.list}" at ` +
+        `line ${listed.index + 1} as the canonical home of ` +
+        `"${listed.identity}"; linking it again would list that work twice.`,
     );
   }
 }

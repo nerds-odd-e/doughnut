@@ -6,14 +6,24 @@ Refine unresolved stories in their seeds. Once goal, scope, and key examples are
 understood and planning is authorized, write/refine one active executable plan.
 A plan does not decide story scope; a seed alone does not authorize execution.
 
-An evidenced bounded retrospective correction may instead use its active plan
-as the authoritative input when the plan contains its source and provenance,
-beneficiary and bounded outcome, current findings and scope, preserved promises
-and genuine constraints, observable proof ownership, current decisions, and
-executable slices. An existing seed can add context but is not required. Name
-whichever required correction field is missing and stop that path; do not create
-or recover a seed to fill the gap. Resolve disputed product constraints through
-the shared
+An evidenced bounded retrospective correction is a work item with correction
+input instead of a refined feature story. A new correction gets a minimal story
+in a suitable seed before its plan is written: reuse the reviewed story's seed
+or another seed whose problem hosts it, and create one under the
+[seed format](../../dough-story-decomposition/references/seed-format.md) only
+when none fits. That story records its `**Identity:**`, a **Goal** naming the
+beneficiary and bounded correction outcome, the bounded **Scope**, and a link
+to the plan; it adds no feature promise. The plan records the story's identity
+under [work item identity](../../dough-product-backlog/references/identity.md)
+and holds the rest of the correction input: source and provenance, current
+findings, preserved promises and genuine constraints, observable proof
+ownership, current decisions, and executable slices.
+
+An existing correction whose plan is already its canonical home keeps that home
+and its recorded identity, with the whole correction input in that plan. Do not
+migrate it or create a seed for it. For either kind, name whichever
+required correction field is missing and stop that path; do not invent it.
+Resolve disputed product constraints through the shared
 [plan-conflict handoff](../../dough-execute-plan/references/execution-decisions.md#resolve-a-disputed-plan-restriction),
 leaving the decision with the human.
 
@@ -73,8 +83,9 @@ boundary or structure for deferred behavior.
 
 ## Update a feature story in its seed
 
-For feature stories, use this section. Corrections keep outcome, scope, proof,
-and decisions in their active plan under the correction-input contract above.
+For feature stories, use this section. A correction story stays minimal under
+the correction-input contract above; findings, proof, and decisions stay in its
+plan.
 
 Follow the shared
 [seed format](../../dough-story-decomposition/references/seed-format.md) for
@@ -210,9 +221,9 @@ external-wait exception that decomposition cannot reduce.
 Keep enduring behavior in tests and product documentation, and enduring design
 in code and ADRs. Once that knowledge is captured, reduce each implemented
 feature story's refinement detail to Goal and Scope, including exclusions,
-while the plan and review evidence still exist. A bounded correction remains in
-its plan; do not create a seed as cleanup ceremony. Retain unfinished siblings
-and correction plans.
+while the plan and review evidence still exist. A correction story is already
+minimal, and a plan-homed correction stays in its plan; do not create a seed as
+cleanup ceremony. Retain unfinished siblings and correction plans.
 
 When the executable plan completes, keep the plan, its feature-story source when
 applicable, and review inputs for retrospective and

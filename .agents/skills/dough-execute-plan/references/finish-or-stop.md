@@ -34,9 +34,9 @@ the recorded product advice, CI verdict or limitation, shutdown evidence, and
 Continue in the recorded execution project/checkout. Supply available references/context:
 source contract, original plan and approved changes, attributable commits, decisions, proof,
 delivery state, CI limitations, and checkout/branch identity. Supply the execution checkout
-path as the retrospective's write location, so its process findings and correction plans stay
-with this execution's changes and enter its completion commit. Trunk Mode attributable commits
-are that identity's retained published revisions, not another ledger or a
+path as the retrospective's write location, so its process findings and correction stories
+and plans stay with this execution's changes and enter its completion commit. Trunk Mode
+attributable commits are that identity's retained published revisions, not another ledger or a
 rewrite's unpublished SHA. Include an initial quick attempt and its planned
 continuation as one execution. Pass existing context to retrospective, which
 validates attribution and follows its
@@ -90,7 +90,7 @@ continue across following lines or list items until the next `## ` heading.
 Write `retrospective skipped` when this execution skipped the retrospective,
 and `product review skipped` when the review ran with `--skip-product`. Commit
 the record together with the retrospective's records written in the execution
-checkout — a correction plan, `DearDough.md` process findings — as one commit
+checkout — a correction story and plan, `DearDough.md` process findings — as one commit
 under this project's commit conventions. The commit changes records only, so
 accepted slice proof still applies. Publish it through
 [increment delivery](trunk-publication.md#publish-an-execution-increment-or-repair)

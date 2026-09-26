@@ -24,9 +24,9 @@ target, hard limit, exceptions, overrun policy, and the plan lifecycle.
 Identify whether the plan's source is a selected feature story or a bounded
 retrospective correction under
 [planning scope and lifecycle](../dough-story-refinement/references/planning.md#choose-the-planning-level).
-For a complete correction, use the plan's outcome, findings, scope, proof,
-decisions, and slices directly; do not require or create a seed. Name whichever
-required correction field is missing and stop. A complete plan permits
+For a complete correction, use its correction input directly from its story
+and plan, or from a plan-homed correction's plan alone; create no seed. Name
+whichever required correction field is missing and stop. A complete plan permits
 refinement, not execution; preserve the invoking instruction's authorization
 boundary. Before revising boundaries, apply the shared
 [reassessment decision](../dough-execute-plan/references/execution-decisions.md#reassess-before-extending-work).
@@ -73,7 +73,7 @@ do not repeat PFE or create a new direction topic merely because slices are
 being refined.
 
 Preserve completed slices, applicable evidence, and the selected story's goal
-and scope or the correction plan's bounded outcome and scope.
+and scope or the correction's bounded outcome and scope.
 
 Assess the cumulative design, including how remaining examples build on
 completed slices, then classify each remaining boundary:

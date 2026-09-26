@@ -1,7 +1,11 @@
 // Establish or reuse matching CI observation for managed delivery: live
 // mailbox match, host-bridge readiness, start, and coordinator binding.
 // Resume recovers only an unambiguous live owner; it never starts a replacement.
-import { bindHostObserver, verifyHostBridge } from "./ci-host-bridge.mjs";
+import {
+  bindHostObserver,
+  resolveHostSession,
+  verifyHostBridge,
+} from "./ci-host-bridge.mjs";
 import { receiptPrefix, startExecutionMailbox } from "./ci-mailbox.mjs";
 import {
   classifyMatchingObservationOwnership,
@@ -84,9 +88,11 @@ export async function establishObservation({
     };
   }
 
+  // One resolved owner for both readiness and binding.
+  const owner = resolveHostSession({ host, session, env });
   const bridge = await verifyHostBridge({
     host,
-    session,
+    session: owner,
     workspace,
     hookPath: runtime.hookEntrypoint,
     env,
@@ -113,7 +119,7 @@ export async function establishObservation({
   const startReceipt = `${receiptPrefix}${JSON.stringify({ directory })}\n`;
   const binding = await bindHostObserver({
     host,
-    session,
+    session: owner,
     receipt: startReceipt,
     workspace,
     hookPath: runtime.hookEntrypoint,

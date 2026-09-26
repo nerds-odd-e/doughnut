@@ -1,5 +1,7 @@
 // Select or reuse the owned execution workspace, then commit the Taken claim
-// there. Publication of that SHA is a separate step.
+// there: a queued entry's Take, or an admission that also carries the
+// accepted story's reconciled canonical content. Publication of that SHA is a
+// separate step.
 import { dirname, join } from "node:path";
 import { existsSync, mkdirSync, writeFileSync } from "node:fs";
 import {
@@ -7,15 +9,18 @@ import {
   renderAgentProfile,
 } from "../../dough-product-backlog/scripts/product-backlog-agent-profile.mjs";
 import { applyToBacklog } from "../../dough-product-backlog/scripts/product-backlog-store.mjs";
-import { takeEntry } from "../../dough-product-backlog/scripts/product-backlog-take.mjs";
+import {
+  admitEntry,
+  takeEntry,
+} from "../../dough-product-backlog/scripts/product-backlog-take.mjs";
 import { git, revParse } from "./publication-git.mjs";
 import {
   claimCommitMessage,
   isAncestor,
   pathOf,
   remoteOf,
+  remoteRef,
   stopped,
-  targetOf,
   trailers,
 } from "./workspace-publication-ownership.mjs";
 import { configureAgentAuthorship } from "./workspace-agent-authorship.mjs";
@@ -36,10 +41,7 @@ async function stageAgentProfile(request, { identity, profile }) {
       name: agent.name,
       identity: request.identity,
       mode: request.mode,
-      branch:
-        request.mode === "trunk"
-          ? `${remoteOf(request)}/${targetOf(request)}`
-          : request.branch,
+      branch: request.mode === "trunk" ? remoteRef(request) : request.branch,
       host: agent.host,
       model: agent.model,
     }),
@@ -103,11 +105,9 @@ async function verifyRetained(request) {
 
 export async function selectOwnedWorkspace(request) {
   if (request.retained?.workspace) return verifyRetained(request);
-  const remote = remoteOf(request);
-  const target = targetOf(request);
   try {
-    await git(request.integration, "fetch", remote);
-    const base = await revParse(request.integration, `${remote}/${target}`);
+    await git(request.integration, "fetch", remoteOf(request));
+    const base = await revParse(request.integration, remoteRef(request));
     if (existsSync(request.workspace)) {
       const actual = await revParse(request.workspace, "--show-toplevel");
       const branch = (
@@ -193,13 +193,27 @@ export async function commitWorkspaceClaim(request) {
   }
   // The agent was chosen on this starting revision, so its profile is free.
   const agentProfile = request.agent && agentProfileOf(request, file);
+  const { admission } = request;
+  // Admitted content lands before the entry, whose home and plan must resolve.
+  for (const { path, content } of admission?.files ?? []) {
+    mkdirSync(dirname(join(workspace, path)), { recursive: true });
+    writeFileSync(join(workspace, path), content);
+    await git(workspace, "add", "--", path);
+  }
   let outcome;
   await applyToBacklog(join(workspace, file), (source) => {
-    outcome = takeEntry(source, {
+    const entryRequest = {
       identity,
       ...(request.plan === undefined ? {} : { plan: request.plan }),
       backlogDirectory: dirname(join(workspace, file)),
-    });
+    };
+    outcome = admission
+      ? admitEntry(source, {
+          ...entryRequest,
+          title: admission.title,
+          href: admission.href,
+        })
+      : takeEntry(source, entryRequest);
     return outcome.source;
   });
   if (outcome.result === "unchanged") {
@@ -215,7 +229,7 @@ export async function commitWorkspaceClaim(request) {
     "commit",
     ...(agentProfile ? [`--author=${agent} <${email}>`] : []),
     "-m",
-    claimCommitMessage(identity, publisherId),
+    claimCommitMessage(identity, publisherId, Boolean(admission)),
   );
   return {
     ok: true,

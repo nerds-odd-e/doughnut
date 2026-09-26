@@ -25,6 +25,11 @@ export function acceptedReceipt(
       : {}),
     ...(request.remote ? {} : { remote: remoteOf(request) }),
     ...(request.plan || !source.planTarget ? {} : { plan: source.planTarget }),
+    // The drafted canonical files this admission published from the
+    // originating checkout, whose own copies stay as they were.
+    ...(source.admission
+      ? { admitted: source.admission.files.map(({ path }) => path) }
+      : {}),
     created: publication.created ?? selected.created,
     ...reportedMaintenance(afterMaintenance, beforeMaintenance),
   };

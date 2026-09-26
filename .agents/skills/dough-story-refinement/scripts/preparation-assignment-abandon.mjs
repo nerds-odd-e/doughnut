@@ -1,9 +1,13 @@
-// Explicit abandonment of a preparation: publishes the end of this
-// workspace's own assignment as a coordination-only commit on fetched trunk
-// that removes exactly its profile. The workspace's HEAD, index, draft and
-// commits are untouched, so the result stays recoverable for keep or discard.
-// Each attempt rereads trunk first, so a repeated or delayed abandonment
-// never ends a later allocation of the same name.
+// Explicit abandonment of a preparation: publishes the end of one assignment
+// as a coordination-only commit on fetched trunk that removes exactly its
+// profile. Addressed by workspace, it ends that workspace's own assignment
+// and leaves its HEAD, index, draft and commits untouched, so the result
+// stays recoverable for keep or discard. Addressed by profile path and
+// allocation from the integration checkout, it ends a lost workspace's
+// assignment once the developer confirms that exact one is abandoned, without
+// touching that checkout's files, index or HEAD. Each attempt rereads trunk
+// first, so a repeated or delayed abandonment never ends a later allocation
+// of the same name.
 import { mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -15,6 +19,8 @@ import {
   revParse,
   tryPushExactRef,
 } from "../../dough-execute-plan/scripts/publication-git.mjs";
+import { remoteRef } from "../../dough-execute-plan/scripts/workspace-publication-ownership.mjs";
+import { addressedAssignment } from "./preparation-assignment-lost-workspace.mjs";
 import {
   alreadyReleased,
   assignmentFields,
@@ -26,8 +32,9 @@ import {
 } from "./preparation-assignment-ownership.mjs";
 
 // A commit on `tip` whose only change removes `own`'s profile, built in a
-// scratch index so the workspace's own index and files stay as they are.
-async function endingCommit(workspace, tip, own, identity) {
+// scratch index so the checkout's own index and files stay as they are.
+async function endingCommit(cwd, tip, own) {
+  const { identity } = own.profile;
   const scratch = mkdtempSync(join(tmpdir(), "dough-abandon-"));
   const { agent, email } = agentIdentity(own.name);
   const env = {
@@ -37,7 +44,7 @@ async function endingCommit(workspace, tip, own, identity) {
     GIT_AUTHOR_EMAIL: email,
   };
   const run = async (...args) =>
-    (await exec("git", args, { cwd: workspace, env })).stdout.trim();
+    (await exec("git", args, { cwd, env })).stdout.trim();
   try {
     await run("read-tree", tip);
     await run("update-index", "--force-remove", "--", own.path);
@@ -59,23 +66,23 @@ async function endingCommit(workspace, tip, own, identity) {
 // which also settles whether a push with a lost response was accepted.
 const attempts = 2;
 
-export async function abandonPreparation(input) {
-  const requested = requestOf("abandon", input);
-  if (!requested.ok) return requested;
-  const { request } = requested;
-  const { workspace, remote, target, identity } = request;
-  const ref = `${remote}/${target}`;
+// Publishes the end of the assignment `locate(ref)` finds held on fetched
+// trunk, reading and pushing from the checkout `cwd`. `place` is what every
+// receipt says about where the request ran.
+async function publishEnding(request, cwd, place, locate) {
+  const { remote, target } = request;
+  const ref = remoteRef(request);
   let candidate;
   for (let pass = 0; ; pass += 1) {
     let found;
     try {
-      await git(workspace, "fetch", "--quiet", remote);
-      found = await workspaceAssignment(request, ref);
+      await git(cwd, "fetch", "--quiet", remote);
+      found = await locate(ref);
     } catch (error) {
       if (candidate === undefined)
-        return stop("source-refused", { workspace, error: errorText(error) });
+        return stop("source-refused", { ...place, error: errorText(error) });
       return stop("unconfirmed", {
-        workspace,
+        ...place,
         candidateSha: candidate,
         error: `whether trunk accepted the end of the assignment is unknown; rerun abandon: ${errorText(error)}`,
       });
@@ -86,33 +93,46 @@ export async function abandonPreparation(input) {
       return {
         ok: true,
         status: "abandoned",
-        ...assignmentFields(request, found.own),
+        ...assignmentFields(found.own.profile, found.own),
         publishedSha: candidate,
-        workspace,
+        ...place,
         refresh: await maintenance(request),
       };
     }
-    if (found.state !== "held")
-      return noAssignment(request, ref, found, "published");
+    if (found.state !== "held") return found.receipt;
     if (pass === attempts)
       return stop("unpublished", {
-        ...assignmentFields(request, found.own),
-        workspace,
+        ...assignmentFields(found.own.profile, found.own),
+        ...place,
         candidateSha: candidate,
         error:
           "remote trunk did not accept the end of the assignment; it is still published",
       });
-    const tip = await revParse(workspace, ref);
-    candidate = await endingCommit(workspace, tip, found.own, identity);
+    const tip = await revParse(cwd, ref);
+    candidate = await endingCommit(cwd, tip, found.own);
     try {
-      await tryPushExactRef(
-        workspace,
-        candidate,
-        remote,
-        `refs/heads/${target}`,
-      );
+      await tryPushExactRef(cwd, candidate, remote, `refs/heads/${target}`);
     } catch {
       // The response is lost or refused: the next read of trunk decides.
     }
   }
+}
+
+export async function abandonPreparation(input) {
+  const requested = requestOf("abandon", input);
+  if (!requested.ok) return requested;
+  const { request } = requested;
+  if (request.profile !== undefined)
+    return publishEnding(request, request.integration, {}, (ref) =>
+      addressedAssignment(request, ref),
+    );
+  const { workspace } = request;
+  return publishEnding(request, workspace, { workspace }, async (ref) => {
+    const found = await workspaceAssignment(request, ref);
+    if (found.state === "held" || found.state === "ended") return found;
+    return {
+      state: "stopped",
+      receipt: noAssignment(request, ref, found, "published"),
+    };
+  });
 }
