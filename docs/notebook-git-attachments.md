@@ -111,7 +111,13 @@ it again, so one upload is exactly one commit. A name that a file, note or
 folder in that folder already uses (ignoring case, under the one set of names),
 or one that is not a plain filename (empty, containing `/`, or starting with
 `.`), is refused with a message naming the path; nothing is renamed or
-overwritten. A notebook without an LFS binding refuses the upload. Uploading a
+overwritten. The upload is a picture by its filename extension alone, from the
+same list the picture address serves (PNG, JPEG, GIF and WebP, ignoring case);
+the content type the browser declares and the bytes are not checked. Any other
+extension is refused with a message naming png, jpg, jpeg, gif and webp, and a
+file over 10 MiB (10,485,760 bytes, inclusive) is refused with a message naming
+the limit; nothing is stored. An accepted upload appears in the sidebar
+listing at once. A notebook without an LFS binding refuses the upload. Uploading a
 replacement picture leaves the previous file in the folder: it stays part of the
 notebook and its Git history until someone deletes it.
 
