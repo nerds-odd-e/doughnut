@@ -7,7 +7,7 @@ const MAX_POINTER_BYTES = 1024
 const POINTER =
   /^version https:\/\/git-lfs\.github\.com\/spec\/v1\noid sha256:([0-9a-f]{64})\nsize (0|[1-9][0-9]*)\n$/
 
-export type ParsedLfsPointer = { sha256Hex: string; size: number }
+type ParsedLfsPointer = { sha256Hex: string; size: number }
 
 export function isEmptyLfsFile(bytes: Buffer): boolean {
   return bytes.length === 0

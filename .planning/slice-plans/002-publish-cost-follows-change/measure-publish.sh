@@ -9,6 +9,7 @@
 #   BASE_URL    Development stack origin (default http://127.0.0.1:5175)
 #   LOGIN       basic-auth user:password (default manual:password)
 #   WORK_ROOT   scratch root (default /Users/terryyin/.claude/jobs/f1831243/tmp/measure-publish)
+#   REUSE_RUN   earlier run id whose notebooks and token to measure again, skipping setup
 set -euo pipefail
 
 CHECKOUT=$(cd "$(dirname "$0")/../../.." && pwd)
@@ -17,14 +18,15 @@ BASE_URL=${BASE_URL:-http://127.0.0.1:5175}
 LOGIN=${LOGIN:-manual:password}
 WORK_ROOT=${WORK_ROOT:-/Users/terryyin/.claude/jobs/f1831243/tmp/measure-publish}
 RUN=$(date +%Y%m%d-%H%M%S)
-WORK=$WORK_ROOT/$RUN
+SETUP_RUN=${REUSE_RUN:-$RUN}
+WORK=$WORK_ROOT/$SETUP_RUN
 mkdir -p "$WORK/cfg"
 
 export DONUT_API_BASE_URL=$BASE_URL DONUT_CONFIG_DIR=$WORK/cfg
-TOKEN=$(curl -sf -u "$LOGIN" -X POST -H 'Content-Type: application/json' \
+[ -n "${REUSE_RUN:-}" ] || TOKEN=$(curl -sf -u "$LOGIN" -X POST -H 'Content-Type: application/json' \
   -d "{\"label\":\"measure-$RUN\"}" "$BASE_URL/api/user/generate-token" |
   node -e 'process.stdout.write(JSON.parse(require("fs").readFileSync(0)).token)')
-printf '{"token":"%s"}\n' "$TOKEN" >"$WORK/cfg/access-tokens.json"
+[ -n "${REUSE_RUN:-}" ] || printf '{"token":"%s"}\n' "$TOKEN" >"$WORK/cfg/access-tokens.json"
 
 cli() { $DONUT_CLI "$@" >>"$WORK/cli.log" 2>&1 || { tail -5 "$WORK/cli.log"; exit 1; }; }
 
@@ -55,7 +57,7 @@ note_commits() { # dir count publish-each(yes|no)
   return 0
 }
 
-RESULTS=$WORK/results.md
+RESULTS=$WORK/results-$RUN.md
 echo "| Run $RUN | Publish | Wall s | CLI user+sys s | CLI git processes |" >"$RESULTS"
 echo "| --- | --- | --- | --- | --- |" >>"$RESULTS"
 
@@ -71,9 +73,11 @@ measure() { # label dir
   echo "| | $1 | $real | $(echo "$user + $sys" | bc) ($user + $sys) | $count |" | tee -a "$RESULTS"
 }
 
-A=A-$RUN
-B=B-$RUN
+A=A-$SETUP_RUN
+B=B-$SETUP_RUN
 echo "work: $WORK"
+
+if [ -z "${REUSE_RUN:-}" ]; then
 
 echo "setup A: 12 x 8,912,896-byte files, then 40 note commits published one by one"
 new_notebook "$A"
@@ -90,16 +94,17 @@ commit "$WORK/$B" "many files"
 publish "$WORK/$B"
 note_commits "$WORK/$B" 45 no
 publish "$WORK/$B"
+fi
 
-note "$WORK/$A" n-01 "Note 01, edited."
+note "$WORK/$A" n-01 "Note 01, edited in $RUN."
 commit "$WORK/$A" "one-line edit"
 measure "A one-line edit" "$WORK/$A"
 
-note "$WORK/$B" n-01 "Note 01, edited."
+note "$WORK/$B" n-01 "Note 01, edited in $RUN."
 commit "$WORK/$B" "one-line edit"
 measure "B one-line edit" "$WORK/$B"
 
-files "$WORK/$A" 12 8912896 new
+files "$WORK/$A" 12 8912896 "new-$RUN"
 commit "$WORK/$A" "twelve new files"
 measure "A +12 files (100 MB)" "$WORK/$A"
 

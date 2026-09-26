@@ -128,7 +128,7 @@ Change:
 ### 2. The CLI uploads only the file contents the unpublished commits change
 
 Type: Behavior
-Status: planned
+Status: done
 Proof: new cost case in `cli/tests/notebookPublish.lfs.test.ts` (example 1:
 equal git process count for an accepted history of 1 commit vs 20 commits × 10
 attachments, and no `lfs push`; examples 3 and 4: pushed ids are exactly the
@@ -192,3 +192,27 @@ suites (19 tests); full backend 2,660 green; e2e `cli_notebook_lfs.feature`
 checkout's backend, so the rerun from this story branch measures the CLI
 (slice 2) against the unchanged server; the server-side timing rerun happens
 after integration to main, when the dev backend reloads the change.
+
+**CLI after slice 2, server pre-change (2026-09-26, run 20260926-213341;
+`REUSE_RUN=20260926-204034 measure-publish.sh` on the baseline notebooks, now
+3–5 accepted commits longer and A holding 24 more files):**
+
+| Publish | Wall s | CLI user+sys s | CLI git processes |
+| --- | --- | --- | --- |
+| A one-line edit | 1.53 | 0.34 (0.21 + 0.13) | 17 (was 580) |
+| B one-line edit | 7.68 | 0.49 (0.25 + 0.24) | 17 (was 49,797) |
+| A +12 files (100 MB) | 2.10 | 0.50 (0.27 + 0.23) | 20 (was 617) |
+| A one changed 8.5 MB file | 2.08 | 0.49 (0.29 + 0.20) | 20 (was 642) |
+
+The CLI git process count no longer depends on accepted history or unchanged
+files, and CLI CPU time is under 0.5 s everywhere. The remaining wall time is
+the pre-change server plus transfers; B's 7.7 s awaits the server rerun after
+integration.
+
+**Slice 2 accepted proof:** `cli/tests/notebookPublish.lfs.test.ts` "costs
+what the unpublished commits change" (equal git process count for 1 vs 20
+accepted commits × 10 attachments and no push; pushed ids exactly
+`[oid(101), oid(102)]` / `[oid(201)]`; all red before the change), and the
+converted-history test now asserts exactly `[OID_B]` is pushed; `pnpm
+cli:test` 468 green; e2e LFS 10/10 and size admission 1/1. The raw `--raw -z`
+parser is shared with accepted-commit changes (`parseRawChangesZ`).

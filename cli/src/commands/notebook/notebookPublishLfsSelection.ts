@@ -1,14 +1,11 @@
 import { spawnSync } from 'node:child_process'
 import { exceptionText } from '../../exceptionText.js'
 import {
-  isEmptyLfsFile,
-  type ParsedLfsPointer,
-  parseLfsPointer,
-} from './notebookLfsPointer.js'
+  type CommitChange,
+  parseRawChangesZ,
+} from './notebookAcceptedCommitChanges.js'
+import { isEmptyLfsFile, parseLfsPointer } from './notebookLfsPointer.js'
 import { runSystemGitOrThrow } from './systemGit.js'
-
-/** Inclusive attachment size limit; must match NotebookGitAttachmentSizeAdmission.LIMIT_BYTES. */
-const LIMIT_BYTES = 10_485_760
 
 function isAttachment(path: string): boolean {
   if (path.endsWith('.md')) return false
@@ -19,191 +16,96 @@ function isAttachment(path: string): boolean {
   return true
 }
 
-function readBlobBytes(directory: string, blobId: string): Buffer {
-  const result = spawnSync(
-    'git',
-    ['-C', directory, 'cat-file', 'blob', blobId],
-    { encoding: 'buffer' }
-  )
+/** Attachment changes the first-parent unpublished commits add or modify. */
+function changedAttachments(
+  directory: string,
+  acceptedHead: string,
+  proposedHead: string
+): CommitChange[] {
+  return parseRawChangesZ(
+    runSystemGitOrThrow(
+      [
+        '-C',
+        directory,
+        'log',
+        '--first-parent',
+        '--raw',
+        '-z',
+        '--no-renames',
+        '--no-abbrev',
+        '--format=',
+        `${acceptedHead}..${proposedHead}`,
+      ],
+      (detail, status) =>
+        `failed to list unpublished first-parent changes${
+          detail ? `: ${detail}` : ` (exit code ${status})`
+        }`
+    )
+  ).filter(({ status, path }) => status !== 'D' && isAttachment(path))
+}
+
+/** Contents of `blobIds`, in order, from one `git cat-file --batch`. */
+function readBlobs(directory: string, blobIds: string[]): Buffer[] {
+  const result = spawnSync('git', ['-C', directory, 'cat-file', '--batch'], {
+    input: `${blobIds.join('\n')}\n`,
+    maxBuffer: Number.POSITIVE_INFINITY,
+  })
   if (result.error) {
     throw new Error(
       `git is required but could not be run: ${exceptionText(result.error)}`
     )
   }
   if (result.status !== 0) {
-    const detail = Buffer.concat([
-      result.stderr ?? Buffer.alloc(0),
-      result.stdout ?? Buffer.alloc(0),
-    ])
-      .toString('utf8')
-      .trim()
     throw new Error(
-      `failed to read Git blob ${blobId}${
-        detail ? `: ${detail}` : ` (exit code ${result.status})`
-      }`
+      `failed to read Git blobs: ${result.stderr.toString('utf8').trim()}`
     )
   }
-  return result.stdout as Buffer
-}
-
-function attachmentBlobIds(
-  directory: string,
-  commitId: string
-): Map<string, string> {
-  const raw = runSystemGitOrThrow(
-    ['-C', directory, 'ls-tree', '-r', '-z', commitId],
-    (detail, status) =>
-      `failed to list tree at ${commitId}${
-        detail ? `: ${detail}` : ` (exit code ${status})`
-      }`
-  )
-  const blobs = new Map<string, string>()
-  for (const entry of raw.split('\0')) {
-    if (entry === '') continue
-    const tab = entry.indexOf('\t')
-    if (tab < 0) continue
-    const meta = entry.slice(0, tab)
-    const filePath = entry.slice(tab + 1)
-    if (!isAttachment(filePath)) continue
-    const parts = meta.split(' ')
-    if (parts.length < 3 || parts[1] !== 'blob') continue
-    blobs.set(filePath, parts[2]!)
+  const out = result.stdout
+  const blobs: Buffer[] = []
+  let offset = 0
+  for (const _ of blobIds) {
+    const headerEnd = out.indexOf(0x0a, offset)
+    const size = Number(
+      out.subarray(offset, headerEnd).toString('utf8').split(' ')[2]
+    )
+    blobs.push(out.subarray(headerEnd + 1, headerEnd + 1 + size))
+    offset = headerEnd + 1 + size + 1
   }
   return blobs
 }
 
-type AttachmentAt = { filePath: string; pointer: ParsedLfsPointer | undefined }
-
-/** Non-empty attachments at a commit, with their LFS pointer when the blob is one. */
-function nonEmptyAttachmentsAt(
-  directory: string,
-  commitId: string
-): AttachmentAt[] {
-  const attachments: AttachmentAt[] = []
-  for (const [filePath, blobId] of attachmentBlobIds(directory, commitId)) {
-    const bytes = readBlobBytes(directory, blobId)
-    if (isEmptyLfsFile(bytes)) continue
-    attachments.push({ filePath, pointer: parseLfsPointer(bytes) })
-  }
-  return attachments
-}
-
-function requireLfsPointer({
-  filePath,
-  pointer,
-}: AttachmentAt): ParsedLfsPointer {
-  if (!pointer) {
-    throw new Error(
-      `Attachment "${filePath}" must be a Git LFS pointer or empty file.`
-    )
-  }
-  return pointer
-}
-
-/** Accepted history may hold raw blobs from before the notebook was converted to LFS. */
-function attachmentPayloadDigestsInHistory(
-  directory: string,
-  head: string
-): Set<string> {
-  const digests = new Set<string>()
-  const commits = runSystemGitOrThrow(
-    ['-C', directory, 'rev-list', head],
-    (detail, status) =>
-      `failed to walk accepted history from ${head}${
-        detail ? `: ${detail}` : ` (exit code ${status})`
-      }`
-  )
-    .split('\n')
-    .filter((line) => line !== '')
-  for (const commitId of commits) {
-    for (const { pointer } of nonEmptyAttachmentsAt(directory, commitId)) {
-      if (pointer) digests.add(pointer.sha256Hex)
-    }
-  }
-  return digests
-}
-
-function firstParentRangeExclusiveStart(
-  directory: string,
-  acceptedHead: string,
-  proposedHead: string
-): string[] {
-  if (acceptedHead === proposedHead) return []
-  return runSystemGitOrThrow(
-    [
-      '-C',
-      directory,
-      'rev-list',
-      '--first-parent',
-      '--reverse',
-      `${acceptedHead}..${proposedHead}`,
-    ],
-    (detail, status) =>
-      `failed to list unpublished first-parent range${
-        detail ? `: ${detail}` : ` (exit code ${status})`
-      }`
-  )
-    .split('\n')
-    .filter((line) => line !== '')
-}
-
-function isNewOversizedIntermediateOnly(
-  claimedSize: number,
-  previouslyAccepted: boolean,
-  referencedAtTip: boolean
-): boolean {
-  return claimedSize > LIMIT_BYTES && !previouslyAccepted && !referencedAtTip
-}
-
 /**
- * Digests that must be uploaded before bundle submission. Aligns with
- * NotebookGitAttachmentSizeAdmission: omit only new oversized intermediate-only
- * payloads; previously accepted and tip-referenced digests stay required.
+ * Digests to upload before bundle submission: the LFS objects that the
+ * first-parent unpublished commits add or change.
  */
 export function selectRequiredLfsObjectIds(
   directory: string,
   acceptedHead: string,
   proposedHead: string
 ): string[] {
-  const grandfathered = attachmentPayloadDigestsInHistory(
+  const changed = changedAttachments(directory, acceptedHead, proposedHead)
+  if (changed.length === 0) return []
+  const contents = readBlobs(
     directory,
-    acceptedHead
+    changed.map(({ dstBlob }) => dstBlob)
   )
-  const tipDigests = new Set(
-    nonEmptyAttachmentsAt(directory, proposedHead).map(
-      (attachment) => requireLfsPointer(attachment).sha256Hex
-    )
-  )
-  const inspectedSizes = new Map<string, number>()
-  const required: string[] = []
-  for (const commitId of firstParentRangeExclusiveStart(
-    directory,
-    acceptedHead,
-    proposedHead
-  )) {
-    for (const attachment of nonEmptyAttachmentsAt(directory, commitId)) {
-      const parsed = requireLfsPointer(attachment)
-      const seenSize = inspectedSizes.get(parsed.sha256Hex)
-      if (seenSize !== undefined) {
-        if (seenSize !== parsed.size) {
-          throw new Error(
-            `Attachment "${attachment.filePath}" references corrupt LFS object sha256:${parsed.sha256Hex}.`
-          )
-        }
-        continue
-      }
-      inspectedSizes.set(parsed.sha256Hex, parsed.size)
-      if (
-        isNewOversizedIntermediateOnly(
-          parsed.size,
-          grandfathered.has(parsed.sha256Hex),
-          tipDigests.has(parsed.sha256Hex)
-        )
-      ) {
-        continue
-      }
-      required.push(parsed.sha256Hex)
+  const sizes = new Map<string, number>()
+  changed.forEach(({ path }, i) => {
+    const bytes = contents[i]!
+    if (isEmptyLfsFile(bytes)) return
+    const pointer = parseLfsPointer(bytes)
+    if (!pointer) {
+      throw new Error(
+        `Attachment "${path}" must be a Git LFS pointer or empty file.`
+      )
     }
-  }
-  return required
+    const seenSize = sizes.get(pointer.sha256Hex)
+    if (seenSize !== undefined && seenSize !== pointer.size) {
+      throw new Error(
+        `Attachment "${path}" references corrupt LFS object sha256:${pointer.sha256Hex}.`
+      )
+    }
+    sizes.set(pointer.sha256Hex, pointer.size)
+  })
+  return [...sizes.keys()]
 }

@@ -1,4 +1,5 @@
 import * as childProcess from 'node:child_process'
+import { execFileSync } from 'node:child_process'
 import type { spawnSync } from 'node:child_process'
 import * as fs from 'node:fs'
 import { join } from 'node:path'
@@ -31,10 +32,6 @@ export const OID_A =
   'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
 export const OID_B =
   'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb'
-export const OID_OVER =
-  'cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc'
-export const THREE_MIB = 3 * 1024 * 1024
-export const TWENTY_MIB = 20 * 1024 * 1024
 
 const VERSION = 'https://git-lfs.github.com/spec/v1'
 
@@ -98,14 +95,16 @@ export function installLfsPushIntercept(
     failPush?: boolean
     onPush?: () => void
   }
-): { pushCalls: string[][] } {
+): { pushCalls: string[][]; gitCalls: string[][] } {
   const pushCalls: string[][] = []
+  const gitCalls: string[][] = []
   vi.mocked(childProcess.spawnSync).mockImplementation(((
     command: string,
     args?: readonly string[],
     spawnOptions?: Parameters<typeof spawnSync>[2]
   ) => {
     const argv = [...(args ?? [])]
+    if (command === 'git') gitCalls.push(argv)
     const lfsIdx = argv.indexOf('lfs')
     if (lfsIdx >= 0 && argv[lfsIdx + 1] === 'push') {
       options?.onPush?.()
@@ -133,7 +132,36 @@ export function installLfsPushIntercept(
     }
     return realSpawnSync(command, args as string[], spawnOptions)
   }) as typeof spawnSync)
-  return { pushCalls }
+  return { pushCalls, gitCalls }
+}
+
+/** An LFS object id distinct for each `n`. */
+export function oid(n: number): string {
+  return n.toString(16).padStart(64, '0')
+}
+
+/**
+ * Appends `commits` commits to main with one `git fast-import`, each changing
+ * `attachmentsPerCommit` pointer attachments (`fileN.bin`) to new objects.
+ */
+export function commitAttachmentHistory(
+  dir: string,
+  commits: number,
+  attachmentsPerCommit: number
+): void {
+  let next = 1
+  let stream = ''
+  for (let c = 0; c < commits; c += 1) {
+    const message = `attachments ${c}`
+    stream += `commit refs/heads/main\ncommitter T <t@example.com> 0 +0000\ndata ${message.length}\n${message}\n`
+    if (c === 0) stream += 'from refs/heads/main^0\n'
+    for (let f = 0; f < attachmentsPerCommit; f += 1) {
+      const pointer = formatLfsPointer(oid(next), next).toString('ascii')
+      next += 1
+      stream += `M 100644 inline file${f}.bin\ndata ${pointer.length}\n${pointer}\n`
+    }
+  }
+  execFileSync('git', ['fast-import', '--quiet'], { cwd: dir, input: stream })
 }
 
 const ACCEPTED_HEAD = 'deadbeefcafef00ddeadbeefcafef00ddeadbeef'
@@ -143,12 +171,14 @@ export function prepareLfsPublishCheckout(
   checkoutName: string,
   postResponse:
     | { status: number; ok: boolean; text: () => Promise<string> }
-    | ReturnType<typeof rejectionPost>
+    | ReturnType<typeof rejectionPost>,
+  buildAcceptedHistory?: (sourceRepoDir: string) => void
 ): {
   dir: string
   fetchMock: ReturnType<typeof stubFetchForSubmission>
 } {
   const sourceRepoDir = buildLfsSourceRepo(workDir)
+  buildAcceptedHistory?.(sourceRepoDir)
   const bundleFile = join(workDir, 'accepted.bundle')
   bundleMain(sourceRepoDir, bundleFile)
   const fetchMock = stubFetchForSubmission(bundleFile, postResponse)

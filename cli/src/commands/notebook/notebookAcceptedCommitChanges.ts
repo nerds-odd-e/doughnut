@@ -5,6 +5,7 @@ const REGULAR_FILE_MODE = '100644'
 export interface CommitChange {
   srcMode: string
   dstMode: string
+  dstBlob: string
   status: string
   path: string
 }
@@ -38,7 +39,7 @@ export function listCommitChanges(
     ],
     inspectAncestryFailure
   )
-  return parseDiffTreeRawZ(raw)
+  return parseRawChangesZ(raw)
 }
 
 function isOrdinaryNotePath(changedPath: string): boolean {
@@ -83,7 +84,8 @@ export function hasSingleParent(
   return commit.parents.length === 1 && commit.parents[0] === expectedParent
 }
 
-function parseDiffTreeRawZ(output: string): CommitChange[] {
+/** Changes in Git's `--raw -z` output, as printed by `diff-tree` or `log`. */
+export function parseRawChangesZ(output: string): CommitChange[] {
   if (output === '') return []
   const parts = output.split('\0')
   if (parts[parts.length - 1] === '') parts.pop()
@@ -106,6 +108,7 @@ function parseDiffTreeRawZ(output: string): CommitChange[] {
     changes.push({
       srcMode: match[1],
       dstMode: match[2],
+      dstBlob: match[4],
       status: match[5],
       path,
     })
