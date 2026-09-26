@@ -399,6 +399,10 @@ A story's readiness basis is a digest of its whole seed document. Wrapping up an
   - Evidence: 5306a7f573 closed SEED-046 story 2, removing its seed section; start refused with "published preparation is needs-reassessment"; d24c9d7ae6 changed only `basis.document` (c4e317cd… → 945f97ea…), `basis.plan` a20d0e1c… unchanged.
   - Observed effect: one refused start, a recheck of the plan's change points against post-story-2 code, one extra commit on main and a retry.
   - Inference: as in the story 24 occurrence, the plan stated "executed after story 2 lands", so the recheck had some value; the refusal still could not distinguish it from an unrelated closure.
+- Execution: SEED-046 story 11 / `.planning/slice-plans/007-clone-test-states-output/PLAN.md` at 69ef49e8d9 / 05b630dce5; Timestamp: 2026-09-26, before 22:24:39+08:00 (refusal; readiness commit 7bb85093ae); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.41.
+  - Evidence: after the correction was planned, d5d22ccbe5 and 5bd90172ab closed SEED-046 stories 3 and 4, removing their seed sections; start refused with "published preparation is needs-reassessment"; 7bb85093ae changed only `basis.document` (3d5b7ba4… → 4895a083…), `basis.plan` c58a45ad… unchanged.
+  - Observed effect: one refused start, a recheck of the story section against the test file, one extra commit on main and a retry, for a one-slice test-only correction.
+  - Inference: unlike the two previous occurrences, this plan did not depend on the closed siblings, so the reassessment carried no information.
 
 ## DD-126 — A plan said the changed script had no test, and nobody searched for one before delivery, so CI caught the stale test
 

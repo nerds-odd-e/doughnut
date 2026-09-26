@@ -10,8 +10,6 @@ and deletable in Web Donut.
 
 ## Taken
 
-- [Clone test states the clone output instead of what it no longer says](seeds/SEED-046-notebook-files-and-git-findings.md#story-11) — SEED-046#story-11 ([plan](slice-plans/007-clone-test-states-output/PLAN.md))
-
 ## Backlog list
 
 - [A web edit changes only what the user edited](seeds/SEED-046-notebook-files-and-git-findings.md#story-5) — SEED-046#story-5
