@@ -76,12 +76,25 @@ while IFS= read -r file; do
   [[ -n "$file" ]] && select_components_for_file "$file"
 done <<< "$changed_files"
 
+lint_frontend_index() {
+  pnpm --frozen-lockfile --silent recursive install
+  index_copy="$(mktemp -d "${TMPDIR:-/tmp}/donut-frontend-index.XXXXXX")"
+  trap 'rm -rf "$index_copy"' EXIT
+  git checkout-index --all --prefix="$index_copy/"
+  ln -s "$REPO_ROOT/node_modules" "$index_copy/node_modules"
+  ln -s "$REPO_ROOT/frontend/node_modules" "$index_copy/frontend/node_modules"
+  pnpm -C "$index_copy/frontend" lint
+}
+
 run_quality_for_component() {
-  case "$1" in
-    root)
+  case "$MODE:$1" in
+    lint:frontend)
+      lint_frontend_index
+      ;;
+    *:root)
       pnpm "cy:$MODE"
       ;;
-    openapi)
+    *:openapi)
       pnpm openapi:lint
       ;;
     *)

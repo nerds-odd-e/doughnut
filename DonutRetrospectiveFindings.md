@@ -17,9 +17,8 @@ file changes. The failing responsibility is Donut’s commit gate:
 `scripts/git-hooks/pre-commit` runs `pnpm lint:changed`, and
 `scripts/quality_changed.sh` picks components from staged files but then runs
 each component’s whole-tree lint (for the frontend, Biome and `vue-tsc`), so
-unstaged files from another slice decide whether a commit passes. Neither
-script has changed since `1e6e69cc64` (2026-09-04), which predates the
-occurrence, so the finding is unresolved.
+unstaged files from another slice decided whether a commit passed. It has
+since been resolved; see [DD-121](#dd-121).
 
 ### Shared findings retained in DearDough
 
@@ -38,20 +37,13 @@ failure was guidance that pointed at that alias instead of the already-tracked
 
 No new occurrence in either log contradicts an earlier resolution:
 DD-073 (frontend proof now typechecks, `7b1d80b4e8`), DD-103 (E2E runner
-backend race, `d86864023c`), and DD-065/DD-074 (returned to shared ownership as
+backend race, `d86864023c`), DD-121 (commit gate checks the index copy,
+`574d61b52c`), and DD-065/DD-074 (returned to shared ownership as
 ODF-085). DD-121 involves a type error at the commit gate, but in another
 slice’s unstaged file; it is not a DD-073 recurrence, because the committing
 slice’s own proof had typechecked.
 
-### Grouping and backlog decision
-
-| Priority | Group | Findings | Frequency | Impact | Backlog story |
-| --- | --- | --- | --- | --- | --- |
-| 1 | Commit gate in a shared execution checkout | [DD-121](#dd-121) | One execution, two failed commits | Finished slices could not be delivered until every other agent in the checkout stopped, so parallel implementation ended in serialized delivery | [Commit a finished slice while other slices are still in progress](.planning/seeds/SEED-043-commit-gate-checks-committed-changes.md#story-1) |
-
-DD-121 is the only unresolved project finding, so only one story is queued
-first; there is no second project problem to rank. No existing queued or taken
-story covers it.
+### Reopening
 
 Reopen a project finding when a new occurrence contradicts its actual correction,
 link that evidence to the existing story or correction if still active, and
@@ -62,7 +54,15 @@ without supporting correction evidence is insufficient to close a finding.
 
 ## DD-121 — Parallel slices in one execution checkout made each commit's hook fail on the other slices' unfinished files
 
-Three file-disjoint slices ran at once in one worktree. The pre-commit hook runs `lint:changed`, which checks the whole frontend working tree (Biome and `vue-tsc`), not only staged files. Committing a finished slice failed twice: once on another slice's unformatted file, once on type errors in a slice still being refactored. Slices were committed only after every agent in the checkout had stopped.
+Before the correction, three file-disjoint slices ran at once in one worktree. The pre-commit hook ran `lint:changed`, which checked the whole frontend working tree (Biome and `vue-tsc`), not only staged files. Committing a finished slice failed twice: once on another slice's unformatted file, once on type errors in a slice still being refactored. Slices were committed only after every agent in the checkout had stopped.
+
+### Resolution
+
+Resolved by `574d61b52c` and `c76f69b62e`: the hook checks the frontend
+against a temporary copy of the index, and the frontend `format` script runs
+Biome only, so `format:changed` no longer stops on another slice's type errors.
+`scripts/test/quality_changed.test` covers the index copy (`120753a097`).
+Current behavior is in the linting skill's "Format vs Lint".
 
 ### Occurrences
 

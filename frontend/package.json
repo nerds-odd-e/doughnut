@@ -13,7 +13,7 @@
     "build": "vue-tsc --noEmit && vite build --emptyOutDir",
     "serve": "vite preview",
     "lint": "biome check . && vue-tsc --noEmit",
-    "format": "biome check --write . && vue-tsc --noEmit",
+    "format": "biome check --write .",
     "storybook": "storybook dev -p 6006 --no-open",
     "test:ui": "vitest run --browser=chromium",
     "test:watch": "vitest --browser=chromium --ui",

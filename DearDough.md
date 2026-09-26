@@ -202,6 +202,9 @@ Former local code: DD-107.
   - Evidence: all three slice receipts (96186af758, 5db1d2beb4, e22c4c1c9a on `refs/heads/story/042-moved-note-keeps-its-picture`) reported `observation.state: unobserved`, "host session identity is required to verify the notification bridge"; the coordinator noted the gap after slice 1 and deferred it to completion instead of passing `--session-json` (`CLAUDE_CODE_SESSION_ID` was set) on slices 2 and 3.
   - Observed effect: no increment was observed during execution; the retrospective started with CI unknown for three pushes.
   - Inference: the coordinator read the ODF-092 occurrences only during the retrospective, so the logged recovery again did not reach delivery.
+- Execution: SEED-043 story 1 / quick/045-commit-gate-checks-committed-content / 574d61b52c; Timestamp: 2026-09-26, ~16:04+08:00 (slice 1 delivery; commit 16:03:40+08:00); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.40.
+  - Evidence: slice 1 receipt `observation.reason` "host session identity is required to verify the notification bridge" (background Claude Code job, Story Branch Mode); recovered by `ci-mailbox.mjs probe` (`CI_MONITOR_READY`), `start --execution nerds-odd-e/doughnut story/045-commit-gate-checks-committed-content`, and `register-push` for 574d61b52c; later deliveries passing `--session-json '{"session_id":…}'` reported `observation.state: reused`.
+  - Observed effect: four extra coordinator calls, including a `grep` of `ci-host-bridge.mjs` for the flag's shape; the recovered observer then delivered slice 1's CI failure (DD-126).
 
 ## ODF-110 — A readiness replay observed only the plan's named seam, not the rest of the slice's journey
 
@@ -376,8 +379,19 @@ A story's readiness basis is a digest of its whole seed document. Wrapping up an
   - Observed effect: one refused start, a reassessment, one extra commit on main and a retry; an execution coordinator performed a preparation assessment, as in DD-114.
   - Inference: every story in a multi-story seed is invalidated by any sibling's wrap-up. A digest of the story's own section (plus shared seed context) would keep unrelated closures from forcing reassessment. Qualified: the number of extra calls is not in the summary.
 
+## DD-126 — A plan said the changed script had no test, and nobody searched for one before delivery, so CI caught the stale test
+
+The plan for the commit-gate change recorded "No permanent automated test is added for the hook: it has none today, CI does not run it". `scripts/test/quality_changed.test` already tested `scripts/quality_changed.sh` with a fake `pnpm`, and CI runs it in "Run script unit tests". The implementer, the refactor agent and the coordinator's proof acceptance all relied on the plan's claim; the path-scoped `script` skill, which covers tests under `scripts/`, was not named in delegation and attached only after the first slice.
+
+### Occurrences
+
+- Execution: SEED-043 story 1 / quick/045-commit-gate-checks-committed-content / 574d61b52c; Timestamp: 2026-09-26T16:06:02+08:00 (CI step failure); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.40.
+  - Evidence: plan "Current decisions" before 120753a097; CI run 36228685291 job "Other Unit Tests" failed `quality_changed.test` ("shared biome config selects every affected component": expected `pnpm frontend:lint`, got the install line after `ln` failed); repair 120753a097 updated and extended the test.
+  - Observed effect: one red story-branch CI run, a stash/repair/restore cycle around slice 2, and two extra agents (repair ~49k and refactor ~48k subagent tokens).
+  - Inference: a negative claim that code has no test needs a search of the test tree (here `grep -rl quality_changed scripts/test`) at planning or delegation; naming the stack skill for `scripts/` in the delegation would likely have surfaced it.
+
 ## Retention
 
-- Highest allocated local number: 124
+- Highest allocated local number: 126
 - Recovery: `33939aa45a17c08f5e6f8076178ce96437fdfbe8:DearDough.md` contains the complete pre-compaction log and earlier recovery references; `b0b385a184e96ecf8b0f6fc5572eaaab69bc8dad` preserves later history.
 - Occurrence history is partial; full observations, effects, inference and historical provenance remain in that snapshot and the upstream catalog.

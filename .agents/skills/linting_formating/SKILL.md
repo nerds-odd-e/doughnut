@@ -69,7 +69,12 @@ This runs:
   components. It is check-only: it does not format files or mutate the Git
   index. Implementers and refactorers do not run `format:changed` or standalone
   `lint:changed`; the coordinator owns formatting and the hook owns the
-  independent lint check.
+  independent lint check. The frontend check reads the committed (index)
+  content from a temporary copy, so unrelated unstaged or untracked work does
+  not affect it. The copy reuses the checkout's `node_modules`, so workspace
+  packages linked there (such as `donut-test-fixtures`) are still read from the
+  working tree; the cold `vue-tsc` run adds roughly 15–20 s per frontend commit.
+  Other components still check the working tree.
 - **Use `CURSOR_DEV=true nix develop -c pnpm lint:all`** for CI/CD validation only — it checks without fixing (plus a few script unit tests that format does not run).
 
 ## OpenAPI Linting
