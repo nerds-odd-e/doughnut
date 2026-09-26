@@ -14,9 +14,13 @@ import {
   yamlRecordFromNoteProperties,
 } from "@/utils/noteProperties"
 
+const leadingBlankLines = /^(?:\r?\n)*/
+const finalNewlines = /(?:\r?\n)*$/
+
 /**
  * Composes `body` after the authored frontmatter text and separator of `authored`,
- * splicing only the entries whose property rows were added, renamed, changed or removed.
+ * splicing only the entries whose property rows were added, renamed, changed or removed,
+ * and ending it with the authored body's final newlines.
  */
 export function composeNoteContentInPlace(
   authored: string,
@@ -25,17 +29,22 @@ export function composeNoteContentInPlace(
 ): string {
   const split = verbatimFrontmatterPrefixAndBody(authored)
   const parsed = parseNoteContentMarkdown(authored)
+  const authoredBody = split?.body ?? authored
+  const endedBody =
+    body.replace(finalNewlines, "") +
+    authoredBody.replace(leadingBlankLines, "").match(finalNewlines)![0]
   if (split === null || (parsed.ok && rows.length === 0)) {
-    return composeNoteContentFromPropertyRows(rows, body)
+    return composeNoteContentFromPropertyRows(rows, endedBody)
   }
   const prefix = parsed.ok
     ? frontmatterWithEditedEntries(split, parsed.properties, rows)
     : split.prefix
   const newline = prefix.includes("\r\n") ? "\r\n" : "\n"
   const fenceEnd = prefix.endsWith("\n") || body === "" ? "" : newline
-  const leadingBlankLines = /^(?:\r?\n)*/
   const blankLines = split.body.match(leadingBlankLines)![0]
-  return prefix + fenceEnd + blankLines + body.replace(leadingBlankLines, "")
+  return (
+    prefix + fenceEnd + blankLines + endedBody.replace(leadingBlankLines, "")
+  )
 }
 
 function frontmatterWithEditedEntries(

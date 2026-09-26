@@ -209,6 +209,10 @@ Former local code: DD-107.
   - Evidence: slice 1 receipt `observation.reason` "host session identity is required to verify the notification bridge" (background Claude Code job, Story Branch Mode); the coordinator found the flag's shape by grepping `ci-host-bridge.mjs` and `CLAUDE_CODE_SESSION_ID` via `env`; re-running `deliver` with `--session-json` for the already-pushed SHA was refused ("rebase left the pre-rebase SHA as the candidate"); slices 2 and 3 with `--session-json` reported `observation.state: reused` (`/tmp/dough-ci-501/watch-xFqwGh`).
   - Observed effect: five extra coordinator calls; slice 1 was never registered by hand, and the observer started by the refused call picked up later pushes.
   - Inference: the fix recorded in earlier rows (pass `--session-json` from `CLAUDE_CODE_SESSION_ID` on the first delivery) is still not in the delivery guidance, so each execution rediscovers it.
+- Execution: SEED-046 story 14 / slice-plans/009-rich-edit-keeps-final-newline / 983ac6d18e; Timestamp: 2026-09-27, ~07:30+08:00 (slice 1 delivery); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.41.
+  - Evidence: first `deliver` refused with "authorized target must be a branch ref: origin/exec/009-rich-edit-keeps-final-newline"; the second, with `refs/heads/…` and abbreviated `--validated-candidate 983ac6d18e`, returned `candidate-mismatch` with nothing pushed; the third, with the full SHA, was accepted. `--host claude` without `--session-json` reported `observation.state: attached`, then `reused` (`/tmp/dough-ci-501/watch-gBNzg7`).
+  - Observed effect: two refused calls before the only delivery; no coverage lost.
+  - Inference: on 0.3.41 the session identity no longer needs recovery, but the two argument-shape refusals recorded for plans 035 and 037 still recur because the usage line names neither `refs/heads/` nor a full SHA.
 
 ## ODF-110 — A readiness replay observed only the plan's named seam, not the rest of the slice's journey
 
@@ -489,7 +493,7 @@ Slice 2's implementer reported that a rich body edit drops the file's final newl
 ### Occurrences
 
 - Execution: SEED-046#story-5 / `.planning/slice-plans/006-web-edit-changes-only-edit/PLAN.md` at 2a8fd844b4 / 5f71d4d237; Timestamp: 2026-09-26, before 23:25:41+08:00 (slice 2 acceptance; commit 61d400007d); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.41.
-  - Evidence: slice 2 implementer return ("Gaps: Example 1's trailing newline is lost"); plan 006 Learnings "Slice 2" ("outside this story's promises"); retrospective probe output `"My First\n\nLast"`; correction `.planning/slice-plans/009-rich-edit-keeps-final-newline/PLAN.md` (SEED-046#story-14).
+  - Evidence: slice 2 implementer return ("Gaps: Example 1's trailing newline is lost"); plan 006 Learnings "Slice 2" ("outside this story's promises"); retrospective probe output `"My First\n\nLast"`; correction `4ba13d691c:.planning/slice-plans/009-rich-edit-keeps-final-newline/PLAN.md` (SEED-046#story-14).
   - Observed effect: a defect against the story's own goal reached the published story branch; a correction story and plan are needed before integration.
   - Inference: a reported gap should be checked against the story's goal and exclusions list before it is filed as out of scope; the fix at slice 2 would have been a few lines in the same function. Qualified: as in DD-129, the key example was a file whose edited line was also its last line, which hid the effect.
 
