@@ -44,7 +44,10 @@ Markdown after `quillInstance().insertText(…, "user")`.
 ### 1. One reason explains why rich editing is unavailable
 
 Type: Structure
-Status: planned
+Status: done — `richEditingUnavailableReason` (`{ message, hint } | null`) drives
+the warning and `effectiveReadonly`; accepted proof: the command above, 19
+files / 148 tests green with the frontmatter spec unchanged; `vue-tsc --noEmit`
+exit 0.
 Proof: `RichMarkdownEditor.frontmatter.spec.ts` stays green unchanged —
 unparseable frontmatter still shows its message plus "Switch to Markdown mode
 to fix the frontmatter." and the editor is read-only.
@@ -100,4 +103,6 @@ Change (in `frontend/src/components/form/`):
 
 ## Learnings
 
-None yet.
+- Slice 1: the warning block still carries
+  `data-testid="rich-note-frontmatter-parse-error"`; slice 2 decides whether
+  the now-general warning needs a general test id.

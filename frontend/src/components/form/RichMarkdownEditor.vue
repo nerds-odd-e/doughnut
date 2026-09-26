@@ -18,15 +18,15 @@
       Edit metadata in Markdown.
     </p>
     <div
-      v-if="frontmatterParseErrorMessage !== null"
+      v-if="richEditingUnavailableReason"
       role="alert"
       aria-live="polite"
       data-testid="rich-note-frontmatter-parse-error"
       class="daisy-alert daisy-alert-warning mb-3 text-sm"
     >
-      <span>{{ frontmatterParseErrorMessage }}</span>
+      <span>{{ richEditingUnavailableReason.message }}</span>
       <span class="block mt-1 text-xs opacity-90">
-        Switch to Markdown mode to fix the frontmatter.
+        {{ richEditingUnavailableReason.hint }}
       </span>
     </div>
     <QuillEditor
@@ -102,9 +102,13 @@ const parsedContent = computed(() =>
   parseNoteContentMarkdown(props.modelValue ?? "")
 )
 
-const frontmatterParseErrorMessage = computed(() => {
+const richEditingUnavailableReason = computed(() => {
   const p = parsedContent.value
-  return p.ok || p.reason === "nested_metadata" ? null : p.message
+  if (p.ok || p.reason === "nested_metadata") return null
+  return {
+    message: p.message,
+    hint: "Switch to Markdown mode to fix the frontmatter.",
+  }
 })
 
 const hasNestedMetadata = computed(() => {
@@ -115,7 +119,7 @@ const hasNestedMetadata = computed(() => {
 const effectiveReadonly = computed(
   () =>
     Boolean(props.readonly) ||
-    frontmatterParseErrorMessage.value !== null ||
+    richEditingUnavailableReason.value !== null ||
     imageUploadInProgress.value
 )
 
