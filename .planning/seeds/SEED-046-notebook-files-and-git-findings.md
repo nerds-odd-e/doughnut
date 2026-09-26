@@ -288,28 +288,59 @@ including delivery, not commitments.
 
 **Identity:** SEED-046#story-5
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"not-refined","approach":"unselected"}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/006-web-edit-changes-only-edit/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"f658172ca79107b7e3666796491a3346f8ac5762b8cef65630a6a3fb75b57b5b","plan":"8bc0a3b8e34b39f6fa6e98dee0e6a17894804f59e1e1de6d84a03c4c51fedffe"}}
 ```
 
-- **For / why:** Owners who also edit locally see a one-word web edit reformat
-  the whole file, so diffs become noisy and local rebases conflict more. The
-  churn is one-time per note plus whatever local tools keep writing in another
-  style (a second rich edit of an already reformatted note changes only the
-  edited word, checked 2026-09-26).
-- **Evaluation:** After a one-word web edit, pulling shows a diff of that word
-  only, for a note whose frontmatter and body use common Markdown and YAML
-  styles.
-- **Owner decisions (2026-09-26):**
-  - The narrow goal is accepted: common local styles survive and a web edit
-    touches only what it edited; the rich editor need not reproduce every
-    authored body style byte for byte.
-  - In: `#` headings and `-` bullets in the rich editor's output; the blank
-    line after the frontmatter kept; a body edit leaves the frontmatter text
-    untouched; a property edit changes only that property's line, both in the
-    web editor and in the server's rewrites for setting a picture and for
-    adding or removing a wiki link property.
-  - Kept: `type: note` → `type: Note` (ADR 0004; one line, once).
-  - Content the rich editor loses is story 4a, not this story.
+- **Goal:** Owners who edit a notebook both locally (often with an AI IDE) and
+  on the web see a web edit change only what they edited, so pulled diffs stay
+  readable and local rebases do not conflict with reformatting. Today one
+  web-edited word reformats the whole note file.
+- **Scope:**
+  - **Required — body style:** the rich editor writes the common Markdown
+    forms: `#` headings, `-` bullets, `*` emphasis (with `**` strong) and
+    `---` rules. So a body using those forms changes only where it was edited.
+  - **Required — body edit:** a rich edit of the body leaves the frontmatter
+    text exactly as it was, including comments, key order, quoting, flow lists
+    and the blank lines between the frontmatter and the body.
+  - **Required — property edit on the web:** changing, adding, renaming or
+    removing one property in the rich editor's property panel changes only
+    that property's lines. A new property goes at the end of the frontmatter.
+    The panel lists properties in the file's order, not sorted.
+  - **Required — server property edits:** setting a note's picture (upload,
+    and its update when the picture file moves), setting its image mask,
+    adding a link property when a relationship note is reduced to a property,
+    and removing links to a trashed note from other notes' properties each
+    change only the affected property's lines.
+  - **Preserved:** `type: note` → `type: Note` on save (ADR 0004; one line,
+    once); author-owned and unknown keys (ADR 0004); Markdown mode saves text
+    as typed; a property left empty by link removal is removed as today; a
+    note without frontmatter gets a new block formatted as today.
+  - **Excluded:** reproducing every other body style (`+`/`*` bullets,
+    `_` emphasis, setext headings, list numbering, blank-line runs); keeping
+    the style of a property's own value once it is changed (a changed flow list
+    may become a block list); content the rich editor loses (story 4a); other
+    server code that writes whole files (export, new notes, readmes).
+- **Key examples:**
+  1. The manual-test file above; append one word to the body in rich mode →
+     the saved file differs only on the body line and on `type: note` →
+     `type: Note`; the blank line and `# Demo2` stay.
+  2. A note whose frontmatter has `# a comment`, `description: "Quoted: value"`
+     and `tags: [x, y]`, keys unsorted; change `description` in the panel →
+     only the `description` line changes.
+  3. Same note; add property `source` → one line appended before the closing
+     `---`; remove `tags` → only its line disappears.
+  4. A body with `## Part`, `- item`, `*em*`, `**strong**` and a `---` rule;
+     one-word edit → only the edited line changes.
+  5. Upload a picture to the note from example 2 → only an `image:` line is
+     added (or replaced); the comment and flow list stay.
+  6. Reduce a relationship note to a property of its source note, whose
+     frontmatter is as in example 2 → one property line appended.
+  7. Move a note to trash choosing to remove its links from properties, when
+     another note has `see also: "[[Target]] and [[Other]]"` → only that
+     value changes.
+  8. Boundary: a body with `+ item` bullets and `_em_`; one-word edit → those
+     lines become `- item` and `*em*` (style outside the common forms is not
+     kept).
 - **Known facts (2026-09-26):** a published file
 
   ```markdown
@@ -337,23 +368,32 @@ including delivery, not commitments.
   ===========
   ```
 
-  - The rich editor re-sorts keys (`noteContentPropertyRows.ts`), re-dumps
-    the whole frontmatter with the `yaml` package even for a body-only edit
-    (dropping YAML comments and turning flow lists into block lists), and
-    Turndown defaults to setext headings and `*` bullets. A frontmatter with
-    nested metadata is instead kept verbatim.
+  - The rich editor sorts property rows (`noteContentPropertyRows.ts`) and
+    re-dumps the whole frontmatter with the `yaml` package even for a
+    body-only edit (`composeNoteContentMarkdown`), dropping comments and
+    turning flow lists into block lists. Turndown defaults to setext headings,
+    `*` bullets and `_` emphasis. A frontmatter with nested metadata is
+    already kept verbatim.
   - `type: Note` comes from the server's in-place, one-line rewrite
     (`NoteLeadingFrontmatter.ensureTypeKey`).
   - The server re-dumps the whole frontmatter through SnakeYAML
-    (`Frontmatter.fenced`) when setting a picture or adding or removing a wiki
-    link property; the body stays verbatim. Inbound link rewriting on rename
-    already splices only the changed scalar.
-- **Value / learning:** Tests whether web edits can touch only the edited
-  frontmatter line while the body keeps the common local styles.
-- **Effort hypothesis:** M — low confidence.
+    (`Frontmatter.fenced`) in `NoteContentMarkdown.setLeadingFrontmatterProperty`
+    (picture, image mask, link property added by reduce) and
+    `removeWikiLinksFromLeadingFrontmatterProperties`. Inbound link rewriting
+    on rename already splices only the changed scalar
+    (`WikiLinkMarkdownDocumentRewrite`).
+- **Owner decisions (2026-09-26):** the narrow goal above rather than
+  reproducing every authored style; keep `type: Note`; include the server
+  picture and link-property rewrites; content loss split out as story 4a.
+  Refinement decided without further questions: the panel follows file order,
+  and `*` emphasis and `---` rules count as common forms, per the evaluation
+  "common Markdown and YAML styles".
+- **Value / learning:** Tests whether every web and server frontmatter edit
+  can share one in-place edit rule.
+- **Effort hypothesis:** M — medium confidence.
 - **Depends on:** none; it lets more notes pass story 4a's check.
-- **Safe stopping point:** Author-owned and unknown frontmatter keys stay
-  preserved, as ADR 0004 requires.
+- **Safe stopping point:** each of body style, body edit, panel edit and
+  server edit stands alone.
 
 <a id="story-4"></a>
 
