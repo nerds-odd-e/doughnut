@@ -16,6 +16,7 @@ import org.junit.jupiter.api.Test;
 /** A note moved within its notebook carries the file its {@code image:} names in its folder. */
 class NotebookGitWebNoteMovePictureControllerTest extends NotebookGitWebNoteMoveTestBase {
   static final String FORCE_BODY = "---\nimage: force.png\n---\nforce body";
+  static final String ENERGY_BODY = "---\nimage: force.png\n---\nenergy body";
 
   Notebook notebook;
   Folder physics;
@@ -94,6 +95,27 @@ class NotebookGitWebNoteMovePictureControllerTest extends NotebookGitWebNoteMove
         equalTo("---\nimage: force (2).png\n---\nforce body"));
     assertThat(tipContent(after, "mechanics/force (2).png"), equalTo(pointer));
     assertThat(tipContent(after, "mechanics/Force.png"), equalTo(taken.getAcceptedGitContent()));
+    assertAcceptedTreeMatchesTheFullAssembly(notebook);
+  }
+
+  @Test
+  void aPictureAnotherNoteUsesIsCopiedNotMoved() throws Exception {
+    makeMe.aNote("Energy").folder(physics).content(ENERGY_BODY).please();
+    snapshotCurrentPortableTree(notebook);
+    AcceptedHistory before = acceptedHistory(notebook);
+
+    relationController.moveNoteToFolder(force, mechanics);
+
+    AcceptedHistory after = acceptedHistory(notebook);
+    assertThat(after.parents(), equalTo(before.commits()));
+    assertThat(
+        after.tipPaths(),
+        containsInAnyOrder(
+            "physics/Energy.md", "physics/force.png", "mechanics/Force.md", "mechanics/force.png"));
+    assertThat(tipText(after, "physics/Energy.md"), equalTo(ENERGY_BODY));
+    assertThat(tipText(after, "mechanics/Force.md"), equalTo(FORCE_BODY));
+    assertThat(tipContent(after, "physics/force.png"), equalTo(pointer));
+    assertThat(tipContent(after, "mechanics/force.png"), equalTo(pointer));
     assertAcceptedTreeMatchesTheFullAssembly(notebook);
   }
 }

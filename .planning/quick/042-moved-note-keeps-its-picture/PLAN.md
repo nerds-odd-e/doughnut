@@ -116,7 +116,8 @@ document persistence in the same change.
 
 ### 3. A picture another note uses is copied, not moved
 Type: Behavior
-Status: planned
+Status: done (accepted proof: `backend:test:worktree --tests
+'*NotebookGitWebNoteMove*'`, `'*NotebookGitWebTrashControllerTest*'`)
 Proof: `NotebookGitWebNoteMovePictureControllerTest`: `physics/Energy.md` also
 says `image: force.png`. Moving `Force` into `mechanics/` keeps
 `physics/force.png` and adds `mechanics/force.png` with the same pointer, and
@@ -145,4 +146,9 @@ file row with the same pointer bytes is placed instead of moving the row.
 - The `image:` rewrite uses `AuthoredNoteDocument.fromContent` (as the
   wiki-link rewrite on move does), not upload's save preparation, so only
   `image:` changes and no validation newly refuses a move.
+- The rule now lives in `MovedNotePicture.placeWithPicture` (look before
+  placing, carry after), which both same-notebook `NoteMoveService` steps call.
+- The folder query for other notes does not filter trashed notes while the
+  root query does; this is harmless, since a note is trashed exactly when its
+  folder is, so all notes in one source folder share that state.
 - `backend:test:worktree` takes one `--tests` pattern per run.

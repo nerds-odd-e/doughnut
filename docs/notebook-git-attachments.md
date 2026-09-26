@@ -39,7 +39,9 @@ through the same folder placement. A note moved within the notebook on the web
 carries the file its `image:` names as a plain filename in the note's folder
 into its new folder, in the same accepted change; when an entry there already
 holds that name (ignoring case), the file takes the first free numbered name
-(`force (2).png`) and the note's `image:` is rewritten to it. Trashing a note
+(`force (2).png`) and the note's `image:` is rewritten to it. When another note
+in the source folder also names the file, the file stays and the moved note gets
+a copy reusing the same stored bytes. Trashing a note
 leaves that file where it is. Dissolving a folder, or merging it into a same-named folder within the
 notebook, carries its files exactly as its notes:
 each file keeps its row and bytes and only its folder changes. File references
