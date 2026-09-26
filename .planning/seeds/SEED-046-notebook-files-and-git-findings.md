@@ -96,26 +96,57 @@ including delivery, not commitments.
 
 <a id="story-9"></a>
 
-### 7. File pages and file responses read cleanly
+### 7. Responses carry no ORM internals and a lean folder trail
 
 **Identity:** SEED-046#story-9
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"not-refined","approach":"unselected"}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/010-responses-carry-no-orm-internals/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"acb4a665131454faf46e42ae55471a838f9c4b66b0215581d14e4efa56658123","plan":"cbd378e18afbfa14ece652f6f41ffdab215313e84ebd13d8a5fa6c4d9940ae48"}}
 ```
 
-- **For / why:** A file page shows raw byte counts, and file, note, and upload
-  responses carry an internal field that API and CLI consumers should not see.
-- **Evaluation:** The file page shows a readable size; those responses no
-  longer contain the internal field.
-- **Known facts (2026-09-26):** a 204,800-byte file's page says
-  "204800 bytes". `hibernateLazyInitializer: {}` appears in the file page
-  response (`GET /api/notebooks/{notebook}/attachments/{attachment}`) and the
-  picture upload response (`POST /api/notes/{note}/images`), on folder and
-  notebook objects.
-- **Value / learning:** Small polish.
-- **Effort hypothesis:** S — medium confidence.
+- **Goal:** API consumers (the web app, CLI, MCP, and anyone reading the
+  API) receive responses that describe the domain, not the persistence layer.
+  Today a Hibernate proxy's internal `hibernateLazyInitializer` property leaks
+  into JSON, and the folder trail beside every note, folder, and file page is a
+  list of full folder entities. Fixing the cause once, instead of on the two
+  endpoints where the manual test noticed it, keeps the API honest as more
+  work flows between local checkouts and Web Donut.
+- **Scope:**
+  - **Required (cause):** JSON responses never contain Hibernate proxy
+    internals, whichever path loads an entity. The web JSON mapper handles
+    Hibernate proxies; values that serialize today keep serializing.
+  - **Required (shape):** each folder-trail entry (`ancestorFolders` on the
+    note, folder, and file page realms and on recalled notes) carries only the
+    folder's `id` and `name`, outermost first, as today.
+  - **Preserved:** breadcrumbs, folder pickers, trash detection, the sidebar
+    tree, recall's folder path, and the CLI's folder path segments behave as
+    before.
+  - **Excluded:** the file page's readable size (owner chose cause and shape
+    only on 2026-09-27); the realm's `notebook` object, which is a loaded
+    entity in practice and is read in about 20 places; other entity-bearing
+    responses whose associations are eager; removing the Jackson 2 mapper
+    used for hand-written serialization.
+- **Key examples:**
+  1. A file in folder `outer/inner`; a fresh request for its file page →
+     `ancestorFolders` is `[{id, name: "outer"}, {id, name: "inner"}]`, with no
+     `hibernateLazyInitializer` anywhere in the body (today the nested folder
+     carries `"hibernateLazyInitializer": {}`).
+  2. A picture uploaded to a note in a nested folder → the returned note realm
+     has the same clean two-entry trail.
+  3. A folder whose readme is long; the page of a note inside it → the trail
+     entry has no `readmeContent`, `createdAt`, or `updatedAt`.
+  4. Boundary: a note at notebook root → `ancestorFolders` is empty.
+- **Known facts (2026-09-27):** Spring Boot 4 serializes web responses with
+  its Jackson 3 (`tools.jackson`) mapper; `ObjectMapperConfig` registers
+  `Hibernate7Module` only on a Jackson 2 mapper that serves hand-written
+  serialization, and its Javadoc wrongly says web JSON uses it. A Jackson 3
+  `tools.jackson.datatype:jackson-datatype-hibernate7` exists (3.1.7+). The
+  leak reproduced on the dev backend for nested folders on the file page;
+  whether it appears depends on whether the session already loaded the folder.
+  Controller tests call methods directly and miss serialization; a MockMvc
+  test like `NotebookFolderPageXmlAcceptMvcTest` sees real proxies.
+- **Effort hypothesis:** M — medium confidence.
 - **Depends on:** none.
-- **Safe stopping point:** Each change stands alone.
+- **Safe stopping point:** after the cause fix; the trail shape stands alone.
 
 <a id="story-13"></a>
 
@@ -158,7 +189,8 @@ including delivery, not commitments.
 Story 8 is a short cleanup that can start only once production has run the
 line-ending normalization; it goes first so it is not forgotten.
 Story 4b fixes a web problem: its whole-file rewrites hurt parallel local and
-web work. Story 7 is polish. Drop first: 7.
+web work. Story 7 removes persistence details from API responses at their cause;
+it matters least to owners today. Drop first: 7.
 
 Story numbers are local order; identities keep their original anchors.
 
