@@ -35,7 +35,19 @@ Accepted history lives in the native object store
 transaction, so a save's new objects and accepted head commit or roll back with
 the application projection. A save writes only its new blobs, trees and
 commit. Git bundles are produced only for download and clone, and read only
-from publication proposals.
+from publication proposals. A download loads the binding's stored objects in
+one query for that download only (no cache); its head comes from the locked
+binding, so it is always the latest accepted commit.
+
+Note Markdown is stored and committed with LF line endings whatever its source
+(web, API, MCP, import): `AuthoredNoteDocument.fromContent`, which every note
+content write passes, replaces CRLF with LF. A lone CR is left as it is, and
+attachment bytes are never normalized. A published `.md` blob that still holds
+CRLF does not match the re-encoded tree and is refused. At application startup,
+`NoteLineEndingNormalizationOnStartup` rewrites notes that still hold CRLF to
+LF, one Donut System commit ("Normalize note line endings") per affected
+notebook; a notebook that fails is logged, left unchanged and retried on the
+next startup.
 
 The [Git synchronization contract](notebook-git-synchronization.md) governs
 history, identity and publication guarantees.

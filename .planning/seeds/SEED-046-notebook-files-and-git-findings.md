@@ -275,6 +275,37 @@ including delivery, not commitments.
 - **Depends on:** none.
 - **Safe stopping point:** Each change stands alone.
 
+<a id="story-13"></a>
+
+### 8. Retire the one-time note line-ending normalization
+
+**Identity:** SEED-046#story-13
+```json dough-story-state
+{"schemaVersion":1,"refinement":"refined","approach":"unselected"}
+```
+
+- **For / why:** Maintainers. Once production has normalized its CRLF notes,
+  the startup normalization is spent code that runs a query on every start.
+- **Goal:** Remove `NoteLineEndingNormalizationOnStartup`, the
+  `NoteLineEndingNormalization` service and its test, and their mention in
+  [note-content saving](../../docs/note-content-saving.md), as the legacy
+  picture move was retired (`0d57de8778`).
+- **Scope:** Required: those removals only. Preserved: note Markdown stays LF on
+  every write (`AuthoredNoteDocument.fromContent`) with its save test.
+  Excluded: any negative test or note about the removed code.
+- **Start condition (gate):** a release containing the normalization has been
+  deployed and started in production, and a read-only production query finds
+  no note content containing CRLF (`content LIKE '%\r\n%'` returns 0). If the
+  query finds notes, read the startup log for the failing notebooks instead of
+  removing the code.
+- **Key examples:**
+  1. After removal, the backend starts with no line-ending startup work, and
+     the save test for CRLF-to-LF content still passes.
+- **Value / learning:** Keeps one-off data repair out of the permanent code.
+- **Effort hypothesis:** S — high confidence.
+- **Depends on:** SEED-046#story-8 released and run in production.
+- **Safe stopping point:** the single removal commit.
+
 ## Ordering and Scope Reduction
 
 Story 4b fixes a web problem: its whole-file rewrites hurt parallel local and
