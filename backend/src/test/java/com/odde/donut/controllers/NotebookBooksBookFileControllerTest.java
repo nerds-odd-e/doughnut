@@ -1,5 +1,7 @@
 package com.odde.donut.controllers;
 
+import static com.odde.donut.services.book.BookReadingWireConstants.BOOK_FORMAT_EPUB;
+import static com.odde.donut.services.book.BookReadingWireConstants.BOOK_FORMAT_PDF;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -7,8 +9,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import com.odde.donut.entities.Book;
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
-import com.odde.donut.services.book.BookReadingWireConstants;
-import java.nio.charset.StandardCharsets;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpHeaders;
@@ -16,7 +16,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockHttpServletRequest;
-import org.springframework.util.DigestUtils;
 import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -39,20 +38,16 @@ class NotebookBooksBookFileControllerTest extends NotebookBooksControllerTestBas
     }
 
     @Test
-    void returnsPdfWhenSourceFileRefPointsAtBlob() throws UnexpectedNoAccessRightException {
-      Notebook nb = notebookWithBook();
+    void returnsThePdfFromTheBooksNotebookFile() throws UnexpectedNoAccessRightException {
       byte[] pdfBytes = new byte[] {0x25, 0x50, 0x44, 0x46};
-      String ref = bookStorage.put(pdfBytes, "pdf");
-      setSourceFileRef(nb, ref);
-      String expectedEtag =
-          "\"" + DigestUtils.md5DigestAsHex(ref.getBytes(StandardCharsets.UTF_8)) + "\"";
+      Notebook nb = notebookWithBookFile("Linear Algebra", BOOK_FORMAT_PDF, pdfBytes);
 
       ResponseEntity<byte[]> res = controller.getBookFile(webRequest(), nb);
 
       assertThat(res.getStatusCode(), equalTo(HttpStatus.OK));
       assertThat(res.getBody(), equalTo(pdfBytes));
       assertThat(res.getHeaders().getContentType(), equalTo(MediaType.APPLICATION_PDF));
-      assertThat(res.getHeaders().getETag(), equalTo(expectedEtag));
+      assertThat(res.getHeaders().getETag(), notNullValue());
       assertThat(
           res.getHeaders().getFirst(HttpHeaders.CONTENT_DISPOSITION),
           equalTo("inline; filename=\"Linear Algebra.pdf\""));
@@ -60,32 +55,9 @@ class NotebookBooksBookFileControllerTest extends NotebookBooksControllerTestBas
     }
 
     @Test
-    void returnsTheNotebookFileWhenSourcePathNamesARootAttachment()
-        throws UnexpectedNoAccessRightException {
-      Notebook nb = notebookWithBook();
-      byte[] pdfBytes = new byte[] {0x25, 0x50, 0x44, 0x46, 0x2d};
-      makeMe.anAttachment("Linear Algebra.pdf").atRootOf(nb).content(pdfBytes).please();
-      Book book = bookOf(nb);
-      book.setSourceFilePath("Linear Algebra.pdf");
-      makeMe.entityPersister.save(book);
-      makeMe.entityPersister.flush();
-
-      ResponseEntity<byte[]> res = controller.getBookFile(webRequest(), nb);
-
-      assertThat(res.getBody(), equalTo(pdfBytes));
-    }
-
-    @Test
     void returnsEpubZipWhenBookFormatIsEpub() throws UnexpectedNoAccessRightException {
-      Notebook nb = notebookWithBook();
-      Book book = bookOf(nb);
       byte[] epubBytes = new byte[] {0x50, 0x4b, 0x03, 0x04};
-      String ref = bookStorage.put(epubBytes, BookReadingWireConstants.BOOK_FORMAT_EPUB);
-      book.setFormat(BookReadingWireConstants.BOOK_FORMAT_EPUB);
-      book.setBookName("Minimal EPUB");
-      book.setSourceFileRef(ref);
-      makeMe.entityPersister.save(book);
-      makeMe.entityPersister.flush();
+      Notebook nb = notebookWithBookFile("Minimal EPUB", BOOK_FORMAT_EPUB, epubBytes);
 
       ResponseEntity<byte[]> res = controller.getBookFile(webRequest(), nb);
 
@@ -101,10 +73,7 @@ class NotebookBooksBookFileControllerTest extends NotebookBooksControllerTestBas
     @Test
     void returns304WhenIfNoneMatchMatchesEtag() throws UnexpectedNoAccessRightException {
       Notebook nb = notebookWithBook();
-      byte[] pdfBytes = new byte[] {0x25, 0x50, 0x44, 0x46};
-      String ref = bookStorage.put(pdfBytes, "pdf");
-      setSourceFileRef(nb, ref);
-      String etag = "\"" + DigestUtils.md5DigestAsHex(ref.getBytes(StandardCharsets.UTF_8)) + "\"";
+      String etag = controller.getBookFile(webRequest(), nb).getHeaders().getETag();
 
       MockHttpServletRequest req = new MockHttpServletRequest();
       req.addHeader(HttpHeaders.IF_NONE_MATCH, etag);
@@ -116,16 +85,13 @@ class NotebookBooksBookFileControllerTest extends NotebookBooksControllerTestBas
     }
 
     @Test
-    void returns404WhenSourceFileRefIsNotNumeric() {
+    void returns404WhenTheSourcePathNamesNoNotebookFile() {
       Notebook nb = notebookWithBook();
-      setSourceFileRef(nb, "not-an-id");
-      assertThrows(ResponseStatusException.class, () -> controller.getBookFile(webRequest(), nb));
-    }
+      Book book = bookOf(nb);
+      book.setSourceFilePath("Missing.pdf");
+      makeMe.entityPersister.save(book);
+      makeMe.entityPersister.flush();
 
-    @Test
-    void returns404WhenSourceFileRefBlobMissing() {
-      Notebook nb = notebookWithBook();
-      setSourceFileRef(nb, String.valueOf(Integer.MAX_VALUE));
       assertThrows(ResponseStatusException.class, () -> controller.getBookFile(webRequest(), nb));
     }
   }

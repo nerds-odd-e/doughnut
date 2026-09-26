@@ -1,6 +1,7 @@
 package com.odde.donut.configs;
 
 import com.google.cloud.storage.Storage;
+import com.google.cloud.storage.StorageOptions;
 import com.odde.donut.services.notebookAttachment.GcsNotebookAttachmentContent;
 import com.odde.donut.services.notebookAttachment.InMemoryNotebookAttachmentContent;
 import com.odde.donut.services.notebookAttachment.NotebookAttachmentContent;
@@ -11,6 +12,12 @@ import org.springframework.context.annotation.Profile;
 
 @Configuration
 public class NotebookAttachmentContentConfiguration {
+
+  @Bean
+  @Profile("prod")
+  Storage gcsStorageClient() {
+    return StorageOptions.getDefaultInstance().getService();
+  }
 
   @Bean
   @Profile("prod")

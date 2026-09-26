@@ -95,61 +95,6 @@ dissolve/merge and cross-notebook operations that the delivered behavior
 refuses for now. The [product backlog](../PRODUCT-BACKLOG.md) owns global order.
 No executable plan or implementation is authorized by this seed.
 
-<a id="story-21"></a>
-
-### Remove the separate Book storage
-```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../quick/040-remove-separate-book-storage/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"627ac528518d10abcb66fa29337e993531392fde866f113b9a71f33cc8fe939a","plan":"04d3969ca688e22975a564818c8893abbd4a7705f2be99c8e2df7af5c8b32393"}}
-```
-
-- **Identity:** SEED-035#story-21
-- **Goal:** Maintainers keep one attachment implementation and one place for
-  file bytes: every Book reads only from its notebook file, and nothing is left
-  of the old Book storage, the old picture bytes, or the old picture address.
-  Owners notice nothing; every Book keeps reading with its progress.
-- **Depends on:** the release carrying story 17's Book move is deployed, and a
-  read-only production query shows no Book without a notebook path
-  (`SELECT COUNT(*) FROM book WHERE source_file_path IS NULL` returns 0).
-  Until then the story cannot start; nothing else waits on it.
-- **Scope:**
-  - Remove the old Book storage and everything that only served it: the
-    storage interface and its GCS and database implementations with their
-    configuration, the startup move of old Books, the read from old storage
-    when a Book has no path, the Book's old storage reference, and their tests
-    and configuration properties.
-  - A Book always has a notebook path; the schema requires it.
-  - Drop `attachment_blob` outright, with no backup. In production it holds only
-    the old pictures' leftover bytes (161 MiB on 2026-09-25), since the picture
-    move is verified (owner decision 2026-09-26).
-  - Remove the `/attachments/` address: the development proxy and the
-    production path-routing entry and its test. Nothing serves it since the
-    legacy picture removal. The notebook file page
-    `/notebooks/:notebookId/attachments/:attachmentId` is unaffected.
-  - Delete the production bucket `doughnut-book-pdf-carbon-syntax-298809` and
-    its access bindings, and remove its setup from the operations docs. The
-    notebook LFS bucket and the production storage client it uses stay.
-- **Excluded:** any change to how Books are attached, read, laid out, or
-  limited (the 100 MB Book upload limit stays); any backup or export of the
-  removed bytes.
-- **Key examples:**
-  - A production Book attached before story 17 opens after this release,
-    reading from its notebook file, and resumes at its saved reading position.
-  - Attaching a new Book in development or test works with no
-    `attachment_blob` table.
-  - Cloning a notebook with a Book still delivers the Book's source file.
-  - A request to `/attachments/...` is no longer sent to the backend.
-  - After the bucket deletion, listing the Book bucket reports it does not
-    exist, and notebook pictures and Book files still download.
-- **Bucket deletion timing:** it cannot be undone, so it runs as the story's
-  last step, after the production query above, with the owner confirming the
-  command at that moment. Code that still refers to the bucket reads it only for
-  a Book without a path, which the query has ruled out.
-- **Order:** independent of story 2; either may go first (owner kept the
-  backlog order, 2026-09-26).
-- **Effort hypothesis:** S–M, medium confidence.
-- **Safe stopping point:** after the code and table removal is released, the
-  bucket is an unused leftover; deleting it is a separate, small step.
-
 <a id="story-2"></a>
 
 ### Delete unwanted supporting files from Web Donut
@@ -341,10 +286,8 @@ avoids a chicken-and-egg problem is:
 3. Story 5: move existing pictures. Its startup run in v1.3.26 moved nothing;
    the owner's manual trigger completed it (verified 2026-09-25).
 4. Story 17: Book files.
-5. The legacy picture storage is removed (its bytes stay in `attachment_blob`);
-   story 21: remove the separate Book storage, `attachment_blob`, the
-   `/attachments/` address and the Book bucket, after story 17 is verified by
-   database query in production.
+5. The legacy picture storage, the separate Book storage, `attachment_blob`,
+   the `/attachments/` address and the Book bucket are removed.
 
 "Present after clone or pull" is not a story: it is how each of these stories
 is proven. Web deletion (story 2), then dissolve/merge (story 11) and the rarer
@@ -392,20 +335,15 @@ integration need their own selected outcomes.
   the notebook that owns it; leave other-notebook references unchanged; accept
   an ordinary rebase conflict for unpublished local frontmatter edits; keep
   learning state and last-updated time; split legacy removal into pictures
-  (now done) and Books (story 21).
+  and Books (both now done).
 - Owner decisions, 2026-09-25 (after the production check of the picture
-  move): the manual trigger completed the move; the picture removal leaves
-  picture bytes in `attachment_blob` for story 21; the production
+  move): the manual trigger completed the move; the production
   check is a read-only database query, not the startup log; the two notes
   with dead picture links are fixed manually, outside any story.
 - Owner decisions, 2026-09-25 (story 2 refinement): the purpose is only to
   remove the file; deleting a file a note's `image:` names is allowed and
   leaves a broken picture; delete outright with no web Trash; keep the
   backlog order.
-- Owner decisions, 2026-09-26 (story 21 refinement): release story 17's Book
-  move first; keep the backlog order, since stories 2 and 21 are independent;
-  drop `attachment_blob` outright with no backup; remove the `/attachments/`
-  address; delete the Book GCS bucket within this story.
 - Owner decisions, 2026-09-26 (story 2 review): the confirmation is plain and
   does not mention that earlier versions stay in history, since most users do
   not need to know; refuse a Book's source file after Delete is chosen rather

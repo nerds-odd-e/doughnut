@@ -60,8 +60,7 @@ folder whose bytes are one immutable Git LFS object in the notebook's private
 GCS content store, keyed by SHA-256 and verified for size and digest when
 stored. Git holds only the pointer; accepted history selects exact versions.
 This holds whether the file was published locally, uploaded on the web, or is
-a Book's source. When the moves below are complete, no other byte store remains:
-the `image` table, `attachment_blob`, and the separate Book storage retire.
+a Book's source. No other byte store exists.
 
 Roles refer to an Attachment and never own bytes:
 
@@ -131,25 +130,13 @@ client's filters are missing or overridden.
 
 - Moves run per notebook, resume after interruption, and skip content already
   moved, so running them again is safe.
-- Keep the old copy until the new one is accepted and verified. Delete old
-  stores and their code in a later release, after the move is confirmed in
-  production — never in the release that moves the bytes.
 - Never delete an object because its current attachment row disappeared.
   Automatic object garbage collection stays deferred until retained history
   and pending uploads are understood.
 
 ### Order
 
-The [product backlog](PRODUCT-BACKLOG.md) owns global order. Within this model:
-
-1. Convert every notebook to LFS first, so each later write path has one
-   representation.
-2. Web picture uploads become attachments, so no new legacy pictures appear.
-3. Existing uploaded pictures move into their notebooks.
-4. Book source files become attachments, for new and existing Books.
-5. Retire the legacy picture and Book storage and their code.
-
-Browsing, deletion and folder operations consume the same model; a PDF file
+The [product backlog](PRODUCT-BACKLOG.md) owns global order. Browsing, deletion and folder operations consume the same model; a PDF file
 does not become a Book by itself. Conversion stops old notebooks' bundles from
 growing with new files but cannot shrink what their history already holds;
 shrinking that would need a separate decision about rewriting history.

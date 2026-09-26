@@ -10,7 +10,6 @@ and deletable in Web Donut.
 
 ## Taken
 
-- [Remove the separate Book storage](seeds/SEED-035-ai-workspace-supporting-files.md#story-21) — SEED-035#story-21 ([plan](quick/040-remove-separate-book-storage/PLAN.md))
 - [Run frontend unit tests faster through cohesive test design](seeds/SEED-039-faster-ci-feedback.md#story-4) — SEED-039#story-4 ([plan](quick/041-faster-frontend-unit-tests/PLAN.md))
 
 ## Backlog list

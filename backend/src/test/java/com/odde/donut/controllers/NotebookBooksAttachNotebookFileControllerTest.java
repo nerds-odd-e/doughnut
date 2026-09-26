@@ -12,7 +12,6 @@ import static com.odde.donut.controllers.NotebookBooksControllerTestBase.webRequ
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.nullValue;
 
 import com.odde.donut.controllers.dto.AttachBookRequest;
 import com.odde.donut.entities.Book;
@@ -51,7 +50,6 @@ class NotebookBooksAttachNotebookFileControllerTest
         equalTo(true));
     Book book = bookRepository.findByNotebook_Id(notebook.getId()).orElseThrow();
     assertThat(book.getSourceFilePath(), equalTo("Physics Primer.pdf"));
-    assertThat(book.getSourceFileRef(), nullValue());
     assertThat(booksController.getBookFile(webRequest(), notebook).getBody(), equalTo(pdfBytes));
     assertAcceptedTreeMatchesTheFullAssembly(notebook);
   }

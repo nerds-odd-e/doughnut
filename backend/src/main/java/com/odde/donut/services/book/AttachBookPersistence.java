@@ -1,20 +1,15 @@
 package com.odde.donut.services.book;
 
-import static com.odde.donut.services.book.BookReadingWireConstants.BOOK_FORMAT_EPUB;
-import static com.odde.donut.services.book.BookReadingWireConstants.BOOK_FORMAT_PDF;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.donut.controllers.dto.ApiError;
 import com.odde.donut.controllers.dto.AttachBookLayoutNodeRequest;
-import com.odde.donut.controllers.dto.AttachBookRequest;
 import com.odde.donut.entities.Book;
 import com.odde.donut.entities.BookBlock;
 import com.odde.donut.entities.BookBlockTitleLimits;
 import com.odde.donut.entities.BookContentBlock;
 import com.odde.donut.exceptions.ApiException;
 import com.odde.donut.factoryServices.EntityPersister;
-import com.odde.donut.testability.TestabilitySettings;
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.IdentityHashMap;
@@ -25,12 +20,10 @@ final class AttachBookPersistence {
 
   private AttachBookPersistence() {}
 
-  static Book persistNewEpubBook(AttachBookService.PersistContext ctx) {
+  static void persistNewEpubBook(AttachBookService.PersistContext ctx, Book book) {
     EntityPersister entityPersister = ctx.entityPersister();
     ObjectMapper objectMapper = ctx.objectMapper();
     byte[] epubBytes = ctx.fileBytes();
-
-    var book = newBook(ctx, BOOK_FORMAT_EPUB);
 
     List<EpubStructureExtractor.EpubLayoutBlock> layout =
         EpubStructureExtractor.extractEpubLayoutWithContent(epubBytes);
@@ -52,13 +45,10 @@ final class AttachBookPersistence {
 
     entityPersister.save(book);
     entityPersister.flush();
-    return book;
   }
 
-  static Book persistNewPdfBook(AttachBookService.PersistContext ctx) {
+  static void persistNewPdfBook(AttachBookService.PersistContext ctx, Book book) {
     EntityPersister entityPersister = ctx.entityPersister();
-
-    var book = newBook(ctx, BOOK_FORMAT_PDF);
 
     List<AttachBookLayoutNodeRequest> roots = ctx.request().getBookLayout().getRoots();
     IdentityHashMap<AttachBookLayoutNodeRequest, BookBlock> nodeToBlock = new IdentityHashMap<>();
@@ -77,21 +67,6 @@ final class AttachBookPersistence {
     for (var entry : pendingContentBlocks) {
       persistContentBlocks(ctx, entry.getKey(), entry.getValue());
     }
-
-    return book;
-  }
-
-  private static Book newBook(AttachBookService.PersistContext ctx, String format) {
-    AttachBookRequest request = ctx.request();
-    TestabilitySettings testabilitySettings = ctx.testabilitySettings();
-    var book = new Book();
-    book.setNotebook(ctx.notebook());
-    book.setBookName(BookService.trimmedMax(request.getBookName(), 512));
-    book.setFormat(format);
-    var now = testabilitySettings.getCurrentUTCTimestamp();
-    book.setCreatedAt(now);
-    book.setUpdatedAt(now);
-    return book;
   }
 
   private static void preorderAttachBlock(

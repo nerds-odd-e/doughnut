@@ -33,9 +33,9 @@ class NotebookBooksRetrievalControllerTest extends NotebookBooksControllerTestBa
     }
 
     @Test
-    void getBookReturnsBookWithNonBlankSourceFileRef() throws UnexpectedNoAccessRightException {
+    void getBookReturnsBookWithItsSourceFilePath() throws UnexpectedNoAccessRightException {
       Notebook nb = notebookWithBook();
-      assertThat(controller.getBook(nb).getSourceFileRef(), not(blankOrNullString()));
+      assertThat(controller.getBook(nb).getSourceFilePath(), equalTo("Linear Algebra.pdf"));
     }
 
     @Test

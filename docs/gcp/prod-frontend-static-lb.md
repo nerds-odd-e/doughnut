@@ -21,7 +21,7 @@ Runbook for production static hosting: one browser-facing hostname, HTTPS load b
 
 - **Single origin** for the browser (existing prod domain): cookies, OAuth redirects, and same-site behavior stay simple.
 - **Static assets and SPA shell** served from **GCS** in front of the domain (via LB, not `storage.googleapis.com` as the script origin).
-- **API, auth, attachments, install script** stay on the **MIG** backend service.
+- **API, auth, install script** stay on the **MIG** backend service.
 
 Do **not** treat `https://storage.googleapis.com/...` as the primary UI origin: use your domain + LB to avoid CORS and cache/versioning issues for module scripts.
 
@@ -99,7 +99,6 @@ Send to the **backend service (MIG)** at least:
 | Path prefix / pattern | Why |
 |----------------------|-----|
 | `/api/*` | REST API |
-| `/attachments/*` | Former legacy picture address; no backend handler serves it since the legacy picture store was retired (the backend answers 404). The route stays until removed separately. |
 | `/logout` | Spring Security logout ([`CommonConfiguration`](../../backend/src/main/java/com/odde/donut/configs/CommonConfiguration.java)) |
 | `/login/continue` | Prod auth bounce ([`ApplicationController`](../../backend/src/main/java/com/odde/donut/controllers/ApplicationController.java)) |
 | `/install` | CLI install script ([`InstallController`](../../backend/src/main/java/com/odde/donut/controllers/InstallController.java)) |
@@ -191,7 +190,7 @@ curl -sf "$BASE/api/healthcheck"
 curl -sfI "$BASE/doughnut-cli-latest/doughnut" | head -5
 ```
 
-Confirm: **HTML/JS** responses are from the **expected** build (e.g. unique hash in a chunk filename or build metadata if you log it), **healthcheck** returns OK and the selected build SHA (`ciSha`) from the MIG, login and **attachments** still work, and the **CLI** URL returns the bundle from **`GCS_FRONTEND_BUCKET`** (via the LB), not the deploy bucket. An ignored-only release retains the tagged SHA in its frontend prefix while health identifies the reused build SHA.
+Confirm: **HTML/JS** responses are from the **expected** build (e.g. unique hash in a chunk filename or build metadata if you log it), **healthcheck** returns OK and the selected build SHA (`ciSha`) from the MIG, login still works, and the **CLI** URL returns the bundle from **`GCS_FRONTEND_BUCKET`** (via the LB), not the deploy bucket. An ignored-only release retains the tagged SHA in its frontend prefix while health identifies the reused build SHA.
 
 ---
 
