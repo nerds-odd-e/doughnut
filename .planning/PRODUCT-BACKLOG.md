@@ -11,6 +11,7 @@ and deletable in Web Donut.
 ## Taken
 
 - [Moves to another notebook reach both notebooks' Git](seeds/SEED-035-ai-workspace-supporting-files.md#story-24) — SEED-035#story-24 ([plan](quick/046-moves-to-another-notebook-reach-git/PLAN.md))
+- [Executable plans live under .planning/slice-plans/](seeds/SEED-044-planning-layout-follows-open-dough.md#story-1) — SEED-044#story-1
 
 ## Backlog list
 
