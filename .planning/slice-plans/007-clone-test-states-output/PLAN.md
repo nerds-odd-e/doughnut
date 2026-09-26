@@ -27,9 +27,14 @@ The clone message itself and every other assertion in the test.
 ### 1. Assert the exact clone message
 
 Type: Structure
-Status: planned
+Status: done
 Change: replace the six output assertions with one
 `expect(ctx.getLogSpy()).toHaveBeenCalledWith(<four joined lines>)` (or an
 equivalent exact equality on the joined output).
 Proof: the test still passes and fails if any line changes or extra text is
 appended; `CURSOR_DEV=true nix develop -c pnpm cli:test` green.
+Accepted proof: `cli/tests/notebookClone.test.ts` first test now asserts
+`getLogSpy()` calls joined equal the four lines of `completeNotebookClone`
+(`cli/src/nonInteractiveCli.ts`); `CURSOR_DEV=true nix develop -c pnpm cli:test`
+passed 67 files / 442 tests; a one-character change to an expected line failed
+that test.

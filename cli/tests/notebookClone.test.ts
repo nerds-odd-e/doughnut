@@ -70,13 +70,14 @@ describe('notebook clone (CLI routing, real Git checkout)', () => {
 
     expect(runGit(['remote'], destinationPath)).toBe('')
 
-    const output = ctx.getLogSpy().mock.calls.flat().join('\n')
-    expect(output).toContain(`Cloned notebook 42 into ${destinationPath}.`)
-    expect(output).toContain('commit')
-    expect(output).toContain(`donut notebook publish ${destinationPath}`)
-    expect(output).toContain(`donut notebook pull ${destinationPath}`)
-    expect(output).not.toContain('Publishing currently accepts')
-    expect(output).not.toContain('rebases')
+    expect(ctx.getLogSpy().mock.calls.flat().join('\n')).toBe(
+      [
+        `Cloned notebook 42 into ${destinationPath}.`,
+        'Edit and commit there with any Git tool.',
+        `Publish with "donut notebook publish ${destinationPath}".`,
+        `Receive newer changes with "donut notebook pull ${destinationPath}".`,
+      ].join('\n')
+    )
   })
 
   test('clone checks out "main" even when the machine defaults to a different branch name', async () => {
