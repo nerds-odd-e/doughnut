@@ -10,8 +10,6 @@ and deletable in Web Donut.
 
 ## Taken
 
-- [Pull, publish and clone read notebook history without per-object queries, and a fresh clone starts clean](seeds/SEED-046-notebook-files-and-git-findings.md#story-8) — SEED-046#story-8 ([plan](slice-plans/008-history-download-and-clean-clone/PLAN.md))
-
 ## Backlog list
 
 - [Retire the one-time note line-ending normalization](seeds/SEED-046-notebook-files-and-git-findings.md#story-13) — SEED-046#story-13
