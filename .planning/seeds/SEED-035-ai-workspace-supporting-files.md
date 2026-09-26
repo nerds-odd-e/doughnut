@@ -90,8 +90,8 @@ in historical bundles.
 
 S = 30–60 minutes, M = 1–2 hours, L = 2–4 hours, including delivery. Estimates
 are hypotheses; refine/split work that exceeds L before execution planning.
-Root-file and nested-file continuity are delivered. Story 11 owns dissolve and
-merge; story 23 fixes the picture a note move leaves behind; stories 24 and 10
+Root-file and nested-file continuity, and folder dissolve and merge, are
+delivered. Story 23 fixes the picture a note move leaves behind; stories 24 and 10
 own moves to another notebook, which the delivered behavior does not publish
 (24) or refuses for folders with files (10). The [product backlog](../PRODUCT-BACKLOG.md) owns global order.
 No executable plan or implementation is authorized by this seed.
@@ -151,103 +151,11 @@ No executable plan or implementation is authorized by this seed.
 - **Safe stopping point:** If never delivered, files are still deleted
   locally.
 
-<a id="story-11"></a>
-
-### Dissolve and merge folders that contain files
-```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../quick/007-dissolve-merge-folders-with-files/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"79dd0d8f920fd295ffbb56f61c30b48c0e7ce0321e691b7a6836a638a97ca2ea","plan":"9d272e09ff8bc64411aa4f5f44ee607916938ed587e6c6f3ee71dfc136908151"}}
-```
-
-- **Identity:** SEED-035#story-11
-- **Slice plan:** [Dissolve and merge folders that contain files](../quick/007-dissolve-merge-folders-with-files/PLAN.md)
-- **Goal:** An owner tidying folders on the web can dissolve or merge a folder
-  that contains files; the files move with the notes instead of the operation
-  being refused. Since web-uploaded and migrated pictures became files in
-  their notes' folders, the refusal blocks any folder holding a picture note.
-  Along the way no web operation may silently lose a file or put two entries on
-  one path, so a clone or pull on any operating system matches what the web
-  shows.
-- **Scope:**
-  - Dissolve, dissolve with merge of same-named subfolders, and a same-notebook
-    folder move with merge carry every file of the moved folders, exactly as
-    they carry notes. The temporary "Folders containing files cannot be
-    dissolved, merged, or moved to another notebook yet" refusal goes away for
-    these operations.
-  - **One set of names per folder** (and at the notebook root): a note's
-    `Title.md`, a subfolder's name and a file's filename share one set of
-    entry names, compared without regard to letter case. Every web placement
-    asks this one rule, reading live rows: a name the user chose is refused
-    when taken (note create, rename and move; folder create, rename and move;
-    picture upload; dissolve and merge); a name Donut chooses is the first free
-    one (note and folder trash, a Book's source file). This follows the North
-    Star rule that Donut-chosen names take a free name and user-placed ones
-    refuse, and replaces today's separate per-kind checks.
-  - **Dissolve and merge check first, then change.** They work out every
-    destination path before changing anything: same-named folders merge (a
-    case variant such as `Diagrams` merges into the existing `diagrams`); any
-    other taken path — file against file, note against note, or one kind
-    against another, even with identical bytes — refuses the whole operation,
-    names the first clashing path, and changes nothing (owner decision
-    2026-09-21; first path only, 2026-09-26). This also closes the known gap
-    that dissolve and merge never checked note titles.
-  - **No database cascade on folder contents** (owner direction 2026-09-26):
-    the foreign keys from a file to its folder (`CASCADE`), a folder to its
-    parent folder (`CASCADE`) and a note to its folder (`SET NULL`) stop acting
-    on delete. Code that means to remove a folder's contents removes them
-    explicitly, so the accepted-change capture sees every removal; a forgotten
-    file fails loudly ([ADR 0006](../../docs/adrs/0006-failure-handling-accepted.md))
-    instead of vanishing. This covers permanently deleting a trashed folder,
-    local-publish acceptance removing a folder, and the "remove empty folders"
-    health fix, which today counts only notes and so deletes a folder holding
-    only files, together with those files.
-  - Existing content is never judged again; the rule applies to new placements.
-- **Excluded:**
-  - Moving or merging into another notebook (story 10). That refusal stays,
-    including a merge into another notebook's same-named folder, which today
-    reaches the same merge code.
-  - Renaming on a clash, and rewriting file references. A note outside the
-    dissolved folder whose `image:` points into it (`physics/intro.md` with
-    `image: old/sketch.png`) shows a broken picture afterwards, as story 2
-    accepted for deletion. Web uploads always place a picture in its note's own
-    folder, so only locally written references can cross folders.
-  - Local-publish acceptance keeps its own validation; the shared name rule is
-    for web placements. A Git tree cannot hold a file and a folder on one path.
-  - Notebook-level cascades (notebook to folder, file, Book): notebooks are
-    only soft-deleted and nothing triggers them.
-  - Any other change to the health fix, such as committing its folder removal
-    to accepted history.
-- **Key examples:**
-  - `physics/old/` holds `sketch.png`; `physics/` has no `sketch.png`. The owner
-    dissolves `old` and pulls → `physics/sketch.png`, same bytes, no `old/`.
-  - `physics/diagrams/a.png` and `physics/old/diagrams/b.png`: dissolving `old`
-    with merge → both files in `physics/diagrams/`.
-  - `archive/diagrams/c.png` moved into `physics/`, which has `diagrams/`, with
-    merge → `physics/diagrams/c.png`.
-  - `physics/force.png` and `physics/old/force.png` (different or identical
-    bytes): dissolving `old` is refused naming `physics/force.png`; folders,
-    notes, files and the accepted head are unchanged.
-  - `physics/Energy.md` and `physics/old/energy.md`: dissolving `old` is
-    refused naming `physics/Energy.md`, instead of today's generic conflict.
-  - `physics/` holds `Force.png`: creating a folder `force.png` in `physics/`
-    is refused naming `physics/Force.png`.
-  - `refs/` holds only `paper.pdf`: "remove empty folders" keeps `refs/` and
-    the file.
-  - A trashed folder holding `paper.pdf` is permanently deleted → the file is
-    gone after pull, now removed explicitly rather than by the database.
-  - Moving `refs/` holding a file into another notebook's `refs/` with merge is
-    still refused.
-- **Effort hypothesis:** L (nine planned slices), medium confidence. A natural
-  later split, if execution overruns: (a) no cascade plus one set of names per
-  folder, then (b) dissolve and merge carry files.
-- **Depends on:** delivered nested attachment continuity.
-- **Safe stopping point:** if never delivered, the current refusal stays safe.
-  The name rule and cascade removal each leave the product safer on their own.
-
 <a id="story-23"></a>
 
 ### A moved note keeps its picture
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../quick/042-moved-note-keeps-its-picture/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"f1cb2be5b3fa63de2c155a9199e02f418e77aa141ddaa4a6ce05e514f030498b","plan":"b7de56b768b196d212af698f2f489e8660b6a5d3e7e1708beebdffd98ab06875"}}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../quick/042-moved-note-keeps-its-picture/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"5ad8e0c37e930ebdcbde4f413906bcfaa516d3e17ae5dd8607335bd7a3027b91","plan":"da326236c8b3fdd950b6e8d1938ac1c75920b7e9cb0d6f7a656f051aa41766c7"}}
 ```
 
 - **Identity:** SEED-035#story-23
@@ -265,8 +173,8 @@ No executable plan or implementation is authorized by this seed.
     destination in the same accepted change, and `image:` stays as it was
     (owner decision 2026-09-26, option A).
   - When the destination folder already has an entry with that filename
-    (compared without letter case, under story 11's one set of names per
-    folder), the file takes the first free name (`force (2).png`) and the
+    (compared without letter case, under the
+    [one set of names per folder](../../docs/notebook-git-attachments.md#one-set-of-names-per-folder)), the file takes the first free name (`force (2).png`) and the
     note's `image:` is rewritten to it in the same change. Donut chooses this
     name and writes the only reference at the same moment, so it takes a free
     name rather than refusing
@@ -288,8 +196,8 @@ No executable plan or implementation is authorized by this seed.
     note moves and `image:` is untouched. Only locally written values reach
     other folders; web uploads always sit beside their note.
   - Other notes elsewhere in the notebook whose locally written `image:`
-    points into the source folder: not searched, as story 11 accepted for
-    folder operations.
+    points into the source folder: not searched, as folder dissolve and merge
+    already accept.
   - Showing `image:` values with `..` on the web, and rewriting `image:` for
     anything but the free-name case.
 - **Key examples:**
@@ -310,8 +218,10 @@ No executable plan or implementation is authorized by this seed.
      beside it with its picture.
 - **Effort hypothesis:** M, medium confidence. The move owner already writes
   one accepted change; it adds a file placement (or copy) and, rarely, a
-  one-field frontmatter rewrite. Story 11 supplies the name rule.
-- **Depends on:** story 11 (one set of names per folder, including files).
+  one-field frontmatter rewrite. The delivered one set of names per folder
+  supplies the name rule.
+- **Depends on:** nothing outstanding (the one set of names per folder,
+  including files, is delivered).
 - **Safe stopping point:** if never delivered, moving picture notes keeps
   breaking their picture, as today; nothing is lost and a local move fixes it.
 
@@ -344,7 +254,8 @@ No executable plan or implementation is authorized by this seed.
   files refuse until their story delivers) or moves with a broken picture as
   today.
 - **Effort hypothesis:** M, low confidence.
-- **Depends on:** story 11 (queued after it by owner decision 2026-09-26).
+- **Depends on:** nothing outstanding (queued after folder dissolve and merge
+  by owner decision 2026-09-26; that is delivered).
 - **Safe stopping point:** if never delivered, web moves to another notebook
   keep diverging from local checkouts.
 
@@ -372,10 +283,11 @@ No executable plan or implementation is authorized by this seed.
   moved to another notebook follows story 23's rules.
 - **Proposed exclusions:** a folder holding a Book's source file is refused
   (the Book belongs to the source notebook; [story 17 decision](#breadcrumbs));
-  references from outside the moved folder break, as story 11 accepted;
+  references from outside the moved folder break, as folder dissolve and
+  merge accept;
   source objects are not deleted (garbage collection stays deferred). A merge
-  into a same-named destination folder only if story 11's merge rules make it
-  free; otherwise it stays refused.
+  into a same-named destination folder only if the delivered merge rules (every
+  destination checked first) make it free; otherwise it stays refused.
 - **Value:** the refusal loses nothing and a local workaround exists (copy the
   files between two checkouts), so this is a convenience ranked after story 24.
 - **Effort hypothesis:** M, low confidence.
@@ -403,7 +315,7 @@ avoids a chicken-and-egg problem is:
    the `/attachments/` address and the Book bucket are removed.
 
 "Present after clone or pull" is not a story: it is how each of these stories
-is proven. Web deletion (story 2), then dissolve/merge (story 11), then a note move keeping
+is proven. Web deletion (story 2), then dissolve/merge (delivered), then a note move keeping
 its picture (story 23, a regression fix), moves to another notebook reaching Git
 (story 24, a correctness fix) and the rarer cross-notebook move of files
 (story 10, a convenience whose absence loses nothing).
@@ -463,17 +375,10 @@ integration need their own selected outcomes.
   not need to know; refuse a Book's source file after Delete is chosen rather
   than hiding Delete; keep the plan's first slice whole and let execution
   escalate if it overruns.
-- Owner decisions, 2026-09-26 (story 11 refinement): widen the story into a
-  cohesive fix — one set of entry names per folder, compared without letter
-  case, for every web placement; dissolve and merge check first and refuse
-  naming the first clash; no database cascade on folder contents, with code
-  removing contents explicitly. Local-publish acceptance keeps its own
-  validation; notebook-level cascades stay. The same-notebook merge move's
-  stale path wiki links become their own story, queued right after story 11.
 - Owner decisions, 2026-09-26 (story 10 refinement): story 10's premise was
   wrong — moves to another notebook never reach either notebook's Git — so
   split it: story 24 makes those moves reach Git, story 10 keeps carrying
-  files, both queued after story 11. A moved folder carries its nested
+  files, both queued after folder dissolve and merge. A moved folder carries its nested
   subfolders; no multi-folder move. A note move leaving its picture behind is
   in scope of this refinement as story 23: the file moves with the note
   (option A), rather than pointing `image:` back (the web does not resolve

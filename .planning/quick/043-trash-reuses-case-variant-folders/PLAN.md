@@ -4,13 +4,14 @@
 
 **Identity:** quick/043-trash-reuses-case-variant-folders/PLAN.md
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"c93932b237ee786328d8b97ec26c74202e2edffd9ab7a17392da1dd786fa6035"}}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"603a0c5c1d23d8f9ef2a79a63426401aa130ac0211c464acc3402237e58f219e"}}
 ```
 
 - Kind: bounded retrospective correction; no story.
 - Provenance: execution retrospective of SEED-035#story-11
-  ([seed](../../seeds/SEED-035-ai-workspace-supporting-files.md#story-11),
-  plan `quick/007-dissolve-merge-folders-with-files`), story branch
+  (seed section and plan recoverable at before-cleanup commit `08fec6ef8d`:
+  `.planning/seeds/SEED-035-ai-workspace-supporting-files.md#story-11`,
+  `.planning/quick/007-dissolve-merge-folders-with-files/PLAN.md`), story branch
   `story/dissolve-merge-folders-with-files`, commits `1a8b7abff7`..`97c1f73ef5`
   (claim `fb2b68dc1d`). Story 11 promised that every web placement asks the one
   set of names per folder and that a name Donut chooses is the first free one

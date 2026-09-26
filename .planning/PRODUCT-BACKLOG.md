@@ -11,7 +11,6 @@ and deletable in Web Donut.
 ## Taken
 
 - [Delete unwanted supporting files from Web Donut](seeds/SEED-035-ai-workspace-supporting-files.md#story-2) — SEED-035#story-2 ([plan](quick/035-delete-notebook-file-on-web/PLAN.md))
-- [Dissolve and merge folders that contain files](seeds/SEED-035-ai-workspace-supporting-files.md#story-11) — SEED-035#story-11 ([plan](quick/007-dissolve-merge-folders-with-files/PLAN.md))
 
 ## Backlog list
 
