@@ -1,6 +1,9 @@
 # Land on the containing folder from one place
 
 **Identity:** quick/044-one-containing-location/PLAN.md
+```json dough-story-state
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"b5be9428a5728c85c45fce30e0102d61a751e6942848be4842cf35080cf08b0e"}}
+```
 
 ## Source
 
