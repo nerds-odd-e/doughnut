@@ -188,6 +188,10 @@ Former local code: DD-107.
   - Evidence: coordinator summary handed to the execution retrospective (no transcript): the first `deliver` returned `candidate-mismatch` because an abbreviated SHA was passed to `--validated-candidate`, and a retry with the full SHA was accepted; every publication (0f8709dfc1, c7ea84e3a7, 7cb7c300b1, 6455811f4d, 5bf185ba0d, db643ef844) reported "host session identity is required to verify the notification bridge".
   - Observed effect: CI on `story/037-share-backend-test-context` was never observed during execution; the retrospective started with CI unknown.
   - Inference: both the abbreviated-SHA refusal and the missing session identity recurred about an hour after the same pair was recorded for `quick/037-fold-picture-attach-step-into-upload` on main, which this execution's base (5c8bb75741) did not contain. Whether a recovery was attempted is not in the summary.
+- Execution: SEED-035 story 2 / quick/035-delete-notebook-file-on-web / 20968e7810; Timestamp: 2026-09-26, ~10:24+08:00 (slice 1 delivery; commit 10:24:02+08:00); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.40.
+  - Evidence: coordinator summary handed to the execution retrospective (no transcript): the first managed delivery failed because the target ref lacked the `refs/heads/` prefix, then `candidate-mismatch` for an abbreviated SHA and a missing host session identity (`--session-json`); later deliveries succeeded and the observer /tmp/dough-ci-501/watch-HC7nuY covers `refs/heads/story/delete-notebook-file-on-web`.
+  - Observed effect: at least two refused delivery calls before slice 1 was published; the release update from 0.3.38 to 0.3.40 did not remove either earlier cause.
+  - Inference: the `refs/heads/` requirement is a new third argument-shape refusal on the same first delivery; the three are rediscovered one refusal at a time. The exact call count is not in the summary.
 
 ## ODF-099 — Queued startup receipt embeds the whole Git index and overflows the coordinator's tool output
 
@@ -349,8 +353,19 @@ Slice planning takes the number after the highest plan entry in the checkout tha
   - Observed effect: DearDough rows and `.planning/test-optimization-candidates.md` ("plan 037 cut the suite…") refer to "037" for two different executions once both plans are deleted at wrap-up; the retrospective's correction plan had to reword the candidate record.
   - Inference: the same stale-base allocation applies to DD numbers in this log, so a merge can also produce duplicate finding codes. Whether the coordinator fetched `origin/main` before planning is not recorded.
 
+## DD-122 — Closing one story in a shared seed made a sibling story's ready assessment stale
+
+A story's readiness basis is a digest of its whole seed document. Wrapping up another story in the same seed removed that story's section, which changed the digest, so `execution-start.mjs start` refused the unchanged, ready sibling with "published preparation is needs-reassessment". The coordinator rechecked the story text and plan assumptions, recorded `ready` again, and published a separate readiness commit on main before the Take.
+
+### Occurrences
+
+- Execution: SEED-035 story 2 / quick/035-delete-notebook-file-on-web / 20968e7810; Timestamp: 2026-09-26, before 10:09:55+08:00 (refusal; readiness commit 7b949a9246 at 10:09:55+08:00); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.40.
+  - Evidence: bfb3d92154 (09:06:00+08:00) closed SEED-035's Book storage story, removing 70 lines of `SEED-035-ai-workspace-supporting-files.md`; 7b949a9246 changed only `basis.document` (627ac528… → f56f518f…) while `basis.plan` stayed e9eb6a56…; the story-2 section and plan were unchanged. Main's 2921f4d44b re-recorded SEED-035#story-11 as ready after the same removal.
+  - Observed effect: one refused start, a reassessment, one extra commit on main and a retry; an execution coordinator performed a preparation assessment, as in DD-114.
+  - Inference: every story in a multi-story seed is invalidated by any sibling's wrap-up. A digest of the story's own section (plus shared seed context) would keep unrelated closures from forcing reassessment. Qualified: the number of extra calls is not in the summary.
+
 ## Retention
 
-- Highest allocated local number: 118
+- Highest allocated local number: 122
 - Recovery: `33939aa45a17c08f5e6f8076178ce96437fdfbe8:DearDough.md` contains the complete pre-compaction log and earlier recovery references; `b0b385a184e96ecf8b0f6fc5572eaaab69bc8dad` preserves later history.
 - Occurrence history is partial; full observations, effects, inference and historical provenance remain in that snapshot and the upstream catalog.
