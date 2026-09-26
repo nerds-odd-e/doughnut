@@ -18,6 +18,8 @@ import com.odde.donut.services.notebookTree.PortableTreeEntry;
 import com.odde.donut.testability.GitBundleTestReader.AcceptedHistory;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 
 /** Deleting a file on the web is one accepted change whose tree lacks the file. */
 class NotebookGitWebAttachmentDeleteControllerTest extends NotebookGitWebContentControllerTestBase {
@@ -83,5 +85,31 @@ class NotebookGitWebAttachmentDeleteControllerTest extends NotebookGitWebContent
     currentUser.setUser(owner);
     assertThat(acceptedHistory(notebook).commits(), equalTo(before.commits()));
     assertThat(notebookAttachmentRepository.findById(sketch.getId()).isPresent(), is(true));
+  }
+
+  @Test
+  void aBooksSourceFileCannotBeDeleted() throws Exception {
+    Notebook notebook = createGitBackedNotebook();
+    makeMe.aBook().notebook(notebook).bookName("paper").fileBytes(PDF_BYTES).please();
+    snapshotCurrentPortableTree(notebook);
+    NotebookAttachment paper =
+        notebookAttachmentRepository
+            .findByNotebook_IdAndFolderIsNullAndFilename(notebook.getId(), "paper.pdf")
+            .orElseThrow();
+    AcceptedHistory before = acceptedHistory(notebook);
+
+    ResponseStatusException exception =
+        assertThrows(
+            ResponseStatusException.class,
+            () -> attachmentController.deleteAttachment(notebook, paper));
+
+    assertThat(exception.getStatusCode(), equalTo(HttpStatus.CONFLICT));
+    assertThat(
+        exception.getReason(),
+        equalTo(
+            "\"paper.pdf\" is the source file of the Book \"paper\". Remove the Book on the"
+                + " web before deleting, renaming or changing it."));
+    assertThat(acceptedHistory(notebook).commits(), equalTo(before.commits()));
+    assertThat(notebookAttachmentRepository.findById(paper.getId()).isPresent(), is(true));
   }
 }

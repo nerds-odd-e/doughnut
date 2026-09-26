@@ -105,8 +105,14 @@ give a usable result.
 
 ### 2. A Book's source file cannot be deleted on the web
 Type: Behavior
-Status: planned
-Proof: slice 2 row above.
+Status: done
+Proof: slice 2 row above. Accepted:
+`NotebookGitWebAttachmentDeleteControllerTest.aBooksSourceFileCannotBeDeleted`
+(CONFLICT with the literal message, no commit, row stays);
+`NotebookGitBookSourceFileProtectionControllerTest` still passes for local publish.
+
+Learnings: `NotebookGitBookSourceFileProtection` is now a component owning the
+Book lookup and the message; local publish and the web delete both call it.
 
 Behavior: notebook whose Book names `paper.pdf` → the owner deletes
 `paper.pdf` on the web → refused (CONFLICT) with "\"paper.pdf\" is the source

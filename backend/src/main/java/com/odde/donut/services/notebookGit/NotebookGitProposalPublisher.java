@@ -3,7 +3,6 @@ package com.odde.donut.services.notebookGit;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.NotebookGitBinding;
-import com.odde.donut.entities.repositories.BookRepository;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.donut.services.AuthorizationService;
 import com.odde.donut.services.notebookAttachment.NotebookAttachmentContent;
@@ -35,7 +34,7 @@ public class NotebookGitProposalPublisher {
   private final NotebookGitProposalNoteAddition noteAddition;
   private final NotebookGitProposalOrdinaryNoteApplication ordinaryNoteApplication;
   private final NotebookAttachmentContent notebookAttachmentContent;
-  private final BookRepository bookRepository;
+  private final NotebookGitBookSourceFileProtection bookSourceFileProtection;
 
   public NotebookGitProposalPublisher(
       NotebookGitStateLoader notebookGitStateLoader,
@@ -49,7 +48,7 @@ public class NotebookGitProposalPublisher {
       NotebookGitProposalNoteAddition noteAddition,
       NotebookGitProposalOrdinaryNoteApplication ordinaryNoteApplication,
       NotebookAttachmentContent notebookAttachmentContent,
-      BookRepository bookRepository) {
+      NotebookGitBookSourceFileProtection bookSourceFileProtection) {
     this.notebookGitStateLoader = notebookGitStateLoader;
     this.authorizationService = authorizationService;
     this.projection = projection;
@@ -61,7 +60,7 @@ public class NotebookGitProposalPublisher {
     this.noteAddition = noteAddition;
     this.ordinaryNoteApplication = ordinaryNoteApplication;
     this.notebookAttachmentContent = notebookAttachmentContent;
-    this.bookRepository = bookRepository;
+    this.bookSourceFileProtection = bookSourceFileProtection;
   }
 
   @Transactional(
@@ -110,9 +109,7 @@ public class NotebookGitProposalPublisher {
     List<NotebookGitProposalTreeShape.InspectedRegularFile> files =
         NotebookGitProposalTreeShape.inspectRegularFiles(
             proposal.repository(), acceptedHead, proposal.mainHead());
-    bookRepository
-        .findByNotebook_Id(notebook.getId())
-        .ifPresent(book -> NotebookGitBookSourceFileProtection.refuseChanging(book, files));
+    bookSourceFileProtection.refuseChanging(notebook.getId(), files);
     List<NotebookGitProposalTreeShape.ChangedDocument> documents =
         NotebookGitProposalTreeShape.classifyChangedDocuments(files);
     Timestamp publishedAt = testabilitySettings.getCurrentUTCTimestamp();

@@ -21,6 +21,7 @@ public class WebAttachmentDeleteService {
   private final AcceptedWebChangeService acceptedWebChangeService;
   private final NotebookRepository notebookRepository;
   private final NotebookAttachmentRepository attachmentRepository;
+  private final NotebookGitBookSourceFileProtection bookSourceFileProtection;
   private final AuthorizationService authorizationService;
   private final EntityPersister entityPersister;
   private final TestabilitySettings testabilitySettings;
@@ -29,12 +30,14 @@ public class WebAttachmentDeleteService {
       AcceptedWebChangeService acceptedWebChangeService,
       NotebookRepository notebookRepository,
       NotebookAttachmentRepository attachmentRepository,
+      NotebookGitBookSourceFileProtection bookSourceFileProtection,
       AuthorizationService authorizationService,
       EntityPersister entityPersister,
       TestabilitySettings testabilitySettings) {
     this.acceptedWebChangeService = acceptedWebChangeService;
     this.notebookRepository = notebookRepository;
     this.attachmentRepository = attachmentRepository;
+    this.bookSourceFileProtection = bookSourceFileProtection;
     this.authorizationService = authorizationService;
     this.entityPersister = entityPersister;
     this.testabilitySettings = testabilitySettings;
@@ -55,6 +58,7 @@ public class WebAttachmentDeleteService {
           authorizationService.assertAuthorization(liveNotebook);
           liveAttachment.requireInNotebook(liveNotebook);
           String path = NotebookGitPortablePath.ofAttachment(liveAttachment);
+          bookSourceFileProtection.refuseChanging(liveNotebook.getId(), path);
           entityPersister.remove(liveAttachment);
           return path;
         },
