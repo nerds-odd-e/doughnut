@@ -87,7 +87,11 @@ as the home of the prod storage client. Gap: none; this is removal.
 
 ### 1. The production storage client belongs to notebook files
 Type: Structure
-Status: planned
+Status: done
+Accepted proof: `NotebookAttachmentContentConfigurationProdTest`
+(prod profile, only `NotebookAttachmentContentConfiguration` loaded →
+`GcsNotebookAttachmentContent`); passes without local gcloud config, so the
+test stays. `*Book*` / `*NotebookAttachment*` backend tests pass (159).
 Proof: the prod-profile context test (second row above).
 
 Internal change: move the prod GCS `Storage` bean from
@@ -136,7 +140,10 @@ the migration fails loudly (ADR 0006). Regenerate `docs/database-erd.md`
 
 ### 4. The old picture address is gone
 Type: Behavior
-Status: planned
+Status: done
+Accepted proof: `pnpm test:path-routing` (catch-all test now asserts
+`/attachments/x` reaches the static bucket) and `pnpm validate:path-routing`
+pass; `docs/gcp/prod_env.md` §6 also lost `/attachments`.
 Proof: slice 4 row above.
 
 Behavior: a request to `/attachments/x` → it is no longer classified as a

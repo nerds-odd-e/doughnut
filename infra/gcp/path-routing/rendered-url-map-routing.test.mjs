@@ -62,7 +62,6 @@ test('rendered URL map: backend-classified paths are not routed to the bucket', 
   assert.ok(!('error' in rr))
   for (const urlPath of [
     '/api/foo',
-    '/attachments/x',
     '/logout',
     '/login/continue',
   ]) {
@@ -82,6 +81,7 @@ test('rendered URL map: unknown frontend deep link hits catch-all bucket rewrite
   assert.ok(gcpRoutesToStaticBucket('/recall', rr.routingRules))
   assert.ok(gcpRoutesToStaticBucket('/circles', rr.routingRules))
   assert.ok(gcpRoutesToStaticBucket('/users/identify', rr.routingRules))
+  assert.ok(gcpRoutesToStaticBucket('/attachments/x', rr.routingRules))
 })
 
 test('local proxy has no spaShellInsteadOfBackendExactPaths', () => {

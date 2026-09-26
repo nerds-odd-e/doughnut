@@ -74,7 +74,6 @@ const config = defineConfig({
     strictPort: true,
     proxy: {
       '/api': backendOrigin,
-      '/attachments': backendOrigin,
       '/logout': backendOrigin,
       '/testability': backendOrigin,
     },

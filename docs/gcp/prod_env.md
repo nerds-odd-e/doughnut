@@ -107,7 +107,7 @@ Each green `main` CI run builds the SPA tree (Vite output under `frontend/dist/`
 
 The CLI install binary goes to `gs://<GCS_FRONTEND_BUCKET>/doughnut-cli-latest/doughnut`. Deploy artifacts (fat jar, `deploy/last-successful-deploy.json`) use **`GCS_BUCKET`** only. Upload scripts: `infra/gcp/scripts/upload-frontend-static-to-gcs.sh`, `infra/gcp/scripts/upload-cli-binary-to-gcs.sh`.
 
-**Prod routing:** HTTPS load balancer sends static paths to a **backend bucket** (and optional Cloud CDN); API, OAuth, `/attachments`, `/logout`, `/install`, etc. stay on the MIG. Full runbook (including a one-page release checklist): [prod-frontend-static-lb.md](prod-frontend-static-lb.md).
+**Prod routing:** HTTPS load balancer sends static paths to a **backend bucket** (and optional Cloud CDN); API, OAuth, `/logout`, `/install`, etc. stay on the MIG. Full runbook (including a one-page release checklist): [prod-frontend-static-lb.md](prod-frontend-static-lb.md).
 
 **Local Development vs E2E / Cypress (ports and LB — source of truth):**
 

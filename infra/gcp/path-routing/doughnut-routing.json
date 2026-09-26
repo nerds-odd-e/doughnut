@@ -3,7 +3,6 @@
     "exactPaths": ["/api", "/install", "/login", "/login/continue", "/robots.txt"],
     "pathPrefixes": [
       "/api/",
-      "/attachments/",
       "/oauth2/",
       "/login/oauth2/"
     ],
