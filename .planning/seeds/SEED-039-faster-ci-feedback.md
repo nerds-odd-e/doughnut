@@ -131,6 +131,30 @@ authorizes no implementation, profiling run, or executable slice plan.
   If the resulting timings no longer justify rebalancing, bring that evidence
   back for an owner decision rather than inventing work or silently cancelling it.
 
+<a id="story-4"></a>
+
+### Run frontend unit tests faster through cohesive test design
+
+**Identity:** SEED-039#story-4
+```json dough-story-state
+{"schemaVersion":1,"refinement":"not-refined","approach":"unselected"}
+```
+
+- **For / why:** Contributors get faster trustworthy feedback from the frontend
+  unit tests locally and in CI.
+- **Scope:** Conduct one measured test-optimization round over the frontend unit
+  tests (`pnpm frontend:test`). The owner chose to skip story refinement; the
+  plan is made during execution.
+- **Required skill handoff:** Invoke
+  [dough-test-optimization](../../.agents/skills/dough-test-optimization/SKILL.md)
+  in its normal measure-and-improve mode on the frontend unit tests.
+- **Evaluation:** Comparable before/after runs of `pnpm frontend:test` show a
+  repeatable wall-time improvement with behavioral coverage preserved.
+- **Effort hypothesis:** L, low confidence until profiling.
+- **Depends on:** Nothing.
+- **Safe stopping point:** Verified improvements stand on their own; record
+  inconclusive experiments or remaining candidates honestly.
+
 ## Ordering and Scope Reduction
 
 Follow story 2, then story 3. Test optimization removes shared cost before shard
