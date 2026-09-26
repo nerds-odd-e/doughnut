@@ -15,3 +15,13 @@ Feature: Notebook files
     Then I should see the file page for "run.json" of 12 bytes
     And after reloading, the sidebar is open at folder "data" showing "run.json"
     And downloading the file gives '{"speed": 3}' named "run.json"
+
+  Scenario: Delete a file from its page
+    Given the notebook "Lab Notebook" has files:
+      | Path               | Content |
+      | physics/sketch.png | sketch  |
+    When I jump to the notebook "Lab Notebook"
+    And I open the file "sketch.png" in sidebar folder path "physics"
+    And I delete the file on its page
+    Then the folder page heading should be "physics"
+    And the sidebar folder "physics" lists only "data"

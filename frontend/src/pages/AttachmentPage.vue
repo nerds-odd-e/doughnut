@@ -18,6 +18,15 @@
         <Download class="size-4" aria-hidden="true" />
         Download
       </a>
+      <button
+        v-if="!attachmentRealm.notebookRealm.readonly"
+        class="daisy-btn daisy-btn-sm daisy-btn-error daisy-btn-outline ml-2"
+        data-testid="attachment-delete-button"
+        @click="deleteAttachment"
+      >
+        <Trash2 class="size-4" aria-hidden="true" />
+        Delete
+      </button>
     </div>
   </div>
 </template>
@@ -28,9 +37,15 @@ import type {
   NotebookAttachmentRealm,
 } from "@generated/donut-backend-api"
 import { client } from "@generated/donut-backend-api/client.gen"
-import { Download } from "@lucide/vue"
+import { NotebookAttachmentController } from "@generated/donut-backend-api/sdk.gen"
+import { Download, Trash2 } from "@lucide/vue"
 import { computed } from "vue"
+import { useRouter } from "vue-router"
 import ContentLoader from "@/components/commons/ContentLoader.vue"
+import usePopups from "@/components/commons/Popups/usePopups"
+import { refreshSidebarStructuralListings } from "@/components/notes/sidebarStructuralRefresh"
+import { apiCallWithLoading } from "@/managedApi/clientSetup"
+import { containingLocationOf } from "@/routes/containingLocation"
 
 const props = defineProps<{
   attachmentRealm: NotebookAttachmentRealm | undefined
@@ -45,6 +60,25 @@ const downloadHref = computed(() =>
     },
   })
 )
+
+const router = useRouter()
+const { popups } = usePopups()
+
+const deleteAttachment = async () => {
+  const realm = props.attachmentRealm!
+  if (!(await popups.confirm(`Delete ${realm.attachment.filename}?`))) return
+  const { error } = await apiCallWithLoading(() =>
+    NotebookAttachmentController.deleteAttachment({
+      path: {
+        notebook: realm.notebookRealm.notebook.id,
+        attachment: realm.attachment.id,
+      },
+    })
+  )
+  if (error) return
+  refreshSidebarStructuralListings()
+  await router.push(containingLocationOf(realm))
+}
 </script>
 
 <style scoped>

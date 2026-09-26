@@ -6,6 +6,7 @@ import { refreshSidebarStructuralListings } from "@/components/notes/sidebarStru
 import type { FolderRemovalOffer } from "@/composables/folderRemovalOffer"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import { toOpenApiError } from "@/managedApi/openApiError"
+import { containingLocationOf } from "@/routes/containingLocation"
 
 export function isFolderNameConflict(
   apiError: ReturnType<typeof toOpenApiError>
@@ -39,29 +40,6 @@ export function throwIfSdkError(result: {
   throw err
 }
 
-export async function routeAfterFolderRemoval(
-  router: Router,
-  r: FolderRealm
-): Promise<void> {
-  const notebookId = r.notebookRealm.notebook.id
-  const ancestors = r.ancestorFolders ?? []
-  if (ancestors.length === 0) {
-    await router.push({
-      name: "notebookPage",
-      params: { notebookId },
-    })
-    return
-  }
-  const parent = ancestors[ancestors.length - 1]!
-  await router.push({
-    name: "folderPage",
-    params: {
-      notebookId: String(notebookId),
-      folderId: String(parent.id),
-    },
-  })
-}
-
 export async function removeFolderOnPage(options: {
   folderRealm: FolderRealm
   router: Router
@@ -79,7 +57,7 @@ export async function removeFolderOnPage(options: {
     )
     throwIfSdkError(result)
     refreshSidebarStructuralListings()
-    await routeAfterFolderRemoval(options.router, r)
+    await options.router.push(containingLocationOf(r))
   } catch (e: unknown) {
     options.removalError.value =
       toOpenApiError(e).message ?? options.offer.failureMessage
@@ -200,7 +178,7 @@ export async function dissolveFolderOnPage(options: {
     )
     throwIfSdkError(dissolveResult)
     refreshSidebarStructuralListings()
-    await routeAfterFolderRemoval(options.router, r)
+    await options.router.push(containingLocationOf(r))
   } catch (e: unknown) {
     const apiError = toOpenApiError(e)
     if (!options.merge && isFolderNameConflict(apiError)) {

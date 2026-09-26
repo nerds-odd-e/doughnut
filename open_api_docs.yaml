@@ -3074,6 +3074,27 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/NotebookAttachmentRealm"
+    delete:
+      tags:
+      - notebook-attachment-controller
+      summary: Delete a file
+      description: Removes the file from the notebook in one accepted change. Earlier
+        history keeps it.
+      operationId: deleteAttachment
+      parameters:
+      - name: notebook
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: attachment
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        "200":
+          description: OK
   /api/notebooks/{notebook}/attachments/{attachment}/content:
     get:
       tags:

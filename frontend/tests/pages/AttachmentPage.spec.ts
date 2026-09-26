@@ -8,6 +8,7 @@ describe("AttachmentPage", () => {
     const notebook = makeMe.aNotebook.please()
     const wrapper = helper
       .component(AttachmentPage)
+      .withRouter()
       .withProps({
         attachmentRealm: {
           notebookRealm: { notebook, readonly: true },
@@ -31,5 +32,27 @@ describe("AttachmentPage", () => {
       `/api/notebooks/${notebook.id}/attachments/42/content`
     )
     expect(link.attributes("download")).toBe("run.json")
+  })
+
+  it.each([
+    [true, false],
+    [false, true],
+  ])("when readonly is %s, offers Delete: %s", (readonly, offered) => {
+    const wrapper = helper
+      .component(AttachmentPage)
+      .withRouter()
+      .withProps({
+        attachmentRealm: {
+          notebookRealm: { notebook: makeMe.aNotebook.please(), readonly },
+          ancestorFolders: [],
+          attachment: { id: 42, filename: "run.json" },
+          size: 12,
+        },
+      })
+      .mount()
+
+    expect(
+      wrapper.find('[data-testid="attachment-delete-button"]').exists()
+    ).toBe(offered)
   })
 })

@@ -9,6 +9,11 @@ import {
 } from '@badeball/cypress-cucumber-preprocessor'
 import start from '../start'
 import { attachmentPage } from '../start/pageObjects/attachmentPage'
+import {
+  childTreeitems,
+  expectRowLabels,
+  folderTreitemByLabel,
+} from '../start/pageObjects/sidebarTreeItems'
 
 Given(
   'the notebook {string} has files:',
@@ -60,5 +65,16 @@ Then(
   'downloading the file gives {string} named {string}',
   (content: string, filename: string) => {
     attachmentPage().expectDownload(filename, content)
+  }
+)
+
+When('I delete the file on its page', () => {
+  attachmentPage().delete()
+})
+
+Then(
+  'the sidebar folder {string} lists only {string}',
+  (folderLabel: string, label: string) => {
+    expectRowLabels(childTreeitems(folderTreitemByLabel(folderLabel)), [label])
   }
 )

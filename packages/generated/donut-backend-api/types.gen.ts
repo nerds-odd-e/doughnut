@@ -3938,6 +3938,23 @@ export type GetBookFileResponses = {
 
 export type GetBookFileResponse = GetBookFileResponses[keyof GetBookFileResponses];
 
+export type DeleteAttachmentData = {
+    body?: never;
+    path: {
+        notebook: number;
+        attachment: number;
+    };
+    query?: never;
+    url: '/api/notebooks/{notebook}/attachments/{attachment}';
+};
+
+export type DeleteAttachmentResponses = {
+    /**
+     * OK
+     */
+    200: unknown;
+};
+
 export type GetAttachmentPageData = {
     body?: never;
     path: {

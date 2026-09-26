@@ -285,6 +285,7 @@ Use this for endpoint lookup; open `sdk.gen.ts` or `types.gen.ts` only for exact
 ## Notebook Attachment Controller
 
 - `getAttachmentPage`: GET `/api/notebooks/{notebook}/attachments/{attachment}` -> `GetAttachmentPageResponse` (request: `GetAttachmentPageData`; path: notebook, attachment; response body: NotebookAttachmentRealm)
+- `deleteAttachment`: DELETE `/api/notebooks/{notebook}/attachments/{attachment}` -> `DeleteAttachmentResponse` (request: `DeleteAttachmentData`; path: notebook, attachment; response body: void)
 - `downloadAttachment`: GET `/api/notebooks/{notebook}/attachments/{attachment}/content` -> `DownloadAttachmentResponse` (request: `DownloadAttachmentData`; path: notebook, attachment; response body: string)
 
 ## Health Check Controller

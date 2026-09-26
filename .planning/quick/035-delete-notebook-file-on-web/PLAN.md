@@ -73,8 +73,18 @@ answers 404) and is not proved again.
 
 ### 1. An owner deletes a file from its page on the web
 Type: Behavior
-Status: planned
-Proof: slice 1 rows above.
+Status: done
+Proof: slice 1 rows above. Accepted: `NotebookGitWebAttachmentDeleteControllerTest`
+(one child commit, bundle lacks the file and keeps the rest, `image:` kept,
+no-edit-rights refused with no commit); `AttachmentPage.spec.ts` (readonly hides
+Delete); `notebook_files.feature` "Delete a file from its page".
+
+Learnings: the sidebar needs `refreshSidebarStructuralListings()` after the
+delete (the E2E fails without it). The service is
+`notebookGit/WebAttachmentDeleteService`; the page lands through
+`routes/containingLocation.ts`, now shared with folder removal and dissolve.
+`StoredApiCollection`'s private `containingLocation` makes the same decision for
+notes and could move there later.
 
 Behavior: `physics/` holds the note `Force` and `sketch.png` → the owner opens
 `sketch.png`, chooses Delete and confirms → one accepted change removes

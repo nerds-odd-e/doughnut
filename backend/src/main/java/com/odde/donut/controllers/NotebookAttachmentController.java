@@ -7,6 +7,7 @@ import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.donut.services.AuthorizationService;
 import com.odde.donut.services.NotebookCatalogService;
 import com.odde.donut.services.notebookAttachment.NotebookAttachmentFile;
+import com.odde.donut.services.notebookGit.WebAttachmentDeleteService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.nio.charset.StandardCharsets;
@@ -14,6 +15,7 @@ import org.springframework.http.ContentDisposition;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -27,14 +29,17 @@ class NotebookAttachmentController {
   private final AuthorizationService authorizationService;
   private final NotebookCatalogService notebookCatalogService;
   private final NotebookAttachmentFile notebookAttachmentFile;
+  private final WebAttachmentDeleteService webAttachmentDeleteService;
 
   NotebookAttachmentController(
       AuthorizationService authorizationService,
       NotebookCatalogService notebookCatalogService,
-      NotebookAttachmentFile notebookAttachmentFile) {
+      NotebookAttachmentFile notebookAttachmentFile,
+      WebAttachmentDeleteService webAttachmentDeleteService) {
     this.authorizationService = authorizationService;
     this.notebookCatalogService = notebookCatalogService;
     this.notebookAttachmentFile = notebookAttachmentFile;
+    this.webAttachmentDeleteService = webAttachmentDeleteService;
   }
 
   @Operation(
@@ -75,5 +80,17 @@ class NotebookAttachmentController {
         .header("X-Content-Type-Options", "nosniff")
         .contentType(MediaType.APPLICATION_OCTET_STREAM)
         .body(notebookAttachmentFile.bytes(attachment));
+  }
+
+  @Operation(
+      summary = "Delete a file",
+      description =
+          "Removes the file from the notebook in one accepted change. Earlier history keeps it.")
+  @DeleteMapping("/{notebook}/attachments/{attachment}")
+  public void deleteAttachment(
+      @PathVariable("notebook") @Schema(type = "integer") Notebook notebook,
+      @PathVariable("attachment") @Schema(type = "integer") NotebookAttachment attachment)
+      throws UnexpectedNoAccessRightException {
+    webAttachmentDeleteService.delete(notebook, attachment);
   }
 }

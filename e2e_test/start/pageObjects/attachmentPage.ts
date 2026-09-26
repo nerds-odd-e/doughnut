@@ -36,6 +36,12 @@ export const attachmentPage = () => ({
     return this
   },
 
+  delete() {
+    cy.get('[data-testid="attachment-delete-button"]').click()
+    cy.findByRole('button', { name: 'OK' }).click()
+    waitUntilAppIsNotBusy()
+  },
+
   expectDownload(filename: string, content: string) {
     cy.get<HTMLAnchorElement>('[data-testid="attachment-download-link"]').then(
       ($link) => {
