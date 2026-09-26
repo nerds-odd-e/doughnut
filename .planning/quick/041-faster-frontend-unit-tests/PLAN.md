@@ -126,11 +126,19 @@ properties, memory tracking; base and guarded mode switch) by responsibility.
 
 ### 3. RecallPage specs share one setup
 Type: Structure
-Status: planned
+Status: done
 Proof: as slice 1.
 
 Merge the 11 `RecallPage*` files by recall-page responsibility, declaring the
 three shared `vi.mock` calls once per file.
+
+Accepted proof: 11 files → 5 (`RecallPage.spec.ts` loading and daily probe,
+real timers; `.dueQueue` activation/load more/diligent; `.queueProgress` just
+review/treadmill; `.answering` threshold/speaking practice/thinking time;
+`.spelling`; fake timers), all ≤250 lines. 36 tests kept. Back-to-back focused
+pairs (11 vs 5 files): 8.18/5.18s, 5.58/4.27s, 8.16/5.10s.
+`cd frontend && CURSOR_DEV=true nix develop -c pnpm exec vitest run --browser=chromium --browser.headless tests/pages/RecallPage*.spec.ts`
+→ 5 files, 36 tests pass (4.35s); `pnpm -C frontend exec vue-tsc --noEmit` passes.
 
 ### 4. NoteEditableContent specs share one setup
 Type: Structure
@@ -171,4 +179,12 @@ remaining candidate.
   `sysctl -n vm.loadavg` and measure the whole suite only when quiet.
 - Merging also exposes one-caller support helpers; fold them into the spec
   rather than keep a helper file per old spec.
+- The refactor skill's file-size check (`refactor-checks.md`, 250 lines) bounds
+  merging: group by responsibility and shared setup, and split along cohesive
+  seams when a merged file exceeds 250 lines.
+- Fair focused timing on a loaded machine: copy the HEAD versions into a
+  temporary sibling folder (with their support files) and alternate old/new
+  runs; separate runs varied by more than 2s.
+- A file's timer mode (real vs fake) is part of its shared setup; RecallPage
+  loading tests need real timers.
 - zsh does not split an unquoted `$F` file list; use brace expansion or `${=F}`.

@@ -1,10 +1,13 @@
 import { useRecallData } from "@/composables/useRecallData"
+import { DailyProbeController } from "@generated/donut-backend-api/sdk.gen"
 import type { AnsweredQuestion } from "@generated/donut-backend-api"
 import makeMe from "donut-test-fixtures/makeMe"
-import { wrapSdkResponse } from "@tests/helpers"
+import { mockSdkService, wrapSdkError, wrapSdkResponse } from "@tests/helpers"
 import { flushPromises } from "@vue/test-utils"
 import { describe, expect, it, vi } from "vitest"
+import { ref } from "vue"
 import {
+  createMemoryTrackerLite,
   createUseRecallDataMock,
   useRecallPageSpecContext,
 } from "./recallPageTestSupport"
@@ -21,9 +24,9 @@ vi.mock("vue-router", async (importOriginal) => {
   }
 })
 
-describe("repeat page loading", () => {
-  const ctx = useRecallPageSpecContext()
+const ctx = useRecallPageSpecContext()
 
+describe("repeat page loading", () => {
   it("should call previouslyAnswered on mount", async () => {
     await ctx.mountPage()
     expect(ctx.previouslyAnsweredSpy).toHaveBeenCalledWith(
@@ -92,5 +95,81 @@ describe("repeat page loading", () => {
     expect(
       wrapper.find('[data-test="learning-session-actions"]').exists()
     ).toBe(true)
+  })
+})
+
+describe("RecallPage Daily probe entry", () => {
+  const mountRecall = async (dailyProbeEnabled: boolean) => {
+    ctx.renderer.withCurrentUserRef(
+      ref(makeMe.aUser.dailyProbeEnabled(dailyProbeEnabled).please())
+    )
+    vi.mocked(useRecallData).mockReturnValue(
+      createUseRecallDataMock({
+        toRepeat: [createMemoryTrackerLite(1)],
+      })
+    )
+    return ctx.mountPage()
+  }
+
+  const showsDailyProbe = (wrapper: Awaited<ReturnType<typeof mountRecall>>) =>
+    wrapper.findComponent({ name: "DailyProbe" }).exists()
+  const showsRecallPrompt = (
+    wrapper: Awaited<ReturnType<typeof mountRecall>>
+  ) => wrapper.findComponent({ name: "RecallPromptCard" }).exists()
+
+  it("shows Daily probe instead of the quiz when the learner has opted in", async () => {
+    const wrapper = await mountRecall(true)
+
+    expect(showsDailyProbe(wrapper)).toBe(true)
+    expect(showsRecallPrompt(wrapper)).toBe(false)
+  })
+
+  it("loads ordinary recall when Daily probe is off", async () => {
+    const wrapper = await mountRecall(false)
+
+    expect(showsDailyProbe(wrapper)).toBe(false)
+    expect(showsRecallPrompt(wrapper)).toBe(true)
+  })
+
+  it("skips Daily probe when today's run is already completed", async () => {
+    mockSdkService(DailyProbeController, "getDailyProbeToday", {
+      completed: true,
+    })
+    const wrapper = await mountRecall(true)
+
+    expect(showsDailyProbe(wrapper)).toBe(false)
+    expect(showsRecallPrompt(wrapper)).toBe(true)
+  })
+
+  it("shows retry when today's Daily probe check fails", async () => {
+    mockSdkService(DailyProbeController, "getDailyProbeToday", {
+      completed: false,
+    }).mockResolvedValue(wrapSdkError("unavailable"))
+    const wrapper = await mountRecall(true)
+
+    expect(
+      wrapper.find('[data-testid="daily-probe-offer-retry"]').exists()
+    ).toBe(true)
+    expect(showsDailyProbe(wrapper)).toBe(false)
+    expect(showsRecallPrompt(wrapper)).toBe(false)
+  })
+
+  it("offers Daily probe after retry succeeds with today's run still due", async () => {
+    const getToday = mockSdkService(
+      DailyProbeController,
+      "getDailyProbeToday",
+      {
+        completed: false,
+      }
+    )
+    getToday.mockResolvedValueOnce(wrapSdkError("unavailable"))
+    const wrapper = await mountRecall(true)
+    await wrapper
+      .find('[data-testid="daily-probe-offer-retry"]')
+      .trigger("click")
+    await flushPromises()
+
+    expect(getToday).toHaveBeenCalledTimes(2)
+    expect(showsDailyProbe(wrapper)).toBe(true)
   })
 })

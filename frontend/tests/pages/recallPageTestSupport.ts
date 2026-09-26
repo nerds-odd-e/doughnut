@@ -99,14 +99,14 @@ export function createMemoryTrackerLite(
   }
 }
 
-export function createRecallPageRenderer() {
+function createRecallPageRenderer() {
   return helper
     .component(RecallPage)
     .withCleanStorage()
     .withProps({ eagerFetchCount: 1 })
 }
 
-export function mockRecallPageDefaults() {
+function mockRecallPageDefaults() {
   mockSdkService(NoteController, "showNote", makeMe.aNoteRealm.please())
   mockSdkService(DailyProbeController, "getDailyProbeToday", {
     completed: false,
@@ -130,7 +130,7 @@ export function mockRecallPageDefaults() {
   return { recallingSpy, previouslyAnsweredSpy }
 }
 
-export type RecallPageRenderer = ReturnType<typeof createRecallPageRenderer>
+type RecallPageRenderer = ReturnType<typeof createRecallPageRenderer>
 
 /** Shared mount + timezone + default SDK mocks for RecallPage specs. */
 export function useRecallPageSpecContext(options?: { fakeTimers?: boolean }) {
@@ -176,36 +176,4 @@ export function useRecallPageSpecContext(options?: { fakeTimers?: boolean }) {
     },
     mountPage,
   }
-}
-
-export async function toggleTreadmillMode(
-  wrapper: {
-    find: (s: string) => { trigger: (e: string) => Promise<unknown> }
-    vm: { $nextTick: () => Promise<void> }
-  },
-  enabled: boolean
-) {
-  let toggle = document.body.querySelector(
-    'input[type="checkbox"]'
-  ) as HTMLInputElement
-
-  if (!toggle) {
-    await wrapper.find(".progress-bar").trigger("click")
-    await wrapper.vm.$nextTick()
-    await flushPromises()
-    await vi.waitUntil(
-      () => {
-        toggle = document.body.querySelector(
-          'input[type="checkbox"]'
-        ) as HTMLInputElement
-        return !!toggle
-      },
-      { timeout: 1000 }
-    )
-  }
-
-  toggle.checked = enabled
-  toggle.dispatchEvent(new Event("change", { bubbles: true }))
-  await wrapper.vm.$nextTick()
-  await flushPromises()
 }
