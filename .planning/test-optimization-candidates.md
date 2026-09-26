@@ -34,7 +34,7 @@ Consequences for future profiling passes:
 - Rejected 2026-09-19: `--no-isolate` (reuse one browser page across files).
   216 of 339 files failed on shared global state and the run took 325s, 5×
   slower. Per-file isolation is required.
-- Applied 2026-09-26 (SEED-039 story 4): merging sibling families by
+- Applied 2026-09-26: merging sibling families by
   responsibility took the suite from 346 to 295 files (1937 → 1900 tests, each
   removed test a named duplicate or an `it.each` row). Alternating whole-suite
   runs against the old revision: 47.3/46.6/55.8s → 37.5/42.2/39.6s (~20%).
