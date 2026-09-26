@@ -10,9 +10,10 @@ and deletable in Web Donut.
 
 ## Taken
 
+- [Pull, publish and clone read notebook history without per-object queries, and a fresh clone starts clean](seeds/SEED-046-notebook-files-and-git-findings.md#story-8) — SEED-046#story-8 ([plan](slice-plans/008-history-download-and-clean-clone/PLAN.md))
+
 ## Backlog list
 
 - [A web edit changes only what the user edited](seeds/SEED-046-notebook-files-and-git-findings.md#story-5) — SEED-046#story-5
-- [Pull, publish and clone read notebook history without per-object queries, and a fresh clone starts clean](seeds/SEED-046-notebook-files-and-git-findings.md#story-8) — SEED-046#story-8
 - [File pages and file responses read cleanly](seeds/SEED-046-notebook-files-and-git-findings.md#story-9) — SEED-046#story-9
 - [Use conversations and memory-tracker review without embedding the full note page](seeds/SEED-033-simplify-note-presentation.md#story-2) — SEED-033#story-2
