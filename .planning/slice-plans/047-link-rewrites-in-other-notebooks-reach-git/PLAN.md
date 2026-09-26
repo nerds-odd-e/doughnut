@@ -97,7 +97,12 @@ comparison as the local publish check (`NotebookGitProjection.requireMatchingAcc
 
 ### 1. Web actions no longer change notes in notebooks the user cannot edit
 Type: Behavior
-Status: planned
+Status: done
+Accepted proof: `NotebookGitWebLinkingNotebookControllerTest`
+(`renameRewritesOwnLinkingNotebookButNotASubscribedOne`,
+`trashRemovingFromPropertiesKeepsTheLinkInASubscribedNotebook`; setup
+`seedForceLinkedFrom`) plus 39 regression tests across the link-rewrite suites.
+The shared method is `NoteReferenceService.editableInboundReferencesForViewer`.
 Proof: new `NotebookGitWebLinkingNotebookControllerTest`, through
 `TextContentController` (title rename with reference handling) and the note
 trash endpoint with `REMOVE_FROM_PROPERTIES`: a referrer in another user's
@@ -178,4 +183,8 @@ that the owner refuses a change to a bound notebook it did not lock.
 
 ## Learnings
 
-None yet.
+- A subscribed-notebook fixture must also add the subscription to the current
+  user's in-memory `subscriptions` list (`owner.getSubscriptions().add(…)`);
+  otherwise the referrer is invisible and the test passes without the fix.
+- Content saved after "remove from properties" gains `type: Note` in its
+  frontmatter; fixtures that compare whole content include it.

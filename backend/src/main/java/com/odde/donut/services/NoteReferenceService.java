@@ -120,13 +120,18 @@ public class NoteReferenceService {
   }
 
   /**
-   * One referrer note plus the distinct authored link text(s) it uses to refer to {@code target}.
+   * The inbound references to {@code target} that a web action by {@code viewer} may change: those
+   * whose referrer is in a notebook {@code viewer} owns. Display keeps every visible referrer.
    *
    * @see AuthoredNoteReferenceInboundFacade#distinctInboundReferencesForViewer
    */
   public List<AuthoredNoteReferenceInboundFacade.InboundReference>
-      distinctInboundReferencesForViewer(Note target, User viewer) {
-    return authoredNoteReferenceInboundFacade.distinctInboundReferencesForViewer(target, viewer);
+      editableInboundReferencesForViewer(Note target, User viewer) {
+    return authoredNoteReferenceInboundFacade
+        .distinctInboundReferencesForViewer(target, viewer)
+        .stream()
+        .filter(inbound -> viewer.owns(inbound.referrer().getNotebook()))
+        .toList();
   }
 
   /**
