@@ -81,6 +81,10 @@ created), then passed. `CURSOR_DEV=true nix develop -c ./backend/gradlew -p back
 passes (40 tests). Refactor made `findConflictingSibling` private; it has no
 caller outside `FolderSiblingNameValidation`.
 
+## Execution complete
+
+Product advice: retrospective skipped
+
 ## Current decisions
 
 - Reuse the existing destination folder and keep its name (the same choice as
