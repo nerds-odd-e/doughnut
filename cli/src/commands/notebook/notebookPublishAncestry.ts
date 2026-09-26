@@ -1,10 +1,9 @@
 import { downloadAcceptedNotebookHead } from './notebookAcceptedHistory.js'
 import { runSystemGitOrThrow } from './systemGit.js'
 
-const ANCESTRY_ERROR =
-  'local main cannot be published: only a contiguous single-parent commit range on top of the ' +
-  "notebook's currently accepted history can be published. " +
-  'Run "donut notebook pull" to base your local commits on the accepted history, then try again.'
+const ancestryError = (directory: string) =>
+  "Local main is not based on the notebook's latest accepted history. " +
+  `Run "donut notebook pull ${directory}", then publish again.`
 
 /**
  * Confirms `directory`'s local `main` either matches the notebook's currently accepted history
@@ -41,7 +40,7 @@ export async function assertLocalMainFollowsAcceptedHistory(
       .filter((sha) => sha !== '')
 
     if (parents.length !== 1) {
-      throw new Error(ANCESTRY_ERROR)
+      throw new Error(ancestryError(directory))
     }
     current = parents[0]!
   }

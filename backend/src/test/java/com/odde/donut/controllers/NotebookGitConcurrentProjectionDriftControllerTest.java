@@ -110,7 +110,8 @@ class NotebookGitConcurrentProjectionDriftControllerTest extends NotebookGitCont
           assertThrows(ExecutionException.class, () -> publishing.get(10, TimeUnit.SECONDS));
       ResponseStatusException rejection = (ResponseStatusException) publishFailure.getCause();
       assertThat(rejection.getStatusCode(), equalTo(HttpStatus.CONFLICT));
-      assertThat(rejection.getReason(), containsString("expectedHead no longer matches"));
+      assertThat(
+          rejection.getReason(), containsString("The notebook changed since this publish started"));
       assertCommittedWebChange(webChange, notebook.getId(), note.getId());
 
       NotebookGitBinding bindingAfter = reloadCommittedBinding(notebook.getId());

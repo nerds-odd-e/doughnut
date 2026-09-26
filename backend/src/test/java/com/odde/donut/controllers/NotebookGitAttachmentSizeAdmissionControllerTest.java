@@ -21,9 +21,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
 /**
- * Attachment admission: the inclusive size limit applies to each attachment, only this notebook's
- * own accepted history grandfathers an oversized payload, and every refusal leaves the notebook
- * unchanged.
+ * Attachment admission: the inclusive size limit applies to each attachment, only an oversized
+ * payload this notebook's accepted head already holds is admitted, and every refusal leaves the
+ * notebook unchanged.
  */
 class NotebookGitAttachmentSizeAdmissionControllerTest
     extends NotebookGitAttachmentSizeAdmissionTestSupport {
@@ -54,15 +54,15 @@ class NotebookGitAttachmentSizeAdmissionControllerTest
   }
 
   @Test
-  void oversizedPayloadIsGrandfatheredOnlyByThisNotebooksOwnAcceptedHistory() throws Exception {
-    byte[] grandfathered = filledBytes(LIMIT + 1, (byte) 0x47);
+  void oversizedPayloadIsAdmittedOnlyWhenThisNotebooksAcceptedHeadHoldsIt() throws Exception {
+    byte[] legacy = filledBytes(LIMIT + 1, (byte) 0x47);
     byte[] foreign = filledBytes(LIMIT + 1, (byte) 0x46);
     storeFolderAttachmentAndSnapshot(
         createGitBackedNotebook("Other Notebook"), null, "foreign.bin", foreign);
     Notebook notebook = createGitBackedNotebook();
     makeMe.aNote("Root Note").notebook(notebook).content(NOTE_MARKDOWN).please();
     byte[] legacyPointer =
-        storeFolderAttachmentAndSnapshot(notebook, null, "legacy.bin", grandfathered)
+        storeFolderAttachmentAndSnapshot(notebook, null, "legacy.bin", legacy)
             .getAcceptedGitContent();
     NotebookGitBinding accepted = reloadCommittedBinding(notebook.getId());
 

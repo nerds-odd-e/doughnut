@@ -13,12 +13,11 @@ import {
   LFS_ATTRIBUTES,
   OID_A,
   OID_B,
-  OID_OVER,
-  THREE_MIB,
-  TWENTY_MIB,
   buildLfsSourceRepo,
+  commitAttachmentHistory,
   commitPointerAttachment,
   installLfsPushIntercept,
+  oid,
   prepareLfsPublishCheckout,
   realSpawnSync,
   stubOrderedLfsThenBundleFetch,
@@ -41,6 +40,69 @@ vi.mock('node:child_process', async () => {
 
 describe('notebook publish — LFS object upload before bundle submission', () => {
   const ctx = installNotebookCliRunFixture('donut-cli-publish-lfs-test-')
+
+  function checkoutWithAcceptedAttachments(
+    name: string,
+    commits: number,
+    attachmentsPerCommit: number
+  ): string {
+    const workDir = join(ctx.getWorkDir(), name)
+    fs.mkdirSync(workDir)
+    return prepareLfsPublishCheckout(
+      workDir,
+      'checkout',
+      stubSuccessfulAcceptedHead(),
+      (sourceRepoDir) =>
+        commitAttachmentHistory(sourceRepoDir, commits, attachmentsPerCommit)
+    ).dir
+  }
+
+  async function publish(dir: string) {
+    const calls = installLfsPushIntercept(realSpawnSync)
+    await run(['notebook', 'publish', dir])
+    return calls
+  }
+
+  function pushedObjectIds(pushCalls: string[][]): string[] {
+    const argv = pushCalls[0]!
+    return argv.slice(argv.findIndex((arg) => arg.endsWith('/lfs')) + 1).sort()
+  }
+
+  describe('costs what the unpublished commits change', () => {
+    async function publishNoteEditAfter(name: string, commits: number) {
+      const dir = checkoutWithAcceptedAttachments(name, commits, 10)
+      fs.writeFileSync(join(dir, 'note.md'), '# lfs notebook edited\n')
+      runGit(['commit', '--quiet', '-am', 'edit note'], dir)
+      return await publish(dir)
+    }
+
+    test('a note edit runs as many git processes after a long attachment history as after one commit, and uploads nothing', async () => {
+      const short = await publishNoteEditAfter('short', 1)
+      const long = await publishNoteEditAfter('long', 20)
+
+      expect(long.gitCalls.length).toBe(short.gitCalls.length)
+      expect([...short.pushCalls, ...long.pushCalls]).toEqual([])
+    })
+
+    test('uploads exactly the new files', async () => {
+      const dir = checkoutWithAcceptedAttachments('new-files', 3, 3)
+      commitPointerAttachment(realSpawnSync, dir, 'new1.bin', oid(101), 1, 'a')
+      commitPointerAttachment(realSpawnSync, dir, 'new2.bin', oid(102), 2, 'b')
+
+      const { pushCalls } = await publish(dir)
+
+      expect(pushedObjectIds(pushCalls)).toEqual([oid(101), oid(102)])
+    })
+
+    test('uploads only the new version of one changed file', async () => {
+      const dir = checkoutWithAcceptedAttachments('changed-file', 3, 3)
+      commitPointerAttachment(realSpawnSync, dir, 'file1.bin', oid(201), 1, 'c')
+
+      const { pushCalls } = await publish(dir)
+
+      expect(pushedObjectIds(pushCalls)).toEqual([oid(201)])
+    })
+  })
 
   afterEach(() => {
     vi.mocked(childProcess.spawnSync).mockReset()
@@ -84,37 +146,6 @@ describe('notebook publish — LFS object upload before bundle submission', () =
     expect(postCount(fetchMock)).toBe(1)
   })
 
-  test('does not upload a new oversized intermediate-only object', async () => {
-    const { pushCalls } = installLfsPushIntercept(realSpawnSync)
-    const { dir } = prepareLfsPublishCheckout(
-      ctx.getWorkDir(),
-      'lfs-over',
-      stubSuccessfulAcceptedHead()
-    )
-    commitPointerAttachment(
-      realSpawnSync,
-      dir,
-      'payload.bin',
-      OID_OVER,
-      TWENTY_MIB,
-      'over'
-    )
-    commitPointerAttachment(
-      realSpawnSync,
-      dir,
-      'payload.bin',
-      OID_B,
-      THREE_MIB,
-      'tip'
-    )
-
-    await run(['notebook', 'publish', dir])
-
-    expect(pushCalls).toHaveLength(1)
-    expect(pushCalls[0]).toContain(OID_B)
-    expect(pushCalls[0]).not.toContain(OID_OVER)
-  })
-
   test('accepted raw history converted to LFS does not block publishing a pointer', async () => {
     const { pushCalls } = installLfsPushIntercept(realSpawnSync)
     const workDir = ctx.getWorkDir()
@@ -152,8 +183,7 @@ describe('notebook publish — LFS object upload before bundle submission', () =
 
     await run(['notebook', 'publish', dir])
 
-    expect(pushCalls).toHaveLength(1)
-    expect(pushCalls[0]).toEqual(expect.arrayContaining([OID_A, OID_B]))
+    expect(pushedObjectIds(pushCalls)).toEqual([OID_B])
   })
 
   test('publishes a note and an attachment under a non-ASCII folder', async () => {

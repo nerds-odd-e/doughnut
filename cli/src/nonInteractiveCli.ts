@@ -52,14 +52,6 @@ export async function completeNonInteractiveCliIfHandled(
   return false
 }
 
-function notebookPullNextSteps(directory: string): string {
-  return (
-    'Pull rebases your linear unpublished commits onto accepted history, and Git pauses only on a real conflict so you can edit, stage, and run git rebase --continue, or git rebase --abort. ' +
-    `Pull does not publish. Inspect the result, then run "donut notebook publish ${directory}" if unpublished work remains. ` +
-    'Accepted history may not include all current web content.'
-  )
-}
-
 const NOTEBOOK_CLONE_USAGE =
   'usage: donut notebook clone <notebook-id> <destination>'
 const NOTEBOOK_PUBLISH_USAGE =
@@ -68,7 +60,9 @@ const NOTEBOOK_PUBLISH_USAGE =
 const NOTEBOOK_PULL_USAGE =
   'usage: donut notebook pull <directory>\n' +
   'Receives accepted notebook history onto a clean local main and fills in current attachment files. ' +
-  notebookPullNextSteps('<directory>')
+  'Pull rebases your linear unpublished commits onto accepted history, and Git pauses only on a real conflict so you can edit, stage, and run git rebase --continue, or git rebase --abort. ' +
+  'Pull does not publish. Inspect the result, then run "donut notebook publish <directory>" if unpublished work remains. ' +
+  'Accepted history may not include all current web content.'
 
 async function completeNotebookSubcommand(
   notebookArgs: string[]
@@ -106,7 +100,12 @@ async function completeNotebookClone(notebookArgs: string[]): Promise<void> {
     exitCliError(exceptionText(e))
   }
   console.log(
-    `Cloned notebook ${notebookId} into ${destination}. Open and edit the files there with any ordinary local Git tool (Obsidian, an IDE, plain git). Publishing currently accepts one or more new single-parent commits directly on the accepted main containing one or more added Markdown notes with optional edits, including notes whose paths imply a new Folder under an already represented Folder without a Folder README, a new folder README alone or together with ordinary notes in that folder, one or more edited existing ordinary Markdown notes at unchanged paths, one or more uniquely matched unchanged-content Markdown note moves that may change folder and/or filename together with compatible same-path edits and either additions or deletions, one or more Markdown note deletions alone or together with same-path edits that leave existing links authored, or one complete same-name subtree whose source has its own accepted README, every active descendant is represented, the destination parent already exists in accepted history, and bytes, modes, and relative paths stay unchanged. Any non-Markdown file is an attachment and may be added, changed, or deleted. Overwriting an existing note and changed-content moves are not supported yet. Authored referring links are not rewritten by a relocation or rename, so links to the old path may no longer resolve. Separate identity-uncertain additions or moves from deletions; do not delete and recreate the note. A Folder that contains concepts does not require a README.md; an empty Folder is represented by a .keep file. Run "donut notebook pull ${destination}" to receive newer accepted history. ${notebookPullNextSteps(destination)}`
+    [
+      `Cloned notebook ${notebookId} into ${destination}.`,
+      'Edit and commit there with any Git tool.',
+      `Publish with "donut notebook publish ${destination}".`,
+      `Receive newer changes with "donut notebook pull ${destination}".`,
+    ].join('\n')
   )
 }
 

@@ -204,25 +204,9 @@ Then(
 )
 
 Then(
-  'the notebook {string} content store {word} object for {string} under attachment {string}',
-  (
-    notebookName: string,
-    storedWord: string,
-    versionAlias: string,
-    filename: string
-  ) => {
-    expect(storedWord, 'expected "has" or "lacks"').to.be.oneOf([
-      'has',
-      'lacks',
-    ])
-    cli
-      .notebookLfs()
-      .expectObjectStorage(
-        notebookName,
-        filename,
-        versionAlias,
-        storedWord === 'has'
-      )
+  'the notebook {string} content store has object for {string} under attachment {string}',
+  (notebookName: string, versionAlias: string, filename: string) => {
+    cli.notebookLfs().expectObjectStored(notebookName, filename, versionAlias)
   }
 )
 

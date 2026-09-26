@@ -15,6 +15,7 @@ import {
   commitFileChange,
   postCount,
   stubFetchWithBundleFile,
+  ancestryRefusal,
 } from './notebookPublish.testHelpers.js'
 import { acceptedHistoryStagingDirsUnderTmp } from './notebookAcceptedHistory.testHelpers.js'
 
@@ -98,12 +99,7 @@ export function describeNotebookPublishAncestry(): void {
         ProcessExitForTest
       )
       expect(ctx.getErrorSpy()).toHaveBeenCalledWith(
-        expect.stringContaining('contiguous single-parent commit range')
-      )
-      expect(ctx.getErrorSpy()).toHaveBeenCalledWith(
-        expect.stringContaining(
-          'Run "donut notebook pull" to base your local commits on the accepted history'
-        )
+        expect.stringContaining(ancestryRefusal(dir))
       )
       expect(acceptedHistoryStagingDirsUnderTmp()).toEqual(before)
     })
@@ -154,7 +150,7 @@ export function describeNotebookPublishAncestry(): void {
         ProcessExitForTest
       )
       expect(ctx.getErrorSpy()).toHaveBeenCalledWith(
-        expect.stringContaining('contiguous single-parent commit range')
+        expect.stringContaining(ancestryRefusal(dir))
       )
       expect(postCount(fetchMock)).toBe(0)
       expect(runGit(['rev-parse', 'main'], dir)).toBe(localHead)

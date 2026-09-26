@@ -17,6 +17,7 @@ import {
   postCount,
   stubFetchForSubmission,
   stubFetchWithBundleFile,
+  ancestryRefusal,
 } from './notebookPublish.testHelpers.js'
 
 /**
@@ -92,7 +93,7 @@ export function describeNotebookPublishAncestryTipEdges(): void {
         ProcessExitForTest
       )
       expect(ctx.getErrorSpy()).toHaveBeenCalledWith(
-        expect.stringContaining('contiguous single-parent commit range')
+        expect.stringContaining(ancestryRefusal(dir))
       )
     })
 
@@ -121,7 +122,7 @@ export function describeNotebookPublishAncestryTipEdges(): void {
         ProcessExitForTest
       )
       expect(ctx.getErrorSpy()).toHaveBeenCalledWith(
-        expect.stringContaining('contiguous single-parent commit range')
+        expect.stringContaining(ancestryRefusal(dir))
       )
     })
   })

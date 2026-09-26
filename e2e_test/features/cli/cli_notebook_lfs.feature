@@ -62,21 +62,6 @@ Feature: Notebook Git LFS authenticated transfer
     And the fresh clone LFS object cache holds only the tip digest
 
   @bundleCliE2eInstall @withCliConfig
-  Scenario: Corrective oversized intermediate LFS commit is omitted while the tip publishes
-    Given the backend is serving the CLI and install script
-    And the CLI is installed from localhost
-    And the notebook "LFS Transfer Notebook" has an accepted LFS tip "payload.bin" with payload "seed-lfs-bytes" and obsolete payload "obsolete-lfs-bytes"
-    When I clone the notebook "LFS Transfer Notebook" into a temporary destination using the installed CLI
-    And I commit the LFS attachment "payload.bin" filled with 20971520 bytes of "0x74" as "lfsOversizedIntermediate"
-    And I commit the LFS attachment "payload.bin" filled with 3145728 bytes of "0x75" as "lfsCorrectiveTip"
-    And I publish the cloned checkout using the installed CLI
-    Then the installed CLI reports the committed change as the accepted head
-    And the LFS commit "lfsOversizedIntermediate" remains an ancestor of "lfsCorrectiveTip"
-    And the notebook "LFS Transfer Notebook" content store lacks object for "lfsOversizedIntermediate" under attachment "payload.bin"
-    And the notebook "LFS Transfer Notebook" content store has object for "lfsCorrectiveTip" under attachment "payload.bin"
-    And the notebook "LFS Transfer Notebook" MySQL attachment "payload.bin" holds the LFS pointer for "lfsCorrectiveTip"
-
-  @bundleCliE2eInstall @withCliConfig
   Scenario: Three incompressible LFS versions keep pointer history and current-only clone download
     Given the backend is serving the CLI and install script
     And the CLI is installed from localhost
@@ -182,19 +167,3 @@ Feature: Notebook Git LFS authenticated transfer
     And I attach a fake blank pdf book with book layout of "refactoring" to the notebook "LFS Transfer Notebook"
     When I clone the notebook "LFS Transfer Notebook" into a temporary destination using the installed CLI
     Then the cloned checkout file "refactoring.pdf" has the bytes of fixture "book_reading/blank_5_pages.pdf"
-
-  @bundleCliE2eInstall @withCliConfig
-  Scenario: Explicit Git LFS fetch of an omitted oversized intermediate reports unavailable
-    Given the backend is serving the CLI and install script
-    And the CLI is installed from localhost
-    And the notebook "LFS Transfer Notebook" has an accepted LFS tip "payload.bin" with payload "seed-lfs-bytes" and obsolete payload "obsolete-lfs-bytes"
-    When I clone the notebook "LFS Transfer Notebook" into a temporary destination using the installed CLI
-    And I commit the LFS attachment "payload.bin" filled with 20971520 bytes of "0x74" as "lfsOversizedIntermediate"
-    And I commit the LFS attachment "payload.bin" filled with 3145728 bytes of "0x75" as "lfsCorrectiveTip"
-    And I publish the cloned checkout using the installed CLI
-    Then the installed CLI reports the committed change as the accepted head
-    And the notebook "LFS Transfer Notebook" content store lacks object for "lfsOversizedIntermediate" under attachment "payload.bin"
-    When I clear the cloned checkout LFS object cache
-    And I attempt to fetch LFS objects for commit "lfsOversizedIntermediate" with the standard Git LFS client
-    Then the standard Git LFS historical fetch reports the object unavailable
-    And the notebook "LFS Transfer Notebook" content store lacks object for "lfsOversizedIntermediate" under attachment "payload.bin"

@@ -156,11 +156,10 @@ export function notebookLfsPublish() {
           })
         )
     },
-    expectObjectStorage(
+    expectObjectStored(
       notebookName: string,
       filename: string,
-      versionAlias: string,
-      stored: boolean
+      versionAlias: string
     ) {
       return cy.get<{ oid: string }>(`@${versionAlias}`).then((version) =>
         inspectNotebookLfsAttachment({
@@ -168,7 +167,7 @@ export function notebookLfsPublish() {
           filename,
           oid: version.oid,
         }).then((response) => {
-          expect(response.body.objectStored).to.equal(stored)
+          expect(response.body.objectStored).to.equal(true)
         })
       )
     },

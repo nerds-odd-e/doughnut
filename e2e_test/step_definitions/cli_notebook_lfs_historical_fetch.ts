@@ -13,13 +13,6 @@ When(
 )
 
 When(
-  'I attempt to fetch LFS objects for commit {string} with the standard Git LFS client',
-  (versionAlias: string) => {
-    cli.notebookLfs().attemptFetchLfsObjectsForCommit(versionAlias)
-  }
-)
-
-When(
   'I remove the LFS attachment {string} from the cloned checkout',
   (relativePath: string) => {
     cli.notebookLfs().commitLfsAttachmentRemoval(relativePath)
@@ -46,13 +39,6 @@ Then(
   'the notebook {string} has no root attachment named {string}',
   (notebookName: string, filename: string) => {
     cli.notebookLfs().expectNoRootAttachment(notebookName, filename)
-  }
-)
-
-Then(
-  'the standard Git LFS historical fetch reports the object unavailable',
-  () => {
-    cli.notebookLfs().expectHistoricalFetchReportsUnavailable()
   }
 )
 

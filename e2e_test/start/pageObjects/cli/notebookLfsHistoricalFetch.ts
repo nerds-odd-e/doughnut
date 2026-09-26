@@ -5,31 +5,6 @@
  */
 import { inspectNotebookLfsAttachment } from './notebookLfsInspect'
 
-function runHistoricalLfsFetch(
-  versionAlias: string,
-  alias: 'lfsHistoricalFetch' | 'lfsHistoricalFetchDenial',
-  requireSuccess: boolean
-) {
-  return cy.get<{ head: string }>(`@${versionAlias}`).then((version) =>
-    cy.get<string>('@cliCloneDestination').then((checkoutDir) =>
-      cy
-        .task<{ status: number | null; output: string }>(
-          'fetchCliNotebookCheckoutLfsRef',
-          { checkoutDir, ref: version.head }
-        )
-        .then((result) => {
-          if (requireSuccess) {
-            expect(
-              result.status,
-              `git lfs fetch <lfs.url> ${version.head}\n${result.output}`
-            ).to.equal(0)
-          }
-          cy.wrap(result).as(alias)
-        })
-    )
-  )
-}
-
 export function notebookLfsHistoricalFetch() {
   return {
     expectNoRootAttachment(notebookName: string, filename: string) {
@@ -63,30 +38,21 @@ export function notebookLfsHistoricalFetch() {
         )
     },
     fetchLfsObjectsForCommit(versionAlias: string) {
-      return runHistoricalLfsFetch(versionAlias, 'lfsHistoricalFetch', true)
-    },
-    attemptFetchLfsObjectsForCommit(versionAlias: string) {
-      return runHistoricalLfsFetch(
-        versionAlias,
-        'lfsHistoricalFetchDenial',
-        false
-      )
-    },
-    expectHistoricalFetchReportsUnavailable() {
-      return cy
-        .get<{ status: number | null; output: string }>(
-          '@lfsHistoricalFetchDenial'
+      return cy.get<{ head: string }>(`@${versionAlias}`).then((version) =>
+        cy.get<string>('@cliCloneDestination').then((checkoutDir) =>
+          cy
+            .task<{ status: number | null; output: string }>(
+              'fetchCliNotebookCheckoutLfsRef',
+              { checkoutDir, ref: version.head }
+            )
+            .then((result) => {
+              expect(
+                result.status,
+                `git lfs fetch <lfs.url> ${version.head}\n${result.output}`
+              ).to.equal(0)
+            })
         )
-        .should((result) => {
-          expect(
-            result.status,
-            'git lfs fetch of omitted object must fail'
-          ).to.not.equal(0)
-          expect(
-            result.output,
-            'historical fetch should report the object unavailable'
-          ).to.match(/does not exist|not found|404|missing|unavailable|error/i)
-        })
+      )
     },
     expectCachedLfsObjectFilledBytes(
       versionAlias: string,
