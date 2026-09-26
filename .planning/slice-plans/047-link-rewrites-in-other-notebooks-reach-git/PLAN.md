@@ -119,7 +119,17 @@ referrers whose notebook the viewer owns, through one shared method on
 
 ### 2. Note rename, move and trash reach linking notebooks' Git
 Type: Behavior
-Status: planned
+Status: done
+Accepted proof: `NotebookGitWebLinkingNotebookControllerTest`
+(`renameCommitsTheRewrittenLinkInTheLinkingNotebook`,
+`moveWithinTheNotebookCommitsTheRewrittenLinkInTheLinkingNotebook`,
+`trashRemovingFromPropertiesCommitsTheLinkingNotebookWithoutTheLink`; helper
+`assertLinkingNotebookCommittedOnce`) plus 202 regression tests. The helper is
+`NoteReferenceService.notebooksToLock(Note, User, Integer...)` (single target
+note; slice 3 widens it to a folder's notes). `WebNoteEditService.edit`
+already had a set form, so no overload was added. `RelationController.webMove`
+serves same- and cross-notebook note moves, so cross-notebook note moves
+already lock linking notebooks; slice 4 adds their proof and the folder part.
 Proof: same test, Git cases for key examples 1 and 3 and the same-notebook
 note move: exactly one new commit in `Engineering`, the tip content of
 `Bridge`, and `assertAcceptedTreeMatchesTheFullAssembly` for both notebooks.

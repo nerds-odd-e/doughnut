@@ -17,6 +17,8 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import java.util.zip.CRC32;
 import org.springframework.stereotype.Service;
 
@@ -132,6 +134,19 @@ public class NoteReferenceService {
         .stream()
         .filter(inbound -> viewer.owns(inbound.referrer().getNotebook()))
         .toList();
+  }
+
+  /**
+   * The notebooks a web action by {@code viewer} locks when it rewrites or removes links to {@code
+   * target}: {@code actionNotebookIds} plus the notebooks of the {@link
+   * #editableInboundReferencesForViewer editable referrers}.
+   */
+  public Set<Integer> notebooksToLock(Note target, User viewer, Integer... actionNotebookIds) {
+    return Stream.concat(
+            Stream.of(actionNotebookIds),
+            editableInboundReferencesForViewer(target, viewer).stream()
+                .map(inbound -> inbound.referrer().getNotebook().getId()))
+        .collect(Collectors.toUnmodifiableSet());
   }
 
   /**

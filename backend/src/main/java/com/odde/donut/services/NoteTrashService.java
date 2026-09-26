@@ -8,6 +8,7 @@ import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.donut.services.notebookGit.WebNoteEditService;
 import com.odde.donut.testability.TestabilitySettings;
 import java.sql.Timestamp;
+import java.util.Set;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -20,6 +21,7 @@ public class NoteTrashService {
   private final NoteMotionService noteMotionService;
   private final AuthorizationService authorizationService;
   private final TestabilitySettings testabilitySettings;
+  private final NoteReferenceService noteReferenceService;
 
   public NoteTrashService(
       WebNoteEditService webNoteEditService,
@@ -27,22 +29,28 @@ public class NoteTrashService {
       FolderConstructionService folderConstructionService,
       NoteMotionService noteMotionService,
       AuthorizationService authorizationService,
-      TestabilitySettings testabilitySettings) {
+      TestabilitySettings testabilitySettings,
+      NoteReferenceService noteReferenceService) {
     this.webNoteEditService = webNoteEditService;
     this.noteService = noteService;
     this.folderConstructionService = folderConstructionService;
     this.noteMotionService = noteMotionService;
     this.authorizationService = authorizationService;
     this.testabilitySettings = testabilitySettings;
+    this.noteReferenceService = noteReferenceService;
   }
 
-  public Note trash(
-      Integer noteId, Integer notebookId, NoteTrashReferenceHandling referenceHandling)
+  public Note trash(Note target, NoteTrashReferenceHandling referenceHandling)
       throws UnexpectedNoAccessRightException {
     Timestamp now = testabilitySettings.getCurrentUTCTimestamp();
+    Integer notebookId = target.getNotebook().getId();
     return webNoteEditService.edit(
-        noteId,
+        target.getId(),
         notebookId,
+        referenceHandling == NoteTrashReferenceHandling.REMOVE_FROM_PROPERTIES
+            ? noteReferenceService.notebooksToLock(
+                target, authorizationService.getCurrentUser(), notebookId)
+            : Set.of(notebookId),
         note -> {
           noteService.applyNoteReferenceHandling(
               note, referenceHandling, authorizationService.getCurrentUser());

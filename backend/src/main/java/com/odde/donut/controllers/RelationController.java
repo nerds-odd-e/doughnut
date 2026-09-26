@@ -8,6 +8,7 @@ import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.donut.services.AuthorizationService;
 import com.odde.donut.services.NoteMoveService;
 import com.odde.donut.services.NoteRealmService;
+import com.odde.donut.services.NoteReferenceService;
 import com.odde.donut.services.notebookGit.RelationReduceService;
 import com.odde.donut.services.notebookGit.WebNoteEditService;
 import com.odde.donut.testability.TestabilitySettings;
@@ -17,8 +18,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Function;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -33,6 +32,7 @@ class RelationController {
   private final WebNoteEditService webNoteEditService;
   private final NoteMoveService noteMoveService;
   private final RelationReduceService relationReduceService;
+  private final NoteReferenceService noteReferenceService;
 
   public RelationController(
       AuthorizationService authorizationService,
@@ -40,13 +40,15 @@ class RelationController {
       TestabilitySettings testabilitySettings,
       WebNoteEditService webNoteEditService,
       NoteMoveService noteMoveService,
-      RelationReduceService relationReduceService) {
+      RelationReduceService relationReduceService,
+      NoteReferenceService noteReferenceService) {
     this.authorizationService = authorizationService;
     this.noteRealmService = noteRealmService;
     this.testabilitySettings = testabilitySettings;
     this.webNoteEditService = webNoteEditService;
     this.noteMoveService = noteMoveService;
     this.relationReduceService = relationReduceService;
+    this.noteReferenceService = noteReferenceService;
   }
 
   @PostMapping(value = "/move-to-folder/{sourceNote}/{targetFolder}")
@@ -110,8 +112,11 @@ class RelationController {
         webNoteEditService.edit(
             sourceNote.getId(),
             sourceNotebookId,
-            Stream.of(sourceNotebookId, targetNotebook.getId())
-                .collect(Collectors.toUnmodifiableSet()),
+            noteReferenceService.notebooksToLock(
+                sourceNote,
+                authorizationService.getCurrentUser(),
+                sourceNotebookId,
+                targetNotebook.getId()),
             mutationFactory.apply(now),
             note -> "Move note: " + note.getTitle(),
             now);

@@ -5,17 +5,19 @@ import static org.hamcrest.Matchers.equalTo;
 
 import com.odde.donut.controllers.dto.NoteUpdateTitleDTO;
 import com.odde.donut.controllers.dto.TitleRenameReferenceHandling;
+import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.User;
-import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
+import com.odde.donut.testability.GitBundleTestReader.AcceptedHistory;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
 class NotebookGitWebLinkingNotebookControllerTest extends NotebookGitWebContentControllerTestBase {
+  @Autowired RelationController relationController;
 
   @Test
-  void renameRewritesOwnLinkingNotebookButNotASubscribedOne()
-      throws UnexpectedNoAccessRightException {
+  void renameRewritesOwnLinkingNotebookButNotASubscribedOne() throws Exception {
     LinkingFixture f = seedForceLinkedFrom("See [[Science:Force]].");
     NoteUpdateTitleDTO rename = titleDto("Load");
     rename.setReferenceHandling(TitleRenameReferenceHandling.UPDATE_VISIBLE_TEXT);
@@ -27,8 +29,7 @@ class NotebookGitWebLinkingNotebookControllerTest extends NotebookGitWebContentC
   }
 
   @Test
-  void trashRemovingFromPropertiesKeepsTheLinkInASubscribedNotebook()
-      throws UnexpectedNoAccessRightException {
+  void trashRemovingFromPropertiesKeepsTheLinkInASubscribedNotebook() throws Exception {
     String linkingProperty = "---\ntype: Note\nuses: \"[[Science:Force]]\"\n---\nBody";
     LinkingFixture f = seedForceLinkedFrom(linkingProperty);
 
@@ -38,10 +39,59 @@ class NotebookGitWebLinkingNotebookControllerTest extends NotebookGitWebContentC
     assertThat(contentOf(f.sharedReferrer()), equalTo(linkingProperty));
   }
 
-  LinkingFixture seedForceLinkedFrom(String referrerContent)
-      throws UnexpectedNoAccessRightException {
+  @Test
+  void renameCommitsTheRewrittenLinkInTheLinkingNotebook() throws Exception {
+    LinkingFixture f = seedForceLinkedFrom("See [[Science:Force]].");
+    NoteUpdateTitleDTO rename = titleDto("Load");
+    rename.setReferenceHandling(TitleRenameReferenceHandling.UPDATE_VISIBLE_TEXT);
+
+    textContentController.updateNoteTitle(f.force(), rename);
+
+    assertLinkingNotebookCommittedOnce(f, "See [[Science:Load]].");
+  }
+
+  @Test
+  void moveWithinTheNotebookCommitsTheRewrittenLinkInTheLinkingNotebook() throws Exception {
+    LinkingFixture f = seedForceLinkedFrom("physics", "See [[Science:physics/Force]].");
+    Folder mechanics = makeMe.aFolder().notebook(f.science()).name("mechanics").please();
+    snapshotCurrentPortableTree(f.science());
+
+    relationController.moveNoteToFolder(f.force(), mechanics);
+
+    assertLinkingNotebookCommittedOnce(f, "See [[Science:mechanics/Force]].");
+  }
+
+  @Test
+  void trashRemovingFromPropertiesCommitsTheLinkingNotebookWithoutTheLink() throws Exception {
+    LinkingFixture f =
+        seedForceLinkedFrom("---\ntype: Note\nuses: \"[[Science:Force]]\"\n---\nBody");
+
+    noteController.trashNote(f.force(), removeFromProperties());
+
+    assertLinkingNotebookCommittedOnce(f, "---\ntype: Note\n---\nBody");
+  }
+
+  void assertLinkingNotebookCommittedOnce(LinkingFixture f, String bridgeContent) throws Exception {
+    AcceptedHistory engineeringAfter = acceptedHistory(f.engineering());
+    assertThat(engineeringAfter.parents(), equalTo(f.engineeringBefore().commits()));
+    assertThat(tipText(engineeringAfter, "Bridge.md"), equalTo(bridgeContent));
+    assertAcceptedTreeMatchesTheFullAssembly(f.science());
+    assertAcceptedTreeMatchesTheFullAssembly(f.engineering());
+  }
+
+  LinkingFixture seedForceLinkedFrom(String referrerContent) throws Exception {
+    return seedForceLinkedFrom(null, referrerContent);
+  }
+
+  LinkingFixture seedForceLinkedFrom(String forceFolder, String referrerContent) throws Exception {
     Notebook science = createGitBackedNotebook("Science");
-    Note force = makeMe.aNote("Force").notebook(science).please();
+    Note force =
+        forceFolder == null
+            ? makeMe.aNote("Force").notebook(science).please()
+            : makeMe
+                .aNote("Force")
+                .folder(makeMe.aFolder().notebook(science).name(forceFolder).please())
+                .please();
     Notebook engineering = createGitBackedNotebook("Engineering");
     Note ownReferrer = makeMe.aNote("Bridge").notebook(engineering).please();
     authorReferencingContentCommitted(ownReferrer, referrerContent);
@@ -55,12 +105,19 @@ class NotebookGitWebLinkingNotebookControllerTest extends NotebookGitWebContentC
         .add(makeMe.aSubscription().forNotebook(shared).forUser(owner).please());
     snapshotCurrentPortableTree(science);
     snapshotCurrentPortableTree(engineering);
-    return new LinkingFixture(force, ownReferrer, sharedReferrer);
+    return new LinkingFixture(
+        science, engineering, acceptedHistory(engineering), force, ownReferrer, sharedReferrer);
   }
 
   String contentOf(Note note) {
     return noteRepository.findById(note.getId()).orElseThrow().getContent();
   }
 
-  record LinkingFixture(Note force, Note ownReferrer, Note sharedReferrer) {}
+  record LinkingFixture(
+      Notebook science,
+      Notebook engineering,
+      AcceptedHistory engineeringBefore,
+      Note force,
+      Note ownReferrer,
+      Note sharedReferrer) {}
 }
