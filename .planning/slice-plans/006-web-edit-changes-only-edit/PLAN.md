@@ -194,6 +194,14 @@ Change: `removeWikiLinksFromLeadingFrontmatterProperties` uses slice 6's
 owner (rewrite values, then remove emptied keys) instead of
 `Frontmatter.mapStringValues(...).fenced(...)`.
 
+## Execution complete
+
+Product advice: the retrospective found one defect against this story's goal —
+a rich body edit drops the file's final newline, so an unedited last line
+changes too. Correction SEED-046#story-13
+(`../009-rich-edit-keeps-final-newline/PLAN.md`, ready) should be queued first
+and delivered before this story is integrated. No other backlog change.
+
 ## Current decisions
 
 - Refinement, 2026-09-26: the panel follows file order; `*` emphasis and

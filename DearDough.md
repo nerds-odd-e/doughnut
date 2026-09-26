@@ -403,6 +403,10 @@ A story's readiness basis is a digest of its whole seed document. Wrapping up an
   - Evidence: after the correction was planned, d5d22ccbe5 and 5bd90172ab closed SEED-046 stories 3 and 4, removing their seed sections; start refused with "published preparation is needs-reassessment"; 7bb85093ae changed only `basis.document` (3d5b7ba4… → 4895a083…), `basis.plan` c58a45ad… unchanged.
   - Observed effect: one refused start, a recheck of the story section against the test file, one extra commit on main and a retry, for a one-slice test-only correction.
   - Inference: unlike the two previous occurrences, this plan did not depend on the closed siblings, so the reassessment carried no information.
+- Execution: SEED-046#story-5 / `.planning/slice-plans/006-web-edit-changes-only-edit/PLAN.md` at 2a8fd844b4 / 5f71d4d237; Timestamp: 2026-09-26, before 23:15:18+08:00 (refusal; readiness commit 2a8fd844b4); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.41.
+  - Evidence: after plan 006 was assessed ready (basis.document f658172c…), df50754d7e and 247e9a9664 closed SEED-046 stories 11, 10 and 12 and removed story 4's section; start refused with "published preparation is needs-reassessment"; the story-5 section was byte-identical before and after (awk section diff); 2a8fd844b4 changed only `basis.document` (→ ad173d6e…), `basis.plan` 8bc0a3b8… unchanged.
+  - Observed effect: one refused start, a recheck of the plan's named symbols against current code, one extra commit on main and a retry.
+  - Inference: the plan referred to story 4a (plan 005) landing first, so the symbol recheck had a little value; the refusal itself carried no information about story 5.
 
 ## DD-126 — A plan said the changed script had no test, and nobody searched for one before delivery, so CI caught the stale test
 
@@ -429,6 +433,10 @@ The slice 3 implementer skipped the red run, arguing that before the change the 
   - Evidence: slice 3 return ("I did not check the accepted-upload test against the code without the change"); slice 2 return reports no red run. Retrospective red runs: `storedApi.spec` with `StoredApiCollection.ts` from 113c9b18f1 → 1 of 12 failed (meaningful). `NoteControllerUploadNoteImageTests` with slice 2 main code reverted to a388ecc2d6 → the three refusals failed, but `aPictureAtTheLimitIsAccepted` and `theDeclaredContentTypeAndTheBytesAreNotChecked` passed: the old type/size refusal lived in `@Valid` binding, which the direct `noteController.uploadNoteImage` call never runs.
   - Observed effect: two extra focused runs by the reviewer; two delivered acceptance tests cannot fail if the content-type refusal returns to the DTO. No behavior defect.
   - Inference: the delegation prompt this time did not ask for a red run at all, so neither implementer attempted one; a red run would have shown that key example 4's "today refused" lies outside the controller-call test boundary.
+- Execution: SEED-046#story-5 / `.planning/slice-plans/006-web-edit-changes-only-edit/PLAN.md` at 2a8fd844b4 / 5f71d4d237; Timestamp: between 2026-09-26T23:37:35+08:00 and 2026-09-26T23:43:24+08:00 (slice 5 quoted-rename test, before commit 2f2cd179cf) and between 2026-09-26T23:53:42+08:00 and 2026-09-27T00:00:58+08:00 (slice 8 flow-list test, before commit 06394ff704); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.41.
+  - Evidence: the coordinator itself added `quotes a renamed key that YAML needs quoted` and `removeWikiLinksFromLeadingFrontmatterProperties_cutsOnlyTheEmptiedFlowListItem` and accepted them by reasoning ("without the fix it would emit `a: b: demo`") after only a green run; the slice implementers' reports also named no red runs.
+  - Observed effect: both tests are plausibly meaningful, but neither was observed failing.
+  - Inference: this time the coordinator, not an implementer, substituted reasoning for the red run; the delegation prompts again did not ask for one.
 
 ## DD-128 — Refined key examples promised link-rewrite outcomes that the existing rewrite rules do not produce
 
@@ -463,8 +471,19 @@ Slice 2's plan named `markdownToQuillHtml` as the renderer for judging meaning a
   - Observed effect: slice 2 ran close to the 10-minute hard limit; the plan's Change text no longer describes the code and is corrected only by its Learnings.
   - Inference: a plan that names the exact function or hook for a new check should name it as a suggestion unless a quick probe confirmed it; here a one-line call of `markdownToQuillHtml` on `**a** *b*` versus `**ab**` would have shown the problem. Qualified: the deviation was handled well and cost one slice's margin, not a retry.
 
+## DD-131 — The coordinator accepted an implementer's reported gap as out of scope without checking the story, and the example test pinned the defect
+
+Slice 2's implementer reported that a rich body edit drops the file's final newline and that its example 1 test pins this (`note.replace("# Demo2\n", "# My Demo2")`). The coordinator judged it "body-side, pre-existing, outside the promises" and recorded it as a learning. The story's goal is that a web edit changes only what the user edited, and its exclusions list other body styles and blank-line runs, not the final newline. The retrospective probed `First\n\nLast\n` with a first-line edit: the unedited last line loses its newline, and the server does not add it back.
+
+### Occurrences
+
+- Execution: SEED-046#story-5 / `.planning/slice-plans/006-web-edit-changes-only-edit/PLAN.md` at 2a8fd844b4 / 5f71d4d237; Timestamp: 2026-09-26, before 23:25:41+08:00 (slice 2 acceptance; commit 61d400007d); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.41.
+  - Evidence: slice 2 implementer return ("Gaps: Example 1's trailing newline is lost"); plan 006 Learnings "Slice 2" ("outside this story's promises"); retrospective probe output `"My First\n\nLast"`; correction `.planning/slice-plans/009-rich-edit-keeps-final-newline/PLAN.md` (SEED-046#story-13).
+  - Observed effect: a defect against the story's own goal reached the published story branch; a correction story and plan are needed before integration.
+  - Inference: a reported gap should be checked against the story's goal and exclusions list before it is filed as out of scope; the fix at slice 2 would have been a few lines in the same function. Qualified: as in DD-129, the key example was a file whose edited line was also its last line, which hid the effect.
+
 ## Retention
 
-- Highest allocated local number: 130
+- Highest allocated local number: 131
 - Recovery: `33939aa45a17c08f5e6f8076178ce96437fdfbe8:DearDough.md` contains the complete pre-compaction log and earlier recovery references; `b0b385a184e96ecf8b0f6fc5572eaaab69bc8dad` preserves later history.
 - Occurrence history is partial; full observations, effects, inference and historical provenance remain in that snapshot and the upstream catalog.

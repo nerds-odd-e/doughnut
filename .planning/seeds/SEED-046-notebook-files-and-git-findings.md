@@ -171,6 +171,40 @@ including delivery, not commitments.
 - **Safe stopping point:** each of body style, body edit, panel edit and
   server edit stands alone.
 
+<a id="story-13"></a>
+
+### 4c. A rich body edit keeps the file's final newline
+
+**Identity:** SEED-046#story-13
+```json dough-story-state
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/009-rich-edit-keeps-final-newline/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"fe1ea8c115e6806321039c2d82ff3730a62655e4eb0f9215594fbf127ef6c5c9","plan":"5422e1da2a3462d5c2f34273f6cdc61a471f3822b03b98dab9e0a9c12d39163c"}}
+```
+
+- **Goal:** Correction of story 4b (SEED-046#story-5, plan 006). Owners who
+  edit a note in the rich editor see the diff limited to the lines they
+  edited; today the file's last line also changes because its final newline
+  is dropped.
+- **Scope:**
+  - **Required:** a rich body edit keeps the authored body's trailing
+    newline run (`\n` or `\r\n`, as written); a body authored without one
+    stays without one.
+  - **Preserved:** everything story 4b delivered (common Markdown forms,
+    frontmatter kept as written, property edits in place); Markdown mode.
+  - **Excluded:** blank-line runs inside the body (story 4b exclusion).
+- **Key examples:**
+  1. `First\n\nLast\n`; type `My ` at the start in rich mode → the emitted
+     Markdown is `My First\n\nLast\n` (today `My First\n\nLast`).
+  2. Story 4b example 1's file (ends `# Demo2\n`); a one-word body edit →
+     the saved file keeps `\n` after the edited line.
+  3. Boundary: `Body` with no final newline; a one-word edit → still no
+     final newline.
+- **Known facts (2026-09-27, retrospective of plan 006):** Turndown output
+  never ends with a newline, and neither `composeNoteContentInPlace` nor the
+  server adds one back; plan 006's example 1 test pins the lost newline
+  (`note.replace("# Demo2\n", "# My Demo2")`).
+- **Effort hypothesis:** S — high confidence.
+- **Depends on:** story 4b's delivered code.
+
 <a id="story-8"></a>
 
 ### 6. Pull, publish and clone read notebook history without per-object queries, and a fresh clone starts clean
