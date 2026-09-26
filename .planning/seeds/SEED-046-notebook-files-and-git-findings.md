@@ -64,16 +64,56 @@ including delivery, not commitments.
 
 **Identity:** SEED-046#story-1
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"not-refined","approach":"unselected"}
+{"schemaVersion":1,"refinement":"refined","approach":"unselected"}
 ```
 
-- **For / why:** Owners publishing from a local checkout of a notebook with
-  files wait tens of seconds or minutes for a one-line note edit; the wait grows
-  with every accepted commit.
-- **Evaluation:** In a notebook holding about 100 MB of files with 40+
-  accepted commits, publishing a one-line note edit, 100 MB of new files, or
-  500 new small files each finishes within 5 s (the owner's limit); a
-  one-line edit costs about the same as in a notebook without files.
+- **Goal:** Owners who publish from a local checkout of a notebook with files,
+  often from an AI IDE, get a publish whose cost follows the size of the
+  change, not the length of accepted history or the number and size of files
+  the change does not touch. Local publishing stays usable as work history
+  grows, which the near-future direction of parallel local and web work
+  depends on.
+- **Scope:**
+  - **Required:** neither the CLI nor the server repeats work over accepted
+    history or over unchanged files when publishing. Evidence is publish time
+    and the number of stored-file content reads per publish, both on the local
+    Development stack.
+  - **Approach constraint (standing owner expectation):** profile first, then
+    remove the measured dominant cost through a simpler, more cohesive design
+    with less code; no caches, background precomputation, or special modes. If
+    only a more complex fast path is found, surface it as a decision.
+  - **Preserved:** every current admission and refusal rule: the size limit
+    for new files, Book source protection, Markdown validation, forward-only
+    history, and size and digest verification of newly published file content.
+    A notebook whose current files include an accepted over-limit Book source
+    keeps publishing.
+  - **Not promised either way (owner decision 2026-09-26, not the center of
+    the problem):** how an over-limit file accepted earlier is recognized, and
+    whether an over-limit file added and removed again within unpublished
+    commits must be uploaded.
+  - **Excluded:** real GCS and production measurement (owner decision
+    2026-09-26: the slowness reproduces without it; content reads are counted
+    instead); network transfer time of new file bytes; clone (story 6); pull
+    (story 2); CLI messages (story 3).
+  - **Deferred unless profiling shows it dominant after the above:** sending
+    the whole Git history as a bundle in each direction; per-file overhead
+    when publishing many new files at once.
+- **Key examples** (local Development stack, owner's 5 s limit):
+  1. A notebook with about 100 MB of files (12 files) and about 40 accepted
+     commits; the owner publishes a one-line note edit → it takes about as
+     long as the same edit in a notebook without files (0.5–0.8 s), not
+     7–12 s, and no stored file content is read.
+  2. A notebook with about 1,036 files, 300 MB and 47 commits; a one-line
+     note edit → the same as example 1 (111.7 s today).
+  3. The notebook from example 1; the owner adds 12 new files totalling
+     100 MB → publish takes about as long as a first publish of those files to
+     a fresh notebook (1.4–1.7 s), not 8–26 s, and only the 12 new files'
+     content is read.
+  4. The notebook from example 1; the owner changes one 8.5 MB file → only
+     that file's new content is read (5.0–8.2 s today).
+  5. Boundary: a new file over the size limit is still refused with today's
+     size-limit message; a note edit in a notebook holding a 60 MB Book source
+     still publishes.
 - **Known facts (2026-09-26):**
 
   | Notebook | Publish | Time |
@@ -94,8 +134,15 @@ including delivery, not commitments.
     run = user 49 s + sys 44 s; 6.5 s run = user 1.5 s + sys 1.6 s.
   - Backend garbage collection did not run during slow publishes (checked with
     `jstat`), so the in-memory byte store is not the cause.
-  - The cost follows history length and the number and size of current files,
-    not the size of the change.
+  - Code reading during refinement (not yet profiled): on every publish the
+    CLI walks every accepted commit and starts one `git cat-file` process per
+    file per commit to collect earlier-accepted file digests
+    (`attachmentPayloadDigestsInHistory` in
+    `cli/src/commands/notebook/notebookPublishLfsSelection.ts`); the server
+    walks the same history and then reads and re-hashes the stored content of
+    every file present in each new commit, changed or not
+    (`NotebookGitAttachmentSizeAdmission.admit`). Both history walks exist
+    only for the over-limit rule that this story does not promise to keep.
   - For contrast, within the limit: clone 0.9–2.1 s (two early 100 MB runs of
     5.4–5.7 s were not reproducible); pull 0.5–2.9 s; web note save 0.12–0.20 s;
     web folder rename, move and trash about 0.1 s; dissolving a 500-file folder
@@ -103,12 +150,11 @@ including delivery, not commitments.
 - **Value / learning:** Removes the largest barrier to working on notebooks
   with files locally; tests the assumption that publish repeats work over
   accepted history and unchanged files that it does not need.
-- **Effort hypothesis:** M–L — low confidence until profiling shows the
-  dominant cost.
+- **Effort hypothesis:** M — medium confidence; the likely cause is located,
+  profiling still has to confirm it is dominant.
 - **Depends on:** none.
 - **Safe stopping point:** Publish keeps every current admission and refusal
-  rule (size limit, Book source protection, Markdown validation, forward-only
-  history).
+  rule listed under Preserved.
 
 <a id="story-2"></a>
 
