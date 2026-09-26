@@ -162,7 +162,7 @@ including delivery, not commitments.
 
 **Identity:** SEED-046#story-3
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/003-clone-and-publish-name-next-step/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"c4e317cdc551a5f995f9e53786684e55f7af5fbd3aba3752dd564981b569470f","plan":"a20d0e1ce4709ecc91fdd532758eec78ee2fbd01157ca3ec819193032238f5ee"}}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/003-clone-and-publish-name-next-step/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"945f97ea998695477866e2c909bc58802b0c3941612ab0e6cbb9a527c3ec9f82","plan":"a20d0e1ce4709ecc91fdd532758eec78ee2fbd01157ca3ec819193032238f5ee"}}
 ```
 
 - **Goal:** Owners working on a notebook from a local checkout read the clone
