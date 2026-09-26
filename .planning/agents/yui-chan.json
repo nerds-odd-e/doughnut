@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "agent": "Yui-chan",
+  "email": "yui-chan@example.org",
+  "identity": "SEED-035#story-25",
+  "mode": "story-branch",
+  "branch": "story/047-link-rewrites-in-other-notebooks-reach-git",
+  "host": "claude",
+  "model": "claude-opus-5-5"
+}
