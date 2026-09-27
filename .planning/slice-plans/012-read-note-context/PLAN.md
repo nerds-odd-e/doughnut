@@ -127,10 +127,13 @@ Keep the current answer feedback, tracker link, and note identity from
 ### 4. Keep correct spelling results concise
 
 Type: Behavior
-Status: planned
+Status: done
 Proof: after a correct answer, mounted result initially shows a compact note
 summary and a control that opens the complete reader; opening it does not
 change the answer or recall progress.
+Accepted: "Show note context" button in `AnsweredSpellingQuestion` (local
+reveal state); `AnsweredSpellingQuestion.spec.ts` correct-answer test. Untested:
+the `RecallPage` `:key` that resets reveal state between previous answers.
 
 Behavior: a learner submits a correct spelling answer → the result remains
 brief → the learner can reveal the complete note context on demand.

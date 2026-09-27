@@ -34,13 +34,21 @@
     :memory-tracker-id="answeredQuestion.memoryTrackerId"
   />
   <NoteContextReader
-    v-if="!answeredQuestion.answer.correct"
+    v-if="showNoteContext"
     :note-id="answeredQuestion.recalledNote.noteTopology.id"
   />
+  <button
+    v-else
+    type="button"
+    class="daisy-btn daisy-btn-neutral daisy-btn-sm mt-2"
+    @click="noteContextRevealed = true"
+  >
+    Show note context
+  </button>
 </template>
 
 <script setup lang="ts">
-import { computed, type PropType } from "vue"
+import { computed, ref, type PropType } from "vue"
 import type { AnsweredQuestion } from "@generated/donut-backend-api"
 import PopButton from "@/components/commons/Popups/PopButton.vue"
 import AccidentalMatchResolveDialog from "@/components/recall/AccidentalMatchResolveDialog.vue"
@@ -56,6 +64,12 @@ const props = defineProps({
     required: true,
   },
 })
+
+const noteContextRevealed = ref(false)
+
+const showNoteContext = computed(
+  () => !props.answeredQuestion.answer.correct || noteContextRevealed.value
+)
 
 const isAccidentalMatch = computed(
   () => props.answeredQuestion.answer.outcome === "ACCIDENTAL_MATCH"
