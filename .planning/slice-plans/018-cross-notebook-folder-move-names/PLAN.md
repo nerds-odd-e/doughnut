@@ -88,7 +88,14 @@ Change: `moveFolderToAnotherNotebook` calls
 ### 2. Merging into another notebook checks every entry first
 
 Type: Behavior
-Status: planned
+Status: done
+Accepted proof: `NotebookFolderMoveNameClashControllerTest`
+`refusesMergingANoteOntoACaseVariantNoteInAnotherNotebook` failed first with the
+`uk_note_notebook_folder_title` constraint violation, then passed;
+`mergesASubfolderIntoACaseVariantFolderInAnotherNotebook` already passed and now
+guards the checked merge; the `*CrossNotebookMove*` classes and the full
+`pnpm backend:test_only` (2678) passed. Both moves now merge through
+`FolderSubtree.mergeChecked`; `mergeInto` is private.
 Proof: new cross-notebook merge cases for examples 3 and 4 in the same test
 class; example 3 fails first (server error today), then passes with nothing
 changed in either notebook; existing merge tests stay green.

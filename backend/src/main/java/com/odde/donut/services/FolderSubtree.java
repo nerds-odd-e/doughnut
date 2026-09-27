@@ -104,20 +104,21 @@ final class FolderSubtree {
   void dissolveInto(Folder folder, boolean merge, Timestamp now) {
     Folder destination = folder.getParentFolder();
     Set<Integer> excluded = Set.of(folder.getId());
-    contentsPlacementCheck.requireContentsFit(folder, destination, merge, excluded);
+    contentsPlacementCheck.requireContentsFit(
+        folder, folder.getNotebook(), destination, merge, excluded);
     moveContentsInto(folder, destination, folder.getNotebook(), excluded, now);
     entityPersister.flush();
     entityPersister.remove(folder);
     entityPersister.flush();
   }
 
-  /** Merges {@code source} into {@code target} in the same notebook, after checking every entry. */
-  void mergeWithinNotebook(Folder source, Folder target, Timestamp now) {
-    contentsPlacementCheck.requireContentsFit(source, target, true, Set.of());
+  /** Merges {@code source} into {@code target}, in any notebook, after checking every entry. */
+  void mergeChecked(Folder source, Folder target, Timestamp now) {
+    contentsPlacementCheck.requireContentsFit(source, target.getNotebook(), target, true, Set.of());
     mergeInto(source, target, now);
   }
 
-  void mergeInto(Folder source, Folder target, Timestamp now) {
+  private void mergeInto(Folder source, Folder target, Timestamp now) {
     moveContentsInto(source, target, target.getNotebook(), Set.of(), now);
     target.setUpdatedAt(now);
     entityPersister.merge(target);

@@ -70,7 +70,7 @@ public class FolderMoveRelocation {
     Map<Integer, Map<Integer, List<String>>> inboundReferencesByNoteId =
         wikiLinkRewriteService.captureLiveResolvedInboundReferencesByNoteId(movedNoteIds, viewer);
     if (mergeTarget.isPresent()) {
-      subtree.mergeWithinNotebook(folder, mergeTarget.get(), now);
+      subtree.mergeChecked(folder, mergeTarget.get(), now);
     } else {
       persistFolderPlacement(folder, newParent, new DisplayName(folder.getName()), now);
     }
@@ -141,7 +141,7 @@ public class FolderMoveRelocation {
         folderSiblingNameValidation.mergeTargetOrRefuse(
             destinationNotebook, newParent, folder, request != null && request.isMerge());
     if (mergeTarget.isPresent()) {
-      subtree.mergeInto(folder, mergeTarget.get(), now);
+      subtree.mergeChecked(folder, mergeTarget.get(), now);
     } else {
       subtree.reassignToNotebook(subtreeFolders, destinationNotebook, now);
       persistFolderPlacement(folder, newParent, new DisplayName(folder.getName()), now);

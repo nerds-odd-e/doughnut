@@ -157,4 +157,43 @@ class NotebookFolderMoveNameClashControllerTest extends NotebookFolderManagement
     makeMe.refresh(moved);
     assertThat(moved.getNotebook().getId(), equalTo(source.getId()));
   }
+
+  @Test
+  void refusesMergingANoteOntoACaseVariantNoteInAnotherNotebook() {
+    Notebook source = ownedNotebook();
+    Folder moved = ownedFolder(source, "shared");
+    Note movedNote = makeMe.aNote("Intro").folder(moved).please();
+    Notebook destination = ownedNotebook();
+    Folder target = ownedFolder(destination, "Shared");
+    makeMe.aNote("intro").folder(target).please();
+
+    ApiException ex =
+        assertThrows(
+            ApiException.class,
+            () -> folderController.moveFolder(source, moved, folderMergeTo(destination, null)));
+
+    assertThat(ex.getErrorBody().getErrorType(), equalTo(ApiError.ErrorType.RESOURCE_CONFLICT));
+    assertThat(ex.getErrorBody().getMessage(), containsString("Shared/intro.md"));
+    makeMe.refresh(moved);
+    makeMe.refresh(movedNote);
+    assertThat(moved.getNotebook().getId(), equalTo(source.getId()));
+    assertThat(movedNote.getFolder().getId(), equalTo(moved.getId()));
+  }
+
+  @Test
+  void mergesASubfolderIntoACaseVariantFolderInAnotherNotebook()
+      throws UnexpectedNoAccessRightException {
+    Notebook source = ownedNotebook();
+    Folder moved = ownedFolder(source, "Shared");
+    Folder movedDeep = makeMe.aFolder().parentFolder(moved).name("Deep").please();
+    Note deepNote = makeMe.aNote("Detail").folder(movedDeep).please();
+    Notebook destination = ownedNotebook();
+    Folder target = ownedFolder(destination, "Shared");
+    Folder targetDeep = makeMe.aFolder().parentFolder(target).name("deep").please();
+
+    folderController.moveFolder(source, moved, folderMergeTo(destination, null));
+
+    makeMe.refresh(deepNote);
+    assertThat(deepNote.getFolder().getId(), equalTo(targetDeep.getId()));
+  }
 }

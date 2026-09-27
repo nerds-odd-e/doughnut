@@ -39,14 +39,20 @@ final class FolderContentsPlacementCheck {
 
   /**
    * Refuses with {@code RESOURCE_CONFLICT} naming the first destination entry that a moved entry
-   * would clash with, other than a folder meeting a folder. When a direct subfolder of {@code
-   * source} meets a folder and {@code merge} is false, refuses with {@code FOLDER_NAME_CONFLICT}.
-   * Folders in {@code excludedFolderIds} do not count as destination entries.
+   * would clash with, other than a folder meeting a folder, resolving names in {@code
+   * destinationNotebook}. When a direct subfolder of {@code source} meets a folder and {@code
+   * merge} is false, refuses with {@code FOLDER_NAME_CONFLICT}. Folders in {@code
+   * excludedFolderIds} do not count as destination entries.
    */
   void requireContentsFit(
-      Folder source, Folder destinationOrNull, boolean merge, Set<Integer> excludedFolderIds) {
+      Folder source,
+      Notebook destinationNotebook,
+      Folder destinationOrNull,
+      boolean merge,
+      Set<Integer> excludedFolderIds) {
     Optional<Folder> folderMeetingAFolder =
-        firstFolderMeetingAFolder(source, destinationOrNull, excludedFolderIds);
+        firstFolderMeetingAFolder(
+            source, destinationNotebook, destinationOrNull, excludedFolderIds);
     if (folderMeetingAFolder.isPresent() && !merge) {
       FolderSiblingNameValidation.throwFolderNameConflict(
           FolderSiblingNameValidation.dissolveSiblingClashAtDestination(
@@ -59,8 +65,7 @@ final class FolderContentsPlacementCheck {
    * folder, and returns the first direct subfolder of {@code source} that meets a folder.
    */
   private Optional<Folder> firstFolderMeetingAFolder(
-      Folder source, Folder destinationOrNull, Set<Integer> excludedFolderIds) {
-    Notebook notebook = source.getNotebook();
+      Folder source, Notebook notebook, Folder destinationOrNull, Set<Integer> excludedFolderIds) {
     Optional<Folder> first = Optional.empty();
     for (Folder child :
         folderRepository.findChildFoldersByParentFolderIdOrderByIdAsc(source.getId())) {
@@ -72,7 +77,7 @@ final class FolderContentsPlacementCheck {
             .ifPresent(FolderSiblingNameValidation::refuseTaken);
         continue;
       }
-      firstFolderMeetingAFolder(child, existing.get(), excludedFolderIds);
+      firstFolderMeetingAFolder(child, notebook, existing.get(), excludedFolderIds);
       first = first.or(() -> Optional.of(child));
     }
     for (Note note : noteRepository.findNotesInFolderOrderByIdAsc(source.getId())) {
