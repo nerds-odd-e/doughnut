@@ -83,6 +83,26 @@ class NotebookAttachmentController {
   }
 
   @Operation(
+      summary = "Show a picture file",
+      description = "The file served inline when it is a PNG, JPEG, GIF or WebP picture.")
+  @GetMapping(
+      value = "/{notebook}/attachments/{attachment}/picture",
+      produces = {
+        MediaType.IMAGE_PNG_VALUE,
+        MediaType.IMAGE_JPEG_VALUE,
+        MediaType.IMAGE_GIF_VALUE,
+        "image/webp"
+      })
+  public ResponseEntity<byte[]> showAttachmentPicture(
+      @PathVariable("notebook") @Schema(type = "integer") Notebook notebook,
+      @PathVariable("attachment") @Schema(type = "integer") NotebookAttachment attachment)
+      throws UnexpectedNoAccessRightException {
+    authorizationService.assertReadAuthorization(notebook);
+    attachment.requireInNotebook(notebook);
+    return InlinePicture.of(attachment, notebookAttachmentFile);
+  }
+
+  @Operation(
       summary = "Delete a file",
       description =
           "Removes the file from the notebook in one accepted change. Earlier history keeps it.")

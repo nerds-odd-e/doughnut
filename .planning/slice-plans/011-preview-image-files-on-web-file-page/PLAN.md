@@ -45,7 +45,12 @@ download.
 ### 1. A notebook file is served inline as a picture by the file itself
 
 Type: Behavior
-Status: planned
+Status: done
+Accepted proof: `NotebookAttachmentControllerTest` `Picture.servesAPictureFileInlineWithItsMediaTypeAndNeverSniffed`,
+`Picture.svgIsRefusedAsUnsupported`, `Access.nonReaderGetsNoPageDownloadOrPicture`;
+`NoteAttachmentImageControllerTest` green. The shared response is
+`controllers/InlinePicture`; the note endpoint now applies the picture rule
+after lookup, so a missing non-picture path is 404 (accepted).
 Proof: new tests in `NotebookAttachmentControllerTest`, run red first: a root
 `photo.JPG` → `inline` disposition, `image/jpeg`, `nosniff`, exact bytes; a
 `logo.svg` → 415 `UNSUPPORTED_MEDIA_TYPE`; a notebook the user cannot read →

@@ -130,6 +130,33 @@ class NotebookAttachmentControllerTest extends ControllerTestBase {
   }
 
   @Nested
+  class Picture {
+    @Test
+    void servesAPictureFileInlineWithItsMediaTypeAndNeverSniffed() throws Exception {
+      NotebookAttachment photo = attachmentAtRoot("photo.JPG", "jpeg bytes");
+
+      ResponseEntity<byte[]> response = controller.showAttachmentPicture(notebook, photo);
+
+      assertThat(new String(response.getBody(), StandardCharsets.UTF_8), equalTo("jpeg bytes"));
+      assertThat(response.getHeaders().getContentType(), equalTo(MediaType.IMAGE_JPEG));
+      assertThat(disposition(response).isInline(), equalTo(true));
+      assertThat(response.getHeaders().getFirst("X-Content-Type-Options"), equalTo("nosniff"));
+    }
+
+    @Test
+    void svgIsRefusedAsUnsupported() {
+      NotebookAttachment svg = attachmentAtRoot("logo.svg", "<svg><script/></svg>");
+
+      assertThat(
+          assertThrows(
+                  ResponseStatusException.class,
+                  () -> controller.showAttachmentPicture(notebook, svg))
+              .getStatusCode(),
+          equalTo(HttpStatus.UNSUPPORTED_MEDIA_TYPE));
+    }
+  }
+
+  @Nested
   class StoredBytesMissing {
     final byte[] png = "real png bytes".getBytes(StandardCharsets.UTF_8);
     NotebookAttachment diagram;
@@ -179,13 +206,16 @@ class NotebookAttachmentControllerTest extends ControllerTestBase {
     }
 
     @Test
-    void nonReaderGetsNeitherPageNorDownload() {
+    void nonReaderGetsNoPageDownloadOrPicture() {
       assertThrows(
           UnexpectedNoAccessRightException.class,
           () -> controller.getAttachmentPage(notebook, othersFile));
       assertThrows(
           UnexpectedNoAccessRightException.class,
           () -> controller.downloadAttachment(notebook, othersFile));
+      assertThrows(
+          UnexpectedNoAccessRightException.class,
+          () -> controller.showAttachmentPicture(notebook, othersFile));
     }
 
     @Test

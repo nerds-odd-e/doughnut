@@ -3974,6 +3974,25 @@ export type GetAttachmentPageResponses = {
 
 export type GetAttachmentPageResponse = GetAttachmentPageResponses[keyof GetAttachmentPageResponses];
 
+export type ShowAttachmentPictureData = {
+    body?: never;
+    path: {
+        notebook: number;
+        attachment: number;
+    };
+    query?: never;
+    url: '/api/notebooks/{notebook}/attachments/{attachment}/picture';
+};
+
+export type ShowAttachmentPictureResponses = {
+    /**
+     * OK
+     */
+    200: string;
+};
+
+export type ShowAttachmentPictureResponse = ShowAttachmentPictureResponses[keyof ShowAttachmentPictureResponses];
+
 export type DownloadAttachmentData = {
     body?: never;
     path: {

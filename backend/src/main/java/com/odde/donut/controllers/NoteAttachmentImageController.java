@@ -4,12 +4,9 @@ import com.odde.donut.entities.Note;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.donut.services.AuthorizationService;
 import com.odde.donut.services.notebookAttachment.NotebookAttachmentFile;
-import com.odde.donut.services.notebookAttachment.PictureFile;
 import com.odde.donut.services.notebookGit.NoteFolderAttachment;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Schema;
-import org.springframework.http.ContentDisposition;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -55,23 +52,9 @@ class NoteAttachmentImageController {
       @PathVariable("note") @Schema(type = "integer") Note note, @RequestParam("path") String path)
       throws UnexpectedNoAccessRightException {
     authorizationService.assertReadAuthorization(note);
-    MediaType mediaType =
-        PictureFile.mediaType(path)
-            .orElseThrow(
-                () ->
-                    new ResponseStatusException(
-                        HttpStatus.UNSUPPORTED_MEDIA_TYPE, "Not a raster picture."));
     return noteFolderAttachment
         .at(note, path)
-        .map(
-            attachment ->
-                ResponseEntity.ok()
-                    .header(
-                        HttpHeaders.CONTENT_DISPOSITION,
-                        ContentDisposition.inline().build().toString())
-                    .header("X-Content-Type-Options", "nosniff")
-                    .contentType(mediaType)
-                    .body(notebookAttachmentFile.bytes(attachment)))
+        .map(attachment -> InlinePicture.of(attachment, notebookAttachmentFile))
         .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "File not found."));
   }
 }
