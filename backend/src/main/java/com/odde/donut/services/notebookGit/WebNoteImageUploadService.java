@@ -101,7 +101,7 @@ public class WebNoteImageUploadService {
         .isPresent()) {
       throw refused(
           path,
-          "already exists; rename the picture and upload it again",
+          "already exists; rename the image and upload it again",
           ApiError.ErrorType.RESOURCE_CONFLICT);
     }
   }

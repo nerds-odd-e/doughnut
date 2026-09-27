@@ -39,10 +39,8 @@ class NoteImageControllerTest extends ControllerTestBase {
     makeMe.anAttachment(filename).in(folder).content(content).please();
   }
 
-  private HttpStatus refusal(String path) {
-    return (HttpStatus)
-        assertThrows(ResponseStatusException.class, () -> controller.showNoteImage(force, path))
-            .getStatusCode();
+  private ResponseStatusException refusal(String path) {
+    return assertThrows(ResponseStatusException.class, () -> controller.showNoteImage(force, path));
   }
 
   @Test
@@ -79,7 +77,10 @@ class NoteImageControllerTest extends ControllerTestBase {
   void svgIsRefusedAsUnsupported() {
     file(physics, "drawing.svg", "<svg><script/></svg>".getBytes(StandardCharsets.UTF_8));
 
-    assertThat(refusal("drawing.svg"), equalTo(HttpStatus.UNSUPPORTED_MEDIA_TYPE));
+    ResponseStatusException refusal = refusal("drawing.svg");
+
+    assertThat(refusal.getStatusCode(), equalTo(HttpStatus.UNSUPPORTED_MEDIA_TYPE));
+    assertThat(refusal.getReason(), equalTo("Not a raster image."));
   }
 
   @ParameterizedTest
@@ -88,7 +89,7 @@ class NoteImageControllerTest extends ControllerTestBase {
     file(physics, "force-diagram.png", png);
     makeMe.anAttachment("x.png").atRootOf(notebook).content(png).please();
 
-    assertThat(refusal(path), equalTo(HttpStatus.NOT_FOUND));
+    assertThat(refusal(path).getStatusCode(), equalTo(HttpStatus.NOT_FOUND));
   }
 
   @Nested

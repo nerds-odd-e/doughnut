@@ -21,7 +21,7 @@ final class InlineImage {
             .orElseThrow(
                 () ->
                     new ResponseStatusException(
-                        HttpStatus.UNSUPPORTED_MEDIA_TYPE, "Not a raster picture."));
+                        HttpStatus.UNSUPPORTED_MEDIA_TYPE, "Not a raster image."));
     return ResponseEntity.ok()
         .header(HttpHeaders.CONTENT_DISPOSITION, ContentDisposition.inline().build().toString())
         .header("X-Content-Type-Options", "nosniff")

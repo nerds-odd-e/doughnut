@@ -134,7 +134,8 @@ titles.
 ### 3. Users read "image" in refusals
 
 Type: Behavior (message wording)
-Status: planned
+Status: done — 4 tightened assertions failed on "picture", then 29 tests green;
+refactor let `NoteImageControllerTest.refusal()` return the exception (10 tests green)
 Proof: first tighten the tests to the new wording (fail):
 `NoteControllerUploadNoteImageTests:181` expects
 `"Cannot upload " + name + ": an image must be a png, jpg, jpeg, gif or webp file."`,

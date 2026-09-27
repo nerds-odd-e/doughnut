@@ -90,7 +90,10 @@ class NoteControllerUploadNoteImageTests extends NotebookGitWebContentController
     Note force = makeMe.aNote("force").folder(physics).content(ACCEPTED_CONTENT).please();
     storeFolderAttachmentAndSnapshot(notebook, physics, "diagram.png", "earlier".getBytes());
 
-    assertUploadRefusedWithNothingChanged(force, "diagram.png", "physics/diagram.png");
+    assertUploadRefusedWithNothingChanged(
+        force,
+        "diagram.png",
+        "Cannot upload physics/diagram.png: it already exists; rename the image and upload it again");
   }
 
   @Test
@@ -178,7 +181,10 @@ class NoteControllerUploadNoteImageTests extends NotebookGitWebContentController
     @ParameterizedTest
     @ValueSource(strings = {"notes.txt", "drawing.svg"})
     void aNameThatIsNotAnImageIsRefusedNamingTheAllowedTypes(String name) throws Exception {
-      assertUploadRefusedWithNothingChanged(force, name, "png, jpg, jpeg, gif or webp");
+      assertUploadRefusedWithNothingChanged(
+          force,
+          name,
+          "Cannot upload " + name + ": an image must be a png, jpg, jpeg, gif or webp file.");
     }
 
     @Test

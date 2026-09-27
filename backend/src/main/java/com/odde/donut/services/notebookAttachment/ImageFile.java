@@ -35,7 +35,7 @@ public final class ImageFile {
   public static void admit(String name, long size) {
     if (mediaType(name).isEmpty()) {
       throw refused(
-          "Cannot upload " + name + ": a picture must be a png, jpg, jpeg, gif or webp file.");
+          "Cannot upload " + name + ": an image must be a png, jpg, jpeg, gif or webp file.");
     }
     if (size > NEW_PAYLOAD_LIMIT_BYTES) {
       throw refused("File size exceeds the limit: " + NEW_PAYLOAD_LIMIT_BYTES + " bytes.");
