@@ -34,7 +34,7 @@
       </PopButton>
 
       <a
-        v-if="!conversationButton && !conversationOverflowed"
+        v-if="!conversationOverflowed"
         class="daisy-btn daisy-btn-ghost daisy-btn-sm"
         role="button"
         :aria-label="noteMoreOptionsTitles.conversation"
@@ -63,7 +63,6 @@
         :toolbar-nav="toolbarNavRef"
         :as-markdown="asMarkdown"
         :has-new-note="showRelocatedNewNote"
-        :has-conversation="!conversationButton"
         @overflowed-ids="overflowedIds = $event"
         @edit-as-markdown="emit('edit-as-markdown', $event)"
         @open-wiki="wikiLinkOrRelationshipPopButtonRef?.openDialog()"
@@ -106,7 +105,6 @@ import { currentRouteSettingConversation } from "@/routes/noteShowLocation"
 import NoteCreationNewButton from "../NoteCreationNewButton.vue"
 import { useNotebookSidebarOpened } from "@/composables/notebookSidebarOpened"
 import { useKeyboardShortcut } from "@/composables/useKeyboardShortcut"
-import { useNoteShortcutScope } from "@/composables/noteShortcutScope"
 import {
   noteMoreOptionsTitles,
   noteToolbarEditTitle,
@@ -122,7 +120,6 @@ const props = withDefaults(
     activeNoteRealm?: NoteRealm
     breadcrumbFolders?: FolderTrailSegment[]
     asMarkdown?: boolean
-    conversationButton?: boolean
     readonly?: boolean
   }>(),
   { breadcrumbFolders: () => [] }
@@ -164,7 +161,6 @@ const editTitle = computed(() => noteToolbarEditTitle(props.asMarkdown))
 
 const router = useRouter()
 const route = useRoute()
-const shortcutScope = useNoteShortcutScope()
 
 function startNoteConversation() {
   return router.replace(currentRouteSettingConversation(route, true))
@@ -177,13 +173,13 @@ const emit = defineEmits<{
 useKeyboardShortcut(
   "note-toggle-edit-mode",
   () => emit("edit-as-markdown", !props.asMarkdown),
-  () => !props.readonly && shortcutScope.value
+  () => !props.readonly
 )
 
 useKeyboardShortcut(
   "wiki-link-or-relationship",
   () => wikiLinkOrRelationshipPopButtonRef.value?.openDialog(),
-  () => !props.readonly && shortcutScope.value
+  () => !props.readonly
 )
 
 watch(

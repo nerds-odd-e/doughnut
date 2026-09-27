@@ -126,7 +126,6 @@ import {
 } from "./noteMoreOptionsTitles"
 import { plainNoteActions } from "./noteMoreOptionsPlainActions"
 import { useKeyboardShortcut } from "@/composables/useKeyboardShortcut"
-import { useNoteShortcutScope } from "@/composables/noteShortcutScope"
 import { computed, ref } from "vue"
 
 const toolbarGhostBtnClass = "daisy-btn daisy-btn-ghost daisy-btn-sm"
@@ -167,18 +166,12 @@ const deleteNote = () =>
   noteIsTrashed.value ? permanentlyDeleteNote() : trashNote()
 
 const exportPopButtonRef = ref<InstanceType<typeof PopButton> | null>(null)
-const shortcutScope = useNoteShortcutScope()
-const shortcutsEnabled = () => shortcutScope.value
 
-useKeyboardShortcut(
-  "note-export",
-  () => {
-    exportPopButtonRef.value?.openDialog()
-  },
-  shortcutsEnabled
-)
+useKeyboardShortcut("note-export", () => {
+  exportPopButtonRef.value?.openDialog()
+})
 
-useKeyboardShortcut("note-trash", deleteNote, shortcutsEnabled)
+useKeyboardShortcut("note-trash", deleteNote)
 
 const noteHasContent = computed(() => hasNoteContent(props.note.content))
 const showRefineNoteModal = ref(false)

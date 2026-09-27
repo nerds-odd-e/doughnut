@@ -130,6 +130,13 @@ Then(
 )
 
 Then(
+  'I should see the reviewed note context containing {string}',
+  (content: string) => {
+    start.assumeAnsweredQuestionPage().expectNoteContextToContain(content)
+  }
+)
+
+Then(
   'I should see spelling question {string} with an overlap explanation and an empty, focused answer input',
   (stem: string) => {
     start.recall().assumeRecallPage().expectOverlapRetryForSpelling(stem)

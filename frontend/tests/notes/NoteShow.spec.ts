@@ -27,7 +27,6 @@ describe("new/updated pink banner", () => {
         .withCleanStorage()
         .withProps({
           noteId: note.id,
-          expandChildren: true,
         })
         .mount({ attachTo: document.body })
       await flushPromises()
@@ -54,7 +53,6 @@ describe("note without children", () => {
       .withCleanStorage()
       .withProps({
         noteId: n.id,
-        expandChildren: true,
       })
       .mount({ attachTo: document.body })
   }
@@ -98,7 +96,7 @@ describe("note availability warning", () => {
       .component(NoteShow)
       .withRouter()
       .withCleanStorage()
-      .withProps({ noteId: realm.id, expandChildren: true })
+      .withProps({ noteId: realm.id })
       .mount({ attachTo: document.body })
 
     await flushPromises()
@@ -130,7 +128,7 @@ describe("note header image", () => {
       .component(NoteShow)
       .withRouter()
       .withCleanStorage()
-      .withProps({ noteId: note.id, expandChildren: true })
+      .withProps({ noteId: note.id })
       .mount({ attachTo: document.body })
     await flushPromises()
     return {

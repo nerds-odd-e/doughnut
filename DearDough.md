@@ -535,8 +535,19 @@ Plan 010 listed `pnpm cy:run --spec e2e_test/features/folder_organization`. The 
   - Observed effect: a small detour inside the slice; proof unaffected.
   - Inference: slice planning did not run or check the E2E command it wrote.
 
+## DD-135 — Agents reported vue-tsc's exit code from a pipe into `tail`, so the coordinator had to rerun the typecheck
+
+The frontend proof requires `vue-tsc --noEmit` to pass. Two agents ran it as `... vue-tsc --noEmit | tail`, then reported "exit 0". That code is `tail`'s, not vue-tsc's. Both agents said so themselves, and the coordinator reran the typecheck without the pipe before accepting.
+
+### Occurrences
+
+- Execution: SEED-033#story-2 / `9c8aca9bbd:.planning/slice-plans/012-read-note-context/PLAN.md` / 99aa915e22; Timestamp: 2026-09-27T09:52:41+08:00 (slice 1 acceptance, before commit 99aa915e22) and 2026-09-27T10:16:30+08:00 (slice 5 refactor acceptance, before commit 3712c94363); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.42.
+  - Evidence: slice 1 implementer return ("The exit code I captured was the pipe's final `tail`, not vue-tsc's own"); slice 5 refactor return (same remark); coordinator reruns `vue-tsc --noEmit >/dev/null 2>&1; echo $?` → 0 both times. Later delegation prompts that said "report its real exit code (don't pipe it into tail)" got a correct exit code.
+  - Observed effect: two extra typecheck runs, about a minute each; no wrong result was accepted.
+  - Inference: a delegated command whose pass/fail matters should be given with its exit-code capture spelled out, since agents tend to trim long output with `tail`. Qualified: small cost, and the agents reported the problem honestly.
+
 ## Retention
 
-- Highest allocated local number: 134
+- Highest allocated local number: 135
 - Recovery: `33939aa45a17c08f5e6f8076178ce96437fdfbe8:DearDough.md` contains the complete pre-compaction log and earlier recovery references; `b0b385a184e96ecf8b0f6fc5572eaaab69bc8dad` preserves later history.
 - Occurrence history is partial; full observations, effects, inference and historical provenance remain in that snapshot and the upstream catalog.
