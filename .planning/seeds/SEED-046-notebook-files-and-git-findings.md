@@ -139,7 +139,8 @@ including delivery, not commitments.
   with CRLF in 96 notebooks, so the release should add up to 96 `Normalize
   note line endings` commits. Query through the Cloud SQL Auth Proxy as `root`
   (`mysql_root_password`); the `doughnut` user only accepts the app's private
-  network.
+  network. After v1.3.28 started in production (2026-09-26 23:52 UTC) the same
+  query returned 0 notes in 0 notebooks: the start condition is met.
 - **Key examples:**
   1. After removal, the backend starts with no line-ending startup work, and
      the save test for CRLF-to-LF content still passes.
