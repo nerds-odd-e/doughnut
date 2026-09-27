@@ -63,7 +63,10 @@ notebook), trash, dissolve and merge; picture upload; Book file naming — asks
 this one rule over the destination notebook's live rows
 (`FolderSiblingNameValidation`). A name held by another folder is
 `FOLDER_NAME_CONFLICT` (where merging is offered); one held by a note or file
-is `RESOURCE_CONFLICT` naming its path. Dissolve and merge check every
+is `RESOURCE_CONFLICT` naming its path. Note creation may name a child
+folder to place the note in (the relationship dialog does): a folder holding
+that name is reused, a free name gets a new folder in the same accepted change
+as the note, and a note or file holding it is refused. Dissolve and merge check every
 destination entry before any change and merge case-variant folders into the
 existing one. Trash mirrors the item's folder path under `_trash/` and reuses a
 folder there whose name differs only in letter case, keeping its name. Existing

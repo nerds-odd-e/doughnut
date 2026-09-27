@@ -14,6 +14,7 @@ and deletable in Web Donut.
 
 ## Backlog list
 
+- [The name owner holds the folder-entry rule once](seeds/SEED-050-local-ai-notebook-technical-debt.md#story-8) — SEED-050#story-8
 - [Local publish checks the Markdown it changes once, before applying anything](seeds/SEED-050-local-ai-notebook-technical-debt.md#story-1) — SEED-050#story-1
 - [Notebook pages and the sidebar say when content cannot be loaded](seeds/SEED-050-local-ai-notebook-technical-debt.md#story-3) — SEED-050#story-3
 - [The notebook tree has one model in code](seeds/SEED-050-local-ai-notebook-technical-debt.md#story-4) — SEED-050#story-4
