@@ -122,3 +122,7 @@ the delegate accessors out of JSON, so Java callers stay unchanged. Delete
   leftover committed test notebooks storing files as RAW. If it does,
   recreate the local `doughnut_test` database and run `migrateTestDB`; do not
   change the migration.
+
+## Execution complete
+
+Product advice: retrospective skipped
