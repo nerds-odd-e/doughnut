@@ -23,9 +23,9 @@ serialization.
 | 3 folder with a long readme → trail entry has no `readmeContent`, `createdAt`, `updatedAt` | slice 2, same test (entry has exactly `id`, `name`) |
 | 4 note at notebook root → empty trail | slice 2, same test |
 
-The new test follows `NotebookFolderPageXmlAcceptMvcTest`: commit the fixture,
-`entityManager.clear()`, then request with `Accept: application/json`, so
-nested folders really arrive as lazy proxies. Controller tests that call
+The test is `ResponsesCarryNoOrmInternalsMvcTest`: it commits the fixture,
+calls `entityManager.clear()`, then requests with `Accept: application/json`,
+so nested folders really arrive as lazy proxies. Controller tests that call
 methods directly cannot see this.
 
 Commands:
@@ -39,7 +39,12 @@ Commands:
 ### 1. Web JSON never exposes Hibernate proxy internals
 
 Type: Behavior
-Status: planned
+Status: done
+Accepted proof (2026-09-27): `ResponsesCarryNoOrmInternalsMvcTest`
+`filePageCarriesTheTrailWithoutProxyInternals` and
+`noteRealmCarriesTheTrailWithoutProxyInternals` (`assertCleanTrail`) failed red
+on `"hibernateLazyInitializer":{}` and pass; the focused command and the full
+backend suite pass. The XML-accept folder page test moved into this class.
 Proof: examples 1–2 without `hibernateLazyInitializer` anywhere in the body,
 run red first; the existing controller and folder tests stay green.
 
@@ -88,6 +93,13 @@ split.
   serialization (OpenAI handlers, book services, conversations).
 
 ## Learnings
+
+- 2026-09-27: the web Hibernate module disables `USE_TRANSIENT_ANNOTATION`, so
+  JPA `@Transient` fields that web JSON shows today (for example
+  `MemoryTracker.latestTutorFeedbackGrade`, `Answer.matchedNoteId`) stay.
+- 2026-09-27: the `GET /api/notes/{note}` body already lists `ancestorFolders`
+  and `notebookRealm` twice at the top level (before this story); slice 2's
+  key assertions should account for it.
 
 - 2026-09-27: the local test database may fail to start the backend test
   context because migration `V300000342__DefaultNotebookGitBindingAttachmentRepresentationToLfs`
