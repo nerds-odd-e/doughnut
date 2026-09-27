@@ -156,7 +156,7 @@ misleading developers.
 
 **Identity:** SEED-050#story-8
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/026-one-folder-entry-rule/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"b84184e408cf7e095f34f94be26a8f7a10af6dfc67c96a79ca69008d25030a65","plan":"302229bbbfa75f7c286c305636ea4e7933723a3508e36b2efc812298a82a2c9f"}}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/026-one-folder-entry-rule/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"348fd390a2a7ae7990b33c33df67fdf2de40bcaa5b16fd5fa894abc99844a5f3","plan":"43fe84055ecebfbeaa4f57ffe96b8c831500b8654b6790783d20dfb3fea52e6a"}}
 ```
 
 **Goal:** Correction of SEED-050#story-2 (provenance
