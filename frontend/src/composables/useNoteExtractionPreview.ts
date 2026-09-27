@@ -9,7 +9,7 @@ import {
   runWithBlockingApiLoading,
 } from "@/managedApi/clientSetup"
 import { toOpenApiError } from "@/managedApi/openApiError"
-import { useStorageAccessor } from "@/composables/useStorageAccessor"
+import { useNoteStore } from "@/store/noteStore"
 import usePopups from "@/components/commons/Popups/usePopups"
 import { computed, ref, type Ref } from "vue"
 import { useRouter } from "vue-router"
@@ -33,7 +33,7 @@ export function useNoteExtractionPreview(
 
   const { popups } = usePopups()
   const router = useRouter()
-  const storageAccessor = useStorageAccessor()
+  const noteStore = useNoteStore()
 
   const resetExtractionPreview = () => {
     showExtractionPreview.value = false
@@ -143,9 +143,7 @@ export function useNoteExtractionPreview(
           return false
         }
 
-        await storageAccessor.value
-          .storedApi()
-          .focusNoteRealm(router, response.data)
+        await noteStore.focusNoteRealm(router, response.data)
         return true
       }, "AI is creating note...")
     } catch (err) {

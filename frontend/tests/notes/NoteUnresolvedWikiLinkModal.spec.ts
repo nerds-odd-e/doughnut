@@ -15,8 +15,8 @@ import {
 } from "@tests/helpers/softKeyboardPrimerTestSupport"
 import makeMe from "donut-test-fixtures/makeMe"
 import { mockSdkService } from "@tests/helpers"
-import createNoteStorage from "@/store/createNoteStorage"
-import { useStorageAccessor } from "@/composables/useStorageAccessor"
+import { resetNoteStore } from "@/store/noteStore"
+import { useNoteStore } from "@/store/noteStore"
 import { flushPromises, mount, type VueWrapper } from "@vue/test-utils"
 import { screen } from "@testing-library/vue"
 import { createRouter, createWebHistory } from "vue-router"
@@ -58,7 +58,6 @@ describe("NoteUnresolvedWikiLinkModal", () => {
     notebookId: noteRealm.notebookRealm.notebook.id,
     noteRealm,
     modelValue: deadWikiLinkPayload,
-    sourceNoteId: noteRealm.note.id,
   }
 
   let matchMediaSpy: ReturnType<typeof mockCoarsePointer> | undefined
@@ -67,9 +66,9 @@ describe("NoteUnresolvedWikiLinkModal", () => {
   beforeEach(() => {
     vi.useFakeTimers({ toFake: ["requestAnimationFrame"] })
     alertMock.mockReset()
-    const storageAccessor = useStorageAccessor()
-    storageAccessor.value = createNoteStorage()
-    storageAccessor.value.refreshNoteRealm(noteRealm)
+    const noteStore = useNoteStore()
+    resetNoteStore()
+    noteStore.refreshNoteRealm(noteRealm)
 
     mockSdkService(SearchController, "searchForRelationshipTarget", [])
     mockSdkService(SearchController, "searchForRelationshipTargetWithin", [])

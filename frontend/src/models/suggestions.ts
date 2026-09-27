@@ -1,6 +1,6 @@
 import type { NoteContentCompletion } from "@generated/donut-backend-api"
 import type { ToolCallResult } from "./aiReplyState"
-import type { StorageAccessor } from "@/store/createNoteStorage"
+import type { NoteStore } from "@/store/noteStore"
 
 interface BaseSuggestion {
   toolCallId: string
@@ -27,7 +27,7 @@ export type Suggestion =
   | UnknownSuggestion
 
 export interface SuggestionContext {
-  storageAccessor: StorageAccessor
+  noteStore: NoteStore
   noteId: string
   suggestionResolver: {
     resolve: (result: ToolCallResult) => void

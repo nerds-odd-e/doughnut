@@ -155,14 +155,16 @@ export async function placeNoteRequest(
 export async function trashNoteRequest(
   noteId: Donut.ID,
   body: NoteTrashDto
-): Promise<NoteRealm | undefined> {
+): Promise<NoteRealm> {
   const { data: trashedRealm, error } = await apiCallWithLoading(() =>
     NoteController.trashNote({
       path: { note: noteId },
       body,
     })
   )
-  if (error || !trashedRealm) return undefined
+  if (error || !trashedRealm) {
+    throw new Error(toErrorMessage(error, "Failed to trash note"))
+  }
   return trashedRealm
 }
 
@@ -184,35 +186,43 @@ export async function undoTrashNoteRequest(
 
 export async function permanentlyDeleteNoteRequest(
   noteId: Donut.ID
-): Promise<boolean> {
+): Promise<void> {
   const { error } = await apiCallWithLoading(() =>
     NoteController.permanentlyDeleteNote({ path: { note: noteId } })
   )
-  return !error
+  if (error) {
+    throw new Error(toErrorMessage(error, "Failed to permanently delete note"))
+  }
 }
 
 export async function reduceRelationNoteToSourcePropertyRequest(
   relationNoteId: Donut.ID
-): Promise<NoteRealm | undefined> {
+): Promise<NoteRealm> {
   const { data: sourceRealm, error } = await apiCallWithLoading(() =>
     RelationController.reduceToSourceProperty({
       path: { relationNote: relationNoteId },
     })
   )
-  if (error || !sourceRealm) return undefined
+  if (error || !sourceRealm) {
+    throw new Error(
+      toErrorMessage(error, "Failed to reduce relationship to source property")
+    )
+  }
   return sourceRealm
 }
 
 export async function uploadNoteImageRequest(
   noteId: Donut.ID,
   file: File
-): Promise<NoteRealm | undefined> {
+): Promise<NoteRealm> {
   const { data: noteRealm, error } = await apiCallWithLoading(() =>
     NoteController.uploadNoteImage({
       path: { note: noteId },
       body: { uploadImage: file },
     })
   )
-  if (error || !noteRealm) return undefined
+  if (error || !noteRealm) {
+    throw new Error(toErrorMessage(error, "Failed to upload note image"))
+  }
   return noteRealm
 }

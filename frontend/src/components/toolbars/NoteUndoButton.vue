@@ -28,19 +28,19 @@
 import { computed } from "vue"
 import { useRouter } from "vue-router"
 import { Undo2 } from "@lucide/vue"
-import { useStorageAccessor } from "@/composables/useStorageAccessor"
+import { useNoteStore } from "@/store/noteStore"
 import { quotedNoteLabel } from "@/utils/quotedNoteLabel"
 import UndoConfirmationForm from "./UndoConfirmationForm.vue"
 import PopButton from "../commons/Popups/PopButton.vue"
 
 const router = useRouter()
-const storageAccessor = useStorageAccessor()
+const noteStore = useNoteStore()
 
 defineProps({
   noteId: Number,
 })
 
-const history = computed(() => storageAccessor.value.peekUndo())
+const history = computed(() => noteStore.peekUndo())
 const undoTitle = computed(() => {
   if (history.value) {
     return `undo ${history.value.type}`
@@ -50,23 +50,18 @@ const undoTitle = computed(() => {
 
 const getNoteTopology = () => {
   if (!history.value) return undefined
-  const noteRealm = storageAccessor.value.refOfNoteRealm(
-    history.value.noteId
-  ).value
+  const noteRealm = noteStore.refOfNoteRealm(history.value.noteId).value
   return noteRealm?.note?.noteTopology
 }
 
 const getNoteIdentifier = (noteId: Donut.ID): string => {
-  const title =
-    storageAccessor.value.refOfNoteRealm(noteId).value?.note?.noteTopology.title
+  const title = noteStore.refOfNoteRealm(noteId).value?.note?.noteTopology.title
   return quotedNoteLabel(title, noteId)
 }
 
 const getCurrentContent = (): string => {
   if (!history.value) return ""
-  const noteRealm = storageAccessor.value.refOfNoteRealm(
-    history.value.noteId
-  ).value
+  const noteRealm = noteStore.refOfNoteRealm(history.value.noteId).value
   if (!noteRealm) return ""
 
   if (history.value.type === "edit title") {
@@ -129,7 +124,7 @@ const shouldShowDiff = computed(
 )
 
 const handleConfirm = async () => {
-  await storageAccessor.value.storedApi().undo(router)
+  await noteStore.undo(router)
 }
 
 const handleCancel = () => {
@@ -137,8 +132,8 @@ const handleCancel = () => {
 }
 
 const handleDiscard = (closer: () => void) => {
-  storageAccessor.value.discardUndo()
-  if (!storageAccessor.value.peekUndo()) {
+  noteStore.discardUndo()
+  if (!noteStore.peekUndo()) {
     closer()
   }
 }

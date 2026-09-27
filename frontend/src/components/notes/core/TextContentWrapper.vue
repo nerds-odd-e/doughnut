@@ -36,8 +36,8 @@
 <script setup lang="ts">
 import type { PropType } from "vue"
 import { computed, onUnmounted, ref, toRef } from "vue"
-import type { TitleRenameReferenceHandling } from "@/store/StoredApiCollection"
-import { useStorageAccessor } from "@/composables/useStorageAccessor"
+import type { TitleRenameReferenceHandling } from "@/store/noteStore"
+import { useNoteStore } from "@/store/noteStore"
 import { useDebouncedTextAutosave } from "@/composables/useDebouncedTextAutosave"
 import { normalizeNoteContent } from "@/utils/normalizeNoteContent"
 import { hasNewWikiLinkTexts } from "@/utils/noteContentWikiLinks"
@@ -46,7 +46,7 @@ import {
   registerNoteContentAutosave,
 } from "@/composables/noteContentMutationBarrier"
 
-const storageAccessor = useStorageAccessor()
+const noteStore = useNoteStore()
 
 const TITLE_RENAME_REFERENCE_SAVE_OPTIONS: {
   value: TitleRenameReferenceHandling
@@ -117,9 +117,7 @@ const autosave = useDebouncedTextAutosave({
   persist: async (value) => {
     const noteId = activeNoteId.value
     if (noteId == null) return
-    await storageAccessor.value
-      .storedApi()
-      .updateTextField(noteId, props.field, value)
+    await noteStore.updateTextField(noteId, props.field, value)
   },
   normalize:
     props.field === "edit content" ? normalizeNoteContent : (value) => value,
@@ -233,11 +231,9 @@ const saveReferencedTitleWithChoice = async (
   savingReferencedTitle.value = true
   errors.value = {}
   try {
-    await storageAccessor.value
-      .storedApi()
-      .updateTextField(noteId, "edit title", localValue.value, {
-        titleReferenceHandling: referenceHandling,
-      })
+    await noteStore.updateTextField(noteId, "edit title", localValue.value, {
+      titleReferenceHandling: referenceHandling,
+    })
     markSaved(localValue.value)
   } catch (errs: unknown) {
     setError(errs)

@@ -2,8 +2,8 @@ import {
   NoteController,
   NotebookFolderController,
 } from "@generated/donut-backend-api/sdk.gen"
-import { useStorageAccessor } from "@/composables/useStorageAccessor"
-import createNoteStorage from "@/store/createNoteStorage"
+import { useNoteStore } from "@/store/noteStore"
+import { resetNoteStore } from "@/store/noteStore"
 import helper, { mockSdkServiceWithImplementation } from "@tests/helpers"
 import { flushPromises } from "@vue/test-utils"
 import { vi, describe, it, expect, beforeEach, afterEach } from "vitest"
@@ -23,16 +23,16 @@ import {
 describe("Sidebar gradual ancestor population", () => {
   // biome-ignore lint/suspicious/noExplicitAny: wrapper for testing
   let wrapper: import("@vue/test-utils").VueWrapper<any>
-  const storageAccessor = useStorageAccessor()
+  const noteStore = useNoteStore()
   const fixtures = sidebarDefaultTreeFixtures
 
   beforeEach(() => {
     prepareSidebarDefaultMountContext({
-      storageAccessor,
+      noteStore,
       fixtures,
       vi,
     })
-    storageAccessor.value = createNoteStorage()
+    resetNoteStore()
   })
 
   afterEach(() => {

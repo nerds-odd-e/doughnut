@@ -3,8 +3,8 @@ import {
   SearchController,
   TextContentController,
 } from "@generated/donut-backend-api/sdk.gen"
-import { useStorageAccessor } from "@/composables/useStorageAccessor"
-import createNoteStorage from "@/store/createNoteStorage"
+import { useNoteStore } from "@/store/noteStore"
+import { resetNoteStore } from "@/store/noteStore"
 import type { DeadWikiLinkPayload } from "@/utils/wikiLinkClick"
 import { fireEvent, screen } from "@testing-library/vue"
 import { flushPromises } from "@vue/test-utils"
@@ -42,9 +42,9 @@ export async function pointDeadWikiLinkAndCaptureUpdate(args: {
     "updateNoteContent",
     MakeMe.aNoteRealm.please()
   )
-  const storageAccessor = useStorageAccessor()
-  storageAccessor.value = createNoteStorage()
-  storageAccessor.value.refreshNoteRealm(noteRealm)
+  const noteStore = useNoteStore()
+  resetNoteStore()
+  noteStore.refreshNoteRealm(noteRealm)
 
   const searchInput = await renderSearchForm(
     { note: noteRealm.note, deadWikiLinkPayload: args.payload },

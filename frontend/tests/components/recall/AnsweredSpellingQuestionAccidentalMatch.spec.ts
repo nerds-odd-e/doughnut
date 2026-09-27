@@ -3,7 +3,7 @@ import {
   TextContentController,
 } from "@generated/donut-backend-api/sdk.gen"
 import AccidentalMatchResolveDialog from "@/components/recall/AccidentalMatchResolveDialog.vue"
-import { useStorageAccessor } from "@/composables/useStorageAccessor"
+import { useNoteStore } from "@/store/noteStore"
 import { flushPromises, type VueWrapper } from "@vue/test-utils"
 import helper, {
   mockSdkService,
@@ -180,8 +180,8 @@ describe("AnsweredSpellingQuestion accidental match", () => {
       .component(AccidentalMatchResolveDialog)
       .withCleanStorage()
       .withCurrentUser(makeMe.aUser.please())
-    useStorageAccessor().value.refreshNoteRealm(reviewedRealm)
-    useStorageAccessor().value.refreshNoteRealm(matched)
+    useNoteStore().refreshNoteRealm(reviewedRealm)
+    useNoteStore().refreshNoteRealm(matched)
 
     wrapper = renderer
       .withProps({

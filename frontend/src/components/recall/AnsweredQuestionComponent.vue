@@ -55,7 +55,7 @@ import NoteUnderQuestion from "./NoteUnderQuestion.vue"
 import ViewMemoryTrackerLink from "./ViewMemoryTrackerLink.vue"
 import RefineNoteModal from "./RefineNoteModal.vue"
 import { recalledNoteUnderQuestionProps } from "./recalledNoteUnderQuestionProps"
-import { useStorageAccessor } from "@/composables/useStorageAccessor"
+import { useNoteStore } from "@/store/noteStore"
 import { hasNoteContent } from "@/utils/hasNoteContent"
 
 const props = defineProps({
@@ -69,15 +69,14 @@ const props = defineProps({
   },
 })
 
-const storageAccessor = useStorageAccessor()
+const noteStore = useNoteStore()
 const showRefineNoteModal = ref(false)
 
 const note = computed<Note | undefined>(() => {
   const recalled = props.answeredQuestion.recalledNote
   if (!recalled) return undefined
-  return storageAccessor.value
-    .storedApi()
-    .getNoteRealmRefAndLoadWhenNeeded(recalled.noteTopology.id).value?.note
+  return noteStore.getNoteRealmRefAndLoadWhenNeeded(recalled.noteTopology.id)
+    .value?.note
 })
 
 const noteHasContent = computed(() => hasNoteContent(note.value?.content))

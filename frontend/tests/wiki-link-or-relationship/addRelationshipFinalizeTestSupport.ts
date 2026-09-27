@@ -1,8 +1,4 @@
-import {
-  NoteController,
-  NotebookController,
-  TextContentController,
-} from "@generated/donut-backend-api/sdk.gen"
+import { NotebookController } from "@generated/donut-backend-api/sdk.gen"
 import AddRelationshipFinalize from "@/components/wiki-link-or-relationship/AddRelationshipFinalize.vue"
 import type {
   Note,
@@ -14,7 +10,7 @@ import helper, {
   mockSdkServiceWithImplementation,
 } from "@tests/helpers"
 import GlobalApiLoadingModal from "@tests/helpers/GlobalApiLoadingModal"
-import { useStorageAccessor } from "@/composables/useStorageAccessor"
+import { useNoteStore } from "@/store/noteStore"
 import { flushPromises, type VueWrapper } from "@vue/test-utils"
 import { defineComponent, type PropType } from "vue"
 import makeMe from "donut-test-fixtures/makeMe"
@@ -63,7 +59,7 @@ export function mountAddRelationshipFinalize({
   })
   const renderer = helper.component(Host).withCleanStorage()
   if (seedRealm) {
-    useStorageAccessor().value.refreshNoteRealm(seedRealm)
+    useNoteStore().refreshNoteRealm(seedRealm)
   }
   return renderer
     .withProps({ note, targetSearchResult, navigateOnSuccess })
@@ -81,12 +77,9 @@ export async function selectRelationType(
 }
 
 export function mockRelationshipNoteCreation(
-  sourceRealm: NoteRealm,
   createdRealm: NoteRealm,
   holdCreate?: Promise<void>
 ) {
-  mockSdkService(NoteController, "showNote", sourceRealm)
-  mockSdkService(TextContentController, "updateNoteContent", sourceRealm)
   if (holdCreate) {
     return mockSdkServiceWithImplementation(
       NotebookController,

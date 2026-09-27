@@ -23,10 +23,10 @@ import AcceptRejectButtons from "@/components/commons/AcceptRejectButtons.vue"
 import markdownizer from "../form/markdownizer"
 import { RICH_CONTENT_PROSE } from "@/constants/richContentProse"
 import type { Suggestion } from "@/models/suggestions"
-import { useStorageAccessor } from "@/composables/useStorageAccessor"
+import { useNoteStore } from "@/store/noteStore"
 import { useToast } from "@/composables/useToast"
 
-const storageAccessor = useStorageAccessor()
+const noteStore = useNoteStore()
 const { showErrorToast } = useToast()
 
 const props = defineProps<{
@@ -101,16 +101,12 @@ const handleAccept = async () => {
     switch (props.suggestion.suggestionType) {
       case "completion": {
         const content = props.suggestion.content
-        await storageAccessor.value
-          .storedApi()
-          .completeContent(props.note.id, content)
+        await noteStore.completeContent(props.note.id, content)
         break
       }
       case "title": {
         const content = props.suggestion.content
-        await storageAccessor.value
-          .storedApi()
-          .updateTextField(props.note.id, "edit title", content)
+        await noteStore.updateTextField(props.note.id, "edit title", content)
         break
       }
     }

@@ -1,6 +1,6 @@
 import { computed, ref } from "vue"
 import WikidataAssociationDialog from "@/components/notes/WikidataAssociationDialog.vue"
-import { useStorageAccessor } from "@/composables/useStorageAccessor"
+import { useNoteStore } from "@/store/noteStore"
 import type { WikidataSearchEntity } from "@generated/donut-backend-api"
 import { WikidataController } from "@generated/donut-backend-api/sdk.gen"
 import { toOpenApiError } from "@/managedApi/openApiError"
@@ -55,7 +55,7 @@ export function useWikidataPropertyDialog({
     typeof WikidataAssociationDialog
   > | null>
 }) {
-  const storageAccessor = useStorageAccessor()
+  const noteStore = useNoteStore()
 
   const wikidataDialogOpen = ref(false)
   const wikidataEditContext = ref<WikidataEditContext | null>(null)
@@ -250,27 +250,25 @@ export function useWikidataPropertyDialog({
               entity,
               titleAction
             )
-            await storageAccessor.value
-              .storedApi()
-              .updateTextField(noteId()!, "edit title", newTitle)
+            await noteStore.updateTextField(noteId()!, "edit title", newTitle)
           } else {
             const newContent = appendAliasToNoteContent(
               contentMarkdown(),
               entity.label
             )
             if (newContent !== null) {
-              await storageAccessor.value
-                .storedApi()
-                .updateTextField(noteId()!, "edit content", newContent)
+              await noteStore.updateTextField(
+                noteId()!,
+                "edit content",
+                newContent
+              )
             } else {
               const newTitle = calculateNewTitle(
                 currentTitle,
                 entity,
                 titleAction
               )
-              await storageAccessor.value
-                .storedApi()
-                .updateTextField(noteId()!, "edit title", newTitle)
+              await noteStore.updateTextField(noteId()!, "edit title", newTitle)
             }
           }
         }

@@ -5,6 +5,9 @@ and blur can flush it earlier. Saves are serialized, and the editor retains
 newer unsaved input while applying an earlier response. Save completion includes
 durable acceptance and application of the refreshed note and live link state.
 
+The [frontend note store](frontend-note-store.md) owns cached note state,
+commands and undo; ordinary content saves leave sidebar listings unchanged.
+
 ## Accepted Git changes
 
 `AcceptedWebChangeService` owns the transaction for a complete web operation.

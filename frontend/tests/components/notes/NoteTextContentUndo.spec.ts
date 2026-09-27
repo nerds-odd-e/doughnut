@@ -1,9 +1,9 @@
 import NoteTextContent from "@/components/notes/core/NoteTextContent.vue"
 import { flushPromises, type VueWrapper } from "@vue/test-utils"
-import createNoteStorage from "@/store/createNoteStorage"
+import { resetNoteStore } from "@/store/noteStore"
 import makeMe from "donut-test-fixtures/makeMe"
 import helper from "@tests/helpers"
-import { useStorageAccessor } from "@/composables/useStorageAccessor"
+import { useNoteStore } from "@/store/noteStore"
 import { describe, it, expect, afterEach } from "vitest"
 
 describe("undo editing", () => {
@@ -15,11 +15,11 @@ describe("undo editing", () => {
   })
 
   it("should call addEditingToUndoHistory on submitChange", async () => {
-    const storageAccessor = useStorageAccessor()
-    storageAccessor.value = createNoteStorage()
+    const noteStore = useNoteStore()
+    resetNoteStore()
 
     const noteRealm = makeMe.aNoteRealm.title("Dummy Title").please()
-    storageAccessor.value.refreshNoteRealm(noteRealm)
+    noteStore.refreshNoteRealm(noteRealm)
 
     const updatedTitle = "updated"
     wrapper = helper
@@ -38,7 +38,7 @@ describe("undo editing", () => {
     titleEl.dispatchEvent(new Event("blur"))
     await flushPromises()
 
-    expect(storageAccessor.value.peekUndo()).toMatchObject({
+    expect(noteStore.peekUndo()).toMatchObject({
       type: "edit title",
     })
   })
