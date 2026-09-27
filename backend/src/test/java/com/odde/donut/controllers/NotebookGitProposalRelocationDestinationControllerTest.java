@@ -50,7 +50,7 @@ class NotebookGitProposalRelocationDestinationControllerTest extends NotebookGit
     NoteRealm shown = noteController.showNote(noteRepository.findById(note.getId()).orElseThrow());
     assertThat(shown.getNote().getTitle(), equalTo("note"));
     assertThat(
-        shown.getAncestorFolders().stream().map(FolderTrailSegment::name).toList(),
+        shown.sidebar().getAncestorFolders().stream().map(FolderTrailSegment::name).toList(),
         contains("Missing"));
     inCommittedTransaction(
         transactionManager,
@@ -119,7 +119,7 @@ class NotebookGitProposalRelocationDestinationControllerTest extends NotebookGit
 
     NoteRealm shown = noteController.showNote(noteRepository.findById(other.getId()).orElseThrow());
     assertThat(
-        shown.getAncestorFolders().stream().map(FolderTrailSegment::name).toList(),
+        shown.sidebar().getAncestorFolders().stream().map(FolderTrailSegment::name).toList(),
         contains("Source"));
     inCommittedTransaction(
         transactionManager,
@@ -152,7 +152,7 @@ class NotebookGitProposalRelocationDestinationControllerTest extends NotebookGit
 
     NoteRealm shown = noteController.showNote(noteRepository.findById(note.getId()).orElseThrow());
     assertThat(
-        shown.getAncestorFolders().stream().map(FolderTrailSegment::id).toList(),
+        shown.sidebar().getAncestorFolders().stream().map(FolderTrailSegment::id).toList(),
         contains(courses.getId()));
   }
 }

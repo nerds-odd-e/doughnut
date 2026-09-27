@@ -72,7 +72,7 @@ Commands:
 ### 1. Note realm JSON lists each sidebar field once
 
 Type: Behavior
-Status: planned
+Status: done
 Proof: examples 1–2 as raw-body occurrence assertions in
 `ResponsesCarryNoOrmInternalsMvcTest`, red first; focused backend command
 green; `generateTypeScript` leaves no diff.
@@ -88,6 +88,20 @@ unwrapped sidebar (it already carries the schema descriptions, `@NotNull` and
 the delegate accessors out of JSON, so Java callers stay unchanged. Delete
 `NoteRealmJsonSerializationTest`.
 
+## Accepted proof (slice 1)
+
+- Red first: a run of
+  `ResponsesCarryNoOrmInternalsMvcTest` failed both new assertions (keys
+  written twice; `"scopedReadmeContent":null` at root).
+- Green: `CURSOR_DEV=true nix develop -c ./backend/gradlew -p backend test -Dspring.profiles.active=test --tests '*ResponsesCarryNoOrmInternals*' --tests '*NoteControllerShow*' --tests '*NoteRealm*' --tests '*NotebookGit*' --tests '*RelationController*'`
+  — 545 tests, 0 failures. Observations:
+  `ResponsesCarryNoOrmInternalsMvcTest.noteRealmCarriesTheTrailWithoutProxyInternals`
+  (raw body `containsOnlyOnce` for `"notebookRealm":` and `"ancestorFolders":`)
+  and `noteAtNotebookRootHasAnEmptyTrailAndNoScopedReadme` (raw body lacks
+  `"scopedReadmeContent"`).
+- `NoteRealm` exposes `sidebar()` like `FolderRealm` and
+  `NotebookAttachmentRealm`; its delegate accessors are gone.
+
 ## Current decisions
 
 - 2026-09-27: proof is a raw-body occurrence count at the MockMvc wire; the
@@ -95,6 +109,10 @@ the delegate accessors out of JSON, so Java callers stay unchanged. Delete
 - 2026-09-27: `open_api_docs.yaml` and the generated client must not change;
   a diff means the fix changed the published contract and must be revisited,
   not accepted.
+- 2026-09-27 (revisited during slice 1): the regenerated schema only moves
+  `references` and `wikiLinks` ahead of the unwrapped sidebar properties; no
+  property, type, description or optionality changed. Accepted as no contract
+  change.
 
 ## Learnings
 

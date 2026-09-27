@@ -41,7 +41,7 @@ class NotebookGitProposalRelocateAndRenameControllerTest extends NotebookGitCont
     assertThat(relocated.getId(), equalTo(setup.note().getId()));
     NoteRealm shown = noteController.showNote(relocated);
     assertThat(
-        shown.getAncestorFolders().stream().map(FolderTrailSegment::id).toList(),
+        shown.sidebar().getAncestorFolders().stream().map(FolderTrailSegment::id).toList(),
         contains(setup.destination().getId()));
     assertThat(shown.getNote().getTitle(), equalTo("renamed"));
     assertThat(shown.getNote().getContent(), equalTo(TYPED_NOTE_CONTENT));
@@ -60,7 +60,7 @@ class NotebookGitProposalRelocateAndRenameControllerTest extends NotebookGitCont
     NoteRealm shown =
         noteController.showNote(noteRepository.findById(setup.note().getId()).orElseThrow());
     assertThat(
-        shown.getAncestorFolders().stream().map(FolderTrailSegment::id).toList(),
+        shown.sidebar().getAncestorFolders().stream().map(FolderTrailSegment::id).toList(),
         contains(setup.destination().getId()));
     assertThat(shown.getNote().getTitle(), equalTo("renamed"));
   }

@@ -44,16 +44,17 @@ class NoteControllerShowTests extends ControllerTestBase {
     Note note = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).please();
     NoteRealm noteRealm = controller.showNote(note);
     assertThat(noteRealm.getId(), equalTo(note.getId()));
-    assertThat(noteRealm.getNotebookRealm().readonly(), is(false));
+    assertThat(noteRealm.sidebar().getNotebookRealm().readonly(), is(false));
     assertThat(
-        noteRealm.getNotebookRealm().notebook().getId(), equalTo(note.getNotebook().getId()));
+        noteRealm.sidebar().getNotebookRealm().notebook().getId(),
+        equalTo(note.getNotebook().getId()));
   }
 
   @Test
   void shouldReturnReadonlyWhenHavingReadingAuthOnly() throws UnexpectedNoAccessRightException {
     Note note = makeMe.aNote().notebookOwnedBy(makeMe.aUser().please()).please();
     makeMe.aBazaarNotebook(note.getNotebook()).please();
-    assertThat(controller.showNote(note).getNotebookRealm().readonly(), is(true));
+    assertThat(controller.showNote(note).sidebar().getNotebookRealm().readonly(), is(true));
   }
 
   @Test

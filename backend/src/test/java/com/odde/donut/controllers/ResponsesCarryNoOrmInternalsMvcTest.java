@@ -1,6 +1,7 @@
 package com.odde.donut.controllers;
 
 import static com.odde.donut.testability.CommittedTransactionTestSupport.inCommittedTransaction;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.aMapWithSize;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.contains;
@@ -81,16 +82,25 @@ class ResponsesCarryNoOrmInternalsMvcTest extends ControllerTestBase {
 
   @Test
   void noteRealmCarriesTheTrailWithoutProxyInternals() throws Exception {
-    assertCleanTrail(
-        mockMvc.perform(get("/api/notes/{note}", noteId).accept(MediaType.APPLICATION_JSON)));
+    String body =
+        assertCleanTrail(
+                mockMvc.perform(
+                    get("/api/notes/{note}", noteId).accept(MediaType.APPLICATION_JSON)))
+            .andReturn()
+            .getResponse()
+            .getContentAsString();
+    assertThat(body)
+        .containsOnlyOnce("\"notebookRealm\":")
+        .containsOnlyOnce("\"ancestorFolders\":");
   }
 
   @Test
-  void noteAtNotebookRootHasAnEmptyTrail() throws Exception {
+  void noteAtNotebookRootHasAnEmptyTrailAndNoScopedReadme() throws Exception {
     mockMvc
         .perform(get("/api/notes/{note}", rootNoteId).accept(MediaType.APPLICATION_JSON))
         .andExpect(status().isOk())
-        .andExpect(jsonPath("$.ancestorFolders", empty()));
+        .andExpect(jsonPath("$.ancestorFolders", empty()))
+        .andExpect(content().string(not(Matchers.containsString("\"scopedReadmeContent\""))));
   }
 
   @Test
@@ -103,8 +113,8 @@ class ResponsesCarryNoOrmInternalsMvcTest extends ControllerTestBase {
         .andExpect(status().isOk());
   }
 
-  private void assertCleanTrail(ResultActions result) throws Exception {
-    result
+  private ResultActions assertCleanTrail(ResultActions result) throws Exception {
+    return result
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.ancestorFolders[*].name", contains("outer", "inner")))
         .andExpect(

@@ -8,15 +8,7 @@ import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
 
-@JsonPropertyOrder({
-  "id",
-  "note",
-  "notebookRealm",
-  "ancestorFolders",
-  "references",
-  "wikiLinks",
-  "scopedReadmeContent"
-})
+@JsonPropertyOrder({"id", "note", "references", "wikiLinks"})
 public class NoteRealm {
   /**
    * Referring notes (live-resolved authored note references), as {@link NoteTopology}, deduplicated
@@ -41,27 +33,7 @@ public class NoteRealm {
     return note.getId();
   }
 
-  public NotebookRealm getNotebookRealm() {
-    return sidebar.getNotebookRealm();
-  }
-
-  public void setNotebookRealm(NotebookRealm notebookRealm) {
-    sidebar.setNotebookRealm(notebookRealm);
-  }
-
-  public List<FolderTrailSegment> getAncestorFolders() {
-    return sidebar.getAncestorFolders();
-  }
-
-  public void setAncestorFolders(List<FolderTrailSegment> ancestorFolders) {
-    sidebar.setAncestorFolders(ancestorFolders);
-  }
-
-  public String getScopedReadmeContent() {
-    return sidebar.getScopedReadmeContent();
-  }
-
-  public void setScopedReadmeContent(String scopedReadmeContent) {
-    sidebar.setScopedReadmeContent(scopedReadmeContent);
+  public RealmNotebookSidebar sidebar() {
+    return sidebar;
   }
 }

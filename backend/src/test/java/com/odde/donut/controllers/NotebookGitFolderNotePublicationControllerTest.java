@@ -71,7 +71,7 @@ class NotebookGitFolderNotePublicationControllerTest extends NotebookGitControll
               .orElseThrow();
       NoteRealm shown = noteController.showNote(created);
       assertThat(
-          shown.getAncestorFolders().stream().map(FolderTrailSegment::id).toList(),
+          shown.sidebar().getAncestorFolders().stream().map(FolderTrailSegment::id).toList(),
           contains(physics.getId()));
       assertThat(shown.getNote().getContent(), equalTo(addition.getValue()));
     }

@@ -62,7 +62,7 @@ class NotebookGitProposalMissingParentNoteMoveControllerTest
         });
     NoteRealm shown = noteController.showNote(noteRepository.findById(cells.getId()).orElseThrow());
     assertThat(
-        shown.getAncestorFolders().stream().map(FolderTrailSegment::name).toList(),
+        shown.sidebar().getAncestorFolders().stream().map(FolderTrailSegment::name).toList(),
         contains("_trash", "Biology"));
     assertExactAcceptedTree(notebook, proposedCommit, publishedHead, binding);
   }
@@ -93,7 +93,7 @@ class NotebookGitProposalMissingParentNoteMoveControllerTest
     assertThat(recovered.getTitle(), equalTo("Cells"));
     NoteRealm shown = noteController.showNote(recovered);
     assertThat(
-        shown.getAncestorFolders().stream().map(FolderTrailSegment::name).toList(),
+        shown.sidebar().getAncestorFolders().stream().map(FolderTrailSegment::name).toList(),
         contains("Research"));
     assertExactAcceptedTree(notebook, proposedCommit, publishedHead, binding);
   }

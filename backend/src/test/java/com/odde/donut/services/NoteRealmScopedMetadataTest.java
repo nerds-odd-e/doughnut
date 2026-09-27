@@ -40,17 +40,17 @@ class NoteRealmScopedMetadataTest extends SpringTestBase {
 
     NoteRealm realm = noteRealmService.build(inFolder, user);
 
-    assertThat(realm.getAncestorFolders(), hasSize(2));
-    assertThat(realm.getAncestorFolders().get(0).name(), equalTo("Outer"));
-    assertThat(realm.getAncestorFolders().get(1).name(), equalTo("Inner"));
-    assertThat(realm.getAncestorFolders().get(0).id(), equalTo(outer.getId()));
-    assertThat(realm.getAncestorFolders().get(1).id(), equalTo(inner.getId()));
+    assertThat(realm.sidebar().getAncestorFolders(), hasSize(2));
+    assertThat(realm.sidebar().getAncestorFolders().get(0).name(), equalTo("Outer"));
+    assertThat(realm.sidebar().getAncestorFolders().get(1).name(), equalTo("Inner"));
+    assertThat(realm.sidebar().getAncestorFolders().get(0).id(), equalTo(outer.getId()));
+    assertThat(realm.sidebar().getAncestorFolders().get(1).id(), equalTo(inner.getId()));
   }
 
   @Test
   void ancestor_folders_empty_when_note_not_in_folder() {
     Note root = makeMe.aNote().notebook(notebook).please();
-    assertThat(noteRealmService.build(root, user).getAncestorFolders(), empty());
+    assertThat(noteRealmService.build(root, user).sidebar().getAncestorFolders(), empty());
   }
 
   @Test
@@ -62,7 +62,7 @@ class NoteRealmScopedMetadataTest extends SpringTestBase {
 
     NoteRealm realm = noteRealmService.build(normal, user);
 
-    assertThat(realm.getScopedReadmeContent(), equalTo(readmeContent));
+    assertThat(realm.sidebar().getScopedReadmeContent(), equalTo(readmeContent));
     List<String> blocks = noteRealmService.questionGenerationInstructionBlocks(normal);
     assertThat(blocks, hasSize(1));
     assertThat(blocks.get(0), containsString("Instruction from notebook"));
@@ -80,7 +80,8 @@ class NoteRealmScopedMetadataTest extends SpringTestBase {
     Note normal = makeMe.aNote().notebook(notebook).please();
 
     assertThat(
-        noteRealmService.build(normal, user).getScopedReadmeContent(), equalTo(readmeContent));
+        noteRealmService.build(normal, user).sidebar().getScopedReadmeContent(),
+        equalTo(readmeContent));
   }
 
   @ParameterizedTest
@@ -123,7 +124,7 @@ class NoteRealmScopedMetadataTest extends SpringTestBase {
 
     NoteRealm realm = noteRealmService.build(inInner, user);
 
-    assertThat(realm.getScopedReadmeContent(), equalTo(innerReadme));
+    assertThat(realm.sidebar().getScopedReadmeContent(), equalTo(innerReadme));
     List<String> blocks = noteRealmService.questionGenerationInstructionBlocks(inInner);
     assertThat(blocks, hasSize(3));
     assertThat(blocks.get(0), containsString("nb-text"));
@@ -145,7 +146,7 @@ class NoteRealmScopedMetadataTest extends SpringTestBase {
 
     NoteRealm realm = noteRealmService.build(inInner, user);
 
-    assertThat(realm.getScopedReadmeContent(), equalTo(outerReadme));
+    assertThat(realm.sidebar().getScopedReadmeContent(), equalTo(outerReadme));
     List<String> blocks = noteRealmService.questionGenerationInstructionBlocks(inInner);
     assertThat(blocks, hasSize(1));
     assertThat(blocks.get(0), containsString("outer-only"));
@@ -181,7 +182,9 @@ class NoteRealmScopedMetadataTest extends SpringTestBase {
 
     Note inFolder = makeMe.aNote().folder(folder).please();
 
-    assertThat(noteRealmService.build(inFolder, user).getScopedReadmeContent(), equalTo(nbContent));
+    assertThat(
+        noteRealmService.build(inFolder, user).sidebar().getScopedReadmeContent(),
+        equalTo(nbContent));
   }
 
   @Test
@@ -190,7 +193,7 @@ class NoteRealmScopedMetadataTest extends SpringTestBase {
 
     NoteRealm realm = noteRealmService.build(normal, user);
 
-    assertThat(realm.getScopedReadmeContent(), nullValue());
+    assertThat(realm.sidebar().getScopedReadmeContent(), nullValue());
     assertThat(noteRealmService.questionGenerationInstructionBlocks(normal), empty());
   }
 
@@ -207,7 +210,7 @@ class NoteRealmScopedMetadataTest extends SpringTestBase {
 
     NoteRealm realm = noteRealmService.build(normal, user);
 
-    assertThat(realm.getScopedReadmeContent(), nullValue());
+    assertThat(realm.sidebar().getScopedReadmeContent(), nullValue());
     assertThat(noteRealmService.questionGenerationInstructionBlocks(normal), empty());
   }
 

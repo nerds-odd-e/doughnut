@@ -66,7 +66,7 @@ class NotebookGitComposedTrashMoveIdentityControllerTest
     assertThat(relocated.getContent(), equalTo(CELLS_BODY));
     NoteRealm shown = noteController.showNote(relocated);
     assertThat(
-        shown.getAncestorFolders().stream().map(FolderTrailSegment::name).toList(),
+        shown.sidebar().getAncestorFolders().stream().map(FolderTrailSegment::name).toList(),
         contains("Research"));
     MemoryTracker learned = memoryTrackerRepository.findById(seed.tracker().getId()).orElseThrow();
     assertThat(learned.getNote().getId(), equalTo(seed.cells().getId()));

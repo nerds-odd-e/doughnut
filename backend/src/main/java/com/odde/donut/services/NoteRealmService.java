@@ -6,6 +6,7 @@ import com.odde.donut.algorithms.NoteContentMarkdown;
 import com.odde.donut.controllers.dto.FolderTrail;
 import com.odde.donut.controllers.dto.FolderTrailSegment;
 import com.odde.donut.controllers.dto.NoteRealm;
+import com.odde.donut.controllers.dto.RealmNotebookSidebar;
 import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
@@ -45,9 +46,11 @@ public class NoteRealmService {
     List<Note> refNotes =
         hydrateNoteList(noteReferenceService.distinctReferrerNotesForViewer(focus, viewer));
     realm.setReferences(refNotes.stream().map(Note::getNoteTopology).toList());
-    realm.setNotebookRealm(notebookCatalogService.notebookRealmFor(focus.getNotebook(), viewer));
-    realm.setAncestorFolders(FolderTrailSegment.of(FolderTrail.fromRootToContainingFolder(focus)));
-    realm.setScopedReadmeContent(resolveScopedReadmeContentForNote(focus));
+    RealmNotebookSidebar sidebar = realm.sidebar();
+    sidebar.setNotebookRealm(notebookCatalogService.notebookRealmFor(focus.getNotebook(), viewer));
+    sidebar.setAncestorFolders(
+        FolderTrailSegment.of(FolderTrail.fromRootToContainingFolder(focus)));
+    sidebar.setScopedReadmeContent(resolveScopedReadmeContentForNote(focus));
     return realm;
   }
 

@@ -4189,6 +4189,14 @@ components:
           format: int32
         note:
           $ref: "#/components/schemas/Note"
+        references:
+          type: array
+          items:
+            $ref: "#/components/schemas/NoteTopology"
+        wikiLinks:
+          type: array
+          items:
+            $ref: "#/components/schemas/WikiLink"
         notebookRealm:
           $ref: "#/components/schemas/NotebookRealm"
           description: "Notebook chrome: entity plus optional catalog hints and optional\
@@ -4199,14 +4207,6 @@ components:
             semantics.
           items:
             $ref: "#/components/schemas/FolderTrailSegment"
-        references:
-          type: array
-          items:
-            $ref: "#/components/schemas/NoteTopology"
-        wikiLinks:
-          type: array
-          items:
-            $ref: "#/components/schemas/WikiLink"
         scopedReadmeContent:
           type: string
           description: Full markdown of the container readme that supplies the nearest

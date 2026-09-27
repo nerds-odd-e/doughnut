@@ -241,6 +241,8 @@ export type Note = {
 export type NoteRealm = {
     id: number;
     note: Note;
+    references?: Array<NoteTopology>;
+    wikiLinks?: Array<WikiLink>;
     /**
      * Notebook chrome: entity plus optional catalog hints and optional notebook readme content.
      */
@@ -249,8 +251,6 @@ export type NoteRealm = {
      * Folders from notebook root outward; see each realm for trail semantics.
      */
     ancestorFolders?: Array<FolderTrailSegment>;
-    references?: Array<NoteTopology>;
-    wikiLinks?: Array<WikiLink>;
     /**
      * Full markdown of the container readme that supplies the nearest non-blank title_pattern (inner scope toward notebook root). Omitted when none applies.
      */

@@ -56,7 +56,7 @@ class NotebookGitProposalRelocationControllerTest extends NotebookGitControllerT
 
     NoteRealm shown = noteController.showNote(noteRepository.findById(note.getId()).orElseThrow());
     assertThat(
-        shown.getAncestorFolders().stream().map(FolderTrailSegment::id).toList(),
+        shown.sidebar().getAncestorFolders().stream().map(FolderTrailSegment::id).toList(),
         contains(folder.getId()));
   }
 
@@ -78,7 +78,7 @@ class NotebookGitProposalRelocationControllerTest extends NotebookGitControllerT
         notebook.getId(), binding.getAcceptedGitObjectId(), proposalBytes);
 
     NoteRealm shown = noteController.showNote(noteRepository.findById(note.getId()).orElseThrow());
-    assertThat(shown.getAncestorFolders(), empty());
+    assertThat(shown.sidebar().getAncestorFolders(), empty());
   }
 
   @Test
@@ -103,7 +103,7 @@ class NotebookGitProposalRelocationControllerTest extends NotebookGitControllerT
 
     NoteRealm shown = noteController.showNote(noteRepository.findById(note.getId()).orElseThrow());
     assertThat(
-        shown.getAncestorFolders().stream().map(FolderTrailSegment::id).toList(),
+        shown.sidebar().getAncestorFolders().stream().map(FolderTrailSegment::id).toList(),
         contains(destination.getId()));
   }
 
@@ -153,7 +153,7 @@ class NotebookGitProposalRelocationControllerTest extends NotebookGitControllerT
     assertThat(relocated.getId(), equalTo(note.getId()));
     NoteRealm shown = noteController.showNote(relocated);
     assertThat(
-        shown.getAncestorFolders().stream().map(FolderTrailSegment::id).toList(),
+        shown.sidebar().getAncestorFolders().stream().map(FolderTrailSegment::id).toList(),
         contains(courses.getId(), nestedPhysics.getId()));
     assertThat(shown.getNote().getContent(), equalTo(TYPED_NOTE_CONTENT));
     assertThat(publishedHead, equalTo(proposedCommit.head().getName()));
