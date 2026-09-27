@@ -40,3 +40,9 @@ drop the inline `takenBy(...).ifPresent(refuseTaken)` for subfolders. Keep the
 note and file loops.
 
 Accepted proof: the four named classes passed (Guard 8, FolderDissolve 9, GitFolderDissolve 5, GitFolderDissolveAtomic 1 — 23 tests, 0 failures); `FolderContentsPlacementCheck.java` 6+/8−. Refactor pass: no edits.
+
+## Execution complete
+
+Product advice: no change. The correction leaves the folder-entry rule only in
+`FolderSiblingNameValidation.folderToEnter`; the queue order (SEED-050#story-10
+next) stands.

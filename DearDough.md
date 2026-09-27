@@ -362,6 +362,10 @@ A story's readiness basis is a digest of its whole seed document. Wrapping up an
   - Evidence: 299cd69bac closed SEED-050 story 3, removing its seed section; `execution-start.mjs start` refused with "published preparation is needs-reassessment"; `read-state` showed only `basis.document` changed (4213a2e5… → e6161163…) with the plan digest and story-4 section unchanged; c896f2fcfc re-recorded ready.
   - Observed effect: one refused start, a starting-facts spot check, one extra commit on main and a retry.
   - Inference: unlike the story 24 and story 3 occurrences, plan 023 did not depend on the closed sibling, so the reassessment carried no information.
+- Execution: SEED-050#story-9 / `.planning/slice-plans/027-dissolve-enters-folders-by-the-one-rule/PLAN.md` / 6d48bad1b5; Timestamp: 2026-09-27, before 18:06:21+08:00 (first readiness commit ac6105235d); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.42.
+  - Evidence: 99137184b3 renumbered sibling story 10 in the same seed; start refused with "published preparation is needs-reassessment" (`basis.document` f61c17e5… → d07d54d7…, `basis.plan` 876b08ab… unchanged); ac6105235d re-recorded ready; its push was rejected, and the rebase brought in dde502bf56, which closed story 7 and changed the digest again, so a second re-record was needed. That uncommitted re-record in the default checkout went into a concurrent session's e2f6ab75c2 ("Reassess SEED-050#story-10 readiness…"), which re-recorded both siblings.
+  - Observed effect: one refused start, two reassessments, one extra commit on main plus a swept-in edit, one rejected push, and one denied amend of the already-pushed readiness commit; about eight extra coordinator calls before the Take 13721c9182.
+  - Inference: story 9 depended on neither story 7 nor story 10, so neither reassessment carried information; two siblings in one seed being prepared and closed within minutes makes this repeat back to back.
 
 ## ODF-155 — An implementer proved fails-first by putting HEAD versions back in the shared execution checkout
 
@@ -546,6 +550,9 @@ Former local code: DD-133.
 - Execution: SEED-050#story-5 / `4426190218:.planning/slice-plans/024-finished-transitions-leave-no-trace/PLAN.md` / 48d5a2e8f8; Timestamp: 2026-09-27, before the slice 1 commit 48d5a2e8f8; Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.42.
   - Evidence: `node .claude/skills/dough-execute-plan/scripts/agent-commit.mjs -m …` from the worktree root twice exited 0 with empty output while `git log` stayed at 45aafefb9f with the change staged; reading the script's guard led to the `realpath` invocation, which returned `{"ok":true,"status":"committed","agent":"Mihiro-chan","sha":"48d5a2e8f8…"}`. `execution-start.mjs start` and `execution-increment-delivery.mjs deliver` (the latter always run by real path) worked.
   - Observed effect: four extra coordinator calls; nothing committed wrongly. Eighth retained occurrence, unknown to the coordinator at call time.
+- Execution: SEED-050#story-9 / `.planning/slice-plans/027-dissolve-enters-folders-by-the-one-rule/PLAN.md` / 6d48bad1b5; Timestamp: 2026-09-27T18:11:11+08:00 (slice 1 commit, made after switching to the `.agents` path); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.42.
+  - Evidence: two runs of `node .claude/skills/dough-execute-plan/scripts/agent-commit.mjs -m …` from the worktree root exited 0 with empty output, HEAD still 13721c9182 with the change staged; after reading the script's guard, the `.agents/skills/…` path returned `{"ok":true,"status":"committed","agent":"Shunka-chan","sha":"6d48bad1b5…"}`.
+  - Observed effect: three extra coordinator calls; nothing committed wrongly. Ninth retained occurrence, unknown to the coordinator at call time.
 
 ## ODF-100 — Agents reported vue-tsc's exit code from a pipe into `tail`, so the coordinator had to rerun the typecheck
 
