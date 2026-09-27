@@ -108,3 +108,15 @@ case only.
   name and callers and only chooses between entering and requiring the name
   free.
 - 2026-09-27: `findOrCreateFolder` (trash) stays on `folderHolding`.
+
+## Execution complete
+
+Product advice: no change to direction or priorities. The retrospective found
+one more inline copy of the entry rule in
+`FolderContentsPlacementCheck.firstFolderMeetingAFolder` (predates this plan)
+and planned it as correction SEED-050#story-9
+([plan 027](../027-dissolve-enters-folders-by-the-one-rule/PLAN.md)); wrap-up
+decides whether to queue it. Observation only: the folder-only
+`requireNoConflictingSibling` family (web folder creation, proposal folder
+placement) is a parallel "name free" rule that ignores notes and files; its
+intent was not reviewed here.

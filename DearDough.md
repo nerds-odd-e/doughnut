@@ -438,6 +438,10 @@ A story's readiness basis is a digest of its whole seed document. Wrapping up an
   - Evidence: 0d7772ed0e (13:02:28+08:00) refined and planned sibling SEED-009#story-48 in the same seed, a preparation write rather than a closure; start refused with "published preparation is needs-reassessment"; `git diff c526dba221 0d7772ed0e` on the seed touched only story 48's section; 7360e9e9f7 changed only story 47's `basis.document` (ee9b982d… → 28c68632…), `basis.plan` 38ea6254… unchanged.
   - Observed effect: one refused start that also left a local Take candidate built on the stale base; the retry with its recovery coordinates refused again ("unpublished selected story source in originating checkout"), so the coordinator removed that unpublished worktree and branch, published the reassessment, and took the story fresh — about six extra calls.
   - Inference: sibling preparation, not only sibling wrap-up, invalidates a story's readiness; two stories prepared minutes apart in one seed will always collide this way.
+- Execution: SEED-050#story-8 / `.planning/slice-plans/026-one-folder-entry-rule/PLAN.md` / 649e162dd4; Timestamp: 2026-09-27, before ~16:59+08:00 (refusal; readiness commit 7fdb9ba0a9); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: unknown.
+  - Evidence: af4f39a65e closed SEED-050 story 2 and rewrote plan 026's story-2 link to a provenance reference; 847c4c5ce3 re-recorded sibling story 5; start refused with "published preparation is needs-reassessment"; story 8's section was unchanged, the plan diff was only that provenance line, and plan 026's product files were untouched since aef1e27b77; 7fdb9ba0a9 changed both `basis.document` (b84184e4… → 348fd390…) and `basis.plan` (302229bb… → 43fe8405…).
+  - Observed effect: one refused start, about five read-only checks, one extra commit on main and a retry.
+  - Inference: the wrap-up that edited plan 026's provenance line could have re-recorded story 8's readiness in the same commit, as the story-25 occurrence already suggests.
 
 ## DD-126 — A plan said the changed script had no test, and nobody searched for one before delivery, so CI caught the stale test
 
@@ -547,6 +551,9 @@ Slice 2's implementer reported that a rich body edit drops the file's final newl
 - Execution: SEED-050#story-1 / `.planning/slice-plans/020-validate-changed-markdown-once/PLAN.md` / f8b186cc7f; Timestamp: 2026-09-27, ~16:00+08:00 (slice 1 amend); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.42.
   - Evidence: `node .claude/skills/dough-execute-plan/scripts/agent-commit.mjs --amend` (bare, and with `-F -`) from the worktree root exited 0 with no output, HEAD still 759f43d897 without the developer trailer; the `realpath` invocation returned `{"ok":true,"status":"amended","agent":"Kaoru-chan","sha":"f8b186cc7f…"}`.
   - Observed effect: four extra calls, including reading the script; the first commit was made with plain `git commit` and had to be amended. Fifth retained occurrence, unknown to the coordinator at call time.
+- Execution: SEED-050#story-8 / `.planning/slice-plans/026-one-folder-entry-rule/PLAN.md` / 649e162dd4; Timestamp: 2026-09-27, ~17:04+08:00 (slice 1 commit); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: unknown.
+  - Evidence: two runs of `node .claude/skills/dough-execute-plan/scripts/agent-commit.mjs -m …` from the worktree root exited 0 with empty output, HEAD still ce8390fdd2; the `.agents/skills/…` path returned `{"ok":true,"status":"committed","agent":"Aino-chan","sha":"649e162dd4…"}`. `execution-start.mjs start` ran through the `.claude` path from the main checkout in the same session.
+  - Observed effect: three extra coordinator calls, including reading the script's guard; nothing committed wrongly. Sixth retained occurrence, unknown to the coordinator at call time.
 
 ## DD-134 — The plan's E2E proof command named a feature directory, which the isolated runner refuses
 
@@ -640,6 +647,9 @@ The slice 5 delegation told the implementer both to show its new assertions fail
   - Evidence: slice 5 implementer return ("I put the HEAD versions of the resolver and the Vue file back temporarily ... restored my versions from temp copies"); delegation prompt's "never stash, reset, clean, checkout paths"; dough-execute-plan/references/delegation.md ownership bullet.
   - Observed effect: no damage; the coordinator checked the working tree afterwards and it held the intended diff. No other writer was active in the checkout at that time.
   - Inference: an implementer that writes code before its test finds the in-place restore the cheapest fails-first route; with a concurrent writer it could clobber or capture sibling work. Writing the test first, or a temporary worktree at HEAD, avoids it. Qualified: one occurrence; coordinator saw only the return.
+- Execution: SEED-050#story-8 / `.planning/slice-plans/026-one-folder-entry-rule/PLAN.md` / 649e162dd4; Timestamp: 2026-09-27, ~17:03+08:00 (slice 2 acceptance) and ~17:13+08:00 (coordinator rerun); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: unknown.
+  - Evidence: slice 2 implementer return ("I piped it through `tail`, so the `EXIT=0` shown is tail's exit code"); the delegation prompt did not spell out exit-code capture; the coordinator first accepted on "no error output", then reran `vue-tsc --noEmit >log 2>&1; echo $?` during the retrospective → 0, no `error TS`.
+  - Observed effect: one extra typecheck run; no wrong result accepted, but acceptance briefly rested on absent output rather than an exit code.
 
 ## Retention
 

@@ -188,3 +188,34 @@ time.
 **Effort hypothesis:** S — high confidence.
 
 **Depends on:** none (SEED-050#story-2 is delivered).
+
+<a id="story-9"></a>
+
+### Folder dissolve and merge enter subfolders by the one entry rule
+
+**Identity:** SEED-050#story-9
+```json dough-story-state
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/027-dissolve-enters-folders-by-the-one-rule/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"5e994b2ee199d85bc4efa1c8db175620efedc033283686420631535d7e31797e","plan":"c003f79909e3d93cb9352c68a2fd092df054d5ec3df174ae2de5a9d592c79d4c"}}
+```
+
+**Goal:** Correction of SEED-050#story-8 (provenance
+`cba24a706e:.planning/slice-plans/026-one-folder-entry-rule/PLAN.md`, commits
+649e162dd4 and cba24a706e). Developers who next change folder naming find
+"enter the folder holding this name (ignoring case), else refuse a note or
+file holding it" only in `FolderSiblingNameValidation.folderToEnter`;
+the dissolve/merge placement check no longer carries its own copy.
+
+**Scope:**
+
+- Required: `FolderContentsPlacementCheck.firstFolderMeetingAFolder` gets each
+  subfolder's existing destination folder from `folderToEnter`; net fewer lines.
+- Preserved: dissolve and merge-move refusals naming the note or file path,
+  case-variant folder merging, and every message and error type.
+- Excluded: the folder-only `requireNoConflictingSibling` family; the trash
+  path's `findOrCreateFolder`.
+
+**Plan:** [027-dissolve-enters-folders-by-the-one-rule](../slice-plans/027-dissolve-enters-folders-by-the-one-rule/PLAN.md)
+
+**Effort hypothesis:** S — high confidence.
+
+**Depends on:** none (SEED-050#story-8 is delivered on its story branch).
