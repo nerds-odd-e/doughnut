@@ -12,6 +12,9 @@
     :allow-new-conversation="allowNewConversation"
     :default-messages="showDefaultMessages ? defaultQuestions : undefined"
   >
+    <template #header-actions>
+      <slot name="header-actions" />
+    </template>
     <template #messages v-if="currentConversationMessages !== undefined">
       <div
         v-for="conversationMessage in currentConversationMessages"

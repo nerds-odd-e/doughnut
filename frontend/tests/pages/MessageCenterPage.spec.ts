@@ -147,40 +147,30 @@ describe("MessageCenterPage", () => {
       return wrapper
     }
 
-    it("shows a note conversation's read-only note context beside its messages and usable composer on a wide screen", async () => {
-      const { width, height } = server.config.browser.viewport
-      onTestFinished(() => page.viewport(width, height))
-      await page.viewport(1280, 800)
+    const openNoteConversationAt = async (width: number, height: number) => {
+      const original = server.config.browser.viewport
+      onTestFinished(() => page.viewport(original.width, original.height))
+      await page.viewport(width, height)
       const noteRealm = makeMe.aNoteRealm
         .title("Sedition")
         .content("Inciting rebellion.")
         .please()
       mockSdkService(NoteController, "showNote", noteRealm)
+      const conversation = makeMe.aConversation
+        .forANote(noteRealm.note)
+        .please()
+      return { conversation, wrapper: await openConversation(conversation) }
+    }
+
+    const expectReplySent = async (
+      wrapper: Awaited<ReturnType<typeof openConversation>>,
+      conversation: Conversation
+    ) => {
       const replySpy = mockSdkService(
         ConversationMessageController,
         "replyToConversation",
         undefined
       )
-      const conversation = makeMe.aConversation
-        .forANote(noteRealm.note)
-        .please()
-
-      const wrapper = await openConversation(conversation)
-
-      const context = wrapper.find('article[aria-label="Note context"]')
-      expect(context.text()).toContain("Sedition")
-      expect(context.text()).toContain("Inciting rebellion.")
-      expect(wrapper.find("#main-note-content").exists()).toBe(false)
-      const message = [...document.querySelectorAll("*")].find(
-        (el) => el.children.length === 0 && el.textContent === "Is this right?"
-      )!
-      const contextBox = context.element.getBoundingClientRect()
-      for (const el of [message, wrapper.find("textarea").element]) {
-        const box = el.getBoundingClientRect()
-        expect(contextBox.left).toBeGreaterThanOrEqual(box.right)
-        expect(contextBox.top).toBeLessThan(box.bottom)
-      }
-
       await wrapper.find("textarea").setValue("Yes, it is.")
       await wrapper.find("form.message-input-form").trigger("submit")
       await flushPromises()
@@ -190,6 +180,52 @@ describe("MessageCenterPage", () => {
           body: "Yes, it is.",
         })
       )
+    }
+
+    const noteContext = () =>
+      document.querySelector<HTMLElement>('article[aria-label="Note context"]')
+
+    it("shows a note conversation's read-only note context beside its messages and usable composer on a wide screen", async () => {
+      const { wrapper, conversation } = await openNoteConversationAt(1280, 800)
+
+      const context = noteContext()!
+      expect(context.textContent).toContain("Sedition")
+      expect(context.textContent).toContain("Inciting rebellion.")
+      expect(wrapper.find("#main-note-content").exists()).toBe(false)
+      expect(wrapper.find('[aria-label="Read note context"]').isVisible()).toBe(
+        false
+      )
+      const message = [...document.querySelectorAll("*")].find(
+        (el) => el.children.length === 0 && el.textContent === "Is this right?"
+      )!
+      const contextBox = context.getBoundingClientRect()
+      for (const el of [message, wrapper.find("textarea").element]) {
+        const box = el.getBoundingClientRect()
+        expect(contextBox.left).toBeGreaterThanOrEqual(box.right)
+        expect(contextBox.top).toBeLessThan(box.bottom)
+      }
+
+      await expectReplySent(wrapper, conversation)
+      wrapper.unmount()
+    })
+
+    it("reaches a note conversation's context from its header on a narrow screen and returns to reply", async () => {
+      const { wrapper, conversation } = await openNoteConversationAt(390, 844)
+
+      expect(noteContext()?.checkVisibility() ?? false).toBe(false)
+      await wrapper.find('[aria-label="Read note context"]').trigger("click")
+      await flushPromises()
+      const drawerContext = document.querySelector<HTMLElement>(
+        'dialog article[aria-label="Note context"]'
+      )!
+      expect(drawerContext.checkVisibility()).toBe(true)
+      expect(drawerContext.textContent).toContain("Inciting rebellion.")
+
+      document.querySelector<HTMLElement>("dialog .close-button")!.click()
+      await flushPromises()
+      expect(document.querySelector("dialog")).toBeNull()
+      expect(wrapper.text()).toContain("Is this right?")
+      await expectReplySent(wrapper, conversation)
       wrapper.unmount()
     })
 

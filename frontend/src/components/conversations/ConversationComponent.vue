@@ -3,11 +3,9 @@
     <div
       v-if="!isMaximized"
       class="subject-container flex-1 min-w-0 overflow-auto p-4 border-b border-base-300 lg:order-last lg:border-b-0 lg:border-l"
+      :class="{ 'hidden lg:block': subjectNoteId }"
     >
-      <NoteContextReader
-        v-if="conversation.subject?.note?.id"
-        :note-id="conversation.subject.note.id"
-      />
+      <NoteContextReader v-if="subjectNoteId" :note-id="subjectNoteId" />
       <AnsweredQuestionComponent
         v-else-if="conversation.subject?.recallPrompt"
         v-bind="{
@@ -29,7 +27,19 @@
         @conversation-changed="handleConversationChange"
         @close-dialog="handleCloseDialog"
         @toggle-maximize="isMaximized = !isMaximized"
-      />
+      >
+        <template #header-actions v-if="subjectNoteId">
+          <PopButton
+            class="lg:hidden"
+            sidebar="right"
+            aria-label="Read note context"
+            title="Read note context"
+          >
+            <template #button_face><FileText class="w-6 h-6" /></template>
+            <div class="p-4"><NoteContextReader :note-id="subjectNoteId" /></div>
+          </PopButton>
+        </template>
+      </ConversationInner>
     </div>
   </div>
 </template>
@@ -38,8 +48,10 @@
 import type { User, Conversation } from "@generated/donut-backend-api"
 import NoteContextReader from "@/components/notes/NoteContextReader.vue"
 import AnsweredQuestionComponent from "@/components/recall/AnsweredQuestionComponent.vue"
+import PopButton from "@/components/commons/Popups/PopButton.vue"
+import { FileText } from "@lucide/vue"
 import { useRouter } from "vue-router"
-import { ref, onMounted } from "vue"
+import { computed, ref, onMounted } from "vue"
 import { ConversationMessageController } from "@generated/donut-backend-api/sdk.gen"
 import ConversationInner from "@/components/conversations/ConversationInner.vue"
 import { noteShowLocation } from "@/routes/noteShowLocation"
@@ -57,12 +69,13 @@ const emit = defineEmits<{
 const router = useRouter()
 const conversations = ref<Conversation[]>([])
 const isMaximized = ref(false)
+const subjectNoteId = computed(() => props.conversation.subject?.note?.id)
 
 onMounted(async () => {
-  if (props.conversation.subject?.note?.id) {
+  if (subjectNoteId.value) {
     const { data: conversationsList, error } =
       await ConversationMessageController.getConversationsAboutNote({
-        path: { note: props.conversation.subject.note.id },
+        path: { note: subjectNoteId.value },
       })
     if (!error) {
       conversations.value = conversationsList!

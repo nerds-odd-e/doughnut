@@ -197,10 +197,15 @@ global main menu. Retain chat maximize as a way to give messages more space.
 ### 8. Reach conversation context on a narrow screen
 
 Type: Behavior
-Status: planned
+Status: done
 Proof: a focused responsive browser journey opens a note conversation at a
 narrow viewport, opens the note reader from its header, reads its content,
 closes it, and replies; the desktop journey still has the side pane.
+Accepted: below `lg` the inline pane is hidden for note subjects and a
+"Read note context" `PopButton` drawer (right sidebar `Modal`) in the new
+conversation `#header-actions` slot opens the reader; narrow (390x844) and
+wide browser-mode tests in `MessageCenterPage.spec.ts` pass. Learning: CSS-only
+responsiveness kept; the drawer reuses the note already loaded into the store.
 
 Behavior: a participant opens a note conversation on a narrow screen → the
 message composer stays usable and the note context is reachable from the
