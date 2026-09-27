@@ -5,7 +5,7 @@
 - Story: [SEED-050#story-9](../../seeds/SEED-050-local-ai-notebook-technical-debt.md#story-9)
 - **Identity:** SEED-050#story-9
 - Correction of SEED-050#story-8; provenance
-  `cba24a706e:.planning/slice-plans/026-one-folder-entry-rule/PLAN.md`,
+  `da1e269ba5:.planning/slice-plans/026-one-folder-entry-rule/PLAN.md`,
   commits 649e162dd4 (slice 1), cba24a706e (slice 2).
 
 ### Finding (retrospective of plan 026, 2026-09-27 at cba24a706e)
