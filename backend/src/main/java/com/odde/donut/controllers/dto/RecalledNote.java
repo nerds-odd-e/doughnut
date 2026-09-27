@@ -26,8 +26,7 @@ public class RecalledNote {
     RecalledNote recalledNote = new RecalledNote();
     recalledNote.setNoteTopology(note.getNoteTopology());
     recalledNote.setNotebookId(note.getNotebook().getId());
-    recalledNote.setAncestorFolders(
-        FolderTrailSegment.of(FolderTrail.fromRootToContainingFolder(note)));
+    recalledNote.setAncestorFolders(FolderTrailSegment.of(note.folderTrailFromRoot()));
     String key = propertyKey;
     recalledNote.setPropertyKey(key == null || key.isEmpty() ? null : key);
     return recalledNote;

@@ -83,14 +83,27 @@ public class Folder extends EntityIdentifiedByIdOnly {
     return parentFolder == null ? null : parentFolder.getId();
   }
 
-  /** Outermost folder first, from notebook root through this folder (inclusive). */
-  public List<Folder> trailFromRoot() {
+  /**
+   * Outermost folder first, from notebook root through {@code folder} (inclusive). A null {@code
+   * folder} is the notebook root, whose trail is empty.
+   */
+  public static List<Folder> trailFromRootTo(Folder folder) {
     List<Folder> leafToRoot = new ArrayList<>();
-    for (Folder f = this; f != null; f = f.getParentFolder()) {
+    for (Folder f = folder; f != null; f = f.getParentFolder()) {
       leafToRoot.add(f);
     }
     Collections.reverse(leafToRoot);
     return List.copyOf(leafToRoot);
+  }
+
+  /** Outermost folder first, from notebook root through this folder (inclusive). */
+  public List<Folder> trailFromRoot() {
+    return trailFromRootTo(this);
+  }
+
+  /** Outermost first, from notebook root through this folder's parent (empty at root). */
+  public List<Folder> ancestorsFromRoot() {
+    return trailFromRootTo(getParentFolder());
   }
 
   @JsonIgnore

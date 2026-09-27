@@ -105,7 +105,10 @@ trail length; `folderDepth` goes.
 ### 2. Services read a folder's trail from the domain
 
 Type: Structure
-Status: planned
+Status: done — full backend suite 2708 tests green; after refactor, focused
+rerun of focus context, attachment, folder, wiki-link and portable-path tests
+(449) green. Trail lives in `Folder.trailFromRootTo`/`trailFromRoot`/
+`ancestorsFromRoot` and `Note.folderTrailFromRoot`/`folderNamesFromRoot`
 Proof: the backend compiles and the full backend suite stays green —
 `CURSOR_DEV=true nix develop -c pnpm backend:test_only` (the change reaches 11
 services across notes, wiki links, recall and focus context, so a focused

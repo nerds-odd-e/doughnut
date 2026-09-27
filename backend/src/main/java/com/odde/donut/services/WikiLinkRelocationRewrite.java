@@ -1,7 +1,6 @@
 package com.odde.donut.services;
 
 import com.odde.donut.algorithms.WikiLinkMarkdownRewrite;
-import com.odde.donut.controllers.dto.FolderTrail;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.User;
@@ -69,7 +68,7 @@ public class WikiLinkRelocationRewrite {
   @Transactional
   public void rewriteInboundWikiLinksForLocationChange(
       Note targetNote, Timestamp updatedAt, Map<Integer, List<String>> inboundReferences) {
-    List<String> folderTrail = FolderTrail.namesFromRootToContainingFolder(targetNote);
+    List<String> folderTrail = targetNote.folderNamesFromRoot();
     rewriteInboundWikiLinks(
         targetNote,
         updatedAt,
