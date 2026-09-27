@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "agent": "Hibiki-chan",
+  "email": "hibiki-chan@example.org",
+  "identity": "SEED-035#story-26",
+  "mode": "story-branch",
+  "branch": "story/preview-image-files",
+  "host": "claude",
+  "model": "claude-opus-5-5"
+}
