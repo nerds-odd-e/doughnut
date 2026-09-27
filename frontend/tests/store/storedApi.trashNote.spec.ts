@@ -1,16 +1,13 @@
-import type { FolderListing, NoteRealm } from "@generated/donut-backend-api"
 import {
   NoteController,
   NotebookFolderController,
 } from "@generated/donut-backend-api/sdk.gen"
 import type { Router } from "vue-router"
 import { sidebarStructuralRefreshKey } from "@/components/notes/sidebarStructuralRefresh"
-import { PEER_SORT_STORAGE_KEY } from "@/composables/usePeerSort"
-import { noteShowLocation } from "@/routes/noteShowLocation"
 import createNoteStorage from "@/store/createNoteStorage"
 import makeMe from "donut-test-fixtures/makeMe"
-import { mockSdkService, testFolderStub, wrapSdkError } from "@tests/helpers"
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
+import { mockSdkService, wrapSdkError } from "@tests/helpers"
+import { beforeEach, describe, expect, it, vi } from "vitest"
 
 describe("storedApiCollection trash note", () => {
   const routerReplace = vi.fn()
@@ -64,95 +61,6 @@ describe("storedApiCollection trash note", () => {
       })
     }
   )
-
-  describe("where the person lands", () => {
-    const notebookId = 71
-    const peer = (title: string) =>
-      makeMe.aNoteRealm
-        .title(title)
-        .inNotebook(notebookId)
-        .inFolder(901, "Work")
-        .please()
-    const [a, b, c] = [peer("A"), peer("B"), peer("C")]
-
-    const trashWithPeers = async (realm: NoteRealm, listing: FolderListing) => {
-      const storage = createNoteStorage()
-      storage.refreshNoteRealm(realm)
-      const listingSpy = mockSdkService(
-        NotebookFolderController,
-        "listNotebookFolderListing",
-        listing
-      )
-      mockSdkService(NoteController, "trashNote", realm)
-      await storage.storedApi().trashNote(router, realm.id, {
-        referenceHandling: "LEAVE_DEAD_LINKS",
-      })
-      return listingSpy
-    }
-
-    const notesListing = (...realms: NoteRealm[]): FolderListing => ({
-      noteTopologies: realms.map((r) => r.note.noteTopology),
-    })
-
-    afterEach(() => localStorage.removeItem(PEER_SORT_STORAGE_KEY))
-
-    it.each([
-      { removed: b, expected: c },
-      { removed: c, expected: b },
-    ])(
-      "opens the neighboring note: $removed.note.noteTopology.title → $expected.note.noteTopology.title",
-      async ({ removed, expected }) => {
-        const listingSpy = await trashWithPeers(removed, notesListing(c, a, b))
-
-        expect(listingSpy).toHaveBeenCalledWith({
-          path: { notebook: notebookId },
-          query: { parent: 901 },
-        })
-        expect(routerReplace).toHaveBeenCalledWith(
-          noteShowLocation(expected.id)
-        )
-      }
-    )
-
-    it("follows the sidebar order chosen in this browser", async () => {
-      localStorage.setItem(
-        PEER_SORT_STORAGE_KEY,
-        JSON.stringify({ field: "title", direction: "desc" })
-      )
-
-      await trashWithPeers(b, notesListing(a, b, c))
-
-      expect(routerReplace).toHaveBeenCalledWith(noteShowLocation(a.id))
-    })
-
-    it("opens the folder page when only subfolders and files remain beside the note", async () => {
-      await trashWithPeers(a, {
-        ...notesListing(a),
-        folders: [testFolderStub(902, "Sub")],
-        attachments: [{ id: 5, filename: "B.png" }],
-      })
-
-      expect(routerReplace).toHaveBeenCalledWith({
-        name: "folderPage",
-        params: { notebookId: String(notebookId), folderId: "901" },
-      })
-    })
-
-    it("opens the notebook page when no other note is at the notebook root", async () => {
-      const realm = makeMe.aNoteRealm.inNotebook(notebookId).please()
-
-      const listingSpy = await trashWithPeers(realm, notesListing(realm))
-
-      expect(listingSpy).toHaveBeenCalledWith({
-        path: { notebook: notebookId },
-        query: undefined,
-      })
-      expect(routerReplace).toHaveBeenCalledWith({
-        name: "notebookPage",
-        params: { notebookId },
-      })
-    })
-  })
 
   it("undoes trash atomically with the original title/placement and consumes history after success", async () => {
     const storage = createNoteStorage()

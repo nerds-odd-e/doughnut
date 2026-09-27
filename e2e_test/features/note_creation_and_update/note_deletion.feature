@@ -169,7 +169,7 @@ Feature: Note trash
     And I open the note "Cells" from the sidebar
     Then I should see the current note is in trash
     When I permanently delete the current note
-    Then I should be on a notebook folder page
+    Then the note title should be "Tissue"
     And I should see sidebar folder "Biology" containing these notes:
       | note-title |
       | Tissue     |

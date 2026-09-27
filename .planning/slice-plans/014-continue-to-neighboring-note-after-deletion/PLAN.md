@@ -91,7 +91,7 @@ rename the E2E folder scenario to its new outcome.
 ### 2. Permanently deleting a trashed note opens its neighboring note
 
 Type: Behavior
-Status: planned
+Status: done
 Proof: store `permanentlyDeleteNote` with peers A, B, C in the trash folder →
 B's successor opens; the updated E2E permanent-delete scenario.
 
@@ -110,9 +110,12 @@ requests the listing before removal and replaces the route with that location.
   (12/12); `pnpm frontend:test tests/notes tests/store tests/toolbars` 353/353
   (all trash consumers mock an empty listing); `vue-tsc --noEmit` clean;
   `note_deletion.feature` 12 passing.
-- Slice 2 calls the private `StoredApiCollection.locationAfterRemoving(realm)`
-  before `permanentlyDeleteNoteRequest`; consumers of permanent delete need the
-  same empty-listing mock.
+- Slice 2 accepted proof: landing examples for both removals live in
+  `tests/store/storedApi.noteRemovalLanding.spec.ts` (notebook-root case for
+  trashing only; permanent delete happens inside trash); `pnpm frontend:test
+  tests/notes tests/store tests/toolbars` 357/357; `vue-tsc --noEmit` clean;
+  `note_deletion.feature` 12/12 with "Cells" → "Tissue". The step
+  `I should be on a notebook folder page` lost its last use and was removed.
 - Learning: `StoredApiCollection.ts` is ~405 lines, over the 250-line guide
   (pre-existing ~380); splitting the store class is out of this story's scope.
 

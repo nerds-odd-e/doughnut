@@ -6,10 +6,7 @@ import type {
   NoteUpdateTitleDto,
 } from "@generated/donut-backend-api"
 import { noteShowLocation } from "@/routes/noteShowLocation"
-import {
-  containingLocationOf,
-  locationAfterNoteRemoval,
-} from "@/routes/containingLocation"
+import { locationAfterNoteRemoval } from "@/routes/containingLocation"
 import { neighborNoteAfterRemoval } from "@/components/notes/sidebarStructuralSort"
 import { usePeerSort } from "@/composables/usePeerSort"
 import { requestNotebookFolderListing } from "@/utils/notebookFolderListingRequest"
@@ -358,11 +355,12 @@ export default class StoredApiCollection {
   async permanentlyDeleteNote(router: Router, noteId: Donut.ID) {
     const cachedRealm = this.storage.refOfNoteRealm(noteId).value
     if (!cachedRealm) throw new Error("Cannot delete a note that is not loaded")
+    const destination = await this.locationAfterRemoving(cachedRealm)
     const ok = await permanentlyDeleteNoteRequest(noteId)
     if (!ok) return
 
     this.noteNoLongerExists(noteId)
-    await router.replace(containingLocationOf(cachedRealm))
+    await router.replace(destination)
     refreshSidebarStructuralListings()
   }
 
