@@ -87,7 +87,7 @@ binding-less branch in `resetHistory`; old Flyway migrations.
 ### 1. An attachment row has one content accessor
 
 Type: Structure
-Status: planned
+Status: done
 Proof: `CURSOR_DEV=true nix develop -c pnpm backend:test_only --tests 'com.odde.donut.controllers.NotebookAttachmentControllerTest'`
 stays green and the backend compiles.
 
