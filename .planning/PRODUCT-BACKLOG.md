@@ -16,4 +16,4 @@ and deletable in Web Donut.
 ## Backlog list
 
 - [Review and close the local AI notebook effort](seeds/SEED-048-local-ai-notebook-final-review.md#story-1) — SEED-048#story-1
-- [Continue to a neighboring node after deletion](seeds/SEED-047-deleted-node-navigation.md#story-1) — SEED-047#story-1
+- [Continue to a neighboring note after deletion](seeds/SEED-047-deleted-node-navigation.md#story-1) — SEED-047#story-1

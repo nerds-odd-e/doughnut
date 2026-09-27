@@ -7,46 +7,59 @@ trigger_when: selected from the product backlog
 scope: small
 ---
 
-# SEED-047: Continue browsing after deleting a node
+# SEED-047: Continue browsing after deleting a note
 
 ## Why This Matters
 
-After deleting a node, Donut currently opens its folder page. A person working
-through nodes in that folder loses their place. The next useful destination
-depends on the node order they selected in their own browser.
+After deleting a note, Donut currently opens its folder page. A person working
+through notes in that folder loses their place. The next useful destination
+depends on the note order they selected in their own browser.
 
 ## Story Decomposition
 
 <a id="story-1"></a>
 
-### Continue to a neighboring node after deletion
+### Continue to a neighboring note after deletion
 
 **Identity:** SEED-047#story-1
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"unselected"}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/014-continue-to-neighboring-note-after-deletion/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"5938f250db05851f800526e01b2c2f9f020e3fe96818a44f2026c402724ba67c","plan":"e57e809e6ebe31931856ca22c3f5e31288b1c743196c5ab282a97a1b7f6301bf"}}
 ```
 
-**Goal:** A person deleting a node can continue browsing the folder's nodes in
-the order currently selected in their browser, without returning to the folder
-page while nodes remain.
+**Goal:** A person deleting notes one after another in a folder keeps their
+place: after each deletion they land on the neighboring note in the order they
+chose for the sidebar, instead of on the folder page while notes remain.
 
-**Scope:** After a successful deletion, navigate to the deleted node's next
-node in the current browser-selected order. If the deleted node was last in
-that order, navigate to the last remaining node in the folder. If no nodes
-remain, show the folder page. The destination is based on this user's current
-UI ordering selection, not a fixed or shared ordering.
+**Scope:**
+
+- Applies to both steps of the note delete action: moving a note to trash and
+  permanently deleting a note that is already in trash.
+- The neighbors are the other notes in the same folder (or the notebook root
+  for a note outside folders), ordered by this browser's current sidebar sort
+  choice (title, created, or updated; ascending or descending), the same order
+  the sidebar shows.
+- After a successful deletion, open the note that followed the deleted note in
+  that order. If the deleted note was last, open the note that is now last.
+- If no other note remains, keep today's destination: the folder page, or the
+  notebook page for a note at the notebook root.
+- Subfolders and files listed beside the notes are not neighbors; they are
+  skipped when choosing the destination.
+- Assumption: "node" in the owner request means note; the product has no node
+  concept (ADR 0001).
+- Deferred: deleting folders or files, moving notes, undo, and reducing a
+  relationship note into a property keep their current navigation.
 
 **Key examples:**
 
-- With nodes A, B, C in the selected order, deleting B opens C.
-- With nodes A, B, C in the selected order, deleting C opens B.
-- With only A in the folder, deleting A opens the folder page.
-- If the user changes the selected order, the next deletion follows that new
-  order.
+- Notes A, B, C in the selected order: deleting B opens C.
+- Notes A, B, C in the selected order: deleting C opens B.
+- Only note A, beside a subfolder or file: deleting A opens the folder page.
+- With the sort switched to Title (Z–A) — C, B, A — deleting B opens A.
+- In trash, permanently deleting B among A, B, C opens C.
 
 ## When to Surface
 
-Select this story from the product backlog when improving node browsing after
+Select this story from the product backlog when improving note browsing after
 deletion.
 
 ## Breadcrumbs
