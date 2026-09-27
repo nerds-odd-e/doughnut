@@ -20,7 +20,7 @@
             :y="item.y"
             :width="item.width"
             :height="item.height"
-            :style="`fill:blue;stroke:pink;stroke-width:1;fill-opacity:${opacity};stroke-opacity:0.8`"
+            style="fill: blue; stroke: pink; stroke-width: 1; fill-opacity: 0.2; stroke-opacity: 0.8"
           />
         </template>
       </svg>
@@ -29,11 +29,40 @@
 </template>
 
 <script setup lang="ts">
+import { computed, type PropType } from "vue"
+import type {
+  Note,
+  ShowAttachmentImageData,
+} from "@generated/donut-backend-api"
+import { client } from "@generated/donut-backend-api/client.gen"
+import { noteImageScalarsFromMarkdown } from "@/utils/noteContentFrontmatter"
+
 const props = defineProps({
-  noteImage: String,
-  imageMask: String,
-  opacity: Number,
+  note: { type: Object as PropType<Note>, required: true },
 })
+
+/**
+ * `<img>` source for a note's `image:` value. An absolute path or a URL is used as-is; anything
+ * else is a notebook file relative to the note's folder.
+ */
+const noteImageSource = (noteId: number, image: string) => {
+  if (image.startsWith("/") || /^[a-z][a-z0-9+.-]*:/i.test(image)) return image
+  return client.buildUrl<ShowAttachmentImageData>({
+    url: "/api/notes/{note}/attachment-image",
+    path: { note: noteId },
+    query: { path: image },
+  })
+}
+
+const scalars = computed(() =>
+  noteImageScalarsFromMarkdown(props.note.content ?? "")
+)
+const noteImage = computed(
+  () =>
+    scalars.value.noteImage &&
+    noteImageSource(props.note.id, scalars.value.noteImage)
+)
+const imageMask = computed(() => scalars.value.imageMask)
 
 const createGroups = (arr: string[], perGroup: number): string[][] => {
   const numGroups = Math.ceil(arr.length / perGroup)
@@ -43,8 +72,8 @@ const createGroups = (arr: string[], perGroup: number): string[][] => {
 }
 
 const getMasks = () => {
-  if (!props.imageMask) return []
-  return createGroups(props.imageMask.split(/\s+/), 4).map((arr, index) => {
+  if (!imageMask.value) return []
+  return createGroups(imageMask.value.split(/\s+/), 4).map((arr, index) => {
     const [x, y, width, height] = arr
     return { index, x, y, width, height }
   })

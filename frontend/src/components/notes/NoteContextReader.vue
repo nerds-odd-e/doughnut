@@ -11,6 +11,11 @@
           :note="noteRealm.note"
           :wiki-links="noteRealm.wikiLinks ?? []"
         />
+        <ShowImage :note="noteRealm.note" />
+        <NoteReferences
+          :note-topologies="noteRealm.references ?? []"
+          expand-children
+        />
         <router-link :to="noteShowLocation(noteId)">Open full note</router-link>
       </article>
     </template>
@@ -23,6 +28,8 @@ import BreadcrumbWithCircle from "@/components/toolbars/BreadcrumbWithCircle.vue
 import { noteShowLocation } from "@/routes/noteShowLocation"
 import NoteRealmLoader from "./NoteRealmLoader.vue"
 import NoteTextContent from "./core/NoteTextContent.vue"
+import NoteReferences from "./NoteReferences.vue"
+import ShowImage from "./widgets/ShowImage.vue"
 
 defineProps({
   noteId: { type: Number, required: true },

@@ -88,10 +88,14 @@ projection just to feed the reader.
 ### 2. Include note image, links, and inbound references
 
 Type: Behavior
-Status: planned
+Status: done
 Proof: the same mounted reader with an image, resolved wiki link, and multiple
 inbound references renders the image and usable links and lists every
 reference; empty references do not leave an empty section.
+Accepted: `ShowImage` now derives image/mask from `note` (moved from
+NoteShow); `NoteReferences` owns its "References" heading; reader spec checks
+image src, references, wiki-link push to `noteShowLocation`, empty case.
+NoteShow, NoteShowPage image upload and `tests/pages` specs pass; vue-tsc 0.
 
 Behavior: a readable note has media or note links or inbound references →
 its task context loads → those parts are available within the same scrollable
