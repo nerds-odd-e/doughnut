@@ -90,7 +90,8 @@ Change:
 ### 2. The relationship dialog spec asserts only what the dialog does
 
 Type: Structure
-Status: planned
+Status: done — accepted 2026-09-27: spec 6/6 green (unchanged count), vue-tsc clean;
+refresh key asserted `+1` in the default-placement case.
 Proof: `CURSOR_DEV=true nix develop -c pnpm frontend:test tests/wiki-link-or-relationship/AddRelationship.spec.ts`
 green (same case count), then
 `CURSOR_DEV=true nix develop -c pnpm -C frontend exec vue-tsc --noEmit` clean.

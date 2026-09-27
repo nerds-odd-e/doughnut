@@ -1,4 +1,3 @@
-import { NotebookFolderController } from "@generated/donut-backend-api/sdk.gen"
 import { noteShowLocation } from "@/routes/noteShowLocation"
 import { formatRelationshipNoteTitle } from "@/utils/relationshipNoteCompose"
 import makeMe from "donut-test-fixtures/makeMe"
@@ -145,11 +144,6 @@ describe("AddRelationshipFinalize", () => {
       const createNoteSpy = mockRelationshipNoteCreation(
         makeMe.aNoteRealm.please()
       )
-      const listingSpy = vi.spyOn(
-        NotebookFolderController,
-        "listNotebookFolderListing"
-      )
-      const createFolderSpy = vi.spyOn(NotebookFolderController, "createFolder")
       const wrapper = mountAddRelationshipFinalize({
         note: sourceRealm.note,
         targetSearchResult: targetSearchResult(),
@@ -161,18 +155,14 @@ describe("AddRelationshipFinalize", () => {
           .find(`#relationship-placement-${placement}`)
           .setValue(true)
       }
-      const refreshKeyBefore = sidebarStructuralRefreshKey.value
       await selectRelationType(wrapper, "related to")
-      expect(listingSpy).not.toHaveBeenCalled()
-      expect(createFolderSpy).not.toHaveBeenCalled()
-      expect(sidebarStructuralRefreshKey.value).toBeGreaterThan(
-        refreshKeyBefore
-      )
       return createNoteSpy
     }
 
     it("lets the server place the note in the relations folder by default", async () => {
+      const refreshKeyBefore = sidebarStructuralRefreshKey.value
       const createNoteSpy = await createRelationshipNote()
+      expect(sidebarStructuralRefreshKey.value).toBe(refreshKeyBefore + 1)
       expect(createNoteSpy).toHaveBeenCalledTimes(1)
       expect(createNoteSpy.mock.calls[0]![0].body).toMatchObject({
         folderId: 5,
