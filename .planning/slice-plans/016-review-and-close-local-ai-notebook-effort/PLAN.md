@@ -87,7 +87,7 @@ change `.planning/NORTH-STAR.md`.
 ### 2. Process feedback section published
 
 Type: Behavior
-Status: planned
+Status: done
 Proof: republished page shows the Process feedback section (see table).
 
 Behavior: slice 1's page exists → the review reads how plans, the North Star,
@@ -147,6 +147,9 @@ the owner's keep-or-delete decision.
   `FolderSubtree.java:120`); (b) one Portable path-kind classifier for server
   and CLI (CLI root `.keep` drift, `notebookPublishLfsSelection.ts:8` vs
   `NotebookGitProposalTreeShape.java:143`). Both spot-checked by the coordinator.
+- Slice 2 has no *queue now* finding: the lasting release-gate rule dropped in
+  `002bad682f` has no consumer now that every legacy store is removed, so it is
+  reported as a wrap-up practice suggestion only.
 
 - Report findings only; no product code changes. The execution wrap-up's
   refactor and API steps have nothing to act on; formatting and lint run on

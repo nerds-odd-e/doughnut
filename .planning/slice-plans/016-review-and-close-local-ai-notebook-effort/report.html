@@ -83,7 +83,7 @@ footer{margin-top:64px;color:var(--muted);font-size:.85rem;border-top:1px solid 
   <p class="lead">This review covers the effort to let local AI IDEs work in Git checkouts of Donut notebooks, and to hold images and other non-Markdown files as folder files that Web Donut can browse, download and delete. Each finding cites its evidence and carries an urgency: <span class="chip urgent">queue now</span> means urgent and important; <span class="chip calm">not now</span> means leave it off the backlog for now.</p>
   <nav class="toc" aria-label="Sections">
     <a href="#architecture">Architecture</a>
-    <a class="pending" href="#pending">Process feedback (next)</a>
+    <a href="#process">Process feedback</a>
     <a class="pending" href="#pending">Feature coverage (next)</a>
     <a class="pending" href="#pending">Follow-ups queued (next)</a>
     <a class="pending" href="#pending">Seed cleanup and stale seeds (next)</a>
@@ -271,9 +271,59 @@ footer{margin-top:64px;color:var(--muted);font-size:.85rem;border-top:1px solid 
 </div>
 </section>
 
+<section id="process">
+<h2>Open Dough process feedback</h2>
+<div class="summary">
+  <p><b>How the architectural process steered the effort.</b> The North Star changed 14 times in the range, growing from 31 to 146 lines. ADRs 0002 and 0004 were amended once and ADR 0001 once. Most of the effort ran as <code>.planning/quick/</code> plans (001–047) until they moved under <code>.planning/slice-plans/</code> on 2026-09-26 (<code>82e789ee86</code>). The owner's conversation history shows where the guidance helped and where it caused rework. Findings already in <code>DearDough.md</code> are cited, not repeated: ODF-092, ODF-106, ODF-110–113, ODF-116 (seven occurrences in range), ODF-120–125, and DD-126–136.</p>
+  <ul>
+    <li><span class="chip calm">not now</span> Six suggestions. None needs a Donut story now, and this story does not edit Open Dough skills.</li>
+  </ul>
+</div>
+
+<div class="topic">
+  <h3>What worked</h3>
+  <ul class="impact">
+    <li><b>Owner decisions reached the North Star the same day, with dates.</b> Examples: "owner decisions 2026-09-26" (<code>NORTH-STAR.md:23</code>); dropping a story changed the backlog, its seed and the North Star together (<code>506c267839</code>); the rebase reversal was recorded as "Git's rebase alone decides what replays" (<code>03afc699bf</code>). Direction stayed current.</li>
+    <li><b>The North Star worked as a review yardstick.</b> Correction quick/031 quoted "Every notebook uses LFS: there is one representation, so no code asks how a notebook stores its files" to find what an earlier story left behind. "Acceptance of the architecture does not mean the capabilities are delivered" (<code>NORTH-STAR.md:57</code>) kept plans honest.</li>
+    <li><b>Humans kept ownership of ADRs.</b> Correction plans quick/021 and quick/031 explicitly left ADR 0002 unchanged. The one agent edit in range, to ADR 0001 vocabulary (<code>9c8aca9bbd</code>), came from story-closure inputs.</li>
+  </ul>
+</div>
+
+<div class="topic">
+  <h3>Suggestions</h3>
+  <ul class="findings">
+    <li class="finding"><div class="t"><span class="chip calm">not now</span>Ask before writing a second representation into the direction</div>
+      <dl><dt>What happened</dt><dd>On 2026-09-23 the North Star introduced two storage representations: "keep the legacy representation readable during rollout", and LFS "for new notebooks". The next day the owner asked: "I never know that we need to mark a notebook to use LFS or not… are we making things more complicated" (transcript <code>6e749b83</code>, 2026-09-24). Undoing it took a forward conversion, the removal of raw storage, and a correction for leftover wording and tests (quick/031, closed in <code>dd17928977</code>). The same session reversed "Books keep their separate limits".</dd>
+      <dt>Guidance</dt><dd><code>.agents/skills/dough-story-refinement/SKILL.md</code> (architectural detail); <code>.agents/skills/dough-adr-awareness/SKILL.md</code>.</dd>
+      <dt>Proposal</dt><dd>When refinement or North Star text would add a per-entity mode, marker or second representation, present it as an explicit owner question next to the simpler one-representation alternative.</dd></dl></li>
+    <li class="finding"><div class="t"><span class="chip calm">not now</span>Have each candidate story cite the North Star rule it relies on or bends</div>
+      <dl><dt>What happened</dt><dd>A story proposed removing the old picture file, against "Never delete an object because its current attachment row disappeared". The owner caught it: "the old picture need to be kept because of the Git history, right?" (transcript <code>8ed5aa4e</code>, 2026-09-26). Another story copied bytes per notebook because of the North Star's "no cross-notebook deduplication" rule, but never said so. The owner asked "Why do we have to copy… it's just a reference, right?" (transcript <code>6806d413</code>, 2026-09-26), and the story was dropped (<code>506c267839</code>). DD-128 records the same pattern for code rules.</dd>
+      <dt>Guidance</dt><dd><code>.agents/skills/dough-story-decomposition/SKILL.md</code>; dough-story-refinement.</dd>
+      <dt>Proposal</dt><dd>One line per candidate story naming the North Star section it depends on or strains, so the owner sees the premise before accepting the story.</dd></dl></li>
+    <li class="finding"><div class="t"><span class="chip calm">not now</span>Separate lasting rules from spent sequencing when trimming the North Star</div>
+      <dl><dt>What happened</dt><dd><code>002bad682f</code> ("drop the spent retirement order", 2026-09-26) also deleted a lasting rule: "Delete old stores and their code in a later release, after the move is confirmed in production — never in the release that moves the bytes." That evening the owner restated it by hand for the last removal story: "after wrapping up the story, I need to make a new release and to see the new release successful and then execute that story" (transcript <code>da2f9fa0</code>). Every legacy store is now gone, so no current work needs the rule back. It will matter again at the next byte move.</dd>
+      <dt>Guidance</dt><dd>dough-story-wrap-up's step that trims spent direction.</dd>
+      <dt>Proposal</dt><dd>When wrap-up trims the North Star, classify each removed sentence as sequencing (delete) or a rule (keep, or move to the owning doc). A good home for this rule is <code>docs/notebook-git-lfs.md</code>.</dd></dl></li>
+    <li class="finding"><div class="t"><span class="chip calm">not now</span>Keep delivery order and story IDs out of the North Star</div>
+      <dl><dt>What happened</dt><dd><code>4f0b551959</code> (2026-09-23) added "Deliver usable increments" with "Story 12… Story 13… Story 14…". A five-step "Order" list and "remaining work: … (SEED-035 story 10)" and "quick/043" pointers followed. Removing them took <code>002bad682f</code>, <code>fcda2014a5</code> and <code>506c267839</code>, which is 3 of 14 North Star commits spent on bookkeeping. The North Star already says "The product backlog owns global order" (<code>NORTH-STAR.md:143</code>).</dd>
+      <dt>Guidance</dt><dd>North Star wording; <code>.agents/skills/dough-story-refinement/references/planning.md</code> (North Star scope).</dd>
+      <dt>Proposal</dt><dd>The North Star states direction and rules only: no story IDs, plan paths or remaining-work lists.</dd></dl></li>
+    <li class="finding"><div class="t"><span class="chip calm">not now</span>Decide how an Accepted ADR may be amended</div>
+      <dl><dt>What happened</dt><dd>The owner's own commit <code>4f0b551959</code> (2026-09-23, a mixed commit with a general message) rewrote Accepted ADRs 0002 and 0004 in place. It removed six "Amended: … decided by Terry Yin" provenance lines and added no new one. <code>docs/adrs/README.md</code> step 6 says "add a new ADR … Do not silently rewrite history." Downstream, correction quick/021 had to reconcile the LFS doc's Decision and Recovery sections, and its plan had to add "Do not change ADR text without a separate human ADR decision."</dd>
+      <dt>Guidance</dt><dd><code>docs/adrs/README.md</code> (Supersede).</dd>
+      <dt>Proposal</dt><dd>Owner's choice: either allow in-place amendment with a one-line dated note, or keep supersession. Either way, commit ADR edits on their own.</dd></dl></li>
+    <li class="finding"><div class="t"><span class="chip calm">not now</span>Correct the plan-numbering note and never reuse a number</div>
+      <dl><dt>What happened</dt><dd><code>CLAUDE.md</code> and <code>AGENTS.md</code> say numbering under <code>.planning/slice-plans/</code> reset "on 2026-09-20". Plans actually lived in <code>.planning/quick/</code> until <code>82e789ee86</code> (2026-09-26). Number 008 was reused within an hour (<code>247e9a9664</code> deleted one 008, <code>38a307560c</code> added another), so <code>DearDough.md</code> evidence now names both. Renumbers followed in <code>909995f4d0</code> and <code>df5ba26eb0</code>. ODF-106 covers the allocation mechanism.</dd>
+      <dt>Guidance</dt><dd>The Plan numbering line in <code>CLAUDE.md</code> and <code>AGENTS.md</code>.</dd>
+      <dt>Proposal</dt><dd>Fix the date and location in that line, and state that a deleted plan's number is never reused.</dd></dl></li>
+  </ul>
+  <p class="note">Plans that named functions, commands or negative claims without checking them are already recorded as DD-126, DD-129, DD-130 and DD-134. This review found no new evidence beyond them.</p>
+</div>
+</section>
+
 <section id="pending">
 <h2>Still to come</h2>
-<p class="note">Process feedback, feature coverage, queued follow-ups, and seed cleanup with the stale-seed list are added to this page as the review continues.</p>
+<p class="note">Feature coverage, queued follow-ups, and seed cleanup with the stale-seed list are added to this page as the review continues.</p>
 </section>
 
 <footer>
