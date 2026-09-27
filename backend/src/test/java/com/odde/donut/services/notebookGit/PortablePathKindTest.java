@@ -18,6 +18,7 @@ class PortablePathKindTest {
     "Folder/diagram.png, ATTACHMENT",
     ".gitattributes, METADATA",
     "nested/.gitattributes, METADATA",
+    "Forces.MD, ATTACHMENT",
   })
   void classifiesEachPath(String path, PortablePathKind kind) {
     assertThat(PortablePathKind.of(path), is(kind));
@@ -32,5 +33,18 @@ class PortablePathKindTest {
   })
   void onlyMarkdownAndAttachmentsCarryPortableContent(String path, boolean carries) {
     assertThat(PortablePathKind.of(path).carriesPortableContent(), is(carries));
+  }
+
+  @ParameterizedTest
+  @CsvSource({
+    "Forces.MD, true",
+    "Physics/Notes.Md, true",
+    "README.mD, true",
+    "Note.md, false",
+    "diagram.png, false",
+    "Folder.MD/diagram.png, false",
+  })
+  void recognisesAMarkdownExtensionInAnotherLetterCase(String path, boolean miscased) {
+    assertThat(PortablePathKind.hasMiscasedMarkdownExtension(path), is(miscased));
   }
 }

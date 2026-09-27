@@ -119,7 +119,11 @@ Update `docs/notebook-git-attachments.md` (the `.keep` paragraph near line 80).
 ### 3. A `.md` extension in another letter case is refused
 
 Type: Behavior
-Status: planned
+Status: done
+Accepted proof: `NotebookGitProposalAdditionValidationControllerTest` (3 new
+`invalidAdditions` cases + `anUnchangedAcceptedMiscasedMarkdownFileStaysWhileAnotherNoteChanges`),
+`PortablePathKindTest` 19 pass, `*NotebookGit*` 465 pass. Both whole-tree path refusals
+now run before attachment size admission. Took ~15 min (over the 10 min limit).
 Proof: new cases `Forces.MD`, `Physics/Notes.Md` and `README.MD` in
 `NotebookGitProposalAdditionValidationControllerTest.invalidAdditions`, each
 failing first (accepted as a file today) and then refused with a reason
@@ -186,3 +190,6 @@ stopped before without losing any promise.
 
 - `pnpm backend:test:worktree` takes one `--tests` pattern per run; `*NotebookGit*`
   misses `services.notebookGit.PortablePathKindTest`.
+- Attachment size admission runs first in publish; a path refusal that must beat the
+  LFS-pointer message goes before `NotebookGitAttachmentSizeAdmission.admit`. Before
+  slice 3, `Forces.MD` was refused as a non-pointer attachment, not accepted.

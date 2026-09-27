@@ -197,6 +197,11 @@ reclassifying files or maintaining another inventory. All Markdown, including
 behavior. Purpose, IDE name, folder location, and whether the file is new do not
 create an alternative Markdown admission path. Existing reserved-name and
 container `README.md` rules remain unchanged; unknown valid types remain valid.
+Markdown is exactly the lowercase `.md` extension. A publish that adds or
+changes a path ending in `.md` in another letter case (`.MD`, `.Md`) is refused
+with a message naming the path and asking to rename it to `.md`, so no new
+attachment arrives with such a name. An unchanged accepted file is not judged
+and stays an attachment.
 
 At local publication, every Markdown file must satisfy the existing format:
 valid UTF-8 and YAML frontmatter with a nonblank type, plus the applicable

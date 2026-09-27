@@ -157,6 +157,21 @@ public final class NotebookGitProposalTreeShape {
     }
   }
 
+  /** Only added or changed paths: an unchanged accepted file is not judged. */
+  static void refuseMiscasedMarkdown(List<InspectedRegularFile> files) {
+    for (InspectedRegularFile file : files) {
+      if (file.proposedBlobId() != null
+          && !file.proposedBlobId().equals(file.acceptedBlobId())
+          && PortablePathKind.hasMiscasedMarkdownExtension(file.path())) {
+        throw new ResponseStatusException(
+            HttpStatus.BAD_REQUEST,
+            "\""
+                + file.path()
+                + "\" is not Markdown; rename it to end in \".md\", then publish again.");
+      }
+    }
+  }
+
   static List<NoteChange> noteChangesFrom(List<ChangedDocument> documents) {
     List<NoteChange> changes = new ArrayList<>();
     for (ChangedDocument document : documents) {

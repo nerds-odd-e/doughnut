@@ -1,6 +1,7 @@
 package com.odde.donut.services.notebookGit;
 
 import java.util.Collection;
+import java.util.Locale;
 import org.eclipse.jgit.lib.Constants;
 import org.eclipse.jgit.lib.ObjectId;
 import org.eclipse.jgit.lib.ObjectInserter;
@@ -30,6 +31,11 @@ public enum PortablePathKind {
       return METADATA;
     }
     return ATTACHMENT;
+  }
+
+  /** A {@code .md} extension in another letter case, which a publish may not add or change. */
+  static boolean hasMiscasedMarkdownExtension(String path) {
+    return of(path) != MARKDOWN && path.toLowerCase(Locale.ROOT).endsWith(".md");
   }
 
   /** A marker holds its folder empty only while it is itself empty and alone in that folder. */

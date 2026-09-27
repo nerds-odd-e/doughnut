@@ -93,6 +93,11 @@ public class NotebookGitProposalPublisher {
     }
     NotebookGitProposalAncestry.assertFollowsAcceptedHead(
         proposal.repository(), proposal.mainHead(), acceptedHead);
+    List<NotebookGitProposalTreeShape.InspectedRegularFile> files =
+        NotebookGitProposalTreeShape.inspectRegularFiles(
+            proposal.repository(), acceptedHead, proposal.mainHead());
+    NotebookGitProposalTreeShape.refuseMiscasedMarkdown(files);
+    NotebookGitProposalTreeShape.refuseLeftoverFolderMarkers(files);
     try (var accepted = repositoryStore.open(binding)) {
       NotebookGitAttachmentSizeAdmission.admit(
           proposal.repository(),
@@ -102,11 +107,6 @@ public class NotebookGitProposalPublisher {
           notebook.getId(),
           notebookAttachmentContent);
     }
-
-    List<NotebookGitProposalTreeShape.InspectedRegularFile> files =
-        NotebookGitProposalTreeShape.inspectRegularFiles(
-            proposal.repository(), acceptedHead, proposal.mainHead());
-    NotebookGitProposalTreeShape.refuseLeftoverFolderMarkers(files);
     bookSourceFileProtection.refuseChanging(notebook.getId(), files);
     List<NotebookGitProposalTreeShape.ChangedDocument> documents =
         NotebookGitProposalTreeShape.classifyChangedDocuments(files);
