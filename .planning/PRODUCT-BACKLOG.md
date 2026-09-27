@@ -11,7 +11,6 @@ and deletable in Web Donut.
 ## Taken
 
 - [Adding a relationship on the web places its note through the server in one accepted change](seeds/SEED-050-local-ai-notebook-technical-debt.md#story-2) — SEED-050#story-2 ([plan](slice-plans/021-relationship-notes-accepted-in-one-change/PLAN.md))
-- [Local publish checks the Markdown it changes once, before applying anything](seeds/SEED-050-local-ai-notebook-technical-debt.md#story-1) — SEED-050#story-1 ([plan](slice-plans/020-validate-changed-markdown-once/PLAN.md))
 - [The notebook tree has one model in code](seeds/SEED-050-local-ai-notebook-technical-debt.md#story-4) — SEED-050#story-4 ([plan](slice-plans/023-one-notebook-tree-model/PLAN.md))
 
 ## Backlog list

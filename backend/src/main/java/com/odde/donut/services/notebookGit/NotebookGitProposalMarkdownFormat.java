@@ -8,15 +8,14 @@ import java.nio.charset.CharacterCodingException;
 import java.nio.charset.CharsetDecoder;
 import java.nio.charset.CodingErrorAction;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 import org.eclipse.jgit.lib.ObjectId;
-import org.eclipse.jgit.lib.ObjectLoader;
 import org.eclipse.jgit.lib.Repository;
-import org.eclipse.jgit.revwalk.RevCommit;
-import org.eclipse.jgit.revwalk.RevTree;
-import org.eclipse.jgit.revwalk.RevWalk;
-import org.eclipse.jgit.treewalk.TreeWalk;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 import org.yaml.snakeyaml.LoaderOptions;
@@ -25,44 +24,42 @@ import org.yaml.snakeyaml.constructor.DuplicateKeyException;
 import org.yaml.snakeyaml.error.YAMLException;
 
 /**
- * Walks every Markdown path in a proposal's proposed tree and requires the strict typed-Markdown
- * contract: strictly valid UTF-8 bytes, and - when a leading {@code ---} fence is present - YAML
- * that parses to a mapping carrying a non-blank scalar {@code type}. Unlike {@link
+ * Requires the strict typed-Markdown contract of every Markdown blob a proposal adds or changes (a
+ * proposed blob already in accepted history, such as an untouched or moved note, is not judged
+ * again): strictly valid UTF-8 bytes, and - when a leading {@code ---} fence is present - YAML that
+ * parses to a mapping carrying a non-blank scalar {@code type}. Unlike {@link
  * com.odde.donut.algorithms.NoteLeadingFrontmatter#ensureTypeKey}, this never repairs content; it
  * only accepts or rejects the bytes exactly as authored. An author-chosen {@code type} value that
  * is not one of Donut's recognized canonical types is still valid here - only structural problems
  * (missing fence, malformed YAML, non-mapping top level, or a missing/blank/non-scalar {@code
  * type}) are rejected.
  */
-public final class NotebookGitProposalMarkdownFormat {
+final class NotebookGitProposalMarkdownFormat {
 
   private NotebookGitProposalMarkdownFormat() {}
 
   /**
    * @throws ResponseStatusException 400 BAD_REQUEST naming the offending path and the specific
-   *     problem when any {@code .md} blob in the proposed tree fails the strict typed-Markdown
-   *     contract, or when the tree cannot be inspected
+   *     problem when any added or changed {@code .md} blob fails the strict typed-Markdown
+   *     contract, or when a blob cannot be read
    */
-  public static void assertValidTypedMarkdown(Repository repository, ObjectId proposedHead) {
-    try (RevWalk revWalk = new RevWalk(repository)) {
-      RevCommit proposedCommit = revWalk.parseCommit(proposedHead);
-      walkMarkdownFiles(repository, proposedCommit.getTree());
-    } catch (IOException e) {
-      throw invalidMarkdown("proposal tree could not be inspected", e);
-    }
-  }
-
-  private static void walkMarkdownFiles(Repository repository, RevTree tree) throws IOException {
-    try (TreeWalk walk = new TreeWalk(repository)) {
-      walk.addTree(tree);
-      walk.setRecursive(true);
-      while (walk.next()) {
-        String path = walk.getPathString();
-        if (PortablePathKind.of(path) != PortablePathKind.MARKDOWN) {
-          continue;
-        }
-        ObjectLoader loader = repository.open(walk.getObjectId(0));
-        assertValidTypedMarkdown(path, loader.getBytes());
+  static void assertValidTypedMarkdown(
+      Repository repository, List<NotebookGitProposalTreeShape.InspectedRegularFile> files) {
+    Set<ObjectId> acceptedBlobIds =
+        files.stream()
+            .map(NotebookGitProposalTreeShape.InspectedRegularFile::acceptedBlobId)
+            .filter(Objects::nonNull)
+            .collect(Collectors.toSet());
+    for (NotebookGitProposalTreeShape.InspectedRegularFile file : files) {
+      if (PortablePathKind.of(file.path()) != PortablePathKind.MARKDOWN
+          || file.proposedBlobId() == null
+          || acceptedBlobIds.contains(file.proposedBlobId())) {
+        continue;
+      }
+      try {
+        assertValidTypedMarkdown(file.path(), repository.open(file.proposedBlobId()).getBytes());
+      } catch (IOException e) {
+        throw invalidMarkdown("proposal tree could not be inspected", e);
       }
     }
   }

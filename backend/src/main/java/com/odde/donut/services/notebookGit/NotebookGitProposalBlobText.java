@@ -14,7 +14,8 @@ import org.eclipse.jgit.treewalk.TreeWalk;
  * Reads one blob's UTF-8 text at a given path from a proposal commit's tree. Callers only use this
  * for a path already confirmed present by {@link NotebookGitProposalTreeShape}, and the bytes are
  * decoded without re-validating UTF-8 strictness because {@link NotebookGitProposalMarkdownFormat}
- * already confirms every {@code .md} blob in the proposed tree is strictly valid UTF-8 first.
+ * already confirms every {@code .md} blob the proposal adds or changes is strictly valid UTF-8
+ * first.
  */
 public final class NotebookGitProposalBlobText {
 

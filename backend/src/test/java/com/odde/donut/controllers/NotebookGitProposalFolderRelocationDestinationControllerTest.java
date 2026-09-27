@@ -1,10 +1,8 @@
 package com.odde.donut.controllers;
 
-import static com.odde.donut.services.notebookTree.PortableTreeEntry.ofText;
 import static com.odde.donut.testability.CommittedTransactionTestSupport.inCommittedTransaction;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.nullValue;
 
@@ -14,8 +12,6 @@ import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.NotebookGitBinding;
 import com.odde.donut.entities.repositories.FolderRepository;
 import com.odde.donut.services.notebookGit.NotebookGitProposalBlobText;
-import com.odde.donut.services.notebookTree.PortableTreeEntry;
-import com.odde.donut.services.notebookTree.PortableTreeReadmeMarkdown;
 import com.odde.donut.testability.GitBundleTestReader;
 import java.util.List;
 import java.util.Map;
@@ -25,24 +21,15 @@ import org.eclipse.jgit.internal.storage.dfs.DfsRepositoryDescription;
 import org.eclipse.jgit.internal.storage.dfs.InMemoryRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.server.ResponseStatusException;
 
 /**
  * Verifies an exact folder relocation constructs missing destination ancestry for a synchronized
- * source, still refuses a pre-existing unrepresented dest parent, and does not invent folder
- * identity. Represented parents are accepted in {@link
- * NotebookGitProposalFolderRelocationControllerTest}. Unrepresented source descendants stay in
- * {@link NotebookGitProposalFolderRelocationEmptyDescendantControllerTest}.
+ * source and does not invent folder identity. Represented parents are accepted in {@link
+ * NotebookGitProposalFolderRelocationControllerTest}.
  */
 class NotebookGitProposalFolderRelocationDestinationControllerTest
     extends NotebookGitControllerTestBase {
-
-  private static final String README_BODY = "readme";
-  private static final String README = PortableTreeReadmeMarkdown.assemble(README_BODY);
-  private static final String NOTE = "---\ntype: Note\n---\nnote";
-  private static final String UNREPRESENTED_NOTE = "note";
 
   @Autowired FolderRepository folderRepository;
 
@@ -107,51 +94,6 @@ class NotebookGitProposalFolderRelocationDestinationControllerTest
         });
     assertExactAcceptedTree(
         notebook, proposedCommit, publishedHead, binding, biologySubtreePaths(destPrefix));
-  }
-
-  @Test
-  void rejectsAnExactFolderRelocationIntoAnExistingUnrepresentedParent() throws Exception {
-    Notebook notebook = createGitBackedNotebook();
-    Folder topics =
-        makeMe.aFolder().notebook(notebook).name("Topics").readmeContent(README_BODY).please();
-    Folder empty = makeMe.aFolder().notebook(notebook).name("Empty").please();
-    NotebookGitBinding binding = seedAcceptedBinding(notebook, topicsAtRoot());
-
-    ResponseStatusException exception =
-        publishRejected(
-            notebook,
-            binding,
-            List.of(
-                ofText("README.md", README_BODY),
-                ofText("Empty/Topics/README.md", README_BODY),
-                ofText("Empty/Topics/A.md", UNREPRESENTED_NOTE)));
-
-    assertThat(exception.getReason(), containsString("Empty/Topics/README.md"));
-    inCommittedTransaction(
-        transactionManager,
-        () ->
-            assertThat(
-                folderRepository.findByNotebookIdOrderByIdAsc(notebook.getId()).stream()
-                    .map(Folder::getId)
-                    .toList(),
-                containsInAnyOrder(topics.getId(), empty.getId())));
-  }
-
-  private ResponseStatusException publishRejected(
-      Notebook notebook, NotebookGitBinding binding, List<PortableTreeEntry> proposed)
-      throws Exception {
-    return assertProposalRejectedWithoutMutatingBinding(
-        notebook,
-        binding.getAcceptedGitObjectId(),
-        proposalBundleBytes(binding, NotebookGitProposalFile.asProposal(proposed)),
-        HttpStatus.BAD_REQUEST);
-  }
-
-  private static List<PortableTreeEntry> topicsAtRoot() {
-    return List.of(
-        ofText("README.md", README_BODY),
-        ofText("Topics/README.md", README_BODY),
-        ofText("Topics/A.md", UNREPRESENTED_NOTE));
   }
 
   private Folder synchronizedBiology(Notebook notebook) {

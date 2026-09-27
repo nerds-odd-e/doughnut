@@ -39,8 +39,6 @@ class NotebookGitProposalDocumentApplication {
       NotebookGitProposalImporter.ImportedProposal proposal,
       List<ChangedDocument> documents,
       Timestamp publishedAt) {
-    NotebookGitProposalMarkdownFormat.assertValidTypedMarkdown(
-        proposal.repository(), proposal.mainHead());
     String notebookReadmePath = null;
     List<String> folderReadmePaths = new ArrayList<>();
     List<String> conceptPaths = new ArrayList<>();

@@ -73,15 +73,6 @@ final class NotebookGitAcceptedTree {
         folderPath, entries, path -> excludingPath != null && path.equals(excludingPath));
   }
 
-  /**
-   * True when some entry under {@code folderPath} is not itself under {@code excludingPrefix} (for
-   * example tip content of a relocated destination must not invent representation for its parent).
-   */
-  static boolean representedInTreeExcludingUnder(
-      String folderPath, List<PortableTreeEntry> entries, String excludingPrefix) {
-    return representedInTree(folderPath, entries, path -> path.startsWith(excludingPrefix));
-  }
-
   private static boolean representedInTree(
       String folderPath, List<PortableTreeEntry> entries, Predicate<String> excludedPath) {
     return entries.stream()

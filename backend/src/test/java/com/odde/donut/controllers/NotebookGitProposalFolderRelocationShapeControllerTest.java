@@ -4,6 +4,7 @@ import static com.odde.donut.services.notebookTree.PortableTreeEntry.ofText;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 
+import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.NotebookGitBinding;
 import com.odde.donut.services.notebookTree.PortableTreeEntry;
@@ -23,21 +24,19 @@ import org.springframework.web.server.ResponseStatusException;
  */
 class NotebookGitProposalFolderRelocationShapeControllerTest extends NotebookGitControllerTestBase {
 
-  private static final String README = "readme";
-  private static final String NOTE = "note";
-  private static final String OTHER = "other";
+  private static final String OTHER = "---\ntype: Note\n---\nother";
 
   @Test
   void explainsAPartialFolderMoveIsNotAnExactSubtreeRelocation() throws Exception {
+    Notebook notebook = createGitBackedNotebook();
+    Folder topics = aFolderWithReadme(notebook, "Topics");
+    makeMe.aNote().folder(topics).title("A").content(NOTE).please();
+    aFolderWithReadme(notebook, "Archive");
+
     ResponseStatusException exception =
         publishRejected(
+            notebook,
             List.of(
-                ofText("README.md", README),
-                ofText("Topics/README.md", README),
-                ofText("Topics/A.md", NOTE),
-                ofText("Archive/README.md", README)),
-            List.of(
-                ofText("README.md", README),
                 ofText("Topics/A.md", NOTE),
                 ofText("Archive/README.md", README),
                 ofText("Archive/Topics/README.md", README)));
@@ -50,25 +49,27 @@ class NotebookGitProposalFolderRelocationShapeControllerTest extends NotebookGit
   @ParameterizedTest(name = "{0}")
   @MethodSource("inexactFolderProposals")
   void namesThePathThatMakesAFolderProposalInexact(
-      String scenario,
-      List<PortableTreeEntry> accepted,
-      List<PortableTreeEntry> proposed,
-      String path)
+      String scenario, boolean withOtherFolder, List<PortableTreeEntry> proposed, String path)
       throws Exception {
-    ResponseStatusException exception = publishRejected(accepted, proposed);
+    Notebook notebook = createGitBackedNotebook();
+    topicsAndArchive(notebook);
+    if (withOtherFolder) {
+      Folder other = aFolderWithReadme(notebook, "Other");
+      makeMe.aNote().folder(other).title("C").content(OTHER).please();
+    }
+
+    ResponseStatusException exception = publishRejected(notebook, proposed);
 
     assertThat(exception.getReason(), containsString("path \"" + path + "\""));
     assertThat(exception.getReason(), containsString("is not an exact folder relocation"));
   }
 
   static Stream<Arguments> inexactFolderProposals() {
-    List<PortableTreeEntry> topicsAndArchive = topicsAndArchive();
     return Stream.of(
         Arguments.of(
             "multiple",
-            withOtherFolder(topicsAndArchive),
+            true,
             List.of(
-                ofText("README.md", README),
                 ofText("note.md", NOTE),
                 ofText("Copy.md", NOTE),
                 ofText("Archive/README.md", README),
@@ -81,9 +82,8 @@ class NotebookGitProposalFolderRelocationShapeControllerTest extends NotebookGit
             "Topics/README.md"),
         Arguments.of(
             "renamed",
-            topicsAndArchive,
+            false,
             List.of(
-                ofText("README.md", README),
                 ofText("note.md", NOTE),
                 ofText("Copy.md", NOTE),
                 ofText("Archive/README.md", README),
@@ -94,28 +94,21 @@ class NotebookGitProposalFolderRelocationShapeControllerTest extends NotebookGit
             "Archive/Renamed/README.md"),
         Arguments.of(
             "edited",
-            topicsAndArchive,
+            false,
             List.of(
-                ofText("README.md", README),
                 ofText("note.md", NOTE),
                 ofText("Copy.md", NOTE),
                 ofText("Archive/README.md", README),
                 ofText("Archive/Topics/README.md", README),
-                ofText("Archive/Topics/A.md", "edited"),
+                ofText("Archive/Topics/A.md", "---\ntype: Note\n---\nedited"),
                 ofText("Archive/Topics/Sub/README.md", README),
                 ofText("Archive/Topics/Sub/B.md", NOTE)),
             "Archive/Topics/A.md"));
   }
 
   private ResponseStatusException publishRejected(
-      List<PortableTreeEntry> accepted, List<PortableTreeEntry> proposed) throws Exception {
-    return publishRejected(createGitBackedNotebook(), accepted, proposed);
-  }
-
-  private ResponseStatusException publishRejected(
-      Notebook notebook, List<PortableTreeEntry> accepted, List<PortableTreeEntry> proposed)
-      throws Exception {
-    NotebookGitBinding binding = seedAcceptedBinding(notebook, accepted);
+      Notebook notebook, List<PortableTreeEntry> proposed) throws Exception {
+    NotebookGitBinding binding = snapshotCurrentPortableTree(notebook);
     return assertProposalRejectedWithoutMutatingBinding(
         notebook,
         binding.getAcceptedGitObjectId(),
@@ -123,22 +116,18 @@ class NotebookGitProposalFolderRelocationShapeControllerTest extends NotebookGit
         HttpStatus.BAD_REQUEST);
   }
 
-  private static List<PortableTreeEntry> topicsAndArchive() {
-    return List.of(
-        ofText("README.md", README),
-        ofText("note.md", NOTE),
-        ofText("Copy.md", NOTE),
-        ofText("Topics/README.md", README),
-        ofText("Topics/A.md", NOTE),
-        ofText("Topics/Sub/README.md", README),
-        ofText("Topics/Sub/B.md", NOTE),
-        ofText("Archive/README.md", README));
+  private void topicsAndArchive(Notebook notebook) {
+    makeMe.aNote().notebook(notebook).title("note").content(NOTE).please();
+    makeMe.aNote().notebook(notebook).title("Copy").content(NOTE).please();
+    Folder topics = aFolderWithReadme(notebook, "Topics");
+    makeMe.aNote().folder(topics).title("A").content(NOTE).please();
+    Folder sub =
+        makeMe.aFolder().parentFolder(topics).name("Sub").readmeContent(README_BODY).please();
+    makeMe.aNote().folder(sub).title("B").content(NOTE).please();
+    aFolderWithReadme(notebook, "Archive");
   }
 
-  private static List<PortableTreeEntry> withOtherFolder(List<PortableTreeEntry> accepted) {
-    return Stream.concat(
-            accepted.stream(),
-            Stream.of(ofText("Other/README.md", README), ofText("Other/C.md", OTHER)))
-        .toList();
+  private Folder aFolderWithReadme(Notebook notebook, String name) {
+    return makeMe.aFolder().notebook(notebook).name(name).readmeContent(README_BODY).please();
   }
 }

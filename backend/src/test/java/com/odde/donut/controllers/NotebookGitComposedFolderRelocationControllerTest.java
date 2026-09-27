@@ -29,9 +29,6 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 class NotebookGitComposedFolderRelocationControllerTest extends NotebookGitControllerTestBase {
 
-  private static final String README_BODY = "readme";
-  private static final String README = PortableTreeReadmeMarkdown.assemble(README_BODY);
-  private static final String NOTE = "---\ntype: Note\n---\nnote";
   private static final String EDITED = "---\ntype: Note\n---\nedited";
   private static final String ADDED = "---\ntype: Note\n---\nadded";
   private static final String ARCHIVE_README =

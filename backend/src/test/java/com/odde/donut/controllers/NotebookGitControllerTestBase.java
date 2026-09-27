@@ -14,6 +14,7 @@ import com.odde.donut.services.notebookAttachment.NotebookAttachmentContent;
 import com.odde.donut.services.notebookGit.NotebookGitCutoverService;
 import com.odde.donut.services.notebookGit.PortablePathKind;
 import com.odde.donut.services.notebookTree.PortableTreeEntry;
+import com.odde.donut.services.notebookTree.PortableTreeReadmeMarkdown;
 import com.odde.donut.testability.GitBundleTestReader;
 import com.odde.donut.testability.GitBundleTestReader.AcceptedHistory;
 import java.io.IOException;
@@ -33,6 +34,9 @@ import org.springframework.web.server.ResponseStatusException;
 @Transactional(propagation = Propagation.NOT_SUPPORTED)
 abstract class NotebookGitControllerTestBase extends NotebookGitAcceptedObjectStoreTestSupport {
 
+  static final String README_BODY = "readme";
+  static final String README = PortableTreeReadmeMarkdown.assemble(README_BODY);
+  static final String NOTE = "---\ntype: Note\n---\nnote";
   private static final String FIXTURE_PREFIX = "notebook-git-proposal-committed-";
 
   @Autowired NotebookGitCutoverService notebookGitCutoverService;

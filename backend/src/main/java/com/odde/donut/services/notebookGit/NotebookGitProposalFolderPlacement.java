@@ -3,7 +3,6 @@ package com.odde.donut.services.notebookGit;
 import com.odde.donut.entities.DisplayName;
 import com.odde.donut.entities.Folder;
 import com.odde.donut.exceptions.ApiException;
-import com.odde.donut.factoryServices.EntityPersister;
 import com.odde.donut.services.FolderMoveDestinationRules;
 import com.odde.donut.services.FolderSiblingNameValidation;
 import org.springframework.web.server.ResponseStatusException;
@@ -14,15 +13,10 @@ final class NotebookGitProposalFolderPlacement {
   private NotebookGitProposalFolderPlacement() {}
 
   static void requireAllowed(
-      NotebookGitProjection.RepresentedFolderRelocation represented,
-      EntityPersister entityPersister,
+      Folder source,
+      Folder destParent,
       FolderSiblingNameValidation folderSiblingNameValidation,
       String destPrefix) {
-    Folder source = entityPersister.find(Folder.class, represented.sourceFolderId());
-    Folder destParent =
-        represented.destParentFolderId() == null
-            ? null
-            : entityPersister.find(Folder.class, represented.destParentFolderId());
     String context = "Cannot move folder to path \"" + destPrefix + "/README.md\"";
     try {
       FolderMoveDestinationRules.requireNotMovingIntoSelfOrDescendant(source, destParent);

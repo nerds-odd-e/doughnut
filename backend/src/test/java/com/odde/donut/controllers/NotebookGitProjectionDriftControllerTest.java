@@ -9,10 +9,12 @@ import static org.hamcrest.Matchers.nullValue;
 
 import com.odde.donut.controllers.dto.NoteCreationDTO;
 import com.odde.donut.controllers.dto.NoteUpdateContentDTO;
+import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.MemoryTracker;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.NotebookGitBinding;
+import com.odde.donut.entities.repositories.FolderRepository;
 import com.odde.donut.entities.repositories.MemoryTrackerRepository;
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -33,6 +35,7 @@ class NotebookGitProjectionDriftControllerTest extends NotebookGitControllerTest
 
   @Autowired TextContentController textContentController;
   @Autowired MemoryTrackerRepository memoryTrackerRepository;
+  @Autowired FolderRepository folderRepository;
 
   @Test
   void rejectsAnAdditionBasedOnAnOldParentAfterWebContentAdvancedAcceptedMain() throws Exception {
@@ -63,6 +66,37 @@ class NotebookGitProjectionDriftControllerTest extends NotebookGitControllerTest
                     .orElseThrow()
                     .isActive()),
         equalTo(true));
+  }
+
+  @Test
+  void rejectsAFolderRelocationWhenAWebCreationHasDriftedTheProjection() throws Exception {
+    Notebook notebook = createGitBackedNotebook();
+    Folder archive =
+        makeMe.aFolder().notebook(notebook).name("Archive").readmeContent(README_BODY).please();
+    Folder topics =
+        makeMe.aFolder().notebook(notebook).name("Topics").readmeContent(README_BODY).please();
+    makeMe.aNote().folder(topics).title("A").content(NOTE).please();
+    NotebookGitBinding binding = snapshotCurrentPortableTree(notebook);
+    NoteCreationDTO webCreation = new NoteCreationDTO();
+    webCreation.setNewTitle("addition");
+    webCreation.setContent(UNSYNCHRONIZED_RELATIONSHIP_CONTENT);
+    controller.createNoteAtNotebookRoot(notebook, webCreation);
+
+    ResponseStatusException exception =
+        assertProposalRejectedWithoutMutatingBinding(
+            notebook,
+            binding.getAcceptedGitObjectId(),
+            proposalBundleBytes(
+                binding,
+                List.of(
+                    new NotebookGitProposalFile("Archive/README.md", README),
+                    new NotebookGitProposalFile("Archive/Topics/README.md", README),
+                    new NotebookGitProposalFile("Archive/Topics/A.md", NOTE))),
+            HttpStatus.CONFLICT);
+
+    assertThat(exception.getReason(), containsString("refresh the checkout before publishing"));
+    NotebookGitProposalFolderRelocationParentMap.assertUnchanged(
+        transactionManager, folderRepository, notebook, archive, topics);
   }
 
   private DriftedWebCreation rejectWhenAWebCreationHasDriftedTheProjection(
