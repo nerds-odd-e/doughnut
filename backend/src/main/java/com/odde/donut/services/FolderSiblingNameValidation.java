@@ -154,6 +154,15 @@ public class FolderSiblingNameValidation {
     return folderHolding(notebook, parentOrNull, folder.getName(), excluded);
   }
 
+  /**
+   * The folder in {@code parentOrNull} named {@code name} (ignoring case) for a new entry to go
+   * into; empty when no entry holds the name.
+   */
+  public Optional<Folder> folderToEnter(Notebook notebook, Folder parentOrNull, DisplayName name) {
+    return entryHolding(notebook, parentOrNull, name.value(), Set.of())
+        .flatMap(taken -> folderHolding(notebook, parentOrNull, name.value(), Set.of()));
+  }
+
   /** The first name from {@code requestedName} that no entry in {@code parentOrNull} holds. */
   public DisplayName firstFreeFolderName(
       Notebook notebook, Folder parentOrNull, DisplayName requestedName, int excludedFolderId) {

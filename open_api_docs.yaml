@@ -4722,6 +4722,14 @@ components:
           format: int32
         content:
           type: string
+        childFolderName:
+          type: string
+          description: "When set, the note goes into the child folder of this name\
+            \ (ignoring letter case) under folderId or the notebook root, created\
+            \ in the same change when absent."
+          maxLength: 512
+          minLength: 0
+          pattern: "^[\\s\\x00-\\x1F]*[^\\\\/:*?\"<>|\\x00-\\x1F]*[\\s\\x00-\\x1F]*$"
     BlockDepthSuggestion:
       type: object
       properties:

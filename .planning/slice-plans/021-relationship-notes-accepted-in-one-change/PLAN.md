@@ -135,7 +135,10 @@ the lookup.
 ### 3. Note creation reuses or creates a named child folder in the same change
 
 Type: Behavior
-Status: planned
+Status: done
+Accepted proof: `childFolderNameReusesTheFolderHoldingItIgnoringCaseInOneCommit`
+and `childFolderNameCreatesTheFolderWithTheNoteInOneCommit` failed first, then
+passed (8/8); client regenerated, `vue-tsc` clean.
 Proof: new cases in `NotebookGitNoteCreationFolderControllerTest` for
 examples 1-2 (`relations` reuses `Relations`, head advances once; no such
 folder → folder and note in one commit) fail first, then pass —
@@ -205,4 +208,8 @@ limit, used by `PictureFile` and `NotebookGitAttachmentSizeAdmission`.
 
 ## Learnings
 
-None yet.
+- The name owner cannot create folders (`FolderConstructionService` already
+  depends on it), so it answers `folderToEnter` and
+  `FolderConstructionService.folderToEnterOrCreate` creates when empty. Slice 4
+  adds the refusal inside `folderToEnter`; the trash path's private
+  `findOrCreateFolder` keeps `folderHolding`.

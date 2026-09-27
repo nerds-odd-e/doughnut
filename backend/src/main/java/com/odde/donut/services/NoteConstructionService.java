@@ -6,6 +6,7 @@ import com.odde.donut.algorithms.NoteContentTitleHeading;
 import com.odde.donut.algorithms.NoteLeadingFrontmatter;
 import com.odde.donut.controllers.dto.NoteCreationDTO;
 import com.odde.donut.controllers.dto.NoteRealm;
+import com.odde.donut.entities.DisplayName;
 import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
@@ -34,6 +35,7 @@ public class NoteConstructionService {
   private final CanonicalDonutOrigin canonicalDonutOrigin;
   private final AuthoredNoteDocumentPersistence authoredNoteDocumentPersistence;
   private final NoteTitleNameRule noteTitleNameRule;
+  private final FolderConstructionService folderConstructionService;
 
   @Autowired
   public NoteConstructionService(
@@ -46,7 +48,8 @@ public class NoteConstructionService {
       NoteFactory noteFactory,
       CanonicalDonutOrigin canonicalDonutOrigin,
       AuthoredNoteDocumentPersistence authoredNoteDocumentPersistence,
-      NoteTitleNameRule noteTitleNameRule) {
+      NoteTitleNameRule noteTitleNameRule,
+      FolderConstructionService folderConstructionService) {
     this.authorizationService = authorizationService;
     this.testabilitySettings = testabilitySettings;
     this.folderRepository = folderRepository;
@@ -57,6 +60,7 @@ public class NoteConstructionService {
     this.canonicalDonutOrigin = canonicalDonutOrigin;
     this.authoredNoteDocumentPersistence = authoredNoteDocumentPersistence;
     this.noteTitleNameRule = noteTitleNameRule;
+    this.folderConstructionService = folderConstructionService;
   }
 
   private Note persistNoteContent(Note note, String content) {
@@ -86,6 +90,11 @@ public class NoteConstructionService {
               .orElseThrow(
                   () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Folder not found."));
       folder.requireInNotebook(notebook);
+    }
+    if (noteCreation.getChildFolderName() != null) {
+      folder =
+          folderConstructionService.folderToEnterOrCreate(
+              notebook, folder, new DisplayName(noteCreation.getChildFolderName()));
     }
     noteTitleNameRule.requireTitleFree(notebook, folder, noteCreation.getNewTitle());
     Note note = noteFactory.create(notebook, folder, noteCreation.getNewTitle());

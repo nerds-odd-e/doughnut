@@ -5,6 +5,7 @@ import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -143,6 +144,52 @@ class NotebookGitNoteCreationFolderControllerTest
     AcceptedHistory after = acceptedHistory(notebook);
     assertThat(after.parents(), equalTo(acceptedHistoryBefore.commits()));
     assertThat(after.tipPaths(), hasItem("Unsynchronized/Inside Drifted Folder.md"));
+  }
+
+  @Test
+  void childFolderNameReusesTheFolderHoldingItIgnoringCaseInOneCommit() throws Exception {
+    Notebook notebook = createGitBackedNotebook();
+    Folder europe = makeMe.aFolder().notebook(notebook).name("Europe").please();
+    Folder relations = makeMe.aFolder().parentFolder(europe).name("Relations").please();
+    makeMe.aNote().folder(relations).title("Existing").please();
+    snapshotCurrentPortableTree(notebook);
+    AcceptedHistory before = acceptedHistory(notebook);
+    NoteCreationDTO creation = titleOnly("Paris to France");
+    creation.setFolderId(europe.getId());
+    creation.setChildFolderName("relations");
+
+    NoteRealm result = controller.createNoteAtNotebookRoot(notebook, creation);
+
+    Note created = noteRepository.findById(result.getId()).orElseThrow();
+    assertThat(created.getFolder().getId(), is(relations.getId()));
+    assertThat(
+        folderRepository.findChildFoldersNamedIgnoringCase(
+            notebook.getId(), europe.getId(), "relations"),
+        hasSize(1));
+    AcceptedHistory after = acceptedHistory(notebook);
+    assertThat(after.parents(), equalTo(before.commits()));
+    assertThat(after.tipPaths(), hasItem("Europe/Relations/Paris to France.md"));
+  }
+
+  @Test
+  void childFolderNameCreatesTheFolderWithTheNoteInOneCommit() throws Exception {
+    Notebook notebook = createGitBackedNotebook();
+    Folder europe = makeMe.aFolder().notebook(notebook).name("Europe").please();
+    makeMe.aNote().folder(europe).title("Paris").please();
+    snapshotCurrentPortableTree(notebook);
+    AcceptedHistory before = acceptedHistory(notebook);
+    NoteCreationDTO creation = titleOnly("Paris to France");
+    creation.setFolderId(europe.getId());
+    creation.setChildFolderName("relations");
+
+    NoteRealm result = controller.createNoteAtNotebookRoot(notebook, creation);
+
+    Folder created = noteRepository.findById(result.getId()).orElseThrow().getFolder();
+    assertThat(created.getName(), is("relations"));
+    assertThat(created.getParentFolder().getId(), is(europe.getId()));
+    AcceptedHistory after = acceptedHistory(notebook);
+    assertThat(after.parents(), equalTo(before.commits()));
+    assertThat(after.tipPaths(), hasItem("Europe/relations/Paris to France.md"));
   }
 
   @Test
