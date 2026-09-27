@@ -115,8 +115,8 @@ public class AcceptedWebChangeService {
             accepted.repository(),
             accepted.head(),
             tree,
-            NotebookGitCutoverService.SYSTEM_AUTHOR_NAME,
-            NotebookGitCutoverService.SYSTEM_AUTHOR_EMAIL,
+            NotebookGitCommitBuilder.SYSTEM_AUTHOR_NAME,
+            NotebookGitCommitBuilder.SYSTEM_AUTHOR_EMAIL,
             message,
             updatedAt.toInstant());
     repositoryStore.store(notebook.binding(), accepted.repository(), newHead, updatedAt);

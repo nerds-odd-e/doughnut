@@ -63,16 +63,6 @@ public class NotebookAttachment extends EntityIdentifiedByIdOnly {
     this.content = acceptedGitContent;
   }
 
-  /** JPA property for column {@code content}; prefer {@link #getAcceptedGitContent()}. */
-  public byte[] getContent() {
-    return getAcceptedGitContent();
-  }
-
-  /** JPA property for column {@code content}; prefer {@link #setAcceptedGitContent(byte[])}. */
-  public void setContent(byte[] content) {
-    setAcceptedGitContent(content);
-  }
-
   public void requireInNotebook(Notebook notebook) {
     if (!getNotebook().getId().equals(notebook.getId())) {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, "File not in notebook.");

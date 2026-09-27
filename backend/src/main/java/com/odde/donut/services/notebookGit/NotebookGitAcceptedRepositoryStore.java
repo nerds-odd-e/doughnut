@@ -18,9 +18,9 @@ import org.springframework.stereotype.Service;
 /**
  * Owns the accepted Git repository's persistence mechanics on behalf of every caller that opens or
  * stores a {@link NotebookGitBinding}'s accepted history: ordinary web changes, proposal
- * publication, creation/cutover/reset and bundle download. Objects and the accepted head live in
- * the native, JDBC-backed object store ({@code com.odde.donut.services.notebookGit.objectstore}),
- * on the connection bound to the surrounding Spring transaction, so a native write commits or rolls
+ * publication, creation/reset and bundle download. Objects and the accepted head live in the
+ * native, JDBC-backed object store ({@code com.odde.donut.services.notebookGit.objectstore}), on
+ * the connection bound to the surrounding Spring transaction, so a native write commits or rolls
  * back exactly with the rest of the business transaction. Every caller reaches native storage
  * through this one place - there is no endpoint-specific storage mode or dual write.
  */
@@ -56,9 +56,9 @@ class NotebookGitAcceptedRepositoryStore {
   /**
    * Opens {@code binding}'s accepted repository from the native object store, on the JDBC
    * connection bound to the current Spring transaction (so a caller's later native writes
-   * commit/roll back with the rest of that transaction). Creation/cutover/reset ({@link #store})
-   * write every object the accepted head reaches, so a later read of an object missing from the
-   * native store fails loudly rather than being repaired here.
+   * commit/roll back with the rest of that transaction). Creation/reset ({@link #store}) write
+   * every object the accepted head reaches, so a later read of an object missing from the native
+   * store fails loudly rather than being repaired here.
    */
   OpenedAcceptedRepository open(NotebookGitBinding binding) {
     Connection connection = DataSourceUtils.getConnection(dataSource);

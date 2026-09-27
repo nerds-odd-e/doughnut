@@ -20,10 +20,15 @@ import org.eclipse.jgit.lib.Repository;
  * in-memory repository with a single, parentless root commit; {@link #append} adds a commit on a
  * given parent.
  *
- * <p>No filesystem writes and no Donut identity: the caller supplies author/message/time, and the
- * notebook ID (if any) stays the caller's concern rather than being embedded in paths or blobs.
+ * <p>No filesystem writes: the caller supplies author/message/time, and the notebook ID (if any)
+ * stays the caller's concern rather than being embedded in paths or blobs.
  */
 public final class NotebookGitCommitBuilder {
+
+  /** Stable system identity for Git commits Donut makes on its own behalf. */
+  public static final String SYSTEM_AUTHOR_NAME = "Donut System";
+
+  public static final String SYSTEM_AUTHOR_EMAIL = "system@donut.local";
 
   private NotebookGitCommitBuilder() {}
 

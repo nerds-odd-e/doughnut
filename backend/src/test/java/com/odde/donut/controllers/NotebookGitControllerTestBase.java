@@ -11,7 +11,7 @@ import com.odde.donut.entities.NotebookGitBinding;
 import com.odde.donut.entities.User;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.donut.services.notebookAttachment.NotebookAttachmentContent;
-import com.odde.donut.services.notebookGit.NotebookGitCutoverService;
+import com.odde.donut.services.notebookGit.NotebookGitHistoryService;
 import com.odde.donut.services.notebookGit.PortablePathKind;
 import com.odde.donut.services.notebookTree.PortableTreeEntry;
 import com.odde.donut.services.notebookTree.PortableTreeReadmeMarkdown;
@@ -39,7 +39,7 @@ abstract class NotebookGitControllerTestBase extends NotebookGitAcceptedObjectSt
   static final String NOTE = "---\ntype: Note\n---\nnote";
   private static final String FIXTURE_PREFIX = "notebook-git-proposal-committed-";
 
-  @Autowired NotebookGitCutoverService notebookGitCutoverService;
+  @Autowired NotebookGitHistoryService notebookGitHistoryService;
   @Autowired NotebookAttachmentContent notebookAttachmentContent;
 
   private String testFixturePrefix;
@@ -141,7 +141,7 @@ abstract class NotebookGitControllerTestBase extends NotebookGitAcceptedObjectSt
   }
 
   NotebookGitBinding snapshotCurrentPortableTree(Notebook notebook) {
-    return notebookGitCutoverService.resetHistory(notebook, Instant.now());
+    return notebookGitHistoryService.resetHistory(notebook, Instant.now());
   }
 
   NotebookGitBinding reloadCommittedBinding(Integer notebookId) {

@@ -4,7 +4,7 @@ import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.Ownership;
 import com.odde.donut.entities.User;
 import com.odde.donut.factoryServices.EntityPersister;
-import com.odde.donut.services.notebookGit.NotebookGitCutoverService;
+import com.odde.donut.services.notebookGit.NotebookGitHistoryService;
 import java.sql.Timestamp;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -12,12 +12,12 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class NotebookService {
   private final EntityPersister entityPersister;
-  private final NotebookGitCutoverService notebookGitCutoverService;
+  private final NotebookGitHistoryService notebookGitHistoryService;
 
   public NotebookService(
-      EntityPersister entityPersister, NotebookGitCutoverService notebookGitCutoverService) {
+      EntityPersister entityPersister, NotebookGitHistoryService notebookGitHistoryService) {
     this.entityPersister = entityPersister;
-    this.notebookGitCutoverService = notebookGitCutoverService;
+    this.notebookGitHistoryService = notebookGitHistoryService;
   }
 
   @Transactional
@@ -31,7 +31,7 @@ public class NotebookService {
         ownership.prepareNotebookForNewNotebook(
             user, currentUTCTimestamp, titleConstructor, description);
     entityPersister.save(notebook);
-    notebookGitCutoverService.createBindingForNotebook(notebook, currentUTCTimestamp.toInstant());
+    notebookGitHistoryService.startHistory(notebook, currentUTCTimestamp.toInstant());
     return notebook;
   }
 }

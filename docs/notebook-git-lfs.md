@@ -18,10 +18,10 @@ local files with compact Git history and one attachment model, including images.
 - **Representation:** Use standard Git LFS v1 pointers (SHA-256 and byte size)
   for non-Markdown attachments. Git selects the exact immutable content version;
   private GCS objects hold its bytes. MySQL stores metadata and references, not
-  attachment payloads, including retained legacy payloads. Never commit storage
-  URLs or credentials. Markdown remains ordinary Git content; `.gitattributes`
-  is Git metadata, and structural markers retain their existing role. Follow
-  the standard empty-file representation.
+  attachment payloads. Never commit storage URLs or credentials. Markdown
+  remains ordinary Git content; `.gitattributes` is Git metadata, and
+  structural markers retain their existing role. Follow the standard empty-file
+  representation.
 - **Clients:** The CLI requires standard Git LFS: clone always configures it in
   the checkout, and pull and publish use it whenever attachments move.
   Donut coordinates existing Git-bundle transport with standard LFS transfers;
@@ -43,8 +43,8 @@ local files with compact Git history and one attachment model, including images.
   even after removing a current file. Backups include Git, referenced objects,
   and private application data. Cleanup must preserve accepted and in-flight work.
 - **Compatibility:** Preserve accepted commit IDs, linear history, note/learning
-  identities, and the shared publication boundary. Existing notebooks transition
-  by forward commits; legacy history stays readable. Forward conversion stops
+  identities, and the shared publication boundary. Notebooks move to LFS by
+  forward commits, and earlier history stays readable. Forward conversion stops
   binary-driven bundle growth but cannot remove old binaries from full-history
   bundles. Rewriting or resetting accepted history needs a separate decision.
 

@@ -21,7 +21,7 @@ import com.odde.donut.entities.repositories.MemoryTrackerRepository;
 import com.odde.donut.entities.repositories.RecallLogRepository;
 import com.odde.donut.exceptions.ApiException;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
-import com.odde.donut.services.notebookGit.NotebookGitCutoverService;
+import com.odde.donut.services.notebookGit.NotebookGitCommitBuilder;
 import com.odde.donut.services.notebookGit.NotebookGitProposalBlobText;
 import com.odde.donut.testability.GitBundleTestReader;
 import com.odde.donut.testability.GitBundleTestReader.AcceptedHistory;
@@ -216,10 +216,10 @@ class NotebookGitWebContentHistoryControllerTest
         assertThat(commit.getParentCount(), is(1));
         assertThat(commit.getParent(0).getId(), equalTo(firstEdit));
         assertThat(
-            commit.getAuthorIdent().getName(), is(NotebookGitCutoverService.SYSTEM_AUTHOR_NAME));
+            commit.getAuthorIdent().getName(), is(NotebookGitCommitBuilder.SYSTEM_AUTHOR_NAME));
         assertThat(
             commit.getAuthorIdent().getEmailAddress(),
-            is(NotebookGitCutoverService.SYSTEM_AUTHOR_EMAIL));
+            is(NotebookGitCommitBuilder.SYSTEM_AUTHOR_EMAIL));
         assertThat(commit.getAuthorIdent().getWhenAsInstant(), equalTo(T1008));
         assertThat(commit.getCommitterIdent(), equalTo(commit.getAuthorIdent()));
         assertThat(commit.getFullMessage(), is("Edit note content: Root Note"));

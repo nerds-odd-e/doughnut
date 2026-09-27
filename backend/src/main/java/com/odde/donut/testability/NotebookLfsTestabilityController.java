@@ -7,7 +7,7 @@ import com.odde.donut.entities.repositories.NotebookAttachmentRepository;
 import com.odde.donut.entities.repositories.NotebookRepository;
 import com.odde.donut.services.notebookAttachment.NotebookAttachmentContent;
 import com.odde.donut.services.notebookAttachment.VerifiedNotebookAttachmentBytes;
-import com.odde.donut.services.notebookGit.NotebookGitCutoverService;
+import com.odde.donut.services.notebookGit.NotebookGitHistoryService;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.nio.charset.StandardCharsets;
 import java.util.Optional;
@@ -31,7 +31,7 @@ class NotebookLfsTestabilityController {
   @Autowired NotebookAttachmentRepository notebookAttachmentRepository;
   @Autowired NotebookAttachmentContent notebookAttachmentContent;
   @Autowired TestabilitySettings testabilitySettings;
-  @Autowired NotebookGitCutoverService notebookGitCutoverService;
+  @Autowired NotebookGitHistoryService notebookGitHistoryService;
 
   @Schema(name = "AcceptLfsAttachmentTipRequest")
   @Getter
@@ -81,7 +81,7 @@ class NotebookLfsTestabilityController {
     attachment.setAcceptedGitContent(pointer);
     notebookAttachmentRepository.save(attachment);
 
-    notebookGitCutoverService.resetHistory(
+    notebookGitHistoryService.resetHistory(
         notebook, testabilitySettings.getCurrentUTCTimestamp().toInstant());
 
     AcceptLfsAttachmentTipResponse response = new AcceptLfsAttachmentTipResponse();

@@ -15,27 +15,21 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * Gives one notebook its accepted Git binding: builds the notebook's canonical Portable-tree
- * snapshot as of a given commit time, commits it as a single parentless root commit under a stable
- * Donut system identity, and persists the accepted binding.
+ * Starts and resets one notebook's accepted Git history: builds the notebook's canonical
+ * Portable-tree snapshot as of a given commit time, commits it as a single parentless root commit
+ * under the Donut system identity, and persists the accepted binding.
  *
- * <p>{@code NotebookService} calls {@link #createBindingForNotebook} at creation time so every
- * notebook starts Git-backed from an empty content tree with the initial LFS {@code
- * .gitattributes}; {@link #resetHistory} writes the same kind of root commit over a binding a
- * notebook already has, preserving that binding's accepted metadata (or, for a notebook without
- * one, creating it as at creation time). The caller supplies the commit time, and a tree failure
- * propagates before a binding is persisted.
+ * <p>{@code NotebookService} calls {@link #startHistory} at creation time so every notebook starts
+ * Git-backed from an empty content tree with the initial LFS {@code .gitattributes}; {@link
+ * #resetHistory} writes the same kind of root commit over a binding a notebook already has,
+ * preserving that binding's accepted metadata (or, for a notebook without one, creating it as at
+ * creation time). The caller supplies the commit time, and a tree failure propagates before a
+ * binding is persisted.
  */
 @Service
-public class NotebookGitCutoverService {
+public class NotebookGitHistoryService {
 
-  /** Stable system identity used for Donut-generated Git commits such as this cutover. */
-  public static final String SYSTEM_AUTHOR_NAME = "Donut System";
-
-  public static final String SYSTEM_AUTHOR_EMAIL = "system@donut.local";
-
-  static final String CUTOVER_COMMIT_MESSAGE =
-      "Cutover: snapshot existing notebook content into Git";
+  static final String CREATION_COMMIT_MESSAGE = "Create notebook";
 
   static final String RESET_COMMIT_MESSAGE = "Reset: restart Git history from the current notebook";
 
@@ -43,7 +37,7 @@ public class NotebookGitCutoverService {
   private final NotebookGitBindingRepository notebookGitBindingRepository;
   private final NotebookGitAcceptedRepositoryStore repositoryStore;
 
-  public NotebookGitCutoverService(
+  public NotebookGitHistoryService(
       NotebookGitTreeEncoder treeEncoder,
       NotebookGitBindingRepository notebookGitBindingRepository,
       NotebookGitAcceptedRepositoryStore repositoryStore) {
@@ -52,17 +46,13 @@ public class NotebookGitCutoverService {
     this.repositoryStore = repositoryStore;
   }
 
-  public NotebookGitBinding createBindingForNotebook(Notebook notebook, Instant cutoverTime) {
-    NotebookGitBinding binding = newBinding(notebook);
-    try (Repository repository =
-        buildRepository(
-            notebook,
-            cutoverTime,
-            CUTOVER_COMMIT_MESSAGE,
-            NotebookGitAttributes.initialMetadata())) {
-      storeHistory(binding, repository, cutoverTime);
-    }
-    return binding;
+  public NotebookGitBinding startHistory(Notebook notebook, Instant creationTime) {
+    return writeRootCommit(
+        notebook,
+        newBinding(notebook),
+        creationTime,
+        CREATION_COMMIT_MESSAGE,
+        NotebookGitAttributes.initialMetadata());
   }
 
   /**
@@ -76,13 +66,17 @@ public class NotebookGitCutoverService {
   public NotebookGitBinding resetHistory(Notebook notebook, Instant resetTime) {
     return notebookGitBindingRepository
         .findByNotebookIdForUpdate(notebook.getId())
-        .map(binding -> resetHistory(notebook, binding, resetTime, acceptedMetadata(binding)))
+        .map(
+            binding ->
+                writeRootCommit(
+                    notebook, binding, resetTime, RESET_COMMIT_MESSAGE, acceptedMetadata(binding)))
         .orElseGet(
             () ->
-                resetHistory(
+                writeRootCommit(
                     notebook,
                     newBinding(notebook),
                     resetTime,
+                    RESET_COMMIT_MESSAGE,
                     NotebookGitAttributes.initialMetadata()));
   }
 
@@ -92,14 +86,20 @@ public class NotebookGitCutoverService {
     return binding;
   }
 
-  private NotebookGitBinding resetHistory(
+  private NotebookGitBinding writeRootCommit(
       Notebook notebook,
       NotebookGitBinding binding,
-      Instant resetTime,
+      Instant commitTime,
+      String message,
       List<PortableTreeEntry> metadata) {
     try (Repository repository =
-        buildRepository(notebook, resetTime, RESET_COMMIT_MESSAGE, metadata)) {
-      storeHistory(binding, repository, resetTime);
+        NotebookGitCommitBuilder.build(
+            treeEncoder.fullTree(notebook, metadata),
+            NotebookGitCommitBuilder.SYSTEM_AUTHOR_NAME,
+            NotebookGitCommitBuilder.SYSTEM_AUTHOR_EMAIL,
+            message,
+            commitTime)) {
+      storeHistory(binding, repository, commitTime);
     }
     return binding;
   }
@@ -109,19 +109,6 @@ public class NotebookGitCutoverService {
         repositoryStore.open(binding)) {
       return NotebookGitAcceptedTree.metadataEntries(opened.repository(), opened.head());
     }
-  }
-
-  private Repository buildRepository(
-      Notebook notebook,
-      Instant commitTime,
-      String message,
-      List<PortableTreeEntry> acceptedMetadata) {
-    return NotebookGitCommitBuilder.build(
-        treeEncoder.fullTree(notebook, acceptedMetadata),
-        SYSTEM_AUTHOR_NAME,
-        SYSTEM_AUTHOR_EMAIL,
-        message,
-        commitTime);
   }
 
   private void storeHistory(NotebookGitBinding binding, Repository repository, Instant time) {
