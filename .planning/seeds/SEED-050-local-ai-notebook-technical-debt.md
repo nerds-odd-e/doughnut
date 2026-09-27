@@ -133,50 +133,6 @@ is refused as drift.
 4. A relationship note created at the root → the accepted head contains it,
    and a following local publish is not refused as drift.
 
-<a id="story-3"></a>
-
-### Notebook pages and the sidebar say when content cannot be loaded
-
-**Identity:** SEED-050#story-3
-```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/022-loud-notebook-load-failures/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"4213a2e511a6f2eb833b7ac740f7a70b392778f81879a2a7d7d13405045cee2d","plan":"b1b38565bb4e70f099f428c8c46102a1575ed21d983a3eb109e99c213e908d40"}}
-```
-
-**Goal:** A notebook owner who opens a notebook, folder or file page that
-cannot be loaded, or whose sidebar listing fails to load, sees a clear
-message instead of an endless spinner, and a folder never shows as empty when
-it is not (ADR 0006).
-
-**Scope:**
-
-- The notebook, folder and file pages share one route loader
-  (`loadRealmOnRoute` in `useNotebookSidebarRouteRealms.ts`); a failed load
-  shows one inline error in place of the page. Today any failure, including a
-  404 for a deleted or moved file or folder, spins forever.
-- A failed sidebar listing keeps the rows it already showed and shows an
-  inline message for that listing (`SidebarInner.vue` today empties the
-  folder). It still does not trigger the global busy indicator.
-- Messages: "Could not load this page." and "Could not load this folder's
-  contents.", in the existing inline `text-error` style; no separate 404
-  wording.
-- Unchanged: existing toasts; no new requests.
-- Dropped (owner, 2026-09-27): making `fk_note_folder` `ON DELETE RESTRICT`
-  (already done and tested); treating a notebook without a Git binding as
-  impossible (backend test notebooks are built without a binding, and binding
-  them all would slow the suite for little gain).
-- Deferred: a dedicated not-found page, retry buttons, note pages.
-
-**Key examples:**
-
-1. A file was deleted → open its old URL → the page says it could not load;
-   no spinner.
-2. A folder URL whose folder is gone → the folder page shows the same
-   message.
-3. The sidebar shows `Chemistry` with 3 entries → a refresh fails → the 3
-   entries stay, plus "Could not load this folder's contents."
-4. The first load of the notebook root listing fails → the sidebar shows the
-   message, not an empty tree.
-
 <a id="story-4"></a>
 
 ### The notebook tree has one model in code
