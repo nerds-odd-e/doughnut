@@ -26,7 +26,7 @@ watch(
 )
 
 const noteRealmRef = computed(() =>
-  storageAccessor.value.storedApi().getNoteRealmRef(reactiveProps.noteId.value)
+  storageAccessor.value.refOfNoteRealm(reactiveProps.noteId.value)
 )
 
 const noteRealm = computed(() => noteRealmRef.value?.value)

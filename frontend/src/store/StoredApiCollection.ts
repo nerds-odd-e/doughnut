@@ -29,10 +29,6 @@ import {
 
 export type NoteTrashReferenceHandling = NoteTrashDto["referenceHandling"]
 
-export type NoteTrashOptions = {
-  referenceHandling: NoteTrashReferenceHandling
-}
-
 export type TitleRenameReferenceHandling = NonNullable<
   NoteUpdateTitleDto["referenceHandling"]
 >
@@ -40,10 +36,6 @@ export type TitleRenameReferenceHandling = NonNullable<
 /** The note's folder id, or null at the notebook root. */
 function containingFolderId(realm: NoteRealm) {
   return realmLeafFolder(realm)?.id ?? null
-}
-
-function noteReferenceHandlingBody(options: NoteTrashOptions): NoteTrashDto {
-  return { referenceHandling: options.referenceHandling }
 }
 
 export default class StoredApiCollection {
@@ -72,38 +64,29 @@ export default class StoredApiCollection {
     return realm
   }
 
-  private async loadNote(noteId: Donut.ID) {
-    const noteRealm = await loadNoteRequest(noteId)
-    return this.storage.refreshNoteRealm(noteRealm)
-  }
-
   /** Loads a note realm into storage (same as navigating to the note-id route). */
   async loadNoteRealm(noteId: Donut.ID): Promise<NoteRealm> {
-    return this.loadNote(noteId)
+    const noteRealm = await loadNoteRequest(noteId)
+    return this.storage.refreshNoteRealm(noteRealm)
   }
 
   getNoteRealmRefAndLoadWhenNeeded(noteId: Donut.ID) {
     const result = this.storage.refOfNoteRealm(noteId)
     if (!result.value && !this.storage.isNotePermanentlyRemoved(noteId)) {
-      this.loadNote(noteId)
+      this.loadNoteRealm(noteId)
     }
     return result
-  }
-
-  getNoteRealmRef(noteId: Donut.ID) {
-    return this.storage.refOfNoteRealm(noteId)
   }
 
   private async navigateToFocusedNote(router: Router, focus: NoteRealm) {
     refreshSidebarStructuralListings()
     await router.replace(noteShowLocation(focus.id))
-    return focus
   }
 
   /** Refresh storage, sidebar listings, and navigate to this note (replace route). */
   async focusNoteRealm(router: Router, noteRealm: NoteRealm) {
     const focus = this.storage.refreshNoteRealm(noteRealm)
-    return this.navigateToFocusedNote(router, focus)
+    await this.navigateToFocusedNote(router, focus)
   }
 
   async createRootNoteAtNotebook(
@@ -123,9 +106,9 @@ export default class StoredApiCollection {
     this.noteEditingHistory.createNote(focus.id)
     if (options?.skipNavigation) {
       refreshSidebarStructuralListings()
-      return focus
+    } else {
+      await this.navigateToFocusedNote(router, focus)
     }
-    return this.navigateToFocusedNote(router, focus)
   }
 
   private refreshNoteRealms(noteRealms: NoteRealm[]) {
@@ -144,9 +127,8 @@ export default class StoredApiCollection {
     notebookId: number
   } | null {
     const realm = this.storage.refOfNoteRealm(sourceId).value
-    if (!realm?.note) return null
+    if (!realm) return null
     const notebookId = realm.notebookRealm.notebook.id
-    if (notebookId == null) return null
     const folderId = containingFolderId(realm)
     return { folderId, notebookId }
   }
@@ -194,9 +176,8 @@ export default class StoredApiCollection {
   async completeContent(noteId: Donut.ID, value?: NoteContentCompletion) {
     if (!value || !value.content) return
 
-    let currentNote = this.storage.refOfNoteRealm(noteId).value?.note
-    if (!currentNote) {
-      currentNote = (await this.loadNote(noteId)).note
+    if (!this.storage.refOfNoteRealm(noteId).value) {
+      await this.loadNoteRealm(noteId)
     }
 
     await this.updateTextField(noteId, "edit content", value.content)
@@ -290,15 +271,13 @@ export default class StoredApiCollection {
       return
     }
     await router.push(noteShowLocation(noteRealm.id))
-    return noteRealm
   }
 
-  async trashNote(router: Router, noteId: Donut.ID, options: NoteTrashOptions) {
+  async trashNote(router: Router, noteId: Donut.ID, options: NoteTrashDto) {
     const cachedRealm = this.storage.refOfNoteRealm(noteId).value
     if (!cachedRealm) throw new Error("Cannot trash a note that is not loaded")
     const destination = await this.locationAfterRemoving(cachedRealm)
-    const body = noteReferenceHandlingBody(options)
-    const trashedRealm = await trashNoteRequest(noteId, body)
+    const trashedRealm = await trashNoteRequest(noteId, options)
 
     const originalFolderId = containingFolderId(cachedRealm)
     this.noteEditingHistory.trashNote(
@@ -309,7 +288,6 @@ export default class StoredApiCollection {
     await router.replace(destination)
     this.storage.refreshNoteRealm(trashedRealm)
     refreshSidebarStructuralListings()
-    return trashedRealm
   }
 
   /** Read before removal, so the note's position is found in the order the person saw. */
@@ -356,21 +334,14 @@ export default class StoredApiCollection {
     await router.replace(noteShowLocation(sourceRealm.id))
     this.storage.refreshNoteRealm(sourceRealm)
     refreshSidebarStructuralListings()
-    return sourceRealm
   }
 
-  async moveNoteToFolder(sourceId: Donut.ID, targetFolderId: Donut.ID) {
+  async moveNote(
+    sourceId: Donut.ID,
+    target: { folderId: Donut.ID } | { notebookId: number }
+  ) {
     const undoPlacement = this.placementUndoForNote(sourceId)
-    await this.placeNoteAt(sourceId, { folderId: targetFolderId })
-
-    if (undoPlacement) {
-      this.noteEditingHistory.moveNote(sourceId, undoPlacement)
-    }
-  }
-
-  async moveNoteToNotebookRoot(sourceId: Donut.ID, targetNotebookId: number) {
-    const undoPlacement = this.placementUndoForNote(sourceId)
-    await this.placeNoteAt(sourceId, { notebookId: targetNotebookId })
+    await this.placeNoteAt(sourceId, target)
 
     if (undoPlacement) {
       this.noteEditingHistory.moveNote(sourceId, undoPlacement)

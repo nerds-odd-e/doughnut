@@ -146,23 +146,23 @@ describe("storedApiCollection", () => {
   })
 
   describe("move note", () => {
-    it("refreshes sidebar structural listings after moveNoteToFolder", async () => {
+    it("refreshes sidebar structural listings after moving to a folder", async () => {
       mockSdkService(RelationController, "moveNoteToFolder", [note])
       storageAccessor.value.refreshNoteRealm(note)
       const before = sidebarStructuralRefreshKey.value
       const sa = storageAccessor.value.storedApi()
-      await sa.moveNoteToFolder(note.id, 99)
+      await sa.moveNote(note.id, { folderId: 99 })
       expect(sidebarStructuralRefreshKey.value).toBe(before + 1)
     })
 
-    it("refreshes sidebar structural listings after moveNoteToNotebookRoot", async () => {
+    it("refreshes sidebar structural listings after moving to a notebook root", async () => {
       mockSdkService(RelationController, "moveNoteToNotebookRootInNotebook", [
         note,
       ])
       storageAccessor.value.refreshNoteRealm(note)
       const before = sidebarStructuralRefreshKey.value
       const sa = storageAccessor.value.storedApi()
-      await sa.moveNoteToNotebookRoot(note.id, note.notebookRealm.notebook.id)
+      await sa.moveNote(note.id, { notebookId: note.notebookRealm.notebook.id })
       expect(sidebarStructuralRefreshKey.value).toBe(before + 1)
     })
   })

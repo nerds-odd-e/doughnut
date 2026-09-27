@@ -1,5 +1,5 @@
 import type { Router } from "vue-router"
-import type { NoteCreationDto, NoteRealm } from "@generated/donut-backend-api"
+import type { NoteCreationDto } from "@generated/donut-backend-api"
 import {
   applyParentRelationshipToCreateContent,
   type NoteCreationParentRelationship,
@@ -13,7 +13,7 @@ type NoteCreateApi = {
     options?: {
       folderId?: number
     }
-  ) => Promise<NoteRealm>
+  ) => Promise<void>
 }
 
 type ConfirmPopups = {

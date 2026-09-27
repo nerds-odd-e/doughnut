@@ -6,7 +6,7 @@ import {
 import usePopups from "@/components/commons/Popups/usePopups"
 import { teardownGlobalClientForTesting } from "@/managedApi/clientSetup"
 import { cleanup } from "@testing-library/vue"
-import { flushPromises } from "@vue/test-utils"
+import { config, flushPromises } from "@vue/test-utils"
 import {
   mockNotebookGetForNoteRealm,
   mockSdkService,
@@ -61,13 +61,18 @@ async function startTrash(choice: boolean | string) {
 }
 
 describe("note show autosave before trashing", () => {
+  const previousErrorHandler = config.global.config.errorHandler
+  const onError = vi.fn()
   beforeEach(() => {
+    onError.mockClear()
+    config.global.config.errorHandler = onError
     vi.useFakeTimers()
     installMockResizeObserver()
   })
 
   afterEach(() => {
     cleanup()
+    config.global.config.errorHandler = previousErrorHandler
     document.body.innerHTML = ""
     vi.useRealTimers()
     vi.restoreAllMocks()
@@ -144,6 +149,11 @@ describe("note show autosave before trashing", () => {
       "save-2-finish",
       "trash",
     ])
+    expect(onError).toHaveBeenCalledWith(
+      new Error("trash failed"),
+      expect.anything(),
+      "native event handler"
+    )
     expect(updateSpy).toHaveBeenNthCalledWith(1, {
       path: { note: relationRealm.id },
       body: { content: editedRelationship },

@@ -31,14 +31,13 @@ describe("storedApiCollection reduceRelationNoteToSourceProperty", () => {
     )
     const refreshKeyBefore = sidebarStructuralRefreshKey.value
 
-    const result = await storage
+    await storage
       .storedApi()
       .reduceRelationNoteToSourceProperty(router, relationRealm.id)
 
     expect(reduceSpy).toHaveBeenCalledWith({
       path: { relationNote: relationRealm.id },
     })
-    expect(result).toEqual(sourceRealm)
     expect(routerReplace).toHaveBeenCalledWith(noteShowLocation(sourceRealm.id))
     expect(relationRef.value).toBeUndefined()
     expect(storage.refOfNoteRealm(relationRealm.id).value).toBeFalsy()

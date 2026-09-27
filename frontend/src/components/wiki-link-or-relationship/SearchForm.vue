@@ -129,7 +129,7 @@ async function moveUnderFolder(targetFolderId: number) {
   }
   await storageAccessor.value
     .storedApi()
-    .moveNoteToFolder(note!.id, targetFolderId)
+    .moveNote(note!.id, { folderId: targetFolderId })
   emit("closeDialog")
 }
 
@@ -139,7 +139,7 @@ async function moveToNotebookRoot(targetNotebookId: number) {
   }
   await storageAccessor.value
     .storedApi()
-    .moveNoteToNotebookRoot(note!.id, targetNotebookId)
+    .moveNote(note!.id, { notebookId: targetNotebookId })
   emit("closeDialog")
 }
 </script>

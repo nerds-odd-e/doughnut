@@ -1,10 +1,8 @@
+import type { NoteTrashDto } from "@generated/donut-backend-api"
 import usePopups from "@/components/commons/Popups/usePopups"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
 import { runWithBlockingApiLoading } from "@/managedApi/clientSetup"
-import type {
-  NoteTrashOptions,
-  NoteTrashReferenceHandling,
-} from "@/store/StoredApiCollection"
+import type { NoteTrashReferenceHandling } from "@/store/StoredApiCollection"
 import { isRelationshipNote } from "@/utils/relationNoteReduceOnTrash"
 import { isNoteRealmInTrash } from "@/utils/folderTrash"
 import { quotedNoteLabel } from "@/utils/quotedNoteLabel"
@@ -24,7 +22,7 @@ const permanentDeleteWarning = (label: string) =>
 
 type TrashFlowChoice =
   | { action: "reduce" }
-  | { action: "trash"; options: NoteTrashOptions }
+  | { action: "trash"; options: NoteTrashDto }
 
 function loadingMessageFor(flowChoice: TrashFlowChoice): string {
   return flowChoice.action === "reduce"

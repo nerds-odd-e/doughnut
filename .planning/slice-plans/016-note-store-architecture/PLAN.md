@@ -107,8 +107,25 @@ branches. Keep field-error enrichment (title, creation). Keep
 ### 3. One move, one read, no leftovers in note commands
 
 Type: Structure
-Status: planned
+Status: done
 Proof: slice 3 row above.
+
+Accepted proof: `CURSOR_DEV=true nix develop -c pnpm frontend:test tests/store tests/wiki-link-or-relationship/SearchDialog.spec.ts tests/notes/TextContentWrapper.spec.ts tests/notes/NoteEditableContent tests/pages/NoteShowPage tests/components/notes/NoteTextContentUndo.spec.ts tests/notes/NoteNewForm tests/wiki-link-or-relationship/AddRelationship.spec.ts`
+passed 124 tests across 21 files; `CURSOR_DEV=true nix develop -c pnpm -C frontend exec vue-tsc --noEmit`
+passed. `CURSOR_DEV=true nix develop -c pnpm cy:run --spec e2e_test/features/note_topology/note_move.feature`
+passed the move-and-undo scenario. SearchDialog observes confirmed folder/root
+placement; store completion observes missing-note loading; page/editor tests
+observe loading and edits. NoteRealmLoader retains its explicit route-triggered
+load and reads the cache directly, avoiding duplicate requests. Only the cache
+absence guard remains in placement undo (required by its type). Refactor: no edits.
+
+CI repair included: run `36294751826`, attempt 1, frontend job `108551410141`
+failed at slice 2 on NoteShowPage.autosaveTrash's unhandled Vue warning. The
+same failure was found locally by slice 3 before notification; its existing
+implementation agent owned the test repair. The spec now observes the expected
+propagated error with a restored test-only Vue handler; no production catch.
+The final focused run includes the repaired case and passes. Nix startup and
+focused proof waits accounted separately from bounded implementation.
 
 Removes duplicate commands. Make these changes:
 - Replace `moveNoteToFolder` and `moveNoteToNotebookRoot` with one
@@ -211,6 +228,8 @@ count.
   above and bound to the execution checkout. Workflow selector verified.
 - Accepted execution-branch increment: `3821dbd9c79c7ab25e68cd1ff96aa44061d6544f`
   (slice 1); observer reused and registration confirmed by managed delivery.
+- Accepted execution-branch increment: `a08a318db1165bbfac47cbf9675c8619615dc833`
+  (slice 2); observer reused and registration confirmed by managed delivery.
 
 - Owner, 2026-09-27: delete the wiki-link re-save with nothing left behind: no
   replacement reload, no absence test, no historical note.
