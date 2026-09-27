@@ -88,7 +88,12 @@ filename, always as `Content-Disposition: attachment` with
 `application/octet-stream` and `nosniff`, so an SVG or HTML file never renders
 in Donut's origin. The download serves the stored object named by the row's
 pointer; [Git LFS attachment storage](./notebook-git-lfs.md#consequences) gives
-the rules for a missing object and an empty file. `.gitattributes`
+the rules for a missing object and an empty file. A picture file's page (PNG,
+JPEG, GIF or WebP by extension, ignoring case) also shows the picture below its
+size, scaled down to fit and never enlarged, from
+`/api/notebooks/{notebook}/attachments/{attachment}/picture`; that address
+serves pictures inline exactly as a note's `image:` does below and refuses any
+other type, including SVG (415). `.gitattributes`
 and nested `.keep` markers are not rows, so, like `.git`, they are not shown on
 the web.
 
