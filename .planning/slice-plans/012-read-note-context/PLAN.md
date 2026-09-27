@@ -141,10 +141,14 @@ brief → the learner can reveal the complete note context on demand.
 ### 5. Distinguish an accidental match from the reviewed note
 
 Type: Behavior
-Status: planned
+Status: done
 Proof: mounted accidental-match result names and links the matched note while
 the automatically opened reader belongs to the note under review; existing
 resolve-accidental-match interaction remains available.
+Accepted: proof only, no production change; the
+`AnsweredSpellingQuestionAccidentalMatch.spec.ts` test checks the matched link
+in the alert, `showNote` for the reviewed id only, reader content, and the
+resolve button. It failed when the reader was pointed at the matched note.
 
 Behavior: a spelling answer names a different accessible note → the result
 separately identifies that match and shows the reviewed note's context → the
