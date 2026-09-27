@@ -11,31 +11,49 @@ scope: medium
 
 ## Why This Matters
 
-For returning Donut users, a period of inactivity should not routinely require
-another trip through GitHub OAuth before they can access their notes and learning.
-The owner reports that production login currently checks OAuth repeatedly and
-frequently asks users to log in again after a while away. This is a reported
-experience, not an investigation of the current authentication implementation.
+For returning Donut users, a deploy, a period of inactivity, or closing the
+browser should not routinely require another trip through GitHub OAuth before
+they can access their notes and learning. Being signed out mid-recall or
+mid-edit also costs work: a save that meets a signed-out session asks the user
+to log in and lose the current changes.
 
 GitHub OAuth remains the only way to establish a production login. The desired
-change is continuity of an already authorized login on the user's browser.
+change is continuity of an already established login on the user's browser.
+
+## Diagnosis
+
+Refinement on 2026-09-28 found that the reported repeat login is lost session
+state, not GitHub re-checking authorization:
+
+- Production keeps HTTP sessions only in each backend instance's memory; no
+  shared session store is configured.
+- Every production deploy replaces both backend instances, so each release signs
+  out every browser user. Releases ran 15 times in the 8 days before refinement.
+  Autohealing an instance has the same effect.
+- Sessions expire after the default 30 minutes idle.
+- The session cookie has no lifetime, so closing the browser drops it.
+  Non-production profiles always remember the login, which is why development
+  and E2E runs never show the problem.
 
 ## Alternatives and Decision
 
-Doing nothing, or asking users to repeat the existing GitHub login whenever their
-session ends, retains the reported interruption. Extending the existing session
-lifetime may be a simpler way to achieve the outcome and should be considered
-during refinement; whether it suffices has not been established.
-
-The owner's proposed direction is a temporary credential or private authorization
-retained by the browser and validated by Donut. A valid credential lets the user
-return without going back to GitHub. This is a solution hypothesis, not a selected
-token format, storage mechanism, or authentication design.
+- A new browser credential or remember-me token (the original hypothesis) adds a
+  second login mechanism beside the session and still loses session-held state
+  on every deploy.
+- Reusing user tokens (the CLI and MCP bearer tokens) was rejected: they never
+  expire, are stored in plain text, and would tie browser login policy to
+  unrelated token uses.
+- **Decision (owner, 2026-09-28):** keep browser sessions in the existing MySQL
+  database so they survive deploys and are shared by all backend instances, with
+  a 30-day lifetime renewed by use and a session cookie that survives browser
+  restarts. Because a long-lived cookie raises the cost of cross-site request
+  forgery (production has CSRF protection disabled), the cookie must be `Secure`
+  and `SameSite=Lax`.
 
 ## Story Decomposition
 
 Effort bands: S = 30–60 minutes, M = 1–2 hours, L = 2–4 hours, including delivery.
-This seed captures one story and authorizes no implementation or executable plan.
+This seed captures one story.
 
 <a id="story-1"></a>
 
@@ -43,69 +61,68 @@ This seed captures one story and authorizes no implementation or executable plan
 
 **Identity:** SEED-040#story-1
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"not-refined","approach":"unselected"}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/002-remember-browser-login/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"62091daaf2d4923bb868ee4adbf27c4e9234e727d4ea2b038bc6cb83bf3ef207","plan":"d2d9f7aab4f05fa1773746211df07ae992e37bf4fbaeb779f9b67fe31f99ba4c"}}
 ```
 
 **Goal**
 
-Returning production users can resume using Donut after a period of inactivity
-without repeating GitHub OAuth while their browser's retained authorization is
-still valid, reducing interruption to note-taking and learning.
+A signed-in Donut user stays signed in on their browser across deploys, idle
+periods, and browser restarts until they log out or 30 days pass without using
+Donut, so note-taking and learning are not interrupted by repeated GitHub logins
+or lost edits.
 
 **Scope**
 
-- Keep GitHub OAuth as the sole way to establish a production login.
-- Retain temporary authorization on the user's browser after a successful login,
-  so Donut can validate it when the user returns and restore authenticated access
-  without another GitHub OAuth round trip.
-- Explicit logout ends that browser's retained authorization. Logging in again
-  requires GitHub OAuth.
-- If retained authorization is missing, no longer matches, or otherwise fails
-  validation, require GitHub OAuth again before granting authenticated access.
-- Consider sharing appropriate infrastructure with the user-token feature,
-  potentially through a temporary token. The owner raised this as speculation;
-  reuse and token design are not requirements or prerequisites for this story.
+- GitHub OAuth stays the only way to establish a production login.
+- A browser session lasts until 30 days after its last use; each use renews it.
+- The session survives backend deploys and restarts, and every backend instance
+  recognizes it.
+- The session survives closing and reopening the browser.
+- Explicit logout ends that browser's session. A later sign-in goes through
+  GitHub OAuth (GitHub may complete it without asking for credentials).
+- A missing, unknown, or expired session is treated as signed out.
+- **Constraint:** the session cookie is `Secure` and `SameSite=Lax`, because the
+  longer lifetime makes cross-site request forgery more costly while production
+  CSRF protection is disabled.
+- CLI and MCP bearer-token authentication is unchanged.
+
+**Deferred and excluded**
+
+- New credential formats, remember-me tokens, and any reuse of user tokens.
+- Session management UI: listing signed-in devices, signing out other devices,
+  or a "remember me" choice (sessions are always remembered).
+- Ending sessions when GitHub authorization is revoked.
+- Changing the confirm-and-lose-changes behavior when a save meets a signed-out
+  session.
+- User-token hardening (hashing, expiry, last-use tracking).
+- Enabling CSRF protection.
 
 **Key examples**
 
-- Successful GitHub login → user leaves Donut inactive for a while, then returns
-  with valid retained browser authorization → authenticated access resumes
-  without another trip to GitHub.
-- Signed-in user → explicit logout, then a later visit requiring login → the old
-  browser authorization does not sign them back in; GitHub OAuth is required.
-- Previously signed-in browser → retained authorization is missing or fails
-  validation on return → authenticated access requires GitHub OAuth again.
+- Signed in → Donut is redeployed (all backend instances replaced) → the next
+  page load or save works and the user is still signed in.
+- Signed in → browser closed and reopened the next day → still signed in, no
+  GitHub redirect.
+- Last used Donut 29 days ago → visit → still signed in, and the 30 days start
+  again. Last used 31 days ago → visit → signed out; logging in goes through
+  GitHub OAuth.
+- Signed in → explicit logout → a later visit on that browser is signed out.
+- A browser presents a session cookie Donut does not recognize → treated as
+  signed out.
+- The session cookie issued at sign-in is `Secure` and `SameSite=Lax`.
 
-- **For / why:** Returning production users avoid frequent login interruptions.
-- **Evaluation:** A returning user can access their authenticated Donut experience
-  without repeating GitHub OAuth while retained authorization is valid; logout
-  and invalid authorization still require a fresh GitHub login.
-- **Value / learning:** Establish whether temporary browser authorization can
-  provide useful login continuity, and whether existing session or user-token
-  infrastructure can support that outcome simply.
-- **Effort hypothesis:** M, low confidence pending inspection of existing session
-  behavior and agreement on credential lifetime and invalidation.
-- **Depends on:** Existing GitHub OAuth login; no new login provider or separate
-  user-token infrastructure story is required by this capture.
-- **Safe stopping point:** Login continuity works as one usable end-to-end
-  behavior, with explicit logout and validation failure handled together.
-
-## Ordering and Scope Reduction
-
-Queue this single story under the current user-experience and hardening direction.
-Keep token infrastructure reuse optional; it must not expand this story into a
-general token redesign. No additional stories or implementation slices are selected.
-
-## Open Decisions
-
-- How long should temporary browser authorization remain valid, and should
-  inactivity or continued use affect that lifetime? No duration or indefinite
-  login promise has been selected.
-- What existing session behavior causes the reported repeat login, and could a
-  smaller session-policy change deliver the desired continuity?
-- What events beyond explicit logout invalidate retained authorization?
-- Can the user-token feature share suitable infrastructure without coupling
-  browser login policy to unrelated token uses?
+- **For / why:** Returning production users avoid repeated login interruptions
+  and lost edits.
+- **Evaluation:** After release, the owner stays signed in across the next
+  production deploy and a browser restart; logout still signs out.
+- **Value / learning:** Removes a daily interruption with a standard shared
+  session store instead of a new login mechanism.
+- **Effort hypothesis:** M, medium confidence. Moving sessions to MySQL requires
+  session contents to be storable, which rules out today's session-scoped
+  controllers.
+- **Depends on:** Existing GitHub OAuth login and the production MySQL database.
+- **Safe stopping point:** Sessions persisted, long-lived, and cookie-hardened
+  together as one release.
 
 ## When to Surface
 
@@ -113,10 +130,10 @@ When selecting work to improve the returning-user login experience.
 
 ## Breadcrumbs
 
-- Owner request on 2026-09-28: capture browser-retained temporary authorization,
-  preserve GitHub OAuth, require it again after logout or validation mismatch,
-  and record possible infrastructure sharing with the user-token feature as an
-  idea to investigate.
-- Owner instruction: write directly on main and leave the changes uncommitted.
+- Owner request on 2026-09-28 captured browser-retained authorization; the same
+  day's refinement replaced that hypothesis with the decision above.
 - [Earlier browser-history login recovery story](SEED-014-reliable-login-with-browser-history.md):
   related login reliability work with a different outcome.
+- Ordering: sessions that survive deploys keep users on older frontend code
+  longer, which raises the value of
+  [the frontend update reminder](SEED-041-frontend-update-reminder.md).
