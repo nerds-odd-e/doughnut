@@ -297,3 +297,42 @@ misleading developers.
    with that path.
 3. Uploading `a.txt` as a note image → refused "Cannot upload a.txt: an
    image must be a png, jpg, jpeg, gif or webp file." (today "a picture").
+
+<a id="story-8"></a>
+
+### The name owner holds the folder-entry rule once
+
+**Identity:** SEED-050#story-8
+```json dough-story-state
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/026-one-folder-entry-rule/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"b84184e408cf7e095f34f94be26a8f7a10af6dfc67c96a79ca69008d25030a65","plan":"302229bbbfa75f7c286c305636ea4e7933723a3508e36b2efc812298a82a2c9f"}}
+```
+
+**Goal:** Correction of SEED-050#story-2 (provenance
+`aef1e27b77:.planning/slice-plans/021-relationship-notes-accepted-in-one-change/PLAN.md`,
+commits f8087d5845, c0a9d8fa0e, aaedc57987, d2fb2c7934, 06ff81b916 and
+aef1e27b77). Developers who next change folder naming find one rule for
+"enter the folder holding this name (ignoring case), else refuse a note or
+file holding it", used by both note creation and folder move/merge, and tests
+that assert only what the product does, so the rule is not copied a third
+time.
+
+**Scope:**
+
+- Required: `FolderSiblingNameValidation.mergeTargetOrRefuse` delegates its
+  merge branch to `folderToEnter` (which takes excluded folder ids); net fewer
+  lines. `AddRelationship.spec.ts` drops the spies and assertions that only
+  check removed folder calls are absent.
+  `NotebookGitNoteCreationFolderControllerTest` is back under the 250-line
+  file check.
+- Preserved: story 2's key examples and their tests; merge, merge refusal and
+  no-merge clash on folder move; every refusal message and error type.
+- Excluded: the trash path's private `FolderConstructionService.findOrCreateFolder`
+  (stays, as plan 021 decided); one composed folder-name validation
+  constraint across `FolderCreationRequest`, `FolderRenameRequest` and
+  `NoteCreationDTO`.
+
+**Plan:** [026-one-folder-entry-rule](../slice-plans/026-one-folder-entry-rule/PLAN.md)
+
+**Effort hypothesis:** S — high confidence.
+
+**Depends on:** SEED-050#story-2 (delivered on its story branch).

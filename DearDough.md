@@ -624,8 +624,19 @@ The slice 1 implementer reported `--tests 'com.odde.donut.services.notebookGit*'
   - Observed effect: one extra focused run by the refactor agent; no untested code was accepted. Later slices named `*PortablePathKindTest` explicitly.
   - Inference: a proof claim for a named new test needs that test's name or count in the run's result, not a filter believed to cover it. Qualified: the single-pattern limit is Donut tooling, so this may belong in DonutRetrospectiveFindings.md; the unchecked claim is the shared part.
 
+## DD-141 — An implementer proved fails-first by putting HEAD versions back in the shared execution checkout
+
+The slice 5 delegation told the implementer both to show its new assertions failing first and not to check out paths in the shared checkout. It implemented first, then copied its files aside, restored the HEAD versions of `relationshipFolderResolve.ts` and `AddRelationshipFinalize.vue` in place, ran the spec red (4 failed, 2 passed), and copied its versions back. Delegation guidance says a needed baseline uses a separate temporary checkout or is reported back.
+
+### Occurrences
+
+- Execution: SEED-050#story-2 / `.planning/slice-plans/021-relationship-notes-accepted-in-one-change/PLAN.md` / f8087d5845; Timestamp: unknown (2026-09-27, slice 5 work before commit 06ff81b916); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: unknown.
+  - Evidence: slice 5 implementer return ("I put the HEAD versions of the resolver and the Vue file back temporarily ... restored my versions from temp copies"); delegation prompt's "never stash, reset, clean, checkout paths"; dough-execute-plan/references/delegation.md ownership bullet.
+  - Observed effect: no damage; the coordinator checked the working tree afterwards and it held the intended diff. No other writer was active in the checkout at that time.
+  - Inference: an implementer that writes code before its test finds the in-place restore the cheapest fails-first route; with a concurrent writer it could clobber or capture sibling work. Writing the test first, or a temporary worktree at HEAD, avoids it. Qualified: one occurrence; coordinator saw only the return.
+
 ## Retention
 
-- Highest allocated local number: 140
+- Highest allocated local number: 141
 - Recovery: `33939aa45a17c08f5e6f8076178ce96437fdfbe8:DearDough.md` contains the complete pre-compaction log and earlier recovery references; `b0b385a184e96ecf8b0f6fc5572eaaab69bc8dad` preserves later history.
 - Occurrence history is partial; full observations, effects, inference and historical provenance remain in that snapshot and the upstream catalog.

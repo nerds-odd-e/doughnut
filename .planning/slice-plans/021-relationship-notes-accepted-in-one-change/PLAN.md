@@ -210,6 +210,18 @@ stays green with refusal messages unchanged.
 Change: one constant on `NotebookAttachment` for the 10 MiB new-payload
 limit, used by `PictureFile` and `NotebookGitAttachmentSizeAdmission`.
 
+## Execution complete
+
+Product advice: no backlog change. The correction SEED-050#story-8
+(plan 026, not queued) holds the folder-entry rule once on the name owner,
+drops the dialog spec's absence checks and brings the folder creation test
+under 250 lines. Consider later, as advice only: one composed folder-name
+constraint for `FolderCreationRequest`, `FolderRenameRequest` and
+`NoteCreationDTO.childFolderName`. For wrap-up: example 4's "next publish is
+not refused as drift" is inferred (relationship notes now share the ordinary
+path), not observed; `docs/notebook-git-attachments.md` "One set of names per
+folder" can gain a line on note creation with a child-folder name.
+
 ## Current decisions
 
 - The server stays relationship-agnostic: a generic child-folder name on note
