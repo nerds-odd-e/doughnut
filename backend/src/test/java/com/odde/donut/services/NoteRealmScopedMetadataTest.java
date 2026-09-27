@@ -41,10 +41,10 @@ class NoteRealmScopedMetadataTest extends SpringTestBase {
     NoteRealm realm = noteRealmService.build(inFolder, user);
 
     assertThat(realm.getAncestorFolders(), hasSize(2));
-    assertThat(realm.getAncestorFolders().get(0).getName(), equalTo("Outer"));
-    assertThat(realm.getAncestorFolders().get(1).getName(), equalTo("Inner"));
-    assertThat(realm.getAncestorFolders().get(0).getId(), equalTo(outer.getId()));
-    assertThat(realm.getAncestorFolders().get(1).getId(), equalTo(inner.getId()));
+    assertThat(realm.getAncestorFolders().get(0).name(), equalTo("Outer"));
+    assertThat(realm.getAncestorFolders().get(1).name(), equalTo("Inner"));
+    assertThat(realm.getAncestorFolders().get(0).id(), equalTo(outer.getId()));
+    assertThat(realm.getAncestorFolders().get(1).id(), equalTo(inner.getId()));
   }
 
   @Test

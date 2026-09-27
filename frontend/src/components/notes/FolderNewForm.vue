@@ -37,7 +37,7 @@
 </template>
 
 <script setup lang="ts">
-import type { Folder } from "@generated/donut-backend-api"
+import type { FolderTrailSegment } from "@generated/donut-backend-api"
 import { NotebookFolderController } from "@generated/donut-backend-api/sdk.gen"
 import { ref, watch } from "vue"
 import { useRouter } from "vue-router"
@@ -49,8 +49,8 @@ import FolderSelector from "./FolderSelector.vue"
 
 const props = defineProps<{
   notebookId: number
-  ancestorFolders: Folder[]
-  contextFolder: Folder | null
+  ancestorFolders: FolderTrailSegment[]
+  contextFolder: FolderTrailSegment | null
 }>()
 
 const emit = defineEmits<{
@@ -63,7 +63,7 @@ const name = ref("")
 const nameError = ref<string | undefined>(undefined)
 const processing = ref(false)
 
-const selectedParentFolder = ref<Folder | null>(null)
+const selectedParentFolder = ref<FolderTrailSegment | null>(null)
 
 watch(
   () => props.contextFolder,

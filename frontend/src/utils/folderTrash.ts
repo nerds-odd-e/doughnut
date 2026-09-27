@@ -1,5 +1,5 @@
 import type {
-  Folder,
+  FolderTrailSegment,
   FolderRealm,
   NoteRealm,
 } from "@generated/donut-backend-api"
@@ -13,8 +13,8 @@ const TRASH_ROOT_NAME = "_trash"
  * case-insensitive per ADR 0004.
  */
 export function isLocationInTrash(
-  ancestorFolders: Folder[],
-  currentFolder: Folder | undefined
+  ancestorFolders: FolderTrailSegment[],
+  currentFolder: FolderTrailSegment | undefined
 ): boolean {
   const root = ancestorFolders[0] ?? currentFolder
   return root?.name.toLowerCase() === TRASH_ROOT_NAME

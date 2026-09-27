@@ -48,7 +48,7 @@ class NotebookFolderPageControllerTest extends NotebookControllerTestBase {
 
     FolderRealm realm = folderController.getFolderPage(nb, nested);
     assertThat(realm.sidebar().getAncestorFolders(), hasSize(1));
-    assertThat(realm.sidebar().getAncestorFolders().get(0).getId(), equalTo(parent.getId()));
+    assertThat(realm.sidebar().getAncestorFolders().get(0).id(), equalTo(parent.getId()));
   }
 
   @Test

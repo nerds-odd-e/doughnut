@@ -1,4 +1,7 @@
-import type { Folder, FolderRealm } from "@generated/donut-backend-api"
+import type {
+  FolderTrailSegment,
+  FolderRealm,
+} from "@generated/donut-backend-api"
 import { NotebookFolderController } from "@generated/donut-backend-api/sdk.gen"
 import type { Ref } from "vue"
 import type { Router } from "vue-router"
@@ -16,7 +19,7 @@ export function isFolderNameConflict(
 
 export function dissolveParentLabelFromChain(
   movingFolderId: number,
-  chain: readonly Folder[]
+  chain: readonly FolderTrailSegment[]
 ): string {
   const idx = chain.findIndex((f) => f.id === movingFolderId)
   if (idx <= 0) return "notebook root"
@@ -67,7 +70,7 @@ export async function removeFolderOnPage(options: {
 export function buildFolderMoveBody(options: {
   isCrossNotebookMove: boolean
   destinationNotebookId: number | undefined
-  selectedParentFolder: Folder | null
+  selectedParentFolder: FolderTrailSegment | null
   merge: boolean
 }) {
   if (options.isCrossNotebookMove) {

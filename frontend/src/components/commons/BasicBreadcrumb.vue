@@ -28,12 +28,12 @@
 
 <script setup lang="ts">
 import type { PropType } from "vue"
-import type { Folder } from "@generated/donut-backend-api"
+import type { FolderTrailSegment } from "@generated/donut-backend-api"
 import { Folder as FolderIcon } from "@lucide/vue"
 
 const props = defineProps({
   folderSegments: {
-    type: Array as PropType<Folder[]>,
+    type: Array as PropType<FolderTrailSegment[]>,
     default: () => [],
   },
   /** When set, each folder segment links to that folder's container page. */

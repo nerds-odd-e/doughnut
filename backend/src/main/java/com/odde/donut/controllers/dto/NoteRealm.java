@@ -2,7 +2,6 @@ package com.odde.donut.controllers.dto;
 
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
-import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.Note;
 import jakarta.validation.constraints.NotNull;
 import java.util.List;
@@ -50,11 +49,11 @@ public class NoteRealm {
     sidebar.setNotebookRealm(notebookRealm);
   }
 
-  public List<Folder> getAncestorFolders() {
+  public List<FolderTrailSegment> getAncestorFolders() {
     return sidebar.getAncestorFolders();
   }
 
-  public void setAncestorFolders(List<Folder> ancestorFolders) {
+  public void setAncestorFolders(List<FolderTrailSegment> ancestorFolders) {
     sidebar.setAncestorFolders(ancestorFolders);
   }
 

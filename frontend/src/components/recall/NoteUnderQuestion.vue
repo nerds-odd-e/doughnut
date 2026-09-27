@@ -17,7 +17,10 @@
 
 <script setup lang="ts">
 import type { PropType } from "vue"
-import type { Folder, NoteTopology } from "@generated/donut-backend-api"
+import type {
+  FolderTrailSegment,
+  NoteTopology,
+} from "@generated/donut-backend-api"
 import Breadcrumb from "@/components/toolbars/Breadcrumb.vue"
 import NoteTitleWithLink from "@/components/notes/NoteTitleWithLink.vue"
 import FocusedPropertyIndicator from "./FocusedPropertyIndicator.vue"
@@ -28,7 +31,7 @@ defineProps({
     required: true,
   },
   ancestorFolders: {
-    type: Array as PropType<Folder[] | undefined>,
+    type: Array as PropType<FolderTrailSegment[] | undefined>,
     default: undefined,
   },
   breadcrumbNotebookId: {

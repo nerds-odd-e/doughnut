@@ -1,5 +1,5 @@
 import type {
-  Folder,
+  FolderTrailSegment,
   FolderRealm,
   Note,
   NoteRealm,
@@ -26,7 +26,7 @@ export function useNoteCreationToolbarContext(
     return renderTitleFromPattern(pattern)
   })
 
-  const parentFolderForCreation = computed((): Folder | null => {
+  const parentFolderForCreation = computed((): FolderTrailSegment | null => {
     const { activeNoteRealm, activeFolderRealm } = toValue(props)
     if (activeFolderRealm) return activeFolderRealm.folder
     return realmLeafFolder(activeNoteRealm) ?? null

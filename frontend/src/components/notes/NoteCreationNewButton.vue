@@ -15,7 +15,7 @@
 
 <script setup lang="ts">
 import type {
-  Folder,
+  FolderTrailSegment,
   FolderRealm,
   NoteRealm,
 } from "@generated/donut-backend-api"
@@ -29,7 +29,7 @@ const props = withDefaults(
     notebookId: number
     activeNoteRealm?: NoteRealm
     activeFolderRealm?: FolderRealm
-    breadcrumbFolders?: Folder[]
+    breadcrumbFolders?: FolderTrailSegment[]
   }>(),
   { breadcrumbFolders: () => [] }
 )

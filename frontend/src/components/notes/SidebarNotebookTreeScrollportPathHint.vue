@@ -34,14 +34,14 @@
 </template>
 
 <script setup lang="ts">
-import type { Folder } from "@generated/donut-backend-api"
+import type { FolderTrailSegment } from "@generated/donut-backend-api"
 import { ChevronUp } from "@lucide/vue"
 import { computed, onBeforeUnmount, ref, watch } from "vue"
 import { RouterLink } from "vue-router"
 import { folderIdsWithRowAboveScrollportTop } from "./sidebarActivePathRowsAboveScrollport"
 
 const props = defineProps<{
-  pathFolders: Folder[]
+  pathFolders: FolderTrailSegment[]
   notebookId: number
   scrollRoot: HTMLElement | null
 }>()

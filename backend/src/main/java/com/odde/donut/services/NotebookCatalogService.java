@@ -1,7 +1,7 @@
 package com.odde.donut.services;
 
 import com.odde.donut.controllers.dto.FolderRealm;
-import com.odde.donut.controllers.dto.FolderTrailSegments;
+import com.odde.donut.controllers.dto.FolderTrail;
 import com.odde.donut.controllers.dto.NotebookCatalogGroupItem;
 import com.odde.donut.controllers.dto.NotebookCatalogItem;
 import com.odde.donut.controllers.dto.NotebookCatalogNotebookItem;
@@ -71,7 +71,7 @@ public class NotebookCatalogService {
         loaded.getParentFolder() == null ? null : loaded.getParentFolder().getId();
     return FolderRealm.of(
         chrome,
-        FolderTrailSegments.ancestorsFromRootToParent(loaded),
+        FolderTrail.ancestorsFromRootToParent(loaded),
         noteRealmService.resolveScopedReadmeContentForFolder(loaded),
         loaded,
         parentFolderId,

@@ -1,7 +1,7 @@
 package com.odde.donut.services;
 
 import com.odde.donut.algorithms.PortablePath;
-import com.odde.donut.controllers.dto.FolderTrailSegments;
+import com.odde.donut.controllers.dto.FolderTrail;
 import com.odde.donut.entities.Note;
 import java.util.List;
 import java.util.Optional;
@@ -49,7 +49,7 @@ public class PortablePathAuthoring {
   }
 
   private static String lengthenedNotePortion(Note note) {
-    List<String> folders = FolderTrailSegments.namesFromRootToContainingFolder(note);
+    List<String> folders = FolderTrail.namesFromRootToContainingFolder(note);
     String title = note.getTitle();
     if (folders.isEmpty()) {
       return "/" + title;

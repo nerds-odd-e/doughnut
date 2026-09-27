@@ -1,6 +1,5 @@
 package com.odde.donut.controllers.dto;
 
-import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.Note;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
@@ -16,7 +15,7 @@ public class RecalledNote {
   @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
   private int notebookId;
 
-  private List<Folder> ancestorFolders;
+  private List<FolderTrailSegment> ancestorFolders;
 
   private String propertyKey;
 
@@ -27,7 +26,8 @@ public class RecalledNote {
     RecalledNote recalledNote = new RecalledNote();
     recalledNote.setNoteTopology(note.getNoteTopology());
     recalledNote.setNotebookId(note.getNotebook().getId());
-    recalledNote.setAncestorFolders(FolderTrailSegments.fromRootToContainingFolder(note));
+    recalledNote.setAncestorFolders(
+        FolderTrailSegment.of(FolderTrail.fromRootToContainingFolder(note)));
     String key = propertyKey;
     recalledNote.setPropertyKey(key == null || key.isEmpty() ? null : key);
     return recalledNote;

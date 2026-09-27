@@ -65,7 +65,7 @@
 </template>
 
 <script setup lang="ts">
-import type { Folder } from "@generated/donut-backend-api"
+import type { Folder, FolderTrailSegment } from "@generated/donut-backend-api"
 import { MoreHorizontal } from "@lucide/vue"
 import { computed, ref, toRef, watch } from "vue"
 import Modal from "@/components/commons/Modal.vue"
@@ -87,11 +87,11 @@ const props = defineProps<{
    * Folder used for quick-pick neighbours (organize = moving folder; new folder = default parent).
    * Null when the UI context is notebook root (no folder).
    */
-  contextFolder: Folder | null
+  contextFolder: FolderTrailSegment | null
   /** Root-to-leaf ancestor chain from NoteRealm (may include the moving folder). */
-  ancestorFolders: Folder[]
+  ancestorFolders: FolderTrailSegment[]
   /** `null` means notebook root. */
-  modelValue: Folder | null
+  modelValue: FolderTrailSegment | null
   /**
    * Display label for the current selection when its path cannot be resolved from the local index.
    * Used as a fallback for the synthetic dropdown option before the full folder index is loaded.
@@ -100,7 +100,7 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits<{
-  "update:modelValue": [value: Folder | null]
+  "update:modelValue": [value: FolderTrailSegment | null]
 }>()
 
 const searchOpen = ref(false)
@@ -183,7 +183,7 @@ function quickPathLabel(id: number): string {
   return folderPathLabel(id, quickPickById.value)
 }
 
-function resolveFolderById(id: number): Folder | null {
+function resolveFolderById(id: number): FolderTrailSegment | null {
   if (props.modelValue?.id === id) return props.modelValue
   const fromChain = props.ancestorFolders.find((f) => f.id === id)
   if (fromChain) return fromChain
