@@ -23,7 +23,7 @@ final review and cleanup before treating the related work as complete.
 
 **Identity:** SEED-048#story-1
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"unselected"}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/016-review-and-close-local-ai-notebook-effort/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"f8e83519f1852675712ac27a8c00727f9c982dad99998eb6c5b2023b04bc2e53","plan":"5d001dae0d044019166b972b5a38ce5aa1f98edd13f81e84174637db698a6daf"}}
 ```
 
 **Goal:** The product owner and maintainers can close the local AI notebook
