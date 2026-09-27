@@ -5,7 +5,7 @@ import {
 import type { Router } from "vue-router"
 import { noteShowLocation } from "@/routes/noteShowLocation"
 import { sidebarStructuralRefreshKey } from "@/components/notes/sidebarStructuralRefresh"
-import createNoteStorage from "@/store/createNoteStorage"
+import { resetNoteStore } from "@/store/noteStore"
 import makeMe from "donut-test-fixtures/makeMe"
 import { mockSdkService } from "@tests/helpers"
 import { describe, it, expect, vi, beforeEach } from "vitest"
@@ -17,7 +17,7 @@ describe("storedApiCollection reduceRelationNoteToSourceProperty", () => {
   beforeEach(() => vi.clearAllMocks())
 
   it("calls the reduce endpoint, removes the relationship note from cache, navigates to the source, refreshes the sidebar, and records no undo", async () => {
-    const storage = createNoteStorage()
+    const storage = resetNoteStore()
     const relationRealm = makeMe.aNoteRealm
       .title("Moon a part of Earth")
       .please()
@@ -31,9 +31,7 @@ describe("storedApiCollection reduceRelationNoteToSourceProperty", () => {
     )
     const refreshKeyBefore = sidebarStructuralRefreshKey.value
 
-    await storage
-      .storedApi()
-      .reduceRelationNoteToSourceProperty(router, relationRealm.id)
+    await storage.reduceRelationNoteToSourceProperty(router, relationRealm.id)
 
     expect(reduceSpy).toHaveBeenCalledWith({
       path: { relationNote: relationRealm.id },
@@ -49,8 +47,8 @@ describe("storedApiCollection reduceRelationNoteToSourceProperty", () => {
       "showNote",
       relationRealm
     )
-    storage.storedApi().getNoteRealmRefAndLoadWhenNeeded(relationRealm.id)
-    storage.storedApi().getNoteRealmRefAndLoadWhenNeeded(relationRealm.id)
+    storage.getNoteRealmRefAndLoadWhenNeeded(relationRealm.id)
+    storage.getNoteRealmRefAndLoadWhenNeeded(relationRealm.id)
     expect(showNoteSpy).toHaveBeenCalledTimes(0)
   })
 })

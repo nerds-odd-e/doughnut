@@ -4,7 +4,7 @@ import {
   NotebookFolderController,
 } from "@generated/donut-backend-api/sdk.gen"
 import NoteMoreOptionsForm from "@/components/notes/widgets/NoteMoreOptionsForm.vue"
-import { useStorageAccessor } from "@/composables/useStorageAccessor"
+import { useNoteStore } from "@/store/noteStore"
 import GlobalApiLoadingModal from "@tests/helpers/GlobalApiLoadingModal"
 import { teardownGlobalClientForTesting } from "@/managedApi/clientSetup"
 import usePopups from "@/components/commons/Popups/usePopups"
@@ -97,9 +97,7 @@ export function setupNoteMoreOptionsTrashFormTests() {
       .component(NoteMoreOptionsFormWithGlobalLoading)
       .withRouter(noteMoreOptionsTrashFormRouter)
       .withCleanStorage()
-    useStorageAccessor().value.refreshNoteRealm(
-      noteMoreOptionsTrashFormNoteRealm
-    )
+    useNoteStore().refreshNoteRealm(noteMoreOptionsTrashFormNoteRealm)
   })
 }
 
@@ -131,7 +129,7 @@ export function qualifyingRelationRealmForTrash(options?: {
 export function seedRelationRealmWithInboundReferences(
   relationRealm: NoteRealm
 ): void {
-  useStorageAccessor().value.refreshNoteRealm({
+  useNoteStore().refreshNoteRealm({
     ...relationRealm,
     references: [makeMe.aNoteRealm.please().note.noteTopology],
   })
@@ -154,10 +152,10 @@ export function relationNotesForPropChangeTest(options?: {
     relationId,
   })
   const relationNote = relationRealm.note
-  useStorageAccessor().value.refreshNoteRealm(
+  useNoteStore().refreshNoteRealm(
     makeMe.aNoteRealm.id(moonId).title("Moon").please()
   )
-  useStorageAccessor().value.refreshNoteRealm(relationRealm)
+  useNoteStore().refreshNoteRealm(relationRealm)
 
   return { moonId, relationId, moonNote, relationNote }
 }

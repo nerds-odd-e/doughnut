@@ -8,8 +8,8 @@ import type {
 import { noteShowLocation } from "@/routes/noteShowLocation"
 import { refreshSidebarStructuralListings } from "@/components/notes/sidebarStructuralRefresh"
 import type { Router } from "vue-router"
-import type NoteUndo from "./noteUndo"
-import type NoteStorage from "./NoteStorage"
+import NoteUndo from "./noteUndo"
+import { StorageImplementation } from "./NoteStorage"
 import {
   updateTextContentRequest,
   loadNoteRequest,
@@ -32,11 +32,15 @@ function containingFolderId(realm: NoteRealm) {
   return realm.ancestorFolders?.at(-1)?.id ?? null
 }
 
-export default class StoredApiCollection {
-  constructor(
-    private noteUndo: NoteUndo,
-    private storage: NoteStorage
-  ) {}
+class NoteStore extends StorageImplementation {
+  noteUndo = new NoteUndo(this)
+
+  peekUndo() {
+    return this.noteUndo.peekUndo() ?? null
+  }
+  discardUndo() {
+    this.noteUndo.discardUndo()
+  }
 
   private async updateTextContentWithoutUndo(
     noteId: Donut.ID,
@@ -44,7 +48,7 @@ export default class StoredApiCollection {
     content: string,
     titleReferenceHandling?: TitleRenameReferenceHandling
   ) {
-    const realm = this.storage.refreshNoteRealm(
+    const realm = this.refreshNoteRealm(
       await updateTextContentRequest(
         noteId,
         field,
@@ -58,15 +62,14 @@ export default class StoredApiCollection {
     return realm
   }
 
-  /** Loads a note realm into storage (same as navigating to the note-id route). */
   async loadNoteRealm(noteId: Donut.ID): Promise<NoteRealm> {
     const noteRealm = await loadNoteRequest(noteId)
-    return this.storage.refreshNoteRealm(noteRealm)
+    return this.refreshNoteRealm(noteRealm)
   }
 
   getNoteRealmRefAndLoadWhenNeeded(noteId: Donut.ID) {
-    const result = this.storage.refOfNoteRealm(noteId)
-    if (!result.value && !this.storage.isNotePermanentlyRemoved(noteId)) {
+    const result = this.refOfNoteRealm(noteId)
+    if (!result.value && !this.isNotePermanentlyRemoved(noteId)) {
       this.loadNoteRealm(noteId)
     }
     return result
@@ -77,9 +80,8 @@ export default class StoredApiCollection {
     await router.replace(noteShowLocation(focus.id))
   }
 
-  /** Refresh storage, sidebar listings, and navigate to this note (replace route). */
   async focusNoteRealm(router: Router, noteRealm: NoteRealm) {
-    const focus = this.storage.refreshNoteRealm(noteRealm)
+    const focus = this.refreshNoteRealm(noteRealm)
     await this.navigateToFocusedNote(router, focus)
   }
 
@@ -96,7 +98,7 @@ export default class StoredApiCollection {
     const body: NoteCreationDto =
       folderId != null ? { ...data, folderId } : { ...data }
     const nrwp = await createNoteRequest(notebookId, body)
-    const focus = this.storage.refreshNoteRealm(nrwp)
+    const focus = this.refreshNoteRealm(nrwp)
     this.noteUndo.createNote(focus.id)
     if (options?.skipNavigation) {
       refreshSidebarStructuralListings()
@@ -105,14 +107,8 @@ export default class StoredApiCollection {
     }
   }
 
-  private refreshNoteRealms(noteRealms: NoteRealm[]) {
-    noteRealms.forEach((n) => this.storage.refreshNoteRealm(n))
-    refreshSidebarStructuralListings()
-  }
-
-  /** This note no longer exists: drop its cached realm and forget its undo entries. */
   private noteNoLongerExists(noteId: Donut.ID) {
-    this.storage.permanentlyRemoveNoteRealm(noteId)
+    this.permanentlyRemoveNoteRealm(noteId)
     this.noteUndo.forgetNote(noteId)
   }
 
@@ -120,20 +116,20 @@ export default class StoredApiCollection {
     folderId: number | null
     notebookId: number
   } | null {
-    const realm = this.storage.refOfNoteRealm(sourceId).value
+    const realm = this.refOfNoteRealm(sourceId).value
     if (!realm) return null
     const notebookId = realm.notebookRealm.notebook.id
     const folderId = containingFolderId(realm)
     return { folderId, notebookId }
   }
 
-  /** Sends the one request that places a note at a folder or a notebook root. */
   private async placeNoteAt(
     sourceId: Donut.ID,
     target: { folderId: Donut.ID } | { notebookId: number }
   ): Promise<NoteRealm> {
     const noteRealms = await placeNoteRequest(sourceId, target)
-    this.refreshNoteRealms(noteRealms)
+    noteRealms.forEach((realm) => this.refreshNoteRealm(realm))
+    refreshSidebarStructuralListings()
     return noteRealms[0]!
   }
 
@@ -143,7 +139,7 @@ export default class StoredApiCollection {
     value: string,
     options?: { titleReferenceHandling?: TitleRenameReferenceHandling }
   ) {
-    const currentNote = this.storage.refOfNoteRealm(noteId).value?.note
+    const currentNote = this.refOfNoteRealm(noteId).value?.note
     if (currentNote) {
       const old =
         field === "edit title"
@@ -162,7 +158,6 @@ export default class StoredApiCollection {
     )
   }
 
-  /** Persists note content without recording undo (e.g. initial body after create). */
   async setNoteContentWithoutUndo(noteId: Donut.ID, content: string) {
     await this.updateTextContentWithoutUndo(noteId, "edit content", content)
   }
@@ -170,17 +165,16 @@ export default class StoredApiCollection {
   async completeContent(noteId: Donut.ID, value?: NoteContentCompletion) {
     if (!value || !value.content) return
 
-    if (!this.storage.refOfNoteRealm(noteId).value) {
+    if (!this.refOfNoteRealm(noteId).value) {
       await this.loadNoteRealm(noteId)
     }
 
     await this.updateTextField(noteId, "edit content", value.content)
   }
 
-  /** Uploads a picture as a file beside the note; the returned realm carries the note's new `image:`. */
   async uploadNoteImage(noteId: Donut.ID, file: File) {
     const noteRealm = await uploadNoteImageRequest(noteId, file)
-    this.storage.refreshNoteRealm(noteRealm)
+    this.refreshNoteRealm(noteRealm)
     refreshSidebarStructuralListings()
   }
 
@@ -189,7 +183,7 @@ export default class StoredApiCollection {
   }
 
   async trashNote(noteId: Donut.ID, options: NoteTrashDto) {
-    const cachedRealm = this.storage.refOfNoteRealm(noteId).value
+    const cachedRealm = this.refOfNoteRealm(noteId).value
     if (!cachedRealm) throw new Error("Cannot trash a note that is not loaded")
     const trashedRealm = await trashNoteRequest(noteId, options)
 
@@ -202,22 +196,14 @@ export default class StoredApiCollection {
     return trashedRealm
   }
 
-  /**
-   * Permanently deletes a note that is in trash, with everything it owns.
-   * Records no undo and drops the note from cache.
-   */
   async permanentlyDeleteNote(noteId: Donut.ID) {
-    const cachedRealm = this.storage.refOfNoteRealm(noteId).value
+    const cachedRealm = this.refOfNoteRealm(noteId).value
     if (!cachedRealm) throw new Error("Cannot delete a note that is not loaded")
     await permanentlyDeleteNoteRequest(noteId)
 
     this.noteNoLongerExists(noteId)
   }
 
-  /**
-   * Permanently reduces a relationship note into a property of its source.
-   * Records no undo and drops the relationship note from cache.
-   */
   async reduceRelationNoteToSourceProperty(
     router: Router,
     relationNoteId: Donut.ID
@@ -227,7 +213,7 @@ export default class StoredApiCollection {
 
     this.noteNoLongerExists(relationNoteId)
     await router.replace(noteShowLocation(sourceRealm.id))
-    this.storage.refreshNoteRealm(sourceRealm)
+    this.refreshNoteRealm(sourceRealm)
     refreshSidebarStructuralListings()
   }
 
@@ -243,3 +229,17 @@ export default class StoredApiCollection {
     }
   }
 }
+
+const noteStore = new NoteStore()
+
+export function useNoteStore() {
+  return noteStore
+}
+
+export function resetNoteStore() {
+  Object.assign(noteStore, new StorageImplementation())
+  noteStore.noteUndo = new NoteUndo(noteStore)
+  return noteStore
+}
+
+export type { NoteStore }

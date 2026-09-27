@@ -1,4 +1,4 @@
-import { useStorageAccessor } from "@/composables/useStorageAccessor"
+import { useNoteStore } from "@/store/noteStore"
 import SidebarToolbar from "@/components/notes/SidebarToolbar.vue"
 import helper from "@tests/helpers"
 import { notebookSidebarClosedPlugin } from "@tests/helpers/notebookSidebarTestProvide"
@@ -16,12 +16,12 @@ import {
 describe("Sidebar toolbar", () => {
   // biome-ignore lint/suspicious/noExplicitAny: wrapper for testing
   let wrapper: import("@vue/test-utils").VueWrapper<any>
-  const storageAccessor = useStorageAccessor()
+  const noteStore = useNoteStore()
   const fixtures = sidebarDefaultTreeFixtures
 
   beforeEach(() => {
     prepareSidebarDefaultMountContext({
-      storageAccessor,
+      noteStore,
       fixtures,
       vi,
     })

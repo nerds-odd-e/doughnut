@@ -86,17 +86,17 @@ import Sidebar from "@/components/notes/Sidebar.vue"
 import NoteCreationNewButton from "@/components/notes/NoteCreationNewButton.vue"
 import { noteChromeToolbarNavClass } from "@/components/notes/noteChromeToolbarNavClass"
 import { useStickyActiveNoteRealmForRoute } from "@/composables/useStickyActiveNoteRealmForRoute"
-import { useStorageAccessor } from "@/composables/useStorageAccessor"
+import { useNoteStore } from "@/store/noteStore"
 import { useNotebookSidebarDrawer } from "@/composables/useNotebookSidebarDrawer"
 import { useNotebookSidebarRouteRealms } from "@/composables/useNotebookSidebarRouteRealms"
 import { useRelocatedNoteCreationInMainColumn } from "@/composables/useRelocatedNoteCreationInMainColumn"
 import { useSidebarCreationReadonly } from "@/composables/useSidebarCreationReadonly"
 
 const route = useRoute()
-const storageAccessor = useStorageAccessor()
+const noteStore = useNoteStore()
 const currentUser = inject<Ref<User | undefined>>("currentUser")
 
-const activeNoteRealm = useStickyActiveNoteRealmForRoute(route, storageAccessor)
+const activeNoteRealm = useStickyActiveNoteRealmForRoute(route, noteStore)
 
 const {
   activeNotebookRealm,

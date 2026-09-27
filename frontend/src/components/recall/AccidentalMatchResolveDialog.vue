@@ -36,7 +36,7 @@ import { computed, inject, ref, type PropType, type Ref } from "vue"
 import type { NoteTopology, User } from "@generated/donut-backend-api"
 import AccidentalMatchResolveRow from "@/components/recall/AccidentalMatchResolveRow.vue"
 import MatchedNoteWikiLinkOrRelationshipOffer from "@/components/recall/MatchedNoteWikiLinkOrRelationshipOffer.vue"
-import { useStorageAccessor } from "@/composables/useStorageAccessor"
+import { useNoteStore } from "@/store/noteStore"
 import { appendOverlapWikiLinkToNoteContent } from "@/utils/appendOverlapWikiLinkToNoteContent"
 import { noteContentDeclaresOverlapToDestination } from "@/utils/overlapWikiLinkTokens"
 
@@ -58,21 +58,17 @@ type ResolveStep =
 const step = ref<ResolveStep>({ kind: "list" })
 
 const currentUser = inject<Ref<User | undefined>>("currentUser")
-const storageAccessor = useStorageAccessor()
+const noteStore = useNoteStore()
 
 const reviewedRealm = computed(
-  () =>
-    storageAccessor.value
-      .storedApi()
-      .getNoteRealmRefAndLoadWhenNeeded(props.reviewedNoteId).value
+  () => noteStore.getNoteRealmRefAndLoadWhenNeeded(props.reviewedNoteId).value
 )
 
 function canOfferMutatingAction(matchedNoteId: number): boolean {
   if (!currentUser?.value || !reviewedRealm.value) return false
   if (reviewedRealm.value.notebookRealm.readonly === true) return false
-  const matchedRealm = storageAccessor.value
-    .storedApi()
-    .getNoteRealmRefAndLoadWhenNeeded(matchedNoteId).value
+  const matchedRealm =
+    noteStore.getNoteRealmRefAndLoadWhenNeeded(matchedNoteId).value
   return !!matchedRealm
 }
 
@@ -96,9 +92,8 @@ function returnToList() {
 
 async function addAsOverlappedNote(matchedNoteId: number) {
   const reviewed = reviewedRealm.value
-  const matched = storageAccessor.value
-    .storedApi()
-    .getNoteRealmRefAndLoadWhenNeeded(matchedNoteId).value
+  const matched =
+    noteStore.getNoteRealmRefAndLoadWhenNeeded(matchedNoteId).value
   if (!reviewed?.note || !matched) return
 
   const composed = await appendOverlapWikiLinkToNoteContent(
@@ -109,8 +104,10 @@ async function addAsOverlappedNote(matchedNoteId: number) {
   )
   if (composed === null) return
 
-  await storageAccessor.value
-    .storedApi()
-    .updateTextField(props.reviewedNoteId, "edit content", composed)
+  await noteStore.updateTextField(
+    props.reviewedNoteId,
+    "edit content",
+    composed
+  )
 }
 </script>

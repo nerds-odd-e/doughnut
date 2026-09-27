@@ -1,7 +1,7 @@
 import { NoteController } from "@generated/donut-backend-api/sdk.gen"
 import type { Router } from "vue-router"
 import { teardownGlobalClientForTesting } from "@/managedApi/clientSetup"
-import createNoteStorage from "@/store/createNoteStorage"
+import { resetNoteStore } from "@/store/noteStore"
 import makeMe from "donut-test-fixtures/makeMe"
 import { mockSdkService, wrapSdkError } from "@tests/helpers"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
@@ -37,7 +37,7 @@ describe("storedApiCollection trash note", () => {
   ])(
     "records the original title/placement for undo ($originalFolderId)",
     async ({ realm, originalFolderId }) => {
-      const storage = createNoteStorage()
+      const storage = resetNoteStore()
       storage.refreshNoteRealm(realm)
       const trashedRealm = makeMe.aNoteRealm
         .id(realm.id)
@@ -45,7 +45,7 @@ describe("storedApiCollection trash note", () => {
         .please()
       const trashSpy = mockSdkService(NoteController, "trashNote", trashedRealm)
 
-      await storage.storedApi().trashNote(realm.id, {
+      await storage.trashNote(realm.id, {
         referenceHandling: "REMOVE_FROM_PROPERTIES",
       })
 
@@ -63,19 +63,19 @@ describe("storedApiCollection trash note", () => {
   )
 
   it("undoes trash atomically with the original title/placement and consumes history after success", async () => {
-    const storage = createNoteStorage()
+    const storage = resetNoteStore()
     const realm = makeMe.aNoteRealm
       .title("Original title")
       .inFolder(901, "Work")
       .please()
     storage.refreshNoteRealm(realm)
     mockSdkService(NoteController, "trashNote", realm)
-    await storage.storedApi().trashNote(realm.id, {
+    await storage.trashNote(realm.id, {
       referenceHandling: "LEAVE_DEAD_LINKS",
     })
     const undoSpy = mockSdkService(NoteController, "undoTrashNote", realm)
 
-    await storage.storedApi().undo(router)
+    await storage.undo(router)
 
     expect(undoSpy).toHaveBeenCalledWith({
       path: { note: realm.id },
@@ -85,20 +85,18 @@ describe("storedApiCollection trash note", () => {
   })
 
   it("retains trash history when atomic Undo fails", async () => {
-    const storage = createNoteStorage()
+    const storage = resetNoteStore()
     const realm = makeMe.aNoteRealm.title("Retry me").please()
     storage.refreshNoteRealm(realm)
     mockSdkService(NoteController, "trashNote", realm)
-    await storage.storedApi().trashNote(realm.id, {
+    await storage.trashNote(realm.id, {
       referenceHandling: "LEAVE_DEAD_LINKS",
     })
     mockSdkService(NoteController, "undoTrashNote", realm).mockResolvedValue(
       wrapSdkError("destination conflict")
     )
 
-    await expect(storage.storedApi().undo(router)).rejects.toThrow(
-      "destination conflict"
-    )
+    await expect(storage.undo(router)).rejects.toThrow("destination conflict")
     expect(storage.peekUndo()).toMatchObject({
       type: "trash note",
       noteId: realm.id,

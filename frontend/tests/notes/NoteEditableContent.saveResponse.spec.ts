@@ -1,10 +1,11 @@
+import { sidebarStructuralRefreshKey } from "@/components/notes/sidebarStructuralRefresh"
 import { vi, describe, it, expect, beforeEach, afterEach } from "vitest"
 import { flushPromises, type VueWrapper } from "@vue/test-utils"
 import type { ComponentPublicInstance } from "vue"
 import makeMe from "donut-test-fixtures/makeMe"
 import { mockSdkServiceWithImplementation } from "@tests/helpers"
 import { TextContentController } from "@generated/donut-backend-api/sdk.gen"
-import { useStorageAccessor } from "@/composables/useStorageAccessor"
+import { useNoteStore } from "@/store/noteStore"
 import {
   advanceNoteContentSaveDebounce,
   deferred,
@@ -50,9 +51,11 @@ describe("NoteEditableContent save response", () => {
 
     wrapper = await mountNoteEditableContent({ noteId, noteContent: "Before" })
 
+    const structuralRefreshKey = sidebarStructuralRefreshKey.value
     await setTextareaValue(wrapper, "After save")
     await blurTextarea(wrapper)
 
+    expect(sidebarStructuralRefreshKey.value).toBe(structuralRefreshKey)
     expect(wrapper.find(".dirty").exists()).toBe(false)
     expect(textareaEl(wrapper).value).toBe(wrapped)
 
@@ -82,7 +85,7 @@ describe("NoteEditableContent save response", () => {
             .id(noteId)
             .content(serverContent)
             .please()
-          useStorageAccessor().value.refreshNoteRealm(realm)
+          useNoteStore().refreshNoteRealm(realm)
           await wrapperRef.value.setProps({
             noteId,
             noteContent: serverContent,
@@ -94,7 +97,7 @@ describe("NoteEditableContent save response", () => {
         noteId,
         noteContent: "A",
       })
-      useStorageAccessor().value.refreshNoteRealm(
+      useNoteStore().refreshNoteRealm(
         makeMe.aNoteRealm.id(noteId).content("A").please()
       )
       return { wrapperRef, spy, gates, getServerContent: () => serverContent }

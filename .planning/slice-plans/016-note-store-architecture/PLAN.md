@@ -198,8 +198,24 @@ notebook page, or notebooks). `undo(router)` becomes
 ### 6. One entry point to the note store
 
 Type: Structure
-Status: planned
+Status: done
 Proof: slice 6 row above.
+
+Accepted proof: `CURSOR_DEV=true nix develop -c pnpm frontend:test` passed
+1,938 tests across 300 files. Final
+`CURSOR_DEV=true nix develop -c pnpm -C frontend exec vue-tsc --noEmit` passed.
+NoteEditableContent.saveResponse's ordinary-save example observes unchanged
+sidebarStructuralRefreshKey after typing/saving. Existing title-refresh and
+toolbar undo/discard examples remain green without the old reactive wrapper.
+Cache implementation unchanged; one reset helper preserves singleton identity.
+Refactor removed redundant aliases and store truthiness guard in refinement/removal
+flows; `CURSOR_DEV=true nix develop -c pnpm frontend:test tests/components/recall/NoteRefinement.layoutSelection.spec.ts tests/components/recall/NoteRefinement.loadingModal.spec.ts tests/notes/NoteMoreOptionsForm`
+passed the 11 refinement tests (removal alias failure then repaired), and
+`CURSOR_DEV=true nix develop -c pnpm frontend:test tests/notes/NoteMoreOptionsForm`
+passed 23 tests, followed by typecheck. Initial refactor verification caught a
+missed cleanup alias, corrected before those final passes. Store sizes after
+format: 45, 6, 228, 245, 167 lines. Existing oversized Wikidata composable is
+mechanically migrated and smaller; unrelated workflow restructuring excluded.
 
 Removes the hidden deep-reactive wrapper and the three-layer access path. Make
 these changes:
@@ -260,6 +276,8 @@ count.
   CI failure sequence 1 acknowledged after diagnosis and repair publication.
 - Accepted execution-branch increment: `743d9fcea5c0a5c79d7a5ab8e3144ce41f2cbda2`
   (slice 4); observer reused and registration confirmed by managed delivery.
+- Accepted execution-branch increment: `0914e0431a52b65e09d61b25328d2ad2d92c640e`
+  (slice 5); observer reused and registration confirmed by managed delivery.
 
 - Owner, 2026-09-27: delete the wiki-link re-save with nothing left behind: no
   replacement reload, no absence test, no historical note.

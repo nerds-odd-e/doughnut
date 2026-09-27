@@ -5,7 +5,7 @@ import {
 } from "@generated/donut-backend-api/sdk.gen"
 import { PEER_SORT_STORAGE_KEY } from "@/composables/usePeerSort"
 import { noteShowLocation } from "@/routes/noteShowLocation"
-import { useStorageAccessor } from "@/composables/useStorageAccessor"
+import { useNoteStore } from "@/store/noteStore"
 import usePopups from "@/components/commons/Popups/usePopups"
 import { flushPromises } from "@vue/test-utils"
 import { sidebarStructuralRefreshKey } from "@/components/notes/sidebarStructuralRefresh"
@@ -44,7 +44,7 @@ describe("where the person lands once a note is removed", () => {
     realm: NoteRealm,
     listing: FolderListing
   ) => {
-    const storage = useStorageAccessor().value
+    const storage = useNoteStore()
     const displayedRealm =
       remove === "delete"
         ? {
@@ -177,7 +177,7 @@ describe("where the person lands once a note is removed", () => {
   })
 
   it("shows busy loading while the listing is read, before sending trash", async () => {
-    useStorageAccessor().value.refreshNoteRealm(a)
+    useNoteStore().refreshNoteRealm(a)
     let resolveListing!: (listing: FolderListing) => void
     mockSdkServiceWithImplementation(
       NotebookFolderController,

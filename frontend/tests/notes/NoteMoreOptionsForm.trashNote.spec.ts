@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest"
 import makeMe from "donut-test-fixtures/makeMe"
 import { wrapSdkResponse } from "@tests/helpers"
 import usePopups from "@/components/commons/Popups/usePopups"
-import { useStorageAccessor } from "@/composables/useStorageAccessor"
+import { useNoteStore } from "@/store/noteStore"
 import {
   noteMoreOptionsTrashFormNote as note,
   noteMoreOptionsTrashFormNoteRealm,
@@ -48,7 +48,7 @@ describe("NoteMoreOptionsForm trash note", () => {
   it("asks how to handle references when the note has inbound references", async () => {
     const noteRealm = makeMe.aNoteRealm.please()
     trashNoteSpy.mockResolvedValue(wrapSdkResponse(noteRealm))
-    useStorageAccessor().value.refreshNoteRealm({
+    useNoteStore().refreshNoteRealm({
       ...noteRealm,
       references: [makeMe.aNoteRealm.please().note.noteTopology],
     })

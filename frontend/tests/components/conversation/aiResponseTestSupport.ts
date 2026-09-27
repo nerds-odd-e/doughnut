@@ -1,6 +1,6 @@
 import AiResponse from "@/components/conversations/AiResponse.vue"
-import createNoteStorage from "@/store/createNoteStorage"
-import { useStorageAccessor } from "@/composables/useStorageAccessor"
+import { resetNoteStore } from "@/store/noteStore"
+import { useNoteStore } from "@/store/noteStore"
 import makeMe from "donut-test-fixtures/makeMe"
 import helper, { mockShowNote } from "@tests/helpers"
 import {
@@ -146,14 +146,14 @@ export const submitMessageAndSimulateToolCall = async (
 }
 
 export function useAiResponseMount() {
-  const storageAccessor = useStorageAccessor()
+  const noteStore = useNoteStore()
   let note: Note
   let noteRealm: NoteRealm
   let conversation: Conversation
   let wrapper: ReturnType<typeof mountAiResponse>
 
   const beforeEachMount = (content?: string) => {
-    storageAccessor.value = createNoteStorage()
+    resetNoteStore()
     resetInstance()
     mockShowNote()
 
@@ -171,7 +171,7 @@ export function useAiResponseMount() {
   const refreshNoteContent = (content: string) => {
     noteRealm = makeMe.aNoteRealm.id(note.id).content(content).please()
     note = noteRealm.note
-    storageAccessor.value.refreshNoteRealm(noteRealm)
+    noteStore.refreshNoteRealm(noteRealm)
   }
 
   return {
@@ -187,7 +187,7 @@ export function useAiResponseMount() {
     get conversation() {
       return conversation
     },
-    storageAccessor,
+    noteStore,
     beforeEachMount,
     afterEachReset,
     refreshNoteContent,

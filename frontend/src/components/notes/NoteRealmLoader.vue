@@ -4,13 +4,13 @@
 
 <script setup lang="ts">
 import { computed, ref, toRefs, watch } from "vue"
-import { useStorageAccessor } from "@/composables/useStorageAccessor"
+import { useNoteStore } from "@/store/noteStore"
 
 const props = defineProps({
   noteId: { type: Number, required: true },
 })
 
-const storageAccessor = useStorageAccessor()
+const noteStore = useNoteStore()
 const reactiveProps = toRefs(props)
 
 const loadGeneration = ref(0)
@@ -19,14 +19,14 @@ watch(
   () => reactiveProps.noteId.value,
   async (noteId) => {
     const my = ++loadGeneration.value
-    await storageAccessor.value.storedApi().loadNoteRealm(noteId)
+    await noteStore.loadNoteRealm(noteId)
     if (my !== loadGeneration.value) return
   },
   { immediate: true }
 )
 
 const noteRealmRef = computed(() =>
-  storageAccessor.value.refOfNoteRealm(reactiveProps.noteId.value)
+  noteStore.refOfNoteRealm(reactiveProps.noteId.value)
 )
 
 const noteRealm = computed(() => noteRealmRef.value?.value)

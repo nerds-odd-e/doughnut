@@ -10,7 +10,7 @@ import helper, {
   mockSdkServiceWithImplementation,
 } from "@tests/helpers"
 import GlobalApiLoadingModal from "@tests/helpers/GlobalApiLoadingModal"
-import { useStorageAccessor } from "@/composables/useStorageAccessor"
+import { useNoteStore } from "@/store/noteStore"
 import { flushPromises, type VueWrapper } from "@vue/test-utils"
 import { defineComponent, type PropType } from "vue"
 import makeMe from "donut-test-fixtures/makeMe"
@@ -59,7 +59,7 @@ export function mountAddRelationshipFinalize({
   })
   const renderer = helper.component(Host).withCleanStorage()
   if (seedRealm) {
-    useStorageAccessor().value.refreshNoteRealm(seedRealm)
+    useNoteStore().refreshNoteRealm(seedRealm)
   }
   return renderer
     .withProps({ note, targetSearchResult, navigateOnSuccess })

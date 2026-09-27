@@ -5,7 +5,7 @@ import {
   setupGlobalClient,
   teardownGlobalClientForTesting,
 } from "@/managedApi/clientSetup"
-import createNoteStorage from "@/store/createNoteStorage"
+import { resetNoteStore } from "@/store/noteStore"
 import type { NoteRealm, NotebookRealm } from "@generated/donut-backend-api"
 import {
   NoteController,
@@ -26,9 +26,7 @@ import {
 export * from "./sidebarFolderListingSupport"
 export * from "./sidebarMountSupport"
 
-type NoteStorageAccessor = ReturnType<
-  typeof import("@/composables/useStorageAccessor")["useStorageAccessor"]
->
+type NoteStore = ReturnType<typeof import("@/store/noteStore")["useNoteStore"]>
 
 export function installSidebarDomMeasurementStubs(vi: {
   fn: typeof import("vitest").vi.fn
@@ -84,17 +82,16 @@ export function stubIntersectionObserver(isIntersecting: boolean): () => void {
 }
 
 export function seedDefaultTreeRealmsInStorage(
-  storageAccessor: NoteStorageAccessor,
+  noteStore: NoteStore,
   fixtures: SidebarTreeFixtures
 ) {
-  storageAccessor.value.refOfNoteRealm(fixtures.topNoteRealm.id).value =
+  noteStore.refOfNoteRealm(fixtures.topNoteRealm.id).value =
     fixtures.topNoteRealm
-  storageAccessor.value.refOfNoteRealm(fixtures.firstGeneration.id).value =
+  noteStore.refOfNoteRealm(fixtures.firstGeneration.id).value =
     fixtures.firstGeneration
-  storageAccessor.value.refOfNoteRealm(
-    fixtures.firstGenerationSibling.id
-  ).value = fixtures.firstGenerationSibling
-  storageAccessor.value.refOfNoteRealm(fixtures.secondGeneration.id).value =
+  noteStore.refOfNoteRealm(fixtures.firstGenerationSibling.id).value =
+    fixtures.firstGenerationSibling
+  noteStore.refOfNoteRealm(fixtures.secondGeneration.id).value =
     fixtures.secondGeneration
 }
 
@@ -133,7 +130,7 @@ export function resetPeerSortStorage() {
 }
 
 export function prepareSidebarDefaultMountContext(options: {
-  storageAccessor: NoteStorageAccessor
+  noteStore: NoteStore
   fixtures: SidebarTreeFixtures
   vi: {
     fn: typeof import("vitest").vi.fn
@@ -142,8 +139,8 @@ export function prepareSidebarDefaultMountContext(options: {
 }) {
   invalidateSidebarListingCache()
   resetPeerSortStorage()
-  options.storageAccessor.value = createNoteStorage()
-  seedDefaultTreeRealmsInStorage(options.storageAccessor, options.fixtures)
+  resetNoteStore()
+  seedDefaultTreeRealmsInStorage(options.noteStore, options.fixtures)
   setupDefaultSidebarSdkMocks(options.fixtures)
   installSidebarDomMeasurementStubs(options.vi)
 }

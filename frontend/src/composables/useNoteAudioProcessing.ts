@@ -6,7 +6,7 @@ import {
 } from "@generated/donut-backend-api/sdk.gen"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import type { AudioChunk } from "@/models/audio/audioProcessingScheduler"
-import { useStorageAccessor } from "@/composables/useStorageAccessor"
+import { useNoteStore } from "@/store/noteStore"
 
 const isPowerOfTwo = (n: number): boolean => n > 0 && (n & (n - 1)) === 0
 
@@ -27,7 +27,7 @@ export function useNoteAudioProcessing(
   processingInstructions: Ref<string>,
   errors: Ref<Record<string, string | undefined> | undefined>
 ) {
-  const storageAccessor = useStorageAccessor()
+  const noteStore = useNoteStore()
   const isProcessing = ref(false)
   const callCount = ref(0)
 
@@ -38,9 +38,11 @@ export function useNoteAudioProcessing(
       })
     )
     if (!error && suggestedTopic?.title) {
-      await storageAccessor.value
-        .storedApi()
-        .updateTextField(noteId, "edit title", suggestedTopic.title)
+      await noteStore.updateTextField(
+        noteId,
+        "edit title",
+        suggestedTopic.title
+      )
     }
   }
 
@@ -62,9 +64,7 @@ export function useNoteAudioProcessing(
         throw new Error("Failed to process audio")
       }
 
-      await storageAccessor.value
-        .storedApi()
-        .completeContent(note.id, response.completionFromAudio)
+      await noteStore.completeContent(note.id, response.completionFromAudio)
 
       callCount.value++
       if (shouldSuggestTitle(callCount.value)) {

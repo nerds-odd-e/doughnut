@@ -97,7 +97,7 @@ import AssimilationPanel from "@/components/recall/AssimilationPanel.vue"
 import NoteToolbarPanelShell from "./NoteToolbarPanelShell.vue"
 import { useNoteToolbarPanel } from "@/composables/useNoteToolbarPanel"
 import { useAssimilationView } from "@/composables/useAssimilationView"
-import { useStorageAccessor } from "@/composables/useStorageAccessor"
+import { useNoteStore } from "@/store/noteStore"
 import { useRoute, useRouter } from "vue-router"
 import NoteToolbarMoreOptions from "../widgets/NoteToolbarMoreOptions.vue"
 import { noteChromeToolbarNavClass } from "../noteChromeToolbarNavClass"
@@ -133,11 +133,11 @@ const showRelocatedNewNote = computed(
 
 const { isAudioOpen, isPanelOpen } = useNoteToolbarPanel()
 const { isOpenForNote } = useAssimilationView()
-const storageAccessor = useStorageAccessor()
+const noteStore = useNoteStore()
 const assimilationPanelKey = ref(0)
 
 const onAssimilationReloadNeeded = async () => {
-  await storageAccessor.value.storedApi().loadNoteRealm(props.note.id)
+  await noteStore.loadNoteRealm(props.note.id)
   assimilationPanelKey.value += 1
 }
 const toolbarNavRef = ref<HTMLElement | null>(null)

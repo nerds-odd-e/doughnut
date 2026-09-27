@@ -1,7 +1,7 @@
 import AnsweredQuestionComponent from "@/components/recall/AnsweredQuestionComponent.vue"
 import type { NoteRealm } from "@generated/donut-backend-api"
 import { AiController } from "@generated/donut-backend-api/sdk.gen"
-import { useStorageAccessor } from "@/composables/useStorageAccessor"
+import { useNoteStore } from "@/store/noteStore"
 import { flushPromises, type VueWrapper } from "@vue/test-utils"
 import helper, { mockSdkService, mockShowNote } from "@tests/helpers"
 import { teardownGlobalClientForTesting } from "@/managedApi/clientSetup"
@@ -68,7 +68,7 @@ describe("AnsweredQuestionComponent", () => {
         .component(AnsweredQuestionComponent)
         .withRouter()
         .withCleanStorage()
-      useStorageAccessor().value.refreshNoteRealm(noteRealm)
+      useNoteStore().refreshNoteRealm(noteRealm)
       return chain
         .withProps({ answeredQuestion, conversationButton: false })
         .mount({ attachTo: document.body })
@@ -102,7 +102,7 @@ describe("AnsweredQuestionComponent", () => {
         .component(AnsweredQuestionComponent)
         .withRouter()
         .withCleanStorage()
-      useStorageAccessor().value.refreshNoteRealm(noteRealm)
+      useNoteStore().refreshNoteRealm(noteRealm)
       wrapper = chain
         .withProps({ answeredQuestion, conversationButton: false })
         .mount({ attachTo: document.body })

@@ -2,9 +2,9 @@ import { locationAfterRemoving } from "@/components/notes/sidebarStructuralSort"
 import { refreshSidebarStructuralListings } from "@/components/notes/sidebarStructuralRefresh"
 import type { NoteTrashDto } from "@generated/donut-backend-api"
 import usePopups from "@/components/commons/Popups/usePopups"
-import { useStorageAccessor } from "@/composables/useStorageAccessor"
+import { useNoteStore } from "@/store/noteStore"
 import { runWithBlockingApiLoading } from "@/managedApi/clientSetup"
-import type { NoteTrashReferenceHandling } from "@/store/StoredApiCollection"
+import type { NoteTrashReferenceHandling } from "@/store/noteStore"
 import { isRelationshipNote } from "@/utils/relationNoteReduceOnTrash"
 import { isNoteRealmInTrash } from "@/utils/folderTrash"
 import { quotedNoteLabel } from "@/utils/quotedNoteLabel"
@@ -38,10 +38,9 @@ export function useNoteRemovalFlow(
 ) {
   const router = useRouter()
   const { popups } = usePopups()
-  const storageAccessor = useStorageAccessor()
+  const noteStore = useNoteStore()
 
-  const noteRealm = () =>
-    storageAccessor.value.refOfNoteRealm(toValue(noteId)).value
+  const noteRealm = () => noteStore.refOfNoteRealm(toValue(noteId)).value
 
   const noteHasReferences = () => (noteRealm()?.references?.length ?? 0) > 0
 
@@ -57,7 +56,7 @@ export function useNoteRemovalFlow(
       const realm = noteRealm()
       if (!realm) throw new Error("Cannot delete a note that is not loaded")
       const destination = await locationAfterRemoving(realm)
-      await storageAccessor.value.storedApi().permanentlyDeleteNote(id)
+      await noteStore.permanentlyDeleteNote(id)
       await router.replace(destination)
       refreshSidebarStructuralListings()
     }, PERMANENT_DELETE_LOADING_MESSAGE)
@@ -69,7 +68,7 @@ export function useNoteRemovalFlow(
       const title = toValue(noteTitle)
       const label = quotedNoteLabel(title, id)
       const noteIsRelationship = isRelationshipNote(
-        storageAccessor.value.refOfNoteRealm(id).value
+        noteStore.refOfNoteRealm(id).value
       )
       if (noteIsRelationship) {
         const choice = await popups.options(
@@ -130,25 +129,20 @@ export function useNoteRemovalFlow(
     await runWithBlockingApiLoading(async () => {
       const id = toValue(noteId)
       if (!(await closeAndFlushNoteContentMutations(id))) return
-      const storage = storageAccessor.value
       try {
         if (flowChoice.action === "reduce") {
-          await storage
-            .storedApi()
-            .reduceRelationNoteToSourceProperty(router, id)
+          await noteStore.reduceRelationNoteToSourceProperty(router, id)
         } else {
           const realm = noteRealm()
           if (!realm) throw new Error("Cannot trash a note that is not loaded")
           const destination = await locationAfterRemoving(realm)
-          const trashedRealm = await storage
-            .storedApi()
-            .trashNote(id, flowChoice.options)
+          const trashedRealm = await noteStore.trashNote(id, flowChoice.options)
           await router.replace(destination)
-          storage.refreshNoteRealm(trashedRealm)
+          noteStore.refreshNoteRealm(trashedRealm)
           refreshSidebarStructuralListings()
         }
       } finally {
-        if (storage.refOfNoteRealm(id).value) {
+        if (noteStore.refOfNoteRealm(id).value) {
           reopenNoteContentMutations(id)
         }
       }

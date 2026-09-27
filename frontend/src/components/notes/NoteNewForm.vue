@@ -76,7 +76,7 @@ import {
   calculateNewTitle,
   appendAliasToNoteContent,
 } from "@/utils/wikidataTitleActions"
-import { useStorageAccessor } from "@/composables/useStorageAccessor"
+import { useNoteStore } from "@/store/noteStore"
 import usePopups from "@/components/commons/Popups/usePopups"
 import {
   contentForNewNote,
@@ -87,7 +87,7 @@ import { initialNewNoteTitle } from "./noteNewFormTitle"
 import type { NoteCreationParentRelationship as ParentRelationship } from "@/utils/noteCreationParentRelationship"
 
 const router = useRouter()
-const storageAccessor = useStorageAccessor()
+const noteStore = useNoteStore()
 const { popups } = usePopups()
 
 const props = withDefaults(
@@ -184,7 +184,7 @@ const processForm = async () => {
   }
   try {
     await createNoteFromForm({
-      api: storageAccessor.value.storedApi(),
+      api: noteStore,
       router,
       popups,
       notebookId: props.notebookId,

@@ -5,16 +5,16 @@ import {
 } from "@generated/donut-backend-api/sdk.gen"
 import type { Router } from "vue-router"
 import { noteShowLocation } from "@/routes/noteShowLocation"
-import createNoteStorage from "@/store/createNoteStorage"
+import { resetNoteStore } from "@/store/noteStore"
 import makeMe from "donut-test-fixtures/makeMe"
 import { mockSdkService, wrapSdkError } from "@tests/helpers"
-import { useStorageAccessor } from "@/composables/useStorageAccessor"
+import { useNoteStore } from "@/store/noteStore"
 import { sidebarStructuralRefreshKey } from "@/components/notes/sidebarStructuralRefresh"
 import { describe, it, expect, vi, beforeEach } from "vitest"
 
 describe("storedApiCollection", () => {
   const note = makeMe.aNoteRealm.please()
-  const storageAccessor = useStorageAccessor()
+  const noteStore = useNoteStore()
   const routerReplace = vi.fn()
   const routerPush = vi.fn()
   const router = {
@@ -24,7 +24,7 @@ describe("storedApiCollection", () => {
 
   beforeEach(() => {
     vi.clearAllMocks()
-    storageAccessor.value = createNoteStorage()
+    resetNoteStore()
   })
 
   describe("undo create note", () => {
@@ -35,31 +35,29 @@ describe("storedApiCollection", () => {
     })
 
     it("should remove the created note from cache after undo", async () => {
-      storageAccessor.value = createNoteStorage()
-      const noteEditingHistory = storageAccessor.value.noteUndo
+      resetNoteStore()
+      const noteEditingHistory = noteStore.noteUndo
 
-      storageAccessor.value.refreshNoteRealm(note)
+      noteStore.refreshNoteRealm(note)
       noteEditingHistory.createNote(note.id)
 
-      expect(storageAccessor.value.refOfNoteRealm(note.id).value).toBeTruthy()
+      expect(noteStore.refOfNoteRealm(note.id).value).toBeTruthy()
 
-      const sa = storageAccessor.value.storedApi()
+      const sa = noteStore
       await sa.undo(router)
 
-      expect(
-        storageAccessor.value.refOfNoteRealm(note.id).value
-      ).toBeUndefined()
+      expect(noteStore.refOfNoteRealm(note.id).value).toBeUndefined()
     })
 
     it("should navigate to notebook page when trash returns no realms", async () => {
       mockSdkService(NoteController, "trashNote", note)
-      storageAccessor.value = createNoteStorage()
-      const noteEditingHistory = storageAccessor.value.noteUndo
+      resetNoteStore()
+      const noteEditingHistory = noteStore.noteUndo
 
-      storageAccessor.value.refreshNoteRealm(note)
+      noteStore.refreshNoteRealm(note)
       noteEditingHistory.createNote(note.id)
 
-      const sa = storageAccessor.value.storedApi()
+      const sa = noteStore
       await sa.undo(router)
 
       expect(routerPush).toHaveBeenCalledWith({
@@ -70,13 +68,13 @@ describe("storedApiCollection", () => {
 
     it("uses the recoverable trash path with LEAVE_DEAD_LINKS when undoing note creation", async () => {
       const trashSpy = mockSdkService(NoteController, "trashNote", note)
-      storageAccessor.value = createNoteStorage()
-      const noteEditingHistory = storageAccessor.value.noteUndo
+      resetNoteStore()
+      const noteEditingHistory = noteStore.noteUndo
 
-      storageAccessor.value.refreshNoteRealm(note)
+      noteStore.refreshNoteRealm(note)
       noteEditingHistory.createNote(note.id)
 
-      const sa = storageAccessor.value.storedApi()
+      const sa = noteStore
       await sa.undo(router)
 
       expect(trashSpy).toHaveBeenCalledWith({
@@ -99,17 +97,17 @@ describe("storedApiCollection", () => {
         note
       )
       showNoteSpy = mockSdkService(NoteController, "showNote", note)
-      noteRef = storageAccessor.value.refOfNoteRealm(note.id)
+      noteRef = noteStore.refOfNoteRealm(note.id)
     })
 
     it("does nothing when no completion value is provided", async () => {
-      const sa = storageAccessor.value.storedApi()
+      const sa = noteStore
       await sa.completeContent(note.id)
       expect(updateNoteContentSpy).not.toHaveBeenCalled()
     })
 
     it("updates note content with completion", async () => {
-      const sa = storageAccessor.value.storedApi()
+      const sa = noteStore
       noteRef.value = { ...note, note: { content: "Hello " } }
 
       await sa.completeContent(note.id, {
@@ -125,7 +123,7 @@ describe("storedApiCollection", () => {
     })
 
     it("loads note first if not in storage", async () => {
-      const sa = storageAccessor.value.storedApi()
+      const sa = noteStore
       noteRef.value = undefined
 
       await sa.completeContent(note.id, {
@@ -147,9 +145,9 @@ describe("storedApiCollection", () => {
   describe("move note", () => {
     it("refreshes sidebar structural listings after moving to a folder", async () => {
       mockSdkService(RelationController, "moveNoteToFolder", [note])
-      storageAccessor.value.refreshNoteRealm(note)
+      noteStore.refreshNoteRealm(note)
       const before = sidebarStructuralRefreshKey.value
-      const sa = storageAccessor.value.storedApi()
+      const sa = noteStore
       await sa.moveNote(note.id, { folderId: 99 })
       expect(sidebarStructuralRefreshKey.value).toBe(before + 1)
     })
@@ -158,9 +156,9 @@ describe("storedApiCollection", () => {
       mockSdkService(RelationController, "moveNoteToNotebookRootInNotebook", [
         note,
       ])
-      storageAccessor.value.refreshNoteRealm(note)
+      noteStore.refreshNoteRealm(note)
       const before = sidebarStructuralRefreshKey.value
-      const sa = storageAccessor.value.storedApi()
+      const sa = noteStore
       await sa.moveNote(note.id, { notebookId: note.notebookRealm.notebook.id })
       expect(sidebarStructuralRefreshKey.value).toBe(before + 1)
     })
@@ -172,7 +170,7 @@ describe("storedApiCollection", () => {
     it("refreshes sidebar structural listings after an accepted upload", async () => {
       mockSdkService(NoteController, "uploadNoteImage", note)
       const before = sidebarStructuralRefreshKey.value
-      const sa = storageAccessor.value.storedApi()
+      const sa = noteStore
       await sa.uploadNoteImage(note.id, file)
       expect(sidebarStructuralRefreshKey.value).toBe(before + 1)
     })
@@ -182,7 +180,7 @@ describe("storedApiCollection", () => {
         wrapSdkError("refused")
       )
       const before = sidebarStructuralRefreshKey.value
-      const sa = storageAccessor.value.storedApi()
+      const sa = noteStore
       await expect(sa.uploadNoteImage(note.id, file)).rejects.toThrow("refused")
       expect(sidebarStructuralRefreshKey.value).toBe(before)
     })
@@ -190,12 +188,12 @@ describe("storedApiCollection", () => {
 
   describe("focusNoteRealm", () => {
     it("refreshes cache, sidebar listings, and navigates to the note", async () => {
-      const sa = storageAccessor.value.storedApi()
+      const sa = noteStore
       const before = sidebarStructuralRefreshKey.value
 
       await sa.focusNoteRealm(router, note)
 
-      expect(storageAccessor.value.refOfNoteRealm(note.id).value).toBeTruthy()
+      expect(noteStore.refOfNoteRealm(note.id).value).toBeTruthy()
       expect(sidebarStructuralRefreshKey.value).toBe(before + 1)
       expect(routerReplace).toHaveBeenCalledWith(noteShowLocation(note.id))
     })

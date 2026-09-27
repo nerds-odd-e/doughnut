@@ -4,7 +4,7 @@ import makeMe from "donut-test-fixtures/makeMe"
 import { NoteController } from "@generated/donut-backend-api/sdk.gen"
 import { mockSdkService, testFolderStub } from "@tests/helpers"
 import usePopups from "@/components/commons/Popups/usePopups"
-import { useStorageAccessor } from "@/composables/useStorageAccessor"
+import { useNoteStore } from "@/store/noteStore"
 import {
   renderer,
   setupNoteMoreOptionsTrashFormTests,
@@ -28,7 +28,7 @@ const mountTrashedNote = async () => {
     "permanentlyDeleteNote",
     undefined
   )
-  useStorageAccessor().value.refreshNoteRealm(noteRealm)
+  useNoteStore().refreshNoteRealm(noteRealm)
   const wrapper = renderer.withProps({ note: noteRealm.note }).mount()
   await flushPromises()
   return { noteRealm, permanentlyDeleteSpy, wrapper }

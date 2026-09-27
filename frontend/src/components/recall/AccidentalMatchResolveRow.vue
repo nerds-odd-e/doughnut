@@ -44,7 +44,7 @@ import type { PropType } from "vue"
 import type { NoteTopology } from "@generated/donut-backend-api"
 import NoteTitleWithLink from "@/components/notes/NoteTitleWithLink.vue"
 import BreadcrumbWithCircle from "@/components/toolbars/BreadcrumbWithCircle.vue"
-import { useStorageAccessor } from "@/composables/useStorageAccessor"
+import { useNoteStore } from "@/store/noteStore"
 
 const addWikiLinkOrRelationshipLabel = "Add wiki link or relationship"
 
@@ -68,8 +68,8 @@ defineEmits<{
   (e: "addAsOverlapped"): void
 }>()
 
-const storageAccessor = useStorageAccessor()
-const matchRealmRef = storageAccessor.value
-  .storedApi()
-  .getNoteRealmRefAndLoadWhenNeeded(props.matched.id)
+const noteStore = useNoteStore()
+const matchRealmRef = noteStore.getNoteRealmRefAndLoadWhenNeeded(
+  props.matched.id
+)
 </script>

@@ -6,7 +6,7 @@ import {
 } from "@generated/donut-backend-api/sdk.gen"
 import MatchedNoteWikiLinkOrRelationshipOffer from "@/components/recall/MatchedNoteWikiLinkOrRelationshipOffer.vue"
 import RelationTypeSelect from "@/components/wiki-link-or-relationship/RelationTypeSelect.vue"
-import { useStorageAccessor } from "@/composables/useStorageAccessor"
+import { useNoteStore } from "@/store/noteStore"
 import helper, { mockSdkService, testFolderStub } from "@tests/helpers"
 import { teardownGlobalClientForTesting } from "@/managedApi/clientSetup"
 import makeMe from "donut-test-fixtures/makeMe"
@@ -49,8 +49,8 @@ function mountOffer(reviewedRealm: NoteRealm, matchedRealm: NoteRealm) {
   const chain = helper
     .component(MatchedNoteWikiLinkOrRelationshipOffer)
     .withCleanStorage()
-  useStorageAccessor().value.refreshNoteRealm(reviewedRealm)
-  useStorageAccessor().value.refreshNoteRealm(matchedRealm)
+  useNoteStore().refreshNoteRealm(reviewedRealm)
+  useNoteStore().refreshNoteRealm(matchedRealm)
   return chain
     .withProps({
       reviewedNoteId: reviewedRealm.id,

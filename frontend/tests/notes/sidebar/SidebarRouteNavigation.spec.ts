@@ -2,7 +2,7 @@ import { NotebookController } from "@generated/donut-backend-api/sdk.gen"
 import NotebookSidebarLayout from "@/layouts/NotebookSidebarLayout.vue"
 import { noteShowLocation } from "@/routes/noteShowLocation"
 import routes from "@/routes/routes"
-import { useStorageAccessor } from "@/composables/useStorageAccessor"
+import { useNoteStore } from "@/store/noteStore"
 import makeMe from "donut-test-fixtures/makeMe"
 import helper, { mockSdkServiceWithImplementation } from "@tests/helpers"
 import { flushPromises } from "@vue/test-utils"
@@ -21,12 +21,12 @@ import {
 describe("Sidebar route navigation: sticky realm during uncached note load", () => {
   // biome-ignore lint/suspicious/noExplicitAny: wrapper for testing
   let wrapper: import("@vue/test-utils").VueWrapper<any>
-  const storageAccessor = useStorageAccessor()
+  const noteStore = useNoteStore()
   const fixtures = sidebarDefaultTreeFixtures
   const notebookName = fixtures.topNoteRealm.notebookRealm.notebook.name
 
   beforeEach(() => {
-    prepareSidebarDefaultMountContext({ storageAccessor, fixtures, vi })
+    prepareSidebarDefaultMountContext({ noteStore, fixtures, vi })
   })
 
   afterEach(() => {

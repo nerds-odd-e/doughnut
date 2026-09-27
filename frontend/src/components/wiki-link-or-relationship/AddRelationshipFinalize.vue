@@ -38,7 +38,7 @@ import RadioButtons from "../form/RadioButtons.vue"
 import RelationTypeSelect from "./RelationTypeSelect.vue"
 import NoteTitleComponent from "../notes/core/NoteTitleComponent.vue"
 import { Reply } from "@lucide/vue"
-import { useStorageAccessor } from "@/composables/useStorageAccessor"
+import { useNoteStore } from "@/store/noteStore"
 import { runWithBlockingApiLoading } from "@/managedApi/clientSetup"
 import {
   formatRelationshipNoteMarkdown,
@@ -50,7 +50,7 @@ import {
   type RelationshipNotePlacement,
 } from "@/utils/relationshipFolderResolve"
 
-const storageAccessor = useStorageAccessor()
+const noteStore = useNoteStore()
 const router = useRouter()
 
 const props = defineProps({
@@ -103,7 +103,7 @@ const relationTypeSelected = async (relationType: string | undefined) => {
   if (relationType === undefined) return
 
   try {
-    const realm = storageAccessor.value.refOfNoteRealm(props.note.id).value
+    const realm = noteStore.refOfNoteRealm(props.note.id).value
     const notebookId = realm?.notebookRealm.notebook.id
     if (realm == null || notebookId == null) {
       throw new Error("Missing notebook for source note")
@@ -114,7 +114,7 @@ const relationTypeSelected = async (relationType: string | undefined) => {
     const sourceTitle = props.note.noteTopology.title
 
     await runWithBlockingApiLoading(async () => {
-      const api = storageAccessor.value.storedApi()
+      const api = noteStore
       const folderId = await resolveRelationshipNoteFolderId({
         notebookId,
         sourceFolderId,

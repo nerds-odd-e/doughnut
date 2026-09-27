@@ -1,7 +1,7 @@
-import { useStorageAccessor } from "@/composables/useStorageAccessor"
+import { useNoteStore } from "@/store/noteStore"
 import type { NoteRealm } from "@generated/donut-backend-api"
 import type NoteUndo from "@/store/noteUndo"
-import createNoteStorage from "@/store/createNoteStorage"
+import { resetNoteStore } from "@/store/noteStore"
 import makeMe from "donut-test-fixtures/makeMe"
 import helper from "@tests/helpers"
 import { flushPromises } from "@vue/test-utils"
@@ -15,10 +15,8 @@ export let noteEditingHistory: NoteUndo
 export function setupNoteUndoButtonTests() {
   beforeEach(() => {
     vi.clearAllMocks()
-    const storageAccessor = useStorageAccessor()
-    const storage = createNoteStorage()
+    const storage = resetNoteStore()
     noteEditingHistory = storage.noteUndo
-    storageAccessor.value = storage
   })
 }
 
@@ -31,9 +29,9 @@ export function renderNoteUndoButton() {
 }
 
 export function refreshNoteRealms(...noteRealms: NoteRealm[]) {
-  const storageAccessor = useStorageAccessor()
+  const noteStore = useNoteStore()
   for (const noteRealm of noteRealms) {
-    storageAccessor.value.refreshNoteRealm(noteRealm)
+    noteStore.refreshNoteRealm(noteRealm)
   }
 }
 

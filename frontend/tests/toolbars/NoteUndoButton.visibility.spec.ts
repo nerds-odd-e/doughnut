@@ -1,5 +1,5 @@
 import { NoteController } from "@generated/donut-backend-api/sdk.gen"
-import { useStorageAccessor } from "@/composables/useStorageAccessor"
+import { useNoteStore } from "@/store/noteStore"
 import { mockSdkService } from "@tests/helpers"
 import makeMe from "donut-test-fixtures/makeMe"
 import { describe, it, expect, vi } from "vitest"
@@ -66,7 +66,7 @@ describe("NoteUndoButton visibility", () => {
       )
       mockSdkService(NoteController, "trashNote", noteRealm1)
       mockSdkService(NoteController, "permanentlyDeleteNote", undefined)
-      const storedApi = useStorageAccessor().value.storedApi()
+      const storedApi = useNoteStore()
 
       await storedApi.trashNote(noteRealm1.id, {
         referenceHandling: "LEAVE_DEAD_LINKS",
@@ -81,7 +81,7 @@ describe("NoteUndoButton visibility", () => {
 
     it("is absent when the only undo entry belonged to the deleted note", async () => {
       const noteRealm = makeMe.aNoteRealm.please()
-      useStorageAccessor().value.refreshNoteRealm(noteRealm)
+      useNoteStore().refreshNoteRealm(noteRealm)
       noteEditingHistory.addEditingToUndoHistory(
         noteRealm.id,
         "edit content",
@@ -89,7 +89,7 @@ describe("NoteUndoButton visibility", () => {
       )
       mockSdkService(NoteController, "trashNote", noteRealm)
       mockSdkService(NoteController, "permanentlyDeleteNote", undefined)
-      const storedApi = useStorageAccessor().value.storedApi()
+      const storedApi = useNoteStore()
 
       await storedApi.trashNote(noteRealm.id, {
         referenceHandling: "LEAVE_DEAD_LINKS",
