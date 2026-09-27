@@ -68,10 +68,14 @@ delivery gates; those are not separate product slices.
 ### 1. Read note title, properties, and body in a task
 
 Type: Behavior
-Status: planned
+Status: done
 Proof: mounted reader with `makeMe.aNoteRealm` including multiple properties
 and body shows all of them, a named **Open full note** link, and no editing
 toolbar or controls. Existing note-page render remains green.
+Accepted: `NoteContextReader` (NoteRealmLoader + BreadcrumbWithCircle +
+read-only NoteTextContent + `noteShowLocation` link);
+`tests/notes/NoteContextReader.spec.ts` plus `tests/notes/NoteShow.spec.ts`
+pass; `vue-tsc --noEmit` exit 0.
 
 Behavior: a task identifies a readable note → its note context loads → the
 learner sees the title, notebook location, complete supported properties, and
@@ -221,3 +225,10 @@ sidebar, and conversation slot.
   property links remain navigable via ADR 0005 named routes.
 - The sketches are illustrative; durable behavior is stated in the story and
   proof table. They are not repository assets.
+
+## Execution
+
+- Mode: Story Branch; worktree `.claude/worktrees/story-read-note-context`,
+  branch `story/read-note-context`, agent Maki-chan.
+- Claim published on `origin/main`: `ff598af05b`.
+- Increments publish to `origin/story/read-note-context`.
