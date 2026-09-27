@@ -165,7 +165,11 @@ attachments).
 ### 5. The Readme role comes from the same owner
 
 Type: Structure
-Status: planned
+Status: done
+Accepted proof: `*NotebookGit*` 465 pass (includes the named Readme tests);
+`PortablePathKindTest` 25 pass (`tellsTheReadmeRoleOfAMarkdownPath`). `PortablePathKind.markdownRole`
+replaced the stored `DocumentRole`; `ChangedDocument.isReadme()` reads it. Remaining
+`README.md`/`.keep` literals outside the classifier only build paths or messages.
 Proof: existing Readme tests stay green
 (`NotebookGitProposalInitialNotebookReadmeControllerTest`,
 `NotebookGitProposalFolderReadmeEditControllerTest`,

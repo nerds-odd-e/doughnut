@@ -2,7 +2,6 @@ package com.odde.donut.services.notebookGit;
 
 import static com.odde.donut.services.notebookGit.NotebookGitProposalTreeShape.ChangeKind;
 import static com.odde.donut.services.notebookGit.NotebookGitProposalTreeShape.ChangedDocument;
-import static com.odde.donut.services.notebookGit.NotebookGitProposalTreeShape.DocumentRole;
 import static com.odde.donut.services.notebookGit.NotebookGitProposalTreeShape.InspectedRegularFile;
 import static com.odde.donut.services.notebookGit.NotebookGitProposalTreeShape.unsupportedTreeShape;
 
@@ -18,7 +17,7 @@ import org.eclipse.jgit.treewalk.TreeWalk;
 
 /**
  * Two-tree walk of safe regular files between commits, plus classification of changed documents by
- * Git operation and container/concept role.
+ * Git operation.
  */
 final class NotebookGitProposalTreeInspection {
 
@@ -51,7 +50,7 @@ final class NotebookGitProposalTreeInspection {
       if (kind == null) {
         continue;
       }
-      documents.add(new ChangedDocument(file, kind, documentRole(file.path())));
+      documents.add(new ChangedDocument(file, kind));
     }
     return documents;
   }
@@ -108,10 +107,6 @@ final class NotebookGitProposalTreeInspection {
     return null;
   }
 
-  private static DocumentRole documentRole(String path) {
-    return "README.md".equals(basename(path)) ? DocumentRole.CONTAINER : DocumentRole.CONCEPT;
-  }
-
   private static void assertPathIsSafe(String path) {
     if (path.isEmpty() || path.startsWith("/")) {
       throw unsupportedTreeShape("path \"" + path + "\" is unsafe");
@@ -121,10 +116,5 @@ final class NotebookGitProposalTreeInspection {
         throw unsupportedTreeShape("path \"" + path + "\" is unsafe");
       }
     }
-  }
-
-  private static String basename(String path) {
-    int lastSlash = path.lastIndexOf('/');
-    return lastSlash < 0 ? path : path.substring(lastSlash + 1);
   }
 }

@@ -87,7 +87,8 @@ class NotebookGitProposalFolderMaterialization {
       List<String> documentPaths,
       NotebookGitProposalImporter.ImportedProposal proposal) {
     for (String documentPath : documentPaths) {
-      if (!documentPath.endsWith("/README.md")) {
+      if (PortablePathKind.markdownRole(documentPath)
+          != PortablePathKind.MarkdownRole.FOLDER_README) {
         continue;
       }
       Folder folder = folders.get(documentPath.substring(0, documentPath.lastIndexOf('/')));

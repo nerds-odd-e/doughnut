@@ -17,6 +17,15 @@ public enum PortablePathKind {
   ATTACHMENT,
   METADATA;
 
+  /** Which document a Markdown path is: a notebook README, a folder README or a note. */
+  public enum MarkdownRole {
+    NOTEBOOK_README,
+    FOLDER_README,
+    NOTE
+  }
+
+  private static final String README = "README.md";
+
   private static final ObjectId EMPTY_BLOB =
       new ObjectInserter.Formatter().idFor(Constants.OBJ_BLOB, new byte[0]);
 
@@ -31,6 +40,13 @@ public enum PortablePathKind {
       return METADATA;
     }
     return ATTACHMENT;
+  }
+
+  static MarkdownRole markdownRole(String path) {
+    if (path.equals(README)) {
+      return MarkdownRole.NOTEBOOK_README;
+    }
+    return path.endsWith("/" + README) ? MarkdownRole.FOLDER_README : MarkdownRole.NOTE;
   }
 
   /** A {@code .md} extension in another letter case, which a publish may not add or change. */

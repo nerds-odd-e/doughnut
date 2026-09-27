@@ -255,9 +255,7 @@ final class NotebookGitProposalFolderShape {
   }
 
   private static boolean isReadme(String path) {
-    int lastSlash = path.lastIndexOf('/');
-    String basename = lastSlash < 0 ? path : path.substring(lastSlash + 1);
-    return "README.md".equals(basename);
+    return PortablePathKind.markdownRole(path) != PortablePathKind.MarkdownRole.NOTE;
   }
 
   private static String prefix(String readmePath) {

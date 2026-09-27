@@ -47,4 +47,17 @@ class PortablePathKindTest {
   void recognisesAMarkdownExtensionInAnotherLetterCase(String path, boolean miscased) {
     assertThat(PortablePathKind.hasMiscasedMarkdownExtension(path), is(miscased));
   }
+
+  @ParameterizedTest
+  @CsvSource({
+    "README.md, NOTEBOOK_README",
+    "Folder/README.md, FOLDER_README",
+    "Folder/Sub/README.md, FOLDER_README",
+    "Note.md, NOTE",
+    "Folder/readme.md, NOTE",
+    "Folder/NOT-README.md, NOTE",
+  })
+  void tellsTheReadmeRoleOfAMarkdownPath(String path, PortablePathKind.MarkdownRole role) {
+    assertThat(PortablePathKind.markdownRole(path), is(role));
+  }
 }
