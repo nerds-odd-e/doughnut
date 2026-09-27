@@ -83,7 +83,7 @@ folder fetcher's defensive notebook check and `FolderPage.vue`'s duplicate
 ### 2. A failed sidebar listing keeps what it showed and says it could not load
 
 Type: Behavior
-Status: planned
+Status: done
 Proof: a new case in `SidebarFolderListingReload.spec.ts`: the first listing
 succeeds, then `refreshSidebarStructuralListings()` fires with the listing
 mock returning an error → the earlier rows stay, "Could not load this

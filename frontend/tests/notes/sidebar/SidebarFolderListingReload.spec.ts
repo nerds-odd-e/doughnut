@@ -1,4 +1,5 @@
 import { NotebookFolderController } from "@generated/donut-backend-api/sdk.gen"
+import { refreshSidebarStructuralListings } from "@/components/notes/sidebarStructuralRefresh"
 import { useNoteStore } from "@/store/noteStore"
 import helper, { mockSdkServiceWithImplementation } from "@tests/helpers"
 import { flushPromises } from "@vue/test-utils"
@@ -74,5 +75,61 @@ describe("Sidebar folder listing reload", () => {
         fixtures.topNoteRealm.note.noteTopology.title
       )?.exists()
     ).toBe(true)
+  })
+
+  it("keeps earlier rows and shows an inline error when listing refresh fails", async () => {
+    await withTrackingGlobalApiClient(async (apiStatus) => {
+      let shouldFail = false
+      mockSdkServiceWithImplementation(
+        NotebookFolderController,
+        "listNotebookFolderListing",
+        (options) => {
+          if (shouldFail) throw new Error("Network error")
+          return folderListingForQueryParent(
+            options,
+            fixtures.defaultTreeFolderListings
+          )
+        }
+      )
+      wrapper = mountSidebar(helper, fixtures.firstGeneration)
+      await flushPromises()
+
+      expect(
+        findSidebarItem(
+          wrapper,
+          fixtures.topNoteRealm.note.noteTopology.title
+        )?.exists()
+      ).toBe(true)
+      expect(wrapper.text()).not.toContain(
+        "Could not load this folder's contents."
+      )
+
+      shouldFail = true
+      refreshSidebarStructuralListings()
+      await flushPromises()
+
+      expect(
+        findSidebarItem(
+          wrapper,
+          fixtures.topNoteRealm.note.noteTopology.title
+        )?.exists()
+      ).toBe(true)
+      expect(wrapper.text()).toContain("Could not load this folder's contents.")
+      expect(apiStatus.states).toHaveLength(0)
+    })
+  })
+
+  it("shows an inline message when the first load of a folder listing fails", async () => {
+    mockSdkServiceWithImplementation(
+      NotebookFolderController,
+      "listNotebookFolderListing",
+      () => {
+        throw new Error("Network error")
+      }
+    )
+    wrapper = mountSidebar(helper, fixtures.firstGeneration)
+    await flushPromises()
+
+    expect(wrapper.text()).toContain("Could not load this folder's contents.")
   })
 })

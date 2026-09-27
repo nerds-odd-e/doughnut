@@ -32,6 +32,9 @@
       />
     </template>
   </ul>
+  <p v-if="loadFailed" class="text-error text-sm">
+    Could not load this folder's contents.
+  </p>
 </template>
 
 <script setup lang="ts">
@@ -95,6 +98,7 @@ const emit = defineEmits<{
 const currentLevel = computed(() => props.level ?? 1)
 
 const rawRows = ref<SidebarStructuralRow[]>([])
+const loadFailed = ref(false)
 
 const displayRows = computed(() =>
   sortSidebarStructuralRows(rawRows.value, peerSortSpec.value)
@@ -114,9 +118,9 @@ async function refreshListing() {
     if (error || !listing) throw new Error("Failed to load listing")
     applyListing(listing)
     setCachedListing(props.notebookId, props.folderId ?? null, listing)
+    loadFailed.value = false
   } catch {
-    rawRows.value = []
-    props.onStructuralPeerCount?.(0)
+    loadFailed.value = true
   }
 }
 
