@@ -141,7 +141,11 @@ refuses it for changed paths only. Update the classification section of
 ### 4. The CLI uploads what is a pointer and leaves admission to the server
 
 Type: Behavior
-Status: planned
+Status: done
+Accepted proof: `pnpm -C cli exec vitest run tests/notebookPublish` 44 pass
+(raw test failed first on POST count; the `.keep` test in `notebookPublish.lfs.test.ts`
+passed before too and now guards path-free selection); `pnpm cli:test` 443 pass.
+`isEmptyLfsFile` removed; `parseLfsPointer` is the only selection rule.
 Proof: in `notebookPublish.lfsFailure.test.ts` the raw-attachment test now
 expects no `git lfs push` for the raw blob, one bundle POST, and the stubbed
 server refusal shown (example 4); a new test commits an empty root `.keep` and

@@ -1,16 +1,7 @@
 import { spawnSync } from 'node:child_process'
 import { exceptionText } from '../../exceptionText.js'
-import { isEmptyLfsFile, parseLfsPointer } from './notebookLfsPointer.js'
+import { parseLfsPointer } from './notebookLfsPointer.js'
 import { runSystemGitOrThrow } from './systemGit.js'
-
-function isAttachment(path: string): boolean {
-  if (path.endsWith('.md')) return false
-  if (path === '.keep' || path.endsWith('/.keep')) return false
-  if (path === '.gitattributes' || path.endsWith('/.gitattributes')) {
-    return false
-  }
-  return true
-}
 
 type ChangedFile = { status: string; dstBlob: string; path: string }
 
@@ -25,8 +16,8 @@ function parseRawChangesZ(output: string): ChangedFile[] {
   return changes
 }
 
-/** Attachment changes the first-parent unpublished commits add or modify. */
-function changedAttachments(
+/** File changes the first-parent unpublished commits add or modify. */
+function changedFiles(
   directory: string,
   acceptedHead: string,
   proposedHead: string
@@ -50,7 +41,7 @@ function changedAttachments(
           detail ? `: ${detail}` : ` (exit code ${status})`
         }`
     )
-  ).filter(({ status, path }) => status !== 'D' && isAttachment(path))
+  ).filter(({ status }) => status !== 'D')
 }
 
 /** Contents of `blobIds`, in order, from one `git cat-file --batch`. */
@@ -84,15 +75,16 @@ function readBlobs(directory: string, blobIds: string[]): Buffer[] {
 }
 
 /**
- * Digests to upload before bundle submission: the LFS objects that the
- * first-parent unpublished commits add or change.
+ * Digests to upload before bundle submission: the LFS objects of the files
+ * that the first-parent unpublished commits add or change and that are LFS
+ * pointers. The server, not the CLI, refuses any other attachment content.
  */
 export function selectRequiredLfsObjectIds(
   directory: string,
   acceptedHead: string,
   proposedHead: string
 ): string[] {
-  const changed = changedAttachments(directory, acceptedHead, proposedHead)
+  const changed = changedFiles(directory, acceptedHead, proposedHead)
   if (changed.length === 0) return []
   const contents = readBlobs(
     directory,
@@ -100,14 +92,8 @@ export function selectRequiredLfsObjectIds(
   )
   const sizes = new Map<string, number>()
   changed.forEach(({ path }, i) => {
-    const bytes = contents[i]!
-    if (isEmptyLfsFile(bytes)) return
-    const pointer = parseLfsPointer(bytes)
-    if (!pointer) {
-      throw new Error(
-        `Attachment "${path}" must be a Git LFS pointer or empty file.`
-      )
-    }
+    const pointer = parseLfsPointer(contents[i]!)
+    if (!pointer) return
     const seenSize = sizes.get(pointer.sha256Hex)
     if (seenSize !== undefined && seenSize !== pointer.size) {
       throw new Error(

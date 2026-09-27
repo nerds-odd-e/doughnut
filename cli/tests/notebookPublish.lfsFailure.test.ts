@@ -39,16 +39,20 @@ describe('notebook publish — LFS refusals and failures keep local state', () =
     vi.unstubAllGlobals()
   })
 
-  test('rejects publishing a raw attachment', async () => {
+  test('submits a raw attachment without uploading it and shows the server refusal', async () => {
     const { pushCalls } = installLfsPushIntercept(realSpawnSync)
     const { dir, fetchMock } = prepareLfsPublishCheckout(
       ctx.getWorkDir(),
       'lfs-raw-publish',
-      stubSuccessfulAcceptedHead()
+      rejectionPost(
+        400,
+        'Attachment "diagram.png" must be a Git LFS pointer or empty file.',
+        'BINDING_ERROR'
+      )
     )
     const blob = hashObject(realSpawnSync, dir, Buffer.from([0x89, 0x50]))
     runGit(
-      ['update-index', '--add', '--cacheinfo', `100644,${blob},raw.png`],
+      ['update-index', '--add', '--cacheinfo', `100644,${blob},diagram.png`],
       dir
     )
     runGit(['commit', '--quiet', '-m', 'raw'], dir)
@@ -57,12 +61,10 @@ describe('notebook publish — LFS refusals and failures keep local state', () =
       ProcessExitForTest
     )
     expect(ctx.getErrorSpy()).toHaveBeenCalledWith(
-      expect.stringContaining(
-        'Attachment "raw.png" must be a Git LFS pointer or empty file.'
-      )
+      'donut: Attachment "diagram.png" must be a Git LFS pointer or empty file.'
     )
     expect(pushCalls).toEqual([])
-    expect(postCount(fetchMock)).toBe(0)
+    expect(postCount(fetchMock)).toBe(1)
   })
 
   test('failed LFS upload preserves local refs and files and skips bundle POST', async () => {

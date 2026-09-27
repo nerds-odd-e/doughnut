@@ -83,9 +83,10 @@ forward commit by Donut System, "Store notebook files with Git LFS", which set
 file with its pointer. Earlier commits keep their raw bytes: a clone still
 reads them, and publishing and web download work on the current pointers.
 
-When publishing, the CLI checks every attachment in the commits being
-published is a pointer or empty, but ignores raw blobs in accepted history
-from before the conversion.
+When publishing, the CLI uploads the LFS objects of the changed files that
+are pointers and does not judge paths or other content. The server refuses a
+changed attachment that is neither a pointer nor empty, but ignores raw blobs
+in accepted history from before the conversion.
 
 ## Recovering a published attachment version
 
