@@ -4,37 +4,45 @@ status: dormant
 planted: 2026-09-28
 planted_during: owner request to capture frontend release awareness
 trigger_when: improving how users receive updated frontend code
-scope: medium
+scope: small
 ---
 
 # SEED-041: Help users receive the latest frontend code
 
 ## Why This Matters
 
-For Donut users with an existing browser session, a frontend release should become
-visible so they know to reload and receive the updated code. The owner wants a
-way to version the frontend, analogous to backend versioning, and to remind users
-when their loaded frontend is older than the released version.
+Donut users often keep a browser tab open across releases, and the application
+releases roughly daily. That tab keeps running the frontend it loaded until the
+user happens to reload, so they miss frontend improvements without knowing.
 
-This records the requested experience; the current release and browser caching
-behavior has not been investigated.
+The bottom line adds urgency: Donut does not promise that an older frontend keeps
+working after a backend API change. A stale tab may therefore misbehave, and the
+reminder is how users are told to get back onto a supported frontend.
+
+Current behavior (inspected 2026-09-28): the production frontend is served from
+a GCS bucket prefix per release commit through the load balancer with Cloud CDN;
+`index.html` is cached for 60 seconds, each URL-map apply invalidates the CDN,
+and there is no service worker. A plain reload therefore already obtains the
+current frontend. Routes are statically imported, so a stale tab rarely requests
+missing chunks. The frontend has no build identity and never checks for one; the
+backend's health check reports a backend commit that can differ from the served
+frontend's commit, so it is not the frontend's release identity.
 
 ## Alternatives and Decision
 
-Doing nothing or relying on users to reload without a reminder leaves them unaware
-of updates. A version tied to every application release may be a simpler starting
-point than detecting frontend-only changes. The owner prefers the frontend version
-to change only when frontend code has changed since the previous release, but
-explicitly treats this as optional because releases are infrequent.
+Doing nothing leaves users unaware of updates and on unsupported frontends after
+API changes. Forcing or automatically reloading would interrupt users mid-task;
+the owner chose an informative reminder that lets the user decide when to reload.
 
-Capture version identification, update awareness, and reload as one user-visible
-story. Build and release support belong within that outcome; no versioning scheme
-or detection mechanism has been selected.
+The frontend owns its own release identity, built into the bundle and published
+beside the released frontend; no backend endpoint is involved. A reminder after
+every application release is acceptable to the owner even when the frontend did
+not change; keeping the identity stable across backend-only releases is a
+preference, not a requirement.
 
 ## Story Decomposition
 
 Effort bands: S = 30–60 minutes, M = 1–2 hours, L = 2–4 hours, including delivery.
-This seed authorizes no implementation or executable plan.
 
 <a id="story-1"></a>
 
@@ -42,74 +50,88 @@ This seed authorizes no implementation or executable plan.
 
 **Identity:** SEED-041#story-1
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"not-refined","approach":"unselected"}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/003-frontend-update-reminder/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"c52851f465d2df50fc1f572fb44132277f68669bb07a59be674f1d636f08c98f","plan":"53d94dfb600718c580b754e90bfadd53ea0f08004a49f4ca4b52d5088f30c0f5"}}
 ```
 
 **Goal**
 
-Donut users running an older frontend know that an update is available and can
-reload to receive the latest released frontend code.
+A Donut user whose open tab runs an older frontend than the one currently
+released learns that an update is available and reloads onto the current
+frontend, receiving its improvements and staying on a frontend that matches the
+backend API.
 
 **Scope**
 
-- Give the released frontend a version or equivalent release identity, analogous
-  in purpose to backend versioning, through the build and release process.
-- Establish whether the frontend loaded in the browser is older than the
-  currently released frontend.
-- Make users aware of the update and remind them that a reload is needed.
-- Reloading in response to the reminder must load the latest released frontend,
-  rather than leave the user on the same stale code.
-- Prefer retaining the frontend version across releases with no frontend code
-  changes. This is a desirable optimization, not a hard acceptance requirement;
-  versioning each application release is acceptable if simpler.
+- Each frontend build carries a release identity, and the released frontend
+  publishes the current identity where an open tab can read it.
+- An open tab compares its own identity with the published one when the user
+  returns to it (the tab becomes visible or focused again), without a periodic
+  timer.
+- When they differ, a non-blocking reminder says a newer version of Donut is
+  available and offers a Reload action; the user can keep working.
+- Reloading, by the action or by the browser, runs the current frontend and the
+  reminder does not reappear for it.
+- A dismissed reminder reappears only when a still newer frontend is released.
+
+Deferred promises (not built or verified in this story):
+
+- Keeping the identity unchanged across releases without frontend changes.
+- Automatic or forced reload, and protection of unsaved work before reloading.
+- Compatibility or messaging during a rollout while old and new backends serve
+  together.
+- Recovery from missing-asset or chunk-load errors in a stale tab.
+- Version checks for the CLI or MCP clients, and semantic version numbering.
+- Changes to caching; reload already obtains the current frontend.
 
 **Key examples**
 
-- A user has Donut open on the previous frontend → an updated frontend is
-  released → the user sees an update reminder explaining the need to reload.
-- A user sees that reminder → reloads → Donut runs the latest released frontend
-  and no longer reports that loaded version as out of date.
-- A user already runs the latest frontend → version comparison occurs → no
-  outdated-frontend reminder is shown.
+- A user has Donut open on the previous frontend → a new application release
+  goes out → the user returns to the tab → a reminder says a newer version is
+  available, with Reload.
+- The user clicks Reload → Donut loads the current frontend → no reminder is
+  shown when they later return to the tab.
+- A user already runs the current frontend → returns to the tab → no reminder.
+- A user dismisses the reminder and keeps working → returns to the tab before
+  another release → no reminder; after a further release → the reminder shows
+  again.
 
-- **For / why:** Users receive current frontend improvements instead of
-  unknowingly continuing with older browser code.
-- **Evaluation:** A browser running an older release shows the reminder; a reload
-  obtains the current release and clears the outdated-version condition.
-- **Value / learning:** Determine whether frontend release identity and update
-  detection can reliably guide users onto current code through the existing
-  deployment and caching behavior.
-- **Effort hypothesis:** M, low confidence until build, release, and caching
-  behavior are inspected.
-- **Depends on:** Existing frontend build and application release flow; no
-  dependency on the preceding login-continuity story is established.
-- **Safe stopping point:** Version detection, reminder, and effective reload work
-  together as one usable outcome. Frontend-only version-change detection may be
-  deferred without losing that value.
+- **For / why:** Users get frontend improvements promptly and move off stale
+  frontends that newer backend APIs no longer promise to support.
+- **Evaluation:** A browser holding an older frontend identity shows the reminder
+  on return; reloading obtains the current identity and clears it.
+- **Value / learning:** Whether a return-to-tab check is timely enough, given
+  roughly daily releases, before investing in anything more intrusive.
+- **Effort hypothesis:** S–M; the reload path already works, so the work is the
+  identity, its publication in the release, the check, and the reminder.
+- **Depends on:** The existing frontend build and GCS/load-balancer release flow.
+- **Safe stopping point:** Identity, check, and reminder with Reload working
+  together in production.
 
 ## Ordering and Scope Reduction
 
 The owner selected this as the second product backlog story, after browser login
-continuity. If scope needs reducing, drop frontend-only version-change detection
-first and retain the update reminder and reliable reload outcome.
+continuity; the unsupported-stale-frontend bottom line confirms that priority.
+If scope needs reducing, keep the return-to-tab reminder and drop dismissal
+memory.
 
 ## Open Decisions
 
-- What frontend release identity and build/release integration are simplest?
-- When should the browser check for updates, and how should the reminder appear?
-- How should the reload interaction handle unsaved user work?
-- Is detecting frontend-only changes worthwhile, and what changes count toward
-  that identity? The owner's preference does not block the core outcome.
+None. The [plan](../slice-plans/003-frontend-update-reminder/PLAN.md) uses the
+served `index.html`'s hashed entry scripts as the published identity.
 
 ## When to Surface
 
-Select as the second queued story when improving general user experience and
-release reliability.
+Second queued story when improving general user experience and release
+reliability.
 
 ## Breadcrumbs
 
 - Owner request on 2026-09-28: version the frontend like the backend, make users
-  aware of frontend updates, and remind them to reload. Prefer version changes
-  only when frontend code changes, but this is optional given infrequent releases.
-- Owner-selected priority: second story in the product backlog.
-- Continuing session instruction: write directly on main, without committing.
+  aware of frontend updates, and remind them to reload.
+- Owner refinement on 2026-09-28: purpose is receiving improvements; old
+  frontends are not promised to work after backend API changes, which adds
+  urgency; reminding on every release is acceptable; exclusions accepted;
+  priority confirmed.
+- Release infrastructure: `infra/gcp/scripts/upload-frontend-static-to-gcs.sh`,
+  `infra/gcp/path-routing/doughnut-routing.json`,
+  `docs/gcp/prod-frontend-static-lb.md`, `infra/gcp/scripts/publish-application.sh`.
