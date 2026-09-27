@@ -104,14 +104,31 @@ assumptions, and key examples without enlarging that source. Read and apply:
   including executable proof ownership.
 
 Inspect only the code and tests needed to find the stable outside-in proof entry
-point, behavior to extend or preserve, genuine dependencies, and any Structure
-justified under the linked slice decomposition rules.
+point, behavior to extend or preserve, genuine dependencies, decisive premises,
+and any Structure justified under the linked slice decomposition rules.
 
-For a concrete uncertain infrastructure or storage assumption, reuse matching
-evidence or require one isolated representative proof against the relevant
-engine and version. Record the assumption, literal command, critical
-postcondition, and result in the plan. Failed proof changes the plan before
-broad implementation. Keep experiments off shared and production systems.
+A decisive premise is a factual claim about this project's current state that a
+slice's approach, sizing, or proof depends on: existing code and tests, host or
+environment state, fixture content, workload data, or a named proof or
+measurement command. Premises inherited from the story, such as "works as
+today", count the same as those you write. Before recording `ready`, establish
+each with the smallest safe observation: reading, searching, listing, a
+read-only host query, or one unpaid, side-effect-free local run of the named
+command. Observe the thing the claim is about, not only where you expect it: a
+claim that something has no test, or that a named proof exercises a behavior,
+is observed by searching for the existing tests and callers of what changes,
+wherever they live. For uncertain infrastructure or storage behavior, the
+observation is one isolated representative proof against the relevant engine
+and version, unless matching evidence exists. Record each premise, the literal
+observation, and its result in the plan. A false premise changes the plan
+before broad implementation. Do not inspect claims the approach does not depend
+on, and keep experiments off shared and production systems.
+
+When only a paid, credentialed, owner-held, or state-changing observation can
+settle a premise, observe its cheap parts now and make the remainder an early
+probe slice whose failure stops dependent slices and changes the plan. Such a
+plan can be `ready`; the probe's observation keeps its existing authority
+requirements.
 
 During construction, apply those decomposition, cumulative design, and sizing checks: correct
 obvious defects such as an independent second outcome before reporting, and
@@ -137,8 +154,9 @@ through the shared procedure:
 - Then apply
   [assess readiness at preparation completion](../dough-product-backlog/references/record-preparation.md#assess-readiness-at-preparation-completion):
   remaining concerns become `not-ready` reasons; when none remain and the plan
-  has bounded slices with mapped proof, record `ready`. Do not prescribe the
-  next workflow action, Take the item, or start execution from this finding.
+  has bounded slices with mapped proof and observed or probe-bounded decisive
+  premises, record `ready`. Do not prescribe the next workflow action, Take
+  the item, or start execution from this finding.
 
 The recipient chooses the next action under the triggering instruction's
 authority and project policy. The recorded assessment is agent judgment bound to

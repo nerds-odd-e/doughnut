@@ -5,7 +5,8 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 // its CLI body only when it is the directly executed entry module, not when
 // another module imports it. The straightforward check compares
 // `import.meta.url` with `pathToFileURL(argv path)`, but a script invoked
-// through a symlink-equivalent spelling (for example macOS mounting `/tmp` as
+// through a symlink-equivalent spelling (for example a project's symlinked
+// `.claude/skills/<name>` directory, or macOS mounting `/tmp` as
 // `/private/tmp`) resolves its module path to the canonical file while argv
 // keeps the spelling the invoker used. Those two URLs then differ even though
 // they name the same file, so the literal comparison alone misses direct

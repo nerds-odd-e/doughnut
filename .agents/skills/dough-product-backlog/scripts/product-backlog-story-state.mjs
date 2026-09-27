@@ -9,7 +9,11 @@
 // results. Needs reassessment is reported on basis mismatch without rewriting
 // the source. Recording never grants execution authority.
 
-import { namedIdentity, readHome } from "./product-backlog-home-reader.mjs";
+import {
+  namedIdentity,
+  readHome,
+  storyContextLines,
+} from "./product-backlog-home-reader.mjs";
 import { BacklogError, requireField } from "./product-backlog-refusal.mjs";
 import { joinSource } from "./product-backlog-source.mjs";
 import {
@@ -46,14 +50,31 @@ function insertionIndex(home) {
   return home.region.heading + 1;
 }
 
-function currentBasisFor(source, approach, options = {}) {
-  if (approach?.kind !== "planned") {
-    return computeBasis(source);
+// The plan text a basis digests separately: none for planless work or for a
+// plan that is the canonical document itself, which is digested once.
+function separatePlanSource(approach, options) {
+  if (approach?.kind !== "planned" || options.planIsCanonical === true) {
+    return undefined;
   }
-  if (options.planIsCanonical === true) {
-    return computeBasis(source, source);
-  }
-  return computeBasis(source, options.planSource);
+  return options.planSource;
+}
+
+// The story-scoped basis every fresh assessment records: this story's
+// section, the seed's shared context, and a distinct plan. Other stories'
+// sections are left out, so preparing, editing, or closing a sibling keeps
+// this story's readiness.
+function currentBasisFor(home, approach, options = {}) {
+  const scoped = joinSource({
+    ...home.document,
+    lines: storyContextLines(home),
+  });
+  return computeBasis(scoped, separatePlanSource(approach, options));
+}
+
+// The whole-document basis a record from before story scoping carries. It
+// still matches while the whole seed is unchanged.
+function formerBasisFor(source, approach, options = {}) {
+  return computeBasis(source, separatePlanSource(approach, options));
 }
 
 // Reads preparation facts and assessment view from already-loaded
@@ -69,7 +90,7 @@ export function readStoryState(source, href, options = {}) {
       href: home.href,
       key: home.key,
       source: { path: home.relative, href: home.href },
-      basis: currentBasisFor(source, undefined, options),
+      basis: currentBasisFor(home, undefined, options),
       assessment: { status: "absent" },
     };
   }
@@ -91,19 +112,20 @@ export function readStoryState(source, href, options = {}) {
       identity: namedIdentity(home),
       href: home.href,
       key: home.key,
-      basis: currentBasisFor(source, undefined, options),
+      basis: currentBasisFor(home, undefined, options),
       assessment: { status: "absent" },
     };
   }
   const recordedAssessment = assessmentFromPayload(payload);
-  const basis = currentBasisFor(source, normalized.approach, options);
+  const basis = currentBasisFor(home, normalized.approach, options);
+  const former = formerBasisFor(source, normalized.approach, options);
   return {
     ...normalized,
     identity: namedIdentity(home),
     href: home.href,
     key: home.key,
     basis,
-    assessment: normalizeAssessmentView(recordedAssessment, basis),
+    assessment: normalizeAssessmentView(recordedAssessment, basis, former),
   };
 }
 
@@ -144,7 +166,7 @@ export function recordStoryState(source, request, options = {}) {
     kind: payload.approach,
     plan: payload.plan,
   };
-  const currentBasis = currentBasisFor(source, approachForBasis, {
+  const currentBasis = currentBasisFor(home, approachForBasis, {
     planSource: options.planSource,
     planIsCanonical,
   });

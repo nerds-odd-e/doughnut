@@ -10,6 +10,7 @@ import {
 } from "./ci-mailbox.mjs";
 import { isDirectCliEntry } from "./ci-direct-entry.mjs";
 import { recoverObservationForResume } from "./execution-increment-observation.mjs";
+import { stopped } from "./applicable-candidate-proof.mjs";
 import { resumeInterruptedPublication } from "./publication-resume.mjs";
 import { targetBranchName } from "./publication-git.mjs";
 
@@ -48,6 +49,7 @@ export async function resumeManagedExecutionIncrement(request) {
     preferredAlias,
     root,
     storage,
+    oneShotIdentity,
   } = request;
 
   for (const field of ["workspace", "candidateSha", "targetRef", "repo"]) {
@@ -79,6 +81,13 @@ export async function resumeManagedExecutionIncrement(request) {
     ? observerAdapter(liveDirectory, targetRef)
     : null;
 
+  // Queued one-shot work keeps its ownership guard when resume must push.
+  const onFetchedTarget = oneShotIdentity
+    ? (await import("./one-shot-ownership.mjs")).queuedOwnershipGuard({
+        workspace,
+        identity: oneShotIdentity,
+      })
+    : undefined;
   const published = await resumeInterruptedPublication({
     ownedWorkspace: workspace,
     defaultCheckout,
@@ -87,7 +96,16 @@ export async function resumeManagedExecutionIncrement(request) {
     publishedRevisions,
     observer,
     targetRef,
+    onFetchedTarget,
   });
+  if (published.held)
+    return stopped(published.held.status, {
+      candidate: candidateSha,
+      pushCount: 0,
+      classification: published.classification,
+      ...published.held.fields,
+      observation: recovered.observation,
+    });
 
   // Ensure the accepted SHA is on the recovered live owner when resume's
   // classification completed registration or coverage was already present.
@@ -120,7 +138,7 @@ export async function resumeManagedExecutionIncrement(request) {
 function argumentsOf(argv) {
   if (argv[0] !== "resume") {
     throw new Error(
-      "usage: execution-increment-resume.mjs resume --workspace PATH --candidate-sha SHA --target-ref REF --repo OWNER/REPO [--host cursor|claude|codex] [--preferred-alias .agents|.claude] [--default-checkout PATH] [--superseded-sha SHA]...",
+      "usage: execution-increment-resume.mjs resume --workspace PATH --candidate-sha SHA --target-ref REF --repo OWNER/REPO [--host cursor|claude|codex] [--preferred-alias .agents|.claude] [--default-checkout PATH] [--superseded-sha SHA]... [--one-shot-identity ID]",
     );
   }
   const result = { supersededShas: [], publishedRevisions: [] };

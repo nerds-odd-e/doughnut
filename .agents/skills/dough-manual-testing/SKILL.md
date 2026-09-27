@@ -30,9 +30,10 @@ stop; do not invent them.
 
 A standalone session the developer accepts is a mission:
 [admit it](../dough-execute-plan/references/admit-accepted-work.md) before
-setup or exploration, approach `unselected`. Observation required by an active
-plan slice or story continues under that story. Admission changes none of the
-testing-only limits here.
+setup or exploration, approach `unselected`, unless explicitly selected as
+[one-shot work](../dough-execute-plan/references/one-shot.md). Observation
+required by an active plan slice or story continues under that story.
+Admission changes none of the testing-only limits here.
 
 ## Plan
 

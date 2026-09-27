@@ -154,7 +154,7 @@ and continue that unfinished obligation only.
 6. Stage only owned files or separable owned changes and inspect the staged diff.
    Stage all content only when all of it is owned. Unrelated unstaged work does
    not block delivery. Resolve unrelated staged content or ambiguous ownership
-   with its owner; never stash, reset, restage, or revert a sibling writer's
+   with its owner; never stash, reset, restage, or revert another writer's
    work to isolate this commit, or silently unstage it.
 7. Commit CI-safe work, as an [agent commit](agent-commits.md) when that
    reference applies. The commit runs this project's check-only lint hook on

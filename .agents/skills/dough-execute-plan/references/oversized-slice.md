@@ -43,7 +43,9 @@ a clean starting point. Keep the same execution identity and backlog placement u
 [Take or admit work](../SKILL.md#take-or-admit-work). A quick attempt that becomes
 planned keeps its selected mode and checkout; Trunk Mode stays Trunk Mode in
 the same worktree. Unclear ownership stops disposition and the dependent
-planning path for human judgment.
+planning path for human judgment. A [one-shot](one-shot.md) attempt instead
+[escalates](one-shot.md#escalate-when-the-work-grows) into admission, which
+gives it the identity to plan under.
 
 After that stop, when the triggering instruction authorizes planning and
 continued execution, use this project's

@@ -105,9 +105,11 @@ unchanged.
 
 read-state prints the shared reader's normalized preparation facts,
 assessment view, and current content basis for the home --link names as
-JSON. Legacy absence is "not-recorded"; an unsupported schema version is
-"unsupported-version"; a stored assessment whose basis no longer matches is
-"needs-reassessment". It never writes.
+JSON. The basis covers the story's own section, the seed's shared context
+outside other stories' sections, and a distinct plan. Legacy absence is
+"not-recorded"; an unsupported schema version is "unsupported-version"; a
+stored assessment whose basis no longer matches is "needs-reassessment". It
+never writes.
 
 Paths are resolved against the current directory; --file defaults to
 ${defaultBacklogPath}. Canonical home links and planned paths are resolved

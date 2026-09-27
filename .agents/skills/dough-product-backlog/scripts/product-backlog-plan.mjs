@@ -29,10 +29,12 @@ export function sameDocument(link, other) {
   return planFileOf(link) === planFileOf(other);
 }
 
-// Whether a plan link names the document another entry lists as its canonical
-// home. The plan's section is navigation and is ignored; the other home is
-// compared as written, since its anchor names which story in a shared seed it
-// is.
+// Whether a plan link names another entry's canonical home: when its file
+// equals that home as written, or the link equals that home exactly. A
+// section is otherwise navigation; the other home is compared as written,
+// since its anchor names which story in a shared seed it is.
 export function planNamesHome(target, href) {
-  return target !== undefined && planFileOf(target) === href;
+  return (
+    target !== undefined && (planFileOf(target) === href || target === href)
+  );
 }

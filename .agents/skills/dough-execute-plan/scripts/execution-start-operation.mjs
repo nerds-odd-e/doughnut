@@ -1,18 +1,18 @@
-// Authoritative startup orchestration for queued work and for admission of
-// accepted work no backlog list holds yet. The CLI adapter stays in
-// execution-start.mjs.
+// Authoritative startup orchestration for queued work, for admission of
+// accepted work (carrying a grown one-shot attempt's edits when asked), and
+// for one-shot work. The CLI adapter stays in execution-start.mjs.
 import { git, lsRemoteSha, revParse } from "./publication-git.mjs";
 import {
   maintenance,
   reportedMaintenance,
 } from "./execution-start-maintenance.mjs";
-import { readPublishedExecutionSource } from "./execution-source.mjs";
+import { recovery, retainedCandidate } from "./execution-start-recovery.mjs";
+import { finishCarry, parkCarriedEdits } from "./execution-start-carry.mjs";
 import {
-  recovery,
-  retainedCandidate,
-  sameSelectedSource,
-} from "./execution-start-recovery.mjs";
-import { existingClaim, startSource } from "./execution-start-source.mjs";
+  existingClaim,
+  prepareOneShot,
+  startSource,
+} from "./execution-start-source.mjs";
 import { acceptedReceipt } from "./execution-start-receipt.mjs";
 import { startRequest } from "./execution-start-request.mjs";
 import { selectAgent } from "./agent-assignments.mjs";
@@ -40,7 +40,11 @@ import {
 export async function startExecution(requestInput) {
   const started = startRequest(requestInput);
   if (!started.ok) return started;
-  const { request } = started;
+  const result = await startRequested(started.request);
+  return started.request.carry ? finishCarry(started.request, result) : result;
+}
+
+async function startRequested(request) {
   const remote = remoteOf(request);
   const ref = remoteRef(request);
   const source = startSource(request);
@@ -52,19 +56,11 @@ export async function startExecution(requestInput) {
     await git(request.integration, "fetch", remote);
     fetched = await revParse(request.integration, ref);
     selectedSource = await source.read(request, ref);
-    if (request.retained && !source.admitting) {
-      const original = await readPublishedExecutionSource(
-        request,
-        request.retained.startingRevision,
-      );
-      if (!sameSelectedSource(original, selectedSource))
-        throw new Error(
-          "selected published source changed since retained claim basis",
-        );
-    }
+    if (request.retained) await source.retainedBasis?.(request, selectedSource);
   } catch (error) {
     return sourceStopped(error, { error: error.stderr || error.message });
   }
+  if (source.oneShot) return prepareOneShot(request, origin, fetched);
   if (selectedSource.existing && !request.retained)
     return existingClaim(request, ref, selectedSource);
   // The rotation is read in the integration checkout, which fetched trunk.
@@ -78,7 +74,11 @@ export async function startExecution(requestInput) {
   const beforeMaintenance = await maintenance(request);
   // Stops report only this compact local outcome; acceptance reports both.
   const stopMaintenance = reportedMaintenance(beforeMaintenance);
-  const selected = await selectOwnedWorkspace({ ...request, origin });
+  // A carried park, its reset and the workspace selection share one trunk.
+  const parked = request.carry && (await parkCarriedEdits(request, fetched));
+  if (parked && !parked.ok) return { ...parked, ...stopMaintenance };
+  const base = parked ? fetched : undefined;
+  const selected = await selectOwnedWorkspace({ ...request, origin, base });
   if (!selected.ok) return { ...selected, fetched, ...stopMaintenance };
   // Trunk can move between the source fetch and the workspace's base; the
   // claim names the rotation's next agent on the trunk it is built on.

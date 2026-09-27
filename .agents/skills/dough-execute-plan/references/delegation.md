@@ -51,8 +51,9 @@ Give the agent:
   obtain the missing proof first, or leave the action unperformed and return
   the exact obligation and gap. A passing operational or health check does not
   relieve this requirement.
-- Ownership of the slice's changes. State that other agents may share the
-  execution checkout and their work must be preserved. The agent does not
+- Ownership of the slice's changes. State that the Git stash stack is shared
+  across all worktrees and that unowned work, from humans or other sessions,
+  may be present in the checkout and must be preserved. The agent does not
   stash, pop, reset, clean, check out paths, or switch branches in the shared
   checkout; when it needs a pre-change baseline, it uses a separate temporary
   checkout or reports the need back. The coordinator's

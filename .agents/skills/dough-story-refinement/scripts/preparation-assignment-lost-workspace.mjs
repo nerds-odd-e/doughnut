@@ -5,7 +5,7 @@
 import { basename } from "node:path";
 import {
   agentIdentity,
-  parseAgentProfile,
+  parseAgentProfileFile,
   profileAgentName,
 } from "../../dough-product-backlog/scripts/product-backlog-agent-profile.mjs";
 import { profileAllocation } from "../../dough-execute-plan/scripts/agent-assignments.mjs";
@@ -57,8 +57,8 @@ export async function addressedAssignment(request, ref) {
       { profile: path },
       `${ref} holds no assignment at ${path} that the addressed allocation added`,
     );
-  const read = parseAgentProfile(text);
-  if (!read.ok || read.profile.name !== name)
+  const read = parseAgentProfileFile(basename(path), text);
+  if (!read.ok)
     return refused(
       "not-preparation",
       { profile: path, allocation: current },

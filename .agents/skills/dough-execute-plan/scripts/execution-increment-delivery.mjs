@@ -37,6 +37,7 @@ export async function deliverManagedExecutionIncrement(request) {
     backlogPath,
     beforeRetryPush,
     beforePush,
+    oneShotIdentity,
   } = request;
 
   if (authority !== "publish") {
@@ -86,6 +87,17 @@ export async function deliverManagedExecutionIncrement(request) {
     codexBridgeAvailable,
   });
 
+  // Queued one-shot work stops on a fetched target tip where another owner
+  // holds it. Its guard reads backlog and profile records through the
+  // product-backlog skill, so it is loaded only then.
+  const onFetchedTarget = oneShotIdentity
+    ? (await import("./one-shot-ownership.mjs")).queuedOwnershipGuard({
+        workspace,
+        identity: oneShotIdentity,
+        backlogPath,
+      })
+    : undefined;
+
   // Observation attaches before the first applicable push when a live owner is
   // established. An unavailable bridge still preserves accepted publication.
   const published = await publishExecutionIncrement({
@@ -101,6 +113,7 @@ export async function deliverManagedExecutionIncrement(request) {
     backlogPath,
     beforeRetryPush,
     beforePush,
+    onFetchedTarget,
   });
 
   let observation = established.observation;
@@ -126,6 +139,8 @@ export async function deliverManagedExecutionIncrement(request) {
       reconciliations: published.reconciliations,
       replay: published.replay,
       validation: published.validation,
+      ownership: published.ownership,
+      error: published.error,
       observation,
       runtime: {
         alias: runtime.alias,
@@ -172,7 +187,7 @@ export async function deliverManagedExecutionIncrement(request) {
 function argumentsOf(argv) {
   if (argv[0] !== "deliver") {
     throw new Error(
-      "usage: execution-increment-delivery.mjs deliver --workspace PATH --branch NAME --previously-published-base SHA --target-ref REF --repo OWNER/REPO [--host cursor|claude|codex] [--preferred-alias .agents|.claude] [--authority publish|local-only] [--session-json JSON] [--max-duration-ms MS] [--codex-bridge-available] [--validated-candidate SHA] [--default-checkout PATH]",
+      "usage: execution-increment-delivery.mjs deliver --workspace PATH --branch NAME --previously-published-base SHA --target-ref REF --repo OWNER/REPO [--host cursor|claude|codex] [--preferred-alias .agents|.claude] [--authority publish|local-only] [--session-json JSON] [--max-duration-ms MS] [--codex-bridge-available] [--validated-candidate SHA] [--default-checkout PATH] [--one-shot-identity ID]",
     );
   }
   const result = { authority: "publish" };

@@ -193,3 +193,14 @@ export function parseAgentProfile(text) {
     },
   };
 }
+
+// Reads the profile published in the file named `fileName` (a name in the
+// profile directory) as parseAgentProfile does, and also refuses text that
+// names another agent than the one the file belongs to: that profile is
+// unreadable for the file's name and assigns no one else.
+export function parseAgentProfileFile(fileName, text) {
+  const read = parseAgentProfile(text);
+  if (read.ok && profileAgentName(fileName) !== read.profile.name)
+    return { ok: false, error: "profile names another agent" };
+  return read;
+}

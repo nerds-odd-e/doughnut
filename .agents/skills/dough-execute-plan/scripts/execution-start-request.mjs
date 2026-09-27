@@ -1,5 +1,5 @@
-// Validates and normalizes a queued-start or admission request before any
-// Git work.
+// Validates and normalizes a queued-start, admission or one-shot request
+// before any Git work.
 import { resolve } from "node:path";
 import {
   agentModes,
@@ -7,14 +7,16 @@ import {
 } from "../../dough-product-backlog/scripts/product-backlog-agent-profile.mjs";
 import { stopped } from "./workspace-publication-ownership.mjs";
 
-// The normalized request, or the stop that refuses it.
+// The normalized request, or the stop that refuses it. A one-shot start
+// publishes no claim, so it needs no publisher, and an unlisted request has no
+// identity; a supplied identity is checked against fetched trunk.
 export function startRequest(requestInput) {
+  const oneShot = requestInput.oneShot === true;
   const required = [
     "integration",
     "workspace",
     "branch",
-    "identity",
-    "publisherId",
+    ...(oneShot ? [] : ["identity", "publisherId"]),
     "mode",
     "target",
   ];
@@ -26,6 +28,16 @@ export function startRequest(requestInput) {
     integration: resolve(requestInput.integration),
     workspace: resolve(requestInput.workspace),
   };
+  if (oneShot && request.admit === true)
+    return stopped("invalid-request", {
+      error:
+        "one-shot work publishes no admission; choose --one-shot or --admit",
+    });
+  if (oneShot && (request.startingRevision || request.candidateSha))
+    return stopped("invalid-request", {
+      error:
+        "a one-shot start publishes no claim to resume; resume its delivery instead",
+    });
   if (request.startingRevision || request.candidateSha) {
     if (!request.startingRevision || !request.candidateSha)
       return stopped("invalid-request", {
@@ -38,6 +50,10 @@ export function startRequest(requestInput) {
       candidateSha: request.candidateSha,
     };
   }
+  if (request.carry === true && request.admit !== true)
+    return stopped("invalid-request", {
+      error: "--carry carries a one-shot attempt's edits into --admit",
+    });
   if (request.admit === true)
     for (const field of ["link", "title"])
       if (!request[field])

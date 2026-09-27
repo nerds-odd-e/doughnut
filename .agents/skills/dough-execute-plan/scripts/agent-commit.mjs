@@ -6,7 +6,7 @@
 // agent's workspace, and nothing is committed there.
 import { readFile } from "node:fs/promises";
 import { resolve } from "node:path";
-import { fileURLToPath } from "node:url";
+import { isDirectCliEntry } from "./ci-direct-entry.mjs";
 import { exec, git, revParse } from "./publication-git.mjs";
 import {
   creditDeveloper,
@@ -96,10 +96,7 @@ async function requestOf(argv) {
   return { workspace, message, amend };
 }
 
-if (
-  process.argv[1] &&
-  resolve(process.argv[1]) === fileURLToPath(import.meta.url)
-) {
+if (isDirectCliEntry(import.meta.url, process.argv[1])) {
   try {
     const { workspace, ...commit } = await requestOf(process.argv.slice(2));
     const result = await agentCommit(workspace, commit);

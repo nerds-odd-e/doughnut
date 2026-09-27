@@ -7,6 +7,7 @@ import {
   agentIdentity,
   agentProfileDirectory,
   parseAgentProfile,
+  parseAgentProfileFile,
   profileAgentName,
   selectAgentName,
 } from "../../dough-product-backlog/scripts/product-backlog-agent-profile.mjs";
@@ -101,13 +102,8 @@ export async function occupiedAssignments(cwd, rev, backlogPath) {
     paths.map(async (path) => {
       const allocation = await profileAllocation(cwd, rev, path);
       const text = (await git(cwd, "cat-file", "-p", `${rev}:${path}`)).stdout;
-      const read = parseAgentProfile(text);
-      if (!read.ok || profileAgentName(basename(path)) !== read.profile.name)
-        return {
-          path,
-          allocation,
-          unrecognized: read.ok ? "profile names another agent" : read.error,
-        };
+      const read = parseAgentProfileFile(basename(path), text);
+      if (!read.ok) return { path, allocation, unrecognized: read.error };
       const { name, ...work } = read.profile;
       return { path, agent: agentIdentity(name).agent, ...work, allocation };
     }),

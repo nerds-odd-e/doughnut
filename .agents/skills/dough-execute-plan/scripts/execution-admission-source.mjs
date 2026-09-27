@@ -1,11 +1,8 @@
-// Admission source: an accepted mission that neither backlog list holds yet.
-// Its canonical story, and a plan that story declares, may still be drafts in
-// the originating checkout. Admission carries only that owned content: the
-// selected story's section of its seed (the whole seed when the seed itself is
-// new) and the whole declared plan. Each is reconciled with fetched trunk
-// against the revision it was drafted from, so sibling sections on trunk
-// survive, other local edits stay local, and an edit trunk also made
-// differently stops with both versions intact for a human decision.
+// Admission source: an accepted mission that neither backlog list holds yet,
+// or a queued story whose one-shot attempt grew and carries its edits into
+// admission. Its canonical story, and a plan that story declares, may still be
+// drafts in the originating checkout; admission carries only that owned
+// content, reconciled with fetched trunk (execution-admission-reconcile.mjs).
 // Preparation is read as recorded; admission never records readiness or
 // approach of its own.
 import {
@@ -15,138 +12,31 @@ import {
 } from "../../dough-product-backlog/scripts/product-backlog-document.mjs";
 import { sameDocument } from "../../dough-product-backlog/scripts/product-backlog-plan.mjs";
 import { BacklogError } from "../../dough-product-backlog/scripts/product-backlog-refusal.mjs";
-import {
-  joinSource,
-  splitSource,
-} from "../../dough-product-backlog/scripts/product-backlog-source.mjs";
 import { readStoryPurpose } from "../../dough-product-backlog/scripts/product-backlog-story-purpose.mjs";
 import {
-  mergeBase,
-  sectionOf,
-  selectedPreparation,
-  show,
-  worktreeSource,
-} from "./execution-source.mjs";
-import { revParse } from "./publication-git.mjs";
+  draftsOf,
+  reconcilePlan,
+  reconcileStory,
+  refused,
+  versionsOf,
+} from "./execution-admission-reconcile.mjs";
+import { sectionOf, selectedPreparation, show } from "./execution-source.mjs";
+import { requireUnheld } from "./one-shot-ownership.mjs";
 import { backlogPath } from "./workspace-publication-ownership.mjs";
 
-// A refusal that names its stop status, such as a reconciliation conflict.
-class AdmissionRefusal extends Error {
-  constructor(status, message, fields = {}) {
-    super(message);
-    this.status = status;
-    this.fields = fields;
-  }
-}
-
-const refused = (message, fields) =>
-  new AdmissionRefusal("source-refused", message, fields);
-
-// Where admitted content is drafted, and the revision it was drafted from:
-// the originating worktree against its merge base with trunk, or a preserved
-// claim candidate against its own parent. Recovery reconciles that candidate
-// again, so later local drafting never changes an accepted admission.
-async function draftsOf(integration, remoteRef, candidateSha) {
-  if (candidateSha)
-    return {
-      base: await revParse(integration, `${candidateSha}^`),
-      read: (path) => show(integration, candidateSha, path),
-    };
-  return {
-    base: await mergeBase(integration, remoteRef),
-    read: async (path) => worktreeSource(integration, path),
-  };
-}
-
-// The file at the drafts' base, on fetched trunk, and as drafted. A file the
-// drafts lack is drafted as trunk has it: there is nothing to carry.
-async function versionsOf(request, remoteRef, drafts, path) {
-  const trunk = await show(request.integration, remoteRef, path);
-  return {
-    path,
-    base: await show(request.integration, drafts.base, path),
-    trunk,
-    draft: (await drafts.read(path)) ?? trunk,
-  };
-}
-
-const conflict = (path, message) =>
-  new AdmissionRefusal(
-    "source-conflict",
-    `${path} ${message}; both versions are preserved`,
-    { path },
-  );
-
-// Where the drafted section goes in a trunk seed that lacks it: before the
-// section boundary that follows it in the draft, or at the end together
-// with the blank lines that separate it.
-function insertionIndex(lines, drafted, path) {
-  const { lines: draft } = drafted.document;
-  const { start, end } = drafted.region;
-  if (end === draft.length) {
-    let from = start;
-    while (from > 0 && draft[from - 1] === "") from -= 1;
-    return { at: lines.length, from };
-  }
-  const at = lines.indexOf(draft[end]);
-  if (at === -1)
-    throw conflict(path, "has no place for the new story section on trunk");
-  return { at, from: start };
-}
-
-// Trunk's seed with only the selected story's section as drafted. Sibling
-// sections keep trunk's text, and other local edits stay local. A section
-// that trunk and the draft each changed from the merge base, or one removed
-// on trunk, stops for a human decision. A seed new on both sides is owned
-// whole.
-function reconcileStory({ base, trunk, draft, path }, href) {
-  if (trunk === null) {
-    if (base !== null) throw conflict(path, "was removed on fetched trunk");
-    return draft;
-  }
-  const drafted = sectionOf(draft, href);
-  const published = sectionOf(trunk, href);
-  const original = sectionOf(base, href);
-  if (published?.text === drafted.text) return trunk;
-  if (published && published.text !== original?.text) {
-    if (drafted.text === original?.text) return trunk;
-    throw conflict(path, "has a story section also changed on fetched trunk");
-  }
-  if (!published && original)
-    throw conflict(path, "lost the story section on fetched trunk");
-  const document = splitSource(trunk);
-  const lines = [...document.lines];
-  const { lines: draftLines } = drafted.document;
-  if (published) {
-    const { start, end } = published.region;
-    lines.splice(
-      start,
-      end - start,
-      ...draftLines.slice(drafted.region.start, drafted.region.end),
+// The selected story section must name the identity being admitted.
+function requireIdentity(state, identity) {
+  if (state.identity !== identity)
+    throw refused(
+      `${state.key} names identity "${state.identity}", not "${identity}"`,
     );
-  } else {
-    const { at, from } = insertionIndex(lines, drafted, path);
-    lines.splice(at, 0, ...draftLines.slice(from, drafted.region.end));
-  }
-  return joinSource({ ...document, lines });
-}
-
-// A declared plan is owned whole: an edit on only one side wins, and
-// different edits on both sides stop.
-function reconcilePlan({ base, trunk, draft, path }) {
-  if (draft === base || draft === trunk) return trunk;
-  if (trunk === base) return draft;
-  throw conflict(path, "was also changed on fetched trunk");
 }
 
 // The minimal content an admitted story needs: its own identity, recorded
 // preparation facts and a recorded Goal the dashboard can show. `state` is
 // the preparation read from `source`.
 function requireAdmissibleStory(state, source, href, identity) {
-  if (state.identity !== identity)
-    throw refused(
-      `${state.key} names identity "${state.identity}", not "${identity}"`,
-    );
+  requireIdentity(state, identity);
   if (state.status !== "recorded")
     throw refused(
       `${state.key} has no recorded preparation facts; record them first`,
@@ -154,6 +44,52 @@ function requireAdmissibleStory(state, source, href, identity) {
   if (readStoryPurpose(source, href).status !== "recorded")
     throw refused(`${state.key} has no recorded Goal`);
   return state;
+}
+
+// The drafted content admission carries, as the claim writes it: the files
+// that differ from fetched trunk.
+const changedFiles = (...pairs) =>
+  pairs
+    .filter(([file, content]) => file && content !== file.trunk)
+    .map(([file, content]) => ({ path: file.path, content }));
+
+// A queued story whose one-shot attempt grew: its existing entry moves to
+// Taken without a readiness assessment, carrying any drafted edit of its
+// story section and declared plan. Another holder, such as a preparation
+// profile, still refuses it.
+async function readQueuedAdmission(request, remoteRef, candidateSha, entry) {
+  const { integration, identity, link } = request;
+  if (link !== entry.href)
+    throw refused(`selected identity is queued at ${entry.href}, not ${link}`);
+  await requireUnheld(integration, remoteRef, identity, backlogPath);
+  const selection = selectedPreparation(integration, entry.href);
+  const drafts = await draftsOf(integration, remoteRef, candidateSha);
+  const home = await versionsOf(request, remoteRef, drafts, selection.homePath);
+  if (home.trunk === null)
+    throw refused(`selected canonical home ${selection.homePath} is absent`);
+  const homeSource = reconcileStory(home, link);
+  const state = selection.read(homeSource);
+  requireIdentity(state, identity);
+  const declared = selection.declaredPlan(state.approach ?? {});
+  const plan = declared.planTarget
+    ? await versionsOf(request, remoteRef, drafts, declared.planPath)
+    : undefined;
+  if (plan?.draft === null)
+    throw refused(`declared plan ${declared.planPath} is absent`);
+  const planSource = plan && reconcilePlan(plan);
+  return {
+    homePath: selection.homePath,
+    planPath: declared.planPath,
+    planTarget: entry.plan?.target ?? declared.planTarget,
+    selectedSource: sectionOf(homeSource, link).text,
+    planSource,
+    admission: {
+      title: entry.title,
+      href: link,
+      queued: true,
+      files: changedFiles([home, homeSource], [plan, planSource]),
+    },
+  };
 }
 
 // With `candidateSha`, the admission that preserved claim candidate carries.
@@ -165,10 +101,13 @@ export async function readAdmissionSource(request, remoteRef, candidateSha) {
   if (backlog === null) throw refused("fetched trunk has no product backlog");
   const document = parseBacklog(backlog);
   const entry = document.entries.find((item) => item.identity === identity);
-  if (entry?.list === queueHeading)
+  if (entry?.list === queueHeading) {
+    if (request.carry === true)
+      return readQueuedAdmission(request, remoteRef, candidateSha, entry);
     throw refused(
       "selected identity is already queued on fetched trunk; start it as queued work",
     );
+  }
   if (entry) return { existing: entry, planTarget: entry.plan?.target };
   // The work is unlisted; its home must be too, as the Take admitting it will
   // require. Refusing here leaves no workspace behind.
@@ -213,12 +152,7 @@ export async function readAdmissionSource(request, remoteRef, candidateSha) {
     link,
     identity,
   );
-  const files = [
-    [home, homeSource],
-    [plan, planSource],
-  ]
-    .filter(([file, content]) => file && content !== file.trunk)
-    .map(([file, content]) => ({ path: file.path, content }));
+  const files = changedFiles([home, homeSource], [plan, planSource]);
   return {
     homePath,
     planPath,

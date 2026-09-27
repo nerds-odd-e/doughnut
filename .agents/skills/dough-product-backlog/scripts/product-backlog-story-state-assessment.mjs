@@ -119,12 +119,17 @@ export function assessmentFromPayload(payload) {
 }
 
 // Read-time view: absent, matching ready/not-ready, or needs reassessment
-// when the stored basis no longer matches current content.
-export function normalizeAssessmentView(recorded, currentBasis) {
+// when the stored basis no longer matches current content. A stored basis
+// matches the current basis, or the former basis a record written before
+// story scoping carries; nothing is rewritten.
+export function normalizeAssessmentView(recorded, currentBasis, formerBasis) {
   if (recorded === undefined) {
     return { status: "absent" };
   }
-  if (!basesEqual(recorded.basis, currentBasis)) {
+  if (
+    !basesEqual(recorded.basis, currentBasis) &&
+    !basesEqual(recorded.basis, formerBasis)
+  ) {
     return {
       status: "needs-reassessment",
       recorded: recorded.status,

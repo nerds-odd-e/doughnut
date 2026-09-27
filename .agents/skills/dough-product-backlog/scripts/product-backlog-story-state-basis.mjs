@@ -1,8 +1,10 @@
-// SHA-256 content basis for a readiness assessment. CLI and browser share
-// this meaning: normalize line endings only, exclude every story-state fence,
-// then digest. Planned work may add a plan digest; when the plan is the
-// canonical document itself, digest that document once so the basis cannot
-// become self-referential through the block that stores it.
+// SHA-256 content basis for a readiness assessment. It covers the story's own
+// section, the seed's shared context outside other stories' sections (the
+// caller supplies that story-scoped text), and a distinct plan. CLI and
+// browser share this meaning: normalize line endings only, exclude every
+// story-state fence, then digest. Planned work may add a plan digest; when
+// the plan is the canonical document itself, digest that document once so the
+// basis cannot become self-referential through the block that stores it.
 
 import { findStoryStateBlocks } from "./product-backlog-story-state-block.mjs";
 

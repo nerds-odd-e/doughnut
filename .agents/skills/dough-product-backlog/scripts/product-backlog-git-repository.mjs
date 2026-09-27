@@ -9,8 +9,8 @@
 // `product-backlog-git-operation-state.mjs`.
 import { AsyncLocalStorage } from "node:async_hooks";
 import { spawnSync } from "node:child_process";
-import { existsSync, readFileSync, writeFileSync } from "node:fs";
-import { resolve } from "node:path";
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { BacklogError } from "./product-backlog-refusal.mjs";
 
@@ -138,6 +138,8 @@ export function ensureDriverRegistered(repoRoot, file) {
     : "";
   if (!existing.split("\n").includes(line)) {
     const separator = existing !== "" && !existing.endsWith("\n") ? "\n" : "";
+    // Git creates `info/` only from its templates, which a repository may lack.
+    mkdirSync(dirname(attributesPath), { recursive: true });
     writeFileSync(attributesPath, `${existing}${separator}${line}\n`, "utf8");
   }
   git(

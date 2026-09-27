@@ -34,3 +34,17 @@ export function acceptedReceipt(
     ...reportedMaintenance(afterMaintenance, beforeMaintenance),
   };
 }
+
+// A prepared one-shot start: the owned workspace's fetched-trunk base, which
+// the result's managed delivery takes as its previously published base.
+// Nothing was published.
+export function preparedReceipt(request, selected, maintained) {
+  return {
+    ok: true,
+    status: "prepared",
+    startingRevision: selected.startingRevision,
+    ...(request.remote ? {} : { remote: remoteOf(request) }),
+    created: selected.created,
+    ...reportedMaintenance(maintained),
+  };
+}

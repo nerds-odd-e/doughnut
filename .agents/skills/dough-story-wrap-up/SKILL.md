@@ -71,14 +71,11 @@ Judge completion from the selected work and available execution evidence.
 ## Assimilate lasting knowledge
 
 Move lasting behavior and design into this project's maintained code, tests,
-documentation, or current Accepted decisions. Describe the current product
-without execution narration, impact chronology, story or plan identity, or
-retrospective judgments. Preserve existing product tests and documents that
-already state current behavior. Do not invent product knowledge. When a current
-product fact is written only in spent execution context or review and is not
-already stated in maintained documentation, write it into maintained documentation
-before deleting that spent copy. Tests that exercise related behavior do not
-replace that documentation step.
+and documentation. Describe the current product without execution narration,
+impact chronology, story or plan identity, or retrospective judgments. Preserve
+existing product tests and documents that already state current behavior. Do not
+invent product knowledge. Before this closure deletes any spent record,
+[preserve its lasting rules](../dough-slice-planning/references/architectural-thinking.md#preserve-lasting-rules-before-deletion).
 
 For North Star topics cited, added, or revised by the completed work, apply the
 shared [topic-retirement instructions](../dough-slice-planning/references/architectural-thinking.md#retire-temporary-direction-during-ordinary-wrap-up)

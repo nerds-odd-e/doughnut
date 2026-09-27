@@ -11,10 +11,8 @@ Caller-selected current-branch
 work commits its claim on the current checkout, which is never published.
 An accepted independent mission, including contextual planless work, is
 [admitted](admit-accepted-work.md) through that same startup operation.
-When no claim applies, use verified current HEAD and create no story, plan, or queue entry; still
-create the local execution workspace from that HEAD unless the caller selected
-the current branch. When that HEAD is the default checkout, verify it first under
-[Refresh eligibility](maintain-default-checkout.md#refresh-eligibility).
+Explicitly selected [one-shot work](one-shot.md), the only Story Branch or
+Trunk Mode start without a claim, prepares its workspace there too.
 
 Select or create that workspace through
 [own a temporary exploration workspace](../../dough-manual-testing/references/exploration-workspace.md)
@@ -29,9 +27,9 @@ base it supplies:
   returns a compact result with the accepted claim SHA and recovery coordinates
   for the workspace you supplied. A conflicting or ambiguous claim stops
   implementation; identical **Taken** text alone proves no ownership.
-- Work with no claim to publish supplies verified current HEAD, after
-  the default-checkout freshness check above when that HEAD is the default
-  checkout. Create no story, plan, or queue entry.
+- [One-shot work](one-shot.md) supplies the same path and authority with
+  `--one-shot`; the operation bases the workspace on fetched remote trunk and
+  publishes nothing.
 - Caller-selected current-branch work records that checkout and creates no
   worktree. An already-supported host-owned execution stays in that same
   recorded checkout and does not switch branches. Publication follows the
@@ -56,7 +54,7 @@ on the authorized remote when this execution publishes one, prepare the checkout
 as part of the same setup lifecycle so this project's ordinary commands are
 usable there before implementation delegation. The same readiness rule applies
 when caller-selected current-branch work newly supplies an unprepared checkout,
-and when contextual work has no claim to publish first.
+and when one-shot work has no claim to publish first.
 
 Resolve the required setup from this project's checked-in conventions and
 locked dependency metadata, not from an Open Dough configuration key. When

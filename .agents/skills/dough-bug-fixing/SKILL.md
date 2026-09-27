@@ -36,12 +36,12 @@ Asking questions to understand the report is not a mission. Once the
 instruction accepts diagnosing a report that is not known larger work (see
 [Route remaining work](#route-remaining-work)),
 [admit it](../dough-execute-plan/references/admit-accepted-work.md) before
-investigation; a discrepancy found inside an active story returns its evidence
-to that story's owner instead. Its story's Goal is resolving the reported
-discrepancy, its expectations are the gathered report below, and its approach
-is `planless` when the instruction also authorizes the bounded repair,
-otherwise `unselected`. That reference owns its checkout, refusals,
-continuation, and closure.
+investigation, unless it explicitly selects [one-shot work](../dough-execute-plan/references/one-shot.md);
+a discrepancy found inside an active story returns its evidence to that story's
+owner instead. Its story's Goal is resolving the reported discrepancy, its
+expectations are the gathered report below, and its approach is `planless` when
+the instruction also authorizes the bounded repair, otherwise `unselected`. That
+reference owns its checkout, refusals, continuation, and closure.
 
 ## Gather the report
 
@@ -100,10 +100,8 @@ expectation, actual behavior, evidence, and gaps. Do not plan, invent another
 story, or start a local implement-and-refactor loop. That execution publishes
 the validated repair through [increment and repair
 publication](../dough-execute-plan/references/trunk-publication.md#publish-an-execution-increment-or-repair).
-Do not push the repair through a separate procedure.
-
-Debug with available knowledge as needed. Do not require a separate debugging
-skill.
+Do not push the repair through a separate procedure. Debug with available
+knowledge; do not require a separate debugging skill.
 
 The contextual instruction must require:
 
@@ -154,18 +152,19 @@ For checkout-bound routing or artifact changes, continue the shared
 already entered for the session, or enter it now if investigation did not need
 a checkout.
 
-Do not repeat execute-plan preservation, rollback, or retry. Link the
-execution-preserved evidence already written under this project's
-executable-plan root (see [refine an oversized slice](../dough-execute-plan/references/oversized-slice.md)
-and [resolve execution context](../dough-slice-planning/SKILL.md#resolve-execution-context)).
+Do not repeat execute-plan preservation, rollback, or retry. Link the evidence
+execution preserved: under this project's executable-plan root (see [refine an oversized slice](../dough-execute-plan/references/oversized-slice.md)
+and [resolve execution context](../dough-slice-planning/SKILL.md#resolve-execution-context)),
+or for an escalated one-shot attempt, as edits restored in its claimed workspace.
 Carry the gathered expectation, actual behavior, remaining uncertainty, and
 acceptance examples into the canonical story. For an inconclusive report, the story first
 asks whether intended behavior is violated, then repairs a confirmed violation.
 
-An admitted story is already that canonical home: carry the evidence into it
-and keep it Taken, without queueing it again or creating another story, unless
-the developer explicitly returns it to **Backlog list** with the product
-backlog's `place --return`. Otherwise choose the canonical home:
+An admitted story, including one a grown one-shot attempt escalated into, is
+already that canonical home: carry the evidence into it and keep it Taken,
+without queueing it again or creating another story, unless the developer
+explicitly returns it to **Backlog list** with the product backlog's
+`place --return`. Otherwise choose the canonical home:
 
 - Reuse an existing owning story when moving it first in **Backlog list**
   preserves that story's scope.
@@ -221,16 +220,17 @@ or which remaining-work route was taken.
 
 - **Repaired:** the reproduction test failed for the reported mismatch, the
   smallest change made that proof green, related verification passed, and
-  shared delivery completed refactoring and branch delivery. Do not report
-  that result as integrated. The coordinator invokes
+  shared delivery completed refactoring and delivery. One-shot delivery reached
+  trunk and ends with its [retirement](../dough-execute-plan/references/one-shot.md#retire-the-workspace).
+  Otherwise do not report branch delivery as integrated: the coordinator invokes
   [story wrap-up](../dough-story-wrap-up/SKILL.md#integrate-committed-story-branch-mode-closure)
   for integration to the selected target (default `main`). Reporter
-  confirmation on main is pending when a repair needs it; never fabricate
-  that confirmation.
+  confirmation on main is pending when a repair needs it; never fabricate it.
 - **Explained no-change:** exploration evidence or execute-plan's
   explained-empty-change return shows the actual behavior matches the intended
-  behavior. Resolve it without a repair or further workspace; story wrap-up
-  closes an admitted story and the workspace its admission created.
+  behavior. Resolve it without a repair. One-shot work follows its
+  [no-change finish](../dough-execute-plan/references/one-shot.md#finish-with-no-change);
+  otherwise story wrap-up closes the admitted story and its workspace.
 - **Unresolved:** validity, cause, or scope remains unconfirmed, and the report
   is not known larger and was not an incomplete or inconclusive execution
   return. Do not claim resolution or invent a queue entry.

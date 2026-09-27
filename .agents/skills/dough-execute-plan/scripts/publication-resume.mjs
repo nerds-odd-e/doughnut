@@ -50,7 +50,9 @@ function appendIdentity(publishedRevisions, sha) {
 // publication obligation. Does not commit, refresh the default checkout,
 // or remove a workspace. `candidateSha` is the SHA retained immediately
 // before the push; after a rewrite that is the rewritten SHA.
-// `supersededShas` are pre-rebase identities and are never pushed.
+// `supersededShas` are pre-rebase identities and are never pushed. Before a
+// push, an `onFetchedTarget` stop (see applicable-candidate-proof.mjs) for
+// the fetched target tip is reported as `held` instead.
 export async function resumeInterruptedPublication({
   ownedWorkspace,
   defaultCheckout,
@@ -60,6 +62,7 @@ export async function resumeInterruptedPublication({
   observer = null,
   targetRef = defaultTargetRef,
   remote = "origin",
+  onFetchedTarget,
 }) {
   if (supersededShas.includes(candidateSha)) {
     throw new Error(
@@ -73,6 +76,12 @@ export async function resumeInterruptedPublication({
   const accepted = await isAncestor(ownedWorkspace, candidateSha, remoteTarget);
 
   if (!accepted) {
+    const held = await onFetchedTarget?.({
+      attempt: 0,
+      candidate: candidateSha,
+      remoteTip: await revParse(ownedWorkspace, remoteTarget).catch(() => null),
+    });
+    if (held) return { classification: "not-on-remote", pushCount: 0, held };
     await pushExactRef(ownedWorkspace, candidateSha, remote, targetRef);
     await git(ownedWorkspace, "fetch", remote);
     if (!(await isAncestor(ownedWorkspace, candidateSha, remoteTarget))) {

@@ -7,7 +7,7 @@ announce result named an `agent`, and its `workspaceAuthorship` is not
 that workspace, such as its wrap-up or the landing of its kept preparation,
 applies it while that workspace's own Git config still names the agent as
 author (`git config --worktree author.name`). Every other commit, such as
-caller-selected current-branch work, contextual work with no claim, a start
+caller-selected current-branch work, [one-shot work](one-shot.md), a start
 result without an `agent`, or a workspace reported `not-configured`, is made as
 before with plain `git commit`.
 

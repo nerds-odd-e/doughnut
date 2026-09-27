@@ -35,6 +35,15 @@ export function stopped(status, fields) {
   };
 }
 
+// A publisher's `onFetchedTarget({ attempt, candidate, remoteTip })` sees
+// each fetched target tip before any reconciliation. A returned
+// `{ status, fields }` stops there: nothing is rebased or pushed.
+export async function fetchedTargetStop(onFetchedTarget, attempt, fields) {
+  const { candidate, remoteTip } = fields;
+  const stop = await onFetchedTarget?.({ attempt, candidate, remoteTip });
+  return stop ? stopped(stop.status, { ...fields, ...stop.fields }) : undefined;
+}
+
 export function needsValidation(fields) {
   return {
     ok: false,

@@ -13,8 +13,9 @@ export async function revParse(cwd, ref) {
   return (await git(cwd, "rev-parse", ref)).stdout.trim();
 }
 
-export async function lsRemoteSha(remote, ref) {
-  const { stdout } = await exec("git", ["ls-remote", remote, ref]);
+// The SHA `remote` holds at `ref`, read live; a remote name resolves in `cwd`.
+export async function lsRemoteSha(remote, ref, cwd) {
+  const { stdout } = await exec("git", ["ls-remote", remote, ref], { cwd });
   return stdout.trim().split(/\s+/)[0];
 }
 

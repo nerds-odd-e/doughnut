@@ -41,9 +41,26 @@ function regionFor(lines, relative, anchor) {
         `to a section that is not there.`,
     );
   }
+  const region = anchoredSection(lines, start);
+  if (region.heading === -1) {
+    throw new BacklogError(
+      `${relative} has no "### " story heading under the anchor "${anchor}".`,
+    );
+  }
+  return region;
+}
+
+// A line that opens an anchored section and so ends the one before it.
+function isAnchorLine(line) {
+  return line.startsWith('<a id="');
+}
+
+// One anchored section from its anchor line to the next anchor line or "## "
+// heading, with its first "### " heading, or -1 when it holds none.
+function anchoredSection(lines, start) {
   let end = lines.length;
   for (let index = start + 1; index < lines.length; index += 1) {
-    if (lines[index].startsWith('<a id="') || lines[index].startsWith("## ")) {
+    if (isAnchorLine(lines[index]) || lines[index].startsWith("## ")) {
       end = index;
       break;
     }
@@ -51,12 +68,38 @@ function regionFor(lines, relative, anchor) {
   const heading = lines.findIndex(
     (line, index) => index > start && index < end && line.startsWith("### "),
   );
-  if (heading === -1) {
-    throw new BacklogError(
-      `${relative} has no "### " story heading under the anchor "${anchor}".`,
-    );
-  }
   return { start, end, heading };
+}
+
+// The home's document lines without the other stories' sections: every other
+// anchored section holding a "### " story heading is left out, and everything
+// else — front matter, title, seed-level prose, and this story's own section —
+// stays as shared context. Blank lines left at the end are dropped, so closing
+// the last sibling reads the same whether or not its separating blank line
+// went with it. A whole-document home leaves nothing out.
+export function storyContextLines(home) {
+  const { lines } = home.document;
+  if (home.anchor === "") {
+    return lines;
+  }
+  const kept = [];
+  let index = 0;
+  while (index < lines.length) {
+    const other =
+      index !== home.region.start && isAnchorLine(lines[index])
+        ? anchoredSection(lines, index)
+        : undefined;
+    if (other !== undefined && other.heading !== -1) {
+      index = other.end;
+      continue;
+    }
+    kept.push(lines[index]);
+    index += 1;
+  }
+  while (kept.length > 0 && kept[kept.length - 1].trim() === "") {
+    kept.pop();
+  }
+  return kept;
 }
 
 // The immutable document ID a seed already carries. Adoption reuses it rather

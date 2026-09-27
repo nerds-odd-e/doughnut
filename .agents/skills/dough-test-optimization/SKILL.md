@@ -29,10 +29,14 @@ ends with findings. For `--resolve`, follow only
 An independently requested pass in any mode is an accepted mission:
 [admit it](../dough-execute-plan/references/admit-accepted-work.md) before
 profiling or triage, with its story in a relevant existing seed when one fits
-and approach `unselected`. A pass requested as a step of an active story
+and approach `unselected`. A pass explicitly selected as
+[one-shot work](../dough-execute-plan/references/one-shot.md) follows that
+instead. A pass requested as a step of an active story
 continues under that story. Findings with no worthwhile change, in profiling
 or resolve-only triage,
-[finish the mission](../dough-execute-plan/references/admit-accepted-work.md#finish-the-mission).
+[finish the mission](../dough-execute-plan/references/admit-accepted-work.md#finish-the-mission),
+or under one-shot its
+[no-change finish](../dough-execute-plan/references/one-shot.md#finish-with-no-change).
 
 Before assessing tests, read the shared
 [behavioral test guidance](../dough-post-change-refactor/references/refactor-checks.md#tests-as-behavioral-documentation).

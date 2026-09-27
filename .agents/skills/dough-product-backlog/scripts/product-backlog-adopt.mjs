@@ -24,6 +24,7 @@ import {
   openHome,
   recordIdentity,
 } from "./product-backlog-home.mjs";
+import { planFileOf, planNamesHome } from "./product-backlog-plan.mjs";
 import { BacklogError } from "./product-backlog-refusal.mjs";
 
 const humanStop =
@@ -61,8 +62,8 @@ function adoptedIdentity(entry, home) {
 
 function homesFor(backlogDirectory, entry, home) {
   const homes = [home];
-  if (entry.plan && entry.plan.target !== entry.href) {
-    homes.push(openHome(backlogDirectory, entry.plan.target));
+  if (entry.plan && !planNamesHome(entry.plan.target, entry.href)) {
+    homes.push(openHome(backlogDirectory, planFileOf(entry.plan.target)));
   }
   return homes;
 }

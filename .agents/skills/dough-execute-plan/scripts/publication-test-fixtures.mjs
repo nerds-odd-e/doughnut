@@ -124,6 +124,14 @@ export async function assertRemoteCandidate(origin, candidateSha) {
   assert.equal(await lsRemoteSha(origin, "refs/heads/main"), candidateSha);
 }
 
+// Clones `origin` into `checkout` with its own committer identity, so another
+// writer can commit there without relying on a global Git identity.
+export async function cloneAsAnotherWriter(origin, checkout) {
+  await exec("git", ["clone", "-q", origin, checkout]);
+  await git(checkout, "config", "user.name", "Another Writer");
+  await git(checkout, "config", "user.email", "another@example.test");
+}
+
 // Another writer advances the authorized remote with one disjoint commit from
 // a separate clone. The clone is removed after the push.
 export async function advanceOriginFromAnotherWriter(
@@ -135,9 +143,7 @@ export async function advanceOriginFromAnotherWriter(
   } = {},
 ) {
   const thirdCheckout = (await exec("mktemp", ["-d"])).stdout.trim();
-  await exec("git", ["clone", origin, thirdCheckout]);
-  await git(thirdCheckout, "config", "user.name", "Another Writer");
-  await git(thirdCheckout, "config", "user.email", "another@example.test");
+  await cloneAsAnotherWriter(origin, thirdCheckout);
   writeFileSync(join(thirdCheckout, file), body);
   await git(thirdCheckout, "add", file);
   await git(thirdCheckout, "commit", "-m", message);

@@ -116,13 +116,15 @@ export async function commitWorkspaceClaim(request) {
       ...(request.plan === undefined ? {} : { plan: request.plan }),
       backlogDirectory: dirname(join(workspace, file)),
     };
-    outcome = admission
-      ? admitEntry(source, {
-          ...entryRequest,
-          title: admission.title,
-          href: admission.href,
-        })
-      : takeEntry(source, entryRequest);
+    // A queued story admitted with its one-shot edits moves its entry.
+    outcome =
+      admission && !admission.queued
+        ? admitEntry(source, {
+            ...entryRequest,
+            title: admission.title,
+            href: admission.href,
+          })
+        : takeEntry(source, entryRequest);
     return outcome.source;
   });
   if (outcome.result === "unchanged") {

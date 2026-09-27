@@ -2,17 +2,17 @@
 name: dough-execute-plan
 description: >-
   Executes one selected story or bounded retrospective correction through an
-  executable plan, or one authorized planless slice from a selected simple story
-  or a contextual instruction, with independent refactoring, delivery, and
-  asynchronous CI repair. Use to execute a plan, run slices, execute a canonical
-  story when the caller explicitly skips slice planning, or execute a small
-  instruction from context without a story or plan. Also admits an accepted
-  mission that no backlog list holds, such as a standalone review,
-  investigation, or maintenance request, into Taken before its work starts.
-  Does not decide story scope or quick-path eligibility. `--trunk` selects
-  Trunk Mode; omitted mode keeps Story Branch Mode. `--skip-retro` skips the
-  automatic planned-execution retrospective. `--replan` and `--no-replan` choose
-  whether an oversized attempt may continue through planning.
+  executable plan, or one authorized planless slice from a selected simple story or
+  a contextual instruction, with independent refactoring, delivery, and asynchronous
+  CI repair. Use to execute a plan, run slices, execute a canonical story when the
+  caller explicitly skips slice planning, or execute a small instruction from
+  context without a story or plan. Also admits an accepted mission that no backlog
+  list holds, such as a standalone review, investigation, or maintenance request,
+  into Taken before its work starts. Does not decide story scope or quick-path
+  eligibility. `--trunk` selects Trunk Mode; omitted mode keeps Story Branch Mode.
+  `--one-shot` publishes only the result of explicitly selected trivial work.
+  `--skip-retro` skips the automatic planned-execution retrospective. `--replan` and
+  `--no-replan` choose whether an oversized attempt may continue through planning.
 ---
 
 # Execute planned or planless work
@@ -164,9 +164,9 @@ failures, completion, and retrospective; wrap-up removes it.
 ### Admit accepted work that no backlog list holds
 
 When the current instruction accepts a mission that no backlog list holds,
-follow [admit accepted work](references/admit-accepted-work.md) before its
-substantive work. It admits the story with this start command and `--admit`,
-and later continues that claim into authorized implementation.
+follow [admit accepted work](references/admit-accepted-work.md), which admits it
+with this start command and `--admit` before its substantive work. Explicitly
+selected [one-shot work](references/one-shot.md) starts with `--one-shot` instead.
 
 ## Choose the execution location
 
@@ -201,7 +201,7 @@ increment, or repair with
 [interrupted publication](references/trunk-publication.md#resume-an-interrupted-publication)
 before any further commit or push. Plan status or a compact report proves none
 of those later boundaries. When pushed commit, retained delivery result, and
-required registration agree, select the next dependency-ready slice.
+required registration agree, select the next unfinished slice in plan order.
 Missing/contradictory execution identity requires the recovery decision above.
 
 ## Execute the next slice
@@ -212,7 +212,7 @@ Missing/contradictory execution identity requires the recovery decision above.
    reread the source and conversation's scope, decisions, progress, proof, and remaining
    uncertainty; it is the only slice, with no separate state artifact. Confirm current
    execution authority. Recover an existing CI observer before considering a new one.
-2. Select the next unfinished dependency-ready planned slice, or the one quick slice. Apply
+2. Select the next unfinished planned slice in plan order, or the one quick slice. Apply
    [execution decisions](references/execution-decisions.md); for behavior/state removal or
    disablement, also run the [destructive later-outcome check](references/destructive-later-outcome-check.md).
 3. When planned refinement is needed and learning escalation permits, invoke
@@ -239,9 +239,8 @@ Missing/contradictory execution identity requires the recovery decision above.
    After successful delivery, restart for remaining planned slices; a delivered
    quick slice has no successor.
 
-Planned slices may run concurrently only with disjoint file changes, mutable state, and
-plan writes. Quick execution has one slice. Each slice completes coordinator-owned delivery
-before a dependent slice starts.
+Slices run one at a time in plan order, each finishing its delivery before the next
+starts; quick execution has one slice.
 
 ## Finish or stop
 

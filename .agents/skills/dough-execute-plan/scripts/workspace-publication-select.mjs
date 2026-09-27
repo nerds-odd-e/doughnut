@@ -64,11 +64,16 @@ async function verifyRetained(request) {
   }
 }
 
+// A supplied `base` is fetched trunk the caller already reset the workspace
+// to, such as a carried escalation's park; it is used without fetching again.
 export async function selectOwnedWorkspace(request) {
   if (request.retained?.workspace) return verifyRetained(request);
   try {
-    await git(request.integration, "fetch", remoteOf(request));
-    const base = await revParse(request.integration, remoteRef(request));
+    let { base } = request;
+    if (!base) {
+      await git(request.integration, "fetch", remoteOf(request));
+      base = await revParse(request.integration, remoteRef(request));
+    }
     if (existsSync(request.workspace)) {
       const actual = await revParse(request.workspace, "--show-toplevel");
       const branch = (
