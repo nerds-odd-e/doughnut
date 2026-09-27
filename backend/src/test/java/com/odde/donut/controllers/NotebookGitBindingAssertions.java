@@ -18,8 +18,9 @@ import org.eclipse.jgit.revwalk.RevWalk;
 
 /**
  * Asserts that a freshly created notebook already has its accepted Git binding: one root commit on
- * {@code refs/heads/main} with no parents and the initial LFS {@code .gitattributes}. The accepted
- * history is read through the notebook's own Git-bundle download endpoint.
+ * {@code refs/heads/main} with no parents, made by Donut System as "Create notebook", holding the
+ * initial LFS {@code .gitattributes}. The accepted history is read through the notebook's own
+ * Git-bundle download endpoint.
  */
 final class NotebookGitBindingAssertions {
 
@@ -41,6 +42,9 @@ final class NotebookGitBindingAssertions {
       try (RevWalk revWalk = new RevWalk(readBack)) {
         RevCommit commit = revWalk.parseCommit(headObjectId);
         assertThat(commit.getParentCount(), equalTo(0));
+        assertThat(commit.getFullMessage(), equalTo("Create notebook"));
+        assertThat(commit.getAuthorIdent().getName(), equalTo("Donut System"));
+        assertThat(commit.getAuthorIdent().getEmailAddress(), equalTo("system@donut.local"));
         assertThat(
             GitBundleTestReader.readExactTree(readBack, commit),
             contains(

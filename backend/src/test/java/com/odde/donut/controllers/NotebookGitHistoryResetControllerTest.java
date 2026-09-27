@@ -84,6 +84,11 @@ class NotebookGitHistoryResetControllerTest extends NotebookGitControllerTestBas
       assertThat(head, equalTo(ObjectId.fromString(afterReset.getAcceptedGitObjectId())));
       RevCommit resetCommit = revWalk.parseCommit(head);
       assertThat(resetCommit.getParentCount(), equalTo(0));
+      assertThat(
+          resetCommit.getFullMessage(),
+          equalTo("Reset: restart Git history from the current notebook"));
+      assertThat(resetCommit.getAuthorIdent().getName(), equalTo("Donut System"));
+      assertThat(resetCommit.getAuthorIdent().getEmailAddress(), equalTo("system@donut.local"));
       revWalk.markStart(resetCommit);
       List<RevCommit> history = new ArrayList<>();
       revWalk.forEach(history::add);
