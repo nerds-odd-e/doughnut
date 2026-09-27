@@ -65,7 +65,7 @@ close button needs.
 ### 1. A spelling result shows the note context once, inside the note under question
 
 Type: Behavior
-Status: planned
+Status: done
 Proof: the three slice-1 rows above; run the recall spelling component and
 page specs, then `pnpm cy:run --spec e2e_test/features/recall/accidental_match_scheduling.feature`.
 

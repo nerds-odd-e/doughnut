@@ -29,16 +29,18 @@
   </PopButton>
   <NoteUnderQuestion
     v-bind="recalledNoteUnderQuestionProps(answeredQuestion.recalledNote)"
-  />
+  >
+    <NoteContextReader
+      v-if="showNoteContext"
+      :note-id="answeredQuestion.recalledNote.noteTopology.id"
+      :focused-property-key="answeredQuestion.recalledNote.propertyKey"
+    />
+  </NoteUnderQuestion>
   <ViewMemoryTrackerLink
     :memory-tracker-id="answeredQuestion.memoryTrackerId"
   />
-  <NoteContextReader
-    v-if="showNoteContext"
-    :note-id="answeredQuestion.recalledNote.noteTopology.id"
-  />
   <button
-    v-else
+    v-if="!showNoteContext"
     type="button"
     class="daisy-btn daisy-btn-neutral daisy-btn-sm mt-2"
     @click="noteContextRevealed = true"

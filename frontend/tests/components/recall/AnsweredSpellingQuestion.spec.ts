@@ -32,7 +32,10 @@ describe("AnsweredSpellingQuestion plain wrong", () => {
 
 describe("AnsweredSpellingQuestion correct", () => {
   it("keeps the result brief and reveals the note context on demand", async () => {
+    const noteTitle = "Sedition"
     const noteRealm = makeMe.aNoteRealm
+      .title(noteTitle)
+      .notebookName("Political History")
       .content("Inciting rebellion against authority.")
       .please()
     mockSdkService(NoteController, "showNote", noteRealm)
@@ -45,6 +48,7 @@ describe("AnsweredSpellingQuestion correct", () => {
     const wrapper = mountAnsweredSpellingQuestion(answeredQuestion)
     await flushPromises()
     expect(wrapper.find('[aria-label="Note context"]').exists()).toBe(false)
+    expect(wrapper.find(".note-under-question").text()).toContain(noteTitle)
 
     const showButton = wrapper
       .findAll("button")
@@ -52,9 +56,13 @@ describe("AnsweredSpellingQuestion correct", () => {
     await showButton.trigger("click")
     await flushPromises()
 
-    expect(wrapper.find('[aria-label="Note context"]').text()).toContain(
+    const noteUnderQuestion = wrapper.find(".note-under-question")
+    const noteContext = noteUnderQuestion.find('[aria-label="Note context"]')
+    expect(noteContext.exists()).toBe(true)
+    expect(noteContext.text()).toContain(
       "Inciting rebellion against authority."
     )
+    expect(wrapper.text().split(noteTitle).length - 1).toBe(1)
     expect(wrapper.find(".daisy-alert-success").text()).toContain("Correct!")
   })
 })

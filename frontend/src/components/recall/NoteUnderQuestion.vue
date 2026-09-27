@@ -2,16 +2,18 @@
   <div class="note-under-question bg-base-200 border-base-300">
     <div class="note-label bg-base-200 text-base-content">Note under question</div>
     <FocusedPropertyIndicator :property-key="focusedPropertyKey" />
-    <div class="breadcrumb-wrapper">
-      <Breadcrumb
-        :ancestor-folders="ancestorFolders ?? []"
-        :breadcrumb-notebook-id="breadcrumbNotebookId"
-      >
-        <template #additional>
-          <NoteTitleWithLink v-bind="{ noteTopology, focusedPropertyKey }" />
-        </template>
-      </Breadcrumb>
-    </div>
+    <slot>
+      <div class="breadcrumb-wrapper">
+        <Breadcrumb
+          :ancestor-folders="ancestorFolders ?? []"
+          :breadcrumb-notebook-id="breadcrumbNotebookId"
+        >
+          <template #additional>
+            <NoteTitleWithLink v-bind="{ noteTopology, focusedPropertyKey }" />
+          </template>
+        </Breadcrumb>
+      </div>
+    </slot>
   </div>
 </template>
 
