@@ -15,5 +15,5 @@ and deletable in Web Donut.
 
 ## Backlog list
 
-- [Notebook history commits are proven where they happen](seeds/SEED-050-local-ai-notebook-technical-debt.md#story-9) — SEED-050#story-9
+- [Notebook history commits are proven where they happen](seeds/SEED-050-local-ai-notebook-technical-debt.md#story-10) — SEED-050#story-10
 - [Code, API and docs say "image", and the UI says "File"](seeds/SEED-050-local-ai-notebook-technical-debt.md#story-7) — SEED-050#story-7

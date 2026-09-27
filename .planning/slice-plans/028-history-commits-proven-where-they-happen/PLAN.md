@@ -2,8 +2,8 @@
 
 ## Source
 
-- Story: [SEED-050#story-9](../../seeds/SEED-050-local-ai-notebook-technical-debt.md#story-9)
-- **Identity:** SEED-050#story-9
+- Story: [SEED-050#story-10](../../seeds/SEED-050-local-ai-notebook-technical-debt.md#story-10)
+- **Identity:** SEED-050#story-10
 - Correction of SEED-050#story-5 (plan
   `4426190218:.planning/slice-plans/024-finished-transitions-leave-no-trace/PLAN.md`,
   commits 48d5a2e8f8, 433ca0be36, b2dd68f03e, 5afa318baf), from its execution

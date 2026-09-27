@@ -124,13 +124,13 @@ performance loss.
 4. A root note whose picture another root note also uses is moved into a
    folder → the picture is copied, not moved, as today.
 
-<a id="story-9"></a>
+<a id="story-10"></a>
 
 ### Notebook history commits are proven where they happen
 
-**Identity:** SEED-050#story-9
+**Identity:** SEED-050#story-10
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/028-history-commits-proven-where-they-happen/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"ea2316921ba1b7d1f14721c8a31f689c612448617ef73440cf40e178c27befa1","plan":"dcd584e6caf210a0258b84c0218a08248da7a7fc2edb51cf606981f4e22ce042"}}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/028-history-commits-proven-where-they-happen/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"23720159991a107a42fefcbb609efe286c8ff6a22c650b0b834dd4b7f21b8a37","plan":"11e47dc69185c0bbc4913f29f26940dd172ee7e521e2085e4c12ea5b59c9e844"}}
 ```
 
 **Goal:** Correction of SEED-050#story-5 (commits 48d5a2e8f8..5afa318baf): a
