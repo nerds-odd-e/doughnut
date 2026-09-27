@@ -30,7 +30,7 @@ Structure: existing tests stay green unchanged in intent.
 ### 1. Dissolve placement check uses folderToEnter
 
 Type: Structure
-Status: planned
+Status: done
 Proof: `CURSOR_DEV=true nix develop -c pnpm backend:test_only --tests 'com.odde.donut.controllers.NotebookGitFolderDissolveGuardControllerTest' --tests 'com.odde.donut.controllers.NotebookFolderDissolveControllerTest' --tests 'com.odde.donut.controllers.NotebookGitFolderDissolveControllerTest' --tests 'com.odde.donut.controllers.NotebookGitFolderDissolveAtomicControllerTest'`
 green; `git diff --stat` shows net fewer lines in `FolderContentsPlacementCheck.java`.
 
@@ -38,3 +38,5 @@ Change: in the subfolder loop, `existing = folderToEnter(notebook,
 destinationOrNull, new DisplayName(child.getName()), excludedFolderIds)`;
 drop the inline `takenBy(...).ifPresent(refuseTaken)` for subfolders. Keep the
 note and file loops.
+
+Accepted proof: the four named classes passed (Guard 8, FolderDissolve 9, GitFolderDissolve 5, GitFolderDissolveAtomic 1 — 23 tests, 0 failures); `FolderContentsPlacementCheck.java` 6+/8−. Refactor pass: no edits.

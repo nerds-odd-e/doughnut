@@ -1,5 +1,6 @@
 package com.odde.donut.services;
 
+import com.odde.donut.entities.DisplayName;
 import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
@@ -70,15 +71,12 @@ final class FolderContentsPlacementCheck {
     for (Folder child :
         folderRepository.findFoldersInContainer(source.getNotebook().getId(), source.getId())) {
       Optional<Folder> existing =
-          folderSiblingNameValidation.folderHolding(
-              notebook, destinationOrNull, child.getName(), excludedFolderIds);
-      if (existing.isEmpty()) {
-        takenBy(notebook, destinationOrNull, child.getName(), excludedFolderIds)
-            .ifPresent(FolderSiblingNameValidation::refuseTaken);
-        continue;
+          folderSiblingNameValidation.folderToEnter(
+              notebook, destinationOrNull, new DisplayName(child.getName()), excludedFolderIds);
+      if (existing.isPresent()) {
+        firstFolderMeetingAFolder(child, notebook, existing.get(), excludedFolderIds);
+        first = first.or(() -> Optional.of(child));
       }
-      firstFolderMeetingAFolder(child, notebook, existing.get(), excludedFolderIds);
-      first = first.or(() -> Optional.of(child));
     }
     for (Note note :
         noteRepository.findNotesInContainer(source.getNotebook().getId(), source.getId())) {
