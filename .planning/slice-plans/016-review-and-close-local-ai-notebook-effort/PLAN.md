@@ -99,7 +99,7 @@ Open Dough architectural process.
 ### 3. Feature coverage section published
 
 Type: Behavior
-Status: planned
+Status: done
 Proof: republished page shows the feature map (see table).
 
 Behavior: slice 2's page exists → the review organizes the effort's
@@ -150,6 +150,8 @@ the owner's keep-or-delete decision.
 - Slice 2 has no *queue now* finding: the lasting release-gate rule dropped in
   `002bad682f` has no consumer now that every legacy store is removed, so it is
   reported as a wrap-up practice suggestion only.
+- Slice 3 has no *queue now* gap; cited E2E feature files and doc headings were
+  checked to exist.
 
 - Report findings only; no product code changes. The execution wrap-up's
   refactor and API steps have nothing to act on; formatting and lint run on

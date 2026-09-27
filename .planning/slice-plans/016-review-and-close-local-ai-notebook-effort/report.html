@@ -67,6 +67,13 @@ nav.toc .pending{color:var(--muted);border-style:dashed;background:transparent}
 .retire{font-size:.92rem;color:var(--muted)}
 .retire b{color:var(--ink)}
 .note{color:var(--muted);font-size:.9rem}
+.table-wrap{overflow-x:auto;margin-top:20px;border:1px solid var(--line);border-radius:6px;background:var(--paper)}
+table.map{border-collapse:collapse;width:100%;min-width:760px;font-size:.88rem}
+table.map th,table.map td{text-align:left;vertical-align:top;padding:8px 10px;border-bottom:1px solid var(--line)}
+table.map thead th{font-size:.72rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:600}
+table.map tr.area th{background:var(--accent-soft);color:var(--ink);font-family:"Schibsted Grotesk",system-ui,sans-serif;font-size:.95rem}
+table.map td.gap{color:var(--urgent);font-weight:600}
+.finding p{font-size:.92rem}
 footer{margin-top:64px;color:var(--muted);font-size:.85rem;border-top:1px solid var(--line);padding-top:16px}
 </style>
 
@@ -84,7 +91,7 @@ footer{margin-top:64px;color:var(--muted);font-size:.85rem;border-top:1px solid 
   <nav class="toc" aria-label="Sections">
     <a href="#architecture">Architecture</a>
     <a href="#process">Process feedback</a>
-    <a class="pending" href="#pending">Feature coverage (next)</a>
+    <a href="#coverage">Feature coverage</a>
     <a class="pending" href="#pending">Follow-ups queued (next)</a>
     <a class="pending" href="#pending">Seed cleanup and stale seeds (next)</a>
   </nav>
@@ -321,9 +328,92 @@ footer{margin-top:64px;color:var(--muted);font-size:.85rem;border-top:1px solid 
 </div>
 </section>
 
+<section id="coverage">
+<h2>Feature coverage</h2>
+<div class="summary">
+  <p><b>The retained behavior, organized as a system.</b> The rows below come from <code>docs/notebook-git-attachments.md</code> (<i>att</i>), <code>docs/notebook-git-lfs.md</code> (<i>lfs</i>), <code>docs/notebook-git-synchronization.md</code> (<i>sync</i>), and ADRs 0002 and 0004. E2E paths are under <code>e2e_test/features/</code>. <i>BE</i> means <code>backend/src/test/java/com/odde/donut/controllers/</code>, <i>FE</i> means <code>frontend/tests/</code>, and <i>CLI</i> means <code>cli/tests/</code>.</p>
+  <ul>
+    <li><span class="chip ok">no queue-now gap</span> Every retained user-facing behavior has an E2E scenario or strong backend coverage.</li>
+    <li><span class="chip calm">not now</span> Eight named gaps and two over-testing candidates, listed after the map.</li>
+  </ul>
+</div>
+
+<div class="table-wrap">
+<table class="map">
+<thead><tr><th scope="col">Behavior</th><th scope="col">Owning doc section</th><th scope="col">E2E</th><th scope="col">Unit</th></tr></thead>
+<tbody>
+<tr class="area"><th colspan="4" scope="rowgroup">Getting a local checkout</th></tr>
+<tr><td>Clone gives a clean <code>main</code> checkout, sets up LFS, fills in only current files, and keeps no credentials</td><td>lfs#Consequences; sync#Repository and transport boundary</td><td><code>cli/cli_notebook_lfs</code> "CLI clone hydrates the current LFS tip…"; <code>cli/cli_notebook_clone</code></td><td>CLI <code>notebookAcquisition.lfs.test.ts</code>; <code>notebookClone.test.ts</code></td></tr>
+<tr><td>A failed or denied clone leaves the destination untouched</td><td>lfs#Consequences</td><td><code>cli_notebook_lfs</code> "Failed CLI clone leaves an existing destination untouched"</td><td>CLI <code>notebookClone.failures.test.ts</code></td></tr>
+<tr><td>Pull rebases local work and fills in files; a failed download reports incomplete and a rerun completes it</td><td>sync#Accepted history; lfs#Consequences</td><td><code>cli_notebook_lfs</code> "Same-checkout pull keeps a local note and image over a web save…"</td><td>CLI <code>notebookPull.lfs.test.ts</code></td></tr>
+<tr><td>Both sides change one file: the rebase pauses on a conflict and you choose</td><td>lfs#Consequences</td><td class="gap">gap</td><td class="gap">gap</td></tr>
+<tr><td>A past version is recovered with standard <code>git lfs fetch</code></td><td>lfs#Recovering a published attachment version</td><td><code>cli_notebook_lfs</code> "Explicit Git LFS fetch recovers a published version…"</td><td>—</td></tr>
+<tr><td>LFS transfer follows notebook access; knowing a hash grants nothing</td><td>lfs#Decision</td><td><code>cli_notebook_lfs</code> "Unauthorized Git LFS upload is refused"</td><td>BE <code>NotebookLfsTransferControllerTest</code></td></tr>
+
+<tr class="area"><th colspan="4" scope="rowgroup">Local publish and acceptance</th></tr>
+<tr><td>Publish uploads objects before the bundle, only new versions; a failure keeps local state</td><td>lfs#Decision</td><td><code>cli_notebook_lfs</code> "CLI publishes two LFS versions…"</td><td>CLI <code>notebookPublish.lfs.test.ts</code>, <code>notebookPublish.lfsFailure.test.ts</code></td></tr>
+<tr><td>The tip's whole file set is applied by path (add, edit, rename, remove)</td><td>att#Attachments today</td><td><code>cli/cli_notebook_publish_to_clean_clone</code> "Nested attachments follow a web folder rename…"</td><td>BE <code>NotebookGitAttachmentLocalChangeControllerTest</code>, <code>NotebookGitAttachmentPublicationControllerTest</code></td></tr>
+<tr><td>10 MiB limit (inclusive) on every published commit; already-accepted content stays publishable</td><td>att#Attachments today; lfs#Decision</td><td><code>cli/cli_notebook_attachment_size_admission</code></td><td>BE <code>NotebookGitAttachmentSizeAdmissionControllerTest</code>, <code>…HistoryControllerTest</code></td></tr>
+<tr><td>A raw (non-pointer) file is refused</td><td>lfs#Decision</td><td class="gap">gap</td><td>CLI <code>notebookPublish.lfsFailure.test.ts</code> "rejects publishing a raw attachment"</td></tr>
+<tr><td>Changing a Book's source file is refused</td><td>att#Attachments today</td><td class="gap">gap</td><td>BE <code>NotebookGitBookSourceFileProtectionControllerTest</code></td></tr>
+
+<tr class="area"><th colspan="4" scope="rowgroup">Classifying and validating files</th></tr>
+<tr><td>Every Markdown file, AI guidance included, needs frontmatter with a <code>type</code>; invalid Markdown rejects the whole proposal</td><td>att#Classification and references; ADR 0004#Validation</td><td class="gap">gap</td><td>BE <code>NotebookGitProposalMarkdownFormatControllerTest</code></td></tr>
+<tr><td>Non-Markdown files are attachments with exact bytes; <code>.gitattributes</code> is metadata; <code>.keep</code> is structural</td><td>ADR 0004#Bundle and concepts</td><td><code>cli/cli_notebook_git_history_reset</code></td><td><code>services/notebookGit/NotebookGitAttachmentClassificationTest</code>; BE <code>NotebookGitAttachmentMetadataControllerTest</code></td></tr>
+<tr><td>A note's <code>image:</code> resolves relative to its folder; PNG, JPEG, GIF, WebP only; SVG refused</td><td>att#Classification and references</td><td><code>note_view/note_frontmatter_image</code> "Note shows a picture file from its own folder"</td><td>BE <code>NoteAttachmentImageControllerTest</code>; FE <code>notes/NoteShow.spec.ts</code></td></tr>
+
+<tr class="area"><th colspan="4" scope="rowgroup">Browsing files in Web Donut</th></tr>
+<tr><td>The sidebar lists files at their folder or the root, sorted with notes</td><td>att#Attachments today</td><td><code>notebooks/notebook_files</code> "Open a file and download its exact bytes"</td><td>BE <code>NotebookFolderListingControllerTest</code>; FE <code>notes/sidebar/SidebarPeerSort.spec.ts</code></td></tr>
+<tr><td>A file's page shows name, size, folder trail, and the picture for picture files</td><td>att#Attachments today</td><td><code>notebooks/notebook_files</code></td><td>BE <code>NotebookAttachmentControllerTest</code>; FE <code>pages/AttachmentPage.spec.ts</code></td></tr>
+<tr><td>Bazaar readers can see files; non-readers cannot</td><td>att#Attachments today</td><td>—</td><td>BE <code>NotebookAttachmentControllerTest</code></td></tr>
+
+<tr class="area"><th colspan="4" scope="rowgroup">Download, delete and upload</th></tr>
+<tr><td>Download returns exact bytes (octet-stream, <code>nosniff</code>); a missing object fails loudly</td><td>att#Attachments today; lfs#Consequences</td><td><code>notebooks/notebook_files</code> "Open a file and download its exact bytes"</td><td>BE <code>NotebookAttachmentControllerTest</code></td></tr>
+<tr><td>Deleting a file is one accepted commit; notes keep their <code>image:</code>; editors only</td><td>att#Attachments today</td><td><code>notebooks/notebook_files</code> "Delete a file from its page"</td><td>BE <code>NotebookGitWebAttachmentDeleteControllerTest</code>; FE <code>pages/AttachmentPage.spec.ts</code></td></tr>
+<tr><td>An uploaded picture becomes a file in the note's folder with <code>image:</code> set, in one commit</td><td>att#Attachments today</td><td><code>note_view/note_frontmatter_image</code> "Uploaded image becomes a file…"; <code>cli_notebook_lfs</code> "A picture uploaded on the web arrives in the owner's clone…"</td><td>BE <code>NoteControllerUploadNoteImageTests</code>; FE <code>pages/NoteShowPage.imageUpload.spec.ts</code></td></tr>
+<tr><td>Attaching a Book makes a root file named by Donut; removing the Book leaves the file</td><td>att#Attachments today</td><td><code>cli_notebook_lfs</code> "A Book attached to a notebook arrives in the owner's clone…"</td><td>BE <code>NotebookBooksAttachNotebookFileControllerTest</code></td></tr>
+
+<tr class="area"><th colspan="4" scope="rowgroup">Folders and the one set of names</th></tr>
+<tr><td>Folder rename, move, trash and recovery carry the folder's files</td><td>att#Attachments today</td><td><code>cli_notebook_publish_to_clean_clone</code> "Nested attachments follow a web folder rename…"</td><td>BE <code>NotebookGitFolderRenameControllerTest</code>, <code>NotebookGitWebFolderTrashControllerTest</code>, <code>NotebookGitWebFolderMoveControllerTest</code></td></tr>
+<tr><td>Dissolve and merge carry files; permanent delete removes them; a cross-notebook move of a folder with files is refused</td><td>att#Attachments today</td><td class="gap">gap (notes only in <code>folder_organization</code>)</td><td>BE <code>NotebookGitFolderDissolveControllerTest</code>, <code>NotebookGitWebFolderCrossNotebookMoveControllerTest</code></td></tr>
+<tr><td>A web note move carries its <code>image:</code> file (renumbered on a clash, copied when shared)</td><td>att#Attachments today</td><td class="gap">gap</td><td>BE <code>NotebookGitWebNoteMovePictureControllerTest</code></td></tr>
+<tr><td>One case-insensitive name rule over notes, folders and files</td><td>att#One set of names per folder</td><td><code>folder_organization</code> "Sibling name clash blocks a folder move…" (folders only)</td><td>BE <code>NotebookFolderCreateControllerTest</code>, <code>NotebookFolderMoveNameClashControllerTest</code>, <code>NotebookNoteCreateControllerTest</code></td></tr>
+<tr><td>Notebook health counts a file as content</td><td>att#Attachments today</td><td class="gap">gap</td><td>BE <code>NotebookHealthControllerTest</code></td></tr>
+
+<tr class="area"><th colspan="4" scope="rowgroup">Converted notebooks</th></tr>
+<tr><td>Notebooks converted from raw storage keep readable raw history and publish pointers</td><td>lfs#Notebooks converted from raw storage</td><td>—</td><td>BE <code>NotebookGitAttachmentRawHistoryControllerTest</code>; CLI <code>notebookPublish.lfs.test.ts</code></td></tr>
+<tr><td>A history reset is created with LFS and carries current files</td><td>sync#Cutover and creation</td><td><code>cli/cli_notebook_git_history_reset</code></td><td>BE <code>NotebookGitHistoryResetControllerTest</code></td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="topic">
+  <h3>Coverage judgment</h3>
+  <ul class="impact">
+    <li><b>High level (E2E).</b> Every main user path has at least one scenario: clone, pull, publish, the size limit, version recovery, and web browse, download, delete and upload. The effort's own features live in <code>notebooks/notebook_files</code>, <code>cli/cli_notebook_lfs</code> and <code>cli/cli_notebook_attachment_size_admission</code>.</li>
+    <li><b>Low level (unit).</b> Backend coverage is thorough and organized by behavior (about 20 attachment controller test classes). CLI LFS unit tests cover the failure paths E2E does not, which is a good split. Frontend coverage is thin but proportionate.</li>
+    <li><b>Over-testing.</b> Three <code>cli_notebook_lfs</code> scenarios repeat the clone-then-publish-several-versions setup; "Three incompressible LFS versions…" is mainly a traffic measurement and is the best candidate to fold or drop. Size-limit tests are spread over four backend classes plus <code>NotebookGitPublishCostControllerTest</code>. Both belong in <code>.planning/test-optimization-candidates.md</code> when the owner next runs test optimization.</li>
+  </ul>
+</div>
+
+<div class="topic">
+  <h3>Named gaps</h3>
+  <ul class="findings">
+    <li class="finding"><div class="t"><span class="chip calm">not now</span>Both sides change the same file on pull</div><p>No test pauses a rebase on an LFS pointer conflict. This is standard Git behavior, so Donut adds little risk.</p></li>
+    <li class="finding"><div class="t"><span class="chip calm">not now</span>Invalid Markdown, AI guidance included, rejected at local publish</div><p>No E2E. The backend covers the general rule well, and a test named after <code>AGENTS.md</code> would only repeat it.</p></li>
+    <li class="finding"><div class="t"><span class="chip calm">not now</span>A web note move carrying its picture</div><p>Backend only, including renumbering on a clash.</p></li>
+    <li class="finding"><div class="t"><span class="chip calm">not now</span>Folders holding files: dissolve, merge, permanent delete, cross-notebook refusal</div><p>Backend only. The cross-notebook name-owner fix queued from the Architecture section brings its own proof.</p></li>
+    <li class="finding"><div class="t"><span class="chip calm">not now</span>Book source change and raw file refused on publish</div><p>Unit tests only.</p></li>
+    <li class="finding"><div class="t"><span class="chip calm">not now</span>A folder holding only files is not reported empty</div><p>Backend only.</p></li>
+    <li class="finding"><div class="t"><span class="chip calm">not now</span>Picture upload refusal messages</div><p>No frontend test shows them to the user.</p></li>
+    <li class="finding"><div class="t"><span class="chip calm">not now</span>Legacy picture migration</div><p>No retained test, by design: the one-time migration is finished and its code removed.</p></li>
+  </ul>
+</div>
+</section>
+
 <section id="pending">
 <h2>Still to come</h2>
-<p class="note">Feature coverage, queued follow-ups, and seed cleanup with the stale-seed list are added to this page as the review continues.</p>
+<p class="note">Queued follow-ups and seed cleanup with the stale-seed list are added to this page as the review continues.</p>
 </section>
 
 <footer>
