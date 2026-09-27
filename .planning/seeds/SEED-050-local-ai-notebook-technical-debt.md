@@ -35,7 +35,7 @@ different frontmatter edits, each already with one owner.
 
 **Identity:** SEED-050#story-1
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/020-validate-changed-markdown-once/PLAN.md","assessment":"not-ready","reasons":["Waits for SEED-009#story-48 (plan 019) to land: it rewrites the same Markdown check and supplies the classifier; re-read the starting facts afterwards."],"basis":{"document":"4213a2e511a6f2eb833b7ac740f7a70b392778f81879a2a7d7d13405045cee2d","plan":"ea22c336a85abdf5d7e7dbee1e82056d4bf7d0bd0707fc1a6cd9dc2c98f67913"}}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/020-validate-changed-markdown-once/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"4213a2e511a6f2eb833b7ac740f7a70b392778f81879a2a7d7d13405045cee2d","plan":"41d31f7e226e32b0d264e16211f9374d3c935d8977955273f5fb3f144b565416"}}
 ```
 
 **Goal:** A notebook owner publishing from a local checkout gets the same

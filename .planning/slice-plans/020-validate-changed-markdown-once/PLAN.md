@@ -26,9 +26,9 @@ format check; refusal wording.
 
 Starts after SEED-009#story-48 (plan 019) lands: its slice 1 rewrites the
 `.md` test in `NotebookGitProposalMarkdownFormat` and its classifier decides
-what "a Markdown path" is here. Re-read the starting facts after it lands.
+what "a Markdown path" is here. It has landed; the starting facts below are re-checked.
 
-## Starting facts (checked 2026-09-27 at `d9abdcc2eb`)
+## Starting facts (checked 2026-09-27 at `d9abdcc2eb`; re-checked after story-48 at `d907a9e6dd`)
 
 Paths under `backend/src/main/java/com/odde/donut/services/notebookGit/`.
 
@@ -51,8 +51,10 @@ Paths under `backend/src/main/java/com/odde/donut/services/notebookGit/`.
   entries have no matching rows: their projection has already drifted, and
   the refusal they assert fires today only because it comes before the drift
   check.
-- Plan 019 moves `inspectRegularFiles` before size admission and adds its path
-  refusals right after it.
+- Plan 019 landed: `inspectRegularFiles` (`Publisher:96-98`) runs before size
+  admission, followed by its path refusals (`refuseMiscasedMarkdown`,
+  `refuseLeftoverFolderMarkers`); `PortablePathKind.of(path) == MARKDOWN` is the
+  Markdown classifier.
 
 ## Outside-in proof
 
@@ -90,7 +92,7 @@ Change: `assertValidTypedMarkdown(Repository, List<InspectedRegularFile>)`
 checks each Markdown path (story-48's classifier) whose proposed blob id is
 present and not among the accepted blob ids, by opening that blob; its
 TreeWalk goes. Call it once in `publish` right after plan 019's path
-refusals; delete the calls in `DocumentApplication:43`,
+refusals; delete the calls in `DocumentApplication:42`,
 `FolderRelocation:89` and `Publisher:173`.
 
 ### 2. Refusal tests start from a projection that matches accepted main
@@ -101,7 +103,7 @@ Proof: the re-seeded tests stay green with the same refusals —
 `CURSOR_DEV=true nix develop -c pnpm backend:test_only --tests 'com.odde.donut.controllers.NotebookGitProposalMarkdownFormatControllerTest' --tests 'com.odde.donut.controllers.NotebookGitProposalFolderRelocationShapeControllerTest' --tests 'com.odde.donut.controllers.NotebookGitProposalFolderRelocationPlacementControllerTest' --tests 'com.odde.donut.controllers.NotebookGitProposalRelocationDestinationControllerTest' --tests 'com.odde.donut.controllers.NotebookGitProposalFolderRelocationEmptyDescendantControllerTest'`.
 
 Change: tests that seed accepted Git with `seedAcceptedBinding`
-(`NotebookGitAcceptedObjectStoreTestSupport:29`) and no matching rows start
+(`NotebookGitAcceptedObjectStoreTestSupport:30`) and no matching rows start
 instead from `makeMe` rows plus a snapshot of the current Portable tree, so
 their projection matches accepted main. Enables slice 3, which checks drift
 before these refusals.
