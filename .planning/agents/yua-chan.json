@@ -1,9 +1,0 @@
-{
-  "schemaVersion": 1,
-  "agent": "Yua-chan",
-  "email": "yua-chan@example.org",
-  "identity": "SEED-049#story-1",
-  "mode": "story-branch",
-  "branch": "codex/note-store-architecture",
-  "host": "codex"
-}

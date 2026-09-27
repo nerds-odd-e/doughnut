@@ -37,8 +37,9 @@ backlog's near-future direction.
   `~/.claude/projects/-Users-terryyin-git-doughnut*` (main checkout and
   worktree directories), filtered to the review range's dates (2026-09-20
   onward).
-- **Queued architecture work:** SEED-049#story-1 (frontend note store) is
-  already queued. The report references it and queues no duplicate.
+- **Frontend note store:** the current ownership and behavior are documented
+  in `docs/frontend-note-store.md`; assess that implementation without queuing
+  a duplicate architecture refactor.
 - **Backlog mechanics:** `product-backlog.mjs add` / `record-state` / `complete`
   and the seed format in `dough-story-decomposition/references/seed-format.md`.
 - **Report page:** the Artifact tool. Load `artifact-design` before writing
@@ -119,7 +120,7 @@ Behavior: sections 1–3 hold *queue now* findings → each becomes one concise
 story (Goal and Scope only) in a suitable seed, recorded `not-refined` and
 `unselected`, and is added to the backlog list at a position ranked under
 `dough-product-backlog`'s rules (owner priority first, then direction and
-value) → the report links each queued story and states its position. Do not duplicate a queued story (SEED-049#story-1);
+value) → the report links each queued story and states its position. Do not duplicate a queued story;
 extend its seed only if a finding belongs to it.
 
 ### 5. Seed cleanup and stale list published
