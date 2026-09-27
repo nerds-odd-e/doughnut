@@ -2,7 +2,7 @@
 
 Compact open shared-process findings; project-only issues live in [DonutRetrospectiveFindings.md](DonutRetrospectiveFindings.md).
 Full evidence and response tracking: [Open Dough catalog](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/finding-names.md).
-Shipped responses are omitted locally; upstream effectiveness checks may remain open.
+Released responses with verified use are tracked upstream; local omission does not assert effectiveness.
 Occurrence details are recoverable from the exact Git snapshot below. Missing provenance is unknown;
 current installed versions are not substituted for historical execution releases.
 
@@ -137,90 +137,6 @@ Three ordinary slice commits used coordinator self-review instead of a fresh ref
 ### Occurrences
 
 - Execution: slice-plans/008-remove-zip-export / 38b5e1ef69; Timestamp: 2026-09-21T22:08:41+08:00; Tool: Cursor; Model: Cursor Grok 4.7; Open Dough release: 0.3.27.
-
-## ODF-092 — Managed increment delivery left the first Claude Code publication unobserved because no guidance names the session identity it needs
-
-Former local code: DD-107.
-
-`execution-increment-delivery.mjs deliver` returned `pendingCi: unobserved` ("host session identity is required to verify the notification bridge") although the Claude Code hook bridge was ready. The references document `--session-json` only in the usage line; recovery needed a manual probe, observer start, and `register-push`.
-
-### Occurrences
-
-- Execution: SEED-035 story 15 / slice-plans/020-notebook-lfs-receive / 2dc0ce9478; Timestamp: 2026-09-24T08:49+08:00 (slice 1 delivery; its CI run was created 00:49:45Z); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.33.
-  - Evidence: slice 1 delivery receipt `observation.reason`; later deliveries passing `--session-json '{"session_id":…}'` (from the session transcript path) reported `observation.state: reused`.
-  - Observed effect: slice 1's SHA was registered by hand after its CI run already existed (`CI_DISCOVERY_DELAYED`); no coverage was lost afterwards.
-  - Inference: the coordinator must discover its own session id outside guidance; a host without an obvious transcript path could leave every increment unobserved.
-- Execution: SEED-035 story 1 / slice-plans/022-browse-download-notebook-files / 70b3b67313; Timestamp: 2026-09-24T11:28+08:00 (slice 1 delivery); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.33.
-  - Evidence: slice 1 receipt `observation.reason` "host session identity is required to verify the notification bridge"; recovered by `ci-mailbox.mjs probe` (hook added `CI_MONITOR_READY`), `start --execution … story/browse-download-notebook-files`, and `register-push`; slices 2 and 3 then reported `observation.state: reused` without `--session-json`.
-  - Observed effect: slice 1's CI run was found late (`CI_DISCOVERY_DELAYED`); three extra coordinator calls; no later coverage loss.
-- Execution: SEED-035 story 3 / slice-plans/024-note-local-picture-file / f0cc15be6a; Timestamp: 2026-09-24T14:25+08:00 (slice 1 delivery); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.37.
-  - Evidence: slice 1 receipt `observation.reason` "host session identity is required to verify the notification bridge" (background Claude Code job); recovered by `ci-mailbox.mjs probe` (`CI_MONITOR_READY`), `start --execution nerds-odd-e/doughnut story/local-image-display`, and `register-push` for f0cc15be6a.
-  - Observed effect: same three-call manual recovery; the release update from 0.3.33 to 0.3.37 did not change this.
-- Execution: SEED-035 story 14 / slice-plans/025-convert-raw-notebooks-to-lfs / 071d0e0861; Timestamp: 2026-09-24T15:50+08:00 (slice 1 delivery; its CI run was created 07:50:15Z); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.37.
-  - Evidence: slice 1 receipt `observation.reason` "host session identity is required to verify the notification bridge" (background Claude Code job); recovered by `ci-mailbox.mjs probe` (`CI_MONITOR_READY`), `start --execution nerds-odd-e/doughnut exec/seed-035-story-14`, and `register-push`; later deliveries reported `observation.state: reused`.
-  - Observed effect: the same three-call manual recovery as earlier occurrences.
-- Execution: SEED-035 story 20 / slice-plans/026-test-file-journeys-on-lfs / 5859e6d663; Timestamp: 2026-09-24, ~17:40+08:00 (slice 1 delivery); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.37.
-  - Evidence: slice 1 receipt `observation.reason` "host session identity is required to verify the notification bridge" (background Claude Code job); recovered by `ci-mailbox.mjs probe` (`CI_MONITOR_READY`), `start --execution nerds-odd-e/doughnut main`, and `register-push` for 5c2e95c367 and 5859e6d663; the next ten deliveries reported `observation.state: reused`.
-  - Observed effect: the same three-call manual recovery; the claim and slice 1 were registered late (`CI_DISCOVERY_DELAYED`).
-- Execution: SEED-035 story 4 / slice-plans/027-web-uploaded-pictures-as-notebook-files / 4250de93e1; Timestamp: 2026-09-24, ~21:22+08:00 (slice 1 delivery; commit 21:21:16+08:00); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.38.
-  - Evidence: slice 1 receipt `observation.reason` "host session identity is required to verify the notification bridge" (background Claude Code job); recovered by `ci-mailbox.mjs probe` (`CI_MONITOR_READY`), `start --execution nerds-odd-e/doughnut main`, and `register-push` for 09a299b665 and 4250de93e1; later deliveries passing `--session-json '{"session_id":…}'` reported `observation.state: reused`.
-  - Observed effect: the same manual recovery plus a read of `ci-host-bridge.mjs` to learn the flag's shape; the claim and slice 1 were discovered late (`CI_DISCOVERY_DELAYED`); unchanged in 0.3.38.
-
-- Execution: SEED-035 story 19 / slice-plans/029-remove-raw-file-storage / 0284ea7f52; Timestamp: 2026-09-25T09:21+08:00 (slice 1 delivery); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.38.
-  - Evidence: slice 1 receipt `observation.reason` "host session identity is required to verify the notification bridge" (background Claude Code job, Story Branch Mode); recovered by `ci-mailbox.mjs probe` (`CI_MONITOR_READY`) and re-running `deliver` for the accepted SHA with `--session-json '{"session_id":…}'`, which reported `observation.state: attached`.
-  - Observed effect: two extra calls; a simpler recovery than `start` plus `register-push`, still discovered only by reading the receipt.
-- Execution: SEED-035 story 5 / slice-plans/033-move-legacy-note-pictures / 4dad58408f; Timestamp: 2026-09-25, ~14:23+08:00 (slice 1 delivery; commit 14:23:10+08:00); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.38.
-  - Evidence: slice 1 receipt `observation.reason` "host session identity is required to verify the notification bridge" (background Claude Code job, Story Branch Mode, bridge probe already `CI_MONITOR_READY`); a re-run passing the original base was refused ("rebase left the pre-rebase SHA as the candidate"); a re-run with the accepted SHA as base and `--session-json` from `CLAUDE_CODE_SESSION_ID` reported `observation.state: reused`.
-  - Observed effect: three extra calls (one refused) plus a `grep` of the delivery scripts to learn the flag's shape; later deliveries passing `--session-json` reported `reused`.
-
-- Execution: SEED-035 story 17 / slice-plans/034-book-source-as-notebook-file / 36eb15caaa; Timestamp: 2026-09-25, ~15:55+08:00 (slice 1 delivery; commit 15:55:12+08:00); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.38.
-  - Evidence: slice 1 and slice 7 (96c756d531) receipts `observation.reason` "host session identity is required to verify the notification bridge" (background Claude Code job, Story Branch Mode); recovered after slice 1 by `ci-mailbox.mjs probe` (`CI_MONITOR_READY`), `start --execution nerds-odd-e/doughnut story/book-source-as-notebook-file`, and `register-push` for 36eb15caaa; slices 2-6 reported `reused`.
-  - Observed effect: the same three-call manual recovery; after the observer ended (see DD-115) the slice 7 delivery could not reattach without the session identity and stayed unobserved.
-
-- Execution: SEED-035 story 18 / slice-plans/036-remove-legacy-picture-storage / 89e3f8a67e; Timestamp: 2026-09-25T22:14:43+08:00 (slice 1 delivery receipt); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.38.
-  - Evidence: coordinator said before delivery "Managed delivery sets up CI observation itself, so no manual observer start is needed"; slice 1 receipt `observation.reason` "host session identity is required to verify the notification bridge"; recovered by a `grep` of the delivery scripts for the flag, `ci-mailbox.mjs probe`, a re-run with `--session-json` refused ("rebase left the pre-rebase SHA as the candidate"), `start --execution nerds-odd-e/doughnut story/036-remove-legacy-picture-storage` (observer watch-2ENnNk), and `register-push` for 89e3f8a67e; slices 2-5 passed `--session-json` and reported `reused`.
-  - Observed effect: five extra calls (one refused) and a `CI_DISCOVERY_DELAYED` advisory for early revisions; no later coverage loss seen before the completion wait.
-  - Inference: the same refused re-run as the story 5 occurrence recurred, so the recovery path is still rediscovered per execution.
-
-- Execution: slice-plans/037-fold-picture-attach-step-into-upload / 1b822a6bf7; Timestamp: 2026-09-25, ~23:30+08:00 (slice 1 delivery); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.38.
-  - Evidence: first `deliver` call (no `--session-json`, abbreviated `--validated-candidate 1b822a6bf7`) returned `candidate-mismatch` with `observation.reason` "host session identity is required to verify the notification bridge"; the coordinator then read `execution-increment-observation.mjs` and `ci-host-bridge.mjs` for the flag's shape; a re-run with the full SHA and `--session-json` built from the session transcript path reported `observation.state: attached` (watch-fa5IXa).
-  - Observed effect: one refused call and two script reads before the only delivery; no coverage lost, because the refused call published nothing.
-  - Inference: the `candidate-mismatch` was likely caused by the abbreviated SHA, which the usage line does not rule out. The coordinator read the ODF-092 occurrences only after delivery, so the logged fix did not reach it beforehand.
-
-- Execution: slice-plans/037-share-backend-test-context / c7ea84e3a7; Timestamp: unknown (first delivery after the plan commit 2026-09-25 23:24:51+08:00; last publication after db643ef844 at 2026-09-26 00:09:04+08:00); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.38.
-  - Evidence: coordinator summary handed to the execution retrospective (no transcript): the first `deliver` returned `candidate-mismatch` because an abbreviated SHA was passed to `--validated-candidate`, and a retry with the full SHA was accepted; every publication (0f8709dfc1, c7ea84e3a7, 7cb7c300b1, 6455811f4d, 5bf185ba0d, db643ef844) reported "host session identity is required to verify the notification bridge".
-  - Observed effect: CI on `story/037-share-backend-test-context` was never observed during execution; the retrospective started with CI unknown.
-  - Inference: both the abbreviated-SHA refusal and the missing session identity recurred about an hour after the same pair was recorded for `slice-plans/037-fold-picture-attach-step-into-upload` on main, which this execution's base (5c8bb75741) did not contain. Whether a recovery was attempted is not in the summary.
-- Execution: SEED-039 story 4 / slice-plans/041-faster-frontend-unit-tests / c9347a9ee3; Timestamp: 2026-09-26T08:50+08:00 (slice 1 delivery); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.38.
-  - Evidence: slice 1 receipt `observation.reason: host session identity is required to verify the notification bridge`; a re-run with `--session-json` refused ("rebase left the pre-rebase SHA as the candidate") because nothing new was left to publish; later deliveries with `--session-json` reported `observation.state: reused`.
-  - Observed effect: c9347a9ee3 stayed unobserved; the coordinator found `--session-json` again only from the usage line and `ci-host-bridge.mjs`.
-- Execution: SEED-035 story 2 / slice-plans/035-delete-notebook-file-on-web / 20968e7810; Timestamp: 2026-09-26, ~10:24+08:00 (slice 1 delivery; commit 10:24:02+08:00); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.40.
-  - Evidence: coordinator summary handed to the execution retrospective (no transcript): the first managed delivery failed because the target ref lacked the `refs/heads/` prefix, then `candidate-mismatch` for an abbreviated SHA and a missing host session identity (`--session-json`); later deliveries succeeded and the observer /tmp/dough-ci-501/watch-HC7nuY covers `refs/heads/story/delete-notebook-file-on-web`.
-  - Observed effect: at least two refused delivery calls before slice 1 was published; the release update from 0.3.38 to 0.3.40 did not remove either earlier cause.
-  - Inference: the `refs/heads/` requirement is a new third argument-shape refusal on the same first delivery; the three are rediscovered one refusal at a time. The exact call count is not in the summary.
-- Execution: SEED-035 story 23 / slice-plans/042-moved-note-keeps-its-picture / 96186af758; Timestamp: 2026-09-26, ~16:30+08:00 (slice 1 delivery); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.40.
-  - Evidence: all three slice receipts (96186af758, 5db1d2beb4, e22c4c1c9a on `refs/heads/story/042-moved-note-keeps-its-picture`) reported `observation.state: unobserved`, "host session identity is required to verify the notification bridge"; the coordinator noted the gap after slice 1 and deferred it to completion instead of passing `--session-json` (`CLAUDE_CODE_SESSION_ID` was set) on slices 2 and 3.
-  - Observed effect: no increment was observed during execution; the retrospective started with CI unknown for three pushes.
-  - Inference: the coordinator read the ODF-092 occurrences only during the retrospective, so the logged recovery again did not reach delivery.
-- Execution: SEED-043 story 1 / slice-plans/045-commit-gate-checks-committed-content / 574d61b52c; Timestamp: 2026-09-26, ~16:04+08:00 (slice 1 delivery; commit 16:03:40+08:00); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.40.
-  - Evidence: slice 1 receipt `observation.reason` "host session identity is required to verify the notification bridge" (background Claude Code job, Story Branch Mode); recovered by `ci-mailbox.mjs probe` (`CI_MONITOR_READY`), `start --execution nerds-odd-e/doughnut story/045-commit-gate-checks-committed-content`, and `register-push` for 574d61b52c; later deliveries passing `--session-json '{"session_id":…}'` reported `observation.state: reused`.
-  - Observed effect: four extra coordinator calls, including a `grep` of `ci-host-bridge.mjs` for the flag's shape; the recovered observer then delivered slice 1's CI failure (DD-126).
-- Execution: SEED-035 story 24 / slice-plans/046-moves-to-another-notebook-reach-git / bc9a0ab229; Timestamp: 2026-09-26, ~17:05+08:00 (slice 1 delivery); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.40.
-  - Evidence: slice 1 receipt `observation.reason` "host session identity is required to verify the notification bridge" (background Claude Code job, Story Branch Mode); the coordinator found the flag's shape by grepping `ci-host-bridge.mjs` and `CLAUDE_CODE_SESSION_ID` via `env`; re-running `deliver` with `--session-json` for the already-pushed SHA was refused ("rebase left the pre-rebase SHA as the candidate"); slices 2 and 3 with `--session-json` reported `observation.state: reused` (`/tmp/dough-ci-501/watch-xFqwGh`).
-  - Observed effect: five extra coordinator calls; slice 1 was never registered by hand, and the observer started by the refused call picked up later pushes.
-  - Inference: the fix recorded in earlier rows (pass `--session-json` from `CLAUDE_CODE_SESSION_ID` on the first delivery) is still not in the delivery guidance, so each execution rediscovers it.
-- Execution: SEED-046 story 14 / slice-plans/009-rich-edit-keeps-final-newline / 983ac6d18e; Timestamp: 2026-09-27, ~07:30+08:00 (slice 1 delivery); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.41.
-  - Evidence: first `deliver` refused with "authorized target must be a branch ref: origin/exec/009-rich-edit-keeps-final-newline"; the second, with `refs/heads/…` and abbreviated `--validated-candidate 983ac6d18e`, returned `candidate-mismatch` with nothing pushed; the third, with the full SHA, was accepted. `--host claude` without `--session-json` reported `observation.state: attached`, then `reused` (`/tmp/dough-ci-501/watch-gBNzg7`).
-  - Observed effect: two refused calls before the only delivery; no coverage lost.
-  - Inference: on 0.3.41 the session identity no longer needs recovery, but the two argument-shape refusals recorded for plans 035 and 037 still recur because the usage line names neither `refs/heads/` nor a full SHA.
-- Execution: SEED-035#story-26 / slice-plans/011-preview-image-files-on-web-file-page / ee09a8a2cf; Timestamp: 2026-09-27T09:53:29+08:00 (slice 1 delivery); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.42 (VERSION at 1eb6310816).
-  - Evidence: coordinator transcript `23a26a0f…jsonl`: `deliver --target-ref story/preview-image-files` refused with "authorized target must be a branch ref: story/preview-image-files"; the retry with `refs/heads/story/preview-image-files` was accepted with `observation.state: attached` (`/tmp/dough-ci-501/watch-rVXFjb`); the coordinator had printed the usage line (`--target-ref REF`) before the first delivery.
-  - Observed effect: one refused call; no coverage lost; slice 2 delivery used the full ref first time.
-  - Inference: the `refs/heads/` refusal still recurs on 0.3.42; the usage line is what the coordinator read, and it does not say the ref must be fully qualified (only `references/publish-the-candidate.md` does).
-- Execution: SEED-009#story-48 / `f321a7cb23:.planning/slice-plans/019-one-path-classifier/PLAN.md` / 83a98aad70; Timestamp: unknown (2026-09-27, first delivery after slice 1 commit 13:18:42+08:00, before slice 2 commit 13:28:46+08:00); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.42 (VERSION unchanged since 1eb6310816).
-  - Evidence: coordinator summary to the retrospective (no transcript): the first managed delivery failed with "authorized target must be a branch ref: story/one-path-classifier"; the retry with `refs/heads/story/one-path-classifier` succeeded; observer `/tmp/dough-ci-501/watch-9bTJQk`.
-  - Observed effect: one refused call; no coverage lost.
-  - Inference: same argument-shape refusal as the rows for plans 035, 009 and 011, still on 0.3.42.
 
 ## ODF-110 — A readiness replay observed only the plan's named seam, not the rest of the slice's journey
 
@@ -439,7 +355,45 @@ A story's readiness basis is a digest of its whole seed document. Wrapping up an
   - Observed effect: one refused start that also left a local Take candidate built on the stale base; the retry with its recovery coordinates refused again ("unpublished selected story source in originating checkout"), so the coordinator removed that unpublished worktree and branch, published the reassessment, and took the story fresh — about six extra calls.
   - Inference: sibling preparation, not only sibling wrap-up, invalidates a story's readiness; two stories prepared minutes apart in one seed will always collide this way.
 
-## DD-126 — A plan said the changed script had no test, and nobody searched for one before delivery, so CI caught the stale test
+## ODF-155 — An implementer proved fails-first by putting HEAD versions back in the shared execution checkout
+
+Former local code: DD-141.
+
+The slice 5 delegation told the implementer both to show its new assertions failing first and not to check out paths in the shared checkout. It implemented first, then copied its files aside, restored the HEAD versions of `relationshipFolderResolve.ts` and `AddRelationshipFinalize.vue` in place, ran the spec red (4 failed, 2 passed), and copied its versions back. Delegation guidance says a needed baseline uses a separate temporary checkout or is reported back.
+
+### Occurrences
+
+- Execution: SEED-050#story-2 / `d3c9b4814d:.planning/slice-plans/021-relationship-notes-accepted-in-one-change/PLAN.md` / f8087d5845; Timestamp: unknown (2026-09-27, slice 5 work before commit 06ff81b916); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: unknown.
+  - Evidence: slice 5 implementer return ("I put the HEAD versions of the resolver and the Vue file back temporarily ... restored my versions from temp copies"); delegation prompt's "never stash, reset, clean, checkout paths"; dough-execute-plan/references/delegation.md ownership bullet.
+  - Observed effect: no damage; the coordinator checked the working tree afterwards and it held the intended diff. No other writer was active in the checkout at that time.
+  - Inference: an implementer that writes code before its test finds the in-place restore the cheapest fails-first route; with a concurrent writer it could clobber or capture sibling work. Writing the test first, or a temporary worktree at HEAD, avoids it. Qualified: one occurrence; coordinator saw only the return.
+
+## ODF-143 — Managed delivery rejects unqualified branch references
+
+Former local code: DD-107 (argument-only reports from plans 009, 011 and 019).
+
+The usage line says REF but publication requires refs/heads/; callers discover the requirement through refused deliveries. Session identity attached successfully in these reports.
+
+### Occurrences
+
+- Execution: SEED-046 story 14 / slice-plans/009-rich-edit-keeps-final-newline / 983ac6d18e; Timestamp: 2026-09-27, ~07:30+08:00 (slice 1 delivery); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.41.
+  - Evidence: first `deliver` refused with "authorized target must be a branch ref: origin/exec/009-rich-edit-keeps-final-newline"; the second, with `refs/heads/…` and abbreviated `--validated-candidate 983ac6d18e`, returned `candidate-mismatch` with nothing pushed; the third, with the full SHA, was accepted. `--host claude` without `--session-json` reported `observation.state: attached`, then `reused` (`/tmp/dough-ci-501/watch-gBNzg7`).
+  - Observed effect: two refused calls before the only delivery; no coverage lost.
+  - Inference: on 0.3.41 the session identity no longer needs recovery, but the two argument-shape refusals recorded for plans 035 and 037 still recur because the usage line names neither `refs/heads/` nor a full SHA.
+
+- Execution: SEED-035#story-26 / slice-plans/011-preview-image-files-on-web-file-page / ee09a8a2cf; Timestamp: 2026-09-27T09:53:29+08:00 (slice 1 delivery); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.42 (VERSION at 1eb6310816).
+  - Evidence: coordinator transcript `23a26a0f…jsonl`: `deliver --target-ref story/preview-image-files` refused with "authorized target must be a branch ref: story/preview-image-files"; the retry with `refs/heads/story/preview-image-files` was accepted with `observation.state: attached` (`/tmp/dough-ci-501/watch-rVXFjb`); the coordinator had printed the usage line (`--target-ref REF`) before the first delivery.
+  - Observed effect: one refused call; no coverage lost; slice 2 delivery used the full ref first time.
+  - Inference: the `refs/heads/` refusal still recurs on 0.3.42; the usage line is what the coordinator read, and it does not say the ref must be fully qualified (only `references/publish-the-candidate.md` does).
+
+- Execution: SEED-009#story-48 / `f321a7cb23:.planning/slice-plans/019-one-path-classifier/PLAN.md` / 83a98aad70; Timestamp: unknown (2026-09-27, first delivery after slice 1 commit 13:18:42+08:00, before slice 2 commit 13:28:46+08:00); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.42 (VERSION unchanged since 1eb6310816).
+  - Evidence: coordinator summary to the retrospective (no transcript): the first managed delivery failed with "authorized target must be a branch ref: story/one-path-classifier"; the retry with `refs/heads/story/one-path-classifier` succeeded; observer `/tmp/dough-ci-501/watch-9bTJQk`.
+  - Observed effect: one refused call; no coverage lost.
+  - Inference: same argument-shape refusal as the rows for plans 035, 009 and 011, still on 0.3.42.
+
+## ODF-074 — A plan said the changed script had no test, and nobody searched for one before delivery, so CI caught the stale test
+
+Former local code: DD-126.
 
 The plan for the commit-gate change recorded "No permanent automated test is added for the hook: it has none today, CI does not run it". `scripts/test/quality_changed.test` already tested `scripts/quality_changed.sh` with a fake `pnpm`, and CI runs it in "Run script unit tests". The implementer, the refactor agent and the coordinator's proof acceptance all relied on the plan's claim; the path-scoped `script` skill, which covers tests under `scripts/`, was not named in delegation and attached only after the first slice.
 
@@ -450,7 +404,48 @@ The plan for the commit-gate change recorded "No permanent automated test is add
   - Observed effect: one red story-branch CI run, a stash/repair/restore cycle around slice 2, and two extra agents (repair ~49k and refactor ~48k subagent tokens).
   - Inference: a negative claim that code has no test needs a search of the test tree (here `grep -rl quality_changed scripts/test`) at planning or delegation; naming the stack skill for `scripts/` in the delegation would likely have surfaced it.
 
-## DD-127 — An implementer reasoned that a new test would fail instead of running it red, and one of its tests could not fail
+### Additional report — The plan prescribed a comparison renderer and a trigger point that the implementer had to replace
+
+Former local code: DD-130.
+
+Slice 2's plan named `markdownToQuillHtml` as the renderer for judging meaning and a change of `markdownForRichDisplay` as the moment to check. Neither was tried at planning. `markdownToQuillHtml` removes whitespace between tags and drops task checkboxes, so it hides the losses the story is about. A watcher with `nextTick` ran before Quill had taken in the HTML. The implementer switched to plain `marked` and a new `QuillEditor` `modelLoaded` event, and reported both deviations.
+
+#### Occurrences
+
+- Execution: SEED-046 story 10 / `.planning/slice-plans/005-rich-editor-keeps-content/PLAN.md` / c5338213d0; Timestamp: 2026-09-26T22:16:23+08:00 (slice 2 commit 0e36045508); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.41.
+  - Evidence: plan slice 2 "Change" and "Learnings" at 0e36045508; slice 2 implementer return (~579 s, ~102k subagent tokens).
+  - Observed effect: slice 2 ran close to the 10-minute hard limit; the plan's Change text no longer describes the code and is corrected only by its Learnings.
+  - Inference: a plan that names the exact function or hook for a new check should name it as a suggestion unless a quick probe confirmed it; here a one-line call of `markdownToQuillHtml` on `**a** *b*` versus `**ab**` would have shown the problem. Qualified: the deviation was handled well and cost one slice's margin, not a retry.
+
+### Additional report — The plan's E2E proof command named a feature directory, which the isolated runner refuses
+
+Former local code: DD-134.
+
+Plan 010 listed `pnpm cy:run --spec e2e_test/features/folder_organization`. The isolated E2E runner requires explicit feature files, so the implementer had to find and list them.
+
+#### Occurrences
+
+- Execution: SEED-046#story-9 / `.planning/slice-plans/010-responses-carry-no-orm-internals/PLAN.md` at d305df9c23 / 9365a11c7d; Timestamp: unknown (2026-09-27, slice 2, before 10:20:32+08:00); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.42.
+  - Evidence: slice 2 implementer report: the literal plan command "is refused by the isolated runner, which requires explicit feature files"; it ran four `.feature` files instead (18/18 passed); the plan's command was corrected in 5d384c2665.
+  - Observed effect: a small detour inside the slice; proof unaffected.
+  - Inference: slice planning did not run or check the E2E command it wrote.
+
+### Additional report — The plan probed today's outcome for one key example but stated another's without a probe, and the wrong premise hid an ordering change
+
+Former local code: DD-139.
+
+Plan 019 recorded a throwaway probe for key example 1 (leftover `.keep` → 409). For example 2 it wrote "each failing first (accepted as a file today)" for `Forces.MD` without a probe. Today's outcome was a 400 from attachment size admission ("must be a Git LFS pointer or empty file"), because size admission runs before tree-shape checks. The implementer found this at the red run and moved the whole-tree path refusals before size admission, a design change the plan had not planned.
+
+#### Occurrences
+
+- Execution: SEED-009#story-48 / `f321a7cb23:.planning/slice-plans/019-one-path-classifier/PLAN.md` / 83a98aad70; Timestamp: unknown (2026-09-27, slice 3 work between commits 2f0afdbce8 13:28:46+08:00 and 82fa7aedb7 13:47:23+08:00); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.42.
+  - Evidence: original plan slice 3 Proof and "Starting facts" probe (example 1 only) at f321a7cb23; plan Learnings at 6de22982d5 ("Before slice 3, `Forces.MD` was refused as a non-pointer attachment, not accepted"); `NotebookGitProposalPublisher.publish` in 82fa7aedb7 (refusals moved above `NotebookGitAttachmentSizeAdmission.admit`); coordinator summary (slice took ~15 min).
+  - Observed effect: slice 3 ran ~15 min, over the 10-minute hard limit; the outcome was complete and correct, and the refactor pass then co-located slice 2's marker refusal with it.
+  - Inference: the probe that settled example 1 would have taken seconds for example 2 and would have shown the ordering dependency at planning. Related in kind to DD-130 and DD-137 (untried premise), but here the premise was about today's refusal path. Qualified: coordinator summary only; implementer transcript not available.
+
+## ODF-147 — An implementer reasoned that a new test would fail instead of running it red, and one of its tests could not fail
+
+Former local code: DD-127.
 
 The slice 3 implementer skipped the red run, arguing that before the change the cross-notebook path made no commit, so the `parents == previous commits` assertions could not pass. The undo test had no such assertion: without the fix neither move committed, so both notebooks stayed at their starting tree and the test passed. The coordinator found this by restoring the old main code and running the new tests (2 of 3 failed), then added a commit-count assertion (3 of 3 failed, then 5 of 5 passed with the fix).
 
@@ -469,7 +464,9 @@ The slice 3 implementer skipped the red run, arguing that before the change the 
   - Observed effect: both tests are plausibly meaningful, but neither was observed failing.
   - Inference: this time the coordinator, not an implementer, substituted reasoning for the red run; the delegation prompts again did not ask for one.
 
-## DD-128 — Refined key examples promised link-rewrite outcomes that the existing rewrite rules do not produce
+## ODF-148 — Refined key examples promised link-rewrite outcomes that the existing rewrite rules do not produce
+
+Former local code: DD-128.
 
 The story said link rewriting stays unchanged, yet its key examples stated rewrite results nobody checked against that code. Example 2 promised that renaming folder `physics` rewrites `[[Science:physics/Force]]` in another notebook; `PortablePath.withRenamedFolder` returns notebook-qualified links unchanged, so folder rename never touches another notebook. Examples 2 and 4 also gave shorthand results (`[[Science:Force]]`-style) where the rules produce `[[Science:/Force]]` (dissolve) and `[[Physics:Force|Science:Force]]` (move to another notebook). Slice 3 found the conflict. The coordinator kept the "rewriting unchanged" exclusion, dropped folder rename from example 2 in the plan's Current decisions, and left the seed promise as written.
 
@@ -480,7 +477,9 @@ The story said link rewriting stays unchanged, yet its key examples stated rewri
   - Observed effect: one owner-visible promise was dropped during execution by a plan note, without an owner decision or a seed edit. No extra slice was needed. The seed still promises the folder-rename case at closure.
   - Inference: when a story says an existing rule stays unchanged, check each key example's expected text against that rule (its code or tests) at refinement. Also, a promise dropped because it conflicts with an exclusion should reach the owner at completion, not only the plan. Qualified: the coordinator summary is the only process record, so how long the discovery took is unknown.
 
-## DD-129 — The "stays editable" boundary examples were all one-line bodies, so a check that refuses wrapped text shipped
+## ODF-149 — The "stays editable" boundary examples were all one-line bodies, so a check that refuses wrapped text shipped
+
+Former local code: DD-129.
 
 Story-10's style-only boundary (key example 5) and every editable test case used bodies with no line wrapped inside a paragraph or list item. The plan asserted that comparing renderings lets style-only changes pass "without special cases" without trying a hard-wrapped body. The implementer, the coordinator's extra probe (wiki links, tables, images, CJK) and the refactor agent never tried one either. The retrospective's first probe of `line one\nline two` found it refused, although the editor's save renders the same.
 
@@ -491,29 +490,9 @@ Story-10's style-only boundary (key example 5) and every editable test case used
   - Observed effect: a regression against the story's own style-only promise reached the published story branch; a correction story and plan were needed before integration.
   - Inference: when a story's promise is "ordinary content keeps working", its boundary examples need a realistic sample of that content (here, a hard-wrapped paragraph such as any file in this repo), not only minimal constructs. The seed's value note already asked how many real notes the editor cannot carry.
 
-## DD-130 — The plan prescribed a comparison renderer and a trigger point that the implementer had to replace
+## ODF-139 — The coordinator accepted an implementer's reported gap as out of scope without checking the story, and the example test pinned the defect
 
-Slice 2's plan named `markdownToQuillHtml` as the renderer for judging meaning and a change of `markdownForRichDisplay` as the moment to check. Neither was tried at planning. `markdownToQuillHtml` removes whitespace between tags and drops task checkboxes, so it hides the losses the story is about. A watcher with `nextTick` ran before Quill had taken in the HTML. The implementer switched to plain `marked` and a new `QuillEditor` `modelLoaded` event, and reported both deviations.
-
-### Occurrences
-
-- Execution: SEED-046 story 10 / `.planning/slice-plans/005-rich-editor-keeps-content/PLAN.md` / c5338213d0; Timestamp: 2026-09-26T22:16:23+08:00 (slice 2 commit 0e36045508); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.41.
-  - Evidence: plan slice 2 "Change" and "Learnings" at 0e36045508; slice 2 implementer return (~579 s, ~102k subagent tokens).
-  - Observed effect: slice 2 ran close to the 10-minute hard limit; the plan's Change text no longer describes the code and is corrected only by its Learnings.
-  - Inference: a plan that names the exact function or hook for a new check should name it as a suggestion unless a quick probe confirmed it; here a one-line call of `markdownToQuillHtml` on `**a** *b*` versus `**ab**` would have shown the problem. Qualified: the deviation was handled well and cost one slice's margin, not a retry.
-
-## DD-131 — The coordinator sent a plan edit and the slice commit as parallel tool calls, so the commit ran without the failed edit
-
-During delivery the coordinator sent the plan-status Edit and the `git add -A && git commit` Bash call in one parallel batch. The Edit was refused (file not yet read in the session), but the commit still ran, so the slice commit lacked its plan evidence and had to be amended before publication.
-
-### Occurrences
-
-- Execution: SEED-046 story 8 / `.planning/slice-plans/008-history-download-and-clean-clone/PLAN.md` / 9acf38c5b6; Timestamp: 2026-09-26T23:24:19+08:00 (author time of the original slice 1 commit); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.41.
-  - Evidence: slice 1 delivery — Edit error "File has not been read yet", commit c73c8039a0 without PLAN.md, amended to 9acf38c5b6 before the first increment push.
-  - Observed effect: one extra amend and hook lint run; nothing wrong was published.
-  - Inference: delivery steps 5–7 are ordered dependencies; sending them in parallel lets a failed earlier step go unnoticed. Qualified: a one-off coordinator slip with small cost; it would have published a slice without plan evidence had the amend been missed.
-
-## DD-132 — The coordinator accepted an implementer's reported gap as out of scope without checking the story, and the example test pinned the defect
+Former local code: DD-132.
 
 Slice 2's implementer reported that a rich body edit drops the file's final newline and that its example 1 test pins this (`note.replace("# Demo2\n", "# My Demo2")`). The coordinator judged it "body-side, pre-existing, outside the promises" and recorded it as a learning. The story's goal is that a web edit changes only what the user edited, and its exclusions list other body styles and blank-line runs, not the final newline. The retrospective probed `First\n\nLast\n` with a first-line edit: the unedited last line loses its newline, and the server does not add it back.
 
@@ -524,7 +503,9 @@ Slice 2's implementer reported that a rich body edit drops the file's final newl
   - Observed effect: a defect against the story's own goal reached the published story branch; a correction story and plan are needed before integration.
   - Inference: a reported gap should be checked against the story's goal and exclusions list before it is filed as out of scope; the fix at slice 2 would have been a few lines in the same function. Qualified: as in DD-129, the key example was a file whose edited line was also its last line, which hid the effect.
 
-## DD-133 — `agent-commit.mjs` run through the `.claude/skills` symlink exits 0 without committing
+## ODF-127 — `agent-commit.mjs` run through the `.claude/skills` symlink exits 0 without committing
+
+Former local code: DD-133.
 
 `agent-commit.mjs` runs its CLI body only when `resolve(process.argv[1]) === fileURLToPath(import.meta.url)`. Invoked as `node .claude/skills/dough-execute-plan/scripts/agent-commit.mjs` from the worktree root, Node resolves the module to the real `.agents/skills/…` file while argv keeps the symlink spelling, so the script does nothing, prints nothing, and exits 0. The sibling scripts that use `ci-direct-entry.mjs` `isDirectCliEntry` (realpath comparison) do not have this problem.
 
@@ -548,18 +529,9 @@ Slice 2's implementer reported that a rich body edit drops the file's final newl
   - Evidence: `node .claude/skills/dough-execute-plan/scripts/agent-commit.mjs --amend` (bare, and with `-F -`) from the worktree root exited 0 with no output, HEAD still 759f43d897 without the developer trailer; the `realpath` invocation returned `{"ok":true,"status":"amended","agent":"Kaoru-chan","sha":"f8b186cc7f…"}`.
   - Observed effect: four extra calls, including reading the script; the first commit was made with plain `git commit` and had to be amended. Fifth retained occurrence, unknown to the coordinator at call time.
 
-## DD-134 — The plan's E2E proof command named a feature directory, which the isolated runner refuses
+## ODF-100 — Agents reported vue-tsc's exit code from a pipe into `tail`, so the coordinator had to rerun the typecheck
 
-Plan 010 listed `pnpm cy:run --spec e2e_test/features/folder_organization`. The isolated E2E runner requires explicit feature files, so the implementer had to find and list them.
-
-### Occurrences
-
-- Execution: SEED-046#story-9 / `.planning/slice-plans/010-responses-carry-no-orm-internals/PLAN.md` at d305df9c23 / 9365a11c7d; Timestamp: unknown (2026-09-27, slice 2, before 10:20:32+08:00); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.42.
-  - Evidence: slice 2 implementer report: the literal plan command "is refused by the isolated runner, which requires explicit feature files"; it ran four `.feature` files instead (18/18 passed); the plan's command was corrected in 5d384c2665.
-  - Observed effect: a small detour inside the slice; proof unaffected.
-  - Inference: slice planning did not run or check the E2E command it wrote.
-
-## DD-135 — Agents reported vue-tsc's exit code from a pipe into `tail`, so the coordinator had to rerun the typecheck
+Former local code: DD-135.
 
 The frontend proof requires `vue-tsc --noEmit` to pass. Two agents ran it as `... vue-tsc --noEmit | tail`, then reported "exit 0". That code is `tail`'s, not vue-tsc's. Both agents said so themselves, and the coordinator reran the typecheck without the pipe before accepting.
 
@@ -570,7 +542,9 @@ The frontend proof requires `vue-tsc --noEmit` to pass. Two agents ran it as `..
   - Observed effect: two extra typecheck runs, about a minute each; no wrong result was accepted.
   - Inference: a delegated command whose pass/fail matters should be given with its exit-code capture spelled out, since agents tend to trim long output with `tail`. Qualified: small cost, and the agents reported the problem honestly.
 
-## DD-136 — An implementer's slice proof ran only the specs it chose, missing consumers of the store method it changed
+## ODF-150 — An implementer's slice proof ran only the specs it chose, missing consumers of the store method it changed
+
+Former local code: DD-136.
 
 The slice changed `StoredApiCollection.trashNote` to request a folder listing before trashing. The implementer proved it with `tests/store`, `tests/toolbars` and two `NoteMoreOptions` specs; `tests/notes/NoteMoreOptionsForm.trashNote.spec.ts`, which also drives `trashNote`, was not run and failed on the unmocked request (ADR 0006: an unmocked request fails loudly). Possibly the same root cause as ODF-111 (proof chosen by the edited area rather than by the changed method's consumers), but there the actor was the refactor pass; matching is uncertain.
 
@@ -586,7 +560,9 @@ The slice changed `StoredApiCollection.trashNote` to request a folder listing be
   - Observed effect: one failed published frontend job and one bounded test repair; 124 focused tests then passed, followed by the 1,938-test full frontend run in slice6.
   - Inference: consumer inspection needs callers of the whole removal flow and their refusal scenarios, not only direct store-call specs. Production error propagation itself was intended.
 
-## DD-137 — A retrospective finding asserted the loading modal, which the product does not show for these requests
+## ODF-151 — A retrospective finding asserted the loading modal, which the product does not show for these requests
+
+Former local code: DD-137.
 
 The SEED-047#story-1 retrospective wrote that the removal request "shows the loading modal at once" and planned proof that observes `GlobalApiLoadingModal`. Non-blocking `apiCallWithLoading` calls, including the trash request and every user-triggered folder listing load, only add a busy state shown as `LoadingThinBar`; `LoadingModal` needs `blockUi: true`. The implementer's first modal-based test failed after the fix, which exposed the wrong premise; it switched to observing `apiStatus.states` and reported the correction.
 
@@ -597,7 +573,9 @@ The SEED-047#story-1 retrospective wrote that the removal request "shows the loa
   - Observed effect: one discarded test attempt inside the slice budget; the story goal ("busy … as for other user-triggered folder listings") still held, so no scope question arose.
   - Inference: a retrospective finding about user-visible behaviour was stated from code reading of the caller only, without checking how the shared loading helper is rendered. Qualified: related in kind to DD-130 (plan names an untried mechanism), but a different concrete problem.
 
-## DD-138 — The file-size rule conflicted with an approved staged simplification and mechanical callers
+## ODF-152 — The file-size rule conflicted with an approved staged simplification and mechanical callers
+
+Former local code: DD-138.
 
 The refactor check requires every changed file to be at most 250 lines, without distinguishing intermediate planned decomposition or a mechanical change to a pre-existing oversized caller. Refactor agents raised both cases during this execution; the coordinator applied the owner-approved store scope and slice ordering rather than expanding the work.
 
@@ -608,41 +586,8 @@ The refactor check requires every changed file to be at most 250 lines, without 
   - Observed effect: two applicability exchanges; no extra split was made. Final noteStore is 245 lines, noteUndo167, requests228, cache45. The unrelated Wikidata workflow was preserved.
   - Inference: clarify how the numeric check composes with approved intermediate states and the skill's requirement that a refactor address an introduced, exposed, or aggravated issue. Unlike ODF-124, the rule was found and acknowledged here.
 
-## DD-139 — The plan probed today's outcome for one key example but stated another's without a probe, and the wrong premise hid an ordering change
-
-Plan 019 recorded a throwaway probe for key example 1 (leftover `.keep` → 409). For example 2 it wrote "each failing first (accepted as a file today)" for `Forces.MD` without a probe. Today's outcome was a 400 from attachment size admission ("must be a Git LFS pointer or empty file"), because size admission runs before tree-shape checks. The implementer found this at the red run and moved the whole-tree path refusals before size admission, a design change the plan had not planned.
-
-### Occurrences
-
-- Execution: SEED-009#story-48 / `f321a7cb23:.planning/slice-plans/019-one-path-classifier/PLAN.md` / 83a98aad70; Timestamp: unknown (2026-09-27, slice 3 work between commits 2f0afdbce8 13:28:46+08:00 and 82fa7aedb7 13:47:23+08:00); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.42.
-  - Evidence: original plan slice 3 Proof and "Starting facts" probe (example 1 only) at f321a7cb23; plan Learnings at 6de22982d5 ("Before slice 3, `Forces.MD` was refused as a non-pointer attachment, not accepted"); `NotebookGitProposalPublisher.publish` in 82fa7aedb7 (refusals moved above `NotebookGitAttachmentSizeAdmission.admit`); coordinator summary (slice took ~15 min).
-  - Observed effect: slice 3 ran ~15 min, over the 10-minute hard limit; the outcome was complete and correct, and the refactor pass then co-located slice 2's marker refusal with it.
-  - Inference: the probe that settled example 1 would have taken seconds for example 2 and would have shown the ordering dependency at planning. Related in kind to DD-130 and DD-137 (untried premise), but here the premise was about today's refusal path. Qualified: coordinator summary only; implementer transcript not available.
-
-## DD-140 — An implementer reported a test as covered by a Gradle test filter that did not select it
-
-The slice 1 implementer reported `--tests 'com.odde.donut.services.notebookGit*'` and `*NotebookGit*` as proof that included the new classifier test. `pnpm backend:test:worktree` accepts only one `--tests` pattern per run, and the case-sensitive `*NotebookGit*` does not match `services.notebookGit.PortablePathKindTest`. The fresh refactor agent noticed and ran the class separately (12 pass).
-
-### Occurrences
-
-- Execution: SEED-009#story-48 / `f321a7cb23:.planning/slice-plans/019-one-path-classifier/PLAN.md` / 83a98aad70; Timestamp: unknown (2026-09-27, before slice 1 commit 13:18:42+08:00); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.42.
-  - Evidence: coordinator summary to the retrospective (no transcript); plan slice 1 "Accepted proof" and Learnings at 6de22982d5 ("`*NotebookGit*` misses `services.notebookGit.PortablePathKindTest`").
-  - Observed effect: one extra focused run by the refactor agent; no untested code was accepted. Later slices named `*PortablePathKindTest` explicitly.
-  - Inference: a proof claim for a named new test needs that test's name or count in the run's result, not a filter believed to cover it. Qualified: the single-pattern limit is Donut tooling, so this may belong in DonutRetrospectiveFindings.md; the unchecked claim is the shared part.
-
-## DD-141 — An implementer proved fails-first by putting HEAD versions back in the shared execution checkout
-
-The slice 5 delegation told the implementer both to show its new assertions failing first and not to check out paths in the shared checkout. It implemented first, then copied its files aside, restored the HEAD versions of `relationshipFolderResolve.ts` and `AddRelationshipFinalize.vue` in place, ran the spec red (4 failed, 2 passed), and copied its versions back. Delegation guidance says a needed baseline uses a separate temporary checkout or is reported back.
-
-### Occurrences
-
-- Execution: SEED-050#story-2 / `d3c9b4814d:.planning/slice-plans/021-relationship-notes-accepted-in-one-change/PLAN.md` / f8087d5845; Timestamp: unknown (2026-09-27, slice 5 work before commit 06ff81b916); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: unknown.
-  - Evidence: slice 5 implementer return ("I put the HEAD versions of the resolver and the Vue file back temporarily ... restored my versions from temp copies"); delegation prompt's "never stash, reset, clean, checkout paths"; dough-execute-plan/references/delegation.md ownership bullet.
-  - Observed effect: no damage; the coordinator checked the working tree afterwards and it held the intended diff. No other writer was active in the checkout at that time.
-  - Inference: an implementer that writes code before its test finds the in-place restore the cheapest fails-first route; with a concurrent writer it could clobber or capture sibling work. Writing the test first, or a temporary worktree at HEAD, avoids it. Qualified: one occurrence; coordinator saw only the return.
-
 ## Retention
 
-- Highest allocated local number: 141
-- Recovery: `33939aa45a17c08f5e6f8076178ce96437fdfbe8:DearDough.md` contains the complete pre-compaction log and earlier recovery references; `b0b385a184e96ecf8b0f6fc5572eaaab69bc8dad` preserves later history.
-- Occurrence history is partial; full observations, effects, inference and historical provenance remain in that snapshot and the upstream catalog.
+- Highest allocated local number: 141. Removed local codes are never reused.
+- Full pre-maintenance log and earlier recovery locators: `99fa1b9835e3dff2473837ba2a1f8b11967d5938:DearDough.md`.
+- Occurrence history is partial; active evidence stays here or in the Open Dough catalog and watch list.
