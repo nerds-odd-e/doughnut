@@ -27,6 +27,7 @@ export async function withDownloadedAcceptedNotebookHistory<T>(
   const tempDir = fs.mkdtempSync(
     path.join(os.tmpdir(), `donut-notebook-accepted-history-${process.pid}-`)
   )
+  let inspected: T
   try {
     const bundleFile = path.join(tempDir, 'accepted.bundle')
     await downloadNotebookGitBundle(notebookId, bundleFile)
@@ -41,6 +42,8 @@ export async function withDownloadedAcceptedNotebookHistory<T>(
       [
         '-C',
         acceptedRepoDir,
+        '-c',
+        'maintenance.auto=false',
         'fetch',
         '--quiet',
         bundleFile,
@@ -53,8 +56,14 @@ export async function withDownloadedAcceptedNotebookHistory<T>(
       ['-C', acceptedRepoDir, 'rev-parse', 'main'],
       acceptedHistoryFailure
     ).trim()
-    return inspectAcceptedHistory(acceptedRepoDir, acceptedHead)
+    inspected = inspectAcceptedHistory(acceptedRepoDir, acceptedHead)
   } finally {
     fs.rmSync(tempDir, { recursive: true, force: true })
   }
+  if (fs.existsSync(tempDir)) {
+    throw new Error(
+      `temporary storage for accepted notebook history was not removed: ${tempDir}`
+    )
+  }
+  return inspected
 }
