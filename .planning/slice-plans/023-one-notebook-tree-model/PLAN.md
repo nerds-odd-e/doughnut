@@ -145,7 +145,15 @@ and record it as a learning.
 ### 4. Note listings read one container query and the listing stops branching
 
 Type: Structure
-Status: planned
+Status: done — `NoteRepository.findNotesInContainer`; the root query's
+not-trashed filter was a no-op (null `folder_id` never matches a trashed
+folder). EXPLAIN on 9,000 seeded notes: root `idx_note_structural_peer`,
+folder `idx_note_folder_id`, same as before. Planned proof 82 green plus the
+other callers (123) green; new
+`aRootPictureAnotherRootNoteUsesIsCopiedNotMoved` observes example 4 at the
+root (fails when the root answer is removed). Refactor split
+`RelationControllerMoveNoteTrashTests` out of
+`RelationControllerMoveNoteToFolderTests`.
 Proof: one `EXPLAIN` of the note query's root and folder forms, recorded
 here; then `CURSOR_DEV=true nix develop -c pnpm backend:test_only --tests 'com.odde.donut.controllers.NotebookFolderListingControllerTest' --tests 'com.odde.donut.controllers.NotebookGitWebNoteMovePictureControllerTest' --tests 'com.odde.donut.controllers.NotebookFolderCrossNotebookMoveControllerTest' --tests 'com.odde.donut.controllers.NotebookFolderPermanentDeleteControllerTest' --tests 'com.odde.donut.controllers.RelationControllerMoveNoteToFolderTests' --tests 'com.odde.donut.controllers.NotebookNoteCreateControllerTest' --tests 'com.odde.donut.controllers.CircleControllerTest' --tests 'com.odde.donut.controllers.NotebookCrudControllerTest'`
 stays green.
@@ -172,3 +180,9 @@ minutes, split the listing's branch removal into its own slice.
 - The name-filtered sibling queries (`findCandidateChildContainers`,
   `findChildFoldersNamedIgnoringCase`, `findFilenamesNamedIgnoringCase`) keep
   the `IS NULL … OR` form; out of this story's scope.
+- A folder's notes are now found by (notebook, folder), so a cross-notebook
+  move reads them before changing the folder's notebook.
+- Still branching outside this story: `NoteService.findStructuralPeerNotesSample`
+  (root vs folder structural-peer queries), and the "folder in this notebook
+  or 404" lookup written in the listing, `FolderRelocationService` and
+  `NoteConstructionService`.

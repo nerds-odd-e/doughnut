@@ -8,10 +8,10 @@ import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.User;
 import com.odde.donut.entities.repositories.FolderRepository;
+import com.odde.donut.entities.repositories.NoteRepository;
 import com.odde.donut.entities.repositories.NotebookAttachmentRepository;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.donut.services.AuthorizationService;
-import com.odde.donut.services.NoteService;
 import com.odde.donut.services.NotebookCatalogService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -25,19 +25,19 @@ import org.springframework.web.server.ResponseStatusException;
 /** Read-only folder listing, page, and index HTTP for notebooks. */
 abstract class NotebookFolderQuerySupport {
   private final AuthorizationService authorizationService;
-  private final NoteService noteService;
+  private final NoteRepository noteRepository;
   private final FolderRepository folderRepository;
   private final NotebookCatalogService notebookCatalogService;
   private final NotebookAttachmentRepository notebookAttachmentRepository;
 
   NotebookFolderQuerySupport(
       AuthorizationService authorizationService,
-      NoteService noteService,
+      NoteRepository noteRepository,
       FolderRepository folderRepository,
       NotebookCatalogService notebookCatalogService,
       NotebookAttachmentRepository notebookAttachmentRepository) {
     this.authorizationService = authorizationService;
-    this.noteService = noteService;
+    this.noteRepository = noteRepository;
     this.folderRepository = folderRepository;
     this.notebookCatalogService = notebookCatalogService;
     this.notebookAttachmentRepository = notebookAttachmentRepository;
@@ -56,33 +56,24 @@ abstract class NotebookFolderQuerySupport {
           Integer parentFolderId)
       throws UnexpectedNoAccessRightException {
     authorizationService.assertReadAuthorization(notebook);
-    if (parentFolderId == null) {
-      List<NoteTopology> noteTopologies =
-          noteService.findNotebookRootNotes(notebook.getId()).stream()
-              .map(Note::getNoteTopology)
-              .toList();
-      List<Folder> folders = folderRepository.findFoldersInContainer(notebook.getId(), null);
-      return new FolderListing(
-          noteTopologies,
-          folders,
-          notebookAttachmentRepository.findListItemsInContainer(notebook.getId(), null));
+    if (parentFolderId != null) {
+      requireFolderIn(notebook, parentFolderId);
     }
-    Folder folder =
-        folderRepository
-            .findById(parentFolderId)
-            .orElseThrow(
-                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Folder not found."));
-    folder.requireInNotebook(notebook);
     List<NoteTopology> noteTopologies =
-        noteService.findNotesInFolderScope(folder.getId()).stream()
+        noteRepository.findNotesInContainer(notebook.getId(), parentFolderId).stream()
             .map(Note::getNoteTopology)
             .toList();
-    List<Folder> childFolders =
-        folderRepository.findFoldersInContainer(notebook.getId(), folder.getId());
     return new FolderListing(
         noteTopologies,
-        childFolders,
-        notebookAttachmentRepository.findListItemsInContainer(notebook.getId(), folder.getId()));
+        folderRepository.findFoldersInContainer(notebook.getId(), parentFolderId),
+        notebookAttachmentRepository.findListItemsInContainer(notebook.getId(), parentFolderId));
+  }
+
+  private void requireFolderIn(Notebook notebook, Integer folderId) {
+    folderRepository
+        .findById(folderId)
+        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Folder not found."))
+        .requireInNotebook(notebook);
   }
 
   @Operation(

@@ -46,7 +46,9 @@ final class FolderSubtree {
   List<Note> collectNotes(List<Folder> subtreeFolders) {
     List<Note> notes = new ArrayList<>();
     for (Folder subtreeFolder : subtreeFolders) {
-      notes.addAll(noteRepository.findNotesInFolderOrderByIdAsc(subtreeFolder.getId()));
+      notes.addAll(
+          noteRepository.findNotesInContainer(
+              subtreeFolder.getNotebook().getId(), subtreeFolder.getId()));
     }
     return notes;
   }
@@ -86,10 +88,13 @@ final class FolderSubtree {
   void reassignToNotebook(
       List<Folder> subtreeFolders, Notebook destinationNotebook, Timestamp now) {
     for (Folder subtreeFolder : subtreeFolders) {
+      List<Note> notes =
+          noteRepository.findNotesInContainer(
+              subtreeFolder.getNotebook().getId(), subtreeFolder.getId());
       subtreeFolder.setNotebook(destinationNotebook);
       subtreeFolder.setUpdatedAt(now);
       entityPersister.merge(subtreeFolder);
-      for (Note note : noteRepository.findNotesInFolderOrderByIdAsc(subtreeFolder.getId())) {
+      for (Note note : notes) {
         note.assignNotebook(destinationNotebook);
         entityPersister.merge(note);
       }
@@ -153,7 +158,8 @@ final class FolderSubtree {
         entityPersister.merge(child);
       }
     }
-    for (Note note : noteRepository.findNotesInFolderOrderByIdAsc(source.getId())) {
+    for (Note note :
+        noteRepository.findNotesInContainer(source.getNotebook().getId(), source.getId())) {
       note.setFolder(destinationOrNull);
       if (crossNotebook) {
         note.assignNotebook(destinationNotebook);

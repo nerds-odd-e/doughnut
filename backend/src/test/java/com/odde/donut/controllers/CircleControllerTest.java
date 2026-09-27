@@ -77,10 +77,7 @@ class CircleControllerTest extends ControllerTestBase {
       assertThat(response.notebook().getId(), notNullValue());
       Notebook nb = notebookRepository.findById(response.notebook().getId()).orElseThrow();
       assertThat(nb.getDescription(), equalTo("Circle catalog blurb"));
-      assertThat(
-          noteRepository.findNotesInNotebookRootFolderScopeByNotebookId(
-              response.notebook().getId()),
-          empty());
+      assertThat(noteRepository.findNotesInContainer(response.notebook().getId(), null), empty());
     }
 
     @Test

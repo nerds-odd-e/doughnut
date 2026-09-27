@@ -90,17 +90,13 @@ public interface NoteRepository extends CrudRepository<Note, Integer>, NoteStruc
   List<Note> searchExactInNotebook(Integer notebookId, @Param("key") String key);
 
   @Query(
-      value =
-          selectFromNote
-              + " WHERE n.notebook.id = :notebookId AND "
-              + Note.JPA_AVAILABLE
-              + " AND n.folder IS NULL"
-              + " ORDER BY n.id ASC")
-  List<Note> findNotesInNotebookRootFolderScopeByNotebookId(
-      @Param("notebookId") Integer notebookId);
-
-  @Query(value = selectFromNote + " WHERE n.folder.id = :folderId" + " ORDER BY n.id ASC")
-  List<Note> findNotesInFolderOrderByIdAsc(@Param("folderId") Integer folderId);
+      """
+      SELECT n FROM Note n
+      WHERE n.notebook.id = :notebookId AND n.folder.id IS NOT DISTINCT FROM :folderId
+      ORDER BY n.id ASC
+      """)
+  List<Note> findNotesInContainer(
+      @Param("notebookId") Integer notebookId, @Param("folderId") Integer folderId);
 
   @Query(
       """

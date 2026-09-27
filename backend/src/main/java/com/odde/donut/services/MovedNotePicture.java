@@ -11,7 +11,6 @@ import com.odde.donut.factoryServices.EntityPersister;
 import com.odde.donut.services.notebookGit.NoteFolderAttachment;
 import com.odde.donut.services.notebookGit.NotebookGitPortablePath;
 import java.sql.Timestamp;
-import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -70,12 +69,9 @@ public class MovedNotePicture {
   }
 
   private boolean anotherNoteNames(Note note, String filename) {
-    List<Note> sourceFolderNotes =
-        note.getFolder() == null
-            ? noteRepository.findNotesInNotebookRootFolderScopeByNotebookId(
-                note.getNotebook().getId())
-            : noteRepository.findNotesInFolderOrderByIdAsc(note.getFolder().getId());
-    return sourceFolderNotes.stream()
+    return noteRepository
+        .findNotesInContainer(note.getNotebook().getId(), folderId(note.getFolder()))
+        .stream()
         .filter(other -> !other.getId().equals(note.getId()))
         .anyMatch(
             other ->

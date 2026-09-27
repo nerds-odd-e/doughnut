@@ -105,7 +105,7 @@ class NotebookFolderPermanentDeleteControllerTest extends NoteDependentRowsContr
 
   /** Titles of the notebook's notes that sit at its root, with no folder of their own. */
   private List<String> rootNoteTitles(Notebook notebook) {
-    return noteRepository.findNotesInNotebookRootFolderScopeByNotebookId(notebook.getId()).stream()
+    return noteRepository.findNotesInContainer(notebook.getId(), null).stream()
         .map(Note::getTitle)
         .toList();
   }

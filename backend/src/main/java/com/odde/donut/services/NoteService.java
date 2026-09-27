@@ -53,14 +53,6 @@ public class NoteService {
     return noteRepository.findById(id);
   }
 
-  public List<Note> findNotebookRootNotes(Integer notebookId) {
-    return noteRepository.findNotesInNotebookRootFolderScopeByNotebookId(notebookId);
-  }
-
-  public List<Note> findNotesInFolderScope(Integer folderId) {
-    return noteRepository.findNotesInFolderOrderByIdAsc(folderId);
-  }
-
   /**
    * Structural peers (same folder, or notebook root when {@code anchor} has no folder), excluding
    * the anchor, optional focus note, and {@code excludeNoteIds}, capped at {@code cap} rows from
