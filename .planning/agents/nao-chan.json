@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "agent": "Nao-chan",
+  "email": "nao-chan@example.org",
+  "identity": "SEED-050#story-3",
+  "mode": "story-branch",
+  "branch": "story/loud-notebook-load-failures",
+  "host": "cursor",
+  "model": "gemini-3.8-flash"
+}
