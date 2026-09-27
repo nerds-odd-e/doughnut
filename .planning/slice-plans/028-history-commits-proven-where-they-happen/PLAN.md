@@ -53,7 +53,7 @@ the binding-less branch in `resetHistory`; the CLI pause test.
 ### 1. Creation and reset commits are asserted at their entry points
 
 Type: Behavior (proof)
-Status: planned
+Status: done
 Proof: temporarily change `CREATION_COMMIT_MESSAGE`/`RESET_COMMIT_MESSAGE`
 and see the new assertions fail, restore, then
 `CURSOR_DEV=true nix develop -c pnpm backend:test_only --tests 'com.odde.donut.controllers.NotebookCrudControllerTest' --tests 'com.odde.donut.controllers.CircleControllerTest' --tests 'com.odde.donut.controllers.NotebookGitHistoryResetControllerTest' --tests 'com.odde.donut.services.notebookGit.NotebookGitHistoryServiceTest'`.
@@ -66,10 +66,24 @@ service creation test keeps only what the shared assertion does not cover.
 ### 2. The synchronization doc drops cutover-era phrases
 
 Type: Structure (docs)
-Status: planned
+Status: done
 Proof: the two phrases are gone and the paragraphs still read whole.
 
 Change: delete `:45-46`'s sentence; drop "still" at `:186` and rewrap.
+
+## Accepted proof
+
+- Slice 1: with both message constants mutated, the focused command failed
+  exactly `NotebookCrudControllerTest$CreateNotebook` and
+  `CircleControllerTest$CreateNotebookInCircle`
+  `startsWithLfsRootCommitAndInitialAttributes` (via
+  `NotebookGitBindingAssertions`) and
+  `NotebookGitHistoryResetControllerTest.resetRestartsHistoryFromTheCurrentNotebookSoAPlainEditPublishesAgain`;
+  restored, 36 tests passed. The reset assertion lives in the controller test,
+  which drives the real reset. The service creation test is now
+  `startHistoryBindsTheNotebooksCanonicalTree` (tree only).
+- Slice 2: `grep -n "owner opt-in\|may still read"
+  docs/notebook-git-synchronization.md` finds nothing.
 
 ## Current decisions
 

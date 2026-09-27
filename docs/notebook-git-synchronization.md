@@ -42,8 +42,6 @@ Every notebook has a dedicated repository and accepted `main` from the moment
 it is created. Creating a notebook commits exactly one root commit, "Create
 notebook", by Donut System <system@donut.local>, holding the notebook's
 canonical Portable tree with the initial LFS `.gitattributes`.
-Repository creation needs no owner opt-in and does not wait for local
-acquisition.
 
 A history reset replaces accepted `main` with one new root commit, "Reset:
 restart Git history from the current notebook", by the same author, holding the
@@ -183,12 +181,13 @@ transaction when the root tree differs. Derivation opens the accepted root and
 the ancestor directories of the paths that captured change affects, rewrites
 those directories from the changed leaf toward the root, and reuses untouched
 child-tree object IDs. It does not load unrelated subtrees, note bodies, or
-attachment bytes in order to publish history. Notebook creation, history
-reset, drift checks, and bundle download may still read a complete tree. An unchanged root
-tree ID does not append a commit or insert new Git objects. Destination construction, collision
-resolution, placement, and authored reference handling finish before that
-capture closes; newly created folders and all affected in-notebook content are
-captured with it. Do not publish individual low-level placement steps.
+attachment bytes in order to publish history. Notebook creation, history reset,
+drift checks, and bundle download may read a complete tree. An unchanged root
+tree ID does not append a commit or insert new Git objects. Destination
+construction, collision resolution, placement, and authored reference handling
+finish before that capture closes; newly created folders and all affected
+in-notebook content are captured with it. Do not publish individual low-level
+placement steps.
 
 Accepted repository persistence receives the commit ID already produced or validated
 by its caller; a web save does not reread the accepted ref after appending.
