@@ -59,36 +59,3 @@ the dissolve/merge placement check no longer carries its own copy.
 **Effort hypothesis:** S — high confidence.
 
 **Depends on:** none (SEED-050#story-8 is delivered).
-
-<a id="story-10"></a>
-
-### Notebook history commits are proven where they happen
-
-**Identity:** SEED-050#story-10
-```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/028-history-commits-proven-where-they-happen/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"05b6de91db7a458c562ad487a19f5326c8e6054dd6a33a9d9246e84e7bb749cd","plan":"11e47dc69185c0bbc4913f29f26940dd172ee7e521e2085e4c12ea5b59c9e844"}}
-```
-
-**Goal:** Correction of SEED-050#story-5 (commits 48d5a2e8f8..5afa318baf): a
-developer changing notebook creation or history reset learns from the
-entry-point tests when the commit message or author changes, and the
-synchronization doc says only what those commits do.
-
-**Scope:**
-
-- Creation through the notebook and circle controllers asserts the root commit
-  "Create notebook" by Donut System <system@donut.local>.
-- History reset asserts "Reset: restart Git history from the current notebook"
-  by the same author.
-- The service test drops checks the shared creation assertion already makes.
-- `docs/notebook-git-synchronization.md` drops "Repository creation needs no
-  owner opt-in…" and the "still" in "may still read a complete tree".
-- Unchanged: `notebook-git-lfs.md` decision-record text; the binding-less
-  branch in `resetHistory`.
-
-**Key examples:**
-
-1. Create a notebook through the controller → its root commit reads "Create
-   notebook" by Donut System.
-2. Reset a notebook's history → its root commit reads "Reset: restart Git
-   history from the current notebook" by Donut System.
