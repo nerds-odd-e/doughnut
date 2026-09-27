@@ -133,7 +133,7 @@ side's YAML library. Run after SEED-009#story-48 lands if it is still editing
 ### 4. Pull leaves every conflict to Git
 
 Type: Behavior
-Status: planned
+Status: done
 Proof: move the final-LF case into `notebookPull.conflict.suite.ts` as a
 pause expectation reusing `pullCreatedConflictObservation` (pull exits 1; the
 error names `note.md` with the `git add` / `git rebase --continue` /
@@ -158,4 +158,13 @@ guidance on a pause; the absorbed suite's final-newline constants go.
 
 ## Learnings
 
-None yet.
+- Two more absorber tests lived in `notebookPull.contentBatch.suite.ts`
+  (an LF-equivalent path beside a companion edit; a wholly LF-equivalent
+  batch); they went with the absorber, and the suite's two-file overlap tests
+  moved to `notebookPull.contentBatchOverlap.suite.ts` to keep files short.
+- `notebookPublish.lfs.test.ts`'s git-process-count test failed once in a full
+  `pnpm cli:test` run and passed alone and on the full rerun; publish code was
+  not touched, so it looks load-sensitive.
+- The installed `agent-commit.mjs` and `execution-increment-delivery.mjs`
+  exit silently when run through the `.claude/skills` symlink; run them by
+  their real path.

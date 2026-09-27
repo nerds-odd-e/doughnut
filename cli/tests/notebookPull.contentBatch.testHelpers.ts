@@ -14,6 +14,8 @@ export const LOCAL_ROOT_NOTE =
   '---\ntype: Note\nauthored: root-local\n---\n# Alpha\n\nLocal root body.\n'
 export const LOCAL_NESTED_NOTE =
   '---\ntype: Note\nauthored: nested-local\n---\n# Nested\n\nLocal nested body.\n'
+export const LOCAL_COMPANION_NOTE =
+  '---\ntype: Note\n---\n# Gamma\n\nLocal companion edit.\n'
 export const ACCEPTED_THIRD_NOTE =
   '---\ntype: Note\nauthored: remote-yaml\n---\n# Gamma\n\nAccepted third-note body.\n'
 
@@ -83,4 +85,30 @@ export function prepareContentBatchDivergence(
     localTip,
     acceptedHead: runGit(['rev-parse', 'main'], source),
   }
+}
+
+// A three-path local batch whose root and nested notes both overlap one accepted commit,
+// leaving the third path as an untouched companion edit.
+export function prepareTwoFileOverlap(workDir: string) {
+  return prepareContentBatchDivergence(workDir, {
+    localChanges: [
+      { path: 'note.md', content: LOCAL_ROOT_NOTE },
+      { path: 'Nested/Cell.md', content: LOCAL_NESTED_NOTE },
+      { path: 'gamma.md', content: LOCAL_COMPANION_NOTE },
+    ],
+    acceptedChangeSets: [
+      [
+        {
+          path: 'note.md',
+          content:
+            '---\ntype: Note\n---\n# Alpha\n\nAccepted overlapping root.\n',
+        },
+        {
+          path: 'Nested/Cell.md',
+          content:
+            '---\ntype: Note\n---\n# Nested\n\nAccepted overlapping nested.\n',
+        },
+      ],
+    ],
+  })
 }
