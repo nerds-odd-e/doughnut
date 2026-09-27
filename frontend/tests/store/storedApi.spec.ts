@@ -184,7 +184,7 @@ describe("storedApiCollection", () => {
       )
       const before = sidebarStructuralRefreshKey.value
       const sa = storageAccessor.value.storedApi()
-      await sa.uploadNoteImage(note.id, file)
+      await expect(sa.uploadNoteImage(note.id, file)).rejects.toThrow("refused")
       expect(sidebarStructuralRefreshKey.value).toBe(before)
     })
   })

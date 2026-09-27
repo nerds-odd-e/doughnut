@@ -88,8 +88,15 @@ adding a replacement.
 ### 2. Note requests fail in one way
 
 Type: Structure
-Status: planned
+Status: done
 Proof: slice 2 row above.
+
+Accepted proof: `CURSOR_DEV=true nix develop -c pnpm frontend:test tests/store tests/notes/NoteMoreOptionsForm.trashNote.spec.ts tests/notes/NoteMoreOptionsForm.permanentlyDeleteNote.spec.ts tests/notes/NoteMoreOptionsForm.trashNote.relationship.spec.ts tests/pages/NoteShowPage.imageUpload.spec.ts tests/managedApi/clientSetup.spec.ts tests/managedApi/clientSetup.loading.spec.ts`
+passed 69 tests across 11 files; `CURSOR_DEV=true nix develop -c pnpm -C frontend exec vue-tsc --noEmit`
+passed. Existing refused-upload assertion observes rejection and unchanged
+sidebar key; mounted removal/reduction/upload specs observe successful flows;
+clientSetup specs observe error toast and rejection loading cleanup. Request
+error and missing-payload checks preserved. Independent refactor: no edits.
 
 Removes four failure styles. `trashNoteRequest`, `permanentlyDeleteNoteRequest`,
 `reduceRelationNoteToSourcePropertyRequest` and `uploadNoteImageRequest` throw
@@ -202,6 +209,8 @@ count.
   `codex/note-store-architecture`; Codex yielded observer cell 29, session 33954,
   PID 11700, mailbox `/tmp/dough-ci-501/watch-Fd6Y7J`, owned by the publisher
   above and bound to the execution checkout. Workflow selector verified.
+- Accepted execution-branch increment: `3821dbd9c79c7ab25e68cd1ff96aa44061d6544f`
+  (slice 1); observer reused and registration confirmed by managed delivery.
 
 - Owner, 2026-09-27: delete the wiki-link re-save with nothing left behind: no
   replacement reload, no absence test, no historical note.

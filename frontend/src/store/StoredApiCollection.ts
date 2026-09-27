@@ -205,7 +205,6 @@ export default class StoredApiCollection {
   /** Uploads a picture as a file beside the note; the returned realm carries the note's new `image:`. */
   async uploadNoteImage(noteId: Donut.ID, file: File) {
     const noteRealm = await uploadNoteImageRequest(noteId, file)
-    if (!noteRealm) return
     this.storage.refreshNoteRealm(noteRealm)
     refreshSidebarStructuralListings()
   }
@@ -267,10 +266,9 @@ export default class StoredApiCollection {
   }> {
     const cached = this.storage.refOfNoteRealm(noteId).value
     const notebookFallbackId = cached?.notebookRealm.notebook.id
-    const trashedRealm = await trashNoteRequest(noteId, {
+    await trashNoteRequest(noteId, {
       referenceHandling: "LEAVE_DEAD_LINKS",
     })
-    if (!trashedRealm) throw new Error("Failed to undo create note")
     this.storage.removeNoteRealm(noteId)
     return {
       noteRealm: undefined,
@@ -301,7 +299,6 @@ export default class StoredApiCollection {
     const destination = await this.locationAfterRemoving(cachedRealm)
     const body = noteReferenceHandlingBody(options)
     const trashedRealm = await trashNoteRequest(noteId, body)
-    if (!trashedRealm) return
 
     const originalFolderId = containingFolderId(cachedRealm)
     this.noteEditingHistory.trashNote(
@@ -337,8 +334,7 @@ export default class StoredApiCollection {
     const cachedRealm = this.storage.refOfNoteRealm(noteId).value
     if (!cachedRealm) throw new Error("Cannot delete a note that is not loaded")
     const destination = await this.locationAfterRemoving(cachedRealm)
-    const ok = await permanentlyDeleteNoteRequest(noteId)
-    if (!ok) return
+    await permanentlyDeleteNoteRequest(noteId)
 
     this.noteNoLongerExists(noteId)
     await router.replace(destination)
@@ -355,7 +351,6 @@ export default class StoredApiCollection {
   ) {
     const sourceRealm =
       await reduceRelationNoteToSourcePropertyRequest(relationNoteId)
-    if (!sourceRealm) return
 
     this.noteNoLongerExists(relationNoteId)
     await router.replace(noteShowLocation(sourceRealm.id))
