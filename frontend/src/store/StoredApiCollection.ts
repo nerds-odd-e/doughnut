@@ -9,7 +9,7 @@ import { noteShowLocation } from "@/routes/noteShowLocation"
 import { locationAfterNoteRemoval } from "@/routes/containingLocation"
 import { neighborNoteAfterRemoval } from "@/components/notes/sidebarStructuralSort"
 import { usePeerSort } from "@/composables/usePeerSort"
-import { requestNotebookFolderListing } from "@/utils/notebookFolderListingRequest"
+import { loadFolderListing } from "@/utils/notebookFolderListingRequest"
 import { refreshSidebarStructuralListings } from "@/components/notes/sidebarStructuralRefresh"
 import { realmLeafFolder } from "@/components/notes/useNoteSidebarTree"
 import type { Router } from "vue-router"
@@ -335,11 +335,10 @@ export default class StoredApiCollection {
 
   /** Read before removal, so the note's position is found in the order the person saw. */
   private async locationAfterRemoving(realm: NoteRealm) {
-    const { data: listing, error } = await requestNotebookFolderListing(
+    const listing = await loadFolderListing(
       realm.notebookRealm.notebook.id,
       containingFolderId(realm)
     )
-    if (error || !listing) throw new Error("Failed to load folder listing")
     const neighbor = neighborNoteAfterRemoval(
       listing,
       realm.id,

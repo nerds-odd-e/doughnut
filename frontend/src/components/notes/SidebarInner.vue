@@ -101,12 +101,7 @@ const displayRows = computed(() =>
 )
 
 function applyListing(listing: FolderListing) {
-  const noteTopologies = listing.noteTopologies ?? []
-  rawRows.value = buildUnsortedStructuralRows(
-    noteTopologies,
-    listing.folders,
-    listing.attachments
-  )
+  rawRows.value = buildUnsortedStructuralRows(listing)
   props.onStructuralPeerCount?.(rawRows.value.length)
 }
 

@@ -2,12 +2,23 @@ import {
   NoteController,
   NotebookFolderController,
 } from "@generated/donut-backend-api/sdk.gen"
+import type { FolderListing } from "@generated/donut-backend-api"
 import type { Router } from "vue-router"
+import { flushPromises } from "@vue/test-utils"
 import { sidebarStructuralRefreshKey } from "@/components/notes/sidebarStructuralRefresh"
+import type { ApiStatus } from "@/managedApi/ApiStatusHandler"
+import {
+  setupGlobalClient,
+  teardownGlobalClientForTesting,
+} from "@/managedApi/clientSetup"
 import createNoteStorage from "@/store/createNoteStorage"
 import makeMe from "donut-test-fixtures/makeMe"
-import { mockSdkService, wrapSdkError } from "@tests/helpers"
-import { beforeEach, describe, expect, it, vi } from "vitest"
+import {
+  mockSdkService,
+  mockSdkServiceWithImplementation,
+  wrapSdkError,
+} from "@tests/helpers"
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 
 describe("storedApiCollection trash note", () => {
   const routerReplace = vi.fn()
@@ -20,6 +31,10 @@ describe("storedApiCollection trash note", () => {
   beforeEach(() => {
     vi.clearAllMocks()
     mockSdkService(NotebookFolderController, "listNotebookFolderListing", {})
+  })
+
+  afterEach(() => {
+    teardownGlobalClientForTesting()
   })
 
   it.each([
@@ -148,5 +163,33 @@ describe("storedApiCollection trash note", () => {
     })
 
     expect(sidebarStructuralRefreshKey.value).toBe(before + 1)
+  })
+
+  it("shows the app as busy while the peer listing loads before trashing", async () => {
+    const storage = createNoteStorage()
+    const realm = makeMe.aNoteRealm.please()
+    storage.refreshNoteRealm(realm)
+    mockSdkService(NoteController, "trashNote", realm)
+    let resolveListing: (listing: FolderListing) => void = () => undefined
+    mockSdkServiceWithImplementation(
+      NotebookFolderController,
+      "listNotebookFolderListing",
+      () =>
+        new Promise((resolve) => {
+          resolveListing = resolve
+        })
+    )
+    const apiStatus: ApiStatus = { states: [] }
+    setupGlobalClient(apiStatus)
+
+    const trashing = storage.storedApi().trashNote(router, realm.id, {
+      referenceHandling: "LEAVE_DEAD_LINKS",
+    })
+    await flushPromises()
+
+    expect(apiStatus.states).toHaveLength(1)
+    resolveListing({})
+    await trashing
+    expect(apiStatus.states).toHaveLength(0)
   })
 })

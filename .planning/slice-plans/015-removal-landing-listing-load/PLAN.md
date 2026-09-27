@@ -65,7 +65,7 @@ the frontend skill's typecheck. E2E only if the step timing changes:
 ### 1. Removal landing uses the shared listing load and row builder
 
 Type: Behavior
-Status: planned
+Status: done
 Proof: the loading-modal observation above fails before the change and passes
 after; the landing, relationship and sidebar specs stay green.
 
@@ -81,6 +81,21 @@ its inline error check). Give `buildUnsortedStructuralRows` a single
 `SidebarInner.applyListing` and `neighborNoteAfterRemoval`. Expected net
 change: fewer lines.
 
+Accepted proof: `tests/store/storedApi.trashNote.spec.ts` "shows the app as
+busy while the peer listing loads before trashing" (one busy state while the
+listing is pending, none after landing; failed before the change);
+`CURSOR_DEV=true nix develop -c pnpm frontend:test tests/notes tests/store tests/toolbars tests/wiki-link-or-relationship tests/components/notes tests/composables`
+and `tests/pages` green; `vue-tsc --noEmit` clean.
+
 ## Current decisions
 
 - The shared load owns loading and the loud failure; callers add neither.
+- `useFolderSelectorNeighbourListing` reuses the shared load too (simpler); it
+  keeps its own catch and message.
+
+## Learnings
+
+- User-triggered listing loads show the non-blocking busy bar
+  (`apiCallWithLoading` without `blockUi`), not `LoadingModal`. The proof
+  observes that busy state, matching the other listing loads, instead of the
+  modal the plan first named.
