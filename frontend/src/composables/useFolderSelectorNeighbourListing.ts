@@ -1,6 +1,5 @@
 import type { Folder } from "@generated/donut-backend-api"
-import { apiCallWithLoading } from "@/managedApi/clientSetup"
-import { requestNotebookFolderListing } from "@/utils/notebookFolderListingRequest"
+import { loadFolderListing } from "@/utils/notebookFolderListingRequest"
 import { ref, type Ref } from "vue"
 
 export function useFolderSelectorNeighbourListing(
@@ -13,11 +12,10 @@ export function useFolderSelectorNeighbourListing(
   async function loadNeighbourFolders() {
     try {
       loadError.value = undefined
-      const { data: listing, error } = await apiCallWithLoading(() =>
-        requestNotebookFolderListing(notebookId.value, parentFolderId.value)
+      const listing = await loadFolderListing(
+        notebookId.value,
+        parentFolderId.value
       )
-      if (error || !listing)
-        throw new Error("Failed to load neighbouring folders")
       neighbourFolders.value = listing.folders ?? []
     } catch {
       loadError.value = "Failed to load neighbouring folders"

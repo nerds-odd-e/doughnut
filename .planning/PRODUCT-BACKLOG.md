@@ -10,8 +10,6 @@ and deletable in Web Donut.
 
 ## Taken
 
-- [Removal landing loads the folder listing like other user actions](seeds/SEED-047-deleted-node-navigation.md#story-2) — SEED-047#story-2 ([plan](slice-plans/015-removal-landing-listing-load/PLAN.md))
-
 ## Backlog list
 
 - [Give the frontend note store a cohesive architecture](seeds/SEED-049-note-store-architecture.md#story-1) — SEED-049#story-1
