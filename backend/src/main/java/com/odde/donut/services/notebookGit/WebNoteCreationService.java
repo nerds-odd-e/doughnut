@@ -1,6 +1,5 @@
 package com.odde.donut.services.notebookGit;
 
-import com.odde.donut.algorithms.NoteConceptType;
 import com.odde.donut.controllers.dto.NoteCreationDTO;
 import com.odde.donut.controllers.dto.NoteRealm;
 import com.odde.donut.entities.Notebook;
@@ -37,7 +36,7 @@ public class WebNoteCreationService {
       User user,
       WikidataIdWithApi wikidataIdWithApi)
       throws InterruptedException, IOException, UnexpectedNoAccessRightException {
-    if (wikidataIdWithApi != null || !NoteConceptType.isOrdinary(noteCreation.getContent())) {
+    if (wikidataIdWithApi != null) {
       return noteConstructionService.createRootNoteWithWikidataService(
           notebook, noteCreation, user, wikidataIdWithApi);
     }

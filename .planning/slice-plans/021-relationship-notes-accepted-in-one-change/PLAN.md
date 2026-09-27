@@ -93,7 +93,11 @@ server.
 ### 1. Relationship notes created on the web are accepted
 
 Type: Behavior
-Status: planned
+Status: done
+Accepted proof: `relationshipNoteIsAcceptedInOneCommit` failed first (head did
+not advance), then passed with parent = old head, message "Add note: Relates",
+`Relates.md` holding the relationship; drift tests now seed an unsynchronized
+`makeMe` row (7 + 4 + 5 tests green).
 Proof: flip `relationshipNoteKeepsExistingWebCreationAndAcceptedHead` to assert
 the accepted head advanced with the note's file (fails first, then passes);
 re-seed the drift in `NotebookGitProjectionDriftControllerTest` and

@@ -7,7 +7,6 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
 
-import com.odde.donut.controllers.dto.NoteCreationDTO;
 import com.odde.donut.controllers.dto.NoteUpdateContentDTO;
 import com.odde.donut.entities.MemoryTracker;
 import com.odde.donut.entities.Note;
@@ -28,8 +27,8 @@ class NotebookGitProjectionDriftControllerTest extends NotebookGitControllerTest
   private static final String ACCEPTED_CONTENT = "---\ntype: Note\n---\naccepted content";
   private static final String PROPOSED_CONTENT = "---\ntype: Note\n---\nproposed content";
   private static final String WEB_CONTENT = "---\ntype: Note\n---\nweb content";
-  private static final String UNSYNCHRONIZED_RELATIONSHIP_CONTENT =
-      "---\ntype: Relationship\nsource: \"[[A]]\"\ntarget: \"[[B]]\"\n---\nweb content";
+  private static final String UNSYNCHRONIZED_CONTENT =
+      "---\ntype: Note\n---\nunsynchronized content";
 
   @Autowired TextContentController textContentController;
   @Autowired MemoryTrackerRepository memoryTrackerRepository;
@@ -46,14 +45,14 @@ class NotebookGitProjectionDriftControllerTest extends NotebookGitControllerTest
   }
 
   @Test
-  void rejectsAnAdditionWhenAWebCreationOccupiesItsDestination() throws Exception {
-    rejectWhenAWebCreationHasDriftedTheProjection(this::additionProposalBundle);
+  void rejectsAnAdditionWhenAnUnsynchronizedNoteOccupiesItsDestination() throws Exception {
+    rejectWhenAnUnsynchronizedNoteHasDriftedTheProjection(this::additionProposalBundle);
   }
 
   @Test
-  void rejectsADeletionWhenAWebCreationHasDriftedTheProjection() throws Exception {
-    DriftedWebCreation remaining =
-        rejectWhenAWebCreationHasDriftedTheProjection(this::isolatedDeletionProposalBundle);
+  void rejectsADeletionWhenAnUnsynchronizedNoteHasDriftedTheProjection() throws Exception {
+    DriftedProjection remaining =
+        rejectWhenAnUnsynchronizedNoteHasDriftedTheProjection(this::isolatedDeletionProposalBundle);
     assertThat(
         inCommittedTransaction(
             transactionManager,
@@ -65,7 +64,7 @@ class NotebookGitProjectionDriftControllerTest extends NotebookGitControllerTest
         equalTo(true));
   }
 
-  private DriftedWebCreation rejectWhenAWebCreationHasDriftedTheProjection(
+  private DriftedProjection rejectWhenAnUnsynchronizedNoteHasDriftedTheProjection(
       ProposalBundleFactory proposalFactory) throws Exception {
     Notebook notebook = createGitBackedNotebook();
     Note acceptedNote =
@@ -78,13 +77,13 @@ class NotebookGitProjectionDriftControllerTest extends NotebookGitControllerTest
                 makeMe
                     .aMemoryTrackerFor(noteRepository.findById(acceptedNote.getId()).orElseThrow())
                     .please());
-    NoteCreationDTO webCreation = new NoteCreationDTO();
-    webCreation.setNewTitle("addition");
-    webCreation.setContent(UNSYNCHRONIZED_RELATIONSHIP_CONTENT);
     Note occupiedDestination =
-        noteRepository
-            .findById(controller.createNoteAtNotebookRoot(notebook, webCreation).getId())
-            .orElseThrow();
+        makeMe
+            .aNote()
+            .notebook(notebook)
+            .title("addition")
+            .content(UNSYNCHRONIZED_CONTENT)
+            .please();
 
     byte[] proposal = proposalFactory.create(binding);
 
@@ -99,15 +98,14 @@ class NotebookGitProjectionDriftControllerTest extends NotebookGitControllerTest
     Note reloadedOccupiedDestination =
         noteRepository.findById(occupiedDestination.getId()).orElseThrow();
     assertThat(reloadedOccupiedDestination.getTitle(), equalTo("addition"));
-    assertThat(
-        reloadedOccupiedDestination.getContent(), equalTo(UNSYNCHRONIZED_RELATIONSHIP_CONTENT));
+    assertThat(reloadedOccupiedDestination.getContent(), equalTo(UNSYNCHRONIZED_CONTENT));
     assertThat(reloadedOccupiedDestination.getFolder(), nullValue());
     assertThat(
         noteRepository.findAllByNotebookIdOrderByIdAsc(notebook.getId()).stream()
             .map(Note::getId)
             .toList(),
         equalTo(List.of(acceptedNote.getId(), occupiedDestination.getId())));
-    return new DriftedWebCreation(reloadedAccepted, tracker);
+    return new DriftedProjection(reloadedAccepted, tracker);
   }
 
   private Note rejectBasedOnAnOldParentAfterWebContentAdvancedAcceptedMain(
@@ -154,5 +152,5 @@ class NotebookGitProjectionDriftControllerTest extends NotebookGitControllerTest
     byte[] create(NotebookGitBinding binding) throws Exception;
   }
 
-  private record DriftedWebCreation(Note acceptedNote, MemoryTracker tracker) {}
+  private record DriftedProjection(Note acceptedNote, MemoryTracker tracker) {}
 }

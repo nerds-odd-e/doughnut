@@ -75,17 +75,26 @@ class NotebookGitNoteCreationControllerTest extends NotebookGitNoteCreationContr
   }
 
   @Test
-  void relationshipNoteKeepsExistingWebCreationAndAcceptedHead() throws Exception {
+  void relationshipNoteIsAcceptedInOneCommit() throws Exception {
     Notebook notebook = createGitBackedNotebook();
-    AcceptedBinding accepted = acceptedBinding(notebook);
+    ObjectId acceptedHead = ObjectId.fromString(binding(notebook).getAcceptedGitObjectId());
     NoteCreationDTO creation = titleOnly("Relates");
     creation.setContent("---\ntype: Relationship\nsource: \"[[A]]\"\ntarget: \"[[B]]\"\n---\n");
 
-    NoteRealm result = controller.createNoteAtNotebookRoot(notebook, creation);
+    controller.createNoteAtNotebookRoot(notebook, creation);
 
-    Note created = noteRepository.findById(result.getId()).orElseThrow();
-    assertThat(created.getContent(), containsString("type: Relationship"));
-    assertBindingUnchanged(notebook, accepted);
+    byte[] downloaded = acceptedBundleBytes(notebook);
+    try (InMemoryRepository repository = new InMemoryRepository(new DfsRepositoryDescription())) {
+      ObjectId newHead = GitBundleTestReader.fetchHead(repository, downloaded);
+      try (RevWalk revWalk = new RevWalk(repository)) {
+        RevCommit commit = revWalk.parseCommit(newHead);
+        assertThat(commit.getParent(0).getId(), is(acceptedHead));
+        assertThat(commit.getFullMessage(), is("Add note: Relates"));
+      }
+      assertThat(
+          NotebookGitProposalBlobText.readUtf8(repository, newHead, "Relates.md"),
+          containsString("type: Relationship"));
+    }
   }
 
   @Test
