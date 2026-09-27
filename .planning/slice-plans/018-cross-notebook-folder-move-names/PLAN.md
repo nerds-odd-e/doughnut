@@ -125,3 +125,12 @@ checked merge.
   (`rejectsCrossNotebookMoveIntoItself`), so the two moves' destination checks
   cannot yet share `validateDestinationAndFindMergeTarget` without changing
   that order on purpose.
+
+## Execution complete
+
+Product advice: no correction needed. The seed expects the North Star topic
+"One set of names per folder" to retire once this lands, but the deferred
+exact-match users (folder creation's second check,
+`NotebookGitProposalFolderPlacement`) and "a name Donut chooses is the first
+free one" remain; at wrap-up, decide whether to retire the topic or narrow it
+to those items. Story-48 stays next.

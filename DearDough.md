@@ -427,6 +427,10 @@ A story's readiness basis is a digest of its whole seed document. Wrapping up an
   - Evidence: 67be25ba00 (08:34:03+08:00) closed SEED-046 story 13 and an earlier closure removed story 14; start refused with "published preparation is needs-reassessment"; `git diff 1f2d54c86c HEAD` on the seed showed only the sibling sections removed; 939ce6b6f7 changed only `basis.document` (acb4a665… → 19996e46…), `basis.plan` cbd378e1… unchanged.
   - Observed effect: one refused start, a reassessment, one extra commit on main whose first push was rejected by a concurrent Take and needed a rebase, then a retry.
   - Inference: the plan did not depend on stories 13 or 14, so the reassessment carried no information.
+- Execution: SEED-009#story-47 / `.planning/slice-plans/018-cross-notebook-folder-move-names/PLAN.md` at c526dba221 / 732dbab312; Timestamp: 2026-09-27, before 13:03:43+08:00 (refusal; readiness commit 7360e9e9f7); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.42.
+  - Evidence: 0d7772ed0e (13:02:28+08:00) refined and planned sibling SEED-009#story-48 in the same seed, a preparation write rather than a closure; start refused with "published preparation is needs-reassessment"; `git diff c526dba221 0d7772ed0e` on the seed touched only story 48's section; 7360e9e9f7 changed only story 47's `basis.document` (ee9b982d… → 28c68632…), `basis.plan` 38ea6254… unchanged.
+  - Observed effect: one refused start that also left a local Take candidate built on the stale base; the retry with its recovery coordinates refused again ("unpublished selected story source in originating checkout"), so the coordinator removed that unpublished worktree and branch, published the reassessment, and took the story fresh — about six extra calls.
+  - Inference: sibling preparation, not only sibling wrap-up, invalidates a story's readiness; two stories prepared minutes apart in one seed will always collide this way.
 
 ## DD-126 — A plan said the changed script had no test, and nobody searched for one before delivery, so CI caught the stale test
 
@@ -530,6 +534,9 @@ Slice 2's implementer reported that a rich body edit drops the file's final newl
 - Execution: SEED-047#story-2 / `72210f216a:.planning/slice-plans/015-removal-landing-listing-load/PLAN.md` / 46e3a106e3; Timestamp: 2026-09-27, before 11:56:35+08:00 (the slice 1 commit, made after switching to the `.agents` path); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.42.
   - Evidence: two runs of `node .claude/skills/dough-execute-plan/scripts/agent-commit.mjs -m …` from the worktree root exited 0 with empty output, `git log` still at 5a4bfe2f92; the `.agents/skills/…` path returned `{"ok":true,"status":"committed","agent":"Akiho-chan","sha":"46e3a106e3…"}`. `execution-start.mjs start` ran through the `.claude` path from the main checkout in the same session.
   - Observed effect: three extra coordinator calls; nothing committed wrongly. Third retained occurrence; the coordinator knew nothing of the earlier ones at call time.
+- Execution: SEED-009#story-47 / `.planning/slice-plans/018-cross-notebook-folder-move-names/PLAN.md` at c526dba221 / 732dbab312; Timestamp: 2026-09-27, before 13:17:42+08:00 (the slice 1 commit, made after switching to the real `.agents` path); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.42.
+  - Evidence: `printf … | node .claude/skills/dough-execute-plan/scripts/agent-commit.mjs -F -` and then `-F <file>` from the worktree root both exited 0 with empty output and `git log` still at 2efbb21bba; the `realpath` (`.agents/skills/…`) invocation returned `{"ok":true,"status":"committed","agent":"Tsubomi-chan","sha":"732dbab312…"}`.
+  - Observed effect: four extra coordinator calls, including reading the script to find the guard; nothing committed wrongly. Fourth retained occurrence, still unknown to the coordinator at call time.
 
 ## DD-134 — The plan's E2E proof command named a feature directory, which the isolated runner refuses
 
