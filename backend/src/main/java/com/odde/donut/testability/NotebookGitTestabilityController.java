@@ -6,7 +6,7 @@ import com.odde.donut.entities.NotebookAttachment;
 import com.odde.donut.entities.repositories.NotebookAttachmentRepository;
 import com.odde.donut.entities.repositories.NotebookRepository;
 import com.odde.donut.services.notebookAttachment.NotebookAttachmentContent;
-import com.odde.donut.services.notebookGit.NotebookGitCutoverService;
+import com.odde.donut.services.notebookGit.NotebookGitHistoryService;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.io.IOException;
 import java.util.Base64;
@@ -29,7 +29,7 @@ class NotebookGitTestabilityController {
   @Autowired NotebookRepository notebookRepository;
   @Autowired NotebookAttachmentRepository notebookAttachmentRepository;
   @Autowired TestabilitySettings testabilitySettings;
-  @Autowired NotebookGitCutoverService notebookGitCutoverService;
+  @Autowired NotebookGitHistoryService notebookGitHistoryService;
   @Autowired InjectNotesWorker injectNotesWorker;
   @Autowired NotebookAttachmentContent notebookAttachmentContent;
 
@@ -58,9 +58,9 @@ class NotebookGitTestabilityController {
   }
 
   /**
-   * Testability-only: simulates content changes landing after a notebook's real cutover by
-   * replacing its accepted Git binding with a fresh snapshot of its current content. See {@link
-   * NotebookGitCutoverService#resetHistory}.
+   * Testability-only: simulates content changes landing after a notebook's creation by replacing
+   * its accepted Git binding with a fresh snapshot of its current content. See {@link
+   * NotebookGitHistoryService#resetHistory}.
    */
   @PostMapping("/resnapshot_notebook_git_binding_for_testability")
   @Transactional
@@ -69,7 +69,7 @@ class NotebookGitTestabilityController {
     if (Strings.isEmpty(request.getNotebookName())) {
       throw new IllegalArgumentException("notebookName is required and cannot be empty");
     }
-    notebookGitCutoverService.resetHistory(
+    notebookGitHistoryService.resetHistory(
         requireNotebook(request.getNotebookName()),
         testabilitySettings.getCurrentUTCTimestamp().toInstant());
     return "OK";
@@ -100,7 +100,7 @@ class NotebookGitTestabilityController {
         notebookAttachmentContent.storeAsLfsPointer(
             notebook.getId(), Base64.getDecoder().decode(request.getContentBase64())));
     notebookAttachmentRepository.save(attachment);
-    notebookGitCutoverService.resetHistory(
+    notebookGitHistoryService.resetHistory(
         notebook, testabilitySettings.getCurrentUTCTimestamp().toInstant());
     return "OK";
   }

@@ -14,7 +14,7 @@ import com.odde.donut.controllers.dto.NoteRealm;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.NotebookGitBinding;
-import com.odde.donut.services.notebookGit.NotebookGitCutoverService;
+import com.odde.donut.services.notebookGit.NotebookGitCommitBuilder;
 import com.odde.donut.services.notebookGit.NotebookGitProposalBlobText;
 import com.odde.donut.testability.GitBundleTestReader;
 import java.sql.Timestamp;
@@ -67,10 +67,10 @@ class NotebookGitNoteCreationAtomicControllerTest
         assertThat(commit.getParentCount(), is(1));
         assertThat(commit.getParent(0).getId(), is(acceptedHead));
         assertThat(
-            commit.getAuthorIdent().getName(), is(NotebookGitCutoverService.SYSTEM_AUTHOR_NAME));
+            commit.getAuthorIdent().getName(), is(NotebookGitCommitBuilder.SYSTEM_AUTHOR_NAME));
         assertThat(
             commit.getAuthorIdent().getEmailAddress(),
-            is(NotebookGitCutoverService.SYSTEM_AUTHOR_EMAIL));
+            is(NotebookGitCommitBuilder.SYSTEM_AUTHOR_EMAIL));
         assertThat(commit.getFullMessage(), is("Add note: First Note"));
         assertThat(commit.getCommitTime(), is((int) createdAt.toInstant().getEpochSecond()));
       }

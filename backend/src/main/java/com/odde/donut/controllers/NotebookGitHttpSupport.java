@@ -4,7 +4,7 @@ import com.odde.donut.entities.Notebook;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.donut.services.AuthorizationService;
 import com.odde.donut.services.notebookGit.NotebookGitBundleDownloadService;
-import com.odde.donut.services.notebookGit.NotebookGitCutoverService;
+import com.odde.donut.services.notebookGit.NotebookGitHistoryService;
 import com.odde.donut.services.notebookGit.NotebookGitProposalImporter;
 import com.odde.donut.services.notebookGit.NotebookGitProposalPublisher;
 import com.odde.donut.testability.TestabilitySettings;
@@ -26,19 +26,19 @@ abstract class NotebookGitHttpSupport {
   private final TestabilitySettings testabilitySettings;
   private final NotebookGitBundleDownloadService notebookGitBundleDownloadService;
   private final NotebookGitProposalPublisher notebookGitProposalPublisher;
-  private final NotebookGitCutoverService notebookGitCutoverService;
+  private final NotebookGitHistoryService notebookGitHistoryService;
 
   NotebookGitHttpSupport(
       AuthorizationService authorizationService,
       TestabilitySettings testabilitySettings,
       NotebookGitBundleDownloadService notebookGitBundleDownloadService,
       NotebookGitProposalPublisher notebookGitProposalPublisher,
-      NotebookGitCutoverService notebookGitCutoverService) {
+      NotebookGitHistoryService notebookGitHistoryService) {
     this.authorizationService = authorizationService;
     this.testabilitySettings = testabilitySettings;
     this.notebookGitBundleDownloadService = notebookGitBundleDownloadService;
     this.notebookGitProposalPublisher = notebookGitProposalPublisher;
-    this.notebookGitCutoverService = notebookGitCutoverService;
+    this.notebookGitHistoryService = notebookGitHistoryService;
   }
 
   @Operation(
@@ -50,7 +50,7 @@ abstract class NotebookGitHttpSupport {
       @PathVariable("notebook") @Schema(type = "integer") Notebook notebook)
       throws UnexpectedNoAccessRightException {
     authorizationService.assertAuthorization(notebook);
-    notebookGitCutoverService.resetHistory(
+    notebookGitHistoryService.resetHistory(
         notebook, testabilitySettings.getCurrentUTCTimestamp().toInstant());
   }
 

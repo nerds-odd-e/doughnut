@@ -60,10 +60,10 @@ function quoteForGitCommand(relativePath: string): string {
 
 function describePausedRebaseConflict(
   directory: string,
-  remainingConflictPaths: string[]
+  conflictPaths: string[]
 ): string {
-  const named = remainingConflictPaths.map((p) => `"${p}"`).join(', ')
-  const addExamples = remainingConflictPaths
+  const named = conflictPaths.map((p) => `"${p}"`).join(', ')
+  const addExamples = conflictPaths
     .map((p) => `git add -- ${quoteForGitCommand(p)}`)
     .join(', then ')
   return (
@@ -77,62 +77,10 @@ function describePausedRebaseConflict(
   )
 }
 
-function stageBlobBytes(
-  directory: string,
-  stage: 2 | 3,
-  relativePath: string
-): string | undefined {
-  const result = spawnSync(
-    'git',
-    ['-C', directory, 'show', `:${stage}:${relativePath}`],
-    { encoding: 'utf8' }
-  )
-  if (result.error || result.status !== 0) return undefined
-  return result.stdout
-}
-
-function isFinalLfOnlyEquivalent(accepted: string, local: string): boolean {
-  return accepted === `${local}\n` || local === `${accepted}\n`
-}
-
-function tryAbsorbFinalLfOnlyConflictPath(
-  directory: string,
-  relativePath: string
-): boolean {
-  if (!relativePath.endsWith('.md')) return false
-  const accepted = stageBlobBytes(directory, 2, relativePath)
-  const local = stageBlobBytes(directory, 3, relativePath)
-  if (accepted === undefined || local === undefined) return false
-  if (!isFinalLfOnlyEquivalent(accepted, local)) return false
-
-  runSystemGitOrThrow(
-    ['-C', directory, 'checkout', '--ours', '--', relativePath],
-    (detail, status) =>
-      `failed to keep the accepted note while absorbing a final-LF-only conflict${detail ? `: ${detail}` : ` (exit code ${status})`}`,
-    smudgeSkippedGitOptions()
-  )
-  runSystemGitOrThrow(
-    ['-C', directory, 'add', '--', relativePath],
-    (detail, status) =>
-      `failed to stage the accepted note while absorbing a final-LF-only conflict${detail ? `: ${detail}` : ` (exit code ${status})`}`
-  )
-  return true
-}
-
-function stagedChangeSurvivesOntoPoint(directory: string): boolean {
-  const result = spawnSync(
-    'git',
-    ['-C', directory, 'diff', '--cached', '--quiet'],
-    { encoding: 'utf8' }
-  )
-  return result.status !== 0
-}
-
 /**
  * Rebases the unpublished local commits since mergeBase onto acceptedHead,
- * preserving their author identity. Each pause whose conflicts are only an
- * optional final LF is absorbed; a real conflict leaves the rebase paused and returns its
- * recovery guidance.
+ * preserving their author identity. A conflict leaves the rebase paused and
+ * returns its recovery guidance.
  */
 export function rebaseUnpublishedCommits(
   directory: string,
@@ -140,47 +88,37 @@ export function rebaseUnpublishedCommits(
   mergeBase: string
 ): string | undefined {
   const { name, email } = unpublishedCommitAuthor(directory)
-  let step = ['rebase', '--onto', acceptedHead, mergeBase]
-  for (;;) {
-    try {
-      runSystemGitOrThrow(
-        [
-          '-C',
-          directory,
-          '-c',
-          `user.name=${name}`,
-          '-c',
-          `user.email=${email}`,
-          '-c',
-          'merge.directoryRenames=true',
-          ...step,
-        ],
-        (detail, status) =>
-          `failed to rebase the unpublished local commits onto the accepted head${detail ? `: ${detail}` : ` (exit code ${status})`}`,
-        {
-          env: {
-            ...smudgeSkippedGitOptions().env,
-            GIT_EDITOR: 'true',
-            GIT_SEQUENCE_EDITOR: 'true',
-          },
-        }
-      )
-      return undefined
-    } catch (e) {
-      const conflictPaths = pausedRebaseConflictPaths(directory)
-      if (conflictPaths === undefined) throw e
-      const remainingConflictPaths = conflictPaths.filter(
-        (relativePath) =>
-          !tryAbsorbFinalLfOnlyConflictPath(directory, relativePath)
-      )
-      if (remainingConflictPaths.length > 0) {
-        const cause = e instanceof Error ? e.message : String(e)
-        return `${describePausedRebaseConflict(directory, remainingConflictPaths)}\n${cause}`
-      }
-      step = [
+  try {
+    runSystemGitOrThrow(
+      [
+        '-C',
+        directory,
+        '-c',
+        `user.name=${name}`,
+        '-c',
+        `user.email=${email}`,
+        '-c',
+        'merge.directoryRenames=true',
         'rebase',
-        stagedChangeSurvivesOntoPoint(directory) ? '--continue' : '--skip',
-      ]
-    }
+        '--onto',
+        acceptedHead,
+        mergeBase,
+      ],
+      (detail, status) =>
+        `failed to rebase the unpublished local commits onto the accepted head${detail ? `: ${detail}` : ` (exit code ${status})`}`,
+      {
+        env: {
+          ...smudgeSkippedGitOptions().env,
+          GIT_EDITOR: 'true',
+          GIT_SEQUENCE_EDITOR: 'true',
+        },
+      }
+    )
+    return undefined
+  } catch (e) {
+    const conflictPaths = pausedRebaseConflictPaths(directory)
+    if (conflictPaths === undefined) throw e
+    const cause = e instanceof Error ? e.message : String(e)
+    return `${describePausedRebaseConflict(directory, conflictPaths)}\n${cause}`
   }
 }

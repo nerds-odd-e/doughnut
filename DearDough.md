@@ -543,6 +543,9 @@ Former local code: DD-133.
   - Evidence: two runs of `node .claude/skills/dough-execute-plan/scripts/agent-commit.mjs -m …` from the worktree root exited 0 with empty output and `git log` still at 9e1aeb19df; the `realpath` invocation returned `{"ok":true,"status":"committed","agent":"Maria-chan"}`. `execution-start.mjs` carries the same guard (line 39) but succeeded through `.claude/skills/…` because it ran from the default checkout, where `.claude/skills/dough-execute-plan` is a real directory; in the worktree it is a symlink to `../../.agents/skills/dough-execute-plan` created by worktree setup.
   - Observed effect: three extra coordinator calls, including reading the script; nothing committed wrongly. Seventh retained occurrence.
   - Inference: the silent exit is specific to worktree-prepared skill links, so every execution that commits from its worktree hits it until the guard compares real paths or worktree setup stops symlinking.
+- Execution: SEED-050#story-5 / `4426190218:.planning/slice-plans/024-finished-transitions-leave-no-trace/PLAN.md` / 48d5a2e8f8; Timestamp: 2026-09-27, before the slice 1 commit 48d5a2e8f8; Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.42.
+  - Evidence: `node .claude/skills/dough-execute-plan/scripts/agent-commit.mjs -m …` from the worktree root twice exited 0 with empty output while `git log` stayed at 45aafefb9f with the change staged; reading the script's guard led to the `realpath` invocation, which returned `{"ok":true,"status":"committed","agent":"Mihiro-chan","sha":"48d5a2e8f8…"}`. `execution-start.mjs start` and `execution-increment-delivery.mjs deliver` (the latter always run by real path) worked.
+  - Observed effect: four extra coordinator calls; nothing committed wrongly. Eighth retained occurrence, unknown to the coordinator at call time.
 
 ## ODF-100 — Agents reported vue-tsc's exit code from a pipe into `tail`, so the coordinator had to rerun the typecheck
 

@@ -25,7 +25,7 @@ import org.springframework.stereotype.Component;
 /**
  * The one encoder of projection rows into a commit's Portable tree. A web commit's tree is derived
  * by editing the accepted directory tree with the projection change the operation flushed; a
- * notebook's full tree (cutover, history reset, the publication drift check) is the same encoding
+ * notebook's full tree (creation, history reset, the publication drift check) is the same encoding
  * over an empty base with every row as an insertion.
  */
 @Component

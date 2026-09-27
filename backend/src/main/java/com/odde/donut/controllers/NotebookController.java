@@ -23,7 +23,7 @@ import com.odde.donut.services.NotebookService;
 import com.odde.donut.services.WikidataService;
 import com.odde.donut.services.notebookGit.AcceptedWebChangeService;
 import com.odde.donut.services.notebookGit.NotebookGitBundleDownloadService;
-import com.odde.donut.services.notebookGit.NotebookGitCutoverService;
+import com.odde.donut.services.notebookGit.NotebookGitHistoryService;
 import com.odde.donut.services.notebookGit.NotebookGitProposalPublisher;
 import com.odde.donut.services.notebookGit.WebNoteCreationService;
 import com.odde.donut.testability.TestabilitySettings;
@@ -69,14 +69,14 @@ class NotebookController extends NotebookGitHttpSupport {
       WikidataService wikidataService,
       NotebookGitBundleDownloadService notebookGitBundleDownloadService,
       NotebookGitProposalPublisher notebookGitProposalPublisher,
-      NotebookGitCutoverService notebookGitCutoverService,
+      NotebookGitHistoryService notebookGitHistoryService,
       AcceptedWebChangeService acceptedWebChangeService) {
     super(
         authorizationService,
         testabilitySettings,
         notebookGitBundleDownloadService,
         notebookGitProposalPublisher,
-        notebookGitCutoverService);
+        notebookGitHistoryService);
     this.entityPersister = entityPersister;
     this.notebookIndexingService = notebookIndexingService;
     this.bazaarService = bazaarService;

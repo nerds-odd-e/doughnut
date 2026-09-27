@@ -13,10 +13,10 @@ import org.eclipse.jgit.revwalk.RevObject;
  * Walks every object reachable from a head commit in one repository (commits, trees, blobs, and any
  * tags in between) and inserts each one into another repository's inserter, without going through a
  * parsed pack stream. {@link NotebookGitAcceptedRepositoryStore} uses this to bring a source
- * repository's history (a creation/cutover/reset snapshot, or an accepted proposal's imported
- * repository) into the native object store. Public so {@code db.migration}'s Flyway backfill
- * migration - which runs outside Spring context - can reuse this exact copy mechanic rather than a
- * second implementation.
+ * repository's history (a creation/reset snapshot, or an accepted proposal's imported repository)
+ * into the native object store. Public so {@code db.migration}'s Flyway backfill migration - which
+ * runs outside Spring context - can reuse this exact copy mechanic rather than a second
+ * implementation.
  */
 public final class NotebookGitReachableObjectCopier {
 

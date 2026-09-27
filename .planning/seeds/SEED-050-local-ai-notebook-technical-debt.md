@@ -29,47 +29,6 @@ different frontmatter edits, each already with one owner.
 
 ## Story Decomposition
 
-<a id="story-5"></a>
-
-### Finished transitions leave no trace in code and docs
-
-**Identity:** SEED-050#story-5
-```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/024-finished-transitions-leave-no-trace/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"8c1ce1fcb03eaee1efd74d124358d2827e6d3c6e61222c91a80a429fea279874","plan":"322c7e1dd275cce99f3be4aa17e2694f5861ef63583f3f7996c8b416f8822e00"}}
-```
-
-**Goal:** Developers see only what the notebook Git model does today, and
-Git alone decides what a pull replays.
-
-**Scope:**
-
-- Delete the unused `NotebookAttachment.getContent`/`setContent` aliases.
-- Name `NotebookGitCutoverService` after what it does now (start and reset a
-  notebook's history); a new notebook's first commit reads "Create notebook"
-  instead of "Cutover: snapshot existing notebook content into Git".
-- Docs describe creation and history reset in the present tense; the finished
-  cutover and legacy-picture passages go (`notebook-git-synchronization.md`,
-  `note-content-saving.md`, `notebook-git-attachments.md`,
-  `notebook-git-lfs.md`). The sentence claiming the web editor and the server
-  edit frontmatter "the same way" states instead which side makes which edit.
-- Remove the pull's final-newline conflict absorber
-  (`cli/src/commands/notebook/notebookPullRebase.ts`): local files are written
-  by whatever tool the owner uses, so web and local final newlines never
-  become uniform; a final-newline-only difference becomes an ordinary Git
-  conflict (owner, 2026-09-27).
-- Unchanged: existing commit messages in history; ADR 0002's text.
-- Deferred: making web note bodies always end with a newline.
-
-**Key examples:**
-
-1. Create a notebook → its first commit reads "Create notebook" by the Donut
-   System author.
-2. From one base, the local `note.md` is "Same authored body.\n" and the
-   accepted one "Same authored body." → pull → the rebase pauses on `note.md`
-   with the usual guidance.
-3. A pull whose local patch accepted history already contains → reported as
-   already published, as today.
-
 <a id="story-7"></a>
 
 ### Code, API and docs say "image", and the UI says "File"
@@ -138,3 +97,36 @@ the dissolve/merge placement check no longer carries its own copy.
 **Effort hypothesis:** S — high confidence.
 
 **Depends on:** none (SEED-050#story-8 is delivered).
+
+<a id="story-10"></a>
+
+### Notebook history commits are proven where they happen
+
+**Identity:** SEED-050#story-10
+```json dough-story-state
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/028-history-commits-proven-where-they-happen/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"d07d54d7ed0835c3ef7a49632aacea5c47e485106399dd186c8073294d8f548d","plan":"11e47dc69185c0bbc4913f29f26940dd172ee7e521e2085e4c12ea5b59c9e844"}}
+```
+
+**Goal:** Correction of SEED-050#story-5 (commits 48d5a2e8f8..5afa318baf): a
+developer changing notebook creation or history reset learns from the
+entry-point tests when the commit message or author changes, and the
+synchronization doc says only what those commits do.
+
+**Scope:**
+
+- Creation through the notebook and circle controllers asserts the root commit
+  "Create notebook" by Donut System <system@donut.local>.
+- History reset asserts "Reset: restart Git history from the current notebook"
+  by the same author.
+- The service test drops checks the shared creation assertion already makes.
+- `docs/notebook-git-synchronization.md` drops "Repository creation needs no
+  owner opt-in…" and the "still" in "may still read a complete tree".
+- Unchanged: `notebook-git-lfs.md` decision-record text; the binding-less
+  branch in `resetHistory`.
+
+**Key examples:**
+
+1. Create a notebook through the controller → its root commit reads "Create
+   notebook" by Donut System.
+2. Reset a notebook's history → its root commit reads "Reset: restart Git
+   history from the current notebook" by Donut System.

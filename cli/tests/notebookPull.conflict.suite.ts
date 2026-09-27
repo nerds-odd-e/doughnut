@@ -155,29 +155,27 @@ export function describeNotebookPullConflict(): void {
       )
     })
 
-    test('absorbs a final-LF-only conflict in the second local commit and finishes the rebase', async () => {
+    test('pauses when local and accepted versions differ only in the final newline', async () => {
       const setup = prepareConflictingSameNote(
         ctx.getWorkDir(),
-        SPACED_NOTE_PATH,
+        'note.md',
         BODY_BASE,
         BODY_LOCAL,
-        BODY_LOCAL.trimEnd(),
-        EARLIER_LOCAL_EDIT
+        BODY_LOCAL.trimEnd()
       )
-      serveAcceptedBundle(ctx, setup.source, 'second-commit-final-lf')
+      serveAcceptedBundle(ctx, setup.source, 'final-lf-conflict')
 
-      await run(['notebook', 'pull', setup.directory])
+      await expect(run(['notebook', 'pull', setup.directory])).rejects.toThrow(
+        ProcessExitForTest
+      )
 
-      expect(runGit(['rev-parse', 'HEAD^'], setup.directory)).toBe(
-        setup.acceptedHead
+      expect(String(ctx.getErrorSpy().mock.calls[0]?.[0])).toContain(
+        'Git paused a rebase with a conflict in "note.md"'
       )
-      expect(runGit(['status', '--porcelain=v1'], setup.directory)).toBe('')
-      expect(
-        fs.readFileSync(join(setup.directory, SPACED_NOTE_PATH), 'utf8')
-      ).toBe(BODY_LOCAL.trimEnd())
-      expect(fs.readFileSync(join(setup.directory, 'note.md'), 'utf8')).toBe(
-        EARLIER_LOCAL_EDIT.content
-      )
+      const paused = pullCreatedConflictObservation(setup.directory, 'note.md')
+      expect(paused.unmerged).toContain('note.md')
+      expect(paused.head).toBe(setup.acceptedHead)
+      expect(paused.main).toBe(setup.localTip)
     })
 
     test('keeps the rebase cause when Git did not pause with unmerged stages', async () => {
