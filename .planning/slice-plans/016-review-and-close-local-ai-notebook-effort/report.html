@@ -74,6 +74,11 @@ table.map thead th{font-size:.72rem;text-transform:uppercase;letter-spacing:.06e
 table.map tr.area th{background:var(--accent-soft);color:var(--ink);font-family:"Schibsted Grotesk",system-ui,sans-serif;font-size:.95rem}
 table.map td.gap{color:var(--urgent);font-weight:600}
 .finding p{font-size:.92rem}
+ol.queue{list-style:none;margin:16px 0 0;padding:0;display:grid;gap:8px}
+ol.queue li{display:flex;gap:12px;align-items:flex-start;padding:10px 14px;border:1px solid var(--line);border-radius:6px;background:var(--paper)}
+ol.queue li.new{border-color:var(--urgent)}
+ol.queue .pos{font-weight:500;color:var(--muted);min-width:1.5em}
+.muted{color:var(--muted)}
 footer{margin-top:64px;color:var(--muted);font-size:.85rem;border-top:1px solid var(--line);padding-top:16px}
 </style>
 
@@ -92,7 +97,7 @@ footer{margin-top:64px;color:var(--muted);font-size:.85rem;border-top:1px solid 
     <a href="#architecture">Architecture</a>
     <a href="#process">Process feedback</a>
     <a href="#coverage">Feature coverage</a>
-    <a class="pending" href="#pending">Follow-ups queued (next)</a>
+    <a href="#followups">Follow-ups queued</a>
     <a class="pending" href="#pending">Seed cleanup and stale seeds (next)</a>
   </nav>
 </header>
@@ -411,9 +416,23 @@ footer{margin-top:64px;color:var(--muted);font-size:.85rem;border-top:1px solid 
 </div>
 </section>
 
+<section id="followups">
+<h2>Follow-ups queued</h2>
+<div class="summary">
+  <p>Both <span class="chip urgent">queue now</span> findings became concise stories (Goal and Scope only) in <code>.planning/seeds/SEED-009-git-backed-local-notebook-workflow.md</code>, the effort's own seed. Both are recorded <i>not refined</i> with no approach selected. They sit right after SEED-049#story-1, which the owner put first on 2026-09-27, and ahead of the unrelated SEED-033#story-3, because they are correctness-bearing architecture fixes within the near-future direction.</p>
+</div>
+<ol class="queue">
+  <li><span class="pos mono">1</span><span>Give the frontend note store a cohesive architecture <span class="mono muted">SEED-049#story-1</span><br><span class="note">Already queued. The Frontend and CLI finding about listing refresh belongs inside it, so no duplicate story was added.</span></span></li>
+  <li class="new"><span class="pos mono">2</span><span><b>Moving a folder to another notebook respects the folder's one set of names</b> <span class="mono muted">SEED-009#story-47</span><br><span class="note">From <a href="#arch-names">One set of names per folder</a>.</span></span></li>
+  <li class="new"><span class="pos mono">3</span><span><b>Server and CLI classify notebook paths the same way</b> <span class="mono muted">SEED-009#story-48</span><br><span class="note">From <a href="#arch-format">One format boundary</a>.</span></span></li>
+  <li><span class="pos mono">4</span><span>Tidy the note context in spelling results and narrow conversations <span class="mono muted">SEED-033#story-3</span></span></li>
+</ol>
+<p class="note">Process feedback and feature coverage produced no queue-now items. Nothing was fixed in this story.</p>
+</section>
+
 <section id="pending">
 <h2>Still to come</h2>
-<p class="note">Queued follow-ups and seed cleanup with the stale-seed list are added to this page as the review continues.</p>
+<p class="note">Seed cleanup and the stale-seed list are added to this page as the review continues.</p>
 </section>
 
 <footer>

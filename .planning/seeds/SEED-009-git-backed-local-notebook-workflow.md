@@ -52,6 +52,47 @@ Completed stories 20 and 25 supply accumulated local publication and web-note
 movement evidence to story 42; they are not remaining queue items. Publication
 performance remains the next selected Git-scale item.
 
+## Story Decomposition
+
+<a id="story-47"></a>
+
+### Moving a folder to another notebook respects the folder's one set of names
+
+**Identity:** SEED-009#story-47
+```json dough-story-state
+{"schemaVersion":1,"refinement":"not-refined","approach":"unselected"}
+```
+
+**Goal:** A notebook owner who moves a folder into another notebook gets the
+same name protection as every other web placement, so the destination never
+holds two entries whose names differ only by letter case, and a clash is
+refused with a clear message instead of a server error.
+
+**Scope:** Route the cross-notebook folder move, including its merge, through
+the one name owner (`FolderSiblingNameValidation`) and its every-destination
+check, as same-notebook moves already do. Retire the exact-match, folder-only
+sibling check it still uses. Moving a folder that holds files to another
+notebook stays refused.
+
+<a id="story-48"></a>
+
+### Server and CLI classify notebook paths the same way
+
+**Identity:** SEED-009#story-48
+```json dough-story-state
+{"schemaVersion":1,"refinement":"not-refined","approach":"unselected"}
+```
+
+**Goal:** A notebook owner publishing from a local checkout gets the same
+answer from the CLI and the server about what each path is (note, folder
+Readme, file, empty-folder marker, or Git metadata), so no publish fails or
+misplaces content because the two sides disagree.
+
+**Scope:** One Portable path classifier on the server that every tree walker
+uses, settling a root `.keep` and `.md` letter case in that one place. The CLI
+stops classifying paths and picks LFS uploads from the changed blobs that are
+LFS pointers, leaving admission to the server.
+
 ## Deferred Directions
 
 Keep these outside the current queue rather than cancelling them:

@@ -112,7 +112,7 @@ judgments, and named gaps.
 ### 4. Urgent follow-ups queued
 
 Type: Behavior
-Status: planned
+Status: done
 Proof: recorder and backlog observations (see table).
 
 Behavior: sections 1–3 hold *queue now* findings → each becomes one concise
@@ -152,6 +152,9 @@ the owner's keep-or-delete decision.
   reported as a wrap-up practice suggestion only.
 - Slice 3 has no *queue now* gap; cited E2E feature files and doc headings were
   checked to exist.
+- Slice 4 queued SEED-009#story-47 (cross-notebook folder move names) and
+  SEED-009#story-48 (one path classifier) after owner-first SEED-049#story-1.
+  SEED-009 story numbers up to 46 were already used in history.
 
 - Report findings only; no product code changes. The execution wrap-up's
   refactor and API steps have nothing to act on; formatting and lint run on
