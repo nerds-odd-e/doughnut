@@ -379,6 +379,10 @@ A delegated implementation agent started its tests in the background and ended i
   - Observed effect: about 12 status-only coordinator turns, plus one inspection and one nudge. The report, proof and delivery were unaffected.
   - Inference: this time the agent kept waiting after its background work had ended, so the notifications continued past the point where anything was running. A coordinator message asking for the report ended the wait. Qualified: token counts for these turns were not captured.
 
+- Execution: SEED-046#story-9 / `.planning/slice-plans/010-responses-carry-no-orm-internals/PLAN.md` at d305df9c23 / 9365a11c7d; Timestamp: unknown (2026-09-27, between 09:50 and 10:02+08:00, slice 1); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.42.
+  - Evidence: coordinator conversation: one task-notification for "Implement plan 010 slice 1" with "stopped with background work of its own still running" / "This agent has not reported yet", followed by the real hand-back.
+  - Observed effect: one status-only coordinator turn; delivery unaffected.
+
 ## ODF-116 — Closing one story in a shared seed made a sibling story's ready assessment stale
 
 Former local code: DD-124.
@@ -411,6 +415,10 @@ A story's readiness basis is a digest of its whole seed document. Wrapping up an
   - Evidence: after plan 006 was assessed ready (basis.document f658172c…), df50754d7e and 247e9a9664 closed SEED-046 stories 11, 10 and 12 and removed story 4's section; start refused with "published preparation is needs-reassessment"; the story-5 section was byte-identical before and after (awk section diff); 2a8fd844b4 changed only `basis.document` (→ ad173d6e…), `basis.plan` 8bc0a3b8… unchanged.
   - Observed effect: one refused start, a recheck of the plan's named symbols against current code, one extra commit on main and a retry.
   - Inference: the plan referred to story 4a (plan 005) landing first, so the symbol recheck had a little value; the refusal itself carried no information about story 5.
+- Execution: SEED-046#story-9 / `.planning/slice-plans/010-responses-carry-no-orm-internals/PLAN.md` at d305df9c23 / 9365a11c7d; Timestamp: 2026-09-27, before 09:44:06+08:00 (refusal; readiness commit 939ce6b6f7); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.42.
+  - Evidence: 67be25ba00 (08:34:03+08:00) closed SEED-046 story 13 and an earlier closure removed story 14; start refused with "published preparation is needs-reassessment"; `git diff 1f2d54c86c HEAD` on the seed showed only the sibling sections removed; 939ce6b6f7 changed only `basis.document` (acb4a665… → 19996e46…), `basis.plan` cbd378e1… unchanged.
+  - Observed effect: one refused start, a reassessment, one extra commit on main whose first push was rejected by a concurrent Take and needed a rebase, then a retry.
+  - Inference: the plan did not depend on stories 13 or 14, so the reassessment carried no information.
 
 ## DD-126 — A plan said the changed script had no test, and nobody searched for one before delivery, so CI caught the stale test
 
@@ -497,8 +505,30 @@ Slice 2's implementer reported that a rich body edit drops the file's final newl
   - Observed effect: a defect against the story's own goal reached the published story branch; a correction story and plan are needed before integration.
   - Inference: a reported gap should be checked against the story's goal and exclusions list before it is filed as out of scope; the fix at slice 2 would have been a few lines in the same function. Qualified: as in DD-129, the key example was a file whose edited line was also its last line, which hid the effect.
 
+## DD-133 — `agent-commit.mjs` run through the `.claude/skills` symlink exited 0 without committing or printing anything
+
+`.claude/skills/<skill>` entries are symlinks to `.agents/skills/<skill>`. The script's main-module guard compares `resolve(process.argv[1])` with `fileURLToPath(import.meta.url)`; Node reports the real `.agents` path for the module, so through the symlink the guard is false and the CLI body never runs. The command looks successful: exit 0, no output, nothing committed.
+
+### Occurrences
+
+- Execution: SEED-046#story-9 / `.planning/slice-plans/010-responses-carry-no-orm-internals/PLAN.md` at d305df9c23 / 9365a11c7d; Timestamp: 2026-09-27, before 10:02:20+08:00 (the slice 1 commit, made after switching to the `.agents` path); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.42.
+  - Evidence: two runs of `node .claude/skills/dough-execute-plan/scripts/agent-commit.mjs -m …` in the execution worktree exited 0 with empty output and `git log` still at d305df9c23; the same command via `.agents/skills/…` returned `{"ok":true,"status":"committed",…,"sha":"9365a11c7d…"}`. `execution-start.mjs start` did run through the `.claude` path in the same session.
+  - Observed effect: two wasted commit attempts and a diagnosis; nothing was committed wrongly.
+  - Inference: any entry script with this guard fails silently when started through the symlink; a guard that compares real paths (or `.agents` paths in the guidance) would avoid it. Which other scripts share the guard was not checked.
+
+## DD-134 — The plan's E2E proof command named a feature directory, which the isolated runner refuses
+
+Plan 010 listed `pnpm cy:run --spec e2e_test/features/folder_organization`. The isolated E2E runner requires explicit feature files, so the implementer had to find and list them.
+
+### Occurrences
+
+- Execution: SEED-046#story-9 / `.planning/slice-plans/010-responses-carry-no-orm-internals/PLAN.md` at d305df9c23 / 9365a11c7d; Timestamp: unknown (2026-09-27, slice 2, before 10:20:32+08:00); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.42.
+  - Evidence: slice 2 implementer report: the literal plan command "is refused by the isolated runner, which requires explicit feature files"; it ran four `.feature` files instead (18/18 passed); the plan's command was corrected in 5d384c2665.
+  - Observed effect: a small detour inside the slice; proof unaffected.
+  - Inference: slice planning did not run or check the E2E command it wrote.
+
 ## Retention
 
-- Highest allocated local number: 132
+- Highest allocated local number: 134
 - Recovery: `33939aa45a17c08f5e6f8076178ce96437fdfbe8:DearDough.md` contains the complete pre-compaction log and earlier recovery references; `b0b385a184e96ecf8b0f6fc5572eaaab69bc8dad` preserves later history.
 - Occurrence history is partial; full observations, effects, inference and historical provenance remain in that snapshot and the upstream catalog.

@@ -112,10 +112,47 @@ including delivery, not commitments.
 - **Depends on:** none.
 - **Safe stopping point:** after the cause fix; the trail shape stands alone.
 
+<a id="story-15"></a>
+
+### 7b. Note realm JSON lists each sidebar field once
+
+**Identity:** SEED-046#story-15
+```json dough-story-state
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/013-note-realm-lists-sidebar-once/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"b654a7b2ae352096bf090bbbf2a380b16a0d0c01fcdd8830dd4824c1fa3b9c4b","plan":"beb5d7e853f40e299203585a590e1a9428211dcbb4de99b02b8ba55d4a4386f4"}}
+```
+
+- **Goal:** Correction of story 7 (SEED-046#story-9; provenance
+  `5d384c2665:.planning/slice-plans/010-responses-carry-no-orm-internals/PLAN.md`,
+  commits 9365a11c7d and 5d384c2665). API consumers of a note realm (the web
+  app, CLI, MCP) receive each of `notebookRealm`, `ancestorFolders` and
+  `scopedReadmeContent` once, so the response describes the domain once
+  instead of repeating the whole notebook, its readme included, in every note
+  show, create, update and move response.
+- **Scope:**
+  - **Required:** the `GET /api/notes/{note}` body lists each of those three
+    keys at most once, with today's values; `scopedReadmeContent` is absent
+    when no scoped readme applies. The Jackson 2 note-realm serialization
+    test, which exercises a mapper web responses never use, is retired.
+  - **Preserved:** every note-realm consumer (frontend, CLI, MCP) and the
+    generated API client, unchanged.
+  - **Excluded:** where the folder trail's response conversion lives (low,
+    cohesion-only); the notebook object's shape; folder and file page realms,
+    which already list each field once.
+- **Key examples:**
+  1. A note in `outer/inner`; `GET /api/notes/{note}` → the raw body contains
+     `"notebookRealm"` and `"ancestorFolders"` exactly once each (today twice).
+  2. Boundary: a note at notebook root with no scoped title pattern → the body
+     has no `"scopedReadmeContent"` key.
+- **Plan:** [013-note-realm-lists-sidebar-once](../slice-plans/013-note-realm-lists-sidebar-once/PLAN.md)
+- **Effort hypothesis:** S — high confidence.
+- **Depends on:** none (story 7 is delivered).
+
 ## Ordering and Scope Reduction
 
 Story 7 removes persistence details from API responses at their cause;
-it matters least to owners today.
+it matters least to owners today. Correction 7b finishes story 7's response
+shape by removing the note realm's duplicated keys; it is small and stands
+alone.
 
 Story numbers are local order; identities keep their original anchors.
 
@@ -125,7 +162,8 @@ None that change selection or order.
 
 ## When to Surface
 
-Now; all stories are queued ahead of SEED-033#story-2.
+Now; story 7 was queued ahead of SEED-033#story-2; correction 7b is not
+queued yet.
 
 ## Breadcrumbs
 

@@ -91,6 +91,16 @@ ten frontend files; splitting by layer would leave a failing build. If it
 overruns, stop and report the frontend files still failing, not a partial
 split.
 
+## Execution complete
+
+Product advice: the story is delivered as promised. The retrospective found
+one bounded correction, SEED-046#story-15 (note realm JSON lists each sidebar
+field once, and the Jackson 2 NoteRealm test is retired), planned as
+[013](../013-note-realm-lists-sidebar-once/PLAN.md) and not queued. Like this
+story, it cuts payload and keeps the API honest, with no user-visible change,
+so queue it after the Taken items and SEED-047#story-1, or drop it if the
+owner judges the duplicate readme payload not worth a slice.
+
 ## Current decisions
 
 - 2026-09-27: web responses are serialized by Spring Boot 4's Jackson 3
