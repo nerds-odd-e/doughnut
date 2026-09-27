@@ -99,6 +99,28 @@ files along was dropped. The
 [product backlog](../PRODUCT-BACKLOG.md) owns global order.
 No executable plan or implementation is authorized by this seed.
 
+<a id="story-26"></a>
+
+### Preview image files on their web file page
+
+**Identity:** SEED-035#story-26
+```json dough-story-state
+{"schemaVersion":1,"refinement":"not-refined","approach":"unselected"}
+```
+
+- **For / why:** Notebook owners browsing their files in Web Donut can see an
+  image on its file page without downloading it first.
+- **Evaluation:** Opening the file page for an image shows that image inline;
+  opening the page for a non-image file shows no preview. Existing file
+  download and deletion remain available.
+- **Value / learning:** Makes image files recognizable while browsing a
+  notebook, without promising previews for other file types.
+- **Effort hypothesis:** S — provisional until the file page and image-serving
+  path are inspected during refinement.
+- **Depends on:** none; web file pages and image retrieval are already delivered.
+- **Safe stopping point:** Image preview is useful on its own; other file types
+  keep their current file-page behavior.
+
 
 ## Ordering and Scope Reduction
 
@@ -133,7 +155,8 @@ loss. Operations that would rehome files refuse until their story delivers.
 
 Now, under the revised near-future direction. No implementation is authorized.
 Ready-made AI skills, arbitrary document previews, file editors, and new Git
-integration need their own selected outcomes.
+integration need their own selected outcomes. Image preview on the web file page
+is selected as story 26.
 
 ## Breadcrumbs
 
@@ -188,6 +211,8 @@ integration need their own selected outcomes.
   The move is refused as a whole with a clear message and nothing changes, so
   the visible refusal is good enough; a single picture note moved to another
   notebook still leaves its picture behind, as decided earlier.
+- Owner request, 2026-09-27: queue an image-only preview on the web file page
+  as the second product backlog story.
 - [Near-future direction](../PRODUCT-BACKLOG.md#near-future-direction).
 - [SEED-009](SEED-009-git-backed-local-notebook-workflow.md): prior local/web note
   workflow. This seed owns non-Markdown attachment continuity.
