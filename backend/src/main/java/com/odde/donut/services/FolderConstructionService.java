@@ -112,7 +112,7 @@ public class FolderConstructionService {
    */
   public Folder folderToEnterOrCreate(Notebook notebook, Folder parentOrNull, DisplayName name) {
     return folderSiblingNameValidation
-        .folderToEnter(notebook, parentOrNull, name)
+        .folderToEnter(notebook, parentOrNull, name, Set.of())
         .orElseGet(() -> createFolder(notebook, parentOrNull, name));
   }
 

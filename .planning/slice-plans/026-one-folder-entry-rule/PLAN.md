@@ -68,7 +68,8 @@ Both slices are Structure: existing tests stay green unchanged in intent.
 ### 1. One folder-entry rule on the name owner
 
 Type: Structure
-Status: planned
+Status: done — accepted 2026-09-27: the seven guarding classes passed (47 tests);
+test file 249 lines; `FolderSiblingNameValidation.java` 19+/25−.
 Proof: all green, no test intent changed —
 `CURSOR_DEV=true nix develop -c pnpm backend:test_only --tests 'com.odde.donut.controllers.NotebookGitNoteCreationFolderControllerTest' --tests 'com.odde.donut.controllers.NotebookGitNoteCreationControllerTest' --tests 'com.odde.donut.controllers.NotebookGitWebFolderMoveControllerTest' --tests 'com.odde.donut.controllers.NotebookGitFolderDissolveGuardControllerTest' --tests 'com.odde.donut.controllers.NotebookFolderMoveNameClashControllerTest' --tests 'com.odde.donut.controllers.NotebookFolderCrossNotebookMoveMergeControllerTest' --tests 'com.odde.donut.controllers.NotebookFolderMoveWikiLinkRewriteControllerTest'`;
 `wc -l` on `NotebookGitNoteCreationFolderControllerTest.java` ≤ 250;
