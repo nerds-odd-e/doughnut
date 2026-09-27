@@ -26,7 +26,7 @@ The stories below are the follow-ups the effort's closing review judged urgent.
 
 **Identity:** SEED-009#story-47
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/018-cross-notebook-folder-move-names/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"ee9b982d4ed7cd8b5274f0a33861c245e6d65c01d76059c03db9dab2b0f7d630","plan":"38ea62547b1137311f8a9302fe93b7efc1a135e98d959b35bd472f370b8db58e"}}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/018-cross-notebook-folder-move-names/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"28c686327ed08c6644de8fffca990da0b9c1b954879687758308a84529d6bb50","plan":"38ea62547b1137311f8a9302fe93b7efc1a135e98d959b35bd472f370b8db58e"}}
 ```
 
 **Goal:** A notebook owner who moves a folder into another notebook gets the
