@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "agent": "Akiho-chan",
+  "email": "akiho-chan@example.org",
+  "identity": "SEED-047#story-2",
+  "mode": "story-branch",
+  "branch": "story/removal-landing-listing-load",
+  "host": "claude",
+  "model": "Claude Opus 5.5"
+}
