@@ -303,6 +303,9 @@ The plan's recorded assessment was `not-ready` solely because its start conditio
   - Evidence: `read-state` reasons "Start condition unmet: reuses naming helpers and the startup-move shape from the picture move (slice-plans/033, SEED-035#story-5), not yet on main."; story 5 merged at 72021b8efe; start receipt `{"status":"source-refused","error":"published preparation is needs-reassessment"}`; readiness recorded and pushed as 741dbf31ba.
   - Observed effect: about six extra calls and one extra commit on main; an execution coordinator performed a preparation assessment.
   - Inference: when a start condition names another story, that story's wrap-up (or the start command) could re-check dependents whose only blocking reason it resolves.
+- Execution: SEED-050#story-1 / `.planning/slice-plans/020-validate-changed-markdown-once/PLAN.md` / f8b186cc7f; Timestamp: 2026-09-27, ~15:40+08:00 (refusal, then readiness commit 0584473e28); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.42.
+  - Evidence: recorded reason "Waits for SEED-009#story-48 (plan 019) to land…"; story-48 wrapped up at 825560fe9e without reassessing SEED-050#story-1; start receipt `{"status":"source-refused","error":"published preparation is not-ready"}`; coordinator re-checked starting facts, recorded `ready`, pushed 0584473e28 (one rejected push, rebased over a sibling Take).
+  - Observed effect: about ten extra coordinator calls and a commit on main before the Take; the coordinator had to find the preparation procedure itself.
 
 ## ODF-121 — One transient GitHub TLS timeout ended CI observation for the rest of the execution
 
@@ -541,6 +544,9 @@ Slice 2's implementer reported that a rich body edit drops the file's final newl
 - Execution: SEED-009#story-47 / `.planning/slice-plans/018-cross-notebook-folder-move-names/PLAN.md` at c526dba221 / 732dbab312; Timestamp: 2026-09-27, before 13:17:42+08:00 (the slice 1 commit, made after switching to the real `.agents` path); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.42.
   - Evidence: `printf … | node .claude/skills/dough-execute-plan/scripts/agent-commit.mjs -F -` and then `-F <file>` from the worktree root both exited 0 with empty output and `git log` still at 2efbb21bba; the `realpath` (`.agents/skills/…`) invocation returned `{"ok":true,"status":"committed","agent":"Tsubomi-chan","sha":"732dbab312…"}`.
   - Observed effect: four extra coordinator calls, including reading the script to find the guard; nothing committed wrongly. Fourth retained occurrence, still unknown to the coordinator at call time.
+- Execution: SEED-050#story-1 / `.planning/slice-plans/020-validate-changed-markdown-once/PLAN.md` / f8b186cc7f; Timestamp: 2026-09-27, ~16:00+08:00 (slice 1 amend); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.42.
+  - Evidence: `node .claude/skills/dough-execute-plan/scripts/agent-commit.mjs --amend` (bare, and with `-F -`) from the worktree root exited 0 with no output, HEAD still 759f43d897 without the developer trailer; the `realpath` invocation returned `{"ok":true,"status":"amended","agent":"Kaoru-chan","sha":"f8b186cc7f…"}`.
+  - Observed effect: four extra calls, including reading the script; the first commit was made with plain `git commit` and had to be amended. Fifth retained occurrence, unknown to the coordinator at call time.
 
 ## DD-134 — The plan's E2E proof command named a feature directory, which the isolated runner refuses
 

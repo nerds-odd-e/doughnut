@@ -163,6 +163,16 @@ re-seeded the README cases of `NotebookGitReservedFileRejectionControllerTest`
 (they relied on drift). Refactor: one placement check after ancestry, the
 `RepresentedFolderRelocation` record and `representedInTreeExcludingUnder` removed.
 
+## Execution complete
+
+Product advice: no priority change; continue the SEED-050 queue. Story 1 is
+delivered as planned (one Markdown check of added or changed files, one drift
+check, the relocation's second mode and three drift-only refusals gone; net
+about 290 lines removed). `NotebookGitProposalTreeShapeControllerTest` and
+`NotebookGitProposalRenameRejectionControllerTest` still seed accepted Git
+without matching rows; their refusals come before the drift check so they pass,
+but wrap-up may note them as a small test-setup follow-up rather than a new story.
+
 ## Current decisions
 
 - Changed Markdown only: a proposed blob already in accepted history is not
