@@ -137,11 +137,11 @@ describe("note header image", () => {
     }
   }
 
-  it("shows a relative picture file through the note's attachment image address", async () => {
+  it("shows a relative image file through the note's image address", async () => {
     const { noteId, src } = await imageSourceFor("images/force diagram.png")
 
     expect(src).toBe(
-      `/api/notes/${noteId}/attachment-image?path=images%2Fforce%20diagram.png`
+      `/api/notes/${noteId}/image?path=images%2Fforce%20diagram.png`
     )
   })
 

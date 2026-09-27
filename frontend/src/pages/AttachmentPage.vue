@@ -10,9 +10,9 @@
         {{ attachmentRealm.size }} bytes
       </p>
       <img
-        v-if="attachmentRealm.picture"
-        class="attachment-picture mb-4"
-        :src="pictureSrc"
+        v-if="attachmentRealm.image"
+        class="attachment-image mb-4"
+        :src="imageSrc"
         :alt="attachmentRealm.attachment.filename"
       />
       <a
@@ -41,7 +41,7 @@
 import type {
   DownloadAttachmentData,
   NotebookAttachmentRealm,
-  ShowAttachmentPictureData,
+  ShowAttachmentImageData,
 } from "@generated/donut-backend-api"
 import { client } from "@generated/donut-backend-api/client.gen"
 import { NotebookAttachmentController } from "@generated/donut-backend-api/sdk.gen"
@@ -70,9 +70,9 @@ const downloadHref = computed(() =>
   })
 )
 
-const pictureSrc = computed(() =>
-  client.buildUrl<ShowAttachmentPictureData>({
-    url: "/api/notebooks/{notebook}/attachments/{attachment}/picture",
+const imageSrc = computed(() =>
+  client.buildUrl<ShowAttachmentImageData>({
+    url: "/api/notebooks/{notebook}/attachments/{attachment}/image",
     path: attachmentPath.value,
   })
 )
@@ -104,7 +104,7 @@ const deleteAttachment = async () => {
   padding: 1.5rem;
 }
 
-.attachment-picture {
+.attachment-image {
   display: block;
   max-width: 100%;
   height: auto;

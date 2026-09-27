@@ -30,10 +30,7 @@
 
 <script setup lang="ts">
 import { computed, type PropType } from "vue"
-import type {
-  Note,
-  ShowAttachmentImageData,
-} from "@generated/donut-backend-api"
+import type { Note, ShowNoteImageData } from "@generated/donut-backend-api"
 import { client } from "@generated/donut-backend-api/client.gen"
 import { noteImageScalarsFromMarkdown } from "@/utils/noteContentFrontmatter"
 
@@ -47,8 +44,8 @@ const props = defineProps({
  */
 const noteImageSource = (noteId: number, image: string) => {
   if (image.startsWith("/") || /^[a-z][a-z0-9+.-]*:/i.test(image)) return image
-  return client.buildUrl<ShowAttachmentImageData>({
-    url: "/api/notes/{note}/attachment-image",
+  return client.buildUrl<ShowNoteImageData>({
+    url: "/api/notes/{note}/image",
     path: { note: noteId },
     query: { path: image },
   })

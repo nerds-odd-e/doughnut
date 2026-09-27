@@ -21,12 +21,12 @@ import org.springframework.web.server.ResponseStatusException;
 @RestController
 @SessionScope
 @RequestMapping("/api/notes")
-class NoteAttachmentImageController {
+class NoteImageController {
   private final AuthorizationService authorizationService;
   private final NoteFolderAttachment noteFolderAttachment;
   private final NotebookAttachmentFile notebookAttachmentFile;
 
-  NoteAttachmentImageController(
+  NoteImageController(
       AuthorizationService authorizationService,
       NoteFolderAttachment noteFolderAttachment,
       NotebookAttachmentFile notebookAttachmentFile) {
@@ -36,19 +36,19 @@ class NoteAttachmentImageController {
   }
 
   @Operation(
-      summary = "Show a picture file the note refers to",
+      summary = "Show an image file the note refers to",
       description =
           "The notebook file at a path relative to the note's folder, served inline when it is a"
-              + " PNG, JPEG, GIF or WebP picture.")
+              + " PNG, JPEG, GIF or WebP image.")
   @GetMapping(
-      value = "/{note}/attachment-image",
+      value = "/{note}/image",
       produces = {
         MediaType.IMAGE_PNG_VALUE,
         MediaType.IMAGE_JPEG_VALUE,
         MediaType.IMAGE_GIF_VALUE,
         "image/webp"
       })
-  public ResponseEntity<byte[]> showAttachmentImage(
+  public ResponseEntity<byte[]> showNoteImage(
       @PathVariable("note") @Schema(type = "integer") Note note, @RequestParam("path") String path)
       throws UnexpectedNoAccessRightException {
     authorizationService.assertReadAuthorization(note);

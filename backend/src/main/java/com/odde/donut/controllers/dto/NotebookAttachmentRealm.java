@@ -11,12 +11,12 @@ import jakarta.validation.constraints.NotNull;
     description =
         "Notebook chrome plus one file for loading the file page: the shared realm sidebar with the"
             + " folder trail from notebook root through the file's folder, the file's id and filename, and its"
-            + " size in bytes, and whether it is a picture the page can show.")
+            + " size in bytes, and whether it is an image the page can show.")
 public record NotebookAttachmentRealm(
     @NotNull @JsonUnwrapped RealmNotebookSidebar sidebar,
     @NotNull NotebookAttachmentListItem attachment,
     @NotNull long size,
-    @NotNull boolean picture) {
+    @NotNull boolean image) {
 
   public static NotebookAttachmentRealm of(
       NotebookRealm chrome, NotebookAttachment attachment, long size) {

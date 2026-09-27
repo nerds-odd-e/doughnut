@@ -44,7 +44,7 @@ async function editBodyAsMarkdownThenReturnToRich(content: string) {
   await flushPromises()
 }
 
-async function choosePicture() {
+async function chooseImage() {
   const input = document.querySelector(
     '[data-testid="rich-note-image-property-file-input"]'
   ) as HTMLInputElement
@@ -56,7 +56,7 @@ async function choosePicture() {
   await flushPromises()
 }
 
-describe("note show picture upload", () => {
+describe("note show image upload", () => {
   const requests: string[] = []
   let saveSpy: ReturnType<typeof mockSdkServiceWithImplementation>
 
@@ -106,7 +106,7 @@ describe("note show picture upload", () => {
     )
     await editBodyAsMarkdownThenReturnToRich(editedContent)
 
-    await choosePicture()
+    await chooseImage()
 
     expect(requests).toEqual([`save: ${editedContent}`, "upload"])
   })
@@ -117,7 +117,7 @@ describe("note show picture upload", () => {
       noteRealm.id
     )
 
-    await choosePicture()
+    await chooseImage()
     vi.runAllTimers()
     await flushPromises()
 

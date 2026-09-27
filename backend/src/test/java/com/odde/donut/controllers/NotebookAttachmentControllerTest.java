@@ -65,7 +65,7 @@ class NotebookAttachmentControllerTest extends ControllerTestBase {
 
       assertThat(page.attachment().filename(), equalTo("run.json"));
       assertThat(page.size(), equalTo(7L));
-      assertThat(page.picture(), equalTo(false));
+      assertThat(page.image(), equalTo(false));
       assertThat(
           page.sidebar().getAncestorFolders().stream().map(FolderTrailSegment::name).toList(),
           contains("physics", "data"));
@@ -84,7 +84,7 @@ class NotebookAttachmentControllerTest extends ControllerTestBase {
     void anImageFileIsMarkedAsAnImage() throws Exception {
       NotebookAttachment flow = attachmentAtRoot("flow.png", "png bytes");
 
-      assertThat(controller.getAttachmentPage(notebook, flow).picture(), equalTo(true));
+      assertThat(controller.getAttachmentPage(notebook, flow).image(), equalTo(true));
     }
   }
 
@@ -144,7 +144,7 @@ class NotebookAttachmentControllerTest extends ControllerTestBase {
     void servesAnImageFileInlineWithItsMediaTypeAndNeverSniffed() throws Exception {
       NotebookAttachment photo = attachmentAtRoot("photo.JPG", "jpeg bytes");
 
-      ResponseEntity<byte[]> response = controller.showAttachmentPicture(notebook, photo);
+      ResponseEntity<byte[]> response = controller.showAttachmentImage(notebook, photo);
 
       assertThat(new String(response.getBody(), StandardCharsets.UTF_8), equalTo("jpeg bytes"));
       assertThat(response.getHeaders().getContentType(), equalTo(MediaType.IMAGE_JPEG));
@@ -159,7 +159,7 @@ class NotebookAttachmentControllerTest extends ControllerTestBase {
       assertThat(
           assertThrows(
                   ResponseStatusException.class,
-                  () -> controller.showAttachmentPicture(notebook, svg))
+                  () -> controller.showAttachmentImage(notebook, svg))
               .getStatusCode(),
           equalTo(HttpStatus.UNSUPPORTED_MEDIA_TYPE));
     }
@@ -224,7 +224,7 @@ class NotebookAttachmentControllerTest extends ControllerTestBase {
           () -> controller.downloadAttachment(notebook, othersFile));
       assertThrows(
           UnexpectedNoAccessRightException.class,
-          () -> controller.showAttachmentPicture(notebook, othersFile));
+          () -> controller.showAttachmentImage(notebook, othersFile));
     }
 
     @Test

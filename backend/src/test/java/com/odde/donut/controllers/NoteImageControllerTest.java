@@ -20,8 +20,8 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.server.ResponseStatusException;
 
-class NoteAttachmentImageControllerTest extends ControllerTestBase {
-  @Autowired NoteAttachmentImageController controller;
+class NoteImageControllerTest extends ControllerTestBase {
+  @Autowired NoteImageController controller;
   final byte[] png = "png bytes".getBytes(StandardCharsets.UTF_8);
   Notebook notebook;
   Folder physics;
@@ -41,8 +41,7 @@ class NoteAttachmentImageControllerTest extends ControllerTestBase {
 
   private HttpStatus refusal(String path) {
     return (HttpStatus)
-        assertThrows(
-                ResponseStatusException.class, () -> controller.showAttachmentImage(force, path))
+        assertThrows(ResponseStatusException.class, () -> controller.showNoteImage(force, path))
             .getStatusCode();
   }
 
@@ -50,7 +49,7 @@ class NoteAttachmentImageControllerTest extends ControllerTestBase {
   void servesAnImageInTheNotesFolderInlineAndNeverSniffed() throws Exception {
     file(physics, "force-diagram.png", png);
 
-    ResponseEntity<byte[]> response = controller.showAttachmentImage(force, "force-diagram.png");
+    ResponseEntity<byte[]> response = controller.showNoteImage(force, "force-diagram.png");
 
     assertThat(response.getBody(), equalTo(png));
     assertThat(response.getHeaders().getContentType(), equalTo(MediaType.IMAGE_PNG));
@@ -64,7 +63,7 @@ class NoteAttachmentImageControllerTest extends ControllerTestBase {
     file(physics, "force.png", "wrong folder".getBytes(StandardCharsets.UTF_8));
     file(images, "force.png", png);
 
-    assertThat(controller.showAttachmentImage(force, "images/force.png").getBody(), equalTo(png));
+    assertThat(controller.showNoteImage(force, "images/force.png").getBody(), equalTo(png));
   }
 
   @Test
@@ -72,7 +71,7 @@ class NoteAttachmentImageControllerTest extends ControllerTestBase {
     file(physics, "photo.JPEG", png);
 
     assertThat(
-        controller.showAttachmentImage(force, "photo.JPEG").getHeaders().getContentType(),
+        controller.showNoteImage(force, "photo.JPEG").getHeaders().getContentType(),
         equalTo(MediaType.IMAGE_JPEG));
   }
 
@@ -104,15 +103,14 @@ class NoteAttachmentImageControllerTest extends ControllerTestBase {
     void bazaarReaderIsServed() throws Exception {
       makeMe.aBazaarNotebook(notebook).please();
 
-      assertThat(
-          controller.showAttachmentImage(force, "force-diagram.png").getBody(), equalTo(png));
+      assertThat(controller.showNoteImage(force, "force-diagram.png").getBody(), equalTo(png));
     }
 
     @Test
     void nonReaderIsRefused() {
       assertThrows(
           UnexpectedNoAccessRightException.class,
-          () -> controller.showAttachmentImage(force, "force-diagram.png"));
+          () -> controller.showNoteImage(force, "force-diagram.png"));
     }
   }
 }

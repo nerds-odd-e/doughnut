@@ -114,7 +114,9 @@ variables and javadoc listed in the starting facts follow the rename.
 ### 2. One image endpoint family
 
 Type: Structure (API names change; product behavior does not)
-Status: planned
+Status: done — backend focused tests, `generateTypeScript`, frontend 18 tests
+(`AttachmentPage.spec.ts`, `NoteShow.spec.ts`, `tests/pages/NoteShowPage.imageUpload.spec.ts`)
+and `pnpm -C frontend exec vue-tsc --noEmit` green; refactor pass made no edits
 Proof: the backend tests above, then
 `CURSOR_DEV=true nix develop -c pnpm generateTypeScript` and
 `CURSOR_DEV=true nix develop -c pnpm frontend:test tests/pages/AttachmentPage.spec.ts tests/notes/NoteShow.spec.ts`
@@ -137,9 +139,9 @@ Proof: first tighten the tests to the new wording (fail):
 `NoteControllerUploadNoteImageTests:181` expects
 `"Cannot upload " + name + ": an image must be a png, jpg, jpeg, gif or webp file."`,
 its name-clash case at `:93` also expects "rename the image and upload it
-again", and the svg case in `NoteAttachmentImageControllerTest:83` expects
+again", and the svg case in `NoteImageControllerTest:83` expects
 "Not a raster image."; then change the messages (pass) —
-`CURSOR_DEV=true nix develop -c pnpm backend:test_only --tests 'com.odde.donut.controllers.NoteControllerUploadNoteImageTests' --tests 'com.odde.donut.controllers.NoteAttachmentImageControllerTest'`.
+`CURSOR_DEV=true nix develop -c pnpm backend:test_only --tests 'com.odde.donut.controllers.NoteControllerUploadNoteImageTests' --tests 'com.odde.donut.controllers.NoteImageControllerTest'`.
 
 Behavior: uploading `a.txt` → "Cannot upload a.txt: an image must be a png,
 jpg, jpeg, gif or webp file."; a taken name → "… rename the image and upload
@@ -180,3 +182,5 @@ Change: rename "picture" phrases in the three features, in
 
 - Replacing `Picture` inside identifiers breaks articles ("aImageFile"); rename
   "a Picture" to "an Image" deliberately in later slices.
+- Slice 2 renamed `NoteAttachmentImageController(Test)` to `NoteImageController(Test)`;
+  the starting facts keep the old names as they were found.

@@ -83,17 +83,17 @@ class NotebookAttachmentController {
   }
 
   @Operation(
-      summary = "Show a picture file",
-      description = "The file served inline when it is a PNG, JPEG, GIF or WebP picture.")
+      summary = "Show an image file",
+      description = "The file served inline when it is a PNG, JPEG, GIF or WebP image.")
   @GetMapping(
-      value = "/{notebook}/attachments/{attachment}/picture",
+      value = "/{notebook}/attachments/{attachment}/image",
       produces = {
         MediaType.IMAGE_PNG_VALUE,
         MediaType.IMAGE_JPEG_VALUE,
         MediaType.IMAGE_GIF_VALUE,
         "image/webp"
       })
-  public ResponseEntity<byte[]> showAttachmentPicture(
+  public ResponseEntity<byte[]> showAttachmentImage(
       @PathVariable("notebook") @Schema(type = "integer") Notebook notebook,
       @PathVariable("attachment") @Schema(type = "integer") NotebookAttachment attachment)
       throws UnexpectedNoAccessRightException {

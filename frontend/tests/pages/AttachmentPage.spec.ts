@@ -8,12 +8,12 @@ const mountPage = ({
   notebook = makeMe.aNotebook.please(),
   readonly = true,
   filename = "run.json",
-  picture = false,
+  image = false,
 }: {
   notebook?: Notebook
   readonly?: boolean
   filename?: string
-  picture?: boolean
+  image?: boolean
 } = {}) =>
   helper
     .component(AttachmentPage)
@@ -24,7 +24,7 @@ const mountPage = ({
         ancestorFolders: [],
         attachment: { id: 42, filename },
         size: 12,
-        picture,
+        image,
       },
     })
     .mount()
@@ -49,13 +49,13 @@ describe("AttachmentPage", () => {
     expect(link.attributes("download")).toBe("run.json")
   })
 
-  it("shows a picture file's picture and keeps its download link", () => {
+  it("shows an image file and keeps its download link", () => {
     const notebook = makeMe.aNotebook.please()
-    const wrapper = mountPage({ notebook, filename: "flow.png", picture: true })
+    const wrapper = mountPage({ notebook, filename: "flow.png", image: true })
 
     const img = wrapper.get<HTMLImageElement>("img")
     expect(new URL(img.element.src).pathname).toBe(
-      `/api/notebooks/${notebook.id}/attachments/42/picture`
+      `/api/notebooks/${notebook.id}/attachments/42/image`
     )
     expect(img.attributes("alt")).toBe("flow.png")
     expect(
@@ -67,12 +67,12 @@ describe("AttachmentPage", () => {
     [true, false],
     [false, true],
   ])(
-    "beside a picture, when readonly is %s, offers Delete: %s",
+    "beside an image, when readonly is %s, offers Delete: %s",
     (readonly, offered) => {
       const wrapper = mountPage({
         readonly,
         filename: "flow.png",
-        picture: true,
+        image: true,
       })
 
       expect(
@@ -81,7 +81,7 @@ describe("AttachmentPage", () => {
     }
   )
 
-  it("shows no picture for a file that is not a picture", () => {
+  it("shows no image for a file that is not an image", () => {
     expect(mountPage().find("img").exists()).toBe(false)
   })
 })

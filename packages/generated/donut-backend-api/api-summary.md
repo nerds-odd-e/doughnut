@@ -278,15 +278,15 @@ Use this for endpoint lookup; open `sdk.gen.ts` or `types.gen.ts` only for exact
 - `recalling`: GET `/api/recalls/recalling` -> `RecallingResponse` (request: `RecallingData`; query: timezone, dueindays; response body: DueMemoryTrackers)
 - `previouslyAnswered`: GET `/api/recalls/previously-answered` -> `PreviouslyAnsweredResponse` (request: `PreviouslyAnsweredData`; query: timezone; response body: Array<AnsweredQuestion>)
 
-## Note Attachment Image Controller
+## Note Image Controller
 
-- `showAttachmentImage`: GET `/api/notes/{note}/attachment-image` -> `ShowAttachmentImageResponse` (request: `ShowAttachmentImageData`; path: note; query: path; response body: string)
+- `showNoteImage`: GET `/api/notes/{note}/image` -> `ShowNoteImageResponse` (request: `ShowNoteImageData`; path: note; query: path; response body: string)
 
 ## Notebook Attachment Controller
 
 - `getAttachmentPage`: GET `/api/notebooks/{notebook}/attachments/{attachment}` -> `GetAttachmentPageResponse` (request: `GetAttachmentPageData`; path: notebook, attachment; response body: NotebookAttachmentRealm)
 - `deleteAttachment`: DELETE `/api/notebooks/{notebook}/attachments/{attachment}` -> `DeleteAttachmentResponse` (request: `DeleteAttachmentData`; path: notebook, attachment; response body: void)
-- `showAttachmentPicture`: GET `/api/notebooks/{notebook}/attachments/{attachment}/picture` -> `ShowAttachmentPictureResponse` (request: `ShowAttachmentPictureData`; path: notebook, attachment; response body: string)
+- `showAttachmentImage`: GET `/api/notebooks/{notebook}/attachments/{attachment}/image` -> `ShowAttachmentImageResponse` (request: `ShowAttachmentImageData`; path: notebook, attachment; response body: string)
 - `downloadAttachment`: GET `/api/notebooks/{notebook}/attachments/{attachment}/content` -> `DownloadAttachmentResponse` (request: `DownloadAttachmentData`; path: notebook, attachment; response body: string)
 
 ## Health Check Controller

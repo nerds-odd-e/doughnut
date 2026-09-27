@@ -1212,7 +1212,7 @@ export type BookUserLastReadPosition = {
 };
 
 /**
- * Notebook chrome plus one file for loading the file page: the shared realm sidebar with the folder trail from notebook root through the file's folder, the file's id and filename, and its size in bytes, and whether it is a picture the page can show.
+ * Notebook chrome plus one file for loading the file page: the shared realm sidebar with the folder trail from notebook root through the file's folder, the file's id and filename, and its size in bytes, and whether it is an image the page can show.
  */
 export type NotebookAttachmentRealm = {
     /**
@@ -1229,7 +1229,7 @@ export type NotebookAttachmentRealm = {
     scopedReadmeContent?: string;
     attachment: NotebookAttachmentListItem;
     size: number;
-    picture: boolean;
+    image: boolean;
 };
 
 export type ThresholdExceededResult = {
@@ -3722,6 +3722,26 @@ export type GetNoteInfoResponses = {
 
 export type GetNoteInfoResponse = GetNoteInfoResponses[keyof GetNoteInfoResponses];
 
+export type ShowNoteImageData = {
+    body?: never;
+    path: {
+        note: number;
+    };
+    query: {
+        path: string;
+    };
+    url: '/api/notes/{note}/image';
+};
+
+export type ShowNoteImageResponses = {
+    /**
+     * OK
+     */
+    200: string;
+};
+
+export type ShowNoteImageResponse = ShowNoteImageResponses[keyof ShowNoteImageResponses];
+
 export type GetGraphData = {
     body?: never;
     path: {
@@ -3765,26 +3785,6 @@ export type AuthoredPortablePathResponses = {
 };
 
 export type AuthoredPortablePathResponse = AuthoredPortablePathResponses[keyof AuthoredPortablePathResponses];
-
-export type ShowAttachmentImageData = {
-    body?: never;
-    path: {
-        note: number;
-    };
-    query: {
-        path: string;
-    };
-    url: '/api/notes/{note}/attachment-image';
-};
-
-export type ShowAttachmentImageResponses = {
-    /**
-     * OK
-     */
-    200: string;
-};
-
-export type ShowAttachmentImageResponse = ShowAttachmentImageResponses[keyof ShowAttachmentImageResponses];
 
 export type GetAiContextMarkdownData = {
     body?: never;
@@ -3987,24 +3987,24 @@ export type GetAttachmentPageResponses = {
 
 export type GetAttachmentPageResponse = GetAttachmentPageResponses[keyof GetAttachmentPageResponses];
 
-export type ShowAttachmentPictureData = {
+export type ShowAttachmentImageData = {
     body?: never;
     path: {
         notebook: number;
         attachment: number;
     };
     query?: never;
-    url: '/api/notebooks/{notebook}/attachments/{attachment}/picture';
+    url: '/api/notebooks/{notebook}/attachments/{attachment}/image';
 };
 
-export type ShowAttachmentPictureResponses = {
+export type ShowAttachmentImageResponses = {
     /**
      * OK
      */
     200: string;
 };
 
-export type ShowAttachmentPictureResponse = ShowAttachmentPictureResponses[keyof ShowAttachmentPictureResponses];
+export type ShowAttachmentImageResponse = ShowAttachmentImageResponses[keyof ShowAttachmentImageResponses];
 
 export type DownloadAttachmentData = {
     body?: never;
