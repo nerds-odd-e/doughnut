@@ -4,53 +4,19 @@ status: active
 planted: 2026-09-04
 planted_during: ADR 0002 v1 discussion
 trigger_when: when selecting the next Git-backed notebook workflow story from the product backlog
-scope: large
+scope: small
 ---
 
 # SEED-009: Refine a Donut notebook locally with Obsidian and AI-enabled IDEs
 
 ## Why This Matters
 
-Notebook owners should move between local refinement and Donut without manual
-copying, losing work, or separating notes from their learning history.
-The [near-future direction](../PRODUCT-BACKLOG.md#near-future-direction) governs
-selection: one accepted append-only history, with either repository potentially
-several commits behind. If local and web changes diverge, the local side rebases
-unpublished work onto the latest accepted head before publishing; the remote
-never merges, rebases, or rewrites accepted history (ADR 0002, amended 2026-09-20).
-
-These candidates are planning hypotheses grounded in the retained workflow
-boundaries and the owner's clarified direction, not a fresh implementation
-audit. Confirm each gap during refinement before planning. Performance work
-remains separately owned and is not decomposed or selected here.
-
-## Alternatives and Decision
-
-Publishing after every local commit is the strongest smaller workaround, but
-does not meet the explicit requirement to catch up across accumulated commits.
-Manual copying sacrifices the continuous workflow and can lose identity.
-Deferring all further work would leave that requirement unanswered even after
-publication becomes faster.
-
-The owner prioritized append-only web saves, receiving web renames, and receiving
-web deletions ahead of accumulated local publication on 2026-09-13. These basic
-web workflow changes take precedence while publishing after each local commit
-remains a smaller workaround. Accumulated publication is retained after them;
-its frequency and urgency remain unmeasured.
-
-## Ordering and Scope Reduction
-
-The [product backlog](../PRODUCT-BACKLOG.md) owns global order.
-
-Completed story 44 removed the spent notebook rebaseline migration
-(`V300000330__RebaselineExistingNotebookGitBindings` and its migration-only
-helpers and test) once production confirmed it applied, and corrected the
-db-migration skill's version guidance; it left the replacement root and later
-accepted history untouched.
-
-Completed stories 20 and 25 supply accumulated local publication and web-note
-movement evidence to story 42; they are not remaining queue items. Publication
-performance remains the next selected Git-scale item.
+Notebook owners move between local refinement in Obsidian or an AI IDE and
+Web Donut without manual copying, losing work, or separating notes from their
+learning history. Accepted history is forward and linear; the local side
+rebases unpublished work before publishing
+([ADR 0002](../../docs/adrs/0002-git-native-portable-notebook-synchronization-accepted.md)).
+The stories below are the follow-ups the effort's closing review judged urgent.
 
 ## Story Decomposition
 
@@ -93,42 +59,3 @@ uses, settling a root `.keep` and `.md` letter case in that one place. The CLI
 stops classifying paths and picks LFS uploads from the changed blobs that are
 LFS pointers, leaving admission to the server.
 
-## Deferred Directions
-
-Keep these outside the current queue rather than cancelling them:
-
-- Additional Donut-assisted conflict-recovery experiences. Ordinary local Git
-  rebase is the owner's selected reconciliation workflow; the local side resolves
-  divergent work before publishing a fast-forward result. This is not a promise
-  of automatic reconciliation by the CLI or remote.
-- Recovery for notebooks whose live projection already differs from accepted
-  history. Establish the owner's blocked journey and a deliberate preservation
-  policy before selecting recovery work.
-- Wider folder operations. Same-notebook web folder moves, rename-with-content-edit,
-  and multi-commit note identity preservation are supported. Cross-notebook
-  folder-move Git histories and further subtree composition remain deferred.
-- Native standard Git transport, notebook binding within a project subdirectory,
-  and history browsing or revision restoration. Supporting files and attachments
-  are delivered as notebook files.
-
-Broader web-authoring coverage is retained in
-[SEED-017](SEED-017-cohesive-design-corrections.md#open-product-decision).
-Local rebasing of unpublished work is compatible with accepted append-only
-history. Web-tip amendments and rewriting already accepted history remain
-outside the selected workflow.
-
-## Open Decisions
-
-- How often do web renames, deletions and moves interrupt actual owner work?
-  The order above is a value hypothesis, to revise with use.
-- Ordinary-note rename-with-edit direction is settled in the North Star.
-  Wider identity outcomes remain deferred;
-  [ADR 0002](../../docs/adrs/0002-git-native-portable-notebook-synchronization-accepted.md)
-  is Accepted. Confirmed deletion/recreation starts a new identity.
-- Additional web creation modes and container mutations need concrete owner
-  journeys before story selection; this queue is not a completeness claim.
-
-## Breadcrumbs
-
-- Owner's 2026-09-12 direction clarification and cleanup/backlog request.
-- Accepted ADR 0004 defines Portable content; Accepted ADR 0002 defines the broader synchronization architecture.

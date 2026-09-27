@@ -125,7 +125,7 @@ extend its seed only if a finding belongs to it.
 ### 5. Seed cleanup and stale list published
 
 Type: Behavior
-Status: planned
+Status: done
 Proof: diff, grep, and stale-list observations (see table).
 
 Behavior: the review is complete → in seeds related to the effort (at
@@ -155,6 +155,12 @@ the owner's keep-or-delete decision.
 - Slice 4 queued SEED-009#story-47 (cross-notebook folder move names) and
   SEED-009#story-48 (one path classifier) after owner-first SEED-049#story-1.
   SEED-009 story numbers up to 46 were already used in history.
+- Slice 5 confirmed the related set as SEED-009, SEED-016, SEED-017, SEED-030,
+  SEED-037 (SEED-017 added: SEED-009's deferred sibling, contradicted by the
+  delivered rebase). SEED-009 trimmed to stories 47–48; the other four
+  deleted. Stale list: SEED-014 only. Remaining mentions of deleted IDs are this
+  story's own seed and plan (removed at wrap-up) and a `DearDough.md` evidence
+  line (execution record, left as is).
 
 - Report findings only; no product code changes. The execution wrap-up's
   refactor and API steps have nothing to act on; formatting and lint run on

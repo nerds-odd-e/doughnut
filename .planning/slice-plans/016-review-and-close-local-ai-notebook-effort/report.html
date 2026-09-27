@@ -98,7 +98,7 @@ footer{margin-top:64px;color:var(--muted);font-size:.85rem;border-top:1px solid 
     <a href="#process">Process feedback</a>
     <a href="#coverage">Feature coverage</a>
     <a href="#followups">Follow-ups queued</a>
-    <a class="pending" href="#pending">Seed cleanup and stale seeds (next)</a>
+    <a href="#seeds">Seed cleanup and stale seeds</a>
   </nav>
 </header>
 
@@ -430,9 +430,32 @@ footer{margin-top:64px;color:var(--muted);font-size:.85rem;border-top:1px solid 
 <p class="note">Process feedback and feature coverage produced no queue-now items. Nothing was fixed in this story.</p>
 </section>
 
-<section id="pending">
-<h2>Still to come</h2>
-<p class="note">Seed cleanup and the stale-seed list are added to this page as the review continues.</p>
+<section id="seeds">
+<h2>Seed cleanup and stale seeds</h2>
+<div class="summary">
+  <p><b>Related seeds.</b> The review confirmed five seeds as part of this effort: the four named at refinement (SEED-009, SEED-016, SEED-030, SEED-037) and SEED-017. SEED-017 is SEED-009's sibling for the same Git-backed workflow; it held only deferred candidates, and its "no-rebase scope" wording contradicted the rebase the effort delivered. SEED-046 was already closed. Only the two queued stories remain. Deleted seeds and passages leave no tombstone; Git history recovers them.</p>
+</div>
+<div class="table-wrap">
+<table class="map">
+<thead><tr><th scope="col">Seed</th><th scope="col">What it held</th><th scope="col">Change</th></tr></thead>
+<tbody>
+<tr><td class="mono">SEED-009</td><td>Umbrella for local refinement with Obsidian and AI IDEs: notes on completed stories, deferred directions (Donut-assisted conflict recovery, drifted-projection recovery, cross-notebook folder histories, native Git transport) and open decisions</td><td>Kept, trimmed to its purpose and the two queued stories, <span class="mono">#story-47</span> and <span class="mono">#story-48</span>. The deferred directions and open decisions are deleted.</td></tr>
+<tr><td class="mono">SEED-016</td><td>Seven delivered initial-tree publication stories and a deferred bulk import</td><td>Deleted: nothing left to do.</td></tr>
+<tr><td class="mono">SEED-017</td><td>Deferred sync and composition candidates, plus an open question on partial web synchronization</td><td>Deleted: deferred only, and overtaken by the rebase direction.</td></tr>
+<tr><td class="mono">SEED-030</td><td>Two delivered folder-ancestry stories, owner reset chores, deferred clone refusal, and residue</td><td>Deleted. Its cutover-naming residue appears in the Architecture section. Its migration-only test, <code>NotebookFollowsFolderContainmentMigrationTest</code>, is still in the code; removing it is a not-now chore once production has applied V300000333.</td></tr>
+<tr><td class="mono">SEED-037</td><td>One abandoned whole-notebook assembly experiment</td><td>Deleted: abandoned, and saves are fast enough per the owner (2026-09-22).</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="topic">
+  <h3>Stale seeds for your keep-or-delete decision</h3>
+  <p class="note">Seeds last changed more than 15 days before the review date (before 2026-09-12), by <code>git log -1</code> per file. These are left untouched.</p>
+  <ul class="findings">
+    <li class="finding"><div class="t"><span class="mono">SEED-014</span> Reliable login with browser history</div><p>Last changed 2026-09-07. Unrelated to this effort.</p></li>
+  </ul>
+  <p class="note">Every other seed changed on or after 2026-09-16, so none of them is stale by this rule.</p>
+</div>
 </section>
 
 <footer>
