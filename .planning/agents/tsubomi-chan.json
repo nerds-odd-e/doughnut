@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "agent": "Tsubomi-chan",
+  "email": "tsubomi-chan@example.org",
+  "identity": "SEED-009#story-47",
+  "mode": "story-branch",
+  "branch": "story/cross-notebook-folder-move-names",
+  "host": "claude",
+  "model": "claude-opus-5-5"
+}
