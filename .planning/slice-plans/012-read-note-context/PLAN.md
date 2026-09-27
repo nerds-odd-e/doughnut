@@ -258,6 +258,12 @@ After the last non-page consumer is replaced, remove embed-only `NoteShow` /
 required post-change refactor. Preserve the note page's editor, toolbar,
 sidebar, and conversation slot.
 
+## Execution complete
+
+Product advice: no backlog change. Check by eye whether the wrong-spelling
+result's duplicate title (NoteUnderQuestion plus reader) and the narrow
+drawer's close button over the reader breadcrumb need a small follow-up.
+
 ## Current decisions
 
 - The three workflows share note-reading data and rendering, but keep their
