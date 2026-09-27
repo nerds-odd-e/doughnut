@@ -435,6 +435,10 @@ A story's readiness basis is a digest of its whole seed document. Wrapping up an
   - Evidence: 0d7772ed0e (13:02:28+08:00) refined and planned sibling SEED-009#story-48 in the same seed, a preparation write rather than a closure; start refused with "published preparation is needs-reassessment"; `git diff c526dba221 0d7772ed0e` on the seed touched only story 48's section; 7360e9e9f7 changed only story 47's `basis.document` (ee9b982d… → 28c68632…), `basis.plan` 38ea6254… unchanged.
   - Observed effect: one refused start that also left a local Take candidate built on the stale base; the retry with its recovery coordinates refused again ("unpublished selected story source in originating checkout"), so the coordinator removed that unpublished worktree and branch, published the reassessment, and took the story fresh — about six extra calls.
   - Inference: sibling preparation, not only sibling wrap-up, invalidates a story's readiness; two stories prepared minutes apart in one seed will always collide this way.
+- Execution: SEED-050#story-4 / `.planning/slice-plans/023-one-notebook-tree-model/PLAN.md` / 3e9f034932; Timestamp: 2026-09-27, before 16:22:33+08:00 (refusal; readiness commit c896f2fcfc); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.42.
+  - Evidence: 299cd69bac closed SEED-050 story 3, removing its seed section; `execution-start.mjs start` refused with "published preparation is needs-reassessment"; `read-state` showed only `basis.document` changed (4213a2e5… → e6161163…) with the plan digest and story-4 section unchanged; c896f2fcfc re-recorded ready.
+  - Observed effect: one refused start, a starting-facts spot check, one extra commit on main and a retry.
+  - Inference: unlike the story 24 and story 3 occurrences, plan 023 did not depend on the closed sibling, so the reassessment carried no information.
 
 ## DD-126 — A plan said the changed script had no test, and nobody searched for one before delivery, so CI caught the stale test
 
@@ -541,6 +545,10 @@ Slice 2's implementer reported that a rich body edit drops the file's final newl
 - Execution: SEED-009#story-47 / `.planning/slice-plans/018-cross-notebook-folder-move-names/PLAN.md` at c526dba221 / 732dbab312; Timestamp: 2026-09-27, before 13:17:42+08:00 (the slice 1 commit, made after switching to the real `.agents` path); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.42.
   - Evidence: `printf … | node .claude/skills/dough-execute-plan/scripts/agent-commit.mjs -F -` and then `-F <file>` from the worktree root both exited 0 with empty output and `git log` still at 2efbb21bba; the `realpath` (`.agents/skills/…`) invocation returned `{"ok":true,"status":"committed","agent":"Tsubomi-chan","sha":"732dbab312…"}`.
   - Observed effect: four extra coordinator calls, including reading the script to find the guard; nothing committed wrongly. Fourth retained occurrence, still unknown to the coordinator at call time.
+- Execution: SEED-050#story-4 / `.planning/slice-plans/023-one-notebook-tree-model/PLAN.md` / 3e9f034932; Timestamp: 2026-09-27T16:27:27+08:00 (slice 1 commit, made after switching to the `realpath`); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.42.
+  - Evidence: two runs of `node .claude/skills/dough-execute-plan/scripts/agent-commit.mjs -m …` from the worktree root exited 0 with empty output and `git log` still at 9e1aeb19df; the `realpath` invocation returned `{"ok":true,"status":"committed","agent":"Maria-chan"}`. `execution-start.mjs` carries the same guard (line 39) but succeeded through `.claude/skills/…` because it ran from the default checkout, where `.claude/skills/dough-execute-plan` is a real directory; in the worktree it is a symlink to `../../.agents/skills/dough-execute-plan` created by worktree setup.
+  - Observed effect: three extra coordinator calls, including reading the script; nothing committed wrongly. Fifth retained occurrence.
+  - Inference: the silent exit is specific to worktree-prepared skill links, so every execution that commits from its worktree hits it until the guard compares real paths or worktree setup stops symlinking.
 
 ## DD-134 — The plan's E2E proof command named a feature directory, which the isolated runner refuses
 

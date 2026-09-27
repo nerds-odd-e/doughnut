@@ -186,3 +186,13 @@ minutes, split the listing's branch removal into its own slice.
   (root vs folder structural-peer queries), and the "folder in this notebook
   or 404" lookup written in the listing, `FolderRelocationService` and
   `NoteConstructionService`.
+
+## Execution complete
+
+Product advice: no correction needed. Candidates for a small follow-up under
+North Star "One notebook tree" (outside this story's scope):
+`NoteService.findStructuralPeerNotesSample` still branches between root and
+folder structural-peer queries; the name-filtered `IS NULL … OR` sibling
+queries; the "folder in this notebook or 404" lookup written in three places.
+SEED-050#story-7 is unblocked but should re-read its `MovedNotePicture`
+starting facts.
