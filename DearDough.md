@@ -552,7 +552,7 @@ The slice changed `StoredApiCollection.trashNote` to request a folder listing be
 
 ### Occurrences
 
-- Execution: SEED-047#story-1 / slice-plans/014-continue-to-neighboring-note-after-deletion / a41b1e0507; Timestamp: unknown (before slice 1 commit 2026-09-27T10:59:16+08:00); Tool: Claude Code; Open Dough release: 0.3.42 (VERSION in the execution checkout).
+- Execution: SEED-047#story-1 / `edfd7ba92a:.planning/slice-plans/014-continue-to-neighboring-note-after-deletion/PLAN.md` / a41b1e0507; Timestamp: unknown (before slice 1 commit 2026-09-27T10:59:16+08:00); Tool: Claude Code; Open Dough release: 0.3.42 (VERSION in the execution checkout).
   - Evidence: coordinator summary to the retrospective (subagent transcripts not supplied): coordinator consumer check found 2 failing tests in `NoteMoreOptionsForm.trashNote.spec.ts`; fixed by an empty listing mock in `tests/notes/noteMoreOptionsTrashTestSupport.ts` (in a41b1e0507), then `tests/notes tests/store tests/toolbars` 353/353.
   - Observed effect: one coordinator repair before commit; no defect shipped.
   - Inference: a `grep` for callers of the changed method across `tests/` when choosing slice proof would have included the spec.

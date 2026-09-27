@@ -4,8 +4,8 @@
 
 - Story: [SEED-047#story-2](../../seeds/SEED-047-deleted-node-navigation.md#story-2)
 - **Identity:** SEED-047#story-2
-- Correction of [SEED-047#story-1](../../seeds/SEED-047-deleted-node-navigation.md#story-1),
-  plan `014-continue-to-neighboring-note-after-deletion` (original at
+- Correction of SEED-047#story-1 (`edfd7ba92a:.planning/seeds/SEED-047-deleted-node-navigation.md`),
+  plan `edfd7ba92a:.planning/slice-plans/014-continue-to-neighboring-note-after-deletion/PLAN.md` (original at
   `a418efdb98`); reviewed commits `a41b1e0507` (trash lands on neighbor) and
   `ff9b3e7871` (permanent delete lands on neighbor), base `6cac6f9127`.
 

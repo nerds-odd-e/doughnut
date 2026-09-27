@@ -57,4 +57,4 @@ Owner priority: first in the product backlog as of 2026-09-27.
   story with the highest priority; it needs a more careful architectural
   design to refine and plan it.
 - The refactor passes for SEED-047#story-1 flagged the file size and
-  recorded the split as out of that story's scope (plan 014 learnings).
+  recorded the split as out of that story's scope (`edfd7ba92a:.planning/slice-plans/014-continue-to-neighboring-note-after-deletion/PLAN.md`).
