@@ -1,4 +1,9 @@
 Feature: Note trash
+  After a note is trashed, or permanently deleted from trash, the reader lands
+  on its neighboring note among the notes in the same folder (or notebook
+  root), in the sidebar order chosen in this browser: the note that followed
+  it, else the note now last. Subfolders and files are not neighbors. With no
+  other note left, the folder page (or notebook page) opens.
 
   Background:
     Given I am logged in as an existing user

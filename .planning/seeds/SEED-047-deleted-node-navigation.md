@@ -62,6 +62,9 @@ chose for the sidebar, instead of on the folder page while notes remain.
 ### Removal landing loads the folder listing like other user actions
 
 **Identity:** SEED-047#story-2
+```json dough-story-state
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/015-removal-landing-listing-load/PLAN.md"}
+```
 
 **Goal:** A person trashing or permanently deleting a note sees the app busy
 from confirmation until they land, as for other user-triggered folder
