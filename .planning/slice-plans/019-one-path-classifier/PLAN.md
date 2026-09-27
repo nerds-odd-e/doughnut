@@ -201,3 +201,10 @@ stopped before without losing any promise.
 - Attachment size admission runs first in publish; a path refusal that must beat the
   LFS-pointer message goes before `NotebookGitAttachmentSizeAdmission.admit`. Before
   slice 3, `Forces.MD` was refused as a non-pointer attachment, not accepted.
+
+## Execution complete
+
+Product advice: no change. The story delivered its whole promise; the seed's
+Excluded items (dot-file policy, case-only name clashes on publish, web picture
+names that look like Markdown, one-pass Markdown validation, frontmatter edit
+owner, pull's final-newline rule) stay deliberate exclusions, not follow-ups.
