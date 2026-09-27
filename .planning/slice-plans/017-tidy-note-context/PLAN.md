@@ -100,6 +100,10 @@ of the close button with the smallest local change in
 `ConversationComponent.vue` — it is the only right-side drawer. Do not change
 the close-button design of other dialogs.
 
+## Execution complete
+
+Product advice: Reasoned no-change. This closed the two post–read-only-note-context glitches in SEED-033#story-3 without surfacing a new beneficiary/outcome against NORTH-STAR or the backlog.
+
 ## Current decisions
 
 - Owner, 2026-09-27: keep the **Note under question** box around the note
