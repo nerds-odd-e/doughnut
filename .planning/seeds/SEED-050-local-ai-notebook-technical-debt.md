@@ -130,7 +130,7 @@ performance loss.
 
 **Identity:** SEED-050#story-5
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/024-finished-transitions-leave-no-trace/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"4213a2e511a6f2eb833b7ac740f7a70b392778f81879a2a7d7d13405045cee2d","plan":"322c7e1dd275cce99f3be4aa17e2694f5861ef63583f3f7996c8b416f8822e00"}}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/024-finished-transitions-leave-no-trace/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"8c1ce1fcb03eaee1efd74d124358d2827e6d3c6e61222c91a80a429fea279874","plan":"322c7e1dd275cce99f3be4aa17e2694f5861ef63583f3f7996c8b416f8822e00"}}
 ```
 
 **Goal:** Developers see only what the notebook Git model does today, and
