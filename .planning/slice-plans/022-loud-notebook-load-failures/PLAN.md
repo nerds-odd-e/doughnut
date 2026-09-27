@@ -109,3 +109,7 @@ so each listing shows its own message. Still no `apiCallWithLoading`.
 ## Learnings
 
 None yet.
+
+## Execution complete
+
+Product advice: no product backlog change; defer dedicated not-found page and retry actions until user feedback calls for them.
