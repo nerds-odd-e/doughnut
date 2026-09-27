@@ -229,8 +229,8 @@ or which remaining-work route was taken.
   that confirmation.
 - **Explained no-change:** exploration evidence or execute-plan's
   explained-empty-change return shows the actual behavior matches the intended
-  behavior. Resolve the report without a repair. A conclusion reached during
-  exploration creates no execution workspace.
+  behavior. Resolve it without a repair or further workspace; story wrap-up
+  closes an admitted story and the workspace its admission created.
 - **Unresolved:** validity, cause, or scope remains unconfirmed, and the report
   is not known larger and was not an incomplete or inconclusive execution
   return. Do not claim resolution or invent a queue entry.

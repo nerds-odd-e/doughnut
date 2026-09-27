@@ -19,6 +19,10 @@ import {
   revParse,
   tryPushExactRef,
 } from "../../dough-execute-plan/scripts/publication-git.mjs";
+import {
+  creditDeveloper,
+  DeveloperIdentityRefused,
+} from "../../dough-execute-plan/scripts/workspace-agent-authorship.mjs";
 import { remoteRef } from "../../dough-execute-plan/scripts/workspace-publication-ownership.mjs";
 import { addressedAssignment } from "./preparation-assignment-lost-workspace.mjs";
 import {
@@ -32,11 +36,18 @@ import {
 } from "./preparation-assignment-ownership.mjs";
 
 // A commit on `tip` whose only change removes `own`'s profile, built in a
-// scratch index so the checkout's own index and files stay as they are.
+// scratch index so the checkout's own index and files stay as they are. The
+// agent authors it and the developer committing in `cwd` is credited; an
+// unusable developer throws DeveloperIdentityRefused before anything is made.
 async function endingCommit(cwd, tip, own) {
   const { identity } = own.profile;
-  const scratch = mkdtempSync(join(tmpdir(), "dough-abandon-"));
   const { agent, email } = agentIdentity(own.name);
+  const message = await creditDeveloper(
+    cwd,
+    `End preparation: ${identity}\n\nPreparation-Identity: ${identity}\n`,
+    { agent, email },
+  );
+  const scratch = mkdtempSync(join(tmpdir(), "dough-abandon-"));
   const env = {
     ...process.env,
     GIT_INDEX_FILE: join(scratch, "index"),
@@ -49,14 +60,7 @@ async function endingCommit(cwd, tip, own) {
     await run("read-tree", tip);
     await run("update-index", "--force-remove", "--", own.path);
     const tree = await run("write-tree");
-    return await run(
-      "commit-tree",
-      tree,
-      "-p",
-      tip,
-      "-m",
-      `End preparation: ${identity}\n\nPreparation-Identity: ${identity}\n`,
-    );
+    return await run("commit-tree", tree, "-p", tip, "-m", message);
   } finally {
     rmSync(scratch, { recursive: true, force: true });
   }
@@ -109,7 +113,16 @@ async function publishEnding(request, cwd, place, locate) {
           "remote trunk did not accept the end of the assignment; it is still published",
       });
     const tip = await revParse(cwd, ref);
-    candidate = await endingCommit(cwd, tip, found.own);
+    try {
+      candidate = await endingCommit(cwd, tip, found.own);
+    } catch (error) {
+      if (!(error instanceof DeveloperIdentityRefused)) throw error;
+      return stop("developer-identity-refused", {
+        ...assignmentFields(found.own.profile, found.own),
+        ...place,
+        error: error.message,
+      });
+    }
     try {
       await tryPushExactRef(cwd, candidate, remote, `refs/heads/${target}`);
     } catch {

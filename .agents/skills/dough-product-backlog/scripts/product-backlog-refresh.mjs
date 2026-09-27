@@ -17,9 +17,13 @@ import {
   renderEntry,
   requireUnlistedHome,
 } from "./product-backlog-document.mjs";
-import { openHome, stillRecords } from "./product-backlog-home.mjs";
+import {
+  openHome,
+  requireResolvedPlan,
+  stillRecords,
+} from "./product-backlog-home.mjs";
 import { findEntry } from "./product-backlog-placement.mjs";
-import { requireResolvedPlan } from "./product-backlog-plan.mjs";
+import { sameDocument } from "./product-backlog-plan.mjs";
 import { BacklogError } from "./product-backlog-refusal.mjs";
 
 // What a caller can do when the named identity is in neither list. A refresh
@@ -99,7 +103,7 @@ function planFor(entry, request) {
   if (request.plan === entry.plan.target) {
     return entry.plan;
   }
-  if (request.plan === (request.href ?? entry.href)) {
+  if (sameDocument(request.plan, request.href ?? entry.href)) {
     throw new BacklogError(
       `The plan "${request.plan}" is the canonical home this entry links, ` +
         `which needs no duplicate plan link.`,

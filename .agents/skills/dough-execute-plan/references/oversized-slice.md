@@ -40,7 +40,7 @@ work and proof, and every incomplete attempt-owned change. Keep completed
 compatible work and proof in place. Safely park or revert only incomplete
 attempt-owned changes; do not discard completed work merely to give later slices
 a clean starting point. Keep the same execution identity and backlog placement under
-[Take queued work](../SKILL.md#take-queued-work). A quick attempt that becomes
+[Take or admit work](../SKILL.md#take-or-admit-work). A quick attempt that becomes
 planned keeps its selected mode and checkout; Trunk Mode stays Trunk Mode in
 the same worktree. Unclear ownership stops disposition and the dependent
 planning path for human judgment.

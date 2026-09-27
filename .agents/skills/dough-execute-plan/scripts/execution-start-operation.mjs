@@ -20,10 +20,8 @@ import {
   claimReceiptAgent,
   reselectClaimAgent,
 } from "./execution-start-agent.mjs";
-import {
-  commitWorkspaceClaim,
-  selectOwnedWorkspace,
-} from "./workspace-publication-select.mjs";
+import { commitWorkspaceClaim } from "./workspace-publication-claim.mjs";
+import { selectOwnedWorkspace } from "./workspace-publication-select.mjs";
 import {
   claimMembership,
   publishClaimSha,

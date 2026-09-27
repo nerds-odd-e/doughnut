@@ -8,7 +8,7 @@ Managed ordinary increments and authorized repairs use
 for establish/reuse and exact-revision attachment — no separate probe, start, or
 `register-push` recipe on that path.
 
-For callers not yet on managed delivery (queue claims before the story-branch
+For callers not yet on managed delivery (claims before the story-branch
 observer is armed, wrap-up closure recovering an ended observer, and other
 explicit paths), start one observer per repository/branch/coordinator before
 the first publication it must cover, where branch is the authorized **target**
@@ -39,6 +39,7 @@ without promising notifications.
 The observer uses no AI calls. It emits failure, incomplete, and lost-coverage
 records incrementally; it never dispatches or retries a check, observes
 deployment, or changes the checkout. Assess coverage with runtime-setup bounds.
+Registering a revision checks it at once, so a finished run needs no poll wait.
 
 Within the startup snapshot, inspect the newest completed attempt and unfinished
 attempts. Preserve opaque run and attempt identities. Retain unfinished
@@ -188,19 +189,19 @@ until that missing history is accounted for.
    before stashing. A sent message or interrupt does not prove subprocesses
    stopped; verify quiescence after an interrupt. Never stash under a live
    writer.
-3. **Preserve unfinished owned work in the execution checkout.** Record branch,
-   HEAD, staged/unstaged/untracked paths, and the previous stash OID. Once all
-   writers are quiescent, if the tree is dirty use `git stash push
-   --include-untracked -m 'dough-execute-plan CI repair RUN_ID/ATTEMPT'`. Record
-   the new stash's exact OID; verify it differs from the previous one and the
-   working tree/index are clean. If clean initially, record “no stash”; never
-   use an older stash. Include pre-existing user changes in the inventory and
-   restore them too.
-   Do not use `--all`: ignored local services, credentials, and dependencies
-   must stay in place. Do not reset or clean the checkout to make stashing work.
-   Store pause/recovery metadata outside the stashed tree (a private temporary
-   file), and retain its path in coordinator resume context. Submodule dirt or
-   concurrent human edits that prevent a clean repair boundary require a stop.
+3. **Preserve unfinished owned work in the execution checkout.** Once all
+   writers are quiescent, run `node '/ABSOLUTE/RESOLVED/SKILL/scripts/ci-repair-stash.mjs'
+   save --checkout EXECUTION_CHECKOUT --label 'dough-execute-plan CI repair RUN_ID/ATTEMPT'`
+   and keep its receipt's `record` path in resume context: a private file
+   outside the checkout listing branch, HEAD, staged, unstaged, and untracked
+   paths (user changes included and restored too) and the one entry's OID.
+   Continue only on `stashed` (saved, tree clean) or `clean` (no entry).
+   `failed` leaves the work in the tree with no entry: retry after verifying
+   quiescence, or stop. `unclean` (dirt such as a submodule's remains),
+   `ambiguous` (no single own entry; see `candidates`), or concurrent human
+   edits preventing a clean repair boundary require a stop keeping the record.
+   Never stash, pop, reset, or clean by hand, or use `--all`: ignored local
+   services, credentials, and dependencies stay in place.
 4. **Delegate analysis and repair to a fresh implementation agent.** Pass run URL/ID,
    attempt, failed SHA, bounded failure evidence, current HEAD, and the paused
    workers' ownership boundaries. Assign only the diagnosed CI failure; the
@@ -216,28 +217,28 @@ until that missing history is accounted for.
    accept the focused proof without manufacturing another commit. For a new
    repair, the coordinator runs [wrap-up](wrap-up.md), which publishes through
    [increment and repair publication](trunk-publication.md#publish-an-execution-increment-or-repair).
-   Do not use a second repair push. Preserve the same
-   observer through that publication.
+   Do not use a second repair push. Preserve the same observer through it.
 5. **Restore unfinished owned work and resume the same execution.**
    Publish a new repair first; otherwise proceed as soon as focused proof shows
    HEAD is already fixed or analysis proves all failures were infrastructure.
-   If no stash was created, resume directly; otherwise apply the saved OID
-   with `git stash apply --index STASH_OID`, not `pop`, so a conflict retains
-   the recovery copy. Verify staged, unstaged, and untracked work was restored
-   over the repair, then drop only the stash entry whose OID matches, after
-   resolving its current selector. Do not assume `stash@{0}` still identifies
-   it. Resolve straightforward overlaps preserving both changes; if meaning
-   is ambiguous, leave the stash intact and report the conflict. Resume the
-   same agents with the repair commit or no-change finding, affected files, and
-   saved handoff under the pause contract.
+   Then run `node '/ABSOLUTE/RESOLVED/SKILL/scripts/ci-repair-stash.mjs' restore --record RECORD_FILE`.
+   It applies the recorded OID with its index state, not `pop`, verifies the
+   saved paths returned, and drops only that entry by its current selector,
+   never assuming `stash@{0}`. On `resumed`, resume the same agents with the
+   repair commit or no-change finding, affected files, and saved handoff
+   under the pause contract. `conflict` keeps the entry and names its paths,
+   OID, and whether it was `applied`: resolve straightforward overlaps
+   preserving both changes, then drop only that OID's entry by its current
+   selector; if meaning is ambiguous, leave it and report. On `missing`
+   (nothing applied) or `ambiguous`, report the OID and stop.
 
-On an unresolved repair, decision stop, or push failure, keep the saved stash OID
-and recovery note and report the exact state. Restore original work when it can
-be done without mixing or losing unfinished repair edits; otherwise keep agents
-paused with both sets of work preserved. Do not silently resume with missing
-changes or pretend the failure was repaired. Ordinary CI defects, including
-flaky tests, use this recovery flow; only unresolved value/design/credential
-decisions need the developer.
+On an unresolved repair, decision stop, or push failure, keep the stash entry
+and its record file and report the exact state. Restore original work when it
+can be done without mixing or losing unfinished repair edits; otherwise keep
+agents paused with both sets of work preserved. Do not silently resume with
+missing changes or pretend the failure was repaired. Ordinary CI defects,
+including flaky tests, use this recovery flow; only unresolved value, design,
+or credential decisions need the developer.
 ## Pause and resume writers
 When the coordinator requests a CI pause, stop editing and finish or terminate
 write-capable commands. Return `## PAUSED FOR CI` with the current slice,

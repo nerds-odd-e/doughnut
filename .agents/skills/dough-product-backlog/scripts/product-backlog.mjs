@@ -18,7 +18,6 @@ import { refreshEntry } from "./product-backlog-refresh.mjs";
 import { BacklogError } from "./product-backlog-refusal.mjs";
 import {
   options,
-  readExpectedBasis,
   readPlacement,
   readPlan,
   resolvePath,
@@ -30,16 +29,15 @@ import {
   reportDirection,
   reportMerge,
   reportPlace,
-  reportRecordState,
   reportRefresh,
   reportTake,
 } from "./product-backlog-report.mjs";
 import { applyToBacklog } from "./product-backlog-store.mjs";
 import {
-  preparationRefusal,
-  readPreparation,
-  recordPreparation,
-} from "./product-backlog-story-state-home.mjs";
+  readState,
+  recordState,
+} from "./product-backlog-story-state-command.mjs";
+import { preparationRefusal } from "./product-backlog-story-state-home.mjs";
 import { takeEntry } from "./product-backlog-take.mjs";
 import { usage } from "./product-backlog-usage.mjs";
 
@@ -171,28 +169,6 @@ async function merge(file, values) {
   );
 
   console.log(reportMerge(outcome, values.file));
-}
-
-async function recordState(file, values) {
-  const outcome = await recordPreparation(dirname(file), {
-    identity: values.identity,
-    href: values.link,
-    refinement: values.refinement,
-    approach: values.approach,
-    plan: values.plan,
-    assessment: values.assessment,
-    reasons: values.reason,
-    expectedBasis: readExpectedBasis(values),
-  });
-  console.log(reportRecordState(outcome));
-}
-
-async function readState(file, values) {
-  if (values.link === undefined || values.link.trim() === "") {
-    throw new BacklogError(`Missing link: supply --link.`);
-  }
-  const state = readPreparation(dirname(file), values.link);
-  console.log(JSON.stringify(state, null, 2));
 }
 
 const operations = {

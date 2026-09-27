@@ -1,7 +1,6 @@
 // Git operations shared by the installed publication commands. Test fixtures
 // import these mechanics, but production never imports fixture setup.
 import { execFile } from "node:child_process";
-import { isAbsolute, join } from "node:path";
 import { promisify } from "node:util";
 
 export const exec = promisify(execFile);
@@ -36,19 +35,13 @@ export async function pushExactRef(workspace, sha, remote, targetRef) {
   await git(workspace, "push", remote, `${sha}:${targetRef}`);
 }
 
-export async function indexLockPath(checkout) {
-  const printed = (
-    await git(checkout, "rev-parse", "--git-path", "index.lock")
-  ).stdout.trim();
-  return isAbsolute(printed) ? printed : join(checkout, printed);
-}
-
 // The checkout facts maintenance decisions use: HEAD and porcelain status.
 // Full index and patch snapshots stay in test fixtures, which prove
-// preservation independently of this production inspection.
-export async function inspectCheckout(checkout) {
+// preservation independently of this production inspection. A caller that
+// already read HEAD passes it as `head`.
+export async function inspectCheckout(checkout, head) {
   return {
-    head: await revParse(checkout, "HEAD"),
+    head: head ?? (await revParse(checkout, "HEAD")),
     status: (await git(checkout, "status", "--porcelain")).stdout,
   };
 }

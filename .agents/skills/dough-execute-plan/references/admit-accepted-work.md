@@ -2,7 +2,7 @@
 
 When the current instruction accepts a mission for tracked work and no backlog
 list holds it, admit it through the startup command in
-[Take queued work](../SKILL.md#take-queued-work) before its substantive work.
+[Take or admit work](../SKILL.md#take-or-admit-work) before its substantive work.
 Work already queued starts as queued work; work already Taken continues under
 its existing claim.
 
@@ -74,13 +74,17 @@ instruction. Otherwise, when implementation is authorized, attach it to the
 same story: plan it with ordinary slice planning (or record `planless` only
 under explicit planless authority), assess readiness through
 [record-state](../../dough-product-backlog/references/record-preparation.md#assess-readiness-at-preparation-completion),
-and publish that preparation through its ordinary keep. Then run the start
-command without `--admit`. It continues your claim as `status: "existing"`
-with the resolved `plan`, writing no second claim, profile, or story. It
+and publish that preparation through its ordinary keep. Recording the planned
+approach also links your Taken entry to its plan; keep and publish that
+backlog change with the plan and story. Then run the start command without
+`--admit`. It continues your claim as `status: "existing"` with the resolved
+`plan`, writing nothing: no second claim, profile, story, or backlog link. It
 refuses, starting nothing, while the published approach is unselected, the
-published preparation is not ready, the originating checkout holds an
-unpublished edit of the story or plan (the draft your admission published is
-not one), or another agent holds the claim.
+published preparation is not ready, the published Taken entry lacks the plan
+link its preparation declares (record the planned approach again with
+`record-state` and publish it), the originating checkout holds an unpublished
+edit of the story or plan (the draft your admission published is not one), or
+another agent holds the claim.
 
 ## Finish the mission
 

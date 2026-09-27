@@ -135,10 +135,15 @@ export async function announcedAssignment(cwd, sha, only) {
 // - `unconfirmed`: trunk never took the recorded announcement;
 // - `none`: this workspace recorded no announcement for `identity`.
 // `assigned` names a still-held assignment the workspace records for another
-// story than the request names.
-export async function workspaceAssignment(request, ref) {
+// story than the request names. A caller that also needs the workspace's
+// record passes its pending read as `recorded`.
+export async function workspaceAssignment(
+  request,
+  ref,
+  recorded = recordedAllocation(request.workspace),
+) {
   const { workspace, identity } = request;
-  const sha = await recordedAllocation(workspace);
+  const sha = await recorded;
   const own = sha && (await announcedAssignment(workspace, sha));
   if (!own) return { state: "none" };
   const named = own.profile.identity === identity;

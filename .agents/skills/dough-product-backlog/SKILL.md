@@ -106,9 +106,9 @@ leaves the entry queued. Follow
 [execution and resume](references/record-preparation.md#execution-and-resume)
 for readiness; Take and resume neither record nor infer it.
 
-Preserve the title, canonical link, and identity. A planned story requires its
-resolvable slice-plan link, including on resume. Quick stories need no plan;
-plan-homed corrections need no duplicate plan link.
+Preserve the title, canonical link, and identity. A planned story requires a
+resolvable link to its slice plan or a section of it, including on resume.
+Quick stories need no plan; plan-homed corrections need no duplicate plan link.
 
 Move the entry to the end of **Taken** once. On resume, do not duplicate or
 reorder it. Refuse an absent or ambiguous entry instead of fabricating one.

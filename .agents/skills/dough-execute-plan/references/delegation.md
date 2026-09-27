@@ -52,7 +52,12 @@ Give the agent:
   the exact obligation and gap. A passing operational or health check does not
   relieve this requirement.
 - Ownership of the slice's changes. State that other agents may share the
-  execution checkout and their work must be preserved.
+  execution checkout and their work must be preserved. The agent does not
+  stash, pop, reset, clean, check out paths, or switch branches in the shared
+  checkout; when it needs a pre-change baseline, it uses a separate temporary
+  checkout or reports the need back. The coordinator's
+  [CI repair pause](ci-monitor.md#handle-a-notification) is the only
+  sanctioned stash.
 - A stop before coordinator delivery: no commit, push, marking a planned slice
   done, refactor pass, selective formatting, or independent hook-owned lint
   command.

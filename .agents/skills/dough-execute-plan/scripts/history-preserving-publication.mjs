@@ -7,6 +7,10 @@ import { isAbsolute, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { defaultBacklogPath } from "../../dough-product-backlog/scripts/product-backlog-store.mjs";
 import {
+  creditMergeInProgress,
+  DeveloperIdentityRefused,
+} from "./workspace-agent-authorship.mjs";
+import {
   exec,
   git,
   lsRemoteSha,
@@ -85,7 +89,9 @@ async function historyPreservingMerge(workspace, ref) {
     await git(workspace, "merge", "--ff-only", ref);
     return;
   }
-  await git(workspace, "merge", "--no-ff", "--no-edit", ref);
+  await git(workspace, "merge", "--no-ff", "--no-commit", ref);
+  await creditMergeInProgress(workspace);
+  await git(workspace, "commit", "--no-edit");
 }
 
 async function constructCandidate(workspace, trunkRef, publishedTip, file) {
@@ -101,7 +107,16 @@ async function constructCandidate(workspace, trunkRef, publishedTip, file) {
       adapterStatus: merged.status,
     };
   }
-  await historyPreservingMerge(workspace, publishedTip);
+  try {
+    await historyPreservingMerge(workspace, publishedTip);
+  } catch (error) {
+    if (!(error instanceof DeveloperIdentityRefused)) throw error;
+    return {
+      ok: false,
+      reason: "developer-identity-refused",
+      error: error.message,
+    };
+  }
   return {
     ok: true,
     sha: await revParse(workspace, "HEAD"),
@@ -176,7 +191,8 @@ export async function publishHistoryPreservingCandidate({
     if (!prepared.ok) {
       return {
         classification: "preserved",
-        reason: "conflict",
+        reason: prepared.reason ?? "conflict",
+        ...(prepared.error && { error: prepared.error }),
         mergeCount,
         pushCount: 0,
         rejectedPushCount,

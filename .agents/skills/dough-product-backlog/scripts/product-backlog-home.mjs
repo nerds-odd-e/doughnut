@@ -1,7 +1,8 @@
 // Opens and records a work item's identity in the canonical home a backlog
 // link points at. Interpretation of region and recorded identity is shared
 // with other consumers through the pure home reader; this module owns only the
-// filesystem load and the write that places an identity under the heading.
+// filesystem load and the write that places an identity under the heading,
+// and the same load of the plan file an active plan link names.
 //
 // This owns where an identity is written, not which identity a work item has.
 
@@ -13,6 +14,7 @@ import {
   readHome,
 } from "./product-backlog-home-reader.mjs";
 import { splitHref } from "./product-backlog-identity.mjs";
+import { planFileOf } from "./product-backlog-plan.mjs";
 import { BacklogError } from "./product-backlog-refusal.mjs";
 import { joinSource } from "./product-backlog-source.mjs";
 import { readFile, replaceFile } from "./product-backlog-store.mjs";
@@ -32,6 +34,19 @@ export function openHome(backlogDirectory, href) {
     path,
     ...readHome(source, href),
   };
+}
+
+// Where an active plan link has to point: claiming work writes that link and
+// refreshing a reference repoints it, so both check it here. The check is
+// mechanical and existence-only: the plan file the target names must resolve
+// relative to the backlog's own directory. `hint` says what the caller of that
+// particular operation can do about a plan that is not there, because claiming
+// work and repointing an established link differ in that.
+export function requireResolvedPlan(backlogDirectory, target, hint) {
+  readFile(
+    resolve(backlogDirectory, planFileOf(target)),
+    `Unresolved plan: ${target} is not there, relative to the backlog. ${hint}`,
+  );
 }
 
 // Writes the identity into the home. The home is read again here, because one

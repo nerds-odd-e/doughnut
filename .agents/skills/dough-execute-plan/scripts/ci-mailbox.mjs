@@ -1,7 +1,5 @@
 import { spawn } from "node:child_process";
 import { once } from "node:events";
-import { existsSync, watch } from "node:fs";
-import { join } from "node:path";
 import {
   checkoutRoot,
   createMailbox,
@@ -17,10 +15,11 @@ import {
   waitForTerminalResult,
 } from "./ci-mailbox-store.mjs";
 import {
+  listRegisteredRevisions,
   observeRevisionCoverage,
-  readRevisionCoverage,
   registerPushedRevision,
 } from "./ci-mailbox-revision-coverage.mjs";
+import { watchMailboxChanges } from "./ci-mailbox-change-watch.mjs";
 import {
   mailboxWorkerPath,
   withStreamWorkerIdentity,
@@ -65,14 +64,8 @@ export async function runMailboxWorker(
   { observe, onRecord, root = checkoutRoot, storage = mailboxRoot } = {},
 ) {
   const request = readMailbox(directory, root, storage);
-  const abort = new AbortController();
-  const stop = () => {
-    if (existsSync(join(directory, "stop"))) abort.abort();
-  };
-  const subscription = watch(directory, stop);
-  const stopFallback = setInterval(stop, 100);
-  stopFallback.unref();
-  stop();
+  const changes = watchMailboxChanges(directory);
+  const stopped = changes.stopSignal;
   const recordEvent = (event) => {
     const sequence = publishMailboxEvent(directory, event);
     onRecord?.({ sequence, event });
@@ -80,23 +73,23 @@ export async function runMailboxWorker(
   let status;
   try {
     let event;
-    if (!abort.signal.aborted)
+    if (!stopped.aborted)
       event = await (observe ?? watchCiExecution)({
         ...request,
-        signal: abort.signal,
+        signal: stopped,
         emit: recordEvent,
         observeCoverage: (runs, observedAt, discoverAncestorCandidates) =>
           observeRevisionCoverage(directory, runs, request, observedAt, {
             discoverAncestorCandidates,
           }),
-        registeredRevisions: async () =>
-          readRevisionCoverage(directory).map(({ sha }) => sha),
+        registeredRevisions: async () => listRegisteredRevisions(directory),
+        armRegistrationWake: changes.armRegistrationWake,
       });
-    status = abort.signal.aborted ? "stopped" : "finished";
-    if (!abort.signal.aborted && event) recordEvent(event);
+    status = stopped.aborted ? "stopped" : "finished";
+    if (!stopped.aborted && event) recordEvent(event);
   } catch (error) {
-    status = abort.signal.aborted ? "stopped" : "finished";
-    if (!abort.signal.aborted)
+    status = stopped.aborted ? "stopped" : "finished";
+    if (!stopped.aborted)
       recordEvent({
         type: "CI_MONITOR_UNAVAILABLE",
         repo: request.repo,
@@ -104,8 +97,7 @@ export async function runMailboxWorker(
         reason: String(error).slice(0, 600),
       });
   } finally {
-    subscription.close();
-    clearInterval(stopFallback);
+    changes.close();
   }
   recordTerminalResult(directory, request, status);
 }

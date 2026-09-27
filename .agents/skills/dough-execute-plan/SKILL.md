@@ -39,9 +39,9 @@ Identify the execution source before changing project state:
   accepted independent mission; otherwise create no story, plan, or queue entry.
 
 Name missing authority or source context and stop before backlog changes, delegation,
-or implementation. Successful quick execution keeps scope, decisions, progress, and
-proof in its story, when admitted, and the conversation; create no plan, completion
-note, or substitute record. A contextual instruction may leave expectations
+or implementation. Successful quick execution keeps its scope in its story, when
+admitted, and its decisions, progress, and proof in the conversation; create no plan,
+completion note, or substitute record. A contextual instruction may leave expectations
 unresolved. Carry its goal and uncertainty, resolve what a behavior change requires,
 and allow an evidenced no-change conclusion through the explained-empty-change path.
 
@@ -62,18 +62,18 @@ Resolve project context at the first boundary that needs it:
 
 - execution-source kind, slice target, hard limit, and exceptions;
   [replanning permission](references/execution-decisions.md#choose-replanning-permission);
-  integration checkout and branch for a queue claim, using the project's configured integration branch or `main` when none is supplied;
+  integration checkout and branch for a claim, using the project's configured integration branch or `main` when none is supplied;
   execution mode and location: default Story Branch Mode; `--trunk` or a clear
   equivalent selects Trunk Mode; explicit caller selection uses the current
   branch. Resolve contradictions before changing state. Mode never creates
   execution authority; for planned work, plan path and status vocabulary;
 - backlog path and selected entry for work selected from **Backlog list**;
-- selective formatter and commit hook contract before taking queued work and its claim commit;
+- selective formatter and commit hook contract before taking or admitting work and its claim commit;
 - navigation, focused tests, runtime wrapper, and workflow precedence for the selected slice;
 - authorized push destination before delivery; for Story Branch or Trunk Mode, also
   [trunk publication's Preconditions](references/trunk-publication.md#preconditions) before
-  selecting the owned workspace and taking queued work, and before publishing a
-  queue claim, validated increment, or owned repair — those preconditions resolve
+  selecting the owned workspace and taking or admitting work, and before publishing a
+  claim, validated increment, or owned repair — those preconditions resolve
   publication inputs and defer shared-checkout access and preservation to
   [maintain the default checkout](references/maintain-default-checkout.md);
 - generation triggers and commands when affected; and
@@ -92,13 +92,13 @@ before delivery, read [delivery](references/wrap-up.md#deliver-the-change). Befo
 arming observation, read [CI observation](references/ci-monitor.md) and only the
 current host's notification adapter. Arm from the execution checkout against the
 authorized target branch; do not wait for CI. Before creating the execution workspace, read
-[execution location](references/execution-location.md). Before a queue claim,
+[execution location](references/execution-location.md). Before a claim,
 validated increment, or owned repair publication, read
 [trunk publication](references/trunk-publication.md).
 Use [targeted retrieval and disposable research](references/disposable-research.md)
 for omitted/truncated passages or bounded investigations; another step alone needs no reload.
 
-## Take queued work
+## Take or admit work
 
 After resolving execution source and authority, inspect the backlog before
 plan-status changes, observer startup, delegation, or implementation. Resolve
@@ -140,16 +140,17 @@ writes nothing and returns that claim's `publishedSha`. A deferred or stopped
 `maintenance` or an `earlierMaintenance` issue leaves accepted publication
 intact. A refusal or unconfirmed result (`ok: false`, non-zero exit) stops
 before implementation; report and act on its `status`, `error`, and any
-`recovery` or `provenance`. Inspect current Git state only when a reported
-reason needs it; never repeat a mutating command to obtain diagnostics. If
-publication is interrupted, invoke the same installed command with the retained
-workspace, branch, publisher ID, identity, `--starting-revision` and
-`--candidate-sha` from the last result (or its `recovery`) or confirmed pre-push
-candidate. Use the latest candidate SHA after a replay. A `resumed` result
-confirms current ownership through remote ancestry, even when trunk has
-advanced; it may finish eligible local refresh without another Take or push. A
-rival or ambiguous provenance stops implementation. Preserve the stopped
-candidate and exact recovery fields on an uncertain result.
+`recovery` or `provenance`, handling `developer-identity-refused` as under
+[agent commits](references/agent-commits.md). Inspect current Git state only
+when a reported reason needs it; never repeat a mutating command to obtain
+diagnostics. If publication is interrupted, invoke the same installed command
+with the retained workspace, branch, publisher ID, identity,
+`--starting-revision` and `--candidate-sha` from the last result (or its
+`recovery`) or confirmed pre-push candidate. Use the latest candidate SHA after
+a replay. A `resumed` result confirms current ownership through remote ancestry,
+even when trunk has advanced; it may finish eligible local refresh without
+another Take or push. A rival or ambiguous provenance stops implementation.
+Preserve the stopped candidate and exact recovery fields on an uncertain result.
 
 Every accepted start, new or resumed, then requires this project's
 checkout-bound setup and applicable command under [execution

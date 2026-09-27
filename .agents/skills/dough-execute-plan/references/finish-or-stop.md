@@ -91,7 +91,8 @@ Write `retrospective skipped` when this execution skipped the retrospective,
 and `product review skipped` when the review ran with `--skip-product`. Commit
 the record together with the retrospective's records written in the execution
 checkout — a correction story and plan, `DearDough.md` process findings — as one commit
-under this project's commit conventions. The commit changes records only, so
+under this project's commit conventions, made as an [agent commit](agent-commits.md)
+when that reference applies. The commit changes records only, so
 accepted slice proof still applies. Publish it through
 [increment delivery](trunk-publication.md#publish-an-execution-increment-or-repair)
 before the completion operation, so the completion wait covers it; do not start

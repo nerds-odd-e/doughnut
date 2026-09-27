@@ -97,8 +97,11 @@ plan to exist; planless needs no plan file. An assessment takes
 --reason. Ready requires refined plus planned or planless and no reasons.
 The recorder rereads current content digests, refuses a stale expected basis
 without edits, and never grants execution authority. It replaces only the
-selected story's block, serializes cooperating writers per canonical file,
-and changes no backlog queue bytes.
+selected story's block and serializes cooperating writers per canonical file.
+A planned approach for work already in "## ${takenHeading}" also links that
+entry to its plan, keeping its place; an entry linking another plan refuses
+with nothing written. Other entries and other approaches leave the backlog
+unchanged.
 
 read-state prints the shared reader's normalized preparation facts,
 assessment view, and current content basis for the home --link names as

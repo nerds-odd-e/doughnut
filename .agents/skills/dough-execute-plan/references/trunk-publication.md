@@ -1,6 +1,6 @@
 # Publish execution results
 
-Startup uses this rule to publish a queue claim. Slice delivery uses it to
+Startup uses this rule to publish a claim. Slice delivery uses it to
 publish a validated increment or an owned CI repair. Story wrap-up uses the
 same Git steps for each owned closure commit, including before-cleanup and
 final-closure commits. Do not invent a second publication sequence.
@@ -8,15 +8,15 @@ final-closure commits. Do not invent a second publication sequence.
 This rule does not create execution authority or wait for CI. Observation is
 armed from the execution checkout against the authorized target branch.
 
-## Publish a queue claim
+## Publish a claim
 
-For queued Story Branch and Trunk Mode, [Take queued work](../SKILL.md#take-queued-work),
+For Story Branch and Trunk Mode, [Take or admit work](../SKILL.md#take-or-admit-work),
 including [admission](admit-accepted-work.md) of accepted unlisted work, uses the installed startup operation to publish and confirm the claim on remote
 trunk before implementation. Retain the published SHA and recovery
 coordinates from its compact result and register that SHA after the observer
 is armed. Later environment preparation does
 not unpublish that SHA. An unavailable destination or failed publication
-preserves the reported state and does not authorize starting unclaimed queued
+preserves the reported state and does not authorize starting unclaimed
 work. CI coverage for this claim, including a Story Branch claim's unobserved
 trunk target, follows
 [Own one observer](ci-monitor.md#own-one-observer).
@@ -55,7 +55,7 @@ sequence.
 Apply [publish the candidate's preconditions](publish-the-candidate.md#preconditions).
 For this caller the owned suffix is the Taken commit for a claim, or
 consecutive execution commits not yet on the authorized remote target for an
-increment or repair. [Publish a queue claim](#publish-a-queue-claim) names the
+increment or repair. [Publish a claim](#publish-a-claim) names the
 claim target. [Publish an execution increment or repair](#publish-an-execution-increment-or-repair)
 names the increment or repair target. The owned workspace is the execution
 worktree. For a claim, the supplied validation confirms the selected entry is
@@ -169,7 +169,7 @@ setup nor an already accepted push.
 
 ## Recover a rejected push
 
-Before replaying a queue claim, recheck that identity's membership on the
+Before replaying a claim, recheck that identity's membership on the
 fetched remote. Resume when retained execution context and the published
 candidate's provenance agree this execution owns it, and do not push again.
 A competing claim whose provenance names another execution is a recoverable
@@ -189,7 +189,7 @@ domain knowledge applies only when that adapter is unavailable.
 
 ## Resume an interrupted publication
 
-After interruption during a queue claim's publication or an increment or
+After interruption during a claim's publication or an increment or
 repair publication, apply
 [publish the candidate's resume](publish-the-candidate.md#resume-an-interrupted-publication)
 against that publication's authorized remote target.
@@ -220,6 +220,6 @@ allocate a replacement claim or a nested worktree.
 Apply [publish the candidate's preserved state](publish-the-candidate.md#preserve-remaining-state),
 which defers local preservation to
 [maintain the default checkout](maintain-default-checkout.md#preserve-pending-local-work).
-For this caller, that state is not permission to start unclaimed queued work,
+For this caller, that state is not permission to start unclaimed work,
 start implementation from an unpublished claim, or substitute a different
 destination than the one recorded for this publication.

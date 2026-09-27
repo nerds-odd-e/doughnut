@@ -1,23 +1,38 @@
-// What an entry's active plan link says and where it has to point. Claiming
-// work writes that link and refreshing a reference repoints it, so both settle
-// the question here rather than each spelling out what a plan path means.
+// What an entry's active plan link says: which plan file it names, whether it
+// names the same document as another link, and whether it names a document
+// another entry lists as its home.
+// Claiming work, recording preparation, refreshing a reference and the
+// backlog's listing checks all settle those questions here rather than each
+// spelling out what a plan path means. No filesystem or Node-only imports, so
+// the pure backlog document model can share them.
 //
 // This owns no judgment about a plan's content: a link this accepts can still
 // be refused by an operation that needs more of the document than its path.
 
-import { resolve } from "node:path";
-import { readFile } from "./product-backlog-store.mjs";
+import { splitHref } from "./product-backlog-identity.mjs";
 
 // How the established backlog spells an active plan link.
 export const planLabel = "plan";
 
-// The check is mechanical and existence-only: the target must resolve to a
-// file relative to the backlog's own directory. `hint` says what the caller of
-// that particular operation can do about a plan that is not there, because
-// claiming work and repointing an established link differ in that.
-export function requireResolvedPlan(backlogDirectory, target, hint) {
-  readFile(
-    resolve(backlogDirectory, target),
-    `Unresolved plan: ${target} is not there, relative to the backlog. ${hint}`,
-  );
+// The plan file a link names. A `#fragment` is navigation inside that plan,
+// never part of which plan the link is.
+export function planFileOf(target) {
+  return splitHref(target).path;
+}
+
+// Whether two links name the same document, whichever section either points
+// into. The one comparison behind two questions: a recorded plan link already
+// links a declared plan of that document, and a declared plan that is the
+// entry's own canonical home is its own plan, taking no link that would name
+// one document twice.
+export function sameDocument(link, other) {
+  return planFileOf(link) === planFileOf(other);
+}
+
+// Whether a plan link names the document another entry lists as its canonical
+// home. The plan's section is navigation and is ignored; the other home is
+// compared as written, since its anchor names which story in a shared seed it
+// is.
+export function planNamesHome(target, href) {
+  return target !== undefined && planFileOf(target) === href;
 }

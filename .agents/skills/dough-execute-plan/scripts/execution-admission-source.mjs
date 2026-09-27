@@ -8,24 +8,22 @@
 // differently stops with both versions intact for a human decision.
 // Preparation is read as recorded; admission never records readiness or
 // approach of its own.
-import { dirname, posix } from "node:path";
 import {
   parseBacklog,
   queueHeading,
+  requireUnlistedHome,
 } from "../../dough-product-backlog/scripts/product-backlog-document.mjs";
-import { readHome } from "../../dough-product-backlog/scripts/product-backlog-home-reader.mjs";
+import { sameDocument } from "../../dough-product-backlog/scripts/product-backlog-plan.mjs";
 import { BacklogError } from "../../dough-product-backlog/scripts/product-backlog-refusal.mjs";
 import {
   joinSource,
   splitSource,
 } from "../../dough-product-backlog/scripts/product-backlog-source.mjs";
 import { readStoryPurpose } from "../../dough-product-backlog/scripts/product-backlog-story-purpose.mjs";
-import { readStoryState } from "../../dough-product-backlog/scripts/product-backlog-story-state.mjs";
 import {
-  canonicalHomePath,
-  declaredPlanPath,
   mergeBase,
-  selectedRegion,
+  sectionOf,
+  selectedPreparation,
   show,
   worktreeSource,
 } from "./execution-source.mjs";
@@ -78,18 +76,6 @@ const conflict = (path, message) =>
     `${path} ${message}; both versions are preserved`,
     { path },
   );
-
-// The selected story's section, or undefined when `source` has none.
-function sectionOf(source, href) {
-  if (source === null) return undefined;
-  try {
-    const { document, region } = readHome(source, href);
-    return { document, region, text: selectedRegion(source, href) };
-  } catch (error) {
-    if (error instanceof BacklogError) return undefined;
-    throw error;
-  }
-}
 
 // Where the drafted section goes in a trunk seed that lacks it: before the
 // section boundary that follows it in the draft, or at the end together
@@ -154,9 +140,9 @@ function reconcilePlan({ base, trunk, draft, path }) {
 }
 
 // The minimal content an admitted story needs: its own identity, recorded
-// preparation facts and a recorded Goal the dashboard can show.
-function requireAdmissibleStory(source, href, identity, options = {}) {
-  const state = readStoryState(source, href, options);
+// preparation facts and a recorded Goal the dashboard can show. `state` is
+// the preparation read from `source`.
+function requireAdmissibleStory(state, source, href, identity) {
   if (state.identity !== identity)
     throw refused(
       `${state.key} names identity "${state.identity}", not "${identity}"`,
@@ -177,32 +163,41 @@ export async function readAdmissionSource(request, remoteRef, candidateSha) {
   const { integration, identity, link } = request;
   const backlog = await show(integration, remoteRef, backlogPath);
   if (backlog === null) throw refused("fetched trunk has no product backlog");
-  const { entries } = parseBacklog(backlog);
-  const entry = entries.find((item) => item.identity === identity);
+  const document = parseBacklog(backlog);
+  const entry = document.entries.find((item) => item.identity === identity);
   if (entry?.list === queueHeading)
     throw refused(
       "selected identity is already queued on fetched trunk; start it as queued work",
     );
   if (entry) return { existing: entry, planTarget: entry.plan?.target };
-  const listed = entries.find((item) => item.href === link);
-  if (listed)
-    throw refused(
-      `canonical home ${link} is already listed as "${listed.identity}"`,
-    );
-  const homePath = canonicalHomePath(integration, link);
+  // The work is unlisted; its home must be too, as the Take admitting it will
+  // require. Refusing here leaves no workspace behind.
+  try {
+    requireUnlistedHome(document, link);
+  } catch (error) {
+    if (error instanceof BacklogError) throw refused(error.message);
+    throw error;
+  }
+  const selection = selectedPreparation(integration, link);
+  const { homePath } = selection;
   const drafts = await draftsOf(integration, remoteRef, candidateSha);
   const home = await versionsOf(request, remoteRef, drafts, homePath);
   if (home.draft === null)
     throw refused(`selected canonical home ${homePath} is absent`);
-  const drafted = requireAdmissibleStory(home.draft, link, identity);
-  let plan, planPath, planTarget;
+  const drafted = requireAdmissibleStory(
+    selection.read(home.draft),
+    home.draft,
+    link,
+    identity,
+  );
+  const declaredPlan = selection.declaredPlan(drafted.approach);
+  const { planPath, planHref, planTarget, planIsCanonical } = declaredPlan;
+  let plan;
   if (drafted.approach.kind === "planned") {
-    planPath = declaredPlanPath(integration, homePath, drafted.approach.plan);
-    const planHref = posix.relative(dirname(backlogPath), planPath);
-    if (planPath !== homePath) planTarget = planHref;
-    if (request.plan && request.plan !== planHref)
+    // A requested section of the declared plan requests that plan.
+    if (request.plan && !sameDocument(request.plan, planHref))
       throw refused("requested plan disagrees with recorded preparation");
-    if (planPath !== homePath) {
+    if (!planIsCanonical) {
       plan = await versionsOf(request, remoteRef, drafts, planPath);
       if (plan.draft === null)
         throw refused(`declared plan ${planPath} is absent`);
@@ -213,14 +208,10 @@ export async function readAdmissionSource(request, remoteRef, candidateSha) {
   const homeSource = reconcileStory(home, link);
   const planSource = plan && reconcilePlan(plan);
   const preparation = requireAdmissibleStory(
+    selection.read(homeSource, declaredPlan, planSource),
     homeSource,
     link,
     identity,
-    planPath === homePath
-      ? { planIsCanonical: true }
-      : planSource === undefined
-        ? {}
-        : { planSource },
   );
   const files = [
     [home, homeSource],
@@ -233,7 +224,7 @@ export async function readAdmissionSource(request, remoteRef, candidateSha) {
     planPath,
     planTarget,
     preparation,
-    selectedSource: selectedRegion(homeSource, link),
+    selectedSource: sectionOf(homeSource, link).text,
     planSource,
     admission: { title: request.title, href: link, files },
   };

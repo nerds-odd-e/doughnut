@@ -16,6 +16,10 @@
 // human to resolve and then explicitly continue.
 import { existsSync } from "node:fs";
 import {
+  creditMergeInProgress,
+  DeveloperIdentityRefused,
+} from "../../dough-execute-plan/scripts/workspace-agent-authorship.mjs";
+import {
   acceptStaged,
   validateCandidate,
 } from "./product-backlog-git-candidate.mjs";
@@ -62,8 +66,22 @@ function fastForward(repoRoot, file, ref) {
 
 // Commits a merge whose own path is now accepted, unless Git itself still
 // refuses because something unrelated is still unresolved — in which case
-// this gate leaves the merge exactly as it was, for a human to resolve.
-function commitAcceptedMerge(repoRoot, file, subject) {
+// this gate leaves the merge exactly as it was, for a human to resolve. In an
+// agent's owned workspace the merge commit credits the developer like any
+// other agent commit, and an unusable developer leaves it uncommitted.
+async function commitAcceptedMerge(repoRoot, file, subject) {
+  try {
+    await creditMergeInProgress(repoRoot);
+  } catch (error) {
+    if (!(error instanceof DeveloperIdentityRefused)) throw error;
+    return {
+      status: "refused-before-commit",
+      message:
+        `${file}'s ${subject} is accepted, but the merge stays uncommitted ` +
+        `because its developer credit is refused. Fix the Git committer ` +
+        `identity, then run \`continue\` for this same merge.\n${error.message}`,
+    };
+  }
   const committed = gitOutcome(["commit", "--no-edit"], repoRoot);
   if (committed.code !== 0) {
     return {
@@ -83,7 +101,7 @@ function commitAcceptedMerge(repoRoot, file, subject) {
 // else. The merge is never committed by this call alone — only once this
 // path's own result is validated, and only if Git itself has nothing else
 // left unresolved.
-export function mergeOperation({ repoRoot, file, ref }) {
+export async function mergeOperation({ repoRoot, file, ref }) {
   const headSha = gitLine(["rev-parse", "HEAD"], repoRoot);
   const mergeBase = gitLine(["merge-base", headSha, ref], repoRoot);
   if (mergeBase === headSha) {
@@ -124,7 +142,7 @@ export function mergeOperation({ repoRoot, file, ref }) {
 // differ from — and only then commits. An unresolved path, a staged
 // candidate that fails this tool's invariants, or one that does not match
 // the working tree all stay stopped exactly where they were.
-export function continueOperation({ repoRoot, file }) {
+export async function continueOperation({ repoRoot, file }) {
   if (!existsSync(gitPath(repoRoot, "MERGE_HEAD"))) {
     throw new BacklogError(`No merge is in progress in ${repoRoot}.`);
   }

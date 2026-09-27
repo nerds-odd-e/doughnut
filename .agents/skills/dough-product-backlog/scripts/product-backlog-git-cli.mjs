@@ -61,16 +61,16 @@ async function dispatch({
     if (!values.ref) {
       throw new BacklogError(`Supply --ref <ref>.\n\n${usage}`);
     }
-    outcome = primaryOperation({
+    outcome = await primaryOperation({
       repoRoot,
       file: values.file,
       ref: values.ref,
       ...extra,
     });
   } else if (named === "continue") {
-    outcome = continueOperation({ repoRoot, file: values.file });
+    outcome = await continueOperation({ repoRoot, file: values.file });
   } else if (named === "validate" && validateOperation) {
-    outcome = validateOperation({ repoRoot, file: values.file });
+    outcome = await validateOperation({ repoRoot, file: values.file });
   } else {
     throw new BacklogError(
       `Unknown operation: ${positionals.join(" ") || "(none)"}\n\n${usage}`,

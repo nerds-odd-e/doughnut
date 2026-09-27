@@ -183,9 +183,10 @@ artifacts alone do not establish completion of another work item.
 
 Review and commit the owned closure changes using this project's Git conventions,
 preserving unrelated changes. Both the before-cleanup revision and the final
-closure must be committed in either execution mode; uncommitted cleanup is not
-completion. Report unresolved ownership or commit failures without claiming
-closure.
+closure must be committed in either execution mode, as
+[agent commits](../dough-execute-plan/references/agent-commits.md) when that
+reference applies; uncommitted cleanup is not completion. Report unresolved
+ownership or commit failures without claiming closure.
 
 Direct-current-branch mode stays in the recorded checkout and creates no
 worktree. Local-only closure commits there and reports that revision as
@@ -207,8 +208,7 @@ unrelated commits and pending human edit.
 
 When the merge touches the product backlog, use the owned workspace's installed
 merge adapter as that procedure requires. A stopped result stays as Git left it.
-Resolve it through
-[a real conflict](../dough-product-backlog/references/merge-conflicts.md#a-real-conflict-resolve-by-hand-then-continue-through-the-same-adapter).
+Resolve it through [a real conflict](../dough-product-backlog/references/merge-conflicts.md#a-real-conflict-resolve-by-hand-then-continue-through-the-same-adapter).
 If the adapter and that reference are unavailable, report the gap and leave the
 conflict. Stop when no coherent resolution is justified. Selected-work cleanup
 alone does not prove a sibling backlog change survived.

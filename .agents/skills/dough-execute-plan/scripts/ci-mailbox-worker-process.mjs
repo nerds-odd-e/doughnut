@@ -1,5 +1,5 @@
 import { createHash } from "node:crypto";
-import { execFile, execFileSync } from "node:child_process";
+import { execFileSync } from "node:child_process";
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { setTimeout as pause } from "node:timers/promises";
@@ -80,26 +80,6 @@ function commandMatchesMailboxWorker(command, directory, identity) {
   );
 }
 
-async function readProcessCommand(pid) {
-  return new Promise((resolveCommand, rejectCommand) => {
-    execFile(
-      "ps",
-      ["-ww", "-p", String(pid), "-o", "command="],
-      (error, stdout) => {
-        if (!error) {
-          resolveCommand(stdout.trim());
-          return;
-        }
-        if (error.code === 1) {
-          resolveCommand(undefined);
-          return;
-        }
-        rejectCommand(error);
-      },
-    );
-  });
-}
-
 function readProcessCommandSync(pid) {
   try {
     return execFileSync("ps", ["-ww", "-p", String(pid), "-o", "command="], {
@@ -111,13 +91,40 @@ function readProcessCommandSync(pid) {
   }
 }
 
-async function verifyMailboxWorker(identity, directory) {
-  const { pid } = identity;
-  const command = await readProcessCommand(pid);
-  if (command === undefined) return false;
-  if (!commandMatchesMailboxWorker(command, directory, identity))
-    throw new Error(`CI observer worker ${pid} does not match this mailbox`);
-  return true;
+// An exited process is gone whatever its state: `ps` shows it as gone or
+// `<defunct>`, including, on Linux, a node process whose main thread exited
+// while other threads unwind and whose state is not yet a zombie's. macOS
+// shows an exiting process, whose arguments are already gone, by its bare
+// name in parentheses, such as `(node)`, before it becomes a zombie.
+function commandShowsExit(command) {
+  return (
+    command === undefined ||
+    command.endsWith("<defunct>") ||
+    /^\(.+\)$/.test(command)
+  );
+}
+
+// One classification of a live PID's command serves liveness and
+// termination. Any command other than this mailbox's worker is a different
+// process only if it still runs: a worker that exits during the read can show
+// a transient command, such as `[node]`.
+function classifyWorkerCommand(command, identity, directory) {
+  if (commandShowsExit(command)) return "dead";
+  if (commandMatchesMailboxWorker(command, directory, identity)) return "alive";
+  return workerIsRunning(identity.pid) ? "unknown" : "dead";
+}
+
+function verifyMailboxWorker(identity, directory, readCommand) {
+  const state = classifyWorkerCommand(
+    readCommand(identity.pid),
+    identity,
+    directory,
+  );
+  if (state === "unknown")
+    throw new Error(
+      `CI observer worker ${identity.pid} does not match this mailbox`,
+    );
+  return state === "alive";
 }
 
 // Read-only liveness check reusing the same identity rule as termination,
@@ -142,10 +149,7 @@ export function checkMailboxWorkerLiveness(
     if (error.code === "EPERM" || error.code === "EACCES") return "alive";
     throw error;
   }
-  if (command === undefined) return "dead";
-  return commandMatchesMailboxWorker(command, directory, identity)
-    ? "alive"
-    : "unknown";
+  return classifyWorkerCommand(command, identity, directory);
 }
 
 // Read-only: reports an already-recorded loss, or newly detects one from the
@@ -171,15 +175,19 @@ export function mailboxWorkerLoss(directory) {
   return recordLostTerminalResult(directory, workerLossReason);
 }
 
-export async function terminateMailboxWorker(identity, directory) {
+export async function terminateMailboxWorker(
+  identity,
+  directory,
+  { readCommand = readProcessCommandSync } = {},
+) {
   const { pid } = identity;
   if (!(Number.isSafeInteger(pid) && pid > 0))
     throw new Error("CI mailbox contains an invalid worker identity");
   if (!workerIsRunning(pid)) return;
-  if (!(await verifyMailboxWorker(identity, directory))) return;
+  if (!verifyMailboxWorker(identity, directory, readCommand)) return;
   process.kill(pid, "SIGTERM");
   if (await waitForWorkerExit(pid)) return;
-  if (!(await verifyMailboxWorker(identity, directory))) return;
+  if (!verifyMailboxWorker(identity, directory, readCommand)) return;
   process.kill(pid, "SIGKILL");
   if (!(await waitForWorkerExit(pid)))
     throw new Error(`CI observer worker ${pid} did not terminate`);

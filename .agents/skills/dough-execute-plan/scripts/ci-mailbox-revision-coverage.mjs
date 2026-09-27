@@ -47,7 +47,7 @@ export function registerPushedRevision(directory, sha) {
   );
 }
 
-export function readRevisionCoverage(directory) {
+function revisionRecordNames(directory) {
   const coverage = revisionDirectory(directory);
   if (!existsSync(coverage)) return [];
   return readdirSync(coverage)
@@ -56,8 +56,19 @@ export function readRevisionCoverage(directory) {
         name.toLowerCase().endsWith(".json") &&
         isFullGitRevision(name.slice(0, -5)),
     )
-    .sort()
-    .map((name) => JSON.parse(readFileSync(join(coverage, name), "utf8")));
+    .sort();
+}
+
+// Registered SHAs from record names alone, cheap enough to check often.
+export function listRegisteredRevisions(directory) {
+  return revisionRecordNames(directory).map((name) => name.slice(0, -5));
+}
+
+export function readRevisionCoverage(directory) {
+  const coverage = revisionDirectory(directory);
+  return revisionRecordNames(directory).map((name) =>
+    JSON.parse(readFileSync(join(coverage, name), "utf8")),
+  );
 }
 
 function discoveryAdvisoryMarkerPath(directory) {

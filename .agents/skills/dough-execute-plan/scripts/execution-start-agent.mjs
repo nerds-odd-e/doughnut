@@ -9,7 +9,7 @@ import {
   nextAgentName,
 } from "./agent-assignments.mjs";
 import { git, revParse } from "./publication-git.mjs";
-import { commitWorkspaceClaim } from "./workspace-publication-select.mjs";
+import { commitWorkspaceClaim } from "./workspace-publication-claim.mjs";
 import { isAncestor } from "./workspace-publication-ownership.mjs";
 import {
   configureAgentAuthorship,
@@ -67,9 +67,9 @@ export function reselectClaimAgent(claimRequest, chosen, onAgent, admission) {
 }
 
 // A resumed claim keeps the agent its claim commit named. Restores that
-// agent's authorship in the reused workspace and returns its name, or
-// undefined for a claim made without a profile. No new name is chosen and no
-// profile is written.
+// agent's authorship in the reused workspace and returns its name with that
+// workspace's authorship, or undefined for a claim made without a profile. No
+// new name is chosen and no profile is written.
 async function resumeClaimAgent(workspace, claimSha, identity, backlogPath) {
   const profile = await claimProfile(
     workspace,
@@ -79,8 +79,10 @@ async function resumeClaimAgent(workspace, claimSha, identity, backlogPath) {
   );
   if (!profile) return undefined;
   const agent = agentIdentity(profile.name);
-  await configureAgentAuthorship(workspace, agent);
-  return agent.agent;
+  return {
+    agent: agent.agent,
+    workspaceAuthorship: await configureAgentAuthorship(workspace, agent),
+  };
 }
 
 // The receipt's agent for the claim at `claimSha`: the agent this Take chose,
@@ -88,9 +90,10 @@ async function resumeClaimAgent(workspace, claimSha, identity, backlogPath) {
 // ordinary commits as that agent; nothing for a claim made without an agent.
 export async function claimReceiptAgent(claimRequest, chosen, claimSha) {
   const { workspace, identity, backlogPath } = claimRequest;
-  const agent = chosen
-    ? agentIdentity(chosen.name).agent
-    : await resumeClaimAgent(workspace, claimSha, identity, backlogPath);
-  if (!agent) return {};
+  if (!chosen)
+    return (
+      (await resumeClaimAgent(workspace, claimSha, identity, backlogPath)) ?? {}
+    );
+  const agent = agentIdentity(chosen.name).agent;
   return { agent, workspaceAuthorship: await workspaceAuthorship(workspace) };
 }

@@ -12,6 +12,14 @@ this project's installed `dough-story-refinement` skill directory (normally
 under `.agents/skills/` or `.claude/skills/`); each command names every
 checkout it acts on, so run it as written with that path.
 
+The assignment's announcement and end are commits authored by its agent that
+credit the developer configured as Git committer in the checkout committing
+them. `developer-identity-refused` from `start` or `abandon` means that
+committer is missing, malformed, or the agent's own; nothing was published or
+changed. Report its `error`; the developer configures `user.name` and
+`user.email` there before you rerun the same command. Never publish around it
+with another identity.
+
 ## Announce the preparation assignment
 
 Story refinement, slice planning, and plan refinement of an existing queued
@@ -67,7 +75,7 @@ Keep the receipt with this session and act on its `status`:
   no process running for it on this machine, or a missing workspace does not
   free it. Only a developer's confirmation that one exact preparation
   assignment is abandoned releases it, under
-  [Release a lost workspace's assignment](#release-a-lost-workspaces-assignment).
+  [Release a lost workspace's assignment](preparation-lost-workspace.md).
   `not-queued`: the story is not queued on the fetched target.
 
 The workspace remembers which announcement is its own. Later `start`,
@@ -75,7 +83,7 @@ The workspace remembers which announcement is its own. Later `start`,
 the agent name, story, or tool and model alone, so keep every later command
 for this assignment in the same workspace. If that workspace is lost before
 the assignment ends, see
-[Release a lost workspace's assignment](#release-a-lost-workspaces-assignment).
+[Release a lost workspace's assignment](preparation-lost-workspace.md).
 
 An explicit developer instruction not to publish or commit means: do not run
 `start`; report that no Preparing assignment was published, so others cannot
@@ -183,7 +191,7 @@ and commits exactly as they were. The story stays queued. Act on `status`:
   trunk and never ends anything twice.
 - `no-assignment`: this workspace holds no published assignment for the story.
   When the workspace that announced it is gone, use
-  [Release a lost workspace's assignment](#release-a-lost-workspaces-assignment).
+  [Release a lost workspace's assignment](preparation-lost-workspace.md).
 
 Afterwards, the draft stays in the workspace for a later keep or discard
 decision. A keep then lands without an assignment: `release` reports
@@ -191,60 +199,3 @@ decision. A keep then lands without an assignment: `release` reports
 workspace. The workspace may be retired under
 [Close or retain the workspace](preparation-workspace.md#close-or-retain-the-workspace)
 once a disposition for its draft is confirmed.
-
-### Release a lost workspace's assignment
-
-When the workspace that announced a preparation assignment no longer exists,
-nothing can abandon it by workspace. Releasing it is then the developer's
-decision about one exact assignment: its profile path plus its allocation,
-the commit that added that profile. Apply this only when a developer asks to
-release such an assignment and publishing to the recorded target is
-authorized, as for the abandonment above. Only that developer's explicit
-confirmation that this exact assignment is abandoned releases it. Its age,
-its silence, no process running for it, a lost workspace, a full rotation, or
-your own inference is never that confirmation. Without it, report the
-assignment and leave it published.
-
-Read the assignment first. The allocation appears in an `agent-unavailable`
-receipt's `occupied` entry, in the `announced` receipt, or in this command's
-own refusal. Name the project's integration checkout (its established
-checkout for ordinary work, never another preparation workspace) and the
-authorized remote target; when either is unknown, ask rather than guess. Run,
-without confirmation:
-
-```text
-node <installed>/scripts/preparation-assignment.mjs abandon \
-  --integration <integration checkout> --profile <profile path> \
-  --remote <remote> --target <trunk branch> --push-authorized
-```
-
-`<profile path>` is the repository path a receipt reports as `profile`, such
-as `.planning/agents/yui-chan.json`. This publishes nothing and stops with
-`confirmation-required`, reporting the assignment trunk holds: `agent`,
-`identity` (the story), `activity`, and `allocation`. Show those to the
-developer and ask whether that exact assignment is abandoned. Only when they
-confirm it, rerun with `--allocation <allocation> --confirmed-abandoned`
-added, using the allocation from that receipt, never one you assume. Act on
-`status`:
-
-- `abandoned`: remote trunk accepted a commit at `publishedSha` that only
-  removes that profile. The story stays queued, and `refresh` reports the
-  integration checkout as for the announcement; that checkout's files,
-  index, and branch are otherwise untouched.
-- `already-released`: trunk had already ended that allocation (`endedBy`);
-  nothing was published. A `successor` is a later allocation of the same
-  name, possibly for the same story, and stays.
-- `allocation-mismatch`: trunk holds a different allocation at that profile
-  than the one supplied; nothing was published. The receipt reports the
-  current one. It is a different assignment, so it needs its own
-  confirmation.
-- `not-preparation`: the profile records execution, or is not a readable
-  preparation assignment; nothing was published. Only completing its Taken
-  story releases an execution assignment.
-- `unpublished` or `unconfirmed`: as for the abandonment above; rerun the
-  same confirmed command once the remote is reachable.
-- `no-assignment`: trunk holds no assignment at that profile that the
-  supplied allocation could have added; nothing was published.
-
-Any draft the lost workspace held is gone with it; this release decides
-nothing about content. Preparing the story again announces anew.

@@ -105,10 +105,12 @@ node '/ABSOLUTE/RESOLVED/SKILL/scripts/ci-mailbox.mjs' stop '/EXACT/RECORDED/MAI
 
 This signals cancellation, including an outstanding GitHub request or polling
 timer. Its terminal wait is finite and checks authoritative `result.json` when
-the file notification is missed. If no terminal result arrives by that
-lifecycle deadline, the stop command reads the mailbox's recorded worker PID,
-validates that it still runs the exact Node worker command for this mailbox,
-and targets only that process; it revalidates before escalating the signal.
+the file notification is missed; it ends early once the recorded worker no
+longer runs, since only that worker publishes the result. If no terminal result
+arrives by then or by the lifecycle deadline, the stop command reads the
+mailbox's recorded worker PID, validates that it still runs the exact Node
+worker command for this mailbox, and targets only that process; it revalidates
+before escalating the signal.
 The command then returns an explicit lost-coverage terminal result instead of
 hanging or implying success. This is local process shutdown, not waiting for
 CI. The hook drains an already-finished event even if stop was requested. Unread

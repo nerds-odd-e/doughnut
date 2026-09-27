@@ -4,7 +4,7 @@ import { publishJson } from "./ci-mailbox-json-file.mjs";
 import { readRevisionCoverage } from "./ci-mailbox-revision-coverage.mjs";
 
 const eventFilePattern = /^(\d{12})\.json$/;
-const terminalResultDeadlineMs = 5_000;
+const defaultTerminalResultDeadlineMs = 5_000;
 export const terminalResultDeadlineCode = "CI_OBSERVER_TERMINAL_DEADLINE";
 export const terminalResultDeadlineReason =
   "CI observer terminal result was not published before its lifecycle deadline";
@@ -97,8 +97,9 @@ function terminalResult(directory, request, status) {
 }
 
 // Distinct from terminalResultDeadlineReason: this records an unexpected
-// worker death discovered by a liveness check at an ordinary coordinator
-// interaction, not the stop command's own publication deadline.
+// worker death discovered by a liveness check, at an ordinary coordinator
+// interaction or while stop awaits the result, not the stop command's own
+// publication deadline.
 export const workerLossReason =
   "CI observer worker exited without recording a normal terminal result";
 
@@ -122,9 +123,22 @@ export function recordLostTerminalResult(
   return result;
 }
 
+// Tests shorten the deadline through DOUGH_CI_TERMINAL_RESULT_DEADLINE_MS to
+// observe it firing without paying the full wait; nothing else sets it.
+export function terminalResultDeadlineMs() {
+  const configured = Number(process.env.DOUGH_CI_TERMINAL_RESULT_DEADLINE_MS);
+  return Number.isFinite(configured) && configured > 0
+    ? configured
+    : defaultTerminalResultDeadlineMs;
+}
+
+export function terminalResultDeadline() {
+  return AbortSignal.timeout(terminalResultDeadlineMs());
+}
+
 export async function waitForTerminalResult(
   directory,
-  { deadline = AbortSignal.timeout(terminalResultDeadlineMs) } = {},
+  { deadline = terminalResultDeadline() } = {},
 ) {
   const path = join(directory, "result.json");
   if (!existsSync(path))

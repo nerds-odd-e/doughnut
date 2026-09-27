@@ -82,7 +82,7 @@ export function reportMerge(outcome, file) {
   ].join("\n");
 }
 
-export function reportRecordState(outcome) {
+export function reportRecordState(outcome, file) {
   const { identity, key, refinement, approach, assessment } = outcome.state;
   const approachText =
     approach.kind === "planned" ? `planned (${approach.plan})` : approach.kind;
@@ -95,11 +95,15 @@ export function reportRecordState(outcome) {
             : ""
         }.`
       : "";
+  const backlogText =
+    outcome.linked?.result === "linked"
+      ? `Linked its ${takenHeading} entry to the plan ${outcome.target} in ` +
+        `${file}; other stories and entries were not changed.`
+      : `Other stories and the backlog were not changed.`;
   return (
     `${verb} preparation for "${identity}" in ${key}: ` +
     `refinement ${refinement}, approach ${approachText}.` +
-    `${assessmentText} ` +
-    `Other stories and the backlog queue were not changed.`
+    `${assessmentText} ${backlogText}`
   );
 }
 

@@ -71,7 +71,8 @@ Ordinary Open Dough release updates remain available from the recorded source.
    c. Inspect that snapshot's `src/install/open-dough-release.sh`,
       `src/install/open-dough-release-apply.sh`, `install.sh`,
       `src/install/open-dough-install-payload.sh`, the helpers they
-      source (including `src/install/open-dough-register-hooks.sh`,
+      source or run (including `src/install/open-dough-payload-bytes.mjs`,
+      `src/install/open-dough-register-hooks.sh`,
       `src/install/open-dough-register-hooks.mjs`,
       `src/install/open-dough-register-hooks-merge.mjs`, and
       `src/install/open-dough-register-hooks-fragments.mjs` when present), and

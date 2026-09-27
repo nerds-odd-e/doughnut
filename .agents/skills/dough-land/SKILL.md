@@ -53,8 +53,11 @@ Stop before committing, and name the gap, when:
 
 Everything in the worktree is the reviewed change. Stage all tracked,
 untracked, and deleted paths (`git -C <worktree> add -A`) and commit them in
-the worktree with a message describing the reviewed change. When there is
-nothing to commit, create no commit; that is the normal rerun case.
+the worktree with a message describing the reviewed change, as an
+[agent commit](../dough-execute-plan/references/agent-commits.md) when that
+reference applies to the worktree; its refusal stops the landing before
+publication. When there is nothing to commit, create no commit; that is the
+normal rerun case.
 
 The owned unpublished suffix is every commit on the worktree branch that the
 fetched target does not contain. Its previously published base is the last

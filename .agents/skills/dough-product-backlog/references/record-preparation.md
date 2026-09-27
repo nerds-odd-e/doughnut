@@ -42,6 +42,13 @@ start execution, or publish merely because recording finished.
 | Refinement establishes goal, scope, and key examples | `--refinement refined`; keep an existing planned or planless approach, otherwise `--approach unselected` |
 | Slice planning writes the active plan | `--refinement refined` and `--approach planned` with `--plan` relative to the canonical home |
 
+When the work is already in **Taken**, as admitted work is, the planned
+recording also links that entry to its plan in place. Keep that backlog
+change with the plan and story in the same disposition, so they publish
+together. A Taken entry that already links a different plan refuses the
+recording with nothing written; report it, since repointing the link is a
+separate decision. Queued work gains its link when it is taken.
+
 Omit `--assessment` on these writes. A plan that still has a remaining concern
 is recorded as planned, not ready. Readiness assessment is the separate step
 below; do not grant execution authority here.

@@ -12,6 +12,7 @@ import {
   recordedFor,
   recordsIdentityInFull,
 } from "./product-backlog-identity.mjs";
+import { planNamesHome } from "./product-backlog-plan.mjs";
 import { BacklogError, requireField } from "./product-backlog-refusal.mjs";
 import { joinSource, splitSource } from "./product-backlog-source.mjs";
 
@@ -116,9 +117,13 @@ function readSection(lines, section) {
 
 // Whether one entry's plan link names the document another entry lists as its
 // canonical home: a plan attached to a story is part of that story's work, so
-// listing the plan again as a home of its own would list the work twice.
+// listing the plan again as a home of its own would list the work twice. A
+// link into a section of that plan names the same document.
 function planOfOther(entry, other) {
-  return entry.plan?.target === other.href || other.plan?.target === entry.href;
+  return (
+    planNamesHome(entry.plan?.target, other.href) ||
+    planNamesHome(other.plan?.target, entry.href)
+  );
 }
 
 // The backlog lists each work item once, by identity, by canonical home, and
@@ -162,10 +167,8 @@ export function requireUnlistedHome(document, href, carried) {
         `"${listed.identity}".`,
     );
   }
-  const linking = otherEntry(
-    document,
-    carried,
-    (other) => other.plan?.target === href,
+  const linking = otherEntry(document, carried, (other) =>
+    planNamesHome(other.plan?.target, href),
   );
   if (linking) {
     throw ambiguousHome(
@@ -179,10 +182,8 @@ export function requireUnlistedHome(document, href, carried) {
 // The same invariant asked of a plan link an operation is about to write: the
 // plan must not already be listed as another entry's canonical home.
 export function requireUnlistedPlan(document, target, carried) {
-  const listed = otherEntry(
-    document,
-    carried,
-    (other) => other.href === target,
+  const listed = otherEntry(document, carried, (other) =>
+    planNamesHome(target, other.href),
   );
   if (listed) {
     throw ambiguousHome(

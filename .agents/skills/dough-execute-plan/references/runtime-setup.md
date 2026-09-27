@@ -92,8 +92,9 @@ node '/ABSOLUTE/RESOLVED/SKILL/scripts/ci-mailbox.mjs' \
 ```
 
 The optional final budget argument is milliseconds; default is eight hours.
-Requests time out after 20 seconds, normal polls are 30 seconds apart, and three
-consecutive observation errors end coverage. Discovery is bounded to 100 startup
+Requests time out after 20 seconds, and three consecutive observation errors
+end coverage. Registering a pushed revision makes the observer check at once;
+otherwise polls are 30 seconds apart. Discovery is bounded to 100 startup
 runs and 20 per later poll, retaining already seen unfinished runs. Report this
 limit when a busy repository requires coverage beyond those bounds.
 

@@ -21,7 +21,7 @@ sequence below.
 
 Resolve the owned workspace, the authorized remote target, and the owned
 unpublished suffix. The suffix is that workspace's commits not yet on the
-authorized remote target. For a queue claim, that suffix is the Taken commit
+authorized remote target. For a claim, that suffix is the Taken commit
 in the execution workspace. For an increment, it is the caller's consecutive
 unpublished commits in the workspace that already holds them. Its parent is the
 previously published base when this caller has recorded one. Rewrite only that
@@ -31,7 +31,7 @@ publish a branch other than the authorized target.
 
 The owned workspace is where the suffix is reconciled and from where it is
 pushed. A preparation keep uses the preparation workspace. An execution
-increment uses the execution worktree. A queue claim is committed and pushed
+increment uses the execution worktree. A claim is committed and pushed
 from the execution workspace selected before that claim.
 
 A pending human edit on the default checkout does not block publication from
@@ -53,10 +53,16 @@ already-published tip supplies that tip instead of a suffix. In the owned
 workspace, merge it onto the fetched authorized target. Fast-forward when
 that tip already contains the fetched target; otherwise create a merge
 commit so both published histories remain. Do not rebase those published
-commits. When the merge touches the product backlog, run
+commits. When [agent commits](agent-commits.md) apply to that workspace, the
+merge commit is one: for example, run
+`git merge --no-ff --no-commit <published-tip>`, then commit the in-progress
+merge through `agent-commit.mjs`; `-F "$(git rev-parse --git-path MERGE_MSG)"`
+keeps Git's prepared message. When the merge
+touches the product backlog, run
 `product-backlog-git-merge.mjs merge --ref <published-tip> --cwd <owned-workspace>`
 rather than a raw `git merge`, following
-[reconcile product backlog Git operations](../../dough-product-backlog/references/merge-conflicts.md).
+[reconcile product backlog Git operations](../../dough-product-backlog/references/merge-conflicts.md);
+it credits its merge commit the same way.
 Push, confirmation, and the receipt stay the candidate SHA and its target.
 A rejected push recomputes this merge once onto the newly fetched target
 and pushes once. A superseded candidate is not the receipt. Resume treats

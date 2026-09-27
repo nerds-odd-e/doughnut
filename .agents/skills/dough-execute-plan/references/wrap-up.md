@@ -140,24 +140,29 @@ and continue that unfinished obligation only.
    For stale feature-story understanding, record `awaiting story review` and
    identify the selected story in its seed and the affected field. For stale
    correction understanding, record `awaiting correction review` and identify
-   the correction plan and affected field. Stop at the safe delivery boundary
+   the correction story's Goal or Scope in its seed, or the affected plan field;
+   a plan-homed correction's plan holds both. Stop at the safe delivery boundary
    without changing other stories or the correction outcome. This plan update
    alone does not trigger another formatting pass. Record a CI repair result
    with the interrupted slice's existing status. For quick execution, do not
    create or update a plan, completion note, project summary, or substitute
-   execution record; retain learnings and delivery progress in the conversation.
+   execution record; retain learnings, decisions, delivery progress, and proof
+   in the conversation. An admitted story keeps only its scope.
    If source understanding is stale, identify the affected field and, when a
    story is the source, its canonical seed location; stop for human review
    without changing its scope or inventing a story.
 6. Stage only owned files or separable owned changes and inspect the staged diff.
    Stage all content only when all of it is owned. Unrelated unstaged work does
    not block delivery. Resolve unrelated staged content or ambiguous ownership
-   with its owner; never silently unstage, reset, or revert another task's work.
-7. Commit CI-safe work using this project's check-only lint hook on staged
-   components, with no formatting or index mutation. Resolve a different hook
-   contract before committing. Fix mechanical findings; stop for semantic or
-   design judgment. Do not run hook-owned lint independently. If hook repairs
-   invalidate preparation, rerun formatting before restaging and retrying.
+   with its owner; never stash, reset, restage, or revert a sibling writer's
+   work to isolate this commit, or silently unstage it.
+7. Commit CI-safe work, as an [agent commit](agent-commits.md) when that
+   reference applies. The commit runs this project's check-only lint hook on
+   staged components, with no formatting or index mutation. Resolve a different
+   hook contract before committing. Fix mechanical findings; stop for semantic
+   or design judgment. Do not run hook-owned lint independently. If hook
+   repairs invalidate preparation, rerun formatting before restaging and
+   retrying.
 8. Immediately before publishing, resolve the owned unpublished suffix in the
    execution workspace. Publish it through managed
    [increment and repair publication](trunk-publication.md#publish-an-execution-increment-or-repair)

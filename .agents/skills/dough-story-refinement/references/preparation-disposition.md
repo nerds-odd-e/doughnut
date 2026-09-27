@@ -153,7 +153,7 @@ Keep authorizes only landing this session's own retained seed, story, plan,
 bug-triage record, or retrospective record. It does not:
 
 - move a backlog entry to **Taken** or perform any part of
-  [take queued work](../../dough-execute-plan/SKILL.md#take-queued-work);
+  [take or admit work](../../dough-execute-plan/SKILL.md#take-or-admit-work);
 - start implementation of the kept record;
 - start, arm, or register with a CI/execution observer — that remains
   execution's own concern under

@@ -31,6 +31,9 @@ export async function watchCiExecution({
   root = process.cwd(),
   observeCoverage = () => [],
   registeredRevisions = async () => [],
+  // Returns a signal that aborts once a revision is registered after this
+  // call; a pending recheck pause then ends at once.
+  armRegistrationWake = () => undefined,
   adapterTimeoutMs,
 }) {
   if (typeof branch !== "string" || !branch.trim())
@@ -104,9 +107,26 @@ export async function watchCiExecution({
     await emit(unavailable(reason));
   };
 
+  // Only the pause after a completed poll ends early on a registration;
+  // retrying after a poll error keeps its full interval.
+  const pauseUntilNextPoll = async (registration) => {
+    try {
+      await sleep(pollMs, undefined, {
+        signal: registration
+          ? AbortSignal.any([observationSignal, registration])
+          : observationSignal,
+      });
+    } catch (error) {
+      if (observationSignal.aborted || !registration?.aborted) throw error;
+    }
+  };
+
   try {
     while (now() - startedAt < maxDurationMs) {
       if (observationSignal.aborted) return;
+      // Armed before the poll, so a registration landing during it still
+      // brings one more check right after it.
+      const registration = armRegistrationWake();
       let matching;
       try {
         matching = await acquireRuns(observationSignal);
@@ -191,7 +211,7 @@ export async function watchCiExecution({
           ciAttemptKey(incomplete.databaseId, incomplete.attempt),
         );
       }
-      await sleep(pollMs, undefined, { signal: observationSignal });
+      await pauseUntilNextPoll(registration);
     }
     await reportObservationLoss(
       `Execution observation budget expired after ${maxDurationMs} ms.`,
