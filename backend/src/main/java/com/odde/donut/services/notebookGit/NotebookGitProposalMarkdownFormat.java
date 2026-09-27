@@ -58,7 +58,7 @@ public final class NotebookGitProposalMarkdownFormat {
       walk.setRecursive(true);
       while (walk.next()) {
         String path = walk.getPathString();
-        if (!path.endsWith(".md")) {
+        if (PortablePathKind.of(path) != PortablePathKind.MARKDOWN) {
           continue;
         }
         ObjectLoader loader = repository.open(walk.getObjectId(0));

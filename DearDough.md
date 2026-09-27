@@ -217,6 +217,10 @@ Former local code: DD-107.
   - Evidence: coordinator transcript `23a26a0f…jsonl`: `deliver --target-ref story/preview-image-files` refused with "authorized target must be a branch ref: story/preview-image-files"; the retry with `refs/heads/story/preview-image-files` was accepted with `observation.state: attached` (`/tmp/dough-ci-501/watch-rVXFjb`); the coordinator had printed the usage line (`--target-ref REF`) before the first delivery.
   - Observed effect: one refused call; no coverage lost; slice 2 delivery used the full ref first time.
   - Inference: the `refs/heads/` refusal still recurs on 0.3.42; the usage line is what the coordinator read, and it does not say the ref must be fully qualified (only `references/publish-the-candidate.md` does).
+- Execution: SEED-009#story-48 / `f321a7cb23:.planning/slice-plans/019-one-path-classifier/PLAN.md` / 83a98aad70; Timestamp: unknown (2026-09-27, first delivery after slice 1 commit 13:18:42+08:00, before slice 2 commit 13:28:46+08:00); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.42 (VERSION unchanged since 1eb6310816).
+  - Evidence: coordinator summary to the retrospective (no transcript): the first managed delivery failed with "authorized target must be a branch ref: story/one-path-classifier"; the retry with `refs/heads/story/one-path-classifier` succeeded; observer `/tmp/dough-ci-501/watch-9bTJQk`.
+  - Observed effect: one refused call; no coverage lost.
+  - Inference: same argument-shape refusal as the rows for plans 035, 009 and 011, still on 0.3.42.
 
 ## ODF-110 — A readiness replay observed only the plan's named seam, not the rest of the slice's journey
 
@@ -598,8 +602,30 @@ The refactor check requires every changed file to be at most 250 lines, without 
   - Observed effect: two applicability exchanges; no extra split was made. Final noteStore is 245 lines, noteUndo167, requests228, cache45. The unrelated Wikidata workflow was preserved.
   - Inference: clarify how the numeric check composes with approved intermediate states and the skill's requirement that a refactor address an introduced, exposed, or aggravated issue. Unlike ODF-124, the rule was found and acknowledged here.
 
+## DD-139 — The plan probed today's outcome for one key example but stated another's without a probe, and the wrong premise hid an ordering change
+
+Plan 019 recorded a throwaway probe for key example 1 (leftover `.keep` → 409). For example 2 it wrote "each failing first (accepted as a file today)" for `Forces.MD` without a probe. Today's outcome was a 400 from attachment size admission ("must be a Git LFS pointer or empty file"), because size admission runs before tree-shape checks. The implementer found this at the red run and moved the whole-tree path refusals before size admission, a design change the plan had not planned.
+
+### Occurrences
+
+- Execution: SEED-009#story-48 / `f321a7cb23:.planning/slice-plans/019-one-path-classifier/PLAN.md` / 83a98aad70; Timestamp: unknown (2026-09-27, slice 3 work between commits 2f0afdbce8 13:28:46+08:00 and 82fa7aedb7 13:47:23+08:00); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.42.
+  - Evidence: original plan slice 3 Proof and "Starting facts" probe (example 1 only) at f321a7cb23; plan Learnings at 6de22982d5 ("Before slice 3, `Forces.MD` was refused as a non-pointer attachment, not accepted"); `NotebookGitProposalPublisher.publish` in 82fa7aedb7 (refusals moved above `NotebookGitAttachmentSizeAdmission.admit`); coordinator summary (slice took ~15 min).
+  - Observed effect: slice 3 ran ~15 min, over the 10-minute hard limit; the outcome was complete and correct, and the refactor pass then co-located slice 2's marker refusal with it.
+  - Inference: the probe that settled example 1 would have taken seconds for example 2 and would have shown the ordering dependency at planning. Related in kind to DD-130 and DD-137 (untried premise), but here the premise was about today's refusal path. Qualified: coordinator summary only; implementer transcript not available.
+
+## DD-140 — An implementer reported a test as covered by a Gradle test filter that did not select it
+
+The slice 1 implementer reported `--tests 'com.odde.donut.services.notebookGit*'` and `*NotebookGit*` as proof that included the new classifier test. `pnpm backend:test:worktree` accepts only one `--tests` pattern per run, and the case-sensitive `*NotebookGit*` does not match `services.notebookGit.PortablePathKindTest`. The fresh refactor agent noticed and ran the class separately (12 pass).
+
+### Occurrences
+
+- Execution: SEED-009#story-48 / `f321a7cb23:.planning/slice-plans/019-one-path-classifier/PLAN.md` / 83a98aad70; Timestamp: unknown (2026-09-27, before slice 1 commit 13:18:42+08:00); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.42.
+  - Evidence: coordinator summary to the retrospective (no transcript); plan slice 1 "Accepted proof" and Learnings at 6de22982d5 ("`*NotebookGit*` misses `services.notebookGit.PortablePathKindTest`").
+  - Observed effect: one extra focused run by the refactor agent; no untested code was accepted. Later slices named `*PortablePathKindTest` explicitly.
+  - Inference: a proof claim for a named new test needs that test's name or count in the run's result, not a filter believed to cover it. Qualified: the single-pattern limit is Donut tooling, so this may belong in DonutRetrospectiveFindings.md; the unchecked claim is the shared part.
+
 ## Retention
 
-- Highest allocated local number: 138
+- Highest allocated local number: 140
 - Recovery: `33939aa45a17c08f5e6f8076178ce96437fdfbe8:DearDough.md` contains the complete pre-compaction log and earlier recovery references; `b0b385a184e96ecf8b0f6fc5572eaaab69bc8dad` preserves later history.
 - Occurrence history is partial; full observations, effects, inference and historical provenance remain in that snapshot and the upstream catalog.

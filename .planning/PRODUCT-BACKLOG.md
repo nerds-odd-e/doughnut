@@ -10,8 +10,6 @@ and deletable in Web Donut.
 
 ## Taken
 
-- [Server and CLI classify notebook paths the same way](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-48) — SEED-009#story-48 ([plan](slice-plans/019-one-path-classifier/PLAN.md))
-
 ## Backlog list
 
 - [Local publish validates and applies a proposal once](seeds/SEED-050-local-ai-notebook-technical-debt.md#story-1) — SEED-050#story-1

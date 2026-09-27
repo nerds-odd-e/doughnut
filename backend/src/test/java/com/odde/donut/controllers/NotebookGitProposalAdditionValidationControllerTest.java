@@ -10,6 +10,7 @@ import static org.hamcrest.Matchers.hasSize;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.NotebookGitBinding;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
@@ -20,9 +21,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
 /** Publish-boundary examples for diagnosing unsupported local note additions. */
-class NotebookGitProposalAdditionValidationControllerTest extends NotebookGitControllerTestBase {
+class NotebookGitProposalAdditionValidationControllerTest
+    extends NotebookGitWebContentControllerTestBase {
 
   private static final String VALID_CONTENT = "---\ntype: Note\n---\nAuthored content.\n";
+  private static final String CHANGED_CONTENT = "---\ntype: Note\n---\nChanged content.\n";
 
   @Test
   void rejectsTheWholeMixedProposalWhenALaterAddedNoteHasNoType() throws Exception {
@@ -35,8 +38,7 @@ class NotebookGitProposalAdditionValidationControllerTest extends NotebookGitCon
             binding,
             List.of(
                 new NotebookGitProposalFile("Added.md", VALID_CONTENT),
-                new NotebookGitProposalFile(
-                    "Existing.md", "---\ntype: Note\n---\nChanged content.\n"),
+                new NotebookGitProposalFile("Existing.md", CHANGED_CONTENT),
                 new NotebookGitProposalFile(
                     "Missing type.md", "---\ncustom: value\n---\nBody.\n")));
 
@@ -90,6 +92,35 @@ class NotebookGitProposalAdditionValidationControllerTest extends NotebookGitCon
             "duplicate"),
         Arguments.of("bad:name.md", VALID_CONTENT, "not contain"),
         Arguments.of("readme.md", VALID_CONTENT, "reserved"),
-        Arguments.of(" Trimmed .md", VALID_CONTENT, "normalized"));
+        Arguments.of(" Trimmed .md", VALID_CONTENT, "normalized"),
+        Arguments.of("Forces.MD", VALID_CONTENT, "rename"),
+        Arguments.of("Physics/Notes.Md", VALID_CONTENT, "rename"),
+        Arguments.of("README.MD", VALID_CONTENT, "rename"));
+  }
+
+  @Test
+  void anUnchangedAcceptedMiscasedMarkdownFileStaysWhileAnotherNoteChanges() throws Exception {
+    Notebook notebook = createGitBackedNotebook();
+    makeMe.aNote().notebook(notebook).title("Existing").content(VALID_CONTENT).please();
+    storeFolderAttachmentAndSnapshot(notebook, null, "x.MD", new byte[] {1});
+    byte[] acceptedPointer = acceptedBytesAt(notebook, "x.MD");
+    byte[] proposal =
+        proposalBundleBytes(
+            binding(notebook),
+            acceptedHistory(notebook).content().stream()
+                .map(
+                    entry ->
+                        entry.path().equals("Existing.md")
+                            ? new NotebookGitProposalFile("Existing.md", CHANGED_CONTENT)
+                            : new NotebookGitProposalFile(entry.path(), entry.content()))
+                .toList());
+
+    controller.publishNotebookGitProposal(
+        notebook.getId(), binding(notebook).getAcceptedGitObjectId(), proposal);
+
+    assertThat(acceptedBytesAt(notebook, "x.MD"), equalTo(acceptedPointer));
+    assertThat(
+        new String(acceptedBytesAt(notebook, "Existing.md"), StandardCharsets.UTF_8),
+        equalTo(CHANGED_CONTENT));
   }
 }

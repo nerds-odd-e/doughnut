@@ -133,7 +133,9 @@ final class NotebookGitDirectoryTree {
   boolean isEmptyAsideFromKeep(String prefix) {
     NotebookGitDirectoryTree directory = directoryAt(prefix);
     if (directory == null) return false;
-    return directory.entries.keySet().stream().allMatch(".keep"::equals);
+    return directory.entries.keySet().stream()
+        .allMatch(
+            name -> PortablePathKind.of(prefix + name) == PortablePathKind.EMPTY_FOLDER_MARKER);
   }
 
   Map<String, ObjectId> toBlobIds() {

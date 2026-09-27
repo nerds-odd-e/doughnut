@@ -186,6 +186,25 @@ describe('notebook publish — LFS object upload before bundle submission', () =
     expect(pushedObjectIds(pushCalls)).toEqual([OID_B])
   })
 
+  test('uploads only the pointer beside empty root and folder .keep files', async () => {
+    const { pushCalls } = installLfsPushIntercept(realSpawnSync)
+    const { dir, fetchMock } = prepareLfsPublishCheckout(
+      ctx.getWorkDir(),
+      'lfs-keep-files',
+      stubSuccessfulAcceptedHead()
+    )
+    fs.mkdirSync(join(dir, 'notes'))
+    fs.writeFileSync(join(dir, '.keep'), '')
+    fs.writeFileSync(join(dir, 'notes', '.keep'), '')
+    runGit(['add', '.keep', 'notes/.keep'], dir)
+    commitPointerAttachment(realSpawnSync, dir, 'payload.bin', OID_A, 64, 'v1')
+
+    await run(['notebook', 'publish', dir])
+
+    expect(pushedObjectIds(pushCalls)).toEqual([OID_A])
+    expect(postCount(fetchMock)).toBe(1)
+  })
+
   test('publishes a note and an attachment under a non-ASCII folder', async () => {
     const { pushCalls } = installLfsPushIntercept(realSpawnSync)
     const { dir, fetchMock } = prepareLfsPublishCheckout(

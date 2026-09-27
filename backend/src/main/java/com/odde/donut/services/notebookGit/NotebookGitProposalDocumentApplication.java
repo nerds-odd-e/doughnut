@@ -4,7 +4,6 @@ import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.Note;
 import com.odde.donut.factoryServices.EntityPersister;
 import com.odde.donut.services.notebookGit.NotebookGitProposalTreeShape.ChangedDocument;
-import com.odde.donut.services.notebookGit.NotebookGitProposalTreeShape.DocumentRole;
 import com.odde.donut.services.notebookTree.PortableTreeFolderRow;
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -47,11 +46,12 @@ class NotebookGitProposalDocumentApplication {
     List<String> conceptPaths = new ArrayList<>();
     List<String> emptyFolderMarkerPaths = new ArrayList<>();
     for (ChangedDocument document : documents) {
-      if (NotebookGitProposalTreeShape.isEmptyFolderMarker(document.path())) {
+      if (PortablePathKind.of(document.path()) == PortablePathKind.EMPTY_FOLDER_MARKER) {
         emptyFolderMarkerPaths.add(document.path());
-      } else if (document.role() == DocumentRole.CONCEPT) {
+      } else if (!document.isReadme()) {
         conceptPaths.add(document.path());
-      } else if ("README.md".equals(document.path())) {
+      } else if (PortablePathKind.markdownRole(document.path())
+          == PortablePathKind.MarkdownRole.NOTEBOOK_README) {
         notebookReadmePath = document.path();
       } else {
         folderReadmePaths.add(document.path());

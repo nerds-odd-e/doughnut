@@ -93,6 +93,11 @@ public class NotebookGitProposalPublisher {
     }
     NotebookGitProposalAncestry.assertFollowsAcceptedHead(
         proposal.repository(), proposal.mainHead(), acceptedHead);
+    List<NotebookGitProposalTreeShape.InspectedRegularFile> files =
+        NotebookGitProposalTreeShape.inspectRegularFiles(
+            proposal.repository(), acceptedHead, proposal.mainHead());
+    NotebookGitProposalTreeShape.refuseMiscasedMarkdown(files);
+    NotebookGitProposalTreeShape.refuseLeftoverFolderMarkers(files);
     try (var accepted = repositoryStore.open(binding)) {
       NotebookGitAttachmentSizeAdmission.admit(
           proposal.repository(),
@@ -102,10 +107,6 @@ public class NotebookGitProposalPublisher {
           notebook.getId(),
           notebookAttachmentContent);
     }
-
-    List<NotebookGitProposalTreeShape.InspectedRegularFile> files =
-        NotebookGitProposalTreeShape.inspectRegularFiles(
-            proposal.repository(), acceptedHead, proposal.mainHead());
     bookSourceFileProtection.refuseChanging(notebook.getId(), files);
     List<NotebookGitProposalTreeShape.ChangedDocument> documents =
         NotebookGitProposalTreeShape.classifyChangedDocuments(files);
@@ -113,8 +114,7 @@ public class NotebookGitProposalPublisher {
     boolean emptyAcceptedNotebook = isEmptyAcceptedNotebook(folders, storedNotes, files);
     if (emptyAcceptedNotebook
         && documents.stream()
-            .noneMatch(
-                document -> NotebookGitProposalTreeShape.carriesPortableContent(document.path()))) {
+            .noneMatch(document -> PortablePathKind.of(document.path()).carriesPortableContent())) {
       throw new ResponseStatusException(
           HttpStatus.BAD_REQUEST, "Initial publication requires nonempty Portable content.");
     }

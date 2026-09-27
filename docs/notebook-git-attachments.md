@@ -82,8 +82,10 @@ export and reset without per-consumer handling. Within a directory the canonical
 order is README, then notes, then attachments by filename, then subdirectories;
 the Git side re-sorts by path.
 
-A root `.keep` is an ordinary attachment. The empty-folder marker is a `.keep`
-inside a folder, which keeps its structural role.
+A root `.keep` is an ordinary attachment. The empty-folder marker is an empty
+`.keep` alone inside a folder, which keeps its structural role. A publish whose
+tree holds a `.keep` below the root beside other entries of its folder, or with
+content, is refused with a message naming that `.keep` and asking to delete it.
 
 Web Donut shows every attachment row to whoever can read the notebook,
 including Bazaar readers. The sidebar lists files at their folder or the root,
@@ -200,6 +202,11 @@ reclassifying files or maintaining another inventory. All Markdown, including
 behavior. Purpose, IDE name, folder location, and whether the file is new do not
 create an alternative Markdown admission path. Existing reserved-name and
 container `README.md` rules remain unchanged; unknown valid types remain valid.
+Markdown is exactly the lowercase `.md` extension. A publish that adds or
+changes a path ending in `.md` in another letter case (`.MD`, `.Md`) is refused
+with a message naming the path and asking to rename it to `.md`, so no new
+attachment arrives with such a name. An unchanged accepted file is not judged
+and stays an attachment.
 
 At local publication, every Markdown file must satisfy the existing format:
 valid UTF-8 and YAML frontmatter with a nonblank type, plus the applicable

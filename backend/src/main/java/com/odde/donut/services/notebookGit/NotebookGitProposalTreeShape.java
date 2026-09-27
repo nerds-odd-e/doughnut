@@ -12,19 +12,19 @@ import org.springframework.web.server.ResponseStatusException;
 
 /**
  * Walks the raw two-tree diff between a proposal's accepted-parent commit and its proposed commit.
- * Changed documents are classified once by operation and container/concept role; unchanged accepted
- * files remain context. Folder Readmes can accompany note edits. Ordinary-note admission permits
- * added and/or modified ordinary Markdown notes at regular file modes, any number of ordinary-note
- * deletions alone or with same-path edits, and unambiguous equal-content moves with compatible
- * companions. Exact move correspondence and confirmed deletion-gap recreation (DELETED+ADDED,
- * including identical tip bytes) are settled by {@link NotebookGitProposalNoteCorrespondence}.
- * Within one adjacent transition, residual removals mixed with additions are refused when identity
- * correspondence is uncertain. Net tip deletions may compose with later additions once each
- * adjacent step is admissible. A non-Markdown file at any depth is an Attachment rather than a
- * note, and acceptance projects the tip's whole Attachment set. Unsafe paths, non-regular modes, or
- * a changed folder-reserved {@code README.md} are refused. Structural {@code .keep} changes are not
- * note changes. Callers only invoke this once proposal ancestry is confirmed to be a contiguous
- * single-parent range from the accepted commit.
+ * Changed documents are classified once by operation, and their Readme role comes from {@link
+ * PortablePathKind}; unchanged accepted files remain context. Folder Readmes can accompany note
+ * edits. Ordinary-note admission permits added and/or modified ordinary Markdown notes at regular
+ * file modes, any number of ordinary-note deletions alone or with same-path edits, and unambiguous
+ * equal-content moves with compatible companions. Exact move correspondence and confirmed
+ * deletion-gap recreation (DELETED+ADDED, including identical tip bytes) are settled by {@link
+ * NotebookGitProposalNoteCorrespondence}. Within one adjacent transition, residual removals mixed
+ * with additions are refused when identity correspondence is uncertain. Net tip deletions may
+ * compose with later additions once each adjacent step is admissible. A non-Markdown file at any
+ * depth is an Attachment rather than a note, and acceptance projects the tip's whole Attachment
+ * set. Unsafe paths, non-regular modes, or a changed folder-reserved {@code README.md} are refused.
+ * Structural {@code .keep} changes are not note changes. Callers only invoke this once proposal
+ * ancestry is confirmed to be a contiguous single-parent range from the accepted commit.
  */
 public final class NotebookGitProposalTreeShape {
 
@@ -70,14 +70,16 @@ public final class NotebookGitProposalTreeShape {
     List<ChangedDocument> conceptDocuments = new ArrayList<>();
     List<ChangedDocument> addedEmptyFolderMarkers = new ArrayList<>();
     for (ChangedDocument document : documents) {
-      if (document.role() == DocumentRole.CONTAINER) {
+      PortablePathKind pathKind = PortablePathKind.of(document.path());
+      if (document.isReadme()) {
         if (document.kind() != ChangeKind.ADDED && document.kind() != ChangeKind.MODIFIED) {
           throw reservedFolderReadme(document.path());
         }
         containerDocuments.add(document);
-      } else if (NotebookGitAttributes.isMetadataPath(document.path())) {
+      } else if (pathKind == PortablePathKind.METADATA) {
         // Reserved Git metadata stays in the tip; it is never a note or attachment projection.
-      } else if (isEmptyFolderMarker(document.path()) && document.kind() == ChangeKind.ADDED) {
+      } else if (pathKind == PortablePathKind.EMPTY_FOLDER_MARKER
+          && document.kind() == ChangeKind.ADDED) {
         // An added .keep marks a new empty Folder; it carries no note identity, so it bypasses
         // note correspondence entirely rather than being dropped like other .keep changes.
         addedEmptyFolderMarkers.add(document);
@@ -117,9 +119,7 @@ public final class NotebookGitProposalTreeShape {
       }
       documentsToApply.add(
           new ChangedDocument(
-              new InspectedRegularFile(change.path(), null, change.blobId()),
-              ChangeKind.ADDED,
-              DocumentRole.CONCEPT));
+              new InspectedRegularFile(change.path(), null, change.blobId()), ChangeKind.ADDED));
     }
     return new AdmittedShape(noteChanges, documentsToApply);
   }
@@ -138,34 +138,46 @@ public final class NotebookGitProposalTreeShape {
         repository, acceptedHead, proposedHead);
   }
 
-  /** {@code .keep} marks an empty Folder; it carries no note or README identity. */
-  static boolean isEmptyFolderMarker(String path) {
-    return path.endsWith("/.keep");
+  /** The whole proposed tree, not just its changes: accepted trees never hold a leftover marker. */
+  static void refuseLeftoverFolderMarkers(List<InspectedRegularFile> files) {
+    List<InspectedRegularFile> proposed =
+        files.stream().filter(file -> file.proposedBlobId() != null).toList();
+    List<String> proposedPaths = proposed.stream().map(InspectedRegularFile::path).toList();
+    for (InspectedRegularFile file : proposed) {
+      if (PortablePathKind.isLeftoverFolderMarker(
+          file.path(), file.proposedBlobId(), proposedPaths)) {
+        throw new ResponseStatusException(
+            HttpStatus.BAD_REQUEST,
+            "\""
+                + file.path()
+                + "\" no longer marks an empty folder; delete it, then publish again.");
+      }
+    }
   }
 
-  /** A non-Markdown, non-structural, non-metadata Portable-tree entry is an Attachment. */
-  static boolean isAttachment(String path) {
-    return !path.endsWith(".md")
-        && !isEmptyFolderMarker(path)
-        && !NotebookGitAttributes.isMetadataPath(path);
-  }
-
-  /**
-   * True when a path carries non-structural Portable content: a Markdown note, README or Attachment
-   * at any depth. Structural {@code .keep} markers and reserved Git metadata do not.
-   */
-  static boolean carriesPortableContent(String path) {
-    return path.endsWith(".md") || isAttachment(path);
+  /** Only added or changed paths: an unchanged accepted file is not judged. */
+  static void refuseMiscasedMarkdown(List<InspectedRegularFile> files) {
+    for (InspectedRegularFile file : files) {
+      if (file.proposedBlobId() != null
+          && !file.proposedBlobId().equals(file.acceptedBlobId())
+          && PortablePathKind.hasMiscasedMarkdownExtension(file.path())) {
+        throw new ResponseStatusException(
+            HttpStatus.BAD_REQUEST,
+            "\""
+                + file.path()
+                + "\" is not Markdown; rename it to end in \".md\", then publish again.");
+      }
+    }
   }
 
   static List<NoteChange> noteChangesFrom(List<ChangedDocument> documents) {
     List<NoteChange> changes = new ArrayList<>();
     for (ChangedDocument document : documents) {
       // Only Markdown paths carry note identity; attachments, markers, and Git metadata do not.
-      if (!document.path().endsWith(".md")) {
+      if (PortablePathKind.of(document.path()) != PortablePathKind.MARKDOWN) {
         continue;
       }
-      if (document.role() == DocumentRole.CONTAINER) {
+      if (document.isReadme()) {
         throw reservedFolderReadme(document.path());
       }
       changes.add(new NoteChange(document.path(), document.kind(), document.blobId(), null));
@@ -189,12 +201,16 @@ public final class NotebookGitProposalTreeShape {
   record InspectedRegularFile(String path, ObjectId acceptedBlobId, ObjectId proposedBlobId) {}
 
   /**
-   * One changed document from the inspected diff, with Git operation and container/concept role.
-   * Unchanged accepted files are not represented here.
+   * One changed document from the inspected diff, with its Git operation. Unchanged accepted files
+   * are not represented here.
    */
-  record ChangedDocument(InspectedRegularFile file, ChangeKind kind, DocumentRole role) {
+  record ChangedDocument(InspectedRegularFile file, ChangeKind kind) {
     String path() {
       return file.path();
+    }
+
+    boolean isReadme() {
+      return PortablePathKind.markdownRole(path()) != PortablePathKind.MarkdownRole.NOTE;
     }
 
     ObjectId blobId() {
@@ -231,10 +247,5 @@ public final class NotebookGitProposalTreeShape {
     MODIFIED,
     DELETED,
     RENAMED
-  }
-
-  enum DocumentRole {
-    CONTAINER,
-    CONCEPT
   }
 }

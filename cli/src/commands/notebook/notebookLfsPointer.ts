@@ -1,6 +1,6 @@
 /**
- * Standard Git LFS v1 pointer classification for local publish selection.
- * Matches the server's NotebookGitLfsPointer contract for empty files and canonical pointers.
+ * Standard Git LFS v1 pointer parsing for local publish selection.
+ * Matches the server's NotebookGitLfsPointer contract for canonical pointers.
  */
 
 const MAX_POINTER_BYTES = 1024
@@ -9,12 +9,8 @@ const POINTER =
 
 type ParsedLfsPointer = { sha256Hex: string; size: number }
 
-export function isEmptyLfsFile(bytes: Buffer): boolean {
-  return bytes.length === 0
-}
-
 export function parseLfsPointer(bytes: Buffer): ParsedLfsPointer | undefined {
-  if (bytes.length === 0 || bytes.length >= MAX_POINTER_BYTES) {
+  if (bytes.length >= MAX_POINTER_BYTES) {
     return undefined
   }
   for (const b of bytes) {

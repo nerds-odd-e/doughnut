@@ -48,7 +48,7 @@ final class NotebookGitProposalRelocatedDocuments {
     List<Note> proposedNotes = new ArrayList<>(published.storedNotes());
     List<NotebookGitProposalTreeShape.ChangedDocument> containers = new ArrayList<>();
     for (NotebookGitProposalTreeShape.ChangedDocument document : documents) {
-      if (document.role() == NotebookGitProposalTreeShape.DocumentRole.CONTAINER) {
+      if (document.isReadme()) {
         containers.add(document);
         continue;
       }

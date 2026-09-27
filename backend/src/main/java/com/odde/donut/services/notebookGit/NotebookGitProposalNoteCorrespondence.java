@@ -4,7 +4,6 @@ import static com.odde.donut.services.notebookGit.NotebookGitProposalTreeInspect
 import static com.odde.donut.services.notebookGit.NotebookGitProposalTreeInspection.inspectRegularFiles;
 import static com.odde.donut.services.notebookGit.NotebookGitProposalTreeShape.ChangeKind;
 import static com.odde.donut.services.notebookGit.NotebookGitProposalTreeShape.ChangedDocument;
-import static com.odde.donut.services.notebookGit.NotebookGitProposalTreeShape.DocumentRole;
 import static com.odde.donut.services.notebookGit.NotebookGitProposalTreeShape.NoteChange;
 import static com.odde.donut.services.notebookGit.NotebookGitProposalTreeShape.NoteOrigin;
 import static com.odde.donut.services.notebookGit.NotebookGitProposalTreeShape.unsupportedTreeShape;
@@ -122,7 +121,8 @@ final class NotebookGitProposalNoteCorrespondence {
       Map<String, NoteOrigin> origins = new HashMap<>();
       while (walk.next()) {
         String path = walk.getPathString();
-        if (!path.endsWith(".md") || "README.md".equals(basename(path))) {
+        if (PortablePathKind.of(path) != PortablePathKind.MARKDOWN
+            || PortablePathKind.markdownRole(path) != PortablePathKind.MarkdownRole.NOTE) {
           continue;
         }
         if (!FileMode.REGULAR_FILE.equals(walk.getFileMode(0))) {
@@ -144,7 +144,7 @@ final class NotebookGitProposalNoteCorrespondence {
     List<ChangedDocument> conceptDocuments = new ArrayList<>();
     for (ChangedDocument document :
         classifyChangedDocuments(inspectRegularFiles(repository, parentHead, childHead))) {
-      if (document.role() == DocumentRole.CONCEPT) {
+      if (!document.isReadme()) {
         conceptDocuments.add(document);
       }
     }
@@ -212,10 +212,5 @@ final class NotebookGitProposalNoteCorrespondence {
       }
     }
     return resolved;
-  }
-
-  private static String basename(String path) {
-    int lastSlash = path.lastIndexOf('/');
-    return lastSlash < 0 ? path : path.substring(lastSlash + 1);
   }
 }
