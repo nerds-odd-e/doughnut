@@ -1,13 +1,26 @@
 import { notePropertyKeyFromRoute } from "@/routes/noteShowLocation"
 import {
   computed,
+  inject,
   nextTick,
+  provide,
   toValue,
   watch,
   type ComponentPublicInstance,
+  type InjectionKey,
   type MaybeRefOrGetter,
 } from "vue"
 import { useRoute } from "vue-router"
+
+const focusedPropertyKeyKey: InjectionKey<
+  MaybeRefOrGetter<string | undefined>
+> = Symbol("focusedPropertyKey")
+
+export function provideFocusedPropertyKey(
+  propertyKey: MaybeRefOrGetter<string | undefined>
+) {
+  provide(focusedPropertyKeyKey, propertyKey)
+}
 
 function scrollPropertyRowIntoView(element: HTMLElement) {
   element.scrollIntoView({
@@ -20,8 +33,13 @@ export function useFocusedNoteProperty(
   propertyKeys?: MaybeRefOrGetter<readonly string[]>
 ) {
   const route = useRoute()
+  const providedPropertyKey = inject(focusedPropertyKeyKey, undefined)
   const propertyRowElements = new Map<string, HTMLElement>()
-  const focusedPropertyKey = computed(() => notePropertyKeyFromRoute(route))
+  const focusedPropertyKey = computed(() =>
+    providedPropertyKey === undefined
+      ? notePropertyKeyFromRoute(route)
+      : toValue(providedPropertyKey)
+  )
   const unresolvedPropertyKey = computed(() => {
     if (propertyKeys === undefined) {
       return

@@ -9,9 +9,7 @@
         class="flex-1 min-h-0"
         v-bind="{
           noteId: resolvedNoteId,
-          expandChildren: true,
           isMinimized: isContentMinimized,
-          ownsShortcuts: true,
         }"
       >
         <template #note-conversation="{ noteRealm: conversationRealm }">

@@ -1,7 +1,10 @@
 <template>
   <ContentLoader v-if="!memoryTracker" />
   <main v-else>
-    <NoteContextReader :note-id="memoryTracker.note.id" />
+    <NoteContextReader
+      :note-id="memoryTracker.note.id"
+      :focused-property-key="memoryTracker.propertyKey"
+    />
   </main>
 </template>
 

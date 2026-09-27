@@ -101,7 +101,6 @@ import { currentRouteSettingConversation } from "@/routes/noteShowLocation"
 import NoteCreationNewButton from "../NoteCreationNewButton.vue"
 import { useNotebookSidebarOpened } from "@/composables/notebookSidebarOpened"
 import { useKeyboardShortcut } from "@/composables/useKeyboardShortcut"
-import { useNoteShortcutScope } from "@/composables/noteShortcutScope"
 import {
   noteMoreOptionsTitles,
   noteToolbarEditTitle,
@@ -158,7 +157,6 @@ const editTitle = computed(() => noteToolbarEditTitle(props.asMarkdown))
 
 const router = useRouter()
 const route = useRoute()
-const shortcutScope = useNoteShortcutScope()
 
 function startNoteConversation() {
   return router.replace(currentRouteSettingConversation(route, true))
@@ -171,13 +169,13 @@ const emit = defineEmits<{
 useKeyboardShortcut(
   "note-toggle-edit-mode",
   () => emit("edit-as-markdown", !props.asMarkdown),
-  () => !props.readonly && shortcutScope.value
+  () => !props.readonly
 )
 
 useKeyboardShortcut(
   "wiki-link-or-relationship",
   () => wikiLinkOrRelationshipPopButtonRef.value?.openDialog(),
-  () => !props.readonly && shortcutScope.value
+  () => !props.readonly
 )
 
 watch(

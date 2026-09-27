@@ -39,12 +39,11 @@ import type { NoteTopology } from "@generated/donut-backend-api"
 import Cards from "./Cards.vue"
 import { ChevronsUpDown } from "@lucide/vue"
 
-const props = defineProps({
+defineProps({
   noteTopologies: { type: Array as PropType<NoteTopology[]>, required: true },
-  expandChildren: { type: Boolean, required: true },
 })
 
-const internalExpandChildren = ref(props.expandChildren)
+const internalExpandChildren = ref(true)
 
 const collapse = () => {
   internalExpandChildren.value = false

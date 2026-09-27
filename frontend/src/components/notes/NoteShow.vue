@@ -19,7 +19,6 @@
             />
             <div
               class="note-content-wrapper flex-1 min-h-0 overflow-auto flex flex-col gap-4"
-              :class="{ minimized: isMinimized }"
             >
               <div id="main-note-content" class="flex flex-col w-full">
                 <NoteTextContent
@@ -51,7 +50,6 @@
                   </p>
                 </NoteRecentUpdateIndicator>
                 <NoteReferences
-                  :expand-children="expandChildren"
                   :note-topologies="noteRealm.references ?? []"
                 />
               </div>
@@ -88,18 +86,14 @@ import NoteRecentUpdateIndicator from "./NoteRecentUpdateIndicator.vue"
 import NoteUnresolvedWikiLinkModal from "./NoteUnresolvedWikiLinkModal.vue"
 import type { DeadWikiLinkPayload } from "@/utils/wikiLinkMarkup"
 import { isNoteRealmInTrash } from "@/utils/folderTrash"
-import { provideNoteShortcutScope } from "@/composables/noteShortcutScope"
 import { provideMemoryTrackerActions } from "@/composables/useMemoryTrackerActions"
 import { isReservedReadmeNoteTitle } from "@/utils/reservedReadmeTitles"
 
 const props = defineProps({
   noteId: { type: Number, required: true },
-  expandChildren: { type: Boolean, required: true },
   isMinimized: { type: Boolean, default: false },
-  ownsShortcuts: { type: Boolean, default: false },
 })
 
-provideNoteShortcutScope(() => props.ownsShortcuts)
 provideMemoryTrackerActions(toRef(() => props.noteId))
 
 const currentUser = inject<Ref<User | undefined>>("currentUser")
@@ -143,10 +137,5 @@ const toLocalDateString = (date: string | undefined) =>
   overflow: auto;
   display: flex;
   gap: 1rem;
-}
-
-.note-content-wrapper.minimized {
-  height: 3rem;
-  overflow: hidden;
 }
 </style>

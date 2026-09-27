@@ -1,6 +1,6 @@
 import { SearchController } from "@generated/donut-backend-api/sdk.gen"
 import makeMe from "donut-test-fixtures/makeMe"
-import helper, { mockSdkService } from "@tests/helpers"
+import { mockSdkService } from "@tests/helpers"
 import { notebookSidebarClosedPlugin } from "@tests/helpers/notebookSidebarTestProvide"
 import {
   installMockResizeObserver,
@@ -10,8 +10,6 @@ import {
   mountNoteToolbar,
   resetNoteToolbarTestState,
 } from "@tests/notes/noteToolbarTestHelpers"
-import { wrapWithNoteShortcutScope } from "@tests/helpers/noteShortcutScopeTestHelpers"
-import NoteToolbar from "@/components/notes/core/NoteToolbar.vue"
 import { noteToolbarEditTitles } from "@/components/notes/widgets/noteMoreOptionsTitles"
 import { screen } from "@testing-library/vue"
 import { describe, it, expect, afterEach, beforeEach, vi } from "vitest"
@@ -152,31 +150,6 @@ describe("NoteToolbar", () => {
     wrapper = await mountNoteToolbar(noteRealm, {
       propsOverrides: { readonly: true },
     })
-
-    dispatchToggleEditModeShortcut()
-    await flushPromises()
-
-    expect(wrapper.emitted("edit-as-markdown")).toBeUndefined()
-  })
-
-  it("does not emit edit-as-markdown when m is pressed outside an active note shortcut scope", async () => {
-    const noteRealm = makeMe.aNoteRealm.title("Dummy Title").please()
-
-    const Harness = wrapWithNoteShortcutScope(
-      NoteToolbar,
-      {
-        note: noteRealm.note,
-        notebookId: noteRealm.notebookRealm.notebook.id,
-        activeNoteRealm: noteRealm,
-      },
-      false
-    )
-    wrapper = helper
-      .component(Harness)
-      .withCleanStorage()
-      .withRouter()
-      .mount({ attachTo: document.body })
-    await flushPromises()
 
     dispatchToggleEditModeShortcut()
     await flushPromises()

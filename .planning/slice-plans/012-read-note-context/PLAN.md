@@ -235,12 +235,19 @@ the existing tracker fetch and grade timing/semantics.
 ### 10. Focus a tracked property and leave NoteShow page-only
 
 Type: Behavior
-Status: planned
+Status: done
 Proof: a property tracker in mounted Just review visibly identifies the
 authored property while the rest of the note remains present; **Open full
 note** resolves to `noteProperty`. Existing note-page and on-page conversation
 tests pass; a production-call-site search finds only `NoteShowPage` mounting
 `NoteShow`; diff inspection finds no main-menu or sidebar change.
+Accepted: `NoteContextReader` provides the tracker's property key through
+`useFocusedNoteProperty` (overrides route focus) and links to
+`notePropertyLocation`; `RecallPage.justReview.spec.ts` property-tracker test.
+Removed embed-only `expandChildren`, `ownsShortcuts` and the note shortcut
+scope. Only `NoteShowPage` mounts `NoteShow`; no menu/sidebar change.
+Acceptance: full `pnpm frontend:test` (1930 tests) and vue-tsc pass; E2E
+spelling, message-for-note, spaced-repetition, conversation-about-a-note pass.
 
 Behavior: a learner reviews a property tracker → its focused property is
 identifiable in the complete read-only note → opening the full note lands on

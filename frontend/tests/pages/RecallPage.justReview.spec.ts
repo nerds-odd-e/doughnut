@@ -3,6 +3,7 @@ import {
   NoteController,
 } from "@generated/donut-backend-api/sdk.gen"
 import { useRecallData } from "@/composables/useRecallData"
+import { notePropertyLocation } from "@/routes/noteShowLocation"
 import makeMe from "donut-test-fixtures/makeMe"
 import { mockSdkService, wrapSdkError } from "@tests/helpers"
 import { flushPromises } from "@vue/test-utils"
@@ -86,6 +87,48 @@ describe("RecallPage Just review", () => {
       path: { memoryTracker: 123 },
       query: { grade: "AGAIN" },
     })
+    wrapper.unmount()
+  })
+
+  it("identifies a tracked property in the complete note and opens it on its note route", async () => {
+    const noteRealm = makeMe.aNoteRealm
+      .title("Sedition")
+      .content("---\ncolor: red\nsize: big\n---\nInciting rebellion.")
+      .please()
+    mockSdkService(NoteController, "showNote", noteRealm)
+    mockSdkService(
+      MemoryTrackerController,
+      "showMemoryTracker",
+      makeMe.aMemoryTracker.ofNote(noteRealm).withPropertyKey("color").please()
+    )
+    vi.mocked(MemoryTrackerController.getRecallPrompt).mockResolvedValue(
+      wrapSdkError("No recall prompt")
+    )
+    vi.mocked(useRecallData).mockReturnValue(
+      createUseRecallDataMock({ toRepeat: [createMemoryTrackerLite(123)] })
+    )
+
+    const wrapper = ctx.renderer.currentRoute({ name: "recall" }).mount()
+    await flushPromises()
+
+    const context = wrapper.find('article[aria-label="Note context"]')
+    expect(context.text()).toContain("Inciting rebellion.")
+    expect(
+      context
+        .find('[data-property-key="color"]')
+        .attributes("data-property-focused")
+    ).toBe("true")
+    expect(
+      context
+        .find('[data-property-key="size"]')
+        .attributes("data-property-focused")
+    ).toBeUndefined()
+    expect(
+      context
+        .findAll("a")
+        .find((a) => a.text() === "Open full note")
+        ?.attributes("to")
+    ).toBe(JSON.stringify(notePropertyLocation(noteRealm.id, "color")))
     wrapper.unmount()
   })
 })
