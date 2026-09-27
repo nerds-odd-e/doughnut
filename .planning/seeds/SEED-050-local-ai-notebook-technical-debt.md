@@ -35,7 +35,7 @@ different frontmatter edits, each already with one owner.
 
 **Identity:** SEED-050#story-9
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/027-dissolve-enters-folders-by-the-one-rule/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"f61c17e5b01f316515c1f60b18096a39cc1dde9a740a90e434a0ac3d9bd1affe","plan":"876b08ab2e545d9cafab89deb82366c270763849229aa48bdfd47033c3436009"}}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/027-dissolve-enters-folders-by-the-one-rule/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"d07d54d7ed0835c3ef7a49632aacea5c47e485106399dd186c8073294d8f548d","plan":"876b08ab2e545d9cafab89deb82366c270763849229aa48bdfd47033c3436009"}}
 ```
 
 **Goal:** Correction of SEED-050#story-8 (provenance
