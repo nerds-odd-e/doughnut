@@ -33,6 +33,10 @@
   <ViewMemoryTrackerLink
     :memory-tracker-id="answeredQuestion.memoryTrackerId"
   />
+  <NoteContextReader
+    v-if="!answeredQuestion.answer.correct"
+    :note-id="answeredQuestion.recalledNote.noteTopology.id"
+  />
 </template>
 
 <script setup lang="ts">
@@ -41,6 +45,7 @@ import type { AnsweredQuestion } from "@generated/donut-backend-api"
 import PopButton from "@/components/commons/Popups/PopButton.vue"
 import AccidentalMatchResolveDialog from "@/components/recall/AccidentalMatchResolveDialog.vue"
 import { noteShowLocation } from "@/routes/noteShowLocation"
+import NoteContextReader from "@/components/notes/NoteContextReader.vue"
 import NoteUnderQuestion from "./NoteUnderQuestion.vue"
 import ViewMemoryTrackerLink from "./ViewMemoryTrackerLink.vue"
 import { recalledNoteUnderQuestionProps } from "./recalledNoteUnderQuestionProps"

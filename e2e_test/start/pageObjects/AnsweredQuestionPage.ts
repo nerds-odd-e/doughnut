@@ -28,6 +28,13 @@ const assumeAnsweredQuestionPage = () => {
       cy.findByText(`Your answer \`${answer}\` is incorrect.`).should('exist')
       return self
     },
+    expectNoteContextToContain(content: string) {
+      cy.findByRole('article', { name: 'Note context' }).should(
+        'contain.text',
+        content
+      )
+      return self
+    },
 
     expectAccidentalMatchReveal(
       answer: string,

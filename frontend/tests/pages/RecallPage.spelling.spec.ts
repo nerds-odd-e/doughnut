@@ -1,5 +1,6 @@
 import {
   MemoryTrackerController,
+  NoteController,
   RecallPromptController,
 } from "@generated/donut-backend-api/sdk.gen"
 import { useRecallData } from "@/composables/useRecallData"
@@ -75,35 +76,51 @@ describe("RecallPage spelling quiz", () => {
       global: { directives: { focus: focusDirective } },
     })
 
-  it("should handle spelling questions correctly", async () => {
-    const note = makeMe.aNote.id(42).please()
-    const answerResult: AnsweredQuestion = makeMe.anAnsweredQuestion
-      .withNote(note)
-      .spelling()
-      .withAnswer({ id: 1, correct: false, spellingAnswer: "test answer" })
-      .withMemoryTrackerId(memoryTrackerId)
+  it("shows incorrect feedback with the reviewed note's context after a wrong answer", async () => {
+    const noteRealm = makeMe.aNoteRealm
+      .title("Sedition")
+      .content(`---
+register: formal
+---
+
+Inciting rebellion against authority.`)
       .please()
-    const mockedAnswerSpellingCall = mockSdkService(
+    makeMe.aNoteRealm.title("Mutiny").under(noteRealm).please()
+    mockSdkService(NoteController, "showNote", noteRealm)
+    mockSdkService(
       RecallPromptController,
       "answerSpelling",
-      answerResult
+      makeMe.anAnsweredQuestion
+        .withNote(noteRealm.note)
+        .spelling()
+        .withAnswer({ id: 1, correct: false, spellingAnswer: "sedation" })
+        .withMemoryTrackerId(memoryTrackerId)
+        .please()
     )
 
     const wrapper = await ctx.mountPage()
-    await wrapper.find("input#memory_tracker-answer").setValue("test answer")
-    await flushPromises()
+    await wrapper.find("input#memory_tracker-answer").setValue("sedation")
     await wrapper.find("form").trigger("submit")
     await flushPromises()
-    expect(mockedAnswerSpellingCall).toHaveBeenCalled()
+
     expect(wrapper.find(".daisy-alert-error").text()).toContain(
-      "Your answer `test answer` is incorrect."
+      "Your answer `sedation` is incorrect."
     )
-    expect(hasNoteShowLink(wrapper, 42)).toBe(true)
+    expect(hasNoteShowLink(wrapper, noteRealm.id)).toBe(true)
     expect(
       wrapper
         .findComponent({ name: "ViewMemoryTrackerLink" })
         .props("memoryTrackerId")
     ).toBe(memoryTrackerId)
+    const noteContext = wrapper.find('[aria-label="Note context"]').text()
+    for (const expected of [
+      "register",
+      "formal",
+      "Inciting rebellion against authority.",
+      "Mutiny",
+    ]) {
+      expect(noteContext).toContain(expected)
+    }
   })
 
   it("focuses the spelling answer input when resuming recall", async () => {

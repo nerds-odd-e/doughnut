@@ -107,10 +107,15 @@ existing route helpers. Do not create parallel parsing rules.
 ### 3. Reveal the reviewed note after wrong spelling
 
 Type: Behavior
-Status: planned
+Status: done
 Proof: `RecallPage` browser-mode test submits a wrong spelling answer and sees
 properties, body, and references for the reviewed note immediately, without a
 click; extend the spelling recall E2E with a wrong-answer journey.
+Accepted: `AnsweredSpellingQuestion` mounts the reader when the answer is
+incorrect; `RecallPage.spelling.spec.ts` wrong-answer test; E2E scenario
+"Spelling quiz reveals the reviewed note after a wrong answer" passes.
+Learning: `NoteUnderQuestion` still shows the title and focused property on
+wrong answers; slice 10 decides whether it goes once the reader shows focus.
 
 Behavior: a learner submits an incorrect spelling answer → the result opens
 the reviewed note reader underneath the answer feedback → the learner can
