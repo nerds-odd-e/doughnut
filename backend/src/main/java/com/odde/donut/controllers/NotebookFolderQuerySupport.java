@@ -61,13 +61,11 @@ abstract class NotebookFolderQuerySupport {
           noteService.findNotebookRootNotes(notebook.getId()).stream()
               .map(Note::getNoteTopology)
               .toList();
-      List<Folder> folders =
-          folderRepository.findRootFoldersByNotebookIdOrderByIdAsc(notebook.getId()).stream()
-              .toList();
+      List<Folder> folders = folderRepository.findFoldersInContainer(notebook.getId(), null);
       return new FolderListing(
           noteTopologies,
           folders,
-          notebookAttachmentRepository.findRootListItemsByNotebookId(notebook.getId()));
+          notebookAttachmentRepository.findListItemsInContainer(notebook.getId(), null));
     }
     Folder folder =
         folderRepository
@@ -80,12 +78,11 @@ abstract class NotebookFolderQuerySupport {
             .map(Note::getNoteTopology)
             .toList();
     List<Folder> childFolders =
-        folderRepository.findChildFoldersByParentFolderIdOrderByIdAsc(folder.getId()).stream()
-            .toList();
+        folderRepository.findFoldersInContainer(notebook.getId(), folder.getId());
     return new FolderListing(
         noteTopologies,
         childFolders,
-        notebookAttachmentRepository.findListItemsByFolderId(folder.getId()));
+        notebookAttachmentRepository.findListItemsInContainer(notebook.getId(), folder.getId()));
   }
 
   @Operation(

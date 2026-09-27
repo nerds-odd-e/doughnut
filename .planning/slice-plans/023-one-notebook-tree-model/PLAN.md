@@ -123,7 +123,13 @@ and the class goes.
 ### 3. Folder and file listings read one container query each
 
 Type: Structure
-Status: planned
+Status: done — `FolderRepository.findFoldersInContainer` and
+`NotebookAttachmentRepository.findListItemsInContainer` (`<=>` in SQL). EXPLAIN
+on a scratch copy seeded with 6,000 folders / 12,300 files: root folders
+index-merge notebook+parent (as before), child folders index-merge
+parent+notebook (1 row), root and folder files ref `fk_notebook_attachment_folder`
+(root plan identical to the old query). Planned tests plus the other
+`FolderSubtree`/`FolderContentsPlacementCheck` callers: 110 green.
 Proof: one `EXPLAIN` of the root and folder forms of each query on the test
 database, recorded here; then
 `CURSOR_DEV=true nix develop -c pnpm backend:test_only --tests 'com.odde.donut.controllers.NotebookFolderListingControllerTest' --tests 'com.odde.donut.controllers.NotebookFolderMoveControllerTest' --tests 'com.odde.donut.controllers.NotebookFolderMoveNameClashControllerTest' --tests 'com.odde.donut.controllers.NotebookGitWebFolderTrashGuardControllerTest' --tests 'com.odde.donut.services.FolderConstructionServiceTest'`
@@ -160,4 +166,9 @@ minutes, split the listing's branch removal into its own slice.
 
 ## Learnings
 
-None yet.
+- On empty tables MySQL picks the notebook-id prefix for `<=>` forms; with
+  realistic data it uses the parent/folder indexes, so verify container query
+  plans on seeded data, not the empty test database.
+- The name-filtered sibling queries (`findCandidateChildContainers`,
+  `findChildFoldersNamedIgnoringCase`, `findFilenamesNamedIgnoringCase`) keep
+  the `IS NULL … OR` form; out of this story's scope.

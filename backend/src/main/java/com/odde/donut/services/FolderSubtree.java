@@ -76,7 +76,7 @@ final class FolderSubtree {
       Folder current = stack.pop();
       result.add(current);
       for (Folder child :
-          folderRepository.findChildFoldersByParentFolderIdOrderByIdAsc(current.getId())) {
+          folderRepository.findFoldersInContainer(current.getNotebook().getId(), current.getId())) {
         stack.push(child);
       }
     }
@@ -138,7 +138,7 @@ final class FolderSubtree {
       Timestamp now) {
     boolean crossNotebook = !source.getNotebook().getId().equals(destinationNotebook.getId());
     for (Folder child :
-        folderRepository.findChildFoldersByParentFolderIdOrderByIdAsc(source.getId())) {
+        folderRepository.findFoldersInContainer(source.getNotebook().getId(), source.getId())) {
       Optional<Folder> existing =
           folderSiblingNameValidation.folderHolding(
               destinationNotebook, destinationOrNull, child.getName(), excludedFolderIds);

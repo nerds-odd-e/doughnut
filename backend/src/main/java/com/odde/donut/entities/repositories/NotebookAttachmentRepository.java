@@ -31,18 +31,11 @@ public interface NotebookAttachmentRepository extends CrudRepository<NotebookAtt
       """
       SELECT NEW com.odde.donut.controllers.dto.NotebookAttachmentListItem(a.id, a.filename)
       FROM NotebookAttachment a
-      WHERE a.notebook.id = :notebookId AND a.folder IS NULL ORDER BY a.id ASC
+      WHERE a.notebook.id = :notebookId AND a.folder.id IS NOT DISTINCT FROM :folderId
+      ORDER BY a.id ASC
       """)
-  List<NotebookAttachmentListItem> findRootListItemsByNotebookId(
-      @Param("notebookId") Integer notebookId);
-
-  @Query(
-      """
-      SELECT NEW com.odde.donut.controllers.dto.NotebookAttachmentListItem(a.id, a.filename)
-      FROM NotebookAttachment a
-      WHERE a.folder.id = :folderId ORDER BY a.id ASC
-      """)
-  List<NotebookAttachmentListItem> findListItemsByFolderId(@Param("folderId") Integer folderId);
+  List<NotebookAttachmentListItem> findListItemsInContainer(
+      @Param("notebookId") Integer notebookId, @Param("folderId") Integer folderId);
 
   @Query(
       """
