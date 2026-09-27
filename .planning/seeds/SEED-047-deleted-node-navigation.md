@@ -23,7 +23,7 @@ depends on the note order they selected in their own browser.
 
 **Identity:** SEED-047#story-2
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/015-removal-landing-listing-load/PLAN.md"}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/015-removal-landing-listing-load/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"8df5497d52356d412fe5a39c5a2b0f58369d705185c103b956161e957f63dd9c","plan":"9b1d9c44a48861bffbb126e4e6fc53a046129a61b61793a41c21371f64135058"}}
 ```
 
 **Goal:** A person trashing or permanently deleting a note sees the app busy
