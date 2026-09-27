@@ -140,6 +140,23 @@ public final class NotebookGitProposalTreeShape {
         repository, acceptedHead, proposedHead);
   }
 
+  /** The whole proposed tree, not just its changes: accepted trees never hold a leftover marker. */
+  static void refuseLeftoverFolderMarkers(List<InspectedRegularFile> files) {
+    List<InspectedRegularFile> proposed =
+        files.stream().filter(file -> file.proposedBlobId() != null).toList();
+    List<String> proposedPaths = proposed.stream().map(InspectedRegularFile::path).toList();
+    for (InspectedRegularFile file : proposed) {
+      if (PortablePathKind.isLeftoverFolderMarker(
+          file.path(), file.proposedBlobId(), proposedPaths)) {
+        throw new ResponseStatusException(
+            HttpStatus.BAD_REQUEST,
+            "\""
+                + file.path()
+                + "\" no longer marks an empty folder; delete it, then publish again.");
+      }
+    }
+  }
+
   static List<NoteChange> noteChangesFrom(List<ChangedDocument> documents) {
     List<NoteChange> changes = new ArrayList<>();
     for (ChangedDocument document : documents) {

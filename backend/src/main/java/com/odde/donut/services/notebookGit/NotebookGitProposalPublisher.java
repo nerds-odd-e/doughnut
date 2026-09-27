@@ -106,6 +106,7 @@ public class NotebookGitProposalPublisher {
     List<NotebookGitProposalTreeShape.InspectedRegularFile> files =
         NotebookGitProposalTreeShape.inspectRegularFiles(
             proposal.repository(), acceptedHead, proposal.mainHead());
+    NotebookGitProposalTreeShape.refuseLeftoverFolderMarkers(files);
     bookSourceFileProtection.refuseChanging(notebook.getId(), files);
     List<NotebookGitProposalTreeShape.ChangedDocument> documents =
         NotebookGitProposalTreeShape.classifyChangedDocuments(files);

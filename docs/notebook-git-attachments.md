@@ -77,8 +77,10 @@ export and reset without per-consumer handling. Within a directory the canonical
 order is README, then notes, then attachments by filename, then subdirectories;
 the Git side re-sorts by path.
 
-A root `.keep` is an ordinary attachment. The empty-folder marker is a `.keep`
-inside a folder, which keeps its structural role.
+A root `.keep` is an ordinary attachment. The empty-folder marker is an empty
+`.keep` alone inside a folder, which keeps its structural role. A publish whose
+tree holds a `.keep` below the root beside other entries of its folder, or with
+content, is refused with a message naming that `.keep` and asking to delete it.
 
 Web Donut shows every attachment row to whoever can read the notebook,
 including Bazaar readers. The sidebar lists files at their folder or the root,

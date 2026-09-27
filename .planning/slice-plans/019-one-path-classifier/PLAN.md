@@ -97,7 +97,11 @@ Enables: slice 2 puts the marker rule in this one owner.
 ### 2. A leftover empty-folder marker is refused by name
 
 Type: Behavior
-Status: planned
+Status: done
+Accepted proof: `NotebookGitProposalLeftoverFolderMarkerControllerTest` (failed first with
+409, now 400 naming the path and "delete"); `*NotebookGit*` 461 pass. The rule lives in
+`PortablePathKind.isLeftoverFolderMarker`, called once from the publisher after
+`inspectRegularFiles`.
 Proof: new controller test for examples 1 and 1b fails first (409 drift
 conflict for 1), then passes with
 `assertProposalRejectedWithoutMutatingBinding(..., BAD_REQUEST)` and a reason
