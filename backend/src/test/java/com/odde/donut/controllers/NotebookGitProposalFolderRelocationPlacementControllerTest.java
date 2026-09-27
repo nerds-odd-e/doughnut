@@ -26,8 +26,6 @@ import org.springframework.web.server.ResponseStatusException;
 class NotebookGitProposalFolderRelocationPlacementControllerTest
     extends NotebookGitControllerTestBase {
 
-  private static final String README = "readme";
-  private static final String NOTE = "note";
   private static final String EXISTING = "existing";
 
   @Autowired FolderRepository folderRepository;
@@ -36,20 +34,13 @@ class NotebookGitProposalFolderRelocationPlacementControllerTest
   void rejectsAnExactFolderRelocationOntoAnExistingSameNameDestination() throws Exception {
     Notebook notebook = createGitBackedNotebook();
     Folder archive =
-        makeMe.aFolder().notebook(notebook).name("Archive").readmeContent(README).please();
+        makeMe.aFolder().notebook(notebook).name("Archive").readmeContent(README_BODY).please();
     Folder existingDest = makeMe.aFolder().parentFolder(archive).name("Topics").please();
     makeMe.aNote().folder(existingDest).title("Existing").content(EXISTING).please();
     Folder topics =
-        makeMe.aFolder().notebook(notebook).name("Topics").readmeContent(README).please();
-    NotebookGitBinding binding =
-        seedAcceptedBinding(
-            notebook,
-            List.of(
-                ofText("README.md", README),
-                ofText("Topics/README.md", README),
-                ofText("Topics/A.md", NOTE),
-                ofText("Archive/README.md", README),
-                ofText("Archive/Topics/Existing.md", EXISTING)));
+        makeMe.aFolder().notebook(notebook).name("Topics").readmeContent(README_BODY).please();
+    makeMe.aNote().folder(topics).title("A").content(NOTE).please();
+    NotebookGitBinding binding = snapshotCurrentPortableTree(notebook);
 
     ApiException exception =
         publishRejectedAs(notebook, binding, moveTopicsUnderArchive(), ApiException.class);
@@ -69,15 +60,14 @@ class NotebookGitProposalFolderRelocationPlacementControllerTest
   void rejectsAnExactFolderRelocationOntoAnInvisibleEmptySameNameContainer() throws Exception {
     Notebook notebook = createGitBackedNotebook();
     Folder archive =
-        makeMe.aFolder().notebook(notebook).name("Archive").readmeContent(README).please();
+        makeMe.aFolder().notebook(notebook).name("Archive").readmeContent(README_BODY).please();
     Folder emptyDest = makeMe.aFolder().parentFolder(archive).name("Topics").please();
     Folder topics =
-        makeMe.aFolder().notebook(notebook).name("Topics").readmeContent(README).please();
+        makeMe.aFolder().notebook(notebook).name("Topics").readmeContent(README_BODY).please();
     NotebookGitBinding binding =
         seedAcceptedBinding(
             notebook,
             List.of(
-                ofText("README.md", README),
                 ofText("Topics/README.md", README),
                 ofText("Topics/A.md", NOTE),
                 ofText("Archive/README.md", README)));
@@ -96,17 +86,15 @@ class NotebookGitProposalFolderRelocationPlacementControllerTest
   void rejectsAnExactFolderRelocationIntoTheSourceFolder() throws Exception {
     Notebook notebook = createGitBackedNotebook();
     Folder topics =
-        makeMe.aFolder().notebook(notebook).name("Topics").readmeContent(README).please();
-    NotebookGitBinding binding = seedAcceptedBinding(notebook, topicsAtRoot());
+        makeMe.aFolder().notebook(notebook).name("Topics").readmeContent(README_BODY).please();
+    makeMe.aNote().folder(topics).title("A").content(NOTE).please();
+    NotebookGitBinding binding = snapshotCurrentPortableTree(notebook);
 
     ResponseStatusException exception =
         publishRejectedAs(
             notebook,
             binding,
-            List.of(
-                ofText("README.md", README),
-                ofText("Topics/Topics/README.md", README),
-                ofText("Topics/Topics/A.md", NOTE)),
+            List.of(ofText("Topics/Topics/README.md", README), ofText("Topics/Topics/A.md", NOTE)),
             ResponseStatusException.class);
 
     assertThat(exception.getStatusCode(), equalTo(HttpStatus.BAD_REQUEST));
@@ -120,23 +108,17 @@ class NotebookGitProposalFolderRelocationPlacementControllerTest
   void rejectsAnExactFolderRelocationIntoADescendantFolder() throws Exception {
     Notebook notebook = createGitBackedNotebook();
     Folder topics =
-        makeMe.aFolder().notebook(notebook).name("Topics").readmeContent(README).please();
-    Folder sub = makeMe.aFolder().parentFolder(topics).name("Sub").readmeContent(README).please();
-    NotebookGitBinding binding =
-        seedAcceptedBinding(
-            notebook,
-            List.of(
-                ofText("README.md", README),
-                ofText("Topics/README.md", README),
-                ofText("Topics/A.md", NOTE),
-                ofText("Topics/Sub/README.md", README)));
+        makeMe.aFolder().notebook(notebook).name("Topics").readmeContent(README_BODY).please();
+    Folder sub =
+        makeMe.aFolder().parentFolder(topics).name("Sub").readmeContent(README_BODY).please();
+    makeMe.aNote().folder(topics).title("A").content(NOTE).please();
+    NotebookGitBinding binding = snapshotCurrentPortableTree(notebook);
 
     ResponseStatusException exception =
         publishRejectedAs(
             notebook,
             binding,
             List.of(
-                ofText("README.md", README),
                 ofText("Topics/Sub/Topics/README.md", README),
                 ofText("Topics/Sub/Topics/A.md", NOTE),
                 ofText("Topics/Sub/Topics/Sub/README.md", README)),
@@ -162,16 +144,8 @@ class NotebookGitProposalFolderRelocationPlacementControllerTest
 
   private static List<PortableTreeEntry> moveTopicsUnderArchive() {
     return List.of(
-        ofText("README.md", README),
         ofText("Archive/README.md", README),
         ofText("Archive/Topics/README.md", README),
         ofText("Archive/Topics/A.md", NOTE));
-  }
-
-  private static List<PortableTreeEntry> topicsAtRoot() {
-    return List.of(
-        ofText("README.md", README),
-        ofText("Topics/README.md", README),
-        ofText("Topics/A.md", NOTE));
   }
 }

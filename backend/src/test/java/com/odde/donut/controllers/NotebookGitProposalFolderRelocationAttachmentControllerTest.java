@@ -21,7 +21,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 class NotebookGitProposalFolderRelocationAttachmentControllerTest
     extends NotebookGitControllerTestBase {
 
-  private static final String NOTE = "---\ntype: Note\n---\nnote";
   private static final byte[] FORCE_DIAGRAM = NOTE.getBytes(StandardCharsets.UTF_8);
 
   @Autowired FolderRepository folderRepository;

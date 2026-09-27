@@ -15,7 +15,6 @@ import com.odde.donut.entities.NotebookGitBinding;
 import com.odde.donut.entities.repositories.FolderRepository;
 import com.odde.donut.services.notebookGit.NotebookGitProposalBlobText;
 import com.odde.donut.services.notebookTree.PortableTreeEntry;
-import com.odde.donut.services.notebookTree.PortableTreeReadmeMarkdown;
 import com.odde.donut.testability.GitBundleTestReader;
 import java.util.List;
 import java.util.Map;
@@ -39,9 +38,6 @@ import org.springframework.web.server.ResponseStatusException;
 class NotebookGitProposalFolderRelocationDestinationControllerTest
     extends NotebookGitControllerTestBase {
 
-  private static final String README_BODY = "readme";
-  private static final String README = PortableTreeReadmeMarkdown.assemble(README_BODY);
-  private static final String NOTE = "---\ntype: Note\n---\nnote";
   private static final String UNREPRESENTED_NOTE = "note";
 
   @Autowired FolderRepository folderRepository;

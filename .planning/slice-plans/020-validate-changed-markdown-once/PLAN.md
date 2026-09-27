@@ -104,7 +104,7 @@ which was refused naming `Legacy.md` before the change); `NotebookGit*` 442 pass
 ### 2. Refusal tests start from a projection that matches accepted main
 
 Type: Structure
-Status: planned
+Status: done
 Proof: the re-seeded tests stay green with the same refusals —
 `CURSOR_DEV=true nix develop -c pnpm backend:test_only --tests 'com.odde.donut.controllers.NotebookGitProposalMarkdownFormatControllerTest' --tests 'com.odde.donut.controllers.NotebookGitProposalFolderRelocationShapeControllerTest' --tests 'com.odde.donut.controllers.NotebookGitProposalFolderRelocationPlacementControllerTest' --tests 'com.odde.donut.controllers.NotebookGitProposalRelocationDestinationControllerTest' --tests 'com.odde.donut.controllers.NotebookGitProposalFolderRelocationEmptyDescendantControllerTest'`.
 
@@ -113,6 +113,21 @@ Change: tests that seed accepted Git with `seedAcceptedBinding`
 instead from `makeMe` rows plus a snapshot of the current Portable tree, so
 their projection matches accepted main. Enables slice 3, which checks drift
 before these refusals.
+
+Accepted proof: the five named classes plus
+`NotebookGitProposalFolderRelocationDestinationControllerTest` (the class that
+actually used `seedAcceptedBinding`) green, 25 tests before and after; the
+refactor moved shared `README_BODY`/`README`/`NOTE` into
+`NotebookGitControllerTestBase` (12 relocation classes, 38 tests green).
+Not re-seeded because their refusal needs drift (a matching snapshot writes
+`.keep` for every empty folder): Placement
+`rejectsAnExactFolderRelocationOntoAnInvisibleEmptySameNameContainer`,
+FolderRelocationDestination
+`rejectsAnExactFolderRelocationIntoAnExistingUnrepresentedParent`,
+EmptyDescendant `rejectsAnExactFolderRelocationWhenASourceDescendantHasNoTrackedContent`
+— slice 3 input. `seedAcceptedBinding` also stays in
+`NotebookGitProposalTreeShapeControllerTest` and
+`NotebookGitProposalRenameRejectionControllerTest` (outside this slice).
 
 ### 3. The live projection is checked against accepted main once, before any change
 

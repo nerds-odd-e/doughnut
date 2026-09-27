@@ -52,14 +52,12 @@ class NotebookGitProposalMarkdownFormatControllerTest extends NotebookGitControl
   @Test
   void rejectsNoteWithNoFrontmatterFenceWithoutMutatingTheAcceptedBinding() throws Exception {
     Notebook notebook = createGitBackedNotebook();
-    NotebookGitBinding binding = seedAcceptedBinding(notebook, validBaselineEntries());
+    NotebookGitBinding binding = snapshotWithTypedNote(notebook);
     byte[] bundleBytes =
         proposalBundleBytes(
             binding,
             List.of(
-                new NotebookGitProposalFile("note.md", "changed content, no frontmatter at all"),
-                new NotebookGitProposalFile(
-                    "README.md", "---\ntype: Readme\n---\nreadme original")));
+                new NotebookGitProposalFile("note.md", "changed content, no frontmatter at all")));
 
     ResponseStatusException exception =
         assertProposalRejectedWithoutMutatingBinding(
@@ -71,15 +69,13 @@ class NotebookGitProposalMarkdownFormatControllerTest extends NotebookGitControl
   @Test
   void rejectsNoteWithMalformedFrontmatterYamlWithoutMutatingTheAcceptedBinding() throws Exception {
     Notebook notebook = createGitBackedNotebook();
-    NotebookGitBinding binding = seedAcceptedBinding(notebook, validBaselineEntries());
+    NotebookGitBinding binding = snapshotWithTypedNote(notebook);
     byte[] bundleBytes =
         proposalBundleBytes(
             binding,
             List.of(
                 new NotebookGitProposalFile(
-                    "note.md", "---\ntype: [unclosed, \"bracket\n---\nchanged content"),
-                new NotebookGitProposalFile(
-                    "README.md", "---\ntype: Readme\n---\nreadme original")));
+                    "note.md", "---\ntype: [unclosed, \"bracket\n---\nchanged content")));
 
     ResponseStatusException exception =
         assertProposalRejectedWithoutMutatingBinding(
@@ -91,14 +87,11 @@ class NotebookGitProposalMarkdownFormatControllerTest extends NotebookGitControl
   @Test
   void rejectsNoteWithNonMappingFrontmatterWithoutMutatingTheAcceptedBinding() throws Exception {
     Notebook notebook = createGitBackedNotebook();
-    NotebookGitBinding binding = seedAcceptedBinding(notebook, validBaselineEntries());
+    NotebookGitBinding binding = snapshotWithTypedNote(notebook);
     byte[] bundleBytes =
         proposalBundleBytes(
             binding,
-            List.of(
-                new NotebookGitProposalFile("note.md", "---\n- a\n- b\n---\nchanged content"),
-                new NotebookGitProposalFile(
-                    "README.md", "---\ntype: Readme\n---\nreadme original")));
+            List.of(new NotebookGitProposalFile("note.md", "---\n- a\n- b\n---\nchanged content")));
 
     ResponseStatusException exception =
         assertProposalRejectedWithoutMutatingBinding(
@@ -110,15 +103,13 @@ class NotebookGitProposalMarkdownFormatControllerTest extends NotebookGitControl
   @Test
   void rejectsNoteWithMissingTypeWithoutMutatingTheAcceptedBinding() throws Exception {
     Notebook notebook = createGitBackedNotebook();
-    NotebookGitBinding binding = seedAcceptedBinding(notebook, validBaselineEntries());
+    NotebookGitBinding binding = snapshotWithTypedNote(notebook);
     byte[] bundleBytes =
         proposalBundleBytes(
             binding,
             List.of(
                 new NotebookGitProposalFile(
-                    "note.md", "---\ncustom_field: hello\n---\nchanged content"),
-                new NotebookGitProposalFile(
-                    "README.md", "---\ntype: Readme\n---\nreadme original")));
+                    "note.md", "---\ncustom_field: hello\n---\nchanged content")));
 
     ResponseStatusException exception =
         assertProposalRejectedWithoutMutatingBinding(
@@ -130,14 +121,11 @@ class NotebookGitProposalMarkdownFormatControllerTest extends NotebookGitControl
   @Test
   void rejectsNoteWithBlankTypeWithoutMutatingTheAcceptedBinding() throws Exception {
     Notebook notebook = createGitBackedNotebook();
-    NotebookGitBinding binding = seedAcceptedBinding(notebook, validBaselineEntries());
+    NotebookGitBinding binding = snapshotWithTypedNote(notebook);
     byte[] bundleBytes =
         proposalBundleBytes(
             binding,
-            List.of(
-                new NotebookGitProposalFile("note.md", "---\ntype:\n---\nchanged content"),
-                new NotebookGitProposalFile(
-                    "README.md", "---\ntype: Readme\n---\nreadme original")));
+            List.of(new NotebookGitProposalFile("note.md", "---\ntype:\n---\nchanged content")));
 
     ResponseStatusException exception =
         assertProposalRejectedWithoutMutatingBinding(
@@ -149,15 +137,10 @@ class NotebookGitProposalMarkdownFormatControllerTest extends NotebookGitControl
   @Test
   void rejectsNoteWithInvalidUtf8BytesWithoutMutatingTheAcceptedBinding() throws Exception {
     Notebook notebook = createGitBackedNotebook();
-    NotebookGitBinding binding = seedAcceptedBinding(notebook, validBaselineEntries());
+    NotebookGitBinding binding = snapshotWithTypedNote(notebook);
     byte[] invalidUtf8 = {(byte) 0x80, 'x'};
     byte[] bundleBytes =
-        proposalBundleBytes(
-            binding,
-            List.of(
-                new NotebookGitProposalFile("note.md", invalidUtf8),
-                new NotebookGitProposalFile(
-                    "README.md", "---\ntype: Readme\n---\nreadme original")));
+        proposalBundleBytes(binding, List.of(new NotebookGitProposalFile("note.md", invalidUtf8)));
 
     ResponseStatusException exception =
         assertProposalRejectedWithoutMutatingBinding(
@@ -212,5 +195,10 @@ class NotebookGitProposalMarkdownFormatControllerTest extends NotebookGitControl
     assertThat(
         noteRepository.findById(edited.getId()).orElseThrow().getContent(),
         equalTo(changedContent));
+  }
+
+  private NotebookGitBinding snapshotWithTypedNote(Notebook notebook) {
+    makeMe.aNote().notebook(notebook).title("note").content(TYPED_NOTE).please();
+    return snapshotCurrentPortableTree(notebook);
   }
 }

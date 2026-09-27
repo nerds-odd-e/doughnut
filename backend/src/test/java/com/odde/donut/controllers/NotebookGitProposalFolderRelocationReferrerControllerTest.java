@@ -14,7 +14,6 @@ import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.NotebookGitBinding;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
-import com.odde.donut.services.notebookTree.PortableTreeReadmeMarkdown;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,8 +27,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 class NotebookGitProposalFolderRelocationReferrerControllerTest
     extends NotebookGitControllerTestBase {
 
-  private static final String README_BODY = "readme";
-  private static final String README = PortableTreeReadmeMarkdown.assemble(README_BODY);
   private static final String TARGET_CONTENT = "---\ntype: Note\n---\nOriginal authored bytes.\n";
   private static final String REFERRER_CONTENT =
       """
