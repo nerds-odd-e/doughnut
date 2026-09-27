@@ -80,7 +80,7 @@ class NotebookGitProposalAcceptance {
     Map<String, byte[]> proposed = new HashMap<>();
     for (PortableTreeEntry entry :
         NotebookGitAcceptedTree.readEntries(proposal.repository(), proposal.mainHead())) {
-      if (NotebookGitProposalTreeShape.isAttachment(entry.path())) {
+      if (PortablePathKind.of(entry.path()) == PortablePathKind.ATTACHMENT) {
         proposed.put(entry.path(), entry.content());
       }
     }

@@ -77,7 +77,10 @@ server (`notebookPublish.lfs*.test.ts`). The classifier's pure contract:
 ### 1. One path-kind owner for markers, Markdown, files and metadata
 
 Type: Structure
-Status: planned
+Status: done
+Accepted proof: `pnpm backend:test:worktree --tests '*NotebookGit*'` (459 pass) and
+`--tests '*PortablePathKindTest'` (12 pass; the first pattern does not select it).
+`PortablePathKind.carriesPortableContent()` replaced the tree-shape predicate.
 Proof: existing `services/notebookGit` unit tests and `NotebookGitProposal*`,
 `NotebookGitAttachment*` controller tests stay green; the classification unit
 test covers each kind, including root `.keep` → attachment and
@@ -177,4 +180,5 @@ stopped before without losing any promise.
 
 ## Learnings
 
-None yet.
+- `pnpm backend:test:worktree` takes one `--tests` pattern per run; `*NotebookGit*`
+  misses `services.notebookGit.PortablePathKindTest`.

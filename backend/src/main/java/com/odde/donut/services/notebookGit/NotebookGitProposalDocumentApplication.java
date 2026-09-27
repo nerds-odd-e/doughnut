@@ -47,7 +47,7 @@ class NotebookGitProposalDocumentApplication {
     List<String> conceptPaths = new ArrayList<>();
     List<String> emptyFolderMarkerPaths = new ArrayList<>();
     for (ChangedDocument document : documents) {
-      if (NotebookGitProposalTreeShape.isEmptyFolderMarker(document.path())) {
+      if (PortablePathKind.of(document.path()) == PortablePathKind.EMPTY_FOLDER_MARKER) {
         emptyFolderMarkerPaths.add(document.path());
       } else if (document.role() == DocumentRole.CONCEPT) {
         conceptPaths.add(document.path());

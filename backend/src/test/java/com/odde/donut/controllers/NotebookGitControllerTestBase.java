@@ -11,8 +11,8 @@ import com.odde.donut.entities.NotebookGitBinding;
 import com.odde.donut.entities.User;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.donut.services.notebookAttachment.NotebookAttachmentContent;
-import com.odde.donut.services.notebookGit.NotebookGitAttributes;
 import com.odde.donut.services.notebookGit.NotebookGitCutoverService;
+import com.odde.donut.services.notebookGit.PortablePathKind;
 import com.odde.donut.services.notebookTree.PortableTreeEntry;
 import com.odde.donut.testability.GitBundleTestReader;
 import com.odde.donut.testability.GitBundleTestReader.AcceptedHistory;
@@ -106,12 +106,8 @@ abstract class NotebookGitControllerTestBase extends NotebookGitAcceptedObjectSt
     return committed;
   }
 
-  /** Neither Markdown, an empty-folder marker, nor reserved Git metadata, at whatever depth. */
   static boolean isAttachment(PortableTreeEntry entry) {
-    String path = entry.path();
-    return !path.endsWith(".md")
-        && !path.endsWith("/.keep")
-        && !NotebookGitAttributes.isMetadataPath(path);
+    return PortablePathKind.of(entry.path()) == PortablePathKind.ATTACHMENT;
   }
 
   ResponseStatusException assertProposalRejectedWithoutMutatingBinding(

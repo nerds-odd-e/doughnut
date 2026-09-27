@@ -87,7 +87,7 @@ final class NotebookGitAttachmentSizeAdmission {
     Set<String> digests = new HashSet<>();
     for (Map.Entry<String, ObjectId> blob :
         NotebookGitAcceptedTree.blobIds(repository, commitId).entrySet()) {
-      if (NotebookGitProposalTreeShape.isAttachment(blob.getKey())) {
+      if (PortablePathKind.of(blob.getKey()) == PortablePathKind.ATTACHMENT) {
         NotebookGitLfsPointer.parse(objectBytes(repository, blob.getValue()))
             .ifPresent(pointer -> digests.add(pointer.sha256Hex()));
       }
@@ -106,7 +106,7 @@ final class NotebookGitAttachmentSizeAdmission {
       Map<String, ObjectId> changed = new LinkedHashMap<>();
       while (treeWalk.next()) {
         if (treeWalk.getFileMode(1) != FileMode.MISSING
-            && NotebookGitProposalTreeShape.isAttachment(treeWalk.getPathString())) {
+            && PortablePathKind.of(treeWalk.getPathString()) == PortablePathKind.ATTACHMENT) {
           changed.put(treeWalk.getPathString(), treeWalk.getObjectId(1));
         }
       }

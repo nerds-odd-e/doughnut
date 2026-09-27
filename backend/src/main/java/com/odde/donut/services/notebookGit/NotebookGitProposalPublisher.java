@@ -113,8 +113,7 @@ public class NotebookGitProposalPublisher {
     boolean emptyAcceptedNotebook = isEmptyAcceptedNotebook(folders, storedNotes, files);
     if (emptyAcceptedNotebook
         && documents.stream()
-            .noneMatch(
-                document -> NotebookGitProposalTreeShape.carriesPortableContent(document.path()))) {
+            .noneMatch(document -> PortablePathKind.of(document.path()).carriesPortableContent())) {
       throw new ResponseStatusException(
           HttpStatus.BAD_REQUEST, "Initial publication requires nonempty Portable content.");
     }

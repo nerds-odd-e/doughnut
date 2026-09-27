@@ -70,14 +70,16 @@ public final class NotebookGitProposalTreeShape {
     List<ChangedDocument> conceptDocuments = new ArrayList<>();
     List<ChangedDocument> addedEmptyFolderMarkers = new ArrayList<>();
     for (ChangedDocument document : documents) {
+      PortablePathKind pathKind = PortablePathKind.of(document.path());
       if (document.role() == DocumentRole.CONTAINER) {
         if (document.kind() != ChangeKind.ADDED && document.kind() != ChangeKind.MODIFIED) {
           throw reservedFolderReadme(document.path());
         }
         containerDocuments.add(document);
-      } else if (NotebookGitAttributes.isMetadataPath(document.path())) {
+      } else if (pathKind == PortablePathKind.METADATA) {
         // Reserved Git metadata stays in the tip; it is never a note or attachment projection.
-      } else if (isEmptyFolderMarker(document.path()) && document.kind() == ChangeKind.ADDED) {
+      } else if (pathKind == PortablePathKind.EMPTY_FOLDER_MARKER
+          && document.kind() == ChangeKind.ADDED) {
         // An added .keep marks a new empty Folder; it carries no note identity, so it bypasses
         // note correspondence entirely rather than being dropped like other .keep changes.
         addedEmptyFolderMarkers.add(document);
@@ -138,31 +140,11 @@ public final class NotebookGitProposalTreeShape {
         repository, acceptedHead, proposedHead);
   }
 
-  /** {@code .keep} marks an empty Folder; it carries no note or README identity. */
-  static boolean isEmptyFolderMarker(String path) {
-    return path.endsWith("/.keep");
-  }
-
-  /** A non-Markdown, non-structural, non-metadata Portable-tree entry is an Attachment. */
-  static boolean isAttachment(String path) {
-    return !path.endsWith(".md")
-        && !isEmptyFolderMarker(path)
-        && !NotebookGitAttributes.isMetadataPath(path);
-  }
-
-  /**
-   * True when a path carries non-structural Portable content: a Markdown note, README or Attachment
-   * at any depth. Structural {@code .keep} markers and reserved Git metadata do not.
-   */
-  static boolean carriesPortableContent(String path) {
-    return path.endsWith(".md") || isAttachment(path);
-  }
-
   static List<NoteChange> noteChangesFrom(List<ChangedDocument> documents) {
     List<NoteChange> changes = new ArrayList<>();
     for (ChangedDocument document : documents) {
       // Only Markdown paths carry note identity; attachments, markers, and Git metadata do not.
-      if (!document.path().endsWith(".md")) {
+      if (PortablePathKind.of(document.path()) != PortablePathKind.MARKDOWN) {
         continue;
       }
       if (document.role() == DocumentRole.CONTAINER) {

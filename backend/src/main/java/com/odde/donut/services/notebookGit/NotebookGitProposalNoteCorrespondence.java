@@ -122,7 +122,8 @@ final class NotebookGitProposalNoteCorrespondence {
       Map<String, NoteOrigin> origins = new HashMap<>();
       while (walk.next()) {
         String path = walk.getPathString();
-        if (!path.endsWith(".md") || "README.md".equals(basename(path))) {
+        if (PortablePathKind.of(path) != PortablePathKind.MARKDOWN
+            || "README.md".equals(basename(path))) {
           continue;
         }
         if (!FileMode.REGULAR_FILE.equals(walk.getFileMode(0))) {
