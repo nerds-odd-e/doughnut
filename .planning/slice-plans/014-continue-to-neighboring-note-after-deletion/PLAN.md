@@ -125,3 +125,11 @@ requests the listing before removal and replaces the route with that location.
   scopes neighbors to notes.
 - The destination comes from the listing fetched before the removal, sorted by
   the current `usePeerSort` spec, so it matches the order the person saw.
+
+## Execution complete
+
+Product advice: No backlog change. Story 1 delivers the owner's request as
+refined; its only learning is bounded correction SEED-047#story-2 (plan 015:
+removal landing loads the folder listing through the shared loading path, and
+the sidebar and neighbor rule share one listing-to-rows function). Deferred
+folder, file, move, undo, and relationship-reduction navigation stay deferred.

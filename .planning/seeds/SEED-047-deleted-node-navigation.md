@@ -57,6 +57,21 @@ chose for the sidebar, instead of on the folder page while notes remain.
 - With the sort switched to Title (Z–A) — C, B, A — deleting B opens A.
 - In trash, permanently deleting B among A, B, C opens C.
 
+<a id="story-2"></a>
+
+### Removal landing loads the folder listing like other user actions
+
+**Identity:** SEED-047#story-2
+
+**Goal:** A person trashing or permanently deleting a note sees the app busy
+from confirmation until they land, as for other user-triggered folder
+listings, and the "load a folder listing" and "listing to sidebar rows" rules
+each live in one place. Bounded retrospective correction of
+[SEED-047#story-1](#story-1); adds no feature promise.
+
+**Scope:** frontend only; the landing destinations of story 1 stay unchanged.
+Plan: [015-removal-landing-listing-load](../slice-plans/015-removal-landing-listing-load/PLAN.md).
+
 ## When to Surface
 
 Select this story from the product backlog when improving note browsing after

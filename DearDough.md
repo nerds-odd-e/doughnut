@@ -512,8 +512,19 @@ Slice 2's implementer reported that a rich body edit drops the file's final newl
   - Observed effect: four extra coordinator calls (about 1.5 minutes) before slice 1 was committed; a silent exit 0 looks like success, so an unattended caller could have delivered without the commit.
   - Inference: `execution-start.mjs` and `ci-repair-stash.mjs` use the same literal check and would likely fail the same way through the alias; using `isDirectCliEntry` in all three would remove the cause.
 
+## DD-134 — An implementer's slice proof ran only the specs it chose, missing consumers of the store method it changed
+
+The slice changed `StoredApiCollection.trashNote` to request a folder listing before trashing. The implementer proved it with `tests/store`, `tests/toolbars` and two `NoteMoreOptions` specs; `tests/notes/NoteMoreOptionsForm.trashNote.spec.ts`, which also drives `trashNote`, was not run and failed on the unmocked request (ADR 0006: an unmocked request fails loudly). Possibly the same root cause as ODF-111 (proof chosen by the edited area rather than by the changed method's consumers), but there the actor was the refactor pass; matching is uncertain.
+
+### Occurrences
+
+- Execution: SEED-047#story-1 / slice-plans/014-continue-to-neighboring-note-after-deletion / a41b1e0507; Timestamp: unknown (before slice 1 commit 2026-09-27T10:59:16+08:00); Tool: Claude Code; Open Dough release: 0.3.42 (VERSION in the execution checkout).
+  - Evidence: coordinator summary to the retrospective (subagent transcripts not supplied): coordinator consumer check found 2 failing tests in `NoteMoreOptionsForm.trashNote.spec.ts`; fixed by an empty listing mock in `tests/notes/noteMoreOptionsTrashTestSupport.ts` (in a41b1e0507), then `tests/notes tests/store tests/toolbars` 353/353.
+  - Observed effect: one coordinator repair before commit; no defect shipped.
+  - Inference: a `grep` for callers of the changed method across `tests/` when choosing slice proof would have included the spec.
+
 ## Retention
 
-- Highest allocated local number: 133
+- Highest allocated local number: 134
 - Recovery: `33939aa45a17c08f5e6f8076178ce96437fdfbe8:DearDough.md` contains the complete pre-compaction log and earlier recovery references; `b0b385a184e96ecf8b0f6fc5572eaaab69bc8dad` preserves later history.
 - Occurrence history is partial; full observations, effects, inference and historical provenance remain in that snapshot and the upstream catalog.
