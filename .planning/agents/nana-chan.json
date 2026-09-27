@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "agent": "Nana-chan",
+  "email": "nana-chan@example.org",
+  "identity": "SEED-040#story-1",
+  "mode": "story-branch",
+  "branch": "story/remember-browser-login",
+  "host": "claude",
+  "model": "claude-opus-5-5"
+}
