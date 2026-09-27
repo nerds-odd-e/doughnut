@@ -58,8 +58,9 @@ holding only files is neither reported nor purged as empty.
 On the web, the entries of one folder (or the notebook root) share one set of
 names: a note occupies `Title.md`, a folder its name and a file its filename,
 compared without letter case. Every web placement — note create, rename, move,
-undo and trash; folder create, rename, move, trash, dissolve and merge; picture
-upload; Book file naming — asks this one rule over live rows
+undo and trash; folder create, rename, move (within the notebook or to another
+notebook), trash, dissolve and merge; picture upload; Book file naming — asks
+this one rule over the destination notebook's live rows
 (`FolderSiblingNameValidation`). A name held by another folder is
 `FOLDER_NAME_CONFLICT` (where merging is offered); one held by a note or file
 is `RESOURCE_CONFLICT` naming its path. Dissolve and merge check every
@@ -69,6 +70,10 @@ folder there whose name differs only in letter case, keeping its name. Existing
 content is not judged again. The case-sensitive
 database unique keys stay as the last safety net, and local publish is not
 governed by this rule.
+
+A folder's notes, files and subfolders are removed or moved by application
+code, never by a database cascade from the folder, so every removal passes the
+accepted-change capture and a forgotten one fails loudly.
 
 Every consumer of a notebook's live Portable content — ZIP export, Git cutover
 and history reset, accepted web changes, and projection-drift detection — reads
