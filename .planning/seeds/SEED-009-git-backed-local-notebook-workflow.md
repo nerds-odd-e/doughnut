@@ -26,7 +26,7 @@ The stories below are the follow-ups the effort's closing review judged urgent.
 
 **Identity:** SEED-009#story-47
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"not-refined","approach":"unselected"}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/018-cross-notebook-folder-move-names/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"ee9b982d4ed7cd8b5274f0a33861c245e6d65c01d76059c03db9dab2b0f7d630","plan":"38ea62547b1137311f8a9302fe93b7efc1a135e98d959b35bd472f370b8db58e"}}
 ```
 
 **Goal:** A notebook owner who moves a folder into another notebook gets the
@@ -34,11 +34,43 @@ same name protection as every other web placement, so the destination never
 holds two entries whose names differ only by letter case, and a clash is
 refused with a clear message instead of a server error.
 
-**Scope:** Route the cross-notebook folder move, including its merge, through
-the one name owner (`FolderSiblingNameValidation`) and its every-destination
-check, as same-notebook moves already do. Retire the exact-match, folder-only
-sibling check it still uses. Moving a folder that holds files to another
-notebook stays refused.
+This is the last web placement outside the one name owner; once it lands, the
+North Star topic "One set of names per folder" can be retired. It stays ahead
+of story-48 because it is small and closes that topic (owner, 2026-09-27).
+
+**Scope:**
+
+- Moving a folder to another notebook, with or without merge, is checked by
+  the one name owner (`FolderSiblingNameValidation`) against the
+  **destination** notebook before any row changes, giving the same outcomes
+  and messages as a move within one notebook: a folder holding the name
+  (ignoring case) is `FOLDER_NAME_CONFLICT` and offers merge; a note or file
+  holding it is refused naming its path; a merge checks every entry at every
+  level first.
+- The move's exact-match, folder-only check (`mergeTargetOrRejectConflict`)
+  is deleted.
+- Git: each notebook's history records the move as an ordinary accepted
+  change; nothing beyond normal Git behavior.
+- Unchanged: moving a folder that holds files to another notebook stays
+  refused (owner decision 2026-09-26); the move and merge UI and its error
+  display.
+- Deferred: the other users of the exact-match sibling check (folder
+  creation's second check, the Git publish folder relocation), one "first
+  free name" operation, and repair of any existing case-variant siblings
+  (no production check requested).
+
+**Key examples** (destination is another notebook):
+
+1. Destination root holds folder `Shared` → move folder `shared` without
+   merge → refused "A folder with this name already exists here."; nothing
+   moves.
+2. Destination root holds a file `shared` → move folder `shared` → refused
+   naming `shared`; nothing moves.
+3. Both `Shared` folders hold a note, `Intro` and `intro` → move with merge →
+   refused naming `Shared/intro.md`, not a server error; nothing changes.
+4. Moved `Shared/Deep` meets destination `Shared/deep` → move with merge →
+   merged into `deep`, as today.
+5. No clash → the move behaves as today.
 
 <a id="story-48"></a>
 
