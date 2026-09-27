@@ -11,7 +11,6 @@ and deletable in Web Donut.
 ## Taken
 
 - [Preview image files on their web file page](seeds/SEED-035-ai-workspace-supporting-files.md#story-26) — SEED-035#story-26 ([plan](slice-plans/011-preview-image-files-on-web-file-page/PLAN.md))
-- [Read note context during spelling answers, conversations, and Just review](seeds/SEED-033-simplify-note-presentation.md#story-2) — SEED-033#story-2 ([plan](slice-plans/012-read-note-context/PLAN.md))
 
 ## Backlog list
 
