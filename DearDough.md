@@ -630,7 +630,7 @@ The slice 5 delegation told the implementer both to show its new assertions fail
 
 ### Occurrences
 
-- Execution: SEED-050#story-2 / `.planning/slice-plans/021-relationship-notes-accepted-in-one-change/PLAN.md` / f8087d5845; Timestamp: unknown (2026-09-27, slice 5 work before commit 06ff81b916); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: unknown.
+- Execution: SEED-050#story-2 / `d3c9b4814d:.planning/slice-plans/021-relationship-notes-accepted-in-one-change/PLAN.md` / f8087d5845; Timestamp: unknown (2026-09-27, slice 5 work before commit 06ff81b916); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: unknown.
   - Evidence: slice 5 implementer return ("I put the HEAD versions of the resolver and the Vue file back temporarily ... restored my versions from temp copies"); delegation prompt's "never stash, reset, clean, checkout paths"; dough-execute-plan/references/delegation.md ownership bullet.
   - Observed effect: no damage; the coordinator checked the working tree afterwards and it held the intended diff. No other writer was active in the checkout at that time.
   - Inference: an implementer that writes code before its test finds the in-place restore the cheapest fails-first route; with a concurrent writer it could clobber or capture sibling work. Writing the test first, or a temporary worktree at HEAD, avoids it. Qualified: one occurrence; coordinator saw only the return.

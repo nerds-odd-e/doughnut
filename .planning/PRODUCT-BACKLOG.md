@@ -10,8 +10,6 @@ and deletable in Web Donut.
 
 ## Taken
 
-- [Adding a relationship on the web places its note through the server in one accepted change](seeds/SEED-050-local-ai-notebook-technical-debt.md#story-2) — SEED-050#story-2 ([plan](slice-plans/021-relationship-notes-accepted-in-one-change/PLAN.md))
-
 ## Backlog list
 
 - [The name owner holds the folder-entry rule once](seeds/SEED-050-local-ai-notebook-technical-debt.md#story-8) — SEED-050#story-8

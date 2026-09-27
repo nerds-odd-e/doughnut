@@ -4,7 +4,7 @@
 
 - Story: [SEED-050#story-8](../../seeds/SEED-050-local-ai-notebook-technical-debt.md#story-8)
 - **Identity:** SEED-050#story-8
-- Correction of [SEED-050#story-2](../../seeds/SEED-050-local-ai-notebook-technical-debt.md#story-2)
+- Correction of SEED-050#story-2 (`d3c9b4814d:.planning/seeds/SEED-050-local-ai-notebook-technical-debt.md#story-2`)
   ("adding a relationship on the web places its note through the server in
   one accepted change"); provenance
   `aef1e27b77:.planning/slice-plans/021-relationship-notes-accepted-in-one-change/PLAN.md`,
