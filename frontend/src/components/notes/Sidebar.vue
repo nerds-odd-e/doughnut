@@ -37,7 +37,7 @@
 import type { Ref } from "vue"
 import { computed, inject, ref, watch } from "vue"
 import type {
-  Folder,
+  FolderTrailSegment,
   FolderRealm,
   NoteRealm,
   User,
@@ -57,7 +57,7 @@ const props = withDefaults(
     notebookReadonly?: boolean
     /** Set on folder page for active-folder toolbar/tree scope */
     activeFolderRealm?: FolderRealm
-    breadcrumbFolders?: Folder[]
+    breadcrumbFolders?: FolderTrailSegment[]
   }>(),
   { breadcrumbFolders: () => [] }
 )

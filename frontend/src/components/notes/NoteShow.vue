@@ -13,14 +13,12 @@
                 activeNoteRealm: noteRealm,
                 breadcrumbFolders: noteRealm.ancestorFolders ?? [],
                 asMarkdown,
-                conversationButton: noConversationButton,
                 readonly: readonly(noteRealm),
               }"
               @edit-as-markdown="asMarkdown = $event"
             />
             <div
               class="note-content-wrapper flex-1 min-h-0 overflow-auto flex flex-col gap-4"
-              :class="{ minimized: isMinimized }"
             >
               <div id="main-note-content" class="flex flex-col w-full">
                 <NoteTextContent
@@ -35,13 +33,7 @@
                   }"
                   @dead-wiki-link-click="onDeadWikiLinkClick"
                 />
-                <ShowImage
-                  v-bind="{
-                    ...noteImageProps(noteRealm),
-                    opacity: 0.2,
-                  }"
-                  :key="noteRealm.id"
-                />
+                <ShowImage :note="noteRealm.note" />
                 <NoteRecentUpdateIndicator
                   v-bind="{
                     id: noteRealm.id,
@@ -57,13 +49,9 @@
                     </span>
                   </p>
                 </NoteRecentUpdateIndicator>
-                <template v-if="noteHasInboundWikiReferences(noteRealm)">
-                  <h3 class="text-lg font-medium mb-2">References</h3>
-                  <NoteReferences
-                    v-bind="{ expandChildren, readonly: readonly(noteRealm) }"
-                    :note-topologies="noteRealm.references ?? []"
-                  />
-                </template>
+                <NoteReferences
+                  :note-topologies="noteRealm.references ?? []"
+                />
               </div>
             </div>
           </template>
@@ -89,34 +77,23 @@
 import { inject, ref, toRef, watch, type Ref } from "vue"
 import ContentLoader from "@/components/commons/ContentLoader.vue"
 import NoteRealmLoader from "./NoteRealmLoader.vue"
-import type {
-  NoteRealm,
-  ShowAttachmentImageData,
-  User,
-} from "@generated/donut-backend-api"
-import { client } from "@generated/donut-backend-api/client.gen"
+import type { NoteRealm, User } from "@generated/donut-backend-api"
 import NoteTextContent from "./core/NoteTextContent.vue"
 import NoteReferences from "./NoteReferences.vue"
 import ShowImage from "./widgets/ShowImage.vue"
-import { noteImageScalarsFromMarkdown } from "@/utils/noteContentFrontmatter"
 import NoteToolbar from "./core/NoteToolbar.vue"
 import NoteRecentUpdateIndicator from "./NoteRecentUpdateIndicator.vue"
 import NoteUnresolvedWikiLinkModal from "./NoteUnresolvedWikiLinkModal.vue"
 import type { DeadWikiLinkPayload } from "@/utils/wikiLinkMarkup"
 import { isNoteRealmInTrash } from "@/utils/folderTrash"
-import { provideNoteShortcutScope } from "@/composables/noteShortcutScope"
 import { provideMemoryTrackerActions } from "@/composables/useMemoryTrackerActions"
 import { isReservedReadmeNoteTitle } from "@/utils/reservedReadmeTitles"
 
 const props = defineProps({
   noteId: { type: Number, required: true },
-  expandChildren: { type: Boolean, required: true },
-  noConversationButton: { type: Boolean, default: false },
   isMinimized: { type: Boolean, default: false },
-  ownsShortcuts: { type: Boolean, default: false },
 })
 
-provideNoteShortcutScope(() => props.ownsShortcuts)
 provideMemoryTrackerActions(toRef(() => props.noteId))
 
 const currentUser = inject<Ref<User | undefined>>("currentUser")
@@ -125,29 +102,6 @@ const readonly = (noteRealm: NoteRealm) =>
 
 const isReadmeTitle = (noteRealm: NoteRealm) =>
   isReservedReadmeNoteTitle(noteRealm.note.noteTopology.title)
-
-/**
- * `<img>` source for a note's `image:` value. An absolute path or a URL is used as-is; anything
- * else is a notebook file relative to the note's folder.
- */
-const noteImageSource = (noteId: number, image: string) => {
-  if (image.startsWith("/") || /^[a-z][a-z0-9+.-]*:/i.test(image)) return image
-  return client.buildUrl<ShowAttachmentImageData>({
-    url: "/api/notes/{note}/attachment-image",
-    path: { note: noteId },
-    query: { path: image },
-  })
-}
-
-const noteImageProps = (noteRealm: NoteRealm) => {
-  const { noteImage, imageMask } = noteImageScalarsFromMarkdown(
-    noteRealm.note.content ?? ""
-  )
-  return {
-    noteImage: noteImage && noteImageSource(noteRealm.id, noteImage),
-    imageMask,
-  }
-}
 
 const noteHasInboundWikiReferences = (noteRealm: NoteRealm) =>
   (noteRealm.references?.length ?? 0) > 0
@@ -183,10 +137,5 @@ const toLocalDateString = (date: string | undefined) =>
   overflow: auto;
   display: flex;
   gap: 1rem;
-}
-
-.note-content-wrapper.minimized {
-  height: 3rem;
-  overflow: hidden;
 }
 </style>

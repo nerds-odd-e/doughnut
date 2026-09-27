@@ -7,6 +7,7 @@
       }"
     />
     <JustReviewButtons
+      class="sticky bottom-0 bg-base-100 py-2"
       @grade="justReview($event)"
       :key="memoryTrackerId"
     />

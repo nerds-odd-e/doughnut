@@ -47,6 +47,7 @@
       />
       <AnsweredSpellingQuestion
         v-if="currentAnsweredSpelling"
+        :key="previousAnsweredQuestionCursor"
         :answered-question="currentAnsweredSpelling"
       />
       <template v-else-if="toRepeatCount === 0 && previousAnsweredQuestionCursor === undefined">

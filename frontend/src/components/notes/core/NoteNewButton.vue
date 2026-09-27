@@ -22,32 +22,26 @@
 
 <script setup lang="ts">
 import PopButton from "../../commons/Popups/PopButton.vue"
-import type { Folder, Note } from "@generated/donut-backend-api"
+import type { FolderTrailSegment, Note } from "@generated/donut-backend-api"
 import NoteNewForm from "../NoteNewForm.vue"
 import { useKeyboardShortcut } from "@/composables/useKeyboardShortcut"
-import { useNoteShortcutScope } from "@/composables/noteShortcutScope"
 import { noteMoreOptionsTitles } from "../widgets/noteMoreOptionsTitles"
 import { ref } from "vue"
 
 defineProps<{
   notebookId: number
   /** Resolved parent folder for create dialog (sidebar selection or active note folder). */
-  initialFolder?: Folder
+  initialFolder?: FolderTrailSegment
   titleSearchAnchorNote?: Note | null
-  ancestorFolders?: Folder[]
+  ancestorFolders?: FolderTrailSegment[]
   initialTitle?: string
 }>()
 
 const popButtonRef = ref<InstanceType<typeof PopButton> | null>(null)
-const shortcutScope = useNoteShortcutScope()
 
-useKeyboardShortcut(
-  "note-new",
-  () => {
-    popButtonRef.value?.openDialog()
-  },
-  () => shortcutScope.value
-)
+useKeyboardShortcut("note-new", () => {
+  popButtonRef.value?.openDialog()
+})
 
 defineExpose({
   openDialog: () => popButtonRef.value?.openDialog(),

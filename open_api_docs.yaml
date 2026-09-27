@@ -4156,33 +4156,18 @@ components:
           type: string
         othersModel:
           type: string
-    Folder:
+    FolderTrailSegment:
       type: object
+      description: "One folder on a folder trail: only its id and name."
       properties:
         id:
           type: integer
           format: int32
-        readmeContent:
-          type: string
-        createdAt:
-          type: string
-          format: date-time
-        updatedAt:
-          type: string
-          format: date-time
-        parentFolderId:
-          type: integer
-          format: int32
-          description: Parent folder id when nested; omitted at notebook root.
         name:
           type: string
-          maxLength: 512
-          minLength: 1
       required:
-      - createdAt
       - id
       - name
-      - updatedAt
     Note:
       type: object
       properties:
@@ -4204,6 +4189,14 @@ components:
           format: int32
         note:
           $ref: "#/components/schemas/Note"
+        references:
+          type: array
+          items:
+            $ref: "#/components/schemas/NoteTopology"
+        wikiLinks:
+          type: array
+          items:
+            $ref: "#/components/schemas/WikiLink"
         notebookRealm:
           $ref: "#/components/schemas/NotebookRealm"
           description: "Notebook chrome: entity plus optional catalog hints and optional\
@@ -4213,15 +4206,7 @@ components:
           description: Folders from notebook root outward; see each realm for trail
             semantics.
           items:
-            $ref: "#/components/schemas/Folder"
-        references:
-          type: array
-          items:
-            $ref: "#/components/schemas/NoteTopology"
-        wikiLinks:
-          type: array
-          items:
-            $ref: "#/components/schemas/WikiLink"
+            $ref: "#/components/schemas/FolderTrailSegment"
         scopedReadmeContent:
           type: string
           description: Full markdown of the container readme that supplies the nearest
@@ -4424,7 +4409,7 @@ components:
         ancestorFolders:
           type: array
           items:
-            $ref: "#/components/schemas/Folder"
+            $ref: "#/components/schemas/FolderTrailSegment"
         propertyKey:
           type: string
       required:
@@ -4671,6 +4656,33 @@ components:
             \ Must belong to the target notebook."
       required:
       - name
+    Folder:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+        readmeContent:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        parentFolderId:
+          type: integer
+          format: int32
+          description: Parent folder id when nested; omitted at notebook root.
+        name:
+          type: string
+          maxLength: 512
+          minLength: 1
+      required:
+      - createdAt
+      - id
+      - name
+      - updatedAt
     FolderMoveRequest:
       type: object
       description: "Move a folder to a new parent in the same notebook, or to another\
@@ -5452,7 +5464,7 @@ components:
           description: Folders from notebook root outward; see each realm for trail
             semantics.
           items:
-            $ref: "#/components/schemas/Folder"
+            $ref: "#/components/schemas/FolderTrailSegment"
         scopedReadmeContent:
           type: string
           description: Full markdown of the container readme that supplies the nearest
@@ -6067,7 +6079,7 @@ components:
           description: Folders from notebook root outward; see each realm for trail
             semantics.
           items:
-            $ref: "#/components/schemas/Folder"
+            $ref: "#/components/schemas/FolderTrailSegment"
         scopedReadmeContent:
           type: string
           description: Full markdown of the container readme that supplies the nearest

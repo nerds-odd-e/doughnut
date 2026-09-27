@@ -7,6 +7,7 @@ import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 
+import com.odde.donut.controllers.dto.FolderTrailSegment;
 import com.odde.donut.controllers.dto.NoteRealm;
 import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.Note;
@@ -70,7 +71,7 @@ class NotebookGitFolderNotePublicationControllerTest extends NotebookGitControll
               .orElseThrow();
       NoteRealm shown = noteController.showNote(created);
       assertThat(
-          shown.getAncestorFolders().stream().map(Folder::getId).toList(),
+          shown.sidebar().getAncestorFolders().stream().map(FolderTrailSegment::id).toList(),
           contains(physics.getId()));
       assertThat(shown.getNote().getContent(), equalTo(addition.getValue()));
     }

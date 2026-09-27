@@ -6,6 +6,7 @@ import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 
+import com.odde.donut.controllers.dto.FolderTrailSegment;
 import com.odde.donut.controllers.dto.NoteRealm;
 import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.Note;
@@ -49,7 +50,8 @@ class NotebookGitProposalRelocationDestinationControllerTest extends NotebookGit
     NoteRealm shown = noteController.showNote(noteRepository.findById(note.getId()).orElseThrow());
     assertThat(shown.getNote().getTitle(), equalTo("note"));
     assertThat(
-        shown.getAncestorFolders().stream().map(Folder::getName).toList(), contains("Missing"));
+        shown.sidebar().getAncestorFolders().stream().map(FolderTrailSegment::name).toList(),
+        contains("Missing"));
     inCommittedTransaction(
         transactionManager,
         () ->
@@ -117,7 +119,8 @@ class NotebookGitProposalRelocationDestinationControllerTest extends NotebookGit
 
     NoteRealm shown = noteController.showNote(noteRepository.findById(other.getId()).orElseThrow());
     assertThat(
-        shown.getAncestorFolders().stream().map(Folder::getName).toList(), contains("Source"));
+        shown.sidebar().getAncestorFolders().stream().map(FolderTrailSegment::name).toList(),
+        contains("Source"));
     inCommittedTransaction(
         transactionManager,
         () ->
@@ -149,6 +152,7 @@ class NotebookGitProposalRelocationDestinationControllerTest extends NotebookGit
 
     NoteRealm shown = noteController.showNote(noteRepository.findById(note.getId()).orElseThrow());
     assertThat(
-        shown.getAncestorFolders().stream().map(Folder::getId).toList(), contains(courses.getId()));
+        shown.sidebar().getAncestorFolders().stream().map(FolderTrailSegment::id).toList(),
+        contains(courses.getId()));
   }
 }

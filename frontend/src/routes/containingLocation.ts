@@ -1,5 +1,5 @@
 import type {
-  Folder,
+  FolderTrailSegment,
   NotebookRealm,
   NoteTopology,
 } from "@generated/donut-backend-api"
@@ -9,7 +9,7 @@ import { noteShowLocation } from "./noteShowLocation"
 /** Where the reader lands once the note, folder or file they were viewing is gone. */
 export function containingLocationOf(realm: {
   notebookRealm: NotebookRealm
-  ancestorFolders?: Folder[]
+  ancestorFolders?: FolderTrailSegment[]
 }): RouteLocationNamedRaw {
   const notebookId = realm.notebookRealm.notebook.id
   const parent = realm.ancestorFolders?.at(-1)

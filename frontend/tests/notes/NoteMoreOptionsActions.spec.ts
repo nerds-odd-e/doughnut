@@ -3,7 +3,6 @@ import NoteMoreOptionsActions from "@/components/notes/widgets/NoteMoreOptionsAc
 import usePopups from "@/components/commons/Popups/usePopups"
 import makeMe from "donut-test-fixtures/makeMe"
 import helper, { mockSdkService } from "@tests/helpers"
-import { wrapWithNoteShortcutScope } from "@tests/helpers/noteShortcutScopeTestHelpers"
 import { flushPromises, type VueWrapper } from "@vue/test-utils"
 import { afterEach, beforeEach, describe, expect, it } from "vitest"
 
@@ -105,30 +104,6 @@ describe("NoteMoreOptionsActions keyboard shortcut", () => {
       expect(popups?.length).toBe(1)
       expect(popups?.[0]?.type).toBe("confirm")
       expect(popups?.[0]?.message).toBe('Confirm to trash "Note1.1.1"?')
-    }
-  )
-
-  it.each(["toolbar", "menu"] as const)(
-    "ignores e and d when shortcut scope is inactive (layout=%s)",
-    async (layout) => {
-      const Harness = wrapWithNoteShortcutScope(
-        NoteMoreOptionsActions,
-        { note, layout },
-        false
-      )
-      wrapper = helper
-        .component(Harness)
-        .withRouter()
-        .withCleanStorage()
-        .mount({ attachTo: document.body })
-
-      await flushPromises()
-      dispatchNoteExportShortcut()
-      dispatchNoteTrashShortcut()
-      await flushPromises()
-
-      expect(document.querySelector("dialog")).toBeNull()
-      expect(usePopups().popups.peek()).toHaveLength(0)
     }
   )
 

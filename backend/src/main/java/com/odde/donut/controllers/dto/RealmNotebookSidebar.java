@@ -1,7 +1,6 @@
 package com.odde.donut.controllers.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.odde.donut.entities.Folder;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import java.util.List;
@@ -24,7 +23,7 @@ public class RealmNotebookSidebar {
   private NotebookRealm notebookRealm;
 
   @Schema(description = "Folders from notebook root outward; see each realm for trail semantics.")
-  private List<Folder> ancestorFolders = List.of();
+  private List<FolderTrailSegment> ancestorFolders = List.of();
 
   @JsonInclude(JsonInclude.Include.NON_NULL)
   @Schema(

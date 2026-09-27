@@ -26,6 +26,7 @@
     </div>
     <div class="spacer"></div>
     <div class="flex items-center gap-2">
+      <slot name="header-actions" />
       <button
         class="export-button"
         @click="showExportDialog = true"

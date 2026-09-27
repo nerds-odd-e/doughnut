@@ -383,6 +383,10 @@ A delegated implementation agent started its tests in the background and ended i
   - Observed effect: about 12 status-only coordinator turns, plus one inspection and one nudge. The report, proof and delivery were unaffected.
   - Inference: this time the agent kept waiting after its background work had ended, so the notifications continued past the point where anything was running. A coordinator message asking for the report ended the wait. Qualified: token counts for these turns were not captured.
 
+- Execution: SEED-046#story-9 / `.planning/slice-plans/010-responses-carry-no-orm-internals/PLAN.md` at d305df9c23 / 9365a11c7d; Timestamp: unknown (2026-09-27, between 09:50 and 10:02+08:00, slice 1); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.42.
+  - Evidence: coordinator conversation: one task-notification for "Implement plan 010 slice 1" with "stopped with background work of its own still running" / "This agent has not reported yet", followed by the real hand-back.
+  - Observed effect: one status-only coordinator turn; delivery unaffected.
+
 ## ODF-116 — Closing one story in a shared seed made a sibling story's ready assessment stale
 
 Former local code: DD-124.
@@ -415,6 +419,10 @@ A story's readiness basis is a digest of its whole seed document. Wrapping up an
   - Evidence: after plan 006 was assessed ready (basis.document f658172c…), df50754d7e and 247e9a9664 closed SEED-046 stories 11, 10 and 12 and removed story 4's section; start refused with "published preparation is needs-reassessment"; the story-5 section was byte-identical before and after (awk section diff); 2a8fd844b4 changed only `basis.document` (→ ad173d6e…), `basis.plan` 8bc0a3b8… unchanged.
   - Observed effect: one refused start, a recheck of the plan's named symbols against current code, one extra commit on main and a retry.
   - Inference: the plan referred to story 4a (plan 005) landing first, so the symbol recheck had a little value; the refusal itself carried no information about story 5.
+- Execution: SEED-046#story-9 / `.planning/slice-plans/010-responses-carry-no-orm-internals/PLAN.md` at d305df9c23 / 9365a11c7d; Timestamp: 2026-09-27, before 09:44:06+08:00 (refusal; readiness commit 939ce6b6f7); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.42.
+  - Evidence: 67be25ba00 (08:34:03+08:00) closed SEED-046 story 13 and an earlier closure removed story 14; start refused with "published preparation is needs-reassessment"; `git diff 1f2d54c86c HEAD` on the seed showed only the sibling sections removed; 939ce6b6f7 changed only `basis.document` (acb4a665… → 19996e46…), `basis.plan` cbd378e1… unchanged.
+  - Observed effect: one refused start, a reassessment, one extra commit on main whose first push was rejected by a concurrent Take and needed a rebase, then a retry.
+  - Inference: the plan did not depend on stories 13 or 14, so the reassessment carried no information.
 
 ## DD-126 — A plan said the changed script had no test, and nobody searched for one before delivery, so CI caught the stale test
 
@@ -511,8 +519,34 @@ Slice 2's implementer reported that a rich body edit drops the file's final newl
   - Evidence: coordinator transcript `23a26a0f…jsonl` 09:51:11–09:52:45+08:00: two commit calls through `.claude/skills/…/agent-commit.mjs` returned no output and `exit=0` with the change still staged; a probe with `-m x --bogus` also exited 0 silently; the same call through `.agents/skills/…` returned `{"ok":true,"status":"committed","agent":"Hibiki-chan","sha":"ee09a8a2cf…"}`. Earlier `--help` through the alias worked only because the shell had `cd` into the symlinked directory (physical cwd). `.claude/skills/dough-execute-plan` is a symlink to `../../.agents/skills/dough-execute-plan`; the delivery receipt reports `runtime.alias: ".claude"`.
   - Observed effect: four extra coordinator calls (about 1.5 minutes) before slice 1 was committed; a silent exit 0 looks like success, so an unattended caller could have delivered without the commit.
   - Inference: `execution-start.mjs` and `ci-repair-stash.mjs` use the same literal check and would likely fail the same way through the alias; using `isDirectCliEntry` in all three would remove the cause.
+- Execution: SEED-046#story-9 / `.planning/slice-plans/010-responses-carry-no-orm-internals/PLAN.md` at d305df9c23 / 9365a11c7d; Timestamp: 2026-09-27, before 10:02:20+08:00 (the slice 1 commit, made after switching to the `.agents` path); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.42.
+  - Evidence: two runs of `node .claude/skills/dough-execute-plan/scripts/agent-commit.mjs -m …` in the execution worktree exited 0 with empty output and `git log` still at d305df9c23; the same command via `.agents/skills/…` returned `{"ok":true,"status":"committed",…,"sha":"9365a11c7d…"}`. `execution-start.mjs start` did run through the `.claude` path in the same session.
+  - Observed effect: two wasted commit attempts and a diagnosis; nothing was committed wrongly.
+  - Inference: any entry script with this guard fails silently when started through the symlink; a guard that compares real paths (or `.agents` paths in the guidance) would avoid it. Which other scripts share the guard was not checked.
 
-## DD-134 — An implementer's slice proof ran only the specs it chose, missing consumers of the store method it changed
+## DD-134 — The plan's E2E proof command named a feature directory, which the isolated runner refuses
+
+Plan 010 listed `pnpm cy:run --spec e2e_test/features/folder_organization`. The isolated E2E runner requires explicit feature files, so the implementer had to find and list them.
+
+### Occurrences
+
+- Execution: SEED-046#story-9 / `.planning/slice-plans/010-responses-carry-no-orm-internals/PLAN.md` at d305df9c23 / 9365a11c7d; Timestamp: unknown (2026-09-27, slice 2, before 10:20:32+08:00); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.42.
+  - Evidence: slice 2 implementer report: the literal plan command "is refused by the isolated runner, which requires explicit feature files"; it ran four `.feature` files instead (18/18 passed); the plan's command was corrected in 5d384c2665.
+  - Observed effect: a small detour inside the slice; proof unaffected.
+  - Inference: slice planning did not run or check the E2E command it wrote.
+
+## DD-135 — Agents reported vue-tsc's exit code from a pipe into `tail`, so the coordinator had to rerun the typecheck
+
+The frontend proof requires `vue-tsc --noEmit` to pass. Two agents ran it as `... vue-tsc --noEmit | tail`, then reported "exit 0". That code is `tail`'s, not vue-tsc's. Both agents said so themselves, and the coordinator reran the typecheck without the pipe before accepting.
+
+### Occurrences
+
+- Execution: SEED-033#story-2 / `9c8aca9bbd:.planning/slice-plans/012-read-note-context/PLAN.md` / 99aa915e22; Timestamp: 2026-09-27T09:52:41+08:00 (slice 1 acceptance, before commit 99aa915e22) and 2026-09-27T10:16:30+08:00 (slice 5 refactor acceptance, before commit 3712c94363); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.42.
+  - Evidence: slice 1 implementer return ("The exit code I captured was the pipe's final `tail`, not vue-tsc's own"); slice 5 refactor return (same remark); coordinator reruns `vue-tsc --noEmit >/dev/null 2>&1; echo $?` → 0 both times. Later delegation prompts that said "report its real exit code (don't pipe it into tail)" got a correct exit code.
+  - Observed effect: two extra typecheck runs, about a minute each; no wrong result was accepted.
+  - Inference: a delegated command whose pass/fail matters should be given with its exit-code capture spelled out, since agents tend to trim long output with `tail`. Qualified: small cost, and the agents reported the problem honestly.
+
+## DD-136 — An implementer's slice proof ran only the specs it chose, missing consumers of the store method it changed
 
 The slice changed `StoredApiCollection.trashNote` to request a folder listing before trashing. The implementer proved it with `tests/store`, `tests/toolbars` and two `NoteMoreOptions` specs; `tests/notes/NoteMoreOptionsForm.trashNote.spec.ts`, which also drives `trashNote`, was not run and failed on the unmocked request (ADR 0006: an unmocked request fails loudly). Possibly the same root cause as ODF-111 (proof chosen by the edited area rather than by the changed method's consumers), but there the actor was the refactor pass; matching is uncertain.
 
@@ -525,6 +559,6 @@ The slice changed `StoredApiCollection.trashNote` to request a folder listing be
 
 ## Retention
 
-- Highest allocated local number: 134
+- Highest allocated local number: 136
 - Recovery: `33939aa45a17c08f5e6f8076178ce96437fdfbe8:DearDough.md` contains the complete pre-compaction log and earlier recovery references; `b0b385a184e96ecf8b0f6fc5572eaaab69bc8dad` preserves later history.
 - Occurrence history is partial; full observations, effects, inference and historical provenance remain in that snapshot and the upstream catalog.

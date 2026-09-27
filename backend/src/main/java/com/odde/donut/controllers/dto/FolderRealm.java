@@ -32,7 +32,7 @@ public record FolderRealm(
       String readmeContent) {
     RealmNotebookSidebar sidebar = new RealmNotebookSidebar();
     sidebar.setNotebookRealm(chrome);
-    sidebar.setAncestorFolders(ancestorFolders);
+    sidebar.setAncestorFolders(FolderTrailSegment.of(ancestorFolders));
     sidebar.setScopedReadmeContent(scopedReadmeContent);
     return new FolderRealm(sidebar, folder, parentFolderId, readmeContent);
   }

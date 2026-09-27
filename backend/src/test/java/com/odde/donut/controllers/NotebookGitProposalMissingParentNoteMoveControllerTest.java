@@ -6,6 +6,7 @@ import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 
+import com.odde.donut.controllers.dto.FolderTrailSegment;
 import com.odde.donut.controllers.dto.NoteRealm;
 import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.MemoryTracker;
@@ -61,7 +62,7 @@ class NotebookGitProposalMissingParentNoteMoveControllerTest
         });
     NoteRealm shown = noteController.showNote(noteRepository.findById(cells.getId()).orElseThrow());
     assertThat(
-        shown.getAncestorFolders().stream().map(Folder::getName).toList(),
+        shown.sidebar().getAncestorFolders().stream().map(FolderTrailSegment::name).toList(),
         contains("_trash", "Biology"));
     assertExactAcceptedTree(notebook, proposedCommit, publishedHead, binding);
   }
@@ -92,7 +93,8 @@ class NotebookGitProposalMissingParentNoteMoveControllerTest
     assertThat(recovered.getTitle(), equalTo("Cells"));
     NoteRealm shown = noteController.showNote(recovered);
     assertThat(
-        shown.getAncestorFolders().stream().map(Folder::getName).toList(), contains("Research"));
+        shown.sidebar().getAncestorFolders().stream().map(FolderTrailSegment::name).toList(),
+        contains("Research"));
     assertExactAcceptedTree(notebook, proposedCommit, publishedHead, binding);
   }
 

@@ -1,4 +1,7 @@
-import type { Folder, FolderRealm } from "@generated/donut-backend-api"
+import type {
+  FolderTrailSegment,
+  FolderRealm,
+} from "@generated/donut-backend-api"
 import { NotebookController } from "@generated/donut-backend-api/sdk.gen"
 import { computed, onMounted, ref, watch, type Ref } from "vue"
 import { useRouter } from "vue-router"
@@ -31,7 +34,7 @@ export function useFolderAdmin(
   const moveError = ref<string | undefined>(undefined)
   const dissolveError = ref<string | undefined>(undefined)
   const removalError = ref<string | undefined>(undefined)
-  const selectedParentFolder = ref<Folder | null>(null)
+  const selectedParentFolder = ref<FolderTrailSegment | null>(null)
   const destinationCatalogItems = ref<NotebookCatalogEntry[] | undefined>(
     undefined
   )
@@ -68,12 +71,12 @@ export function useFolderAdmin(
     return folderRealm.value.notebookRealm.notebook.id
   })
 
-  const folderPickerContextFolder = computed((): Folder | null => {
+  const folderPickerContextFolder = computed((): FolderTrailSegment | null => {
     if (isCrossNotebookMove.value) return null
     return folderRealm.value.folder
   })
 
-  const folderPickerAncestorFolders = computed((): Folder[] => {
+  const folderPickerAncestorFolders = computed((): FolderTrailSegment[] => {
     if (isCrossNotebookMove.value) return []
     return folderRealm.value.ancestorFolders ?? []
   })

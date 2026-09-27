@@ -1,11 +1,10 @@
 import type {
-  Folder,
+  FolderTrailSegment,
   NoteRealm,
   NotebookRealm,
   WikiLink,
 } from '@generated/donut-backend-api'
 import Builder from './Builder'
-import FolderBuilder from './FolderBuilder'
 import NoteBuilder from './NoteBuilder'
 
 class NoteRealmBuilder extends Builder<NoteRealm> {
@@ -95,13 +94,11 @@ class NoteRealmBuilder extends Builder<NoteRealm> {
   }
 
   inFolder(folderId: number, folderName: string): NoteRealmBuilder {
-    this.data.ancestorFolders = [
-      new FolderBuilder().folder(folderId, folderName).do(),
-    ]
+    this.data.ancestorFolders = [{ id: folderId, name: folderName }]
     return this
   }
 
-  ancestorFolders(folders: Folder[]): NoteRealmBuilder {
+  ancestorFolders(folders: FolderTrailSegment[]): NoteRealmBuilder {
     this.data.ancestorFolders = folders
     return this
   }

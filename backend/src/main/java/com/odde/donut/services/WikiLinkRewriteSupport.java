@@ -10,7 +10,7 @@ import com.odde.donut.algorithms.PortablePath;
 import com.odde.donut.algorithms.WikiLinkMarkdown;
 import com.odde.donut.algorithms.WikiLinkMarkdownDocumentRewrite;
 import com.odde.donut.algorithms.WikiLinkMarkdownRewrite;
-import com.odde.donut.controllers.dto.FolderTrailSegments;
+import com.odde.donut.controllers.dto.FolderTrail;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.User;
 import com.odde.donut.factoryServices.EntityPersister;
@@ -242,8 +242,7 @@ final class WikiLinkRewriteSupport {
                         path ->
                             path.matchesTitleAndFolderTrail(
                                 destinationNote.getTitle(),
-                                FolderTrailSegments.namesFromRootToContainingFolder(
-                                    destinationNote))))
+                                FolderTrail.namesFromRootToContainingFolder(destinationNote))))
         .isPresent();
   }
 }

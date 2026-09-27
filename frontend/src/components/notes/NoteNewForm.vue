@@ -60,7 +60,7 @@
 
 <script setup lang="ts">
 import type {
-  Folder,
+  FolderTrailSegment,
   WikidataSearchEntity,
   Note,
   NoteCreationDto,
@@ -93,12 +93,12 @@ const { popups } = usePopups()
 const props = withDefaults(
   defineProps<{
     notebookId: number
-    initialFolder?: Folder
+    initialFolder?: FolderTrailSegment
     initialTitle?: string
     /** When set, title search is scoped under this note. */
     titleSearchAnchorNote?: Note
     wikiLinkCacheRefreshSourceNoteId?: number
-    ancestorFolders?: Folder[]
+    ancestorFolders?: FolderTrailSegment[]
   }>(),
   { ancestorFolders: () => [] }
 )
@@ -112,7 +112,9 @@ const contextNote = computed(() => {
 })
 
 const parentRelationship = ref<ParentRelationship>("none")
-const selectedFolder = ref<Folder | null>(props.initialFolder ?? null)
+const selectedFolder = ref<FolderTrailSegment | null>(
+  props.initialFolder ?? null
+)
 
 watch(
   () => props.initialFolder,
@@ -132,7 +134,8 @@ const parentLocationDescription = computed(() => {
 })
 
 const folderSelectorContextFolder = computed(
-  (): Folder | null => selectedFolder.value ?? props.initialFolder ?? null
+  (): FolderTrailSegment | null =>
+    selectedFolder.value ?? props.initialFolder ?? null
 )
 
 const emit = defineEmits<{

@@ -1,11 +1,9 @@
 <template>
   <ContentLoader v-if="!memoryTracker" />
   <main v-else>
-    <NoteShow
-      v-bind="{
-        noteId: memoryTracker.note.id,
-        expandChildren: false,
-      }"
+    <NoteContextReader
+      :note-id="memoryTracker.note.id"
+      :focused-property-key="memoryTracker.propertyKey"
     />
   </main>
 </template>
@@ -16,7 +14,7 @@ import ContentLoader from "@/components/commons/ContentLoader.vue"
 import type { MemoryTracker } from "@generated/donut-backend-api"
 import { MemoryTrackerController } from "@generated/donut-backend-api/sdk.gen"
 import {} from "@/managedApi/clientSetup"
-import NoteShow from "../notes/NoteShow.vue"
+import NoteContextReader from "../notes/NoteContextReader.vue"
 
 // Props definition
 const props = defineProps<{
