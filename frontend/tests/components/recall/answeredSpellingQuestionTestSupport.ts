@@ -34,7 +34,6 @@ export function mountAnsweredSpellingQuestion(
     attachTo: document.body,
     global: {
       stubs: {
-        NoteUnderQuestion: true,
         ViewMemoryTrackerLink: true,
       },
     },

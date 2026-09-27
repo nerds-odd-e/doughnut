@@ -77,8 +77,11 @@ describe("RecallPage spelling quiz", () => {
     })
 
   it("shows incorrect feedback with the reviewed note's context after a wrong answer", async () => {
+    const noteTitle = "Sedition"
+    const notebookName = "Political History"
     const noteRealm = makeMe.aNoteRealm
-      .title("Sedition")
+      .title(noteTitle)
+      .notebookName(notebookName)
       .content(`---
 register: formal
 ---
@@ -112,14 +115,22 @@ Inciting rebellion against authority.`)
         .findComponent({ name: "ViewMemoryTrackerLink" })
         .props("memoryTrackerId")
     ).toBe(memoryTrackerId)
-    const noteContext = wrapper.find('[aria-label="Note context"]').text()
+
+    const resultText = wrapper.text()
+    expect(resultText.split(noteTitle).length - 1).toBe(1)
+    expect(resultText.split(notebookName).length - 1).toBe(1)
+
+    const noteUnderQuestion = wrapper.find(".note-under-question")
+    const noteContext = noteUnderQuestion.find('[aria-label="Note context"]')
+    expect(noteContext.exists()).toBe(true)
+    const noteContextText = noteContext.text()
     for (const expected of [
       "register",
       "formal",
       "Inciting rebellion against authority.",
       "Mutiny",
     ]) {
-      expect(noteContext).toContain(expected)
+      expect(noteContextText).toContain(expected)
     }
   })
 

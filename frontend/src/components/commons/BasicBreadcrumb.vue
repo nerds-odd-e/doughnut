@@ -1,5 +1,5 @@
 <template>
-  <div class="text-sm daisy-breadcrumbs max-w-full">
+  <div class="text-sm daisy-breadcrumbs min-w-0 w-full max-w-full overflow-x-auto">
     <ul class="m-0 pl-0">
       <slot name="topLink" />
       <li
