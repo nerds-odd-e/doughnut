@@ -81,7 +81,7 @@ class NotebookAttachmentControllerTest extends ControllerTestBase {
     }
 
     @Test
-    void aPictureFileIsMarkedAsAPicture() throws Exception {
+    void anImageFileIsMarkedAsAnImage() throws Exception {
       NotebookAttachment flow = attachmentAtRoot("flow.png", "png bytes");
 
       assertThat(controller.getAttachmentPage(notebook, flow).picture(), equalTo(true));
@@ -139,9 +139,9 @@ class NotebookAttachmentControllerTest extends ControllerTestBase {
   }
 
   @Nested
-  class Picture {
+  class Image {
     @Test
-    void servesAPictureFileInlineWithItsMediaTypeAndNeverSniffed() throws Exception {
+    void servesAnImageFileInlineWithItsMediaTypeAndNeverSniffed() throws Exception {
       NotebookAttachment photo = attachmentAtRoot("photo.JPG", "jpeg bytes");
 
       ResponseEntity<byte[]> response = controller.showAttachmentPicture(notebook, photo);
@@ -215,7 +215,7 @@ class NotebookAttachmentControllerTest extends ControllerTestBase {
     }
 
     @Test
-    void nonReaderGetsNoPageDownloadOrPicture() {
+    void nonReaderGetsNoPageDownloadOrImage() {
       assertThrows(
           UnexpectedNoAccessRightException.class,
           () -> controller.getAttachmentPage(notebook, othersFile));

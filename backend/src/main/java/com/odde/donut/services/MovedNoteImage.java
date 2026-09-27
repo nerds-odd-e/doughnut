@@ -17,14 +17,14 @@ import java.util.Set;
 import org.springframework.stereotype.Service;
 
 /**
- * The picture a note moved to another folder within its notebook takes along: the file its {@code
+ * The image a note moved to another folder within its notebook takes along: the file its {@code
  * image:} names as a plain filename in its own folder. The file moves with the note, or the note
  * gets a copy reusing the same stored bytes while another note in the source folder also names it.
  * In the new folder it takes the first name no entry there holds (ignoring case), and the note's
  * {@code image:} is rewritten when that name differs.
  */
 @Service
-public class MovedNotePicture {
+public class MovedNoteImage {
   private final NoteFolderAttachment noteFolderAttachment;
   private final NoteRepository noteRepository;
   private final FolderSiblingNameValidation folderSiblingNameValidation;
@@ -32,7 +32,7 @@ public class MovedNotePicture {
   private final AuthoredNoteDocumentPersistence authoredNoteDocumentPersistence;
   private final CanonicalDonutOrigin canonicalDonutOrigin;
 
-  public MovedNotePicture(
+  public MovedNoteImage(
       NoteFolderAttachment noteFolderAttachment,
       NoteRepository noteRepository,
       FolderSiblingNameValidation folderSiblingNameValidation,
@@ -48,17 +48,16 @@ public class MovedNotePicture {
   }
 
   /**
-   * Runs {@code placeNote}, which places the note in {@code destinationOrNull}, carrying its
-   * picture.
+   * Runs {@code placeNote}, which places the note in {@code destinationOrNull}, carrying its image.
    */
-  public void placeWithPicture(
+  public void placeWithImage(
       Note note, Folder destinationOrNull, Timestamp now, Runnable placeNote) {
-    Optional<NotebookAttachment> picture = pictureToCarry(note, destinationOrNull);
+    Optional<NotebookAttachment> image = imageToCarry(note, destinationOrNull);
     placeNote.run();
-    picture.ifPresent(file -> carry(note, file, destinationOrNull, now));
+    image.ifPresent(file -> carry(note, file, destinationOrNull, now));
   }
 
-  private Optional<NotebookAttachment> pictureToCarry(Note note, Folder destinationOrNull) {
+  private Optional<NotebookAttachment> imageToCarry(Note note, Folder destinationOrNull) {
     if (Objects.equals(folderId(note.getFolder()), folderId(destinationOrNull))) {
       return Optional.empty();
     }

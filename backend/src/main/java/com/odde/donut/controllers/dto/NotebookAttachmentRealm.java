@@ -3,7 +3,7 @@ package com.odde.donut.controllers.dto;
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.NotebookAttachment;
-import com.odde.donut.services.notebookAttachment.PictureFile;
+import com.odde.donut.services.notebookAttachment.ImageFile;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 
@@ -28,6 +28,6 @@ public record NotebookAttachmentRealm(
         sidebar,
         new NotebookAttachmentListItem(attachment.getId(), attachment.getFilename()),
         size,
-        PictureFile.mediaType(attachment.getFilename()).isPresent());
+        ImageFile.mediaType(attachment.getFilename()).isPresent());
   }
 }

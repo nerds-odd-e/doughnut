@@ -99,7 +99,9 @@ Paths under `backend/src/main/java/com/odde/donut/`.
 ### 1. Image rules and serving use the image name
 
 Type: Structure
-Status: planned
+Status: done — proof (plus the renamed `NotebookGitAttachmentRawHistoryControllerTest`,
+`NotebookGitDerivedTreeOracleControllerTest`, `NotebookGitWebAttachmentDeleteControllerTest`)
+61 tests green; refactor pass made no edits
 Proof: `CURSOR_DEV=true nix develop -c pnpm backend:test_only --tests 'com.odde.donut.controllers.NoteAttachmentImageControllerTest' --tests 'com.odde.donut.controllers.NotebookAttachmentControllerTest' --tests 'com.odde.donut.controllers.NotebookGitWebNoteMoveImageControllerTest' --tests 'com.odde.donut.controllers.NoteControllerUploadNoteImageTests'`
 stays green.
 
@@ -176,4 +178,5 @@ Change: rename "picture" phrases in the three features, in
 
 ## Learnings
 
-None yet.
+- Replacing `Picture` inside identifiers breaks articles ("aImageFile"); rename
+  "a Picture" to "an Image" deliberately in later slices.

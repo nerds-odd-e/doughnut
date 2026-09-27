@@ -47,7 +47,7 @@ class NoteAttachmentImageControllerTest extends ControllerTestBase {
   }
 
   @Test
-  void servesAPictureInTheNotesFolderInlineAndNeverSniffed() throws Exception {
+  void servesAnImageInTheNotesFolderInlineAndNeverSniffed() throws Exception {
     file(physics, "force-diagram.png", png);
 
     ResponseEntity<byte[]> response = controller.showAttachmentImage(force, "force-diagram.png");

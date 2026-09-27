@@ -11,8 +11,8 @@ import com.odde.donut.exceptions.ApiException;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.donut.services.AuthoredNoteDocumentPersistence;
 import com.odde.donut.services.FolderSiblingNameValidation;
+import com.odde.donut.services.notebookAttachment.ImageFile;
 import com.odde.donut.services.notebookAttachment.NotebookAttachmentContent;
-import com.odde.donut.services.notebookAttachment.PictureFile;
 import com.odde.donut.validators.AuthoredNoteContent;
 import java.io.IOException;
 import java.sql.Timestamp;
@@ -21,9 +21,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
- * A picture uploaded for a note's {@code image} property becomes a file in the note's folder under
- * its uploaded name. A name that is not a plain filename, is already taken there, or is not a
- * {@link PictureFile} within its limit is refused before anything is stored; nothing is renamed or
+ * An image uploaded for a note's {@code image} property becomes a file in the note's folder under
+ * its uploaded name. A name that is not a plain filename, is already taken there, or is not an
+ * {@link ImageFile} within its limit is refused before anything is stored; nothing is renamed or
  * overwritten. Otherwise its bytes are stored first, then the pointer and the note's {@code image:}
  * are accepted together as one web change, with the content prepared like any ordinary content
  * save. A notebook without a Git binding refuses the upload.
@@ -56,16 +56,16 @@ public class WebNoteImageUploadService {
   }
 
   /** Returns the saved note. */
-  public Note upload(Note note, MultipartFile picture, Timestamp updatedAt)
+  public Note upload(Note note, MultipartFile image, Timestamp updatedAt)
       throws IOException, UnexpectedNoAccessRightException {
     Integer notebookId = note.getNotebook().getId();
-    String filename = picture.getOriginalFilename();
+    String filename = image.getOriginalFilename();
     if (bindingRepository.findByNotebook_Id(notebookId).isEmpty()) {
       throw NotebookGitBindingMissing.refusal();
     }
     requireFreePlainFilename(note, filename);
-    PictureFile.admit(filename, picture.getSize());
-    byte[] pointer = attachmentContent.storeAsLfsPointer(notebookId, picture.getBytes());
+    ImageFile.admit(filename, image.getSize());
+    byte[] pointer = attachmentContent.storeAsLfsPointer(notebookId, image.getBytes());
     return webNoteEditService.edit(
         note.getId(),
         notebookId,

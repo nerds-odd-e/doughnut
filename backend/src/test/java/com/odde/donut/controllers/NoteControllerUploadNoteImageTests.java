@@ -25,49 +25,49 @@ import org.springframework.web.server.ResponseStatusException;
 
 class NoteControllerUploadNoteImageTests extends NotebookGitWebContentControllerTestBase {
   @Test
-  void theUploadedPictureIsAFileInTheNotesFolderNamedByItsImageInOneAcceptedCommit()
+  void theUploadedImageIsAFileInTheNotesFolderNamedByItsImageInOneAcceptedCommit()
       throws Exception {
     Notebook notebook = createGitBackedNotebook();
     Folder physics = makeMe.aFolder().notebook(notebook).name("physics").please();
     Note moon = makeMe.aNote("Moon").folder(physics).content(ACCEPTED_CONTENT).please();
     snapshotCurrentPortableTree(notebook);
     List<String> commitsBefore = acceptedHistory(notebook).commits();
-    MultipartFile picture = makeMe.anUploadedImage().toMultiplePartFilePlease();
+    MultipartFile image = makeMe.anUploadedImage().toMultiplePartFilePlease();
 
-    upload(moon, picture);
+    upload(moon, image);
 
     AcceptedHistory after = acceptedHistory(notebook);
     assertThat(after.parents(), equalTo(commitsBefore));
     assertThat(
         tipContent(after, "physics/my.png"),
-        equalTo(lfsPointerStoredFor(notebook, picture.getBytes())));
+        equalTo(lfsPointerStoredFor(notebook, image.getBytes())));
     assertThat(
         tipText(after, "physics/Moon.md"),
         equalTo("---\ntype: Note\nimage: my.png\n---\naccepted content"));
   }
 
   @Test
-  void aRootNotesPictureIsAFileAtTheNotebookRootAndItsContentIsPreparedLikeAnySave()
+  void aRootNotesImageIsAFileAtTheNotebookRootAndItsContentIsPreparedLikeAnySave()
       throws Exception {
     Notebook notebook = createGitBackedNotebook();
     Note moon = makeMe.aNote("Moon").notebook(notebook).content("no frontmatter").please();
     snapshotCurrentPortableTree(notebook);
     List<String> commitsBefore = acceptedHistory(notebook).commits();
-    MultipartFile picture = makeMe.anUploadedImage().toMultiplePartFilePlease();
+    MultipartFile image = makeMe.anUploadedImage().toMultiplePartFilePlease();
 
-    NoteRealm realm = upload(moon, picture);
+    NoteRealm realm = upload(moon, image);
 
     String prepared = "---\ntype: Note\nimage: my.png\n---\nno frontmatter";
     assertThat(realm.getNote().getContent(), equalTo(prepared));
     AcceptedHistory after = acceptedHistory(notebook);
     assertThat(after.parents(), equalTo(commitsBefore));
     assertThat(
-        tipContent(after, "my.png"), equalTo(lfsPointerStoredFor(notebook, picture.getBytes())));
+        tipContent(after, "my.png"), equalTo(lfsPointerStoredFor(notebook, image.getBytes())));
     assertThat(tipText(after, "Moon.md"), equalTo(prepared));
   }
 
   @Test
-  void replacingAPictureChangesOnlyItsImageLine() throws Exception {
+  void replacingAnImageChangesOnlyItsImageLine() throws Exception {
     Notebook notebook = createGitBackedNotebook();
     Folder physics = makeMe.aFolder().notebook(notebook).name("physics").please();
     String authored =
@@ -143,12 +143,12 @@ class NoteControllerUploadNoteImageTests extends NotebookGitWebContentController
   }
 
   private void assertUploadRefusedWithNothingChanged(
-      Note note, MultipartFile picture, String messagePart) throws Exception {
+      Note note, MultipartFile image, String messagePart) throws Exception {
     Integer notebookId = note.getNotebook().getId();
     List<String> commitsBefore = acceptedHistory(note.getNotebook()).commits();
     long attachmentsBefore = notebookAttachmentRepository.count();
 
-    ApiException refusal = assertThrows(ApiException.class, () -> upload(note, picture));
+    ApiException refusal = assertThrows(ApiException.class, () -> upload(note, image));
 
     assertThat(refusal.getErrorBody().getMessage(), containsString(messagePart));
     assertThat(acceptedHistory(note.getNotebook()).commits(), equalTo(commitsBefore));
@@ -158,7 +158,7 @@ class NoteControllerUploadNoteImageTests extends NotebookGitWebContentController
     assertThat(notebookAttachmentRepository.count(), equalTo(attachmentsBefore));
     assertThat(
         notebookAttachmentContent.get(
-            notebookId, VerifiedNotebookAttachmentBytes.sha256Hex(picture.getBytes())),
+            notebookId, VerifiedNotebookAttachmentBytes.sha256Hex(image.getBytes())),
         equalTo(Optional.empty()));
   }
 
@@ -177,12 +177,12 @@ class NoteControllerUploadNoteImageTests extends NotebookGitWebContentController
 
     @ParameterizedTest
     @ValueSource(strings = {"notes.txt", "drawing.svg"})
-    void aNameThatIsNotAPictureIsRefusedNamingTheAllowedTypes(String name) throws Exception {
+    void aNameThatIsNotAnImageIsRefusedNamingTheAllowedTypes(String name) throws Exception {
       assertUploadRefusedWithNothingChanged(force, name, "png, jpg, jpeg, gif or webp");
     }
 
     @Test
-    void aPictureOverTheLimitIsRefused() throws Exception {
+    void anImageOverTheLimitIsRefused() throws Exception {
       assertUploadRefusedWithNothingChanged(
           force,
           makeMe.anUploadedImage().bytes(new byte[LIMIT + 1]).toMultiplePartFilePlease(),
@@ -190,7 +190,7 @@ class NoteControllerUploadNoteImageTests extends NotebookGitWebContentController
     }
 
     @Test
-    void aPictureAtTheLimitIsAccepted() throws Exception {
+    void anImageAtTheLimitIsAccepted() throws Exception {
       NoteRealm realm =
           upload(force, makeMe.anUploadedImage().bytes(new byte[LIMIT]).toMultiplePartFilePlease());
 
@@ -217,10 +217,10 @@ class NoteControllerUploadNoteImageTests extends NotebookGitWebContentController
   void aNotebookWithoutAGitBindingRefusesTheUploadAndStoresNothing() {
     Note moon = makeMe.aNote("Moon").notebookOwnedBy(currentUser.getUser()).please();
     long attachmentsBefore = notebookAttachmentRepository.count();
-    MultipartFile picture = makeMe.anUploadedImage().toMultiplePartFilePlease();
+    MultipartFile image = makeMe.anUploadedImage().toMultiplePartFilePlease();
 
     ResponseStatusException refusal =
-        assertThrows(ResponseStatusException.class, () -> upload(moon, picture));
+        assertThrows(ResponseStatusException.class, () -> upload(moon, image));
 
     assertThat(refusal.getReason(), equalTo("Notebook has no Git binding."));
     assertThat(notebookAttachmentRepository.count(), equalTo(attachmentsBefore));
@@ -237,9 +237,9 @@ class NoteControllerUploadNoteImageTests extends NotebookGitWebContentController
         () -> noteController.uploadNoteImage(note, new NoteImageUploadDTO()));
   }
 
-  private NoteRealm upload(Note note, MultipartFile picture) throws Exception {
+  private NoteRealm upload(Note note, MultipartFile image) throws Exception {
     NoteImageUploadDTO dto = new NoteImageUploadDTO();
-    dto.setUploadImage(picture);
+    dto.setUploadImage(image);
     return noteController.uploadNoteImage(noteRepository.findById(note.getId()).orElseThrow(), dto);
   }
 }

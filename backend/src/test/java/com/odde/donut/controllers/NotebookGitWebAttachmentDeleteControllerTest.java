@@ -59,10 +59,10 @@ class NotebookGitWebAttachmentDeleteControllerTest extends NotebookGitWebContent
     Notebook notebook = createGitBackedNotebook();
     Folder physics = makeMe.aFolder().notebook(notebook).name("physics").please();
     Note force = makeMe.aNote("Force").folder(physics).content(FORCE_BODY).please();
-    NotebookAttachment picture =
+    NotebookAttachment image =
         storeFolderAttachmentAndSnapshot(notebook, physics, "force.png", PNG_BYTES);
 
-    attachmentController.deleteAttachment(notebook, picture);
+    attachmentController.deleteAttachment(notebook, image);
 
     assertThat(
         noteRepository.findById(force.getId()).orElseThrow().getContent(), equalTo(FORCE_BODY));

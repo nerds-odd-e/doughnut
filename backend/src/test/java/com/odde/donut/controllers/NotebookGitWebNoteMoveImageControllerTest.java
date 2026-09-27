@@ -14,7 +14,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 /** A note moved within its notebook carries the file its {@code image:} names in its folder. */
-class NotebookGitWebNoteMovePictureControllerTest extends NotebookGitWebNoteMoveTestBase {
+class NotebookGitWebNoteMoveImageControllerTest extends NotebookGitWebNoteMoveTestBase {
   static final String FORCE_BODY = "---\nimage: force.png\n---\nforce body";
   static final String ENERGY_BODY = "---\nimage: force.png\n---\nenergy body";
 
@@ -22,22 +22,22 @@ class NotebookGitWebNoteMovePictureControllerTest extends NotebookGitWebNoteMove
   Folder physics;
   Folder mechanics;
   Note force;
-  NotebookAttachment picture;
+  NotebookAttachment image;
   byte[] pointer;
 
   @BeforeEach
-  void seedForceWithItsPicture() throws Exception {
+  void seedForceWithItsImage() throws Exception {
     notebook = createGitBackedNotebook();
     physics = makeMe.aFolder().notebook(notebook).name("physics").please();
     mechanics = makeMe.aFolder().notebook(notebook).name("mechanics").please();
     force = makeMe.aNote("Force").folder(physics).content(FORCE_BODY).please();
-    picture = storeFolderAttachmentAndSnapshot(notebook, physics, "force.png", new byte[] {7});
-    pointer = picture.getAcceptedGitContent();
+    image = storeFolderAttachmentAndSnapshot(notebook, physics, "force.png", new byte[] {7});
+    pointer = image.getAcceptedGitContent();
     testabilitySettings.timeTravelTo(Timestamp.from(MOVE_AT));
   }
 
   @Test
-  void movingIntoAFolderCarriesThePictureInOneAcceptedCommit() throws Exception {
+  void movingIntoAFolderCarriesTheImageInOneAcceptedCommit() throws Exception {
     AcceptedHistory before = acceptedHistory(notebook);
 
     relationController.moveNoteToFolder(force, mechanics);
@@ -53,7 +53,7 @@ class NotebookGitWebNoteMovePictureControllerTest extends NotebookGitWebNoteMove
   }
 
   @Test
-  void movingToTheNotebookRootCarriesThePicture() throws Exception {
+  void movingToTheNotebookRootCarriesTheImage() throws Exception {
     relationController.moveNoteToNotebookRoot(force);
 
     AcceptedHistory after = acceptedHistory(notebook);
@@ -65,7 +65,7 @@ class NotebookGitWebNoteMovePictureControllerTest extends NotebookGitWebNoteMove
   }
 
   @Test
-  void aSamePlaceMoveKeepsThePicture() throws Exception {
+  void aSamePlaceMoveKeepsTheImage() throws Exception {
     relationController.moveNoteToFolder(force, physics);
 
     assertThat(
@@ -74,7 +74,7 @@ class NotebookGitWebNoteMovePictureControllerTest extends NotebookGitWebNoteMove
   }
 
   @Test
-  void aTakenNameGivesThePictureTheFirstFreeNameAndRewritesItsImage() throws Exception {
+  void aTakenNameGivesTheImageTheFirstFreeNameAndRewritesItsImage() throws Exception {
     NotebookAttachment taken =
         storeFolderAttachmentAndSnapshot(notebook, mechanics, "Force.png", new byte[] {9});
     AcceptedHistory before = acceptedHistory(notebook);
@@ -99,7 +99,7 @@ class NotebookGitWebNoteMovePictureControllerTest extends NotebookGitWebNoteMove
   }
 
   @Test
-  void aPictureAnotherNoteUsesIsCopiedNotMoved() throws Exception {
+  void anImageAnotherNoteUsesIsCopiedNotMoved() throws Exception {
     makeMe.aNote("Energy").folder(physics).content(ENERGY_BODY).please();
     snapshotCurrentPortableTree(notebook);
     AcceptedHistory before = acceptedHistory(notebook);
@@ -120,7 +120,7 @@ class NotebookGitWebNoteMovePictureControllerTest extends NotebookGitWebNoteMove
   }
 
   @Test
-  void aRootPictureAnotherRootNoteUsesIsCopiedNotMoved() throws Exception {
+  void aRootImageAnotherRootNoteUsesIsCopiedNotMoved() throws Exception {
     String pushBody = "---\nimage: push.png\n---\npush body";
     Note push = makeMe.aNote("Push").notebook(notebook).content(pushBody).please();
     makeMe

@@ -12,11 +12,11 @@ import org.springframework.http.MediaType;
 import org.springframework.util.StringUtils;
 
 /**
- * A notebook file is a picture by its name's extension, ignoring case. Uploads are admitted by that
+ * A notebook file is an image by its name's extension, ignoring case. Uploads are admitted by that
  * name alone (the declared content type and the bytes are not checked) up to {@link
  * NotebookAttachment#NEW_PAYLOAD_LIMIT_BYTES}.
  */
-public final class PictureFile {
+public final class ImageFile {
   private static final Map<String, MediaType> TYPES =
       Map.of(
           "png", MediaType.IMAGE_PNG,
@@ -25,7 +25,7 @@ public final class PictureFile {
           "gif", MediaType.IMAGE_GIF,
           "webp", MediaType.parseMediaType("image/webp"));
 
-  private PictureFile() {}
+  private ImageFile() {}
 
   public static Optional<MediaType> mediaType(String name) {
     return Optional.ofNullable(StringUtils.getFilenameExtension(name))

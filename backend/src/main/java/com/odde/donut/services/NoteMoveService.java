@@ -13,8 +13,8 @@ import org.springframework.stereotype.Service;
 
 /**
  * Web note-move orchestration: capture inbound references, place the note via {@link
- * NoteMotionService}, then rewrite wiki links. A same-notebook move also carries the note's picture
- * via {@link MovedNotePicture}. Moves run through {@code WebNoteEditService.edit} so the moved tree
+ * NoteMotionService}, then rewrite wiki links. A same-notebook move also carries the note's image
+ * via {@link MovedNoteImage}. Moves run through {@code WebNoteEditService.edit} so the moved tree
  * appends to accepted history (a cross-notebook move in both notebooks); the {@link Consumer}
  * factories here supply the capture-place-rewrite recipe for that boundary.
  */
@@ -25,7 +25,7 @@ public class NoteMoveService {
   private final WikiLinkRelocationRewrite wikiLinkRelocationRewrite;
   private final AuthorizationService authorizationService;
   private final FolderRepository folderRepository;
-  private final MovedNotePicture movedNotePicture;
+  private final MovedNoteImage movedNoteImage;
 
   public NoteMoveService(
       NoteMotionService noteMotionService,
@@ -33,19 +33,19 @@ public class NoteMoveService {
       WikiLinkRelocationRewrite wikiLinkRelocationRewrite,
       AuthorizationService authorizationService,
       FolderRepository folderRepository,
-      MovedNotePicture movedNotePicture) {
+      MovedNoteImage movedNoteImage) {
     this.noteMotionService = noteMotionService;
     this.wikiLinkRewriteService = wikiLinkRewriteService;
     this.wikiLinkRelocationRewrite = wikiLinkRelocationRewrite;
     this.authorizationService = authorizationService;
     this.folderRepository = folderRepository;
-    this.movedNotePicture = movedNotePicture;
+    this.movedNoteImage = movedNoteImage;
   }
 
   /**
    * Same-notebook move into an existing folder, as a mutation to run inside the accepted-history
    * edit transaction: capture inbound references, reload the destination folder by id, place and
-   * carry the picture, then apply the same-notebook reference rewrite.
+   * carry the image, then apply the same-notebook reference rewrite.
    */
   public Consumer<Note> sameNotebookMoveIntoFolder(Integer targetFolderId, Timestamp now) {
     return note -> {
@@ -53,7 +53,7 @@ public class NoteMoveService {
       Map<Integer, List<String>> inboundReferences =
           wikiLinkRewriteService.captureLiveResolvedInboundReferences(note, user);
       Folder targetFolder = folderRepository.findById(targetFolderId).orElseThrow();
-      movedNotePicture.placeWithPicture(
+      movedNoteImage.placeWithImage(
           note,
           targetFolder,
           now,
@@ -72,7 +72,7 @@ public class NoteMoveService {
       User user = authorizationService.getCurrentUser();
       Map<Integer, List<String>> inboundReferences =
           wikiLinkRewriteService.captureLiveResolvedInboundReferences(note, user);
-      movedNotePicture.placeWithPicture(
+      movedNoteImage.placeWithImage(
           note, null, now, () -> noteMotionService.executeMoveToNotebookRoot(note));
       wikiLinkRelocationRewrite.rewriteInboundWikiLinksForLocationChange(
           note, now, inboundReferences);
@@ -81,7 +81,7 @@ public class NoteMoveService {
 
   /**
    * Move into a folder of another notebook, as a mutation for an accepted change over both
-   * notebooks: the picture stays in the source notebook.
+   * notebooks: the image stays in the source notebook.
    */
   public Consumer<Note> crossNotebookMoveIntoFolder(
       Integer targetFolderId, Notebook targetNotebook, Timestamp now) {

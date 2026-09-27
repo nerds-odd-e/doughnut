@@ -23,7 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * A notebook whose accepted history still holds a raw file from before attachments became pointers
- * keeps that history readable and keeps accepting new pictures.
+ * keeps that history readable and keeps accepting new images.
  */
 class NotebookGitAttachmentRawHistoryControllerTest
     extends NotebookGitWebContentControllerTestBase {
@@ -34,7 +34,7 @@ class NotebookGitAttachmentRawHistoryControllerTest
   @Autowired NotebookAttachmentController attachmentController;
 
   @Test
-  void rawHistoryStaysReadableWhileANewPictureIsPublished() throws Exception {
+  void rawHistoryStaysReadableWhileANewImageIsPublished() throws Exception {
     Notebook notebook = createGitBackedNotebook();
     Folder physics = makeMe.aFolder().notebook(notebook).name("physics").please();
     byte[] diagramPointer =

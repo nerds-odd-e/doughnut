@@ -54,7 +54,7 @@ class NoteAttachmentImageController {
     authorizationService.assertReadAuthorization(note);
     return noteFolderAttachment
         .at(note, path)
-        .map(attachment -> InlinePicture.of(attachment, notebookAttachmentFile))
+        .map(attachment -> InlineImage.of(attachment, notebookAttachmentFile))
         .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "File not found."));
   }
 }

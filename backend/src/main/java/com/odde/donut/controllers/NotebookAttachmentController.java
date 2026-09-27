@@ -99,7 +99,7 @@ class NotebookAttachmentController {
       throws UnexpectedNoAccessRightException {
     authorizationService.assertReadAuthorization(notebook);
     attachment.requireInNotebook(notebook);
-    return InlinePicture.of(attachment, notebookAttachmentFile);
+    return InlineImage.of(attachment, notebookAttachmentFile);
   }
 
   @Operation(

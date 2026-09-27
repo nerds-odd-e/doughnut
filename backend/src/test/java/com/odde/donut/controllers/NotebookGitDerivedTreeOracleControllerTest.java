@@ -44,7 +44,7 @@ class NotebookGitDerivedTreeOracleControllerTest extends NotebookGitWebContentCo
   }
 
   @Test
-  void uploadingANotePictureAddsItsFileAndMatchesTheFullAssembly() throws Exception {
+  void uploadingANoteImageAddsItsFileAndMatchesTheFullAssembly() throws Exception {
     Notebook notebook = createGitBackedNotebook();
     Folder physics = makeMe.aFolder().notebook(notebook).name("physics").please();
     Note moon = makeMe.aNote("Moon").folder(physics).content(ACCEPTED_CONTENT).please();
