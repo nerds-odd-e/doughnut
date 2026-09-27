@@ -10,6 +10,7 @@ import helper, { mockSdkService } from "@tests/helpers"
 import makeMe from "donut-test-fixtures/makeMe"
 import { flushPromises } from "@vue/test-utils"
 import { createMemoryHistory, createRouter } from "vue-router"
+import { page, server } from "vitest/browser"
 
 describe("MessageCenterPage", () => {
   it("fetch API to be called ONCE on mount", async () => {
@@ -146,7 +147,10 @@ describe("MessageCenterPage", () => {
       return wrapper
     }
 
-    it("shows a note conversation with the read-only note context, messages, and a usable composer", async () => {
+    it("shows a note conversation's read-only note context beside its messages and usable composer on a wide screen", async () => {
+      const { width, height } = server.config.browser.viewport
+      onTestFinished(() => page.viewport(width, height))
+      await page.viewport(1280, 800)
       const noteRealm = makeMe.aNoteRealm
         .title("Sedition")
         .content("Inciting rebellion.")
@@ -167,7 +171,15 @@ describe("MessageCenterPage", () => {
       expect(context.text()).toContain("Sedition")
       expect(context.text()).toContain("Inciting rebellion.")
       expect(wrapper.find("#main-note-content").exists()).toBe(false)
-      expect(wrapper.text()).toContain("Is this right?")
+      const message = [...document.querySelectorAll("*")].find(
+        (el) => el.children.length === 0 && el.textContent === "Is this right?"
+      )!
+      const contextBox = context.element.getBoundingClientRect()
+      for (const el of [message, wrapper.find("textarea").element]) {
+        const box = el.getBoundingClientRect()
+        expect(contextBox.left).toBeGreaterThanOrEqual(box.right)
+        expect(contextBox.top).toBeLessThan(box.bottom)
+      }
 
       await wrapper.find("textarea").setValue("Yes, it is.")
       await wrapper.find("form.message-input-form").trigger("submit")

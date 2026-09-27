@@ -1,7 +1,9 @@
 <template>
-  <div class="conversation-container flex flex-col flex-1 min-h-0">
-    <!-- Upper half -->
-    <div v-if="!isMaximized" class="subject-container flex-1 overflow-auto p-4 border-b border-base-300">
+  <div class="conversation-container flex flex-col lg:flex-row flex-1 min-h-0">
+    <div
+      v-if="!isMaximized"
+      class="subject-container flex-1 min-w-0 overflow-auto p-4 border-b border-base-300 lg:order-last lg:border-b-0 lg:border-l"
+    >
       <NoteContextReader
         v-if="conversation.subject?.note?.id"
         :note-id="conversation.subject.note.id"
@@ -15,8 +17,7 @@
       />
     </div>
 
-    <!-- Lower half -->
-    <div class="flex-1 flex flex-col bg-base-200 min-h-0" :class="{ 'maximized': isMaximized }">
+    <div class="flex-1 flex flex-col bg-base-200 min-h-0 min-w-0" :class="{ 'maximized': isMaximized }">
       <ConversationInner
         v-bind="{
           conversation,

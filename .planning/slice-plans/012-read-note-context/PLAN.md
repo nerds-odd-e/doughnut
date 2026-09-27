@@ -177,10 +177,15 @@ conversation slot.
 ### 7. Keep note conversation and reading context side by side
 
 Type: Behavior
-Status: planned
+Status: done
 Proof: mounted Message Center note conversation at desktop width places the
 reader beside messages and a usable composer. Existing conversation selection
 and chat maximize behavior remain usable.
+Accepted: `ConversationComponent` goes `lg:flex-row` with the subject pane
+on the right; `MessageCenterPage.spec.ts` wide-screen test sets
+`page.viewport(1280, 800)` (restored via `onTestFinished`) and checks the
+reader's box sits beside the message and composer. Learning: `lg` chosen
+because the Message Center list already takes 25% from `md`.
 
 Behavior: a participant opens a conversation whose subject is a note on a
 wide screen → the conversation list, messages, composer, and complete note
