@@ -13,10 +13,9 @@ import com.odde.donut.entities.User;
 import com.odde.donut.entities.repositories.FolderRepository;
 import com.odde.donut.factoryServices.EntityPersister;
 import com.odde.donut.services.ai.NoteExtractionResult;
-import com.odde.donut.services.wikidataApis.WikidataIdWithApi;
 import com.odde.donut.testability.TestabilitySettings;
 import com.odde.donut.validators.AuthoredNoteContent;
-import java.io.IOException;
+import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -104,24 +103,14 @@ public class NoteConstructionService {
     return noteRealmService.build(note, user);
   }
 
-  /** Synchronous construction: no external enrichment, so no IO/interruption contract. */
-  public NoteRealm createRootNote(Notebook notebook, NoteCreationDTO noteCreation, User user) {
-    Note note = buildNote(notebook, noteCreation);
-    return finalizeAndRespond(note, user);
-  }
-
-  public NoteRealm createRootNoteWithWikidataService(
+  public NoteRealm createRootNote(
       Notebook notebook,
       NoteCreationDTO noteCreation,
       User user,
-      WikidataIdWithApi wikidataIdWithApi)
-      throws InterruptedException, IOException {
+      Optional<String> wikidataDescription) {
     Note note = buildNote(notebook, noteCreation);
-    if (wikidataIdWithApi != null) {
-      wikidataIdWithApi
-          .fetchWikidataDescription()
-          .ifPresent(description -> prependAndPersistWikidataDescription(note, description));
-    }
+    wikidataDescription.ifPresent(
+        description -> prependAndPersistWikidataDescription(note, description));
     return finalizeAndRespond(note, user);
   }
 

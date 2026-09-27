@@ -114,7 +114,11 @@ Change: only a Wikidata id bypasses `apply`; delete `NoteConceptType.isOrdinary`
 ### 2. Wikidata-assisted notes created on the web are accepted
 
 Type: Behavior
-Status: planned
+Status: done
+Accepted proof: `wikidataAssistedRootCreateIsAcceptedInOneCommit` failed first,
+then passed (parent = old head; `Wikidata Root.md` holds the Wikidata-derived
+location); 8 + 7 tests green. `createRootNote` takes the pre-fetched
+`Optional<String>` description.
 Proof: flip `wikidataAssistedRootCreateDoesNotAdvanceAcceptedHead` (fails first,
 then passes); `NotebookRootNoteCreationWithWikidataTests` stays green otherwise —
 `CURSOR_DEV=true nix develop -c pnpm backend:test_only --tests 'com.odde.donut.controllers.NotebookRootNoteCreationWithWikidataTests' --tests 'com.odde.donut.controllers.NotebookGitNoteCreationControllerTest'`.
