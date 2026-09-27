@@ -564,6 +564,11 @@ The slice changed `StoredApiCollection.trashNote` to request a folder listing be
   - Observed effect: one coordinator repair before commit; no defect shipped.
   - Inference: a `grep` for callers of the changed method across `tests/` when choosing slice proof would have included the spec.
 
+- Execution: SEED-049#story-1 / slice-plans/016-note-store-architecture / 3821dbd9c79c7ab25e68cd1ff96aa44061d6544f; Timestamp: unknown (2026-09-27, slice 2 delivery and slice 3 proof); Tool: Codex; Open Dough release: 0.3.42 (unchanged installed guidance across this execution).
+  - Evidence: chat 01a0e0fe-e37c-7512-a6b3-b8d4c1318365, slice2 return and slice3 messages; a08a318db1 changed trash to throw, while its 69-test selection omitted NoteShowPage.autosaveTrash. CI run 36294751826 attempt 1, job 108551410141 reports that spec's unhandled Vue warning. Slice3's broader local selection independently found the same error; d697a1326b adds the test-only expected-error observation.
+  - Observed effect: one failed published frontend job and one bounded test repair; 124 focused tests then passed, followed by the 1,938-test full frontend run in slice6.
+  - Inference: consumer inspection needs callers of the whole removal flow and their refusal scenarios, not only direct store-call specs. Production error propagation itself was intended.
+
 ## DD-137 — A retrospective finding asserted the loading modal, which the product does not show for these requests
 
 The SEED-047#story-1 retrospective wrote that the removal request "shows the loading modal at once" and planned proof that observes `GlobalApiLoadingModal`. Non-blocking `apiCallWithLoading` calls, including the trash request and every user-triggered folder listing load, only add a busy state shown as `LoadingThinBar`; `LoadingModal` needs `blockUi: true`. The implementer's first modal-based test failed after the fix, which exposed the wrong premise; it switched to observing `apiStatus.states` and reported the correction.
@@ -575,8 +580,19 @@ The SEED-047#story-1 retrospective wrote that the removal request "shows the loa
   - Observed effect: one discarded test attempt inside the slice budget; the story goal ("busy … as for other user-triggered folder listings") still held, so no scope question arose.
   - Inference: a retrospective finding about user-visible behaviour was stated from code reading of the caller only, without checking how the shared loading helper is rendered. Qualified: related in kind to DD-130 (plan names an untried mechanism), but a different concrete problem.
 
+## DD-138 — The file-size rule conflicted with an approved staged simplification and mechanical callers
+
+The refactor check requires every changed file to be at most 250 lines, without distinguishing intermediate planned decomposition or a mechanical change to a pre-existing oversized caller. Refactor agents raised both cases during this execution; the coordinator applied the owner-approved store scope and slice ordering rather than expanding the work.
+
+### Occurrences
+
+- Execution: SEED-049#story-1 / slice-plans/016-note-store-architecture / 3821dbd9c79c7ab25e68cd1ff96aa44061d6544f; Timestamp: unknown (2026-09-27, refactor1 and refactor6 handoffs); Tool: Codex; Open Dough release: 0.3.42.
+  - Evidence: chat 01a0e0fe-e37c-7512-a6b3-b8d4c1318365, refactor1 questioned the 384-line intermediate store before planned slices4–6; refactor6 questioned useWikidataPropertyDialog after mechanical migration (300 lines at its base, then smaller). Rule: dough-post-change-refactor/references/refactor-checks.md, File size. Source: SEED-049 owner-approved single command/undo split; slice7 owns store size proof.
+  - Observed effect: two applicability exchanges; no extra split was made. Final noteStore is 245 lines, noteUndo167, requests228, cache45. The unrelated Wikidata workflow was preserved.
+  - Inference: clarify how the numeric check composes with approved intermediate states and the skill's requirement that a refactor address an introduced, exposed, or aggravated issue. Unlike ODF-124, the rule was found and acknowledged here.
+
 ## Retention
 
-- Highest allocated local number: 137
+- Highest allocated local number: 138
 - Recovery: `33939aa45a17c08f5e6f8076178ce96437fdfbe8:DearDough.md` contains the complete pre-compaction log and earlier recovery references; `b0b385a184e96ecf8b0f6fc5572eaaab69bc8dad` preserves later history.
 - Occurrence history is partial; full observations, effects, inference and historical provenance remain in that snapshot and the upstream catalog.
