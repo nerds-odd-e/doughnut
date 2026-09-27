@@ -1,5 +1,5 @@
 import type { Router } from "vue-router"
-import type { NoteCreationDto, NoteRealm } from "@generated/donut-backend-api"
+import type { NoteCreationDto } from "@generated/donut-backend-api"
 import {
   applyParentRelationshipToCreateContent,
   type NoteCreationParentRelationship,
@@ -12,9 +12,8 @@ type NoteCreateApi = {
     body: NoteCreationDto,
     options?: {
       folderId?: number
-      refreshWikiLinkCacheForNoteIds?: number[]
     }
-  ) => Promise<NoteRealm>
+  ) => Promise<void>
 }
 
 type ConfirmPopups = {
@@ -64,7 +63,6 @@ export async function createNoteFromForm(input: {
   notebookId: number
   body: NoteCreationDto
   folderId?: number
-  refreshWikiLinkCacheForNoteIds?: number[]
   onFieldErrors: (errors: { newTitle?: string; wikidataId?: string }) => void
   onSuccess: () => void
 }): Promise<void> {
@@ -75,7 +73,6 @@ export async function createNoteFromForm(input: {
       input.body,
       {
         folderId: input.folderId,
-        refreshWikiLinkCacheForNoteIds: input.refreshWikiLinkCacheForNoteIds,
       }
     )
     input.onSuccess()

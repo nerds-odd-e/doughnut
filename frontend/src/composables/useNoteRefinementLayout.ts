@@ -10,7 +10,7 @@ import {
   runWithBlockingApiLoading,
 } from "@/managedApi/clientSetup"
 import { useRefinementLayoutSelection } from "@/composables/useRefinementLayoutSelection"
-import { useStorageAccessor } from "@/composables/useStorageAccessor"
+import { useNoteStore } from "@/store/noteStore"
 import usePopups from "@/components/commons/Popups/usePopups"
 import { onMounted, ref, type Ref } from "vue"
 
@@ -35,7 +35,7 @@ export function useNoteRefinementLayout(
   } = useRefinementLayoutSelection(refinementLayoutItems)
 
   const { popups } = usePopups()
-  const storageAccessor = useStorageAccessor()
+  const noteStore = useNoteStore()
 
   const layoutSelectionBody = () => ({
     refinementLayout: { items: refinementLayoutItems.value },
@@ -123,14 +123,11 @@ export function useNoteRefinementLayout(
           return
         }
 
-        const storedApi = storageAccessor.value?.storedApi()
-        if (storedApi) {
-          await storedApi.updateTextField(
-            note.value.id,
-            "edit content",
-            data.content
-          )
-        }
+        await noteStore.updateTextField(
+          note.value.id,
+          "edit content",
+          data.content
+        )
         onContentUpdated(data.content)
         await loadRefinementLayout({ blockUi: false })
       }

@@ -65,7 +65,6 @@
             v-model="pendingDeadWikiLink"
             :notebook-id="noteRealm.notebookRealm.notebook.id"
             :note-realm="noteRealm"
-            :source-note-id="noteRealm.id"
           />
         </template>
       </template>

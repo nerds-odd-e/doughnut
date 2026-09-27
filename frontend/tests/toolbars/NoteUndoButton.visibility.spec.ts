@@ -1,12 +1,8 @@
-import {
-  NoteController,
-  NotebookFolderController,
-} from "@generated/donut-backend-api/sdk.gen"
-import type { Router } from "vue-router"
-import { useStorageAccessor } from "@/composables/useStorageAccessor"
+import { NoteController } from "@generated/donut-backend-api/sdk.gen"
+import { useNoteStore } from "@/store/noteStore"
 import { mockSdkService } from "@tests/helpers"
 import makeMe from "donut-test-fixtures/makeMe"
-import { beforeEach, describe, it, expect, vi } from "vitest"
+import { describe, it, expect, vi } from "vitest"
 import {
   mountNoteUndoButton,
   noteEditingHistory,
@@ -56,12 +52,6 @@ describe("NoteUndoButton visibility", () => {
   )
 
   describe("after a note is trashed and then permanently deleted", () => {
-    const router = { replace: vi.fn() } as unknown as Router
-
-    beforeEach(() => {
-      mockSdkService(NotebookFolderController, "listNotebookFolderListing", {})
-    })
-
     it("offers the other note's older entry instead of naming the deleted note", async () => {
       const { noteRealm1, noteRealm2 } = setupTwoCachedNotes()
       noteEditingHistory.addEditingToUndoHistory(
@@ -76,12 +66,12 @@ describe("NoteUndoButton visibility", () => {
       )
       mockSdkService(NoteController, "trashNote", noteRealm1)
       mockSdkService(NoteController, "permanentlyDeleteNote", undefined)
-      const storedApi = useStorageAccessor().value.storedApi()
+      const storedApi = useNoteStore()
 
-      await storedApi.trashNote(router, noteRealm1.id, {
+      await storedApi.trashNote(noteRealm1.id, {
         referenceHandling: "LEAVE_DEAD_LINKS",
       })
-      await storedApi.permanentlyDeleteNote(router, noteRealm1.id)
+      await storedApi.permanentlyDeleteNote(noteRealm1.id)
 
       const wrapper = mountNoteUndoButton()
       expect(wrapper.find("button").attributes("title")).toBe(
@@ -91,7 +81,7 @@ describe("NoteUndoButton visibility", () => {
 
     it("is absent when the only undo entry belonged to the deleted note", async () => {
       const noteRealm = makeMe.aNoteRealm.please()
-      useStorageAccessor().value.refreshNoteRealm(noteRealm)
+      useNoteStore().refreshNoteRealm(noteRealm)
       noteEditingHistory.addEditingToUndoHistory(
         noteRealm.id,
         "edit content",
@@ -99,12 +89,12 @@ describe("NoteUndoButton visibility", () => {
       )
       mockSdkService(NoteController, "trashNote", noteRealm)
       mockSdkService(NoteController, "permanentlyDeleteNote", undefined)
-      const storedApi = useStorageAccessor().value.storedApi()
+      const storedApi = useNoteStore()
 
-      await storedApi.trashNote(router, noteRealm.id, {
+      await storedApi.trashNote(noteRealm.id, {
         referenceHandling: "LEAVE_DEAD_LINKS",
       })
-      await storedApi.permanentlyDeleteNote(router, noteRealm.id)
+      await storedApi.permanentlyDeleteNote(noteRealm.id)
 
       const wrapper = mountNoteUndoButton()
       expect(wrapper.find("button").exists()).toBe(false)

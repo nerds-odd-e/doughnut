@@ -2,7 +2,11 @@
   <NoteRealmLoader v-bind="{ noteId }">
     <template #default="{ noteRealm }">
       <ContentLoader v-if="!noteRealm" />
-      <article v-else aria-label="Note context" class="flex flex-col gap-2">
+      <article
+        v-else
+        aria-label="Note context"
+        class="flex min-w-0 flex-col gap-2"
+      >
         <BreadcrumbWithCircle
           :notebook-realm="noteRealm.notebookRealm"
           :ancestor-folders="noteRealm.ancestorFolders ?? []"

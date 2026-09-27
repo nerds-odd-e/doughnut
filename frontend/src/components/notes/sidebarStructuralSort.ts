@@ -2,8 +2,12 @@ import type {
   Folder,
   FolderListing,
   NoteTopology,
+  NoteRealm,
   NotebookAttachmentListItem,
 } from "@generated/donut-backend-api"
+import { locationAfterNoteRemoval } from "@/routes/containingLocation"
+import { loadFolderListing } from "@/utils/notebookFolderListingRequest"
+import { usePeerSort } from "@/composables/usePeerSort"
 import type { PeerSortSpec } from "@/composables/usePeerSort"
 
 export type SidebarStructuralRow =
@@ -141,4 +145,18 @@ export function neighborNoteAfterRemoval(
   ).flatMap((row) => (row.kind === "note" ? [row.noteTopology] : []))
   const index = notes.findIndex((note) => note.id === removedNoteId)
   return notes[index + 1] ?? notes[index - 1]
+}
+
+/** Read before removal, using the same peer ordering as the visible sidebar. */
+export async function locationAfterRemoving(realm: NoteRealm) {
+  const listing = await loadFolderListing(
+    realm.notebookRealm.notebook.id,
+    realm.ancestorFolders?.at(-1)?.id ?? null
+  )
+  const neighbor = neighborNoteAfterRemoval(
+    listing,
+    realm.id,
+    usePeerSort().peerSortSpec.value
+  )
+  return locationAfterNoteRemoval(realm, neighbor)
 }

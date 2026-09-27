@@ -42,7 +42,7 @@ class StoredComponentTestHelper {
 
 /**
  * Mocks showNote service to prevent unhandled promise rejections
- * in tests that use StoredApiCollection.loadNote (via storageAccessor).
+ * in tests that use NoteStore.loadNote (via noteStore).
  */
 export function mockShowNote(noteRealm?: NoteRealm) {
   return mockSdkService(

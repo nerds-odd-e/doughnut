@@ -1,6 +1,6 @@
-import { useStorageAccessor } from "@/composables/useStorageAccessor"
+import { useNoteStore } from "@/store/noteStore"
 import { PEER_SORT_STORAGE_KEY } from "@/composables/usePeerSort"
-import createNoteStorage from "@/store/createNoteStorage"
+import { resetNoteStore } from "@/store/noteStore"
 import type { NotebookAttachmentListItem } from "@generated/donut-backend-api"
 import makeMe from "donut-test-fixtures/makeMe"
 import helper from "@tests/helpers"
@@ -19,12 +19,12 @@ import {
 describe("Sidebar peer sort", () => {
   // biome-ignore lint/suspicious/noExplicitAny: wrapper for testing
   let wrapper: import("@vue/test-utils").VueWrapper<any>
-  const storageAccessor = useStorageAccessor()
+  const noteStore = useNoteStore()
   const fixtures = sidebarDefaultTreeFixtures
 
   beforeEach(() => {
     prepareSidebarDefaultMountContext({
-      storageAccessor,
+      noteStore,
       fixtures,
       vi,
     })
@@ -62,10 +62,10 @@ describe("Sidebar peer sort", () => {
   async function mountZebraAppleRootSidebar(
     attachments: NotebookAttachmentListItem[] = []
   ) {
-    storageAccessor.value = createNoteStorage()
+    resetNoteStore()
     const { realmZ, realmA } = zebraApplePeerRealms()
     const { nbId, realmA: activeA } = setupRootPeersWithFolders({
-      storageAccessor,
+      noteStore,
       topNoteRealm: fixtures.topNoteRealm,
       realmZ,
       realmA,

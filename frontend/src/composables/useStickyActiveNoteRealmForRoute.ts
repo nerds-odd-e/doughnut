@@ -1,7 +1,7 @@
 import type { NoteRealm } from "@generated/donut-backend-api"
 import type NoteStorage from "@/store/NoteStorage"
 import { noteRouteFamilyNoteId } from "@/routes/noteRouteFamily"
-import { ref, watch, type Ref } from "vue"
+import { ref, watch } from "vue"
 import type { RouteLocationNormalizedLoaded } from "vue-router"
 
 /**
@@ -10,7 +10,7 @@ import type { RouteLocationNormalizedLoaded } from "vue-router"
  */
 export function useStickyActiveNoteRealmForRoute(
   route: RouteLocationNormalizedLoaded,
-  storageAccessor: Ref<NoteStorage>
+  noteStore: NoteStorage
 ) {
   const activeNoteRealm = ref<NoteRealm | undefined>(undefined)
 
@@ -22,7 +22,7 @@ export function useStickyActiveNoteRealmForRoute(
       }
       return {
         onNoteFamily: true as const,
-        realm: storageAccessor.value.refOfNoteRealm(id).value,
+        realm: noteStore.refOfNoteRealm(id).value,
       }
     },
     ({ onNoteFamily, realm }) => {

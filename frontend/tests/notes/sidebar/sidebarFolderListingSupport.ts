@@ -19,9 +19,7 @@ type ListNotebookFolderListingOptions = Parameters<
   typeof NotebookFolderController.listNotebookFolderListing
 >[0]
 
-type NoteStorageAccessor = ReturnType<
-  typeof import("@/composables/useStorageAccessor")["useStorageAccessor"]
->
+type NoteStore = ReturnType<typeof import("@/store/noteStore")["useNoteStore"]>
 
 export const EMPTY_FOLDER_LISTING: FolderListing = {
   noteTopologies: [],
@@ -98,7 +96,7 @@ export const DEFAULT_ROOT_PEER_ORDER = [
 ] as const
 
 export function setupRootPeersWithFolders(options: {
-  storageAccessor: NoteStorageAccessor
+  noteStore: NoteStore
   topNoteRealm: NoteRealm
   realmZ: NoteRealm
   realmA: NoteRealm
@@ -108,18 +106,12 @@ export function setupRootPeersWithFolders(options: {
   }
   attachments?: NotebookAttachmentListItem[]
 }) {
-  const {
-    storageAccessor,
-    topNoteRealm,
-    realmZ,
-    realmA,
-    folderExtras,
-    attachments,
-  } = options
+  const { noteStore, topNoteRealm, realmZ, realmA, folderExtras, attachments } =
+    options
   const nbId = topNoteRealm.notebookRealm.notebook.id
-  storageAccessor.value.refOfNoteRealm(realmZ.id).value = realmZ
-  storageAccessor.value.refOfNoteRealm(realmA.id).value = realmA
-  storageAccessor.value.refOfNoteRealm(topNoteRealm.id).value = topNoteRealm
+  noteStore.refOfNoteRealm(realmZ.id).value = realmZ
+  noteStore.refOfNoteRealm(realmA.id).value = realmA
+  noteStore.refOfNoteRealm(topNoteRealm.id).value = topNoteRealm
 
   const folderBanana = {
     ...testFolderStub(9001, "banana"),

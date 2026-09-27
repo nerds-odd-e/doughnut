@@ -5,8 +5,8 @@ import {
 import GlobalBar from "@/components/toolbars/GlobalBar.vue"
 import SoftKeyboardPrimer from "@/components/commons/SoftKeyboardPrimer.vue"
 import type { User } from "@generated/donut-backend-api"
-import NoteEditingHistory from "@/store/NoteEditingHistory"
-import createNoteStorage from "@/store/createNoteStorage"
+import type NoteUndo from "@/store/noteUndo"
+import { resetNoteStore } from "@/store/noteStore"
 import {
   scheduleFocusTargetWithin,
   softKeyboardPrimerId,
@@ -17,7 +17,6 @@ import { mount } from "@vue/test-utils"
 import makeMe from "donut-test-fixtures/makeMe"
 import helper, { mockSdkService } from "@tests/helpers"
 import { beforeEach, vi, describe, it, expect, afterEach } from "vitest"
-import { useStorageAccessor } from "@/composables/useStorageAccessor"
 import { flushPromises } from "@vue/test-utils"
 import { defineComponent, h, nextTick, provide, ref } from "vue"
 import { createRouter, createWebHistory } from "vue-router"
@@ -59,7 +58,7 @@ function renderGlobalBarWithSearchShortcut(loggedInUser?: User) {
 }
 
 describe("global bar", () => {
-  let noteEditingHistory: NoteEditingHistory
+  let noteEditingHistory: NoteUndo
   let user: User
   let matchMediaSpy: ReturnType<typeof vi.spyOn> | undefined
 
@@ -72,9 +71,8 @@ describe("global bar", () => {
     mockSdkService(SearchController, "semanticSearch", [])
     mockSdkService(SearchController, "semanticSearchWithin", [])
     user = makeMe.aUser.please()
-    noteEditingHistory = new NoteEditingHistory()
-    const storageAccessor = useStorageAccessor()
-    storageAccessor.value = createNoteStorage(noteEditingHistory)
+    const storage = resetNoteStore()
+    noteEditingHistory = storage.noteUndo
   })
 
   afterEach(() => {

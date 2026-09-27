@@ -23,7 +23,7 @@ import { computed, nextTick, ref } from "vue"
 import type { Note, NoteSearchResult } from "@generated/donut-backend-api"
 import AddRelationshipFinalize from "@/components/wiki-link-or-relationship/AddRelationshipFinalize.vue"
 import WikiLinkOrRelationshipChoice from "@/components/wiki-link-or-relationship/WikiLinkOrRelationshipChoice.vue"
-import { useStorageAccessor } from "@/composables/useStorageAccessor"
+import { useNoteStore } from "@/store/noteStore"
 import { parseNoteContentMarkdown } from "@/utils/noteContentFrontmatterParse"
 import { appendWikiLinkPropertyRow } from "@/utils/noteContentPropertyRows"
 import { authoredWikiLinkTokenForInsert } from "@/utils/wikiLinkAuthoring"
@@ -37,14 +37,14 @@ const emit = defineEmits<{
   closeDialog: []
 }>()
 
-const storageAccessor = useStorageAccessor()
+const noteStore = useNoteStore()
 
-const reviewedRealmRef = storageAccessor.value
-  .storedApi()
-  .getNoteRealmRefAndLoadWhenNeeded(props.reviewedNoteId)
-const matchedRealmRef = storageAccessor.value
-  .storedApi()
-  .getNoteRealmRefAndLoadWhenNeeded(props.matchedNoteId)
+const reviewedRealmRef = noteStore.getNoteRealmRefAndLoadWhenNeeded(
+  props.reviewedNoteId
+)
+const matchedRealmRef = noteStore.getNoteRealmRefAndLoadWhenNeeded(
+  props.matchedNoteId
+)
 
 const sourceNote = computed<Note | undefined>(
   () => reviewedRealmRef.value?.note
@@ -88,9 +88,7 @@ async function onInsertWikiLinkAsProperty() {
   const composed = appendWikiLinkPropertyRow(source.content ?? "", linkText)
   if (composed === undefined) return
   await closeDialogThen(() =>
-    storageAccessor.value
-      .storedApi()
-      .updateTextField(source.id, "edit content", composed)
+    noteStore.updateTextField(source.id, "edit content", composed)
   )
 }
 </script>

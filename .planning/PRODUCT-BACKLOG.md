@@ -10,9 +10,13 @@ and deletable in Web Donut.
 
 ## Taken
 
-- [Give the frontend note store a cohesive architecture](seeds/SEED-049-note-store-architecture.md#story-1) — SEED-049#story-1 ([plan](slice-plans/016-note-store-architecture/PLAN.md))
-- [Tidy the note context in spelling results and narrow conversations](seeds/SEED-033-simplify-note-presentation.md#story-3) — SEED-033#story-3 ([plan](slice-plans/017-tidy-note-context/PLAN.md))
+- [Server and CLI classify notebook paths the same way](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-48) — SEED-009#story-48 ([plan](slice-plans/019-one-path-classifier/PLAN.md))
 
 ## Backlog list
 
-- [Server and CLI classify notebook paths the same way](seeds/SEED-009-git-backed-local-notebook-workflow.md#story-48) — SEED-009#story-48
+- [Local publish validates and applies a proposal once](seeds/SEED-050-local-ai-notebook-technical-debt.md#story-1) — SEED-050#story-1
+- [Web placement rules live with the server's owners](seeds/SEED-050-local-ai-notebook-technical-debt.md#story-2) — SEED-050#story-2
+- [Notebook content failures are loud](seeds/SEED-050-local-ai-notebook-technical-debt.md#story-3) — SEED-050#story-3
+- [The notebook tree has one model in code](seeds/SEED-050-local-ai-notebook-technical-debt.md#story-4) — SEED-050#story-4
+- [Settle the file and image vocabulary and remove leftovers](seeds/SEED-050-local-ai-notebook-technical-debt.md#story-5) — SEED-050#story-5
+- [One owner edits frontmatter in place](seeds/SEED-050-local-ai-notebook-technical-debt.md#story-6) — SEED-050#story-6

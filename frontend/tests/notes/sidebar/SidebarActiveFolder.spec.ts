@@ -1,4 +1,4 @@
-import { useStorageAccessor } from "@/composables/useStorageAccessor"
+import { useNoteStore } from "@/store/noteStore"
 import { DOMWrapper, flushPromises } from "@vue/test-utils"
 import { vi, describe, it, expect, beforeEach, afterEach } from "vitest"
 import helper from "@tests/helpers"
@@ -13,12 +13,12 @@ import {
 describe("Sidebar active folder", () => {
   // biome-ignore lint/suspicious/noExplicitAny: wrapper for testing
   let wrapper: import("@vue/test-utils").VueWrapper<any>
-  const storageAccessor = useStorageAccessor()
+  const noteStore = useNoteStore()
   const fixtures = sidebarDefaultTreeFixtures
 
   beforeEach(() => {
     prepareSidebarDefaultMountContext({
-      storageAccessor,
+      noteStore,
       fixtures,
       vi,
     })

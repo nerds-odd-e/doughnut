@@ -32,7 +32,6 @@
         :notebookId="notebookId"
         :initial-folder="realmLeafFolder(noteRealm)"
         :initial-title="modelValue.portablePath"
-        :wiki-link-cache-refresh-source-note-id="sourceNoteId"
         :ancestor-folders="noteRealm.ancestorFolders ?? []"
         @close-dialog="close"
       />
@@ -64,7 +63,6 @@ const props = defineProps<{
   notebookId: number
   noteRealm: NoteRealm
   modelValue: DeadWikiLinkPayload | null
-  sourceNoteId: number
 }>()
 
 const emit = defineEmits<{

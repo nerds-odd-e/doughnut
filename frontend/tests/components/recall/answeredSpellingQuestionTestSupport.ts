@@ -4,7 +4,7 @@ import type {
   NoteRealm,
   User,
 } from "@generated/donut-backend-api"
-import { useStorageAccessor } from "@/composables/useStorageAccessor"
+import { useNoteStore } from "@/store/noteStore"
 import { wikiLinkFromAuthoredToken } from "@/utils/authoredLinkMarkup"
 import helper from "@tests/helpers"
 import makeMe from "donut-test-fixtures/makeMe"
@@ -27,14 +27,13 @@ export function mountAnsweredSpellingQuestion(
   }
   if (options.seedRealms) {
     for (const realm of options.seedRealms) {
-      useStorageAccessor().value.refreshNoteRealm(realm)
+      useNoteStore().refreshNoteRealm(realm)
     }
   }
   return chain.mount({
     attachTo: document.body,
     global: {
       stubs: {
-        NoteUnderQuestion: true,
         ViewMemoryTrackerLink: true,
       },
     },

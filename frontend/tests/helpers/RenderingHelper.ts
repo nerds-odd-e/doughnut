@@ -1,6 +1,5 @@
-import { useStorageAccessor } from "@/composables/useStorageAccessor"
 import routes from "@/routes/routes"
-import createNoteStorage from "@/store/createNoteStorage"
+import { resetNoteStore } from "@/store/noteStore"
 import type { User } from "@generated/donut-backend-api"
 import { render } from "@testing-library/vue"
 import { mount } from "@vue/test-utils"
@@ -45,8 +44,7 @@ class RenderingHelper<T = DefineComponent> {
 
   withCleanStorage() {
     // Reset the singleton for each test
-    const storageAccessor = useStorageAccessor()
-    storageAccessor.value = createNoteStorage()
+    resetNoteStore()
     return this
   }
 

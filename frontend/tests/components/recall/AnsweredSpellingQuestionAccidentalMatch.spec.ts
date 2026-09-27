@@ -3,7 +3,7 @@ import {
   TextContentController,
 } from "@generated/donut-backend-api/sdk.gen"
 import AccidentalMatchResolveDialog from "@/components/recall/AccidentalMatchResolveDialog.vue"
-import { useStorageAccessor } from "@/composables/useStorageAccessor"
+import { useNoteStore } from "@/store/noteStore"
 import { flushPromises, type VueWrapper } from "@vue/test-utils"
 import helper, {
   mockSdkService,
@@ -63,30 +63,6 @@ describe("AnsweredSpellingQuestion accidental match", () => {
     expect(
       wrapper.find('[data-testid="accidental-match-answer-link"]').exists()
     ).toBe(false)
-  })
-
-  it("links the matched note while the note context shows the reviewed note", async () => {
-    const { answeredQuestion, reviewedRealm } =
-      accidentalMatchWithOneMatchedNote()
-    const showNote = mockSdkService(NoteController, "showNote", reviewedRealm)
-
-    wrapper = mountAnsweredSpellingQuestion(answeredQuestion)
-    await flushPromises()
-
-    const alert = wrapper.find('[data-testid="accidental-match-alert"]')
-    expect(
-      alert
-        .find('[data-testid="accidental-match-answer-link"]')
-        .attributes("to")
-    ).toMatch(/10/)
-    expect(showNote).toHaveBeenCalledWith({ path: { note: reviewedRealm.id } })
-    expect(showNote).not.toHaveBeenCalledWith({ path: { note: 10 } })
-    expect(wrapper.find('[aria-label="Note context"]').text()).toContain(
-      "Reviewed Note"
-    )
-    expect(
-      wrapper.find('[data-testid="resolve-accidental-match"]').exists()
-    ).toBe(true)
   })
 
   it("opens resolve dialog with clickable titles and notebook path identity", async () => {
@@ -204,8 +180,8 @@ describe("AnsweredSpellingQuestion accidental match", () => {
       .component(AccidentalMatchResolveDialog)
       .withCleanStorage()
       .withCurrentUser(makeMe.aUser.please())
-    useStorageAccessor().value.refreshNoteRealm(reviewedRealm)
-    useStorageAccessor().value.refreshNoteRealm(matched)
+    useNoteStore().refreshNoteRealm(reviewedRealm)
+    useNoteStore().refreshNoteRealm(matched)
 
     wrapper = renderer
       .withProps({

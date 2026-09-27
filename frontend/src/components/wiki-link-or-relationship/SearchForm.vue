@@ -38,7 +38,7 @@ import AddRelationshipFinalize from "./AddRelationshipFinalize.vue"
 import WikiLinkOrRelationshipChoice from "./WikiLinkOrRelationshipChoice.vue"
 import SearchForNoteAndFolder from "../search/SearchForNoteAndFolder.vue"
 import usePopups from "../commons/Popups/usePopups"
-import { useStorageAccessor } from "@/composables/useStorageAccessor"
+import { useNoteStore } from "@/store/noteStore"
 import { useContentCursorInserter } from "@/composables/useContentCursorInserter"
 import { type DeadWikiLinkPayload } from "@/utils/wikiLinkMarkup"
 import { wikiLinkTokenFromDecodedParts } from "@/utils/authoredLinkMarkup"
@@ -48,7 +48,7 @@ import {
 } from "@/utils/wikiLinkAuthoring"
 
 const { popups } = usePopups()
-const storageAccessor = useStorageAccessor()
+const noteStore = useNoteStore()
 const { insert, canInsertWikiLinkAsProperty, insertWikiLinkAsProperty } =
   useContentCursorInserter()
 
@@ -70,7 +70,7 @@ const selectedSearchResult = ref<NoteSearchResult | undefined>(undefined)
 const targetSearchResult = ref<NoteSearchResult | undefined>(undefined)
 
 const noteRealm = computed(() =>
-  note ? storageAccessor.value.refOfNoteRealm(note.id).value : undefined
+  note ? noteStore.refOfNoteRealm(note.id).value : undefined
 )
 const notebookId = computed(() => noteRealm.value?.notebookRealm.notebook.id)
 
@@ -114,12 +114,10 @@ async function onDeadWikiLinkToNote() {
   )
   if (newLinkText === undefined) return
   const currentContent =
-    storageAccessor.value.refOfNoteRealm(note.id).value?.note.content ?? ""
+    noteStore.refOfNoteRealm(note.id).value?.note.content ?? ""
   const newContent = currentContent.replaceAll(originalToken, newLinkText)
   await closeDialogThen(() =>
-    storageAccessor.value
-      .storedApi()
-      .updateTextField(note.id, "edit content", newContent)
+    noteStore.updateTextField(note.id, "edit content", newContent)
   )
 }
 
@@ -127,9 +125,7 @@ async function moveUnderFolder(targetFolderId: number) {
   if (!(await popups.confirm("Move note into this folder?"))) {
     return
   }
-  await storageAccessor.value
-    .storedApi()
-    .moveNoteToFolder(note!.id, targetFolderId)
+  await noteStore.moveNote(note!.id, { folderId: targetFolderId })
   emit("closeDialog")
 }
 
@@ -137,9 +133,7 @@ async function moveToNotebookRoot(targetNotebookId: number) {
   if (!(await popups.confirm("Move note to this notebook's root?"))) {
     return
   }
-  await storageAccessor.value
-    .storedApi()
-    .moveNoteToNotebookRoot(note!.id, targetNotebookId)
+  await noteStore.moveNote(note!.id, { notebookId: targetNotebookId })
   emit("closeDialog")
 }
 </script>

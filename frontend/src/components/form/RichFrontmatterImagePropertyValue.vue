@@ -51,7 +51,7 @@
 <script setup lang="ts">
 import { ref } from "vue"
 import RichFrontmatterPropertyExternalLink from "@/components/form/RichFrontmatterPropertyExternalLink.vue"
-import { useStorageAccessor } from "@/composables/useStorageAccessor"
+import { useNoteStore } from "@/store/noteStore"
 import {
   closeAndFlushNoteContentMutations,
   reopenNoteContentMutations,
@@ -78,7 +78,7 @@ const emit = defineEmits<{
   "image-upload-state": [inProgress: boolean]
 }>()
 
-const storageAccessor = useStorageAccessor()
+const noteStore = useNoteStore()
 
 const valueInputRef = ref<HTMLInputElement | null>(null)
 const imageFileInputRef = ref<HTMLInputElement | null>(null)
@@ -104,7 +104,7 @@ async function onImageFileSelected(event: Event) {
   try {
     if (!(await closeAndFlushNoteContentMutations(noteId))) return
     try {
-      await storageAccessor.value.storedApi().uploadNoteImage(noteId, file)
+      await noteStore.uploadNoteImage(noteId, file)
     } finally {
       reopenNoteContentMutations(noteId)
     }
