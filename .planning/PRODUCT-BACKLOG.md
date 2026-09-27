@@ -12,9 +12,9 @@ and deletable in Web Donut.
 
 ## Backlog list
 
-- [Local publish validates and applies a proposal once](seeds/SEED-050-local-ai-notebook-technical-debt.md#story-1) — SEED-050#story-1
-- [Web placement rules live with the server's owners](seeds/SEED-050-local-ai-notebook-technical-debt.md#story-2) — SEED-050#story-2
-- [Notebook content failures are loud](seeds/SEED-050-local-ai-notebook-technical-debt.md#story-3) — SEED-050#story-3
+- [Local publish checks the Markdown it changes once, before applying anything](seeds/SEED-050-local-ai-notebook-technical-debt.md#story-1) — SEED-050#story-1
+- [Adding a relationship on the web places its note through the server in one accepted change](seeds/SEED-050-local-ai-notebook-technical-debt.md#story-2) — SEED-050#story-2
+- [Notebook pages and the sidebar say when content cannot be loaded](seeds/SEED-050-local-ai-notebook-technical-debt.md#story-3) — SEED-050#story-3
 - [The notebook tree has one model in code](seeds/SEED-050-local-ai-notebook-technical-debt.md#story-4) — SEED-050#story-4
-- [Settle the file and image vocabulary and remove leftovers](seeds/SEED-050-local-ai-notebook-technical-debt.md#story-5) — SEED-050#story-5
-- [One owner edits frontmatter in place](seeds/SEED-050-local-ai-notebook-technical-debt.md#story-6) — SEED-050#story-6
+- [Finished transitions leave no trace in code and docs](seeds/SEED-050-local-ai-notebook-technical-debt.md#story-5) — SEED-050#story-5
+- [Code, API and docs say "image", and the UI says "File"](seeds/SEED-050-local-ai-notebook-technical-debt.md#story-7) — SEED-050#story-7
