@@ -6055,7 +6055,8 @@ components:
       type: object
       description: "Notebook chrome plus one file for loading the file page: the shared\
         \ realm sidebar with the folder trail from notebook root through the file's\
-        \ folder, the file's id and filename, and its size in bytes."
+        \ folder, the file's id and filename, and its size in bytes, and whether it\
+        \ is a picture the page can show."
       properties:
         notebookRealm:
           $ref: "#/components/schemas/NotebookRealm"
@@ -6077,9 +6078,12 @@ components:
         size:
           type: integer
           format: int64
+        picture:
+          type: boolean
       required:
       - attachment
       - notebookRealm
+      - picture
       - size
     ThresholdExceededResult:
       type: object

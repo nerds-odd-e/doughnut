@@ -9,6 +9,12 @@
       <p class="mb-4" data-testid="attachment-page-size">
         {{ attachmentRealm.size }} bytes
       </p>
+      <img
+        v-if="attachmentRealm.picture"
+        class="attachment-picture mb-4"
+        :src="pictureSrc"
+        :alt="attachmentRealm.attachment.filename"
+      />
       <a
         class="daisy-btn daisy-btn-sm"
         data-testid="attachment-download-link"
@@ -35,6 +41,7 @@
 import type {
   DownloadAttachmentData,
   NotebookAttachmentRealm,
+  ShowAttachmentPictureData,
 } from "@generated/donut-backend-api"
 import { client } from "@generated/donut-backend-api/client.gen"
 import { NotebookAttachmentController } from "@generated/donut-backend-api/sdk.gen"
@@ -51,13 +58,22 @@ const props = defineProps<{
   attachmentRealm: NotebookAttachmentRealm | undefined
 }>()
 
+const attachmentPath = computed(() => ({
+  notebook: props.attachmentRealm!.notebookRealm.notebook.id,
+  attachment: props.attachmentRealm!.attachment.id,
+}))
+
 const downloadHref = computed(() =>
   client.buildUrl<DownloadAttachmentData>({
     url: "/api/notebooks/{notebook}/attachments/{attachment}/content",
-    path: {
-      notebook: props.attachmentRealm!.notebookRealm.notebook.id,
-      attachment: props.attachmentRealm!.attachment.id,
-    },
+    path: attachmentPath.value,
+  })
+)
+
+const pictureSrc = computed(() =>
+  client.buildUrl<ShowAttachmentPictureData>({
+    url: "/api/notebooks/{notebook}/attachments/{attachment}/picture",
+    path: attachmentPath.value,
   })
 )
 
@@ -86,5 +102,11 @@ const deleteAttachment = async () => {
   background: color-mix(in oklch, var(--color-base-200) 80%, transparent);
   border-radius: 8px;
   padding: 1.5rem;
+}
+
+.attachment-picture {
+  display: block;
+  max-width: 100%;
+  height: auto;
 }
 </style>

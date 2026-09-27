@@ -68,6 +68,10 @@ Then(
   }
 )
 
+Then('the file page shows its picture', () => {
+  attachmentPage().expectPicture('image/png')
+})
+
 When('I delete the file on its page', () => {
   attachmentPage().delete()
 })

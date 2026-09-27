@@ -22,6 +22,7 @@ Feature: Notebook files
       | physics/sketch.png | sketch  |
     When I jump to the notebook "Lab Notebook"
     And I open the file "sketch.png" in sidebar folder path "physics"
-    And I delete the file on its page
+    Then the file page shows its picture
+    When I delete the file on its page
     Then the folder page heading should be "physics"
     And the sidebar folder "physics" lists only "data"

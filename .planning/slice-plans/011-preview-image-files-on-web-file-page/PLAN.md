@@ -71,7 +71,11 @@ cannot drift. Regenerate the API client (generate-api-client).
 ### 2. The file page shows an image file's picture
 
 Type: Behavior
-Status: planned
+Status: done
+Accepted proof: `NotebookAttachmentControllerTest` `FilePage.aPictureFileIsMarkedAsAPicture`
+and `showsFilenameSizeAndFolderTrailThroughItsFolder` (`picture` false);
+`AttachmentPage.spec.ts` 5/5 with `vue-tsc` clean; `notebook_files.feature`
+2/2 with the new step "the file page shows its picture".
 Proof: `AttachmentPage.spec.ts` — a realm with `picture: true` renders an
 `<img>` whose path is the slice 1 address and alt is the filename, with
 Download (and Delete when not readonly) still present; `picture: false` renders

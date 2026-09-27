@@ -64,6 +64,7 @@ class NotebookAttachmentControllerTest extends ControllerTestBase {
 
       assertThat(page.attachment().filename(), equalTo("run.json"));
       assertThat(page.size(), equalTo(7L));
+      assertThat(page.picture(), equalTo(false));
       assertThat(
           page.sidebar().getAncestorFolders().stream().map(Folder::getName).toList(),
           contains("physics", "data"));
@@ -76,6 +77,13 @@ class NotebookAttachmentControllerTest extends ControllerTestBase {
 
       assertThat(
           controller.getAttachmentPage(notebook, keep).sidebar().getAncestorFolders(), empty());
+    }
+
+    @Test
+    void aPictureFileIsMarkedAsAPicture() throws Exception {
+      NotebookAttachment flow = attachmentAtRoot("flow.png", "png bytes");
+
+      assertThat(controller.getAttachmentPage(notebook, flow).picture(), equalTo(true));
     }
   }
 

@@ -55,4 +55,16 @@ export const attachmentPage = () => ({
     )
     return this
   },
+
+  expectPicture(mediaType: string) {
+    cy.get<HTMLImageElement>('[data-testid="attachment-page"] img').then(
+      ($img) => {
+        cy.request($img[0].src)
+          .its('headers')
+          .its('content-type')
+          .should('equal', mediaType)
+      }
+    )
+    return this
+  },
 })

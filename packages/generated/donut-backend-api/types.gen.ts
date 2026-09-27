@@ -1200,7 +1200,7 @@ export type BookUserLastReadPosition = {
 };
 
 /**
- * Notebook chrome plus one file for loading the file page: the shared realm sidebar with the folder trail from notebook root through the file's folder, the file's id and filename, and its size in bytes.
+ * Notebook chrome plus one file for loading the file page: the shared realm sidebar with the folder trail from notebook root through the file's folder, the file's id and filename, and its size in bytes, and whether it is a picture the page can show.
  */
 export type NotebookAttachmentRealm = {
     /**
@@ -1217,6 +1217,7 @@ export type NotebookAttachmentRealm = {
     scopedReadmeContent?: string;
     attachment: NotebookAttachmentListItem;
     size: number;
+    picture: boolean;
 };
 
 export type ThresholdExceededResult = {
