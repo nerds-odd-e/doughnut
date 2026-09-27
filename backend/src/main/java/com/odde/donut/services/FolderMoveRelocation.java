@@ -137,13 +137,9 @@ public class FolderMoveRelocation {
           HttpStatus.BAD_REQUEST,
           "Folders containing files cannot be moved to another notebook yet.");
     }
-    Integer destParentId = newParent == null ? null : newParent.getId();
     Optional<Folder> mergeTarget =
-        folderSiblingNameValidation.mergeTargetOrRejectConflict(
-            destinationNotebook.getId(),
-            destParentId,
-            folder,
-            request != null && request.isMerge());
+        folderSiblingNameValidation.mergeTargetOrRefuse(
+            destinationNotebook, newParent, folder, request != null && request.isMerge());
     if (mergeTarget.isPresent()) {
       subtree.mergeInto(folder, mergeTarget.get(), now);
     } else {

@@ -63,7 +63,12 @@ cross-notebook scenarios stay green unchanged.
 ### 1. The destination notebook's folder name check is the one owner's
 
 Type: Behavior
-Status: planned
+Status: done
+Accepted proof: `NotebookFolderMoveNameClashControllerTest`
+`refusesMovingOntoACaseVariantFolderInAnotherNotebook`,
+`mergesIntoACaseVariantFolderInAnotherNotebookKeepingItsName` and
+`refusesMovingOntoAFileNameInAnotherNotebook` failed first, then passed; the
+`*CrossNotebookMove*` classes and the full `pnpm backend:test_only` (2676) passed.
 Proof: new cross-notebook cases for examples 1, 1b and 2 in
 `NotebookFolderMoveNameClashControllerTest` fail first (1 and 2 currently
 succeed with a case-variant sibling or a folder beside a same-named file; 1b
@@ -108,4 +113,8 @@ checked merge.
 
 ## Learnings
 
-None yet.
+- A cross-notebook move into the folder itself or a descendant is refused with
+  400 before the 404 for a parent in another notebook
+  (`rejectsCrossNotebookMoveIntoItself`), so the two moves' destination checks
+  cannot yet share `validateDestinationAndFindMergeTarget` without changing
+  that order on purpose.

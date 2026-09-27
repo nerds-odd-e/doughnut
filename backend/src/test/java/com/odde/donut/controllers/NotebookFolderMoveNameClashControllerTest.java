@@ -103,4 +103,58 @@ class NotebookFolderMoveNameClashControllerTest extends NotebookFolderManagement
     makeMe.refresh(moved);
     assertThat(moved.getParentFolder(), nullValue());
   }
+
+  @Test
+  void refusesMovingOntoACaseVariantFolderInAnotherNotebook() {
+    Notebook source = ownedNotebook();
+    Folder moved = ownedFolder(source, "shared");
+    Notebook destination = ownedNotebook();
+    ownedFolder(destination, "Shared");
+
+    ApiException ex =
+        assertThrows(
+            ApiException.class,
+            () -> folderController.moveFolder(source, moved, folderMoveTo(destination, null)));
+
+    assertThat(ex.getErrorBody().getErrorType(), equalTo(ApiError.ErrorType.FOLDER_NAME_CONFLICT));
+    assertThat(
+        ex.getErrorBody().getMessage(), equalTo("A folder with this name already exists here."));
+    makeMe.refresh(moved);
+    assertThat(moved.getNotebook().getId(), equalTo(source.getId()));
+  }
+
+  @Test
+  void mergesIntoACaseVariantFolderInAnotherNotebookKeepingItsName()
+      throws UnexpectedNoAccessRightException {
+    Notebook source = ownedNotebook();
+    Folder moved = ownedFolder(source, "shared");
+    Note noteInSource = makeMe.aNote("Intro").folder(moved).please();
+    Notebook destination = ownedNotebook();
+    Folder target = ownedFolder(destination, "Shared");
+
+    Folder result = folderController.moveFolder(source, moved, folderMergeTo(destination, null));
+
+    assertThat(result.getId(), equalTo(target.getId()));
+    assertThat(result.getName(), equalTo("Shared"));
+    makeMe.refresh(noteInSource);
+    assertThat(noteInSource.getFolder().getId(), equalTo(target.getId()));
+  }
+
+  @Test
+  void refusesMovingOntoAFileNameInAnotherNotebook() {
+    Notebook source = ownedNotebook();
+    Folder moved = ownedFolder(source, "shared");
+    Notebook destination = ownedNotebook();
+    makeMe.anAttachment("shared").atRootOf(destination).please();
+
+    ApiException ex =
+        assertThrows(
+            ApiException.class,
+            () -> folderController.moveFolder(source, moved, folderMoveTo(destination, null)));
+
+    assertThat(ex.getErrorBody().getErrorType(), equalTo(ApiError.ErrorType.RESOURCE_CONFLICT));
+    assertThat(ex.getErrorBody().getMessage(), containsString("shared"));
+    makeMe.refresh(moved);
+    assertThat(moved.getNotebook().getId(), equalTo(source.getId()));
+  }
 }
