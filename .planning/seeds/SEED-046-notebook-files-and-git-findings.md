@@ -118,7 +118,7 @@ including delivery, not commitments.
 
 **Identity:** SEED-046#story-13
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"unselected"}
+{"schemaVersion":1,"refinement":"refined","approach":"planless","assessment":"ready","reasons":[],"basis":{"document":"a011abb3cb555bce419a4f8b81b2698544c8f9cdaffacb23c7d99fb296dfbe1b"}}
 ```
 
 - **For / why:** Maintainers. Once production has normalized its CRLF notes,
