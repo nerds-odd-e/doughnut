@@ -155,6 +155,12 @@ actionable error. Folder representation follows
 [ADR 0004](./adrs/0004-okf-compatible-notebook-markdown-accepted.md#bundle-and-concepts);
 omitting a folder's last represented path dissolves its projected Folder.
 
+Local publication judges only the Markdown the proposal adds or changes;
+Markdown whose bytes are already in accepted history, untouched or moved, is
+not judged again. It checks that the live projection still matches accepted
+`main` before any change and refuses a drifted projection, asking to refresh the
+checkout, ahead of shape and placement refusals.
+
 Every accepted web editing batch that changes Portable content appends exactly
 one commit; never amend or coalesce accepted or advertised commits. V1 authors
 directly on `main`. For a future project binding, repository policy determines
