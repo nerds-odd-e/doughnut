@@ -171,3 +171,10 @@ the owner's keep-or-delete decision.
   subagents give the speed instead.
 
 ## Learnings
+
+## Execution complete
+
+Product advice: SEED-009#story-47 and #story-48 are queued after owner-first
+SEED-049#story-1. At wrap-up, add the listing-refresh finding (report,
+Frontend and CLI) to SEED-049's seed, and let the owner decide the North Star
+retirements the report proposes and the stale SEED-014.
