@@ -89,7 +89,10 @@ All Structure: existing behavior stays green.
 ### 1. A folder answers its own trail from the root
 
 Type: Structure
-Status: planned
+Status: done — proof passed 26/26 (`rejectsMoveIntoDescendant`,
+`rejectsAnExactFolderRelocationIntoADescendantFolder`,
+`nestedFullyEmptyTreePurgedDeepestFirst`; the purge order is observed only
+indirectly, over two levels, as before)
 Proof: `CURSOR_DEV=true nix develop -c pnpm backend:test_only --tests 'com.odde.donut.controllers.NotebookFolderMoveControllerTest' --tests 'com.odde.donut.controllers.NotebookGitProposalFolderRelocationPlacementControllerTest' --tests 'com.odde.donut.controllers.NotebookFolderCrossNotebookMoveControllerTest' --tests 'com.odde.donut.services.health.EmptyFolderBulkPurgeTest' --tests 'com.odde.donut.controllers.NotebookGitWebTrashControllerTest'`
 stays green.
 

@@ -9,6 +9,9 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.Formula;
@@ -78,6 +81,16 @@ public class Folder extends EntityIdentifiedByIdOnly {
   @JsonInclude(JsonInclude.Include.NON_NULL)
   public Integer getParentFolderId() {
     return parentFolder == null ? null : parentFolder.getId();
+  }
+
+  /** Outermost folder first, from notebook root through this folder (inclusive). */
+  public List<Folder> trailFromRoot() {
+    List<Folder> leafToRoot = new ArrayList<>();
+    for (Folder f = this; f != null; f = f.getParentFolder()) {
+      leafToRoot.add(f);
+    }
+    Collections.reverse(leafToRoot);
+    return List.copyOf(leafToRoot);
   }
 
   @JsonIgnore

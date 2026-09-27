@@ -2,8 +2,6 @@ package com.odde.donut.controllers.dto;
 
 import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.Note;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 /** Folder path from notebook root to the note's containing folder (outermost first). */
@@ -29,12 +27,7 @@ public final class FolderTrail {
    * {@code folder} is null (notebook root).
    */
   public static List<Folder> fromRootToFolder(Folder folder) {
-    List<Folder> leafToRoot = new ArrayList<>();
-    for (Folder f = folder; f != null; f = f.getParentFolder()) {
-      leafToRoot.add(f);
-    }
-    Collections.reverse(leafToRoot);
-    return List.copyOf(leafToRoot);
+    return folder == null ? List.of() : folder.trailFromRoot();
   }
 
   /**

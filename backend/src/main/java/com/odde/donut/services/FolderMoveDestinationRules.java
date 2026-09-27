@@ -16,21 +16,9 @@ public final class FolderMoveDestinationRules {
     if (newParent.getId().equals(folder.getId())) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Cannot move folder into itself.");
     }
-    if (folderIsStrictDescendantOf(folder, newParent)) {
+    if (newParent.trailFromRoot().stream().anyMatch(f -> f.getId().equals(folder.getId()))) {
       throw new ResponseStatusException(
           HttpStatus.BAD_REQUEST, "Cannot move folder into its descendant.");
     }
-  }
-
-  /** True if {@code possibleDescendant} is {@code ancestor} or strictly under {@code ancestor}. */
-  private static boolean folderIsStrictDescendantOf(Folder ancestor, Folder possibleDescendant) {
-    Folder x = possibleDescendant;
-    while (x != null) {
-      if (x.getId().equals(ancestor.getId())) {
-        return true;
-      }
-      x = x.getParentFolder();
-    }
-    return false;
   }
 }

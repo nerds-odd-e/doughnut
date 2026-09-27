@@ -86,7 +86,7 @@ final class FolderSubtreeOccupancy {
       }
       deletable.add(folder);
     }
-    deletable.sort(Comparator.comparingInt(FolderSubtreeOccupancy::folderDepth).reversed());
+    deletable.sort(Comparator.comparingInt((Folder f) -> f.trailFromRoot().size()).reversed());
     return deletable;
   }
 
@@ -119,15 +119,5 @@ final class FolderSubtreeOccupancy {
       }
     }
     return true;
-  }
-
-  private static int folderDepth(Folder folder) {
-    int depth = 0;
-    Folder current = folder.getParentFolder();
-    while (current != null) {
-      depth++;
-      current = current.getParentFolder();
-    }
-    return depth;
   }
 }
