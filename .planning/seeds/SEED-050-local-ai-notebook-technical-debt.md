@@ -124,54 +124,13 @@ performance loss.
 4. A root note whose picture another root note also uses is moved into a
    folder → the picture is copied, not moved, as today.
 
-<a id="story-5"></a>
-
-### Finished transitions leave no trace in code and docs
-
-**Identity:** SEED-050#story-5
-```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/024-finished-transitions-leave-no-trace/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"8c1ce1fcb03eaee1efd74d124358d2827e6d3c6e61222c91a80a429fea279874","plan":"322c7e1dd275cce99f3be4aa17e2694f5861ef63583f3f7996c8b416f8822e00"}}
-```
-
-**Goal:** Developers see only what the notebook Git model does today, and
-Git alone decides what a pull replays.
-
-**Scope:**
-
-- Delete the unused `NotebookAttachment.getContent`/`setContent` aliases.
-- Name `NotebookGitCutoverService` after what it does now (start and reset a
-  notebook's history); a new notebook's first commit reads "Create notebook"
-  instead of "Cutover: snapshot existing notebook content into Git".
-- Docs describe creation and history reset in the present tense; the finished
-  cutover and legacy-picture passages go (`notebook-git-synchronization.md`,
-  `note-content-saving.md`, `notebook-git-attachments.md`,
-  `notebook-git-lfs.md`). The sentence claiming the web editor and the server
-  edit frontmatter "the same way" states instead which side makes which edit.
-- Remove the pull's final-newline conflict absorber
-  (`cli/src/commands/notebook/notebookPullRebase.ts`): local files are written
-  by whatever tool the owner uses, so web and local final newlines never
-  become uniform; a final-newline-only difference becomes an ordinary Git
-  conflict (owner, 2026-09-27).
-- Unchanged: existing commit messages in history; ADR 0002's text.
-- Deferred: making web note bodies always end with a newline.
-
-**Key examples:**
-
-1. Create a notebook → its first commit reads "Create notebook" by the Donut
-   System author.
-2. From one base, the local `note.md` is "Same authored body.\n" and the
-   accepted one "Same authored body." → pull → the rebase pauses on `note.md`
-   with the usual guidance.
-3. A pull whose local patch accepted history already contains → reported as
-   already published, as today.
-
 <a id="story-9"></a>
 
 ### Notebook history commits are proven where they happen
 
 **Identity:** SEED-050#story-9
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/028-history-commits-proven-where-they-happen/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"e80a6f5cfae21e5fcad6ddd0dadc123dcd3a401a97eec89b8bffc049c400af13","plan":"846f0f92dc198ecc3b3a6616f856a12a3e17c2fb24974c350b22c0ff03e09f45"}}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/028-history-commits-proven-where-they-happen/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"ea2316921ba1b7d1f14721c8a31f689c612448617ef73440cf40e178c27befa1","plan":"dcd584e6caf210a0258b84c0218a08248da7a7fc2edb51cf606981f4e22ce042"}}
 ```
 
 **Goal:** Correction of SEED-050#story-5 (commits 48d5a2e8f8..5afa318baf): a

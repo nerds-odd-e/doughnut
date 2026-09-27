@@ -4,8 +4,10 @@
 
 - Story: [SEED-050#story-9](../../seeds/SEED-050-local-ai-notebook-technical-debt.md#story-9)
 - **Identity:** SEED-050#story-9
-- Correction of SEED-050#story-5 (plan 024, commits 48d5a2e8f8, 433ca0be36,
-  b2dd68f03e, 5afa318baf), from its execution retrospective on 2026-09-27.
+- Correction of SEED-050#story-5 (plan
+  `4426190218:.planning/slice-plans/024-finished-transitions-leave-no-trace/PLAN.md`,
+  commits 48d5a2e8f8, 433ca0be36, b2dd68f03e, 5afa318baf), from its execution
+  retrospective on 2026-09-27.
 
 ## Goal and scope
 
