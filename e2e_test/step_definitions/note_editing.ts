@@ -30,7 +30,7 @@ Then('I should see note {string} has an image', (noteTopology: string) => {
   start.jumpToNotePage(noteTopology).expectHeaderImage()
 })
 
-Then('I should see note {string} shows its picture', (noteTopology: string) => {
+Then('I should see note {string} shows its image', (noteTopology: string) => {
   start.jumpToNotePage(noteTopology).expectHeaderImageLoaded()
 })
 

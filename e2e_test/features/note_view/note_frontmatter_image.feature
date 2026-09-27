@@ -18,7 +18,7 @@ Feature: Note header image from frontmatter
   Scenario: Uploaded image becomes a file the image property names
     When I upload an image from fixture "moon.jpg" to the note "shown"
     And I reload the current page for note "shown"
-    Then I should see note "shown" shows its picture
+    Then I should see note "shown" shows its image
     When I open the note content markdown editor
     Then the note content markdown source should contain "image: moon.jpg"
 
@@ -28,9 +28,9 @@ Feature: Note header image from frontmatter
     Then I should see note "shown" has an image
     And I should see rich note property "image" with value "https://example.com/a.png"
 
-  Scenario: Note shows a picture file from its own folder
+  Scenario: Note shows an image file from its own folder
     Given I have a notebook "Physics" with notes:
       | Title | Folder  | Content   | Image Url         |
       | force | physics | Body text | force-diagram.png |
-    And the notebook "Physics" has the picture "physics/force-diagram.png" from fixture "example.png"
-    Then I should see note "force" shows its picture
+    And the notebook "Physics" has the image "physics/force-diagram.png" from fixture "example.png"
+    Then I should see note "force" shows its image

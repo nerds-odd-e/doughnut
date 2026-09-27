@@ -56,7 +56,7 @@ export const attachmentPage = () => ({
     return this
   },
 
-  expectPicture(mediaType: string) {
+  expectImage(mediaType: string) {
     cy.get<HTMLImageElement>('[data-testid="attachment-page"] img').then(
       ($img) => {
         cy.request($img[0].src)

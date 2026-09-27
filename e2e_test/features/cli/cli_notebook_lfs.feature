@@ -141,7 +141,7 @@ Feature: Notebook Git LFS authenticated transfer
     And the note "LFS Transfer Notebook/Shopping list" in Donut should have content "Milk and eggs"
 
   @bundleCliE2eInstall @withCliConfig
-  Scenario: A picture uploaded on the web arrives in the owner's clone beside its note
+  Scenario: An image uploaded on the web arrives in the owner's clone beside its note
     Given the backend is serving the CLI and install script
     And the CLI is installed from localhost
     And I have a notebook "LFS Transfer Notebook" with notes:

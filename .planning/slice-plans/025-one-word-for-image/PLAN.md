@@ -153,7 +153,8 @@ Change: the three messages.
 ### 4. Docs and the vocabulary say "image" and "File"
 
 Type: Structure (docs)
-Status: planned
+Status: done — proof grep finds no "picture" in docs or North Star; ADR line added;
+refactor named the `image:` / `image_mask:` keys in `docs/note-content-saving.md`
 Proof: `grep -rni "picture" docs/*.md .planning/NORTH-STAR.md` finds only
 sentences about pictures in general, none naming the concept; ADR 0001's
 Attachment entry ends with "Short UI: **File**."
@@ -165,7 +166,8 @@ Change: "picture" → "image" in `docs/notebook-git-attachments.md`,
 ### 5. E2E phrases say image
 
 Type: Structure
-Status: planned
+Status: done — the three features passed 16/16 scenarios; no "picture" left in
+`e2e_test`; refactor made no edits
 Proof: `CURSOR_DEV=true nix develop -c pnpm cy:run --spec e2e_test/features/note_view/note_frontmatter_image.feature,e2e_test/features/notebooks/notebook_files.feature,e2e_test/features/cli/cli_notebook_lfs.feature`
 stays green (E2E boot makes this leaf longer than 5 minutes; stated reason).
 

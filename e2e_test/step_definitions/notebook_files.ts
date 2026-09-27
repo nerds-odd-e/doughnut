@@ -28,7 +28,7 @@ Given(
 )
 
 Given(
-  'the notebook {string} has the picture {string} from fixture {string}',
+  'the notebook {string} has the image {string} from fixture {string}',
   (notebookName: string, path: string, fixture: string) => {
     cy.fixture(fixture, 'base64').then((contentBase64: string) =>
       start
@@ -68,8 +68,8 @@ Then(
   }
 )
 
-Then('the file page shows its picture', () => {
-  attachmentPage().expectPicture('image/png')
+Then('the file page shows its image', () => {
+  attachmentPage().expectImage('image/png')
 })
 
 When('I delete the file on its page', () => {
