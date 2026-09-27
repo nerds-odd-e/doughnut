@@ -29,44 +29,6 @@ different frontmatter edits, each already with one owner.
 
 ## Story Decomposition
 
-<a id="story-7"></a>
-
-### Code, API and docs say "image", and the UI says "File"
-
-**Identity:** SEED-050#story-7
-```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/025-one-word-for-image/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"bacae6f90ae97410c39bd1affdb92c4c6ee7e2f2ecebfccd12758e6d5b7ad994","plan":"4b2be11412ad113af679736da97f8b106f9496f828c613401a189efe06798189"}}
-```
-
-**Goal:** New work copies one name per concept: Attachment and Image in code,
-API and docs, and File in the UI, so the crossed image endpoint names stop
-misleading developers.
-
-**Scope:**
-
-- ADR 0001's Attachment entry gains "Short UI: **File**" (owner decision
-  2026-09-27), legitimizing "File" on the file page, in "File not found." and
-  in "Delete file" commit messages.
-- "picture" becomes "image" in code, the API and messages: `PictureFile`,
-  `InlinePicture`, `MovedNotePicture`, the file page realm's `picture` field,
-  and the endpoints — the note's image by path and an attachment's image by
-  id get matching image names (today `showAttachmentImage` is the note
-  endpoint and `showAttachmentPicture` the attachment one).
-- Docs, North Star and E2E phrases say "image".
-- Unchanged: Attachment stays the code, API and schema name; the two image
-  endpoints stay separate resources; the upload endpoint.
-- After SEED-050#story-2, which changes `PictureFile` and the picture upload,
-  and SEED-050#story-4, which edits `MovedNotePicture`.
-
-**Key examples:**
-
-1. The file page for `diagram.png` shows it through the attachment's image
-   endpoint.
-2. A note with `image: moon.jpg` loads it through the note's image endpoint
-   with that path.
-3. Uploading `a.txt` as a note image → refused "Cannot upload a.txt: an
-   image must be a png, jpg, jpeg, gif or webp file." (today "a picture").
-
 <a id="story-9"></a>
 
 ### Folder dissolve and merge enter subfolders by the one entry rule

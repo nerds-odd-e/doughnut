@@ -10,8 +10,6 @@ and deletable in Web Donut.
 
 ## Taken
 
-- [Code, API and docs say "image", and the UI says "File"](seeds/SEED-050-local-ai-notebook-technical-debt.md#story-7) — SEED-050#story-7 ([plan](slice-plans/025-one-word-for-image/PLAN.md))
-
 ## Backlog list
 
 - [Folder dissolve and merge enter subfolders by the one entry rule](seeds/SEED-050-local-ai-notebook-technical-debt.md#story-9) — SEED-050#story-9
