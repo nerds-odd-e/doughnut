@@ -25,8 +25,8 @@ import org.eclipse.jgit.revwalk.RevWalk;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-class NotebookGitCutoverServiceTest extends SpringTestBase {
-  @Autowired NotebookGitCutoverService notebookGitCutoverService;
+class NotebookGitHistoryServiceTest extends SpringTestBase {
+  @Autowired NotebookGitHistoryService notebookGitHistoryService;
   @Autowired NotebookGitBindingRepository notebookGitBindingRepository;
   @Autowired FolderRepository folderRepository;
   @Autowired NotebookGitAcceptedRepositoryStore acceptedRepositoryStore;
@@ -46,8 +46,8 @@ class NotebookGitCutoverServiceTest extends SpringTestBase {
     Integer emptyFolderId = emptyFolder.getId();
     makeMe.entityPersister.flush();
 
-    Instant cutoverTime = Instant.parse("2026-09-04T10:15:30Z");
-    notebookGitCutoverService.createBindingForNotebook(notebook, cutoverTime);
+    Instant creationTime = Instant.parse("2026-09-04T10:15:30Z");
+    notebookGitHistoryService.startHistory(notebook, creationTime);
     makeMe.entityPersister.flushAndClear();
 
     NotebookGitBinding binding =
@@ -75,6 +75,7 @@ class NotebookGitCutoverServiceTest extends SpringTestBase {
         assertThat(commit.getParentCount(), equalTo(0));
         assertThat(commit.getAuthorIdent().getName(), equalTo("Donut System"));
         assertThat(commit.getAuthorIdent().getEmailAddress(), equalTo("system@donut.local"));
+        assertThat(commit.getFullMessage(), equalTo("Create notebook"));
 
         List<PortableTreeEntry> foundEntries = GitBundleTestReader.readExactTree(readBack, commit);
 
@@ -97,8 +98,7 @@ class NotebookGitCutoverServiceTest extends SpringTestBase {
     Notebook notebook = makeMe.aNotebook().please();
     makeMe.entityPersister.flush();
     NotebookGitBinding initialBinding =
-        notebookGitCutoverService.createBindingForNotebook(
-            notebook, Instant.parse("2026-09-01T00:00:00Z"));
+        notebookGitHistoryService.startHistory(notebook, Instant.parse("2026-09-01T00:00:00Z"));
     Integer initialBindingId = initialBinding.getId();
     String initialGitObjectId = initialBinding.getAcceptedGitObjectId();
 
@@ -114,7 +114,7 @@ class NotebookGitCutoverServiceTest extends SpringTestBase {
     makeMe.entityPersister.flush();
 
     Instant snapshotTime = Instant.parse("2026-09-04T10:15:30Z");
-    notebookGitCutoverService.resetHistory(notebook, snapshotTime);
+    notebookGitHistoryService.resetHistory(notebook, snapshotTime);
     makeMe.entityPersister.flushAndClear();
 
     NotebookGitBinding binding =

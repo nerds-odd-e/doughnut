@@ -3,7 +3,7 @@ package com.odde.donut.testability;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 
-import com.odde.donut.services.notebookGit.NotebookGitCutoverService;
+import com.odde.donut.services.notebookGit.NotebookGitHistoryService;
 import java.time.Instant;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,12 +17,12 @@ import org.springframework.jdbc.core.JdbcTemplate;
  */
 class TestabilityDbResetTest extends SpringTestBase {
   @Autowired TestabilityRestController testabilityRestController;
-  @Autowired NotebookGitCutoverService notebookGitCutoverService;
+  @Autowired NotebookGitHistoryService notebookGitHistoryService;
   @Autowired JdbcTemplate jdbcTemplate;
 
   @Test
   void resetLeavesNoNativeGitObjects() {
-    notebookGitCutoverService.createBindingForNotebook(makeMe.aNotebook().please(), Instant.now());
+    notebookGitHistoryService.startHistory(makeMe.aNotebook().please(), Instant.now());
 
     testabilityRestController.resetDBAndTestabilitySettings();
 

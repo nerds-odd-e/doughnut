@@ -96,7 +96,7 @@ Change: delete `NotebookAttachment.getContent`/`setContent`.
 ### 2. Notebook history starts and resets under its own name
 
 Type: Behavior
-Status: planned
+Status: done
 Proof: add an assertion on the creation commit's message to the renamed
 service test (fails first on "Cutover: …", then passes) —
 `CURSOR_DEV=true nix develop -c pnpm backend:test_only --tests 'com.odde.donut.services.notebookGit.NotebookGitHistoryServiceTest' --tests 'com.odde.donut.controllers.NotebookGitNoteCreationAtomicControllerTest' --tests 'com.odde.donut.controllers.NotebookGitHistoryResetControllerTest' --tests 'com.odde.donut.controllers.NotebookGitWebContentHistoryControllerTest' --tests 'com.odde.donut.controllers.NotebookGitWebContentSaveControllerTest'`.
