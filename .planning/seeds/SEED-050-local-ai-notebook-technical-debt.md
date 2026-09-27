@@ -29,57 +29,6 @@ different frontmatter edits, each already with one owner.
 
 ## Story Decomposition
 
-<a id="story-1"></a>
-
-### Local publish checks the Markdown it changes once, before applying anything
-
-**Identity:** SEED-050#story-1
-```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/020-validate-changed-markdown-once/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"4213a2e511a6f2eb833b7ac740f7a70b392778f81879a2a7d7d13405045cee2d","plan":"41d31f7e226e32b0d264e16211f9374d3c935d8977955273f5fb3f144b565416"}}
-```
-
-**Goal:** A notebook owner publishing from a local checkout gets the same
-Markdown refusal at the same step whether or not the proposal moves a folder,
-and publishing costs in proportion to what changed rather than to the
-notebook's size. Developers find proposal validation and the drift guard once
-each in the publisher instead of inside the apply steps.
-
-**Scope:**
-
-- Strict typed-Markdown validation runs once, right after the publisher reads
-  the changed files and before any shape detection or change, on the `.md`
-  files the proposal adds or changes. Today it walks the whole proposed tree
-  from up to three places (`NotebookGitProposalPublisher`,
-  `NotebookGitProposalDocumentApplication`,
-  `NotebookGitProposalFolderRelocation`), so a relocation publish parses every
-  note three times.
-- Unchanged accepted Markdown is not judged again, consistent with
-  SEED-009#story-48's decision.
-- The check that the live projection matches accepted main runs once in the
-  publisher before any change; the relocation's second mode
-  (`applyAfterMatchedAcceptedTree`) goes away.
-- Unchanged: refusal messages; where authored properties and the Readme type
-  are checked (each already has one owner where the blob is read); the final
-  check against the proposed tree.
-- Dropped (owner, 2026-09-27): rewriting note and folder publication as one
-  final-state step "like files". Notes and folders carry identity (learning
-  data, links, folder ids) that files do not, so that rewrite would keep all
-  the correspondence machinery and only move it.
-- Depends on SEED-009#story-48 (plan 019), which rewrites the same Markdown
-  check and adds a classifier this check reuses.
-
-**Key examples:**
-
-1. Accepted `Physics/` is moved to `Science/Physics/` and the proposal adds
-   `Science/Physics/Waves.md` without `type` → publish → refused "Invalid
-   Markdown" naming `Science/Physics/Waves.md`; nothing changes.
-2. The proposal edits only `Notes.md`, adding a duplicate YAML key → refused
-   naming `Notes.md`. An untouched accepted note without frontmatter no
-   longer blocks a publish that changes other notes.
-3. The live projection has drifted from accepted main and the proposal moves
-   a folder or adds a note → refused "refresh the checkout"; nothing changes.
-4. The proposal only adds a file → it still publishes.
-
 <a id="story-2"></a>
 
 ### Adding a relationship on the web places its note through the server in one accepted change
