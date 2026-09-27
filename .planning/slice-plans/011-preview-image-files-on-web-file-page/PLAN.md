@@ -93,6 +93,13 @@ Change: `NotebookAttachmentRealm` gains `@NotNull boolean picture` from
 the extension rule. Regenerate the API client; `AttachmentPage.vue` renders the
 `<img>` when `picture` is true.
 
+## Execution complete
+
+Product advice: No change. The story delivered its goal by reusing the existing
+picture rule and inline response; thumbnails, other previews, zoom and caching
+stay deferred in the seed, and nothing learned here calls for a new story or a
+priority change.
+
 ## Current decisions
 
 - 2026-09-27: whether a file is a picture is decided only by the backend's
