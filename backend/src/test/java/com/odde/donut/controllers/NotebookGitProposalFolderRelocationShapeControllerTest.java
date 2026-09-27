@@ -101,7 +101,7 @@ class NotebookGitProposalFolderRelocationShapeControllerTest extends NotebookGit
                 ofText("Copy.md", NOTE),
                 ofText("Archive/README.md", README),
                 ofText("Archive/Topics/README.md", README),
-                ofText("Archive/Topics/A.md", "edited"),
+                ofText("Archive/Topics/A.md", "---\ntype: Note\n---\nedited"),
                 ofText("Archive/Topics/Sub/README.md", README),
                 ofText("Archive/Topics/Sub/B.md", NOTE)),
             "Archive/Topics/A.md"));

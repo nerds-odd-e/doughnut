@@ -72,7 +72,7 @@ Controller-level tests through the publish endpoint.
 ### 1. Markdown the proposal adds or changes is validated once, before any branching
 
 Type: Behavior
-Status: planned
+Status: done
 Proof: first add the guard case for example 1 to
 `NotebookGitProposalMarkdownFormatControllerTest` (relocate a folder, add an
 untyped note under the destination → `BAD_REQUEST` "Invalid Markdown" naming
@@ -94,6 +94,12 @@ present and not among the accepted blob ids, by opening that blob; its
 TreeWalk goes. Call it once in `publish` right after plan 019's path
 refusals; delete the calls in `DocumentApplication:42`,
 `FolderRelocation:89` and `Publisher:173`.
+
+Accepted proof: `NotebookGitProposalMarkdownFormatControllerTest` 9 pass
+(new `rejectsAnUntypedNoteAddedUnderARelocatedFolderWithoutMutatingTheAcceptedBinding`
+and fail-first `publishesAnEditBesideAnUntouchedAcceptedNoteWithoutFrontmatter`,
+which was refused naming `Legacy.md` before the change); `NotebookGit*` 442 pass,
+2 skipped (pre-existing).
 
 ### 2. Refusal tests start from a projection that matches accepted main
 
@@ -140,4 +146,8 @@ delete each that became unreachable together with its test (for example
 
 ## Learnings
 
-None yet.
+- Slice 1: the format check now runs before shape and placement refusals, so a
+  fixture whose changed `.md` has no frontmatter now gets "Invalid Markdown"
+  first (`NotebookGitProposalFolderRelocationShapeControllerTest` "edited" case
+  was made typed). Slices 2-3 should expect the same for changed untyped
+  fixture notes; unchanged untyped fixture notes are no longer judged.

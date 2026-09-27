@@ -98,6 +98,7 @@ public class NotebookGitProposalPublisher {
             proposal.repository(), acceptedHead, proposal.mainHead());
     NotebookGitProposalTreeShape.refuseMiscasedMarkdown(files);
     NotebookGitProposalTreeShape.refuseLeftoverFolderMarkers(files);
+    NotebookGitProposalMarkdownFormat.assertValidTypedMarkdown(proposal.repository(), files);
     try (var accepted = repositoryStore.open(binding)) {
       NotebookGitAttachmentSizeAdmission.admit(
           proposal.repository(),
@@ -170,8 +171,6 @@ public class NotebookGitProposalPublisher {
             notebook, folders, storedNotes, proposal.repository(), acceptedHead);
         return proposalAcceptance.acceptMatchingProposedTree(state, proposal, publishedAt);
       }
-      NotebookGitProposalMarkdownFormat.assertValidTypedMarkdown(
-          proposal.repository(), proposal.mainHead());
       projection.requireMatchingAcceptedTree(
           notebook, folders, storedNotes, proposal.repository(), acceptedHead);
       published =

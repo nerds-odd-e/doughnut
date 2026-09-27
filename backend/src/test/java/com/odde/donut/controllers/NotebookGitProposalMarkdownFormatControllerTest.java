@@ -4,6 +4,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 
+import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.NotebookGitBinding;
@@ -13,13 +14,15 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
 /**
- * Verifies {@code publishNotebookGitProposal}'s typed-Markdown gating: once a proposal clears the
- * tree-shape gate, every {@code .md} blob in the proposed tree must be strictly valid UTF-8 with a
- * leading {@code ---} fenced YAML block that parses to a mapping carrying a non-blank {@code type}.
- * An author-chosen {@code type} value outside Donut's recognized canonical types is still valid
- * here.
+ * Verifies {@code publishNotebookGitProposal}'s typed-Markdown gating: every {@code .md} blob the
+ * proposal adds or changes must be strictly valid UTF-8 with a leading {@code ---} fenced YAML
+ * block that parses to a mapping carrying a non-blank {@code type}, whether or not the proposal
+ * relocates a folder. Markdown already in accepted history is not judged again. An author-chosen
+ * {@code type} value outside Donut's recognized canonical types is still valid here.
  */
 class NotebookGitProposalMarkdownFormatControllerTest extends NotebookGitControllerTestBase {
+
+  private static final String TYPED_NOTE = "---\ntype: Note\n---\nbody";
 
   @Test
   void rejectsDuplicateKeysInAnEditWithoutChangingTheNoteOrAcceptedBinding() throws Exception {
@@ -161,5 +164,53 @@ class NotebookGitProposalMarkdownFormatControllerTest extends NotebookGitControl
             notebook, binding.getAcceptedGitObjectId(), bundleBytes, HttpStatus.BAD_REQUEST);
 
     assertThat(exception.getReason(), containsString("note.md"));
+  }
+
+  @Test
+  void rejectsAnUntypedNoteAddedUnderARelocatedFolderWithoutMutatingTheAcceptedBinding()
+      throws Exception {
+    Notebook notebook = createGitBackedNotebook();
+    Folder source = makeMe.aFolder().notebook(notebook).name("Source").please();
+    Folder destination = makeMe.aFolder().notebook(notebook).name("Dest").please();
+    makeMe.aNote().folder(source).title("A").content(TYPED_NOTE).please();
+    makeMe.aNote().folder(destination).title("keep").content(TYPED_NOTE).please();
+    NotebookGitBinding binding = snapshotCurrentPortableTree(notebook);
+    byte[] proposal =
+        proposalBundleBytes(
+            binding,
+            List.of(
+                new NotebookGitProposalFile("Dest/keep.md", TYPED_NOTE),
+                new NotebookGitProposalFile("Dest/Source/A.md", TYPED_NOTE),
+                new NotebookGitProposalFile("Dest/Source/Untyped.md", "no frontmatter at all")));
+
+    ResponseStatusException exception =
+        assertProposalRejectedWithoutMutatingBinding(
+            notebook, binding.getAcceptedGitObjectId(), proposal, HttpStatus.BAD_REQUEST);
+
+    assertThat(exception.getReason(), containsString("Invalid Markdown"));
+    assertThat(exception.getReason(), containsString("Dest/Source/Untyped.md"));
+  }
+
+  @Test
+  void publishesAnEditBesideAnUntouchedAcceptedNoteWithoutFrontmatter() throws Exception {
+    Notebook notebook = createGitBackedNotebook();
+    String legacyContent = "legacy body without frontmatter";
+    makeMe.aNote().notebook(notebook).title("Legacy").content(legacyContent).please();
+    Note edited = makeMe.aNote().notebook(notebook).title("Notes").content(TYPED_NOTE).please();
+    NotebookGitBinding binding = snapshotCurrentPortableTree(notebook);
+    String changedContent = "---\ntype: Note\n---\nChanged body.\n";
+    byte[] proposal =
+        proposalBundleBytes(
+            binding,
+            List.of(
+                new NotebookGitProposalFile("Legacy.md", legacyContent),
+                new NotebookGitProposalFile("Notes.md", changedContent)));
+
+    controller.publishNotebookGitProposal(
+        notebook.getId(), binding.getAcceptedGitObjectId(), proposal);
+
+    assertThat(
+        noteRepository.findById(edited.getId()).orElseThrow().getContent(),
+        equalTo(changedContent));
   }
 }

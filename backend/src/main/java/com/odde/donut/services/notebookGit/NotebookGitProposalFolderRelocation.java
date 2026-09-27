@@ -86,8 +86,6 @@ class NotebookGitProposalFolderRelocation {
     if (!constructDestAncestry) {
       requireAllowed(sourceFolderId, destParentFolderId, destPrefix);
     }
-    NotebookGitProposalMarkdownFormat.assertValidTypedMarkdown(
-        proposal.repository(), proposal.mainHead());
     if (requireMatchingAcceptedTree) {
       projection.requireMatchingAcceptedTree(
           state.notebook(), folders, state.storedNotes(), proposal.repository(), acceptedHead);
