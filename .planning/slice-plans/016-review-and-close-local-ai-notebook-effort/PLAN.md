@@ -69,7 +69,7 @@ an urgency judgment: *queue now* or *not now*.
 ### 1. Architecture section published
 
 Type: Behavior
-Status: planned
+Status: done
 Proof: first publish of the report page with the Architecture section (see table).
 
 Behavior: the effort has landed → the review reads the range's aggregate
@@ -137,6 +137,16 @@ report gains its final section, listing what changed and the stale seeds for
 the owner's keep-or-delete decision.
 
 ## Current decisions
+
+- Review range end: `5a4bfe2f92` (main when slice 1 started; claim `bace70a8d7`).
+  Range is `23f081f05b..5a4bfe2f92`.
+- Report page: https://claude.ai/artifact/5zjpVg4o5yvTtRQNn3LWjB (republish
+  `report.html` from this directory to keep the URL).
+- Slice 1 *queue now* findings (for slice 4): (a) moving a folder to another
+  notebook bypasses the one name owner (`FolderMoveRelocation.java:141-148`,
+  `FolderSubtree.java:120`); (b) one Portable path-kind classifier for server
+  and CLI (CLI root `.keep` drift, `notebookPublishLfsSelection.ts:8` vs
+  `NotebookGitProposalTreeShape.java:143`). Both spot-checked by the coordinator.
 
 - Report findings only; no product code changes. The execution wrap-up's
   refactor and API steps have nothing to act on; formatting and lint run on
