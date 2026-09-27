@@ -1,5 +1,6 @@
 package com.odde.donut.services.notebookGit;
 
+import com.odde.donut.entities.NotebookAttachment;
 import com.odde.donut.services.notebookAttachment.NotebookAttachmentContent;
 import com.odde.donut.services.notebookAttachment.VerifiedNotebookAttachmentBytes;
 import java.io.IOException;
@@ -25,8 +26,6 @@ import org.springframework.web.server.ResponseStatusException;
  * ADR 0006).
  */
 final class NotebookGitAttachmentSizeAdmission {
-
-  static final long LIMIT_BYTES = 10_485_760L;
 
   private NotebookGitAttachmentSizeAdmission() {}
 
@@ -64,7 +63,7 @@ final class NotebookGitAttachmentSizeAdmission {
           }
           continue;
         }
-        if (pointer.size() > LIMIT_BYTES) {
+        if (pointer.size() > NotebookAttachment.NEW_PAYLOAD_LIMIT_BYTES) {
           if (acceptedHeadDigests == null) {
             acceptedHeadDigests = attachmentPayloadDigestsAt(acceptedRepository, acceptedHead);
           }
@@ -132,7 +131,7 @@ final class NotebookGitAttachmentSizeAdmission {
             + "\" is "
             + size
             + " bytes, which exceeds the "
-            + LIMIT_BYTES
+            + NotebookAttachment.NEW_PAYLOAD_LIMIT_BYTES
             + "-byte limit in the proposal's latest commit. Remove or shrink it in the unpublished"
             + " commits (amending or adding a commit both work), then publish again. Do not"
             + " rewrite already accepted commits.");

@@ -201,7 +201,9 @@ both the navigating and non-navigating paths.
 ### 6. One new-payload size limit
 
 Type: Structure
-Status: planned
+Status: done
+Accepted proof: `NotebookAttachment.NEW_PAYLOAD_LIMIT_BYTES` replaces both
+`LIMIT_BYTES`; 25 size tests green with refusal messages unchanged.
 Proof: `CURSOR_DEV=true nix develop -c pnpm backend:test_only --tests 'com.odde.donut.controllers.NoteControllerUploadNoteImageTests' --tests 'com.odde.donut.controllers.NotebookGitAttachmentSizeAdmission*'`
 stays green with refusal messages unchanged.
 

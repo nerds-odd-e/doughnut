@@ -1,6 +1,9 @@
 package com.odde.donut.services.notebookAttachment;
 
+import static com.odde.donut.entities.NotebookAttachment.NEW_PAYLOAD_LIMIT_BYTES;
+
 import com.odde.donut.controllers.dto.ApiError;
+import com.odde.donut.entities.NotebookAttachment;
 import com.odde.donut.exceptions.ApiException;
 import java.util.Locale;
 import java.util.Map;
@@ -10,11 +13,10 @@ import org.springframework.util.StringUtils;
 
 /**
  * A notebook file is a picture by its name's extension, ignoring case. Uploads are admitted by that
- * name alone (the declared content type and the bytes are not checked) up to {@link #LIMIT_BYTES}.
+ * name alone (the declared content type and the bytes are not checked) up to {@link
+ * NotebookAttachment#NEW_PAYLOAD_LIMIT_BYTES}.
  */
 public final class PictureFile {
-  public static final long LIMIT_BYTES = 10 * 1024 * 1024;
-
   private static final Map<String, MediaType> TYPES =
       Map.of(
           "png", MediaType.IMAGE_PNG,
@@ -35,8 +37,8 @@ public final class PictureFile {
       throw refused(
           "Cannot upload " + name + ": a picture must be a png, jpg, jpeg, gif or webp file.");
     }
-    if (size > LIMIT_BYTES) {
-      throw refused("File size exceeds the limit: " + LIMIT_BYTES + " bytes.");
+    if (size > NEW_PAYLOAD_LIMIT_BYTES) {
+      throw refused("File size exceeds the limit: " + NEW_PAYLOAD_LIMIT_BYTES + " bytes.");
     }
   }
 
