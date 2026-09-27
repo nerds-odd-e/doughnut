@@ -68,7 +68,7 @@ Keep these outside the current queue rather than cancelling them:
   folder-move Git histories and further subtree composition remain deferred.
 - Native standard Git transport, notebook binding within a project subdirectory,
   and history browsing or revision restoration. Supporting files and attachments
-  are now selected in [SEED-035](SEED-035-ai-workspace-supporting-files.md).
+  are delivered as notebook files.
 
 Broader web-authoring coverage is retained in
 [SEED-017](SEED-017-cohesive-design-corrections.md#open-product-decision).

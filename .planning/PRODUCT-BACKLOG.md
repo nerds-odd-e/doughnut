@@ -10,8 +10,6 @@ and deletable in Web Donut.
 
 ## Taken
 
-- [Preview image files on their web file page](seeds/SEED-035-ai-workspace-supporting-files.md#story-26) — SEED-035#story-26 ([plan](slice-plans/011-preview-image-files-on-web-file-page/PLAN.md))
-
 ## Backlog list
 
 - [Responses carry no ORM internals and a lean folder trail](seeds/SEED-046-notebook-files-and-git-findings.md#story-9) — SEED-046#story-9
