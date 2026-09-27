@@ -99,3 +99,9 @@ and `tests/pages` green; `vue-tsc --noEmit` clean.
   (`apiCallWithLoading` without `blockUi`), not `LoadingModal`. The proof
   observes that busy state, matching the other listing loads, instead of the
   modal the plan first named.
+
+## Execution complete
+
+Product advice: no change. The correction adds no feature promise; the
+remaining size of `StoredApiCollection.ts` stays with SEED-049#story-1, already
+first in the backlog.
