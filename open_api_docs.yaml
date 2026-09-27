@@ -3095,6 +3095,44 @@ paths:
       responses:
         "200":
           description: OK
+  /api/notebooks/{notebook}/attachments/{attachment}/picture:
+    get:
+      tags:
+      - notebook-attachment-controller
+      summary: Show a picture file
+      description: "The file served inline when it is a PNG, JPEG, GIF or WebP picture."
+      operationId: showAttachmentPicture
+      parameters:
+      - name: notebook
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: attachment
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        "200":
+          description: OK
+          content:
+            image/png:
+              schema:
+                type: string
+                format: byte
+            image/jpeg:
+              schema:
+                type: string
+                format: byte
+            image/gif:
+              schema:
+                type: string
+                format: byte
+            image/webp:
+              schema:
+                type: string
+                format: byte
   /api/notebooks/{notebook}/attachments/{attachment}/content:
     get:
       tags:
@@ -6017,7 +6055,8 @@ components:
       type: object
       description: "Notebook chrome plus one file for loading the file page: the shared\
         \ realm sidebar with the folder trail from notebook root through the file's\
-        \ folder, the file's id and filename, and its size in bytes."
+        \ folder, the file's id and filename, and its size in bytes, and whether it\
+        \ is a picture the page can show."
       properties:
         notebookRealm:
           $ref: "#/components/schemas/NotebookRealm"
@@ -6039,9 +6078,12 @@ components:
         size:
           type: integer
           format: int64
+        picture:
+          type: boolean
       required:
       - attachment
       - notebookRealm
+      - picture
       - size
     ThresholdExceededResult:
       type: object

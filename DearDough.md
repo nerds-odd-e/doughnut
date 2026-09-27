@@ -213,6 +213,10 @@ Former local code: DD-107.
   - Evidence: first `deliver` refused with "authorized target must be a branch ref: origin/exec/009-rich-edit-keeps-final-newline"; the second, with `refs/heads/…` and abbreviated `--validated-candidate 983ac6d18e`, returned `candidate-mismatch` with nothing pushed; the third, with the full SHA, was accepted. `--host claude` without `--session-json` reported `observation.state: attached`, then `reused` (`/tmp/dough-ci-501/watch-gBNzg7`).
   - Observed effect: two refused calls before the only delivery; no coverage lost.
   - Inference: on 0.3.41 the session identity no longer needs recovery, but the two argument-shape refusals recorded for plans 035 and 037 still recur because the usage line names neither `refs/heads/` nor a full SHA.
+- Execution: SEED-035#story-26 / slice-plans/011-preview-image-files-on-web-file-page / ee09a8a2cf; Timestamp: 2026-09-27T09:53:29+08:00 (slice 1 delivery); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.42 (VERSION at 1eb6310816).
+  - Evidence: coordinator transcript `23a26a0f…jsonl`: `deliver --target-ref story/preview-image-files` refused with "authorized target must be a branch ref: story/preview-image-files"; the retry with `refs/heads/story/preview-image-files` was accepted with `observation.state: attached` (`/tmp/dough-ci-501/watch-rVXFjb`); the coordinator had printed the usage line (`--target-ref REF`) before the first delivery.
+  - Observed effect: one refused call; no coverage lost; slice 2 delivery used the full ref first time.
+  - Inference: the `refs/heads/` refusal still recurs on 0.3.42; the usage line is what the coordinator read, and it does not say the ref must be fully qualified (only `references/publish-the-candidate.md` does).
 
 ## ODF-110 — A readiness replay observed only the plan's named seam, not the rest of the slice's journey
 
@@ -497,8 +501,19 @@ Slice 2's implementer reported that a rich body edit drops the file's final newl
   - Observed effect: a defect against the story's own goal reached the published story branch; a correction story and plan are needed before integration.
   - Inference: a reported gap should be checked against the story's goal and exclusions list before it is filed as out of scope; the fix at slice 2 would have been a few lines in the same function. Qualified: as in DD-129, the key example was a file whose edited line was also its last line, which hid the effect.
 
+## DD-133 — `agent-commit.mjs` run through the `.claude/skills` symlink exits 0 without committing
+
+`agent-commit.mjs` runs its CLI body only when `resolve(process.argv[1]) === fileURLToPath(import.meta.url)`. Invoked as `node .claude/skills/dough-execute-plan/scripts/agent-commit.mjs` from the worktree root, Node resolves the module to the real `.agents/skills/…` file while argv keeps the symlink spelling, so the script does nothing, prints nothing, and exits 0. The sibling scripts that use `ci-direct-entry.mjs` `isDirectCliEntry` (realpath comparison) do not have this problem.
+
+### Occurrences
+
+- Execution: SEED-035#story-26 / slice-plans/011-preview-image-files-on-web-file-page / ee09a8a2cf; Timestamp: 2026-09-27T09:51:11+08:00 (slice 1 commit); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.42 (VERSION at 1eb6310816).
+  - Evidence: coordinator transcript `23a26a0f…jsonl` 09:51:11–09:52:45+08:00: two commit calls through `.claude/skills/…/agent-commit.mjs` returned no output and `exit=0` with the change still staged; a probe with `-m x --bogus` also exited 0 silently; the same call through `.agents/skills/…` returned `{"ok":true,"status":"committed","agent":"Hibiki-chan","sha":"ee09a8a2cf…"}`. Earlier `--help` through the alias worked only because the shell had `cd` into the symlinked directory (physical cwd). `.claude/skills/dough-execute-plan` is a symlink to `../../.agents/skills/dough-execute-plan`; the delivery receipt reports `runtime.alias: ".claude"`.
+  - Observed effect: four extra coordinator calls (about 1.5 minutes) before slice 1 was committed; a silent exit 0 looks like success, so an unattended caller could have delivered without the commit.
+  - Inference: `execution-start.mjs` and `ci-repair-stash.mjs` use the same literal check and would likely fail the same way through the alias; using `isDirectCliEntry` in all three would remove the cause.
+
 ## Retention
 
-- Highest allocated local number: 132
+- Highest allocated local number: 133
 - Recovery: `33939aa45a17c08f5e6f8076178ce96437fdfbe8:DearDough.md` contains the complete pre-compaction log and earlier recovery references; `b0b385a184e96ecf8b0f6fc5572eaaab69bc8dad` preserves later history.
 - Occurrence history is partial; full observations, effects, inference and historical provenance remain in that snapshot and the upstream catalog.
