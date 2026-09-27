@@ -36,7 +36,9 @@
             title="Read note context"
           >
             <template #button_face><FileText class="w-6 h-6" /></template>
-            <div class="p-4"><NoteContextReader :note-id="subjectNoteId" /></div>
+            <div class="min-w-0 max-w-[calc(100vw-50px)] px-4 pb-4 pt-10">
+              <NoteContextReader :note-id="subjectNoteId" />
+            </div>
           </PopButton>
         </template>
       </ConversationInner>

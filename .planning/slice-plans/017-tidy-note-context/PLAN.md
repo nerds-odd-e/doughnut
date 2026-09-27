@@ -85,7 +85,7 @@ multiple-choice results, the memory tracker page) keep today's summary.
 ### 2. The narrow conversation drawer keeps its close button and the location clear
 
 Type: Behavior
-Status: planned
+Status: done
 Proof: the slice-2 row above in `MessageCenterPage.spec.ts`; run that spec.
 
 Behavior: a note conversation on a 390px-wide screen for a note under
