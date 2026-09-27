@@ -175,6 +175,12 @@ Change: rename "picture" phrases in the three features, in
 `notebook_files.ts` / `note_editing.ts`, and the page object's
 `expectPicture`.
 
+## Execution complete
+
+Product advice: no change — the story's scope is delivered as refined; SEED-050#story-9
+stays next in the queue. The two image endpoints still repeat their `produces`
+media-type list; Java annotations cannot share an array constant, so no correction.
+
 ## Current decisions
 
 - Attachment stays the code, API and schema name; File is its UI word.
