@@ -38,6 +38,12 @@ class NotebookGitNoteCreationFolderControllerTest
 
   @Autowired FolderRepository folderRepository;
 
+  private NoteCreationDTO titleIn(String title, int folderId) {
+    NoteCreationDTO creation = titleOnly(title);
+    creation.setFolderId(folderId);
+    return creation;
+  }
+
   @Test
   void firstNoteInWebCreatedEmptyFolderReplacesMarkerAndRetainsHistory() throws Exception {
     Notebook notebook = createGitBackedNotebook();
@@ -46,8 +52,7 @@ class NotebookGitNoteCreationFolderControllerTest
     folderCreation.setName("Biology");
     Folder folder = folderController.createFolder(notebook, folderCreation);
     ObjectId folderHead = ObjectId.fromString(binding(notebook).getAcceptedGitObjectId());
-    NoteCreationDTO creation = titleOnly("Cells");
-    creation.setFolderId(folder.getId());
+    NoteCreationDTO creation = titleIn("Cells", folder.getId());
 
     NoteRealm result = controller.createNoteAtNotebookRoot(notebook, creation);
 
@@ -77,8 +82,7 @@ class NotebookGitNoteCreationFolderControllerTest
     makeMe.aNote().folder(alpine).title("Observation").please();
     NotebookGitBinding accepted = snapshotCurrentPortableTree(notebook);
     ObjectId acceptedHead = ObjectId.fromString(accepted.getAcceptedGitObjectId());
-    NoteCreationDTO creation = titleOnly("Seedling");
-    creation.setFolderId(alpine.getId());
+    NoteCreationDTO creation = titleIn("Seedling", alpine.getId());
 
     NoteRealm result = controller.createNoteAtNotebookRoot(notebook, creation);
 
@@ -112,8 +116,7 @@ class NotebookGitNoteCreationFolderControllerTest
         makeMe.aFolder().notebook(notebook).name("Box").readmeContent("Box notes").please();
     NotebookGitBinding accepted = snapshotCurrentPortableTree(notebook);
     ObjectId acceptedHead = ObjectId.fromString(accepted.getAcceptedGitObjectId());
-    NoteCreationDTO creation = titleOnly("Nested");
-    creation.setFolderId(box.getId());
+    NoteCreationDTO creation = titleIn("Nested", box.getId());
 
     NoteRealm result = controller.createNoteAtNotebookRoot(notebook, creation);
 
@@ -140,8 +143,7 @@ class NotebookGitNoteCreationFolderControllerTest
     Notebook notebook = createGitBackedNotebook();
     var acceptedHistoryBefore = acceptedHistory(notebook);
     Folder unsynchronized = makeMe.aFolder().notebook(notebook).name("Unsynchronized").please();
-    NoteCreationDTO creation = titleOnly("Inside Drifted Folder");
-    creation.setFolderId(unsynchronized.getId());
+    NoteCreationDTO creation = titleIn("Inside Drifted Folder", unsynchronized.getId());
 
     controller.createNoteAtNotebookRoot(notebook, creation);
 
@@ -158,8 +160,7 @@ class NotebookGitNoteCreationFolderControllerTest
     makeMe.aNote().folder(relations).title("Existing").please();
     snapshotCurrentPortableTree(notebook);
     AcceptedHistory before = acceptedHistory(notebook);
-    NoteCreationDTO creation = titleOnly("Paris to France");
-    creation.setFolderId(europe.getId());
+    NoteCreationDTO creation = titleIn("Paris to France", europe.getId());
     creation.setChildFolderName("relations");
 
     NoteRealm result = controller.createNoteAtNotebookRoot(notebook, creation);
@@ -182,8 +183,7 @@ class NotebookGitNoteCreationFolderControllerTest
     makeMe.aNote().folder(europe).title("Paris").please();
     snapshotCurrentPortableTree(notebook);
     AcceptedHistory before = acceptedHistory(notebook);
-    NoteCreationDTO creation = titleOnly("Paris to France");
-    creation.setFolderId(europe.getId());
+    NoteCreationDTO creation = titleIn("Paris to France", europe.getId());
     creation.setChildFolderName("relations");
 
     NoteRealm result = controller.createNoteAtNotebookRoot(notebook, creation);
@@ -204,8 +204,7 @@ class NotebookGitNoteCreationFolderControllerTest
     snapshotCurrentPortableTree(notebook);
     AcceptedBinding accepted = acceptedBinding(notebook);
     long notesBefore = noteRepository.count();
-    NoteCreationDTO creation = titleOnly("Paris to France");
-    creation.setFolderId(europe.getId());
+    NoteCreationDTO creation = titleIn("Paris to France", europe.getId());
     creation.setChildFolderName("relations");
 
     ApiException ex =
@@ -226,8 +225,7 @@ class NotebookGitNoteCreationFolderControllerTest
   void absentDestinationFolderIsRefusedBeforeAnyAcceptedChange() throws Exception {
     Notebook notebook = createGitBackedNotebook();
     AcceptedBinding accepted = acceptedBinding(notebook);
-    NoteCreationDTO creation = titleOnly("Nowhere");
-    creation.setFolderId(-1);
+    NoteCreationDTO creation = titleIn("Nowhere", -1);
 
     assertThrows(
         ResponseStatusException.class,
@@ -241,8 +239,7 @@ class NotebookGitNoteCreationFolderControllerTest
     Notebook otherNotebook = createGitBackedNotebook("Other Git Backed Notebook");
     Folder foreignFolder = makeMe.aFolder().notebook(otherNotebook).name("Foreign").please();
     AcceptedBinding accepted = acceptedBinding(notebook);
-    NoteCreationDTO creation = titleOnly("Wrong Notebook");
-    creation.setFolderId(foreignFolder.getId());
+    NoteCreationDTO creation = titleIn("Wrong Notebook", foreignFolder.getId());
 
     assertThrows(
         ResponseStatusException.class,

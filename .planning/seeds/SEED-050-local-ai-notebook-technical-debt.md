@@ -150,41 +150,33 @@ misleading developers.
 3. Uploading `a.txt` as a note image → refused "Cannot upload a.txt: an
    image must be a png, jpg, jpeg, gif or webp file." (today "a picture").
 
-<a id="story-8"></a>
+<a id="story-9"></a>
 
-### The name owner holds the folder-entry rule once
+### Folder dissolve and merge enter subfolders by the one entry rule
 
-**Identity:** SEED-050#story-8
+**Identity:** SEED-050#story-9
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/026-one-folder-entry-rule/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"348fd390a2a7ae7990b33c33df67fdf2de40bcaa5b16fd5fa894abc99844a5f3","plan":"43fe84055ecebfbeaa4f57ffe96b8c831500b8654b6790783d20dfb3fea52e6a"}}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/027-dissolve-enters-folders-by-the-one-rule/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"f61c17e5b01f316515c1f60b18096a39cc1dde9a740a90e434a0ac3d9bd1affe","plan":"876b08ab2e545d9cafab89deb82366c270763849229aa48bdfd47033c3436009"}}
 ```
 
-**Goal:** Correction of SEED-050#story-2 (provenance
-`aef1e27b77:.planning/slice-plans/021-relationship-notes-accepted-in-one-change/PLAN.md`,
-commits f8087d5845, c0a9d8fa0e, aaedc57987, d2fb2c7934, 06ff81b916 and
-aef1e27b77). Developers who next change folder naming find one rule for
+**Goal:** Correction of SEED-050#story-8 (provenance
+`da1e269ba5:.planning/slice-plans/026-one-folder-entry-rule/PLAN.md`, commits
+649e162dd4 and cba24a706e). Developers who next change folder naming find
 "enter the folder holding this name (ignoring case), else refuse a note or
-file holding it", used by both note creation and folder move/merge, and tests
-that assert only what the product does, so the rule is not copied a third
-time.
+file holding it" only in `FolderSiblingNameValidation.folderToEnter`;
+the dissolve/merge placement check no longer carries its own copy.
 
 **Scope:**
 
-- Required: `FolderSiblingNameValidation.mergeTargetOrRefuse` delegates its
-  merge branch to `folderToEnter` (which takes excluded folder ids); net fewer
-  lines. `AddRelationship.spec.ts` drops the spies and assertions that only
-  check removed folder calls are absent.
-  `NotebookGitNoteCreationFolderControllerTest` is back under the 250-line
-  file check.
-- Preserved: story 2's key examples and their tests; merge, merge refusal and
-  no-merge clash on folder move; every refusal message and error type.
-- Excluded: the trash path's private `FolderConstructionService.findOrCreateFolder`
-  (stays, as plan 021 decided); one composed folder-name validation
-  constraint across `FolderCreationRequest`, `FolderRenameRequest` and
-  `NoteCreationDTO`.
+- Required: `FolderContentsPlacementCheck.firstFolderMeetingAFolder` gets each
+  subfolder's existing destination folder from `folderToEnter`; net fewer lines.
+- Preserved: dissolve and merge-move refusals naming the note or file path,
+  case-variant folder merging, and every message and error type.
+- Excluded: the folder-only `requireNoConflictingSibling` family; the trash
+  path's `findOrCreateFolder`.
 
-**Plan:** [026-one-folder-entry-rule](../slice-plans/026-one-folder-entry-rule/PLAN.md)
+**Plan:** [027-dissolve-enters-folders-by-the-one-rule](../slice-plans/027-dissolve-enters-folders-by-the-one-rule/PLAN.md)
 
 **Effort hypothesis:** S — high confidence.
 
-**Depends on:** none (SEED-050#story-2 is delivered).
+**Depends on:** none (SEED-050#story-8 is delivered).

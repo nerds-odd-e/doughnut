@@ -130,39 +130,40 @@ public class FolderSiblingNameValidation {
     entryHolding(notebook, parentOrNull, name.value(), excludedFolderIds)
         .ifPresent(
             taken -> {
-              requireHeldByAFolder(taken);
+              if (taken.kind() != TakenEntry.Kind.FOLDER) {
+                refuseTaken(taken);
+              }
               throwFolderNameConflict(DUPLICATE_SIBLING_NAME_HERE);
             });
   }
 
   /**
-   * Moving {@code folder} into {@code parentOrNull}: empty when its name is free there. A folder
-   * holding the name (ignoring case) is returned when {@code merge} is true, otherwise {@code
-   * FOLDER_NAME_CONFLICT}; a note or file holding it is {@code RESOURCE_CONFLICT} naming its path.
+   * Moving {@code folder} into {@code parentOrNull}: with {@code merge}, the folder to enter (see
+   * {@link #folderToEnter}); without, its name must be free there (see {@link
+   * #requireFolderNameFree}) and the result is empty.
    */
   public Optional<Folder> mergeTargetOrRefuse(
       Notebook notebook, Folder parentOrNull, Folder folder, boolean merge) {
+    DisplayName name = new DisplayName(folder.getName());
     Set<Integer> excluded = Set.of(folder.getId());
-    Optional<TakenEntry> taken = entryHolding(notebook, parentOrNull, folder.getName(), excluded);
-    if (taken.isEmpty()) {
-      return Optional.empty();
+    if (merge) {
+      return folderToEnter(notebook, parentOrNull, name, excluded);
     }
-    requireHeldByAFolder(taken.get());
-    if (!merge) {
-      throwFolderNameConflict(DUPLICATE_SIBLING_NAME_HERE);
-    }
-    return folderHolding(notebook, parentOrNull, folder.getName(), excluded);
+    requireFolderNameFree(notebook, parentOrNull, name, excluded);
+    return Optional.empty();
   }
 
   /**
-   * The folder in {@code parentOrNull} named {@code name} (ignoring case) for a new entry to go
-   * into; empty when no entry holds the name. A note or file holding it is {@code
-   * RESOURCE_CONFLICT} naming its path.
+   * The folder in {@code parentOrNull} holding {@code name} (ignoring case), other than those in
+   * {@code excludedFolderIds}, to enter; empty when no entry holds the name. A note or file holding
+   * it is {@code RESOURCE_CONFLICT} naming its path.
    */
-  public Optional<Folder> folderToEnter(Notebook notebook, Folder parentOrNull, DisplayName name) {
-    Optional<Folder> folder = folderHolding(notebook, parentOrNull, name.value(), Set.of());
+  public Optional<Folder> folderToEnter(
+      Notebook notebook, Folder parentOrNull, DisplayName name, Set<Integer> excludedFolderIds) {
+    Optional<Folder> folder =
+        folderHolding(notebook, parentOrNull, name.value(), excludedFolderIds);
     if (folder.isEmpty()) {
-      entryHolding(notebook, parentOrNull, name.value(), Set.of())
+      entryHolding(notebook, parentOrNull, name.value(), excludedFolderIds)
           .ifPresent(FolderSiblingNameValidation::refuseTaken);
     }
     return folder;
@@ -178,12 +179,6 @@ public class FolderSiblingNameValidation {
             candidate ->
                 entryHolding(notebook, parentOrNull, candidate, Set.of(excludedFolderId))
                     .isPresent()));
-  }
-
-  private static void requireHeldByAFolder(TakenEntry taken) {
-    if (taken.kind() != TakenEntry.Kind.FOLDER) {
-      refuseTaken(taken);
-    }
   }
 
   /** {@code RESOURCE_CONFLICT} naming the path of the entry that holds the name. */
