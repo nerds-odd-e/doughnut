@@ -2,7 +2,7 @@ import { NotebookFolderController } from "@generated/donut-backend-api/sdk.gen"
 import { noteShowLocation } from "@/routes/noteShowLocation"
 import { formatRelationshipNoteTitle } from "@/utils/relationshipNoteCompose"
 import makeMe from "donut-test-fixtures/makeMe"
-import { mockSdkService, testFolderStub } from "@tests/helpers"
+import { sidebarStructuralRefreshKey } from "@/components/notes/sidebarStructuralRefresh"
 import { teardownGlobalClientForTesting } from "@/managedApi/clientSetup"
 import { nextTick } from "vue"
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest"
@@ -30,14 +30,6 @@ describe("AddRelationshipFinalize", () => {
   beforeEach(() => {
     vi.resetAllMocks()
     routerReplace.mockResolvedValue(undefined)
-    mockSdkService(NotebookFolderController, "listNotebookFolderListing", {
-      folders: [],
-    })
-    mockSdkService(
-      NotebookFolderController,
-      "createFolder",
-      testFolderStub(77, "relations")
-    )
   })
 
   afterEach(() => {
@@ -139,5 +131,63 @@ describe("AddRelationshipFinalize", () => {
 
     expect(routerReplace).not.toHaveBeenCalled()
     expect(withoutNav.emitted().success).toHaveLength(1)
+  })
+
+  describe("placing the relationship note in a child folder", () => {
+    const sourceRealm = makeMe.aNoteRealm
+      .title("Source")
+      .inFolder(5, "Topics")
+      .please()
+
+    const createRelationshipNote = async (
+      placement?: "named_after_source_note"
+    ) => {
+      const createNoteSpy = mockRelationshipNoteCreation(
+        makeMe.aNoteRealm.please()
+      )
+      const listingSpy = vi.spyOn(
+        NotebookFolderController,
+        "listNotebookFolderListing"
+      )
+      const createFolderSpy = vi.spyOn(NotebookFolderController, "createFolder")
+      const wrapper = mountAddRelationshipFinalize({
+        note: sourceRealm.note,
+        targetSearchResult: targetSearchResult(),
+        seedRealm: sourceRealm,
+        navigateOnSuccess: false,
+      })
+      if (placement) {
+        await wrapper
+          .find(`#relationship-placement-${placement}`)
+          .setValue(true)
+      }
+      const refreshKeyBefore = sidebarStructuralRefreshKey.value
+      await selectRelationType(wrapper, "related to")
+      expect(listingSpy).not.toHaveBeenCalled()
+      expect(createFolderSpy).not.toHaveBeenCalled()
+      expect(sidebarStructuralRefreshKey.value).toBeGreaterThan(
+        refreshKeyBefore
+      )
+      return createNoteSpy
+    }
+
+    it("lets the server place the note in the relations folder by default", async () => {
+      const createNoteSpy = await createRelationshipNote()
+      expect(createNoteSpy).toHaveBeenCalledTimes(1)
+      expect(createNoteSpy.mock.calls[0]![0].body).toMatchObject({
+        folderId: 5,
+        childFolderName: "relations",
+      })
+    })
+
+    it("lets the server place the note in a folder named after the source", async () => {
+      const createNoteSpy = await createRelationshipNote(
+        "named_after_source_note"
+      )
+      expect(createNoteSpy.mock.calls[0]![0].body).toMatchObject({
+        folderId: 5,
+        childFolderName: "Source",
+      })
+    })
   })
 })

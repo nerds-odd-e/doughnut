@@ -174,7 +174,13 @@ Change: the find-folder-or-create method refuses a non-folder holder.
 ### 5. The relationship dialog lets the server place its folder
 
 Type: Behavior
-Status: planned
+Status: done
+Accepted proof: `AddRelationship.spec.ts` "placing the relationship note in a
+child folder" failed first (listing called), then passed 6/6: body carries
+`folderId` and `childFolderName` ("relations" / source title), no listing or
+`createFolder` call, sidebar refresh key rises; `vue-tsc` clean;
+`add_relationship.feature` 7/7. `relationshipFolderResolve.ts` is gone; the
+placement mapping lives in `AddRelationshipFinalize.vue`.
 Proof: `AddRelationship.spec.ts` asserts the create request carries the source
 folder and `childFolderName: "relations"` (and the source title for
 `named_after_source_note`), that no listing or `createFolder` call happens,
@@ -216,3 +222,5 @@ limit, used by `PictureFile` and `NotebookGitAttachmentSizeAdmission`.
   `FolderConstructionService.folderToEnterOrCreate` creates when empty. Slice 4
   adds the refusal inside `folderToEnter`; the trash path's private
   `findOrCreateFolder` keeps `folderHolding`.
+- The note store already refreshes the sidebar on both the navigating path
+  (`navigateToFocusedNote`) and `skipNavigation`; no store change was needed.

@@ -45,10 +45,6 @@ import {
   formatRelationshipNoteTitle,
 } from "@/utils/relationshipNoteCompose"
 import { realmLeafFolder } from "@/components/notes/useNoteSidebarTree"
-import {
-  resolveRelationshipNoteFolderId,
-  type RelationshipNotePlacement,
-} from "@/utils/relationshipFolderResolve"
 
 const noteStore = useNoteStore()
 const router = useRouter()
@@ -63,6 +59,21 @@ const props = defineProps({
 })
 
 const emit = defineEmits(["success", "goBack"])
+
+type RelationshipNotePlacement =
+  | "relations_subfolder"
+  | "same_level_as_source"
+  | "named_after_source_note"
+
+const childFolderNameFor = (
+  placement: RelationshipNotePlacement,
+  sourceTitle: string
+): string | undefined =>
+  ({
+    relations_subfolder: "relations",
+    same_level_as_source: undefined,
+    named_after_source_note: sourceTitle,
+  })[placement]
 
 const placementOptions: {
   value: RelationshipNotePlacement
@@ -115,12 +126,10 @@ const relationTypeSelected = async (relationType: string | undefined) => {
 
     await runWithBlockingApiLoading(async () => {
       const api = noteStore
-      const folderId = await resolveRelationshipNoteFolderId({
-        notebookId,
-        sourceFolderId,
-        sourceTitle,
-        placement: formData.value.relationshipNotePlacement,
-      })
+      const childFolderName = childFolderNameFor(
+        formData.value.relationshipNotePlacement,
+        sourceTitle
+      )
 
       const metaTitle = formatRelationshipNoteTitle(
         sourceTitle,
@@ -145,9 +154,9 @@ const relationTypeSelected = async (relationType: string | undefined) => {
       await api.createRootNoteAtNotebook(
         router,
         notebookId,
-        { newTitle: metaTitle, content: markdown },
+        { newTitle: metaTitle, content: markdown, childFolderName },
         {
-          folderId: folderId ?? undefined,
+          folderId: sourceFolderId,
           skipNavigation: props.navigateOnSuccess === false,
         }
       )
