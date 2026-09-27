@@ -6,7 +6,13 @@ import type {
   NoteUpdateTitleDto,
 } from "@generated/donut-backend-api"
 import { noteShowLocation } from "@/routes/noteShowLocation"
-import { containingLocationOf } from "@/routes/containingLocation"
+import {
+  containingLocationOf,
+  locationAfterNoteRemoval,
+} from "@/routes/containingLocation"
+import { neighborNoteAfterRemoval } from "@/components/notes/sidebarStructuralSort"
+import { usePeerSort } from "@/composables/usePeerSort"
+import { requestNotebookFolderListing } from "@/utils/notebookFolderListingRequest"
 import { refreshSidebarStructuralListings } from "@/components/notes/sidebarStructuralRefresh"
 import { realmLeafFolder } from "@/components/notes/useNoteSidebarTree"
 import type { Router } from "vue-router"
@@ -33,6 +39,11 @@ export type NoteTrashOptions = {
 export type TitleRenameReferenceHandling = NonNullable<
   NoteUpdateTitleDto["referenceHandling"]
 >
+
+/** The note's folder id, or null at the notebook root. */
+function containingFolderId(realm: NoteRealm) {
+  return realmLeafFolder(realm)?.id ?? null
+}
 
 function noteReferenceHandlingBody(options: NoteTrashOptions): NoteTrashDto {
   return { referenceHandling: options.referenceHandling }
@@ -147,7 +158,7 @@ export default class StoredApiCollection {
     if (!realm?.note) return null
     const notebookId = realm.notebookRealm.notebook.id
     if (notebookId == null) return null
-    const folderId = realmLeafFolder(realm)?.id ?? null
+    const folderId = containingFolderId(realm)
     return { folderId, notebookId }
   }
 
@@ -308,20 +319,36 @@ export default class StoredApiCollection {
   async trashNote(router: Router, noteId: Donut.ID, options: NoteTrashOptions) {
     const cachedRealm = this.storage.refOfNoteRealm(noteId).value
     if (!cachedRealm) throw new Error("Cannot trash a note that is not loaded")
+    const destination = await this.locationAfterRemoving(cachedRealm)
     const body = noteReferenceHandlingBody(options)
     const trashedRealm = await trashNoteRequest(noteId, body)
     if (!trashedRealm) return
 
-    const originalFolderId = realmLeafFolder(cachedRealm)?.id ?? null
+    const originalFolderId = containingFolderId(cachedRealm)
     this.noteEditingHistory.trashNote(
       noteId,
       cachedRealm.note.noteTopology.title,
       originalFolderId
     )
-    await router.replace(containingLocationOf(cachedRealm))
+    await router.replace(destination)
     this.storage.refreshNoteRealm(trashedRealm)
     refreshSidebarStructuralListings()
     return trashedRealm
+  }
+
+  /** Read before removal, so the note's position is found in the order the person saw. */
+  private async locationAfterRemoving(realm: NoteRealm) {
+    const { data: listing, error } = await requestNotebookFolderListing(
+      realm.notebookRealm.notebook.id,
+      containingFolderId(realm)
+    )
+    if (error || !listing) throw new Error("Failed to load folder listing")
+    const neighbor = neighborNoteAfterRemoval(
+      listing,
+      realm.id,
+      usePeerSort().peerSortSpec.value
+    )
+    return locationAfterNoteRemoval(realm, neighbor)
   }
 
   /**

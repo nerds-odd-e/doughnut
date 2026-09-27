@@ -1,5 +1,6 @@
 import type {
   Folder,
+  FolderListing,
   NoteTopology,
   NotebookAttachmentListItem,
 } from "@generated/donut-backend-api"
@@ -126,4 +127,22 @@ export function buildUnsortedStructuralRows(
   }))
 
   return [...folderRows, ...noteRows, ...attachmentRows]
+}
+
+/** The note to show once `removedNoteId` leaves these peers: the note after it in sidebar order, else the one before. */
+export function neighborNoteAfterRemoval(
+  listing: FolderListing,
+  removedNoteId: number,
+  spec: PeerSortSpec
+): NoteTopology | undefined {
+  const notes = sortSidebarStructuralRows(
+    buildUnsortedStructuralRows(
+      listing.noteTopologies ?? [],
+      listing.folders,
+      listing.attachments
+    ),
+    spec
+  ).flatMap((row) => (row.kind === "note" ? [row.noteTopology] : []))
+  const index = notes.findIndex((note) => note.id === removedNoteId)
+  return notes[index + 1] ?? notes[index - 1]
 }

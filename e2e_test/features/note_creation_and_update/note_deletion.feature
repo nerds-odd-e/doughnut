@@ -14,9 +14,9 @@ Feature: Note trash
     When I trash note "TDD"
     Then I should see the note "TDD" is in trash
 
-  Scenario: Trashing a note in a folder opens that folder page
+  Scenario: Trashing a note in a folder opens its neighboring note
     When I trash note "TDD"
-    Then I should be on a notebook folder page
+    Then the note title should be "CI System"
 
   Scenario: Trashing a note at notebook root opens the notebook page
     When I trash note "LeSS in Action"

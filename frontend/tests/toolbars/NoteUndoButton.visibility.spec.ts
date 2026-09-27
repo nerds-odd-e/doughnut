@@ -1,9 +1,12 @@
-import { NoteController } from "@generated/donut-backend-api/sdk.gen"
+import {
+  NoteController,
+  NotebookFolderController,
+} from "@generated/donut-backend-api/sdk.gen"
 import type { Router } from "vue-router"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
 import { mockSdkService } from "@tests/helpers"
 import makeMe from "donut-test-fixtures/makeMe"
-import { describe, it, expect, vi } from "vitest"
+import { beforeEach, describe, it, expect, vi } from "vitest"
 import {
   mountNoteUndoButton,
   noteEditingHistory,
@@ -54,6 +57,10 @@ describe("NoteUndoButton visibility", () => {
 
   describe("after a note is trashed and then permanently deleted", () => {
     const router = { replace: vi.fn() } as unknown as Router
+
+    beforeEach(() => {
+      mockSdkService(NotebookFolderController, "listNotebookFolderListing", {})
+    })
 
     it("offers the other note's older entry instead of naming the deleted note", async () => {
       const { noteRealm1, noteRealm2 } = setupTwoCachedNotes()

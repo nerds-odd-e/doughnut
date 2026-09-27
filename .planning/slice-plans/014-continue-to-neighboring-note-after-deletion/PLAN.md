@@ -73,7 +73,7 @@ then `CURSOR_DEV=true nix develop -c pnpm cy:run --spec e2e_test/features/note_c
 ### 1. Trashing a note opens its neighboring note
 
 Type: Behavior
-Status: planned
+Status: done
 Proof: store `trashNote` examples above (B→C, C→B, alone beside a subfolder
 and a file → folder page, title Z–A → A, root without other notes → notebook
 page); the updated E2E trash scenario.
@@ -101,6 +101,20 @@ note the folder page opens as before.
 
 Reuses slice 1's rule and location unchanged; only `permanentlyDeleteNote`
 requests the listing before removal and replaces the route with that location.
+
+## Execution
+
+- Story Branch Mode; worktree `.claude/worktrees/story-continue-to-neighboring-note`,
+  branch `story/continue-to-neighboring-note`; claim `28974e985c` on `origin/main`.
+- Slice 1 accepted proof: `storedApi.trashNote.spec.ts` "where the person lands"
+  (12/12); `pnpm frontend:test tests/notes tests/store tests/toolbars` 353/353
+  (all trash consumers mock an empty listing); `vue-tsc --noEmit` clean;
+  `note_deletion.feature` 12 passing.
+- Slice 2 calls the private `StoredApiCollection.locationAfterRemoving(realm)`
+  before `permanentlyDeleteNoteRequest`; consumers of permanent delete need the
+  same empty-listing mock.
+- Learning: `StoredApiCollection.ts` is ~405 lines, over the 250-line guide
+  (pre-existing ~380); splitting the store class is out of this story's scope.
 
 ## Current decisions
 

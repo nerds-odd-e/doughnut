@@ -1,5 +1,8 @@
 import type { Note, NoteRealm } from "@generated/donut-backend-api"
-import { NoteController } from "@generated/donut-backend-api/sdk.gen"
+import {
+  NoteController,
+  NotebookFolderController,
+} from "@generated/donut-backend-api/sdk.gen"
 import NoteMoreOptionsForm from "@/components/notes/widgets/NoteMoreOptionsForm.vue"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
 import GlobalApiLoadingModal from "@tests/helpers/GlobalApiLoadingModal"
@@ -89,6 +92,7 @@ export function setupNoteMoreOptionsTrashFormTests() {
       "trashNote",
       noteMoreOptionsTrashFormNoteRealm
     )
+    mockSdkService(NotebookFolderController, "listNotebookFolderListing", {})
     renderer = helper
       .component(NoteMoreOptionsFormWithGlobalLoading)
       .withRouter(noteMoreOptionsTrashFormRouter)
