@@ -105,22 +105,44 @@ No executable plan or implementation is authorized by this seed.
 
 **Identity:** SEED-035#story-26
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"not-refined","approach":"unselected"}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/011-preview-image-files-on-web-file-page/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"0ecd6f46364eed8084f3c9924c84d3c4ad41788a1b34dad2e3d41707cb159549","plan":"3dc490eb1474f64ab06def1aceb6cd8b9b7f96132ada0146584efbe9b7d40986"}}
 ```
 
-- **For / why:** Notebook owners browsing their files in Web Donut can see an
-  image on its file page without downloading it first.
-- **Evaluation:** Opening the file page for an image shows that image inline;
-  opening the page for a non-image file shows no preview. Existing file
-  download and deletion remain available.
-- **Value / learning:** Makes image files recognizable while browsing a
-  notebook, without promising previews for other file types.
-- **Effort hypothesis:** S — provisional until the file page and image-serving
-  path are inspected during refinement.
-- **Depends on:** none; web file pages and image retrieval are already delivered.
-- **Safe stopping point:** Image preview is useful on its own; other file types
-  keep their current file-page behavior.
+**Goal:** A notebook reader who opens an image file's page in Web Donut sees
+the picture there, so an image that no note displays (for example one an AI
+IDE added to a folder) is recognizable without downloading it. It completes
+browsing for the most common file type in the near-future direction.
 
+**Scope:**
+
+- An image file's page shows the picture below its name and size, scaled
+  down to fit the page width and never enlarged. "Image" follows the existing
+  picture rule: a png, jpg, jpeg, gif or webp extension, ignoring letter case.
+- Anyone who can read the notebook sees the preview, including readers of a
+  notebook they cannot edit. Download and Delete keep their current behavior.
+- **Rejection constraint:** every other file type, SVG included, is not
+  rendered inline. A file served inline from Donut's own site could run
+  script (SVG, HTML), which is why the download stays a forced download with
+  `nosniff` (owner decision, 2026-09-27).
+- **Deferred:** thumbnails in the sidebar or folder pages; zoom or full-screen
+  viewing; image dimensions; which notes use the picture; previews for PDF,
+  text or other types; caching headers; showing images that a note's body
+  text references.
+- **Boundary assumption:** a file whose bytes do not match its image
+  extension shows the browser's broken-image mark; nothing is checked or
+  hidden (ADR 0006). The 10 MiB file limit keeps a full-size load bounded.
+
+**Key examples:**
+
+- `diagrams/flow.png` → its page shows the picture; Download and Delete are
+  still there.
+- `photo.JPG` in a notebook shared read-only with the reader → the picture
+  shows; there is no Delete.
+- `notes.pdf` or `logo.svg` → the page is unchanged: name, size, Download.
+
+**Effort hypothesis:** S. The picture rule and an inline picture response
+already exist for a note's `image:`; the file page needs the same response
+looked up by file.
 
 ## Ordering and Scope Reduction
 
@@ -213,6 +235,10 @@ is selected as story 26.
   notebook still leaves its picture behind, as decided earlier.
 - Owner request, 2026-09-27: queue an image-only preview on the web file page
   as the second product backlog story.
+- Owner decisions, 2026-09-27 (story 26 refinement): keep it second in the
+  backlog; exclude SVG and other non-raster types from inline display because
+  of the script risk; defer thumbnails, zoom, dimensions, other previews and
+  images referenced from note body text.
 - [Near-future direction](../PRODUCT-BACKLOG.md#near-future-direction).
 - [SEED-009](SEED-009-git-backed-local-notebook-workflow.md): prior local/web note
   workflow. This seed owns non-Markdown attachment continuity.
