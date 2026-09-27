@@ -201,34 +201,4 @@ describe("storedApiCollection", () => {
       expect(routerReplace).toHaveBeenCalledWith(noteShowLocation(note.id))
     })
   })
-
-  describe("refreshWikiLinkCacheForNote", () => {
-    let updateNoteContentSpy: ReturnType<typeof mockSdkService>
-
-    beforeEach(() => {
-      vi.clearAllMocks()
-      updateNoteContentSpy = mockSdkService(
-        TextContentController,
-        "updateNoteContent",
-        note
-      )
-    })
-
-    it("calls updateNoteContent even when content matches stored note", async () => {
-      const sameBody = "same body"
-      const sa = storageAccessor.value.storedApi()
-      storageAccessor.value.refreshNoteRealm({
-        ...note,
-        note: { ...note.note, content: sameBody },
-      })
-
-      await sa.refreshWikiLinkCacheForNote(note.id)
-
-      expect(updateNoteContentSpy).toHaveBeenCalledTimes(1)
-      expect(updateNoteContentSpy).toHaveBeenCalledWith({
-        path: { note: note.id },
-        body: { content: sameBody },
-      })
-    })
-  })
 })

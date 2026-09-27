@@ -75,7 +75,7 @@ describe("AddRelationshipFinalize", () => {
     const createHeld = new Promise<void>((r) => {
       resolveCreate = r
     })
-    mockRelationshipNoteCreation(sourceRealm, createdRealm, createHeld)
+    mockRelationshipNoteCreation(createdRealm, createHeld)
 
     const wrapper = mountAddRelationshipFinalize({
       note,
@@ -100,10 +100,7 @@ describe("AddRelationshipFinalize", () => {
     const { sourceRealm, note, createdRealm } =
       sourceAndCreatedRelationshipRealms()
     const target = targetSearchResult()
-    const createNoteSpy = mockRelationshipNoteCreation(
-      sourceRealm,
-      createdRealm
-    )
+    const createNoteSpy = mockRelationshipNoteCreation(createdRealm)
 
     const navigating = mountAddRelationshipFinalize({
       note,

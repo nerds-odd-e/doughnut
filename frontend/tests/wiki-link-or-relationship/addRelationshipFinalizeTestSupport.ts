@@ -1,8 +1,4 @@
-import {
-  NoteController,
-  NotebookController,
-  TextContentController,
-} from "@generated/donut-backend-api/sdk.gen"
+import { NotebookController } from "@generated/donut-backend-api/sdk.gen"
 import AddRelationshipFinalize from "@/components/wiki-link-or-relationship/AddRelationshipFinalize.vue"
 import type {
   Note,
@@ -81,12 +77,9 @@ export async function selectRelationType(
 }
 
 export function mockRelationshipNoteCreation(
-  sourceRealm: NoteRealm,
   createdRealm: NoteRealm,
   holdCreate?: Promise<void>
 ) {
-  mockSdkService(NoteController, "showNote", sourceRealm)
-  mockSdkService(TextContentController, "updateNoteContent", sourceRealm)
   if (holdCreate) {
     return mockSdkServiceWithImplementation(
       NotebookController,

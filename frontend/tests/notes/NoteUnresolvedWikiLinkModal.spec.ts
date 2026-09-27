@@ -58,7 +58,6 @@ describe("NoteUnresolvedWikiLinkModal", () => {
     notebookId: noteRealm.notebookRealm.notebook.id,
     noteRealm,
     modelValue: deadWikiLinkPayload,
-    sourceNoteId: noteRealm.note.id,
   }
 
   let matchMediaSpy: ReturnType<typeof mockCoarsePointer> | undefined

@@ -112,23 +112,15 @@ export default class StoredApiCollection {
     data: NoteCreationDto,
     options?: {
       folderId?: number | null
-      refreshWikiLinkCacheForNoteIds?: number[]
       skipNavigation?: boolean
     }
   ) {
     const folderId = options?.folderId
-    const refreshWikiLinkCacheForNoteIds =
-      options?.refreshWikiLinkCacheForNoteIds
     const body: NoteCreationDto =
       folderId != null ? { ...data, folderId } : { ...data }
     const nrwp = await createNoteRequest(notebookId, body)
     const focus = this.storage.refreshNoteRealm(nrwp)
     this.noteEditingHistory.createNote(focus.id)
-    if (refreshWikiLinkCacheForNoteIds) {
-      for (const id of refreshWikiLinkCacheForNoteIds) {
-        await this.refreshWikiLinkCacheForNote(id)
-      }
-    }
     if (options?.skipNavigation) {
       refreshSidebarStructuralListings()
       return focus
@@ -216,16 +208,6 @@ export default class StoredApiCollection {
     if (!noteRealm) return
     this.storage.refreshNoteRealm(noteRealm)
     refreshSidebarStructuralListings()
-  }
-
-  /** PATCH note content with current stored body so the backend rebuilds the resolved wiki-link index. */
-  async refreshWikiLinkCacheForNote(noteId: Donut.ID): Promise<void> {
-    let realm = this.storage.refOfNoteRealm(noteId).value
-    if (!realm?.note) {
-      realm = await this.loadNote(noteId)
-    }
-    const content = realm.note.content ?? ""
-    await this.updateTextContentWithoutUndo(noteId, "edit content", content)
   }
 
   private async undoInner(): Promise<{

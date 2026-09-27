@@ -63,8 +63,16 @@ and the frontend skill's typecheck. E2E per the table:
 ### 1. Creating a note or relationship sends no wiki-link re-save
 
 Type: Structure
-Status: planned
+Status: done
 Proof: slice 1 row above.
+
+Accepted proof (2026-09-27): `CURSOR_DEV=true nix develop -c pnpm frontend:test tests/notes/NoteNewForm.spec.ts tests/notes/NoteNewForm.submit.spec.ts tests/notes/NoteUnresolvedWikiLinkModal.spec.ts tests/wiki-link-or-relationship/AddRelationship.spec.ts tests/store/storedApi.spec.ts`
+passed 40 tests; `CURSOR_DEV=true nix develop -c pnpm -C frontend exec vue-tsc --noEmit`
+passed. `CURSOR_DEV=true nix develop -c pnpm cy:run --spec e2e_test/features/note_topology/wiki_link.feature,e2e_test/features/note_topology/property_wiki_link.feature,e2e_test/features/relationships/add_relationship.feature`
+passed all 26 scenarios. Mounted creation forms observe request payload and
+navigation; wiki-link features observe missing/piped target creation and live
+links; relationship feature observes creation and undo. Independent refactor:
+no edits. The intermediate store size is owned by slices 4–7 as planned.
 
 Removes a leftover workaround. The backend dropped its resolved wiki-link cache
 (`V300000316__drop_resolved_wiki_link.sql`) and resolves links live. Delete
@@ -175,6 +183,25 @@ the note realm cache rules. Prefer fewer tests; move nothing just to keep a
 count.
 
 ## Current decisions
+
+- Execution: Story Branch Mode in
+  `/Users/terryyin/.codex/worktrees/note-store-architecture/doughnut`, branch
+  `codex/note-store-architecture`; originating and integration checkout
+  `/Users/terryyin/git/doughnut`. Managed worktree created by this chat.
+  Starting revision: `30b470c4251f69bb5eba9b4928836210ed750dc9`.
+  Publisher: `codex-01a0e0fe-e37c-7512-a6b3-b8d4c1318365` (Yua-chan).
+  Claim accepted on `origin/main` and execution branch:
+  `ae374ab6da9299dc9364454dbbf8d734ba6feb0c`.
+  Increment target: `origin/refs/heads/codex/note-store-architecture`.
+  Plan 015 is complete and integrated (`c2fefdc293`).
+  Setup: `./scripts/run.sh bash scripts/worktree_setup.sh` and
+  `./scripts/run.sh pnpm -C frontend exec vue-tsc --version` passed.
+  Existing planned-execution refinement authority retained; no scope change.
+  The claim's trunk CI is unobserved; branch delivery owns subsequent coverage.
+- CI: GitHub Actions `ci.yml` (`donut CI`), branch
+  `codex/note-store-architecture`; Codex yielded observer cell 29, session 33954,
+  PID 11700, mailbox `/tmp/dough-ci-501/watch-Fd6Y7J`, owned by the publisher
+  above and bound to the execution checkout. Workflow selector verified.
 
 - Owner, 2026-09-27: delete the wiki-link re-save with nothing left behind: no
   replacement reload, no absence test, no historical note.

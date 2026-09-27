@@ -12,7 +12,6 @@ type NoteCreateApi = {
     body: NoteCreationDto,
     options?: {
       folderId?: number
-      refreshWikiLinkCacheForNoteIds?: number[]
     }
   ) => Promise<NoteRealm>
 }
@@ -64,7 +63,6 @@ export async function createNoteFromForm(input: {
   notebookId: number
   body: NoteCreationDto
   folderId?: number
-  refreshWikiLinkCacheForNoteIds?: number[]
   onFieldErrors: (errors: { newTitle?: string; wikidataId?: string }) => void
   onSuccess: () => void
 }): Promise<void> {
@@ -75,7 +73,6 @@ export async function createNoteFromForm(input: {
       input.body,
       {
         folderId: input.folderId,
-        refreshWikiLinkCacheForNoteIds: input.refreshWikiLinkCacheForNoteIds,
       }
     )
     input.onSuccess()
