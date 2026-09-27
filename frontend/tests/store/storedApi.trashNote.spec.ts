@@ -1,23 +1,9 @@
-import {
-  NoteController,
-  NotebookFolderController,
-} from "@generated/donut-backend-api/sdk.gen"
-import type { FolderListing } from "@generated/donut-backend-api"
+import { NoteController } from "@generated/donut-backend-api/sdk.gen"
 import type { Router } from "vue-router"
-import { flushPromises } from "@vue/test-utils"
-import { sidebarStructuralRefreshKey } from "@/components/notes/sidebarStructuralRefresh"
-import type { ApiStatus } from "@/managedApi/ApiStatusHandler"
-import {
-  setupGlobalClient,
-  teardownGlobalClientForTesting,
-} from "@/managedApi/clientSetup"
+import { teardownGlobalClientForTesting } from "@/managedApi/clientSetup"
 import createNoteStorage from "@/store/createNoteStorage"
 import makeMe from "donut-test-fixtures/makeMe"
-import {
-  mockSdkService,
-  mockSdkServiceWithImplementation,
-  wrapSdkError,
-} from "@tests/helpers"
+import { mockSdkService, wrapSdkError } from "@tests/helpers"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 
 describe("storedApiCollection trash note", () => {
@@ -30,7 +16,6 @@ describe("storedApiCollection trash note", () => {
 
   beforeEach(() => {
     vi.clearAllMocks()
-    mockSdkService(NotebookFolderController, "listNotebookFolderListing", {})
   })
 
   afterEach(() => {
@@ -60,7 +45,7 @@ describe("storedApiCollection trash note", () => {
         .please()
       const trashSpy = mockSdkService(NoteController, "trashNote", trashedRealm)
 
-      await storage.storedApi().trashNote(router, realm.id, {
+      await storage.storedApi().trashNote(realm.id, {
         referenceHandling: "REMOVE_FROM_PROPERTIES",
       })
 
@@ -85,7 +70,7 @@ describe("storedApiCollection trash note", () => {
       .please()
     storage.refreshNoteRealm(realm)
     mockSdkService(NoteController, "trashNote", realm)
-    await storage.storedApi().trashNote(router, realm.id, {
+    await storage.storedApi().trashNote(realm.id, {
       referenceHandling: "LEAVE_DEAD_LINKS",
     })
     const undoSpy = mockSdkService(NoteController, "undoTrashNote", realm)
@@ -104,7 +89,7 @@ describe("storedApiCollection trash note", () => {
     const realm = makeMe.aNoteRealm.title("Retry me").please()
     storage.refreshNoteRealm(realm)
     mockSdkService(NoteController, "trashNote", realm)
-    await storage.storedApi().trashNote(router, realm.id, {
+    await storage.storedApi().trashNote(realm.id, {
       referenceHandling: "LEAVE_DEAD_LINKS",
     })
     mockSdkService(NoteController, "undoTrashNote", realm).mockResolvedValue(
@@ -118,78 +103,5 @@ describe("storedApiCollection trash note", () => {
       type: "trash note",
       noteId: realm.id,
     })
-  })
-
-  it("keeps the trashed note in cache instead of removing it", async () => {
-    const storage = createNoteStorage()
-    const realm = makeMe.aNoteRealm.please()
-    storage.refreshNoteRealm(realm)
-    mockSdkService(NoteController, "trashNote", realm)
-
-    await storage.storedApi().trashNote(router, realm.id, {
-      referenceHandling: "LEAVE_DEAD_LINKS",
-    })
-
-    expect(storage.refOfNoteRealm(realm.id).value).toBeTruthy()
-  })
-
-  it("navigates away before applying the trashed realm, so a still-mounted sidebar cannot react to the note's new trash ancestry", async () => {
-    const storage = createNoteStorage()
-    const realm = makeMe.aNoteRealm.inFolder(901, "Work").please()
-    storage.refreshNoteRealm(realm)
-    const trashedRealm = makeMe.aNoteRealm.id(realm.id).please()
-    mockSdkService(NoteController, "trashNote", trashedRealm)
-    const refreshSpy = vi.spyOn(storage, "refreshNoteRealm")
-    refreshSpy.mockClear()
-
-    await storage.storedApi().trashNote(router, realm.id, {
-      referenceHandling: "LEAVE_DEAD_LINKS",
-    })
-
-    const navigateOrder = routerReplace.mock.invocationCallOrder[0]!
-    const refreshOrder = refreshSpy.mock.invocationCallOrder[0]!
-    expect(navigateOrder).toBeLessThan(refreshOrder)
-  })
-
-  it("refreshes sidebar structural listings after trash", async () => {
-    const storage = createNoteStorage()
-    const realm = makeMe.aNoteRealm.please()
-    storage.refreshNoteRealm(realm)
-    mockSdkService(NoteController, "trashNote", realm)
-    const before = sidebarStructuralRefreshKey.value
-
-    await storage.storedApi().trashNote(router, realm.id, {
-      referenceHandling: "LEAVE_DEAD_LINKS",
-    })
-
-    expect(sidebarStructuralRefreshKey.value).toBe(before + 1)
-  })
-
-  it("shows the app as busy while the peer listing loads before trashing", async () => {
-    const storage = createNoteStorage()
-    const realm = makeMe.aNoteRealm.please()
-    storage.refreshNoteRealm(realm)
-    mockSdkService(NoteController, "trashNote", realm)
-    let resolveListing: (listing: FolderListing) => void = () => undefined
-    mockSdkServiceWithImplementation(
-      NotebookFolderController,
-      "listNotebookFolderListing",
-      () =>
-        new Promise((resolve) => {
-          resolveListing = resolve
-        })
-    )
-    const apiStatus: ApiStatus = { states: [] }
-    setupGlobalClient(apiStatus)
-
-    const trashing = storage.storedApi().trashNote(router, realm.id, {
-      referenceHandling: "LEAVE_DEAD_LINKS",
-    })
-    await flushPromises()
-
-    expect(apiStatus.states).toHaveLength(1)
-    resolveListing({})
-    await trashing
-    expect(apiStatus.states).toHaveLength(0)
   })
 })

@@ -6,12 +6,7 @@ import type {
   NoteUpdateTitleDto,
 } from "@generated/donut-backend-api"
 import { noteShowLocation } from "@/routes/noteShowLocation"
-import { locationAfterNoteRemoval } from "@/routes/containingLocation"
-import { neighborNoteAfterRemoval } from "@/components/notes/sidebarStructuralSort"
-import { usePeerSort } from "@/composables/usePeerSort"
-import { loadFolderListing } from "@/utils/notebookFolderListingRequest"
 import { refreshSidebarStructuralListings } from "@/components/notes/sidebarStructuralRefresh"
-import { realmLeafFolder } from "@/components/notes/useNoteSidebarTree"
 import type { Router } from "vue-router"
 import NoteEditingHistory from "./NoteEditingHistory"
 import type NoteStorage from "./NoteStorage"
@@ -35,7 +30,7 @@ export type TitleRenameReferenceHandling = NonNullable<
 
 /** The note's folder id, or null at the notebook root. */
 function containingFolderId(realm: NoteRealm) {
-  return realmLeafFolder(realm)?.id ?? null
+  return realm.ancestorFolders?.at(-1)?.id ?? null
 }
 
 export default class StoredApiCollection {
@@ -273,10 +268,9 @@ export default class StoredApiCollection {
     await router.push(noteShowLocation(noteRealm.id))
   }
 
-  async trashNote(router: Router, noteId: Donut.ID, options: NoteTrashDto) {
+  async trashNote(noteId: Donut.ID, options: NoteTrashDto) {
     const cachedRealm = this.storage.refOfNoteRealm(noteId).value
     if (!cachedRealm) throw new Error("Cannot trash a note that is not loaded")
-    const destination = await this.locationAfterRemoving(cachedRealm)
     const trashedRealm = await trashNoteRequest(noteId, options)
 
     const originalFolderId = containingFolderId(cachedRealm)
@@ -285,38 +279,19 @@ export default class StoredApiCollection {
       cachedRealm.note.noteTopology.title,
       originalFolderId
     )
-    await router.replace(destination)
-    this.storage.refreshNoteRealm(trashedRealm)
-    refreshSidebarStructuralListings()
-  }
-
-  /** Read before removal, so the note's position is found in the order the person saw. */
-  private async locationAfterRemoving(realm: NoteRealm) {
-    const listing = await loadFolderListing(
-      realm.notebookRealm.notebook.id,
-      containingFolderId(realm)
-    )
-    const neighbor = neighborNoteAfterRemoval(
-      listing,
-      realm.id,
-      usePeerSort().peerSortSpec.value
-    )
-    return locationAfterNoteRemoval(realm, neighbor)
+    return trashedRealm
   }
 
   /**
    * Permanently deletes a note that is in trash, with everything it owns.
    * Records no undo and drops the note from cache.
    */
-  async permanentlyDeleteNote(router: Router, noteId: Donut.ID) {
+  async permanentlyDeleteNote(noteId: Donut.ID) {
     const cachedRealm = this.storage.refOfNoteRealm(noteId).value
     if (!cachedRealm) throw new Error("Cannot delete a note that is not loaded")
-    const destination = await this.locationAfterRemoving(cachedRealm)
     await permanentlyDeleteNoteRequest(noteId)
 
     this.noteNoLongerExists(noteId)
-    await router.replace(destination)
-    refreshSidebarStructuralListings()
   }
 
   /**

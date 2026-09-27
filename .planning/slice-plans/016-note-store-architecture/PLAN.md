@@ -145,8 +145,21 @@ Removes duplicate commands. Make these changes:
 ### 4. The removal flow owns where to land
 
 Type: Structure
-Status: planned
+Status: done
 Proof: slice 4 row above.
+
+Accepted proof: `CURSOR_DEV=true nix develop -c pnpm frontend:test tests/store tests/notes/NoteMoreOptionsForm tests/pages/NoteShowPage tests/toolbars/NoteUndoButton`
+passed 78 tests across 16 files; typecheck passed. Refactor made cache/sidebar
+ordering canonical once per mutation, reran
+`CURSOR_DEV=true nix develop -c pnpm frontend:test tests/notes/NoteMoreOptionsForm.removalLanding.spec.ts`
+(10 passing) and `CURSOR_DEV=true nix develop -c pnpm -C frontend exec vue-tsc --noEmit`.
+Other accepted boundaries unchanged. `CURSOR_DEV=true nix develop -c pnpm cy:run --spec e2e_test/features/note_creation_and_update/note_deletion.feature`
+passed 12 scenarios. Mounted form examples own next/previous/sorted/folder/root
+landing and delayed-listing busy observations. Canonical route callback observes
+old trash cache and sidebar before navigation completes, refreshed cache/sidebar
+afterward. Permanent-delete tombstone and undo invalidation intentionally remain
+before navigation, preserving existing protection against reloading deleted notes.
+Trash's now-used return carries its realm to the flow for post-navigation refresh.
 
 Removes the store's dependence on sidebar code. Move `locationAfterRemoving`
 beside the sidebar order it uses (next to `neighborNoteAfterRemoval`).
@@ -230,6 +243,9 @@ count.
   (slice 1); observer reused and registration confirmed by managed delivery.
 - Accepted execution-branch increment: `a08a318db1165bbfac47cbf9675c8619615dc833`
   (slice 2); observer reused and registration confirmed by managed delivery.
+- Accepted execution-branch increment: `d697a1326b572dea3e33585507f9db0e17bbc72a`
+  (slice 3 and autosave test repair); observer registration confirmed. Delivered
+  CI failure sequence 1 acknowledged after diagnosis and repair publication.
 
 - Owner, 2026-09-27: delete the wiki-link re-save with nothing left behind: no
   replacement reload, no absence test, no historical note.

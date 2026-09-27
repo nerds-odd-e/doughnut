@@ -1,3 +1,5 @@
+import { locationAfterRemoving } from "@/components/notes/sidebarStructuralSort"
+import { refreshSidebarStructuralListings } from "@/components/notes/sidebarStructuralRefresh"
 import type { NoteTrashDto } from "@generated/donut-backend-api"
 import usePopups from "@/components/commons/Popups/usePopups"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
@@ -52,7 +54,12 @@ export function useNoteRemovalFlow(
 
     await runWithBlockingApiLoading(async () => {
       if (!(await closeAndFlushNoteContentMutations(id))) return
-      await storageAccessor.value.storedApi().permanentlyDeleteNote(router, id)
+      const realm = noteRealm()
+      if (!realm) throw new Error("Cannot delete a note that is not loaded")
+      const destination = await locationAfterRemoving(realm)
+      await storageAccessor.value.storedApi().permanentlyDeleteNote(id)
+      await router.replace(destination)
+      refreshSidebarStructuralListings()
     }, PERMANENT_DELETE_LOADING_MESSAGE)
   }
 
@@ -130,7 +137,15 @@ export function useNoteRemovalFlow(
             .storedApi()
             .reduceRelationNoteToSourceProperty(router, id)
         } else {
-          await storage.storedApi().trashNote(router, id, flowChoice.options)
+          const realm = noteRealm()
+          if (!realm) throw new Error("Cannot trash a note that is not loaded")
+          const destination = await locationAfterRemoving(realm)
+          const trashedRealm = await storage
+            .storedApi()
+            .trashNote(id, flowChoice.options)
+          await router.replace(destination)
+          storage.refreshNoteRealm(trashedRealm)
+          refreshSidebarStructuralListings()
         }
       } finally {
         if (storage.refOfNoteRealm(id).value) {
