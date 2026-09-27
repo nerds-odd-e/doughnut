@@ -216,10 +216,15 @@ Reuse the existing `Modal` drawer convention for the context surface.
 ### 9. Review the complete note and grade from one surface
 
 Type: Behavior
-Status: planned
+Status: done
 Proof: mounted `RecallPage` with a Just review tracker shows the reader; with
 long content the Good/Again controls remain reachable; a grade calls the
 existing tracker endpoint once with the selected grade and advances recall.
+Accepted: `MemoryTrackerAsync` mounts the reader; `JustReviewButtons` is
+sticky at the bottom of the recall scroll area. `RecallPage.justReview.spec.ts`
+(390x600, long note) checks reader content, no NoteShow, Again stays on screen
+(fails without `sticky`), one `markAsRecalled` AGAIN call; advancing stays
+proven by `RecallPage.queueProgress.spec.ts`; `spaced_repetition.feature` passes.
 
 Behavior: a learner reaches Just review → reads the note and its references
 in place → grades Good or Again without opening the full note page.
