@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "agent": "Mihiro-chan",
+  "email": "mihiro-chan@example.org",
+  "identity": "SEED-050#story-5",
+  "mode": "story-branch",
+  "branch": "story/finished-transitions-leave-no-trace",
+  "host": "claude",
+  "model": "Opus 5.5"
+}
