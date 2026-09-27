@@ -43,7 +43,7 @@ This seed captures the assessment story and authorizes no UAT run or fixes now.
 
 **Identity:** SEED-042#story-1
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"not-refined","approach":"unselected"}
+{"schemaVersion":1,"refinement":"refined","approach":"planless","assessment":"ready","reasons":[],"basis":{"document":"1b58c61210d04383077b1730691203ae920b3272dc4079d663635f4dc0ae6767"}}
 ```
 
 **Goal**
@@ -99,6 +99,17 @@ Produce one findings report containing:
   proportionate recommendation. Distinguish observations from hypotheses.
 - Suggested priorities, proposed follow-up story outcomes, and a reasoned
   progressive-loading recommendation or the missing evidence needed to decide.
+
+**Refinement decisions**
+
+- Run the UAT against the local app started from this story's own execution
+  checkout, logged in as a seeded local account, in a browser that renders the
+  real sidebar (screenshots serve as evidence). Representative notebooks are
+  built as local test data; that setup time is reported separately from the hour.
+- Deliver the findings report as a `## UAT Findings` section in this seed, so the
+  owner reviews it in the same place as the story before choosing follow-ups.
+- Execute as one planless slice: the UAT and its report. No product code,
+  automated test, or permanent tooling change is part of this story.
 
 The owner can evaluate success by reviewing reproducible findings and actionable
 recommendations. An unreproduced reported glitch must be recorded honestly with
