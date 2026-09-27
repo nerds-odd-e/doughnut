@@ -101,11 +101,11 @@ export function sortSidebarStructuralRows(
   return [...folderRows, ...leafRows]
 }
 
-export function buildUnsortedStructuralRows(
-  noteTopologies: NoteTopology[],
-  folders: Folder[] | undefined,
-  attachments: NotebookAttachmentListItem[] | undefined
-): SidebarStructuralRow[] {
+export function buildUnsortedStructuralRows({
+  noteTopologies,
+  folders,
+  attachments,
+}: FolderListing): SidebarStructuralRow[] {
   type FolderRow = Extract<SidebarStructuralRow, { kind: "folder" }>
   type NoteRow = Extract<SidebarStructuralRow, { kind: "note" }>
 
@@ -116,7 +116,7 @@ export function buildUnsortedStructuralRows(
     }
   }
 
-  const noteRows: NoteRow[] = noteTopologies.map((noteTopology) => ({
+  const noteRows: NoteRow[] = (noteTopologies ?? []).map((noteTopology) => ({
     kind: "note" as const,
     noteTopology,
   }))
@@ -136,11 +136,7 @@ export function neighborNoteAfterRemoval(
   spec: PeerSortSpec
 ): NoteTopology | undefined {
   const notes = sortSidebarStructuralRows(
-    buildUnsortedStructuralRows(
-      listing.noteTopologies ?? [],
-      listing.folders,
-      listing.attachments
-    ),
+    buildUnsortedStructuralRows(listing),
     spec
   ).flatMap((row) => (row.kind === "note" ? [row.noteTopology] : []))
   const index = notes.findIndex((note) => note.id === removedNoteId)

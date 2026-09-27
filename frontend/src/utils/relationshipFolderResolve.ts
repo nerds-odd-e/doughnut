@@ -1,7 +1,6 @@
-import type { FolderListing } from "@generated/donut-backend-api"
 import { NotebookFolderController } from "@generated/donut-backend-api/sdk.gen"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
-import { requestNotebookFolderListing } from "@/utils/notebookFolderListingRequest"
+import { loadFolderListing } from "@/utils/notebookFolderListingRequest"
 import { refreshSidebarStructuralListings } from "@/components/notes/sidebarStructuralRefresh"
 
 export type RelationshipNotePlacement =
@@ -14,17 +13,6 @@ function folderNameForSourceNote(title: string | undefined | null): string {
     return " "
   }
   return title
-}
-
-async function loadFolderListing(
-  notebookId: number,
-  parentFolderId: number | null
-): Promise<FolderListing> {
-  const { data, error } = await apiCallWithLoading(() =>
-    requestNotebookFolderListing(notebookId, parentFolderId)
-  )
-  if (error || !data) throw new Error("Failed to load folder listing")
-  return data
 }
 
 async function findOrCreateChildFolder(
