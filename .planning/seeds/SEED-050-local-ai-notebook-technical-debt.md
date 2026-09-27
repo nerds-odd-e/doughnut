@@ -35,7 +35,7 @@ different frontmatter edits, each already with one owner.
 
 **Identity:** SEED-050#story-9
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/027-dissolve-enters-folders-by-the-one-rule/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"d07d54d7ed0835c3ef7a49632aacea5c47e485106399dd186c8073294d8f548d","plan":"876b08ab2e545d9cafab89deb82366c270763849229aa48bdfd47033c3436009"}}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/027-dissolve-enters-folders-by-the-one-rule/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"05b6de91db7a458c562ad487a19f5326c8e6054dd6a33a9d9246e84e7bb749cd","plan":"876b08ab2e545d9cafab89deb82366c270763849229aa48bdfd47033c3436009"}}
 ```
 
 **Goal:** Correction of SEED-050#story-8 (provenance
@@ -66,7 +66,7 @@ the dissolve/merge placement check no longer carries its own copy.
 
 **Identity:** SEED-050#story-10
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/028-history-commits-proven-where-they-happen/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"d07d54d7ed0835c3ef7a49632aacea5c47e485106399dd186c8073294d8f548d","plan":"11e47dc69185c0bbc4913f29f26940dd172ee7e521e2085e4c12ea5b59c9e844"}}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/028-history-commits-proven-where-they-happen/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"05b6de91db7a458c562ad487a19f5326c8e6054dd6a33a9d9246e84e7bb749cd","plan":"11e47dc69185c0bbc4913f29f26940dd172ee7e521e2085e4c12ea5b59c9e844"}}
 ```
 
 **Goal:** Correction of SEED-050#story-5 (commits 48d5a2e8f8..5afa318baf): a
