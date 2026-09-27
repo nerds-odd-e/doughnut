@@ -547,6 +547,9 @@ Slice 2's implementer reported that a rich body edit drops the file's final newl
 - Execution: SEED-050#story-1 / `.planning/slice-plans/020-validate-changed-markdown-once/PLAN.md` / f8b186cc7f; Timestamp: 2026-09-27, ~16:00+08:00 (slice 1 amend); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.42.
   - Evidence: `node .claude/skills/dough-execute-plan/scripts/agent-commit.mjs --amend` (bare, and with `-F -`) from the worktree root exited 0 with no output, HEAD still 759f43d897 without the developer trailer; the `realpath` invocation returned `{"ok":true,"status":"amended","agent":"Kaoru-chan","sha":"f8b186cc7f…"}`.
   - Observed effect: four extra calls, including reading the script; the first commit was made with plain `git commit` and had to be amended. Fifth retained occurrence, unknown to the coordinator at call time.
+- Execution: SEED-050#story-5 / `.planning/slice-plans/024-finished-transitions-leave-no-trace/PLAN.md` / 48d5a2e8f8; Timestamp: 2026-09-27, before the slice 1 commit 48d5a2e8f8; Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.42.
+  - Evidence: `node .claude/skills/dough-execute-plan/scripts/agent-commit.mjs -m …` from the worktree root twice exited 0 with empty output while `git log` stayed at 45aafefb9f with the change staged; reading the script's guard led to the `realpath` invocation, which returned `{"ok":true,"status":"committed","agent":"Mihiro-chan","sha":"48d5a2e8f8…"}`. `execution-start.mjs start` and `execution-increment-delivery.mjs deliver` (the latter always run by real path) worked.
+  - Observed effect: four extra coordinator calls; nothing committed wrongly. Sixth retained occurrence, unknown to the coordinator at call time.
 
 ## DD-134 — The plan's E2E proof command named a feature directory, which the isolated runner refuses
 

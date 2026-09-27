@@ -165,6 +165,39 @@ Git alone decides what a pull replays.
 3. A pull whose local patch accepted history already contains → reported as
    already published, as today.
 
+<a id="story-9"></a>
+
+### Notebook history commits are proven where they happen
+
+**Identity:** SEED-050#story-9
+```json dough-story-state
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/028-history-commits-proven-where-they-happen/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"e80a6f5cfae21e5fcad6ddd0dadc123dcd3a401a97eec89b8bffc049c400af13","plan":"846f0f92dc198ecc3b3a6616f856a12a3e17c2fb24974c350b22c0ff03e09f45"}}
+```
+
+**Goal:** Correction of SEED-050#story-5 (commits 48d5a2e8f8..5afa318baf): a
+developer changing notebook creation or history reset learns from the
+entry-point tests when the commit message or author changes, and the
+synchronization doc says only what those commits do.
+
+**Scope:**
+
+- Creation through the notebook and circle controllers asserts the root commit
+  "Create notebook" by Donut System <system@donut.local>.
+- History reset asserts "Reset: restart Git history from the current notebook"
+  by the same author.
+- The service test drops checks the shared creation assertion already makes.
+- `docs/notebook-git-synchronization.md` drops "Repository creation needs no
+  owner opt-in…" and the "still" in "may still read a complete tree".
+- Unchanged: `notebook-git-lfs.md` decision-record text; the binding-less
+  branch in `resetHistory`.
+
+**Key examples:**
+
+1. Create a notebook through the controller → its root commit reads "Create
+   notebook" by Donut System.
+2. Reset a notebook's history → its root commit reads "Reset: restart Git
+   history from the current notebook" by Donut System.
+
 <a id="story-7"></a>
 
 ### Code, API and docs say "image", and the UI says "File"

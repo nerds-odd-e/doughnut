@@ -165,6 +165,14 @@ guidance on a pause; the absorbed suite's final-newline constants go.
 - `notebookPublish.lfs.test.ts`'s git-process-count test failed once in a full
   `pnpm cli:test` run and passed alone and on the full rerun; publish code was
   not touched, so it looks load-sensitive.
-- The installed `agent-commit.mjs` and `execution-increment-delivery.mjs`
-  exit silently when run through the `.claude/skills` symlink; run them by
-  their real path.
+- The installed `agent-commit.mjs` exits silently when run through the
+  `.claude/skills` symlink (DD-133); run it by its real path.
+
+## Execution complete
+
+Product advice: Queue the correction SEED-050#story-9 (plan 028: assert the
+creation and reset commit messages at their entry points, drop two cutover-era
+phrases) ahead of SEED-050#story-7, which still waits for plans 021 and 023.
+Owner question: `docs/notebook-git-lfs.md` still says "Rewriting or resetting
+accepted history needs a separate decision", although history reset exists;
+decide whether that decision-record line changes.
