@@ -15,11 +15,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.context.annotation.SessionScope;
 import org.springframework.web.server.ResponseStatusException;
 
 @RestController
-@SessionScope
 @RequestMapping("/api/notes")
 class NoteImageController {
   private final AuthorizationService authorizationService;

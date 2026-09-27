@@ -66,7 +66,7 @@ the next release, not as slice proof.
 
 ### 1. Controllers and the non-production OpenAI client no longer live in the HTTP session
 Type: Structure
-Status: planned
+Status: done
 Proof: full backend suite
 (`./backend/gradlew -p backend test -Dspring.profiles.active=test --build-cache --parallel`)
 plus a focused E2E run of an AI feature that uses the replaced OpenAI URL
@@ -76,6 +76,18 @@ Internal change: remove `@SessionScope` from the 17 controllers; change the
 non-production `officialOpenAiClient` bean to `@RequestScope`. External
 behavior is unchanged. Enables slice 2, whose store requires serializable
 session contents.
+
+Accepted proof: `SUT_TIMEOUT_MS=360000 ./scripts/run.sh pnpm cy:run --spec
+e2e_test/features/messages/conversation_about_a_note.feature` → 1 passing;
+`./scripts/run.sh pnpm backend:test:worktree` → 2712 tests, 0 failures.
+
+Learnings:
+- The request-scoped client is `@Bean(destroyMethod = "")`: otherwise Spring
+  closes the SDK client at request end while streaming AI calls are still in
+  flight (`RejectedExecutionException` from OkHttp, no AI reply in E2E). The
+  SDK closes an unreachable client itself.
+- No `@SessionScope` remains in `backend/src`; slice 2 still needs to confirm
+  the remaining session attributes (security context) serialize.
 
 ### 2. A signed-in session is kept in the database, shared by all instances
 Type: Behavior

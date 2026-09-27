@@ -8,10 +8,8 @@ import com.odde.donut.testability.TestabilitySettings;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.context.annotation.SessionScope;
 
 @RestController
-@SessionScope
 @RequestMapping("/api/settings")
 public class GlobalSettingsController {
 
