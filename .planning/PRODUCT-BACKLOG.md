@@ -10,7 +10,8 @@ and deletable in Web Donut.
 
 ## Taken
 
+- [Notebook history commits are proven where they happen](seeds/SEED-050-local-ai-notebook-technical-debt.md#story-10) — SEED-050#story-10 ([plan](slice-plans/028-history-commits-proven-where-they-happen/PLAN.md))
+
 ## Backlog list
 
 - [Folder dissolve and merge enter subfolders by the one entry rule](seeds/SEED-050-local-ai-notebook-technical-debt.md#story-9) — SEED-050#story-9
-- [Notebook history commits are proven where they happen](seeds/SEED-050-local-ai-notebook-technical-debt.md#story-10) — SEED-050#story-10
