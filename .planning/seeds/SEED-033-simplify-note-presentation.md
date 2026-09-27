@@ -115,6 +115,36 @@ responsive layout work.
 note details remain reachable throughout; the final state has no non-note-page
 NoteShow caller.
 
+<a id="story-3"></a>
+
+### 3. Tidy the note context in spelling results and narrow conversations
+
+**Identity:** SEED-033#story-3
+```json dough-story-state
+{"schemaVersion":1,"refinement":"refined","approach":"unselected"}
+```
+
+**Goal:** A learner reading note context after a wrong spelling answer, or in
+a note conversation on a narrow screen, sees each piece of note information
+once and can read it without controls covering it.
+
+**Scope:** After a wrong spelling answer, the note title and location appear
+once, not both in the compact note summary and at the top of the note
+context; the focused-property indicator and tracker link stay available. In a
+narrow-screen note conversation, the note context drawer's close button does
+not cover the note's location or title. Correct-answer results, the wide
+conversation layout, and Just review are unchanged. First check both in the
+running app; drop any part that turns out not to happen.
+
+**Key examples:**
+
+- A learner answers a spelling prompt wrongly → the result shows the note
+  title once, with its properties, body, and references below.
+- A learner opens a note conversation on a phone-width screen and opens the
+  note context → the close button sits clear of the location line and title.
+
+**Effort hypothesis:** S.
+
 ## Ordering and Scope Reduction
 
 Story 1 delivered its small spelling-result simplification independently.

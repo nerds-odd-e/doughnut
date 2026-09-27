@@ -18,3 +18,4 @@ and deletable in Web Donut.
 - [Responses carry no ORM internals and a lean folder trail](seeds/SEED-046-notebook-files-and-git-findings.md#story-9) — SEED-046#story-9
 - [Review and close the local AI notebook effort](seeds/SEED-048-local-ai-notebook-final-review.md#story-1) — SEED-048#story-1
 - [Continue to a neighboring node after deletion](seeds/SEED-047-deleted-node-navigation.md#story-1) — SEED-047#story-1
+- [Tidy the note context in spelling results and narrow conversations](seeds/SEED-033-simplify-note-presentation.md#story-3) — SEED-033#story-3

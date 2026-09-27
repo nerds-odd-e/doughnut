@@ -72,6 +72,11 @@ Amend domain terms here in place; do not supersede this ADR.
   are still properties. Portable identity is (Portable path, exact YAML
   key) via `#prop:<encoded-key>` (ADR 0004). Web canonical location is
   `noteProperty` ([ADR 0005](./0005-web-routes-accepted.md)).
+- **Note context** — Read-only view of a note shown inside another task
+  (spelling results, note conversations, **just review**): location,
+  properties, body, image, inbound references, and an **Open full note**
+  link to `noteShow` (or `noteProperty` for a focused property). Editing and
+  the note toolbar exist only on the note page.
 - **Relationship** — Typed association between notes (e.g. “similar to”,
   “a part of”)
 - **Relationship note** — A note that represents a relationship
