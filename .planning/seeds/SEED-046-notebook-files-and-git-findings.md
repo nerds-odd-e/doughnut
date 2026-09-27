@@ -162,8 +162,7 @@ None that change selection or order.
 
 ## When to Surface
 
-Now; story 7 was queued ahead of SEED-033#story-2; correction 7b is not
-queued yet.
+Now; correction 7b is first in the backlog list.
 
 ## Breadcrumbs
 

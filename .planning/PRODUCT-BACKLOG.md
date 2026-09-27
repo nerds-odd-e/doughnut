@@ -16,5 +16,6 @@ and deletable in Web Donut.
 
 ## Backlog list
 
+- [Note realm JSON lists each sidebar field once](seeds/SEED-046-notebook-files-and-git-findings.md#story-15) — SEED-046#story-15
 - [Review and close the local AI notebook effort](seeds/SEED-048-local-ai-notebook-final-review.md#story-1) — SEED-048#story-1
 - [Continue to a neighboring node after deletion](seeds/SEED-047-deleted-node-navigation.md#story-1) — SEED-047#story-1
