@@ -1,7 +1,12 @@
 package com.odde.donut.controllers;
 
 import static com.odde.donut.testability.CommittedTransactionTestSupport.inCommittedTransaction;
+import static org.hamcrest.Matchers.aMapWithSize;
+import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.everyItem;
+import static org.hamcrest.Matchers.hasKey;
 import static org.hamcrest.Matchers.not;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -37,6 +42,7 @@ class ResponsesCarryNoOrmInternalsMvcTest extends ControllerTestBase {
   private int innerFolderId;
   private int attachmentId;
   private int noteId;
+  private int rootNoteId;
 
   @BeforeEach
   void setup() {
@@ -46,13 +52,20 @@ class ResponsesCarryNoOrmInternalsMvcTest extends ControllerTestBase {
         () -> {
           User owner = makeMe.aUser().please();
           Notebook nb = makeMe.aNotebook().creatorAndOwner(owner).please();
-          Folder outer = makeMe.aFolder().notebook(nb).name("outer").please();
+          Folder outer =
+              makeMe
+                  .aFolder()
+                  .notebook(nb)
+                  .name("outer")
+                  .readmeContent("# Outer\n\n" + "A long readme. ".repeat(200))
+                  .please();
           Folder inner = makeMe.aFolder().parentFolder(outer).name("inner").please();
           ownerId[0] = owner.getId();
           notebookId = nb.getId();
           innerFolderId = inner.getId();
           attachmentId = makeMe.anAttachment("a.txt").in(inner).please().getId();
           noteId = makeMe.aNote().folder(inner).please().getId();
+          rootNoteId = makeMe.aNote().notebook(nb).please().getId();
         });
     entityManager.clear();
     currentUser.setUser(userRepository.findById(ownerId[0]).orElseThrow());
@@ -73,6 +86,14 @@ class ResponsesCarryNoOrmInternalsMvcTest extends ControllerTestBase {
   }
 
   @Test
+  void noteAtNotebookRootHasAnEmptyTrail() throws Exception {
+    mockMvc
+        .perform(get("/api/notes/{note}", rootNoteId).accept(MediaType.APPLICATION_JSON))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.ancestorFolders", empty()));
+  }
+
+  @Test
   void nestedFolderPageIsServedAsJsonEvenWhenBrowserAcceptHeaderPrefersXml() throws Exception {
     mockMvc
         .perform(
@@ -85,7 +106,11 @@ class ResponsesCarryNoOrmInternalsMvcTest extends ControllerTestBase {
   private void assertCleanTrail(ResultActions result) throws Exception {
     result
         .andExpect(status().isOk())
-        .andExpect(jsonPath("$..ancestorFolders[*].name", contains("outer", "inner")))
+        .andExpect(jsonPath("$.ancestorFolders[*].name", contains("outer", "inner")))
+        .andExpect(
+            jsonPath(
+                "$.ancestorFolders",
+                everyItem(allOf(aMapWithSize(2), hasKey("id"), hasKey("name")))))
         .andExpect(content().string(not(Matchers.containsString("hibernateLazyInitializer"))));
   }
 }

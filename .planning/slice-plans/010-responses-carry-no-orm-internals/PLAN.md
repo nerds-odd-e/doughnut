@@ -32,7 +32,7 @@ Commands:
 
 - `CURSOR_DEV=true nix develop -c ./backend/gradlew -p backend test -Dspring.profiles.active=test --tests '*ResponsesCarryNoOrmInternals*' --tests '*NotebookAttachmentController*' --tests '*NotebookFolderPage*' --tests '*NoteControllerShow*' --tests '*NoteRealm*' --tests '*Recall*'`
 - `CURSOR_DEV=true nix develop -c pnpm frontend:test notes/ Breadcrumb`
-- `CURSOR_DEV=true nix develop -c pnpm cy:run --spec e2e_test/features/folder_organization`
+- `CURSOR_DEV=true nix develop -c pnpm cy:run --spec e2e_test/features/folder_organization/folder_organization.feature,e2e_test/features/folder_organization/folder_page_readme.feature,e2e_test/features/folder_organization/folder_trash.feature,e2e_test/features/notebooks/notebook_files.feature`
 
 ## Slices
 
@@ -61,7 +61,14 @@ Javadoc, which says web JSON uses the Jackson 2 `objectMapper()`.
 ### 2. Folder-trail entries carry only id and name
 
 Type: Behavior
-Status: planned
+Status: done
+Accepted proof (2026-09-27): `ResponsesCarryNoOrmInternalsMvcTest`
+`assertCleanTrail` (every entry a two-key map of `id`, `name`; the outer folder
+has a long readme) failed red on five-key entries and passes;
+`noteAtNotebookRootHasAnEmptyTrail`; focused backend command, `vue-tsc`, full
+frontend suite, CLI recall tests, and the E2E features pass. `FolderTrailSegments`
+became `FolderTrail` (internal `Folder` lists); responses convert through
+`FolderTrailSegment.of`.
 Proof: examples 1–4 asserting each trail entry's keys are exactly `id` and
 `name`; regenerated API client; frontend tests for breadcrumbs, folder
 pickers, and the sidebar tree; the folder organization E2E feature.

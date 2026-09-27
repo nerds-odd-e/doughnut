@@ -13,13 +13,13 @@
 </template>
 
 <script setup lang="ts">
-import type { Folder } from "@generated/donut-backend-api"
+import type { FolderTrailSegment } from "@generated/donut-backend-api"
 import type { PropType } from "vue"
 import BasicBreadcrumb from "@/components/commons/BasicBreadcrumb.vue"
 
 defineProps({
   ancestorFolders: {
-    type: Array as PropType<Folder[]>,
+    type: Array as PropType<FolderTrailSegment[]>,
     default: () => [],
   },
   breadcrumbNotebookId: {

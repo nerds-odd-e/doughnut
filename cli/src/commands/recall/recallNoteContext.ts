@@ -1,7 +1,6 @@
 import type { Note, NoteTopology, RecalledNote } from 'donut-api'
 
-/** Minimal shape for folder breadcrumb rows (matches API `Folder` name field). */
-type FolderTrailLike = { name?: string }
+type FolderTrail = RecalledNote['ancestorFolders']
 
 /**
  * Titles for recall scrollback: notebook, folder path (outer→inner), then note title.
@@ -20,7 +19,7 @@ export function breadcrumbTrailFromRecalledNote(
 
 export function noteBreadcrumbTrailTitles(
   note: Note | undefined,
-  ancestorFolders?: readonly FolderTrailLike[] | undefined,
+  ancestorFolders?: FolderTrail,
   notebookName?: string | undefined
 ): readonly string[] {
   if (note === undefined) {
@@ -33,7 +32,7 @@ export function noteBreadcrumbTrailTitles(
 function titlesFromTopologyAndFolders(
   topo: NoteTopology | undefined,
   notebookName: string | undefined,
-  ancestorFolders: readonly FolderTrailLike[] | undefined
+  ancestorFolders: FolderTrail
 ): readonly string[] {
   if (topo === undefined) {
     return ['Note']
@@ -44,8 +43,8 @@ function titlesFromTopologyAndFolders(
     parts.push(notebook)
   }
   for (const seg of ancestorFolders ?? []) {
-    const n = seg.name?.trim()
-    if (n !== undefined && n.length > 0) {
+    const n = seg.name.trim()
+    if (n.length > 0) {
       parts.push(n)
     }
   }

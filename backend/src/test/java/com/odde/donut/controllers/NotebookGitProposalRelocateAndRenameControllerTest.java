@@ -4,6 +4,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.equalTo;
 
+import com.odde.donut.controllers.dto.FolderTrailSegment;
 import com.odde.donut.controllers.dto.NoteRealm;
 import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.Note;
@@ -40,7 +41,7 @@ class NotebookGitProposalRelocateAndRenameControllerTest extends NotebookGitCont
     assertThat(relocated.getId(), equalTo(setup.note().getId()));
     NoteRealm shown = noteController.showNote(relocated);
     assertThat(
-        shown.getAncestorFolders().stream().map(Folder::getId).toList(),
+        shown.getAncestorFolders().stream().map(FolderTrailSegment::id).toList(),
         contains(setup.destination().getId()));
     assertThat(shown.getNote().getTitle(), equalTo("renamed"));
     assertThat(shown.getNote().getContent(), equalTo(TYPED_NOTE_CONTENT));
@@ -59,7 +60,7 @@ class NotebookGitProposalRelocateAndRenameControllerTest extends NotebookGitCont
     NoteRealm shown =
         noteController.showNote(noteRepository.findById(setup.note().getId()).orElseThrow());
     assertThat(
-        shown.getAncestorFolders().stream().map(Folder::getId).toList(),
+        shown.getAncestorFolders().stream().map(FolderTrailSegment::id).toList(),
         contains(setup.destination().getId()));
     assertThat(shown.getNote().getTitle(), equalTo("renamed"));
   }

@@ -15,14 +15,14 @@
 </template>
 
 <script setup lang="ts">
-import type { Folder } from "@generated/donut-backend-api"
+import type { FolderTrailSegment } from "@generated/donut-backend-api"
 import PopButton from "../../commons/Popups/PopButton.vue"
 import FolderNewForm from "../FolderNewForm.vue"
 
 defineProps<{
   notebookId: number
-  ancestorFolders: Folder[]
-  contextFolder: Folder | null
+  ancestorFolders: FolderTrailSegment[]
+  contextFolder: FolderTrailSegment | null
   buttonTitle: string
   ariaLabel?: string
 }>()

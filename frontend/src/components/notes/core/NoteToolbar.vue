@@ -84,7 +84,11 @@
 
 <script setup lang="ts">
 import { computed, ref, watch } from "vue"
-import type { Folder, Note, NoteRealm } from "@generated/donut-backend-api"
+import type {
+  FolderTrailSegment,
+  Note,
+  NoteRealm,
+} from "@generated/donut-backend-api"
 import SvgSearchForWikiLinkOrRelationship from "../../svgs/SvgSearchForWikiLinkOrRelationship.vue"
 import SearchForm from "../../wiki-link-or-relationship/SearchForm.vue"
 import PopButton from "@/components/commons/Popups/PopButton.vue"
@@ -116,7 +120,7 @@ const props = withDefaults(
     note: Note
     notebookId: number
     activeNoteRealm?: NoteRealm
-    breadcrumbFolders?: Folder[]
+    breadcrumbFolders?: FolderTrailSegment[]
     asMarkdown?: boolean
     conversationButton?: boolean
     readonly?: boolean

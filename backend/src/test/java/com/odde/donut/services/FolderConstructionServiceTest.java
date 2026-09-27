@@ -4,7 +4,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 
-import com.odde.donut.controllers.dto.FolderTrailSegments;
+import com.odde.donut.controllers.dto.FolderTrail;
 import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
@@ -29,10 +29,10 @@ class FolderConstructionServiceTest extends SpringTestBase {
 
     Folder destination =
         folderConstructionService.ensureTrashParentFor(
-            notebook, FolderTrailSegments.fromRootToContainingFolder(note));
+            notebook, FolderTrail.fromRootToContainingFolder(note));
     Folder repeatedDestination =
         folderConstructionService.ensureTrashParentFor(
-            notebook, FolderTrailSegments.fromRootToContainingFolder(note));
+            notebook, FolderTrail.fromRootToContainingFolder(note));
 
     assertThat(destination.getName(), equalTo("Physics"));
     assertThat(destination.getParentFolder().getId(), equalTo(mirroredRoot.getId()));

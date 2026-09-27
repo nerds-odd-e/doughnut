@@ -7,6 +7,7 @@ import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import com.odde.donut.controllers.dto.FolderTrailSegment;
 import com.odde.donut.controllers.dto.NotebookAttachmentRealm;
 import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.Notebook;
@@ -65,7 +66,7 @@ class NotebookAttachmentControllerTest extends ControllerTestBase {
       assertThat(page.attachment().filename(), equalTo("run.json"));
       assertThat(page.size(), equalTo(7L));
       assertThat(
-          page.sidebar().getAncestorFolders().stream().map(Folder::getName).toList(),
+          page.sidebar().getAncestorFolders().stream().map(FolderTrailSegment::name).toList(),
           contains("physics", "data"));
       assertThat(page.sidebar().getNotebookRealm().notebook().getId(), equalTo(notebook.getId()));
     }

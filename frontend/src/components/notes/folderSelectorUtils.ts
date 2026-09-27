@@ -1,6 +1,11 @@
-import type { Folder } from "@generated/donut-backend-api"
+import type { Folder, FolderTrailSegment } from "@generated/donut-backend-api"
 
-export function folderRowsById(rows: Folder[]): Map<number, Folder> {
+/** A folder with the parent link needed to label its path. */
+export type FolderPathRow = FolderTrailSegment & { parentFolderId?: number }
+
+export function folderRowsById(
+  rows: readonly FolderPathRow[]
+): Map<number, FolderPathRow> {
   return new Map(rows.map((r) => [r.id, r]))
 }
 
@@ -20,7 +25,7 @@ export function siblingFoldersForQuickPick(
 /** Path from notebook root to folder, segments joined with ` / `. */
 export function folderPathLabel(
   folderId: number,
-  byId: Map<number, Folder>
+  byId: Map<number, FolderPathRow>
 ): string {
   const segments: string[] = []
   const visited = new Set<number>()
@@ -37,15 +42,15 @@ export function folderPathLabel(
 }
 
 /**
- * Copy a root-to-leaf Folder array with inferred parentFolderId on each entry
+ * Copy a root-to-leaf folder trail with inferred parentFolderId on each entry
  * (outermost folder has no parent).
  */
-export function folderChainWithParentIds(chain: readonly Folder[]): Folder[] {
+export function folderChainWithParentIds(
+  chain: readonly FolderTrailSegment[]
+): FolderPathRow[] {
   return chain.map((f, i) => ({
     id: f.id,
     name: f.name,
-    createdAt: f.createdAt,
-    updatedAt: f.updatedAt,
     parentFolderId: i === 0 ? undefined : chain[i - 1]!.id,
   }))
 }
@@ -57,8 +62,8 @@ export function folderChainWithParentIds(chain: readonly Folder[]): Folder[] {
  */
 export function ancestorsFromChain(
   folderId: number,
-  chain: readonly Folder[]
-): { ancestorFolders: Folder[]; parentFolderId: number | null } {
+  chain: readonly FolderTrailSegment[]
+): { ancestorFolders: FolderPathRow[]; parentFolderId: number | null } {
   const idx = chain.findIndex((f) => f.id === folderId)
   if (idx === -1) {
     // Folder not in chain – return chain as ancestors (best-effort)

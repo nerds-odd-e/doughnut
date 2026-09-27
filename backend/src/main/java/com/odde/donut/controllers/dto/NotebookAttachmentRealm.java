@@ -19,7 +19,8 @@ public record NotebookAttachmentRealm(
       NotebookRealm chrome, NotebookAttachment attachment, long size) {
     RealmNotebookSidebar sidebar = new RealmNotebookSidebar();
     sidebar.setNotebookRealm(chrome);
-    sidebar.setAncestorFolders(FolderTrailSegments.fromRootToFolder(attachment.getFolder()));
+    sidebar.setAncestorFolders(
+        FolderTrailSegment.of(FolderTrail.fromRootToFolder(attachment.getFolder())));
     return new NotebookAttachmentRealm(
         sidebar,
         new NotebookAttachmentListItem(attachment.getId(), attachment.getFilename()),

@@ -224,15 +224,11 @@ export type GlobalAiModelSettings = {
     othersModel?: string;
 };
 
-export type Folder = {
+/**
+ * One folder on a folder trail: only its id and name.
+ */
+export type FolderTrailSegment = {
     id: number;
-    readmeContent?: string;
-    createdAt: string;
-    updatedAt: string;
-    /**
-     * Parent folder id when nested; omitted at notebook root.
-     */
-    parentFolderId?: number;
     name: string;
 };
 
@@ -252,7 +248,7 @@ export type NoteRealm = {
     /**
      * Folders from notebook root outward; see each realm for trail semantics.
      */
-    ancestorFolders?: Array<Folder>;
+    ancestorFolders?: Array<FolderTrailSegment>;
     references?: Array<NoteTopology>;
     wikiLinks?: Array<WikiLink>;
     /**
@@ -347,7 +343,7 @@ export type AnsweredQuestion = {
 export type RecalledNote = {
     noteTopology: NoteTopology;
     notebookId: number;
-    ancestorFolders?: Array<Folder>;
+    ancestorFolders?: Array<FolderTrailSegment>;
     propertyKey?: string;
 };
 
@@ -518,6 +514,18 @@ export type FolderCreationRequest = {
      * When set (and underFolderId is not), the new folder is a child of this note's folder (or notebook root when the note has no folder). Must belong to the target notebook.
      */
     underNoteId?: number;
+};
+
+export type Folder = {
+    id: number;
+    readmeContent?: string;
+    createdAt: string;
+    updatedAt: string;
+    /**
+     * Parent folder id when nested; omitted at notebook root.
+     */
+    parentFolderId?: number;
+    name: string;
 };
 
 /**
@@ -916,7 +924,7 @@ export type FolderRealm = {
     /**
      * Folders from notebook root outward; see each realm for trail semantics.
      */
-    ancestorFolders?: Array<Folder>;
+    ancestorFolders?: Array<FolderTrailSegment>;
     /**
      * Full markdown of the container readme that supplies the nearest non-blank title_pattern (inner scope toward notebook root). Omitted when none applies.
      */
@@ -1210,7 +1218,7 @@ export type NotebookAttachmentRealm = {
     /**
      * Folders from notebook root outward; see each realm for trail semantics.
      */
-    ancestorFolders?: Array<Folder>;
+    ancestorFolders?: Array<FolderTrailSegment>;
     /**
      * Full markdown of the container readme that supplies the nearest non-blank title_pattern (inner scope toward notebook root). Omitted when none applies.
      */

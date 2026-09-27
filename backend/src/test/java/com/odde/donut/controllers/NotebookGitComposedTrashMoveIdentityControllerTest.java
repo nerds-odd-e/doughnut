@@ -8,6 +8,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 
+import com.odde.donut.controllers.dto.FolderTrailSegment;
 import com.odde.donut.controllers.dto.NoteRealm;
 import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.MemoryTracker;
@@ -65,7 +66,8 @@ class NotebookGitComposedTrashMoveIdentityControllerTest
     assertThat(relocated.getContent(), equalTo(CELLS_BODY));
     NoteRealm shown = noteController.showNote(relocated);
     assertThat(
-        shown.getAncestorFolders().stream().map(Folder::getName).toList(), contains("Research"));
+        shown.getAncestorFolders().stream().map(FolderTrailSegment::name).toList(),
+        contains("Research"));
     MemoryTracker learned = memoryTrackerRepository.findById(seed.tracker().getId()).orElseThrow();
     assertThat(learned.getNote().getId(), equalTo(seed.cells().getId()));
     assertThat(learned.isActive(), is(true));

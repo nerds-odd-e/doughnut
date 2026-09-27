@@ -7,8 +7,8 @@ import java.util.Collections;
 import java.util.List;
 
 /** Folder path from notebook root to the note's containing folder (outermost first). */
-public final class FolderTrailSegments {
-  private FolderTrailSegments() {}
+public final class FolderTrail {
+  private FolderTrail() {}
 
   /** Outer-most folder first, separated by {@code " / "} (empty when the note has no folder). */
   public static String crumbPathJoinedBySlashSpace(Note note) {
