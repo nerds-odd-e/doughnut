@@ -64,7 +64,7 @@ including delivery, not commitments.
 
 **Identity:** SEED-046#story-9
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/010-responses-carry-no-orm-internals/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"acb4a665131454faf46e42ae55471a838f9c4b66b0215581d14e4efa56658123","plan":"cbd378e18afbfa14ece652f6f41ffdab215313e84ebd13d8a5fa6c4d9940ae48"}}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/010-responses-carry-no-orm-internals/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"19996e467b834aa860320cf45f90459df6e199e4ee97f26b3f3583f482d9bb50","plan":"cbd378e18afbfa14ece652f6f41ffdab215313e84ebd13d8a5fa6c4d9940ae48"}}
 ```
 
 - **Goal:** API consumers (the web app, CLI, MCP, and anyone reading the
