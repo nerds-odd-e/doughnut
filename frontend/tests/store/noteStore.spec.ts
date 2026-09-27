@@ -12,7 +12,7 @@ import { useNoteStore } from "@/store/noteStore"
 import { sidebarStructuralRefreshKey } from "@/components/notes/sidebarStructuralRefresh"
 import { describe, it, expect, vi, beforeEach } from "vitest"
 
-describe("storedApiCollection", () => {
+describe("noteStore", () => {
   const note = makeMe.aNoteRealm.please()
   const noteStore = useNoteStore()
   const routerReplace = vi.fn()
@@ -36,51 +36,16 @@ describe("storedApiCollection", () => {
 
     it("should remove the created note from cache after undo", async () => {
       resetNoteStore()
-      const noteEditingHistory = noteStore.noteUndo
+      const noteUndo = noteStore.noteUndo
 
       noteStore.refreshNoteRealm(note)
-      noteEditingHistory.createNote(note.id)
+      noteUndo.createNote(note.id)
 
       expect(noteStore.refOfNoteRealm(note.id).value).toBeTruthy()
 
-      const sa = noteStore
-      await sa.undo(router)
+      await noteStore.undo(router)
 
       expect(noteStore.refOfNoteRealm(note.id).value).toBeUndefined()
-    })
-
-    it("should navigate to notebook page when trash returns no realms", async () => {
-      mockSdkService(NoteController, "trashNote", note)
-      resetNoteStore()
-      const noteEditingHistory = noteStore.noteUndo
-
-      noteStore.refreshNoteRealm(note)
-      noteEditingHistory.createNote(note.id)
-
-      const sa = noteStore
-      await sa.undo(router)
-
-      expect(routerPush).toHaveBeenCalledWith({
-        name: "notebookPage",
-        params: { notebookId: note.notebookRealm.notebook.id },
-      })
-    })
-
-    it("uses the recoverable trash path with LEAVE_DEAD_LINKS when undoing note creation", async () => {
-      const trashSpy = mockSdkService(NoteController, "trashNote", note)
-      resetNoteStore()
-      const noteEditingHistory = noteStore.noteUndo
-
-      noteStore.refreshNoteRealm(note)
-      noteEditingHistory.createNote(note.id)
-
-      const sa = noteStore
-      await sa.undo(router)
-
-      expect(trashSpy).toHaveBeenCalledWith({
-        path: { note: note.id },
-        body: { referenceHandling: "LEAVE_DEAD_LINKS" },
-      })
     })
   })
 
@@ -101,16 +66,14 @@ describe("storedApiCollection", () => {
     })
 
     it("does nothing when no completion value is provided", async () => {
-      const sa = noteStore
-      await sa.completeContent(note.id)
+      await noteStore.completeContent(note.id)
       expect(updateNoteContentSpy).not.toHaveBeenCalled()
     })
 
     it("updates note content with completion", async () => {
-      const sa = noteStore
       noteRef.value = { ...note, note: { content: "Hello " } }
 
-      await sa.completeContent(note.id, {
+      await noteStore.completeContent(note.id, {
         content: "Hello world!",
       })
 
@@ -123,10 +86,9 @@ describe("storedApiCollection", () => {
     })
 
     it("loads note first if not in storage", async () => {
-      const sa = noteStore
       noteRef.value = undefined
 
-      await sa.completeContent(note.id, {
+      await noteStore.completeContent(note.id, {
         content: "<p>Desc</p>world!",
       })
 
@@ -147,8 +109,7 @@ describe("storedApiCollection", () => {
       mockSdkService(RelationController, "moveNoteToFolder", [note])
       noteStore.refreshNoteRealm(note)
       const before = sidebarStructuralRefreshKey.value
-      const sa = noteStore
-      await sa.moveNote(note.id, { folderId: 99 })
+      await noteStore.moveNote(note.id, { folderId: 99 })
       expect(sidebarStructuralRefreshKey.value).toBe(before + 1)
     })
 
@@ -158,8 +119,9 @@ describe("storedApiCollection", () => {
       ])
       noteStore.refreshNoteRealm(note)
       const before = sidebarStructuralRefreshKey.value
-      const sa = noteStore
-      await sa.moveNote(note.id, { notebookId: note.notebookRealm.notebook.id })
+      await noteStore.moveNote(note.id, {
+        notebookId: note.notebookRealm.notebook.id,
+      })
       expect(sidebarStructuralRefreshKey.value).toBe(before + 1)
     })
   })
@@ -170,8 +132,7 @@ describe("storedApiCollection", () => {
     it("refreshes sidebar structural listings after an accepted upload", async () => {
       mockSdkService(NoteController, "uploadNoteImage", note)
       const before = sidebarStructuralRefreshKey.value
-      const sa = noteStore
-      await sa.uploadNoteImage(note.id, file)
+      await noteStore.uploadNoteImage(note.id, file)
       expect(sidebarStructuralRefreshKey.value).toBe(before + 1)
     })
 
@@ -180,18 +141,18 @@ describe("storedApiCollection", () => {
         wrapSdkError("refused")
       )
       const before = sidebarStructuralRefreshKey.value
-      const sa = noteStore
-      await expect(sa.uploadNoteImage(note.id, file)).rejects.toThrow("refused")
+      await expect(noteStore.uploadNoteImage(note.id, file)).rejects.toThrow(
+        "refused"
+      )
       expect(sidebarStructuralRefreshKey.value).toBe(before)
     })
   })
 
   describe("focusNoteRealm", () => {
     it("refreshes cache, sidebar listings, and navigates to the note", async () => {
-      const sa = noteStore
       const before = sidebarStructuralRefreshKey.value
 
-      await sa.focusNoteRealm(router, note)
+      await noteStore.focusNoteRealm(router, note)
 
       expect(noteStore.refOfNoteRealm(note.id).value).toBeTruthy()
       expect(sidebarStructuralRefreshKey.value).toBe(before + 1)

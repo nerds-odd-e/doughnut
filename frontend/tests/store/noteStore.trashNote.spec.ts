@@ -6,7 +6,7 @@ import makeMe from "donut-test-fixtures/makeMe"
 import { mockSdkService, wrapSdkError } from "@tests/helpers"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 
-describe("storedApiCollection trash note", () => {
+describe("noteStore trash note", () => {
   const routerReplace = vi.fn()
   const routerPush = vi.fn()
   const router = {
@@ -37,15 +37,15 @@ describe("storedApiCollection trash note", () => {
   ])(
     "records the original title/placement for undo ($originalFolderId)",
     async ({ realm, originalFolderId }) => {
-      const storage = resetNoteStore()
-      storage.refreshNoteRealm(realm)
+      const noteStore = resetNoteStore()
+      noteStore.refreshNoteRealm(realm)
       const trashedRealm = makeMe.aNoteRealm
         .id(realm.id)
         .title(`${realm.note.noteTopology.title} (2)`)
         .please()
       const trashSpy = mockSdkService(NoteController, "trashNote", trashedRealm)
 
-      await storage.trashNote(realm.id, {
+      await noteStore.trashNote(realm.id, {
         referenceHandling: "REMOVE_FROM_PROPERTIES",
       })
 
@@ -53,7 +53,7 @@ describe("storedApiCollection trash note", () => {
         path: { note: realm.id },
         body: { referenceHandling: "REMOVE_FROM_PROPERTIES" },
       })
-      expect(storage.peekUndo()).toEqual({
+      expect(noteStore.peekUndo()).toEqual({
         type: "trash note",
         noteId: realm.id,
         originalTitle: realm.note.noteTopology.title,
@@ -63,41 +63,41 @@ describe("storedApiCollection trash note", () => {
   )
 
   it("undoes trash atomically with the original title/placement and consumes history after success", async () => {
-    const storage = resetNoteStore()
+    const noteStore = resetNoteStore()
     const realm = makeMe.aNoteRealm
       .title("Original title")
       .inFolder(901, "Work")
       .please()
-    storage.refreshNoteRealm(realm)
+    noteStore.refreshNoteRealm(realm)
     mockSdkService(NoteController, "trashNote", realm)
-    await storage.trashNote(realm.id, {
+    await noteStore.trashNote(realm.id, {
       referenceHandling: "LEAVE_DEAD_LINKS",
     })
     const undoSpy = mockSdkService(NoteController, "undoTrashNote", realm)
 
-    await storage.undo(router)
+    await noteStore.undo(router)
 
     expect(undoSpy).toHaveBeenCalledWith({
       path: { note: realm.id },
       body: { priorTitle: "Original title", priorFolderId: 901 },
     })
-    expect(storage.peekUndo()).toBeNull()
+    expect(noteStore.peekUndo()).toBeNull()
   })
 
   it("retains trash history when atomic Undo fails", async () => {
-    const storage = resetNoteStore()
+    const noteStore = resetNoteStore()
     const realm = makeMe.aNoteRealm.title("Retry me").please()
-    storage.refreshNoteRealm(realm)
+    noteStore.refreshNoteRealm(realm)
     mockSdkService(NoteController, "trashNote", realm)
-    await storage.trashNote(realm.id, {
+    await noteStore.trashNote(realm.id, {
       referenceHandling: "LEAVE_DEAD_LINKS",
     })
     mockSdkService(NoteController, "undoTrashNote", realm).mockResolvedValue(
       wrapSdkError("destination conflict")
     )
 
-    await expect(storage.undo(router)).rejects.toThrow("destination conflict")
-    expect(storage.peekUndo()).toMatchObject({
+    await expect(noteStore.undo(router)).rejects.toThrow("destination conflict")
+    expect(noteStore.peekUndo()).toMatchObject({
       type: "trash note",
       noteId: realm.id,
     })

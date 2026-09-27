@@ -237,9 +237,20 @@ accessor delegating to the new store until the second part.
 ### 7. Store tests prove only what components do not
 
 Type: Structure
-Status: planned
+Status: done
 Proof: slice 7 row above; `wc -l frontend/src/store/*.ts` shows each file
 ≤ 250 lines.
+
+Accepted proof: `CURSOR_DEV=true nix develop -c pnpm frontend:test tests/store tests/toolbars/NoteUndoButton.actions.spec.ts tests/components/notes/NoteTextContentUndo.spec.ts`
+passed 30 tests across six files; `CURSOR_DEV=true nix develop -c pnpm -C frontend exec vue-tsc --noEmit`
+passed. Source sizes remain 45, 6, 228, 245, 167. Four surviving spec files
+renamed to noteStore/noteUndo. Six duplicate cases removed: edit recording is
+observed by NoteTextContentUndo's real title edit; different-note recording and
+discard by NoteUndoButton.actions' two-note dialog sequence; create recording,
+recoverable trash request and notebook route by its create-undo example.
+Those setup calls exercise real recording, not mocked history arrays. The 21
+remaining store examples own distinct cache eviction, completion, sidebar,
+coalescing, placement and failed-undo observations. Refactor: no edits.
 
 Removes duplicate low-level tests (unit-testing skill: observe through
 high-level entry points). Remove each remaining `tests/store/` example that a
@@ -278,6 +289,8 @@ count.
   (slice 4); observer reused and registration confirmed by managed delivery.
 - Accepted execution-branch increment: `0914e0431a52b65e09d61b25328d2ad2d92c640e`
   (slice 5); observer reused and registration confirmed by managed delivery.
+- Accepted execution-branch increment: `a6b7e7da04c0aab235bd64cca0ba2e0bf9228691`
+  (slice 6); observer reused and registration confirmed by managed delivery.
 
 - Owner, 2026-09-27: delete the wiki-link re-save with nothing left behind: no
   replacement reload, no absence test, no historical note.
