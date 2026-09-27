@@ -139,7 +139,7 @@ is refused as drift.
 
 **Identity:** SEED-050#story-4
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/023-one-notebook-tree-model/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"4213a2e511a6f2eb833b7ac740f7a70b392778f81879a2a7d7d13405045cee2d","plan":"76ee1b124492c58e07dbee2cf33510d9fa97a5f4cbe45d316249da7008decf23"}}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/023-one-notebook-tree-model/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"e6161163959b0e22e3bce2e0d325b35ac717097dfd44eadf96c221ed26b4db1b","plan":"76ee1b124492c58e07dbee2cf33510d9fa97a5f4cbe45d316249da7008decf23"}}
 ```
 
 **Goal:** Developers read a folder's ancestry from one method on `Folder`
