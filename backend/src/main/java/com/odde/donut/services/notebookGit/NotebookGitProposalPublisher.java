@@ -109,6 +109,8 @@ public class NotebookGitProposalPublisher {
           notebookAttachmentContent);
     }
     bookSourceFileProtection.refuseChanging(notebook.getId(), files);
+    projection.requireMatchingAcceptedTree(
+        notebook, folders, storedNotes, proposal.repository(), acceptedHead);
     List<NotebookGitProposalTreeShape.ChangedDocument> documents =
         NotebookGitProposalTreeShape.classifyChangedDocuments(files);
     Timestamp publishedAt = testabilitySettings.getCurrentUTCTimestamp();
@@ -131,7 +133,7 @@ public class NotebookGitProposalPublisher {
           NotebookGitProposalTreeShape.classifyChangedDocuments(
               NotebookGitProposalFolderShape.residualOutside(files, relocation.get()));
       if (documents.isEmpty()) {
-        published = folderRelocation.apply(state, proposal, acceptedHead, relocation.get());
+        published = folderRelocation.apply(state, relocation.get());
         return proposalAcceptance.acceptMatchingProposedTree(published, proposal);
       }
       admitted =
@@ -143,15 +145,9 @@ public class NotebookGitProposalPublisher {
           admitted.documents(), relocation.get(), beforeRelocation, afterRelocation);
       published = state;
       if (!beforeRelocation.isEmpty()) {
-        projection.requireMatchingAcceptedTree(
-            notebook, folders, storedNotes, proposal.repository(), acceptedHead);
         published = documentApplication.apply(published, proposal, beforeRelocation, publishedAt);
-        published =
-            folderRelocation.applyAfterMatchedAcceptedTree(
-                published, proposal, acceptedHead, relocation.get());
-      } else {
-        published = folderRelocation.apply(published, proposal, acceptedHead, relocation.get());
       }
+      published = folderRelocation.apply(published, relocation.get());
       if (!afterRelocation.isEmpty()) {
         published =
             NotebookGitProposalRelocatedDocuments.applyUnderDestination(
@@ -167,14 +163,9 @@ public class NotebookGitProposalPublisher {
           NotebookGitProposalTreeShape.requireAdmittedShape(
               proposal.repository(), acceptedHead, proposal.mainHead(), documents);
       if (admitted.noteChanges().isEmpty() && admitted.documents().isEmpty()) {
-        projection.requireMatchingAcceptedTree(
-            notebook, folders, storedNotes, proposal.repository(), acceptedHead);
         return proposalAcceptance.acceptMatchingProposedTree(state, proposal, publishedAt);
       }
-      projection.requireMatchingAcceptedTree(
-          notebook, folders, storedNotes, proposal.repository(), acceptedHead);
-      published =
-          new NotebookGitStateLoader.LockedNotebookState(binding, notebook, folders, storedNotes);
+      published = state;
     }
     List<Note> proposedNotes = new ArrayList<>(published.storedNotes());
     // Deletions before additions so same-path deletion-gap recreation can replace the old identity.

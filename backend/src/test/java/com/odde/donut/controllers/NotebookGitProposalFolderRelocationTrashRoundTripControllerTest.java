@@ -26,8 +26,6 @@ import org.springframework.http.ResponseEntity;
 /**
  * Publishes an exact folder-subtree move into an existing {@code _trash} parent and back. Source
  * identities stay on the original folders and notes; eligibility follows the final ancestry.
- * Unrepresented empty descendants remain refused in {@link
- * NotebookGitProposalFolderRelocationEmptyDescendantControllerTest}.
  */
 class NotebookGitProposalFolderRelocationTrashRoundTripControllerTest
     extends NotebookGitWebContentControllerTestBase {

@@ -132,7 +132,7 @@ EmptyDescendant `rejectsAnExactFolderRelocationWhenASourceDescendantHasNoTracked
 ### 3. The live projection is checked against accepted main once, before any change
 
 Type: Behavior (drift is now reported before shape and placement refusals)
-Status: planned
+Status: done
 Proof: existing drift and relocation tests are green —
 `CURSOR_DEV=true nix develop -c pnpm backend:test_only --tests 'com.odde.donut.controllers.NotebookGitProjectionDriftControllerTest' --tests 'com.odde.donut.controllers.NotebookGitProposal*Relocation*' --tests 'com.odde.donut.controllers.NotebookGitProposalFolderPublicationSafetyControllerTest'`,
 then `--tests 'com.odde.donut.controllers.NotebookGit*'`.
@@ -152,6 +152,17 @@ refusals can fire only under drift
 delete each that became unreachable together with its test (for example
 `NotebookGitProposalFolderRelocationEmptyDescendantControllerTest`).
 
+Accepted proof: drift + relocation + publication-safety command 45 pass;
+`NotebookGit*` 442 pass, 2 skipped (pre-existing), rerun after refactor. The
+one drift check runs right after book-source protection. Deleted as
+unreachable under a matching projection (every folder row is represented, by
+content or `.keep`): unrepresented source, unrepresented empty source
+descendant, and unrepresented destination parent refusals, with their tests.
+Added `NotebookGitProjectionDriftControllerTest.rejectsAFolderRelocationWhenAWebCreationHasDriftedTheProjection`;
+re-seeded the README cases of `NotebookGitReservedFileRejectionControllerTest`
+(they relied on drift). Refactor: one placement check after ancestry, the
+`RepresentedFolderRelocation` record and `representedInTreeExcludingUnder` removed.
+
 ## Current decisions
 
 - Changed Markdown only: a proposed blob already in accepted history is not
@@ -166,3 +177,7 @@ delete each that became unreachable together with its test (for example
   first (`NotebookGitProposalFolderRelocationShapeControllerTest` "edited" case
   was made typed). Slices 2-3 should expect the same for changed untyped
   fixture notes; unchanged untyped fixture notes are no longer judged.
+- Slice 3: fixtures seeding accepted Git without matching rows now hit the
+  drift refusal before any later refusal, including non-relocation shape
+  refusals (reserved README). Slice 3 took about 8.5 minutes (over the 5-minute
+  target, under the limit) because of that hidden dependent.

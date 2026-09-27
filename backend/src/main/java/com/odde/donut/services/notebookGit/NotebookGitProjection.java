@@ -50,72 +50,8 @@ public class NotebookGitProjection {
     throw unrepresentedParentFolder(notePath);
   }
 
-  record RepresentedFolderRelocation(int sourceFolderId, Integer destParentFolderId) {}
-
-  /**
-   * Resolves the source Folder of an exact folder relocation. The source must be represented in the
-   * accepted tree.
-   */
-  int requireRepresentedRelocationSource(
-      List<PortableTreeFolderRow> folders,
-      Repository repository,
-      ObjectId acceptedHead,
-      NotebookGitProposalFolderShape.FolderRelocation relocation) {
-    return requireRepresentedFolderPath(
-        folders,
-        repository,
-        acceptedHead,
-        relocation.sourcePrefix() + "/",
-        relocation.sourcePrefix() + "/README.md");
-  }
-
-  boolean hasFolderAtPath(List<PortableTreeFolderRow> folders, String requiredFolderPath) {
-    return folderRowAtPath(folders, requiredFolderPath) != null;
-  }
-
-  /**
-   * Resolves a destination parent that already exists as a folder row. Notebook root is a valid
-   * destination parent. Nested parents must be represented in the accepted tree or by tip content
-   * so a parent added earlier in the range can receive the relocated source. Callers construct a
-   * dest parent that is absent from live folders.
-   */
-  Integer requireRepresentedDestinationParent(
-      List<PortableTreeFolderRow> folders,
-      Repository repository,
-      ObjectId acceptedHead,
-      ObjectId tipHead,
-      String destParentPrefix,
-      String destPrefix) {
-    if (destParentPrefix.isEmpty()) {
-      return null;
-    }
-    String parentPath = destParentPrefix + "/";
-    String pathForError = destPrefix + "/README.md";
-    PortableTreeFolderRow folder = requireFolderRowAtPath(folders, parentPath, pathForError);
-    if (NotebookGitAcceptedTree.representedInTree(
-            parentPath, NotebookGitAcceptedTree.readEntries(repository, acceptedHead))
-        || NotebookGitAcceptedTree.representedInTreeExcludingUnder(
-            parentPath,
-            NotebookGitAcceptedTree.readEntries(repository, tipHead),
-            destPrefix + "/")) {
-      return folder.id();
-    }
-    throw unrepresentedParentFolder(pathForError);
-  }
-
-  private Integer requireRepresentedFolderPath(
-      List<PortableTreeFolderRow> folders,
-      Repository repository,
-      ObjectId treeHead,
-      String requiredFolderPath,
-      String pathForError) {
-    PortableTreeFolderRow folder =
-        requireFolderRowAtPath(folders, requiredFolderPath, pathForError);
-    if (!NotebookGitAcceptedTree.representedInTree(
-        requiredFolderPath, NotebookGitAcceptedTree.readEntries(repository, treeHead))) {
-      throw unrepresentedParentFolder(pathForError);
-    }
-    return folder.id();
+  int folderIdAtPath(List<PortableTreeFolderRow> folders, String folderPath) {
+    return folderRowAtPath(folders, folderPath).id();
   }
 
   private static PortableTreeFolderRow requireFolderRowAtPath(
@@ -134,26 +70,6 @@ public class NotebookGitProjection {
         .filter(candidate -> requiredFolderPath.equals(prefixes.get(candidate.id())))
         .findFirst()
         .orElse(null);
-  }
-
-  void requireNoUnrepresentedEmptySourceDescendants(
-      List<PortableTreeFolderRow> folders,
-      Repository repository,
-      ObjectId acceptedHead,
-      int sourceFolderId) {
-    Map<Integer, String> prefixes = NotebookGitPortablePath.folderPrefixes(folders);
-    String sourcePath = prefixes.get(sourceFolderId);
-    List<PortableTreeEntry> accepted =
-        NotebookGitAcceptedTree.readEntries(repository, acceptedHead);
-    for (PortableTreeFolderRow folder : folders) {
-      String descendantPath = prefixes.get(folder.id());
-      if (descendantPath.equals(sourcePath) || !descendantPath.startsWith(sourcePath)) {
-        continue;
-      }
-      if (!NotebookGitAcceptedTree.representedInTree(descendantPath, accepted)) {
-        throw unrepresentedEmptyDescendant(descendantPath);
-      }
-    }
   }
 
   public Note requireOneNoteAtPath(List<Note> notes, String changedPath) {
@@ -188,15 +104,6 @@ public class NotebookGitProjection {
         HttpStatus.CONFLICT,
         "The notebook's current Portable content differs from accepted main; refresh the checkout"
             + " before publishing.");
-  }
-
-  private static ResponseStatusException unrepresentedEmptyDescendant(String descendantPath) {
-    return new ResponseStatusException(
-        HttpStatus.BAD_REQUEST,
-        "Descendant folder \""
-            + descendantPath
-            + "\" is not represented in accepted Portable content; every active descendant must"
-            + " have tracked content before the folder can be moved.");
   }
 
   static ResponseStatusException unrepresentedParentFolder(String notePath) {

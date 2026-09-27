@@ -57,32 +57,6 @@ class NotebookGitProposalFolderRelocationPlacementControllerTest
   }
 
   @Test
-  void rejectsAnExactFolderRelocationOntoAnInvisibleEmptySameNameContainer() throws Exception {
-    Notebook notebook = createGitBackedNotebook();
-    Folder archive =
-        makeMe.aFolder().notebook(notebook).name("Archive").readmeContent(README_BODY).please();
-    Folder emptyDest = makeMe.aFolder().parentFolder(archive).name("Topics").please();
-    Folder topics =
-        makeMe.aFolder().notebook(notebook).name("Topics").readmeContent(README_BODY).please();
-    NotebookGitBinding binding =
-        seedAcceptedBinding(
-            notebook,
-            List.of(
-                ofText("Topics/README.md", README),
-                ofText("Topics/A.md", NOTE),
-                ofText("Archive/README.md", README)));
-
-    ApiException exception =
-        publishRejectedAs(notebook, binding, moveTopicsUnderArchive(), ApiException.class);
-
-    assertThat(
-        exception.getErrorBody().getMessage(),
-        containsString(FolderSiblingNameValidation.DUPLICATE_SIBLING_NAME_HERE));
-    NotebookGitProposalFolderRelocationParentMap.assertUnchanged(
-        transactionManager, folderRepository, notebook, archive, emptyDest, topics);
-  }
-
-  @Test
   void rejectsAnExactFolderRelocationIntoTheSourceFolder() throws Exception {
     Notebook notebook = createGitBackedNotebook();
     Folder topics =
