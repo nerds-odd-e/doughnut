@@ -106,6 +106,16 @@ public class FolderConstructionService {
     return folder;
   }
 
+  /**
+   * The folder in {@code parentOrNull} named {@code name} (ignoring case) for a new entry to go
+   * into, created when no entry holds the name; a note or file holding it is refused.
+   */
+  public Folder folderToEnterOrCreate(Notebook notebook, Folder parentOrNull, DisplayName name) {
+    return folderSiblingNameValidation
+        .folderToEnter(notebook, parentOrNull, name)
+        .orElseGet(() -> createFolder(notebook, parentOrNull, name));
+  }
+
   private Folder findOrCreateFolder(
       Notebook notebook, Folder parentFolder, DisplayName displayName) {
     return folderSiblingNameValidation

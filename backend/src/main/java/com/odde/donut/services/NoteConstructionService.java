@@ -6,6 +6,7 @@ import com.odde.donut.algorithms.NoteContentTitleHeading;
 import com.odde.donut.algorithms.NoteLeadingFrontmatter;
 import com.odde.donut.controllers.dto.NoteCreationDTO;
 import com.odde.donut.controllers.dto.NoteRealm;
+import com.odde.donut.entities.DisplayName;
 import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
@@ -13,10 +14,9 @@ import com.odde.donut.entities.User;
 import com.odde.donut.entities.repositories.FolderRepository;
 import com.odde.donut.factoryServices.EntityPersister;
 import com.odde.donut.services.ai.NoteExtractionResult;
-import com.odde.donut.services.wikidataApis.WikidataIdWithApi;
 import com.odde.donut.testability.TestabilitySettings;
 import com.odde.donut.validators.AuthoredNoteContent;
-import java.io.IOException;
+import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -35,6 +35,7 @@ public class NoteConstructionService {
   private final CanonicalDonutOrigin canonicalDonutOrigin;
   private final AuthoredNoteDocumentPersistence authoredNoteDocumentPersistence;
   private final NoteTitleNameRule noteTitleNameRule;
+  private final FolderConstructionService folderConstructionService;
 
   @Autowired
   public NoteConstructionService(
@@ -47,7 +48,8 @@ public class NoteConstructionService {
       NoteFactory noteFactory,
       CanonicalDonutOrigin canonicalDonutOrigin,
       AuthoredNoteDocumentPersistence authoredNoteDocumentPersistence,
-      NoteTitleNameRule noteTitleNameRule) {
+      NoteTitleNameRule noteTitleNameRule,
+      FolderConstructionService folderConstructionService) {
     this.authorizationService = authorizationService;
     this.testabilitySettings = testabilitySettings;
     this.folderRepository = folderRepository;
@@ -58,6 +60,7 @@ public class NoteConstructionService {
     this.canonicalDonutOrigin = canonicalDonutOrigin;
     this.authoredNoteDocumentPersistence = authoredNoteDocumentPersistence;
     this.noteTitleNameRule = noteTitleNameRule;
+    this.folderConstructionService = folderConstructionService;
   }
 
   private Note persistNoteContent(Note note, String content) {
@@ -88,6 +91,11 @@ public class NoteConstructionService {
                   () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Folder not found."));
       folder.requireInNotebook(notebook);
     }
+    if (noteCreation.getChildFolderName() != null) {
+      folder =
+          folderConstructionService.folderToEnterOrCreate(
+              notebook, folder, new DisplayName(noteCreation.getChildFolderName()));
+    }
     noteTitleNameRule.requireTitleFree(notebook, folder, noteCreation.getNewTitle());
     Note note = noteFactory.create(notebook, folder, noteCreation.getNewTitle());
     if (noteCreation.getContent() != null) {
@@ -104,24 +112,14 @@ public class NoteConstructionService {
     return noteRealmService.build(note, user);
   }
 
-  /** Synchronous construction: no external enrichment, so no IO/interruption contract. */
-  public NoteRealm createRootNote(Notebook notebook, NoteCreationDTO noteCreation, User user) {
-    Note note = buildNote(notebook, noteCreation);
-    return finalizeAndRespond(note, user);
-  }
-
-  public NoteRealm createRootNoteWithWikidataService(
+  public NoteRealm createRootNote(
       Notebook notebook,
       NoteCreationDTO noteCreation,
       User user,
-      WikidataIdWithApi wikidataIdWithApi)
-      throws InterruptedException, IOException {
+      Optional<String> wikidataDescription) {
     Note note = buildNote(notebook, noteCreation);
-    if (wikidataIdWithApi != null) {
-      wikidataIdWithApi
-          .fetchWikidataDescription()
-          .ifPresent(description -> prependAndPersistWikidataDescription(note, description));
-    }
+    wikidataDescription.ifPresent(
+        description -> prependAndPersistWikidataDescription(note, description));
     return finalizeAndRespond(note, user);
   }
 

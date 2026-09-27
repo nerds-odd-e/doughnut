@@ -29,59 +29,6 @@ different frontmatter edits, each already with one owner.
 
 ## Story Decomposition
 
-<a id="story-2"></a>
-
-### Adding a relationship on the web places its note through the server in one accepted change
-
-**Identity:** SEED-050#story-2
-```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/021-relationship-notes-accepted-in-one-change/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"4213a2e511a6f2eb833b7ac740f7a70b392778f81879a2a7d7d13405045cee2d","plan":"bc06f312f565517c394c884a6beacef1a97e5aefa2c00794fed6b906c266505f"}}
-```
-
-**Goal:** A notebook owner who adds a relationship on the web gets the note
-in the chosen folder, also when that folder's name differs only in letter
-case, and the note and any new folder reach accepted Git as one commit, so
-clone, pull and publish see them. Today web-created relationship notes and
-Wikidata-assisted notes never reach accepted Git, and the next local publish
-is refused as drift.
-
-**Scope:**
-
-- Web creation of relationship notes and Wikidata-assisted notes goes through
-  the accepted change like every other note creation
-  (`WebNoteCreationService` bypasses it for any non-`Note` type and for
-  Wikidata). The Wikidata lookup happens before the notebook lock.
-- Note creation takes an optional child-folder name, found ignoring case or
-  created in the same change, through the one name owner. The server stays
-  free of relationship-specific placement (as decided when
-  `RelationshipNotePlacement` was removed).
-- The relationship dialog stops listing and creating folders itself
-  (`frontend/src/utils/relationshipFolderResolve.ts`).
-- The 10 MiB limit on new attachment payloads is defined once
-  (`PictureFile`, `NotebookGitAttachmentSizeAdmission`).
-- Unchanged: the audio upload limit (a different concept) and the Book
-  source limit (a documented exception).
-- Dropped (owner, 2026-09-27): moving the picture upload and Book attach
-  checks under the lock (a check inside the lock still reads the snapshot the
-  transaction already took, and the database already refuses the same-name
-  race loudly); one "first free name" operation (there is one numbering
-  algorithm; the four callers' predicates differ legitimately).
-- Deferred: AI "create extracted note" also bypasses the accepted change;
-  undo removing a folder created for the note; retiring the exact-match
-  folder sibling check on folder creation and publish.
-
-**Key examples:**
-
-1. `Europe` holds folder `Relations` → add a relationship from
-   `Europe/Paris` with the default placement → the note is created in
-   `Relations`; no new folder; one commit.
-2. `Europe` holds no `relations` folder → the folder and the note are created
-   and the accepted head advances once.
-3. `Europe` holds a file named `relations` → refused naming
-   `Europe/relations`; no folder, no note, head unchanged.
-4. A relationship note created at the root → the accepted head contains it,
-   and a following local publish is not refused as drift.
-
 <a id="story-4"></a>
 
 ### The notebook tree has one model in code
@@ -202,3 +149,42 @@ misleading developers.
    with that path.
 3. Uploading `a.txt` as a note image → refused "Cannot upload a.txt: an
    image must be a png, jpg, jpeg, gif or webp file." (today "a picture").
+
+<a id="story-8"></a>
+
+### The name owner holds the folder-entry rule once
+
+**Identity:** SEED-050#story-8
+```json dough-story-state
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/026-one-folder-entry-rule/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"b84184e408cf7e095f34f94be26a8f7a10af6dfc67c96a79ca69008d25030a65","plan":"302229bbbfa75f7c286c305636ea4e7933723a3508e36b2efc812298a82a2c9f"}}
+```
+
+**Goal:** Correction of SEED-050#story-2 (provenance
+`aef1e27b77:.planning/slice-plans/021-relationship-notes-accepted-in-one-change/PLAN.md`,
+commits f8087d5845, c0a9d8fa0e, aaedc57987, d2fb2c7934, 06ff81b916 and
+aef1e27b77). Developers who next change folder naming find one rule for
+"enter the folder holding this name (ignoring case), else refuse a note or
+file holding it", used by both note creation and folder move/merge, and tests
+that assert only what the product does, so the rule is not copied a third
+time.
+
+**Scope:**
+
+- Required: `FolderSiblingNameValidation.mergeTargetOrRefuse` delegates its
+  merge branch to `folderToEnter` (which takes excluded folder ids); net fewer
+  lines. `AddRelationship.spec.ts` drops the spies and assertions that only
+  check removed folder calls are absent.
+  `NotebookGitNoteCreationFolderControllerTest` is back under the 250-line
+  file check.
+- Preserved: story 2's key examples and their tests; merge, merge refusal and
+  no-merge clash on folder move; every refusal message and error type.
+- Excluded: the trash path's private `FolderConstructionService.findOrCreateFolder`
+  (stays, as plan 021 decided); one composed folder-name validation
+  constraint across `FolderCreationRequest`, `FolderRenameRequest` and
+  `NoteCreationDTO`.
+
+**Plan:** [026-one-folder-entry-rule](../slice-plans/026-one-folder-entry-rule/PLAN.md)
+
+**Effort hypothesis:** S — high confidence.
+
+**Depends on:** none (SEED-050#story-2 is delivered).

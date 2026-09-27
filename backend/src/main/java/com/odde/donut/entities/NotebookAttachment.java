@@ -27,6 +27,9 @@ import org.springframework.web.server.ResponseStatusException;
 @Table(name = "notebook_attachment")
 public class NotebookAttachment extends EntityIdentifiedByIdOnly {
 
+  /** Inclusive size limit for a newly admitted attachment payload (10 MiB). */
+  public static final long NEW_PAYLOAD_LIMIT_BYTES = 10 * 1024 * 1024;
+
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "notebook_id", nullable = false)
   @Getter

@@ -8,12 +8,16 @@ import static org.mockito.ArgumentMatchers.any;
 import com.odde.donut.controllers.dto.*;
 import com.odde.donut.entities.*;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
+import com.odde.donut.services.notebookGit.NotebookGitProposalBlobText;
 import com.odde.donut.testability.GitBundleTestReader;
-import com.odde.donut.testability.GitBundleTestReader.AcceptedHistory;
+import com.odde.donut.testability.GitBundleTestReader.SingleParentGitCommit;
 import com.odde.donut.testability.MakeMeWithoutDB;
 import java.io.IOException;
 import java.net.URI;
 import org.apache.logging.log4j.util.Strings;
+import org.eclipse.jgit.internal.storage.dfs.DfsRepositoryDescription;
+import org.eclipse.jgit.internal.storage.dfs.InMemoryRepository;
+import org.eclipse.jgit.lib.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -72,35 +76,40 @@ class NotebookRootNoteCreationWithWikidataTests extends NotebookControllerTestBa
     }
 
     @Test
-    void wikidataAssistedRootCreateDoesNotAdvanceAcceptedHead() throws Exception {
+    void wikidataAssistedRootCreateIsAcceptedInOneCommit() throws Exception {
       NotebookCreationRequest request = new NotebookCreationRequest();
       request.setNewTitle("Wikidata Git Notebook");
       Notebook gitNotebook =
           notebookRepository
               .findById(controller.createNotebook(request).notebook().getId())
               .orElseThrow();
-      NotebookGitBinding accepted =
-          notebookGitBindingRepository.findByNotebook_Id(gitNotebook.getId()).orElseThrow();
-      AcceptedHistory acceptedHistoryBefore = acceptedHistory(gitNotebook);
-      Mockito.when(httpClientAdapter.getResponseString(any()))
-          .thenReturn(new MakeMeWithoutDB().wikidataEntityJson().entityId("Q12345").please());
+      ObjectId acceptedHead =
+          ObjectId.fromString(
+              notebookGitBindingRepository
+                  .findByNotebook_Id(gitNotebook.getId())
+                  .orElseThrow()
+                  .getAcceptedGitObjectId());
+      mockWikidataWBGetEntity(
+          "Q334",
+          makeMe
+              .wikidataClaimsJson("Q334")
+              .globeCoordinate("{\"latitude\":1.3,\"longitude\":103.8}", "globecoordinate")
+              .please());
       NoteCreationDTO creation = new NoteCreationDTO();
       creation.setNewTitle("Wikidata Root");
-      creation.setContent("---\nwikidata_id: Q12345\n---\n");
+      creation.setContent("---\nwikidata_id: Q334\n---\n");
 
-      NoteRealm response = controller.createNoteAtNotebookRoot(gitNotebook, creation);
+      controller.createNoteAtNotebookRoot(gitNotebook, creation);
 
-      assertThat(response.getNote().getContent(), containsString("wikidata_id: Q12345"));
-      NotebookGitBinding after =
-          notebookGitBindingRepository.findByNotebook_Id(gitNotebook.getId()).orElseThrow();
-      assertThat(after.getAcceptedGitObjectId(), is(accepted.getAcceptedGitObjectId()));
-      assertThat(acceptedHistory(gitNotebook), equalTo(acceptedHistoryBefore));
-    }
-
-    /** The accepted history the notebook's own download boundary currently serves. */
-    private AcceptedHistory acceptedHistory(Notebook notebook) throws Exception {
-      return GitBundleTestReader.fetchAcceptedHistory(
-          controller.downloadNotebookGitBundle(notebook).getBody());
+      byte[] downloaded = controller.downloadNotebookGitBundle(gitNotebook).getBody();
+      try (InMemoryRepository repository = new InMemoryRepository(new DfsRepositoryDescription())) {
+        SingleParentGitCommit accepted =
+            GitBundleTestReader.fetchSingleParentCommit(repository, downloaded);
+        assertThat(accepted.parent(), is(acceptedHead));
+        assertThat(
+            NotebookGitProposalBlobText.readUtf8(repository, accepted.head(), "Wikidata Root.md"),
+            containsString("Location: 1.3'N, 103.8'E"));
+      }
     }
 
     @Nested

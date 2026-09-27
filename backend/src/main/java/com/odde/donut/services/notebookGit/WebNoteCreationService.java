@@ -1,6 +1,5 @@
 package com.odde.donut.services.notebookGit;
 
-import com.odde.donut.algorithms.NoteConceptType;
 import com.odde.donut.controllers.dto.NoteCreationDTO;
 import com.odde.donut.controllers.dto.NoteRealm;
 import com.odde.donut.entities.Notebook;
@@ -11,6 +10,7 @@ import com.odde.donut.services.NoteConstructionService;
 import com.odde.donut.services.wikidataApis.WikidataIdWithApi;
 import com.odde.donut.testability.TestabilitySettings;
 import java.io.IOException;
+import java.util.Optional;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -37,15 +37,14 @@ public class WebNoteCreationService {
       User user,
       WikidataIdWithApi wikidataIdWithApi)
       throws InterruptedException, IOException, UnexpectedNoAccessRightException {
-    if (wikidataIdWithApi != null || !NoteConceptType.isOrdinary(noteCreation.getContent())) {
-      return noteConstructionService.createRootNoteWithWikidataService(
-          notebook, noteCreation, user, wikidataIdWithApi);
-    }
+    Optional<String> wikidataDescription =
+        wikidataIdWithApi == null ? Optional.empty() : wikidataIdWithApi.fetchWikidataDescription();
     return acceptedWebChangeService.apply(
         notebook.getId(),
         () -> {
           Notebook liveNotebook = notebookRepository.findById(notebook.getId()).orElseThrow();
-          return noteConstructionService.createRootNote(liveNotebook, noteCreation, user);
+          return noteConstructionService.createRootNote(
+              liveNotebook, noteCreation, user, wikidataDescription);
         },
         realm -> "Add note: " + realm.getNote().getTitle(),
         testabilitySettings.getCurrentUTCTimestamp());

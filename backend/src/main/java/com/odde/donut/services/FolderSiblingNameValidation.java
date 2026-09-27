@@ -154,6 +154,20 @@ public class FolderSiblingNameValidation {
     return folderHolding(notebook, parentOrNull, folder.getName(), excluded);
   }
 
+  /**
+   * The folder in {@code parentOrNull} named {@code name} (ignoring case) for a new entry to go
+   * into; empty when no entry holds the name. A note or file holding it is {@code
+   * RESOURCE_CONFLICT} naming its path.
+   */
+  public Optional<Folder> folderToEnter(Notebook notebook, Folder parentOrNull, DisplayName name) {
+    Optional<Folder> folder = folderHolding(notebook, parentOrNull, name.value(), Set.of());
+    if (folder.isEmpty()) {
+      entryHolding(notebook, parentOrNull, name.value(), Set.of())
+          .ifPresent(FolderSiblingNameValidation::refuseTaken);
+    }
+    return folder;
+  }
+
   /** The first name from {@code requestedName} that no entry in {@code parentOrNull} holds. */
   public DisplayName firstFreeFolderName(
       Notebook notebook, Folder parentOrNull, DisplayName requestedName, int excludedFolderId) {

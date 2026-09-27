@@ -551,6 +551,10 @@ export type NoteCreationDto = {
     referenceHandling?: 'UPDATE_VISIBLE_TEXT' | 'KEEP_VISIBLE_TEXT';
     folderId?: number;
     content?: string;
+    /**
+     * When set, the note goes into the child folder of this name (ignoring letter case) under folderId or the notebook root, created in the same change when absent.
+     */
+    childFolderName?: string;
 };
 
 export type BlockDepthSuggestion = {

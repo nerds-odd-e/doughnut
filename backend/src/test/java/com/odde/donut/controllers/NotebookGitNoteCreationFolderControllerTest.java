@@ -3,12 +3,16 @@ package com.odde.donut.controllers;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import com.odde.donut.controllers.dto.ApiError;
 import com.odde.donut.controllers.dto.FolderCreationRequest;
 import com.odde.donut.controllers.dto.NoteCreationDTO;
 import com.odde.donut.controllers.dto.NoteRealm;
@@ -17,6 +21,7 @@ import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.NotebookGitBinding;
 import com.odde.donut.entities.repositories.FolderRepository;
+import com.odde.donut.exceptions.ApiException;
 import com.odde.donut.testability.GitBundleTestReader;
 import com.odde.donut.testability.GitBundleTestReader.AcceptedHistory;
 import org.eclipse.jgit.internal.storage.dfs.DfsRepositoryDescription;
@@ -143,6 +148,78 @@ class NotebookGitNoteCreationFolderControllerTest
     AcceptedHistory after = acceptedHistory(notebook);
     assertThat(after.parents(), equalTo(acceptedHistoryBefore.commits()));
     assertThat(after.tipPaths(), hasItem("Unsynchronized/Inside Drifted Folder.md"));
+  }
+
+  @Test
+  void childFolderNameReusesTheFolderHoldingItIgnoringCaseInOneCommit() throws Exception {
+    Notebook notebook = createGitBackedNotebook();
+    Folder europe = makeMe.aFolder().notebook(notebook).name("Europe").please();
+    Folder relations = makeMe.aFolder().parentFolder(europe).name("Relations").please();
+    makeMe.aNote().folder(relations).title("Existing").please();
+    snapshotCurrentPortableTree(notebook);
+    AcceptedHistory before = acceptedHistory(notebook);
+    NoteCreationDTO creation = titleOnly("Paris to France");
+    creation.setFolderId(europe.getId());
+    creation.setChildFolderName("relations");
+
+    NoteRealm result = controller.createNoteAtNotebookRoot(notebook, creation);
+
+    Note created = noteRepository.findById(result.getId()).orElseThrow();
+    assertThat(created.getFolder().getId(), is(relations.getId()));
+    assertThat(
+        folderRepository.findChildFoldersNamedIgnoringCase(
+            notebook.getId(), europe.getId(), "relations"),
+        hasSize(1));
+    AcceptedHistory after = acceptedHistory(notebook);
+    assertThat(after.parents(), equalTo(before.commits()));
+    assertThat(after.tipPaths(), hasItem("Europe/Relations/Paris to France.md"));
+  }
+
+  @Test
+  void childFolderNameCreatesTheFolderWithTheNoteInOneCommit() throws Exception {
+    Notebook notebook = createGitBackedNotebook();
+    Folder europe = makeMe.aFolder().notebook(notebook).name("Europe").please();
+    makeMe.aNote().folder(europe).title("Paris").please();
+    snapshotCurrentPortableTree(notebook);
+    AcceptedHistory before = acceptedHistory(notebook);
+    NoteCreationDTO creation = titleOnly("Paris to France");
+    creation.setFolderId(europe.getId());
+    creation.setChildFolderName("relations");
+
+    NoteRealm result = controller.createNoteAtNotebookRoot(notebook, creation);
+
+    Folder created = noteRepository.findById(result.getId()).orElseThrow().getFolder();
+    assertThat(created.getName(), is("relations"));
+    assertThat(created.getParentFolder().getId(), is(europe.getId()));
+    AcceptedHistory after = acceptedHistory(notebook);
+    assertThat(after.parents(), equalTo(before.commits()));
+    assertThat(after.tipPaths(), hasItem("Europe/relations/Paris to France.md"));
+  }
+
+  @Test
+  void childFolderNameHeldByAFileIsRefusedWithoutAnyChange() throws Exception {
+    Notebook notebook = createGitBackedNotebook();
+    Folder europe = makeMe.aFolder().notebook(notebook).name("Europe").please();
+    makeMe.anAttachment("relations").in(europe).please();
+    snapshotCurrentPortableTree(notebook);
+    AcceptedBinding accepted = acceptedBinding(notebook);
+    long notesBefore = noteRepository.count();
+    NoteCreationDTO creation = titleOnly("Paris to France");
+    creation.setFolderId(europe.getId());
+    creation.setChildFolderName("relations");
+
+    ApiException ex =
+        assertThrows(
+            ApiException.class, () -> controller.createNoteAtNotebookRoot(notebook, creation));
+
+    assertThat(ex.getErrorBody().getErrorType(), equalTo(ApiError.ErrorType.RESOURCE_CONFLICT));
+    assertThat(ex.getErrorBody().getMessage(), containsString("Europe/relations"));
+    assertBindingUnchanged(notebook, accepted);
+    assertThat(
+        folderRepository.findChildFoldersNamedIgnoringCase(
+            notebook.getId(), europe.getId(), "relations"),
+        empty());
+    assertThat(noteRepository.count(), is(notesBefore));
   }
 
   @Test

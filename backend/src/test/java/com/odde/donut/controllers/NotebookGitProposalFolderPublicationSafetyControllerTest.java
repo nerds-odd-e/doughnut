@@ -7,7 +7,6 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 
 import com.odde.donut.algorithms.FrontmatterNoteLevel;
-import com.odde.donut.controllers.dto.NoteCreationDTO;
 import com.odde.donut.controllers.dto.NoteUpdateContentDTO;
 import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.Note;
@@ -139,14 +138,7 @@ class NotebookGitProposalFolderPublicationSafetyControllerTest
   @Test
   void refusesAComposedProposalWhenLiveProjectionHasDrifted() throws Exception {
     LearnedNotebook fixture = boundNotebookWithLearnedNote();
-    NoteCreationDTO webCreation = new NoteCreationDTO();
-    webCreation.setNewTitle("addition");
-    webCreation.setContent(
-        "---\ntype: Relationship\nsource: \"[[A]]\"\ntarget: \"[[B]]\"\n---\nweb content");
-    Note occupied =
-        noteRepository
-            .findById(controller.createNoteAtNotebookRoot(fixture.notebook(), webCreation).getId())
-            .orElseThrow();
+    Note occupied = makeMe.aNote().notebook(fixture.notebook()).title("addition").please();
     byte[] proposalBytes =
         proposalBundleBytes(
             fixture.binding(),
