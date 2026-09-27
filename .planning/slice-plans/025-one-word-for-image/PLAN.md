@@ -24,19 +24,21 @@ and E2E phrases to "image"; add the ADR line.
 Excluded: renaming Attachment; merging the endpoints; the upload endpoint
 `POST /api/notes/{note}/images`.
 
-Starts after SEED-050#story-2 (plan 021), which changes `PictureFile`'s size
-limit and the picture upload, and after SEED-050#story-4 (plan 023), which
-edits `MovedNotePicture` and names its test; plan 024 edits
-`docs/note-content-saving.md` first. Re-read the starting facts then.
+SEED-050#story-2 (plan 021) and SEED-050#story-4 (plan 023) have landed;
+plan 024 (SEED-050#story-5) is finishing and also edits
+`docs/notebook-git-attachments.md` and `docs/note-content-saving.md`, so
+slice 4 rebases onto it.
 
-## Starting facts (checked 2026-09-27 at `d9abdcc2eb`)
+## Starting facts (rechecked 2026-09-27 at `3d4d6055c0`)
 
 Paths under `backend/src/main/java/com/odde/donut/`.
 
 - Picture identifiers: `services/notebookAttachment/PictureFile`,
   `controllers/InlinePicture`, `services/MovedNotePicture` (and
   `placeWithPicture` in `NoteMoveService`), `controllers/dto/NotebookAttachmentRealm.picture`,
-  `services/notebookGit/WebNoteImageUploadService`.
+  `services/notebookGit/WebNoteImageUploadService`. `NoteMoveService` also
+  names picture in a field, constructor parameter and javadoc; `PictureFile`
+  now uses `NotebookAttachment.NEW_PAYLOAD_LIMIT_BYTES`.
 - Endpoints: `GET /api/notes/{note}/attachment-image?path=` →
   `NoteAttachmentImageController.showAttachmentImage` (the note's authored
   `image:` path, used by `frontend/src/components/notes/widgets/ShowImage.vue`);
@@ -44,7 +46,7 @@ Paths under `backend/src/main/java/com/odde/donut/`.
   `NotebookAttachmentController.showAttachmentPicture` (used by
   `frontend/src/pages/AttachmentPage.vue`). Only the frontend calls them.
 - Messages: "Cannot upload <name>: a picture must be a png, jpg, jpeg, gif or
-  webp file." (`PictureFile:36`), "… already exists; rename the picture and
+  webp file." (`PictureFile:38`), "… already exists; rename the picture and
   upload it again" (`WebNoteImageUploadService:104`), "Not a raster picture."
   (`InlinePicture:24`).
 - No test asserts the three messages: `NoteControllerUploadNoteImageTests:181`
@@ -52,7 +54,7 @@ Paths under `backend/src/main/java/com/odde/donut/`.
   only the path, `NoteAttachmentImageControllerTest:83` only the 415 status.
 - API text: OpenAPI summaries and descriptions at
   `NoteAttachmentImageController:39,42`, `NotebookAttachmentController:86-87`,
-  `NotebookAttachmentRealm:13`. Frontend: `pictureSrc` and the CSS class
+  `NotebookAttachmentRealm:14`, repeated in the generated `open_api_docs.yaml`. Frontend: `pictureSrc` and the CSS class
   `attachment-picture` (`AttachmentPage.vue:14,73,107`). The generated
   `showAttachmentImage` / `ShowAttachmentImageData` is today the note
   endpoint (`ShowImage.vue:35`); URL assertions at `NoteShow.spec.ts:144` and
@@ -60,7 +62,19 @@ Paths under `backend/src/main/java/com/odde/donut/`.
 - Test names saying picture: nested `class Picture` and
   `aPictureFileIsMarkedAsAPicture` in `NotebookAttachmentControllerTest`
   (`:142`, `:84`), methods in `NoteControllerUploadNoteImageTests`,
-  `choosePicture` in `NoteShowPage.imageUpload.spec.ts:47`.
+  `choosePicture` in `NoteShowPage.imageUpload.spec.ts:47`. Also:
+  `servesAPictureFileInline…` and `nonReaderGetsNoPageDownloadOrPicture`
+  (`NotebookAttachmentControllerTest`), `servesAPictureInTheNotesFolder…`
+  (`NoteAttachmentImageControllerTest:50`), the move test's picture names
+  (including the new `aRootPictureAnotherRootNoteUsesIsCopiedNotMoved`),
+  `rawHistoryStaysReadableWhileANewPictureIsPublished`
+  (`NotebookGitAttachmentRawHistoryControllerTest`),
+  `uploadingANotePictureAddsItsFile…` (`NotebookGitDerivedTreeOracleControllerTest`),
+  a `picture` variable in `NotebookGitWebAttachmentDeleteControllerTest`, and
+  test titles in `NoteShow.spec.ts:140` and `AttachmentPage.spec.ts`.
+- Kept: historical Flyway migrations (`picture_url`,
+  `V300000347__drop_book_and_picture_bytes`), fixture data such as a
+  "Pictures" folder or "picture.bin", and the recall picture quiz.
 - Docs and plans: `docs/notebook-git-attachments.md`,
   `docs/note-content-saving.md:62,91`, `.planning/NORTH-STAR.md`
   (`:38-39`, `:56`, `:99`). E2E page object `expectPicture`
@@ -92,8 +106,8 @@ stays green.
 Change: `PictureFile` → `ImageFile`, `InlinePicture` → `InlineImage`,
 `MovedNotePicture` → `MovedNoteImage`, `placeWithPicture` → `placeWithImage`,
 and the move test class `NotebookGitWebNoteMovePictureControllerTest` →
-`NotebookGitWebNoteMoveImageControllerTest`; test names in the touched
-backend tests follow the rename.
+`NotebookGitWebNoteMoveImageControllerTest`; picture-named backend tests,
+variables and javadoc listed in the starting facts follow the rename.
 
 ### 2. One image endpoint family
 
@@ -110,7 +124,8 @@ Change: rename both controller methods before generating —
 `showAttachmentImage`; the realm field `picture` becomes `image`; OpenAPI
 summaries and descriptions say image; `ShowImage.vue` switches to
 `ShowNoteImageData`; `AttachmentPage.vue`'s `pictureSrc` and
-`attachment-picture` follow; update the URL assertions and `choosePicture`.
+`attachment-picture` follow; update the URL assertions, `choosePicture` and the frontend test
+titles.
 
 ### 3. Users read "image" in refusals
 

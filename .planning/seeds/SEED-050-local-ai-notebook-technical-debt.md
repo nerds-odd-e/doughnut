@@ -76,7 +76,7 @@ Git alone decides what a pull replays.
 
 **Identity:** SEED-050#story-7
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/025-one-word-for-image/PLAN.md","assessment":"not-ready","reasons":["Waits for SEED-050#story-2 (plan 021) and SEED-050#story-4 (plan 023), which change PictureFile, the picture upload and MovedNotePicture; re-read the starting facts afterwards."],"basis":{"document":"4213a2e511a6f2eb833b7ac740f7a70b392778f81879a2a7d7d13405045cee2d","plan":"f3029c04ddbe47d94ba6f7126596694cf8845022771158ea06bca40f5a1d49e2"}}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/025-one-word-for-image/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"bacae6f90ae97410c39bd1affdb92c4c6ee7e2f2ecebfccd12758e6d5b7ad994","plan":"4b2be11412ad113af679736da97f8b106f9496f828c613401a189efe06798189"}}
 ```
 
 **Goal:** New work copies one name per concept: Attachment and Image in code,
