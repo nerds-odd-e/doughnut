@@ -172,8 +172,20 @@ the cache and sidebar.
 ### 5. Undo lives in one module
 
 Type: Structure
-Status: planned
+Status: done
 Proof: slice 5 row above.
+
+Accepted proof: `CURSOR_DEV=true nix develop -c pnpm frontend:test tests/toolbars/NoteUndoButton tests/toolbars/GlobalBar.spec.ts tests/components/notes/NoteTextContentUndo.spec.ts tests/store`
+passed 57 tests across nine files; `CURSOR_DEV=true nix develop -c pnpm -C frontend exec vue-tsc --noEmit`
+passed. `CURSOR_DEV=true nix develop -c pnpm cy:run --spec e2e_test/features/note_creation_and_update/note_edit.feature,e2e_test/features/note_creation_and_update/note_creation.feature`
+passed 21 scenarios. Toolbar actions observe edit/trash/create routes and
+discard updates; store assertions retain edit coalescing and failed trash-undo
+history. Move reversal preserves the inspected slice-3 request target, cache
+refresh, sidebar and route sequence, reusing its move E2E observation.
+Refactor: no edits; shared HTTP semantics remain in requests, with separate
+forward and reverse orchestration as the owner-approved single split requires.
+An unnecessary E2E repeat was already launched before equivalence was established;
+both runs passed, with no further repetition.
 
 Removes scattered undo. `store/noteUndo.ts` holds the history (explicitly
 reactive state), the record types, recording helpers, and one `undoLast()`.
@@ -246,6 +258,8 @@ count.
 - Accepted execution-branch increment: `d697a1326b572dea3e33585507f9db0e17bbc72a`
   (slice 3 and autosave test repair); observer registration confirmed. Delivered
   CI failure sequence 1 acknowledged after diagnosis and repair publication.
+- Accepted execution-branch increment: `743d9fcea5c0a5c79d7a5ab8e3144ce41f2cbda2`
+  (slice 4); observer reused and registration confirmed by managed delivery.
 
 - Owner, 2026-09-27: delete the wiki-link re-save with nothing left behind: no
   replacement reload, no absence test, no historical note.

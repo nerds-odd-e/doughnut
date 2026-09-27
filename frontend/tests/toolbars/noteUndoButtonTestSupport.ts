@@ -1,6 +1,6 @@
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
 import type { NoteRealm } from "@generated/donut-backend-api"
-import NoteEditingHistory from "@/store/NoteEditingHistory"
+import type NoteUndo from "@/store/noteUndo"
 import createNoteStorage from "@/store/createNoteStorage"
 import makeMe from "donut-test-fixtures/makeMe"
 import helper from "@tests/helpers"
@@ -10,14 +10,15 @@ import NoteUndoButton from "@/components/toolbars/NoteUndoButton.vue"
 
 export { mockedPush } from "./noteUndoButtonMocks"
 
-export let noteEditingHistory: NoteEditingHistory
+export let noteEditingHistory: NoteUndo
 
 export function setupNoteUndoButtonTests() {
   beforeEach(() => {
     vi.clearAllMocks()
-    noteEditingHistory = new NoteEditingHistory()
     const storageAccessor = useStorageAccessor()
-    storageAccessor.value = createNoteStorage(noteEditingHistory)
+    const storage = createNoteStorage()
+    noteEditingHistory = storage.noteUndo
+    storageAccessor.value = storage
   })
 }
 

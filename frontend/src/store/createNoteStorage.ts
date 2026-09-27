@@ -1,10 +1,11 @@
-import type { HistoryRecord } from "./NoteEditingHistory"
-import NoteEditingHistory from "./NoteEditingHistory"
+import type { HistoryRecord } from "./noteUndo"
+import NoteUndo from "./noteUndo"
 import type NoteStorage from "./NoteStorage"
 import { StorageImplementation } from "./NoteStorage"
 import StoredApiCollection from "./StoredApiCollection"
 
 interface StorageAccessor extends NoteStorage {
+  noteUndo: NoteUndo
   storedApi(): StoredApiCollection
   peekUndo(): null | HistoryRecord
   discardUndo(): void
@@ -14,36 +15,24 @@ class AccessorImplementation
   extends StorageImplementation
   implements StorageAccessor
 {
-  noteEditingHistory: NoteEditingHistory
+  noteUndo = new NoteUndo(this)
 
-  constructor(noteEditingHistory?: NoteEditingHistory) {
-    super()
-    if (noteEditingHistory) {
-      this.noteEditingHistory = noteEditingHistory
-    } else {
-      this.noteEditingHistory = new NoteEditingHistory()
-    }
+  peekUndo() {
+    return this.noteUndo.peekUndo() ?? null
   }
 
-  peekUndo(): HistoryRecord | null {
-    return this.noteEditingHistory.peekUndo() as HistoryRecord
+  storedApi() {
+    return new StoredApiCollection(this.noteUndo, this)
   }
 
-  storedApi(): StoredApiCollection {
-    return new StoredApiCollection(this.noteEditingHistory, this)
-  }
-
-  discardUndo(): void {
-    this.noteEditingHistory.popUndoHistory()
+  discardUndo() {
+    this.noteUndo.discardUndo()
   }
 }
 
-function createNoteStorage(
-  noteEditingHistory?: NoteEditingHistory
-): StorageAccessor {
-  return new AccessorImplementation(noteEditingHistory)
+function createNoteStorage(): StorageAccessor {
+  return new AccessorImplementation()
 }
 
 export default createNoteStorage
 export type { StorageAccessor }
-export { NoteEditingHistory }

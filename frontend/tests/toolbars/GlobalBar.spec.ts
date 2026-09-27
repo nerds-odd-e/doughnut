@@ -5,7 +5,7 @@ import {
 import GlobalBar from "@/components/toolbars/GlobalBar.vue"
 import SoftKeyboardPrimer from "@/components/commons/SoftKeyboardPrimer.vue"
 import type { User } from "@generated/donut-backend-api"
-import NoteEditingHistory from "@/store/NoteEditingHistory"
+import type NoteUndo from "@/store/noteUndo"
 import createNoteStorage from "@/store/createNoteStorage"
 import {
   scheduleFocusTargetWithin,
@@ -59,7 +59,7 @@ function renderGlobalBarWithSearchShortcut(loggedInUser?: User) {
 }
 
 describe("global bar", () => {
-  let noteEditingHistory: NoteEditingHistory
+  let noteEditingHistory: NoteUndo
   let user: User
   let matchMediaSpy: ReturnType<typeof vi.spyOn> | undefined
 
@@ -72,9 +72,10 @@ describe("global bar", () => {
     mockSdkService(SearchController, "semanticSearch", [])
     mockSdkService(SearchController, "semanticSearchWithin", [])
     user = makeMe.aUser.please()
-    noteEditingHistory = new NoteEditingHistory()
     const storageAccessor = useStorageAccessor()
-    storageAccessor.value = createNoteStorage(noteEditingHistory)
+    const storage = createNoteStorage()
+    noteEditingHistory = storage.noteUndo
+    storageAccessor.value = storage
   })
 
   afterEach(() => {

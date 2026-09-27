@@ -8,7 +8,7 @@ import type {
 import { noteShowLocation } from "@/routes/noteShowLocation"
 import { refreshSidebarStructuralListings } from "@/components/notes/sidebarStructuralRefresh"
 import type { Router } from "vue-router"
-import NoteEditingHistory from "./NoteEditingHistory"
+import type NoteUndo from "./noteUndo"
 import type NoteStorage from "./NoteStorage"
 import {
   updateTextContentRequest,
@@ -16,7 +16,6 @@ import {
   createNoteRequest,
   placeNoteRequest,
   trashNoteRequest,
-  undoTrashNoteRequest,
   permanentlyDeleteNoteRequest,
   reduceRelationNoteToSourcePropertyRequest,
   uploadNoteImageRequest,
@@ -35,7 +34,7 @@ function containingFolderId(realm: NoteRealm) {
 
 export default class StoredApiCollection {
   constructor(
-    private noteEditingHistory: NoteEditingHistory,
+    private noteUndo: NoteUndo,
     private storage: NoteStorage
   ) {}
 
@@ -98,7 +97,7 @@ export default class StoredApiCollection {
       folderId != null ? { ...data, folderId } : { ...data }
     const nrwp = await createNoteRequest(notebookId, body)
     const focus = this.storage.refreshNoteRealm(nrwp)
-    this.noteEditingHistory.createNote(focus.id)
+    this.noteUndo.createNote(focus.id)
     if (options?.skipNavigation) {
       refreshSidebarStructuralListings()
     } else {
@@ -114,7 +113,7 @@ export default class StoredApiCollection {
   /** This note no longer exists: drop its cached realm and forget its undo entries. */
   private noteNoLongerExists(noteId: Donut.ID) {
     this.storage.permanentlyRemoveNoteRealm(noteId)
-    this.noteEditingHistory.forgetNote(noteId)
+    this.noteUndo.forgetNote(noteId)
   }
 
   private placementUndoForNote(sourceId: Donut.ID): {
@@ -153,7 +152,7 @@ export default class StoredApiCollection {
       if (old === value) {
         return
       }
-      this.noteEditingHistory.addEditingToUndoHistory(noteId, field, old)
+      this.noteUndo.addEditingToUndoHistory(noteId, field, old)
     }
     await this.updateTextContentWithoutUndo(
       noteId,
@@ -185,87 +184,8 @@ export default class StoredApiCollection {
     refreshSidebarStructuralListings()
   }
 
-  private async undoInner(): Promise<{
-    noteRealm: NoteRealm | undefined
-    notebookFallbackId?: number
-  }> {
-    const undone = this.noteEditingHistory.peekUndo()
-    if (!undone) throw new Error("undo history is empty")
-    if (undone.type === "trash note") {
-      const noteRealm = await undoTrashNoteRequest(undone.noteId, {
-        priorTitle: undone.originalTitle,
-        ...(undone.originalFolderId == null
-          ? {}
-          : { priorFolderId: undone.originalFolderId }),
-      })
-      this.noteEditingHistory.popUndoHistory()
-      refreshSidebarStructuralListings()
-      return { noteRealm: this.storage.refreshNoteRealm(noteRealm) }
-    }
-    this.noteEditingHistory.popUndoHistory()
-    if (undone.type === "edit title" || undone.type === "edit content") {
-      const noteRealm = await this.updateTextContentWithoutUndo(
-        undone.noteId,
-        undone.type,
-        undone.textContent ?? ""
-      )
-      return { noteRealm }
-    }
-    if (undone.type === "create note") {
-      return this.undoCreateNote(undone.noteId)
-    }
-    if (undone.type === "move note") {
-      const noteRealm = await this.undoMoveNote(
-        undone.noteId,
-        undone.originalFolderId ?? null,
-        undone.originalNotebookId
-      )
-      return { noteRealm }
-    }
-    return { noteRealm: undefined }
-  }
-
-  private async undoMoveNote(
-    noteId: Donut.ID,
-    originalFolderId: Donut.ID | null,
-    originalNotebookId: number
-  ): Promise<NoteRealm> {
-    if (originalFolderId != null) {
-      return this.placeNoteAt(noteId, { folderId: originalFolderId })
-    }
-    return this.placeNoteAt(noteId, { notebookId: originalNotebookId })
-  }
-
-  private async undoCreateNote(noteId: Donut.ID): Promise<{
-    noteRealm: NoteRealm | undefined
-    notebookFallbackId?: number
-  }> {
-    const cached = this.storage.refOfNoteRealm(noteId).value
-    const notebookFallbackId = cached?.notebookRealm.notebook.id
-    await trashNoteRequest(noteId, {
-      referenceHandling: "LEAVE_DEAD_LINKS",
-    })
-    this.storage.removeNoteRealm(noteId)
-    return {
-      noteRealm: undefined,
-      ...(notebookFallbackId !== undefined ? { notebookFallbackId } : {}),
-    }
-  }
-
   async undo(router: Router) {
-    const { noteRealm, notebookFallbackId } = await this.undoInner()
-    if (!noteRealm) {
-      if (notebookFallbackId !== undefined) {
-        await router.push({
-          name: "notebookPage",
-          params: { notebookId: notebookFallbackId },
-        })
-      } else {
-        await router.push({ name: "notebooks" })
-      }
-      return
-    }
-    await router.push(noteShowLocation(noteRealm.id))
+    await router.push(await this.noteUndo.undoLast())
   }
 
   async trashNote(noteId: Donut.ID, options: NoteTrashDto) {
@@ -274,7 +194,7 @@ export default class StoredApiCollection {
     const trashedRealm = await trashNoteRequest(noteId, options)
 
     const originalFolderId = containingFolderId(cachedRealm)
-    this.noteEditingHistory.trashNote(
+    this.noteUndo.trashNote(
       noteId,
       cachedRealm.note.noteTopology.title,
       originalFolderId
@@ -319,7 +239,7 @@ export default class StoredApiCollection {
     await this.placeNoteAt(sourceId, target)
 
     if (undoPlacement) {
-      this.noteEditingHistory.moveNote(sourceId, undoPlacement)
+      this.noteUndo.moveNote(sourceId, undoPlacement)
     }
   }
 }

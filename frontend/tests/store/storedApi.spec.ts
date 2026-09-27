@@ -6,7 +6,6 @@ import {
 import type { Router } from "vue-router"
 import { noteShowLocation } from "@/routes/noteShowLocation"
 import createNoteStorage from "@/store/createNoteStorage"
-import NoteEditingHistory from "@/store/NoteEditingHistory"
 import makeMe from "donut-test-fixtures/makeMe"
 import { mockSdkService, wrapSdkError } from "@tests/helpers"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
@@ -36,8 +35,8 @@ describe("storedApiCollection", () => {
     })
 
     it("should remove the created note from cache after undo", async () => {
-      const noteEditingHistory = new NoteEditingHistory()
-      storageAccessor.value = createNoteStorage(noteEditingHistory)
+      storageAccessor.value = createNoteStorage()
+      const noteEditingHistory = storageAccessor.value.noteUndo
 
       storageAccessor.value.refreshNoteRealm(note)
       noteEditingHistory.createNote(note.id)
@@ -54,8 +53,8 @@ describe("storedApiCollection", () => {
 
     it("should navigate to notebook page when trash returns no realms", async () => {
       mockSdkService(NoteController, "trashNote", note)
-      const noteEditingHistory = new NoteEditingHistory()
-      storageAccessor.value = createNoteStorage(noteEditingHistory)
+      storageAccessor.value = createNoteStorage()
+      const noteEditingHistory = storageAccessor.value.noteUndo
 
       storageAccessor.value.refreshNoteRealm(note)
       noteEditingHistory.createNote(note.id)
@@ -71,8 +70,8 @@ describe("storedApiCollection", () => {
 
     it("uses the recoverable trash path with LEAVE_DEAD_LINKS when undoing note creation", async () => {
       const trashSpy = mockSdkService(NoteController, "trashNote", note)
-      const noteEditingHistory = new NoteEditingHistory()
-      storageAccessor.value = createNoteStorage(noteEditingHistory)
+      storageAccessor.value = createNoteStorage()
+      const noteEditingHistory = storageAccessor.value.noteUndo
 
       storageAccessor.value.refreshNoteRealm(note)
       noteEditingHistory.createNote(note.id)

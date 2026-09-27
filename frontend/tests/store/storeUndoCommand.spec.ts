@@ -1,4 +1,4 @@
-import NoteEditingHistory from "@/store/NoteEditingHistory"
+import createNoteStorage from "@/store/createNoteStorage"
 import makeMe from "donut-test-fixtures/makeMe"
 import { describe, it, expect, beforeEach } from "vitest"
 
@@ -7,7 +7,7 @@ describe("storeUndoCommand", () => {
 
   describe("addEditingToUndoHistory", () => {
     it("pushes an edit into noteUndoHistories", () => {
-      const histories = new NoteEditingHistory()
+      const histories = createNoteStorage().noteUndo
       histories.addEditingToUndoHistory(
         note.id,
         "edit title",
@@ -18,7 +18,7 @@ describe("storeUndoCommand", () => {
     })
 
     it("accumulates continuous same-field edits to the same note", () => {
-      const histories = new NoteEditingHistory()
+      const histories = createNoteStorage().noteUndo
       const note1 = makeMe.aNote.please()
       histories.addEditingToUndoHistory(
         note1.id,
@@ -39,7 +39,7 @@ describe("storeUndoCommand", () => {
     })
 
     it("creates a new entry for the same field on a different note", () => {
-      const histories = new NoteEditingHistory()
+      const histories = createNoteStorage().noteUndo
       const note1 = makeMe.aNote.please()
       const note2 = makeMe.aNote.please()
       histories.addEditingToUndoHistory(note1.id, "edit title", "Title 1")
@@ -49,7 +49,7 @@ describe("storeUndoCommand", () => {
     })
 
     it("creates a new entry when switching between title and content", () => {
-      const histories = new NoteEditingHistory()
+      const histories = createNoteStorage().noteUndo
       const note1 = makeMe.aNote.please()
       histories.addEditingToUndoHistory(note1.id, "edit title", "Title")
       histories.addEditingToUndoHistory(note1.id, "edit content", "Body")
@@ -58,7 +58,7 @@ describe("storeUndoCommand", () => {
     })
 
     it("creates a new entry for title edit after trash note", () => {
-      const histories = new NoteEditingHistory()
+      const histories = createNoteStorage().noteUndo
       const note1 = makeMe.aNote.please()
       histories.addEditingToUndoHistory(note1.id, "edit title", "Title")
       histories.trashNote(note1.id, "Title", null)
@@ -70,7 +70,7 @@ describe("storeUndoCommand", () => {
 
   describe("createNote", () => {
     it("adds a create-note entry", () => {
-      const histories = new NoteEditingHistory()
+      const histories = createNoteStorage().noteUndo
       const note1 = makeMe.aNote.please()
       histories.createNote(note1.id)
 
@@ -81,7 +81,7 @@ describe("storeUndoCommand", () => {
     })
 
     it("allows multiple create-note entries", () => {
-      const histories = new NoteEditingHistory()
+      const histories = createNoteStorage().noteUndo
       histories.createNote(makeMe.aNote.please().id)
       histories.createNote(makeMe.aNote.please().id)
 
@@ -89,7 +89,7 @@ describe("storeUndoCommand", () => {
     })
 
     it("creates a new entry for title edit after create note", () => {
-      const histories = new NoteEditingHistory()
+      const histories = createNoteStorage().noteUndo
       const note1 = makeMe.aNote.please()
       histories.createNote(note1.id)
       histories.addEditingToUndoHistory(note1.id, "edit title", "New Title")
@@ -100,7 +100,7 @@ describe("storeUndoCommand", () => {
 
   describe("moveNote", () => {
     it("adds a move-note entry with original location", () => {
-      const histories = new NoteEditingHistory()
+      const histories = createNoteStorage().noteUndo
       const note1 = makeMe.aNote.please()
       histories.moveNote(note1.id, { folderId: null, notebookId: 42 })
 
@@ -113,9 +113,9 @@ describe("storeUndoCommand", () => {
     })
   })
 
-  describe("popUndoHistory", () => {
+  describe("discardUndo", () => {
     let initialUndoCount: number
-    const histories = new NoteEditingHistory()
+    const histories = createNoteStorage().noteUndo
 
     beforeEach(() => {
       histories.addEditingToUndoHistory(
@@ -127,15 +127,15 @@ describe("storeUndoCommand", () => {
     })
 
     it("pops the last history entry", () => {
-      histories.popUndoHistory()
+      histories.discardUndo()
 
       expect(histories.noteUndoHistories).toHaveLength(initialUndoCount - 1)
     })
 
     it("stays empty when popping with no remaining history", () => {
-      histories.popUndoHistory()
-      histories.popUndoHistory()
-      histories.popUndoHistory()
+      histories.discardUndo()
+      histories.discardUndo()
+      histories.discardUndo()
 
       expect(histories.noteUndoHistories).toHaveLength(0)
     })
