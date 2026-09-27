@@ -71,6 +71,11 @@ Proof: the two phrases are gone and the paragraphs still read whole.
 
 Change: delete `:45-46`'s sentence; drop "still" at `:186` and rewrap.
 
+## Execution complete
+
+Product advice: no change — the correction closes the SEED-050#story-5
+findings; SEED-050#story-9 stays next in the backlog.
+
 ## Accepted proof
 
 - Slice 1: with both message constants mutated, the focused command failed
