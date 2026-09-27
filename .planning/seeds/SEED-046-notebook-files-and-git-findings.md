@@ -58,67 +58,13 @@ Owner decisions on 2026-09-26 that removed candidates:
 S = 30–60 minutes, M = 1–2 hours, L = 2–4 hours. These are hypotheses
 including delivery, not commitments.
 
-<a id="story-9"></a>
-
-### 7. Responses carry no ORM internals and a lean folder trail
-
-**Identity:** SEED-046#story-9
-```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/010-responses-carry-no-orm-internals/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"19996e467b834aa860320cf45f90459df6e199e4ee97f26b3f3583f482d9bb50","plan":"cbd378e18afbfa14ece652f6f41ffdab215313e84ebd13d8a5fa6c4d9940ae48"}}
-```
-
-- **Goal:** API consumers (the web app, CLI, MCP, and anyone reading the
-  API) receive responses that describe the domain, not the persistence layer.
-  Today a Hibernate proxy's internal `hibernateLazyInitializer` property leaks
-  into JSON, and the folder trail beside every note, folder, and file page is a
-  list of full folder entities. Fixing the cause once, instead of on the two
-  endpoints where the manual test noticed it, keeps the API honest as more
-  work flows between local checkouts and Web Donut.
-- **Scope:**
-  - **Required (cause):** JSON responses never contain Hibernate proxy
-    internals, whichever path loads an entity. The web JSON mapper handles
-    Hibernate proxies; values that serialize today keep serializing.
-  - **Required (shape):** each folder-trail entry (`ancestorFolders` on the
-    note, folder, and file page realms and on recalled notes) carries only the
-    folder's `id` and `name`, outermost first, as today.
-  - **Preserved:** breadcrumbs, folder pickers, trash detection, the sidebar
-    tree, recall's folder path, and the CLI's folder path segments behave as
-    before.
-  - **Excluded:** the file page's readable size (owner chose cause and shape
-    only on 2026-09-27); the realm's `notebook` object, which is a loaded
-    entity in practice and is read in about 20 places; other entity-bearing
-    responses whose associations are eager; removing the Jackson 2 mapper
-    used for hand-written serialization.
-- **Key examples:**
-  1. A file in folder `outer/inner`; a fresh request for its file page →
-     `ancestorFolders` is `[{id, name: "outer"}, {id, name: "inner"}]`, with no
-     `hibernateLazyInitializer` anywhere in the body (today the nested folder
-     carries `"hibernateLazyInitializer": {}`).
-  2. A picture uploaded to a note in a nested folder → the returned note realm
-     has the same clean two-entry trail.
-  3. A folder whose readme is long; the page of a note inside it → the trail
-     entry has no `readmeContent`, `createdAt`, or `updatedAt`.
-  4. Boundary: a note at notebook root → `ancestorFolders` is empty.
-- **Known facts (2026-09-27):** Spring Boot 4 serializes web responses with
-  its Jackson 3 (`tools.jackson`) mapper; `ObjectMapperConfig` registers
-  `Hibernate7Module` only on a Jackson 2 mapper that serves hand-written
-  serialization, and its Javadoc wrongly says web JSON uses it. A Jackson 3
-  `tools.jackson.datatype:jackson-datatype-hibernate7` exists (3.1.7+). The
-  leak reproduced on the dev backend for nested folders on the file page;
-  whether it appears depends on whether the session already loaded the folder.
-  Controller tests call methods directly and miss serialization; a MockMvc
-  test like `NotebookFolderPageXmlAcceptMvcTest` sees real proxies.
-- **Effort hypothesis:** M — medium confidence.
-- **Depends on:** none.
-- **Safe stopping point:** after the cause fix; the trail shape stands alone.
-
 <a id="story-15"></a>
 
 ### 7b. Note realm JSON lists each sidebar field once
 
 **Identity:** SEED-046#story-15
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/013-note-realm-lists-sidebar-once/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"b654a7b2ae352096bf090bbbf2a380b16a0d0c01fcdd8830dd4824c1fa3b9c4b","plan":"beb5d7e853f40e299203585a590e1a9428211dcbb4de99b02b8ba55d4a4386f4"}}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/013-note-realm-lists-sidebar-once/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"6f7de99d34dd03f2b4cca5a40641ae885f6fea3cef4fe57fe77fb1386bd2bd42","plan":"145b87e7bbecea54b1e28ec834fa6a56e7be66d2d0156f5c599996551e9d686d"}}
 ```
 
 - **Goal:** Correction of story 7 (SEED-046#story-9; provenance
@@ -149,10 +95,8 @@ including delivery, not commitments.
 
 ## Ordering and Scope Reduction
 
-Story 7 removes persistence details from API responses at their cause;
-it matters least to owners today. Correction 7b finishes story 7's response
-shape by removing the note realm's duplicated keys; it is small and stands
-alone.
+Correction 7b finishes story 7's response shape by removing the note realm's
+duplicated keys; it is small and stands alone.
 
 Story numbers are local order; identities keep their original anchors.
 

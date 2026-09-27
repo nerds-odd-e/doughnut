@@ -4,7 +4,7 @@
 
 - Story: [SEED-046#story-15](../../seeds/SEED-046-notebook-files-and-git-findings.md#story-15)
 - **Identity:** SEED-046#story-15
-- Correction of [SEED-046#story-9](../../seeds/SEED-046-notebook-files-and-git-findings.md#story-9)
+- Correction of SEED-046#story-9 (`3c7b1b7a13:.planning/seeds/SEED-046-notebook-files-and-git-findings.md#story-9`)
   ("responses describe the domain, not the persistence layer"); provenance
   `5d384c2665:.planning/slice-plans/010-responses-carry-no-orm-internals/PLAN.md`,
   commits 9365a11c7d (slice 1) and 5d384c2665 (slice 2).
