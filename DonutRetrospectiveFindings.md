@@ -36,6 +36,13 @@ them project findings:
   without the test’s name in the result.
 - DD-126: `scripts/test/quality_changed.test` and the `script` skill existed;
   the failure was a plan’s unchecked negative claim.
+- DD-133: Donut’s trigger is its layout. `.gitignore` excludes `.claude/*`, so
+  a fresh worktree has no installed `.claude/skills/dough-*` copies, and
+  `scripts/worktree_setup.sh` links every skill there to `.agents/skills`.
+  The shared runtime guidance prefers that alias, and the sibling entry
+  scripts compare real paths; only `agent-commit.mjs`’s literal-path guard
+  fails, so the correction belongs upstream. Excluding `dough-*` from Donut’s
+  links would add a special case to work around it.
 
 ### Resolved project findings
 
