@@ -24,6 +24,7 @@ Amend domain terms here in place; do not supersede this ADR.
   its root or in a folder, with its original bytes preserved. Covers non-Markdown
   files, including images; Markdown uses the ordinary note/Readme rules even
   when it contains AI guidance. An attachment requires no referring note.
+  Short UI: **File**.
 - **Image** — An Attachment with image presentation capabilities.
 - **Attachment reference** — Authored reference to an Attachment, distinct from
   a note/property Wiki link. References do not own the file's lifetime.

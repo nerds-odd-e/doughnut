@@ -47,7 +47,7 @@ leaves that file where it is. Dissolving a folder, or merging it into a same-nam
 notebook, carries its files exactly as its notes:
 each file keeps its row and bytes and only its folder changes. File references
 are not rewritten: a note outside the dissolved or merged folder whose `image:`
-points into it shows a broken picture afterwards. Permanent folder
+points into it shows a broken image afterwards. Permanent folder
 deletion removes its files. Moving a folder whose subtree contains a file to
 another notebook is refused without changing either the accepted tree or its
 projection. Notebook health counts a file as occupying its folder, so a folder
@@ -59,7 +59,7 @@ On the web, the entries of one folder (or the notebook root) share one set of
 names: a note occupies `Title.md`, a folder its name and a file its filename,
 compared without letter case. Every web placement — note create, rename, move,
 undo and trash; folder create, rename, move (within the notebook or to another
-notebook), trash, dissolve and merge; picture upload; Book file naming — asks
+notebook), trash, dissolve and merge; image upload; Book file naming — asks
 this one rule over the destination notebook's live rows
 (`FolderSiblingNameValidation`). A name held by another folder is
 `FOLDER_NAME_CONFLICT` (where merging is offered); one held by a note or file
@@ -98,11 +98,11 @@ filename, always as `Content-Disposition: attachment` with
 `application/octet-stream` and `nosniff`, so an SVG or HTML file never renders
 in Donut's origin. The download serves the stored object named by the row's
 pointer; [Git LFS attachment storage](./notebook-git-lfs.md#consequences) gives
-the rules for a missing object and an empty file. A picture file's page (PNG,
-JPEG, GIF or WebP by extension, ignoring case) also shows the picture below its
+the rules for a missing object and an empty file. An image file's page (PNG,
+JPEG, GIF or WebP by extension, ignoring case) also shows the image below its
 size, scaled down to fit and never enlarged, from
-`/api/notebooks/{notebook}/attachments/{attachment}/picture`; that address
-serves pictures inline exactly as a note's `image:` does below and refuses any
+`/api/notebooks/{notebook}/attachments/{attachment}/image`; that address
+serves images inline exactly as a note's `image:` does below and refuses any
 other type, including SVG (415). `.gitattributes`
 and nested `.keep` markers are not rows, so, like `.git`, they are not shown on
 the web.
@@ -113,10 +113,10 @@ web change ("Delete file: <path>"), so the next pull no longer has the file;
 notes, other files and learning history are untouched, and the reader lands on
 the containing folder or notebook page. The LFS object stays, since earlier
 history still names it, and there is no web Trash for files. A note whose
-`image` names the deleted file keeps that value and shows a broken picture, as
+`image` names the deleted file keeps that value and shows a broken image, as
 after the same delete through local publish.
 
-A picture uploaded with a note's `image` property on the web becomes a file in
+An image uploaded with a note's `image` property on the web becomes a file in
 the note's folder under its uploaded name, with its original bytes: the bytes are
 stored in the notebook's content store first, then the LFS pointer and the
 note's `image: <filename>` are accepted together in one web commit, with the
@@ -126,14 +126,14 @@ it again, so one upload is exactly one commit. A name that a file, note or
 folder in that folder already uses (ignoring case, under the one set of names),
 or one that is not a plain filename (empty, containing `/`, or starting with
 `.`), is refused with a message naming the path; nothing is renamed or
-overwritten. The upload is a picture by its filename extension alone, from the
-same list the picture address serves (PNG, JPEG, GIF and WebP, ignoring case);
+overwritten. The upload is an image by its filename extension alone, from the
+same list the image address serves (PNG, JPEG, GIF and WebP, ignoring case);
 the content type the browser declares and the bytes are not checked. Any other
 extension is refused with a message naming png, jpg, jpeg, gif and webp, and a
 file over 10 MiB (10,485,760 bytes, inclusive) is refused with a message naming
 the limit; nothing is stored. An accepted upload appears in the sidebar
 listing at once. A notebook without an LFS binding refuses the upload. Uploading a
-replacement picture leaves the previous file in the folder: it stays part of the
+replacement image leaves the previous file in the folder: it stays part of the
 notebook and its Git history until someone deletes it.
 
 A Book's source file (PDF or EPUB) is an ordinary file at the notebook root.
@@ -231,13 +231,13 @@ by this direction.
 A note's frontmatter `image:` may name a notebook file by a path relative to the
 note's own folder (`force-diagram.png`, `images/force.png`), so the same authored
 value works locally and on the web without private server IDs. Web Donut serves
-it at `/api/notes/{note}/attachment-image?path=<image value>` under the notebook
+it at `/api/notes/{note}/image?path=<image value>` under the notebook
 read rule: the file whose path equals the note's folder prefix plus the value,
 taken literally with no normalization, so `..`, `./` or a leading `/` never
-match and the picture stays visibly broken (404). Only PNG, JPEG, GIF and WebP,
+match and the image stays visibly broken (404). Only PNG, JPEG, GIF and WebP,
 chosen by filename extension and never sniffed, are served inline with
 `nosniff`; any other type, including SVG, is refused (415). Values starting with
-`/` (such as `/pictures/example.png`) or carrying a URL scheme are used as-is,
+`/` (such as `/images/example.png`) or carrying a URL scheme are used as-is,
 and `image_mask:` is unchanged. Markdown body image embeds are kept on web edits
 but not yet rendered from notebook files.
 This does not change semantic Wiki-link or property-reference rules. Existing

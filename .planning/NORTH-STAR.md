@@ -35,8 +35,8 @@ and [domain operation ownership](../docs/notebook-git-synchronization.md#domain-
 
 ## One attachment content model
 
-This governs every attachment story: LFS conversion, web picture upload,
-picture migration, Books, legacy retirement, and the later browsing, deletion
+This governs every attachment story: LFS conversion, web image upload,
+image migration, Books, legacy retirement, and the later browsing, deletion
 and folder operations. [Git LFS attachment storage](../docs/notebook-git-lfs.md)
 holds the accepted details under ADRs 0002 and 0004; this section decides how
 the remaining work grows. Acceptance of the architecture does not mean the
@@ -53,7 +53,7 @@ a Book's source. No other byte store exists.
 
 Roles refer to an Attachment and never own bytes:
 
-- A note's picture is the authored `image:` value, a path relative to the
+- A note's image is the authored `image:` value, a path relative to the
   note's folder; `image_mask:` stays presentation on the note.
 - A Book is private reading structure (layout, blocks, reading progress) over
   one source Attachment. Like learning history, it stays server-side.
@@ -96,7 +96,7 @@ so existing local checkouts keep working with `donut notebook pull`.
 
 ### One way out
 
-One reader (`NotebookAttachmentFile`) serves the file download, note pictures,
+One reader (`NotebookAttachmentFile`) serves the file download, note images,
 and Book reading, under the notebook read rule. Clone and pull fill in every
 current attachment. "Available in a local checkout" is therefore a property of
 the model, and each story proves it with a pull rather than building it.

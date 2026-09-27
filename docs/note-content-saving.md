@@ -64,7 +64,7 @@ lines, a new property is appended before the closing fence, and a rename
 changes only the key text. The panel matches keys exactly, including case.
 Removing the last property drops the block.
 
-Server-side property writes — setting a picture or image mask, reducing a
+Server-side property writes — setting `image:` or `image_mask:`, reducing a
 relationship note to a source property, and removing a trashed note's links
 from other notes' properties — edit through the backend's
 `FrontmatterInPlaceEdit`. Setting a property matches its key ignoring case and
@@ -99,7 +99,7 @@ them.
 
 The rich editor rebuilds the Markdown body from its content on each edit, so it
 keeps body image embeds (`![alt](src)`) through an edit to other text. Showing
-those pictures in the editor is not promised.
+those images in the editor is not promised.
 
 When a note's body holds content the rich editor cannot carry through an edit,
 the rich editor shows it read-only and asks the owner to switch to Markdown
