@@ -62,7 +62,10 @@
           </div>
         </nav>
         <slot>
-          <RouterView v-slot="{ Component }">
+          <p v-if="pageLoadFailed" class="text-error text-sm">
+            Could not load this page.
+          </p>
+          <RouterView v-else v-slot="{ Component }">
             <component :is="Component" v-bind="routeViewProps" />
           </RouterView>
         </slot>
@@ -103,6 +106,7 @@ const {
   activeFolderRealm,
   activeAttachmentRealm,
   routeViewProps,
+  pageLoadFailed,
 } = useNotebookSidebarRouteRealms(route)
 
 const breadcrumbFolders = computed(

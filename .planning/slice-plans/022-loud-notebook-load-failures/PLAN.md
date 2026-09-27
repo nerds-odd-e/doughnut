@@ -59,7 +59,7 @@ toast changes; E2E tests.
 ### 1. A notebook, folder or file page that cannot be loaded says so
 
 Type: Behavior
-Status: planned
+Status: done
 Proof: a new case in `SidebarRouteNavigation.spec.ts` mounts the layout at
 the `attachmentPage` route with `NotebookAttachmentController.getAttachmentPage`
 returning `wrapSdkError("not found")` (any error) and asserts "Could not

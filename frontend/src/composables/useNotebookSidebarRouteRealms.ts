@@ -14,29 +14,38 @@ import type { RouteLocationNormalizedLoaded } from "vue-router"
 
 /**
  * Loads `realm` while `routeName` is the current route (again whenever its
- * path changes) and clears it otherwise. Returns the reload function.
+ * path changes) and clears it otherwise. Returns the reload function and failed flag.
  */
 function loadRealmOnRoute<T>(
   route: RouteLocationNormalizedLoaded,
   routeName: string,
   realm: Ref<T | undefined>,
-  fetchRealm: () => Promise<T | undefined>
+  fetchRealm: () => Promise<{ data?: T; error?: unknown }>
 ) {
+  const failed = ref(false)
   async function reload() {
-    realm.value = await fetchRealm()
+    failed.value = false
+    const { data, error } = await fetchRealm()
+    if (error) {
+      failed.value = true
+      realm.value = undefined
+      return
+    }
+    realm.value = data
   }
   watch(
     () => (route.name === routeName ? route.path : undefined),
     async (path) => {
       if (path === undefined) {
         realm.value = undefined
+        failed.value = false
         return
       }
       await reload()
     },
     { immediate: true }
   )
-  return reload
+  return { reload, failed }
 }
 
 export function useNotebookSidebarRouteRealms(
@@ -48,24 +57,16 @@ export function useNotebookSidebarRouteRealms(
     undefined
   )
 
-  const fetchNotebookPage = loadRealmOnRoute(
-    route,
-    "notebookPage",
-    activeNotebookRealm,
-    async () => {
-      const { data, error } = await NotebookController.get({
+  const { reload: fetchNotebookPage, failed: notebookLoadFailed } =
+    loadRealmOnRoute(route, "notebookPage", activeNotebookRealm, () =>
+      NotebookController.get({
         path: { notebook: Number(route.params.notebookId) },
       })
-      return !error && data ? data : undefined
-    }
-  )
+    )
 
-  const fetchFolderPage = loadRealmOnRoute(
-    route,
-    "folderPage",
-    activeFolderRealm,
-    async () => {
-      const { data: page, error } = await apiCallWithLoading(() =>
+  const { reload: fetchFolderPage, failed: folderLoadFailed } =
+    loadRealmOnRoute(route, "folderPage", activeFolderRealm, () =>
+      apiCallWithLoading(() =>
         NotebookFolderController.getFolderPage({
           path: {
             notebook: Number(route.params.notebookId),
@@ -73,21 +74,29 @@ export function useNotebookSidebarRouteRealms(
           },
         })
       )
-      return !error && page?.notebookRealm?.notebook ? page : undefined
-    }
+    )
+
+  const { failed: attachmentLoadFailed } = loadRealmOnRoute(
+    route,
+    "attachmentPage",
+    activeAttachmentRealm,
+    () =>
+      apiCallWithLoading(() =>
+        NotebookAttachmentController.getAttachmentPage({
+          path: {
+            notebook: Number(route.params.notebookId),
+            attachment: Number(route.params.attachmentId),
+          },
+        })
+      )
   )
 
-  loadRealmOnRoute(route, "attachmentPage", activeAttachmentRealm, async () => {
-    const { data, error } = await apiCallWithLoading(() =>
-      NotebookAttachmentController.getAttachmentPage({
-        path: {
-          notebook: Number(route.params.notebookId),
-          attachment: Number(route.params.attachmentId),
-        },
-      })
-    )
-    return error ? undefined : data
-  })
+  const pageLoadFailed = computed(
+    () =>
+      (route.name === "notebookPage" && notebookLoadFailed.value) ||
+      (route.name === "folderPage" && folderLoadFailed.value) ||
+      (route.name === "attachmentPage" && attachmentLoadFailed.value)
+  )
 
   const routeViewProps = computed(() => {
     if (route.name === "notebookPage") {
@@ -109,5 +118,6 @@ export function useNotebookSidebarRouteRealms(
     fetchNotebookPage,
     fetchFolderPage,
     routeViewProps,
+    pageLoadFailed,
   }
 }

@@ -76,11 +76,7 @@ const props = defineProps<{
   fetchFolderPage: () => Promise<void>
 }>()
 
-const folderForView = computed((): FolderRealm | undefined => {
-  const r = props.folderRealm
-  if (r?.notebookRealm?.notebook == null) return undefined
-  return r
-})
+const folderForView = computed(() => props.folderRealm)
 
 const folderIsTrashed = computed(() =>
   isFolderRealmInTrash(folderForView.value)

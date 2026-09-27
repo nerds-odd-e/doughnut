@@ -1,10 +1,16 @@
-import { NotebookController } from "@generated/donut-backend-api/sdk.gen"
+import {
+  NotebookAttachmentController,
+  NotebookController,
+} from "@generated/donut-backend-api/sdk.gen"
 import NotebookSidebarLayout from "@/layouts/NotebookSidebarLayout.vue"
 import { noteShowLocation } from "@/routes/noteShowLocation"
 import routes from "@/routes/routes"
 import { useNoteStore } from "@/store/noteStore"
 import makeMe from "donut-test-fixtures/makeMe"
-import helper, { mockSdkServiceWithImplementation } from "@tests/helpers"
+import helper, {
+  mockSdkServiceWithImplementation,
+  wrapSdkError,
+} from "@tests/helpers"
 import { flushPromises } from "@vue/test-utils"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import { createRouter, createWebHistory } from "vue-router"
@@ -99,5 +105,35 @@ describe("Sidebar route navigation: sticky realm during uncached note load", () 
         value: originalWidth,
       })
     }
+  })
+
+  it("shows an inline message when a page cannot be loaded and clears it on leave", async () => {
+    vi.spyOn(
+      NotebookAttachmentController,
+      "getAttachmentPage"
+    ).mockResolvedValue(wrapSdkError("not found"))
+
+    const router = createRouter({ history: createWebHistory(), routes })
+    await router.push({
+      name: "attachmentPage",
+      params: {
+        notebookId: String(fixtures.topNoteRealm.notebookRealm.notebook.id),
+        attachmentId: "123",
+      },
+    })
+    wrapper = helper
+      .component(NotebookSidebarLayout)
+      .withRouter(router)
+      .withCurrentUser(makeMe.aUser.please())
+      .mount({ attachTo: document.body })
+    await flushPromises()
+
+    expect(wrapper.text()).toContain("Could not load this page.")
+    expect(wrapper.find("[data-app-busy]").exists()).toBe(false)
+
+    await router.push(noteShowLocation(fixtures.firstGeneration.id))
+    await flushPromises()
+
+    expect(wrapper.text()).not.toContain("Could not load this page.")
   })
 })
