@@ -56,7 +56,6 @@ const props = defineProps<{
   toolbarNav: HTMLElement | null
   asMarkdown?: boolean
   hasNewNote?: boolean
-  hasConversation?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -122,11 +121,9 @@ const measureAndCompute = () => {
   if (overflowWidth > 0) cachedOverflowButtonWidth = overflowWidth
 
   const nextOverflowedIds = computeNoteToolbarOverflow({
-    presentIds: NOTE_TOOLBAR_MORE_OPTIONS_ORDER.filter((id) => {
-      if (id === "new") return props.hasNewNote === true
-      if (id === "conversation") return props.hasConversation !== false
-      return true
-    }),
+    presentIds: NOTE_TOOLBAR_MORE_OPTIONS_ORDER.filter(
+      (id) => id !== "new" || props.hasNewNote === true
+    ),
     pinnedIds: pinnedIds.value,
     widthById: cachedWidths,
     overflowButtonWidth: cachedOverflowButtonWidth,
@@ -163,5 +160,5 @@ watch(
 )
 
 watch(pinnedIds, scheduleUpdate)
-watch(() => [props.hasNewNote, props.hasConversation], scheduleUpdate)
+watch(() => props.hasNewNote, scheduleUpdate)
 </script>

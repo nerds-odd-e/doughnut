@@ -157,10 +157,14 @@ learner can resolve the match without confusing the two notes.
 ### 6. Read a conversation's note without NoteShow
 
 Type: Behavior
-Status: planned
+Status: done
 Proof: mounted Message Center note conversation shows the shared reader,
 messages, and a usable composer; no `NoteShow` controls appear. Selecting a
 recall-prompt conversation still displays its answered-question subject.
+Accepted: `ConversationComponent` mounts the reader for a note subject;
+`MessageCenterPage.spec.ts` checks reader, message, composer reply, and the
+recall-prompt subject; message E2E features pass. Refactor removed the dead
+`noConversationButton` / `conversationButton` / `hasConversation` chain.
 
 Behavior: a participant opens a conversation whose subject is a note → the
 complete read-only note context, messages, and composer remain usable in that

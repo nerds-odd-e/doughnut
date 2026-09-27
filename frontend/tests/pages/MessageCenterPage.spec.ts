@@ -1,4 +1,8 @@
-import { ConversationMessageController } from "@generated/donut-backend-api/sdk.gen"
+import {
+  ConversationMessageController,
+  NoteController,
+} from "@generated/donut-backend-api/sdk.gen"
+import type { Conversation } from "@generated/donut-backend-api"
 import MessageCenterPage from "@/pages/MessageCenterPage.vue"
 import routes from "@/routes/routes"
 import { describe, it, expect, beforeEach, vi } from "vitest"
@@ -101,6 +105,97 @@ describe("MessageCenterPage", () => {
         name: "messageCenter",
         params: { conversationId: conversations[0]?.id },
       })
+    })
+  })
+
+  describe("reading the selected conversation's subject", () => {
+    const user = makeMe.aUser.please()
+
+    const openConversation = async (conversation: Conversation) => {
+      mockSdkService(
+        ConversationMessageController,
+        "getConversationsOfCurrentUser",
+        [makeMe.aConversationListItem.please()]
+      )
+      mockSdkService(
+        ConversationMessageController,
+        "getConversation",
+        conversation
+      )
+      mockSdkService(
+        ConversationMessageController,
+        "getConversationsAboutNote",
+        []
+      )
+      mockSdkService(ConversationMessageController, "getConversationMessages", [
+        { id: 1, message: "Is this right?", sender: user },
+      ])
+      mockSdkService(
+        ConversationMessageController,
+        "markConversationAsRead",
+        []
+      )
+      const wrapper = helper
+        .component(MessageCenterPage)
+        .withRouter()
+        .withCleanStorage()
+        .withCurrentUser(user)
+        .withProps({ conversationId: conversation.id })
+        .mount({ attachTo: document.body })
+      await flushPromises()
+      return wrapper
+    }
+
+    it("shows a note conversation with the read-only note context, messages, and a usable composer", async () => {
+      const noteRealm = makeMe.aNoteRealm
+        .title("Sedition")
+        .content("Inciting rebellion.")
+        .please()
+      mockSdkService(NoteController, "showNote", noteRealm)
+      const replySpy = mockSdkService(
+        ConversationMessageController,
+        "replyToConversation",
+        undefined
+      )
+      const conversation = makeMe.aConversation
+        .forANote(noteRealm.note)
+        .please()
+
+      const wrapper = await openConversation(conversation)
+
+      const context = wrapper.find('article[aria-label="Note context"]')
+      expect(context.text()).toContain("Sedition")
+      expect(context.text()).toContain("Inciting rebellion.")
+      expect(wrapper.find("#main-note-content").exists()).toBe(false)
+      expect(wrapper.text()).toContain("Is this right?")
+
+      await wrapper.find("textarea").setValue("Yes, it is.")
+      await wrapper.find("form.message-input-form").trigger("submit")
+      await flushPromises()
+      expect(replySpy).toHaveBeenCalledWith(
+        expect.objectContaining({
+          path: { conversationId: conversation.id },
+          body: "Yes, it is.",
+        })
+      )
+      wrapper.unmount()
+    })
+
+    it("shows the answered question of a recall-prompt conversation", async () => {
+      const answeredQuestion = makeMe.anAnsweredQuestion
+        .withMcq(makeMe.anMcq.withQuestionStem("What is sedition?").please())
+        .please()
+      const conversation = makeMe.aConversation
+        .forAnsweredQuestion(answeredQuestion)
+        .please()
+
+      const wrapper = await openConversation(conversation)
+
+      expect(wrapper.text()).toContain("What is sedition?")
+      expect(wrapper.find('article[aria-label="Note context"]').exists()).toBe(
+        false
+      )
+      wrapper.unmount()
     })
   })
 })

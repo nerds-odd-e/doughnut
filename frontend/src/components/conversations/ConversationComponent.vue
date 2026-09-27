@@ -2,13 +2,9 @@
   <div class="conversation-container flex flex-col flex-1 min-h-0">
     <!-- Upper half -->
     <div v-if="!isMaximized" class="subject-container flex-1 overflow-auto p-4 border-b border-base-300">
-      <NoteShow
+      <NoteContextReader
         v-if="conversation.subject?.note?.id"
-        v-bind="{
-          noteId: conversation.subject?.note?.id,
-          expandChildren: false,
-          noConversationButton: true,
-        }"
+        :note-id="conversation.subject.note.id"
       />
       <AnsweredQuestionComponent
         v-else-if="conversation.subject?.recallPrompt"
@@ -39,7 +35,7 @@
 
 <script setup lang="ts">
 import type { User, Conversation } from "@generated/donut-backend-api"
-import NoteShow from "@/components/notes/NoteShow.vue"
+import NoteContextReader from "@/components/notes/NoteContextReader.vue"
 import AnsweredQuestionComponent from "@/components/recall/AnsweredQuestionComponent.vue"
 import { useRouter } from "vue-router"
 import { ref, onMounted } from "vue"

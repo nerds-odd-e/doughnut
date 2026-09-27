@@ -34,7 +34,7 @@
       </PopButton>
 
       <a
-        v-if="!conversationButton && !conversationOverflowed"
+        v-if="!conversationOverflowed"
         class="daisy-btn daisy-btn-ghost daisy-btn-sm"
         role="button"
         :aria-label="noteMoreOptionsTitles.conversation"
@@ -63,7 +63,6 @@
         :toolbar-nav="toolbarNavRef"
         :as-markdown="asMarkdown"
         :has-new-note="showRelocatedNewNote"
-        :has-conversation="!conversationButton"
         @overflowed-ids="overflowedIds = $event"
         @edit-as-markdown="emit('edit-as-markdown', $event)"
         @open-wiki="wikiLinkOrRelationshipPopButtonRef?.openDialog()"
@@ -118,7 +117,6 @@ const props = withDefaults(
     activeNoteRealm?: NoteRealm
     breadcrumbFolders?: Folder[]
     asMarkdown?: boolean
-    conversationButton?: boolean
     readonly?: boolean
   }>(),
   { breadcrumbFolders: () => [] }

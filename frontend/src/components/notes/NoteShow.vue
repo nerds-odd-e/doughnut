@@ -13,7 +13,6 @@
                 activeNoteRealm: noteRealm,
                 breadcrumbFolders: noteRealm.ancestorFolders ?? [],
                 asMarkdown,
-                conversationButton: noConversationButton,
                 readonly: readonly(noteRealm),
               }"
               @edit-as-markdown="asMarkdown = $event"
@@ -96,7 +95,6 @@ import { isReservedReadmeNoteTitle } from "@/utils/reservedReadmeTitles"
 const props = defineProps({
   noteId: { type: Number, required: true },
   expandChildren: { type: Boolean, required: true },
-  noConversationButton: { type: Boolean, default: false },
   isMinimized: { type: Boolean, default: false },
   ownsShortcuts: { type: Boolean, default: false },
 })
