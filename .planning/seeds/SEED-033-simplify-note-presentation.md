@@ -3,7 +3,7 @@ id: SEED-033
 status: dormant
 planted: 2026-09-18
 planted_during: investigation of embedded NoteShow and owner backlog request
-trigger_when: story 1 now; story 2 after higher-priority queued work
+trigger_when: story 2 selected by owner for refinement on 2026-09-27
 scope: medium
 ---
 
@@ -11,25 +11,35 @@ scope: medium
 
 ## Why This Matters
 
-Learners see a full editable note beneath their spelling result even though
-the result already links to the note. Removing it makes the result easier to
-scan and removes one consumer of the full note display. The owner accepts
-this small gain on its own.
+A full editable note used to appear beneath spelling results and still
+appears inside Message Center conversations and during Just review. An
+embedded NoteShow has no notebook sidebar, while making its page controls
+work there requires context-specific behavior. Removing the spelling embed
+made results easier to scan, but after a wrong answer the learner now needs
+another click to read the note's properties, content, and references. The
+owner wants that context
+back without putting a full note page inside another workflow.
 
 Two other embedded consumers remain: Message Center's conversation subject,
-and memory-tracker review through Just review. Eventually removing those
-embeds should let maintainers simplify NoteShow and NoteShowPage completely
-around the note page's needs, with fewer constraints on its menu and layout.
-Their replacement interactions are deliberately undecided until later.
+and memory-tracker review through Just review. Replacing those embeds lets
+maintainers simplify NoteShow and NoteShowPage around the note page's needs,
+with fewer constraints on its menu and layout. The selected replacement
+interactions are recorded in story 2 below.
 
 ## Alternatives and Decision
 
 The owner chose two stories on 2026-09-18: remove the spelling-result embed
 first, and queue the remaining embedded-use removal and resulting cleanup
-last. Keeping all embeds avoids navigation changes but retains unnecessary
-weight on spelling results. Removing all three at once would require deciding
-conversation and Just review behavior before realizing the small known gain.
-Keeping a hidden or configurable spelling embed would not deliver the removal.
+last. Keeping all embeds would retain the page-specific complexity; removing
+all three at once would have deferred the small known spelling gain. The owner
+accepted the first removal as a separate outcome.
+
+On 2026-09-27, after experiencing the extra click following a wrong spelling
+answer, the owner selected a common read-only note-reading direction for all
+three workflows. The reading view shows the complete properties, body, and
+inbound references and links to the full note page. It carries no note-page
+toolbar, editing controls, or notebook sidebar. The existing main menu and
+sidebar are outside this story.
 
 ## Story Decomposition
 
@@ -38,47 +48,84 @@ including delivery, not commitments.
 
 <a id="story-2"></a>
 
-### 2. Use conversations and memory-tracker review without embedding the full note page
+### 2. Read note context during spelling answers, conversations, and Just review
 
-Unrefined candidate; the owner explicitly deferred figuring out the replacement
-interactions. No executable plan yet.
+**Identity:** SEED-033#story-2
+```json dough-story-state
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/012-read-note-context/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"09854d0f0283a70e00c83145aae90fb8c316cafc1e7a5e19aecdecfbabeaf141","plan":"360483de49d096efff5f56c0d6b939159d7f861e57ce6396653619467b9890c5"}}
+```
 
-- **Goal / beneficiaries:** Conversation participants and learners can complete
-  conversation and Just review tasks without an embedded full NoteShow;
-  maintainers can make the note page and its menu/layout serve one context.
-- **Evaluation:** Both workflows have agreed, usable replacements for their
-  full-note embeds. No non-note-page production caller uses NoteShow, and the
-  page no longer carries props, branches, slots, or wrappers whose only purpose
-  was supporting those embeds. Preserve capabilities still needed by the note
-  page itself; simplification need not mean flattening every component.
-- **Scope direction:** Remove the conversation-subject and MemoryTrackerAsync
-  embeds and clean up the resulting unnecessary NoteShow/NoteShowPage machinery.
-  Include currently unused options where confirmed unnecessary. Do not replace
-  embedding with a duplicate full note-page implementation.
-- **Value / learning:** Remove the remaining constraints imposed by embedding
-  while learning which context each workflow actually needs.
-- **Effort hypothesis:** M–L — low confidence pending the replacement UX;
-  reassess and split if refinement discovers independent product outcomes.
-- **Depends on:** Story 1 for the final single-context outcome.
-- **Safe stopping point:** Both replacement workflows remain usable and full
-  note details are reachable; the note page retains its own editing and
-  conversation capabilities.
-- **Open decisions for later refinement:** What note context and navigation
-  should conversations retain? What replaces the note shown during Just review,
-  so the learner can still review and grade meaningfully? Which remaining page
-  controls and component boundaries become unnecessary after those choices?
+**Goal:** Learners can understand a spelling result, discuss a note, and grade
+a Just review while seeing the note information relevant to that task. These
+workflows use a read-only note-reading view instead of embedding the full
+NoteShow page, leaving NoteShow and NoteShowPage dedicated to the note page.
+
+**Scope:**
+
+- The shared reading view presents the note title and location, every property
+  and its value, the complete body (including images and resolved links), and
+  the inbound references when present. It has an **Open full note** route for
+  editing and page-specific actions. It never exposes note editing controls.
+- A wrong spelling result automatically reveals the reviewed note's reading
+  view after the answer is submitted, without another click. A correct result
+  keeps its compact summary and offers the reading view on demand. An
+  accidental match distinguishes the reviewed note from the different note
+  named by the answer.
+- A note-subject conversation keeps its messages and composer primary, with
+  the note reading view beside them on wider screens and available from the
+  conversation header on narrow screens. Recall-prompt subjects retain their
+  own answer context; they are not reinterpreted as note subjects.
+- Just review shows the reading view before Good/Again grading, with grading
+  controls kept reachable while reading a long note. A property memory tracker
+  indicates its focused property without hiding the rest of the note. The
+  existing grade and scheduling behavior remains.
+- Remove the conversation and Just review NoteShow embeds and the NoteShow /
+  NoteShowPage options and branches confirmed to exist only for embeds. Keep
+  the note page's own editing, sidebar, and conversation capabilities. The
+  global main menu and notebook sidebar are not redesigned or changed.
+
+**Key examples:**
+
+1. A learner answers a spelling prompt incorrectly → the result names the
+   reviewed note and immediately displays all its properties, body, and
+   inbound references; **Open full note** reaches the ordinary note page.
+2. A learner answers correctly → the concise success result remains easy to
+   scan; the note reading view is available without loading a full note page
+   inside the result.
+3. A learner selects a conversation about a note → messages, reply composer,
+   and the read-only note context can be used together on desktop; on a narrow
+   screen, the same complete context is reachable from the conversation.
+4. A learner reaches Just review for a property tracker → the complete note is
+   readable, the focused property is identifiable, and Good/Again remains
+   reachable and grades the same tracker as before.
+5. A conversation about a recall prompt still presents its answered-question
+   subject; the note page still provides its sidebar, toolbar, editing, and
+   on-page conversation behavior.
+
+**Value / learning:** Restore immediate learning context and free NoteShow
+from non-page consumers without duplicating a second editable note page.
+
+**Effort hypothesis:** L — one shared reading capability across three
+workflows, with low confidence until the slice plan sizes the rendering and
+responsive layout work.
+
+**Depends on:** Story 1's spelling embed removal, already delivered.
+
+**Safe stopping point:** Each workflow stays usable between slices, and full
+note details remain reachable throughout; the final state has no non-note-page
+NoteShow caller.
 
 ## Ordering and Scope Reduction
 
-By explicit owner priority, story 1 is first in the queued backlog and story 2
-is last. Existing Taken work and unrelated queue order are unchanged. The
-near-future notebook-publication direction remains unchanged. Story 2 is the
-first to defer; story 1 delivers useful simplicity independently.
+Story 1 delivered its small spelling-result simplification independently.
+Story 2 remains in its existing backlog position while the owner prepares its
+expanded three-workflow outcome. Existing Taken work, unrelated queue order,
+and the near-future notebook-publication direction remain unchanged.
 
 ## When to Surface
 
-Story 1 now. Refine story 2 when it reaches priority or the owner selects the
-broader note-page cleanup.
+Story 2 was selected for refinement on 2026-09-27 after the owner experienced
+the extra click following a wrong spelling answer.
 
 ## Breadcrumbs
 
