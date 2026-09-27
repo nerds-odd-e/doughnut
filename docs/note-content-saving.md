@@ -24,7 +24,7 @@ stays detectable at local publication. A canonical no-op does not append a
 commit.
 
 The same encoder, applied to an empty base with every row as an insertion,
-assembles a notebook's complete tree for repository cutover, history reset and
+assembles a notebook's complete tree for notebook creation, history reset and
 the publication drift check, so one place decides how projection rows become
 Portable entries. Publication retains entity loading where it needs identity
 evidence. The no-op decision, like publication's drift check, compares path to
@@ -53,17 +53,28 @@ history, identity and publication guarantees.
 
 ## Rich property editing
 
-The property panel lists properties in the order the file has them. A panel
-edit changes only the affected entry's lines: a changed value rewrites that
-`key: value`, a removal deletes its lines, a new property is appended before
-the closing fence, and a rename changes only the key text (quoted when YAML
-needs it). Comments, key order, quoting and flow lists elsewhere stay as
-written. Removing the last property drops the block. Server-side property
-writes — setting a picture or image mask, reducing a relationship note to a
-source property, and removing a trashed note's links from other notes'
-properties — edit the frontmatter in place the same way; a value left empty
-by link removal loses its entry, and a note without frontmatter gets a new
-block.
+The property panel lists properties in the order the file has them. Both the
+panel and server-side property writes change only the affected entry's lines,
+so comments, key order, quoting and flow lists elsewhere stay as written, but
+each side makes its own edit.
+
+The panel edits through its property rows (`composeNoteContentInPlace` in the
+frontend): a changed value rewrites that `key: value`, a removal deletes its
+lines, a new property is appended before the closing fence, and a rename
+changes only the key text. The panel matches keys exactly, including case.
+Removing the last property drops the block.
+
+Server-side property writes — setting a picture or image mask, reducing a
+relationship note to a source property, and removing a trashed note's links
+from other notes' properties — edit through the backend's
+`FrontmatterInPlaceEdit`. Setting a property matches its key ignoring case and
+replaces that entry, or appends it after the last entry; a note without
+frontmatter gets a new block. A value left empty by link removal loses its
+entry, and a block left empty is dropped.
+
+New keys and values are quoted when YAML needs it, by each side's own YAML
+library (`yaml` in the frontend, SnakeYAML in the backend), so the two sides
+may quote the same value differently.
 
 Property drafts synchronize when incoming parsed properties change, rather
 than when only the Markdown body or YAML formatting changes. This preserves

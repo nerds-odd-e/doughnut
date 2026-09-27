@@ -75,8 +75,8 @@ A folder's notes, files and subfolders are removed or moved by application
 code, never by a database cascade from the folder, so every removal passes the
 accepted-change capture and a forgotten one fails loudly.
 
-Every consumer of a notebook's live Portable content — ZIP export, Git cutover
-and history reset, accepted web changes, and projection-drift detection — reads
+Every consumer of a notebook's live Portable content — ZIP export, Git history
+creation and reset, accepted web changes, and projection-drift detection — reads
 one assembled tree, so files survive ordinary note and folder work and appear in
 export and reset without per-consumer handling. Within a directory the canonical
 order is README, then notes, then attachments by filename, then subdirectories;
@@ -133,10 +133,6 @@ listing at once. A notebook without an LFS binding refuses the upload. Uploading
 replacement picture leaves the previous file in the folder: it stays part of the
 notebook and its Git history until someone deletes it.
 
-Pictures uploaded before pictures became notebook files were moved into their
-notebooks as files beside their notes; their old table and
-`/attachments/images/...` address no longer exist.
-
 A Book's source file (PDF or EPUB) is an ordinary file at the notebook root.
 Attaching a Book on the web stores the bytes in the notebook's content store
 first, then accepts the file's LFS pointer together with the Book in one web
@@ -161,7 +157,7 @@ Git LFS pointer or an empty file, and a payload may be at most 10 MiB
 at each historical path, so a later rename to Markdown does not hide an earlier
 oversized attachment. An over-limit file is refused wherever the published
 commits introduce it, unless the accepted notebook's current tree already holds
-it, so an accepted over-limit file (a Book source, a legacy file) stays
+it, so an accepted over-limit file (such as a Book source) stays
 publishable when unchanged, moved or renamed. To fix a refused proposal, rewrite
 only unpublished commits.
 

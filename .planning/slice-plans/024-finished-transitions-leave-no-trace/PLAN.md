@@ -115,7 +115,7 @@ that read them.
 ### 3. Docs describe creation, reset and frontmatter editing as they are
 
 Type: Structure (docs)
-Status: planned
+Status: done
 Proof: `grep -rni "cutover\|legacy\|before pictures became" docs/notebook-git-*.md docs/note-content-saving.md`
 finds nothing; the rewritten sections name only current
 behavior; a reviewer reading "Rich property editing" can tell which side

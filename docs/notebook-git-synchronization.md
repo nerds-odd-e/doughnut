@@ -36,19 +36,24 @@ same repository-commit boundary. Crossing a binding boundary is deletion from
 one Portable tree and addition to the other. Do not give a bound subtree
 filtered or synthetic commit IDs as part of this contract.
 
-## Cutover and creation
+## Creation and history reset
 
-One fleet migration creates a dedicated repository and accepted `main` for
-every existing notebook. Each receives exactly one root commit containing its
-canonical Portable tree at cutover. Do not fabricate commits for earlier MySQL
-history, require owner opt-in, or defer repository creation until local
-acquisition. New notebooks are Git-backed from creation.
+Every notebook has a dedicated repository and accepted `main` from the moment
+it is created. Creating a notebook commits exactly one root commit, "Create
+notebook", by Donut System <system@donut.local>, holding the notebook's
+canonical Portable tree with the initial LFS `.gitattributes`.
+Repository creation needs no owner opt-in and does not wait for local
+acquisition.
 
-After cutover, accepted Git content is authoritative, including pointers that
-select immutable attachment versions in object storage. MySQL holds the current
-projection without attachment payloads and is authoritative for private
-identity-bound data. Existing database payloads transition under the
-[attachment storage contract](./notebook-git-lfs.md).
+A history reset replaces accepted `main` with one new root commit, "Reset:
+restart Git history from the current notebook", by the same author, holding the
+notebook's current canonical Portable tree. It keeps the accepted Git metadata,
+such as `.gitattributes`, exactly as the accepted tree holds it.
+
+Accepted Git content is authoritative, including pointers that select immutable
+attachment versions in object storage. MySQL holds the current projection
+without attachment payloads and is authoritative for private identity-bound
+data, under the [attachment storage contract](./notebook-git-lfs.md).
 
 Markdown notes and AI guidance, and non-Markdown attachments, are Portable
 content. Recall history, memory-tracker state, and other private learning data
@@ -103,8 +108,9 @@ separate operational decisions within the attachment retention contract.
 LFS payloads are external to Git blobs: a full Git bundle preserves the original
 Git history and pointers, while a usable checkout separately hydrates its files.
 Historical LFS objects remain available for explicit retrieval; a complete
-backup includes them. Legacy binary Git blobs remain in historical bundles,
-even after their server-side bytes move to object storage.
+backup includes them. Raw binary Git blobs committed before a notebook's
+[LFS conversion](./notebook-git-lfs.md#notebooks-converted-from-raw-storage)
+remain in full-history bundles.
 
 Only the publication tip must satisfy
 [ADR 0004 validation](./adrs/0004-okf-compatible-notebook-markdown-accepted.md#validation)
@@ -113,8 +119,7 @@ Markdown, temporary files, or structures Donut cannot represent. Git object
 integrity, connectivity, permitted ancestry, authorization, and safe inspection
 still apply to the entire received range. Attachment admission and referenced
 object availability also apply across newly admitted history, including files
-absent from the tip. The legacy transition does not rewrite existing commits.
-Retention does not authorize rendering
+absent from the tip. Retention does not authorize rendering
 historical drafts as current application content.
 
 V1 requires no historical-checkout UI, remote-history browser, or Donut revert
@@ -178,8 +183,8 @@ transaction when the root tree differs. Derivation opens the accepted root and
 the ancestor directories of the paths that captured change affects, rewrites
 those directories from the changed leaf toward the root, and reuses untouched
 child-tree object IDs. It does not load unrelated subtrees, note bodies, or
-attachment bytes in order to publish history. Cutover, history reset, drift
-checks, and bundle download may still read a complete tree. An unchanged root
+attachment bytes in order to publish history. Notebook creation, history
+reset, drift checks, and bundle download may still read a complete tree. An unchanged root
 tree ID does not append a commit or insert new Git objects. Destination construction, collision
 resolution, placement, and authored reference handling finish before that
 capture closes; newly created folders and all affected in-notebook content are
