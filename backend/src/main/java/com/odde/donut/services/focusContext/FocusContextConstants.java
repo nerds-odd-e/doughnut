@@ -1,5 +1,7 @@
 package com.odde.donut.services.focusContext;
 
+import com.odde.donut.entities.Note;
+
 public class FocusContextConstants {
   public static final String FOCUS_CONTEXT_ELEMENT = "focus_context";
   public static final String FOCUS_CONTEXT_OPEN_MARKER = "<" + FOCUS_CONTEXT_ELEMENT + ">";
@@ -51,6 +53,11 @@ public class FocusContextConstants {
       cap = cap / 3;
     }
     return cap;
+  }
+
+  /** A note's {@code folderPath}: outermost folder name first, joined by {@code " / "}. */
+  static String folderPathOf(Note note) {
+    return String.join(" / ", note.folderNamesFromRoot());
   }
 
   /**

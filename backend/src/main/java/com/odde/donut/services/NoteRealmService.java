@@ -3,7 +3,6 @@ package com.odde.donut.services;
 import com.odde.donut.algorithms.Frontmatter;
 import com.odde.donut.algorithms.FrontmatterQuestionGenerationInstruction;
 import com.odde.donut.algorithms.NoteContentMarkdown;
-import com.odde.donut.controllers.dto.FolderTrail;
 import com.odde.donut.controllers.dto.FolderTrailSegment;
 import com.odde.donut.controllers.dto.NoteRealm;
 import com.odde.donut.controllers.dto.RealmNotebookSidebar;
@@ -48,8 +47,7 @@ public class NoteRealmService {
     realm.setReferences(refNotes.stream().map(Note::getNoteTopology).toList());
     RealmNotebookSidebar sidebar = realm.sidebar();
     sidebar.setNotebookRealm(notebookCatalogService.notebookRealmFor(focus.getNotebook(), viewer));
-    sidebar.setAncestorFolders(
-        FolderTrailSegment.of(FolderTrail.fromRootToContainingFolder(focus)));
+    sidebar.setAncestorFolders(FolderTrailSegment.of(focus.folderTrailFromRoot()));
     sidebar.setScopedReadmeContent(resolveScopedReadmeContentForNote(focus));
     return realm;
   }
@@ -58,7 +56,7 @@ public class NoteRealmService {
     if (folder.getNotebook() == null) {
       return null;
     }
-    return resolveScopedReadmeContent(FolderTrail.fromRootToFolder(folder), folder.getNotebook());
+    return resolveScopedReadmeContent(folder.trailFromRoot(), folder.getNotebook());
   }
 
   /**
@@ -77,7 +75,7 @@ public class NoteRealmService {
           seenInstructionText,
           notebook.getReadmeContent(),
           "Instruction from notebook \"" + notebook.getName() + "\":");
-      for (Folder folder : FolderTrail.fromRootToContainingFolder(focus)) {
+      for (Folder folder : focus.folderTrailFromRoot()) {
         addLabeledInstructionBlockIfDistinct(
             blocks,
             seenInstructionText,
@@ -101,8 +99,7 @@ public class NoteRealmService {
     if (focus.getNotebook() == null) {
       return null;
     }
-    return resolveScopedReadmeContent(
-        FolderTrail.fromRootToContainingFolder(focus), focus.getNotebook());
+    return resolveScopedReadmeContent(focus.folderTrailFromRoot(), focus.getNotebook());
   }
 
   private String resolveScopedReadmeContent(List<Folder> outerToInner, Notebook notebook) {

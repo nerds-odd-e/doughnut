@@ -34,10 +34,7 @@ class NotebookCrudControllerTest extends NotebookControllerTestBase {
       NotebookRealm response = controller.createNotebook(notebookCreate("My Notebook Title"));
       assertThat(response.notebook().getId(), notNullValue());
       notebookRepository.findById(response.notebook().getId()).orElseThrow();
-      assertThat(
-          noteRepository.findNotesInNotebookRootFolderScopeByNotebookId(
-              response.notebook().getId()),
-          empty());
+      assertThat(noteRepository.findNotesInContainer(response.notebook().getId(), null), empty());
     }
 
     @Test

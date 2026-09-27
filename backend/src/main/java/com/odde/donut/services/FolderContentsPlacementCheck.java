@@ -68,7 +68,7 @@ final class FolderContentsPlacementCheck {
       Folder source, Notebook notebook, Folder destinationOrNull, Set<Integer> excludedFolderIds) {
     Optional<Folder> first = Optional.empty();
     for (Folder child :
-        folderRepository.findChildFoldersByParentFolderIdOrderByIdAsc(source.getId())) {
+        folderRepository.findFoldersInContainer(source.getNotebook().getId(), source.getId())) {
       Optional<Folder> existing =
           folderSiblingNameValidation.folderHolding(
               notebook, destinationOrNull, child.getName(), excludedFolderIds);
@@ -80,7 +80,8 @@ final class FolderContentsPlacementCheck {
       firstFolderMeetingAFolder(child, notebook, existing.get(), excludedFolderIds);
       first = first.or(() -> Optional.of(child));
     }
-    for (Note note : noteRepository.findNotesInFolderOrderByIdAsc(source.getId())) {
+    for (Note note :
+        noteRepository.findNotesInContainer(source.getNotebook().getId(), source.getId())) {
       takenBy(
               notebook,
               destinationOrNull,

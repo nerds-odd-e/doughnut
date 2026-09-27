@@ -80,19 +80,11 @@ public interface FolderRepository extends CrudRepository<Folder, Integer> {
   @Query(
       """
       SELECT f FROM Folder f
-      WHERE f.notebook.id = :notebookId AND f.parentFolder IS NULL
+      WHERE f.notebook.id = :notebookId AND f.parentFolder.id IS NOT DISTINCT FROM :folderId
       ORDER BY f.id ASC
       """)
-  List<Folder> findRootFoldersByNotebookIdOrderByIdAsc(@Param("notebookId") Integer notebookId);
-
-  @Query(
-      """
-      SELECT f FROM Folder f
-      WHERE f.parentFolder.id = :parentFolderId
-      ORDER BY f.id ASC
-      """)
-  List<Folder> findChildFoldersByParentFolderIdOrderByIdAsc(
-      @Param("parentFolderId") Integer parentFolderId);
+  List<Folder> findFoldersInContainer(
+      @Param("notebookId") Integer notebookId, @Param("folderId") Integer folderId);
 
   @Query(
       """

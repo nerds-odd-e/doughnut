@@ -2,7 +2,6 @@ package com.odde.donut.services;
 
 import com.odde.donut.controllers.dto.FolderMoveRequest;
 import com.odde.donut.controllers.dto.FolderRenameRequest;
-import com.odde.donut.controllers.dto.FolderTrail;
 import com.odde.donut.controllers.dto.NoteTrashReferenceHandling;
 import com.odde.donut.entities.DisplayName;
 import com.odde.donut.entities.Folder;
@@ -108,7 +107,7 @@ public class FolderRelocationService {
           }
           Folder trashParent =
               folderConstructionService.ensureTrashParentFor(
-                  liveNotebook, FolderTrail.ancestorsFromRootToParent(liveFolder));
+                  liveNotebook, liveFolder.ancestorsFromRoot());
           return folderMoveRelocation.placeFolderWithinNotebook(
               liveNotebook, liveFolder, trashParent, now);
         });

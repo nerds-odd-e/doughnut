@@ -48,7 +48,7 @@ class NotebookNoteCreateControllerTest extends NotebookControllerTestBase {
   @Test
   void createsTopLevelNoteWithNullParentFolder() throws Exception {
     Notebook nb = ownedNotebook();
-    assertThat(noteRepository.findNotesInNotebookRootFolderScopeByNotebookId(nb.getId()), empty());
+    assertThat(noteRepository.findNotesInContainer(nb.getId(), null), empty());
 
     NoteRealm result = controller.createNoteAtNotebookRoot(nb, noteCreate("Root One"));
 
@@ -118,7 +118,7 @@ class NotebookNoteCreateControllerTest extends NotebookControllerTestBase {
     controller.createNoteAtNotebookRoot(nb, noteCreateInFolder("B", f));
 
     assertThat(
-        noteRepository.findNotesInFolderOrderByIdAsc(f.getId()).stream()
+        noteRepository.findNotesInContainer(nb.getId(), f.getId()).stream()
             .map(Note::getTitle)
             .toList(),
         contains("A", "B"));

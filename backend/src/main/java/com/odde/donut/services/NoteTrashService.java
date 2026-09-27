@@ -1,6 +1,5 @@
 package com.odde.donut.services;
 
-import com.odde.donut.controllers.dto.FolderTrail;
 import com.odde.donut.controllers.dto.NoteTrashReferenceHandling;
 import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.Note;
@@ -57,7 +56,7 @@ public class NoteTrashService {
               note, referenceHandling, authorizationService.getCurrentUser());
           Folder trashParent =
               folderConstructionService.ensureTrashParentFor(
-                  note.getNotebook(), FolderTrail.fromRootToContainingFolder(note));
+                  note.getNotebook(), note.folderTrailFromRoot());
           noteMotionService.executeMoveIntoFolderWithAvailableTitle(note, trashParent);
         },
         note -> "Trash note: " + note.getTitle(),

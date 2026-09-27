@@ -76,7 +76,7 @@ public class FolderConstructionService {
 
   public Folder ensureTrashParentFor(Notebook notebook, List<Folder> sourceFolders) {
     Folder parent =
-        folderRepository.findRootFoldersByNotebookIdOrderByIdAsc(notebook.getId()).stream()
+        folderRepository.findFoldersInContainer(notebook.getId(), null).stream()
             .filter(Folder::isTrashed)
             .findFirst()
             .orElseGet(() -> createFolder(notebook, null, new DisplayName("_trash")));

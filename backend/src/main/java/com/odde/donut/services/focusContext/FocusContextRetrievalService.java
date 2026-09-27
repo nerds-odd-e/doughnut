@@ -1,6 +1,5 @@
 package com.odde.donut.services.focusContext;
 
-import com.odde.donut.controllers.dto.FolderTrail;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.User;
 import com.odde.donut.entities.repositories.NoteRepository;
@@ -111,7 +110,7 @@ public class FocusContextRetrievalService {
         new FocusContextFocusNote(
             hydrated.getNotebook() != null ? hydrated.getNotebook().getName() : null,
             hydrated.getTitle(),
-            FolderTrail.crumbPathJoinedBySlashSpace(hydrated),
+            FocusContextConstants.folderPathOf(hydrated),
             0,
             outgoingLinkUris,
             inboundRefUris,

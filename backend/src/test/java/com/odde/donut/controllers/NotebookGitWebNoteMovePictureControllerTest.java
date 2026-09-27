@@ -118,4 +118,35 @@ class NotebookGitWebNoteMovePictureControllerTest extends NotebookGitWebNoteMove
     assertThat(tipContent(after, "mechanics/force.png"), equalTo(pointer));
     assertAcceptedTreeMatchesTheFullAssembly(notebook);
   }
+
+  @Test
+  void aRootPictureAnotherRootNoteUsesIsCopiedNotMoved() throws Exception {
+    String pushBody = "---\nimage: push.png\n---\npush body";
+    Note push = makeMe.aNote("Push").notebook(notebook).content(pushBody).please();
+    makeMe
+        .aNote("Pull")
+        .notebook(notebook)
+        .content("---\nimage: push.png\n---\npull body")
+        .please();
+    byte[] rootPointer =
+        storeFolderAttachmentAndSnapshot(notebook, null, "push.png", new byte[] {8})
+            .getAcceptedGitContent();
+
+    relationController.moveNoteToFolder(push, mechanics);
+
+    AcceptedHistory after = acceptedHistory(notebook);
+    assertThat(
+        after.tipPaths(),
+        containsInAnyOrder(
+            "physics/Force.md",
+            "physics/force.png",
+            "Pull.md",
+            "push.png",
+            "mechanics/Push.md",
+            "mechanics/push.png"));
+    assertThat(tipText(after, "mechanics/Push.md"), equalTo(pushBody));
+    assertThat(tipContent(after, "push.png"), equalTo(rootPointer));
+    assertThat(tipContent(after, "mechanics/push.png"), equalTo(rootPointer));
+    assertAcceptedTreeMatchesTheFullAssembly(notebook);
+  }
 }

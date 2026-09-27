@@ -29,48 +29,6 @@ different frontmatter edits, each already with one owner.
 
 ## Story Decomposition
 
-<a id="story-4"></a>
-
-### The notebook tree has one model in code
-
-**Identity:** SEED-050#story-4
-```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/023-one-notebook-tree-model/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"e6161163959b0e22e3bce2e0d325b35ac717097dfd44eadf96c221ed26b4db1b","plan":"76ee1b124492c58e07dbee2cf33510d9fa97a5f4cbe45d316249da7008decf23"}}
-```
-
-**Goal:** Developers read a folder's ancestry from one method on `Folder`
-and read what a container (the notebook root or a folder) holds through one
-query per kind, so root and folder code paths stop diverging, with no
-performance loss.
-
-**Scope:**
-
-- `Folder` answers its trail from the root; the move-into-descendant check
-  and the health rule's depth derive from it instead of their own loops
-  (`FolderMoveDestinationRules`, `FolderSubtreeOccupancy`), and services stop
-  depending on a controller DTO helper (`FolderTrail`) for a domain rule.
-- One container query per kind (folders, files, notes) taking the notebook
-  and the folder or the root, as the name checks already do. The paired
-  root/folder queries, the listing's branch and `MovedNotePicture`'s own
-  root/folder branch go away.
-- Constraints: the same number of queries per request; ancestry compared by
-  id; listing response and move messages unchanged.
-- Unchanged: `Folder.isTrashed` and `NotebookGitPortablePath.folderPath`
-  (short recursions already reading as definitions, on hot paths).
-- Dropped (owner, 2026-09-27): resolving a Book's source file one way (it is
-  always a plain filename at the root, so both readings agree).
-
-**Key examples:**
-
-1. Folder `A/B/C`, move `A` into `C` → "Cannot move folder into its
-   descendant.", as today.
-2. Empty nested folders `X/Y/Z` → the empty-folder purge removes `Z`, then
-   `Y`, then `X`, as today.
-3. The root holds a note, a folder and a file, and so does a folder → each
-   listing shows only its own entries, as today.
-4. A root note whose picture another root note also uses is moved into a
-   folder → the picture is copied, not moved, as today.
-
 <a id="story-5"></a>
 
 ### Finished transitions leave no trace in code and docs

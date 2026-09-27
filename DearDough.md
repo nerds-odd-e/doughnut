@@ -358,6 +358,10 @@ A story's readiness basis is a digest of its whole seed document. Wrapping up an
   - Evidence: af4f39a65e closed SEED-050 story 2 and rewrote plan 026's story-2 link to a provenance reference; 847c4c5ce3 re-recorded sibling story 5; start refused with "published preparation is needs-reassessment"; story 8's section was unchanged, the plan diff was only that provenance line, and plan 026's product files were untouched since aef1e27b77; 7fdb9ba0a9 changed both `basis.document` (b84184e4… → 348fd390…) and `basis.plan` (302229bb… → 43fe8405…).
   - Observed effect: one refused start, about five read-only checks, one extra commit on main and a retry.
   - Inference: the wrap-up that edited plan 026's provenance line could have re-recorded story 8's readiness in the same commit, as the story-25 occurrence already suggests.
+- Execution: SEED-050#story-4 / `35972d89e4:.planning/slice-plans/023-one-notebook-tree-model/PLAN.md` / 3e9f034932; Timestamp: 2026-09-27, before 16:22:33+08:00 (refusal; readiness commit c896f2fcfc); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.42.
+  - Evidence: 299cd69bac closed SEED-050 story 3, removing its seed section; `execution-start.mjs start` refused with "published preparation is needs-reassessment"; `read-state` showed only `basis.document` changed (4213a2e5… → e6161163…) with the plan digest and story-4 section unchanged; c896f2fcfc re-recorded ready.
+  - Observed effect: one refused start, a starting-facts spot check, one extra commit on main and a retry.
+  - Inference: unlike the story 24 and story 3 occurrences, plan 023 did not depend on the closed sibling, so the reassessment carried no information.
 
 ## ODF-155 — An implementer proved fails-first by putting HEAD versions back in the shared execution checkout
 
@@ -535,6 +539,10 @@ Former local code: DD-133.
 - Execution: SEED-050#story-8 / `.planning/slice-plans/026-one-folder-entry-rule/PLAN.md` / 649e162dd4; Timestamp: 2026-09-27, ~17:04+08:00 (slice 1 commit); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: unknown.
   - Evidence: two runs of `node .claude/skills/dough-execute-plan/scripts/agent-commit.mjs -m …` from the worktree root exited 0 with empty output, HEAD still ce8390fdd2; the `.agents/skills/…` path returned `{"ok":true,"status":"committed","agent":"Aino-chan","sha":"649e162dd4…"}`. `execution-start.mjs start` ran through the `.claude` path from the main checkout in the same session.
   - Observed effect: three extra coordinator calls, including reading the script's guard; nothing committed wrongly. Sixth retained occurrence, unknown to the coordinator at call time.
+- Execution: SEED-050#story-4 / `35972d89e4:.planning/slice-plans/023-one-notebook-tree-model/PLAN.md` / 3e9f034932; Timestamp: 2026-09-27T16:27:27+08:00 (slice 1 commit, made after switching to the `realpath`); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.42.
+  - Evidence: two runs of `node .claude/skills/dough-execute-plan/scripts/agent-commit.mjs -m …` from the worktree root exited 0 with empty output and `git log` still at 9e1aeb19df; the `realpath` invocation returned `{"ok":true,"status":"committed","agent":"Maria-chan"}`. `execution-start.mjs` carries the same guard (line 39) but succeeded through `.claude/skills/…` because it ran from the default checkout, where `.claude/skills/dough-execute-plan` is a real directory; in the worktree it is a symlink to `../../.agents/skills/dough-execute-plan` created by worktree setup.
+  - Observed effect: three extra coordinator calls, including reading the script; nothing committed wrongly. Seventh retained occurrence.
+  - Inference: the silent exit is specific to worktree-prepared skill links, so every execution that commits from its worktree hits it until the guard compares real paths or worktree setup stops symlinking.
 
 ## ODF-100 — Agents reported vue-tsc's exit code from a pipe into `tail`, so the coordinator had to rerun the typecheck
 

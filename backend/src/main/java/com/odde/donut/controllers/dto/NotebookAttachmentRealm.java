@@ -1,6 +1,7 @@
 package com.odde.donut.controllers.dto;
 
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
+import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.NotebookAttachment;
 import com.odde.donut.services.notebookAttachment.PictureFile;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -22,7 +23,7 @@ public record NotebookAttachmentRealm(
     RealmNotebookSidebar sidebar = new RealmNotebookSidebar();
     sidebar.setNotebookRealm(chrome);
     sidebar.setAncestorFolders(
-        FolderTrailSegment.of(FolderTrail.fromRootToFolder(attachment.getFolder())));
+        FolderTrailSegment.of(Folder.trailFromRootTo(attachment.getFolder())));
     return new NotebookAttachmentRealm(
         sidebar,
         new NotebookAttachmentListItem(attachment.getId(), attachment.getFilename()),

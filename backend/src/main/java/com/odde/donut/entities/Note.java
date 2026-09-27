@@ -84,6 +84,16 @@ public class Note extends EntityIdentifiedByIdOnly {
   @JsonIgnore
   private Timestamp createdAt;
 
+  /** Outermost folder first, from notebook root to the containing folder (empty at root). */
+  public List<Folder> folderTrailFromRoot() {
+    return Folder.trailFromRootTo(folder);
+  }
+
+  /** Outermost folder name first, from notebook root to the containing folder. */
+  public List<String> folderNamesFromRoot() {
+    return folderTrailFromRoot().stream().map(Folder::getName).toList();
+  }
+
   @JsonIgnore
   public boolean isAvailable() {
     return !isTrashed();

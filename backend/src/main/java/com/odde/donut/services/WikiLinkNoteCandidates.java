@@ -2,7 +2,6 @@ package com.odde.donut.services;
 
 import com.odde.donut.algorithms.FrontmatterAliases;
 import com.odde.donut.algorithms.PathShapedTarget;
-import com.odde.donut.controllers.dto.FolderTrail;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.NoteAliasIndex;
 import com.odde.donut.entities.repositories.NoteAliasIndexRepository;
@@ -61,8 +60,7 @@ final class WikiLinkNoteCandidates {
     }
     List<Note> inFolder = new ArrayList<>();
     for (Note candidate : byTitle) {
-      if (path.matchesTitleAndFolderTrail(
-          candidate.getTitle(), FolderTrail.namesFromRootToContainingFolder(candidate))) {
+      if (path.matchesTitleAndFolderTrail(candidate.getTitle(), candidate.folderNamesFromRoot())) {
         inFolder.add(candidate);
       }
     }

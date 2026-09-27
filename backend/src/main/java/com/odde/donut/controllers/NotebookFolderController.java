@@ -9,13 +9,13 @@ import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.User;
 import com.odde.donut.entities.repositories.FolderRepository;
+import com.odde.donut.entities.repositories.NoteRepository;
 import com.odde.donut.entities.repositories.NotebookAttachmentRepository;
 import com.odde.donut.entities.repositories.NotebookRepository;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.donut.factoryServices.EntityPersister;
 import com.odde.donut.services.AuthorizationService;
 import com.odde.donut.services.FolderRelocationService;
-import com.odde.donut.services.NoteService;
 import com.odde.donut.services.NotebookCatalogService;
 import com.odde.donut.services.notebookGit.AcceptedWebChangeService;
 import com.odde.donut.services.notebookGit.WebFolderCreationService;
@@ -51,7 +51,7 @@ class NotebookFolderController extends NotebookFolderQuerySupport {
 
   NotebookFolderController(
       AuthorizationService authorizationService,
-      NoteService noteService,
+      NoteRepository noteRepository,
       FolderRepository folderRepository,
       NotebookCatalogService notebookCatalogService,
       WebFolderCreationService webFolderCreationService,
@@ -63,7 +63,7 @@ class NotebookFolderController extends NotebookFolderQuerySupport {
       NotebookAttachmentRepository notebookAttachmentRepository) {
     super(
         authorizationService,
-        noteService,
+        noteRepository,
         folderRepository,
         notebookCatalogService,
         notebookAttachmentRepository);
