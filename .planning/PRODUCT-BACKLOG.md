@@ -10,8 +10,6 @@ and deletable in Web Donut.
 
 ## Taken
 
-- [Retire the one-time note line-ending normalization](seeds/SEED-046-notebook-files-and-git-findings.md#story-13) — SEED-046#story-13
-
 ## Backlog list
 
 - [Responses carry no ORM internals and a lean folder trail](seeds/SEED-046-notebook-files-and-git-findings.md#story-9) — SEED-046#story-9
