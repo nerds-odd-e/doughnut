@@ -156,11 +156,16 @@ public class FolderSiblingNameValidation {
 
   /**
    * The folder in {@code parentOrNull} named {@code name} (ignoring case) for a new entry to go
-   * into; empty when no entry holds the name.
+   * into; empty when no entry holds the name. A note or file holding it is {@code
+   * RESOURCE_CONFLICT} naming its path.
    */
   public Optional<Folder> folderToEnter(Notebook notebook, Folder parentOrNull, DisplayName name) {
-    return entryHolding(notebook, parentOrNull, name.value(), Set.of())
-        .flatMap(taken -> folderHolding(notebook, parentOrNull, name.value(), Set.of()));
+    Optional<Folder> folder = folderHolding(notebook, parentOrNull, name.value(), Set.of());
+    if (folder.isEmpty()) {
+      entryHolding(notebook, parentOrNull, name.value(), Set.of())
+          .ifPresent(FolderSiblingNameValidation::refuseTaken);
+    }
+    return folder;
   }
 
   /** The first name from {@code requestedName} that no entry in {@code parentOrNull} holds. */

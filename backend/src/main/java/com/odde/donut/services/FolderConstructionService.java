@@ -108,7 +108,7 @@ public class FolderConstructionService {
 
   /**
    * The folder in {@code parentOrNull} named {@code name} (ignoring case) for a new entry to go
-   * into, created when absent.
+   * into, created when no entry holds the name; a note or file holding it is refused.
    */
   public Folder folderToEnterOrCreate(Notebook notebook, Folder parentOrNull, DisplayName name) {
     return folderSiblingNameValidation

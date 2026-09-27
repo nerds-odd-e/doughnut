@@ -157,7 +157,10 @@ on the name owner beside `mergeTargetOrRefuse`, using `entryHolding` and
 ### 4. A child folder name held by a file is refused
 
 Type: Behavior
-Status: planned
+Status: done
+Accepted proof: `childFolderNameHeldByAFileIsRefusedWithoutAnyChange` failed
+first (folder created beside the file), then passed: `RESOURCE_CONFLICT`
+naming `Europe/relations`, binding, folders and notes unchanged (9/9).
 Proof: a new case in `NotebookGitNoteCreationFolderControllerTest` for
 example 3 (`Europe` holds a file `relations` → `RESOURCE_CONFLICT` naming
 `Europe/relations`; head and rows unchanged) fails first (a `relations`
