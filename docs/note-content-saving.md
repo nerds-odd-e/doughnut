@@ -43,11 +43,7 @@ Note Markdown is stored and committed with LF line endings whatever its source
 (web, API, MCP, import): `AuthoredNoteDocument.fromContent`, which every note
 content write passes, replaces CRLF with LF. A lone CR is left as it is, and
 attachment bytes are never normalized. A published `.md` blob that still holds
-CRLF does not match the re-encoded tree and is refused. At application startup,
-`NoteLineEndingNormalizationOnStartup` rewrites notes that still hold CRLF to
-LF, one Donut System commit ("Normalize note line endings") per affected
-notebook; a notebook that fails is logged, left unchanged and retried on the
-next startup.
+CRLF does not match the re-encoded tree and is refused.
 
 The [Git synchronization contract](notebook-git-synchronization.md) governs
 history, identity and publication guarantees.
