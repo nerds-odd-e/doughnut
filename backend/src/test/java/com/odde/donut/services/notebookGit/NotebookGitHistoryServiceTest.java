@@ -21,7 +21,6 @@ import org.eclipse.jgit.internal.storage.dfs.DfsRepositoryDescription;
 import org.eclipse.jgit.internal.storage.dfs.InMemoryRepository;
 import org.eclipse.jgit.lib.ObjectId;
 import org.eclipse.jgit.revwalk.RevCommit;
-import org.eclipse.jgit.revwalk.RevWalk;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -32,7 +31,7 @@ class NotebookGitHistoryServiceTest extends SpringTestBase {
   @Autowired NotebookGitAcceptedRepositoryStore acceptedRepositoryStore;
 
   @Test
-  void createsOneRootCommitBindingCapturingTheNotebooksCanonicalTree() throws Exception {
+  void startHistoryBindsTheNotebooksCanonicalTree() throws Exception {
     Notebook notebook = makeMe.aNotebook().readmeContent("# Notebook readme").please();
     Folder folder =
         makeMe
@@ -70,26 +69,10 @@ class NotebookGitHistoryServiceTest extends SpringTestBase {
               readBack, acceptedRepositoryStore.downloadableBundle(binding));
       assertThat(headObjectId.getName(), equalTo(binding.getAcceptedGitObjectId()));
 
-      try (RevWalk revWalk = new RevWalk(readBack)) {
-        RevCommit commit = revWalk.parseCommit(headObjectId);
-        assertThat(commit.getParentCount(), equalTo(0));
-        assertThat(commit.getAuthorIdent().getName(), equalTo("Donut System"));
-        assertThat(commit.getAuthorIdent().getEmailAddress(), equalTo("system@donut.local"));
-        assertThat(commit.getFullMessage(), equalTo("Create notebook"));
-
-        List<PortableTreeEntry> foundEntries = GitBundleTestReader.readExactTree(readBack, commit);
-
-        assertThat(foundEntries, contains(expectedEntries.toArray(new PortableTreeEntry[0])));
-
-        // Only one commit reachable from main: no earlier history was fabricated.
-        revWalk.reset();
-        revWalk.markStart(commit);
-        int commitCount = 0;
-        for (RevCommit ignored : revWalk) {
-          commitCount++;
-        }
-        assertThat(commitCount, equalTo(1));
-      }
+      RevCommit commit = readBack.parseCommit(headObjectId);
+      assertThat(
+          GitBundleTestReader.readExactTree(readBack, commit),
+          contains(expectedEntries.toArray(new PortableTreeEntry[0])));
     }
   }
 
@@ -135,13 +118,10 @@ class NotebookGitHistoryServiceTest extends SpringTestBase {
               readBack, acceptedRepositoryStore.downloadableBundle(binding));
       assertThat(headObjectId.getName(), equalTo(binding.getAcceptedGitObjectId()));
 
-      try (RevWalk revWalk = new RevWalk(readBack)) {
-        RevCommit commit = revWalk.parseCommit(headObjectId);
-
-        List<PortableTreeEntry> foundEntries = GitBundleTestReader.readExactTree(readBack, commit);
-
-        assertThat(foundEntries, contains(expectedEntries.toArray(new PortableTreeEntry[0])));
-      }
+      RevCommit commit = readBack.parseCommit(headObjectId);
+      assertThat(
+          GitBundleTestReader.readExactTree(readBack, commit),
+          contains(expectedEntries.toArray(new PortableTreeEntry[0])));
     }
   }
 }

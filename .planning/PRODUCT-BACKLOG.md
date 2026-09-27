@@ -10,7 +10,5 @@ and deletable in Web Donut.
 
 ## Taken
 
-- [Notebook history commits are proven where they happen](seeds/SEED-050-local-ai-notebook-technical-debt.md#story-10) — SEED-050#story-10 ([plan](slice-plans/028-history-commits-proven-where-they-happen/PLAN.md))
-
 ## Backlog list
 
