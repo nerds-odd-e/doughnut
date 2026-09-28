@@ -6,6 +6,7 @@ import {
   TestabilityRestController,
 } from "@generated/donut-backend-api/sdk.gen"
 import helper, { mockSdkService } from "@tests/helpers"
+import { screen } from "@testing-library/vue"
 import { flushPromises } from "@vue/test-utils"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import createFetchMock from "vitest-fetch-mock"
@@ -20,7 +21,7 @@ const reminder = () =>
 describe("DonutApp frontend update reminder", () => {
   let entryScript: HTMLScriptElement
 
-  beforeEach(() => {
+  beforeEach(async () => {
     entryScript = document.createElement("script")
     entryScript.type = "module"
     entryScript.src = loadedEntry
@@ -31,6 +32,8 @@ describe("DonutApp frontend update reminder", () => {
       user: undefined,
       externalIdentifier: undefined,
     })
+    helper.component(DonutApp).withRouter().render()
+    await flushPromises()
   })
 
   afterEach(() => {
@@ -48,9 +51,9 @@ describe("DonutApp frontend update reminder", () => {
     fetchMock.mockResponse((request) =>
       new URL(request.url).pathname === "/" ? servedIndexHtml : ""
     )
-    const servedHtmlRead = vi.spyOn(DOMParser.prototype, "parseFromString")
-    helper.component(DonutApp).withRouter().render()
-    await flushPromises()
+    const servedHtmlRead = vi
+      .spyOn(DOMParser.prototype, "parseFromString")
+      .mockClear()
     document.dispatchEvent(new Event("visibilitychange"))
     await vi.waitFor(() => expect(servedHtmlRead).toHaveBeenCalled())
     await nextTick()
@@ -65,7 +68,7 @@ describe("DonutApp frontend update reminder", () => {
     expect(reminder()?.textContent).toContain(
       "A newer version of Donut is available"
     )
-    reminder()!.querySelector("button")!.click()
+    screen.getByRole("button", { name: "Reload" }).click()
     expect(reload).toHaveBeenCalled()
   })
 
@@ -73,5 +76,17 @@ describe("DonutApp frontend update reminder", () => {
     await returnToTabWhileServing(loadedEntry)
 
     expect(reminder()).toBeNull()
+  })
+
+  it("brings a dismissed reminder back only for a newer release", async () => {
+    await returnToTabWhileServing("data:text/javascript,//entry-B")
+    screen.getByRole("button", { name: "Dismiss" }).click()
+    await nextTick()
+
+    await returnToTabWhileServing("data:text/javascript,//entry-B")
+    expect(reminder()).toBeNull()
+
+    await returnToTabWhileServing("data:text/javascript,//entry-C")
+    expect(reminder()).not.toBeNull()
   })
 })

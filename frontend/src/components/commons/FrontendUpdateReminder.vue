@@ -8,19 +8,33 @@
     <button class="daisy-btn daisy-btn-sm" @click="browserLocation.reload()">
       Reload
     </button>
+    <button class="daisy-btn daisy-btn-sm daisy-btn-ghost" @click="dismiss">
+      Dismiss
+    </button>
   </div>
 </template>
 
 <script setup lang="ts">
-import { onMounted, onUnmounted, ref } from "vue"
+import { computed, onMounted, onUnmounted, ref } from "vue"
 import { browserLocation } from "@/managedApi/window/browserLocation"
-
-const updateAvailable = ref(false)
 
 const moduleEntries = (doc: Document) =>
   Array.from(doc.querySelectorAll('script[type="module"][src]'), (script) =>
     script.getAttribute("src")
   ).join(" ")
+
+const loadedEntries = moduleEntries(document)
+const servedEntries = ref(loadedEntries)
+const dismissedEntries = ref<string>()
+const updateAvailable = computed(
+  () =>
+    servedEntries.value !== loadedEntries &&
+    servedEntries.value !== dismissedEntries.value
+)
+
+const dismiss = () => {
+  dismissedEntries.value = servedEntries.value
+}
 
 const checkForUpdate = async () => {
   if (document.visibilityState !== "visible") return
@@ -29,7 +43,7 @@ const checkForUpdate = async () => {
     await response.text(),
     "text/html"
   )
-  updateAvailable.value = moduleEntries(served) !== moduleEntries(document)
+  servedEntries.value = moduleEntries(served)
 }
 
 onMounted(() => document.addEventListener("visibilitychange", checkForUpdate))

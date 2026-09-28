@@ -71,8 +71,11 @@ Behavior: the app is loaded with entry script A →
 
 ### 2. A dismissed reminder returns only for a newer release
 Type: Behavior
-Status: planned
-Proof: extend the same spec; same command.
+Status: done
+Accepted proof: "brings a dismissed reminder back only for a newer release" in
+the same spec (3 tests pass) and `vue-tsc --noEmit` pass; removing the
+dismissed-identity condition makes it fail.
+Planned proof: extend the same spec; same command.
 
 Behavior: the reminder for entry B is showing → the user dismisses it → the tab
 becomes visible and `/` still names B → no reminder; the tab becomes visible and
@@ -91,4 +94,5 @@ becomes visible and `/` still names B → no reminder; the tab becomes visible a
 - A fetch-driven check does not settle within one `flushPromises()` under
   vitest-fetch-mock. The spec waits on its `DOMParser.prototype.parseFromString`
   spy (`returnToTabWhileServing`) so absence assertions cannot pass before the
-  check runs; slice 2 reuses that helper.
+  check runs. Rendering once in `beforeEach` and clearing that spy per call
+  lets one test return to the tab several times.
