@@ -84,6 +84,10 @@ Type: Behavior
 Status: done
 Proof: added case to `tests/pages/HomePage.welcome.spec.ts` (3 passed).
 
+## Execution complete
+
+Product advice: No backlog change. Promised maintenance delivered across all three slices (due-only Assimilate badge, recent-notes requested at most once per view, and home flow line not drawn while hidden). Optional hardening if desired: pin viewport in home welcome unit test to ≤768px and assert desktop still sets d.
+
 ## Current decisions
 
 - Badge option (b): due count only; total stays in the tooltip (owner, during
