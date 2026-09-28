@@ -37,7 +37,7 @@ turning them into permanent historical or research documentation.
 
 **Identity:** SEED-051#story-2
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/010-search-shows-each-response/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"7ba4a63818116f2c4308360c5d6bce2d22cdd24d0886559d2878d122357c3531","plan":"a7e4bddc90fc0c3c1ed02fcff01854fd65675ae7f318bb13fa1b581572ba6281"}}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/010-search-shows-each-response/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"080610786fefe842f9ca473ed6c6c99eafe2d807a410ded556f960ca3c0c764d","plan":"a7e4bddc90fc0c3c1ed02fcff01854fd65675ae7f318bb13fa1b581572ba6281"}}
 ```
 
 **Slice plan:** [Web search shows each response without accumulating earlier ones](../slice-plans/010-search-shows-each-response/PLAN.md)
