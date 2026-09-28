@@ -90,8 +90,6 @@
         </button>
       </div>
     </section>
-
-    <NotebookIndexingSection :notebook-id="notebook.id" />
   </div>
 </template>
 
@@ -115,7 +113,6 @@ import NotebookMoveForm from "@/components/notebook/NotebookMoveForm.vue"
 import CheckInput from "@/components/form/CheckInput.vue"
 import TextInput from "@/components/form/TextInput.vue"
 import NotebookAttachedBookSection from "@/components/notebook/NotebookAttachedBookSection.vue"
-import NotebookIndexingSection from "@/components/notebook/NotebookIndexingSection.vue"
 
 const props = defineProps({
   notebook: { type: Object as PropType<Notebook>, required: true },

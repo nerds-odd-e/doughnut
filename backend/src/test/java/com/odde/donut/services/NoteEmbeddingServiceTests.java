@@ -5,7 +5,6 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 
 import com.odde.donut.entities.Note;
-import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.repositories.NoteEmbeddingRepository;
 import com.odde.donut.testability.SpringTestBase;
 import java.util.List;
@@ -19,12 +18,10 @@ class NoteEmbeddingServiceTests extends SpringTestBase {
   @Autowired NoteEmbeddingService service;
 
   Note note;
-  Notebook notebook;
 
   @BeforeEach
   void setup() {
-    notebook = makeMe.aNotebook().please();
-    note = makeMe.aNote().notebook(notebook).please();
+    note = makeMe.aNote().please();
   }
 
   @Test
@@ -34,19 +31,6 @@ class NoteEmbeddingServiceTests extends SpringTestBase {
     service.deleteEmbedding(note.getId());
 
     assertThat(noteEmbeddingRepository.existsByNoteId(note.getId()), is(false));
-  }
-
-  @Test
-  void shouldDeleteNotebookEmbeddings() {
-    makeMe.aNote().notebook(notebook).please();
-    makeMe.refresh(notebook);
-    notebook.getNotes().forEach(n -> makeMe.aNoteEmbedding(n).please());
-
-    service.deleteNotebookEmbeddings(notebook.getId());
-
-    notebook
-        .getNotes()
-        .forEach(n -> assertThat(noteEmbeddingRepository.existsByNoteId(n.getId()), is(false)));
   }
 
   @Test

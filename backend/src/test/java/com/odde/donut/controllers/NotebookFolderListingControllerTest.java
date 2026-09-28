@@ -159,17 +159,4 @@ class NotebookFolderListingControllerTest extends NotebookControllerTestBase {
     assertThrows(
         UnexpectedNoAccessRightException.class, () -> folderController.listNotebookFolderIndex(nb));
   }
-
-  @Test
-  void updateNotebookIndexRequiresAuthorization() throws UnexpectedNoAccessRightException {
-    controller.updateNotebookIndex(ownedNotebook());
-  }
-
-  @Test
-  void updateNotebookIndexRejectsUnauthorizedUser() {
-    Note note = makeMe.aNote().notebookOwnedBy(makeMe.aUser().please()).please();
-    assertThrows(
-        UnexpectedNoAccessRightException.class,
-        () -> controller.updateNotebookIndex(note.getNotebook()));
-  }
 }

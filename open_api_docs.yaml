@@ -985,20 +985,6 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/Notebook"
-  /api/notebooks/{notebook}/update-index:
-    post:
-      tags:
-      - notebook-controller
-      operationId: updateNotebookIndex
-      parameters:
-      - name: notebook
-        in: path
-        required: true
-        schema:
-          type: integer
-      responses:
-        "200":
-          description: OK
   /api/notebooks/{notebook}/share:
     post:
       tags:
@@ -1017,20 +1003,6 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/Notebook"
-  /api/notebooks/{notebook}/reset-index:
-    post:
-      tags:
-      - notebook-controller
-      operationId: resetNotebookIndex
-      parameters:
-      - name: notebook
-        in: path
-        required: true
-        schema:
-          type: integer
-      responses:
-        "200":
-          description: OK
   /api/notebooks/{notebook}/reset-git-history:
     post:
       tags:

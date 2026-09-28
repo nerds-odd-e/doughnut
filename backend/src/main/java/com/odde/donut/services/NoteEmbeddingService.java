@@ -28,10 +28,6 @@ public class NoteEmbeddingService {
     noteEmbeddingRepository.deleteByNoteId(noteId);
   }
 
-  public void deleteNotebookEmbeddings(Integer notebookId) {
-    noteEmbeddingRepository.deleteByNotebookId(notebookId);
-  }
-
   public Optional<List<Float>> getEmbedding(Integer noteId) {
     return noteEmbeddingJdbcRepository
         .select(noteId)

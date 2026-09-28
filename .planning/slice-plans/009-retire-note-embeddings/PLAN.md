@@ -244,7 +244,11 @@ real MCP feature. Remove embedding/semantic promises, not the working tool.
 
 ### 6. Notebook administration stops producing embedding indexes
 Type: Behavior
-Status: planned
+Status: done
+Accepted proof: B `backend:test_only` full suite exit 0; A regenerated (index operations gone);
+F 1941 pass, `vue-tsc` 0. Manual (controller/service/UI) and scheduled (`EmbeddingMaintenanceJob`)
+producers deleted; `SchedulingConfig` stays for `QuestionGenerationBatchMaintenanceJob`. Deleting a
+Vue component needs `vite build` to refresh tracked `frontend/components.d.ts`.
 Size: 5–8 minutes active; B/A/F runtime excepted.
 Proof: B, A, F; current notebook settings save successfully; reviewed removal
 inventory covers manual and scheduled producers.

@@ -2211,22 +2211,6 @@ export type UpdateNotebookResponses = {
 
 export type UpdateNotebookResponse = UpdateNotebookResponses[keyof UpdateNotebookResponses];
 
-export type UpdateNotebookIndexData = {
-    body?: never;
-    path: {
-        notebook: number;
-    };
-    query?: never;
-    url: '/api/notebooks/{notebook}/update-index';
-};
-
-export type UpdateNotebookIndexResponses = {
-    /**
-     * OK
-     */
-    200: unknown;
-};
-
 export type ShareNotebookData = {
     body?: never;
     path: {
@@ -2244,22 +2228,6 @@ export type ShareNotebookResponses = {
 };
 
 export type ShareNotebookResponse = ShareNotebookResponses[keyof ShareNotebookResponses];
-
-export type ResetNotebookIndexData = {
-    body?: never;
-    path: {
-        notebook: number;
-    };
-    query?: never;
-    url: '/api/notebooks/{notebook}/reset-index';
-};
-
-export type ResetNotebookIndexResponses = {
-    /**
-     * OK
-     */
-    200: unknown;
-};
 
 export type ResetNotebookGitHistoryData = {
     body?: never;
