@@ -23,4 +23,17 @@ describe("HomePage welcome copy", () => {
     expect(text).toContain("To Donut")
     expect(text).toContain("Donut will eventually")
   })
+
+  it("does not draw the flow line while the background is hidden", async () => {
+    const wrapper = helper
+      .component(HomePage)
+      .withRouter()
+      .withCurrentUser(makeMe.aUser.please())
+      .mount({ attachTo: document.body })
+
+    await new Promise((resolve) => setTimeout(resolve, 150))
+
+    expect(wrapper.find(".flow-path").attributes("d")).toBeUndefined()
+    wrapper.unmount()
+  })
 })

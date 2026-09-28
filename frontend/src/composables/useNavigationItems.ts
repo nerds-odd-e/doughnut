@@ -1,8 +1,8 @@
 import { computed } from "vue"
 import { useRoute } from "vue-router"
 import {
+  abbreviateCount,
   assimilationBadgeTitle,
-  formatAssimilationBadge,
   useAssimilationCount,
 } from "@/composables/useAssimilationCount"
 import { useRecallData } from "@/composables/useRecallData"
@@ -46,10 +46,7 @@ export function useNavigationItems() {
         name: "assimilate",
         label: "Assimilate",
         icon: CircleCheck,
-        badge:
-          due > 0 || totalUnassimilated > 0
-            ? formatAssimilationBadge(due, totalUnassimilated)
-            : undefined,
+        badge: due > 0 ? abbreviateCount(due) : undefined,
         badgeTitle: assimilationBadgeTitle(due, totalUnassimilated),
         badgeClass: "due-count",
         isActive: false,
