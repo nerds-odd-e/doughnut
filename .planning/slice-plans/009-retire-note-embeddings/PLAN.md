@@ -319,7 +319,12 @@ Record the release receipt here. Failure holds schema deployment.
 
 ### 9. Installed schemas migrate to the current data model
 Type: Behavior
-Status: planned
+Status: done — D = `V300000350__drop_note_embeddings.sql` (``DROP TABLE `note_embeddings`;``), P =
+`V300000351__db_migration_placeholder.sql` (comment-only, like former V300000339). Highest ever used was
+`300000349` (branch and `origin/main` files; deleted versions max 339). B `backend:test_only` exit 0 with
+`migrateTestDB` applying 350/351 on owned `doughnut_wt_77e8daf1364047cbad7ae6ef537b98a1_test` (table absent);
+ERD regenerated from that schema (only `note_embeddings` removed); db-migration skill newest-version facts
+updated. SQL matches the slice 2 rehearsal except P being comment-only, as production already accepted for 339.
 Size: 3–5 minutes active after slice 2; migration/B/ERD runtime excepted.
 Proof: populated isolated upgrade preserves ordinary data and schema; B and ERD.
 
