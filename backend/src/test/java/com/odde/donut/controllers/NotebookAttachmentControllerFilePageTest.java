@@ -98,6 +98,43 @@ class NotebookAttachmentControllerFilePageTest extends ControllerTestBase {
         contains(design.getId(), review.getId()));
   }
 
+  @Test
+  void listsRootNoteWhoseFolderRelativeImagePathResolvesToThisFile() throws Exception {
+    Folder docs = makeMe.aFolder().notebook(notebook).name("docs").please();
+    NotebookAttachment diagram = attachmentIn(docs, "diagram.png");
+    Note overview = noteWithImageAtRoot("Overview", "docs/diagram.png");
+
+    NotebookAttachmentRealm page = controller.getAttachmentPage(notebook, diagram);
+
+    assertThat(page.references(), hasSize(1));
+    assertThat(page.references().getFirst().getId(), equalTo(overview.getId()));
+  }
+
+  @Test
+  void sameFilenameInAnotherFolderIsNotConfused() throws Exception {
+    Folder docs = makeMe.aFolder().notebook(notebook).name("docs").please();
+    Folder archive = makeMe.aFolder().notebook(notebook).name("archive").please();
+    NotebookAttachment docsDiagram = attachmentIn(docs, "diagram.png");
+    NotebookAttachment archiveDiagram = attachmentIn(archive, "diagram.png");
+    Note design = noteWithImage("Design", docs, "diagram.png");
+
+    NotebookAttachmentRealm docsPage = controller.getAttachmentPage(notebook, docsDiagram);
+    NotebookAttachmentRealm archivePage = controller.getAttachmentPage(notebook, archiveDiagram);
+
+    assertThat(docsPage.references(), hasSize(1));
+    assertThat(docsPage.references().getFirst().getId(), equalTo(design.getId()));
+    assertThat(archivePage.references(), empty());
+  }
+
+  @Test
+  void doesNotListTrashedNotes() throws Exception {
+    Folder docs = makeMe.aFolder().inTrashOf(notebook).name("docs").please();
+    NotebookAttachment diagram = attachmentIn(docs, "diagram.png");
+    noteWithImage("Gone", docs, "diagram.png");
+
+    assertThat(controller.getAttachmentPage(notebook, diagram).references(), empty());
+  }
+
   private NotebookAttachment attachmentAtRoot(String filename, String content) {
     return makeMe
         .anAttachment(filename)
@@ -118,6 +155,14 @@ class NotebookAttachmentControllerFilePageTest extends ControllerTestBase {
     return makeMe
         .aNote(title)
         .folder(folder)
+        .content("---\nimage: " + image + "\n---\nBody text")
+        .please();
+  }
+
+  private Note noteWithImageAtRoot(String title, String image) {
+    return makeMe
+        .aNote(title)
+        .notebook(notebook)
         .content("---\nimage: " + image + "\n---\nBody text")
         .please();
   }

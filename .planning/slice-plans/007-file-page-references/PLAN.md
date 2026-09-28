@@ -94,8 +94,8 @@ Behavior:
 
 ### 2. References follow the folder-relative path across the notebook and skip trashed notes
 Type: Behavior
-Status: planned
-Proof: `NotebookAttachmentControllerTest.FilePage` extended; slice 1's E2E scenario and `AttachmentPage.spec.ts` stay green.
+Status: done
+Proof: `NotebookAttachmentControllerFilePageTest` extended; slice 1's E2E scenario and `AttachmentPage.spec.ts` stay green.
 
 Behavior:
 - `Overview` at the notebook root has `image: docs/diagram.png` → it is in the
