@@ -7,6 +7,7 @@ import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.donut.services.AuthorizationService;
 import com.odde.donut.services.NotebookCatalogService;
 import com.odde.donut.services.notebookAttachment.NotebookAttachmentFile;
+import com.odde.donut.services.notebookGit.NoteFolderAttachment;
 import com.odde.donut.services.notebookGit.WebAttachmentDeleteService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -28,16 +29,19 @@ class NotebookAttachmentController {
   private final NotebookCatalogService notebookCatalogService;
   private final NotebookAttachmentFile notebookAttachmentFile;
   private final WebAttachmentDeleteService webAttachmentDeleteService;
+  private final NoteFolderAttachment noteFolderAttachment;
 
   NotebookAttachmentController(
       AuthorizationService authorizationService,
       NotebookCatalogService notebookCatalogService,
       NotebookAttachmentFile notebookAttachmentFile,
-      WebAttachmentDeleteService webAttachmentDeleteService) {
+      WebAttachmentDeleteService webAttachmentDeleteService,
+      NoteFolderAttachment noteFolderAttachment) {
     this.authorizationService = authorizationService;
     this.notebookCatalogService = notebookCatalogService;
     this.notebookAttachmentFile = notebookAttachmentFile;
     this.webAttachmentDeleteService = webAttachmentDeleteService;
+    this.noteFolderAttachment = noteFolderAttachment;
   }
 
   @Operation(
@@ -53,7 +57,8 @@ class NotebookAttachmentController {
     return NotebookAttachmentRealm.of(
         notebookCatalogService.notebookRealmFor(notebook, authorizationService.getCurrentUser()),
         attachment,
-        notebookAttachmentFile.size(attachment));
+        notebookAttachmentFile.size(attachment),
+        noteFolderAttachment.referencingNotes(attachment));
   }
 
   @Operation(
