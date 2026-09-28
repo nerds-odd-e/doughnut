@@ -129,3 +129,7 @@ Behavior:
   note's notebook, and the page already requires read access to that notebook.
 - E2E cases for slice 2: they are edges of one rule and are covered by
   focused controller tests.
+
+## Execution complete
+
+Product advice: Reasoned no-change to the product backlog from this execution: outcome matches the refined story; deferred items already live in the seed. Keep SEED-053 deferred promises as the home for later reference forms (body links, embeds, etc.) if those arrive — they should extend this list, not invent a parallel one.
