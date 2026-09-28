@@ -14,7 +14,7 @@ scope: small
 A one-hour manual UAT of the sidebar (2026-09-28, commit `ee8859e4fc`) found
 defects that make navigation feel unstable. The most visible one is the owner's
 reported glitch: the sidebar brings the visited note into view, and then a sticky
-bar covers it. The owner grouped the defects into the three stories below.
+bar covers it. The owner grouped the defects into the stories below.
 
 The UAT ran in visible headless Chromium on a local E2E stack with seeded notebooks:
 - a tree with folders 7 levels deep;
@@ -69,7 +69,9 @@ Effort bands: S = 30–60 minutes, M = 1–2 hours, L = 2–4 hours, including d
 **Goal**
 
 When the sidebar reveals the current note, users can see and read the whole
-selected row, however deep the note sits and however long the list is.
+selected row, however deep the note sits and however long the list is. Changing
+the sidebar sort order reveals the selected note the same way, so users do not
+lose their place after reordering the list.
 
 **Observed defect**
 
@@ -92,6 +94,16 @@ selected row, however deep the note sits and however long the list is.
 - *Impact:* on every far jump, users cannot read which note is selected at the
   moment the sidebar is supposed to show it.
 
+**Observed defect: re-sorting**
+
+- *Expected:* after the sort order changes, the selected note stays in view.
+- *Observed:* with Note 120 selected and revealed in the 150-note folder,
+  choosing *Sort sidebar → Title (Z–A)* reorders the list but keeps the old
+  scroll offset. The selected row ends up about 2,700px above the visible area.
+- *Cause:* the reveal runs only when the selected row is first rendered;
+  re-sorting moves existing rows without re-rendering them, so nothing reveals
+  again.
+
 **Scope**
 
 Decided by the owner: remove the sidebar path hint rather than make room for it.
@@ -107,6 +119,10 @@ hint is what covers the revealed row.
 - This applies on every way of reaching a note (direct URL, search, Back,
   creating a note), for deep and long folders, at narrow heights, and in the
   390px drawer.
+- Changing the sort order from the sidebar reveals the selected note by the
+  same rule. The selected note, not the top of the list, is the target: it is
+  the sidebar's "you are here", and the old scroll offset means nothing after
+  the list is reordered.
 - The reveal change applies to the sidebar only; conversations keep their
   current scrolling.
 
@@ -115,8 +131,13 @@ Not promised by this story:
 - Losing the hint's shortcut to scroll the tree to an ancestor folder row is
   accepted. The breadcrumb still links to each folder's page.
 - Far jumps keep the current smooth scrolling (see Open Decisions).
-- Story 2's other defects, re-sorting (story 3), and the other unselected UAT
-  observations. Removing the hint also removes story 2's first defect (rows
+- Re-sorting when no note is selected (for example on a folder or notebook
+  page), when the selected note sits inside a folder the user collapsed, or
+  when the sort order is changed outside the sidebar (the Notebooks page or
+  another tab): current behavior stays.
+- Keeping the previously visible rows in place instead of revealing the
+  selected note.
+- Story 2's other defects and the other unselected UAT observations. Removing the hint also removes story 2's first defect (rows
   under the hint cannot be clicked); story 2's refinement should drop that
   defect.
 
@@ -129,6 +150,11 @@ Not promised by this story:
   edge. Opening that note (or returning to it with Back) scrolls the tree just
   enough to show the whole row.
 - A note whose row is already fully visible is opened: the tree does not scroll.
+- Note 120 is selected and revealed in the 150-note folder; choosing *Sort
+  sidebar → Title (Z–A)* reorders the list and the whole Note 120 row is
+  visible.
+- A selected note whose row stays fully visible after a re-sort (every row of a
+  short folder fits): the tree does not scroll.
 - Any note page with ancestor folders: the breadcrumb still shows those folders;
   the sidebar shows no path hint.
 
@@ -205,43 +231,17 @@ Not promised by this story:
 **Effort hypothesis:** S, medium confidence. Three independent fixes, each with
 a known cause.
 
-<a id="story-3"></a>
-
-### Keep the selected note in view after re-sorting the sidebar
-
-**Identity:** SEED-043#story-3
-```json dough-story-state
-{"schemaVersion":1,"refinement":"not-refined","approach":"unselected"}
-```
-
-**Goal**
-
-After users change the sidebar sort order, the selected note is still where they
-can see it.
-
-**Observed defect**
-
-- *Expected:* after the sort order changes, the selected note stays in view.
-- *Observed:* with Note 120 selected and revealed in a 150-note folder, choosing
-  *Sort sidebar → Title (Z–A)* reorders the list but keeps the old scroll offset.
-  The selected row ends up about 2,700px above the visible area.
-- *Reproduction:* open a note deep in a long folder, then apply Title (Z–A).
-- *Impact:* users lose their place right after reorganising the view.
-- It may share the reveal behavior from story 1; it must also keep that story's
-  full-row visibility.
-
-**Effort hypothesis:** S, medium confidence.
-
 ## Ordering and Scope Reduction
 
 The owner queued these stories in this order after the existing backlog. Refine
 each before planning or execution. Story 1's removal of the path hint also
-removed story 2's original first defect.
+removed story 2's original first defect. The re-sorting defect was folded into
+story 1 because it is the same reveal rule triggered by reordering.
 
 ## Open Decisions
 
-- Whether far jumps should reveal instantly or keep smooth scrolling. Story 1
-  keeps smooth scrolling; story 3 may revisit it.
+- Whether far jumps (including after a re-sort) should reveal instantly or keep
+  smooth scrolling. Story 1 keeps smooth scrolling.
 
 ## Breadcrumbs
 

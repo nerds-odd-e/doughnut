@@ -11,5 +11,4 @@ Bug fixing and general maintenance.
 
 - [Keep the revealed note fully visible in the sidebar](seeds/SEED-043-sidebar-uat-defects.md#story-1) — SEED-043#story-1
 - [Stop the Assimilate badge covering its icon and search re-requesting recent notes](seeds/SEED-043-sidebar-uat-defects.md#story-2) — SEED-043#story-2
-- [Keep the selected note in view after re-sorting the sidebar](seeds/SEED-043-sidebar-uat-defects.md#story-3) — SEED-043#story-3
 - [Keep production secrets out of the app process command line](seeds/SEED-008-prod-secrets-visible-in-process-args.md#story-1) — SEED-008#story-1
