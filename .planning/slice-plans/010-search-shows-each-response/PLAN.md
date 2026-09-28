@@ -80,3 +80,8 @@ Helper renamed to `rankRelationshipLiteralSearchHits`; model method is `cacheRes
 Frontend ordering stays where it is. The web ordering and `RelationshipLiteralHitSorter` differ in tie-breaks
 (exact title first, global-search current-notebook preference, shorter title); choosing one ranking owner is
 an owner decision outside this correction.
+
+## Execution complete
+
+Product advice: no change. The open owner decision on one ranking owner (frontend ordering versus
+`RelationshipLiteralHitSorter`) stays as recorded under Current decisions.
