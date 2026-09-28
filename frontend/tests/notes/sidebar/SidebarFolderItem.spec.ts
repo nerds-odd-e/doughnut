@@ -4,8 +4,7 @@ import makeMe from "donut-test-fixtures/makeMe"
 import { flushPromises, mount, type VueWrapper } from "@vue/test-utils"
 import { dummyRouteRecordsFromMetadata } from "@/routes/dummyRouteRecords"
 import { createRouter, createWebHistory } from "vue-router"
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
-import { stubIntersectionObserver } from "./sidebarTestSupport"
+import { afterEach, beforeEach, describe, expect, it } from "vitest"
 
 function mountFolderItem(
   router: ReturnType<typeof createRouter>,
@@ -33,7 +32,6 @@ function mountFolderItem(
 describe("SidebarFolderItem", () => {
   let router: ReturnType<typeof createRouter>
   let wrapper: VueWrapper | undefined
-  let restoreIntersectionObserver: (() => void) | undefined
 
   beforeEach(async () => {
     router = createRouter({
@@ -46,14 +44,9 @@ describe("SidebarFolderItem", () => {
   afterEach(() => {
     wrapper?.unmount()
     wrapper = undefined
-    restoreIntersectionObserver?.()
-    restoreIntersectionObserver = undefined
-    vi.restoreAllMocks()
   })
 
-  async function mountActiveFolderItem(isIntersecting: boolean) {
-    const scrollSpy = vi.spyOn(HTMLElement.prototype, "scrollIntoView")
-    restoreIntersectionObserver = stubIntersectionObserver(isIntersecting)
+  it("requests expansion for the active folder", async () => {
     const activeFolder = makeMe.aFolder.folder(42, "Alpha").please()
     wrapper = mountFolderItem(router, {
       folderId: 42,
@@ -61,18 +54,12 @@ describe("SidebarFolderItem", () => {
       activeFolder,
     })
     await flushPromises()
-    return { scrollSpy, activeFolder }
-  }
-
-  it("requests expansion for the active folder and does not scroll when intersecting", async () => {
-    const { scrollSpy, activeFolder } = await mountActiveFolderItem(true)
-    const updates = wrapper!.emitted("update:expandedFolderIds") as
+    const updates = wrapper.emitted("update:expandedFolderIds") as
       | [Set<number>][]
       | undefined
     expect(updates?.some(([ids]) => ids.has(activeFolder.id))).toBe(true)
-    await wrapper!.setProps({ expandedFolderIds: new Set([activeFolder.id]) })
-    expect(wrapper!.attributes("aria-expanded")).toBe("true")
-    expect(scrollSpy).not.toHaveBeenCalled()
+    await wrapper.setProps({ expandedFolderIds: new Set([activeFolder.id]) })
+    expect(wrapper.attributes("aria-expanded")).toBe("true")
   })
 
   it("renders a link to folderPage with encoded ids", async () => {
@@ -85,10 +72,5 @@ describe("SidebarFolderItem", () => {
       }).href
     )
     expect(link.text()).toContain("Alpha")
-  })
-
-  it("scrolls folder row into view when active folder row is not intersecting", async () => {
-    const { scrollSpy } = await mountActiveFolderItem(false)
-    expect(scrollSpy).toHaveBeenCalled()
   })
 })

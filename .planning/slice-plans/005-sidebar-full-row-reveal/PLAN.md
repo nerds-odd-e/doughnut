@@ -85,9 +85,13 @@ Behavior:
 
 ### 2. A partly visible selected row scrolls just enough to show all of it
 Type: Behavior
-Status: planned
+Status: done
 Proof: extend `SidebarRowReveal.spec.ts`; run the `tests/notes/sidebar` and
 `tests/components/conversation` specs.
+Accepted proof: `CURSOR_DEV=true nix develop -c bash -c 'cd frontend && pnpm
+vitest run tests/notes/sidebar tests/components/conversation'` → 16 files, 63
+tests passed. On the old `ScrollTo` reveal only the bottom-cut case failed; the
+top-cut and fully-visible cases already held there.
 
 Behavior:
 - Note 30 is active and revealed; the tree is scrolled so Note 31's row is cut
@@ -123,6 +127,18 @@ Behavior:
 - A whole-row check alone can pass partway through the smooth scroll. The spec
   first waits until `scrollTop` is unchanged across two animation frames; reuse
   that wait in later cases, including the "does not move" ones.
+- `useSidebarRowReveal(row, isActive)` watches `isActive() && row.value`
+  post-flush; slice 3's sort trigger can call the same reveal from a second
+  watch. The folder row's ref sits on `.folder-row`, not the `<li>`, because an
+  expanded folder's `<li>` contains its children.
+
+- CI repair after slice 1 (run 36373090056): an unrelated flaky script test,
+  "isolated start escalates past a TERM-resistant owned descendant", raced a
+  100ms start timeout against the stand-in recording its pids. Fixed in
+  `32c68269cd` by cancelling once the owned tree is recorded. The file's
+  timeout test ("isolated start timeout stops the owned process tree…", 1.5s)
+  has the same kind of race at a wider margin and is left open: fixing it needs
+  a design choice about how the stand-in holds off the deadline.
 
 ## Considered and excluded
 

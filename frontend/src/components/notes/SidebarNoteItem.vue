@@ -1,24 +1,12 @@
 <template>
   <li
+    ref="row"
     class="sidebar-note-li"
     role="treeitem"
-    :aria-selected="activeNoteTopology != null && noteTopology.id === activeNoteTopology.id"
+    :aria-selected="isActive"
     :aria-label="noteTopology.title"
-    :class="{
-      'active-item':
-        activeNoteTopology != null &&
-        noteTopology.id === activeNoteTopology.id,
-      'sidebar-note-active':
-        activeNoteTopology != null &&
-        noteTopology.id === activeNoteTopology.id,
-    }"
+    :class="{ 'active-item': isActive, 'sidebar-note-active': isActive }"
   >
-    <ScrollTo
-      v-if="
-        activeNoteTopology != null &&
-        noteTopology.id === activeNoteTopology.id
-      "
-    />
     <RouterLink
       :to="noteShowLocation(noteTopology.id)"
       class="note-row no-underline"
@@ -31,9 +19,10 @@
 <script setup lang="ts">
 import type { NoteTopology } from "@generated/donut-backend-api"
 import { RouterLink } from "vue-router"
-import ScrollTo from "@/components/commons/ScrollTo.vue"
 import NoteTitleComponent from "./core/NoteTitleComponent.vue"
 import { noteShowLocation } from "@/routes/noteShowLocation"
+import { computed, ref } from "vue"
+import { useSidebarRowReveal } from "./useSidebarRowReveal"
 
 interface Props {
   noteTopology: NoteTopology
@@ -41,6 +30,13 @@ interface Props {
 }
 
 const props = defineProps<Props>()
+
+const isActive = computed(
+  () => props.noteTopology.id === props.activeNoteTopology?.id
+)
+
+const row = ref<HTMLElement | null>(null)
+useSidebarRowReveal(row, () => isActive.value)
 </script>
 
 <style lang="scss" scoped>

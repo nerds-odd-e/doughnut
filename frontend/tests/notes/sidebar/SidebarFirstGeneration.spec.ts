@@ -5,10 +5,8 @@ import { sidebarDefaultTreeFixtures } from "./sidebarDefaultTree"
 import {
   findSidebarItem,
   isBefore,
-  mountSidebarFirstGenReady,
   mountSidebarNotesReady,
   prepareSidebarDefaultMountContext,
-  stubIntersectionObserver,
   teardownSidebarComponentTest,
 } from "./sidebarTestSupport"
 
@@ -28,19 +26,6 @@ describe("Sidebar first generation", () => {
 
   afterEach(() => {
     teardownSidebarComponentTest(wrapper)
-  })
-
-  it("shows the active note without scrolling when already intersecting", async () => {
-    const restoreIntersectionObserver = stubIntersectionObserver(true)
-
-    wrapper = await mountSidebarFirstGenReady(helper, fixtures)
-    const activeElement = wrapper.find(".active-item")
-    expect(activeElement.exists()).toBe(true)
-    expect(activeElement.text()).toContain(
-      fixtures.firstGeneration.note.noteTopology.title
-    )
-    expect(HTMLElement.prototype.scrollIntoView).not.toHaveBeenCalled()
-    restoreIntersectionObserver()
   })
 
   it("orders nested child note before same-folder sibling when deeper note is active", async () => {

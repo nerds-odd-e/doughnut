@@ -12,8 +12,7 @@
       'sidebar-folder-active': isActiveFolderRow,
     }"
   >
-    <ScrollTo v-if="isActiveFolderRow" />
-    <div class="folder-row">
+    <div ref="row" class="folder-row">
       <button
         class="chevron-btn"
         aria-label="expand children"
@@ -68,8 +67,8 @@
 <script setup lang="ts">
 import type { Folder, NoteTopology } from "@generated/donut-backend-api"
 import { ChevronRight } from "@lucide/vue"
-import ScrollTo from "@/components/commons/ScrollTo.vue"
 import SidebarInner from "./SidebarInner.vue"
+import { useSidebarRowReveal } from "./useSidebarRowReveal"
 import { computed, ref, watch } from "vue"
 
 const props = defineProps<{
@@ -128,6 +127,9 @@ const isOnActivePath = computed(
 const isActiveFolderRow = computed(
   () => folderId.value != null && props.activeFolder?.id === folderId.value
 )
+
+const row = ref<HTMLElement | null>(null)
+useSidebarRowReveal(row, () => isActiveFolderRow.value)
 
 function setStructuralChildCount(count: number) {
   structuralChildCount.value = count

@@ -30,7 +30,6 @@ type NoteStore = ReturnType<typeof import("@/store/noteStore")["useNoteStore"]>
 
 export function installSidebarDomMeasurementStubs(vi: {
   fn: typeof import("vitest").vi.fn
-  spyOn: typeof import("vitest").vi.spyOn
 }) {
   Element.prototype.getBoundingClientRect = vi.fn().mockReturnValue({
     top: 0,
@@ -55,30 +54,6 @@ export function installSidebarDomMeasurementStubs(vi: {
       return 200
     },
   })
-  vi.spyOn(HTMLElement.prototype, "scrollIntoView")
-}
-
-/** Browser IntersectionObserver stub — fires once on observe with a fixed intersecting flag. */
-export function stubIntersectionObserver(isIntersecting: boolean): () => void {
-  const original = globalThis.IntersectionObserver
-  globalThis.IntersectionObserver = class {
-    constructor(private readonly cb: IntersectionObserverCallback) {}
-    observe(target: Element) {
-      this.cb(
-        [{ isIntersecting, target }] as IntersectionObserverEntry[],
-        this as unknown as IntersectionObserver
-      )
-    }
-    disconnect() {
-      /* no-op stub */
-    }
-    unobserve() {
-      /* no-op stub */
-    }
-  } as unknown as typeof IntersectionObserver
-  return () => {
-    globalThis.IntersectionObserver = original
-  }
 }
 
 export function seedDefaultTreeRealmsInStorage(
@@ -134,7 +109,6 @@ export function prepareSidebarDefaultMountContext(options: {
   fixtures: SidebarTreeFixtures
   vi: {
     fn: typeof import("vitest").vi.fn
-    spyOn: typeof import("vitest").vi.spyOn
   }
 }) {
   invalidateSidebarListingCache()
