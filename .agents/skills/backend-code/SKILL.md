@@ -30,6 +30,11 @@ The `docs/database-erd.md` Mermaid diagram documents tables, foreign keys, and k
 CURSOR_DEV=true nix develop -c pnpm export:database-erd
 ```
 
+## HTTP Sessions
+
+- HTTP sessions are stored in MySQL (Spring Session JDBC) and must stay serializable: they hold only the signed-in security context (and, in production, the OAuth2 authorization request). Do not add `@SessionScope` beans or session attributes; controllers are singletons, and per-request state uses `@RequestScope`.
+- Non-prod Basic sign-in keeps its user in the session, like production's GitHub login; there is no remember-me cookie.
+
 ## Controller Return Values
 
 - Prefer returning entities, or other types already used as API bodies, from controllers when the JSON shape fits.
