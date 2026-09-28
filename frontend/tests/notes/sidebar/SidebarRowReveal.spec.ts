@@ -3,7 +3,7 @@ import { resetNoteStore, useNoteStore } from "@/store/noteStore"
 import makeMe from "donut-test-fixtures/makeMe"
 import helper, { testFolderStub } from "@tests/helpers"
 import type { NoteRealm } from "@generated/donut-backend-api"
-import type { VueWrapper } from "@vue/test-utils"
+import { flushPromises, type VueWrapper } from "@vue/test-utils"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import {
   findSidebarItem,
@@ -16,11 +16,15 @@ import {
 
 const NOTES_FOLDER_ID = 78001
 
+function noteTitle(number: number) {
+  return `Note ${String(number).padStart(2, "0")}`
+}
+
 function fortyNotesInOneFolder() {
   const folder = testFolderStub(NOTES_FOLDER_ID, "Notes")
   const notes = Array.from({ length: 40 }, (_, i) =>
     makeMe.aNoteRealm
-      .title(`Note ${String(i + 1).padStart(2, "0")}`)
+      .title(noteTitle(i + 1))
       .ancestorFolders([{ id: folder.id, name: folder.name }])
       .please()
   )
@@ -93,9 +97,19 @@ describe("Sidebar row reveal", () => {
     )
     await vi.waitFor(async () => {
       await settledScrollTop()
-      expect(isWholeRowVisible("Note 30")).toBe(true)
+      expect(isWholeRowVisible(noteTitle(30))).toBe(true)
     })
     return notes
+  }
+
+  async function chooseTitleZa() {
+    await wrapper!.find("[data-note-sidebar-sort] summary").trigger("click")
+    await flushPromises()
+    document
+      .querySelector<HTMLButtonElement>('button[title="Title (Z–A)"]')!
+      .click()
+    await flushPromises()
+    return settledScrollTop()
   }
 
   async function scrollTreeBy(offset: number) {
@@ -155,5 +169,16 @@ describe("Sidebar row reveal", () => {
     expect(isWholeRowVisible("Note 25")).toBe(true)
 
     expect(await activate(notes[24]!)).toBe(scrollTopBefore)
+  })
+
+  it("reveals the whole active row after re-sorting", async () => {
+    await openNoteThirtyInFortyNoteFolder()
+
+    await chooseTitleZa()
+
+    expect(rowRect("Note 31").bottom).toBeLessThanOrEqual(
+      rowRect("Note 30").top
+    )
+    expect(isWholeRowVisible("Note 30")).toBe(true)
   })
 })

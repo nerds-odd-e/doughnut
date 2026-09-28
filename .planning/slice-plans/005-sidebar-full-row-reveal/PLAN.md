@@ -110,7 +110,7 @@ Behavior:
 
 ### 3. Re-sorting the sidebar reveals the selected note
 Type: Behavior
-Status: planned
+Status: done
 Proof: extend `SidebarRowReveal.spec.ts`, choosing the sort through the
 toolbar menu as `SidebarPeerSort.spec.ts` does
 (`[data-note-sidebar-sort] summary`, then the Title (Z–A) row); run with
@@ -119,8 +119,12 @@ toolbar menu as `SidebarPeerSort.spec.ts` does
 Behavior:
 - Note 30 is active and revealed in the 40-note folder; choose Title (Z–A) →
   the rows are reordered and the whole Note 30 row is visible.
-- A short folder whose rows all fit in the tree, with its note active; choose
-  Title (Z–A) → `scrollTop` does not change.
+
+Accepted proof: `CURSOR_DEV=true nix develop -c bash -c 'cd frontend && pnpm
+vitest run tests/notes/sidebar tests/components/conversation'` → 16 files, 64
+tests passed; "reveals the whole active row after re-sorting" failed before the
+sort watch was added. The planned short-folder case was dropped: a tree whose
+rows all fit cannot scroll, so that check could never fail.
 
 ## Learnings
 
