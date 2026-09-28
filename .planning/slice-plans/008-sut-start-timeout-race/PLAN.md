@@ -85,3 +85,11 @@ passes 7/7 (5.9s, was 8 in 7.4s). Commenting out `releaseSutOwnership` in
 `releaseOwnedLifetime` fails the lock assertion. `pnpm test:sut-start` passes
 71/71. No remaining test pairs `neverHealthy` with a deadline under the 3s
 pid wait.
+
+## Execution complete
+
+Product advice: no backlog change. The race is gone and the suite is one test
+smaller (about 1.5s less). The seed's order stands: story 2 (test
+optimization), then story 3 (shard rebalancing). Story 2's audit of timing
+races should also check the remaining 5s `prepareOwnedStandIn` start deadlines
+used with `neverHealthy`. This is a hypothesis, not an observed failure.
