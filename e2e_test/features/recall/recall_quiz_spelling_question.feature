@@ -17,6 +17,7 @@ Feature: Spelling recall quiz
     Then I should be asked spelling question "means incite violence" from notebook "English practice"
     When I type my answer "Sedition"
     Then I should see that my last answer to spelling question is correct
+    And I should see the reviewed note context containing "Sedition means incite violence"
 
   Scenario: Spelling quiz reveals the reviewed note after a wrong answer
     Given the note "sedition" was assimilated as spelling on day 1

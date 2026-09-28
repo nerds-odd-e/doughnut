@@ -55,7 +55,7 @@ and one piece of local state removed; no lines added.
 ### 1. Every spelling result shows the note content
 
 Type: Behavior
-Status: planned
+Status: done
 Proof: the E2E scenario and the rewritten unit test in the table above, then
 `CURSOR_DEV=true nix develop -c bash -c 'cd frontend && pnpm vitest run tests/components/recall/AnsweredSpellingQuestion.spec.ts tests/components/recall/AnsweredSpellingQuestionAccidentalMatchNoteContext.spec.ts tests/pages/RecallPage.spelling.spec.ts'`
 and `CURSOR_DEV=true nix develop -c pnpm cy:run --spec e2e_test/features/recall/recall_quiz_spelling_question.feature`.
@@ -69,3 +69,11 @@ Steps: add the E2E line (red), rewrite the unit test "keeps the result brief
 and reveals the note context on demand" into "shows the note context for a
 correct answer" without the button click (red), then remove the flag, the
 `v-if`, and the button (green).
+
+Accepted proof: focused vitest (3 files, 7 tests), `vue-tsc --noEmit`, and the
+spelling E2E feature (2 passing) all green; the correct-answer E2E and the
+rewritten unit test observe the note context without a click.
+
+Learning: `RecallPage.spelling.spec.ts` "focuses the spelling answer input when
+resuming recall" uses a correct answered question, so its `showNote` mock now
+matches that question's note because the reader loads for every outcome.

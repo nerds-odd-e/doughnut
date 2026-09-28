@@ -136,8 +136,11 @@ Inciting rebellion against authority.`)
 
   it("focuses the spelling answer input when resuming recall", async () => {
     const rafCallbacks = captureRequestAnimationFrame()
+    const noteRealm = makeMe.aNoteRealm.please()
+    mockSdkService(NoteController, "showNote", noteRealm)
     const previousQuestion = makeMe.anAnsweredQuestion
       .withId(1)
+      .withNote(noteRealm.note)
       .spelling()
       .withAnswer({ id: 1, correct: true, spellingAnswer: "done" })
       .please()
