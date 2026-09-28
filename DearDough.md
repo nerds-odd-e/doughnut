@@ -645,7 +645,7 @@ The Slice 1 implementer was told to run `./scripts/run.sh pnpm test:typecheck` a
 
 ### Occurrences
 
-- Execution: SEED-053#story-1 / slice-plans/007-file-page-references / c86eb7eba0; Timestamp: 2026-09-28T12:24:00+08:00 (Slice 1 implementer start; delivery at 12:32:48+08:00); Tool: Cursor; Model: gemini-3.8-flash; Open Dough release: 0.3.45.
+- Execution: SEED-053#story-1 / `12c0f629ac:.planning/slice-plans/007-file-page-references/PLAN.md` / c86eb7eba0; Timestamp: 2026-09-28T12:24:00+08:00 (Slice 1 implementer start; delivery at 12:32:48+08:00); Tool: Cursor; Model: gemini-3.8-flash; Open Dough release: 0.3.45.
   - Evidence: implementer prompt in transcript `ff698959-2f7d-4392-a127-0f3f0adcc8f8/subagents/b7997c35-374a-4b20-824a-dca12fb505b1`; return notes "no root `pnpm test:typecheck` script" and used `pnpm -C frontend exec vue-tsc --noEmit`. Root/frontend `package.json` have no `test:typecheck`. Frontend skill "Frontend proof" documents the vue-tsc command.
   - Observed effect: one extra discovery step inside the slice; typecheck still passed via the substituted command. No false green.
   - Inference: the coordinator prompt invented a script name instead of copying the frontend skill's command. Qualified: different from ODF-100 (piped vue-tsc exit code), which assumed the correct command.
@@ -656,7 +656,7 @@ Slice 2 added one content-contains query to `NoteRepository` (244 → 254 lines)
 
 ### Occurrences
 
-- Execution: SEED-053#story-1 / slice-plans/007-file-page-references / c86eb7eba0; Timestamp: 2026-09-28T12:37:00+08:00 through 2026-09-28T12:40:26+08:00 (Slice 2 refactor through delivery); Tool: Cursor; Model: gemini-3.8-flash; Open Dough release: 0.3.45.
+- Execution: SEED-053#story-1 / `12c0f629ac:.planning/slice-plans/007-file-page-references/PLAN.md` / bc870053e8; Timestamp: 2026-09-28T12:37:00+08:00 through 2026-09-28T12:40:26+08:00 (Slice 2 refactor through delivery); Tool: Cursor; Model: gemini-3.8-flash; Open Dough release: 0.3.45.
   - Evidence: refactor transcript `ff698959-2f7d-4392-a127-0f3f0adcc8f8/subagents/2b60056d-ca4d-4cae-8a47-c79402587e9f` (decision pass: File size 254; learning "Slice 2's candidate query pushed NoteRepository over 250"); commit `bc870053` adds `NoteAssimilationQueries.java` and shrinks `NoteRepository.java`. Pre-Slice-2 `NoteRepository` at `c86eb7eba0` was 244 lines.
   - Observed effect: ~8 minutes of refactor time and an assimilation-focused re-proof (`AssimilationControllerTests`) for a tip-over caused by one new query.
   - Inference: the hard 250-line ceiling can force relocating a large untouched block when a small addition crosses it. Related in theme to ODF-152 (numeric check applicability), but here the agent performed the split rather than escalating a staged-simplification conflict.
