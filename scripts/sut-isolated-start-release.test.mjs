@@ -69,51 +69,16 @@ function prepareOwnedStandIn(t, extra = {}) {
 
 async function cancelOnceOwned(t, extra = {}) {
   const controller = new AbortController()
-  const { standIn, start, state } = prepareOwnedStandIn(t, {
+  const { checkout, standIn, start, state } = prepareOwnedStandIn(t, {
     ...extra,
     timeoutMs: 30_000,
     signal: controller.signal,
   })
   state.owned = await waitForOwnedPids(standIn.pidsFile)
-  controller.abort()
-  return { owned: state.owned, code: await start }
-}
-
-test('isolated start timeout stops the owned process tree and releases the claim', async (t) => {
-  const foreign = spawnForeignProcess()
-  const foreignListener = await listenTcp()
-  t.after(() => {
-    try {
-      foreign.kill('SIGKILL')
-    } catch {
-      // already gone
-    }
-    closeServer(foreignListener.server)
-  })
-  const { checkout, standIn, start, state } = prepareOwnedStandIn(t, {
-    timeoutMs: 1_500,
-  })
-  state.owned = await waitForOwnedPids(standIn.pidsFile)
-  assert.equal(isPidAlive(state.owned.leader), true)
-  assert.equal(isPidAlive(state.owned.grandchild), true)
-  assert.equal(existsSync(sutOwnerLockDir(checkout.root)), true)
   const owner = JSON.parse(readFileSync(ownerRecordPath(checkout.root), 'utf8'))
-
-  const code = await start
-  assert.equal(code, 1)
-  assert.equal(isPidAlive(state.owned.leader), false)
-  assert.equal(isPidAlive(state.owned.grandchild), false)
-  assert.equal(isPidAlive(foreign.pid), true)
-  assert.equal(existsSync(sutOwnerLockDir(checkout.root)), false)
-  assert.equal(existsSync(path.dirname(owner.controlPath)), false)
-  assert.equal((await verifyLiveSutOwner(checkout.root)).ok, false)
-  const health = await runSutHealthcheck({
-    checkoutRoot: checkout.root,
-    log: () => undefined,
-  })
-  assert.equal(health.ok, false)
-  assert.equal(await isTcpListening(foreignListener.port), true)
-})
+  controller.abort()
+  return { checkout, owner, owned: state.owned, code: await start }
+}
 
 test('isolated start early exit reaps leftover owned grandchildren', async (t) => {
   const { standIn, start, state } = prepareOwnedStandIn(t, {
@@ -142,15 +107,35 @@ test('isolated start escalates past a TERM-resistant owned descendant', async (t
   assert.equal(isPidAlive(foreign.pid), true)
 })
 
-test('isolated start cancellation stops the owned process tree', async (t) => {
+test('isolated start cancellation stops the owned process tree and releases the claim', async (t) => {
+  const foreign = spawnForeignProcess()
+  const foreignListener = await listenTcp()
+  t.after(() => {
+    try {
+      foreign.kill('SIGKILL')
+    } catch {
+      // already gone
+    }
+    closeServer(foreignListener.server)
+  })
   const errors = []
-  const { owned, code } = await cancelOnceOwned(t, {
+  const { checkout, owner, owned, code } = await cancelOnceOwned(t, {
     errLog: (line) => errors.push(line),
   })
   assert.equal(code, 1)
   assert.equal(isPidAlive(owned.leader), false)
   assert.equal(isPidAlive(owned.grandchild), false)
   assert.ok(errors.some((line) => /cancelled/i.test(line)))
+  assert.equal(isPidAlive(foreign.pid), true)
+  assert.equal(await isTcpListening(foreignListener.port), true)
+  assert.equal(existsSync(sutOwnerLockDir(checkout.root)), false)
+  assert.equal(existsSync(path.dirname(owner.controlPath)), false)
+  assert.equal((await verifyLiveSutOwner(checkout.root)).ok, false)
+  const health = await runSutHealthcheck({
+    checkoutRoot: checkout.root,
+    log: () => undefined,
+  })
+  assert.equal(health.ok, false)
 })
 
 test('startOwnedSutLifetime shutdown stops a healthy owned stack and releases ownership', async (t) => {

@@ -23,7 +23,8 @@ Test-only change in `scripts/sut-isolated-start-release.test.mjs`:
 
 - Delete "isolated start timeout stops the owned process tree and releases the
   claim".
-- Extend "isolated start cancellation stops the owned process tree" with the
+- Extend "isolated start cancellation stops the owned process tree" (renamed
+  "… and releases the claim") with the
   moved observations: a foreign process and a foreign TCP listener survive;
   the owner lock dir and the owner's control endpoint dir are removed;
   `verifyLiveSutOwner` is not ok; `runSutHealthcheck` is not ok. The owner
@@ -63,7 +64,7 @@ product code change, about 1.6s less in `test:sut-start` and the lint job.
 ### 1. Teardown proof no longer races a start deadline
 
 Type: Structure
-Status: planned
+Status: done
 Proof: `CURSOR_DEV=true nix develop -c node --test scripts/sut-isolated-start-release.test.mjs`
 passes with 7 tests. Before committing, confirm the moved assertions bite: temporarily
 skip `releaseSutOwnership` in `releaseOwnedLifetime`
@@ -74,3 +75,13 @@ on the lock or endpoint assertion, then restore it. Finish with
 Change: move the unique teardown observations into the cancellation test and
 delete the timeout test, as in Approach. It directly removes the race named in
 the story; there is no later Behavior slice.
+
+Accepted proof: `cancelOnceOwned` reads the owner record after the pids are
+recorded and before aborting, and returns `{ checkout, owner, owned, code }`.
+"isolated start cancellation stops the owned process tree and releases the
+claim" asserts the foreign pid and listener survive, the lock and endpoint
+dirs are gone, and the live-owner check and healthcheck fail. The focused file
+passes 7/7 (5.9s, was 8 in 7.4s). Commenting out `releaseSutOwnership` in
+`releaseOwnedLifetime` fails the lock assertion. `pnpm test:sut-start` passes
+71/71. No remaining test pairs `neverHealthy` with a deadline under the 3s
+pid wait.
