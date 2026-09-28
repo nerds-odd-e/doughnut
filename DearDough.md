@@ -128,6 +128,10 @@ The coordinator implemented the first slice of a three-slice plan locally, apply
 ### Occurrences
 
 - Execution: slice-plans/008-remove-zip-export / 38b5e1ef69; Timestamp: 2026-09-21T22:08:41+08:00; Tool: Cursor; Model: Cursor Grok 4.7; Open Dough release: 0.3.27.
+- Execution: SEED-051#story-1 / `f35fa810f1:.planning/slice-plans/009-retire-note-embeddings/PLAN.md` / 5003fbecc8; Timestamp: 2026-09-28T06:51:38Z (slice 9) and 2026-09-28T07:25:32Z (slice 10 docs); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.45.
+  - Evidence: slice 9 `Agent` launch refused three times by transient auto-mode "no verdict" errors (06:39–06:42Z); after the owner's third "continue" the coordinator wrote `V300000350`/`V300000351` and ran the backend suite itself (commit 5034e1543d), though its refactor `Agent` launch succeeded at 06:54Z. Slice 10's `prod_env.md` and diagram edits were coordinator `Edit`/`sed` (commit 8e03ac5f5f).
+  - Observed effect: two of eleven delivered slices had no implementation handoff; both were tiny and their proofs passed.
+  - Inference: a host outage that blocks agent launch, and a docs-only slice, both pulled the coordinator into local work; the one-interactive-slice exception covered neither. Qualified: low cost here.
 
 ## ODF-091 — Coordinator accepted its own refactor pass without a fresh refactor agent
 
@@ -137,6 +141,9 @@ Three ordinary slice commits used coordinator self-review instead of a fresh ref
 ### Occurrences
 
 - Execution: slice-plans/008-remove-zip-export / 38b5e1ef69; Timestamp: 2026-09-21T22:08:41+08:00; Tool: Cursor; Model: Cursor Grok 4.7; Open Dough release: 0.3.27.
+- Execution: SEED-051#story-1 / `f35fa810f1:.planning/slice-plans/009-retire-note-embeddings/PLAN.md` / 5003fbecc8; Timestamp: 2026-09-28T07:25:32Z–07:26:36Z; Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.45.
+  - Evidence: slice 10's docs removal (`docs/gcp/prod_env.md` −14 lines, excalidraw label) went from coordinator edits to the plan update and commit 8e03ac5f5f with no refactor `Agent` call; every other code/docs slice of the execution had one.
+  - Observed effect: one small docs change delivered without independent review; no defect found in this retrospective.
 
 ## ODF-110 — A readiness replay observed only the plan's named seam, not the rest of the slice's journey
 
@@ -583,6 +590,9 @@ The frontend proof requires `vue-tsc --noEmit` to pass. Two agents ran it as `..
 - Execution: SEED-050#story-8 / `.planning/slice-plans/026-one-folder-entry-rule/PLAN.md` / 649e162dd4; Timestamp: 2026-09-27, ~17:03+08:00 (slice 2 acceptance) and ~17:13+08:00 (coordinator rerun); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: unknown.
   - Evidence: slice 2 implementer return ("I piped it through `tail`, so the `EXIT=0` shown is tail's exit code"); the delegation prompt did not spell out exit-code capture; the coordinator first accepted on "no error output", then reran `vue-tsc --noEmit >log 2>&1; echo $?` during the retrospective → 0, no `error TS`.
   - Observed effect: one extra typecheck run; no wrong result accepted, but acceptance briefly rested on absent output rather than an exit code.
+- Execution: SEED-051#story-1 / `f35fa810f1:.planning/slice-plans/009-retire-note-embeddings/PLAN.md` / 5003fbecc8; Timestamp: 2026-09-28T05:05:14Z (slice 4 refactor acceptance); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.45.
+  - Evidence: slice 4 refactor agent ran `vue-tsc --noEmit 2>&1 | tail -5; echo tsc=$?` and reported "The `tsc=0` echo only captured the exit status of `tail`"; the coordinator reran the typecheck before formatting.
+  - Observed effect: one extra typecheck run; no wrong result accepted.
 
 ## ODF-150 — An implementer's slice proof ran only the specs it chose, missing consumers of the store method it changed
 
@@ -639,8 +649,30 @@ Slice planning wrote two observations into the executable plan that the delivere
   - Observed effect: one assertion written then removed, one test written, run, and removed; two plan-text corrections during delivery. No behavior defect.
   - Inference: a planning check that each planned observation can fail on the pre-change code, and does not assert a removed feature's absence, would have caught both. Qualified: one execution; related to ODF-147 (an implementer's test that could not fail) but here the plan prescribed it and the implementer ran it red.
 
+## DD-143 — The plan prescribed production observations whose access route or log source did not exist, and whose results could not change the approach
+
+Plan 009 required a SQL catalog probe "through the established authorized DB connection" (slice 1), a disposable Cloud SQL vector rehearsal (slice 3), and Flyway D/P success "in the serving instance's application log (`gcloud logging`)" (slice 10). No DB connection route was established for agents, the app's log does not reach Cloud Logging, and the chosen `DROP TABLE` worked whatever the catalog showed.
+
+### Occurrences
+
+- Execution: SEED-051#story-1 / `f35fa810f1:.planning/slice-plans/009-retire-note-embeddings/PLAN.md` / 5003fbecc8; Timestamp: 2026-09-28T05:36:39Z–06:03:39Z (slice 1/3) and 2026-09-28T07:17:43Z–07:18:10Z (slice 10); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.45.
+  - Evidence: four auto-mode denials while seeking a DB route (credential lookup, SSH to the app VM, probe edit to root, bucket IAM); owner: "But this wasn't needed uh, previously. Um, or can we skip this?"; coordinator's covering reasoning and skip recorded in d111968b62; slice 10 `gcloud logging read` found no Flyway lines, so sustained health became the D/P evidence (8e03ac5f5f).
+  - Observed effect: about 27 minutes of owner-attended probing ended in skipping slice 1's SQL part and dropping slice 3; slice 10's named proof was replaced during delivery. No product defect.
+  - Inference: planning could have asked, for each production observation, whether any result would change the approach, and whether the access route and log source exist (both checkable cheaply once `gcloud` auth worked). Related to DD-142 (prescribed observations dropped in execution), but here the cost was production access and owner time. Qualified: one execution; planning-time `gcloud` auth had failed.
+
+## DD-144 — Transient permission-check outages ended the coordinator's turn three times, so the owner had to type "continue"
+
+The auto-mode classifier returned "no verdict" errors, which the tool result called transient and retryable. The coordinator each time reported and ended its turn instead of waiting in the background and retrying, and resumed only when the owner wrote "continue".
+
+### Occurrences
+
+- Execution: SEED-051#story-1 / `f35fa810f1:.planning/slice-plans/009-retire-note-embeddings/PLAN.md` / 5003fbecc8; Timestamp: 2026-09-28T06:32:45Z, 06:39:37Z, 06:42:33Z (stops); owner resumes 06:37:14Z, 06:42:06Z, 06:51:34Z; Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.45.
+  - Evidence: coordinator texts "I'm pausing here", "Stopping here rather than retrying in a loop", "Slice 9 hasn't started"; the next command after the third resume succeeded.
+  - Observed effect: about 19 minutes of stalled execution and three owner prompts; no wrong action.
+  - Inference: a bounded background wait (for example a timed Monitor) before one retry would likely have avoided the stops. Qualified: host-specific outage; retrying immediately in a loop was correctly avoided.
+
 ## Retention
 
-- Highest allocated local number: 142. Removed local codes are never reused.
+- Highest allocated local number: 144. Removed local codes are never reused.
 - Full pre-maintenance log and earlier recovery locators: `99fa1b9835e3dff2473837ba2a1f8b11967d5938:DearDough.md`.
 - Occurrence history is partial; active evidence stays here or in the Open Dough catalog and watch list.

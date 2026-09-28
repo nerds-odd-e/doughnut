@@ -406,6 +406,17 @@ baseline history, successful current tip, healthy serving instances and usable
 ordinary search/notebook data. Complete the migration freeze. Do not report
 completion after R1 or R2 alone.
 
+## Execution complete
+
+Product advice: The retirement is complete and matches current direction; web and MCP use only title/alias
+search. Owner follow-ups: (1) web and server rank results differently (exact-title-first, current-notebook
+preference in global search, shorter-title tie-break), so MCP's top result can differ from the web's first
+result — choose one ranking owner before changing ranking again; correction SEED-051#story-2 only removes the
+leftover response merging. (2) Operations: the application's own log does not reach Cloud Logging, so
+production Flyway success or startup errors can only be inferred from sustained health; Application Release
+admission can return `waiting` while GitHub's run search lags a just-finished CI run — consider shipping app
+logs and a brief admission retry or a documented pre-tag listing check. Neither is queued.
+
 ## Completion and ordinary closure
 
 Final repository inventory is owned by slice 11 before R3: review tracked source,

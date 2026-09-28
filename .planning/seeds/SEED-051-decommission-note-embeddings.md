@@ -176,6 +176,25 @@ feature updates, no replacement or negation artifacts, and Git-only historical
 retention. Remaining production facts and rollout sequencing belong to
 execution preparation.
 
+<a id="story-2"></a>
+
+### Web search shows each response without accumulating earlier ones
+
+**Identity:** SEED-051#story-2
+```json dough-story-state
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/010-search-shows-each-response/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"7ba4a63818116f2c4308360c5d6bce2d22cdd24d0886559d2878d122357c3531","plan":"a7e4bddc90fc0c3c1ed02fcff01854fd65675ae7f318bb13fa1b581572ba6281"}}
+```
+
+**Slice plan:** [Web search shows each response without accumulating earlier ones](../slice-plans/010-search-shows-each-response/PLAN.md)
+
+**Goal:** Donut users searching for notes, folders, and notebooks on the web see the
+results of their current search, not a union with hits kept from earlier responses.
+This bounded retrospective correction removes the multi-response merging that
+existed only to combine literal and semantic batches.
+
+**Scope:** Frontend search results caching and ordering only; server search,
+MCP, and ranking rules are unchanged.
+
 ## Ordering and Scope Reduction
 
 Keep the story queued as non-urgent maintenance, preserving unrelated priority
