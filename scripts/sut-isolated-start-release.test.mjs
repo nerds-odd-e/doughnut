@@ -67,6 +67,18 @@ function prepareOwnedStandIn(t, extra = {}) {
   return { checkout, standIn, start, state }
 }
 
+async function cancelOnceOwned(t, extra = {}) {
+  const controller = new AbortController()
+  const { standIn, start, state } = prepareOwnedStandIn(t, {
+    ...extra,
+    timeoutMs: 30_000,
+    signal: controller.signal,
+  })
+  state.owned = await waitForOwnedPids(standIn.pidsFile)
+  controller.abort()
+  return { owned: state.owned, code: await start }
+}
+
 test('isolated start timeout stops the owned process tree and releases the claim', async (t) => {
   const foreign = spawnForeignProcess()
   const foreignListener = await listenTcp()
@@ -122,32 +134,22 @@ test('isolated start escalates past a TERM-resistant owned descendant', async (t
       // already gone
     }
   })
-  const { standIn, start, state } = prepareOwnedStandIn(t, {
+  const { owned, code } = await cancelOnceOwned(t, {
     env: { SUT_STANDIN_GRANDCHILD_IGNORE_TERM: '1' },
-    timeoutMs: 100,
   })
-  state.owned = await waitForOwnedPids(standIn.pidsFile)
-
-  const code = await start
   assert.equal(code, 1)
-  assert.equal(isPidAlive(state.owned.grandchild), false)
+  assert.equal(isPidAlive(owned.grandchild), false)
   assert.equal(isPidAlive(foreign.pid), true)
 })
 
 test('isolated start cancellation stops the owned process tree', async (t) => {
-  const controller = new AbortController()
   const errors = []
-  const { standIn, start, state } = prepareOwnedStandIn(t, {
-    timeoutMs: 30_000,
-    signal: controller.signal,
+  const { owned, code } = await cancelOnceOwned(t, {
     errLog: (line) => errors.push(line),
   })
-  state.owned = await waitForOwnedPids(standIn.pidsFile)
-  controller.abort()
-  const code = await start
   assert.equal(code, 1)
-  assert.equal(isPidAlive(state.owned.leader), false)
-  assert.equal(isPidAlive(state.owned.grandchild), false)
+  assert.equal(isPidAlive(owned.leader), false)
+  assert.equal(isPidAlive(owned.grandchild), false)
   assert.ok(errors.some((line) => /cancelled/i.test(line)))
 })
 
