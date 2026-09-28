@@ -3,7 +3,7 @@
 **Identity:** SEED-051#story-1  
 **Source:** [refined story](../../seeds/SEED-051-decommission-note-embeddings.md#story-1) and the owner's complete-deletion acceptance criteria.  
 **Preparation base:** `982e31b5a111be0d0cb1c2e01270be225c46261a`; preparation assignment `92d4ed76db515aec351d45b2dc544ec7fc544304`.  
-**Workspace:** `/Users/terryyin/.codex/worktrees/embedding-refinement/doughnut`, branch `codex/embedding-refinement`; originating/integration checkout `/Users/terryyin/git/doughnut`; eventual publication target `origin/main`.
+**Execution:** Story Branch Mode; workspace `/Users/terryyin/git/doughnut/.worktrees/story-retire-note-embeddings`, branch `story/retire-note-embeddings` (created at Take); originating/integration checkout `/Users/terryyin/git/doughnut`; claim `28d0154b3d` on `origin/main` (starting revision `f35fa810f1`); increments publish to `origin/story/retire-note-embeddings`.
 
 ## Outcome and boundaries
 
@@ -130,7 +130,7 @@ proof/external-wait exceptions, not permission for unbounded implementation.
 
 ### 1. Establish the production retirement boundary
 Type: Behavior
-Status: planned
+Status: blocked — 2026-09-28 `gcloud sql instances describe doughnut-db --project=carbon-syntax-298809` again failed with "Reauthentication failed. cannot prompt during non-interactive execution"; needs the owner's `gcloud auth login`. Slices 4–7 proceed meanwhile.
 Size: 3–5 minutes active; credential/host access wait excepted.
 Proof: operator receives a verified target and bounded cleanup inventory.
 
@@ -204,7 +204,12 @@ that changes the cleanup sequence triggers plan refinement before schema work.
 
 ### 4. Web discovery uses its existing title and alias workflow
 Type: Behavior
-Status: planned
+Status: done
+Accepted proof: F (`pnpm frontend:test` 1941 pass; `vue-tsc --noEmit` exit 0), H 8/8,
+W 16/16 (`search_note`, `add_relationship`, `wiki_link_insert`). `embedSemanticToggle`
+became `listModeToggle` (new-note form passes `false`); literal-with-literal cache merge kept
+(pinned by the within-note merge test). Generated client still exposes semantic and index
+operations for slice 6/7 removal.
 Size: 5–8 minutes active; F/W/H runtime excepted.
 Proof: F, W, H; mounted title suggestions and real target-selection journeys pass.
 

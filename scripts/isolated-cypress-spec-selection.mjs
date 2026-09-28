@@ -38,8 +38,8 @@ export const SUPPORTED_ISOLATED_WIKIDATA_MOCK_SPEC =
  * Remaining active OpenAI-mock feature files — each declares an existing
  * private-mock requirement. Assessed 2026-09-12 from `e2e_test/features/`.
  * This includes files whose `@usingMockedOpenAiService` tag appears on a
- * scenario rather than on the Feature (`semantic_search`,
- * `property_memory_tracker`, `mcq_management`); the registry's declared
+ * scenario rather than on the Feature (`property_memory_tracker`,
+ * `mcq_management`); the registry's declared
  * requirement is the authority, not the feature filename or tag placement.
  * `note_content_completion.feature` is the already-admitted representative
  * (`SUPPORTED_ISOLATED_OPEN_AI_MOCK_SPEC`); the remaining active OpenAI-mock
@@ -55,7 +55,6 @@ const ACTIVE_OPEN_AI_MOCK_SPECS = [
   'e2e_test/features/note_creation_and_update/record_live_audio.feature',
   'e2e_test/features/recall/recall_quiz_ai_question.feature',
   'e2e_test/features/user_admin/manage_ai_models.feature',
-  'e2e_test/features/note_view/semantic_search.feature',
   'e2e_test/features/recall/property_memory_tracker.feature',
   'e2e_test/features/note_creation_and_update/mcq_management.feature',
 ]

@@ -3,11 +3,10 @@ import {
   RelationController,
   SearchController,
 } from "@generated/donut-backend-api/sdk.gen"
-import SearchForm from "@/components/wiki-link-or-relationship/SearchForm.vue"
 import { fireEvent, screen } from "@testing-library/vue"
 import { flushPromises } from "@vue/test-utils"
 import MakeMe from "donut-test-fixtures/makeMe"
-import helper, { mockSdkService } from "@tests/helpers"
+import { mockSdkService } from "@tests/helpers"
 import { dispatchArrowKey } from "@tests/helpers/searchDialogKeyboardTestSupport"
 import { advanceSearchDebounce } from "@tests/helpers/searchDebounceTestSupport"
 import { describe, expect, it } from "vitest"
@@ -105,14 +104,7 @@ describe("SearchForm", () => {
   })
 
   it("Search at the top level with no note", async () => {
-    helper
-      .component(SearchForm)
-      .withCleanStorage()
-      .withProps({ note: null })
-      .render()
-    await flushPromises()
-    screen.getByPlaceholderText("Search")
-    expect(titleEl("Semantic search")).toBeInTheDocument()
+    await renderSearchForm({ note: null })
     expect(titleEl("All notebooks")).toBeDisabled()
   })
 
@@ -122,13 +114,7 @@ describe("SearchForm", () => {
         MakeMe.aNoteSearchResult.title(`Recent Note ${i + 1}`).please()
       )
       mockSdkService(NoteController, "getRecentNotes", recentNotes)
-      helper
-        .component(SearchForm)
-        .withCleanStorage()
-        .withProps({ note: null })
-        .render()
-      await flushPromises()
-      const searchInput = screen.getByPlaceholderText("Search")
+      const searchInput = await renderSearchForm({ note: null })
       expect(allSearchResultItems().length).toBeGreaterThanOrEqual(count)
       return searchInput
     }
@@ -160,8 +146,7 @@ describe("SearchForm", () => {
 
   it("toggle search settings", async () => {
     const note = MakeMe.aNote.please()
-    helper.component(SearchForm).withCleanStorage().withProps({ note }).render()
-    await flushPromises()
+    await renderSearchForm({ note })
     titleEl("All My Circles").click()
     expect(titleEl("All notebooks")).toHaveClass("text-primary")
     titleEl("All notebooks").click()

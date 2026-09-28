@@ -72,8 +72,6 @@ describe("NoteUnresolvedWikiLinkModal", () => {
 
     mockSdkService(SearchController, "searchForRelationshipTarget", [])
     mockSdkService(SearchController, "searchForRelationshipTargetWithin", [])
-    mockSdkService(SearchController, "semanticSearch", [])
-    mockSdkService(SearchController, "semanticSearchWithin", [])
     mockSdkService(NoteController, "getRecentNotes", [])
     mockSdkService(NotebookFolderController, "listNotebookFolderIndex", [])
     mockSdkService(NotebookFolderController, "listNotebookFolderListing", {

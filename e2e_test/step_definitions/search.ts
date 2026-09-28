@@ -3,21 +3,13 @@
 /// <reference types="../support" />
 // @ts-check
 
-import { Given, Then, When } from '@badeball/cypress-cucumber-preprocessor'
+import { Then, When } from '@badeball/cypress-cucumber-preprocessor'
 import start from '../start'
 import { commonSenseSplit } from '../support/string_util'
-
-Given('I reindex the notebook {string}', (notebookName: string) => {
-  start.testability().updateNotebookIndex(notebookName)
-})
 
 When('I start searching notes', () => {
   start.navigateToNotebooksPage()
   start.assumeNotePage().toolbarButton('search note').click()
-})
-
-When('I enable semantic search', () => {
-  start.assumeNoteTargetSearchDialog().enableSemanticSearch()
 })
 
 When('I search from the current note', () => {
@@ -65,15 +57,6 @@ Then(
       .expectExactRelationshipTargets(
         commonSenseSplit(noteTopicsAsString, ',').map((i: string) => i.trim())
       )
-  }
-)
-
-Then(
-  'I should see notebook {string} in search results',
-  (notebookName: string) => {
-    start
-      .assumeNoteTargetSearchDialog()
-      .expectNotebookNameInSearchResults(notebookName)
   }
 )
 

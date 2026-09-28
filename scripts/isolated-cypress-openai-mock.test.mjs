@@ -175,7 +175,7 @@ test('the registry admits exactly the assessed OpenAI-mock inventory and each de
   // The registry (`APPROVED_ISOLATED_CYPRESS_SPECS` exposed via
   // `SUPPORTED_ISOLATED_CYPRESS_SPECS`) is the single authority for which
   // specs require a private OpenAI mock — not a parallel inventory list.
-  // The assessed inventory is 12 files (one representative plus the 11
+  // The assessed inventory is 11 files (one representative plus the 10
   // remaining active OpenAI-mock features admitted through
   // `ACTIVE_OPEN_AI_MOCK_SPECS`); every admitted OpenAI-mock spec must
   // declare `requiresPrivateOpenAiMock: true`.
@@ -185,8 +185,8 @@ test('the registry admits exactly the assessed OpenAI-mock inventory and each de
   )
   assert.equal(
     openAiMockSpecs.length,
-    12,
-    'assessed OpenAI-mock inventory is 12 files admitted by the registry'
+    11,
+    'assessed OpenAI-mock inventory is 11 files admitted by the registry'
   )
   // A mixed OpenAI-mock + application batch unions to a mock requirement.
   const mixed = assertSupportedIsolatedCypressSpecs([
@@ -202,24 +202,10 @@ test('the registry admits exactly the assessed OpenAI-mock inventory and each de
 })
 
 test('scenario-level mock tag is admitted via the registry requirement, not inferred from the feature filename', () => {
-  // `note_view/semantic_search.feature` carries `@usingMockedOpenAiService`
-  // on its scenarios, not on the Feature line. The registry declares the
-  // private-mock requirement for the file; service code does not infer it
-  // from the filename or tag placement.
-  const scenarioLevelSpec =
-    'e2e_test/features/note_view/semantic_search.feature'
-  assert.equal(
-    SUPPORTED_ISOLATED_CYPRESS_SPECS.includes(scenarioLevelSpec),
-    true,
-    `${scenarioLevelSpec} must be admitted by the registry`
-  )
-  const requirement = assertSupportedIsolatedCypressSpecs([scenarioLevelSpec])
-  assert.equal(
-    requirement.requiresPrivateOpenAiMock,
-    true,
-    `${scenarioLevelSpec} must declare requiresPrivateOpenAiMock: true via the registry`
-  )
-  // The other two scenario-level mock-tagged files are admitted the same way.
+  // These files carry `@usingMockedOpenAiService` on their scenarios, not on
+  // the Feature line. The registry declares the private-mock requirement for
+  // each file; service code does not infer it from the filename or tag
+  // placement.
   for (const spec of [
     'e2e_test/features/recall/property_memory_tracker.feature',
     'e2e_test/features/note_creation_and_update/mcq_management.feature',

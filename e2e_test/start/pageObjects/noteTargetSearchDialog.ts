@@ -44,14 +44,6 @@ function ensureAllNotebooksScopeOn() {
   })
 }
 
-function ensureSemanticSearchOn() {
-  cy.findByRole('button', { name: 'Semantic search' }).then(($btn) => {
-    if (!$btn.hasClass('text-primary')) {
-      cy.wrap($btn).click()
-    }
-  })
-}
-
 function searchNote(searchKey: string, allNotebooks: boolean) {
   if (allNotebooks) {
     ensureAllNotebooksScopeOn()
@@ -78,10 +70,6 @@ export const assumeNoteTargetSearchDialog = () => {
     },
     expectClosed() {
       cy.get('dialog[open]').should('not.exist')
-      return this
-    },
-    enableSemanticSearch() {
-      ensureSemanticSearchOn()
       return this
     },
     findTarget(target: string) {
@@ -193,13 +181,6 @@ export const assumeNoteTargetSearchDialog = () => {
 
     expectSearchFieldContains(value: string) {
       cy.findByPlaceholderText('Search').should('have.value', value)
-      return this
-    },
-
-    expectNotebookNameInSearchResults(notebookName: string) {
-      searchResultSection().within(() => {
-        cy.contains('.notebook-name-label', notebookName).should('be.visible')
-      })
       return this
     },
   }

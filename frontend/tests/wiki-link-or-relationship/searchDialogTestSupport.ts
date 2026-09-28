@@ -76,8 +76,6 @@ export function setupSearchFormSdkMocks() {
   mockSdkService(NoteController, "getRecentNotes", [])
   mockSdkService(SearchController, "searchForRelationshipTarget", [])
   mockSdkService(SearchController, "searchForRelationshipTargetWithin", [])
-  mockSdkService(SearchController, "semanticSearch", [])
-  mockSdkService(SearchController, "semanticSearchWithin", [])
 }
 
 export async function typeInSearch(input: HTMLElement, value: string) {
