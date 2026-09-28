@@ -30,33 +30,51 @@ reported inconsistency.
 
 **Identity:** SEED-052#story-1
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"not-refined","approach":"unselected"}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/006-spelling-result-note-content/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"1f4e6b3624e63a2af384747f19768aac27e183a65c2a9a26657feb70187ceb99","plan":"f307992e6e054c9281b97d8ee2ea38ad6b7dd909c525edb5596568127270da94"}}
 ```
 
-- **For / why:** learners answering spelling questions can review the note
-  regardless of whether their answer was correct.
-- **Evaluation:** after submitting either a correct or an incorrect spelling
-  answer, the answer-the-question page displays the read-only note content.
-- **Value / learning:** provide consistent access to note context during
-  spelling-answer review.
-- **Effort hypothesis:** S (roughly 30–60 minutes), medium confidence; assumes
-  the existing incorrect-answer presentation can be reused.
+**Goal**
+
+Learners reviewing a spelling answer see the read-only note content right away,
+whether the answer was correct or wrong. Today a wrong answer shows it and a
+correct one hides it behind a **Show note context** button. One consistent
+result page removes that extra click and a special case from the recall
+answer review.
+
+- **Effort hypothesis:** S (roughly 30 minutes), high confidence; the
+  existing wrong-answer display is reused as is.
 - **Depends on:** none.
-- **Safe stopping point:** consistent note review after both spelling-answer
-  outcomes is useful as a standalone UI/UX improvement.
+- **Safe stopping point:** the change is complete and useful on its own.
+- **Plan:** [006-spelling-result-note-content](../slice-plans/006-spelling-result-note-content/PLAN.md)
 
 **Scope**
 
-Extend the existing read-only note-content presentation to correct spelling
-answers and retain it for incorrect spelling answers. This story captures only
-that display change; no additional read-only-page improvement was requested.
+- Required: the spelling result page shows the read-only note content inside
+  the note-under-question area for every outcome: correct, wrong, and an
+  accidental match with another note.
+- Required: the **Show note context** button on a correct spelling result is
+  removed, together with the reveal-on-demand state behind it. This reverses
+  the earlier "keep a correct spelling result brief" choice on the owner's
+  request.
+- Boundary: the recall flow is unchanged (the owner proceeded to planning
+  with this default). A correct answer still moves on to the next question
+  without stopping. Its result page is seen when the learner goes back with
+  **view last answered question**, and that page now shows the note content.
+  Only a wrong answer stops on its result page, as today.
+- Deferred: the recall history view ("This is a spelling question. Details
+  are not needed.") and non-spelling answered-question pages are not changed.
 
 **Key examples**
 
-- A learner submits a correct spelling answer → the result page shows the
-  read-only note content.
-- A learner submits an incorrect spelling answer → the result page continues
-  to show the read-only note content.
+- A learner answers "Sedition" correctly, and recall moves on to the next
+  question. They go back with **view last answered question** → the result
+  shows "Correct!" and the note content containing "Sedition means incite
+  violence", with no **Show note context** button.
+- A learner answers "sedation" (wrong) → recall stops on the result, which
+  says the answer is incorrect and shows the same note content, as today.
+- An answer names another note (accidental match) → the result keeps its
+  accidental-match message and resolve action and also shows the note
+  content, as today.
 
 ## Ordering and Scope Reduction
 
