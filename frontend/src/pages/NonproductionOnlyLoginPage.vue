@@ -40,8 +40,8 @@
 </template>
 
 <script lang="ts">
+import { browserLocation } from "@/managedApi/window/browserLocation"
 import {
-  browserLocation,
   healthcheckPing,
   pingHasProdProfile,
   signInRedirectHref,

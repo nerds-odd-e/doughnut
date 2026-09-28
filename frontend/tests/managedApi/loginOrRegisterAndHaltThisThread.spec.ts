@@ -1,6 +1,6 @@
 import { HealthCheckController } from "@generated/donut-backend-api/sdk.gen"
 import loginOrRegisterAndHaltThisThread from "@/managedApi/window/loginOrRegisterAndHaltThisThread"
-import { browserLocation } from "@/managedApi/window/signInRedirect"
+import { browserLocation } from "@/managedApi/window/browserLocation"
 import { healthcheckPingBody, mockSdkService } from "@tests/helpers"
 import { flushPromises } from "@vue/test-utils"
 import { afterEach, describe, expect, it, vi } from "vitest"

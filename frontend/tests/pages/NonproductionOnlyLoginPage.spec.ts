@@ -1,5 +1,5 @@
 import { HealthCheckController } from "@generated/donut-backend-api/sdk.gen"
-import * as signInRedirect from "@/managedApi/window/signInRedirect"
+import { browserLocation } from "@/managedApi/window/browserLocation"
 import NonproductionOnlyLoginPage from "@/pages/NonproductionOnlyLoginPage.vue"
 import helper, { healthcheckPingBody, mockSdkService } from "@tests/helpers"
 import { screen } from "@testing-library/vue"
@@ -38,7 +38,7 @@ describe("NonproductionOnlyLoginPage", () => {
   it("does not show the password form and sends the browser to continue when backend is prod", async () => {
     mockSdkService(HealthCheckController, "ping", healthcheckPingBody("prod"))
     const assignSpy = vi
-      .spyOn(signInRedirect.browserLocation, "assign")
+      .spyOn(browserLocation, "assign")
       .mockImplementation(() => undefined)
     await renderIdentifyPage({ from: "/notebooks/1" })
 
@@ -50,7 +50,7 @@ describe("NonproductionOnlyLoginPage", () => {
   it("continues to / when the identify screen has no from query", async () => {
     mockSdkService(HealthCheckController, "ping", healthcheckPingBody("prod"))
     const assignSpy = vi
-      .spyOn(signInRedirect.browserLocation, "assign")
+      .spyOn(browserLocation, "assign")
       .mockImplementation(() => undefined)
     await renderIdentifyPage()
 

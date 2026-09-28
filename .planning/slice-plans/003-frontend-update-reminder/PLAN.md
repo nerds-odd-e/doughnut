@@ -53,8 +53,13 @@ observed after the next release, not as slice proof.
 
 ### 1. Returning to a stale tab shows a reminder that reloads onto the current frontend
 Type: Behavior
-Status: planned
-Proof: new `frontend/tests/DonutApp.frontendUpdateReminder.spec.ts` rendering
+Status: done
+Accepted proof: `pnpm frontend:test DonutApp.frontendUpdateReminder` (2 tests:
+"offers a reload when the served frontend has a different entry", "shows no
+reminder when the served frontend is the loaded one") and `vue-tsc --noEmit`
+pass. The check lives in `components/commons/FrontendUpdateReminder.vue`;
+Reload goes through `managedApi/window/browserLocation.ts`.
+Planned proof: new `frontend/tests/DonutApp.frontendUpdateReminder.spec.ts` rendering
 `DonutApp`, mocking `fetch("/")`, and dispatching `visibilitychange` while
 visible; `pnpm frontend:test DonutApp.frontendUpdateReminder`.
 
@@ -80,3 +85,10 @@ becomes visible and `/` still names B → no reminder; the tab becomes visible a
 - Checks run only on the tab becoming visible; no timer.
 - Dismissal is remembered in memory for the tab's life; after a reload the tab
   runs the current frontend, so no persistence is needed.
+
+## Learnings
+
+- A fetch-driven check does not settle within one `flushPromises()` under
+  vitest-fetch-mock. The spec waits on its `DOMParser.prototype.parseFromString`
+  spy (`returnToTabWhileServing`) so absence assertions cannot pass before the
+  check runs; slice 2 reuses that helper.

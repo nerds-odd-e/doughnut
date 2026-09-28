@@ -1,8 +1,5 @@
-import {
-  browserLocation,
-  healthcheckPing,
-  signInRedirectHref,
-} from "./signInRedirect"
+import { browserLocation } from "./browserLocation"
+import { healthcheckPing, signInRedirectHref } from "./signInRedirect"
 
 const loginOrRegisterAndHaltThisThread = async () => {
   browserLocation.assign(

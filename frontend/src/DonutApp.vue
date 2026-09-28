@@ -19,6 +19,7 @@ import {
 import getEnvironment from "./managedApi/window/getEnvironment"
 import MainMenu from "./components/toolbars/MainMenu.vue"
 import SoftKeyboardPrimer from "./components/commons/SoftKeyboardPrimer.vue"
+import FrontendUpdateReminder from "./components/commons/FrontendUpdateReminder.vue"
 import { useFeatureToggle } from "./composables/useFeatureToggle"
 import { migrateSearchKeyHistory } from "./utils/searchKeyHistory"
 
@@ -68,6 +69,7 @@ onMounted(async () => {
 <template>
   <SoftKeyboardPrimer />
   <Popups />
+  <FrontendUpdateReminder />
   <LoadingThinBar v-if="apiStatus.states.length > 0" />
   <LoadingModal
     :show="!!blockingApiState"

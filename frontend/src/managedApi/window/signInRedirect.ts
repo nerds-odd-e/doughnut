@@ -17,12 +17,6 @@ export const signInRedirectHref = (fromHref: string, ping: string) => {
   return `${path}?from=${fromHref}`
 }
 
-export const browserLocation = {
-  assign(url: string) {
-    window.location.href = url
-  },
-}
-
 export const healthcheckPing = async (): Promise<string> => {
   const { data, error } = await HealthCheckController.ping()
   if (error) throw error
