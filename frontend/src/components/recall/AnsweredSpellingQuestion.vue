@@ -31,7 +31,6 @@
     v-bind="recalledNoteUnderQuestionProps(answeredQuestion.recalledNote)"
   >
     <NoteContextReader
-      v-if="showNoteContext"
       :note-id="answeredQuestion.recalledNote.noteTopology.id"
       :focused-property-key="answeredQuestion.recalledNote.propertyKey"
     />
@@ -39,18 +38,10 @@
   <ViewMemoryTrackerLink
     :memory-tracker-id="answeredQuestion.memoryTrackerId"
   />
-  <button
-    v-if="!showNoteContext"
-    type="button"
-    class="daisy-btn daisy-btn-neutral daisy-btn-sm mt-2"
-    @click="noteContextRevealed = true"
-  >
-    Show note context
-  </button>
 </template>
 
 <script setup lang="ts">
-import { computed, ref, type PropType } from "vue"
+import { computed, type PropType } from "vue"
 import type { AnsweredQuestion } from "@generated/donut-backend-api"
 import PopButton from "@/components/commons/Popups/PopButton.vue"
 import AccidentalMatchResolveDialog from "@/components/recall/AccidentalMatchResolveDialog.vue"
@@ -66,12 +57,6 @@ const props = defineProps({
     required: true,
   },
 })
-
-const noteContextRevealed = ref(false)
-
-const showNoteContext = computed(
-  () => !props.answeredQuestion.answer.correct || noteContextRevealed.value
-)
 
 const isAccidentalMatch = computed(
   () => props.answeredQuestion.answer.outcome === "ACCIDENTAL_MATCH"

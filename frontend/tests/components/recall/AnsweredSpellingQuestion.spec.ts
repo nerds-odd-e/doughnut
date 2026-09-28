@@ -31,7 +31,7 @@ describe("AnsweredSpellingQuestion plain wrong", () => {
 })
 
 describe("AnsweredSpellingQuestion correct", () => {
-  it("keeps the result brief and reveals the note context on demand", async () => {
+  it("shows the note context for a correct answer", async () => {
     const noteTitle = "Sedition"
     const noteRealm = makeMe.aNoteRealm
       .title(noteTitle)
@@ -46,14 +46,6 @@ describe("AnsweredSpellingQuestion correct", () => {
       .please()
 
     const wrapper = mountAnsweredSpellingQuestion(answeredQuestion)
-    await flushPromises()
-    expect(wrapper.find('[aria-label="Note context"]').exists()).toBe(false)
-    expect(wrapper.find(".note-under-question").text()).toContain(noteTitle)
-
-    const showButton = wrapper
-      .findAll("button")
-      .find((b) => b.text() === "Show note context")!
-    await showButton.trigger("click")
     await flushPromises()
 
     const noteUnderQuestion = wrapper.find(".note-under-question")

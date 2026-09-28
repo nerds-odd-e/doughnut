@@ -7,7 +7,6 @@ Bug fixing and general maintenance.
 
 ## Taken
 
-- [Show read-only note content after every spelling answer](seeds/SEED-052-spelling-answer-note-content.md#story-1) — SEED-052#story-1 ([plan](slice-plans/006-spelling-result-note-content/PLAN.md))
 - [Show references on a file page](seeds/SEED-053-file-page-references.md#story-1) — SEED-053#story-1 ([plan](slice-plans/007-file-page-references/PLAN.md))
 
 ## Backlog list
