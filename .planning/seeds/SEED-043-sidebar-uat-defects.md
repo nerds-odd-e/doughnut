@@ -166,7 +166,7 @@ Not promised by this story:
 
 **Identity:** SEED-043#story-2
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/003-rail-badge-and-search-requests/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"73173663e17f9d914d5af9290401094b29868a9044fe5bc61ce22d805d4015cc","plan":"5ea398659ca5b7388a492635bd76d976d9906b282b57abd2facea9f1026a1db9"}}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/003-rail-badge-and-search-requests/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"4c856d8ef6e575b2608c4ee6ca28c52c9ada14e54c8cba51a4c4a465f5dbb09d","plan":"5ea398659ca5b7388a492635bd76d976d9906b282b57abd2facea9f1026a1db9"}}
 ```
 
 **Goal**
