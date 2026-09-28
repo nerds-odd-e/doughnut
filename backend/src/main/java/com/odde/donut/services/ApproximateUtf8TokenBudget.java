@@ -2,7 +2,7 @@ package com.odde.donut.services;
 
 import java.nio.charset.StandardCharsets;
 
-/** UTF-8 byte length divided by ~3.75 bytes per token (embedding and note-detail budgeting). */
+/** UTF-8 byte length divided by ~3.75 bytes per token (prompt and note-detail budgeting). */
 public final class ApproximateUtf8TokenBudget {
   private static final double BYTES_PER_TOKEN = 3.75d;
 

@@ -111,9 +111,7 @@ Use this for endpoint lookup; open `sdk.gen.ts` or `types.gen.ts` only for exact
 
 ## Search Controller
 
-- `semanticSearchWithin`: POST `/api/notes/{note}/semantic-search` -> `SemanticSearchWithinResponse` (request: `SemanticSearchWithinData`; path: note; body: SearchTerm; response body: Array<NoteSearchResult>)
 - `searchForRelationshipTargetWithin`: POST `/api/notes/{note}/search` -> `SearchForRelationshipTargetWithinResponse` (request: `SearchForRelationshipTargetWithinData`; path: note; body: SearchTerm; response body: Array<RelationshipLiteralSearchHit>)
-- `semanticSearch`: POST `/api/notes/semantic-search` -> `SemanticSearchResponse` (request: `SemanticSearchData`; body: SearchTerm; response body: Array<NoteSearchResult>)
 - `searchForRelationshipTarget`: POST `/api/notes/search` -> `SearchForRelationshipTargetResponse` (request: `SearchForRelationshipTargetData`; body: SearchTerm; response body: Array<RelationshipLiteralSearchHit>)
 
 ## Notebook Controller

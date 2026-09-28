@@ -6,7 +6,6 @@ import com.odde.donut.algorithms.CanonicalDonutOrigin;
 import com.odde.donut.entities.*;
 import com.odde.donut.factoryServices.EntityPersister;
 import com.odde.donut.services.NoteAliasIndexService;
-import com.odde.donut.services.NoteEmbeddingService;
 import com.odde.donut.services.NoteLevelIndexService;
 import com.odde.donut.services.notebookAttachment.NotebookAttachmentContent;
 import com.odde.donut.testability.builders.*;
@@ -16,7 +15,6 @@ import org.springframework.stereotype.Component;
 @Component
 public class MakeMe extends MakeMeWithoutDB {
   @Autowired public EntityPersister entityPersister;
-  @Autowired public NoteEmbeddingService noteEmbeddingService;
   @Autowired public NoteAliasIndexService noteAliasIndexService;
   @Autowired public NoteLevelIndexService noteLevelIndexService;
   @Autowired public NotebookAttachmentContent notebookAttachmentContent;
@@ -179,10 +177,6 @@ public class MakeMe extends MakeMeWithoutDB {
 
   public ConversationMessageBuilder aConversationMessage(Conversation conversation) {
     return new ConversationMessageBuilder(conversation, this);
-  }
-
-  public NoteEmbeddingBuilder aNoteEmbedding(Note note) {
-    return new NoteEmbeddingBuilder(note, this);
   }
 
   public QuestionGenerationBatchBuilder aQuestionGenerationBatch() {

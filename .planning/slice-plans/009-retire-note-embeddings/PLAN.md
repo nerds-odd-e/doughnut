@@ -264,7 +264,12 @@ tests may remain until slice 7; do not commit broken fixtures between slices.
 
 ### 7. The server contains only the surviving search responsibility
 Type: Behavior
-Status: planned
+Status: done
+Accepted proof: A regenerated (semantic operations gone); B `backend:test_only` 2697 tests 0 failures;
+`vue-tsc` 0; M 11 pass + bundle; W 16/16; G 3/3. Inventory `git grep -niE 'embedding|semantic' -- . ':!.planning'`
+leaves only independent wording plus retained storage/ops references for slices 9–11: baseline
+`note_embeddings` block, `docs/database-erd.md`, `docs/gcp/prod_env.md` §4 vector flag/index, and the
+excalidraw "vector enabled" label. Nothing reads/writes `note_embeddings`; it has no foreign keys locally.
 Size: 5–10 minutes active; B/A/F/M/W/G runtime excepted where changed boundaries require them.
 Proof: B, A, frontend typecheck, M; W and G against the final application tree
 cover target selection and web/local note continuity. Reviewed source inventory

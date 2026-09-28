@@ -815,32 +815,6 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/NoteRealm"
-  /api/notes/{note}/semantic-search:
-    post:
-      tags:
-      - search-controller
-      operationId: semanticSearchWithin
-      parameters:
-      - name: note
-        in: path
-        required: true
-        schema:
-          type: integer
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/SearchTerm"
-        required: true
-      responses:
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/NoteSearchResult"
   /api/notes/{note}/search:
     post:
       tags:
@@ -904,26 +878,6 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/NoteRealm"
-  /api/notes/semantic-search:
-    post:
-      tags:
-      - search-controller
-      operationId: semanticSearch
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/SearchTerm"
-        required: true
-      responses:
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/NoteSearchResult"
   /api/notes/search:
     post:
       tags:

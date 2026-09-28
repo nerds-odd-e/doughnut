@@ -20,7 +20,7 @@
 - [vitest-browser-mode](https://vitest.dev/guide/browser/)
 - [Vue Testing Library](https://testing-library.com/docs/vue-testing-library/intro/)
 - [DaisyUI v4.x](https://v4.daisyui.com/)
-- [Cloud SQL for MySQL 8.4 (VECTOR enabled)](https://cloud.google.com/sql/docs/mysql/introduction)
+- [Cloud SQL for MySQL 8.4](https://cloud.google.com/sql/docs/mysql/introduction)
 - [Github Actions](https://docs.github.com/en/actions)
 - [git-secret](https://git-secret.io)
 - [SaltStack](https://docs.saltproject.io/en/latest/)
@@ -28,4 +28,3 @@
 - [packer googlecompute builder](https://www.packer.io/docs/builders/googlecompute)
 - [Google Cloud](https://cloud.google.com/gcp/getting-started)
 - [Google Cloud Managed Instance Group](https://cloud.google.com/compute/docs/instance-groups/)
-- VECTOR requires MySQL 8.4+ and Cloud SQL flag `cloudsql_vector=on`.

@@ -2073,24 +2073,6 @@ export type TrashNoteResponses = {
 
 export type TrashNoteResponse = TrashNoteResponses[keyof TrashNoteResponses];
 
-export type SemanticSearchWithinData = {
-    body: SearchTerm;
-    path: {
-        note: number;
-    };
-    query?: never;
-    url: '/api/notes/{note}/semantic-search';
-};
-
-export type SemanticSearchWithinResponses = {
-    /**
-     * OK
-     */
-    200: Array<NoteSearchResult>;
-};
-
-export type SemanticSearchWithinResponse = SemanticSearchWithinResponses[keyof SemanticSearchWithinResponses];
-
 export type SearchForRelationshipTargetWithinData = {
     body: SearchTerm;
     path: {
@@ -2142,22 +2124,6 @@ export type UploadNoteImageResponses = {
 };
 
 export type UploadNoteImageResponse = UploadNoteImageResponses[keyof UploadNoteImageResponses];
-
-export type SemanticSearchData = {
-    body: SearchTerm;
-    path?: never;
-    query?: never;
-    url: '/api/notes/semantic-search';
-};
-
-export type SemanticSearchResponses = {
-    /**
-     * OK
-     */
-    200: Array<NoteSearchResult>;
-};
-
-export type SemanticSearchResponse = SemanticSearchResponses[keyof SemanticSearchResponses];
 
 export type SearchForRelationshipTargetData = {
     body: SearchTerm;

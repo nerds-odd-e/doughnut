@@ -109,7 +109,6 @@ Amend domain terms here in place; do not supersede this ADR.
   Does not mutate the notebook. Short UI: **Run lint**.
 - **Fix** — Applies selected repairs from current **notebook health**
   findings, then typically lints again
-- **Semantic search** — Meaning-based find of notes via embeddings
 
 ## Assimilation
 

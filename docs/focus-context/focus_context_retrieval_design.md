@@ -73,4 +73,4 @@ Title: Related
 
 - `com.odde.donut.services.focusContext.FocusContextRetrievalService`
 - `com.odde.donut.services.focusContext.FocusContextMarkdownRenderer`
-- `ApproximateUtf8TokenBudget` — shared UTF-8 byte / token estimate for truncation (e.g. embeddings).
+- `ApproximateUtf8TokenBudget` — shared UTF-8 byte / token estimate for truncation.

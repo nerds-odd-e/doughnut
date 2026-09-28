@@ -27,17 +27,14 @@ public class NoteSearchService {
   private final NoteRepository noteRepository;
   private final NoteAliasSearchService noteAliasSearchService;
   private final RelationshipLiteralHitService relationshipLiteralHitService;
-  private final SemanticNoteSearchService semanticNoteSearchService;
 
   public NoteSearchService(
       NoteRepository noteRepository,
       NoteAliasSearchService noteAliasSearchService,
-      RelationshipLiteralHitService relationshipLiteralHitService,
-      SemanticNoteSearchService semanticNoteSearchService) {
+      RelationshipLiteralHitService relationshipLiteralHitService) {
     this.noteRepository = noteRepository;
     this.noteAliasSearchService = noteAliasSearchService;
     this.relationshipLiteralHitService = relationshipLiteralHitService;
-    this.semanticNoteSearchService = semanticNoteSearchService;
   }
 
   public List<RelationshipLiteralSearchHit> searchForNotes(User user, SearchTerm searchTerm) {
@@ -82,15 +79,6 @@ public class NoteSearchService {
             notebookId);
     return relationshipLiteralHitService.mergeNoteAndContainerLiteralHits(
         user, searchTerm, notebookId, noteResults);
-  }
-
-  public List<NoteSearchResult> semanticSearchForNotes(User user, SearchTerm searchTerm) {
-    return semanticNoteSearchService.semanticSearchForNotes(user, searchTerm);
-  }
-
-  public List<NoteSearchResult> semanticSearchForNotesInRelationTo(
-      User user, SearchTerm searchTerm, Note note) {
-    return semanticNoteSearchService.semanticSearchForNotesInRelationTo(user, searchTerm, note);
   }
 
   private List<Note> searchExactMatches(User user, SearchTerm searchTerm, Integer notebookId) {
