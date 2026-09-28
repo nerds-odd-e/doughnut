@@ -130,7 +130,7 @@ proof/external-wait exceptions, not permission for unbounded implementation.
 
 ### 1. Establish the production retirement boundary
 Type: Behavior
-Status: in progress — metadata observed; SQL catalog inspection awaits an owner-approved read-only DB access route.
+Status: done — metadata only; owner decided 2026-09-28 to skip SQL catalog inspection (not needed for earlier migrations).
 Size: 3–5 minutes active; credential/host access wait excepted.
 Observed 2026-09-28 after owner `gcloud auth login` (metadata-only `gcloud sql instances describe/list`,
 `gcloud sql databases list`, `gcloud compute instance-groups managed list`, `gcloud compute instances list`,
@@ -139,9 +139,10 @@ project `carbon-syntax-298809`):
   `doughnut`, so `cloudsql_vector=on` (the instance's only database flag) has no other schema consumer.
 - One MIG `doughnut-app-group` (us-east1-b, target size 1), one serving VM `doughnut-app-group-jc41`; no other
   retained long-lived installation was found in the project.
-- DB users: `doughnut` limited to `10.142.%`/`10.142.0.25`/localhost; no local proxy or mysql client. No
-  established read-only SQL route exists; `SHOW CREATE TABLE note_embeddings`, row count, keys, vector index and
-  Flyway history remain unobserved.
+- SQL catalog left unobserved by owner decision. Covering reasoning: a plain `DROP TABLE note_embeddings`
+  removes the table and any VECTOR index whatever its column type; the deployed app reads/writes the table, so
+  it exists; no foreign keys exist in the baseline or code (an unexpected one fails the migration loudly);
+  production only ran this repository's migrations, so versions allocate above every file ever used.
 Proof: operator receives a verified target and bounded cleanup inventory.
 
 Probe the documented project `carbon-syntax-298809`, Cloud SQL `doughnut-db`,
@@ -179,7 +180,7 @@ migrations as deleted, Aligned applied migration checksums", migrate 0, P stays 
 columns/indexes/FKs/views/data identical to before. Fresh install from final resources (40 migrations, tip P) is
 schema-identical to the upgraded install. An install that never applied D would silently keep the table under the
 final resources, so slice 11's "D verified on every retained installation" gate is essential. Native VECTOR
-behavior remains slice 3's.
+behavior is covered by dropping the table (slice 3 dropped).
 Size: 5–8 minutes active, one local lifecycle probe; engine/test runtime excepted.
 Proof: one disposable rehearsal demonstrates the exact drop → newer tip →
 baseline edit/drop-migration removal → repair/migrate sequence and a fresh path.
@@ -192,7 +193,7 @@ baseline and `D` removal. Compare ordinary schema/data before and after; verify
 repair accepts the baseline and removed migration, and preserves the newer tip.
 Provision a fresh schema from the final resources and compare the resulting
 current schema. This probe owns the local populated/fresh Flyway lifecycle;
-native Cloud SQL vector DDL is owned separately by slice 3.
+dropping the table also removes its native Cloud SQL VECTOR index.
 
 Temporary SQL/Flyway harnesses are observation tools outside tracked product
 tests. Record their literal commands, runtime versions, setup, result and
@@ -205,25 +206,8 @@ general migration harness.
 
 ### 3. Establish native Cloud SQL vector cleanup behavior
 Type: Behavior
-Status: planned
-Size: 3–5 minutes active; authorized environment/access waits excepted.
-Proof: operator has observed safe removal of the production-shaped vector
-storage/index on the matching Cloud SQL engine, with ordinary fixture data intact.
-
-Requires slice 1's actual native shape and instance-wide dependency inventory.
-Use an already designated, authorized disposable Cloud SQL environment. Recreate
-only the relevant structural shape with synthetic data; observe the planned
-index/table removal and applicable flag-disable preconditions/restart effects.
-A local VARBINARY rehearsal does not prove these provider-specific behaviors.
-If the production catalog establishes there is no native vector dependency,
-record that observed conditional branch and use slice 2's matching local proof.
-
-If no authorized disposable matching environment is available, stop this probe
-and report the missing resource; do not provision paid infrastructure or test
-DDL on production implicitly. Hold slices 9–12 until matching evidence exists.
-Record literal commands, environment/version, setup and results in this plan,
-and remove the disposable fixture under its established ownership. Any finding
-that changes the cleanup sequence triggers plan refinement before schema work.
+Status: dropped — owner decision 2026-09-28 together with slice 1's SQL catalog: dropping the table removes its
+VECTOR index; the instance-wide flag has no other consumer (slice 1), so slice 10 removes it after storage is gone.
 
 ### 4. Web discovery uses its existing title and alias workflow
 Type: Behavior
@@ -329,11 +313,10 @@ Record the release receipt here. Failure holds schema deployment.
 ### 9. Installed schemas migrate to the current data model
 Type: Behavior
 Status: planned
-Size: 3–5 minutes active after slices 2–3; migration/B/ERD runtime excepted.
+Size: 3–5 minutes active after slice 2; migration/B/ERD runtime excepted.
 Proof: populated isolated upgrade preserves ordinary data and schema; B and ERD.
 
-Requires successful local lifecycle and native-vector probes (slices 2–3), and
-R1. Allocate `D` and `P` after inspecting
+Requires the successful local lifecycle probe (slice 2) and R1. Allocate `D` and `P` after inspecting
 current files, Git-deleted versions, and the now-current live histories. Add the
 minimal drop DDL for the verified embedding-only structures and a newer generic
 tip placeholder. Use the rehearsed sequence, not speculative conditional DDL
@@ -346,14 +329,14 @@ current positive backend contracts prove ordinary behavior.
 Type: Behavior
 Status: planned
 Size: 3–5 minutes active; release/DB/configuration restart waits excepted.
-Proof: authorized R2 publication, successful D/P history on each retained
-installation, catalog/data removal observations, unchanged unrelated settings,
-healthy instances and positive current-product smoke.
+Proof: authorized R2 publication, Flyway D/P success in the serving instance's application log
+(`gcloud logging`), `gcloud sql instances describe` showing the removed flag, healthy instances and
+positive current-product smoke.
 
 Release slice 9 only after rechecking the R1 all-instances barrier. Verify
 actual migration completion, not readiness alone. Remove the identified
 feature-only Cloud SQL vector settings after storage cleanup, using slice 1's
-instance-wide ownership evidence and slice 3's disable/restart evidence.
+instance-wide ownership evidence; observe any restart the flag change requires.
 Preserve settings shared with another consumer and the complete unrelated flag
 set; use the actual observed API/configuration form.
 If settings require restart, finish and verify that operation too. Delete
@@ -416,8 +399,8 @@ both verified production cleanup and this final disposition.
 | Notebook settings work; manual/background indexing implementation is deleted | 6, all-instance retirement 8 | Positive settings/controller proof; source inventory; R1 build/rollout evidence |
 | All remaining feature code/tests/contracts and obsolete documentation are deleted | 7, operational docs 10, final audit 11 | Reviewed tracked-source inventory and generated contracts; no new absence tests |
 | Independent AI utilities, literal distance ranking, learning and Git workflows continue | 7, schema transitions 9/11 | B, retained ranking proofs, G, preserved ordinary fixture data/schema |
-| All production embedding records/structures and feature-only settings are removed | 1–3 establish premises, 9/10 deliver | Verified target/FK/index/instance-wide ownership inventory; real D/P application, catalog and setting observations |
-| Fresh installs and existing installs use the final current schema safely | 2/3 establish recipe, 11/12 deliver | Populated upgrade + fresh rehearsal, native DDL probe, R3 repair/migration and current-product observations |
+| All production embedding records/structures and feature-only settings are removed | 1 establishes premises, 9/10 deliver | Metadata inventory and flag ownership; D/P success in application logs and removed flag |
+| Fresh installs and existing installs use the final current schema safely | 2 establishes recipe, 11/12 deliver | Populated upgrade + fresh rehearsal, R3 repair/migration and current-product observations |
 | No historical/negated replacement artifacts; temporary work is deleted | 4–7 delete feature tests/docs; 11 final audit; ordinary closure after 12 | Source review, transition cleanup and normal wrap-up; Git retains history |
 
 ## Current decisions and limitations
