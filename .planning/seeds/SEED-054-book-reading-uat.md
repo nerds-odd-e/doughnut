@@ -39,7 +39,7 @@ This seed captures the assessment story and authorizes no UAT run or fixes now.
 
 **Identity:** SEED-054#story-1
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"not-refined","approach":"unselected"}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/011-book-reading-uat/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"1ab4b82536f69590d4c26d8481a5230751e9cb711ab3c8a0fcbbd05e5af4da71","plan":"5fe6bafaf69a2fc654ada9803c8e400c8271a2912422547f808d8cecfe6c58b6"}}
 ```
 
 **Goal**
@@ -122,6 +122,28 @@ the conditions tried; it must not become a confirmed defect by assumption.
 - **Execution handoff:** Use
   [dough-manual-testing](../../.agents/skills/dough-manual-testing/SKILL.md)
   when this assessment is selected for execution.
+
+**Refinement decisions (owner, 2026-09-29)**
+
+- The agent runs the whole UAT itself, then plans and executes it; the owner does
+  not drive the browser.
+- Books are freely licensed and downloaded from the internet, not committed:
+  *Think Python 2e* (244-page PDF with chapters, sections, code, and figures),
+  *Attention Is All You Need* (15-page arXiv PDF with numbered sections, tables,
+  and formulas), and Project Gutenberg EPUBs of *Alice's Adventures in
+  Wonderland* (short, flat chapters with images) and *On the Origin of Species*
+  (long chapters). A real DRM-protected EPUB cannot be obtained legitimately, so
+  the refusal case uses a copy of a Gutenberg EPUB with a
+  `META-INF/encryption.xml` added; report it as derived, not real DRM.
+- The owner expects the local MinerU install to work. PDFs attach through the
+  CLI's `/attach` with real MinerU; EPUBs attach through the web notebook
+  settings, as supported today.
+- AI reorganization is judged against the real OpenAI service, so the UAT uses
+  the Development stack (profile `dev`) from the default checkout, whose product
+  code matches the story's base commit. The E2E stack replaces OpenAI with a mock.
+  UAT data goes into the development database under notebooks named `UAT …`.
+- MinerU extraction time for a real book is part of the attach experience and is
+  recorded, but waiting for it does not use up the two-hour exploration budget.
 
 ## Ordering and Scope Reduction
 
