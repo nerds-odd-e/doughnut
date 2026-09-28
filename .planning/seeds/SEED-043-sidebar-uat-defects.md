@@ -35,12 +35,17 @@ defect below.
 - The sticky bar is the "Ancestor folders scrolled out of view" hint at the top
   of the tree scroll area. It shows a chevron-up and the names of ancestor
   folders scrolled above the top, so it looks like a folder row.
-- Unverified hypothesis from reading the code:
-  - the hint's sticky anchor has zero height, so the hint is drawn over rows
-    instead of taking space;
-  - the reveal uses `scrollIntoView` with the default `block: 'start'`;
+- Confirmed in the code during story 1 refinement:
+  - the hint's sticky anchor has zero height on purpose (to avoid show/hide
+    flicker), so the hint is drawn over rows instead of taking space;
+  - the hint appears only once ancestor folder rows scroll above the top, which
+    is exactly what revealing a deep note does, so it lands on the revealed row;
+  - the reveal is the generic `ScrollTo` marker, shared with conversations. It
+    calls `scrollIntoView` with the default `block: 'start'`, and only when the
+    zero-size marker is fully out of view;
   - the tree scroll area's 0.75rem `scroll-padding-top` is smaller than the
-    hint's height.
+    hint's height;
+  - the note toolbar breadcrumb already shows the same ancestor folders.
 - Other observations left unselected by the owner:
   - ArrowDown does not move focus within the `role="tree"` sidebar.
   - Far jumps smooth-scroll a long distance (about 25,600px in about 1.5
@@ -54,11 +59,11 @@ Effort bands: S = 30–60 minutes, M = 1–2 hours, L = 2–4 hours, including d
 
 <a id="story-1"></a>
 
-### Keep the revealed note fully visible below the sidebar path hint
+### Keep the revealed note fully visible in the sidebar
 
 **Identity:** SEED-043#story-1
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"not-refined","approach":"unselected"}
+{"schemaVersion":1,"refinement":"refined","approach":"unselected"}
 ```
 
 **Goal**
@@ -86,6 +91,46 @@ selected row, however deep the note sits and however long the list is.
   and light themes, and in the 390px drawer.
 - *Impact:* on every far jump, users cannot read which note is selected at the
   moment the sidebar is supposed to show it.
+
+**Scope**
+
+Decided by the owner: remove the sidebar path hint rather than make room for it.
+The note toolbar breadcrumb already shows the same ancestor folders, and the
+hint is what covers the revealed row.
+
+- The sidebar no longer shows the "Ancestor folders scrolled out of view" hint.
+  Nothing is drawn over the tree rows.
+- When the sidebar reveals the selected note, the whole row ends up inside the
+  tree's visible area. A row that is only partly visible, cut off at the top or
+  bottom edge, counts as not visible and is scrolled fully into view. A row that
+  is already fully visible does not move the tree.
+- This applies on every way of reaching a note (direct URL, search, Back,
+  creating a note), for deep and long folders, at narrow heights, and in the
+  390px drawer.
+- The reveal change applies to the sidebar only; conversations keep their
+  current scrolling.
+
+Not promised by this story:
+
+- Losing the hint's shortcut to scroll the tree to an ancestor folder row is
+  accepted. The breadcrumb still links to each folder's page.
+- Far jumps keep the current smooth scrolling (see Open Decisions).
+- Story 2's other defects, re-sorting (story 3), and the other unselected UAT
+  observations. Removing the hint also removes story 2's first defect (rows
+  under the hint cannot be clicked); story 2's refinement should drop that
+  defect.
+
+**Key examples**
+
+- Note 120 in the 150-note folder at 1440×900, opened at `/n/<id>`: the whole
+  row is inside the tree's visible area, and no bar covers it.
+- Deep Target Note in the 7-level tree at 1280×560: the whole row is visible.
+- The tree is scrolled by hand so a note's row is half cut off at the bottom
+  edge. Opening that note (or returning to it with Back) scrolls the tree just
+  enough to show the whole row.
+- A note whose row is already fully visible is opened: the tree does not scroll.
+- Any note page with ancestor folders: the breadcrumb still shows those folders;
+  the sidebar shows no path hint.
 
 **Effort hypothesis:** S, medium confidence.
 
@@ -171,8 +216,8 @@ not refined yet; refine each before planning or execution.
 
 ## Open Decisions
 
-- Whether far jumps should reveal instantly or keep smooth scrolling, if story 1 or
-  story 3 touches the reveal behavior.
+- Whether far jumps should reveal instantly or keep smooth scrolling. Story 1
+  keeps smooth scrolling; story 3 may revisit it.
 
 ## Breadcrumbs
 

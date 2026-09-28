@@ -23,6 +23,25 @@ The troubleshooting docs used to instruct running `ps aux | grep java` as a norm
 
 **Medium** — pass these three secrets as environment variables (not visible in `ps aux`) instead of `-D` args, or mount them from Secret Manager into a file Spring reads at startup. Requires updating the startup script and confirming Spring Boot picks up the equivalent `SPRING_DATASOURCE_PASSWORD` / etc. env vars correctly, then rotating the three credentials since they've been exposed.
 
+## Story Decomposition
+
+<a id="story-1"></a>
+
+### Keep production secrets out of the app process command line
+
+**Identity:** SEED-008#story-1
+```json dough-story-state
+{"schemaVersion":1,"refinement":"not-refined","approach":"unselected"}
+```
+
+**Goal**
+
+Anyone who can list processes on a production app instance no longer sees the
+database password, GitHub token, or OpenAI key. The three exposed credentials
+are rotated.
+
+**Effort hypothesis:** M, low confidence. Refine before planning.
+
 ## Breadcrumbs
 
 - `infra/gcp/scripts/mig-zulu25-openai-app-instance-startup.sh` — the `java ${JAVA_OPTS} ... -jar` command with secrets as `-D` args
