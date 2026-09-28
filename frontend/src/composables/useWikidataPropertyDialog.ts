@@ -4,6 +4,7 @@ import { useNoteStore } from "@/store/noteStore"
 import type { WikidataSearchEntity } from "@generated/donut-backend-api"
 import { WikidataController } from "@generated/donut-backend-api/sdk.gen"
 import { toOpenApiError } from "@/managedApi/openApiError"
+import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import {
   appendAliasToNoteContent,
   calculateNewTitle,
@@ -182,10 +183,11 @@ export function useWikidataPropertyDialog({
     wikidataProcessing.value = true
     wikidataIdError.value = undefined
     try {
-      const { data: entityData, error } =
-        await WikidataController.fetchWikidataEntityDataById({
+      const { data: entityData, error } = await apiCallWithLoading(() =>
+        WikidataController.fetchWikidataEntityDataById({
           path: { wikidataId: wikidataId.trim() },
         })
+      )
       if (error) {
         wikidataIdError.value =
           toOpenApiError(error).message || "Invalid Wikidata ID"

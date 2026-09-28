@@ -9,7 +9,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
-import org.springframework.web.context.annotation.SessionScope;
+import org.springframework.web.context.annotation.RequestScope;
 
 /**
  * Configuration for OpenAI API client.
@@ -22,11 +22,12 @@ import org.springframework.web.context.annotation.SessionScope;
 @Configuration
 public class OpenAiApiConfig {
 
-  // Official OpenAI Java SDK - Non-prod: keep session scope so web/session features can swap
-  // endpoints
-  @Bean
+  // Official OpenAI Java SDK - Non-prod: request scope so each request reads the current
+  // testability endpoint. No Spring destroy callback: closing at request end would kill async
+  // streaming calls still in flight; the SDK closes the client when it becomes unreachable.
+  @Bean(destroyMethod = "")
   @Profile("!prod")
-  @SessionScope
+  @RequestScope
   @Qualifier("officialOpenAiClient")
   public OpenAIClient getOfficialOpenAiClientNonProd(
       @Value("${spring.openai.token}") String openAiToken,
@@ -38,7 +39,7 @@ public class OpenAiApiConfig {
     return OpenAIOkHttpClient.builder().apiKey(openAiToken).baseUrl(baseUrl).build();
   }
 
-  // Official OpenAI Java SDK - Prod: provide the same qualified bean without session scope for
+  // Official OpenAI Java SDK - Prod: provide the same qualified bean without request scope for
   // schedulers/background jobs
   @Bean
   @Profile("prod")

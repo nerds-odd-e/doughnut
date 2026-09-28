@@ -12,11 +12,9 @@ import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.context.annotation.SessionScope;
 import org.springframework.web.server.ResponseStatusException;
 
 @RestController
-@SessionScope
 @RequestMapping("/api/notebook-groups")
 class NotebookGroupController {
   private final NotebookGroupService notebookGroupService;

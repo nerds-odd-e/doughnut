@@ -7,8 +7,6 @@ Bug fixing and general maintenance.
 
 ## Taken
 
-- [Return to Donut without repeating GitHub login while browser authorization remains valid](seeds/SEED-040-remember-browser-login.md#story-1) — SEED-040#story-1 ([plan](slice-plans/002-remember-browser-login/PLAN.md))
-
 ## Backlog list
 
 - [Keep the revealed note fully visible in the sidebar](seeds/SEED-043-sidebar-uat-defects.md#story-1) — SEED-043#story-1

@@ -36,10 +36,8 @@ import java.util.List;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.context.annotation.SessionScope;
 
 @RestController
-@SessionScope
 @RequestMapping("/api/notebooks")
 class NotebookController extends NotebookGitHttpSupport {
   private final EntityPersister entityPersister;

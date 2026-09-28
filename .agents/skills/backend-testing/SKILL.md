@@ -74,6 +74,7 @@ void clozeDescription(String title, String markdown, String expectedClozeDescrip
 - Tests use actual database interactions inside the transaction that `SpringTestBase` rolls back after each test.
 - This gives confidence in database operations and repository behavior.
 - A `@Formula` field (for example `Note.trashedInDatabase`) is hydrated only when Hibernate loads the row from the database. An entity persisted or moved earlier in the same persistence context still carries the Java default, so a test that reads such a field through a loaded collection must `makeMe.refresh(entity)` first. Query-level predicates (`Note.JPA_AVAILABLE`) evaluate in SQL and need no refresh.
+- A test that signs in through the security filters creates a `SPRING_SESSION` row in Spring Session's own transaction, outside that rollback. Such a test class is non-transactional and deletes its session rows after each test (see `DevelopmentAuthenticationConfigurationTest`). Session cookie attributes apply only on the embedded server, so a test asserting them uses `webEnvironment = RANDOM_PORT`.
 
 Example (`TextContentValidatorTest`): no restated Spring annotations; `makeMe` comes from the base.
 

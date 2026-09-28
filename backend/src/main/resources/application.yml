@@ -34,6 +34,13 @@ spring:
       globally_quoted_identifiers: true
       globally_quoted_identifiers_skip_column_definitions: true
     open-in-view: false
+  # Spring Session JDBC keeps HTTP sessions in MySQL for every profile. A session ends after 30 days
+  # without use; each request renews it. (Spring Session honours spring.session.timeout, not
+  # server.servlet.session.timeout.)
+  session:
+    timeout: 30d
+    jdbc:
+      initialize-schema: never
   redis:
     host: 127.0.0.1
     port: 6380
@@ -55,6 +62,15 @@ question:
 server:
   forward-headers-strategy: FRAMEWORK
   port: 8081
+  servlet:
+    session:
+      # The cookie is written only when a session is created or its ID changes, so it keeps the
+      # browsers' longest lifetime and the 30-day server timeout decides expiry. Secure and
+      # SameSite=Lax (a Spring Session default, like HttpOnly) limit cross-site request forgery while
+      # CSRF protection is disabled. Applied only on the embedded server.
+      cookie:
+        max-age: 400d
+        secure: true
 springdoc:
   override-with-generic-response: false
   writer-with-json-view: true

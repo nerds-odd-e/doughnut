@@ -17,10 +17,8 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.context.annotation.SessionScope;
 
 @RestController
-@SessionScope
 @RequestMapping("/api/assimilation")
 class AssimilationController {
   private final MemoryTrackerService memoryTrackerService;
