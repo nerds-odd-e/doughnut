@@ -11,47 +11,23 @@ scope: medium
 
 ## Why This Matters
 
-Note embeddings were introduced some time ago and are still refreshed. The
-owner reports that semantic search performs poorly, partly because of the
-Google Cloud SQL for MySQL implementation, and provides little practical value
-for its ongoing cost and maintenance. Users can now check out notebooks locally
-and work with them in modern IDEs, reducing the urgency of hosted semantic
-search. The requested direction is complete decommissioning, preceded by a
-brief investigation of whether a cheaper, faster, useful alternative exists.
+The owner reports that hosted note semantic search performs poorly and provides
+little practical value for its recurring embedding work and maintenance. Users
+can now check out notebooks locally and work in modern IDEs. After the brief
+alternatives review, the owner confirmed complete retirement without a
+replacement.
 
-## Alternatives and Decision
+## Decision
 
-Default direction: remove the hosted note embedding and semantic search feature
-completely. First review the options below against ordinary Donut search and
-the existing local notebook/IDE workflow. A promising alternative is a proposal
-for the owner to consider, not an implicit commitment to build a replacement.
+The owner's acceptance rule is deletion: remove the feature's code, tests,
+documentation, production data, and data structures completely. Do not replace
+them with disabled implementations, tests asserting the feature's absence, or
+documentation saying it was removed. Git supplies the history.
 
-### Preliminary research — 2026-09-28
-
-- **Existing Cloud SQL implementation:** the production query in
-  `NoteEmbeddingJdbcRepository.semanticKnnSearch` uses `vector_distance` with
-  scope joins, a distance threshold, ordering, and a limit. Google documents
-  `vector_distance` for exact KNN and `approx_distance` for indexed ANN.
-  An index/query mismatch is therefore a plausible performance lead, not a
-  confirmed root cause. Check the deployed version, index, query plan, and
-  query-embedding API latency before concluding that MySQL itself is unusable.
-  ANN filtering can return too few matches, so notebook and authorization scope
-  must remain correct. See [Google's search and filtering documentation](https://docs.cloud.google.com/sql/docs/mysql/search-filter-vector-embeddings).
-- **Simplest alternative:** retain ordinary Donut search and use the existing
-  local notebook/IDE workflow. If local keyword search needs more, SQLite FTS5
-  supplies full-text search with relevance ranking; it does not provide
-  meaning-based matching. This is a candidate to assess, not a new feature
-  promise. See [SQLite FTS5](https://www.sqlite.org/fts5.html).
-- **Local semantic alternative:** local embeddings through Ollama plus a local
-  vector index such as Faiss could move embedding generation and search off the
-  hosted database. The inference is that this could avoid hosted embedding API
-  calls and database search load; hardware cost, setup, index freshness,
-  relevance, and maintenance still need assessment. See [Ollama embeddings](https://docs.ollama.com/capabilities/embeddings)
-  and [Faiss](https://github.com/facebookresearch/faiss).
-
-No production benchmark, bill analysis, or alternative prototype was performed
-for this capture. The reported poor performance remains owner evidence; these
-options are research leads rather than proven savings or speed improvements.
+The alternatives decision is closed. No further rescue investigation or
+replacement implementation is included. This seed is temporary preparation
+input: remove it and other spent execution records at wrap-up instead of
+turning them into permanent historical or research documentation.
 
 ## Story Decomposition
 
@@ -61,66 +37,170 @@ options are research leads rather than proven savings or speed improvements.
 
 **Identity:** SEED-051#story-1
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"not-refined","approach":"unselected"}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/009-retire-note-embeddings/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"c2a8037a896eeaf30b73472eb48cf5e166c1c7c33e345fdc2256d0e6a62b90bc","plan":"a92f6f0d272013a6f6f10bc9512fe06131871ec85551e4fb8ab34bcbc60e17eb"}}
 ```
 
-- **For / why:** Donut users and the operator need reliable note discovery
-  without paying for and maintaining an underused, slow embedding feature.
-- **Evaluation:** after a brief documented alternatives review, Donut no longer
-  exposes semantic search or embedding index controls, generates or refreshes
-  note/query embeddings, or retains live embedding storage and feature-specific
-  infrastructure. Ordinary search, notes, relationships, and local notebook
-  checkout continue to work.
-- **Value / learning:** remove recurring API, database, and maintenance work;
-  establish whether any inexpensive alternative offers enough additional value
-  over the current local IDE workflow to warrant a separate proposal.
-- **Effort hypothesis:** L (roughly 2–4 hours), low confidence until the removal
-  inventory is refined. The alternatives review is intended to be brief
-  (initial hypothesis: 30–60 minutes), not a replacement implementation project.
-- **Depends on:** no other queued story. Conduct the alternatives review before
-  removing the feature.
-- **Safe stopping point:** the review alone leaves a useful recommendation and
-  an unchanged working product; after retirement, ordinary search and local
-  notebook work remain available without an embedding dependency.
+**Slice plan:** [Retire note embeddings and semantic search](../slice-plans/009-retire-note-embeddings/PLAN.md)
 
-**Scope**
+**Goal**
 
-- Briefly compare fixing the existing vector query/index usage, using the local
-  notebook/IDE workflow or keyword search, and a lightweight local semantic
-  option. Assess usefulness on representative note-finding tasks, end-to-end
-  latency, refresh work, recurring cost, and implementation/operational effort.
-  Distinguish measured evidence from estimates and identify any promising
-  alternative that would justify reconsidering the removal direction.
-- Remove semantic search from all product surfaces, including note creation
-  and relationship-target search, and remove notebook index update/reset UI
-  and APIs. Remove backend services, repositories, entities, query generation,
-  scheduled refresh, and any other note-embedding producers or consumers.
-- Remove persisted embedding data, tables/vector indexes, and feature-specific
-  configuration and infrastructure through the normal migration and deployment
-  path. Cover existing installations as well as fresh/local/test databases.
-- Remove or update obsolete tests, fixtures, generated API contracts,
-  dependencies, and documentation. Preserve shared utilities, AI capabilities,
-  and search behavior that have uses independent of note embeddings; complete
-  removal means removing this feature's responsibilities, not unrelated uses.
-- A replacement search service, database migration to another engine, new local
-  search tool, or broader search redesign is not promised by this story.
+Donut users continue ordinary note discovery and local notebook work while the
+operator completely retires hosted note/query embeddings and semantic search,
+including production storage and operating dependencies. Current dependent
+features work through the remaining capabilities and describe them accurately.
+
+**Scope and acceptance criteria**
+
+- Delete semantic switches and result requests from new-note suggestions and
+  relationship/wiki-link target search. Keep the current literal title/alias
+  matching, ranking, folder/notebook hits, search scopes, and target selection.
+  Existing access and trash boundaries still apply.
+- Delete the Notebook Indexing section and reset/update controls. Delete both
+  note semantic-search operations and both notebook index operations from the
+  backend and generated API contracts, and update their callers.
+- Delete embedding generation, scheduled/manual refresh, query generation,
+  persistence, production/non-production vector search, and feature-only
+  implementation, dependencies, fixtures, mocks, tests, and runner references.
+  Remove feature-only branches from shared code and tests.
+- Delete obsolete documentation, glossary entries, comments, examples,
+  configuration, and operational instructions. Remove feature-only documents;
+  edit shared documents to describe the remaining current behavior positively.
+- Delete every persisted note embedding in production, including accumulated
+  previous versions. Remove the embedding tables, columns, vector indexes,
+  constraints, and feature-only Cloud SQL settings. Apply equivalent schema
+  cleanup to existing non-production installations and fresh installations.
+  Production cleanup is part of completion, not a deferred follow-up.
+- Remove embedding schema definitions from the maintained baseline and remove
+  obsolete feature migrations through the safe Flyway cleanup lifecycle.
+  Transition migrations, operational scripts, and temporary verification
+  artifacts needed for rollout are temporary: remove them after their required
+  application is verified. The current tree must not retain obsolete DDL as
+  historical documentation or keep creating then dropping the former schema.
+- Update every current consumer affected by removal, including MCP services,
+  generated clients, shared callers, tests, and documentation. In particular,
+  `find_most_relevant_note` already calls literal search: retain its working
+  behavior, remove semantic/embedding claims, and describe its title/alias
+  matching positively. Preserve other MCP tools and the existing notebook
+  checkout/publication, content, relationship, and learning workflows.
+- Preserve shared dependencies with independent current uses: the OpenAI
+  client/SDK, token-budget utility used by question generation and focus
+  context, and literal search's result-distance ranking. Authored-reference,
+  property, and alias indexes, image embedding, and semantic recall terminology
+  belong to other features; remove this feature's responsibilities from shared
+  artifacts without damaging those independent uses.
+- Leave no disabled controls, feature-only flags, tombstone endpoints, dead
+  wrappers, compatibility shims, negated feature tests, retirement notices, or
+  historical feature/design/research records. Git is the historical record.
+
+**Verification approach**
+
+Delete tests whose subject is the retired feature. Preserve or adapt tests
+that prove current dependent capabilities, such as title/alias target selection
+and MCP results, using positive examples. Do not convert semantic-search tests
+into permanent assertions such as "semantic search is unavailable", "the
+control is absent", or "no embeddings are generated".
+
+Verify deletion through change review, a focused repository inventory, and
+inspection of production data/schema/configuration after cleanup. These are
+completion evidence during execution, not a new permanent absence-test suite
+or retirement document. The examples below describe surviving product
+contracts; removal is governed by the acceptance criteria above.
+
+**Key examples**
+
+- A user types an existing title or alias while creating a note or choosing a
+  relationship/wiki-link target → matching accessible notes appear and can be
+  opened/selected using the existing literal workflow.
+- A user broadens search to subscribed notebooks or circles → existing literal
+  note and container matches retain their scope, access, and trash behavior.
+- A notebook owner opens settings → remaining settings display their current
+  purpose and save successfully.
+- A note is created or edited, including by Git publication → its content is
+  available and ordinary title/alias discovery reflects the change.
+- An MCP client calls `find_most_relevant_note` with a matching title/alias →
+  the existing literal result is returned and the tool describes it accurately.
+- An existing installation completes retirement, or a fresh installation runs
+  its migrations → note content, relationships, and learning data continue
+  supporting their existing workflows.
+
+**Delivery constraints**
+
+- Production replaces application instances one at a time, while Flyway runs
+  at `ApplicationReadyEvent`. Retire every deployed embedding reader/writer
+  before removing schema/configuration. Expect separate release boundaries for
+  stopping use and dropping storage; this remains one retirement story.
+- The baseline defines `embedding_raw VARBINARY(6144)`; production code expects
+  an `embedding` VECTOR column. The production vector setup is documented
+  operationally rather than reproduced by a current migration. Inspect actual
+  deployed schema/indexes and feature-flag ownership before destructive
+  cleanup. The earlier read-only Cloud SQL request failed because GCP
+  credentials need reauthentication; production cleanup remains unverified.
+- The owner's explicit removal requirement supersedes the earlier draft's
+  instruction to retain obsolete historical migrations. Coordinate baseline
+  DDL and migration removal with Flyway repair/squashing and verified rollout
+  state so existing installations upgrade safely and fresh installations use
+  only the current schema. Temporary upgrade machinery is not a permanent
+  exception to complete removal. Preserve Flyway metadata needed to operate
+  the current database correctly.
+- Current Accepted ADRs 0002 (Git-native notebook synchronization), 0004
+  (OKF-compatible notebook Markdown), 0005 (web/API routes), and 0007
+  (environments and isolation) govern preserved workflows, authored indexes,
+  contracts, and environment ownership. No retirement conflict was found.
+  Delete ADR 0001's obsolete semantic-search glossary entry; its description
+  does not require retaining the feature.
+
+**Excluded work**
+
+A replacement search service, another database engine, a new local search tool,
+full-text body search, performance rescue experiments, and broader search
+redesign are outside this story. Update existing dependencies for their current
+behavior without adding replacement semantic capabilities.
+
+**Dependencies and stopping points**
+
+No other queued story is a prerequisite. After all embedding use is retired,
+the product can operate while storage cleanup awaits its safe release boundary.
+That is an intermediate stopping point only. Completion requires verified
+production data/schema removal, dependent-feature updates, deletion of obsolete
+code/tests/docs/schema definitions and spent transition artifacts, and removal
+of this seed and other spent planning records through story wrap-up.
+
+**Effort hypothesis:** several hours of engineering, low confidence until
+execution planning resolves verification and production cleanup; elapsed
+delivery includes the separate release boundaries.
+
+**Open decisions**
+
+None. The owner confirmed complete deletion, production cleanup, dependent
+feature updates, no replacement or negation artifacts, and Git-only historical
+retention. Remaining production facts and rollout sequencing belong to
+execution preparation.
 
 ## Ordering and Scope Reduction
 
-Queue as non-urgent maintenance. Preserve the current Taken work and other
-priorities. Keep the brief alternatives review ahead of decommissioning within
-this story; do not turn the review into an open-ended search platform project.
-Refine the removal boundaries and evaluation examples before slice planning.
+Keep the story queued as non-urgent maintenance, preserving unrelated priority
+and Taken work. The owner requested the linked slice plan for this retirement
+outcome. Implementation has not started. Keep the preparation draft available
+for review until its disposition is decided.
 
-## Breadcrumbs
+## Preparation pointers
 
-- Owner request, 2026-09-28: completely remove note semantic search/embeddings,
-  first spending a little effort on cheaper or more usable alternatives; local
-  notebook checkout and modern IDEs reduce the need and urgency.
+These pointers support execution preparation and leave with this seed at wrap-up:
+
 - `backend/src/main/java/com/odde/donut/services/EmbeddingMaintenanceJob.java`
-  currently schedules production notebook embedding updates every five minutes.
-- `backend/src/main/java/com/odde/donut/entities/repositories/NoteEmbeddingJdbcRepository.java`
-  contains the production exact-distance query.
+  and `NotebookIndexingService.java`: scheduled and manual refresh.
+- `backend/src/main/java/com/odde/donut/entities/repositories/NoteEmbeddingJdbcRepository.java`:
+  storage, production query, and schema variant assumptions.
 - `backend/src/main/java/com/odde/donut/controllers/SearchController.java` and
-  `NotebookController.java` expose semantic search and embedding index controls.
-- `docs/gcp/prod_env.md` documents Cloud SQL MySQL 8.4 and its vector flag.
+  `NotebookController.java`: semantic search and index operations.
+- `mcp-server/src/tools/find-most-relevant-note.ts`: literal search consumer
+  whose description currently claims semantic matching.
+- `backend/src/main/resources/db/migration/V100000000__baseline.sql` and
+  `docs/gcp/prod_env.md`: local schema and production vector setup.
+- `backend/src/main/java/com/odde/donut/configs/FlyWayFreeVersionRealMigration.java`
+  and `infra/gcp/scripts/perform-rolling-replace-app-mig.sh`: migration timing
+  and rolling replacement.
+- Relevant current decisions: `docs/adrs/0002-git-native-portable-notebook-synchronization-accepted.md`,
+  `docs/adrs/0004-okf-compatible-notebook-markdown-accepted.md`,
+  `docs/adrs/0005-web-routes-accepted.md`, and
+  `docs/adrs/0007-environments-and-isolation-accepted.md`.
