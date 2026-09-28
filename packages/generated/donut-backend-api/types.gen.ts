@@ -1230,6 +1230,7 @@ export type NotebookAttachmentRealm = {
     attachment: NotebookAttachmentListItem;
     size: number;
     image: boolean;
+    references: Array<NoteTopology>;
 };
 
 export type ThresholdExceededResult = {

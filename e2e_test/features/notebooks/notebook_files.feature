@@ -26,3 +26,18 @@ Feature: Notebook files
     When I delete the file on its page
     Then the folder page heading should be "physics"
     And the sidebar folder "physics" lists only "data"
+
+  Scenario: File page lists referencing notes in its folder and opens them
+    Given the notebook "Lab Notebook" has files:
+      | Path             | Content |
+      | docs/diagram.png | diagram |
+    And I have a notebook "Lab Notebook" with notes:
+      | Title  | Folder | Content   | Image Url   |
+      | Design | docs   | Body text | diagram.png |
+      | Review | docs   | Body text | diagram.png |
+    When I jump to the notebook "Lab Notebook"
+    And I open the file "diagram.png" in sidebar folder path "docs"
+    Then I should see "Design" in the References section
+    And I should see "Review" in the References section
+    When I open "Design" from the References section
+    Then I should still be on the note page for "Design"

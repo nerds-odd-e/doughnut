@@ -131,10 +131,15 @@ Then('I should see the References section', () => {
   cy.findByRole('heading', { name: 'References' }).should('be.visible')
 })
 
+const referencesSection = () =>
+  cy.findByRole('heading', { name: 'References' }).parent()
+
 Then('I should see {string} in the References section', (noteTitle: string) => {
-  cy.findByRole('heading', { name: 'References' })
-    .parent()
-    .should('contain.text', noteTitle)
+  referencesSection().should('contain.text', noteTitle)
+})
+
+When('I open {string} from the References section', (noteTitle: string) => {
+  referencesSection().findAllByRole('link', { name: noteTitle }).first().click()
 })
 
 When(

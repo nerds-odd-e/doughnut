@@ -1,21 +1,16 @@
 package com.odde.donut.entities.repositories;
 
-import com.odde.donut.entities.AssimilationSequenceSkip;
-import com.odde.donut.entities.MemoryTrackerQueryFragments;
 import com.odde.donut.entities.Note;
-import com.odde.donut.entities.NoteLevelIndex;
-import com.odde.donut.entities.NotebookSettings;
-import com.odde.donut.services.AssimilationUnit;
 import com.odde.donut.services.notebookTree.PortableTreeNoteRow;
 import com.odde.donut.utils.SearchTitleNormalizer;
 import java.util.List;
-import java.util.stream.Stream;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 
-public interface NoteRepository extends CrudRepository<Note, Integer>, NoteStructuralPeerQueries {
+public interface NoteRepository
+    extends CrudRepository<Note, Integer>, NoteStructuralPeerQueries, NoteAssimilationQueries {
 
   String selectFromNote = "SELECT n FROM Note n";
   String searchForTitleLike =
@@ -99,6 +94,16 @@ public interface NoteRepository extends CrudRepository<Note, Integer>, NoteStruc
       @Param("notebookId") Integer notebookId, @Param("folderId") Integer folderId);
 
   @Query(
+      value =
+          selectFromNote
+              + " WHERE n.notebook.id = :notebookId AND "
+              + Note.JPA_AVAILABLE
+              + " AND n.content LIKE CONCAT('%', :filename, '%')"
+              + " ORDER BY n.id ASC")
+  List<Note> findAvailableNotesByNotebookIdAndContentContaining(
+      @Param("notebookId") Integer notebookId, @Param("filename") String filename);
+
+  @Query(
       """
       SELECT NEW com.odde.donut.services.notebookTree.PortableTreeNoteRow(
           n.folder.id, n.title, n.content)
@@ -153,75 +158,6 @@ public interface NoteRepository extends CrudRepository<Note, Integer>, NoteStruc
           "SELECT DISTINCT n FROM Note n JOIN FETCH n.notebook LEFT JOIN FETCH n.folder "
               + "WHERE n.id IN :ids")
   List<Note> hydrateNonDeletedNotesWithNotebookAndFolderByIds(@Param("ids") List<Integer> ids);
-
-  String unassimilatedWhereClause =
-      " WHERE "
-          + "   rp IS NULL "
-          + "   AND "
-          + Note.JPA_AVAILABLE
-          + " "
-          + "   AND "
-          + AssimilationSequenceSkip.JPA_NOT_EXISTS_NOTE_LEVEL_SKIP
-          + " AND "
-          + NotebookSettings.JPA_NOTEBOOK_NOT_SKIP_MEMORY_TRACKING;
-
-  String joinMemoryTracker =
-      " LEFT JOIN n.memoryTrackers rp ON rp.user.id = :userId"
-          + " AND "
-          + MemoryTrackerQueryFragments.JPA_WHERE_NOTE_LEVEL_TRACKER
-          + " AND "
-          + MemoryTrackerQueryFragments.JPA_WHERE_UNDERSTANDING_TRACKER;
-
-  String unassimilatedOrderBy = " ORDER BY " + NoteLevelIndex.JPA_LEVEL + ", n.createdAt, n.id";
-
-  String selectUnassimilatedNoteUnit =
-      "SELECT NEW com.odde.donut.services.AssimilationUnit(n, "
-          + NoteLevelIndex.JPA_LEVEL
-          + ") FROM Note n";
-
-  String selectFromNoteWithOwnership =
-      " JOIN n.notebook nb " + " ON nb.ownership.id = :ownershipId ";
-
-  @Query(
-      value =
-          selectUnassimilatedNoteUnit
-              + selectFromNoteWithOwnership
-              + joinMemoryTracker
-              + NoteLevelIndex.JPA_LEFT_JOIN
-              + unassimilatedWhereClause
-              + unassimilatedOrderBy)
-  Stream<AssimilationUnit> findUnassimilatedByOwnership(Integer userId, Integer ownershipId);
-
-  @Query(
-      value =
-          "SELECT count(1) as count from Note n "
-              + selectFromNoteWithOwnership
-              + joinMemoryTracker
-              + unassimilatedWhereClause)
-  int countUnassimilatedByOwnership(Integer userId, Integer ownershipId);
-
-  String fromNotebook = "   AND n.notebook.id = :notebookId ";
-
-  @Query(
-      value =
-          selectUnassimilatedNoteUnit
-              + joinMemoryTracker
-              + NoteLevelIndex.JPA_LEFT_JOIN
-              + unassimilatedWhereClause
-              + fromNotebook
-              + unassimilatedOrderBy)
-  Stream<AssimilationUnit> findUnassimilatedByAncestor(Integer userId, Integer notebookId);
-
-  @Query(
-      value =
-          "SELECT count(1) as count from Note n "
-              + joinMemoryTracker
-              + unassimilatedWhereClause
-              + fromNotebook)
-  int countUnassimilatedByAncestor(Integer userId, Integer notebookId);
-
-  @Query(value = "SELECT count(1) as count from Note n " + " WHERE n.id in :noteIds" + fromNotebook)
-  int countByAncestorAndInTheList(Integer notebookId, @Param("noteIds") List<Integer> noteIds);
 
   @Query(value = "SELECT COUNT(nc) FROM NoteCreator nc WHERE nc.user.id = :userId")
   long countByCreator(@Param("userId") Integer userId);

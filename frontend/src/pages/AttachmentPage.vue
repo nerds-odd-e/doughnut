@@ -33,6 +33,7 @@
         <Trash2 class="size-4" aria-hidden="true" />
         Delete
       </button>
+      <NoteReferences :note-topologies="attachmentRealm.references" />
     </div>
   </div>
 </template>
@@ -50,6 +51,7 @@ import { computed } from "vue"
 import { useRouter } from "vue-router"
 import ContentLoader from "@/components/commons/ContentLoader.vue"
 import usePopups from "@/components/commons/Popups/usePopups"
+import NoteReferences from "@/components/notes/NoteReferences.vue"
 import { refreshSidebarStructuralListings } from "@/components/notes/sidebarStructuralRefresh"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import { containingLocationOf } from "@/routes/containingLocation"

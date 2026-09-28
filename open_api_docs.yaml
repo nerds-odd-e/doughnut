@@ -6026,10 +6026,15 @@ components:
           format: int64
         image:
           type: boolean
+        references:
+          type: array
+          items:
+            $ref: "#/components/schemas/NoteTopology"
       required:
       - attachment
       - image
       - notebookRealm
+      - references
       - size
     ThresholdExceededResult:
       type: object

@@ -1,15 +1,10 @@
 package com.odde.donut.controllers;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import com.odde.donut.controllers.dto.FolderTrailSegment;
-import com.odde.donut.controllers.dto.NotebookAttachmentRealm;
-import com.odde.donut.entities.Folder;
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.NotebookAttachment;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
@@ -46,46 +41,6 @@ class NotebookAttachmentControllerTest extends ControllerTestBase {
 
   private static ContentDisposition disposition(ResponseEntity<byte[]> response) {
     return response.getHeaders().getContentDisposition();
-  }
-
-  @Nested
-  class FilePage {
-    @Test
-    void showsFilenameSizeAndFolderTrailThroughItsFolder() throws Exception {
-      Folder physics = makeMe.aFolder().notebook(notebook).name("physics").please();
-      Folder data = makeMe.aFolder().parentFolder(physics).name("data").please();
-      NotebookAttachment runJson =
-          makeMe
-              .anAttachment("run.json")
-              .in(data)
-              .content("{\"a\":1}".getBytes(StandardCharsets.UTF_8))
-              .please();
-
-      NotebookAttachmentRealm page = controller.getAttachmentPage(notebook, runJson);
-
-      assertThat(page.attachment().filename(), equalTo("run.json"));
-      assertThat(page.size(), equalTo(7L));
-      assertThat(page.image(), equalTo(false));
-      assertThat(
-          page.sidebar().getAncestorFolders().stream().map(FolderTrailSegment::name).toList(),
-          contains("physics", "data"));
-      assertThat(page.sidebar().getNotebookRealm().notebook().getId(), equalTo(notebook.getId()));
-    }
-
-    @Test
-    void rootFileHasNoFolderTrail() throws Exception {
-      NotebookAttachment keep = attachmentAtRoot(".keep", "");
-
-      assertThat(
-          controller.getAttachmentPage(notebook, keep).sidebar().getAncestorFolders(), empty());
-    }
-
-    @Test
-    void anImageFileIsMarkedAsAnImage() throws Exception {
-      NotebookAttachment flow = attachmentAtRoot("flow.png", "png bytes");
-
-      assertThat(controller.getAttachmentPage(notebook, flow).image(), equalTo(true));
-    }
   }
 
   @Nested

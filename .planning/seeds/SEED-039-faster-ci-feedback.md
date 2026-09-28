@@ -131,76 +131,9 @@ authorizes no implementation, profiling run, or executable slice plan.
   If the resulting timings no longer justify rebalancing, bring that evidence
   back for an owner decision rather than inventing work or silently cancelling it.
 
-<a id="story-4"></a>
-
-### Stop the SUT start timeout test depending on runner speed
-
-**Identity:** SEED-039#story-4
-```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/008-sut-start-timeout-race/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"9f1b2dee4f36def21e3556f62349bac4e3e6931aa30ed1c6a26728b8bf56d4e7","plan":"6da9c47f929ff6ee76763b6643661384a1594a41f943f55c20a824d6c8f33d9b"}}
-```
-
-**Goal**
-
-Contributors get CI failures only for real defects, never because a runner
-was slow. The isolated SUT start tests stop racing a wall-clock deadline
-against the stand-in's startup, and the suite gets smaller rather than more
-elaborate.
-
-- **Evidence:** in `scripts/sut-isolated-start-release.test.mjs`, "isolated
-  start timeout stops the owned process tree and releases the claim" gives the
-  stand-in a 1.5s start timeout and must see its owned pids recorded, and
-  still alive, before that deadline fires. Its sibling with a 100ms timeout
-  failed that race in CI run [36373090056](https://github.com/nerds-odd-e/doughnut/actions/runs/36373090056)
-  (fixed by `32c68269cd`). A scan of every failed CI run since 2026-09-08 found
-  no failure of the 1.5s test (four observed passes, 1.56–1.65s), so this is a
-  cheap removal of a known race pattern, not a response to observed flakiness.
-- **Why this shape:** a start deadline and a cancellation end the same way.
-  `waitForSutHealthy` returns `{ ok: false, exitCode: 1 }` for both, and
-  `runSutStart` then runs the one shared `lifetime.shutdown()`. The
-  deadline-specific behavior is already proven deterministically with a mock
-  child in `sut-start-health-wait.test.mjs` ("returns ok=false when timeout
-  expires") and `sut-start.test.mjs`. The isolated timeout test therefore adds
-  only its teardown observations, which do not depend on what ended the start.
-- **Effort hypothesis:** S (under 30 minutes), high confidence.
-- **Depends on:** nothing.
-- **Safe stopping point:** the change is complete on its own.
-- **Plan:** [008-sut-start-timeout-race](../slice-plans/008-sut-start-timeout-race/PLAN.md)
-
-**Scope**
-
-- Required: the isolated timeout test is removed. Its teardown observations
-  that no other isolated start test makes move into "isolated start
-  cancellation stops the owned process tree", which already cancels only after
-  the owned tree is recorded: a foreign process and a foreign TCP listener
-  survive, the owner lock and control endpoint are removed, the live-owner
-  check fails, and the SUT healthcheck reports not ok afterwards.
-- Required: no isolated start test sets a start deadline that can fire before
-  the stand-in records its pids. The remaining tests still expect the stand-in
-  to start within the shared pid wait, which is ordinary fixture startup.
-- Excluded: raising the timeout (keeps the race and slows the lint job), and
-  any test-only clock or deadline hook in product code (adds complexity for an
-  unobserved failure). Product code under `scripts/sut-*.mjs` is unchanged.
-- Deferred: auditing other script tests for timing races; that belongs to the
-  test-optimization story (story 2).
-
-**Key examples**
-
-- A contributor pushes while the lint job's runner is slow to start Node
-  processes → the isolated start tests pass, because none starts a deadline
-  racing the stand-in's startup.
-- The cancellation test starts the stand-in, waits for its owned pids, cancels
-  → the start returns 1, the owned leader and grandchild are gone, the foreign
-  process and listener still run, the owner lock and endpoint are removed, and
-  the healthcheck is not ok.
-- A regression makes an expired start deadline skip teardown → the
-  deadline-path unit tests still show a timeout returns exit code 1, and the
-  one shared shutdown after any non-zero exit code is proven by the
-  cancellation test.
-
 ## Ordering and Scope Reduction
 
-Story 4 is independent of the others. Follow story 2, then story 3. Test optimization removes shared cost before shard
+Follow story 2, then story 3. Test optimization removes shared cost before shard
 rebalancing redistributes the residual workload. If scope must shrink, defer
 story 3 first. Global backlog priority has not been selected, so these remain
 ordered candidates in this seed.

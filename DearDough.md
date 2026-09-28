@@ -424,6 +424,11 @@ The usage line says REF but publication requires refs/heads/; callers discover t
   - Observed effect: no refused call; two extra source-reading calls replaced the usual refusal.
   - Inference: on 0.3.43 the usage line still does not state the required `refs/heads/` form; a coordinator either pays a refusal or reads the script source.
 
+- Execution: SEED-039#story-4 / `7dca65eaf1:.planning/slice-plans/008-sut-start-timeout-race/PLAN.md` / d33dedc7c8; Timestamp: 2026-09-28T12:53:52+08:00 (slice 1 delivery); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.45.
+  - Evidence: coordinator transcript `bdf6220e…jsonl`: `deliver --target-ref origin/story/sut-start-timeout-race` refused with "authorized target must be a branch ref: origin/story/sut-start-timeout-race"; the retry with `refs/heads/story/sut-start-timeout-race` was accepted (`/tmp/dough-ci-501/watch-TspK5B`).
+  - Observed effect: one refused call (~3s); no coverage lost.
+  - Inference: still recurs on 0.3.45; this time the guessed form was the remote-tracking name, which the usage line's `REF` also admits.
+
 ## ODF-074 — A plan said the changed script had no test, and nobody searched for one before delivery, so CI caught the stale test
 
 Former local code: DD-126.
@@ -649,7 +654,29 @@ Slice planning wrote two observations into the executable plan that the delivere
   - Observed effect: one assertion written then removed, one test written, run, and removed; two plan-text corrections during delivery. No behavior defect.
   - Inference: a planning check that each planned observation can fail on the pre-change code, and does not assert a removed feature's absence, would have caught both. Qualified: one execution; related to ODF-147 (an implementer's test that could not fail) but here the plan prescribed it and the implementer ran it red.
 
-## DD-143 — The plan prescribed production observations whose access route or log source did not exist, and whose results could not change the approach
+## DD-143 — An implementer prompt required a nonexistent `pnpm test:typecheck` script
+
+The Slice 1 implementer was told to run `./scripts/run.sh pnpm test:typecheck` after regenerating the API client. That script is not defined at the repo root or under `frontend/`. The project's frontend skill names `pnpm -C frontend exec vue-tsc --noEmit`. The agent substituted that command and reported the gap.
+
+### Occurrences
+
+- Execution: SEED-053#story-1 / `12c0f629ac:.planning/slice-plans/007-file-page-references/PLAN.md` / c86eb7eba0; Timestamp: 2026-09-28T12:24:00+08:00 (Slice 1 implementer start; delivery at 12:32:48+08:00); Tool: Cursor; Model: gemini-3.8-flash; Open Dough release: 0.3.45.
+  - Evidence: implementer prompt in transcript `ff698959-2f7d-4392-a127-0f3f0adcc8f8/subagents/b7997c35-374a-4b20-824a-dca12fb505b1`; return notes "no root `pnpm test:typecheck` script" and used `pnpm -C frontend exec vue-tsc --noEmit`. Root/frontend `package.json` have no `test:typecheck`. Frontend skill "Frontend proof" documents the vue-tsc command.
+  - Observed effect: one extra discovery step inside the slice; typecheck still passed via the substituted command. No false green.
+  - Inference: the coordinator prompt invented a script name instead of copying the frontend skill's command. Qualified: different from ODF-100 (piped vue-tsc exit code), which assumed the correct command.
+
+## DD-144 — A four-line repository tip-over forced extracting an unrelated assimilation query block
+
+Slice 2 added one content-contains query to `NoteRepository` (244 → 254 lines). The post-change refactor's 250-line check then required a split; the agent extracted the pre-existing assimilation query block into `NoteAssimilationQueries` (~85 lines moved) so the file dropped to 180. The assimilation seam is cohesive, but it was not implicated by file-page references except as the cheapest way under the numeric limit.
+
+### Occurrences
+
+- Execution: SEED-053#story-1 / `12c0f629ac:.planning/slice-plans/007-file-page-references/PLAN.md` / bc870053e8; Timestamp: 2026-09-28T12:37:00+08:00 through 2026-09-28T12:40:26+08:00 (Slice 2 refactor through delivery); Tool: Cursor; Model: gemini-3.8-flash; Open Dough release: 0.3.45.
+  - Evidence: refactor transcript `ff698959-2f7d-4392-a127-0f3f0adcc8f8/subagents/2b60056d-ca4d-4cae-8a47-c79402587e9f` (decision pass: File size 254; learning "Slice 2's candidate query pushed NoteRepository over 250"); commit `bc870053` adds `NoteAssimilationQueries.java` and shrinks `NoteRepository.java`. Pre-Slice-2 `NoteRepository` at `c86eb7eba0` was 244 lines.
+  - Observed effect: ~8 minutes of refactor time and an assimilation-focused re-proof (`AssimilationControllerTests`) for a tip-over caused by one new query.
+  - Inference: the hard 250-line ceiling can force relocating a large untouched block when a small addition crosses it. Related in theme to ODF-152 (numeric check applicability), but here the agent performed the split rather than escalating a staged-simplification conflict.
+
+## DD-145 — The plan prescribed production observations whose access route or log source did not exist, and whose results could not change the approach
 
 Plan 009 required a SQL catalog probe "through the established authorized DB connection" (slice 1), a disposable Cloud SQL vector rehearsal (slice 3), and Flyway D/P success "in the serving instance's application log (`gcloud logging`)" (slice 10). No DB connection route was established for agents, the app's log does not reach Cloud Logging, and the chosen `DROP TABLE` worked whatever the catalog showed.
 
@@ -660,7 +687,7 @@ Plan 009 required a SQL catalog probe "through the established authorized DB con
   - Observed effect: about 27 minutes of owner-attended probing ended in skipping slice 1's SQL part and dropping slice 3; slice 10's named proof was replaced during delivery. No product defect.
   - Inference: planning could have asked, for each production observation, whether any result would change the approach, and whether the access route and log source exist (both checkable cheaply once `gcloud` auth worked). Related to DD-142 (prescribed observations dropped in execution), but here the cost was production access and owner time. Qualified: one execution; planning-time `gcloud` auth had failed.
 
-## DD-144 — Transient permission-check outages ended the coordinator's turn three times, so the owner had to type "continue"
+## DD-146 — Transient permission-check outages ended the coordinator's turn three times, so the owner had to type "continue"
 
 The auto-mode classifier returned "no verdict" errors, which the tool result called transient and retryable. The coordinator each time reported and ended its turn instead of waiting in the background and retrying, and resumed only when the owner wrote "continue".
 
@@ -673,6 +700,6 @@ The auto-mode classifier returned "no verdict" errors, which the tool result cal
 
 ## Retention
 
-- Highest allocated local number: 144. Removed local codes are never reused.
+- Highest allocated local number: 146. Removed local codes are never reused.
 - Full pre-maintenance log and earlier recovery locators: `99fa1b9835e3dff2473837ba2a1f8b11967d5938:DearDough.md`.
 - Occurrence history is partial; active evidence stays here or in the Open Dough catalog and watch list.
