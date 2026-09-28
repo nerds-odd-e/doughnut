@@ -131,9 +131,44 @@ authorizes no implementation, profiling run, or executable slice plan.
   If the resulting timings no longer justify rebalancing, bring that evidence
   back for an owner decision rather than inventing work or silently cancelling it.
 
+<a id="story-4"></a>
+
+### Stop the SUT start timeout test depending on runner speed
+
+**Identity:** SEED-039#story-4
+```json dough-story-state
+{"schemaVersion":1,"refinement":"not-refined","approach":"unselected"}
+```
+
+- **For / why:** Contributors get CI failures only for real defects, not for a
+  slow runner.
+- **Observed risk:** In `scripts/sut-isolated-start-release.test.mjs`, "isolated
+  start timeout stops the owned process tree and releases the claim" starts the
+  stand-in with a 1.5s start timeout, then waits for the stand-in to record its
+  owned pids and asserts they are still alive. On a slow runner the timeout can
+  fire before the pids are recorded, or between recording and those
+  assertions. Its sibling "isolated start escalates past a TERM-resistant owned
+  descendant" failed CI run [36373090056](https://github.com/nerds-odd-e/doughnut/actions/runs/36373090056)
+  the same way with a 100ms timeout; commit `32c68269cd` fixed that one by
+  cancelling once the owned tree is recorded.
+- **Scope:** Make the timeout test deterministic while it still observes the
+  timeout path it promises: the start ends through its deadline, the owned tree
+  is stopped, the foreign process survives, and the claim is released. Cancelling
+  instead would test a different path, so the likely shape is letting the
+  stand-in hold off the deadline until its pids are recorded, or starting the
+  deadline from a readiness point; choose from the code.
+- **Evaluation:** The test fails for the right reason when the stand-in's pid
+  recording is artificially delayed past today's margin, and passes with the
+  fix under that same delay and in repeated runs.
+- **Value / learning:** Removes a known intermittent CI failure before it
+  costs a repair cycle.
+- **Effort hypothesis:** S, medium confidence.
+- **Depends on:** Nothing.
+- **Safe stopping point:** The single test fixed and proven is complete.
+
 ## Ordering and Scope Reduction
 
-Follow story 2, then story 3. Test optimization removes shared cost before shard
+Story 4 is independent of the others. Follow story 2, then story 3. Test optimization removes shared cost before shard
 rebalancing redistributes the residual workload. If scope must shrink, defer
 story 3 first. Global backlog priority has not been selected, so these remain
 ordered candidates in this seed.

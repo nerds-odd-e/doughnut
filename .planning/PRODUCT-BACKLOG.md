@@ -12,3 +12,4 @@ Bug fixing and general maintenance.
 
 ## Backlog list
 
+- [Stop the SUT start timeout test depending on runner speed](seeds/SEED-039-faster-ci-feedback.md#story-4) — SEED-039#story-4
