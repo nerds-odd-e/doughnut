@@ -141,6 +141,7 @@ Missing hashed assets (e.g. a typo under `/assets/`) return a real **404** — t
    - Hashed assets under `/assets/` → long cache safe (immutable filenames).
    - `index.html` → **`Cache-Control: public,max-age=60`** set by [`upload-frontend-static-to-gcs.sh`](../../infra/gcp/scripts/upload-frontend-static-to-gcs.sh) after rsync (hashed assets keep the rsync default).
    - After each URL-map import, [`apply-doughnut-app-service-url-map.sh`](../../infra/gcp/scripts/apply-doughnut-app-service-url-map.sh) runs `gcloud compute url-maps invalidate-cdn-cache … --path "/*" --async` so shells cached against a previous SHA (or any poisoned entry) do not linger.
+   - The app's update reminder relies on this: when a tab becomes visible again it fetches `/` with `cache: "no-store"` and compares the served `index.html`'s module entry scripts (the content-hashed `/assets/main-<hash>.js`) with those of the loaded page ([`FrontendUpdateReminder.vue`](../../frontend/src/components/commons/FrontendUpdateReminder.vue)). Keep `/` serving the active release's `index.html` with a short cache, or open tabs stop learning about new frontends.
 
 Manual invalidation (e.g. after a bad CDN fill):
 
