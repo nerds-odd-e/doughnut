@@ -4,7 +4,6 @@ import {
   clickUseThisNoteOnTargetNote,
   clickUseThisNoteOnTargetNoteInFolder,
   expectSearchResultHeading,
-  searchResultSection,
 } from './noteTargetSearchResult'
 
 const relationshipTargetListMaxAttempts = 5
