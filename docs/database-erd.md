@@ -166,9 +166,6 @@ erDiagram
         int note_id PK FK
         int user_id FK
     }
-    note_embeddings {
-        bigint id PK
-    }
     note_level_index {
         int note_id PK FK
     }

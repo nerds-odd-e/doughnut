@@ -1,0 +1,2 @@
+-- No-op tip placeholder above every migration version ever applied (highest was 300000350).
+-- Future migrations must use a version greater than 300000351.
