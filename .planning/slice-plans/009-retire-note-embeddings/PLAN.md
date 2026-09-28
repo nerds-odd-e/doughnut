@@ -367,7 +367,14 @@ remains unfinished.
 
 ### 11. Fresh installations use only current schema definitions
 Type: Behavior
-Status: planned
+Status: done — baseline `note_embeddings` block (18 lines) removed, `V300000350` deleted, generic tip `V300000351`
+kept, db-migration skill lists 350 as retired. B `backend:test_only` 2697 tests 0 failures (repair realigned the
+owned test DB: baseline checksum 183701009, 350 DELETED, tip 351); ERD unchanged. Rehearsal with the slice 2
+harness: retained schema built from pre-cleanup resources through D/P, then final resources → repair "Marked
+missing migrations as deleted, Aligned applied migration checksums", migrate 0, tip 351, repeat no-op, data
+checksums unchanged; fresh schema from final resources identical. Inventory `git grep -niE
+'embedding|note_embeddings|vector|semantic search' -- . ':!.planning' ':!pnpm-lock.yaml'` leaves only ADR 0004's
+independent "image embedding". No migrations exist above 351 on main, so no allocation freeze conflict arose.
 Size: 3–5 minutes active after rehearsal; fresh/upgrade/B runtime excepted.
 Proof: fresh schema and populated post-R2 upgrade converge through repair/migrate;
 B passes; ERD remains the current schema; final tracked-source inventory confirms
