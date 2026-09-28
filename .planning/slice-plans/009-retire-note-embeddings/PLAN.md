@@ -130,8 +130,18 @@ proof/external-wait exceptions, not permission for unbounded implementation.
 
 ### 1. Establish the production retirement boundary
 Type: Behavior
-Status: blocked — 2026-09-28 `gcloud sql instances describe doughnut-db --project=carbon-syntax-298809` again failed with "Reauthentication failed. cannot prompt during non-interactive execution"; needs the owner's `gcloud auth login`. Slices 4–7 proceed meanwhile.
+Status: in progress — metadata observed; SQL catalog inspection awaits an owner-approved read-only DB access route.
 Size: 3–5 minutes active; credential/host access wait excepted.
+Observed 2026-09-28 after owner `gcloud auth login` (metadata-only `gcloud sql instances describe/list`,
+`gcloud sql databases list`, `gcloud compute instance-groups managed list`, `gcloud compute instances list`,
+project `carbon-syntax-298809`):
+- Only Cloud SQL instance is `doughnut-db` (MYSQL_8_4, RUNNABLE, us-east1); its only non-system database is
+  `doughnut`, so `cloudsql_vector=on` (the instance's only database flag) has no other schema consumer.
+- One MIG `doughnut-app-group` (us-east1-b, target size 1), one serving VM `doughnut-app-group-jc41`; no other
+  retained long-lived installation was found in the project.
+- DB users: `doughnut` limited to `10.142.%`/`10.142.0.25`/localhost; no local proxy or mysql client. No
+  established read-only SQL route exists; `SHOW CREATE TABLE note_embeddings`, row count, keys, vector index and
+  Flyway history remain unobserved.
 Proof: operator receives a verified target and bounded cleanup inventory.
 
 Probe the documented project `carbon-syntax-298809`, Cloud SQL `doughnut-db`,
