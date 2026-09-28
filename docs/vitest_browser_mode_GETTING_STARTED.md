@@ -23,6 +23,11 @@ pnpm exec playwright install chromium
 
 From the `frontend/` directory:
 
+All commands, including direct Vitest runs, use headless Chromium locally and in
+CI. The test runner never automatically opens a browser window; watch mode prints
+the Vitest UI URL if you want to open it yourself. Agents must keep test runs
+headless unless explicitly asked to use a visible browser.
+
 ### Run all browser tests
 
 ```bash
@@ -136,7 +141,7 @@ Run: `pnpm exec playwright install chromium`
 ### Tests are slow
 
 - Browser Mode is slower than jsdom, but still fast
-- Use `headless: true` in CI (already configured)
+- `headless: true` is configured for both local and CI runs
 - Use `--ui` only for debugging
 
 ## Resources

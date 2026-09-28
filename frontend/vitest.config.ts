@@ -72,6 +72,8 @@ const config = defineConfig({
   },
   test: {
     globals: true,
+    // Keep automated test runs from opening the desktop browser, including --ui.
+    open: false,
     environment: "node", // Browser mode uses 'node' environment
     // Parallel file imports overwhelm the browser orchestrator on CI runners.
     fileParallelism: !isCI,
@@ -92,7 +94,7 @@ const config = defineConfig({
     ],
     browser: {
       enabled: true,
-      headless: process.env.CI === "true",
+      headless: true,
       provider: playwright(),
       screenshotDirectory: "vitest-test-results",
       instances: [{ browser: "chromium" }],

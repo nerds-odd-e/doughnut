@@ -20,13 +20,17 @@ From the repo root:
 CURSOR_DEV=true nix develop -c pnpm frontend:test
 ```
 
-Run tests with browser rendering UI:
+All frontend unit-test commands use headless Chromium and never automatically open
+a browser window. Do not enable a visible browser unless the user explicitly asks.
+
+The legacy UI command also runs headlessly:
 
 ```bash
 CURSOR_DEV=true nix develop -c pnpm frontend:test:ui
 ```
 
-Run tests in browser-rendered watch mode:
+Run tests in headless watch mode (the Vitest UI remains available at its printed
+URL without opening a browser):
 
 ```bash
 CURSOR_DEV=true nix develop -c pnpm frontend:test:watch

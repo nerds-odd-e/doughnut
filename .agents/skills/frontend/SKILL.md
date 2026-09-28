@@ -18,6 +18,11 @@ CURSOR_DEV=true nix develop -c pnpm frontend:test
 
 Spec paths are relative to `frontend/`. Do not pass `--` before the path (Vitest skips file filtering). Prefer the full frontend unit suite; a single file only while iterating on that file.
 
+Always run frontend unit tests headlessly. The shared Vitest config keeps Chromium
+headless and disables automatic browser opening for regular, direct, UI, and watch
+runs. Agents must not override this with `--browser.headless=false` or `--open`
+unless the user explicitly requests a visible browser.
+
 ## Frontend proof
 
 `frontend:test` runs Vitest only; `frontend/vitest.config.ts` disables
