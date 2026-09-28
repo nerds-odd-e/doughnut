@@ -72,8 +72,8 @@ regenerated API types.
 
 ### 1. A file page lists the notes in its folder that show it as their image, and opens them
 Type: Behavior
-Status: planned
-Proof: new E2E scenario in `notebook_files.feature`; `NotebookAttachmentControllerTest.FilePage` and `AttachmentPage.spec.ts` extended; API regenerated; frontend typecheck per the `frontend` skill.
+Status: done
+Proof: new E2E scenario in `notebook_files.feature`; `NotebookAttachmentControllerFilePageTest` (extracted from `NotebookAttachmentControllerTest.FilePage`) and `AttachmentPage.spec.ts` extended; API regenerated; frontend typecheck verified.
 
 Behavior:
 - Notebook "Lab Notebook" has the file `docs/diagram.png` and notes `Design` and

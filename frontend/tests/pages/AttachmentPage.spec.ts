@@ -1,5 +1,5 @@
 import AttachmentPage from "@/pages/AttachmentPage.vue"
-import type { Notebook } from "@generated/donut-backend-api"
+import type { Notebook, NoteTopology } from "@generated/donut-backend-api"
 import helper from "@tests/helpers"
 import makeMe from "donut-test-fixtures/makeMe"
 import { describe, expect, it } from "vitest"
@@ -9,11 +9,13 @@ const mountPage = ({
   readonly = true,
   filename = "run.json",
   image = false,
+  references = [],
 }: {
   notebook?: Notebook
   readonly?: boolean
   filename?: string
   image?: boolean
+  references?: NoteTopology[]
 } = {}) =>
   helper
     .component(AttachmentPage)
@@ -25,6 +27,7 @@ const mountPage = ({
         attachment: { id: 42, filename },
         size: 12,
         image,
+        references,
       },
     })
     .mount()
@@ -83,5 +86,21 @@ describe("AttachmentPage", () => {
 
   it("shows no image for a file that is not an image", () => {
     expect(mountPage().find("img").exists()).toBe(false)
+  })
+
+  it("shows the References heading and both titles when there are references", () => {
+    const design = makeMe.aNote.title("Design").please().noteTopology
+    const review = makeMe.aNote.title("Review").please().noteTopology
+    const wrapper = mountPage({ references: [design, review] })
+
+    expect(wrapper.get("h3").text()).toBe("References")
+    expect(wrapper.text()).toContain("Design")
+    expect(wrapper.text()).toContain("Review")
+  })
+
+  it("shows no References heading when there are no references", () => {
+    const wrapper = mountPage({ references: [] })
+
+    expect(wrapper.find("h3").exists()).toBe(false)
   })
 })

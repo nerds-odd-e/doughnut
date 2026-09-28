@@ -6,6 +6,7 @@ import com.odde.donut.entities.NotebookAttachment;
 import com.odde.donut.services.notebookAttachment.ImageFile;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
+import java.util.List;
 
 @Schema(
     description =
@@ -16,10 +17,14 @@ public record NotebookAttachmentRealm(
     @NotNull @JsonUnwrapped RealmNotebookSidebar sidebar,
     @NotNull NotebookAttachmentListItem attachment,
     @NotNull long size,
-    @NotNull boolean image) {
+    @NotNull boolean image,
+    @NotNull List<NoteTopology> references) {
 
   public static NotebookAttachmentRealm of(
-      NotebookRealm chrome, NotebookAttachment attachment, long size) {
+      NotebookRealm chrome,
+      NotebookAttachment attachment,
+      long size,
+      List<NoteTopology> references) {
     RealmNotebookSidebar sidebar = new RealmNotebookSidebar();
     sidebar.setNotebookRealm(chrome);
     sidebar.setAncestorFolders(
@@ -28,6 +33,7 @@ public record NotebookAttachmentRealm(
         sidebar,
         new NotebookAttachmentListItem(attachment.getId(), attachment.getFilename()),
         size,
-        ImageFile.mediaType(attachment.getFilename()).isPresent());
+        ImageFile.mediaType(attachment.getFilename()).isPresent(),
+        references);
   }
 }
