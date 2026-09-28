@@ -96,3 +96,10 @@ becomes visible and `/` still names B → no reminder; the tab becomes visible a
   spy (`returnToTabWhileServing`) so absence assertions cannot pass before the
   check runs. Rendering once in `beforeEach` and clearing that spy per call
   lets one test return to the tab several times.
+
+## Execution complete
+
+Product advice: no backlog change. The story's learning question — whether a
+return-to-tab check is timely enough given roughly daily releases — is answered
+only by the owner observing a real tab across the next production release; hold
+any more intrusive follow-up (timer, forced reload) until that observation.

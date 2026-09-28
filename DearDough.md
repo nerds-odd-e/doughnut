@@ -407,6 +407,11 @@ The usage line says REF but publication requires refs/heads/; callers discover t
   - Observed effect: one refused call; no coverage lost.
   - Inference: same argument-shape refusal as the rows for plans 035, 009 and 011, still on 0.3.42.
 
+- Execution: SEED-041#story-1 / slice-plans/003-frontend-update-reminder / 751f877d2a; Timestamp: unknown (2026-09-28, before the slice 1 delivery of 751f877d2a); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.43.
+  - Evidence: coordinator printed the usage line (`--target-ref REF`), then grepped `execution-increment-delivery.mjs` and read `targetBranchName` in `publication-git.mjs` ("authorized target must be a branch ref") before the first `deliver`; both deliveries with `refs/heads/story/frontend-update-reminder` were accepted (`observation.state: attached`, then `reused`, `/tmp/dough-ci-501/watch-8FYr7O`).
+  - Observed effect: no refused call; two extra source-reading calls replaced the usual refusal.
+  - Inference: on 0.3.43 the usage line still does not state the required `refs/heads/` form; a coordinator either pays a refusal or reads the script source.
+
 ## ODF-074 — A plan said the changed script had no test, and nobody searched for one before delivery, so CI caught the stale test
 
 Former local code: DD-126.
