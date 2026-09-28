@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "agent": "Yuma-chan",
+  "email": "yuma-chan@example.org",
+  "identity": "SEED-008#story-1",
+  "mode": "story-branch",
+  "branch": "story/secrets-off-command-line",
+  "host": "claude",
+  "model": "claude-opus-5-5"
+}
