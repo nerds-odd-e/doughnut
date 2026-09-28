@@ -176,5 +176,5 @@ not refined yet; refine each before planning or execution.
 
 ## Breadcrumbs
 
-- Source: sidebar UX manual UAT findings, recoverable from the SEED-042 story's
-  before-cleanup commit on `main`.
+- Source: the sidebar UX manual UAT findings in
+  `.planning/seeds/SEED-042-sidebar-ux-uat.md` at commit `adce721eea`.
