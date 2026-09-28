@@ -63,7 +63,7 @@ Effort bands: S = 30–60 minutes, M = 1–2 hours, L = 2–4 hours, including d
 
 **Identity:** SEED-043#story-1
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"unselected"}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/005-sidebar-full-row-reveal/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"81c538f5dfee464c58713a34918c076f185062232739cdfc949c5f8103e64459","plan":"c60b48ad0127e7878033208c5f24901adf4398f02e62e6d20e324e2ddef6c13a"}}
 ```
 
 **Goal**
@@ -123,23 +123,32 @@ hint is what covers the revealed row.
   same rule. The selected note, not the top of the list, is the target: it is
   the sidebar's "you are here", and the old scroll offset means nothing after
   the list is reordered.
-- The reveal change applies to the sidebar only; conversations keep their
-  current scrolling.
+- The whole-row rule is the only promise about where the row lands. The row
+  may end up at the top edge, the bottom edge, or anywhere in between, as long
+  as all of it is visible.
+- On a folder page, the active folder row is revealed the same way. It shares
+  the reveal and needs no separate check.
 
 Not promised by this story:
 
+- Changing how conversations scroll. The reveal may change for conversations
+  too, or stay as it is, whichever is simpler.
 - Losing the hint's shortcut to scroll the tree to an ancestor folder row is
   accepted. The breadcrumb still links to each folder's page.
-- Far jumps keep the current smooth scrolling (see Open Decisions).
+- Losing the only list of ancestor folders in the 390px drawer is accepted.
+  The drawer covers the breadcrumb, but the ancestor folder rows are still in
+  the tree above the revealed row.
+- Instant reveal. Far jumps, including after a re-sort, keep the current
+  smooth scrolling.
 - Re-sorting when no note is selected (for example on a folder or notebook
   page), when the selected note sits inside a folder the user collapsed, or
   when the sort order is changed outside the sidebar (the Notebooks page or
-  another tab): current behavior stays.
+  another tab).
 - Keeping the previously visible rows in place instead of revealing the
   selected note.
-- Story 2's other defects and the other unselected UAT observations. Removing the hint also removes story 2's first defect (rows
-  under the hint cannot be clicked); story 2's refinement should drop that
-  defect.
+- Story 2's defects and the other unselected UAT observations. Removing the
+  hint also removes the UAT defect that rows under the hint cannot be clicked;
+  story 2 already dropped it.
 
 **Key examples**
 
@@ -158,7 +167,9 @@ Not promised by this story:
 - Any note page with ancestor folders: the breadcrumb still shows those folders;
   the sidebar shows no path hint.
 
-**Effort hypothesis:** S, medium confidence.
+**Effort hypothesis:** M, medium confidence. Removing the hint is mostly
+deletion; the whole-row rule and revealing again after a re-sort are two small
+behaviors on the same reveal.
 
 <a id="story-2"></a>
 
@@ -237,11 +248,6 @@ The owner queued these stories in this order after the existing backlog. Refine
 each before planning or execution. Story 1's removal of the path hint also
 removed story 2's original first defect. The re-sorting defect was folded into
 story 1 because it is the same reveal rule triggered by reordering.
-
-## Open Decisions
-
-- Whether far jumps (including after a re-sort) should reveal instantly or keep
-  smooth scrolling. Story 1 keeps smooth scrolling.
 
 ## Breadcrumbs
 
