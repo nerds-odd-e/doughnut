@@ -43,7 +43,13 @@ them. Leave every other flag unchanged.
 
 ### 1. The production app starts without secrets on its command line
 Type: Behavior
-Status: planned
+Status: delivered; production check pending the next application release
+Accepted local proof: `CURSOR_DEV=true nix develop -c bash scripts/test/run_all_script_tests.sh`
+→ 20/20 pass, including `production-database-routing.test` (runs the startup
+script with fakes) and `mig-startup-java-command.test`. The three removed flags
+set exactly `spring.datasource.password`, `spring.github_for_issues.token`, and
+`spring.openai.token`, which `application-prod.yml` reads from the variables the
+script still exports.
 Proof:
 - Local: `bash scripts/test/run_all_script_tests.sh` stays green (the routing
   test runs the whole startup script with fakes).

@@ -146,9 +146,6 @@ bash -c "java ${JAVA_OPTS} \
         -Dspring-boot.run.profiles=prod \
         -Dspring.profiles.active=prod \
         -Dspring.datasource.url='jdbc:mysql://db-server:3306/doughnut?connectionTimeZone=UTC&forceConnectionTimeZoneToSession=true' \
-        -Dspring.datasource.password=${MYSQL_PASSWORD} \
-        -Dspring.github_for_issues.token=${GITHUB_FOR_ISSUES_API_TOKEN} \
-        -Dspring.openai.token=${OPENAI_API_TOKEN} \
         -Dlogging.level.com.zaxxer.hikari=WARN \
         -Dlogging.level.com.zaxxer.hikari.HikariConfig=WARN \
         -jar /opt/doughnut_app/${ARTIFACT}-${VERSION}.jar" &
