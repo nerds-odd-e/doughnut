@@ -4,6 +4,7 @@ Entity-relationship view of the application database: foreign keys as relationsh
 
 ```mermaid
 erDiagram
+    SPRING_SESSION ||--o{ SPRING_SESSION_ATTRIBUTES : "SESSION_PRIMARY_ID ON DELETE CASCADE"
     answer ||--o{ recall_log : "answer_id ON DELETE SET NULL"
     answer ||--o{ recall_prompt : "answer_id ON DELETE NO ACTION"
     authored_note_reference ||--o{ note_property_index : "authored_note_reference_id ON DELETE SET NULL"
@@ -60,6 +61,14 @@ erDiagram
     "user" ||--o{ question_generation_batch : "user_id ON DELETE CASCADE"
     "user" ||--o{ subscription : "user_id ON DELETE CASCADE"
     "user" ||--o{ user_token : "user_id ON DELETE CASCADE"
+    SPRING_SESSION {
+        string PRIMARY_ID PK
+        string SESSION_ID UK
+    }
+    SPRING_SESSION_ATTRIBUTES {
+        string SESSION_PRIMARY_ID PK FK
+        string ATTRIBUTE_NAME PK
+    }
     answer {
         int id PK
     }

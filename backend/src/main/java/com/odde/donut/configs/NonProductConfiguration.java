@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -17,6 +16,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -33,10 +33,11 @@ public class NonProductConfiguration {
   public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
     http.csrf(AbstractHttpConfigurer::disable);
     http.cors(cors -> cors.configurationSource(corsConfigurationSource()));
-    http.authorizeHttpRequests(auth -> auth.requestMatchers("/api/games").permitAll())
-        .rememberMe(rememberMe -> rememberMe.alwaysRemember(true));
+    http.authorizeHttpRequests(auth -> auth.requestMatchers("/api/games").permitAll());
 
-    commonConfiguration.commonConfig(http.httpBasic(Customizer.withDefaults()));
+    commonConfiguration.commonConfig(
+        http.httpBasic(
+            basic -> basic.securityContextRepository(new HttpSessionSecurityContextRepository())));
     return http.build();
   }
 

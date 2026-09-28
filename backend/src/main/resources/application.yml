@@ -34,6 +34,9 @@ spring:
       globally_quoted_identifiers: true
       globally_quoted_identifiers_skip_column_definitions: true
     open-in-view: false
+  session:
+    jdbc:
+      initialize-schema: never
   redis:
     host: 127.0.0.1
     port: 6380

@@ -56,6 +56,7 @@ testability URL).
 | Slice 1's E2E proof exercises the swapped OpenAI URL | `head e2e_test/features/messages/conversation_about_a_note.feature`; `e2e_test/start/testability.ts:436` | Tagged `@usingMockedOpenAiService`; the URL is set through testability before the scenario |
 | A MockMvc sign-in test exists to extend | `configs/DevelopmentAuthenticationConfigurationTest.java` (dev profile, Basic sign-in via `/login/continue`) | Present |
 | Flyway owns schema; next version is above `300000348` | `.agents/skills/db-migration/SKILL.md`, `db/migration/` listing | Confirmed; choose the next free version at execution time |
+| Non-prod sign-in creates an HTTP session | Slice 2 attempt: dev `GET /login/continue` with Basic returns only a `remember-me` cookie (14 days); Spring Security's Basic filter keeps the context per request; E2E signs in with Basic (`e2e_test/start/actions/loginActions.ts`) | Refuted; owner decided (2026-09-28) that non-prod Basic sign-in stores its security context in the HTTP session and non-prod remember-me is removed, so dev, test and E2E sign-in use the session like production |
 | E2E sign-in keeps working with a `Secure` cookie over `http://localhost` | Bounded by slice 4's E2E proof | Unobserved; if it fails, set `Secure` only in `application-prod.yml` and prove it there |
 
 The production journey (staying signed in across a real release and a GitHub
@@ -91,7 +92,11 @@ Learnings:
 
 ### 2. A signed-in session is kept in the database, shared by all instances
 Type: Behavior
-Status: planned
+Status: done
+CI repair during slice 2: run 36360207670 failed "Associate note with Wikidata"
+(example #2) on slice 1's commit from a race that was already in the product.
+The Wikidata ID validation fetch ran without `apiCallWithLoading`, so the E2E
+wait for the app to settle returned early. Fixed in `useWikidataPropertyDialog.ts`.
 Proof: extend `DevelopmentAuthenticationConfigurationTest` (dev profile,
 MockMvc against the real test database) or a sibling test beside it; run that
 class, then the E2E sign-in and note-editing features
@@ -106,7 +111,9 @@ Behavior:
   out.
 - An unknown session cookie → signed out.
 
-Implementation: starter dependency, Flyway migration with Spring Session's
+Implementation: non-prod Basic sign-in saves its security context in the HTTP
+session and non-prod remember-me is removed (owner decision, see premises);
+starter dependency, Flyway migration with Spring Session's
 MySQL schema (its attribute table's `ON DELETE CASCADE` to its session table is
 Spring Session's own delete path, not notebook content), and
 `spring.session.jdbc.initialize-schema: never`. Tests that sign in must delete
@@ -115,6 +122,18 @@ their session rows (Spring Session commits in its own transaction, outside
 
 Stopping here is safe: sessions survive deploys; idle timeout and cookie
 lifetime are unchanged.
+
+Accepted proof: `DevelopmentAuthenticationConfigurationTest` (5 tests,
+cookie-only requests: `signedInSessionIsStoredInTheDatabaseAndFoundByItsCookie`,
+`logoutSignsOutTheSessionCookie`, `unknownSessionCookieIsSignedOut`); full
+`pnpm backend:test:worktree` 2714 passing; E2E `users/account_control`,
+`new_user`, `user_access_token`, `user_profile` and `mcq_management` 11/11
+(the runner rejects a `users/*` glob; list the specs).
+
+Learnings for slices 3–4: the cookie is Spring Session's `SESSION`; tests move
+last access with `UPDATE SPRING_SESSION SET LAST_ACCESS_TIME=?, EXPIRY_TIME=?`
+(epoch ms) and read `MAX_INACTIVE_INTERVAL` (seconds); tests that sign in must
+be non-transactional and delete their `SPRING_SESSION` rows.
 
 ### 3. A session ends only after 30 days without use
 Type: Behavior
@@ -144,7 +163,9 @@ Behavior: sign-in → the session cookie carries `Max-Age` of 400 days, `Secure`
 ## Current decisions
 
 - One session store (MySQL through Spring Session JDBC) for every profile; no
-  profile-specific session code.
+  profile-specific session store code. Non-prod sign-in differs from prod only
+  in how it authenticates (Basic instead of GitHub); both keep the signed-in
+  user in the session, and non-prod has no remember-me cookie.
 - The server-side 30-day inactivity timeout decides expiry; the cookie lifetime
   is kept at the browser maximum so it never ends a session early.
 - `Secure` applies in all profiles unless slice 4's E2E proof disproves the
