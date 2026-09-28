@@ -9,3 +9,4 @@ Bug fixing and general maintenance.
 
 ## Backlog list
 
+- [Identify book reading fixes and improvements through a two-hour manual UAT](seeds/SEED-054-book-reading-uat.md#story-1) — SEED-054#story-1
