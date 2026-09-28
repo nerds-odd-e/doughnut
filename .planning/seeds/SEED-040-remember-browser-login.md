@@ -136,4 +136,4 @@ When selecting work to improve the returning-user login experience.
   related login reliability work with a different outcome.
 - Ordering: sessions that survive deploys keep users on older frontend code
   longer, which raises the value of
-  [the frontend update reminder](SEED-041-frontend-update-reminder.md).
+  the frontend update reminder.
