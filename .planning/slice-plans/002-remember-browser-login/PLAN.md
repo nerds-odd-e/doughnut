@@ -137,7 +137,7 @@ be non-transactional and delete their `SPRING_SESSION` rows.
 
 ### 3. A session ends only after 30 days without use
 Type: Behavior
-Status: planned
+Status: done
 Proof: extend the slice 2 test; run that class.
 
 Behavior:
@@ -150,6 +150,15 @@ Behavior:
 Implementation: session timeout of 30 days.
 
 Stopping here is safe: the cookie still ends when the browser closes.
+
+Accepted proof: `DevelopmentAuthenticationConfigurationTest` 9/9
+(`signedInSessionEndsAfterThirtyDaysWithoutUse`,
+`sessionLastUsedDaysAgoIsSignedInOnlyWithinThirtyDays` 29/31,
+`usingTheSessionMovesItsLastAccessToNow`); 3 failed before the change.
+
+Learning: Spring Session in Boot 4.1 honours `spring.session.timeout`, not
+`server.servlet.session.timeout`; slice 4 lets the `Set-Cookie` assertion decide
+which cookie properties take effect.
 
 ### 4. The session cookie survives a browser restart and is Secure and SameSite=Lax
 Type: Behavior

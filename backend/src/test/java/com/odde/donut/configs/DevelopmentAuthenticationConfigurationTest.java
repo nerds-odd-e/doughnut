@@ -1,6 +1,7 @@
 package com.odde.donut.configs;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -11,8 +12,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import jakarta.servlet.http.Cookie;
 import java.nio.charset.StandardCharsets;
+import java.time.Duration;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
@@ -69,6 +73,36 @@ class DevelopmentAuthenticationConfigurationTest {
         .andExpect(jsonPath("$.externalIdentifier").value(nullValue()));
   }
 
+  @Test
+  void signedInSessionEndsAfterThirtyDaysWithoutUse() throws Exception {
+    signInAndGetSessionCookie();
+
+    assertThat(
+        storedSession("MAX_INACTIVE_INTERVAL", Integer.class),
+        is((int) Duration.ofDays(30).toSeconds()));
+  }
+
+  @ParameterizedTest
+  @CsvSource({"29, manual", "31,"})
+  void sessionLastUsedDaysAgoIsSignedInOnlyWithinThirtyDays(int daysAgo, String expectedUser)
+      throws Exception {
+    Cookie sessionCookie = signInAndGetSessionCookie();
+    lastUsedDaysAgo(daysAgo);
+
+    currentUserInfo(sessionCookie).andExpect(jsonPath("$.externalIdentifier").value(expectedUser));
+  }
+
+  @Test
+  void usingTheSessionMovesItsLastAccessToNow() throws Exception {
+    Cookie sessionCookie = signInAndGetSessionCookie();
+    lastUsedDaysAgo(29);
+    long beforeRequest = System.currentTimeMillis();
+
+    currentUserInfo(sessionCookie);
+
+    assertThat(storedSession("LAST_ACCESS_TIME", Long.class), greaterThan(beforeRequest - 1000));
+  }
+
   private ResultActions signIn() throws Exception {
     return mockMvc.perform(
         get("/login/continue")
@@ -77,6 +111,20 @@ class DevelopmentAuthenticationConfigurationTest {
                 HttpHeaders.AUTHORIZATION,
                 "Basic "
                     + HttpHeaders.encodeBasicAuth("manual", "password", StandardCharsets.UTF_8)));
+  }
+
+  private void lastUsedDaysAgo(int days) {
+    long lastAccess = System.currentTimeMillis() - Duration.ofDays(days).toMillis();
+    jdbcTemplate.update(
+        "UPDATE SPRING_SESSION SET LAST_ACCESS_TIME = ?, EXPIRY_TIME = ? + MAX_INACTIVE_INTERVAL * 1000"
+            + " WHERE PRINCIPAL_NAME = 'manual'",
+        lastAccess,
+        lastAccess);
+  }
+
+  private <T> T storedSession(String column, Class<T> type) {
+    return jdbcTemplate.queryForObject(
+        "SELECT " + column + " FROM SPRING_SESSION WHERE PRINCIPAL_NAME = 'manual'", type);
   }
 
   private Cookie signInAndGetSessionCookie() throws Exception {

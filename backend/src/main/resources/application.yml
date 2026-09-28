@@ -35,6 +35,7 @@ spring:
       globally_quoted_identifiers_skip_column_definitions: true
     open-in-view: false
   session:
+    timeout: 30d
     jdbc:
       initialize-schema: never
   redis:
