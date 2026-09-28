@@ -417,6 +417,11 @@ The usage line says REF but publication requires refs/heads/; callers discover t
   - Observed effect: no refused call; two extra source-reading calls replaced the usual refusal.
   - Inference: on 0.3.43 the usage line still does not state the required `refs/heads/` form; a coordinator either pays a refusal or reads the script source.
 
+- Execution: SEED-039#story-4 / `7dca65eaf1:.planning/slice-plans/008-sut-start-timeout-race/PLAN.md` / d33dedc7c8; Timestamp: 2026-09-28T12:53:52+08:00 (slice 1 delivery); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.45.
+  - Evidence: coordinator transcript `bdf6220e…jsonl`: `deliver --target-ref origin/story/sut-start-timeout-race` refused with "authorized target must be a branch ref: origin/story/sut-start-timeout-race"; the retry with `refs/heads/story/sut-start-timeout-race` was accepted (`/tmp/dough-ci-501/watch-TspK5B`).
+  - Observed effect: one refused call (~3s); no coverage lost.
+  - Inference: still recurs on 0.3.45; this time the guessed form was the remote-tracking name, which the usage line's `REF` also admits.
+
 ## ODF-074 — A plan said the changed script had no test, and nobody searched for one before delivery, so CI caught the stale test
 
 Former local code: DD-126.
