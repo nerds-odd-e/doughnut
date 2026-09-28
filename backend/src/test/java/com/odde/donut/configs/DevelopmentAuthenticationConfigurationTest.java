@@ -1,9 +1,12 @@
 package com.odde.donut.configs;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.allOf;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
+import static org.hamcrest.Matchers.startsWith;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -28,6 +31,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
 @SpringBootTest(
+    webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
     properties =
         "spring.datasource.url=${SPRING_DATASOURCE_URL:jdbc:mysql://127.0.0.1:3309/doughnut_test?connectionTimeZone=UTC&forceConnectionTimeZoneToSession=true}")
 @AutoConfigureMockMvc
@@ -80,6 +84,20 @@ class DevelopmentAuthenticationConfigurationTest {
     assertThat(
         storedSession("MAX_INACTIVE_INTERVAL", Integer.class),
         is((int) Duration.ofDays(30).toSeconds()));
+  }
+
+  @Test
+  void sessionCookieSurvivesBrowserRestartAndIsSecureAndSameSiteLax() throws Exception {
+    String setCookie = signIn().andReturn().getResponse().getHeader(HttpHeaders.SET_COOKIE);
+
+    assertThat(
+        setCookie,
+        allOf(
+            startsWith("SESSION="),
+            containsString("Max-Age=" + Duration.ofDays(400).toSeconds()),
+            containsString("Secure"),
+            containsString("HttpOnly"),
+            containsString("SameSite=Lax")));
   }
 
   @ParameterizedTest

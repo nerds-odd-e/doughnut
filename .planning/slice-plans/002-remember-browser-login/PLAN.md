@@ -57,7 +57,7 @@ testability URL).
 | A MockMvc sign-in test exists to extend | `configs/DevelopmentAuthenticationConfigurationTest.java` (dev profile, Basic sign-in via `/login/continue`) | Present |
 | Flyway owns schema; next version is above `300000348` | `.agents/skills/db-migration/SKILL.md`, `db/migration/` listing | Confirmed; choose the next free version at execution time |
 | Non-prod sign-in creates an HTTP session | Slice 2 attempt: dev `GET /login/continue` with Basic returns only a `remember-me` cookie (14 days); Spring Security's Basic filter keeps the context per request; E2E signs in with Basic (`e2e_test/start/actions/loginActions.ts`) | Refuted; owner decided (2026-09-28) that non-prod Basic sign-in stores its security context in the HTTP session and non-prod remember-me is removed, so dev, test and E2E sign-in use the session like production |
-| E2E sign-in keeps working with a `Secure` cookie over `http://localhost` | Bounded by slice 4's E2E proof | Unobserved; if it fails, set `Secure` only in `application-prod.yml` and prove it there |
+| E2E sign-in keeps working with a `Secure` cookie over `http://localhost` | Slice 4's E2E proof | Confirmed |
 
 The production journey (staying signed in across a real release and a GitHub
 OAuth callback under `SameSite=Lax`) belongs to the owner and is checked after
@@ -162,12 +162,22 @@ which cookie properties take effect.
 
 ### 4. The session cookie survives a browser restart and is Secure and SameSite=Lax
 Type: Behavior
-Status: planned
+Status: done
 Proof: extend the slice 2 test with the `Set-Cookie` header after sign-in; run
 that class and the E2E sign-in feature through `pnpm cy:run --spec`.
 
 Behavior: sign-in → the session cookie carries `Max-Age` of 400 days, `Secure`,
 `HttpOnly`, and `SameSite=Lax`; E2E sign-in and a signed-in page still work.
+
+Accepted proof: `DevelopmentAuthenticationConfigurationTest` 10/10
+(`sessionCookieSurvivesBrowserRestartAndIsSecureAndSameSiteLax` on the raw
+`Set-Cookie`; red with the cookie settings removed); E2E `account_control`,
+`user_profile`, `mcq_management` 8/8 with `Secure` in every profile, so the
+localhost premise holds.
+
+Learning: Boot copies `server.servlet.session.cookie.*` to Spring Session only
+on an embedded server, so the test class runs with `RANDOM_PORT`; production
+runs `java -jar`. `HttpOnly` and `SameSite=Lax` are Spring Session defaults.
 
 ## Current decisions
 

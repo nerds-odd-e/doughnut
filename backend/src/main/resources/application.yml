@@ -59,6 +59,11 @@ question:
 server:
   forward-headers-strategy: FRAMEWORK
   port: 8081
+  servlet:
+    session:
+      cookie:
+        max-age: 400d
+        secure: true
 springdoc:
   override-with-generic-response: false
   writer-with-json-view: true
