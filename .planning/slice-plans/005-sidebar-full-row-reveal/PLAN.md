@@ -126,6 +126,15 @@ tests passed; "reveals the whole active row after re-sorting" failed before the
 sort watch was added. The planned short-folder case was dropped: a tree whose
 rows all fit cannot scroll, so that check could never fail.
 
+## Execution complete
+
+Product advice: the story is delivered as refined and fits the near-future
+direction (UI improvement and hardening); no correction is needed. For wrap-up
+to weigh: the SUT start test "isolated start timeout stops the owned process
+tree and releases the claim" has the same startup-race shape as the flaky test
+repaired in `32c68269cd`, at a 1.5s margin; a fix needs a choice about how the
+stand-in holds off the deadline.
+
 ## Learnings
 
 - A whole-row check alone can pass partway through the smooth scroll. The spec
