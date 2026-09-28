@@ -58,12 +58,11 @@ export function useSearchExecution(opts: {
   const isSearchInProgress = computed(() => model.isSearchInProgress)
 
   const debounced = debounce((callback) => callback(), SEARCH_DEBOUNCE_MS)
+  let recentNotesRequested = false
 
   const fetchRecentNotes = async () => {
-    if (
-      (isGlobalSearch.value || opts.noteId.value) &&
-      model.recentNotes.length === 0
-    ) {
+    if ((isGlobalSearch.value || opts.noteId.value) && !recentNotesRequested) {
+      recentNotesRequested = true
       const { data: notes, error } = await NoteController.getRecentNotes({})
       model.recentNotes = error ? [] : notes || []
     }
@@ -73,11 +72,7 @@ export function useSearchExecution(opts: {
     const originalTrimmedKey = trimmedSearchKey.value
     model.prepareForNewSearch(originalTrimmedKey, isGlobalSearch.value)
 
-    if (
-      !model.hasPreviousResult() &&
-      (isGlobalSearch.value || opts.noteId.value) &&
-      model.recentNotes.length === 0
-    ) {
+    if (!model.hasPreviousResult()) {
       fetchRecentNotes()
     }
 

@@ -68,10 +68,8 @@ Behavior:
 
 ### 2. Search asks for recent notes at most once per search view
 Type: Behavior
-Status: planned
-Proof: extend `tests/components/search/SearchResults.recentNotes.spec.ts`; run it
-with the other `tests/components/search/` and
-`tests/wiki-link-or-relationship/SearchDialog*.spec.ts` specs.
+Status: done
+Proof: extended `tests/components/search/SearchResults.recentNotes.spec.ts` (10 passed); all search and SearchDialog specs passed (6 files, 68 passed).
 
 Behavior:
 - Recent notes answer `[]`; mount with an empty key and type `a`, `ab`, `abc`
