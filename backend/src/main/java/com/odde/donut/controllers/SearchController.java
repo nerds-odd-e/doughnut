@@ -1,6 +1,5 @@
 package com.odde.donut.controllers;
 
-import com.odde.donut.controllers.dto.NoteSearchResult;
 import com.odde.donut.controllers.dto.RelationshipLiteralSearchHit;
 import com.odde.donut.controllers.dto.SearchTerm;
 import com.odde.donut.entities.Note;
@@ -49,30 +48,6 @@ class SearchController {
     }
     authorizationService.assertLoggedIn();
     return noteSearchService.searchForNotesInRelationTo(
-        authorizationService.getCurrentUser(), searchTerm, note);
-  }
-
-  @PostMapping("/semantic-search")
-  public List<NoteSearchResult> semanticSearch(@Valid @RequestBody SearchTerm searchTerm)
-      throws UnexpectedNoAccessRightException {
-    if (searchTerm == null) {
-      throw new IllegalArgumentException("SearchTerm cannot be null");
-    }
-    authorizationService.assertLoggedIn();
-    return noteSearchService.semanticSearchForNotes(
-        authorizationService.getCurrentUser(), searchTerm);
-  }
-
-  @PostMapping("/{note}/semantic-search")
-  public List<NoteSearchResult> semanticSearchWithin(
-      @PathVariable("note") @Schema(type = "integer") Note note,
-      @Valid @RequestBody SearchTerm searchTerm)
-      throws UnexpectedNoAccessRightException {
-    if (searchTerm == null) {
-      throw new IllegalArgumentException("SearchTerm cannot be null");
-    }
-    authorizationService.assertLoggedIn();
-    return noteSearchService.semanticSearchForNotesInRelationTo(
         authorizationService.getCurrentUser(), searchTerm, note);
   }
 }

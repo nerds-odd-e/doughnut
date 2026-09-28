@@ -47,10 +47,6 @@ Given('OpenAI has models {string} available', (modelNames: string) => {
   })
 })
 
-Given('OpenAI returns embeddings successfully', () => {
-  mock_services.openAi().stubCreateEmbeddings()
-})
-
 Given('An OpenAI response is unavailable', () => {
   mock_services.openAi().stubOpenAiWithErrorResponse()
 })

@@ -79,18 +79,6 @@
         <Users class="w-6 h-6" />
       </button>
       <button
-        type="button"
-        title="Semantic search"
-        aria-label="Semantic search"
-        :class="[
-          'daisy-btn daisy-btn-ghost daisy-btn-sm daisy-btn-square',
-          semanticSearchEnabled ? 'text-primary' : 'opacity-30',
-        ]"
-        @click="semanticSearchEnabled = !semanticSearchEnabled"
-      >
-        <Sparkles class="w-6 h-6" />
-      </button>
-      <button
         v-if="modalCloser"
         type="button"
         title="Close"
@@ -102,7 +90,6 @@
       </button>
     </div>
     <SearchResults
-      v-model:semantic-search-enabled="semanticSearchEnabled"
       v-bind="{
         noteId,
         inputSearchKey,
@@ -149,7 +136,7 @@
 
 <script setup lang="ts">
 import { ref } from "vue"
-import { BookOpen, Clock, Sparkles, Users, X } from "@lucide/vue"
+import { BookOpen, Clock, Users, X } from "@lucide/vue"
 import TextInput from "../form/TextInput.vue"
 import SearchResults from "./SearchResults.vue"
 import type { NoteSearchResult } from "@generated/donut-backend-api"
@@ -184,7 +171,6 @@ const searchInputRef = ref<InstanceType<typeof TextInput> | null>(null)
 const inputSearchKey = ref(initialSearchKey ?? "")
 const allMyNotebooksAndSubscriptions = ref(true)
 const allMyCircles = ref(false)
-const semanticSearchEnabled = ref(false)
 
 const historyKeys = ref<string[]>([])
 

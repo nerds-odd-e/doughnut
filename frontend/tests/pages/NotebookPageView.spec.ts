@@ -73,11 +73,8 @@ describe("NotebookPageView.spec", () => {
     )
     expect(wrapper.text()).not.toContain("Notebook Management")
     expect(wrapper.text()).not.toContain("Notebook Settings")
-    expect(wrapper.text()).not.toContain("Notebook Indexing")
     expect(wrapper.text()).not.toContain("Share notebook to bazaar")
     expect(wrapper.text()).not.toContain("Skip Memory Tracking")
-    expect(wrapper.text()).not.toContain("Update index")
-    expect(wrapper.text()).not.toContain("Reset notebook index")
   })
 
   it("shows Health panel and hides Settings after opening Health tab", async () => {
@@ -115,11 +112,8 @@ describe("NotebookPageView.spec", () => {
     expect(settings.exists()).toBe(true)
     expect(settings.text()).toContain("Description")
     expect(settings.text()).toContain("Notebook Management")
-    expect(settings.text()).toContain("Notebook Indexing")
     expect(settings.text()).toContain("Share notebook to bazaar")
     expect(settings.text()).toContain("Skip Memory Tracking")
-    expect(settings.text()).toContain("Update index")
-    expect(settings.text()).toContain("Reset notebook index")
     expect(settings.text()).not.toContain("Notebook Settings")
     expect(settings.text()).not.toContain("Update Settings")
     expect(wrapper.find('[data-testid="notebook-readme"]').exists()).toBe(false)

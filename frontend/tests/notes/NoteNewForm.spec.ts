@@ -90,7 +90,6 @@ describe("adding new note", () => {
       path: { note: noteNewFormNote.id },
       body: expect.objectContaining({ searchKey: "myth" }),
     })
-    expect(sdkSpies.semanticSearchWithinSpy).not.toHaveBeenCalled()
 
     sdkSpies.searchForRelationshipTargetWithinSpy.mockClear()
     await setNoteNewFormTitle(wrapper, "Untitled")
@@ -100,24 +99,6 @@ describe("adding new note", () => {
     expect(sdkSpies.searchForRelationshipTargetWithinSpy).toHaveBeenCalledWith({
       path: { note: noteNewFormNote.id },
       body: expect.objectContaining({ searchKey: "Untitled" }),
-    })
-  })
-
-  it("runs semantic search when the semantic toggle is turned on", async () => {
-    wrapper = mountNoteNewForm()
-    await setNoteNewFormTitle(wrapper, "myth")
-    vi.runOnlyPendingTimers()
-
-    sdkSpies.semanticSearchWithinSpy.mockClear()
-
-    await wrapper
-      .find('[data-testid="note-new-form-semantic-search-toggle"]')
-      .trigger("click")
-    vi.runOnlyPendingTimers()
-
-    expect(sdkSpies.semanticSearchWithinSpy).toHaveBeenCalledWith({
-      path: { note: noteNewFormNote.id },
-      body: expect.objectContaining({ searchKey: "myth" }),
     })
   })
 

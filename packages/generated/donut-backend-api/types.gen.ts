@@ -2074,24 +2074,6 @@ export type TrashNoteResponses = {
 
 export type TrashNoteResponse = TrashNoteResponses[keyof TrashNoteResponses];
 
-export type SemanticSearchWithinData = {
-    body: SearchTerm;
-    path: {
-        note: number;
-    };
-    query?: never;
-    url: '/api/notes/{note}/semantic-search';
-};
-
-export type SemanticSearchWithinResponses = {
-    /**
-     * OK
-     */
-    200: Array<NoteSearchResult>;
-};
-
-export type SemanticSearchWithinResponse = SemanticSearchWithinResponses[keyof SemanticSearchWithinResponses];
-
 export type SearchForRelationshipTargetWithinData = {
     body: SearchTerm;
     path: {
@@ -2143,22 +2125,6 @@ export type UploadNoteImageResponses = {
 };
 
 export type UploadNoteImageResponse = UploadNoteImageResponses[keyof UploadNoteImageResponses];
-
-export type SemanticSearchData = {
-    body: SearchTerm;
-    path?: never;
-    query?: never;
-    url: '/api/notes/semantic-search';
-};
-
-export type SemanticSearchResponses = {
-    /**
-     * OK
-     */
-    200: Array<NoteSearchResult>;
-};
-
-export type SemanticSearchResponse = SemanticSearchResponses[keyof SemanticSearchResponses];
 
 export type SearchForRelationshipTargetData = {
     body: SearchTerm;
@@ -2212,22 +2178,6 @@ export type UpdateNotebookResponses = {
 
 export type UpdateNotebookResponse = UpdateNotebookResponses[keyof UpdateNotebookResponses];
 
-export type UpdateNotebookIndexData = {
-    body?: never;
-    path: {
-        notebook: number;
-    };
-    query?: never;
-    url: '/api/notebooks/{notebook}/update-index';
-};
-
-export type UpdateNotebookIndexResponses = {
-    /**
-     * OK
-     */
-    200: unknown;
-};
-
 export type ShareNotebookData = {
     body?: never;
     path: {
@@ -2245,22 +2195,6 @@ export type ShareNotebookResponses = {
 };
 
 export type ShareNotebookResponse = ShareNotebookResponses[keyof ShareNotebookResponses];
-
-export type ResetNotebookIndexData = {
-    body?: never;
-    path: {
-        notebook: number;
-    };
-    query?: never;
-    url: '/api/notebooks/{notebook}/reset-index';
-};
-
-export type ResetNotebookIndexResponses = {
-    /**
-     * OK
-     */
-    200: unknown;
-};
 
 export type ResetNotebookGitHistoryData = {
     body?: never;

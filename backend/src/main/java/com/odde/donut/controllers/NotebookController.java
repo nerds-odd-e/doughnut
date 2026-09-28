@@ -18,7 +18,6 @@ import com.odde.donut.services.AuthorizationService;
 import com.odde.donut.services.BazaarService;
 import com.odde.donut.services.NotebookCatalogService;
 import com.odde.donut.services.NotebookGroupService;
-import com.odde.donut.services.NotebookIndexingService;
 import com.odde.donut.services.NotebookService;
 import com.odde.donut.services.WikidataService;
 import com.odde.donut.services.notebookGit.AcceptedWebChangeService;
@@ -42,7 +41,6 @@ import org.springframework.web.bind.annotation.*;
 class NotebookController extends NotebookGitHttpSupport {
   private final EntityPersister entityPersister;
   private final NotebookService notebookService;
-  private final NotebookIndexingService notebookIndexingService;
   private final BazaarService bazaarService;
   private final NotebookGroupRepository notebookGroupRepository;
   private final NotebookGroupService notebookGroupService;
@@ -55,7 +53,6 @@ class NotebookController extends NotebookGitHttpSupport {
   public NotebookController(
       EntityPersister entityPersister,
       TestabilitySettings testabilitySettings,
-      NotebookIndexingService notebookIndexingService,
       BazaarService bazaarService,
       AuthorizationService authorizationService,
       NotebookService notebookService,
@@ -76,7 +73,6 @@ class NotebookController extends NotebookGitHttpSupport {
         notebookGitProposalPublisher,
         notebookGitHistoryService);
     this.entityPersister = entityPersister;
-    this.notebookIndexingService = notebookIndexingService;
     this.bazaarService = bazaarService;
     this.notebookService = notebookService;
     this.notebookGroupRepository = notebookGroupRepository;
@@ -229,23 +225,5 @@ class NotebookController extends NotebookGitHttpSupport {
         },
         realm -> "Edit notebook README",
         testabilitySettings().getCurrentUTCTimestamp());
-  }
-
-  @PostMapping("/{notebook}/update-index")
-  @Transactional
-  public void updateNotebookIndex(
-      @PathVariable("notebook") @Schema(type = "integer") Notebook notebook)
-      throws UnexpectedNoAccessRightException {
-    authorizationService().assertAuthorization(notebook);
-    notebookIndexingService.updateNotebookIndex(notebook);
-  }
-
-  @PostMapping("/{notebook}/reset-index")
-  @Transactional
-  public void resetNotebookIndex(
-      @PathVariable("notebook") @Schema(type = "integer") Notebook notebook)
-      throws UnexpectedNoAccessRightException {
-    authorizationService().assertAuthorization(notebook);
-    notebookIndexingService.resetNotebookIndex(notebook);
   }
 }

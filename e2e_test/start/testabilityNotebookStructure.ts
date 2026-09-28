@@ -74,17 +74,6 @@ export const notebookStructureTestabilityMethods = {
   getNotebookIdByName,
   getFolderIdInNotebook,
 
-  updateNotebookIndex(notebookName: string) {
-    return getNotebookIdByName(notebookName).then((notebookId) =>
-      cy.wrap(
-        NotebookController.updateNotebookIndex({
-          path: { notebook: notebookId },
-        }),
-        { log: false }
-      )
-    )
-  },
-
   createEmptyFolder(
     this: InjectedNoteIds,
     notebookName: string,

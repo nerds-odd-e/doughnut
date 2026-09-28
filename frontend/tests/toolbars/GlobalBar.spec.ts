@@ -68,8 +68,6 @@ describe("global bar", () => {
     mockSdkService(NoteController, "getRecentNotes", [])
     mockSdkService(SearchController, "searchForRelationshipTarget", [])
     mockSdkService(SearchController, "searchForRelationshipTargetWithin", [])
-    mockSdkService(SearchController, "semanticSearch", [])
-    mockSdkService(SearchController, "semanticSearchWithin", [])
     user = makeMe.aUser.please()
     const storage = resetNoteStore()
     noteEditingHistory = storage.noteUndo

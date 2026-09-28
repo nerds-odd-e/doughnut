@@ -18,7 +18,6 @@ export function useSearchExecution(opts: {
   inputSearchKey: Ref<string>
   noteId: Ref<number | undefined>
   notebookId: Ref<number | undefined>
-  semanticSearchEnabled: Ref<boolean>
   allMyNotebooksAndSubscriptions: Ref<boolean>
   allMyCircles: Ref<boolean>
 }) {
@@ -90,18 +89,15 @@ export function useSearchExecution(opts: {
       }
       const snapshotTrimmed = term.searchKey.trim()
       const snapshotGlobal = term.allMyNotebooksAndSubscriptions === true
-      const snapshotSemantic = opts.semanticSearchEnabled.value
       await executeDebouncedSearch({
         model,
         term,
         noteId: opts.noteId.value,
         notebookId: opts.notebookId.value,
-        semanticEnabled: snapshotSemantic,
         isStillCurrent: () =>
           gen === searchGeneration.value &&
           snapshotTrimmed === trimmedSearchKey.value &&
-          snapshotGlobal === isGlobalSearch.value &&
-          snapshotSemantic === opts.semanticSearchEnabled.value,
+          snapshotGlobal === isGlobalSearch.value,
       })
     })
   }
@@ -150,17 +146,6 @@ export function useSearchExecution(opts: {
           model.clearRecentResult()
           fetchRecentNotes()
         }
-      }
-    }
-  )
-
-  watch(
-    () => opts.semanticSearchEnabled.value,
-    () => {
-      searchGeneration.value++
-      model.clearSearchCaches()
-      if (trimmedSearchKey.value !== "") {
-        search()
       }
     }
   )

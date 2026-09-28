@@ -31,15 +31,10 @@ export function asLiteralHits(
   return notes.map((r) => ({ hitKind: "NOTE", noteSearchResult: r }))
 }
 
-export function setupSearchMocks(
-  literalResults: NoteSearchResult[] = [],
-  semanticResults: NoteSearchResult[] = []
-) {
-  const literal = asLiteralHits(literalResults)
-  mockSdkService(SearchController, "searchForRelationshipTarget", literal)
-  mockSdkService(SearchController, "semanticSearch", semanticResults)
-  mockSdkService(SearchController, "searchForRelationshipTargetWithin", literal)
-  mockSdkService(SearchController, "semanticSearchWithin", semanticResults)
+export function setupSearchMocks(results: NoteSearchResult[] = []) {
+  const hits = asLiteralHits(results)
+  mockSdkService(SearchController, "searchForRelationshipTarget", hits)
+  mockSdkService(SearchController, "searchForRelationshipTargetWithin", hits)
 }
 
 /** Fake timers drive the search debounce; every search returns nothing until a test says otherwise. */
@@ -60,19 +55,11 @@ export function setupDelayedSearchMocks() {
     setTimeout(() => resolve([]), 1)
   )
 
-  const searchSpy = mockSdkService(
+  mockSdkService(
     SearchController,
     "searchForRelationshipTarget",
     []
-  )
-  const semanticSpy = mockSdkService(SearchController, "semanticSearch", [])
-  searchSpy.mockReturnValue(
-    delayed.then((data) => wrapSdkResponse(data)) as never
-  )
-  semanticSpy.mockReturnValue(
-    delayed.then((data) => wrapSdkResponse(data)) as never
-  )
-  return { searchSpy, semanticSpy }
+  ).mockReturnValue(delayed.then((data) => wrapSdkResponse(data)) as never)
 }
 
 /** Note id from stubbed router-link `to` (see RenderingHelper). */
@@ -111,7 +98,6 @@ export function mountSearchResults(props: {
   isDropdown?: boolean
   noteId?: number
   notebookId?: number
-  semanticSearchEnabled?: boolean
 }) {
   return helper.component(SearchResults).withProps(props).mount()
 }

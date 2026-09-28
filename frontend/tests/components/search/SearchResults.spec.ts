@@ -48,49 +48,35 @@ describe("SearchResults.vue", () => {
 
   it.each([
     {
-      when: "a shorter empty phrase is contained, without semantic search",
-      semanticSearchEnabled: false,
+      when: "a shorter empty phrase is contained",
       nextKey: "abc",
-      literalCalls: 1,
-      semanticCalls: 0,
-    },
-    {
-      when: "semantic search is enabled",
-      semanticSearchEnabled: true,
-      nextKey: "abc",
-      literalCalls: 2,
-      semanticCalls: 2,
+      searchCalls: 1,
     },
     {
       when: "the empty phrase is not contained",
-      semanticSearchEnabled: false,
       nextKey: "xy",
-      literalCalls: 2,
-      semanticCalls: 0,
+      searchCalls: 2,
     },
   ])(
-    "searches literal $literalCalls and semantic $semanticCalls times when $when",
-    async ({ semanticSearchEnabled, nextKey, literalCalls, semanticCalls }) => {
-      const literalSpy = mockSdkService(
+    "searches $searchCalls times when $when",
+    async ({ nextKey, searchCalls }) => {
+      const searchSpy = mockSdkService(
         SearchController,
         "searchForRelationshipTarget",
         []
       )
-      const semanticSpy = mockSdkService(SearchController, "semanticSearch", [])
 
       const wrapper = mountSearchResults({
         inputSearchKey: "ab",
         isDropdown: true,
-        semanticSearchEnabled,
       })
       await waitForDebounce()
-      expect(literalSpy).toHaveBeenCalledTimes(1)
+      expect(searchSpy).toHaveBeenCalledTimes(1)
 
       await wrapper.setProps({ inputSearchKey: nextKey })
       await waitForDebounce()
 
-      expect(literalSpy).toHaveBeenCalledTimes(literalCalls)
-      expect(semanticSpy).toHaveBeenCalledTimes(semanticCalls)
+      expect(searchSpy).toHaveBeenCalledTimes(searchCalls)
       expect(wrapper.text()).toContain("No matching notes found.")
     }
   )
@@ -154,13 +140,6 @@ describe("SearchResults search caching", () => {
       "searchForRelationshipTargetWithin",
       asLiteralHits([searchResult(1, "N1", 0.1), searchResult(3, "N3", 0.8)])
     )
-    const semanticSpy = mockSdkService(SearchController, "semanticSearch", [])
-    const semanticWithinSpy = mockSdkService(
-      SearchController,
-      "semanticSearchWithin",
-      []
-    )
-
     const wrapper = mountSearchResults({
       inputSearchKey: "x",
       isDropdown: true,
@@ -171,9 +150,7 @@ describe("SearchResults search caching", () => {
     await waitForDebounce()
 
     expect(topSpy).toHaveBeenCalledTimes(1)
-    expect(semanticSpy).toHaveBeenCalledTimes(1)
     expect(withinSpy).toHaveBeenCalledTimes(1)
-    expect(semanticWithinSpy).toHaveBeenCalledTimes(1)
     expect(linkedNoteIds(wrapper)).toEqual([1, 2, 3])
   })
 
@@ -212,9 +189,6 @@ describe("SearchResults search caching", () => {
       .mockResolvedValueOnce(
         wrapSdkResponse(asLiteralHits([searchResult(1, "First Result")]))
       )
-      .mockReturnValue(secondSearchDelayed)
-    mockSdkService(SearchController, "semanticSearch", [])
-      .mockResolvedValueOnce(wrapSdkResponse([]))
       .mockReturnValue(secondSearchDelayed)
     mockSdkService(NoteController, "getRecentNotes", recentNotes)
 

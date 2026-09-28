@@ -27,7 +27,6 @@ export const notebookRootProps = {
 
 export type NoteNewFormSdkSpies = {
   searchForRelationshipTargetWithinSpy: ReturnType<typeof mockSdkService>
-  semanticSearchWithinSpy: ReturnType<typeof mockSdkService>
   mockedCreateNoteAtRoot: ReturnType<typeof mockSdkService>
 }
 
@@ -36,12 +35,6 @@ export function setupNoteNewFormSdkMocks(): NoteNewFormSdkSpies {
   const searchForRelationshipTargetWithinSpy = mockSdkService(
     SearchController,
     "searchForRelationshipTargetWithin",
-    []
-  )
-  mockSdkService(SearchController, "semanticSearch", [])
-  const semanticSearchWithinSpy = mockSdkService(
-    SearchController,
-    "semanticSearchWithin",
     []
   )
   mockSdkService(NoteController, "getRecentNotes", [])
@@ -56,7 +49,6 @@ export function setupNoteNewFormSdkMocks(): NoteNewFormSdkSpies {
   )
   return {
     searchForRelationshipTargetWithinSpy,
-    semanticSearchWithinSpy,
     mockedCreateNoteAtRoot,
   }
 }

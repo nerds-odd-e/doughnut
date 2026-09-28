@@ -1,12 +1,10 @@
 <template>
   <div :class="{ 'dropdown-style': isDropdown }">
-    <div v-if="panelVisible" :class="displayState.containerClass">
+    <div v-if="hasVisibleResultsSection" :class="displayState.containerClass">
       <SearchResultsPanelHeader
-        v-if="showTitleBar"
-        v-model:semantic-search-enabled="semanticSearchEnabled"
+        v-if="displayState.title"
         v-model:list-preference="listPreference"
-        :embed-semantic-toggle="embedSemanticToggle"
-        :show-list-mode-toggle="showListModeToggle"
+        :show-list-mode-toggle="listModeToggle"
         :active-list-mode="activeListMode"
         :title="displayState.title"
         :is-search-in-progress="isSearchInProgress"
@@ -98,15 +96,7 @@ const props = defineProps({
   inputSearchKey: { type: String, required: true },
   isDropdown: { type: Boolean, default: false },
   notebookId: { type: Number, default: undefined },
-  /**
-   * When true, renders the semantic search toggle before the section title (e.g. new note form).
-   * Use with v-model:semantic-search-enabled.
-   */
-  embedSemanticToggle: { type: Boolean, default: false },
-})
-
-const semanticSearchEnabled = defineModel<boolean>("semanticSearchEnabled", {
-  default: true,
+  listModeToggle: { type: Boolean, default: true },
 })
 
 const allMyNotebooksAndSubscriptions = defineModel<boolean>(
@@ -137,7 +127,6 @@ defineSlots<{
 const inputSearchKeyRef = toRef(props, "inputSearchKey")
 const noteIdRef = toRef(props, "noteId")
 const notebookIdRef = toRef(props, "notebookId")
-const semanticSearchEnabledRef = semanticSearchEnabled
 
 const {
   model,
@@ -149,7 +138,6 @@ const {
   inputSearchKey: inputSearchKeyRef,
   noteId: noteIdRef,
   notebookId: notebookIdRef,
-  semanticSearchEnabled: semanticSearchEnabledRef,
   allMyNotebooksAndSubscriptions,
   allMyCircles,
 })
@@ -159,9 +147,8 @@ const isGlobalSearch = computed(
   () => allMyNotebooksAndSubscriptions.value === true
 )
 
-const showListModeToggle = computed(() => !props.embedSemanticToggle)
 const { listPreference, effectiveListPreference } = useSearchListPreference({
-  enabled: showListModeToggle,
+  enabled: toRef(props, "listModeToggle"),
   trimmedSearchKey,
 })
 
@@ -193,24 +180,6 @@ const hasVisibleResultsSection = computed(
     displayState.value.showRecentNotes ||
     displayState.value.showEmptyState ||
     displayState.value.showSearchResults
-)
-
-const blindLoading = computed(
-  () => isSearchInProgress.value && !hasVisibleResultsSection.value
-)
-
-const panelVisible = computed(
-  () =>
-    hasVisibleResultsSection.value ||
-    (props.embedSemanticToggle && blindLoading.value)
-)
-
-const hasTitleText = computed(
-  () => !!displayState.value.title && hasVisibleResultsSection.value
-)
-
-const showTitleBar = computed(
-  () => hasTitleText.value || (props.embedSemanticToggle && blindLoading.value)
 )
 </script>
 

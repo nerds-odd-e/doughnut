@@ -111,18 +111,14 @@ Use this for endpoint lookup; open `sdk.gen.ts` or `types.gen.ts` only for exact
 
 ## Search Controller
 
-- `semanticSearchWithin`: POST `/api/notes/{note}/semantic-search` -> `SemanticSearchWithinResponse` (request: `SemanticSearchWithinData`; path: note; body: SearchTerm; response body: Array<NoteSearchResult>)
 - `searchForRelationshipTargetWithin`: POST `/api/notes/{note}/search` -> `SearchForRelationshipTargetWithinResponse` (request: `SearchForRelationshipTargetWithinData`; path: note; body: SearchTerm; response body: Array<RelationshipLiteralSearchHit>)
-- `semanticSearch`: POST `/api/notes/semantic-search` -> `SemanticSearchResponse` (request: `SemanticSearchData`; body: SearchTerm; response body: Array<NoteSearchResult>)
 - `searchForRelationshipTarget`: POST `/api/notes/search` -> `SearchForRelationshipTargetResponse` (request: `SearchForRelationshipTargetData`; body: SearchTerm; response body: Array<RelationshipLiteralSearchHit>)
 
 ## Notebook Controller
 
 - `get`: GET `/api/notebooks/{notebook}` -> `GetResponse` (request: `GetData`; path: notebook; response body: NotebookRealm)
 - `updateNotebook`: POST `/api/notebooks/{notebook}` -> `UpdateNotebookResponse` (request: `UpdateNotebookData`; path: notebook; body: NotebookUpdateRequest; response body: Notebook)
-- `updateNotebookIndex`: POST `/api/notebooks/{notebook}/update-index` -> `UpdateNotebookIndexResponse` (request: `UpdateNotebookIndexData`; path: notebook; response body: void)
 - `shareNotebook`: POST `/api/notebooks/{notebook}/share` -> `ShareNotebookResponse` (request: `ShareNotebookData`; path: notebook; response body: Notebook)
-- `resetNotebookIndex`: POST `/api/notebooks/{notebook}/reset-index` -> `ResetNotebookIndexResponse` (request: `ResetNotebookIndexData`; path: notebook; response body: void)
 - `resetNotebookGitHistory`: POST `/api/notebooks/{notebook}/reset-git-history` -> `ResetNotebookGitHistoryResponse` (request: `ResetNotebookGitHistoryData`; path: notebook; response body: void)
 - `downloadNotebookGitBundle`: GET `/api/notebooks/{notebook}/git-bundle` -> `DownloadNotebookGitBundleResponse` (request: `DownloadNotebookGitBundleData`; path: notebook; response body: string)
 - `publishNotebookGitProposal`: POST `/api/notebooks/{notebook}/git-bundle` -> `PublishNotebookGitProposalResponse` (request: `PublishNotebookGitProposalData`; path: notebook; query: expectedHead; body: string; response body: string)

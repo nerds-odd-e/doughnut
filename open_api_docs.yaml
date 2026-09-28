@@ -815,32 +815,6 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/NoteRealm"
-  /api/notes/{note}/semantic-search:
-    post:
-      tags:
-      - search-controller
-      operationId: semanticSearchWithin
-      parameters:
-      - name: note
-        in: path
-        required: true
-        schema:
-          type: integer
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/SearchTerm"
-        required: true
-      responses:
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/NoteSearchResult"
   /api/notes/{note}/search:
     post:
       tags:
@@ -904,26 +878,6 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/NoteRealm"
-  /api/notes/semantic-search:
-    post:
-      tags:
-      - search-controller
-      operationId: semanticSearch
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/SearchTerm"
-        required: true
-      responses:
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/NoteSearchResult"
   /api/notes/search:
     post:
       tags:
@@ -985,20 +939,6 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/Notebook"
-  /api/notebooks/{notebook}/update-index:
-    post:
-      tags:
-      - notebook-controller
-      operationId: updateNotebookIndex
-      parameters:
-      - name: notebook
-        in: path
-        required: true
-        schema:
-          type: integer
-      responses:
-        "200":
-          description: OK
   /api/notebooks/{notebook}/share:
     post:
       tags:
@@ -1017,20 +957,6 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/Notebook"
-  /api/notebooks/{notebook}/reset-index:
-    post:
-      tags:
-      - notebook-controller
-      operationId: resetNotebookIndex
-      parameters:
-      - name: notebook
-        in: path
-        required: true
-        schema:
-          type: integer
-      responses:
-        "200":
-          description: OK
   /api/notebooks/{notebook}/reset-git-history:
     post:
       tags:

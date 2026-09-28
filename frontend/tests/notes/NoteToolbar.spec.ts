@@ -65,8 +65,6 @@ describe("NoteToolbar", () => {
     const noteRealm = makeMe.aNoteRealm.title("Dummy Title").please()
     mockSdkService(SearchController, "searchForRelationshipTarget", [])
     mockSdkService(SearchController, "searchForRelationshipTargetWithin", [])
-    mockSdkService(SearchController, "semanticSearch", [])
-    mockSdkService(SearchController, "semanticSearchWithin", [])
 
     wrapper = await mountNoteToolbar(noteRealm)
     expect(screen.queryByPlaceholderText("Search")).toBeNull()

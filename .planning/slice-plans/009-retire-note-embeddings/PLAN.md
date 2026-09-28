@@ -3,7 +3,7 @@
 **Identity:** SEED-051#story-1  
 **Source:** [refined story](../../seeds/SEED-051-decommission-note-embeddings.md#story-1) and the owner's complete-deletion acceptance criteria.  
 **Preparation base:** `982e31b5a111be0d0cb1c2e01270be225c46261a`; preparation assignment `92d4ed76db515aec351d45b2dc544ec7fc544304`.  
-**Workspace:** `/Users/terryyin/.codex/worktrees/embedding-refinement/doughnut`, branch `codex/embedding-refinement`; originating/integration checkout `/Users/terryyin/git/doughnut`; eventual publication target `origin/main`.
+**Execution:** Story Branch Mode; workspace `/Users/terryyin/git/doughnut/.worktrees/story-retire-note-embeddings`, branch `story/retire-note-embeddings` (created at Take); originating/integration checkout `/Users/terryyin/git/doughnut`; claim `28d0154b3d` on `origin/main` (starting revision `f35fa810f1`); increments publish to `origin/story/retire-note-embeddings`.
 
 ## Outcome and boundaries
 
@@ -130,8 +130,19 @@ proof/external-wait exceptions, not permission for unbounded implementation.
 
 ### 1. Establish the production retirement boundary
 Type: Behavior
-Status: planned
+Status: done — metadata only; owner decided 2026-09-28 to skip SQL catalog inspection (not needed for earlier migrations).
 Size: 3–5 minutes active; credential/host access wait excepted.
+Observed 2026-09-28 after owner `gcloud auth login` (metadata-only `gcloud sql instances describe/list`,
+`gcloud sql databases list`, `gcloud compute instance-groups managed list`, `gcloud compute instances list`,
+project `carbon-syntax-298809`):
+- Only Cloud SQL instance is `doughnut-db` (MYSQL_8_4, RUNNABLE, us-east1); its only non-system database is
+  `doughnut`, so `cloudsql_vector=on` (the instance's only database flag) has no other schema consumer.
+- One MIG `doughnut-app-group` (us-east1-b, target size 1), one serving VM `doughnut-app-group-jc41`; no other
+  retained long-lived installation was found in the project.
+- SQL catalog left unobserved by owner decision. Covering reasoning: a plain `DROP TABLE note_embeddings`
+  removes the table and any VECTOR index whatever its column type; the deployed app reads/writes the table, so
+  it exists; no foreign keys exist in the baseline or code (an unexpected one fails the migration loudly);
+  production only ran this repository's migrations, so versions allocate above every file ever used.
 Proof: operator receives a verified target and bounded cleanup inventory.
 
 Probe the documented project `carbon-syntax-298809`, Cloud SQL `doughnut-db`,
@@ -156,7 +167,20 @@ dependent storage/release work and triggers refinement; application slices
 
 ### 2. Prove fresh and populated installations converge after cleanup
 Type: Behavior
-Status: planned
+Status: done — PASS (2026-09-28, MySQL 8.4 local 127.0.0.1:3309, Flyway core/mysql 12.4.0, OpenJDK 25.0.3).
+Harness (deleted after use): throwaway Gradle init script printing backend runtime classpath, then
+`java -cp <cp> Harness.java <schema> <sqlDir> repair|migrate|info` configuring
+`Flyway.configure().dataSource(<worktree-owned rh_old/rh_fresh schema>).locations("filesystem:<staged copies>","classpath:db/migration").cleanDisabled(true)`
+and calling repair then migrate as `FlyWayFreeVersionRealMigration` does; compiled Java migrations from `backend/build`.
+Provisional (re-allocate in slice 9): D = `DROP TABLE note_embeddings;` (the only embedding structure: table +
+`idx_note_embeddings_note_id`, no FKs), P = `SELECT 1;` placeholder; highest version ever used was `300000349`.
+Results: populated old install (39 migrations, 7 embedding rows) → D+P migrate 2, table gone, other tables'
+row counts/CHECKSUM unchanged → final resources (baseline block removed, D deleted) repair "Marked missing
+migrations as deleted, Aligned applied migration checksums", migrate 0, P stays tip, restart repeat is a no-op →
+columns/indexes/FKs/views/data identical to before. Fresh install from final resources (40 migrations, tip P) is
+schema-identical to the upgraded install. An install that never applied D would silently keep the table under the
+final resources, so slice 11's "D verified on every retained installation" gate is essential. Native VECTOR
+behavior is covered by dropping the table (slice 3 dropped).
 Size: 5–8 minutes active, one local lifecycle probe; engine/test runtime excepted.
 Proof: one disposable rehearsal demonstrates the exact drop → newer tip →
 baseline edit/drop-migration removal → repair/migrate sequence and a fresh path.
@@ -169,7 +193,7 @@ baseline and `D` removal. Compare ordinary schema/data before and after; verify
 repair accepts the baseline and removed migration, and preserves the newer tip.
 Provision a fresh schema from the final resources and compare the resulting
 current schema. This probe owns the local populated/fresh Flyway lifecycle;
-native Cloud SQL vector DDL is owned separately by slice 3.
+dropping the table also removes its native Cloud SQL VECTOR index.
 
 Temporary SQL/Flyway harnesses are observation tools outside tracked product
 tests. Record their literal commands, runtime versions, setup, result and
@@ -182,29 +206,17 @@ general migration harness.
 
 ### 3. Establish native Cloud SQL vector cleanup behavior
 Type: Behavior
-Status: planned
-Size: 3–5 minutes active; authorized environment/access waits excepted.
-Proof: operator has observed safe removal of the production-shaped vector
-storage/index on the matching Cloud SQL engine, with ordinary fixture data intact.
-
-Requires slice 1's actual native shape and instance-wide dependency inventory.
-Use an already designated, authorized disposable Cloud SQL environment. Recreate
-only the relevant structural shape with synthetic data; observe the planned
-index/table removal and applicable flag-disable preconditions/restart effects.
-A local VARBINARY rehearsal does not prove these provider-specific behaviors.
-If the production catalog establishes there is no native vector dependency,
-record that observed conditional branch and use slice 2's matching local proof.
-
-If no authorized disposable matching environment is available, stop this probe
-and report the missing resource; do not provision paid infrastructure or test
-DDL on production implicitly. Hold slices 9–12 until matching evidence exists.
-Record literal commands, environment/version, setup and results in this plan,
-and remove the disposable fixture under its established ownership. Any finding
-that changes the cleanup sequence triggers plan refinement before schema work.
+Status: dropped — owner decision 2026-09-28 together with slice 1's SQL catalog: dropping the table removes its
+VECTOR index; the instance-wide flag has no other consumer (slice 1), so slice 10 removes it after storage is gone.
 
 ### 4. Web discovery uses its existing title and alias workflow
 Type: Behavior
-Status: planned
+Status: done
+Accepted proof: F (`pnpm frontend:test` 1941 pass; `vue-tsc --noEmit` exit 0), H 8/8,
+W 16/16 (`search_note`, `add_relationship`, `wiki_link_insert`). `embedSemanticToggle`
+became `listModeToggle` (new-note form passes `false`); literal-with-literal cache merge kept
+(pinned by the within-note merge test). Generated client still exposes semantic and index
+operations for slice 6/7 removal.
 Size: 5–8 minutes active; F/W/H runtime excepted.
 Proof: F, W, H; mounted title suggestions and real target-selection journeys pass.
 
@@ -225,7 +237,9 @@ still accepts old operations at this stopping point; slice 7 removes them.
 
 ### 5. MCP describes and returns literal search results
 Type: Behavior
-Status: planned
+Status: done
+Accepted proof: M (`mcp-server:test` 11 pass; bundle built), E `mcp_services.feature` 5/5.
+Only `find-most-relevant-note.ts` descriptions changed; no MCP doc made semantic claims.
 Size: 3–5 minutes active; M/E runtime excepted.
 Proof: M and E; actual MCP title query returns the existing note result.
 
@@ -237,7 +251,11 @@ real MCP feature. Remove embedding/semantic promises, not the working tool.
 
 ### 6. Notebook administration stops producing embedding indexes
 Type: Behavior
-Status: planned
+Status: done
+Accepted proof: B `backend:test_only` full suite exit 0; A regenerated (index operations gone);
+F 1941 pass, `vue-tsc` 0. Manual (controller/service/UI) and scheduled (`EmbeddingMaintenanceJob`)
+producers deleted; `SchedulingConfig` stays for `QuestionGenerationBatchMaintenanceJob`. Deleting a
+Vue component needs `vite build` to refresh tracked `frontend/components.d.ts`.
 Size: 5–8 minutes active; B/A/F runtime excepted.
 Proof: B, A, F; current notebook settings save successfully; reviewed removal
 inventory covers manual and scheduled producers.
@@ -253,7 +271,12 @@ tests may remain until slice 7; do not commit broken fixtures between slices.
 
 ### 7. The server contains only the surviving search responsibility
 Type: Behavior
-Status: planned
+Status: done
+Accepted proof: A regenerated (semantic operations gone); B `backend:test_only` 2697 tests 0 failures;
+`vue-tsc` 0; M 11 pass + bundle; W 16/16; G 3/3. Inventory `git grep -niE 'embedding|semantic' -- . ':!.planning'`
+leaves only independent wording plus retained storage/ops references for slices 9–11: baseline
+`note_embeddings` block, `docs/database-erd.md`, `docs/gcp/prod_env.md` §4 vector flag/index, and the
+excalidraw "vector enabled" label. Nothing reads/writes `note_embeddings`; it has no foreign keys locally.
 Size: 5–10 minutes active; B/A/F/M/W/G runtime excepted where changed boundaries require them.
 Proof: B, A, frontend typecheck, M; W and G against the final application tree
 cover target selection and web/local note continuity. Reviewed source inventory
@@ -290,11 +313,10 @@ Record the release receipt here. Failure holds schema deployment.
 ### 9. Installed schemas migrate to the current data model
 Type: Behavior
 Status: planned
-Size: 3–5 minutes active after slices 2–3; migration/B/ERD runtime excepted.
+Size: 3–5 minutes active after slice 2; migration/B/ERD runtime excepted.
 Proof: populated isolated upgrade preserves ordinary data and schema; B and ERD.
 
-Requires successful local lifecycle and native-vector probes (slices 2–3), and
-R1. Allocate `D` and `P` after inspecting
+Requires the successful local lifecycle probe (slice 2) and R1. Allocate `D` and `P` after inspecting
 current files, Git-deleted versions, and the now-current live histories. Add the
 minimal drop DDL for the verified embedding-only structures and a newer generic
 tip placeholder. Use the rehearsed sequence, not speculative conditional DDL
@@ -307,14 +329,14 @@ current positive backend contracts prove ordinary behavior.
 Type: Behavior
 Status: planned
 Size: 3–5 minutes active; release/DB/configuration restart waits excepted.
-Proof: authorized R2 publication, successful D/P history on each retained
-installation, catalog/data removal observations, unchanged unrelated settings,
-healthy instances and positive current-product smoke.
+Proof: authorized R2 publication, Flyway D/P success in the serving instance's application log
+(`gcloud logging`), `gcloud sql instances describe` showing the removed flag, healthy instances and
+positive current-product smoke.
 
 Release slice 9 only after rechecking the R1 all-instances barrier. Verify
 actual migration completion, not readiness alone. Remove the identified
 feature-only Cloud SQL vector settings after storage cleanup, using slice 1's
-instance-wide ownership evidence and slice 3's disable/restart evidence.
+instance-wide ownership evidence; observe any restart the flag change requires.
 Preserve settings shared with another consumer and the complete unrelated flag
 set; use the actual observed API/configuration form.
 If settings require restart, finish and verify that operation too. Delete
@@ -377,8 +399,8 @@ both verified production cleanup and this final disposition.
 | Notebook settings work; manual/background indexing implementation is deleted | 6, all-instance retirement 8 | Positive settings/controller proof; source inventory; R1 build/rollout evidence |
 | All remaining feature code/tests/contracts and obsolete documentation are deleted | 7, operational docs 10, final audit 11 | Reviewed tracked-source inventory and generated contracts; no new absence tests |
 | Independent AI utilities, literal distance ranking, learning and Git workflows continue | 7, schema transitions 9/11 | B, retained ranking proofs, G, preserved ordinary fixture data/schema |
-| All production embedding records/structures and feature-only settings are removed | 1–3 establish premises, 9/10 deliver | Verified target/FK/index/instance-wide ownership inventory; real D/P application, catalog and setting observations |
-| Fresh installs and existing installs use the final current schema safely | 2/3 establish recipe, 11/12 deliver | Populated upgrade + fresh rehearsal, native DDL probe, R3 repair/migration and current-product observations |
+| All production embedding records/structures and feature-only settings are removed | 1 establishes premises, 9/10 deliver | Metadata inventory and flag ownership; D/P success in application logs and removed flag |
+| Fresh installs and existing installs use the final current schema safely | 2 establishes recipe, 11/12 deliver | Populated upgrade + fresh rehearsal, R3 repair/migration and current-product observations |
 | No historical/negated replacement artifacts; temporary work is deleted | 4–7 delete feature tests/docs; 11 final audit; ordinary closure after 12 | Source review, transition cleanup and normal wrap-up; Git retains history |
 
 ## Current decisions and limitations

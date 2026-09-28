@@ -12,12 +12,6 @@ import type { SearchListPreference } from "./searchListPreference"
 
 export type { DisplayState }
 
-function noteHitFromSemantic(
-  n: NoteSearchResult
-): RelationshipLiteralSearchHit {
-  return { hitKind: "NOTE", noteSearchResult: n }
-}
-
 export class SearchResultsModel {
   private state = reactive({
     isSearchInProgress: false,
@@ -50,13 +44,6 @@ export class SearchResultsModel {
 
   completeSearch(): void {
     this.state.isSearchInProgress = false
-  }
-
-  clearSearchCaches(): void {
-    this.state.cache.global = {}
-    this.state.cache.local = {}
-    this.state.recentResult = undefined
-    this.state.previousSearchResult = undefined
   }
 
   getCachedSearches(
@@ -177,34 +164,23 @@ export class SearchResultsModel {
     })
   }
 
-  /**
-   * Merges new result batches into the cache for this search key.
-   * Omit `literalResults` or `semanticResults` (leave undefined) when that
-   * request has not completed yet; pass an array (possibly empty) when it has.
-   */
+  /** Merges results into the cache for this search key. */
   mergeAndCacheResults(opts: {
     trimmedSearchKey: string
     isGlobal: boolean
-    literalResults?: RelationshipLiteralSearchHit[]
-    semanticResults?: NoteSearchResult[]
+    results: RelationshipLiteralSearchHit[]
     currentNotebookId?: number
   }): void {
-    const existing =
-      this.getCachedResult(opts.trimmedSearchKey, opts.isGlobal) ?? []
-    const incoming: RelationshipLiteralSearchHit[] = []
-    if (opts.literalResults !== undefined) {
-      incoming.push(...opts.literalResults)
-    }
-    if (opts.semanticResults !== undefined) {
-      incoming.push(...opts.semanticResults.map((n) => noteHitFromSemantic(n)))
-    }
-    const merged = mergeRelationshipLiteralSearchHits(
-      existing,
-      incoming,
-      opts.currentNotebookId,
-      opts.trimmedSearchKey.trim().toLowerCase()
+    this.setCachedResult(
+      opts.trimmedSearchKey,
+      opts.isGlobal,
+      mergeRelationshipLiteralSearchHits(
+        this.getCachedResult(opts.trimmedSearchKey, opts.isGlobal) ?? [],
+        opts.results,
+        opts.currentNotebookId,
+        opts.trimmedSearchKey.toLowerCase()
+      )
     )
-    this.setCachedResult(opts.trimmedSearchKey, opts.isGlobal, merged)
     this.clearPreviousResult()
   }
 }

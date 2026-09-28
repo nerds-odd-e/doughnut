@@ -49,63 +49,6 @@ const openAiService = (
       )
     },
 
-    // Smarter stub for POST /embeddings used by semantic search tests.
-    // - If the request body contains "something else" in its input, return a very different vector.
-    // - Otherwise, return 10 identical embeddings (more than requested) with a base vector.
-    stubCreateEmbeddings() {
-      const buildEmbeddingResponse = (vector: number[]) => ({
-        object: 'list',
-        data: Array.from({ length: 10 }).map((_, index) => ({
-          object: 'embedding',
-          index,
-          embedding: vector,
-        })),
-        model: 'text-embedding-3-small',
-        usage: { prompt_tokens: 0, total_tokens: 0 },
-      })
-
-      const buildSizedEmbeddingResponse = (
-        count: number,
-        vector: number[]
-      ) => ({
-        object: 'list',
-        data: Array.from({ length: count }).map((_, index) => ({
-          object: 'embedding',
-          index,
-          embedding: vector,
-        })),
-        model: 'text-embedding-3-small',
-        usage: { prompt_tokens: 0, total_tokens: 0 },
-      })
-
-      const baseVector = [0.1, 0.1, 0.1, 0.1, 0.1]
-      const differentVector = [0.9, 0.9, 0.9, 0.9, 0.9]
-
-      // Match when the input contains "something else"
-      serviceMocker.mockPostMatchsAndNotMatches(
-        `/embeddings`,
-        { input: '.*something else.*' },
-        undefined,
-        [buildEmbeddingResponse(differentVector)]
-      )
-
-      // Ensure indexing calls for the Physics note (single input) get exactly one embedding
-      serviceMocker.mockPostMatchsAndNotMatches(
-        `/embeddings`,
-        { input: ['.*The study of nature.*'] },
-        undefined,
-        [buildSizedEmbeddingResponse(1, baseVector)]
-      )
-
-      // Default for all other inputs
-      return serviceMocker.mockPostMatchsAndNotMatches(
-        `/embeddings`,
-        {},
-        { input: '.*something else.*' },
-        [buildEmbeddingResponse(baseVector)]
-      )
-    },
-
     stubOpenAiWithErrorResponse() {
       return serviceMocker.stubGetterWithError500Response(`/*`, {})
     },
