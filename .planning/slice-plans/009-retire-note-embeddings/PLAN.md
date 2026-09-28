@@ -298,7 +298,14 @@ Storage still exists inertly; production has not yet been changed.
 
 ### 8. Production runs the application retirement everywhere — R1
 Type: Behavior
-Status: planned
+Status: done — R1 = `v1.3.30` (owner-authorized 2026-09-28) on main merge `ab08d6d046` (first parent
+`22dfc1db90`, story tip `d111968b62`). CI run `36385416563` attempt 1 success with jar/frontend/cli artifacts.
+Application Release run `36386169192`: attempt 1 admission `waiting` (GitHub run search had not yet indexed
+the just-finished CI), deploy skipped; runbook rerun (attempt 2) admitted and deployed successfully.
+`/api/healthcheck` reports `Commit: ab08d6d046`; MIG `doughnut-app-group` `isStable: true`,
+`versionTarget.isReached: true`, one instance `doughnut-app-group-jc41`, so no older reader/writer serves.
+Smoke: SPA 200, unauthenticated `POST /api/notes/search` 401, no application ERROR logs after rollout
+(only startup-script curl progress on stderr).
 Size: 3–5 minutes active; CI/release/rollout waits excepted.
 Proof: release runbook receipt plus every serving instance on the retirement
 build, stable MIG target and positive current-product smoke observations.
