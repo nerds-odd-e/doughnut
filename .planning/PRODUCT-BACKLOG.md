@@ -7,8 +7,6 @@ Bug fixing and general maintenance.
 
 ## Taken
 
-- [Keep the revealed note fully visible in the sidebar](seeds/SEED-043-sidebar-uat-defects.md#story-1) — SEED-043#story-1 ([plan](slice-plans/005-sidebar-full-row-reveal/PLAN.md))
-
 ## Backlog list
 
 - [Stop the SUT start timeout test depending on runner speed](seeds/SEED-039-faster-ci-feedback.md#story-4) — SEED-039#story-4
