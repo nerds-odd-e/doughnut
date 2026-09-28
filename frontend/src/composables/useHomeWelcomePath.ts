@@ -10,6 +10,17 @@ function updateHomeWelcomePath() {
   if (!svg || iconWrappers.length !== 3) return
 
   const svgRect = svg.getBoundingClientRect()
+  const path = document.querySelector(".flow-path") as SVGPathElement | null
+  if (!path) return
+
+  if (svgRect.width === 0 || svgRect.height === 0) {
+    path.removeAttribute("d")
+    document.querySelectorAll(".arrow-marker").forEach((arrow) => {
+      arrow.removeAttribute("d")
+    })
+    return
+  }
+
   const positions = Array.from(iconWrappers).map((wrapper) => {
     const rect = wrapper.getBoundingClientRect()
     return {
@@ -17,9 +28,6 @@ function updateHomeWelcomePath() {
       y: rect.top + rect.height / 2 - svgRect.top,
     }
   })
-
-  const path = document.querySelector(".flow-path") as SVGPathElement | null
-  if (!path) return
 
   const spacing = 30
   const curveRadius = 20

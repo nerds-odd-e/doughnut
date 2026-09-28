@@ -20,8 +20,15 @@ export const assimilation = () => {
 
   return {
     expectAssimilationNavBadge(dueOverTotal: string) {
+      const [due, total] = dueOverTotal.split('/')
       getAssimilateListItemInSidebar(($el) => {
-        $el.findByText(dueOverTotal, { selector: '.due-count' })
+        $el
+          .findByText(due!, { selector: '.due-count' })
+          .should(
+            'have.attr',
+            'title',
+            `${due} due today, ${total} total unassimilated`
+          )
       })
       return this
     },

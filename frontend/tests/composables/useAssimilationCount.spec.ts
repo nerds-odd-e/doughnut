@@ -2,7 +2,6 @@ import { describe, it, expect } from "vitest"
 import {
   abbreviateCount,
   assimilationBadgeTitle,
-  formatAssimilationBadge,
 } from "@/composables/useAssimilationCount"
 
 describe("abbreviateCount", () => {
@@ -20,12 +19,6 @@ describe("abbreviateCount", () => {
 
   it("abbreviates a large value with one decimal place", () => {
     expect(abbreviateCount(12400)).toBe("12.4k")
-  })
-})
-
-describe("formatAssimilationBadge", () => {
-  it("combines due and total counts as due/total, each independently abbreviated", () => {
-    expect(formatAssimilationBadge(5, 12400)).toBe("5/12.4k")
   })
 })
 

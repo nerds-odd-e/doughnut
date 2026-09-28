@@ -1,6 +1,6 @@
 import type { NoteSearchResult } from "@generated/donut-backend-api"
 import { NoteController } from "@generated/donut-backend-api/sdk.gen"
-import { mockSdkService } from "@tests/helpers"
+import { mockSdkService, wrapSdkResponse } from "@tests/helpers"
 import { flushPromises } from "@vue/test-utils"
 import makeMe from "donut-test-fixtures/makeMe"
 import { nextTick } from "vue"
@@ -140,5 +140,66 @@ describe("SearchResults recent notes", () => {
     expect(wrapper.text()).toContain("Recently updated notes")
     expect(wrapper.text()).not.toContain("Search result")
     expect(wrapper.text()).toContain("Recent Note 1")
+  })
+
+  it("asks for recent notes only once when the answer is empty", async () => {
+    const getRecentNotesSpy = mockSdkService(
+      NoteController,
+      "getRecentNotes",
+      []
+    )
+
+    const wrapper = mountSearchResults({
+      inputSearchKey: "",
+      isDropdown: false,
+    })
+    await flushPromises()
+
+    for (const key of ["a", "ab", "abc"]) {
+      await wrapper.setProps({ inputSearchKey: key })
+      await flushPromises()
+    }
+
+    expect(getRecentNotesSpy).toHaveBeenCalledTimes(1)
+  })
+
+  it("asks for recent notes only once while the request is still pending", async () => {
+    let resolveRecentNotes!: (notes: NoteSearchResult[]) => void
+    const pendingRecentNotes = new Promise<NoteSearchResult[]>((resolve) => {
+      resolveRecentNotes = resolve
+    })
+
+    const getRecentNotesSpy = mockSdkService(
+      NoteController,
+      "getRecentNotes",
+      []
+    )
+    getRecentNotesSpy.mockReturnValue(
+      pendingRecentNotes.then((data) => wrapSdkResponse(data)) as never
+    )
+    setupDelayedSearchMocks()
+
+    const wrapper = mountSearchResults({
+      inputSearchKey: "",
+      isDropdown: false,
+    })
+    await flushPromises()
+
+    for (const key of ["a", "ab", "abc"]) {
+      await wrapper.setProps({ inputSearchKey: key })
+      await flushPromises()
+    }
+
+    expect(getRecentNotesSpy).toHaveBeenCalledTimes(1)
+    expect(wrapper.text()).not.toContain("Recent Note 1")
+
+    resolveRecentNotes(recentNotes)
+    await flushPromises()
+
+    expect(wrapper.text()).toContain("Recently updated notes")
+    expect(wrapper.text()).toContain("Recent Note 1")
+    expect(
+      wrapper.find(".searching-indicator .daisy-loading-spinner").exists()
+    ).toBe(true)
   })
 })
