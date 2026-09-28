@@ -71,20 +71,6 @@ Expect to see following log line towards end of Packer build stdout log:
 
 - Instance: `doughnut-db` (Cloud SQL, MySQL 8.4)
 - Private DNS target for app: `db-server` (maps to the instance's private IP)
-- Vector support: enabled via Cloud SQL flag `cloudsql_vector=on`
-
-Enable/verify vector flag:
-
-```bash
-gcloud sql instances patch doughnut-db \
-  --database-flags=cloudsql_vector=on
-gcloud sql instances describe doughnut-db \
-  --format="table(settings.databaseFlags[].name, settings.databaseFlags[].value)"
-```
-
-Operational note: creating a Cloud SQL VECTOR index may fail with
-"Vector index: not enough data to train" if the table has too few embeddings.
-Run index creation after sufficient data exists.
 
 ## 5. Version-tag releases and conditional backend deploy
 

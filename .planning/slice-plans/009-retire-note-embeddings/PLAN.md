@@ -339,7 +339,15 @@ current positive backend contracts prove ordinary behavior.
 
 ### 10. Production embedding storage and settings are removed — R2
 Type: Behavior
-Status: planned
+Status: done — R2 = `v1.3.31` (owner-authorized) on main merge `aa6ae01a05` (first parent `ab08d6d046`, story
+tip `5034e1543d`); main CI `36389613406` success; Application Release `36390200576` admitted and deployed first
+attempt. Instance restarted 07:15:47Z with the new jar, `/api/healthcheck` 503 until 07:17:10Z then 200 at
+`aa6ae01a05` through 07:25Z, MIG stable. The app's own log does not reach Cloud Logging, so Flyway lines are not
+observable; D runs on `ApplicationReadyEvent` and a failure exits the JVM, so sustained health is the D/P evidence.
+Owner ran `gcloud sql instances patch doughnut-db --clear-database-flags` (`cloudsql_vector=on` was the only flag;
+the auto-mode classifier blocked Claude from running it); `describe` shows state RUNNABLE with no flags; app
+healthy afterwards (SPA 200, unauthenticated search 401). Vector setup notes removed from `docs/gcp/prod_env.md`
+and the deployment diagram label.
 Size: 3–5 minutes active; release/DB/configuration restart waits excepted.
 Proof: authorized R2 publication, Flyway D/P success in the serving instance's application log
 (`gcloud logging`), `gcloud sql instances describe` showing the removed flag, healthy instances and
