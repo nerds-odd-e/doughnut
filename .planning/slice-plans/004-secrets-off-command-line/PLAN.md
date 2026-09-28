@@ -78,3 +78,10 @@ token → the app starts and uses all three secrets as before.
 - Execution may deliver the code change to `main` and stop with the
   production check pending the next release; the story is not complete until
   that check is recorded here.
+
+## Execution complete
+
+Product advice: no backlog change. The only remaining obligation is this plan's
+one-time production check after the next owner-authorized application release;
+record its result here before story wrap-up. Owner exclusions (no rotation, keep
+the unused repo-access token fetch) stand.
