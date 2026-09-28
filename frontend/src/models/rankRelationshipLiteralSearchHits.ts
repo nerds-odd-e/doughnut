@@ -1,7 +1,4 @@
-import type {
-  NoteSearchResult,
-  RelationshipLiteralSearchHit,
-} from "@generated/donut-backend-api"
+import type { RelationshipLiteralSearchHit } from "@generated/donut-backend-api"
 import { relationshipLiteralSearchHitKey } from "./relationshipLiteralSearchHitKey"
 
 function hitDistance(h: RelationshipLiteralSearchHit): number {
@@ -44,63 +41,16 @@ function hitKindRank(kind: RelationshipLiteralSearchHit["hitKind"]): number {
   return 3
 }
 
-export function mergeRelationshipLiteralSearchHits(
-  existing: RelationshipLiteralSearchHit[],
-  incoming: RelationshipLiteralSearchHit[],
+export function rankRelationshipLiteralSearchHits(
+  hits: RelationshipLiteralSearchHit[],
   currentNotebookId?: number,
   searchKeyLower = ""
 ): RelationshipLiteralSearchHit[] {
   const byKey = new Map<string, RelationshipLiteralSearchHit>()
-
-  const isExactLiteralDistance = (d: number) => d === 0
-
-  const chooseBetterNote = (a: NoteSearchResult, b: NoteSearchResult) => {
-    const da = a.distance ?? Number.POSITIVE_INFINITY
-    const db = b.distance ?? Number.POSITIVE_INFINITY
-    if (isExactLiteralDistance(da) && !isExactLiteralDistance(db)) return a
-    if (!isExactLiteralDistance(da) && isExactLiteralDistance(db)) return b
-    return db < da ? b : a
-  }
-
-  const mergeHit = (
-    prev: RelationshipLiteralSearchHit | undefined,
-    next: RelationshipLiteralSearchHit
-  ): RelationshipLiteralSearchHit => {
-    if (!prev) return next
-    if (
-      prev.hitKind === "NOTE" &&
-      next.hitKind === "NOTE" &&
-      prev.noteSearchResult &&
-      next.noteSearchResult
-    ) {
-      const better = chooseBetterNote(
-        prev.noteSearchResult,
-        next.noteSearchResult
-      )
-      return better === prev.noteSearchResult ? prev : next
-    }
-    if (prev.hitKind === "FOLDER" && next.hitKind === "FOLDER") {
-      const da = prev.distance ?? Number.POSITIVE_INFINITY
-      const db = next.distance ?? Number.POSITIVE_INFINITY
-      if (isExactLiteralDistance(da) && !isExactLiteralDistance(db)) return prev
-      if (!isExactLiteralDistance(da) && isExactLiteralDistance(db)) return next
-      return db < da ? next : prev
-    }
-    if (prev.hitKind === "NOTEBOOK" && next.hitKind === "NOTEBOOK") {
-      const da = prev.distance ?? Number.POSITIVE_INFINITY
-      const db = next.distance ?? Number.POSITIVE_INFINITY
-      if (isExactLiteralDistance(da) && !isExactLiteralDistance(db)) return prev
-      if (!isExactLiteralDistance(da) && isExactLiteralDistance(db)) return next
-      return db < da ? next : prev
-    }
-    return next
-  }
-
-  existing.forEach((h) => byKey.set(relationshipLiteralSearchHitKey(h), h))
-  incoming.forEach((h) => {
+  hits.forEach((h) => {
     const key = relationshipLiteralSearchHitKey(h)
     const prev = byKey.get(key)
-    byKey.set(key, mergeHit(prev, h))
+    if (!prev || hitDistance(h) < hitDistance(prev)) byKey.set(key, h)
   })
 
   return Array.from(byKey.values()).sort((a, b) => {

@@ -129,7 +129,7 @@ const linkedNoteIds = (wrapper: ReturnType<typeof mountSearchResults>) =>
     .filter((id) => id !== undefined)
 
 describe("SearchResults search caching", () => {
-  it("searches again within the note context and merges unique results by ascending distance", async () => {
+  it("searches again within the note context and lists only the within-note results", async () => {
     const topSpy = mockSdkService(
       SearchController,
       "searchForRelationshipTarget",
@@ -151,7 +151,7 @@ describe("SearchResults search caching", () => {
 
     expect(topSpy).toHaveBeenCalledTimes(1)
     expect(withinSpy).toHaveBeenCalledTimes(1)
-    expect(linkedNoteIds(wrapper)).toEqual([1, 2, 3])
+    expect(linkedNoteIds(wrapper)).toEqual([1, 3])
   })
 
   it("prioritizes same-notebook results when distances are equal", async () => {

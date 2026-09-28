@@ -7,7 +7,7 @@ import {
   computeSearchDisplayState,
   type DisplayState,
 } from "./searchDisplayState"
-import { mergeRelationshipLiteralSearchHits } from "./mergeRelationshipLiteralSearchHits"
+import { rankRelationshipLiteralSearchHits } from "./rankRelationshipLiteralSearchHits"
 import type { SearchListPreference } from "./searchListPreference"
 
 export type { DisplayState }
@@ -71,15 +71,6 @@ export class SearchResultsModel {
       if (results.length !== 0 || key === "") return false
       return lower.includes(key.toLowerCase())
     })
-  }
-
-  setCachedResult(
-    searchKey: string,
-    isGlobal: boolean,
-    results: RelationshipLiteralSearchHit[]
-  ) {
-    this.getCachedSearches(isGlobal)[searchKey] = results
-    this.state.recentResult = results
   }
 
   getSearchResult(
@@ -164,23 +155,19 @@ export class SearchResultsModel {
     })
   }
 
-  /** Merges results into the cache for this search key. */
-  mergeAndCacheResults(opts: {
+  cacheResults(opts: {
     trimmedSearchKey: string
     isGlobal: boolean
     results: RelationshipLiteralSearchHit[]
     currentNotebookId?: number
   }): void {
-    this.setCachedResult(
-      opts.trimmedSearchKey,
-      opts.isGlobal,
-      mergeRelationshipLiteralSearchHits(
-        this.getCachedResult(opts.trimmedSearchKey, opts.isGlobal) ?? [],
-        opts.results,
-        opts.currentNotebookId,
-        opts.trimmedSearchKey.toLowerCase()
-      )
+    const ranked = rankRelationshipLiteralSearchHits(
+      opts.results,
+      opts.currentNotebookId,
+      opts.trimmedSearchKey.toLowerCase()
     )
+    this.getCachedSearches(opts.isGlobal)[opts.trimmedSearchKey] = ranked
+    this.state.recentResult = ranked
     this.clearPreviousResult()
   }
 }

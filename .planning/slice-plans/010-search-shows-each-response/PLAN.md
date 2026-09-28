@@ -57,7 +57,7 @@ Preserved promises: title/alias matching, ranking, scopes, folder/notebook hits,
 
 ### 1. A new search response replaces the hits cached for its key
 Type: Behavior
-Status: planned
+Status: done
 Size: about 5 minutes active; F/W runtime excepted.
 Proof: F and W. Reshape the pinned spec to its observable: after the context changes to note 1 and the
 within-note response returns N1 and N3, the dropdown lists `[1, 3]`. Keep the same-notebook tie-break and
@@ -69,6 +69,11 @@ scope (or the within-note context) arrives → only that response's hits are lis
 Replace `mergeAndCacheResults` with caching the ranked response; reduce the merge helper to ranking one
 response, keeping the lower-distance hit when a response repeats a key, and delete the exact-literal
 special cases. No new tests for the absence of merging.
+
+Accepted proof: F — `frontend:test` 1943 passed, `SearchResults.spec.ts` "searches again within the note
+context and lists only the within-note results" asserts `[1, 3]`; vue-tsc exit 0; after refactor (folded
+`setCachedResult` into `cacheResults`) focused search specs 110 passed and vue-tsc exit 0. W — 16/16.
+Helper renamed to `rankRelationshipLiteralSearchHits`; model method is `cacheResults`.
 
 ## Current decisions
 

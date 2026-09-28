@@ -18,7 +18,7 @@ export async function executeDebouncedSearch(opts: {
     opts.model.isImpliedEmptyByShorterPhrase(snapshotTrimmed, snapshotGlobal)
   ) {
     if (!opts.isStillCurrent()) return
-    opts.model.mergeAndCacheResults({
+    opts.model.cacheResults({
       trimmedSearchKey: snapshotTrimmed,
       isGlobal: snapshotGlobal,
       results: [],
@@ -36,7 +36,7 @@ export async function executeDebouncedSearch(opts: {
     : await SearchController.searchForRelationshipTarget({ body: opts.term })
 
   if (!opts.isStillCurrent()) return
-  opts.model.mergeAndCacheResults({
+  opts.model.cacheResults({
     trimmedSearchKey: snapshotTrimmed,
     isGlobal: snapshotGlobal,
     results: error ? [] : data || [],
