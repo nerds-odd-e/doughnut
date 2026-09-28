@@ -156,7 +156,20 @@ dependent storage/release work and triggers refinement; application slices
 
 ### 2. Prove fresh and populated installations converge after cleanup
 Type: Behavior
-Status: planned
+Status: done — PASS (2026-09-28, MySQL 8.4 local 127.0.0.1:3309, Flyway core/mysql 12.4.0, OpenJDK 25.0.3).
+Harness (deleted after use): throwaway Gradle init script printing backend runtime classpath, then
+`java -cp <cp> Harness.java <schema> <sqlDir> repair|migrate|info` configuring
+`Flyway.configure().dataSource(<worktree-owned rh_old/rh_fresh schema>).locations("filesystem:<staged copies>","classpath:db/migration").cleanDisabled(true)`
+and calling repair then migrate as `FlyWayFreeVersionRealMigration` does; compiled Java migrations from `backend/build`.
+Provisional (re-allocate in slice 9): D = `DROP TABLE note_embeddings;` (the only embedding structure: table +
+`idx_note_embeddings_note_id`, no FKs), P = `SELECT 1;` placeholder; highest version ever used was `300000349`.
+Results: populated old install (39 migrations, 7 embedding rows) → D+P migrate 2, table gone, other tables'
+row counts/CHECKSUM unchanged → final resources (baseline block removed, D deleted) repair "Marked missing
+migrations as deleted, Aligned applied migration checksums", migrate 0, P stays tip, restart repeat is a no-op →
+columns/indexes/FKs/views/data identical to before. Fresh install from final resources (40 migrations, tip P) is
+schema-identical to the upgraded install. An install that never applied D would silently keep the table under the
+final resources, so slice 11's "D verified on every retained installation" gate is essential. Native VECTOR
+behavior remains slice 3's.
 Size: 5–8 minutes active, one local lifecycle probe; engine/test runtime excepted.
 Proof: one disposable rehearsal demonstrates the exact drop → newer tip →
 baseline edit/drop-migration removal → repair/migrate sequence and a fresh path.
