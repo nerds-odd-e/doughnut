@@ -9,10 +9,10 @@ description: >-
   work from a sufficient instruction needs an ordinary plan. Stays within the
   triggering instruction's execution authority: finish after writing and
   reporting the plan unless that instruction explicitly also requests execution.
-  Reports remaining slice-specific concerns or a limited no-concerns finding,
-  then records readiness assessment through the shared preparation procedure
-  without granting Take or execution. Concern evidence does not authorize
-  execution.
+  Invokes slice-plan refinement when remaining plan concerns can be resolved
+  within the understood outcome, then reports remaining concerns or a limited
+  no-concerns finding and records readiness through the shared preparation
+  procedure without granting Take or execution.
 ---
 
 # Slice planning
@@ -133,13 +133,28 @@ requirements.
 During construction, apply those decomposition, cumulative design, and sizing checks: correct
 obvious defects such as an independent second outcome before reporting, and
 preserve proof ownership and any supplied sizing constraints on every resulting
-slice. [dough-slice-plan-refinement](../dough-slice-plan-refinement/SKILL.md)
-owns resolving remaining concerns when the coordinator or invoking workflow
-separately requests it; do not invoke it as part of writing this plan.
+slice.
 
 After the plan file exists for a work item with a recorded identity, apply
 [record preparation facts](../dough-product-backlog/references/record-preparation.md)
 for the planned approach (omit assessment on that write).
+
+## Resolve fixable plan concerns
+
+When remaining concerns about slice boundaries, cumulative design, proof
+ownership, or sizing can be resolved within the understood outcome and scope,
+invoke [dough-slice-plan-refinement](../dough-slice-plan-refinement/SKILL.md)
+on the written plan before the final report and readiness assessment. This
+refinement is part of slice planning and needs no additional instruction;
+honor an explicit instruction to leave refinement to a later step. A plan
+without such concerns needs no refinement pass.
+
+Keep unresolved source questions and human-owned decisions outside this
+handoff. If refinement returns a missing input, disputed constraint, or a
+remaining concern it cannot resolve within scope, report it under the next
+section; do not repeat refinement without new evidence or widen the outcome.
+Refinement keeps the same plan, preparation workspace, and assignment. It
+grants neither execution nor publication authority.
 
 ## Report concern evidence and assess readiness
 
