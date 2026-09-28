@@ -179,6 +179,12 @@ Learning: Boot copies `server.servlet.session.cookie.*` to Spring Session only
 on an embedded server, so the test class runs with `RANDOM_PORT`; production
 runs `java -jar`. `HttpOnly` and `SameSite=Lax` are Spring Session defaults.
 
+## Execution complete
+
+Product advice: no backlog change. The first release with this change signs
+every user out once; afterwards the owner confirms staying signed in across the
+next deploy and a browser restart, and that logout still signs out.
+
 ## Current decisions
 
 - One session store (MySQL through Spring Session JDBC) for every profile; no
