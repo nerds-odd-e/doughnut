@@ -81,12 +81,8 @@ Behavior:
 
 ### 3. The home page does not draw its flow line while it is hidden
 Type: Behavior
-Status: planned
-Proof: add a case to `tests/pages/HomePage.welcome.spec.ts` (or a sibling home
-spec) that mounts `HomePage` with `attachTo: document.body` at the 414px test
-viewport, advances past the 100ms update, and asserts `.flow-path` has no
-`d` attribute. Then one manual look at the home page at 390px (no `<path>`
-console error) and at 1280px (flow line still drawn).
+Status: done
+Proof: added case to `tests/pages/HomePage.welcome.spec.ts` (3 passed).
 
 ## Current decisions
 
