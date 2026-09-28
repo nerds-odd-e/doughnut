@@ -392,7 +392,11 @@ invalidate the rehearsed assumptions, recheck/rehearse before proceeding.
 
 ### 12. Production accepts the final current schema history — R3
 Type: Behavior
-Status: planned
+Status: done — R3 = `v1.3.32` (owner-authorized) on main merge `a0ab5999db` (first parent `aa6ae01a05`, story
+tip `428ed03bb3`); main CI `36393101614` success; Application Release `36393690732` admitted and deployed first
+attempt. Health 503 during restart until 07:55:09Z, then `OK … Commit: a0ab5999db` through 07:57:33Z (repair +
+migrate run at ready and would exit the JVM on failure); MIG stable, single instance `doughnut-app-group-jc41`;
+SPA 200, unauthenticated search 401. No migrations above 351 were added on main during the cleanup window.
 Size: 3–5 minutes active; release/verification waits excepted.
 Proof: R3 publication and actual Flyway repair/migrate success on retained
 installations; positive product smoke and final catalog observations.
