@@ -14,12 +14,6 @@
       ref="treeScrollRef"
       class="sidebar-tree-scroll overflow-y-auto flex-1 min-h-0"
     >
-      <SidebarNotebookTreeScrollportPathHint
-        v-if="sidebarTreeShown && breadcrumbFolders.length > 0"
-        :path-folders="breadcrumbFolders"
-        :notebook-id="notebookId"
-        :scroll-root="treeScrollRef"
-      />
       <SidebarInner
         v-if="sidebarTreeShown"
         :notebook-id="notebookId"
@@ -44,7 +38,6 @@ import type {
 } from "@generated/donut-backend-api"
 import SidebarToolbar from "./SidebarToolbar.vue"
 import SidebarInner from "./SidebarInner.vue"
-import SidebarNotebookTreeScrollportPathHint from "./SidebarNotebookTreeScrollportPathHint.vue"
 import { useSidebarCreationReadonly } from "@/composables/useSidebarCreationReadonly"
 
 const props = withDefaults(

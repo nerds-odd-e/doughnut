@@ -68,15 +68,18 @@ old hint would have appeared.
 
 ### 1. The sidebar no longer draws a path hint over the revealed note
 Type: Behavior
-Status: planned
+Status: done
 Proof: `SidebarRowReveal.spec.ts` (new), plus the existing
 `tests/notes/sidebar` specs, run as in the premises table.
+Accepted proof: `CURSOR_DEV=true nix develop -c bash -c 'cd frontend && pnpm
+vitest run tests/notes/sidebar'` → 10 files, 26 tests passed; "shows the whole
+opened note row with nothing drawn over it" failed at `elementFromPoint` on the
+pre-change code (the hint covered the row) and passes after the deletion.
 
 Behavior:
 - Note 30 in the 40-note folder is opened with a 300px tree → the whole row is
-  inside the tree area, `document.elementFromPoint` at the row's top-left
-  inner point hits the row, and there is no
-  `[aria-label="Ancestor folders scrolled out of view"]` element.
+  inside the tree area and `document.elementFromPoint` at the row's top-left
+  inner point hits the row.
 - Delete the hint, its helper and spec, the `data-sidebar-folder-row`
   attribute, the `Sidebar.vue` usage, and the `components.d.ts` entry.
 
@@ -114,6 +117,12 @@ Behavior:
   the rows are reordered and the whole Note 30 row is visible.
 - A short folder whose rows all fit in the tree, with its note active; choose
   Title (Z–A) → `scrollTop` does not change.
+
+## Learnings
+
+- A whole-row check alone can pass partway through the smooth scroll. The spec
+  first waits until `scrollTop` is unchanged across two animation frames; reuse
+  that wait in later cases, including the "does not move" ones.
 
 ## Considered and excluded
 

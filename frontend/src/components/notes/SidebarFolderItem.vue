@@ -13,7 +13,7 @@
     }"
   >
     <ScrollTo v-if="isActiveFolderRow" />
-    <div class="folder-row" :data-sidebar-folder-row="String(folderId)">
+    <div class="folder-row">
       <button
         class="chevron-btn"
         aria-label="expand children"
