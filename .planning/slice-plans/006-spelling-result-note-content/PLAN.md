@@ -77,3 +77,8 @@ rewritten unit test observe the note context without a click.
 Learning: `RecallPage.spelling.spec.ts` "focuses the spelling answer input when
 resuming recall" uses a correct answered question, so its `showNote` mock now
 matches that question's note because the reader loads for every outcome.
+
+## Execution complete
+
+Product advice: no change — the backlog order stands; the next queued stories
+(SEED-053#story-1, SEED-051#story-1) are unaffected by this change.
