@@ -7,8 +7,6 @@ Bug fixing and general maintenance.
 
 ## Taken
 
-- [Show read-only note content after every spelling answer](seeds/SEED-052-spelling-answer-note-content.md#story-1) — SEED-052#story-1 ([plan](slice-plans/006-spelling-result-note-content/PLAN.md))
-
 ## Backlog list
 
 - [Stop the SUT start timeout test depending on runner speed](seeds/SEED-039-faster-ci-feedback.md#story-4) — SEED-039#story-4
