@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "agent": "Mana-chan",
+  "email": "mana-chan@example.org",
+  "identity": "SEED-053#story-1",
+  "mode": "story-branch",
+  "branch": "story/file-page-references",
+  "host": "cursor",
+  "model": "gemini-3.8-flash"
+}
