@@ -136,51 +136,74 @@ Not promised by this story:
 
 <a id="story-2"></a>
 
-### Fix clickable rows under the path hint and small shell defects
+### Stop the Assimilate badge covering its icon and search re-requesting recent notes
 
 **Identity:** SEED-043#story-2
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"not-refined","approach":"unselected"}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/003-rail-badge-and-search-requests/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"73173663e17f9d914d5af9290401094b29868a9044fe5bc61ce22d805d4015cc","plan":"5ea398659ca5b7388a492635bd76d976d9906b282b57abd2facea9f1026a1db9"}}
 ```
 
 **Goal**
 
-Users never meet visible elements that ignore clicks, overlapping rail
-decoration, console errors, or wasteful search traffic while navigating.
+Users see a left rail whose Assimilate icon is not covered by its count badge,
+and note search stops sending the same recent-notes request on every keystroke.
+The phone-width console error is removed as a cheap extra. This is maintenance:
+it makes the rail look finished and removes wasted server requests. It does not
+change how anyone navigates.
 
-**Observed defects**
+**Scope**
 
-1. **Rows behind the path hint cannot be clicked.**
-   - *Expected:* a row that can be seen can be clicked.
-   - *Observed:* clicking the visible half of a row under the hint does nothing.
-     There is no navigation and no scroll.
-   - *Reproduction:* in a long folder, scroll so a note row is half under the
-     hint, then click its visible half.
-   - *Impact:* users see a row they cannot select until they scroll.
-2. **The left-rail count badge overlaps the Assimilate icon.**
-   - *Expected:* the badge sits clear of the icon below it.
-   - *Observed:* the badge ("15/623", "15/1.6k") covers the top of the
-     Assimilate icon.
-   - *Reproduction:* log in with notes due, then view a note page at 1280px or
-     1440px width.
-   - *Impact:* cosmetic. The rail looks unfinished, but the icon stays usable.
-3. **Console error at phone width.**
-   - *Expected:* no console errors.
-   - *Observed:* at 390px, the console logs `<path> attribute d: Expected number,
-     "… h --120 …"`, which suggests a malformed SVG path in the mobile layout.
-   - *Reproduction:* open any note page with a 390×844 viewport.
-   - *Impact:* no visual breakage has been traced to it yet.
-4. **Search sends a burst of recent-notes requests.**
-   - *Expected:* recent notes load once when search opens.
-   - *Observed:* typing one query sent `GET /api/notes/recent` 15 times before
-     the single `POST /api/notes/search`.
-   - *Reproduction:* open note search, type a query at normal speed, and watch
-     network requests.
-   - *Impact:* wasted server load and bandwidth; no visible slowness observed
-     locally.
+Decided by the owner during refinement:
 
-**Effort hypothesis:** M, low confidence. These are four independent small
-fixes. If one of them grows, split it rather than stretching the story.
+- The UAT's first defect (rows under the path hint cannot be clicked) is
+  dropped. Story 1 removes the path hint, so there is nothing left to fix.
+- The Assimilate badge shows only the number of notes due today, in the same
+  small corner badge as the Recall item. The badge's tooltip keeps giving both
+  numbers ("15 due today, 623 total unassimilated").
+- The story keeps its place in the backlog.
+
+Promised:
+
+1. **Assimilate badge.** The rail badge shows the due count only (for example
+   "15"), sitting at the icon's top-right corner the way the Recall badge does,
+   instead of a "due/total" label that spreads across the icon. Counts of 1,000
+   or more keep the existing abbreviation ("1.2k"). With nothing due, no badge
+   is shown, as for Recall.
+2. **Recent notes.** One search view requests recent notes at most once,
+   however much is typed and even when the answer is an empty list. Recent
+   notes still appear wherever they appear today: with an empty search box,
+   while the first search is still running, and with the "recent" list
+   preference.
+3. **Phone-width console error.** The home page's decorative flow line, which is
+   hidden at phone width, no longer produces the `<path> attribute d: Expected
+   number, "… h --120 …"` error at phone width. The UAT saw the error in the
+   console on a note page, but it is the only dynamically built SVG path in the
+   frontend: the home page draws it after measuring the hidden, zero-size flow
+   background. Once the home page is left, the update finds no elements and
+   stops, so leaving the page does not produce it.
+
+Not promised by this story:
+
+- Where the total unassimilated count is shown elsewhere; only the rail badge
+  changes. The tooltip and the Assimilate page keep showing it.
+- A general "no console errors at phone width" guarantee; only this one error.
+- Any rail redesign, and the other UAT observations left unselected.
+
+**Key examples**
+
+- 15 notes due, 623 unassimilated, note page at 1440px: the Assimilate badge
+  reads "15" at the icon's top-right corner, and the icon's top is not covered.
+  Hovering the badge shows "15 due today, 623 total unassimilated".
+- 0 due, 623 unassimilated: the Assimilate item shows no badge.
+- Open note search and type a word at normal speed: the network shows
+  `GET /api/notes/recent` once, then one `POST /api/notes/search`.
+- A user with no notes opens search and types: recent notes are requested once
+  (the empty answer is not re-requested on each keystroke).
+- Home page at 390×844: no `<path>` console error. At 1280px the flow line is
+  still drawn as before.
+
+**Effort hypothesis:** S, medium confidence. Three independent fixes, each with
+a known cause.
 
 <a id="story-3"></a>
 
@@ -211,8 +234,9 @@ can see it.
 
 ## Ordering and Scope Reduction
 
-The owner queued these stories in this order after the existing backlog. They are
-not refined yet; refine each before planning or execution.
+The owner queued these stories in this order after the existing backlog. Refine
+each before planning or execution. Story 1's removal of the path hint also
+removed story 2's original first defect.
 
 ## Open Decisions
 

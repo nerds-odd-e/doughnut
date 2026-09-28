@@ -1,0 +1,98 @@
+# Stop the Assimilate badge covering its icon and search re-requesting recent notes
+
+## Source
+
+- Story: [Stop the Assimilate badge covering its icon and search re-requesting recent notes](../../seeds/SEED-043-sidebar-uat-defects.md#story-2)
+- **Identity:** SEED-043#story-2
+
+## Goal and scope
+
+The left rail's Assimilate badge no longer covers its icon, note search asks for
+recent notes at most once per search view, and the home page stops drawing its
+hidden flow line at phone width (the `h --120` console error).
+
+Excluded (see the seed): the original "rows under the path hint" defect (story 1
+removes the hint), any other place showing the total unassimilated count, a
+general "no console errors" guarantee, and any rail redesign.
+
+## Approach
+
+Three independent fixes, each with a known cause:
+
+- **Badge.** Reuse the Recall item's existing badge pattern: the Assimilate
+  badge carries only the abbreviated due count (`abbreviateCount`), and is
+  absent when nothing is due. `formatAssimilationBadge` has no other caller
+  and is deleted with its test. The tooltip (`assimilationBadgeTitle`) keeps both
+  numbers. No CSS change is needed: the overlap came from a 5–7 character
+  label in a badge built for 1–3 characters (`NavigationItem.vue:121-140`).
+- **Recent notes.** `useSearchExecution.ts` decides "already fetched" by
+  `recentNotes.length === 0`, so it re-requests while a request is in flight
+  and forever when the answer is empty. Record that the request was made
+  (before awaiting) and fetch only when it was not. The display rules in
+  `searchDisplayState.ts` stay unchanged.
+- **Home flow line.** `useHomeWelcomePath.ts` measures `.flow-background`,
+  which CSS hides at `max-width: 768px`, and builds `h -${width - 120}` from a
+  0×0 box. Do not draw when the background has no size.
+
+## Decisive premises
+
+| Premise | Observation | Result |
+| --- | --- | --- |
+| The existing proof entry points run green on trunk | `CURSOR_DEV=true nix develop -c bash -c 'cd frontend && pnpm vitest run tests/toolbars/MainMenu.spec.ts tests/composables/useAssimilationCount.spec.ts tests/components/search/SearchResults.recentNotes.spec.ts tests/pages/HomePage.welcome.spec.ts'` | 4 files, 28 tests passed (real Chromium, browser mode) |
+| `formatAssimilationBadge` is used only by the rail | `grep -rn formatAssimilationBadge frontend/src` | Only `useNavigationItems.ts:51` |
+| The badge text is asserted in E2E only through one step | `grep -rn "should see assimilation progress" e2e_test/features`; `e2e_test/start/pageObjects/assimilationPage/assimilationMenu.ts:22` | 5 uses in `assimilation/assimilation_walkthrough.feature`, all via `expectAssimilationNavBadge(dueOverTotal)`. The Skip Memory Tracking scenario relies on the total (5, not 6) |
+| The recent-notes repeat is reproducible at the component entry point | Temporary spec (deleted): `mountSearchResults({ inputSearchKey: "" })`, then `setProps` to `a`, `ab`, `abc`, `abcd` with `flushPromises` between, `getRecentNotes` returning `[]` | `getRecentNotes` called 5 times |
+| The malformed path is reproducible in the unit-test browser | Temporary spec (deleted): `HomePage` mounted with `attachTo: document.body`, wait 200ms | Viewport 414px; `.flow-background` 0×0; `.flow-path` `d` contains `h --120` and `v --360.6` |
+| The home flow line is the only dynamically built SVG path | `grep -rn 'h -\${\|"d",\|:d="' frontend/src` | Only `useHomeWelcomePath.ts` |
+| Leaving the home page cannot produce the error | `useHomeWelcomePath.ts:5-10,21`: the update looks elements up with `document.querySelector` and returns when they are gone | No timer cleanup needed |
+
+## Slices
+
+### 1. The Assimilate badge shows the due count at the icon's corner
+Type: Behavior
+Status: planned
+Proof: `tests/toolbars/MainMenu.spec.ts` and `tests/composables/useAssimilationCount.spec.ts`
+(run as in the premises table), then
+`pnpm cy:run --spec e2e_test/features/assimilation/assimilation_walkthrough.feature`,
+then one manual look at a note page at 1440px with notes due.
+
+Behavior:
+- 5 due, 128 unassimilated → the badge reads `5` with class `due-count` and
+  title `5 due today, 128 total unassimilated` (replaces the `5/128` test).
+- 0 due, 128 unassimilated → no Assimilate badge (the existing "nothing due or
+  backlogged" test changes to this case).
+- E2E: `I should see assimilation progress "2/5"` keeps its feature wording;
+  the page object checks the badge text `2` and its title
+  `2 due today, 5 total unassimilated`, so the Skip Memory Tracking scenario
+  still proves the total.
+- Manual: the badge sits at the icon's top-right corner like the Recall badge
+  and the icon's top is visible.
+
+### 2. Search asks for recent notes at most once per search view
+Type: Behavior
+Status: planned
+Proof: extend `tests/components/search/SearchResults.recentNotes.spec.ts`; run it
+with the other `tests/components/search/` and
+`tests/wiki-link-or-relationship/SearchDialog*.spec.ts` specs.
+
+Behavior:
+- Recent notes answer `[]`; mount with an empty key and type `a`, `ab`, `abc`
+  (flushing between) → `getRecentNotes` called once.
+- Recent notes request still pending; type several keys → called once, and the
+  notes appear once it resolves while the first search is still running.
+- Existing tests (loads once on mount, shows recent notes for an empty key,
+  excludes the current note) stay green unchanged.
+
+### 3. The home page does not draw its flow line while it is hidden
+Type: Behavior
+Status: planned
+Proof: add a case to `tests/pages/HomePage.welcome.spec.ts` (or a sibling home
+spec) that mounts `HomePage` with `attachTo: document.body` at the 414px test
+viewport, advances past the 100ms update, and asserts `.flow-path` has no
+`d` attribute. Then one manual look at the home page at 390px (no `<path>`
+console error) and at 1280px (flow line still drawn).
+
+## Current decisions
+
+- Badge option (b): due count only; total stays in the tooltip (owner, during
+  refinement).
