@@ -19,9 +19,9 @@ import {
 // A one-shot start claims nothing: it only checks how fetched trunk holds a
 // supplied identity. An unlisted request, with no identity or one no backlog
 // list holds, has nothing to check.
-async function readOneShotSource({ integration, identity }, ref) {
+async function readOneShotSource({ repository, identity }, ref) {
   if (identity)
-    await requireOneShotStart(integration, ref, identity, backlogPath);
+    await requireOneShotStart(repository, ref, identity, backlogPath);
   return {};
 }
 
@@ -78,7 +78,7 @@ export async function existingClaim(request, ref, source = {}) {
     "claim" in source
       ? source.claim
       : await claimProvenance(
-          request.integration,
+          request.repository,
           ref,
           request.identity,
           backlogPath,

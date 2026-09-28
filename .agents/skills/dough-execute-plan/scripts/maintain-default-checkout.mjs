@@ -16,8 +16,7 @@ function singleOwner(owner) {
   return typeof owner === "string" && owner.trim() !== "";
 }
 
-// Direct edits and publication from this checkout still require declared access.
-export function declaredOwnerRefusal(declaredOwner, requester) {
+function declaredOwnerRefusal(declaredOwner, requester) {
   if (!singleOwner(declaredOwner) || !singleOwner(requester)) {
     return "unclear-ownership";
   }
@@ -156,9 +155,27 @@ async function fetchedState(checkout, remoteRef) {
 }
 
 // Ownership declarations are optional for refresh. A declared owner must match
-// the requester; this module does not acquire exclusive access or create a lock.
-// A missing snapshot argument is intentional: callers cannot supply a stale one.
-export async function refreshDefaultCheckout({
+// the requester. A missing snapshot argument is intentional: callers cannot
+// supply a stale one. With no default checkout supplied there is nothing to
+// refresh. A supplied checkout that cannot be read or refreshed (a missing
+// path, or Git failing there) reports `refresh-failed`; the caller's accepted
+// publication stands.
+export async function refreshDefaultCheckout(request) {
+  if (!request.checkout) return { result: "not applicable" };
+  try {
+    return await attemptRefresh(request);
+  } catch (error) {
+    return {
+      result: "deferred",
+      reason: "refresh-failed",
+      error: existsSync(request.checkout)
+        ? error.stderr || error.message
+        : `default checkout not found: ${request.checkout}`,
+    };
+  }
+}
+
+async function attemptRefresh({
   checkout,
   declaredOwner,
   requester,

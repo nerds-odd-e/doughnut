@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 // Installed CLI for a queued story's preparation assignment. `start` publishes
 // the Preparing announcement before substantive preparation, or continues the
-// workspace's existing one; `release` stages removal of exactly that
+// workspace's existing one, first creating a missing workspace on `--branch`
+// at fetched trunk; `release` stages removal of exactly that
 // assignment beside the retained result so one landing publishes both;
 // `abandon` publishes its end alone, leaving the draft in the workspace, or,
 // addressed by profile and allocation from the integration checkout, ends a
@@ -18,9 +19,9 @@ const operations = {
 };
 
 const usage =
-  "usage: preparation-assignment.mjs start --integration PATH --workspace PATH --identity ID --remote NAME --target BRANCH --push-authorized [--host claude|codex|cursor] [--model TEXT] [--declared-owner ID --requester ID]\n" +
+  "usage: preparation-assignment.mjs start [--integration PATH] --workspace PATH [--branch NAME] --identity ID --remote NAME --target BRANCH --push-authorized [--host claude|codex|cursor] [--model TEXT] [--declared-owner ID --requester ID]\n" +
   "       preparation-assignment.mjs release --workspace PATH --identity ID --remote NAME --target BRANCH\n" +
-  "       preparation-assignment.mjs abandon --integration PATH --workspace PATH --identity ID --remote NAME --target BRANCH --push-authorized [--declared-owner ID --requester ID]\n" +
+  "       preparation-assignment.mjs abandon [--integration PATH] --workspace PATH --identity ID --remote NAME --target BRANCH --push-authorized [--declared-owner ID --requester ID]\n" +
   "       preparation-assignment.mjs abandon --integration PATH --profile PATH [--allocation SHA --confirmed-abandoned] --remote NAME --target BRANCH --push-authorized [--declared-owner ID --requester ID]";
 
 // Flags that stand alone: authority and confirmation the developer supplied.

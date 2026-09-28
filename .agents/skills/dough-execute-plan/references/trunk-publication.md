@@ -62,8 +62,8 @@ worktree. For a claim, the supplied validation confirms the selected entry is
 **Taken** on the candidate and that no empty commit was invented. For an increment or
 repair, it reuses accepted proof whose promise, boundary, implementation,
 setup, and observations still match.
-[Default-checkout access and preservation](maintain-default-checkout.md)
-apply only when this publication mutates that checkout. A maintenance stop
+[Default-checkout preservation](maintain-default-checkout.md#preserve-pending-local-work)
+applies only when this publication mutates that checkout. A maintenance stop
 follows
 [human judgment](execution-decisions.md#stop-for-human-judgment),
 [delivery staging](wrap-up.md#deliver-the-change), and
@@ -106,11 +106,11 @@ undo acceptance.
 ## Publish wrap-up closure
 
 Story wrap-up treats each owned wrap-up commit on the execution checkout as a
-verified increment whose target remains remote trunk. Publish it immediately
-through [the common sequence](#publish-the-candidate) before the next wrap-up
-mutation that depends on its recovery from shared trunk. That closure target
-is not the Story Branch increment destination above. Do not merge the
-execution branch.
+verified increment whose target remains the authorized remote trunk. Publish it
+immediately through [the common sequence](#publish-the-candidate) before the
+next wrap-up mutation that depends on its recovery from shared trunk. That
+closure target is not the Story Branch increment destination above. Do not
+merge the execution branch.
 
 Resolve observation ownership before the first wrap-up publication: recover
 the matching execution observer when it still exists; if observation already

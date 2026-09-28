@@ -62,7 +62,7 @@ Resolve project context at the first boundary that needs it:
 
 - execution-source kind, slice target, hard limit, and exceptions;
   [replanning permission](references/execution-decisions.md#choose-replanning-permission);
-  integration checkout and branch for a claim, using the project's configured integration branch or `main` when none is supplied;
+  integration checkout, when one exists, and branch for a claim, using the project's configured integration branch or `main` when none is supplied;
   execution mode and location: default Story Branch Mode; `--trunk` or a clear
   equivalent selects Trunk Mode; explicit caller selection uses the current
   branch. Resolve contradictions before changing state. Mode never creates
@@ -74,7 +74,7 @@ Resolve project context at the first boundary that needs it:
   [trunk publication's Preconditions](references/trunk-publication.md#preconditions) before
   selecting the owned workspace and taking or admitting work, and before publishing a
   claim, validated increment, or owned repair — those preconditions resolve
-  publication inputs and defer shared-checkout access and preservation to
+  publication inputs and defer shared-checkout preservation to
   [maintain the default checkout](references/maintain-default-checkout.md);
 - generation triggers and commands when affected; and
 - [refactor context](../dough-post-change-refactor/SKILL.md) before refactor delegation.
@@ -111,22 +111,23 @@ current-branch and host-owned checkout restrictions still apply.
 
 For authorized queued Story Branch or Trunk Mode work, invoke the installed
 `scripts/execution-start.mjs start` once with the originating integration
-checkout, owned workspace path and branch, selected identity, stable execution
-publisher ID, mode (`trunk` or `story-branch`), actual remote and trunk branch,
-and the established `--push-authorized --workspace-authorized` flags. Supply
-your own `--host` (`claude`, `codex`, or `cursor`) and `--model`; omit either
-you cannot state rather than guess. Supply `--plan` as a path relative to the
-backlog directory when explicitly selected; the command also resolves the
-canonical published plan. Supply `--declared-owner` and matching `--requester`
-only when default-checkout access has actually been established. Missing
-declarations do not prevent a safe automatic refresh. The command fetches trunk,
-checks the published selected source and preparation, selects or reuses the
-workspace, names you as an agent, commits an isolated Take that publishes your
-agent profile, makes that agent the author of your workspace commits
-(`workspaceAuthorship: "not-configured"` means only the Take commit names the
-agent), confirms publication on remote trunk, publishes a Story Branch Mode
-execution branch at that Take so the branch the profile names exists on the
-remote, and reports local refresh separately.
+checkout as `--integration` when one exists (without one, an existing owned
+worktree supplies repository access), owned workspace path and branch, selected
+identity, stable execution publisher ID, mode (`trunk` or `story-branch`),
+actual remote and trunk branch, and the established `--push-authorized
+--workspace-authorized` flags. Supply your own `--host` (`claude`, `codex`, or
+`cursor`) and `--model`; omit either you cannot state rather than guess. Supply
+`--plan` as a path relative to the backlog directory when explicitly selected;
+the command also resolves the canonical published plan. Supply
+`--declared-owner` and matching `--requester` only when your context declares
+the default checkout's owner for [refresh eligibility](references/maintain-default-checkout.md#refresh-eligibility).
+The command fetches trunk, checks the published selected
+source and preparation, selects or reuses the workspace, names you as an agent,
+commits an isolated Take that publishes your agent profile, makes that agent the
+author of your workspace commits (`workspaceAuthorship: "not-configured"` means
+only the Take commit names the agent), confirms publication on remote trunk,
+publishes a Story Branch Mode execution branch at that Take so the branch the
+profile names exists on the remote, and reports local refresh separately.
 
 Use its compact one-line result directly; do not filter or fetch it again.
 Values you supplied stay in your execution context and are not echoed. An

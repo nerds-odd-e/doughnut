@@ -32,11 +32,20 @@ and "Use and resume it" as this preparation's Git lifecycle; do not duplicate
 its recipe here. First check whether the current story, active plan, session,
 or a host-supplied workspace already owns a suitable checkout for this
 preparation. Use it, and do not create a nested or per-invocation workspace
-merely because a different skill named above is now writing. When
-no suitable owned workspace exists, start one using that reference's create
-step, from a suitable existing host workspace when one is available, otherwise
-from the verified current revision of the checkout this preparation was
-invoked from.
+merely because a different skill named above is now writing.
+
+When no suitable owned workspace exists, start one using that reference's
+create step, in the repository of a suitable existing host workspace when one
+is available, otherwise of the checkout this preparation was invoked from. Its
+verified base is the authorized remote target, freshly fetched (for example,
+`git fetch <remote>`, then `<remote>/<trunk branch>`), so the draft starts from
+published history however stale, divergent, or dirty the invoking checkout is.
+That checkout's commits, staged content, and edits stay where they are and
+enter the draft only when the developer explicitly supplies them as
+preparation input. For an existing queued story, the announcement command in
+[Announce the preparation assignment](#announce-the-preparation-assignment)
+makes this selection: give it the new workspace path and branch instead of
+creating the workspace yourself.
 
 Verify a candidate against that reference before writing into it. The suitable
 owner is the current story, plan, session, or host. An unverifiable or
@@ -52,8 +61,9 @@ the actual established paths. The owned workspace path is the preparation
 workspace. The integration checkout path is the checkout this preparation was
 invoked from, or a reused host workspace's already-recorded integration
 checkout — the project's established checkout for ordinary work, never the
-owned preparation workspace itself. Target selection is the authorized remote
-target, recorded separately from that path. A later keep decision publishes
+owned preparation workspace itself. When no such checkout exists, record none.
+Target selection is the authorized remote target, recorded separately from that
+path. A later keep decision publishes
 onto this recorded target; see
 [Decide what happens to the written result](preparation-disposition.md#decide-what-happens-to-the-written-result).
 Preparation's continuation after this selection is the record write and that
@@ -61,9 +71,9 @@ disposition. It does not apply execution mode or project-command readiness.
 
 ## Announce the preparation assignment
 
-For an existing queued story, announce it as **Preparing** after selecting the
-workspace and before its first record write, and keep that assignment through
-pauses, under
+For an existing queued story, announce it as **Preparing** before its first
+record write, either after selecting the workspace or as the step that creates
+a new one, and keep that assignment through pauses, under
 [Publish the preparation assignment](preparation-assignment.md). An explicit
 instruction not to publish or commit means announcing nothing.
 

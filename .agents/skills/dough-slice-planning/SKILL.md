@@ -85,6 +85,17 @@ numeric limit alone is not missing context: apply the linked sizing guidance
 without inventing a timing policy. Do not create a new plan under a deprecated
 or merely inferred location.
 
+Treat a verification gate as a local requirement only when the user's
+instructions or this project's guidance require it for local work, and cite
+that requirement in the plan. Hosted CI configuration shows which checks exist
+and how to run them. Hosted CI still runs them after publication, where their
+failures stay owned, but its configuration does not by itself make each check a
+local gate for every change. Choose local proof for the affected behavior under
+[own executable proof](../dough-story-refinement/references/executable-proof.md),
+and state in the plan the reason for any broader local check, such as a changed
+fixture that distributed consumers load. Execution applies the same distinction
+when it [accepts proof](../dough-execute-plan/references/wrap-up.md#accept-proof).
+
 ## Write the plan
 
 Before writing to the plan, establish or reuse the required workspace under

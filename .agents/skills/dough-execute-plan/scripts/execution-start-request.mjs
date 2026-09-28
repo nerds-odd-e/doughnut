@@ -1,5 +1,6 @@
 // Validates and normalizes a queued-start, admission or one-shot request
 // before any Git work.
+import { existsSync } from "node:fs";
 import { resolve } from "node:path";
 import {
   agentModes,
@@ -9,11 +10,13 @@ import { stopped } from "./workspace-publication-ownership.mjs";
 
 // The normalized request, or the stop that refuses it. A one-shot start
 // publishes no claim, so it needs no publisher, and an unlisted request has no
-// identity; a supplied identity is checked against fetched trunk.
+// identity; a supplied identity is checked against fetched trunk. The Git
+// `repository` the start reads and selects from is the supplied integration
+// (default) checkout, or else the owned workspace, which must then already
+// exist; only a supplied checkout gets a local refresh or supplies drafts.
 export function startRequest(requestInput) {
   const oneShot = requestInput.oneShot === true;
   const required = [
-    "integration",
     "workspace",
     "branch",
     ...(oneShot ? [] : ["identity", "publisherId"]),
@@ -23,10 +26,15 @@ export function startRequest(requestInput) {
   for (const field of required)
     if (!requestInput[field])
       return stopped("invalid-request", { error: `missing ${field}` });
+  const workspace = resolve(requestInput.workspace);
+  const integration = requestInput.integration
+    ? resolve(requestInput.integration)
+    : undefined;
   const request = {
     ...requestInput,
-    integration: resolve(requestInput.integration),
-    workspace: resolve(requestInput.workspace),
+    integration,
+    workspace,
+    repository: integration ?? workspace,
   };
   if (oneShot && request.admit === true)
     return stopped("invalid-request", {
@@ -75,6 +83,11 @@ export function startRequest(requestInput) {
   if (request.integration === request.workspace)
     return stopped("invalid-request", {
       error: "queued work requires a separate owned workspace",
+    });
+  if (!request.integration && !existsSync(request.workspace))
+    return stopped("invalid-request", {
+      error:
+        "without --integration, --workspace must name an existing owned worktree of the repository",
     });
   return { ok: true, request };
 }

@@ -57,10 +57,12 @@ function addressingError(input) {
 // The validated request for an operation, or a stop saying why not.
 export function requestOf(operation, input) {
   const addressed = operation === "abandon" && input.profile !== undefined;
+  // A lost workspace's assignment is ended from the integration checkout; an
+  // existing owned workspace supplies its own repository access, and a
+  // supplied integration checkout only gets a local refresh.
   const required = addressed
-    ? ["profile", "target"]
+    ? ["profile", "target", "integration"]
     : ["workspace", "identity", "target"];
-  if (publishing.has(operation)) required.push("integration");
   for (const field of required)
     if (!input[field])
       return stop("invalid-request", { error: `missing ${field}` });

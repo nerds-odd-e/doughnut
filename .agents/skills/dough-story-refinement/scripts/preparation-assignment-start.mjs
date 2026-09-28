@@ -1,13 +1,13 @@
 // Publishes a queued story's preparation announcement before substantive
-// preparation, or continues the workspace's existing one. The announcement
-// commit adds only the assignment profile; the draft stays in the workspace.
+// preparation, or continues the workspace's existing one, first creating a
+// missing workspace at fetched trunk. The announcement commit adds only the
+// assignment profile; the draft stays in the workspace.
 import { mkdirSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import {
   agentIdentity,
   renderAgentProfile,
 } from "../../dough-product-backlog/scripts/product-backlog-agent-profile.mjs";
-import { queueHeading } from "../../dough-product-backlog/scripts/product-backlog-document.mjs";
 import {
   profileAllocation,
   selectAgent,
@@ -38,9 +38,12 @@ import {
   restoreAllocation,
   requestOf,
   stop,
-  storyListAt,
   workspaceAssignment,
 } from "./preparation-assignment-ownership.mjs";
+import {
+  fetchQueuedTrunk,
+  selectPreparationWorkspace,
+} from "./preparation-assignment-trunk.mjs";
 
 // Commits only the new profile on top of fetched trunk, from a clean
 // workspace whose history trunk already contains; nothing else is staged.
@@ -108,21 +111,19 @@ export async function startPreparation(input) {
   const requested = requestOf("start", input);
   if (!requested.ok) return requested;
   const { request } = requested;
-  const { workspace, remote, target, identity } = request;
+  const selected = await selectPreparationWorkspace(request);
+  if (!selected.ok) return selected;
+  const { selection } = selected;
+  const result = await announce(request);
+  return selection ? { ...result, selection } : result;
+}
+
+async function announce(request) {
+  const { workspace, remote, target } = request;
   const ref = remoteRef(request);
-  let base;
-  try {
-    await git(workspace, "fetch", "--quiet", remote);
-    base = await revParse(workspace, ref);
-  } catch (error) {
-    return stop("source-refused", { workspace, error: errorText(error) });
-  }
-  if ((await storyListAt(workspace, ref, identity)) !== queueHeading)
-    return stop("not-queued", {
-      workspace,
-      fetched: base,
-      error: `${identity} is not queued on ${ref}`,
-    });
+  const trunk = await fetchQueuedTrunk(workspace, request);
+  if (!trunk.ok) return trunk;
+  let base = trunk.fetched;
   const recorded = recordedAllocation(workspace);
   const found = await workspaceAssignment(request, ref, recorded);
   if (found.state === "held") {

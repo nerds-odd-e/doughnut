@@ -1,6 +1,8 @@
 // Settle one unpublished Trunk closure SHA: resume when already on remote,
 // publish through publishExecutionIncrement when the owned tip still holds it,
-// or stop with recoverable context. Resume orchestration stays in
+// or stop with recoverable context. Inspection runs from the owned workspace,
+// or from the repository's management context once that workspace is gone,
+// against the authorized remote target. Resume orchestration stays in
 // closure-publication.mjs.
 import { existsSync } from "node:fs";
 import { publishExecutionIncrement } from "../../dough-execute-plan/scripts/execution-increment-publication.mjs";
@@ -8,7 +10,7 @@ import {
   git,
   originTrackingRef,
   revParse,
-} from "../../dough-execute-plan/scripts/publication-test-fixtures.mjs";
+} from "../../dough-execute-plan/scripts/publication-git.mjs";
 import { resumeInterruptedPublication } from "../../dough-execute-plan/scripts/publication-resume.mjs";
 import { findWorktree, isAncestor, trunkTarget } from "./closure-resources.mjs";
 
@@ -33,16 +35,28 @@ function stoppedClosurePublish(published) {
   };
 }
 
-async function ownedWorkspaceAvailable(integration, ownedWorkspace) {
-  if (await findWorktree(integration, ownedWorkspace)) {
+async function ownedWorkspaceAvailable(repository, ownedWorkspace) {
+  if (repository && (await findWorktree(repository, ownedWorkspace))) {
     return true;
   }
   return existsSync(ownedWorkspace);
 }
 
+function stoppedBeforeRemote(reason) {
+  return {
+    classification: "stopped",
+    stopped: true,
+    completedObligation: "publish",
+    pushCount: 0,
+    acceptedSha: null,
+    cleanup: "not-performed",
+    reason,
+  };
+}
+
 export async function settleClosureCandidate({
   ownedWorkspace,
-  integration,
+  repository,
   defaultCheckout,
   branch,
   sha,
@@ -53,57 +67,54 @@ export async function settleClosureCandidate({
   validate,
   validatedCandidate,
   backlogPath,
+  remote = "origin",
+  targetRef = trunkTarget,
 }) {
   const workspaceReady = await ownedWorkspaceAvailable(
-    integration,
+    repository,
     ownedWorkspace,
   );
-  const inspectionWorkspace = workspaceReady ? ownedWorkspace : integration;
-  await git(inspectionWorkspace, "fetch", "origin");
-  const tracking = originTrackingRef(trunkTarget);
+  if (!workspaceReady && !repository) {
+    return stoppedBeforeRemote(
+      "execution worktree and management context are both absent",
+    );
+  }
+  const inspectionWorkspace = workspaceReady ? ownedWorkspace : repository;
+  await git(inspectionWorkspace, "fetch", remote);
+  const tracking = originTrackingRef(targetRef, remote);
   const remoteTip = await revParse(inspectionWorkspace, tracking);
   const onRemote = await isAncestor(inspectionWorkspace, sha, tracking);
   if (!workspaceReady && !onRemote) {
-    return {
-      classification: "stopped",
-      stopped: true,
-      completedObligation: "publish",
-      pushCount: 0,
-      acceptedSha: null,
-      cleanup: "not-performed",
-      reason: "execution worktree is absent before closure is on remote trunk",
-    };
+    return stoppedBeforeRemote(
+      "execution worktree is absent before closure is on remote trunk",
+    );
   }
   const canFastForward =
     onRemote || (await isAncestor(inspectionWorkspace, remoteTip, sha));
   if (canFastForward) {
     return resumeInterruptedPublication({
-      ownedWorkspace: workspaceReady ? ownedWorkspace : integration,
+      ownedWorkspace: inspectionWorkspace,
       defaultCheckout,
       candidateSha: sha,
       supersededShas,
       publishedRevisions,
       observer,
-      targetRef: trunkTarget,
+      targetRef,
+      remote,
     });
   }
   const tip = await revParse(ownedWorkspace, branch);
   if (tip !== sha) {
-    return {
-      classification: "stopped",
-      stopped: true,
-      completedObligation: "publish",
-      pushCount: 0,
-      acceptedSha: null,
-      cleanup: "not-performed",
-      reason: "unpublished closure needs rebase and is not the branch tip",
-    };
+    return stoppedBeforeRemote(
+      "unpublished closure needs rebase and is not the branch tip",
+    );
   }
   const published = await publishExecutionIncrement({
     workspace: ownedWorkspace,
     branch,
     previouslyPublishedBase,
-    targetRef: trunkTarget,
+    targetRef,
+    remote,
     register: registerClosureReceipt(observer),
     validate,
     validatedCandidate,

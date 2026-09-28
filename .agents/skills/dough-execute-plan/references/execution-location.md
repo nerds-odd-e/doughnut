@@ -25,8 +25,10 @@ base it supplies:
   workspace path and authority to the installed startup operation.
   It uses fetched remote trunk as the base, confirms the Taken claim there, and
   returns a compact result with the accepted claim SHA and recovery coordinates
-  for the workspace you supplied. A conflicting or ambiguous claim stops
-  implementation; identical **Taken** text alone proves no ownership.
+  for the workspace you supplied. Without an integration checkout, supply an
+  existing owned worktree, as [Take or admit work](../SKILL.md#take-or-admit-work)
+  describes. A conflicting or ambiguous claim stops implementation; identical
+  **Taken** text alone proves no ownership.
 - [One-shot work](one-shot.md) supplies the same path and authority with
   `--one-shot`; the operation bases the workspace on fetched remote trunk and
   publishes nothing.
@@ -45,9 +47,9 @@ publish the claim or refresh the default checkout; those stay with
 
 Record the local checkout role and target selection through that reference,
 using the actual established paths. The originating checkout path, the
-execution checkout path and branch, and the integration checkout path are
-separate local roles. The authorized remote target is target selection and is
-not one of those paths.
+execution checkout path and branch, and the integration checkout path, when
+one exists, are separate local roles. The authorized remote target is target
+selection and is not one of those paths.
 
 After the selected checkout exists, and after a claim's SHA is confirmed
 on the authorized remote when this execution publishes one, prepare the checkout

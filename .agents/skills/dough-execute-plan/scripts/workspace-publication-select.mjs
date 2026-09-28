@@ -66,13 +66,23 @@ async function verifyRetained(request) {
 
 // A supplied `base` is fetched trunk the caller already reset the workspace
 // to, such as a carried escalation's park; it is used without fetching again.
+// `repository` is the Git context for fetching and creating the workspace; it
+// is required so that Git never falls back to the process working directory.
 export async function selectOwnedWorkspace(request) {
   if (request.retained?.workspace) return verifyRetained(request);
+  if (!request.repository)
+    return stopped("setup-failed", {
+      recovery: {
+        workspace: request.workspace,
+        branch: request.branch,
+        error: "workspace selection needs a repository",
+      },
+    });
   try {
     let { base } = request;
     if (!base) {
-      await git(request.integration, "fetch", remoteOf(request));
-      base = await revParse(request.integration, remoteRef(request));
+      await git(request.repository, "fetch", remoteOf(request));
+      base = await revParse(request.repository, remoteRef(request));
     }
     if (existsSync(request.workspace)) {
       const actual = await revParse(request.workspace, "--show-toplevel");
@@ -106,7 +116,7 @@ export async function selectOwnedWorkspace(request) {
       };
     }
     await git(
-      request.integration,
+      request.repository,
       "worktree",
       "add",
       "-b",

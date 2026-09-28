@@ -51,10 +51,10 @@ async function startRequested(request) {
   let selectedSource, fetched, origin;
   try {
     origin = (
-      await git(request.integration, "remote", "get-url", remote)
+      await git(request.repository, "remote", "get-url", remote)
     ).stdout.trim();
-    await git(request.integration, "fetch", remote);
-    fetched = await revParse(request.integration, ref);
+    await git(request.repository, "fetch", remote);
+    fetched = await revParse(request.repository, ref);
     selectedSource = await source.read(request, ref);
     if (request.retained) await source.retainedBasis?.(request, selectedSource);
   } catch (error) {
@@ -63,8 +63,8 @@ async function startRequested(request) {
   if (source.oneShot) return prepareOneShot(request, origin, fetched);
   if (selectedSource.existing && !request.retained)
     return existingClaim(request, ref, selectedSource);
-  // The rotation is read in the integration checkout, which fetched trunk.
-  const selection = { ...request, cwd: request.integration };
+  // The rotation is read in the repository, which fetched trunk.
+  const selection = { ...request, cwd: request.repository };
   let agent;
   if (!request.retained) {
     const chosen = await selectAgent(selection, ref, backlogPath, { fetched });
@@ -163,7 +163,7 @@ async function startRequested(request) {
     ...claimRequest,
     candidateSha: committed.candidateSha,
     async recheckSource({ candidateSha }) {
-      await git(request.integration, "fetch", remote);
+      await git(request.repository, "fetch", remote);
       const refreshed = await source.read(request, ref, candidateSha);
       if (source.changed(refreshed, selectedSource)) {
         throw new Error(

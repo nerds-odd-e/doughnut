@@ -178,9 +178,9 @@ and continue that unfinished obligation only.
    Do not run a separate observer probe, start, or `register-push` for this
    managed path, and do not copy mailbox directories by hand. A pending human
    edit on that checkout stays out of the published commit.
-   When the selected checkout is the default checkout, apply
-   [default-checkout preservation](maintain-default-checkout.md#preserve-pending-local-work)
-   before mutating it. A local commit or a local merge stays a local
+   When the selected checkout is the default checkout, follow its
+   [direct edit](maintain-default-checkout.md#direct-edit) checks before
+   mutating it. A local commit or a local merge stays a local
    operation; do not report it as remote publication. Codex, Cursor, and
    Claude keep the recorded checkout and authorized target their existing
    adapters already supply. A rejected push follows

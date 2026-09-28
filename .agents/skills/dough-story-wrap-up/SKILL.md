@@ -43,8 +43,8 @@ Resolve from this project, not this skill's location:
 - optional retrospective advice when present, including an empty result, and
   the product advice in the plan's [execution-complete record](../dough-execute-plan/references/finish-or-stop.md#record-execution-completion);
 - Git commit conventions used to preserve a recoverable revision;
-- selected mode and available originating checkout, execution checkout and
-  branch, and integration-target identity;
+- selected mode, execution checkout and branch, authorized remote and target
+  branch, and an originating or default checkout only when one is available;
 - the product backlog path when a **Taken** or **Backlog list** entry points
   at the selected work; and
 - shared records that name the selected work: its seed when applicable, process
@@ -52,10 +52,12 @@ Resolve from this project, not this skill's location:
   incoming links, and assessment records.
 
 Before deleting a plan that carries planned-execution identity, retain the
-resolved mode and checkout, branch, and target values in the coordinator's
-available execution context for the remaining wrap-up actions and report. Do not
-create a parallel registry. Missing identity needed by a later action stops that
-action instead of reconstructing or guessing it after plan deletion.
+resolved mode, checkout, branch, remote, target, and the execution checkout's
+[management context](../dough-land/SKILL.md#retire-the-worktree) in the
+coordinator's available execution context for the remaining wrap-up actions and
+report. Do not create a parallel registry. Missing identity needed by a later
+action stops that action instead of reconstructing or guessing it after plan
+deletion.
 
 ## Establish execution completion
 
@@ -200,7 +202,7 @@ Save the final-closure tip already published on the remote execution branch.
 Follow [Story Branch integration observation](../dough-execute-plan/references/trunk-publication.md#observe-story-branch-integration)
 for the target transition, publication, and shared completion on the accepted
 integrated SHA. Its publication uses [Preserve published history](../dough-execute-plan/references/publish-the-candidate.md#preserve-published-history)
-from the owned execution workspace, excluding the integration checkout's
+from the owned execution workspace, excluding any default checkout's
 unrelated commits and pending human edit.
 
 When the merge touches the product backlog, use the owned workspace's installed
@@ -223,19 +225,20 @@ Wrap-up's gate: the final accepted publication (Trunk Mode's final closure, or
 Story Branch Mode's integrated SHA) has a completion receipt whose shutdown is
 confirmed, and no active checkout-bound observer still hosts the worktree under
 [preserve pending local work](../dough-execute-plan/references/maintain-default-checkout.md#preserve-pending-local-work).
-Trunk Mode publishes no remote execution branch and never deletes one. A
-deferred [refresh](../dough-land/SKILL.md#refresh-the-default-checkout) does
-not block retirement. Report blocked or partial cleanup without repeating
+Trunk Mode publishes no remote execution branch and never deletes one. A not
+applicable or deferred [refresh](../dough-land/SKILL.md#refresh-the-default-checkout)
+does not block retirement. Report blocked or partial cleanup without repeating
 already-completed closure. Skip cleanup in direct-current-branch mode.
 
 ## Report
 
 Report selected work and identity, completion judgment, mode and retained
-checkout/branch/target, before-cleanup and final-closure commits when deletion
-happened, Trunk Mode published closure SHAs, the completion receipt (CI verdict
-or exact unresolved reason with shutdown evidence), remaining CI coverage,
-assimilated knowledge, deleted paths, Story Branch saved tip and
-integration/push results when the target is `main`, worktree and branch cleanup
+checkout/branch/remote/target, before-cleanup and final-closure commits when
+deletion happened, Trunk Mode published closure SHAs, the
+completion receipt (CI verdict or exact unresolved reason with shutdown
+evidence), remaining CI coverage, assimilated knowledge, deleted paths, Story
+Branch saved tip and integration/push results to the authorized trunk target,
+each refresh result (including not applicable), worktree and branch cleanup
 results (remote deletion only when verified absent), preserved material and
 resources, and any gap. Distinguish a new merge from an already-integrated tip,
 integration from refused cleanup, an accepted trunk receipt from a superseded

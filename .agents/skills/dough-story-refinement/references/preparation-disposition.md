@@ -120,7 +120,8 @@ Reuse the local checkout role and the target
 selection recorded in
 [Select or reuse the workspace](preparation-workspace.md#select-or-reuse-the-workspace).
 The owned workspace is the worktree to land.
-The integration checkout path is the default checkout Dough Land refreshes.
+The recorded integration checkout, when there is one, is the default checkout
+Dough Land may refresh; with none recorded, its refresh is not applicable.
 The authorized remote target is the publication destination.
 The checkout is not a stage the candidate must pass through.
 Dough Land owns committing, publishing, refreshing the default checkout,

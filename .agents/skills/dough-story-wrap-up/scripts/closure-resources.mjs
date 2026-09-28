@@ -1,11 +1,15 @@
 // Git mechanics for wrap-up's execution-resource cleanup: Dough Land
 // "Retire the worktree" behind wrap-up's gate (confirmed completion receipt,
-// no checkout-bound observer). Trunk Mode passes no remote execution branch.
+// no checkout-bound observer), run from the repository management context and
+// judged against the authorized remote target; no default checkout is needed.
+// Trunk Mode passes no remote execution branch.
 import { existsSync, realpathSync } from "node:fs";
 import {
   git,
   lsRemoteSha,
-} from "../../dough-execute-plan/scripts/publication-test-fixtures.mjs";
+  originTrackingRef,
+  resolveManagementContext,
+} from "../../dough-execute-plan/scripts/publication-git.mjs";
 
 export const trunkTarget = "refs/heads/main";
 
@@ -37,8 +41,8 @@ async function refExists(repo, ref) {
   }
 }
 
-export async function findWorktree(integration, execution) {
-  const { stdout } = await git(integration, "worktree", "list", "--porcelain");
+export async function findWorktree(repository, execution) {
+  const { stdout } = await git(repository, "worktree", "list", "--porcelain");
   const wanted = canonical(execution);
   const blocks = stdout.split("\n\n").filter((block) => block.trim() !== "");
   for (const block of blocks) {
@@ -72,13 +76,14 @@ function preserved(reason, execution, branch) {
   };
 }
 
-function cleaned(worktree, branch) {
+function cleaned(worktree, branch, repository) {
   return {
     removed: true,
     partial: false,
     worktree,
     branch,
     reason: null,
+    repository,
   };
 }
 
@@ -104,13 +109,13 @@ function hostsThisWorktree(observer, execution) {
   return canonical(observer.checkout) === canonical(execution);
 }
 
-function bothRegistered(observer, closureShas) {
+function bothRegistered(observer, closureShas, targetRef) {
   return (
     observer?.bound === true &&
     observer.stopped === true &&
     closureShas.every((sha) =>
       observer.receipts.some(
-        (receipt) => receipt.sha === sha && receipt.target === trunkTarget,
+        (receipt) => receipt.sha === sha && receipt.target === targetRef,
       ),
     )
   );
@@ -130,13 +135,15 @@ async function everyAncestor(workspace, shas, descendant) {
 }
 
 export async function removeExecutionResources({
-  integration,
+  repository,
   execution,
   branch,
   observer,
   sessionOwned,
   closureShas,
   remoteBranch,
+  remote = "origin",
+  targetRef = trunkTarget,
 }) {
   if (hostsThisWorktree(observer, execution)) {
     return preserved("active checkout-bound observer", execution, branch);
@@ -144,11 +151,12 @@ export async function removeExecutionResources({
   if (sessionOwned !== true) {
     return preserved("another workspace", execution, branch);
   }
-  const listed = await findWorktree(integration, execution);
-  if (!listed && existsSync(execution)) {
-    return preserved("ambiguous checkout", execution, branch);
+  const management = await resolveManagementContext(repository, execution);
+  if (!management) {
+    return preserved("management context unavailable", execution, branch);
   }
-  if (listed && listed.branch === null) {
+  const listed = await findWorktree(management, execution);
+  if ((!listed && existsSync(execution)) || listed?.branch === null) {
     return preserved("ambiguous checkout", execution, branch);
   }
   if (listed && listed.branch !== branch) {
@@ -160,22 +168,20 @@ export async function removeExecutionResources({
       return preserved("dirty checkout", execution, branch);
     }
   }
-  await git(integration, "fetch", "origin");
+  await git(management, "fetch", remote);
+  const tracking = originTrackingRef(targetRef, remote);
   const remoteExecutionBranch =
     typeof remoteBranch === "string" && remoteBranch !== "" ? remoteBranch : "";
-  const originUrl = remoteExecutionBranch
-    ? (await git(integration, "remote", "get-url", "origin")).stdout.trim()
-    : "";
   const remoteRef = remoteExecutionBranch
     ? `refs/heads/${remoteExecutionBranch}`
     : "";
   const remoteTip = remoteExecutionBranch
-    ? await lsRemoteSha(originUrl, remoteRef)
+    ? await lsRemoteSha(remote, remoteRef, management)
     : "";
   if (
     remoteExecutionBranch &&
     remoteTip &&
-    !(await isAncestor(integration, remoteTip, "origin/main"))
+    !(await isAncestor(management, remoteTip, tracking))
   ) {
     return preserved(
       "remote execution tip is not integrated",
@@ -187,20 +193,20 @@ export async function removeExecutionResources({
   const published =
     (remoteExecutionBranch ? shas.length >= 1 : shas.length === 2) &&
     shas.every((sha) => isNonEmpty(sha)) &&
-    (await everyAncestor(integration, shas, "origin/main"));
+    (await everyAncestor(management, shas, tracking));
   const branchRef = `refs/heads/${branch}`;
-  const branchPresent = await refExists(integration, branchRef);
+  const branchPresent = await refExists(management, branchRef);
   const branchContained =
-    branchPresent && (await isAncestor(integration, branch, "origin/main"));
+    branchPresent && (await isAncestor(management, branch, tracking));
   if (!published || (branchPresent && !branchContained)) {
     return preserved("unique unpublished work", execution, branch);
   }
-  if (!bothRegistered(observer, shas)) {
+  if (!bothRegistered(observer, shas, targetRef)) {
     return preserved("observer obligation unfinished", execution, branch);
   }
   if (listed) {
-    await git(integration, "worktree", "remove", execution);
-    if (await findWorktree(integration, execution)) {
+    await git(management, "worktree", "remove", execution);
+    if (await findWorktree(management, execution)) {
       return unverifiedRemoval(
         "worktree removal was not verified",
         execution,
@@ -211,9 +217,9 @@ export async function removeExecutionResources({
     }
   }
   if (branchPresent) {
-    await git(integration, "branch", "--set-upstream-to=origin/main", branch);
-    await git(integration, "branch", "-d", branch);
-    if (await refExists(integration, branchRef)) {
+    await git(management, "branch", `--set-upstream-to=${tracking}`, branch);
+    await git(management, "branch", "-d", branch);
+    if (await refExists(management, branchRef)) {
       return unverifiedRemoval(
         "local branch removal was not verified",
         execution,
@@ -224,8 +230,8 @@ export async function removeExecutionResources({
     }
   }
   if (remoteExecutionBranch && remoteTip) {
-    await git(integration, "push", "origin", "--delete", remoteExecutionBranch);
-    if (await lsRemoteSha(originUrl, remoteRef)) {
+    await git(management, "push", remote, "--delete", remoteExecutionBranch);
+    if (await lsRemoteSha(remote, remoteRef, management)) {
       return unverifiedRemoval(
         "remote branch removal was not verified",
         execution,
@@ -238,5 +244,6 @@ export async function removeExecutionResources({
   return cleaned(
     listed ? "removed" : "already-absent",
     branchPresent ? "removed" : "already-absent",
+    management,
   );
 }

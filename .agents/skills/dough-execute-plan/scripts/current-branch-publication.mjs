@@ -7,43 +7,14 @@
 // Installed guidance is the agent's contract.
 import { realpathSync } from "node:fs";
 import { publishExecutionIncrement } from "./execution-increment-publication.mjs";
-import {
-  declaredOwnerRefusal,
-  refreshDefaultCheckout,
-} from "./maintain-default-checkout.mjs";
-import {
-  git,
-  recordedCheckoutIdentity,
-  revParse,
-} from "./publication-test-fixtures.mjs";
+import { refreshDefaultCheckout } from "./maintain-default-checkout.mjs";
+import { git, recordedCheckoutIdentity, revParse } from "./publication-git.mjs";
 
 function sameCheckout(left, right) {
   if (!left || !right) {
     return false;
   }
   return realpathSync(left) === realpathSync(right);
-}
-
-function preserved(reason) {
-  return {
-    ok: false,
-    classification: "local",
-    publication: "pending",
-    report: "preserved",
-    receipt: null,
-    maintenance: { result: "deferred", reason },
-  };
-}
-
-function ownerAccess(request) {
-  const refusal = declaredOwnerRefusal(
-    request.declaredOwner,
-    request.requester,
-  );
-  if (refusal) {
-    return preserved(refusal);
-  }
-  return { ok: true };
 }
 
 async function assertStayed(checkout, before) {
@@ -88,16 +59,6 @@ function pending(operation, sha, checkout, branch) {
 export async function deliverRecordedCheckout(request) {
   const { checkout, operation } = request;
   const before = await recordedCheckoutIdentity(checkout);
-  const onDefault = sameCheckout(checkout, request.defaultCheckout);
-
-  if (onDefault) {
-    const access = ownerAccess(request);
-    if (!access.ok) {
-      await assertStayed(checkout, before);
-      return { ...access, checkout: before.toplevel, branch: before.branch };
-    }
-  }
-
   const sha =
     operation === "merge"
       ? await mergeLocal(checkout, request.mergeRef, request.message)
@@ -140,11 +101,9 @@ export async function deliverRecordedCheckout(request) {
       maintenance: null,
     };
   }
-  const maintenance = onDefault
+  const maintenance = sameCheckout(checkout, request.defaultCheckout)
     ? await refreshDefaultCheckout({
         checkout,
-        declaredOwner: request.declaredOwner,
-        requester: request.requester,
         integrationBranch: request.integrationBranch ?? "main",
       })
     : null;

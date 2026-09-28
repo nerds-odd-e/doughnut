@@ -9,7 +9,7 @@ export { startExecution } from "./execution-start-operation.mjs";
 function argumentsOf(argv) {
   if (argv[0] !== "start")
     throw new Error(
-      "usage: execution-start.mjs start --integration PATH --workspace PATH --branch NAME [--identity ID] [--publisher-id ID] --mode trunk|story-branch --remote NAME --target BRANCH --push-authorized --workspace-authorized [--admit --link HREF --title TEXT [--carry] | --one-shot] [--plan PATH] [--host claude|codex|cursor] [--model TEXT] [--declared-owner ID --requester ID] [--starting-revision SHA --candidate-sha SHA]",
+      "usage: execution-start.mjs start [--integration PATH] --workspace PATH --branch NAME [--identity ID] [--publisher-id ID] --mode trunk|story-branch --remote NAME --target BRANCH --push-authorized --workspace-authorized [--admit --link HREF --title TEXT [--carry] | --one-shot] [--plan PATH] [--host claude|codex|cursor] [--model TEXT] [--declared-owner ID --requester ID] [--starting-revision SHA --candidate-sha SHA]",
     );
   const result = {};
   for (let index = 1; index < argv.length; index += 1) {

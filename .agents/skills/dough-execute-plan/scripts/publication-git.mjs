@@ -1,6 +1,7 @@
 // Git operations shared by the installed publication commands. Test fixtures
 // import these mechanics, but production never imports fixture setup.
 import { execFile } from "node:child_process";
+import { existsSync } from "node:fs";
 import { promisify } from "node:util";
 
 export const exec = promisify(execFile);
@@ -30,6 +31,50 @@ export function targetBranchName(targetRef) {
 // Authorized publication target as the workspace's remote-tracking ref.
 export function originTrackingRef(targetRef, remote = "origin") {
   return `${remote}/${targetBranchName(targetRef)}`;
+}
+
+// The repository management context: its shared Git directory, read from a
+// worktree that still exists. Retirement runs from there, so removing the
+// repository's last worktree leaves fetch, containment, and branch deletion
+// usable without a default checkout.
+export async function managementContext(worktree) {
+  return (
+    await git(
+      worktree,
+      "rev-parse",
+      "--path-format=absolute",
+      "--git-common-dir",
+    )
+  ).stdout.trim();
+}
+
+// The retained management context when supplied, otherwise the one recorded
+// from the worktree; null when neither is available.
+export async function resolveManagementContext(repository, worktree) {
+  if (typeof repository === "string" && repository !== "") {
+    return repository;
+  }
+  if (worktree && existsSync(worktree)) {
+    return managementContext(worktree);
+  }
+  return null;
+}
+
+// Identity of a recorded checkout that current-branch work must not change:
+// its top level, current branch, and the repository's worktree list.
+export async function recordedCheckoutIdentity(checkout) {
+  const porcelain = (await git(checkout, "worktree", "list", "--porcelain"))
+    .stdout;
+  return {
+    toplevel: await revParse(checkout, "--show-toplevel"),
+    branch: (await git(checkout, "branch", "--show-current")).stdout.trim(),
+    worktrees: porcelain
+      .split("\n")
+      .filter(
+        (line) => line.startsWith("worktree ") || line.startsWith("branch "),
+      )
+      .join("\n"),
+  };
 }
 
 export async function pushExactRef(workspace, sha, remote, targetRef) {
@@ -92,19 +137,25 @@ export function maintenanceFromInspection(checkoutState, remoteSha) {
   return "deferred";
 }
 
+// Without a supplied default checkout there is nothing to inspect. A supplied
+// checkout that cannot be read is deferred; the acceptance stands.
 export async function inspectDefaultCheckoutMaintenance(
   workspace,
   defaultCheckout,
   remote,
   targetRef,
 ) {
-  if (!defaultCheckout) return null;
+  if (!defaultCheckout) return "not applicable";
   const remoteTip = await revParse(
     workspace,
     originTrackingRef(targetRef, remote),
   );
-  return maintenanceFromInspection(
-    await inspectCheckout(defaultCheckout),
-    remoteTip,
-  );
+  try {
+    return maintenanceFromInspection(
+      await inspectCheckout(defaultCheckout),
+      remoteTip,
+    );
+  } catch {
+    return "deferred";
+  }
 }
