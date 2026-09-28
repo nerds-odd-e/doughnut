@@ -3,18 +3,19 @@ name: dough-execution-retrospective
 description: >-
   Reviews planned, completed planless quick, or quick-to-planned execution against
   original intent, aggregate commits, current whole-product architecture, and tests,
-  including after cleanup; process review needs available agent history. Use for
-  execution retrospective, product review, or backlog
-  recommendations from current/supplied history. Supports `--skip-process`, `--skip-product`,
-  and project `skipProcessRetrospective` preference. May plan corrections, record process
-  findings in `DearDough.md` (500-line warning, 1,000-line ceiling, recoverable lower-priority
-  replacement on overflow), and recommend product work; never implements findings.
+  including after cleanup. Process review is opt-in: it runs only when the project sets
+  `skipProcessRetrospective: false` or the request asks to include it, and needs available
+  agent history. Use for execution retrospective, product review, or backlog
+  recommendations from current/supplied history. Supports `--skip-process` and `--skip-product`.
+  May plan corrections, record process findings in `DearDough.md` (500-line warning, 1,000-line
+  ceiling, recoverable lower-priority replacement on overflow), and recommend product work; never
+  implements findings.
 ---
 
 # Review an execution
 
-Review implementation, process, and product learning by default. Return evidence and needed
-correction plans; do not implement, commit, push, or change the backlog. Leave closure to
+Review implementation and product learning by default, and process when enabled. Return evidence
+and needed correction plans; do not implement, commit, push, or change the backlog. Leave closure to
 [dough-story-wrap-up](../dough-story-wrap-up/SKILL.md).
 
 An execution retrospective may start once implementation is delivered while its
@@ -35,8 +36,9 @@ reviews retain their authority, implementation planning, and direction considera
 
 Read this project's optional `<established-planning-directory>/open-dough.json` (default:
 `<project-root>/.planning/open-dough.json`), not a skill-local or other project's file.
-Expect a JSON object with optional boolean `skipProcessRetrospective`: missing file/key or
-`false` enables process; `true` skips. Ignore unknown keys; never create, rewrite, or repair it.
+Expect a JSON object with optional boolean `skipProcessRetrospective`: `false` enables process;
+missing file/key or `true` skips it like `--skip-process`. Ignore unknown keys; never create,
+rewrite, or repair it.
 
 Explicit process selection overrides storage, including errors: `--skip-process` skips;
 an include-process request enables without a new flag. Clarify contradictory instructions.
