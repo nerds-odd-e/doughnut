@@ -153,6 +153,13 @@ stand-in holds off the deadline.
   has the same kind of race at a wider margin and is left open: fixing it needs
   a design choice about how the stand-in holds off the deadline.
 
+- CI repair after slice 3 (runs 36374442307, 36374566718): the browser's
+  smooth scroll can start several frames after `scrollIntoView`, so settling on
+  two unchanged frames read `scrollTop` before the scroll began. The reveal
+  assertions now wait until the scroll has settled and the whole row is
+  visible. The product sort is a synchronous computed, so the reveal already
+  aims at the reordered row.
+
 ## Considered and excluded
 
 - An E2E scenario: the defect and the fix live entirely inside the `Sidebar`

@@ -77,6 +77,14 @@ describe("Sidebar row reveal", () => {
     return scrollTopBefore
   }
 
+  function expectWholeRowRevealed(title: string) {
+    return vi.waitFor(async () => {
+      const scrollTop = await settledScrollTop()
+      expect(isWholeRowVisible(title)).toBe(true)
+      return scrollTop
+    })
+  }
+
   async function openNoteThirtyInFortyNoteFolder() {
     const { folder, notes } = fortyNotesInOneFolder()
     const noteStore = useNoteStore()
@@ -95,10 +103,7 @@ describe("Sidebar row reveal", () => {
       active,
       active.notebookRealm.notebook.id
     )
-    await vi.waitFor(async () => {
-      await settledScrollTop()
-      expect(isWholeRowVisible(noteTitle(30))).toBe(true)
-    })
+    await expectWholeRowRevealed(noteTitle(30))
     return notes
   }
 
@@ -109,7 +114,6 @@ describe("Sidebar row reveal", () => {
       .querySelector<HTMLButtonElement>('button[title="Title (Z–A)"]')!
       .click()
     await flushPromises()
-    return settledScrollTop()
   }
 
   async function scrollTreeBy(offset: number) {
@@ -122,7 +126,6 @@ describe("Sidebar row reveal", () => {
       activeNoteRealm: note,
       breadcrumbFolders: note.ancestorFolders ?? [],
     })
-    return settledScrollTop()
   }
 
   it("shows the whole opened note row with nothing drawn over it", async () => {
@@ -141,9 +144,9 @@ describe("Sidebar row reveal", () => {
     )
     expect(isWholeRowVisible("Note 31")).toBe(false)
 
-    const scrollTopAfter = await activate(notes[30]!)
+    await activate(notes[30]!)
+    const scrollTopAfter = await expectWholeRowRevealed("Note 31")
 
-    expect(isWholeRowVisible("Note 31")).toBe(true)
     expect(Math.abs(scrollTopAfter - scrollTopBefore)).toBeLessThan(row.height)
   })
 
@@ -156,8 +159,7 @@ describe("Sidebar row reveal", () => {
     expect(isWholeRowVisible("Note 31")).toBe(false)
 
     await activate(notes[30]!)
-
-    expect(isWholeRowVisible("Note 31")).toBe(true)
+    await expectWholeRowRevealed("Note 31")
   })
 
   it("does not scroll when the newly active row is already fully visible", async () => {
@@ -168,7 +170,9 @@ describe("Sidebar row reveal", () => {
     )
     expect(isWholeRowVisible("Note 25")).toBe(true)
 
-    expect(await activate(notes[24]!)).toBe(scrollTopBefore)
+    await activate(notes[24]!)
+
+    expect(await settledScrollTop()).toBe(scrollTopBefore)
   })
 
   it("reveals the whole active row after re-sorting", async () => {
@@ -179,6 +183,6 @@ describe("Sidebar row reveal", () => {
     expect(rowRect("Note 31").bottom).toBeLessThanOrEqual(
       rowRect("Note 30").top
     )
-    expect(isWholeRowVisible("Note 30")).toBe(true)
+    await expectWholeRowRevealed("Note 30")
   })
 })
