@@ -33,7 +33,7 @@ The project uses Flyway for database migrations, configured in Spring Boot.
 
 * Versions use a numerical format
 
-The project uses versioned files named `V{number}__{description}.sql`. The current full application DDL is collapsed into **`V100000000__baseline.sql`**; the upgrade migrations after it run in order on every install, and **`V300000351__db_migration_placeholder.sql`** is the newest file: a no-op tip placeholder above every version ever applied. Versions **`300000330`** and **`300000339`** are retired — their migrations were deleted after production applied them — and stay reserved in `flyway_schema_history`.
+The project uses versioned files named `V{number}__{description}.sql`. The current full application DDL is collapsed into **`V100000000__baseline.sql`**; the upgrade migrations after it run in order on every install, and **`V300000351__db_migration_placeholder.sql`** is the newest file: a no-op tip placeholder above every version ever applied. Versions **`300000330`**, **`300000339`**, and **`300000350`** are retired — their migrations were deleted after production applied them — and stay reserved in `flyway_schema_history`.
 
 New migrations need to use a **greater** version number than **`300000351`**.
 

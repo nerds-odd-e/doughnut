@@ -2369,12 +2369,12 @@
       },
       "fontSize": 12,
       "fontFamily": 4,
-      "text": "MySQL 8.4 doughnut_db (Cloud SQL, vector enabled)",
+      "text": "MySQL 8.4 doughnut_db (Cloud SQL)",
       "baseline": 11,
       "textAlign": "left",
       "verticalAlign": "top",
       "containerId": null,
-      "originalText": "MySQL 8.4 doughnut_db (Cloud SQL, vector enabled)"
+      "originalText": "MySQL 8.4 doughnut_db (Cloud SQL)"
     },
     {
       "type": "line",

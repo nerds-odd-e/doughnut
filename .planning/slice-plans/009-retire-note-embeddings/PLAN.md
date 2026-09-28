@@ -339,7 +339,15 @@ current positive backend contracts prove ordinary behavior.
 
 ### 10. Production embedding storage and settings are removed — R2
 Type: Behavior
-Status: planned
+Status: done — R2 = `v1.3.31` (owner-authorized) on main merge `aa6ae01a05` (first parent `ab08d6d046`, story
+tip `5034e1543d`); main CI `36389613406` success; Application Release `36390200576` admitted and deployed first
+attempt. Instance restarted 07:15:47Z with the new jar, `/api/healthcheck` 503 until 07:17:10Z then 200 at
+`aa6ae01a05` through 07:25Z, MIG stable. The app's own log does not reach Cloud Logging, so Flyway lines are not
+observable; D runs on `ApplicationReadyEvent` and a failure exits the JVM, so sustained health is the D/P evidence.
+Owner ran `gcloud sql instances patch doughnut-db --clear-database-flags` (`cloudsql_vector=on` was the only flag;
+the auto-mode classifier blocked Claude from running it); `describe` shows state RUNNABLE with no flags; app
+healthy afterwards (SPA 200, unauthenticated search 401). Vector setup notes removed from `docs/gcp/prod_env.md`
+and the deployment diagram label.
 Size: 3–5 minutes active; release/DB/configuration restart waits excepted.
 Proof: authorized R2 publication, Flyway D/P success in the serving instance's application log
 (`gcloud logging`), `gcloud sql instances describe` showing the removed flag, healthy instances and
@@ -359,7 +367,14 @@ remains unfinished.
 
 ### 11. Fresh installations use only current schema definitions
 Type: Behavior
-Status: planned
+Status: done — baseline `note_embeddings` block (18 lines) removed, `V300000350` deleted, generic tip `V300000351`
+kept, db-migration skill lists 350 as retired. B `backend:test_only` 2697 tests 0 failures (repair realigned the
+owned test DB: baseline checksum 183701009, 350 DELETED, tip 351); ERD unchanged. Rehearsal with the slice 2
+harness: retained schema built from pre-cleanup resources through D/P, then final resources → repair "Marked
+missing migrations as deleted, Aligned applied migration checksums", migrate 0, tip 351, repeat no-op, data
+checksums unchanged; fresh schema from final resources identical. Inventory `git grep -niE
+'embedding|note_embeddings|vector|semantic search' -- . ':!.planning' ':!pnpm-lock.yaml'` leaves only ADR 0004's
+independent "image embedding". No migrations exist above 351 on main, so no allocation freeze conflict arose.
 Size: 3–5 minutes active after rehearsal; fresh/upgrade/B runtime excepted.
 Proof: fresh schema and populated post-R2 upgrade converge through repair/migrate;
 B passes; ERD remains the current schema; final tracked-source inventory confirms

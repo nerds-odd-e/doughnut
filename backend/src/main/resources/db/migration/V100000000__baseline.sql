@@ -488,24 +488,6 @@ CREATE TABLE `note_creator` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Table structure for table `note_embeddings`
---
-
-DROP TABLE IF EXISTS `note_embeddings`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `note_embeddings` (
-  `id` bigint NOT NULL AUTO_INCREMENT,
-  `note_id` bigint NOT NULL,
-  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  `embedding_raw` varbinary(6144) NOT NULL,
-  PRIMARY KEY (`id`),
-  KEY `idx_note_embeddings_note_id` (`note_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=265 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
 -- Table structure for table `note_property_index`
 --
 
