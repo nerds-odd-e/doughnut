@@ -50,11 +50,9 @@ Three independent fixes, each with a known cause:
 
 ### 1. The Assimilate badge shows the due count at the icon's corner
 Type: Behavior
-Status: planned
-Proof: `tests/toolbars/MainMenu.spec.ts` and `tests/composables/useAssimilationCount.spec.ts`
-(run as in the premises table), then
-`pnpm cy:run --spec e2e_test/features/assimilation/assimilation_walkthrough.feature`,
-then one manual look at a note page at 1440px with notes due.
+Status: done
+Proof: `tests/toolbars/MainMenu.spec.ts` and `tests/composables/useAssimilationCount.spec.ts` (17 passed),
+and `pnpm cy:run --spec e2e_test/features/assimilation/assimilation_walkthrough.feature` (9 passed).
 
 Behavior:
 - 5 due, 128 unassimilated → the badge reads `5` with class `due-count` and

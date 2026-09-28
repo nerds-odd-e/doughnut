@@ -17,10 +17,6 @@ export function abbreviateCount(count: number): string {
   return `${rounded}${suffix}`
 }
 
-export function formatAssimilationBadge(due: number, total: number): string {
-  return `${abbreviateCount(due)}/${abbreviateCount(total)}`
-}
-
 export function assimilationBadgeTitle(due: number, total: number): string {
   return `${due} due today, ${total} total unassimilated`
 }

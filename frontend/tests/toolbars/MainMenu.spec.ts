@@ -112,13 +112,13 @@ describe("MainMenu navigation", () => {
 })
 
 describe("MainMenu assimilate due count", () => {
-  it("shows a combined due/total badge when there are due items", async () => {
+  it("shows due count badge when there are due items", async () => {
     mockAssimilationCount(5, 0, 128)
 
     const { getByText } = mountMainMenu()
     await flushPromises()
 
-    const badge = getByText("5/128")
+    const badge = getByText("5")
     expect(badge).toHaveClass("due-count")
     expect(badge).toHaveAttribute(
       "title",
@@ -129,11 +129,13 @@ describe("MainMenu assimilate due count", () => {
     ).not.toBeInTheDocument()
   })
 
-  it("does not show the badge when there is nothing due or backlogged", async () => {
-    const { queryByText } = mountMainMenu()
+  it("does not show the badge when nothing is due", async () => {
+    mockAssimilationCount(0, 0, 128)
+
+    const { container } = mountMainMenu()
     await flushPromises()
 
-    expect(queryByText("0/0")).not.toBeInTheDocument()
+    expect(container.querySelector(".due-count")).not.toBeInTheDocument()
   })
 
   it("calls getMenuData with timezone and refetches when user changes", async () => {
