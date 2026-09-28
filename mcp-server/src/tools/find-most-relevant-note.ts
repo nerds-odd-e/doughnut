@@ -9,20 +9,19 @@ const SearchNoteParamsSchema = z.object({
   query: z
     .string()
     .describe(
-      "Search query - can be keywords, questions, or concepts. AI will find semantically related notes even if exact words don't match."
+      'Search text matched against note titles and aliases, e.g. a note title or a keyword it contains.'
     ),
 })
 
 // Tool definition with co-located logic
 export const findMostRelevantNoteTool = createTool(
   'find_most_relevant_note',
-  `Searches across all accessible notes and returns the single most relevant note based on semantic similarity.
+  `Searches across all accessible notes and returns the single best note whose title or alias matches the query text.
 
 Search Behavior:
-- Searches through note titles and content using AI-powered semantic matching
+- Matches the query text against note titles and aliases
 - Covers all user's notebooks and subscribed notebooks
-- Returns only the single most relevant result
-- Uses embeddings to find conceptually related content, not just exact text matches
+- Returns only the single best-ranked result
 
 When to Use:
 - Finding existing information on a topic
@@ -34,7 +33,7 @@ Response Format:
 - If no relevant notes found, returns "No relevant note found."
 - Use the returned note ID with 'get_note_graph' for context and connections
 
-For broader search results, consider breaking down complex queries into specific concepts.`,
+For best results, search with a likely note title or a distinctive word from it.`,
   SearchNoteParamsSchema
 ).handle(async (_ctx, { query }) => {
   const searchTerm = {

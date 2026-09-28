@@ -230,7 +230,9 @@ still accepts old operations at this stopping point; slice 7 removes them.
 
 ### 5. MCP describes and returns literal search results
 Type: Behavior
-Status: planned
+Status: done
+Accepted proof: M (`mcp-server:test` 11 pass; bundle built), E `mcp_services.feature` 5/5.
+Only `find-most-relevant-note.ts` descriptions changed; no MCP doc made semantic claims.
 Size: 3–5 minutes active; M/E runtime excepted.
 Proof: M and E; actual MCP title query returns the existing note result.
 
