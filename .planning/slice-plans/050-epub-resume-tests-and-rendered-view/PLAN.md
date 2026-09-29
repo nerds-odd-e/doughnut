@@ -2,7 +2,8 @@
 
 **Identity:** SEED-059#story-13
 **Source:** [correction story](../../seeds/SEED-059-book-reading-uat-fixes.md#story-13), from the
-execution retrospective of SEED-059#story-1 (plan `049-epub-land-and-track-chosen-place`, original
+execution retrospective of SEED-059#story-1 (final plan
+`52e8d849e7:.planning/slice-plans/049-epub-land-and-track-chosen-place/PLAN.md`, original
 contract `e733844d01:.planning/slice-plans/049-epub-land-and-track-chosen-place/PLAN.md`; reviewed
 commits `485ed2eb49` slice 1 through `26c34d6649` slice 6 on `story/seed-059-story-1`).
 
