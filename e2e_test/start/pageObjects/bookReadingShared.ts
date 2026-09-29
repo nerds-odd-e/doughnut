@@ -73,3 +73,28 @@ export const ensureOnBookReadingPage = () => {
   cy.location('pathname').should('match', BOOK_READING_PATHNAME)
   cy.get('[data-testid="book-reading-page"]').should('exist')
 }
+
+/** The element spans at least 90% of the window width (phone-width reading). */
+export const expectUsesScreenWidth = (selector: string) => {
+  cy.window().then((win) => {
+    cy.get(selector)
+      .first()
+      .should(($el) => {
+        const { width } = ($el[0] as HTMLElement).getBoundingClientRect()
+        expect(width, `${selector} width`).to.be.at.least(win.innerWidth * 0.9)
+      })
+  })
+}
+
+/** The element lies entirely inside the window. */
+export const expectFullyOnScreen = (selector: string) => {
+  cy.window().then((win) => {
+    cy.get(selector).should(($el) => {
+      const r = ($el[0] as HTMLElement).getBoundingClientRect()
+      expect(r.left, `${selector} left`).to.be.at.least(0)
+      expect(r.top, `${selector} top`).to.be.at.least(0)
+      expect(r.right, `${selector} right`).to.be.at.most(win.innerWidth)
+      expect(r.bottom, `${selector} bottom`).to.be.at.most(win.innerHeight)
+    })
+  })
+}

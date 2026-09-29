@@ -62,3 +62,11 @@ Then(
     return bookReadingPage().expectEpubReadingControlPanelContentAnchored()
   }
 )
+
+Then(
+  'the EPUB text should use the screen width',
+  // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
+  () => {
+    return bookReadingPage().expectEpubTextUsesScreenWidth()
+  }
+)

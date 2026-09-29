@@ -180,3 +180,11 @@ Then(
     return bookReadingPage().expectBookBlockIsCurrentSelectionByTitle(title)
   }
 )
+
+Then(
+  'the PDF pages should use the screen width',
+  // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
+  () => {
+    return bookReadingPage().expectPdfPagesUseScreenWidth()
+  }
+)

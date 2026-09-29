@@ -1,6 +1,12 @@
 import { waitUntilAppIsNotBusy } from '../pageBase'
+import { expectFullyOnScreen } from './bookReadingShared'
 
 export const bookReadingProgressMethods = () => ({
+  expectReadingControlPanelFullyOnScreen() {
+    waitUntilAppIsNotBusy()
+    expectFullyOnScreen('[data-testid="book-reading-reading-control-panel"]')
+    return this
+  },
   /**
    * Reading Control Panel: bottom of PDF main pane.
    * Contract for production: data-testid book-reading-reading-control-panel + book-reading-mark-as-read.

@@ -5,10 +5,16 @@ import {
   bookBlockRowByTitle,
   ensureOnBookReadingPage,
   epubHostViewportIntersectsMarker,
+  expectUsesScreenWidth,
   notebookIdFromBookReadingPathname,
 } from './bookReadingShared'
 
 export const bookReadingEpubMethods = () => ({
+  expectEpubTextUsesScreenWidth() {
+    ensureOnBookReadingPage()
+    expectUsesScreenWidth('[data-testid="epub-book-viewer"] .epub-container')
+    return this
+  },
   expectEpubReadingViewShowsBookName(name: string) {
     ensureOnBookReadingPage()
     cy.get('[data-testid="book-reading-epub-global-bar-title"]').should(

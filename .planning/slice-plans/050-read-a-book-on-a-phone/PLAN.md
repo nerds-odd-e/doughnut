@@ -66,7 +66,7 @@ the repository), and sets the viewport before opening the book.
 | --- | --- | --- |
 | At 390×844 a PDF page is as wide as the screen, not a thumbnail | 1 | E2E: the PDF content area is at least 90 % of the viewport width |
 | At 390×844 EPUB text fills the screen width | 1 | E2E: the EPUB reader area is at least 90 % of the viewport width and shows its opening text |
-| At 390×844 the Read/Skim/Skip panel is fully visible and can be tapped | 1 | E2E: scroll until the panel shows for "2.1 …", mark it read → marked in the layout |
+| At 390×844 the Read/Skim/Skip panel is fully visible and can be tapped | 1 | E2E: scroll until the panel shows for "Code Refactoring", panel inside the window, mark it read → marked in the layout |
 | At 390 and 768 px *Book layout* opens the layout | 2 | E2E at both sizes: a real (non-forced) click on the toggle → the layout is visible |
 | Choosing a block closes the drawer and moves the book there | 3 | E2E at 390×844: open the layout, choose "2.2 …" → drawer closed, PDF on page 2, block selected |
 | Tapping the backdrop closes the drawer and keeps the place | 3 | E2E at 390×844: open the layout, tap the backdrop → drawer closed, same page |
@@ -82,7 +82,7 @@ Unit: `CURSOR_DEV=true nix develop -c pnpm frontend:test <changed spec files>`.
 
 ### 1. On a phone the book uses the screen width
 Type: Behavior
-Status: planned
+Status: done
 Proof: `phone_reading.feature` PDF and EPUB width scenarios and the panel
 scenario; `book_browsing.feature` and `BookReadingPage.spec.ts` stay green.
 
@@ -129,4 +129,22 @@ breakpoint module if nothing else needs it. The E2E page object's
 
 ## Learnings
 
-(none yet)
+- Slice 1 (done): moving `relative` to the desktop-open branch of
+  `BookReadingBookLayout.vue` lets the phone branch's `fixed` win. Accepted
+  proof: `phone_reading.feature` 3/3 (the PDF viewer and EPUB
+  `.epub-container` are at least 90 % of the window width; without the fix
+  they are 102 px), `book_browsing.feature` 5/5, `reorganize_layout.feature`
+  8/8, `BookReadingBookLayout.spec.ts` and `BookReadingPage.spec.ts` 14/14,
+  and `vue-tsc` clean. The rendered PDF page itself is 334 of 390 px because
+  pdf.js fits the page width inside the viewer's padding and scrollbar, so
+  the proof measures the viewer.
+- The panel scenario uses the block selected when the book opens ("Code
+  Refactoring"), not "2.1 …": the desktop-tuned within-page scroll steps land
+  on "2.2 …" at 390 px, and choosing a block through the layout on a phone
+  needs slice 3's drawer. That scenario passes without the fix; the width
+  scenarios are what catch the bug.
+- The drag-to-indent pointer handling moved to
+  `useBookLayoutBlockPointerDrag` so the layout component stays under the
+  file-size limit. Slice 3 removes the component's drawer copy.
+- `bookReadingShared.ts` has `expectUsesScreenWidth` and
+  `expectFullyOnScreen`; slice 3 can reuse them for the below-the-menu check.

@@ -11,10 +11,10 @@
       ref="asideRef"
       data-testid="book-reading-book-layout-aside"
       :class="[
-        'relative bg-base-200 w-72 min-w-[16rem] max-w-[min(20rem,85vw)] transition-transform ease-in-out duration-200 overflow-y-auto overflow-x-hidden',
+        'bg-base-200 w-72 min-w-[16rem] max-w-[min(20rem,85vw)] transition-transform ease-in-out duration-200 overflow-y-auto overflow-x-hidden',
         isMdOrLarger
           ? opened
-            ? 'shrink-0 border-r border-base-300'
+            ? 'relative shrink-0 border-r border-base-300'
             : 'hidden'
           : opened
             ? 'translate-x-0 fixed top-0 left-0 z-40 h-full pt-[env(safe-area-inset-top)]'
@@ -60,13 +60,13 @@
             block.id === currentBlockId ? 'location' : undefined
           "
           @click="onBlockRowClick(block, $event)"
-          @pointerdown="onBlockPointerDown(block, $event)"
-          @pointermove="onBlockPointerMove(block, $event)"
-          @pointerup="onBlockPointerUp(block, $event)"
-          @pointercancel="onBlockPointerCancel(block, $event)"
-          @keydown.tab.shift.prevent="onBlockKeyOutdent(block)"
-          @keydown.tab.exact.prevent="onBlockKeyIndent(block)"
-          @keydown.delete.prevent="onBlockKeyCancel(block)"
+          @pointerdown="blockDrag.onPointerDown(block, $event)"
+          @pointermove="blockDrag.onPointerMove(block, $event)"
+          @pointerup="blockDrag.onPointerUp(block, $event)"
+          @pointercancel="blockDrag.onPointerCancel(block, $event)"
+          @keydown.tab.shift.prevent="emit('blockOutdent', block)"
+          @keydown.tab.exact.prevent="emit('blockIndent', block)"
+          @keydown.delete.prevent="emit('blockCancel', block)"
         >
           <span
             class="book-reading-book-block-guides"
@@ -85,23 +85,8 @@
           </span>
           <span class="book-reading-book-block-title">
             {{ block.title }}
-            <span
-              v-if="dispositionForBlock(block.id) === 'READ'"
-              class="sr-only"
-            >
-              Marked as read
-            </span>
-            <span
-              v-else-if="dispositionForBlock(block.id) === 'SKIMMED'"
-              class="sr-only"
-            >
-              Marked as skimmed
-            </span>
-            <span
-              v-else-if="dispositionForBlock(block.id) === 'SKIPPED'"
-              class="sr-only"
-            >
-              Marked as skipped
+            <span v-if="dispositionForBlock(block.id)" class="sr-only">
+              Marked as {{ dispositionForBlock(block.id)?.toLowerCase() }}
             </span>
           </span>
         </button>
@@ -113,11 +98,7 @@
 
 <script setup lang="ts">
 import { blockStartEpubDisplayHref } from "@/lib/book-reading/asEpubLocator"
-import {
-  BOOK_LAYOUT_BLOCK_DRAG_THRESHOLD_PX,
-  bookLayoutBlockDragIntent,
-  bookLayoutBlockDragShouldCapture,
-} from "@/lib/book-reading/bookLayoutBlockDragIntent"
+import { useBookLayoutBlockPointerDrag } from "@/composables/book-reading/useBookLayoutBlockPointerDrag"
 import type { BookBlockReadingDisposition } from "@/lib/book-reading/readBlockIdsFromRecords"
 import type { BookBlockFull } from "@generated/donut-backend-api"
 import { ref, watch } from "vue"
@@ -148,154 +129,57 @@ const emit = defineEmits<{
 
 const asideRef = ref<HTMLElement | null>(null)
 
-const dragThresholdOpts = { thresholdPx: BOOK_LAYOUT_BLOCK_DRAG_THRESHOLD_PX }
-
-const blockPointerDrag = ref<{
-  blockId: number
-  startX: number
-  startY: number
-  pointerId: number
-  captured: boolean
-} | null>(null)
-
-const suppressNextBlockClick = ref(false)
+const blockDrag = useBookLayoutBlockPointerDrag({
+  indent: (block) => emit("blockIndent", block),
+  outdent: (block) => emit("blockOutdent", block),
+})
 
 function closeOverlay() {
   opened.value = false
 }
 
-function onBlockKeyIndent(block: BookBlockFull) {
-  emit("blockIndent", block)
-}
-
-function onBlockKeyOutdent(block: BookBlockFull) {
-  emit("blockOutdent", block)
-}
-
-function onBlockKeyCancel(block: BookBlockFull) {
-  emit("blockCancel", block)
-}
-
 function onBlockRowClick(block: BookBlockFull, e: MouseEvent) {
-  if (suppressNextBlockClick.value) {
-    suppressNextBlockClick.value = false
-    e.preventDefault()
-    e.stopPropagation()
+  if (blockDrag.consumeDragClick(e)) {
     return
   }
   emit("blockClick", block)
 }
 
-function onBlockPointerDown(block: BookBlockFull, e: PointerEvent) {
-  if (e.pointerType === "mouse" && e.button !== 0) {
-    return
-  }
-  blockPointerDrag.value = {
-    blockId: block.id,
-    startX: e.clientX,
-    startY: e.clientY,
-    pointerId: e.pointerId,
-    captured: false,
-  }
+/** Once the open layout has painted, act on the row marked by `selector`. */
+function onOpenLayoutRow(
+  source: () => number | null,
+  selector: string,
+  act: (row: HTMLElement) => void
+) {
+  watch(
+    source,
+    (id) => {
+      if (id === null || !opened.value) {
+        return
+      }
+      requestAnimationFrame(() => {
+        if (!opened.value) {
+          return
+        }
+        const row = asideRef.value?.querySelector(selector)
+        if (row instanceof HTMLElement) {
+          act(row)
+        }
+      })
+    },
+    { flush: "post" }
+  )
 }
 
-function onBlockPointerMove(block: BookBlockFull, e: PointerEvent) {
-  const s = blockPointerDrag.value
-  if (!s || s.pointerId !== e.pointerId || s.blockId !== block.id) {
-    return
-  }
-  const dx = e.clientX - s.startX
-  const dy = e.clientY - s.startY
-  if (
-    !s.captured &&
-    bookLayoutBlockDragShouldCapture(dx, dy, dragThresholdOpts)
-  ) {
-    try {
-      ;(e.currentTarget as HTMLElement).setPointerCapture(e.pointerId)
-    } catch {
-      /* Synthetic pointer events in tests may not have an active pointer id. */
-    }
-    blockPointerDrag.value = { ...s, captured: true }
-  }
-}
-
-function onBlockPointerUp(block: BookBlockFull, e: PointerEvent) {
-  const s = blockPointerDrag.value
-  if (!s || s.pointerId !== e.pointerId || s.blockId !== block.id) {
-    return
-  }
-  const target = e.currentTarget as HTMLElement
-  const dx = e.clientX - s.startX
-  const dy = e.clientY - s.startY
-  if (s.captured) {
-    try {
-      target.releasePointerCapture(e.pointerId)
-    } catch {
-      /* ignore */
-    }
-  }
-  blockPointerDrag.value = null
-  const intent = bookLayoutBlockDragIntent(dx, dy, dragThresholdOpts)
-  if (intent === "INDENT") {
-    suppressNextBlockClick.value = true
-    emit("blockIndent", block)
-  } else if (intent === "OUTDENT") {
-    suppressNextBlockClick.value = true
-    emit("blockOutdent", block)
-  }
-}
-
-function onBlockPointerCancel(block: BookBlockFull, e: PointerEvent) {
-  const s = blockPointerDrag.value
-  if (!s || s.pointerId !== e.pointerId || s.blockId !== block.id) {
-    return
-  }
-  if (s.captured) {
-    try {
-      ;(e.currentTarget as HTMLElement).releasePointerCapture(e.pointerId)
-    } catch {
-      /* ignore */
-    }
-  }
-  blockPointerDrag.value = null
-}
-
-watch(
+onOpenLayoutRow(
   () => props.currentBlockId,
-  (id) => {
-    if (id === null || !opened.value) {
-      return
-    }
-    requestAnimationFrame(() => {
-      if (!opened.value) {
-        return
-      }
-      const row = asideRef.value?.querySelector('[data-current-block="true"]')
-      row?.scrollIntoView({ block: "nearest", inline: "nearest" })
-    })
-  },
-  { flush: "post" }
+  '[data-current-block="true"]',
+  (row) => row.scrollIntoView({ block: "nearest", inline: "nearest" })
 )
-
-watch(
+onOpenLayoutRow(
   () => props.selectedBlockId,
-  (id) => {
-    if (id === null || !opened.value) {
-      return
-    }
-    requestAnimationFrame(() => {
-      if (!opened.value) {
-        return
-      }
-      const row = asideRef.value?.querySelector(
-        '[data-current-selection="true"]'
-      )
-      if (row instanceof HTMLElement) {
-        row.focus()
-      }
-    })
-  },
-  { flush: "post" }
+  '[data-current-selection="true"]',
+  (row) => row.focus()
 )
 </script>
 

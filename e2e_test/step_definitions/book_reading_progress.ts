@@ -81,3 +81,11 @@ Then(
     return bookReadingPage().expectCurrentBlockNavigationBarNotVisible()
   }
 )
+
+Then(
+  'the Reading Control Panel should be fully on the screen',
+  // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
+  () => {
+    return bookReadingPage().expectReadingControlPanelFullyOnScreen()
+  }
+)

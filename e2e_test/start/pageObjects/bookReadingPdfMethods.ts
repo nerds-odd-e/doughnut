@@ -6,9 +6,15 @@ import { waitUntilAppIsNotBusy } from '../pageBase'
 import {
   BOOK_READING_PATHNAME,
   assertPdfCanvasIsRendered,
+  expectUsesScreenWidth,
 } from './bookReadingShared'
 
 export const bookReadingPdfMethods = () => ({
+  expectPdfPagesUseScreenWidth() {
+    this.expectCurrentPage(1)
+    expectUsesScreenWidth('[data-testid="pdf-book-viewer"]')
+    return this
+  },
   expectPdfBeginningVisible() {
     waitUntilAppIsNotBusy()
     cy.location('pathname').should('match', BOOK_READING_PATHNAME)
