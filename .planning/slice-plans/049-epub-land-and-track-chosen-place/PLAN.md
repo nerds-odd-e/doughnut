@@ -61,7 +61,7 @@ migration of stored layouts.
 | The existing EPUB scenarios pass when re-enabled | Temporary local run with `@ignore` removed and the spec added to `APPLICATION_ONLY_ACTIVE_SPECS` (reverted afterwards): `SUT_TIMEOUT_MS=360000 CURSOR_DEV=true nix develop -c pnpm cy:run --spec e2e_test/features/book_reading/epub_book.feature` | **False, and caused by this story's defect.** 4 pass, 6 fail, all at `chooseBookBlockByTitle`'s check that the chosen block becomes current (`data-current-block`). The screenshot shows "Chapter Beta" chosen, selected, and shown, but not current. |
 | The current block is resolved per spine file from the bottom of the view | Read `currentBlockIdFromEpubLocation`, `EpubBookViewer.onRelocated`, `BookReadingEpubView.onEpubRelocated`; the fixture's `nav.xhtml` and chapters | Confirmed: it uses the bottom-most visible spine file (`location.end`) and picks the **last block in reading order** in that file. With the fixture's short chapters, choosing "Chapter Alpha" (chapter2) shows chapter3 too, so "Section Beta-Two" becomes current. The same rule explains first open (cover and contents visible → contents current) and the shared-start case (title → detailed contents). |
 | Landing today does not aim at "start at top" | Read `EpubBookViewer.displayLocator` | Confirmed: after `display()` and a fixed 100 ms wait, it scrolls a heading's **next sibling** to the **centre**. |
-| The landing offset comes from epub.js adding the previous section above after the scroll | — | **Unverified.** Slice 1 is the probe. |
+| The landing offset comes from epub.js adding the previous section above after the scroll | Slice 1 probe (see *Learnings*) | **Partly.** Two viewer-side causes: Chrome scroll anchoring doubles epub.js's own correction when it prepends sections, and `displayLocator` centres the whole chapter wrapper. |
 | Anchorless blocks come from table-of-contents entries that receive no content at attach time | Read `EpubStructureExtractor.extractContentForSpineFile` and `BookBlockEpubContentLocators` | Confirmed: an entry sharing another's start, or with no content before the next start, gets an empty payload list and so no locator, although its nav row has a target. |
 | The first-open record is the auto-mark rule reacting to the wrong current block | Read `useAutoMarkNoDirectContentPredecessor` | Confirmed: when the current block changes, a predecessor with exactly one locator and no record is marked read. |
 | The extractor can be unit-tested with EPUBs built in code | Read `EpubStructureExtractorTest` | Confirmed. |
@@ -97,7 +97,7 @@ changed spec files, and the backend extractor test via Gradle `--tests`.
 
 ### 1. Find why choosing a chapter lands inside it (probe)
 Type: Structure (probe; no product change)
-Status: planned
+Status: done
 Proof: a written observation in *Learnings* that explains the measured
 offsets.
 
@@ -122,9 +122,14 @@ revived scenarios that pass today stay green.
 
 Behavior: an EPUB with a long chapter before "Chapter N" → the reader chooses
 "Chapter N" in the layout, or follows the contents link to it → the heading of
-"Chapter N" is at the top of the reader. The landing rule replaces the
-next-sibling-to-centre scroll and follows slice 1's approach. If links inside
-the book turned out to have a separate cause, split them into their own slice.
+"Chapter N" is at the top of the reader. Landing (slice 1): turn off scroll
+anchoring on epub.js's `.epub-container` (`overflow-anchor: none`) and let
+`rendition.display(target)` land; remove the 100 ms wait and the
+next-sibling/centre scroll without adding another scroll. Links inside the book
+share the anchoring cause, so the same change covers them in this slice.
+Fixture: `e2e_test/fixtures/book_reading/epub_long_chapter_before_target.epub`
+(Chapter One, Chapter Two, contents links), from
+`./e2e_test/fixtures/book_reading/regenerate_epub_long_chapter_before_target.sh`.
 
 Revive `epub_book.feature`: remove the feature-level `@ignore` and add it to
 `APPLICATION_ONLY_ACTIVE_SPECS`. **Interim:** the six scenarios that fail only
@@ -177,7 +182,8 @@ block's row is visible in the layout.
 
 ## Current decisions
 
-- Probe first (owner instruction). Slice 1's stop rule gates slice 2.
+- Probe first (owner instruction). Slice 1's stop rule did not trigger: both
+  causes are in the viewer.
 - Landing target: the place's start at the top of the view, as in PDF.
 - One current-block rule (top of view, selection wins ties) for relocation and
   reopen seeding.
@@ -187,4 +193,26 @@ block's row is visible in the layout.
 
 ## Learnings
 
-(none yet)
+- **Slice 1 cause (probe, headless Chrome on a page replicating
+  `EpubBookViewer` with the same epubjs 0.3.93 and `renderTo` options):**
+  - A. `displayLocator` resolves the stored fragment to Gutenberg's
+    `<div class="chapter" id=…>`, which wraps the whole chapter; not a heading,
+    so it `scrollIntoView({block:"center"})`s the whole div, putting the heading
+    about (div height − view height) / 2 above the top. The 100 ms wait is not
+    the cause.
+  - B. `ContinuousViewManager` prepends earlier sections after `display()` and
+    `counter()` scrolls down by their height, while Chrome's scroll anchoring
+    has already shifted by that height, so each prepended section counts twice
+    (`scrollBy(0,5200)` with scrollTop already 5264). Nothing in `frontend/src`
+    sets `overflow-anchor`. In-book links go through `rendition.display(href)`
+    and share only this cause.
+  - With `.epub-container { overflow-anchor: none }` alone, `display()` puts the
+    target at 0 and it stays there for 3.5 s, for Origin IV, Alice III, and the
+    "CHAPTER 2" link at 1440×900 and 1280×560. A post-display
+    `scrollIntoView(start)` settles at +4 px, so rely on `display()` alone.
+  - Measured today (heading top vs view top): Origin IV −6,273 (1440×900) and
+    −7,487 (1280×560); Alice III −847 and −1,098; Origin "CHAPTER 2" link
+    −3,422 and −4,428. The added fixture reproduces both: choosing Chapter Two
+    −2,700 / −2,870, its link −5,420 / −5,760; 0 with anchoring off.
+  - Not checked: WebKit, and whether anchoring also jumps the view when scrolling
+    up into a prepended chapter (likely; the same CSS would cover it).
