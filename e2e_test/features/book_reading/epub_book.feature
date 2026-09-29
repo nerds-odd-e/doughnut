@@ -130,6 +130,14 @@ Feature: EPUB book
       Then the heading "Licence Section One" should be at the top of the EPUB reader
       And the book block "Licence Section One" should be the current block and visible in the book layout aside
 
+    Scenario: Reopening when the saved exact place no longer resolves resumes at its block start
+      Given I set the book reading viewport to 1280 by 560
+      And I open the reading view for the attached book "epub_long_chapter_before_target"
+      When I choose the book block "Licence Section One"
+      And I leave the EPUB reading view and return to it after its saved exact place stops resolving
+      Then the heading "Licence Section One" should be at the top of the EPUB reader
+      And the book block "Licence Section One" should be the current block in the book reader
+
     Scenario: Reopening an EPUB at another width shows the same paragraph at the top
       Given I set the book reading viewport to 1440 by 900
       And I open the reading view for the attached book "epub_long_chapter_before_target"

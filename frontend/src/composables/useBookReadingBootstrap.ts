@@ -1,9 +1,7 @@
-import { epubDisplayHref } from "@/lib/book-reading/asEpubLocator"
 import type {
   BookFull,
   BookUserLastReadPosition,
   ContentLocatorFull,
-  EpubLocatorFull,
   PdfLocatorFull,
 } from "@generated/donut-backend-api"
 import { NotebookBooksController } from "@generated/donut-backend-api/sdk.gen"
@@ -30,17 +28,6 @@ export type BookReadingBootstrap =
 
 function bookSourceFilePath(bookId: number) {
   return `/api/books/${bookId}/file`
-}
-
-function epubInitialLocatorFromSaved(
-  loc: ContentLocatorFull | undefined
-): ContentLocatorFull | null {
-  if (!loc || loc.type !== "EpubLocator_Full") {
-    return null
-  }
-  const epub = loc as EpubLocatorFull
-  const s = epubDisplayHref(epub)
-  return s.length > 0 ? loc : null
 }
 
 function pdfInitialLastReadFromSaved(
@@ -111,7 +98,7 @@ export function useBookReadingBootstrap(notebookId: number) {
           kind: "epub",
           book: data,
           bytes,
-          initialLocator: epubInitialLocatorFromSaved(loc),
+          initialLocator: loc ?? null,
           initialSelectedBlockId,
         }
       } else {

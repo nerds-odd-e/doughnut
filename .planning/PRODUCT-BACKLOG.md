@@ -7,8 +7,6 @@ Bug fixing and general maintenance.
 
 ## Taken
 
-- [Reopen at the block start when the saved exact EPUB place no longer resolves](seeds/SEED-059-book-reading-uat-fixes.md#story-20) — SEED-059#story-20 ([plan](slice-plans/062-stale-epub-place-reopens-at-block-start/PLAN.md))
-
 ## Backlog list
 
 - [The current block moves the same way in PDF as in EPUB](seeds/SEED-059-book-reading-uat-fixes.md#story-16) — SEED-059#story-16

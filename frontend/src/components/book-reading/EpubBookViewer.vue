@@ -22,11 +22,7 @@ import {
   resolveSpineHrefForStoredPath,
   splitEpubHref,
 } from "@/lib/book-reading/epubHrefMatch"
-import type {
-  BookFull,
-  ContentLocatorFull,
-  EpubLocatorFull,
-} from "@generated/donut-backend-api"
+import type { BookFull, ContentLocatorFull } from "@generated/donut-backend-api"
 import ePub, { type Book as EpubJsBook, type Rendition } from "epubjs"
 import { nextTick, onBeforeUnmount, onMounted, ref, watch } from "vue"
 
@@ -90,38 +86,52 @@ const {
 const emitRelocated = () => emit("relocated")
 
 /**
- * Resolve a stored locator to an epub.js display target. A locator with an exact place (CFI)
- * displays there; otherwise at href#fragment. The backend stores package-root paths (e.g.
+ * The epub.js display targets for a stored locator, in the order to try: its exact place (CFI),
+ * then its block start (href#fragment); none for a locator that is not an EPUB one. The backend stores package-root paths (e.g.
  * `OEBPS/chapter3.xhtml`) while epub.js indexes sections by the raw manifest href (e.g.
  * `chapter3.xhtml`), so we must translate before calling `rendition.display`.
  */
-function epubDisplayTarget(epub: EpubLocatorFull): string | null {
+function epubDisplayTargets(loc: ContentLocatorFull | null): string[] {
+  const epub = asEpubLocator(loc ?? undefined)
+  if (!epub) {
+    return []
+  }
+  const targets: string[] = []
   const cfi = epub.cfi?.trim() ?? ""
   if (cfi.length > 0) {
-    return cfi
+    targets.push(cfi)
   }
   const storedPath = splitEpubHref(epub.href.trim()).path
-  if (storedPath.length === 0) {
-    return null
+  if (storedPath.length > 0) {
+    const spineHref =
+      resolveSpineHrefForStoredPath(epubSpineItems(bookInstance), storedPath) ??
+      storedPath
+    const frag = epub.fragment?.trim() ?? ""
+    targets.push(frag.length === 0 ? spineHref : `${spineHref}#${frag}`)
   }
-  const spineHref =
-    resolveSpineHrefForStoredPath(epubSpineItems(bookInstance), storedPath) ??
-    storedPath
-  const frag = epub.fragment?.trim() ?? ""
-  return frag.length === 0 ? spineHref : `${spineHref}#${frag}`
+  return targets
+}
+
+/** Displays the first target epub.js can display; resolves false when none can. */
+async function displayFirst(r: Rendition, targets: string[]): Promise<boolean> {
+  for (const target of targets) {
+    if (
+      await r.display(target).then(
+        () => true,
+        () => false
+      )
+    ) {
+      return true
+    }
+  }
+  return false
 }
 
 async function displayLocator(loc: ContentLocatorFull): Promise<void> {
   await opened
-  const epub = asEpubLocator(loc)
-  if (!epub || !rendition) {
-    return
+  if (rendition) {
+    await displayFirst(rendition, epubDisplayTargets(loc))
   }
-  const target = epubDisplayTarget(epub)
-  if (!target) {
-    return
-  }
-  await rendition.display(target).catch(() => undefined)
 }
 
 /** The exact place (CFI) at the top of the reader's view, once epub.js has located it. */
@@ -177,11 +187,7 @@ async function openEpub() {
   landOneDisplayAtATime(r)
   r.on("relocated", emitRelocated)
   r.on("displayed", emitRelocated)
-  const initial = asEpubLocator(props.initialLocator ?? undefined)
-  const target = initial ? epubDisplayTarget(initial) : null
-  if (target) {
-    await r.display(target).catch(() => r.display().catch(() => undefined))
-  } else {
+  if (!(await displayFirst(r, epubDisplayTargets(props.initialLocator)))) {
     await r.display().catch(() => undefined)
   }
   await observeHostResize(r)

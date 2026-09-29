@@ -904,8 +904,19 @@ Plan 053's premises confirmed what snap-back did and that only it used scroll su
   - Observed effect: two implementation stops, one owner decision on a scope the story had deferred (panel position), and slice 1 took about 30 minutes against a ~5-minute target.
   - Inference: reading `blockAwaitingConfirmation` and the overlay classes for the story's own "scroll past without marking" key example would have shown both at planning. Related to DD-162 and DD-163 (premises that stopped short of the consuming step).
 
+## DD-172 — Managed increment delivery rejected a remote-tracking target ref; the only example of the accepted form is in the wrap-up reference
+
+Trunk publication's "Publish the candidate" asks for an "authorized target ref" but does not give its form. `execution-increment-delivery.mjs deliver` accepts only a full branch ref (`refs/heads/<branch>`). The only worked example of that form is in `wrap-up-closure-publication.md`.
+
+### Occurrences
+
+- Execution: SEED-059#story-20 / slice-plans/062-stale-epub-place-reopens-at-block-start / a18764005f; Timestamp: 2026-09-29, ~23:25+08:00 (slice 1 delivery); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.47.
+  - Evidence: the first `deliver --target-ref origin/story/seed-059-story-20` exited with "authorized target must be a branch ref: origin/story/seed-059-story-20". A retry with `refs/heads/story/seed-059-story-20` was accepted.
+  - Observed effect: one rejected delivery call. Nothing was published or changed.
+  - Inference: the cost is small, but every coordinator that reads only trunk-publication.md can hit it. One example next to that step would prevent it.
+
 ## Retention
 
-- Highest allocated local number: 171. Removed local codes are never reused.
+- Highest allocated local number: 172. Removed local codes are never reused.
 - Full pre-maintenance log and earlier recovery locators: `99fa1b9835e3dff2473837ba2a1f8b11967d5938:DearDough.md`.
 - Occurrence history is partial; active evidence stays here or in the Open Dough catalog and watch list.
