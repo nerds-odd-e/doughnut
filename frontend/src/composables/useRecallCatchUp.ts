@@ -20,6 +20,9 @@ export function useRecallCatchUp() {
     setCurrentRecallWindowEndAt,
   } = useRecallData()
 
+  // Adds newly due trackers after the queue without moving the position; only
+  // trackers still waiting count as queued, so an answered one due again is
+  // added. Explicit refreshes (after assimilating or removing) replace instead.
   const catchUpDueRecalls = async () => {
     const response = await fetchDueRecalls(0)
     if (!response) return

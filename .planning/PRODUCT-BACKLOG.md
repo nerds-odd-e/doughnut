@@ -7,8 +7,6 @@ Bug fixing and general maintenance.
 
 ## Taken
 
-- [Refresh recall automatically at each local half-day boundary](seeds/SEED-056-recall-half-day-refresh.md#story-1) — SEED-056#story-1 ([plan](slice-plans/014-recall-half-day-refresh/PLAN.md))
-
 ## Backlog list
 
 - [Reduce relationship notes whose body is a simple wiki-link sentence](seeds/SEED-057-reduce-relationship-sentence.md#story-1) — SEED-057#story-1
