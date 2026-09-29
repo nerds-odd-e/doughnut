@@ -152,7 +152,7 @@ in Team Development" current. Existing scenarios keep the blank PDF.
 
 ### 6. Real books match their contents (manual acceptance)
 Type: Behavior (manual observation, no product change expected)
-Status: planned
+Status: done
 Proof: observations recorded in *Learnings*.
 
 Repair `.venv-mineru` (`python3 -m venv --clear` then
@@ -202,3 +202,23 @@ unproved and report it; do not claim them from slices 3–5.
   8/8. Observed, out of scope: opening a second notebook's book in-app kept the
   first book's layout and PDF (and patched the first notebook's reading
   position), so each Rule has its own Background — a candidate for the backlog.
+- Slice 6 (real MinerU 3.4.5 pipeline, CLI `/attach` against a disposable E2E
+  stack, browser via Claude in Chrome), all observed:
+  - Think Python: 241 blocks = `*beginning*` + 22 top-level (Preface, 18
+    chapters, 3 appendices) + 218 sections; all 240 (depth, title, page) match
+    a pypdf bookmark dump in order; no "Chapter N" or page-header blocks.
+  - Attention: Model Architecture → Attention → Scaled Dot-Product Attention.
+  - "The way of the program" lands on page 23/244 with the chapter heading at
+    the top and becomes the current selection; "What is a program?" starts on
+    the same page.
+  - Wheel-scrolling chapter 14 moves the current block through all 12 sections
+    in order, no copies.
+  - Owner question: the story's Think Python example says "Index" once, but the
+    PDF has no Index bookmark, so there is no Index block (its text is inside
+    "Analysis of Algorithms"). Consistent with "bookmarks decide the layout";
+    the example's wording may need correcting at wrap-up.
+  - Environment: `.venv-mineru` (main checkout, gitignored) rebuilt on Homebrew
+    Python 3.12 with `mineru[pipeline]==3.4.5` and `six`. MinerU 4.x has no
+    `pipeline` extra or `mineru.cli.common`, so the unpinned
+    `pip install 'mineru[pipeline]'` in `cli/python/mineru_book_outline.py` and
+    `regenerate_mineru_output_for_refactoring.sh` no longer works — follow-up.
