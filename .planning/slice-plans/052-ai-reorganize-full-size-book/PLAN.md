@@ -85,3 +85,9 @@ Implemented as `BASE_ANSWER_TOKENS` (700) + `ANSWER_TOKENS_PER_BLOCK` (12)
   messages (story scope).
 - Local proof is the focused backend test only; no frontend, E2E, or API
   change is involved, so no API generation.
+
+## Execution complete
+
+Product advice: no backlog change. The delivered budget matches the observed
+failure with 50% headroom; a paid real-model run on the 361-block book stays
+an optional owner demonstration. Continue with SEED-059#story-5 as queued.
