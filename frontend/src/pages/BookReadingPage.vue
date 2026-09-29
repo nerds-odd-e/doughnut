@@ -3,6 +3,7 @@
     data-testid="book-reading-page"
     class="book-reading-page flex flex-col h-full min-h-0"
   >
+    <!-- The reader loads its notebook's book once; the key gives each notebook a fresh reader when the router reuses this page. -->
     <BookReader :key="notebookId" :notebook-id="notebookId" />
   </div>
 </template>
