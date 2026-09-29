@@ -860,8 +860,19 @@ The coordinator appended learnings with a script that replaced an anchor copied 
   - Observed effect: during execution the plan did not carry the slice 2 attempts, the CI repair, or the slice 3–6 causes, so a resumed execution would have lost them. No product effect.
   - Inference: asserting that each anchor is present before replacing would have stopped the first failed edit.
 
+## DD-167 — A correction to merge two lookups was planned without checking that they choose the same result
+
+The retrospective that created SEED-059#story-14 saw two EPUB rendered-view lookups and planned to merge them. Nobody compared their matching rules before planning. At execution, the first slice 2 attempt found that they choose different sections when one stored path matches two spine items. Execution had to stop for an owner decision. The plan's "stop and report instead of choosing one" guard worked as intended.
+
+### Occurrences
+
+- Execution: SEED-059#story-14 / `.planning/slice-plans/055-epub-resume-tests-and-rendered-view/PLAN.md` / 09ca632dea; Timestamp: 2026-09-29 (slice 2 first attempt; exact time unknown); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.46.
+  - Evidence: slice 2 Decision paragraph in plan 055 at 0e9048812c; `epubSpinePathMatches` suffix rule in `frontend/src/lib/book-reading/epubHrefMatch.ts`.
+  - Observed effect: one implementation-agent round of about 57k tokens returned no change, and the owner was asked one question. The recommended option was accepted and no work was lost.
+  - Inference: reading the two matching rules while planning the correction (a few minutes) would have found the difference and taken the decision to the owner before the plan. Qualified: one occurrence.
+
 ## Retention
 
-- Highest allocated local number: 166. Removed local codes are never reused.
+- Highest allocated local number: 167. Removed local codes are never reused.
 - Full pre-maintenance log and earlier recovery locators: `99fa1b9835e3dff2473837ba2a1f8b11967d5938:DearDough.md`.
 - Occurrence history is partial; active evidence stays here or in the Open Dough catalog and watch list.
