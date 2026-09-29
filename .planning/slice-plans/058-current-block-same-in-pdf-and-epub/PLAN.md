@@ -46,6 +46,11 @@ parts B and C). The slices below are provisional planning input.
 
 1. **Structure:** move the rule to a format-neutral module taking a block-start
    function; EPUB unchanged. About 5 min.
+   Status: done. The rule is `currentBlockIdFromViewStarts.ts` (generic over a
+   block-keyed `startTopPx`); the EPUB adapter sits in `BookReadingEpub.vue`;
+   `EpubViewBlockStarts` moved to `useEpubLocatorGeometry.ts`. Proof: vitest
+   `Epub ViewStarts` (20) and `BookReadingPage` (33) pass; `vue-tsc --noEmit`
+   passes.
 2. **Behavior:** a chosen PDF block lands with its start at the top and is
    current, including on the first page (new E2E in `book_browsing.feature`).
    Also repairs what landing changes: `reading_record.feature:25-29` and the

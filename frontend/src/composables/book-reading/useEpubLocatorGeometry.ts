@@ -1,6 +1,5 @@
 import type { ViewerLocatorRect } from "@/composables/bookReaderViewerRef"
 import { asEpubLocator } from "@/lib/book-reading/asEpubLocator"
-import type { EpubViewBlockStarts } from "@/lib/book-reading/currentBlockIdFromEpubView"
 import {
   epubSpinePathMatches,
   splitEpubHref,
@@ -13,6 +12,13 @@ import type { Book as EpubJsBook, Rendition } from "epubjs"
 import type { Ref } from "vue"
 
 const READING_PANEL_ANCHOR_GAP_PX = 8
+
+export type EpubViewBlockStarts = {
+  /** Distance in px from the top of the view down to a block start (negative when above); null when unknown. */
+  startTopPx: (start: EpubLocatorFull) => number | null
+  /** How far below the top a start may lie and still count as landed at the top (the view's end). */
+  landingLimitPx: number
+}
 
 type EpubRenditionIframeView = {
   displayed?: boolean
