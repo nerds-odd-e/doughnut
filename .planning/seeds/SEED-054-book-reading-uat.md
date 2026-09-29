@@ -150,12 +150,22 @@ the conditions tried; it must not become a confirmed defect by assumption.
 UAT on 2026-09-29 against commit `1f9bdae1bc` (Development stack from the
 default checkout, real MinerU and real OpenAI, account `manual`, headless
 Chromium driven by Playwright, the interactive CLI driven through a pseudo
-terminal). Setup took about 15 minutes outside the budget. Attach and browse
-exploration took 27 minutes of its 50-minute share (07:33–08:00). Breadth
-across the planned areas was complete by then, and the remaining time was not
-needed to confirm the defects below. MinerU ran while other books were being
-explored, so its time is recorded per book and was not spent waiting.
-Screenshots (`s2-…`) and the raw measurements stay outside the repository; the
+terminal). Viewports are 1440×900 unless stated.
+
+Time, against the two-hour exploration budget:
+
+- Setup took about 15 minutes, outside the budget.
+- Attaching and browsing took 27 minutes of its 50-minute share (07:33–08:00).
+  Breadth across the planned areas was complete by then, and the remaining
+  time was not needed to confirm defects 1–9. MinerU ran while other books
+  were being explored, so its time is recorded per book and was not spent
+  waiting.
+- Reading records and reorganizing took 29 minutes of its 55-minute share
+  (08:07–08:36). Defects 10–17 come from this part.
+- None of the 15-minute reserve was used.
+
+Screenshots (`s2-…` from attaching and browsing, `s3-…` from reading records
+and reorganizing) and the raw measurements stay outside the repository; the
 figures quoted below are the retained evidence.
 
 ### Setup and books
@@ -281,7 +291,7 @@ store path. The CLI worked only with
      heading-only auto-marking and descendant-aware reorganizing have wrong
      parents to work with.
    - *Evidence:* the Think Python layout dump `s2-tp-layout.txt`.
-   - *Hypothesis (not verified):* the slice-1 probe of the MinerU script alone
+   - *Hypothesis (not verified):* the setup probe of the MinerU script alone
      produced a nested outline for the arXiv paper, so nesting may be lost
      after extraction.
 7. **On first open, the EPUB current block is not what is shown, and
@@ -323,29 +333,185 @@ store path. The CLI worked only with
      `/attach arxiv-attention.pdf`.
    - *Impact:* wasted wait with no result.
    - *Evidence:* the CLI session log (`cli-raw.log`).
+10. **AI reorganization fails on a full-size book (High).**
+    - *Expected:* *AI Reorganize* on *UAT Think Python* (361 blocks) shows the
+      preview of a proposed structure, as it does for the 27-block paper.
+    - *Observed:* in 3 of 3 runs, the request failed with a server error after
+      7.5–8.3 s. A red message filled a third of the screen with raw text:
+      "Error parsing JSON: {"blocks":[{"depth":0,"id":44}, …". The text stops
+      in the middle of an entry at block id 130, about 87 of the 361 blocks.
+      The message disappeared after a few seconds, with no preview and no
+      plain explanation. After the failure, the layout had scrolled back to its
+      top. The current block, 9.1, moved from y 860 to y 6,367, out of view
+      (seen in 2 runs).
+    - *Reproduction:* open the reader for *UAT Think Python* and click *AI
+      Reorganize*.
+    - *Impact:* AI help is unavailable for exactly the kind of book that needs
+      it most. Think Python has defects 5 and 6 to clean up, and doing that by
+      hand is slow (see the improvement "Fixing a layout by hand").
+    - *Evidence:* `s3-33-ai-err-17`, `s3-34-ai-err-later-17`, `s3-ai-tp.txt`.
+    - *Hypothesis (not verified):* the model's answer is cut off by an output
+      size limit. That would make every book above roughly 90 blocks fail.
+11. **In EPUB, the reorganizing controls are shown but do nothing (Medium).**
+    - *Expected:* *AI Reorganize*, Tab, Shift+Tab and Backspace on a chosen
+      block act as they do in PDF, or are not offered.
+    - *Observed:* in both *UAT Alice* and *UAT Origin of Species*:
+      - clicking *AI Reorganize* sends no request and shows nothing, no
+        progress, message or preview;
+      - Tab on "CHAPTER II" (the block before it is at the same depth) sends
+        no request, and so do Shift+Tab and Backspace. The depth stays the same,
+        and nothing says the action is unavailable.
+      The spurious "Contents" block from defect 7 therefore cannot be cancelled
+      either. Clicking the EPUB text offers no "New block".
+    - *Reproduction:* open the reader for *UAT Alice*, click *AI Reorganize*;
+      then click "CHAPTER II. The Pool of Tears" and press Tab.
+    - *Impact:* an EPUB whose table of contents is poor cannot be improved, and
+      a visible button that silently does nothing looks broken. The automated
+      scenarios cover reorganizing only for PDF, so keyboard reorganizing of
+      EPUB may be a missing capability. The visible button doing nothing is a
+      defect either way.
+    - *Evidence:* `s3-35-ai-epub-click`, `s3-36-ai-epub-after`,
+      `s3-37-epub-reorg`, `s3-37-epub-reorg-origin`.
+12. **A block made from an ordinary paragraph takes the whole paragraph as its
+    title, with no chance to type one (Medium).**
+    - *Expected:* creating a block from a long content box asks for a title,
+      with the content as the default.
+    - *Observed:* the title prompt appears only when the paragraph text reaches
+      512 characters. Paragraphs of 200 characters (Attention 3.2) and 289
+      characters (Think Python 8.3) became block titles directly. In the
+      layout, the 200-character title fills seven lines. No control to rename a
+      block was found. A 512-character paragraph (Think Python 9.1) did show the
+      "Name the new block" prompt, and the typed title was used.
+    - *Reproduction:* in *UAT Attention*, choose "3.2 Attention", click the
+      first paragraph under the heading, then click *New block*.
+    - *Impact:* the layout fills with paragraph-length titles that cannot be
+      corrected afterwards.
+    - *Evidence:* `s3-23-attn-callout`, `s3-25-attn-after-new-block`,
+      `s3-26-title-dialog`.
+13. **Keyboard users cannot move through the book layout (Medium).**
+    - *Expected:* keyboard users can move from block to block and choose one.
+    - *Observed:* pressing Tab from the top of the page reaches the zoom and
+      search buttons, *AI Reorganize*, and then the first block, "*beginning*".
+      The next Tab is treated as "indent": it sends a depth change, which is
+      refused with "Block is already at maximum depth relative to predecessor",
+      and focus drops to the page body. The arrow keys do nothing. No other
+      block can be reached by keyboard. On any block that can be indented, a
+      Tab meant to move on would change the saved layout.
+    - *Reproduction:* open *UAT Attention*, click the page header, and press
+      Tab seven times.
+    - *Impact:* the layout, the main way to move around a book, cannot be used
+      without a mouse.
+    - *Evidence:* `s3-38-kbd-focus-block` and the refused depth request.
+14. **Keyboard focus leaves the block after each indent or outdent (Low).**
+    - *Expected:* after Tab or Shift+Tab, the block keeps focus, so a second
+      press moves it again.
+    - *Observed:* after each successful Tab or Shift+Tab, focus went to the page
+      body (2 of 2). A second key press then moved focus through the page
+      instead, and in one run reached a close button. To press the key again,
+      the block has to be clicked again, which also moves the book to it.
+    - *Reproduction:* in *UAT Think Python*, click "Case study: word play" and
+      press Shift+Tab twice.
+    - *Impact:* moving a block by two levels, or fixing several blocks, takes a
+      click per step (see the improvement "Fixing a layout by hand").
+    - *Evidence:* `s3-19-tp-focus-after-outdent`.
+15. **With a heading-only block selected, there is no Read/Skim/Skip, and the
+    heading is never marked (Medium).**
+    - *Expected:* after choosing a block with no text of its own, such as a
+      "Chapter 9" label, the reader can go on reading and marking. The
+      heading-only block is marked read when its successor is entered.
+    - *Observed:* choosing "Chapter 9", "Chapter 10" or "Chapter 12" in *UAT
+      Think Python* hid the Reading Control Panel. It stayed hidden while
+      scrolling through 3–4 pages of the chapter. The current block went from
+      the label straight to x.1. It skipped the chapter title block ("Case
+      study: word play", "Lists"), which starts on the same screen and has
+      introduction text. Neither the label nor the title was marked. The "Now
+      reading" bar was shown, so *Read from here* lets the reader continue.
+      When "Case study: word play" was chosen instead, "Chapter 9" was marked
+      read straight away, as promised. Separately, running-header duplicates
+      from defect 5 (for example "9.3. Search") have no text of their own, so
+      they are auto-marked read while scrolling.
+    - *Reproduction:* open *UAT Think Python*, choose "Chapter 12", and scroll
+      down four pages.
+    - *Impact:* at every chapter start of a book like this, marking stops until
+      the reader notices and uses *Read from here*. The chapter title block is
+      never reached, so it keeps no record.
+    - *Evidence:* `s3-12-tp-chapter-label`, `s3-13-tp-after-scroll`.
+16. **Reopening an EPUB does not scroll the layout to the current block
+    (Low).**
+    - *Expected:* on reopening, the layout shows the current and selected
+      block, as it does for PDF.
+    - *Observed:* at 1280×560, *UAT Origin of Species* reopened with the layout
+      at its top. The current and selected block was out of view: "CHAPTER
+      III" at y 689, and after choosing "CHAPTER XIV", leaving and returning,
+      at y 1,288, with the layout panel ending at y 560. At 1440×900, CHAPTER
+      III was just visible only because it was near the top of the list. Think
+      Python (PDF) reopened with its current block scrolled into the layout.
+    - *Reproduction:* at 1280×560 in *UAT Origin of Species*, choose "CHAPTER
+      XIV", go to the notebook page, and open the reader again.
+    - *Impact:* the reader cannot see where they are in the book until they
+      scroll the layout by hand.
+    - *Evidence:* `s3-41-open-layoutpos-20-560`, `s3-42-origin-reopen-xiv-560`.
+17. **AI reorganization leaves one level of the paper unnested (Low).**
+    - *Expected:* the proposed structure follows the paper's numbering:
+      3 → 3.2 → 3.2.1.
+    - *Observed:* in two runs (6.1 s and 3.1 s) the same proposal nested every
+      x.y under x and kept Abstract … References under the title. However, it
+      left 3.2.1, 3.2.2 and 3.2.3 at the same depth as 3.2 instead of under it.
+      Everything else was correct. The preview cannot be adjusted row by row,
+      so these three blocks must be fixed by hand after confirming.
+    - *Reproduction:* attach `arxiv-attention.pdf` to a new notebook with the
+      CLI. It arrives flat, as described in defect 6 (*UAT Attention* is now
+      nested). Then click *AI Reorganize*.
+    - *Impact:* small here, but it shows that the proposal needs checking. The
+      preview makes that possible only by reading every row.
+    - *Evidence:* `s3-31-ai-preview-a`, `s3-31-ai-preview-b`.
 
 ### What worked
 
-- PDF navigation is precise. Every deep block tried landed on the right page
-  with its heading at the top:
-  - Think Python: 3.9 → p. 45, 14.6 → p. 163, 16.1 → p. 177, B.4 → p. 228,
-    matching the contents page numbers plus the 22-page front matter;
-  - Attention: 3.2.1 → p. 4, 6.2 → p. 9.
-- The current block follows scrolling in both formats. In PDF, the "Now
-  reading … / Read from here / Back to selected" bar appears when the current
-  block differs from the selection, and *Back to selected* returns to it.
-- At 1280×560, the layout kept the current block visible on every one of 30
-  scroll steps in both a PDF (Think Python, 361 blocks) and an EPUB (Origin).
-  Zooming in twice and resizing from 1440×900 to 1280×560 kept the position.
-- Rapidly choosing 5–6 blocks ended in the right place for the last choice.
-  Scrolling had no long-running browser tasks, and the worst frame gap was
-  33–83 ms. No console or page errors appeared apart from development-only
-  items (a feature-toggle 404, and the yellow "T" testability button on
-  screenshots).
-- Reopening a reader resumed the last position (PDF 3.9; EPUB chapter VIII).
-  Slice 3 examines resume in depth.
-- The DRM refusal is clear by both routes. EPUB upload is quick on the web and
-  in the CLI, and the CLI prints the resulting layout.
+- Attaching and browsing:
+  - PDF navigation is precise. Every deep block tried landed on the right page
+    with its heading at the top:
+    - Think Python: 3.9 → p. 45, 14.6 → p. 163, 16.1 → p. 177,
+      B.4 → p. 228, matching the contents page numbers plus the 22-page front matter;
+    - Attention: 3.2.1 → p. 4, 6.2 → p. 9.
+  - The current block follows scrolling in both formats. In PDF, the "Now
+    reading … / Read from here / Back to selected" bar appears when the
+    current block differs from the selection, and *Back to selected* returns
+    to it.
+  - At 1280×560, the layout kept the current block visible on every one of 30
+    scroll steps in both a PDF (Think Python, 361 blocks) and an EPUB
+    (Origin). Zooming in twice and resizing from 1440×900 to 1280×560 kept the
+    position.
+  - Rapidly choosing 5–6 blocks ended in the right place for the last choice.
+    Scrolling had no long-running browser tasks, and the worst frame gap was
+    33–83 ms. No console or page errors appeared apart from development-only
+    items (a feature-toggle 404, and the yellow "T" testability button on
+    screenshots).
+  - The DRM refusal is clear by both routes. EPUB upload is quick on the web
+    and in the CLI, and the CLI prints the resulting layout.
+- Resuming: reopening a reader resumed the last position in both formats.
+  - While browsing: PDF at 3.9; EPUB at chapter VIII.
+  - While recording: Attention reopened at page 3 and at page 15; Alice
+    reopened at the scrolled place in chapter V with chapter IV still
+    selected.
+- Reading records and reorganizing:
+  - Read, Skim and Skip each save at once (checked through the API), show as
+    a mark in the layout, and move the selection to the next block. This
+    worked in PDF (Attention) and EPUB (Alice), and the marks were still there
+    after leaving and returning.
+  - As promised, choosing an already marked block makes the panel offer the
+    next block: "5.1" marked → panel for "5.2". The last block ("References")
+    could be marked once the end of the paper was reached.
+  - PDF indent and outdent (with descendants) and cancel (children move up a
+    level) worked and were still there after reloading. Each took about 1.5 s
+    to show. An impossible indent shows a clear message. Dragging a block left
+    or right with the mouse also changes its depth.
+  - Records, the current block and the selection stayed consistent through
+    indent, cancel, block creation and AI confirmation. Cancelling a marked
+    block also removed its record.
+  - AI reorganization on the paper: preview in 3.1–6.1 s with changed rows
+    highlighted. *Cancel* left the layout untouched, and *Confirm* applied the
+    proposal in 0.8 s and kept all records.
 
 ### Improvements
 
@@ -365,8 +531,9 @@ store path. The CLI worked only with
   - Recommendation: one sentence in the web card about the CLI route for PDF,
     and `/attach` and where to get a token in the CLI help.
 - **There is no feedback during extraction.** The CLI shows only a spinner and
-  "Attaching book…" for the whole MinerU run (about 3 minutes for 244 pages). Showing the
-  stage and page progress would tell the reader it is working.
+  "Attaching book…" for the whole MinerU run (about 3 minutes for 244
+  pages). Showing the stage and page progress would tell the reader it is
+  working.
 - **It is hard to get from attaching to reading.**
   - After a CLI attach, nothing says where to read, although a reader URL could
     be printed.
@@ -384,7 +551,60 @@ store path. The CLI worked only with
   "3.2.2 Multi-Head Attention" heading is under the panel in
   `s2-19-attn-land-1`. The bars could reserve space instead, or avoid the next
   heading.
-- **Small visual items:**
+- **A reading record cannot be changed or removed.** Choosing a marked block
+  makes the panel offer the next block, as designed, and no other control
+  exists. A mistaken Skim, the spurious "Contents" record (defect 7), and
+  auto-marked running-header duplicates (defect 15) stay for good. Cancelling
+  the block clears the record, but only in PDF (defect 11). Recommendation:
+  when a marked block is chosen, offer to change or clear its mark.
+- **Record marks are hard to read** (`s3-03-attn-after-skip`,
+  `s3-39-dark-21`). A record shows only as a thin coloured bar at the layout's
+  right edge: green read, orange skimmed, black skipped. There is no legend or
+  tooltip; the words exist only for screen readers. In the dark theme, the
+  black "skipped" bar cannot be seen. A chapter whose sections are all read
+  shows nothing on the chapter itself. Recommendation: a tooltip or legend,
+  colours that work in both themes, and a simple progress sign on parents.
+- **Nothing marks the end of the book.** After the last block was marked, the
+  panel simply disappeared (`s3-10-attn-after-last-read`). Nothing said the
+  book was finished, or that 19 of 27 blocks were still unmarked. A short
+  summary with a way to jump to unmarked blocks would tell the reader what is
+  left.
+- **Fixing a layout by hand takes one click and one key per block.**
+  - Outdenting a block makes the blocks after it at its old level its
+    children, because the order of blocks is fixed. One wrong Shift+Tab on
+    "9.1" put the rest of chapter 9 under it. Restoring it took 8 separate
+    operations.
+  - Cancelling the "Chapter 12" label moved "Tuples" and all 14 sections to
+    the top level. Nesting them again under "Tuples" took 14 click-and-Tab
+    steps.
+  - Every click to choose a block also moves the book there, and after
+    cancelling, the selection and the book go back to the previous block.
+  - Together with defects 5, 6 and 10, cleaning up Think Python by hand would
+    take hundreds of such steps.
+  - Recommendation: an undo for the last change, and a way to indent or
+    outdent a range of blocks at once, for example "make the following
+    blocks children of this one".
+- **The "New block" action is hidden.** The coloured content boxes that show
+  where a click creates a block fade out about 2 s after a block is chosen
+  (`s3-22-attn-bboxes-400ms`). Nothing tells the reader that clicking a
+  paragraph offers *New block*, and the small callout then covers the
+  paragraph's own text (`s3-23-attn-callout`). A visible hint or a menu entry
+  would help.
+- **The title prompt is awkward** (`s3-26-title-dialog`). The default is the
+  full 512 characters, cut in the middle of a word ("…113809of.fic; y"). It is
+  not selected, so typing adds to it, and Enter does not confirm. A short
+  default (the first sentence), selected, with Enter to confirm, would make
+  typing a title quick.
+- **The AI preview is hard to check.**
+  - Changed rows are highlighted, but there is no count of changes. The list
+    sits in a small scrolling box, about 11 rows at 900 px high and 8 at
+    560 px, so checking a long book means scrolling through every row.
+  - When the proposal matches the current layout, nothing says so and
+    *Confirm* is still offered (`s3-31-ai-preview-small`).
+  - Rows cannot be accepted or rejected one by one (see defect 17).
+  - The waiting screen ("Analyzing book layout…") has no cancel. That is fine
+    at 3–6 s, but not for a long wait.
+- **Small items:**
   - In short viewports, the current block is kept at the layout panel's
     bottom edge (520–560 of 560 px), so the reader cannot see what comes next;
     a margin would help.
@@ -396,31 +616,50 @@ store path. The CLI worked only with
   - *Read from here* scrolls back to the block's start (about 280 px at
     1280×560) instead of keeping the reader's place.
   - The new-notebook name field has only a placeholder, no visible label.
+  - Right after creating a block, the "Now reading" bar appears, because the
+    parent is current and the new child is selected, although the reader has
+    not moved (`s3-25-attn-after-new-block`).
+  - In the dark theme, EPUB pages stay bright white next to the dark layout
+    (`s3-39-dark-18`).
 
-### Coverage gaps (attach and browse)
+### Coverage gaps
 
 - Only headless Chromium with synthetic wheel events was used. Trackpad
   momentum, touch scrolling, other browsers, and perceived flicker were not
   observed; only frame timing was measured.
+- Phone width could not be explored beyond the first screen because of
+  defect 2.
 - PDF attach failures (a corrupt PDF, a MinerU error or timeout) and PDF
   upload through the web (not offered) were not exercised.
-- The dark theme was not checked. No image-heavy EPUB was used: this Alice
-  edition has only a cover.
-- Mobile browsing could not go beyond the first screen because of defect 2.
-- Keyboard-only navigation of the layout was not tried.
-- Deleting a book through the sidebar file view was not tried, to keep the
-  data for slice 3.
+- No image-heavy EPUB was used: this Alice edition has only a cover.
+- The dark theme was checked only through the browser's colour-scheme setting,
+  on one screen per format. Keyboard use was checked only for the layout
+  (defects 13 and 14), not for the reading panel or dialogs.
+- Heading-only auto-marking in EPUB was not exercised; no suitable block was
+  found in these two EPUBs within the time.
+- AI reorganization was judged on one small book only. The book size at which
+  it starts to fail (defect 10) is unknown, because no book between 27 and 361
+  blocks was tried. AI reorganization of EPUB could not be judged (defect 11).
+- Block creation from a content box exists only for PDF; EPUB offers nothing
+  to click, so it was not evaluated.
+- Reading on two devices or in two tabs at once was not tried.
+- Deleting a book through the sidebar file view, and what that does to its
+  records, was not tried, to keep the UAT data.
 
-### Data left for reading records and reorganizing
+### UAT data left in the development database
 
-- *UAT Attention* is the cleanest start for reading records and AI
-  reorganizing: 26 blocks, no records, and a flat hierarchy that AI should
-  nest.
-- *UAT Think Python* suits manual reorganizing: running-header duplicates to
-  cancel and misplaced chapters to outdent. It already has one READ record,
-  from heading-only auto-marking during browsing.
+- *UAT Attention* arrived flat with 26 blocks and no records. It is now nested
+  by AI and has records on 7 blocks. It has a new block made from the first
+  paragraph of 3.2.
+- *UAT Think Python* had one READ record after browsing, from heading-only
+  auto-marking. It has lost the duplicate "9.3. Search" and the "Chapter 12"
+  label. It has three new blocks: one under 8.3 titled with a whole paragraph
+  ("A lot of computations involve processing a string…"), "Moby word list
+  (UAT)", and "Anagram exercises (UAT)". Chapter 9's depths were restored by
+  hand.
 - *UAT Origin of Species* and *UAT Alice* each carry the spurious "Contents"
-  READ record from defect 7, and each has a saved reading position.
+  READ record from defect 7, and each has a saved reading position. *UAT
+  Alice* also has records on chapters II and III.
 
 ## Ordering and Scope Reduction
 

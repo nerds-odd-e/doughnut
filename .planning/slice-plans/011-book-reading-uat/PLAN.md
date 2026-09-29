@@ -73,7 +73,7 @@ layout stays scrolled to the current block at 1280×560 → observed defects and
 
 ### 3. Reading records and reorganizing findings are recorded
 Type: Behavior
-Status: planned
+Status: done
 Size: about 55 minutes of UAT budget plus the 15-minute reserve.
 Proof: the same section gains findings for reading records, resume, manual reorganization, and AI
 reorganization, each with evidence.
@@ -114,9 +114,13 @@ rereading the session.
 - The CLI `/attach` also accepts EPUB (raw upload), so both EPUB routes (CLI and web) are in scope for
   slice 2.
 - Slice 2 (accepted 2026-09-29): exploration 07:33–08:00, 27 of 50 budget minutes; breadth complete, so
-  about 38 minutes (23 unused + 15 reserve) remain for slice 3. Real MinerU took 167 s for Think Python
+  93 of the 120 budget minutes remained for slice 3. Real MinerU took 167 s for Think Python
   (not ~13 min) and 28 s for the arXiv paper. Findings: nine defects and the improvements are in the
   seed's `## UAT Findings`. Evidence inspected: `shots/s2-11-tp-mobile-open.png` (defect 2) and
   `s2-tp-layout.txt` (defects 5 and 6). Notebooks for slice 3: UAT Think Python 17 (PDF book 5), UAT Alice
   18 (EPUB 3), UAT DRM Alice 19 (no book), UAT Origin of Species 20 (EPUB 4), UAT Attention 21 (PDF 6).
   Helper `br.js` gives reader goto, layout dump, and current/selected state.
+- Slice 3 (accepted 2026-09-29): exploration 08:07–08:36, 29 minutes; breadth complete, reserve unused,
+  so the UAT used 56 of 120 minutes. Defects 10–17 added; evidence inspected: `shots/s3-33-ai-err-17.png`
+  and `s3-ai-tp.txt` (defect 10: AI reorganization of the 361-block Think Python returns HTTP 500 and shows
+  truncated raw JSON). AI reorganization of the 27-block paper previewed in 3–6 s and was mostly correct.
