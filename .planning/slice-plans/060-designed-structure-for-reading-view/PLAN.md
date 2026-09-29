@@ -157,7 +157,15 @@ bindings. Enables story 10 turning `reorganize` on for EPUB. About 10 min.
 
 ### 5. Format views own only their format; the file-size waiver ends
 Type: Structure
-Status: planned
+Status: done
+Accepted proof: frontend command plus `tests/composables/book-reading` and
+`tests/composables/useBookReadingCurrentBlock`, 14 files / 74 tests; `vue-tsc
+--noEmit` clean; `wc -l` largest reading-view file 230 (`PdfBookViewer.vue`,
+400, excluded); `book_browsing` 6, `phone_reading` 7, `reading_record` 7,
+`epub_book` 17, `reorganize_layout` 8 (45/45; selection refactor rerun 30/30 on
+the first three plus `epub_book`). PDF's viewport position moved to
+`usePdfViewportPosition`. No lint or config exemption named the old file; the
+waiver lived only in DD-160.
 Proof: frontend command; `wc -l` check above; `cy:run --spec e2e_test/features/book_reading/book_browsing.feature,e2e_test/features/book_reading/phone_reading.feature`.
 
 Rename the views to `BookReadingPdf.vue` and `BookReadingEpub.vue` (update

@@ -4,7 +4,7 @@ import {
 } from "@/lib/book-reading/debounceCurrentBlockId"
 import {
   createLastReadPositionPatchDebouncer,
-  type LastReadPositionPatchDebouncer,
+  type LastReadPositionPatchBody,
 } from "@/lib/book-reading/debounceLastReadPositionPatch"
 import { NotebookBooksController } from "@generated/donut-backend-api/sdk.gen"
 import {
@@ -16,38 +16,23 @@ import {
   type Ref,
 } from "vue"
 
-const DEFAULT_CURRENT_BLOCK_DEBOUNCE_MS = 120
-const DEFAULT_LAST_READ_PATCH_DEBOUNCE_MS = 400
+const CURRENT_BLOCK_DEBOUNCE_MS = 120
+const LAST_READ_PATCH_DEBOUNCE_MS = 400
 
 export function useBookReadingCurrentBlock(options: {
   notebookId: MaybeRefOrGetter<number>
   commitCurrentBlock: (id: number | null) => boolean
-  /**
-   * Format-specific: receives the PATCH debouncer (single `propose(locator, selectedBookBlockId?)`),
-   * returns the function to run when the reading position should be sent (viewport/relocate updates
-   * and when `currentBlockId` changes).
-   */
-  proposeReadingPosition: (
-    debouncer: LastReadPositionPatchDebouncer
-  ) => () => void
-  currentBlockDebounceMs?: number
-  lastReadPositionPatchDebounceMs?: number
-  /** EPUB flushes a pending PATCH on leave; PDF cancels without sending. */
-  flushLastReadPositionPatchOnUnmount?: boolean
+  /** The reading position to send, or null when there is none yet. */
+  readingPosition: () => LastReadPositionPatchBody | null
+  /** EPUB sends a pending reading position on leave; PDF drops it. */
+  flushPositionOnLeave?: boolean
 }): {
   currentBlockId: DeepReadonly<Ref<number | null>>
   currentBlockIdDebouncer: CurrentBlockIdDebouncer
-  lastReadPositionPatchDebouncer: LastReadPositionPatchDebouncer
   proposeReadingPosition: () => void
 } {
-  const currentBlockDebounceMs =
-    options.currentBlockDebounceMs ?? DEFAULT_CURRENT_BLOCK_DEBOUNCE_MS
-  const lastReadPatchMs =
-    options.lastReadPositionPatchDebounceMs ??
-    DEFAULT_LAST_READ_PATCH_DEBOUNCE_MS
-
   const lastReadPositionPatchDebouncer = createLastReadPositionPatchDebouncer({
-    delayMs: lastReadPatchMs,
+    delayMs: LAST_READ_PATCH_DEBOUNCE_MS,
     patch: (body) =>
       NotebookBooksController.patchNotebookBookReadingPosition({
         path: { notebook: toValue(options.notebookId) },
@@ -55,12 +40,17 @@ export function useBookReadingCurrentBlock(options: {
       }),
   })
 
-  const proposeReadingPosition = options.proposeReadingPosition(
-    lastReadPositionPatchDebouncer
-  )
+  function proposeReadingPosition() {
+    const position = options.readingPosition()
+    if (position === null) return
+    lastReadPositionPatchDebouncer.propose(
+      position.locator,
+      position.selectedBookBlockId
+    )
+  }
 
   const currentBlockIdDebouncer = createCurrentBlockIdDebouncer({
-    delayMs: currentBlockDebounceMs,
+    delayMs: CURRENT_BLOCK_DEBOUNCE_MS,
     commit: options.commitCurrentBlock,
   })
 
@@ -72,7 +62,7 @@ export function useBookReadingCurrentBlock(options: {
 
   onBeforeUnmount(() => {
     currentBlockIdDebouncer.cancel()
-    if (options.flushLastReadPositionPatchOnUnmount) {
+    if (options.flushPositionOnLeave) {
       lastReadPositionPatchDebouncer.flush()
     } else {
       lastReadPositionPatchDebouncer.cancel()
@@ -82,7 +72,6 @@ export function useBookReadingCurrentBlock(options: {
   return {
     currentBlockId,
     currentBlockIdDebouncer,
-    lastReadPositionPatchDebouncer,
     proposeReadingPosition,
   }
 }

@@ -68,12 +68,14 @@ export function useBookReadingSession(options: {
     useBookReadingCurrentBlock({
       notebookId,
       commitCurrentBlock: (id) => surface.commitCurrentBlock?.(id) ?? true,
-      flushLastReadPositionPatchOnUnmount: surface.flushPositionOnLeave,
-      proposeReadingPosition: (debouncer) => () => {
+      flushPositionOnLeave: surface.flushPositionOnLeave,
+      readingPosition: () => {
         const locator = surface.readingPositionLocator()
-        if (locator === null) return
-        const sel = selectedBlockId.value
-        debouncer.propose(locator, sel === null ? undefined : sel)
+        if (locator === null) return null
+        return {
+          locator,
+          selectedBookBlockId: selectedBlockId.value ?? undefined,
+        }
       },
     })
 
@@ -87,10 +89,8 @@ export function useBookReadingSession(options: {
     hasRecordedDisposition: bookReading.hasRecordedDisposition,
     submitReadingDisposition: bookReading.submitReadingDisposition,
     selectedBlockId,
-    repairSelectionWhenBlocksChange: surface.repairSelection,
-    overrideBlockAwaitingConfirmation: surface.blockAwaitingConfirmation
-      ? computed(surface.blockAwaitingConfirmation)
-      : undefined,
+    repairSelection: surface.repairSelection,
+    blockAwaitingConfirmation: surface.blockAwaitingConfirmation,
     onMarkedRead: surface.onMarkedRead,
     onAdvance: async (block) => {
       await surface.showBlock(block)

@@ -9,8 +9,8 @@
     <template #bar-end>
       <PdfControl
         class="ml-auto mr-2"
-        :current-page="pdfBarCurrentPage"
-        :pages-total="pdfBarPagesTotal"
+        :current-page="currentPage"
+        :pages-total="pagesTotal"
         @zoom-in="pdfViewerRef?.zoomIn()"
         @zoom-out="pdfViewerRef?.zoomOut()"
       />
@@ -40,27 +40,18 @@ import PdfBookViewer from "@/components/book-reading/PdfBookViewer.vue"
 import PdfControl from "@/components/book-reading/PdfControl.vue"
 import { pdfLocatorsFromBlock } from "@/lib/book-reading/asPdfLocator"
 import { wireItemsToNavigationTargets } from "@/lib/book-reading/pdfOutlineV1Anchor"
-import { currentBlockIdFromVisiblePage } from "@/lib/book-reading/currentBlockIdFromVisiblePage"
-import type { ViewportYRange } from "@/lib/book-reading/pdfViewerViewportTopYDown"
+import {
+  usePdfViewportPosition,
+  type PdfViewportPayload,
+} from "@/composables/book-reading/usePdfViewportPosition"
 import { READING_PANEL_OBSTRUCTION_PX } from "@/composables/useReadingPanelAnchor"
 import { useBookReadingSnapBack } from "@/composables/useBookReadingSnapBack"
 import type { BookReadingPdfViewerRef } from "@/composables/bookReaderViewerRef"
 import { useBookReadingSession } from "@/composables/useBookReadingSession"
-import type {
-  BookBlockFull,
-  BookFull,
-  PdfLocatorFull,
-} from "@generated/donut-backend-api"
+import type { BookBlockFull, BookFull } from "@generated/donut-backend-api"
 import { NotebookBooksController } from "@generated/donut-backend-api/sdk.gen"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
-import { computed, ref, watch } from "vue"
-
-type ViewportPayload = {
-  anchorPageIndexZeroBased: number
-  viewport: ViewportYRange | null
-  pagesCount: number
-  readingPosition?: { pageIndexZeroBased: number; normalizedTop: number } | null
-}
+import { ref, watch } from "vue"
 
 const emit = defineEmits<{
   "update:book": [book: BookFull]
@@ -80,37 +71,13 @@ const props = withDefaults(
 )
 
 const pdfViewerLoadError = ref<string | null>(null)
-const viewportPayload = ref<ViewportPayload | null>(null)
-
-const pdfBarCurrentPage = computed(() => {
-  const p = viewportPayload.value
-  return p && p.pagesCount > 0 ? p.anchorPageIndexZeroBased + 1 : null
-})
-
-const pdfBarPagesTotal = computed(() => {
-  const p = viewportPayload.value
-  return p && p.pagesCount > 0 ? p.pagesCount : null
-})
-
-const lastReadingForPatch = computed(() => {
-  const p = viewportPayload.value
-  if (!p) return null
-  let reading: { pageIndexZeroBased: number; normalizedTop: number } | null =
-    null
-  if (p.readingPosition !== undefined) {
-    reading = p.readingPosition
-  } else if (p.viewport !== null) {
-    reading = {
-      pageIndexZeroBased: p.anchorPageIndexZeroBased,
-      normalizedTop: p.viewport.top,
-    }
-  }
-  if (reading === null) return null
-  return {
-    pageIndex: reading.pageIndexZeroBased,
-    normalizedY: Math.round(reading.normalizedTop),
-  }
-})
+const {
+  payload: viewportPayload,
+  currentPage,
+  pagesTotal,
+  readingPositionLocator,
+  currentBlockCandidate,
+} = usePdfViewportPosition(() => props.book.blocks)
 
 function onPdfLoadError(message: string) {
   pdfViewerLoadError.value = message
@@ -155,17 +122,6 @@ async function showBlock(block: BookBlockFull) {
   currentBlockIdDebouncer.commitNow(block.id)
 }
 
-function readingPositionLocator(): PdfLocatorFull | null {
-  const last = lastReadingForPatch.value
-  if (last === null) return null
-  const y = Math.max(0, Math.min(1000, last.normalizedY))
-  return {
-    type: "PdfLocator_Full",
-    pageIndex: last.pageIndex,
-    bbox: [0, y, 0, y],
-  }
-}
-
 const {
   snapAnimationKey,
   blockAwaitingConfirmation: snapBlockAwaitingConfirmation,
@@ -192,28 +148,10 @@ function commitCurrentBlockId(id: number | null): boolean {
   return true
 }
 
-/**
- * Scroll → current-block pipeline:
- *   PdfBookViewer emits `viewportAnchorPage` → here we map anchor page + viewport Y-range to a block ID
- *   → result is debounced through `currentBlockIdDebouncer`.
- */
-function onViewportAnchorPage(payload: ViewportPayload) {
+/** PdfBookViewer's viewport → the debounced current block, panel anchor, and reading position. */
+function onViewportAnchorPage(payload: PdfViewportPayload) {
   viewportPayload.value = payload
-  const candidate = currentBlockIdFromVisiblePage(
-    bookBlocks.value.map((r) => {
-      const first = pdfLocatorsFromBlock(r)[0]
-      return {
-        id: r.id,
-        firstBbox: first
-          ? { pageIndex: first.pageIndex, bbox: first.bbox }
-          : undefined,
-      }
-    }),
-    payload.anchorPageIndexZeroBased,
-    payload.viewport,
-    payload.pagesCount
-  )
-  currentBlockIdDebouncer.propose(candidate)
+  currentBlockIdDebouncer.propose(currentBlockCandidate(payload))
   updateLastDirectContentGeometry()
   updateReadingPanelAnchor()
   proposeReadingPosition()

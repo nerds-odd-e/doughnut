@@ -20,13 +20,10 @@ export function useBookReadingSelection(options: {
     status: BookBlockReadingDisposition
   ) => Promise<boolean>
   onAdvance: (block: BookBlockFull) => void | Promise<void>
-  /** When set (PDF), snap-back supplies the panel target; otherwise EPUB-style. */
-  overrideBlockAwaitingConfirmation?: ComputedRef<BookBlockFull | null>
-  /**
-   * PDF: keep selection valid when `book.blocks` changes (first block fallback).
-   * EPUB: leave false to preserve prior behavior.
-   */
-  repairSelectionWhenBlocksChange?: boolean
+  /** Decides which block awaits confirmation instead of the unmarked selected block. */
+  blockAwaitingConfirmation?: () => BookBlockFull | null
+  /** Keeps the selection on an existing block (the first) when the blocks change. */
+  repairSelection?: boolean
   onMarkedRead?: (blockId: number) => void
   selectedBlockId: Ref<number | null>
 }): {
@@ -42,24 +39,20 @@ export function useBookReadingSelection(options: {
     hasRecordedDisposition,
     submitReadingDisposition,
     onAdvance,
-    overrideBlockAwaitingConfirmation,
-    repairSelectionWhenBlocksChange = false,
+    repairSelection = false,
     onMarkedRead,
     selectedBlockId,
   } = options
 
-  const defaultBlockAwaitingConfirmation = computed<BookBlockFull | null>(
-    () => {
-      const selId = selectedBlockId.value
-      if (selId === null) return null
-      if (hasRecordedDisposition(selId)) return null
-      const rows = toValue(bookBlocks)
-      return rows.find((b) => b.id === selId) ?? null
-    }
+  const blockAwaitingConfirmation = computed<BookBlockFull | null>(
+    options.blockAwaitingConfirmation ??
+      (() => {
+        const selId = selectedBlockId.value
+        if (selId === null) return null
+        if (hasRecordedDisposition(selId)) return null
+        return toValue(bookBlocks).find((b) => b.id === selId) ?? null
+      })
   )
-
-  const blockAwaitingConfirmation =
-    overrideBlockAwaitingConfirmation ?? defaultBlockAwaitingConfirmation
 
   useAutoMarkPredecessorWithNoTextOfItsOwn({
     bookBlocks,
@@ -68,7 +61,7 @@ export function useBookReadingSelection(options: {
     submitReadingDisposition,
   })
 
-  if (repairSelectionWhenBlocksChange) {
+  if (repairSelection) {
     watch(
       () => toValue(bookBlocks),
       (blocks) => {

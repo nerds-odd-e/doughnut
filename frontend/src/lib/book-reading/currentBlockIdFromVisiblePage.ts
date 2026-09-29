@@ -18,7 +18,7 @@ export type BookBlockFirstBboxRow = {
 
 /**
  * Maps the anchor page + viewport Y-range (from `pdfViewerViewportTopYDown`) to the current block ID.
- * Called by `BookReadingContent.onViewportAnchorPage` on every scroll/resize.
+ * Called by `usePdfViewportPosition.currentBlockCandidate` on every scroll/resize.
  *
  * Key invariant: if the first visible block's `y0` is above the viewport midpoint, the previous
  * block is returned. Scrolling page N to the container top is not sufficient to make a block at

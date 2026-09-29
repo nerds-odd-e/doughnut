@@ -9,13 +9,13 @@ import makeMe from "donut-test-fixtures/makeMe"
 import { flushPromises } from "@vue/test-utils"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import {
-  bookReadingContentProps,
+  bookReadingPdfProps,
   clickAiReorganize,
   loadingModal,
   mockToast,
-  mountBookReadingContent,
+  mountBookReadingPdf,
   mountBookReadingWithGlobalModal,
-} from "./bookReadingContentAiReorganizeTestSupport"
+} from "./bookReadingPdfAiReorganizeTestSupport"
 
 vi.mock("vue-toastification", () => ({
   useToast: () => mockToast,
@@ -63,7 +63,7 @@ function mockPendingApply() {
   }
 }
 
-describe("BookReadingContent AI reorganize suggest", () => {
+describe("BookReadingPdf AI reorganize suggest", () => {
   const apiStatus: ApiStatus = { states: [] }
   let innerWidthDesc: PropertyDescriptor | undefined
 
@@ -103,7 +103,7 @@ describe("BookReadingContent AI reorganize suggest", () => {
   })
 
   it("shows error toast when suggest fails", async () => {
-    const wrapper = mountBookReadingContent(bookReadingContentProps())
+    const wrapper = mountBookReadingPdf(bookReadingPdfProps())
 
     await flushPromises()
     await clickAiReorganize(wrapper)
@@ -118,7 +118,7 @@ describe("BookReadingContent AI reorganize suggest", () => {
       NotebookBooksController.suggestBookLayoutReorganization
     ).mockResolvedValueOnce(wrapSdkResponse({ blocks: [{ id: 1, depth: 0 }] }))
 
-    const wrapper = mountBookReadingContent(bookReadingContentProps())
+    const wrapper = mountBookReadingPdf(bookReadingPdfProps())
 
     await flushPromises()
     await clickAiReorganize(wrapper)
@@ -159,7 +159,7 @@ describe("BookReadingContent AI reorganize suggest", () => {
       })
     )
 
-    const wrapper = mountBookReadingContent(bookReadingContentProps(book))
+    const wrapper = mountBookReadingPdf(bookReadingPdfProps(book))
 
     await flushPromises()
     await clickAiReorganize(wrapper)
@@ -179,7 +179,7 @@ describe("BookReadingContent AI reorganize suggest", () => {
 
   it("shows the global loading modal while suggest API is pending", async () => {
     const pending = mockPendingSuggest()
-    const wrapper = mountBookReadingWithGlobalModal(bookReadingContentProps())
+    const wrapper = mountBookReadingWithGlobalModal(bookReadingPdfProps())
 
     await flushPromises()
     await clickAiReorganize(wrapper)
@@ -206,9 +206,7 @@ describe("BookReadingContent AI reorganize suggest", () => {
     ).mockResolvedValueOnce(wrapSdkResponse({ blocks: [{ id: 1, depth: 1 }] }))
 
     const pending = mockPendingApply()
-    const wrapper = mountBookReadingWithGlobalModal(
-      bookReadingContentProps(book)
-    )
+    const wrapper = mountBookReadingWithGlobalModal(bookReadingPdfProps(book))
 
     await flushPromises()
     await clickAiReorganize(wrapper)

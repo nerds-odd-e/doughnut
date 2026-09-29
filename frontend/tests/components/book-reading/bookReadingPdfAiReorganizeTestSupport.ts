@@ -1,4 +1,4 @@
-import BookReadingContent from "@/components/book-reading/BookReadingContent.vue"
+import BookReadingPdf from "@/components/book-reading/BookReadingPdf.vue"
 import GlobalApiLoadingModal from "@tests/helpers/GlobalApiLoadingModal"
 import helper from "@tests/helpers"
 import makeMe from "donut-test-fixtures/makeMe"
@@ -9,22 +9,22 @@ export const mockToast = {
   error: vi.fn(),
 }
 
-export const bookReadingContentStubs = {
+export const bookReadingPdfStubs = {
   GlobalBar: { template: "<div><slot /></div>" },
   PdfBookViewer: { template: '<div data-testid="pdf-stub" />' },
   ReadingControlPanel: true,
   CurrentBlockNavigationBar: true,
 }
 
-export type BookReadingContentProps = {
+export type BookReadingPdfProps = {
   book: ReturnType<typeof makeMe.aBook.please>
   bookPdfBytes: ArrayBuffer
   initialLastRead: null
 }
 
-export function bookReadingContentProps(
-  book: BookReadingContentProps["book"] = makeMe.aBook.notebookId("9").please()
-): BookReadingContentProps {
+export function bookReadingPdfProps(
+  book: BookReadingPdfProps["book"] = makeMe.aBook.notebookId("9").please()
+): BookReadingPdfProps {
   return {
     book,
     bookPdfBytes: new ArrayBuffer(0),
@@ -32,31 +32,31 @@ export function bookReadingContentProps(
   }
 }
 
-export function mountBookReadingContent(contentProps: BookReadingContentProps) {
+export function mountBookReadingPdf(contentProps: BookReadingPdfProps) {
   return helper
-    .component(BookReadingContent)
+    .component(BookReadingPdf)
     .withRouter()
     .withProps(contentProps)
     .mount({
       global: {
-        stubs: bookReadingContentStubs,
+        stubs: bookReadingPdfStubs,
       },
     })
 }
 
 export function mountBookReadingWithGlobalModal(
-  contentProps: BookReadingContentProps
+  contentProps: BookReadingPdfProps
 ) {
   const Host = defineComponent({
-    components: { BookReadingContent, GlobalApiLoadingModal },
+    components: { BookReadingPdf, GlobalApiLoadingModal },
     props: {
       contentProps: {
-        type: Object as () => BookReadingContentProps,
+        type: Object as () => BookReadingPdfProps,
         required: true,
       },
     },
     template: `
-      <BookReadingContent v-bind="contentProps" />
+      <BookReadingPdf v-bind="contentProps" />
       <GlobalApiLoadingModal />
     `,
   })
@@ -67,7 +67,7 @@ export function mountBookReadingWithGlobalModal(
     .withProps({ contentProps })
     .mount({
       global: {
-        stubs: bookReadingContentStubs,
+        stubs: bookReadingPdfStubs,
       },
     })
 }

@@ -19,14 +19,14 @@
         {{ fileError }}
       </div>
     </div>
-    <BookReadingEpubView
+    <BookReadingEpub
       v-else-if="bootstrap?.kind === 'epub'"
       :book="bootstrap.book"
       :epub-bytes="bootstrap.bytes"
       :initial-locator="bootstrap.initialLocator"
       :initial-selected-block-id="bootstrap.initialSelectedBlockId"
     />
-    <BookReadingContent
+    <BookReadingPdf
       v-else-if="bootstrap?.kind === 'pdf'"
       :book="bootstrap.book"
       :book-pdf-bytes="bootstrap.bytes"
@@ -38,8 +38,8 @@
 </template>
 
 <script setup lang="ts">
-import BookReadingContent from "@/components/book-reading/BookReadingContent.vue"
-import BookReadingEpubView from "@/components/book-reading/BookReadingEpubView.vue"
+import BookReadingEpub from "@/components/book-reading/BookReadingEpub.vue"
+import BookReadingPdf from "@/components/book-reading/BookReadingPdf.vue"
 import ContentLoader from "@/components/commons/ContentLoader.vue"
 import { useBookReadingBootstrap } from "@/composables/useBookReadingBootstrap"
 
