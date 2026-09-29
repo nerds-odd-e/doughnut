@@ -222,3 +222,18 @@ unproved and report it; do not claim them from slices 3–5.
     `pipeline` extra or `mineru.cli.common`, so the unpinned
     `pip install 'mineru[pipeline]'` in `cli/python/mineru_book_outline.py` and
     `regenerate_mineru_output_for_refactoring.sh` no longer works — follow-up.
+
+## Execution complete
+
+Product advice:
+- Queue a bug story first: in slice 5's E2E, opening a second notebook's book
+  in-app kept the first book's layout and PDF and sent
+  `PATCH /api/notebooks/1/book/reading-position` from `/notebooks/2/book`, so a
+  reader can write reading position to the wrong book.
+- Pin MinerU (`mineru[pipeline]==3.4.5` plus `six`) where the CLI docstring and
+  `regenerate_mineru_output_for_refactoring.sh` install it; the unpinned install
+  now gets MinerU 4.x, which the CLI cannot import (DD-161).
+- At wrap-up, correct the Think Python key example's "'Index' once": the PDF has
+  no Index bookmark, so the delivered rule (bookmarks decide the layout) gives
+  no Index block.
+- No change to the order of the remaining SEED-059 stories.
