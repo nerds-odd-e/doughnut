@@ -8,23 +8,6 @@ Resolved findings are removed; Git history keeps their evidence.
 
 ## Open findings
 
-### Queued: MinerU install that PDF book attach depends on
-
-#### DD-161 — Real-book manual acceptance had no supported way to hold a disposable stack or run MinerU
-
-Story: [SEED-060#story-1](.planning/seeds/SEED-060-mineru-version-for-pdf-books.md#story-1) (the MinerU version; stack holding and venv repair are deferred there).
-
-Impact check (2026-09-29): the released CLI bundles this outline script and tells users to `pip install 'mineru[pipeline]'`. MinerU 4.0.0 (2026-09-16) and later have neither the `pipeline` extra nor `mineru.cli.common` (PyPI wheels 4.0.10 and 3.4.5 compared), so the same failure reaches CLI users who attach PDF books.
-
-The plan's manual slice needed real MinerU and a running app to `/attach` real PDFs through the CLI. `.venv-mineru`'s Python pointed into a garbage-collected Nix store path, the unpinned `pip install 'mineru[pipeline]'` in the repo's docstrings installs MinerU 4.x (no `pipeline` extra, no `mineru.cli.common`), and no repo command keeps a disposable E2E stack up without Cypress, so the agent wrote a temporary `hold-stack.mjs` around `runE2eInteractive`.
-
-##### Occurrences
-
-- Execution: SEED-059#story-3 / slice-plans/051-pdf-layout-from-bookmarks / 946e2a70e3; Timestamp: 2026-09-29 (slice 6, after 6f36cb2952); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.46.
-  - Evidence: slice 6 agent report (1,692 s, about 197k tokens, 96 tool uses); plan premise "`.venv-mineru/bin` has no `python`"; venv rebuilt with Homebrew Python 3.12, `mineru[pipeline]==3.4.5` and `six`; `cli/python/mineru_book_outline.py` and `regenerate_mineru_output_for_refactoring.sh` still say unpinned.
-  - Observed effect: about 28 minutes for one manual slice, most of it environment repair and stack scaffolding rather than observation.
-  - Inference: much of the cost was necessary once; a pinned MinerU install and a documented "hold a disposable stack" command would make the next real-book acceptance cheaper. Donut tooling, so correction belongs to Donut, not shared guidance.
-
 ### Open, not queued: Development stack start
 
 #### DD-159 — The Development stack failed to start on stale compiled backend classes in the default checkout
@@ -82,15 +65,30 @@ No new occurrence reopens DD-073, DD-103 or DD-121. The SUT start fix
 `d33dedc7c8` (SEED-039#story-4) repaired a script test racing its own deadline,
 not the DD-103 runner backend race.
 
+### Open, not queued: Real-book manual acceptance setup
+
+#### DD-161 — Real-book manual acceptance had no supported way to hold a disposable stack or run MinerU
+
+The MinerU version part is resolved: every install hint now names `pip install 'mineru[pipeline]==3.4.5' six` on Python 3.10–3.13. Still open: no repo command keeps a disposable E2E stack up for manual use, and a `.venv-mineru` whose Python lived in a garbage-collected Nix store path must be rebuilt by hand.
+
+The plan's manual slice needed real MinerU and a running app to `/attach` real PDFs through the CLI. `.venv-mineru`'s Python pointed into a garbage-collected Nix store path, the unpinned `pip install 'mineru[pipeline]'` in the repo's docstrings installs MinerU 4.x (no `pipeline` extra, no `mineru.cli.common`), and no repo command keeps a disposable E2E stack up without Cypress, so the agent wrote a temporary `hold-stack.mjs` around `runE2eInteractive`.
+
+##### Occurrences
+
+- Execution: SEED-059#story-3 / slice-plans/051-pdf-layout-from-bookmarks / 946e2a70e3; Timestamp: 2026-09-29 (slice 6, after 6f36cb2952); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.46.
+  - Evidence: slice 6 agent report (1,692 s, about 197k tokens, 96 tool uses); plan premise "`.venv-mineru/bin` has no `python`"; venv rebuilt with Homebrew Python 3.12, `mineru[pipeline]==3.4.5` and `six`; `cli/python/mineru_book_outline.py` and `regenerate_mineru_output_for_refactoring.sh` still say unpinned.
+  - Observed effect: about 28 minutes for one manual slice, most of it environment repair and stack scaffolding rather than observation.
+  - Inference: much of the cost was necessary once; a pinned MinerU install and a documented "hold a disposable stack" command would make the next real-book acceptance cheaper. Donut tooling, so correction belongs to Donut, not shared guidance.
+
 ### Priority
 
 A finding is queued only for high impact or high frequency, with impact
 ranked first.
 
-- DD-161 is queued first (SEED-060#story-1). It has high impact: one
-  occurrence cost about 28 minutes, and its root cause, Donut advising an
-  unpinned MinerU install, breaks PDF book outlines for CLI users on any fresh
-  install since MinerU 4.0.0.
+- DD-161 is not queued. Its high-impact part, Donut advising an unpinned
+  MinerU install that breaks PDF book outlines for CLI users, is fixed. What
+  remains (holding a disposable stack, rebuilding a stale `.venv-mineru`) is a
+  lower-impact convenience for real-book manual acceptance, seen once.
 - DD-159 is not queued. It has one occurrence, and one failed start was fixed
   by deleting `backend/build/classes`. `pnpm backend:watch` runs Gradle's
   incremental `classes` build, which normally removes stale classes, so how

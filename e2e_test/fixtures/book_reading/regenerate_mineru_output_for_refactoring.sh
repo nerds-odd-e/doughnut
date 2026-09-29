@@ -10,9 +10,9 @@ set -euo pipefail
 #   - Preparing sp-2.2: promote this file to mineru_output_for_refactoring.json after updating E2E
 #
 # Prerequisite (real MinerU — not e2e_test/python_stubs/mineru_site on PYTHONPATH):
-#   python3 -m venv .venv-mineru
+#   python3.12 -m venv .venv-mineru   # any Python 3.10–3.13
 #   source .venv-mineru/bin/activate
-#   pip install 'mineru[pipeline]'
+#   pip install 'mineru[pipeline]==3.4.5' six
 #
 # From repo root:
 #   ./e2e_test/fixtures/book_reading/regenerate_mineru_output_for_refactoring.sh
@@ -36,7 +36,7 @@ if [[ ! -f $outline_script ]]; then
 fi
 
 if ! env -u PYTHONPATH python3 -c 'import mineru' 2>/dev/null; then
-  echo "error: cannot import mineru. Activate .venv-mineru and: pip install 'mineru[pipeline]'" >&2
+  echo "error: cannot import mineru. Activate a Python 3.10–3.13 .venv-mineru and: pip install 'mineru[pipeline]==3.4.5' six" >&2
   echo "       (use a clean env; do not set PYTHONPATH to the E2E mineru stub.)" >&2
   exit 1
 fi

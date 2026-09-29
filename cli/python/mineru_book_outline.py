@@ -2,7 +2,9 @@
 """
 Donut CLI: heading outline (layers 1–3) from PDF or EPUB for attach-book layout extraction.
 
-PDF: MinerU `do_parse` (pipeline). Example venv: `.venv-mineru/bin/pip install 'mineru[pipeline]'`.
+PDF: MinerU `do_parse` (pipeline). Example venv (Python 3.10–3.13): `.venv-mineru/bin/pip install 'mineru[pipeline]==3.4.5' six`.
+MinerU is pinned to 3.x: 4.x has no `pipeline` extra and no `mineru.cli.common`, and 3.4.5's
+pipeline imports `six` without declaring it.
 
 EPUB: MinerU does not accept EPUB. For `.epub` we walk the OPF spine and collect <h1>–<h3> text
 (BeautifulSoup — `pip install beautifulsoup4`; only loaded for `.epub`).
