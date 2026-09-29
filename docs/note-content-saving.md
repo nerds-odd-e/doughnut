@@ -108,5 +108,9 @@ loaded, and compares the two HTML renderings, treating whitespace in text as a
 browser displays it and keeping whitespace inside code exact. Style-only
 differences such as heading or bullet style, emphasis markers, reference links
 and line wrapping stay editable; raw HTML, task lists, hard line breaks, tagged
-code blocks and loose lists do not. Read-only viewers see no warning.
+code blocks and loose lists do not. A body that renders only empty paragraphs,
+line breaks, non-breaking spaces and whitespace shows nothing to lose, so it
+stays editable; opening it changes nothing, and the first rich edit replaces
+that invisible markup. Visible content without text, such as an image or a
+rule, still goes through the comparison. Read-only viewers see no warning.
 Markdown mode edits the text as typed.
