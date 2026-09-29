@@ -1,6 +1,5 @@
 <template>
   <div
-    ref="rootRef"
     class="pointer-events-auto mx-auto max-w-3xl rounded-lg bg-base-200/95 border border-base-300 shadow-lg px-3 py-2 flex flex-wrap items-center gap-2 relative"
   >
     <span
@@ -13,10 +12,5 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue"
-
 withDefaults(defineProps<{ showCaret?: boolean }>(), { showCaret: false })
-
-const rootRef = ref<HTMLElement | null>(null)
-defineExpose({ el: rootRef })
 </script>

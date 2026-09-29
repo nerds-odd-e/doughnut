@@ -91,7 +91,7 @@ resume, and layout editing.
 ### 1. Nothing pulls a PDF reader back to an unmarked block
 
 Type: Behavior
-Status: planned
+Status: done (manual wheel observation outstanding)
 Proof: new E2E scenario red → green; manual wheel-delta observation; book
 reading E2E features and `pnpm frontend:test` for book-reading specs green.
 
@@ -124,10 +124,33 @@ Change: send plain wheel events over the PDF panel to the PDF scroll container
 ## Current decisions
 
 - Snap-back is removed, not softened (owner, 2026-09-29).
+- Once a block's content end was seen, the panel stays offered for it until it
+  is marked or the selection changes; it no longer hides when the successor
+  becomes current (coordinator, from the story's key example, 2026-09-29).
+- When the fixed panel and the "Now reading" bar both show, the panel stacks
+  just above the bar (owner, 2026-09-29); both used the same bottom slot and the
+  bar covered the panel.
 - The E2E wheel over the panel uses a synthetic `wheel` event; real-wheel
   timing is covered by the slice-1 manual observation, not a new E2E
   dependency.
 
+## Accepted proof
+
+- Slice 1: `reading_record.feature` "Scrolling past an unmarked book block stays
+  where the reader scrolled" red (view pulled back to page 1) → green, including
+  marking 2.1 from the panel above the "Now reading" bar; `pnpm frontend:test`
+  (1922), book_browsing/reading_record/reorganize_layout/phone_reading 29/29,
+  `epub_book.feature` 17/17 (EPUB panel moved into the shared
+  `ReadingOverlayDock`).
+- **Outstanding:** the per-step real-wheel delta observation. Still needed
+  before the story closes, in a headed browser on the dev stack.
+
 ## Learnings
 
-(none yet)
+- CDP `mouseWheel` sent through `Cypress.automation` reaches the DOM (not
+  prevented) but does not natively scroll in headless Electron/Chrome, so it
+  cannot measure wheel deltas; the persistent dev stack refuses linked
+  worktrees.
+- With snap-back gone, scrolling past an unmarked block is the normal path, and
+  it exposed two older rules: the panel hid once the successor became current,
+  and the fixed panel and the "Now reading" bar shared one bottom slot.

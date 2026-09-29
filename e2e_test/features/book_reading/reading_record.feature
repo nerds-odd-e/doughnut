@@ -35,6 +35,15 @@ Feature: Reading record
     Then I should see that book block "2.1 Easier to Change—and Harder to Misuse" is marked as read in the book layout
     And I should see that book block "2.2 Refactoring as Strengthening the Code" is selected in the book layout
 
+  Scenario: Scrolling past an unmarked book block stays where the reader scrolled
+    When I choose the book block "2.1 Easier to Change—and Harder to Misuse"
+    And I scroll the PDF book reader until the Reading Control Panel shows for "2.1 Easier to Change—and Harder to Misuse"
+    And I scroll the PDF book reader to bring page 2 into primary view
+    Then the book reader PDF viewport should be on page 2
+    And the book block "2.2 Refactoring as Strengthening the Code" should be the current block in the book reader
+    When I mark the book block "2.1 Easier to Change—and Harder to Misuse" as read in the Reading Control Panel
+    Then I should see that book block "2.1 Easier to Change—and Harder to Misuse" is marked as read in the book layout
+
   Scenario: Change the mark of a book block in the book layout
     When I choose the book block "2.1 Easier to Change—and Harder to Misuse"
     And I scroll the PDF book reader until the Reading Control Panel shows for "2.1 Easier to Change—and Harder to Misuse"

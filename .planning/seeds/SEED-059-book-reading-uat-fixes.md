@@ -101,7 +101,10 @@ which makes reading a book in Donut feel broken rather than smooth.
 - **The Reading Control Panel never stops scrolling.** Wheeling with the pointer
   over the PDF panel scrolls the book, as the EPUB panel already allows. Its
   buttons still work.
-- **Deferred:** the panel's position, look, and the text it covers; EPUB
+- **The panel stays reachable after scrolling past** (owner decision,
+  2026-09-29). When the panel and the "Now reading" bar both show at the
+  bottom of the PDF, the panel sits just above the bar instead of under it.
+- **Deferred:** otherwise the panel's position, look, and the text it covers; EPUB
   scrolling; keeping the current block at the layout's edge in short viewports.
 - **Must keep working:** PDF landing on the exact page with the heading at the
   top, the current block following scrolling, the panel appearing at the

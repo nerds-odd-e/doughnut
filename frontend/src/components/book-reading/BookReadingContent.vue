@@ -76,21 +76,22 @@
             @pages-ready="onPagesReady"
             @create-block-from-content="onCreateBlockFromContent"
           />
-          <ReadingControlPanel
-            v-if="blockAwaitingConfirmation"
-            :selected-block-title="blockAwaitingConfirmation.title"
-            :snap-animation-key="snapAnimationKey"
-            :anchor-top-px="readingPanelAnchorTopPx"
-            @mark-as-read="() => markSelectedBlockDisposition('READ')"
-            @mark-as-skimmed="() => markSelectedBlockDisposition('SKIMMED')"
-            @mark-as-skipped="() => markSelectedBlockDisposition('SKIPPED')"
-          />
-          <CurrentBlockNavigationBar
-            v-if="currentBlockForNavBar"
-            :current-block-title="currentBlockForNavBar.title"
-            @read-from-here="onReadFromHere"
-            @back-to-selected="onBackToSelected"
-          />
+          <ReadingOverlayDock>
+            <ReadingControlPanel
+              v-if="blockAwaitingConfirmation"
+              :selected-block-title="blockAwaitingConfirmation.title"
+              :anchor-top-px="readingPanelAnchorTopPx"
+              @mark-as-read="() => markSelectedBlockDisposition('READ')"
+              @mark-as-skimmed="() => markSelectedBlockDisposition('SKIMMED')"
+              @mark-as-skipped="() => markSelectedBlockDisposition('SKIPPED')"
+            />
+            <CurrentBlockNavigationBar
+              v-if="currentBlockForNavBar"
+              :current-block-title="currentBlockForNavBar.title"
+              @read-from-here="onReadFromHere"
+              @back-to-selected="onBackToSelected"
+            />
+          </ReadingOverlayDock>
         </div>
       </div>
     </main>
@@ -119,6 +120,7 @@ import NewBookBlockTitleDialog from "@/components/book-reading/NewBookBlockTitle
 import PdfBookViewer from "@/components/book-reading/PdfBookViewer.vue"
 import PdfControl from "@/components/book-reading/PdfControl.vue"
 import ReadingControlPanel from "@/components/book-reading/ReadingControlPanel.vue"
+import ReadingOverlayDock from "@/components/book-reading/ReadingOverlayDock.vue"
 import { pdfLocatorsFromBlock } from "@/lib/book-reading/asPdfLocator"
 import { wireItemsToNavigationTargets } from "@/lib/book-reading/pdfOutlineV1Anchor"
 import { structuralTitleForBlockId } from "@/lib/book-reading/currentBlockLiveAnnouncement"
@@ -128,7 +130,7 @@ import {
   READING_PANEL_OBSTRUCTION_PX,
   useReadingPanelAnchor,
 } from "@/composables/useReadingPanelAnchor"
-import { useBookReadingSnapBack } from "@/composables/useBookReadingSnapBack"
+import { useReadingPanelTarget } from "@/composables/useReadingPanelTarget"
 import type { BookReadingPdfViewerRef } from "@/composables/bookReaderViewerRef"
 import { useBookReadingCurrentBlock } from "@/composables/useBookReadingCurrentBlock"
 import { useBookReadingSelection } from "@/composables/useBookReadingSelection"
@@ -160,7 +162,6 @@ const emit = defineEmits<{
 }>()
 
 const bookReadingBookLayoutPanelId = "book-reading-book-layout-panel"
-const SNAP_HOLD_MS = 500
 const STRUCTURAL_TITLE_MAX_CHARS = 512
 
 const props = withDefaults(
@@ -229,7 +230,6 @@ const {
 const { currentBlockId, currentBlockIdDebouncer, proposeReadingPosition } =
   useBookReadingCurrentBlock({
     notebookId,
-    commitCurrentBlock: commitCurrentBlockId,
     proposeReadingPosition: (debouncer) => () => {
       const last = lastReadingForPatch.value
       if (last === null) return
@@ -255,21 +255,16 @@ const pdfViewerRef = ref<BookReadingPdfViewerRef | null>(null)
 const pdfPaneRef = ref<HTMLElement | null>(null)
 
 const {
-  snapAnimationKey,
-  blockAwaitingConfirmation: snapBlockAwaitingConfirmation,
-  lastContentBottomVisible,
-  shouldSnapBack,
-  performSnapBack,
+  blockAwaitingConfirmation: readingPanelTargetBlock,
+  anchoredBlock: readingPanelAnchoredBlock,
   updateLastDirectContentGeometry,
-  clearSnapbackAttemptsForBlock,
-} = useBookReadingSnapBack({
+} = useReadingPanelTarget({
   bookBlocks,
   selectedBlockId,
   currentBlockId,
   hasRecordedDisposition: bookReading.hasRecordedDisposition,
   pdfViewerRef,
   obstructionPx: READING_PANEL_OBSTRUCTION_PX,
-  snapHoldMs: SNAP_HOLD_MS,
 })
 
 const {
@@ -284,8 +279,7 @@ const {
   selectedBlockId,
   initialSelectedBlockId: props.initialSelectedBlockId ?? null,
   repairSelectionWhenBlocksChange: true,
-  overrideBlockAwaitingConfirmation: snapBlockAwaitingConfirmation,
-  onMarkedRead: (id) => clearSnapbackAttemptsForBlock(id),
+  overrideBlockAwaitingConfirmation: readingPanelTargetBlock,
   onAdvance: async (block) => {
     const targets = wireItemsToNavigationTargets(pdfLocatorsFromBlock(block))
     const parsed = targets[0] ?? null
@@ -298,14 +292,10 @@ const {
   },
 })
 
-const readingPanelBlockRef = computed(() =>
-  lastContentBottomVisible.value ? blockAwaitingConfirmation.value : null
-)
-
 const { readingPanelAnchorTopPx, updateReadingPanelAnchor } =
   useReadingPanelAnchor({
     viewerRef: pdfViewerRef,
-    blockRef: readingPanelBlockRef,
+    blockRef: readingPanelAnchoredBlock,
     mainPaneRef: pdfPaneRef,
   })
 
@@ -319,14 +309,6 @@ const { onBlockIndent, onBlockOutdent, onBlockCancel } = useBookLayoutMutations(
     onBookUpdated: (book) => emit("update:book", book),
   }
 )
-
-function commitCurrentBlockId(id: number | null): boolean {
-  if (shouldSnapBack(id)) {
-    performSnapBack()
-    return false
-  }
-  return true
-}
 
 const currentBlockLiveText = computed(() =>
   structuralTitleForBlockId(currentBlockId.value, bookBlocks.value)

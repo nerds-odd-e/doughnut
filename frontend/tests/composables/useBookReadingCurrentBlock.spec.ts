@@ -18,7 +18,6 @@ describe("useBookReadingCurrentBlock", () => {
         const notebookId = ref(1)
         const { currentBlockIdDebouncer } = useBookReadingCurrentBlock({
           notebookId,
-          commitCurrentBlock: () => true,
           proposeReadingPosition: () => () => {
             propose()
           },
@@ -45,7 +44,6 @@ describe("useBookReadingCurrentBlock", () => {
         const notebookId = ref(1)
         const { currentBlockIdDebouncer } = useBookReadingCurrentBlock({
           notebookId,
-          commitCurrentBlock: () => true,
           proposeReadingPosition: () => () => {
             propose()
           },

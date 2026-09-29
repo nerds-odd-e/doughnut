@@ -21,7 +21,6 @@ const DEFAULT_LAST_READ_PATCH_DEBOUNCE_MS = 400
 
 export function useBookReadingCurrentBlock(options: {
   notebookId: MaybeRefOrGetter<number>
-  commitCurrentBlock: (id: number | null) => boolean
   /**
    * Format-specific: receives the PATCH debouncer (single `propose(locator, selectedBookBlockId?)`),
    * returns the function to run when the reading position should be sent (viewport/relocate updates
@@ -61,7 +60,6 @@ export function useBookReadingCurrentBlock(options: {
 
   const currentBlockIdDebouncer = createCurrentBlockIdDebouncer({
     delayMs: currentBlockDebounceMs,
-    commit: options.commitCurrentBlock,
   })
 
   const { currentBlockId } = currentBlockIdDebouncer

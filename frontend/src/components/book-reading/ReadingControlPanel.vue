@@ -2,11 +2,10 @@
   <div
     data-testid="book-reading-reading-control-panel"
     :data-panel-placement="panelPlacement"
-    :data-snap-animating="isAnimating || undefined"
     :class="wrapperClass"
     :style="wrapperStyle"
   >
-    <CalloutCard ref="cardRef" :show-caret="panelPlacement === 'anchored'">
+    <CalloutCard :show-caret="panelPlacement === 'anchored'">
       <p class="text-sm min-w-0 flex-1 basis-full sm:basis-auto m-0">
         <span class="font-medium">{{ selectedBlockTitle }}</span>
       </p>
@@ -45,17 +44,16 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, watch } from "vue"
+import { computed } from "vue"
 import CalloutCard from "@/components/book-reading/CalloutCard.vue"
 
 const props = withDefaults(
   defineProps<{
     selectedBlockTitle: string
-    snapAnimationKey?: number
     anchorTopPx?: number | null
     showSkimAndSkip?: boolean
   }>(),
-  { snapAnimationKey: 0, anchorTopPx: null, showSkimAndSkip: true }
+  { anchorTopPx: null, showSkimAndSkip: true }
 )
 
 const panelPlacement = computed(() =>
@@ -64,8 +62,8 @@ const panelPlacement = computed(() =>
 
 const wrapperClass = computed(() => {
   const base =
-    "pointer-events-none absolute left-0 right-0 z-20 px-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] pt-2"
-  return props.anchorTopPx === null ? `${base} bottom-0` : base
+    "pointer-events-none px-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] pt-2"
+  return props.anchorTopPx === null ? base : `${base} absolute left-0 right-0`
 })
 
 const wrapperStyle = computed(() =>
@@ -79,48 +77,4 @@ const emit = defineEmits<{
   markAsSkimmed: []
   markAsSkipped: []
 }>()
-
-const cardRef = ref<InstanceType<typeof CalloutCard> | null>(null)
-const isAnimating = ref(false)
-
-watch(
-  () => props.snapAnimationKey,
-  (key) => {
-    if (key <= 0) return
-    const el = cardRef.value?.el
-    if (!el) return
-    isAnimating.value = true
-    el.classList.remove("snap-attention")
-    const onEnd = () => {
-      el.classList.remove("snap-attention")
-      isAnimating.value = false
-      el.removeEventListener("animationend", onEnd)
-    }
-    el.addEventListener("animationend", onEnd)
-    requestAnimationFrame(() => {
-      el.classList.add("snap-attention")
-    })
-  }
-)
 </script>
-
-<style scoped>
-@keyframes snap-attention {
-  0% {
-    transform: scale(1);
-    box-shadow: 0 0 0 0 color-mix(in oklch, var(--color-primary) 60%, transparent);
-  }
-  40% {
-    transform: scale(1.02);
-    box-shadow: 0 0 0 8px transparent;
-  }
-  100% {
-    transform: scale(1);
-    box-shadow: 0 0 0 0 transparent;
-  }
-}
-
-.snap-attention {
-  animation: snap-attention 400ms ease-out forwards;
-}
-</style>

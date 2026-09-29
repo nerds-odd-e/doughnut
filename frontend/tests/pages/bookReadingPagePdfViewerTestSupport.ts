@@ -44,27 +44,6 @@ export function mockReadingPanelAnchorTopPx(
   ).mockReturnValue(returnValue)
 }
 
-export function spyOnScrollPageNormalizedYToReadingClearance(
-  wrapper: BookReadingPageWrapper
-) {
-  return vi.spyOn(
-    pdfViewerExposed(wrapper),
-    "scrollPageNormalizedYToReadingClearance"
-  )
-}
-
-/** Matches stub bbox span vs viewport; `fits` mirrors old `contentFitsFromBlockTop` mock. */
-export function mockSnapBackContentFitsInViewport(
-  wrapper: BookReadingPageWrapper,
-  fits: boolean
-) {
-  const exposed = pdfViewerExposed(wrapper)
-  vi.spyOn(exposed, "getPageRect").mockReturnValue({ height: 1000 })
-  vi.spyOn(exposed, "getScrollViewportHeightPx").mockReturnValue(
-    fits ? 10_000 : 100
-  )
-}
-
 export function spyOnScrollToBookNavTarget(wrapper: BookReadingPageWrapper) {
   return vi
     .spyOn(pdfViewerExposed(wrapper), "scrollToBookNavigationTarget")

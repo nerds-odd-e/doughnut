@@ -26,36 +26,15 @@ export type BookReaderViewerRef = {
   ) => number | null
 }
 
-/** Scroll/wheel suppression API registered by `useBookReadingSnapBack` on the PDF viewer. */
-export type PdfViewerScrollSuppressionApi = {
-  activate: (holdMs: number) => void
-  checkEvent: () => boolean
-  reset: () => void
-  isHoldWindowActive: () => boolean
-}
-
 export type BookReadingPdfViewerRef = BookReaderViewerRef & {
   scrollToBookNavigationTarget: (
     target: BookNavigationTarget,
     highlightBboxes?: ReadonlyArray<BookNavigationTarget>
   ) => Promise<void>
-  highlightBlockSelection: (
-    highlightBboxes: ReadonlyArray<BookNavigationTarget>
-  ) => void
   scrollToStoredReadingPosition: (
     pageIndexZeroBased: number,
     normalizedY: number
   ) => Promise<void>
-  /** Scroll so `normalizedY` (0–1000) on `pageIndex` sits `obstructionPx` above the container bottom. */
-  scrollPageNormalizedYToReadingClearance: (
-    pageIndex: number,
-    normalizedY: number,
-    obstructionPx: number
-  ) => void
-  afterNextViewUpdate: (fn: () => void) => void
-  registerScrollSuppression: (api: PdfViewerScrollSuppressionApi) => () => void
-  getPageRect: (pageIndex: number) => { height: number } | null
-  getScrollViewportHeightPx: () => number | null
   zoomIn: () => void
   zoomOut: () => void
 }

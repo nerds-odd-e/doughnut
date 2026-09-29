@@ -3,7 +3,6 @@ import {
   scrollAfterUniformContentScale,
   wheelDeltaYToScaleFactor,
 } from "@/lib/book-reading/pdfBookViewerZoomAroundPoint"
-import type { PdfViewerScrollSuppressionApi } from "@/composables/bookReaderViewerRef"
 import type { PDFViewer } from "pdfjs-dist/web/pdf_viewer.mjs"
 import type { Ref } from "vue"
 
@@ -21,7 +20,6 @@ function clampOriginInSpan(offset: number, span: number) {
 export function usePdfGestureZoom(opts: {
   containerRef: Ref<HTMLDivElement | null>
   getPdfViewer: () => PDFViewer | null
-  getScrollSuppression: () => PdfViewerScrollSuppressionApi
   onUserAdjusted: () => void
   afterScaleChange: () => void
   onClearCallout: () => void
@@ -106,10 +104,6 @@ export function usePdfGestureZoom(opts: {
 
   function attachGestureListeners(container: HTMLElement) {
     onWheelForZoom = (e: WheelEvent) => {
-      if (opts.getScrollSuppression().checkEvent()) {
-        e.preventDefault()
-        return
-      }
       if (e.ctrlKey || e.metaKey) {
         if (!opts.getPdfViewer()) return
         e.preventDefault()
@@ -129,10 +123,6 @@ export function usePdfGestureZoom(opts: {
       }
     }
     onTouchMoveForPinch = (e: TouchEvent) => {
-      if (opts.getScrollSuppression().checkEvent()) {
-        e.preventDefault()
-        return
-      }
       const a = e.touches[0]
       const b = e.touches[1]
       if (!b) {

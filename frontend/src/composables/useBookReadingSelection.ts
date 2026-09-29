@@ -24,14 +24,13 @@ export function useBookReadingSelection(options: {
   /** Called after `onAdvance` from `applyBookBlockSelection` (e.g. EPUB anchor refresh). */
   afterAdvance?: () => void | Promise<void>
   initialSelectedBlockId?: number | null
-  /** When set (PDF), snap-back supplies the panel target; otherwise EPUB-style. */
+  /** When set (PDF), the reading panel target composable supplies it; otherwise EPUB-style. */
   overrideBlockAwaitingConfirmation?: ComputedRef<BookBlockFull | null>
   /**
    * PDF: keep selection valid when `book.blocks` changes (first block fallback).
    * EPUB: leave false to preserve prior behavior.
    */
   repairSelectionWhenBlocksChange?: boolean
-  onMarkedRead?: (blockId: number) => void
   selectedBlockId?: Ref<number | null>
 }): {
   selectedBlockId: Ref<number | null>
@@ -51,7 +50,6 @@ export function useBookReadingSelection(options: {
     initialSelectedBlockId = null,
     overrideBlockAwaitingConfirmation,
     repairSelectionWhenBlocksChange = false,
-    onMarkedRead,
     selectedBlockId: selectedBlockIdOption,
   } = options
 
@@ -110,9 +108,6 @@ export function useBookReadingSelection(options: {
     const ok = await submitReadingDisposition(block.id, status)
     if (!ok) {
       return
-    }
-    if (status === "READ") {
-      onMarkedRead?.(block.id)
     }
     const next = nextBookBlockAfter(toValue(bookBlocks), block.id)
     if (next) {

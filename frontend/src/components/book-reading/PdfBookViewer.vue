@@ -39,7 +39,6 @@ import {
   pdfViewerViewportTopYDown,
   type ViewportYRange,
 } from "@/lib/book-reading/pdfViewerViewportTopYDown"
-import { createIntervalScrollSuppression } from "@/lib/book-reading/intervalScrollSuppression"
 import { usePdfBlockHighlight } from "@/composables/book-reading/usePdfBlockHighlight"
 import { usePdfNavigation } from "@/composables/book-reading/usePdfNavigation"
 import { usePdfLocatorGeometry } from "@/composables/book-reading/usePdfLocatorGeometry"
@@ -51,7 +50,6 @@ import {
   PDFViewer,
 } from "pdfjs-dist/web/pdf_viewer.mjs"
 import "pdfjs-dist/web/pdf_viewer.css"
-import type { PdfViewerScrollSuppressionApi } from "@/composables/bookReaderViewerRef"
 import { nextTick, onBeforeUnmount, ref, watch } from "vue"
 
 const props = withDefaults(
@@ -100,18 +98,6 @@ let detachGeometryResampleListeners: (() => void) | null = null
 let intrinsicFirstPageWidth = 0
 let userAdjustedScale = false
 
-let scrollSuppression: PdfViewerScrollSuppressionApi =
-  createIntervalScrollSuppression()
-
-function registerScrollSuppression(
-  api: PdfViewerScrollSuppressionApi
-): () => void {
-  scrollSuppression = api
-  return () => {
-    scrollSuppression = createIntervalScrollSuppression()
-  }
-}
-
 const SCALE_EPSILON = 0.001
 
 function teardownGeometryResample() {
@@ -137,9 +123,6 @@ function detachViewportScrollListener(container: HTMLElement) {
 function emitViewportDescriptorIfChanged() {
   const container = containerRef.value
   if (!container || !pdfViewer) return
-  if (scrollSuppression.isHoldWindowActive()) {
-    return
-  }
   const sample = pdfViewerViewportTopYDown(container, pdfViewer)
   const midQ =
     sample.viewport === null
@@ -200,7 +183,6 @@ const locatorGeometry = usePdfLocatorGeometry({
 const gestureZoom = usePdfGestureZoom({
   containerRef,
   getPdfViewer: () => pdfViewer,
-  getScrollSuppression: () => scrollSuppression,
   onUserAdjusted: () => {
     userAdjustedScale = true
   },
@@ -216,14 +198,7 @@ defineExpose({
   displayLocator: navigation.displayLocator,
   resolveLocatorRect: locatorGeometry.resolveLocatorRect,
   scrollToBookNavigationTarget: navigation.scrollToBookNavigationTarget,
-  highlightBlockSelection: blockHighlight.highlightBlockSelection,
   scrollToStoredReadingPosition: navigation.scrollToStoredReadingPosition,
-  scrollPageNormalizedYToReadingClearance:
-    locatorGeometry.scrollPageNormalizedYToReadingClearance,
-  afterNextViewUpdate: locatorGeometry.afterNextViewUpdate,
-  registerScrollSuppression,
-  getPageRect: locatorGeometry.getPageRect,
-  getScrollViewportHeightPx: locatorGeometry.getScrollViewportHeightPx,
   zoomIn: gestureZoom.zoomIn,
   zoomOut: gestureZoom.zoomOut,
   isLocatorBottomVisible: locatorGeometry.isLocatorBottomVisible,
@@ -353,7 +328,6 @@ watch(
 )
 
 onBeforeUnmount(async () => {
-  scrollSuppression.reset()
   const container = containerRef.value
   if (container) {
     detachViewportScrollListener(container)

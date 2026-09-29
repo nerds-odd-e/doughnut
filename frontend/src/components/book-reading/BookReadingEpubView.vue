@@ -42,14 +42,16 @@
         :initial-locator="initialLocatorDisplayHref"
         @relocated="onEpubRelocated"
       />
-      <ReadingControlPanel
-        v-if="blockAwaitingConfirmation"
-        :selected-block-title="blockAwaitingConfirmation.title"
-        :anchor-top-px="readingPanelAnchorTopPx"
-        @mark-as-read="() => markSelectedBlockDisposition('READ')"
-        @mark-as-skimmed="() => markSelectedBlockDisposition('SKIMMED')"
-        @mark-as-skipped="() => markSelectedBlockDisposition('SKIPPED')"
-      />
+      <ReadingOverlayDock>
+        <ReadingControlPanel
+          v-if="blockAwaitingConfirmation"
+          :selected-block-title="blockAwaitingConfirmation.title"
+          :anchor-top-px="readingPanelAnchorTopPx"
+          @mark-as-read="() => markSelectedBlockDisposition('READ')"
+          @mark-as-skimmed="() => markSelectedBlockDisposition('SKIMMED')"
+          @mark-as-skipped="() => markSelectedBlockDisposition('SKIPPED')"
+        />
+      </ReadingOverlayDock>
     </main>
   </BookReadingBookLayout>
 </template>
@@ -60,6 +62,7 @@ import BookReadingBookLayout from "@/components/book-reading/BookReadingBookLayo
 import EpubBookViewer from "@/components/book-reading/EpubBookViewer.vue"
 import GlobalBar from "@/components/toolbars/GlobalBar.vue"
 import ReadingControlPanel from "@/components/book-reading/ReadingControlPanel.vue"
+import ReadingOverlayDock from "@/components/book-reading/ReadingOverlayDock.vue"
 import type { BookReaderViewerRef } from "@/composables/bookReaderViewerRef"
 import { useBookReadingCurrentBlock } from "@/composables/useBookReadingCurrentBlock"
 import { useSidebarDrawer } from "@/composables/useSidebarDrawer"
@@ -122,7 +125,6 @@ const selectedBlockId = ref<number | null>(props.initialSelectedBlockId ?? null)
 const { currentBlockId, currentBlockIdDebouncer, proposeReadingPosition } =
   useBookReadingCurrentBlock({
     notebookId,
-    commitCurrentBlock: () => true,
     flushLastReadPositionPatchOnUnmount: true,
     proposeReadingPosition: (debouncer) => () => {
       const current = props.book.blocks.find(
