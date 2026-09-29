@@ -128,56 +128,6 @@ Matters*. Snap-back has unit tests but no E2E scenario.
 **Effort hypothesis:** S–M, medium confidence.
 **Depends on:** none.
 
-<a id="story-6"></a>
-
-### Let readers change or clear a reading mark
-
-**Identity:** SEED-059#story-6
-```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/056-change-or-clear-reading-mark/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"7890add75c01c9427e347cdffbd0fa46f990fcef261e47862fd96096523152c3","plan":"46254747e103fd019fc6a7510694643d2e5529f9df094e1e53182af68cd0b837"}}
-```
-
-**Goal:** A reader can change or clear a reading mark that is wrong. Today a
-mistaken Skim, a spurious record, or an auto-marked header copy stays for good,
-so the reading record, the point of reading a book in Donut, cannot be
-trusted.
-
-**Scope**
-
-- **A mark can be changed or cleared on the block in the layout** (owner
-  decision, 2026-09-29). Clicking the mark of the chosen, marked block offers
-  Read, Skimmed, Skipped, and Clear mark. The choice saves at once and
-  persists. A cleared block is unmarked, so the panel treats it as any unmarked
-  block. It works the same in PDF and EPUB, because both share the layout; this
-  also clears the spurious "Contents" record in EPUBs attached before the
-  first-open fix, and auto-marked header duplicates in old layouts.
-- **Moved to story 16** (owner decision, 2026-09-29; via story 15): marking going on after
-  choosing a block with no text of its own (UAT defect 15). Story 16 changes
-  the current-block rule and what counts as "no text of its own", which that
-  fix depends on.
-- **Must keep working:** Read/Skim/Skip on the panel, the panel moving on to
-  the next block once the selected one is marked, and offering the next block
-  when a marked block is chosen; resume; cancelling a PDF block clears its
-  record.
-- **Deferred:** a legend, tooltips, dark-theme colours, and progress on
-  chapters (story 12); marking or clearing several blocks at once; undoing a
-  change of mark (choosing again corrects it).
-
-**Key examples**
-
-- Choose a block marked Skimmed, click its mark, choose Read → the layout shows
-  it read, and it stays read after reopening the book.
-- In an EPUB attached before the first-open fix, choose "Contents", click its
-  mark, choose Clear mark → it is unmarked after reopening.
-- Choose a read block without touching its mark → the panel still offers the
-  next unmarked block, as today.
-
-**UAT evidence:** the improvement "A reading record cannot be changed or
-removed" in the report linked under *Why This Matters*.
-
-**Effort hypothesis:** S–M, medium confidence.
-**Depends on:** none.
-
 <a id="story-7"></a>
 
 ### Fix a book layout by hand in a few steps
@@ -519,8 +469,8 @@ and last-read position. Every story touching PDF reading adds lines to it.
 - **Behavior unchanged.** Existing book-reading E2E features and page specs
   stay green; no user-visible change.
 - **Evidence:** DD-160 (the file-size check was waived for this file in
-  SEED-059#story-2), and SEED-059#story-6 added one binding line in each of
-  two slices while leaving it over the limit.
+  SEED-059#story-2), and SEED-059#story-6 (change or clear a reading mark)
+  added one binding line in each of two slices while leaving it over the limit.
 
 **Key examples**
 
@@ -537,7 +487,7 @@ and last-read position. Every story touching PDF reading adds lines to it.
 - **Highest priority** (reading breaks for common books and devices):
   delivered.
 - **Next** (reading works but is jerky, records go wrong, or correcting is
-  slow): stories 5–9.
+  slow): stories 5 and 7–9.
 - **Then** (completing the feature): stories 10–12.
 
 Stories are independent unless stated. The bookmark-based PDF layout (delivered) lowers

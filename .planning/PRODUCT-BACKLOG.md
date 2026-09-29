@@ -7,8 +7,6 @@ Bug fixing and general maintenance.
 
 ## Taken
 
-- [Let readers change or clear a reading mark](seeds/SEED-059-book-reading-uat-fixes.md#story-6) — SEED-059#story-6 ([plan](slice-plans/056-change-or-clear-reading-mark/PLAN.md))
-
 ## Backlog list
 
 - [Give the PDF reading view a designed structure, not just a smaller file](seeds/SEED-059-book-reading-uat-fixes.md#story-19) — SEED-059#story-19
