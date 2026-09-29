@@ -375,28 +375,6 @@ through each chapter and the book they are, and what is left at the end.
 **Effort hypothesis:** M, medium confidence.
 **Depends on:** none.
 
-<a id="story-14"></a>
-
-### EPUB resume tests say what the product does, and one lookup finds a locator's rendered view
-
-**Identity:** SEED-059#story-14
-```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/055-epub-resume-tests-and-rendered-view/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"9d108ccd333aa5caedb2ba899028b9fff7e2076bdbf7d203da96a47c9a19c377","plan":"2b3317d1198d19618685bde607a375b9e856304b73b5e1f748206c74bd4f56d0"}}
-```
-
-**Slice plan:** [EPUB resume tests and rendered view](../slice-plans/055-epub-resume-tests-and-rendered-view/PLAN.md)
-
-**Goal:** Developers reading Donut's EPUB tests see only behavior the product
-has, and the EPUB viewer places a locator one way for both the reading panel
-and the current block. This bounded retrospective correction of
-SEED-059#story-1 removes two resume scenarios the new reopen scenario
-supersedes (one names the opposite of today's block-level resume) and merges
-two rendered-view lookups in `useEpubLocatorGeometry`.
-
-**Scope:** `epub_book.feature` resume scenarios and the steps and page-object
-methods only they use; `useEpubLocatorGeometry.ts`. Finer in-block resume,
-the current-block rule, auto-marking, PDF, and the extractor are unchanged.
-
 <a id="story-15"></a>
 
 ### Resume exactly and track the current block and records the same way in EPUB and PDF
