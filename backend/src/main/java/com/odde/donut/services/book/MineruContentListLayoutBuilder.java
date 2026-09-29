@@ -11,82 +11,68 @@ import java.util.Map;
  * Builds attach-book {@link AttachBookLayoutRequest} from a MinerU {@code content_list} array.
  * Canonical implementation for attach-book {@code contentList} → layout; covered by {@code
  * com.odde.donut.services.book.MineruContentListLayoutBuilderTest}.
+ *
+ * <p>An ordered list of {@link OutlineEntry outline entries} splits the content items: each item
+ * belongs to the last entry at or before it, and items before the first entry go to {@code
+ * *beginning*}. MinerU headings are one source of entries.
  */
 public final class MineruContentListLayoutBuilder {
+
+  /**
+   * One block of the outline. It starts with {@code startBlock} (its locator) and holds the content
+   * items from index {@code firstItem} up to the next entry's {@code firstItem}.
+   */
+  record OutlineEntry(int level, String title, Map<String, Object> startBlock, int firstItem) {}
 
   private MineruContentListLayoutBuilder() {}
 
   public static AttachBookLayoutRequest buildLayout(List<?> contentList) {
-    List<AttachBookLayoutNodeRequest> roots = new ArrayList<>();
-    List<StackEntry> stack = new ArrayList<>();
-    AttachBookLayoutNodeRequest beginningNode = null;
-
+    List<Map<String, Object>> items = new ArrayList<>();
+    List<OutlineEntry> entries = new ArrayList<>();
     for (Object el : contentList) {
       if (!(el instanceof Map<?, ?> rawMap)) {
         continue;
       }
       @SuppressWarnings("unchecked")
       Map<String, Object> item = (Map<String, Object>) rawMap;
-
-      Object itemType = item.get("type");
-      Integer textLevel = textLevelIfTextHeading(itemType, item.get("text_level"));
-
-      if ("text".equals(itemType) && textLevel != null && textLevel >= 1 && textLevel <= 3) {
-        String title = stringOrEmpty(item.get("text")).trim();
-        if (title.isEmpty()) {
-          continue;
-        }
-        Object pageIdx = item.get("page_idx");
-        Object bbox = item.get("bbox");
-        if (pageIdx == null || !isValidBbox(bbox)) {
-          continue;
-        }
-        flushBeginning(roots, beginningNode);
-        beginningNode = null;
-
-        AttachBookLayoutNodeRequest node = new AttachBookLayoutNodeRequest();
-        node.setTitle(title);
-        List<Map<String, Object>> cbs = new ArrayList<>();
-        cbs.add(item);
-        node.setContentBlocks(cbs);
-
-        while (!stack.isEmpty() && stack.getLast().level >= textLevel) {
-          stack.removeLast();
-        }
-        if (stack.isEmpty()) {
-          roots.add(node);
-        } else {
-          ensureChildren(stack.getLast().node).add(node);
-        }
-        stack.add(new StackEntry(textLevel, node));
-      } else {
-        if (!stack.isEmpty()) {
-          stack.getLast().node.getContentBlocks().add(item);
-        } else {
-          if (beginningNode == null) {
-            Map<String, Object> anchorPayload = beginningAnchorPayload(item);
-            Object apPage = anchorPayload.get("page_idx");
-            Object apBbox = anchorPayload.get("bbox");
-            if (apPage != null && isValidBbox(apBbox)) {
-              Map<String, Object> synthetic = new LinkedHashMap<>();
-              synthetic.put("type", "beginning_anchor");
-              synthetic.putAll(anchorPayload);
-              beginningNode = new AttachBookLayoutNodeRequest();
-              beginningNode.setTitle("*beginning*");
-              List<Map<String, Object>> bc = new ArrayList<>();
-              bc.add(synthetic);
-              beginningNode.setContentBlocks(bc);
-            }
-          }
-          if (beginningNode != null) {
-            beginningNode.getContentBlocks().add(item);
-          }
-        }
+      Integer level = headingLevel(item);
+      if (level == null) {
+        items.add(item);
+        continue;
+      }
+      String title = stringOrEmpty(item.get("text")).trim();
+      if (!title.isEmpty() && item.get("page_idx") != null && isValidBbox(item.get("bbox"))) {
+        entries.add(new OutlineEntry(level, title, item, items.size()));
       }
     }
+    return buildLayout(entries, items);
+  }
 
-    if (beginningNode != null) {
-      roots.add(beginningNode);
+  static AttachBookLayoutRequest buildLayout(
+      List<OutlineEntry> entries, List<Map<String, Object>> items) {
+    List<AttachBookLayoutNodeRequest> roots = new ArrayList<>();
+    int firstEntryItem = entries.isEmpty() ? items.size() : entries.getFirst().firstItem();
+    AttachBookLayoutNodeRequest beginning = beginningNode(items.subList(0, firstEntryItem));
+    if (beginning != null) {
+      roots.add(beginning);
+    }
+
+    List<StackEntry> stack = new ArrayList<>();
+    for (int i = 0; i < entries.size(); i++) {
+      OutlineEntry entry = entries.get(i);
+      int end = i + 1 < entries.size() ? entries.get(i + 1).firstItem() : items.size();
+      AttachBookLayoutNodeRequest node =
+          node(entry.title(), entry.startBlock(), items.subList(entry.firstItem(), end));
+
+      while (!stack.isEmpty() && stack.getLast().level >= entry.level()) {
+        stack.removeLast();
+      }
+      if (stack.isEmpty()) {
+        roots.add(node);
+      } else {
+        ensureChildren(stack.getLast().node).add(node);
+      }
+      stack.add(new StackEntry(entry.level(), node));
     }
 
     AttachBookLayoutRequest layout = new AttachBookLayoutRequest();
@@ -94,11 +80,28 @@ public final class MineruContentListLayoutBuilder {
     return layout;
   }
 
-  private static void flushBeginning(
-      List<AttachBookLayoutNodeRequest> roots, AttachBookLayoutNodeRequest beginningNode) {
-    if (beginningNode != null) {
-      roots.add(beginningNode);
+  private static AttachBookLayoutNodeRequest beginningNode(List<Map<String, Object>> orphans) {
+    for (int i = 0; i < orphans.size(); i++) {
+      Map<String, Object> anchorPayload = beginningAnchorPayload(orphans.get(i));
+      if (anchorPayload.get("page_idx") != null && isValidBbox(anchorPayload.get("bbox"))) {
+        Map<String, Object> synthetic = new LinkedHashMap<>();
+        synthetic.put("type", "beginning_anchor");
+        synthetic.putAll(anchorPayload);
+        return node("*beginning*", synthetic, orphans.subList(i, orphans.size()));
+      }
     }
+    return null;
+  }
+
+  private static AttachBookLayoutNodeRequest node(
+      String title, Map<String, Object> startBlock, List<Map<String, Object>> items) {
+    AttachBookLayoutNodeRequest node = new AttachBookLayoutNodeRequest();
+    node.setTitle(title);
+    List<Map<String, Object>> blocks = new ArrayList<>();
+    blocks.add(startBlock);
+    blocks.addAll(items);
+    node.setContentBlocks(blocks);
+    return node;
   }
 
   private static List<AttachBookLayoutNodeRequest> ensureChildren(AttachBookLayoutNodeRequest n) {
@@ -108,11 +111,11 @@ public final class MineruContentListLayoutBuilder {
     return n.getChildren();
   }
 
-  private static Integer textLevelIfTextHeading(Object itemType, Object textLevelObj) {
-    if (!"text".equals(itemType)) {
-      return null;
-    }
-    if (textLevelObj instanceof Number n) {
+  private static Integer headingLevel(Map<String, Object> item) {
+    if ("text".equals(item.get("type"))
+        && item.get("text_level") instanceof Number n
+        && n.intValue() >= 1
+        && n.intValue() <= 3) {
       return n.intValue();
     }
     return null;

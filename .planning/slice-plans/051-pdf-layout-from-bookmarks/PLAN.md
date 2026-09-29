@@ -107,7 +107,7 @@ mechanical change with one proof loop.
 
 ### 2. The layout builder splits content by an ordered list of outline entries
 Type: Structure
-Status: planned
+Status: done
 Proof: existing `MineruContentListLayoutBuilderTest`, book controller tests,
 and `book_browsing.feature` stay green unchanged.
 
@@ -170,3 +170,9 @@ unproved and report it; do not claim them from slices 3–5.
   `NotebookBooksControllerTestBase.onePagePdf(padding)` / `ONE_PAGE_PDF`;
   tests that store books through `makeMe` (not attach) keep fake bytes.
   Accepted proof: `NotebookBooksAttachControllerTest$AttachBook.rejectsAnUnreadablePdf`.
+- Slice 2: `MineruContentListLayoutBuilder.buildLayout(entries, items)` (package
+  private) holds the common rule; `OutlineEntry(level, title, startBlock,
+  firstItem)` — `startBlock` is the entry's locator block, `firstItem` the index
+  of its first item in `items`. The MinerU entry point removes headings from
+  `items`; bookmark entries (slice 3) keep the full content list as `items` and
+  use a `beginning_anchor`-style `startBlock`.
