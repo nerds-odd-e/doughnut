@@ -177,3 +177,15 @@ breakpoint module if nothing else needs it. The E2E page object's
 - `BookReadingContent.vue` is 453 lines (was 474), over the 250-line
   file-size guideline; splitting its PDF reading orchestration is outside this
   story.
+
+## Execution complete
+
+Product advice: no change to backlog priorities. Phone reading now works for
+PDF and EPUB, and the book layout shares the notebook sidebar's drawer
+(`SidebarDrawer`). Later SEED-059 stories that touch the layout (story 7 hand
+fixes, story 9 keyboard, story 10 EPUB tools) should build on that shared
+drawer rather than add layout-specific open/close rules. EPUB close-on-choice
+goes through the same layout component as PDF but has no phone E2E of its own;
+add one only if a later EPUB story changes that path. `BookReadingContent.vue`
+(453 lines) is over the file-size guideline; split it when a story next
+changes its PDF reading orchestration, not as a separate story.

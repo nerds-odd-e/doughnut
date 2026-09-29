@@ -445,6 +445,10 @@ The usage line says REF but publication requires refs/heads/; callers discover t
   - Evidence: after printing the usage line (`--target-ref REF`) and grepping the script for `targetRef`, `deliver --target-ref origin/exec/seed-058-story-1` refused with "authorized target must be a branch ref: origin/exec/seed-058-story-1"; the retry with `refs/heads/exec/seed-058-story-1` was accepted (`observation.state: attached`, `/tmp/dough-ci-501/watch-FeKCIi`).
   - Observed effect: one refused call plus two lookup calls; no coverage lost.
 
+- Execution: SEED-059#story-2 / slice-plans/050-read-a-book-on-a-phone / d4a47402af; Timestamp: 2026-09-29T12:09+08:00 (slice 1 delivery); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.46.
+  - Evidence: after printing the usage line (`--target-ref REF`) and grepping the script for `targetRef`, `deliver --target-ref origin/story/seed-059-story-2` refused with "authorized target must be a branch ref: origin/story/seed-059-story-2"; the retry with `refs/heads/story/seed-059-story-2` was accepted (`observation.state: attached`, `/tmp/dough-ci-501/watch-O2h2e5`).
+  - Observed effect: one refused call plus one lookup call; no coverage lost; slices 2 and 3 used the full ref first time.
+
 ## ODF-074 — A plan said the changed script had no test, and nobody searched for one before delivery, so CI caught the stale test
 
 Former local code: DD-126.
@@ -779,8 +783,19 @@ The execute-plan skill text lists a "stable execution publisher ID" as a start i
   - Observed effect: one failed start and a short diagnosis before the UAT setup could continue.
   - Inference: the Development start's incremental build did not drop classes whose sources were deleted. Qualified: cause not investigated further.
 
+## DD-160 — The file-size check split an untouched block in one slice of an execution and was waived in a later slice
+
+Within one execution, the post-change refactor treated an already-oversized file differently in two slices. In slice 1, a two-line class change to `BookReadingBookLayout.vue` (354 lines before the change) led the refactor agent to move the unrelated drag-to-indent pointer handling into a new composable. In slice 3, `BookReadingContent.vue` (474 → 453 lines) was left over the limit as "not caused nor worsened by this slice".
+
+### Occurrences
+
+- Execution: SEED-059#story-2 / slice-plans/050-read-a-book-on-a-phone / d4a47402af; Timestamp: 2026-09-29T12:00+08:00 through 2026-09-29T12:40+08:00 (slice 1 and slice 3 refactor passes); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.46.
+  - Evidence: slice 1 refactor report ("`BookReadingBookLayout.vue` is in the diff and was 354 lines, over the 250-line limit"; new `useBookLayoutBlockPointerDrag.ts`, commit d4a47402af); slice 3 refactor report ("`BookReadingContent.vue` is 453 lines … It was 474 before this change … I left it for the owner to decide"). Pre-change size: `1e19f8224a:frontend/src/components/book-reading/BookReadingBookLayout.vue` has 354 lines.
+  - Observed effect: about 15 minutes of refactor time in slice 1, plus a desktop re-proof (`reorganize_layout.feature`, `book_browsing.feature`) for code the story did not touch. Slice 3 took the other path, with no extraction.
+  - Inference: `refactor-checks.md` "File size" does not say whether a file that was already over the limit, and that a slice barely touches, must be split. Agents resolve this differently, and the time cost follows whichever reading they pick. Related to DD-144 (a small addition tipping a file over the limit) and ODF-152; here the file was over the limit before the change.
+
 ## Retention
 
-- Highest allocated local number: 159. Removed local codes are never reused.
+- Highest allocated local number: 160. Removed local codes are never reused.
 - Full pre-maintenance log and earlier recovery locators: `99fa1b9835e3dff2473837ba2a1f8b11967d5938:DearDough.md`.
 - Occurrence history is partial; active evidence stays here or in the Open Dough catalog and watch list.
