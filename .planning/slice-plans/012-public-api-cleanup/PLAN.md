@@ -131,7 +131,11 @@ private and drop the Javadoc that described the removed callers. Keep shared fix
 
 ### 5. The public API serves a Book's file only by Book
 Type: Behavior
-Status: planned
+Status: done
+Accepted: full backend suite (2674, 0 failures) and `frontend:test` (1943) green; focused
+`--tests 'com.odde.donut.controllers.*Book*'` (100) green after refactor. The deleted test class's
+`deleteBook` guards moved to `NotebookBooksDeleteBookControllerTest`; its unknown-source-path 404
+moved to `BooksControllerTest`. `BookService.notebookBookFileFromBook` is now `bookFile`.
 Proof: regenerated artifacts omit `getBookFile` and `/api/notebooks/{notebook}/book/file`;
 `BooksControllerTest`, `NotebookBooksAttachControllerTest`, and
 `NotebookBooksAttachNotebookFileControllerTest` green; full backend suite and `frontend:test` green.

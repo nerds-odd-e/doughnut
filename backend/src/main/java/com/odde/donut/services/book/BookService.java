@@ -166,12 +166,7 @@ public class BookService {
   }
 
   @Transactional(readOnly = true)
-  public NotebookBookFile getNotebookBookFile(Notebook notebook) {
-    return notebookBookFileFromBook(requireBook(notebook));
-  }
-
-  @Transactional(readOnly = true)
-  public NotebookBookFile notebookBookFileFromBook(Book book) {
+  public NotebookBookFile bookFile(Book book) {
     return bookSourceFile.read(book);
   }
 

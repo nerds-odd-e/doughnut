@@ -22,7 +22,6 @@ Use this for endpoint lookup; open `sdk.gen.ts` or `types.gen.ts` only for exact
 - `getBook`: GET `/api/notebooks/{notebook}/book` -> `GetBookResponse` (request: `GetBookData`; path: notebook; response body: BookFull)
 - `deleteBook`: DELETE `/api/notebooks/{notebook}/book` -> `DeleteBookResponse` (request: `DeleteBookData`; path: notebook; response body: void)
 - `getNotebookBookReadingRecords`: GET `/api/notebooks/{notebook}/book/reading-records` -> `GetNotebookBookReadingRecordsResponse` (request: `GetNotebookBookReadingRecordsData`; path: notebook; response body: Array<BookBlockReadingRecordListItem>)
-- `getBookFile`: GET `/api/notebooks/{notebook}/book/file` -> `GetBookFileResponse` (request: `GetBookFileData`; path: notebook; response body: string)
 - `cancelBookBlock`: DELETE `/api/notebooks/{notebook}/book/blocks/{bookBlock}` -> `CancelBookBlockResponse` (request: `CancelBookBlockData`; path: notebook, bookBlock; response body: BookMutationResponseFull)
 
 ## User Controller

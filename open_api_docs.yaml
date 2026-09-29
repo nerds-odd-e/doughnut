@@ -2908,29 +2908,6 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/BookBlockReadingRecordListItem"
-  /api/notebooks/{notebook}/book/file:
-    get:
-      tags:
-      - notebook-books-controller
-      operationId: getBookFile
-      parameters:
-      - name: notebook
-        in: path
-        required: true
-        schema:
-          type: integer
-      responses:
-        "200":
-          description: OK
-          content:
-            application/pdf:
-              schema:
-                type: string
-                format: byte
-            application/epub+zip:
-              schema:
-                type: string
-                format: byte
   /api/notebooks/{notebook}/attachments/{attachment}:
     get:
       tags:

@@ -3800,24 +3800,6 @@ export type GetNotebookBookReadingRecordsResponses = {
 
 export type GetNotebookBookReadingRecordsResponse = GetNotebookBookReadingRecordsResponses[keyof GetNotebookBookReadingRecordsResponses];
 
-export type GetBookFileData = {
-    body?: never;
-    path: {
-        notebook: number;
-    };
-    query?: never;
-    url: '/api/notebooks/{notebook}/book/file';
-};
-
-export type GetBookFileResponses = {
-    /**
-     * OK
-     */
-    200: string;
-};
-
-export type GetBookFileResponse = GetBookFileResponses[keyof GetBookFileResponses];
-
 export type DeleteAttachmentData = {
     body?: never;
     path: {
