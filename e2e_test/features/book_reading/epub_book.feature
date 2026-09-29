@@ -91,6 +91,13 @@ Feature: EPUB book
         | 1440  | 900    |
         | 1280  | 560    |
 
+    Scenario: Following a link inside the book shows its heading at the top
+      Given I set the book reading viewport to 1280 by 560
+      And I open the reading view for the attached book "epub_long_chapter_before_target"
+      When I follow the link "Go to Chapter Two" in the EPUB reader
+      Then the heading "Chapter Two" should be at the top of the EPUB reader
+      And the book block "Chapter Two" should be the current block in the book reader
+
   Rule: Unsupported EPUB attachment
 
     Scenario: Upload DRM-flagged EPUB shows a clear attach error

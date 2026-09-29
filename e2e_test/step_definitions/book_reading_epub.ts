@@ -78,3 +78,11 @@ Then(
     return bookReadingPage().expectEpubHeadingAtTopOfReader(headingText)
   }
 )
+
+When(
+  'I follow the link {string} in the EPUB reader',
+  // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
+  (linkText: string) => {
+    return bookReadingPage().followEpubLinkInReader(linkText)
+  }
+)

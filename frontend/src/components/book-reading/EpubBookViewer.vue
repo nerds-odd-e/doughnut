@@ -46,11 +46,26 @@ const emit = defineEmits<{
 const renditionHostRef = ref<HTMLElement | null>(null)
 let bookInstance: EpubJsBook | null = null
 let rendition: Rendition | null = null
+/** Resolves once the book is open and its opening display has landed. */
+let opened: Promise<void> = Promise.resolve()
+
 /**
  * epub.js runs one display at a time: a second `display()` resolves the first early and
- * both then drive the view manager, so landing waits for the book's opening display.
+ * clears its views while the first is still filling them, which stalls the view manager for
+ * good. Every display (the opening one, a chosen block, a link inside the book, epub.js's own
+ * redisplay after a resize) therefore waits for the previous one to land.
  */
-let opened: Promise<void> = Promise.resolve()
+function landOneDisplayAtATime(r: Rendition) {
+  const display = r.display.bind(r) as (
+    target?: string | number
+  ) => Promise<void>
+  let landed: Promise<unknown> = Promise.resolve()
+  r.display = (target?: string | number) => {
+    const landing = landed.then(() => display(target))
+    landed = landing.catch(() => undefined)
+    return landing
+  }
+}
 
 const { observeHostResize, stopObservingHostResize } = useEpubRenditionResize({
   hostRef: renditionHostRef,
@@ -164,6 +179,7 @@ async function openEpub() {
     allowScriptedContent: false,
   })
   rendition = r
+  landOneDisplayAtATime(r)
   r.on("relocated", onRelocated)
   r.on("displayed", onDisplayed)
   const rawInitial = (props.initialLocator ?? "").trim()

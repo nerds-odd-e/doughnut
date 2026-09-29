@@ -149,7 +149,7 @@ and the spec in `APPLICATION_ONLY_ACTIVE_SPECS`. Remaining for this slice:
 
 ### 3. Following a link inside the book lands at the top and tracks
 Type: Behavior
-Status: planned
+Status: done
 Proof: E2E "Following a link inside the book shows its heading at the top"
 (1280×560, the fixture's "Go to Chapter Two"), heading at the top and Chapter
 Two current, green on repeated runs.
