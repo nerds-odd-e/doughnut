@@ -9,10 +9,10 @@ Bug fixing and general maintenance.
 
 - [Refresh recall automatically at each local half-day boundary](seeds/SEED-056-recall-half-day-refresh.md#story-1) — SEED-056#story-1 ([plan](slice-plans/014-recall-half-day-refresh/PLAN.md))
 - [Land on and track the chosen place in an EPUB](seeds/SEED-059-book-reading-uat-fixes.md#story-1) — SEED-059#story-1 ([plan](slice-plans/049-epub-land-and-track-chosen-place/PLAN.md))
+- [Read a book on a phone](seeds/SEED-059-book-reading-uat-fixes.md#story-2) — SEED-059#story-2 ([plan](slice-plans/050-read-a-book-on-a-phone/PLAN.md))
 
 ## Backlog list
 
-- [Read a book on a phone](seeds/SEED-059-book-reading-uat-fixes.md#story-2) — SEED-059#story-2
 - [Get a PDF book layout that matches the book's headings and nesting](seeds/SEED-059-book-reading-uat-fixes.md#story-3) — SEED-059#story-3
 - [Reorganize a full-size book with AI](seeds/SEED-059-book-reading-uat-fixes.md#story-4) — SEED-059#story-4
 - [Scroll a PDF smoothly right after choosing a block](seeds/SEED-059-book-reading-uat-fixes.md#story-5) — SEED-059#story-5
