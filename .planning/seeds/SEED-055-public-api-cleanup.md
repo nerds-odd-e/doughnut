@@ -38,7 +38,7 @@ implementation now.
 
 **Identity:** SEED-055#story-1
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"unselected"}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/012-public-api-cleanup/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"11ac7526dbf86e0d8a04314f733e2cae230570ee05b533ddd7a607d20a3bd40d","plan":"35244fb9fd161058946a269429558c9676478656f20256a86cc203077b7482bd"}}
 ```
 
 **Goal**
@@ -61,11 +61,13 @@ external feature journeys keep working.
   from removal as test infrastructure. Other test calls, fixtures, and mocks do
   not count as use.
 - Remove the endpoints with no such use. A usage review on 2026-09-29 found
-  these four; the implementer confirms each before removal:
+  these five; the implementer confirms each before removal:
   - `DELETE /api/user/token-info` (revoke token)
   - `GET /api/user/recall-ez-diffusion`
   - `GET /api/user/daily-probe-convergent-validity`
   - `GET /api/memory-trackers/{memoryTracker}/recall-logs`
+  - `GET /api/notebooks/{notebook}/book/file`, found during slice planning: the
+    frontend reads Book bytes only through `GET /api/books/{book}/file`
 - Removal is transitive: also remove every implementation piece whose only
   dependent was a removed endpoint (services, queries, DTOs, entities or
   columns, helpers, tests, fixtures), repeating until nothing orphaned
@@ -75,8 +77,7 @@ external feature journeys keep working.
   repository's generation workflow.
 - Removal leaves no trace: no negative tests, absence checks, or historical
   notes replace what was removed.
-- Compare the file-serving endpoints — `GET /api/notebooks/{notebook}/book/file`,
-  `GET /api/books/{book}/file`,
+- Compare the remaining file-serving endpoints — `GET /api/books/{book}/file`,
   `GET /api/notebooks/{notebook}/attachments/{attachment}/image`,
   `GET /api/notebooks/{notebook}/attachments/{attachment}/content`, and
   `GET /api/notes/{note}/image` — by consumer, authorization, inputs, outputs,
@@ -99,8 +100,8 @@ external feature journeys keep working.
   but the CLI calls it over HTTP → keep it as used by the CLI.
 - A service method was used only by a removed diagnostic endpoint → remove it
   too, and any query or DTO only that method used.
-- If both Book file endpoints return the same source bytes, addressed by
-  notebook or by Book → the proposal explains who calls each and what differs, then
+- The Book file and attachment content endpoints return the same bytes, but
+  only the Book endpoint sets caching headers → the proposal explains who calls each and what differs, then
   recommends consolidating or keeping the distinction, with its migration impact.
 
 **Output and evaluation**
