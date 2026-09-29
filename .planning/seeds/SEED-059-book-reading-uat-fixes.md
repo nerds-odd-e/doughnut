@@ -130,38 +130,52 @@ Matters*. Snap-back has unit tests but no E2E scenario.
 
 <a id="story-6"></a>
 
-### Keep reading records right and let readers correct them
+### Let readers change or clear a reading mark
 
 **Identity:** SEED-059#story-6
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"not-refined","approach":"unselected"}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/056-change-or-clear-reading-mark/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"7890add75c01c9427e347cdffbd0fa46f990fcef261e47862fd96096523152c3","plan":"46254747e103fd019fc6a7510694643d2e5529f9df094e1e53182af68cd0b837"}}
 ```
 
-**Goal:** Marking continues through chapter labels, and a reader can change or
-clear a mark that is wrong.
+**Goal:** A reader can change or clear a reading mark that is wrong. Today a
+mistaken Skim, a spurious record, or an auto-marked header copy stays for good,
+so the reading record, the point of reading a book in Donut, cannot be
+trusted.
 
-**Observed defect and gap**
+**Scope**
 
-- **Heading-only block selected (defect 15, Medium).** After choosing "Chapter
-  9", "Chapter 10" or "Chapter 12" in Think Python, the Reading Control Panel
-  stays hidden for 3–4 pages; the current block goes from the label straight to
-  x.1, skipping the chapter title block ("Case study: word play", "Lists"), which
-  has introduction text. Neither is marked. Choosing the title block instead
-  marks the label read at once, as promised.
-- **Marks cannot be changed or cleared.** Choosing a marked block makes the
-  panel offer the next block, and no other control exists. A mistaken Skim, the
-  spurious "Contents" record from the first-open defect (books attached before
-  its fix), and auto-marked
-  header duplicates from the old heading layout stay for good. Cancelling the block clears its
-  record, but only in PDF.
+- **A mark can be changed or cleared on the block in the layout** (owner
+  decision, 2026-09-29). Clicking the mark of the chosen, marked block offers
+  Read, Skimmed, Skipped, and Clear mark. The choice saves at once and
+  persists. A cleared block is unmarked, so the panel treats it as any unmarked
+  block. It works the same in PDF and EPUB, because both share the layout; this
+  also clears the spurious "Contents" record in EPUBs attached before the
+  first-open fix, and auto-marked header duplicates in old layouts.
+- **Moved to story 15** (owner decision, 2026-09-29): marking going on after
+  choosing a block with no text of its own (UAT defect 15). Story 15 changes
+  the current-block rule and what counts as "no text of its own", which that
+  fix depends on.
+- **Must keep working:** Read/Skim/Skip on the panel, the panel moving on to
+  the next block once the selected one is marked, and offering the next block
+  when a marked block is chosen; resume; cancelling a PDF block clears its
+  record.
+- **Deferred:** a legend, tooltips, dark-theme colours, and progress on
+  chapters (story 12); marking or clearing several blocks at once; undoing a
+  change of mark (choosing again corrects it).
 
 **Key examples**
 
-- Choose "Chapter 12" in Think Python and scroll → the panel is offered, and the
-  chapter title block becomes current and can be marked.
-- Choose a block marked Skimmed → the reader can change it to Read or clear it.
+- Choose a block marked Skimmed, click its mark, choose Read → the layout shows
+  it read, and it stays read after reopening the book.
+- In an EPUB attached before the first-open fix, choose "Contents", click its
+  mark, choose Clear mark → it is unmarked after reopening.
+- Choose a read block without touching its mark → the panel still offers the
+  next unmarked block, as today.
 
-**Effort hypothesis:** M, medium confidence.
+**UAT evidence:** the improvement "A reading record cannot be changed or
+removed" in the report linked under *Why This Matters*.
+
+**Effort hypothesis:** S–M, medium confidence.
 **Depends on:** none.
 
 <a id="story-7"></a>
@@ -410,6 +424,16 @@ read or chose to mark, so reading positions and records can be trusted.
   middle of the view", with no chosen-block preference. Use the EPUB rule for
   both, in one place: both formats now land a chosen block at the top, and PDFs
   can have two headings on one page.
+- **Marking goes on after choosing a block with no text of its own** (moved
+  from story 6, owner decision 2026-09-29; UAT defect 15). A PDF without
+  bookmarks keeps MinerU's headings, so a "Chapter N" label can come directly
+  before its title block. After choosing such a block and scrolling, each
+  following block becomes current in order (the title block is not skipped),
+  the empty block is marked read when its successor is entered, and the Reading
+  Control Panel is offered for the next unmarked block with text. UAT: choosing
+  "Chapter 9", "Chapter 10" or "Chapter 12" in Think Python (before the bookmark
+  layout) hid the panel for 3–4 pages, the current block went from the label
+  straight to x.1, and neither the label nor the title was marked.
 - **Auto-mark only blocks with no text of their own.**
   `useAutoMarkNoDirectContentPredecessor` treats "exactly one locator" as "no
   direct content", so leaving a one-paragraph block unread marks it read. Test
@@ -426,11 +450,15 @@ read or chose to mark, so reading positions and records can be trusted.
   current.
 - Move from a one-paragraph block to the next without reading it → it is not
   marked read; a heading-only block still is.
+- In a PDF without bookmarks whose layout has "Chapter 12" (no text), then
+  "Tuples" (introduction text), then "12.1 Tuples are immutable": choose
+  "Chapter 12" and scroll down → "Tuples" becomes current before 12.1,
+  "Chapter 12" is marked read, and the panel is offered for "Tuples".
 
-**Effort hypothesis:** L, low confidence. The three parts are independent and
+**Effort hypothesis:** L, low confidence. The parts are independent and
 may be split into separate stories at refinement.
-**Depends on:** none. Overlaps story 6 (reading records) on auto-marking;
-refine together or move that part into story 6.
+**Depends on:** none. Holds the marking-after-an-empty-block part moved from
+story 6.
 
 ## Ordering and Scope Reduction
 
