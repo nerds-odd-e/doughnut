@@ -173,7 +173,11 @@ and continue that unfinished obligation only.
    revision as committed and pending publication. Do not push. Remote refs
    stay unchanged, and the checkout identity stays the recorded path.
    With that authority, invoke the installed managed delivery entry point from
-   that same checkout. The receipt is the accepted SHA, the authorized target,
+   that same checkout, passing its `HEAD` from before this operation's first
+   commit as `--previously-published-base`. Handle an `unpublished-base` stop
+   as [current-branch publication](trunk-publication.md#publish-an-execution-increment-or-repair)
+   does.
+   The receipt is the accepted SHA, the authorized target,
    and the observation result (attached, reused, or an explicit coverage gap).
    Do not run a separate observer probe, start, or `register-push` for this
    managed path, and do not copy mailbox directories by hand. A pending human

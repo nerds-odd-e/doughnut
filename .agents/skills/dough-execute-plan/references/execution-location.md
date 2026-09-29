@@ -26,9 +26,10 @@ base it supplies:
   It uses fetched remote trunk as the base, confirms the Taken claim there, and
   returns a compact result with the accepted claim SHA and recovery coordinates
   for the workspace you supplied. Without an integration checkout, supply an
-  existing owned worktree, as [Take or admit work](../SKILL.md#take-or-admit-work)
-  describes. A conflicting or ambiguous claim stops implementation; identical
-  **Taken** text alone proves no ownership.
+  existing owned worktree, or the repository context a new one is created
+  from, as [Take or admit work](../SKILL.md#take-or-admit-work) describes.
+  A conflicting or ambiguous claim stops implementation; identical **Taken**
+  text alone proves no ownership.
 - [One-shot work](one-shot.md) supplies the same path and authority with
   `--one-shot`; the operation bases the workspace on fetched remote trunk and
   publishes nothing.

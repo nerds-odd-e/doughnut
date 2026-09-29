@@ -13,6 +13,7 @@ import {
   selectAgent,
 } from "../../dough-execute-plan/scripts/agent-assignments.mjs";
 import { maintenance } from "../../dough-execute-plan/scripts/execution-start-maintenance.mjs";
+import { fastForwardToFetchedTrunk } from "../../dough-execute-plan/scripts/maintain-default-checkout.mjs";
 import {
   git,
   lsRemoteSha,
@@ -46,10 +47,10 @@ import {
 } from "./preparation-assignment-trunk.mjs";
 
 // Commits only the new profile on top of fetched trunk, from a clean
-// workspace whose history trunk already contains; nothing else is staged.
+// workspace already at that trunk; nothing else is staged.
 // The agent authors it and the developer committing it is credited; an
 // unusable developer throws DeveloperIdentityRefused before anything changes.
-async function commitAnnouncement(request, base, agent) {
+async function commitAnnouncement(request, agent) {
   const { workspace } = request;
   const identity = agentIdentity(agent.name);
   const message = await creditDeveloper(
@@ -57,7 +58,6 @@ async function commitAnnouncement(request, base, agent) {
     `Announce preparation: ${request.identity}\n\nPreparation-Identity: ${request.identity}\n`,
     identity,
   );
-  await git(workspace, "merge", "--ff-only", "--quiet", base);
   const path = profilePathOf(agent.name);
   mkdirSync(dirname(join(workspace, path)), { recursive: true });
   writeFileSync(
@@ -151,18 +151,16 @@ async function announce(request) {
     previous = await recordedAllocation(workspace);
   }
   const startHead = await revParse(workspace, "HEAD");
-  if (
-    (await git(workspace, "status", "--porcelain")).stdout !== "" ||
-    !(await isAncestor(workspace, startHead, ref))
-  )
+  // Refresh's eligibility on the workspace's own branch: only a fast-forward
+  // to fetched trunk, or already being there, continues.
+  const { reason } = await fastForwardToFetchedTrunk(workspace, base);
+  if (reason)
     return stop("workspace-not-isolated", {
       workspace,
       fetched: base,
-      error:
-        "a new announcement needs a clean workspace whose commits trunk already contains; nothing was published",
+      error: `a new announcement needs a workspace that fast-forwards to fetched trunk (${reason}); nothing was published`,
     });
-  // Stops with the workspace back where it started, even when a rebuild
-  // moved it onto newer trunk.
+  // Stops with the workspace back where it started, however it moved since.
   const unannounced = async (status, fields) => {
     await git(workspace, "reset", "--keep", "--quiet", startHead);
     await restoreAllocation(workspace, previous);
@@ -181,7 +179,7 @@ async function announce(request) {
     }
     agent = chosen.agent;
     try {
-      announced = await commitAnnouncement(request, base, agent);
+      announced = await commitAnnouncement(request, agent);
     } catch (error) {
       if (!(error instanceof DeveloperIdentityRefused)) throw error;
       return unannounced("developer-identity-refused", {

@@ -126,8 +126,7 @@ Apply [Preconditions](#preconditions) before this sequence.
    by inspecting the default checkout and not refreshing it in this
    sequence. A caller attempts refresh only after this sequence, under
    [Refresh eligibility](maintain-default-checkout.md#refresh-eligibility).
-   Acceptance here is independent of that attempt. A deferred or unfinished
-   maintenance result is not an unfinished publication.
+   Acceptance here is independent of that attempt.
 
 ## Recover a rejected push
 

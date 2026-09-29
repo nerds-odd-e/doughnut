@@ -10,17 +10,18 @@ replace a caller's disposition, cleanup, or CI policy.
 ## Independent maintenance outcome
 
 Successful remote publication and default-checkout maintenance are
-independently reportable. A deferred, stopped, or unfinished refresh does
-not erase an accepted remote publication. A publication that never reached
-remote acceptance leaves any outstanding maintenance obligation unchanged
-and does not authorize treating the remote as updated.
+independently reportable. No maintenance result below erases an accepted
+remote publication, leaves it unfinished, or authorizes another push. A
+publication that never reached remote acceptance leaves any outstanding
+maintenance obligation unchanged and does not authorize treating the remote
+as updated.
 
 When reporting, name the maintenance result separately from publication
 acceptance:
 
 - **advanced** — this attempt fast-forwarded an eligible clean checkout to fetched trunk.
 - **already current** — the checkout is clean and its `HEAD` is that fetched revision.
-- **deferred** — a pending human edit, staged or unstaged change, unpublished commit, ongoing operation, another writer's ownership, or ambiguous ownership. Name the preserved `HEAD`, index, and working tree. A supplied checkout that could not be read or refreshed, such as a missing path or a failing Git command there, is **deferred** (`refresh-failed`) with the error.
+- **deferred** — a pending human edit, staged or unstaged change, unpublished commit, or ongoing operation. Name the preserved `HEAD`, index, and working tree. A supplied checkout that could not be read or refreshed, such as a missing path or a failing Git command there, is **deferred** (`refresh-failed`) with the error.
 - **stopped** — the checked-out branch is not the integration branch, or local history has diverged from fetched trunk. Preserve that state and name it.
 - **not applicable** — no default checkout was supplied; there is nothing to refresh or preserve locally.
 
@@ -42,9 +43,9 @@ work in a refresh or in a publication that mutates this checkout. These
 checks do not gate commits, proof, or formatting in a separate owned
 execution or preparation workspace.
 
-Report the competing writer or inspectable state. When the unpublished
-suffix lives on this checkout, leave it recoverable and do not treat a
-remote that lacks it as published. When the suffix lives in a separate
+Report the inspectable state. When the unpublished suffix lives on this
+checkout, leave it recoverable and do not treat a remote that lacks it as
+published. When the suffix lives in a separate
 owned workspace, this preservation does not block that workspace's push.
 
 Apply the same preservation after a rejected push that left an owned
@@ -58,7 +59,9 @@ toward fetched trunk. Callers invoke a refresh only when their own
 procedure requests one: after an accepted trunk publication, or before
 using this checkout's commit as a new task base. A new owned workspace may
 start from fetched remote trunk without advancing the default checkout.
-Publication success does not decide eligibility.
+Publication success does not decide eligibility. Startup and preparation
+apply steps 1 and 3–7 to a reused owned workspace after their own fetch;
+startup checks its owned branch in place of the integration branch.
 
 Inspect current checkout state on every refresh attempt. With no default
 checkout supplied, report **not applicable** and stop. When the supplied path
@@ -67,26 +70,21 @@ is missing or a Git command there fails, report **deferred**
 caller's accepted publication and its later steps, such as retirement,
 unaffected.
 
-1. Honor any declared owner from coordinator context. Another declared owner
-   is **deferred** (`another-writer`); a declared owner with no identified
-   requester is **deferred** (`unclear-ownership`). Without a declared owner,
-   continue with the Git checks below. Do not require or invent an ownership
-   declaration merely to refresh.
-2. Re-read the working tree, index, `HEAD`, checked-out branch, and any
+1. Re-read the working tree, index, `HEAD`, checked-out branch, and any
    in-progress operation. An `index.lock`, or an in-progress merge, rebase,
    cherry-pick, or revert, is **deferred** (`ongoing-operation`). Leave the
    lock and the operation in place.
-3. Fetch the authorized remote. Fetch updates remote-tracking refs only.
-4. When the checked-out branch is not the integration branch, **stop**
+2. Fetch the authorized remote. Fetch updates remote-tracking refs only.
+3. When the checked-out branch is not the integration branch, **stop**
    (`unexpected-branch`). When `HEAD` and fetched trunk have diverged,
    **stop** (`diverged`), including when the index or working tree also
    has a pending edit. Preserve that state. Do not merge, rebase, or reset.
-5. When status is not clean — staged, unstaged, or untracked — **defer**
+4. When status is not clean — staged, unstaged, or untracked — **defer**
    (`pending-edit`). Preserve the exact index and working tree.
-6. When `HEAD` contains commits fetched trunk does not, **defer**
+5. When `HEAD` contains commits fetched trunk does not, **defer**
    (`unpublished-commits`). Leave those commits in place.
-7. When `HEAD` is the fetched trunk revision, report **already current**.
-8. When the checkout is clean and `HEAD` is a strict ancestor of fetched
+6. When `HEAD` is the fetched trunk revision, report **already current**.
+7. When the checkout is clean and `HEAD` is a strict ancestor of fetched
    trunk, fast-forward with a checkout-aware update:
    `git merge --ff-only <fetched-trunk>`.
    Do not use `update-ref`, `branch -f`, or a merge that creates a commit.
@@ -111,12 +109,13 @@ publication needs its separately established publication authority.
    stops the edit. Preserve that state. Do not stash or reset it to make room.
 2. Change and commit only the authorized content. Unrelated unstaged edits
    stay out of the commit, byte for byte.
-3. With publication authority, publish only that authorized commit through
-   [publish the candidate](publish-the-candidate.md). The owned workspace
-   is this checkout. The suffix is that commit. When any other unpublished
-   commit would be reachable from the pushed SHA, stop under
-   [Preserve pending local work](#preserve-pending-local-work) and do not
-   push. Do not fast-forward the checkout as part of the push. Without
+3. With publication authority, publish that commit from the default checkout
+   through the installed `deliver` entry point, as
+   [current-branch publication](trunk-publication.md#publish-an-execution-increment-or-repair)
+   does, with the `HEAD` from before the edit's commit as
+   `--previously-published-base`. Handle an `unpublished-base` stop as that
+   section does, preserving the developer's work under
+   [Preserve pending local work](#preserve-pending-local-work). Without
    publication authority, report the commit as pending publication.
 4. Keep the selected checkout and branch throughout. A rejected push leaves
    the commit and any unpublished suffix in place.

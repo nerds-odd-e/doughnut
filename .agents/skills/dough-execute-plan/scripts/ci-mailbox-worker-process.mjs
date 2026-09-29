@@ -15,6 +15,12 @@ export const mailboxWorkerPath = fileURLToPath(
   new URL("./ci-mailbox.mjs", import.meta.url),
 );
 
+// A sandbox such as macOS `sandbox-exec` refuses to run the setuid `ps`: the
+// process table is unreadable, which says nothing about whether a PID runs.
+function inspectionDenied(error) {
+  return error.code === "EPERM" || error.code === "EACCES";
+}
+
 function workerIsRunning(pid) {
   try {
     process.kill(pid, 0);
@@ -31,6 +37,8 @@ function workerIsRunning(pid) {
     return state !== "" && !state.startsWith("Z");
   } catch (error) {
     if (error.status === 1) return false;
+    // kill(pid, 0) found the PID; without its state it counts as running.
+    if (inspectionDenied(error)) return true;
     throw error;
   }
 }
@@ -52,12 +60,22 @@ export async function withStreamWorkerIdentity(directory, run) {
   try {
     process.title = streamWorkerTitle(directory);
     const identity = { pid: process.pid, mode: "stream" };
-    if (readProcessCommandSync(process.pid) !== streamWorkerTitle(directory))
+    if (!streamTitleVisible(directory))
       throw new Error("CI stream worker identity could not be verified");
     recordWorkerIdentity(directory, identity);
     return await run();
   } finally {
     process.title = originalTitle;
+  }
+}
+
+// This process set its own title; a denied read cannot contradict it.
+function streamTitleVisible(directory) {
+  try {
+    return readProcessCommandSync(process.pid) === streamWorkerTitle(directory);
+  } catch (error) {
+    if (inspectionDenied(error)) return true;
+    throw error;
   }
 }
 
@@ -114,12 +132,17 @@ function classifyWorkerCommand(command, identity, directory) {
   return workerIsRunning(identity.pid) ? "unknown" : "dead";
 }
 
+// Only a verified mailbox worker may be signaled. When inspection is denied
+// the worker stays unverified, and its caller keeps its lost-coverage path.
 function verifyMailboxWorker(identity, directory, readCommand) {
-  const state = classifyWorkerCommand(
-    readCommand(identity.pid),
-    identity,
-    directory,
-  );
+  let command;
+  try {
+    command = readCommand(identity.pid);
+  } catch (error) {
+    if (inspectionDenied(error)) return false;
+    throw error;
+  }
+  const state = classifyWorkerCommand(command, identity, directory);
   if (state === "unknown")
     throw new Error(
       `CI observer worker ${identity.pid} does not match this mailbox`,
@@ -146,7 +169,7 @@ export function checkMailboxWorkerLiveness(
   } catch (error) {
     // Permission-denied process inspection must not end a completion wait:
     // the PID is live; command matching remains required before any signal.
-    if (error.code === "EPERM" || error.code === "EACCES") return "alive";
+    if (inspectionDenied(error)) return "alive";
     throw error;
   }
   return classifyWorkerCommand(command, identity, directory);

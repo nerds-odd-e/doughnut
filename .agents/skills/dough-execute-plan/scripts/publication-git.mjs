@@ -60,23 +60,6 @@ export async function resolveManagementContext(repository, worktree) {
   return null;
 }
 
-// Identity of a recorded checkout that current-branch work must not change:
-// its top level, current branch, and the repository's worktree list.
-export async function recordedCheckoutIdentity(checkout) {
-  const porcelain = (await git(checkout, "worktree", "list", "--porcelain"))
-    .stdout;
-  return {
-    toplevel: await revParse(checkout, "--show-toplevel"),
-    branch: (await git(checkout, "branch", "--show-current")).stdout.trim(),
-    worktrees: porcelain
-      .split("\n")
-      .filter(
-        (line) => line.startsWith("worktree ") || line.startsWith("branch "),
-      )
-      .join("\n"),
-  };
-}
-
 export async function pushExactRef(workspace, sha, remote, targetRef) {
   await git(workspace, "push", remote, `${sha}:${targetRef}`);
 }
@@ -106,6 +89,25 @@ export async function fetchedTarget(workspace, targetRef, remote = "origin") {
       return null;
     }
     throw error;
+  }
+}
+
+// Whether any fetched ref of `remote` already contains `sha`. A revision the
+// workspace cannot resolve is not held there either.
+export async function remoteHolds(workspace, sha, remote = "origin") {
+  try {
+    const { stdout } = await git(
+      workspace,
+      "for-each-ref",
+      "--count=1",
+      "--format=%(refname)",
+      "--contains",
+      sha,
+      `refs/remotes/${remote}/`,
+    );
+    return stdout.trim() !== "";
+  } catch {
+    return false;
   }
 }
 

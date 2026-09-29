@@ -38,22 +38,24 @@ export async function fetchQueuedTrunk(cwd, request) {
 
 // Creates the owned workspace on its branch at queued fetched trunk when its
 // path does not exist yet, so a refused request leaves nothing behind. The
-// integration checkout supplies the repository to create it from. An
-// existing path is the caller's owned workspace, verified by the announcement.
+// integration checkout, or else the repository context, supplies the
+// repository to create it from. An existing path is the caller's owned
+// workspace, verified by the announcement.
 export async function selectPreparationWorkspace(request) {
-  const { integration, workspace, branch } = request;
+  const { workspace, branch } = request;
   if (existsSync(workspace)) return { ok: true };
-  if (!branch || !integration)
+  const repository = request.integration ?? request.repository;
+  if (!branch || !repository)
     return stop("invalid-request", {
       workspace,
       error:
-        "a workspace that does not exist yet needs --branch and --integration to create it",
+        "a workspace that does not exist yet needs --branch and --integration or --repository to create it",
     });
-  const trunk = await fetchQueuedTrunk(integration, request);
+  const trunk = await fetchQueuedTrunk(repository, request);
   if (!trunk.ok) return trunk;
   const selected = await selectOwnedWorkspace({
     ...request,
-    repository: integration,
+    repository,
     base: trunk.fetched,
   });
   if (!selected.ok)

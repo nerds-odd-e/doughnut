@@ -19,10 +19,10 @@ const operations = {
 };
 
 const usage =
-  "usage: preparation-assignment.mjs start [--integration PATH] --workspace PATH [--branch NAME] --identity ID --remote NAME --target BRANCH --push-authorized [--host claude|codex|cursor] [--model TEXT] [--declared-owner ID --requester ID]\n" +
+  "usage: preparation-assignment.mjs start [--integration PATH] [--repository PATH] --workspace PATH [--branch NAME] --identity ID --remote NAME --target BRANCH --push-authorized [--host claude|codex|cursor] [--model TEXT]\n" +
   "       preparation-assignment.mjs release --workspace PATH --identity ID --remote NAME --target BRANCH\n" +
-  "       preparation-assignment.mjs abandon [--integration PATH] --workspace PATH --identity ID --remote NAME --target BRANCH --push-authorized [--declared-owner ID --requester ID]\n" +
-  "       preparation-assignment.mjs abandon --integration PATH --profile PATH [--allocation SHA --confirmed-abandoned] --remote NAME --target BRANCH --push-authorized [--declared-owner ID --requester ID]";
+  "       preparation-assignment.mjs abandon [--integration PATH] --workspace PATH --identity ID --remote NAME --target BRANCH --push-authorized\n" +
+  "       preparation-assignment.mjs abandon --integration PATH --profile PATH [--allocation SHA --confirmed-abandoned] --remote NAME --target BRANCH --push-authorized";
 
 // Flags that stand alone: authority and confirmation the developer supplied.
 const switches = {

@@ -2,14 +2,18 @@
 // claim there is workspace-publication-claim.mjs; publication of that SHA is a
 // separate step.
 import { existsSync } from "node:fs";
+import { fastForwardToFetchedTrunk } from "./maintain-default-checkout.mjs";
 import { git, revParse } from "./publication-git.mjs";
 import {
+  createdForRef,
   isAncestor,
   remoteOf,
   remoteRef,
   stopped,
   trailers,
 } from "./workspace-publication-ownership.mjs";
+
+const continuable = new Set(["advanced", "already current"]);
 
 async function verifyRetained(request) {
   const { retained } = request;
@@ -64,6 +68,20 @@ async function verifyRetained(request) {
   }
 }
 
+// The ref recording that a workspace was created for `identity`, or undefined
+// when the request names no identity or Git rejects it as a ref name.
+async function creationRecord(repository, identity) {
+  if (!identity) return undefined;
+  const ref = createdForRef(identity);
+  try {
+    await git(repository, "check-ref-format", ref);
+    return ref;
+  } catch (error) {
+    if (error.code === 1) return undefined;
+    throw error;
+  }
+}
+
 // A supplied `base` is fetched trunk the caller already reset the workspace
 // to, such as a carried escalation's park; it is used without fetching again.
 // `repository` is the Git context for fetching and creating the workspace; it
@@ -86,24 +104,23 @@ export async function selectOwnedWorkspace(request) {
     }
     if (existsSync(request.workspace)) {
       const actual = await revParse(request.workspace, "--show-toplevel");
-      const branch = (
-        await git(request.workspace, "branch", "--show-current")
-      ).stdout.trim();
-      const head = await revParse(request.workspace, "HEAD");
-      const status = (await git(request.workspace, "status", "--porcelain"))
-        .stdout;
-      if (
-        actual !== request.workspace ||
-        branch !== request.branch ||
-        head !== base ||
-        status !== ""
-      ) {
+      // A reused workspace continues on fetched trunk only through refresh's
+      // fast-forward eligibility; its own commits, edits, and any ongoing Git
+      // operation stay as they are.
+      const reused =
+        actual === request.workspace
+          ? await fastForwardToFetchedTrunk(
+              request.workspace,
+              base,
+              request.branch,
+            )
+          : { reason: "not-the-workspace-toplevel" };
+      if (!continuable.has(reused.result)) {
         return stopped("setup-failed", {
           recovery: {
             workspace: request.workspace,
             branch: request.branch,
-            error:
-              "existing workspace does not match clean fetched trunk and owned branch",
+            error: `existing workspace cannot continue on fetched trunk as ${request.branch}: ${reused.reason}`,
           },
         });
       }
@@ -111,10 +128,13 @@ export async function selectOwnedWorkspace(request) {
         ok: true,
         created: false,
         workspace: request.workspace,
-        branch,
+        branch: request.branch,
         startingRevision: base,
       };
     }
+    // A created workspace records the work it was created for, so a later
+    // session can tell it from one that work only reused.
+    const record = await creationRecord(request.repository, request.identity);
     await git(
       request.repository,
       "worktree",
@@ -124,6 +144,7 @@ export async function selectOwnedWorkspace(request) {
       request.workspace,
       base,
     );
+    if (record) await git(request.workspace, "update-ref", record, base);
     return {
       ok: true,
       created: true,

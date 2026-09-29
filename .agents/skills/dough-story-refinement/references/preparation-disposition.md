@@ -192,9 +192,9 @@ owned workspace. It does not remove:
   that must survive a discard aimed only at this session's draft. Whether the
   workspace later becomes safe to remove is a separate, independent decision
   governed by [Close or retain the
-  workspace](preparation-workspace.md#close-or-retain-the-workspace) (its
-  session-created, clean, unambiguous test); discard here is about removing
-  the identified draft content, not necessarily the workspace that held it;
+  workspace](preparation-workspace.md#close-or-retain-the-workspace); discard
+  here is about removing the identified draft content, not necessarily the
+  workspace that held it;
 - **unrelated edits** already present in that workspace before or alongside
   this session's write; or
 - **another session's work**, even one sharing the same workspace.

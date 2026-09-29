@@ -5,8 +5,6 @@ import { remoteOf } from "./workspace-publication-ownership.mjs";
 export function maintenance(request) {
   return refreshDefaultCheckout({
     checkout: request.integration,
-    declaredOwner: request.declaredOwner,
-    requester: request.requester,
     remote: remoteOf(request),
     integrationBranch: request.target,
   });

@@ -24,6 +24,7 @@ import {
   backlogPath,
   fileAt,
   isAncestor,
+  preparationAssignmentRef,
 } from "../../dough-execute-plan/scripts/workspace-publication-ownership.mjs";
 
 export function stop(status, fields) {
@@ -58,8 +59,10 @@ function addressingError(input) {
 export function requestOf(operation, input) {
   const addressed = operation === "abandon" && input.profile !== undefined;
   // A lost workspace's assignment is ended from the integration checkout; an
-  // existing owned workspace supplies its own repository access, and a
-  // supplied integration checkout only gets a local refresh.
+  // existing owned workspace supplies its own repository access, a supplied
+  // repository context (an owned worktree or the common Git directory) only
+  // gives Git access, and a supplied integration checkout also gets a local
+  // refresh.
   const required = addressed
     ? ["profile", "target", "integration"]
     : ["workspace", "identity", "target"];
@@ -73,6 +76,7 @@ export function requestOf(operation, input) {
     remote: input.remote ?? "origin",
     ...(input.workspace ? { workspace: resolve(input.workspace) } : {}),
     ...(input.integration ? { integration: resolve(input.integration) } : {}),
+    ...(input.repository ? { repository: resolve(input.repository) } : {}),
   };
   const reportError = agentReportError(request);
   if (reportError) return stop("invalid-request", { error: reportError });
@@ -98,20 +102,19 @@ export async function storyListAt(cwd, ref, identity) {
     ?.list;
 }
 
-const recordRef = "refs/worktree/dough/preparation-assignment";
-
 // Remembers `sha` as this workspace's own announcement commit.
 export async function recordAllocation(workspace, sha) {
-  await git(workspace, "update-ref", recordRef, sha);
+  await git(workspace, "update-ref", preparationAssignmentRef, sha);
 }
 
 // Puts back the record a workspace held before (`sha`), or none.
 export async function restoreAllocation(workspace, sha) {
   if (sha) await recordAllocation(workspace, sha);
-  else await git(workspace, "update-ref", "-d", recordRef);
+  else await git(workspace, "update-ref", "-d", preparationAssignmentRef);
 }
 
-export const recordedAllocation = (workspace) => commitOf(workspace, recordRef);
+export const recordedAllocation = (workspace) =>
+  commitOf(workspace, preparationAssignmentRef);
 
 // The preparation profile the announcement commit `sha` added, as an
 // assignment: its name, path, allocation, and recorded facts. `only` narrows

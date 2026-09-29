@@ -68,37 +68,37 @@ Before checkout-bound investigation, read and follow the shared
 [exploration workspace lifecycle](../dough-manual-testing/references/exploration-workspace.md).
 Enter that lifecycle before investigation begins.
 
-Use a session-created workspace only to establish the report's validity,
-evidence, reproduction, and likely size. Do not repair the product there. A
-temporary reproduction test or harness is investigation evidence, not a product
-change or durable planning artifact. Keep the investigation bounded to the
-evidence needed to choose a supported disposition.
+Use a workspace this investigation created only to establish the report's
+validity, evidence, reproduction, and likely size. Do not repair the product
+there. A temporary reproduction test or harness is investigation evidence, not
+a product change or durable planning artifact. Keep the investigation bounded
+to the evidence needed to choose a supported disposition.
 
 If evidence shows that actual behavior already matches intended behavior, close
-any session-created workspace safely and return an explained-no-change
-disposition. Create no plan or further workspace for that result. If the report
-is known larger, or investigation is incomplete or inconclusive, use [Route
-remaining work](#route-remaining-work). If a repair is supported within the
-ten-minute attempt, first remove owned temporary investigation artifacts and
-safely close any session-created workspace, then invoke shared execution. Report
-a repair the instruction did not authorize with its evidence instead. If the
-lifecycle cannot close safely, return its retained-workspace handoff and do not
-begin repair.
+any workspace this investigation created safely and return an
+explained-no-change disposition. Create no plan or further workspace for that
+result. If the report is known larger, or investigation is incomplete or
+inconclusive, use [Route remaining work](#route-remaining-work). If a repair is
+supported within the ten-minute attempt, first remove owned temporary
+investigation artifacts and safely close any workspace this investigation
+created, then invoke shared execution. Report a repair the instruction did not
+authorize with its evidence instead. If the lifecycle cannot close safely,
+return its retained-workspace handoff and do not begin repair.
 
 ## Invoke shared execution for repair
 
-Only after exploration is complete and any session-created workspace has closed
-safely, invoke [dough-execute-plan](../dough-execute-plan/SKILL.md) as one
-planless contextual instruction from the applicable local `main` or other
-already integrated revision. Let execute-plan create its own execution branch
-and worktree; never reuse or nest a session-created exploration workspace. For
-an admitted story, execution continues under its claim in the story's owned
-checkout. If the established checkout already belongs to an active execute-plan
-repair, return the evidence to that owning execution instead of invoking a
-nested one. Pass `--no-replan` and a ten-minute hard limit. Carry the gathered
-expectation, actual behavior, evidence, and gaps. Do not plan, invent another
-story, or start a local implement-and-refactor loop. That execution publishes
-the validated repair through [increment and repair
+Only after exploration is complete and any workspace this investigation created
+has closed safely, invoke [dough-execute-plan](../dough-execute-plan/SKILL.md)
+as one planless contextual instruction from the applicable local `main` or
+other already integrated revision. Let execute-plan create its own execution
+branch and worktree; never reuse or nest an exploration workspace this
+investigation created. For an admitted story, execution continues under its
+claim in the story's owned checkout. If the established checkout already
+belongs to an active execute-plan repair, return the evidence to that owning
+execution instead of invoking a nested one. Pass `--no-replan` and a ten-minute
+hard limit. Carry the gathered expectation, actual behavior, evidence, and gaps.
+Do not plan, invent another story, or start a local implement-and-refactor
+loop. That execution publishes the validated repair through [increment and repair
 publication](../dough-execute-plan/references/trunk-publication.md#publish-an-execution-increment-or-repair).
 Do not push the repair through a separate procedure. Debug with available
 knowledge; do not require a separate debugging skill.
@@ -198,8 +198,8 @@ that holds a pending human edit stays untouched.
 
 Workspace retirement after a confirmed disposition follows Dough Land's
 [Retire the worktree](../dough-land/SKILL.md#retire-the-worktree). An
-unrelated exploration workspace is not this session's workspace; leave it in
-place. Do not start repair.
+unrelated exploration workspace belongs to other work; leave it in place. Do
+not start repair.
 
 An established checkout remains under its owning workflow's delivery and
 cleanup rules; do not impose this retention sequence or create a nested

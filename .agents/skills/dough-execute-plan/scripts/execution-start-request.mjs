@@ -12,8 +12,10 @@ import { stopped } from "./workspace-publication-ownership.mjs";
 // publishes no claim, so it needs no publisher, and an unlisted request has no
 // identity; a supplied identity is checked against fetched trunk. The Git
 // `repository` the start reads and selects from is the supplied integration
-// (default) checkout, or else the owned workspace, which must then already
-// exist; only a supplied checkout gets a local refresh or supplies drafts.
+// (default) checkout, else the supplied repository context (an owned worktree
+// or the common Git directory), else the owned workspace, which must then
+// already exist. Only a supplied integration checkout gets a local refresh or
+// supplies drafts.
 export function startRequest(requestInput) {
   const oneShot = requestInput.oneShot === true;
   const required = [
@@ -30,11 +32,14 @@ export function startRequest(requestInput) {
   const integration = requestInput.integration
     ? resolve(requestInput.integration)
     : undefined;
+  const context = requestInput.repository
+    ? resolve(requestInput.repository)
+    : undefined;
   const request = {
     ...requestInput,
     integration,
     workspace,
-    repository: integration ?? workspace,
+    repository: integration ?? context ?? workspace,
   };
   if (oneShot && request.admit === true)
     return stopped("invalid-request", {
@@ -84,10 +89,10 @@ export function startRequest(requestInput) {
     return stopped("invalid-request", {
       error: "queued work requires a separate owned workspace",
     });
-  if (!request.integration && !existsSync(request.workspace))
+  if (!request.integration && !context && !existsSync(request.workspace))
     return stopped("invalid-request", {
       error:
-        "without --integration, --workspace must name an existing owned worktree of the repository",
+        "without --integration or --repository, --workspace must name an existing owned worktree of the repository",
     });
   return { ok: true, request };
 }

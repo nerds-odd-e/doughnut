@@ -38,8 +38,9 @@ Resolve the same execution context and
 Branch or Trunk Mode start, including the authority to push the result. Then
 invoke the start command from [Take or admit work](../SKILL.md#take-or-admit-work)
 with `--one-shot` instead of `--admit`: the originating integration checkout
-when one exists, owned workspace path and branch, mode, actual remote and trunk
-branch, and `--push-authorized --workspace-authorized`. An unlisted request needs no
+when one exists (otherwise the repository context that section describes),
+owned workspace path and branch, mode, actual remote and trunk branch, and
+`--push-authorized --workspace-authorized`. An unlisted request needs no
 `--identity` or `--publisher-id`; supply `--identity` for a queued story, or
 when the request names existing work, so the command can check how fetched
 trunk holds it.
