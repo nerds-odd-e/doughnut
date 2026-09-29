@@ -102,3 +102,11 @@ the unpinned-install grep finds nothing. All three hints read
 `pip install 'mineru[pipeline]==3.4.5' six` with Python 3.10–3.13. The regeneration
 script's "When to re-run" comment still mentions `mineru[pipeline]` as a version
 bump trigger, not an install hint, and stays.
+
+## Execution complete
+
+Product advice: no backlog change. The story's goal is met: every install hint
+names `pip install 'mineru[pipeline]==3.4.5' six` on Python 3.10–3.13, and the
+fresh-environment attach was observed during planning with exactly that command.
+The deferred items (MinerU 4.x support, a clearer message for an installed but
+wrong MinerU) stay deferred; nothing in this execution raised their impact.
