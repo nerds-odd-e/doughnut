@@ -32,7 +32,7 @@ One story extends the existing relationship reduction behavior.
 
 **Identity:** SEED-057#story-1
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"unselected","assessment":"not-ready","reasons":["An execution approach has not been selected; this request captures backlog work only."],"basis":{"document":"2c01f394cb3564b7b521f5475511bc2df23b3e265d6fa0bd479fe4cdd8eb466b"}}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/048-reduce-legacy-relationship-sentence/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"f9b14fdb83c9aa013d5afdabb0b9a73440a9c7c5f4e89b576b7dcfc44b0f7c93","plan":"d2a73cef8071b1b6d9d3ad70ac43a8178a271c60de54c8e98a2d20817df42288"}}
 ```
 
 **Goal**
@@ -42,6 +42,10 @@ body has the form `[[first link]] some words [[second link]].`.
 
 **Scope**
 
+- This is a temporary accommodation for existing legacy note data; keep it
+  extremely narrow (owner, 2026-09-29).
+- Match on the sentence shape only; the two links need not name the
+  relationship's own source and target (owner, 2026-09-29).
 - Treat that entire-body sentence form as ignorable for the existing
   relationship reduction content check, alongside the already-supported empty body.
 - Ignore and discard the matching body when reduction proceeds; use the existing
