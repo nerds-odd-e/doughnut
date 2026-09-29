@@ -141,7 +141,7 @@ describe("BookReadingPage reading control panel marking", () => {
     expect(readingControlPanel(wrapper).exists()).toBe(false)
   })
 
-  it("auto-marks predecessor with READ body when it has no direct content and no record", async () => {
+  it("auto-marks a heading-only PDF predecessor with READ when it has no record", async () => {
     const putSpy = vi
       .spyOn(NotebookBooksController, "putNotebookBookBlockReadingRecord")
       .mockResolvedValue(

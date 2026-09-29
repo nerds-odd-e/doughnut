@@ -39,11 +39,11 @@ Feature: EPUB book
       Then the book block "Chapter Alpha" should be the current selection in the book reader
       And the current block in the book layout should not be the selected block
 
-    Scenario: Entering the next EPUB block auto-marks a structural-only predecessor as read
-      Then I should see the text "Opening paragraph for part one." in the EPUB reader
+    Scenario: Leaving an EPUB block with text unread does not mark it
+      Given I should see the text "Opening paragraph for part one." in the EPUB reader
       When I choose the book block "Chapter Alpha"
       Then I should see the text "Body text with an illustration." in the EPUB reader
-      And I should see that book block "Part One" is marked as read in the book layout
+      And no book block should be marked in the book layout
 
     Scenario: Mark an EPUB block as read advances the selection
       When I choose the book block "Chapter Alpha"
@@ -96,6 +96,12 @@ Feature: EPUB book
       Then the heading "The Full Licence" should be at the top of the EPUB reader
       And the book block "The Full Licence" should be the current selection in the book reader
       And the book block "The Full Licence" should be the current block in the book reader
+
+    Scenario: Entering the next EPUB block auto-marks a structural-only predecessor as read
+      Given I open the reading view for the attached book "epub_long_chapter_before_target"
+      When I choose the book block "The Full Licence"
+      And I choose the book block "Licence Section One"
+      Then I should see that book block "The Full Licence" is marked as read in the book layout
 
     Scenario: Choosing the first of two blocks sharing a start keeps it selected and current
       Given I open the reading view for the attached book "epub_long_chapter_before_target"
