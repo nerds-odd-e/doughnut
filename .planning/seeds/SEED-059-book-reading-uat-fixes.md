@@ -459,6 +459,38 @@ mode is unverified). Provisional slices:
 [plan 059](../slice-plans/059-reopen-epub-at-exact-paragraph/PLAN.md).
 **Depends on:** none.
 
+<a id="story-18"></a>
+
+### Anchor the Reading Control Panel after a one-paragraph EPUB block
+
+**Identity:** SEED-059#story-18
+```json dough-story-state
+{"schemaVersion":1,"refinement":"not-refined","approach":"unselected"}
+```
+
+**Goal:** A reader of an EPUB block with one paragraph gets the Reading Control
+Panel at the end of that paragraph, as they do for blocks with more text.
+
+**Scope** (awaiting story refinement)
+
+- **Anchor at the block's last text, whatever its count.**
+  `lastDirectContentLocator` (`bookBlockDirectContent.ts`) returns nothing when
+  a block has one locator. In EPUB that locator is often the block's only
+  paragraph, so `useReadingPanelAnchor` gives no anchor for a heading plus one
+  paragraph. It should agree with `hasNoTextOfItsOwn`: only a block with no
+  text of its own has no anchor.
+- **Check snap-back too:** `useBookReadingSnapBack.ts` also uses
+  `lastDirectContentLocator`; story 16 owns snap-back's other rules.
+
+**Key examples**
+
+- In an EPUB, choose "Part One" (a heading and one paragraph) → the Reading
+  Control Panel is anchored at the end of "Opening paragraph for part one."
+- A PDF block with a heading and paragraphs still anchors as today.
+
+**Effort hypothesis:** S, low confidence.
+**Depends on:** none; coordinate with story 16 on snap-back.
+
 ## Ordering and Scope Reduction
 
 - **Highest priority** (reading breaks for common books and devices):

@@ -15,6 +15,7 @@ Bug fixing and general maintenance.
 - [Reopen an EPUB at the exact paragraph](seeds/SEED-059-book-reading-uat-fixes.md#story-17) — SEED-059#story-17
 - [Scroll a PDF smoothly right after choosing a block](seeds/SEED-059-book-reading-uat-fixes.md#story-5) — SEED-059#story-5
 - [The current block moves the same way in PDF as in EPUB](seeds/SEED-059-book-reading-uat-fixes.md#story-16) — SEED-059#story-16
+- [Anchor the Reading Control Panel after a one-paragraph EPUB block](seeds/SEED-059-book-reading-uat-fixes.md#story-18) — SEED-059#story-18
 - [Fix a book layout by hand in a few steps](seeds/SEED-059-book-reading-uat-fixes.md#story-7) — SEED-059#story-7
 - [Give new and existing blocks short, readable titles](seeds/SEED-059-book-reading-uat-fixes.md#story-8) — SEED-059#story-8
 - [Move through the book layout with the keyboard](seeds/SEED-059-book-reading-uat-fixes.md#story-9) — SEED-059#story-9
