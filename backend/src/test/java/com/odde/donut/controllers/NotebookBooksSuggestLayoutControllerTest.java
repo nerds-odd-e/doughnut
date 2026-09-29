@@ -81,7 +81,7 @@ class NotebookBooksSuggestLayoutControllerTest
           fullSize,
           attachRequest(
               titles.stream().map(t -> node(t)).toArray(AttachBookLayoutNodeRequest[]::new)),
-          pdfFile(STUB_PDF_BYTES));
+          pdfFile(ONE_PAGE_PDF));
       openAiStructuredResponseMock.stubStructuredResponse(
           suggestionWithDepths(fullSize, titles.stream().collect(toMap(t -> t, t -> 0))));
 
