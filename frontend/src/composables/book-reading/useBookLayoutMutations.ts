@@ -34,7 +34,7 @@ const BOOK_LAYOUT_MUTATION_LOADING_MESSAGE = "Updating book layout…"
 export function useBookLayoutMutations(opts: {
   notebookId: ComputedRef<number>
   bookBlocks: ComputedRef<BookBlockFull[]>
-  getPropBook: () => BookFull
+  getBook: () => BookFull
   selectedBlockId: Ref<number | null>
   applyBookBlockSelection: (block: BookBlockFull) => Promise<void>
   onBookUpdated: (book: BookFull) => void
@@ -62,9 +62,7 @@ export function useBookLayoutMutations(opts: {
         { blockUi: true, message: BOOK_LAYOUT_MUTATION_LOADING_MESSAGE }
       )
       if (!error && data) {
-        opts.onBookUpdated(
-          bookFullAfterLayoutMutation(opts.getPropBook(), data)
-        )
+        opts.onBookUpdated(bookFullAfterLayoutMutation(opts.getBook(), data))
         opts.selectedBlockId.value = block.id
       }
     } finally {
@@ -98,7 +96,7 @@ export function useBookLayoutMutations(opts: {
         { blockUi: true, message: BOOK_LAYOUT_MUTATION_LOADING_MESSAGE }
       )
       if (!error && data) {
-        const merged = bookFullAfterLayoutMutation(opts.getPropBook(), data)
+        const merged = bookFullAfterLayoutMutation(opts.getBook(), data)
         if (
           predecessorId !== null &&
           merged.blocks.some((b) => b.id === predecessorId)

@@ -4,7 +4,6 @@ import type { BookBlockReadingDisposition } from "@/lib/book-reading/readBlockId
 import type { BookBlockFull } from "@generated/donut-backend-api"
 import {
   computed,
-  ref,
   toValue,
   watch,
   type ComputedRef,
@@ -21,19 +20,12 @@ export function useBookReadingSelection(options: {
     status: BookBlockReadingDisposition
   ) => Promise<boolean>
   onAdvance: (block: BookBlockFull) => void | Promise<void>
-  /** Called after `onAdvance` from `applyBookBlockSelection` (e.g. EPUB anchor refresh). */
-  afterAdvance?: () => void | Promise<void>
-  initialSelectedBlockId?: number | null
-  /** When set (PDF), the reading panel target composable supplies it; otherwise EPUB-style. */
-  overrideBlockAwaitingConfirmation?: ComputedRef<BookBlockFull | null>
-  /**
-   * PDF: keep selection valid when `book.blocks` changes (first block fallback).
-   * EPUB: leave false to preserve prior behavior.
-   */
-  repairSelectionWhenBlocksChange?: boolean
-  selectedBlockId?: Ref<number | null>
-}): {
+  /** Decides which block awaits confirmation instead of the unmarked selected block. */
+  blockAwaitingConfirmation?: () => BookBlockFull | null
+  /** Keeps the selection on an existing block (the first) when the blocks change. */
+  repairSelection?: boolean
   selectedBlockId: Ref<number | null>
+}): {
   blockAwaitingConfirmation: ComputedRef<BookBlockFull | null>
   applyBookBlockSelection: (block: BookBlockFull) => Promise<void>
   markSelectedBlockDisposition: (
@@ -46,28 +38,19 @@ export function useBookReadingSelection(options: {
     hasRecordedDisposition,
     submitReadingDisposition,
     onAdvance,
-    afterAdvance,
-    initialSelectedBlockId = null,
-    overrideBlockAwaitingConfirmation,
-    repairSelectionWhenBlocksChange = false,
-    selectedBlockId: selectedBlockIdOption,
+    repairSelection = false,
+    selectedBlockId,
   } = options
 
-  const selectedBlockId =
-    selectedBlockIdOption ?? ref<number | null>(initialSelectedBlockId)
-
-  const defaultBlockAwaitingConfirmation = computed<BookBlockFull | null>(
-    () => {
-      const selId = selectedBlockId.value
-      if (selId === null) return null
-      if (hasRecordedDisposition(selId)) return null
-      const rows = toValue(bookBlocks)
-      return rows.find((b) => b.id === selId) ?? null
-    }
+  const blockAwaitingConfirmation = computed<BookBlockFull | null>(
+    options.blockAwaitingConfirmation ??
+      (() => {
+        const selId = selectedBlockId.value
+        if (selId === null) return null
+        if (hasRecordedDisposition(selId)) return null
+        return toValue(bookBlocks).find((b) => b.id === selId) ?? null
+      })
   )
-
-  const blockAwaitingConfirmation =
-    overrideBlockAwaitingConfirmation ?? defaultBlockAwaitingConfirmation
 
   useAutoMarkPredecessorWithNoTextOfItsOwn({
     bookBlocks,
@@ -76,7 +59,7 @@ export function useBookReadingSelection(options: {
     submitReadingDisposition,
   })
 
-  if (repairSelectionWhenBlocksChange) {
+  if (repairSelection) {
     watch(
       () => toValue(bookBlocks),
       (blocks) => {
@@ -95,7 +78,6 @@ export function useBookReadingSelection(options: {
 
   async function applyBookBlockSelection(block: BookBlockFull) {
     await onAdvance(block)
-    await afterAdvance?.()
   }
 
   async function markSelectedBlockDisposition(
@@ -116,7 +98,6 @@ export function useBookReadingSelection(options: {
   }
 
   return {
-    selectedBlockId,
     blockAwaitingConfirmation,
     applyBookBlockSelection,
     markSelectedBlockDisposition,

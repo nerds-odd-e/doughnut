@@ -200,6 +200,13 @@ bar and working reorganizing controls, or at least no controls that do nothing.
 - In an EPUB, indent, outdent, cancel, and *AI Reorganize* act as in PDF; any
   action not supported is not shown.
 
+**Design note:** reorganizing is the reading surface's `reorganize` capability
+(`useBookReadingSession`); turning it on for EPUB wires the book layout's
+reorganize listeners and the AI preview dialog. The "Now reading" bar sits only
+in `BookReadingShell`'s PDF pane layout, so showing it in EPUB means giving EPUB
+that pane layout (a DOM change), which also lets the shell declare the Reading
+Control Panel once.
+
 **Effort hypothesis:** L, low confidence. A first slice can hide the controls
 that do nothing. Open question: is creating a block from EPUB text also needed?
 **Depends on:** none (reliable EPUB positions are in place).
@@ -354,101 +361,6 @@ Panel at the end of that paragraph, as they do for blocks with more text.
 
 **Effort hypothesis:** S, low confidence.
 **Depends on:** none; coordinate with story 16 on the reading panel target.
-
-<a id="story-19"></a>
-
-### Give the PDF reading view a designed structure, not just a smaller file
-
-**Identity:** SEED-059#story-19
-```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/060-designed-structure-for-reading-view/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"9969518ae62bcc71bff0bd055be88b65cfa23b7067766df35effc8b13ce3a412","plan":"0da09d6cdfba248eba95cc6016fed2292a0e7012f372d90f3c17fb9112599f16"}}
-```
-
-**Goal:** Developers of later book-reading stories (7, 9, 10, 16, 17, 18)
-change one reading concept in the one place that owns it, and a concept that
-PDF and EPUB share is wired once for both formats. Readers see no change.
-Today `BookReadingContent.vue` has 455 lines, over the 250-line limit. It wires
-the PDF viewer, the viewport and current block, selection and snap-back, the
-Reading Control Panel anchor, reading records, creating a block from content
-with its title dialog, AI reorganize, layout changes, and the last-read
-position. `BookReadingEpubView.vue` (218 lines) wires the same bar, book
-layout, records, selection, and panel again. Every story that touches reading
-adds lines to one of them.
-
-**Scope** (owner request, 2026-09-29)
-
-- **Design first, not a mechanical split.** Owner: it needs architectural
-  consideration, not simply splitting it. The design is the whole reading view,
-  both formats, as set out under **Architecture**. Splitting
-  `BookReadingContent.vue` into files without changing who owns what does not
-  meet the goal.
-- **Behavior unchanged, in both formats.** The existing book-reading E2E
-  features and page specs stay green, and no user-visible change is made. The
-  current differences between formats stay as they are:
-  - PDF only: layout changes (indent, outdent, cancel, drag), AI reorganize,
-    the "Now reading" bar, creating a block from content, snap-back, the page
-    and zoom control, and moving the selection to a valid block when the
-    layout changes.
-  - The two current-block rules (story 16 unifies them).
-  - Leaving the book: EPUB sends a pending reading position; PDF drops it.
-  - The EPUB panel anchor is updated on window resize.
-- **Observable structure outcome.** No file of the reading view is over the
-  250-line limit, so the waiver recorded in DD-160 ends.
-- **Deferred:** giving EPUB the PDF-only tools (story 10), one current-block
-  rule (story 16), and changes to `PdfBookViewer.vue` (400 lines) or
-  `EpubBookViewer.vue` other than what the new surface boundary needs. The
-  viewer is the format's rendering component and is not part of this story.
-
-**Architecture** (confirmed by the owner, 2026-09-29)
-
-- **One format-neutral reading view** owns everything that does not depend on
-  how the book is displayed: the global bar with the book name, the book
-  layout panel, reading records and the mark control, selection and the
-  Reading Control Panel, the current block and its live announcement, saving
-  the last-read position, the "Now reading" bar, and layout changes with AI
-  reorganize.
-- **One reading surface per format** (PDF and EPUB) sits in its main area and
-  owns only what depends on the format: its viewer, showing a chosen block,
-  turning a view change into a current-block candidate, the locator saved as
-  the reading position, the geometry that anchors the panel, and anything that
-  only the format has (PDF page and zoom control, creating a block from
-  content, snap-back). The existing `BookReaderViewerRef` geometry contract is
-  the starting point for this surface contract.
-- **Format differences are explicit capabilities of the surface**, not
-  duplicated wiring. For example, "the reader can reorganize the layout" is on
-  for PDF and off for EPUB. Story 10 turns it on for EPUB instead of wiring
-  reorganizing again.
-- `BookReader.vue` keeps loading the book and choosing the surface by format.
-- The existing composables (`useBookReadingSelection`,
-  `useBookReadingCurrentBlock`, `useReadingPanelAnchor`,
-  `useBookReadingSnapBack`, `useBookLayoutMutations`,
-  `useBookLayoutAiReorganize`) are reused under these owners. Their
-  format-switch options (for example `overrideBlockAwaitingConfirmation` and
-  `repairSelectionWhenBlocksChange`) are replaced by the surface's
-  capabilities where that makes them simpler.
-
-**Key examples**
-
-- Story 16 changes how the current block moves in PDF → it edits the
-  current-block owner and the PDF surface's candidate, not the reading view's
-  wiring.
-- Story 10 gives EPUB readers AI reorganize → it turns on a capability for the
-  EPUB surface, and the reading view already wires AI reorganize once.
-- Story 17 saves an EPUB CFI → only the EPUB surface's reading-position
-  locator changes.
-- A reader marks a block Read in a PDF and in an EPUB → the same wiring saves
-  the record in both, and each format looks and behaves as it does today.
-- In an EPUB, Tab on a block still sends nothing (defect 11 stays for story
-  10).
-
-**Effort hypothesis:** M–L, low confidence; the design moves the wiring of
-two views into one, not only one file. Slices:
-[plan 060](../slice-plans/060-designed-structure-for-reading-view/PLAN.md).
-**Depends on:** none. Placed first so later book-reading stories build on it.
-**Evidence:** DD-160 (the file-size check was waived for
-`BookReadingContent.vue` in SEED-059#story-2), and SEED-059#story-6 (change or
-clear a reading mark) added one binding line to each view in two slices while
-leaving the PDF view over the limit.
 
 <a id="story-20"></a>
 

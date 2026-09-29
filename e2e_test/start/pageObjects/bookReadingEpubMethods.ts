@@ -208,7 +208,7 @@ export const bookReadingEpubMethods = () => ({
   /**
    * Navigate away via the GlobalBar "Notebook" link, wait for the pending reading-position
    * PATCH to flush so the server reflects the user's last position, then revisit the same
-   * reading-page URL to force a full remount of BookReadingEpubView.
+   * reading-page URL to force a full remount of BookReadingEpub.
    */
   leaveEpubReadingViewAndReturn() {
     waitUntilAppIsNotBusy()

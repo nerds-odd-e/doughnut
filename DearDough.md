@@ -877,6 +877,10 @@ After the CI observer lost its worker, the coordinator reported the lost coverag
   - Evidence: coordinator session `9516bae0-…`: 51 Stop-hook messages naming `/tmp/dough-ci-501/watch-MvVUKq`, the first before and the rest after the 12:19:47Z `ci-mailbox.mjs stop`; 49 coordinator turns answered "Handled; waiting". Those turns read about 7.7M cache-read tokens in total. The coordinator also filed host feedback about the loop.
   - Observed effect: token and turn waste only. Delivery, proof, and the later observer for b47d6eb4c8 were unaffected.
   - Inference: the hook's binding to the lost mailbox survives `stop`, so `lostWorkerMessage` (`ci-host-hook.mjs`) fires again at every stop until a new delivery rebinds. Qualified: the coordinator inferred this from reading the hook; there was no controlled check.
+- Execution: SEED-059#story-19 / `.planning/slice-plans/060-designed-structure-for-reading-view/PLAN.md` / 821f5d617b; Timestamp: unknown (2026-09-29, between slice 3's publication a8cd47911c and slice 4's 16afb85941); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.47.
+  - Evidence: mailbox `/tmp/dough-ci-501/watch-62k1ov`, killed by a full disk; after `ci-mailbox.mjs stop` returned `stopped`/`lost`, and after managed delivery attached a new observer, the Stop hook still returned `decision: block` with the lost-worker notice.
+  - Observed effect: two blocked turn ends and the notice on every tool call; the coordinator deleted this session's binding file for the stopped mailbox to continue.
+  - Inference: a second session confirms the binding to a lost mailbox survives both `stop` and a new observer's attachment.
 
 ## DD-170 — A delegated slice's hand-back never reached the coordinator during a disk-full episode; the fallback heartbeat resumed it
 

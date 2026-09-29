@@ -59,7 +59,7 @@ describe("useBookReadingSelection", () => {
           hasRecordedDisposition: options.hasRecordedDisposition,
           submitReadingDisposition: options.submitReadingDisposition,
           onAdvance,
-          initialSelectedBlockId: options.initialSelectedBlockId ?? null,
+          selectedBlockId: ref(options.initialSelectedBlockId ?? null),
         })
         return { currentBlockId }
       },
@@ -183,7 +183,7 @@ describe("useBookReadingSelection", () => {
           hasRecordedDisposition: () => false,
           submitReadingDisposition: submit,
           onAdvance,
-          initialSelectedBlockId: 1,
+          selectedBlockId: ref<number | null>(1),
         })
         return { markSelectedBlockDisposition }
       },

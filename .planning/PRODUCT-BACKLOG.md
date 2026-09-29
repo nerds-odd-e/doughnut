@@ -7,7 +7,6 @@ Bug fixing and general maintenance.
 
 ## Taken
 
-- [Give the PDF reading view a designed structure, not just a smaller file](seeds/SEED-059-book-reading-uat-fixes.md#story-19) — SEED-059#story-19 ([plan](slice-plans/060-designed-structure-for-reading-view/PLAN.md))
 - [Reopen at the block start when the saved exact EPUB place no longer resolves](seeds/SEED-059-book-reading-uat-fixes.md#story-20) — SEED-059#story-20 ([plan](slice-plans/062-stale-epub-place-reopens-at-block-start/PLAN.md))
 
 ## Backlog list

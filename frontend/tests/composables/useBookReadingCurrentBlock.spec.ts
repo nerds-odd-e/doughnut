@@ -11,15 +11,16 @@ describe("useBookReadingCurrentBlock", () => {
     vi.useRealTimers()
   })
 
-  it("runs proposeReadingPosition when currentBlockId commits after debounce", async () => {
+  it("reads the reading position when currentBlockId commits after debounce", async () => {
     const propose = vi.fn()
     const Root = defineComponent({
       setup() {
         const notebookId = ref(1)
         const { currentBlockIdDebouncer } = useBookReadingCurrentBlock({
           notebookId,
-          proposeReadingPosition: () => () => {
+          readingPosition: () => {
             propose()
+            return null
           },
         })
         return { currentBlockIdDebouncer }
@@ -37,15 +38,16 @@ describe("useBookReadingCurrentBlock", () => {
     expect(propose).toHaveBeenCalledTimes(1)
   })
 
-  it("runs proposeReadingPosition on commitNow without waiting for debounce", async () => {
+  it("reads the reading position on commitNow without waiting for debounce", async () => {
     const propose = vi.fn()
     const Root = defineComponent({
       setup() {
         const notebookId = ref(1)
         const { currentBlockIdDebouncer } = useBookReadingCurrentBlock({
           notebookId,
-          proposeReadingPosition: () => () => {
+          readingPosition: () => {
             propose()
+            return null
           },
         })
         currentBlockIdDebouncer.commitNow(99)
