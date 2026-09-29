@@ -867,7 +867,29 @@ The plan's decisive premises confirmed by grep that "no book block should be mar
   - Observed effect: one failed EPUB feature run and a new step; the plan's slice 2 behavior text was corrected during delivery. Small cost.
   - Inference: the premise checked that a step exists, not that it holds for the chosen fixture path. Related to DD-162 (a grep premise that did not reach the changed path).
 
-## DD-169 — A removal plan checked what it deleted but not the journey right after it, so two older panel rules surfaced as stops
+## DD-169 — The CI stop hook re-announced an already-stopped lost observer at every coordinator stop
+
+After the CI observer lost its worker, the coordinator reported the lost coverage, stopped that mailbox with `ci-mailbox.mjs stop`, and waited for a delegated agent. The Stop hook still sent the same "CI observer lost its worker" notice every time the coordinator ended a turn, so each wait turn became another status-only reply.
+
+### Occurrences
+
+- Execution: SEED-059#story-17 / slice-plans/059-reopen-epub-at-exact-paragraph / 946dccd30f; Timestamp: 2026-09-29T12:19:30Z–12:23:58Z (still repeating when the retrospective started); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.47.
+  - Evidence: coordinator session `9516bae0-…`: 51 Stop-hook messages naming `/tmp/dough-ci-501/watch-MvVUKq`, the first before and the rest after the 12:19:47Z `ci-mailbox.mjs stop`; 49 coordinator turns answered "Handled; waiting". Those turns read about 7.7M cache-read tokens in total. The coordinator also filed host feedback about the loop.
+  - Observed effect: token and turn waste only. Delivery, proof, and the later observer for b47d6eb4c8 were unaffected.
+  - Inference: the hook's binding to the lost mailbox survives `stop`, so `lostWorkerMessage` (`ci-host-hook.mjs`) fires again at every stop until a new delivery rebinds. Qualified: the coordinator inferred this from reading the hook; there was no controlled check.
+
+## DD-170 — A delegated slice's hand-back never reached the coordinator during a disk-full episode; the fallback heartbeat resumed it
+
+The coordinator had scheduled a 30-minute fallback wake-up when it delegated slice 1. Slice 3's implementer handed back while the disk was full. No completion notification appears in the coordinator's history. The coordinator resumed only when the heartbeat fired, found the disk had space again, and accepted slice 3 from the diff.
+
+### Occurrences
+
+- Execution: SEED-059#story-17 / slice-plans/059-reopen-epub-at-exact-paragraph / 946dccd30f; Timestamp: 2026-09-29T12:12:17Z (hand-back) to 12:19:00Z (heartbeat resume); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.47.
+  - Evidence: subagent `a672003fc5545b1f6` ended with SubagentHandback at 12:12:17Z. The coordinator's next input is the 11:48:27Z `ScheduleWakeup` prompt, whose text still said "waiting on slice 1 probe agent". The coordinator then noted "Disk space is back (8.1 GiB free)". The CI observer lost its worker in the same episode (DD-169).
+  - Observed effect: about 7 minutes idle; nothing was lost, because the coordinator read slice 3's result from the worktree diff.
+  - Inference: the host lost the notification while the disk was full. Useful practice: keep a fallback heartbeat whenever a delegated agent is running, and accept its work from the checkout when its report is missing. Qualified: one occurrence, environmental cause.
+
+## DD-171 — A removal plan checked what it deleted but not the journey right after it, so two older panel rules surfaced as stops
 
 Plan 053's premises confirmed what snap-back did and that only it used scroll suppression, and listed "panel appears after scrolling past" as must-keep. It did not look at what happens when the reader scrolls past without marking, which snap-back had made rare: the panel hid once the next block became current, and the fixed panel shared one bottom slot with the "Now reading" bar, which covered it.
 
@@ -880,6 +902,6 @@ Plan 053's premises confirmed what snap-back did and that only it used scroll su
 
 ## Retention
 
-- Highest allocated local number: 169. Removed local codes are never reused.
+- Highest allocated local number: 171. Removed local codes are never reused.
 - Full pre-maintenance log and earlier recovery locators: `99fa1b9835e3dff2473837ba2a1f8b11967d5938:DearDough.md`.
 - Occurrence history is partial; active evidence stays here or in the Open Dough catalog and watch list.

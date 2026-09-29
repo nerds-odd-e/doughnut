@@ -130,6 +130,15 @@ Feature: EPUB book
       Then the heading "Licence Section One" should be at the top of the EPUB reader
       And the book block "Licence Section One" should be the current block and visible in the book layout aside
 
+    Scenario: Reopening an EPUB at another width shows the same paragraph at the top
+      Given I set the book reading viewport to 1440 by 900
+      And I open the reading view for the attached book "epub_long_chapter_before_target"
+      When I scroll the EPUB reader until the paragraph "Chapter One paragraph 60." is at the top
+      And I set the book reading viewport to 390 by 844
+      And I leave the EPUB reading view and return to it
+      Then the paragraph "Chapter One paragraph 60." should be at the top of the EPUB reader
+      And the book block "Chapter One" should be the current block in the book reader
+
   Rule: Unsupported EPUB attachment
 
     Scenario: Upload DRM-flagged EPUB shows a clear attach error

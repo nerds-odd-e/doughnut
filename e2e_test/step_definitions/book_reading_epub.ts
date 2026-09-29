@@ -72,6 +72,24 @@ Then(
 )
 
 When(
+  'I scroll the EPUB reader until the paragraph {string} is at the top',
+  // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
+  (paragraphText: string) => {
+    return bookReadingPage().scrollEpubReaderUntilParagraphIsAtTop(
+      paragraphText
+    )
+  }
+)
+
+Then(
+  'the paragraph {string} should be at the top of the EPUB reader',
+  // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
+  (paragraphText: string) => {
+    return bookReadingPage().expectEpubParagraphAtTopOfReader(paragraphText)
+  }
+)
+
+When(
   'I follow the link {string} in the EPUB reader',
   // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
   (linkText: string) => {
