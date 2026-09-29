@@ -120,6 +120,15 @@ Feature: EPUB book
       When I mark the book block "The Fixture Title" as read in the Reading Control Panel
       Then I should see that book block "The Fixture Title" is marked as read in the book layout
 
+    Scenario: Reopening resumes at the last place and shows its block in the book layout
+      Given I set the book reading viewport to 1280 by 560
+      And I open the reading view for the attached book "epub_long_chapter_before_target"
+      When I choose the book block "Licence Section One"
+      Then the book block "Licence Section One" should be the current block in the book reader
+      When I leave the EPUB reading view and return to it
+      Then the heading "Licence Section One" should be at the top of the EPUB reader
+      And the book block "Licence Section One" should be the current block and visible in the book layout aside
+
   Rule: Unsupported EPUB attachment
 
     Scenario: Upload DRM-flagged EPUB shows a clear attach error

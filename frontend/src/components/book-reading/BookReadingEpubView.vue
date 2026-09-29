@@ -75,12 +75,10 @@ import {
   currentBlockIdFromEpubView,
   type EpubViewBlockStarts,
 } from "@/lib/book-reading/currentBlockIdFromEpubView"
-import { splitEpubHref } from "@/lib/book-reading/epubHrefMatch"
 import type {
   BookBlockFull,
   BookFull,
   ContentLocatorFull,
-  EpubLocatorFull,
 } from "@generated/donut-backend-api"
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from "vue"
 
@@ -122,23 +120,17 @@ const epubMainPaneRef = ref<HTMLElement | null>(null)
 const bookBlocks = computed(() => props.book.blocks)
 
 const selectedBlockId = ref<number | null>(props.initialSelectedBlockId ?? null)
-const lastRelocateHref = ref<string | null>(null)
-
 const { currentBlockId, currentBlockIdDebouncer, proposeReadingPosition } =
   useBookReadingCurrentBlock({
     notebookId,
     commitCurrentBlock: () => true,
     flushLastReadPositionPatchOnUnmount: true,
     proposeReadingPosition: (debouncer) => () => {
-      const raw = lastRelocateHref.value
-      if (raw === null || raw.length === 0) return
-      const { path, fragment } = splitEpubHref(raw.trim())
-      if (path.length === 0) return
-      const locator: EpubLocatorFull = {
-        type: "EpubLocator_Full",
-        href: path,
-        ...(fragment !== null ? { fragment } : {}),
-      }
+      const current = props.book.blocks.find(
+        (b) => b.id === currentBlockId.value
+      )
+      const locator = asEpubLocator(current?.contentLocators[0])
+      if (!locator) return
       const sel = selectedBlockId.value
       debouncer.propose(locator, sel === null ? undefined : sel)
     },
@@ -213,8 +205,7 @@ const { readingPanelAnchorTopPx, updateReadingPanelAnchor } =
   })
 refreshReadingPanelAnchorAfterSelection.value = updateReadingPanelAnchor
 
-function onEpubRelocated(payload: { href: string }) {
-  lastRelocateHref.value = payload.href
+function onEpubRelocated() {
   const id = currentBlockIdInView()
   if (id !== null) {
     currentBlockIdDebouncer.propose(id)

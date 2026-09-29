@@ -187,7 +187,7 @@ shown. Attach-time change only: books attached earlier are excluded.
 
 ### 6. Reopening shows the current block in the layout
 Type: Behavior
-Status: planned
+Status: done
 Proof: E2E at 1280×560 on the added fixture, extended so its layout overflows.
 
 Behavior: the reader has read to a late block → leaves the reading view and

@@ -147,13 +147,20 @@ export const bookReadingLayoutMethods = () => ({
     this.expectBookBlockIsCurrentBlockByTitle(title)
     cy.get('[data-testid="book-reading-book-layout-aside"]').should(
       ($aside) => {
+        const aside = $aside[0]!
         expect(
-          $aside[0]!.scrollTop,
+          aside.scrollTop,
           'book layout aside should have scrolled to reveal the current block'
         ).to.be.greaterThan(0)
+        const row = aside.querySelector('[data-current-block="true"]')!
+        const asideRect = aside.getBoundingClientRect()
+        const rowRect = row.getBoundingClientRect()
+        expect(
+          rowRect.top >= asideRect.top && rowRect.bottom <= asideRect.bottom,
+          `current block row (${rowRect.top}–${rowRect.bottom}) should be within the book layout aside's view (${asideRect.top}–${asideRect.bottom})`
+        ).to.equal(true)
       }
     )
-    bookBlockRowByTitle(title).should('be.visible')
     return this
   },
   /**

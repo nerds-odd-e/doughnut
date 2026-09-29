@@ -40,7 +40,7 @@ const props = withDefaults(
 )
 
 const emit = defineEmits<{
-  relocated: [payload: { href: string }]
+  relocated: []
 }>()
 
 const renditionHostRef = ref<HTMLElement | null>(null)
@@ -83,30 +83,11 @@ const {
   getBook: () => bookInstance,
 })
 
-function emitIfHref(href: string | undefined) {
-  if (typeof href === "string" && href.length > 0) {
-    emit("relocated", { href })
-  }
-}
-
 /**
  * epub.js's `relocated` does not always fire on the initial `display()` in continuous/scrolled
- * mode, so we also listen to `displayed` (fires when a section first mounts) to guarantee the
- * initial current block is reported. Both deliver the spine href we need.
+ * mode, so `displayed` (fires when a section first mounts) also reports that the view moved.
  */
-/**
- * In continuous/scrolled mode, `start` is the topmost visible section and `end` the bottommost.
- * Using `end` (when set) matches reading position when more than one spine item intersects
- * the viewport (e.g. a tall window shows the tail of ch.N and the start of ch.N+1).
- */
-const onRelocated = (location: {
-  start?: { href?: string }
-  end?: { href?: string }
-}) => {
-  const href = location.end?.href ?? location.start?.href
-  emitIfHref(href)
-}
-const onDisplayed = (section: { href?: string }) => emitIfHref(section.href)
+const emitRelocated = () => emit("relocated")
 
 /**
  * Resolve a stored locator to an epub.js display target. The backend stores package-root
@@ -149,8 +130,8 @@ defineExpose({
 function destroyEpub() {
   stopObservingHostResize()
   if (rendition) {
-    rendition.off("relocated", onRelocated)
-    rendition.off("displayed", onDisplayed)
+    rendition.off("relocated", emitRelocated)
+    rendition.off("displayed", emitRelocated)
   }
   rendition?.destroy()
   rendition = null
@@ -180,8 +161,8 @@ async function openEpub() {
   })
   rendition = r
   landOneDisplayAtATime(r)
-  r.on("relocated", onRelocated)
-  r.on("displayed", onDisplayed)
+  r.on("relocated", emitRelocated)
+  r.on("displayed", emitRelocated)
   const rawInitial = (props.initialLocator ?? "").trim()
   if (rawInitial.length > 0) {
     const { path, fragment } = splitEpubHref(rawInitial)

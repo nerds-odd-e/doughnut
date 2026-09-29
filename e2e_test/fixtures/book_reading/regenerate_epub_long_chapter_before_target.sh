@@ -19,6 +19,9 @@ set -euo pipefail
 # "ON THE ORIGIN OF SPECIES."), and a licence heading followed directly by its first
 # section's target (as in Alice's "THE FULL PROJECT GUTENBERG LICENSE").
 #
+# Short chapters between Chapter Two and the end matter make the book layout overflow at
+# 1280x560, so the end matter's rows start below the layout's top.
+#
 # When to re-run: after changing this script. The output is deterministic.
 #
 # From repo root:
@@ -53,6 +56,19 @@ def chapter(title, wrapper_id, anchor_id):
     )
 
 
+SHORT_CHAPTERS = [f"Short Chapter {n}" for n in range(1, 21)]
+
+
+def short_chapter_id(title):
+    return title.lower().replace(" ", "-")
+
+
+SHORT_CHAPTER_NAV_ITEMS = "\n".join(
+    f'    <li><a href="shortchapters.xhtml#{short_chapter_id(t)}">{t}</a></li>'
+    for t in SHORT_CHAPTERS
+)
+
+
 def xhtml(title, body):
     return f"""<?xml version="1.0" encoding="UTF-8"?>
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -85,6 +101,7 @@ files = {
     <item id="contents" href="contents.xhtml" media-type="application/xhtml+xml"/>
     <item id="c1" href="chapter1.xhtml" media-type="application/xhtml+xml"/>
     <item id="c2" href="chapter2.xhtml" media-type="application/xhtml+xml"/>
+    <item id="short" href="shortchapters.xhtml" media-type="application/xhtml+xml"/>
     <item id="end" href="endmatter.xhtml" media-type="application/xhtml+xml"/>
   </manifest>
   <spine>
@@ -92,11 +109,12 @@ files = {
     <itemref idref="contents"/>
     <itemref idref="c1"/>
     <itemref idref="c2"/>
+    <itemref idref="short"/>
     <itemref idref="end"/>
   </spine>
 </package>
 """,
-    "OEBPS/nav.xhtml": """<?xml version="1.0" encoding="UTF-8"?>
+    "OEBPS/nav.xhtml": f"""<?xml version="1.0" encoding="UTF-8"?>
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops">
 <head><title>Navigation</title></head>
 <body>
@@ -105,6 +123,7 @@ files = {
     <li><a href="contents.xhtml#contents">Contents</a></li>
     <li><a href="chapter1.xhtml#chapter-one">Chapter One</a></li>
     <li><a href="chapter2.xhtml#chapter-two">Chapter Two</a></li>
+{SHORT_CHAPTER_NAV_ITEMS}
     <li><a href="endmatter.xhtml#title-page">The Fixture Title</a></li>
     <li><a href="endmatter.xhtml#title-page">Detailed Contents</a></li>
     <li><a href="endmatter.xhtml#licence">The Full Licence</a>
@@ -134,6 +153,16 @@ files = {
     ),
     "OEBPS/chapter1.xhtml": chapter("Chapter One", "chapter-one", "chap01"),
     "OEBPS/chapter2.xhtml": chapter("Chapter Two", "chapter-two", "chap02"),
+    "OEBPS/shortchapters.xhtml": xhtml(
+        "Short Chapters",
+        "\n".join(
+            f"""<div class="chapter" id="{short_chapter_id(t)}">
+  <h2>{t}</h2>
+{paragraphs(t, 3)}
+</div>"""
+            for t in SHORT_CHAPTERS
+        ),
+    ),
     "OEBPS/endmatter.xhtml": xhtml(
         "End Matter",
         f"""<div class="chapter" id="title-page">
