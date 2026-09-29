@@ -1054,14 +1054,6 @@ export type RecallStatsDto = {
     dailyProbe?: Array<DailyProbeDay>;
 };
 
-export type RecallEzDiffusionDto = {
-    driftRate?: number;
-    boundarySeparation?: number;
-    nondecisionTimeMs?: number;
-    trialCount?: number;
-    morningCount?: number;
-};
-
 export type AssimilationCountDto = {
     dueCount?: number;
     assimilatedCountOfTheDay?: number;
@@ -1092,16 +1084,6 @@ export type MenuDataDto = {
     assimilationCount?: AssimilationCountDto;
     recallStatus?: DueMemoryTrackers;
     unreadMessages?: Array<ConversationMessage>;
-};
-
-export type DailyProbeConvergentValidityDto = {
-    pairs?: Array<PairValidity>;
-};
-
-export type PairValidity = {
-    pair?: string;
-    pairCount?: number;
-    rawCorrelation?: number;
 };
 
 export type CurrentUserInfo = {
@@ -3466,24 +3448,6 @@ export type GetRecallStatsResponses = {
 
 export type GetRecallStatsResponse = GetRecallStatsResponses[keyof GetRecallStatsResponses];
 
-export type GetRecallEzDiffusionData = {
-    body?: never;
-    path?: never;
-    query: {
-        timezone: string;
-    };
-    url: '/api/user/recall-ez-diffusion';
-};
-
-export type GetRecallEzDiffusionResponses = {
-    /**
-     * OK
-     */
-    200: RecallEzDiffusionDto;
-};
-
-export type GetRecallEzDiffusionResponse = GetRecallEzDiffusionResponses[keyof GetRecallEzDiffusionResponses];
-
 export type GetMenuDataData = {
     body?: never;
     path?: never;
@@ -3517,24 +3481,6 @@ export type GetTokensResponses = {
 };
 
 export type GetTokensResponse = GetTokensResponses[keyof GetTokensResponses];
-
-export type GetDailyProbeConvergentValidityData = {
-    body?: never;
-    path?: never;
-    query: {
-        timezone: string;
-    };
-    url: '/api/user/daily-probe-convergent-validity';
-};
-
-export type GetDailyProbeConvergentValidityResponses = {
-    /**
-     * OK
-     */
-    200: DailyProbeConvergentValidityDto;
-};
-
-export type GetDailyProbeConvergentValidityResponse = GetDailyProbeConvergentValidityResponses[keyof GetDailyProbeConvergentValidityResponses];
 
 export type CurrentUserInfoData = {
     body?: never;

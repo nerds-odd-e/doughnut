@@ -2520,24 +2520,6 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/RecallStatsDTO"
-  /api/user/recall-ez-diffusion:
-    get:
-      tags:
-      - user-controller
-      operationId: getRecallEzDiffusion
-      parameters:
-      - name: timezone
-        in: query
-        required: true
-        schema:
-          type: string
-      responses:
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/RecallEzDiffusionDTO"
   /api/user/menu-data:
     get:
       tags:
@@ -2570,24 +2552,6 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/UserToken"
-  /api/user/daily-probe-convergent-validity:
-    get:
-      tags:
-      - user-controller
-      operationId: getDailyProbeConvergentValidity
-      parameters:
-      - name: timezone
-        in: query
-        required: true
-        schema:
-          type: string
-      responses:
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/DailyProbeConvergentValidityDTO"
   /api/user/current-user-info:
     get:
       tags:
@@ -5622,24 +5586,6 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/DailyProbeDay"
-    RecallEzDiffusionDTO:
-      type: object
-      properties:
-        driftRate:
-          type: number
-          format: double
-        boundarySeparation:
-          type: number
-          format: double
-        nondecisionTimeMs:
-          type: number
-          format: double
-        trialCount:
-          type: integer
-          format: int32
-        morningCount:
-          type: integer
-          format: int32
     AssimilationCountDTO:
       type: object
       properties:
@@ -5713,24 +5659,6 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/ConversationMessage"
-    DailyProbeConvergentValidityDTO:
-      type: object
-      properties:
-        pairs:
-          type: array
-          items:
-            $ref: "#/components/schemas/PairValidity"
-    PairValidity:
-      type: object
-      properties:
-        pair:
-          type: string
-        pairCount:
-          type: integer
-          format: int32
-        rawCorrelation:
-          type: number
-          format: double
     CurrentUserInfo:
       type: object
       properties:

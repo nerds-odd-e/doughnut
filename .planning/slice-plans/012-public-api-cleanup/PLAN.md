@@ -113,7 +113,10 @@ read and tokens deleted by id from settings, but no bearer self-revocation exist
 
 ### 4. The public API no longer offers recall probe diagnostics
 Type: Behavior
-Status: planned
+Status: done
+Accepted: grep empty; full backend suite (2679, 0 failures) and `frontend:test` (1943) green.
+`RecallPaceAggregator.compute`'s `todayRowsToScore` overload was already dead before this story
+(its caller left in 8ca3115dd5), so it stays out of scope.
 Proof: regenerated artifacts omit both diagnostic operations and their DTO schemas; `git grep` finds
 no `EzDiffusion`, `ConvergentValidity`, or `RecallProbeConvergentValidity`; recall-stats tests
 (`UserRecallStatsControllerTest`, `RecallStatsServiceAccuracyGuessingFloorTest`) green; full backend
