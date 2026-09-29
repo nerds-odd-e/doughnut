@@ -708,7 +708,7 @@ The owner set a two-hour manual UAT budget. The exploration agents stopped once 
 
 ### Occurrences
 
-- Execution: SEED-054#story-1 / `.planning/slice-plans/011-book-reading-uat/PLAN.md` / 681768a71b; Timestamp: 2026-09-29T08:36+08:00 (second exploration part ends); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.46.
+- Execution: SEED-054#story-1 / `4f2f230505:.planning/slice-plans/011-book-reading-uat/PLAN.md` / 681768a71b; Timestamp: 2026-09-29T08:36+08:00 (second exploration part ends); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.46.
   - Evidence: seed `## UAT Findings` time list and `### Coverage gaps`; plan learnings for the two exploration parts; the coordinator's synthesis prompt asked for "the remaining gaps need other browsers, touch devices, or book sizes rather than more time".
   - Observed effect: 64 budget minutes unused; the size at which AI reorganization fails (defect 10) stays unknown.
   - Inference: exploration prompts could say to spend leftover budget on the cheapest open gaps before stopping, and the coordinator should not pre-write the report's justification. Qualified: one execution; the story calls the budget a limit, not a target.
@@ -719,7 +719,7 @@ Each of three report-writing slices ended with a fresh post-change refactor agen
 
 ### Occurrences
 
-- Execution: SEED-054#story-1 / `.planning/slice-plans/011-book-reading-uat/PLAN.md` / 681768a71b; Timestamp: 2026-09-29T08:45+08:00 (second refactor pass); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.46.
+- Execution: SEED-054#story-1 / `4f2f230505:.planning/slice-plans/011-book-reading-uat/PLAN.md` / 681768a71b; Timestamp: 2026-09-29T08:45+08:00 (second refactor pass); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.46.
   - Evidence: refactor returns for the three slices (about 72k, 85k, and 74k subagent tokens); the second return lists merges of lists written by the first slice.
   - Observed effect: about 230k tokens and three agent round trips for text-only changes; the merges were useful but partly repeated.
   - Inference: a single refactor pass after the last report slice, or slicing the UAT so only the final slice writes the synthesis and structure, may give the same result for less. Qualified: the passes also fixed real duplication and wording.
@@ -730,7 +730,7 @@ The execute-plan skill text lists a "stable execution publisher ID" as a start i
 
 ### Occurrences
 
-- Execution: SEED-054#story-1 / `.planning/slice-plans/011-book-reading-uat/PLAN.md` / 681768a71b; Timestamp: 2026-09-29T07:22+08:00; Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.46.
+- Execution: SEED-054#story-1 / `4f2f230505:.planning/slice-plans/011-book-reading-uat/PLAN.md` / 681768a71b; Timestamp: 2026-09-29T07:22+08:00; Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.46.
   - Evidence: start result `{"ok":false,"status":"invalid-request","error":"missing publisherId"}`; usage line in `execution-start.mjs`.
   - Observed effect: one refused call and a usage lookup; no state change.
 
@@ -740,7 +740,7 @@ The execute-plan skill text lists a "stable execution publisher ID" as a start i
 
 ### Occurrences
 
-- Execution: SEED-054#story-1 / `.planning/slice-plans/011-book-reading-uat/PLAN.md` / 681768a71b; Timestamp: 2026-09-29T07:25:42+08:00; Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.46.
+- Execution: SEED-054#story-1 / `4f2f230505:.planning/slice-plans/011-book-reading-uat/PLAN.md` / 681768a71b; Timestamp: 2026-09-29T07:25:42+08:00; Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.46.
   - Evidence: `dev.log` "APPLICATION FAILED TO START" with the missing-bean message; `git grep NotebookGitCutoverService -- backend/src` found nothing; the next `pnpm dev` was healthy.
   - Observed effect: one failed start and a short diagnosis before the UAT setup could continue.
   - Inference: the Development start's incremental build did not drop classes whose sources were deleted. Qualified: cause not investigated further.
