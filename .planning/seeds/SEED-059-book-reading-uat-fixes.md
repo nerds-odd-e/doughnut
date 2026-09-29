@@ -375,50 +375,6 @@ through each chapter and the book they are, and what is left at the end.
 **Effort hypothesis:** M, medium confidence.
 **Depends on:** none.
 
-<a id="story-15"></a>
-
-### Leaving a block with text unread does not mark it
-
-**Identity:** SEED-059#story-15
-```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/057-leave-text-blocks-unmarked/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"d233c9325cdc8d4b8d0febf16527bf99b05ee1624c55ef30da1155a43fdc8824","plan":"4ec164c4d70150f6bd6147cfccab6cefc99637430f465f4f612ba79a228b598a"}}
-```
-
-**Goal:** A reader who moves past an EPUB block that has text of its own,
-without reading it, gets no record for it, so reading records show only what
-they read or chose to mark. Blocks with no text of their own are still marked
-read when the reader moves on.
-
-**Scope** (owner decisions 2026-09-29; resplit from the original story 15 into
-this story and stories 16 and 17)
-
-- **Auto-mark only blocks with no text of their own.**
-  `useAutoMarkNoDirectContentPredecessor` treats "exactly one locator" as "no
-  text of its own". In EPUB the first paragraph is the block's only locator, so
-  a heading plus one paragraph is marked read when the reader moves on. A block
-  has no text of its own when its only content is a start anchor
-  (`beginning_anchor`) or, in PDF, a heading.
-- **Must keep working:** a heading-only or start-only block is still marked read
-  when its successor is entered (EPUB and PDF, including
-  `reading_record.feature` "Auto-read a heading-only book block…"); a block
-  already marked is left alone.
-- **Excluded:** where the reading panel anchors for a one-paragraph block
-  (`lastDirectContentLocator` has the same blind spot); the current-block rule
-  (story 16); marking after an empty block (story 16); records already made
-  (story 6).
-
-**Key examples**
-
-- In an EPUB, choose "Part One" (a heading and one paragraph), then choose the
-  next block without marking it → "Part One" has no mark.
-- In an EPUB, a block with only a heading comes before a block with text; enter
-  the next block → the heading-only block is marked read.
-- In a PDF, a heading-only block is still marked read when its successor is
-  entered.
-
-**Effort hypothesis:** S, medium confidence.
-**Depends on:** none.
-
 <a id="story-16"></a>
 
 ### The current block moves the same way in PDF as in EPUB
