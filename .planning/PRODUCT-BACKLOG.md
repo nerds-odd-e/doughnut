@@ -9,10 +9,10 @@ Bug fixing and general maintenance.
 
 - [Give the PDF reading view a designed structure, not just a smaller file](seeds/SEED-059-book-reading-uat-fixes.md#story-19) — SEED-059#story-19 ([plan](slice-plans/060-designed-structure-for-reading-view/PLAN.md))
 - [Attach a PDF book after installing MinerU as Donut advises](seeds/SEED-060-mineru-version-for-pdf-books.md#story-1) — SEED-060#story-1 ([plan](slice-plans/061-pinned-mineru-install-hint/PLAN.md))
+- [Reopen at the block start when the saved exact EPUB place no longer resolves](seeds/SEED-059-book-reading-uat-fixes.md#story-20) — SEED-059#story-20 ([plan](slice-plans/062-stale-epub-place-reopens-at-block-start/PLAN.md))
 
 ## Backlog list
 
-- [Reopen at the block start when the saved exact EPUB place no longer resolves](seeds/SEED-059-book-reading-uat-fixes.md#story-20) — SEED-059#story-20
 - [The current block moves the same way in PDF as in EPUB](seeds/SEED-059-book-reading-uat-fixes.md#story-16) — SEED-059#story-16
 - [Anchor the Reading Control Panel after a one-paragraph EPUB block](seeds/SEED-059-book-reading-uat-fixes.md#story-18) — SEED-059#story-18
 - [Fix a book layout by hand in a few steps](seeds/SEED-059-book-reading-uat-fixes.md#story-7) — SEED-059#story-7
