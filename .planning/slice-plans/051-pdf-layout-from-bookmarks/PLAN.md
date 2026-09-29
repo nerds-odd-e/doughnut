@@ -133,7 +133,7 @@ between → both blocks exist and each lands at its own position.
 
 ### 4. Bookmarks nest and point anywhere a PDF can point
 Type: Behavior
-Status: planned
+Status: done
 Proof: controller tests with in-code PDFs: three-level bookmarks → three-level
 layout; a named destination → the named page; a `/Fit` bookmark → its page top.
 
@@ -186,4 +186,11 @@ unproved and report it; do not claim them from slices 3–5.
   is `[0, y, 1000, y + 1]` (check highlight/current block in slice 5). Test PDFs
   live in `controllers/TestPdfs` (`pdfWithBookmarks`). A content item without
   `page_idx` in a bookmarked PDF fails loudly (MinerU always supplies it).
-  Accepted proof: `NotebookBooksAttachContentControllerTest$AttachPdfWithBookmarks`.
+  Accepted proof: `NotebookBooksAttachPdfBookmarksControllerTest$AttachPdfWithBookmarks`.
+- Slice 4: `PdfBookmarkReader` recurses children (level + 1) and resolves
+  `/Dest`, GoTo actions, and named destinations (LaTeX uses GoTo → named);
+  y only for `/XYZ` with a top, else page top. Deeper than `MAX_LAYOUT_DEPTH`
+  fails with the existing depth binding error. A throwaway read of
+  `thinkpython2.pdf` (240 bookmarks: 22/218), arXiv 1706.03762 (22: 7/12/3),
+  and `refactoring.pdf` (6; y 217/576/67.6/67.6/94.9/328.9) threw nothing.
+  Accepted proof: `NotebookBooksAttachPdfBookmarksControllerTest$AttachPdfWithNestedAndIndirectBookmarks`.
