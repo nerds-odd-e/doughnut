@@ -49,7 +49,10 @@ content-anchored.
 
 ### 1. Remove the resume scenarios the reopen scenario supersedes
 Type: Structure
-Status: planned
+Status: done
+Accepted proof: E, 15 passing, including "Reopening resumes at the last place and shows its
+block in the book layout"; `git grep` finds no callers of the removed steps or methods.
+`epubHostViewportIntersectsMarker` keeps other callers and stays.
 Size: about 5 minutes active; E runtime excepted.
 Proof: E green without the two scenarios; "Reopening resumes at the last place and shows its
 block in the book layout" is the surviving resume proof.
