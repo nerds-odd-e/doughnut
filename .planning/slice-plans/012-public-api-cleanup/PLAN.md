@@ -48,7 +48,7 @@ MCP, docs, and agent guidance for mentions. Nothing asserts the removed endpoint
 
 - Focused backend tests in this worktree:
   `CURSOR_DEV=true nix develop -c pnpm backend:test:worktree --tests '<pattern>'`
-  (`docs/worktree-backend-tests.md`).
+  (`docs/worktree-backend-tests.md`); one `--tests` pattern per command.
 - Regenerate the API client after each controller removal, as the `generate-api-client` skill
   requires: `CURSOR_DEV=true nix develop -c pnpm generateTypeScript`, then
   `CURSOR_DEV=true nix develop -c pnpm frontend:test` because generated types feed the frontend.
@@ -71,10 +71,12 @@ MCP, docs, and agent guidance for mentions. Nothing asserts the removed endpoint
 
 ### 1. Recall-log tests observe logs through recall history
 Type: Structure
-Status: planned
-Proof: `CURSOR_DEV=true nix develop -c pnpm backend:test:worktree --tests '*RecallLog*' --tests
-'*MemoryTracker*' --tests '*RecallPrompt*'` green, with no test calling
-`MemoryTrackerController.getRecallLogs`.
+Status: done
+Proof: `CURSOR_DEV=true nix develop -c pnpm backend:test:worktree --tests '*Recall*'` (355 green,
+all six rewritten `Recall*` classes selected) and `--tests '*MemoryTracker*'`
+(`MemoryTrackerTrackingControllerTest` 10/10) green; `git grep getRecallLogs -- backend/src/test`
+empty. Tests read logs through `ControllerTestBase.recallLogsOf`.
+Learning: `backend:test:worktree` accepts exactly one `--tests` pattern; run one command per pattern.
 
 Rewrite the 20 `getRecallLogs` call sites in `MemoryTrackerTrackingControllerTest`,
 `MemoryTrackerRecallHistoryRetrievabilityTest`, `LearningSessionRecordTutorFeedbackRecallLogTests`,

@@ -52,8 +52,7 @@ class RecallPromptAccidentalMatchGradingTests extends RecallPromptControllerTest
   void accidentalMatchLeavesAnAgainRecallLog() throws UnexpectedNoAccessRightException {
     controller.answerSpelling(recallPrompt, answerDTO);
 
-    assertThat(
-        memoryTrackerController.getRecallLogs(memoryTracker).get(0).getGrade(), is(Grade.AGAIN));
+    assertThat(recallLogsOf(memoryTracker).get(0).getGrade(), is(Grade.AGAIN));
   }
 
   @Test

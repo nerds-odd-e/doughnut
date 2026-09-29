@@ -80,7 +80,7 @@ class MemoryTrackerTrackingControllerTest extends MemoryTrackerControllerTestBas
 
     controller.markAsRecalled(tracker, Grade.GOOD);
 
-    List<RecallLog> logs = controller.getRecallLogs(tracker);
+    List<RecallLog> logs = recallLogsOf(tracker);
     assertThat(logs, hasSize(1));
     RecallLog log = logs.get(0);
     assertThat(log.getGrade(), is(Grade.GOOD));
@@ -105,7 +105,7 @@ class MemoryTrackerTrackingControllerTest extends MemoryTrackerControllerTestBas
 
     controller.markAsRecalled(tracker, Grade.GOOD);
 
-    assertThat(controller.getRecallLogs(tracker).get(0).getElapsedHours(), equalTo(24));
+    assertThat(recallLogsOf(tracker).get(0).getElapsedHours(), equalTo(24));
   }
 
   @Test
@@ -115,7 +115,7 @@ class MemoryTrackerTrackingControllerTest extends MemoryTrackerControllerTestBas
 
     controller.markAsRecalled(tracker, Grade.AGAIN);
 
-    List<RecallLog> logs = controller.getRecallLogs(tracker);
+    List<RecallLog> logs = recallLogsOf(tracker);
     assertThat(logs, hasSize(2));
     assertThat(logs.get(0).getGrade(), is(Grade.AGAIN));
   }

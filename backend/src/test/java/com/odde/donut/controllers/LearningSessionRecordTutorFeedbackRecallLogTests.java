@@ -11,11 +11,8 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
-import org.springframework.beans.factory.annotation.Autowired;
 
 class LearningSessionRecordTutorFeedbackRecallLogTests extends LearningSessionControllerTestBase {
-
-  @Autowired MemoryTrackerController memoryTrackerController;
 
   @ParameterizedTest
   @CsvSource({"4, EASY", "3, GOOD", "2, HARD", "1, AGAIN"})
@@ -29,7 +26,7 @@ class LearningSessionRecordTutorFeedbackRecallLogTests extends LearningSessionCo
         recordRequest(fixture.notebook(), learningSessionReport("Hola", gradeValue)),
         "Asia/Shanghai");
 
-    List<RecallLog> logs = memoryTrackerController.getRecallLogs(fixture.holaTracker());
+    List<RecallLog> logs = recallLogsOf(fixture.holaTracker());
     RecallLog log = logs.get(0);
     assertThat(log.getGrade(), is(grade));
     assertThat(log.getAnswerId(), nullValue());
@@ -48,7 +45,7 @@ class LearningSessionRecordTutorFeedbackRecallLogTests extends LearningSessionCo
                 "Hola", 4, "Pronunciation was clear; still mixes ser/estar under pressure.")),
         "Asia/Shanghai");
 
-    RecallLog log = memoryTrackerController.getRecallLogs(fixture.holaTracker()).get(0);
+    RecallLog log = recallLogsOf(fixture.holaTracker()).get(0);
     assertThat(
         log.getTutorFeedback(),
         is("Pronunciation was clear; still mixes ser/estar under pressure."));
@@ -63,7 +60,7 @@ class LearningSessionRecordTutorFeedbackRecallLogTests extends LearningSessionCo
     controller.record(
         recordRequest(fixture.notebook(), learningSessionReport("Hola", 4)), "Asia/Shanghai");
 
-    RecallLog log = memoryTrackerController.getRecallLogs(fixture.holaTracker()).get(0);
+    RecallLog log = recallLogsOf(fixture.holaTracker()).get(0);
     assertThat(log.getTutorFeedback(), nullValue());
   }
 
@@ -77,7 +74,7 @@ class LearningSessionRecordTutorFeedbackRecallLogTests extends LearningSessionCo
         recordRequest(fixture.notebook(), learningSessionReport("UnknownNote", 4)),
         "Asia/Shanghai");
 
-    assertThat(memoryTrackerController.getRecallLogs(fixture.holaTracker()), empty());
-    assertThat(memoryTrackerController.getRecallLogs(fixture.graciasTracker()), empty());
+    assertThat(recallLogsOf(fixture.holaTracker()), empty());
+    assertThat(recallLogsOf(fixture.graciasTracker()), empty());
   }
 }

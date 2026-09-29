@@ -49,9 +49,8 @@ class RecallPromptAccidentalMatchConfusionAdjustmentTests extends RecallPromptCo
         throws UnexpectedNoAccessRightException {
       controller.answerSpelling(recallPrompt, answerDTO);
 
-      Integer promptedAnswerId =
-          memoryTrackerController.getRecallLogs(promptedTracker).get(0).getAnswerId();
-      List<RecallLog> matchedLogs = memoryTrackerController.getRecallLogs(matchedSpellingTracker);
+      Integer promptedAnswerId = recallLogsOf(promptedTracker).get(0).getAnswerId();
+      List<RecallLog> matchedLogs = recallLogsOf(matchedSpellingTracker);
       assertThat(matchedLogs.get(0).isConfusion(), is(true));
       assertThat(matchedLogs.get(0).getAnswerId(), equalTo(promptedAnswerId));
     }
@@ -213,11 +212,11 @@ class RecallPromptAccidentalMatchConfusionAdjustmentTests extends RecallPromptCo
 
   private void assertConfusionLogged(MemoryTracker tracker)
       throws UnexpectedNoAccessRightException {
-    assertThat(memoryTrackerController.getRecallLogs(tracker).get(0).isConfusion(), is(true));
+    assertThat(recallLogsOf(tracker).get(0).isConfusion(), is(true));
   }
 
   private void assertNoConfusionLog(MemoryTracker tracker) throws UnexpectedNoAccessRightException {
-    assertThat(memoryTrackerController.getRecallLogs(tracker), hasSize(0));
+    assertThat(recallLogsOf(tracker), hasSize(0));
   }
 
   private void assertIneligibleTrackerIsUnchanged(Note note, MemoryTracker tracker)

@@ -47,7 +47,7 @@ class RecallPromptAnswerControllerTest extends RecallPromptControllerTestBase {
       throws UnexpectedNoAccessRightException {
     AnsweredQuestion answerResult = controller.answer(recallPrompt, answerDTO);
 
-    List<RecallLog> logs = memoryTrackerController.getRecallLogs(memoryTracker);
+    List<RecallLog> logs = recallLogsOf(memoryTracker);
     assertThat(logs, hasSize(1));
     RecallLog log = logs.get(0);
     assertThat(log.getGrade(), is(Grade.GOOD));
@@ -210,7 +210,7 @@ class RecallPromptAnswerControllerTest extends RecallPromptControllerTestBase {
 
       AnsweredQuestion answerResult = controller.answer(recallPrompt, answerDTO);
 
-      List<RecallLog> logs = memoryTrackerController.getRecallLogs(memoryTracker);
+      List<RecallLog> logs = recallLogsOf(memoryTracker);
       assertThat(logs.get(0).getGrade(), is(Grade.AGAIN));
       assertThat(logs.get(0).getAnswerId(), equalTo(answerResult.getAnswer().getId()));
     }
