@@ -13,6 +13,7 @@ Bug fixing and general maintenance.
 
 ## Backlog list
 
+- [Open another notebook's book without seeing the previous one](seeds/SEED-059-book-reading-uat-fixes.md#story-13) — SEED-059#story-13
 - [Reorganize a full-size book with AI](seeds/SEED-059-book-reading-uat-fixes.md#story-4) — SEED-059#story-4
 - [Scroll a PDF smoothly right after choosing a block](seeds/SEED-059-book-reading-uat-fixes.md#story-5) — SEED-059#story-5
 - [Keep reading records right and let readers correct them](seeds/SEED-059-book-reading-uat-fixes.md#story-6) — SEED-059#story-6

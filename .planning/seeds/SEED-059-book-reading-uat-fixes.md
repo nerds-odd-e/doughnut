@@ -511,6 +511,42 @@ through each chapter and the book they are, and what is left at the end.
 **Effort hypothesis:** M, medium confidence.
 **Depends on:** none.
 
+<a id="story-13"></a>
+
+### Open another notebook's book without seeing the previous one
+
+**Identity:** SEED-059#story-13
+```json dough-story-state
+{"schemaVersion":1,"refinement":"not-refined","approach":"unselected"}
+```
+
+**Goal:** Opening a book from another notebook inside the app shows that book
+and records reading position against it.
+
+**Reported discrepancy (possible bug, inconclusive)**
+
+- **Expected:** after opening one notebook's book and then moving in the app to
+  another notebook's book, the second book's layout, PDF, and reading position
+  load, and reading-position updates go to the second notebook.
+- **Actual (observed once, in E2E):** during SEED-059#story-3 slice 5, a
+  `book_browsing.feature` scenario opened the blank-PDF book of notebook 1 and
+  then the bookmarked book of notebook 2. Under `/notebooks/2/book` the browser
+  still showed notebook 1's layout and blank PDF, and sent
+  `PATCH /api/notebooks/1/book/reading-position`.
+- **Uncertainty:** not reproduced by hand; the cause (for example the book page
+  being reused across in-app navigation without reloading) is unconfirmed. The
+  test worked around it by giving each Rule its own Background.
+
+**Key examples**
+
+- First confirm whether a reader can hit this: open notebook A's book, go to
+  notebook B's book in the app → B's layout and file show.
+- Reading in B after that → the reading position saved is B's, and A's is
+  unchanged.
+
+**Effort hypothesis:** S–M, low confidence (depends on the cause).
+**Depends on:** none.
+
 ## Ordering and Scope Reduction
 
 - **Highest priority** (reading breaks for common books and devices): stories
