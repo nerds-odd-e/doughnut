@@ -37,6 +37,7 @@ abstract class NotebookBooksControllerTestBase extends ControllerTestBase {
   static final byte[] ONE_PAGE_PDF = TestPdfs.onePagePdf(0);
 
   @Autowired NotebookBooksController controller;
+  @Autowired NotebookBookReadingController readingController;
   @Autowired BookRepository bookRepository;
   @Autowired BookUserLastReadPositionRepository bookUserLastReadPositionRepository;
   @Autowired BookBlockReadingRecordRepository bookBlockReadingRecordRepository;

@@ -25,9 +25,9 @@ class NotebookBooksReadingRecordControllerTest extends NotebookBooksControllerTe
       testabilitySettings.timeTravelTo(makeMe.aTimestamp().please());
       Notebook nb = notebookWithBook();
       BookBlock range = rootBlocksSorted(bookOf(nb)).getFirst();
-      controller.putBlockReadingRecord(nb, range, null);
+      readingController.putBlockReadingRecord(nb, range, null);
 
-      var list = controller.getBookReadingRecords(nb);
+      var list = readingController.getBookReadingRecords(nb);
       assertThat(list, hasSize(1));
       assertThat(list.getFirst().getBookBlockId(), equalTo(range.getId()));
       assertThat(list.getFirst().getStatus(), equalTo(BookBlockReadingRecord.STATUS_READ));
@@ -40,9 +40,9 @@ class NotebookBooksReadingRecordControllerTest extends NotebookBooksControllerTe
       Notebook nb = myNotebook();
       controller.attachBook(nb, attachRequest(node("2.1"), node("2.2")), pdfFile(ONE_PAGE_PDF));
       BookBlock first = rootBlocksSorted(bookOf(nb)).getFirst();
-      controller.putBlockReadingRecord(nb, first, null);
+      readingController.putBlockReadingRecord(nb, first, null);
 
-      var list = controller.getBookReadingRecords(nb);
+      var list = readingController.getBookReadingRecords(nb);
       assertThat(list, hasSize(1));
       assertThat(list.getFirst().getBookBlockId(), equalTo(first.getId()));
     }
@@ -61,13 +61,13 @@ class NotebookBooksReadingRecordControllerTest extends NotebookBooksControllerTe
       makeMe.entityPersister.save(otherRow);
       makeMe.entityPersister.flush();
 
-      assertThat(controller.getBookReadingRecords(nb), empty());
+      assertThat(readingController.getBookReadingRecords(nb), empty());
     }
 
     @Test
     void returnsEmptyWhenNoRecords() throws Exception {
       Notebook nb = notebookWithBook();
-      assertThat(controller.getBookReadingRecords(nb), empty());
+      assertThat(readingController.getBookReadingRecords(nb), empty());
     }
   }
 
@@ -79,7 +79,7 @@ class NotebookBooksReadingRecordControllerTest extends NotebookBooksControllerTe
       Notebook nb = notebookWithBook();
       BookBlock range = rootBlocksSorted(bookOf(nb)).getFirst();
 
-      var returned = controller.putBlockReadingRecord(nb, range, null);
+      var returned = readingController.putBlockReadingRecord(nb, range, null);
       assertThat(returned, hasSize(1));
       assertThat(returned.getFirst().getBookBlockId(), equalTo(range.getId()));
       assertThat(returned.getFirst().getStatus(), equalTo(BookBlockReadingRecord.STATUS_READ));
@@ -96,7 +96,7 @@ class NotebookBooksReadingRecordControllerTest extends NotebookBooksControllerTe
 
       assertThrows(
           ResponseStatusException.class,
-          () -> controller.putBlockReadingRecord(nbEmpty, range, null));
+          () -> readingController.putBlockReadingRecord(nbEmpty, range, null));
     }
 
     @Test
@@ -107,7 +107,7 @@ class NotebookBooksReadingRecordControllerTest extends NotebookBooksControllerTe
 
       assertThrows(
           ResponseStatusException.class,
-          () -> controller.putBlockReadingRecord(myNb, otherRange, null));
+          () -> readingController.putBlockReadingRecord(myNb, otherRange, null));
     }
 
     @Test
@@ -117,7 +117,7 @@ class NotebookBooksReadingRecordControllerTest extends NotebookBooksControllerTe
 
       assertThrows(
           UnexpectedNoAccessRightException.class,
-          () -> controller.putBlockReadingRecord(otherNb, range, null));
+          () -> readingController.putBlockReadingRecord(otherNb, range, null));
     }
 
     @Test
@@ -127,7 +127,8 @@ class NotebookBooksReadingRecordControllerTest extends NotebookBooksControllerTe
       currentUser.setUser(null);
 
       assertThrows(
-          ResponseStatusException.class, () -> controller.putBlockReadingRecord(nb, range, null));
+          ResponseStatusException.class,
+          () -> readingController.putBlockReadingRecord(nb, range, null));
     }
 
     @Test
@@ -141,12 +142,12 @@ class NotebookBooksReadingRecordControllerTest extends NotebookBooksControllerTe
 
       var skimBody = new BookBlockReadingRecordPutRequest();
       skimBody.setStatus(BookBlockReadingRecord.STATUS_SKIMMED);
-      var afterSkim = controller.putBlockReadingRecord(nb, first, skimBody);
+      var afterSkim = readingController.putBlockReadingRecord(nb, first, skimBody);
       assertThat(afterSkim.getFirst().getStatus(), equalTo(BookBlockReadingRecord.STATUS_SKIMMED));
 
       var skipBody = new BookBlockReadingRecordPutRequest();
       skipBody.setStatus(BookBlockReadingRecord.STATUS_SKIPPED);
-      var afterSkip = controller.putBlockReadingRecord(nb, second, skipBody);
+      var afterSkip = readingController.putBlockReadingRecord(nb, second, skipBody);
       assertThat(afterSkip, hasSize(2));
       assertThat(
           afterSkip.stream()
@@ -167,7 +168,7 @@ class NotebookBooksReadingRecordControllerTest extends NotebookBooksControllerTe
       var ex =
           assertThrows(
               ResponseStatusException.class,
-              () -> controller.putBlockReadingRecord(nb, range, bad));
+              () -> readingController.putBlockReadingRecord(nb, range, bad));
       assertThat(ex.getStatusCode(), equalTo(HttpStatus.BAD_REQUEST));
       assertThat(ex.getReason(), equalTo("Invalid reading record status"));
     }
@@ -181,16 +182,67 @@ class NotebookBooksReadingRecordControllerTest extends NotebookBooksControllerTe
 
       var skim = new BookBlockReadingRecordPutRequest();
       skim.setStatus(BookBlockReadingRecord.STATUS_SKIMMED);
-      controller.putBlockReadingRecord(nb, range, skim);
+      readingController.putBlockReadingRecord(nb, range, skim);
 
       testabilitySettings.timeTravelTo(makeMe.aTimestamp().of(1, 11).please());
-      var second = controller.putBlockReadingRecord(nb, range, null);
+      var second = readingController.putBlockReadingRecord(nb, range, null);
 
       assertThat(bookBlockReadingRecordRepository.count(), equalTo(1L));
       assertThat(second.getFirst().getStatus(), equalTo(BookBlockReadingRecord.STATUS_READ));
       assertThat(
           second.getFirst().getCompletedAt(),
           equalTo(testabilitySettings.getCurrentUTCTimestamp()));
+    }
+  }
+
+  @Nested
+  class DeleteBlockReadingRecord {
+    @Test
+    void removesOnlyTheCurrentUsersRecordForThatBlock() throws Exception {
+      Notebook nb = myNotebook();
+      controller.attachBook(
+          nb, attachRequest(node("Block A"), node("Block B")), pdfFile(ONE_PAGE_PDF));
+      List<BookBlock> roots = rootBlocksSorted(bookOf(nb));
+      BookBlock first = roots.getFirst();
+      BookBlock second = roots.get(1);
+      readingController.putBlockReadingRecord(nb, first, null);
+      readingController.putBlockReadingRecord(nb, second, null);
+      var otherRow = new BookBlockReadingRecord();
+      otherRow.setUser(makeMe.aUser().please());
+      otherRow.setBookBlock(first);
+      otherRow.setStatus(BookBlockReadingRecord.STATUS_READ);
+      otherRow.setCompletedAt(testabilitySettings.getCurrentUTCTimestamp());
+      makeMe.entityPersister.save(otherRow);
+      makeMe.entityPersister.flush();
+
+      var remaining = readingController.deleteBlockReadingRecord(nb, first);
+
+      assertThat(remaining, hasSize(1));
+      assertThat(remaining.getFirst().getBookBlockId(), equalTo(second.getId()));
+      assertThat(bookBlockReadingRecordRepository.count(), equalTo(2L));
+    }
+
+    @Test
+    void returns404WhenBlockBelongsToAnotherNotebooksBook() {
+      Notebook otherNb = otherUsersNotebookWithBook();
+      BookBlock otherRange = rootBlocksSorted(bookOf(otherNb)).getFirst();
+      Notebook myNb = notebookWithBook();
+
+      var ex =
+          assertThrows(
+              ResponseStatusException.class,
+              () -> readingController.deleteBlockReadingRecord(myNb, otherRange));
+      assertThat(ex.getStatusCode(), equalTo(HttpStatus.NOT_FOUND));
+    }
+
+    @Test
+    void rejectsNotebookWithoutReadAccess() {
+      Notebook otherNb = otherUsersNotebookWithBook();
+      BookBlock range = rootBlocksSorted(bookOf(otherNb)).getFirst();
+
+      assertThrows(
+          UnexpectedNoAccessRightException.class,
+          () -> readingController.deleteBlockReadingRecord(otherNb, range));
     }
   }
 }

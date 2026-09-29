@@ -81,6 +81,31 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/BookBlockReadingRecordListItem"
+    delete:
+      tags:
+      - notebook-books-controller
+      summary: Clear reading disposition for a book block
+      operationId: deleteNotebookBookBlockReadingRecord
+      parameters:
+      - name: notebook
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: bookBlock
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/BookBlockReadingRecordListItem"
   /api/notebooks/{notebook}/book/blocks/{bookBlock}/depth:
     put:
       tags:

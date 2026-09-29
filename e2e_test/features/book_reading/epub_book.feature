@@ -71,6 +71,15 @@ Feature: EPUB book
       Then I should see that book block "Chapter Alpha" is marked as skimmed in the book layout
       And I should see that book block "Chapter Beta" is selected in the book layout
 
+    Scenario: Clear the mark of an EPUB block in the book layout
+      When I choose the book block "Chapter Alpha"
+      And I mark the book block "Chapter Alpha" as skimmed in the Reading Control Panel
+      And I choose the book block "Chapter Alpha"
+      And I clear the mark of book block "Chapter Alpha" in the book layout
+      Then book block "Chapter Alpha" should not be marked in the book layout
+      When I leave the EPUB reading view and return to it
+      Then book block "Chapter Alpha" should not be marked in the book layout
+
   Rule: Landing on the chosen place
 
     Background:

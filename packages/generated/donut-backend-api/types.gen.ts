@@ -1388,6 +1388,25 @@ export type UploadResponses = {
 
 export type UploadResponse = UploadResponses[keyof UploadResponses];
 
+export type DeleteNotebookBookBlockReadingRecordData = {
+    body?: never;
+    path: {
+        notebook: number;
+        bookBlock: number;
+    };
+    query?: never;
+    url: '/api/notebooks/{notebook}/book/blocks/{bookBlock}/reading-record';
+};
+
+export type DeleteNotebookBookBlockReadingRecordResponses = {
+    /**
+     * OK
+     */
+    200: Array<BookBlockReadingRecordListItem>;
+};
+
+export type DeleteNotebookBookBlockReadingRecordResponse = DeleteNotebookBookBlockReadingRecordResponses[keyof DeleteNotebookBookBlockReadingRecordResponses];
+
 export type PutNotebookBookBlockReadingRecordData = {
     body?: BookBlockReadingRecordPutRequest;
     path: {

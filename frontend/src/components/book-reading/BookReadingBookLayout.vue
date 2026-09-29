@@ -80,6 +80,7 @@
             v-if="block.id === selectedBlockId && dispositionForBlock(block.id)"
             :disposition="dispositionForBlock(block.id)!"
             @change="(status) => emit('changeMark', block.id, status)"
+            @clear="emit('clearMark', block.id)"
           />
         </template>
       </div>
@@ -119,6 +120,7 @@ const emit = defineEmits<{
   blockOutdent: [block: BookBlockFull]
   blockCancel: [block: BookBlockFull]
   changeMark: [blockId: number, status: BookBlockReadingDisposition]
+  clearMark: [blockId: number]
   requestAiReorganize: []
 }>()
 

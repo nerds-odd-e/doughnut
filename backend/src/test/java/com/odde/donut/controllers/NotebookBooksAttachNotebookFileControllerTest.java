@@ -29,6 +29,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 class NotebookBooksAttachNotebookFileControllerTest
     extends NotebookGitWebContentControllerTestBase {
   @Autowired NotebookBooksController notebookBooksController;
+  @Autowired NotebookBookReadingController notebookBookReadingController;
   @Autowired BooksController booksController;
   @Autowired BookRepository bookRepository;
   @Autowired BookUserLastReadPositionRepository bookUserLastReadPositionRepository;
@@ -125,8 +126,8 @@ class NotebookBooksAttachNotebookFileControllerTest
     Notebook notebook = createGitBackedNotebook();
     notebookBooksController.attachBook(notebook, physicsPrimer(), pdfFile(ONE_PAGE_PDF));
     Book book = bookRepository.findByNotebook_Id(notebook.getId()).orElseThrow();
-    notebookBooksController.patchReadingPosition(notebook, lastReadBody(1, 200));
-    notebookBooksController.putBlockReadingRecord(
+    notebookBookReadingController.patchReadingPosition(notebook, lastReadBody(1, 200));
+    notebookBookReadingController.putBlockReadingRecord(
         notebook, rootBlocksSorted(book).getFirst(), null);
     AcceptedHistory before = acceptedHistory(notebook);
 

@@ -206,37 +206,6 @@ export const bookReadingLayoutMethods = () => ({
     })
     return this
   },
-  /**
-   * Book layout row marked as read: `data-direct-content-read="true"` plus success right border
-   * and screen-reader “Marked as read” on the row.
-   */
-  expectBookBlockMarkedAsReadInBookLayout(title: string) {
-    waitUntilAppIsNotBusy()
-    bookBlockRowByTitle(title).should(
-      'have.attr',
-      'data-direct-content-read',
-      'true'
-    )
-    return this
-  },
-  expectBookBlockMarkedAsSkimmedInBookLayout(title: string) {
-    waitUntilAppIsNotBusy()
-    bookBlockRowByTitle(title).should(
-      'have.attr',
-      'data-direct-content-skimmed',
-      'true'
-    )
-    return this
-  },
-  expectNoBookBlockMarkedInBookLayout() {
-    waitUntilAppIsNotBusy()
-    bookBlockRows()
-      .filter(
-        '[data-direct-content-read], [data-direct-content-skimmed], [data-direct-content-skipped]'
-      )
-      .should('have.length', 0)
-    return this
-  },
   expectNewChildBlockInLayout() {
     waitUntilAppIsNotBusy()
     cy.get('[data-testid="book-reading-book-layout"]')

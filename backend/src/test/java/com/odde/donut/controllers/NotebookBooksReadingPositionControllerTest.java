@@ -25,7 +25,7 @@ class NotebookBooksReadingPositionControllerTest extends NotebookBooksController
     void persistsSnapshotForCurrentUserAndBook() throws Exception {
       Notebook nb = notebookWithBook();
 
-      controller.patchReadingPosition(nb, lastReadBody(2, 750));
+      readingController.patchReadingPosition(nb, lastReadBody(2, 750));
 
       var stored =
           bookUserLastReadPositionRepository
@@ -41,8 +41,8 @@ class NotebookBooksReadingPositionControllerTest extends NotebookBooksController
     void secondPatchUpdatesSameRow() throws Exception {
       Notebook nb = notebookWithBook();
 
-      controller.patchReadingPosition(nb, lastReadBody(0, 100));
-      controller.patchReadingPosition(nb, lastReadBody(5, 0));
+      readingController.patchReadingPosition(nb, lastReadBody(0, 100));
+      readingController.patchReadingPosition(nb, lastReadBody(5, 0));
 
       assertThat(bookUserLastReadPositionRepository.count(), equalTo(1L));
       var stored =
@@ -59,7 +59,7 @@ class NotebookBooksReadingPositionControllerTest extends NotebookBooksController
       Notebook nb = myNotebook();
       assertThrows(
           ResponseStatusException.class,
-          () -> controller.patchReadingPosition(nb, lastReadBody(0, 0)));
+          () -> readingController.patchReadingPosition(nb, lastReadBody(0, 0)));
     }
 
     @Test
@@ -67,7 +67,7 @@ class NotebookBooksReadingPositionControllerTest extends NotebookBooksController
       Notebook otherNb = otherUsersNotebookWithBook();
       assertThrows(
           UnexpectedNoAccessRightException.class,
-          () -> controller.patchReadingPosition(otherNb, lastReadBody(0, 0)));
+          () -> readingController.patchReadingPosition(otherNb, lastReadBody(0, 0)));
     }
 
     @Test
@@ -76,7 +76,7 @@ class NotebookBooksReadingPositionControllerTest extends NotebookBooksController
       currentUser.setUser(null);
       assertThrows(
           ResponseStatusException.class,
-          () -> controller.patchReadingPosition(nb, lastReadBody(0, 0)));
+          () -> readingController.patchReadingPosition(nb, lastReadBody(0, 0)));
     }
 
     @Test
@@ -86,7 +86,7 @@ class NotebookBooksReadingPositionControllerTest extends NotebookBooksController
           nb, attachRequest(node("Chapter 1", node("Section 1.1"))), pdfFile(ONE_PAGE_PDF));
       int secondBlockId = blocksByLayoutOrder(bookOf(nb)).get(1).getId();
 
-      controller.patchReadingPosition(nb, lastReadBody(3, 420, secondBlockId));
+      readingController.patchReadingPosition(nb, lastReadBody(3, 420, secondBlockId));
 
       var stored =
           bookUserLastReadPositionRepository
@@ -105,15 +105,15 @@ class NotebookBooksReadingPositionControllerTest extends NotebookBooksController
 
       assertThrows(
           ResponseStatusException.class,
-          () -> controller.patchReadingPosition(nbB, lastReadBody(0, 100, blockFromA)));
+          () -> readingController.patchReadingPosition(nbB, lastReadBody(0, 100, blockFromA)));
     }
 
     @Test
     void patchWithoutSelectedBookBlockIdLeavesStoredBlockUnchanged() throws Exception {
       Notebook nb = notebookWithBook();
       int blockId = blocksByLayoutOrder(bookOf(nb)).getFirst().getId();
-      controller.patchReadingPosition(nb, lastReadBody(1, 500, blockId));
-      controller.patchReadingPosition(nb, lastReadBody(2, 600));
+      readingController.patchReadingPosition(nb, lastReadBody(1, 500, blockId));
+      readingController.patchReadingPosition(nb, lastReadBody(2, 600));
 
       var stored =
           bookUserLastReadPositionRepository
@@ -130,7 +130,7 @@ class NotebookBooksReadingPositionControllerTest extends NotebookBooksController
     void persistsEpubLocator() throws Exception {
       Notebook nb = notebookWithBook();
 
-      controller.patchReadingPosition(
+      readingController.patchReadingPosition(
           nb, lastReadEpubBody("OEBPS/chapter2.xhtml#section-beta-two"));
 
       var stored =
@@ -148,7 +148,7 @@ class NotebookBooksReadingPositionControllerTest extends NotebookBooksController
       BookLastReadPositionRequest empty = new BookLastReadPositionRequest();
 
       ApiException ex =
-          assertThrows(ApiException.class, () -> controller.patchReadingPosition(nb, empty));
+          assertThrows(ApiException.class, () -> readingController.patchReadingPosition(nb, empty));
       assertThat(ex.getErrorBody().getErrorType(), equalTo(ApiError.ErrorType.BINDING_ERROR));
     }
   }

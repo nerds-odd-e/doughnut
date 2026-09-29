@@ -108,13 +108,23 @@ block's mark in the layout.
 ### 2. Clear the mark of the chosen block in the book layout
 
 Type: Behavior
-Status: planned
+Status: done
 Proof: controller tests red → green; API client regenerated; new EPUB E2E
 scenario red → green; `epub_book.feature` green.
+Accepted proof: `NotebookBooksReadingRecordControllerTest` `DeleteBlockReadingRecord`
+red (missing endpoint) → green, with the reading-position, attach, and
+access-denial controller tests green after the refactor; `pnpm
+generateTypeScript` output unchanged by the refactor; `epub_book.feature`
+18/18 (new "Clear the mark of an EPUB block in the book layout" red first) and
+`reading_record.feature` 7/7; book-reading page, layout, and
+`useBookReadingSelection` specs green; `vue-tsc` clean. The reading-progress
+endpoints now live in `NotebookBookReadingController` (same API tag).
 
 Behavior: in the minimal EPUB, "Chapter Alpha" is marked Skimmed and chosen →
-the reader clicks its mark and chooses Clear mark → no block is marked, and
-after leaving and returning none is.
+the reader clicks its mark and chooses Clear mark → "Chapter Alpha" is no
+longer marked, and after leaving and returning it still is not. (Choosing
+Chapter Alpha auto-marks the structural "Part One" read, so "no block is
+marked" does not hold in this fixture.)
 
 Change: `DELETE /api/notebooks/{notebook}/book/blocks/{bookBlock}/reading-record`
 (same ownership checks as `PUT`, returns the list); regenerate the frontend
@@ -133,4 +143,7 @@ composable; Clear mark in the control.
 - "I open the book attached to notebook …" does not remount an already open
   book, so it cannot prove persistence. Slice 1 added "I open the book again"
   (a full visit); reuse it for reopen checks.
-- Slice 2 adds Clear mark to `BookBlockMarkControl.vue`'s options.
+- In the minimal EPUB, choosing "Chapter Alpha" always marks "Part One" read;
+  assert on the cleared block, not on "no block marked".
+- `BookReadingContent.vue` (455 lines) stays over the file-size limit; both
+  slices added one binding line each. Splitting it is outside this story.

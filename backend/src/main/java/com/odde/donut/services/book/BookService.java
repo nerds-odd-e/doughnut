@@ -137,6 +137,11 @@ public class BookService {
   }
 
   @Transactional
+  public void deleteReadingRecord(Notebook notebook, User user, BookBlock bookBlock) {
+    readingProgress.deleteReadingRecord(requireBook(notebook), user, bookBlock);
+  }
+
+  @Transactional
   public Book changeBlockDepth(Notebook notebook, BookBlock bookBlock, String direction) {
     return outlineEditor.changeBlockDepth(requireBook(notebook), bookBlock, direction);
   }

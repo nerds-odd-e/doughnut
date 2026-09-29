@@ -24,9 +24,10 @@ class NotebookBooksGetReadingPositionControllerTest extends NotebookBooksControl
     @Test
     void returnsSavedSnapshotAfterPatch() throws Exception {
       Notebook nb = notebookWithBook();
-      controller.patchReadingPosition(nb, lastReadBody(3, 420));
+      readingController.patchReadingPosition(nb, lastReadBody(3, 420));
 
-      ResponseEntity<BookUserLastReadPositionResponse> res = controller.getReadingPosition(nb);
+      ResponseEntity<BookUserLastReadPositionResponse> res =
+          readingController.getReadingPosition(nb);
 
       assertThat(res.getStatusCode(), equalTo(HttpStatus.OK));
       assertThat(res.getBody(), notNullValue());
@@ -41,9 +42,10 @@ class NotebookBooksGetReadingPositionControllerTest extends NotebookBooksControl
       controller.attachBook(
           nb, attachRequest(node("Chapter 1", node("Section 1.1"))), pdfFile(ONE_PAGE_PDF));
       int secondBlockId = blocksByLayoutOrder(bookOf(nb)).get(1).getId();
-      controller.patchReadingPosition(nb, lastReadBody(1, 200, secondBlockId));
+      readingController.patchReadingPosition(nb, lastReadBody(1, 200, secondBlockId));
 
-      ResponseEntity<BookUserLastReadPositionResponse> res = controller.getReadingPosition(nb);
+      ResponseEntity<BookUserLastReadPositionResponse> res =
+          readingController.getReadingPosition(nb);
 
       assertThat(res.getBody().selectedBookBlockId(), equalTo(secondBlockId));
       JsonNode json = objectMapper.valueToTree(res.getBody());
@@ -54,10 +56,11 @@ class NotebookBooksGetReadingPositionControllerTest extends NotebookBooksControl
     @Test
     void returnsSavedEpubLocatorAfterPatch() throws Exception {
       Notebook nb = notebookWithBook();
-      controller.patchReadingPosition(
+      readingController.patchReadingPosition(
           nb, lastReadEpubBody("OEBPS/chapter2.xhtml#section-beta-two"));
 
-      ResponseEntity<BookUserLastReadPositionResponse> res = controller.getReadingPosition(nb);
+      ResponseEntity<BookUserLastReadPositionResponse> res =
+          readingController.getReadingPosition(nb);
 
       assertThat(
           res.getBody().locator(),
@@ -68,7 +71,8 @@ class NotebookBooksGetReadingPositionControllerTest extends NotebookBooksControl
     void returns204WhenNoSnapshotStored() throws UnexpectedNoAccessRightException {
       Notebook nb = notebookWithBook();
 
-      ResponseEntity<BookUserLastReadPositionResponse> res = controller.getReadingPosition(nb);
+      ResponseEntity<BookUserLastReadPositionResponse> res =
+          readingController.getReadingPosition(nb);
 
       assertThat(res.getStatusCode(), equalTo(HttpStatus.NO_CONTENT));
       assertThat(res.getBody(), nullValue());
@@ -77,21 +81,22 @@ class NotebookBooksGetReadingPositionControllerTest extends NotebookBooksControl
     @Test
     void returns404WhenNotebookHasNoBook() throws UnexpectedNoAccessRightException {
       Notebook nb = myNotebook();
-      assertThrows(ResponseStatusException.class, () -> controller.getReadingPosition(nb));
+      assertThrows(ResponseStatusException.class, () -> readingController.getReadingPosition(nb));
     }
 
     @Test
     void rejectsNotebookWithoutReadAccess() {
       Notebook otherNb = otherUsersNotebookWithBook();
       assertThrows(
-          UnexpectedNoAccessRightException.class, () -> controller.getReadingPosition(otherNb));
+          UnexpectedNoAccessRightException.class,
+          () -> readingController.getReadingPosition(otherNb));
     }
 
     @Test
     void requiresLoggedInUser() {
       Notebook nb = notebookWithBook();
       currentUser.setUser(null);
-      assertThrows(ResponseStatusException.class, () -> controller.getReadingPosition(nb));
+      assertThrows(ResponseStatusException.class, () -> readingController.getReadingPosition(nb));
     }
   }
 }

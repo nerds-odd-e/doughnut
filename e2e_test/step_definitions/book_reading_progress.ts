@@ -43,6 +43,14 @@ When(
 )
 
 When(
+  'I clear the mark of book block {string} in the book layout',
+  // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
+  (blockTitle: string) => {
+    return bookReadingPage().clearBookBlockMarkInBookLayout(blockTitle)
+  }
+)
+
+When(
   'I open the book again',
   // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
   () => {
@@ -63,6 +71,14 @@ Then(
   // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
   (title: string) => {
     return bookReadingPage().expectBookBlockMarkedAsSkimmedInBookLayout(title)
+  }
+)
+
+Then(
+  'book block {string} should not be marked in the book layout',
+  // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
+  (title: string) => {
+    return bookReadingPage().expectBookBlockNotMarkedInBookLayout(title)
   }
 )
 

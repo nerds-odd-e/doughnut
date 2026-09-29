@@ -11,5 +11,7 @@ public interface BookBlockReadingRecordRepository
   Optional<BookBlockReadingRecord> findByUser_IdAndBookBlock_Id(
       Integer userId, Integer bookBlockId);
 
+  void deleteByUser_IdAndBookBlock_Id(Integer userId, Integer bookBlockId);
+
   List<BookBlockReadingRecord> findAllByUser_IdAndBookBlock_Book_Id(Integer userId, Integer bookId);
 }

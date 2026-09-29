@@ -94,9 +94,7 @@ final class BookReadingProgress {
         || BookBlockReadingRecord.STATUS_SKIPPED.equals(status))) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid reading record status");
     }
-    if (!bookBlock.getBook().getId().equals(book.getId())) {
-      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Resource not found");
-    }
+    requireBlockOfBook(book, bookBlock);
     Timestamp now = testabilitySettings.getCurrentUTCTimestamp();
     bookBlockReadingRecordRepository
         .findByUser_IdAndBookBlock_Id(user.getId(), bookBlock.getId())
@@ -116,6 +114,19 @@ final class BookReadingProgress {
               return entityPersister.save(row);
             });
     entityPersister.flush();
+  }
+
+  void deleteReadingRecord(Book book, User user, BookBlock bookBlock) {
+    requireBlockOfBook(book, bookBlock);
+    bookBlockReadingRecordRepository.deleteByUser_IdAndBookBlock_Id(
+        user.getId(), bookBlock.getId());
+    entityPersister.flush();
+  }
+
+  private static void requireBlockOfBook(Book book, BookBlock bookBlock) {
+    if (!bookBlock.getBook().getId().equals(book.getId())) {
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Resource not found");
+    }
   }
 
   private void applyReadingPositionFields(

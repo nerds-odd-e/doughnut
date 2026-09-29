@@ -29,6 +29,7 @@
     :disposition-for-block="bookReading.dispositionForBlock"
     @block-click="onBookBlockClick"
     @change-mark="bookReading.submitReadingDisposition"
+    @clear-mark="bookReading.clearReadingDisposition"
   >
     <main
       ref="epubMainPaneRef"

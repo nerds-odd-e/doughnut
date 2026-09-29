@@ -25,24 +25,38 @@ export function useNotebookBookReadingRecords(
     }
   }
 
-  async function submitReadingDisposition(
-    bookBlockId: number,
-    status: BookBlockReadingDisposition
+  async function replaceRowsWith(
+    call: () => Promise<{
+      data?: BookBlockReadingRecordListItem[]
+      error?: unknown
+    }>
   ): Promise<boolean> {
-    const result = await apiCallWithLoading(() =>
-      NotebookBooksController.putNotebookBookBlockReadingRecord({
-        path: {
-          notebook: toValue(notebookId),
-          bookBlock: bookBlockId,
-        },
-        body: { status },
-      })
-    )
+    const result = await apiCallWithLoading(call)
     if (result.error || result.data === undefined) {
       return false
     }
     rows.value = result.data
     return true
+  }
+
+  function submitReadingDisposition(
+    bookBlockId: number,
+    status: BookBlockReadingDisposition
+  ): Promise<boolean> {
+    return replaceRowsWith(() =>
+      NotebookBooksController.putNotebookBookBlockReadingRecord({
+        path: { notebook: toValue(notebookId), bookBlock: bookBlockId },
+        body: { status },
+      })
+    )
+  }
+
+  function clearReadingDisposition(bookBlockId: number): Promise<boolean> {
+    return replaceRowsWith(() =>
+      NotebookBooksController.deleteNotebookBookBlockReadingRecord({
+        path: { notebook: toValue(notebookId), bookBlock: bookBlockId },
+      })
+    )
   }
 
   function hasRecordedDisposition(blockId: number): boolean {
@@ -58,6 +72,7 @@ export function useNotebookBookReadingRecords(
   return {
     syncFromServer,
     submitReadingDisposition,
+    clearReadingDisposition,
     hasRecordedDisposition,
     dispositionForBlock,
   }

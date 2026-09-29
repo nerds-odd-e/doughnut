@@ -23,6 +23,14 @@
       >
         {{ option.label }}
       </button>
+      <button
+        type="button"
+        data-testid="book-reading-clear-mark"
+        class="daisy-btn daisy-btn-xs daisy-btn-outline"
+        @click="clearMark"
+      >
+        Clear mark
+      </button>
     </template>
   </div>
 </template>
@@ -33,7 +41,10 @@ import { ref } from "vue"
 
 defineProps<{ disposition: BookBlockReadingDisposition }>()
 
-const emit = defineEmits<{ change: [status: BookBlockReadingDisposition] }>()
+const emit = defineEmits<{
+  change: [status: BookBlockReadingDisposition]
+  clear: []
+}>()
 
 const markOptions: { status: BookBlockReadingDisposition; label: string }[] = [
   { status: "READ", label: "Read" },
@@ -45,5 +56,10 @@ const menuOpen = ref(false)
 function changeMark(status: BookBlockReadingDisposition) {
   menuOpen.value = false
   emit("change", status)
+}
+
+function clearMark() {
+  menuOpen.value = false
+  emit("clear")
 }
 </script>

@@ -46,6 +46,7 @@
     @block-outdent="onBlockOutdent"
     @block-cancel="onBlockCancel"
     @change-mark="bookReading.submitReadingDisposition"
+    @clear-mark="bookReading.clearReadingDisposition"
     @request-ai-reorganize="requestAiReorganize"
   >
     <main

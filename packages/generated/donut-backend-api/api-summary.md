@@ -12,6 +12,7 @@ Use this for endpoint lookup; open `sdk.gen.ts` or `types.gen.ts` only for exact
 ## Notebook Books Controller
 
 - `putNotebookBookBlockReadingRecord`: PUT `/api/notebooks/{notebook}/book/blocks/{bookBlock}/reading-record` -> `PutNotebookBookBlockReadingRecordResponse` (request: `PutNotebookBookBlockReadingRecordData`; path: notebook, bookBlock; body: BookBlockReadingRecordPutRequest; response body: Array<BookBlockReadingRecordListItem>)
+- `deleteNotebookBookBlockReadingRecord`: DELETE `/api/notebooks/{notebook}/book/blocks/{bookBlock}/reading-record` -> `DeleteNotebookBookBlockReadingRecordResponse` (request: `DeleteNotebookBookBlockReadingRecordData`; path: notebook, bookBlock; response body: Array<BookBlockReadingRecordListItem>)
 - `changeBookBlockDepth`: PUT `/api/notebooks/{notebook}/book/blocks/{bookBlock}/depth` -> `ChangeBookBlockDepthResponse` (request: `ChangeBookBlockDepthData`; path: notebook, bookBlock; body: BookBlockDepthRequestFull; response body: BookMutationResponseFull)
 - `suggestBookLayoutReorganization`: POST `/api/notebooks/{notebook}/book/reorganize-layout/suggest` -> `SuggestBookLayoutReorganizationResponse` (request: `SuggestBookLayoutReorganizationData`; path: notebook; response body: BookLayoutReorganizationSuggestion)
 - `applyBookLayoutReorganization`: POST `/api/notebooks/{notebook}/book/reorganize-layout/apply` -> `ApplyBookLayoutReorganizationResponse` (request: `ApplyBookLayoutReorganizationData`; path: notebook; body: BookLayoutReorganizationSuggestionFull; response body: BookMutationResponseFull)
