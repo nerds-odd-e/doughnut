@@ -97,7 +97,11 @@ same entry points:
 
 ### 1. One reading session owns records, current block, and reading position
 Type: Structure
-Status: planned
+Status: done
+Accepted proof: frontend command 12 files / 71 tests; `vue-tsc --noEmit` clean;
+`reading_record.feature` 7/7 and `epub_book.feature` 17/17. EPUB's send-on-leave
+is passed through unchanged (`flushPositionOnLeave` → the existing
+`flushLastReadPositionPatchOnUnmount`); no test observes it directly.
 Proof: frontend command; `cy:run --spec e2e_test/features/book_reading/reading_record.feature,e2e_test/features/book_reading/epub_book.feature`.
 
 Create `useBookReadingSession` with the surface object and move into it, for
@@ -162,6 +166,15 @@ About 5–10 min.
   unifies them in the session.
 
 ## Learnings
+
+- Slice 1 added one surface hook the Architecture does not list:
+  `onRecordsSynced`, which EPUB uses to refresh the panel anchor after the
+  records sync. Slice 2 removes it when the panel anchor moves into the session.
+- Slice 5 candidates in `useBookReadingCurrentBlock.ts`: the unused
+  `lastReadPositionPatchDebouncer` return and the factory-style
+  `proposeReadingPosition` option, now with one caller (the session).
+- `PdfBookViewer.vue` (400 lines) is excluded from this story, so slice 5's
+  `wc -l` check covers the reading-view files, not the viewers.
 
 - Plans 053 (story 5) and 058 (story 16) name `BookReadingContent.vue` and its
   wiring; after this story they need their file references realigned when they

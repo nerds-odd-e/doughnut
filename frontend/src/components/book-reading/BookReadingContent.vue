@@ -121,7 +121,6 @@ import PdfControl from "@/components/book-reading/PdfControl.vue"
 import ReadingControlPanel from "@/components/book-reading/ReadingControlPanel.vue"
 import { pdfLocatorsFromBlock } from "@/lib/book-reading/asPdfLocator"
 import { wireItemsToNavigationTargets } from "@/lib/book-reading/pdfOutlineV1Anchor"
-import { structuralTitleForBlockId } from "@/lib/book-reading/currentBlockLiveAnnouncement"
 import { currentBlockIdFromVisiblePage } from "@/lib/book-reading/currentBlockIdFromVisiblePage"
 import type { ViewportYRange } from "@/lib/book-reading/pdfViewerViewportTopYDown"
 import {
@@ -130,11 +129,10 @@ import {
 } from "@/composables/useReadingPanelAnchor"
 import { useBookReadingSnapBack } from "@/composables/useBookReadingSnapBack"
 import type { BookReadingPdfViewerRef } from "@/composables/bookReaderViewerRef"
-import { useBookReadingCurrentBlock } from "@/composables/useBookReadingCurrentBlock"
 import { useBookReadingSelection } from "@/composables/useBookReadingSelection"
 import { useSidebarDrawer } from "@/composables/useSidebarDrawer"
 import { useBookLayoutAiReorganize } from "@/composables/useBookLayoutAiReorganize"
-import { useNotebookBookReadingRecords } from "@/composables/useNotebookBookReadingRecords"
+import { useBookReadingSession } from "@/composables/useBookReadingSession"
 import {
   bookFullAfterLayoutMutation,
   useBookLayoutMutations,
@@ -146,7 +144,7 @@ import type {
 } from "@generated/donut-backend-api"
 import { NotebookBooksController } from "@generated/donut-backend-api/sdk.gen"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
-import { computed, onMounted, ref, watch } from "vue"
+import { computed, ref, watch } from "vue"
 
 type ViewportPayload = {
   anchorPageIndexZeroBased: number
@@ -172,9 +170,6 @@ const props = withDefaults(
   }>(),
   { initialSelectedBlockId: null }
 )
-
-const notebookId = computed(() => Number(props.book.notebookId))
-const bookReading = useNotebookBookReadingRecords(notebookId)
 
 const pdfViewerLoadError = ref<string | null>(null)
 const viewportPayload = ref<ViewportPayload | null>(null)
@@ -215,8 +210,34 @@ function onPdfLoadError(message: string) {
   pdfViewerLoadError.value = message
 }
 
-const bookBlocks = computed(() => props.book.blocks)
-const selectedBlockId = ref<number | null>(props.initialSelectedBlockId ?? null)
+const {
+  notebookId,
+  bookBlocks,
+  bookReading,
+  selectedBlockId,
+  currentBlockId,
+  currentBlockIdDebouncer,
+  proposeReadingPosition,
+  currentBlockLiveText,
+} = useBookReadingSession({
+  book: () => props.book,
+  initialSelectedBlockId: props.initialSelectedBlockId ?? null,
+  surface: {
+    readingPositionLocator,
+    commitCurrentBlock: commitCurrentBlockId,
+  },
+})
+
+function readingPositionLocator(): PdfLocatorFull | null {
+  const last = lastReadingForPatch.value
+  if (last === null) return null
+  const y = Math.max(0, Math.min(1000, last.normalizedY))
+  return {
+    type: "PdfLocator_Full",
+    pageIndex: last.pageIndex,
+    bbox: [0, y, 0, y],
+  }
+}
 
 const {
   suggestion: aiSuggestion,
@@ -225,24 +246,6 @@ const {
   confirmSuggest: confirmAiReorganize,
   dismiss: dismissAiReorganizePreview,
 } = useBookLayoutAiReorganize(notebookId, bookBlocks)
-
-const { currentBlockId, currentBlockIdDebouncer, proposeReadingPosition } =
-  useBookReadingCurrentBlock({
-    notebookId,
-    commitCurrentBlock: commitCurrentBlockId,
-    proposeReadingPosition: (debouncer) => () => {
-      const last = lastReadingForPatch.value
-      if (last === null) return
-      const sel = selectedBlockId.value
-      const y = Math.max(0, Math.min(1000, last.normalizedY))
-      const locator: PdfLocatorFull = {
-        type: "PdfLocator_Full",
-        pageIndex: last.pageIndex,
-        bbox: [0, y, 0, y],
-      }
-      debouncer.propose(locator, sel === null ? undefined : sel)
-    },
-  })
 
 const currentBlockForNavBar = computed(() => {
   const curId = currentBlockId.value
@@ -327,10 +330,6 @@ function commitCurrentBlockId(id: number | null): boolean {
   }
   return true
 }
-
-const currentBlockLiveText = computed(() =>
-  structuralTitleForBlockId(currentBlockId.value, bookBlocks.value)
-)
 
 /**
  * Scroll → current-block pipeline:
@@ -448,8 +447,4 @@ async function onBackToSelected() {
   const block = bookBlocks.value.find((b) => b.id === selId)
   if (block) await applyBookBlockSelection(block)
 }
-
-onMounted(async () => {
-  await bookReading.syncFromServer()
-})
 </script>
