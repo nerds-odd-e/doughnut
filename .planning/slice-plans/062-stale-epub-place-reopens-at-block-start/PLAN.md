@@ -97,3 +97,8 @@ book start remains the unchanged `r.display()` fallback, with no test.
 
 - "No longer resolves" means epub.js rejects the display. A CFI that displays
   somewhere else is out of scope.
+
+## Execution complete
+
+Product advice: no change. The correction restores story 17's promise and teaches
+nothing new about reader value. Keep the backlog order: story 16 next, then 18.
