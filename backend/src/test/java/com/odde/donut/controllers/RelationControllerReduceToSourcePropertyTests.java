@@ -20,6 +20,9 @@ import com.odde.donut.testability.RelationshipNoteMarkdown;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
@@ -35,16 +38,18 @@ class RelationControllerReduceToSourcePropertyTests extends ControllerTestBase {
     currentUser.setUser(makeMe.aUser().please());
   }
 
-  @Test
-  void reducesTheRelationshipIntoTheSourcePropertyAndPermanentlyDeletesTheRelationshipNote()
-      throws UnexpectedNoAccessRightException {
+  @ParameterizedTest
+  @NullSource
+  @ValueSource(strings = {"[[Moon]] is a part of [[Earth]]."})
+  void reducesTheRelationshipIntoTheSourcePropertyAndPermanentlyDeletesTheRelationshipNote(
+      String body) throws UnexpectedNoAccessRightException {
     Note source = makeMe.aNote("Moon").notebookOwnedBy(currentUser.getUser()).please();
     Note target = makeMe.aNote("Earth").underSameNotebookAs(source).please();
     Note relation =
         makeMe
             .aNote()
             .underSameNotebookAs(source)
-            .asRelationship("a part of", source, target)
+            .content(RelationshipNoteMarkdown.forEndpoints(null, "a part of", source, target, body))
             .please();
     noteReferenceService.refreshDerivedIndexesForNote(relation);
     Integer relationId = relation.getId();
@@ -52,8 +57,7 @@ class RelationControllerReduceToSourcePropertyTests extends ControllerTestBase {
     NoteRealm result = controller.reduceToSourceProperty(relation);
 
     assertThat(result.getNote().getId(), equalTo(source.getId()));
-    assertThat(source.getContent(), containsString("a part of"));
-    assertThat(source.getContent(), containsString("[[Earth]]"));
+    assertThat(source.getContent(), containsString("a part of: '[[Earth]]'"));
     assertThat(noteRepository.findById(relationId).isEmpty(), equalTo(true));
   }
 
@@ -196,20 +200,14 @@ class RelationControllerReduceToSourcePropertyTests extends ControllerTestBase {
             .underSameNotebookAs(source)
             .content(
                 RelationshipNoteMarkdown.forEndpoints(
-                    null, "a part of", source, target, "Observations from orbit."))
+                    null,
+                    "a part of",
+                    source,
+                    target,
+                    "[[Moon]] is a part of [[Earth]]. Observations from orbit."))
             .please();
     noteReferenceService.refreshDerivedIndexesForNote(relation);
-    Integer relationId = relation.getId();
-    String relationContentBefore = relation.getContent();
-
-    ResponseStatusException exception =
-        assertThrows(
-            ResponseStatusException.class, () -> controller.reduceToSourceProperty(relation));
-
-    assertThat(exception.getStatusCode(), equalTo(HttpStatus.BAD_REQUEST));
-    assertThat(noteRepository.findById(relationId).isPresent(), equalTo(true));
-    assertThat(relation.getContent(), equalTo(relationContentBefore));
-    assertThat(source.getContent(), equalTo(sourceContentBefore));
+    assertRefusedLeavingNothingChanged(relation, source, sourceContentBefore);
   }
 
   @Test
@@ -227,6 +225,11 @@ class RelationControllerReduceToSourcePropertyTests extends ControllerTestBase {
             + "---\n";
     Note relation = makeMe.aNote().underSameNotebookAs(source).content(unresolvedContent).please();
     noteReferenceService.refreshDerivedIndexesForNote(relation);
+    assertRefusedLeavingNothingChanged(relation, source, sourceContentBefore);
+  }
+
+  private void assertRefusedLeavingNothingChanged(
+      Note relation, Note source, String sourceContentBefore) {
     Integer relationId = relation.getId();
     String relationContentBefore = relation.getContent();
 

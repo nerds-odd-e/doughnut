@@ -59,9 +59,14 @@ more than two links), and any product documentation.
 
 ### 1. Reduction ignores a body that is only a two-link sentence
 Type: Behavior
-Status: planned
+Status: done
 Proof: `RelationControllerReduceToSourcePropertyTests` via the command above —
 the new sentence-body test passes and the changed refusal test stays green.
+Accepted proof (2026-09-29): 8 tests, 0 failures. The empty-body and sentence-body
+cases share the parameterized
+`reducesTheRelationshipIntoTheSourcePropertyAndPermanentlyDeletesTheRelationshipNote`
+(asserts `a part of: '[[Earth]]'` on the source and the relationship note is gone).
+`refusesToReduceARelationshipNoteThatHasBodyText` asserts 400 with nothing changed.
 
 Behavior: a relationship note whose body is only `[[Moon]] is a part of [[Earth]].`
 → the learner reduces it to a source property → the source note gains

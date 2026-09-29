@@ -15,6 +15,7 @@ import java.sql.Timestamp;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.regex.Pattern;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -26,6 +27,10 @@ import org.springframework.web.server.ResponseStatusException;
  */
 final class NoteReferenceHandling {
   private static final String RELATIONSHIP_NOTE_TYPE = "relationship";
+  // Temporary accommodation for legacy note data: a body that is only "[[A]] words [[B]]." is
+  // discarded on reduction like a blank body.
+  private static final Pattern LEGACY_RELATIONSHIP_SENTENCE =
+      Pattern.compile("\\[\\[[^\\]]+]][^\\[\\]\n]+\\[\\[[^\\]]+]]\\.");
 
   private final MemoryTrackerRepository memoryTrackerRepository;
   private final NoteReferenceService noteReferenceService;
@@ -54,7 +59,8 @@ final class NoteReferenceHandling {
    */
   Note reduceRelationNoteToSourceProperty(Note relationNote, User viewer, Timestamp updatedAt) {
     RelationshipFrontmatter relationship = relationshipOf(relationNote);
-    if (!NoteContentMarkdown.isBodyContentBlank(relationNote.getContent())) {
+    if (!NoteContentMarkdown.isBodyContentBlank(relationNote.getContent())
+        && !isLegacyRelationshipSentence(relationNote.getContent())) {
       throw new ResponseStatusException(
           HttpStatus.BAD_REQUEST,
           "This relationship note has body text and cannot be reduced to a property.");
@@ -119,6 +125,12 @@ final class NoteReferenceHandling {
     }
     return WikiLinkRewriteSupport.markdownLeavingNotebook(
         wikiLinkResolver, targetScalar, relationNote.getNotebook().getName(), viewer);
+  }
+
+  private static boolean isLegacyRelationshipSentence(String content) {
+    return LEGACY_RELATIONSHIP_SENTENCE
+        .matcher(NoteContentMarkdown.bodyWithoutLeadingFrontmatter(content).trim())
+        .matches();
   }
 
   /** Same rule as frontend {@code relationTypeFromKebab}: hyphens become spaces, trimmed. */
