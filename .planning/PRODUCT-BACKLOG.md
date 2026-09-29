@@ -9,10 +9,10 @@ Bug fixing and general maintenance.
 
 - [Refresh recall automatically at each local half-day boundary](seeds/SEED-056-recall-half-day-refresh.md#story-1) — SEED-056#story-1 ([plan](slice-plans/014-recall-half-day-refresh/PLAN.md))
 - [Let readers change or clear a reading mark](seeds/SEED-059-book-reading-uat-fixes.md#story-6) — SEED-059#story-6 ([plan](slice-plans/056-change-or-clear-reading-mark/PLAN.md))
+- [Leaving a block with text unread does not mark it](seeds/SEED-059-book-reading-uat-fixes.md#story-15) — SEED-059#story-15 ([plan](slice-plans/057-leave-text-blocks-unmarked/PLAN.md))
 
 ## Backlog list
 
-- [Leaving a block with text unread does not mark it](seeds/SEED-059-book-reading-uat-fixes.md#story-15) — SEED-059#story-15
 - [Reopen an EPUB at the exact paragraph](seeds/SEED-059-book-reading-uat-fixes.md#story-17) — SEED-059#story-17
 - [Scroll a PDF smoothly right after choosing a block](seeds/SEED-059-book-reading-uat-fixes.md#story-5) — SEED-059#story-5
 - [The current block moves the same way in PDF as in EPUB](seeds/SEED-059-book-reading-uat-fixes.md#story-16) — SEED-059#story-16
