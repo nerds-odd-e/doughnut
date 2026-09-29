@@ -695,6 +695,10 @@ Slice 2 added one content-contains query to `NoteRepository` (244 → 254 lines)
   - Evidence: refactor transcript `ff698959-2f7d-4392-a127-0f3f0adcc8f8/subagents/2b60056d-ca4d-4cae-8a47-c79402587e9f` (decision pass: File size 254; learning "Slice 2's candidate query pushed NoteRepository over 250"); commit `bc870053` adds `NoteAssimilationQueries.java` and shrinks `NoteRepository.java`. Pre-Slice-2 `NoteRepository` at `c86eb7eba0` was 244 lines.
   - Observed effect: ~8 minutes of refactor time and an assimilation-focused re-proof (`AssimilationControllerTests`) for a tip-over caused by one new query.
   - Inference: the hard 250-line ceiling can force relocating a large untouched block when a small addition crosses it. Related in theme to ODF-152 (numeric check applicability), but here the agent performed the split rather than escalating a staged-simplification conflict.
+- Execution: SEED-059#story-6 / slice-plans/056-change-or-clear-reading-mark / 7c9935b2c2; Timestamp: 2026-09-29T17:53+08:00 through 2026-09-29T18:12+08:00 (slice 2 implementation through refactor and delivery); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.47.
+  - Evidence: `7c9935b2c2:backend/src/main/java/com/odde/donut/controllers/NotebookBooksController.java` has 248 lines; the slice 2 DELETE endpoint added 15. The slice 2 refactor report ("pushed `NotebookBooksController.java` to 263 lines") split out `NotebookBookReadingController` (124 lines) and changed five controller test files. Commit 5cab6e8827 carries the repo's only `@Tag(name = "notebook-books-controller")`, so the generated SDK class stays unchanged.
+  - Observed effect: the refactor pass took about 25 minutes, against about 12 for the slice's implementation, and needed a wider backend re-proof. The seam it chose, the user's reading progress versus the book's attach and structure, is domain-meaningful.
+  - Inference: same tip-over pattern; here the split landed on a real seam but introduced a new convention (a shared OpenAPI tag across two controllers) to avoid touching the frontend.
 
 ## DD-145 — The plan prescribed production observations whose access route or log source did not exist, and whose results could not change the approach
 
@@ -860,8 +864,19 @@ The coordinator appended learnings with a script that replaced an anchor copied 
   - Observed effect: during execution the plan did not carry the slice 2 attempts, the CI repair, or the slice 3–6 causes, so a resumed execution would have lost them. No product effect.
   - Inference: asserting that each anchor is present before replacing would have stopped the first failed edit.
 
+## DD-167 — A plan named an existing "no block marked" step for a scenario whose fixture always auto-marks another block
+
+The plan's decisive premises confirmed by grep that "no book block should be marked in the book layout" exists, and slice 2's behavior used it after choosing "Chapter Alpha" in the minimal EPUB. Choosing Chapter Alpha always auto-marks the structural "Part One" read (covered by an existing scenario), so the assertion could not hold.
+
+### Occurrences
+
+- Execution: SEED-059#story-6 / slice-plans/056-change-or-clear-reading-mark / 7c9935b2c2; Timestamp: 2026-09-29 (slice 2 implementation, between 17:53 and 18:12 +08:00); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.47.
+  - Evidence: plan *Decisive premises* "E2E setup and steps exist … Confirmed by grep"; slice 2 implementation report ("My first green run failed on `no book block should be marked` (found 1)"); new step "book block {string} should not be marked in the book layout" in 5cab6e8827.
+  - Observed effect: one failed EPUB feature run and a new step; the plan's slice 2 behavior text was corrected during delivery. Small cost.
+  - Inference: the premise checked that a step exists, not that it holds for the chosen fixture path. Related to DD-162 (a grep premise that did not reach the changed path).
+
 ## Retention
 
-- Highest allocated local number: 166. Removed local codes are never reused.
+- Highest allocated local number: 167. Removed local codes are never reused.
 - Full pre-maintenance log and earlier recovery locators: `99fa1b9835e3dff2473837ba2a1f8b11967d5938:DearDough.md`.
 - Occurrence history is partial; active evidence stays here or in the Open Dough catalog and watch list.

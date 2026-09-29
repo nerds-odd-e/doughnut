@@ -147,3 +147,12 @@ composable; Clear mark in the control.
   assert on the cleared block, not on "no block marked".
 - `BookReadingContent.vue` (455 lines) stays over the file-size limit; both
   slices added one binding line each. Splitting it is outside this story.
+
+## Execution complete
+
+Product advice: no backlog change. Clearing a mark also lets readers remove the
+spurious EPUB "Contents" records and auto-marked header duplicates the story
+names, so story 15 (next in the queue) can change the auto-mark rule knowing a
+wrong mark is now fixable by hand. `BookReadingContent.vue` stays at 455 lines,
+over the file-size limit (DD-160); splitting it is the owner's call and fits
+best with a story that already touches that component, such as story 15 or 10.
