@@ -175,7 +175,7 @@ it does, record why in *Learnings*.
 
 ### 5. Every block has a place to go
 Type: Behavior
-Status: planned
+Status: done
 Proof: `EpubStructureExtractorTest` for the stored start; E2E for choosing the
 blocks.
 

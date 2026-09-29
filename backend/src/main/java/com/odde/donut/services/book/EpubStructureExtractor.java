@@ -5,7 +5,6 @@ import static java.util.stream.Collectors.toSet;
 import com.odde.donut.controllers.dto.ApiError;
 import com.odde.donut.exceptions.ApiException;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -87,16 +86,13 @@ final class EpubStructureExtractor {
    */
   private static Map<String, Object> beginningAnchorPayload(
       List<String> leadingSpinePaths, List<Map<String, Object>> orphans) {
-    Map<String, Object> m = new LinkedHashMap<>();
-    m.put("type", "beginning_anchor");
+    Map<String, Object> m =
+        leadingSpinePaths.isEmpty()
+            ? EpubSpineContent.startAnchorPayload(
+                (String) orphans.getFirst().get("href"),
+                (String) orphans.getFirst().get("fragment"))
+            : EpubSpineContent.startAnchorPayload(leadingSpinePaths.getFirst(), "");
     m.put("kind", "beginning");
-    if (leadingSpinePaths.isEmpty()) {
-      m.put("href", orphans.getFirst().get("href"));
-      m.put("fragment", orphans.getFirst().get("fragment"));
-    } else {
-      m.put("href", leadingSpinePaths.getFirst());
-      m.put("fragment", "");
-    }
     return m;
   }
 }

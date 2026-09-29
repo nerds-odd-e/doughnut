@@ -14,6 +14,11 @@ set -euo pipefail
 # Project Gutenberg's wrap0000.xhtml), so the book's first block is the extractor's
 # `*beginning*` block holding the cover.
 #
+# End matter after the chapters has table-of-contents entries without content of their
+# own: a title and its detailed contents that share one start (as in Project Gutenberg's
+# "ON THE ORIGIN OF SPECIES."), and a licence heading followed directly by its first
+# section's target (as in Alice's "THE FULL PROJECT GUTENBERG LICENSE").
+#
 # When to re-run: after changing this script. The output is deterministic.
 #
 # From repo root:
@@ -80,12 +85,14 @@ files = {
     <item id="contents" href="contents.xhtml" media-type="application/xhtml+xml"/>
     <item id="c1" href="chapter1.xhtml" media-type="application/xhtml+xml"/>
     <item id="c2" href="chapter2.xhtml" media-type="application/xhtml+xml"/>
+    <item id="end" href="endmatter.xhtml" media-type="application/xhtml+xml"/>
   </manifest>
   <spine>
     <itemref idref="cover"/>
     <itemref idref="contents"/>
     <itemref idref="c1"/>
     <itemref idref="c2"/>
+    <itemref idref="end"/>
   </spine>
 </package>
 """,
@@ -98,6 +105,13 @@ files = {
     <li><a href="contents.xhtml#contents">Contents</a></li>
     <li><a href="chapter1.xhtml#chapter-one">Chapter One</a></li>
     <li><a href="chapter2.xhtml#chapter-two">Chapter Two</a></li>
+    <li><a href="endmatter.xhtml#title-page">The Fixture Title</a></li>
+    <li><a href="endmatter.xhtml#title-page">Detailed Contents</a></li>
+    <li><a href="endmatter.xhtml#licence">The Full Licence</a>
+      <ol>
+        <li><a href="endmatter.xhtml#licence-section-one">Licence Section One</a></li>
+      </ol>
+    </li>
   </ol>
 </nav>
 </body>
@@ -120,6 +134,21 @@ files = {
     ),
     "OEBPS/chapter1.xhtml": chapter("Chapter One", "chapter-one", "chap01"),
     "OEBPS/chapter2.xhtml": chapter("Chapter Two", "chapter-two", "chap02"),
+    "OEBPS/endmatter.xhtml": xhtml(
+        "End Matter",
+        f"""<div class="chapter" id="title-page">
+  <h1>The Fixture Title</h1>
+  <h2>Detailed Contents</h2>
+{paragraphs("Detailed Contents", 3)}
+</div>
+<div class="chapter" id="licence">
+  <h2>The Full Licence</h2>
+  <div id="licence-section-one">
+  <h3>Licence Section One</h3>
+{paragraphs("Licence Section One", 120)}
+  </div>
+</div>""",
+    ),
 }
 
 with zipfile.ZipFile(out, "w") as z:

@@ -104,6 +104,22 @@ Feature: EPUB book
       Then the heading "Chapter Two" should be at the top of the EPUB reader
       And the book block "Chapter Two" should be the current block in the book reader
 
+    Scenario: Choosing a block with no content of its own shows its table-of-contents target
+      Given I open the reading view for the attached book "epub_long_chapter_before_target"
+      When I choose the book block "The Full Licence"
+      Then the heading "The Full Licence" should be at the top of the EPUB reader
+      And the book block "The Full Licence" should be the current selection in the book reader
+      And the book block "The Full Licence" should be the current block in the book reader
+
+    Scenario: Choosing the first of two blocks sharing a start keeps it selected and current
+      Given I open the reading view for the attached book "epub_long_chapter_before_target"
+      When I choose the book block "The Fixture Title"
+      Then the heading "The Fixture Title" should be at the top of the EPUB reader
+      And the book block "The Fixture Title" should be the current selection in the book reader
+      And the book block "The Fixture Title" should be the current block in the book reader
+      When I mark the book block "The Fixture Title" as read in the Reading Control Panel
+      Then I should see that book block "The Fixture Title" is marked as read in the book layout
+
   Rule: Unsupported EPUB attachment
 
     Scenario: Upload DRM-flagged EPUB shows a clear attach error

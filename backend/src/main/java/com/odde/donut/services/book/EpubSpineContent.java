@@ -85,12 +85,28 @@ final class EpubSpineContent {
 
     for (int tocIdx : targeting) {
       String fragId = tocEntries.get(tocIdx).fragmentId();
+      String fragment = fragId == null ? "" : fragId.trim();
       List<Map<String, Object>> payloads = perBlock.get(tocIdx);
-      if (fragId == null || fragId.isBlank() || payloads.isEmpty()) {
-        continue;
+      if (payloads.isEmpty()) {
+        // No content of its own (empty, or sharing another entry's start): start at its target.
+        payloads.add(startAnchorPayload(spineZipPath, fragment));
+      } else if (!fragment.isEmpty()) {
+        payloads.getFirst().put("fragment", fragment);
       }
-      payloads.getFirst().put("fragment", fragId.trim());
     }
+  }
+
+  /**
+   * A payload that gives a block its start without contributing content. Its stored type keeps the
+   * name {@code beginning_anchor} (shared with PDF layouts and already-attached books) although it
+   * now also starts table-of-contents entries with no content of their own.
+   */
+  static Map<String, Object> startAnchorPayload(String href, String fragment) {
+    Map<String, Object> m = new LinkedHashMap<>();
+    m.put("type", "beginning_anchor");
+    m.put("href", href);
+    m.put("fragment", fragment);
+    return m;
   }
 
   private void emitChildren(Element el) {
