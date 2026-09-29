@@ -117,7 +117,9 @@ Proof: recorded observation in this plan's Learnings.
 ### 2. The reading-position API keeps an exact EPUB place
 
 Type: Behavior
-Status: planned
+Status: done (accepted proof: `NotebookBooksReadingPositionControllerTest`
+`keepsExactEpubPlaceAsCfi`; full `backend:test_only`, `openapi:lint`, and
+frontend `vue-tsc --noEmit` passed)
 Proof: `NotebookBooksReadingPositionControllerTest` (new case), the existing
 `NotebookBooksGetReadingPositionControllerTest`, and `pnpm openapi:lint` after
 regenerating the client.
