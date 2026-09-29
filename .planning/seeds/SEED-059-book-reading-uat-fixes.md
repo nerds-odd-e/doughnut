@@ -78,44 +78,59 @@ Effort bands: S = 30–60 minutes, M = 1–2 hours, L = 2–4 hours, including d
 
 **Identity:** SEED-059#story-1
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"not-refined","approach":"unselected"}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/049-epub-land-and-track-chosen-place/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"d61c0b22c3c154ada0410336b7a2d57bde30f3111cfab6dac5ac91214b82906f","plan":"22a042d813b2336cb680bf9a81ed07d7854d545a54de6f6b81c0211aa71ab6c1"}}
 ```
 
-**Goal:** In an EPUB, the content shown, the current block, and the selection
-agree with the place the reader chose, from the first open onwards.
+**Goal:** An EPUB reader lands where they chose, and the content shown, the
+current block, and the selection agree, from the first open onwards. This lets
+readers trust EPUB navigation and reading records, which reading a book end to
+end needs.
 
-**Observed defects**
+**Scope**
 
-- **Choosing a chapter lands far inside it (defect 1, High).** Expected: the
-  chapter heading at the top. Observed: the heading is far above the view, by a
-  fixed amount on every try: Alice chapter III 855 px, chapter XII 1,077 px;
-  Origin chapter IV 6,416 px at 1440×900 and 7,702 px at 1280×560. A link inside
-  the book (Origin's contents → "CHAPTER 2") lands near the end of chapter II.
-  Reproduction: in *Origin of Species*, choose "CHAPTER IV. NATURAL SELECTION.".
-  Hypothesis (not verified): the offset grows with the previous chapter's
-  length, so the scroll target may be computed before epub.js inserts the
-  previous section above the chosen one.
-- **Blocks without an anchor (defect 8, Medium).** Choosing a layout block that
-  has no EPUB start href selects it but does not move the content (Alice: "THE
-  FULL PROJECT GUTENBERG™ LICENSE"), or selects a different block (Origin: "ON
-  THE ORIGIN OF SPECIES." selects "DETEAILED CONTENTS…"). The panel then offers
-  *Read* for a block that is not shown.
-- **First open (defect 7, Medium).** A newly attached EPUB shows its cover, but
-  the current block is "Contents" (or the detailed contents), and "Contents" is
-  immediately marked read: a record the reader never made.
-- **Reopening (defect 16, Low).** At 1280×560, reopening Origin leaves the
-  layout at its top with the current block out of view (y 689 and y 1,288, with
-  the panel ending at y 560). PDF reopens with the current block in view.
+- **Choosing a block lands on it.** Choosing a chapter or section in the layout,
+  or following a link inside the book, puts that place's start at the top of the
+  view at any viewport size.
+- **Every block has a place to go** (owner decision, 2026-09-29). A block with no
+  content of its own goes to the target its entry has in the book's own table of
+  contents. The chosen block stays selected and current, even when another block
+  starts at the same spot (Origin: the book title and the detailed contents).
+- **First open makes no record.** A newly attached EPUB opens with the current
+  block matching what is shown, and no block is marked.
+- **Reopening shows the current block.** Reopening a book resumes at the last
+  place, with the current block visible in the layout, as PDF already does.
+- **Deferred:** blocks with no anchor in books attached before this fix keep
+  today's behavior (owner decision, 2026-09-29); re-attaching the book gives the
+  fix. Chapter landing, first open, and reopening are promised for every book.
+  Changing or clearing a wrong record already made (story 6) and the EPUB
+  current-block bar (story 10) are separate stories.
+- **Must keep working:** the current block follows scrolling, Read/Skim/Skip save
+  and persist, resume works, and PDF behavior is unchanged.
 
 **Key examples**
 
-- Choose any chapter in *Origin of Species* → its heading is at the top.
-- Choose a block without an anchor → the content goes to the nearest right
-  place, or the block is not offered as a place to go (decide during
-  refinement).
-- Attach an EPUB and open it → the current block matches what is shown, and no
-  block is marked.
-- Reopen at 1280×560 → the layout shows the current block.
+- In *Origin of Species* at 1440×900, choose "CHAPTER IV. NATURAL SELECTION."
+  (today 6,416 px too far) → the heading is at the top of the view. The same at
+  1280×560, and for Alice chapters III and XII.
+- In Origin's contents page, follow the "CHAPTER 2" link → chapter II's heading
+  is at the top (today it lands near the end of chapter II).
+- Choose "ON THE ORIGIN OF SPECIES." → the book shows the title, and the title
+  block stays selected and current (today "DETEAILED CONTENTS…" is selected).
+- In Alice, choose "THE FULL PROJECT GUTENBERG™ LICENSE" → the book shows the
+  licence's start (today the content does not move).
+- Attach Alice on the web and open it → the cover is shown, the current block is
+  the one holding the cover, and no block is marked (today "Contents" is current
+  and marked read).
+- Read part of Origin, then reopen the book at 1280×560 → the book resumes at
+  the last place, and the layout shows the current block (today it stays at the
+  layout's top).
+
+**UAT evidence:** defects 1, 7, 8, and 16 in the report linked under
+*Why This Matters*. Unverified hypothesis for defect 1: the offset grows with
+the previous chapter's length, so the scroll target may be computed before
+epub.js inserts the previous section above the chosen one. Defect 8 happens when
+an entry gets no content at attach time (two entries starting at the same spot,
+or its text counted under another entry), so it has no stored start.
 
 **Effort hypothesis:** M–L, medium confidence.
 **Depends on:** none.
@@ -511,8 +526,7 @@ story 7. First to drop: story 12, then story 11.
 ## Open Decisions
 
 - Which open question in each story needs the owner before refinement: for
-  example, blocks without an anchor in story 1, and the drawer behaviour in
-  story 2.
+  example, the drawer behaviour in story 2.
 
 ## When to Surface
 
