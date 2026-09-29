@@ -120,7 +120,8 @@ Status: done
 Proof: all of `epub_book.feature` green in the isolated runner except the
 in-book link scenario (slice 3), including the six scenarios that failed
 before and the choose-Chapter-Two outline at 1440×900 and 1280×560;
-`currentBlockIdFromEpubLocation.spec.ts` for the new rule.
+`currentBlockIdFromEpubView.spec.ts` (renamed from
+`currentBlockIdFromEpubLocation.spec.ts`) for the new rule.
 
 Behavior: an EPUB with a long chapter before "Chapter Two" → the reader chooses
 "Chapter Two" in the layout → its heading is at the top of the reader, and it
@@ -232,3 +233,80 @@ block's row is visible in the layout.
     −2,700 / −2,870, its link −5,420 / −5,760; 0 with anchoring off.
   - Not checked: WebKit, and whether anchoring also jumps the view when scrolling
     up into a prepended chapter (likely; the same CSS would cover it).
+- **Slice 2 first attempt (landing only, ~6 min, did not converge):** the
+  landing worked, but with anchoring off epub.js's own prepend correction is an
+  ignored scroll, so no later `relocated` fired; the last report came from
+  `display()` and, under the old bottom-most-spine rule, replaced the chosen
+  block after `onAdvance`'s commit. "Resume EPUB reading at the last position"
+  (passing before) failed. Landing and the current-block rule were useful only
+  together, so slices 2 and 3 were consolidated.
+- **Consolidated slice 2 attempt (~25 min, 11 of 13 green, stopped):**
+  concurrent `rendition.display()` calls break epub.js; a layout click in the
+  first ~70 ms left the rendition with no `relocated` ever, fixed by
+  `displayLocator` awaiting `opened`. Measured block starts differ from where
+  epub.js lands by heading margins (+20 px for Contents on first open), so the
+  rule needs a named tolerance. The scroll scenario's step never moved a start
+  past the top. In-book links stayed flaky, so they were split into slice 3.
+  Attempts were parked as a patch in this folder and resumed from it.
+- **Slice 2 delivered:** the rule is `currentBlockIdFromEpubView`, fed by the
+  viewer's `viewBlockStarts()` (in `useEpubLocatorGeometry`); "at the top" is
+  `EPUB_AT_TOP_TOLERANCE_PX = 24`. `landingLimitPx` stays: a block near the end
+  of the book can never reach the top. Only the scroll step of "Current block
+  updates on scroll…" changed. Proof: `epub_book.feature` 12/12 three times,
+  unit specs, `vue-tsc`, full `pnpm frontend:test` before the refactor.
+- **CI repair after slice 2:** five script tests used `epub_book.feature` as
+  their example of an unadmitted isolated spec; they now share
+  `UNADMITTED_ISOLATED_CYPRESS_SPEC` (a made-up path) in
+  `scripts/isolated-cypress-test-helpers.mjs`
+  (`pnpm test:browser-worktree-isolation` 101/106 before, 106/106 after).
+- **Slice 3 cause (traced):** a link click during the opening display's fill
+  made epub.js start a second display whose `clear()` destroyed a view the
+  first display's `check()` was awaiting; the manager queue then stalled for
+  good. `landOneDisplayAtATime` wraps `rendition.display` so every display
+  (opening, `displayLocator`, epub.js link handling, resize redisplay) waits
+  for the previous one. `opened` stays because `displayLocator` can run before
+  the rendition exists. Not guarded: `manager.resize()` clearing views during a
+  fill, and a display that never settles (no timeout).
+- **Slice 4 needed an attach-time rule:** a cover in a spine file no contents
+  entry targets (Alice's `wrap0000.xhtml`) was never extracted. Spine files
+  before the first targeted file now go to `*beginning*`, whose start is the
+  first such file; if no entry targets any spine file, all content goes there.
+  The first fixture put the cover inside a targeted file, which made the test
+  pass without the fix; the coordinator rejected it after checking the real
+  Alice EPUB. The refactor split `EpubStructureExtractor` into
+  `EpubPackageDocument`, `EpubNavDocument`, `EpubHeadingOutline`,
+  `EpubSpineContent`, `EpubXhtml`, and `EpubTocEntry`.
+- **Slice 5:** an entry left with no payloads gets one start-only payload from
+  `EpubSpineContent.startAnchorPayload` at its nav target. The stored type
+  stays `beginning_anchor` (persisted, on the wire, and emitted by the PDF
+  builder). Such blocks are auto-marked read when the reader moves past them.
+- **Slice 6 defect was the saved position:** it was epub.js's
+  `location.end.href`, a spine file without a fragment. It is now the current
+  block's start, so resume and the layout's existing scroll-into-view follow
+  the one rule. `expectCurrentBlockVisibleInBookLayoutAside` now checks the row
+  is inside the aside (PDF `book_browsing.feature` 5/5). Resume is block-level:
+  finer than before, but not the exact scroll point inside a long block.
+
+## Execution complete
+
+Product advice:
+
+- Correction [SEED-059#story-13](../../seeds/SEED-059-book-reading-uat-fixes.md#story-13)
+  (plan `050-epub-resume-tests-and-rendered-view`) is written and ready but not
+  queued: remove two resume scenarios the reopen scenario supersedes (one names
+  the opposite of today's block-level resume) and merge the two rendered-view
+  lookups in `useEpubLocatorGeometry`. Wrap-up decides its placement.
+- Owner decision: EPUB now resumes at the current block's start, finer than
+  the old spine-file save but not the exact point inside a long block (PDF
+  saves page plus y). A finer EPUB position needs a finer locator (CFI or
+  nearest element), which this story ruled out; consider a backlog story.
+- Owner decision: the EPUB current-block rule (last start at the top, 24 px
+  tolerance, selection wins ties) differs from PDF's (first visible block above
+  the viewport middle, no selection rule), although the plan called them the
+  same. Readers see the current block switch at different moments.
+- Feed into story 6 (keep reading records right): auto-mark treats "exactly
+  one locator" as "no content of its own", so a one-paragraph block the reader
+  skips is marked read; slice 5's start-only blocks now reach that rule too.
+  The start-only payload would allow an exact test, but PDF shares the rule.
+- Direction: aligned with the near-future focus on user experience and
+  hardening; no North Star topic affected.
