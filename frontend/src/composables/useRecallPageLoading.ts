@@ -7,6 +7,10 @@ import type {
 import { RecallsController } from "@generated/donut-backend-api/sdk.gen"
 import getEnvironment from "@/managedApi/window/getEnvironment"
 import timezoneParam from "@/managedApi/window/timezoneParam"
+import {
+  fetchDueRecalls,
+  useRecallCatchUp,
+} from "@/composables/useRecallCatchUp"
 import { shuffle } from "es-toolkit"
 import {
   onActivated,
@@ -17,23 +21,9 @@ import {
   type Ref,
 } from "vue"
 
-const sameHalfDayWindow = (
-  fetchedWindowEndAt: string | undefined,
-  storedWindowEndAt: string | undefined
-) => {
-  if (fetchedWindowEndAt === storedWindowEndAt) return true
-  if (!fetchedWindowEndAt || !storedWindowEndAt) return false
-  return (
-    Math.trunc(Date.parse(fetchedWindowEndAt) / 1000) ===
-    Math.trunc(Date.parse(storedWindowEndAt) / 1000)
-  )
-}
-
 export function useRecallPageLoading(options: {
   currentIndex: Ref<number>
   previousAnsweredQuestions: Ref<(AnsweredQuestion | undefined)[]>
-  toRepeat: Ref<MemoryTrackerLite[] | undefined>
-  currentRecallWindowEndAt: Ref<string | undefined>
   dueRecallsRefreshNonce: Ref<number>
   setToRepeat: (trackers: MemoryTrackerLite[] | undefined) => void
   setDueCommissioned: (
@@ -46,8 +36,6 @@ export function useRecallPageLoading(options: {
   const {
     currentIndex,
     previousAnsweredQuestions,
-    toRepeat,
-    currentRecallWindowEndAt,
     dueRecallsRefreshNonce,
     setToRepeat,
     setDueCommissioned,
@@ -56,26 +44,12 @@ export function useRecallPageLoading(options: {
     setCurrentRecallWindowEndAt,
   } = options
 
+  const { catchUpDueRecalls } = useRecallCatchUp()
   const isProgressBarVisible = ref(true)
   const isLoadingMore = ref(false)
 
-  const applySessionStrips = (response: DueMemoryTrackers) => {
-    setDueCommissioned(response.dueCommissioned ?? [])
-  }
-
-  const fetchDueRecalls = async (dueInDays?: number) => {
-    const { data: response, error } = await RecallsController.recalling({
-      query: {
-        timezone: timezoneParam(),
-        dueindays: dueInDays,
-      },
-    })
-    if (!error && response) return response
-    return
-  }
-
   const applyDueList = (response: DueMemoryTrackers, dueInDays?: number) => {
-    applySessionStrips(response)
+    setDueCommissioned(response.dueCommissioned ?? [])
     let trackers = response.toRepeat
     currentIndex.value = 0
     setTotalAssimilatedCount(response.totalAssimilatedCount)
@@ -128,15 +102,6 @@ export function useRecallPageLoading(options: {
     }
   }
 
-  const dueQueueNeedsReload = (fetchedWindowEndAt: string | undefined) => {
-    if (toRepeat.value === undefined) return true
-    const storedWindowEndAt = currentRecallWindowEndAt.value
-    return (
-      !!storedWindowEndAt &&
-      !sameHalfDayWindow(fetchedWindowEndAt, storedWindowEndAt)
-    )
-  }
-
   watch(dueRecallsRefreshNonce, async () => {
     await loadCurrentDueRecalls()
   })
@@ -145,19 +110,9 @@ export function useRecallPageLoading(options: {
     loadPreviouslyAnsweredRecallPrompts()
   })
 
-  onActivated(async () => {
+  onActivated(() => {
     isProgressBarVisible.value = true
-    const response = await fetchDueRecalls(0)
-    if (!response) return
-    if (dueQueueNeedsReload(response.currentRecallWindowEndAt)) {
-      applyDueList(response, 0)
-      setCurrentRecallWindowEndAt(response.currentRecallWindowEndAt)
-      return
-    }
-    applySessionStrips(response)
-    if (!currentRecallWindowEndAt.value) {
-      setCurrentRecallWindowEndAt(response.currentRecallWindowEndAt)
-    }
+    catchUpDueRecalls()
   })
 
   onDeactivated(() => {

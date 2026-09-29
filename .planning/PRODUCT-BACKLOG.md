@@ -7,7 +7,6 @@ Bug fixing and general maintenance.
 
 ## Taken
 
-- [Refresh recall automatically at each local half-day boundary](seeds/SEED-056-recall-half-day-refresh.md#story-1) — SEED-056#story-1 ([plan](slice-plans/014-recall-half-day-refresh/PLAN.md))
 - [Let readers change or clear a reading mark](seeds/SEED-059-book-reading-uat-fixes.md#story-6) — SEED-059#story-6 ([plan](slice-plans/056-change-or-clear-reading-mark/PLAN.md))
 
 ## Backlog list

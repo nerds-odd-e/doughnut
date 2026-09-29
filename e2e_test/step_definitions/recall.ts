@@ -52,6 +52,14 @@ Then(
   }
 )
 
+Then('I should be recalling {string}', (noteTitle: string) => {
+  start.recall().assumeRecallPage().expectRecalling(noteTitle)
+})
+
+Then('the menu should show {int} note to recall', (numberOfNotes: number) => {
+  start.recall().expectCount(numberOfNotes)
+})
+
 Then(
   'I should see {int} potential learning session for notebook {string}',
   (count: number, notebookTitle: string) => {

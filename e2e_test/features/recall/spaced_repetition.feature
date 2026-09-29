@@ -16,6 +16,14 @@ Feature: Spaced-repetition
     And On day 2 I should have "1/2/3" note for assimilation and "0/1/1" for recall
 
   @mockBrowserTime
+  Scenario: Recall catches up by itself when the half-day ends
+    Given On day 1 I recall "end" and assimilate new "Note 1, end"
+    And It's day 2
+    When it is 1440 minutes later in the browser
+    Then I should be recalling "Note 1"
+    And the menu should show 1 note to recall
+
+  @mockBrowserTime
   Scenario: Strictly follow the schedule
     When On day 1 I recall "                    " and assimilate new "Note 1, end "
     And On day 2 I recall "Note 1, end         " and assimilate new "Note 2, end "

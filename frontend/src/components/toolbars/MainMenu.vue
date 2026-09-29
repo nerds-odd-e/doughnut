@@ -21,10 +21,11 @@
 import type { User } from "@generated/donut-backend-api"
 import type { PropType } from "vue"
 import { UserController } from "@generated/donut-backend-api/sdk.gen"
-import { watch, computed } from "vue"
+import { watch, computed, onUnmounted } from "vue"
 import { useAssimilationCount } from "@/composables/useAssimilationCount"
 import timezoneParam from "@/managedApi/window/timezoneParam"
 import { useRecallData } from "@/composables/useRecallData"
+import { useRecallCatchUp } from "@/composables/useRecallCatchUp"
 import { useNavigationItems } from "@/composables/useNavigationItems"
 import { messageCenter } from "@/store/messageCenter"
 import { useBreakpoint } from "@/composables/useBreakpoint"
@@ -84,6 +85,26 @@ watch(
   },
   { immediate: true }
 )
+
+// Tolerates a browser clock slightly ahead of the server.
+const recallWindowEndMarginMs = 5000
+const { catchUpDueRecalls } = useRecallCatchUp()
+let recallCatchUpTimer: ReturnType<typeof setTimeout> | undefined
+
+watch(
+  currentRecallWindowEndAt,
+  (endAt) => {
+    clearTimeout(recallCatchUpTimer)
+    if (!endAt) return
+    recallCatchUpTimer = setTimeout(
+      catchUpDueRecalls,
+      new Date(endAt).getTime() - Date.now() + recallWindowEndMarginMs
+    )
+  },
+  { immediate: true }
+)
+
+onUnmounted(() => clearTimeout(recallCatchUpTimer))
 
 const logout = async () => {
   await fetch("/logout", {
