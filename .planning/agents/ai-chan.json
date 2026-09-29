@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "agent": "Ai-chan",
+  "email": "ai-chan@example.org",
+  "identity": "SEED-059#story-13",
+  "mode": "story-branch",
+  "branch": "story/seed-059-story-13",
+  "host": "claude",
+  "model": "claude-opus-5-5"
+}
