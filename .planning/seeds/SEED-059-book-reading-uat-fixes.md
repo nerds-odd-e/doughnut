@@ -383,6 +383,55 @@ two rendered-view lookups in `useEpubLocatorGeometry`.
 methods only they use; `useEpubLocatorGeometry.ts`. Finer in-block resume,
 the current-block rule, auto-marking, PDF, and the extractor are unchanged.
 
+<a id="story-15"></a>
+
+### Resume exactly and track the current block and records the same way in EPUB and PDF
+
+**Identity:** SEED-059#story-15
+```json dough-story-state
+{"schemaVersion":1,"refinement":"not-refined","approach":"unselected"}
+```
+
+**Goal:** A reader reopens a book exactly where they stopped, sees the current
+block move the same way in EPUB and PDF, and gets a record only for blocks they
+read or chose to mark, so reading positions and records can be trusted.
+
+**Scope** (owner decision, 2026-09-29, from the SEED-059#story-1 retrospective)
+
+- **Exact EPUB resume.** Today EPUB saves the current block's start, so a
+  reader part-way through a long block (Origin chapter IV is over 13,000 px)
+  reopens at its heading; PDF saves page and offset. Save epub.js's CFI as an
+  optional extra field of the EPUB position and resume from it; the block start
+  still drives choosing and the current block. A pixel offset is not enough,
+  because text reflows at other widths.
+- **One current-block rule for both formats.** EPUB uses "the last block whose
+  start is at the top of the view (24 px tolerance), and the chosen block wins
+  among blocks sharing that start". PDF uses "the first visible block above the
+  middle of the view", with no chosen-block preference. Use the EPUB rule for
+  both, in one place: both formats now land a chosen block at the top, and PDFs
+  can have two headings on one page.
+- **Auto-mark only blocks with no text of their own.**
+  `useAutoMarkNoDirectContentPredecessor` treats "exactly one locator" as "no
+  direct content", so leaving a one-paragraph block unread marks it read. Test
+  instead whether the block's only payload is a start anchor (EPUB) or it holds
+  only a heading (PDF).
+
+**Key examples**
+
+- Read to the middle of Origin chapter IV, leave, and reopen at a different
+  window width → the same paragraph is at the top.
+- Scroll a PDF and an EPUB past a heading → the current block changes when the
+  heading reaches the top of the view in both.
+- Choose the first of two PDF headings on one page → it stays selected and
+  current.
+- Move from a one-paragraph block to the next without reading it → it is not
+  marked read; a heading-only block still is.
+
+**Effort hypothesis:** L, low confidence. The three parts are independent and
+may be split into separate stories at refinement.
+**Depends on:** none. Overlaps story 6 (reading records) on auto-marking;
+refine together or move that part into story 6.
+
 ## Ordering and Scope Reduction
 
 - **Highest priority** (reading breaks for common books and devices):
