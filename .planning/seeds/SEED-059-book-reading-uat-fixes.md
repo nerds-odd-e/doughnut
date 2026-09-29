@@ -429,35 +429,52 @@ through each chapter and the book they are, and what is left at the end.
 
 **Identity:** SEED-059#story-13
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"not-refined","approach":"unselected"}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/054-book-page-follows-notebook/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"565e0e0106b2e9951a1dc2e9174f8f8bde9fafc0d655ac53190edbc14f65365f","plan":"7c997ee1031ce32bdc3f0172535b208b7283fdcb5e86ecb26d31393214eb9733"}}
 ```
 
-**Goal:** Opening a book from another notebook inside the app shows that book
-and records reading position against it.
+**Goal:** Whenever the book page moves from one notebook's book to another's,
+the reader sees the new book and their reading position is saved against it.
+Today the page keeps the first book and writes the reading position to the
+wrong notebook, which silently corrupts a reading record, and it already
+forced one E2E scenario to be restructured around it.
 
-**Reported discrepancy (possible bug, inconclusive)**
+**Cause (read in code, 2026-09-29):** the book page loads its book once, when
+it first appears, from the notebook it was opened for. Moving to
+`/notebooks/B/book` straight from `/notebooks/A/book` reuses the same page with
+the new notebook, so nothing reloads: A's layout and file stay, and reading
+position updates go to A. Going through any other page in between (the
+notebook list, a notebook, Settings) builds the page afresh and works.
 
-- **Expected:** after opening one notebook's book and then moving in the app to
-  another notebook's book, the second book's layout, PDF, and reading position
-  load, and reading-position updates go to the second notebook.
-- **Actual (observed once, in E2E):** during SEED-059#story-3 slice 5 (plan at
-  `b6ec47b937:.planning/slice-plans/051-pdf-layout-from-bookmarks/PLAN.md`), a
-  `book_browsing.feature` scenario opened the blank-PDF book of notebook 1 and
-  then the bookmarked book of notebook 2. Under `/notebooks/2/book` the browser
-  still showed notebook 1's layout and blank PDF, and sent
-  `PATCH /api/notebooks/1/book/reading-position`.
-- **Uncertainty:** not reproduced by hand; the cause (for example the book page
-  being reused across in-app navigation without reloading) is unconfirmed. The
-  test worked around it by giving each Rule its own Background.
+**Reach (read in code, 2026-09-29):** no link in the app today goes from one
+book straight to another, so readers are not known to hit it through normal
+clicks; E2E steps that jump between book pages do hit it. The story is kept
+(owner may drop it) because the damage is a wrong reading record, the fix is
+small, and any future book-to-book path would expose it.
+
+**Scope**
+
+- **Book page follows the notebook.** Moving to another notebook's book while
+  the book page is shown loads that book's layout, file, and saved reading
+  position, as opening it fresh would, for PDF and EPUB.
+- **Records go to the book shown.** After the switch, reading position and
+  Read/Skim/Skip records are saved against the book shown; the previous
+  book's records are unchanged.
+- **Deferred:** adding any new way to go from one book to another; the E2E
+  scenario's separate Backgrounds per Rule stay (they are good structure,
+  not only a workaround).
+- **Must keep working:** opening a book from the notebook list, notebook page,
+  or Settings; resume at the last place; everything story 1 and story 5
+  promise.
 
 **Key examples**
 
-- First confirm whether a reader can hit this: open notebook A's book, go to
-  notebook B's book in the app → B's layout and file show.
-- Reading in B after that → the reading position saved is B's, and A's is
-  unchanged.
+- Open notebook A's blank PDF book, then go straight to notebook B's
+  bookmarked PDF book in the app → B's layout and PDF show (today A's stay).
+- Then scroll in B → `PATCH /api/notebooks/B/book/reading-position` is sent,
+  and reopening A resumes where A was left.
+- Open A's EPUB, then go straight to B's PDF → B's PDF and layout show.
 
-**Effort hypothesis:** S–M, low confidence (depends on the cause).
+**Effort hypothesis:** S, medium confidence (cause known).
 **Depends on:** none.
 
 ## Ordering and Scope Reduction
