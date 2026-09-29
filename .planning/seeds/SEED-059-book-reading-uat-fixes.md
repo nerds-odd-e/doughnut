@@ -200,6 +200,13 @@ bar and working reorganizing controls, or at least no controls that do nothing.
 - In an EPUB, indent, outdent, cancel, and *AI Reorganize* act as in PDF; any
   action not supported is not shown.
 
+**Design note:** reorganizing is the reading surface's `reorganize` capability
+(`useBookReadingSession`); turning it on for EPUB wires the book layout's
+reorganize listeners and the AI preview dialog. The "Now reading" bar sits only
+in `BookReadingShell`'s PDF pane layout, so showing it in EPUB means giving EPUB
+that pane layout (a DOM change), which also lets the shell declare the Reading
+Control Panel once.
+
 **Effort hypothesis:** L, low confidence. A first slice can hide the controls
 that do nothing. Open question: is creating a block from EPUB text also needed?
 **Depends on:** none (reliable EPUB positions are in place).

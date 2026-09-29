@@ -26,7 +26,15 @@ import {
   type Ref,
 } from "vue"
 
-/** What a format view (PDF, EPUB) offers the reading session. Hooks are called lazily. */
+/**
+ * The book reading view is one format-neutral reading session, bound once to `BookReadingShell`,
+ * plus one format view per format (`BookReadingPdf`, `BookReadingEpub`). The session owns reading
+ * records, selection and the Reading Control Panel, the current block, the last-read position, and
+ * layout changes with AI reorganize. A format view owns its viewer and supplies this surface; what
+ * differs by format is a surface capability, not duplicated wiring.
+ *
+ * What a format view offers the reading session. Hooks are called lazily.
+ */
 export type BookReadingSurface = {
   /** Land on a chosen block. */
   showBlock: (block: BookBlockFull) => Promise<void>
