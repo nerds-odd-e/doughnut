@@ -75,7 +75,7 @@ prop change.
 
 ### 1. Book page shows and records the notebook it is opened for
 Type: Behavior
-Status: planned
+Status: done
 Proof: new cases in `frontend/tests/pages/BookReadingPage.spec.ts` (or the
 reading-position spec if its helpers fit better) fail first, then pass;
 `pnpm frontend:test` for the book-reading page and bootstrap specs; run
@@ -84,3 +84,15 @@ reading-position spec if its helpers fit better) fail first, then pass;
 Behavior: the book page is showing notebook A's book → the page's notebook
 becomes B → B's layout, file, and saved position load, and reading position
 updates go to B; A's reader is gone.
+
+Accepted proof: `BookReadingPage` wraps a `BookReader` (the former page body,
+now `frontend/src/components/book-reading/BookReader.vue`) keyed by
+`notebookId`. `frontend/tests/pages/BookReadingPage.notebookSwitch.spec.ts`
+("shows the other notebook's book and saves the reading position to it",
+"shows the other notebook's PDF book after an EPUB book") failed first, then
+passed; `pnpm frontend:test tests/pages/BookReadingPage` 45/45,
+`useBookReadingBootstrap` 3/3, `vue-tsc --noEmit` clean,
+`book_browsing.feature` 6/6.
+
+Learning: Vue Router passes the new prop to the reused page, so a key inside
+the page is enough; `DonutApp`, layouts and router are unchanged.

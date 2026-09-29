@@ -11,7 +11,7 @@ import topMathsUrl from "../../../e2e_test/fixtures/book_reading/top-maths.pdf?u
 
 const fetchMock = createFetchMock(vi)
 
-/** Keep in sync with `BookReadingPage.vue` */
+/** Keep in sync with `useBookReadingCurrentBlock.ts` */
 export const CURRENT_BLOCK_ANCHOR_DEBOUNCE_MS = 120
 export const LAST_READ_POSITION_PATCH_DEBOUNCE_MS = 400
 
