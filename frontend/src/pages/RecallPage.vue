@@ -103,7 +103,6 @@ import { useRecallPageLoading } from "@/composables/useRecallPageLoading"
 import { scheduleFocusAutofocusTargetWithin } from "@/utils/focusTarget"
 
 const {
-  currentRecallWindowEndAt,
   setCurrentRecallWindowEndAt,
   totalAssimilatedCount,
   setTotalAssimilatedCount,
@@ -211,8 +210,6 @@ watch(
 const { isProgressBarVisible, isLoadingMore, loadMore } = useRecallPageLoading({
   currentIndex,
   previousAnsweredQuestions,
-  toRepeat,
-  currentRecallWindowEndAt,
   dueRecallsRefreshNonce,
   setToRepeat,
   setDueCommissioned,

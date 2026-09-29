@@ -1,9 +1,12 @@
-import { UserController } from "@generated/donut-backend-api/sdk.gen"
+import {
+  RecallsController,
+  UserController,
+} from "@generated/donut-backend-api/sdk.gen"
 import { useRecallData } from "@/composables/useRecallData"
 import { screen } from "@testing-library/vue"
 import { mockSdkService } from "@tests/helpers"
 import { flushPromises } from "@vue/test-utils"
-import { describe, it, expect, vi } from "vitest"
+import { describe, it, expect, vi, afterEach } from "vitest"
 import {
   createMenuData,
   createUseRecallDataMock,
@@ -127,4 +130,53 @@ describe("MainMenu recall count", () => {
       expect(count?.classList.contains("diligent-mode")).toBe(expectDiligent)
     }
   )
+
+  describe("when the recall window ends", () => {
+    const windowEndAt = "2026-09-29T12:00:00Z"
+
+    afterEach(() => {
+      vi.useRealTimers()
+    })
+
+    it("catches up due recalls once and updates the count", async () => {
+      vi.useFakeTimers({ toFake: ["setTimeout", "clearTimeout", "Date"] })
+      vi.setSystemTime("2026-09-29T11:00:00Z")
+      const { useRecallData: realUseRecallData } = await vi.importActual<
+        typeof import("@/composables/useRecallData")
+      >("@/composables/useRecallData")
+      vi.mocked(useRecallData).mockImplementation(realUseRecallData)
+      mockSdkService(
+        UserController,
+        "getMenuData",
+        createMenuData({
+          recallStatus: {
+            toRepeat: memoryTrackerLitesStub(1),
+            currentRecallWindowEndAt: windowEndAt,
+            totalAssimilatedCount: 0,
+          },
+        })
+      )
+      const recalling = mockSdkService(RecallsController, "recalling", {
+        toRepeat: memoryTrackerLitesStub(2),
+        currentRecallWindowEndAt: windowEndAt,
+        totalAssimilatedCount: 0,
+      })
+
+      await renderComponent()
+      await flushPromises()
+      await vi.advanceTimersByTimeAsync(59 * 60 * 1000)
+      expect(recalling).not.toHaveBeenCalled()
+
+      await vi.advanceTimersByTimeAsync(2 * 60 * 1000)
+      await flushPromises()
+      const count = screen
+        .getByLabelText("Recall")
+        .closest(".nav-item")
+        ?.querySelector(".recall-count")
+      expect(count).toHaveTextContent("2")
+
+      await vi.advanceTimersByTimeAsync(24 * 60 * 60 * 1000)
+      expect(recalling).toHaveBeenCalledTimes(1)
+    })
+  })
 })

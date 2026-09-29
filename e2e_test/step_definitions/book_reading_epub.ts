@@ -39,22 +39,6 @@ When(
   }
 )
 
-When(
-  'I scroll the EPUB reader until the text {string} is in the viewport',
-  // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
-  (markerText: string) => {
-    return bookReadingPage().scrollEpubReaderUntilTextInViewport(markerText)
-  }
-)
-
-When(
-  'I scroll the EPUB reader host to the top',
-  // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
-  () => {
-    return bookReadingPage().scrollEpubReaderHostToTop()
-  }
-)
-
 Then(
   'the EPUB Reading Control Panel should be content-anchored',
   // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain

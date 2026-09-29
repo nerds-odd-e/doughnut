@@ -6,6 +6,7 @@ import helper, { mockSdkService, wrapSdkResponse } from "@tests/helpers"
 import { flushPromises } from "@vue/test-utils"
 import { defineComponent, KeepAlive, nextTick } from "vue"
 import { beforeEach, describe, expect, it, vi } from "vitest"
+import type { MemoryTrackerLite } from "@generated/donut-backend-api"
 import {
   createMemoryTrackerLite,
   createUseRecallDataMock,
@@ -27,9 +28,6 @@ vi.mock("vue-router", async (importOriginal) => {
 const ctx = useRecallPageSpecContext({ fakeTimers: true })
 
 describe("RecallPage KeepAlive activation", () => {
-  const menuLoadedWindowEndAt = "2026-08-27T00:00:00.123+00:00"
-  const fetchedSameHalfDayWindowEndAt = "2026-08-27T00:00:00.456Z"
-
   const mountWithKeepAlive = () => {
     const WrapperComponent = defineComponent({
       components: { RecallPage, KeepAlive },
@@ -46,45 +44,12 @@ describe("RecallPage KeepAlive activation", () => {
       .mount()
   }
 
-  const mountWithMenuLoadedQueue = async (fetchedWindowEndAt: string) => {
-    const originalTracker = createMemoryTrackerLite(1)
-    const mockData = createUseRecallDataMock({
-      toRepeat: [originalTracker],
-      currentRecallWindowEndAt: menuLoadedWindowEndAt,
-    })
-    vi.mocked(useRecallData).mockReturnValue(mockData)
+  const dueRecallsWith = (trackers: MemoryTrackerLite[]) =>
+    wrapSdkResponse(makeMe.aDueMemoryTrackersList.toRepeat(trackers).please())
 
-    const fetchedTracker = createMemoryTrackerLite(2)
-    const fetchedResponse = makeMe.aDueMemoryTrackersList
-      .toRepeat([fetchedTracker])
-      .please()
-    fetchedResponse.currentRecallWindowEndAt = fetchedWindowEndAt
-    ctx.recallingSpy.mockResolvedValue(wrapSdkResponse(fetchedResponse))
-
-    const wrapper = mountWithKeepAlive()
-    await flushPromises()
-    return { wrapper, mockData, originalTracker, fetchedTracker }
-  }
-
-  const detourAndReturn = async (
-    wrapper: ReturnType<typeof mountWithKeepAlive>
-  ) => {
-    // biome-ignore lint/suspicious/noExplicitAny: test wrapper's own data property
-    ;(wrapper.vm as any).show = false
-    await nextTick()
-    // biome-ignore lint/suspicious/noExplicitAny: test wrapper's own data property
-    ;(wrapper.vm as any).show = true
-    await nextTick()
-    await flushPromises()
-  }
-
-  it("loads the due queue on first activation when menu has not populated toRepeat", async () => {
+  it("loads the due queue on first activation when there is no queue yet", async () => {
     const loadedTracker = createMemoryTrackerLite(7)
-    const loadedResponse = makeMe.aDueMemoryTrackersList
-      .toRepeat([loadedTracker])
-      .please()
-    loadedResponse.currentRecallWindowEndAt = fetchedSameHalfDayWindowEndAt
-    ctx.recallingSpy.mockResolvedValue(wrapSdkResponse(loadedResponse))
+    ctx.recallingSpy.mockResolvedValue(dueRecallsWith([loadedTracker]))
     const mockData = createUseRecallDataMock({ toRepeat: undefined })
     vi.mocked(useRecallData).mockReturnValue(mockData)
 
@@ -94,37 +59,37 @@ describe("RecallPage KeepAlive activation", () => {
     expect(mockData.toRepeat.value).toEqual([loadedTracker])
   })
 
-  it("keeps toRepeat on first activation when the due window is the same half-day", async () => {
-    const { mockData, originalTracker } = await mountWithMenuLoadedQueue(
-      fetchedSameHalfDayWindowEndAt
+  it("keeps the queue and position on return and adds newly due trackers, including answered ones due again, at the end", async () => {
+    const tracker1 = createMemoryTrackerLite(1)
+    const tracker2 = createMemoryTrackerLite(2)
+    const tracker3 = createMemoryTrackerLite(3)
+    const mockData = createUseRecallDataMock({ toRepeat: [tracker1, tracker2] })
+    vi.mocked(useRecallData).mockReturnValue(mockData)
+    ctx.recallingSpy.mockResolvedValue(dueRecallsWith([tracker1, tracker2]))
+    const wrapper = mountWithKeepAlive()
+    await flushPromises()
+    const recallPage = wrapper.findComponent(RecallPage).vm as unknown as {
+      currentIndex: number
+    }
+    recallPage.currentIndex = 1
+
+    // biome-ignore lint/suspicious/noExplicitAny: test wrapper's own data property
+    ;(wrapper.vm as any).show = false
+    await nextTick()
+    ctx.recallingSpy.mockResolvedValue(
+      dueRecallsWith([tracker1, tracker2, tracker3])
     )
+    // biome-ignore lint/suspicious/noExplicitAny: test wrapper's own data property
+    ;(wrapper.vm as any).show = true
+    await flushPromises()
 
-    expect(ctx.recallingSpy).toHaveBeenCalled()
-    expect(mockData.toRepeat.value).toEqual([originalTracker])
-  })
-
-  it("keeps the menu-loaded queue when reactivated with the same half-day due window", async () => {
-    const { wrapper, mockData, originalTracker } =
-      await mountWithMenuLoadedQueue(fetchedSameHalfDayWindowEndAt)
-
-    ctx.recallingSpy.mockClear()
-
-    await detourAndReturn(wrapper)
-
-    expect(ctx.recallingSpy).toHaveBeenCalled()
-    expect(mockData.toRepeat.value).toEqual([originalTracker])
-  })
-
-  it("remounts toRepeat when reactivated after the due window actually rolled over", async () => {
-    const { wrapper, mockData, fetchedTracker } =
-      await mountWithMenuLoadedQueue("2026-08-27T12:00:00.000Z")
-
-    ctx.recallingSpy.mockClear()
-
-    await detourAndReturn(wrapper)
-
-    expect(ctx.recallingSpy).toHaveBeenCalled()
-    expect(mockData.toRepeat.value).toEqual([fetchedTracker])
+    expect(mockData.toRepeat.value).toEqual([
+      tracker1,
+      tracker2,
+      tracker1,
+      tracker3,
+    ])
+    expect(mockData.currentIndex.value).toBe(1)
   })
 })
 

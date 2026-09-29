@@ -11,3 +11,16 @@ export function lastDirectContentLocator(
   if (block.contentLocators.length <= 1) return null
   return block.contentLocators[block.contentLocators.length - 1]!
 }
+
+/**
+ * A block with nothing to read of its own: its only locator is a PDF heading,
+ * or an EPUB start-only entry (its only content block is a `beginning_anchor`).
+ */
+export function hasNoTextOfItsOwn(block: BookBlockFull): boolean {
+  if (block.contentLocators.length !== 1) return false
+  if (block.contentLocators[0]!.type === "PdfLocator_Full") return true
+  return (
+    block.contentBlocks.length === 1 &&
+    block.contentBlocks[0]!.type === "beginning_anchor"
+  )
+}

@@ -6,6 +6,96 @@ remain in [DearDough.md](DearDough.md), including those observed in this project
 Existing finding identifiers and occurrence evidence are preserved when moved.
 Resolved findings are removed; Git history keeps their evidence.
 
+## Open findings
+
+### Queued: MinerU install that PDF book attach depends on
+
+#### DD-161 — Real-book manual acceptance had no supported way to hold a disposable stack or run MinerU
+
+Story: [SEED-060#story-1](.planning/seeds/SEED-060-mineru-version-for-pdf-books.md#story-1) (the MinerU version; stack holding and venv repair are deferred there).
+
+Impact check (2026-09-29): the released CLI bundles this outline script and tells users to `pip install 'mineru[pipeline]'`. MinerU 4.0.0 (2026-09-16) and later have neither the `pipeline` extra nor `mineru.cli.common` (PyPI wheels 4.0.10 and 3.4.5 compared), so the same failure reaches CLI users who attach PDF books.
+
+The plan's manual slice needed real MinerU and a running app to `/attach` real PDFs through the CLI. `.venv-mineru`'s Python pointed into a garbage-collected Nix store path, the unpinned `pip install 'mineru[pipeline]'` in the repo's docstrings installs MinerU 4.x (no `pipeline` extra, no `mineru.cli.common`), and no repo command keeps a disposable E2E stack up without Cypress, so the agent wrote a temporary `hold-stack.mjs` around `runE2eInteractive`.
+
+##### Occurrences
+
+- Execution: SEED-059#story-3 / slice-plans/051-pdf-layout-from-bookmarks / 946e2a70e3; Timestamp: 2026-09-29 (slice 6, after 6f36cb2952); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.46.
+  - Evidence: slice 6 agent report (1,692 s, about 197k tokens, 96 tool uses); plan premise "`.venv-mineru/bin` has no `python`"; venv rebuilt with Homebrew Python 3.12, `mineru[pipeline]==3.4.5` and `six`; `cli/python/mineru_book_outline.py` and `regenerate_mineru_output_for_refactoring.sh` still say unpinned.
+  - Observed effect: about 28 minutes for one manual slice, most of it environment repair and stack scaffolding rather than observation.
+  - Inference: much of the cost was necessary once; a pinned MinerU install and a documented "hold a disposable stack" command would make the next real-book acceptance cheaper. Donut tooling, so correction belongs to Donut, not shared guidance.
+
+### Open, not queued: Development stack start
+
+#### DD-159 — The Development stack failed to start on stale compiled backend classes in the default checkout
+
+Not queued: one occurrence, low impact (see Priority below). Queue a story if it recurs.
+
+`pnpm dev` from the default checkout failed with `No qualifying bean of type NotebookGitCutoverService`: `backend/build/classes` still held classes from before that service was removed. Deleting `backend/build/classes` let the next start succeed.
+
+##### Occurrences
+
+- Execution: SEED-054#story-1 / `4f2f230505:.planning/slice-plans/011-book-reading-uat/PLAN.md` / 681768a71b; Timestamp: 2026-09-29T07:25:42+08:00; Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.46.
+  - Evidence: `dev.log` "APPLICATION FAILED TO START" with the missing-bean message; `git grep NotebookGitCutoverService -- backend/src` found nothing; the next `pnpm dev` was healthy.
+  - Observed effect: one failed start and a short diagnosis before the UAT setup could continue.
+  - Inference: the Development start's incremental build did not drop classes whose sources were deleted. Qualified: cause not investigated further.
+
+## Review — 2026-09-29
+
+Reviewed `DearDough.md` at `b9d503cf02` with the ownership rule below
+(a finding is Donut's when its correction lands in Donut's product, scripts,
+or Donut-authored skills and `.agents/agent-map.md`).
+
+### Moved from DearDough
+
+- DD-161 (queued) and DD-159 (open, not queued); see above.
+- DD-165 — reviving `epub_book.feature` broke `scripts/` tests that used it as
+  their "not admitted" example (SEED-059#story-1, CI run 36522703164). The
+  cause was Donut's script tests coupling to a live spec name. Resolved by
+  `7580fceccc`, which introduced the made-up
+  `UNADMITTED_ISOLATED_CYPRESS_SPEC`; removed here, Git history keeps its
+  evidence. The general lesson (prove the changed code's consumers) stays with
+  ODF-150 and ODF-111.
+
+### Newer entries kept in DearDough
+
+Donut tooling behaved as documented, or the correction belongs to shared
+guidance or the host:
+
+- DD-143: the `frontend` skill names `pnpm -C frontend exec vue-tsc --noEmit`;
+  the coordinator invented `pnpm test:typecheck`.
+- DD-147: `docs/worktree-backend-tests.md` documents one `--tests '<pattern>'`
+  and the wrapper refuses more loudly, as for DD-140; the plan copied Gradle's
+  form unchecked.
+- DD-145: shared planning of production observations; Donut's missing agent
+  DB route and log routing are the facts the plan failed to check.
+- DD-144, DD-160: the file-size rule in the shared
+  `dough-post-change-refactor` references (with ODF-152).
+- DD-142, DD-162, DD-163, DD-164, DD-166, DD-167: shared planning, proof and
+  delegation guidance.
+- DD-146, DD-148: host behavior. DD-156: shared manual-testing guidance.
+  DD-157: shared refactor cadence. DD-158: shared `execution-start.mjs`.
+
+### Resolved findings rechecked
+
+No new occurrence reopens DD-073, DD-103 or DD-121. The SUT start fix
+`d33dedc7c8` (SEED-039#story-4) repaired a script test racing its own deadline,
+not the DD-103 runner backend race.
+
+### Priority
+
+A finding is queued only for high impact or high frequency, with impact
+ranked first.
+
+- DD-161 is queued first (SEED-060#story-1). It has high impact: one
+  occurrence cost about 28 minutes, and its root cause, Donut advising an
+  unpinned MinerU install, breaks PDF book outlines for CLI users on any fresh
+  install since MinerU 4.0.0.
+- DD-159 is not queued. It has one occurrence, and one failed start was fixed
+  by deleting `backend/build/classes`. `pnpm backend:watch` runs Gradle's
+  incremental `classes` build, which normally removes stale classes, so how
+  often it recurs is unknown.
+
 ## Review — 2026-09-27
 
 Reviewed both finding logs at `299cd69bac`. Ownership follows the failing
@@ -58,7 +148,7 @@ No occurrence in either log contradicts these resolutions:
   (`scripts/test/quality_changed.test`); removed from this log.
 - DD-065/DD-074 — returned to shared ownership as ODF-085.
 
-No project finding is open, so no product backlog story is queued from this log.
+No project finding was open at that review, so no product backlog story was queued.
 
 ### Reopening
 

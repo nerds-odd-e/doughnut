@@ -18,14 +18,18 @@ function epubLoc(href: string, fragment?: string): EpubLocatorFull {
 
 function stubBlock(
   id: number,
-  contentLocators: BookBlockFull["contentLocators"]
+  contentLocators: BookBlockFull["contentLocators"],
+  contentBlockTypes: string[] = contentLocators.map(() => "text")
 ): BookBlockFull {
   return {
     id,
     depth: 0,
     title: `block-${id}`,
     contentLocators,
-    contentBlocks: [],
+    contentBlocks: contentBlockTypes.map((type, i) => ({
+      id: id * 100 + i,
+      type,
+    })),
   }
 }
 
@@ -66,7 +70,7 @@ describe("useBookReadingSelection", () => {
     return { wrapper, currentBlockId, onAdvance }
   }
 
-  it("auto-mark: does not call submit when predecessor has direct content (multiple locators)", async () => {
+  it("auto-mark: does not call submit when EPUB predecessor has a paragraph of its own", async () => {
     const submit = vi
       .fn<
         (
@@ -75,7 +79,7 @@ describe("useBookReadingSelection", () => {
         ) => Promise<boolean>
       >()
       .mockResolvedValue(true)
-    const pred = stubBlock(1, [epubLoc("a.xhtml"), epubLoc("a.xhtml", "frag")])
+    const pred = stubBlock(1, [epubLoc("a.xhtml")], ["text"])
     const cur = stubBlock(2, [epubLoc("b.xhtml")])
     const { currentBlockId } = mountHarness({
       blocks: [pred, cur],
@@ -90,7 +94,7 @@ describe("useBookReadingSelection", () => {
     expect(submit).not.toHaveBeenCalled()
   })
 
-  it("auto-mark: does not call submit when predecessor has one locator but already has a disposition", async () => {
+  it("auto-mark: does not call submit when predecessor is start-only but already has a disposition", async () => {
     const submit = vi
       .fn<
         (
@@ -99,7 +103,7 @@ describe("useBookReadingSelection", () => {
         ) => Promise<boolean>
       >()
       .mockResolvedValue(true)
-    const pred = stubBlock(1, [epubLoc("a.xhtml")])
+    const pred = stubBlock(1, [epubLoc("a.xhtml")], ["beginning_anchor"])
     const cur = stubBlock(2, [epubLoc("b.xhtml")])
     const { currentBlockId } = mountHarness({
       blocks: [pred, cur],
@@ -114,7 +118,7 @@ describe("useBookReadingSelection", () => {
     expect(submit).not.toHaveBeenCalled()
   })
 
-  it("auto-mark: calls submit with READ when predecessor has one locator and no record", async () => {
+  it("auto-mark: calls submit with READ when EPUB predecessor is start-only and has no record", async () => {
     const submit = vi
       .fn<
         (
@@ -123,7 +127,7 @@ describe("useBookReadingSelection", () => {
         ) => Promise<boolean>
       >()
       .mockResolvedValue(true)
-    const pred = stubBlock(1, [epubLoc("a.xhtml")])
+    const pred = stubBlock(1, [epubLoc("a.xhtml")], ["beginning_anchor"])
     const cur = stubBlock(2, [epubLoc("b.xhtml")])
     const { currentBlockId } = mountHarness({
       blocks: [pred, cur],

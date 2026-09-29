@@ -618,6 +618,10 @@ The frontend proof requires `vue-tsc --noEmit` to pass. Two agents ran it as `..
 - Execution: SEED-051#story-1 / `f35fa810f1:.planning/slice-plans/009-retire-note-embeddings/PLAN.md` / 5003fbecc8; Timestamp: 2026-09-28T05:05:14Z (slice 4 refactor acceptance); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.45.
   - Evidence: slice 4 refactor agent ran `vue-tsc --noEmit 2>&1 | tail -5; echo tsc=$?` and reported "The `tsc=0` echo only captured the exit status of `tail`"; the coordinator reran the typecheck before formatting.
   - Observed effect: one extra typecheck run; no wrong result accepted.
+- Execution: SEED-056#story-1 / `6e23621c23:.planning/slice-plans/014-recall-half-day-refresh/PLAN.md` / 4b39b579e0; Timestamp: 2026-09-29T11:08:48+08:00 (slice 1 commit after acceptance); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.46.
+  - Evidence: slice 1 implementer and refactor agents ran `vue-tsc --noEmit 2>&1 | tail -15; echo EXIT $?` / `| tail -5` and reported the typecheck clean; CI run 36515871965 (job 109237884287, `pnpm -C frontend build`) failed on `tests/pages/RecallPage.dueQueue.spec.ts(71,5): error TS2322`; fixed in 171e696e06. The slice 2 agent then wrongly concluded a standalone `vue-tsc --noEmit` misses test files.
+  - Observed effect: unlike earlier rows, a wrong result was accepted: one failed published CI job and one repair; the delegation prompt did not spell out exit-code capture.
+  - Inference: the coordinator should require an unpiped exit code (or reuse `pnpm -C frontend build`) in every delegation that asks for the typecheck.
 
 ## ODF-150 — An implementer's slice proof ran only the specs it chose, missing consumers of the store method it changed
 
@@ -636,6 +640,10 @@ The slice changed `StoredApiCollection.trashNote` to request a folder listing be
   - Evidence: chat 01a0e0fe-e37c-7512-a6b3-b8d4c1318365, slice2 return and slice3 messages; a08a318db1 changed trash to throw, while its 69-test selection omitted NoteShowPage.autosaveTrash. CI run 36294751826 attempt 1, job 108551410141 reports that spec's unhandled Vue warning. Slice3's broader local selection independently found the same error; d697a1326b adds the test-only expected-error observation.
   - Observed effect: one failed published frontend job and one bounded test repair; 124 focused tests then passed, followed by the 1,938-test full frontend run in slice6.
   - Inference: consumer inspection needs callers of the whole removal flow and their refusal scenarios, not only direct store-call specs. Production error propagation itself was intended.
+- Execution: SEED-056#story-1 / `6e23621c23:.planning/slice-plans/014-recall-half-day-refresh/PLAN.md` / 4b39b579e0; Timestamp: 2026-09-29T11:08:48+08:00 (slice 1 commit after acceptance); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.46.
+  - Evidence: slice 1 changed the recall page's return path (deduplicating due trackers against the whole queue); planning's premise "Existing tests pin the replacement behavior" searched only `frontend/tests`, and slice 1 proof ran only frontend specs. E2E `spaced_repetition.feature` "Strictly follow the schedule" exercises that return path and failed (CI run 36515871965, the recall E2E job; locally found by the slice 2 agent). Repaired in 171e696e06 by deduplicating only waiting trackers.
+  - Observed effect: one failed published E2E job and a slice-1 repair folded into slice 2.
+  - Inference: consumer search for a changed behavior should include `e2e_test/` features that drive it, at planning or proof-acceptance time. Matching is by root cause (proof chosen by edited area); the actor here was planning plus coordinator acceptance.
 
 ## ODF-151 — A retrospective finding asserted the loading modal, which the product does not show for these requests
 
@@ -776,17 +784,6 @@ The execute-plan skill text lists a "stable execution publisher ID" as a start i
   - Evidence: start result `{"ok":false,"status":"invalid-request","error":"missing publisherId"}`; usage line in `execution-start.mjs`.
   - Observed effect: one refused call and a usage lookup; no state change.
 
-## DD-159 — The Development stack failed to start on stale compiled backend classes in the default checkout
-
-`pnpm dev` from the default checkout failed with `No qualifying bean of type NotebookGitCutoverService`: `backend/build/classes` still held classes from before that service was removed. Deleting `backend/build/classes` let the next start succeed.
-
-### Occurrences
-
-- Execution: SEED-054#story-1 / `4f2f230505:.planning/slice-plans/011-book-reading-uat/PLAN.md` / 681768a71b; Timestamp: 2026-09-29T07:25:42+08:00; Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.46.
-  - Evidence: `dev.log` "APPLICATION FAILED TO START" with the missing-bean message; `git grep NotebookGitCutoverService -- backend/src` found nothing; the next `pnpm dev` was healthy.
-  - Observed effect: one failed start and a short diagnosis before the UAT setup could continue.
-  - Inference: the Development start's incremental build did not drop classes whose sources were deleted. Qualified: cause not investigated further.
-
 ## DD-160 — The file-size check split an untouched block in one slice of an execution and was waived in a later slice
 
 Within one execution, the post-change refactor treated an already-oversized file differently in two slices. In slice 1, a two-line class change to `BookReadingBookLayout.vue` (354 lines before the change) led the refactor agent to move the unrelated drag-to-indent pointer handling into a new composable. In slice 3, `BookReadingContent.vue` (474 → 453 lines) was left over the limit as "not caused nor worsened by this slice".
@@ -797,17 +794,6 @@ Within one execution, the post-change refactor treated an already-oversized file
   - Evidence: slice 1 refactor report ("`BookReadingBookLayout.vue` is in the diff and was 354 lines, over the 250-line limit"; new `useBookLayoutBlockPointerDrag.ts`, commit d4a47402af); slice 3 refactor report ("`BookReadingContent.vue` is 453 lines … It was 474 before this change … I left it for the owner to decide"). Pre-change size: `1e19f8224a:frontend/src/components/book-reading/BookReadingBookLayout.vue` has 354 lines.
   - Observed effect: about 15 minutes of refactor time in slice 1, plus a desktop re-proof (`reorganize_layout.feature`, `book_browsing.feature`) for code the story did not touch. Slice 3 took the other path, with no extraction.
   - Inference: `refactor-checks.md` "File size" does not say whether a file that was already over the limit, and that a slice barely touches, must be split. Agents resolve this differently, and the time cost follows whichever reading they pick. Related to DD-144 (a small addition tipping a file over the limit) and ODF-152; here the file was over the limit before the change.
-
-## DD-161 — Real-book manual acceptance had no supported way to hold a disposable stack or run MinerU
-
-The plan's manual slice needed real MinerU and a running app to `/attach` real PDFs through the CLI. `.venv-mineru`'s Python pointed into a garbage-collected Nix store path, the unpinned `pip install 'mineru[pipeline]'` in the repo's docstrings installs MinerU 4.x (no `pipeline` extra, no `mineru.cli.common`), and no repo command keeps a disposable E2E stack up without Cypress, so the agent wrote a temporary `hold-stack.mjs` around `runE2eInteractive`.
-
-### Occurrences
-
-- Execution: SEED-059#story-3 / slice-plans/051-pdf-layout-from-bookmarks / 946e2a70e3; Timestamp: 2026-09-29 (slice 6, after 6f36cb2952); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.46.
-  - Evidence: slice 6 agent report (1,692 s, about 197k tokens, 96 tool uses); plan premise "`.venv-mineru/bin` has no `python`"; venv rebuilt with Homebrew Python 3.12, `mineru[pipeline]==3.4.5` and `six`; `cli/python/mineru_book_outline.py` and `regenerate_mineru_output_for_refactoring.sh` still say unpinned.
-  - Observed effect: about 28 minutes for one manual slice, most of it environment repair and stack scaffolding rather than observation.
-  - Inference: much of the cost was necessary once; a pinned MinerU install and a documented "hold a disposable stack" command would make the next real-book acceptance cheaper. Donut tooling, so correction belongs to Donut, not shared guidance.
 
 ## DD-162 — A grep-based plan premise named tests that never reached the changed path
 
@@ -842,17 +828,6 @@ For "opening a new EPUB marks nothing", the implementer's first cover (a separat
   - Observed effect: one extra implementation round; without the check, the story's key example would have been reported as met while failing on the real book.
   - Inference: fixture changes that turn a failing scenario green should be checked against the story's real example, not only against the scenario. The implementer did name the gap, which made the check possible.
 
-## DD-165 — Reviving an E2E spec broke script tests that used it as their "not admitted" example
-
-Slice 2 added `epub_book.feature` to `APPLICATION_ONLY_ACTIVE_SPECS`. Five `scripts/` tests used that spec as their example of a refused selection. The slice's focused proof covered the feature and frontend tests but not `pnpm test:browser-worktree-isolation`, so CI found it.
-
-### Occurrences
-
-- Execution: SEED-059#story-1 / `e733844d01:.planning/slice-plans/049-epub-land-and-track-chosen-place/PLAN.md` / 485ed2eb49; Timestamp: 2026-09-29T04:45Z (CI run 36522703164, "Linting & Types Gen for Frontend"); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.46.
-  - Evidence: CI failure on 2ace76ecd6; repair 7580fceccc (101/106 before, 106/106 after).
-  - Observed effect: a stash, repair, refactor, and republish cycle while slice 3 waited.
-  - Inference: a `git grep` for the spec path when changing the admitted-spec list would have found the tests. Qualified: one occurrence.
-
 ## DD-166 — Plan edits by text replacement silently did nothing, and five slices' learnings never reached the plan
 
 The coordinator appended learnings with a script that replaced an anchor copied from its own earlier edit. The file's line wrapping differed, so the replacement matched nothing, and each later append used the previous one as its anchor. Only the slice 1 learning stayed in the plan.
@@ -864,7 +839,18 @@ The coordinator appended learnings with a script that replaced an anchor copied 
   - Observed effect: during execution the plan did not carry the slice 2 attempts, the CI repair, or the slice 3–6 causes, so a resumed execution would have lost them. No product effect.
   - Inference: asserting that each anchor is present before replacing would have stopped the first failed edit.
 
-## DD-167 — A plan named an existing "no block marked" step for a scenario whose fixture always auto-marks another block
+## DD-167 — A correction to merge two lookups was planned without checking that they choose the same result
+
+The retrospective that created SEED-059#story-14 saw two EPUB rendered-view lookups and planned to merge them. Nobody compared their matching rules before planning. At execution, the first slice 2 attempt found that they choose different sections when one stored path matches two spine items. Execution had to stop for an owner decision. The plan's "stop and report instead of choosing one" guard worked as intended.
+
+### Occurrences
+
+- Execution: SEED-059#story-14 / `.planning/slice-plans/055-epub-resume-tests-and-rendered-view/PLAN.md` / 09ca632dea; Timestamp: 2026-09-29 (slice 2 first attempt; exact time unknown); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.46.
+  - Evidence: slice 2 Decision paragraph in plan 055 at 0e9048812c; `epubSpinePathMatches` suffix rule in `frontend/src/lib/book-reading/epubHrefMatch.ts`.
+  - Observed effect: one implementation-agent round of about 57k tokens returned no change, and the owner was asked one question. The recommended option was accepted and no work was lost.
+  - Inference: reading the two matching rules while planning the correction (a few minutes) would have found the difference and taken the decision to the owner before the plan. Qualified: one occurrence.
+
+## DD-168 — A plan named an existing "no block marked" step for a scenario whose fixture always auto-marks another block
 
 The plan's decisive premises confirmed by grep that "no book block should be marked in the book layout" exists, and slice 2's behavior used it after choosing "Chapter Alpha" in the minimal EPUB. Choosing Chapter Alpha always auto-marks the structural "Part One" read (covered by an existing scenario), so the assertion could not hold.
 
@@ -877,6 +863,6 @@ The plan's decisive premises confirmed by grep that "no book block should be mar
 
 ## Retention
 
-- Highest allocated local number: 167. Removed local codes are never reused.
+- Highest allocated local number: 168. Removed local codes are never reused.
 - Full pre-maintenance log and earlier recovery locators: `99fa1b9835e3dff2473837ba2a1f8b11967d5938:DearDough.md`.
 - Occurrence history is partial; active evidence stays here or in the Open Dough catalog and watch list.

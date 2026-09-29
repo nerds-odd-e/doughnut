@@ -375,42 +375,72 @@ through each chapter and the book they are, and what is left at the end.
 **Effort hypothesis:** M, medium confidence.
 **Depends on:** none.
 
-<a id="story-14"></a>
+<a id="story-16"></a>
 
-### EPUB resume tests say what the product does, and one lookup finds a locator's rendered view
+### The current block moves the same way in PDF as in EPUB
 
-**Identity:** SEED-059#story-14
+**Identity:** SEED-059#story-16
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/055-epub-resume-tests-and-rendered-view/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"9d108ccd333aa5caedb2ba899028b9fff7e2076bdbf7d203da96a47c9a19c377","plan":"2b3317d1198d19618685bde607a375b9e856304b73b5e1f748206c74bd4f56d0"}}
+{"schemaVersion":1,"refinement":"not-refined","approach":"planned","plan":"../slice-plans/058-current-block-same-in-pdf-and-epub/PLAN.md"}
 ```
 
-**Slice plan:** [EPUB resume tests and rendered view](../slice-plans/055-epub-resume-tests-and-rendered-view/PLAN.md)
+**Goal:** A reader sees the current block change at the same moment in PDF and
+EPUB, a chosen PDF block lands with its start at the top and stays current, and
+marking goes on after choosing a block with no text of its own.
 
-**Goal:** Developers reading Donut's EPUB tests see only behavior the product
-has, and the EPUB viewer places a locator one way for both the reading panel
-and the current block. This bounded retrospective correction of
-SEED-059#story-1 removes two resume scenarios the new reopen scenario
-supersedes (one names the opposite of today's block-level resume) and merges
-two rendered-view lookups in `useEpubLocatorGeometry`.
+**Scope** (resplit from story 15; awaiting story refinement)
 
-**Scope:** `epub_book.feature` resume scenarios and the steps and page-object
-methods only they use; `useEpubLocatorGeometry.ts`. Finer in-block resume,
-the current-block rule, auto-marking, PDF, and the extractor are unchanged.
+- **One current-block rule for both formats.** EPUB uses "the last block whose
+  start is at the top of the view (24 px tolerance), and the chosen block wins
+  among blocks sharing that start". PDF uses "the first visible block above the
+  middle of the view", with no chosen-block preference, and lands a chosen block
+  40 PDF points below its start. Use the EPUB rule for both, in one place, and
+  land PDF at the start.
+- **Marking goes on after choosing a block with no text of its own** (moved
+  from story 6 via story 15; UAT defect 15). A PDF without bookmarks keeps
+  MinerU's headings, so a "Chapter N" label can come directly before its title
+  block. After choosing such a block and scrolling, each following block
+  becomes current in order (the title block is not skipped), the empty block is
+  marked read when its successor is entered, and the Reading Control Panel is
+  offered for the next unmarked block with text. UAT: choosing "Chapter 9",
+  "Chapter 10" or "Chapter 12" in Think Python (before the bookmark layout) hid
+  the panel for 3–4 pages, the current block went from the label straight to
+  x.1, and neither the label nor the title was marked.
 
-<a id="story-15"></a>
+**Key examples**
 
-### Resume exactly and track the current block and records the same way in EPUB and PDF
+- Scroll a PDF and an EPUB past a heading → the current block changes when the
+  heading reaches the top of the view in both.
+- Choose a PDF block → its start is at the top and it is current.
+- Choose the first of two PDF headings sharing a start → it stays selected and
+  current.
+- In a PDF without bookmarks whose layout has "Chapter 12" (no text), then
+  "Tuples" (introduction text), then "12.1 Tuples are immutable": choose
+  "Chapter 12" and scroll down → "Tuples" becomes current before 12.1,
+  "Chapter 12" is marked read, and the panel is offered for "Tuples".
 
-**Identity:** SEED-059#story-15
+**Effort hypothesis:** M–L, low confidence. Provisional slices:
+[plan 058](../slice-plans/058-current-block-same-in-pdf-and-epub/PLAN.md).
+**Depends on:** story 5 (it removes snap-back from the same PDF pipeline).
+"No text of its own" is `hasNoTextOfItsOwn` in
+`frontend/src/lib/book-reading/bookBlockDirectContent.ts` (a PDF heading-only
+block, or an EPUB block whose only content is its start anchor); auto-mark
+already uses it. Snap-back's `hasDirectContent` (`useBookReadingSnapBack.ts`)
+still means "more than one locator" and should use it too.
+
+<a id="story-17"></a>
+
+### Reopen an EPUB at the exact paragraph
+
+**Identity:** SEED-059#story-17
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"not-refined","approach":"unselected"}
+{"schemaVersion":1,"refinement":"not-refined","approach":"planned","plan":"../slice-plans/059-reopen-epub-at-exact-paragraph/PLAN.md"}
 ```
 
-**Goal:** A reader reopens a book exactly where they stopped, sees the current
-block move the same way in EPUB and PDF, and gets a record only for blocks they
-read or chose to mark, so reading positions and records can be trusted.
+**Goal:** A reader who stops part-way through a long EPUB block reopens the
+book at the same paragraph, as PDF readers already do.
 
-**Scope** (owner decision, 2026-09-29, from the SEED-059#story-1 retrospective)
+**Scope** (resplit from story 15; awaiting story refinement)
 
 - **Exact EPUB resume.** Today EPUB saves the current block's start, so a
   reader part-way through a long block (Origin chapter IV is over 13,000 px)
@@ -418,47 +448,48 @@ read or chose to mark, so reading positions and records can be trusted.
   optional extra field of the EPUB position and resume from it; the block start
   still drives choosing and the current block. A pixel offset is not enough,
   because text reflows at other widths.
-- **One current-block rule for both formats.** EPUB uses "the last block whose
-  start is at the top of the view (24 px tolerance), and the chosen block wins
-  among blocks sharing that start". PDF uses "the first visible block above the
-  middle of the view", with no chosen-block preference. Use the EPUB rule for
-  both, in one place: both formats now land a chosen block at the top, and PDFs
-  can have two headings on one page.
-- **Marking goes on after choosing a block with no text of its own** (moved
-  from story 6, owner decision 2026-09-29; UAT defect 15). A PDF without
-  bookmarks keeps MinerU's headings, so a "Chapter N" label can come directly
-  before its title block. After choosing such a block and scrolling, each
-  following block becomes current in order (the title block is not skipped),
-  the empty block is marked read when its successor is entered, and the Reading
-  Control Panel is offered for the next unmarked block with text. UAT: choosing
-  "Chapter 9", "Chapter 10" or "Chapter 12" in Think Python (before the bookmark
-  layout) hid the panel for 3–4 pages, the current block went from the label
-  straight to x.1, and neither the label nor the title was marked.
-- **Auto-mark only blocks with no text of their own.**
-  `useAutoMarkNoDirectContentPredecessor` treats "exactly one locator" as "no
-  direct content", so leaving a one-paragraph block unread marks it read. Test
-  instead whether the block's only payload is a start anchor (EPUB) or it holds
-  only a heading (PDF).
 
 **Key examples**
 
 - Read to the middle of Origin chapter IV, leave, and reopen at a different
   window width → the same paragraph is at the top.
-- Scroll a PDF and an EPUB past a heading → the current block changes when the
-  heading reaches the top of the view in both.
-- Choose the first of two PDF headings on one page → it stays selected and
-  current.
-- Move from a one-paragraph block to the next without reading it → it is not
-  marked read; a heading-only block still is.
-- In a PDF without bookmarks whose layout has "Chapter 12" (no text), then
-  "Tuples" (introduction text), then "12.1 Tuples are immutable": choose
-  "Chapter 12" and scroll down → "Tuples" becomes current before 12.1,
-  "Chapter 12" is marked read, and the panel is offered for "Tuples".
 
-**Effort hypothesis:** L, low confidence. The parts are independent and
-may be split into separate stories at refinement.
-**Depends on:** none. Holds the marking-after-an-empty-block part moved from
-story 6.
+**Effort hypothesis:** M, low confidence (CFI precision in continuous scrolled
+mode is unverified). Provisional slices:
+[plan 059](../slice-plans/059-reopen-epub-at-exact-paragraph/PLAN.md).
+**Depends on:** none.
+
+<a id="story-18"></a>
+
+### Anchor the Reading Control Panel after a one-paragraph EPUB block
+
+**Identity:** SEED-059#story-18
+```json dough-story-state
+{"schemaVersion":1,"refinement":"not-refined","approach":"unselected"}
+```
+
+**Goal:** A reader of an EPUB block with one paragraph gets the Reading Control
+Panel at the end of that paragraph, as they do for blocks with more text.
+
+**Scope** (awaiting story refinement)
+
+- **Anchor at the block's last text, whatever its count.**
+  `lastDirectContentLocator` (`bookBlockDirectContent.ts`) returns nothing when
+  a block has one locator. In EPUB that locator is often the block's only
+  paragraph, so `useReadingPanelAnchor` gives no anchor for a heading plus one
+  paragraph. It should agree with `hasNoTextOfItsOwn`: only a block with no
+  text of its own has no anchor.
+- **Check snap-back too:** `useBookReadingSnapBack.ts` also uses
+  `lastDirectContentLocator`; story 16 owns snap-back's other rules.
+
+**Key examples**
+
+- In an EPUB, choose "Part One" (a heading and one paragraph) → the Reading
+  Control Panel is anchored at the end of "Opening paragraph for part one."
+- A PDF block with a heading and paragraphs still anchors as today.
+
+**Effort hypothesis:** S, low confidence.
+**Depends on:** none; coordinate with story 16 on snap-back.
 
 ## Ordering and Scope Reduction
 
