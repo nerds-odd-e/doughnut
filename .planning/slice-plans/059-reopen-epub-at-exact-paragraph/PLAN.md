@@ -96,7 +96,7 @@ same paragraph, at any window width.
 ### 1. Probe: the CFI at the top lands the same paragraph at another width
 
 Type: Probe (no product change; stops dependent slices on failure)
-Status: planned
+Status: done (passed 2026-09-29; see Learnings)
 Proof: recorded observation in this plan's Learnings.
 
 - **Steps:**
@@ -156,6 +156,9 @@ leave and return. Result: that paragraph is at the top of the EPUB reader, and
     reader".
   - The assertion checks that the paragraph crosses the top: its top ≤ 8 px
     and its bottom > 8 px.
+  - The scroll step parks the paragraph's top only a few pixels above the
+    reader top, so the saved CFI's character offset stays in its first line
+    (see Learnings).
   - Both steps generalize the heading-offset helper to a selector; they do not
     copy it.
 - **Viewer:**
@@ -187,4 +190,25 @@ leave and return. Result: that paragraph is at the top of the EPUB reader, and
 
 ## Learnings
 
-(none yet)
+- **Slice 1 probe passed** (temporary `@focus` scenario in `epub_book.feature`
+  plus a debug hook exposing the rendition, both removed; run with
+  `SUT_TIMEOUT_MS=360000 CURSOR_DEV=true nix develop -c pnpm cy:run --spec e2e_test/features/book_reading/epub_book.feature`).
+  - At 1440×900 with paragraph 60 at the top (top −3 px),
+    `currentLocation().start.cfi` was
+    `epubcfi(/6/6!/4/2[chapter-one]/122/1:131)`: the paragraph element, its
+    text node, and a character offset.
+  - After resizing to 390×844 and leaving and returning,
+    `rendition.display(cfi)` through the one-display-at-a-time wrapper put
+    paragraph 60 at top −37 px, bottom +37 px, stable after 2 s. No wait was
+    needed after the opening display.
+- **The CFI changes within a paragraph.** A small scroll changed the offset
+  (`:131` → `:0`) while the element path stayed. Once `sameLocator` compares
+  `cfi`, small scrolls inside one paragraph send new PATCHes, limited by the
+  debounce. That meets "saved while scrolling"; do not expect one save per
+  paragraph.
+- **`display(cfi)` lands on the character, not the paragraph top.** A saved
+  offset in a paragraph's last line could put that paragraph's top well above
+  the reader top. The E2E scroll step keeps the offset in the first line.
+- **E2E runner:** `cy:run` accepts only known spec paths, so new scenarios go
+  into an existing feature file. Worktrees share Mountebank's port 2525, so a
+  concurrent E2E run in another worktree fails SUT readiness.
