@@ -34,7 +34,6 @@
     </slot>
   </GlobalBar>
   <BookReadingBookLayout
-    v-bind="$attrs"
     v-model:opened="bookLayoutOpened"
     :panel-id="bookReadingBookLayoutPanelId"
     :is-md-or-larger="isMdOrLarger"
@@ -45,6 +44,7 @@
     @block-click="applyBookBlockSelection"
     @change-mark="bookReading.submitReadingDisposition"
     @clear-mark="bookReading.clearReadingDisposition"
+    v-on="reorganize?.layoutListeners ?? {}"
   >
     <main
       v-if="format === 'pdf'"
@@ -75,7 +75,12 @@
             @mark-as-skimmed="() => markSelectedBlockDisposition('SKIMMED')"
             @mark-as-skipped="() => markSelectedBlockDisposition('SKIPPED')"
           />
-          <slot name="pane-end" />
+          <CurrentBlockNavigationBar
+            v-if="reorganize?.currentBlockForNavBar.value"
+            :current-block-title="reorganize.currentBlockForNavBar.value.title"
+            @read-from-here="reorganize.readFromHere"
+            @back-to-selected="reorganize.backToSelected"
+          />
         </div>
       </div>
     </main>
@@ -95,11 +100,20 @@
       />
     </main>
   </BookReadingBookLayout>
+  <BookLayoutReorganizePreviewDialog
+    v-if="reorganize"
+    :open="reorganize.aiSuggestion.value !== null"
+    :preview-rows="reorganize.aiPreviewRows.value"
+    @confirm="reorganize.confirmAiReorganize"
+    @cancel="reorganize.dismissAiReorganizePreview"
+  />
 </template>
 
 <script setup lang="ts">
+import BookLayoutReorganizePreviewDialog from "@/components/book-reading/BookLayoutReorganizePreviewDialog.vue"
 import BookLayoutToggleButton from "@/components/book-reading/BookLayoutToggleButton.vue"
 import BookReadingBookLayout from "@/components/book-reading/BookReadingBookLayout.vue"
+import CurrentBlockNavigationBar from "@/components/book-reading/CurrentBlockNavigationBar.vue"
 import ReadingControlPanel from "@/components/book-reading/ReadingControlPanel.vue"
 import GlobalBar from "@/components/toolbars/GlobalBar.vue"
 import type { BookReadingSession } from "@/composables/useBookReadingSession"
@@ -108,9 +122,9 @@ import { useSidebarDrawer } from "@/composables/useSidebarDrawer"
 /**
  * The reading view both formats share, bound to one reading session. `format` keeps each
  * format's current markup: PDF's live announcement, load error, and framed pane; EPUB's
- * title test id. Listeners not declared here go to the book layout.
+ * title test id. Reorganizing and the "Now reading" bar are wired only when the session
+ * allows reorganizing.
  */
-defineOptions({ inheritAttrs: false })
 
 const props = defineProps<{
   session: BookReadingSession
@@ -133,6 +147,7 @@ const {
   applyBookBlockSelection,
   markSelectedBlockDisposition,
   readingPanelAnchorTopPx,
+  reorganize,
 } = props.session
 
 function setMainPane(el: unknown) {

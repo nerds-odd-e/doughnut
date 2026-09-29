@@ -1,4 +1,9 @@
 import type { BookReaderViewerRef } from "@/composables/bookReaderViewerRef"
+import {
+  bookFullAfterLayoutMutation,
+  useBookLayoutMutations,
+} from "@/composables/book-reading/useBookLayoutMutations"
+import { useBookLayoutAiReorganize } from "@/composables/useBookLayoutAiReorganize"
 import { useBookReadingCurrentBlock } from "@/composables/useBookReadingCurrentBlock"
 import { useBookReadingSelection } from "@/composables/useBookReadingSelection"
 import { useNotebookBookReadingRecords } from "@/composables/useNotebookBookReadingRecords"
@@ -16,6 +21,7 @@ import {
   ref,
   toValue,
   watch,
+  type ComputedRef,
   type MaybeRefOrGetter,
   type Ref,
 } from "vue"
@@ -41,6 +47,8 @@ export type BookReadingSurface = {
   reanchorPanelAfterSyncAndShow?: boolean
   /** EPUB sends a pending reading position on leave; PDF drops it. */
   flushPositionOnLeave?: boolean
+  /** PDF reorganizes the book layout, receiving the updated book, and shows the "Now reading" bar. */
+  reorganize?: { onBookUpdated: (book: BookFull) => void }
 }
 
 export function useBookReadingSession(options: {
@@ -114,6 +122,18 @@ export function useBookReadingSession(options: {
     structuralTitleForBlockId(currentBlockId.value, bookBlocks.value)
   )
 
+  const reorganize = surface.reorganize
+    ? useReorganize({
+        getBook: () => toValue(options.book),
+        notebookId,
+        bookBlocks,
+        selectedBlockId,
+        currentBlockId,
+        applyBookBlockSelection,
+        onBookUpdated: surface.reorganize.onBookUpdated,
+      })
+    : null
+
   onMounted(async () => {
     await bookReading.syncFromServer()
     if (surface.reanchorPanelAfterSyncAndShow) await reanchorPanel()
@@ -134,6 +154,65 @@ export function useBookReadingSession(options: {
     readingPanelAnchorTopPx,
     updateReadingPanelAnchor,
     mainPane,
+    reorganize,
+  }
+}
+
+/** Layout changes, AI reorganize, and the "Now reading" bar's navigation. */
+function useReorganize(opts: {
+  getBook: () => BookFull
+  notebookId: ComputedRef<number>
+  bookBlocks: ComputedRef<BookBlockFull[]>
+  selectedBlockId: Ref<number | null>
+  currentBlockId: Ref<number | null>
+  applyBookBlockSelection: (block: BookBlockFull) => Promise<void>
+  onBookUpdated: (book: BookFull) => void
+}) {
+  const { bookBlocks, selectedBlockId, applyBookBlockSelection } = opts
+  const { onBlockIndent, onBlockOutdent, onBlockCancel } =
+    useBookLayoutMutations(opts)
+  const ai = useBookLayoutAiReorganize(opts.notebookId, bookBlocks)
+
+  async function confirmAiReorganize() {
+    const mutation = await ai.confirmSuggest()
+    if (mutation) {
+      opts.onBookUpdated(bookFullAfterLayoutMutation(opts.getBook(), mutation))
+    }
+  }
+
+  const currentBlockForNavBar = computed(() => {
+    const curId = opts.currentBlockId.value
+    const selId = selectedBlockId.value
+    if (curId === null || selId === null || curId === selId) return null
+    return bookBlocks.value.find((b) => b.id === curId) ?? null
+  })
+
+  async function readFromHere() {
+    const block = currentBlockForNavBar.value
+    if (block) await applyBookBlockSelection(block)
+  }
+
+  async function backToSelected() {
+    const selId = selectedBlockId.value
+    if (selId === null) return
+    const block = bookBlocks.value.find((b) => b.id === selId)
+    if (block) await applyBookBlockSelection(block)
+  }
+
+  return {
+    layoutListeners: {
+      blockIndent: onBlockIndent,
+      blockOutdent: onBlockOutdent,
+      blockCancel: onBlockCancel,
+      requestAiReorganize: ai.requestSuggest,
+    },
+    aiSuggestion: ai.suggestion,
+    aiPreviewRows: ai.previewRows,
+    confirmAiReorganize,
+    dismissAiReorganizePreview: ai.dismiss,
+    currentBlockForNavBar,
+    readFromHere,
+    backToSelected,
   }
 }
 

@@ -33,7 +33,7 @@ describe("useBookLayoutMutations", () => {
         const { onBlockIndent } = useBookLayoutMutations({
           notebookId,
           bookBlocks,
-          getPropBook: () => updatedBook.value,
+          getBook: () => updatedBook.value,
           selectedBlockId,
           applyBookBlockSelection: async () => undefined,
           onBookUpdated: (next) => {

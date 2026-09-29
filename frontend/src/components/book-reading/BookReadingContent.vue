@@ -5,10 +5,6 @@
     :book-name="book.bookName"
     :load-error="pdfViewerLoadError"
     :snap-animation-key="snapAnimationKey"
-    @block-indent="onBlockIndent"
-    @block-outdent="onBlockOutdent"
-    @block-cancel="onBlockCancel"
-    @request-ai-reorganize="requestAiReorganize"
   >
     <template #bar-end>
       <PdfControl
@@ -28,14 +24,6 @@
       @pages-ready="onPagesReady"
       @create-block-from-content="onCreateBlockFromContent"
     />
-    <template #pane-end>
-      <CurrentBlockNavigationBar
-        v-if="currentBlockForNavBar"
-        :current-block-title="currentBlockForNavBar.title"
-        @read-from-here="onReadFromHere"
-        @back-to-selected="onBackToSelected"
-      />
-    </template>
   </BookReadingShell>
   <NewBookBlockTitleDialog
     :open="pendingBlockCreation !== null"
@@ -43,18 +31,10 @@
     @confirm="onConfirmBlockTitle"
     @cancel="pendingBlockCreation = null"
   />
-  <BookLayoutReorganizePreviewDialog
-    :open="aiSuggestion !== null"
-    :preview-rows="aiPreviewRows"
-    @confirm="onConfirmAiReorganize"
-    @cancel="dismissAiReorganizePreview"
-  />
 </template>
 
 <script setup lang="ts">
-import BookLayoutReorganizePreviewDialog from "@/components/book-reading/BookLayoutReorganizePreviewDialog.vue"
 import BookReadingShell from "@/components/book-reading/BookReadingShell.vue"
-import CurrentBlockNavigationBar from "@/components/book-reading/CurrentBlockNavigationBar.vue"
 import NewBookBlockTitleDialog from "@/components/book-reading/NewBookBlockTitleDialog.vue"
 import PdfBookViewer from "@/components/book-reading/PdfBookViewer.vue"
 import PdfControl from "@/components/book-reading/PdfControl.vue"
@@ -65,12 +45,7 @@ import type { ViewportYRange } from "@/lib/book-reading/pdfViewerViewportTopYDow
 import { READING_PANEL_OBSTRUCTION_PX } from "@/composables/useReadingPanelAnchor"
 import { useBookReadingSnapBack } from "@/composables/useBookReadingSnapBack"
 import type { BookReadingPdfViewerRef } from "@/composables/bookReaderViewerRef"
-import { useBookLayoutAiReorganize } from "@/composables/useBookLayoutAiReorganize"
 import { useBookReadingSession } from "@/composables/useBookReadingSession"
-import {
-  bookFullAfterLayoutMutation,
-  useBookLayoutMutations,
-} from "@/composables/book-reading/useBookLayoutMutations"
 import type {
   BookBlockFull,
   BookFull,
@@ -155,6 +130,7 @@ const session = useBookReadingSession({
     canAnchorPanel: () => lastContentBottomVisible.value,
     onMarkedRead: (id) => clearSnapbackAttemptsForBlock(id),
     repairSelection: true,
+    reorganize: { onBookUpdated: (book) => emit("update:book", book) },
   },
 })
 const {
@@ -165,7 +141,6 @@ const {
   currentBlockId,
   currentBlockIdDebouncer,
   proposeReadingPosition,
-  applyBookBlockSelection,
   updateReadingPanelAnchor,
 } = session
 
@@ -192,21 +167,6 @@ function readingPositionLocator(): PdfLocatorFull | null {
 }
 
 const {
-  suggestion: aiSuggestion,
-  previewRows: aiPreviewRows,
-  requestSuggest: requestAiReorganize,
-  confirmSuggest: confirmAiReorganize,
-  dismiss: dismissAiReorganizePreview,
-} = useBookLayoutAiReorganize(notebookId, bookBlocks)
-
-const currentBlockForNavBar = computed(() => {
-  const curId = currentBlockId.value
-  const selId = selectedBlockId.value
-  if (curId === null || selId === null || curId === selId) return null
-  return bookBlocks.value.find((b) => b.id === curId) ?? null
-})
-
-const {
   snapAnimationKey,
   blockAwaitingConfirmation: snapBlockAwaitingConfirmation,
   lastContentBottomVisible,
@@ -223,17 +183,6 @@ const {
   obstructionPx: READING_PANEL_OBSTRUCTION_PX,
   snapHoldMs: SNAP_HOLD_MS,
 })
-
-const { onBlockIndent, onBlockOutdent, onBlockCancel } = useBookLayoutMutations(
-  {
-    notebookId,
-    bookBlocks,
-    getPropBook: () => props.book,
-    selectedBlockId,
-    applyBookBlockSelection,
-    onBookUpdated: (book) => emit("update:book", book),
-  }
-)
 
 function commitCurrentBlockId(id: number | null): boolean {
   if (shouldSnapBack(id)) {
@@ -285,13 +234,6 @@ function onPagesReady() {
     .catch(() => undefined)
 }
 
-async function onConfirmAiReorganize() {
-  const mutation = await confirmAiReorganize()
-  if (mutation) {
-    emit("update:book", bookFullAfterLayoutMutation(props.book, mutation))
-  }
-}
-
 const pendingBlockCreation = ref<{
   contentBlockId: number
   structuralTitle: string
@@ -341,17 +283,5 @@ async function onConfirmBlockTitle(title: string | undefined) {
   if (pending) {
     await createBlock(pending.contentBlockId, title)
   }
-}
-
-async function onReadFromHere() {
-  const block = currentBlockForNavBar.value
-  if (block) await applyBookBlockSelection(block)
-}
-
-async function onBackToSelected() {
-  const selId = selectedBlockId.value
-  if (selId === null) return
-  const block = bookBlocks.value.find((b) => b.id === selId)
-  if (block) await applyBookBlockSelection(block)
 }
 </script>

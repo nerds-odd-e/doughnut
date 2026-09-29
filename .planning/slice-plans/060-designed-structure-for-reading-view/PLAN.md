@@ -141,7 +141,12 @@ follows Current decisions. Enables slice 4. About 10 min.
 
 ### 4. Reorganizing and the "Now reading" bar are a PDF capability of the shell
 Type: Structure
-Status: planned
+Status: done
+Accepted proof: frontend command 12 files / 71 tests (13 / 72 with
+`tests/composables/book-reading/useBookLayoutMutations` after the refactor
+renamed its `getPropBook` option to `getBook`); `vue-tsc --noEmit` clean;
+`reorganize_layout` 8, `ai_reorganize_layout` 1, `reading_record` 7,
+`epub_book` 17 (33/33).
 Proof: `pnpm frontend:test tests/components/book-reading/BookReadingContentAiReorganize.spec.ts` plus the frontend command; `cy:run --spec e2e_test/features/book_reading/reorganize_layout.feature,e2e_test/features/book_reading/ai_reorganize_layout.feature,e2e_test/features/book_reading/reading_record.feature,e2e_test/features/book_reading/epub_book.feature`.
 
 Move `useBookLayoutMutations`, `useBookLayoutAiReorganize`, the reorganize
@@ -187,6 +192,10 @@ About 5–10 min.
   reorganize listeners reach the book layout through the shell's `$attrs`, and
   the "Now reading" bar through a `#pane-end` slot. Giving EPUB PDF's pane
   layout would need a DOM change this story excludes.
+- Slice 4 shaped the `reorganize` capability as
+  `reorganize?: { onBookUpdated(book) }` (present means on), held by a private
+  `useReorganize` in the session file; the shell's `$attrs` forwarding and
+  `#pane-end` slot are gone. `BookReadingContent.vue` is 287 lines after it.
 - Slice 5 candidates in `useBookReadingSelection.ts`:
   `overrideBlockAwaitingConfirmation` and `repairSelectionWhenBlocksChange`,
   now set only by the session.
