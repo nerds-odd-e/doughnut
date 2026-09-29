@@ -403,7 +403,7 @@ the current-block rule, auto-marking, PDF, and the extractor are unchanged.
 
 **Identity:** SEED-059#story-15
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"not-refined","approach":"unselected"}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/057-exact-resume-one-current-block-rule/PLAN.md","assessment":"not-ready","reasons":["Four independent outcomes in one story (A auto-mark, B one current-block rule, C marking after an empty block, D exact EPUB resume); nine slices with different prerequisites","B and C depend on story 5 (snap-back removal) and D on story 14 (resume-test cleanup) being delivered first","B3 is over the slice target (about 15 min)","Unverified: CFI precision in continuous scrolled mode (D1 probe) and a no-bookmark fixture for defect 15 (C1)"],"basis":{"document":"0d4b36c2c9f00bf9c3ccddfdb18c942b7ba2303d9aaf5d65311fc09e1a38ff5f","plan":"e0304f4e6eaf8c0632add25bd0678d97c13b5ce553022f1744891b579f804c54"}}
 ```
 
 **Goal:** A reader reopens a book exactly where they stopped, sees the current
