@@ -112,7 +112,7 @@ public enum BookFormat {
         frag = frag.substring(1);
       }
       frag = trimToNull(frag);
-      persistReadingPositionLocatorJson(row, objectMapper, new EpubLocator(href, frag));
+      persistReadingPositionLocatorJson(row, objectMapper, new EpubLocator(href, frag, epub.cfi()));
     }
   };
 

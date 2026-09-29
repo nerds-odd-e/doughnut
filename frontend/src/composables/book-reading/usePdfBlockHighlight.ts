@@ -142,18 +142,11 @@ export function usePdfBlockHighlight(opts: {
     }
   }
 
-  function highlightBlockSelection(
-    highlightBboxes: ReadonlyArray<BookNavigationTarget>
-  ) {
-    showSelectionBboxHighlights(highlightBboxes)
-  }
-
   return {
     holdCallout: holdCallout as Ref<HoldCallout | null>,
     onContainerClick,
     onConfirmNewBlock,
     clearBlockHighlight,
     showSelectionBboxHighlights,
-    highlightBlockSelection,
   }
 }

@@ -3679,6 +3679,8 @@ components:
             type: string
           fragment:
             type: string
+          cfi:
+            type: string
       required:
       - href
     PdfLocator_Full:

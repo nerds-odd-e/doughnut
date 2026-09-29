@@ -77,6 +77,20 @@ describe("createLastReadPositionPatchDebouncer", () => {
       ])
     })
 
+    it("sends again when only the exact place (cfi) moves within the block", async () => {
+      const { d, sent } = setup()
+      const at = (cfi: string) => ({ ...epubLoc("OEBPS/ch1.xhtml", "a"), cfi })
+      d.propose(at("epubcfi(/6/6!/4/2/122/1:131)"))
+      vi.advanceTimersByTime(100)
+      await Promise.resolve()
+      d.propose(at("epubcfi(/6/6!/4/2/124/1:0)"))
+      vi.advanceTimersByTime(100)
+      expect(sent).toEqual([
+        { locator: at("epubcfi(/6/6!/4/2/122/1:131)") },
+        { locator: at("epubcfi(/6/6!/4/2/124/1:0)") },
+      ])
+    })
+
     it("treats different selectedBookBlockId as a distinct body", async () => {
       const { d, sent } = setup()
       d.propose(epubLoc("OEBPS/ch1.xhtml"), 1)

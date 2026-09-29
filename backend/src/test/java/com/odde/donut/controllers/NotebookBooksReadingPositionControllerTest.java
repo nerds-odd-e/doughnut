@@ -139,7 +139,22 @@ class NotebookBooksReadingPositionControllerTest extends NotebookBooksController
               .orElseThrow();
       ContentLocator fromJson =
           objectMapper.readValue(stored.getReadingPositionLocatorJson(), ContentLocator.class);
-      assertThat(fromJson, equalTo(new EpubLocator("OEBPS/chapter2.xhtml", "section-beta-two")));
+      assertThat(
+          fromJson, equalTo(new EpubLocator("OEBPS/chapter2.xhtml", "section-beta-two", null)));
+    }
+
+    @Test
+    void keepsExactEpubPlaceAsCfi() throws Exception {
+      Notebook nb = notebookWithBook();
+      String cfi = "epubcfi(/6/4!/4/2[section-beta-two]/10/1:0)";
+      BookLastReadPositionRequest body = new BookLastReadPositionRequest();
+      body.setLocator(new EpubLocator("OEBPS/chapter2.xhtml", "section-beta-two", cfi));
+
+      readingController.patchReadingPosition(nb, body);
+
+      assertThat(
+          readingController.getReadingPosition(nb).getBody().locator(),
+          equalTo(new EpubLocator("OEBPS/chapter2.xhtml", "section-beta-two", cfi)));
     }
 
     @Test

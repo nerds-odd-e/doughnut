@@ -66,21 +66,22 @@
           class="relative min-h-0 min-w-0 flex-1"
         >
           <slot />
-          <ReadingControlPanel
-            v-if="blockAwaitingConfirmation"
-            :selected-block-title="blockAwaitingConfirmation.title"
-            :snap-animation-key="snapAnimationKey"
-            :anchor-top-px="readingPanelAnchorTopPx"
-            @mark-as-read="() => markSelectedBlockDisposition('READ')"
-            @mark-as-skimmed="() => markSelectedBlockDisposition('SKIMMED')"
-            @mark-as-skipped="() => markSelectedBlockDisposition('SKIPPED')"
-          />
-          <CurrentBlockNavigationBar
-            v-if="reorganize?.currentBlockForNavBar.value"
-            :current-block-title="reorganize.currentBlockForNavBar.value.title"
-            @read-from-here="reorganize.readFromHere"
-            @back-to-selected="reorganize.backToSelected"
-          />
+          <ReadingOverlayDock @wheel="emit('overlayWheel', $event)">
+            <ReadingControlPanel
+              v-if="blockAwaitingConfirmation"
+              :selected-block-title="blockAwaitingConfirmation.title"
+              :anchor-top-px="readingPanelAnchorTopPx"
+              @mark-as-read="() => markSelectedBlockDisposition('READ')"
+              @mark-as-skimmed="() => markSelectedBlockDisposition('SKIMMED')"
+              @mark-as-skipped="() => markSelectedBlockDisposition('SKIPPED')"
+            />
+            <CurrentBlockNavigationBar
+              v-if="reorganize?.currentBlockForNavBar.value"
+              :current-block-title="reorganize.currentBlockForNavBar.value.title"
+              @read-from-here="reorganize.readFromHere"
+              @back-to-selected="reorganize.backToSelected"
+            />
+          </ReadingOverlayDock>
         </div>
       </div>
     </main>
@@ -90,14 +91,16 @@
       class="flex flex-1 min-h-0 min-w-0 flex-col relative"
     >
       <slot />
-      <ReadingControlPanel
-        v-if="blockAwaitingConfirmation"
-        :selected-block-title="blockAwaitingConfirmation.title"
-        :anchor-top-px="readingPanelAnchorTopPx"
-        @mark-as-read="() => markSelectedBlockDisposition('READ')"
-        @mark-as-skimmed="() => markSelectedBlockDisposition('SKIMMED')"
-        @mark-as-skipped="() => markSelectedBlockDisposition('SKIPPED')"
-      />
+      <ReadingOverlayDock>
+        <ReadingControlPanel
+          v-if="blockAwaitingConfirmation"
+          :selected-block-title="blockAwaitingConfirmation.title"
+          :anchor-top-px="readingPanelAnchorTopPx"
+          @mark-as-read="() => markSelectedBlockDisposition('READ')"
+          @mark-as-skimmed="() => markSelectedBlockDisposition('SKIMMED')"
+          @mark-as-skipped="() => markSelectedBlockDisposition('SKIPPED')"
+        />
+      </ReadingOverlayDock>
     </main>
   </BookReadingBookLayout>
   <BookLayoutReorganizePreviewDialog
@@ -115,6 +118,7 @@ import BookLayoutToggleButton from "@/components/book-reading/BookLayoutToggleBu
 import BookReadingBookLayout from "@/components/book-reading/BookReadingBookLayout.vue"
 import CurrentBlockNavigationBar from "@/components/book-reading/CurrentBlockNavigationBar.vue"
 import ReadingControlPanel from "@/components/book-reading/ReadingControlPanel.vue"
+import ReadingOverlayDock from "@/components/book-reading/ReadingOverlayDock.vue"
 import GlobalBar from "@/components/toolbars/GlobalBar.vue"
 import type { BookReadingSession } from "@/composables/useBookReadingSession"
 import { useSidebarDrawer } from "@/composables/useSidebarDrawer"
@@ -131,7 +135,11 @@ const props = defineProps<{
   format: "pdf" | "epub"
   bookName: string
   loadError?: string | null
-  snapAnimationKey?: number
+}>()
+
+const emit = defineEmits<{
+  /** A wheel over the PDF pane's Reading Control Panel or "Now reading" bar. */
+  overlayWheel: [event: WheelEvent]
 }>()
 
 const bookReadingBookLayoutPanelId = "book-reading-book-layout-panel"

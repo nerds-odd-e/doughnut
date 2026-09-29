@@ -70,66 +70,9 @@ export function usePdfLocatorGeometry(opts: {
     return rect.bottom - containerRect.top + READING_PANEL_ANCHOR_GAP_PX
   }
 
-  function getPageRect(pageIndex: number): { height: number } | null {
-    const pdfViewer = opts.getPdfViewer()
-    if (!pdfViewer) return null
-    if (
-      !Number.isInteger(pageIndex) ||
-      pageIndex < 0 ||
-      pageIndex >= pdfViewer.pagesCount
-    )
-      return null
-    const pageView = pdfViewer.getPageView(pageIndex)
-    if (!pageView?.div) return null
-    return { height: pageView.div.getBoundingClientRect().height }
-  }
-
-  function getScrollViewportHeightPx(): number | null {
-    const container = opts.containerRef.value
-    if (!container) return null
-    return container.getBoundingClientRect().height
-  }
-
-  function scrollPageNormalizedYToReadingClearance(
-    pageIndex: number,
-    normalizedY: number,
-    obstructionPx: number
-  ): void {
-    const container = opts.containerRef.value
-    const pdfViewer = opts.getPdfViewer()
-    if (!container || !pdfViewer) return
-    if (
-      !Number.isInteger(pageIndex) ||
-      pageIndex < 0 ||
-      pageIndex >= pdfViewer.pagesCount
-    )
-      return
-    const pageView = pdfViewer.getPageView(pageIndex)
-    if (!(pageView as { div?: HTMLDivElement } | null)?.div) return
-    const pageDiv = (pageView as { div: HTMLDivElement }).div
-    const pageRect = pageDiv.getBoundingClientRect()
-    const containerRect = container.getBoundingClientRect()
-    const pointClientY = pageRect.top + (normalizedY / 1000) * pageRect.height
-    const targetClient = containerRect.bottom - obstructionPx
-    container.scrollTop += pointClientY - targetClient
-  }
-
-  function afterNextViewUpdate(fn: () => void): void {
-    const pdfViewer = opts.getPdfViewer()
-    if (!pdfViewer) {
-      queueMicrotask(fn)
-      return
-    }
-    pdfViewer.eventBus.on("updateviewarea", fn, { once: true })
-  }
-
   return {
     resolveLocatorRect,
     isLocatorBottomVisible,
     readingPanelAnchorTopPx,
-    getPageRect,
-    getScrollViewportHeightPx,
-    scrollPageNormalizedYToReadingClearance,
-    afterNextViewUpdate,
   }
 }

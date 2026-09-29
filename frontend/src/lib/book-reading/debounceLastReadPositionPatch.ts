@@ -25,7 +25,7 @@ function sameLocator(a: ContentLocatorFull, b: ContentLocatorFull): boolean {
     const eb = b as EpubLocatorFull
     const fa = ea.fragment?.trim() ?? ""
     const fb = eb.fragment?.trim() ?? ""
-    return ea.href === eb.href && fa === fb
+    return ea.href === eb.href && fa === fb && ea.cfi === eb.cfi
   }
   if (a.type === "PdfLocator_Full") {
     const pa = a as PdfLocatorFull

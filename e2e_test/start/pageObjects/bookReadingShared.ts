@@ -99,32 +99,49 @@ export const expectFullyOnScreen = (selector: string) => {
   })
 }
 
-/** Elements matching `selector` in the reader's rendered chapters whose trimmed text is exactly `text`. */
+/**
+ * Elements matching `selector` in the reader's rendered chapters whose trimmed text is exactly
+ * `text`, or with `textMatch: 'start'`, begins with it.
+ */
 export function epubReaderElementsWithText(
   container: HTMLElement,
   selector: string,
-  text: string
+  text: string,
+  textMatch: 'exact' | 'start' = 'exact'
 ): { iframe: HTMLIFrameElement; element: HTMLElement }[] {
+  const matches = (content: string) =>
+    textMatch === 'start' ? content.startsWith(text) : content === text
   return [...container.querySelectorAll('iframe')].flatMap((iframe) =>
     [...(iframe.contentDocument?.querySelectorAll<HTMLElement>(selector) ?? [])]
-      .filter((element) => (element.textContent ?? '').trim() === text)
+      .filter((element) => matches((element.textContent ?? '').trim()))
       .map((element) => ({ iframe, element }))
   )
 }
 
-/** Offsets in px from the top of the reader's scrolled view to each rendered heading with this text. */
-export function epubHeadingOffsetsFromReaderTopPx(
+/** How to find an element in the reader: `selector` plus its text (see `epubReaderElementsWithText`). */
+export type EpubReaderElementQuery = {
+  selector: string
+  text: string
+  textMatch: 'exact' | 'start'
+}
+
+/** Where an element sits vertically, in px from the top of the reader's scrolled view. */
+export type EpubReaderElementSpan = { top: number; bottom: number }
+
+/** Spans of each rendered element matching the query. */
+export function epubElementSpansFromReaderTopPx(
   container: HTMLElement,
-  headingText: string
-): number[] {
-  return epubReaderElementsWithText(
-    container,
-    'h1,h2,h3,h4,h5,h6',
-    headingText
-  ).map(
-    ({ iframe, element }) =>
-      iframe.getBoundingClientRect().top +
-      element.getBoundingClientRect().top -
-      container.getBoundingClientRect().top
+  { selector, text, textMatch }: EpubReaderElementQuery
+): EpubReaderElementSpan[] {
+  const readerTop = container.getBoundingClientRect().top
+  return epubReaderElementsWithText(container, selector, text, textMatch).map(
+    ({ iframe, element }) => {
+      const iframeTop = iframe.getBoundingClientRect().top
+      const r = element.getBoundingClientRect()
+      return {
+        top: iframeTop + r.top - readerTop,
+        bottom: iframeTop + r.bottom - readerTop,
+      }
+    }
   )
 }

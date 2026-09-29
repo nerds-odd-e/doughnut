@@ -21,7 +21,6 @@ const LAST_READ_PATCH_DEBOUNCE_MS = 400
 
 export function useBookReadingCurrentBlock(options: {
   notebookId: MaybeRefOrGetter<number>
-  commitCurrentBlock: (id: number | null) => boolean
   /** The reading position to send, or null when there is none yet. */
   readingPosition: () => LastReadPositionPatchBody | null
   /** EPUB sends a pending reading position on leave; PDF drops it. */
@@ -51,7 +50,6 @@ export function useBookReadingCurrentBlock(options: {
 
   const currentBlockIdDebouncer = createCurrentBlockIdDebouncer({
     delayMs: CURRENT_BLOCK_DEBOUNCE_MS,
-    commit: options.commitCurrentBlock,
   })
 
   const { currentBlockId } = currentBlockIdDebouncer

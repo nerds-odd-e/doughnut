@@ -4,7 +4,9 @@ import {
   BOOK_READING_PATHNAME,
   bookBlockRowByTitle,
   ensureOnBookReadingPage,
-  epubHeadingOffsetsFromReaderTopPx,
+  epubElementSpansFromReaderTopPx,
+  type EpubReaderElementQuery,
+  type EpubReaderElementSpan,
   epubHostViewportIntersectsMarker,
   expectUsesScreenWidth,
   epubReaderElementsWithText,
@@ -13,6 +15,80 @@ import {
 
 /** The reader's scrolled view: epub.js's stage inside the viewer. */
 const EPUB_READER_VIEW = '[data-testid="epub-book-viewer"] .epub-container'
+
+const HEADINGS = 'h1,h2,h3,h4,h5,h6'
+
+/** How far (px) an element's edge may sit from the reader top and still count as "at the top". */
+const TOP_TOLERANCE_PX = 8
+
+/** How the reader steps find an element: a heading by its text, a paragraph by its opening text. */
+type EpubReaderElement = EpubReaderElementQuery & { label: string }
+
+const heading = (text: string): EpubReaderElement => ({
+  label: `heading "${text}"`,
+  selector: HEADINGS,
+  text,
+  textMatch: 'exact',
+})
+
+const paragraph = (text: string): EpubReaderElement => ({
+  label: `paragraph "${text}"`,
+  selector: 'p',
+  text,
+  textMatch: 'start',
+})
+
+/** The element is rendered exactly once and its span passes `check`. */
+function expectEpubElementSpan(
+  el: EpubReaderElement,
+  check: (span: EpubReaderElementSpan) => void
+) {
+  ensureOnBookReadingPage()
+  cy.get(EPUB_READER_VIEW, { timeout: 30000 }).should(($c) => {
+    const spans = epubElementSpansFromReaderTopPx($c.get(0) as HTMLElement, el)
+    expect(spans, `EPUB ${el.label} rendered`).to.have.length(1)
+    const [span] = spans
+    if (span)
+      check({ top: Math.round(span.top), bottom: Math.round(span.bottom) })
+  })
+}
+
+/**
+ * Scrolls the reader down in steps until the element is rendered, then scrolls its top
+ * `passPx` above the top of the reader's view.
+ */
+function scrollEpubReaderUntilElementPassesTop(
+  el: EpubReaderElement,
+  passPx: number
+) {
+  ensureOnBookReadingPage()
+  const maxSteps = 48
+  const step = (n: number): Cypress.Chainable =>
+    cy.get(EPUB_READER_VIEW, { timeout: 30000 }).then(($c) => {
+      const container = $c.get(0) as HTMLElement
+      const [span] = epubElementSpansFromReaderTopPx(container, el)
+      if (span !== undefined) {
+        // epub.js drops the first scroll event after its own silent scroll adjustment, so a
+        // single jump may go unreported; a reader's scroll is many events, and a final 1 px
+        // step stands in for them.
+        container.scrollTop += span.top + passPx + 1
+        cy.wait(300)
+        return cy.then(() => {
+          container.scrollTop -= 1
+          cy.wait(300)
+        })
+      }
+      if (n >= maxSteps) {
+        throw new Error(
+          `EPUB ${el.label} not rendered after ${maxSteps} scroll steps`
+        )
+      }
+      container.scrollTop += Math.ceil(container.clientHeight * 0.85)
+      cy.wait(200)
+      return step(n + 1)
+    })
+  return cy.then(() => step(0))
+}
 
 export const bookReadingEpubMethods = () => ({
   expectEpubTextUsesScreenWidth() {
@@ -96,53 +172,38 @@ export const bookReadingEpubMethods = () => ({
    * (`.epub-container`), within a few pixels.
    */
   expectEpubHeadingAtTopOfReader(headingText: string) {
-    ensureOnBookReadingPage()
-    const tolerancePx = 8
-    cy.get(EPUB_READER_VIEW, { timeout: 30000 }).should(($c) => {
-      const offsets = epubHeadingOffsetsFromReaderTopPx(
-        $c.get(0) as HTMLElement,
-        headingText
-      )
-      expect(offsets, `EPUB heading "${headingText}" rendered`).to.have.length(
-        1
-      )
-      const offset = Math.round(offsets[0] ?? Number.NaN)
+    expectEpubElementSpan(heading(headingText), ({ top }) =>
       expect(
-        Math.abs(offset),
-        `EPUB heading "${headingText}" should be at the top of the reader, but its top is ${offset}px from the reader's top`
-      ).to.be.at.most(tolerancePx)
-    })
+        Math.abs(top),
+        `EPUB heading "${headingText}" should be at the top of the reader, but its top is ${top}px from the reader's top`
+      ).to.be.at.most(TOP_TOLERANCE_PX)
+    )
     return this
   },
   /**
-   * Scrolls the reader down in steps until the heading is rendered, then scrolls it just
-   * above the top of the reader's view.
+   * The paragraph (found by its opening text) crosses the top edge of the reader's scrolled
+   * view: its top is at or above the reader top and its bottom below it (within a few pixels).
    */
+  expectEpubParagraphAtTopOfReader(paragraphText: string) {
+    expectEpubElementSpan(
+      paragraph(paragraphText),
+      ({ top, bottom }) =>
+        expect(
+          top <= TOP_TOLERANCE_PX && bottom > TOP_TOLERANCE_PX,
+          `EPUB paragraph "${paragraphText}" should cross the top of the reader, but it spans ${top}px to ${bottom}px from the reader's top`
+        ).to.be.true
+    )
+    return this
+  },
   scrollEpubReaderUntilHeadingPassesTop(headingText: string) {
-    ensureOnBookReadingPage()
-    const maxSteps = 48
-    const step = (n: number): Cypress.Chainable =>
-      cy.get(EPUB_READER_VIEW, { timeout: 30000 }).then(($c) => {
-        const container = $c.get(0) as HTMLElement
-        const [offset] = epubHeadingOffsetsFromReaderTopPx(
-          container,
-          headingText
-        )
-        if (offset !== undefined) {
-          container.scrollTop += offset + 10
-          cy.wait(300)
-          return cy.wrap(null)
-        }
-        if (n >= maxSteps) {
-          throw new Error(
-            `scrollEpubReaderUntilHeadingPassesTop: heading "${headingText}" not rendered after ${maxSteps} steps`
-          )
-        }
-        container.scrollTop += Math.ceil(container.clientHeight * 0.85)
-        cy.wait(200)
-        return step(n + 1)
-      })
-    return cy.then(() => step(0))
+    return scrollEpubReaderUntilElementPassesTop(heading(headingText), 10)
+  },
+  /**
+   * Parks the paragraph's top just above the reader top, so the reading place saved from
+   * this view points into the paragraph's first line.
+   */
+  scrollEpubReaderUntilParagraphIsAtTop(paragraphText: string) {
+    return scrollEpubReaderUntilElementPassesTop(paragraph(paragraphText), 3)
   },
   /**
    * Navigate away via the GlobalBar "Notebook" link, wait for the pending reading-position

@@ -4,7 +4,7 @@
     format="pdf"
     :book-name="book.bookName"
     :load-error="pdfViewerLoadError"
-    :snap-animation-key="snapAnimationKey"
+    @overlay-wheel="pdfViewerRef?.scrollByWheel($event)"
   >
     <template #bar-end>
       <PdfControl
@@ -45,7 +45,7 @@ import {
   type PdfViewportPayload,
 } from "@/composables/book-reading/usePdfViewportPosition"
 import { READING_PANEL_OBSTRUCTION_PX } from "@/composables/useReadingPanelAnchor"
-import { useBookReadingSnapBack } from "@/composables/useBookReadingSnapBack"
+import { useReadingPanelTarget } from "@/composables/useReadingPanelTarget"
 import type { BookReadingPdfViewerRef } from "@/composables/bookReaderViewerRef"
 import { useBookReadingSession } from "@/composables/useBookReadingSession"
 import type { BookBlockFull, BookFull } from "@generated/donut-backend-api"
@@ -57,7 +57,6 @@ const emit = defineEmits<{
   "update:book": [book: BookFull]
 }>()
 
-const SNAP_HOLD_MS = 500
 const STRUCTURAL_TITLE_MAX_CHARS = 512
 
 const props = withDefaults(
@@ -92,10 +91,8 @@ const session = useBookReadingSession({
     showBlock,
     readingPositionLocator,
     viewer: pdfViewerRef,
-    commitCurrentBlock: commitCurrentBlockId,
-    blockAwaitingConfirmation: () => snapBlockAwaitingConfirmation.value,
-    canAnchorPanel: () => lastContentBottomVisible.value,
-    onMarkedRead: (id) => clearSnapbackAttemptsForBlock(id),
+    blockAwaitingConfirmation: () => readingPanelTargetBlock.value,
+    anchoredBlock: () => readingPanelAnchoredBlock.value,
     repairSelection: true,
     reorganize: { onBookUpdated: (book) => emit("update:book", book) },
   },
@@ -123,30 +120,17 @@ async function showBlock(block: BookBlockFull) {
 }
 
 const {
-  snapAnimationKey,
-  blockAwaitingConfirmation: snapBlockAwaitingConfirmation,
-  lastContentBottomVisible,
-  shouldSnapBack,
-  performSnapBack,
+  blockAwaitingConfirmation: readingPanelTargetBlock,
+  anchoredBlock: readingPanelAnchoredBlock,
   updateLastDirectContentGeometry,
-  clearSnapbackAttemptsForBlock,
-} = useBookReadingSnapBack({
+} = useReadingPanelTarget({
   bookBlocks,
   selectedBlockId,
   currentBlockId,
   hasRecordedDisposition: bookReading.hasRecordedDisposition,
   pdfViewerRef,
   obstructionPx: READING_PANEL_OBSTRUCTION_PX,
-  snapHoldMs: SNAP_HOLD_MS,
 })
-
-function commitCurrentBlockId(id: number | null): boolean {
-  if (shouldSnapBack(id)) {
-    performSnapBack()
-    return false
-  }
-  return true
-}
 
 /** PdfBookViewer's viewport → the debounced current block, panel anchor, and reading position. */
 function onViewportAnchorPage(payload: PdfViewportPayload) {

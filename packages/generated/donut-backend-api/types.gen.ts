@@ -54,6 +54,7 @@ export type ContentLocatorFull = {
 export type EpubLocatorFull = Omit<ContentLocatorFull, 'type'> & {
     href: string;
     fragment?: string;
+    cfi?: string;
     type: 'EpubLocator_Full';
 };
 

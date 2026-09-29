@@ -29,6 +29,11 @@ export function clampScrollAxis(
   return Math.min(max, Math.max(0, value))
 }
 
+/** A ctrl/meta wheel zooms the PDF; a plain wheel scrolls it. */
+export function isZoomWheel(event: WheelEvent): boolean {
+  return event.ctrlKey || event.metaKey
+}
+
 /** Maps ctrl/meta wheel deltaY (pixels, typical trackpad) to a per-event scale multiplier. */
 export function wheelDeltaYToScaleFactor(deltaY: number): number {
   const factor = Math.exp(-deltaY * 0.002)

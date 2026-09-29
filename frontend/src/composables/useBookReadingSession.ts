@@ -34,13 +34,10 @@ export type BookReadingSurface = {
   readingPositionLocator: () => ContentLocatorFull | null
   /** Geometry used to anchor the Reading Control Panel. */
   viewer: Ref<Pick<BookReaderViewerRef, "readingPanelAnchorTopPx"> | null>
-  /** Returns false to keep the current block unchanged (PDF snap-back). */
-  commitCurrentBlock?: (id: number | null) => boolean
-  /** PDF snap-back decides which block awaits confirmation. */
+  /** PDF's reading panel target decides which block awaits confirmation. */
   blockAwaitingConfirmation?: () => BookBlockFull | null
-  /** PDF anchors the panel only while the block's last content is visible. */
-  canAnchorPanel?: () => boolean
-  onMarkedRead?: (blockId: number) => void
+  /** PDF anchors the panel to this block, only while its last content is visible. */
+  anchoredBlock?: () => BookBlockFull | null
   /** PDF keeps the selection valid when the blocks change. */
   repairSelection?: boolean
   /** EPUB re-anchors the panel after the records sync and after showing a block. */
@@ -67,7 +64,6 @@ export function useBookReadingSession(options: {
   const { currentBlockId, currentBlockIdDebouncer, proposeReadingPosition } =
     useBookReadingCurrentBlock({
       notebookId,
-      commitCurrentBlock: (id) => surface.commitCurrentBlock?.(id) ?? true,
       flushPositionOnLeave: surface.flushPositionOnLeave,
       readingPosition: () => {
         const locator = surface.readingPositionLocator()
@@ -91,7 +87,6 @@ export function useBookReadingSession(options: {
     selectedBlockId,
     repairSelection: surface.repairSelection,
     blockAwaitingConfirmation: surface.blockAwaitingConfirmation,
-    onMarkedRead: surface.onMarkedRead,
     onAdvance: async (block) => {
       await surface.showBlock(block)
       if (surface.reanchorPanelAfterSyncAndShow) await reanchorPanel()
@@ -102,9 +97,9 @@ export function useBookReadingSession(options: {
     useReadingPanelAnchor({
       viewerRef: surface.viewer,
       blockRef: computed(() =>
-        (surface.canAnchorPanel?.() ?? true)
-          ? blockAwaitingConfirmation.value
-          : null
+        surface.anchoredBlock
+          ? surface.anchoredBlock()
+          : blockAwaitingConfirmation.value
       ),
       mainPaneRef: mainPane,
     })

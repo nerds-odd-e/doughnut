@@ -24,7 +24,6 @@ export function useBookReadingSelection(options: {
   blockAwaitingConfirmation?: () => BookBlockFull | null
   /** Keeps the selection on an existing block (the first) when the blocks change. */
   repairSelection?: boolean
-  onMarkedRead?: (blockId: number) => void
   selectedBlockId: Ref<number | null>
 }): {
   blockAwaitingConfirmation: ComputedRef<BookBlockFull | null>
@@ -40,7 +39,6 @@ export function useBookReadingSelection(options: {
     submitReadingDisposition,
     onAdvance,
     repairSelection = false,
-    onMarkedRead,
     selectedBlockId,
   } = options
 
@@ -92,9 +90,6 @@ export function useBookReadingSelection(options: {
     const ok = await submitReadingDisposition(block.id, status)
     if (!ok) {
       return
-    }
-    if (status === "READ") {
-      onMarkedRead?.(block.id)
     }
     const next = nextBookBlockAfter(toValue(bookBlocks), block.id)
     if (next) {

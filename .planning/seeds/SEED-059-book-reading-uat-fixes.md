@@ -72,62 +72,6 @@ reading a book end to end.
 
 Effort bands: S = 30–60 minutes, M = 1–2 hours, L = 2–4 hours, including delivery.
 
-<a id="story-5"></a>
-
-### Scroll a PDF smoothly right after choosing a block
-
-**Identity:** SEED-059#story-5
-```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/053-pdf-smooth-scroll-after-choosing-block/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"539e46a16a7b820bf4bc9777266cd200f6c5ecf800bb1e6166388cfa44de8ed7","plan":"591165dbf17b9e072f0fd9ecb222f4d93d6b6aa8cedd90ee592aeb35dab88f4d"}}
-```
-
-**Goal:** A PDF reader's view moves only where they scroll it, from the first
-wheel step after choosing a block, wherever the pointer rests. Today the start
-of every reading run jerks back by up to a screen, and the view can seem frozen,
-which makes reading a book in Donut feel broken rather than smooth.
-
-**Scope**
-
-- **Nothing pulls the reader back** (owner decision, 2026-09-29). The
-  snap-back reminder is removed: scrolling past an unmarked block into the next
-  one no longer moves the view back to it, and no wheel steps are ignored
-  afterwards. Cause (read in code, 2026-09-29): snap-back pulls the view back
-  up to twice per block and ignores wheel steps for 500 ms after each pull,
-  which matches the UAT's two backward jumps per run. The Read/Skim/Skip panel,
-  which already appears at the block's end and after scrolling past it, stays
-  the only reminder.
-- **Any other backward jump in the first second is in scope too.** The promise
-  is that each downward wheel step moves the view down, whatever causes a jump.
-- **The Reading Control Panel never stops scrolling.** Wheeling with the pointer
-  over the PDF panel scrolls the book, as the EPUB panel already allows. Its
-  buttons still work.
-- **Deferred:** the panel's position, look, and the text it covers; EPUB
-  scrolling; keeping the current block at the layout's edge in short viewports.
-- **Must keep working:** PDF landing on the exact page with the heading at the
-  top, the current block following scrolling, the panel appearing at the
-  block's end and after scrolling past it, the panel moving on to the next block
-  once the selected one is marked, Read/Skim/Skip and resume, and layout
-  editing.
-
-**Key examples**
-
-- In *Think Python*, choose "8.1 A string is a sequence", then wheel down in
-  400 px steps every 120 ms → every step moves the view down (today
-  `+400, +400, −156, +400, −800, +400…`). The same after choosing 14.6, and 3.1
-  in the *Attention* paper.
-- Choose a block, scroll past its end into the next block without marking it →
-  the view stays where the reader scrolled, and the panel is still offered for
-  the chosen block.
-- With the pointer resting at the centre of the PDF, wheel down until the panel
-  arrives under the pointer, and keep wheeling → the book keeps scrolling
-  (today 0 px for 12 steps); clicking *Read* on the panel still marks the block.
-
-**UAT evidence:** defects 3 and 4 in the report linked under *Why This
-Matters*. Snap-back has unit tests but no E2E scenario.
-
-**Effort hypothesis:** S–M, medium confidence.
-**Depends on:** none.
-
 <a id="story-7"></a>
 
 ### Fix a book layout by hand in a few steps
@@ -371,66 +315,13 @@ marking goes on after choosing a block with no text of its own.
 
 **Effort hypothesis:** M–L, low confidence. Provisional slices:
 [plan 058](../slice-plans/058-current-block-same-in-pdf-and-epub/PLAN.md).
-**Depends on:** story 5 (it removes snap-back from the same PDF pipeline).
+**Depends on:** none (snap-back is removed).
 "No text of its own" is `hasNoTextOfItsOwn` in
 `frontend/src/lib/book-reading/bookBlockDirectContent.ts` (a PDF heading-only
 block, or an EPUB block whose only content is its start anchor); auto-mark
-already uses it. Snap-back's `hasDirectContent` (`useBookReadingSnapBack.ts`)
-still means "more than one locator" and should use it too.
-
-<a id="story-17"></a>
-
-### Reopen an EPUB at the exact paragraph
-
-**Identity:** SEED-059#story-17
-```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/059-reopen-epub-at-exact-paragraph/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"798dc7a92f6a9fe43f74e2812a5911d0bcb181d0e6dd602da24557374dfd578f","plan":"40791cf42bd5eafd7afd83659fb37d0f263e85e93a223d8a7e0542e088b17b89"}}
-```
-
-**Goal:** A reader who stops part-way through a long EPUB block reopens the
-book at the same paragraph, on any window width, as PDF readers already reopen
-at their page and offset. Long chapters (Origin chapter IV is over 13,000 px)
-stop sending the reader back to the chapter heading to search for their place.
-
-**Scope**
-
-- **The last-read EPUB position names the paragraph at the top of the view.**
-  Today it holds only the current block's start, and it is saved only when the
-  current block changes. It gains an optional exact reading place (epub.js's
-  CFI), saved as the reader scrolls within a block too, not only when the
-  current block changes. A pixel offset is not enough, because text reflows at
-  other widths.
-- **Reopening lands on that paragraph.** The paragraph that was at the top of
-  the view is at the top again; paragraph precision is the promise, not the
-  same line or pixel. The current block on reopen follows the existing
-  current-block rule from what is then in view.
-- **The block start still drives choosing and the current block.** Choosing a
-  block lands at its start as today; the exact place only affects reopening.
-- **Boundary assumptions:**
-  - a position saved before this story, without an exact place, reopens at its
-    block start as today;
-  - an exact place that no longer resolves reopens at its block start, through
-    the existing fallback, with no new message.
-- **Deferred:** PDF resume is unchanged; no "resume here" prompt, history of
-  positions, or cross-device merging beyond the one last-read position.
-- **Precision risk:** whether epub.js's CFI is paragraph-precise in Donut's
-  continuous scrolled mode is unverified. If it is not, stop and bring the
-  options back to the owner before building on it.
-
-**Key examples**
-
-- Read to the middle of Origin chapter IV at 1440 px wide, leave, and reopen at
-  390 px wide → the paragraph that was at the top is at the top, and chapter IV
-  is the current block.
-- Choose chapter IV, leave without scrolling, and reopen → chapter IV's heading
-  is at the top, as today.
-- A book whose last-read position was saved before this story → reopens at the
-  saved block's start, as today.
-
-**Effort hypothesis:** M, low confidence (CFI precision in continuous scrolled
-mode is unverified; probed first). Slices:
-[plan 059](../slice-plans/059-reopen-epub-at-exact-paragraph/PLAN.md).
-**Depends on:** none.
+already uses it. The reading panel target's `hasDirectContent`
+(`useReadingPanelTarget.ts`) still means "more than one locator" and should
+use it too.
 
 <a id="story-18"></a>
 
@@ -452,8 +343,8 @@ Panel at the end of that paragraph, as they do for blocks with more text.
   paragraph, so `useReadingPanelAnchor` gives no anchor for a heading plus one
   paragraph. It should agree with `hasNoTextOfItsOwn`: only a block with no
   text of its own has no anchor.
-- **Check snap-back too:** `useBookReadingSnapBack.ts` also uses
-  `lastDirectContentLocator`; story 16 owns snap-back's other rules.
+- **Check the panel target too:** `useReadingPanelTarget.ts` also uses
+  `lastDirectContentLocator`; story 16 owns its other rules.
 
 **Key examples**
 
@@ -462,7 +353,7 @@ Panel at the end of that paragraph, as they do for blocks with more text.
 - A PDF block with a heading and paragraphs still anchors as today.
 
 **Effort hypothesis:** S, low confidence.
-**Depends on:** none; coordinate with story 16 on snap-back.
+**Depends on:** none; coordinate with story 16 on the reading panel target.
 
 <a id="story-19"></a>
 
@@ -558,6 +449,34 @@ two views into one, not only one file. Slices:
 `BookReadingContent.vue` in SEED-059#story-2), and SEED-059#story-6 (change or
 clear a reading mark) added one binding line to each view in two slices while
 leaving the PDF view over the limit.
+
+<a id="story-20"></a>
+
+### Reopen at the block start when the saved exact EPUB place no longer resolves
+
+**Identity:** SEED-059#story-20
+```json dough-story-state
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/062-stale-epub-place-reopens-at-block-start/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"ac4d121184eea524ae2643a4127730c33a4745b4b313cc6a660a21f69f65580e","plan":"214bdfa528820cfd4e1fb5c346953c914dc07a0abc881e9cdb9aa444579215b8"}}
+```
+
+**Goal:** A reader whose saved exact EPUB place (CFI) no longer resolves
+reopens at the start of the block they were reading, as
+story 17 promised (SEED-059#story-17, closed; recoverable at `e505a489f9:.planning/seeds/SEED-059-book-reading-uat-fixes.md`), not at the book's cover. This is a
+retrospective correction of story 17; it adds no feature promise.
+
+**Scope**
+
+- Reopening an EPUB whose stored exact place epub.js cannot display falls back
+  to the stored block start (href#fragment), then to the book start, with no
+  new message.
+- One display rule in the EPUB viewer serves reopening and choosing a block;
+  the reading-page bootstrap stops applying its own href-only check.
+- **Excluded:** an exact place that epub.js does display, but somewhere else
+  (for example after the book file was replaced by another edition); the PDF
+  reader; the dropped first scroll event noted in story 17's plan.
+
+**Correction input and slices:**
+[plan 062](../slice-plans/062-stale-epub-place-reopens-at-block-start/PLAN.md).
 
 ## Ordering and Scope Reduction
 

@@ -8,7 +8,7 @@
       ref="epubViewerRef"
       :epub-bytes="epubBytes"
       :book="book"
-      :initial-locator="initialLocatorDisplayHref"
+      :initial-locator="initialLocator"
       @relocated="onEpubRelocated"
     />
   </BookReadingShell>
@@ -19,10 +19,7 @@ import BookReadingShell from "@/components/book-reading/BookReadingShell.vue"
 import EpubBookViewer from "@/components/book-reading/EpubBookViewer.vue"
 import type { BookReaderViewerRef } from "@/composables/bookReaderViewerRef"
 import { useBookReadingSession } from "@/composables/useBookReadingSession"
-import {
-  asEpubLocator,
-  epubDisplayHref,
-} from "@/lib/book-reading/asEpubLocator"
+import { asEpubLocator } from "@/lib/book-reading/asEpubLocator"
 import {
   currentBlockIdFromEpubView,
   type EpubViewBlockStarts,
@@ -33,7 +30,7 @@ import type {
   ContentLocatorFull,
   EpubLocatorFull,
 } from "@generated/donut-backend-api"
-import { computed, onBeforeUnmount, onMounted, ref } from "vue"
+import { onBeforeUnmount, onMounted, ref } from "vue"
 
 type EpubViewerExposed = Pick<
   BookReaderViewerRef,
@@ -41,7 +38,10 @@ type EpubViewerExposed = Pick<
   | "resolveLocatorRect"
   | "isLocatorBottomVisible"
   | "readingPanelAnchorTopPx"
-> & { viewBlockStarts: () => EpubViewBlockStarts | null }
+> & {
+  viewBlockStarts: () => EpubViewBlockStarts | null
+  currentCfi: () => string | undefined
+}
 
 const props = withDefaults(
   defineProps<{
@@ -52,15 +52,6 @@ const props = withDefaults(
   }>(),
   { initialLocator: null, initialSelectedBlockId: null }
 )
-
-const initialLocatorDisplayHref = computed(() => {
-  const epub = asEpubLocator(props.initialLocator ?? undefined)
-  if (!epub) {
-    return null
-  }
-  const s = epubDisplayHref(epub)
-  return s.length > 0 ? s : null
-})
 
 const epubViewerRef = ref<EpubViewerExposed | null>(null)
 
@@ -94,7 +85,10 @@ async function showBlock(block: BookBlockFull) {
 
 function readingPositionLocator(): EpubLocatorFull | null {
   const current = props.book.blocks.find((b) => b.id === currentBlockId.value)
-  return asEpubLocator(current?.contentLocators[0])
+  const blockStart = asEpubLocator(current?.contentLocators[0])
+  if (!blockStart) return null
+  const cfi = epubViewerRef.value?.currentCfi()
+  return cfi ? { ...blockStart, cfi } : blockStart
 }
 
 function currentBlockIdInView(): number | null {

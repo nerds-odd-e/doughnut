@@ -10,26 +10,14 @@ export type CurrentBlockIdDebouncer = {
 
 export function createCurrentBlockIdDebouncer(options: {
   delayMs: number
-  commit: (id: number | null) => boolean
 }): CurrentBlockIdDebouncer {
-  const { delayMs, commit } = options
   const currentBlockId = ref<number | null>(null)
-  let lastCommitted: number | null = null
 
-  const apply = (id: number | null) => {
-    if (id === lastCommitted) {
-      return
-    }
-    const prev = lastCommitted
-    lastCommitted = id
-    if (!commit(id)) {
-      lastCommitted = prev
-    } else {
-      currentBlockId.value = id
-    }
+  const commit = (id: number | null) => {
+    currentBlockId.value = id
   }
 
-  const debounced = debounce(apply, delayMs)
+  const debounced = debounce(commit, options.delayMs)
 
   return {
     currentBlockId: readonly(currentBlockId),
@@ -41,16 +29,7 @@ export function createCurrentBlockIdDebouncer(options: {
     },
     commitNow(id: number | null) {
       debounced.cancel()
-      if (id === lastCommitted) {
-        return
-      }
-      const prev = lastCommitted
-      lastCommitted = id
-      if (!commit(id)) {
-        lastCommitted = prev
-      } else {
-        currentBlockId.value = id
-      }
+      commit(id)
     },
   }
 }

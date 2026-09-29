@@ -117,6 +117,27 @@ export const bookReadingPdfMethods = () => ({
       .and('contain', selectedBlockTitle)
     return this
   },
+  wheelDownOverReadingControlPanel() {
+    waitUntilAppIsNotBusy()
+    cy.get('[data-testid="pdf-book-viewer"]').then(($viewer) => {
+      cy.wrap(($viewer[0] as HTMLElement).scrollTop).as(
+        'pdfScrollTopBeforeWheel'
+      )
+    })
+    cy.get('[data-testid="book-reading-reading-control-panel"] p').trigger(
+      'wheel',
+      { deltaY: 300 }
+    )
+    return this
+  },
+  expectPdfScrolledDownSinceWheel() {
+    cy.get<number>('@pdfScrollTopBeforeWheel').then((before) => {
+      cy.get('[data-testid="pdf-book-viewer"]').should(($viewer) => {
+        expect(($viewer[0] as HTMLElement).scrollTop).to.be.greaterThan(before)
+      })
+    })
+    return this
+  },
   expectContentBlockBboxOverlaysVisible() {
     waitUntilAppIsNotBusy()
     cy.get('[data-testid="pdf-book-viewer"]')
