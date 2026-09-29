@@ -104,7 +104,7 @@ does not cover the top bar. Add the book reading route to the "Note" area in
 
 ### 3. The book layout drawer behaves like the notebook sidebar drawer
 Type: Behavior
-Status: planned
+Status: done
 Proof: `phone_reading.feature` choose-block, backdrop, and below-the-menu
 scenarios; desktop book features and `note_tree_view.feature` green.
 
@@ -161,3 +161,19 @@ breakpoint module if nothing else needs it. The E2E page object's
   `expectBookLayoutOpen` and `expectBookLayoutClosed`. The closed phone aside
   is only moved off-screen, so Cypress's `be.visible` may still pass; "closed"
   checks rely on `aria-expanded` or position.
+- Slice 3 (done): `useSidebarDrawer` (768 px, `>= 768` is desktop, open state
+  decided in setup) and `SidebarDrawer.vue` (backdrop and aside below the main
+  menu) are the one drawer behavior. `useNotebookSidebarDrawer` wraps it for
+  the notebook sidebar; the book layout closes on choosing a block below
+  768 px. `bookReadingLayoutBreakpoint.ts` and its spec are deleted. Product
+  code is 51 lines smaller. Accepted proof: `phone_reading.feature` 7/7 (the
+  panel scenario now uses "2.1 …" chosen through the drawer),
+  `book_browsing` 5/5, `reading_record` 6/6, `reorganize_layout` 8/8,
+  `note_tree_view` 6/6, 388 unit tests, `vue-tsc` clean. No red check for the
+  new drawer scenarios; the tap-outside scenario would also pass on the old
+  code (its backdrop closed the drawer too).
+- On a phone the book drawer now starts below the main menu and its backdrop
+  no longer covers the menu, matching the notebook drawer.
+- `BookReadingContent.vue` is 453 lines (was 474), over the 250-line
+  file-size guideline; splitting its PDF reading orchestration is outside this
+  story.

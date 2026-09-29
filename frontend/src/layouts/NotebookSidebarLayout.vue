@@ -26,14 +26,13 @@
       />
     </GlobalBar>
     <div
-      v-if="!isMdOrLarger && sidebarOpened"
-      class="notebook-sidebar-drawer-backdrop fixed inset-x-0 bottom-0 bg-black/50 z-30"
-      @click="sidebarOpened = false"
-    />
-    <div
       class="h-full relative flex flex-1 min-h-0"
     >
-      <aside :class="sidebarClasses">
+      <SidebarDrawer
+        v-model:opened="sidebarOpened"
+        :is-md-or-larger="isMdOrLarger"
+        class="bg-base-200 w-72 transition-all ease-in-out flex flex-col overflow-x-visible"
+      >
         <Sidebar
           v-if="currentNotebookId != null"
           :key="currentNotebookId"
@@ -43,7 +42,7 @@
           :active-folder-realm="activeFolderRealm"
           :breadcrumb-folders="breadcrumbFolders"
         />
-      </aside>
+      </SidebarDrawer>
       <main
         class="flex-1 px-4 container mx-auto overflow-y-auto"
       >
@@ -84,6 +83,7 @@ import type {
 } from "@generated/donut-backend-api"
 import { PanelLeft, PanelLeftClose } from "@lucide/vue"
 import GlobalBar from "@/components/toolbars/GlobalBar.vue"
+import SidebarDrawer from "@/components/commons/SidebarDrawer.vue"
 import BreadcrumbWithCircle from "@/components/toolbars/BreadcrumbWithCircle.vue"
 import Sidebar from "@/components/notes/Sidebar.vue"
 import NoteCreationNewButton from "@/components/notes/NoteCreationNewButton.vue"
@@ -138,8 +138,10 @@ watch(
   { immediate: true }
 )
 
-const { sidebarOpened, isMdOrLarger, sidebarClasses } =
-  useNotebookSidebarDrawer(route, currentNotebookId)
+const { opened: sidebarOpened, isMdOrLarger } = useNotebookSidebarDrawer(
+  route,
+  currentNotebookId
+)
 
 const noteCreationReadonly = useSidebarCreationReadonly(currentUser, () => ({
   activeNoteRealm: activeNoteRealm.value,
@@ -155,24 +157,7 @@ const showRelocatedNoteCreationInMainColumn =
   )
 </script>
 
-<style scoped lang="scss">
-@use "@/assets/menu-variables.scss" as *;
-
-.notebook-sidebar-drawer {
-  @media (max-width: 768px) {
-    top: calc(#{$main-menu-height-mobile} + env(safe-area-inset-top, 0px));
-    bottom: 0;
-    height: auto;
-  }
-}
-
-.notebook-sidebar-drawer-backdrop {
-  @media (max-width: 768px) {
-    top: calc(#{$main-menu-height-mobile} + env(safe-area-inset-top, 0px));
-  }
-}
-
-aside,
+<style scoped>
 main {
   max-height: 100%;
 }

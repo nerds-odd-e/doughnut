@@ -117,10 +117,6 @@ import NewBookBlockTitleDialog from "@/components/book-reading/NewBookBlockTitle
 import PdfBookViewer from "@/components/book-reading/PdfBookViewer.vue"
 import PdfControl from "@/components/book-reading/PdfControl.vue"
 import ReadingControlPanel from "@/components/book-reading/ReadingControlPanel.vue"
-import {
-  BOOK_READING_LAYOUT_BREAKPOINT_PX,
-  bookLayoutAsideInitiallyOpen,
-} from "@/lib/book-reading/bookReadingLayoutBreakpoint"
 import { pdfLocatorsFromBlock } from "@/lib/book-reading/asPdfLocator"
 import { wireItemsToNavigationTargets } from "@/lib/book-reading/pdfOutlineV1Anchor"
 import { structuralTitleForBlockId } from "@/lib/book-reading/currentBlockLiveAnnouncement"
@@ -134,6 +130,7 @@ import { useBookReadingSnapBack } from "@/composables/useBookReadingSnapBack"
 import type { BookReadingPdfViewerRef } from "@/composables/bookReaderViewerRef"
 import { useBookReadingCurrentBlock } from "@/composables/useBookReadingCurrentBlock"
 import { useBookReadingSelection } from "@/composables/useBookReadingSelection"
+import { useSidebarDrawer } from "@/composables/useSidebarDrawer"
 import { useBookLayoutAiReorganize } from "@/composables/useBookLayoutAiReorganize"
 import { useNotebookBookReadingRecords } from "@/composables/useNotebookBookReadingRecords"
 import {
@@ -147,7 +144,7 @@ import type {
 } from "@generated/donut-backend-api"
 import { NotebookBooksController } from "@generated/donut-backend-api/sdk.gen"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
-import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue"
+import { computed, onMounted, ref, watch } from "vue"
 
 type ViewportPayload = {
   anchorPageIndexZeroBased: number
@@ -210,20 +207,7 @@ const lastReadingForPatch = computed(() => {
   }
 })
 
-const windowWidth = ref(
-  typeof window !== "undefined"
-    ? window.innerWidth
-    : BOOK_READING_LAYOUT_BREAKPOINT_PX
-)
-const bookLayoutOpened = ref(bookLayoutAsideInitiallyOpen(windowWidth.value))
-
-function handleResize() {
-  windowWidth.value = window.innerWidth
-}
-
-const isMdOrLarger = computed(
-  () => windowWidth.value >= BOOK_READING_LAYOUT_BREAKPOINT_PX
-)
+const { opened: bookLayoutOpened, isMdOrLarger } = useSidebarDrawer()
 
 function onPdfLoadError(message: string) {
   pdfViewerLoadError.value = message
@@ -464,11 +448,6 @@ async function onBackToSelected() {
 }
 
 onMounted(async () => {
-  window.addEventListener("resize", handleResize)
   await bookReading.syncFromServer()
-})
-
-onBeforeUnmount(() => {
-  window.removeEventListener("resize", handleResize)
 })
 </script>

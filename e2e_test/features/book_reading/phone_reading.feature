@@ -22,10 +22,11 @@ Feature: Reading a book on a phone
     Given I have a notebook "Refactoring read"
     And I attach a fake blank pdf book with book layout of "refactoring" to the notebook "Refactoring read"
     And I open the book attached to notebook "Refactoring read"
-    When I scroll the PDF book reader until the Reading Control Panel shows for "Code Refactoring"
+    When I choose the book block "2.1 Easier to Change—and Harder to Misuse"
+    And I scroll the PDF book reader until the Reading Control Panel shows for "2.1 Easier to Change—and Harder to Misuse"
     Then the Reading Control Panel should be fully on the screen
-    When I mark the book block "Code Refactoring" as read in the Reading Control Panel
-    Then I should see that book block "Code Refactoring" is marked as read in the book layout
+    When I mark the book block "2.1 Easier to Change—and Harder to Misuse" as read in the Reading Control Panel
+    Then I should see that book block "2.1 Easier to Change—and Harder to Misuse" is marked as read in the book layout
 
   Scenario: Open the book layout on a phone
     Given I have a notebook "Refactoring read"
@@ -33,6 +34,25 @@ Feature: Reading a book on a phone
     And I open the book attached to notebook "Refactoring read"
     When I tap the Book layout toggle
     Then the book layout should be open
+    And the book layout should be below the main menu
+
+  Scenario: Choosing a book block closes the book layout and moves the book there
+    Given I have a notebook "Refactoring read"
+    And I attach a fake blank pdf book with book layout of "refactoring" to the notebook "Refactoring read"
+    And I open the book attached to notebook "Refactoring read"
+    When I choose the book block "2.2 Refactoring as Strengthening the Code"
+    Then the book layout should be closed
+    And the book reader PDF viewport should be on page 2
+    And the book block "2.2 Refactoring as Strengthening the Code" should be the current selection in the book reader
+
+  Scenario: Tapping outside the book layout closes it and keeps the place
+    Given I have a notebook "Refactoring read"
+    And I attach a fake blank pdf book with book layout of "refactoring" to the notebook "Refactoring read"
+    And I open the book attached to notebook "Refactoring read"
+    When I tap the Book layout toggle
+    And I tap outside the book layout
+    Then the book layout should be closed
+    And the book reader PDF viewport should be on page 1
 
   Scenario: Reopen the book layout on a tablet
     Given I am on a window 768 * 1024

@@ -30,9 +30,15 @@ export const bookReadingLayoutMethods = () => ({
    * so PDF page jumps and EPUB spine navigation settle before the next step.
    * When the PDF page indicator is present, wait for it so page layers can settle
    * before selection highlights attach (including off-screen pages).
+   * Opens the layout first when it is closed (a phone drawer).
    */
   chooseBookBlockByTitle(title: string) {
     ensureOnBookReadingPage()
+    bookLayoutToggle().then(($toggle) => {
+      if ($toggle.attr('aria-expanded') === 'false') {
+        this.clickBookLayoutToggle()
+      }
+    })
     cy.get('[data-testid="book-reading-page"]').then(($page) => {
       if (
         $page.find('[data-testid="book-reading-page-indicator"]').length > 0
@@ -153,6 +159,25 @@ export const bookReadingLayoutMethods = () => ({
   },
   expectBookLayoutClosed() {
     bookLayoutToggle().should('have.attr', 'aria-expanded', 'false')
+    return this
+  },
+  expectBookLayoutBelowMainMenu() {
+    cy.get('.main-menu').then(($menu) => {
+      const menuBottom = $menu[0]!.getBoundingClientRect().bottom
+      cy.get(bookLayoutAside).should(($aside) => {
+        expect(
+          $aside[0]!.getBoundingClientRect().top,
+          'book layout top'
+        ).to.be.at.least(menuBottom)
+      })
+    })
+    return this
+  },
+  /** Tap the page beside the open phone drawer. */
+  tapOutsideBookLayout() {
+    cy.window().then((win) => {
+      cy.get('body').click(win.innerWidth - 10, win.innerHeight / 2)
+    })
     return this
   },
   setBookReadingViewport(width: number, height: number) {

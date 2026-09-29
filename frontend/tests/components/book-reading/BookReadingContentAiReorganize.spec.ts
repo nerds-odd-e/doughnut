@@ -1,4 +1,3 @@
-import { BOOK_READING_LAYOUT_BREAKPOINT_PX } from "@/lib/book-reading/bookReadingLayoutBreakpoint"
 import type { ApiStatus } from "@/managedApi/ApiStatusHandler"
 import {
   setupGlobalClient,
@@ -77,7 +76,7 @@ describe("BookReadingContent AI reorganize suggest", () => {
     Object.defineProperty(window, "innerWidth", {
       configurable: true,
       writable: true,
-      value: BOOK_READING_LAYOUT_BREAKPOINT_PX + 100,
+      value: 1024,
     })
 
     vi.spyOn(

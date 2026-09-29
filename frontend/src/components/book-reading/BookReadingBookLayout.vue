@@ -1,27 +1,14 @@
 <template>
-  <div
-    v-if="!isMdOrLarger && opened"
-    class="fixed inset-0 bg-black/50 z-30"
-    aria-hidden="true"
-    @click="closeOverlay"
-  />
   <div class="flex flex-1 min-h-0 relative">
-    <aside
+    <SidebarDrawer
       :id="panelId"
-      ref="asideRef"
+      v-model:opened="opened"
+      :is-md-or-larger="isMdOrLarger"
       data-testid="book-reading-book-layout-aside"
-      :class="[
-        'bg-base-200 w-72 min-w-[16rem] max-w-[min(20rem,85vw)] transition-transform ease-in-out duration-200 overflow-y-auto overflow-x-hidden',
-        isMdOrLarger
-          ? opened
-            ? 'relative shrink-0 border-r border-base-300'
-            : 'hidden'
-          : opened
-            ? 'translate-x-0 fixed top-0 left-0 z-40 h-full pt-[env(safe-area-inset-top)]'
-            : '-translate-x-full fixed top-0 left-0 z-40 h-full',
-      ]"
+      class="bg-base-200 w-72 min-w-[16rem] max-w-[min(20rem,85vw)] shrink-0 border-r border-base-300 transition-transform ease-in-out duration-200 overflow-y-auto overflow-x-hidden"
     >
       <div
+        ref="layoutRef"
         data-testid="book-reading-book-layout"
         class="p-3 pb-8"
       >
@@ -91,12 +78,13 @@
           </span>
         </button>
       </div>
-    </aside>
+    </SidebarDrawer>
     <slot />
   </div>
 </template>
 
 <script setup lang="ts">
+import SidebarDrawer from "@/components/commons/SidebarDrawer.vue"
 import { blockStartEpubDisplayHref } from "@/lib/book-reading/asEpubLocator"
 import { useBookLayoutBlockPointerDrag } from "@/composables/book-reading/useBookLayoutBlockPointerDrag"
 import type { BookBlockReadingDisposition } from "@/lib/book-reading/readBlockIdsFromRecords"
@@ -127,22 +115,21 @@ const emit = defineEmits<{
   requestAiReorganize: []
 }>()
 
-const asideRef = ref<HTMLElement | null>(null)
+const layoutRef = ref<HTMLElement | null>(null)
 
 const blockDrag = useBookLayoutBlockPointerDrag({
   indent: (block) => emit("blockIndent", block),
   outdent: (block) => emit("blockOutdent", block),
 })
 
-function closeOverlay() {
-  opened.value = false
-}
-
 function onBlockRowClick(block: BookBlockFull, e: MouseEvent) {
   if (blockDrag.consumeDragClick(e)) {
     return
   }
   emit("blockClick", block)
+  if (!props.isMdOrLarger) {
+    opened.value = false
+  }
 }
 
 /** Once the open layout has painted, act on the row marked by `selector`. */
@@ -161,7 +148,7 @@ function onOpenLayoutRow(
         if (!opened.value) {
           return
         }
-        const row = asideRef.value?.querySelector(selector)
+        const row = layoutRef.value?.querySelector(selector)
         if (row instanceof HTMLElement) {
           act(row)
         }
@@ -185,10 +172,6 @@ onOpenLayoutRow(
 
 <style scoped>
 @reference "@/assets/daisyui.css";
-
-aside {
-  max-height: 100%;
-}
 
 .book-reading-book-block {
   @apply flex w-full min-h-10 items-stretch gap-1 text-left rounded-none;

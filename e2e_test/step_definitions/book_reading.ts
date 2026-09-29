@@ -200,3 +200,11 @@ Then('the book layout should be open', () => {
 Then('the book layout should be closed', () => {
   bookReadingPage().expectBookLayoutClosed()
 })
+
+Then('the book layout should be below the main menu', () => {
+  bookReadingPage().expectBookLayoutBelowMainMenu()
+})
+
+When('I tap outside the book layout', () => {
+  bookReadingPage().tapOutsideBookLayout()
+})

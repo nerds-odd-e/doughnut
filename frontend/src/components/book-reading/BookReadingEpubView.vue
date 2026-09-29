@@ -60,6 +60,7 @@ import GlobalBar from "@/components/toolbars/GlobalBar.vue"
 import ReadingControlPanel from "@/components/book-reading/ReadingControlPanel.vue"
 import type { BookReaderViewerRef } from "@/composables/bookReaderViewerRef"
 import { useBookReadingCurrentBlock } from "@/composables/useBookReadingCurrentBlock"
+import { useSidebarDrawer } from "@/composables/useSidebarDrawer"
 import { useReadingPanelAnchor } from "@/composables/useReadingPanelAnchor"
 import { useBookReadingSelection } from "@/composables/useBookReadingSelection"
 import { useNotebookBookReadingRecords } from "@/composables/useNotebookBookReadingRecords"
@@ -67,10 +68,6 @@ import {
   asEpubLocator,
   epubDisplayHref,
 } from "@/lib/book-reading/asEpubLocator"
-import {
-  BOOK_READING_LAYOUT_BREAKPOINT_PX,
-  bookLayoutAsideInitiallyOpen,
-} from "@/lib/book-reading/bookReadingLayoutBreakpoint"
 import { currentBlockIdFromEpubLocation } from "@/lib/book-reading/currentBlockIdFromEpubLocation"
 import { splitEpubHref } from "@/lib/book-reading/epubHrefMatch"
 import type {
@@ -187,27 +184,11 @@ if (seedHref !== null && seedHref.length > 0) {
   currentBlockIdDebouncer.commitNow(props.initialSelectedBlockId)
 }
 
-const windowWidth = ref(
-  typeof window !== "undefined"
-    ? window.innerWidth
-    : BOOK_READING_LAYOUT_BREAKPOINT_PX
-)
 /**
- * Initialize synchronously so the book layout aside is rendered in its final open/closed
- * state before `EpubBookViewer` mounts. Otherwise epub.js sizes the rendition to the full
- * main width, then the aside appears and our resize observer triggers a `clear() + redisplay`
- * which can land on the wrong section for beginning-of-book saved positions.
+ * Decided synchronously so the book layout aside is in its final open/closed state before
+ * `EpubBookViewer` mounts; otherwise a late resize can redisplay the wrong section.
  */
-const bookLayoutOpened = ref(bookLayoutAsideInitiallyOpen(windowWidth.value))
-
-function handleResize() {
-  windowWidth.value = window.innerWidth
-  updateReadingPanelAnchor()
-}
-
-const isMdOrLarger = computed(
-  () => windowWidth.value >= BOOK_READING_LAYOUT_BREAKPOINT_PX
-)
+const { opened: bookLayoutOpened, isMdOrLarger } = useSidebarDrawer()
 
 const { readingPanelAnchorTopPx, updateReadingPanelAnchor } =
   useReadingPanelAnchor({
@@ -236,13 +217,13 @@ async function onBookBlockClick(block: BookBlockFull) {
 }
 
 onMounted(async () => {
-  window.addEventListener("resize", handleResize)
+  window.addEventListener("resize", updateReadingPanelAnchor)
   await bookReading.syncFromServer()
   await nextTick()
   updateReadingPanelAnchor()
 })
 
 onBeforeUnmount(() => {
-  window.removeEventListener("resize", handleResize)
+  window.removeEventListener("resize", updateReadingPanelAnchor)
 })
 </script>
