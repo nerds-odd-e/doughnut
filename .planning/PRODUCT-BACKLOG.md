@@ -8,7 +8,6 @@ Bug fixing and general maintenance.
 ## Taken
 
 - [Refresh recall automatically at each local half-day boundary](seeds/SEED-056-recall-half-day-refresh.md#story-1) — SEED-056#story-1 ([plan](slice-plans/014-recall-half-day-refresh/PLAN.md))
-- [EPUB resume tests say what the product does, and one lookup finds a locator's rendered view](seeds/SEED-059-book-reading-uat-fixes.md#story-14) — SEED-059#story-14 ([plan](slice-plans/055-epub-resume-tests-and-rendered-view/PLAN.md))
 
 ## Backlog list
 
