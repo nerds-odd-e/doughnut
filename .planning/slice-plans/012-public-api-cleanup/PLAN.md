@@ -42,7 +42,7 @@ MCP, docs, and agent guidance for mentions. Nothing asserts the removed endpoint
 | Recall diagnostics own a closed code island | Trace of `UserController.java:215-244` | Dead with them: `RecallStatsService.computeConvergentValidity`/`computeEzDiffusion`, `RecallEzDiffusion`, `EzDiffusion`, `RecallProbeConvergentValidity`, `RecallEzDiffusionDTO`, `DailyProbeConvergentValidityDTO`, and 5 test classes. `RecallPaceAggregator.ABSOLUTE_FLOOR_MS`/`HARD_DROP_MS` and `DailyProbeDaySeries.latestByLocalDay` lose their only outside caller. No table orphaned |
 | Revoke token owns only one helper | Trace of `UserController.java:127-151` | `persistedUserTokenFromBearerOrThrow` dies; `bearerTokenFromRequestOrThrow`, `findTokenByToken`, `UserService.deleteToken` stay |
 | Notebook-addressed Book file owns one service method | `git grep -n "getNotebookBookFile\|notebookBookFileFromBook" -- backend/src` | `BookService.getNotebookBookFile` is used only by this endpoint; `notebookBookFileFromBook` stays (used by `BooksController`). Three test classes read bytes through it: `NotebookBooksBookFileControllerTest` (exercises the endpoint), `NotebookBooksAttachControllerTest:77`, `NotebookBooksAttachNotebookFileControllerTest:53,76` (observe attached bytes) |
-| All five file-serving endpoints share one byte store | Trace: all read through `NotebookAttachmentFile.bytes`; Book endpoints share `BookSourceFile.read`; image endpoints share `InlineImage.of` | Yes; only the Book endpoints set ETag/304/Cache-Control |
+| All file-serving endpoints share one byte store | Trace: all read through `NotebookAttachmentFile.bytes`; Book endpoints share `BookSourceFile.read`; image endpoints share `InlineImage.of` | Yes; only the Book endpoints set ETag/304/Cache-Control |
 
 ## Commands
 
@@ -149,7 +149,10 @@ through `BooksController` for the attached Book.
 
 ### 6. The owner can decide on file-serving consolidation
 Type: Behavior
-Status: planned
+Status: done
+Accepted: `## File-serving proposal` in the seed recommends retiring `GET /api/books/{book}/file`
+in favor of `/attachments/{attachment}/content` with its caching, and keeping both image endpoints;
+cited handlers and the reader's hand-built URL re-read against the code.
 Proof: a `## File-serving proposal` section in the seed, reviewed against the code it cites.
 
 Behavior: the four remaining file-serving endpoints (`/api/books/{book}/file`,
