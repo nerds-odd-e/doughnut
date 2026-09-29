@@ -119,7 +119,7 @@ unchanged. Enables slice 3.
 
 ### 3. A PDF with bookmarks gets one block per bookmark
 Type: Behavior
-Status: planned
+Status: done
 Proof: controller test (attach, then read the book view) with an in-code PDF
 holding top-level `/XYZ` bookmarks, plus the unchanged no-bookmark tests.
 
@@ -176,3 +176,14 @@ unproved and report it; do not claim them from slices 3–5.
   of its first item in `items`. The MinerU entry point removes headings from
   `items`; bookmark entries (slice 3) keep the full content list as `items` and
   use a `beginning_anchor`-style `startBlock`.
+- Slice 3: `PdfBookmarkReader.read` loads the PDF once (readability check +
+  bookmarks as `Bookmark(level, title, pageIdx, y)`); it reads only top-level
+  `/XYZ` destinations and casts, so other destinations fail loudly until slice
+  4 (recurse `children()` with level + 1; resolve named destinations; top only
+  for `/XYZ` with top ≠ −1, else y = 0; mind `MAX_LAYOUT_DEPTH`).
+  `buildLayoutFromBookmarks` falls back to headings without bookmarks. One
+  `beginningAnchor(pageIdx, bbox)` builds both anchors; a bookmark anchor's bbox
+  is `[0, y, 1000, y + 1]` (check highlight/current block in slice 5). Test PDFs
+  live in `controllers/TestPdfs` (`pdfWithBookmarks`). A content item without
+  `page_idx` in a bookmarked PDF fails loudly (MinerU always supplies it).
+  Accepted proof: `NotebookBooksAttachContentControllerTest$AttachPdfWithBookmarks`.

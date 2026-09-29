@@ -6,11 +6,11 @@ import static com.odde.donut.controllers.NotebookBooksControllerTestBase.epubAtt
 import static com.odde.donut.controllers.NotebookBooksControllerTestBase.epubFile;
 import static com.odde.donut.controllers.NotebookBooksControllerTestBase.lastReadBody;
 import static com.odde.donut.controllers.NotebookBooksControllerTestBase.node;
-import static com.odde.donut.controllers.NotebookBooksControllerTestBase.onePagePdf;
 import static com.odde.donut.controllers.NotebookBooksControllerTestBase.pdfFile;
 import static com.odde.donut.controllers.NotebookBooksControllerTestBase.readFixtureEpubValidMinimal;
 import static com.odde.donut.controllers.NotebookBooksControllerTestBase.rootBlocksSorted;
 import static com.odde.donut.controllers.NotebookBooksControllerTestBase.webRequest;
+import static com.odde.donut.controllers.TestPdfs.onePagePdf;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;

@@ -14,7 +14,8 @@ import java.util.Map;
  *
  * <p>An ordered list of {@link OutlineEntry outline entries} splits the content items: each item
  * belongs to the last entry at or before it, and items before the first entry go to {@code
- * *beginning*}. MinerU headings are one source of entries.
+ * *beginning*}. PDF bookmarks, when the book has them, supply the entries; otherwise MinerU
+ * headings do.
  */
 public final class MineruContentListLayoutBuilder {
 
@@ -24,17 +25,33 @@ public final class MineruContentListLayoutBuilder {
    */
   record OutlineEntry(int level, String title, Map<String, Object> startBlock, int firstItem) {}
 
+  /** A PDF bookmark at {@code y} (0–1000 from the top) on page {@code pageIdx}. */
+  record Bookmark(int level, String title, int pageIdx, double y) {}
+
   private MineruContentListLayoutBuilder() {}
+
+  static AttachBookLayoutRequest buildLayoutFromBookmarks(
+      List<Bookmark> bookmarks, List<?> contentList) {
+    if (bookmarks.isEmpty()) {
+      return buildLayout(contentList);
+    }
+    List<Map<String, Object>> items = contentItems(contentList);
+    List<OutlineEntry> entries = new ArrayList<>();
+    int next = 0;
+    for (Bookmark bookmark : bookmarks) {
+      while (next < items.size() && isBefore(items.get(next), bookmark)) {
+        next++;
+      }
+      entries.add(
+          new OutlineEntry(bookmark.level(), bookmark.title(), bookmarkAnchor(bookmark), next));
+    }
+    return buildLayout(entries, items);
+  }
 
   public static AttachBookLayoutRequest buildLayout(List<?> contentList) {
     List<Map<String, Object>> items = new ArrayList<>();
     List<OutlineEntry> entries = new ArrayList<>();
-    for (Object el : contentList) {
-      if (!(el instanceof Map<?, ?> rawMap)) {
-        continue;
-      }
-      @SuppressWarnings("unchecked")
-      Map<String, Object> item = (Map<String, Object>) rawMap;
+    for (Map<String, Object> item : contentItems(contentList)) {
       Integer level = headingLevel(item);
       if (level == null) {
         items.add(item);
@@ -80,14 +97,37 @@ public final class MineruContentListLayoutBuilder {
     return layout;
   }
 
+  private static List<Map<String, Object>> contentItems(List<?> contentList) {
+    List<Map<String, Object>> items = new ArrayList<>();
+    for (Object el : contentList) {
+      if (el instanceof Map<?, ?> rawMap) {
+        @SuppressWarnings("unchecked")
+        Map<String, Object> item = (Map<String, Object>) rawMap;
+        items.add(item);
+      }
+    }
+    return items;
+  }
+
+  private static boolean isBefore(Map<String, Object> item, Bookmark bookmark) {
+    int pageIdx = ((Number) item.get("page_idx")).intValue();
+    if (pageIdx != bookmark.pageIdx()) {
+      return pageIdx < bookmark.pageIdx();
+    }
+    return item.get("bbox") instanceof List<?> bbox
+        && ((Number) bbox.get(1)).doubleValue() < bookmark.y();
+  }
+
+  private static Map<String, Object> bookmarkAnchor(Bookmark bookmark) {
+    return beginningAnchor(
+        bookmark.pageIdx(), List.of(0.0, bookmark.y(), 1000.0, bookmark.y() + 1));
+  }
+
   private static AttachBookLayoutNodeRequest beginningNode(List<Map<String, Object>> orphans) {
     for (int i = 0; i < orphans.size(); i++) {
-      Map<String, Object> anchorPayload = beginningAnchorPayload(orphans.get(i));
-      if (anchorPayload.get("page_idx") != null && isValidBbox(anchorPayload.get("bbox"))) {
-        Map<String, Object> synthetic = new LinkedHashMap<>();
-        synthetic.put("type", "beginning_anchor");
-        synthetic.putAll(anchorPayload);
-        return node("*beginning*", synthetic, orphans.subList(i, orphans.size()));
+      Map<String, Object> anchor = anchorAbove(orphans.get(i));
+      if (anchor.get("page_idx") != null && isValidBbox(anchor.get("bbox"))) {
+        return node("*beginning*", anchor, orphans.subList(i, orphans.size()));
       }
     }
     return null;
@@ -155,28 +195,38 @@ public final class MineruContentListLayoutBuilder {
     throw new IllegalArgumentException();
   }
 
-  static Map<String, Object> beginningAnchorPayload(Map<String, Object> firstOrphan) {
-    Map<String, Object> payload = new LinkedHashMap<>();
-    payload.put("kind", "beginning");
-    Object pageIdx = firstOrphan.get("page_idx");
-    if (pageIdx != null) {
-      payload.put("page_idx", pageIdx);
-    }
-    Object bbox = firstOrphan.get("bbox");
-    if (bbox instanceof List<?> list && list.size() == 4) {
+  /** An anchor just above {@code item}, as tall as the item. */
+  private static Map<String, Object> anchorAbove(Map<String, Object> item) {
+    List<Double> bbox = null;
+    if (item.get("bbox") instanceof List<?> list && list.size() == 4) {
       try {
         double x0 = toFiniteDouble(list.get(0));
         double y0 = toFiniteDouble(list.get(1));
         double x1 = toFiniteDouble(list.get(2));
         double y1 = toFiniteDouble(list.get(3));
-        double h = y1 - y0;
-        List<Double> synthetic = List.of(x0, Math.max(0.0, y0 - h), x1, y0);
-        payload.put("bbox", new ArrayList<>(synthetic));
+        bbox = List.of(x0, Math.max(0.0, y0 - (y1 - y0)), x1, y0);
       } catch (IllegalArgumentException ignored) {
         // omit bbox
       }
     }
-    return payload;
+    return beginningAnchor(item.get("page_idx"), bbox);
+  }
+
+  /**
+   * The synthetic {@code beginning_anchor} content block: a locator for where a block starts when
+   * no content item marks it.
+   */
+  private static Map<String, Object> beginningAnchor(Object pageIdx, List<Double> bbox) {
+    Map<String, Object> anchor = new LinkedHashMap<>();
+    anchor.put("type", "beginning_anchor");
+    anchor.put("kind", "beginning");
+    if (pageIdx != null) {
+      anchor.put("page_idx", pageIdx);
+    }
+    if (bbox != null) {
+      anchor.put("bbox", new ArrayList<>(bbox));
+    }
+    return anchor;
   }
 
   private record StackEntry(int level, AttachBookLayoutNodeRequest node) {}

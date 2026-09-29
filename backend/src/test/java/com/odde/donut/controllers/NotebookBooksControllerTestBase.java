@@ -1,7 +1,5 @@
 package com.odde.donut.controllers;
 
-import static java.nio.charset.StandardCharsets.US_ASCII;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.donut.controllers.dto.AttachBookLayoutNodeRequest;
 import com.odde.donut.controllers.dto.AttachBookLayoutRequest;
@@ -20,10 +18,6 @@ import com.odde.donut.services.book.EpubLocator;
 import com.odde.donut.services.book.PdfLocator;
 import com.odde.donut.testability.OpenAiStructuredResponseMock;
 import jakarta.persistence.EntityManager;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -31,9 +25,6 @@ import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import org.apache.pdfbox.pdmodel.PDDocument;
-import org.apache.pdfbox.pdmodel.PDPage;
-import org.apache.pdfbox.pdmodel.common.PDStream;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mock.web.MockHttpServletRequest;
@@ -43,7 +34,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 abstract class NotebookBooksControllerTestBase extends ControllerTestBase {
 
-  static final byte[] ONE_PAGE_PDF = onePagePdf(0);
+  static final byte[] ONE_PAGE_PDF = TestPdfs.onePagePdf(0);
 
   @Autowired NotebookBooksController controller;
   @Autowired BookRepository bookRepository;
@@ -88,21 +79,6 @@ abstract class NotebookBooksControllerTestBase extends ControllerTestBase {
 
   static MultipartFile pdfFile(byte[] content) {
     return new MockMultipartFile("file", "book.pdf", "application/pdf", content);
-  }
-
-  static byte[] onePagePdf(int blankContentBytes) {
-    try (PDDocument doc = new PDDocument();
-        ByteArrayOutputStream out = new ByteArrayOutputStream()) {
-      PDPage page = new PDPage();
-      page.setContents(
-          new PDStream(
-              doc, new ByteArrayInputStream(" ".repeat(blankContentBytes).getBytes(US_ASCII))));
-      doc.addPage(page);
-      doc.save(out);
-      return out.toByteArray();
-    } catch (IOException e) {
-      throw new UncheckedIOException(e);
-    }
   }
 
   static MultipartFile epubFile(byte[] content) {

@@ -10,10 +10,7 @@ import com.odde.donut.entities.Book;
 import com.odde.donut.entities.BookContentBlock;
 import com.odde.donut.entities.BookUserLastReadPosition;
 import com.odde.donut.exceptions.ApiException;
-import java.io.IOException;
 import java.util.List;
-import org.apache.pdfbox.Loader;
-import org.apache.pdfbox.pdmodel.PDDocument;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.CacheControl;
@@ -29,18 +26,8 @@ public enum BookFormat {
     }
 
     @Override
-    public void validateAttachRequest(AttachBookRequest request) {
-      AttachBookLayoutValidator.validatePdfAttachRequest(request);
-    }
-
-    @Override
-    public void validateAttachableFile(byte[] bytes) {
-      try (PDDocument ignored = Loader.loadPDF(bytes)) {
-        // loading is the check
-      } catch (IOException e) {
-        throw new ApiException(
-            "not a readable PDF", ApiError.ErrorType.BINDING_ERROR, "not a readable PDF");
-      }
+    public void validateAttach(AttachBookRequest request, byte[] bytes) {
+      AttachBookLayoutValidator.validatePdfAttachRequest(request, PdfBookmarkReader.read(bytes));
     }
 
     @Override
@@ -84,12 +71,8 @@ public enum BookFormat {
     }
 
     @Override
-    public void validateAttachRequest(AttachBookRequest request) {
+    public void validateAttach(AttachBookRequest request, byte[] bytes) {
       AttachBookLayoutValidator.validateEpubAttachRequest(request);
-    }
-
-    @Override
-    public void validateAttachableFile(byte[] bytes) {
       EpubAttachValidator.validateAttachableEpub(bytes);
     }
 
@@ -136,9 +119,11 @@ public enum BookFormat {
   public abstract List<ContentLocator> assembleContentLocators(
       List<BookContentBlock> contentBlocks);
 
-  public abstract void validateAttachRequest(AttachBookRequest request);
-
-  public abstract void validateAttachableFile(byte[] bytes);
+  /**
+   * Validates the attach request with its file; for a PDF, also builds the layout from its
+   * contentList.
+   */
+  public abstract void validateAttach(AttachBookRequest request, byte[] bytes);
 
   public abstract void persistNewBook(AttachBookService.PersistContext ctx, Book book);
 

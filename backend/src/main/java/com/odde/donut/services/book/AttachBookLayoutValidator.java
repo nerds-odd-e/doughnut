@@ -9,13 +9,14 @@ import com.odde.donut.controllers.dto.AttachBookLayoutRequest;
 import com.odde.donut.controllers.dto.AttachBookRequest;
 import com.odde.donut.entities.BookBlockTitleLimits;
 import com.odde.donut.exceptions.ApiException;
+import com.odde.donut.services.book.MineruContentListLayoutBuilder.Bookmark;
 import java.util.List;
 
 final class AttachBookLayoutValidator {
 
   private AttachBookLayoutValidator() {}
 
-  static void validatePdfAttachRequest(AttachBookRequest request) {
+  static void validatePdfAttachRequest(AttachBookRequest request, List<Bookmark> bookmarks) {
     List<Object> contentList = request.getContentList();
     boolean hasContentList = hasContentList(request);
     List<AttachBookLayoutNodeRequest> layoutRoots = layoutRootsOrNull(request);
@@ -32,7 +33,8 @@ final class AttachBookLayoutValidator {
       if (contentList.size() > MAX_CONTENT_LIST_ITEMS) {
         throw bindingError("contentList exceeds maximum size of " + MAX_CONTENT_LIST_ITEMS);
       }
-      AttachBookLayoutRequest built = MineruContentListLayoutBuilder.buildLayout(contentList);
+      AttachBookLayoutRequest built =
+          MineruContentListLayoutBuilder.buildLayoutFromBookmarks(bookmarks, contentList);
       if (built.getRoots().isEmpty()) {
         throw bindingError("contentList produced no book layout blocks");
       }
