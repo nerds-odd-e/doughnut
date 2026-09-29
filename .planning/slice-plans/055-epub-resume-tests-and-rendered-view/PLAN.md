@@ -63,7 +63,13 @@ without callers (`git grep` to confirm). Leave the other scenarios unchanged.
 
 ### 2. One lookup finds a locator's rendered view
 Type: Structure
-Status: planned
+Status: done
+Accepted proof: U (`currentBlockIdFromEpubView.spec.ts`, `epubHrefMatch.spec.ts`, 17 pass),
+vue-tsc clean, E 15 passing including the content-anchored panel, landing Rule and
+current-block-on-scroll scenarios. `locateRenderedView` now serves both `startTopPx` and
+`resolveLocatorRect`. No test covers two spine items matching one stored path.
+Learning: `resolveLocatorRect` reports the element rect in the iframe's own coordinates while
+`startTopPx` adds the iframe offset; left unchanged and untested here.
 Size: about 5 minutes active; E runtime excepted.
 Proof: U, and E including "EPUB reading control panel is content-anchored" and the landing Rule.
 
@@ -71,3 +77,10 @@ Give `useEpubLocatorGeometry` one "rendered view for a locator" helper used by b
 `resolveEpubLocatorElement` and `startTopPx`, keeping each caller's observable result. If the
 two fallbacks cannot share one helper without changing where the panel or the current block
 lands, stop and report the difference instead of choosing one.
+
+Decision (owner, 2026-09-29): the lookups disagree only when a stored path suffix-matches two
+spine items (`epubSpinePathMatches`, e.g. `chapter1.xhtml` and `part2/chapter1.xhtml`): the
+panel took the last displayed href match, the current block the first spine match. Use the
+spine-index rule for both — the one navigation (`resolveSpineHrefForStoredPath`) already uses.
+Each caller keeps its own fallback (panel: fragment element, then `body`; current block:
+fragment offset, iframe top, −∞/+∞).

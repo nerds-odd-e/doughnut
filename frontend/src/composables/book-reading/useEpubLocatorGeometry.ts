@@ -32,11 +32,9 @@ export function epubSpineItems(
   return Array.isArray(raw) ? raw : []
 }
 
-function forEachRenditionView(
-  r: Rendition,
-  fn: (view: EpubRenditionIframeView) => void
-): void {
+function renditionViews(r: Rendition): EpubRenditionIframeView[] {
   const views = r.views() as unknown
+  const all: EpubRenditionIframeView[] = []
   if (
     views &&
     typeof views === "object" &&
@@ -44,43 +42,39 @@ function forEachRenditionView(
   ) {
     ;(
       views as { forEach: (cb: (v: EpubRenditionIframeView) => void) => void }
-    ).forEach(fn)
+    ).forEach((v) => all.push(v))
   }
+  return all
 }
 
-function resolveEpubLocatorElement(
-  r: Rendition,
+function displayedViews(
+  views: readonly EpubRenditionIframeView[]
+): EpubRenditionIframeView[] {
+  return views.filter((v) => v.displayed && v.section?.index !== undefined)
+}
+
+/** The locator's spine index and, when that section is rendered, its view. */
+function locateRenderedView(
+  rendered: readonly EpubRenditionIframeView[],
+  spine: ReadonlyArray<EpubSpineItem>,
+  epub: EpubLocatorFull
+): { index: number; view?: EpubRenditionIframeView } | null {
+  const storedPath = splitEpubHref(epub.href.trim()).path
+  const index = spine.find(
+    (s) => s.href !== undefined && epubSpinePathMatches(storedPath, s.href)
+  )?.index
+  return index === undefined
+    ? null
+    : { index, view: rendered.find((v) => v.section?.index === index) }
+}
+
+/** The element the locator's fragment names in its rendered view, if any. */
+function fragmentElement(
+  view: EpubRenditionIframeView,
   epub: EpubLocatorFull
 ): HTMLElement | null {
-  const storedPath = splitEpubHref(epub.href.trim()).path
-  if (storedPath.length === 0) {
-    return null
-  }
-  const frag = epub.fragment?.trim() ?? null
-
-  const matches: EpubRenditionIframeView[] = []
-  forEachRenditionView(r, (view) => {
-    if (!view.displayed || !view.section?.href) {
-      return
-    }
-    const { path: viewPath } = splitEpubHref(view.section.href.trim())
-    if (epubSpinePathMatches(storedPath, viewPath)) {
-      matches.push(view)
-    }
-  })
-
-  const hit = matches.length > 0 ? (matches[matches.length - 1] ?? null) : null
-  const doc = hit?.contents?.document
-  if (!doc?.body) {
-    return null
-  }
-  if (frag !== null && frag.length > 0) {
-    const byId = doc.getElementById(frag)
-    if (byId) {
-      return byId
-    }
-  }
-  return doc.body
+  const frag = epub.fragment?.trim()
+  return frag ? (view.contents?.document?.getElementById(frag) ?? null) : null
 }
 
 /**
@@ -94,22 +88,17 @@ function startTopPx(
   spine: ReadonlyArray<EpubSpineItem>,
   epub: EpubLocatorFull
 ): number | null {
-  const storedPath = splitEpubHref(epub.href.trim()).path
-  const index = spine.find(
-    (s) => s.href !== undefined && epubSpinePathMatches(storedPath, s.href)
-  )?.index
-  if (index === undefined || rendered.length === 0) {
+  const located = locateRenderedView(rendered, spine, epub)
+  if (!located || rendered.length === 0) {
     return null
   }
-  const view = rendered.find((v) => v.section?.index === index)
+  const { index, view } = located
   if (!view?.iframe) {
     return index < (rendered[0]?.section?.index ?? 0)
       ? Number.NEGATIVE_INFINITY
       : Number.POSITIVE_INFINITY
   }
-  const frag = epub.fragment?.trim() ?? ""
-  const el =
-    frag.length > 0 ? view.contents?.document?.getElementById(frag) : null
+  const el = fragmentElement(view, epub)
   return Math.round(
     view.iframe.getBoundingClientRect().top +
       (el ? el.getBoundingClientRect().top : 0) -
@@ -134,14 +123,12 @@ export function useEpubLocatorGeometry(opts: {
       return null
     }
     const spine = epubSpineItems(opts.getBook())
-    const rendered: EpubRenditionIframeView[] = []
-    let lastRenderedIndex = -1
-    forEachRenditionView(r, (view) => {
-      lastRenderedIndex = Math.max(lastRenderedIndex, view.section?.index ?? -1)
-      if (view.displayed && view.section?.index !== undefined) {
-        rendered.push(view)
-      }
-    })
+    const views = renditionViews(r)
+    const rendered = displayedViews(views)
+    const lastRenderedIndex = Math.max(
+      -1,
+      ...views.map((v) => v.section?.index ?? -1)
+    )
     const atEnd =
       lastRenderedIndex === spine.length - 1 &&
       container.scrollTop + container.clientHeight >= container.scrollHeight - 1
@@ -162,11 +149,16 @@ export function useEpubLocatorGeometry(opts: {
     if (!epub) {
       return null
     }
-    const el = resolveEpubLocatorElement(r, epub)
-    if (!el) {
+    const view = locateRenderedView(
+      displayedViews(renditionViews(r)),
+      epubSpineItems(opts.getBook()),
+      epub
+    )?.view
+    const body = view?.contents?.document?.body
+    if (!view || !body) {
       return null
     }
-    const b = el.getBoundingClientRect()
+    const b = (fragmentElement(view, epub) ?? body).getBoundingClientRect()
     return {
       top: b.top,
       bottom: b.bottom,
