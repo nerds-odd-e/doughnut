@@ -48,7 +48,7 @@ conditions tried, never as confirmed defects.
 
 ### 1. UAT environment is usable end to end
 Type: Structure
-Status: planned
+Status: done
 Size: about 15 minutes, outside the UAT budget.
 Proof: the Development app serves the login page; a Playwright session signed in as the UAT account sees
 its notebooks; the interactive CLI accepts the access token and `/use` of a `UAT …` notebook. Record
@@ -61,7 +61,7 @@ Enables slice 2.
 
 ### 2. Attaching and browsing findings are recorded
 Type: Behavior
-Status: planned
+Status: done
 Size: about 50 minutes of UAT budget, plus MinerU waits.
 Proof: `## UAT Findings` in the seed gains setup, books, and findings for attach, browse, current block,
 and selection, each with evidence.
@@ -101,3 +101,22 @@ rereading the session.
   `PYTHONPATH=/Users/terryyin/git/doughnut/.venv-mineru/lib/python3.12/site-packages`; repairing the
   owner's venv is out of scope, but its broken interpreter link is reported as a setup observation.
 - Screenshots and raw measurements stay out of the repository; the report cites the retained measurements.
+
+## Learnings
+
+- Slice 1 (explained empty change, accepted 2026-09-29): Development stack healthy at commit `1f9bdae1bc`
+  after deleting stale `backend/build/classes` in the default checkout (a removed
+  `NotebookGitCutoverService` was still referenced). Account `manual`; notebook `UAT Think Python` is
+  id 17; CLI access token `UAT CLI`. Reusable helpers live in `$CLAUDE_JOB_DIR/tmp/uat/`: `pw.js` /
+  `shot.js` (Playwright with saved session), `cli.js` (CLI via node-pty with MinerU env), `attach.sh`
+  (background `/use` + `/attach`, timed log). Setup: about 5 minutes for the probe plus about 10 minutes of
+  stack and book preparation.
+- The CLI `/attach` also accepts EPUB (raw upload), so both EPUB routes (CLI and web) are in scope for
+  slice 2.
+- Slice 2 (accepted 2026-09-29): exploration 07:33–08:00, 27 of 50 budget minutes; breadth complete, so
+  about 38 minutes (23 unused + 15 reserve) remain for slice 3. Real MinerU took 167 s for Think Python
+  (not ~13 min) and 28 s for the arXiv paper. Findings: nine defects and the improvements are in the
+  seed's `## UAT Findings`. Evidence inspected: `shots/s2-11-tp-mobile-open.png` (defect 2) and
+  `s2-tp-layout.txt` (defects 5 and 6). Notebooks for slice 3: UAT Think Python 17 (PDF book 5), UAT Alice
+  18 (EPUB 3), UAT DRM Alice 19 (no book), UAT Origin of Species 20 (EPUB 4), UAT Attention 21 (PDF 6).
+  Helper `br.js` gives reader goto, layout dump, and current/selected state.
