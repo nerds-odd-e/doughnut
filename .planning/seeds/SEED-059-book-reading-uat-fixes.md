@@ -217,33 +217,60 @@ and 7.
 
 **Identity:** SEED-059#story-4
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"not-refined","approach":"unselected"}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/052-ai-reorganize-full-size-book/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"5f8a75352df0baccd268f4a18f213655187e371c15bf3a6c7c9e0db976b10142","plan":"1e0b0e485638c9e4de8e8239e80ab472feba32ae1ea8fe21b6fce1a996f97184"}}
 ```
 
-**Goal:** *AI Reorganize* gives a preview for a book of real size, and when it
-cannot, the reader gets a plain explanation and keeps their place.
+**Goal:** A reader whose PDF book has no bookmarks gets an *AI Reorganize*
+preview they can confirm, however many blocks the book has. Today every book
+above roughly 90 blocks fails with raw JSON on screen, so the fallback that
+story 3 leaves for PDFs without bookmarks crashes exactly on real books.
 
-**Observed defect (defect 10, High)**
+**Why now** (owner decision, 2026-09-29): after story 3 few readers need AI
+Reorganize, but today it is a visible crash, and the cause is known and small
+to remove. It stays first in the queue as a small crash fix; the larger
+reworking this story first suggested is not justified.
 
-- On Think Python (361 blocks), 3 of 3 runs failed with a server error after
-  7.5–8.3 s. A red message filled a third of the screen with raw text ("Error
-  parsing JSON: {"blocks":[{"depth":0,"id":44}, …") that stops mid-entry at
-  block id 130, then disappeared. No preview. In 2 runs the layout also scrolled
-  back to its top, leaving the current block out of view.
-- The 27-block paper works (preview in 3–6 s).
-- Hypothesis (not verified): the model's answer is cut off by an output size
-  limit, so books above roughly 90 blocks would fail. No book between 27 and 361
-  blocks was tried.
+**Scope**
+
+- **The AI's answer has room for the whole book.** The answer size the
+  reorganization request allows grows with the book's block count, so no
+  answer is cut off. Cause (confirmed in code, 2026-09-29): the request
+  inherits the 700-token default meant for single quiz questions; the Think
+  Python answer stopped after about 87 entries (ids 44–130), about 8 tokens
+  each.
+- **Waiting is accepted** (owner decision, 2026-09-29): a large book may take
+  tens of seconds, up to about a minute, behind the existing "Analyzing book
+  layout…" overlay. No size cap and no progress display.
+- **Deferred** (owner decision, 2026-09-29):
+  - a new plain-words failure message: once answers are not cut off, the raw
+    JSON case is gone, and the remaining failures already have short
+    messages;
+  - keeping the current block in view after a failure;
+  - splitting the book into parts or asking the AI only for changes;
+  - how good the AI's nesting is (defect 17), checking the preview row by row,
+    EPUB (story 10), and removing duplicate or label blocks (AI Reorganize
+    changes only depth).
+- **Boundary assumption:** production's load balancer may end a request
+  before a very large book's answer arrives (unchecked 2026-09-29; the
+  backend service timeout is set outside the repository, by
+  `infra/gcp/scripts/update-backend-service-timeout.sh`).
+- **Must keep working:** the 27-block paper's preview, Cancel and Confirm, and
+  the existing rejection of an invalid suggestion.
 
 **Key examples**
 
-- *AI Reorganize* on Think Python shows a preview that can be confirmed.
-- If the request still fails, the message says so in plain words, and the
-  layout keeps the current block in view.
+- A book of about 360 blocks laid out from MinerU headings (for example Think
+  Python attached before story 3, or a PDF without bookmarks) → *AI
+  Reorganize* shows a preview listing every block, and Confirm applies it.
+  Today: raw "Error parsing JSON…" after about 8 s.
+- The 27-block *Attention* paper → preview as today.
 
-**Effort hypothesis:** M–L, low confidence. Open question: split the book into
-parts, or ask the AI only for the changes?
-**Depends on:** none; story 3 reduces how much the AI has to fix.
+**UAT evidence:** defect 10 in the report linked under *Why This Matters*
+(Think Python, 361 blocks: 3 of 3 runs failed after 7.5–8.3 s; in 2 runs the
+layout also scrolled back to its top).
+
+**Effort hypothesis:** S, medium confidence.
+**Depends on:** none.
 
 <a id="story-5"></a>
 
