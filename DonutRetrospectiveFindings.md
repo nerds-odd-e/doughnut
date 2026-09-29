@@ -8,15 +8,13 @@ Resolved findings are removed; Git history keeps their evidence.
 
 ## Open findings
 
-### Group: local run environment for manual and development runs
-
-Both findings are Donut's own run tooling costing time before any product
-observation starts. Home seed:
-[SEED-060](.planning/seeds/SEED-060-dependable-local-run-environment.md).
+### Queued: MinerU install that PDF book attach depends on
 
 #### DD-161 — Real-book manual acceptance had no supported way to hold a disposable stack or run MinerU
 
-Story: [SEED-060#story-1](.planning/seeds/SEED-060-dependable-local-run-environment.md#story-1).
+Story: [SEED-060#story-1](.planning/seeds/SEED-060-mineru-version-for-pdf-books.md#story-1) (the MinerU version; stack holding and venv repair are deferred there).
+
+Impact check (2026-09-29): the released CLI bundles this outline script and tells users to `pip install 'mineru[pipeline]'`. MinerU 4.0.0 (2026-09-16) and later have neither the `pipeline` extra nor `mineru.cli.common` (PyPI wheels 4.0.10 and 3.4.5 compared), so the same failure reaches CLI users who attach PDF books.
 
 The plan's manual slice needed real MinerU and a running app to `/attach` real PDFs through the CLI. `.venv-mineru`'s Python pointed into a garbage-collected Nix store path, the unpinned `pip install 'mineru[pipeline]'` in the repo's docstrings installs MinerU 4.x (no `pipeline` extra, no `mineru.cli.common`), and no repo command keeps a disposable E2E stack up without Cypress, so the agent wrote a temporary `hold-stack.mjs` around `runE2eInteractive`.
 
@@ -27,9 +25,11 @@ The plan's manual slice needed real MinerU and a running app to `/attach` real P
   - Observed effect: about 28 minutes for one manual slice, most of it environment repair and stack scaffolding rather than observation.
   - Inference: much of the cost was necessary once; a pinned MinerU install and a documented "hold a disposable stack" command would make the next real-book acceptance cheaper. Donut tooling, so correction belongs to Donut, not shared guidance.
 
+### Open, not queued: Development stack start
+
 #### DD-159 — The Development stack failed to start on stale compiled backend classes in the default checkout
 
-Story: [SEED-060#story-2](.planning/seeds/SEED-060-dependable-local-run-environment.md#story-2).
+Not queued: one occurrence, low impact (see Priority below). Queue a story if it recurs.
 
 `pnpm dev` from the default checkout failed with `No qualifying bean of type NotebookGitCutoverService`: `backend/build/classes` still held classes from before that service was removed. Deleting `backend/build/classes` let the next start succeed.
 
@@ -48,7 +48,7 @@ or Donut-authored skills and `.agents/agent-map.md`).
 
 ### Moved from DearDough
 
-- DD-161 and DD-159 — open; see above.
+- DD-161 (queued) and DD-159 (open, not queued); see above.
 - DD-165 — reviving `epub_book.feature` broke `scripts/` tests that used it as
   their "not admitted" example (SEED-059#story-1, CI run 36522703164). The
   cause was Donut's script tests coupling to a live spec name. Resolved by
@@ -84,11 +84,17 @@ not the DD-103 runner backend race.
 
 ### Priority
 
-Only two project findings are open, each with one occurrence; both are queued
-as the first two backlog stories. DD-161 ranks first: about 28 minutes lost,
-and the queued SEED-059 book-reading stories will need real-book acceptance
-again. DD-159 ranks second: low cost per occurrence, but it recurs whenever a
-backend class is removed and the stack starts from an older build.
+A finding is queued only for high impact or high frequency, with impact
+ranked first.
+
+- DD-161 is queued first (SEED-060#story-1). It has high impact: one
+  occurrence cost about 28 minutes, and its root cause, Donut advising an
+  unpinned MinerU install, breaks PDF book outlines for CLI users on any fresh
+  install since MinerU 4.0.0.
+- DD-159 is not queued. It has one occurrence, and one failed start was fixed
+  by deleting `backend/build/classes`. `pnpm backend:watch` runs Gradle's
+  incremental `classes` build, which normally removes stale classes, so how
+  often it recurs is unknown.
 
 ## Review — 2026-09-27
 

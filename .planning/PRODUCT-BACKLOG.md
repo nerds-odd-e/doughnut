@@ -13,8 +13,7 @@ Bug fixing and general maintenance.
 
 ## Backlog list
 
-- [Run real-book manual acceptance without rebuilding the environment](seeds/SEED-060-dependable-local-run-environment.md#story-1) — SEED-060#story-1
-- [The Development stack starts after backend code is removed](seeds/SEED-060-dependable-local-run-environment.md#story-2) — SEED-060#story-2
+- [Attach a PDF book after installing MinerU as Donut advises](seeds/SEED-060-mineru-version-for-pdf-books.md#story-1) — SEED-060#story-1
 - [Reopen an EPUB at the exact paragraph](seeds/SEED-059-book-reading-uat-fixes.md#story-17) — SEED-059#story-17
 - [Scroll a PDF smoothly right after choosing a block](seeds/SEED-059-book-reading-uat-fixes.md#story-5) — SEED-059#story-5
 - [The current block moves the same way in PDF as in EPUB](seeds/SEED-059-book-reading-uat-fixes.md#story-16) — SEED-059#story-16
