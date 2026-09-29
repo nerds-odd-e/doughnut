@@ -400,6 +400,10 @@ The slice 5 delegation told the implementer both to show its new assertions fail
   - Observed effect: no damage; each return's diff held the intended change and no other writer was active. Slice 3's implementer wrote the tests first and ran them red against untouched HEAD code, needing no swap.
   - Inference: the coordinator converted the finding's workaround into instruction; slice 3 shows test-first avoids it. Qualified: coordinator saw only the returns.
 
+- Execution: SEED-055#story-1 / `2509421236:.planning/slice-plans/012-public-api-cleanup/PLAN.md` / be9f44cd11; Timestamp: unknown (2026-09-29, between 08:35 and 08:55+08:00, slices 2–4); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.46.
+  - Evidence: coordinator conversation: one or two task-notifications per slice for the slice 2, 3 and 4 implementers with "stopped with background work of its own still running" / "This agent has not reported yet", each followed by the real hand-back after the full backend suite finished.
+  - Observed effect: four status-only coordinator turns; delivery unaffected.
+
 ## ODF-143 — Managed delivery rejects unqualified branch references
 
 Former local code: DD-107 (argument-only reports from plans 009, 011 and 019).
@@ -432,6 +436,10 @@ The usage line says REF but publication requires refs/heads/; callers discover t
   - Evidence: coordinator transcript `bdf6220e…jsonl`: `deliver --target-ref origin/story/sut-start-timeout-race` refused with "authorized target must be a branch ref: origin/story/sut-start-timeout-race"; the retry with `refs/heads/story/sut-start-timeout-race` was accepted (`/tmp/dough-ci-501/watch-TspK5B`).
   - Observed effect: one refused call (~3s); no coverage lost.
   - Inference: still recurs on 0.3.45; this time the guessed form was the remote-tracking name, which the usage line's `REF` also admits.
+
+- Execution: SEED-055#story-1 / `2509421236:.planning/slice-plans/012-public-api-cleanup/PLAN.md` / be9f44cd11; Timestamp: 2026-09-29T08:29+08:00 (slice 1 delivery); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.46.
+  - Evidence: `deliver --target-ref origin/seed-055-public-api-cleanup` refused with "authorized target must be a branch ref: origin/seed-055-public-api-cleanup"; the retry with `refs/heads/seed-055-public-api-cleanup` was accepted (`/tmp/dough-ci-501/watch-3aU6BR`).
+  - Observed effect: one refused call; no coverage lost.
 
 ## ODF-074 — A plan said the changed script had no test, and nobody searched for one before delivery, so CI caught the stale test
 
@@ -702,8 +710,30 @@ The auto-mode classifier returned "no verdict" errors, which the tool result cal
   - Observed effect: about 19 minutes of stalled execution and three owner prompts; no wrong action.
   - Inference: a bounded background wait (for example a timed Monitor) before one retry would likely have avoided the stops. Qualified: host-specific outage; retrying immediately in a loop was correctly avoided.
 
+## DD-147 — The plan's focused proof command passed several `--tests` patterns to a wrapper that accepts only one
+
+Plan 012 slice 1 named `pnpm backend:test:worktree --tests A --tests B --tests C` as its proof. `scripts/backend-test-worktree.sh` accepts exactly one `--tests` pattern, so the command printed usage and exited 1. The implementer split it into two single-pattern runs that together selected every rewritten class.
+
+### Occurrences
+
+- Execution: SEED-055#story-1 / `2509421236:.planning/slice-plans/012-public-api-cleanup/PLAN.md` / be9f44cd11; Timestamp: 2026-09-29T08:24+08:00 (slice 1 implementer); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.46.
+  - Evidence: slice 1 implementer hand-back ("accepts exactly one `--tests <pattern>`, so it printed usage and exited 1"); plan learning added in be9f44cd11.
+  - Observed effect: one failed run and a reselection inside the slice; proof unaffected.
+  - Inference: slice planning copied Gradle's repeatable `--tests` form without checking the worktree wrapper. Related to DD-143 (an unchecked command in a prompt); qualified: one occurrence.
+
+## DD-148 — A refactor agent's hand-back contained only the word "placeholder"
+
+The slice 6 refactor agent (a Sonnet model, for a planning-only change) returned "placeholder" with no `## REFACTOR COMPLETE`. The coordinator checked the diff, messaged the agent, and received the real report, which named two small edits it had already made.
+
+### Occurrences
+
+- Execution: SEED-055#story-1 / `2509421236:.planning/slice-plans/012-public-api-cleanup/PLAN.md` / be9f44cd11; Timestamp: 2026-09-29T09:05+08:00 (approximately; slice 6 refactor); Tool: Claude Code; Model: coordinator claude-opus-5-5, refactor agent Sonnet; Open Dough release: 0.3.46.
+  - Evidence: first hand-back text "placeholder"; second hand-back listed the `NotebookAttachmentFile.bytes` wording fix and the `nosniff` label, then `## REFACTOR COMPLETE`.
+  - Observed effect: one extra message round trip; the marker rule stopped acceptance of an empty report.
+  - Inference: qualified one-off; host or model behavior, not project guidance.
+
 ## Retention
 
-- Highest allocated local number: 146. Removed local codes are never reused.
+- Highest allocated local number: 148. Removed local codes are never reused.
 - Full pre-maintenance log and earlier recovery locators: `99fa1b9835e3dff2473837ba2a1f8b11967d5938:DearDough.md`.
 - Occurrence history is partial; active evidence stays here or in the Open Dough catalog and watch list.

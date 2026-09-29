@@ -160,3 +160,11 @@ Behavior: the four remaining file-serving endpoints (`/api/books/{book}/file`,
 → compare consumers, authorization, lookup, response headers, and caching (only the Book endpoint
 sets ETag/304/Cache-Control; all read `NotebookAttachmentFile.bytes`) → one recommendation naming
 affected endpoints, intended benefit, consumer impact, and migration work. No product code changes.
+
+## Execution complete
+
+Product advice: The five dead endpoints are gone with no correction needed. The owner decides next
+whether to adopt the seed's `## File-serving proposal` (retire `GET /api/books/{book}/file` in favor
+of attachment content with its caching; about one S–M story). A separate small cleanup candidate,
+older than this story: `RecallPaceAggregator.compute`'s `todayRowsToScore` overload has had no
+non-null caller since 8ca3115dd5.
