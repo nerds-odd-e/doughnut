@@ -58,7 +58,7 @@ Source: [story 20](../../seeds/SEED-059-book-reading-uat-fixes.md#story-20).
 ### 1. Reopening with an exact place that no longer resolves lands at the block start
 
 Type: Behavior
-Status: planned
+Status: done
 Proof: `SUT_TIMEOUT_MS=360000 CURSOR_DEV=true nix develop -c pnpm cy:run --spec e2e_test/features/book_reading/epub_book.feature`
 (the new scenario fails first, landing at the cover), plus frontend
 `vue-tsc --noEmit`, and `pnpm frontend:test tests/composables/useBookReadingBootstrap.spec.ts tests/pages/BookReadingPage.spec.ts`.
@@ -84,6 +84,14 @@ current block.
   Inline `epubDisplayHref` into `blockStartEpubDisplayHref` if that becomes its
   only caller.
 - About 10 min, most of it the E2E step.
+
+Accepted proof (2026-09-29): the new scenario "Reopening when the saved exact
+place no longer resolves resumes at its block start" failed before the fix (reader
+at the cover) and passes after it. `epub_book.feature` is 19 passing,
+`vue-tsc --noEmit` passes, and the bootstrap, reading-page, and book-layout specs
+pass. The viewer alone decides EPUB displayability (`epubDisplayTargets` →
+`displayFirst`). Bootstrap passes the saved locator unchanged. Both failing →
+book start remains the unchanged `r.display()` fallback, with no test.
 
 ## Current decisions
 

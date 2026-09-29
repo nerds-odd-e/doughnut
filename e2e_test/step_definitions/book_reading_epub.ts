@@ -39,6 +39,14 @@ When(
   }
 )
 
+When(
+  'I leave the EPUB reading view and return to it after its saved exact place stops resolving',
+  // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
+  () => {
+    return bookReadingPage().leaveEpubReadingViewAndReturnAfterItsExactPlaceStopsResolving()
+  }
+)
+
 Then(
   'the EPUB Reading Control Panel should be content-anchored',
   // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain

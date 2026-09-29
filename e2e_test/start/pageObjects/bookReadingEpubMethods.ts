@@ -1,3 +1,4 @@
+import { e2eAppBaseUrl } from '../../support/e2eAppUrl'
 import { waitUntilAppIsNotBusy } from '../pageBase'
 import router from '../router'
 import {
@@ -208,9 +209,12 @@ export const bookReadingEpubMethods = () => ({
   /**
    * Navigate away via the GlobalBar "Notebook" link, wait for the pending reading-position
    * PATCH to flush so the server reflects the user's last position, then revisit the same
-   * reading-page URL to force a full remount of BookReadingEpubView.
+   * reading-page URL to force a full remount of BookReadingEpubView. `whileAway` runs after
+   * the flush and before the remount.
    */
-  leaveEpubReadingViewAndReturn() {
+  leaveEpubReadingViewAndReturn(
+    whileAway: (notebookId: string) => void = () => undefined
+  ) {
     waitUntilAppIsNotBusy()
     cy.get('[data-testid="epub-book-viewer"]').should('be.visible')
     cy.location('pathname').then((pathname) => {
@@ -218,6 +222,7 @@ export const bookReadingEpubMethods = () => ({
       cy.wait(2000)
       cy.contains('a', 'Notebook').click()
       cy.location('pathname').should('not.match', BOOK_READING_PATHNAME)
+      whileAway(notebookId)
       router().visitNamed('bookReading', { notebookId })
       waitUntilAppIsNotBusy()
       cy.get('[data-testid="epub-book-viewer"]', {
@@ -226,6 +231,17 @@ export const bookReadingEpubMethods = () => ({
       cy.wait(1500)
     })
     return this
+  },
+  /** The stored exact place is replaced by one with no spine item; href and fragment stay. */
+  leaveEpubReadingViewAndReturnAfterItsExactPlaceStopsResolving() {
+    return this.leaveEpubReadingViewAndReturn((notebookId) => {
+      const url = `${e2eAppBaseUrl()}/api/notebooks/${notebookId}/book/reading-position`
+      cy.request(url).then(({ body }) => {
+        cy.request('PATCH', url, {
+          locator: { ...body.locator, cfi: 'epubcfi(/6/200!/4/2/1:0)' },
+        })
+      })
+    })
   },
   expectBookLayoutBlockEpubStartHrefContains(title: string, substring: string) {
     waitUntilAppIsNotBusy()
