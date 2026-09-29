@@ -84,3 +84,18 @@ panel took the last displayed href match, the current block the first spine matc
 spine-index rule for both — the one navigation (`resolveSpineHrefForStoredPath`) already uses.
 Each caller keeps its own fallback (panel: fragment element, then `body`; current block:
 fragment offset, iframe top, −∞/+∞).
+
+## Execution complete
+
+Product advice: no correction is needed for this execution. For story wrap-up, two
+book-reading candidates, neither queued:
+- `epubSpinePathMatches` matches by path suffix, so a stored path can match two spine items
+  (e.g. `chapter1.xhtml` and `part2/chapter1.xhtml`). Navigation, the panel and the current
+  block now all pick the first match, which is consistent but can be the wrong section.
+  Candidate bug: match stored paths to spine hrefs exactly, resolving them against the package
+  folder.
+- Hypothesis, not verified: `resolveLocatorRect` returns element rects in the iframe's own
+  coordinates but compares them with the host rect, and `startTopPx` adds the iframe offset.
+  "EPUB reading control panel is content-anchored" checks only `data-panel-placement`, so a
+  panel placed wrongly for a section below other rendered sections would still pass. Check
+  it by hand before writing a story.
