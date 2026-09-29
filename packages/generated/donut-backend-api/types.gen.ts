@@ -1054,14 +1054,6 @@ export type RecallStatsDto = {
     dailyProbe?: Array<DailyProbeDay>;
 };
 
-export type RecallEzDiffusionDto = {
-    driftRate?: number;
-    boundarySeparation?: number;
-    nondecisionTimeMs?: number;
-    trialCount?: number;
-    morningCount?: number;
-};
-
 export type AssimilationCountDto = {
     dueCount?: number;
     assimilatedCountOfTheDay?: number;
@@ -1092,16 +1084,6 @@ export type MenuDataDto = {
     assimilationCount?: AssimilationCountDto;
     recallStatus?: DueMemoryTrackers;
     unreadMessages?: Array<ConversationMessage>;
-};
-
-export type DailyProbeConvergentValidityDto = {
-    pairs?: Array<PairValidity>;
-};
-
-export type PairValidity = {
-    pair?: string;
-    pairCount?: number;
-    rawCorrelation?: number;
 };
 
 export type CurrentUserInfo = {
@@ -1250,6 +1232,11 @@ export type RecallPromptHistoryItem = {
     mcq?: Mcq;
 };
 
+export type RecallHistoryItem = {
+    recallLog?: RecallLog;
+    recallPrompt?: RecallPromptHistoryItem;
+};
+
 export type RecallLog = {
     id: number;
     recordedAt: string;
@@ -1261,11 +1248,6 @@ export type RecallLog = {
     stabilityBefore?: number;
     difficultyBefore?: number;
     retrievability?: number;
-};
-
-export type RecallHistoryItem = {
-    recallLog?: RecallLog;
-    recallPrompt?: RecallPromptHistoryItem;
 };
 
 export type LearningSessionRequestResponse = {
@@ -3432,20 +3414,6 @@ export type FetchWikidataEntityDataByIdResponses = {
 
 export type FetchWikidataEntityDataByIdResponse = FetchWikidataEntityDataByIdResponses[keyof FetchWikidataEntityDataByIdResponses];
 
-export type RevokeTokenData = {
-    body?: never;
-    path?: never;
-    query?: never;
-    url: '/api/user/token-info';
-};
-
-export type RevokeTokenResponses = {
-    /**
-     * OK
-     */
-    200: unknown;
-};
-
 export type GetTokenInfoData = {
     body?: never;
     path?: never;
@@ -3480,24 +3448,6 @@ export type GetRecallStatsResponses = {
 
 export type GetRecallStatsResponse = GetRecallStatsResponses[keyof GetRecallStatsResponses];
 
-export type GetRecallEzDiffusionData = {
-    body?: never;
-    path?: never;
-    query: {
-        timezone: string;
-    };
-    url: '/api/user/recall-ez-diffusion';
-};
-
-export type GetRecallEzDiffusionResponses = {
-    /**
-     * OK
-     */
-    200: RecallEzDiffusionDto;
-};
-
-export type GetRecallEzDiffusionResponse = GetRecallEzDiffusionResponses[keyof GetRecallEzDiffusionResponses];
-
 export type GetMenuDataData = {
     body?: never;
     path?: never;
@@ -3531,24 +3481,6 @@ export type GetTokensResponses = {
 };
 
 export type GetTokensResponse = GetTokensResponses[keyof GetTokensResponses];
-
-export type GetDailyProbeConvergentValidityData = {
-    body?: never;
-    path?: never;
-    query: {
-        timezone: string;
-    };
-    url: '/api/user/daily-probe-convergent-validity';
-};
-
-export type GetDailyProbeConvergentValidityResponses = {
-    /**
-     * OK
-     */
-    200: DailyProbeConvergentValidityDto;
-};
-
-export type GetDailyProbeConvergentValidityResponse = GetDailyProbeConvergentValidityResponses[keyof GetDailyProbeConvergentValidityResponses];
 
 export type CurrentUserInfoData = {
     body?: never;
@@ -3868,24 +3800,6 @@ export type GetNotebookBookReadingRecordsResponses = {
 
 export type GetNotebookBookReadingRecordsResponse = GetNotebookBookReadingRecordsResponses[keyof GetNotebookBookReadingRecordsResponses];
 
-export type GetBookFileData = {
-    body?: never;
-    path: {
-        notebook: number;
-    };
-    query?: never;
-    url: '/api/notebooks/{notebook}/book/file';
-};
-
-export type GetBookFileResponses = {
-    /**
-     * OK
-     */
-    200: string;
-};
-
-export type GetBookFileResponse = GetBookFileResponses[keyof GetBookFileResponses];
-
 export type DeleteAttachmentData = {
     body?: never;
     path: {
@@ -4047,24 +3961,6 @@ export type GetRecallPromptResponses = {
 };
 
 export type GetRecallPromptResponse = GetRecallPromptResponses[keyof GetRecallPromptResponses];
-
-export type GetRecallLogsData = {
-    body?: never;
-    path: {
-        memoryTracker: number;
-    };
-    query?: never;
-    url: '/api/memory-trackers/{memoryTracker}/recall-logs';
-};
-
-export type GetRecallLogsResponses = {
-    /**
-     * OK
-     */
-    200: Array<RecallLog>;
-};
-
-export type GetRecallLogsResponse = GetRecallLogsResponses[keyof GetRecallLogsResponses];
 
 export type GetRecallHistoryData = {
     body?: never;

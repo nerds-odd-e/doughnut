@@ -1,8 +1,5 @@
 package com.odde.donut.services;
 
-import com.odde.donut.controllers.dto.DailyProbeConvergentValidityDTO;
-import com.odde.donut.controllers.dto.DailyProbeConvergentValidityDTO.PairValidity;
-import com.odde.donut.controllers.dto.RecallEzDiffusionDTO;
 import com.odde.donut.controllers.dto.RecallStatsDTO;
 import com.odde.donut.controllers.dto.RecallStatsDTO.AccuracyStats;
 import com.odde.donut.controllers.dto.RecallStatsDTO.AmPmResponseTime;
@@ -12,7 +9,6 @@ import com.odde.donut.controllers.dto.RecallStatsDTO.DayCount;
 import com.odde.donut.controllers.dto.RecallStatsDTO.DayRetention;
 import com.odde.donut.controllers.dto.RecallStatsDTO.HeadlineStats;
 import com.odde.donut.controllers.dto.RecallStatsDTO.PaceStats;
-import com.odde.donut.entities.DailyProbe;
 import com.odde.donut.entities.User;
 import com.odde.donut.entities.repositories.DailyProbeRepository;
 import com.odde.donut.entities.repositories.RecallPromptRepository;
@@ -59,43 +55,6 @@ public class RecallStatsService {
             ? DailyProbeDaySeries.from(dailyProbeRepository.findByUser(user), zoneId)
             : List.of();
     return aggregateRows(recent, allTime, zoneId, now, dailyProbe);
-  }
-
-  /**
-   * Internal diagnostic (plan {@code 008-probe-convergent-analyses}): convergent validity between
-   * the daily probe's four readouts and the corresponding recall-history component, across the
-   * current user's own trailing morning history. Same same-user-only projection query as {@link
-   * #compute}; not wired into {@link RecallStatsDTO}.
-   */
-  public DailyProbeConvergentValidityDTO computeConvergentValidity(
-      User user, ZoneId zoneId, Timestamp now) {
-    List<RecallAnswerRow> allTimeReviews = reviewsOnly(findAllTimeAnsweredRows(user, now));
-    List<DailyProbe> probes = dailyProbeRepository.findByUser(user);
-    LocalDate today = localToday(now, zoneId);
-    List<RecallProbeConvergentValidity.PairResult> results =
-        RecallProbeConvergentValidity.compute(allTimeReviews, probes, today, zoneId);
-    List<PairValidity> pairs =
-        results.stream()
-            .map(r -> new PairValidity(r.pair().name(), r.pairCount(), r.rawCorrelation()))
-            .toList();
-    return new DailyProbeConvergentValidityDTO(pairs);
-  }
-
-  /**
-   * Internal diagnostic (plan {@code 008-probe-convergent-analyses}, slice 3): trailing
-   * three-local-morning EZ-diffusion decomposition of the current user's MCQ recall trials. Same
-   * same-user-only projection query as {@link #compute}; not wired into {@link RecallStatsDTO}.
-   */
-  public RecallEzDiffusionDTO computeEzDiffusion(User user, ZoneId zoneId, Timestamp now) {
-    List<RecallAnswerRow> allTimeReviews = reviewsOnly(findAllTimeAnsweredRows(user, now));
-    LocalDate today = localToday(now, zoneId);
-    RecallEzDiffusion.Result result = RecallEzDiffusion.compute(allTimeReviews, today, zoneId);
-    return new RecallEzDiffusionDTO(
-        result.driftRate(),
-        result.boundarySeparation(),
-        result.nondecisionTimeMs(),
-        result.trialCount(),
-        result.morningCount());
   }
 
   private List<RecallAnswerRow> findAllTimeAnsweredRows(User user, Timestamp now) {

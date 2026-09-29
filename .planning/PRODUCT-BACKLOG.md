@@ -7,8 +7,6 @@ Bug fixing and general maintenance.
 
 ## Taken
 
-- [Remove unused public APIs and propose improvements for redundant services](seeds/SEED-055-public-api-cleanup.md#story-1) — SEED-055#story-1 ([plan](slice-plans/012-public-api-cleanup/PLAN.md))
-
 ## Backlog list
 
 - [Refresh recall automatically at each local half-day boundary](seeds/SEED-056-recall-half-day-refresh.md#story-1) — SEED-056#story-1

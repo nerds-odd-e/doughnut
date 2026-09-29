@@ -2502,13 +2502,6 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/UserToken"
-    delete:
-      tags:
-      - user-controller
-      operationId: revokeToken
-      responses:
-        "200":
-          description: OK
   /api/user/recall-stats:
     get:
       tags:
@@ -2527,24 +2520,6 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/RecallStatsDTO"
-  /api/user/recall-ez-diffusion:
-    get:
-      tags:
-      - user-controller
-      operationId: getRecallEzDiffusion
-      parameters:
-      - name: timezone
-        in: query
-        required: true
-        schema:
-          type: string
-      responses:
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/RecallEzDiffusionDTO"
   /api/user/menu-data:
     get:
       tags:
@@ -2577,24 +2552,6 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/UserToken"
-  /api/user/daily-probe-convergent-validity:
-    get:
-      tags:
-      - user-controller
-      operationId: getDailyProbeConvergentValidity
-      parameters:
-      - name: timezone
-        in: query
-        required: true
-        schema:
-          type: string
-      responses:
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/DailyProbeConvergentValidityDTO"
   /api/user/current-user-info:
     get:
       tags:
@@ -2951,29 +2908,6 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/BookBlockReadingRecordListItem"
-  /api/notebooks/{notebook}/book/file:
-    get:
-      tags:
-      - notebook-books-controller
-      operationId: getBookFile
-      parameters:
-      - name: notebook
-        in: path
-        required: true
-        schema:
-          type: integer
-      responses:
-        "200":
-          description: OK
-          content:
-            application/pdf:
-              schema:
-                type: string
-                format: byte
-            application/epub+zip:
-              schema:
-                type: string
-                format: byte
   /api/notebooks/{notebook}/attachments/{attachment}:
     get:
       tags:
@@ -3173,26 +3107,6 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/RecallPrompt"
-  /api/memory-trackers/{memoryTracker}/recall-logs:
-    get:
-      tags:
-      - memory-tracker-controller
-      operationId: getRecallLogs
-      parameters:
-      - name: memoryTracker
-        in: path
-        required: true
-        schema:
-          type: integer
-      responses:
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/RecallLog"
   /api/memory-trackers/{memoryTracker}/recall-history:
     get:
       tags:
@@ -5649,24 +5563,6 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/DailyProbeDay"
-    RecallEzDiffusionDTO:
-      type: object
-      properties:
-        driftRate:
-          type: number
-          format: double
-        boundarySeparation:
-          type: number
-          format: double
-        nondecisionTimeMs:
-          type: number
-          format: double
-        trialCount:
-          type: integer
-          format: int32
-        morningCount:
-          type: integer
-          format: int32
     AssimilationCountDTO:
       type: object
       properties:
@@ -5740,24 +5636,6 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/ConversationMessage"
-    DailyProbeConvergentValidityDTO:
-      type: object
-      properties:
-        pairs:
-          type: array
-          items:
-            $ref: "#/components/schemas/PairValidity"
-    PairValidity:
-      type: object
-      properties:
-        pair:
-          type: string
-        pairCount:
-          type: integer
-          format: int32
-        rawCorrelation:
-          type: number
-          format: double
     CurrentUserInfo:
       type: object
       properties:
@@ -6077,6 +5955,13 @@ components:
       - id
       - questionGeneratedTime
       - questionType
+    RecallHistoryItem:
+      type: object
+      properties:
+        recallLog:
+          $ref: "#/components/schemas/RecallLog"
+        recallPrompt:
+          $ref: "#/components/schemas/RecallPromptHistoryItem"
     RecallLog:
       type: object
       properties:
@@ -6120,13 +6005,6 @@ components:
       - memoryTrackerId
       - productOutcome
       - recordedAt
-    RecallHistoryItem:
-      type: object
-      properties:
-        recallLog:
-          $ref: "#/components/schemas/RecallLog"
-        recallPrompt:
-          $ref: "#/components/schemas/RecallPromptHistoryItem"
     LearningSessionRequestResponse:
       type: object
       properties:

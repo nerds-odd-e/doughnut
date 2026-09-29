@@ -98,28 +98,6 @@ class UserTokenControllerTest extends ControllerTestBase {
   }
 
   @Test
-  void revokeTokenDeletesTokenByBearerAuth() {
-    TokenConfigDTO tokenConfig = new TokenConfigDTO();
-    tokenConfig.setLabel("Revokable Token");
-    GeneratedTokenDTO generated = controller.generateToken(tokenConfig);
-
-    MockHttpServletRequest request = new MockHttpServletRequest();
-    request.addHeader("Authorization", "Bearer " + generated.token());
-    controller.revokeToken(request);
-
-    assertThat(controller.getTokens(), hasSize(0));
-  }
-
-  @Test
-  void revokeTokenReturns401ForInvalidToken() {
-    MockHttpServletRequest request = new MockHttpServletRequest();
-    request.addHeader("Authorization", "Bearer invalid-token");
-    ResponseStatusException exception =
-        assertThrows(ResponseStatusException.class, () -> controller.revokeToken(request));
-    assertEquals(HttpStatusCode.valueOf(401), exception.getStatusCode());
-  }
-
-  @Test
   void deleteTokenDeniedForAnotherUser() {
     UserToken otherToken =
         makeMe.aUserToken().forUser(makeMe.aUser().please()).withLabel("OTHER_USER_TOKEN").please();
