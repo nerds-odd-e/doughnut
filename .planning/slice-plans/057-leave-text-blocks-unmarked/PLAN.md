@@ -62,9 +62,13 @@ Proof commands:
 
 ### 1. The auto-mark scenario uses a block with no text of its own
 Type: Structure (test)
-Status: planned
+Status: done
 Size: about 5 minutes; E2E runtime excepted.
 Proof: `epub_book.feature` green with the moved scenario.
+Accepted proof: `SUT_TIMEOUT_MS=360000 CURSOR_DEV=true nix develop -c pnpm cy:run --spec e2e_test/features/book_reading/epub_book.feature`
+→ 15/15 passing; Rule "Landing on the chosen place", scenario "Entering the
+next EPUB block auto-marks a structural-only predecessor as read", last step
+asserts "The Full Licence" is marked read.
 
 Move "Entering the next EPUB block auto-marks a structural-only predecessor as
 read" to the long-chapter fixture's Rule: choose "The Full Licence", then
