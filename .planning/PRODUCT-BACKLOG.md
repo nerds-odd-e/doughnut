@@ -12,6 +12,7 @@ Bug fixing and general maintenance.
 
 ## Backlog list
 
+- [Reopen at the block start when the saved exact EPUB place no longer resolves](seeds/SEED-059-book-reading-uat-fixes.md#story-20) — SEED-059#story-20
 - [Attach a PDF book after installing MinerU as Donut advises](seeds/SEED-060-mineru-version-for-pdf-books.md#story-1) — SEED-060#story-1
 - [Scroll a PDF smoothly right after choosing a block](seeds/SEED-059-book-reading-uat-fixes.md#story-5) — SEED-059#story-5
 - [The current block moves the same way in PDF as in EPUB](seeds/SEED-059-book-reading-uat-fixes.md#story-16) — SEED-059#story-16
