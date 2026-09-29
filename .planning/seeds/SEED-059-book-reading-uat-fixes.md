@@ -141,42 +141,75 @@ or its text counted under another entry), so it has no stored start.
 
 **Identity:** SEED-059#story-3
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"not-refined","approach":"unselected"}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/051-pdf-layout-from-bookmarks/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"c27a37d3f8639b5500d541dffc1f7dadb46de685990fa92b882542e1c2300e61","plan":"551f6c48865af2336aeff7b1485c7823d481bde6f3df20bb8c584f8f1a329307"}}
 ```
 
-**Goal:** A PDF attached through the CLI gets one block per real heading, nested
-as in the book, so readers do not have to clean up the layout before reading.
+**Goal:** A reader who attaches a PDF book gets a layout that matches the
+book's own outline: one block per entry, nested as the book nests them, with no
+page-header copies or label blocks. They can then move around the book, follow
+the current block, and trust their reading records without first cleaning up
+the layout. Today the layout of a real book is unusable, and neither AI
+Reorganize (story 4) nor fixing by hand (story 7) is a practical way out.
 
-**Observed defects**
+**Why now:** this lowers the need for stories 4 and 7 and removes the separate
+chapter-label blocks behind story 6's first half, so it is cheaper before them.
+Every PDF attached before the fix keeps its bad layout and false records.
 
-- **Duplicates from running page headers (defect 5, High).** Think Python's 361
-  blocks contain all 218 numbered sections plus 75 duplicates from page headers
-  (for example "14.6. Databases" next to "14.6 Databases"), 3 "Contents" and 6
-  "Index" blocks, and 16 separate "Chapter N"/"Appendix A" label blocks. Choosing
-  a duplicate lands on the next page's header; the current block and "Now
-  reading" pass through duplicates while scrolling, and they are auto-marked read
-  because they have no text of their own.
-- **Flat or wrong nesting (defect 6, Medium).** Attention: every block from
-  "Abstract" to "References", including 3.2.1, sits at one depth, so "3 Model
-  Architecture" does not contain its sections. Think Python: only two depths; 6
-  of 21 chapter titles (Strings, Lists, Tuples, Inheritance, The Goodies,
-  Debugging) and 5 label blocks sit under the previous chapter; subsections such
-  as A.2.1 sit beside A.2. Hypothesis (not verified): running the MinerU outline
-  script alone gave a nested outline for the arXiv paper, so nesting may be lost
-  in Donut after extraction.
-- Reproduction: `/attach thinkpython2.pdf` in the CLI, open the reader, and
-  compare with the book's contents pages.
+**Scope**
+
+- **The PDF's bookmarks decide the layout** (owner decision, 2026-09-29). When a
+  PDF has bookmarks (the outline most PDF viewers show in a sidebar), there is
+  one block per bookmark, in the same order and nesting, at any depth the
+  layout allows. MinerU's headings no longer create blocks for that book. This
+  is the PDF counterpart of EPUB, whose layout already comes from the book's own
+  table of contents.
+- **Choosing a block lands where its bookmark points,** including a bookmark
+  with no text of its own before the next one (a chapter directly followed by
+  its first section).
+- **The book's text still belongs to blocks.** Each piece of text MinerU found
+  belongs to the last bookmark at or above it; text before the first bookmark
+  belongs to the `*beginning*` block, as today. Page headers and headings are
+  text inside a block, not blocks.
+- **Titles are the bookmark titles as they are** (owner decision, 2026-09-29),
+  even without section numbers ("What is a program?", not "1.1 What is a
+  program?").
+- **Deferred:**
+  - PDFs without bookmarks keep today's MinerU headings (owner decision,
+    2026-09-29); story 4 is their fallback.
+  - Books already attached keep their layout (owner decision, 2026-09-29).
+    Re-attaching gives the fix and loses that book's records; no migration or
+    re-extract action.
+  - Headings deeper than the bookmarks go: a book whose bookmarks stop at
+    chapters gets chapter blocks only.
+  - Web PDF attach (story 11), EPUB, AI Reorganize, and MinerU speed.
+- **Must keep working:** PDF landing on the exact page with the heading at the
+  top, the current block following scrolling, Read/Skim/Skip and resume, and
+  layout editing.
 
 **Key examples**
 
-- Think Python's layout has one block per contents entry, with chapters at the
-  top and sections and subsections nested under them; no page-header duplicates,
-  no repeated "Contents"/"Index".
-- The Attention paper arrives nested: 3 → 3.2 → 3.2.1.
+- Attach *Think Python 2e* (240 bookmarks: 22 top-level, 218 sections) → 22
+  top-level blocks (Preface, chapters, appendices) with their sections under
+  them; no page-header copies, no "Chapter N" label blocks, "Index" once.
+- Attach *Attention Is All You Need* → "Model Architecture" contains
+  "Attention", which contains "Scaled Dot-Product Attention".
+- In Think Python, choose "The way of the program" → its page is shown with the
+  chapter heading at the top, although "What is a program?" starts on the same
+  page with no text between.
+- Scroll through Think Python chapter 14 → the current block moves section by
+  section, with no copies in between.
+- Attach a PDF without bookmarks → today's layout from MinerU headings.
 
-**Effort hypothesis:** L (M if nesting is lost in Donut after MinerU), low
-confidence. Open question: should the PDF's own bookmarks be used when present?
-**Depends on:** none.
+**UAT evidence:** defects 5 and 6 in the report linked under *Why This
+Matters*. Checked 2026-09-29: both UAT PDFs carry bookmarks that match the
+book (Think Python: all 218 numbered sections; Attention: nested to three
+levels), and so does a 565-page trade book (32 chapter-level bookmarks). The
+builder copies MinerU's heading levels as they come, so the wrong nesting most
+likely comes from MinerU, not Donut (not confirmed by a MinerU run).
+
+**Effort hypothesis:** M, medium confidence.
+**Depends on:** none. After delivery, re-judge the priority of stories 4, 6,
+and 7.
 
 <a id="story-4"></a>
 
