@@ -34,7 +34,7 @@ const props = withDefaults(
   defineProps<{
     epubBytes: ArrayBuffer
     book: BookFull
-    initialLocator?: string | null
+    initialLocator?: ContentLocatorFull | null
   }>(),
   { initialLocator: null }
 )
@@ -90,11 +90,16 @@ const {
 const emitRelocated = () => emit("relocated")
 
 /**
- * Resolve a stored locator to an epub.js display target. The backend stores package-root
- * paths (e.g. `OEBPS/chapter3.xhtml`) while epub.js indexes sections by the raw manifest
- * href (e.g. `chapter3.xhtml`), so we must translate before calling `rendition.display`.
+ * Resolve a stored locator to an epub.js display target. A locator with an exact place (CFI)
+ * displays there; otherwise at href#fragment. The backend stores package-root paths (e.g.
+ * `OEBPS/chapter3.xhtml`) while epub.js indexes sections by the raw manifest href (e.g.
+ * `chapter3.xhtml`), so we must translate before calling `rendition.display`.
  */
 function epubDisplayTarget(epub: EpubLocatorFull): string | null {
+  const cfi = epub.cfi?.trim() ?? ""
+  if (cfi.length > 0) {
+    return cfi
+  }
   const storedPath = splitEpubHref(epub.href.trim()).path
   if (storedPath.length === 0) {
     return null
@@ -119,8 +124,17 @@ async function displayLocator(loc: ContentLocatorFull): Promise<void> {
   await rendition.display(target).catch(() => undefined)
 }
 
+/** The exact place (CFI) at the top of the reader's view, once epub.js has located it. */
+function currentCfi(): string | undefined {
+  const location = rendition?.currentLocation() as unknown as
+    | { start?: { cfi?: string } }
+    | undefined
+  return location?.start?.cfi
+}
+
 defineExpose({
   displayLocator,
+  currentCfi,
   viewBlockStarts,
   resolveLocatorRect,
   isLocatorBottomVisible,
@@ -163,15 +177,9 @@ async function openEpub() {
   landOneDisplayAtATime(r)
   r.on("relocated", emitRelocated)
   r.on("displayed", emitRelocated)
-  const rawInitial = (props.initialLocator ?? "").trim()
-  if (rawInitial.length > 0) {
-    const { path, fragment } = splitEpubHref(rawInitial)
-    const spineHref =
-      resolveSpineHrefForStoredPath(epubSpineItems(b), path) ?? path
-    const target =
-      fragment !== null && fragment.length > 0
-        ? `${spineHref}#${fragment}`
-        : spineHref
+  const initial = asEpubLocator(props.initialLocator ?? undefined)
+  const target = initial ? epubDisplayTarget(initial) : null
+  if (target) {
     await r.display(target).catch(() => r.display().catch(() => undefined))
   } else {
     await r.display().catch(() => undefined)

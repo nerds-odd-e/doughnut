@@ -140,7 +140,10 @@ without `cfi` is stored and returned as today.
 ### 3. Reopening an EPUB at another width shows the same paragraph at the top
 
 Type: Behavior
-Status: planned
+Status: done (accepted proof: `epub_book.feature` 18 passing, including the
+new scenario and "Reopening resumes at the last place…"; debouncer spec case
+"sends again when only the exact place (cfi) moves within the block";
+frontend `vue-tsc --noEmit`)
 Proof: the new E2E scenario plus the existing "Reopening resumes at the last
 place…" scenario, via
 `CURSOR_DEV=true nix develop -c pnpm cy:run --spec e2e_test/features/book_reading/epub_book.feature`;
@@ -214,3 +217,9 @@ leave and return. Result: that paragraph is at the top of the EPUB reader, and
 - **E2E runner:** `cy:run` accepts only known spec paths, so new scenarios go
   into an existing feature file. Worktrees share Mountebank's port 2525, so a
   concurrent E2E run in another worktree fails SUT readiness.
+- **epub.js drops the first scroll event after its own silent scroll
+  adjustment** (the continuous manager sets `ignore`). A single scroll jump
+  was never reported as `relocated`, so nothing was saved. The E2E scroll
+  step therefore overshoots by 1 px and scrolls back, standing in for a
+  reader's many scroll events. Open product risk: a reader whose scrolling
+  ends in one jump may not have that place saved.
