@@ -702,8 +702,51 @@ The auto-mode classifier returned "no verdict" errors, which the tool result cal
   - Observed effect: about 19 minutes of stalled execution and three owner prompts; no wrong action.
   - Inference: a bounded background wait (for example a timed Monitor) before one retry would likely have avoided the stops. Qualified: host-specific outage; retrying immediately in a loop was correctly avoided.
 
+## DD-147 — A two-hour UAT stopped at 56 minutes while cheap coverage gaps stayed open
+
+The owner set a two-hour manual UAT budget. The exploration agents stopped once breadth was complete (27 and 29 minutes), and the coordinator's synthesis prompt supplied the report's explanation that the remaining gaps needed other browsers, devices, or book sizes rather than more time. Two listed gaps were testable in the same setup: a mid-size book for the AI reorganization limit (the CLI can attach part of a PDF with `DONUT_MINERU_PDF_END_PAGE`) and EPUB heading-only auto-marking.
+
+### Occurrences
+
+- Execution: SEED-054#story-1 / `.planning/slice-plans/011-book-reading-uat/PLAN.md` / 681768a71b; Timestamp: 2026-09-29T08:36+08:00 (second exploration part ends); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.46.
+  - Evidence: seed `## UAT Findings` time list and `### Coverage gaps`; plan learnings for the two exploration parts; the coordinator's synthesis prompt asked for "the remaining gaps need other browsers, touch devices, or book sizes rather than more time".
+  - Observed effect: 64 budget minutes unused; the size at which AI reorganization fails (defect 10) stays unknown.
+  - Inference: exploration prompts could say to spend leftover budget on the cheapest open gaps before stopping, and the coordinator should not pre-write the report's justification. Qualified: one execution; the story calls the budget a limit, not a target.
+
+## DD-148 — Per-slice refactor passes on a documentation-only UAT report kept restructuring the previous slice's text
+
+Each of three report-writing slices ended with a fresh post-change refactor agent. The second pass merged lists that the first pass had just shaped (two "what worked" notes, two coverage-gap lists, two small-items lists), because the report's final shape only exists after the last slice.
+
+### Occurrences
+
+- Execution: SEED-054#story-1 / `.planning/slice-plans/011-book-reading-uat/PLAN.md` / 681768a71b; Timestamp: 2026-09-29T08:45+08:00 (second refactor pass); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.46.
+  - Evidence: refactor returns for the three slices (about 72k, 85k, and 74k subagent tokens); the second return lists merges of lists written by the first slice.
+  - Observed effect: about 230k tokens and three agent round trips for text-only changes; the merges were useful but partly repeated.
+  - Inference: a single refactor pass after the last report slice, or slicing the UAT so only the final slice writes the synthesis and structure, may give the same result for less. Qualified: the passes also fixed real duplication and wording.
+
+## DD-149 — `execution-start.mjs` guidance names a "publisher ID" without its flag, and `--publisher` is refused
+
+The execute-plan skill text lists a "stable execution publisher ID" as a start input without naming the flag. The coordinator passed `--publisher`, which the script refused as `missing publisherId`; the usage line shows `--publisher-id`.
+
+### Occurrences
+
+- Execution: SEED-054#story-1 / `.planning/slice-plans/011-book-reading-uat/PLAN.md` / 681768a71b; Timestamp: 2026-09-29T07:22+08:00; Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.46.
+  - Evidence: start result `{"ok":false,"status":"invalid-request","error":"missing publisherId"}`; usage line in `execution-start.mjs`.
+  - Observed effect: one refused call and a usage lookup; no state change.
+
+## DD-150 — The Development stack failed to start on stale compiled backend classes in the default checkout
+
+`pnpm dev` from the default checkout failed with `No qualifying bean of type NotebookGitCutoverService`: `backend/build/classes` still held classes from before that service was removed. Deleting `backend/build/classes` let the next start succeed.
+
+### Occurrences
+
+- Execution: SEED-054#story-1 / `.planning/slice-plans/011-book-reading-uat/PLAN.md` / 681768a71b; Timestamp: 2026-09-29T07:25:42+08:00; Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.46.
+  - Evidence: `dev.log` "APPLICATION FAILED TO START" with the missing-bean message; `git grep NotebookGitCutoverService -- backend/src` found nothing; the next `pnpm dev` was healthy.
+  - Observed effect: one failed start and a short diagnosis before the UAT setup could continue.
+  - Inference: the Development start's incremental build did not drop classes whose sources were deleted. Qualified: cause not investigated further.
+
 ## Retention
 
-- Highest allocated local number: 146. Removed local codes are never reused.
+- Highest allocated local number: 150. Removed local codes are never reused.
 - Full pre-maintenance log and earlier recovery locators: `99fa1b9835e3dff2473837ba2a1f8b11967d5938:DearDough.md`.
 - Occurrence history is partial; active evidence stays here or in the Open Dough catalog and watch list.

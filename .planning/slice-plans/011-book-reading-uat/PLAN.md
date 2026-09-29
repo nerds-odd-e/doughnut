@@ -127,3 +127,13 @@ rereading the session.
 - Slice 4 (accepted 2026-09-29): the report ends with time, suggested priorities (P1: defects 1, 2, 5, 6,
   10), 11 fix stories and 10 capability stories, and recommendations on the seed's Open Decisions. Three
   P3 polish improvements are intentionally in no follow-up story.
+
+## Execution complete
+
+Product advice: Queue the report's P1 fix stories first (EPUB chapter landing; PDF extraction headings and
+nesting; AI reorganization on a real-size book; the phone-width reader), as one defect seed holding the
+proposed fix stories, the way the sidebar UAT's findings were queued. Consider the small "change or clear a
+reading record" capability early because the defects already leave wrong records. Before closing, the owner
+decides whether to spend part of the 64 unused budget minutes on two gaps testable in the same setup (a
+mid-size PDF to find where AI reorganization starts failing; EPUB heading-only auto-marking); the report's
+sentence that the remaining gaps need other browsers, devices, or book sizes is only partly accurate.
