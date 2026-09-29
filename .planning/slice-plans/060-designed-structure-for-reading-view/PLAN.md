@@ -23,9 +23,7 @@ see no change in either format.
   panel anchor on window resize.
 - **Excluded:** changes to `PdfBookViewer.vue` and `EpubBookViewer.vue` beyond
   the surface boundary; `useBookReadingBootstrap`; any user-visible change.
-- **Assumption:** the owner asked for this plan after the story recorded the
-  proposed architecture as its open question; planning proceeds on that
-  architecture. If the owner rejects it, this plan is replanned, not executed.
+- **Architecture:** confirmed by the owner on 2026-09-29.
 
 ## Architecture
 

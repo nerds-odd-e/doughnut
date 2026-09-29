@@ -447,7 +447,7 @@ Panel at the end of that paragraph, as they do for blocks with more text.
 
 **Identity:** SEED-059#story-19
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/060-designed-structure-for-reading-view/PLAN.md","assessment":"not-ready","reasons":["The owner has not yet confirmed the proposed architecture (one format-neutral reading session and shell, one reading surface per format with explicit capabilities), which the story records as its open question and every slice builds on."],"basis":{"document":"b2743f6ea3e158b192ba8f73c75d682f2f516ca642d5b6a3c3d380058cf83a7c","plan":"a753cb608daf0d297d70b215eb239b06865aaa85b3b34f00b663a6eb1947b54b"}}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/060-designed-structure-for-reading-view/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"9969518ae62bcc71bff0bd055be88b65cfa23b7067766df35effc8b13ce3a412","plan":"0da09d6cdfba248eba95cc6016fed2292a0e7012f372d90f3c17fb9112599f16"}}
 ```
 
 **Goal:** Developers of later book-reading stories (7, 9, 10, 16, 17, 18)
@@ -485,7 +485,7 @@ adds lines to one of them.
   `EpubBookViewer.vue` other than what the new surface boundary needs. The
   viewer is the format's rendering component and is not part of this story.
 
-**Architecture** (proposed; for the owner to confirm)
+**Architecture** (confirmed by the owner, 2026-09-29)
 
 - **One format-neutral reading view** owns everything that does not depend on
   how the book is displayed: the global bar with the book name, the book
@@ -528,16 +528,13 @@ adds lines to one of them.
   10).
 
 **Effort hypothesis:** M–L, low confidence; the design moves the wiring of
-two views into one, not only one file.
+two views into one, not only one file. Slices:
+[plan 060](../slice-plans/060-designed-structure-for-reading-view/PLAN.md).
 **Depends on:** none. Placed first so later book-reading stories build on it.
 **Evidence:** DD-160 (the file-size check was waived for
 `BookReadingContent.vue` in SEED-059#story-2), and SEED-059#story-6 (change or
 clear a reading mark) added one binding line to each view in two slices while
 leaving the PDF view over the limit.
-
-**Open question:** the owner confirms the proposed architecture (one
-format-neutral view, one surface per format with explicit capabilities) before
-slice planning.
 
 ## Ordering and Scope Reduction
 
