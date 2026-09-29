@@ -73,3 +73,23 @@ export const ensureOnBookReadingPage = () => {
   cy.location('pathname').should('match', BOOK_READING_PATHNAME)
   cy.get('[data-testid="book-reading-page"]').should('exist')
 }
+
+/** Offsets in px from the top of the reader's scrolled view to each rendered heading with this text. */
+export function epubHeadingOffsetsFromReaderTopPx(
+  container: HTMLElement,
+  headingText: string
+): number[] {
+  return [...container.querySelectorAll('iframe')].flatMap((f) => {
+    const iframe = f as HTMLIFrameElement
+    return [
+      ...(iframe.contentDocument?.querySelectorAll('h1,h2,h3,h4,h5,h6') ?? []),
+    ]
+      .filter((h) => (h.textContent ?? '').trim() === headingText)
+      .map(
+        (h) =>
+          iframe.getBoundingClientRect().top +
+          h.getBoundingClientRect().top -
+          container.getBoundingClientRect().top
+      )
+  })
+}

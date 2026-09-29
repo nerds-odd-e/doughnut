@@ -1,4 +1,3 @@
-@ignore
 Feature: EPUB book
 
   Rule: Supported minimal EPUB in reading view
@@ -50,7 +49,7 @@ Feature: EPUB book
       When I choose the book block "Chapter Alpha"
       Then the book block "Chapter Alpha" should be the current selection in the book reader
       And the book block "Chapter Alpha" should be the current block in the book reader
-      When I scroll the EPUB reader until the text "Cell One" is in the viewport
+      When I scroll the EPUB reader until the heading "Chapter Beta" passes the top
       Then the book block "Chapter Alpha" should be the current selection in the book reader
       And the current block in the book layout should not be the selected block
 
@@ -71,6 +70,26 @@ Feature: EPUB book
       And I mark the book block "Chapter Alpha" as skimmed in the Reading Control Panel
       Then I should see that book block "Chapter Alpha" is marked as skimmed in the book layout
       And I should see that book block "Chapter Beta" is selected in the book layout
+
+  Rule: Landing on the chosen place
+
+    Background:
+      Given I am logged in as an existing user
+      And I have a notebook "EPUB landing" with a note "EPUB Landing E2E Notebook"
+      And I open the notebook settings for "EPUB landing"
+      And I attach the EPUB file "book_reading/epub_long_chapter_before_target.epub"
+
+    Scenario Outline: Choosing a chapter after a long chapter shows its heading at the top
+      Given I set the book reading viewport to <width> by <height>
+      And I open the reading view for the attached book "epub_long_chapter_before_target"
+      When I choose the book block "Chapter Two"
+      Then the heading "Chapter Two" should be at the top of the EPUB reader
+      And the book block "Chapter Two" should be the current block in the book reader
+
+      Examples:
+        | width | height |
+        | 1440  | 900    |
+        | 1280  | 560    |
 
   Rule: Unsupported EPUB attachment
 

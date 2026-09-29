@@ -4,6 +4,7 @@ import {
   BOOK_READING_PATHNAME,
   bookBlockRowByTitle,
   ensureOnBookReadingPage,
+  epubHeadingOffsetsFromReaderTopPx,
   epubHostViewportIntersectsMarker,
   notebookIdFromBookReadingPathname,
 } from './bookReadingShared'
@@ -65,6 +66,65 @@ export const bookReadingEpubMethods = () => ({
         ).to.be.true
       })
     return this
+  },
+  /**
+   * The heading's top edge sits at the top edge of the reader's scrolled view
+   * (`.epub-container`), within a few pixels.
+   */
+  expectEpubHeadingAtTopOfReader(headingText: string) {
+    ensureOnBookReadingPage()
+    const tolerancePx = 8
+    cy.get('[data-testid="epub-book-viewer"] .epub-container', {
+      timeout: 30000,
+    }).should(($c) => {
+      const offsets = epubHeadingOffsetsFromReaderTopPx(
+        $c.get(0) as HTMLElement,
+        headingText
+      )
+      expect(offsets, `EPUB heading "${headingText}" rendered`).to.have.length(
+        1
+      )
+      const offset = Math.round(offsets[0] ?? Number.NaN)
+      expect(
+        Math.abs(offset),
+        `EPUB heading "${headingText}" should be at the top of the reader, but its top is ${offset}px from the reader's top`
+      ).to.be.at.most(tolerancePx)
+    })
+    return this
+  },
+  /**
+   * Scrolls the reader down in steps until the heading is rendered, then scrolls it just
+   * above the top of the reader's view.
+   */
+  scrollEpubReaderUntilHeadingPassesTop(headingText: string) {
+    ensureOnBookReadingPage()
+    const maxSteps = 48
+    const step = (n: number): Cypress.Chainable =>
+      cy
+        .get('[data-testid="epub-book-viewer"] .epub-container', {
+          timeout: 30000,
+        })
+        .then(($c) => {
+          const container = $c.get(0) as HTMLElement
+          const [offset] = epubHeadingOffsetsFromReaderTopPx(
+            container,
+            headingText
+          )
+          if (offset !== undefined) {
+            container.scrollTop += offset + 10
+            cy.wait(300)
+            return cy.wrap(null)
+          }
+          if (n >= maxSteps) {
+            throw new Error(
+              `scrollEpubReaderUntilHeadingPassesTop: heading "${headingText}" not rendered after ${maxSteps} steps`
+            )
+          }
+          container.scrollTop += Math.ceil(container.clientHeight * 0.85)
+          cy.wait(200)
+          return step(n + 1)
+        })
+    return cy.then(() => step(0))
   },
   /**
    * Scrolls the epub.js host (`.epub-book-viewer-host`, `overflow-auto`) in steps until

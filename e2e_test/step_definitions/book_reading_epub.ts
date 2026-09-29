@@ -62,3 +62,19 @@ Then(
     return bookReadingPage().expectEpubReadingControlPanelContentAnchored()
   }
 )
+
+When(
+  'I scroll the EPUB reader until the heading {string} passes the top',
+  // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
+  (headingText: string) => {
+    return bookReadingPage().scrollEpubReaderUntilHeadingPassesTop(headingText)
+  }
+)
+
+Then(
+  'the heading {string} should be at the top of the EPUB reader',
+  // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
+  (headingText: string) => {
+    return bookReadingPage().expectEpubHeadingAtTopOfReader(headingText)
+  }
+)

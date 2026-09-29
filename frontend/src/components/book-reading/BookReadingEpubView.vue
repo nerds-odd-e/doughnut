@@ -71,7 +71,10 @@ import {
   BOOK_READING_LAYOUT_BREAKPOINT_PX,
   bookLayoutAsideInitiallyOpen,
 } from "@/lib/book-reading/bookReadingLayoutBreakpoint"
-import { currentBlockIdFromEpubLocation } from "@/lib/book-reading/currentBlockIdFromEpubLocation"
+import {
+  currentBlockIdFromEpubView,
+  type EpubViewBlockStarts,
+} from "@/lib/book-reading/currentBlockIdFromEpubView"
 import { splitEpubHref } from "@/lib/book-reading/epubHrefMatch"
 import type {
   BookBlockFull,
@@ -87,7 +90,7 @@ type EpubViewerExposed = Pick<
   | "resolveLocatorRect"
   | "isLocatorBottomVisible"
   | "readingPanelAnchorTopPx"
->
+> & { viewBlockStarts: () => EpubViewBlockStarts | null }
 
 const bookReadingBookLayoutPanelId = "book-reading-book-layout-panel"
 
@@ -160,7 +163,7 @@ const {
     if (loc) {
       await epubViewerRef.value?.displayLocator(loc)
     }
-    currentBlockIdDebouncer.commitNow(block.id)
+    currentBlockIdDebouncer.commitNow(currentBlockIdInView())
   },
   afterAdvance: async () => {
     await nextTick()
@@ -168,23 +171,16 @@ const {
   },
 })
 
-/**
- * When the page restores a saved EPUB position, the tiny continuous-scrolled viewport may
- * already render the target section so epub.js never fires a fresh `relocated` event for it.
- * Seed the current-block debouncer from the saved locator so the layout reflects where we
- * just resumed before any scroll-driven event arrives. Fall back to the saved selection if
- * the href cannot be mapped.
- */
-const seedHref = initialLocatorDisplayHref.value
-if (seedHref !== null && seedHref.length > 0) {
-  const seededId = currentBlockIdFromEpubLocation(props.book.blocks, seedHref)
-  if (seededId !== null) {
-    currentBlockIdDebouncer.commitNow(seededId)
-  } else if (props.initialSelectedBlockId !== null) {
-    currentBlockIdDebouncer.commitNow(props.initialSelectedBlockId)
+function currentBlockIdInView(): number | null {
+  const view = epubViewerRef.value?.viewBlockStarts()
+  if (!view) {
+    return null
   }
-} else if (props.initialSelectedBlockId !== null) {
-  currentBlockIdDebouncer.commitNow(props.initialSelectedBlockId)
+  return currentBlockIdFromEpubView(
+    props.book.blocks,
+    view,
+    selectedBlockId.value
+  )
 }
 
 const windowWidth = ref(
@@ -219,7 +215,7 @@ refreshReadingPanelAnchorAfterSelection.value = updateReadingPanelAnchor
 
 function onEpubRelocated(payload: { href: string }) {
   lastRelocateHref.value = payload.href
-  const id = currentBlockIdFromEpubLocation(props.book.blocks, payload.href)
+  const id = currentBlockIdInView()
   if (id !== null) {
     currentBlockIdDebouncer.propose(id)
   }

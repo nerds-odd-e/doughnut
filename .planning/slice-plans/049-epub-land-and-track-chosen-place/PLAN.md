@@ -31,8 +31,9 @@ migration of stored layouts.
     layout choices and the reading panel's advance. Change it; do not add a
     second landing path. Links inside the book go through epub.js directly;
     slice 1 finds whether they share the cause.
-  - Current block: `currentBlockIdFromEpubLocation` is the one location →
-    block rule, used for relocation and for seeding on reopen. Evolve it
+  - Current block: `currentBlockIdFromEpubView` is the one view →
+    block rule, used for relocation, the post-advance commit, and reopen (the
+    viewer's first report after display; href-based seeding is gone). Evolve it
     there, not per caller.
   - Anchorless blocks: the extractor already gives the `*beginning*` block a
     `beginning_anchor` payload that carries a start without contributing
@@ -115,7 +116,7 @@ stop before slice 2 and replan it with the owner.
 
 ### 2. Choosing a block lands at the top, and the block at the top is current
 Type: Behavior
-Status: planned
+Status: done
 Proof: all of `epub_book.feature` green in the isolated runner except the
 in-book link scenario (slice 3), including the six scenarios that failed
 before and the choose-Chapter-Two outline at 1440×900 and 1280×560;
