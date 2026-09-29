@@ -223,3 +223,11 @@ leave and return. Result: that paragraph is at the top of the EPUB reader, and
   step therefore overshoots by 1 px and scrolls back, standing in for a
   reader's many scroll events. Open product risk: a reader whose scrolling
   ends in one jump may not have that place saved.
+
+## Execution complete
+
+Product advice: keep story 17 closed as delivered. Queue SEED-059#story-20
+(a stale exact place reopens at the block start, plan 062) at the owner's
+discretion: it fixes a small gap in story 17's fallback promise. Watch the
+next book-reading UAT for a place that is not saved after a single scroll
+jump; open no story unless a reader reproduces it. No backlog reorder.
