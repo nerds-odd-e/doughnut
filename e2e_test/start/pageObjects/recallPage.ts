@@ -146,10 +146,14 @@ const recallPage = () => {
             'You have finished all recalls for this half a day!'
           ).should('be.visible')
         } else {
-          cy.findByText(title, { selector: 'h2 *' })
+          this.expectRecalling(title)
           this.chooseGood()
         }
       })
+    },
+    expectRecalling(noteTitle: string) {
+      cy.findByText(noteTitle, { selector: 'h2 *' })
+      return this
     },
     expectCurrentQuestion() {
       waitUntilAppIsNotBusy()

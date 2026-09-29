@@ -13,6 +13,7 @@ export const fetchDueRecalls = async (dueInDays?: number) => {
 export function useRecallCatchUp() {
   const {
     toRepeat,
+    currentIndex,
     setToRepeat,
     setDueCommissioned,
     setTotalAssimilatedCount,
@@ -23,11 +24,13 @@ export function useRecallCatchUp() {
     const response = await fetchDueRecalls(0)
     if (!response) return
     const queued = toRepeat.value ?? []
-    const queuedIds = new Set(queued.map((t) => t.memoryTrackerId))
+    const waitingIds = new Set(
+      queued.slice(currentIndex.value).map((t) => t.memoryTrackerId)
+    )
     setToRepeat([
       ...queued,
       ...(response.toRepeat ?? []).filter(
-        (t) => !queuedIds.has(t.memoryTrackerId)
+        (t) => !waitingIds.has(t.memoryTrackerId)
       ),
     ])
     setDueCommissioned(response.dueCommissioned ?? [])

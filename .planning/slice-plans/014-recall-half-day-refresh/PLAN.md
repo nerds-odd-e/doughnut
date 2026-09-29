@@ -43,7 +43,8 @@ stays a replacement, because removal must drop queued trackers.
 
 - **One catch-up operation.** A single frontend operation fetches
   `RecallsController.recalling` with `dueindays: 0`, adds returned `toRepeat`
-  trackers whose `memoryTrackerId` is not already in the shared queue to its
+  trackers whose `memoryTrackerId` is not still waiting in the shared queue (at
+  or after the current position; an answered tracker due again is added) to its
   end, and updates `dueCommissioned`, `totalAssimilatedCount`, and
   `currentRecallWindowEndAt`. It never touches the position or diligent mode.
   Both the recall page's return path and the boundary timer call it; they do
@@ -104,7 +105,19 @@ rewritten to the new rule, not kept alongside it.
 ### 2. Recall catches up by itself when the half-day ends
 
 Type: Behavior
-Status: planned
+Status: done
+Accepted proof: `CURSOR_DEV=true nix develop -c pnpm -C frontend build` (runs
+`vue-tsc` over tests too; a standalone `vue-tsc --noEmit` missed a test type
+error CI caught), `… vitest run tests/pages/RecallPage tests/toolbars/MainMenu`
+(65 pass), and `SUT_TIMEOUT_MS=360000 … pnpm cy:run --spec
+e2e_test/features/recall/spaced_repetition.feature` (4 pass; the new scenario
+failed with the timer callback disabled, showing "finished all recalls").
+Repair to slice 1 found here: deduplicating against the whole queue hid an
+answered tracker that came due again ("Strictly follow the schedule" failed);
+deduplication now covers only waiting trackers. Time-zone note: on a +08
+machine the mocked browser clock is ahead of the backend, so the timer fires
+on the scenario's first `cy.tick`; the scenario stays deterministic because
+nothing ticks before the full-day tick.
 Proof:
 - E2E, a new scenario in `e2e_test/features/recall/spaced_repetition.feature`
   (`@mockBrowserTime`): assimilate a note on day 1 morning; browser and backend

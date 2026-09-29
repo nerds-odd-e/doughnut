@@ -59,7 +59,7 @@ describe("RecallPage KeepAlive activation", () => {
     expect(mockData.toRepeat.value).toEqual([loadedTracker])
   })
 
-  it("keeps the queue and position on return and adds newly due trackers at the end", async () => {
+  it("keeps the queue and position on return and adds newly due trackers, including answered ones due again, at the end", async () => {
     const tracker1 = createMemoryTrackerLite(1)
     const tracker2 = createMemoryTrackerLite(2)
     const tracker3 = createMemoryTrackerLite(3)
@@ -68,17 +68,27 @@ describe("RecallPage KeepAlive activation", () => {
     ctx.recallingSpy.mockResolvedValue(dueRecallsWith([tracker1, tracker2]))
     const wrapper = mountWithKeepAlive()
     await flushPromises()
-    wrapper.findComponent(RecallPage).vm.currentIndex = 1
+    const recallPage = wrapper.findComponent(RecallPage).vm as unknown as {
+      currentIndex: number
+    }
+    recallPage.currentIndex = 1
 
     // biome-ignore lint/suspicious/noExplicitAny: test wrapper's own data property
     ;(wrapper.vm as any).show = false
     await nextTick()
-    ctx.recallingSpy.mockResolvedValue(dueRecallsWith([tracker2, tracker3]))
+    ctx.recallingSpy.mockResolvedValue(
+      dueRecallsWith([tracker1, tracker2, tracker3])
+    )
     // biome-ignore lint/suspicious/noExplicitAny: test wrapper's own data property
     ;(wrapper.vm as any).show = true
     await flushPromises()
 
-    expect(mockData.toRepeat.value).toEqual([tracker1, tracker2, tracker3])
+    expect(mockData.toRepeat.value).toEqual([
+      tracker1,
+      tracker2,
+      tracker1,
+      tracker3,
+    ])
     expect(mockData.currentIndex.value).toBe(1)
   })
 })
