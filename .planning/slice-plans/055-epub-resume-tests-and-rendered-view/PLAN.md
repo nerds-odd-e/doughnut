@@ -1,7 +1,7 @@
 # EPUB resume tests say what the product does, and one lookup finds a locator's rendered view
 
-**Identity:** SEED-059#story-13
-**Source:** [correction story](../../seeds/SEED-059-book-reading-uat-fixes.md#story-13), from the
+**Identity:** SEED-059#story-14
+**Source:** [correction story](../../seeds/SEED-059-book-reading-uat-fixes.md#story-14), from the
 execution retrospective of SEED-059#story-1 (final plan
 `52e8d849e7:.planning/slice-plans/049-epub-land-and-track-chosen-place/PLAN.md`, original
 contract `e733844d01:.planning/slice-plans/049-epub-land-and-track-chosen-place/PLAN.md`; reviewed

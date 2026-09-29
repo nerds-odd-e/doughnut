@@ -11,7 +11,7 @@ Bug fixing and general maintenance.
 
 ## Backlog list
 
-- [EPUB resume tests say what the product does, and one lookup finds a locator's rendered view](seeds/SEED-059-book-reading-uat-fixes.md#story-13) — SEED-059#story-13
+- [EPUB resume tests say what the product does, and one lookup finds a locator's rendered view](seeds/SEED-059-book-reading-uat-fixes.md#story-14) — SEED-059#story-14
 - [Read a book on a phone](seeds/SEED-059-book-reading-uat-fixes.md#story-2) — SEED-059#story-2
 - [Get a PDF book layout that matches the book's headings and nesting](seeds/SEED-059-book-reading-uat-fixes.md#story-3) — SEED-059#story-3
 - [Reorganize a full-size book with AI](seeds/SEED-059-book-reading-uat-fixes.md#story-4) — SEED-059#story-4

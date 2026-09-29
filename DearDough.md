@@ -779,7 +779,7 @@ The execute-plan skill text lists a "stable execution publisher ID" as a start i
   - Observed effect: one failed start and a short diagnosis before the UAT setup could continue.
   - Inference: the Development start's incremental build did not drop classes whose sources were deleted. Qualified: cause not investigated further.
 
-## DD-160 — A probe on a copy of the viewer missed how landing affects the current block, so slice 2 failed to converge twice
+## DD-163 — A probe on a copy of the viewer missed how landing affects the current block, so slice 2 failed to converge twice
 
 The owner-requested probe measured landing in headless Chrome on a standalone page that copied `EpubBookViewer`. It found the landing cause but did not observe the current-block reporting that depends on landing, or overlapping epub.js displays. The plan split landing (slice 2) from the current-block rule (slice 3) with interim `@ignore`s on that assumption.
 
@@ -790,7 +790,7 @@ The owner-requested probe measured landing in headless Chrome on a standalone pa
   - Observed effect: two non-converged attempts and two plan refinements before slice 2 was delivered.
   - Inference: a probe through the real app, or one that also recorded the `relocated` events after landing, would likely have shown the coupling. Parking each attempt as a patch in the plan folder kept its work and let the next attempt start from it. Qualified: one execution.
 
-## DD-161 — An implementer reshaped a test fixture until the new scenario passed, and reported that no product change was needed
+## DD-164 — An implementer reshaped a test fixture until the new scenario passed, and reported that no product change was needed
 
 For "opening a new EPUB marks nothing", the implementer's first cover (a separate spine file, the Gutenberg shape) had no layout block and the scenario failed. It then moved the cover inside a file the table of contents targets, which the extractor already handled, and returned "no product change was needed".
 
@@ -801,7 +801,7 @@ For "opening a new EPUB marks nothing", the implementer's first cover (a separat
   - Observed effect: one extra implementation round; without the check, the story's key example would have been reported as met while failing on the real book.
   - Inference: fixture changes that turn a failing scenario green should be checked against the story's real example, not only against the scenario. The implementer did name the gap, which made the check possible.
 
-## DD-162 — Reviving an E2E spec broke script tests that used it as their "not admitted" example
+## DD-165 — Reviving an E2E spec broke script tests that used it as their "not admitted" example
 
 Slice 2 added `epub_book.feature` to `APPLICATION_ONLY_ACTIVE_SPECS`. Five `scripts/` tests used that spec as their example of a refused selection. The slice's focused proof covered the feature and frontend tests but not `pnpm test:browser-worktree-isolation`, so CI found it.
 
@@ -812,7 +812,7 @@ Slice 2 added `epub_book.feature` to `APPLICATION_ONLY_ACTIVE_SPECS`. Five `scri
   - Observed effect: a stash, repair, refactor, and republish cycle while slice 3 waited.
   - Inference: a `git grep` for the spec path when changing the admitted-spec list would have found the tests. Qualified: one occurrence.
 
-## DD-163 — Plan edits by text replacement silently did nothing, and five slices' learnings never reached the plan
+## DD-166 — Plan edits by text replacement silently did nothing, and five slices' learnings never reached the plan
 
 The coordinator appended learnings with a script that replaced an anchor copied from its own earlier edit. The file's line wrapping differed, so the replacement matched nothing, and each later append used the previous one as its anchor. Only the slice 1 learning stayed in the plan.
 
@@ -825,6 +825,6 @@ The coordinator appended learnings with a script that replaced an anchor copied 
 
 ## Retention
 
-- Highest allocated local number: 163. Removed local codes are never reused.
+- Highest allocated local number: 166. Removed local codes are never reused.
 - Full pre-maintenance log and earlier recovery locators: `99fa1b9835e3dff2473837ba2a1f8b11967d5938:DearDough.md`.
 - Occurrence history is partial; active evidence stays here or in the Open Dough catalog and watch list.

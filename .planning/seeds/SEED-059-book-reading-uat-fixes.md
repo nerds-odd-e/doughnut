@@ -449,16 +449,16 @@ through each chapter and the book they are, and what is left at the end.
 **Effort hypothesis:** M, medium confidence.
 **Depends on:** none.
 
-<a id="story-13"></a>
+<a id="story-14"></a>
 
 ### EPUB resume tests say what the product does, and one lookup finds a locator's rendered view
 
-**Identity:** SEED-059#story-13
+**Identity:** SEED-059#story-14
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/050-epub-resume-tests-and-rendered-view/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"a208da0edbcf41f4ccb67091893f8cd52d43c61e98480371e71314f5900cd7db","plan":"ab290b6744b0cf83d7dddb7919c0fb0a3b3ac47ccd3db90330dda886779e0172"}}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/055-epub-resume-tests-and-rendered-view/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"4d0e96bd4758f167eb25e45e69000265365cf945e48bd04c527ec7927752f222","plan":"2b3317d1198d19618685bde607a375b9e856304b73b5e1f748206c74bd4f56d0"}}
 ```
 
-**Slice plan:** [EPUB resume tests and rendered view](../slice-plans/050-epub-resume-tests-and-rendered-view/PLAN.md)
+**Slice plan:** [EPUB resume tests and rendered view](../slice-plans/055-epub-resume-tests-and-rendered-view/PLAN.md)
 
 **Goal:** Developers reading Donut's EPUB tests see only behavior the product
 has, and the EPUB viewer places a locator one way for both the reading panel
