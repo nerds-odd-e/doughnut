@@ -1,10 +1,12 @@
 package com.odde.donut.controllers;
 
+import static com.odde.donut.controllers.NotebookBooksControllerTestBase.ONE_PAGE_PDF;
 import static com.odde.donut.controllers.NotebookBooksControllerTestBase.attachRequest;
 import static com.odde.donut.controllers.NotebookBooksControllerTestBase.epubAttachRequest;
 import static com.odde.donut.controllers.NotebookBooksControllerTestBase.epubFile;
 import static com.odde.donut.controllers.NotebookBooksControllerTestBase.lastReadBody;
 import static com.odde.donut.controllers.NotebookBooksControllerTestBase.node;
+import static com.odde.donut.controllers.NotebookBooksControllerTestBase.onePagePdf;
 import static com.odde.donut.controllers.NotebookBooksControllerTestBase.pdfFile;
 import static com.odde.donut.controllers.NotebookBooksControllerTestBase.readFixtureEpubValidMinimal;
 import static com.odde.donut.controllers.NotebookBooksControllerTestBase.rootBlocksSorted;
@@ -36,14 +38,14 @@ class NotebookBooksAttachNotebookFileControllerTest
   void theBookAndItsFileAtTheNotebookRootAreAcceptedInOneCommit() throws Exception {
     Notebook notebook = createGitBackedNotebook();
     List<String> commitsBefore = acceptedHistory(notebook).commits();
-    byte[] pdfBytes = new byte[] {0x25, 0x50, 0x44, 0x46, 0x2d, 0x31, 0x2e};
 
-    notebookBooksController.attachBook(notebook, physicsPrimer(), pdfFile(pdfBytes));
+    notebookBooksController.attachBook(notebook, physicsPrimer(), pdfFile(ONE_PAGE_PDF));
 
     AcceptedHistory after = acceptedHistory(notebook);
     assertThat(after.parents(), equalTo(commitsBefore));
     assertThat(
-        tipContent(after, "Physics Primer.pdf"), equalTo(lfsPointerStoredFor(notebook, pdfBytes)));
+        tipContent(after, "Physics Primer.pdf"),
+        equalTo(lfsPointerStoredFor(notebook, ONE_PAGE_PDF)));
     assertThat(
         notebookAttachmentRepository
             .findByNotebook_IdAndFolderIsNullAndFilename(notebook.getId(), "Physics Primer.pdf")
@@ -51,7 +53,7 @@ class NotebookBooksAttachNotebookFileControllerTest
         equalTo(true));
     Book book = bookRepository.findByNotebook_Id(notebook.getId()).orElseThrow();
     assertThat(book.getSourceFilePath(), equalTo("Physics Primer.pdf"));
-    assertThat(booksController.getBookFile(webRequest(), book).getBody(), equalTo(pdfBytes));
+    assertThat(booksController.getBookFile(webRequest(), book).getBody(), equalTo(ONE_PAGE_PDF));
     assertAcceptedTreeMatchesTheFullAssembly(notebook);
   }
 
@@ -71,7 +73,7 @@ class NotebookBooksAttachNotebookFileControllerTest
   @Test
   void aFileOverTenMebibytesIsAttachedAndReadBack() throws Exception {
     Notebook notebook = createGitBackedNotebook();
-    byte[] pdfBytes = new byte[11 * 1024 * 1024];
+    byte[] pdfBytes = onePagePdf(11 * 1024 * 1024);
 
     Book book =
         notebookBooksController.attachBook(notebook, physicsPrimer(), pdfFile(pdfBytes)).getBody();
@@ -85,7 +87,7 @@ class NotebookBooksAttachNotebookFileControllerTest
     byte[] existing = {0x01, 0x02};
     storeFolderAttachmentAndSnapshot(notebook, null, "Physics Primer.pdf", existing);
 
-    notebookBooksController.attachBook(notebook, physicsPrimer(), pdfFile(new byte[] {0x25, 0x50}));
+    notebookBooksController.attachBook(notebook, physicsPrimer(), pdfFile(ONE_PAGE_PDF));
 
     AcceptedHistory after = acceptedHistory(notebook);
     assertThat(
@@ -100,7 +102,7 @@ class NotebookBooksAttachNotebookFileControllerTest
     Notebook notebook = createGitBackedNotebook();
     storeFolderAttachmentAndSnapshot(notebook, null, "physics primer.pdf", new byte[] {0x01});
 
-    notebookBooksController.attachBook(notebook, physicsPrimer(), pdfFile(new byte[] {0x25, 0x50}));
+    notebookBooksController.attachBook(notebook, physicsPrimer(), pdfFile(ONE_PAGE_PDF));
 
     assertThat(
         bookRepository.findByNotebook_Id(notebook.getId()).orElseThrow().getSourceFilePath(),
@@ -111,8 +113,7 @@ class NotebookBooksAttachNotebookFileControllerTest
   void aBookNameThatIsNotAPlainFilenameGetsADonutChosenName() throws Exception {
     Notebook notebook = createGitBackedNotebook();
 
-    notebookBooksController.attachBook(
-        notebook, bookNamed("a/b"), pdfFile(new byte[] {0x25, 0x50}));
+    notebookBooksController.attachBook(notebook, bookNamed("a/b"), pdfFile(ONE_PAGE_PDF));
 
     assertThat(
         bookRepository.findByNotebook_Id(notebook.getId()).orElseThrow().getSourceFilePath(),
@@ -122,8 +123,7 @@ class NotebookBooksAttachNotebookFileControllerTest
   @Test
   void removingTheBookLeavesItsFileInTheNotebook() throws Exception {
     Notebook notebook = createGitBackedNotebook();
-    byte[] pdfBytes = new byte[] {0x25, 0x50, 0x44, 0x46};
-    notebookBooksController.attachBook(notebook, physicsPrimer(), pdfFile(pdfBytes));
+    notebookBooksController.attachBook(notebook, physicsPrimer(), pdfFile(ONE_PAGE_PDF));
     Book book = bookRepository.findByNotebook_Id(notebook.getId()).orElseThrow();
     notebookBooksController.patchReadingPosition(notebook, lastReadBody(1, 200));
     notebookBooksController.putBlockReadingRecord(
@@ -143,7 +143,8 @@ class NotebookBooksAttachNotebookFileControllerTest
     AcceptedHistory after = acceptedHistory(notebook);
     assertThat(after.commits(), equalTo(before.commits()));
     assertThat(
-        tipContent(after, "Physics Primer.pdf"), equalTo(lfsPointerStoredFor(notebook, pdfBytes)));
+        tipContent(after, "Physics Primer.pdf"),
+        equalTo(lfsPointerStoredFor(notebook, ONE_PAGE_PDF)));
     assertThat(
         notebookAttachmentRepository
             .findByNotebook_IdAndFolderIsNullAndFilename(notebook.getId(), "Physics Primer.pdf")

@@ -52,7 +52,7 @@ class NotebookBooksRetrievalControllerTest extends NotebookBooksControllerTestBa
       n.setContentBlocks(
           new ArrayList<>(
               List.of(headingBlock("Headed Section", 1, 1, List.of(5.0, 10.0, 200.0, 50.0)))));
-      controller.attachBook(nb, attachRequest(n), pdfFile(STUB_PDF_BYTES));
+      controller.attachBook(nb, attachRequest(n), pdfFile(ONE_PAGE_PDF));
       makeMe.entityPersister.flushAndClear();
 
       BookBlock block = rootBlocksSorted(controller.getBook(nb)).getFirst();
@@ -71,7 +71,7 @@ class NotebookBooksRetrievalControllerTest extends NotebookBooksControllerTestBa
               List.of(
                   headingBlock("Section With Bbox", 1, 2, List.of(1.0, 2.0, 100.0, 15.0)),
                   textBlock("Body paragraph", 2, List.of(10.0, 20.0, 300.0, 400.0)))));
-      controller.attachBook(nb, attachRequest(n), pdfFile(STUB_PDF_BYTES));
+      controller.attachBook(nb, attachRequest(n), pdfFile(ONE_PAGE_PDF));
       makeMe.entityPersister.flushAndClear();
 
       BookBlock block = rootBlocksSorted(controller.getBook(nb)).getFirst();
@@ -119,7 +119,7 @@ class NotebookBooksRetrievalControllerTest extends NotebookBooksControllerTestBa
                   pageNum,
                   subHeading,
                   textBlock("Body paragraph", 2, List.of(10.0, 20.0, 300.0, 400.0)))));
-      controller.attachBook(nb, attachRequest(n), pdfFile(STUB_PDF_BYTES));
+      controller.attachBook(nb, attachRequest(n), pdfFile(ONE_PAGE_PDF));
       makeMe.entityPersister.flushAndClear();
 
       BookBlock block = rootBlocksSorted(controller.getBook(nb)).getFirst();

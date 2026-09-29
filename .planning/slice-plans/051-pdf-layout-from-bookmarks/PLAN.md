@@ -93,7 +93,7 @@ E2E
 
 ### 1. Attaching an unreadable PDF is refused
 Type: Behavior
-Status: planned
+Status: done
 Proof: controller test in `NotebookBooksAttachControllerTest`; all book and
 notebook-file controller tests green.
 
@@ -165,4 +165,8 @@ unproved and report it; do not claim them from slices 3–5.
 
 ## Learnings
 
-None yet.
+- Slice 1: the PDF readability check is `BookFormat.validateAttachableFile`
+  (EPUB delegates to `EpubAttachValidator`). Test PDFs come from
+  `NotebookBooksControllerTestBase.onePagePdf(padding)` / `ONE_PAGE_PDF`;
+  tests that store books through `makeMe` (not attach) keep fake bytes.
+  Accepted proof: `NotebookBooksAttachControllerTest$AttachBook.rejectsAnUnreadablePdf`.

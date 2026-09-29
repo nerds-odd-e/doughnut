@@ -10,7 +10,10 @@ import com.odde.donut.entities.Book;
 import com.odde.donut.entities.BookContentBlock;
 import com.odde.donut.entities.BookUserLastReadPosition;
 import com.odde.donut.exceptions.ApiException;
+import java.io.IOException;
 import java.util.List;
+import org.apache.pdfbox.Loader;
+import org.apache.pdfbox.pdmodel.PDDocument;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.CacheControl;
@@ -28,6 +31,16 @@ public enum BookFormat {
     @Override
     public void validateAttachRequest(AttachBookRequest request) {
       AttachBookLayoutValidator.validatePdfAttachRequest(request);
+    }
+
+    @Override
+    public void validateAttachableFile(byte[] bytes) {
+      try (PDDocument ignored = Loader.loadPDF(bytes)) {
+        // loading is the check
+      } catch (IOException e) {
+        throw new ApiException(
+            "not a readable PDF", ApiError.ErrorType.BINDING_ERROR, "not a readable PDF");
+      }
     }
 
     @Override
@@ -76,6 +89,11 @@ public enum BookFormat {
     }
 
     @Override
+    public void validateAttachableFile(byte[] bytes) {
+      EpubAttachValidator.validateAttachableEpub(bytes);
+    }
+
+    @Override
     public void persistNewBook(AttachBookService.PersistContext ctx, Book book) {
       AttachBookPersistence.persistNewEpubBook(ctx, book);
     }
@@ -119,6 +137,8 @@ public enum BookFormat {
       List<BookContentBlock> contentBlocks);
 
   public abstract void validateAttachRequest(AttachBookRequest request);
+
+  public abstract void validateAttachableFile(byte[] bytes);
 
   public abstract void persistNewBook(AttachBookService.PersistContext ctx, Book book);
 
