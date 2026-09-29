@@ -381,6 +381,8 @@ A story's readiness basis is a digest of its whole seed document. Wrapping up an
   - Evidence: 2160ce302a (16:23:47+08:00) closed sibling SEED-051#story-1, removing its section and a trailing shared code-locations block from the seed; start refused with "published preparation is needs-reassessment"; `read-state` showed only `basis.document` changed (7ba4a638… → 080610786…), `basis.plan` a7e4bddc… unchanged; 499b34eb3c re-recorded ready after re-running the plan's premise grep.
   - Observed effect: one refused start, three read-only checks, one extra commit on main and a retry.
   - Inference: the correction was queued by the story-1 retrospective only minutes before that wrap-up, so the wrap-up could have re-recorded its sibling's readiness in the same commit; the removed shared block carried no premise of plan 010.
+- Execution: SEED-059#story-5 / slice-plans/053-pdf-smooth-scroll-after-choosing-block / 5989892325; Timestamp: 2026-09-29, before 21:40:27+08:00 (refusal; Take cac7f918b7 at 21:40:27+08:00); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.47.
+  - Evidence: start refused with "published preparation is needs-reassessment"; `git diff 75ce4c5986 HEAD` on SEED-059 showed only sibling sections removed (stories 1, 4, 6) or added (story 16); `read-state` showed only `basis.document` changed (539e46a1… → 28cca868…), `basis.plan` 591165db… unchanged; fafa8ba75d re-recorded ready after confirming the snap-back files were untouched since planning.
 
 ## ODF-155 — An implementer proved fails-first by putting HEAD versions back in the shared execution checkout
 
@@ -718,6 +720,10 @@ Plan 009 required a SQL catalog probe "through the established authorized DB con
   - Evidence: four auto-mode denials while seeking a DB route (credential lookup, SSH to the app VM, probe edit to root, bucket IAM); owner: "But this wasn't needed uh, previously. Um, or can we skip this?"; coordinator's covering reasoning and skip recorded in d111968b62; slice 10 `gcloud logging read` found no Flyway lines, so sustained health became the D/P evidence (8e03ac5f5f).
   - Observed effect: about 27 minutes of owner-attended probing ended in skipping slice 1's SQL part and dropping slice 3; slice 10's named proof was replaced during delivery. No product defect.
   - Inference: planning could have asked, for each production observation, whether any result would change the approach, and whether the access route and log source exist (both checkable cheaply once `gcloud` auth worked). Related to DD-142 (prescribed observations dropped in execution), but here the cost was production access and owner time. Qualified: one execution; planning-time `gcloud` auth had failed.
+- Execution: SEED-059#story-5 / slice-plans/053-pdf-smooth-scroll-after-choosing-block / 5989892325; Timestamp: 2026-09-29T21:45+08:00 through 22:10+08:00 (slice 1 attempts); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.47.
+  - Evidence: plan 053's proof row "Manual observation … Chromium DevTools protocol or Playwright `mouse.wheel`" on the dev stack; the repo has no Playwright/Puppeteer, `.agents/agent-map.md` says linked worktrees refuse the persistent Development stack, and a throwaway Cypress spec sending CDP `mouseWheel` reached the DOM but scrolled 0 px in headless Electron and Chrome.
+  - Observed effect: about 15 minutes of implementer time; the story's key example (every wheel step moves down) was delivered without its real-wheel observation.
+  - Inference: same pattern in a local setting: the observation route could have been checked at planning from the agent map and `package.json`.
 
 ## DD-146 — Transient permission-check outages ended the coordinator's turn three times, so the owner had to type "continue"
 
@@ -861,8 +867,19 @@ The plan's decisive premises confirmed by grep that "no book block should be mar
   - Observed effect: one failed EPUB feature run and a new step; the plan's slice 2 behavior text was corrected during delivery. Small cost.
   - Inference: the premise checked that a step exists, not that it holds for the chosen fixture path. Related to DD-162 (a grep premise that did not reach the changed path).
 
+## DD-169 — A removal plan checked what it deleted but not the journey right after it, so two older panel rules surfaced as stops
+
+Plan 053's premises confirmed what snap-back did and that only it used scroll suppression, and listed "panel appears after scrolling past" as must-keep. It did not look at what happens when the reader scrolls past without marking, which snap-back had made rare: the panel hid once the next block became current, and the fixed panel shared one bottom slot with the "Now reading" bar, which covered it.
+
+### Occurrences
+
+- Execution: SEED-059#story-5 / slice-plans/053-pdf-smooth-scroll-after-choosing-block / 5989892325; Timestamp: 2026-09-29T21:45+08:00 through 22:15:52+08:00 (slice 1 implementation to commit); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.47.
+  - Evidence: slice 1 hand-backs stopping at "the panel element never appears" (`panelShownBecauseScrolledPastContent` required `successor.id !== currentBlockId`) and then at "`read-from-here` covers `book-reading-mark-as-read`" (both overlays `absolute left-0 right-0 bottom-0 z-20`); owner question answered "Stack the two"; fix in 5989892325 (`ReadingOverlayDock.vue`).
+  - Observed effect: two implementation stops, one owner decision on a scope the story had deferred (panel position), and slice 1 took about 30 minutes against a ~5-minute target.
+  - Inference: reading `blockAwaitingConfirmation` and the overlay classes for the story's own "scroll past without marking" key example would have shown both at planning. Related to DD-162 and DD-163 (premises that stopped short of the consuming step).
+
 ## Retention
 
-- Highest allocated local number: 168. Removed local codes are never reused.
+- Highest allocated local number: 169. Removed local codes are never reused.
 - Full pre-maintenance log and earlier recovery locators: `99fa1b9835e3dff2473837ba2a1f8b11967d5938:DearDough.md`.
 - Occurrence history is partial; active evidence stays here or in the Open Dough catalog and watch list.

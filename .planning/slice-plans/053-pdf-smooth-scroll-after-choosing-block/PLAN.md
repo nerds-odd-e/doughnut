@@ -159,3 +159,11 @@ Change: send plain wheel events over the PDF panel to the PDF scroll container
 - With snap-back gone, scrolling past an unmarked block is the normal path, and
   it exposed two older rules: the panel hid once the successor became current,
   and the fixed panel and the "Now reading" bar shared one bottom slot.
+
+## Execution complete
+
+Product advice: no backlog change. Before wrap-up closes the story, observe the
+key example with a real wheel in a headed browser on the Development stack
+(Think Python 8.1 and 14.6, Attention 3.1: every 400 px step moves down; wheel
+over the panel keeps scrolling). Story 18 (EPUB panel anchoring) should start
+from the shared `ReadingOverlayDock` that both readers now use.
