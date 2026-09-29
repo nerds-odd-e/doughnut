@@ -2502,13 +2502,6 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/UserToken"
-    delete:
-      tags:
-      - user-controller
-      operationId: revokeToken
-      responses:
-        "200":
-          description: OK
   /api/user/recall-stats:
     get:
       tags:

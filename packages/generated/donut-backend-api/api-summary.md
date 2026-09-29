@@ -32,7 +32,6 @@ Use this for endpoint lookup; open `sdk.gen.ts` or `types.gen.ts` only for exact
 - `generateToken`: POST `/api/user/generate-token` -> `GenerateTokenResponse` (request: `GenerateTokenData`; body: TokenConfigDto; response body: GeneratedTokenDto)
 - `updateUser`: PATCH `/api/user/{user}` -> `UpdateUserResponse` (request: `UpdateUserData`; path: user; body: UserDto; response body: User)
 - `getTokenInfo`: GET `/api/user/token-info` -> `GetTokenInfoResponse` (request: none; response body: UserToken)
-- `revokeToken`: DELETE `/api/user/token-info` -> `RevokeTokenResponse` (request: none; response body: void)
 - `getRecallStats`: GET `/api/user/recall-stats` -> `GetRecallStatsResponse` (request: `GetRecallStatsData`; query: timezone; response body: RecallStatsDto)
 - `getRecallEzDiffusion`: GET `/api/user/recall-ez-diffusion` -> `GetRecallEzDiffusionResponse` (request: `GetRecallEzDiffusionData`; query: timezone; response body: RecallEzDiffusionDto)
 - `getMenuData`: GET `/api/user/menu-data` -> `GetMenuDataResponse` (request: `GetMenuDataData`; query: timezone; response body: MenuDataDto)

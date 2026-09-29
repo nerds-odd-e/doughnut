@@ -101,9 +101,10 @@ endpoint is listed, while the memory tracker page still shows recall history thr
 
 ### 3. The public API no longer offers bearer-token self-revocation
 Type: Behavior
-Status: planned
+Status: done
 Proof: regenerated artifacts omit the `DELETE /api/user/token-info` operation (`GET` stays);
-`UserTokenControllerTest` green without the two revoke tests; full backend suite green.
+`UserTokenControllerTest` 9/9 green without the two revoke tests; full backend suite (2701, 0
+failures) and `frontend:test` (1943) green.
 
 Behavior: a user with an access token → the owner inspects the public API → token info can still be
 read and tokens deleted by id from settings, but no bearer self-revocation exists. Remove

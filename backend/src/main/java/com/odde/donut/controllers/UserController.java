@@ -124,13 +124,6 @@ class UserController {
                     org.springframework.http.HttpStatus.UNAUTHORIZED, "Invalid token"));
   }
 
-  @DeleteMapping("/token-info")
-  @Transactional
-  public void revokeToken(HttpServletRequest request) {
-    UserToken userToken = persistedUserTokenFromBearerOrThrow(request);
-    userService.deleteToken(userToken.getId());
-  }
-
   private String bearerTokenFromRequestOrThrow(HttpServletRequest request) {
     String authHeader = request.getHeader("Authorization");
     if (authHeader == null || !authHeader.startsWith("Bearer ")) {
@@ -138,16 +131,6 @@ class UserController {
           org.springframework.http.HttpStatus.UNAUTHORIZED, "Missing or invalid Authorization");
     }
     return authHeader.substring(7);
-  }
-
-  private UserToken persistedUserTokenFromBearerOrThrow(HttpServletRequest request) {
-    String token = bearerTokenFromRequestOrThrow(request);
-    return userService
-        .findTokenByToken(token)
-        .orElseThrow(
-            () ->
-                new ResponseStatusException(
-                    org.springframework.http.HttpStatus.UNAUTHORIZED, "Invalid token"));
   }
 
   private Optional<UserToken> userTokenFromTestAccessToken(String token) {
