@@ -28,6 +28,7 @@
     :selected-block-id="selectedBlockId"
     :disposition-for-block="bookReading.dispositionForBlock"
     @block-click="onBookBlockClick"
+    @change-mark="bookReading.submitReadingDisposition"
   >
     <main
       ref="epubMainPaneRef"

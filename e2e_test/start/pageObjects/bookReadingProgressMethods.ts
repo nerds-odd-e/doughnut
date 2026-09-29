@@ -1,5 +1,10 @@
 import { waitUntilAppIsNotBusy } from '../pageBase'
-import { expectFullyOnScreen } from './bookReadingShared'
+import router from '../router'
+import {
+  bookBlockRowByTitle,
+  expectFullyOnScreen,
+  notebookIdFromBookReadingPathname,
+} from './bookReadingShared'
 
 export const bookReadingProgressMethods = () => ({
   expectReadingControlPanelFullyOnScreen() {
@@ -19,6 +24,27 @@ export const bookReadingProgressMethods = () => ({
     cy.get('[data-testid="book-reading-mark-as-read"]')
       .should('be.visible')
       .click()
+    return this
+  },
+  /** The mark control is the sibling right after the chosen, marked row. */
+  changeBookBlockMarkToReadInBookLayout(blockTitle: string) {
+    waitUntilAppIsNotBusy()
+    bookBlockRowByTitle(blockTitle)
+      .next('[data-testid="book-reading-book-block-mark-control"]')
+      .find('[data-testid="book-reading-book-block-mark"]')
+      .click()
+    cy.get('[data-testid="book-reading-change-mark-to-read"]').click()
+    waitUntilAppIsNotBusy()
+    return this
+  },
+  /** Remounts the book reading page, reloading its records from the server. */
+  openBookAgain() {
+    waitUntilAppIsNotBusy()
+    cy.location('pathname').then((pathname) => {
+      router().visitNamed('bookReading', {
+        notebookId: notebookIdFromBookReadingPathname(String(pathname)),
+      })
+    })
     return this
   },
   markBookBlockAsSkimmedInReadingControlPanel(blockTitle: string) {

@@ -20,63 +20,68 @@
         >
           AI Reorganize
         </button>
-        <button
-          v-for="block in blocks"
-          :key="block.id"
-          type="button"
-          data-testid="book-reading-book-block"
-          class="book-reading-book-block"
-          :data-epub-start-href="blockStartEpubDisplayHref(block) ?? undefined"
-          :data-book-block-depth="block.depth"
-          :data-current-block="
-            block.id === currentBlockId ? 'true' : undefined
-          "
-          :data-current-selection="
-            block.id === selectedBlockId ? 'true' : undefined
-          "
-          :data-direct-content-read="
-            dispositionForBlock(block.id) === 'READ' ? 'true' : undefined
-          "
-          :data-direct-content-skimmed="
-            dispositionForBlock(block.id) === 'SKIMMED' ? 'true' : undefined
-          "
-          :data-direct-content-skipped="
-            dispositionForBlock(block.id) === 'SKIPPED' ? 'true' : undefined
-          "
-          :aria-current="
-            block.id === currentBlockId ? 'location' : undefined
-          "
-          @click="onBlockRowClick(block, $event)"
-          @pointerdown="blockDrag.onPointerDown(block, $event)"
-          @pointermove="blockDrag.onPointerMove(block, $event)"
-          @pointerup="blockDrag.onPointerUp(block, $event)"
-          @pointercancel="blockDrag.onPointerCancel(block, $event)"
-          @keydown.tab.shift.prevent="emit('blockOutdent', block)"
-          @keydown.tab.exact.prevent="emit('blockIndent', block)"
-          @keydown.delete.prevent="emit('blockCancel', block)"
-        >
-          <span
-            class="book-reading-book-block-guides"
-            data-testid="book-reading-book-block-guides"
-            :data-book-block-guide-depth="block.depth"
-            aria-hidden="true"
+        <template v-for="block in blocks" :key="block.id">
+          <button
+            type="button"
+            data-testid="book-reading-book-block"
+            class="book-reading-book-block"
+            :data-epub-start-href="blockStartEpubDisplayHref(block) ?? undefined"
+            :data-book-block-depth="block.depth"
+            :data-current-block="
+              block.id === currentBlockId ? 'true' : undefined
+            "
+            :data-current-selection="
+              block.id === selectedBlockId ? 'true' : undefined
+            "
+            :data-direct-content-read="
+              dispositionForBlock(block.id) === 'READ' ? 'true' : undefined
+            "
+            :data-direct-content-skimmed="
+              dispositionForBlock(block.id) === 'SKIMMED' ? 'true' : undefined
+            "
+            :data-direct-content-skipped="
+              dispositionForBlock(block.id) === 'SKIPPED' ? 'true' : undefined
+            "
+            :aria-current="
+              block.id === currentBlockId ? 'location' : undefined
+            "
+            @click="onBlockRowClick(block, $event)"
+            @pointerdown="blockDrag.onPointerDown(block, $event)"
+            @pointermove="blockDrag.onPointerMove(block, $event)"
+            @pointerup="blockDrag.onPointerUp(block, $event)"
+            @pointercancel="blockDrag.onPointerCancel(block, $event)"
+            @keydown.tab.shift.prevent="emit('blockOutdent', block)"
+            @keydown.tab.exact.prevent="emit('blockIndent', block)"
+            @keydown.delete.prevent="emit('blockCancel', block)"
           >
             <span
-              v-for="n in block.depth"
-              :key="n"
-              class="book-reading-book-block-guide"
-              data-testid="book-reading-book-block-guide"
+              class="book-reading-book-block-guides"
+              data-testid="book-reading-book-block-guides"
+              :data-book-block-guide-depth="block.depth"
+              aria-hidden="true"
             >
-              <span class="book-reading-book-block-guide-line" />
+              <span
+                v-for="n in block.depth"
+                :key="n"
+                class="book-reading-book-block-guide"
+                data-testid="book-reading-book-block-guide"
+              >
+                <span class="book-reading-book-block-guide-line" />
+              </span>
             </span>
-          </span>
-          <span class="book-reading-book-block-title">
-            {{ block.title }}
-            <span v-if="dispositionForBlock(block.id)" class="sr-only">
-              Marked as {{ dispositionForBlock(block.id)?.toLowerCase() }}
+            <span class="book-reading-book-block-title">
+              {{ block.title }}
+              <span v-if="dispositionForBlock(block.id)" class="sr-only">
+                Marked as {{ dispositionForBlock(block.id)?.toLowerCase() }}
+              </span>
             </span>
-          </span>
-        </button>
+          </button>
+          <BookBlockMarkControl
+            v-if="block.id === selectedBlockId && dispositionForBlock(block.id)"
+            :disposition="dispositionForBlock(block.id)!"
+            @change="(status) => emit('changeMark', block.id, status)"
+          />
+        </template>
       </div>
     </SidebarDrawer>
     <slot />
@@ -84,6 +89,7 @@
 </template>
 
 <script setup lang="ts">
+import BookBlockMarkControl from "@/components/book-reading/BookBlockMarkControl.vue"
 import SidebarDrawer from "@/components/commons/SidebarDrawer.vue"
 import { blockStartEpubDisplayHref } from "@/lib/book-reading/asEpubLocator"
 import { useBookLayoutBlockPointerDrag } from "@/composables/book-reading/useBookLayoutBlockPointerDrag"
@@ -112,6 +118,7 @@ const emit = defineEmits<{
   blockIndent: [block: BookBlockFull]
   blockOutdent: [block: BookBlockFull]
   blockCancel: [block: BookBlockFull]
+  changeMark: [blockId: number, status: BookBlockReadingDisposition]
   requestAiReorganize: []
 }>()
 

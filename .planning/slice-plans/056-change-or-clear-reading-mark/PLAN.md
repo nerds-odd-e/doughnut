@@ -83,9 +83,17 @@ is chosen, resume, and cancelling a PDF block clearing its record.
 ### 1. Change the mark of the chosen block in the book layout
 
 Type: Behavior
-Status: planned
+Status: done
 Proof: new E2E scenario red → green; `reading_record.feature` and
 book-reading page specs green.
+Accepted proof: `reading_record.feature` 7/7 (new "Change the mark of a book
+block in the book layout" red first, then green; rerun after refactor);
+`epub_book.feature` 17/17 and `reorganize_layout.feature` 8/8;
+`pnpm frontend:test tests/pages/BookReadingPage
+tests/components/book-reading/BookReadingBookLayout` green; `vue-tsc` clean.
+The control is `BookBlockMarkControl.vue`; the layout emits
+`changeMark(blockId, status)` and both hosts bind
+`bookReading.submitReadingDisposition` directly.
 
 Behavior: in the refactoring PDF, "2.1 Easier to Change—and Harder to Misuse"
 is marked Skimmed and chosen → the reader clicks its mark in the book layout and
@@ -122,4 +130,7 @@ composable; Clear mark in the control.
 
 ## Learnings
 
-(none yet)
+- "I open the book attached to notebook …" does not remount an already open
+  book, so it cannot prove persistence. Slice 1 added "I open the book again"
+  (a full visit); reuse it for reopen checks.
+- Slice 2 adds Clear mark to `BookBlockMarkControl.vue`'s options.

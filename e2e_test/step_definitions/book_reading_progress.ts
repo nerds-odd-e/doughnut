@@ -34,6 +34,22 @@ When(
   }
 )
 
+When(
+  'I change the mark of book block {string} to read in the book layout',
+  // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
+  (blockTitle: string) => {
+    return bookReadingPage().changeBookBlockMarkToReadInBookLayout(blockTitle)
+  }
+)
+
+When(
+  'I open the book again',
+  // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
+  () => {
+    return bookReadingPage().openBookAgain()
+  }
+)
+
 Then(
   'I should see that book block {string} is marked as read in the book layout',
   // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain

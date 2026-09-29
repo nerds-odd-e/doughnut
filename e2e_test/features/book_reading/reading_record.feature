@@ -35,6 +35,17 @@ Feature: Reading record
     Then I should see that book block "2.1 Easier to Change—and Harder to Misuse" is marked as read in the book layout
     And I should see that book block "2.2 Refactoring as Strengthening the Code" is selected in the book layout
 
+  Scenario: Change the mark of a book block in the book layout
+    When I choose the book block "2.1 Easier to Change—and Harder to Misuse"
+    And I scroll the PDF book reader until the Reading Control Panel shows for "2.1 Easier to Change—and Harder to Misuse"
+    And I mark the book block "2.1 Easier to Change—and Harder to Misuse" as skimmed in the Reading Control Panel
+    Then I should see that book block "2.1 Easier to Change—and Harder to Misuse" is marked as skimmed in the book layout
+    When I choose the book block "2.1 Easier to Change—and Harder to Misuse"
+    And I change the mark of book block "2.1 Easier to Change—and Harder to Misuse" to read in the book layout
+    Then I should see that book block "2.1 Easier to Change—and Harder to Misuse" is marked as read in the book layout
+    When I open the book again
+    Then I should see that book block "2.1 Easier to Change—and Harder to Misuse" is marked as read in the book layout
+
   Scenario: Panel auto-targets next block when selected is already marked
     When I choose the book block "3.1 Can You Refactor Without Tests?"
     And I scroll the PDF book reader until the Reading Control Panel shows for "3.1 Can You Refactor Without Tests?"

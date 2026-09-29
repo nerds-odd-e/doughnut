@@ -45,6 +45,7 @@
     @block-indent="onBlockIndent"
     @block-outdent="onBlockOutdent"
     @block-cancel="onBlockCancel"
+    @change-mark="bookReading.submitReadingDisposition"
     @request-ai-reorganize="requestAiReorganize"
   >
     <main
