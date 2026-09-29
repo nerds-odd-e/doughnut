@@ -68,12 +68,6 @@ abstract class NotebookBooksControllerTestBase extends ControllerTestBase {
     return bookRepository.findByNotebook_Id(nb.getId()).orElseThrow();
   }
 
-  Notebook notebookWithBookFile(String bookName, String format, byte[] fileBytes) {
-    Notebook nb = myNotebook();
-    makeMe.aBook().notebook(nb).bookName(bookName).format(format).fileBytes(fileBytes).please();
-    return nb;
-  }
-
   Notebook otherUsersNotebook() {
     return makeMe.aNotebook().creatorAndOwner(makeMe.aUser().please()).please();
   }

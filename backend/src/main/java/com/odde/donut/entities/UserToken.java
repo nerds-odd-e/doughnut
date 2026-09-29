@@ -39,7 +39,7 @@ public class UserToken extends EntityIdentifiedByIdOnly {
   /**
    * Response-only token info for {@code GET /api/user/token-info} when the bearer value is a
    * non-persisted test token ({@link com.odde.donut.testability.TestAccessTokenResolver}). Not
-   * saved; {@code id} is 0 so revoke-by-bearer does not delete a real row.
+   * saved; {@code id} is 0.
    */
   public static UserToken forTestabilityTokenInfo(User user) {
     UserToken t = new UserToken();

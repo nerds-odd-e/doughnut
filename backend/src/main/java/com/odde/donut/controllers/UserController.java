@@ -1,9 +1,7 @@
 package com.odde.donut.controllers;
 
-import com.odde.donut.controllers.dto.DailyProbeConvergentValidityDTO;
 import com.odde.donut.controllers.dto.GeneratedTokenDTO;
 import com.odde.donut.controllers.dto.MenuDataDTO;
-import com.odde.donut.controllers.dto.RecallEzDiffusionDTO;
 import com.odde.donut.controllers.dto.RecallStatsDTO;
 import com.odde.donut.controllers.dto.TokenConfigDTO;
 import com.odde.donut.controllers.dto.UserDTO;
@@ -124,13 +122,6 @@ class UserController {
                     org.springframework.http.HttpStatus.UNAUTHORIZED, "Invalid token"));
   }
 
-  @DeleteMapping("/token-info")
-  @Transactional
-  public void revokeToken(HttpServletRequest request) {
-    UserToken userToken = persistedUserTokenFromBearerOrThrow(request);
-    userService.deleteToken(userToken.getId());
-  }
-
   private String bearerTokenFromRequestOrThrow(HttpServletRequest request) {
     String authHeader = request.getHeader("Authorization");
     if (authHeader == null || !authHeader.startsWith("Bearer ")) {
@@ -138,16 +129,6 @@ class UserController {
           org.springframework.http.HttpStatus.UNAUTHORIZED, "Missing or invalid Authorization");
     }
     return authHeader.substring(7);
-  }
-
-  private UserToken persistedUserTokenFromBearerOrThrow(HttpServletRequest request) {
-    String token = bearerTokenFromRequestOrThrow(request);
-    return userService
-        .findTokenByToken(token)
-        .orElseThrow(
-            () ->
-                new ResponseStatusException(
-                    org.springframework.http.HttpStatus.UNAUTHORIZED, "Invalid token"));
   }
 
   private Optional<UserToken> userTokenFromTestAccessToken(String token) {
@@ -210,36 +191,5 @@ class UserController {
     ZoneId timeZone = TimezoneUtils.parseTimezone(timezone);
     Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
     return recallStatsService.compute(user, timeZone, currentUTCTimestamp);
-  }
-
-  /**
-   * Internal diagnostic (plan {@code 008-probe-convergent-analyses}) — not wired into any
-   * user-facing page. Same same-user auth/scoping as {@link #getRecallStats}, since this is a
-   * per-user convergent-validity check over one learner's own history, not a cross-user admin view.
-   */
-  @GetMapping("/daily-probe-convergent-validity")
-  @Transactional(readOnly = true)
-  public DailyProbeConvergentValidityDTO getDailyProbeConvergentValidity(
-      @RequestParam(value = "timezone") String timezone) {
-    authorizationService.assertLoggedIn();
-    User user = authorizationService.getCurrentUser();
-    ZoneId timeZone = TimezoneUtils.parseTimezone(timezone);
-    Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
-    return recallStatsService.computeConvergentValidity(user, timeZone, currentUTCTimestamp);
-  }
-
-  /**
-   * Internal diagnostic (plan {@code 008-probe-convergent-analyses}, slice 3) — not wired into any
-   * user-facing page. Same same-user auth/scoping as {@link #getRecallStats}.
-   */
-  @GetMapping("/recall-ez-diffusion")
-  @Transactional(readOnly = true)
-  public RecallEzDiffusionDTO getRecallEzDiffusion(
-      @RequestParam(value = "timezone") String timezone) {
-    authorizationService.assertLoggedIn();
-    User user = authorizationService.getCurrentUser();
-    ZoneId timeZone = TimezoneUtils.parseTimezone(timezone);
-    Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
-    return recallStatsService.computeEzDiffusion(user, timeZone, currentUTCTimestamp);
   }
 }

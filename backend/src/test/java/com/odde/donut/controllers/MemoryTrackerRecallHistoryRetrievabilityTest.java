@@ -26,7 +26,7 @@ class MemoryTrackerRecallHistoryRetrievabilityTest extends RecallPromptControlle
 
     memoryTrackerController.markAsRecalled(tracker, Grade.GOOD);
 
-    RecallLog log = memoryTrackerController.getRecallLogs(tracker).get(0);
+    RecallLog log = recallLogsOf(tracker).get(0);
     assertThat(log.getStabilityBefore(), equalTo(stabilityBefore));
     assertThat(log.getDifficultyBefore(), equalTo(difficultyBefore));
     assertThat(log.getRetrievability(), notNullValue());
@@ -40,7 +40,7 @@ class MemoryTrackerRecallHistoryRetrievabilityTest extends RecallPromptControlle
 
     memoryTrackerController.markAsRecalled(newTracker, Grade.GOOD);
 
-    RecallLog log = memoryTrackerController.getRecallLogs(newTracker).get(0);
+    RecallLog log = recallLogsOf(newTracker).get(0);
     assertThat(log.getStabilityBefore(), equalTo(0f));
     assertThat(log.getRetrievability(), nullValue());
   }
@@ -59,7 +59,7 @@ class MemoryTrackerRecallHistoryRetrievabilityTest extends RecallPromptControlle
 
     controller.answerSpelling(recallPrompt, answerDTO);
 
-    RecallLog matchedLog = memoryTrackerController.getRecallLogs(matchedSpellingTracker).get(0);
+    RecallLog matchedLog = recallLogsOf(matchedSpellingTracker).get(0);
     assertThat(matchedLog.isConfusion(), is(true));
     assertThat(matchedLog.getStabilityBefore(), equalTo(stabilityBefore));
     assertThat(matchedLog.getDifficultyBefore(), equalTo(difficultyBefore));

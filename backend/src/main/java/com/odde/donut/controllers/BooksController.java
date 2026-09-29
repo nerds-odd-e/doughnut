@@ -42,7 +42,7 @@ class BooksController {
       WebRequest request, @PathVariable("book") @Schema(type = "integer") Book book)
       throws UnexpectedNoAccessRightException {
     authorizationService.assertReadAuthorization(book.getNotebook());
-    var file = bookService.notebookBookFileFromBook(book);
+    var file = bookService.bookFile(book);
     String etag = file.etag();
     CacheControl cacheControl = bookFileDownloadCacheControl.value();
     if (request.checkNotModified(etag)) {

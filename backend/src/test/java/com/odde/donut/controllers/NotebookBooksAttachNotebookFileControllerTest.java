@@ -26,7 +26,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 class NotebookBooksAttachNotebookFileControllerTest
     extends NotebookGitWebContentControllerTestBase {
-  @Autowired NotebookBooksController booksController;
+  @Autowired NotebookBooksController notebookBooksController;
+  @Autowired BooksController booksController;
   @Autowired BookRepository bookRepository;
   @Autowired BookUserLastReadPositionRepository bookUserLastReadPositionRepository;
   @Autowired BookBlockReadingRecordRepository bookBlockReadingRecordRepository;
@@ -37,7 +38,7 @@ class NotebookBooksAttachNotebookFileControllerTest
     List<String> commitsBefore = acceptedHistory(notebook).commits();
     byte[] pdfBytes = new byte[] {0x25, 0x50, 0x44, 0x46, 0x2d, 0x31, 0x2e};
 
-    booksController.attachBook(notebook, physicsPrimer(), pdfFile(pdfBytes));
+    notebookBooksController.attachBook(notebook, physicsPrimer(), pdfFile(pdfBytes));
 
     AcceptedHistory after = acceptedHistory(notebook);
     assertThat(after.parents(), equalTo(commitsBefore));
@@ -50,7 +51,7 @@ class NotebookBooksAttachNotebookFileControllerTest
         equalTo(true));
     Book book = bookRepository.findByNotebook_Id(notebook.getId()).orElseThrow();
     assertThat(book.getSourceFilePath(), equalTo("Physics Primer.pdf"));
-    assertThat(booksController.getBookFile(webRequest(), notebook).getBody(), equalTo(pdfBytes));
+    assertThat(booksController.getBookFile(webRequest(), book).getBody(), equalTo(pdfBytes));
     assertAcceptedTreeMatchesTheFullAssembly(notebook);
   }
 
@@ -59,7 +60,8 @@ class NotebookBooksAttachNotebookFileControllerTest
     Notebook notebook = createGitBackedNotebook();
     byte[] epubBytes = readFixtureEpubValidMinimal();
 
-    booksController.attachBook(notebook, epubAttachRequest("Physics Primer"), epubFile(epubBytes));
+    notebookBooksController.attachBook(
+        notebook, epubAttachRequest("Physics Primer"), epubFile(epubBytes));
 
     assertThat(
         tipContent(acceptedHistory(notebook), "Physics Primer.epub"),
@@ -71,9 +73,10 @@ class NotebookBooksAttachNotebookFileControllerTest
     Notebook notebook = createGitBackedNotebook();
     byte[] pdfBytes = new byte[11 * 1024 * 1024];
 
-    booksController.attachBook(notebook, physicsPrimer(), pdfFile(pdfBytes));
+    Book book =
+        notebookBooksController.attachBook(notebook, physicsPrimer(), pdfFile(pdfBytes)).getBody();
 
-    assertThat(booksController.getBookFile(webRequest(), notebook).getBody(), equalTo(pdfBytes));
+    assertThat(booksController.getBookFile(webRequest(), book).getBody(), equalTo(pdfBytes));
   }
 
   @Test
@@ -82,7 +85,7 @@ class NotebookBooksAttachNotebookFileControllerTest
     byte[] existing = {0x01, 0x02};
     storeFolderAttachmentAndSnapshot(notebook, null, "Physics Primer.pdf", existing);
 
-    booksController.attachBook(notebook, physicsPrimer(), pdfFile(new byte[] {0x25, 0x50}));
+    notebookBooksController.attachBook(notebook, physicsPrimer(), pdfFile(new byte[] {0x25, 0x50}));
 
     AcceptedHistory after = acceptedHistory(notebook);
     assertThat(
@@ -97,7 +100,7 @@ class NotebookBooksAttachNotebookFileControllerTest
     Notebook notebook = createGitBackedNotebook();
     storeFolderAttachmentAndSnapshot(notebook, null, "physics primer.pdf", new byte[] {0x01});
 
-    booksController.attachBook(notebook, physicsPrimer(), pdfFile(new byte[] {0x25, 0x50}));
+    notebookBooksController.attachBook(notebook, physicsPrimer(), pdfFile(new byte[] {0x25, 0x50}));
 
     assertThat(
         bookRepository.findByNotebook_Id(notebook.getId()).orElseThrow().getSourceFilePath(),
@@ -108,7 +111,8 @@ class NotebookBooksAttachNotebookFileControllerTest
   void aBookNameThatIsNotAPlainFilenameGetsADonutChosenName() throws Exception {
     Notebook notebook = createGitBackedNotebook();
 
-    booksController.attachBook(notebook, bookNamed("a/b"), pdfFile(new byte[] {0x25, 0x50}));
+    notebookBooksController.attachBook(
+        notebook, bookNamed("a/b"), pdfFile(new byte[] {0x25, 0x50}));
 
     assertThat(
         bookRepository.findByNotebook_Id(notebook.getId()).orElseThrow().getSourceFilePath(),
@@ -119,13 +123,14 @@ class NotebookBooksAttachNotebookFileControllerTest
   void removingTheBookLeavesItsFileInTheNotebook() throws Exception {
     Notebook notebook = createGitBackedNotebook();
     byte[] pdfBytes = new byte[] {0x25, 0x50, 0x44, 0x46};
-    booksController.attachBook(notebook, physicsPrimer(), pdfFile(pdfBytes));
+    notebookBooksController.attachBook(notebook, physicsPrimer(), pdfFile(pdfBytes));
     Book book = bookRepository.findByNotebook_Id(notebook.getId()).orElseThrow();
-    booksController.patchReadingPosition(notebook, lastReadBody(1, 200));
-    booksController.putBlockReadingRecord(notebook, rootBlocksSorted(book).getFirst(), null);
+    notebookBooksController.patchReadingPosition(notebook, lastReadBody(1, 200));
+    notebookBooksController.putBlockReadingRecord(
+        notebook, rootBlocksSorted(book).getFirst(), null);
     AcceptedHistory before = acceptedHistory(notebook);
 
-    booksController.deleteBook(notebook);
+    notebookBooksController.deleteBook(notebook);
 
     assertThat(bookRepository.findByNotebook_Id(notebook.getId()).isEmpty(), equalTo(true));
     Integer userId = currentUser.getUser().getId();

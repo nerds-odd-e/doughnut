@@ -22,7 +22,6 @@ Use this for endpoint lookup; open `sdk.gen.ts` or `types.gen.ts` only for exact
 - `getBook`: GET `/api/notebooks/{notebook}/book` -> `GetBookResponse` (request: `GetBookData`; path: notebook; response body: BookFull)
 - `deleteBook`: DELETE `/api/notebooks/{notebook}/book` -> `DeleteBookResponse` (request: `DeleteBookData`; path: notebook; response body: void)
 - `getNotebookBookReadingRecords`: GET `/api/notebooks/{notebook}/book/reading-records` -> `GetNotebookBookReadingRecordsResponse` (request: `GetNotebookBookReadingRecordsData`; path: notebook; response body: Array<BookBlockReadingRecordListItem>)
-- `getBookFile`: GET `/api/notebooks/{notebook}/book/file` -> `GetBookFileResponse` (request: `GetBookFileData`; path: notebook; response body: string)
 - `cancelBookBlock`: DELETE `/api/notebooks/{notebook}/book/blocks/{bookBlock}` -> `CancelBookBlockResponse` (request: `CancelBookBlockData`; path: notebook, bookBlock; response body: BookMutationResponseFull)
 
 ## User Controller
@@ -32,12 +31,9 @@ Use this for endpoint lookup; open `sdk.gen.ts` or `types.gen.ts` only for exact
 - `generateToken`: POST `/api/user/generate-token` -> `GenerateTokenResponse` (request: `GenerateTokenData`; body: TokenConfigDto; response body: GeneratedTokenDto)
 - `updateUser`: PATCH `/api/user/{user}` -> `UpdateUserResponse` (request: `UpdateUserData`; path: user; body: UserDto; response body: User)
 - `getTokenInfo`: GET `/api/user/token-info` -> `GetTokenInfoResponse` (request: none; response body: UserToken)
-- `revokeToken`: DELETE `/api/user/token-info` -> `RevokeTokenResponse` (request: none; response body: void)
 - `getRecallStats`: GET `/api/user/recall-stats` -> `GetRecallStatsResponse` (request: `GetRecallStatsData`; query: timezone; response body: RecallStatsDto)
-- `getRecallEzDiffusion`: GET `/api/user/recall-ez-diffusion` -> `GetRecallEzDiffusionResponse` (request: `GetRecallEzDiffusionData`; query: timezone; response body: RecallEzDiffusionDto)
 - `getMenuData`: GET `/api/user/menu-data` -> `GetMenuDataResponse` (request: `GetMenuDataData`; query: timezone; response body: MenuDataDto)
 - `getTokens`: GET `/api/user/get-tokens` -> `GetTokensResponse` (request: none; response body: Array<UserToken>)
-- `getDailyProbeConvergentValidity`: GET `/api/user/daily-probe-convergent-validity` -> `GetDailyProbeConvergentValidityResponse` (request: `GetDailyProbeConvergentValidityData`; query: timezone; response body: DailyProbeConvergentValidityDto)
 - `deleteToken`: DELETE `/api/user/token/{tokenId}` -> `DeleteTokenResponse` (request: `DeleteTokenData`; path: tokenId; response body: void)
 
 ## Testability Rest Controller
@@ -162,7 +158,6 @@ Use this for endpoint lookup; open `sdk.gen.ts` or `types.gen.ts` only for exact
 - `getThresholdExceeded`: GET `/api/memory-trackers/{memoryTracker}/threshold-exceeded` -> `GetThresholdExceededResponse` (request: `GetThresholdExceededData`; path: memoryTracker; response body: ThresholdExceededResult)
 - `getRecallPrompts`: GET `/api/memory-trackers/{memoryTracker}/recall-prompts` -> `GetRecallPromptsResponse` (request: `GetRecallPromptsData`; path: memoryTracker; response body: Array<RecallPromptHistoryItem>)
 - `getRecallPrompt`: GET `/api/memory-trackers/{memoryTracker}/recall-prompt` -> `GetRecallPromptResponse` (request: `GetRecallPromptData`; path: memoryTracker; response body: RecallPrompt)
-- `getRecallLogs`: GET `/api/memory-trackers/{memoryTracker}/recall-logs` -> `GetRecallLogsResponse` (request: `GetRecallLogsData`; path: memoryTracker; response body: Array<RecallLog>)
 - `getRecallHistory`: GET `/api/memory-trackers/{memoryTracker}/recall-history` -> `GetRecallHistoryResponse` (request: `GetRecallHistoryData`; path: memoryTracker; response body: Array<RecallHistoryItem>)
 - `getRecentlyRecalled`: GET `/api/memory-trackers/recently-recalled` -> `GetRecentlyRecalledResponse` (request: none; response body: Array<MemoryTracker>)
 - `getRecentMemoryTrackers`: GET `/api/memory-trackers/recent` -> `GetRecentMemoryTrackersResponse` (request: none; response body: Array<MemoryTracker>)

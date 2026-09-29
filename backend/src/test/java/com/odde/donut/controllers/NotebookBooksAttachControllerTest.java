@@ -19,11 +19,13 @@ import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockMultipartFile;
 
 class NotebookBooksAttachControllerTest extends NotebookBooksControllerTestBase {
+  @Autowired BooksController booksController;
 
   @Nested
   class AttachBook {
@@ -72,9 +74,10 @@ class NotebookBooksAttachControllerTest extends NotebookBooksControllerTestBase 
     void returnsAttachedPdfBytes() throws Exception {
       Notebook nb = myNotebook();
       byte[] pdfBytes = new byte[] {0x25, 0x50, 0x44, 0x46, 0x2d, 0x31, 0x2e};
-      controller.attachBook(nb, attachRequest(node("Chapter 1")), pdfFile(pdfBytes));
+      Book attached =
+          controller.attachBook(nb, attachRequest(node("Chapter 1")), pdfFile(pdfBytes)).getBody();
 
-      ResponseEntity<byte[]> fileRes = controller.getBookFile(webRequest(), nb);
+      ResponseEntity<byte[]> fileRes = booksController.getBookFile(webRequest(), attached);
 
       assertThat(fileRes.getStatusCode(), equalTo(HttpStatus.OK));
       assertThat(fileRes.getBody(), equalTo(pdfBytes));

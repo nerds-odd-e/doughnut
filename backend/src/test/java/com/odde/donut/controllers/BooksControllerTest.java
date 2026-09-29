@@ -23,6 +23,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.web.context.request.ServletWebRequest;
+import org.springframework.web.server.ResponseStatusException;
 
 class BooksControllerTest extends ControllerTestBase {
 
@@ -121,6 +122,17 @@ class BooksControllerTest extends ControllerTestBase {
       assertThat(res.getStatusCode(), equalTo(HttpStatus.NOT_MODIFIED));
       assertThat(res.getBody(), nullValue());
       assertThat(res.getHeaders().getETag(), equalTo(etag));
+    }
+
+    @Test
+    void returns404WhenTheSourcePathNamesNoNotebookFile() {
+      Book book = bookOf(notebookWithBook());
+      book.setSourceFilePath("Missing.pdf");
+      makeMe.entityPersister.save(book);
+      makeMe.entityPersister.flush();
+
+      assertThrows(
+          ResponseStatusException.class, () -> booksController.getBookFile(webRequest(), book));
     }
   }
 }

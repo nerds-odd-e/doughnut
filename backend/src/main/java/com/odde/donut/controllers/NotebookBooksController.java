@@ -1,7 +1,6 @@
 package com.odde.donut.controllers;
 
 import com.fasterxml.jackson.annotation.JsonView;
-import com.odde.donut.configs.BookFileDownloadCacheControl;
 import com.odde.donut.controllers.dto.ApiError;
 import com.odde.donut.controllers.dto.AttachBookRequest;
 import com.odde.donut.controllers.dto.BookBlockDepthRequest;
@@ -32,13 +31,11 @@ import jakarta.validation.Valid;
 import java.io.IOException;
 import java.util.List;
 import java.util.Set;
-import org.springframework.http.CacheControl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.multipart.MultipartFile;
 
 @RestController
@@ -47,15 +44,10 @@ class NotebookBooksController {
 
   private final AuthorizationService authorizationService;
   private final BookService bookService;
-  private final BookFileDownloadCacheControl bookFileDownloadCacheControl;
 
-  NotebookBooksController(
-      AuthorizationService authorizationService,
-      BookService bookService,
-      BookFileDownloadCacheControl bookFileDownloadCacheControl) {
+  NotebookBooksController(AuthorizationService authorizationService, BookService bookService) {
     this.authorizationService = authorizationService;
     this.bookService = bookService;
-    this.bookFileDownloadCacheControl = bookFileDownloadCacheControl;
   }
 
   @Operation(operationId = "attachBook", summary = "Attach book")
@@ -242,25 +234,6 @@ class NotebookBooksController {
     authorizationService.assertAuthorization(notebook);
     var result = bookService.cancelBlock(notebook, bookBlock);
     return BookMutationResponseMapper.fromBook(result.book(), Set.of(result.predecessorBlockId()));
-  }
-
-  @GetMapping(
-      value = "/{notebook}/book/file",
-      produces = {MediaType.APPLICATION_PDF_VALUE, "application/epub+zip"})
-  public ResponseEntity<byte[]> getBookFile(
-      WebRequest request, @PathVariable("notebook") @Schema(type = "integer") Notebook notebook)
-      throws UnexpectedNoAccessRightException {
-    authorizationService.assertReadAuthorization(notebook);
-    var file = bookService.getNotebookBookFile(notebook);
-    String etag = file.etag();
-    CacheControl cacheControl = bookFileDownloadCacheControl.value();
-    if (request.checkNotModified(etag)) {
-      return ResponseEntity.status(HttpStatus.NOT_MODIFIED)
-          .eTag(etag)
-          .cacheControl(cacheControl)
-          .build();
-    }
-    return bookService.streamBookFile(file, cacheControl);
   }
 
   @Operation(operationId = "deleteBook", summary = "Delete book")
