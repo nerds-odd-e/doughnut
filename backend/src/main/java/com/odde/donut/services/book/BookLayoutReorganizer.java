@@ -31,6 +31,9 @@ import org.springframework.web.server.ResponseStatusException;
 
 final class BookLayoutReorganizer {
 
+  private static final long BASE_ANSWER_TOKENS = 700L;
+  private static final long ANSWER_TOKENS_PER_BLOCK = 12L;
+
   private final ObjectMapper objectMapper;
   private final OpenAiApiHandler openAiApiHandler;
   private final GlobalSettingsService globalSettingsService;
@@ -70,6 +73,7 @@ final class BookLayoutReorganizer {
             .model(model)
             .addInstruction(tool.getMessageBody())
             .addUserMessage(userJson)
+            .maxOutputTokens(BASE_ANSWER_TOKENS + ANSWER_TOKENS_PER_BLOCK * ordered.size())
             .build();
     BookLayoutReorganizationSuggestion suggestion =
         openAiApiHandler

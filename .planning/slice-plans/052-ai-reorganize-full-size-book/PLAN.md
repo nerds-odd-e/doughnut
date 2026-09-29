@@ -58,7 +58,7 @@ real-model run at 361 blocks is an optional owner demonstration, not a gate
 ### 1. AI Reorganize allows an answer as long as the book
 
 Type: Behavior
-Status: planned
+Status: done
 Proof: new case in `NotebookBooksSuggestLayoutControllerTest`
 (`SuggestBookLayoutReorganization`), run with
 `CURSOR_DEV=true nix develop -c ./backend/gradlew -p backend test -Dspring.profiles.active=test --tests 'com.odde.donut.controllers.NotebookBooksSuggestLayoutControllerTest'`;
@@ -70,6 +70,12 @@ sent to OpenAI allows at least 12 × 361 output tokens. In
 count with a per-block allowance and a small fixed base (for the JSON wrapper),
 named as constants in that class. A small book keeps a budget no lower than
 today's 700.
+
+Accepted proof (2026-09-29): `allowsAnAnswerAsLongAsAFullSizeBook` attaches
+361 top-level blocks and asserts the captured request's `maxOutputTokens`
+≥ 12 × 361; it failed at 700 before the change. The class's 6 tests pass.
+Implemented as `BASE_ANSWER_TOKENS` (700) + `ANSWER_TOKENS_PER_BLOCK` (12)
+× block count in `BookLayoutReorganizer`.
 
 ## Current decisions
 
