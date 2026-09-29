@@ -85,7 +85,7 @@ and confirm; check the layout, current block, and records stay consistent → fi
 
 ### 4. The owner can choose follow-up work from the report
 Type: Behavior
-Status: planned
+Status: done
 Size: about 10 minutes, outside the UAT budget.
 Proof: the section ends with actual UAT time, scenarios not reached, suggested priorities, and proposed
 follow-up story outcomes separating fixes to supported behavior from missing capabilities.
@@ -124,3 +124,6 @@ rereading the session.
   so the UAT used 56 of 120 minutes. Defects 10–17 added; evidence inspected: `shots/s3-33-ai-err-17.png`
   and `s3-ai-tp.txt` (defect 10: AI reorganization of the 361-block Think Python returns HTTP 500 and shows
   truncated raw JSON). AI reorganization of the 27-block paper previewed in 3–6 s and was mostly correct.
+- Slice 4 (accepted 2026-09-29): the report ends with time, suggested priorities (P1: defects 1, 2, 5, 6,
+  10), 11 fix stories and 10 capability stories, and recommendations on the seed's Open Decisions. Three
+  P3 polish improvements are intentionally in no follow-up story.

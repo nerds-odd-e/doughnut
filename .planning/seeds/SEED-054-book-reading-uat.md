@@ -162,7 +162,14 @@ Time, against the two-hour exploration budget:
   waiting.
 - Reading records and reorganizing took 29 minutes of its 55-minute share
   (08:07–08:36). Defects 10–17 come from this part.
-- None of the 15-minute reserve was used.
+- None of the 15-minute reserve was used. In total, exploration used 56 of the
+  120 budget minutes (27 + 29).
+- Why the budget was not used up: every starting scenario was covered early,
+  and each defect was reproduced before it was written down. The scenarios
+  still open (see "Coverage gaps") need other browsers, touch devices, or books
+  of other sizes, not more time with the same setup.
+- Writing up took about 10 minutes for each of the two parts, plus about 10
+  minutes for the priorities and follow-up stories, all outside the budget.
 
 Screenshots (`s2-…` from attaching and browsing, `s3-…` from reading records
 and reorganizing) and the raw measurements stay outside the repository; the
@@ -661,6 +668,112 @@ store path. The CLI worked only with
   READ record from defect 7, and each has a saved reading position. *UAT
   Alice* also has records on chapters II and III.
 
+### Suggested priorities
+
+The ranking asks one question: how much does the finding stop a reader from
+reading a whole book completely, smoothly, and stably?
+
+**P1: the reader cannot rely on the book or the layout**
+
+- Defect 1, EPUB chapter landing: choosing a chapter, the main way to move
+  around an EPUB, starts the reader in the middle of the chapter.
+- Defect 5, duplicate blocks from PDF page headers: about a fifth of a real
+  book's layout is not real headings, and records and the current block pass
+  through them.
+- Defect 6, flat or wrong PDF nesting: the layout cannot be read or folded by
+  chapter, and the parent-based features work on wrong parents.
+- Defect 10, AI reorganization fails on a real-size book: the one tool that
+  could clean up defects 5 and 6 fails on exactly the books that need it, and
+  shows raw JSON.
+- Defect 2, phone width: no reading at all on a phone.
+
+**P2: reading works, but breaks the flow or leaves wrong data**
+
+- Defects 3 and 4, PDF scrolling jumps back or stops: a visible jerk or a
+  frozen view at the start of every reading run.
+- Defect 15, chapter labels stop marking: at each chapter start in a book like
+  Think Python, marking stops until the reader notices.
+- Defects 7 and 8, EPUB first open and blocks without an anchor: records and
+  the selection describe text the reader never saw.
+- Defect 11, EPUB reorganizing controls that do nothing: a visible button that
+  silently does nothing looks broken.
+- Defect 12, paragraph-length block titles: they clutter the layout and cannot
+  be corrected.
+- Defect 13, Tab in the layout: keyboard users cannot move around, and a Tab
+  can change the saved layout by accident.
+- Improvement "A reading record cannot be changed or removed": wrong records
+  from defects 7 and 15, or from a mistaken click, stay for good.
+- Improvement "Fixing a layout by hand": without undo or range moves, one wrong
+  key costs many steps, and imperfect extraction makes such fixes common.
+- Improvement "EPUB has no current-block bar": EPUB readers lose the way back
+  to the selection that PDF readers have.
+
+**P3: friction or polish**
+
+- Defect 9 (the CLI extracts before refusing), defect 14 (focus leaves the
+  block), defect 16 (EPUB reopening does not scroll the layout), and defect 17
+  (the AI leaves one level unnested): each costs a little time and has an easy
+  way around it.
+- Improvements on attaching and finding the reader: discovering how to attach,
+  extraction progress, a *Read* entry point, and the book title.
+- Improvements on reading comfort and progress: overlays over the text, marks
+  that are hard to read, the end of the book, the hidden *New block* action, the
+  title prompt, checking the AI preview, and the small items.
+
+### Proposed follow-up stories
+
+Sizes use the seed's effort bands (S = 30–60 minutes, M = 1–2 hours,
+L = 2–4 hours). These are candidates for the owner's decision; none is queued.
+
+**Fixes to supported behavior**
+
+| Story outcome | Covers | Size | Open question |
+| --- | --- | --- | --- |
+| Choosing an EPUB block shows the start of that block, and reopening shows it in the layout | Defects 1, 8, 16 | M | For a block without an anchor: go to the nearest place in the book, or stop offering it as a place to go? |
+| A reader on a phone can read a book and open the layout as a drawer | Defect 2 | M | Should the drawer behave like the notebook sidebar drawer? |
+| A PDF attached through the CLI gets one block per real heading, nested as in the book | Defects 5, 6 (and the header duplicates auto-marked in defect 15) | L | Is nesting lost in Donut after MinerU (the hypothesis in defect 6)? If so, the story may be M. Should the PDF's own bookmarks be used when present? |
+| AI reorganization gives a preview for a real-size book, and a failure is explained in plain words without moving the layout | Defect 10; defect 17 could be included | M–L | Where is the limit (no book between 27 and 361 blocks was tried)? Split the book into parts, or ask the AI only for the changes? |
+| Scrolling a PDF moves smoothly in one direction from the first wheel step, wherever the pointer rests | Defects 3, 4 | M | None |
+| A newly attached EPUB opens at its start, with no records the reader did not make | Defect 7 | S | None |
+| Reading and marking continue through a chapter label into the chapter | Defect 15 | S–M | Should label blocks such as "Chapter 9" disappear once extraction is fixed? |
+| Keyboard users can move between layout blocks without changing the layout, and can indent or outdent the same block again | Defects 13, 14 | M | Which keys move and which keys change depth, if Tab no longer does both? |
+| EPUB readers see only reorganizing controls that work | Defect 11 (hiding them); making them work is a capability below | S | Not needed if EPUB reorganizing is built first |
+| A new block gets a short title the reader can type, whatever the paragraph length | Defect 12, improvement "The title prompt is awkward" | S | None |
+| The CLI refuses a PDF for a notebook that already has a book before extracting it | Defect 9 | S | None |
+
+**Missing capabilities that would complete the feature**
+
+| Story outcome | Covers | Size | Open question |
+| --- | --- | --- | --- |
+| A reader can undo the last layout change and indent or outdent several blocks at once | Improvement "Fixing a layout by hand" | M | Does undo need to cover more than the last change? |
+| A reader can change or clear the mark on a block | Improvement "A reading record cannot be changed or removed"; the wrong records left by defects 7 and 15 | S–M | None |
+| A reader can rename a block | Defect 12 (existing titles) | S | None |
+| A reader can reorganize an EPUB layout as for PDF (indent, outdent, cancel, AI) | Defect 11 | L | Is creating a block from EPUB text also needed, or only the other actions? |
+| EPUB readers get the same "Now reading / Read from here / Back to selected" bar as PDF readers | Improvement "EPUB has no current-block bar" | M | None |
+| A reader sees how far through the book they are: readable marks, progress on chapters, and a summary at the end with a way to the unmarked blocks | Improvements "Record marks are hard to read" and "Nothing marks the end of the book" | M | None |
+| A reader goes from an attached book to reading it in one step | Improvement "It is hard to get from attaching to reading" (a *Read* entry point where the book file is shown, a reader link after a CLI attach); improvement "Attaching is hard to discover" | S–M | Should PDFs also be attachable on the web, or is a hint about the CLI enough? |
+| A book shows its real title | Improvement "Books are named after the file" | S | EPUB metadata only, or also a title the reader can edit? |
+| The CLI shows extraction progress while a PDF is attached | Improvement "There is no feedback during extraction" | S–M | Does MinerU report page progress that the CLI can show? |
+| A reader can check an AI proposal quickly and take only the rows they want | Improvement "The AI preview is hard to check"; defect 17 | M | None |
+
+**Recommendations on the Open Decisions** (the owner decides):
+
+- *Which findings, in what order:* the P1 fixes first, starting with EPUB
+  landing and PDF extraction, because they decide whether a layout can be
+  trusted at all. The phone-width fix can follow if phone reading matters now.
+- *Which missing pieces most limit completeness:* the ability to correct
+  things. Extraction is imperfect and AI help fails on real books, yet the
+  reader cannot undo a layout change, move several blocks at once, rename a
+  block, reorganize an EPUB, or correct a reading record. After that comes giving
+  EPUB what PDF already has (the current-block bar and reorganizing).
+- *Missing capabilities before fixes?* No, with one exception. Fixes to
+  supported behavior should come first, because the missing pieces matter less
+  while navigation and extraction are unreliable. The exception is changing or
+  clearing a record: it is small, and it lets readers recover from the wrong
+  records that the defects already produce. Undo and range moves should be
+  judged again after the PDF extraction and AI reorganization fixes, which
+  decide how much fixing by hand is still needed.
+
 ## Ordering and Scope Reduction
 
 The owner added this as the last item in the current product backlog.
@@ -676,6 +789,8 @@ supplies candidates for a later product decision.
   the UAT report rather than selecting them in advance.
 - Which missing capabilities most limit the feature's completeness, and should
   they come before fixes to supported behavior?
+- The UAT's recommendations on both questions are at the end of
+  `### Proposed follow-up stories`; the owner decides.
 
 ## When to Surface
 
