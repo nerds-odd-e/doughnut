@@ -92,6 +92,15 @@ paragraph case); `epub_book.feature` 16/16 and `reading_record.feature` 6/6
 (new scenario red on the old rule); frontend pages/composables/lib/book-reading
 500/500; `vue-tsc` clean.
 
+## Execution complete
+
+Product advice: no correction needed. Snap-back's `hasDirectContent`
+(`useBookReadingSnapBack.ts`, more than one locator) keeps the old blind spot;
+story 16 should reuse `hasNoTextOfItsOwn` and carry this story's definition of
+"no text of its own" when this story is wrapped up. The reading panel's anchor
+(`lastDirectContentLocator`, excluded here) has no home story; wrap-up should
+place it in a story or confirm it stays out of scope.
+
 ## Current decisions
 
 - One frontend predicate from `contentBlocks` types; no API change.
