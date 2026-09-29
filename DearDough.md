@@ -610,6 +610,10 @@ The frontend proof requires `vue-tsc --noEmit` to pass. Two agents ran it as `..
 - Execution: SEED-051#story-1 / `f35fa810f1:.planning/slice-plans/009-retire-note-embeddings/PLAN.md` / 5003fbecc8; Timestamp: 2026-09-28T05:05:14Z (slice 4 refactor acceptance); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.45.
   - Evidence: slice 4 refactor agent ran `vue-tsc --noEmit 2>&1 | tail -5; echo tsc=$?` and reported "The `tsc=0` echo only captured the exit status of `tail`"; the coordinator reran the typecheck before formatting.
   - Observed effect: one extra typecheck run; no wrong result accepted.
+- Execution: SEED-056#story-1 / `.planning/slice-plans/014-recall-half-day-refresh/PLAN.md` / 4b39b579e0; Timestamp: 2026-09-29T11:08:48+08:00 (slice 1 commit after acceptance); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.46.
+  - Evidence: slice 1 implementer and refactor agents ran `vue-tsc --noEmit 2>&1 | tail -15; echo EXIT $?` / `| tail -5` and reported the typecheck clean; CI run 36515871965 (job 109237884287, `pnpm -C frontend build`) failed on `tests/pages/RecallPage.dueQueue.spec.ts(71,5): error TS2322`; fixed in 171e696e06. The slice 2 agent then wrongly concluded a standalone `vue-tsc --noEmit` misses test files.
+  - Observed effect: unlike earlier rows, a wrong result was accepted: one failed published CI job and one repair; the delegation prompt did not spell out exit-code capture.
+  - Inference: the coordinator should require an unpiped exit code (or reuse `pnpm -C frontend build`) in every delegation that asks for the typecheck.
 
 ## ODF-150 — An implementer's slice proof ran only the specs it chose, missing consumers of the store method it changed
 
@@ -628,6 +632,10 @@ The slice changed `StoredApiCollection.trashNote` to request a folder listing be
   - Evidence: chat 01a0e0fe-e37c-7512-a6b3-b8d4c1318365, slice2 return and slice3 messages; a08a318db1 changed trash to throw, while its 69-test selection omitted NoteShowPage.autosaveTrash. CI run 36294751826 attempt 1, job 108551410141 reports that spec's unhandled Vue warning. Slice3's broader local selection independently found the same error; d697a1326b adds the test-only expected-error observation.
   - Observed effect: one failed published frontend job and one bounded test repair; 124 focused tests then passed, followed by the 1,938-test full frontend run in slice6.
   - Inference: consumer inspection needs callers of the whole removal flow and their refusal scenarios, not only direct store-call specs. Production error propagation itself was intended.
+- Execution: SEED-056#story-1 / `.planning/slice-plans/014-recall-half-day-refresh/PLAN.md` / 4b39b579e0; Timestamp: 2026-09-29T11:08:48+08:00 (slice 1 commit after acceptance); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.46.
+  - Evidence: slice 1 changed the recall page's return path (deduplicating due trackers against the whole queue); planning's premise "Existing tests pin the replacement behavior" searched only `frontend/tests`, and slice 1 proof ran only frontend specs. E2E `spaced_repetition.feature` "Strictly follow the schedule" exercises that return path and failed (CI run 36515871965, the recall E2E job; locally found by the slice 2 agent). Repaired in 171e696e06 by deduplicating only waiting trackers.
+  - Observed effect: one failed published E2E job and a slice-1 repair folded into slice 2.
+  - Inference: consumer search for a changed behavior should include `e2e_test/` features that drive it, at planning or proof-acceptance time. Matching is by root cause (proof chosen by edited area); the actor here was planning plus coordinator acceptance.
 
 ## ODF-151 — A retrospective finding asserted the loading modal, which the product does not show for these requests
 

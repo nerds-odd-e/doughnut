@@ -106,9 +106,9 @@ rewritten to the new rule, not kept alongside it.
 
 Type: Behavior
 Status: done
-Accepted proof: `CURSOR_DEV=true nix develop -c pnpm -C frontend build` (runs
-`vue-tsc` over tests too; a standalone `vue-tsc --noEmit` missed a test type
-error CI caught), `… vitest run tests/pages/RecallPage tests/toolbars/MainMenu`
+Accepted proof: `CURSOR_DEV=true nix develop -c pnpm -C frontend build` (its
+`vue-tsc` caught a slice-1 test type error that CI also caught; slice 1's
+typecheck had been piped into `tail`, so its reported exit code was `tail`'s), `… vitest run tests/pages/RecallPage tests/toolbars/MainMenu`
 (65 pass), and `SUT_TIMEOUT_MS=360000 … pnpm cy:run --spec
 e2e_test/features/recall/spaced_repetition.feature` (4 pass; the new scenario
 failed with the timer callback disabled, showing "finished all recalls").
@@ -149,3 +149,13 @@ question, answer, and position are untouched; no spinner.
 | "Done" turns into newly due questions | 2 | E2E |
 | Return to recall page uses the same rule | 1 | dueQueue spec |
 | Questions loaded ahead stay queued | 1 | Naturally held by "add only missing"; covered by the kept-queue assertion, no separate test |
+
+## Execution complete
+
+Product advice: no backlog change. The recall queue is no longer replaced at a
+half-day boundary, so the page's "Recalling x/y" count now includes questions
+answered earlier in the same open session; this follows the story's "never
+reset position" promise. Watch whether learners find the growing total
+confusing before proposing a counter change. The main menu's first menu-data
+load still fills the queue only when it is empty; it coincides with catch-up at
+sign-in and needs no correction now.
