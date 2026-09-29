@@ -9,7 +9,6 @@ Bug fixing and general maintenance.
 
 - [Give the PDF reading view a designed structure, not just a smaller file](seeds/SEED-059-book-reading-uat-fixes.md#story-19) — SEED-059#story-19 ([plan](slice-plans/060-designed-structure-for-reading-view/PLAN.md))
 - [Reopen an EPUB at the exact paragraph](seeds/SEED-059-book-reading-uat-fixes.md#story-17) — SEED-059#story-17 ([plan](slice-plans/059-reopen-epub-at-exact-paragraph/PLAN.md))
-- [Attach a PDF book after installing MinerU as Donut advises](seeds/SEED-060-mineru-version-for-pdf-books.md#story-1) — SEED-060#story-1 ([plan](slice-plans/061-pinned-mineru-install-hint/PLAN.md))
 
 ## Backlog list
 
