@@ -72,65 +72,6 @@ reading a book end to end.
 
 Effort bands: S = 30–60 minutes, M = 1–2 hours, L = 2–4 hours, including delivery.
 
-<a id="story-5"></a>
-
-### Scroll a PDF smoothly right after choosing a block
-
-**Identity:** SEED-059#story-5
-```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/053-pdf-smooth-scroll-after-choosing-block/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"28cca86835fd2a2f26c88e96e49caaca2127129ebc19e752ff952a9e926b2861","plan":"591165dbf17b9e072f0fd9ecb222f4d93d6b6aa8cedd90ee592aeb35dab88f4d"}}
-```
-
-**Goal:** A PDF reader's view moves only where they scroll it, from the first
-wheel step after choosing a block, wherever the pointer rests. Today the start
-of every reading run jerks back by up to a screen, and the view can seem frozen,
-which makes reading a book in Donut feel broken rather than smooth.
-
-**Scope**
-
-- **Nothing pulls the reader back** (owner decision, 2026-09-29). The
-  snap-back reminder is removed: scrolling past an unmarked block into the next
-  one no longer moves the view back to it, and no wheel steps are ignored
-  afterwards. Cause (read in code, 2026-09-29): snap-back pulls the view back
-  up to twice per block and ignores wheel steps for 500 ms after each pull,
-  which matches the UAT's two backward jumps per run. The Read/Skim/Skip panel,
-  which already appears at the block's end and after scrolling past it, stays
-  the only reminder.
-- **Any other backward jump in the first second is in scope too.** The promise
-  is that each downward wheel step moves the view down, whatever causes a jump.
-- **The Reading Control Panel never stops scrolling.** Wheeling with the pointer
-  over the PDF panel scrolls the book, as the EPUB panel already allows. Its
-  buttons still work.
-- **The panel stays reachable after scrolling past** (owner decision,
-  2026-09-29). When the panel and the "Now reading" bar both show at the
-  bottom of the PDF, the panel sits just above the bar instead of under it.
-- **Deferred:** otherwise the panel's position, look, and the text it covers; EPUB
-  scrolling; keeping the current block at the layout's edge in short viewports.
-- **Must keep working:** PDF landing on the exact page with the heading at the
-  top, the current block following scrolling, the panel appearing at the
-  block's end and after scrolling past it, the panel moving on to the next block
-  once the selected one is marked, Read/Skim/Skip and resume, and layout
-  editing.
-
-**Key examples**
-
-- In *Think Python*, choose "8.1 A string is a sequence", then wheel down in
-  400 px steps every 120 ms → every step moves the view down (today
-  `+400, +400, −156, +400, −800, +400…`). The same after choosing 14.6, and 3.1
-  in the *Attention* paper.
-- Choose a block, scroll past its end into the next block without marking it →
-  the view stays where the reader scrolled, and the panel is still offered for
-  the chosen block.
-- With the pointer resting at the centre of the PDF, wheel down until the panel
-  arrives under the pointer, and keep wheeling → the book keeps scrolling
-  (today 0 px for 12 steps); clicking *Read* on the panel still marks the block.
-
-**UAT evidence:** defects 3 and 4 in the report linked under *Why This
-Matters*. Snap-back has unit tests but no E2E scenario.
-
-**Effort hypothesis:** S–M, medium confidence.
-**Depends on:** none.
-
 <a id="story-7"></a>
 
 ### Fix a book layout by hand in a few steps
@@ -374,12 +315,13 @@ marking goes on after choosing a block with no text of its own.
 
 **Effort hypothesis:** M–L, low confidence. Provisional slices:
 [plan 058](../slice-plans/058-current-block-same-in-pdf-and-epub/PLAN.md).
-**Depends on:** story 5 (it removes snap-back from the same PDF pipeline).
+**Depends on:** none (snap-back is removed).
 "No text of its own" is `hasNoTextOfItsOwn` in
 `frontend/src/lib/book-reading/bookBlockDirectContent.ts` (a PDF heading-only
 block, or an EPUB block whose only content is its start anchor); auto-mark
-already uses it. Snap-back's `hasDirectContent` (`useBookReadingSnapBack.ts`)
-still means "more than one locator" and should use it too.
+already uses it. The reading panel target's `hasDirectContent`
+(`useReadingPanelTarget.ts`) still means "more than one locator" and should
+use it too.
 
 <a id="story-17"></a>
 
@@ -455,8 +397,8 @@ Panel at the end of that paragraph, as they do for blocks with more text.
   paragraph, so `useReadingPanelAnchor` gives no anchor for a heading plus one
   paragraph. It should agree with `hasNoTextOfItsOwn`: only a block with no
   text of its own has no anchor.
-- **Check snap-back too:** `useBookReadingSnapBack.ts` also uses
-  `lastDirectContentLocator`; story 16 owns snap-back's other rules.
+- **Check the panel target too:** `useReadingPanelTarget.ts` also uses
+  `lastDirectContentLocator`; story 16 owns its other rules.
 
 **Key examples**
 
@@ -465,7 +407,7 @@ Panel at the end of that paragraph, as they do for blocks with more text.
 - A PDF block with a heading and paragraphs still anchors as today.
 
 **Effort hypothesis:** S, low confidence.
-**Depends on:** none; coordinate with story 16 on snap-back.
+**Depends on:** none; coordinate with story 16 on the reading panel target.
 
 <a id="story-19"></a>
 
