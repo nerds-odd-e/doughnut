@@ -65,7 +65,7 @@ class NotebookBooksBlockDepthControllerTest extends NotebookBooksBlockController
       nb = myNotebook();
       // Layout: A(0), B(0), C(1), D(0)
       controller.attachBook(
-          nb, attachRequest(node("A"), node("B", node("C")), node("D")), pdfFile(STUB_PDF_BYTES));
+          nb, attachRequest(node("A"), node("B", node("C")), node("D")), pdfFile(ONE_PAGE_PDF));
     }
 
     @Test
@@ -82,7 +82,7 @@ class NotebookBooksBlockDepthControllerTest extends NotebookBooksBlockController
     void outdentMovesDescendantsWithHead() throws Exception {
       Notebook nb2 = myNotebook();
       controller.attachBook(
-          nb2, attachRequest(node("X", node("Y", node("Z"))), node("W")), pdfFile(STUB_PDF_BYTES));
+          nb2, attachRequest(node("X", node("Y", node("Z"))), node("W")), pdfFile(ONE_PAGE_PDF));
       BookBlock y = blockByTitle(bookOf(nb2), "Y");
 
       BookMutationResponse result = controller.changeBookBlockDepth(nb2, y, outdent());
@@ -171,7 +171,7 @@ class NotebookBooksBlockDepthControllerTest extends NotebookBooksBlockController
     @Test
     void titleBecomesContentBlockOfPredecessorWhenCancelledBlockHasNoContent() throws Exception {
       Notebook nb = myNotebook();
-      controller.attachBook(nb, attachRequest(node("A"), node("B")), pdfFile(STUB_PDF_BYTES));
+      controller.attachBook(nb, attachRequest(node("A"), node("B")), pdfFile(ONE_PAGE_PDF));
       Book book = bookOf(nb);
       BookBlock blockB = blockByTitle(book, "B");
       BookBlock blockA = blockByTitle(book, "A");
@@ -205,7 +205,7 @@ class NotebookBooksBlockDepthControllerTest extends NotebookBooksBlockController
               List.of(
                   headingBlock("B", 1, 0, List.of(0.0, 0.0, 100.0, 20.0)),
                   textBlock("Body of B", 1, null))));
-      controller.attachBook(nb, attachRequest(node("A"), nodeB), pdfFile(STUB_PDF_BYTES));
+      controller.attachBook(nb, attachRequest(node("A"), nodeB), pdfFile(ONE_PAGE_PDF));
       Book book = bookOf(nb);
       BookBlock blockB = blockByTitle(book, "B");
       BookBlock blockA = blockByTitle(book, "A");

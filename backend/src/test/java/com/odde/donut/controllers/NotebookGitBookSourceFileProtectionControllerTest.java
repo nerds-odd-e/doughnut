@@ -1,5 +1,6 @@
 package com.odde.donut.controllers;
 
+import static com.odde.donut.controllers.NotebookBooksControllerTestBase.ONE_PAGE_PDF;
 import static com.odde.donut.controllers.NotebookBooksControllerTestBase.attachRequest;
 import static com.odde.donut.controllers.NotebookBooksControllerTestBase.node;
 import static com.odde.donut.controllers.NotebookBooksControllerTestBase.pdfFile;
@@ -30,12 +31,11 @@ class NotebookGitBookSourceFileProtectionControllerTest
   @BeforeEach
   void attachPhysicsPrimer() throws Exception {
     notebook = createGitBackedNotebook();
-    byte[] pdfBytes = {0x25, 0x50, 0x44, 0x46};
     AttachBookRequest request = attachRequest(node("Chapter 1"));
     request.setBookName("Physics Primer");
-    booksController.attachBook(notebook, request, pdfFile(pdfBytes));
+    booksController.attachBook(notebook, request, pdfFile(ONE_PAGE_PDF));
     accepted = reloadCommittedBinding(notebook.getId());
-    bookPointer = lfsPointerStoredFor(notebook, pdfBytes);
+    bookPointer = lfsPointerStoredFor(notebook, ONE_PAGE_PDF);
   }
 
   @Test

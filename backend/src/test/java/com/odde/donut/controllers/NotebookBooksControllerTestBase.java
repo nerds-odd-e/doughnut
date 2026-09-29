@@ -34,7 +34,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 abstract class NotebookBooksControllerTestBase extends ControllerTestBase {
 
-  static final byte[] STUB_PDF_BYTES = new byte[] {1};
+  static final byte[] ONE_PAGE_PDF = TestPdfs.onePagePdf(0);
 
   @Autowired NotebookBooksController controller;
   @Autowired BookRepository bookRepository;
@@ -120,34 +120,13 @@ abstract class NotebookBooksControllerTestBase extends ControllerTestBase {
   }
 
   static List<BookBlock> childrenOf(Book book, BookBlock parent) {
-    List<BookBlock> ordered = blocksByLayoutOrder(book);
-    int p = -1;
-    for (int i = 0; i < ordered.size(); i++) {
-      if (ordered.get(i).getId().equals(parent.getId())) {
-        p = i;
-        break;
-      }
-    }
-    if (p < 0) {
-      return List.of();
-    }
-    int parentDepth = parent.getDepth();
-    List<BookBlock> out = new ArrayList<>();
-    int i = p + 1;
-    while (i < ordered.size() && ordered.get(i).getDepth() > parentDepth) {
-      BookBlock candidate = ordered.get(i);
-      if (candidate.getDepth() == parentDepth + 1) {
-        out.add(candidate);
-        int subtreeRootDepth = candidate.getDepth();
-        i++;
-        while (i < ordered.size() && ordered.get(i).getDepth() > subtreeRootDepth) {
-          i++;
-        }
-      } else {
-        i++;
-      }
-    }
-    return out;
+    int depth = parent.getDepth();
+    return blocksByLayoutOrder(book).stream()
+        .dropWhile(b -> !b.getId().equals(parent.getId()))
+        .skip(1)
+        .takeWhile(b -> b.getDepth() > depth)
+        .filter(b -> b.getDepth() == depth + 1)
+        .toList();
   }
 
   static AttachBookLayoutNodeRequest node(String title, AttachBookLayoutNodeRequest... kids) {

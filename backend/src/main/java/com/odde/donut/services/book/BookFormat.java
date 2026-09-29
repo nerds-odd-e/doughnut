@@ -26,8 +26,8 @@ public enum BookFormat {
     }
 
     @Override
-    public void validateAttachRequest(AttachBookRequest request) {
-      AttachBookLayoutValidator.validatePdfAttachRequest(request);
+    public void validateAttach(AttachBookRequest request, byte[] bytes) {
+      AttachBookLayoutValidator.validatePdfAttachRequest(request, PdfBookmarkReader.read(bytes));
     }
 
     @Override
@@ -71,8 +71,9 @@ public enum BookFormat {
     }
 
     @Override
-    public void validateAttachRequest(AttachBookRequest request) {
+    public void validateAttach(AttachBookRequest request, byte[] bytes) {
       AttachBookLayoutValidator.validateEpubAttachRequest(request);
+      EpubAttachValidator.validateAttachableEpub(bytes);
     }
 
     @Override
@@ -118,7 +119,11 @@ public enum BookFormat {
   public abstract List<ContentLocator> assembleContentLocators(
       List<BookContentBlock> contentBlocks);
 
-  public abstract void validateAttachRequest(AttachBookRequest request);
+  /**
+   * Validates the attach request with its file; for a PDF, also builds the layout from its
+   * contentList.
+   */
+  public abstract void validateAttach(AttachBookRequest request, byte[] bytes);
 
   public abstract void persistNewBook(AttachBookService.PersistContext ctx, Book book);
 

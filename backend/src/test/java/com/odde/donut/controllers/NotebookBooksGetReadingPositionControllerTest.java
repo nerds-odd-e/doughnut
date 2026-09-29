@@ -39,7 +39,7 @@ class NotebookBooksGetReadingPositionControllerTest extends NotebookBooksControl
     void returnsSelectedBookBlockIdWithoutEntityInJson() throws Exception {
       Notebook nb = myNotebook();
       controller.attachBook(
-          nb, attachRequest(node("Chapter 1", node("Section 1.1"))), pdfFile(STUB_PDF_BYTES));
+          nb, attachRequest(node("Chapter 1", node("Section 1.1"))), pdfFile(ONE_PAGE_PDF));
       int secondBlockId = blocksByLayoutOrder(bookOf(nb)).get(1).getId();
       controller.patchReadingPosition(nb, lastReadBody(1, 200, secondBlockId));
 

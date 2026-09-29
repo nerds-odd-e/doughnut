@@ -37,7 +37,7 @@ class NotebookBooksSuggestLayoutControllerTest
     void setupBook() throws Exception {
       nb = myNotebook();
       controller.attachBook(
-          nb, attachRequest(node("A"), node("B", node("C")), node("D")), pdfFile(STUB_PDF_BYTES));
+          nb, attachRequest(node("A"), node("B", node("C")), node("D")), pdfFile(ONE_PAGE_PDF));
     }
 
     @Test

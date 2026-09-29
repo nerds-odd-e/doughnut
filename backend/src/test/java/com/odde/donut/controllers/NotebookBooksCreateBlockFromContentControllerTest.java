@@ -75,7 +75,7 @@ class NotebookBooksCreateBlockFromContentControllerTest
               .attachBook(
                   nb,
                   attachRequest(chapterWithHeadingAndBody("Chapter 1", "Some body text")),
-                  pdfFile(STUB_PDF_BYTES))
+                  pdfFile(ONE_PAGE_PDF))
               .getBody();
       BookBlock chapter = blockByTitle(created, "Chapter 1");
       int secondId = contentBlockId(chapter, 1);
@@ -123,7 +123,7 @@ class NotebookBooksCreateBlockFromContentControllerTest
               .attachBook(
                   nb,
                   attachRequest(chapterWithHeadingAndBody("Chapter 1", "W".repeat(550))),
-                  pdfFile(STUB_PDF_BYTES))
+                  pdfFile(ONE_PAGE_PDF))
               .getBody();
       int secondId = contentBlockId(blockByTitle(created, "Chapter 1"), 1);
 
@@ -147,7 +147,7 @@ class NotebookBooksCreateBlockFromContentControllerTest
     @Test
     void unknownContentBlockIdThrows404() throws Exception {
       Notebook nb = myNotebook();
-      controller.attachBook(nb, attachRequest(node("A")), pdfFile(STUB_PDF_BYTES));
+      controller.attachBook(nb, attachRequest(node("A")), pdfFile(ONE_PAGE_PDF));
 
       var ex =
           assertThrows(
@@ -160,11 +160,11 @@ class NotebookBooksCreateBlockFromContentControllerTest
     void contentBlockFromAnotherNotebookBookThrows404() throws Exception {
       Notebook nbA = myNotebook();
       controller.attachBook(
-          nbA, attachRequest(chapterWithHeadingAndBody("A", "tail")), pdfFile(STUB_PDF_BYTES));
+          nbA, attachRequest(chapterWithHeadingAndBody("A", "tail")), pdfFile(ONE_PAGE_PDF));
       int foreignContentId = contentBlockId(rootBlocksSorted(bookOf(nbA)).getFirst(), 1);
 
       Notebook nbB = myNotebook();
-      controller.attachBook(nbB, attachRequest(node("B")), pdfFile(STUB_PDF_BYTES));
+      controller.attachBook(nbB, attachRequest(node("B")), pdfFile(ONE_PAGE_PDF));
 
       var ex =
           assertThrows(
@@ -179,7 +179,7 @@ class NotebookBooksCreateBlockFromContentControllerTest
       controller.attachBook(
           nb,
           attachRequest(chapterWithHeadingAndBody("Chapter 1", "Some body text")),
-          pdfFile(STUB_PDF_BYTES));
+          pdfFile(ONE_PAGE_PDF));
       int firstId = contentBlockId(rootBlocksSorted(bookOf(nb)).getFirst(), 0);
 
       var ex =
@@ -192,8 +192,7 @@ class NotebookBooksCreateBlockFromContentControllerTest
     @Test
     void rejectsWhenChildWouldExceedMaxLayoutDepth() throws Exception {
       Notebook nb = myNotebook();
-      controller.attachBook(
-          nb, attachRequest(chapterWithTwoBodies("Leaf")), pdfFile(STUB_PDF_BYTES));
+      controller.attachBook(nb, attachRequest(chapterWithTwoBodies("Leaf")), pdfFile(ONE_PAGE_PDF));
       BookBlock leaf = rootBlocksSorted(bookOf(nb)).getFirst();
       leaf.setDepth(BookReadingWireConstants.MAX_LAYOUT_DEPTH - 1);
       entityManager.flush();
@@ -212,7 +211,7 @@ class NotebookBooksCreateBlockFromContentControllerTest
       Notebook otherNb = makeMe.aNotebook().creatorAndOwner(owner).please();
       currentUser.setUser(owner);
       controller.attachBook(
-          otherNb, attachRequest(chapterWithTwoBodies("R")), pdfFile(STUB_PDF_BYTES));
+          otherNb, attachRequest(chapterWithTwoBodies("R")), pdfFile(ONE_PAGE_PDF));
       int cid = contentBlockId(rootBlocksSorted(bookOf(otherNb)).getFirst(), 1);
 
       currentUser.setUser(makeMe.aUser().please());

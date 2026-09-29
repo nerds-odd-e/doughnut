@@ -34,7 +34,7 @@ class NotebookBooksAttachContentControllerTest extends NotebookBooksControllerTe
       Book created =
           controller
               .attachBook(
-                  nb, contentListAttachRequest("MinerU book", contentList), pdfFile(STUB_PDF_BYTES))
+                  nb, contentListAttachRequest("MinerU book", contentList), pdfFile(ONE_PAGE_PDF))
               .getBody();
 
       assertThat(created, notNullValue());
@@ -58,7 +58,7 @@ class NotebookBooksAttachContentControllerTest extends NotebookBooksControllerTe
                   headingBlock("Chapter 1", 1, 0, List.of(0.0, 0.0, 100.0, 20.0)),
                   textBlock("Some body text", 1, null))));
 
-      Book created = controller.attachBook(nb, attachRequest(n), pdfFile(STUB_PDF_BYTES)).getBody();
+      Book created = controller.attachBook(nb, attachRequest(n), pdfFile(ONE_PAGE_PDF)).getBody();
       BookBlock block = rootBlocksSorted(created).getFirst();
       List<BookContentBlock> cbs =
           bookContentBlockRepository.findAllByBookBlock_IdOrderBySiblingOrder(block.getId());
@@ -111,7 +111,7 @@ class NotebookBooksAttachContentControllerTest extends NotebookBooksControllerTe
 
       Book created =
           controller
-              .attachBook(nb, attachRequest(beginning, chapter), pdfFile(STUB_PDF_BYTES))
+              .attachBook(nb, attachRequest(beginning, chapter), pdfFile(ONE_PAGE_PDF))
               .getBody();
 
       List<BookBlock> roots = rootBlocksSorted(created);
@@ -138,8 +138,7 @@ class NotebookBooksAttachContentControllerTest extends NotebookBooksControllerTe
 
       Book created =
           controller
-              .attachBook(
-                  nb, contentListAttachRequest("Linear Algebra", cl), pdfFile(STUB_PDF_BYTES))
+              .attachBook(nb, contentListAttachRequest("Linear Algebra", cl), pdfFile(ONE_PAGE_PDF))
               .getBody();
 
       List<BookBlock> roots = rootBlocksSorted(created);
@@ -166,7 +165,7 @@ class NotebookBooksAttachContentControllerTest extends NotebookBooksControllerTe
           ApiException.class,
           () ->
               controller.attachBook(
-                  nb, contentListAttachRequest("Book", List.of(pn)), pdfFile(STUB_PDF_BYTES)));
+                  nb, contentListAttachRequest("Book", List.of(pn)), pdfFile(ONE_PAGE_PDF)));
     }
   }
 }

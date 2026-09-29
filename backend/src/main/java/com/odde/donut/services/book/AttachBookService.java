@@ -60,11 +60,9 @@ public class AttachBookService {
   @Transactional
   public Book attach(Notebook notebook, AttachBookRequest request, byte[] fileBytes)
       throws IOException, UnexpectedNoAccessRightException {
-    validateAttachRequest(request);
+    BookFormat format = validatedFormat(request);
+    format.validateAttach(request, fileBytes);
     assertNotebookHasNoBook(notebook);
-    if (BOOK_FORMAT_EPUB.equals(request.getFormat())) {
-      EpubAttachValidator.validateAttachableEpub(fileBytes);
-    }
     byte[] pointer = attachmentContent.storeAsLfsPointer(notebook.getId(), fileBytes);
     var ctx = new PersistContext(request, fileBytes, entityPersister, objectMapper);
     return acceptedWebChangeService.apply(
@@ -72,7 +70,7 @@ public class AttachBookService {
         () -> {
           Book book = newBook(notebook, request);
           bookSourceFilePlacement.place(book, pointer);
-          BookFormat.fromString(request.getFormat()).persistNewBook(ctx, book);
+          format.persistNewBook(ctx, book);
           return book;
         },
         book -> "Attach book: " + book.getBookName(),
@@ -99,14 +97,14 @@ public class AttachBookService {
     }
   }
 
-  private void validateAttachRequest(AttachBookRequest request) {
-    String format = request.getFormat();
-    if (!BOOK_FORMAT_PDF.equals(format) && !BOOK_FORMAT_EPUB.equals(format)) {
+  private BookFormat validatedFormat(AttachBookRequest request) {
+    String formatName = request.getFormat();
+    if (!BOOK_FORMAT_PDF.equals(formatName) && !BOOK_FORMAT_EPUB.equals(formatName)) {
       throw new ApiException(
           "format must be \"pdf\" or \"epub\"",
           ApiError.ErrorType.BINDING_ERROR,
           "format must be \"pdf\" or \"epub\"");
     }
-    BookFormat.fromString(format).validateAttachRequest(request);
+    return BookFormat.fromString(formatName);
   }
 }

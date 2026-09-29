@@ -9,6 +9,9 @@ import {
   expectUsesScreenWidth,
 } from './bookReadingShared'
 
+const pdfPageSelector = (pageNumber: number) =>
+  `[data-testid="pdf-book-viewer"] .pdfViewer .page[data-page-number="${pageNumber}"]`
+
 export const bookReadingPdfMethods = () => ({
   expectPdfPagesUseScreenWidth() {
     this.expectCurrentPage(1)
@@ -28,27 +31,27 @@ export const bookReadingPdfMethods = () => ({
       .and('contain', `${pageNumber} /`)
     cy.get('[data-testid="pdf-book-viewer"]')
       .should('be.visible')
-      .get(
-        `[data-testid="pdf-book-viewer"] .pdfViewer .page[data-page-number="${pageNumber}"] canvas`
-      )
+      .get(`${pdfPageSelector(pageNumber)} canvas`)
       .first()
       .should(($canvas) => {
         assertPdfCanvasIsRendered($canvas[0] as HTMLCanvasElement)
       })
     return this
   },
-  scrollPdfBookReaderToBringPage2IntoPrimaryView() {
+  scrollPdfBookReaderToTopOfPage(pageNumber: number) {
     waitUntilAppIsNotBusy()
-    const page2Sel =
-      '[data-testid="pdf-book-viewer"] .pdfViewer .page[data-page-number="2"]'
-    cy.get(page2Sel)
+    cy.get(pdfPageSelector(pageNumber))
       .first()
       // @ts-expect-error Cypress ScrollIntoViewOptions omits DOM `block`
       .scrollIntoView({ block: 'start' })
+    return this
+  },
+  scrollPdfBookReaderToBringPage2IntoPrimaryView() {
+    this.scrollPdfBookReaderToTopOfPage(2)
     // Block 2.2 starts at y0=89/1000 normalized on page 2. Scroll that extra
     // amount so block 2.2 is at the container top, guaranteeing its y0 is below
     // the viewport midpoint even with very short test viewports (e.g. 1200×280).
-    cy.get(page2Sel)
+    cy.get(pdfPageSelector(2))
       .first()
       .then(($page) => {
         const pageHeight = ($page[0] as HTMLElement).getBoundingClientRect()
@@ -70,9 +73,7 @@ export const bookReadingPdfMethods = () => ({
    */
   scrollPdfBookReaderDownWithinSamePageForNextBbox() {
     waitUntilAppIsNotBusy()
-    cy.get(
-      '[data-testid="pdf-book-viewer"] .pdfViewer .page[data-page-number="1"]'
-    )
+    cy.get(pdfPageSelector(1))
       .first()
       .then(($page) => {
         const pageHeight = ($page[0] as HTMLElement).getBoundingClientRect()
@@ -131,13 +132,7 @@ export const bookReadingPdfMethods = () => ({
     return this
   },
   createBookBlockFromLongTextContentBlockOnPdf() {
-    waitUntilAppIsNotBusy()
-    cy.get(
-      '[data-testid="pdf-book-viewer"] .pdfViewer .page[data-page-number="2"]'
-    )
-      .first()
-      // @ts-expect-error Cypress ScrollIntoViewOptions omits DOM `block`
-      .scrollIntoView({ block: 'start' })
+    this.scrollPdfBookReaderToTopOfPage(2)
     cy.get('[data-testid="book-reading-book-layout"]')
       .find('[data-current-selection="true"]')
       .click()

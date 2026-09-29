@@ -34,9 +34,9 @@ class NotebookBooksAttachControllerTest extends NotebookBooksControllerTestBase 
       Notebook nb = myNotebook();
       AttachBookLayoutNodeRequest root =
           node("Chapter 1", node("Section 1.1"), node("Section 1.2"));
-      byte[] pdfBytes = new byte[] {0x25, 0x50, 0x44, 0x46, 0x2d, 0x31, 0x2e};
 
-      ResponseEntity<Book> res = controller.attachBook(nb, attachRequest(root), pdfFile(pdfBytes));
+      ResponseEntity<Book> res =
+          controller.attachBook(nb, attachRequest(root), pdfFile(ONE_PAGE_PDF));
 
       assertThat(res.getStatusCode(), equalTo(HttpStatus.CREATED));
       Book created = res.getBody();
@@ -59,7 +59,7 @@ class NotebookBooksAttachControllerTest extends NotebookBooksControllerTestBase 
       AttachBookLayoutNodeRequest root =
           node("Chapter 1", node("Section 1.1"), node("Section 1.2"));
       Book created =
-          controller.attachBook(nb, attachRequest(root), pdfFile(STUB_PDF_BYTES)).getBody();
+          controller.attachBook(nb, attachRequest(root), pdfFile(ONE_PAGE_PDF)).getBody();
       BookBlock outRoot = rootBlocksSorted(created).getFirst();
 
       Book detail = controller.getBook(nb);
@@ -73,14 +73,15 @@ class NotebookBooksAttachControllerTest extends NotebookBooksControllerTestBase 
     @Test
     void returnsAttachedPdfBytes() throws Exception {
       Notebook nb = myNotebook();
-      byte[] pdfBytes = new byte[] {0x25, 0x50, 0x44, 0x46, 0x2d, 0x31, 0x2e};
       Book attached =
-          controller.attachBook(nb, attachRequest(node("Chapter 1")), pdfFile(pdfBytes)).getBody();
+          controller
+              .attachBook(nb, attachRequest(node("Chapter 1")), pdfFile(ONE_PAGE_PDF))
+              .getBody();
 
       ResponseEntity<byte[]> fileRes = booksController.getBookFile(webRequest(), attached);
 
       assertThat(fileRes.getStatusCode(), equalTo(HttpStatus.OK));
-      assertThat(fileRes.getBody(), equalTo(pdfBytes));
+      assertThat(fileRes.getBody(), equalTo(ONE_PAGE_PDF));
     }
 
     @Test
@@ -89,7 +90,7 @@ class NotebookBooksAttachControllerTest extends NotebookBooksControllerTestBase 
       controller.attachBook(
           nb,
           attachRequest(node("Chapter 1", node("Section 1.1"), node("Section 1.2"))),
-          pdfFile(STUB_PDF_BYTES));
+          pdfFile(ONE_PAGE_PDF));
       Book detail = controller.getBook(nb);
 
       String json = objectMapper.writerWithView(BookViews.Full.class).writeValueAsString(detail);
@@ -115,8 +116,7 @@ class NotebookBooksAttachControllerTest extends NotebookBooksControllerTestBase 
           assertThrows(
               ApiException.class,
               () ->
-                  controller.attachBook(
-                      nb, attachRequest(node("Second")), pdfFile(STUB_PDF_BYTES)));
+                  controller.attachBook(nb, attachRequest(node("Second")), pdfFile(ONE_PAGE_PDF)));
       assertThat(ex.getErrorBody().getErrorType(), equalTo(ApiError.ErrorType.RESOURCE_CONFLICT));
     }
 
@@ -125,7 +125,7 @@ class NotebookBooksAttachControllerTest extends NotebookBooksControllerTestBase 
       Notebook otherNb = otherUsersNotebook();
       assertThrows(
           UnexpectedNoAccessRightException.class,
-          () -> controller.attachBook(otherNb, attachRequest(node("A")), pdfFile(STUB_PDF_BYTES)));
+          () -> controller.attachBook(otherNb, attachRequest(node("A")), pdfFile(ONE_PAGE_PDF)));
     }
 
     @Test
@@ -150,7 +150,7 @@ class NotebookBooksAttachControllerTest extends NotebookBooksControllerTestBase 
       req.setFormat(BookReadingWireConstants.BOOK_FORMAT_EPUB);
       ApiException ex =
           assertThrows(
-              ApiException.class, () -> controller.attachBook(nb, req, epubFile(STUB_PDF_BYTES)));
+              ApiException.class, () -> controller.attachBook(nb, req, epubFile(ONE_PAGE_PDF)));
       assertThat(
           ex.getMessage(), equalTo("EPUB attach must not include book layout or contentList"));
     }
@@ -162,7 +162,7 @@ class NotebookBooksAttachControllerTest extends NotebookBooksControllerTestBase 
       req.setFormat("doc");
       ApiException ex =
           assertThrows(
-              ApiException.class, () -> controller.attachBook(nb, req, pdfFile(STUB_PDF_BYTES)));
+              ApiException.class, () -> controller.attachBook(nb, req, pdfFile(ONE_PAGE_PDF)));
       assertThat(ex.getMessage(), equalTo("format must be \"pdf\" or \"epub\""));
     }
 
@@ -171,8 +171,7 @@ class NotebookBooksAttachControllerTest extends NotebookBooksControllerTestBase 
       Notebook nb = myNotebook();
       AttachBookRequest req = attachRequest();
       req.getBookLayout().setRoots(new ArrayList<>());
-      assertThrows(
-          ApiException.class, () -> controller.attachBook(nb, req, pdfFile(STUB_PDF_BYTES)));
+      assertThrows(ApiException.class, () -> controller.attachBook(nb, req, pdfFile(ONE_PAGE_PDF)));
     }
 
     @Test
@@ -185,7 +184,7 @@ class NotebookBooksAttachControllerTest extends NotebookBooksControllerTestBase 
       AttachBookLayoutNodeRequest root = deep;
       assertThrows(
           ApiException.class,
-          () -> controller.attachBook(nb, attachRequest(root), pdfFile(STUB_PDF_BYTES)));
+          () -> controller.attachBook(nb, attachRequest(root), pdfFile(ONE_PAGE_PDF)));
     }
 
     @Test
@@ -198,12 +197,23 @@ class NotebookBooksAttachControllerTest extends NotebookBooksControllerTestBase 
     }
 
     @Test
+    void rejectsAnUnreadablePdf() {
+      Notebook nb = myNotebook();
+      byte[] notAPdf = {0x25, 0x50, 0x44, 0x46, 0x2d, 0x31, 0x2e};
+      ApiException ex =
+          assertThrows(
+              ApiException.class,
+              () -> controller.attachBook(nb, attachRequest(node("A")), pdfFile(notAPdf)));
+      assertThat(ex.getErrorBody().getErrorType(), equalTo(ApiError.ErrorType.BINDING_ERROR));
+      assertThat(ex.getErrorBody().getMessage(), equalTo("not a readable PDF"));
+    }
+
+    @Test
     void rejectsBothLayoutRootsAndContentList() {
       Notebook nb = myNotebook();
       AttachBookRequest req = attachRequest(node("A"));
       req.setContentList(List.of(textBlock("only body", 0, List.of(0.0, 0.0, 1.0, 1.0))));
-      assertThrows(
-          ApiException.class, () -> controller.attachBook(nb, req, pdfFile(STUB_PDF_BYTES)));
+      assertThrows(ApiException.class, () -> controller.attachBook(nb, req, pdfFile(ONE_PAGE_PDF)));
     }
 
     @Test
@@ -212,8 +222,7 @@ class NotebookBooksAttachControllerTest extends NotebookBooksControllerTestBase 
       AttachBookRequest req = new AttachBookRequest();
       req.setBookName("X");
       req.setFormat(BookReadingWireConstants.BOOK_FORMAT_PDF);
-      assertThrows(
-          ApiException.class, () -> controller.attachBook(nb, req, pdfFile(STUB_PDF_BYTES)));
+      assertThrows(ApiException.class, () -> controller.attachBook(nb, req, pdfFile(ONE_PAGE_PDF)));
     }
   }
 }

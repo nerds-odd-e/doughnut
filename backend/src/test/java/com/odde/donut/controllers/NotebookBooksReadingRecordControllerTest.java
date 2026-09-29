@@ -38,7 +38,7 @@ class NotebookBooksReadingRecordControllerTest extends NotebookBooksControllerTe
     @Test
     void returnsOnlyMarkedRangesAmongSiblings() throws Exception {
       Notebook nb = myNotebook();
-      controller.attachBook(nb, attachRequest(node("2.1"), node("2.2")), pdfFile(STUB_PDF_BYTES));
+      controller.attachBook(nb, attachRequest(node("2.1"), node("2.2")), pdfFile(ONE_PAGE_PDF));
       BookBlock first = rootBlocksSorted(bookOf(nb)).getFirst();
       controller.putBlockReadingRecord(nb, first, null);
 
@@ -134,7 +134,7 @@ class NotebookBooksReadingRecordControllerTest extends NotebookBooksControllerTe
     void persistsSkimmedAndSkippedStatuses() throws Exception {
       Notebook nb = myNotebook();
       controller.attachBook(
-          nb, attachRequest(node("Block A"), node("Block B")), pdfFile(STUB_PDF_BYTES));
+          nb, attachRequest(node("Block A"), node("Block B")), pdfFile(ONE_PAGE_PDF));
       List<BookBlock> roots = rootBlocksSorted(bookOf(nb));
       BookBlock first = roots.getFirst();
       BookBlock second = roots.get(1);

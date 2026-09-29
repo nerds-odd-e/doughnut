@@ -4,21 +4,23 @@ import type { AttachBookRequestFull } from '@generated/donut-backend-api'
 import { NotebookBooksController } from '@generated/donut-backend-api/sdk.gen'
 import { notebookStructureTestabilityMethods } from './testabilityNotebookStructure'
 
+const BLANK_BOOK_FIXTURE = 'blank_5_pages.pdf'
 /** Must match page count in `e2e_test/fixtures/book_reading/blank_5_pages.pdf`. */
 const BLANK_BOOK_FIXTURE_PAGE_COUNT = 5
 
-/** Cached once per Cypress process — blank PDF bytes for attachBook. */
-let blankBookPdfBuffer: ArrayBuffer | undefined
+/** Cached once per Cypress process — PDF fixture bytes for attachBook, by file name. */
+const pdfFixtureBuffers = new Map<string, ArrayBuffer>()
 
-function readBlankBookPdf() {
-  if (blankBookPdfBuffer !== undefined) {
-    return cy.wrap(blankBookPdfBuffer, { log: false })
+function readPdfFixture(pdfFixture: string) {
+  const cached = pdfFixtureBuffers.get(pdfFixture)
+  if (cached !== undefined) {
+    return cy.wrap(cached, { log: false })
   }
   return cy
-    .readFile('e2e_test/fixtures/book_reading/blank_5_pages.pdf', null)
+    .readFile(`e2e_test/fixtures/book_reading/${pdfFixture}`, null)
     .then((pdfBuffer) => {
-      blankBookPdfBuffer = pdfBuffer as ArrayBuffer
-      return blankBookPdfBuffer
+      pdfFixtureBuffers.set(pdfFixture, pdfBuffer as ArrayBuffer)
+      return pdfBuffer as ArrayBuffer
     })
 }
 
@@ -39,20 +41,18 @@ function pageCountFromContentList(contentList: Array<unknown>): number {
 }
 
 export const bookTestabilityMethods = {
+  /** Attaches `pdfFixture` (under `e2e_test/fixtures/book_reading/`) with its MinerU `contentList`. */
   attachBookToNotebook(
     notebookName: string,
     bookName: string,
-    contentList: Array<unknown>
+    contentList: Array<unknown>,
+    pdfFixture: string
   ) {
-    expect(
-      pageCountFromContentList(contentList),
-      `contentList page range must match blank_${BLANK_BOOK_FIXTURE_PAGE_COUNT}_pages.pdf`
-    ).to.equal(BLANK_BOOK_FIXTURE_PAGE_COUNT)
     return notebookStructureTestabilityMethods
       .getNotebookIdByName(notebookName)
       .then((notebookId) =>
-        readBlankBookPdf().then((pdfBuffer) => {
-          const file = new File([pdfBuffer as BlobPart], 'blank.pdf', {
+        readPdfFixture(pdfFixture).then((pdfBuffer) => {
+          const file = new File([pdfBuffer as BlobPart], pdfFixture, {
             type: 'application/pdf',
           })
           const metadataBlob = new Blob(
@@ -71,5 +71,23 @@ export const bookTestabilityMethods = {
           )
         })
       )
+  },
+
+  /** Attaches the blank 5-page PDF with a MinerU `contentList` of the same page range. */
+  attachBlankPdfBookToNotebook(
+    notebookName: string,
+    bookName: string,
+    contentList: Array<unknown>
+  ) {
+    expect(
+      pageCountFromContentList(contentList),
+      `contentList page range must match ${BLANK_BOOK_FIXTURE}`
+    ).to.equal(BLANK_BOOK_FIXTURE_PAGE_COUNT)
+    return bookTestabilityMethods.attachBookToNotebook(
+      notebookName,
+      bookName,
+      contentList,
+      BLANK_BOOK_FIXTURE
+    )
   },
 }
