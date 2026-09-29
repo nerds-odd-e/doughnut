@@ -91,6 +91,12 @@ Feature: EPUB book
         | 1440  | 900    |
         | 1280  | 560    |
 
+    Scenario: Opening a new EPUB for the first time shows its cover as the current block and marks nothing
+      When I open the reading view for the attached book "epub_long_chapter_before_target"
+      Then I should see the text "A cover page for the long chapter fixture." in the EPUB reader
+      And the book block "*beginning*" should be the current block in the book reader
+      And no book block should be marked in the book layout
+
     Scenario: Following a link inside the book shows its heading at the top
       Given I set the book reading viewport to 1280 by 560
       And I open the reading view for the attached book "epub_long_chapter_before_target"

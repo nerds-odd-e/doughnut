@@ -178,6 +178,15 @@ export const bookReadingLayoutMethods = () => ({
     )
     return this
   },
+  expectNoBookBlockMarkedInBookLayout() {
+    waitUntilAppIsNotBusy()
+    bookBlockRows()
+      .filter(
+        '[data-direct-content-read], [data-direct-content-skimmed], [data-direct-content-skipped]'
+      )
+      .should('have.length', 0)
+    return this
+  },
   expectNewChildBlockInLayout() {
     waitUntilAppIsNotBusy()
     cy.get('[data-testid="book-reading-book-layout"]')

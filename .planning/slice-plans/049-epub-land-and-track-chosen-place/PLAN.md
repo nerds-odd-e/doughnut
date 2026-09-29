@@ -165,7 +165,7 @@ the owner.
 
 ### 4. Opening a new EPUB marks nothing
 Type: Behavior
-Status: planned
+Status: done
 Proof: E2E on the added fixture, extended with a cover before the first entry.
 
 Behavior: a newly attached EPUB with a cover → the reader opens it for the

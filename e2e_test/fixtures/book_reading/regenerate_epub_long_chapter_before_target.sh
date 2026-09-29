@@ -10,6 +10,10 @@ set -euo pipefail
 # inserts above the target after display, and the wrapper div makes the chapter's
 # target span the whole chapter rather than its heading.
 #
+# A cover page comes first in the spine and no table-of-contents entry targets it (as in
+# Project Gutenberg's wrap0000.xhtml), so the book's first block is the extractor's
+# `*beginning*` block holding the cover.
+#
 # When to re-run: after changing this script. The output is deterministic.
 #
 # From repo root:
@@ -72,11 +76,13 @@ files = {
   </metadata>
   <manifest>
     <item id="nav" href="nav.xhtml" media-type="application/xhtml+xml" properties="nav"/>
+    <item id="cover" href="cover.xhtml" media-type="application/xhtml+xml"/>
     <item id="contents" href="contents.xhtml" media-type="application/xhtml+xml"/>
     <item id="c1" href="chapter1.xhtml" media-type="application/xhtml+xml"/>
     <item id="c2" href="chapter2.xhtml" media-type="application/xhtml+xml"/>
   </manifest>
   <spine>
+    <itemref idref="cover"/>
     <itemref idref="contents"/>
     <itemref idref="c1"/>
     <itemref idref="c2"/>
@@ -97,6 +103,13 @@ files = {
 </body>
 </html>
 """,
+    "OEBPS/cover.xhtml": xhtml(
+        "Cover",
+        """<div class="cover">
+  <h1>Long Chapter Fixture</h1>
+  <p>A cover page for the long chapter fixture.</p>
+</div>""",
+    ),
     "OEBPS/contents.xhtml": xhtml(
         "Contents",
         """<div class="chapter" id="contents">
