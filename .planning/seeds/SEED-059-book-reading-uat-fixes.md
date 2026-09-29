@@ -465,8 +465,12 @@ marking goes on after choosing a block with no text of its own.
 
 **Effort hypothesis:** M–L, low confidence. Provisional slices:
 [plan 058](../slice-plans/058-current-block-same-in-pdf-and-epub/PLAN.md).
-**Depends on:** story 5 (it removes snap-back from the same PDF pipeline);
-story 15 for what "no text of its own" means.
+**Depends on:** story 5 (it removes snap-back from the same PDF pipeline).
+"No text of its own" is `hasNoTextOfItsOwn` in
+`frontend/src/lib/book-reading/bookBlockDirectContent.ts` (a PDF heading-only
+block, or an EPUB block whose only content is its start anchor); auto-mark
+already uses it. Snap-back's `hasDirectContent` (`useBookReadingSnapBack.ts`)
+still means "more than one locator" and should use it too.
 
 <a id="story-17"></a>
 

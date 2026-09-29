@@ -50,4 +50,4 @@ parts B and C). The slices below are provisional planning input.
    About 10 min.
 5. **Behavior:** marking goes on after choosing "Chapter 12" in a no-bookmark
    PDF (new fixture shaped like Think Python). About 10 min if the rule and
-   story 15's predicate suffice.
+   `hasNoTextOfItsOwn` suffice.
