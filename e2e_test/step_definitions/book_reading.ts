@@ -10,6 +10,11 @@ import start from '../start'
 import testability from '../start/testability'
 import { parseBookLayoutTable, pdfFixtureStem } from './book_reading_helpers'
 
+const mineruOutputFixture = (stem: string) =>
+  cy
+    .fixture(`book_reading/mineru_output_for_${stem}.json`)
+    .then((contentList: unknown) => contentList as Array<unknown>)
+
 Given(
   'I set the book reading viewport to {int} by {int}',
   // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
@@ -36,15 +41,29 @@ When(
   'I attach a fake blank pdf book with book layout of {string} to the notebook {string}',
   // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
   (fixtureStem: string, notebookName: string) => {
-    return cy
-      .fixture(`book_reading/mineru_output_for_${fixtureStem}.json`)
-      .then((contentList: unknown) => {
-        return testability().attachBookToNotebook(
-          notebookName,
-          fixtureStem,
-          contentList as Array<unknown>
-        )
-      })
+    return mineruOutputFixture(fixtureStem).then((contentList) =>
+      testability().attachBlankPdfBookToNotebook(
+        notebookName,
+        fixtureStem,
+        contentList
+      )
+    )
+  }
+)
+
+When(
+  'I attach the pdf book {string} with its MinerU output to the notebook {string}',
+  // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
+  (fixtureFilename: string, notebookName: string) => {
+    const stem = pdfFixtureStem(fixtureFilename)
+    return mineruOutputFixture(stem).then((contentList) =>
+      testability().attachBookToNotebook(
+        notebookName,
+        stem,
+        contentList,
+        fixtureFilename
+      )
+    )
   }
 )
 
@@ -114,6 +133,14 @@ When(
   // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
   () => {
     return bookReadingPage().scrollPdfBookReaderToBringPage2IntoPrimaryView()
+  }
+)
+
+When(
+  'I scroll the PDF book reader to the top of page {int}',
+  // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
+  (pageNumber: number) => {
+    return bookReadingPage().scrollPdfBookReaderToTopOfPage(pageNumber)
   }
 )
 

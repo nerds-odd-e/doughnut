@@ -139,7 +139,7 @@ layout; a named destination → the named page; a `/Fit` bookmark → its page t
 
 ### 5. The browser shows and follows a bookmark layout
 Type: Behavior
-Status: planned
+Status: done
 Proof: new scenario in `book_browsing.feature`.
 
 Let the E2E attach step send a real fixture PDF instead of the blank one
@@ -194,3 +194,11 @@ unproved and report it; do not claim them from slices 3–5.
   `thinkpython2.pdf` (240 bookmarks: 22/218), arXiv 1706.03762 (22: 7/12/3),
   and `refactoring.pdf` (6; y 217/576/67.6/67.6/94.9/328.9) threw nothing.
   Accepted proof: `NotebookBooksAttachPdfBookmarksControllerTest$AttachPdfWithNestedAndIndirectBookmarks`.
+- Slice 5: `book_browsing.feature` Rule "A PDF with bookmarks is laid out by its
+  bookmarks" attaches the real `refactoring.pdf` with its MinerU output
+  (`attachBookToNotebook` takes the PDF fixture; blank path is
+  `attachBlankPdfBookToNotebook`). The thin anchor bbox needed no product change.
+  Accepted proof: whole `book_browsing.feature` 6/6 and `reorganize_layout.feature`
+  8/8. Observed, out of scope: opening a second notebook's book in-app kept the
+  first book's layout and PDF (and patched the first notebook's reading
+  position), so each Rule has its own Background — a candidate for the backlog.
