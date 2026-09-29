@@ -114,7 +114,11 @@ About 10 min.
 
 ### 2. The session owns selection and the Reading Control Panel
 Type: Structure
-Status: planned
+Status: done
+Accepted proof: frontend command 12 files / 71 tests; `vue-tsc --noEmit` clean;
+`reading_record` 7/7, `epub_book` 17/17, `phone_reading` 7/7 (EPUB and phone
+rerun after the refactor, 24/24). The refactor removed
+`useBookReadingSelection`'s `initialSelectedBlockId` and `afterAdvance` options.
 Proof: frontend command (marking, visibility, snap specs); `cy:run --spec e2e_test/features/book_reading/reading_record.feature,e2e_test/features/book_reading/epub_book.feature,e2e_test/features/book_reading/phone_reading.feature`.
 
 Move `useBookReadingSelection` and `useReadingPanelAnchor` into the session,
@@ -167,9 +171,16 @@ About 5–10 min.
 
 ## Learnings
 
-- Slice 1 added one surface hook the Architecture does not list:
-  `onRecordsSynced`, which EPUB uses to refresh the panel anchor after the
-  records sync. Slice 2 removes it when the panel anchor moves into the session.
+- The surface carries more than the Architecture lists, all needed for exact
+  preservation: `mainPane` (each view keeps its pane ref, because vue-tsc
+  reports a template ref bound to a destructured value as unused; slice 3's
+  shell decides how the pane reaches the session), PDF's `canAnchorPanel`
+  (panel shown only while the block's last content is visible), and EPUB's
+  `reanchorPanelAfterSyncAndShow` (anchor refresh after the records sync and
+  after showing a block). Slice 1's `onRecordsSynced` hook is gone.
+- Slice 5 candidates in `useBookReadingSelection.ts`:
+  `overrideBlockAwaitingConfirmation` and `repairSelectionWhenBlocksChange`,
+  now set only by the session.
 - Slice 5 candidates in `useBookReadingCurrentBlock.ts`: the unused
   `lastReadPositionPatchDebouncer` return and the factory-style
   `proposeReadingPosition` option, now with one caller (the session).

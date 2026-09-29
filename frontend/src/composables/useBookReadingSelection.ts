@@ -4,7 +4,6 @@ import type { BookBlockReadingDisposition } from "@/lib/book-reading/readBlockId
 import type { BookBlockFull } from "@generated/donut-backend-api"
 import {
   computed,
-  ref,
   toValue,
   watch,
   type ComputedRef,
@@ -21,9 +20,6 @@ export function useBookReadingSelection(options: {
     status: BookBlockReadingDisposition
   ) => Promise<boolean>
   onAdvance: (block: BookBlockFull) => void | Promise<void>
-  /** Called after `onAdvance` from `applyBookBlockSelection` (e.g. EPUB anchor refresh). */
-  afterAdvance?: () => void | Promise<void>
-  initialSelectedBlockId?: number | null
   /** When set (PDF), snap-back supplies the panel target; otherwise EPUB-style. */
   overrideBlockAwaitingConfirmation?: ComputedRef<BookBlockFull | null>
   /**
@@ -32,9 +28,8 @@ export function useBookReadingSelection(options: {
    */
   repairSelectionWhenBlocksChange?: boolean
   onMarkedRead?: (blockId: number) => void
-  selectedBlockId?: Ref<number | null>
-}): {
   selectedBlockId: Ref<number | null>
+}): {
   blockAwaitingConfirmation: ComputedRef<BookBlockFull | null>
   applyBookBlockSelection: (block: BookBlockFull) => Promise<void>
   markSelectedBlockDisposition: (
@@ -47,16 +42,11 @@ export function useBookReadingSelection(options: {
     hasRecordedDisposition,
     submitReadingDisposition,
     onAdvance,
-    afterAdvance,
-    initialSelectedBlockId = null,
     overrideBlockAwaitingConfirmation,
     repairSelectionWhenBlocksChange = false,
     onMarkedRead,
-    selectedBlockId: selectedBlockIdOption,
+    selectedBlockId,
   } = options
-
-  const selectedBlockId =
-    selectedBlockIdOption ?? ref<number | null>(initialSelectedBlockId)
 
   const defaultBlockAwaitingConfirmation = computed<BookBlockFull | null>(
     () => {
@@ -97,7 +87,6 @@ export function useBookReadingSelection(options: {
 
   async function applyBookBlockSelection(block: BookBlockFull) {
     await onAdvance(block)
-    await afterAdvance?.()
   }
 
   async function markSelectedBlockDisposition(
@@ -121,7 +110,6 @@ export function useBookReadingSelection(options: {
   }
 
   return {
-    selectedBlockId,
     blockAwaitingConfirmation,
     applyBookBlockSelection,
     markSelectedBlockDisposition,

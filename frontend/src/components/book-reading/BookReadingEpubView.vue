@@ -63,8 +63,6 @@ import ReadingControlPanel from "@/components/book-reading/ReadingControlPanel.v
 import type { BookReaderViewerRef } from "@/composables/bookReaderViewerRef"
 import { useBookReadingSession } from "@/composables/useBookReadingSession"
 import { useSidebarDrawer } from "@/composables/useSidebarDrawer"
-import { useReadingPanelAnchor } from "@/composables/useReadingPanelAnchor"
-import { useBookReadingSelection } from "@/composables/useBookReadingSelection"
 import {
   asEpubLocator,
   epubDisplayHref,
@@ -79,7 +77,7 @@ import type {
   ContentLocatorFull,
   EpubLocatorFull,
 } from "@generated/donut-backend-api"
-import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from "vue"
+import { computed, onBeforeUnmount, onMounted, ref } from "vue"
 
 type EpubViewerExposed = Pick<
   BookReaderViewerRef,
@@ -115,56 +113,42 @@ const epubMainPaneRef = ref<HTMLElement | null>(null)
 
 const {
   notebookId,
-  bookBlocks,
   bookReading,
   selectedBlockId,
   currentBlockId,
   currentBlockIdDebouncer,
   proposeReadingPosition,
+  blockAwaitingConfirmation,
+  applyBookBlockSelection,
+  markSelectedBlockDisposition,
+  readingPanelAnchorTopPx,
+  updateReadingPanelAnchor,
 } = useBookReadingSession({
   book: () => props.book,
   initialSelectedBlockId: props.initialSelectedBlockId ?? null,
   surface: {
+    showBlock,
     readingPositionLocator,
-    onRecordsSynced: async () => {
-      await nextTick()
-      updateReadingPanelAnchor()
-    },
+    viewer: epubViewerRef,
+    mainPane: epubMainPaneRef,
+    reanchorPanelAfterSyncAndShow: true,
     flushPositionOnLeave: true,
   },
 })
+
+async function showBlock(block: BookBlockFull) {
+  selectedBlockId.value = block.id
+  const loc = asEpubLocator(block.contentLocators[0])
+  if (loc) {
+    await epubViewerRef.value?.displayLocator(loc)
+  }
+  currentBlockIdDebouncer.commitNow(currentBlockIdInView())
+}
 
 function readingPositionLocator(): EpubLocatorFull | null {
   const current = props.book.blocks.find((b) => b.id === currentBlockId.value)
   return asEpubLocator(current?.contentLocators[0])
 }
-
-const refreshReadingPanelAnchorAfterSelection = ref<(() => void) | null>(null)
-
-const {
-  blockAwaitingConfirmation,
-  applyBookBlockSelection,
-  markSelectedBlockDisposition,
-} = useBookReadingSelection({
-  bookBlocks,
-  currentBlockId,
-  hasRecordedDisposition: bookReading.hasRecordedDisposition,
-  submitReadingDisposition: bookReading.submitReadingDisposition,
-  selectedBlockId,
-  initialSelectedBlockId: props.initialSelectedBlockId ?? null,
-  onAdvance: async (block) => {
-    selectedBlockId.value = block.id
-    const loc = asEpubLocator(block.contentLocators[0])
-    if (loc) {
-      await epubViewerRef.value?.displayLocator(loc)
-    }
-    currentBlockIdDebouncer.commitNow(currentBlockIdInView())
-  },
-  afterAdvance: async () => {
-    await nextTick()
-    refreshReadingPanelAnchorAfterSelection.value?.()
-  },
-})
 
 function currentBlockIdInView(): number | null {
   const view = epubViewerRef.value?.viewBlockStarts()
@@ -184,14 +168,6 @@ function currentBlockIdInView(): number | null {
  */
 const { opened: bookLayoutOpened, isMdOrLarger } = useSidebarDrawer()
 
-const { readingPanelAnchorTopPx, updateReadingPanelAnchor } =
-  useReadingPanelAnchor({
-    viewerRef: epubViewerRef,
-    blockRef: blockAwaitingConfirmation,
-    mainPaneRef: epubMainPaneRef,
-  })
-refreshReadingPanelAnchorAfterSelection.value = updateReadingPanelAnchor
-
 function onEpubRelocated() {
   const id = currentBlockIdInView()
   if (id !== null) {
@@ -200,10 +176,6 @@ function onEpubRelocated() {
   proposeReadingPosition()
   updateReadingPanelAnchor()
 }
-
-watch(selectedBlockId, () => {
-  readingPanelAnchorTopPx.value = null
-})
 
 async function onBookBlockClick(block: BookBlockFull) {
   await applyBookBlockSelection(block)

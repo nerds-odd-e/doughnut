@@ -123,13 +123,9 @@ import { pdfLocatorsFromBlock } from "@/lib/book-reading/asPdfLocator"
 import { wireItemsToNavigationTargets } from "@/lib/book-reading/pdfOutlineV1Anchor"
 import { currentBlockIdFromVisiblePage } from "@/lib/book-reading/currentBlockIdFromVisiblePage"
 import type { ViewportYRange } from "@/lib/book-reading/pdfViewerViewportTopYDown"
-import {
-  READING_PANEL_OBSTRUCTION_PX,
-  useReadingPanelAnchor,
-} from "@/composables/useReadingPanelAnchor"
+import { READING_PANEL_OBSTRUCTION_PX } from "@/composables/useReadingPanelAnchor"
 import { useBookReadingSnapBack } from "@/composables/useBookReadingSnapBack"
 import type { BookReadingPdfViewerRef } from "@/composables/bookReaderViewerRef"
-import { useBookReadingSelection } from "@/composables/useBookReadingSelection"
 import { useSidebarDrawer } from "@/composables/useSidebarDrawer"
 import { useBookLayoutAiReorganize } from "@/composables/useBookLayoutAiReorganize"
 import { useBookReadingSession } from "@/composables/useBookReadingSession"
@@ -210,6 +206,9 @@ function onPdfLoadError(message: string) {
   pdfViewerLoadError.value = message
 }
 
+const pdfViewerRef = ref<BookReadingPdfViewerRef | null>(null)
+const pdfPaneRef = ref<HTMLElement | null>(null)
+
 const {
   notebookId,
   bookBlocks,
@@ -219,14 +218,37 @@ const {
   currentBlockIdDebouncer,
   proposeReadingPosition,
   currentBlockLiveText,
+  blockAwaitingConfirmation,
+  applyBookBlockSelection,
+  markSelectedBlockDisposition,
+  readingPanelAnchorTopPx,
+  updateReadingPanelAnchor,
 } = useBookReadingSession({
   book: () => props.book,
   initialSelectedBlockId: props.initialSelectedBlockId ?? null,
   surface: {
+    showBlock,
     readingPositionLocator,
+    viewer: pdfViewerRef,
+    mainPane: pdfPaneRef,
     commitCurrentBlock: commitCurrentBlockId,
+    blockAwaitingConfirmation: () => snapBlockAwaitingConfirmation.value,
+    canAnchorPanel: () => lastContentBottomVisible.value,
+    onMarkedRead: (id) => clearSnapbackAttemptsForBlock(id),
+    repairSelection: true,
   },
 })
+
+async function showBlock(block: BookBlockFull) {
+  const targets = wireItemsToNavigationTargets(pdfLocatorsFromBlock(block))
+  const parsed = targets[0] ?? null
+  if (parsed === null) {
+    return
+  }
+  selectedBlockId.value = block.id
+  await pdfViewerRef.value?.scrollToBookNavigationTarget(parsed, targets)
+  currentBlockIdDebouncer.commitNow(block.id)
+}
 
 function readingPositionLocator(): PdfLocatorFull | null {
   const last = lastReadingForPatch.value
@@ -254,9 +276,6 @@ const currentBlockForNavBar = computed(() => {
   return bookBlocks.value.find((b) => b.id === curId) ?? null
 })
 
-const pdfViewerRef = ref<BookReadingPdfViewerRef | null>(null)
-const pdfPaneRef = ref<HTMLElement | null>(null)
-
 const {
   snapAnimationKey,
   blockAwaitingConfirmation: snapBlockAwaitingConfirmation,
@@ -274,43 +293,6 @@ const {
   obstructionPx: READING_PANEL_OBSTRUCTION_PX,
   snapHoldMs: SNAP_HOLD_MS,
 })
-
-const {
-  blockAwaitingConfirmation,
-  applyBookBlockSelection,
-  markSelectedBlockDisposition,
-} = useBookReadingSelection({
-  bookBlocks,
-  currentBlockId,
-  hasRecordedDisposition: bookReading.hasRecordedDisposition,
-  submitReadingDisposition: bookReading.submitReadingDisposition,
-  selectedBlockId,
-  initialSelectedBlockId: props.initialSelectedBlockId ?? null,
-  repairSelectionWhenBlocksChange: true,
-  overrideBlockAwaitingConfirmation: snapBlockAwaitingConfirmation,
-  onMarkedRead: (id) => clearSnapbackAttemptsForBlock(id),
-  onAdvance: async (block) => {
-    const targets = wireItemsToNavigationTargets(pdfLocatorsFromBlock(block))
-    const parsed = targets[0] ?? null
-    if (parsed === null) {
-      return
-    }
-    selectedBlockId.value = block.id
-    await pdfViewerRef.value?.scrollToBookNavigationTarget(parsed, targets)
-    currentBlockIdDebouncer.commitNow(block.id)
-  },
-})
-
-const readingPanelBlockRef = computed(() =>
-  lastContentBottomVisible.value ? blockAwaitingConfirmation.value : null
-)
-
-const { readingPanelAnchorTopPx, updateReadingPanelAnchor } =
-  useReadingPanelAnchor({
-    viewerRef: pdfViewerRef,
-    blockRef: readingPanelBlockRef,
-    mainPaneRef: pdfPaneRef,
-  })
 
 const { onBlockIndent, onBlockOutdent, onBlockCancel } = useBookLayoutMutations(
   {
@@ -359,7 +341,6 @@ function onViewportAnchorPage(payload: ViewportPayload) {
 }
 
 watch(selectedBlockId, (id) => {
-  readingPanelAnchorTopPx.value = null
   if (id === null) {
     return
   }
