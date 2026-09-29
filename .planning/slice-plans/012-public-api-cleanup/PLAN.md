@@ -90,9 +90,10 @@ Enables slice 2.
 
 ### 2. The public API no longer offers recall logs by memory tracker
 Type: Behavior
-Status: planned
-Proof: regenerated API artifacts omit `getRecallLogs` and `/recall-logs`; full backend suite and
-`frontend:test` green.
+Status: done
+Proof: regenerated API artifacts omit `getRecallLogs` and `/recall-logs`; full backend suite (2703,
+0 failures) and `frontend:test` (1943) green. `MemoryTrackerService.getRecallLogs` lost its only
+outside caller and was inlined into `getRecallHistory`.
 
 Behavior: a memory tracker with recall logs → the owner inspects the public API → no recall-logs
 endpoint is listed, while the memory tracker page still shows recall history through

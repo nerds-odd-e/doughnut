@@ -6,7 +6,6 @@ import com.odde.donut.controllers.dto.ThresholdExceededResult;
 import com.odde.donut.controllers.dto.UpdateMemoryTrackerPropertyKeyDTO;
 import com.odde.donut.entities.Grade;
 import com.odde.donut.entities.MemoryTracker;
-import com.odde.donut.entities.RecallLog;
 import com.odde.donut.entities.RecallPrompt;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.donut.factoryServices.EntityPersister;
@@ -138,15 +137,6 @@ class MemoryTrackerController {
     authorizationService.assertLoggedIn();
     return memoryTrackerService.findLast100RecalledByUser(
         authorizationService.getCurrentUser().getId());
-  }
-
-  @GetMapping("/{memoryTracker}/recall-logs")
-  public List<RecallLog> getRecallLogs(
-      @PathVariable("memoryTracker") @Schema(type = "integer") MemoryTracker memoryTracker)
-      throws UnexpectedNoAccessRightException {
-    authorizationService.assertLoggedIn();
-    authorizationService.assertReadAuthorization(memoryTracker);
-    return memoryTrackerService.getRecallLogs(memoryTracker);
   }
 
   @GetMapping("/{memoryTracker}/recall-history")

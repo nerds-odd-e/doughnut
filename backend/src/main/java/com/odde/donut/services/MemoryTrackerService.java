@@ -189,13 +189,11 @@ public class MemoryTrackerService {
     return recallPromptRepository.findAllByMemoryTracker_IdOrderByIdDesc(memoryTracker.getId());
   }
 
-  public List<RecallLog> getRecallLogs(MemoryTracker memoryTracker) {
-    return recallLogRepository.findAllByMemoryTracker_IdOrderByRecordedAtDescIdDesc(
-        memoryTracker.getId());
-  }
-
   public List<RecallHistoryItem> getRecallHistory(MemoryTracker memoryTracker) {
-    return RecallHistoryItem.from(getRecallLogs(memoryTracker), getAllRecallPrompts(memoryTracker));
+    return RecallHistoryItem.from(
+        recallLogRepository.findAllByMemoryTracker_IdOrderByRecordedAtDescIdDesc(
+            memoryTracker.getId()),
+        getAllRecallPrompts(memoryTracker));
   }
 
   public void deleteUnansweredRecallPrompts(MemoryTracker memoryTracker) {

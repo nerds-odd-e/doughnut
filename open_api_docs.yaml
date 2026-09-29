@@ -3173,26 +3173,6 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/RecallPrompt"
-  /api/memory-trackers/{memoryTracker}/recall-logs:
-    get:
-      tags:
-      - memory-tracker-controller
-      operationId: getRecallLogs
-      parameters:
-      - name: memoryTracker
-        in: path
-        required: true
-        schema:
-          type: integer
-      responses:
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/RecallLog"
   /api/memory-trackers/{memoryTracker}/recall-history:
     get:
       tags:
@@ -6077,6 +6057,13 @@ components:
       - id
       - questionGeneratedTime
       - questionType
+    RecallHistoryItem:
+      type: object
+      properties:
+        recallLog:
+          $ref: "#/components/schemas/RecallLog"
+        recallPrompt:
+          $ref: "#/components/schemas/RecallPromptHistoryItem"
     RecallLog:
       type: object
       properties:
@@ -6120,13 +6107,6 @@ components:
       - memoryTrackerId
       - productOutcome
       - recordedAt
-    RecallHistoryItem:
-      type: object
-      properties:
-        recallLog:
-          $ref: "#/components/schemas/RecallLog"
-        recallPrompt:
-          $ref: "#/components/schemas/RecallPromptHistoryItem"
     LearningSessionRequestResponse:
       type: object
       properties:
