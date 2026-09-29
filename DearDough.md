@@ -441,6 +441,10 @@ The usage line says REF but publication requires refs/heads/; callers discover t
   - Evidence: `deliver --target-ref origin/seed-055-public-api-cleanup` refused with "authorized target must be a branch ref: origin/seed-055-public-api-cleanup"; the retry with `refs/heads/seed-055-public-api-cleanup` was accepted (`/tmp/dough-ci-501/watch-3aU6BR`).
   - Observed effect: one refused call; no coverage lost.
 
+- Execution: SEED-058#story-1 / slice-plans/013-blank-looking-body-stays-editable / 180136ce4a; Timestamp: 2026-09-29T11:15+08:00 (slice 1 delivery); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.46.
+  - Evidence: after printing the usage line (`--target-ref REF`) and grepping the script for `targetRef`, `deliver --target-ref origin/exec/seed-058-story-1` refused with "authorized target must be a branch ref: origin/exec/seed-058-story-1"; the retry with `refs/heads/exec/seed-058-story-1` was accepted (`observation.state: attached`, `/tmp/dough-ci-501/watch-FeKCIi`).
+  - Observed effect: one refused call plus two lookup calls; no coverage lost.
+
 ## ODF-074 — A plan said the changed script had no test, and nobody searched for one before delivery, so CI caught the stale test
 
 Former local code: DD-126.
