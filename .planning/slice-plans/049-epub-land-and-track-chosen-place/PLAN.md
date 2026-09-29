@@ -44,12 +44,11 @@ migration of stored layouts.
   - Layout following: `BookReadingBookLayout` already scrolls the current
     block's row into view when `currentBlockId` changes. Reopening must go
     through that same path.
-- **One current-block rule** (slice 3, used by slices 4–6): the current block
+- **One current-block rule** (slice 2, used by slices 3–5): the current block
   is the last block in reading order whose start is at or above the top of the
   view. Among blocks that share that start, the selected block wins. This
   replaces "last block in the bottom-most visible spine file". It is the same
-  rule PDF readers already experience, and it depends on slice 2's landing at
-  the top.
+  rule PDF readers already experience, and it depends on landing at the top.
 - No North Star topic or ADR is affected: the Book stays private reading
   structure over its source attachment.
 
@@ -73,19 +72,19 @@ The UAT books are not in the repository. Besides the revived
 `e2e_test/fixtures/book_reading/`, built reproducibly by a script beside it (as
 `regenerate_mineru_output_for_refactoring.sh` is). Each slice adds only the
 parts it needs: a long chapter before another chapter and a contents link
-(slice 2), a cover before the first entry (slice 4), an entry with no content
-of its own and two entries sharing a start (slice 5), and enough entries to
-overflow the layout at 1280×560 (slice 6).
+(slice 2), a cover before the first entry (slice 3), an entry with no content
+of its own and two entries sharing a start (slice 4), and enough entries to
+overflow the layout at 1280×560 (slice 5).
 
 | Promise | Slice | Proof |
 | --- | --- | --- |
 | Choosing a chapter after a long chapter puts its heading at the top (Origin IV, Alice III/XII) | 2 | E2E: heading at the top of the reader at 1440×900 and 1280×560 |
 | Following a link inside the book lands on its heading (Origin "CHAPTER 2") | 2 | E2E: follow the fixture's contents link → heading at the top |
-| The chosen block is current; scrolling on moves the current block | 3 | The six revived scenarios that fail today, green; "Current block updates on scroll…" green |
-| First open: the current block holds what is shown; nothing is marked | 4 | E2E: attach the fixture with a cover, open → the cover's block is current, no block marked |
-| A block with no content goes to its table-of-contents target (Alice licence) | 5 | `EpubStructureExtractorTest`: an entry with no content gets a start at its nav target; E2E: choose it → its text is shown |
-| The chosen block stays selected and current when it shares a start (Origin title) | 5 | E2E: choose the first of two entries sharing a start → it is shown, selected, and current |
-| Reopening shows the current block in the layout at 1280×560 | 6 | E2E: choose a late block, leave and return → its layout row is visible |
+| The chosen block is current; scrolling on moves the current block | 2 | The six revived scenarios that fail today, green; "Current block updates on scroll…" green |
+| First open: the current block holds what is shown; nothing is marked | 3 | E2E: attach the fixture with a cover, open → the cover's block is current, no block marked |
+| A block with no content goes to its table-of-contents target (Alice licence) | 4 | `EpubStructureExtractorTest`: an entry with no content gets a start at its nav target; E2E: choose it → its text is shown |
+| The chosen block stays selected and current when it shares a start (Origin title) | 4 | E2E: choose the first of two entries sharing a start → it is shown, selected, and current |
+| Reopening shows the current block in the layout at 1280×560 | 5 | E2E: choose a late block, leave and return → its layout row is visible |
 | Existing EPUB behavior keeps working | 2 onward | `epub_book.feature` green in the isolated runner |
 
 Proof command for every E2E row:
@@ -114,52 +113,45 @@ the book share it. **Stop rule:** if the cause is not in how Donut scrolls after
 `display()` (for example, an epub.js defect with no workaround at the viewer),
 stop before slice 2 and replan it with the owner.
 
-### 2. Choosing a place lands its start at the top
+### 2. Choosing a place lands at the top, and the block at the top is current
 Type: Behavior
 Status: planned
-Proof: new E2E scenarios on the added fixture at both viewport sizes; the four
-revived scenarios that pass today stay green.
+Proof: new E2E scenarios on the added fixture at both viewport sizes; all of
+`epub_book.feature` green in the isolated runner, including the six scenarios
+that fail today; `currentBlockIdFromEpubLocation.spec.ts` rewritten for the
+new rule.
 
-Behavior: an EPUB with a long chapter before "Chapter N" → the reader chooses
-"Chapter N" in the layout, or follows the contents link to it → the heading of
-"Chapter N" is at the top of the reader. Landing (slice 1): turn off scroll
-anchoring on epub.js's `.epub-container` (`overflow-anchor: none`) and let
-`rendition.display(target)` land; remove the 100 ms wait and the
-next-sibling/centre scroll without adding another scroll. Links inside the book
-share the anchoring cause, so the same change covers them in this slice.
-Fixture: `e2e_test/fixtures/book_reading/epub_long_chapter_before_target.epub`
-(Chapter One, Chapter Two, contents links), from
-`./e2e_test/fixtures/book_reading/regenerate_epub_long_chapter_before_target.sh`.
+Behavior: an EPUB with a long chapter before "Chapter Two" → the reader chooses
+"Chapter Two" in the layout, or follows the contents link to it → its heading
+is at the top of the reader, and the chosen block is selected and current, even
+when later blocks are also visible → the reader scrolls until another block's
+start passes the top → that block becomes current while the selection stays.
 
-Revive `epub_book.feature`: remove the feature-level `@ignore` and add it to
-`APPLICATION_ONLY_ACTIVE_SPECS`. **Interim:** the six scenarios that fail only
-on the current-block check keep a scenario-level `@ignore`, which slice 3
-removes. Do not change their expectations.
+Landing (slice 1): turn off scroll anchoring on epub.js's `.epub-container`
+(`overflow-anchor: none`) and let `rendition.display(target)` land; remove the
+100 ms wait and the next-sibling/centre scroll without adding another scroll.
+Links inside the book share the anchoring cause. Current block: apply the rule
+under *Architecture*, fed by the viewer's rendered block starts instead of the
+bottom-most spine file; reopen seeding uses the same rule.
 
-### 3. The block at the top of the view is current, and the chosen one wins
-Type: Behavior
-Status: planned
-Proof: the six scenarios from slice 2 lose their `@ignore` and pass;
-`currentBlockIdFromEpubLocation.spec.ts` rewritten for the new rule.
+Start from the parked attempt `slice-2-landing-attempt.patch` in this folder
+(`git apply` it; delete the file in this slice's commit): viewer landing and
+CSS, `followEpubLinkInReader` / `expectEpubHeadingAtTopOfReader`, their steps,
+the new Rule "Landing on the chosen place", the feature-level `@ignore`
+removed, and the spec added to `APPLICATION_ONLY_ACTIVE_SPECS`. No interim
+scenario-level `@ignore`.
 
-Behavior: the reader chooses a block → it is selected and current, even when
-later blocks are also visible → the reader scrolls until another block's start
-passes the top → that block becomes current while the selection stays. Apply
-the current-block rule under *Architecture*, fed by the viewer's rendered
-block starts instead of the bottom-most spine file. Reopen seeding uses the
-same rule.
-
-### 4. Opening a new EPUB marks nothing
+### 3. Opening a new EPUB marks nothing
 Type: Behavior
 Status: planned
 Proof: E2E on the added fixture, extended with a cover before the first entry.
 
 Behavior: a newly attached EPUB with a cover → the reader opens it for the
 first time → the current block is the one holding the cover (`*beginning*`),
-and no block is marked read. Expected to need no new rule beyond slice 3; if
+and no block is marked read. Expected to need no new rule beyond slice 2; if
 it does, record why in *Learnings*.
 
-### 5. Every block has a place to go
+### 4. Every block has a place to go
 Type: Behavior
 Status: planned
 Proof: `EpubStructureExtractorTest` for the stored start; E2E for choosing the
@@ -171,7 +163,7 @@ either → the book shows that entry's table-of-contents target, and the chosen
 block is selected and current. The panel offers *Read* for the block that is
 shown. Attach-time change only: books attached earlier are excluded.
 
-### 6. Reopening shows the current block in the layout
+### 5. Reopening shows the current block in the layout
 Type: Behavior
 Status: planned
 Proof: E2E at 1280×560 on the added fixture, extended so its layout overflows.
@@ -186,7 +178,8 @@ block's row is visible in the layout.
   causes are in the viewer.
 - Landing target: the place's start at the top of the view, as in PDF.
 - One current-block rule (top of view, selection wins ties) for relocation and
-  reopen seeding.
+  reopen seeding, delivered with the landing change (slices 2 and 3
+  consolidated after the slice 2 attempt).
 - One added fixture EPUB, generated by a committed script; the minimal fixture
   keeps its current role.
 - Books attached before this fix get no stored start for anchorless blocks.

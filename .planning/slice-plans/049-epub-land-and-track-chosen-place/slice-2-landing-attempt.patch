@@ -1,0 +1,184 @@
+diff --git a/e2e_test/features/book_reading/epub_book.feature b/e2e_test/features/book_reading/epub_book.feature
+index c68d5d3557..8ffc1dea1e 100644
+--- a/e2e_test/features/book_reading/epub_book.feature
++++ b/e2e_test/features/book_reading/epub_book.feature
+@@ -1,4 +1,3 @@
+-@ignore
+ Feature: EPUB book
+ 
+   Rule: Supported minimal EPUB in reading view
+@@ -72,6 +71,31 @@ Feature: EPUB book
+       Then I should see that book block "Chapter Alpha" is marked as skimmed in the book layout
+       And I should see that book block "Chapter Beta" is selected in the book layout
+ 
++  Rule: Landing on the chosen place
++
++    Background:
++      Given I am logged in as an existing user
++      And I have a notebook "EPUB landing" with a note "EPUB Landing E2E Notebook"
++      And I open the notebook settings for "EPUB landing"
++      And I attach the EPUB file "book_reading/epub_long_chapter_before_target.epub"
++
++    Scenario Outline: Choosing a chapter after a long chapter shows its heading at the top
++      Given I set the book reading viewport to <width> by <height>
++      And I open the reading view for the attached book "epub_long_chapter_before_target"
++      When I choose the book block "Chapter Two"
++      Then the heading "Chapter Two" should be at the top of the EPUB reader
++
++      Examples:
++        | width | height |
++        | 1440  | 900    |
++        | 1280  | 560    |
++
++    Scenario: Following a link inside the book shows its heading at the top
++      Given I set the book reading viewport to 1280 by 560
++      And I open the reading view for the attached book "epub_long_chapter_before_target"
++      When I follow the link "Go to Chapter Two" in the EPUB reader
++      Then the heading "Chapter Two" should be at the top of the EPUB reader
++
+   Rule: Unsupported EPUB attachment
+ 
+     Scenario: Upload DRM-flagged EPUB shows a clear attach error
+diff --git a/e2e_test/start/pageObjects/bookReadingEpubMethods.ts b/e2e_test/start/pageObjects/bookReadingEpubMethods.ts
+index 4986aabe32..66b0da63ea 100644
+--- a/e2e_test/start/pageObjects/bookReadingEpubMethods.ts
++++ b/e2e_test/start/pageObjects/bookReadingEpubMethods.ts
+@@ -66,6 +66,60 @@ export const bookReadingEpubMethods = () => ({
+       })
+     return this
+   },
++  /**
++   * Follows a link inside the book the way a reader clicks it; epub.js handles the click
++   * on the link element inside the chapter iframe.
++   */
++  followEpubLinkInReader(linkText: string) {
++    this.expectEpubContentTextVisible(linkText)
++    cy.get('[data-testid="epub-book-viewer"] .epub-container').then(($c) => {
++      const link = [...$c.get(0).querySelectorAll('iframe')]
++        .flatMap((f) => [
++          ...((f as HTMLIFrameElement).contentDocument?.querySelectorAll('a') ??
++            []),
++        ])
++        .find((a) => (a.textContent ?? '').trim() === linkText)
++      expect(link, `EPUB link "${linkText}"`).to.exist
++      link?.click()
++    })
++    return this
++  },
++  /**
++   * The heading's top edge sits at the top edge of the reader's scrolled view
++   * (`.epub-container`), within a few pixels.
++   */
++  expectEpubHeadingAtTopOfReader(headingText: string) {
++    ensureOnBookReadingPage()
++    const tolerancePx = 8
++    cy.get('[data-testid="epub-book-viewer"] .epub-container', {
++      timeout: 30000,
++    }).should(($c) => {
++      const container = $c.get(0) as HTMLElement
++      const offsets = [...container.querySelectorAll('iframe')].flatMap((f) => {
++        const iframe = f as HTMLIFrameElement
++        return [
++          ...(iframe.contentDocument?.querySelectorAll('h1,h2,h3,h4,h5,h6') ??
++            []),
++        ]
++          .filter((h) => (h.textContent ?? '').trim() === headingText)
++          .map(
++            (h) =>
++              iframe.getBoundingClientRect().top +
++              h.getBoundingClientRect().top -
++              container.getBoundingClientRect().top
++          )
++      })
++      expect(offsets, `EPUB heading "${headingText}" rendered`).to.have.length(
++        1
++      )
++      const offset = Math.round(offsets[0] ?? Number.NaN)
++      expect(
++        Math.abs(offset),
++        `EPUB heading "${headingText}" should be at the top of the reader, but its top is ${offset}px from the reader's top`
++      ).to.be.at.most(tolerancePx)
++    })
++    return this
++  },
+   /**
+    * Scrolls the epub.js host (`.epub-book-viewer-host`, `overflow-auto`) in steps until
+    * marker text intersects `.epub-container` (same contract as `expectEpubContentTextVisible`),
+diff --git a/e2e_test/step_definitions/book_reading_epub.ts b/e2e_test/step_definitions/book_reading_epub.ts
+index 48b4b7a324..67cfa52c63 100644
+--- a/e2e_test/step_definitions/book_reading_epub.ts
++++ b/e2e_test/step_definitions/book_reading_epub.ts
+@@ -62,3 +62,19 @@ Then(
+     return bookReadingPage().expectEpubReadingControlPanelContentAnchored()
+   }
+ )
++
++When(
++  'I follow the link {string} in the EPUB reader',
++  // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
++  (linkText: string) => {
++    return bookReadingPage().followEpubLinkInReader(linkText)
++  }
++)
++
++Then(
++  'the heading {string} should be at the top of the EPUB reader',
++  // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
++  (headingText: string) => {
++    return bookReadingPage().expectEpubHeadingAtTopOfReader(headingText)
++  }
++)
+diff --git a/frontend/src/components/book-reading/EpubBookViewer.vue b/frontend/src/components/book-reading/EpubBookViewer.vue
+index f06c25ac8f..5589fc269e 100644
+--- a/frontend/src/components/book-reading/EpubBookViewer.vue
++++ b/frontend/src/components/book-reading/EpubBookViewer.vue
+@@ -264,23 +264,7 @@ async function displayLocator(loc: ContentLocatorFull): Promise<void> {
+   if (!target) {
+     return
+   }
+-  const r = rendition
+-  await r.display(target).catch(() => undefined)
+-  await nextTick()
+-  await new Promise<void>((r0) => setTimeout(r0, 100))
+-  let el: HTMLElement | null = resolveEpubLocatorElement(r, epub)
+-  if (el && /^H[1-6]$/i.test(el.tagName)) {
+-    const next = el.nextElementSibling
+-    if (
+-      next instanceof HTMLElement &&
+-      (next.textContent?.trim().length ?? 0) > 0
+-    ) {
+-      el = next
+-    }
+-  }
+-  if (el) {
+-    el.scrollIntoView({ block: "center", inline: "nearest" })
+-  }
++  await rendition.display(target).catch(() => undefined)
+ }
+ 
+ function resolveLocatorRect(
+@@ -429,4 +413,12 @@ onBeforeUnmount(() => {
+ .epub-book-viewer-host :deep(iframe) {
+   border: 0;
+ }
++
++/*
++ * epub.js corrects scrollTop itself when it prepends earlier sections; browser scroll
++ * anchoring would shift by the same height again and land the target far below.
++ */
++.epub-book-viewer-host :deep(.epub-container) {
++  overflow-anchor: none;
++}
+ </style>
+diff --git a/scripts/isolated-cypress-active-specs.mjs b/scripts/isolated-cypress-active-specs.mjs
+index 6c3b753480..feb2e11a3c 100644
+--- a/scripts/isolated-cypress-active-specs.mjs
++++ b/scripts/isolated-cypress-active-specs.mjs
+@@ -27,6 +27,7 @@ export const APPLICATION_ONLY_ACTIVE_SPECS = [
+   'e2e_test/features/bazaar/browsing.feature',
+   'e2e_test/features/bazaar/sharing.feature',
+   'e2e_test/features/book_reading/book_browsing.feature',
++  'e2e_test/features/book_reading/epub_book.feature',
+   'e2e_test/features/book_reading/reading_record.feature',
+   'e2e_test/features/book_reading/reorganize_layout.feature',
+   'e2e_test/features/circles/creating_circles.feature',
