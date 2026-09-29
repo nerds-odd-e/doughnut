@@ -450,34 +450,6 @@ two views into one, not only one file. Slices:
 clear a reading mark) added one binding line to each view in two slices while
 leaving the PDF view over the limit.
 
-<a id="story-20"></a>
-
-### Reopen at the block start when the saved exact EPUB place no longer resolves
-
-**Identity:** SEED-059#story-20
-```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/062-stale-epub-place-reopens-at-block-start/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"ac4d121184eea524ae2643a4127730c33a4745b4b313cc6a660a21f69f65580e","plan":"214bdfa528820cfd4e1fb5c346953c914dc07a0abc881e9cdb9aa444579215b8"}}
-```
-
-**Goal:** A reader whose saved exact EPUB place (CFI) no longer resolves
-reopens at the start of the block they were reading, as
-story 17 promised (SEED-059#story-17, closed; recoverable at `e505a489f9:.planning/seeds/SEED-059-book-reading-uat-fixes.md`), not at the book's cover. This is a
-retrospective correction of story 17; it adds no feature promise.
-
-**Scope**
-
-- Reopening an EPUB whose stored exact place epub.js cannot display falls back
-  to the stored block start (href#fragment), then to the book start, with no
-  new message.
-- One display rule in the EPUB viewer serves reopening and choosing a block;
-  the reading-page bootstrap stops applying its own href-only check.
-- **Excluded:** an exact place that epub.js does display, but somewhere else
-  (for example after the book file was replaced by another edition); the PDF
-  reader; the dropped first scroll event noted in story 17's plan.
-
-**Correction input and slices:**
-[plan 062](../slice-plans/062-stale-epub-place-reopens-at-block-start/PLAN.md).
-
 ## Ordering and Scope Reduction
 
 - **Highest priority** (reading breaks for common books and devices):
