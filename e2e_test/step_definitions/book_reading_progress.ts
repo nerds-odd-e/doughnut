@@ -14,6 +14,14 @@ When(
   }
 )
 
+When('I wheel down over the Reading Control Panel', () => {
+  bookReadingPage().wheelDownOverReadingControlPanel()
+})
+
+Then('the PDF book reader should have scrolled down', () => {
+  bookReadingPage().expectPdfScrolledDownSinceWheel()
+})
+
 When(
   'I mark the book block {string} as read in the Reading Control Panel',
   // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain

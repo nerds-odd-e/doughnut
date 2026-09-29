@@ -1,5 +1,6 @@
 import {
   clampScrollAxis,
+  isZoomWheel,
   scrollAfterUniformContentScale,
   wheelDeltaYToScaleFactor,
 } from "@/lib/book-reading/pdfBookViewerZoomAroundPoint"
@@ -104,7 +105,7 @@ export function usePdfGestureZoom(opts: {
 
   function attachGestureListeners(container: HTMLElement) {
     onWheelForZoom = (e: WheelEvent) => {
-      if (e.ctrlKey || e.metaKey) {
+      if (isZoomWheel(e)) {
         if (!opts.getPdfViewer()) return
         e.preventDefault()
         const factor = wheelDeltaYToScaleFactor(e.deltaY)

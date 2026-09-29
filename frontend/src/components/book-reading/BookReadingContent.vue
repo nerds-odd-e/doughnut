@@ -76,7 +76,7 @@
             @pages-ready="onPagesReady"
             @create-block-from-content="onCreateBlockFromContent"
           />
-          <ReadingOverlayDock>
+          <ReadingOverlayDock @wheel="pdfViewerRef?.scrollByWheel($event)">
             <ReadingControlPanel
               v-if="blockAwaitingConfirmation"
               :selected-block-title="blockAwaitingConfirmation.title"

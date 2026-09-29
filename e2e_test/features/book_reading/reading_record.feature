@@ -44,6 +44,14 @@ Feature: Reading record
     When I mark the book block "2.1 Easier to Change—and Harder to Misuse" as read in the Reading Control Panel
     Then I should see that book block "2.1 Easier to Change—and Harder to Misuse" is marked as read in the book layout
 
+  Scenario: Wheeling over the Reading Control Panel scrolls the book
+    When I choose the book block "2.1 Easier to Change—and Harder to Misuse"
+    And I scroll the PDF book reader until the Reading Control Panel shows for "2.1 Easier to Change—and Harder to Misuse"
+    And I wheel down over the Reading Control Panel
+    Then the PDF book reader should have scrolled down
+    When I mark the book block "2.1 Easier to Change—and Harder to Misuse" as read in the Reading Control Panel
+    Then I should see that book block "2.1 Easier to Change—and Harder to Misuse" is marked as read in the book layout
+
   Scenario: Change the mark of a book block in the book layout
     When I choose the book block "2.1 Easier to Change—and Harder to Misuse"
     And I scroll the PDF book reader until the Reading Control Panel shows for "2.1 Easier to Change—and Harder to Misuse"

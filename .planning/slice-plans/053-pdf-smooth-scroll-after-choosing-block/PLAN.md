@@ -110,7 +110,7 @@ tests, renamed to what they are about.
 ### 2. Wheeling over the Reading Control Panel scrolls the PDF
 
 Type: Behavior
-Status: planned
+Status: done
 Proof: new E2E scenario red → green; `reading_record.feature` mark scenarios
 green.
 
@@ -142,6 +142,11 @@ Change: send plain wheel events over the PDF panel to the PDF scroll container
   (1922), book_browsing/reading_record/reorganize_layout/phone_reading 29/29,
   `epub_book.feature` 17/17 (EPUB panel moved into the shared
   `ReadingOverlayDock`).
+- Slice 2: `reading_record.feature` "Wheeling over the Reading Control Panel
+  scrolls the book" red (scrollTop unchanged) → green; one `@wheel` on the PDF
+  `ReadingOverlayDock` forwards to the viewer's `scrollByWheel`, which ignores
+  zoom wheels (`isZoomWheel`, shared with gesture zoom); reading_record,
+  book_browsing, phone_reading 22/22; `pnpm frontend:test` 1920.
 - **Outstanding:** the per-step real-wheel delta observation. Still needed
   before the story closes, in a headed browser on the dev stack.
 

@@ -37,6 +37,7 @@ export type BookReadingPdfViewerRef = BookReaderViewerRef & {
   ) => Promise<void>
   zoomIn: () => void
   zoomOut: () => void
+  scrollByWheel: (event: WheelEvent) => void
 }
 
 export function locatorAsPdfNavigationTarget(

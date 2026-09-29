@@ -34,6 +34,7 @@ import {
   createCoalescedRequestAnimationFrameEmitter,
 } from "@/lib/book-reading/pdfBookViewerGeometryResample"
 import { pdfScaleAfterPageWidth } from "@/lib/book-reading/pdfDefaultScale"
+import { isZoomWheel } from "@/lib/book-reading/pdfBookViewerZoomAroundPoint"
 import {
   pdfViewerReadingPositionTopEdge,
   pdfViewerViewportTopYDown,
@@ -201,6 +202,10 @@ defineExpose({
   scrollToStoredReadingPosition: navigation.scrollToStoredReadingPosition,
   zoomIn: gestureZoom.zoomIn,
   zoomOut: gestureZoom.zoomOut,
+  scrollByWheel: (event: WheelEvent) => {
+    if (!isZoomWheel(event))
+      containerRef.value?.scrollBy(event.deltaX, event.deltaY)
+  },
   isLocatorBottomVisible: locatorGeometry.isLocatorBottomVisible,
   readingPanelAnchorTopPx: locatorGeometry.readingPanelAnchorTopPx,
 })
