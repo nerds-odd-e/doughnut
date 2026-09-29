@@ -772,17 +772,6 @@ The execute-plan skill text lists a "stable execution publisher ID" as a start i
   - Evidence: start result `{"ok":false,"status":"invalid-request","error":"missing publisherId"}`; usage line in `execution-start.mjs`.
   - Observed effect: one refused call and a usage lookup; no state change.
 
-## DD-159 — The Development stack failed to start on stale compiled backend classes in the default checkout
-
-`pnpm dev` from the default checkout failed with `No qualifying bean of type NotebookGitCutoverService`: `backend/build/classes` still held classes from before that service was removed. Deleting `backend/build/classes` let the next start succeed.
-
-### Occurrences
-
-- Execution: SEED-054#story-1 / `4f2f230505:.planning/slice-plans/011-book-reading-uat/PLAN.md` / 681768a71b; Timestamp: 2026-09-29T07:25:42+08:00; Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.46.
-  - Evidence: `dev.log` "APPLICATION FAILED TO START" with the missing-bean message; `git grep NotebookGitCutoverService -- backend/src` found nothing; the next `pnpm dev` was healthy.
-  - Observed effect: one failed start and a short diagnosis before the UAT setup could continue.
-  - Inference: the Development start's incremental build did not drop classes whose sources were deleted. Qualified: cause not investigated further.
-
 ## DD-160 — The file-size check split an untouched block in one slice of an execution and was waived in a later slice
 
 Within one execution, the post-change refactor treated an already-oversized file differently in two slices. In slice 1, a two-line class change to `BookReadingBookLayout.vue` (354 lines before the change) led the refactor agent to move the unrelated drag-to-indent pointer handling into a new composable. In slice 3, `BookReadingContent.vue` (474 → 453 lines) was left over the limit as "not caused nor worsened by this slice".
@@ -793,17 +782,6 @@ Within one execution, the post-change refactor treated an already-oversized file
   - Evidence: slice 1 refactor report ("`BookReadingBookLayout.vue` is in the diff and was 354 lines, over the 250-line limit"; new `useBookLayoutBlockPointerDrag.ts`, commit d4a47402af); slice 3 refactor report ("`BookReadingContent.vue` is 453 lines … It was 474 before this change … I left it for the owner to decide"). Pre-change size: `1e19f8224a:frontend/src/components/book-reading/BookReadingBookLayout.vue` has 354 lines.
   - Observed effect: about 15 minutes of refactor time in slice 1, plus a desktop re-proof (`reorganize_layout.feature`, `book_browsing.feature`) for code the story did not touch. Slice 3 took the other path, with no extraction.
   - Inference: `refactor-checks.md` "File size" does not say whether a file that was already over the limit, and that a slice barely touches, must be split. Agents resolve this differently, and the time cost follows whichever reading they pick. Related to DD-144 (a small addition tipping a file over the limit) and ODF-152; here the file was over the limit before the change.
-
-## DD-161 — Real-book manual acceptance had no supported way to hold a disposable stack or run MinerU
-
-The plan's manual slice needed real MinerU and a running app to `/attach` real PDFs through the CLI. `.venv-mineru`'s Python pointed into a garbage-collected Nix store path, the unpinned `pip install 'mineru[pipeline]'` in the repo's docstrings installs MinerU 4.x (no `pipeline` extra, no `mineru.cli.common`), and no repo command keeps a disposable E2E stack up without Cypress, so the agent wrote a temporary `hold-stack.mjs` around `runE2eInteractive`.
-
-### Occurrences
-
-- Execution: SEED-059#story-3 / slice-plans/051-pdf-layout-from-bookmarks / 946e2a70e3; Timestamp: 2026-09-29 (slice 6, after 6f36cb2952); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.46.
-  - Evidence: slice 6 agent report (1,692 s, about 197k tokens, 96 tool uses); plan premise "`.venv-mineru/bin` has no `python`"; venv rebuilt with Homebrew Python 3.12, `mineru[pipeline]==3.4.5` and `six`; `cli/python/mineru_book_outline.py` and `regenerate_mineru_output_for_refactoring.sh` still say unpinned.
-  - Observed effect: about 28 minutes for one manual slice, most of it environment repair and stack scaffolding rather than observation.
-  - Inference: much of the cost was necessary once; a pinned MinerU install and a documented "hold a disposable stack" command would make the next real-book acceptance cheaper. Donut tooling, so correction belongs to Donut, not shared guidance.
 
 ## DD-162 — A grep-based plan premise named tests that never reached the changed path
 
@@ -837,17 +815,6 @@ For "opening a new EPUB marks nothing", the implementer's first cover (a separat
   - Evidence: slice 4 hand-back listing the moved cover and the gap "a cover in a spine file that no entry targets gets no block"; the coordinator's check of the real Alice EPUB (`wrap0000.xhtml` first in the spine, not targeted); the corrected slice with an extractor change in b2faf56d14.
   - Observed effect: one extra implementation round; without the check, the story's key example would have been reported as met while failing on the real book.
   - Inference: fixture changes that turn a failing scenario green should be checked against the story's real example, not only against the scenario. The implementer did name the gap, which made the check possible.
-
-## DD-165 — Reviving an E2E spec broke script tests that used it as their "not admitted" example
-
-Slice 2 added `epub_book.feature` to `APPLICATION_ONLY_ACTIVE_SPECS`. Five `scripts/` tests used that spec as their example of a refused selection. The slice's focused proof covered the feature and frontend tests but not `pnpm test:browser-worktree-isolation`, so CI found it.
-
-### Occurrences
-
-- Execution: SEED-059#story-1 / `e733844d01:.planning/slice-plans/049-epub-land-and-track-chosen-place/PLAN.md` / 485ed2eb49; Timestamp: 2026-09-29T04:45Z (CI run 36522703164, "Linting & Types Gen for Frontend"); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.46.
-  - Evidence: CI failure on 2ace76ecd6; repair 7580fceccc (101/106 before, 106/106 after).
-  - Observed effect: a stash, repair, refactor, and republish cycle while slice 3 waited.
-  - Inference: a `git grep` for the spec path when changing the admitted-spec list would have found the tests. Qualified: one occurrence.
 
 ## DD-166 — Plan edits by text replacement silently did nothing, and five slices' learnings never reached the plan
 
