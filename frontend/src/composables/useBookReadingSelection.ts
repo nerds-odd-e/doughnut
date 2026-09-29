@@ -1,4 +1,4 @@
-import { useAutoMarkNoDirectContentPredecessor } from "@/composables/useAutoMarkNoDirectContentPredecessor"
+import { useAutoMarkPredecessorWithNoTextOfItsOwn } from "@/composables/useAutoMarkPredecessorWithNoTextOfItsOwn"
 import { nextBookBlockAfter } from "@/lib/book-reading/nextBookBlockAfter"
 import type { BookBlockReadingDisposition } from "@/lib/book-reading/readBlockIdsFromRecords"
 import type { BookBlockFull } from "@generated/donut-backend-api"
@@ -71,7 +71,7 @@ export function useBookReadingSelection(options: {
   const blockAwaitingConfirmation =
     overrideBlockAwaitingConfirmation ?? defaultBlockAwaitingConfirmation
 
-  useAutoMarkNoDirectContentPredecessor({
+  useAutoMarkPredecessorWithNoTextOfItsOwn({
     bookBlocks,
     currentBlockId,
     hasRecordedDisposition,

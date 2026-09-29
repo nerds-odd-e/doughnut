@@ -76,7 +76,7 @@ read" to the long-chapter fixture's Rule: choose "The Full Licence", then
 
 ### 2. Leaving a block with text unread does not mark it
 Type: Behavior
-Status: planned
+Status: done
 Size: about 5–8 minutes; E2E runtime excepted.
 Proof: new E2E "Leaving an EPUB block with text unread does not mark it": choose
 "Chapter Alpha" after "Part One" is shown → "Part One" has no mark (fails today);
@@ -87,10 +87,18 @@ green.
 Add the "has text of its own" predicate and use it in
 `useAutoMarkNoDirectContentPredecessor`.
 
+Accepted proof: the two frontend specs 10/10 (red on the old rule for the EPUB
+paragraph case); `epub_book.feature` 16/16 and `reading_record.feature` 6/6
+(new scenario red on the old rule); frontend pages/composables/lib/book-reading
+500/500; `vue-tsc` clean.
+
 ## Current decisions
 
 - One frontend predicate from `contentBlocks` types; no API change.
 - The reading panel's anchor keeps using `lastDirectContentLocator` (excluded).
+- The predicate is `hasNoTextOfItsOwn` (seed wording; a block with no locators
+  is not auto-marked). The composable is renamed
+  `useAutoMarkPredecessorWithNoTextOfItsOwn`.
 
 ## Learnings
 

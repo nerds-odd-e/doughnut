@@ -1,8 +1,9 @@
+import { hasNoTextOfItsOwn } from "@/lib/book-reading/bookBlockDirectContent"
 import type { BookBlockReadingDisposition } from "@/lib/book-reading/readBlockIdsFromRecords"
 import type { BookBlockFull } from "@generated/donut-backend-api"
 import { toValue, unref, type MaybeRefOrGetter, type Ref, watch } from "vue"
 
-export function useAutoMarkNoDirectContentPredecessor(options: {
+export function useAutoMarkPredecessorWithNoTextOfItsOwn(options: {
   bookBlocks: MaybeRefOrGetter<readonly BookBlockFull[]>
   currentBlockId: Readonly<Ref<number | null>>
   hasRecordedDisposition: (id: number) => boolean
@@ -27,7 +28,7 @@ export function useAutoMarkNoDirectContentPredecessor(options: {
       if (bIdx <= 0) return
       const predecessor = rows[bIdx - 1]!
       if (
-        predecessor.contentLocators.length === 1 &&
+        hasNoTextOfItsOwn(predecessor) &&
         !hasRecordedDisposition(predecessor.id)
       ) {
         await submitReadingDisposition(predecessor.id, "READ")
