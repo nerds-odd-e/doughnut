@@ -202,32 +202,54 @@ layout also scrolled back to its top).
 
 **Identity:** SEED-059#story-5
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"not-refined","approach":"unselected"}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/053-pdf-smooth-scroll-after-choosing-block/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"539e46a16a7b820bf4bc9777266cd200f6c5ecf800bb1e6166388cfa44de8ed7","plan":"591165dbf17b9e072f0fd9ecb222f4d93d6b6aa8cedd90ee592aeb35dab88f4d"}}
 ```
 
-**Goal:** Scrolling a PDF moves in the reader's direction from the first wheel
-step, wherever the pointer rests.
+**Goal:** A PDF reader's view moves only where they scroll it, from the first
+wheel step after choosing a block, wherever the pointer rests. Today the start
+of every reading run jerks back by up to a screen, and the view can seem frozen,
+which makes reading a book in Donut feel broken rather than smooth.
 
-**Observed defects**
+**Scope**
 
-- **Backward jumps (defect 3, Medium).** In the first second after choosing a
-  block, 400 px wheel steps at 120 ms gave `+400, +400, −156, +400, −800, +400…`
-  (Think Python 8.1, three of three runs), and similar on 14.6 and the Attention
-  paper. Reproduction: in Think Python choose "8.1 A string is a sequence" and
-  wheel down steadily.
-- **The Reading Control Panel stops wheel scrolling (defect 4, Medium).** The PDF
-  panel (Read/Skim/Skip) appears mid-view (y 437–485 at 1440×900); when it comes
-  to rest under the pointer, every wheel step is swallowed (0 px for 12 steps,
-  still 0 after 3 s). The EPUB panel, docked at the bottom, passes wheel events
-  through.
+- **Nothing pulls the reader back** (owner decision, 2026-09-29). The
+  snap-back reminder is removed: scrolling past an unmarked block into the next
+  one no longer moves the view back to it, and no wheel steps are ignored
+  afterwards. Cause (read in code, 2026-09-29): snap-back pulls the view back
+  up to twice per block and ignores wheel steps for 500 ms after each pull,
+  which matches the UAT's two backward jumps per run. The Read/Skim/Skip panel,
+  which already appears at the block's end and after scrolling past it, stays
+  the only reminder.
+- **Any other backward jump in the first second is in scope too.** The promise
+  is that each downward wheel step moves the view down, whatever causes a jump.
+- **The Reading Control Panel never stops scrolling.** Wheeling with the pointer
+  over the PDF panel scrolls the book, as the EPUB panel already allows. Its
+  buttons still work.
+- **Deferred:** the panel's position, look, and the text it covers; EPUB
+  scrolling; keeping the current block at the layout's edge in short viewports.
+- **Must keep working:** PDF landing on the exact page with the heading at the
+  top, the current block following scrolling, the panel appearing at the
+  block's end and after scrolling past it, the panel moving on to the next block
+  once the selected one is marked, Read/Skim/Skip and resume, and layout
+  editing.
 
 **Key examples**
 
-- Choosing a block, then wheeling down steadily, moves down on every step.
-- With the pointer at the centre of the PDF, wheeling keeps scrolling when the
-  panel passes under it.
+- In *Think Python*, choose "8.1 A string is a sequence", then wheel down in
+  400 px steps every 120 ms → every step moves the view down (today
+  `+400, +400, −156, +400, −800, +400…`). The same after choosing 14.6, and 3.1
+  in the *Attention* paper.
+- Choose a block, scroll past its end into the next block without marking it →
+  the view stays where the reader scrolled, and the panel is still offered for
+  the chosen block.
+- With the pointer resting at the centre of the PDF, wheel down until the panel
+  arrives under the pointer, and keep wheeling → the book keeps scrolling
+  (today 0 px for 12 steps); clicking *Read* on the panel still marks the block.
 
-**Effort hypothesis:** M, medium confidence.
+**UAT evidence:** defects 3 and 4 in the report linked under *Why This
+Matters*. Snap-back has unit tests but no E2E scenario.
+
+**Effort hypothesis:** S–M, medium confidence.
 **Depends on:** none.
 
 <a id="story-6"></a>
