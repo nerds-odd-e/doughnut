@@ -78,3 +78,9 @@ changes.
 
 - Temporary legacy-data exception, kept private to `NoteReferenceHandling`.
 - Shape only; link targets are not checked.
+
+## Execution complete
+
+Product advice: no change. The commented private pattern keeps this temporary
+legacy-data exception easy to delete once legacy relationship bodies are gone;
+no backlog change recommended.
