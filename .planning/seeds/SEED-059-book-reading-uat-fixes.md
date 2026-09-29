@@ -72,69 +72,6 @@ reading a book end to end.
 
 Effort bands: S = 30–60 minutes, M = 1–2 hours, L = 2–4 hours, including delivery.
 
-<a id="story-1"></a>
-
-### Land on and track the chosen place in an EPUB
-
-**Identity:** SEED-059#story-1
-```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/049-epub-land-and-track-chosen-place/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"d61c0b22c3c154ada0410336b7a2d57bde30f3111cfab6dac5ac91214b82906f","plan":"22a042d813b2336cb680bf9a81ed07d7854d545a54de6f6b81c0211aa71ab6c1"}}
-```
-
-**Goal:** An EPUB reader lands where they chose, and the content shown, the
-current block, and the selection agree, from the first open onwards. This lets
-readers trust EPUB navigation and reading records, which reading a book end to
-end needs.
-
-**Scope**
-
-- **Choosing a block lands on it.** Choosing a chapter or section in the layout,
-  or following a link inside the book, puts that place's start at the top of the
-  view at any viewport size.
-- **Every block has a place to go** (owner decision, 2026-09-29). A block with no
-  content of its own goes to the target its entry has in the book's own table of
-  contents. The chosen block stays selected and current, even when another block
-  starts at the same spot (Origin: the book title and the detailed contents).
-- **First open makes no record.** A newly attached EPUB opens with the current
-  block matching what is shown, and no block is marked.
-- **Reopening shows the current block.** Reopening a book resumes at the last
-  place, with the current block visible in the layout, as PDF already does.
-- **Deferred:** blocks with no anchor in books attached before this fix keep
-  today's behavior (owner decision, 2026-09-29); re-attaching the book gives the
-  fix. Chapter landing, first open, and reopening are promised for every book.
-  Changing or clearing a wrong record already made (story 6) and the EPUB
-  current-block bar (story 10) are separate stories.
-- **Must keep working:** the current block follows scrolling, Read/Skim/Skip save
-  and persist, resume works, and PDF behavior is unchanged.
-
-**Key examples**
-
-- In *Origin of Species* at 1440×900, choose "CHAPTER IV. NATURAL SELECTION."
-  (today 6,416 px too far) → the heading is at the top of the view. The same at
-  1280×560, and for Alice chapters III and XII.
-- In Origin's contents page, follow the "CHAPTER 2" link → chapter II's heading
-  is at the top (today it lands near the end of chapter II).
-- Choose "ON THE ORIGIN OF SPECIES." → the book shows the title, and the title
-  block stays selected and current (today "DETEAILED CONTENTS…" is selected).
-- In Alice, choose "THE FULL PROJECT GUTENBERG™ LICENSE" → the book shows the
-  licence's start (today the content does not move).
-- Attach Alice on the web and open it → the cover is shown, the current block is
-  the one holding the cover, and no block is marked (today "Contents" is current
-  and marked read).
-- Read part of Origin, then reopen the book at 1280×560 → the book resumes at
-  the last place, and the layout shows the current block (today it stays at the
-  layout's top).
-
-**UAT evidence:** defects 1, 7, 8, and 16 in the report linked under
-*Why This Matters*. Unverified hypothesis for defect 1: the offset grows with
-the previous chapter's length, so the scroll target may be computed before
-epub.js inserts the previous section above the chosen one. Defect 8 happens when
-an entry gets no content at attach time (two entries starting at the same spot,
-or its text counted under another entry), so it has no stored start.
-
-**Effort hypothesis:** M–L, medium confidence.
-**Depends on:** none.
-
 <a id="story-5"></a>
 
 ### Scroll a PDF smoothly right after choosing a block
@@ -213,7 +150,8 @@ clear a mark that is wrong.
   marks the label read at once, as promised.
 - **Marks cannot be changed or cleared.** Choosing a marked block makes the
   panel offer the next block, and no other control exists. A mistaken Skim, the
-  spurious "Contents" record from story 1's first-open defect, and auto-marked
+  spurious "Contents" record from the first-open defect (books attached before
+  its fix), and auto-marked
   header duplicates from the old heading layout stay for good. Cancelling the block clears its
   record, but only in PDF.
 
@@ -356,7 +294,7 @@ bar and working reorganizing controls, or at least no controls that do nothing.
 
 **Effort hypothesis:** L, low confidence. A first slice can hide the controls
 that do nothing. Open question: is creating a block from EPUB text also needed?
-**Depends on:** story 1 (reliable EPUB positions).
+**Depends on:** none (reliable EPUB positions are in place).
 
 <a id="story-11"></a>
 
@@ -423,10 +361,32 @@ through each chapter and the book they are, and what is left at the end.
 **Effort hypothesis:** M, medium confidence.
 **Depends on:** none.
 
+<a id="story-14"></a>
+
+### EPUB resume tests say what the product does, and one lookup finds a locator's rendered view
+
+**Identity:** SEED-059#story-14
+```json dough-story-state
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/055-epub-resume-tests-and-rendered-view/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"9d108ccd333aa5caedb2ba899028b9fff7e2076bdbf7d203da96a47c9a19c377","plan":"2b3317d1198d19618685bde607a375b9e856304b73b5e1f748206c74bd4f56d0"}}
+```
+
+**Slice plan:** [EPUB resume tests and rendered view](../slice-plans/055-epub-resume-tests-and-rendered-view/PLAN.md)
+
+**Goal:** Developers reading Donut's EPUB tests see only behavior the product
+has, and the EPUB viewer places a locator one way for both the reading panel
+and the current block. This bounded retrospective correction of
+SEED-059#story-1 removes two resume scenarios the new reopen scenario
+supersedes (one names the opposite of today's block-level resume) and merges
+two rendered-view lookups in `useEpubLocatorGeometry`.
+
+**Scope:** `epub_book.feature` resume scenarios and the steps and page-object
+methods only they use; `useEpubLocatorGeometry.ts`. Finer in-block resume,
+the current-block rule, auto-marking, PDF, and the extractor are unchanged.
+
 ## Ordering and Scope Reduction
 
-- **Highest priority** (reading breaks for common books and devices): stories
-  1–4.
+- **Highest priority** (reading breaks for common books and devices):
+  delivered.
 - **Next** (reading works but is jerky, records go wrong, or correcting is
   slow): stories 5–9.
 - **Then** (completing the feature): stories 10–12.

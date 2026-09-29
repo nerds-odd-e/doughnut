@@ -98,3 +98,33 @@ export const expectFullyOnScreen = (selector: string) => {
     })
   })
 }
+
+/** Elements matching `selector` in the reader's rendered chapters whose trimmed text is exactly `text`. */
+export function epubReaderElementsWithText(
+  container: HTMLElement,
+  selector: string,
+  text: string
+): { iframe: HTMLIFrameElement; element: HTMLElement }[] {
+  return [...container.querySelectorAll('iframe')].flatMap((iframe) =>
+    [...(iframe.contentDocument?.querySelectorAll<HTMLElement>(selector) ?? [])]
+      .filter((element) => (element.textContent ?? '').trim() === text)
+      .map((element) => ({ iframe, element }))
+  )
+}
+
+/** Offsets in px from the top of the reader's scrolled view to each rendered heading with this text. */
+export function epubHeadingOffsetsFromReaderTopPx(
+  container: HTMLElement,
+  headingText: string
+): number[] {
+  return epubReaderElementsWithText(
+    container,
+    'h1,h2,h3,h4,h5,h6',
+    headingText
+  ).map(
+    ({ iframe, element }) =>
+      iframe.getBoundingClientRect().top +
+      element.getBoundingClientRect().top -
+      container.getBoundingClientRect().top
+  )
+}

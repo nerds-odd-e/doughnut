@@ -60,6 +60,13 @@ final class EpubPackageIo {
     return null;
   }
 
+  static ApiException readError() {
+    return new ApiException(
+        "EPUB file could not be read",
+        ApiError.ErrorType.BINDING_ERROR,
+        "EPUB file could not be read");
+  }
+
   static void drain(InputStream in) throws IOException {
     in.transferTo(OutputStream.nullOutputStream());
   }

@@ -191,12 +191,19 @@ export const bookReadingLayoutMethods = () => ({
   expectCurrentBlockVisibleInBookLayoutAside(title: string) {
     this.expectBookBlockIsCurrentBlockByTitle(title)
     cy.get(bookLayoutAside).should(($aside) => {
+      const aside = $aside[0]!
       expect(
-        $aside[0]!.scrollTop,
+        aside.scrollTop,
         'book layout aside should have scrolled to reveal the current block'
       ).to.be.greaterThan(0)
+      const row = aside.querySelector('[data-current-block="true"]')!
+      const asideRect = aside.getBoundingClientRect()
+      const rowRect = row.getBoundingClientRect()
+      expect(
+        rowRect.top >= asideRect.top && rowRect.bottom <= asideRect.bottom,
+        `current block row (${rowRect.top}–${rowRect.bottom}) should be within the book layout aside's view (${asideRect.top}–${asideRect.bottom})`
+      ).to.equal(true)
     })
-    bookBlockRowByTitle(title).should('be.visible')
     return this
   },
   /**
@@ -219,6 +226,15 @@ export const bookReadingLayoutMethods = () => ({
       'data-direct-content-skimmed',
       'true'
     )
+    return this
+  },
+  expectNoBookBlockMarkedInBookLayout() {
+    waitUntilAppIsNotBusy()
+    bookBlockRows()
+      .filter(
+        '[data-direct-content-read], [data-direct-content-skimmed], [data-direct-content-skipped]'
+      )
+      .should('have.length', 0)
     return this
   },
   expectNewChildBlockInLayout() {

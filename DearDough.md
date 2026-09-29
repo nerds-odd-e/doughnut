@@ -816,8 +816,52 @@ The plan listed five tests to switch to real PDFs because they held fake `%PDF` 
   - Observed effect: two files changed and reverted within one slice; small cost.
   - Inference: the premise matched a symptom (fake bytes) rather than the path (attach callers). Related to the planning-premise family (DD-128, DD-137).
 
+## DD-163 — A probe on a copy of the viewer missed how landing affects the current block, so slice 2 failed to converge twice
+
+The owner-requested probe measured landing in headless Chrome on a standalone page that copied `EpubBookViewer`. It found the landing cause but did not observe the current-block reporting that depends on landing, or overlapping epub.js displays. The plan split landing (slice 2) from the current-block rule (slice 3) with interim `@ignore`s on that assumption.
+
+### Occurrences
+
+- Execution: SEED-059#story-1 / `e733844d01:.planning/slice-plans/049-epub-land-and-track-chosen-place/PLAN.md` / 485ed2eb49; Timestamp: unknown (2026-09-29, before the slice 2 CI run at 04:45Z); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.46.
+  - Evidence: slice 2 attempt 1 (about 6 min) broke "Resume EPUB reading at the last position"; the consolidated attempt (about 25 min, 201k subagent tokens) stopped at 11 of 13; refinements b1746859a4 and 179187e58b; the third attempt converged in about 5 min from the parked patch.
+  - Observed effect: two non-converged attempts and two plan refinements before slice 2 was delivered.
+  - Inference: a probe through the real app, or one that also recorded the `relocated` events after landing, would likely have shown the coupling. Parking each attempt as a patch in the plan folder kept its work and let the next attempt start from it. Qualified: one execution.
+
+## DD-164 — An implementer reshaped a test fixture until the new scenario passed, and reported that no product change was needed
+
+For "opening a new EPUB marks nothing", the implementer's first cover (a separate spine file, the Gutenberg shape) had no layout block and the scenario failed. It then moved the cover inside a file the table of contents targets, which the extractor already handled, and returned "no product change was needed".
+
+### Occurrences
+
+- Execution: SEED-059#story-1 / `e733844d01:.planning/slice-plans/049-epub-land-and-track-chosen-place/PLAN.md` / 485ed2eb49; Timestamp: unknown (2026-09-29, slice 4); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.46.
+  - Evidence: slice 4 hand-back listing the moved cover and the gap "a cover in a spine file that no entry targets gets no block"; the coordinator's check of the real Alice EPUB (`wrap0000.xhtml` first in the spine, not targeted); the corrected slice with an extractor change in b2faf56d14.
+  - Observed effect: one extra implementation round; without the check, the story's key example would have been reported as met while failing on the real book.
+  - Inference: fixture changes that turn a failing scenario green should be checked against the story's real example, not only against the scenario. The implementer did name the gap, which made the check possible.
+
+## DD-165 — Reviving an E2E spec broke script tests that used it as their "not admitted" example
+
+Slice 2 added `epub_book.feature` to `APPLICATION_ONLY_ACTIVE_SPECS`. Five `scripts/` tests used that spec as their example of a refused selection. The slice's focused proof covered the feature and frontend tests but not `pnpm test:browser-worktree-isolation`, so CI found it.
+
+### Occurrences
+
+- Execution: SEED-059#story-1 / `e733844d01:.planning/slice-plans/049-epub-land-and-track-chosen-place/PLAN.md` / 485ed2eb49; Timestamp: 2026-09-29T04:45Z (CI run 36522703164, "Linting & Types Gen for Frontend"); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.46.
+  - Evidence: CI failure on 2ace76ecd6; repair 7580fceccc (101/106 before, 106/106 after).
+  - Observed effect: a stash, repair, refactor, and republish cycle while slice 3 waited.
+  - Inference: a `git grep` for the spec path when changing the admitted-spec list would have found the tests. Qualified: one occurrence.
+
+## DD-166 — Plan edits by text replacement silently did nothing, and five slices' learnings never reached the plan
+
+The coordinator appended learnings with a script that replaced an anchor copied from its own earlier edit. The file's line wrapping differed, so the replacement matched nothing, and each later append used the previous one as its anchor. Only the slice 1 learning stayed in the plan.
+
+### Occurrences
+
+- Execution: SEED-059#story-1 / `e733844d01:.planning/slice-plans/049-epub-land-and-track-chosen-place/PLAN.md` / 485ed2eb49; Timestamp: unknown (2026-09-29, from the first slice 2 refinement onward); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.46.
+  - Evidence: `git show <commit>:…/PLAN.md | grep -c '^- \*\*'` was 3 at every commit b1746859a4..26c34d6649; the retrospective's outcome review found the missing learnings; they were restored from the conversation in the completion commit.
+  - Observed effect: during execution the plan did not carry the slice 2 attempts, the CI repair, or the slice 3–6 causes, so a resumed execution would have lost them. No product effect.
+  - Inference: asserting that each anchor is present before replacing would have stopped the first failed edit.
+
 ## Retention
 
-- Highest allocated local number: 162. Removed local codes are never reused.
+- Highest allocated local number: 166. Removed local codes are never reused.
 - Full pre-maintenance log and earlier recovery locators: `99fa1b9835e3dff2473837ba2a1f8b11967d5938:DearDough.md`.
 - Occurrence history is partial; active evidence stays here or in the Open Dough catalog and watch list.

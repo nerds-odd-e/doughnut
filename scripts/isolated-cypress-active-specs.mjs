@@ -28,6 +28,7 @@ export const APPLICATION_ONLY_ACTIVE_SPECS = [
   'e2e_test/features/bazaar/sharing.feature',
   'e2e_test/features/book_reading/book_browsing.feature',
   'e2e_test/features/book_reading/phone_reading.feature',
+  'e2e_test/features/book_reading/epub_book.feature',
   'e2e_test/features/book_reading/reading_record.feature',
   'e2e_test/features/book_reading/reorganize_layout.feature',
   'e2e_test/features/circles/creating_circles.feature',

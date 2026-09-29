@@ -51,6 +51,14 @@ Then(
 )
 
 Then(
+  'no book block should be marked in the book layout',
+  // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
+  () => {
+    return bookReadingPage().expectNoBookBlockMarkedInBookLayout()
+  }
+)
+
+Then(
   'I should see the current block navigation bar showing {string}',
   // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
   (title: string) => {

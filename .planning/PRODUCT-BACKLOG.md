@@ -8,10 +8,10 @@ Bug fixing and general maintenance.
 ## Taken
 
 - [Refresh recall automatically at each local half-day boundary](seeds/SEED-056-recall-half-day-refresh.md#story-1) — SEED-056#story-1 ([plan](slice-plans/014-recall-half-day-refresh/PLAN.md))
-- [Land on and track the chosen place in an EPUB](seeds/SEED-059-book-reading-uat-fixes.md#story-1) — SEED-059#story-1 ([plan](slice-plans/049-epub-land-and-track-chosen-place/PLAN.md))
 
 ## Backlog list
 
+- [EPUB resume tests say what the product does, and one lookup finds a locator's rendered view](seeds/SEED-059-book-reading-uat-fixes.md#story-14) — SEED-059#story-14
 - [Scroll a PDF smoothly right after choosing a block](seeds/SEED-059-book-reading-uat-fixes.md#story-5) — SEED-059#story-5
 - [Keep reading records right and let readers correct them](seeds/SEED-059-book-reading-uat-fixes.md#story-6) — SEED-059#story-6
 - [Fix a book layout by hand in a few steps](seeds/SEED-059-book-reading-uat-fixes.md#story-7) — SEED-059#story-7
