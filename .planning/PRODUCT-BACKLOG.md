@@ -12,3 +12,4 @@ Bug fixing and general maintenance.
 
 ## Backlog list
 
+- [Refresh recall automatically at each local half-day boundary](seeds/SEED-056-recall-half-day-refresh.md#story-1) — SEED-056#story-1
