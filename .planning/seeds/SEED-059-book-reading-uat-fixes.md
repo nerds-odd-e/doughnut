@@ -141,31 +141,64 @@ or its text counted under another entry), so it has no stored start.
 
 **Identity:** SEED-059#story-2
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"not-refined","approach":"unselected"}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/050-read-a-book-on-a-phone/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"c4c8441d9d9f1ff3bed12e446123d97224161a61939b0149111ee01dd7a5c279","plan":"62500f47bc6496c871f621a04fd253a14b0e02c77e7e8844dff2a5c95bb7eb76"}}
 ```
 
-**Goal:** A reader on a phone-width screen can read a PDF or EPUB and open the
-book layout as a drawer.
+**Goal:** A reader who attached a book at the desk can keep reading it on a
+phone: the book uses the screen width, the reading panel works, and the book
+layout opens as a drawer to choose where to go. The owner does read books on a
+phone (confirmed 2026-09-29), and today the reader is unusable there, not just
+rough, while the rest of Donut already works at phone width.
 
-**Observed defect (defect 2, High)**
+**Scope**
 
-- At 390×844 the collapsed layout panel is moved off screen (x = −288) but still
-  takes its 288 px, so the content gets a 102 px column. PDF pages render as
-  thumbnails, EPUB shows one or two words per line, and the "Now reading" bar and
-  the Read/Skim/Skip panel are cut off.
-- The *Book layout* toggle (x 88–130) sits under the main menu's *Toggle menu*
-  button, which takes the click, so the layout cannot be opened. At 768×1024 the
-  toggle is also covered. At 1024×768 and above it works.
-- Reproduction: open a book's reader (`/notebooks/<id>/book`) at 390×844.
+- **Content uses the full width.** Below the desktop width (768 px), the closed
+  layout takes no space: an EPUB wraps to the screen width, a PDF page fits the
+  screen width, and the "Now reading" bar and the Read/Skim/Skip panel are fully
+  visible.
+- **The layout toggle is reachable** and opens the layout at 390 and 768 px
+  wide. Nothing in the top bar sits under the collapsed main menu.
+- **The drawer behaves like the notebook sidebar drawer** (owner decision,
+  2026-09-29): it opens over the book below the main menu, tapping the backdrop
+  closes it, and choosing a block closes it and moves the book there.
+- **Reading works on a phone:** Read/Skim/Skip can be tapped and saved; the
+  current block follows scrolling and resume works, as on desktop.
+- **PDF on a phone only has to be not broken** (owner decision, 2026-09-29): a
+  page as wide as the screen, with today's zoom. It need not be pleasant.
+- **Deferred:** changing the layout on a phone (indent, outdent, cancel, drag;
+  stories 7 and 9 own layout editing), anything extra for *AI Reorganize* or
+  creating blocks on a phone, a reflowed or text-only PDF mode, attaching books
+  from a phone, swipe gestures, landscape tuning, and font-size controls. Other
+  SEED-059 defects seen on a phone stay in their own stories.
+- **Must keep working:** the reader at 1024 px and wider, including the inline
+  layout panel, its toggle, and the short-viewport layout behavior.
 
 **Key examples**
 
-- At 390×844 the content uses the screen width and the reading panel is fully
-  visible.
-- The layout toggle opens the layout as a drawer at 390 and 768 px wide.
+- Open *Alice* (EPUB) at 390×844 → the text fills the screen width, and the
+  Read/Skim/Skip panel is fully visible and can be tapped (today: 102 px column,
+  panel cut off).
+- At 390×844, tap *Book layout*, then choose "CHAPTER III" → the drawer closes
+  and the book shows chapter III (today: the toggle click goes to *Toggle
+  menu*).
+- With the drawer open at 390×844, tap the backdrop → the drawer closes and the
+  reading place is unchanged.
+- Open *Think Python* (PDF) at 390×844 → the page is as wide as the screen, not
+  a thumbnail.
+- At 768×1024, *Book layout* opens the layout (today it is covered).
 
-**Effort hypothesis:** M, medium confidence. Open question: should the drawer
-behave like the notebook sidebar drawer?
+**UAT evidence:** defect 2 in the report linked under *Why This Matters*.
+Causes observed on 2026-09-29 (temporary E2E probe, then reverted): the layout
+panel always carries `relative` while its phone branch adds `fixed`, and
+Tailwind 4.3.3 emits `.relative` after `.fixed`, so the off-screen panel keeps
+its 288 px (content 102 px wide at 390 px). The book route has no active main
+menu item, so the collapsed main menu shows its "Menu" fallback and grows to
+112–120 px, while the top bar reserves 88 px; the *Toggle menu* button then
+covers the layout toggle at 390 and 768 px. Notebook pages have an active item
+and are not covered. The book layout drawer also duplicates the notebook sidebar
+drawer's behavior (`useNotebookSidebarDrawer`) instead of sharing it.
+
+**Effort hypothesis:** S–M, medium confidence.
 **Depends on:** none.
 
 <a id="story-3"></a>
@@ -525,8 +558,7 @@ story 7. First to drop: story 12, then story 11.
 
 ## Open Decisions
 
-- Which open question in each story needs the owner before refinement: for
-  example, the drawer behaviour in story 2.
+- Which open question in each story needs the owner before refinement.
 
 ## When to Surface
 
