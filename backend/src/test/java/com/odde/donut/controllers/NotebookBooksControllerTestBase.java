@@ -209,7 +209,7 @@ abstract class NotebookBooksControllerTestBase extends ControllerTestBase {
     }
     hrefPart = hrefPart.trim();
     BookLastReadPositionRequest r = new BookLastReadPositionRequest();
-    r.setLocator(new EpubLocator(hrefPart.isEmpty() ? null : hrefPart, fragPart));
+    r.setLocator(new EpubLocator(hrefPart.isEmpty() ? null : hrefPart, fragPart, null));
     return r;
   }
 }

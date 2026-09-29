@@ -64,7 +64,7 @@ class NotebookBooksGetReadingPositionControllerTest extends NotebookBooksControl
 
       assertThat(
           res.getBody().locator(),
-          equalTo(new EpubLocator("OEBPS/chapter2.xhtml", "section-beta-two")));
+          equalTo(new EpubLocator("OEBPS/chapter2.xhtml", "section-beta-two", null)));
     }
 
     @Test

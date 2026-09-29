@@ -58,7 +58,7 @@ public final class BookBlockEpubContentLocators {
           }
         }
       }
-      return new EpubLocator(href, fragment);
+      return new EpubLocator(href, fragment, null);
     } catch (Exception e) {
       return null;
     }

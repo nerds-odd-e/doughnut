@@ -378,60 +378,6 @@ block, or an EPUB block whose only content is its start anchor); auto-mark
 already uses it. Snap-back's `hasDirectContent` (`useBookReadingSnapBack.ts`)
 still means "more than one locator" and should use it too.
 
-<a id="story-17"></a>
-
-### Reopen an EPUB at the exact paragraph
-
-**Identity:** SEED-059#story-17
-```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/059-reopen-epub-at-exact-paragraph/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"798dc7a92f6a9fe43f74e2812a5911d0bcb181d0e6dd602da24557374dfd578f","plan":"40791cf42bd5eafd7afd83659fb37d0f263e85e93a223d8a7e0542e088b17b89"}}
-```
-
-**Goal:** A reader who stops part-way through a long EPUB block reopens the
-book at the same paragraph, on any window width, as PDF readers already reopen
-at their page and offset. Long chapters (Origin chapter IV is over 13,000 px)
-stop sending the reader back to the chapter heading to search for their place.
-
-**Scope**
-
-- **The last-read EPUB position names the paragraph at the top of the view.**
-  Today it holds only the current block's start, and it is saved only when the
-  current block changes. It gains an optional exact reading place (epub.js's
-  CFI), saved as the reader scrolls within a block too, not only when the
-  current block changes. A pixel offset is not enough, because text reflows at
-  other widths.
-- **Reopening lands on that paragraph.** The paragraph that was at the top of
-  the view is at the top again; paragraph precision is the promise, not the
-  same line or pixel. The current block on reopen follows the existing
-  current-block rule from what is then in view.
-- **The block start still drives choosing and the current block.** Choosing a
-  block lands at its start as today; the exact place only affects reopening.
-- **Boundary assumptions:**
-  - a position saved before this story, without an exact place, reopens at its
-    block start as today;
-  - an exact place that no longer resolves reopens at its block start, through
-    the existing fallback, with no new message.
-- **Deferred:** PDF resume is unchanged; no "resume here" prompt, history of
-  positions, or cross-device merging beyond the one last-read position.
-- **Precision risk:** whether epub.js's CFI is paragraph-precise in Donut's
-  continuous scrolled mode is unverified. If it is not, stop and bring the
-  options back to the owner before building on it.
-
-**Key examples**
-
-- Read to the middle of Origin chapter IV at 1440 px wide, leave, and reopen at
-  390 px wide → the paragraph that was at the top is at the top, and chapter IV
-  is the current block.
-- Choose chapter IV, leave without scrolling, and reopen → chapter IV's heading
-  is at the top, as today.
-- A book whose last-read position was saved before this story → reopens at the
-  saved block's start, as today.
-
-**Effort hypothesis:** M, low confidence (CFI precision in continuous scrolled
-mode is unverified; probed first). Slices:
-[plan 059](../slice-plans/059-reopen-epub-at-exact-paragraph/PLAN.md).
-**Depends on:** none.
-
 <a id="story-18"></a>
 
 ### Anchor the Reading Control Panel after a one-paragraph EPUB block
@@ -558,6 +504,34 @@ two views into one, not only one file. Slices:
 `BookReadingContent.vue` in SEED-059#story-2), and SEED-059#story-6 (change or
 clear a reading mark) added one binding line to each view in two slices while
 leaving the PDF view over the limit.
+
+<a id="story-20"></a>
+
+### Reopen at the block start when the saved exact EPUB place no longer resolves
+
+**Identity:** SEED-059#story-20
+```json dough-story-state
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/062-stale-epub-place-reopens-at-block-start/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"ac4d121184eea524ae2643a4127730c33a4745b4b313cc6a660a21f69f65580e","plan":"214bdfa528820cfd4e1fb5c346953c914dc07a0abc881e9cdb9aa444579215b8"}}
+```
+
+**Goal:** A reader whose saved exact EPUB place (CFI) no longer resolves
+reopens at the start of the block they were reading, as
+story 17 promised (SEED-059#story-17, closed; recoverable at `e505a489f9:.planning/seeds/SEED-059-book-reading-uat-fixes.md`), not at the book's cover. This is a
+retrospective correction of story 17; it adds no feature promise.
+
+**Scope**
+
+- Reopening an EPUB whose stored exact place epub.js cannot display falls back
+  to the stored block start (href#fragment), then to the book start, with no
+  new message.
+- One display rule in the EPUB viewer serves reopening and choosing a block;
+  the reading-page bootstrap stops applying its own href-only check.
+- **Excluded:** an exact place that epub.js does display, but somewhere else
+  (for example after the book file was replaced by another edition); the PDF
+  reader; the dropped first scroll event noted in story 17's plan.
+
+**Correction input and slices:**
+[plan 062](../slice-plans/062-stale-epub-place-reopens-at-block-start/PLAN.md).
 
 ## Ordering and Scope Reduction
 

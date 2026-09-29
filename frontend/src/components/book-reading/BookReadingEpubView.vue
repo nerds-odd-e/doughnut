@@ -39,7 +39,7 @@
         ref="epubViewerRef"
         :epub-bytes="epubBytes"
         :book="book"
-        :initial-locator="initialLocatorDisplayHref"
+        :initial-locator="initialLocator"
         @relocated="onEpubRelocated"
       />
       <ReadingControlPanel
@@ -66,10 +66,7 @@ import { useSidebarDrawer } from "@/composables/useSidebarDrawer"
 import { useReadingPanelAnchor } from "@/composables/useReadingPanelAnchor"
 import { useBookReadingSelection } from "@/composables/useBookReadingSelection"
 import { useNotebookBookReadingRecords } from "@/composables/useNotebookBookReadingRecords"
-import {
-  asEpubLocator,
-  epubDisplayHref,
-} from "@/lib/book-reading/asEpubLocator"
+import { asEpubLocator } from "@/lib/book-reading/asEpubLocator"
 import {
   currentBlockIdFromEpubView,
   type EpubViewBlockStarts,
@@ -87,7 +84,10 @@ type EpubViewerExposed = Pick<
   | "resolveLocatorRect"
   | "isLocatorBottomVisible"
   | "readingPanelAnchorTopPx"
-> & { viewBlockStarts: () => EpubViewBlockStarts | null }
+> & {
+  viewBlockStarts: () => EpubViewBlockStarts | null
+  currentCfi: () => string | undefined
+}
 
 const bookReadingBookLayoutPanelId = "book-reading-book-layout-panel"
 
@@ -100,15 +100,6 @@ const props = withDefaults(
   }>(),
   { initialLocator: null, initialSelectedBlockId: null }
 )
-
-const initialLocatorDisplayHref = computed(() => {
-  const epub = asEpubLocator(props.initialLocator ?? undefined)
-  if (!epub) {
-    return null
-  }
-  const s = epubDisplayHref(epub)
-  return s.length > 0 ? s : null
-})
 
 const notebookId = computed(() => Number(props.book.notebookId))
 const bookReading = useNotebookBookReadingRecords(notebookId)
@@ -128,8 +119,10 @@ const { currentBlockId, currentBlockIdDebouncer, proposeReadingPosition } =
       const current = props.book.blocks.find(
         (b) => b.id === currentBlockId.value
       )
-      const locator = asEpubLocator(current?.contentLocators[0])
-      if (!locator) return
+      const blockStart = asEpubLocator(current?.contentLocators[0])
+      if (!blockStart) return
+      const cfi = epubViewerRef.value?.currentCfi()
+      const locator = cfi ? { ...blockStart, cfi } : blockStart
       const sel = selectedBlockId.value
       debouncer.propose(locator, sel === null ? undefined : sel)
     },
