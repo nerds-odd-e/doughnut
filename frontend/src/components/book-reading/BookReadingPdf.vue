@@ -39,6 +39,7 @@ import NewBookBlockTitleDialog from "@/components/book-reading/NewBookBlockTitle
 import PdfBookViewer from "@/components/book-reading/PdfBookViewer.vue"
 import PdfControl from "@/components/book-reading/PdfControl.vue"
 import { pdfLocatorsFromBlock } from "@/lib/book-reading/asPdfLocator"
+import { currentBlockIdFromViewStarts } from "@/lib/book-reading/currentBlockIdFromViewStarts"
 import { wireItemsToNavigationTargets } from "@/lib/book-reading/pdfOutlineV1Anchor"
 import {
   usePdfViewportPosition,
@@ -116,7 +117,27 @@ async function showBlock(block: BookBlockFull) {
   }
   selectedBlockId.value = block.id
   await pdfViewerRef.value?.scrollToBookNavigationTarget(parsed, targets)
-  currentBlockIdDebouncer.commitNow(block.id)
+  currentBlockIdDebouncer.commitNow(currentBlockIdInView() ?? block.id)
+}
+
+function currentBlockIdInView(): number | null {
+  const view = pdfViewerRef.value?.viewBlockStarts()
+  if (!view) {
+    return null
+  }
+  return currentBlockIdFromViewStarts(
+    bookBlocks.value,
+    {
+      startTopPx: (block) => {
+        const start = wireItemsToNavigationTargets(
+          pdfLocatorsFromBlock(block)
+        )[0]
+        return start ? view.startTopPx(start) : null
+      },
+      landingLimitPx: view.landingLimitPx,
+    },
+    selectedBlockId.value
+  )
 }
 
 const {

@@ -55,6 +55,18 @@ parts B and C). The slices below are provisional planning input.
    current, including on the first page (new E2E in `book_browsing.feature`).
    Also repairs what landing changes: `reading_record.feature:25-29` and the
    same-page helper's deltas (`bookReadingPdfMethods.ts:69-89`). About 10 min.
+   Status: done. `reading_record.feature` needed no edit; the same-page helper
+   delta went from 0.42 to 0.378 of the page height. Landing is bbox top
+   (padding removed); `usePdfLocatorGeometry.viewBlockStarts()` supplies starts
+   and a landing limit (0, or the whole view at the document end); `showBlock`
+   derives the current block after landing (falls back to the chosen block when
+   the viewer has no document yet). New E2E outline in `book_browsing.feature`
+   (page 1 y=252, page 2 y=89, first block y=72). Learning: pdf.js lands a
+   start up to about 11 px above the canvas position (page div borders), so
+   the E2E tolerance is 15 px. Not exercised: a block whose start is at or
+   above the first page's top edge. Proof: vitest `pdfOutlineV1Anchor
+   BookReadingPage currentBlock ViewStarts` (90), vue-tsc, `pnpm cy:run --spec`
+   `book_browsing.feature` 9/9 and `reading_record.feature` 9/9.
 3. **Behavior:** PDF follows scrolling with the shared rule; delete the old
    rule (`currentBlockIdFromVisiblePage` and its cases); move the bookmark
    scenario to scroll to the block's start; move the page specs to a stubbed

@@ -2,6 +2,7 @@ import type {
   BookNavigationTarget,
   NormalizedPageBbox,
 } from "@/lib/book-reading/pdfOutlineV1Anchor"
+import type { PdfViewBlockStarts } from "@/composables/book-reading/usePdfLocatorGeometry"
 import type { ContentLocatorFull } from "@generated/donut-backend-api"
 
 export type ViewerLocatorRect = {
@@ -27,6 +28,7 @@ export type BookReaderViewerRef = {
 }
 
 export type BookReadingPdfViewerRef = BookReaderViewerRef & {
+  viewBlockStarts: () => PdfViewBlockStarts | null
   scrollToBookNavigationTarget: (
     target: BookNavigationTarget,
     highlightBboxes?: ReadonlyArray<BookNavigationTarget>

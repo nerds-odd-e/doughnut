@@ -169,6 +169,17 @@ Then(
 )
 
 Then(
+  'the top of the PDF book reader should be at {int} of 1000 down page {int}',
+  // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
+  (normalizedY: number, pageNumber: number) => {
+    return bookReadingPage().expectPdfPositionAtTopOfReader(
+      pageNumber,
+      normalizedY
+    )
+  }
+)
+
+Then(
   'the book block {string} should be the current selection in the book reader',
   // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
   (title: string) => {

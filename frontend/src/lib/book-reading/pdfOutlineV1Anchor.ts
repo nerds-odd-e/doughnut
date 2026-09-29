@@ -4,7 +4,6 @@
  * `contentLocators` entries (`PdfLocatorFull`) into scroll/highlight targets for pdf.js.
  */
 const NORMALIZED_MAX = 1000
-const SCROLL_TOP_PADDING_PDF = 40
 
 export type NormalizedPageBbox = readonly [number, number, number, number]
 
@@ -98,8 +97,7 @@ export function wireItemsToNavigationTargets(
 }
 
 /**
- * Map normalized bbox to pdf.js scrollPageIntoView XYZ so the viewport top sits a little above the
- * bbox top. Zoom null keeps the current scale.
+ * Map normalized bbox to pdf.js scrollPageIntoView XYZ so the viewport top sits at the bbox top. Zoom null keeps the current scale.
  */
 export function normalizedBboxToPdfJsXyzDestArray(
   pageWidthPdf: number,
@@ -108,10 +106,7 @@ export function normalizedBboxToPdfJsXyzDestArray(
 ): PdfJsXyzDestArray {
   const [x0, y0, x1] = bbox
   const x = ((x0 + x1) / 2 / NORMALIZED_MAX) * pageWidthPdf
-  const yTopPdf = Math.max(
-    0,
-    (y0 / NORMALIZED_MAX) * pageHeightPdf - SCROLL_TOP_PADDING_PDF
-  )
+  const yTopPdf = (y0 / NORMALIZED_MAX) * pageHeightPdf
   const y = pageHeightPdf - yTopPdf
   return [null, { name: "XYZ" }, x, y, null]
 }

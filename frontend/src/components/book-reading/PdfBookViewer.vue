@@ -198,6 +198,7 @@ const { holdCallout, onContainerClick, onConfirmNewBlock } = blockHighlight
 defineExpose({
   displayLocator: navigation.displayLocator,
   resolveLocatorRect: locatorGeometry.resolveLocatorRect,
+  viewBlockStarts: locatorGeometry.viewBlockStarts,
   scrollToBookNavigationTarget: navigation.scrollToBookNavigationTarget,
   scrollToStoredReadingPosition: navigation.scrollToStoredReadingPosition,
   zoomIn: gestureZoom.zoomIn,

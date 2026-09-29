@@ -1,15 +1,50 @@
 import type { ViewerLocatorRect } from "@/composables/bookReaderViewerRef"
 import { locatorAsPdfNavigationTarget } from "@/composables/bookReaderViewerRef"
+import type { BookNavigationTarget } from "@/lib/book-reading/pdfOutlineV1Anchor"
 import type { ContentLocatorFull } from "@generated/donut-backend-api"
 import type { PDFViewer } from "pdfjs-dist/web/pdf_viewer.mjs"
 import type { Ref } from "vue"
 
 const READING_PANEL_ANCHOR_GAP_PX = 8
 
+export type PdfViewBlockStarts = {
+  startTopPx: (start: BookNavigationTarget) => number | null
+  landingLimitPx: number
+}
+
 export function usePdfLocatorGeometry(opts: {
   containerRef: Ref<HTMLDivElement | null>
   getPdfViewer: () => PDFViewer | null
 }) {
+  /**
+   * Where a block's start lies relative to the top of the reader's view right now. A page-only
+   * start is the top of its page. The landing limit is how far below the top a start may lie and
+   * still count as landed at the top: 0, or the whole view once it is scrolled to the end of the
+   * document and cannot go further.
+   */
+  function viewBlockStarts(): PdfViewBlockStarts | null {
+    const container = opts.containerRef.value
+    const pdfViewer = opts.getPdfViewer()
+    if (!container || !pdfViewer?.pdfDocument) return null
+    const containerRect = container.getBoundingClientRect()
+    const atEnd =
+      container.scrollTop + container.clientHeight >= container.scrollHeight - 1
+    return {
+      startTopPx: ({ pageIndex, bbox }) => {
+        const pageRect = pdfViewer
+          .getPageView(pageIndex)
+          ?.div.getBoundingClientRect()
+        if (!pageRect) return null
+        return (
+          pageRect.top +
+          ((bbox?.[1] ?? 0) / 1000) * pageRect.height -
+          containerRect.top
+        )
+      },
+      landingLimitPx: atEnd ? container.clientHeight : 0,
+    }
+  }
+
   function resolveLocatorRect(
     locator: ContentLocatorFull
   ): ViewerLocatorRect | null {
@@ -71,6 +106,7 @@ export function usePdfLocatorGeometry(opts: {
   }
 
   return {
+    viewBlockStarts,
     resolveLocatorRect,
     isLocatorBottomVisible,
     readingPanelAnchorTopPx,
