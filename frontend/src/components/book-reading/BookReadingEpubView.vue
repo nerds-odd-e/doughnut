@@ -1,68 +1,24 @@
 <template>
-  <GlobalBar>
-    <BookLayoutToggleButton
-      v-model:opened="bookLayoutOpened"
-      :panel-id="bookReadingBookLayoutPanelId"
-    />
-    <router-link
-      :to="{ name: 'notebookPage', params: { notebookId: notebookId } }"
-      class="daisy-btn daisy-btn-sm daisy-btn-ghost shrink-0 no-underline"
-    >
-      Notebook
-    </router-link>
-    <span
-      class="truncate text-sm font-medium min-w-0 ml-1"
-      data-testid="book-reading-epub-global-bar-title"
-      :title="book.bookName"
-    >
-      {{ book.bookName }}
-    </span>
-    <span class="ml-auto shrink-0" aria-hidden="true" />
-  </GlobalBar>
-  <BookReadingBookLayout
-    v-model:opened="bookLayoutOpened"
-    :panel-id="bookReadingBookLayoutPanelId"
-    :is-md-or-larger="isMdOrLarger"
-    :blocks="book.blocks"
-    :current-block-id="currentBlockId"
-    :selected-block-id="selectedBlockId"
-    :disposition-for-block="bookReading.dispositionForBlock"
-    @block-click="onBookBlockClick"
-    @change-mark="bookReading.submitReadingDisposition"
-    @clear-mark="bookReading.clearReadingDisposition"
+  <BookReadingShell
+    :session="session"
+    format="epub"
+    :book-name="book.bookName"
   >
-    <main
-      ref="epubMainPaneRef"
-      class="flex flex-1 min-h-0 min-w-0 flex-col relative"
-    >
-      <EpubBookViewer
-        ref="epubViewerRef"
-        :epub-bytes="epubBytes"
-        :book="book"
-        :initial-locator="initialLocatorDisplayHref"
-        @relocated="onEpubRelocated"
-      />
-      <ReadingControlPanel
-        v-if="blockAwaitingConfirmation"
-        :selected-block-title="blockAwaitingConfirmation.title"
-        :anchor-top-px="readingPanelAnchorTopPx"
-        @mark-as-read="() => markSelectedBlockDisposition('READ')"
-        @mark-as-skimmed="() => markSelectedBlockDisposition('SKIMMED')"
-        @mark-as-skipped="() => markSelectedBlockDisposition('SKIPPED')"
-      />
-    </main>
-  </BookReadingBookLayout>
+    <EpubBookViewer
+      ref="epubViewerRef"
+      :epub-bytes="epubBytes"
+      :book="book"
+      :initial-locator="initialLocatorDisplayHref"
+      @relocated="onEpubRelocated"
+    />
+  </BookReadingShell>
 </template>
 
 <script setup lang="ts">
-import BookLayoutToggleButton from "@/components/book-reading/BookLayoutToggleButton.vue"
-import BookReadingBookLayout from "@/components/book-reading/BookReadingBookLayout.vue"
+import BookReadingShell from "@/components/book-reading/BookReadingShell.vue"
 import EpubBookViewer from "@/components/book-reading/EpubBookViewer.vue"
-import GlobalBar from "@/components/toolbars/GlobalBar.vue"
-import ReadingControlPanel from "@/components/book-reading/ReadingControlPanel.vue"
 import type { BookReaderViewerRef } from "@/composables/bookReaderViewerRef"
 import { useBookReadingSession } from "@/composables/useBookReadingSession"
-import { useSidebarDrawer } from "@/composables/useSidebarDrawer"
 import {
   asEpubLocator,
   epubDisplayHref,
@@ -87,8 +43,6 @@ type EpubViewerExposed = Pick<
   | "readingPanelAnchorTopPx"
 > & { viewBlockStarts: () => EpubViewBlockStarts | null }
 
-const bookReadingBookLayoutPanelId = "book-reading-book-layout-panel"
-
 const props = withDefaults(
   defineProps<{
     book: BookFull
@@ -109,32 +63,25 @@ const initialLocatorDisplayHref = computed(() => {
 })
 
 const epubViewerRef = ref<EpubViewerExposed | null>(null)
-const epubMainPaneRef = ref<HTMLElement | null>(null)
 
-const {
-  notebookId,
-  bookReading,
-  selectedBlockId,
-  currentBlockId,
-  currentBlockIdDebouncer,
-  proposeReadingPosition,
-  blockAwaitingConfirmation,
-  applyBookBlockSelection,
-  markSelectedBlockDisposition,
-  readingPanelAnchorTopPx,
-  updateReadingPanelAnchor,
-} = useBookReadingSession({
+const session = useBookReadingSession({
   book: () => props.book,
   initialSelectedBlockId: props.initialSelectedBlockId ?? null,
   surface: {
     showBlock,
     readingPositionLocator,
     viewer: epubViewerRef,
-    mainPane: epubMainPaneRef,
     reanchorPanelAfterSyncAndShow: true,
     flushPositionOnLeave: true,
   },
 })
+const {
+  selectedBlockId,
+  currentBlockId,
+  currentBlockIdDebouncer,
+  proposeReadingPosition,
+  updateReadingPanelAnchor,
+} = session
 
 async function showBlock(block: BookBlockFull) {
   selectedBlockId.value = block.id
@@ -162,12 +109,6 @@ function currentBlockIdInView(): number | null {
   )
 }
 
-/**
- * Decided synchronously so the book layout aside is in its final open/closed state before
- * `EpubBookViewer` mounts; otherwise a late resize can redisplay the wrong section.
- */
-const { opened: bookLayoutOpened, isMdOrLarger } = useSidebarDrawer()
-
 function onEpubRelocated() {
   const id = currentBlockIdInView()
   if (id !== null) {
@@ -175,10 +116,6 @@ function onEpubRelocated() {
   }
   proposeReadingPosition()
   updateReadingPanelAnchor()
-}
-
-async function onBookBlockClick(block: BookBlockFull) {
-  await applyBookBlockSelection(block)
 }
 
 onMounted(() => {

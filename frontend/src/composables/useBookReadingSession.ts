@@ -28,8 +28,6 @@ export type BookReadingSurface = {
   readingPositionLocator: () => ContentLocatorFull | null
   /** Geometry used to anchor the Reading Control Panel. */
   viewer: Ref<Pick<BookReaderViewerRef, "readingPanelAnchorTopPx"> | null>
-  /** The pane the Reading Control Panel is positioned in. */
-  mainPane: Ref<HTMLElement | null>
   /** Returns false to keep the current block unchanged (PDF snap-back). */
   commitCurrentBlock?: (id: number | null) => boolean
   /** PDF snap-back decides which block awaits confirmation. */
@@ -55,6 +53,8 @@ export function useBookReadingSession(options: {
   const bookBlocks = computed(() => toValue(options.book).blocks)
   const bookReading = useNotebookBookReadingRecords(notebookId)
   const selectedBlockId = ref<number | null>(options.initialSelectedBlockId)
+  /** The pane the Reading Control Panel is positioned in; set by the reading shell. */
+  const mainPane = ref<HTMLElement | null>(null)
 
   const { currentBlockId, currentBlockIdDebouncer, proposeReadingPosition } =
     useBookReadingCurrentBlock({
@@ -98,7 +98,7 @@ export function useBookReadingSession(options: {
           ? blockAwaitingConfirmation.value
           : null
       ),
-      mainPaneRef: surface.mainPane,
+      mainPaneRef: mainPane,
     })
 
   async function reanchorPanel() {
@@ -133,5 +133,8 @@ export function useBookReadingSession(options: {
     markSelectedBlockDisposition,
     readingPanelAnchorTopPx,
     updateReadingPanelAnchor,
+    mainPane,
   }
 }
+
+export type BookReadingSession = ReturnType<typeof useBookReadingSession>

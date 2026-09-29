@@ -128,7 +128,9 @@ wired once. Enables slice 3 (the shell binds one session). About 10 min.
 
 ### 3. One reading shell for both formats
 Type: Structure
-Status: planned
+Status: done
+Accepted proof: frontend command 12 files / 71 tests; `vue-tsc --noEmit` clean;
+`epub_book` 17, `phone_reading` 7, `book_browsing` 6, `reading_record` 7 (37/37).
 Proof: frontend command; `cy:run --spec e2e_test/features/book_reading/epub_book.feature,e2e_test/features/book_reading/phone_reading.feature,e2e_test/features/book_reading/book_browsing.feature`.
 
 Add `BookReadingShell.vue` with the global bar, book layout panel (block click
@@ -178,6 +180,13 @@ About 5–10 min.
   (panel shown only while the block's last content is visible), and EPUB's
   `reanchorPanelAfterSyncAndShow` (anchor refresh after the records sync and
   after showing a block). Slice 1's `onRecordsSynced` hook is gone.
+- Slice 3's shell takes a `format` prop only for today's markup differences
+  (PDF's live region and load-error pane wrappers, EPUB's title test id), so the
+  Reading Control Panel is declared once per pane layout. The session owns
+  `mainPane`; the shell sets it with a function ref. Until slice 4, PDF's
+  reorganize listeners reach the book layout through the shell's `$attrs`, and
+  the "Now reading" bar through a `#pane-end` slot. Giving EPUB PDF's pane
+  layout would need a DOM change this story excludes.
 - Slice 5 candidates in `useBookReadingSelection.ts`:
   `overrideBlockAwaitingConfirmation` and `repairSelectionWhenBlocksChange`,
   now set only by the session.

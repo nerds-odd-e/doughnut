@@ -1,100 +1,42 @@
 <template>
-  <div
-    role="status"
-    aria-live="polite"
-    aria-atomic="true"
-    data-testid="book-reading-current-block-live"
-    class="sr-only"
-  >
-    {{ currentBlockLiveText }}
-  </div>
-  <GlobalBar>
-    <BookLayoutToggleButton
-      v-model:opened="bookLayoutOpened"
-      :panel-id="bookReadingBookLayoutPanelId"
-    />
-    <router-link
-      :to="{ name: 'notebookPage', params: { notebookId: notebookId } }"
-      class="daisy-btn daisy-btn-sm daisy-btn-ghost shrink-0 no-underline"
-    >
-      Notebook
-    </router-link>
-    <span
-      class="truncate text-sm font-medium min-w-0 ml-1"
-      :title="book.bookName"
-    >
-      {{ book.bookName }}
-    </span>
-    <PdfControl
-      class="ml-auto mr-2"
-      :current-page="pdfBarCurrentPage"
-      :pages-total="pdfBarPagesTotal"
-      @zoom-in="pdfViewerRef?.zoomIn()"
-      @zoom-out="pdfViewerRef?.zoomOut()"
-    />
-  </GlobalBar>
-  <BookReadingBookLayout
-    v-model:opened="bookLayoutOpened"
-    :panel-id="bookReadingBookLayoutPanelId"
-    :is-md-or-larger="isMdOrLarger"
-    :blocks="bookBlocks"
-    :current-block-id="currentBlockId"
-    :selected-block-id="selectedBlockId"
-    :disposition-for-block="bookReading.dispositionForBlock"
-    @block-click="onBookBlockClick"
+  <BookReadingShell
+    :session="session"
+    format="pdf"
+    :book-name="book.bookName"
+    :load-error="pdfViewerLoadError"
+    :snap-animation-key="snapAnimationKey"
     @block-indent="onBlockIndent"
     @block-outdent="onBlockOutdent"
     @block-cancel="onBlockCancel"
-    @change-mark="bookReading.submitReadingDisposition"
-    @clear-mark="bookReading.clearReadingDisposition"
     @request-ai-reorganize="requestAiReorganize"
   >
-    <main
-      class="flex flex-1 min-h-0 min-w-0 flex-col"
-    >
-      <div
-        v-if="pdfViewerLoadError"
-        class="daisy-alert daisy-alert-error mb-2 mx-2 mt-2"
-        data-testid="book-reading-pdf-viewer-load-error"
-      >
-        {{ pdfViewerLoadError }}
-      </div>
-      <div
-        v-else
-        class="flex min-h-0 min-w-0 flex-1 flex-col"
-      >
-        <div
-          ref="pdfPaneRef"
-          class="relative min-h-0 min-w-0 flex-1"
-        >
-          <PdfBookViewer
-            ref="pdfViewerRef"
-            :pdf-bytes="bookPdfBytes"
-            :bottom-padding-px="READING_PANEL_OBSTRUCTION_PX"
-            @load-error="onPdfLoadError"
-            @viewport-anchor-page="onViewportAnchorPage"
-            @pages-ready="onPagesReady"
-            @create-block-from-content="onCreateBlockFromContent"
-          />
-          <ReadingControlPanel
-            v-if="blockAwaitingConfirmation"
-            :selected-block-title="blockAwaitingConfirmation.title"
-            :snap-animation-key="snapAnimationKey"
-            :anchor-top-px="readingPanelAnchorTopPx"
-            @mark-as-read="() => markSelectedBlockDisposition('READ')"
-            @mark-as-skimmed="() => markSelectedBlockDisposition('SKIMMED')"
-            @mark-as-skipped="() => markSelectedBlockDisposition('SKIPPED')"
-          />
-          <CurrentBlockNavigationBar
-            v-if="currentBlockForNavBar"
-            :current-block-title="currentBlockForNavBar.title"
-            @read-from-here="onReadFromHere"
-            @back-to-selected="onBackToSelected"
-          />
-        </div>
-      </div>
-    </main>
-  </BookReadingBookLayout>
+    <template #bar-end>
+      <PdfControl
+        class="ml-auto mr-2"
+        :current-page="pdfBarCurrentPage"
+        :pages-total="pdfBarPagesTotal"
+        @zoom-in="pdfViewerRef?.zoomIn()"
+        @zoom-out="pdfViewerRef?.zoomOut()"
+      />
+    </template>
+    <PdfBookViewer
+      ref="pdfViewerRef"
+      :pdf-bytes="bookPdfBytes"
+      :bottom-padding-px="READING_PANEL_OBSTRUCTION_PX"
+      @load-error="onPdfLoadError"
+      @viewport-anchor-page="onViewportAnchorPage"
+      @pages-ready="onPagesReady"
+      @create-block-from-content="onCreateBlockFromContent"
+    />
+    <template #pane-end>
+      <CurrentBlockNavigationBar
+        v-if="currentBlockForNavBar"
+        :current-block-title="currentBlockForNavBar.title"
+        @read-from-here="onReadFromHere"
+        @back-to-selected="onBackToSelected"
+      />
+    </template>
+  </BookReadingShell>
   <NewBookBlockTitleDialog
     :open="pendingBlockCreation !== null"
     :default-title="pendingBlockCreation?.structuralTitle"
@@ -110,15 +52,12 @@
 </template>
 
 <script setup lang="ts">
-import BookLayoutToggleButton from "@/components/book-reading/BookLayoutToggleButton.vue"
 import BookLayoutReorganizePreviewDialog from "@/components/book-reading/BookLayoutReorganizePreviewDialog.vue"
-import BookReadingBookLayout from "@/components/book-reading/BookReadingBookLayout.vue"
+import BookReadingShell from "@/components/book-reading/BookReadingShell.vue"
 import CurrentBlockNavigationBar from "@/components/book-reading/CurrentBlockNavigationBar.vue"
-import GlobalBar from "@/components/toolbars/GlobalBar.vue"
 import NewBookBlockTitleDialog from "@/components/book-reading/NewBookBlockTitleDialog.vue"
 import PdfBookViewer from "@/components/book-reading/PdfBookViewer.vue"
 import PdfControl from "@/components/book-reading/PdfControl.vue"
-import ReadingControlPanel from "@/components/book-reading/ReadingControlPanel.vue"
 import { pdfLocatorsFromBlock } from "@/lib/book-reading/asPdfLocator"
 import { wireItemsToNavigationTargets } from "@/lib/book-reading/pdfOutlineV1Anchor"
 import { currentBlockIdFromVisiblePage } from "@/lib/book-reading/currentBlockIdFromVisiblePage"
@@ -126,7 +65,6 @@ import type { ViewportYRange } from "@/lib/book-reading/pdfViewerViewportTopYDow
 import { READING_PANEL_OBSTRUCTION_PX } from "@/composables/useReadingPanelAnchor"
 import { useBookReadingSnapBack } from "@/composables/useBookReadingSnapBack"
 import type { BookReadingPdfViewerRef } from "@/composables/bookReaderViewerRef"
-import { useSidebarDrawer } from "@/composables/useSidebarDrawer"
 import { useBookLayoutAiReorganize } from "@/composables/useBookLayoutAiReorganize"
 import { useBookReadingSession } from "@/composables/useBookReadingSession"
 import {
@@ -153,7 +91,6 @@ const emit = defineEmits<{
   "update:book": [book: BookFull]
 }>()
 
-const bookReadingBookLayoutPanelId = "book-reading-book-layout-panel"
 const SNAP_HOLD_MS = 500
 const STRUCTURAL_TITLE_MAX_CHARS = 512
 
@@ -200,15 +137,26 @@ const lastReadingForPatch = computed(() => {
   }
 })
 
-const { opened: bookLayoutOpened, isMdOrLarger } = useSidebarDrawer()
-
 function onPdfLoadError(message: string) {
   pdfViewerLoadError.value = message
 }
 
 const pdfViewerRef = ref<BookReadingPdfViewerRef | null>(null)
-const pdfPaneRef = ref<HTMLElement | null>(null)
 
+const session = useBookReadingSession({
+  book: () => props.book,
+  initialSelectedBlockId: props.initialSelectedBlockId ?? null,
+  surface: {
+    showBlock,
+    readingPositionLocator,
+    viewer: pdfViewerRef,
+    commitCurrentBlock: commitCurrentBlockId,
+    blockAwaitingConfirmation: () => snapBlockAwaitingConfirmation.value,
+    canAnchorPanel: () => lastContentBottomVisible.value,
+    onMarkedRead: (id) => clearSnapbackAttemptsForBlock(id),
+    repairSelection: true,
+  },
+})
 const {
   notebookId,
   bookBlocks,
@@ -217,27 +165,9 @@ const {
   currentBlockId,
   currentBlockIdDebouncer,
   proposeReadingPosition,
-  currentBlockLiveText,
-  blockAwaitingConfirmation,
   applyBookBlockSelection,
-  markSelectedBlockDisposition,
-  readingPanelAnchorTopPx,
   updateReadingPanelAnchor,
-} = useBookReadingSession({
-  book: () => props.book,
-  initialSelectedBlockId: props.initialSelectedBlockId ?? null,
-  surface: {
-    showBlock,
-    readingPositionLocator,
-    viewer: pdfViewerRef,
-    mainPane: pdfPaneRef,
-    commitCurrentBlock: commitCurrentBlockId,
-    blockAwaitingConfirmation: () => snapBlockAwaitingConfirmation.value,
-    canAnchorPanel: () => lastContentBottomVisible.value,
-    onMarkedRead: (id) => clearSnapbackAttemptsForBlock(id),
-    repairSelection: true,
-  },
-})
+} = session
 
 async function showBlock(block: BookBlockFull) {
   const targets = wireItemsToNavigationTargets(pdfLocatorsFromBlock(block))
@@ -353,10 +283,6 @@ function onPagesReady() {
   pdfViewerRef.value
     ?.scrollToStoredReadingPosition(snap.pageIndexZeroBased, snap.normalizedY)
     .catch(() => undefined)
-}
-
-async function onBookBlockClick(block: BookBlockFull) {
-  await applyBookBlockSelection(block)
 }
 
 async function onConfirmAiReorganize() {
