@@ -216,3 +216,14 @@ About 5–10 min.
 - Plans 053 (story 5) and 058 (story 16) name `BookReadingContent.vue` and its
   wiring; after this story they need their file references realigned when they
   are next refined. This plan does not edit them.
+
+## Execution complete
+
+Product advice: no correction needed; the goal and structure outcome hold. When
+story 10 is refined, note that turning on the `reorganize` capability for EPUB
+wires the book-layout listeners and the AI preview dialog, but the "Now reading"
+bar sits only in the shell's PDF pane layout. Showing it in EPUB means giving
+EPUB the PDF pane layout, a DOM change this story excluded; that also lets the
+shell declare the Reading Control Panel once. Plans 053 and 058 still name
+`BookReadingContent.vue` and need their file references realigned at their
+next refinement.

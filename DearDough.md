@@ -861,8 +861,19 @@ The plan's decisive premises confirmed by grep that "no book block should be mar
   - Observed effect: one failed EPUB feature run and a new step; the plan's slice 2 behavior text was corrected during delivery. Small cost.
   - Inference: the premise checked that a step exists, not that it holds for the chosen fixture path. Related to DD-162 (a grep premise that did not reach the changed path).
 
+## DD-169 — After a CI observer's worker died, the Stop hook blocked every turn end, even after the observer was stopped
+
+A full disk killed the CI observer worker for a story branch. The Claude Code Stop hook (`ci-host-hook.mjs claude`) then answered every turn end with `decision: block` and "CI observer lost its worker for this coordinator". `ci-mailbox.mjs stop` on that directory returned a terminal `stopped`/`lost` result, and managed delivery attached a new observer for the next push, but the hook kept blocking. `ci-notify-hosts.md` says to report the loss once and continue.
+
+### Occurrences
+
+- Execution: SEED-059#story-19 / `.planning/slice-plans/060-designed-structure-for-reading-view/PLAN.md` / 821f5d617b; Timestamp: unknown (2026-09-29, between slice 3's publication a8cd47911c and slice 4's 16afb85941); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.47.
+  - Evidence: `ci-host-hook.mjs` bindings loop calls `mailboxWorkerLoss(directory)` for every bound directory on every invocation and never removes or acknowledges that binding; mailbox `/tmp/dough-ci-501/watch-62k1ov`.
+  - Observed effect: two blocked turn ends and one repeated notice on every tool call; the coordinator deleted this session's binding file for the stopped mailbox to proceed.
+  - Inference: the hook needs a way to retire a reported lost-worker binding (for example, drop it once `stop` records a terminal result). Qualified: triggered by an environment failure; one occurrence.
+
 ## Retention
 
-- Highest allocated local number: 168. Removed local codes are never reused.
+- Highest allocated local number: 169. Removed local codes are never reused.
 - Full pre-maintenance log and earlier recovery locators: `99fa1b9835e3dff2473837ba2a1f8b11967d5938:DearDough.md`.
 - Occurrence history is partial; active evidence stays here or in the Open Dough catalog and watch list.
