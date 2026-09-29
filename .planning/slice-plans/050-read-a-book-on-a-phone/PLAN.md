@@ -93,7 +93,7 @@ panel for the current block is fully visible and can be tapped. Remove the
 
 ### 2. The book layout toggle is reachable on phones and tablets
 Type: Behavior
-Status: planned
+Status: done
 Proof: `phone_reading.feature` toggle scenarios at 390×844 and 768×1024 with a
 non-forced click.
 
@@ -148,3 +148,16 @@ breakpoint module if nothing else needs it. The E2E page object's
   file-size limit. Slice 3 removes the component's drawer copy.
 - `bookReadingShared.ts` has `expectUsesScreenWidth` and
   `expectFullyOnScreen`; slice 3 can reuse them for the below-the-menu check.
+- Slice 2 (done): `bookReading` joined the "Note" item's active routes in
+  `useNavigationItems`. Accepted proof: `phone_reading.feature` 5/5 (both new
+  toggle scenarios failed with "being covered by another element" before the
+  fix), `book_browsing.feature` 5/5, `MainMenu.spec.ts` `bookReading` row
+  (red before the fix), `tests/toolbars/` 80/80, `vue-tsc` clean.
+- At 768 px the layout starts open and uses the desktop (in-flow) layout, since
+  the breakpoint counts 768 as desktop. The tablet scenario therefore closes and
+  reopens it. Slice 3 must check that `useNotebookSidebarDrawer` uses the same
+  `>= 768` rule, or change it on purpose.
+- Page object: `clickBookLayoutToggle` (a real, non-forced click),
+  `expectBookLayoutOpen` and `expectBookLayoutClosed`. The closed phone aside
+  is only moved off-screen, so Cypress's `be.visible` may still pass; "closed"
+  checks rely on `aria-expanded` or position.

@@ -26,3 +26,20 @@ Feature: Reading a book on a phone
     Then the Reading Control Panel should be fully on the screen
     When I mark the book block "Code Refactoring" as read in the Reading Control Panel
     Then I should see that book block "Code Refactoring" is marked as read in the book layout
+
+  Scenario: Open the book layout on a phone
+    Given I have a notebook "Refactoring read"
+    And I attach a fake blank pdf book with book layout of "refactoring" to the notebook "Refactoring read"
+    And I open the book attached to notebook "Refactoring read"
+    When I tap the Book layout toggle
+    Then the book layout should be open
+
+  Scenario: Reopen the book layout on a tablet
+    Given I am on a window 768 * 1024
+    And I have a notebook "Refactoring read"
+    And I attach a fake blank pdf book with book layout of "refactoring" to the notebook "Refactoring read"
+    And I open the book attached to notebook "Refactoring read"
+    When I tap the Book layout toggle
+    Then the book layout should be closed
+    When I tap the Book layout toggle
+    Then the book layout should be open

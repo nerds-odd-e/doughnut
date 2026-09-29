@@ -4,7 +4,11 @@ import {
   bookBlockRowByTitle,
   bookBlockRows,
   ensureOnBookReadingPage,
+  expectFullyOnScreen,
 } from './bookReadingShared'
+
+const bookLayoutToggle = () => cy.findByRole('button', { name: 'Book layout' })
+const bookLayoutAside = '[data-testid="book-reading-book-layout-aside"]'
 
 export const bookReadingLayoutMethods = () => ({
   expectBookLayoutRows(expected: BookLayoutRow[]) {
@@ -135,6 +139,22 @@ export const bookReadingLayoutMethods = () => ({
       .should('have.length', 1)
     return this
   },
+  /** A real (not forced) click, so it fails when something covers the toggle. */
+  clickBookLayoutToggle() {
+    ensureOnBookReadingPage()
+    bookLayoutToggle().click()
+    return this
+  },
+  expectBookLayoutOpen() {
+    bookLayoutToggle().should('have.attr', 'aria-expanded', 'true')
+    cy.get(bookLayoutAside).should('be.visible')
+    expectFullyOnScreen(bookLayoutAside)
+    return this
+  },
+  expectBookLayoutClosed() {
+    bookLayoutToggle().should('have.attr', 'aria-expanded', 'false')
+    return this
+  },
   setBookReadingViewport(width: number, height: number) {
     cy.viewport(width, height)
     return this
@@ -145,14 +165,12 @@ export const bookReadingLayoutMethods = () => ({
    */
   expectCurrentBlockVisibleInBookLayoutAside(title: string) {
     this.expectBookBlockIsCurrentBlockByTitle(title)
-    cy.get('[data-testid="book-reading-book-layout-aside"]').should(
-      ($aside) => {
-        expect(
-          $aside[0]!.scrollTop,
-          'book layout aside should have scrolled to reveal the current block'
-        ).to.be.greaterThan(0)
-      }
-    )
+    cy.get(bookLayoutAside).should(($aside) => {
+      expect(
+        $aside[0]!.scrollTop,
+        'book layout aside should have scrolled to reveal the current block'
+      ).to.be.greaterThan(0)
+    })
     bookBlockRowByTitle(title).should('be.visible')
     return this
   },

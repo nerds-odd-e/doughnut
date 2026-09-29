@@ -78,6 +78,11 @@ describe("MainMenu navigation", () => {
     },
     {
       linkLabel: "Note",
+      route: { name: "bookReading", params: { notebookId: "1" } },
+      context: "book reading page",
+    },
+    {
+      linkLabel: "Note",
       route: { name: "noteShow", params: { noteId: "1" } },
       context: "note show",
     },

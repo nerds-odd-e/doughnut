@@ -38,9 +38,13 @@ export function useNavigationItems() {
         label: "Note",
         icon: BookText,
         isActive:
-          ["notebooks", "notebookGroup", "notebookPage", "folderPage"].includes(
-            route.name as string
-          ) || isNoteRouteFamily(route),
+          [
+            "notebooks",
+            "notebookGroup",
+            "notebookPage",
+            "folderPage",
+            "bookReading",
+          ].includes(route.name as string) || isNoteRouteFamily(route),
       },
       {
         name: "assimilate",
