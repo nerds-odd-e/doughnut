@@ -151,8 +151,8 @@ trusted.
   block. It works the same in PDF and EPUB, because both share the layout; this
   also clears the spurious "Contents" record in EPUBs attached before the
   first-open fix, and auto-marked header duplicates in old layouts.
-- **Moved to story 15** (owner decision, 2026-09-29): marking going on after
-  choosing a block with no text of its own (UAT defect 15). Story 15 changes
+- **Moved to story 16** (owner decision, 2026-09-29; via story 15): marking going on after
+  choosing a block with no text of its own (UAT defect 15). Story 16 changes
   the current-block rule and what counts as "no text of its own", which that
   fix depends on.
 - **Must keep working:** Read/Skim/Skip on the panel, the panel moving on to
@@ -490,6 +490,47 @@ Panel at the end of that paragraph, as they do for blocks with more text.
 
 **Effort hypothesis:** S, low confidence.
 **Depends on:** none; coordinate with story 16 on snap-back.
+
+<a id="story-19"></a>
+
+### Give the PDF reading view a designed structure, not just a smaller file
+
+**Identity:** SEED-059#story-19
+```json dough-story-state
+{"schemaVersion":1,"refinement":"not-refined","approach":"unselected"}
+```
+
+**Goal:** Developers of later book-reading stories (7, 9, 10, 16, 17, 18)
+can change PDF reading behavior in one cohesive place, with each reading
+concept owned once. Today `BookReadingContent.vue` (455 lines, over the
+250-line limit) wires the PDF viewer, viewport and current block, selection
+and snap-back, the Reading Control Panel anchor, reading records, block
+creation from content with its title dialog, AI reorganize, layout mutations,
+and last-read position. Every story touching PDF reading adds lines to it.
+
+**Scope** (owner request, 2026-09-29; awaiting story refinement)
+
+- **Design first, not a mechanical split.** Owner: it needs architectural
+  consideration, not simply splitting it. Before slicing, decide which reading
+  concepts exist, who owns each, and how the PDF and EPUB views share them.
+  `BookReadingEpubView.vue` (218 lines) wires the same layout, records, and
+  selection separately, so the design question is the reading view as a
+  whole, not one file.
+- **Behavior unchanged.** Existing book-reading E2E features and page specs
+  stay green; no user-visible change.
+- **Evidence:** DD-160 (the file-size check was waived for this file in
+  SEED-059#story-2), and SEED-059#story-6 added one binding line in each of
+  two slices while leaving it over the limit.
+
+**Key examples**
+
+- A story changing how the current block moves in PDF (story 16) edits the
+  current-block owner, not the view's wiring.
+- A reading concept shared by PDF and EPUB (records, selection, the mark
+  control) is wired once, not in each view.
+
+**Effort hypothesis:** M, low confidence; the design pass decides.
+**Depends on:** none. Placed first so later book-reading stories build on it.
 
 ## Ordering and Scope Reduction
 
