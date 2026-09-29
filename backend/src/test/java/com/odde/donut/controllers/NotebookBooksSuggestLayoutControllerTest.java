@@ -1,10 +1,12 @@
 package com.odde.donut.controllers;
 
+import static java.util.stream.Collectors.toMap;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.verify;
 
+import com.odde.donut.controllers.dto.AttachBookLayoutNodeRequest;
 import com.odde.donut.controllers.dto.BookLayoutReorganizationSuggestion;
 import com.odde.donut.controllers.dto.BookLayoutReorganizationSuggestion.BlockDepthSuggestion;
 import com.odde.donut.entities.Book;
@@ -18,6 +20,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.IntStream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -59,12 +62,7 @@ class NotebookBooksSuggestLayoutControllerTest
       }
       assertThat(byTitle, equalTo(nestBAndCDepths()));
 
-      @SuppressWarnings({"unchecked", "rawtypes"})
-      ArgumentCaptor<StructuredResponseCreateParams<BookLayoutReorganizationSuggestion>>
-          paramsCaptor = ArgumentCaptor.forClass((Class) StructuredResponseCreateParams.class);
-      verify(openAiStructuredResponseMock.responseService()).create(paramsCaptor.capture());
-      StructuredResponseCreateParams<BookLayoutReorganizationSuggestion> params =
-          paramsCaptor.getValue();
+      StructuredResponseCreateParams<BookLayoutReorganizationSuggestion> params = sentRequest();
       assertThat(
           params.rawParams().instructions().orElse(""),
           containsString("You reorganize the outline nesting"));
@@ -72,6 +70,34 @@ class NotebookBooksSuggestLayoutControllerTest
           params.rawParams().input().flatMap(i -> i.text()).orElse(""), containsString("\"id\""));
       assertThat(
           params.rawParams().text().flatMap(ResponseTextConfig::format).isPresent(), is(true));
+    }
+
+    @Test
+    void allowsAnAnswerAsLongAsAFullSizeBook() throws Exception {
+      int blockCount = 361;
+      List<String> titles = IntStream.range(0, blockCount).mapToObj(i -> "Section " + i).toList();
+      Notebook fullSize = myNotebook();
+      controller.attachBook(
+          fullSize,
+          attachRequest(
+              titles.stream().map(t -> node(t)).toArray(AttachBookLayoutNodeRequest[]::new)),
+          pdfFile(STUB_PDF_BYTES));
+      openAiStructuredResponseMock.stubStructuredResponse(
+          suggestionWithDepths(fullSize, titles.stream().collect(toMap(t -> t, t -> 0))));
+
+      controller.suggestBookLayoutReorganization(fullSize);
+
+      assertThat(
+          sentRequest().rawParams().maxOutputTokens().orElseThrow(),
+          greaterThanOrEqualTo(12L * blockCount));
+    }
+
+    private StructuredResponseCreateParams<BookLayoutReorganizationSuggestion> sentRequest() {
+      @SuppressWarnings({"unchecked", "rawtypes"})
+      ArgumentCaptor<StructuredResponseCreateParams<BookLayoutReorganizationSuggestion>>
+          paramsCaptor = ArgumentCaptor.forClass((Class) StructuredResponseCreateParams.class);
+      verify(openAiStructuredResponseMock.responseService()).create(paramsCaptor.capture());
+      return paramsCaptor.getValue();
     }
 
     @Test
