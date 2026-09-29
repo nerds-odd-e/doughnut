@@ -5,8 +5,9 @@ Source: [story 20](../../seeds/SEED-059-book-reading-uat-fixes.md#story-20).
 
 ## Provenance
 
-- Corrects [SEED-059#story-17](../../seeds/SEED-059-book-reading-uat-fixes.md#story-17)
-  (plan `.planning/slice-plans/059-reopen-epub-at-exact-paragraph/PLAN.md`).
+- Corrects SEED-059#story-17, closed. Its story and plan are recoverable at
+  `e505a489f9:.planning/seeds/SEED-059-book-reading-uat-fixes.md` and
+  `e505a489f9:.planning/slice-plans/059-reopen-epub-at-exact-paragraph/PLAN.md`.
 - Reviewed commits on `story/seed-059-story-17`: 8d3d821f28 (probe record),
   946dccd30f (API keeps `cfi`), b47d6eb4c8 (viewer, debouncer, E2E).
 - Story 17's boundary assumption: "an exact place that no longer resolves

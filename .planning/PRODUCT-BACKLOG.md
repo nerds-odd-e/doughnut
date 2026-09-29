@@ -8,7 +8,6 @@ Bug fixing and general maintenance.
 ## Taken
 
 - [Give the PDF reading view a designed structure, not just a smaller file](seeds/SEED-059-book-reading-uat-fixes.md#story-19) — SEED-059#story-19 ([plan](slice-plans/060-designed-structure-for-reading-view/PLAN.md))
-- [Reopen an EPUB at the exact paragraph](seeds/SEED-059-book-reading-uat-fixes.md#story-17) — SEED-059#story-17 ([plan](slice-plans/059-reopen-epub-at-exact-paragraph/PLAN.md))
 
 ## Backlog list
 
