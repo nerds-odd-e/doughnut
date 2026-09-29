@@ -78,7 +78,17 @@ stays a replacement, because removal must drop queued trackers.
 ### 1. Returning to recall adds newly due questions without resetting the queue
 
 Type: Behavior
-Status: planned
+Status: done
+Accepted proof: `CURSOR_DEV=true nix develop -c pnpm -C frontend exec vitest run tests/pages/RecallPage tests/toolbars/MainMenu`
+(64 pass) and `vue-tsc --noEmit`; observed by "keeps the queue and position on
+return and adds newly due trackers at the end" and "loads the due queue on
+first activation when there is no queue yet". The operation is
+`useRecallCatchUp().catchUpDueRecalls()` in
+`frontend/src/composables/useRecallCatchUp.ts` (with the shared
+`fetchDueRecalls`), a sibling of `useRecallData` so page specs that mock
+`useRecallData` still run it. For slice 2: the test mock's
+`setCurrentRecallWindowEndAt` in `recallPageTestSupport.ts` is a bare `vi.fn()`
+that does not write its ref.
 Proof: `frontend/tests/pages/RecallPage.dueQueue.spec.ts` (KeepAlive
 activation): with a queue of trackers 1–2 and position on tracker 2, returning
 after the window changed with a fetch of trackers 2–3 leaves the queue as 1, 2,
