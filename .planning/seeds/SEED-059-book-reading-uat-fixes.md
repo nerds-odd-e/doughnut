@@ -78,7 +78,7 @@ Effort bands: S = 30–60 minutes, M = 1–2 hours, L = 2–4 hours, including d
 
 **Identity:** SEED-059#story-5
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/053-pdf-smooth-scroll-after-choosing-block/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"539e46a16a7b820bf4bc9777266cd200f6c5ecf800bb1e6166388cfa44de8ed7","plan":"591165dbf17b9e072f0fd9ecb222f4d93d6b6aa8cedd90ee592aeb35dab88f4d"}}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/053-pdf-smooth-scroll-after-choosing-block/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"28cca86835fd2a2f26c88e96e49caaca2127129ebc19e752ff952a9e926b2861","plan":"591165dbf17b9e072f0fd9ecb222f4d93d6b6aa8cedd90ee592aeb35dab88f4d"}}
 ```
 
 **Goal:** A PDF reader's view moves only where they scroll it, from the first
