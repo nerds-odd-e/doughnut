@@ -4,6 +4,8 @@ import { completeIsolatedConfig } from './sut-isolated-fixtures.mjs'
 import { isolatedBrowserOrigin } from './sut-runtime-target.mjs'
 
 export const isolatedCypressSpec = /only supports|spec selection/i
+export const UNADMITTED_ISOLATED_CYPRESS_SPEC =
+  'e2e_test/features/unadmitted/example.feature'
 export const isolatedOrigin = isolatedBrowserOrigin(completeIsolatedConfig.e2e)
 
 export function cypressArgv(spec = SUPPORTED_ISOLATED_CYPRESS_SPEC) {

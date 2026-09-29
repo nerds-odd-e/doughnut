@@ -8,6 +8,7 @@ import {
   makeCypressChild,
   makeOpenCypressChild,
 } from './e2e-runner-cypress-fixtures.mjs'
+import { UNADMITTED_ISOLATED_CYPRESS_SPEC } from './isolated-cypress-test-helpers.mjs'
 
 test('unsupported spec selection refuses before the stack starts', async (t) => {
   const checkout = makePrimaryCheckout(t)
@@ -15,7 +16,7 @@ test('unsupported spec selection refuses before the stack starts', async (t) => 
   let startCalled = false
 
   const code = await runE2eBatch({
-    argv: ['--spec', 'e2e_test/features/book_reading/epub_book.feature'],
+    argv: ['--spec', UNADMITTED_ISOLATED_CYPRESS_SPEC],
     checkoutRoot: checkout.root,
     startLifetime: async () => {
       startCalled = true
@@ -51,7 +52,7 @@ test('interactive session: unsupported preselected spec refuses before the stack
   let startCalled = false
 
   const code = await runE2eInteractive({
-    argv: ['--spec', 'e2e_test/features/book_reading/epub_book.feature'],
+    argv: ['--spec', UNADMITTED_ISOLATED_CYPRESS_SPEC],
     checkoutRoot: checkout.root,
     startLifetime: async () => {
       startCalled = true

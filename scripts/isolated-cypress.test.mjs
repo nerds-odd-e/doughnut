@@ -17,6 +17,7 @@ import {
   isolatedCypressSpec,
   isolatedOrigin,
   supportedConfig,
+  UNADMITTED_ISOLATED_CYPRESS_SPEC,
 } from './isolated-cypress-test-helpers.mjs'
 import {
   completeIsolatedConfig,
@@ -117,18 +118,14 @@ test('selections containing unsupported isolated Cypress specs refuse before res
   const checkout = makePrimaryCheckout(t, {
     config: JSON.stringify(completeIsolatedConfig),
   })
-  // A wholly-ignored file is permanently outside admission; a resource-dependent
-  // file not yet admitted by its owning slice is also unsupported here.
-  const unsupported = 'e2e_test/features/book_reading/epub_book.feature'
-
   for (const argv of [
-    cypressArgv(unsupported),
+    cypressArgv(UNADMITTED_ISOLATED_CYPRESS_SPEC),
     [
       'node',
       'cypress',
       'run',
       '--spec',
-      `${SUPPORTED_ISOLATED_CYPRESS_SPEC},${unsupported}`,
+      `${SUPPORTED_ISOLATED_CYPRESS_SPEC},${UNADMITTED_ISOLATED_CYPRESS_SPEC}`,
     ],
     ['node', 'cypress', 'run'],
   ]) {
@@ -171,9 +168,7 @@ test('CLI glob spec selection is refused in before:run before reset', async (t) 
       listeners['before:run']({
         specs: [
           { relative: SUPPORTED_ISOLATED_CYPRESS_SPEC },
-          {
-            relative: 'e2e_test/features/book_reading/epub_book.feature',
-          },
+          { relative: UNADMITTED_ISOLATED_CYPRESS_SPEC },
         ],
       }),
     isolatedCypressSpec
@@ -229,7 +224,6 @@ test('application-only active specs are admitted; resource-dependent and ignored
   // admitted by slices 1–3 or 6. Active OpenAI-mock features are admitted by
   // slice 3 and Wikidata-mock features by slice 6 through the same registry.
   for (const excluded of [
-    'e2e_test/features/book_reading/epub_book.feature',
     'e2e_test/features/cli/cli_access_token.feature',
     'e2e_test/features/cli/cli_gmail.feature',
     'e2e_test/features/cli/cli_interactive_mode.feature',
