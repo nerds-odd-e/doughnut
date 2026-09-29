@@ -384,28 +384,51 @@ still means "more than one locator" and should use it too.
 
 **Identity:** SEED-059#story-17
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"not-refined","approach":"planned","plan":"../slice-plans/059-reopen-epub-at-exact-paragraph/PLAN.md"}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/059-reopen-epub-at-exact-paragraph/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"798dc7a92f6a9fe43f74e2812a5911d0bcb181d0e6dd602da24557374dfd578f","plan":"40791cf42bd5eafd7afd83659fb37d0f263e85e93a223d8a7e0542e088b17b89"}}
 ```
 
 **Goal:** A reader who stops part-way through a long EPUB block reopens the
-book at the same paragraph, as PDF readers already do.
+book at the same paragraph, on any window width, as PDF readers already reopen
+at their page and offset. Long chapters (Origin chapter IV is over 13,000 px)
+stop sending the reader back to the chapter heading to search for their place.
 
-**Scope** (resplit from story 15; awaiting story refinement)
+**Scope**
 
-- **Exact EPUB resume.** Today EPUB saves the current block's start, so a
-  reader part-way through a long block (Origin chapter IV is over 13,000 px)
-  reopens at its heading; PDF saves page and offset. Save epub.js's CFI as an
-  optional extra field of the EPUB position and resume from it; the block start
-  still drives choosing and the current block. A pixel offset is not enough,
-  because text reflows at other widths.
+- **The last-read EPUB position names the paragraph at the top of the view.**
+  Today it holds only the current block's start, and it is saved only when the
+  current block changes. It gains an optional exact reading place (epub.js's
+  CFI), saved as the reader scrolls within a block too, not only when the
+  current block changes. A pixel offset is not enough, because text reflows at
+  other widths.
+- **Reopening lands on that paragraph.** The paragraph that was at the top of
+  the view is at the top again; paragraph precision is the promise, not the
+  same line or pixel. The current block on reopen follows the existing
+  current-block rule from what is then in view.
+- **The block start still drives choosing and the current block.** Choosing a
+  block lands at its start as today; the exact place only affects reopening.
+- **Boundary assumptions:**
+  - a position saved before this story, without an exact place, reopens at its
+    block start as today;
+  - an exact place that no longer resolves reopens at its block start, through
+    the existing fallback, with no new message.
+- **Deferred:** PDF resume is unchanged; no "resume here" prompt, history of
+  positions, or cross-device merging beyond the one last-read position.
+- **Precision risk:** whether epub.js's CFI is paragraph-precise in Donut's
+  continuous scrolled mode is unverified. If it is not, stop and bring the
+  options back to the owner before building on it.
 
 **Key examples**
 
-- Read to the middle of Origin chapter IV, leave, and reopen at a different
-  window width → the same paragraph is at the top.
+- Read to the middle of Origin chapter IV at 1440 px wide, leave, and reopen at
+  390 px wide → the paragraph that was at the top is at the top, and chapter IV
+  is the current block.
+- Choose chapter IV, leave without scrolling, and reopen → chapter IV's heading
+  is at the top, as today.
+- A book whose last-read position was saved before this story → reopens at the
+  saved block's start, as today.
 
 **Effort hypothesis:** M, low confidence (CFI precision in continuous scrolled
-mode is unverified). Provisional slices:
+mode is unverified; probed first). Slices:
 [plan 059](../slice-plans/059-reopen-epub-at-exact-paragraph/PLAN.md).
 **Depends on:** none.
 
