@@ -59,8 +59,9 @@ Focused command:
 ### 1. A blank-looking body opens editable without the warning
 
 Type: Behavior
-Status: planned
+Status: done
 Proof: the new and existing cases in `RichMarkdownEditor.bodyItCannotKeep.spec.ts`, plus the focused command above.
+Accepted proof (2026-09-29): the focused command passed 36/36; `CURSOR_DEV=true nix develop -c pnpm -C frontend exec vitest run tests/components/form` passed 241/241; `pnpm -C frontend exec vue-tsc --noEmit` exited 0. The new `it.each` "opens a blank-looking body editable without changing it" asserts no warning, `quillReadonly()` false, and no `update:modelValue`; "saves only the typed text into a blank-looking body" asserts `Hello`. The four new tests failed before the rule was added.
 
 Behavior: a note body of `&nbsp;`, `<p></p>`, or `<br/>` and a newline → open it
 in the rich editor → no "cannot keep" warning, the editor is editable, and no

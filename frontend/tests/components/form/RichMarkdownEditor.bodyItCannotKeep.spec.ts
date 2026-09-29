@@ -7,8 +7,9 @@ describe("RichMarkdownEditor with a body it cannot keep", () => {
     h.cleanup()
   })
 
-  const warningText = () =>
-    h.getWrapper().find('[data-testid="rich-note-unavailable-warning"]').text()
+  const warning = () =>
+    h.getWrapper().find('[data-testid="rich-note-unavailable-warning"]')
+  const warningText = () => warning().text()
 
   it.each([
     "<details><summary>S</summary>Inner</details>",
@@ -22,6 +23,24 @@ describe("RichMarkdownEditor with a body it cannot keep", () => {
     expect(h.quillReadonly()).toBe(true)
     expect(warningText()).toContain("rich editor cannot keep")
     expect(warningText()).toContain("Switch to Markdown mode")
+  })
+
+  it.each(["&nbsp;", "<p></p>", "<br/>\n"])(
+    "opens a blank-looking body editable without changing it: %j",
+    async (body) => {
+      await h.mountEditor(body)
+
+      expect(warning().exists()).toBe(false)
+      expect(h.quillReadonly()).toBe(false)
+      expect(h.getWrapper().emitted("update:modelValue")).toBeUndefined()
+    }
+  )
+
+  it("saves only the typed text into a blank-looking body", async () => {
+    await h.mountEditor("&nbsp;")
+
+    h.quillInstance().insertText(0, "Hello", "user")
+    expect(h.lastEmittedMarkdown()).toBe("Hello")
   })
 
   it.each([

@@ -6,6 +6,17 @@ const rendered = (markdown: string) =>
     .replace(/>\s*\n\s*</g, "><")
     .replace(/(<pre[\s\S]*?<\/pre>)|\s+/g, (_, pre) => pre ?? " ")
 
-/** True when the Markdown the editor would save from `heldHtml` renders the same as `body`. */
-export const richEditorKeepsBody = (body: string, heldHtml: string) =>
-  rendered(body) === rendered(markdownizer.htmlToMarkdown(heldHtml))
+const blankMarkup = /^(\s|&nbsp;|<\/?p>|<br\s*\/?>)*$/i
+
+/**
+ * True when `body` renders only blank markup (empty paragraphs, line breaks,
+ * non-breaking spaces, whitespace), or when the Markdown the editor would save
+ * from `heldHtml` renders the same as `body`.
+ */
+export const richEditorKeepsBody = (body: string, heldHtml: string) => {
+  const renderedBody = rendered(body)
+  return (
+    blankMarkup.test(renderedBody) ||
+    renderedBody === rendered(markdownizer.htmlToMarkdown(heldHtml))
+  )
+}
