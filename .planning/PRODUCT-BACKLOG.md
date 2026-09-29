@@ -9,7 +9,6 @@ Bug fixing and general maintenance.
 
 - [Refresh recall automatically at each local half-day boundary](seeds/SEED-056-recall-half-day-refresh.md#story-1) — SEED-056#story-1 ([plan](slice-plans/014-recall-half-day-refresh/PLAN.md))
 - [Reduce relationship notes whose body is a simple wiki-link sentence](seeds/SEED-057-reduce-relationship-sentence.md#story-1) — SEED-057#story-1 ([plan](slice-plans/048-reduce-legacy-relationship-sentence/PLAN.md))
-- [Hide the empty-content rich Markdown mismatch warning](seeds/SEED-058-silent-empty-markdown-mismatch.md#story-1) — SEED-058#story-1 ([plan](slice-plans/013-blank-looking-body-stays-editable/PLAN.md))
 
 ## Backlog list
 
