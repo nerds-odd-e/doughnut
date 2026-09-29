@@ -77,7 +77,7 @@ string, a Python docstring and shell comments change.
 ### 1. Every MinerU install hint names the working pinned install
 
 Type: Behavior
-Status: planned
+Status: done
 Proof: focused CLI test
 `CURSOR_DEV=true nix develop -c pnpm -C cli exec vitest run mineruOutlineSubprocess`
 passes with the updated assertion; `grep -rn "mineru\[pipeline\]'"` (the
@@ -95,3 +95,10 @@ setup comment and import error name the same command.
   two places in `regenerate_mineru_output_for_refactoring.sh` (its setup
   comment's `python3 -m venv` becomes a 3.10–3.13 interpreter, for example
   `python3.12 -m venv`).
+
+Accepted proof (2026-09-29): the focused CLI test failed on the new pinned-install
+assertion before `MINERU_IMPORT_HINT` changed and passed after (2 files, 18 tests);
+the unpinned-install grep finds nothing. All three hints read
+`pip install 'mineru[pipeline]==3.4.5' six` with Python 3.10–3.13. The regeneration
+script's "When to re-run" comment still mentions `mineru[pipeline]` as a version
+bump trigger, not an install hint, and stays.

@@ -141,7 +141,10 @@ export function describeMineruOutlineSubprocessErrors(): void {
         expect(result.error).toContain(
           'MinerU is missing or could not be imported'
         )
-        expect(result.error).toContain('mineru[pipeline]')
+        expect(result.error).toContain(
+          "pip install 'mineru[pipeline]==3.4.5' six"
+        )
+        expect(result.error).toContain('Python 3.10–3.13')
         expect(result.error.length).toBeLessThan(4000)
       }
     })

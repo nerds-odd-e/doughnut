@@ -10,7 +10,7 @@ const MINERU_STDERR_EXCERPT_CHARS = 12_000
 const MINERU_IMPORT_DETAIL_MAX_CHARS = 800
 
 const MINERU_IMPORT_HINT =
-  "MinerU is missing or could not be imported. Install MinerU for PDF outlines (e.g. pip install 'mineru[pipeline]' in the Python environment used by the CLI), or set DONUT_MINERU_OUTLINE_SCRIPT to a different outline script."
+  "MinerU is missing or could not be imported. Install MinerU for PDF outlines with Python 3.10–3.13: pip install 'mineru[pipeline]==3.4.5' six (in the Python environment used by the CLI), or set DONUT_MINERU_OUTLINE_SCRIPT to a different outline script."
 
 export type SpawnOutcome = {
   code: number | null
