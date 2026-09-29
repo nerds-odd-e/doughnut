@@ -38,75 +38,87 @@ implementation now.
 
 **Identity:** SEED-055#story-1
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"not-refined","approach":"unselected"}
+{"schemaVersion":1,"refinement":"refined","approach":"unselected"}
 ```
 
 **Goal**
 
-Donut maintainers have a public API with confirmed dead endpoints removed and
-an evidence-backed set of improvement proposals for endpoints that provide
-duplicated services. Existing frontend and external feature journeys continue
-to work.
+Donut maintainers and their coding agents work from a public API that
+advertises only endpoints serving real features. The generated API summary is
+the agents' default endpoint lookup, so every dead or duplicated endpoint is a
+wrong option an agent can pick and build on. This story removes the confirmed
+dead endpoints with everything only they kept alive, and gives the owner one
+evidence-backed improvement proposal for the overlapping file-serving endpoints
+left behind by the attachment, Book, and LFS migration. Supported frontend and
+external feature journeys keep working.
 
 **Scope**
 
-- Inventory the current backend public API from the generated TypeScript API
-  client or `open_api_docs.yaml`, checking against backend routes where needed
-  to establish coverage and freshness.
-- Trace actual feature use across the frontend and external consumers,
-  including CLI and MCP features, direct HTTP calls, and supported external
-  integrations. Generated declarations, backend implementation references,
-  test calls, test fixtures, and mocks do not count as feature use.
-- An API is unused when no frontend or external feature uses it. Tests alone
-  never justify retaining it. Record the evidence and search coverage for each
-  removal candidate; unresolved external usage is an uncertainty to resolve,
-  rather than proof that an endpoint is dead.
-- Remove confirmed unused endpoints and supporting code that becomes unused
-  solely through their removal. Update affected documentation and tests, and
-  regenerate the API artifacts through the repository's generation workflow.
-- Compare endpoints that deliver the same or overlapping service. Explain
-  consumer needs and meaningful differences in behavior, authorization,
-  inputs, outputs, and side effects before recommending consolidation,
-  simplification, or retention of a justified distinction.
-- Deliver concrete proposals for redundancies, identifying affected APIs,
-  intended benefit, consumer impact, and any migration or compatibility work.
-  Implementing those proposals is deferred to a later product decision.
-- Preserve supported feature behavior. Broad service redesign, unrelated dead
-  code cleanup, and new API capabilities are outside this story.
+- An endpoint is used when a frontend, CLI, MCP, or supported external feature
+  calls it, through the generated client or direct HTTP (for example Git and
+  Git LFS transfer, page image and file URLs, event streams, install).
+  Endpoints used by E2E tests, such as the testability controllers, are exempt
+  from removal as test infrastructure. Other test calls, fixtures, and mocks do
+  not count as use.
+- Remove the endpoints with no such use. A usage review on 2026-09-29 found
+  these four; the implementer confirms each before removal:
+  - `DELETE /api/user/token-info` (revoke token)
+  - `GET /api/user/recall-ez-diffusion`
+  - `GET /api/user/daily-probe-convergent-validity`
+  - `GET /api/memory-trackers/{memoryTracker}/recall-logs`
+- Removal is transitive: also remove every implementation piece whose only
+  dependent was a removed endpoint (services, queries, DTOs, entities or
+  columns, helpers, tests, fixtures), repeating until nothing orphaned
+  remains. Then clean up across the whole product scope (backend, frontend,
+  CLI, MCP, documentation, agent guidance) so the result reads as though the
+  removed things never existed. Regenerate the API artifacts through the
+  repository's generation workflow.
+- Removal leaves no trace: no negative tests, absence checks, or historical
+  notes replace what was removed.
+- Compare the file-serving endpoints — `GET /api/notebooks/{notebook}/book/file`,
+  `GET /api/books/{book}/file`,
+  `GET /api/notebooks/{notebook}/attachments/{attachment}/image`,
+  `GET /api/notebooks/{notebook}/attachments/{attachment}/content`, and
+  `GET /api/notes/{note}/image` — by consumer, authorization, inputs, outputs,
+  and side effects, then deliver one concrete proposal naming affected
+  endpoints, intended benefit, consumer impact, and migration work.
+  Implementing it is a later product decision.
+- Deferred: redundancy review of the rest of the API, implementing any
+  consolidation, the code-generation workaround endpoint
+  (`AiController.dummyEntryToGenerateDataTypesThatAreRequiredInEventStream`),
+  unused DTO fields or parameters, dead code unrelated to removed endpoints,
+  and new API capabilities.
 
 **Key examples**
 
-- An endpoint appears in the generated client and has backend tests, but no
-  frontend or external feature uses it → confirm the usage evidence, remove
-  it and its orphaned support, and regenerate the public API artifacts.
-- An endpoint has no frontend caller but supports a CLI command or external
-  integration → retain it as used, with that feature recorded as evidence.
-- Two APIs provide substantially the same service → compare their consumers
-  and behavior, then propose a specific improvement with its migration impact.
-- No repository caller is found and external use remains unknown → record the
-  unresolved evidence and resolve it before classifying the API for removal.
+- The recall logs endpoint has backend tests but no frontend or external
+  caller → remove it, the implementation only it used, and its tests;
+  regenerate the API artifacts; nothing asserts it is gone.
+- A testability endpoint is called only by E2E setup → keep it.
+- `POST /api/notebooks/{notebook}/attach-book` has no generated-client caller
+  but the CLI calls it over HTTP → keep it as used by the CLI.
+- A service method was used only by a removed diagnostic endpoint → remove it
+  too, and any query or DTO only that method used.
+- If both Book file endpoints return the same source bytes, addressed by
+  notebook or by Book → the proposal explains who calls each and what differs, then
+  recommends consolidating or keeping the distinction, with its migration impact.
 
 **Output and evaluation**
 
-The owner can review API coverage, usage classifications and their evidence,
-the APIs removed, any unresolved usage questions, and redundancy proposals.
-The resulting public API artifacts no longer advertise confirmed dead
-endpoints, and relevant automated checks demonstrate that affected supported
-feature journeys still work. Finding no dead or redundant APIs is a valid
-result when supported by the completed review, rather than assumed in advance.
+The owner can review the confirmed usage evidence for each removed endpoint,
+the removal diff, and the file-serving proposal. The public API artifacts no
+longer advertise the removed endpoints, and the relevant automated checks
+show that supported feature journeys still work.
 
-- **For / why:** Maintainers reduce unnecessary public contracts and can judge
-  how to simplify duplicated services without disrupting real consumers.
-- **Value / learning:** Establish which exposed APIs actually serve features,
-  and which apparent redundancies represent distinct product needs.
-- **Effort hypothesis:** L, low confidence until the API inventory and consumer
-  coverage are known. Reassess scope and story sizing during refinement if the
-  work cannot fit a few hours; this estimate is not an exhaustive-audit budget.
-- **Depends on:** Access to the current API definition and evidence of supported
-  frontend and external consumers; no dependency on another queued story.
-- **Safe stopping point:** Confirmed dead APIs are removed with supported
-  behavior preserved; redundancy proposals remain useful independently of any
-  later consolidation. Unresolved usage questions remain explicit.
+- **For / why:** Maintainers and agents stop reading, maintaining, and
+  building on endpoints no feature needs.
+- **Value / learning:** Whether the migration's overlapping file-serving
+  endpoints are a real distinction or duplication worth consolidating.
+- **Effort hypothesis:** S–M. The main usage review is done; the rest is
+  confirming it, transitive removal, and one focused comparison.
+- **Depends on:** Nothing queued.
+- **Safe stopping point:** After the removals land with behavior preserved;
+  the proposal is useful independently.
 
 ## Ordering and Scope Reduction
 
@@ -116,10 +128,8 @@ implementation is deferred; the requested recommendations remain in scope.
 
 ## Open Decisions
 
-- Which APIs are unused, and where does external usage need confirmation?
-  Determine from the review, without preselecting endpoints for deletion.
-- Which redundancy proposals should be implemented? Decide from the evidence
-  and consumer impact after this story's recommendations are available.
+- Whether to implement the file-serving proposal is decided after the owner
+  reviews it.
 
 ## When to Surface
 
@@ -131,5 +141,9 @@ Next, as the highest-priority queued story requested by the owner.
   generated TypeScript code or YAML; unused means no frontend or external
   feature use, and tests do not justify keeping an API. Find and clean up dead
   APIs and propose improvements for duplicated services.
+- Owner refinement on 2026-09-29: accepted the four removals, the E2E
+  exemption, and limiting redundancy review to the file-serving endpoints;
+  removal is transitive and followed by whole-product cleanup, with no
+  negative tests.
 - `.agents/agent-map.md` identifies the generated API summary, TypeScript
   client, OpenAPI YAML, backend routes, frontend, CLI, and MCP entry points.
