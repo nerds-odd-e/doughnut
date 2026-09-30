@@ -211,6 +211,43 @@ describe("BookReadingBookLayout", () => {
     wrapper.unmount()
   })
 
+  it("does not emit or prevent default on Tab and Shift+Tab", async () => {
+    const wrapper = mountLayout()
+    const row = wrapper.find('[data-testid="book-reading-book-block"]')
+    for (const shiftKey of [false, true]) {
+      const tab = new KeyboardEvent("keydown", {
+        key: "Tab",
+        shiftKey,
+        bubbles: true,
+        cancelable: true,
+      })
+      row.element.dispatchEvent(tab)
+      expect(tab.defaultPrevented).toBe(false)
+    }
+    expect(wrapper.emitted("blockIndent")).toBeUndefined()
+    expect(wrapper.emitted("blockOutdent")).toBeUndefined()
+    wrapper.unmount()
+  })
+
+  it("emits blockIndent on Alt+Shift+ArrowRight and blockOutdent on Alt+Shift+ArrowLeft", async () => {
+    const block = blockStub({ id: 4, depth: 1, title: "D" })
+    const wrapper = mountLayout([block])
+    const row = wrapper.find('[data-testid="book-reading-book-block"]')
+    await row.trigger("keydown", {
+      key: "ArrowRight",
+      altKey: true,
+      shiftKey: true,
+    })
+    await row.trigger("keydown", {
+      key: "ArrowLeft",
+      altKey: true,
+      shiftKey: true,
+    })
+    expect(wrapper.emitted("blockIndent")![0]![0]).toEqual(block)
+    expect(wrapper.emitted("blockOutdent")![0]![0]).toEqual(block)
+    wrapper.unmount()
+  })
+
   it("emits requestAiReorganize when AI Reorganize is clicked", async () => {
     const wrapper = mountLayout()
     await wrapper

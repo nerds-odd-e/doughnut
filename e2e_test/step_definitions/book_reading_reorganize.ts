@@ -98,18 +98,18 @@ Given(
 )
 
 When(
-  'I indent the focused book block with Tab',
+  'I indent the focused book block with Alt+Shift+Right',
   // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
   () => {
-    return bookReadingPage().indentFocusedBookBlockWithTab()
+    return bookReadingPage().indentFocusedBookBlockWithAltShiftRight()
   }
 )
 
 When(
-  'I outdent the focused book block with Shift+Tab',
+  'I outdent the focused book block with Alt+Shift+Left',
   // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
   () => {
-    return bookReadingPage().outdentFocusedBookBlockWithShiftTab()
+    return bookReadingPage().outdentFocusedBookBlockWithAltShiftLeft()
   }
 )
 

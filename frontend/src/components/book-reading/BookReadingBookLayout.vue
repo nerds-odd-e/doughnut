@@ -59,8 +59,8 @@
             @pointermove="blockDrag.onPointerMove(block, $event)"
             @pointerup="blockDrag.onPointerUp(block, $event)"
             @pointercancel="blockDrag.onPointerCancel(block, $event)"
-            @keydown.tab.shift.prevent="emit('blockOutdent', block)"
-            @keydown.tab.exact.prevent="emit('blockIndent', block)"
+            @keydown.alt.shift.right.prevent="emit('blockIndent', block)"
+            @keydown.alt.shift.left.prevent="emit('blockOutdent', block)"
             @keydown.delete.prevent="emit('blockCancel', block)"
           >
             <span

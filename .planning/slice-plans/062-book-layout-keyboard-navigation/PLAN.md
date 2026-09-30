@@ -2,7 +2,7 @@
 
 Work item: **SEED-059#story-9**
 ([story](../../seeds/SEED-059-book-reading-uat-fixes.md#story-9)).
-Status: **story refined; three Behavior slices planned.**
+Status: **slice 1 done; slices 2 and 3 planned.**
 
 ## Goal and scope
 
@@ -76,7 +76,7 @@ phones, focus after Cancel or AI reorganize, making the depth keys work in EPUB
 
 ### 1. Tab no longer changes the layout; Alt+Shift+Arrow does
 Type: Behavior
-Status: planned
+Status: done
 Proof: component spec of `BookReadingBookLayout`: Tab and Shift+Tab keydown
 emit nothing and are not default-prevented; Alt+Shift+ArrowRight emits
 `blockIndent` and Alt+Shift+ArrowLeft emits `blockOutdent` for the row. E2E:
@@ -124,4 +124,8 @@ the first assertion passes without a change, the slice is that assertion only.
 
 ## Learnings
 
-None yet.
+- Slice 1: five existing E2E scenarios (not three) use the depth-key steps; all
+  were renamed and pass. `BookReadingPdfUndoShortcut.spec.ts` also indented with
+  synthetic Tab and now sends Alt+Shift+ArrowRight.
+- Cypress `trigger('keydown')` must keep a `getModifierState` stub (the Vue
+  inspector overlay in dev mode calls it).

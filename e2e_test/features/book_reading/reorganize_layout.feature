@@ -10,22 +10,22 @@ Feature: Reorganize book layout
       And I attach a fake blank pdf book with book layout of "refactoring" to the notebook "Refactoring read"
       And I open the book attached to notebook "Refactoring read"
 
-    Scenario Outline: Indent a book block with Tab
+    Scenario Outline: Indent a book block with Alt+Shift+Right
       Given the book layout shows block "<block>" at depth <start_depth>
       When I choose the book block "<block>"
       Then the book block "<block>" should be focused in the book layout
-      When I indent the focused book block with Tab
+      When I indent the focused book block with Alt+Shift+Right
       Then the book block "<block>" should be at depth <end_depth> in the book layout
 
       Examples:
         | block                                   | start_depth | end_depth |
         | 2. The Usual Defi nition Is Not Enough  | 0           | 1         |
 
-    Scenario Outline: Outdent a book block with Shift+Tab
+    Scenario Outline: Outdent a book block with Alt+Shift+Left
       Given the book layout shows block "<block>" at depth <start_depth>
       When I choose the book block "<block>"
       Then the book block "<block>" should be focused in the book layout
-      When I outdent the focused book block with Shift+Tab
+      When I outdent the focused book block with Alt+Shift+Left
       Then the book block "<block>" should be at depth <end_depth> in the book layout
 
       Examples:
@@ -34,7 +34,7 @@ Feature: Reorganize book layout
 
     Scenario: Undo a wrong outdent
       When I choose the book block "3.1 Can You Refactor Without Tests?"
-      And I outdent the focused book block with Shift+Tab
+      And I outdent the focused book block with Alt+Shift+Left
       Then the book block "3.1 Can You Refactor Without Tests?" should be at depth 0 in the book layout
       When I undo the last book layout change
       Then the book block "3.1 Can You Refactor Without Tests?" should be at depth 1 in the book layout
@@ -81,7 +81,7 @@ Feature: Reorganize book layout
       Given the book layout shows block "Chapter A" at depth 0
       When I choose the book block "Chapter A"
       Then the book block "Chapter A" should be focused in the book layout
-      When I indent the focused book block with Tab
+      When I indent the focused book block with Alt+Shift+Right
       Then the book block "Chapter A" should be at depth 1 in the book layout
       And the book block "A.1 First section" should be at depth 2 in the book layout
       And the book block "A.2 Second section" should be at depth 2 in the book layout
@@ -89,7 +89,7 @@ Feature: Reorganize book layout
 
     Scenario: Undo an indent with the keyboard
       When I choose the book block "Chapter A"
-      And I indent the focused book block with Tab
+      And I indent the focused book block with Alt+Shift+Right
       Then the book block "Chapter A" should be at depth 1 in the book layout
       When I press Ctrl+Z
       Then the book block "Chapter A" should be at depth 0 in the book layout

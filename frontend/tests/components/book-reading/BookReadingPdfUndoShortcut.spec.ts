@@ -37,7 +37,11 @@ describe("BookReadingPdf undo shortcut", () => {
   const indentSecondBlock = async (
     wrapper: ReturnType<typeof mountBookReadingPdf>
   ) => {
-    await blockRow(wrapper, 1).trigger("keydown", { key: "Tab" })
+    await blockRow(wrapper, 1).trigger("keydown", {
+      key: "ArrowRight",
+      altKey: true,
+      shiftKey: true,
+    })
     await flushPromises()
     await wrapper.setProps({
       book: wrapper.emitted("update:book")![0]![0] as BookFull,

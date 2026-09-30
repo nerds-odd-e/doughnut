@@ -93,26 +93,29 @@ export const bookReadingLayoutMethods = () => ({
     )
     return this
   },
-  indentFocusedBookBlockWithTab() {
+  indentFocusedBookBlockWithAltShiftRight() {
     cy.focused().trigger('keydown', {
-      key: 'Tab',
-      code: 'Tab',
-      keyCode: 9,
-      which: 9,
+      key: 'ArrowRight',
+      code: 'ArrowRight',
+      keyCode: 39,
+      which: 39,
+      altKey: true,
+      shiftKey: true,
       bubbles: true,
-      getModifierState: () => false,
+      getModifierState: (key: string) => key === 'Alt' || key === 'Shift',
     })
     return this
   },
-  outdentFocusedBookBlockWithShiftTab() {
+  outdentFocusedBookBlockWithAltShiftLeft() {
     cy.focused().trigger('keydown', {
-      key: 'Tab',
-      code: 'Tab',
-      keyCode: 9,
-      which: 9,
+      key: 'ArrowLeft',
+      code: 'ArrowLeft',
+      keyCode: 37,
+      which: 37,
+      altKey: true,
       shiftKey: true,
       bubbles: true,
-      getModifierState: (key: string) => key === 'Shift',
+      getModifierState: (key: string) => key === 'Alt' || key === 'Shift',
     })
     return this
   },
