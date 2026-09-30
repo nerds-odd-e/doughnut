@@ -62,7 +62,7 @@ Size target is about 10 minutes each including proof.
 
 ### 1. The message has one component for both places
 Type: Structure
-Status: planned
+Status: done
 Proof: the three frontend specs named above are green with no assertion changed
 (`CURSOR_DEV=true nix develop -c pnpm -C frontend exec vitest run <the three spec files>`).
 
@@ -99,7 +99,8 @@ adjacent, stop and re-read the layout before changing anything.
 
 ## Learnings
 
-_None yet._
+- Slice 1 (2026-09-30): proof green — the three specs, 27 tests, no assertion changed. `frontend/components.d.ts`
+  (tracked, auto-generated) gains the new component's declarations; commit it with the component.
 
 ## Real iPad check (owner, optional)
 

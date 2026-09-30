@@ -45,15 +45,10 @@
       @relation-type-selected="onRelationTypeSelected"
       @image-upload-state="emits('image-upload-state', $event)"
     />
-    <p
+    <RichFrontmatterPropertyValidationMessage
       v-if="validationMessage"
-      role="alert"
-      aria-live="polite"
-      class="text-error text-xs mt-1"
-      data-testid="rich-note-property-validation"
-    >
-      {{ validationMessage }}
-    </p>
+      :message="validationMessage"
+    />
     <button
       v-if="showInsertChrome && !insertOpen && propertyRows.length === 0"
       type="button"
@@ -106,6 +101,7 @@ import RichFrontmatterReadOnlyList from "@/components/form/RichFrontmatterReadOn
 import RichFrontmatterEditablePropertyList from "@/components/form/RichFrontmatterEditablePropertyList.vue"
 import RichFrontmatterInsertForm from "@/components/form/RichFrontmatterInsertForm.vue"
 import RichFrontmatterPropertyNotFound from "@/components/form/RichFrontmatterPropertyNotFound.vue"
+import RichFrontmatterPropertyValidationMessage from "@/components/form/RichFrontmatterPropertyValidationMessage.vue"
 import { richFrontmatterIsReadmeContextKey } from "@/components/form/richFrontmatterProvide"
 import WikidataAssociationDialog from "@/components/notes/WikidataAssociationDialog.vue"
 import type { WikiLink } from "@generated/donut-backend-api"
