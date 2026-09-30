@@ -121,55 +121,6 @@ and a component test; an E2E scenario only if a component test cannot show the
 button absent in a real EPUB).
 **Depends on:** none.
 
-<a id="story-12"></a>
-
-### Make every reading mark visible and explained
-
-**Identity:** SEED-059#story-12
-```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/062-visible-explained-reading-marks/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"7637fa1967191896cc2e2ea7678b0b72338daae8ccac1fe0698adea2c174dd66","plan":"e430399703d835bd8684df216309f1572e7765dfa2df5f2bc348c97c38ee23be"}}
-```
-
-**Goal:** A reader of a book, in PDF or EPUB and in either theme, can see every
-reading mark in the book layout and can tell what each one means. This is a small
-fix to supported behavior; it adds no reading-progress capability.
-
-**Why it matters:** A record shows only as a thin coloured bar at the right edge
-of a layout row (green read, orange skimmed, black skipped), with no explanation.
-The skipped bar uses `border-neutral`, which cannot be seen in the dark theme, so
-a saved skip is invisible on any row that is not selected. The selected row
-already says "Marked as …", and every row carries that text for screen readers,
-so the gap is sighted readers of unselected rows. The owner narrowed the
-story to this defect and dropped the larger progress ideas because the current
-focus is bug fixing and technical debt, and the book layout serves a rarely
-used feature.
-
-**Scope**
-
-- **One rule.** A row that carries a reading mark shows a mark that is visible
-  against the layout background in both themes, and hovering the row says which
-  mark it is (Read, Skimmed, or Skipped). The layout is shared, so PDF and EPUB
-  behave alike. Marks, saving, and the selected row's mark control behave as today.
-- **Deferred (built when readers need it; no follow-up story is queued):**
-  a chapter showing how many of its sections are marked (it first needs a
-  decision on what counts as marked and which descendants count); an end-of-book
-  summary of unmarked blocks and the notion of a finished book (scrolling past a
-  block deliberately leaves it unmarked, so unmarked does not mean unread); a
-  separate legend; a way to see a mark without hover on touch devices; a
-  non-colour glyph for marks.
-
-**Key examples**
-
-- In the dark theme, a row marked Skipped shows a visible mark.
-- Hovering a row marked Read, Skimmed, or Skipped says "Read", "Skimmed", or
-  "Skipped".
-- A row without a mark shows no mark and no such hover text.
-- In the light theme and in EPUB, marks look and behave as before.
-
-**Effort hypothesis:** S, high confidence (one colour and one attribute in the
-book layout row, with a component test).
-**Depends on:** none.
-
 <a id="story-21"></a>
 
 ### Book reading E2E scenarios stay stable at any window size
