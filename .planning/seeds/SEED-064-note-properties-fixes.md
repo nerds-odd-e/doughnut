@@ -80,7 +80,7 @@ Effort bands: S = 30–60 minutes, M = 1–2 hours, L = 2–4 hours, including d
 
 **Identity:** SEED-064#story-4
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/004-wikidata-typed-id-title-choice/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"28ae3509c41d88fe5cfcc9e62134d32ed772e2faf6189bd451682410a070cf43","plan":"4f04ce63e96af3dded0e4bf0c35b36c469aae147d917e9bc5930155b69f1f342"}}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/004-wikidata-typed-id-title-choice/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"ebf3780003dfdd07455fe3f689df36dad3cf1291798de39d0e33573456543e82","plan":"4f04ce63e96af3dded0e4bf0c35b36c469aae147d917e9bc5930155b69f1f342"}}
 ```
 
 - **Goal:** a user (iPad, phone or desktop; the cause is not device-specific) who types or pastes a Wikidata ID into a
