@@ -86,7 +86,7 @@ phone observations are marked optional and lower priority.
 
 ### 4. Design and architecture assessment is recorded
 Type: Behavior
-Status: todo
+Status: done
 Size: about 25 minutes, outside the UAT budget.
 Proof: the report's design section lists, for each candidate, where the properties concept is spread or
 duplicated between read-only and editable paths, what could be merged or removed, the estimated lines and
@@ -139,3 +139,7 @@ the session.
   search list gives a silent Save; the Replace timeout stayed unreproduced. Assimilate from a row panel moves
   the page to another note (recorded as an owner question). Dev data side effects: scratch notes 13721-13725
   and one assimilation record.
+- Slice 4 (about 20 minutes, code reading only): 13 `RichFrontmatter*.vue` = 1,608 lines plus 822 lines of
+  composable and utilities = the 2,430 restated in the premises; the seed's "about 4,000" is not
+  reproducible by any counting method and the section says so. Eight ranked candidates, no ADR conflict;
+  one owner question (should a read-only viewer see row panel controls).

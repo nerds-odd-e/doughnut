@@ -573,7 +573,265 @@ properties). Component tests run in jsdom, which has no layout, so no width or o
 
 ### Design and architecture assessment (slice 4)
 
-_To be filled in slice 4._
+Method: read-only review of the code on `main` (this worktree is the same). "Observed" means read in code
+(file:line); "hypothesis" means not confirmed by running it. Every line count is from `wc -l`; every saving is
+an estimate (existing lines removed minus a stated guess of the replacement lines). Defect and improvement
+numbers refer to the lists above ("iPad D2" = iPad defect 2, "iPad I6" = iPad improvement 6, "phone D1" =
+phone operability defect 1).
+
+#### Size of the properties concept
+
+Commands (repository root):
+
+```
+cat frontend/src/components/form/RichFrontmatter*.vue | wc -l                       # 1,608  (13 files)
+cat frontend/src/composables/useRichFrontmatterPropertyEditing.ts \
+    frontend/src/utils/noteContentFrontmatter*.ts frontend/src/utils/noteProperties.ts | wc -l   # 822
+  -> 1,608 + 822 = 2,430   (the plan's count)
+cat frontend/src/utils/noteContent*.ts | wc -l                                       # 1,058 (10 files)
+cat <13 components> useRichFrontmatterPropertyEditing.ts noteContent*.ts noteProperties.ts | wc -l   # 3,047 (all frontend property code, no double count)
+cat PropertyValueField.vue propertyValueField.ts useFocusedNoteProperty.ts useNotePropertyPanelLocation.ts \
+    usePropertyRowClientIds.ts authored{Aliases,Overlaps,NoteLevel}Validation.ts | wc -l   # 532 (related helpers)
+cat frontend/tests/components/form/RichMarkdownEditor.*.spec.ts propertiesTestDom.ts propertyValueDialogTestDom.ts \
+    richMarkdownEditorTestHarness.ts frontend/tests/utils/noteContent*.spec.ts | wc -l   # 3,508 (frontend tests)
+cat backend/src/main/java/com/odde/donut/algorithms/{Frontmatter*,NoteLeadingFrontmatter}.java | wc -l   # 917 (9 files)
+```
+
+Reconciling: the plan's 2,430 is the 13 components plus the composable, the two `noteContentFrontmatter*`
+utilities and `noteProperties.ts`. The seed's "about 4,000" cannot be reproduced: all frontend property code
+is 3,047 lines, with related helpers 3,579, and the frontend tests alone are 3,508. So "about 4,000" is not
+a count of code that could be removed; use the per-candidate estimates below.
+
+Component roles (lines):
+
+| File | Lines | Role |
+| --- | ---: | --- |
+| `RichFrontmatterProperties.vue` | 244 | Section owner: parses, holds rows and the single validation message, switches read-only or editable list, insert form, Wikidata dialog |
+| `RichFrontmatterEditablePropertyList.vue` | 60 | Loop over editable rows, ids, forwards 7 events |
+| `RichFrontmatterEditablePropertyRow.vue` | 246 | One editable row: 3-column grid, chevron, key input plus presets, value by key kind, panel |
+| `RichFrontmatterScalarPropertyValue.vue` | 134 | Text or list value of one editable row, edit-dialog button, URL link |
+| `RichFrontmatterReadOnlyList.vue` | 81 | The whole read-only path: own grid, own value-by-key-kind chain |
+| `RichFrontmatterInsertForm.vue` | 171 | The add form: own key input plus presets, own value-by-key-kind chain |
+| `RichFrontmatterPropertyValueDialog.vue` | 264 | Text or list edit dialog |
+| `RichFrontmatterImagePropertyValue.vue` | 120 | Image URL input, upload, Choose or Replace (used by row and insert form) |
+| `RichFrontmatterListPropertyValue.vue` | 83 | List value display (wiki links only for `overlaps`, URLs for `url`) |
+| `RichFrontmatterPropertyKeyPresets.vue` | 62 | Preset list (absolutely positioned) |
+| `RichFrontmatterPropertyExternalLink.vue` | 61 | Open URL or Wikidata icon; has a `compact` variant for read-only |
+| `RichFrontmatterPropertyPanel.vue` | 59 | Row panel: remove, Assimilate, Skip (`pl-8`) |
+| `RichFrontmatterPropertyNotFound.vue` | 23 | Unresolved-property warning |
+| `useRichFrontmatterPropertyEditing.ts` | 249 | Insert, commit, remove, rename, relation, validation calls |
+| `noteContentPropertyKeys.ts` / `Rows.ts` / `KeyPresets.ts` | 232 / 200 / 62 | Key rules, row functions and validation, preset keys |
+| `noteContentFrontmatter.ts` / `Parse.ts` / `noteProperties.ts` | 202 / 239 / 132 | Re-export barrel plus compose, YAML parse, value type |
+
+#### Where the concept is spread or duplicated
+
+Observations (file:line):
+
+1. **The read-only path is a second implementation of the row, not a mode of it.** `RichFrontmatterReadOnlyList.vue`
+   has its own grid (line 6, `grid-cols-[auto_minmax(0,1fr)]`) and its own chain choosing the value display
+   (lines 19-54: list, relation, Wikidata, URL, else plain text). The editable row has a second grid
+   (`EditablePropertyRow.vue:14`, three columns) and a third chain (lines 54-127: text, relation, image, Wikidata).
+   `InsertForm.vue:43-105` is a fourth chain (Wikidata, image, URL, text). The decision "what kind of value is
+   this key" is made in four places, in different orders. A `compact` flag exists only so the read-only path can
+   draw the external link smaller (`ExternalLink.vue:11,29-35`; used at `ReadOnlyList.vue:25,40,51`,
+   `ListPropertyValue.vue:39`). Connects to: iPad I4 (ragged columns, plain `[[...]]` for a single wiki-link value,
+   image row shows only a file name), iPad D1, phone D1.
+2. **Wiki-link rendering has two mechanisms.** Editable scalars use `PropertyValueField.vue` (contenteditable, wiki
+   links drawn by `propertyValuePlainToDisplayHtml`); read-only scalars print `{{ row.value.value }}` as plain text
+   (`ReadOnlyList.vue:54`), which is why `related` shows "[[UAT six properties]]" as text (iPad I4). Lists show wiki
+   links only when the key is exactly `overlaps` (`ListPropertyValue.vue:75-78`). `PropertyValueField` already has a
+   `readonly` prop (`PropertyValueField.vue:39,92`) that no property component passes (no `:readonly` in
+   `RichFrontmatter*.vue`). ADR 0004 (line 127) says wiki-link rules apply to frontmatter scalars and one-level list
+   items, so the split is an implementation accident, not a rule.
+3. **The list-capable key rule is written twice.** `isListCapablePropertyKey` (`noteContentPropertyKeys.ts:214`) is
+   used only by `tryCommitInsert` (`useRichFrontmatterPropertyEditing.ts:87`). The value dialog uses
+   `!isScalarOnlyStructuralPropertyKey(key)` (`ScalarPropertyValue.vue:108-110`). The text-capable rule is also
+   spelled twice in one row: `isTextCapablePropertyRow(...)` at `EditablePropertyRow.vue:55`, then the other kinds
+   are re-tested one by one (lines 67, 76, 91). Hypothesis: they agree today; nothing forces it.
+4. **Key names are listed in three places.** The preset lists (`noteContentPropertyKeyPresets.ts:13-26`), the `switch`
+   in `propertyKeyMatchesPresetFamily` (`noteContentPropertyKeys.ts:110-136`), and single-key files
+   `authoredAliasesValidation.ts`, `authoredOverlapsValidation.ts`, `authoredNoteLevelValidation.ts` (each has its
+   own key test). A new preset means editing at least the list and the switch.
+5. **The key field with presets is written twice, word for word.** `presetPanelOpen`, `onKeyPresetWrapperFocusOut`
+   and `onPresetSelected` are identical in `EditablePropertyRow.vue:192,234-244` and `InsertForm.vue:148-170`.
+   `KeyPresets.vue:24-30` computes the list from the whole preset set and never sees the typed text, so the list
+   cannot narrow (iPad D3). The list is `absolute ... top-full w-full` inside the key cell (`KeyPresets.vue:42`) and
+   options are `font-mono` buttons without wrap: hypothesis for why they overflow the 158 px panel (the classes are
+   observed, the cause is not proven). In the phone stack layout it is drawn over the value field (phone D2).
+6. **Validation has one message slot at the wrong level.** `validationMessage` is one `ref` in
+   `RichFrontmatterProperties.vue:153`, rendered at lines 48-56 after the list, before the insert form. The composable
+   receives `setValidationMessage` and cannot say which row failed
+   (`useRichFrontmatterPropertyEditing.ts:88,102,139,185,199`). That is why the message sits at y 984 for a row at
+   y 380 (iPad D2). The text "Duplicate property keys are not allowed." exists twice
+   (`useRichFrontmatterPropertyEditing.ts:88` and `noteContentPropertyRows.ts:106`).
+7. **The add form is a separate mini-row.** It has its own layout (`flex flex-wrap ... sm:w-auto`,
+   `InsertForm.vue:5-8,39`), labels the rows do not have, and commits only through the value field's blur
+   (`Properties.vue:79`); `tryCommitInsert` returns silently when key or value is empty
+   (`useRichFrontmatterPropertyEditing.ts:83`). That is iPad I6. An existing precedent: `addWikiLinkAsProperty`
+   (lines 192-217) already adds an ordinary row with an empty key and focuses its key input, so "a new property
+   is a row" already exists for one path.
+8. **Image handling has extra props for two callers.** `ImagePropertyValue.vue` takes five test-id props
+   (lines 62-70) so the row and the insert form can pass different ids (`EditablePropertyRow.vue:81-84`,
+   `InsertForm.vue:67-70`). The read-only path shows an image value as plain text (`ReadOnlyList.vue:54`; iPad I4).
+9. **Fixed layout code.** Editable row: `grid-cols-[auto_minmax(8rem,auto)_minmax(0,1fr)]` plus `min-w-[8rem]` on the
+   cell and the input (`EditablePropertyRow.vue:14,28,36`): chevron, key of at least 8 rem, value gets the rest.
+   The row has no breakpoint; the only breakpoint in the concept is `sm:` in the add form (`InsertForm.vue:8,39`).
+   Read-only: an `auto` key column with no upper bound (`ReadOnlyList.vue:6`), the likely code cause of iPad D1 and
+   phone D1 (measured `dt` 484 or 571 px, `dd` 0 px; matches the grid, still a hypothesis until a layout test shows
+   it). Panel indent `pl-8` is a fixed 32 px, not tied to the chevron width (`PropertyPanel.vue:3`). Every button and
+   input is `daisy-*-sm` (32 px): 21 lines in 10 files (`grep -c "daisy-btn-sm\|daisy-input-sm\|daisy-btn-xs"`),
+   which is iPad I1; there is no single place to set the touch size.
+10. **Value area of about 60 px on a phone (phone D3)** follows from item 9: 42 px chevron + 158 px key + 42 px
+    trailing button + gaps leave about 60 px at 375 px (as measured); hypothesis that a wrapping layout fixes it.
+
+#### Candidates, best first
+
+Order rule: candidates that improve the experience and reduce code come first; those that add code come after
+and are marked. "Lines removed" is `wc -l` of the cited ranges; "lines added" is my guess of the replacement.
+
+**1. Responsive row layout in place of the fixed grid (the seed's key example).** Improves: iPad D1 and phone D1
+(value lost with a long key), iPad D4 and phone D3 (cut values), iPad I2 (density: a narrow row may wrap to two
+lines instead of forcing a fixed column), and it is the base for 44 px targets (I1).
+Change: one row rule, key cell `minmax(6rem, 40%)` with `break-words` (or `flex-wrap` so the value drops under
+the key below a width), shared by read-only and editable. The class strings at `ReadOnlyList.vue:6`,
+`EditablePropertyRow.vue:14,28,36` and `PropertyPanel.vue:3` become one shared rule; `min-w-[8rem]` on the input goes.
+Lines: about 0 to -5 (class edits in 4 files; estimate from counted lines). Files: 0. Alone it does not reduce
+code; with candidate 2 the layout lives once.
+ADR: compatible (ADR 0004 governs stored markdown, not layout; there is no accepted ADR on component layout).
+Protection: none for layout (jsdom has no layout). Gap to close first: a Cypress scenario at 820 and 375 px with a
+long-key note, asserting the value is visible and there is no horizontal scroll; about +25 lines of feature and
+step code (estimate). `note_property.feature` "Visiting a read-only property location focuses the property
+value" covers a short key only.
+
+**2. One row for read-only and editable (a `readonly` mode of the same row).** Improves: iPad I4 (same spacing,
+link style, image display); with candidate 1 the layout is written once (iPad D1, phone D1).
+Change: delete `RichFrontmatterReadOnlyList.vue` (81 lines); the row takes `readonly` and swaps input parts for
+display parts (key as text, `PropertyValueField` with its existing `readonly`, same list and URL components);
+chevron, edit and remove are not drawn. The `compact` flag in `ExternalLink` (about 8 lines) and
+`ListPropertyValue` (about 4) goes.
+Lines: remove 81 + about 12 (compact) + about 35 (duplicated chain, `ReadOnlyList.vue:19-54`) = about 130; add about
+55 for readonly branches; net about -60 to -75 (estimate). Files: -1.
+ADR: compatible, one owner question. ADR 0005: the property panel is part of the `noteProperty` route family; the
+read-only path today has no chevron and only focuses the row. Keep that: read-only draws no panel controls, so no
+product change. Adding the panel (for example Assimilate) to read-only would be new behavior, not this candidate.
+Protection: `RichMarkdownEditor.frontmatter.spec.ts` (191), `.propertyWikiLinks.spec.ts` (168),
+`.listProperties.spec.ts` (192), `.propertyLocation.spec.ts` (250), `note_property.feature` (read-only focus),
+`property_wiki_link.feature` (wiki links in values). Gaps before the change: read-only tests for a single wiki-link
+value, an image value and a Wikidata value (only spec names were checked for read-only cases, not each assertion),
+plus candidate 1's layout test.
+
+**3. One key field with presets, and presets that narrow while typing.** Improves: iPad D3 (does not narrow, wider
+than its panel), phone D2 (list covers the value field; with narrowing, a custom key leaves no matches and the list
+closes, so the value can be tapped).
+Change: a `RichFrontmatterKeyField.vue` owning the input, `presetPanelOpen`, focus-out and preset selection
+(item 5), used by the row and the insert form; the preset function takes the typed text and filters (about 6 lines
+in `noteContentPropertyKeyPresets.ts`).
+Lines: remove about 88 (`EditablePropertyRow.vue:27-52` 26, `:192,229-244` about 22, `InsertForm.vue:11-35` 25,
+`:148,155-170` about 15); add about 55 (component) + 6 (filter); net about -25 (estimate). Files: +1.
+ADR: compatible (ADR 0004 preserves unknown keys; a filtered list does not stop a custom key).
+Protection: `noteContentPropertyKeyPresets.spec.ts` (98), `RichMarkdownEditor.propertyEntry.spec.ts` (242),
+`.propertyRowEditing.spec.ts` (233). Gap: a test that the list narrows to typed text (pure function, cheap) and
+candidate 1's viewport test extended to check the list stays inside the viewport.
+
+**4. The add form becomes a draft row of the same component.** Improves: iPad I6 (aligned columns; a visible Add
+button on that row that also explains a missing key or value), phone D2 (same key field as candidate 3), one look.
+Precedent: `addWikiLinkAsProperty` (item 7).
+Change: delete `RichFrontmatterInsertForm.vue` (171 lines) and its pass-through in `Properties.vue:66-83` (18 lines);
+a draft row (not emitted by `filterForEmit`) uses the row component; `tryCommitInsert`
+(`useRichFrontmatterPropertyEditing.ts:80-107`) stays. Image test-id props shrink (item 8).
+Lines: remove about 190; add about 40 (draft flag, Add button, messages); net about -120 to -150 (estimate;
+largest single saving and highest risk). Files: -1.
+ADR: compatible. ADR 0006 supports messages for business outcomes ("Add a key" or "Add a value" instead of doing
+nothing); no new `catch`.
+Protection: `RichMarkdownEditor.propertyEntry.spec.ts` (242) and page object
+`e2e_test/start/pageObjects/noteRichPropertyMethods.ts` (190) use the insert form's ids `rich-note-property-key`
+and `rich-note-property-value`; keep the ids or change page objects in the same commit. Gap: a test for key only
+and value only (no test found, slice 3 table), written first. Do after candidates 2 and 3.
+
+**5. One value-kind decision.** Improves nothing directly; it stops the four chains (item 1) from drifting, which
+is why iPad I4 exists. Change: one function `propertyValueKind(key)` (text, list-capable text, relation, image,
+Wikidata, URL) in `noteContentPropertyKeys.ts`, used by the row, the insert form and `tryCommitInsert`, replacing
+`isTextCapablePropertyRow`, `isListCapablePropertyKey` and the dialog's `!isScalarOnlyStructuralPropertyKey`
+(item 3). Lines: remove about 25, add about 15; net about -10 (estimate). Files: 0. ADR: compatible. Protection:
+`noteContentPropertyKeys.spec.ts` (142). Best done inside candidates 2 and 4; small reduction, so it ranks below them.
+
+*The next three add code or scatter the concept. They improve the experience, and are listed after the
+code-reducing ones.*
+
+**6. Validation message next to its row (adds code).** Improves: iPad D2. Change: the composable reports the failed
+row index with the message; the row draws it below itself. Lines: about +20, -3 (moved `<p>`); net about +17.
+Files: 0. Cheaper option, about +4 lines: keep one message but scroll it into view when it appears; it fixes "off
+screen" but not "far away". ADR: compatible (ADR 0006 supports business-outcome messages). Protection: message text
+is covered (`propertyRowEditing.spec.ts`, `noteContentPropertyRows.validate.spec.ts`); position is not. Gap: viewport
+check with an invalid `note_level` on a long note.
+
+**7. 44 px touch targets on touch widths (adds a little code, conflicts with density).** Improves: iPad I1. Change:
+one rule on the section (for example `@media (pointer: coarse)` raising `.daisy-btn-sm` and `.daisy-input-sm` to 44 px
+inside the properties section) instead of editing 21 class strings. Lines: about +8 CSS. It raises each row from 32
+to 44 px, so a 19-row note grows by about 230 px (19 x 12 px, estimate) and worsens iPad I2 unless candidate 1 lets
+rows fit better. ADR: compatible. Protection: none; finger feel needs a real iPad.
+
+**8. Feedback for silent outcomes (adds code, scatters the concept).** Covers iPad I7 (silent append to a list key),
+iPad I10 (upload error gone after 2 s) and the typed-ID Wikidata Save with an empty search list. Each lives in a
+different place (composable, `ImagePropertyValue.vue`, `WikidataAssociationDialog`), each about +10 to +20 lines
+(estimate), and nothing merges. Do after the structure work if the owner wants them. Protection: append is covered
+(`noteContentPropertyRows.append.spec.ts`), the message is not; the Wikidata combination is not (slice 3 table).
+
+#### Not recommended
+
+- **A collapsed "show all" summary for many properties (iPad I2).** New mode and state, so more code; candidate 1 may
+  give the same gain. Owner's call after candidate 1.
+- **Merging all `noteContent*` utilities into one file.** Moves lines, saves none (1,058 today), and loses small,
+  well-tested units.
+- **Sharing one YAML parser between frontend (`noteContentFrontmatterParse.ts`, 239 lines) and backend
+  (`Frontmatter*.java`, 917 lines).** Two languages; parity risk is real but not a UX issue, and it would need a
+  generated contract. Out of scope for this story.
+- **Replacing the contenteditable `PropertyValueField` with a plain `<input>`.** It draws wiki links inside values
+  (ADR 0004 line 127); removing it loses links in editable mode and does not shrink the row.
+- **Changing the value dialog (264 lines) or the panel's Assimilate and Skip actions.** No finding needs it; the
+  26 px close button is in the shared Modal and is a separate, general item.
+- **A new confirmation dialog for remove (iPad I8).** Adds code; a text label on the remove button or an undo
+  message is proportionate polish, not structure work.
+- **Hiding the `type: Note` row when there are no other properties (iPad I5).** Whether the row is stored is
+  unchecked; a display rule could disagree with ADR 0004 (stored notes carry `type`). Ask the owner first.
+
+#### ADR check
+
+Read `docs/adrs/README.md` and the accepted ADRs 0004, 0005 and 0006; 0002 and 0007 (Git synchronization,
+environments) do not touch the properties UI. No ADR covers frontend structure or layout, so the layout and
+component changes are not constrained by one.
+
+- ADR 0004: "Preserve author-owned and unknown frontmatter keys on persist and round-trip." All candidates change
+  display and entry components only; candidate 4 must keep `filterForEmit` and `notePropertiesFromPropertyRows`
+  behavior so an unsaved draft row never reaches stored markdown. "Wiki-link rules apply to the body and to YAML
+  frontmatter values (scalars and one-level list items)": candidate 2 aligns read-only display with it. Compatible.
+- ADR 0005: "Opening or closing the property panel replaces within the note family ... it must not silently look
+  like `noteShow`." Candidates 2 and 4 keep `useNotePropertyPanelLocation` and `useFocusedNoteProperty` unchanged.
+  Compatible. Owner decision only if read-only should gain the panel (not proposed).
+- ADR 0006: "Handle an exception when a business requirement needs a specific outcome, or when wrapping improves the
+  failure message." Candidates 6 and 8 add visible messages for business outcomes and no `catch`. Compatible.
+
+No ADR conflict found. One question for the owner: should a read-only viewer ever see row panel controls (Assimilate,
+Skip)? The answer does not block candidates 1 to 5.
+
+#### What protects the behavior today
+
+- Component tests (jsdom, no layout): `frontend/tests/components/form/RichMarkdownEditor.frontmatter.spec.ts` (191),
+  `.propertyEntry.spec.ts` (242), `.propertyRowEditing.spec.ts` (233), `.listProperties.spec.ts` (192),
+  `.propertyValueDialog.spec.ts` (173), `.propertyWikiLinks.spec.ts` (168), `.propertyLocation.spec.ts` (250),
+  `.propertyMemoryTracking.spec.ts` (246), `.changesOnlyTheEdit.spec.ts` (152).
+- Utility tests: `frontend/tests/utils/noteContentPropertyKeys.spec.ts`, `noteContentPropertyKeyPresets.spec.ts`,
+  `noteContentPropertyRows.spec.ts` (plus `.append` and `.validate`), `noteContentFrontmatter*.spec.ts`.
+- End to end: `e2e_test/features/note_view/note_frontmatter_image.feature` (header image, upload becomes a file,
+  image property URL), `note_topology/note_property.feature` and `property_wiki_link.feature` (location, panel,
+  read-only focus, wiki links in values), `recall/property_memory_tracker.feature`, `note_edit.feature`.
+- Not protected: layout, width, overlap and viewport behavior (no phone or tablet property scenario; the plan's
+  `grep -ril ipad frontend/tests e2e_test` found nothing), the position of the validation message, and the key-only
+  or value-only add. Closing these gaps first (one viewport feature with a long-key note at 820 and 375 px; a
+  key-only add test) is the cheapest way to make candidates 1 to 4 safe.
+
+Time spent on slice 4: about 20 minutes (13 components, the composable, key, row and preset utilities, ADRs 0004 to
+0006, counting; no application run).
 
 ### Synthesis and follow-up (slice 5)
 
