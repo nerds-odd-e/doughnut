@@ -80,22 +80,54 @@ Effort bands: S = 30–60 minutes, M = 1–2 hours, L = 2–4 hours, including d
 
 **Identity:** SEED-064#story-1
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"not-refined","approach":"unselected"}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/001-note-properties-touch-layout/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"463baf37f47acba5999efb0b1375c5b15d9fd504d2dbdac5aea696a6ba2ac6e7","plan":"6307ab8e03312f8e9717d10e2ec35d1a0d53aa4a6df601fc167e09479b953730"}}
 ```
 
-- **For / why:** iPad and phone users lose the value of a property when its key is long (iPad D1, phone D1), cannot
-  see that long text is cut (iPad D4, phone D3), and miss small controls (iPad I1, iPad D5).
-- **Evaluation:** open a note with a 76-character key and a 200-character value at 820 px and 375 px, in the
-  read-only and the editable view: the value is visible or clearly cut with a cue that shows the full text, there is
-  no sideways scroll, and every row control and dialog close button is at least 44 px high on touch widths. The row
-  does not grow so much that a 19-row note pushes the body further down than today (iPad I2 is the guard, measured
-  by the body's start position). Check on a real iPad.
-- **Value / learning:** removes the most severe defect and answers whether 44 px controls still fit the density.
-  Includes the key and value hierarchy (iPad I3) because it is the same row rule.
-- **Effort hypothesis:** M, medium confidence: one viewport scenario, one layout rule in each of the three places.
-- **Depends on:** none. The protecting test comes first: a Cypress scenario at 820 and 375 px with a long-key note
-  (about +25 lines, estimate).
-- **Safe stopping point:** the defect is fixed for the current three code paths even if stories 5 and 6 never happen.
+- **Goal:** an iPad user (primary device) and a phone user can read every value of a note's properties, in the
+  read-only and the editable view, even when a key or value is long, and can tap a row control without hitting its
+  neighbour. This removes the most severe defect of the note properties area (iPad D1, phone D1: the value is 0 px
+  wide when the key is long) and the small-target risk beside an unconfirmed Remove (no undo, iPad I8 left out).
+- **Scope:**
+  - **Value stays visible.** At 820 px and 375 px, in both views, a note with a 76-character key and a 200-character
+    value shows the key and the value, and the note has no sideways scroll. A read-only key and value wrap. In the
+    editable row the value field wraps; the single-line key field shows an ellipsis when its text is cut, and its full
+    text is reached by tapping into the field. A cut with no cue is not left anywhere in the row (iPad D4, phone D3).
+  - **44 px touch targets.** On touch devices (`pointer: coarse`, so an iPad in both orientations as well as a phone,
+    not a width rule) the row chevron, edit, remove and external-link controls and the row key and value fields are at
+    least 44 px high; one rule for the properties section, not per-component edits (iPad I1).
+  - **Density is a reported number, not a gate (owner decision).** The result reports how far the note body starts from
+    the top of the screen for a 19-row note at 820 px, before and after, editable and read-only. A worse number does
+    not fail the story and is not corrected inside it; it goes to the owner as a trade-off. A hard gate was rejected
+    because meeting it may force a different structure and an ADR change.
+  - **Read-only keeps its own component here.** The read-only list gets the same wrapping fix now, even though story 5
+    deletes that component: it is cheap and keeps the defect fixed if story 5 is delayed. Its Cypress scenario carries
+    over to the merged row.
+  - **Real iPad check by the owner** (device mode cannot show real touch): open the long-key note read-only and
+    editable in both orientations; tap chevron, edit, remove; report the density number.
+- **Key examples:**
+  - Read-only, 820 px: key `a_rather_long_...` (76 characters, no spaces) with value `short` → key wraps inside its
+    column, `short` is visible, `scrollWidth` does not exceed the note width.
+  - Read-only, 375 px: a 76-character key with spaces and a 200-character value → both wrap; the value is fully
+    readable by scrolling down, not sideways.
+  - Editable, 375 px: the same note → the value field shows the whole 200 characters wrapped; the key field shows an
+    ellipsis; chevron, edit and remove do not overlap.
+  - Editable on a touch device: every row control measures at least 44 px high; on a non-touch desktop the row is as
+    tall as today.
+  - 19-row note at 820 px: body start reported before (UAT baseline: 992 px editable, 1120 px read-only, from a commit
+    whose properties components are unchanged) and after.
+- **Excluded (considered, not done):**
+  - key and value visual hierarchy (iPad I3): no failure behind it; it may follow from the layout rule at no cost, but
+    is not a promise or a test;
+  - dialog close buttons (iPad D5, 26 px): a different component and concern from the row;
+  - add form and preset list sizing: story 2;
+  - a "show all" collapse (iPad I2), a tap-to-expand cue for cut text, and a width-based touch rule.
+- **Value / learning:** removes the most severe defect and answers, with a number, how much 44 px targets cost in
+  density.
+- **Effort hypothesis:** M, medium confidence. The layout part is small; one Cypress viewport scenario and finding a
+  way to prove `pointer: coarse` in Cypress carry the effort.
+- **Depends on:** none.
+- **Safe stopping point:** the value-visible increment stands alone; the touch-target increment can be dropped or
+  reverted without losing it.
 
 <a id="story-2"></a>
 
