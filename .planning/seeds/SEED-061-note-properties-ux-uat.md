@@ -53,14 +53,14 @@ This seed captures the assessment story and authorizes no UAT run or fixes now.
 
 **Identity:** SEED-061#story-1
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"not-refined","approach":"unselected"}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/001-note-properties-uat/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"174eae1ecc198e62d4b44bf24ad68dc169591e4c5f86ee1a3193d4f583628445","plan":"ee93161540648f0bb220c688adcb566860dbb5f11a159984ecf29bba83fd2dd0"}}
 ```
 
 **Goal**
 
 The product owner receives an evidence-backed list of defects to fix and
-improvements to consider, so that note properties become more compact, modern
-looking, and friendly on a phone, and so that each recommended change also makes
+improvements to consider, so that note properties are comfortable on an iPad (the device the owner uses
+most often), stay operable on a phone, and so that each recommended change also makes
 the design and architecture of the properties area more cohesive with fewer lines
 of code.
 
@@ -68,9 +68,11 @@ of code.
 
 - Start the assessment with a one-hour budgeted manual UAT of the note properties
   that exist today, in both the editable view and the read-only view of a note.
-- Run the same journeys at a phone width (for example 375 px), a tablet width, and
-  a desktop width. Use the real browser's device mode, and note where a real
-  touch device would differ.
+- Device priority: an iPad-class tablet is the primary device, so run every
+  journey there first, in both portrait (about 820 px wide) and landscape (about
+  1180 px wide), with touch input and the on-screen keyboard. Then repeat the core
+  journeys at a phone width (for example 375 px) and a desktop width. Use the real
+  browser's device mode, and note where a real touch device would differ.
 - Viewing: notes with no properties, a few properties, and many properties; long
   keys, long values, long lists (aliases), wiki-link values, image values,
   Wikidata ID values.
@@ -83,10 +85,11 @@ of code.
   its panel use.
 - Touch and small-screen fit: tap target sizes, horizontal overflow, key column
   width, dialogs and preset lists that leave the screen, and how the properties
-  area competes with the note content for space.
-- Modern presentation: visual density, spacing, hierarchy between key and value,
-  empty states, hover-only cues that a touch user cannot see, and consistency with
-  the rest of the note page.
+  area competes with the note content for space. On an iPad, judge comfort and
+  density; on a phone, judge only whether every journey can be completed.
+- Presentation: on an iPad, visual density, spacing, hierarchy between key and
+  value, empty states, hover-only cues that a touch user cannot see, and
+  consistency with the rest of the note page. Phone appearance is not judged.
 - Design and architecture assessment (required, given equal weight with the
   observed experience): from the running product and the code, identify where the
   properties concept is spread over many files, where the read-only and editable
@@ -103,12 +106,14 @@ of code.
 
 **Key examples**
 
-- Open a note with six properties on a 375 px wide viewport → observe whether every
-  key and value is readable without sideways scrolling, how much of the screen the
-  properties use before the note content begins, and whether the row buttons can be
-  tapped without mistakes.
-- Add a property on a phone-size viewport with the on-screen keyboard open → observe
-  whether the key presets, value input, and validation message stay visible.
+- Open a note with six properties on an iPad-sized viewport in portrait and
+  landscape → observe readability, how much of the screen the properties use before
+  the note content begins, and whether the row buttons can be tapped without mistakes.
+- Add a property on an iPad-sized viewport with the on-screen keyboard open →
+  observe whether the key presets, value input, and validation message stay visible.
+- Open a note with six properties and add, change, and remove one on a 375 px wide
+  viewport → observe only whether each action can be completed (no unreachable
+  control, no content lost off screen); do not record looks as defects.
 - Compare the read-only list and the editable list of the same note → observe what
   differs visually, and record which parts of the code exist twice to produce the
   differences.
@@ -116,11 +121,23 @@ of code.
   replaces the fixed three-column grid) → estimate the lines removed, the files
   merged, and the behavior that must stay covered by tests.
 
+**Acceptance criteria**
+
+- Every journey was run on an iPad-sized viewport in portrait and landscape with
+  touch input; iPad findings rank above phone and desktop findings.
+- The phone-width journeys are judged only by operability: view, add, change, and
+  remove a property, save, and reach every control. Appearance is not an
+  acceptance concern on a phone.
+- A phone finding is a defect only when a user cannot complete a journey; cosmetic
+  phone observations are recorded as optional, at lower priority than iPad findings.
+- The report meets the output list below.
+
 **Output and evaluation**
 
 Produce one findings report containing:
 
-- Scenarios exercised, viewport sizes, note characteristics, and actual UAT time;
+- Scenarios exercised, viewport sizes (iPad portrait and landscape first), note
+  characteristics, and actual UAT time;
   identify important scenarios not reached within the hour.
 - For each defect: expected versus observed behavior, reproduction steps, viewport
   conditions, user impact, and evidence where practical.
@@ -141,8 +158,8 @@ recommendations. An unreproduced suspected problem must be recorded honestly wit
 the conditions tried; it must not become a confirmed defect by assumption. A line
 count estimate must say how it was obtained.
 
-- **For / why:** Users on phones and small windows can read and edit note
-  properties comfortably; the owner can judge which changes to make first, with the
+- **For / why:** Users on an iPad can read and edit note properties comfortably and
+  users on a phone can operate them; the owner can judge which changes to make first, with the
   code getting smaller and more cohesive rather than larger.
 - **Value / learning:** Learn where the properties area fails on small screens or
   feels heavy, and where its structure can be simplified without losing behavior.
@@ -164,15 +181,17 @@ At the one-hour boundary, stop exploration and synthesize what was observed.
 Preserve untested scenarios as coverage gaps rather than extending the UAT or
 claiming complete coverage. Implementation fixes, redesign, and automatic creation
 of follow-up backlog entries are deferred; the output supplies candidates for a
-later product decision. If time is short, keep the phone-width journeys and the
+later product decision. If time is short, keep the iPad journeys, the phone operability journeys, and the
 design and architecture section, and reduce coverage of rare value types first.
 
 ## Open Decisions
 
 - Which findings warrant changes, and in what order? Decide from the UAT report
   rather than selecting them in advance.
-- Whether the assessment is run by an agent or by the owner, and against which
-  stack, is decided at refinement, as it was for the book reading UAT.
+- Decided at refinement: an agent runs the assessment in an exploration workspace
+  against the local dev stack with the seeded `old_learner` account, driving a real
+  browser in device mode; the owner reviews the report. Device mode cannot show real
+  touch behavior, so those cases are listed as needing a real iPad or phone.
 
 ## When to Surface
 
