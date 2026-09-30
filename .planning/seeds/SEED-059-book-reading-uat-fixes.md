@@ -74,37 +74,66 @@ Effort bands: S = 30–60 minutes, M = 1–2 hours, L = 2–4 hours, including d
 
 <a id="story-8"></a>
 
-### Give new and existing blocks short, readable titles
+### Give new blocks a short, readable title
 
 **Identity:** SEED-059#story-8
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"not-refined","approach":"unselected"}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/061-new-block-title-prompt/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"2f46e7920c6e4b656f18d3842c3f197629068f9bcff4e22d0d4f515c8948efcb","plan":"04f5f9165d49ed5122c5ec2a5b275b94e7434e9bef124f416382eeb5b1f2aca4"}}
 ```
 
-**Goal:** A reader can create a block with a short typed title from any
-paragraph, find the *New block* action, and rename a block.
+**Goal:** A reader who creates a block from a paragraph always gets a short
+title they can accept with Enter or replace by typing, instead of a paragraph
+copied into the layout. Creating blocks by hand is rare now that the
+bookmark-based PDF layout exists, so the story shrinks the flow and its tests.
 
-**Observed defect and friction**
+**Observed defect** (UAT defect 12, Medium)
 
-- **Paragraph-length titles (defect 12, Medium).** The title prompt appears only
-  when the paragraph reaches 512 characters; 200- and 289-character paragraphs
-  (Attention 3.2, Think Python 8.3) became titles directly, the 200-character
-  one filling seven lines in the layout. No rename control exists.
-- **The prompt is awkward.** Its default is the full 512 characters cut
-  mid-word, not selected, so typing appends; Enter does not confirm.
-- **The action is hidden.** The content boxes that show where a click creates a
-  block fade about 2 s after a block is chosen, nothing hints that clicking a
-  paragraph offers *New block*, and the callout covers the paragraph's text.
+- The title prompt appears only when the paragraph reaches 512 characters;
+  200- and 289-character paragraphs (Attention 3.2, Think Python 8.3) became
+  titles directly, the 200-character one filling seven lines in the layout.
+- When the prompt does appear, its default is the full 512 characters cut
+  mid-word and not selected, so typing appends; Enter does not confirm.
 - Reproduction: in the Attention paper, choose "3.2 Attention", click the first
   paragraph, then *New block*.
 
+**Scope**
+
+- **Always ask for a title.** Creating a block from any paragraph opens the
+  title prompt. There is no length threshold, so no "long paragraph" special
+  case remains.
+- **Short default.** The default is the paragraph's first sentence, cut at a
+  word boundary to at most 80 characters. A single word longer than 80
+  characters is cut at 80.
+- **Keyboard-ready.** The default is selected when the prompt opens, so typing
+  replaces it; Enter confirms and Escape cancels the creation.
+- **Simplify.** Remove what only served the threshold: the "truncated" marker on
+  the paragraph overlays, the long-paragraph E2E scenario and its fixture step.
+  One E2E scenario covers block creation, and the default rule is proven in a
+  small unit test.
+- **No server change.** The server keeps accepting an optional title up to its
+  existing limit; the web page now always sends one.
+- **Formats:** PDF, the only format where a block can be created today. EPUB
+  reuses the same prompt when story 10 turns reorganizing on for it.
+- **Deferred (not committed here):**
+  - Renaming an existing block, including fixing titles already saved (a new
+    endpoint and row control; the layout may later clamp long titles instead).
+  - Making *New block* easier to find: overlays fading after about 2 s, no hint
+    that a paragraph click offers it, the callout covering the paragraph text.
+  - AI-generated titles and bulk retitling.
+
 **Key examples**
 
-- Creating a block from any paragraph asks for a title, with a short selected
-  default (the first sentence), and Enter confirms.
-- A block with a long title can be renamed.
+- Click a 289-character paragraph in the Attention paper, then *New block* →
+  the prompt shows its first sentence, at most 80 characters, cut at a word
+  boundary, already selected. Type "Attention" and press Enter → a block titled
+  "Attention" is created under the chosen block.
+- A short paragraph, "Python is a language." → the prompt shows exactly that;
+  Enter accepts it.
+- The first sentence is 200 characters long → the default is its first 80
+  characters or fewer, ending at a word.
+- Press Escape in the prompt → no block is created.
 
-**Effort hypothesis:** M, medium confidence.
+**Effort hypothesis:** S, medium confidence.
 **Depends on:** none.
 
 <a id="story-9"></a>
@@ -363,7 +392,8 @@ page indicator step keeps a role for page-1 and page-boundary-free cases.
 - **Highest priority** (reading breaks for common books and devices):
   delivered.
 - **Next** (reading works but is jerky, records go wrong, or correcting is
-  slow): stories 5, 8 and 9.
+  slow): stories 5, 8 and 9. Story 8 shrank to the new-block title prompt on
+  2026-09-30, since hand-made blocks are rare with the bookmark-based layout.
 - **Then** (completing the feature): stories 10–12.
 
 Stories are independent unless stated. First to drop: story 12, then story 11.
