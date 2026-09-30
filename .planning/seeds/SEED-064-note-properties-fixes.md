@@ -170,7 +170,7 @@ When the owner selects note properties, iPad or phone comfort, or simplification
 
 - UAT report: `1986473b79:.planning/seeds/SEED-061-note-properties-ux-uat.md`, section `## UAT Findings`
   (screenshots were not committed).
-- Related queued work in the same area: [SEED-062](SEED-062-reify-property.md#story-1),
+- Related queued work in the same area: [SEED-062](SEED-062-reify-property.md),
   [SEED-063](SEED-063-track-property-values-separately.md#story-1). Both add to the properties rows; story 5 gives
   them one row to extend; story 6 uses whichever rule for repeated keys is current when it is delivered.
 - Code: `frontend/src/components/form/RichFrontmatter*.vue`,

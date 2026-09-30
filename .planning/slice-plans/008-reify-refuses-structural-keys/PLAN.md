@@ -2,8 +2,8 @@
 
 **Identity:** SEED-062#story-2
 **Source:** [story](../../seeds/SEED-062-reify-property.md#story-2) — bounded retrospective correction of
-SEED-062#story-1 ([plan](../006-reify-property/PLAN.md) while it exists; commits 508d4909..58bdfa2d on
-`claude/reify-a-property`).
+SEED-062#story-1 (story and plan recoverable at `c3a7e2f826:.planning/seeds/SEED-062-reify-property.md` and
+`c3a7e2f826:.planning/slice-plans/006-reify-property/PLAN.md`; commits 508d4909..58bdfa2d).
 
 ## Finding (current truth at 58bdfa2d)
 
