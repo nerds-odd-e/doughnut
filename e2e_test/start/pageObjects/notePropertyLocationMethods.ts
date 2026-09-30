@@ -194,6 +194,41 @@ export const notePropertyLocationMethods = () => ({
     })
     return this
   },
+  expectNewRichNotePropertyControlNotCovered(testId: string) {
+    cy.findByTestId(testId).should(($control) => {
+      const box = $control[0]!.getBoundingClientRect()
+      const list = $control[0]!.ownerDocument.querySelector(
+        '[data-testid="rich-note-property-key-preset-list"]'
+      )
+      const covering = list
+        ? [list, ...list.querySelectorAll('button')].filter((element) => {
+            const rect = element.getBoundingClientRect()
+            return (
+              rect.left < box.right &&
+              box.left < rect.right &&
+              rect.top < box.bottom &&
+              box.top < rect.bottom
+            )
+          })
+        : []
+      expect(covering.length, `preset list over ${testId}`).to.equal(0)
+    })
+    return this
+  },
+  expectKeyPresetInsideKeyPanel(presetKey: string) {
+    cy.findByTestId('rich-note-property-key-preset-list').should(($list) => {
+      const panelRight = $list[0]!.parentElement!.getBoundingClientRect().right
+      const option = $list.find(`[data-preset-key="${presetKey}"]`)[0]!
+      expect(
+        option.getBoundingClientRect().right,
+        'option right edge'
+      ).to.be.at.most(panelRight)
+      expect(option.scrollWidth, 'option scroll width').to.be.at.most(
+        option.clientWidth
+      )
+    })
+    return this
+  },
   expectNoteWithoutSidewaysScroll() {
     cy.document().should((doc) => {
       const page = doc.documentElement

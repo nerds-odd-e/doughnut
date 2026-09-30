@@ -23,7 +23,7 @@ already recorded against the property.
 
 **Identity:** SEED-062#story-1
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"unselected"}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/006-reify-property/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"4826b09ae98e8edf84c063f1df910be591fb72d70704d065afe0ac7dbb7d868e","plan":"aa85e518f2a96ac87a2f046128754e61238cf89510208e34dd477cc1b6b3505a"}}
 ```
 
 **Goal**
@@ -34,9 +34,16 @@ work with it as a relationship while retaining the property's existing trackers.
 **Scope**
 
 - Let the user select an existing property and turn it into a relationship node
-  representing the same information.
-- Any trackers attached to the property follow the resulting relationship node.
-  Preserve their learner association, recall history, and current scheduling
+  representing the same information: the source is the note holding the property,
+  the relation is the property key, and the target is the note its wiki-link value
+  names. The new relationship note is created in the same notebook and the same
+  folder as the source note.
+- Only a property whose value is a wiki link to a note can be reified. A plain-text
+  value cannot; that limit is stated to the user rather than failing silently.
+- Reifying replaces the property: the property is removed from the source note and
+  the relationship note holds the information.
+- Any trackers attached to the property follow the resulting relationship node,
+  which becomes the tracked note. Preserve their learner association, recall history, and current scheduling
   state, so reifying a property does not restart learning.
 - A property without trackers can also be reified.
 - Deferred promises: bulk conversion and reversing the conversion.
@@ -44,8 +51,11 @@ work with it as a relationship while retaining the property's existing trackers.
 **Key examples**
 
 - A note has a property describing its relationship to another concept, with
-  no trackers → the author reifies that property → a relationship node expresses
-  the same information.
+  no trackers → the author reifies that property → a relationship note in the same
+  notebook and folder expresses the same information, and the property is gone
+  from the source note.
+- A property whose value is plain text, not a wiki link → the author tries to
+  reify it → nothing changes and the author is told why it cannot be reified.
 - A property has an existing tracker with recall history and a scheduled next
   recall → the author reifies the property → that tracker follows the relationship
   node, retaining its history and next recall.

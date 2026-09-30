@@ -138,3 +138,33 @@ Then(
     start.assumeNotePage().expectAtNoteShow(noteTopology, conversationQuery)
   }
 )
+
+When('I start adding a property with key {string}', (key: string) => {
+  start.assumeNotePage().startAddingRichNoteProperty(key)
+})
+
+When(
+  'I type {string} in the key of property {string}',
+  (text: string, key: string) => {
+    start.assumeNotePage().typeInRichNotePropertyKey(key, text)
+  }
+)
+
+Then('the new property value should not be covered', () => {
+  start
+    .assumeNotePage()
+    .expectNewRichNotePropertyControlNotCovered('rich-note-property-value')
+})
+
+Then('the new property Choose image button should not be covered', () => {
+  start
+    .assumeNotePage()
+    .expectNewRichNotePropertyControlNotCovered('rich-note-image-insert-choose')
+})
+
+Then(
+  'the key preset {string} should stay inside the key panel',
+  (presetKey: string) => {
+    start.assumeNotePage().expectKeyPresetInsideKeyPanel(presetKey)
+  }
+)

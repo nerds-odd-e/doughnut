@@ -8,31 +8,18 @@
         class="daisy-form-control w-full sm:w-auto min-w-[8rem]"
       >
         <span class="daisy-label text-xs">Property key</span>
-        <div
-          class="relative w-full"
-          @focusout="onKeyPresetWrapperFocusOut"
-        >
-          <input
-            :id="insertKeyInputId"
-            :value="draftKey"
-            type="text"
-            autocapitalize="off"
-            class="daisy-input daisy-input-sm w-full"
-            aria-label="Property key"
-            :aria-expanded="presetPanelOpen"
-            :aria-controls="presetPanelOpen ? insertKeyPresetListId : undefined"
-            data-testid="rich-note-property-key"
-            @input="onKeyInput"
-            @focus="presetPanelOpen = true"
-            @keydown.enter.prevent="focusValueInput"
-          />
-          <RichFrontmatterPropertyKeyPresets
-            v-if="presetPanelOpen"
-            :list-id="insertKeyPresetListId"
-            :property-rows="propertyRows"
-            @select="onPresetSelected"
-          />
-        </div>
+        <RichFrontmatterPropertyKeyField
+          class="w-full"
+          :model-value="draftKey"
+          :input-id="insertKeyInputId"
+          :list-id="insertKeyPresetListId"
+          label="Property key"
+          test-id="rich-note-property-key"
+          :property-rows="propertyRows"
+          @update:model-value="emit('update:draftKey', $event)"
+          @enter="focusValueInput"
+          @select="focusValueInput"
+        />
       </label>
       <label
         ref="valueAreaRef"
@@ -112,7 +99,7 @@
 import { ref } from "vue"
 import RichFrontmatterImagePropertyValue from "@/components/form/RichFrontmatterImagePropertyValue.vue"
 import RichFrontmatterPropertyExternalLink from "@/components/form/RichFrontmatterPropertyExternalLink.vue"
-import RichFrontmatterPropertyKeyPresets from "@/components/form/RichFrontmatterPropertyKeyPresets.vue"
+import RichFrontmatterPropertyKeyField from "@/components/form/RichFrontmatterPropertyKeyField.vue"
 import PropertyValueField from "@/components/form/PropertyValueField.vue"
 import type { WikiLink } from "@generated/donut-backend-api"
 import {
@@ -145,27 +132,9 @@ const emit = defineEmits<{
   "image-upload-state": [inProgress: boolean]
 }>()
 
-const presetPanelOpen = ref(false)
 const valueAreaRef = ref<HTMLElement | null>(null)
-
-function onKeyInput(event: Event) {
-  emit("update:draftKey", (event.target as HTMLInputElement).value)
-}
-
-function onKeyPresetWrapperFocusOut(event: FocusEvent) {
-  const root = event.currentTarget as HTMLElement | null
-  const next = event.relatedTarget as Node | null
-  if (root?.contains(next)) return
-  presetPanelOpen.value = false
-}
 
 function focusValueInput() {
   scheduleFocusTargetWithin(valueAreaRef.value)
-}
-
-function onPresetSelected(key: string) {
-  emit("update:draftKey", key)
-  presetPanelOpen.value = false
-  focusValueInput()
 }
 </script>
