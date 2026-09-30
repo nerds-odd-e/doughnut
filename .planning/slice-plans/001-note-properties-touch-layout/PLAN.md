@@ -160,3 +160,10 @@ row panel's Assimilate and Skip are inside the section and so are included; no o
 
 After slice 4, on a real iPad, in both orientations: open the long-key note read-only and editable; tap chevron, edit
 and remove; report the density number for a 19-row note.
+
+## Execution complete
+
+Product advice: The owner's real-iPad check is still the only proof of the 44 px rule on hardware. Two follow-ups for
+the owner to weigh: the `minmax(6rem,40%)` key column widens short read-only keys and raises non-touch read-only density
+by 40 px, and the touch rule fixes height only, so square icon buttons stay 32 px wide. Story 5 deletes
+`RichFrontmatterReadOnlyList.vue`, which retires slice 1's read-only wrapping change. No queue change is recommended now.
