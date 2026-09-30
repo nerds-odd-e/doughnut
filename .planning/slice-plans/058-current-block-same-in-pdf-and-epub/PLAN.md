@@ -101,3 +101,14 @@ parts B and C). The slices below are provisional planning input.
 5. **Behavior:** marking goes on after choosing "Chapter 12" in a no-bookmark
    PDF (new fixture shaped like Think Python). About 10 min if the rule and
    `hasNoTextOfItsOwn` suffice.
+   Status: done. `useReadingPanelTarget.ts` uses `hasNoTextOfItsOwn` in place of
+   its own `hasDirectContent` (equivalent for PDF; the only user is the PDF
+   page). Page spec "goes on after choosing a heading-only label before its
+   title block" (`BookReadingPage.readingControlPanel.marking.spec.ts`): label
+   then title become current in order, the label is marked READ when the title
+   is entered, and the panel is offered for the title. It passed before the
+   product swap too, so it is regression proof from slices 1-4, not a failing-
+   first reproduction. Not reproduced: the UAT panel hidden for 3-4 pages in
+   Think Python (no real-PDF fixture; the cause may be a long introduction whose
+   end is not yet visible). Proof: vitest pages/components/lib/composables (457),
+   vue-tsc, `cy:run` `reading_record` 9/9 and `book_browsing` 9/9.

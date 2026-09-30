@@ -2,6 +2,7 @@ import ReadingControlPanel from "@/components/book-reading/ReadingControlPanel.v
 import { NotebookBooksController } from "@generated/donut-backend-api/sdk.gen"
 import { wrapSdkResponse } from "@tests/helpers"
 import { flushPromises } from "@vue/test-utils"
+import makeMe from "donut-test-fixtures/makeMe"
 import { beforeAll, beforeEach, describe, expect, it, vi } from "vitest"
 import {
   markSection1ReadViaPanel,
@@ -15,10 +16,20 @@ import {
   readingControlPanel,
 } from "./bookReadingPageInteractionTestSupport"
 import {
+  mockIsLastContentBottomVisible,
+  spyOnScrollToBookNavTarget,
+} from "./bookReadingPagePdfViewerTestSupport"
+import {
+  bookId,
+  getTopMathsPdfBytes,
   loadBookReadingPageFixtures,
   mockBookReadingPageDefaults,
+  mockNotebookBookFilePdfOk,
+  mountBookReadingPage,
   mountLoadedBookWithBlocks,
   notebookId,
+  stubGetBookWithTopMathsLikeContentLocators,
+  waitForPdfViewer,
 } from "./bookReadingPageTestSupport"
 
 describe("BookReadingPage reading control panel marking", () => {
@@ -204,5 +215,63 @@ describe("BookReadingPage reading control panel marking", () => {
     await flushPromises()
 
     expect(putSpy).not.toHaveBeenCalled()
+  })
+
+  it("goes on after choosing a heading-only label before its title block", async () => {
+    // Section 1 is the "Chapter" label, Section 2 its title with introduction text
+    stubGetBookWithTopMathsLikeContentLocators((i) => {
+      if (i === 0) return [makeMe.pdfLocator.withBbox(0, [48, 72, 564, 90])]
+      if (i === 1)
+        return [
+          makeMe.pdfLocator.withBbox(0, [48, 100, 564, 120]),
+          makeMe.pdfLocator.withBbox(0, [48, 130, 564, 300]),
+        ]
+      return [makeMe.bookReading.topMathsLikePreorderFirstLocatorAt(i)]
+    })
+    mockNotebookBookFilePdfOk(bookId, getTopMathsPdfBytes())
+    const putSpy = vi
+      .spyOn(NotebookBooksController, "putNotebookBookBlockReadingRecord")
+      .mockResolvedValue(
+        wrapSdkResponse([
+          {
+            bookBlockId: "101",
+            status: "READ",
+            completedAt: "2020-01-01T00:00:00Z",
+          },
+        ])
+      )
+    const wrapper = mountBookReadingPage(notebookId)
+    await waitForPdfViewer(wrapper)
+    mockIsLastContentBottomVisible(wrapper, true)
+    spyOnScrollToBookNavTarget(wrapper)
+
+    await clickBookBlockAndExpectSelection(wrapper, "Section 1")
+    await emitViewportAndSettleCurrentBlock(wrapper, {
+      anchorPageIndexZeroBased: 0,
+      viewport: { top: 72, mid: 100, bottom: 300 },
+      pagesCount: 10,
+    })
+    expect(wrapper.find('[data-current-block="true"]').text()).toBe("Section 1")
+
+    await emitViewportAndSettleCurrentBlock(wrapper, {
+      anchorPageIndexZeroBased: 0,
+      viewport: { top: 100, mid: 200, bottom: 400 },
+      pagesCount: 10,
+    })
+
+    expect(wrapper.find('[data-current-block="true"]').text()).toBe("Section 2")
+    expect(putSpy).toHaveBeenCalledWith(
+      expect.objectContaining({
+        path: expect.objectContaining({ bookBlock: 101 }),
+        body: { status: "READ" },
+      })
+    )
+    await emitViewportAndSettleCurrentBlock(wrapper, {
+      anchorPageIndexZeroBased: 0,
+      viewport: { top: 110, mid: 200, bottom: 400 },
+      pagesCount: 10,
+    })
+    expect(wrapper.find('[data-current-block="true"]').text()).toBe("Section 2")
+    expect(readingControlPanel(wrapper).exists()).toBe(true)
   })
 })
