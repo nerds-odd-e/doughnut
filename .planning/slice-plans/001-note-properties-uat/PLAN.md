@@ -48,7 +48,7 @@ obtained.
 
 ### 1. UAT environment is usable end to end
 Type: Structure
-Status: todo
+Status: done
 Size: about 15 minutes, outside the UAT budget.
 Proof: the Development app started from the primary checkout serves the login page; a Playwright session
 using an iPad descriptor signs in as `manual` and opens a UAT note. Notes exist with no properties, six
@@ -117,4 +117,13 @@ the session.
 
 ## Learnings
 
-None yet.
+- Slice 1 (about 4 minutes): Development stack runs from the primary checkout at http://127.0.0.1:5175/
+  (login page returns 200). Notes are in notebook "UAT notebook" (id 22, account `manual`):
+  `UAT no properties` /n13716, `UAT six properties` /n13717 (screenshot shows five rows, so slice 2 counts
+  the real number), `UAT many properties` /n13718 (19 rows: 14-item aliases, `wikidata_id: Q42`, long key
+  and value, wiki-link values, uploaded `example.png` image). Helper `uat.mjs` with presets `ipad-portrait`,
+  `ipad-landscape`, `phone`, `desktop` is under `$CLAUDE_JOB_DIR/tmp/uat/`.
+- Sign in through `/users/identify`; call the API from inside the page (`page.evaluate(fetch)`) because the
+  secure session cookie is refused over http.
+- First look, to confirm in slice 2: long keys and values are truncated; the floating yellow "T" button
+  overlaps the rightmost row controls; adding `wikidata_id` may insert body text automatically.
