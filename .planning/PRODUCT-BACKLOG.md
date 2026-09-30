@@ -7,7 +7,6 @@ Bug fixing and general maintenance.
 
 ## Taken
 
-- [Typing a property key narrows the presets, and the list stays on screen](seeds/SEED-064-note-properties-fixes.md#story-2) — SEED-064#story-2 ([plan](slice-plans/002-note-properties-key-presets/PLAN.md))
 - [A read-only property's wiki-link value is a link, and both views share one row](seeds/SEED-064-note-properties-fixes.md#story-5) — SEED-064#story-5 ([plan](slice-plans/005-note-property-read-only-row/PLAN.md))
 
 ## Backlog list

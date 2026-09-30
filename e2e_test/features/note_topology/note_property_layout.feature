@@ -81,3 +81,36 @@ Feature: Note property layout
     When I visit note "Linked"
     And I open the property panel for property "url"
     Then the controls of property "url" should be under 44 px high
+
+  Scenario Outline: The key presets of a new property do not cover the value field
+    Given I am re-logged in as "another_old_learner"
+    And I am on a window <width> * 1000
+    When I visit note "Long properties"
+    And I start adding a property with key "url"
+    Then the new property value should not be covered
+    When I start adding a property with key "image"
+    Then the new property Choose image button should not be covered
+
+    Examples:
+      | width |
+      | 375   |
+
+  Scenario Outline: A long key preset wraps inside the key panel of a new property
+    Given I am re-logged in as "another_old_learner"
+    And I am on a window <width> * 1000
+    When I visit note "Long properties"
+    And I start adding a property with key "question"
+    Then the key preset "question_generation_instruction" should stay inside the key panel
+    And the new property value should not be covered
+
+    Examples:
+      | width |
+      | 820   |
+      | 375   |
+
+  Scenario: A long key preset wraps inside the key panel of an existing property
+    Given I am re-logged in as "another_old_learner"
+    And I am on a window 820 * 1000
+    When I visit note "Long properties"
+    And I type "question" in the key of property "a_rather_long_property_key_name_that_keeps_going_and_going_without_any_space"
+    Then the key preset "question_generation_instruction" should stay inside the key panel
