@@ -85,3 +85,7 @@ Cause confirmed by the red run: the choice was hidden by the empty-results branc
 
 After slice 1, on a note whose title finds no Wikidata entries, type `Q42` in the property's Wikidata dialog, tap Save,
 and confirm the choice is visible.
+
+## Execution complete
+
+Product advice: no change. The story delivered the reported behavior: typing a Wikidata ID and pressing Save now shows the "Replace title" / "Add as alias" choice even when the title search found nothing. It is a one-slice reorder with no new product learning. Queue order and the stale-ID hole, which stays out of scope, are unchanged. The optional real-iPad check by the owner is still open.
