@@ -119,6 +119,21 @@ export const bookReadingLayoutMethods = () => ({
     })
     return this
   },
+  pressArrowDownOnFocusedBookBlock() {
+    cy.focused().trigger('keydown', {
+      key: 'ArrowDown',
+      code: 'ArrowDown',
+      keyCode: 40,
+      which: 40,
+      bubbles: true,
+      getModifierState: () => false,
+    })
+    return this
+  },
+  pressEnterOnFocusedBookBlock() {
+    cy.focused().type('{enter}')
+    return this
+  },
   undoLastBookLayoutChange() {
     cy.get('[data-testid="book-reading-undo-layout-change"]')
       .should('be.visible')

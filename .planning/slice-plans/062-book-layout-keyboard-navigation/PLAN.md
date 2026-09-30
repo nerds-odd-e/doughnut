@@ -2,7 +2,7 @@
 
 Work item: **SEED-059#story-9**
 ([story](../../seeds/SEED-059-book-reading-uat-fixes.md#story-9)).
-Status: **slice 1 done; slices 2 and 3 planned.**
+Status: **slices 1 and 2 done; slice 3 planned.**
 
 ## Goal and scope
 
@@ -89,7 +89,7 @@ row natively (a long walk, but no accidental depth change).
 
 ### 2. The layout is one tab stop; arrows move focus
 Type: Behavior
-Status: planned
+Status: done
 Proof: component spec: exactly one row has `tabindex="0"` (last focused, else
 selected, else current, else first); ArrowDown/ArrowUp focus the next/previous
 row without emitting `blockClick`, and stay put at the ends. E2E new scenario
@@ -129,3 +129,7 @@ the first assertion passes without a change, the slice is that assertion only.
   synthetic Tab and now sends Alt+Shift+ArrowRight.
 - Cypress `trigger('keydown')` must keep a `getModifierState` stub (the Vue
   inspector overlay in dev mode calls it).
+- Slice 2: a synthetic keydown does not fire a native click, so the E2E Enter
+  step uses `cy.focused().type('{enter}')`. The component spec does not cover
+  arrows with modifiers falling through `.exact`; slice 1's Alt+Shift spec and
+  the depth E2E scenarios cover that.

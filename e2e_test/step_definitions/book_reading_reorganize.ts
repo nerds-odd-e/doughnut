@@ -114,6 +114,22 @@ When(
 )
 
 When(
+  'I press ArrowDown on the focused book block',
+  // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
+  () => {
+    return bookReadingPage().pressArrowDownOnFocusedBookBlock()
+  }
+)
+
+When(
+  'I press Enter on the focused book block',
+  // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
+  () => {
+    return bookReadingPage().pressEnterOnFocusedBookBlock()
+  }
+)
+
+When(
   'I undo the last book layout change',
   // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
   () => {

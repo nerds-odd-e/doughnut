@@ -40,6 +40,14 @@ Feature: Reorganize book layout
       Then the book block "3.1 Can You Refactor Without Tests?" should be at depth 1 in the book layout
       And the book block "3.2 Can You Refactor Without Changing the Code?" should be at depth 1 in the book layout
 
+    Scenario: Move between book blocks with the arrow keys
+      When I choose the book block "3. Refactoring Is Not Only About Changing Production Code"
+      And I press ArrowDown on the focused book block
+      Then the book block "3.1 Can You Refactor Without Tests?" should be focused in the book layout
+      And I should see that book block "3. Refactoring Is Not Only About Changing Production Code" is selected in the book layout
+      When I press Enter on the focused book block
+      Then I should see that book block "3.1 Can You Refactor Without Tests?" is selected in the book layout
+
   Rule: Content block bbox overlays
 
     Background:

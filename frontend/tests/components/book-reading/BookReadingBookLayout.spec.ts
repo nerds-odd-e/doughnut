@@ -15,6 +15,7 @@ function mountLayout(
   blocks = [blockStub({ id: 1, depth: 0, title: "A" })],
   options?: {
     selectedBlockId?: number | null
+    currentBlockId?: number | null
     isMdOrLarger?: boolean
     opened?: boolean
     canUndoDepthChange?: boolean
@@ -27,7 +28,7 @@ function mountLayout(
       panelId,
       isMdOrLarger: options?.isMdOrLarger ?? true,
       blocks,
-      currentBlockId: null,
+      currentBlockId: options?.currentBlockId ?? null,
       selectedBlockId: options?.selectedBlockId ?? null,
       canUndoDepthChange: options?.canUndoDepthChange ?? false,
       dispositionForBlock: () => undefined,
@@ -246,6 +247,68 @@ describe("BookReadingBookLayout", () => {
     expect(wrapper.emitted("blockIndent")![0]![0]).toEqual(block)
     expect(wrapper.emitted("blockOutdent")![0]![0]).toEqual(block)
     wrapper.unmount()
+  })
+
+  describe("keyboard navigation", () => {
+    const threeBlocks = [
+      blockStub({ id: 1, depth: 0, title: "A" }),
+      blockStub({ id: 2, depth: 0, title: "B" }),
+      blockStub({ id: 3, depth: 0, title: "C" }),
+    ]
+    const rowsOf = (wrapper: ReturnType<typeof mountLayout>) =>
+      wrapper
+        .findAll('[data-testid="book-reading-book-block"]')
+        .map((r) => r.element as HTMLElement)
+    const tabStops = (wrapper: ReturnType<typeof mountLayout>) =>
+      rowsOf(wrapper)
+        .filter((r) => r.getAttribute("tabindex") === "0")
+        .map((r) => r.textContent!.trim())
+
+    it.each([
+      [{}, "A"],
+      [{ currentBlockId: 2 }, "B"],
+      [{ currentBlockId: 2, selectedBlockId: 3 }, "C"],
+    ])("makes one row the tab stop with options %j: %s", (options, title) => {
+      const wrapper = mountLayout(threeBlocks, options)
+      expect(tabStops(wrapper)).toEqual([title])
+      wrapper.unmount()
+    })
+
+    it("moves the tab stop to the last focused row", async () => {
+      const wrapper = mountLayout(threeBlocks, { selectedBlockId: 3 })
+      rowsOf(wrapper)[1]!.focus()
+      await wrapper.vm.$nextTick()
+      expect(tabStops(wrapper)).toEqual(["B"])
+      wrapper.unmount()
+    })
+
+    it("moves focus with ArrowDown and ArrowUp without choosing, and stays at the ends", async () => {
+      const wrapper = mountLayout(threeBlocks)
+      const rows = rowsOf(wrapper)
+      const press = async (key: string) => {
+        const ev = new KeyboardEvent("keydown", {
+          key,
+          bubbles: true,
+          cancelable: true,
+        })
+        document.activeElement!.dispatchEvent(ev)
+        await wrapper.vm.$nextTick()
+        return ev
+      }
+      rows[0]!.focus()
+      expect((await press("ArrowDown")).defaultPrevented).toBe(true)
+      expect(document.activeElement).toBe(rows[1])
+      await press("ArrowDown")
+      await press("ArrowDown")
+      expect(document.activeElement).toBe(rows[2])
+      await press("ArrowUp")
+      expect(document.activeElement).toBe(rows[1])
+      await press("ArrowUp")
+      await press("ArrowUp")
+      expect(document.activeElement).toBe(rows[0])
+      expect(wrapper.emitted("blockClick")).toBeUndefined()
+      wrapper.unmount()
+    })
   })
 
   it("emits requestAiReorganize when AI Reorganize is clicked", async () => {
