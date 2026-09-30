@@ -65,7 +65,7 @@ describe("BookReadingPage reading control panel marking", () => {
 
     await emitViewportAndSettleCurrentBlock(wrapper, {
       anchorPageIndexZeroBased: 0,
-      viewport: { top: 0, mid: 100, bottom: 300 },
+      viewport: { top: 72, mid: 100, bottom: 300 },
       pagesCount: 10,
     })
 
@@ -104,7 +104,7 @@ describe("BookReadingPage reading control panel marking", () => {
 
     await emitViewportAndSettleCurrentBlock(wrapper, {
       anchorPageIndexZeroBased: 0,
-      viewport: { top: 0, mid: 500, bottom: 1000 },
+      viewport: { top: 72, mid: 500, bottom: 1000 },
       pagesCount: 10,
     })
 
@@ -159,7 +159,7 @@ describe("BookReadingPage reading control panel marking", () => {
 
     await emitViewportAndSettleCurrentBlock(wrapper, {
       anchorPageIndexZeroBased: 0,
-      viewport: { top: 0, mid: 500, bottom: 1000 },
+      viewport: { top: 72, mid: 500, bottom: 1000 },
       pagesCount: 10,
     })
     await flushPromises()
@@ -198,7 +198,7 @@ describe("BookReadingPage reading control panel marking", () => {
 
     await emitViewportAndSettleCurrentBlock(wrapper, {
       anchorPageIndexZeroBased: 0,
-      viewport: { top: 0, mid: 500, bottom: 1000 },
+      viewport: { top: 72, mid: 500, bottom: 1000 },
       pagesCount: 10,
     })
     await flushPromises()

@@ -137,10 +137,13 @@ When(
 )
 
 When(
-  'I scroll the PDF book reader to the top of page {int}',
+  'I scroll the PDF book reader to {int} of 1000 down page {int}',
   // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
-  (pageNumber: number) => {
-    return bookReadingPage().scrollPdfBookReaderToTopOfPage(pageNumber)
+  (normalizedY: number, pageNumber: number) => {
+    return bookReadingPage().scrollPdfBookReaderToPosition(
+      pageNumber,
+      normalizedY
+    )
   }
 )
 

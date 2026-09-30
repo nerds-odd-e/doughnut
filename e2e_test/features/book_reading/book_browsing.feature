@@ -72,6 +72,8 @@ Feature: Book browsing
       When I choose the book block "4. Two Different Kinds of Refactoring"
       Then the book reader PDF viewport should be on page 4
       And the book block "4. Two Different Kinds of Refactoring" should be the current selection in the book reader
-      When I scroll the PDF book reader to the top of page 5
+      When I scroll the PDF book reader to 0 of 1000 down page 5
       Then the book reader PDF viewport should be on page 5
-      And the book block "5. Refactoring in Team Development" should be the current block in the book reader
+      And the book block "4. Two Different Kinds of Refactoring" should be the current block in the book reader
+      When I scroll the PDF book reader to 95 of 1000 down page 5
+      Then the book block "5. Refactoring in Team Development" should be the current block in the book reader

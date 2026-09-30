@@ -73,6 +73,21 @@ parts B and C). The slices below are provisional planning input.
    block-start source. About 10–12 min. Exception: the spec migration is
    mechanical and cannot be split off without leaving red specs or a dead old
    rule.
+   Status: done. `onViewportAnchorPage` proposes `currentBlockIdInView()` (same
+   as `showBlock`); `currentBlockIdFromVisiblePage` and its spec are deleted and
+   `usePdfViewportPosition()` takes no blocks. The bookmark scenario scrolls to
+   `0 of 1000` (block 4 still current) then `95 of 1000` (block 5 current) on
+   page 5. Page specs stub the view through `stubViewTopAt`. No start-of-document
+   landing limit was needed. Learning: the page indicator follows the reader's
+   midpoint, so after landing without padding a "viewport should be on page N"
+   assertion can sit within pixels of a page boundary; CI run 36647846005
+   failed on this in `phone_reading.feature` and was repaired by asserting the
+   start position (`5206b08370`). `book_browsing.feature` and
+   `reading_record.feature` still use the indicator step after choosing a block
+   and could be similarly fragile. Proof: vitest book-reading pages, components,
+   lib and composables (253), vue-tsc, `cy:run` for `book_browsing` 9/9,
+   `reading_record` 9/9, `reorganize_layout` 8/8, `ai_reorganize_layout` 1/1,
+   `phone_reading` 7/7.
 4. **Behavior:** a chosen PDF block keeps a shared start (bookmark fixture).
    About 10 min.
 5. **Behavior:** marking goes on after choosing "Chapter 12" in a no-bookmark

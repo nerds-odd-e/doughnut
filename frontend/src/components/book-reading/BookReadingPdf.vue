@@ -76,8 +76,7 @@ const {
   currentPage,
   pagesTotal,
   readingPositionLocator,
-  currentBlockCandidate,
-} = usePdfViewportPosition(() => props.book.blocks)
+} = usePdfViewportPosition()
 
 function onPdfLoadError(message: string) {
   pdfViewerLoadError.value = message
@@ -156,7 +155,10 @@ const {
 /** PdfBookViewer's viewport → the debounced current block, panel anchor, and reading position. */
 function onViewportAnchorPage(payload: PdfViewportPayload) {
   viewportPayload.value = payload
-  currentBlockIdDebouncer.propose(currentBlockCandidate(payload))
+  const id = currentBlockIdInView()
+  if (id !== null) {
+    currentBlockIdDebouncer.propose(id)
+  }
   updateLastDirectContentGeometry()
   updateReadingPanelAnchor()
   proposeReadingPosition()

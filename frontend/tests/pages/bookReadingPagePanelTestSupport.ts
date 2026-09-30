@@ -44,7 +44,7 @@ async function selectSection1AndShowPanel(wrapper: BookReadingPageWrapper) {
   await clickBookBlockAndExpectSelection(wrapper, "Section 1")
   await emitViewportAndSettleCurrentBlock(wrapper, {
     anchorPageIndexZeroBased: 0,
-    viewport: { top: 0, mid: 500, bottom: 1000 },
+    viewport: { top: 72, mid: 500, bottom: 1000 },
     pagesCount: 10,
   })
 }

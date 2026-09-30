@@ -158,7 +158,7 @@ describe("BookReadingPage", () => {
 
       await emitViewportAndSettleCurrentBlock(wrapper, {
         anchorPageIndexZeroBased: 0,
-        viewport: null,
+        viewport: { top: 520, mid: 600, bottom: 1000 },
         pagesCount: 10,
       })
 
