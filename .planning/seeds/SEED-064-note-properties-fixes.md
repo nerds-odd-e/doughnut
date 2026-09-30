@@ -80,20 +80,51 @@ Effort bands: S = 30–60 minutes, M = 1–2 hours, L = 2–4 hours, including d
 
 **Identity:** SEED-064#story-2
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"not-refined","approach":"unselected"}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/002-note-properties-key-presets/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"a75e92592c3093789e8f7154bf1d7210b70a43380c03645e1253741e89fe2af5","plan":"8940e8fae6150d2c46859f1c0ebbc539fffab743878df9e8f640f424c42f089d"}}
 ```
 
-- **For / why:** the preset list keeps all seven presets while typing, is wider than its panel, runs off the screen
-  with the keyboard (iPad D3), and covers the value field and the Choose image button on a phone until the key loses
-  focus (phone D2).
-- **Evaluation:** on an iPad in both orientations and on a 375 px phone, type `mo` in the key field: only matching
-  presets show, the list stays inside its panel and inside the visible area, and the value field stays reachable
-  with one tap. Check on a real iPad with the software keyboard.
-- **Value / learning:** the add journey becomes clear on the primary device and unblocks the phone path; one key
-  field replaces two copies (C3, about -25 lines, estimate).
-- **Effort hypothesis:** M, medium confidence: filtering is cheap; keeping the list on screen with the keyboard is
-  the uncertain part.
-- **Depends on:** none genuine.
+- **Goal:** an iPad user (primary device) or a phone user who types a property key sees only the presets that match
+  what was typed, and can always tap the value field, or Choose image for the key `image`, with one tap while the
+  list is showing. Nothing is lost today and typing a custom key already works; the story removes the one silent
+  blocker (a tap on the value field or Choose image lands on a preset option, phone D2) and makes the list usable
+  (iPad D3).
+- **Scope:**
+  - **Narrowing.** The list shows the presets whose displayed name contains the text typed since the key field took
+    focus (case-insensitive) and disappears when none matches, because a custom key is then being typed. Focusing a
+    key field without typing shows every available preset, as today (an existing row's key can be swapped for a
+    preset). Choosing a preset, or leaving the field, closes the list and clears the filter.
+  - **Width.** No option extends beyond its key panel: long names such as `question_generation_instruction` wrap
+    inside it (iPad D3, width part).
+  - **Value stays reachable.** At 375 px, with a key typed that still matches a preset (`url`, or `image`), the value
+    field and the Choose image button are not covered by the list; the element at their centre is the field or the
+    button itself (phone D2). At 820 px the list also does not extend over the value column. How this is achieved is
+    left to planning; the list must not depend on a breakpoint other than the row's own.
+  - **Both entry points.** The add form's key field and an existing row's key field behave the same, because they are
+    one field; one key field replaces the two copies (C3, about -25 lines, estimate). This is how the fix is made
+    once and survives story 6's draft row; it is not a separate outcome.
+  - **Real iPad check by the owner** with the software keyboard, in both orientations: type `ur` in the add form's key
+    field and confirm the list and the value field are visible. If the list still runs off the screen, that is a new
+    finding for the owner, not a failure of this story.
+- **Excluded (story decisions):**
+  - keyboard-aware positioning (visual viewport, opening the list upward); the automated proof is layout at fixed
+    widths, not a keyboard;
+  - Tab order from the key field into the first preset instead of the value field (phone D2 observation); deferred, the
+    owner has not rated it;
+  - the numbered `url 2` entry stays as it is and is not tested (SEED-063 boundary);
+  - changes to which presets exist, their order, or the key-family rules.
+- **Key examples:**
+  - Add property, type `ur` → only `url` is listed; clear the text → all available presets are listed again.
+  - Type `of` → `example of`; type `UR` → `url`; type `mo` → no list.
+  - Focus an existing row's key `custom` without typing → every available preset is listed; type `ur` → only `url`;
+    choose it → the key is `url`, the list closes, and the value field of that row has focus.
+  - 375 px, add form, type `url` → the value field is not covered by the list. Type `image` → Choose image is not
+    covered.
+  - 820 px and 375 px, type `question` → the list stays within the key panel and its option wraps inside it; at 820 px
+    the value column is not covered.
+- **Effort hypothesis:** M, medium-high confidence: one structural slice (shared key field), one filtering slice, one
+  layout slice. The keyboard part that made it uncertain is excluded.
+- **Depends on:** none. This story's layout scenario extends `note_property_layout.feature`, which already has the
+  window step `I am on a window {int} * {int}`.
 - **Boundary with SEED-063:** the numbered preset entry that appears when a key is taken (`url 2`) is left as it is and
   is not a target of this story's filtering tests; SEED-063 removes it with the numbered-key convention. This story
   filters and positions the list only.

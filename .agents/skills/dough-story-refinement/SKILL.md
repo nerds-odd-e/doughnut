@@ -52,6 +52,11 @@ seed or correction-home write records goal, scope, and key examples for a work
 item with a known identity, apply
 [record preparation facts](../dough-product-backlog/references/record-preparation.md).
 
+When the request includes options such as `--explore`, read
+[refinement options](references/refinement-options.json) and apply the selected
+options' instructions within this workflow. Without options, refine
+straightforwardly.
+
 Report the story links, material constraints and deferred promises, and
 unresolved decisions. Apply that reference's keep or discard decision, then
 close or retain the workspace, when this session ends.

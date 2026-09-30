@@ -83,13 +83,13 @@ premise that was not observed is a blocking reason — record `not-ready` with
 slices are defined under
 [slice planning](../../dough-slice-planning/SKILL.md#write-the-plan).
 
-An observation or replay settles a premise only when it covers the slice's
-promised journey through the next operation that consumes its result, not only
-the seam a concern named: a replay proving pull alone does not settle a slice
-that promises pull then publish. Clear a premise-based reason only with a fresh
-observation of that premise; citing earlier evidence again does not clear it.
-After the blocking concern is gone, re-read the current basis and record
-`ready` without reasons.
+An observation settles a premise only as
+[slice planning](../../dough-slice-planning/SKILL.md#write-the-plan) describes:
+through the operation that consumes its result. An observation or replay that
+records part of the promised journey as not covered blocks `ready`. Clear a
+premise-based reason only with a fresh observation of that premise; citing
+earlier evidence again does not clear it. After the blocking concern is gone,
+re-read the current basis and record `ready` without reasons.
 
 ### Planless authority
 
