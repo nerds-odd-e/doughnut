@@ -1,6 +1,7 @@
 package com.odde.donut.services;
 
 import com.odde.donut.entities.Note;
+import com.odde.donut.entities.PropertyFocus;
 import com.odde.donut.entities.User;
 import com.odde.donut.entities.repositories.NoteRepository;
 import com.odde.donut.services.ai.GeneratedMcq;
@@ -58,22 +59,30 @@ public class QuestionGenerationRequestBuilder {
 
   @Transactional(readOnly = true)
   public StructuredResponseCreateParams<GeneratedMcq> buildQuestionGenerationResponseRequest(
-      Note note, String additionalMessage, Long contextSeed, String propertyKey) {
+      Note note, String additionalMessage, Long contextSeed, PropertyFocus propertyFocus) {
     return buildQuestionGenerationResponseRequest(
-        note, additionalMessage, contextSeed, propertyKey, authorizationService.getCurrentUser());
+        note, additionalMessage, contextSeed, propertyFocus, authorizationService.getCurrentUser());
   }
 
   public StructuredResponseCreateParams<GeneratedMcq> buildQuestionGenerationResponseRequest(
-      Note note, String additionalMessage, Long contextSeed, String propertyKey, User viewer) {
+      Note note,
+      String additionalMessage,
+      Long contextSeed,
+      PropertyFocus propertyFocus,
+      User viewer) {
     return buildQuestionGenerationResponseRequestInternal(
-        note, additionalMessage, contextSeed, propertyKey, viewer, false);
+        note, additionalMessage, contextSeed, propertyFocus, viewer, false);
   }
 
   public StructuredResponseCreateParams<GeneratedMcq>
       buildQuestionGenerationResponseRequestForBatch(
-          Note note, String additionalMessage, Long contextSeed, String propertyKey, User viewer) {
+          Note note,
+          String additionalMessage,
+          Long contextSeed,
+          PropertyFocus propertyFocus,
+          User viewer) {
     return buildQuestionGenerationResponseRequestInternal(
-        note, additionalMessage, contextSeed, propertyKey, viewer, true);
+        note, additionalMessage, contextSeed, propertyFocus, viewer, true);
   }
 
   private StructuredResponseCreateParams<GeneratedMcq>
@@ -81,7 +90,7 @@ public class QuestionGenerationRequestBuilder {
           Note note,
           String additionalMessage,
           Long contextSeed,
-          String propertyKey,
+          PropertyFocus propertyFocus,
           User viewer,
           boolean batch) {
     String modelName = globalSettingsService.globalSettingQuestionGeneration().getValue();
@@ -92,7 +101,7 @@ public class QuestionGenerationRequestBuilder {
         AiToolFactory.mcqAiTool(hydrateFocusNoteForQuestionGeneration(note).isBodyContentBlank());
     OpenAIResponseRequestBuilder<GeneratedMcq> responseRequestBuilder =
         openAiResponseRequestForQuestionGeneration(
-            GeneratedMcq.class, note, additionalMessage, contextSeed, propertyKey, viewer);
+            GeneratedMcq.class, note, additionalMessage, contextSeed, propertyFocus, viewer);
     responseRequestBuilder.addInstruction(tool.getMessageBody());
     responseRequestBuilder.reasoningEffort(reasoningEffort);
     responseRequestBuilder.maxOutputTokens(
@@ -122,13 +131,13 @@ public class QuestionGenerationRequestBuilder {
       Note note,
       String additionalMessage,
       Long contextSeed,
-      String propertyKey) {
+      PropertyFocus propertyFocus) {
     return openAiResponseRequestForQuestionGeneration(
         responseType,
         note,
         additionalMessage,
         contextSeed,
-        propertyKey,
+        propertyFocus,
         authorizationService.getCurrentUser());
   }
 
@@ -137,11 +146,11 @@ public class QuestionGenerationRequestBuilder {
       Note note,
       String additionalMessage,
       Long contextSeed,
-      String propertyKey,
+      PropertyFocus propertyFocus,
       User viewer) {
     String modelName = globalSettingsService.globalSettingQuestionGeneration().getValue();
     return openAiResponseRequestForQuestionGeneration(
-        responseType, note, additionalMessage, contextSeed, modelName, propertyKey, viewer);
+        responseType, note, additionalMessage, contextSeed, modelName, propertyFocus, viewer);
   }
 
   public <T> OpenAIResponseRequestBuilder<T> openAiResponseRequestForQuestionEvaluation(
@@ -163,7 +172,7 @@ public class QuestionGenerationRequestBuilder {
       String additionalMessage,
       Long contextSeed,
       String modelName,
-      String propertyKey,
+      PropertyFocus propertyFocus,
       User viewer) {
     Note focus = hydrateFocusNoteForQuestionGeneration(note);
 
@@ -177,8 +186,8 @@ public class QuestionGenerationRequestBuilder {
             ? ApproximateUtf8TokenBudget.estimateApproxTokens(instructionUserBlock)
             : 0;
     String propertyFocusBlock =
-        propertyKey != null && !propertyKey.isBlank()
-            ? FocusContextMarkdownAugmenter.buildPropertyFocusBlock(focus, propertyKey)
+        propertyFocus != null
+            ? FocusContextMarkdownAugmenter.buildPropertyFocusBlock(focus, propertyFocus)
             : null;
     int propertyFocusTokens =
         propertyFocusBlock != null

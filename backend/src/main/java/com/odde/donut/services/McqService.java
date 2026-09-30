@@ -59,10 +59,10 @@ public class McqService {
     return generateAFeasibleQuestion(note, null);
   }
 
-  public Mcq generateAFeasibleQuestion(Note note, String propertyKey) {
+  public Mcq generateAFeasibleQuestion(Note note, PropertyFocus propertyFocus) {
     Long contextSeedBoxed = Long.valueOf(ThreadLocalRandom.current().nextLong());
     Mcq result =
-        aiQuestionGenerator.getAiGeneratedQuestion(note, null, contextSeedBoxed, propertyKey);
+        aiQuestionGenerator.getAiGeneratedQuestion(note, null, contextSeedBoxed, propertyFocus);
     if (result == null) {
       return null;
     }
@@ -79,7 +79,7 @@ public class McqService {
       Long regSeedBoxed = Long.valueOf(ThreadLocalRandom.current().nextLong());
       Mcq regeneratedQuestion =
           aiQuestionGenerator.regenerateQuestion(
-              contestResult, note, result, regSeedBoxed, propertyKey);
+              contestResult, note, result, regSeedBoxed, propertyFocus);
       if (regeneratedQuestion != null) {
         result = entityPersister.save(regeneratedQuestion);
       } else {

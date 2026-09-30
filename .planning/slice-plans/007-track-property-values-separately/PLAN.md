@@ -149,7 +149,10 @@ as today. Omitted value means `''` (scalar), so existing callers are unchanged.
 
 ### 3. A value's recall question is about that value
 Type: Behavior
-Status: planned
+Status: done — `QuestionGenerationBatchJsonlRendererTest.focusesTheTrackedValueOfAListProperty` red then green,
+`QuestionGenerationRequestBuilderTests`; question-generation/recall-prompt/MCQ set green. `entities.PropertyFocus(key,
+value)` from `MemoryTracker.propertyFocus()` replaces the key along the question-generation chain; `''` reads the scalar
+from frontmatter.
 Proof: `QuestionGenerationRequestBuilderTests`, `QuestionGenerationBatchJsonlRendererTest`, red then green.
 
 Behavior: a tracker (`example of`, `[[run]]`) → the property focus block says `Property key: example of` and

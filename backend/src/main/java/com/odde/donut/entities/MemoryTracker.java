@@ -239,6 +239,10 @@ public class MemoryTracker extends EntityIdentifiedByIdOnly {
     return key == null || key.isEmpty();
   }
 
+  public PropertyFocus propertyFocus() {
+    return isNoteLevelTracker() ? null : new PropertyFocus(getPropertyKey(), getPropertyValue());
+  }
+
   @JsonProperty
   public RecalledNote getRecalledNote() {
     return RecalledNote.from(getNote(), getPropertyKey());

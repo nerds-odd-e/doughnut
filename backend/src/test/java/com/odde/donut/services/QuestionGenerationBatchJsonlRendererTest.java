@@ -66,13 +66,13 @@ class QuestionGenerationBatchJsonlRendererTest extends SpringTestBase {
   private Map<String, Object> expectedBodyForRequest(
       QuestionGenerationBatch batch, QuestionGenerationBatchRequest request) {
     MemoryTracker tracker = request.getMemoryTracker();
-    String propertyKey = tracker.getPropertyKey();
-    if (propertyKey != null && propertyKey.isBlank()) {
-      propertyKey = null;
-    }
     StructuredResponseCreateParams<GeneratedMcq> params =
         requestBuilder.buildQuestionGenerationResponseRequestForBatch(
-            tracker.getNote(), null, request.getContextSeed(), propertyKey, batch.getUser());
+            tracker.getNote(),
+            null,
+            request.getContextSeed(),
+            tracker.propertyFocus(),
+            batch.getUser());
     return paramsSerializer.toBodyMap(params);
   }
 
@@ -117,6 +117,29 @@ class QuestionGenerationBatchJsonlRendererTest extends SpringTestBase {
         Map<String, Object> body = (Map<String, Object>) line.get("body");
         assertThat(body, is(expectedBodyForRequest(batch, request)));
       }
+    }
+
+    @Test
+    void focusesTheTrackedValueOfAListProperty() throws Exception {
+      Note note =
+          makeMe
+              .aNote()
+              .notebookOwnedBy(user)
+              .content("---\nexample of: [\"[[run]]\", \"[[past tense]]\"]\n---\nran\n")
+              .please();
+      MemoryTracker tracker =
+          makeMe
+              .aMemoryTrackerFor(note)
+              .propertyKey("example of")
+              .propertyValue("[[run]]")
+              .please();
+      QuestionGenerationBatch batch = savePlannedBatch();
+      saveBatchRequest(batch, tracker);
+
+      String jsonl = jsonlRenderer.renderInputJsonl(batch);
+
+      assertThat(jsonl, containsString("Property key: example of"));
+      assertThat(jsonl, containsString("Property value: [[run]]\\n"));
     }
 
     @Test

@@ -3,6 +3,7 @@ package com.odde.donut.services;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.odde.donut.entities.Mcq;
 import com.odde.donut.entities.Note;
+import com.odde.donut.entities.PropertyFocus;
 import com.odde.donut.entities.User;
 import com.odde.donut.services.ai.GeneratedMcq;
 import com.odde.donut.services.ai.QuestionEvaluation;
@@ -39,9 +40,9 @@ public class NoteQuestionGenerationService {
   }
 
   public GeneratedMcq generateQuestion(
-      Note note, String additionalMessage, Long contextSeed, String propertyKey)
+      Note note, String additionalMessage, Long contextSeed, PropertyFocus propertyFocus)
       throws JsonProcessingException {
-    return generateQuestionWithResponses(note, additionalMessage, contextSeed, propertyKey);
+    return generateQuestionWithResponses(note, additionalMessage, contextSeed, propertyFocus);
   }
 
   public StructuredResponseCreateParams<GeneratedMcq> buildQuestionGenerationRequest(
@@ -50,22 +51,26 @@ public class NoteQuestionGenerationService {
   }
 
   public StructuredResponseCreateParams<GeneratedMcq> buildQuestionGenerationRequest(
-      Note note, String additionalMessage, String propertyKey) {
+      Note note, String additionalMessage, PropertyFocus propertyFocus) {
     return requestBuilder.buildQuestionGenerationResponseRequest(
-        note, additionalMessage, null, propertyKey);
+        note, additionalMessage, null, propertyFocus);
   }
 
   public StructuredResponseCreateParams<GeneratedMcq> buildQuestionGenerationRequest(
-      Note note, String additionalMessage, Long contextSeed, String propertyKey, User viewer) {
+      Note note,
+      String additionalMessage,
+      Long contextSeed,
+      PropertyFocus propertyFocus,
+      User viewer) {
     return requestBuilder.buildQuestionGenerationResponseRequest(
-        note, additionalMessage, contextSeed, propertyKey, viewer);
+        note, additionalMessage, contextSeed, propertyFocus, viewer);
   }
 
   private GeneratedMcq generateQuestionWithResponses(
-      Note note, String additionalMessage, Long contextSeed, String propertyKey) {
+      Note note, String additionalMessage, Long contextSeed, PropertyFocus propertyFocus) {
     StructuredResponseCreateParams<GeneratedMcq> responseRequest =
         requestBuilder.buildQuestionGenerationResponseRequest(
-            note, additionalMessage, contextSeed, propertyKey);
+            note, additionalMessage, contextSeed, propertyFocus);
 
     return openAiApiHandler
         .requestAndGetStructuredResponseResult(responseRequest)
