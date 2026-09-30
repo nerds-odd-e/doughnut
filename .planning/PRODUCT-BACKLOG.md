@@ -12,3 +12,5 @@ Bug fixing and general maintenance.
 ## Backlog list
 
 - [Book reading E2E scenarios stay stable at any window size](seeds/SEED-059-book-reading-uat-fixes.md#story-21) — SEED-059#story-21
+- [Reify a property](seeds/SEED-062-reify-property.md#story-1) — SEED-062#story-1
+- [Track each value of a property separately without numbered keys](seeds/SEED-063-track-property-values-separately.md#story-1) — SEED-063#story-1
