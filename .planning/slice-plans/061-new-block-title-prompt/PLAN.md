@@ -113,3 +113,11 @@ presses Enter to create the block; Escape abandons it. About 5 min.
 ## Learnings
 
 None yet.
+
+## Execution complete
+
+Product advice: no change. The story's outcome matches its scope; PDF is the only
+format that creates blocks, and EPUB reuses the same prompt when story 10 enables
+reorganizing. Gap for the record: no E2E asserts the shortened default text of a
+long paragraph in the real page; the pure-function spec and the non-empty-default
+E2E carry it.
