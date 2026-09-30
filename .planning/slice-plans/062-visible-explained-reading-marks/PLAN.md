@@ -2,7 +2,7 @@
 
 Work item: **SEED-059#story-12**
 ([story](../../seeds/SEED-059-book-reading-uat-fixes.md#story-12)).
-Status: **story refined; two Behavior slices planned.**
+Status: **slice 1 done; slice 2 planned.**
 Nothing blocks execution.
 
 ## Goal and scope
@@ -91,7 +91,7 @@ marks appear and persist.
 
 ### 1. Hovering a marked row says which mark it has
 Type: Behavior
-Status: planned
+Status: done
 Proof: layout spec case above, written first and seen failing. Focused check:
 `BookReadingBookLayout.spec.ts`.
 
@@ -135,4 +135,4 @@ each is independently useful.
 
 ## Learnings
 
-None yet.
+- Slice 1: labels now live in `dispositionLabels` (`readBlockIdsFromRecords.ts`), used by the layout row title and `BookBlockMarkControl`. Accepted proof: `BookReadingBookLayout.spec.ts` title cases (seen failing 3, then passing); `vitest run tests/components/book-reading tests/pages` 278 pass; `vue-tsc --noEmit` clean. `BookBlockMarkControl` has no direct spec; its label refactor is covered by the type check only.

@@ -14,14 +14,14 @@
     </button>
     <template v-if="menuOpen">
       <button
-        v-for="option in markOptions"
-        :key="option.status"
+        v-for="(label, status) in dispositionLabels"
+        :key="status"
         type="button"
-        :data-testid="`book-reading-change-mark-to-${option.status.toLowerCase()}`"
+        :data-testid="`book-reading-change-mark-to-${status.toLowerCase()}`"
         class="daisy-btn daisy-btn-xs daisy-btn-outline"
-        @click="changeMark(option.status)"
+        @click="changeMark(status)"
       >
-        {{ option.label }}
+        {{ label }}
       </button>
       <button
         type="button"
@@ -36,7 +36,10 @@
 </template>
 
 <script setup lang="ts">
-import type { BookBlockReadingDisposition } from "@/lib/book-reading/readBlockIdsFromRecords"
+import {
+  dispositionLabels,
+  type BookBlockReadingDisposition,
+} from "@/lib/book-reading/readBlockIdsFromRecords"
 import { ref } from "vue"
 
 defineProps<{ disposition: BookBlockReadingDisposition }>()
@@ -46,11 +49,6 @@ const emit = defineEmits<{
   clear: []
 }>()
 
-const markOptions: { status: BookBlockReadingDisposition; label: string }[] = [
-  { status: "READ", label: "Read" },
-  { status: "SKIMMED", label: "Skimmed" },
-  { status: "SKIPPED", label: "Skipped" },
-]
 const menuOpen = ref(false)
 
 function changeMark(status: BookBlockReadingDisposition) {

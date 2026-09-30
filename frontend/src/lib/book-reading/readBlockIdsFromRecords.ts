@@ -7,6 +7,12 @@ import type {
 export type BookBlockReadingDisposition =
   BookBlockReadingRecordPutRequest["status"]
 
+export const dispositionLabels: Record<BookBlockReadingDisposition, string> = {
+  READ: "Read",
+  SKIMMED: "Skimmed",
+  SKIPPED: "Skipped",
+}
+
 const ALL_DISPOSITIONS = [
   "READ",
   "SKIMMED",

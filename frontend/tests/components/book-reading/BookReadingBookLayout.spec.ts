@@ -1,5 +1,6 @@
 import BookReadingBookLayout from "@/components/book-reading/BookReadingBookLayout.vue"
 import helper from "@tests/helpers"
+import type { BookBlockReadingDisposition } from "@/lib/book-reading/readBlockIdsFromRecords"
 import type { BookBlockFull } from "@generated/donut-backend-api"
 import { describe, expect, it } from "vitest"
 
@@ -19,6 +20,7 @@ function mountLayout(
     isMdOrLarger?: boolean
     opened?: boolean
     canUndoDepthChange?: boolean
+    disposition?: BookBlockReadingDisposition
   }
 ) {
   return helper
@@ -31,7 +33,7 @@ function mountLayout(
       currentBlockId: options?.currentBlockId ?? null,
       selectedBlockId: options?.selectedBlockId ?? null,
       canUndoDepthChange: options?.canUndoDepthChange ?? false,
-      dispositionForBlock: () => undefined,
+      dispositionForBlock: () => options?.disposition,
     })
     .mount({ attachTo: document.body })
 }
@@ -72,6 +74,30 @@ describe("BookReadingBookLayout", () => {
     const wrapper = mountLayout(undefined, { canUndoDepthChange: true })
     await wrapper.find(undoSelector).trigger("click")
     expect(wrapper.emitted("undoDepthChange")).toHaveLength(1)
+    wrapper.unmount()
+  })
+
+  it.each([
+    ["READ", "Read"],
+    ["SKIMMED", "Skimmed"],
+    ["SKIPPED", "Skipped"],
+  ] as const)("titles a %s row %s", (disposition, title) => {
+    const wrapper = mountLayout(undefined, { disposition })
+    expect(
+      wrapper
+        .find('[data-testid="book-reading-book-block"]')
+        .attributes("title")
+    ).toBe(title)
+    wrapper.unmount()
+  })
+
+  it("gives a row with no mark no title", () => {
+    const wrapper = mountLayout()
+    expect(
+      wrapper
+        .find('[data-testid="book-reading-book-block"]')
+        .attributes("title")
+    ).toBeUndefined()
     wrapper.unmount()
   })
 

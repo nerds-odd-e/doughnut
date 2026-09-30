@@ -51,6 +51,7 @@
             :data-direct-content-skipped="
               dispositionForBlock(block.id) === 'SKIPPED' ? 'true' : undefined
             "
+            :title="markTitle(block.id)"
             :aria-current="
               block.id === currentBlockId ? 'location' : undefined
             "
@@ -107,7 +108,10 @@ import BookBlockMarkControl from "@/components/book-reading/BookBlockMarkControl
 import SidebarDrawer from "@/components/commons/SidebarDrawer.vue"
 import { blockStartEpubDisplayHref } from "@/lib/book-reading/asEpubLocator"
 import { useBookLayoutBlockPointerDrag } from "@/composables/book-reading/useBookLayoutBlockPointerDrag"
-import type { BookBlockReadingDisposition } from "@/lib/book-reading/readBlockIdsFromRecords"
+import {
+  dispositionLabels,
+  type BookBlockReadingDisposition,
+} from "@/lib/book-reading/readBlockIdsFromRecords"
 import type { BookBlockFull } from "@generated/donut-backend-api"
 import { computed, ref, watch } from "vue"
 
@@ -138,6 +142,11 @@ const emit = defineEmits<{
   requestAiReorganize: []
   undoDepthChange: []
 }>()
+
+function markTitle(blockId: number) {
+  const disposition = props.dispositionForBlock(blockId)
+  return disposition && dispositionLabels[disposition]
+}
 
 const layoutRef = ref<HTMLElement | null>(null)
 
