@@ -1,9 +1,0 @@
-{
-  "schemaVersion": 1,
-  "agent": "Tsukasa-chan",
-  "email": "tsukasa-chan@example.org",
-  "identity": "SEED-063#story-1",
-  "mode": "story-branch",
-  "branch": "claude/track-each-value-of-a-property-separately-withou",
-  "host": "claude"
-}
