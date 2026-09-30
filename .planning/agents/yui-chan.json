@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "agent": "Yui-chan",
+  "email": "yui-chan@example.org",
+  "identity": "SEED-064#story-1",
+  "mode": "story-branch",
+  "branch": "exec/seed-064-story-1",
+  "host": "claude",
+  "model": "claude-sonnet-5-5"
+}

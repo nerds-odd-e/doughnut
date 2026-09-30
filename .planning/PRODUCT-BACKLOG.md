@@ -7,9 +7,10 @@ Bug fixing and general maintenance.
 
 ## Taken
 
+- [A note's properties keep every value visible and are easy to tap on an iPad and a phone](seeds/SEED-064-note-properties-fixes.md#story-1) — SEED-064#story-1 ([plan](slice-plans/001-note-properties-touch-layout/PLAN.md))
+
 ## Backlog list
 
-- [A note's properties keep every value visible and are easy to tap on an iPad and a phone](seeds/SEED-064-note-properties-fixes.md#story-1) — SEED-064#story-1
 - [Typing a property key narrows the presets, and the list stays on screen](seeds/SEED-064-note-properties-fixes.md#story-2) — SEED-064#story-2
 - [A rejected property value is explained next to the row that was rejected](seeds/SEED-064-note-properties-fixes.md#story-3) — SEED-064#story-3
 - [Saving a typed Wikidata ID that cannot be used tells the user why](seeds/SEED-064-note-properties-fixes.md#story-4) — SEED-064#story-4
