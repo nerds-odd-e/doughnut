@@ -7,8 +7,6 @@ Bug fixing and general maintenance.
 
 ## Taken
 
-- [Show EPUB readers only the layout controls that work](seeds/SEED-059-book-reading-uat-fixes.md#story-10) — SEED-059#story-10 ([plan](slice-plans/061-epub-layout-only-working-controls/PLAN.md))
-
 ## Backlog list
 
 - [Go from attaching a book to reading it without searching](seeds/SEED-059-book-reading-uat-fixes.md#story-11) — SEED-059#story-11

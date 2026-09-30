@@ -72,52 +72,6 @@ reading a book end to end.
 
 Effort bands: S = 30–60 minutes, M = 1–2 hours, L = 2–4 hours, including delivery.
 
-<a id="story-10"></a>
-
-### Show EPUB readers only the layout controls that work
-
-**Identity:** SEED-059#story-10
-```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/061-epub-layout-only-working-controls/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"aec7cbe5f61559310cf1136d6afd3774098dd3794421de233542a2b02322d132","plan":"e8ae0ee9c277ede502154cea49625dc410b353e31d7e50217e95ce57e062bf5d"}}
-```
-
-**Goal:** An EPUB reader is not offered layout controls that do nothing. This is
-a small fix for a rarely used feature; it adds no EPUB capability.
-
-**Why it matters:** In an EPUB, *AI Reorganize* sends no request and shows
-nothing, and indent, outdent, cancel (Alt+Shift+Right, Alt+Shift+Left, Delete)
-and dragging a block send nothing and say nothing (defect 11, Medium). The cause
-is that only PDF turns on the reading session's `reorganize` capability, while
-the book layout always draws the button and always binds the row handlers. The
-web attaches only EPUBs, so EPUB readers are the ones who meet the dead controls.
-
-**Scope**
-
-- **One rule.** The book layout offers reorganizing only when the reading
-  session has the `reorganize` capability. Without it, the layout shows no
-  *AI Reorganize* button and its rows do not bind indent, outdent, cancel, or
-  drag, so those keys and drags do nothing in EPUB because they are not
-  offered, not because a handler is empty. The undo control and the Ctrl/Cmd+Z
-  shortcut already depend on the capability. PDF behaves as today.
-- **Deferred (built when readers need it; no follow-up story is queued):**
-  reorganizing an EPUB layout (indent, outdent, cancel, *AI Reorganize*);
-  the "Now reading / Read from here / Back to selected" bar and the EPUB pane
-  layout it needs; creating a block from EPUB text; the panel keeping the old
-  selection after scrolling on.
-
-**Key examples**
-
-- In an EPUB, the book layout has no *AI Reorganize* button.
-- In an EPUB, Alt+Shift+Right, Alt+Shift+Left, Delete, and dragging on a block
-  send no request and change nothing.
-- In a PDF, *AI Reorganize*, indent, outdent, cancel, drag, and undo work as
-  today.
-
-**Effort hypothesis:** S, medium confidence (one capability check in the layout
-and a component test; an E2E scenario only if a component test cannot show the
-button absent in a real EPUB).
-**Depends on:** none.
-
 <a id="story-11"></a>
 
 ### Go from attaching a book to reading it without searching
