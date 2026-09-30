@@ -33,7 +33,7 @@ Feature: Relationship edit and remove
     Then the note content markdown source should contain "a part of: '[[Mars]]'"
     And I should see "Moon" has no relationship to "Mars"
 
-  Scenario: Reducing to source property uses a suffixed key when the property already exists
+  Scenario: Reducing to source property adds a value to the property when it already exists
     Given note "Moon" has content:
       """
       ---
@@ -44,7 +44,8 @@ Feature: Relationship edit and remove
     And there is "a part of" relationship between note "Moon" and "Mars" in notebook "Space topics"
     When I delete the relationship from "Moon" to "Mars" and reduce it to a property of the source
     And I open the note content markdown editor on note "Moon"
-    Then the note content markdown source should contain "a part of 2: '[[Mars]]'"
+    Then the note content markdown source should contain 'a part of: ["[[Earth]]", "[[Mars]]"]'
+    And the note content markdown source should not contain "a part of 2"
     And I should see "Moon" has no relationship to "Mars"
 
   Scenario: Tracked relationship reduced keeps property memory tracker on source

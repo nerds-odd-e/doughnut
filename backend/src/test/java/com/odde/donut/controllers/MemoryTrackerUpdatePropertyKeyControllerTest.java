@@ -46,6 +46,39 @@ class MemoryTrackerUpdatePropertyKeyControllerTest extends MemoryTrackerControll
   }
 
   @Test
+  void shouldRenameAListValueTrackerBesideAnotherValueOfTheNewKey()
+      throws UnexpectedNoAccessRightException {
+    Note note = ownedNote();
+    makeMe
+        .aMemoryTrackerFor(note)
+        .propertyKey("sample of")
+        .propertyValue("[[past tense]]")
+        .please();
+    MemoryTracker tracker =
+        makeMe.aMemoryTrackerFor(note).propertyKey("example of").propertyValue("[[run]]").please();
+
+    MemoryTracker result = controller.updatePropertyKey(tracker, renameTo("sample of"));
+
+    assertThat(result.getPropertyKey(), equalTo("sample of"));
+    assertThat(result.getPropertyValue(), equalTo("[[run]]"));
+  }
+
+  @Test
+  void shouldRejectRenameWhenTheSameValueOfTheNewKeyIsTracked() {
+    Note note = ownedNote();
+    makeMe.aMemoryTrackerFor(note).propertyKey("sample of").propertyValue("[[run]]").please();
+    MemoryTracker tracker =
+        makeMe.aMemoryTrackerFor(note).propertyKey("example of").propertyValue("[[run]]").please();
+
+    ResponseStatusException ex =
+        assertThrows(
+            ResponseStatusException.class,
+            () -> controller.updatePropertyKey(tracker, renameTo("sample of")));
+
+    assertThat(ex.getStatusCode(), equalTo(HttpStatus.CONFLICT));
+  }
+
+  @Test
   void shouldRejectRenameForNoteLevelTracker() {
     MemoryTracker tracker = ownedTracker();
 

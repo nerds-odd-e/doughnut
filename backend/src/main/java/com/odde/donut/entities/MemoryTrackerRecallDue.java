@@ -22,4 +22,16 @@ final class MemoryTrackerRecallDue {
     }
     return TimestampOperations.getDiffInHours(currentUTCTimestamp, lastRecalledAt);
   }
+
+  static void scheduleNextRecallFromStability(
+      MemoryTracker tracker, Timestamp currentUTCTimestamp) {
+    tracker.setLastRecalledAt(currentUTCTimestamp);
+    Timestamp scheduled = calculateNextRecallAt(tracker);
+    if (!scheduled.after(currentUTCTimestamp)) {
+      scheduled =
+          TimestampOperations.addHoursToTimestamp(
+              currentUTCTimestamp, Fsrs.intervalHours(Fsrs.STRICTLY_FUTURE_FALLBACK_HOURS));
+    }
+    tracker.setNextRecallAt(scheduled);
+  }
 }

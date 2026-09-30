@@ -58,14 +58,6 @@ public class RecallPrompt extends EntityIdentifiedByIdOnly {
     return Objects.requireNonNull(memoryTracker, "recall prompt requires a memory tracker");
   }
 
-  public String getPropertyKey() {
-    if (memoryTracker == null) {
-      return null;
-    }
-    String key = memoryTracker.getPropertyKey();
-    return key == null || key.isEmpty() ? null : key;
-  }
-
   public String getQuestionDetails() {
     if (getMcq() == null) {
       return "{}";

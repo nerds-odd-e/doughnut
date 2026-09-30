@@ -3,6 +3,7 @@ package com.odde.donut.services.focusContext;
 import com.odde.donut.algorithms.NoteContentMarkdown;
 import com.odde.donut.controllers.dto.WikiLink;
 import com.odde.donut.entities.Note;
+import com.odde.donut.entities.PropertyFocus;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,11 +13,14 @@ public final class FocusContextMarkdownAugmenter {
 
   private FocusContextMarkdownAugmenter() {}
 
-  public static String buildPropertyFocusBlock(Note focus, String propertyKey) {
+  public static String buildPropertyFocusBlock(Note focus, PropertyFocus propertyFocus) {
+    String propertyKey = propertyFocus.key();
     String propertyValue =
-        NoteContentMarkdown.splitLeadingFrontmatter(focus.getContent())
-            .flatMap(split -> split.frontmatter().getString(propertyKey))
-            .orElse("");
+        propertyFocus.value().isEmpty()
+            ? NoteContentMarkdown.splitLeadingFrontmatter(focus.getContent())
+                .flatMap(split -> split.frontmatter().getString(propertyKey))
+                .orElse("")
+            : propertyFocus.value();
     StringBuilder block = new StringBuilder();
     block.append(PROPERTY_FOCUS_CONTEXT_HEADER).append("\n");
     block

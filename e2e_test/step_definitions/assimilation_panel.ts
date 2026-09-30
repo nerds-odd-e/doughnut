@@ -47,6 +47,31 @@ Then(
   }
 )
 
+When(
+  'I assimilate the value {string} of property {string}',
+  (value: string, propertyKey: string) => {
+    start.assumeNotePage().assimilateRichNotePropertyValue(propertyKey, value)
+  }
+)
+
+Then(
+  'the value {string} of property {string} should be tracked',
+  (value: string, propertyKey: string) => {
+    start
+      .assumeNotePage()
+      .expectRichNotePropertyValueTracked(propertyKey, value)
+  }
+)
+
+Then(
+  'the value {string} of property {string} should still be offered to assimilate',
+  (value: string, propertyKey: string) => {
+    start
+      .assumeNotePage()
+      .expectRichNotePropertyValueOfferedToAssimilate(propertyKey, value)
+  }
+)
+
 Then('I should see Skip on the assimilation panel', () => {
   start.assumeAssimilationPage().expectSkipOnPanel()
 })

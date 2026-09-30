@@ -87,6 +87,16 @@ describe("diffFrontmatterPropertyKeyChanges", () => {
     ])
   })
 
+  it("detects a rename of a list key when its items are unchanged", () => {
+    const old = md('example of:\n  - "[[run]]"\n  - "[[past tense]]"')
+    const neu = md(
+      'sample of:\n  - "[[run]]"\n  - "[[past tense]]"\nsee also:\n  - "[[walk]]"'
+    )
+    expect(diffFrontmatterPropertyKeyChanges(old, neu)).toEqual([
+      { type: "rename", fromKey: "example of", toKey: "sample of" },
+    ])
+  })
+
   it("returns [] when frontmatter is invalid", () => {
     const valid = md("topic: math")
     const invalid = "---\ntopic: math\n"

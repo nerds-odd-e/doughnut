@@ -64,6 +64,22 @@ class RecallsControllerTests extends RecallsControllerTestBase {
     }
 
     @Test
+    void shouldIncludePropertyValueOfAListValueTrackerOnDueMemoryTrackerLite() {
+      Timestamp currentTime = makeMe.aTimestamp().of(0, 0).please();
+      testabilitySettings.timeTravelTo(currentTime);
+      makeMe
+          .aMemoryTrackerFor(ownedNote())
+          .propertyKey("example of")
+          .propertyValue("[[run]]")
+          .nextRecallAt(currentTime)
+          .please();
+
+      DueMemoryTrackers dueMemoryTrackers = controller.recalling("Asia/Shanghai", 0);
+
+      assertEquals("[[run]]", dueMemoryTrackers.getToRepeat().get(0).getPropertyValue());
+    }
+
+    @Test
     void shouldIncludeRecallStatusInDueMemoryTrackers() {
       Timestamp currentTime = makeMe.aTimestamp().of(0, 0).please();
       testabilitySettings.timeTravelTo(currentTime);
@@ -124,6 +140,35 @@ class RecallsControllerTests extends RecallsControllerTestBase {
 
   @Nested
   class PreviouslyAnswered {
+
+    @ParameterizedTest
+    @CsvSource(
+        nullValues = "null",
+        value = {"[[run]], [[run]]", "'', null"})
+    void recalledNoteNamesTheTrackedPropertyValue(String trackedValue, String expectedValue) {
+      Timestamp currentTime = makeMe.aTimestamp().of(1, 2).fromShanghai().please();
+      testabilitySettings.timeTravelTo(currentTime);
+      Note note = ownedNote();
+      MemoryTracker memoryTracker =
+          makeMe
+              .aMemoryTrackerFor(note)
+              .propertyKey("example of")
+              .propertyValue(trackedValue)
+              .please();
+      makeMe
+          .aRecallPrompt()
+          .withMcqForNote(note)
+          .forMemoryTracker(memoryTracker)
+          .answerChoiceIndex(0)
+          .answerTimestamp(currentTime)
+          .please();
+
+      AnsweredQuestion answered = controller.previouslyAnswered("Asia/Shanghai").get(0);
+
+      assertEquals("example of", answered.getRecalledNote().getPropertyKey());
+      assertEquals(expectedValue, answered.getRecalledNote().getPropertyValue());
+    }
+
     @Test
     void shouldNotBeAbleToAccessWithoutLogin() {
       currentUser.setUser(null);

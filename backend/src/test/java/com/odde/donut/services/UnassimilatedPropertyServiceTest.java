@@ -4,25 +4,36 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 
 import com.odde.donut.entities.Note;
-import com.odde.donut.entities.NotePropertyIndex;
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.Subscription;
 import com.odde.donut.entities.User;
-import com.odde.donut.entities.repositories.NotePropertyIndexRepository;
 import com.odde.donut.testability.SpringTestBase;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 class UnassimilatedPropertyServiceTest extends SpringTestBase {
+  private static final String TWO_VALUES =
+      "---\nexample of:\n  - \"[[run]]\"\n  - \"[[past tense]]\"\n---\n\nbody";
+
   @Autowired NotePropertyIndexService notePropertyIndexService;
-  @Autowired NotePropertyIndexRepository notePropertyIndexRepository;
   @Autowired UnassimilatedPropertyService unassimilatedPropertyService;
 
   private Note noteWithContent(User user, String content) {
     Note note = makeMe.aNote().notebookOwnedBy(user).content(content).please();
     notePropertyIndexService.refreshForNote(note);
     return note;
+  }
+
+  private void reindex(Note note, String content) {
+    note.setContent(content);
+    notePropertyIndexService.refreshForNote(note);
+  }
+
+  private List<String> pendingValuesForUser(User user) {
+    return pendingPropertiesForUser(user).stream()
+        .map(unit -> unit.propertyKey() + "=" + unit.propertyValue())
+        .toList();
   }
 
   private List<AssimilationUnit> pendingPropertiesForUser(User user) {
@@ -43,19 +54,59 @@ class UnassimilatedPropertyServiceTest extends SpringTestBase {
             + "example of 2: gamma\n"
             + "---\n\nbody");
 
-    List<String> propertyKeys =
-        pendingPropertiesForUser(user).stream().map(AssimilationUnit::propertyKey).toList();
-    assertThat(propertyKeys, containsInAnyOrder("example of", "example of 2"));
+    assertThat(
+        pendingValuesForUser(user),
+        containsInAnyOrder("example of=alpha", "example of=beta", "example of 2="));
   }
 
   @Test
-  void list_property_emits_one_unit_after_refresh() {
+  void list_property_emits_one_unit_per_value() {
     User user = makeMe.aUser().please();
-    noteWithContent(user, "---\n" + "example of:\n" + "  - alpha\n" + "  - beta\n" + "---\n\nbody");
+    noteWithContent(user, TWO_VALUES);
+
+    assertThat(unassimilatedPropertyService.countUnassimilatedPropertiesForUser(user), equalTo(2));
+    assertThat(
+        pendingValuesForUser(user), contains("example of=[[run]]", "example of=[[past tense]]"));
+  }
+
+  @Test
+  void value_tracker_suppresses_only_that_value() {
+    User user = makeMe.aUser().please();
+    Note note = noteWithContent(user, TWO_VALUES);
+    makeMe.aMemoryTrackerFor(note).propertyKey("example of").propertyValue("[[run]]").please();
 
     assertThat(unassimilatedPropertyService.countUnassimilatedPropertiesForUser(user), equalTo(1));
-    AssimilationUnit pending = pendingPropertiesForUser(user).getFirst();
-    assertThat(pending.propertyKey(), equalTo("example of"));
+    assertThat(pendingValuesForUser(user), contains("example of=[[past tense]]"));
+  }
+
+  @Test
+  void value_tracker_still_matches_after_reordering_or_removing_other_value() {
+    User user = makeMe.aUser().please();
+    Note note = noteWithContent(user, TWO_VALUES);
+    makeMe.aMemoryTrackerFor(note).propertyKey("example of").propertyValue("[[run]]").please();
+
+    reindex(note, "---\nexample of:\n  - \"[[past tense]]\"\n  - \"[[run]]\"\n---\n\nbody");
+    assertThat(pendingValuesForUser(user), contains("example of=[[past tense]]"));
+
+    reindex(note, "---\nexample of:\n  - \"[[run]]\"\n---\n\nbody");
+    assertThat(pendingValuesForUser(user), empty());
+  }
+
+  @Test
+  void scalar_property_emits_one_unit_with_empty_value() {
+    User user = makeMe.aUser().please();
+    noteWithContent(user, "---\ntopic: physics\n---\n\nbody");
+
+    assertThat(pendingValuesForUser(user), contains("topic="));
+  }
+
+  @Test
+  void key_skip_suppresses_every_value() {
+    User user = makeMe.aUser().please();
+    Note note = noteWithContent(user, TWO_VALUES);
+    makeMe.anAssimilationSequenceSkipFor(note).propertyKey("example of").please();
+
+    assertThat(unassimilatedPropertyService.countUnassimilatedPropertiesForUser(user), equalTo(0));
   }
 
   @Test
@@ -104,27 +155,6 @@ class UnassimilatedPropertyServiceTest extends SpringTestBase {
   }
 
   @Test
-  void emits_one_property_unit_when_multiple_index_rows_share_exact_key() {
-    User user = makeMe.aUser().please();
-    Note note = noteWithContent(user, "---\nexample of: \"[[Word]]\"\n---\n\nbody");
-    insertAdditionalIndexRow(note, "example of", 1);
-
-    List<AssimilationUnit> pending = pendingPropertiesForUser(user);
-    assertThat(pending, hasSize(1));
-    assertThat(pending.get(0).note(), equalTo(note));
-  }
-
-  @Test
-  void property_tracker_suppresses_all_index_rows_for_exact_key() {
-    User user = makeMe.aUser().please();
-    Note note = noteWithContent(user, "---\ntopic: physics\n---\n\nbody");
-    insertAdditionalIndexRow(note, "topic", 1);
-    makeMe.aMemoryTrackerFor(note).propertyKey("topic").please();
-
-    assertThat(unassimilatedPropertyService.countUnassimilatedPropertiesForUser(user), equalTo(0));
-  }
-
-  @Test
   void counts_unassimilated_properties_in_subscribed_notebook() {
     User owner = makeMe.aUser().please();
     User subscriber = makeMe.aUser().please();
@@ -149,13 +179,5 @@ class UnassimilatedPropertyServiceTest extends SpringTestBase {
     assertThat(
         unassimilatedPropertyService.countUnassimilatedPropertiesForSubscription(subscription),
         equalTo(1));
-  }
-
-  private void insertAdditionalIndexRow(Note note, String propertyKey, int itemIndex) {
-    NotePropertyIndex row = new NotePropertyIndex();
-    row.setNote(note);
-    row.setPropertyKey(propertyKey);
-    row.setItemIndex(itemIndex);
-    notePropertyIndexRepository.save(row);
   }
 }

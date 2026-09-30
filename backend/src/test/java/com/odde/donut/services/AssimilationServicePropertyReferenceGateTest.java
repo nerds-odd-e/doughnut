@@ -44,29 +44,31 @@ class AssimilationServicePropertyReferenceGateTest extends AssimilationServiceTe
   }
 
   @Test
-  void gates_list_property_until_all_resolved_targets_are_assimilated() {
+  void gates_each_list_value_by_its_own_target() {
     Note targetA = makeMe.aNote().title("A").notebookOwnedBy(user).please();
-    Note targetB = makeMe.aNote().title("B").underSameNotebookAs(targetA).please();
-    Note carrier =
-        carrierWithExampleOf(
-            targetA,
-            "---\n" + "example of:\n" + "  - \"[[A]]\"\n" + "  - \"[[B]]\"\n" + "---\n\nbody");
+    makeMe.aNote().title("B").underSameNotebookAs(targetA).please();
+    carrierWithExampleOf(
+        targetA, "---\n" + "example of:\n" + "  - \"[[A]]\"\n" + "  - \"[[B]]\"\n" + "---\n\nbody");
 
-    assertThat(assimilationService.getCounts().getTotalUnassimilatedCount(), equalTo(3));
-    AssimilationUnit next = assimilationService.getNextAssimilationUnit().orElseThrow();
-    assertThat(next.note(), equalTo(targetA));
-    assertThat(next.propertyKey(), nullValue());
+    assertThat(assimilationService.getCounts().getTotalUnassimilatedCount(), equalTo(4));
+    assertThat(pendingPropertiesForUser(), empty());
 
     makeMe.aMemoryTrackerFor(targetA).assimilatedAt(day1).please();
 
-    AssimilationUnit stillGated = assimilationService.getNextAssimilationUnit().orElseThrow();
-    assertThat(stillGated.note(), equalTo(targetB));
+    List<AssimilationUnit> pending = pendingPropertiesForUser();
+    assertThat(pending, hasSize(1));
+    assertThat(pending.get(0).propertyValue(), equalTo("[[A]]"));
+  }
 
-    makeMe.aMemoryTrackerFor(targetB).assimilatedAt(day1).please();
+  @Test
+  void does_not_gate_plain_text_list_value() {
+    Note target = makeMe.aNote().title("A").notebookOwnedBy(user).please();
+    carrierWithExampleOf(
+        target, "---\n" + "example of:\n" + "  - \"[[A]]\"\n" + "  - plain\n" + "---\n\nbody");
 
-    AssimilationUnit property = assimilationService.getNextAssimilationUnit().orElseThrow();
-    assertThat(property.note(), equalTo(carrier));
-    assertThat(property.propertyKey(), equalTo("example of"));
+    List<AssimilationUnit> pending = pendingPropertiesForUser();
+    assertThat(pending, hasSize(1));
+    assertThat(pending.get(0).propertyValue(), equalTo("plain"));
   }
 
   @Test
@@ -89,7 +91,7 @@ class AssimilationServicePropertyReferenceGateTest extends AssimilationServiceTe
     notePropertyIndexService.refreshForNote(carrier);
     var staleRow =
         notePropertyIndexRepository
-            .findByNote_IdAndPropertyKey(carrier.getId(), "example of 2")
+            .findByNote_IdAndPropertyKeyAndPropertyValue(carrier.getId(), "example of 2", "")
             .getFirst();
     staleRow.setAuthoredNoteReference(null);
     makeMe.entityPersister.flush();

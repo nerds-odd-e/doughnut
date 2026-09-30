@@ -3,7 +3,6 @@ package com.odde.donut.services;
 import com.odde.donut.controllers.dto.NoteTrashReferenceHandling;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.User;
-import com.odde.donut.entities.repositories.MemoryTrackerRepository;
 import com.odde.donut.entities.repositories.NoteRepository;
 import com.odde.donut.factoryServices.EntityPersister;
 import com.odde.donut.testability.TestabilitySettings;
@@ -17,7 +16,6 @@ import org.springframework.stereotype.Service;
 @Service
 public class NoteService {
   private final NoteRepository noteRepository;
-  private final MemoryTrackerRepository memoryTrackerRepository;
   private final EntityPersister entityPersister;
   private final TestabilitySettings testabilitySettings;
   private final NoteReferenceHandling noteReferenceHandling;
@@ -25,24 +23,23 @@ public class NoteService {
 
   public NoteService(
       NoteRepository noteRepository,
-      MemoryTrackerRepository memoryTrackerRepository,
       NoteReferenceService noteReferenceService,
       WikiLinkResolver wikiLinkResolver,
       AuthorizationService authorizationService,
       EntityPersister entityPersister,
-      TestabilitySettings testabilitySettings) {
+      TestabilitySettings testabilitySettings,
+      PropertyMemoryTrackerService propertyMemoryTrackerService) {
     this.noteRepository = noteRepository;
-    this.memoryTrackerRepository = memoryTrackerRepository;
     this.entityPersister = entityPersister;
     this.testabilitySettings = testabilitySettings;
     this.noteReferenceService = noteReferenceService;
     this.noteReferenceHandling =
         new NoteReferenceHandling(
-            memoryTrackerRepository,
             noteReferenceService,
             wikiLinkResolver,
             authorizationService,
-            entityPersister);
+            entityPersister,
+            propertyMemoryTrackerService);
   }
 
   public List<Note> findRecentNotesByUser(Integer userId) {

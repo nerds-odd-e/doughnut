@@ -5,6 +5,7 @@ import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.nullValue;
 
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.NotePropertyIndex;
@@ -26,6 +27,10 @@ class NotePropertyIndexServiceTest extends SpringTestBase {
 
   private List<NotePropertyIndex> propertyRows(Note note) {
     return notePropertyIndexRepository.findByNote_IdOrderByIdAsc(note.getId());
+  }
+
+  private List<NotePropertyIndex> propertyRows(Note note, String propertyKey) {
+    return propertyRows(note).stream().filter(r -> r.getPropertyKey().equals(propertyKey)).toList();
   }
 
   @Nested
@@ -50,6 +55,33 @@ class NotePropertyIndexServiceTest extends SpringTestBase {
       assertThat(rows.get(1).getPropertyKey(), equalTo("example of"));
       assertThat(rows.get(1).getItemIndex(), equalTo(1));
       assertThat(rows.get(1).getAuthoredNoteReference().getAuthoredLink(), equalTo("B"));
+    }
+
+    @Test
+    void indexes_every_list_item_with_its_value_and_a_scalar_with_an_empty_value() {
+      User user = makeMe.aUser().please();
+      Note targetB = makeMe.aNote().title("B").notebookOwnedBy(user).please();
+      String markdown =
+          "---\n"
+              + "example of:\n"
+              + "  - alpha\n"
+              + "  - \"[[B]]\"\n"
+              + "topic: physics\n"
+              + "---\n\nbody";
+      Note note = makeMe.aNote().underSameNotebookAs(targetB).please();
+      makeMe.authorReferencingContent(note, markdown);
+
+      notePropertyIndexService.refreshForNote(note);
+
+      List<NotePropertyIndex> listRows = propertyRows(note, "example of");
+      assertThat(listRows, hasSize(2));
+      assertThat(listRows.get(0).getPropertyValue(), equalTo("alpha"));
+      assertThat(listRows.get(0).getAuthoredNoteReference(), nullValue());
+      assertThat(listRows.get(1).getPropertyValue(), equalTo("[[B]]"));
+      assertThat(listRows.get(1).getAuthoredNoteReference().getAuthoredLink(), equalTo("B"));
+      List<NotePropertyIndex> scalarRows = propertyRows(note, "topic");
+      assertThat(scalarRows, hasSize(1));
+      assertThat(scalarRows.get(0).getPropertyValue(), equalTo(""));
     }
 
     @Test

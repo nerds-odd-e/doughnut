@@ -24,6 +24,13 @@ final class AssimilationControllerTestSupport {
     return request;
   }
 
+  static AssimilationRequestDTO assimilatePropertyValueRequest(
+      Note note, String propertyKey, String propertyValue) {
+    AssimilationRequestDTO request = assimilatePropertyRequest(note, propertyKey);
+    request.propertyValue = propertyValue;
+    return request;
+  }
+
   static AssimilationRequestDTO assimilateCommissionedRequest(Note note) {
     AssimilationRequestDTO request = assimilateRequest(note);
     request.assimilateAsCommissioned = true;

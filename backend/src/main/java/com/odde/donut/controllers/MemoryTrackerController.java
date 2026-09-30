@@ -1,16 +1,19 @@
 package com.odde.donut.controllers;
 
+import com.odde.donut.controllers.dto.FollowPropertyValueDTO;
 import com.odde.donut.controllers.dto.RecallHistoryItem;
 import com.odde.donut.controllers.dto.RecallPromptHistoryItem;
 import com.odde.donut.controllers.dto.ThresholdExceededResult;
 import com.odde.donut.controllers.dto.UpdateMemoryTrackerPropertyKeyDTO;
 import com.odde.donut.entities.Grade;
 import com.odde.donut.entities.MemoryTracker;
+import com.odde.donut.entities.Note;
 import com.odde.donut.entities.RecallPrompt;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.donut.factoryServices.EntityPersister;
 import com.odde.donut.services.AuthorizationService;
 import com.odde.donut.services.MemoryTrackerService;
+import com.odde.donut.services.PropertyMemoryTrackerService;
 import com.odde.donut.services.RecallPromptService;
 import com.odde.donut.testability.TestabilitySettings;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -32,18 +35,21 @@ class MemoryTrackerController {
 
   private final AuthorizationService authorizationService;
   private final RecallPromptService recallPromptService;
+  private final PropertyMemoryTrackerService propertyMemoryTrackerService;
 
   public MemoryTrackerController(
       EntityPersister entityPersister,
       TestabilitySettings testabilitySettings,
       AuthorizationService authorizationService,
       MemoryTrackerService memoryTrackerService,
-      RecallPromptService recallPromptService) {
+      RecallPromptService recallPromptService,
+      PropertyMemoryTrackerService propertyMemoryTrackerService) {
     this.entityPersister = entityPersister;
     this.testabilitySettings = testabilitySettings;
     this.authorizationService = authorizationService;
     this.memoryTrackerService = memoryTrackerService;
     this.recallPromptService = recallPromptService;
+    this.propertyMemoryTrackerService = propertyMemoryTrackerService;
   }
 
   @GetMapping("/{memoryTracker}/recall-prompt")
@@ -177,8 +183,19 @@ class MemoryTrackerController {
       throws UnexpectedNoAccessRightException {
     authorizationService.assertLoggedIn();
     authorizationService.assertReadAuthorization(memoryTracker);
-    memoryTrackerService.updatePropertyKey(memoryTracker, dto.getPropertyKey());
+    propertyMemoryTrackerService.updatePropertyKey(memoryTracker, dto.getPropertyKey());
     return memoryTracker;
+  }
+
+  @PatchMapping(path = "/notes/{note}/property-value")
+  @Transactional
+  public void followPropertyValue(
+      @PathVariable("note") @Schema(type = "integer") Note note,
+      @Valid @RequestBody FollowPropertyValueDTO dto)
+      throws UnexpectedNoAccessRightException {
+    authorizationService.assertAuthorization(note);
+    propertyMemoryTrackerService.followPropertyValue(
+        note, dto.getPropertyKey(), dto.getPropertyValue());
   }
 
   @DeleteMapping("/{memoryTracker}")

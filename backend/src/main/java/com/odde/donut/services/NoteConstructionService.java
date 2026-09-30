@@ -16,7 +16,6 @@ import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.User;
 import com.odde.donut.entities.repositories.FolderRepository;
-import com.odde.donut.entities.repositories.MemoryTrackerRepository;
 import com.odde.donut.factoryServices.EntityPersister;
 import com.odde.donut.services.ai.NoteExtractionResult;
 import com.odde.donut.testability.TestabilitySettings;
@@ -42,7 +41,7 @@ public class NoteConstructionService {
   private final NoteTitleNameRule noteTitleNameRule;
   private final FolderConstructionService folderConstructionService;
   private final WikiLinkResolver wikiLinkResolver;
-  private final RelationshipMemoryTrackerRehoming memoryTrackerRehoming;
+  private final PropertyMemoryTrackerService propertyMemoryTrackerService;
 
   @Autowired
   public NoteConstructionService(
@@ -58,7 +57,7 @@ public class NoteConstructionService {
       NoteTitleNameRule noteTitleNameRule,
       FolderConstructionService folderConstructionService,
       WikiLinkResolver wikiLinkResolver,
-      MemoryTrackerRepository memoryTrackerRepository) {
+      PropertyMemoryTrackerService propertyMemoryTrackerService) {
     this.authorizationService = authorizationService;
     this.testabilitySettings = testabilitySettings;
     this.folderRepository = folderRepository;
@@ -71,8 +70,7 @@ public class NoteConstructionService {
     this.noteTitleNameRule = noteTitleNameRule;
     this.folderConstructionService = folderConstructionService;
     this.wikiLinkResolver = wikiLinkResolver;
-    this.memoryTrackerRehoming =
-        new RelationshipMemoryTrackerRehoming(memoryTrackerRepository, entityPersister);
+    this.propertyMemoryTrackerService = propertyMemoryTrackerService;
   }
 
   private Note persistNoteContent(Note note, String content) {
@@ -195,7 +193,7 @@ public class NoteConstructionService {
         relationshipNote,
         RelationshipNoteComposition.markdown(
             propertyKey, "[[" + source.getTitle() + "]]", targetLink));
-    memoryTrackerRehoming.movePropertyTrackersOntoRelationshipNote(
+    propertyMemoryTrackerService.movePropertyTrackersOntoRelationshipNote(
         source, propertyKey, relationshipNote);
     persistAuthoredContent(
         source, NoteContentMarkdown.removeFrontmatterProperty(source.getContent(), propertyKey));

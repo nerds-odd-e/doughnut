@@ -99,6 +99,7 @@ class NoteReifyPropertyTests extends ControllerTestBase {
     MemoryTracker trackerA;
     MemoryTracker trackerB;
     MemoryTracker otherPropertyTracker;
+    MemoryTracker listValueTrackerOfSameKey;
     MemoryTracker sourceNoteLevelTracker;
     float stabilityBefore;
     Timestamp nextRecallAtBefore;
@@ -127,6 +128,13 @@ class NoteReifyPropertyTests extends ControllerTestBase {
       trackerB = makeMe.aMemoryTrackerFor(source).by(learnerB).propertyKey("related").please();
       otherPropertyTracker =
           makeMe.aMemoryTrackerFor(source).by(currentUser.getUser()).propertyKey("kind").please();
+      listValueTrackerOfSameKey =
+          makeMe
+              .aMemoryTrackerFor(source)
+              .by(currentUser.getUser())
+              .propertyKey("related")
+              .propertyValue("[[Former]]")
+              .please();
       sourceNoteLevelTracker = makeMe.aMemoryTrackerFor(source).by(currentUser.getUser()).please();
       stabilityBefore = trackerA.getStability();
       nextRecallAtBefore = trackerA.getNextRecallAt();
@@ -163,7 +171,8 @@ class NoteReifyPropertyTests extends ControllerTestBase {
     void leavesTheSourcesOtherTrackersOnTheSource() {
       assertThat(
           memoryTrackerRepository.findByNote_IdIn(List.of(source.getId())),
-          containsInAnyOrder(otherPropertyTracker, sourceNoteLevelTracker));
+          containsInAnyOrder(
+              otherPropertyTracker, listValueTrackerOfSameKey, sourceNoteLevelTracker));
     }
   }
 

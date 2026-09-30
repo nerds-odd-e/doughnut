@@ -11,9 +11,7 @@ import com.odde.donut.entities.repositories.NotePropertyIndexRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.FlushModeType;
 import jakarta.persistence.PersistenceContext;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -61,23 +59,14 @@ public class NotePropertyIndexService {
             lf -> {
               Map<String, AuthoredNoteReferenceRow> bySourceLocalKey =
                   note.authoredReferenceRowsBySourceLocalKey();
-              Map<String, List<NotePropertyIndexPlanner.PlannedRow>> rowsByKey =
-                  new LinkedHashMap<>();
-              for (NotePropertyIndexPlanner.PlannedRow planned :
-                  NotePropertyIndexPlanner.plannedRows(lf.frontmatter(), canonicalDonutOrigin)) {
-                rowsByKey
-                    .computeIfAbsent(planned.propertyKey(), k -> new ArrayList<>())
-                    .add(planned);
-              }
-              rowsByKey.forEach(
-                  (propertyKey, plannedRows) ->
-                      persistRowsForPropertyKey(note, propertyKey, plannedRows, bySourceLocalKey));
+              NotePropertyIndexPlanner.plannedRows(lf.frontmatter(), canonicalDonutOrigin)
+                  .forEach(planned -> saveIndexRow(note, planned, bySourceLocalKey));
             });
   }
 
-  public List<AuthoredNoteReference> authoredReferencesForProperty(
-      Note note, String propertyKey, List<NotePropertyIndex> indexRows) {
-    List<String> plannedSourceLocalKeys = plannedSourceLocalKeys(note, propertyKey);
+  public List<AuthoredNoteReference> authoredReferencesForPropertyValue(
+      Note note, String propertyKey, String propertyValue, List<NotePropertyIndex> indexRows) {
+    List<String> plannedSourceLocalKeys = plannedSourceLocalKeys(note, propertyKey, propertyValue);
     if (plannedSourceLocalKeys.isEmpty()) {
       return List.of();
     }
@@ -102,7 +91,7 @@ public class NotePropertyIndexService {
         .toList();
   }
 
-  private List<String> plannedSourceLocalKeys(Note note, String propertyKey) {
+  private List<String> plannedSourceLocalKeys(Note note, String propertyKey, String propertyValue) {
     return NoteContentMarkdown.splitLeadingFrontmatter(
             note.getContent() == null ? "" : note.getContent())
         .map(
@@ -110,7 +99,10 @@ public class NotePropertyIndexService {
                 NotePropertyIndexPlanner.plannedRows(
                         leadingFrontmatter.frontmatter(), canonicalDonutOrigin)
                     .stream()
-                    .filter(planned -> planned.propertyKey().equals(propertyKey))
+                    .filter(
+                        planned ->
+                            planned.propertyKey().equals(propertyKey)
+                                && planned.propertyValue().equals(propertyValue))
                     .map(NotePropertyIndexPlanner.PlannedRow::sourceLocalKey)
                     .filter(Objects::nonNull)
                     .distinct()
@@ -118,52 +110,16 @@ public class NotePropertyIndexService {
         .orElseGet(List::of);
   }
 
-  private void persistRowsForPropertyKey(
-      Note indexOwner,
-      String propertyKey,
-      List<NotePropertyIndexPlanner.PlannedRow> plannedRows,
-      Map<String, AuthoredNoteReferenceRow> bySourceLocalKey) {
-    if (plannedRows.size() == 1 && !plannedRows.getFirst().listProperty()) {
-      saveIndexRow(
-          indexOwner,
-          propertyKey,
-          plannedRows.getFirst().itemIndex(),
-          resolveAuthoredReference(plannedRows.getFirst(), bySourceLocalKey));
-      return;
-    }
-
-    List<IndexedListReference> indexedReferences = new ArrayList<>();
-    for (NotePropertyIndexPlanner.PlannedRow planned : plannedRows) {
-      if (planned.valueText() == null || planned.valueText().isBlank()) {
-        continue;
-      }
-      resolveAuthoredReference(planned, bySourceLocalKey)
-          .ifPresent(
-              reference ->
-                  indexedReferences.add(new IndexedListReference(planned.itemIndex(), reference)));
-    }
-
-    if (indexedReferences.isEmpty()) {
-      saveIndexRow(indexOwner, propertyKey, 0, Optional.empty());
-      return;
-    }
-
-    for (IndexedListReference indexed : indexedReferences) {
-      saveIndexRow(
-          indexOwner, propertyKey, indexed.itemIndex(), Optional.of(indexed.authoredReference()));
-    }
-  }
-
   private void saveIndexRow(
       Note indexOwner,
-      String propertyKey,
-      int itemIndex,
-      Optional<AuthoredNoteReferenceRow> authoredReference) {
+      NotePropertyIndexPlanner.PlannedRow planned,
+      Map<String, AuthoredNoteReferenceRow> bySourceLocalKey) {
     NotePropertyIndex row = new NotePropertyIndex();
     row.setNote(indexOwner);
-    row.setPropertyKey(propertyKey);
-    row.setItemIndex(itemIndex);
-    authoredReference.ifPresent(row::setAuthoredNoteReference);
+    row.setPropertyKey(planned.propertyKey());
+    row.setItemIndex(planned.itemIndex());
+    row.setPropertyValue(planned.propertyValue());
+    resolveAuthoredReference(planned, bySourceLocalKey).ifPresent(row::setAuthoredNoteReference);
     notePropertyIndexRepository.save(row);
   }
 
@@ -172,6 +128,4 @@ public class NotePropertyIndexService {
       Map<String, AuthoredNoteReferenceRow> bySourceLocalKey) {
     return Optional.ofNullable(planned.sourceLocalKey()).map(bySourceLocalKey::get);
   }
-
-  private record IndexedListReference(int itemIndex, AuthoredNoteReferenceRow authoredReference) {}
 }

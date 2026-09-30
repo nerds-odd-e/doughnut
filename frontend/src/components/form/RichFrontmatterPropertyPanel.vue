@@ -38,6 +38,7 @@
       :allowed-modes="allowedModes"
       :trackers="noteRecallInfo?.memoryTrackers"
       :property-key="propertyKey"
+      :property-values="assimilableListValues(propertyValue)"
       :disabled="assimilatingPropertyKey === propertyKey"
       :skipped-from-assimilation-sequence="
         isSkippedFromAssimilationSequence(noteRecallInfo, propertyKey)
@@ -54,14 +55,19 @@ import { Minus } from "@lucide/vue"
 import { toRef, useId } from "vue"
 import { useRouter } from "vue-router"
 import AssimilationModes from "@/components/recall/AssimilationModes.vue"
-import type { MemoryTrackerType } from "@/components/recall/assimilationMemoryTrackers"
+import {
+  assimilableListValues,
+  type MemoryTrackerType,
+} from "@/components/recall/assimilationMemoryTrackers"
 import { useInjectedMemoryTrackerActions } from "@/composables/useMemoryTrackerActions"
 import { isSkippedFromAssimilationSequence } from "@/composables/useAssimilationSequenceSkip"
 import { isNoteLevelPropertyKey } from "@/utils/noteContentPropertyKeys"
 import { useNoteStore } from "@/store/noteStore"
+import type { PropertyValue } from "@/utils/noteProperties"
 
 const props = defineProps<{
   propertyKey: string
+  propertyValue: PropertyValue
   noteId?: number
   reifiable: boolean
 }>()

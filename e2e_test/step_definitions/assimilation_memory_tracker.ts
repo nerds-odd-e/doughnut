@@ -4,7 +4,10 @@
 
 import { Then, When } from '@badeball/cypress-cucumber-preprocessor'
 import start from '../start'
-import { followNoteUnderQuestion } from '../start/pageObjects/noteUnderQuestion'
+import {
+  expectNoteUnderQuestionFocusedProperty,
+  followNoteUnderQuestion,
+} from '../start/pageObjects/noteUnderQuestion'
 
 Then(
   'the note memory tracker should have recall count {int}',
@@ -41,6 +44,13 @@ Then(
 Then('I should see a spelling memory tracker', () => {
   start.assumeAssimilationPage().expectSpellingMemoryTracker()
 })
+
+Then(
+  'the note under question should focus on property {string} with value {string}',
+  (propertyKey: string, propertyValue: string) => {
+    expectNoteUnderQuestionFocusedProperty(propertyKey, propertyValue)
+  }
+)
 
 When('I follow the note under question {string}', (noteTitle: string) => {
   followNoteUnderQuestion(noteTitle)

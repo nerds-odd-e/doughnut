@@ -12,6 +12,7 @@ class MemoryTrackerBuilder extends Builder<MemoryTracker> {
   data: MemoryTracker
   private notebookId = generateId()
   private propertyKey?: string
+  private propertyValue?: string
   private ancestorFolders: RecalledNote['ancestorFolders'] = []
 
   constructor() {
@@ -33,8 +34,12 @@ class MemoryTrackerBuilder extends Builder<MemoryTracker> {
     return this
   }
 
-  withPropertyKey(propertyKey: string): MemoryTrackerBuilder {
+  withPropertyKey(
+    propertyKey: string,
+    propertyValue?: string
+  ): MemoryTrackerBuilder {
     this.propertyKey = propertyKey
+    this.propertyValue = propertyValue
     return this
   }
 
@@ -106,6 +111,7 @@ class MemoryTrackerBuilder extends Builder<MemoryTracker> {
       notebookId: this.notebookId,
       ancestorFolders: this.ancestorFolders ?? [],
       propertyKey: this.propertyKey,
+      propertyValue: this.propertyValue,
     }
   }
 
@@ -113,6 +119,9 @@ class MemoryTrackerBuilder extends Builder<MemoryTracker> {
     this.data.recalledNote = this.buildRecalledNote()
     if (this.propertyKey !== undefined) {
       this.data.propertyKey = this.propertyKey
+    }
+    if (this.propertyValue !== undefined) {
+      this.data.propertyValue = this.propertyValue
     }
     return this.data
   }

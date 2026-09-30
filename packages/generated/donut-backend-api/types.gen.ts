@@ -346,6 +346,7 @@ export type RecalledNote = {
     notebookId: number;
     ancestorFolders?: Array<FolderTrailSegment>;
     propertyKey?: string;
+    propertyValue?: string;
 };
 
 export type AnswerSpellingDto = {
@@ -684,6 +685,7 @@ export type MemoryTracker = {
     recalledNote?: RecalledNote;
     latestTutorFeedbackGrade?: number;
     spelling?: boolean;
+    propertyValue?: string;
 };
 
 export type RecordLearningSessionRequest = {
@@ -789,6 +791,7 @@ export type TextFromAudioWithCallInfo = {
 export type AssimilationRequestDto = {
     noteId?: number;
     propertyKey?: string;
+    propertyValue?: string;
     assimilateAsCommissioned?: boolean;
     assimilateAsSpelling?: boolean;
 };
@@ -963,6 +966,20 @@ export type UpdateMemoryTrackerPropertyKeyDto = {
     propertyKey: string;
 };
 
+/**
+ * A property's single value became one value of a list: its trackers follow that value.
+ */
+export type FollowPropertyValueDto = {
+    /**
+     * Frontmatter property key
+     */
+    propertyKey: string;
+    /**
+     * The list value that was the property's single value
+     */
+    propertyValue: string;
+};
+
 export type WikidataSearchEntity = {
     id?: string;
     label: string;
@@ -1079,6 +1096,7 @@ export type MemoryTrackerLite = {
     memoryTrackerId: number;
     spelling: boolean;
     propertyKey?: string;
+    propertyValue?: string;
 };
 
 export type MenuDataDto = {
@@ -1305,6 +1323,7 @@ export type AssimilationNextDto = {
 export type AssimilationNextUnitDto = {
     noteId?: number;
     propertyKey?: string;
+    propertyValue?: string;
 };
 
 export type DummyForGeneratingTypes = {
@@ -3381,6 +3400,22 @@ export type MarkAsRecalledResponses = {
 };
 
 export type MarkAsRecalledResponse = MarkAsRecalledResponses[keyof MarkAsRecalledResponses];
+
+export type FollowPropertyValueData = {
+    body: FollowPropertyValueDto;
+    path: {
+        note: number;
+    };
+    query?: never;
+    url: '/api/memory-trackers/notes/{note}/property-value';
+};
+
+export type FollowPropertyValueResponses = {
+    /**
+     * OK
+     */
+    200: unknown;
+};
 
 export type MarkConversationAsReadData = {
     body?: never;

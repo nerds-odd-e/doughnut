@@ -59,11 +59,7 @@ public class QuestionGenerationBatchJsonlRenderer {
     MemoryTracker tracker = request.getMemoryTracker();
     StructuredResponseCreateParams<GeneratedMcq> params =
         requestBuilder.buildQuestionGenerationResponseRequestForBatch(
-            tracker.getNote(),
-            null,
-            request.getContextSeed(),
-            propertyKeyOrNull(tracker.getPropertyKey()),
-            viewer);
+            tracker.getNote(), null, request.getContextSeed(), tracker.propertyFocus(), viewer);
 
     Map<String, Object> line = new LinkedHashMap<>();
     line.put("custom_id", request.getCustomId());
@@ -76,12 +72,5 @@ public class QuestionGenerationBatchJsonlRenderer {
     } catch (Exception e) {
       throw new RuntimeException("Failed to render batch JSONL line", e);
     }
-  }
-
-  private static String propertyKeyOrNull(String propertyKey) {
-    if (propertyKey == null || propertyKey.isBlank()) {
-      return null;
-    }
-    return propertyKey;
   }
 }

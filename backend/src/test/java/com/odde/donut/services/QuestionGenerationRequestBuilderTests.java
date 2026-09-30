@@ -5,6 +5,7 @@ import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.not;
 
 import com.odde.donut.entities.Note;
+import com.odde.donut.entities.PropertyFocus;
 import com.odde.donut.entities.User;
 import com.odde.donut.services.ai.GeneratedMcq;
 import com.odde.donut.services.focusContext.FocusContextConstants;
@@ -51,7 +52,8 @@ class QuestionGenerationRequestBuilderTests extends SpringTestBase {
     Note focus = propertyFocusNote();
 
     StructuredResponseCreateParams<GeneratedMcq> request =
-        noteQuestionGenerationService.buildQuestionGenerationRequest(focus, null, "a part of");
+        noteQuestionGenerationService.buildQuestionGenerationRequest(
+            focus, null, new PropertyFocus("a part of", ""));
 
     assertThat(
         instructionText(request),
@@ -65,6 +67,24 @@ class QuestionGenerationRequestBuilderTests extends SpringTestBase {
     assertThat(
         focusContext, containsString("Property value: Circulatory system includes [[Heart]]"));
     assertThat(focusContext, containsString("Heart"));
+  }
+
+  @Test
+  void shouldFocusOnTheGivenValueOfAListProperty() {
+    Note focus =
+        makeMe
+            .aNote()
+            .notebookOwnedBy(user)
+            .content("---\nexample of: [\"[[run]]\", \"[[past tense]]\"]\n---\nran\n")
+            .please();
+
+    StructuredResponseCreateParams<GeneratedMcq> request =
+        noteQuestionGenerationService.buildQuestionGenerationRequest(
+            focus, null, new PropertyFocus("example of", "[[run]]"));
+
+    String focusContext = inputText(request);
+    assertThat(focusContext, containsString("Property key: example of"));
+    assertThat(focusContext, containsString("Property value: [[run]]\n"));
   }
 
   @Test
@@ -82,7 +102,7 @@ class QuestionGenerationRequestBuilderTests extends SpringTestBase {
 
     StructuredResponseCreateParams<GeneratedMcq> request =
         questionGenerationRequestBuilder.buildQuestionGenerationResponseRequest(
-            focus, null, null, "a part of", viewer);
+            focus, null, null, new PropertyFocus("a part of", ""), viewer);
 
     String focusContext = inputText(request);
     assertThat(focusContext, containsString(FocusContextConstants.RETRIEVED_NOTE_OPEN_MARKER));

@@ -32,10 +32,12 @@ export function useRecallAnswerHandling({
     thresholdResult: ThresholdExceededResult
   ) => {
     const propertyKey = answerResult.recalledNote?.propertyKey
+    const propertyValue = answerResult.recalledNote?.propertyValue
     const { wrongCount, periodDays } = thresholdResult
-    const message = propertyKey
-      ? `You've answered the "${propertyKey}" property incorrectly ${wrongCount} times within the last ${periodDays} days.`
-      : `You've answered incorrectly ${wrongCount} times within the last ${periodDays} days.`
+    const subject = propertyKey
+      ? ` the "${propertyKey}" property${propertyValue ? ` value "${propertyValue}"` : ""}`
+      : ""
+    const message = `You've answered${subject} incorrectly ${wrongCount} times within the last ${periodDays} days.`
     await popups.alert(message)
   }
 

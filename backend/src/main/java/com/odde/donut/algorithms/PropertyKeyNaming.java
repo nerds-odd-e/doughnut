@@ -1,7 +1,5 @@
 package com.odde.donut.algorithms;
 
-import java.util.HashSet;
-import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -129,35 +127,5 @@ public final class PropertyKeyNaming {
   /** Frontmatter keys excluded from {@code note_property_index} and automatic tracker seeding. */
   public static boolean isExcludedFromPropertyIndexing(String key) {
     return isReservedStructuralKey(key) || isPassthroughPropertyKey(key);
-  }
-
-  /**
-   * Next free key in a base-key family: returns {@code baseKey} when slot 1 is free, otherwise
-   * {@code baseKey N} for the smallest free {@code N >= 2}.
-   */
-  public static String nextAvailablePropertyKeyForBase(
-      String baseKey, Iterable<String> existingKeys) {
-    Set<Integer> occupied = new HashSet<>();
-    for (String existingKey : existingKeys) {
-      if (existingKey == null || existingKey.isBlank()) {
-        continue;
-      }
-      if (!propertyKeyBaseMatches(existingKey, baseKey)) {
-        continue;
-      }
-      BaseAndSuffix parts = propertyKeyBaseAndSuffix(existingKey);
-      occupied.add(parts.suffix() == null ? 1 : parts.suffix());
-    }
-    if (!occupied.contains(1)) {
-      return baseKey;
-    }
-    if (isNoteLevelPropertyKey(baseKey)) {
-      return baseKey;
-    }
-    int n = 2;
-    while (occupied.contains(n)) {
-      n++;
-    }
-    return baseKey + " " + n;
   }
 }

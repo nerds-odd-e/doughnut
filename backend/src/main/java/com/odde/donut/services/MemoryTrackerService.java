@@ -21,10 +21,8 @@ import java.sql.Timestamp;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
 
 @Service
 public class MemoryTrackerService {
@@ -145,35 +143,6 @@ public class MemoryTrackerService {
 
   public void delete(MemoryTracker memoryTracker) {
     entityPersister.remove(memoryTracker);
-  }
-
-  public void updatePropertyKey(MemoryTracker memoryTracker, String newPropertyKey) {
-    if (!memoryTracker.getNote().isAvailable()) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Memory tracker is deleted");
-    }
-    if (memoryTracker.isNoteLevelTracker()) {
-      throw new ResponseStatusException(
-          HttpStatus.BAD_REQUEST, "Cannot rename note-level memory tracker");
-    }
-    if (newPropertyKey == null || newPropertyKey.isBlank()) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Property key must not be blank");
-    }
-    if (newPropertyKey.equals(memoryTracker.getPropertyKey())) {
-      return;
-    }
-    boolean conflict =
-        userService.getMemoryTrackersFor(memoryTracker.getUser(), memoryTracker.getNote()).stream()
-            .filter(MemoryTracker::isActive)
-            .filter(mt -> !mt.isSpelling())
-            .filter(mt -> !mt.getId().equals(memoryTracker.getId()))
-            .anyMatch(mt -> newPropertyKey.equals(mt.getPropertyKey()));
-    if (conflict) {
-      throw new ResponseStatusException(
-          HttpStatus.CONFLICT,
-          "A property memory tracker for \"" + newPropertyKey + "\" already exists on this note.");
-    }
-    memoryTracker.setPropertyKey(newPropertyKey);
-    entityPersister.save(memoryTracker);
   }
 
   public RecallPrompt answerSpelling(

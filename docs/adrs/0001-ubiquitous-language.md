@@ -133,7 +133,8 @@ Amend domain terms here in place; do not supersede this ADR.
 - **Remember spelling** — Learner action at assimilation: verify the note
   title (or alias), then create a spelling memory tracker
 - **Property memory tracker** — Understanding memory tracker keyed by a
-  **property** name (the frontmatter key).
+  **property** name (the frontmatter key) and, for a list property, one of
+  its values.
 - **Daily assimilation target** — Max new understanding memory trackers
   to create per day (profile or subscription). Spelling and commissioned
   trackers do not consume this count.

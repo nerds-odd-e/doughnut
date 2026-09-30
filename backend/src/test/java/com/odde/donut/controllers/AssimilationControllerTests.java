@@ -225,14 +225,14 @@ class AssimilationControllerTests extends ControllerTestBase {
     }
 
     @Test
-    void returns_next_property_key_for_untracked_example_of() {
+    void returns_next_property_key_and_value_for_untracked_example_of_list_item() {
       Timestamp day1 = makeMe.aTimestamp().of(1, 8).fromShanghai().please();
       testabilitySettings.timeTravelTo(day1);
       Note note =
           makeMe
               .aNote()
               .notebookOwnedBy(currentUser.getUser())
-              .content("---\nexample of: \"[[Word]]\"\n---\n\nbody")
+              .content("---\nexample of:\n  - \"[[Word]]\"\n---\n\nbody")
               .please();
       notePropertyIndexService.refreshForNote(note);
       makeMe.aMemoryTrackerFor(note).assimilatedAt(day1).please();
@@ -240,6 +240,7 @@ class AssimilationControllerTests extends ControllerTestBase {
       AssimilationNextDTO result = controller.next("Asia/Shanghai");
       assertThat(result.getNextUnit().getNoteId(), equalTo(note.getId()));
       assertThat(result.getNextUnit().getPropertyKey(), equalTo("example of"));
+      assertThat(result.getNextUnit().getPropertyValue(), equalTo("[[Word]]"));
     }
   }
 }

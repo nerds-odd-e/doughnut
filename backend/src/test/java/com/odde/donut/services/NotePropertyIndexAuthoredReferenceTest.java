@@ -47,23 +47,7 @@ class NotePropertyIndexAuthoredReferenceTest extends SpringTestBase {
   }
 
   @Test
-  void indexes_non_empty_list_without_wiki_links_as_one_null_reference_row() {
-    User user = makeMe.aUser().please();
-    String markdown =
-        "---\n" + "topic:\n" + "  - alpha\n" + "  - beta\n" + "  - gamma\n" + "---\n\nbody";
-    Note note = makeMe.aNote().notebookOwnedBy(user).content(markdown).please();
-
-    notePropertyIndexService.refreshForNote(note);
-
-    List<NotePropertyIndex> rows = propertyRows(note);
-    assertThat(rows, hasSize(1));
-    assertThat(rows.getFirst().getPropertyKey(), equalTo("topic"));
-    assertThat(rows.getFirst().getItemIndex(), equalTo(0));
-    assertThat(rows.getFirst().getAuthoredNoteReference(), nullValue());
-  }
-
-  @Test
-  void indexes_list_with_mixed_link_and_non_link_items_only_for_wiki_linked_items() {
+  void indexes_list_with_mixed_link_and_non_link_items_referencing_only_wiki_linked_items() {
     User user = makeMe.aUser().please();
     Note targetA = makeMe.aNote().title("A").notebookOwnedBy(user).please();
     String markdown =
@@ -79,11 +63,11 @@ class NotePropertyIndexAuthoredReferenceTest extends SpringTestBase {
     notePropertyIndexService.refreshForNote(note);
 
     List<NotePropertyIndex> rows = propertyRows(note);
-    assertThat(rows, hasSize(2));
-    assertThat(rows.get(0).getItemIndex(), equalTo(0));
+    assertThat(rows, hasSize(3));
     assertThat(rows.get(0).getAuthoredNoteReference().getAuthoredLink(), equalTo("A"));
-    assertThat(rows.get(1).getItemIndex(), equalTo(2));
-    assertThat(rows.get(1).getAuthoredNoteReference().getAuthoredLink(), equalTo("C"));
+    assertThat(rows.get(1).getItemIndex(), equalTo(1));
+    assertThat(rows.get(1).getAuthoredNoteReference(), nullValue());
+    assertThat(rows.get(2).getAuthoredNoteReference().getAuthoredLink(), equalTo("C"));
   }
 
   @Test

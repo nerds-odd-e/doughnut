@@ -79,13 +79,16 @@ public final class FrontmatterInPlaceEdit {
    */
   public static String setTopLevelScalar(String yamlRaw, String key, String value) {
     String entry = dumpEntry(key, value);
-    return firstTopLevelEntry(yamlRaw, key)
+    return topLevelEntry(yamlRaw, key)
         .map(
-            tuple -> {
-              int start = offset(yamlRaw, tuple.getKeyNode().getStartMark());
-              int end = offset(yamlRaw, tuple.getValueNode().getEndMark());
-              return splice(yamlRaw, List.of(new Replacement(start, end, entry)));
-            })
+            tuple ->
+                splice(
+                    yamlRaw,
+                    List.of(
+                        new Replacement(
+                            offset(yamlRaw, tuple.getKeyNode().getStartMark()),
+                            offset(yamlRaw, tuple.getValueNode().getEndMark()),
+                            entry))))
         .orElseGet(() -> yamlRaw.isEmpty() ? entry : yamlRaw + "\n" + entry);
   }
 
@@ -94,12 +97,51 @@ public final class FrontmatterInPlaceEdit {
    * value, leaving every other line as is.
    */
   public static String removeTopLevelEntry(String yamlRaw, String key) {
-    return firstTopLevelEntry(yamlRaw, key)
+    return topLevelEntry(yamlRaw, key)
         .map(tuple -> splice(yamlRaw, List.of(entryRemoval(yamlRaw, tuple, tuple.getValueNode()))))
         .orElse(yamlRaw);
   }
 
-  private static Optional<NodeTuple> firstTopLevelEntry(String yamlRaw, String key) {
+  /**
+   * Adds {@code value} as a list item of the top-level {@code key} (matched case-insensitively),
+   * which holds a scalar or an all-scalar sequence: a sequence gets the item appended in its own
+   * style, a scalar becomes a flow list of itself and the item.
+   */
+  public static String addTopLevelListItem(String yamlRaw, String key, String value) {
+    Node node = topLevelEntry(yamlRaw, key).orElseThrow().getValueNode();
+    String item = dumpScalar(value, DumperOptions.ScalarStyle.DOUBLE_QUOTED);
+    int start = offset(yamlRaw, node.getStartMark());
+    int end = offset(yamlRaw, node.getEndMark());
+    Replacement addition =
+        switch (node) {
+          case SequenceNode sequence
+              when sequence.getFlowStyle() == DumperOptions.FlowStyle.BLOCK -> {
+            int lastStart = offset(yamlRaw, sequence.getValue().getLast().getStartMark());
+            int lastEnd = offset(yamlRaw, sequence.getValue().getLast().getEndMark());
+            String itemPrefix =
+                yamlRaw.substring(yamlRaw.lastIndexOf('\n', lastStart - 1) + 1, lastStart);
+            yield new Replacement(lastEnd, lastEnd, "\n" + itemPrefix + item);
+          }
+          case SequenceNode sequence -> {
+            int close = yamlRaw.lastIndexOf(']', end - 1);
+            yield new Replacement(close, close, (sequence.getValue().isEmpty() ? "" : ", ") + item);
+          }
+          case ScalarNode scalar ->
+              new Replacement(
+                  start,
+                  end,
+                  "["
+                      + dumpScalar(scalar.getValue(), DumperOptions.ScalarStyle.DOUBLE_QUOTED)
+                      + ", "
+                      + item
+                      + "]");
+          default -> throw new IllegalArgumentException("Not a scalar or list: " + key);
+        };
+    return splice(yamlRaw, List.of(addition));
+  }
+
+  /** The top-level entry whose scalar key matches {@code key} case-insensitively. */
+  private static Optional<NodeTuple> topLevelEntry(String yamlRaw, String key) {
     if (!(new Yaml().compose(new StringReader(yamlRaw)) instanceof MappingNode mapping)) {
       return Optional.empty();
     }

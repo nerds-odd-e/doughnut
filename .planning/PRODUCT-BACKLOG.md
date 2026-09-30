@@ -7,8 +7,6 @@ Bug fixing and general maintenance.
 
 ## Taken
 
-- [Track each value of a property separately without numbered keys](seeds/SEED-063-track-property-values-separately.md#story-1) — SEED-063#story-1 ([plan](slice-plans/007-track-property-values-separately/PLAN.md))
-
 ## Backlog list
 
 - [Reify refuses structural keys](seeds/SEED-062-reify-property.md#story-2) — SEED-062#story-2

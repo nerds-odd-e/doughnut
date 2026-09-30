@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.odde.donut.controllers.dto.QuestionContestResult;
 import com.odde.donut.entities.Mcq;
 import com.odde.donut.entities.Note;
+import com.odde.donut.entities.PropertyFocus;
 import com.odde.donut.services.NoteQuestionGenerationService;
 import com.odde.donut.services.ai.tools.AiToolFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,11 +32,11 @@ public class AiQuestionGenerator {
   }
 
   public Mcq getAiGeneratedQuestion(
-      Note note, String additionalMessage, Long contextSeed, String propertyKey) {
+      Note note, String additionalMessage, Long contextSeed, PropertyFocus propertyFocus) {
     try {
       GeneratedMcq original =
           noteQuestionGenerationService.generateQuestion(
-              note, additionalMessage, contextSeed, propertyKey);
+              note, additionalMessage, contextSeed, propertyFocus);
       return generatedQuestionPostProcessor.assembleMcq(original, note, contextSeed);
     } catch (JsonProcessingException e) {
       throw new RuntimeException(e);
@@ -67,8 +68,8 @@ public class AiQuestionGenerator {
       Note note,
       Mcq mcq,
       Long contextSeed,
-      String propertyKey) {
+      PropertyFocus propertyFocus) {
     String additionalMessage = AiToolFactory.buildRegenerateQuestionMessage(contestResult, mcq);
-    return getAiGeneratedQuestion(note, additionalMessage, contextSeed, propertyKey);
+    return getAiGeneratedQuestion(note, additionalMessage, contextSeed, propertyFocus);
   }
 }

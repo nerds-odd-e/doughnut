@@ -2461,6 +2461,26 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/MemoryTracker"
+  /api/memory-trackers/notes/{note}/property-value:
+    patch:
+      tags:
+      - memory-tracker-controller
+      operationId: followPropertyValue
+      parameters:
+      - name: note
+        in: path
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/FollowPropertyValueDTO"
+        required: true
+      responses:
+        "200":
+          description: OK
   /api/conversation/{conversationId}/read:
     patch:
       tags:
@@ -4302,6 +4322,8 @@ components:
             $ref: "#/components/schemas/FolderTrailSegment"
         propertyKey:
           type: string
+        propertyValue:
+          type: string
       required:
       - noteTopology
       - notebookId
@@ -4895,6 +4917,8 @@ components:
           format: int32
         spelling:
           type: boolean
+        propertyValue:
+          type: string
       required:
       - id
       - nextRecallAt
@@ -5118,6 +5142,8 @@ components:
           type: integer
           format: int32
         propertyKey:
+          type: string
+        propertyValue:
           type: string
         assimilateAsCommissioned:
           type: boolean
@@ -5403,6 +5429,22 @@ components:
           minLength: 1
       required:
       - propertyKey
+    FollowPropertyValueDTO:
+      type: object
+      description: "A property's single value became one value of a list: its trackers\
+        \ follow that value."
+      properties:
+        propertyKey:
+          type: string
+          description: Frontmatter property key
+          minLength: 1
+        propertyValue:
+          type: string
+          description: The list value that was the property's single value
+          minLength: 1
+      required:
+      - propertyKey
+      - propertyValue
     WikidataSearchEntity:
       type: object
       properties:
@@ -5671,6 +5713,8 @@ components:
         spelling:
           type: boolean
         propertyKey:
+          type: string
+        propertyValue:
           type: string
       required:
       - memoryTrackerId
@@ -6163,6 +6207,8 @@ components:
           type: integer
           format: int32
         propertyKey:
+          type: string
+        propertyValue:
           type: string
     DummyForGeneratingTypes:
       type: object
