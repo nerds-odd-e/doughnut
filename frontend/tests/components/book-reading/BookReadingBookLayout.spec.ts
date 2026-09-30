@@ -17,6 +17,7 @@ function mountLayout(
     selectedBlockId?: number | null
     isMdOrLarger?: boolean
     opened?: boolean
+    canUndoDepthChange?: boolean
   }
 ) {
   return helper
@@ -28,6 +29,7 @@ function mountLayout(
       blocks,
       currentBlockId: null,
       selectedBlockId: options?.selectedBlockId ?? null,
+      canUndoDepthChange: options?.canUndoDepthChange ?? false,
       dispositionForBlock: () => undefined,
     })
     .mount({ attachTo: document.body })
@@ -60,6 +62,18 @@ function pointerMouse(
 }
 
 describe("BookReadingBookLayout", () => {
+  it("shows Undo only while a depth change can be undone and emits undoDepthChange", async () => {
+    const undoSelector = '[data-testid="book-reading-undo-layout-change"]'
+    const without = mountLayout()
+    expect(without.find(undoSelector).exists()).toBe(false)
+    without.unmount()
+
+    const wrapper = mountLayout(undefined, { canUndoDepthChange: true })
+    await wrapper.find(undoSelector).trigger("click")
+    expect(wrapper.emitted("undoDepthChange")).toHaveLength(1)
+    wrapper.unmount()
+  })
+
   it("sets data-book-block-depth from each block depth in preorder list", () => {
     const parent = blockStub({ id: 101, depth: 0, title: "Parent Section" })
     const child = blockStub({ id: 102, depth: 1, title: "Child Section" })

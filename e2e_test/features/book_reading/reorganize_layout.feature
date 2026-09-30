@@ -32,6 +32,14 @@ Feature: Reorganize book layout
         | block                               | start_depth | end_depth |
         | 3.1 Can You Refactor Without Tests? | 1           | 0         |
 
+    Scenario: Undo a wrong outdent
+      When I choose the book block "3.1 Can You Refactor Without Tests?"
+      And I outdent the focused book block with Shift+Tab
+      Then the book block "3.1 Can You Refactor Without Tests?" should be at depth 0 in the book layout
+      When I undo the last book layout change
+      Then the book block "3.1 Can You Refactor Without Tests?" should be at depth 1 in the book layout
+      And the book block "3.2 Can You Refactor Without Changing the Code?" should be at depth 1 in the book layout
+
   Rule: Content block bbox overlays
 
     Background:

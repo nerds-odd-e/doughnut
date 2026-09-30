@@ -20,6 +20,15 @@
         >
           AI Reorganize
         </button>
+        <button
+          v-if="canUndoDepthChange"
+          type="button"
+          data-testid="book-reading-undo-layout-change"
+          class="daisy-btn daisy-btn-sm daisy-btn-outline mb-3 w-full"
+          @click="emit('undoDepthChange')"
+        >
+          Undo
+        </button>
         <template v-for="block in blocks" :key="block.id">
           <button
             type="button"
@@ -107,6 +116,7 @@ const props = withDefaults(
     blocks: BookBlockFull[]
     currentBlockId: number | null
     selectedBlockId: number | null
+    canUndoDepthChange?: boolean
     dispositionForBlock: (
       blockId: number
     ) => BookBlockReadingDisposition | undefined
@@ -122,6 +132,7 @@ const emit = defineEmits<{
   changeMark: [blockId: number, status: BookBlockReadingDisposition]
   clearMark: [blockId: number]
   requestAiReorganize: []
+  undoDepthChange: []
 }>()
 
 const layoutRef = ref<HTMLElement | null>(null)

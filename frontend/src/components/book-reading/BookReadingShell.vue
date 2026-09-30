@@ -40,6 +40,7 @@
     :blocks="bookBlocks"
     :current-block-id="currentBlockId"
     :selected-block-id="selectedBlockId"
+    :can-undo-depth-change="reorganize?.canUndoDepthChange.value"
     :disposition-for-block="bookReading.dispositionForBlock"
     @block-click="applyBookBlockSelection"
     @change-mark="bookReading.submitReadingDisposition"

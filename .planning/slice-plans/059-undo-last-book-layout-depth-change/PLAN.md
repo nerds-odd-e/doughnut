@@ -2,7 +2,7 @@
 
 Work item: **SEED-059#story-7**
 ([story](../../seeds/SEED-059-book-reading-uat-fixes.md#story-7)).
-Status: **story refined; two Behavior slices planned.**
+Status: **slice 1 done; slice 2 planned.**
 
 ## Goal and scope
 
@@ -83,13 +83,13 @@ focus and keyboard movement (story 9); EPUB (story 10 turns reorganizing on).
 
 ### 1. A reader undoes a wrong indent or outdent with an Undo button
 Type: Behavior
-Status: planned
+Status: done
 Proof: E2E scenario "Undo a wrong outdent" in `reorganize_layout.feature`
 (refactoring fixture, new step "I undo the last book layout change" clicking the
 button, existing depth-assertion steps). Composable spec: after an outdent the
 mutations composable can undo and the book's depths return to their earlier
-values; after a second, different change (a cancel or a depth change of another
-block) undo is unavailable; undo of an indent restores too. Layout component
+values; after a cancel undo is unavailable, and after a second depth change undo
+offers that newer change; undo of an indent restores too. Layout component
 spec: the button is shown only while undo is available and emits its event.
 
 Behavior: a PDF book is open and the reader has just outdented "3.1" (Shift+Tab)
@@ -130,4 +130,9 @@ About 5 min: one window listener on the surface from slice 1.
 
 ## Learnings
 
-None yet.
+- Slice 1 done: E2E "Undo a wrong outdent" (`reorganize_layout.feature`, 9/9) and
+  the composable, layout and AI-reorganize specs pass. A second depth change
+  replaces the memory, so Undo then reverses the newest change; only Cancel (or
+  any other change of ids or depths) makes it unavailable.
+- Not directly observed: E2E does not assert Undo disappears afterwards (the
+  composable and layout specs do); no spec for reload or the apply failure path.
