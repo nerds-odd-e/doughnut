@@ -108,7 +108,7 @@ rule with that proof or dropping the increment. Slices 1 and 2 stand alone.
 
 ### 4. Touch devices get controls of at least 44 px in the properties section
 Type: Behavior
-Status: planned
+Status: done
 Proof: the touch-size scenario is red then green; `pnpm frontend:test` for the properties component tests stays green;
 `pnpm cy:run --spec e2e_test/features/note_topology/note_property_layout.feature` passes; the density numbers are
 measured again with the throwaway step from slice 1 and recorded.
@@ -143,6 +143,16 @@ row panel's Assimilate and Skip are inside the section and so are included; no o
   ...})` makes `(pointer: coarse)` match in Cypress with no reload; without the step it is false. Support lives in
   `e2e_test/start/touchDevice.ts` (`use`, `reset`, `expectCoarsePointer`); an `After` hook resets it. Slice 4 reuses
   `I use a touch device` and its "unchanged without touch" check also proves the reset.
+- Slice 4 density (top of `.ql-editor`, 820x1000, 19-row note, one run each): editable 864 baseline, 879 after on
+  non-touch, 1071 on touch; read-only 608 baseline, 648 after on both. Non-touch growth (+15 editable, +40 read-only)
+  comes from the slice 1 and 2 wrapping; touch editable is +192 px over non-touch from 44 px controls. Reported, not
+  gated.
+- Slice 3's `touchDevice.reset` did not work at first (CDP rejects `maxTouchPoints: 0`, and the rejected call was not
+  awaited), so touch leaked into later scenarios; slice 4's non-touch scenario caught it and the disable call now omits
+  `maxTouchPoints` inside `cy.wrap`.
+- The touch rule sets `min-h-11` only, so square icon buttons stay 32 px wide and are 44 px high. Only the `url` row with
+  its panel open was measured; Wikidata rows and the add form were not. A `min-w-11` for `.square` is a one-line
+  follow-up if the owner wants 44x44 targets.
 - The two long-key rows live in the feature's Background (another user's shared notebook); slice 2's editable scenario
   can reuse the same rows with the owner logged in.
 

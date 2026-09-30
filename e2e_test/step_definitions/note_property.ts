@@ -90,6 +90,20 @@ Then('the controls of property {string} should not overlap', (key: string) => {
   start.assumeNotePage().expectRichNotePropertyControlsApart(key)
 })
 
+Then(
+  'the controls of property {string} should be at least 44 px high',
+  (key: string) => {
+    start.assumeNotePage().expectRichNotePropertyControlHeights(key, true)
+  }
+)
+
+Then(
+  'the controls of property {string} should be under 44 px high',
+  (key: string) => {
+    start.assumeNotePage().expectRichNotePropertyControlHeights(key, false)
+  }
+)
+
 Then('the note should not scroll sideways', () => {
   start.assumeNotePage().expectNoteWithoutSidewaysScroll()
 })

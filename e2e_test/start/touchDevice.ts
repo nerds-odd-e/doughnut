@@ -2,10 +2,12 @@ let enabled = false
 
 const setTouchEmulation = (on: boolean) => {
   enabled = on
-  return Cypress.automation('remote:debugger:protocol', {
-    command: 'Emulation.setTouchEmulationEnabled',
-    params: { enabled: on, maxTouchPoints: on ? 5 : 0 },
-  })
+  return cy.wrap(null, { log: false }).then(() =>
+    Cypress.automation('remote:debugger:protocol', {
+      command: 'Emulation.setTouchEmulationEnabled',
+      params: on ? { enabled: true, maxTouchPoints: 5 } : { enabled: false },
+    })
+  )
 }
 
 export const touchDevice = {

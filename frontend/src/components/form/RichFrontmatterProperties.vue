@@ -4,7 +4,7 @@
   />
   <section
     v-if="showSection"
-    class="mb-3"
+    class="mb-3 pointer-coarse:[&_.daisy-btn-sm]:min-h-11 pointer-coarse:[&_.daisy-input-sm]:min-h-11"
     :class="isInteractionLocked ? 'pointer-events-none opacity-60' : ''"
     :aria-labelledby="headingVisible ? headingId : undefined"
     :aria-label="headingVisible ? undefined : 'Note properties'"

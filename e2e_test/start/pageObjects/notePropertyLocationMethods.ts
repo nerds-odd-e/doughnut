@@ -169,6 +169,31 @@ export const notePropertyLocationMethods = () => ({
     })
     return this
   },
+  expectRichNotePropertyControlHeights(key: string, tall: boolean) {
+    this.switchToRichContent()
+    findNoteContentRegion().within(() => {
+      cy.get(richNotePropertyRow(key)).should(($row) => {
+        ;[
+          'rich-note-property-panel-toggle',
+          'rich-note-property-value-dialog-open',
+          'rich-note-property-row-remove',
+          'rich-note-property-external-link',
+          'rich-note-property-row-key-input',
+          'rich-note-property-row-value-input',
+        ].forEach((testId) => {
+          const control = $row.find(`[data-testid="${testId}"]`)[0]
+          expect(control, `control ${testId} of "${key}"`).to.exist
+          const height = control!.getBoundingClientRect().height
+          if (tall) {
+            expect(height, `${testId} height`).to.be.at.least(44)
+          } else {
+            expect(height, `${testId} height`).to.be.below(44)
+          }
+        })
+      })
+    })
+    return this
+  },
   expectNoteWithoutSidewaysScroll() {
     cy.document().should((doc) => {
       const page = doc.documentElement
