@@ -83,7 +83,7 @@ wrong, so report before changing the assertion.
 
 ### 3. The read-only value display is its own component
 Type: Structure
-Status: planned
+Status: done
 Proof: slice 2's spec and `listProperties.spec.ts`, `frontmatter.spec.ts`, `propertyLocation.spec.ts` green, no assertion changed.
 
 Move the relation / Wikidata / URL / list / scalar branches out of `RichFrontmatterReadOnlyList.vue` into
