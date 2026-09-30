@@ -60,4 +60,6 @@ When selecting note property or relationship improvements from the backlog.
 
 - Owner request: "Reify a property" lets a user turn a property into a relationship
   node; if the property has trackers, they should follow.
-- Related assessment: [note properties UX UAT](SEED-061-note-properties-ux-uat.md#story-1).
+- Related assessment: the note properties UX UAT report, recoverable at
+  `1986473b79:.planning/seeds/SEED-061-note-properties-ux-uat.md`; its follow-up fixes are in
+  [SEED-064](SEED-064-note-properties-fixes.md#story-1).

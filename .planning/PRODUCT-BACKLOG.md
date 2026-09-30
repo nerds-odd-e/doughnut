@@ -7,8 +7,6 @@ Bug fixing and general maintenance.
 
 ## Taken
 
-- [Identify note properties UX and design improvements through a one-hour manual UAT](seeds/SEED-061-note-properties-ux-uat.md#story-1) — SEED-061#story-1 ([plan](slice-plans/001-note-properties-uat/PLAN.md))
-
 ## Backlog list
 
 - [A note's properties keep every value visible and are easy to tap on an iPad and a phone](seeds/SEED-064-note-properties-fixes.md#story-1) — SEED-064#story-1
