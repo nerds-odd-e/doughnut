@@ -118,6 +118,57 @@ export const notePropertyLocationMethods = () => ({
     })
     return this
   },
+  expectEditablePropertyValueShowsAllText(key: string) {
+    this.switchToRichContent()
+    findNoteContentRegion().within(() => {
+      cy.get(richNotePropertyRow(key))
+        .find('[data-testid="rich-note-property-row-value-input"]')
+        .should(($value) => {
+          const field = $value[0]!
+          expect(
+            field.scrollHeight,
+            `scroll height of the value of "${key}"`
+          ).to.be.at.most(field.clientHeight)
+        })
+    })
+    return this
+  },
+  expectRichNotePropertyKeyEndsWithEllipsis(key: string) {
+    this.switchToRichContent()
+    findNoteContentRegion().within(() => {
+      cy.get(richNotePropertyRow(key))
+        .find('[data-testid="rich-note-property-row-key-input"]')
+        .should('have.css', 'text-overflow', 'ellipsis')
+    })
+    return this
+  },
+  expectRichNotePropertyControlsApart(key: string) {
+    this.switchToRichContent()
+    findNoteContentRegion().within(() => {
+      cy.get(richNotePropertyRow(key)).should(($row) => {
+        const boxes = [
+          '[data-testid="rich-note-property-panel-toggle"]',
+          '[data-testid="rich-note-property-value-dialog-open"]',
+          '[data-testid="rich-note-property-row-remove"]',
+        ].map((selector) => {
+          const control = $row.find(selector)[0]
+          expect(control, `control ${selector} of "${key}"`).to.exist
+          return control!.getBoundingClientRect()
+        })
+        boxes.forEach((a, i) =>
+          boxes.slice(i + 1).forEach((b) => {
+            const apart =
+              a.right <= b.left ||
+              b.right <= a.left ||
+              a.bottom <= b.top ||
+              b.bottom <= a.top
+            expect(apart, `controls of "${key}" apart`).to.be.true
+          })
+        )
+      })
+    })
+    return this
+  },
   expectNoteWithoutSidewaysScroll() {
     cy.document().should((doc) => {
       const page = doc.documentElement

@@ -33,7 +33,7 @@
           :value="modelValue.key"
           type="text"
           autocapitalize="off"
-          class="daisy-input daisy-input-sm w-full min-w-[8rem]"
+          class="daisy-input daisy-input-sm w-full min-w-[8rem] text-ellipsis"
           :aria-label="`Existing note property key (row ${idx + 1})`"
           :aria-expanded="presetPanelOpen"
           :aria-controls="presetPanelOpen ? presetListId : undefined"

@@ -54,6 +54,24 @@ Then('the value of property {string} should be visible', (key: string) => {
   start.assumeNotePage().expectRichNotePropertyValueVisible(key)
 })
 
+Then(
+  'the editable value of property {string} should show all its text',
+  (key: string) => {
+    start.assumeNotePage().expectEditablePropertyValueShowsAllText(key)
+  }
+)
+
+Then(
+  'the key of property {string} should end with an ellipsis',
+  (key: string) => {
+    start.assumeNotePage().expectRichNotePropertyKeyEndsWithEllipsis(key)
+  }
+)
+
+Then('the controls of property {string} should not overlap', (key: string) => {
+  start.assumeNotePage().expectRichNotePropertyControlsApart(key)
+})
+
 Then('the note should not scroll sideways', () => {
   start.assumeNotePage().expectNoteWithoutSidewaysScroll()
 })

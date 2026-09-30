@@ -20,6 +20,7 @@
       @pointerdown="onValuePointerDown"
     >
       <PropertyValueField
+        class="h-auto"
         :model-value="scalarValue"
         :wiki-links="wikiLinks"
         :last-saved-markdown="lastSavedMarkdown"

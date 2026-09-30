@@ -81,7 +81,7 @@ Steps, in order:
 
 ### 2. Editable properties keep a long-key note's value visible and cut keys are cued
 Type: Behavior
-Status: planned
+Status: done
 Proof: the same feature file, editable scenario at 820 and 375 px, red then green; then `pnpm frontend:test` for
 `RichMarkdownEditor.frontmatter.spec.ts`.
 
@@ -136,6 +136,9 @@ row panel's Assimilate and Skip are inside the section and so are included; no o
   `scripts/isolated-cypress-active-specs.mjs`; slice 1 added it.
 - The `minmax(6rem,40%)` key column makes short read-only keys sit in a wider column than before; not asserted, for the
   owner's iPad check.
+- Slice 2: at 820 and 375 px the editable row's controls and page width already held, so the planned grid change
+  ("value drops under the key") was not needed; only `h-auto` on the value field and `text-ellipsis` on the key input
+  were. The controls check covers the panel-open state and the spaces-key row only.
 - The two long-key rows live in the feature's Background (another user's shared notebook); slice 2's editable scenario
   can reuse the same rows with the owner logged in.
 

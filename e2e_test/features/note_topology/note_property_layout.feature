@@ -29,3 +29,19 @@ Feature: Note property layout
       | width |
       | 820   |
       | 375   |
+
+  Scenario Outline: An editable property with a long key keeps its value visible and its controls apart
+    Given I am re-logged in as "another_old_learner"
+    And I am on a window <width> * 1000
+    When I visit note "Long properties"
+    And I open the property panel for property "a_rather_long_property_key_name_that_keeps_going_and_going_without_any_space"
+    And I open the property panel for property "a rather long property key name that keeps going and going with spaces in it"
+    Then the editable value of property "a rather long property key name that keeps going and going with spaces in it" should show all its text
+    And the key of property "a_rather_long_property_key_name_that_keeps_going_and_going_without_any_space" should end with an ellipsis
+    And the controls of property "a rather long property key name that keeps going and going with spaces in it" should not overlap
+    And the note should not scroll sideways
+
+    Examples:
+      | width |
+      | 820   |
+      | 375   |
