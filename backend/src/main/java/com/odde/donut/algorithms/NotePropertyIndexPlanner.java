@@ -6,12 +6,14 @@ import java.util.List;
 /** Plans {@code note_property_index} rows from parsed frontmatter. */
 public final class NotePropertyIndexPlanner {
 
+  /**
+   * One index row: a scalar has one row with an empty {@code propertyValue}; a list has one row per
+   * item with the item as its value.
+   */
   public record PlannedRow(
-      String propertyKey,
-      int itemIndex,
-      String valueText,
-      boolean listProperty,
-      String sourceLocalKey) {}
+      String propertyKey, int itemIndex, String propertyValue, String sourceLocalKey) {}
+
+  private static final int MAX_PROPERTY_VALUE_LENGTH = 255;
 
   private NotePropertyIndexPlanner() {}
 
@@ -38,29 +40,14 @@ public final class NotePropertyIndexPlanner {
       CanonicalDonutOrigin canonicalOrigin) {
     switch (propertyValue) {
       case FrontmatterPropertyValue.Scalar scalar ->
-          rows.add(
-              new PlannedRow(
-                  key,
-                  0,
-                  scalar.value(),
-                  false,
-                  sourceLocalKeyFor(scalar.value(), canonicalOrigin)));
+          rows.add(new PlannedRow(key, 0, "", sourceLocalKeyFor(scalar.value(), canonicalOrigin)));
       case FrontmatterPropertyValue.ListItems listItems -> {
-        if (listItems.items().isEmpty()) {
-          return;
-        }
-        List<PlannedRow> referenceRows = new ArrayList<>();
         for (int i = 0; i < listItems.items().size(); i++) {
           String item = listItems.items().get(i);
-          String sourceLocalKey = sourceLocalKeyFor(item, canonicalOrigin);
-          if (sourceLocalKey != null) {
-            referenceRows.add(new PlannedRow(key, i, item, true, sourceLocalKey));
+          if (item.isBlank() || item.length() > MAX_PROPERTY_VALUE_LENGTH) {
+            continue;
           }
-        }
-        if (referenceRows.isEmpty()) {
-          rows.add(new PlannedRow(key, 0, "", true, null));
-        } else {
-          rows.addAll(referenceRows);
+          rows.add(new PlannedRow(key, i, item, sourceLocalKeyFor(item, canonicalOrigin)));
         }
       }
     }

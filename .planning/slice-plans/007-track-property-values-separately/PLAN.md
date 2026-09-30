@@ -108,7 +108,11 @@ key stays note, key, item). Entities and builders gain the field. Enables slice 
 
 ### 1b. The index keeps every list item with its value
 Type: Structure
-Status: planned
+Status: done — `NotePropertyIndexPlannerTest`, `NotePropertyIndexServiceTest`, `NotePropertyIndexAuthoredReferenceTest`;
+focused tracker/assimilation/index/recall/note-controller set green. Blank list items are skipped too (`''` means a
+single value), so a list whose items are all blank or over 255 characters has no row. A list reference item whose
+authored reference is missing keeps its row with a null reference. `Frontmatter.keys()` is `Set.copyOf` (order varies
+per JVM run), so index row ids are ordered only within one key: tests assert per key.
 Proof: `NotePropertyIndexPlannerTest` and a `NotePropertyIndexService` test: a list `[alpha, "[[B]]"]` gives two rows
 with values `alpha` and `[[B]]` (the second with its reference), a scalar gives one row with `''`; every existing
 assimilation and gate test green.
