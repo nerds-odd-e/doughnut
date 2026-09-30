@@ -130,62 +130,6 @@ Effort bands: S = 30–60 minutes, M = 1–2 hours, L = 2–4 hours, including d
   filters and positions the list only.
 - **Safe stopping point:** the add journey works better even if later stories are cancelled.
 
-<a id="story-3"></a>
-
-### A rejected property value is explained next to the row that was rejected
-
-**Identity:** SEED-064#story-3
-```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/003-note-property-row-rejection-message/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"cf4526e1610ae1667b681fa01ea0dd2c1bdffaa40f651a2d75df17d52c817d35","plan":"8c254fd55c91e343b4a2cb9c4a0dc1d555991014581702aca18809d45213b783"}}
-```
-
-- **Goal:** an iPad user (primary device) or a phone user whose change to an existing property row is rejected sees the
-  reason directly under that row, without scrolling. Today the reason is one message below the last row, about 600 px
-  from the edited row on a 19-row note and off screen on an iPad in landscape, so the value goes back to its old text
-  with no visible reason (iPad D2). Nothing is lost when this happens (the old value returns and a retry works); the
-  story removes the confusion and the search for the reason.
-- **Scope:**
-  - **Message under its row.** When a change to an existing row is rejected (a value that breaks a rule such as
-    `note_level` outside 1 to 6 or a scalar `aliases`, or a key renamed to an existing key), the message appears
-    immediately below that row, inside the list. It is not also shown at the bottom. The value or key goes back to its
-    old text, as today.
-  - **One message at a time.** A rejection on another row moves the message to that row. A change that is accepted, a
-    removal, or a reload clears it, as today. It never stays under a row it does not describe.
-  - **Everything else stays as it is.** The add form's message stays directly above the form (already next to what was
-    typed), and the Wikidata and value-dialog messages stay where they are. The message keeps its role, live-region
-    behavior, size and colour.
-  - **Relation type.** A rejected relation type change carries its row in the same way, at no extra cost. It is not a
-    promise and has no test of its own: no valid table can make it fail, because the backend refuses invalid stored
-    content.
-  - **Proof is placement, not layout.** The edited row was just tapped, so it is on screen; a message that is that
-    row's neighbour is on screen with it. A frontend component test (which runs in Chromium) proves the neighbour
-    relation; no Cypress viewport or touch step is needed.
-  - **Real iPad check by the owner** (optional): on the long note change `note_level` to 7 in both orientations and
-    confirm the message shows beside the row.
-- **Excluded (story decisions):**
-  - the add form, Wikidata and value-dialog messages (already adjacent or in their own dialog);
-  - the message's size, colour or wording, and a scroll-into-view variant (it moves the edited row off screen and
-    contradicts this story's evaluation);
-  - keeping the rejected text in the field so the user can correct it instead of retyping: the invalid text would have
-    to live in the table while the checks run;
-  - any change to which values are valid, and keyboard-aware positioning.
-- **Key examples:**
-  - 19-row note, `note_level: 3`; set it to `7` and leave the field → the message "note_level must be an integer from 1
-    to 6." is directly under that row, and the field shows `3` again.
-  - Then set `4` → the change is saved and the message is gone.
-  - Two rows `alpha` and `beta`; rename `beta` to `alpha` → "Duplicate property keys are not allowed." under the second
-    row, which shows `beta` again.
-  - A rejected value on row 1, then a rejected value on row 2 → one message, under row 2.
-  - Row with a message is removed → no message remains.
-  - Add form, key `note_level`, value `7` → the message is still directly above the form, not under a row.
-- **Value / learning:** the message belongs to the row; adds about 15 to 20 lines (estimate) and one small shared
-  message component that the add form's message also uses. Story 6's draft row and SEED-063's rows per value can reuse
-  it.
-- **Effort hypothesis:** S, high confidence: rows already have client ids and both call sites know their row.
-- **Depends on:** none. Story 2 (planned) also edits `RichFrontmatterEditablePropertyRow.vue`; the two touch different
-  parts (the key field versus the row's neighbour), so only a routine merge is expected.
-- **Safe stopping point:** independent.
-
 <a id="story-4"></a>
 
 ### Saving a typed Wikidata ID that cannot be used tells the user why
@@ -264,7 +208,6 @@ Effort bands: S = 30–60 minutes, M = 1–2 hours, L = 2–4 hours, including d
   queued, they act on the row story 5 unifies), then story 6.
 - Stories 2, 3 and 4 are independent of each other; story 6 needs stories 2 and 5 and
   SEED-063#story-1, because adding a property must follow the new rule for repeated keys.
-- Story 3 anchors its message to a row, not to a key, so it holds if SEED-063 makes rows per value.
 - First to drop: story 6 (largest risk, the defects it touches are already softened by story 2).
 
 ## Open Decisions
