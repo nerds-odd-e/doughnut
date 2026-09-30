@@ -145,6 +145,25 @@ function propertyValueIdentity(value: PropertyValue): string {
     : JSON.stringify(value.items)
 }
 
+export type PropertyValueFollow = { key: string; value: string }
+
+/** Keys whose single value became one value of a list between two note Markdown snapshots. */
+export function diffSingleValuesBecomingListValues(
+  oldMarkdown: string,
+  newMarkdown: string
+): PropertyValueFollow[] {
+  const oldParsed = parseNoteContentMarkdown(oldMarkdown)
+  const newParsed = parseNoteContentMarkdown(newMarkdown)
+  if (!oldParsed.ok || !newParsed.ok) return []
+
+  return Object.entries(oldParsed.properties).flatMap(([key, oldValue]) => {
+    const newValue = newParsed.properties[key]
+    if (oldValue.kind !== "scalar" || newValue?.kind !== "list") return []
+    const value = oldValue.value.trim()
+    return newValue.items.includes(value) ? [{ key, value }] : []
+  })
+}
+
 /** Detects property key removals and renames between two note Markdown snapshots. */
 export function diffFrontmatterPropertyKeyChanges(
   oldMarkdown: string,

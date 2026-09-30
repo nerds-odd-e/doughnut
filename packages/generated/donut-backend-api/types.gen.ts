@@ -966,6 +966,20 @@ export type UpdateMemoryTrackerPropertyKeyDto = {
     propertyKey: string;
 };
 
+/**
+ * A property's single value became one value of a list: its trackers follow that value.
+ */
+export type FollowPropertyValueDto = {
+    /**
+     * Frontmatter property key
+     */
+    propertyKey: string;
+    /**
+     * The list value that was the property's single value
+     */
+    propertyValue: string;
+};
+
 export type WikidataSearchEntity = {
     id?: string;
     label: string;
@@ -3366,6 +3380,22 @@ export type MarkAsRecalledResponses = {
 };
 
 export type MarkAsRecalledResponse = MarkAsRecalledResponses[keyof MarkAsRecalledResponses];
+
+export type FollowPropertyValueData = {
+    body: FollowPropertyValueDto;
+    path: {
+        note: number;
+    };
+    query?: never;
+    url: '/api/memory-trackers/notes/{note}/property-value';
+};
+
+export type FollowPropertyValueResponses = {
+    /**
+     * OK
+     */
+    200: unknown;
+};
 
 export type MarkConversationAsReadData = {
     body?: never;

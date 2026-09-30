@@ -54,7 +54,14 @@
 </template>
 
 <script setup lang="ts">
-import { nextTick, onMounted, onUnmounted, ref, type PropType } from "vue"
+import {
+  nextTick,
+  onMounted,
+  onUnmounted,
+  ref,
+  toRef,
+  type PropType,
+} from "vue"
 import RichMarkdownEditor from "../../form/RichMarkdownEditor.vue"
 import PasteChoiceActionBar from "./PasteChoiceActionBar.vue"
 import TextContentWrapper from "./TextContentWrapper.vue"
@@ -62,10 +69,12 @@ import TextArea from "@/components/form/TextArea.vue"
 import type { WikiLink } from "@generated/donut-backend-api"
 import { useContentCursorInserter } from "@/composables/useContentCursorInserter"
 import { useNoteContentPaste } from "@/composables/useNoteContentPaste"
+import { useInjectedMemoryTrackerActions } from "@/composables/useMemoryTrackerActions"
 import { usePropertyMemoryTrackerGuard } from "@/composables/usePropertyMemoryTrackerGuard"
 import {
   appendWikiLinkPropertyRow,
   diffFrontmatterPropertyKeyChanges,
+  diffSingleValuesBecomingListValues,
   parseNoteContentMarkdown,
 } from "@/utils/noteContentFrontmatter"
 import type { DeadWikiLinkPayload } from "@/utils/wikiLinkMarkup"
@@ -84,22 +93,31 @@ const props = defineProps({
   isReadmeContext: { type: Boolean, default: false },
 })
 
+const { reloadNoteInfo } = useInjectedMemoryTrackerActions(
+  toRef(() => props.noteId)
+)
 const propertyMemoryTrackerGuard = usePropertyMemoryTrackerGuard(
-  () => props.noteId
+  () => props.noteId,
+  reloadNoteInfo
 )
 
+/** Rich-mode key changes are guarded by the property rows themselves. */
 async function beforeSaveContent(
   lastSaved: string,
   newValue: string
 ): Promise<boolean> {
-  if (!props.asMarkdown) {
-    return true
+  if (
+    props.asMarkdown &&
+    !(await propertyMemoryTrackerGuard.confirmAndApplyPropertyKeyChanges(
+      diffFrontmatterPropertyKeyChanges(lastSaved, newValue)
+    ))
+  ) {
+    return false
   }
-  const changes = diffFrontmatterPropertyKeyChanges(lastSaved, newValue)
-  if (changes.length === 0) {
-    return true
-  }
-  return propertyMemoryTrackerGuard.confirmAndApplyPropertyKeyChanges(changes)
+  await propertyMemoryTrackerGuard.applyTrackersFollowingValues(
+    diffSingleValuesBecomingListValues(lastSaved, newValue)
+  )
+  return true
 }
 
 const rootRef = ref<HTMLElement | null>(null)

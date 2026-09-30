@@ -8,7 +8,10 @@ import {
 } from "@generated/donut-backend-api/sdk.gen"
 import usePopups from "@/components/commons/Popups/usePopups"
 import { toOpenApiError } from "@/managedApi/openApiError"
-import type { PropertyKeyChange } from "@/utils/noteContentFrontmatter"
+import type {
+  PropertyKeyChange,
+  PropertyValueFollow,
+} from "@/utils/noteContentFrontmatter"
 
 function propertyMemoryTrackers(
   noteInfo: NoteRecallInfo | undefined,
@@ -156,7 +159,28 @@ export function usePropertyMemoryTrackerGuard(
     return true
   }
 
+  /** No confirmation: the trackers keep their history on the value they were about. */
+  const applyTrackersFollowingValues = async (
+    follows: PropertyValueFollow[]
+  ) => {
+    const id = noteId()
+    if (id === undefined || follows.length === 0) {
+      return
+    }
+
+    for (const { key, value } of follows) {
+      await MemoryTrackerController.followPropertyValue({
+        path: { note: id },
+        body: { propertyKey: key, propertyValue: value },
+      })
+    }
+
+    invalidateNoteInfoCache()
+    await notifyChanged()
+  }
+
   return {
+    applyTrackersFollowingValues,
     confirmAndApplyRemoval,
     confirmAndApplyRename,
     confirmAndApplyPropertyKeyChanges,

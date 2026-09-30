@@ -197,7 +197,11 @@ confirmation. The rename conflict check compares (key, value).
 
 ### 7. A tracked single value that becomes a list keeps its tracker on that value
 Type: Behavior
-Status: planned
+Status: done — `MemoryTrackerFollowPropertyValueControllerTest`, `NoteEditableContent.trackerFollowsValue.spec.ts`
+(Markdown, rich-row append, list dialog) red then green; full frontend suite green; API client regenerated. The operation
+is `PropertyMemoryTrackerService.followPropertyValue` (with `updatePropertyKey` moved beside it) behind
+`PATCH /api/memory-trackers/notes/{note}/property-value`; it needs write access to the note and moves every learner's
+`''` tracker of the key, as the reduce flow does. The frontend detects the transition in `NoteEditableContent`'s save.
 Proof: guard spec and a `MemoryTrackerController` test, red then green; API client regenerated.
 
 Behavior: `example of: "[[run]]"` with a tracker (value `''`) → the author adds `[[past tense]]` (rich row append, list
