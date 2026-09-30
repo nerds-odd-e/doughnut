@@ -67,7 +67,7 @@ Story 1 has landed, so there is no ordering constraint.
 
 ### 1. The add form and an existing row share one key field with its presets
 Type: Structure
-Status: planned
+Status: done
 Proof: the three frontend specs named above are green with no assertion changed; `pnpm frontend:test` for
 `frontend/tests/components/form`.
 
@@ -118,7 +118,7 @@ changing anything.
 
 ## Learnings
 
-_None yet._
+- Slice 1 (accepted): `RichFrontmatterPropertyKeyField.vue` (props `modelValue`, `inputId`, `listId`, `label`, `testId`, `propertyRows`, `excludeRowIndex`; emits `update:modelValue`, `focus`, `blur`, `enter`, `select`). Proof: `pnpm frontend:test tests/components/form` 21 files / 241 tests green, `vue-tsc --noEmit` clean. The add form's key input now also carries the row's `min-w-[8rem] text-ellipsis` (no visible change expected; layout is slice 3's proof).
 
 ## Real iPad check (owner)
 

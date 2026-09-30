@@ -24,32 +24,20 @@
         <ChevronRight v-if="!isFocused" class="h-4 w-4" aria-hidden="true" />
         <ChevronDown v-else class="h-4 w-4" aria-hidden="true" />
       </button>
-      <div
-        class="relative min-w-[8rem]"
-        @focusout="onKeyPresetWrapperFocusOut"
-      >
-        <input
-          :id="keyInputId"
-          :value="modelValue.key"
-          type="text"
-          autocapitalize="off"
-          class="daisy-input daisy-input-sm w-full min-w-[8rem] text-ellipsis"
-          :aria-label="`Existing note property key (row ${idx + 1})`"
-          :aria-expanded="presetPanelOpen"
-          :aria-controls="presetPanelOpen ? presetListId : undefined"
-          data-testid="rich-note-property-row-key-input"
-          @input="onKeyInput"
-          @focus="onKeyFocus"
-          @blur="emit('commit')"
-        />
-        <RichFrontmatterPropertyKeyPresets
-          v-if="presetPanelOpen"
-          :list-id="presetListId"
-          :property-rows="propertyRows"
-          :exclude-row-index="idx"
-          @select="onPresetSelected"
-        />
-      </div>
+      <RichFrontmatterPropertyKeyField
+        class="min-w-[8rem]"
+        :model-value="modelValue.key"
+        :input-id="keyInputId"
+        :list-id="presetListId"
+        :label="`Existing note property key (row ${idx + 1})`"
+        test-id="rich-note-property-row-key-input"
+        :property-rows="propertyRows"
+        :exclude-row-index="idx"
+        @update:model-value="onKeyUpdate"
+        @focus="emit('row-focus')"
+        @blur="emit('commit')"
+        @select="focusValue"
+      />
       <div ref="valueAreaRef" class="min-w-0">
         <RichFrontmatterScalarPropertyValue
           v-if="isTextCapablePropertyRow(modelValue)"
@@ -143,7 +131,7 @@ import { useNotePropertyPanelLocation } from "@/composables/useNotePropertyPanel
 import RichFrontmatterPropertyPanel from "@/components/form/RichFrontmatterPropertyPanel.vue"
 import RichFrontmatterImagePropertyValue from "@/components/form/RichFrontmatterImagePropertyValue.vue"
 import RichFrontmatterPropertyExternalLink from "@/components/form/RichFrontmatterPropertyExternalLink.vue"
-import RichFrontmatterPropertyKeyPresets from "@/components/form/RichFrontmatterPropertyKeyPresets.vue"
+import RichFrontmatterPropertyKeyField from "@/components/form/RichFrontmatterPropertyKeyField.vue"
 import RichFrontmatterScalarPropertyValue from "@/components/form/RichFrontmatterScalarPropertyValue.vue"
 import RelationTypeSelectCompact from "@/components/wiki-link-or-relationship/RelationTypeSelectCompact.vue"
 import type { WikiLink } from "@generated/donut-backend-api"
@@ -189,7 +177,6 @@ const emit = defineEmits<{
   "image-upload-state": [inProgress: boolean]
 }>()
 
-const presetPanelOpen = ref(false)
 const { togglePropertyPanel } = useNotePropertyPanelLocation(
   () => props.modelValue.key
 )
@@ -205,11 +192,8 @@ const relationModelValue = computed(() => {
   return v.trim()
 })
 
-function onKeyInput(event: Event) {
-  emit("update:modelValue", {
-    ...props.modelValue,
-    key: (event.target as HTMLInputElement).value,
-  })
+function onKeyUpdate(key: string) {
+  emit("update:modelValue", { ...props.modelValue, key })
 }
 
 function onValueUpdate(value: string) {
@@ -226,21 +210,7 @@ function onPropertyValueUpdate(value: PropertyValue) {
   })
 }
 
-function onKeyFocus() {
-  presetPanelOpen.value = true
-  emit("row-focus")
-}
-
-function onKeyPresetWrapperFocusOut(event: FocusEvent) {
-  const root = event.currentTarget as HTMLElement | null
-  const next = event.relatedTarget as Node | null
-  if (root?.contains(next)) return
-  presetPanelOpen.value = false
-}
-
-function onPresetSelected(key: string) {
-  emit("update:modelValue", { ...props.modelValue, key })
-  presetPanelOpen.value = false
+function focusValue() {
   scheduleFocusTargetWithin(valueAreaRef.value)
 }
 </script>
