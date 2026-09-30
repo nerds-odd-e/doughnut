@@ -134,6 +134,7 @@
       v-if="isFocused && !readOnly"
       :property-key="modelValue.key"
       :note-id="noteId"
+      :reifiable="isWellFormedWholeWikiLinkItem(scalarValue.trim())"
       @remove="emit('remove')"
     />
   </div>
@@ -164,6 +165,7 @@ import {
   scalarStringFromPropertyValue,
   type PropertyValue,
 } from "@/utils/noteProperties"
+import { isWellFormedWholeWikiLinkItem } from "@/utils/authoredLinkMarkup"
 import type { DeadWikiLinkPayload } from "@/utils/wikiLinkMarkup"
 import {
   isKnownRelationKebab,

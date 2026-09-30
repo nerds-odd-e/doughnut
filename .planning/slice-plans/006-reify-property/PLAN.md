@@ -108,7 +108,8 @@ Regenerate the client after slice 2's controller signature. Enables slice 6.
 
 ### 6. A property row with a wiki-link value offers Reify
 Type: Behavior
-Status: planned
+Status: done — Reify button in `RichFrontmatterPropertyPanel.vue` (`reifiable` from `isWellFormedWholeWikiLinkItem`),
+`noteStore.reifyProperty` → `focusNoteRealm`; proof `RichMarkdownEditor.propertyReify.spec.ts` + vue-tsc green
 Proof: new component spec near `RichMarkdownEditor.propertyEntry.spec.ts` conventions, red then green.
 
 Behavior: an editable row whose scalar value is one whole wiki link, panel open → a Reify button is shown; clicking it
@@ -143,6 +144,7 @@ tracker on source".
   and report.
 - 2026-09-30: execution stopped after slices 1–5 because SEED-064#story-5 is still Taken on trunk (its plan
   `slice-plans/005-note-property-read-only-row/` has no done slice). Resume at slice 6 once story-5 is delivered.
+- Story-5 landed on main (merged into this branch at 93eb7fd3); execution resumed at slice 6.
 
 ## Learnings
 

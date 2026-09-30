@@ -18,6 +18,7 @@ import {
   trashNoteRequest,
   permanentlyDeleteNoteRequest,
   reduceRelationNoteToSourcePropertyRequest,
+  reifyPropertyRequest,
   uploadNoteImageRequest,
 } from "./noteRequests"
 
@@ -215,6 +216,12 @@ class NoteStore extends StorageImplementation {
     await router.replace(noteShowLocation(sourceRealm.id))
     this.refreshNoteRealm(sourceRealm)
     refreshSidebarStructuralListings()
+  }
+
+  async reifyProperty(router: Router, noteId: Donut.ID, propertyKey: string) {
+    const relationshipRealm = await reifyPropertyRequest(noteId, propertyKey)
+    await this.focusNoteRealm(router, relationshipRealm)
+    await this.loadNoteRealm(noteId)
   }
 
   async moveNote(

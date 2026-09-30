@@ -211,6 +211,22 @@ export async function reduceRelationNoteToSourcePropertyRequest(
   return sourceRealm
 }
 
+export async function reifyPropertyRequest(
+  noteId: Donut.ID,
+  propertyKey: string
+): Promise<NoteRealm> {
+  const { data: relationshipRealm, error } = await apiCallWithLoading(() =>
+    NoteController.reifyProperty({
+      path: { note: noteId },
+      query: { propertyKey },
+    })
+  )
+  if (error || !relationshipRealm) {
+    throw new Error(toErrorMessage(error, "Failed to reify property"))
+  }
+  return relationshipRealm
+}
+
 export async function uploadNoteImageRequest(
   noteId: Donut.ID,
   file: File
