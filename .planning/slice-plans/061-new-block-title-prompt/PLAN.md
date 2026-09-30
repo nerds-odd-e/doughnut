@@ -2,7 +2,7 @@
 
 Work item: **SEED-059#story-8**
 ([story](../../seeds/SEED-059-book-reading-uat-fixes.md#story-8)).
-Status: **slice 1 done; slices 2 and 3 planned.**
+Status: **slices 1 and 2 done; slice 3 planned.**
 
 ## Goal and scope
 
@@ -82,7 +82,7 @@ scenario.
 
 ### 2. The prompt's default is a short first sentence
 Type: Behavior
-Status: planned
+Status: done
 Proof: unit spec of the pure function with a table: short sentence unchanged;
 two sentences → the first; a 200-character first sentence → at most 80
 characters ending at a word; one 100-character word → 80 characters; no

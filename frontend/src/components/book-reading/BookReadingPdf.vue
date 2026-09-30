@@ -40,6 +40,7 @@ import PdfBookViewer from "@/components/book-reading/PdfBookViewer.vue"
 import PdfControl from "@/components/book-reading/PdfControl.vue"
 import { pdfLocatorsFromBlock } from "@/lib/book-reading/asPdfLocator"
 import { currentBlockIdFromViewStarts } from "@/lib/book-reading/currentBlockIdFromViewStarts"
+import { firstSentenceTitle } from "@/lib/book-reading/firstSentenceTitle"
 import { wireItemsToNavigationTargets } from "@/lib/book-reading/pdfOutlineV1Anchor"
 import {
   usePdfViewportPosition,
@@ -209,7 +210,7 @@ function onCreateBlockFromContent({
 }) {
   pendingBlockCreation.value = {
     contentBlockId,
-    structuralTitle: derivedTitle ?? "",
+    structuralTitle: firstSentenceTitle(derivedTitle ?? ""),
   }
 }
 
