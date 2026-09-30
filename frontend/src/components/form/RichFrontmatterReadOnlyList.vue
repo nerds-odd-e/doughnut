@@ -51,7 +51,12 @@
             compact
           />
         </span>
-        <template v-else>{{ row.value.value }}</template>
+        <WikiLinkToken
+          v-else
+          :token="row.value.value"
+          :wiki-links="wikiLinks"
+          :last-saved-markdown="lastSavedMarkdown"
+        />
       </dd>
     </div>
   </dl>
@@ -60,6 +65,7 @@
 <script setup lang="ts">
 import RichFrontmatterListPropertyValue from "@/components/form/RichFrontmatterListPropertyValue.vue"
 import RichFrontmatterPropertyExternalLink from "@/components/form/RichFrontmatterPropertyExternalLink.vue"
+import WikiLinkToken from "@/components/notes/WikiLinkToken.vue"
 import { useFocusedNoteProperty } from "@/composables/useFocusedNoteProperty"
 import type { WikiLink } from "@generated/donut-backend-api"
 import { relationLabelFromKebab } from "@/models/relationTypeOptions"

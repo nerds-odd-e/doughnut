@@ -62,7 +62,7 @@ Size target is about 10 minutes including proof.
 
 ### 1. A read-only whole wiki-link value is a link
 Type: Behavior
-Status: planned
+Status: done
 Proof: the new spec, red then green (`CURSOR_DEV=true nix develop -c pnpm -C frontend exec vitest run
 tests/components/form/RichMarkdownEditor.readOnlyProperties.spec.ts tests/components/form/RichMarkdownEditor.propertyWikiLinks.spec.ts`).
 
@@ -73,7 +73,7 @@ not fail on the missing link, stop and re-read the flow.
 
 ### 2. Read-only rows keep their values and show no editing controls
 Type: Behavior
-Status: planned
+Status: done
 Proof: extend the same spec; it is green on today's code and stays green through slices 3 to 5.
 
 Behavior (already true, now pinned): read-only `wikidata_id: Q42` → `Q42` and its external link; scalar `url` → text and
@@ -126,7 +126,12 @@ change no behavior. Story 6 and SEED-062 add to the renamed row.
 
 ## Learnings
 
-_None yet._
+- Slices 1 and 2 were delivered in one commit because they share one spec. Slice 1's red run failed on the missing
+  `dd a`; the slice 2 assertions were green on today's code, so the premise held.
+- `WikiLinkToken` lives in `@/components/notes/`. Existing read-only specs are named `RichMarkdownEditor.listProperties.spec.ts`,
+  `RichMarkdownEditor.frontmatter.spec.ts` and `RichMarkdownEditor.propertyLocation.spec.ts`.
+- The read-only external-link control is a `button` with `data-testid=rich-note-property-external-link`, not an anchor;
+  `RichMarkdownEditor.readOnlyProperties.spec.ts` must stay green through slice 4.
 
 ## Real iPad check (owner, optional)
 
