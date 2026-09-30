@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 1,
+  "agent": "Tsubomi-chan",
+  "email": "tsubomi-chan@example.org",
+  "identity": "SEED-062#story-1",
+  "mode": "story-branch",
+  "branch": "claude/reify-a-property",
+  "host": "claude"
+}
