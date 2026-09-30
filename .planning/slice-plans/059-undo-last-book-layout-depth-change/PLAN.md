@@ -143,3 +143,7 @@ About 5 min: one window listener on the surface from slice 1.
   Untested: the Cmd/Meta path, contenteditable, redo and Alt combinations.
   Page-level specs must feed `update:book` back (`setProps`); synthetic Cypress
   keydown needs `getModifierState`.
+
+## Execution complete
+
+Product advice: No change. Both slices delivered the story's outcome and no correction is needed. The shortcut is page-wide until story 9 keeps focus in the layout; it could then be narrowed (optional). Story 10, which turns reorganizing on for EPUB, inherits Undo and should get one E2E scenario checking the button and shortcut there.
