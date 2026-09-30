@@ -109,3 +109,7 @@ adjacent, stop and re-read the layout before changing anything.
 
 After slice 2, on the long note change `note_level` to `7` in both orientations and confirm the message shows beside
 the row.
+
+## Execution complete
+
+Product advice: no change. Retrospective found no defects; story 4 stays next in the queue. The owner's optional real iPad check of this story remains.
