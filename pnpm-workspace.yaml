@@ -22,7 +22,7 @@ overrides:
   ajv: '>=8.18.0'
   axios: '>=1.15.0'
   body-parser: '>=2.2.1'
-  brace-expansion: '>=5.0.5'
+  brace-expansion: '>=5.0.12'
   browserslist: '>=4.28.7'
   canvas: '>=3.2.3'
   csv-parse: '>=7.0.2'
