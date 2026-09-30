@@ -138,3 +138,7 @@ never swallowed. About 5 min.
 Slice 1 accepted proof: `BookReadingBookLayout.spec.ts` (16/16, incl. "draws AI Reorganize only when reorganizing is offered"); E2E `epub_book.feature` (new scenario failed before, passes after) and `ai_reorganize_layout.feature` (PDF), 22/22. `reorganize_layout.feature` not run.
 
 Slice 2 accepted proof: `BookReadingBookLayout.spec.ts` "without reorganizing" cases (3 failed before; 19/19 after); E2E `reorganize_layout.feature` 10/10 and `epub_book.feature` 21/21. Vue's `.delete` modifier also matches Backspace, so the row handler keeps both. `BookReadingBookLayout.vue` (314 lines) and its spec (409) were already over the 250-line guide before this story.
+
+## Execution complete
+
+Product advice: no backlog change; the 314-line BookReadingBookLayout.vue is a possible later structural cleanup, not urgent.
