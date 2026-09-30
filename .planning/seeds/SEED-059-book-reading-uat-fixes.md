@@ -74,44 +74,49 @@ Effort bands: S = 30–60 minutes, M = 1–2 hours, L = 2–4 hours, including d
 
 <a id="story-10"></a>
 
-### Give EPUB readers the reading and reorganizing tools PDF readers have
+### Show EPUB readers only the layout controls that work
 
 **Identity:** SEED-059#story-10
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"not-refined","approach":"unselected"}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/061-epub-layout-only-working-controls/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"d98841e67ae4a306388722a77f85f9b24b22d311ac450abfaeab1822b09b93c6","plan":"e8ae0ee9c277ede502154cea49625dc410b353e31d7e50217e95ce57e062bf5d"}}
 ```
 
-**Goal:** EPUB readers get the "Now reading / Read from here / Back to selected"
-bar and working reorganizing controls, or at least no controls that do nothing.
+**Goal:** An EPUB reader is not offered layout controls that do nothing. This is
+a small fix for a rarely used feature; it adds no EPUB capability.
 
-**Observed defect and gap**
+**Why it matters:** In an EPUB, *AI Reorganize* sends no request and shows
+nothing, and indent, outdent, cancel (Alt+Shift+Right, Alt+Shift+Left, Delete)
+and dragging a block send nothing and say nothing (defect 11, Medium). The cause
+is that only PDF turns on the reading session's `reorganize` capability, while
+the book layout always draws the button and always binds the row handlers. The
+web attaches only EPUBs, so EPUB readers are the ones who meet the dead controls.
 
-- **Controls that do nothing (defect 11, Medium).** In both EPUBs, *AI
-  Reorganize* sends no request and shows nothing; Tab, Shift+Tab and Backspace
-  on a block send nothing and say nothing. So a poor EPUB table of contents
-  cannot be improved, and the spurious "Contents" block cannot be cancelled.
-  Automated scenarios cover reorganizing only for PDF.
-- **No current-block bar.** Once an EPUB reader scrolls on, the only way back to
-  the selection is clicking the block again, and the panel keeps targeting the
-  old selection.
+**Scope**
+
+- **One rule.** The book layout offers reorganizing only when the reading
+  session has the `reorganize` capability. Without it, the layout shows no
+  *AI Reorganize* button and its rows do not bind indent, outdent, cancel, or
+  drag, so those keys and drags do nothing in EPUB because they are not
+  offered, not because a handler is empty. The undo control and the Ctrl/Cmd+Z
+  shortcut already depend on the capability. PDF behaves as today.
+- **Deferred (built when readers need it; no follow-up story is queued):**
+  reorganizing an EPUB layout (indent, outdent, cancel, *AI Reorganize*);
+  the "Now reading / Read from here / Back to selected" bar and the EPUB pane
+  layout it needs; creating a block from EPUB text; the panel keeping the old
+  selection after scrolling on.
 
 **Key examples**
 
-- In an EPUB, scrolling past the selection shows the same bar as PDF, and *Back
-  to selected* returns to it.
-- In an EPUB, indent, outdent, cancel, and *AI Reorganize* act as in PDF; any
-  action not supported is not shown.
+- In an EPUB, the book layout has no *AI Reorganize* button.
+- In an EPUB, Alt+Shift+Right, Alt+Shift+Left, Delete, and dragging on a block
+  send no request and change nothing.
+- In a PDF, *AI Reorganize*, indent, outdent, cancel, drag, and undo work as
+  today.
 
-**Design note:** reorganizing is the reading surface's `reorganize` capability
-(`useBookReadingSession`); turning it on for EPUB wires the book layout's
-reorganize listeners and the AI preview dialog. The "Now reading" bar sits only
-in `BookReadingShell`'s PDF pane layout, so showing it in EPUB means giving EPUB
-that pane layout (a DOM change), which also lets the shell declare the Reading
-Control Panel once.
-
-**Effort hypothesis:** L, low confidence. A first slice can hide the controls
-that do nothing. Open question: is creating a block from EPUB text also needed?
-**Depends on:** none (reliable EPUB positions are in place).
+**Effort hypothesis:** S, medium confidence (one capability check in the layout
+and a component test; an E2E scenario only if a component test cannot show the
+button absent in a real EPUB).
+**Depends on:** none.
 
 <a id="story-11"></a>
 
