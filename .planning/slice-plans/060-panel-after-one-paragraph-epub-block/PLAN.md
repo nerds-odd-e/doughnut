@@ -118,3 +118,11 @@ None that change remaining work.
   (20 passing), the same with `phone_reading.feature` (7 passing), and
   `./scripts/run.sh pnpm frontend:test tests/pages/BookReadingPage.readingPanelTarget.spec.ts tests/pages/BookReadingPage.readingControlPanel`
   (3 files, 17 tests).
+
+## Execution complete
+
+Product advice: no change to the backlog. The fix reaches only EPUB blocks with
+one locator; real books checked at planning (Alice, Origin of Species) have none,
+so the fixture is the only proof. The accepted imprecision for a last paragraph
+without an id stays a separate, unqueued story; queue it only if a reader
+reports a misplaced panel.

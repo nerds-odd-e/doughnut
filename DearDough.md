@@ -919,6 +919,11 @@ Trunk publication's "Publish the candidate" asks for an "authorized target ref" 
   - Observed effect: one rejected delivery call. Nothing was published or changed.
   - Inference: the cost is small, but every coordinator that reads only trunk-publication.md can hit it. One example next to that step would prevent it.
 
+- Execution: SEED-059#story-18 / slice-plans/060-panel-after-one-paragraph-epub-block / d439c05234; Timestamp: 2026-09-30, ~10:25+08:00 (slice 1 delivery); Tool: Claude Code; Model: claude-sonnet-5-5; Open Dough release: unknown.
+  - Evidence: `deliver --target-ref origin/story/SEED-059-story-18` exited with "authorized target must be a branch ref: origin/story/SEED-059-story-18"; retry with `refs/heads/story/SEED-059-story-18` was accepted (receipt sha d439c05234).
+  - Observed effect: one rejected delivery call, nothing published. Same first-try mistake as the story-20 occurrence, by a different coordinator.
+  - Inference: confirms the form is not discoverable from trunk-publication.md alone; the Story Branch example is the gap.
+
 ## DD-173 — A slice's premise that one code swap fixes a UAT defect was not tested first, and its spec passed before the change
 
 Slice 5 of SEED-059#story-16 was planned as "marking goes on after choosing 'Chapter 12'" once the current-block rule and `hasNoTextOfItsOwn` suffice. The implementer wrote the spec first and it already passed with the old `hasDirectContent`; the swap is equivalent for PDF. The UAT symptom (panel hidden for 3-4 pages) was not reproduced.
@@ -930,8 +935,19 @@ Slice 5 of SEED-059#story-16 was planned as "marking goes on after choosing 'Cha
   - Observed effect: a slice that delivered a regression spec and a refactor, with no reproduced defect; the UAT case stays unexplained.
   - Inference: the plan's own condition was the open question; a probe in the migrated page-spec fixture before slicing, or moving the slice after a real-PDF check, would have told the plan whether a fix was needed. Qualified: one execution. Related to DD-162 and DD-164.
 
+## DD-174 — Execution start reported "no plan" from a stale local checkout before fetching origin
+
+The coordinator looked for the story's plan in the local checkout only and told the developer none existed. Origin already held the refined story and plan 060 (commit ba70e34680); the local `main` was behind. The developer had to correct it.
+
+### Occurrences
+
+- Execution: SEED-059#story-18 / slice-plans/060-panel-after-one-paragraph-epub-block / d439c05234; Timestamp: 2026-09-30, ~10:05+08:00 (start of execution); Tool: Claude Code; Model: claude-sonnet-5-5; Open Dough release: unknown.
+  - Evidence: first reply stopped with "SEED-059#story-18 has no executable plan" from `ls .planning/slice-plans` (only plan 059); user: "Are you sure it doesn't have a plan? ... in the origin, it has a plan 60"; `git fetch origin` then showed `060-panel-after-one-paragraph-epub-block/PLAN.md` at `ba70e34680`, and the backlog had story-7 Taken.
+  - Observed effect: one wrong stop and one round trip; nothing changed on disk.
+  - Inference: "Establish execution context" does not say to fetch before concluding a plan or claim is missing. `execution-start.mjs` fetches, but only after the coordinator has already decided the source exists. Qualified: one occurrence.
+
 ## Retention
 
-- Highest allocated local number: 173. Removed local codes are never reused.
+- Highest allocated local number: 174. Removed local codes are never reused.
 - Full pre-maintenance log and earlier recovery locators: `99fa1b9835e3dff2473837ba2a1f8b11967d5938:DearDough.md`.
 - Occurrence history is partial; active evidence stays here or in the Open Dough catalog and watch list.
