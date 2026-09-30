@@ -7,8 +7,6 @@ Bug fixing and general maintenance.
 
 ## Taken
 
-- [A note's properties keep every value visible and are easy to tap on an iPad and a phone](seeds/SEED-064-note-properties-fixes.md#story-1) — SEED-064#story-1 ([plan](slice-plans/001-note-properties-touch-layout/PLAN.md))
-
 ## Backlog list
 
 - [Typing a property key narrows the presets, and the list stays on screen](seeds/SEED-064-note-properties-fixes.md#story-2) — SEED-064#story-2

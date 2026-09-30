@@ -36,11 +36,11 @@ candidate 3 in that report. Line effects are that report's estimates.
   desktop; the list dialog with reorder; image add and replace; relation type; Wikidata Save with a chosen search
   result; the duplicate-key message.
 - **Findings left out by the owner** (low value for the effort, or not reproduced):
-  - a collapsed "show all" mode for long property lists (iPad I2); the row compaction in story 1 is tried first;
+  - a collapsed "show all" mode for long property lists (iPad I2); the row wrapping already keeps every value visible;
   - an empty-state message for a note without properties, and hiding the `type: Note` row (iPad I5); its answer
     depends on whether the row is stored (ADR 0004);
   - a message when a value is appended to a list key such as `url` (iPad I7);
-  - a confirmation or undo for remove (iPad I8); larger targets in story 1 reduce mistaken taps;
+  - a confirmation or undo for remove (iPad I8); 44 px targets on touch devices reduce mistaken taps;
   - the upload error disappearing after 2.5 seconds (iPad I10);
   - a Replace tap that timed out once and a tap blocked once after an image upload: not reproduced;
   - the panel's Assimilate moving to another note and the Skip wording (phone finding, iPad I8 wording): these are
@@ -74,61 +74,6 @@ changes the shared layout comes before the stories that reuse it.
 
 Effort bands: S = 30–60 minutes, M = 1–2 hours, L = 2–4 hours, including delivery.
 
-<a id="story-1"></a>
-
-### A note's properties keep every value visible and are easy to tap on an iPad and a phone
-
-**Identity:** SEED-064#story-1
-```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/001-note-properties-touch-layout/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"463baf37f47acba5999efb0b1375c5b15d9fd504d2dbdac5aea696a6ba2ac6e7","plan":"6307ab8e03312f8e9717d10e2ec35d1a0d53aa4a6df601fc167e09479b953730"}}
-```
-
-- **Goal:** an iPad user (primary device) and a phone user can read every value of a note's properties, in the
-  read-only and the editable view, even when a key or value is long, and can tap a row control without hitting its
-  neighbour. This removes the most severe defect of the note properties area (iPad D1, phone D1: the value is 0 px
-  wide when the key is long) and the small-target risk beside an unconfirmed Remove (no undo, iPad I8 left out).
-- **Scope:**
-  - **Value stays visible.** At 820 px and 375 px, in both views, a note with a 76-character key and a 200-character
-    value shows the key and the value, and the note has no sideways scroll. A read-only key and value wrap. In the
-    editable row the value field wraps; the single-line key field shows an ellipsis when its text is cut, and its full
-    text is reached by tapping into the field. A cut with no cue is not left anywhere in the row (iPad D4, phone D3).
-  - **44 px touch targets.** On touch devices (`pointer: coarse`, so an iPad in both orientations as well as a phone,
-    not a width rule) the row chevron, edit, remove and external-link controls and the row key and value fields are at
-    least 44 px high; one rule for the properties section, not per-component edits (iPad I1).
-  - **Density is a reported number, not a gate (owner decision).** The result reports how far the note body starts from
-    the top of the screen for a 19-row note at 820 px, before and after, editable and read-only. A worse number does
-    not fail the story and is not corrected inside it; it goes to the owner as a trade-off. A hard gate was rejected
-    because meeting it may force a different structure and an ADR change.
-  - **Read-only keeps its own component here.** The read-only list gets the same wrapping fix now, even though story 5
-    deletes that component: it is cheap and keeps the defect fixed if story 5 is delayed. Its Cypress scenario carries
-    over to the merged row.
-  - **Real iPad check by the owner** (device mode cannot show real touch): open the long-key note read-only and
-    editable in both orientations; tap chevron, edit, remove; report the density number.
-- **Key examples:**
-  - Read-only, 820 px: key `a_rather_long_...` (76 characters, no spaces) with value `short` → key wraps inside its
-    column, `short` is visible, `scrollWidth` does not exceed the note width.
-  - Read-only, 375 px: a 76-character key with spaces and a 200-character value → both wrap; the value is fully
-    readable by scrolling down, not sideways.
-  - Editable, 375 px: the same note → the value field shows the whole 200 characters wrapped; the key field shows an
-    ellipsis; chevron, edit and remove do not overlap.
-  - Editable on a touch device: every row control measures at least 44 px high; on a non-touch desktop the row is as
-    tall as today.
-  - 19-row note at 820 px: body start reported before (UAT baseline: 992 px editable, 1120 px read-only, from a commit
-    whose properties components are unchanged) and after.
-- **Excluded (considered, not done):**
-  - key and value visual hierarchy (iPad I3): no failure behind it; it may follow from the layout rule at no cost, but
-    is not a promise or a test;
-  - dialog close buttons (iPad D5, 26 px): a different component and concern from the row;
-  - add form and preset list sizing: story 2;
-  - a "show all" collapse (iPad I2), a tap-to-expand cue for cut text, and a width-based touch rule.
-- **Value / learning:** removes the most severe defect and answers, with a number, how much 44 px targets cost in
-  density.
-- **Effort hypothesis:** M, medium confidence. The layout part is small; one Cypress viewport scenario and finding a
-  way to prove `pointer: coarse` in Cypress carry the effort.
-- **Depends on:** none.
-- **Safe stopping point:** the value-visible increment stands alone; the touch-target increment can be dropped or
-  reverted without losing it.
-
 <a id="story-2"></a>
 
 ### Typing a property key narrows the presets, and the list stays on screen
@@ -148,7 +93,7 @@ Effort bands: S = 30–60 minutes, M = 1–2 hours, L = 2–4 hours, including d
   field replaces two copies (C3, about -25 lines, estimate).
 - **Effort hypothesis:** M, medium confidence: filtering is cheap; keeping the list on screen with the keyboard is
   the uncertain part.
-- **Depends on:** none genuine; after story 1 the row width is settled.
+- **Depends on:** none genuine.
 - **Boundary with SEED-063:** the numbered preset entry that appears when a key is taken (`url 2`) is left as it is and
   is not a target of this story's filtering tests; SEED-063 removes it with the numbered-key convention. This story
   filters and positions the list only.
@@ -212,9 +157,9 @@ Effort bands: S = 30–60 minutes, M = 1–2 hours, L = 2–4 hours, including d
 - **Effort hypothesis:** M to L, medium confidence.
 - **Boundary with SEED-063:** keeps today's unit of a row (one entry per key as stored) and adds no rule that a key
   is unique; SEED-063 decides whether a row becomes one value. The single shared row is what SEED-063 extends.
-- **Depends on:** story 1 (the row layout rule to reuse). Protecting tests first: read-only component tests for a
+- **Depends on:** none. Protecting tests first: read-only component tests for a
   single wiki-link value, an image value and a Wikidata value (only spec names were checked, not assertions), and
-  story 1's scenario.
+  the read-only scenario in `note_property_layout.feature`.
 - **Safe stopping point:** the read-only view is consistent even if story 6 is cancelled.
 
 <a id="story-6"></a>
@@ -249,7 +194,7 @@ Effort bands: S = 30–60 minutes, M = 1–2 hours, L = 2–4 hours, including d
 - **Highest priority** (data hidden or a dead end on the primary device): stories 1 to 4, in the order listed.
 - **Then** (structure that removes code and prevents the same defects): story 5, then SEED-062 and SEED-063 (already
   queued, they act on the row story 5 unifies), then story 6.
-- Stories 2, 3 and 4 are independent of each other; story 5 needs story 1; story 6 needs stories 2 and 5 and
+- Stories 2, 3 and 4 are independent of each other; story 6 needs stories 2 and 5 and
   SEED-063#story-1, because adding a property must follow the new rule for repeated keys.
 - Story 3 anchors its message to a row, not to a key, so it holds if SEED-063 makes rows per value.
 - First to drop: story 6 (largest risk, the defects it touches are already softened by story 2).
