@@ -50,15 +50,7 @@ Feature: Reorganize book layout
       And I create a book block from a content block on the PDF
       Then I should see the "New block" callout
       When I confirm creating a new block
-      Then the book layout should contain a new block as a child of the selected block
-
-    @mockBrowserTime
-    Scenario: Create a book block from long content bbox with a typed title
-      When I choose the book block "1. Refactoring: Protecting Intention in Working Software"
-      And I create a book block from a long-text content block on the PDF
-      Then I should see the "New block" callout
-      When I confirm creating a new block
-      Then I should be prompted to enter a title defaulting to truncated content
+      Then I should be prompted to enter a title defaulting to the paragraph
       When I confirm the title
       Then the book layout should contain a new block as a child of the selected block
 

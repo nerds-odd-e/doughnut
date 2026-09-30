@@ -74,37 +74,6 @@ describe("attachBookBlockSelectionBboxHighlight", () => {
     expect(el.dataset.bookContentBlockId).toBeUndefined()
   })
 
-  it("sets data-derived-title-truncated when derivedTitle is at max length (>=512)", () => {
-    const longTitle = "a".repeat(512)
-    attachBookBlockSelectionBboxHighlight(host, {
-      left: 0,
-      top: 0,
-      width: 10,
-      height: 10,
-      contentBlockId: 42,
-      derivedTitle: longTitle,
-    })
-    const el = host.querySelector(
-      "[data-testid=book-block-selection-bbox-highlight]"
-    ) as HTMLElement
-    expect(el.dataset.derivedTitleTruncated).toBe("true")
-  })
-
-  it("does not set data-derived-title-truncated when derivedTitle is short", () => {
-    attachBookBlockSelectionBboxHighlight(host, {
-      left: 0,
-      top: 0,
-      width: 10,
-      height: 10,
-      contentBlockId: 42,
-      derivedTitle: "short title",
-    })
-    const el = host.querySelector(
-      "[data-testid=book-block-selection-bbox-highlight]"
-    ) as HTMLElement
-    expect(el.dataset.derivedTitleTruncated).toBeUndefined()
-  })
-
   it("fades out overlay after fade timeout", () => {
     vi.useFakeTimers()
     attachBookBlockSelectionBboxHighlight(host, {

@@ -58,8 +58,6 @@ const emit = defineEmits<{
   "update:book": [book: BookFull]
 }>()
 
-const STRUCTURAL_TITLE_MAX_CHARS = 512
-
 const props = withDefaults(
   defineProps<{
     book: BookFull
@@ -209,16 +207,9 @@ function onCreateBlockFromContent({
   contentBlockId: number
   derivedTitle: string | undefined
 }) {
-  if (
-    derivedTitle !== undefined &&
-    derivedTitle.length >= STRUCTURAL_TITLE_MAX_CHARS
-  ) {
-    pendingBlockCreation.value = {
-      contentBlockId,
-      structuralTitle: derivedTitle,
-    }
-  } else {
-    createBlock(contentBlockId)
+  pendingBlockCreation.value = {
+    contentBlockId,
+    structuralTitle: derivedTitle ?? "",
   }
 }
 

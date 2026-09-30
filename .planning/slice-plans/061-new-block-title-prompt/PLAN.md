@@ -2,7 +2,7 @@
 
 Work item: **SEED-059#story-8**
 ([story](../../seeds/SEED-059-book-reading-uat-fixes.md#story-8)).
-Status: **story refined; three Behavior slices planned.**
+Status: **slice 1 done; slices 2 and 3 planned.**
 
 ## Goal and scope
 
@@ -66,7 +66,7 @@ API change.
 
 ### 1. Creating a block from any paragraph asks for a title
 Type: Behavior
-Status: planned
+Status: done
 Proof: E2E `Create a new book block from a content block bbox` gains "Then I
 should be prompted to enter a title defaulting to the paragraph" (existing
 step, renamed) and "When I confirm the title" before the layout assertion. The
