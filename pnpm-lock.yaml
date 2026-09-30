@@ -45,7 +45,7 @@ overrides:
   mailparser: '>=3.9.3'
   minimatch: '>=10.2.3'
   nanoid: '>=3.3.18'
-  nodemailer: '>=9.1.0'
+  nodemailer: '>=10.0.6'
   path-to-regexp: '>=8.4.0'
   picomatch: '>=4.0.4'
   postcss: '>=8.5.23'
@@ -4453,8 +4453,8 @@ packages:
     resolution: {integrity: sha512-71kFFjYaSshDTA8/a2HiTYPLdASWjLJxUyJxGE+ffxU+KhxSBtM9kiLUX+R2yooFdSFKMFpi4n3PFtDy6qXv8A==}
     engines: {node: '>=18'}
 
-  nodemailer@10.0.1:
-    resolution: {integrity: sha512-c+gU9cL9HLDax3vjxL88kW+6NOgdtEUWaZ+AUtxdJR6LLhf0kGdCLExof7yiKW7zdO9EfXCSIgmhGyFmUM0mYQ==}
+  nodemailer@10.0.12:
+    resolution: {integrity: sha512-PQ46oNbNMuH/Sno7B5IWIU9etytwrO0xdTFvWXpIQFRXhBAXtzD48243AS+BCbQQTPD8y3fqUrgLn0tSo77gvg==}
     engines: {node: '>=20.0.0'}
 
   nopt@10.0.1:
@@ -10316,7 +10316,7 @@ snapshots:
       iconv-lite: 0.7.2
       libmime: 5.4.0
       linkify-it: 5.0.2
-      nodemailer: 10.0.1
+      nodemailer: 10.0.12
       punycode.js: 2.3.1
       tlds: 1.261.0
 
@@ -10471,7 +10471,7 @@ snapshots:
     dependencies:
       '@babel/parser': 7.29.8
 
-  nodemailer@10.0.1: {}
+  nodemailer@10.0.12: {}
 
   nopt@10.0.1:
     dependencies:
@@ -11367,7 +11367,7 @@ snapshots:
   smtp-server@3.19.13:
     dependencies:
       ipv6-normalize: 1.0.1
-      nodemailer: 10.0.1
+      nodemailer: 10.0.12
       punycode.js: 2.3.1
 
   source-map-js@1.2.1: {}
