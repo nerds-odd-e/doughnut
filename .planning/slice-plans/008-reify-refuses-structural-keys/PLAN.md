@@ -66,6 +66,10 @@ before the fix): Reify disabled, row shows "A structural property cannot be reif
 link case still reifies; vue-tsc passes. The frontend rule is `isReservedStructuralPropertyKey` (scalar-only structural
 keys plus url), and `RichFrontmatterPropertyPanel` owns the one refusal reason.
 
+CI repair (run 36729419519): the unrelated CLI test `notebookPublish.lfs.test.ts` "a note edit runs as many git
+processes…" timed out (6.2 s vs 5 s) because a host-wide Git LFS filter ran git-lfs and its hooks on each setup clone and
+commit; that block now ignores host Git config like `notebookPull.lfs.test.ts` (~2 s → ~0.5 s locally).
+
 ## Current decisions
 
 - One rule, the backend's existing structural-key set; no new list of forbidden keys.

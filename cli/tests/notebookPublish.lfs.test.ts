@@ -1,7 +1,7 @@
 import * as childProcess from 'node:child_process'
 import * as fs from 'node:fs'
 import { join } from 'node:path'
-import { afterEach, describe, expect, test, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
 import { getApiConfig } from 'donut-api'
 import { run } from '../src/run.js'
 import {
@@ -69,6 +69,13 @@ describe('notebook publish — LFS object upload before bundle submission', () =
   }
 
   describe('costs what the unpublished commits change', () => {
+    // Ignore host Git config: a host-wide LFS filter would start git-lfs and
+    // its hooks on every setup clone and commit; pointers hash the same without it.
+    beforeEach(() => {
+      vi.stubEnv('GIT_CONFIG_GLOBAL', '/dev/null')
+      vi.stubEnv('GIT_CONFIG_NOSYSTEM', '1')
+    })
+
     async function publishNoteEditAfter(name: string, commits: number) {
       const dir = checkoutWithAcceptedAttachments(name, commits, 10)
       fs.writeFileSync(join(dir, 'note.md'), '# lfs notebook edited\n')
@@ -107,6 +114,7 @@ describe('notebook publish — LFS object upload before bundle submission', () =
   afterEach(() => {
     vi.mocked(childProcess.spawnSync).mockReset()
     vi.unstubAllGlobals()
+    vi.unstubAllEnvs()
   })
 
   test('uploads required in-limit objects before submitting the bundle', async () => {
