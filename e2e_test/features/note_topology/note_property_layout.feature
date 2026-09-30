@@ -72,7 +72,7 @@ Feature: Note property layout
     And I have a note "Linked" under notebook "Long property shelf" with content:
       """
       ---
-      url: https://example.com/a/b
+      url: https://a.io
       ---
 
       Linked body.
