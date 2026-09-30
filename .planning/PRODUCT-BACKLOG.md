@@ -12,7 +12,7 @@ Bug fixing and general maintenance.
 
 ## Backlog list
 
-- [Give new and existing blocks short, readable titles](seeds/SEED-059-book-reading-uat-fixes.md#story-8) — SEED-059#story-8
+- [Give new blocks a short, readable title](seeds/SEED-059-book-reading-uat-fixes.md#story-8) — SEED-059#story-8
 - [Move through the book layout with the keyboard](seeds/SEED-059-book-reading-uat-fixes.md#story-9) — SEED-059#story-9
 - [Give EPUB readers the reading and reorganizing tools PDF readers have](seeds/SEED-059-book-reading-uat-fixes.md#story-10) — SEED-059#story-10
 - [Go from attaching a book to reading it without searching](seeds/SEED-059-book-reading-uat-fixes.md#story-11) — SEED-059#story-11
