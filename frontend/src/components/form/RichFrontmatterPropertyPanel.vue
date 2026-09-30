@@ -17,19 +17,19 @@
         type="button"
         class="daisy-btn daisy-btn-ghost daisy-btn-sm shrink-0"
         :aria-label="`Reify note property ${propertyKey}`"
-        :aria-describedby="reifiable ? undefined : reifyReasonId"
-        :disabled="!reifiable"
+        :aria-describedby="reifyRefusal ? reifyReasonId : undefined"
+        :disabled="!!reifyRefusal"
         data-testid="rich-note-property-row-reify"
         @click="noteStore.reifyProperty(router, noteId, propertyKey)"
       >
         Reify
       </button>
       <span
-        v-if="!reifiable"
+        v-if="reifyRefusal"
         :id="reifyReasonId"
         class="text-xs text-base-content/70"
       >
-        Only a property whose value is a link to a note can be reified
+        {{ reifyRefusal }}
       </span>
     </template>
     <AssimilationModes
@@ -52,7 +52,7 @@
 
 <script setup lang="ts">
 import { Minus } from "@lucide/vue"
-import { toRef, useId } from "vue"
+import { computed, toRef, useId } from "vue"
 import { useRouter } from "vue-router"
 import AssimilationModes from "@/components/recall/AssimilationModes.vue"
 import {
@@ -61,15 +61,21 @@ import {
 } from "@/components/recall/assimilationMemoryTrackers"
 import { useInjectedMemoryTrackerActions } from "@/composables/useMemoryTrackerActions"
 import { isSkippedFromAssimilationSequence } from "@/composables/useAssimilationSequenceSkip"
-import { isNoteLevelPropertyKey } from "@/utils/noteContentPropertyKeys"
+import {
+  isNoteLevelPropertyKey,
+  isReservedStructuralPropertyKey,
+} from "@/utils/noteContentPropertyKeys"
+import { isWellFormedWholeWikiLinkItem } from "@/utils/authoredLinkMarkup"
 import { useNoteStore } from "@/store/noteStore"
-import type { PropertyValue } from "@/utils/noteProperties"
+import {
+  scalarStringFromPropertyValue,
+  type PropertyValue,
+} from "@/utils/noteProperties"
 
 const props = defineProps<{
   propertyKey: string
   propertyValue: PropertyValue
   noteId?: number
-  reifiable: boolean
 }>()
 
 const emit = defineEmits<{
@@ -88,6 +94,15 @@ const router = useRouter()
 const noteStore = useNoteStore()
 
 const reifyReasonId = useId()
+
+const reifyRefusal = computed(() => {
+  if (isReservedStructuralPropertyKey(props.propertyKey))
+    return "A structural property cannot be reified"
+  const value = scalarStringFromPropertyValue(props.propertyValue) ?? ""
+  if (!isWellFormedWholeWikiLinkItem(value.trim()))
+    return "Only a property whose value is a link to a note can be reified"
+  return undefined
+})
 
 const allowedModes: MemoryTrackerType[] = ["UNDERSTANDING"]
 </script>

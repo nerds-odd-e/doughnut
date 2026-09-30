@@ -59,34 +59,52 @@ Body`
     )
   })
 
-  it.each([
-    ["a plain-text value", "kind", "kind: training"],
-    ["a list value", "tags", 'tags:\n  - "[[Other]]"\n  - plain'],
-  ])("explains why %s cannot be reified", async (_, key, frontmatter) => {
-    const reifySpy = mockSdkService(
-      NoteController,
-      "reifyProperty",
-      makeMe.aNoteRealm.please()
-    )
-    const rowSelector = propertyRowSelector(key)
-    const wrapper = await h.mountEditor(`---\n${frontmatter}\n---\n\nBody`, {
-      noteId,
-      route: noteShowLocation(noteId),
-      wikiLinks: [wikiLinkFromAuthoredToken("Other", 5)],
-    })
-    await expandPropertyPanel(wrapper, rowSelector)
-    const button = wrapper.find(
-      `${rowSelector} [data-testid="rich-note-property-row-reify"]`
-    )
+  const notLinkReason =
+    "Only a property whose value is a link to a note can be reified"
 
-    expect(button.attributes("disabled")).toBeDefined()
-    expect(wrapper.find(rowSelector).text()).toContain(
-      "Only a property whose value is a link to a note can be reified"
-    )
-    await button.trigger("click")
-    await flushPromises()
-    expect(reifySpy).not.toHaveBeenCalled()
-  })
+  it.each([
+    ["a plain-text value", "kind", "kind: training", notLinkReason],
+    [
+      "a list value",
+      "tags",
+      'tags:\n  - "[[Other]]"\n  - plain',
+      notLinkReason,
+    ],
+    [
+      "a structural property",
+      "source",
+      'type: Relationship\nsource: "[[Src]]"\ntarget: "[[Other]]"',
+      "A structural property cannot be reified",
+    ],
+  ])(
+    "explains why %s cannot be reified",
+    async (_, key, frontmatter, reason) => {
+      const reifySpy = mockSdkService(
+        NoteController,
+        "reifyProperty",
+        makeMe.aNoteRealm.please()
+      )
+      const rowSelector = propertyRowSelector(key)
+      const wrapper = await h.mountEditor(`---\n${frontmatter}\n---\n\nBody`, {
+        noteId,
+        route: noteShowLocation(noteId),
+        wikiLinks: [
+          wikiLinkFromAuthoredToken("Other", 5),
+          wikiLinkFromAuthoredToken("Src", 6),
+        ],
+      })
+      await expandPropertyPanel(wrapper, rowSelector)
+      const button = wrapper.find(
+        `${rowSelector} [data-testid="rich-note-property-row-reify"]`
+      )
+
+      expect(button.attributes("disabled")).toBeDefined()
+      expect(wrapper.find(rowSelector).text()).toContain(reason)
+      await button.trigger("click")
+      await flushPromises()
+      expect(reifySpy).not.toHaveBeenCalled()
+    }
+  )
 
   it("offers no reify in the read-only view", async () => {
     const wrapper = await h.mountEditor(markdown, {

@@ -54,12 +54,17 @@ Behavior: relationship note with `source: "[[Src]]"` → reify `source` → 400 
 
 ### 2. The row says a structural key cannot be reified
 Type: Behavior
-Status: planned
+Status: done
 Proof: `CURSOR_DEV=true nix develop -c pnpm frontend:test tests/components/form/RichMarkdownEditor.propertyReify.spec.ts`
 and `CURSOR_DEV=true nix develop -c pnpm -C frontend exec vue-tsc --noEmit`.
 
 Behavior: panel open on `source: "[[Src]]"` of a relationship note → Reify disabled, reason visible, nothing sent; the
 existing ordinary-link case still reifies. The reason text may differ from the non-link reason; keep one reason shown.
+
+Accepted proof: `RichMarkdownEditor.propertyReify.spec.ts` "explains why a structural property cannot be reified" (red
+before the fix): Reify disabled, row shows "A structural property cannot be reified", click sends nothing; the ordinary
+link case still reifies; vue-tsc passes. The frontend rule is `isReservedStructuralPropertyKey` (scalar-only structural
+keys plus url), and `RichFrontmatterPropertyPanel` owns the one refusal reason.
 
 ## Current decisions
 

@@ -17,6 +17,11 @@ export function isScalarOnlyStructuralPropertyKey(key: string): boolean {
   return propertyKeyBaseMatches(key, ["type", "relation", "source", "target"])
 }
 
+/** Keys that are note structure rather than ordinary properties (mirrors backend `isReservedStructuralKey`). */
+export function isReservedStructuralPropertyKey(key: string): boolean {
+  return isScalarOnlyStructuralPropertyKey(key) || isUrlPropertyKey(key)
+}
+
 /** Splits a property key into its base name and optional numeric suffix (`url 2` → suffix 2). */
 export function propertyKeyBaseAndSuffix(key: string): {
   base: string
