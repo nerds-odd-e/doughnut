@@ -95,7 +95,10 @@ the generate-api-client skill in each slice that changes a controller signature 
 
 ### 1a. Trackers and index rows have a property value column
 Type: Structure
-Status: planned
+Status: done — `V300000352`; `MemoryTrackerPropertyValueUniquenessTest`; focused tracker/assimilation/index/recall set green.
+`MemoryTracker.propertyValue` is `@JsonIgnore` until slice 4 exposes it. Still matching by key only (correct while every
+value is `''`): `MemoryTrackerAssimilation` duplicate check, `MemoryTrackerService.updatePropertyKey` collision check,
+`NotePropertyIndexRepository` joins, `findByNote_IdAndPropertyKey`.
 Proof: migrate the test DB; a `MemoryTrackerBuilder` pair with the same key and different values saves, the same
 (key, value) pair is refused by the unique key; every existing tracker and assimilation test green.
 

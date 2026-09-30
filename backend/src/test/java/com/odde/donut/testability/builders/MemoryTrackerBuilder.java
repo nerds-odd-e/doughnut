@@ -90,4 +90,9 @@ public class MemoryTrackerBuilder extends EntityBuilder<MemoryTracker> {
     entity.setPropertyKey(propertyKey);
     return this;
   }
+
+  public MemoryTrackerBuilder propertyValue(String propertyValue) {
+    entity.setPropertyValue(propertyValue);
+    return this;
+  }
 }

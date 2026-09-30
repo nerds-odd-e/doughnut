@@ -135,6 +135,12 @@ public class MemoryTracker extends EntityIdentifiedByIdOnly {
   @Setter
   private String propertyKey = "";
 
+  @Column(name = "property_value")
+  @JsonIgnore
+  @Getter
+  @Setter
+  private String propertyValue = "";
+
   @JsonProperty("spelling")
   public Boolean getSpelling() {
     return isSpelling();

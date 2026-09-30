@@ -31,6 +31,13 @@ public class NotePropertyIndex extends EntityIdentifiedByIdOnly {
   @Setter
   private int itemIndex;
 
+  @Column(name = "property_value", nullable = false, length = 255)
+  @NotNull
+  @Size(max = 255)
+  @Getter
+  @Setter
+  private String propertyValue = "";
+
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "authored_note_reference_id", referencedColumnName = "id")
   @JsonIgnore
