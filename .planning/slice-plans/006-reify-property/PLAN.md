@@ -128,7 +128,7 @@ whose value is a link to a note can be reified"); nothing is sent.
 
 ### 8. Reify works end to end, trackers included
 Type: Behavior
-Status: planned
+Status: done — `reify_property.feature` 1 passing (due count kept, note-level tracker on the relationship note)
 Proof: `CURSOR_DEV=true nix develop -c pnpm cy:run --spec e2e_test/features/relationships/reify_property.feature` once.
 
 Behavior: a tracked property `related: [[Other]]` → the author reifies it in the app → the relationship note opens and the
@@ -159,3 +159,4 @@ tracker on source".
   reduce moves back only note-level understanding trackers and drops the rest with the note. Asymmetric by design of
   each direction; revisit only if the owner wants round-trips to keep spelling trackers.
 - `MemoryTrackerBuilder.recallCount(n)` creates n recall logs.
+- A new e2e feature must be added to `scripts/isolated-cypress-active-specs.mjs`, or the worktree runner refuses it.

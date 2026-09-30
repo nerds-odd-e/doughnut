@@ -172,3 +172,7 @@ Then(
       .expectRenderedNoteContent(data.hashes())
   }
 )
+
+When('I reify the rich note property {string}', (key: string) => {
+  start.assumeNotePage().reifyRichNoteProperty(key)
+})

@@ -91,6 +91,16 @@ export const noteRichPropertyMethods = () => ({
     })
     return this
   },
+  reifyRichNoteProperty(key: string) {
+    this.openRichNotePropertyPanel(key)
+    findNoteContentRegion().within(() => {
+      cy.get(richNotePropertyRow(key))
+        .findByRole('button', { name: `Reify note property ${key}` })
+        .click()
+    })
+    waitUntilAppIsNotBusy()
+    return this
+  },
   removeRichNoteProperty(key: string) {
     this.switchToRichContent()
     findNoteContentRegion().within(() => {
