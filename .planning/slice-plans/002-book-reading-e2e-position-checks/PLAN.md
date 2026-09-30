@@ -173,3 +173,7 @@ handler updates it (a race); with a 1500 ms wait first it fails, since the scrol
 - The plan's "reproduces 1.5 px" promise was not met literally; the plan was revised, not the method:
   the qualitative failure (indicator on the wrong page) reproduces and the threshold now allows the
   observed landing variance.
+
+## Execution complete
+
+Product advice: no follow-up story; the outcome is met. Residual gaps: the same-page scroll's upper margin and the EPUB steps were judged by reading, not measured.
