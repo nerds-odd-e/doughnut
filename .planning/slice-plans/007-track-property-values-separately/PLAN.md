@@ -217,7 +217,8 @@ list append, repeated value not added, a map value refused with 400 and nothing 
 `RelationControllerReduceToSourcePropertyTests` green. Backend `nextAvailablePropertyKeyForBase` and
 `addPropertyWithAvailableKeyToLeadingFrontmatter` are deleted. When a learner already tracks the reduced (key, value) on
 the source, their relationship tracker goes with the relationship note. Tracker moving lives in
-`PropertyMemoryTrackerService.rehomeNoteLevelTrackersToProperty`.
+`PropertyMemoryTrackerService.rehomeNoteLevelTrackersToProperty`. CI repair (run 36723317159): the relationship e2e
+scenario that expected `a part of 2` now expects the value appended to `a part of`.
 Proof: `RelationControllerReduceToSourcePropertyTests` (replace the colliding-key suffix case), red then green.
 
 Behavior: `Sentence` has `example of: "[[run]]"` with a tracker, and the tracked relationship note "Sentence an example
