@@ -107,7 +107,7 @@ delete".
 
 ### 5. The row and list names no longer say "Editable"
 Type: Structure
-Status: planned
+Status: done
 Proof: `CURSOR_DEV=true nix develop -c pnpm -C frontend exec vitest run tests/components/form` green, and the frontend
 type check and lint of the changed files as the project's wrap-up requires.
 

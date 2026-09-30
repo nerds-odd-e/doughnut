@@ -24,7 +24,7 @@
         Add property
       </button>
     </div>
-    <RichFrontmatterEditablePropertyList
+    <RichFrontmatterPropertyList
       v-if="propertyRows.length > 0"
       v-model="propertyRows"
       :wiki-links="wikiLinks"
@@ -94,8 +94,8 @@
 import { Plus } from "@lucide/vue"
 import { isEqual } from "es-toolkit"
 import { computed, provide, ref, useId, watch } from "vue"
-import RichFrontmatterEditablePropertyList from "@/components/form/RichFrontmatterEditablePropertyList.vue"
 import RichFrontmatterInsertForm from "@/components/form/RichFrontmatterInsertForm.vue"
+import RichFrontmatterPropertyList from "@/components/form/RichFrontmatterPropertyList.vue"
 import RichFrontmatterPropertyNotFound from "@/components/form/RichFrontmatterPropertyNotFound.vue"
 import RichFrontmatterPropertyValidationMessage from "@/components/form/RichFrontmatterPropertyValidationMessage.vue"
 import { richFrontmatterIsReadmeContextKey } from "@/components/form/richFrontmatterProvide"

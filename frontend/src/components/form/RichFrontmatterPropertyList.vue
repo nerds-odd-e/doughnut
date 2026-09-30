@@ -1,7 +1,7 @@
 <template>
   <component :is="readOnly ? 'dl' : 'div'" class="flex flex-col gap-2 text-sm">
     <template v-for="(row, idx) in propertyRows" :key="rowClientIds[idx]">
-    <RichFrontmatterEditablePropertyRow
+    <RichFrontmatterPropertyRow
       v-model="propertyRows[idx]!"
       :idx="idx"
       :wiki-links="wikiLinks"
@@ -30,7 +30,7 @@
 </template>
 
 <script setup lang="ts">
-import RichFrontmatterEditablePropertyRow from "@/components/form/RichFrontmatterEditablePropertyRow.vue"
+import RichFrontmatterPropertyRow from "@/components/form/RichFrontmatterPropertyRow.vue"
 import RichFrontmatterPropertyValidationMessage from "@/components/form/RichFrontmatterPropertyValidationMessage.vue"
 import { useFocusedNoteProperty } from "@/composables/useFocusedNoteProperty"
 import { usePropertyRowClientIds } from "@/composables/usePropertyRowClientIds"
