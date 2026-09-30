@@ -54,3 +54,40 @@ Feature: Property memory tracker
     When I follow the note under question "Vitamins"
     Then I should be at property "topic" of note "Vitamins"
     And the rich note property "topic" should be focused with its property panel open
+
+  @usingMockedOpenAiService
+  Scenario: Recalling one value of a list property leaves the other value to assimilate
+    Given I have a note "run" under notebook "Property recall" with content:
+      """
+      To move fast on foot.
+      """
+    And I have a note "past tense" under notebook "Property recall" with content:
+      """
+      A verb form for the past.
+      """
+    And I have a note "Sentence" under notebook "Property recall" with content:
+      """
+      ---
+      example of:
+        - "[[run]]"
+        - "[[past tense]]"
+      ---
+
+      I ran yesterday.
+      """
+    # An hour before the background's "topic" tracker, so the "[[run]]"
+    # tracker is due first on day 2.
+    And It's day 1, 7 hour
+    When I visit note "Sentence"
+    And I assimilate the value "[[run]]" of property "example of"
+    And I visit note "Sentence"
+    Then the value "[[run]]" of property "example of" should be tracked
+    And the value "[[past tense]]" of property "example of" should still be offered to assimilate
+    Given OpenAI generates this question:
+      | Question Stem                     | Correct Choice | Incorrect Choice 1 | Incorrect Choice 2 | Incorrect Choice 3 |
+      | Which verb is this an example of? | run            | walk               | swim               | jump               |
+    And OpenAI evaluates the question as legitimate
+    When I visit recall for a due recall prompt on day 2
+    Then I should be asked "Which verb is this an example of?"
+    When I choose answer "walk"
+    Then the note under question should focus on property "example of" with value "[[run]]"

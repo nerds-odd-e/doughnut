@@ -230,7 +230,10 @@ delete `addPropertyWithAvailableKeyToLeadingFrontmatter` and the backend `nextAv
 
 ### 9. The journey in the app
 Type: Behavior
-Status: planned
+Status: done — `property_memory_tracker.feature` "Recalling one value of a list property leaves the other value to
+assimilate" passes with the whole feature (3/3). Assimilating from the panel moves the app on to the next unit, so the
+panel is checked after revisiting the note; the tracked `[[run]]` row after reload is the cross-stack proof that
+`propertyValue` is serialized.
 Proof: new scenario in `e2e_test/features/recall/property_memory_tracker.feature`, run once.
 
 Behavior: a note with `example of: ["[[run]]", "[[past tense]]"]` → the learner assimilates only `[[run]]` from the

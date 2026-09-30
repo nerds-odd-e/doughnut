@@ -1,3 +1,4 @@
+import { waitUntilAppIsNotBusy } from '../pageBase'
 import { switchToRichContentIfNeeded } from './noteContentEditingMethods'
 import {
   findNoteContentRegion,
@@ -35,7 +36,34 @@ export const clickPropertyPanelAction = (key: string, testId: string) => {
   })
 }
 
+const propertyValueRow = (value: string) =>
+  cy.get(`[data-property-value="${value}"]`)
+
 export const noteRichPropertyAssimilationMethods = () => ({
+  assimilateRichNotePropertyValue(key: string, value: string) {
+    withPropertyPanel(key, () => {
+      cy.findByRole('button', { name: `Assimilate ${value}` }).click()
+    })
+    waitUntilAppIsNotBusy()
+    return this
+  },
+  expectRichNotePropertyValueTracked(key: string, value: string) {
+    withPropertyPanel(key, () => {
+      propertyValueRow(value)
+        .find('[data-test="assimilation-status-UNDERSTANDING"]')
+        .should('be.visible')
+    })
+    return this
+  },
+  expectRichNotePropertyValueOfferedToAssimilate(key: string, value: string) {
+    withPropertyPanel(key, () => {
+      propertyValueRow(value)
+        .find('[data-test="assimilate-UNDERSTANDING"]')
+        .should('be.visible')
+        .and('not.be.disabled')
+    })
+    return this
+  },
   expectRichNotePropertyAssimilateEnabled(key: string) {
     this.switchToRichContent()
     withPropertyPanel(key, () => {
