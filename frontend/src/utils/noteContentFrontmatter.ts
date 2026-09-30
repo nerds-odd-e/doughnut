@@ -3,6 +3,7 @@ import { isTitlePatternPropertyKey } from "@/utils/noteContentPropertyKeys"
 import { parseNoteContentMarkdown } from "@/utils/noteContentFrontmatterParse"
 import {
   type NoteProperties,
+  type PropertyValue,
   scalarStringFromPropertyValue,
   yamlRecordFromNoteProperties,
 } from "@/utils/noteProperties"
@@ -138,6 +139,12 @@ export type PropertyKeyChange =
   | { type: "removal"; key: string }
   | { type: "rename"; fromKey: string; toKey: string }
 
+function propertyValueIdentity(value: PropertyValue): string {
+  return value.kind === "scalar"
+    ? value.value.trim()
+    : JSON.stringify(value.items)
+}
+
 /** Detects property key removals and renames between two note Markdown snapshots. */
 export function diffFrontmatterPropertyKeyChanges(
   oldMarkdown: string,
@@ -162,7 +169,7 @@ export function diffFrontmatterPropertyKeyChanges(
 
   const removedByValue = new Map<string, string[]>()
   for (const key of removedKeys) {
-    const value = (scalarStringFromPropertyValue(oldProps[key]!) ?? "").trim()
+    const value = propertyValueIdentity(oldProps[key]!)
     const list = removedByValue.get(value) ?? []
     list.push(key)
     removedByValue.set(value, list)
@@ -170,7 +177,7 @@ export function diffFrontmatterPropertyKeyChanges(
 
   const addedByValue = new Map<string, string[]>()
   for (const key of addedKeys) {
-    const value = (scalarStringFromPropertyValue(newProps[key]!) ?? "").trim()
+    const value = propertyValueIdentity(newProps[key]!)
     const list = addedByValue.get(value) ?? []
     list.push(key)
     addedByValue.set(value, list)

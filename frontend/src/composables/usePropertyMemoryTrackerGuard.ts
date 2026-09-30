@@ -10,12 +10,14 @@ import usePopups from "@/components/commons/Popups/usePopups"
 import { toOpenApiError } from "@/managedApi/openApiError"
 import type { PropertyKeyChange } from "@/utils/noteContentFrontmatter"
 
-function findPropertyMemoryTracker(
+function propertyMemoryTrackers(
   noteInfo: NoteRecallInfo | undefined,
   propertyKey: string
-): MemoryTracker | undefined {
-  return noteInfo?.memoryTrackers?.find(
-    (tracker) => tracker.propertyKey && tracker.propertyKey === propertyKey
+): MemoryTracker[] {
+  return (
+    noteInfo?.memoryTrackers?.filter(
+      (tracker) => tracker.propertyKey && tracker.propertyKey === propertyKey
+    ) ?? []
   )
 }
 
@@ -67,9 +69,8 @@ export function usePropertyMemoryTrackerGuard(
       return true
     }
 
-    const noteInfo = await loadNoteInfo()
-    const tracker = findPropertyMemoryTracker(noteInfo, propertyKey)
-    if (!tracker) {
+    const trackers = propertyMemoryTrackers(await loadNoteInfo(), propertyKey)
+    if (trackers.length === 0) {
       return true
     }
 
@@ -80,11 +81,13 @@ export function usePropertyMemoryTrackerGuard(
       return false
     }
 
-    const { error } = await MemoryTrackerController.delete({
-      path: { memoryTracker: tracker.id },
-    })
-    if (error) {
-      return false
+    for (const tracker of trackers) {
+      const { error } = await MemoryTrackerController.delete({
+        path: { memoryTracker: tracker.id },
+      })
+      if (error) {
+        return false
+      }
     }
 
     invalidateNoteInfoCache()
@@ -100,9 +103,8 @@ export function usePropertyMemoryTrackerGuard(
       return true
     }
 
-    const noteInfo = await loadNoteInfo()
-    const tracker = findPropertyMemoryTracker(noteInfo, fromKey)
-    if (!tracker) {
+    const trackers = propertyMemoryTrackers(await loadNoteInfo(), fromKey)
+    if (trackers.length === 0) {
       return true
     }
 
@@ -113,15 +115,17 @@ export function usePropertyMemoryTrackerGuard(
       return false
     }
 
-    const { error } = await MemoryTrackerController.updatePropertyKey({
-      path: { memoryTracker: tracker.id },
-      body: { propertyKey: toKey },
-    })
-    if (error) {
-      await popups.alert(
-        toOpenApiError(error).message ?? "Failed to update memory tracker"
-      )
-      return false
+    for (const tracker of trackers) {
+      const { error } = await MemoryTrackerController.updatePropertyKey({
+        path: { memoryTracker: tracker.id },
+        body: { propertyKey: toKey },
+      })
+      if (error) {
+        await popups.alert(
+          toOpenApiError(error).message ?? "Failed to update memory tracker"
+        )
+        return false
+      }
     }
 
     invalidateNoteInfoCache()

@@ -8,6 +8,7 @@ import com.odde.donut.entities.Answer;
 import com.odde.donut.entities.Grade;
 import com.odde.donut.entities.MemoryTracker;
 import com.odde.donut.entities.Note;
+import com.odde.donut.entities.PropertyFocus;
 import com.odde.donut.entities.RecallLog;
 import com.odde.donut.entities.RecallPrompt;
 import com.odde.donut.entities.User;
@@ -161,12 +162,13 @@ public class MemoryTrackerService {
     if (newPropertyKey.equals(memoryTracker.getPropertyKey())) {
       return;
     }
+    PropertyFocus renamed = new PropertyFocus(newPropertyKey, memoryTracker.getPropertyValue());
     boolean conflict =
         userService.getMemoryTrackersFor(memoryTracker.getUser(), memoryTracker.getNote()).stream()
             .filter(MemoryTracker::isActive)
             .filter(mt -> !mt.isSpelling())
             .filter(mt -> !mt.getId().equals(memoryTracker.getId()))
-            .anyMatch(mt -> newPropertyKey.equals(mt.getPropertyKey()));
+            .anyMatch(mt -> renamed.equals(mt.propertyFocus()));
     if (conflict) {
       throw new ResponseStatusException(
           HttpStatus.CONFLICT,

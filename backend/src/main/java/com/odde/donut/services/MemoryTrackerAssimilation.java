@@ -4,6 +4,7 @@ import com.odde.donut.controllers.dto.AssimilationRequestDTO;
 import com.odde.donut.entities.MemoryTracker;
 import com.odde.donut.entities.MemoryTrackerType;
 import com.odde.donut.entities.Note;
+import com.odde.donut.entities.PropertyFocus;
 import com.odde.donut.entities.User;
 import com.odde.donut.entities.repositories.AssimilationSequenceSkipRepository;
 import com.odde.donut.factoryServices.EntityPersister;
@@ -47,12 +48,9 @@ final class MemoryTrackerAssimilation {
 
     if (isPropertyLevelRequest(request)) {
       String propertyValue = request.propertyValue == null ? "" : request.propertyValue;
+      PropertyFocus focus = new PropertyFocus(request.propertyKey, propertyValue);
       boolean propertyTrackerExists =
-          existingTrackers.stream()
-              .anyMatch(
-                  mt ->
-                      request.propertyKey.equals(mt.getPropertyKey())
-                          && propertyValue.equals(mt.getPropertyValue()));
+          existingTrackers.stream().anyMatch(mt -> focus.equals(mt.propertyFocus()));
       if (propertyTrackerExists) {
         return List.of();
       }

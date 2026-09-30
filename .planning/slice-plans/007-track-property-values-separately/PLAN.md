@@ -185,7 +185,10 @@ unchanged; Skip stays one control for the key. Tracker lookup in `assimilationMe
 
 ### 6. Renaming or removing a list key carries every value's tracker
 Type: Behavior
-Status: planned
+Status: done — `usePropertyMemoryTrackerGuard.listProperty.spec.ts`, `noteContentFrontmatter.spec.ts` (a list key rename is
+detected by its items), `MemoryTrackerUpdatePropertyKeyControllerTest` red then green. Property tracker identity is
+`PropertyFocus` equality in the backend. The Markdown key diff now compares list values by their items, which slice 7
+builds on. Confirmation wording stays singular.
 Proof: `usePropertyMemoryTrackerGuard.spec.ts`, `MemoryTrackerUpdatePropertyKeyControllerTest`, red then green.
 
 Behavior: a list key with two tracked values → renamed in the rich row or the Markdown editor → after the one
