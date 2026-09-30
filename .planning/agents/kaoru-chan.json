@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 1,
+  "agent": "Kaoru-chan",
+  "email": "kaoru-chan@example.org",
+  "identity": "SEED-062#story-2",
+  "mode": "story-branch",
+  "branch": "claude/reify-refuses-structural-keys",
+  "host": "claude"
+}
