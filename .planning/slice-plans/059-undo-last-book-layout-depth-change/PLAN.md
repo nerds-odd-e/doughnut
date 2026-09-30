@@ -2,7 +2,7 @@
 
 Work item: **SEED-059#story-7**
 ([story](../../seeds/SEED-059-book-reading-uat-fixes.md#story-7)).
-Status: **slice 1 done; slice 2 planned.**
+Status: **both slices done.**
 
 ## Goal and scope
 
@@ -103,7 +103,7 @@ proof loop and none of them is observable alone.
 
 ### 2. A reader undoes with Ctrl/Cmd+Z anywhere on the reading page
 Type: Behavior
-Status: planned
+Status: done
 Proof: E2E scenario "Undo an indent with the keyboard" (subtree_indent fixture,
 new step "I press Ctrl+Z" sending the key to the page after the existing Tab
 step, so it covers focus having fallen to the body). Spec: the shortcut runs
@@ -136,3 +136,10 @@ About 5 min: one window listener on the surface from slice 1.
   any other change of ids or depths) makes it unavailable.
 - Not directly observed: E2E does not assert Undo disappears afterwards (the
   composable and layout specs do); no spec for reload or the apply failure path.
+- Slice 2 done: E2E "Undo an indent with the keyboard" (10/10) and
+  `BookReadingPdfUndoShortcut.spec.ts` (undo runs, nothing to undo, text input
+  left alone, listener removed on unmount). The listener lives in
+  `BookReadingShell.vue`, registered only when reorganizing is available.
+  Untested: the Cmd/Meta path, contenteditable, redo and Alt combinations.
+  Page-level specs must feed `update:book` back (`setProps`); synthetic Cypress
+  keydown needs `getModifierState`.

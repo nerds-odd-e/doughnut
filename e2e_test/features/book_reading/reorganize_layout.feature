@@ -87,6 +87,15 @@ Feature: Reorganize book layout
       And the book block "A.2 Second section" should be at depth 2 in the book layout
       And the book block "Chapter B" should be at depth 0 in the book layout
 
+    Scenario: Undo an indent with the keyboard
+      When I choose the book block "Chapter A"
+      And I indent the focused book block with Tab
+      Then the book block "Chapter A" should be at depth 1 in the book layout
+      When I press Ctrl+Z
+      Then the book block "Chapter A" should be at depth 0 in the book layout
+      And the book block "A.1 First section" should be at depth 1 in the book layout
+      And the book block "A.2 Second section" should be at depth 1 in the book layout
+
     Scenario: Cancel a leaf block removes it from the book layout
       When I choose the book block "Chapter B"
       Then the book block "Chapter B" should be focused in the book layout
