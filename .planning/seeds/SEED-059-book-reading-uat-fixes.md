@@ -77,48 +77,56 @@ Effort bands: S = 30–60 minutes, M = 1–2 hours, L = 2–4 hours, including d
 
 <a id="story-21"></a>
 
-### Book reading E2E scenarios stay stable at any window size
+### Book reading E2E position checks do not sit on a page boundary
 
 **Identity:** SEED-059#story-21
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"not-refined","approach":"unselected"}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/002-book-reading-e2e-position-checks/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"131736b7183a651a49c38f4184727bc1a590cb9d70481a50904c27a8ff601e67","plan":"bfef90d66d174e8bff6142c079dfbc7264cee3a20d4aaeab767433e3c0d02215"}}
 ```
 
 **Goal:** A Donut developer can trust the book reading E2E scenarios to pass or
-fail because of reading behavior, not because of the browser window's size.
+fail because of reading behavior, not because a page-position assertion sits
+within pixels of a page boundary at the scenario's window size. Every scenario
+runs at one fixed window size, so the risk is boundary proximity, not a range of
+sizes.
 
 **Observed friction**
 
 - The step "the book reader PDF viewport should be on page N" reads the page
   indicator, which shows the page under the middle of the reader. After a PDF
   block lands at its start, the middle can sit within pixels of a page boundary.
-  In `phone_reading.feature` (390 × 844) block 2.2's start lands 1.5 px from
+  In `phone_reading.feature` (390 × 844) block 2.2's start landed 1.5 px from
   the page 2/3 boundary; CI (run 36647846005) failed at a slightly different
   window, and the repair reproduced the failure at 390 × 900. It was repaired
-  there by asserting the start position instead.
-- `book_browsing.feature` (lines about 22, 38, 45, 73, 76) and
-  `reading_record.feature` (line about 42) use the same step after choosing a
-  block. They pass at their desktop window size. Whether they, or other book
-  reading steps that read the middle of the reader, would fail at other sizes
-  is unverified.
+  there (`5206b08370`) by asserting the start position instead.
+- `book_browsing.feature` (lines about 22, 38, 45, 52, 73, 76),
+  `reading_record.feature` (line about 42) and `phone_reading.feature` (line
+  about 55) use the same step. They pass at their fixed window sizes. Whether any
+  sits close to a boundary is unverified.
 
-**Scope** (awaiting story refinement)
+**Scope**
 
-- **Analysis first.** Confirm which scenarios and steps depend on window size or
-  on reader-middle geometry: run the book reading features at several window
-  sizes (phone, laptop, tall and short desktop), and list every step that reads
+- **Analysis by arithmetic first.** For every scenario that uses a step reading
   layout geometry (page indicator, scroll offsets, pixel tolerances such as the
-  15 px start-at-top check). Report which fail, at which sizes, and why. If none
-  can fail, stop with that finding and change no tests.
-- **Careful test design.** Decide, before changing tests, how book reading E2E
-  steps should express position: what a scenario asserts (which block is
-  current, where a block's start is, which page holds it), which step owns each
-  kind of check, and how tolerances are chosen and documented. Fit the
-  e2e-authoring conventions and the test guidance on whole-suite coverage and
-  cost.
-- **Then repair** only the steps and scenarios the analysis confirms, keeping
-  each scenario's journey and its integration proof.
-- **Deferred:** no product change, and no change to the page indicator itself.
+  15 px start-at-top check, the 37.8% same-page scroll), take its fixed window
+  size and compute the margin between the reader's middle (or other read
+  position) and the nearest page boundary. The margin is computed from the
+  measured reader height and page height, and the phone case is confirmed once
+  locally at 390 × 844 and 390 × 900 to check the method. No multi-size run of
+  the suite.
+- **Stop when nothing is at risk.** If no scenario other than the already
+  repaired one has a small margin, stop with that finding and change no tests.
+- **Then repair only what the analysis confirms**, following the pattern already
+  used: assert where the block's start is ("the top of the PDF book reader should
+  be at Y of 1000 down page N") after landing, and assert the current block after
+  scrolling, instead of the page indicator. Keep each scenario's journey and its
+  integration proof.
+- **Excluded:** a supported-window-size list for E2E; running features at several
+  sizes; designing new position-step conventions beyond the existing start
+  position step; changing `START_AT_TOP_TOLERANCE_PX`; removing page-indicator
+  checks that carry no risk (they are redundant with start-position assertions in
+  places, but that is a different outcome); any product change, including the page
+  indicator itself.
 
 **Key examples**
 
@@ -126,12 +134,11 @@ fail because of reading behavior, not because of the browser window's size.
   passes at 390 × 844 and at 390 × 900.
 - A scenario that scrolls past a heading asserts the current block, and does not
   depend on which page holds the middle of the reader.
-- The analysis states the sizes tried and which step failed at which size.
+- The analysis states each scenario's window size and margin, and which are at
+  risk.
 
-**Open questions:** which window sizes count as supported for E2E; whether the
-page indicator step keeps a role for page-1 and page-boundary-free cases.
-
-**Effort hypothesis:** M, low confidence (the analysis decides).
+**Effort hypothesis:** S, moderate confidence (the analysis decides whether any
+repair is needed).
 **Depends on:** none.
 
 ## Ordering and Scope Reduction
