@@ -1,7 +1,7 @@
 <template>
-  <div class="flex flex-col gap-2 text-sm">
+  <component :is="readOnly ? 'dl' : 'div'" class="flex flex-col gap-2 text-sm">
     <template v-for="(row, idx) in propertyRows" :key="rowClientIds[idx]">
-    <RichFrontmatterEditablePropertyRow
+    <RichFrontmatterPropertyRow
       v-model="propertyRows[idx]!"
       :idx="idx"
       :wiki-links="wikiLinks"
@@ -11,6 +11,7 @@
       :key-input-id="rowKeyInputId(idx)"
       :preset-list-id="rowKeyPresetListId(idx)"
       :is-focused="isFocusedProperty(row!.key)"
+      :read-only="readOnly"
       :set-root-ref="(el) => setPropertyRowRef(row!.key, el)"
       @row-focus="emit('row-focus', idx)"
       @commit="emit('commit', idx)"
@@ -25,11 +26,11 @@
       :message="validationMessage"
     />
     </template>
-  </div>
+  </component>
 </template>
 
 <script setup lang="ts">
-import RichFrontmatterEditablePropertyRow from "@/components/form/RichFrontmatterEditablePropertyRow.vue"
+import RichFrontmatterPropertyRow from "@/components/form/RichFrontmatterPropertyRow.vue"
 import RichFrontmatterPropertyValidationMessage from "@/components/form/RichFrontmatterPropertyValidationMessage.vue"
 import { useFocusedNoteProperty } from "@/composables/useFocusedNoteProperty"
 import { usePropertyRowClientIds } from "@/composables/usePropertyRowClientIds"
@@ -43,6 +44,7 @@ const props = defineProps<{
   wikiLinks: WikiLink[]
   lastSavedMarkdown?: string
   noteId?: number
+  readOnly?: boolean
   headingId: string
   validationMessage: string
   validationRowIndex?: number
