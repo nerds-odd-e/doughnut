@@ -114,6 +114,22 @@ When(
 )
 
 When(
+  'I undo the last book layout change',
+  // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
+  () => {
+    return bookReadingPage().undoLastBookLayoutChange()
+  }
+)
+
+When(
+  'I press Ctrl+Z',
+  // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
+  () => {
+    return bookReadingPage().pressCtrlZ()
+  }
+)
+
+When(
   'I cancel the focused book block with Backspace',
   // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
   () => {

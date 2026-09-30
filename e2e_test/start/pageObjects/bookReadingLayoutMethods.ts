@@ -116,6 +116,24 @@ export const bookReadingLayoutMethods = () => ({
     })
     return this
   },
+  undoLastBookLayoutChange() {
+    cy.get('[data-testid="book-reading-undo-layout-change"]')
+      .should('be.visible')
+      .click()
+    return this
+  },
+  pressCtrlZ() {
+    cy.get('body').trigger('keydown', {
+      key: 'z',
+      code: 'KeyZ',
+      keyCode: 90,
+      which: 90,
+      ctrlKey: true,
+      bubbles: true,
+      getModifierState: () => false,
+    })
+    return this
+  },
   cancelFocusedBookBlockWithBackspace() {
     cy.focused().trigger('keydown', {
       key: 'Backspace',

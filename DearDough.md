@@ -158,6 +158,42 @@ A plan was recorded not-ready because slice 3 relied on an inferred CLI path. Th
   - Observed effect: one human round-trip and a scope change (CLI change, option A) that preparation could have surfaced before Take.
   - Inference: when resolving a readiness concern by observation, replay the slice's full promised journey (here pull, then publish), not only the mechanism the concern names; the replay's own "not covered" list was the signal.
 
+### Additional report — A probe on a copy of the viewer missed how landing affects the current block, so slice 2 failed to converge twice
+Former local code: DD-163.
+
+The owner-requested probe measured landing in headless Chrome on a standalone page that copied `EpubBookViewer`. It found the landing cause but did not observe the current-block reporting that depends on landing, or overlapping epub.js displays. The plan split landing (slice 2) from the current-block rule (slice 3) with interim `@ignore`s on that assumption.
+
+#### Occurrences
+
+- Execution: SEED-059#story-1 / `e733844d01:.planning/slice-plans/049-epub-land-and-track-chosen-place/PLAN.md` / 485ed2eb49; Timestamp: unknown (2026-09-29, before the slice 2 CI run at 04:45Z); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.46.
+  - Evidence: slice 2 attempt 1 (about 6 min) broke "Resume EPUB reading at the last position"; the consolidated attempt (about 25 min, 201k subagent tokens) stopped at 11 of 13; refinements b1746859a4 and 179187e58b; the third attempt converged in about 5 min from the parked patch.
+  - Observed effect: two non-converged attempts and two plan refinements before slice 2 was delivered.
+  - Inference: a probe through the real app, or one that also recorded the `relocated` events after landing, would likely have shown the coupling. Parking each attempt as a patch in the plan folder kept its work and let the next attempt start from it. Qualified: one execution.
+
+### Additional report — A plan named an existing "no block marked" step for a scenario whose fixture always auto-marks another block
+Former local code: DD-168.
+
+The plan's decisive premises confirmed by grep that "no book block should be marked in the book layout" exists, and slice 2's behavior used it after choosing "Chapter Alpha" in the minimal EPUB. Choosing Chapter Alpha always auto-marks the structural "Part One" read (covered by an existing scenario), so the assertion could not hold.
+
+#### Occurrences
+
+- Execution: SEED-059#story-6 / slice-plans/056-change-or-clear-reading-mark / 7c9935b2c2; Timestamp: 2026-09-29 (slice 2 implementation, between 17:53 and 18:12 +08:00); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.47.
+  - Evidence: plan *Decisive premises* "E2E setup and steps exist … Confirmed by grep"; slice 2 implementation report ("My first green run failed on `no book block should be marked` (found 1)"); new step "book block {string} should not be marked in the book layout" in 5cab6e8827.
+  - Observed effect: one failed EPUB feature run and a new step; the plan's slice 2 behavior text was corrected during delivery. Small cost.
+  - Inference: the premise checked that a step exists, not that it holds for the chosen fixture path. Related to DD-162 (a grep premise that did not reach the changed path).
+
+### Additional report — A removal plan checked what it deleted but not the journey right after it, so two older panel rules surfaced as stops
+Former local code: DD-171.
+
+Plan 053's premises confirmed what snap-back did and that only it used scroll suppression, and listed "panel appears after scrolling past" as must-keep. It did not look at what happens when the reader scrolls past without marking, which snap-back had made rare: the panel hid once the next block became current, and the fixed panel shared one bottom slot with the "Now reading" bar, which covered it.
+
+#### Occurrences
+
+- Execution: SEED-059#story-5 / slice-plans/053-pdf-smooth-scroll-after-choosing-block / 5989892325; Timestamp: 2026-09-29T21:45+08:00 through 22:15:52+08:00 (slice 1 implementation to commit); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.47.
+  - Evidence: slice 1 hand-backs stopping at "the panel element never appears" (`panelShownBecauseScrolledPastContent` required `successor.id !== currentBlockId`) and then at "`read-from-here` covers `book-reading-mark-as-read`" (both overlays `absolute left-0 right-0 bottom-0 z-20`); owner question answered "Stack the two"; fix in 5989892325 (`ReadingOverlayDock.vue`).
+  - Observed effect: two implementation stops, one owner decision on a scope the story had deferred (panel position), and slice 1 took about 30 minutes against a ~5-minute target.
+  - Inference: reading `blockAwaitingConfirmation` and the overlay classes for the story's own "scroll past without marking" key example would have shown both at planning. Related to DD-162 and DD-163 (premises that stopped short of the consuming step).
+
 ## ODF-104 — Increment delivery reports the default-checkout refresh as deferred without a reason
 
 Former local code: DD-110.
@@ -451,6 +487,18 @@ The usage line says REF but publication requires refs/heads/; callers discover t
   - Evidence: after printing the usage line (`--target-ref REF`) and grepping the script for `targetRef`, `deliver --target-ref origin/story/seed-059-story-2` refused with "authorized target must be a branch ref: origin/story/seed-059-story-2"; the retry with `refs/heads/story/seed-059-story-2` was accepted (`observation.state: attached`, `/tmp/dough-ci-501/watch-O2h2e5`).
   - Observed effect: one refused call plus one lookup call; no coverage lost; slices 2 and 3 used the full ref first time.
 
+### Additional report — Managed increment delivery rejected a remote-tracking target ref; the only example of the accepted form is in the wrap-up reference
+Former local code: DD-172.
+
+Trunk publication's "Publish the candidate" asks for an "authorized target ref" but does not give its form. `execution-increment-delivery.mjs deliver` accepts only a full branch ref (`refs/heads/<branch>`). The only worked example of that form is in `wrap-up-closure-publication.md`.
+
+#### Occurrences
+
+- Execution: SEED-059#story-20 / slice-plans/062-stale-epub-place-reopens-at-block-start / a18764005f; Timestamp: 2026-09-29, ~23:25+08:00 (slice 1 delivery); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.47.
+  - Evidence: the first `deliver --target-ref origin/story/seed-059-story-20` exited with "authorized target must be a branch ref: origin/story/seed-059-story-20". A retry with `refs/heads/story/seed-059-story-20` was accepted.
+  - Observed effect: one rejected delivery call. Nothing was published or changed.
+  - Inference: the cost is small, but every coordinator that reads only trunk-publication.md can hit it. One example next to that step would prevent it.
+
 ## ODF-074 — A plan said the changed script had no test, and nobody searched for one before delivery, so CI caught the stale test
 
 Former local code: DD-126.
@@ -502,6 +550,42 @@ Plan 019 recorded a throwaway probe for key example 1 (leftover `.keep` → 409)
   - Evidence: original plan slice 3 Proof and "Starting facts" probe (example 1 only) at f321a7cb23; plan Learnings at 6de22982d5 ("Before slice 3, `Forces.MD` was refused as a non-pointer attachment, not accepted"); `NotebookGitProposalPublisher.publish` in 82fa7aedb7 (refusals moved above `NotebookGitAttachmentSizeAdmission.admit`); coordinator summary (slice took ~15 min).
   - Observed effect: slice 3 ran ~15 min, over the 10-minute hard limit; the outcome was complete and correct, and the refactor pass then co-located slice 2's marker refusal with it.
   - Inference: the probe that settled example 1 would have taken seconds for example 2 and would have shown the ordering dependency at planning. Related in kind to DD-130 and DD-137 (untried premise), but here the premise was about today's refusal path. Qualified: coordinator summary only; implementer transcript not available.
+
+### Additional report — The plan's focused proof command passed several `--tests` patterns to a wrapper that accepts only one
+Former local code: DD-147.
+
+Plan 012 slice 1 named `pnpm backend:test:worktree --tests A --tests B --tests C` as its proof. `scripts/backend-test-worktree.sh` accepts exactly one `--tests` pattern, so the command printed usage and exited 1. The implementer split it into two single-pattern runs that together selected every rewritten class.
+
+#### Occurrences
+
+- Execution: SEED-055#story-1 / `2509421236:.planning/slice-plans/012-public-api-cleanup/PLAN.md` / be9f44cd11; Timestamp: 2026-09-29T08:24+08:00 (slice 1 implementer); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.46.
+  - Evidence: slice 1 implementer hand-back ("accepts exactly one `--tests <pattern>`, so it printed usage and exited 1"); plan learning added in be9f44cd11.
+  - Observed effect: one failed run and a reselection inside the slice; proof unaffected.
+  - Inference: slice planning copied Gradle's repeatable `--tests` form without checking the worktree wrapper. Related to DD-143 (an unchecked command in a prompt); qualified: one occurrence.
+
+### Additional report — A grep-based plan premise named tests that never reached the changed path
+Former local code: DD-162.
+
+The plan listed five tests to switch to real PDFs because they held fake `%PDF` bytes. Two of them store books through `makeMe`, not attach, so the new check never ran for them. Slice 1 changed them anyway, and its refactor pass reverted both.
+
+#### Occurrences
+
+- Execution: SEED-059#story-3 / slice-plans/051-pdf-layout-from-bookmarks / 946e2a70e3; Timestamp: 2026-09-29 (slice 1); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.46.
+  - Evidence: plan *Decisive premises* row "Backend tests attach fake PDF bytes" (`grep -rn "0x25, 0x50"`); slice 1 refactor report item 2 (`BooksControllerTest`, `NotebookGitWebAttachmentDeleteControllerTest` back to HEAD).
+  - Observed effect: two files changed and reverted within one slice; small cost.
+  - Inference: the premise matched a symptom (fake bytes) rather than the path (attach callers). Related to the planning-premise family (DD-128, DD-137).
+
+### Additional report — A correction to merge two lookups was planned without checking that they choose the same result
+Former local code: DD-167.
+
+The retrospective that created SEED-059#story-14 saw two EPUB rendered-view lookups and planned to merge them. Nobody compared their matching rules before planning. At execution, the first slice 2 attempt found that they choose different sections when one stored path matches two spine items. Execution had to stop for an owner decision. The plan's "stop and report instead of choosing one" guard worked as intended.
+
+#### Occurrences
+
+- Execution: SEED-059#story-14 / `.planning/slice-plans/055-epub-resume-tests-and-rendered-view/PLAN.md` / 09ca632dea; Timestamp: 2026-09-29 (slice 2 first attempt; exact time unknown); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.46.
+  - Evidence: slice 2 Decision paragraph in plan 055 at 0e9048812c; `epubSpinePathMatches` suffix rule in `frontend/src/lib/book-reading/epubHrefMatch.ts`.
+  - Observed effect: one implementation-agent round of about 57k tokens returned no change, and the owner was asked one question. The recommended option was accepted and no work was lost.
+  - Inference: reading the two matching rules while planning the correction (a few minutes) would have found the difference and taken the decision to the owner before the plan. Qualified: one occurrence.
 
 ## ODF-147 — An implementer reasoned that a new test would fail instead of running it red, and one of its tests could not fail
 
@@ -677,7 +761,8 @@ The refactor check requires every changed file to be at most 250 lines, without 
   - Observed effect: two applicability exchanges; no extra split was made. Final noteStore is 245 lines, noteUndo167, requests228, cache45. The unrelated Wikidata workflow was preserved.
   - Inference: clarify how the numeric check composes with approved intermediate states and the skill's requirement that a refactor address an introduced, exposed, or aggravated issue. Unlike ODF-124, the rule was found and acknowledged here.
 
-## DD-142 — The plan prescribed observations that execution had to drop: an absence check for removed UI and a case that could never fail
+## ODF-187 — The plan prescribed observations that execution had to drop: an absence check for removed UI and a case that could never fail
+Former local code: DD-142.
 
 Slice planning wrote two observations into the executable plan that the delivered tests could not keep. Slice 1 asked for "there is no `[aria-label="Ancestor folders scrolled out of view"]` element" after deleting that hint, against the owner's rule that removals leave no trace. Slice 3 asked that re-sorting a short folder whose rows all fit leaves `scrollTop` unchanged, which holds whatever the product does, because such a tree cannot scroll.
 
@@ -688,7 +773,8 @@ Slice planning wrote two observations into the executable plan that the delivere
   - Observed effect: one assertion written then removed, one test written, run, and removed; two plan-text corrections during delivery. No behavior defect.
   - Inference: a planning check that each planned observation can fail on the pre-change code, and does not assert a removed feature's absence, would have caught both. Qualified: one execution; related to ODF-147 (an implementer's test that could not fail) but here the plan prescribed it and the implementer ran it red.
 
-## DD-143 — An implementer prompt required a nonexistent `pnpm test:typecheck` script
+## ODF-188 — An implementer prompt required a nonexistent `pnpm test:typecheck` script
+Former local code: DD-143.
 
 The Slice 1 implementer was told to run `./scripts/run.sh pnpm test:typecheck` after regenerating the API client. That script is not defined at the repo root or under `frontend/`. The project's frontend skill names `pnpm -C frontend exec vue-tsc --noEmit`. The agent substituted that command and reported the gap.
 
@@ -699,7 +785,8 @@ The Slice 1 implementer was told to run `./scripts/run.sh pnpm test:typecheck` a
   - Observed effect: one extra discovery step inside the slice; typecheck still passed via the substituted command. No false green.
   - Inference: the coordinator prompt invented a script name instead of copying the frontend skill's command. Qualified: different from ODF-100 (piped vue-tsc exit code), which assumed the correct command.
 
-## DD-144 — A four-line repository tip-over forced extracting an unrelated assimilation query block
+## ODF-189 — A four-line repository tip-over forced extracting an unrelated assimilation query block
+Former local code: DD-144.
 
 Slice 2 added one content-contains query to `NoteRepository` (244 → 254 lines). The post-change refactor's 250-line check then required a split; the agent extracted the pre-existing assimilation query block into `NoteAssimilationQueries` (~85 lines moved) so the file dropped to 180. The assimilation seam is cohesive, but it was not implicated by file-page references except as the cheapest way under the numeric limit.
 
@@ -714,7 +801,8 @@ Slice 2 added one content-contains query to `NoteRepository` (244 → 254 lines)
   - Observed effect: the refactor pass took about 25 minutes, against about 12 for the slice's implementation, and needed a wider backend re-proof. The seam it chose, the user's reading progress versus the book's attach and structure, is domain-meaningful.
   - Inference: same tip-over pattern; here the split landed on a real seam but introduced a new convention (a shared OpenAPI tag across two controllers) to avoid touching the frontend.
 
-## DD-145 — The plan prescribed production observations whose access route or log source did not exist, and whose results could not change the approach
+## ODF-190 — The plan prescribed production observations whose access route or log source did not exist, and whose results could not change the approach
+Former local code: DD-145.
 
 Plan 009 required a SQL catalog probe "through the established authorized DB connection" (slice 1), a disposable Cloud SQL vector rehearsal (slice 3), and Flyway D/P success "in the serving instance's application log (`gcloud logging`)" (slice 10). No DB connection route was established for agents, the app's log does not reach Cloud Logging, and the chosen `DROP TABLE` worked whatever the catalog showed.
 
@@ -729,7 +817,8 @@ Plan 009 required a SQL catalog probe "through the established authorized DB con
   - Observed effect: about 15 minutes of implementer time; the story's key example (every wheel step moves down) was delivered without its real-wheel observation.
   - Inference: same pattern in a local setting: the observation route could have been checked at planning from the agent map and `package.json`.
 
-## DD-146 — Transient permission-check outages ended the coordinator's turn three times, so the owner had to type "continue"
+## ODF-191 — Transient permission-check outages ended the coordinator's turn three times, so the owner had to type "continue"
+Former local code: DD-146.
 
 The auto-mode classifier returned "no verdict" errors, which the tool result called transient and retryable. The coordinator each time reported and ended its turn instead of waiting in the background and retrying, and resumed only when the owner wrote "continue".
 
@@ -740,29 +829,8 @@ The auto-mode classifier returned "no verdict" errors, which the tool result cal
   - Observed effect: about 19 minutes of stalled execution and three owner prompts; no wrong action.
   - Inference: a bounded background wait (for example a timed Monitor) before one retry would likely have avoided the stops. Qualified: host-specific outage; retrying immediately in a loop was correctly avoided.
 
-## DD-147 — The plan's focused proof command passed several `--tests` patterns to a wrapper that accepts only one
-
-Plan 012 slice 1 named `pnpm backend:test:worktree --tests A --tests B --tests C` as its proof. `scripts/backend-test-worktree.sh` accepts exactly one `--tests` pattern, so the command printed usage and exited 1. The implementer split it into two single-pattern runs that together selected every rewritten class.
-
-### Occurrences
-
-- Execution: SEED-055#story-1 / `2509421236:.planning/slice-plans/012-public-api-cleanup/PLAN.md` / be9f44cd11; Timestamp: 2026-09-29T08:24+08:00 (slice 1 implementer); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.46.
-  - Evidence: slice 1 implementer hand-back ("accepts exactly one `--tests <pattern>`, so it printed usage and exited 1"); plan learning added in be9f44cd11.
-  - Observed effect: one failed run and a reselection inside the slice; proof unaffected.
-  - Inference: slice planning copied Gradle's repeatable `--tests` form without checking the worktree wrapper. Related to DD-143 (an unchecked command in a prompt); qualified: one occurrence.
-
-## DD-148 — A refactor agent's hand-back contained only the word "placeholder"
-
-The slice 6 refactor agent (a Sonnet model, for a planning-only change) returned "placeholder" with no `## REFACTOR COMPLETE`. The coordinator checked the diff, messaged the agent, and received the real report, which named two small edits it had already made.
-
-### Occurrences
-
-- Execution: SEED-055#story-1 / `2509421236:.planning/slice-plans/012-public-api-cleanup/PLAN.md` / be9f44cd11; Timestamp: 2026-09-29T09:05+08:00 (approximately; slice 6 refactor); Tool: Claude Code; Model: coordinator claude-opus-5-5, refactor agent Sonnet; Open Dough release: 0.3.46.
-  - Evidence: first hand-back text "placeholder"; second hand-back listed the `NotebookAttachmentFile.bytes` wording fix and the `nosniff` label, then `## REFACTOR COMPLETE`.
-  - Observed effect: one extra message round trip; the marker rule stopped acceptance of an empty report.
-  - Inference: qualified one-off; host or model behavior, not project guidance.
-
-## DD-156 — A two-hour UAT stopped at 56 minutes while cheap coverage gaps stayed open
+## ODF-192 — A two-hour UAT stopped at 56 minutes while cheap coverage gaps stayed open
+Former local code: DD-156.
 
 The owner set a two-hour manual UAT budget. The exploration agents stopped once breadth was complete (27 and 29 minutes), and the coordinator's synthesis prompt supplied the report's explanation that the remaining gaps needed other browsers, devices, or book sizes rather than more time. Two listed gaps were testable in the same setup: a mid-size book for the AI reorganization limit (the CLI can attach part of a PDF with `DONUT_MINERU_PDF_END_PAGE`) and EPUB heading-only auto-marking.
 
@@ -773,7 +841,8 @@ The owner set a two-hour manual UAT budget. The exploration agents stopped once 
   - Observed effect: 64 budget minutes unused; the size at which AI reorganization fails (defect 10) stays unknown.
   - Inference: exploration prompts could say to spend leftover budget on the cheapest open gaps before stopping, and the coordinator should not pre-write the report's justification. Qualified: one execution; the story calls the budget a limit, not a target.
 
-## DD-157 — Per-slice refactor passes on a documentation-only UAT report kept restructuring the previous slice's text
+## ODF-193 — Per-slice refactor passes on a documentation-only UAT report kept restructuring the previous slice's text
+Former local code: DD-157.
 
 Each of three report-writing slices ended with a fresh post-change refactor agent. The second pass merged lists that the first pass had just shaped (two "what worked" notes, two coverage-gap lists, two small-items lists), because the report's final shape only exists after the last slice.
 
@@ -784,7 +853,8 @@ Each of three report-writing slices ended with a fresh post-change refactor agen
   - Observed effect: about 230k tokens and three agent round trips for text-only changes; the merges were useful but partly repeated.
   - Inference: a single refactor pass after the last report slice, or slicing the UAT so only the final slice writes the synthesis and structure, may give the same result for less. Qualified: the passes also fixed real duplication and wording.
 
-## DD-158 — `execution-start.mjs` guidance names a "publisher ID" without its flag, and `--publisher` is refused
+## ODF-194 — `execution-start.mjs` guidance names a "publisher ID" without its flag, and `--publisher` is refused
+Former local code: DD-158.
 
 The execute-plan skill text lists a "stable execution publisher ID" as a start input without naming the flag. The coordinator passed `--publisher`, which the script refused as `missing publisherId`; the usage line shows `--publisher-id`.
 
@@ -794,7 +864,8 @@ The execute-plan skill text lists a "stable execution publisher ID" as a start i
   - Evidence: start result `{"ok":false,"status":"invalid-request","error":"missing publisherId"}`; usage line in `execution-start.mjs`.
   - Observed effect: one refused call and a usage lookup; no state change.
 
-## DD-160 — The file-size check split an untouched block in one slice of an execution and was waived in a later slice
+## ODF-195 — The file-size check split an untouched block in one slice of an execution and was waived in a later slice
+Former local code: DD-160.
 
 Within one execution, the post-change refactor treated an already-oversized file differently in two slices. In slice 1, a two-line class change to `BookReadingBookLayout.vue` (354 lines before the change) led the refactor agent to move the unrelated drag-to-indent pointer handling into a new composable. In slice 3, `BookReadingContent.vue` (474 → 453 lines) was left over the limit as "not caused nor worsened by this slice".
 
@@ -805,29 +876,8 @@ Within one execution, the post-change refactor treated an already-oversized file
   - Observed effect: about 15 minutes of refactor time in slice 1, plus a desktop re-proof (`reorganize_layout.feature`, `book_browsing.feature`) for code the story did not touch. Slice 3 took the other path, with no extraction.
   - Inference: `refactor-checks.md` "File size" does not say whether a file that was already over the limit, and that a slice barely touches, must be split. Agents resolve this differently, and the time cost follows whichever reading they pick. Related to DD-144 (a small addition tipping a file over the limit) and ODF-152; here the file was over the limit before the change.
 
-## DD-162 — A grep-based plan premise named tests that never reached the changed path
-
-The plan listed five tests to switch to real PDFs because they held fake `%PDF` bytes. Two of them store books through `makeMe`, not attach, so the new check never ran for them. Slice 1 changed them anyway, and its refactor pass reverted both.
-
-### Occurrences
-
-- Execution: SEED-059#story-3 / slice-plans/051-pdf-layout-from-bookmarks / 946e2a70e3; Timestamp: 2026-09-29 (slice 1); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.46.
-  - Evidence: plan *Decisive premises* row "Backend tests attach fake PDF bytes" (`grep -rn "0x25, 0x50"`); slice 1 refactor report item 2 (`BooksControllerTest`, `NotebookGitWebAttachmentDeleteControllerTest` back to HEAD).
-  - Observed effect: two files changed and reverted within one slice; small cost.
-  - Inference: the premise matched a symptom (fake bytes) rather than the path (attach callers). Related to the planning-premise family (DD-128, DD-137).
-
-## DD-163 — A probe on a copy of the viewer missed how landing affects the current block, so slice 2 failed to converge twice
-
-The owner-requested probe measured landing in headless Chrome on a standalone page that copied `EpubBookViewer`. It found the landing cause but did not observe the current-block reporting that depends on landing, or overlapping epub.js displays. The plan split landing (slice 2) from the current-block rule (slice 3) with interim `@ignore`s on that assumption.
-
-### Occurrences
-
-- Execution: SEED-059#story-1 / `e733844d01:.planning/slice-plans/049-epub-land-and-track-chosen-place/PLAN.md` / 485ed2eb49; Timestamp: unknown (2026-09-29, before the slice 2 CI run at 04:45Z); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.46.
-  - Evidence: slice 2 attempt 1 (about 6 min) broke "Resume EPUB reading at the last position"; the consolidated attempt (about 25 min, 201k subagent tokens) stopped at 11 of 13; refinements b1746859a4 and 179187e58b; the third attempt converged in about 5 min from the parked patch.
-  - Observed effect: two non-converged attempts and two plan refinements before slice 2 was delivered.
-  - Inference: a probe through the real app, or one that also recorded the `relocated` events after landing, would likely have shown the coupling. Parking each attempt as a patch in the plan folder kept its work and let the next attempt start from it. Qualified: one execution.
-
-## DD-164 — An implementer reshaped a test fixture until the new scenario passed, and reported that no product change was needed
+## ODF-196 — An implementer reshaped a test fixture until the new scenario passed, and reported that no product change was needed
+Former local code: DD-164.
 
 For "opening a new EPUB marks nothing", the implementer's first cover (a separate spine file, the Gutenberg shape) had no layout block and the scenario failed. It then moved the cover inside a file the table of contents targets, which the extractor already handled, and returned "no product change was needed".
 
@@ -838,7 +888,8 @@ For "opening a new EPUB marks nothing", the implementer's first cover (a separat
   - Observed effect: one extra implementation round; without the check, the story's key example would have been reported as met while failing on the real book.
   - Inference: fixture changes that turn a failing scenario green should be checked against the story's real example, not only against the scenario. The implementer did name the gap, which made the check possible.
 
-## DD-166 — Plan edits by text replacement silently did nothing, and five slices' learnings never reached the plan
+## ODF-197 — Plan edits by text replacement silently did nothing, and five slices' learnings never reached the plan
+Former local code: DD-166.
 
 The coordinator appended learnings with a script that replaced an anchor copied from its own earlier edit. The file's line wrapping differed, so the replacement matched nothing, and each later append used the previous one as its anchor. Only the slice 1 learning stayed in the plan.
 
@@ -849,29 +900,8 @@ The coordinator appended learnings with a script that replaced an anchor copied 
   - Observed effect: during execution the plan did not carry the slice 2 attempts, the CI repair, or the slice 3–6 causes, so a resumed execution would have lost them. No product effect.
   - Inference: asserting that each anchor is present before replacing would have stopped the first failed edit.
 
-## DD-167 — A correction to merge two lookups was planned without checking that they choose the same result
-
-The retrospective that created SEED-059#story-14 saw two EPUB rendered-view lookups and planned to merge them. Nobody compared their matching rules before planning. At execution, the first slice 2 attempt found that they choose different sections when one stored path matches two spine items. Execution had to stop for an owner decision. The plan's "stop and report instead of choosing one" guard worked as intended.
-
-### Occurrences
-
-- Execution: SEED-059#story-14 / `.planning/slice-plans/055-epub-resume-tests-and-rendered-view/PLAN.md` / 09ca632dea; Timestamp: 2026-09-29 (slice 2 first attempt; exact time unknown); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.46.
-  - Evidence: slice 2 Decision paragraph in plan 055 at 0e9048812c; `epubSpinePathMatches` suffix rule in `frontend/src/lib/book-reading/epubHrefMatch.ts`.
-  - Observed effect: one implementation-agent round of about 57k tokens returned no change, and the owner was asked one question. The recommended option was accepted and no work was lost.
-  - Inference: reading the two matching rules while planning the correction (a few minutes) would have found the difference and taken the decision to the owner before the plan. Qualified: one occurrence.
-
-## DD-168 — A plan named an existing "no block marked" step for a scenario whose fixture always auto-marks another block
-
-The plan's decisive premises confirmed by grep that "no book block should be marked in the book layout" exists, and slice 2's behavior used it after choosing "Chapter Alpha" in the minimal EPUB. Choosing Chapter Alpha always auto-marks the structural "Part One" read (covered by an existing scenario), so the assertion could not hold.
-
-### Occurrences
-
-- Execution: SEED-059#story-6 / slice-plans/056-change-or-clear-reading-mark / 7c9935b2c2; Timestamp: 2026-09-29 (slice 2 implementation, between 17:53 and 18:12 +08:00); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.47.
-  - Evidence: plan *Decisive premises* "E2E setup and steps exist … Confirmed by grep"; slice 2 implementation report ("My first green run failed on `no book block should be marked` (found 1)"); new step "book block {string} should not be marked in the book layout" in 5cab6e8827.
-  - Observed effect: one failed EPUB feature run and a new step; the plan's slice 2 behavior text was corrected during delivery. Small cost.
-  - Inference: the premise checked that a step exists, not that it holds for the chosen fixture path. Related to DD-162 (a grep premise that did not reach the changed path).
-
-## DD-169 — The CI stop hook re-announced an already-stopped lost observer at every coordinator stop
+## ODF-144 — The CI stop hook re-announced an already-stopped lost observer at every coordinator stop
+Former local code: DD-169.
 
 After the CI observer lost its worker, the coordinator reported the lost coverage, stopped that mailbox with `ci-mailbox.mjs stop`, and waited for a delegated agent. The Stop hook still sent the same "CI observer lost its worker" notice every time the coordinator ended a turn, so each wait turn became another status-only reply.
 
@@ -886,40 +916,8 @@ After the CI observer lost its worker, the coordinator reported the lost coverag
   - Observed effect: two blocked turn ends and the notice on every tool call; the coordinator deleted this session's binding file for the stopped mailbox to continue.
   - Inference: a second session confirms the binding to a lost mailbox survives both `stop` and a new observer's attachment.
 
-## DD-170 — A delegated slice's hand-back never reached the coordinator during a disk-full episode; the fallback heartbeat resumed it
-
-The coordinator had scheduled a 30-minute fallback wake-up when it delegated slice 1. Slice 3's implementer handed back while the disk was full. No completion notification appears in the coordinator's history. The coordinator resumed only when the heartbeat fired, found the disk had space again, and accepted slice 3 from the diff.
-
-### Occurrences
-
-- Execution: SEED-059#story-17 / slice-plans/059-reopen-epub-at-exact-paragraph / 946dccd30f; Timestamp: 2026-09-29T12:12:17Z (hand-back) to 12:19:00Z (heartbeat resume); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.47.
-  - Evidence: subagent `a672003fc5545b1f6` ended with SubagentHandback at 12:12:17Z. The coordinator's next input is the 11:48:27Z `ScheduleWakeup` prompt, whose text still said "waiting on slice 1 probe agent". The coordinator then noted "Disk space is back (8.1 GiB free)". The CI observer lost its worker in the same episode (DD-169).
-  - Observed effect: about 7 minutes idle; nothing was lost, because the coordinator read slice 3's result from the worktree diff.
-  - Inference: the host lost the notification while the disk was full. Useful practice: keep a fallback heartbeat whenever a delegated agent is running, and accept its work from the checkout when its report is missing. Qualified: one occurrence, environmental cause.
-
-## DD-171 — A removal plan checked what it deleted but not the journey right after it, so two older panel rules surfaced as stops
-
-Plan 053's premises confirmed what snap-back did and that only it used scroll suppression, and listed "panel appears after scrolling past" as must-keep. It did not look at what happens when the reader scrolls past without marking, which snap-back had made rare: the panel hid once the next block became current, and the fixed panel shared one bottom slot with the "Now reading" bar, which covered it.
-
-### Occurrences
-
-- Execution: SEED-059#story-5 / slice-plans/053-pdf-smooth-scroll-after-choosing-block / 5989892325; Timestamp: 2026-09-29T21:45+08:00 through 22:15:52+08:00 (slice 1 implementation to commit); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.47.
-  - Evidence: slice 1 hand-backs stopping at "the panel element never appears" (`panelShownBecauseScrolledPastContent` required `successor.id !== currentBlockId`) and then at "`read-from-here` covers `book-reading-mark-as-read`" (both overlays `absolute left-0 right-0 bottom-0 z-20`); owner question answered "Stack the two"; fix in 5989892325 (`ReadingOverlayDock.vue`).
-  - Observed effect: two implementation stops, one owner decision on a scope the story had deferred (panel position), and slice 1 took about 30 minutes against a ~5-minute target.
-  - Inference: reading `blockAwaitingConfirmation` and the overlay classes for the story's own "scroll past without marking" key example would have shown both at planning. Related to DD-162 and DD-163 (premises that stopped short of the consuming step).
-
-## DD-172 — Managed increment delivery rejected a remote-tracking target ref; the only example of the accepted form is in the wrap-up reference
-
-Trunk publication's "Publish the candidate" asks for an "authorized target ref" but does not give its form. `execution-increment-delivery.mjs deliver` accepts only a full branch ref (`refs/heads/<branch>`). The only worked example of that form is in `wrap-up-closure-publication.md`.
-
-### Occurrences
-
-- Execution: SEED-059#story-20 / slice-plans/062-stale-epub-place-reopens-at-block-start / a18764005f; Timestamp: 2026-09-29, ~23:25+08:00 (slice 1 delivery); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.47.
-  - Evidence: the first `deliver --target-ref origin/story/seed-059-story-20` exited with "authorized target must be a branch ref: origin/story/seed-059-story-20". A retry with `refs/heads/story/seed-059-story-20` was accepted.
-  - Observed effect: one rejected delivery call. Nothing was published or changed.
-  - Inference: the cost is small, but every coordinator that reads only trunk-publication.md can hit it. One example next to that step would prevent it.
-
-## DD-173 — A slice's premise that one code swap fixes a UAT defect was not tested first, and its spec passed before the change
+## ODF-198 — A slice's premise that one code swap fixes a UAT defect was not tested first, and its spec passed before the change
+Former local code: DD-173.
 
 Slice 5 of SEED-059#story-16 was planned as "marking goes on after choosing 'Chapter 12'" once the current-block rule and `hasNoTextOfItsOwn` suffice. The implementer wrote the spec first and it already passed with the old `hasDirectContent`; the swap is equivalent for PDF. The UAT symptom (panel hidden for 3-4 pages) was not reproduced.
 
