@@ -249,3 +249,10 @@ assimilate.
   it is not promised to be cleaned up.
 - Frontend numbered-key suggestions (`nextAvailablePropertyKeyFor*` in `noteContentPropertyKeys.ts`) stay; story 2 and
   SEED-064#story-6 decide their removal.
+
+## Execution complete
+
+Product advice: no reorder. SEED-064#story-6 and then SEED-063#story-2 are already next in the queue. Story 2 can reuse
+`PropertyMemoryTrackerService.followPropertyValue`, `PropertyFocus` identity and `FrontmatterInPlaceEdit.addTopLevelListItem`;
+SEED-064#story-6 should reuse the frontend list append and `assimilableListValues` for its existing-key rule. The
+frontend `assimilableListValues` repeats the backend planner's list-item rule; keep them in step.
