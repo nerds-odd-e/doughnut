@@ -47,9 +47,9 @@ candidate 3 in that report. Line effects are that report's estimates.
     assimilation behavior, not properties layout; the owner has not decided whether they are wanted;
   - merging the `noteContent*` utilities, one YAML parser for both languages, replacing the value field with a plain
     input, changing the value dialog, and a new confirmation dialog for remove (report, "Not recommended").
-- **Direction shared with SEED-063 (multiple values of one property, no numbered keys):** SEED-063 will replace the
-  numbered-key convention (`url 2`, `example of two`) with several values under one key, each with its own tracker;
-  its storage and editing representation is still undecided. The code that produces numbered keys today is
+- **Direction shared with SEED-063 (multiple values of one property, no numbered keys):** SEED-063 replaces the
+  numbered-key convention (`url 2`, `example of two`) with several values under one key (a YAML list), each value
+  with its own tracker; that rule is in the product now, and converting existing numbered keys is SEED-063#story-2. The code that produces numbered keys today is
   `propertyKeyBaseAndSuffix` and `nextAvailablePropertyKeyForBase` / `ForPreset` in
   `frontend/src/utils/noteContentPropertyKeys.ts`, plus the duplicate-key rule that shows "Duplicate property keys are
   not allowed." This seed therefore (a) does not add, keep or test numbered-key behavior, (b) does not decide what
@@ -139,9 +139,9 @@ Effort bands: S = 30–60 minutes, M = 1–2 hours, L = 2–4 hours, including d
   promise); the add journey changes, so protecting tests come first: key-only and value-only add tests (none exist
   today), and the e2e page object follows the new Add step.
 - **Effort hypothesis:** L, medium confidence: the highest risk of the seed.
-- **Boundary with SEED-063:** story 6 no longer depends on SEED-063. Whichever is delivered second adapts to the
-  other: if SEED-063 lands first, the draft's Add uses its rule for an existing key; if story 6 lands first, SEED-063
-  changes the one add path the draft row uses.
+- **Boundary with SEED-063:** story 6 no longer depends on SEED-063. SEED-063's per-value rule has landed, so the
+  draft's Add uses it for an existing key: the value is appended to that key's list
+  (`propertyRowsAfterAppendingValueToExactKey`), and `assimilableListValues` gives the values tracked separately.
 - **Depends on:** story 5 (the shared row the draft is built from; Taken). Story 2 is delivered.
 - **Real-iPad check:** the draft row, its focus and the 44 px Add and Cancel controls on a real iPad keyboard and
   touch.
@@ -171,7 +171,7 @@ When the owner selects note properties, iPad or phone comfort, or simplification
 - UAT report: `1986473b79:.planning/seeds/SEED-061-note-properties-ux-uat.md`, section `## UAT Findings`
   (screenshots were not committed).
 - Related queued work in the same area: [SEED-062](SEED-062-reify-property.md#story-1),
-  [SEED-063](SEED-063-track-property-values-separately.md#story-1). Both add to the properties rows; story 5 gives
+  [SEED-063](SEED-063-track-property-values-separately.md#story-2). Both add to the properties rows; story 5 gives
   them one row to extend; story 6 uses whichever rule for repeated keys is current when it is delivered.
 - Code: `frontend/src/components/form/RichFrontmatter*.vue`,
   `frontend/src/composables/useRichFrontmatterPropertyEditing.ts`, `frontend/src/utils/noteContentFrontmatter*.ts`.
