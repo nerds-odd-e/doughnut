@@ -37,6 +37,8 @@
       :last-saved-markdown="lastSavedMarkdown"
       :note-id="noteId"
       :heading-id="headingId"
+      :validation-message="validationMessage"
+      :validation-row-index="validationRowIndex"
       @row-focus="onRowFocus"
       @commit="commitRow"
       @remove="removeRow"
@@ -45,15 +47,10 @@
       @relation-type-selected="onRelationTypeSelected"
       @image-upload-state="emits('image-upload-state', $event)"
     />
-    <p
-      v-if="validationMessage"
-      role="alert"
-      aria-live="polite"
-      class="text-error text-xs mt-1"
-      data-testid="rich-note-property-validation"
-    >
-      {{ validationMessage }}
-    </p>
+    <RichFrontmatterPropertyValidationMessage
+      v-if="validationMessage && validationRowIndex === undefined"
+      :message="validationMessage"
+    />
     <button
       v-if="showInsertChrome && !insertOpen && propertyRows.length === 0"
       type="button"
@@ -106,6 +103,7 @@ import RichFrontmatterReadOnlyList from "@/components/form/RichFrontmatterReadOn
 import RichFrontmatterEditablePropertyList from "@/components/form/RichFrontmatterEditablePropertyList.vue"
 import RichFrontmatterInsertForm from "@/components/form/RichFrontmatterInsertForm.vue"
 import RichFrontmatterPropertyNotFound from "@/components/form/RichFrontmatterPropertyNotFound.vue"
+import RichFrontmatterPropertyValidationMessage from "@/components/form/RichFrontmatterPropertyValidationMessage.vue"
 import { richFrontmatterIsReadmeContextKey } from "@/components/form/richFrontmatterProvide"
 import WikidataAssociationDialog from "@/components/notes/WikidataAssociationDialog.vue"
 import type { WikiLink } from "@generated/donut-backend-api"
@@ -151,6 +149,7 @@ const insertOpen = ref(false)
 const draftKey = ref("")
 const draftValue = ref("")
 const validationMessage = ref("")
+const validationRowIndex = ref<number>()
 const rowSnapshots = ref<Record<number, PropertyRow>>({})
 const wikidataSearchKeyForDialog = computed(
   () => props.noteTitleForWikidataSearch ?? ""
@@ -159,11 +158,13 @@ const wikidataAssociationDialogRef = ref<InstanceType<
   typeof WikidataAssociationDialog
 > | null>(null)
 
-const setValidationMessage = (msg: string) => {
+const setValidationMessage = (msg: string, rowIndex?: number) => {
   validationMessage.value = msg
+  validationRowIndex.value = rowIndex
 }
 const clearValidation = () => {
   validationMessage.value = ""
+  validationRowIndex.value = undefined
 }
 
 const {
@@ -233,7 +234,7 @@ watch(
     insertOpen.value = false
     draftKey.value = ""
     draftValue.value = ""
-    validationMessage.value = ""
+    clearValidation()
     rowSnapshots.value = {}
     resetDialog()
   },

@@ -87,6 +87,19 @@ export function propertyValidationText(root: ParentNode): string {
   return el!.textContent ?? ""
 }
 
+export function propertyValidationMessages(root: ParentNode): HTMLElement[] {
+  return Array.from(
+    root.querySelectorAll('[data-testid="rich-note-property-validation"]')
+  ) as HTMLElement[]
+}
+
+export function validationMessageAfterRow(
+  root: ParentNode,
+  key: string
+): Element | null {
+  return root.querySelector(propertyRowSelector(key))!.nextElementSibling
+}
+
 export async function triggerRowKeyBlurValidation(wrapper: VueWrapper) {
   const keyInput = wrapper.find(
     '[data-testid="rich-note-property-row-key-input"]'
