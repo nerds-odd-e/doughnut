@@ -193,14 +193,6 @@ When(
   }
 )
 
-When(
-  'I create a book block from a long-text content block on the PDF',
-  // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
-  () => {
-    return bookReadingPage().createBookBlockFromLongTextContentBlockOnPdf()
-  }
-)
-
 Then(
   'I should see the {string} callout',
   // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
@@ -226,7 +218,7 @@ Then(
 )
 
 Then(
-  'I should be prompted to enter a title defaulting to truncated content',
+  'I should be prompted to enter a title defaulting to the paragraph',
   // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
   () => {
     return bookReadingPage().expectTitlePromptWithDefaultTitle()

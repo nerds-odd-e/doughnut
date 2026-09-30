@@ -167,19 +167,6 @@ export const bookReadingPdfMethods = () => ({
       .trigger('click', { bubbles: true, force: true })
     return this
   },
-  createBookBlockFromLongTextContentBlockOnPdf() {
-    this.scrollPdfBookReaderToPosition(2, 0)
-    cy.get('[data-testid="book-reading-book-layout"]')
-      .find('[data-current-selection="true"]')
-      .click()
-    cy.get('[data-derived-title-truncated="true"][data-book-content-block-id]')
-      .first()
-      .scrollIntoView()
-    cy.get('[data-derived-title-truncated="true"][data-book-content-block-id]')
-      .first()
-      .trigger('click', { bubbles: true, force: true })
-    return this
-  },
   expectNewBlockCallout() {
     waitUntilAppIsNotBusy()
     cy.get('[data-testid="new-book-block-callout"]').should('be.visible')

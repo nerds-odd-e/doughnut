@@ -37,8 +37,7 @@ export function usePdfBlockHighlight(opts: {
   function appendBboxHighlight(
     pageNumber: number,
     bbox: NormalizedPageBbox,
-    contentBlockId?: number,
-    derivedTitle?: string
+    contentBlockId?: number
   ) {
     const pdfViewer = opts.getPdfViewer()
     if (!pdfViewer) return
@@ -53,7 +52,6 @@ export function usePdfBlockHighlight(opts: {
       attachBookBlockSelectionBboxHighlight(pageView.div, {
         ...rect,
         contentBlockId,
-        derivedTitle,
       })
     )
   }
@@ -74,12 +72,7 @@ export function usePdfBlockHighlight(opts: {
       ) {
         continue
       }
-      appendBboxHighlight(
-        e.pageIndex + 1,
-        e.bbox,
-        e.contentBlockId,
-        e.derivedTitle
-      )
+      appendBboxHighlight(e.pageIndex + 1, e.bbox, e.contentBlockId)
     }
   }
 
