@@ -8,7 +8,6 @@ Bug fixing and general maintenance.
 ## Taken
 
 - [Identify note properties UX and design improvements through a one-hour manual UAT](seeds/SEED-061-note-properties-ux-uat.md#story-1) — SEED-061#story-1 ([plan](slice-plans/001-note-properties-uat/PLAN.md))
-- [Book reading E2E position checks do not sit on a page boundary](seeds/SEED-059-book-reading-uat-fixes.md#story-21) — SEED-059#story-21 ([plan](slice-plans/002-book-reading-e2e-position-checks/PLAN.md))
 
 ## Backlog list
 
