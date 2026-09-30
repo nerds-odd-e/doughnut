@@ -2,7 +2,7 @@
 
 Work item: **SEED-059#story-18**
 ([story](../../seeds/SEED-059-book-reading-uat-fixes.md#story-18)).
-Status: **story refined; one Behavior slice planned.**
+Status: **story refined; slice 1 done.**
 Story 16's delivery is on trunk; nothing blocks execution.
 
 ## Goal and scope
@@ -83,7 +83,7 @@ any backend or generated API change.
 
 ### 1. A reader gets the panel after a one-paragraph EPUB block
 Type: Behavior
-Status: planned
+Status: done
 Proof: new scenario "EPUB reading control panel is content-anchored after a
 one-paragraph block" in `epub_book.feature`, written first and seen failing.
 Focused check: `epub_book.feature` and `phone_reading.feature` through the
@@ -107,4 +107,14 @@ serves both the target and the anchor, and the scenario is the only observable.
 
 ## Learnings
 
-None yet.
+None that change remaining work.
+
+## Accepted proof
+
+- Slice 1: the new `epub_book.feature` scenario failed before the change (19
+  passing, 1 failing, on "the EPUB Reading Control Panel should be
+  content-anchored") and passes after it. Commands, all passing:
+  `./scripts/run.sh pnpm cy:run --spec e2e_test/features/book_reading/epub_book.feature`
+  (20 passing), the same with `phone_reading.feature` (7 passing), and
+  `./scripts/run.sh pnpm frontend:test tests/pages/BookReadingPage.readingPanelTarget.spec.ts tests/pages/BookReadingPage.readingControlPanel`
+  (3 files, 17 tests).

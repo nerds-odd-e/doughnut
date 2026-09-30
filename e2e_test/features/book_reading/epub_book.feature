@@ -31,6 +31,11 @@ Feature: EPUB book
       Then I should see the text "Body text with an illustration." in the EPUB reader
       And the EPUB Reading Control Panel should be content-anchored
 
+    Scenario: EPUB reading control panel is content-anchored after a one-paragraph block
+      When I choose the book block "Part One"
+      Then I should see the text "Opening paragraph for part one." in the EPUB reader
+      And the EPUB Reading Control Panel should be content-anchored
+
     Scenario: Current block updates on scroll while explicit book layout selection is unchanged
       When I choose the book block "Chapter Alpha"
       Then the book block "Chapter Alpha" should be the current selection in the book reader

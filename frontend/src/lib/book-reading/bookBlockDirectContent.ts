@@ -2,14 +2,14 @@ import type { BookBlockFull } from "@generated/donut-backend-api"
 
 /**
  * The last direct-content locator in a block, shared by PDF and EPUB readers for
- * the reading panel's target and anchoring. Returns `null` when the block has only
- * its start anchor (no direct content locators follow).
+ * the reading panel's target and anchoring. Returns `null` when the block has no
+ * text of its own (see `hasNoTextOfItsOwn`) or no locator at all.
  */
 export function lastDirectContentLocator(
   block: BookBlockFull
 ): BookBlockFull["contentLocators"][number] | null {
-  if (block.contentLocators.length <= 1) return null
-  return block.contentLocators[block.contentLocators.length - 1]!
+  if (hasNoTextOfItsOwn(block)) return null
+  return block.contentLocators.at(-1) ?? null
 }
 
 /**
