@@ -46,7 +46,7 @@ overrides:
   immutable: '>=5.1.5'
   ip-address: '>=10.7.1'
   joi: '>=18.2.4'
-  js-yaml: '>=5.2.2'
+  js-yaml: '>=5.4.1'
   'jsonpath-plus@<10.0.0': '>=10.2.0'
   linkify-it: 5.0.2
   lodash: '>=4.18.0'
