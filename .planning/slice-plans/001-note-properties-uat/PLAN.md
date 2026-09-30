@@ -63,7 +63,7 @@ Enables slices 2 and 3.
 
 ### 2. iPad findings are recorded
 Type: Behavior
-Status: todo
+Status: done
 Size: about 40 minutes of UAT budget.
 Proof: `## UAT Findings` in the seed gains setup, note characteristics, and iPad findings (portrait about
 820 px, landscape about 1180 px, touch), each with evidence.
@@ -127,3 +127,9 @@ the session.
   secure session cookie is refused over http.
 - First look, to confirm in slice 2: long keys and values are truncated; the floating yellow "T" button
   overlaps the rightmost row controls; adding `wikidata_id` may insert body text automatically.
+- Slice 2 (about 20 of 40 UAT minutes): iPad portrait and landscape findings are in the seed's
+  `## UAT Findings`. Read-only mode needs a second user, so notebook 22 was shared to the Bazaar and viewed
+  as `old_learner`. The yellow "T" button is the Testability menu (testing environment only), not a defect.
+  Unresolved for slice 3: Wikidata dialog Save showed no visible result for `Q42`; one Replace tap timeout
+  did not reproduce. Not reached: Assimilate/Skip taps, list reorder, relation type selection flow, rename
+  to an existing key. About 20 minutes remain in the exploration budget plus the reserve.
