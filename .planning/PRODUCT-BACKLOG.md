@@ -12,7 +12,7 @@ Bug fixing and general maintenance.
 
 ## Backlog list
 
-- [Saving a typed Wikidata ID that cannot be used tells the user why](seeds/SEED-064-note-properties-fixes.md#story-4) — SEED-064#story-4
+- [Saving a typed Wikidata ID shows the title choice even when the search found nothing](seeds/SEED-064-note-properties-fixes.md#story-4) — SEED-064#story-4
 - [Read-only properties look and link like the editable ones, without the row panel](seeds/SEED-064-note-properties-fixes.md#story-5) — SEED-064#story-5
 - [Reify a property](seeds/SEED-062-reify-property.md#story-1) — SEED-062#story-1
 - [Track each value of a property separately without numbered keys](seeds/SEED-063-track-property-values-separately.md#story-1) — SEED-063#story-1

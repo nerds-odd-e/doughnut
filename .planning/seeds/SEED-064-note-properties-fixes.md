@@ -188,20 +188,54 @@ Effort bands: S = 30–60 minutes, M = 1–2 hours, L = 2–4 hours, including d
 
 <a id="story-4"></a>
 
-### Saving a typed Wikidata ID that cannot be used tells the user why
+### Saving a typed Wikidata ID shows the title choice even when the search found nothing
 
 **Identity:** SEED-064#story-4
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"not-refined","approach":"unselected"}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/004-wikidata-typed-id-title-choice/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"28ae3509c41d88fe5cfcc9e62134d32ed772e2faf6189bd451682410a070cf43","plan":"4f04ce63e96af3dded0e4bf0c35b36c469aae147d917e9bc5930155b69f1f342"}}
 ```
 
-- **For / why:** with a typed ID such as `Q42` and an empty search list, Save closes nothing and shows nothing
-  (reproduced twice: iPad portrait and phone). With a chosen search result Save works.
-- **Evaluation:** in the Wikidata dialog type an ID with no matching search results and tap Save: the dialog either
-  saves the ID or shows a message that says why not. Which of the two is intended is decided at refinement, against
-  the Wikidata scenarios under `e2e_test/features/wikidata/`.
-- **Value / learning:** removes a silent dead end; settles whether a typed ID is a supported path.
-- **Effort hypothesis:** S, medium confidence: the cause is not yet found.
+- **Goal:** a user (iPad, phone or desktop; the cause is not device-specific) who types or pastes a Wikidata ID into a
+  property's Wikidata dialog, when the title search found nothing, sees what Save is asking. Typing an ID is an
+  intended way to fill the property (owner decision, 2026-09-30): it is the natural fallback exactly when the search
+  finds nothing. Today the first Save appears to do nothing (reproduced twice, iPad portrait and phone). Reading the
+  code, Save checks the ID and, when that entry's English label differs from the note title, is meant to show the
+  "Replace title" / "Add as alias" choice; the dialog hides that choice behind "No Wikidata entries found" whenever the
+  search list is empty. Nothing is lost and a second Save appears to apply the ID; the owner accepts a second Save as
+  long as the meaning is clear.
+- **Scope:**
+  - **Choice is visible.** In the property Wikidata dialog, Save on a typed ID whose English label differs from the note
+    title shows the "Replace title" / "Add as alias" choice and keeps the dialog open, whether or not the search list is
+    empty. The choice takes the place of the results area, as it already does when the search has results. The
+    "No Wikidata entries found" text is not shown beside it.
+  - **Second Save keeps the title.** With the choice showing, Save without choosing applies the ID and closes the
+    dialog, leaving the title as it is. This is today's behavior and is what the owner accepts as the second step; it is
+    proven, not changed.
+  - **Confirm the cause first.** The cause above is read from the code and not yet run. The first slice reproduces the
+    report with an empty search list; if the cause differs, that is reported to the owner before the fix.
+  - **Everything else stays as it is.** Label equal to the title, or an empty label, saves and closes at once; an
+    invalid ID or an unavailable service shows its existing message; choosing a search result works as before.
+  - **Real iPad check by the owner** (optional): a note whose title finds no Wikidata entries, type `Q42`, tap Save, and
+    confirm the choice is visible.
+- **Excluded (story decisions):**
+  - a message about why an ID cannot be used: there is no such case; real rejections already show their own messages;
+  - whether saving a property should offer to rename the note at all (existing behavior, a product question);
+  - the "No Wikidata entries found" wording, other dialog layout, and keyboard or viewport behavior;
+  - a Cypress scenario: a frontend component test with an empty search stub is the proof;
+  - a stale-ID hole found while reading: once the choice is showing, editing the ID and pressing Save applies the new ID
+    without checking it. It is reachable today after choosing a search result and is not changed here (finding for the
+    owner).
+- **Key examples:**
+  - Note "Snake", search list empty; type `Q42` (English label "Douglas Adams"), Save → the choice is shown and the
+    dialog stays open. Choose "Add as alias" → the ID is saved and the alias is added.
+  - Same, then Save again without choosing → the ID is saved, the dialog closes, the title is unchanged.
+  - Same setup, an ID whose label equals the title (any case) → saved and closed at once.
+  - Same setup, `Q12345R` → the existing invalid-ID message.
+  - Search list not empty, a result chosen whose label differs → the choice shows, as today.
+- **Value / learning:** removes a silent dead end on a route the owner keeps; settles that a typed ID is a supported
+  path.
+- **Effort hypothesis:** S, medium-high confidence: the likely cause is one template branch order; the first slice
+  confirms it.
 - **Depends on:** none.
 - **Safe stopping point:** independent.
 
@@ -271,7 +305,6 @@ Effort bands: S = 30–60 minutes, M = 1–2 hours, L = 2–4 hours, including d
 
 - Story 6 waits for SEED-063's representation; if SEED-063 is dropped or reordered later, story 6 keeps today's
   duplicate-key rule and its dependency on SEED-063 is removed.
-- Story 4: is a typed Wikidata ID without search results meant to be supported?
 - Not queued, owner has not decided: whether the row panel's Assimilate should move to another note after saving
   a property understanding item, and the wording of its Skip confirmation.
 
