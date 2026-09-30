@@ -70,7 +70,7 @@ which the desktop windows are not and a phone-width window can be.
 
 ### 1. The margin method reproduces the known phone failure
 Type: Structure
-Status: todo
+Status: done (revised: see Learnings)
 Size: about 10 minutes.
 Proof: a temporary local probe (an uncommitted step or spec that logs the reader's middle, the page 2
 boundary and the margin after landing block 2.2) run through `pnpm cy:run --spec
@@ -82,15 +82,21 @@ the probe is reverted (`git status` clean apart from this plan).
 
 Probe: if the probe cannot reproduce the seed's 1.5 px, stop dependent slices and revise this plan.
 
-Decision threshold, to be confirmed by this slice's data: a scenario is at risk when its margin is smaller
-than the shift the reader's middle moves between the 390 × 844 and 390 × 900 windows (half the height
-difference, about 28 px), since CI's window differed from that scale.
+Decision threshold (revised after slice 1 data): a scenario is at risk when its margin is smaller than
+about 37 px, the 28 px shift the reader's middle moves between the 390 × 844 and 390 × 900 windows (half
+the height difference, confirmed) plus the roughly 9 px landing offset seen locally. A negative margin
+(middle already past the boundary) is at risk by definition.
 
 Enables slice 2.
 
 ### 2. Every page-position scenario has a known margin and verdict
 Type: Structure
 Status: todo
+Probe: add the geometry log inside `expectCurrentPage` (and `expectPdfPositionAtTopOfReader`) in
+`e2e_test/start/pageObjects/bookReadingPdfMethods.ts`, appending one JSON line per call to a file with
+`cy.writeFile` (headless Cypress hides `console.log`), `cy.wait(1500)` before measuring, and one run per
+feature; the window comes from the "I am on a window W * H" step (`cy.viewport`); reader height is window
+height minus 55 px.
 Size: about 10 minutes.
 Proof: the inventory rows are each run once with the same temporary probe at their own window size; the plan
 gains the margin table and one verdict per row, and the other geometry-reading steps listed above are read
@@ -124,4 +130,12 @@ on which page holds the middle of the reader → the scenario passes at the wind
 
 ## Learnings
 
-None yet.
+- Slice 1 (local, `phone_reading.feature`, block 2.2 landed): at 390 × 844 the reader is 789 px high, page 2
+  spans 7.5–440.5 px (page height 433, page divs overlap by 7 px), the reader middle is 449.5 px, so the
+  middle is 9 px past page 2's bottom and the indicator reads "3 / 5"; the old middle-based step fails
+  locally at 844. At 390 × 900 the middle is 477.5 px (37 px past). The seed's 1.5 px margin was not
+  reproduced (local landing is about 9 px above the reader top, inside the 15 px tolerance; CI differed).
+  The method and the 28 px shift are confirmed; the repaired scenario is green at 844 and 900.
+- The plan's "reproduces 1.5 px" promise was not met literally; the plan was revised, not the method:
+  the qualitative failure (indicator on the wrong page) reproduces and the threshold now allows the
+  observed landing variance.
