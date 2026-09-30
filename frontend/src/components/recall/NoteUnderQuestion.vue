@@ -1,7 +1,10 @@
 <template>
   <div class="note-under-question bg-base-200 border-base-300">
     <div class="note-label bg-base-200 text-base-content">Note under question</div>
-    <FocusedPropertyIndicator :property-key="focusedPropertyKey" />
+    <FocusedPropertyIndicator
+      :property-key="focusedPropertyKey"
+      :property-value="focusedPropertyValue"
+    />
     <slot>
       <div class="breadcrumb-wrapper">
         <Breadcrumb
@@ -41,6 +44,10 @@ defineProps({
     default: undefined,
   },
   focusedPropertyKey: {
+    type: String as PropType<string | undefined>,
+    default: undefined,
+  },
+  focusedPropertyValue: {
     type: String as PropType<string | undefined>,
     default: undefined,
   },

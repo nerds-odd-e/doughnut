@@ -1,6 +1,7 @@
 package com.odde.donut.controllers.dto;
 
 import com.odde.donut.entities.Note;
+import com.odde.donut.entities.PropertyFocus;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
 import lombok.Data;
@@ -19,7 +20,9 @@ public class RecalledNote {
 
   private String propertyKey;
 
-  public static RecalledNote from(Note note, String propertyKey) {
+  private String propertyValue;
+
+  public static RecalledNote from(Note note, PropertyFocus propertyFocus) {
     if (note == null) {
       return null;
     }
@@ -27,8 +30,10 @@ public class RecalledNote {
     recalledNote.setNoteTopology(note.getNoteTopology());
     recalledNote.setNotebookId(note.getNotebook().getId());
     recalledNote.setAncestorFolders(FolderTrailSegment.of(note.folderTrailFromRoot()));
-    String key = propertyKey;
-    recalledNote.setPropertyKey(key == null || key.isEmpty() ? null : key);
+    if (propertyFocus != null) {
+      recalledNote.setPropertyKey(propertyFocus.key());
+      recalledNote.setPropertyValue(propertyFocus.listItemOrNull());
+    }
     return recalledNote;
   }
 }

@@ -346,6 +346,7 @@ export type RecalledNote = {
     notebookId: number;
     ancestorFolders?: Array<FolderTrailSegment>;
     propertyKey?: string;
+    propertyValue?: string;
 };
 
 export type AnswerSpellingDto = {
@@ -1080,6 +1081,7 @@ export type MemoryTrackerLite = {
     memoryTrackerId: number;
     spelling: boolean;
     propertyKey?: string;
+    propertyValue?: string;
 };
 
 export type MenuDataDto = {

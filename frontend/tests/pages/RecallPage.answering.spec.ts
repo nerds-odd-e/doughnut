@@ -125,6 +125,17 @@ describe("RecallPage frequent failure warning", () => {
       'You\'ve answered the "topic" property incorrectly 7 times within the last 14 days.'
     )
   })
+
+  it("names the list value in the frequent failure warning", async () => {
+    thresholdExceeded(7)
+    await answer(
+      await ctx.mountPage(),
+      answeredMcq(false).withPropertyKey("example of", "[[run]]").please()
+    )
+    expect(alertMock).toHaveBeenCalledWith(
+      'You\'ve answered the "example of" property value "[[run]]" incorrectly 7 times within the last 14 days.'
+    )
+  })
 })
 
 describe("RecallPage speaking practice input", () => {

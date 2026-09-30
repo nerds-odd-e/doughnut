@@ -4279,6 +4279,8 @@ components:
             $ref: "#/components/schemas/FolderTrailSegment"
         propertyKey:
           type: string
+        propertyValue:
+          type: string
       required:
       - noteTopology
       - notebookId
@@ -5650,6 +5652,8 @@ components:
         spelling:
           type: boolean
         propertyKey:
+          type: string
+        propertyValue:
           type: string
       required:
       - memoryTrackerId

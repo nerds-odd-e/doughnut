@@ -2,6 +2,7 @@ package com.odde.donut.controllers.dto;
 
 import com.odde.donut.entities.Answer;
 import com.odde.donut.entities.Mcq;
+import com.odde.donut.entities.MemoryTracker;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.QuestionType;
 import com.odde.donut.entities.RecallPrompt;
@@ -38,9 +39,10 @@ public class AnsweredQuestion {
     AnsweredQuestion answeredQuestion = new AnsweredQuestion();
     answeredQuestion.setId(recallPrompt.getId());
     answeredQuestion.setQuestionType(recallPrompt.getQuestionType());
-    answeredQuestion.setMemoryTrackerId(recallPrompt.requireMemoryTracker().getId());
+    MemoryTracker memoryTracker = recallPrompt.requireMemoryTracker();
+    answeredQuestion.setMemoryTrackerId(memoryTracker.getId());
     answeredQuestion.setRecalledNote(
-        RecalledNote.from(recallPrompt.getNote(), recallPrompt.getPropertyKey()));
+        RecalledNote.from(recallPrompt.getNote(), memoryTracker.propertyFocus()));
     answeredQuestion.setAnswer(recallPrompt.getAnswer());
     if (recallPrompt.getQuestionType() == QuestionType.MCQ) {
       answeredQuestion.setMcq(recallPrompt.getMcq());

@@ -14,6 +14,7 @@ class AnsweredQuestionBuilder extends Builder<AnsweredQuestion> {
   private isCorrect = true
   private choiceIndexToUse?: number
   private propertyKeyToUse?: string
+  private propertyValueToUse?: string
   private memoryTrackerIdToUse = generateId()
   private idToUse?: number
   private questionType: 'MCQ' | 'SPELLING' = 'MCQ'
@@ -42,8 +43,9 @@ class AnsweredQuestionBuilder extends Builder<AnsweredQuestion> {
     return this
   }
 
-  withPropertyKey(propertyKey: string): this {
+  withPropertyKey(propertyKey: string, propertyValue?: string): this {
     this.propertyKeyToUse = propertyKey
+    this.propertyValueToUse = propertyValue
     return this
   }
 
@@ -141,6 +143,7 @@ class AnsweredQuestionBuilder extends Builder<AnsweredQuestion> {
         notebookId: this.notebookIdToUse,
         ancestorFolders: [],
         propertyKey: this.propertyKeyToUse,
+        propertyValue: this.propertyValueToUse,
       },
       answer,
       mcq,

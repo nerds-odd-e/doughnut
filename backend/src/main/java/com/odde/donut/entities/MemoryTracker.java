@@ -245,6 +245,6 @@ public class MemoryTracker extends EntityIdentifiedByIdOnly {
 
   @JsonProperty
   public RecalledNote getRecalledNote() {
-    return RecalledNote.from(getNote(), getPropertyKey());
+    return RecalledNote.from(getNote(), propertyFocus());
   }
 }

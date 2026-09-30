@@ -58,16 +58,7 @@ public class RecallService {
       User user, Timestamp currentUTCTimestamp, ZoneId timeZone, int dueInDays) {
     List<MemoryTrackerLite> toRepeat =
         getMemoryTrackersNeedToRepeat(user, currentUTCTimestamp, timeZone, dueInDays)
-            .map(
-                mt -> {
-                  MemoryTrackerLite lite = new MemoryTrackerLite();
-                  lite.setMemoryTrackerId(mt.getId());
-                  lite.setSpelling(mt.isSpelling());
-                  String propertyKey = mt.getPropertyKey();
-                  lite.setPropertyKey(
-                      propertyKey == null || propertyKey.isEmpty() ? null : propertyKey);
-                  return lite;
-                })
+            .map(MemoryTrackerLite::from)
             .toList();
     List<DueCommissionedMemoryTrackerLite> dueCommissioned =
         getCommissionedMemoryTrackersNeedToRepeat(user, currentUTCTimestamp, timeZone, dueInDays)

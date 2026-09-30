@@ -161,7 +161,9 @@ Behavior: a tracker (`example of`, `[[run]]`) → the property focus block says 
 
 ### 4. Recall names the value being recalled
 Type: Behavior
-Status: planned
+Status: done — `RecallsControllerTests` (`MemoryTrackerLite`, `RecalledNote` carry the value; `''` sends null),
+`MemoryTrackerPageView.spec.ts` and `RecallPage.answering.spec.ts` red then green; API client regenerated. The note
+context reader still highlights the key row, not the value (not promised).
 Proof: `RecallsControllerTests` (`MemoryTrackerLite`, `RecalledNote` carry `propertyValue`) and a recall component spec
 on `FocusedPropertyIndicator`; API client regenerated.
 
