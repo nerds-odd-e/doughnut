@@ -34,15 +34,19 @@ refusals; trackers follow). Excluded: any change to which keys are structural.
 
 | Promise | Owner | Observable proof |
 | --- | --- | --- |
-| Reifying `source` (or `target`) of a relationship note is refused with a message and changes nothing | slice 1 | `NoteReifyPropertyTests.ValueThatCannotBeReified` new case(s), red then green |
+| Reifying `source` (or `target`) of a relationship note is refused with a message and changes nothing | slice 1 | `NoteReifyPropertyRefusalTests` structural-key case, red then green |
 | The row of a structural key shows Reify disabled with a reason; an ordinary link property still reifies | slice 2 | `RichMarkdownEditor.propertyReify.spec.ts` new case, red then green; vue-tsc |
 
 ## Ordered slices
 
 ### 1. The server refuses reifying a structural key
 Type: Behavior
-Status: planned
-Proof: `CURSOR_DEV=true nix develop -c ./backend/gradlew -p backend test --tests '*NoteReifyPropertyTests*' -Dspring.profiles.active=test`.
+Status: done
+Proof: `CURSOR_DEV=true nix develop -c ./backend/gradlew -p backend test --tests '*NoteReifyProperty*' -Dspring.profiles.active=test`.
+
+Accepted proof: `NoteReifyPropertyRefusalTests.structuralKeyIsRefusedWithTheReasonAndChangesNothing` (source, target;
+red before the fix) asserts 400 "A structural property cannot be reified.", unchanged content and note count. The
+refusal cases moved from `NoteReifyPropertyTests.ValueThatCannotBeReified` to `NoteReifyPropertyRefusalTests` (file size).
 
 Behavior: relationship note with `source: "[[Src]]"` → reify `source` → 400 "A structural property cannot be reified."
 (wording may follow neighbouring messages); note content and note count unchanged. Check before the value checks, using

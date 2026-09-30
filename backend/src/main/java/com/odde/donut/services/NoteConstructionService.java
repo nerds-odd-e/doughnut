@@ -6,6 +6,7 @@ import com.odde.donut.algorithms.Frontmatter;
 import com.odde.donut.algorithms.NoteContentMarkdown;
 import com.odde.donut.algorithms.NoteContentTitleHeading;
 import com.odde.donut.algorithms.NoteLeadingFrontmatter;
+import com.odde.donut.algorithms.PropertyKeyNaming;
 import com.odde.donut.algorithms.RelationshipNoteComposition;
 import com.odde.donut.algorithms.WikiLinkMarkdown;
 import com.odde.donut.controllers.dto.NoteCreationDTO;
@@ -166,6 +167,10 @@ public class NoteConstructionService {
     if (!frontmatter.containsKeyIgnoreCase(propertyKey)) {
       throw new ResponseStatusException(
           HttpStatus.BAD_REQUEST, "The note has no property " + propertyKey + ".");
+    }
+    if (PropertyKeyNaming.isReservedStructuralKey(propertyKey)) {
+      throw new ResponseStatusException(
+          HttpStatus.BAD_REQUEST, "A structural property cannot be reified.");
     }
     String targetLink =
         frontmatter
