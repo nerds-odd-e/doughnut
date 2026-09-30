@@ -22,6 +22,17 @@ Feature: Book browsing
       Then the book reader PDF viewport should be on page 2
       And the book block "2.2 Refactoring as Strengthening the Code" should be the current selection in the book reader
 
+    Scenario Outline: Choosing a book block lands its start at the top and makes it current
+      When I choose the book block "<block>"
+      Then the top of the PDF book reader should be at <y> of 1000 down page <page>
+      And the book block "<block>" should be the current block in the book reader
+
+      Examples:
+        | block                                                    | page | y   |
+        | 1. Refactoring: Protecting Intention in Working Software | 1    | 252 |
+        | 2.2 Refactoring as Strengthening the Code                | 2    | 89  |
+        | Code Refactoring                                         | 1    | 72  |
+
     Scenario: Scrolling the PDF updates the current block
       When I scroll the PDF book reader to bring page 2 into primary view
       Then the book reader PDF viewport should be on page 2
@@ -61,6 +72,8 @@ Feature: Book browsing
       When I choose the book block "4. Two Different Kinds of Refactoring"
       Then the book reader PDF viewport should be on page 4
       And the book block "4. Two Different Kinds of Refactoring" should be the current selection in the book reader
-      When I scroll the PDF book reader to the top of page 5
+      When I scroll the PDF book reader to 0 of 1000 down page 5
       Then the book reader PDF viewport should be on page 5
-      And the book block "5. Refactoring in Team Development" should be the current block in the book reader
+      And the book block "4. Two Different Kinds of Refactoring" should be the current block in the book reader
+      When I scroll the PDF book reader to 95 of 1000 down page 5
+      Then the book block "5. Refactoring in Team Development" should be the current block in the book reader

@@ -42,7 +42,7 @@ Feature: Reading a book on a phone
     And I open the book attached to notebook "Refactoring read"
     When I choose the book block "2.2 Refactoring as Strengthening the Code"
     Then the book layout should be closed
-    And the book reader PDF viewport should be on page 2
+    And the top of the PDF book reader should be at 89 of 1000 down page 2
     And the book block "2.2 Refactoring as Strengthening the Code" should be the current selection in the book reader
 
   Scenario: Tapping outside the book layout closes it and keeps the place

@@ -4,7 +4,11 @@ import { mockSdkService } from "@tests/helpers"
 import makeMe from "donut-test-fixtures/makeMe"
 import { flushPromises } from "@vue/test-utils"
 import { beforeAll, beforeEach, describe, expect, it, vi } from "vitest"
-import { emitViewportAndSettleCurrentBlock } from "./bookReadingPageInteractionTestSupport"
+import {
+  clickBookBlockAndExpectSelection,
+  emitViewportAndSettleCurrentBlock,
+} from "./bookReadingPageInteractionTestSupport"
+import { spyOnScrollToBookNavTarget } from "./bookReadingPagePdfViewerTestSupport"
 import {
   type BookReadingPageWrapper,
   bookId,
@@ -158,7 +162,7 @@ describe("BookReadingPage", () => {
 
       await emitViewportAndSettleCurrentBlock(wrapper, {
         anchorPageIndexZeroBased: 0,
-        viewport: null,
+        viewport: { top: 520, mid: 600, bottom: 1000 },
         pagesCount: 10,
       })
 
@@ -168,6 +172,30 @@ describe("BookReadingPage", () => {
       expect(current.attributes("aria-current")).toBe("location")
       expect(current.text()).toBe("Section 3")
     })
+
+    it.each(["Section 4", "Section 5", "Section 6"])(
+      "keeps chosen %s current among blocks sharing a start, and moves on when scrolled past",
+      async (title) => {
+        const wrapper = await mountLoadedBookWithBlocks(notebookId)
+        spyOnScrollToBookNavTarget(wrapper)
+        await clickBookBlockAndExpectSelection(wrapper, title)
+        await emitViewportAndSettleCurrentBlock(wrapper, {
+          anchorPageIndexZeroBased: 1,
+          viewport: { top: 0, mid: 500, bottom: 1000 },
+          pagesCount: 10,
+        })
+        expect(wrapper.find('[data-current-block="true"]').text()).toBe(title)
+
+        await emitViewportAndSettleCurrentBlock(wrapper, {
+          anchorPageIndexZeroBased: 0,
+          viewport: { top: 600, mid: 700, bottom: 1000 },
+          pagesCount: 10,
+        })
+        expect(wrapper.find('[data-current-block="true"]').text()).toBe(
+          "Section 3"
+        )
+      }
+    )
 
     it("zoom buttons exist with accessible names and page indicator shows via PdfControl", async () => {
       const wrapper = await mountPlainPdfBook()

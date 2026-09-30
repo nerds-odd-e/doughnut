@@ -61,10 +61,10 @@ describe("normalizedBboxToPdfJsXyzDestArray", () => {
     ])
   })
 
-  it("maps a lower band with top padding above bbox top", () => {
+  it("maps a lower band to its bbox top", () => {
     const w = 400
     const h = 600
-    const yTopPdf = Math.max(0, (400 / 1000) * 600 - 40)
+    const yTopPdf = (400 / 1000) * 600
     expect(
       normalizedBboxToPdfJsXyzDestArray(w, h, [10, 400, 200, 550])
     ).toEqual([null, { name: "XYZ" }, (105 / 1000) * 400, h - yTopPdf, null])

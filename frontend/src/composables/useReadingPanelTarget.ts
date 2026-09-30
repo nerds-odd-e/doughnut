@@ -1,4 +1,7 @@
-import { lastDirectContentLocator } from "@/lib/book-reading/bookBlockDirectContent"
+import {
+  hasNoTextOfItsOwn,
+  lastDirectContentLocator,
+} from "@/lib/book-reading/bookBlockDirectContent"
 import type { BookReadingPdfViewerRef } from "@/composables/bookReaderViewerRef"
 import type { BookBlockFull } from "@generated/donut-backend-api"
 import { computed, type ComputedRef, type Ref, ref, watch } from "vue"
@@ -12,10 +15,6 @@ function successorOf(
     return null
   }
   return rows[selIdx + 1]!
-}
-
-function hasDirectContent(row: BookBlockFull): boolean {
-  return lastDirectContentLocator(row) !== null
 }
 
 export function useReadingPanelTarget(options: {
@@ -48,7 +47,7 @@ export function useReadingPanelTarget(options: {
     if (
       successor === null ||
       hasRecordedDisposition(successor.id) ||
-      !hasDirectContent(successor)
+      hasNoTextOfItsOwn(successor)
     )
       return null
     return successor
@@ -63,11 +62,11 @@ export function useReadingPanelTarget(options: {
     }
     const successor = successorOf(bookBlocks.value, selId)
     if (successor === null) {
-      return hasDirectContent(target) && lastContentBottomVisible.value
+      return !hasNoTextOfItsOwn(target) && lastContentBottomVisible.value
         ? target
         : null
     }
-    if (hasDirectContent(target)) {
+    if (!hasNoTextOfItsOwn(target)) {
       return geometryEverVisibleForSelection.value ? target : null
     }
     return successor.id === currentBlockId.value ? target : null

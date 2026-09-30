@@ -1,11 +1,6 @@
-import { pdfLocatorsFromBlock } from "@/lib/book-reading/asPdfLocator"
-import { currentBlockIdFromVisiblePage } from "@/lib/book-reading/currentBlockIdFromVisiblePage"
 import type { ViewportYRange } from "@/lib/book-reading/pdfViewerViewportTopYDown"
-import type {
-  BookBlockFull,
-  PdfLocatorFull,
-} from "@generated/donut-backend-api"
-import { computed, ref, toValue, type MaybeRefOrGetter } from "vue"
+import type { PdfLocatorFull } from "@generated/donut-backend-api"
+import { computed, ref } from "vue"
 
 export type PdfViewportPayload = {
   anchorPageIndexZeroBased: number
@@ -14,10 +9,8 @@ export type PdfViewportPayload = {
   readingPosition?: { pageIndexZeroBased: number; normalizedTop: number } | null
 }
 
-/** What the PDF viewer's latest viewport shows: page counter, reading position, current-block candidate. */
-export function usePdfViewportPosition(
-  bookBlocks: MaybeRefOrGetter<readonly BookBlockFull[]>
-) {
+/** What the PDF viewer's latest viewport shows: page counter, reading position. */
+export function usePdfViewportPosition() {
   const payload = ref<PdfViewportPayload | null>(null)
 
   const currentPage = computed(() => {
@@ -52,29 +45,10 @@ export function usePdfViewportPosition(
     }
   }
 
-  /** Maps the anchor page and viewport Y-range to the block being read. */
-  function currentBlockCandidate(p: PdfViewportPayload): number | null {
-    return currentBlockIdFromVisiblePage(
-      toValue(bookBlocks).map((r) => {
-        const first = pdfLocatorsFromBlock(r)[0]
-        return {
-          id: r.id,
-          firstBbox: first
-            ? { pageIndex: first.pageIndex, bbox: first.bbox }
-            : undefined,
-        }
-      }),
-      p.anchorPageIndexZeroBased,
-      p.viewport,
-      p.pagesCount
-    )
-  }
-
   return {
     payload,
     currentPage,
     pagesTotal,
     readingPositionLocator,
-    currentBlockCandidate,
   }
 }

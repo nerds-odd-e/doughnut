@@ -12,6 +12,9 @@ import {
 const pdfPageSelector = (pageNumber: number) =>
   `[data-testid="pdf-book-viewer"] .pdfViewer .page[data-page-number="${pageNumber}"]`
 
+/** pdf.js lands a start within about 1% of the page height of the top, far less than the 40 pt padding it replaces. */
+const START_AT_TOP_TOLERANCE_PX = 15
+
 export const bookReadingPdfMethods = () => ({
   expectPdfPagesUseScreenWidth() {
     this.expectCurrentPage(1)
@@ -38,25 +41,16 @@ export const bookReadingPdfMethods = () => ({
       })
     return this
   },
-  scrollPdfBookReaderToTopOfPage(pageNumber: number) {
+  scrollPdfBookReaderToPosition(pageNumber: number, normalizedY: number) {
     waitUntilAppIsNotBusy()
     cy.get(pdfPageSelector(pageNumber))
       .first()
       // @ts-expect-error Cypress ScrollIntoViewOptions omits DOM `block`
       .scrollIntoView({ block: 'start' })
-    return this
-  },
-  scrollPdfBookReaderToBringPage2IntoPrimaryView() {
-    this.scrollPdfBookReaderToTopOfPage(2)
-    // Block 2.2 starts at y0=89/1000 normalized on page 2. Scroll that extra
-    // amount so block 2.2 is at the container top, guaranteeing its y0 is below
-    // the viewport midpoint even with very short test viewports (e.g. 1200×280).
-    cy.get(pdfPageSelector(2))
-      .first()
       .then(($page) => {
         const pageHeight = ($page[0] as HTMLElement).getBoundingClientRect()
           .height
-        const extra = Math.ceil((89 / 1000) * pageHeight)
+        const extra = Math.ceil((normalizedY / 1000) * pageHeight)
         cy.get('[data-testid="pdf-book-viewer"]').then(($viewer) => {
           cy.get('[data-testid="pdf-book-viewer"]').scrollTo(
             0,
@@ -66,9 +60,30 @@ export const bookReadingPdfMethods = () => ({
       })
     return this
   },
+  expectPdfPositionAtTopOfReader(pageNumber: number, normalizedY: number) {
+    waitUntilAppIsNotBusy()
+    cy.get('[data-testid="pdf-book-viewer"]').then(($viewer) => {
+      const viewerTop = $viewer[0]!.getBoundingClientRect().top
+      cy.get(`${pdfPageSelector(pageNumber)} canvas`)
+        .first()
+        .should(($canvas) => {
+          const canvasRect = $canvas[0]!.getBoundingClientRect()
+          const startTop =
+            canvasRect.top +
+            (normalizedY / 1000) * canvasRect.height -
+            viewerTop
+          expect(Math.abs(startTop)).to.be.lessThan(START_AT_TOP_TOLERANCE_PX)
+        })
+    })
+    return this
+  },
+  scrollPdfBookReaderToBringPage2IntoPrimaryView() {
+    // Block 2.2 starts at y0=89/1000 normalized on page 2.
+    return this.scrollPdfBookReaderToPosition(2, 89)
+  },
   /**
-   * Scrolls by 42% of the rendered page-1 height from §1's click position (y≈204 MinerU),
-   * giving total scroll ≈ 624 MinerU — past §2's bbox bottom (y1=608) so §2 scrolls above the
+   * Scrolls by 37.8% of the rendered page-1 height from §1's start (y0=252 MinerU),
+   * putting the view top at ≈630 MinerU — past §2's bbox bottom (y1=607) so §2 scrolls above the
    * viewport, making §2.1 (y0=631) the first visible anchor and therefore the current block.
    */
   scrollPdfBookReaderDownWithinSamePageForNextBbox() {
@@ -78,7 +93,7 @@ export const bookReadingPdfMethods = () => ({
       .then(($page) => {
         const pageHeight = ($page[0] as HTMLElement).getBoundingClientRect()
           .height
-        const deltaPx = Math.round(pageHeight * 0.42)
+        const deltaPx = Math.round(pageHeight * 0.378)
         cy.get('[data-testid="pdf-book-viewer"]').then(($el) => {
           const newTop = ($el[0] as HTMLElement).scrollTop + deltaPx
           cy.get('[data-testid="pdf-book-viewer"]').scrollTo(0, newTop)
@@ -153,7 +168,7 @@ export const bookReadingPdfMethods = () => ({
     return this
   },
   createBookBlockFromLongTextContentBlockOnPdf() {
-    this.scrollPdfBookReaderToTopOfPage(2)
+    this.scrollPdfBookReaderToPosition(2, 0)
     cy.get('[data-testid="book-reading-book-layout"]')
       .find('[data-current-selection="true"]')
       .click()

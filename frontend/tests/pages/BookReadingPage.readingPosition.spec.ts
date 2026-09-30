@@ -43,13 +43,13 @@ async function mountPlainPdfBookAndReportPagesReady() {
   return restore
 }
 
-async function mountNavBarScenario(viewportMid: number) {
+async function mountNavBarScenario(viewportTop: number) {
   const wrapper = await mountLoadedBookWithBlocks(notebookId)
   spyOnScrollToBookNavTarget(wrapper)
   await clickBookBlockAndExpectSelection(wrapper, "Section 1")
   await emitViewportAndSettleCurrentBlock(wrapper, {
     anchorPageIndexZeroBased: 0,
-    viewport: { top: 0, mid: viewportMid, bottom: 1000 },
+    viewport: { top: viewportTop, mid: 500, bottom: 1000 },
     pagesCount: 10,
   })
   return wrapper
@@ -182,20 +182,20 @@ describe("BookReadingPage reading position", () => {
 
   describe("current block navigation bar", () => {
     it("shows navigation bar when current block differs from selected block", async () => {
-      const wrapper = await mountNavBarScenario(500)
+      const wrapper = await mountNavBarScenario(72)
 
       expect(currentBlockNavBar(wrapper).exists()).toBe(true)
       expect(currentBlockNavBar(wrapper).text()).toContain("Section 2")
     })
 
     it("hides navigation bar when current block equals selected block", async () => {
-      const wrapper = await mountNavBarScenario(10)
+      const wrapper = await mountNavBarScenario(0)
 
       expect(currentBlockNavBar(wrapper).exists()).toBe(false)
     })
 
     it("Read from here makes current block the selected block and hides nav bar", async () => {
-      const wrapper = await mountNavBarScenario(500)
+      const wrapper = await mountNavBarScenario(72)
 
       await wrapper
         .findComponent(CurrentBlockNavigationBar)
@@ -207,7 +207,7 @@ describe("BookReadingPage reading position", () => {
     })
 
     it("Back to selected scrolls to selected block and hides nav bar", async () => {
-      const wrapper = await mountNavBarScenario(500)
+      const wrapper = await mountNavBarScenario(72)
 
       await wrapper
         .findComponent(CurrentBlockNavigationBar)

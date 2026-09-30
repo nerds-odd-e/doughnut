@@ -7,8 +7,6 @@ Bug fixing and general maintenance.
 
 ## Taken
 
-- [The current block moves the same way in PDF as in EPUB](seeds/SEED-059-book-reading-uat-fixes.md#story-16) — SEED-059#story-16 ([plan](slice-plans/058-current-block-same-in-pdf-and-epub/PLAN.md))
-
 ## Backlog list
 
 - [Anchor the Reading Control Panel after a one-paragraph EPUB block](seeds/SEED-059-book-reading-uat-fixes.md#story-18) — SEED-059#story-18
@@ -18,3 +16,4 @@ Bug fixing and general maintenance.
 - [Give EPUB readers the reading and reorganizing tools PDF readers have](seeds/SEED-059-book-reading-uat-fixes.md#story-10) — SEED-059#story-10
 - [Go from attaching a book to reading it without searching](seeds/SEED-059-book-reading-uat-fixes.md#story-11) — SEED-059#story-11
 - [See reading progress through the book](seeds/SEED-059-book-reading-uat-fixes.md#story-12) — SEED-059#story-12
+- [Book reading E2E scenarios stay stable at any window size](seeds/SEED-059-book-reading-uat-fixes.md#story-21) — SEED-059#story-21

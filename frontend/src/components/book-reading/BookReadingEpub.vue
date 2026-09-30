@@ -18,12 +18,10 @@
 import BookReadingShell from "@/components/book-reading/BookReadingShell.vue"
 import EpubBookViewer from "@/components/book-reading/EpubBookViewer.vue"
 import type { BookReaderViewerRef } from "@/composables/bookReaderViewerRef"
+import type { EpubViewBlockStarts } from "@/composables/book-reading/useEpubLocatorGeometry"
 import { useBookReadingSession } from "@/composables/useBookReadingSession"
 import { asEpubLocator } from "@/lib/book-reading/asEpubLocator"
-import {
-  currentBlockIdFromEpubView,
-  type EpubViewBlockStarts,
-} from "@/lib/book-reading/currentBlockIdFromEpubView"
+import { currentBlockIdFromViewStarts } from "@/lib/book-reading/currentBlockIdFromViewStarts"
 import type {
   BookBlockFull,
   BookFull,
@@ -96,9 +94,15 @@ function currentBlockIdInView(): number | null {
   if (!view) {
     return null
   }
-  return currentBlockIdFromEpubView(
+  return currentBlockIdFromViewStarts(
     props.book.blocks,
-    view,
+    {
+      startTopPx: (block) => {
+        const start = asEpubLocator(block.contentLocators[0])
+        return start ? view.startTopPx(start) : null
+      },
+      landingLimitPx: view.landingLimitPx,
+    },
     selectedBlockId.value
   )
 }

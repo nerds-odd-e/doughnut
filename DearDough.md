@@ -646,6 +646,10 @@ The slice changed `StoredApiCollection.trashNote` to request a folder listing be
   - Evidence: slice 1 changed the recall page's return path (deduplicating due trackers against the whole queue); planning's premise "Existing tests pin the replacement behavior" searched only `frontend/tests`, and slice 1 proof ran only frontend specs. E2E `spaced_repetition.feature` "Strictly follow the schedule" exercises that return path and failed (CI run 36515871965, the recall E2E job; locally found by the slice 2 agent). Repaired in 171e696e06 by deduplicating only waiting trackers.
   - Observed effect: one failed published E2E job and a slice-1 repair folded into slice 2.
   - Inference: consumer search for a changed behavior should include `e2e_test/` features that drive it, at planning or proof-acceptance time. Matching is by root cause (proof chosen by edited area); the actor here was planning plus coordinator acceptance.
+- Execution: SEED-059#story-16 / `dfec19ca03:.planning/slice-plans/058-current-block-same-in-pdf-and-epub/PLAN.md` / d3eec9db16; Timestamp: 2026-09-30T00:01:40Z (CI job log time of the failure); Tool: Claude Code; Model: claude-sonnet-5-5; Open Dough release: unknown.
+  - Evidence: slice 2 removed the 40-point landing padding; its delegation named `book_browsing.feature` and `reading_record.feature`, and the report ran only those. CI run 36647846005 attempt 1 failed `phone_reading.feature` "Choosing a book block closes the book layout and moves the book there" (`expected ... to contain '2 /'`); the slice 3 agent ran `phone_reading` (7/7 locally at 390*844); the repair agent reproduced the failure only at 390*900 and repaired in 5206b08370.
+  - Observed effect: one failed published E2E job, a paused slice 3 (stash, repair agent about 10 min, restore) and one test repair.
+  - Inference: `phone_reading.feature` also chooses PDF blocks, so a search of `e2e_test/features/book_reading/` for scenarios that choose a block would have listed it. Same root cause as the entries above (proof chosen by edited area); the actor was the coordinator's delegation. The failure itself needed a taller-than-stock window, so local runs could not have shown it.
 
 ## ODF-151 — A retrospective finding asserted the loading modal, which the product does not show for these requests
 
@@ -915,8 +919,19 @@ Trunk publication's "Publish the candidate" asks for an "authorized target ref" 
   - Observed effect: one rejected delivery call. Nothing was published or changed.
   - Inference: the cost is small, but every coordinator that reads only trunk-publication.md can hit it. One example next to that step would prevent it.
 
+## DD-173 — A slice's premise that one code swap fixes a UAT defect was not tested first, and its spec passed before the change
+
+Slice 5 of SEED-059#story-16 was planned as "marking goes on after choosing 'Chapter 12'" once the current-block rule and `hasNoTextOfItsOwn` suffice. The implementer wrote the spec first and it already passed with the old `hasDirectContent`; the swap is equivalent for PDF. The UAT symptom (panel hidden for 3-4 pages) was not reproduced.
+
+### Occurrences
+
+- Execution: SEED-059#story-16 / `dfec19ca03:.planning/slice-plans/058-current-block-same-in-pdf-and-epub/PLAN.md` / f9a6f4a416; Timestamp: 2026-09-30 (slice 5); Tool: Claude Code; Model: claude-sonnet-5-5; Open Dough release: unknown.
+  - Evidence: slice 5 hand-back ("the new test already passed with today's `hasDirectContent`"; "the story's premise ... does not hold for this shape"); plan slice 5 "About 10 min if the rule and `hasNoTextOfItsOwn` suffice".
+  - Observed effect: a slice that delivered a regression spec and a refactor, with no reproduced defect; the UAT case stays unexplained.
+  - Inference: the plan's own condition was the open question; a probe in the migrated page-spec fixture before slicing, or moving the slice after a real-PDF check, would have told the plan whether a fix was needed. Qualified: one execution. Related to DD-162 and DD-164.
+
 ## Retention
 
-- Highest allocated local number: 172. Removed local codes are never reused.
+- Highest allocated local number: 173. Removed local codes are never reused.
 - Full pre-maintenance log and earlier recovery locators: `99fa1b9835e3dff2473837ba2a1f8b11967d5938:DearDough.md`.
 - Occurrence history is partial; active evidence stays here or in the Open Dough catalog and watch list.

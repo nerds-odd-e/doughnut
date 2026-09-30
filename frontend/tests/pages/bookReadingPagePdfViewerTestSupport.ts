@@ -44,8 +44,28 @@ export function mockReadingPanelAnchorTopPx(
   ).mockReturnValue(returnValue)
 }
 
+/** Scrolling to a target puts the view's top edge at the target's start. */
 export function spyOnScrollToBookNavTarget(wrapper: BookReadingPageWrapper) {
   return vi
     .spyOn(pdfViewerExposed(wrapper), "scrollToBookNavigationTarget")
-    .mockResolvedValue(undefined)
+    .mockImplementation(async (target) => {
+      stubViewTopAt(wrapper, target.pageIndex, target.bbox?.[1] ?? 0)
+    })
+}
+
+const PAGE_HEIGHT_PX = 1000
+
+/** Puts the view's top edge at `topY` (0-1000, page-normalized) of `pageIndex`; pages are 1000 px tall. */
+export function stubViewTopAt(
+  wrapper: BookReadingPageWrapper,
+  pageIndex: number,
+  topY: number
+) {
+  vi.spyOn(pdfViewerExposed(wrapper), "viewBlockStarts").mockReturnValue({
+    startTopPx: (start) =>
+      (start.pageIndex - pageIndex) * PAGE_HEIGHT_PX +
+      ((start.bbox?.[1] ?? 0) / 1000) * PAGE_HEIGHT_PX -
+      topY,
+    landingLimitPx: 0,
+  })
 }

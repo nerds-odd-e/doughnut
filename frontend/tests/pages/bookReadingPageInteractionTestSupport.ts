@@ -5,8 +5,12 @@ import {
   withFakeTimers,
   type BookReadingPageWrapper,
 } from "./bookReadingPageTestSupport"
-import { findPdfBookViewer } from "./bookReadingPagePdfViewerTestSupport"
+import {
+  findPdfBookViewer,
+  stubViewTopAt,
+} from "./bookReadingPagePdfViewerTestSupport"
 
+/** Emits the viewer's viewport and stubs the view so its top edge is at `viewport.top` (0-1000) of the anchor page. */
 export async function emitViewportAndSettleCurrentBlock(
   wrapper: BookReadingPageWrapper,
   payload: {
@@ -16,6 +20,11 @@ export async function emitViewportAndSettleCurrentBlock(
   }
 ) {
   const pdf = findPdfBookViewer(wrapper)
+  stubViewTopAt(
+    wrapper,
+    payload.anchorPageIndexZeroBased,
+    payload.viewport?.top ?? 0
+  )
   await withFakeTimers(async () => {
     pdf.vm.$emit("viewportAnchorPage", payload)
     await vi.advanceTimersByTimeAsync(CURRENT_BLOCK_ANCHOR_DEBOUNCE_MS)

@@ -1,15 +1,10 @@
-import type { BookBlockEpubStartRow } from "@/lib/book-reading/currentBlockIdFromEpubView"
-import { currentBlockIdFromEpubView } from "@/lib/book-reading/currentBlockIdFromEpubView"
-import type { EpubLocatorFull } from "@generated/donut-backend-api"
+import { currentBlockIdFromViewStarts } from "@/lib/book-reading/currentBlockIdFromViewStarts"
 import { describe, expect, it } from "vitest"
 
-function row(id: number, fragment?: string): BookBlockEpubStartRow {
-  const start: EpubLocatorFull = {
-    type: "EpubLocator_Full",
-    href: "OEBPS/ch.xhtml",
-    ...(fragment !== undefined ? { fragment } : {}),
-  }
-  return { id, contentLocators: [start] }
+type Row = { id: number; key: string }
+
+function row(id: number, key = ""): Row {
+  return { id, key }
 }
 
 const blocks = [row(1), row(2, "a"), row(3, "b"), row(4, "c")]
@@ -19,17 +14,17 @@ function currentBlock(
   selectedBlockId: number | null = null,
   landingLimitPx = 0
 ) {
-  return currentBlockIdFromEpubView(
+  return currentBlockIdFromViewStarts(
     blocks,
     {
-      startTopPx: (start) => startTops[start.fragment ?? ""] ?? null,
+      startTopPx: (block) => startTops[block.key] ?? null,
       landingLimitPx,
     },
     selectedBlockId
   )
 }
 
-describe("currentBlockIdFromEpubView", () => {
+describe("currentBlockIdFromViewStarts", () => {
   it("is the last block whose start is at or above the top of the view", () => {
     expect(currentBlock({ "": -900, a: -40, b: 120, c: 600 })).toBe(2)
     expect(currentBlock({ "": -900, a: -40, b: 0, c: 600 })).toBe(3)
@@ -62,11 +57,14 @@ describe("currentBlockIdFromEpubView", () => {
   })
 
   it("skips blocks whose start cannot be placed", () => {
-    const withoutStart: BookBlockEpubStartRow = { id: 9, contentLocators: [] }
+    const withoutStart = row(9, "unplaced")
     expect(
-      currentBlockIdFromEpubView(
+      currentBlockIdFromViewStarts(
         [...blocks, withoutStart],
-        { startTopPx: () => -10, landingLimitPx: 0 },
+        {
+          startTopPx: (block) => (block === withoutStart ? null : -10),
+          landingLimitPx: 0,
+        },
         9
       )
     ).toBe(4)

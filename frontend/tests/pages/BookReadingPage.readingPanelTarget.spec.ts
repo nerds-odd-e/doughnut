@@ -99,7 +99,7 @@ describe("BookReadingPage reading panel target", () => {
     mockIsLastContentBottomVisible(wrapper, false)
     await emitViewportAndSettleCurrentBlock(wrapper, {
       anchorPageIndexZeroBased: 0,
-      viewport: { top: 0, mid: 200, bottom: 600 },
+      viewport: { top: 72, mid: 200, bottom: 600 },
       pagesCount: 10,
     })
 
