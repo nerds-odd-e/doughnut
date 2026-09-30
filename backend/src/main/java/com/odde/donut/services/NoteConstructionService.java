@@ -2,10 +2,12 @@ package com.odde.donut.services;
 
 import com.odde.donut.algorithms.AuthoredNoteDocument;
 import com.odde.donut.algorithms.CanonicalDonutOrigin;
+import com.odde.donut.algorithms.Frontmatter;
 import com.odde.donut.algorithms.NoteContentMarkdown;
 import com.odde.donut.algorithms.NoteContentTitleHeading;
 import com.odde.donut.algorithms.NoteLeadingFrontmatter;
 import com.odde.donut.algorithms.RelationshipNoteComposition;
+import com.odde.donut.algorithms.WikiLinkMarkdown;
 import com.odde.donut.controllers.dto.NoteCreationDTO;
 import com.odde.donut.controllers.dto.NoteRealm;
 import com.odde.donut.entities.DisplayName;
@@ -153,11 +155,32 @@ public class NoteConstructionService {
    * Returns the new relationship note.
    */
   public Note reifyPropertyIntoRelationshipNote(Note source, String propertyKey, User viewer) {
-    String targetLink =
+    Frontmatter frontmatter =
         NoteContentMarkdown.splitLeadingFrontmatter(source.getContent())
-            .flatMap(leading -> leading.frontmatter().getString(propertyKey))
-            .orElseThrow();
-    Note target = wikiLinkResolver.resolveFirstWikiLink(targetLink, source, viewer).orElseThrow();
+            .map(NoteContentMarkdown.LeadingFrontmatter::frontmatter)
+            .orElseGet(Frontmatter::empty);
+    if (!frontmatter.containsKeyIgnoreCase(propertyKey)) {
+      throw new ResponseStatusException(
+          HttpStatus.BAD_REQUEST, "The note has no property " + propertyKey + ".");
+    }
+    String targetLink =
+        frontmatter
+            .getString(propertyKey)
+            .map(String::trim)
+            .filter(WikiLinkMarkdown::isWellFormedWholeLinkToken)
+            .orElseThrow(
+                () ->
+                    new ResponseStatusException(
+                        HttpStatus.BAD_REQUEST,
+                        "Only a property whose value is a link to a note can be reified."));
+    Note target =
+        wikiLinkResolver
+            .resolveFirstWikiLink(targetLink, source, viewer)
+            .orElseThrow(
+                () ->
+                    new ResponseStatusException(
+                        HttpStatus.BAD_REQUEST,
+                        "The link " + targetLink + " does not name an existing note."));
     String title =
         RelationshipNoteComposition.title(source.getTitle(), propertyKey, target.getTitle());
     noteTitleNameRule.requireTitleFree(source.getNotebook(), source.getFolder(), title);

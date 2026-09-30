@@ -80,7 +80,8 @@ If this runs past about 10 minutes, split at "note created in the same notebook 
 
 ### 3. A value that cannot be reified is refused with the reason
 Type: Behavior
-Status: planned
+Status: done — 400 with reason before any write (missing key; not one whole link, incl. list and text around a link;
+unresolved link); proof `NoteReifyPropertyTests.ValueThatCannotBeReified` green
 Proof: same test class.
 
 Behavior: value `training` (plain text), a list value, a key that is not on the note, or `[[Nowhere]]` resolving to no
