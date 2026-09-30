@@ -91,7 +91,7 @@ Move the relation / Wikidata / URL / list / scalar branches out of `RichFrontmat
 
 ### 4. The row has a read-only mode and the read-only list is deleted
 Type: Structure
-Status: planned
+Status: done
 Start: only after SEED-064#story-2 is on trunk (`git fetch origin`; the shared key field is in the row); otherwise stop
 after slice 3 and report.
 Proof: slice 2's spec, `listProperties.spec.ts`, `frontmatter.spec.ts`, `propertyLocation.spec.ts` and the editable specs
@@ -132,6 +132,8 @@ change no behavior. Story 6 and SEED-062 add to the renamed row.
   `RichMarkdownEditor.frontmatter.spec.ts` and `RichMarkdownEditor.propertyLocation.spec.ts`.
 - The read-only external-link control is a `button` with `data-testid=rich-note-property-external-link`, not an anchor;
   `RichMarkdownEditor.readOnlyProperties.spec.ts` must stay green through slice 4.
+- Slice 4 ran on trunk with story 2 merged in. Read-only rows now sit in the shared list's `gap-2` (was `gap-1`); the e2e
+  layout scenarios pass. The row keeps both modes in one template because they share one root identity.
 
 ## Real iPad check (owner, optional)
 

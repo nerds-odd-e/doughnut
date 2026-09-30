@@ -24,18 +24,13 @@
         Add property
       </button>
     </div>
-    <RichFrontmatterReadOnlyList
-      v-if="propertyRows.length > 0 && isReadOnly"
-      :property-rows="propertyRows"
-      :wiki-links="wikiLinks"
-      :last-saved-markdown="lastSavedMarkdown"
-    />
     <RichFrontmatterEditablePropertyList
-      v-else-if="propertyRows.length > 0"
+      v-if="propertyRows.length > 0"
       v-model="propertyRows"
       :wiki-links="wikiLinks"
       :last-saved-markdown="lastSavedMarkdown"
       :note-id="noteId"
+      :read-only="isReadOnly"
       :heading-id="headingId"
       :validation-message="validationMessage"
       :validation-row-index="validationRowIndex"
@@ -99,7 +94,6 @@
 import { Plus } from "@lucide/vue"
 import { isEqual } from "es-toolkit"
 import { computed, provide, ref, useId, watch } from "vue"
-import RichFrontmatterReadOnlyList from "@/components/form/RichFrontmatterReadOnlyList.vue"
 import RichFrontmatterEditablePropertyList from "@/components/form/RichFrontmatterEditablePropertyList.vue"
 import RichFrontmatterInsertForm from "@/components/form/RichFrontmatterInsertForm.vue"
 import RichFrontmatterPropertyNotFound from "@/components/form/RichFrontmatterPropertyNotFound.vue"
