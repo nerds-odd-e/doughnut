@@ -137,3 +137,7 @@ each is independently useful.
 
 - Slice 1: labels now live in `dispositionLabels` (`readBlockIdsFromRecords.ts`), used by the layout row title and `BookBlockMarkControl`. Accepted proof: `BookReadingBookLayout.spec.ts` title cases (seen failing 3, then passing); `vitest run tests/components/book-reading tests/pages` 278 pass; `vue-tsc --noEmit` clean. `BookBlockMarkControl` has no direct spec; its label refactor is covered by the type check only.
 - Slice 2: Skipped border is `color-mix(in oklab, base-content 60%, base-200)` (opaque, follows theme). Accepted proof: layout spec light/dark cases (dark failed before with gap 0.0926, then 22/22 pass); `vitest run tests/components/book-reading tests/pages` 280 pass; `vue-tsc --noEmit` clean.
+
+## Execution complete
+
+Product advice: no change. The fix is small and finished; the deferred reading-progress ideas stay unqueued while the focus is bug fixing and technical debt.
