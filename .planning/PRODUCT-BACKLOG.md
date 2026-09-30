@@ -8,7 +8,6 @@ Bug fixing and general maintenance.
 ## Taken
 
 - [A read-only property's wiki-link value is a link, and both views share one row](seeds/SEED-064-note-properties-fixes.md#story-5) — SEED-064#story-5 ([plan](slice-plans/005-note-property-read-only-row/PLAN.md))
-- [Saving a typed Wikidata ID shows the title choice even when the search found nothing](seeds/SEED-064-note-properties-fixes.md#story-4) — SEED-064#story-4 ([plan](slice-plans/004-wikidata-typed-id-title-choice/PLAN.md))
 
 ## Backlog list
 
