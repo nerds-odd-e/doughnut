@@ -1,0 +1,224 @@
+---
+id: SEED-064
+status: dormant
+planted: 2026-09-30
+planted_during: owner selection of note properties fixes and improvements found by the one-hour manual UAT (SEED-061#story-1)
+trigger_when: making note properties comfortable on an iPad, operable on a phone, and simpler to maintain
+scope: medium
+---
+
+# SEED-064: Make note properties comfortable on an iPad, operable on a phone, and smaller in code
+
+## Why This Matters
+
+A manual UAT of the note properties area (2026-09-30, iPad first, then phone and desktop, commit
+`1986473b79`) found that every journey can be completed, but a long key hides its value in the read-only view,
+the key preset list gets in the way, a rejected value gives no message near the row, and touch controls are
+small. The code review found that the read-only list, the editable row and the add form each decide separately how
+to show a key, so the same fix has to be made in three places.
+
+The owner kept every defect and kept an improvement only where its value justified the effort, then grouped what
+remained by severity and value. Every story below carries the user interface change that belongs to it; there is
+no separate polish story. An iPad is the primary device; a phone only has to be operable.
+
+The full report (measurements, reproduction steps, screenshot file names, line-count method) is recoverable at
+`1986473b79:.planning/seeds/SEED-061-note-properties-ux-uat.md`, section `## UAT Findings`. "iPad D1" means iPad
+defect 1, "iPad I4" means iPad improvement 4, "phone D2" means phone operability defect 2, and "C3" means design
+candidate 3 in that report. Line effects are that report's estimates.
+
+## Context
+
+- **Owner decisions (2026-09-30):**
+  - A read-only view must not show the row panel controls Assimilate and Skip. Today the read-only view has no
+    chevron and no panel; that stays true.
+  - Kept: all defects. Kept improvements: those folded into the stories below.
+- **What already works and must keep working:** adding, changing, removing and saving a property on iPad, phone and
+  desktop; the list dialog with reorder; image add and replace; relation type; Wikidata Save with a chosen search
+  result; the duplicate-key message.
+- **Findings left out by the owner** (low value for the effort, or not reproduced):
+  - a collapsed "show all" mode for long property lists (iPad I2); the row compaction in story 1 is tried first;
+  - an empty-state message for a note without properties, and hiding the `type: Note` row (iPad I5); its answer
+    depends on whether the row is stored (ADR 0004);
+  - a message when a value is appended to a list key such as `url` (iPad I7);
+  - a confirmation or undo for remove (iPad I8); larger targets in story 1 reduce mistaken taps;
+  - the upload error disappearing after 2.5 seconds (iPad I10);
+  - a Replace tap that timed out once and a tap blocked once after an image upload: not reproduced;
+  - the panel's Assimilate moving to another note and the Skip wording (phone finding, iPad I8 wording): these are
+    assimilation behavior, not properties layout; the owner has not decided whether they are wanted;
+  - merging the `noteContent*` utilities, one YAML parser for both languages, replacing the value field with a plain
+    input, changing the value dialog, and a new confirmation dialog for remove (report, "Not recommended").
+- **Real device:** device mode cannot show the real iPad keyboard, visual viewport or touch. Each story lists a check
+  on a real iPad in its evaluation.
+
+## Alternatives and Decision
+
+Fixing each defect where it appears would repeat the fix in the read-only list, the editable row and the add form.
+The recommended direction is to fix the visible defects first (stories 1 to 4), then merge the paths that make them
+recur (stories 5 and 6), which also removes about 180 to 225 lines (estimate). The strongest simpler alternative,
+fixing only the defects and leaving the structure, was rejected because the same layout rule would still live in
+three places and each later change (for example SEED-062 and SEED-063) would touch all three.
+
+Stories are ordered by user impact on an iPad first, then by code reduction, then by dependency. A story that
+changes the shared layout comes before the stories that reuse it.
+
+## Story Decomposition
+
+Effort bands: S = 30–60 minutes, M = 1–2 hours, L = 2–4 hours, including delivery.
+
+<a id="story-1"></a>
+
+### A note's properties keep every value visible and are easy to tap on an iPad and a phone
+
+**Identity:** SEED-064#story-1
+```json dough-story-state
+{"schemaVersion":1,"refinement":"not-refined","approach":"unselected"}
+```
+
+- **For / why:** iPad and phone users lose the value of a property when its key is long (iPad D1, phone D1), cannot
+  see that long text is cut (iPad D4, phone D3), and miss small controls (iPad I1, iPad D5).
+- **Evaluation:** open a note with a 76-character key and a 200-character value at 820 px and 375 px, in the
+  read-only and the editable view: the value is visible or clearly cut with a cue that shows the full text, there is
+  no sideways scroll, and every row control and dialog close button is at least 44 px high on touch widths. The row
+  does not grow so much that a 19-row note pushes the body further down than today (iPad I2 is the guard, measured
+  by the body's start position). Check on a real iPad.
+- **Value / learning:** removes the most severe defect and answers whether 44 px controls still fit the density.
+  Includes the key and value hierarchy (iPad I3) because it is the same row rule.
+- **Effort hypothesis:** M, medium confidence: one viewport scenario, one layout rule in each of the three places.
+- **Depends on:** none. The protecting test comes first: a Cypress scenario at 820 and 375 px with a long-key note
+  (about +25 lines, estimate).
+- **Safe stopping point:** the defect is fixed for the current three code paths even if stories 5 and 6 never happen.
+
+<a id="story-2"></a>
+
+### Typing a property key narrows the presets, and the list stays on screen
+
+**Identity:** SEED-064#story-2
+```json dough-story-state
+{"schemaVersion":1,"refinement":"not-refined","approach":"unselected"}
+```
+
+- **For / why:** the preset list keeps all seven presets while typing, is wider than its panel, runs off the screen
+  with the keyboard (iPad D3), and covers the value field and the Choose image button on a phone until the key loses
+  focus (phone D2).
+- **Evaluation:** on an iPad in both orientations and on a 375 px phone, type `mo` in the key field: only matching
+  presets show, the list stays inside its panel and inside the visible area, and the value field stays reachable
+  with one tap. Check on a real iPad with the software keyboard.
+- **Value / learning:** the add journey becomes clear on the primary device and unblocks the phone path; one key
+  field replaces two copies (C3, about -25 lines, estimate).
+- **Effort hypothesis:** M, medium confidence: filtering is cheap; keeping the list on screen with the keyboard is
+  the uncertain part.
+- **Depends on:** none genuine; after story 1 the row width is settled.
+- **Safe stopping point:** the add journey works better even if later stories are cancelled.
+
+<a id="story-3"></a>
+
+### A rejected property value is explained next to the row that was rejected
+
+**Identity:** SEED-064#story-3
+```json dough-story-state
+{"schemaVersion":1,"refinement":"not-refined","approach":"unselected"}
+```
+
+- **For / why:** the validation message appears below the last row, about 600 px from the edited row on a 19-row
+  note and off screen on an iPad in landscape, so the value jumps back with no visible reason (iPad D2).
+- **Evaluation:** on a 19-row note enter an invalid `note_level` on an iPad in both orientations: the message shows
+  next to that row without scrolling, and disappears when the value is corrected.
+- **Value / learning:** the message belongs to its row; adds about 17 lines (estimate) or 4 for a scroll-into-view
+  variant, chosen at refinement.
+- **Effort hypothesis:** S, high confidence.
+- **Depends on:** none.
+- **Safe stopping point:** independent.
+
+<a id="story-4"></a>
+
+### Saving a typed Wikidata ID that cannot be used tells the user why
+
+**Identity:** SEED-064#story-4
+```json dough-story-state
+{"schemaVersion":1,"refinement":"not-refined","approach":"unselected"}
+```
+
+- **For / why:** with a typed ID such as `Q42` and an empty search list, Save closes nothing and shows nothing
+  (reproduced twice: iPad portrait and phone). With a chosen search result Save works.
+- **Evaluation:** in the Wikidata dialog type an ID with no matching search results and tap Save: the dialog either
+  saves the ID or shows a message that says why not. Which of the two is intended is decided at refinement, against
+  the Wikidata scenarios under `e2e_test/features/wikidata/`.
+- **Value / learning:** removes a silent dead end; settles whether a typed ID is a supported path.
+- **Effort hypothesis:** S, medium confidence: the cause is not yet found.
+- **Depends on:** none.
+- **Safe stopping point:** independent.
+
+<a id="story-5"></a>
+
+### Read-only properties look and link like the editable ones, without the row panel
+
+**Identity:** SEED-064#story-5
+```json dough-story-state
+{"schemaVersion":1,"refinement":"not-refined","approach":"unselected"}
+```
+
+- **For / why:** the read-only list is a separate component with its own grid: values start at ragged positions,
+  a single wiki-link value shows as plain `[[...]]` text while list values are links, and an image value shows only a
+  file name (iPad I4, C2). Its key column has no maximum width, the likely cause of iPad D1.
+- **Evaluation:** open the same note read-only and editable at 820 px: rows line up, single wiki-link values are
+  links, image values show the image, and the read-only view still has no chevron, no remove control, no Assimilate
+  and no Skip (owner decision). The read-only list component is deleted.
+- **Value / learning:** one row for both modes puts the layout in one place, about -60 to -75 lines and one file
+  fewer (estimate).
+- **Effort hypothesis:** M to L, medium confidence.
+- **Depends on:** story 1 (the row layout rule to reuse). Protecting tests first: read-only component tests for a
+  single wiki-link value, an image value and a Wikidata value (only spec names were checked, not assertions), and
+  story 1's scenario.
+- **Safe stopping point:** the read-only view is consistent even if story 6 is cancelled.
+
+<a id="story-6"></a>
+
+### Adding a property uses a row with a visible Add button that says why nothing was added
+
+**Identity:** SEED-064#story-6
+```json dough-story-state
+{"schemaVersion":1,"refinement":"not-refined","approach":"unselected"}
+```
+
+- **For / why:** the add form is a separate structure with its own grid; a row is added only when the value field
+  loses focus, so a key without a value, or a value without a key, does nothing and shows no message (iPad I6).
+- **Evaluation:** on an iPad tap Add property: a draft row appears in the list with an Add button of at least 44 px;
+  entering only a key, then tapping Add, shows what is missing; a complete row is added and saved once; a draft row
+  never reaches the stored Markdown (ADR 0004).
+- **Value / learning:** the largest code reduction, about -120 to -150 lines and one file fewer (estimate); changes
+  the add journey, so the test ids `rich-note-property-key` and `rich-note-property-value` are kept or the page
+  object `noteRichPropertyMethods.ts` changes in the same commit.
+- **Effort hypothesis:** L, medium confidence: the highest risk of the seed.
+- **Depends on:** stories 2 and 5 (one key field and one row to build the draft on). Protecting tests first:
+  key-only and value-only add tests (none exist).
+- **Safe stopping point:** stories 1 to 5 stand without it.
+
+## Ordering and Scope Reduction
+
+- **Highest priority** (data hidden or a dead end on the primary device): stories 1 to 4, in the order listed.
+- **Then** (structure that removes code and prevents the same defects): story 5, then story 6.
+- Stories 2, 3 and 4 are independent of each other; story 5 needs story 1; story 6 needs stories 2 and 5.
+- First to drop: story 6 (largest risk, the defects it touches are already softened by story 2).
+
+## Open Decisions
+
+- Story 3: the message next to the row (about +17 lines) or the cheaper scroll-into-view (about +4)?
+- Story 4: is a typed Wikidata ID without search results meant to be supported?
+- Not queued, owner has not decided: whether the row panel's Assimilate should move to another note after saving
+  a property understanding item, and the wording of its Skip confirmation.
+
+## When to Surface
+
+When the owner selects note properties, iPad or phone comfort, or simplification work from the product backlog.
+
+## Breadcrumbs
+
+- UAT report: `1986473b79:.planning/seeds/SEED-061-note-properties-ux-uat.md`, section `## UAT Findings`
+  (screenshots were not committed).
+- Related queued work in the same area: [SEED-062](SEED-062-reify-property.md#story-1),
+  [SEED-063](SEED-063-track-property-values-separately.md#story-1). Both add to the properties rows; stories 5 and 6
+  give them one row to extend.
+- Code: `frontend/src/components/form/RichFrontmatter*.vue`,
+  `frontend/src/composables/useRichFrontmatterPropertyEditing.ts`, `frontend/src/utils/noteContentFrontmatter*.ts`.
+- Protecting tests today: `e2e_test/features/note_view/note_frontmatter_image.feature`,
+  `frontend/tests/components/form/RichMarkdownEditor.frontmatter.spec.ts`.

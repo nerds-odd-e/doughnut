@@ -965,7 +965,7 @@ minutes, M = 1 to 2 hours, L = 2 to 4 hours, including delivery.
 
 #### Open questions for the owner
 
-1. **Read-only panel controls.** Should a read-only viewer ever see the row panel controls (Assimilate, Skip)? Today
+1. **Answered 2026-09-30: no.** A read-only viewer does not see the row panel controls (Assimilate, Skip); recorded in [SEED-064](SEED-064-note-properties-fixes.md). Original question: **Read-only panel controls.** Should a read-only viewer ever see the row panel controls (Assimilate, Skip)? Today
    read-only has no chevron. The answer does not block F1 to F3; F2 keeps today's behavior.
 2. **Assimilate from a row panel.** Tapping Assimilate ran `POST /api/assimilation` and then moved the page to another
    note (the next one in the sequence). Is that intended when the button is inside a single property's panel? It was
