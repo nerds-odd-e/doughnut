@@ -13,3 +13,4 @@ Bug fixing and general maintenance.
 
 - [Track each value of a property separately without numbered keys](seeds/SEED-063-track-property-values-separately.md#story-1) — SEED-063#story-1
 - [Adding a property uses a row with a visible Add button that says why nothing was added](seeds/SEED-064-note-properties-fixes.md#story-6) — SEED-064#story-6
+- [Existing numbered property keys become one list, and their trackers follow](seeds/SEED-063-track-property-values-separately.md#story-2) — SEED-063#story-2
