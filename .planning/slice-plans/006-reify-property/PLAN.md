@@ -119,7 +119,8 @@ after `reduce-to-source-property`). Add a whole-link check by trimming to `^\[\[
 
 ### 7. The row says why a value cannot be reified
 Type: Behavior
-Status: planned
+Status: done — disabled Reify with visible reason (aria-describedby); proof `RichMarkdownEditor.propertyReify.spec.ts`
+"explains why %s cannot be reified" + vue-tsc; `tests/components/form tests/pages` green
 Proof: same spec.
 
 Behavior: panel open on a plain-text or list value → Reify is disabled and a short reason is visible ("Only a property
