@@ -321,31 +321,53 @@ through each chapter and the book they are, and what is left at the end.
 
 **Identity:** SEED-059#story-18
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"not-refined","approach":"unselected"}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/060-panel-after-one-paragraph-epub-block/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"51f8bee2c64fccd3a70733ded508ffd0e9606f70fccafdeb958d1888f2e195fc","plan":"6dad6b064ec82775bfb26f28ac75163c60498af7c833582d34d316a54d97f0db"}}
 ```
 
 **Goal:** A reader of an EPUB block with one paragraph gets the Reading Control
-Panel at the end of that paragraph, as they do for blocks with more text.
+Panel, placed after that paragraph, as they do for blocks with more text.
 
-**Scope** (awaiting story refinement)
+**Why it matters:** Story 16's delivery makes the panel target treat a
+one-paragraph EPUB block as having text, so the panel is offered only once the
+block's last text is on screen. That position is measured from
+`lastDirectContentLocator`, which returns nothing for a block with one locator.
+The panel therefore never appears for such a block. Before story 16 it appeared
+when the next block became current.
 
-- **Anchor at the block's last text, whatever its count.**
-  `lastDirectContentLocator` (`bookBlockDirectContent.ts`) returns nothing when
-  a block has one locator. In EPUB that locator is often the block's only
-  paragraph, so `useReadingPanelAnchor` gives no anchor for a heading plus one
-  paragraph. It should agree with `hasNoTextOfItsOwn`: only a block with no
-  text of its own has no anchor.
-- **Check the panel target too:** `useReadingPanelTarget.ts` also uses
-  `lastDirectContentLocator`; its other rules already use `hasNoTextOfItsOwn`.
+**Scope**
+
+- **One rule for "the block's last text".** `lastDirectContentLocator`
+  (`bookBlockDirectContent.ts`) returns nothing only for a block with no text of
+  its own (`hasNoTextOfItsOwn`), and otherwise the block's last locator, so a
+  block with one locator that is its only paragraph has one. Panel target and
+  panel anchor both use it, so both work with no separate change. PDF blocks
+  behave as today.
+- **Deferred: precise placement.** The panel is placed at the bottom of what
+  that locator resolves to: its element when it has an id, otherwise the whole
+  spine document. For an EPUB block whose last paragraph has no id, the panel
+  may sit under the block's heading, or at the end of the spine file when the
+  file holds several blocks. This is accepted for now, and it holds for
+  multi-paragraph blocks today too. Placing the panel at the real end of a
+  block's text is a separate story, not yet queued.
 
 **Key examples**
 
-- In an EPUB, choose "Part One" (a heading and one paragraph) → the Reading
-  Control Panel is anchored at the end of "Opening paragraph for part one."
-- A PDF block with a heading and paragraphs still anchors as today.
+- In an EPUB, choose "Part One" (a heading and one paragraph, in its own file)
+  → the Reading Control Panel is shown, anchored beneath "Opening paragraph for
+  part one."
+- A block with a heading and several paragraphs, in either format, is offered
+  and anchored as today.
+- A PDF or EPUB block with no text of its own still gets no anchor.
 
-**Effort hypothesis:** S, low confidence.
-**Depends on:** none.
+**Evidence (2026-09-30):** In *Alice's Adventures in Wonderland* and *On the
+Origin of Species* (Project Gutenberg EPUBs), no block has one paragraph; the
+few short blocks are front matter with none. No paragraph in either has an id,
+and most blocks are one per spine file. One-paragraph blocks are therefore not
+seen in these two books; the story is kept at the owner's decision, for books
+with short sections.
+
+**Effort hypothesis:** S, high confidence (one function and one E2E scenario).
+**Depends on:** none (story 16's target rule is on trunk).
 
 <a id="story-21"></a>
 
