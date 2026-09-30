@@ -26,10 +26,9 @@ reuse the key field extracted in slice 1, which is why the fix belongs there and
 
 Nothing new is built. Reused: `richModeKeyDropdownPresetKeysForPropertyRows` for the available presets (unchanged);
 the two existing copies of the key-field logic are merged into one component; the existing component-test helpers
-`expectPresetOptions` and `selectPresetKey` in `frontend/tests/components/form/propertiesTestDom.ts`. Gap: a viewport
-step and a layout feature file. Story 1 creates both (`I set the viewport to {int} by {int}`,
-`e2e_test/features/note_topology/note_property_layout.feature`); this plan extends them and does not create a second
-step.
+`expectPresetOptions` and `selectPresetKey` in `frontend/tests/components/form/propertiesTestDom.ts`. Story 1 landed
+the viewport step (`I am on a window {int} * {int}`, `e2e_test/step_definitions/sidebar.ts`) and
+`e2e_test/features/note_topology/note_property_layout.feature`; this plan extends them and creates no second step.
 
 ## Decisive premises
 
@@ -40,11 +39,11 @@ step.
 | The list never sees the typed text | read `RichFrontmatterPropertyKeyPresets.vue` | props are `listId`, `propertyRows`, `excludeRowIndex`; no text |
 | Focusing an existing key shows every available preset today and a test relies on it | read `RichMarkdownEditor.propertyEntry.spec.ts`, "key presets" | focus on row key `custom` expects all presets; this fixes "filter on typed text only, not on the current text" |
 | No e2e scenario covers presets | `grep -rni "preset" e2e_test` | no match; `noteRichPropertyMethods.ts` types keys through `rich-note-property-key` and the row key input, so those test ids must stay |
-| Story 1's viewport step and layout feature are not on trunk yet | `ls e2e_test/features/note_topology \| grep layout`; `grep -rn "I set the viewport" e2e_test` in this workspace | none; story 1's branch has an uncommitted `note_property_layout.feature`, `EditablePropertyRow.vue` and `ScalarPropertyValue.vue` |
+| Story 1 is on trunk | `ls e2e_test/features/note_topology \| grep layout`; `grep -rn "on a window" e2e_test/step_definitions` (2026-09-30, after story 1 landed) | `note_property_layout.feature` exists; the step is `I am on a window {int} * {int}`; story 1 changed `EditablePropertyRow.vue` (+/-2 lines) and `ScalarPropertyValue.vue` |
 | The list sits below the key input in a `relative` wrapper and options are `daisy-btn` (single line) | read `KeyPresets.vue` and both wrappers | `absolute left-0 right-0 top-full w-full`; the options have no wrap rule, which is the likely cause of the 250 px width inside a 158 px panel (a hypothesis until slice 3's scenario fails) |
 | The `sm` breakpoint (640 px) is where the add form's key and value sit side by side | read `InsertForm.vue` classes | `w-full sm:w-auto` on the key label and `w-full sm:flex-1` on the value label |
 | An element covering a target can be detected in Cypress | not observed | slice 3's scenario asserts `document.elementFromPoint` at the target's centre returns the target or a descendant; the first red run confirms it |
-| Story 1's narrow row rule changes the row's breakpoint | not observed until story 1 lands | slice 3 reads the merged row layout before choosing the list rule |
+| Story 1's row layout is small | `git diff 6c6642a4fa HEAD --stat` on the row components | one-line edits only; slice 3 still reads the row's classes before choosing the list rule |
 
 ## Outside-in proof
 
@@ -64,8 +63,7 @@ slice 3, because the field's markup changed in slice 1 and its behavior in slice
 ## Ordered slices
 
 Size target is about 10 minutes each including proof. Slice 3 takes longer only by the first Cypress stack start.
-Execute after story 1 lands: it edits the row's key cell and grid, and slice 3 needs its step and feature file. Slices
-1 and 2 have no dependency on it; only start them earlier if a merge with story 1's row edit is accepted.
+Story 1 has landed, so there is no ordering constraint.
 
 ### 1. The add form and an existing row share one key field with its presets
 Type: Structure
@@ -115,7 +113,7 @@ changing anything.
   presets (the current "key presets" test requires this).
 - Match the displayed preset name (contains, case-insensitive). The `url 2` entry is matched by its name like any
   other and is not tested (SEED-063 boundary).
-- Layout scenarios extend story 1's feature file and viewport step; no second step is defined.
+- Layout scenarios extend `note_property_layout.feature` and the step `I am on a window {int} * {int}`; no second step is defined.
 - Layout is proved at fixed widths in Cypress. Keyboard behavior is a manual check by the owner, not an assertion.
 
 ## Learnings

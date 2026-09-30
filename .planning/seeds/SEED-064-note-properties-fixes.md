@@ -80,7 +80,7 @@ Effort bands: S = 30–60 minutes, M = 1–2 hours, L = 2–4 hours, including d
 
 **Identity:** SEED-064#story-2
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/002-note-properties-key-presets/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"a75e92592c3093789e8f7154bf1d7210b70a43380c03645e1253741e89fe2af5","plan":"8940e8fae6150d2c46859f1c0ebbc539fffab743878df9e8f640f424c42f089d"}}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/002-note-properties-key-presets/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"6bd805231755afb8dc39996234a50c49a4b5c81f24918596da2bc9683dc9e952","plan":"4518b0ea61d267e3c40b339c7d65403ef03a4c4059cf874be4ad493793285d4e"}}
 ```
 
 - **Goal:** an iPad user (primary device) or a phone user who types a property key sees only the presets that match
