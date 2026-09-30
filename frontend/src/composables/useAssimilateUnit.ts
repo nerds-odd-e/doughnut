@@ -8,13 +8,17 @@ import { useRecallData } from "@/composables/useRecallData"
 export type AssimilateUnitRequest = {
   noteId: number
   propertyKey?: string
+  propertyValue?: string
   assimilateAsCommissioned?: boolean
   assimilateAsSpelling?: boolean
 }
 
 export type AssimilateEvent = Pick<
   AssimilateUnitRequest,
-  "propertyKey" | "assimilateAsCommissioned" | "assimilateAsSpelling"
+  | "propertyKey"
+  | "propertyValue"
+  | "assimilateAsCommissioned"
+  | "assimilateAsSpelling"
 >
 
 export type AssimilateUnitResult = {
@@ -38,6 +42,9 @@ export function useAssimilateUnit() {
             noteId: request.noteId,
             ...(request.propertyKey
               ? { propertyKey: request.propertyKey }
+              : {}),
+            ...(request.propertyValue
+              ? { propertyValue: request.propertyValue }
               : {}),
             ...(request.assimilateAsCommissioned
               ? { assimilateAsCommissioned: true }

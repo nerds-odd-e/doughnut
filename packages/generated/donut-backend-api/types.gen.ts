@@ -685,6 +685,7 @@ export type MemoryTracker = {
     recalledNote?: RecalledNote;
     latestTutorFeedbackGrade?: number;
     spelling?: boolean;
+    propertyValue?: string;
 };
 
 export type RecordLearningSessionRequest = {

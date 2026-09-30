@@ -172,7 +172,11 @@ wrong-answer message names the value; a scalar tracker shows as today.
 
 ### 5. The property panel offers Assimilate for each value
 Type: Behavior
-Status: planned
+Status: done — `RichMarkdownEditor.listPropertyMemoryTracking.spec.ts` red then green; recall/form/page specs and typecheck
+green. `MemoryTracker.propertyValue` is now serialized (API client regenerated); no backend test reads it from JSON —
+slice 9's e2e is the cross-stack proof. `assimilableListValues` repeats the backend planner's list-item rule (blank,
+over 255 characters, repeats). The assimilation page routes a property unit to this panel by key, so it needs no value.
+New list-property panel tests go in the list spec file (the original spec is at the 250-line limit).
 Proof: `RichMarkdownEditor.propertyMemoryTracking.spec.ts`, red then green.
 
 Behavior: open the panel of a list row → one Assimilate control per value, labelled with the value; assimilating

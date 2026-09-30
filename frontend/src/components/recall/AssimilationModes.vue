@@ -5,10 +5,11 @@
   >
     <div
       v-for="row in rows"
-      :key="row.mode"
+      :key="row.key"
       class="col-span-2 grid grid-cols-subgrid items-center"
       :class="rowHeightClass"
       :data-test="`assimilation-mode-row-${row.mode}`"
+      :data-property-value="row.propertyValue"
     >
       <span
         class="text-right text-sm font-medium"
@@ -39,6 +40,7 @@
           :class="row.showSkipAffordance ? 'daisy-join' : undefined"
         >
           <button
+            v-if="row.assimilable"
             type="button"
             :class="[
               'daisy-btn daisy-btn-primary',
@@ -46,9 +48,11 @@
               sizeClass,
             ]"
             :data-test="`assimilate-${row.mode}`"
-            :aria-label="`Assimilate as ${row.label}`"
+            :aria-label="row.assimilateLabel"
             :disabled="disabled"
-            @click="$emit('assimilate', assimilatePayloadFor(row.mode))"
+            @click="
+              $emit('assimilate', assimilatePayloadFor(row.mode, row.propertyValue))
+            "
           >
             Assimilate
           </button>
@@ -96,6 +100,7 @@ const props = withDefaults(
     allowedModes: MemoryTrackerType[]
     trackers?: MemoryTracker[]
     propertyKey?: string
+    propertyValues?: readonly string[]
     disabled?: boolean
     skippedFromAssimilationSequence?: boolean
     size?: "default" | "sm"
@@ -103,6 +108,7 @@ const props = withDefaults(
   {
     trackers: () => [],
     propertyKey: undefined,
+    propertyValues: undefined,
     disabled: false,
     skippedFromAssimilationSequence: false,
     size: "default",
@@ -133,39 +139,69 @@ function formatNextRecallAt(nextRecallAt: string): string {
   })
 }
 
-function assimilatePayloadFor(mode: MemoryTrackerType): AssimilateEvent {
+function assimilatePayloadFor(
+  mode: MemoryTrackerType,
+  propertyValue?: string
+): AssimilateEvent {
   return {
     propertyKey: props.propertyKey,
+    propertyValue,
     assimilateAsCommissioned: mode === "COMMISSIONED" ? true : undefined,
     assimilateAsSpelling: mode === "SPELLING" ? true : undefined,
   }
 }
 
+function unitRow(mode: MemoryTrackerType, propertyValue?: string) {
+  const tracker = noteLevelTrackerOfType(
+    props.trackers,
+    mode,
+    props.propertyKey,
+    propertyValue
+  )
+  return {
+    key: `${mode}:${propertyValue ?? ""}`,
+    mode,
+    propertyValue,
+    label: propertyValue ?? modeLabels[mode],
+    assimilable: true,
+    assimilateLabel:
+      propertyValue === undefined
+        ? `Assimilate as ${modeLabels[mode]}`
+        : `Assimilate ${propertyValue}`,
+    tracker,
+    trackerLocation: tracker
+      ? {
+          name: "memoryTrackerShow",
+          params: { memoryTrackerId: tracker.id },
+        }
+      : undefined,
+    nextRecallAtText: tracker
+      ? formatNextRecallAt(tracker.nextRecallAt)
+      : undefined,
+    statusTitle: tracker
+      ? `Recalled ${tracker.recallCount ?? 0} times`
+      : undefined,
+    showSkipAffordance: mode === "UNDERSTANDING" && !props.propertyValues,
+  }
+}
+
+/** A list property is skipped as a whole, so its values share one Skip row. */
+function keySkipRow() {
+  return {
+    ...unitRow("UNDERSTANDING"),
+    key: "skip",
+    label: "",
+    assimilable: false,
+    tracker: undefined,
+    showSkipAffordance: true,
+  }
+}
+
 const rows = computed(() =>
-  props.allowedModes.map((mode) => {
-    const tracker = noteLevelTrackerOfType(
-      props.trackers,
-      mode,
-      props.propertyKey
-    )
-    return {
-      mode,
-      label: modeLabels[mode],
-      tracker,
-      trackerLocation: tracker
-        ? {
-            name: "memoryTrackerShow",
-            params: { memoryTrackerId: tracker.id },
-          }
-        : undefined,
-      nextRecallAtText: tracker
-        ? formatNextRecallAt(tracker.nextRecallAt)
-        : undefined,
-      statusTitle: tracker
-        ? `Recalled ${tracker.recallCount ?? 0} times`
-        : undefined,
-      showSkipAffordance: mode === "UNDERSTANDING",
-    }
+  props.allowedModes.flatMap((mode) => {
+    if (!props.propertyValues) return [unitRow(mode)]
+    const valueRows = props.propertyValues.map((value) => unitRow(mode, value))
+    return mode === "UNDERSTANDING" ? [...valueRows, keySkipRow()] : valueRows
   })
 )
 </script>

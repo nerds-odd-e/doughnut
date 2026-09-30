@@ -120,6 +120,9 @@ class MemoryTrackerBuilder extends Builder<MemoryTracker> {
     if (this.propertyKey !== undefined) {
       this.data.propertyKey = this.propertyKey
     }
+    if (this.propertyValue !== undefined) {
+      this.data.propertyValue = this.propertyValue
+    }
     return this.data
   }
 }

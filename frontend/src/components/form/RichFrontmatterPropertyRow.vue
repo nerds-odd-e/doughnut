@@ -133,6 +133,7 @@
     <RichFrontmatterPropertyPanel
       v-if="isFocused && !readOnly"
       :property-key="modelValue.key"
+      :property-value="modelValue.value"
       :note-id="noteId"
       @remove="emit('remove')"
     />

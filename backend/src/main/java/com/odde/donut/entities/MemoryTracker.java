@@ -137,7 +137,6 @@ public class MemoryTracker extends EntityIdentifiedByIdOnly {
   private String propertyKey = "";
 
   @Column(name = "property_value")
-  @JsonIgnore
   @Getter
   @Setter
   private String propertyValue = "";
