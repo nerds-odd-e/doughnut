@@ -104,6 +104,29 @@ export const notePropertyLocationMethods = () => ({
     })
     return this
   },
+  expectRichNotePropertyValueVisible(key: string) {
+    this.switchToRichContent()
+    findNoteContentRegion().within(() => {
+      cy.get(richNotePropertyRow(key))
+        .find('dd')
+        .should('be.visible')
+        .and(($value) => {
+          expect($value.width(), `width of the value of "${key}"`).to.be.above(
+            100
+          )
+        })
+    })
+    return this
+  },
+  expectNoteWithoutSidewaysScroll() {
+    cy.document().should((doc) => {
+      const page = doc.documentElement
+      expect(page.scrollWidth, 'page scroll width').to.be.at.most(
+        page.clientWidth
+      )
+    })
+    return this
+  },
   expectRichNotePropertyNotFound(key: string) {
     this.switchToRichContent()
     const expected = `Property "${key}" not found`

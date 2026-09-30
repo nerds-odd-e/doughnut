@@ -62,7 +62,7 @@ external wait for the first stack start.
 
 ### 1. Read-only properties keep a long-key note's value visible on an iPad and a phone
 Type: Behavior
-Status: planned
+Status: done
 Proof: `pnpm cy:run --spec e2e_test/features/note_topology/note_property_layout.feature` runs the read-only scenario
 at 820 and 375 px, red before the change and green after.
 
@@ -129,7 +129,15 @@ row panel's Assimilate and Skip are inside the section and so are included; no o
 
 ## Learnings
 
-_None yet. Slice 1 records the density baseline; slice 4 records the after number and the difference._
+- Density baseline (Cypress, 820x1000, 19-row note, top of `.ql-editor` in viewport px): editable 864, read-only 608.
+  Slice 4 measures again the same way.
+- Slice 1 reused the existing step `I am on a window {int} * {int}` (sidebar.ts) instead of adding a viewport step;
+  only slice 3's touch step is still new. The feature file must be listed in
+  `scripts/isolated-cypress-active-specs.mjs`; slice 1 added it.
+- The `minmax(6rem,40%)` key column makes short read-only keys sit in a wider column than before; not asserted, for the
+  owner's iPad check.
+- The two long-key rows live in the feature's Background (another user's shared notebook); slice 2's editable scenario
+  can reuse the same rows with the owner logged in.
 
 ## Real iPad check (owner)
 

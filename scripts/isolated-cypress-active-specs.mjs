@@ -45,6 +45,7 @@ export const APPLICATION_ONLY_ACTIVE_SPECS = [
   'e2e_test/features/note_topology/markdown_link.feature',
   'e2e_test/features/note_topology/note_move.feature',
   'e2e_test/features/note_topology/note_property.feature',
+  'e2e_test/features/note_topology/note_property_layout.feature',
   'e2e_test/features/note_topology/note_tree_view.feature',
   'e2e_test/features/note_topology/property_wiki_link.feature',
   'e2e_test/features/note_topology/wiki_link.feature',

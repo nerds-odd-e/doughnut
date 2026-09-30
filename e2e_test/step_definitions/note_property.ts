@@ -50,6 +50,14 @@ Then(
   }
 )
 
+Then('the value of property {string} should be visible', (key: string) => {
+  start.assumeNotePage().expectRichNotePropertyValueVisible(key)
+})
+
+Then('the note should not scroll sideways', () => {
+  start.assumeNotePage().expectNoteWithoutSidewaysScroll()
+})
+
 Then('the property {string} should not be found', (key: string) => {
   start.assumeNotePage().expectRichNotePropertyNotFound(key)
 })

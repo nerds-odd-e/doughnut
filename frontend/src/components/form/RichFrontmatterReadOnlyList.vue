@@ -3,7 +3,7 @@
     <div
       v-for="row in propertyRows"
       :key="row.key"
-      class="grid grid-cols-[auto_minmax(0,1fr)] gap-x-4 gap-y-1"
+      class="grid grid-cols-[minmax(6rem,40%)_minmax(0,1fr)] gap-x-4 gap-y-1"
       data-testid="rich-note-property-row"
       :data-property-key="row.key"
       :data-property-focused="isFocusedProperty(row.key) ? 'true' : undefined"
@@ -14,8 +14,8 @@
       }"
       :ref="(el) => setPropertyRowRef(row.key, el)"
     >
-      <dt class="font-medium text-base-content/80">{{ row.key }}</dt>
-      <dd class="m-0">
+      <dt class="break-words font-medium text-base-content/80">{{ row.key }}</dt>
+      <dd class="m-0 break-words">
         <RichFrontmatterListPropertyValue
           v-if="isListPropertyValue(row.value)"
           :value="row.value"
@@ -31,7 +31,7 @@
           v-else-if="isWikidataIdPropertyKey(row.key)"
           class="inline-flex min-w-0 max-w-full items-center gap-1"
         >
-          <span class="truncate font-mono">{{
+          <span class="min-w-0 font-mono">{{
             row.value.value.trim() || "—"
           }}</span>
           <RichFrontmatterPropertyExternalLink
@@ -44,7 +44,7 @@
           v-else-if="isUrlPropertyKey(row.key)"
           class="inline-flex min-w-0 max-w-full items-center gap-1"
         >
-          <span class="truncate">{{ row.value.value }}</span>
+          <span class="min-w-0">{{ row.value.value }}</span>
           <RichFrontmatterPropertyExternalLink
             kind="url"
             :value="row.value.value"
