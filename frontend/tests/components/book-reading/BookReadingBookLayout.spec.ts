@@ -19,6 +19,7 @@ function mountLayout(
     isMdOrLarger?: boolean
     opened?: boolean
     canUndoDepthChange?: boolean
+    canReorganize?: boolean
   }
 ) {
   return helper
@@ -31,6 +32,7 @@ function mountLayout(
       currentBlockId: options?.currentBlockId ?? null,
       selectedBlockId: options?.selectedBlockId ?? null,
       canUndoDepthChange: options?.canUndoDepthChange ?? false,
+      canReorganize: options?.canReorganize ?? true,
       dispositionForBlock: () => undefined,
     })
     .mount({ attachTo: document.body })
@@ -339,11 +341,14 @@ describe("BookReadingBookLayout", () => {
     })
   })
 
-  it("emits requestAiReorganize when AI Reorganize is clicked", async () => {
+  it("draws AI Reorganize only when reorganizing is offered", async () => {
+    const aiReorganize = '[data-testid="book-reading-ai-reorganize-layout"]'
+    const without = mountLayout(undefined, { canReorganize: false })
+    expect(without.find(aiReorganize).exists()).toBe(false)
+    without.unmount()
+
     const wrapper = mountLayout()
-    await wrapper
-      .find('[data-testid="book-reading-ai-reorganize-layout"]')
-      .trigger("click")
+    await wrapper.find(aiReorganize).trigger("click")
     expect(wrapper.emitted("requestAiReorganize")).toHaveLength(1)
     wrapper.unmount()
   })

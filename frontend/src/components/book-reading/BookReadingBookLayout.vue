@@ -13,6 +13,7 @@
         class="p-3 pb-8"
       >
         <button
+          v-if="canReorganize"
           type="button"
           data-testid="book-reading-ai-reorganize-layout"
           class="daisy-btn daisy-btn-sm daisy-btn-outline daisy-btn-primary mb-3 w-full"
@@ -120,6 +121,7 @@ const props = withDefaults(
     blocks: BookBlockFull[]
     currentBlockId: number | null
     selectedBlockId: number | null
+    canReorganize: boolean
     canUndoDepthChange?: boolean
     dispositionForBlock: (
       blockId: number

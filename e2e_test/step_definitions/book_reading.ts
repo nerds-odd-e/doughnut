@@ -191,6 +191,14 @@ Then(
 )
 
 Then(
+  'the book layout should not offer AI reorganization',
+  // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
+  () => {
+    return bookReadingPage().expectNoAiReorganizationOfBookLayout()
+  }
+)
+
+Then(
   'the current block in the book layout should not be the selected block',
   // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
   () => {

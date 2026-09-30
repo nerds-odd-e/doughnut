@@ -2,7 +2,7 @@
 
 Work item: **SEED-059#story-10**
 ([story](../../seeds/SEED-059-book-reading-uat-fixes.md#story-10)).
-Status: **story refined; two Behavior slices planned.**
+Status: **slice 1 done; slice 2 planned.**
 Nothing blocks execution.
 
 ## Goal and scope
@@ -87,7 +87,7 @@ generated API, or CLI change.
 
 ### 1. An EPUB layout offers no AI Reorganize
 Type: Behavior
-Status: planned
+Status: done
 Proof: new E2E scenario "EPUB book layout offers no AI reorganization" in
 `epub_book.feature`, with a step that asserts the button does not exist after
 the layout has listed its blocks; and a layout spec case that the button is
@@ -135,4 +135,4 @@ never swallowed. About 5 min.
 
 ## Learnings
 
-None yet.
+Slice 1 accepted proof: `BookReadingBookLayout.spec.ts` (16/16, incl. "draws AI Reorganize only when reorganizing is offered"); E2E `epub_book.feature` (new scenario failed before, passes after) and `ai_reorganize_layout.feature` (PDF), 22/22. `reorganize_layout.feature` not run.

@@ -15,6 +15,12 @@ export const bookReadingAiReorganizeMethods = () => ({
     }).should('not.exist')
     return this
   },
+  expectNoAiReorganizationOfBookLayout() {
+    cy.get('[data-testid="book-reading-ai-reorganize-layout"]').should(
+      'not.exist'
+    )
+    return this
+  },
   expectReorganizationPreviewDialog() {
     waitUntilAppIsNotBusy()
     const dialog = '[data-testid="book-layout-reorganize-preview-dialog"]'
