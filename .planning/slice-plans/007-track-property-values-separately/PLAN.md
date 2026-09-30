@@ -122,7 +122,10 @@ scalars `''`. The unassimilated query keeps its per-key dedupe, so external beha
 
 ### 2a. Each list value is its own assimilation unit
 Type: Behavior
-Status: planned
+Status: done — `UnassimilatedPropertyServiceTest`, `AssimilationServicePropertyReferenceGateTest` red then green; full
+backend suite and frontend typecheck green; ADR 0001 amended. `AssimilationNextUnitDTO.propertyValue` is not yet asserted
+on the wire (2b). A list repeating one value still gives two index rows and two units with the same (key, value): 2b
+skips a repeated value in `NotePropertyIndexPlanner`.
 Proof: `UnassimilatedPropertyServiceTest`, `AssimilationServicePropertyReferenceGateTest`, red then green.
 
 Behavior: note with `example of: ["[[run]]", "[[past tense]]"]` → the sequence and counts offer two units with values

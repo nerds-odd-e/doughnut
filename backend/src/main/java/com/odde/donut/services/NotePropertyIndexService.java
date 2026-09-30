@@ -64,9 +64,9 @@ public class NotePropertyIndexService {
             });
   }
 
-  public List<AuthoredNoteReference> authoredReferencesForProperty(
-      Note note, String propertyKey, List<NotePropertyIndex> indexRows) {
-    List<String> plannedSourceLocalKeys = plannedSourceLocalKeys(note, propertyKey);
+  public List<AuthoredNoteReference> authoredReferencesForPropertyValue(
+      Note note, String propertyKey, String propertyValue, List<NotePropertyIndex> indexRows) {
+    List<String> plannedSourceLocalKeys = plannedSourceLocalKeys(note, propertyKey, propertyValue);
     if (plannedSourceLocalKeys.isEmpty()) {
       return List.of();
     }
@@ -91,7 +91,7 @@ public class NotePropertyIndexService {
         .toList();
   }
 
-  private List<String> plannedSourceLocalKeys(Note note, String propertyKey) {
+  private List<String> plannedSourceLocalKeys(Note note, String propertyKey, String propertyValue) {
     return NoteContentMarkdown.splitLeadingFrontmatter(
             note.getContent() == null ? "" : note.getContent())
         .map(
@@ -99,7 +99,10 @@ public class NotePropertyIndexService {
                 NotePropertyIndexPlanner.plannedRows(
                         leadingFrontmatter.frontmatter(), canonicalDonutOrigin)
                     .stream()
-                    .filter(planned -> planned.propertyKey().equals(propertyKey))
+                    .filter(
+                        planned ->
+                            planned.propertyKey().equals(propertyKey)
+                                && planned.propertyValue().equals(propertyValue))
                     .map(NotePropertyIndexPlanner.PlannedRow::sourceLocalKey)
                     .filter(Objects::nonNull)
                     .distinct()

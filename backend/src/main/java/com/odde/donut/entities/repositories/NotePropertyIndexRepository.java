@@ -17,11 +17,8 @@ public interface NotePropertyIndexRepository extends JpaRepository<NotePropertyI
   String unassimilatedJoinPropertyTracker =
       " LEFT JOIN n.memoryTrackers mt ON mt.user.id = :userId"
           + " AND mt.type <> com.odde.donut.entities.MemoryTrackerType.SPELLING"
-          + " AND mt.propertyKey = i.propertyKey";
-
-  String unassimilatedDedupeByExactKey =
-      " AND i.itemIndex = (SELECT MIN(i2.itemIndex) FROM NotePropertyIndex i2"
-          + " WHERE i2.note = n AND i2.propertyKey = i.propertyKey)";
+          + " AND mt.propertyKey = i.propertyKey"
+          + " AND mt.propertyValue = i.propertyValue";
 
   String unassimilatedWhereClause =
       " WHERE mt IS NULL"
@@ -30,14 +27,13 @@ public interface NotePropertyIndexRepository extends JpaRepository<NotePropertyI
           + " AND "
           + AssimilationSequenceSkip.JPA_NOT_EXISTS_PROPERTY_SKIP
           + " AND "
-          + NotebookSettings.JPA_NOTEBOOK_NOT_SKIP_MEMORY_TRACKING
-          + unassimilatedDedupeByExactKey;
+          + NotebookSettings.JPA_NOTEBOOK_NOT_SKIP_MEMORY_TRACKING;
 
   String unassimilatedOrderBy =
-      " ORDER BY " + NoteLevelIndex.JPA_LEVEL + ", n.createdAt, n.id, i.propertyKey";
+      " ORDER BY " + NoteLevelIndex.JPA_LEVEL + ", n.createdAt, n.id, i.propertyKey, i.itemIndex";
 
   String selectUnassimilatedPropertyUnit =
-      "SELECT NEW com.odde.donut.services.AssimilationUnit(n, i.propertyKey, "
+      "SELECT NEW com.odde.donut.services.AssimilationUnit(n, i.propertyKey, i.propertyValue, "
           + NoteLevelIndex.JPA_LEVEL
           + ")";
 
@@ -51,7 +47,8 @@ public interface NotePropertyIndexRepository extends JpaRepository<NotePropertyI
 
   List<NotePropertyIndex> findByNote_IdOrderByIdAsc(Integer noteId);
 
-  List<NotePropertyIndex> findByNote_IdAndPropertyKey(Integer noteId, String propertyKey);
+  List<NotePropertyIndex> findByNote_IdAndPropertyKeyAndPropertyValue(
+      Integer noteId, String propertyKey, String propertyValue);
 
   @Query(
       value =

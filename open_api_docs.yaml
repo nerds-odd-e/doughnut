@@ -6141,6 +6141,8 @@ components:
           format: int32
         propertyKey:
           type: string
+        propertyValue:
+          type: string
     DummyForGeneratingTypes:
       type: object
       properties:

@@ -1305,6 +1305,7 @@ export type AssimilationNextDto = {
 export type AssimilationNextUnitDto = {
     noteId?: number;
     propertyKey?: string;
+    propertyValue?: string;
 };
 
 export type DummyForGeneratingTypes = {

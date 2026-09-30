@@ -32,7 +32,7 @@ public class UnassimilatedPropertyService {
   }
 
   /**
-   * Counts every property family without a tracker, including families whose references are still
+   * Counts every property value without a tracker, including values whose references are still
    * gated: they are unassimilated, merely not yet offerable. Counting never resolves references.
    */
   public int countUnassimilatedPropertiesForUser(User user) {
@@ -73,21 +73,21 @@ public class UnassimilatedPropertyService {
   }
 
   /**
-   * A property unit is gated while any sibling row in its (note, propertyKey) list-property family
-   * currently resolves, for {@code viewer}, to a note that isn't yet handled (no completed
-   * note-level UNDERSTANDING tracker). A reference that doesn't currently resolve (deleted target,
-   * ambiguous, missing) never gates. Note-level units (propertyKey == null) are never gated.
+   * A property unit is gated while its own value's reference currently resolves, for {@code
+   * viewer}, to a note that isn't yet handled (no completed note-level UNDERSTANDING tracker). A
+   * plain-text value, or a reference that doesn't currently resolve (deleted target, ambiguous,
+   * missing), never gates. Note-level units (propertyKey == null) are never gated.
    */
   private boolean isGated(AssimilationUnit unit, User viewer) {
     if (!unit.isPropertyLevel()) {
       return false;
     }
-    List<NotePropertyIndex> siblings =
-        notePropertyIndexRepository.findByNote_IdAndPropertyKey(
-            unit.note().getId(), unit.propertyKey());
+    List<NotePropertyIndex> valueRows =
+        notePropertyIndexRepository.findByNote_IdAndPropertyKeyAndPropertyValue(
+            unit.note().getId(), unit.propertyKey(), unit.propertyValue());
     for (var reference :
-        notePropertyIndexService.authoredReferencesForProperty(
-            unit.note(), unit.propertyKey(), siblings)) {
+        notePropertyIndexService.authoredReferencesForPropertyValue(
+            unit.note(), unit.propertyKey(), unit.propertyValue(), valueRows)) {
       NoteReferenceResolution resolution =
           wikiLinkResolver.resolveReference(reference, unit.note(), viewer);
       if (resolution instanceof NoteReferenceResolution.Resolved resolved
