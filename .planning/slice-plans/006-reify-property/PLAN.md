@@ -56,7 +56,8 @@ on source" in `relationship_edit_and_remove.feature`.
 
 ### 1. One frontmatter property can be removed by key
 Type: Structure
-Status: planned
+Status: done — `NoteContentMarkdown.removeFrontmatterProperty` (via `FrontmatterInPlaceEdit.removeTopLevelEntry`);
+proof `NoteContentMarkdownTest.removeFrontmatterProperty_*` plus `*Frontmatter*`/`*WikiLink*` green
 Proof: unit test on the new removal (`NoteContentMarkdown` level), removing the last property drops the block, other
 lines untouched (`CURSOR_DEV=true nix develop -c ./backend/gradlew -p backend test --tests '*NoteContentMarkdown*' -Dspring.profiles.active=test`).
 
@@ -138,4 +139,5 @@ tracker on source".
 
 ## Learnings
 
-_None yet._
+- `entryRemoval` now cuts through the line holding the value node's last character, so block-list values are removed
+  with their key; key lookup is shared with `setTopLevelScalar`.

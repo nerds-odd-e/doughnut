@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.UnaryOperator;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
@@ -78,29 +79,50 @@ public final class FrontmatterInPlaceEdit {
    */
   public static String setTopLevelScalar(String yamlRaw, String key, String value) {
     String entry = dumpEntry(key, value);
-    Node document = new Yaml().compose(new StringReader(yamlRaw));
-    if (document instanceof MappingNode mapping) {
-      for (NodeTuple tuple : mapping.getValue()) {
-        if (tuple.getKeyNode() instanceof ScalarNode keyNode
-            && keyNode.getValue().equalsIgnoreCase(key)) {
-          int start = offset(yamlRaw, keyNode.getStartMark());
-          int end = offset(yamlRaw, tuple.getValueNode().getEndMark());
-          return splice(yamlRaw, List.of(new Replacement(start, end, entry)));
-        }
-      }
+    return firstTopLevelEntry(yamlRaw, key)
+        .map(
+            tuple -> {
+              int start = offset(yamlRaw, tuple.getKeyNode().getStartMark());
+              int end = offset(yamlRaw, tuple.getValueNode().getEndMark());
+              return splice(yamlRaw, List.of(new Replacement(start, end, entry)));
+            })
+        .orElseGet(() -> yamlRaw.isEmpty() ? entry : yamlRaw + "\n" + entry);
+  }
+
+  /**
+   * Removes the first top-level {@code key} entry (matched case-insensitively), with its whole
+   * value, leaving every other line as is.
+   */
+  public static String removeTopLevelEntry(String yamlRaw, String key) {
+    return firstTopLevelEntry(yamlRaw, key)
+        .map(tuple -> splice(yamlRaw, List.of(entryRemoval(yamlRaw, tuple, tuple.getValueNode()))))
+        .orElse(yamlRaw);
+  }
+
+  private static Optional<NodeTuple> firstTopLevelEntry(String yamlRaw, String key) {
+    if (!(new Yaml().compose(new StringReader(yamlRaw)) instanceof MappingNode mapping)) {
+      return Optional.empty();
     }
-    return yamlRaw.isEmpty() ? entry : yamlRaw + "\n" + entry;
+    return mapping.getValue().stream()
+        .filter(
+            tuple ->
+                tuple.getKeyNode() instanceof ScalarNode keyNode
+                    && keyNode.getValue().equalsIgnoreCase(key))
+        .findFirst();
   }
 
   private static boolean emptiedBy(ScalarNode scalar, UnaryOperator<String> rewrite) {
     return !scalar.getValue().isBlank() && rewrite.apply(scalar.getValue()).isBlank();
   }
 
-  /** From the key's line start through the end of the line holding {@code last}. */
-  private static Replacement entryRemoval(String yamlRaw, NodeTuple tuple, ScalarNode last) {
+  /**
+   * From the key's line start through the end of the line holding {@code last}'s final character (a
+   * block node's end mark already sits at the next line's start).
+   */
+  private static Replacement entryRemoval(String yamlRaw, NodeTuple tuple, Node last) {
     int start =
         yamlRaw.lastIndexOf('\n', offset(yamlRaw, tuple.getKeyNode().getStartMark()) - 1) + 1;
-    int lineEnd = yamlRaw.indexOf('\n', offset(yamlRaw, last.getEndMark()));
+    int lineEnd = yamlRaw.indexOf('\n', offset(yamlRaw, last.getEndMark()) - 1);
     return new Replacement(start, lineEnd < 0 ? yamlRaw.length() : lineEnd + 1, "");
   }
 

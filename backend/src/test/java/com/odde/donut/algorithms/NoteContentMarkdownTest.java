@@ -95,4 +95,31 @@ class NoteContentMarkdownTest {
 
     assertThat(result, equalTo("---\n" + "a part of: '[[Earth]]'\n" + "---\n" + "Hello"));
   }
+
+  @Test
+  void removeFrontmatterProperty_removes_only_that_property_and_its_list_value() {
+    String content =
+        "---\n# a comment\nsource: \"[[Moon]]\"\na part of:\n  - \"[[Earth]]\"\n  - \"[[Sun]]\"\ntags: [x, y]\n---\nBody\n";
+
+    assertThat(
+        NoteContentMarkdown.removeFrontmatterProperty(content, "a part of"),
+        equalTo("---\n# a comment\nsource: \"[[Moon]]\"\ntags: [x, y]\n---\nBody\n"));
+  }
+
+  @Test
+  void removeFrontmatterProperty_removes_the_first_of_duplicate_keys_only() {
+    String content = "---\nsource: a\nsource: b\n---\nBody";
+
+    assertThat(
+        NoteContentMarkdown.removeFrontmatterProperty(content, "source"),
+        equalTo("---\nsource: b\n---\nBody"));
+  }
+
+  @Test
+  void removeFrontmatterProperty_drops_the_block_when_removing_the_last_property() {
+    assertThat(
+        NoteContentMarkdown.removeFrontmatterProperty(
+            "---\nsource: \"[[Moon]]\"\n---\nBody", "source"),
+        equalTo("Body"));
+  }
 }

@@ -92,9 +92,26 @@ public final class NoteContentMarkdown {
               if (yaml.equals(split.yamlRaw())) {
                 return Optional.empty();
               }
-              return Optional.of(
-                  Frontmatter.parse(yaml).isEmpty() ? split.body() : split.rebuild(yaml));
+              return Optional.of(rebuildDroppingEmptyBlock(split, yaml));
             });
+  }
+
+  /**
+   * Removes the first {@code key} property (case-insensitive) from the leading frontmatter,
+   * dropping the block when it was the last property; every other line stays as is.
+   */
+  public static String removeFrontmatterProperty(String content, String key) {
+    return NoteLeadingFrontmatter.splitVerbatim(content)
+        .map(
+            split ->
+                rebuildDroppingEmptyBlock(
+                    split, FrontmatterInPlaceEdit.removeTopLevelEntry(split.yamlRaw(), key)))
+        .orElse(content);
+  }
+
+  private static String rebuildDroppingEmptyBlock(
+      NoteLeadingFrontmatter.VerbatimSplit split, String yaml) {
+    return Frontmatter.parse(yaml).isEmpty() ? split.body() : split.rebuild(yaml);
   }
 
   public record AddPropertyWithAvailableKeyResult(String content, String resolvedKey) {}
