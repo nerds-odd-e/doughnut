@@ -276,71 +276,6 @@ through each chapter and the book they are, and what is left at the end.
 **Effort hypothesis:** M, medium confidence.
 **Depends on:** none.
 
-<a id="story-16"></a>
-
-### The current block moves the same way in PDF as in EPUB
-
-**Identity:** SEED-059#story-16
-```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/058-current-block-same-in-pdf-and-epub/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"b498a207d1d1ab66ce330471ccea01d5aa033e659b382c2c6cbcf98a3b2c96e1","plan":"6d5ff634f7248441c78b9da7ece5f8b1754094a55cbf59a5680ee70acd0e6e1e"}}
-```
-
-**Goal:** A reader sees the current block change at the same moment in PDF and
-EPUB, a chosen PDF block lands with its start at the top and stays current, and
-marking goes on after choosing a block with no text of its own.
-
-**Scope**
-
-- **One current-block rule for both formats.** EPUB uses "the last block whose
-  start is at the top of the view (24 px tolerance), and the chosen block wins
-  among blocks sharing that start". PDF uses "the first visible block above the
-  middle of the view", with no chosen-block preference, and lands a chosen block
-  40 PDF points below its start. Use the EPUB rule for both, in one place, and
-  land PDF at the start.
-  - Where the view cannot bring the start to the top (the first or last page),
-    the chosen block still wins, as it does in EPUB today.
-  - The old PDF rule is removed, not kept beside the new one.
-- **Marking goes on after choosing a block with no text of its own** (moved
-  from story 6 via story 15; UAT defect 15). A PDF without bookmarks keeps
-  MinerU's headings, so a "Chapter N" label can come directly before its title
-  block. After choosing such a block and scrolling, each following block
-  becomes current in order (the title block is not skipped), the empty block is
-  marked read when its successor is entered, and the Reading Control Panel is
-  offered for the next unmarked block with text. UAT: choosing "Chapter 9",
-  "Chapter 10" or "Chapter 12" in Think Python (before the bookmark layout) hid
-  the panel for 3–4 pages, the current block went from the label straight to
-  x.1, and neither the label nor the title was marked.
-  - "No text of its own" is `hasNoTextOfItsOwn`
-    (`frontend/src/lib/book-reading/bookBlockDirectContent.ts`; a PDF
-    heading-only block, or an EPUB block whose only content is its start
-    anchor). Auto-mark already uses it; the reading panel target's
-    `hasDirectContent` (`useReadingPanelTarget.ts`, today "more than one
-    locator") should use it too.
-- **Boundary with story 18:** this story owns which block the panel is offered
-  for; story 18 owns where the panel is anchored for a one-paragraph EPUB
-  block. Neither changes the other's rule.
-- **Deferred:** no change to the reading position saved on scroll, the page
-  indicator, or EPUB behavior beyond sharing the rule; no new UI.
-
-**Key examples**
-
-- Scroll a PDF and an EPUB past a heading → the current block changes when the
-  heading reaches the top of the view in both (a heading lower on the page is
-  not yet current, so the block above stays current).
-- Choose a PDF block → its start is at the top and it is current.
-- Choose the first of two PDF headings sharing a start (a parent and child
-  bookmark at one destination) → it stays selected and current.
-- Choose a PDF block on the first page, whose start cannot reach the top → it
-  is still current.
-- In a PDF without bookmarks whose layout has "Chapter 12" (no text), then
-  "Tuples" (introduction text), then "12.1 Tuples are immutable": choose
-  "Chapter 12" and scroll down → "Tuples" becomes current before 12.1,
-  "Chapter 12" is marked read, and the panel is offered for "Tuples".
-
-**Effort hypothesis:** M–L, low confidence. Provisional slices:
-[plan 058](../slice-plans/058-current-block-same-in-pdf-and-epub/PLAN.md).
-**Depends on:** none (story 5 removed snap-back and the hold-window gate).
-
 <a id="story-18"></a>
 
 ### Anchor the Reading Control Panel after a one-paragraph EPUB block
@@ -362,7 +297,7 @@ Panel at the end of that paragraph, as they do for blocks with more text.
   paragraph. It should agree with `hasNoTextOfItsOwn`: only a block with no
   text of its own has no anchor.
 - **Check the panel target too:** `useReadingPanelTarget.ts` also uses
-  `lastDirectContentLocator`; story 16 owns its other rules.
+  `lastDirectContentLocator`; its other rules already use `hasNoTextOfItsOwn`.
 
 **Key examples**
 
@@ -371,7 +306,7 @@ Panel at the end of that paragraph, as they do for blocks with more text.
 - A PDF block with a heading and paragraphs still anchors as today.
 
 **Effort hypothesis:** S, low confidence.
-**Depends on:** none; coordinate with story 16 on the reading panel target.
+**Depends on:** none.
 
 <a id="story-21"></a>
 
