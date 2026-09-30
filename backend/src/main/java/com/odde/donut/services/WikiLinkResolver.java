@@ -4,6 +4,7 @@ import com.odde.donut.algorithms.AuthoredNoteReference;
 import com.odde.donut.algorithms.AuthoredNoteReferences;
 import com.odde.donut.algorithms.CanonicalDonutOrigin;
 import com.odde.donut.algorithms.NoteReferenceResolution;
+import com.odde.donut.algorithms.WikiLinkMarkdown;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.User;
@@ -103,6 +104,15 @@ public class WikiLinkResolver {
       case CandidateCardinality.Unresolved ignored -> Optional.empty();
       case CandidateCardinality.Ambiguous ignored -> Optional.empty();
     };
+  }
+
+  /** Resolves the first wiki link authored in {@code markdown}, if any. */
+  public Optional<Note> resolveFirstWikiLink(String markdown, Note focusNote, User viewer) {
+    List<String> tokens = WikiLinkMarkdown.authoredTokensInOccurrenceOrder(markdown);
+    if (tokens.isEmpty()) {
+      return Optional.empty();
+    }
+    return resolveWikiLinkToken(tokens.getFirst(), focusNote, viewer);
   }
 
   public Optional<Note> findAccidentalMatch(String answer, Note reviewedNote, User viewer) {

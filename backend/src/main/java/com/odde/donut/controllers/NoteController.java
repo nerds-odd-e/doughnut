@@ -18,6 +18,7 @@ import com.odde.donut.services.focusContext.FocusContextMarkdownRenderer;
 import com.odde.donut.services.focusContext.FocusContextResult;
 import com.odde.donut.services.focusContext.FocusContextRetrievalService;
 import com.odde.donut.services.focusContext.RetrievalConfig;
+import com.odde.donut.services.notebookGit.PropertyReifyService;
 import com.odde.donut.services.notebookGit.WebNoteImageUploadService;
 import com.odde.donut.testability.TestabilitySettings;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -48,6 +49,7 @@ class NoteController {
   private final NoteTrashService noteTrashService;
   private final NoteTrashUndoService noteTrashUndoService;
   private final WebNoteImageUploadService webNoteImageUploadService;
+  private final PropertyReifyService propertyReifyService;
   private final TestabilitySettings testabilitySettings;
 
   public NoteController(
@@ -65,6 +67,7 @@ class NoteController {
       NoteTrashService noteTrashService,
       NoteTrashUndoService noteTrashUndoService,
       WebNoteImageUploadService webNoteImageUploadService,
+      PropertyReifyService propertyReifyService,
       TestabilitySettings testabilitySettings) {
     this.entityPersister = entityPersister;
     this.noteService = noteService;
@@ -80,6 +83,7 @@ class NoteController {
     this.noteTrashService = noteTrashService;
     this.noteTrashUndoService = noteTrashUndoService;
     this.webNoteImageUploadService = webNoteImageUploadService;
+    this.propertyReifyService = propertyReifyService;
     this.testabilitySettings = testabilitySettings;
   }
 
@@ -217,6 +221,14 @@ class NoteController {
         focusContextRetrievalService.retrieve(note, user, config);
     String markdown = focusContextMarkdownRenderer.render(focusContextResult, config);
     return new NoteAiContextMarkdown(markdown);
+  }
+
+  @PostMapping(value = "/{note}/reify-property")
+  public NoteRealm reifyProperty(
+      @PathVariable("note") @Schema(type = "integer") Note note, @RequestParam String propertyKey)
+      throws UnexpectedNoAccessRightException {
+    authorizationService.assertAuthorization(note);
+    return propertyReifyService.reifyProperty(note, propertyKey);
   }
 
   @PostMapping(value = "/{note}/verify-spelling")

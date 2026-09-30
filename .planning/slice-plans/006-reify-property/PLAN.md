@@ -66,7 +66,9 @@ Add key removal beside `FrontmatterInPlaceEdit.rewriteSupportedValues` (reuse `e
 
 ### 2. Reifying a wiki-link property creates the relationship note and removes the property
 Type: Behavior
-Status: planned
+Status: done — `POST /api/notes/{note}/reify-property?propertyKey=` → `PropertyReifyService` →
+`NoteConstructionService.reifyPropertyIntoRelationshipNote`; writer `RelationshipNoteComposition` (fixture now uses it);
+proof `NoteReifyPropertyTests` + `RelationControllerReduceToSourcePropertyTests` green
 Proof: `NoteReifyPropertyTests` (new), red then green; `RelationControllerReduceToSourcePropertyTests` green.
 
 Behavior: note `Src` in folder `F` with `related: "[[Other]]"`, no trackers → `POST /api/notes/{src}/reify-property` with
@@ -96,7 +98,8 @@ tracker gets none.
 
 ### 5. The frontend API client knows the operation
 Type: Structure
-Status: planned
+Status: done — absorbed into slice 2's delivery (the new endpoint made `RobotsTests.openApiDocsMatchCommittedYaml`
+fail, so the client was regenerated there to keep the increment CI-safe)
 Proof: generate-api-client skill; frontend type check passes; `pnpm lint:all` OpenAPI validation as that skill states.
 
 Regenerate the client after slice 2's controller signature. Enables slice 6.
@@ -141,3 +144,7 @@ tracker on source".
 
 - `entryRemoval` now cuts through the line holding the value node's last character, so block-list values are removed
   with their key; key lookup is shared with `setTopLevelScalar`.
+- Any new endpoint must regenerate the API client in the same delivery (`RobotsTests` compares the OpenAPI yaml).
+- Saving authored content adds `type: Note` to the source's frontmatter; assert absence of the key, not exact content.
+- Slice 3's refusals: today a missing key or unresolved link fails via bare `orElseThrow()` in
+  `NoteConstructionService.reifyPropertyIntoRelationshipNote`; `WikiLinkResolver.resolveFirstWikiLink` is shared with reduce.

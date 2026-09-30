@@ -1,11 +1,11 @@
 package com.odde.donut.testability;
 
+import com.odde.donut.algorithms.RelationshipNoteComposition;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
 
 /** Builds relationship-note frontmatter markdown for test fixtures. */
 public final class RelationshipNoteMarkdown {
-  private static final String RELATIONSHIP_NOTE_TYPE = "Relationship";
   private static final String UNTITLED = "Untitled";
   private static final String DEFAULT_RELATION_LABEL = "related to";
 
@@ -17,17 +17,12 @@ public final class RelationshipNoteMarkdown {
       Note sourceEndpoint,
       Note targetEndpoint,
       String preservedDetailsOrNull) {
-    String relationLabel = resolveRelationLabel(relationLabelOrNull);
-    String relationKebab = relationKebabFromLabel(relationLabel);
-    String sourceLink = wikiTokenForEndpoint(relationshipNote, sourceEndpoint);
-    String targetLink = wikiTokenForEndpoint(relationshipNote, targetEndpoint);
-    StringBuilder out = new StringBuilder();
-    out.append("---\n");
-    out.append("type: ").append(RELATIONSHIP_NOTE_TYPE).append('\n');
-    out.append("relation: ").append(relationKebab).append('\n');
-    out.append("source: \"").append(yamlDoubleQuotedInner(sourceLink)).append("\"\n");
-    out.append("target: \"").append(yamlDoubleQuotedInner(targetLink)).append("\"\n");
-    out.append("---\n\n");
+    StringBuilder out =
+        new StringBuilder(
+            RelationshipNoteComposition.markdown(
+                resolveRelationLabel(relationLabelOrNull),
+                wikiTokenForEndpoint(relationshipNote, sourceEndpoint),
+                wikiTokenForEndpoint(relationshipNote, targetEndpoint)));
     String preserved = trimmedOrNull(preservedDetailsOrNull);
     if (preserved != null) {
       out.append("\n\n").append(preserved);
@@ -40,14 +35,6 @@ public final class RelationshipNoteMarkdown {
       return DEFAULT_RELATION_LABEL;
     }
     return relationLabelOrNull.trim();
-  }
-
-  private static String relationKebabFromLabel(String label) {
-    String t = trimmedOrEmpty(label);
-    if (t.isEmpty()) {
-      return relationKebabFromLabel(DEFAULT_RELATION_LABEL);
-    }
-    return t.toLowerCase().replaceAll("\\s+", "-");
   }
 
   private static String wikiTokenForEndpoint(Note relationshipNote, Note endpoint) {
@@ -105,9 +92,5 @@ public final class RelationshipNoteMarkdown {
     }
     String t = s.trim();
     return t.isEmpty() ? null : t;
-  }
-
-  private static String yamlDoubleQuotedInner(String s) {
-    return s.replace("\\", "\\\\").replace("\"", "\\\"");
   }
 }

@@ -2,8 +2,10 @@ package com.odde.donut.services;
 
 import com.odde.donut.algorithms.AuthoredNoteDocument;
 import com.odde.donut.algorithms.CanonicalDonutOrigin;
+import com.odde.donut.algorithms.NoteContentMarkdown;
 import com.odde.donut.algorithms.NoteContentTitleHeading;
 import com.odde.donut.algorithms.NoteLeadingFrontmatter;
+import com.odde.donut.algorithms.RelationshipNoteComposition;
 import com.odde.donut.controllers.dto.NoteCreationDTO;
 import com.odde.donut.controllers.dto.NoteRealm;
 import com.odde.donut.entities.DisplayName;
@@ -36,6 +38,7 @@ public class NoteConstructionService {
   private final AuthoredNoteDocumentPersistence authoredNoteDocumentPersistence;
   private final NoteTitleNameRule noteTitleNameRule;
   private final FolderConstructionService folderConstructionService;
+  private final WikiLinkResolver wikiLinkResolver;
 
   @Autowired
   public NoteConstructionService(
@@ -49,7 +52,8 @@ public class NoteConstructionService {
       CanonicalDonutOrigin canonicalDonutOrigin,
       AuthoredNoteDocumentPersistence authoredNoteDocumentPersistence,
       NoteTitleNameRule noteTitleNameRule,
-      FolderConstructionService folderConstructionService) {
+      FolderConstructionService folderConstructionService,
+      WikiLinkResolver wikiLinkResolver) {
     this.authorizationService = authorizationService;
     this.testabilitySettings = testabilitySettings;
     this.folderRepository = folderRepository;
@@ -61,6 +65,7 @@ public class NoteConstructionService {
     this.authoredNoteDocumentPersistence = authoredNoteDocumentPersistence;
     this.noteTitleNameRule = noteTitleNameRule;
     this.folderConstructionService = folderConstructionService;
+    this.wikiLinkResolver = wikiLinkResolver;
   }
 
   private Note persistNoteContent(Note note, String content) {
@@ -140,6 +145,30 @@ public class NoteConstructionService {
     persistAuthoredContent(originalNote, aiResult.updatedOriginalNoteContent);
 
     return noteRealmService.build(newNote, user);
+  }
+
+  /**
+   * Turns the {@code propertyKey} property of {@code source}, whose value is a wiki link to a note,
+   * into a relationship note beside {@code source}, and removes the property from {@code source}.
+   * Returns the new relationship note.
+   */
+  public Note reifyPropertyIntoRelationshipNote(Note source, String propertyKey, User viewer) {
+    String targetLink =
+        NoteContentMarkdown.splitLeadingFrontmatter(source.getContent())
+            .flatMap(leading -> leading.frontmatter().getString(propertyKey))
+            .orElseThrow();
+    Note target = wikiLinkResolver.resolveFirstWikiLink(targetLink, source, viewer).orElseThrow();
+    String title =
+        RelationshipNoteComposition.title(source.getTitle(), propertyKey, target.getTitle());
+    noteTitleNameRule.requireTitleFree(source.getNotebook(), source.getFolder(), title);
+    Note relationshipNote = noteFactory.create(source.getNotebook(), source.getFolder(), title);
+    persistAuthoredContent(
+        relationshipNote,
+        RelationshipNoteComposition.markdown(
+            propertyKey, "[[" + source.getTitle() + "]]", targetLink));
+    persistAuthoredContent(
+        source, NoteContentMarkdown.removeFrontmatterProperty(source.getContent(), propertyKey));
+    return relationshipNote;
   }
 
   private void persistAuthoredContent(Note note, String content) {

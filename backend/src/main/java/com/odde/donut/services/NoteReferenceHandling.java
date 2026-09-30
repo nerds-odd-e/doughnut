@@ -3,7 +3,7 @@ package com.odde.donut.services;
 import com.odde.donut.algorithms.Frontmatter;
 import com.odde.donut.algorithms.NoteContentMarkdown;
 import com.odde.donut.algorithms.PropertyKeyNaming;
-import com.odde.donut.algorithms.WikiLinkMarkdown;
+import com.odde.donut.algorithms.RelationshipNoteComposition;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.User;
 import com.odde.donut.entities.repositories.AuthoredNoteReferenceInboundFacade;
@@ -65,7 +65,8 @@ final class NoteReferenceHandling {
           HttpStatus.BAD_REQUEST,
           "This relationship note has body text and cannot be reduced to a property.");
     }
-    String effectivePropertyKey = propertyKeyFromRelationScalar(relationship.relationScalar());
+    String effectivePropertyKey =
+        RelationshipNoteComposition.propertyKey(relationship.relationScalar());
     if (effectivePropertyKey == null || effectivePropertyKey.isBlank()) {
       throw new ResponseStatusException(
           HttpStatus.BAD_REQUEST, "Property key is required to reduce a relationship note.");
@@ -104,7 +105,8 @@ final class NoteReferenceHandling {
   private Note editableRelationshipSource(
       Note relationNote, RelationshipFrontmatter relationship, User viewer) {
     Note sourceNote =
-        resolveRelationshipSourceNote(relationNote, relationship.sourceScalar(), viewer)
+        wikiLinkResolver
+            .resolveFirstWikiLink(relationship.sourceScalar(), relationNote, viewer)
             .orElseThrow(
                 () ->
                     new ResponseStatusException(
@@ -131,15 +133,6 @@ final class NoteReferenceHandling {
     return LEGACY_RELATIONSHIP_SENTENCE
         .matcher(NoteContentMarkdown.bodyWithoutLeadingFrontmatter(content).trim())
         .matches();
-  }
-
-  /** Same rule as frontend {@code relationTypeFromKebab}: hyphens become spaces, trimmed. */
-  private static String propertyKeyFromRelationScalar(String relationScalar) {
-    if (relationScalar == null) {
-      return null;
-    }
-    String derived = relationScalar.replace('-', ' ').trim();
-    return derived.isEmpty() ? null : derived;
   }
 
   void removeNoteLinksFromReferrerProperties(Note target, User viewer, Timestamp updatedAt) {
@@ -209,14 +202,5 @@ final class NoteReferenceHandling {
               String relation = fm.getString("relation").map(String::trim).orElse(null);
               return Optional.of(new RelationshipFrontmatter(relation, source.get(), target.get()));
             });
-  }
-
-  private Optional<Note> resolveRelationshipSourceNote(
-      Note relationNote, String sourceScalar, User viewer) {
-    List<String> linkTokens = WikiLinkMarkdown.authoredTokensInOccurrenceOrder(sourceScalar);
-    if (linkTokens.isEmpty()) {
-      return Optional.empty();
-    }
-    return wikiLinkResolver.resolveWikiLinkToken(linkTokens.getFirst(), relationNote, viewer);
   }
 }

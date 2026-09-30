@@ -2094,6 +2094,26 @@ export type SearchForRelationshipTargetWithinResponses = {
 
 export type SearchForRelationshipTargetWithinResponse = SearchForRelationshipTargetWithinResponses[keyof SearchForRelationshipTargetWithinResponses];
 
+export type ReifyPropertyData = {
+    body?: never;
+    path: {
+        note: number;
+    };
+    query: {
+        propertyKey: string;
+    };
+    url: '/api/notes/{note}/reify-property';
+};
+
+export type ReifyPropertyResponses = {
+    /**
+     * OK
+     */
+    200: NoteRealm;
+};
+
+export type ReifyPropertyResponse = ReifyPropertyResponses[keyof ReifyPropertyResponses];
+
 export type PermanentlyDeleteNoteData = {
     body?: never;
     path: {

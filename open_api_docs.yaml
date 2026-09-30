@@ -866,6 +866,29 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/RelationshipLiteralSearchHit"
+  /api/notes/{note}/reify-property:
+    post:
+      tags:
+      - note-controller
+      operationId: reifyProperty
+      parameters:
+      - name: note
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: propertyKey
+        in: query
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/NoteRealm"
   /api/notes/{note}/permanently-delete:
     post:
       tags:
