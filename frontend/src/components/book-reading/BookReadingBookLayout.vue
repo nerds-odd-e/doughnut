@@ -63,8 +63,8 @@
             @pointercancel="blockDrag.onPointerCancel(block, $event)"
             @keydown.down.exact.prevent="focusRowBy($event, 1)"
             @keydown.up.exact.prevent="focusRowBy($event, -1)"
-            @keydown.alt.shift.right.prevent="emit('blockIndent', block)"
-            @keydown.alt.shift.left.prevent="emit('blockOutdent', block)"
+            @keydown.alt.shift.right.prevent="changeDepth('blockIndent', block)"
+            @keydown.alt.shift.left.prevent="changeDepth('blockOutdent', block)"
             @keydown.delete.prevent="emit('blockCancel', block)"
           >
             <span
@@ -155,18 +155,47 @@ const tabStopBlockId = computed(() => {
   )
 })
 
+const blockRows = () => [
+  ...(layoutRef.value?.querySelectorAll<HTMLElement>(
+    '[data-testid="book-reading-book-block"]'
+  ) ?? []),
+]
+
 function focusRowBy(e: KeyboardEvent, step: number) {
-  const rows = [
-    ...layoutRef.value!.querySelectorAll<HTMLElement>(
-      '[data-testid="book-reading-book-block"]'
-    ),
-  ]
+  const rows = blockRows()
   rows[rows.indexOf(e.currentTarget as HTMLElement) + step]?.focus()
 }
 
+let blockAwaitingFocus: number | null = null
+
+/** The busy overlay of a depth change takes focus away; return it once the new layout is in. */
+function changeDepth(
+  event: "blockIndent" | "blockOutdent",
+  block: BookBlockFull
+) {
+  blockAwaitingFocus = block.id
+  if (event === "blockIndent") emit("blockIndent", block)
+  else emit("blockOutdent", block)
+}
+
+watch(
+  () => props.blocks,
+  () => {
+    const id = blockAwaitingFocus
+    blockAwaitingFocus = null
+    if (id === null) {
+      return
+    }
+    requestAnimationFrame(() => {
+      blockRows()[props.blocks.findIndex((b) => b.id === id)]?.focus()
+    })
+  },
+  { flush: "post" }
+)
+
 const blockDrag = useBookLayoutBlockPointerDrag({
-  indent: (block) => emit("blockIndent", block),
-  outdent: (block) => emit("blockOutdent", block),
+  indent: (block) => changeDepth("blockIndent", block),
+  outdent: (block) => changeDepth("blockOutdent", block),
 })
 
 function onBlockRowClick(block: BookBlockFull, e: MouseEvent) {

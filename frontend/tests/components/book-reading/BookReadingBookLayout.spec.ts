@@ -249,6 +249,34 @@ describe("BookReadingBookLayout", () => {
     wrapper.unmount()
   })
 
+  it("returns focus to the block's row once the layout it changed arrives", async () => {
+    const blocks = [
+      blockStub({ id: 1, depth: 0, title: "A" }),
+      blockStub({ id: 2, depth: 0, title: "B" }),
+    ]
+    const wrapper = mountLayout(blocks)
+    const rows = () =>
+      wrapper
+        .findAll('[data-testid="book-reading-book-block"]')
+        .map((r) => r.element as HTMLElement)
+    rows()[1]!.focus()
+    await rows()[1]!.dispatchEvent(
+      new KeyboardEvent("keydown", {
+        key: "ArrowRight",
+        altKey: true,
+        shiftKey: true,
+        bubbles: true,
+      })
+    )
+    ;(document.activeElement as HTMLElement).blur()
+    await wrapper.setProps({
+      blocks: [blocks[0]!, { ...blocks[1]!, depth: 1 }],
+    })
+    await new Promise((resolve) => requestAnimationFrame(resolve))
+    expect(document.activeElement).toBe(rows()[1])
+    wrapper.unmount()
+  })
+
   describe("keyboard navigation", () => {
     const threeBlocks = [
       blockStub({ id: 1, depth: 0, title: "A" }),

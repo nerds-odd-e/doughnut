@@ -2,7 +2,7 @@
 
 Work item: **SEED-059#story-9**
 ([story](../../seeds/SEED-059-book-reading-uat-fixes.md#story-9)).
-Status: **slices 1 and 2 done; slice 3 planned.**
+Status: **all three slices done.**
 
 ## Goal and scope
 
@@ -103,7 +103,7 @@ ArrowUp/ArrowDown walk the rows; Enter chooses. About 8 min.
 
 ### 3. The block keeps focus after a depth change
 Type: Behavior
-Status: planned
+Status: done
 Proof: E2E, extending "Indent a block and its children together": after the
 indent, the existing step "the book block "Chapter A" should be focused in the
 book layout" is added first and watched failing if the premise holds; then the
@@ -133,3 +133,7 @@ the first assertion passes without a change, the slice is that assertion only.
   step uses `cy.focused().type('{enter}')`. The component spec does not cover
   arrows with modifiers falling through `.exact`; slice 1's Alt+Shift spec and
   the depth E2E scenarios cover that.
+- Slice 3: the premise held (the focus assertion failed before the fix). The
+  layout component records the block it changes and refocuses its row after the
+  next `blocks` update and a frame. A refused depth change leaves that record
+  pending until the next `blocks` change, which only refocuses the same row.
