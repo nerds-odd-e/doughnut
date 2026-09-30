@@ -112,3 +112,7 @@ parts B and C). The slices below are provisional planning input.
    Think Python (no real-PDF fixture; the cause may be a long introduction whose
    end is not yet visible). Proof: vitest pages/components/lib/composables (457),
    vue-tsc, `cy:run` `reading_record` 9/9 and `book_browsing` 9/9.
+
+## Execution complete
+
+Product advice: The shared rule now drives both formats and the old PDF rule is gone. Two open points for backlog review, not for automatic correction. (1) The UAT panel-hidden-for-3-4-pages case in Think Python (no-bookmark PDF) was not reproduced: slice 5 has only a page-level regression spec, so a real-PDF check on the next UAT pass would settle it. (2) After landing without padding, "viewport should be on page N" (the reader-midpoint indicator) can sit within pixels of a page boundary; `phone_reading.feature` failed on it in CI and was repaired, while `book_browsing.feature` and `reading_record.feature` still use that step after choosing a block and pass only at their desktop window size (hypothesis: they could break at other sizes). Replacing those assertions with the start-position step is a small bounded correction if it shows up in CI. Alignment with the near-future direction (UX improvement and hardening) is unremarkable.
