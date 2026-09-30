@@ -24,7 +24,9 @@ with `.worktree.local.json`) uses that checkout's isolated origin
 Cypress accepts one or more selections from the assessed active feature set
 declared in `scripts/isolated-cypress-spec-selection.mjs` (application-only
 active specs plus the active CLI, MCP, OpenAI-mock, and Wikidata-mock focused
-specs) per run. The CLI command is scoped to the assessed active CLI workflows.
+specs) per run; a new feature file must be added to that set (e.g.
+`APPLICATION_ONLY_ACTIVE_SPECS` in `scripts/isolated-cypress-active-specs.mjs`) before an
+isolated run accepts it. The CLI command is scoped to the assessed active CLI workflows.
 The MCP command is scoped to that one search/graph feature. OpenAI-mock specs
 start a runner-owned private OpenAI Mountebank; Wikidata-mock specs start a
 runner-owned private Wikidata Mountebank; application-only, CLI, and MCP specs

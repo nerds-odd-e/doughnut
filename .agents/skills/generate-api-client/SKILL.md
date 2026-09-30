@@ -37,6 +37,10 @@ manual whitespace fixes.
 - A backend controller signature changed
 - A backend data type used by any controller signature changed
 - `pnpm openapi:lint` or `pnpm format:all` fails with OpenAPI validation errors
+
+Regenerate in the same change as the controller edit: the backend test
+`RobotsTests.openApiDocsMatchCommittedYaml` fails until `open_api_docs.yaml`
+matches, so a signature change cannot be committed on its own while CI stays green.
 </context>
 
 <process>
