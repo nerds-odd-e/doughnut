@@ -78,7 +78,7 @@ Effort bands: S = 30–60 minutes, M = 1–2 hours, L = 2–4 hours, including d
 
 **Identity:** SEED-059#story-10
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/061-epub-layout-only-working-controls/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"d98841e67ae4a306388722a77f85f9b24b22d311ac450abfaeab1822b09b93c6","plan":"e8ae0ee9c277ede502154cea49625dc410b353e31d7e50217e95ce57e062bf5d"}}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/061-epub-layout-only-working-controls/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"aec7cbe5f61559310cf1136d6afd3774098dd3794421de233542a2b02322d132","plan":"e8ae0ee9c277ede502154cea49625dc410b353e31d7e50217e95ce57e062bf5d"}}
 ```
 
 **Goal:** An EPUB reader is not offered layout controls that do nothing. This is
