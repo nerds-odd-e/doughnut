@@ -47,6 +47,15 @@ candidate 3 in that report. Line effects are that report's estimates.
     assimilation behavior, not properties layout; the owner has not decided whether they are wanted;
   - merging the `noteContent*` utilities, one YAML parser for both languages, replacing the value field with a plain
     input, changing the value dialog, and a new confirmation dialog for remove (report, "Not recommended").
+- **Direction shared with SEED-063 (multiple values of one property, no numbered keys):** SEED-063 will replace the
+  numbered-key convention (`url 2`, `example of two`) with several values under one key, each with its own tracker;
+  its storage and editing representation is still undecided. The code that produces numbered keys today is
+  `propertyKeyBaseAndSuffix` and `nextAvailablePropertyKeyForBase` / `ForPreset` in
+  `frontend/src/utils/noteContentPropertyKeys.ts`, plus the duplicate-key rule that shows "Duplicate property keys are
+  not allowed." This seed therefore (a) does not add, keep or test numbered-key behavior, (b) does not decide what
+  adding an existing key means, and (c) does not assume that a key appears once. SEED-062 (reify a property) acts on
+  one property row and needs no change here. Expected deletions by SEED-063 and by stories 5 and 6 may overlap, so the
+  line estimates here are not additive with SEED-063's.
 - **Real device:** device mode cannot show the real iPad keyboard, visual viewport or touch. Each story lists a check
   on a real iPad in its evaluation.
 
@@ -108,6 +117,9 @@ Effort bands: S = 30–60 minutes, M = 1–2 hours, L = 2–4 hours, including d
 - **Effort hypothesis:** M, medium confidence: filtering is cheap; keeping the list on screen with the keyboard is
   the uncertain part.
 - **Depends on:** none genuine; after story 1 the row width is settled.
+- **Boundary with SEED-063:** the numbered preset entry that appears when a key is taken (`url 2`) is left as it is and
+  is not a target of this story's filtering tests; SEED-063 removes it with the numbered-key convention. This story
+  filters and positions the list only.
 - **Safe stopping point:** the add journey works better even if later stories are cancelled.
 
 <a id="story-3"></a>
@@ -166,6 +178,8 @@ Effort bands: S = 30–60 minutes, M = 1–2 hours, L = 2–4 hours, including d
 - **Value / learning:** one row for both modes puts the layout in one place, about -60 to -75 lines and one file
   fewer (estimate).
 - **Effort hypothesis:** M to L, medium confidence.
+- **Boundary with SEED-063:** keeps today's unit of a row (one entry per key as stored) and adds no rule that a key
+  is unique; SEED-063 decides whether a row becomes one value. The single shared row is what SEED-063 extends.
 - **Depends on:** story 1 (the row layout rule to reuse). Protecting tests first: read-only component tests for a
   single wiki-link value, an image value and a Wikidata value (only spec names were checked, not assertions), and
   story 1's scenario.
@@ -189,20 +203,30 @@ Effort bands: S = 30–60 minutes, M = 1–2 hours, L = 2–4 hours, including d
   the add journey, so the test ids `rich-note-property-key` and `rich-note-property-value` are kept or the page
   object `noteRichPropertyMethods.ts` changes in the same commit.
 - **Effort hypothesis:** L, medium confidence: the highest risk of the seed.
-- **Depends on:** stories 2 and 5 (one key field and one row to build the draft on). Protecting tests first:
+- **Boundary with SEED-063:** what happens when the typed key already exists (today: list keys append, other keys are
+  refused as duplicates) is SEED-063's decision. This story is refined after SEED-063 and uses its rule; it must not
+  freeze the current duplicate-key behavior or the numbered-key suggestions.
+- **Depends on:** stories 2 and 5 (one key field and one row to build the draft on) and
+  [SEED-063](SEED-063-track-property-values-separately.md#story-1) (how an existing key is added). Protecting tests
+  first:
   key-only and value-only add tests (none exist).
 - **Safe stopping point:** stories 1 to 5 stand without it.
 
 ## Ordering and Scope Reduction
 
 - **Highest priority** (data hidden or a dead end on the primary device): stories 1 to 4, in the order listed.
-- **Then** (structure that removes code and prevents the same defects): story 5, then story 6.
-- Stories 2, 3 and 4 are independent of each other; story 5 needs story 1; story 6 needs stories 2 and 5.
+- **Then** (structure that removes code and prevents the same defects): story 5, then SEED-062 and SEED-063 (already
+  queued, they act on the row story 5 unifies), then story 6.
+- Stories 2, 3 and 4 are independent of each other; story 5 needs story 1; story 6 needs stories 2 and 5 and
+  SEED-063#story-1, because adding a property must follow the new rule for repeated keys.
+- Story 3 anchors its message to a row, not to a key, so it holds if SEED-063 makes rows per value.
 - First to drop: story 6 (largest risk, the defects it touches are already softened by story 2).
 
 ## Open Decisions
 
 - Story 3: the message next to the row (about +17 lines) or the cheaper scroll-into-view (about +4)?
+- Story 6 waits for SEED-063's representation; if SEED-063 is dropped or reordered later, story 6 keeps today's
+  duplicate-key rule and its dependency on SEED-063 is removed.
 - Story 4: is a typed Wikidata ID without search results meant to be supported?
 - Not queued, owner has not decided: whether the row panel's Assimilate should move to another note after saving
   a property understanding item, and the wording of its Skip confirmation.
@@ -216,8 +240,8 @@ When the owner selects note properties, iPad or phone comfort, or simplification
 - UAT report: `1986473b79:.planning/seeds/SEED-061-note-properties-ux-uat.md`, section `## UAT Findings`
   (screenshots were not committed).
 - Related queued work in the same area: [SEED-062](SEED-062-reify-property.md#story-1),
-  [SEED-063](SEED-063-track-property-values-separately.md#story-1). Both add to the properties rows; stories 5 and 6
-  give them one row to extend.
+  [SEED-063](SEED-063-track-property-values-separately.md#story-1). Both add to the properties rows; story 5 gives
+  them one row to extend, and story 6 follows SEED-063's rule for repeated keys.
 - Code: `frontend/src/components/form/RichFrontmatter*.vue`,
   `frontend/src/composables/useRichFrontmatterPropertyEditing.ts`, `frontend/src/utils/noteContentFrontmatter*.ts`.
 - Protecting tests today: `e2e_test/features/note_view/note_frontmatter_image.feature`,
