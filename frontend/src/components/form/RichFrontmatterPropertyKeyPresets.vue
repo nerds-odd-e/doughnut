@@ -42,7 +42,7 @@ const emit = defineEmits<{
     v-if="presetKeys.length"
     :id="listId"
     role="listbox"
-    class="donut-menu-panel daisy-menu absolute left-0 right-0 top-full z-20 mt-0.5 w-full rounded-box bg-base-100 p-1 shadow"
+    class="donut-menu-panel daisy-menu sm:absolute sm:left-0 sm:right-0 sm:top-full z-20 mt-0.5 w-full rounded-box bg-base-100 p-1 shadow"
     data-testid="rich-note-property-key-preset-list"
   >
     <li
@@ -52,7 +52,7 @@ const emit = defineEmits<{
       <button
         type="button"
         role="option"
-        class="daisy-btn daisy-btn-ghost daisy-btn-sm w-full justify-start font-mono"
+        class="daisy-btn daisy-btn-ghost daisy-btn-sm h-auto w-full justify-start whitespace-normal break-all text-left font-mono"
         data-testid="rich-note-property-key-preset-option"
         :data-preset-key="presetKey"
         @mousedown.prevent

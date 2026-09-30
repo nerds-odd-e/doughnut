@@ -92,7 +92,7 @@ hides itself when empty.
 
 ### 3. The preset list stays inside its panel and off the value field
 Type: Behavior
-Status: planned
+Status: done
 Proof: `pnpm cy:run --spec e2e_test/features/note_topology/note_property_layout.feature` runs the new scenarios, red
 before the change and green after; then `note_property.feature` and `note_frontmatter_image.feature` once.
 
@@ -120,6 +120,7 @@ changing anything.
 
 - Slice 1 (accepted): `RichFrontmatterPropertyKeyField.vue` (props `modelValue`, `inputId`, `listId`, `label`, `testId`, `propertyRows`, `excludeRowIndex`; emits `update:modelValue`, `focus`, `blur`, `enter`, `select`). Proof: `pnpm frontend:test tests/components/form` 21 files / 241 tests green, `vue-tsc --noEmit` clean. The add form's key input now also carries the row's `min-w-[8rem] text-ellipsis` (no visible change expected; layout is slice 3's proof).
 - Slice 2 (accepted): `RichFrontmatterPropertyKeyField` keeps `typedText` (reset on focus) and passes `name-filter` to `RichFrontmatterPropertyKeyPresets` (case-insensitive contains). Proof: new describe "key preset narrowing" in `RichMarkdownEditor.propertyEntry.spec.ts` (red: 5 failures with 8 options listed; green), `tests/components/form` 21 files / 248 tests, `vue-tsc` clean. The reset of typed text on focus has no separate test.
+- Slice 3 (accepted): the list is `sm:absolute` (in flow below 640 px, overlay from 640 px) with wrapping options (`h-auto whitespace-normal break-all text-left`). The `elementFromPoint` centre check never went red (the list ends about 4 px above the field's centre), so the scenarios assert box overlap with the value field / Choose image and the option's right edge against the key panel's right edge; that was red on 4 examples, then green. Proof: `pnpm cy:run --spec e2e_test/features/note_topology/note_property_layout.feature` 11/11, `note_property.feature` 10, `note_frontmatter_image.feature` 4, form tests 248, `vue-tsc` clean. Known, not exercised by a scenario: the existing row is a grid at all widths, so below 640 px its list is now in flow (it grows the key cell and covers nothing).
 
 ## Real iPad check (owner)
 
