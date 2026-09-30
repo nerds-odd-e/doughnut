@@ -146,3 +146,7 @@ the session.
 - Slice 5: the seed's `### Synthesis and follow-up (slice 5)` holds the actual times, coverage gaps, seven
   ordered priorities, follow-up candidates F1-F5 and N1-N3 (candidates only, no backlog entries), owner
   questions, and the development-database side effects.
+
+## Execution complete
+
+Product advice: Choose follow-up work from the seed's `### Synthesis and follow-up (slice 5)`. Start with the shared responsive row that also serves as the read-only view, then one key field with narrowing presets, then the draft-row add form; these improve the iPad experience and remove code. Answer the owner questions first: whether a read-only viewer sees Assimilate and Skip, and whether Assimilate from a row panel should move to another note. Selecting stories and reordering the backlog stay with the owner.
