@@ -91,7 +91,7 @@ Enables slice 2.
 
 ### 2. Every page-position scenario has a known margin and verdict
 Type: Structure
-Status: todo
+Status: done (margin table below; three rows at risk, so slice 3 applies)
 Probe: add the geometry log inside `expectCurrentPage` (and `expectPdfPositionAtTopOfReader`) in
 `e2e_test/start/pageObjects/bookReadingPdfMethods.ts`, appending one JSON line per call to a file with
 `cy.writeFile` (headless Cypress hides `console.log`), `cy.wait(1500)` before measuring, and one run per
@@ -109,7 +109,11 @@ Enables slice 3 when any row is at risk.
 
 ### 3. At-risk scenarios assert position by start or current block
 Type: Behavior
-Status: todo (conditional on slice 2)
+Status: todo
+At risk (from the margin table): `book_browsing.feature:52` (page-indicator step after the same-page
+scroll; replace with the current-block assertion) and `phone_reading.feature:11` and `:55` at 390 × 844
+(page 1 at the top; assert the start position `expectPdfPositionAtTopOfReader(1, 0)` or the existing
+top-of-page step).
 Size: about 10 minutes, per at-risk scenario group.
 Proof: for each scenario slice 2 marked at risk, the middle-based assertion is replaced by "the top of the
 PDF book reader should be at Y of 1000 down page N" after landing, or by the current-block assertion after
@@ -120,6 +124,36 @@ behavior-level).
 
 Behavior: an at-risk scenario, given its window size and PDF block landing, → the assertion no longer depends
 on which page holds the middle of the reader → the scenario passes at the window size and 56 px taller.
+
+## Margin table (slice 2)
+
+Measured locally with a temporary probe (reader rect, page rect, indicator text after 1500 ms), one
+`pnpm cy:run --spec` per feature (`book_browsing` 9, `reading_record` 9, `phone_reading` 7 passing). Margin
+is the reader middle's distance to the nearest boundary of the page holding it; negative means already past.
+Reader height is the window height minus 64 px (desktop) or 55 px (phone).
+
+| Scenario (feature) | Step | Window | Reader h | Page h | Margin px | Verdict |
+| --- | --- | --- | --- | --- | --- | --- |
+| See layout and beginning (`book_browsing`) | on page 1 | 1200 × 800 | 736 | 992 | 377 | safe |
+| Book block jumps to anchored page (`book_browsing`) | on page 2 | 1200 × 800 | 736 | 992 | 465.5 | safe |
+| Scrolling the PDF updates the current block (`book_browsing`) | on page 2 | 1200 × 800 | 736 | 992 | 457 | safe |
+| Short viewport (`book_browsing`) | on page 2 | 1200 × 280 | 216 | 992 | 197 | safe |
+| **Same-page scroll (`book_browsing`:52)** | on page 1 | 1200 × 800 | 736 | 992 | -10 | **at risk** |
+| Bookmark blocks (`book_browsing`:73, :76) | on page 4, on page 5 | 1200 × 800 | 736 | 1084 | 450.5, 368 | safe |
+| Scrolling past an unmarked block (`reading_record`:42) | on page 2 | 1200 × 800 | 736 | 992 | 457 | safe |
+| **PDF page as wide as the phone screen (`phone_reading`:11)** | on page 1 | 390 × 844 | 789 | 433 | 29.5 | **at risk** |
+| **Tapping outside the layout (`phone_reading`:55)** | on page 1 | 390 × 844 | 789 | 433 | 29.5 | **at risk** |
+| Choosing a block on a phone (`phone_reading`) | start position | 390 × 844 | 789 | 433 | offset 0.04 of 15 px | repaired |
+
+Other geometry steps: `expectPdfPositionAtTopOfReader` offsets are 0 to 0.2 px against 15 px (safe);
+`scrollPdfBookReaderDownWithinSamePageForNextBbox` scales with page height, not window height, margin about
+23 px on a 992 px page, upper margin unchecked (safe from window height); EPUB steps use 8 px element-span
+checks driven by epub.js, no page indicator, no evidence of risk (read, not measured).
+
+Notes: `book_browsing`:52 passes only because `expectCurrentPage(1)` matches the indicator before the scroll
+handler updates it (a race); with a 1500 ms wait first it fails, since the scroll lands the top at about
+630/1000 of page 1 and the middle is in page 2. The phone rows swing 28 px per 56 px of window height; at
+390 × 900 page 1's margin is about 1.5 px, matching the seed's number.
 
 ## Current decisions
 
