@@ -69,3 +69,11 @@ keys plus url), and `RichFrontmatterPropertyPanel` owns the one refusal reason.
 ## Current decisions
 
 - One rule, the backend's existing structural-key set; no new list of forbidden keys.
+
+## Execution complete
+
+Product advice: no change. The correction delivers its story as refined and fits the hardening direction; SEED-062 has
+no other open story and the backlog order stays. Noted, not recommended now: the frontend and backend keep separate
+structural-key lists that differ only on spelling variants of the image-mask key (the backend strips underscores). The
+server stays the authority, so the only effect is that the row can offer Reify and the server then refuses it. Giving
+the rule one home is a backend-plus-frontend decision for the owner if more structural keys are added.
