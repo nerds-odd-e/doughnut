@@ -109,6 +109,9 @@ preconditions](references/trunk-publication.md#preconditions), including the
 authorized remote/trunk, before a Story Branch or Trunk Mode startup. Existing
 current-branch and host-owned checkout restrictions still apply.
 
+When your instruction carries an established start, follow [established
+start](references/established-start.md) instead of the start command below.
+
 For authorized queued Story Branch or Trunk Mode work, invoke the installed
 `scripts/execution-start.mjs start` once with the originating integration
 checkout as `--integration` when one exists. Without one, an existing owned
