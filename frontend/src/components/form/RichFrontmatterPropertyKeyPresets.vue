@@ -12,8 +12,9 @@ const props = withDefaults(
     listId: string
     propertyRows?: PropertyRow[]
     excludeRowIndex?: number
+    nameFilter?: string
   }>(),
-  { propertyRows: () => [] }
+  { propertyRows: () => [], nameFilter: "" }
 )
 
 const isReadmeContextRef = inject(
@@ -26,6 +27,8 @@ const presetKeys = computed(() =>
     unref(isReadmeContextRef),
     props.propertyRows,
     { excludeRowIndex: props.excludeRowIndex }
+  ).filter((presetKey) =>
+    presetKey.toLowerCase().includes(props.nameFilter.toLowerCase())
   )
 )
 

@@ -79,7 +79,7 @@ written once.
 
 ### 2. Typing a property key narrows the presets
 Type: Behavior
-Status: planned
+Status: done
 Proof: the component tests above, red before the change and green after.
 
 Behavior: the add form or an existing row's key field is focused → the user types `ur` → only `url` is listed; `mo`
@@ -119,6 +119,7 @@ changing anything.
 ## Learnings
 
 - Slice 1 (accepted): `RichFrontmatterPropertyKeyField.vue` (props `modelValue`, `inputId`, `listId`, `label`, `testId`, `propertyRows`, `excludeRowIndex`; emits `update:modelValue`, `focus`, `blur`, `enter`, `select`). Proof: `pnpm frontend:test tests/components/form` 21 files / 241 tests green, `vue-tsc --noEmit` clean. The add form's key input now also carries the row's `min-w-[8rem] text-ellipsis` (no visible change expected; layout is slice 3's proof).
+- Slice 2 (accepted): `RichFrontmatterPropertyKeyField` keeps `typedText` (reset on focus) and passes `name-filter` to `RichFrontmatterPropertyKeyPresets` (case-insensitive contains). Proof: new describe "key preset narrowing" in `RichMarkdownEditor.propertyEntry.spec.ts` (red: 5 failures with 8 options listed; green), `tests/components/form` 21 files / 248 tests, `vue-tsc` clean. The reset of typed text on focus has no separate test.
 
 ## Real iPad check (owner)
 

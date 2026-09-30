@@ -10,7 +10,7 @@
       :aria-expanded="presetPanelOpen"
       :aria-controls="presetPanelOpen ? listId : undefined"
       :data-testid="testId"
-      @input="emit('update:modelValue', ($event.target as HTMLInputElement).value)"
+      @input="onInput"
       @focus="onFocus"
       @blur="emit('blur')"
       @keydown.enter.prevent="emit('enter')"
@@ -20,6 +20,7 @@
       :list-id="listId"
       :property-rows="propertyRows"
       :exclude-row-index="excludeRowIndex"
+      :name-filter="typedText"
       @select="onPresetSelected"
     />
   </div>
@@ -49,8 +50,15 @@ const emit = defineEmits<{
 }>()
 
 const presetPanelOpen = ref(false)
+const typedText = ref("")
+
+function onInput(event: Event) {
+  typedText.value = (event.target as HTMLInputElement).value
+  emit("update:modelValue", typedText.value)
+}
 
 function onFocus() {
+  typedText.value = ""
   presetPanelOpen.value = true
   emit("focus")
 }
