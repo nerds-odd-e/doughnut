@@ -20,6 +20,15 @@
         >
           AI Reorganize
         </button>
+        <button
+          v-if="canUndoDepthChange"
+          type="button"
+          data-testid="book-reading-undo-layout-change"
+          class="daisy-btn daisy-btn-sm daisy-btn-outline mb-3 w-full"
+          @click="emit('undoDepthChange')"
+        >
+          Undo
+        </button>
         <template v-for="block in blocks" :key="block.id">
           <button
             type="button"
@@ -45,13 +54,17 @@
             :aria-current="
               block.id === currentBlockId ? 'location' : undefined
             "
+            :tabindex="block.id === tabStopBlockId ? 0 : -1"
+            @focusin="lastFocusedBlockId = block.id"
             @click="onBlockRowClick(block, $event)"
             @pointerdown="blockDrag.onPointerDown(block, $event)"
             @pointermove="blockDrag.onPointerMove(block, $event)"
             @pointerup="blockDrag.onPointerUp(block, $event)"
             @pointercancel="blockDrag.onPointerCancel(block, $event)"
-            @keydown.tab.shift.prevent="emit('blockOutdent', block)"
-            @keydown.tab.exact.prevent="emit('blockIndent', block)"
+            @keydown.down.exact.prevent="focusRowBy($event, 1)"
+            @keydown.up.exact.prevent="focusRowBy($event, -1)"
+            @keydown.alt.shift.right.prevent="changeDepth('blockIndent', block)"
+            @keydown.alt.shift.left.prevent="changeDepth('blockOutdent', block)"
             @keydown.delete.prevent="emit('blockCancel', block)"
           >
             <span
@@ -96,7 +109,7 @@ import { blockStartEpubDisplayHref } from "@/lib/book-reading/asEpubLocator"
 import { useBookLayoutBlockPointerDrag } from "@/composables/book-reading/useBookLayoutBlockPointerDrag"
 import type { BookBlockReadingDisposition } from "@/lib/book-reading/readBlockIdsFromRecords"
 import type { BookBlockFull } from "@generated/donut-backend-api"
-import { ref, watch } from "vue"
+import { computed, ref, watch } from "vue"
 
 const opened = defineModel<boolean>("opened", { required: true })
 
@@ -107,6 +120,7 @@ const props = withDefaults(
     blocks: BookBlockFull[]
     currentBlockId: number | null
     selectedBlockId: number | null
+    canUndoDepthChange?: boolean
     dispositionForBlock: (
       blockId: number
     ) => BookBlockReadingDisposition | undefined
@@ -122,13 +136,66 @@ const emit = defineEmits<{
   changeMark: [blockId: number, status: BookBlockReadingDisposition]
   clearMark: [blockId: number]
   requestAiReorganize: []
+  undoDepthChange: []
 }>()
 
 const layoutRef = ref<HTMLElement | null>(null)
 
+const lastFocusedBlockId = ref<number | null>(null)
+
+const tabStopBlockId = computed(() => {
+  const candidates = [
+    lastFocusedBlockId.value,
+    props.selectedBlockId,
+    props.currentBlockId,
+  ]
+  return (
+    candidates.find((id) => props.blocks.some((b) => b.id === id)) ??
+    props.blocks[0]?.id
+  )
+})
+
+const blockRows = () => [
+  ...(layoutRef.value?.querySelectorAll<HTMLElement>(
+    '[data-testid="book-reading-book-block"]'
+  ) ?? []),
+]
+
+function focusRowBy(e: KeyboardEvent, step: number) {
+  const rows = blockRows()
+  rows[rows.indexOf(e.currentTarget as HTMLElement) + step]?.focus()
+}
+
+let blockAwaitingFocus: number | null = null
+
+/** The busy overlay of a depth change takes focus away; return it once the new layout is in. */
+function changeDepth(
+  event: "blockIndent" | "blockOutdent",
+  block: BookBlockFull
+) {
+  blockAwaitingFocus = block.id
+  if (event === "blockIndent") emit("blockIndent", block)
+  else emit("blockOutdent", block)
+}
+
+watch(
+  () => props.blocks,
+  () => {
+    const id = blockAwaitingFocus
+    blockAwaitingFocus = null
+    if (id === null) {
+      return
+    }
+    requestAnimationFrame(() => {
+      blockRows()[props.blocks.findIndex((b) => b.id === id)]?.focus()
+    })
+  },
+  { flush: "post" }
+)
+
 const blockDrag = useBookLayoutBlockPointerDrag({
-  indent: (block) => emit("blockIndent", block),
-  outdent: (block) => emit("blockOutdent", block),
+  indent: (block) => changeDepth("blockIndent", block),
+  outdent: (block) => changeDepth("blockOutdent", block),
 })
 
 function onBlockRowClick(block: BookBlockFull, e: MouseEvent) {

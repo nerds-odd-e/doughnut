@@ -15,8 +15,10 @@ function mountLayout(
   blocks = [blockStub({ id: 1, depth: 0, title: "A" })],
   options?: {
     selectedBlockId?: number | null
+    currentBlockId?: number | null
     isMdOrLarger?: boolean
     opened?: boolean
+    canUndoDepthChange?: boolean
   }
 ) {
   return helper
@@ -26,8 +28,9 @@ function mountLayout(
       panelId,
       isMdOrLarger: options?.isMdOrLarger ?? true,
       blocks,
-      currentBlockId: null,
+      currentBlockId: options?.currentBlockId ?? null,
       selectedBlockId: options?.selectedBlockId ?? null,
+      canUndoDepthChange: options?.canUndoDepthChange ?? false,
       dispositionForBlock: () => undefined,
     })
     .mount({ attachTo: document.body })
@@ -60,6 +63,18 @@ function pointerMouse(
 }
 
 describe("BookReadingBookLayout", () => {
+  it("shows Undo only while a depth change can be undone and emits undoDepthChange", async () => {
+    const undoSelector = '[data-testid="book-reading-undo-layout-change"]'
+    const without = mountLayout()
+    expect(without.find(undoSelector).exists()).toBe(false)
+    without.unmount()
+
+    const wrapper = mountLayout(undefined, { canUndoDepthChange: true })
+    await wrapper.find(undoSelector).trigger("click")
+    expect(wrapper.emitted("undoDepthChange")).toHaveLength(1)
+    wrapper.unmount()
+  })
+
   it("sets data-book-block-depth from each block depth in preorder list", () => {
     const parent = blockStub({ id: 101, depth: 0, title: "Parent Section" })
     const child = blockStub({ id: 102, depth: 1, title: "Child Section" })
@@ -195,6 +210,133 @@ describe("BookReadingBookLayout", () => {
     expect(wrapper.emitted("blockClick")).toHaveLength(1)
     expect(wrapper.emitted("blockClick")![0]![0]).toEqual(block)
     wrapper.unmount()
+  })
+
+  it("does not emit or prevent default on Tab and Shift+Tab", async () => {
+    const wrapper = mountLayout()
+    const row = wrapper.find('[data-testid="book-reading-book-block"]')
+    for (const shiftKey of [false, true]) {
+      const tab = new KeyboardEvent("keydown", {
+        key: "Tab",
+        shiftKey,
+        bubbles: true,
+        cancelable: true,
+      })
+      row.element.dispatchEvent(tab)
+      expect(tab.defaultPrevented).toBe(false)
+    }
+    expect(wrapper.emitted("blockIndent")).toBeUndefined()
+    expect(wrapper.emitted("blockOutdent")).toBeUndefined()
+    wrapper.unmount()
+  })
+
+  it("emits blockIndent on Alt+Shift+ArrowRight and blockOutdent on Alt+Shift+ArrowLeft", async () => {
+    const block = blockStub({ id: 4, depth: 1, title: "D" })
+    const wrapper = mountLayout([block])
+    const row = wrapper.find('[data-testid="book-reading-book-block"]')
+    await row.trigger("keydown", {
+      key: "ArrowRight",
+      altKey: true,
+      shiftKey: true,
+    })
+    await row.trigger("keydown", {
+      key: "ArrowLeft",
+      altKey: true,
+      shiftKey: true,
+    })
+    expect(wrapper.emitted("blockIndent")![0]![0]).toEqual(block)
+    expect(wrapper.emitted("blockOutdent")![0]![0]).toEqual(block)
+    wrapper.unmount()
+  })
+
+  it("returns focus to the block's row once the layout it changed arrives", async () => {
+    const blocks = [
+      blockStub({ id: 1, depth: 0, title: "A" }),
+      blockStub({ id: 2, depth: 0, title: "B" }),
+    ]
+    const wrapper = mountLayout(blocks)
+    const rows = () =>
+      wrapper
+        .findAll('[data-testid="book-reading-book-block"]')
+        .map((r) => r.element as HTMLElement)
+    rows()[1]!.focus()
+    await rows()[1]!.dispatchEvent(
+      new KeyboardEvent("keydown", {
+        key: "ArrowRight",
+        altKey: true,
+        shiftKey: true,
+        bubbles: true,
+      })
+    )
+    ;(document.activeElement as HTMLElement).blur()
+    await wrapper.setProps({
+      blocks: [blocks[0]!, { ...blocks[1]!, depth: 1 }],
+    })
+    await new Promise((resolve) => requestAnimationFrame(resolve))
+    expect(document.activeElement).toBe(rows()[1])
+    wrapper.unmount()
+  })
+
+  describe("keyboard navigation", () => {
+    const threeBlocks = [
+      blockStub({ id: 1, depth: 0, title: "A" }),
+      blockStub({ id: 2, depth: 0, title: "B" }),
+      blockStub({ id: 3, depth: 0, title: "C" }),
+    ]
+    const rowsOf = (wrapper: ReturnType<typeof mountLayout>) =>
+      wrapper
+        .findAll('[data-testid="book-reading-book-block"]')
+        .map((r) => r.element as HTMLElement)
+    const tabStops = (wrapper: ReturnType<typeof mountLayout>) =>
+      rowsOf(wrapper)
+        .filter((r) => r.getAttribute("tabindex") === "0")
+        .map((r) => r.textContent!.trim())
+
+    it.each([
+      [{}, "A"],
+      [{ currentBlockId: 2 }, "B"],
+      [{ currentBlockId: 2, selectedBlockId: 3 }, "C"],
+    ])("makes one row the tab stop with options %j: %s", (options, title) => {
+      const wrapper = mountLayout(threeBlocks, options)
+      expect(tabStops(wrapper)).toEqual([title])
+      wrapper.unmount()
+    })
+
+    it("moves the tab stop to the last focused row", async () => {
+      const wrapper = mountLayout(threeBlocks, { selectedBlockId: 3 })
+      rowsOf(wrapper)[1]!.focus()
+      await wrapper.vm.$nextTick()
+      expect(tabStops(wrapper)).toEqual(["B"])
+      wrapper.unmount()
+    })
+
+    it("moves focus with ArrowDown and ArrowUp without choosing, and stays at the ends", async () => {
+      const wrapper = mountLayout(threeBlocks)
+      const rows = rowsOf(wrapper)
+      const press = async (key: string) => {
+        const ev = new KeyboardEvent("keydown", {
+          key,
+          bubbles: true,
+          cancelable: true,
+        })
+        document.activeElement!.dispatchEvent(ev)
+        await wrapper.vm.$nextTick()
+        return ev
+      }
+      rows[0]!.focus()
+      expect((await press("ArrowDown")).defaultPrevented).toBe(true)
+      expect(document.activeElement).toBe(rows[1])
+      await press("ArrowDown")
+      await press("ArrowDown")
+      expect(document.activeElement).toBe(rows[2])
+      await press("ArrowUp")
+      expect(document.activeElement).toBe(rows[1])
+      await press("ArrowUp")
+      await press("ArrowUp")
+      expect(document.activeElement).toBe(rows[0])
+      expect(wrapper.emitted("blockClick")).toBeUndefined()
+      wrapper.unmount()
+    })
   })
 
   it("emits requestAiReorganize when AI Reorganize is clicked", async () => {

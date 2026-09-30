@@ -93,26 +93,62 @@ export const bookReadingLayoutMethods = () => ({
     )
     return this
   },
-  indentFocusedBookBlockWithTab() {
+  indentFocusedBookBlockWithAltShiftRight() {
     cy.focused().trigger('keydown', {
-      key: 'Tab',
-      code: 'Tab',
-      keyCode: 9,
-      which: 9,
+      key: 'ArrowRight',
+      code: 'ArrowRight',
+      keyCode: 39,
+      which: 39,
+      altKey: true,
+      shiftKey: true,
+      bubbles: true,
+      getModifierState: (key: string) => key === 'Alt' || key === 'Shift',
+    })
+    return this
+  },
+  outdentFocusedBookBlockWithAltShiftLeft() {
+    cy.focused().trigger('keydown', {
+      key: 'ArrowLeft',
+      code: 'ArrowLeft',
+      keyCode: 37,
+      which: 37,
+      altKey: true,
+      shiftKey: true,
+      bubbles: true,
+      getModifierState: (key: string) => key === 'Alt' || key === 'Shift',
+    })
+    return this
+  },
+  pressArrowDownOnFocusedBookBlock() {
+    cy.focused().trigger('keydown', {
+      key: 'ArrowDown',
+      code: 'ArrowDown',
+      keyCode: 40,
+      which: 40,
       bubbles: true,
       getModifierState: () => false,
     })
     return this
   },
-  outdentFocusedBookBlockWithShiftTab() {
-    cy.focused().trigger('keydown', {
-      key: 'Tab',
-      code: 'Tab',
-      keyCode: 9,
-      which: 9,
-      shiftKey: true,
+  pressEnterOnFocusedBookBlock() {
+    cy.focused().type('{enter}')
+    return this
+  },
+  undoLastBookLayoutChange() {
+    cy.get('[data-testid="book-reading-undo-layout-change"]')
+      .should('be.visible')
+      .click()
+    return this
+  },
+  pressCtrlZ() {
+    cy.get('body').trigger('keydown', {
+      key: 'z',
+      code: 'KeyZ',
+      keyCode: 90,
+      which: 90,
+      ctrlKey: true,
       bubbles: true,
-      getModifierState: (key: string) => key === 'Shift',
+      getModifierState: () => false,
     })
     return this
   },

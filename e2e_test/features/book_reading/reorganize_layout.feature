@@ -10,27 +10,43 @@ Feature: Reorganize book layout
       And I attach a fake blank pdf book with book layout of "refactoring" to the notebook "Refactoring read"
       And I open the book attached to notebook "Refactoring read"
 
-    Scenario Outline: Indent a book block with Tab
+    Scenario Outline: Indent a book block with Alt+Shift+Right
       Given the book layout shows block "<block>" at depth <start_depth>
       When I choose the book block "<block>"
       Then the book block "<block>" should be focused in the book layout
-      When I indent the focused book block with Tab
+      When I indent the focused book block with Alt+Shift+Right
       Then the book block "<block>" should be at depth <end_depth> in the book layout
 
       Examples:
         | block                                   | start_depth | end_depth |
         | 2. The Usual Defi nition Is Not Enough  | 0           | 1         |
 
-    Scenario Outline: Outdent a book block with Shift+Tab
+    Scenario Outline: Outdent a book block with Alt+Shift+Left
       Given the book layout shows block "<block>" at depth <start_depth>
       When I choose the book block "<block>"
       Then the book block "<block>" should be focused in the book layout
-      When I outdent the focused book block with Shift+Tab
+      When I outdent the focused book block with Alt+Shift+Left
       Then the book block "<block>" should be at depth <end_depth> in the book layout
 
       Examples:
         | block                               | start_depth | end_depth |
         | 3.1 Can You Refactor Without Tests? | 1           | 0         |
+
+    Scenario: Undo a wrong outdent
+      When I choose the book block "3.1 Can You Refactor Without Tests?"
+      And I outdent the focused book block with Alt+Shift+Left
+      Then the book block "3.1 Can You Refactor Without Tests?" should be at depth 0 in the book layout
+      When I undo the last book layout change
+      Then the book block "3.1 Can You Refactor Without Tests?" should be at depth 1 in the book layout
+      And the book block "3.2 Can You Refactor Without Changing the Code?" should be at depth 1 in the book layout
+
+    Scenario: Move between book blocks with the arrow keys
+      When I choose the book block "3. Refactoring Is Not Only About Changing Production Code"
+      And I press ArrowDown on the focused book block
+      Then the book block "3.1 Can You Refactor Without Tests?" should be focused in the book layout
+      And I should see that book block "3. Refactoring Is Not Only About Changing Production Code" is selected in the book layout
+      When I press Enter on the focused book block
+      Then I should see that book block "3.1 Can You Refactor Without Tests?" is selected in the book layout
 
   Rule: Content block bbox overlays
 
@@ -50,15 +66,7 @@ Feature: Reorganize book layout
       And I create a book block from a content block on the PDF
       Then I should see the "New block" callout
       When I confirm creating a new block
-      Then the book layout should contain a new block as a child of the selected block
-
-    @mockBrowserTime
-    Scenario: Create a book block from long content bbox with a typed title
-      When I choose the book block "1. Refactoring: Protecting Intention in Working Software"
-      And I create a book block from a long-text content block on the PDF
-      Then I should see the "New block" callout
-      When I confirm creating a new block
-      Then I should be prompted to enter a title defaulting to truncated content
+      Then I should be prompted to enter a title defaulting to the paragraph
       When I confirm the title
       Then the book layout should contain a new block as a child of the selected block
 
@@ -73,11 +81,23 @@ Feature: Reorganize book layout
       Given the book layout shows block "Chapter A" at depth 0
       When I choose the book block "Chapter A"
       Then the book block "Chapter A" should be focused in the book layout
-      When I indent the focused book block with Tab
+      When I indent the focused book block with Alt+Shift+Right
       Then the book block "Chapter A" should be at depth 1 in the book layout
+      And the book block "Chapter A" should be focused in the book layout
       And the book block "A.1 First section" should be at depth 2 in the book layout
       And the book block "A.2 Second section" should be at depth 2 in the book layout
       And the book block "Chapter B" should be at depth 0 in the book layout
+      When I outdent the focused book block with Alt+Shift+Left
+      Then the book block "Chapter A" should be at depth 0 in the book layout
+
+    Scenario: Undo an indent with the keyboard
+      When I choose the book block "Chapter A"
+      And I indent the focused book block with Alt+Shift+Right
+      Then the book block "Chapter A" should be at depth 1 in the book layout
+      When I press Ctrl+Z
+      Then the book block "Chapter A" should be at depth 0 in the book layout
+      And the book block "A.1 First section" should be at depth 1 in the book layout
+      And the book block "A.2 Second section" should be at depth 1 in the book layout
 
     Scenario: Cancel a leaf block removes it from the book layout
       When I choose the book block "Chapter B"

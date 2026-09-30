@@ -172,8 +172,13 @@ function useReorganize(opts: {
   onBookUpdated: (book: BookFull) => void
 }) {
   const { bookBlocks, selectedBlockId, applyBookBlockSelection } = opts
-  const { onBlockIndent, onBlockOutdent, onBlockCancel } =
-    useBookLayoutMutations(opts)
+  const {
+    onBlockIndent,
+    onBlockOutdent,
+    onBlockCancel,
+    canUndoDepthChange,
+    onUndoDepthChange,
+  } = useBookLayoutMutations(opts)
   const ai = useBookLayoutAiReorganize(opts.notebookId, bookBlocks)
 
   async function confirmAiReorganize() {
@@ -208,7 +213,9 @@ function useReorganize(opts: {
       blockOutdent: onBlockOutdent,
       blockCancel: onBlockCancel,
       requestAiReorganize: ai.requestSuggest,
+      undoDepthChange: onUndoDepthChange,
     },
+    canUndoDepthChange,
     aiSuggestion: ai.suggestion,
     aiPreviewRows: ai.previewRows,
     confirmAiReorganize,

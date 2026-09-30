@@ -1,4 +1,4 @@
-import { type ComputedRef, type Ref, ref } from "vue"
+import { type ComputedRef, type Ref, computed, ref } from "vue"
 import type {
   BookBlockFull,
   BookFull,
@@ -6,6 +6,7 @@ import type {
 } from "@generated/donut-backend-api"
 import { NotebookBooksController } from "@generated/donut-backend-api/sdk.gen"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
+import { applyBookLayoutDepths } from "@/composables/book-reading/applyBookLayoutDepths"
 import { predecessorBookBlockIdInPreorder } from "@/lib/book-reading/predecessorBookBlockIdInPreorder"
 
 export function bookFullAfterLayoutMutation(
@@ -40,6 +41,23 @@ export function useBookLayoutMutations(opts: {
   onBookUpdated: (book: BookFull) => void
 }) {
   const layoutMutationInFlight = ref(false)
+  const lastDepthChange = ref<{
+    before: Map<number, number>
+    after: Map<number, number>
+  } | null>(null)
+
+  const depthsById = (blocks: BookBlockFull[]) =>
+    new Map(blocks.map((b) => [b.id, b.depth] as const))
+
+  const canUndoDepthChange = computed(() => {
+    const last = lastDepthChange.value
+    if (!last) return false
+    const current = depthsById(opts.bookBlocks.value)
+    return (
+      current.size === last.after.size &&
+      [...last.after].every(([id, depth]) => current.get(id) === depth)
+    )
+  })
 
   async function changeBlockDepth(
     block: BookBlockFull,
@@ -50,6 +68,7 @@ export function useBookLayoutMutations(opts: {
     }
     layoutMutationInFlight.value = true
     try {
+      const before = depthsById(opts.bookBlocks.value)
       const { data, error } = await apiCallWithLoading(
         () =>
           NotebookBooksController.changeBookBlockDepth({
@@ -62,7 +81,9 @@ export function useBookLayoutMutations(opts: {
         { blockUi: true, message: BOOK_LAYOUT_MUTATION_LOADING_MESSAGE }
       )
       if (!error && data) {
-        opts.onBookUpdated(bookFullAfterLayoutMutation(opts.getBook(), data))
+        const updated = bookFullAfterLayoutMutation(opts.getBook(), data)
+        lastDepthChange.value = { before, after: depthsById(updated.blocks) }
+        opts.onBookUpdated(updated)
         opts.selectedBlockId.value = block.id
       }
     } finally {
@@ -76,6 +97,25 @@ export function useBookLayoutMutations(opts: {
 
   async function onBlockOutdent(block: BookBlockFull) {
     await changeBlockDepth(block, "OUTDENT")
+  }
+
+  async function onUndoDepthChange() {
+    const last = lastDepthChange.value
+    if (!last || !canUndoDepthChange.value || layoutMutationInFlight.value) {
+      return
+    }
+    layoutMutationInFlight.value = true
+    try {
+      const data = await applyBookLayoutDepths(opts.notebookId.value, {
+        blocks: [...last.before].map(([id, depth]) => ({ id, depth })),
+      })
+      if (data) {
+        lastDepthChange.value = null
+        opts.onBookUpdated(bookFullAfterLayoutMutation(opts.getBook(), data))
+      }
+    } finally {
+      layoutMutationInFlight.value = false
+    }
   }
 
   async function onBlockCancel(block: BookBlockFull) {
@@ -115,5 +155,11 @@ export function useBookLayoutMutations(opts: {
     }
   }
 
-  return { onBlockIndent, onBlockOutdent, onBlockCancel }
+  return {
+    onBlockIndent,
+    onBlockOutdent,
+    onBlockCancel,
+    canUndoDepthChange,
+    onUndoDepthChange,
+  }
 }

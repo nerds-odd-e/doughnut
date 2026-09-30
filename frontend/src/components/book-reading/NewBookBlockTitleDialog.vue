@@ -10,10 +10,12 @@
       <h2 class="text-lg font-semibold">Name the new block</h2>
       <input
         v-if="open"
+        ref="inputRef"
         v-model="titleInput"
         data-testid="new-block-title-input"
         class="daisy-input w-full mt-2"
         type="text"
+        @keydown.enter="onConfirm"
       />
       <div class="daisy-modal-action">
         <button
@@ -51,7 +53,17 @@ const emit = defineEmits<{
 
 const titleInput = ref(props.defaultTitle ?? "")
 const dialogRef = ref<HTMLDialogElement | null>(null)
+const inputRef = ref<HTMLInputElement | null>(null)
 useDaisyDialog(toRef(props, "open"), dialogRef)
+
+watch(
+  inputRef,
+  (input) => {
+    input?.focus()
+    input?.select()
+  },
+  { flush: "post" }
+)
 
 watch(
   () => props.defaultTitle,

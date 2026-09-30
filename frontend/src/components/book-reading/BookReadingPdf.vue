@@ -40,6 +40,7 @@ import PdfBookViewer from "@/components/book-reading/PdfBookViewer.vue"
 import PdfControl from "@/components/book-reading/PdfControl.vue"
 import { pdfLocatorsFromBlock } from "@/lib/book-reading/asPdfLocator"
 import { currentBlockIdFromViewStarts } from "@/lib/book-reading/currentBlockIdFromViewStarts"
+import { firstSentenceTitle } from "@/lib/book-reading/firstSentenceTitle"
 import { wireItemsToNavigationTargets } from "@/lib/book-reading/pdfOutlineV1Anchor"
 import {
   usePdfViewportPosition,
@@ -57,8 +58,6 @@ import { ref, watch } from "vue"
 const emit = defineEmits<{
   "update:book": [book: BookFull]
 }>()
-
-const STRUCTURAL_TITLE_MAX_CHARS = 512
 
 const props = withDefaults(
   defineProps<{
@@ -209,16 +208,9 @@ function onCreateBlockFromContent({
   contentBlockId: number
   derivedTitle: string | undefined
 }) {
-  if (
-    derivedTitle !== undefined &&
-    derivedTitle.length >= STRUCTURAL_TITLE_MAX_CHARS
-  ) {
-    pendingBlockCreation.value = {
-      contentBlockId,
-      structuralTitle: derivedTitle,
-    }
-  } else {
-    createBlock(contentBlockId)
+  pendingBlockCreation.value = {
+    contentBlockId,
+    structuralTitle: firstSentenceTitle(derivedTitle ?? ""),
   }
 }
 

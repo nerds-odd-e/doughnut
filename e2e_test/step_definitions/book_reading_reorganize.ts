@@ -98,18 +98,50 @@ Given(
 )
 
 When(
-  'I indent the focused book block with Tab',
+  'I indent the focused book block with Alt+Shift+Right',
   // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
   () => {
-    return bookReadingPage().indentFocusedBookBlockWithTab()
+    return bookReadingPage().indentFocusedBookBlockWithAltShiftRight()
   }
 )
 
 When(
-  'I outdent the focused book block with Shift+Tab',
+  'I outdent the focused book block with Alt+Shift+Left',
   // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
   () => {
-    return bookReadingPage().outdentFocusedBookBlockWithShiftTab()
+    return bookReadingPage().outdentFocusedBookBlockWithAltShiftLeft()
+  }
+)
+
+When(
+  'I press ArrowDown on the focused book block',
+  // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
+  () => {
+    return bookReadingPage().pressArrowDownOnFocusedBookBlock()
+  }
+)
+
+When(
+  'I press Enter on the focused book block',
+  // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
+  () => {
+    return bookReadingPage().pressEnterOnFocusedBookBlock()
+  }
+)
+
+When(
+  'I undo the last book layout change',
+  // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
+  () => {
+    return bookReadingPage().undoLastBookLayoutChange()
+  }
+)
+
+When(
+  'I press Ctrl+Z',
+  // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
+  () => {
+    return bookReadingPage().pressCtrlZ()
   }
 )
 
@@ -161,14 +193,6 @@ When(
   }
 )
 
-When(
-  'I create a book block from a long-text content block on the PDF',
-  // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
-  () => {
-    return bookReadingPage().createBookBlockFromLongTextContentBlockOnPdf()
-  }
-)
-
 Then(
   'I should see the {string} callout',
   // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
@@ -194,7 +218,7 @@ Then(
 )
 
 Then(
-  'I should be prompted to enter a title defaulting to truncated content',
+  'I should be prompted to enter a title defaulting to the paragraph',
   // @ts-expect-error Cucumber preprocessor typings omit Cypress.Chainable; runtime supports returning the chain
   () => {
     return bookReadingPage().expectTitlePromptWithDefaultTitle()

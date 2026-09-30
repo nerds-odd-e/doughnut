@@ -1,3 +1,4 @@
+import { applyBookLayoutDepths } from "@/composables/book-reading/applyBookLayoutDepths"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import type {
   BookBlockFull,
@@ -8,7 +9,6 @@ import { NotebookBooksController } from "@generated/donut-backend-api/sdk.gen"
 import { computed, ref, toValue, type MaybeRefOrGetter } from "vue"
 
 const BOOK_LAYOUT_SUGGEST_LOADING_MESSAGE = "Analyzing book layout…"
-const BOOK_LAYOUT_APPLY_LOADING_MESSAGE = "Applying book layout changes…"
 
 export function useBookLayoutAiReorganize(
   notebookId: MaybeRefOrGetter<number>,
@@ -52,19 +52,14 @@ export function useBookLayoutAiReorganize(
     BookMutationResponseFull | undefined
   > {
     if (!suggestion.value) return
-    const { data, error } = await apiCallWithLoading(
-      () =>
-        NotebookBooksController.applyBookLayoutReorganization({
-          path: { notebook: toValue(notebookId) },
-          body: suggestion.value!,
-        }),
-      { blockUi: true, message: BOOK_LAYOUT_APPLY_LOADING_MESSAGE }
+    const data = await applyBookLayoutDepths(
+      toValue(notebookId),
+      suggestion.value
     )
-    if (!error && data) {
+    if (data) {
       suggestion.value = null
-      return data
     }
-    return
+    return data
   }
 
   function dismiss() {

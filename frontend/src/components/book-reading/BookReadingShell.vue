@@ -40,6 +40,7 @@
     :blocks="bookBlocks"
     :current-block-id="currentBlockId"
     :selected-block-id="selectedBlockId"
+    :can-undo-depth-change="reorganize?.canUndoDepthChange.value"
     :disposition-for-block="bookReading.dispositionForBlock"
     @block-click="applyBookBlockSelection"
     @change-mark="bookReading.submitReadingDisposition"
@@ -122,6 +123,7 @@ import ReadingOverlayDock from "@/components/book-reading/ReadingOverlayDock.vue
 import GlobalBar from "@/components/toolbars/GlobalBar.vue"
 import type { BookReadingSession } from "@/composables/useBookReadingSession"
 import { useSidebarDrawer } from "@/composables/useSidebarDrawer"
+import { onMounted, onUnmounted } from "vue"
 
 /**
  * The reading view both formats share, bound to one reading session. `format` keeps each
@@ -157,6 +159,24 @@ const {
   readingPanelAnchorTopPx,
   reorganize,
 } = props.session
+
+function undoDepthChangeOnShortcut(event: KeyboardEvent) {
+  if (!(event.ctrlKey || event.metaKey) || event.shiftKey || event.altKey)
+    return
+  if (event.key.toLowerCase() !== "z") return
+  const target = event.target as HTMLElement
+  if (target.closest("input, textarea, [contenteditable]")) return
+  if (!reorganize?.canUndoDepthChange.value) return
+  event.preventDefault()
+  reorganize.layoutListeners.undoDepthChange()
+}
+
+onMounted(() => {
+  if (reorganize) window.addEventListener("keydown", undoDepthChangeOnShortcut)
+})
+onUnmounted(() => {
+  window.removeEventListener("keydown", undoDepthChangeOnShortcut)
+})
 
 function setMainPane(el: unknown) {
   props.session.mainPane.value = el as HTMLElement | null
