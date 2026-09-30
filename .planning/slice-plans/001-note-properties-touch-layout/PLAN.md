@@ -95,7 +95,7 @@ replacing the fixed three-column grid); the value field grows in height (`h-auto
 
 ### 3. A touch device can be selected in a scenario
 Type: Structure
-Status: planned
+Status: done
 Proof: a scenario step `I use a touch device` passes its own assertion that `matchMedia('(pointer: coarse)')`
 matches; existing scenarios remain unaffected because the step is opt-in.
 
@@ -139,6 +139,10 @@ row panel's Assimilate and Skip are inside the section and so are included; no o
 - Slice 2: at 820 and 375 px the editable row's controls and page width already held, so the planned grid change
   ("value drops under the key") was not needed; only `h-auto` on the value field and `text-ellipsis` on the key input
   were. The controls check covers the panel-open state and the spaces-key row only.
+- Slice 3 probe passed: `Cypress.automation('remote:debugger:protocol', {command: 'Emulation.setTouchEmulationEnabled',
+  ...})` makes `(pointer: coarse)` match in Cypress with no reload; without the step it is false. Support lives in
+  `e2e_test/start/touchDevice.ts` (`use`, `reset`, `expectCoarsePointer`); an `After` hook resets it. Slice 4 reuses
+  `I use a touch device` and its "unchanged without touch" check also proves the reset.
 - The two long-key rows live in the feature's Background (another user's shared notebook); slice 2's editable scenario
   can reuse the same rows with the owner logged in.
 

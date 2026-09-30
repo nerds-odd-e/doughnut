@@ -2,10 +2,28 @@
 /// <reference types="../support" />
 // @ts-check
 
-import { Given, Then, When } from '@badeball/cypress-cucumber-preprocessor'
+import {
+  After,
+  Given,
+  Then,
+  When,
+} from '@badeball/cypress-cucumber-preprocessor'
 import start from '../start'
+import { touchDevice } from '../start/touchDevice'
 
 const conversationQuery = { conversation: 'true' }
+
+Given('I use a touch device', () => {
+  touchDevice.use()
+})
+
+Then('the device should report a coarse pointer', () => {
+  touchDevice.expectCoarsePointer()
+})
+
+After(() => {
+  touchDevice.reset()
+})
 
 When(
   'I visit property {string} of note {string}',

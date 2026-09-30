@@ -45,3 +45,8 @@ Feature: Note property layout
       | width |
       | 820   |
       | 375   |
+
+  Scenario: A touch device reports a coarse pointer
+    Given I use a touch device
+    When I visit note "Long properties"
+    Then the device should report a coarse pointer
