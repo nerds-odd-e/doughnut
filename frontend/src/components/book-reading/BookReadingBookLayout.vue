@@ -301,6 +301,11 @@ onOpenLayoutRow(
 }
 
 .book-reading-book-block[data-direct-content-skipped="true"] {
-  @apply border-r-4 border-r-neutral;
+  @apply border-r-4;
+  border-right-color: color-mix(
+    in oklab,
+    var(--color-base-content) 60%,
+    var(--color-base-200)
+  );
 }
 </style>

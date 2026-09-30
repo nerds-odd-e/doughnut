@@ -2,7 +2,7 @@
 
 Work item: **SEED-059#story-12**
 ([story](../../seeds/SEED-059-book-reading-uat-fixes.md#story-12)).
-Status: **slice 1 done; slice 2 planned.**
+Status: **both slices done.**
 Nothing blocks execution.
 
 ## Goal and scope
@@ -110,7 +110,7 @@ options. About 5 min.
 
 ### 2. A Skipped mark stays visible in the dark theme
 Type: Behavior
-Status: planned
+Status: done
 Proof: layout spec case above, written first and seen failing in dark. Focused check: `BookReadingBookLayout.spec.ts`.
 
 Behavior: a block is marked Skipped → its layout row in the dark theme →
@@ -136,3 +136,4 @@ each is independently useful.
 ## Learnings
 
 - Slice 1: labels now live in `dispositionLabels` (`readBlockIdsFromRecords.ts`), used by the layout row title and `BookBlockMarkControl`. Accepted proof: `BookReadingBookLayout.spec.ts` title cases (seen failing 3, then passing); `vitest run tests/components/book-reading tests/pages` 278 pass; `vue-tsc --noEmit` clean. `BookBlockMarkControl` has no direct spec; its label refactor is covered by the type check only.
+- Slice 2: Skipped border is `color-mix(in oklab, base-content 60%, base-200)` (opaque, follows theme). Accepted proof: layout spec light/dark cases (dark failed before with gap 0.0926, then 22/22 pass); `vitest run tests/components/book-reading tests/pages` 280 pass; `vue-tsc --noEmit` clean.

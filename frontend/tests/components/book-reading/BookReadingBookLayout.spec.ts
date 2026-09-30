@@ -2,7 +2,7 @@ import BookReadingBookLayout from "@/components/book-reading/BookReadingBookLayo
 import helper from "@tests/helpers"
 import type { BookBlockReadingDisposition } from "@/lib/book-reading/readBlockIdsFromRecords"
 import type { BookBlockFull } from "@generated/donut-backend-api"
-import { describe, expect, it } from "vitest"
+import { afterEach, describe, expect, it } from "vitest"
 
 const panelId = "book-reading-book-layout-panel-test"
 
@@ -64,6 +64,14 @@ function pointerMouse(
   )
 }
 
+function lightnessOf(color: string): number {
+  return Number(/^okl(?:ch|ab)\(([\d.]+)/.exec(color)![1])
+}
+
+afterEach(() => {
+  document.documentElement.removeAttribute("data-theme")
+})
+
 describe("BookReadingBookLayout", () => {
   it("shows Undo only while a depth change can be undone and emits undoDepthChange", async () => {
     const undoSelector = '[data-testid="book-reading-undo-layout-change"]'
@@ -90,6 +98,24 @@ describe("BookReadingBookLayout", () => {
     ).toBe(title)
     wrapper.unmount()
   })
+
+  it.each(["light", "dark"] as const)(
+    "keeps a Skipped mark visible against the layout background in the %s theme",
+    (theme) => {
+      document.documentElement.setAttribute("data-theme", theme)
+      const wrapper = mountLayout(undefined, { disposition: "SKIPPED" })
+      const mark = getComputedStyle(
+        wrapper.find('[data-testid="book-reading-book-block"]').element
+      ).borderRightColor
+      const background = getComputedStyle(
+        wrapper.find(".bg-base-200").element
+      ).backgroundColor
+      expect(
+        Math.abs(lightnessOf(mark) - lightnessOf(background))
+      ).toBeGreaterThanOrEqual(0.3)
+      wrapper.unmount()
+    }
+  )
 
   it("gives a row with no mark no title", () => {
     const wrapper = mountLayout()
