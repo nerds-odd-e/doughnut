@@ -7,8 +7,6 @@ Bug fixing and general maintenance.
 
 ## Taken
 
-- [Fix a book layout by hand in a few steps](seeds/SEED-059-book-reading-uat-fixes.md#story-7) — SEED-059#story-7 ([plan](slice-plans/059-undo-last-book-layout-depth-change/PLAN.md))
-
 ## Backlog list
 
 - [Anchor the Reading Control Panel after a one-paragraph EPUB block](seeds/SEED-059-book-reading-uat-fixes.md#story-18) — SEED-059#story-18

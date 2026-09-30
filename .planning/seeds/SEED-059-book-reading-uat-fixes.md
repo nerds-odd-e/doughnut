@@ -72,76 +72,6 @@ reading a book end to end.
 
 Effort bands: S = 30–60 minutes, M = 1–2 hours, L = 2–4 hours, including delivery.
 
-<a id="story-7"></a>
-
-### Fix a book layout by hand in a few steps
-
-**Identity:** SEED-059#story-7
-```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/059-undo-last-book-layout-depth-change/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"77280a215b97fa986f569c0c063787e03a7eecfcb8c6ccd25cda86f7b2d2360f","plan":"cb8d2728fe627af751b0b001913a69982b5282c4f0674da1bf1e1ea3214a1a43"}}
-```
-
-**Goal:** A reader who indents or outdents a block by mistake gets the previous
-layout back in one step, instead of repairing it block by block.
-
-**Observed friction** (UAT, before the bookmark-based PDF layout replaced most
-of the cleanup that caused these mistakes)
-
-- Outdenting makes the following blocks at its old level its children, because
-  block order is fixed. One wrong Shift+Tab on "9.1" put the rest of chapter 9
-  under it; indenting "9.1" again does not undo that (it moves those children
-  down with it), and restoring took 8 operations.
-- Cancelling the "Chapter 12" label moved "Tuples" and all 14 sections to the
-  top level; nesting them again took 14 click-and-Tab steps.
-
-**Scope**
-
-- **Undo the last depth change.** After an Indent or Outdent (Tab, Shift+Tab, or
-  a drag), the reader can restore the layout as it was just before. Only the
-  last change is undone; there is no redo and no multi-step history.
-- **Available only right after that change.** Undo is offered only while the
-  book's block depths are exactly what that change produced. Any other layout
-  change (cancel, new block, AI reorganize) or a reload makes it unavailable,
-  so undo never restores a layout the reader did not just leave.
-- **Two ways to trigger it:** an *Undo* button beside *AI Reorganize*, shown
-  only while undo is available, and Ctrl/Cmd+Z anywhere on the reading page
-  (not only inside the layout, because focus falls to the page after a Tab;
-  story 9 owns that). Ctrl/Cmd+Z typed in a text field keeps editing the text.
-- **Formats:** wherever the reader can indent and outdent today (PDF).
-  EPUB follows when story 10 turns reorganizing on for it.
-- **Kept in the browser.** The reader's device remembers the depths before the
-  change and restores them through the existing apply-depths request, so no
-  new server behavior is needed. Undo does not survive a reload and does not
-  work across devices.
-- **Deferred (not committed here):**
-  - Undoing Cancel. Cancel merges the block's content into its predecessor and
-    deletes the block, and the database then deletes every reader's marks on
-    it; restoring it needs a data-model change. Undo is offered for depth
-    changes only.
-  - Undoing AI reorganize (it already has a preview and Cancel) and undoing
-    block creation.
-  - Redo and multi-step undo.
-  - "Make the following blocks children of this one": nobody has needed it
-    apart from the Cancel case above.
-  - Choosing a block no longer moving the book: story 9 owns focus and
-    keyboard behavior around choosing blocks.
-
-**Key examples**
-
-- In *Code Refactoring*, "3.1 Can You Refactor Without Tests?" and "3.2 Can You
-  Refactor Without Changing the Code?" are siblings under "3. Refactoring Is
-  Not Only About Changing Production Code". Choose "3.1", press Shift+Tab: "3.1"
-  moves to the top level and "3.2" becomes its child. Undo → "3.1" and "3.2" are
-  siblings under "3." again.
-- Indent "Chapter A" (with its children), then press Ctrl/Cmd+Z → "Chapter A"
-  and its children are at their earlier depths.
-- Outdent a block, then cancel another block → *Undo* is no longer offered.
-- Outdent a block, then reload the page → *Undo* is not offered.
-
-**Effort hypothesis:** S–M, medium confidence. Two Behavior slices; the plan is
-[plan 059](../slice-plans/059-undo-last-book-layout-depth-change/PLAN.md).
-**Depends on:** none.
-
 <a id="story-8"></a>
 
 ### Give new and existing blocks short, readable titles
@@ -433,12 +363,10 @@ page indicator step keeps a role for page-1 and page-boundary-free cases.
 - **Highest priority** (reading breaks for common books and devices):
   delivered.
 - **Next** (reading works but is jerky, records go wrong, or correcting is
-  slow): stories 5 and 7–9.
+  slow): stories 5, 8 and 9.
 - **Then** (completing the feature): stories 10–12.
 
-Stories are independent unless stated. The bookmark-based PDF layout (delivered) lowers
-the cleanup that stories 4 and 7 are needed for; the owner re-judged story 7
-on 2026-09-30, cut it to undoing the last depth change, and kept its priority. First to drop: story 12, then story 11.
+Stories are independent unless stated. First to drop: story 12, then story 11.
 
 ## Open Decisions
 
