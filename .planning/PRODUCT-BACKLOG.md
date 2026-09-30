@@ -7,7 +7,6 @@ Bug fixing and general maintenance.
 
 ## Taken
 
-- [A read-only property's wiki-link value is a link, and both views share one row](seeds/SEED-064-note-properties-fixes.md#story-5) — SEED-064#story-5 ([plan](slice-plans/005-note-property-read-only-row/PLAN.md))
 - [Reify a property](seeds/SEED-062-reify-property.md#story-1) — SEED-062#story-1 ([plan](slice-plans/006-reify-property/PLAN.md))
 
 ## Backlog list

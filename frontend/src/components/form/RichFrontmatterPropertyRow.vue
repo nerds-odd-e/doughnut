@@ -1,16 +1,31 @@
 <template>
   <div
-    class="flex flex-col gap-1"
+    :class="[
+      readOnly
+        ? 'grid grid-cols-[minmax(6rem,40%)_minmax(0,1fr)] gap-x-4 gap-y-1'
+        : 'flex flex-col gap-1',
+      { 'rounded bg-primary/10 ring-1 ring-primary/30': isFocused },
+    ]"
     data-testid="rich-note-property-row"
     :data-row-index="idx"
     :data-property-key="modelValue.key"
     :data-property-focused="isFocused ? 'true' : undefined"
-    :class="{
-      'rounded bg-primary/10 ring-1 ring-primary/30': isFocused,
-    }"
     :ref="setRootRef"
   >
+    <template v-if="readOnly">
+      <dt class="break-words font-medium text-base-content/80">
+        {{ modelValue.key }}
+      </dt>
+      <dd class="m-0 break-words">
+        <RichFrontmatterReadOnlyPropertyValue
+          :row="modelValue"
+          :wiki-links="wikiLinks"
+          :last-saved-markdown="lastSavedMarkdown"
+        />
+      </dd>
+    </template>
     <div
+      v-else
       class="grid grid-cols-[auto_minmax(8rem,auto)_minmax(0,1fr)] gap-x-4 items-center"
     >
       <button
@@ -116,7 +131,7 @@
       </div>
     </div>
     <RichFrontmatterPropertyPanel
-      v-if="isFocused"
+      v-if="isFocused && !readOnly"
       :property-key="modelValue.key"
       :note-id="noteId"
       @remove="emit('remove')"
@@ -132,6 +147,7 @@ import RichFrontmatterPropertyPanel from "@/components/form/RichFrontmatterPrope
 import RichFrontmatterImagePropertyValue from "@/components/form/RichFrontmatterImagePropertyValue.vue"
 import RichFrontmatterPropertyExternalLink from "@/components/form/RichFrontmatterPropertyExternalLink.vue"
 import RichFrontmatterPropertyKeyField from "@/components/form/RichFrontmatterPropertyKeyField.vue"
+import RichFrontmatterReadOnlyPropertyValue from "@/components/form/RichFrontmatterReadOnlyPropertyValue.vue"
 import RichFrontmatterScalarPropertyValue from "@/components/form/RichFrontmatterScalarPropertyValue.vue"
 import RelationTypeSelectCompact from "@/components/wiki-link-or-relationship/RelationTypeSelectCompact.vue"
 import type { WikiLink } from "@generated/donut-backend-api"
@@ -163,6 +179,7 @@ const props = defineProps<{
   propertyRows: PropertyRow[]
   noteId?: number
   isFocused: boolean
+  readOnly?: boolean
   setRootRef: (el: Element | ComponentPublicInstance | null) => void
 }>()
 

@@ -74,68 +74,6 @@ changes the shared layout comes before the stories that reuse it.
 
 Effort bands: S = 30–60 minutes, M = 1–2 hours, L = 2–4 hours, including delivery.
 
-<a id="story-5"></a>
-
-### A read-only property's wiki-link value is a link, and both views share one row
-
-**Identity:** SEED-064#story-5
-```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/005-note-property-read-only-row/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"6493571101843d930cf0fb0e5075d253f33f3586c49ea8174789cd46d32079c4","plan":"58c5c945b2e1ef580c5d0bb649e8a5419e87a71dac247016a08dde76261acea4"}}
-```
-
-- **Goal:** a reader of a shared or subscribed note (read-only view) can follow a property whose whole value is a
-  wiki link, such as `related: "[[Other]]"`. Today that value shows as plain `[[Other]]` text, while the same value
-  is a link in the editable view. The story then makes the read-only view a mode of the editable row, so the layout
-  of a property row lives in one place for SEED-062, SEED-063 and story 6 to extend. Nothing is lost or blocked
-  today: the reader can still read the text and find the note another way. The reader-visible gain is small; the
-  structural gain is what queued work depends on.
-- **Scope:**
-  - **Link.** In the read-only view, a scalar property value that is a single whole wiki link is a link to the
-    note it names, in the way the editable view links it. Any other scalar value, and every list value, shows as
-    it does today.
-  - **One row.** The read-only view is rendered by the same row component as the editable view, in a read-only
-    mode: the key is text, the value is the compact display used today (relation label, Wikidata ID with its link,
-    URL with its link, list value, plain text). The separate read-only list component is deleted, and the row
-    and list names stop saying "Editable".
-  - **Read-only stays read-only.** No chevron, no property panel, no Assimilate, no Skip, no remove control, no key
-    or value input, no key presets (owner decision, 2026-09-30). A property visit still highlights the row and
-    scrolls it into view (existing behavior, `RichMarkdownEditor.propertyLocation.spec.ts`).
-  - **Semantics kept.** The read-only list stays a description list (`dl`, `dt`, `dd`); the specs that read it
-    keep working.
-  - **Evidence about the reported layout.** A Chromium measurement (2026-09-30, five rows, one width) found the
-    read-only value column already starts at the same position on every row, and so does the editable one. The
-    seed's "ragged positions" finding is therefore not reproduced within a view; the two views only differ from each
-    other (read-only has no chevron column). Cross-view alignment is not a promise here, and the long-key defect
-    (iPad D1) was already fixed by commit `da80025b09`.
-- **Excluded (story decisions):**
-  - showing an image for an `image` value, in either mode: the editable row does not show one either (it shows the
-    URL in an input with Replace / Choose image), so this is a new capability and would be its own story;
-  - a dead wiki link in the read-only view doing anything when tapped (not wired today, as for list values);
-  - linking text inside a longer value such as `see [[A]] and [[B]]`: the read-only view keeps plain text for it;
-  - pixel-identical layout between the two views, or adding a blank chevron column to the read-only view;
-  - any rule that a key is unique or appears once (SEED-063 boundary);
-  - changes to what the editable view shows or does.
-- **Key examples:**
-  - Read-only note with `related: "[[Other]]"` where `Other` is a note the reader can see → the value is a link to
-    that note (today: the text `[[Other]]`).
-  - Same note, editable view → unchanged, the value is a link inside the value field.
-  - Read-only `topic: training` → plain text `training`, as today.
-  - Read-only `wikidata_id: Q42` → `Q42` and its external link, as today; `url: https://a.io` → text and link.
-  - Read-only `tags: [alpha, beta]` → compact list, as today.
-  - Read-only, property visit for `topic` → that row is highlighted and scrolled into view; other rows are not.
-  - Read-only note → no toggle, remove control, key input, value input, Assimilate or Skip appears anywhere in the list.
-  - 820 px and 375 px, long-key note (existing `note_property_layout.feature` read-only scenario) → every value stays
-    visible and the note does not scroll sideways.
-- **Value / learning:** the wiki-link value becomes a link for readers, and one row serves both modes. The code
-  reduction is smaller than first estimated: the read-only value display moves into the row rather than
-  disappearing, so expect roughly -20 to -35 lines and one component fewer (estimate, not a promise). The larger
-  saving belongs to story 6.
-- **Effort hypothesis:** M, medium confidence.
-- **Boundary with SEED-063:** keeps today's unit of a row (one entry per key as stored) and adds no rule that a key
-  is unique; SEED-063 decides whether a row becomes one value. The single shared row is what SEED-063 extends.
-- **Depends on:** none for the link. The row merge waits until story 2 (Taken) is on trunk, because both edit the row.
-- **Safe stopping point:** the wiki-link value is a link for readers even if the row merge is cancelled.
-
 <a id="story-6"></a>
 
 ### Adding a property uses a row with a visible Add button that says why nothing was added

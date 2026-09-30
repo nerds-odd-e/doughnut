@@ -74,7 +74,7 @@ When selecting note property or memory tracking improvements from the backlog.
   convention with multiple values of one property, each tracked independently.
 - Related story: [Reify a property](SEED-062-reify-property.md#story-1). Neither
   story is currently identified as a prerequisite of the other.
-- Related UAT fixes: [SEED-064](SEED-064-note-properties-fixes.md#story-5) unifies the read-only and editable rows
+- Related UAT fixes: [SEED-064](SEED-064-note-properties-fixes.md) unifies the read-only and editable rows
   before this story, and [SEED-064#story-6](SEED-064-note-properties-fixes.md#story-6) (add-property row) does not
   wait for this story: whichever is delivered second adapts the one add path to the other. The numbered-key code is `propertyKeyBaseAndSuffix` and
   `nextAvailablePropertyKeyFor*` in `frontend/src/utils/noteContentPropertyKeys.ts`.
