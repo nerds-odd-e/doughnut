@@ -43,8 +43,11 @@ missing and stop the affected activity. Do not invent project paths or decisions
 
 Read and follow [planning scope and lifecycle](references/planning.md) for the
 conversation, scope decisions, optional UI and architecture detail, seed updates,
-and cleanup after implementation. Before writing to a story's seed, establish
-or reuse the required workspace under
+and cleanup after implementation. When your instruction
+carries an established preparation, follow
+[established preparation](references/established-preparation.md) instead of the
+workspace and announcement steps below. Before writing to a story's seed,
+establish or reuse the required workspace under
 [preparation workspace](references/preparation-workspace.md), then, for a
 queued story, [announce the preparation assignment](references/preparation-assignment.md#announce-the-preparation-assignment);
 refinement discussion and clarifying questions need neither on their own. After the
@@ -54,8 +57,10 @@ item with a known identity, apply
 
 When the request includes options such as `--explore`, read
 [refinement options](references/refinement-options.json) and apply the selected
-options' instructions within this workflow. Without options, refine
-straightforwardly.
+options' instructions within this workflow. Options in the same group, an entry
+of that file's `groups` list, are exclusive; if a request names more than one of
+them, stop and report the conflict, naming the group's `label` and the flags the
+request named from it. Without options, refine straightforwardly.
 
 Report the story links, material constraints and deferred promises, and
 unresolved decisions. Apply that reference's keep or discard decision, then
