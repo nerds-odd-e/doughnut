@@ -98,7 +98,7 @@ lines → recommendations ordered with experience-improving and code-reducing ch
 
 ### 5. The owner can choose follow-up work from the report
 Type: Behavior
-Status: todo
+Status: done
 Size: about 10 minutes, outside the UAT budget.
 Proof: the section ends with actual UAT time, scenarios not reached, needs-real-device cases, suggested
 priorities, and proposed follow-up story outcomes separating fixes from new capabilities and code-reducing
@@ -143,3 +143,6 @@ the session.
   composable and utilities = the 2,430 restated in the premises; the seed's "about 4,000" is not
   reproducible by any counting method and the section says so. Eight ranked candidates, no ADR conflict;
   one owner question (should a read-only viewer see row panel controls).
+- Slice 5: the seed's `### Synthesis and follow-up (slice 5)` holds the actual times, coverage gaps, seven
+  ordered priorities, follow-up candidates F1-F5 and N1-N3 (candidates only, no backlog entries), owner
+  questions, and the development-database side effects.

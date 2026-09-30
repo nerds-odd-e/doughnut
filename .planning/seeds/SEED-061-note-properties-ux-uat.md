@@ -835,7 +835,171 @@ Time spent on slice 4: about 20 minutes (13 components, the composable, key, row
 
 ### Synthesis and follow-up (slice 5)
 
-_To be filled in slice 5._
+Sources: slices 2 to 4 above. Numbers: "iPad D1" is iPad defect 1, "iPad I6" is iPad improvement 6, "phone D2" is
+phone operability defect 2, "C3" is design candidate 3 (slice 4). All line effects are slice 4 estimates.
+
+#### Summary for the owner
+
+- **What was exercised:** the note properties area (view, add, change, remove, list dialog, image, relation type,
+  Wikidata dialog, validation, row panel) in editable and read-only mode, on an iPad (portrait 820 px and landscape
+  1180 px, touch, keyboard emulated), then on a phone (375 px) and a desktop (1440 px). The code was reviewed for
+  duplication and size.
+- **iPad, headline:** every journey can be completed and saving works. The main defect is read-only: a long key
+  leaves the value 0 px wide, so the value is not visible (iPad D1). Next: the validation message can sit far below
+  the edited row and off screen on long lists (D2), the key preset list does not narrow and is wider than its panel
+  (D3), and long text is cut with no cue (D4). Controls are 32 px high (guide: 44 px), and 19 rows push the note
+  body to 84% of the screen height (I1, I2).
+- **Phone, operability:** all journeys can be completed. Three obstacles: the read-only value of a long key is
+  unreachable even by panning (phone D1), the preset list covers the value field and Choose image until the key loses
+  focus (phone D2), and plain text values show about 50 px (phone D3).
+- **Design finding:** the read-only list, the editable row and the add form each decide separately how to show a key
+  (four value-kind chains, three grids). One row with a read-only mode, one key field, and the add form as a draft row
+  would remove about 200 to 250 lines (estimate) and fix the most visible defects with them. The size the story
+  quoted ("about 4,000" lines) is not reproducible; all frontend property code is 3,047 lines.
+- **Not confirmed:** a Wikidata Save that shows nothing (reproduced only for a typed ID with an empty search list)
+  and one Replace timeout (not reproduced).
+
+#### Actual UAT time
+
+| Part | Minutes |
+| --- | ---: |
+| Setup (slice 1) | about 4 |
+| iPad exploration (slice 2, 14:07 to 14:27) | about 20 |
+| Phone and desktop exploration, Wikidata and Replace checks (slice 3, 14:29 to 14:44) | about 15 |
+| Exploration total | about 35 of the 60 minute budget |
+| Design and code review (slice 4) | about 20 |
+| Write-up (slice 5) | not timed here |
+
+The exploration budget was not used up; the remaining time went to checks and to clarifying the read-only mode.
+
+#### Scenarios not reached / needs a real iPad or phone
+
+Consolidated from the coverage lists above; nothing is added.
+
+- **Needs a real device:** iPadOS Safari behaviour with the software keyboard (visual viewport, auto-scroll to the
+  focused field, whether presets and the message stay visible), floating keyboard and shortcut bar, hardware keyboard
+  and trackpad, Apple Pencil, split view widths, safe-area insets, Safari zoom on focus of small inputs, the native
+  file picker and camera upload, long-press and text selection in 32 px inputs, momentum scrolling in the preset list
+  and dialogs. On a phone: the keyboard shrinking only the visual viewport, the Wikidata dialog's Save and Close at
+  the bottom edge, and whether the 44 px rule works for a real finger.
+- **Not run on the iPad:** tapping Assimilate and Skip (measured only), list reorder, the relation type selection,
+  the portrait list dialog with the keyboard, rename to an existing key, Wikidata Save with a real search result,
+  read-only landscape beyond height measurements, dark mode, very narrow split view. (Slice 3 ran list reorder,
+  relation type, duplicate rename and Wikidata with a search result on the phone only.)
+- **Not run on the phone or desktop:** landscape phone, phone in dark mode, the Wikidata follow-up choice (Replace
+  title, Add as alias) and what it inserts, descriptive text for other entry types, tapping the clipped wiki-link
+  value, list dialog on a phone in landscape; on desktop: image upload, relation type, Wikidata, read-only view and
+  long keys.
+- **Not checked in code or running product:** whether the `type: Note` row is stored or only shown (iPad I5); the
+  relation type control flow on the iPad (I12).
+
+#### Suggested priorities
+
+One ordered list. iPad findings come first, and changes that improve the experience and reduce code come before
+those that add code. Slice 4's ranking is kept; the validation message (iPad D2, medium severity on the iPad) is moved
+up within the code-adding items, as the first of them.
+
+1. **Shared responsive row, and read-only as a mode of the same row** (C1 + C2; iPad D1, D4, I4; phone D1, D3;
+   base for I1 and I2). [fix existing behavior] [reduces code]
+2. **One key field with presets that narrow while typing** (C3; iPad D3; phone D2). [fix existing behavior]
+   [reduces code]
+3. **Add form becomes a draft row with a visible Add button and reasons** (C4 with C5; iPad I6; phone D2 rest).
+   [new capability] [reduces code]
+4. **Validation message next to its row** (C6; iPad D2). [fix existing behavior] [adds code / polish]
+5. **44 px touch targets on touch widths** (C7; iPad I1; iPad D5 partly). [fix existing behavior]
+   [adds code / polish]
+6. **Feedback for silent outcomes** (C8; iPad I7, I10; the typed-ID Wikidata Save). [new capability]
+   [adds code / polish]
+7. **Remove control with a text label or undo message** (iPad I8). [new capability] [adds code / polish]
+
+Not proposed (slice 4, "Not recommended"): a collapsed "show all" mode (iPad I2), merging `noteContent*` utilities,
+one YAML parser for both languages, replacing the contenteditable value field, changing the value dialog or panel
+actions, hiding the `type: Note` row (iPad I5).
+
+#### Proposed follow-up story outcomes
+
+Candidates for the owner to select. No backlog entry was created. Effort bands from this seed: S = 30 to 60
+minutes, M = 1 to 2 hours, L = 2 to 4 hours, including delivery.
+
+**Fixes to existing behavior, changes that reduce code**
+
+- **F1. Long keys no longer hide values, on iPad and phone.** A note with a very long key shows its value at 820 and
+  375 px without sideways scrolling, in one shared row rule. Covers iPad D1, D4; phone D1, D3. Effort M. Line effect
+  (estimate): about 0 to -5. Protecting test first: a Cypress scenario at 820 and 375 px with a long-key note,
+  read-only and editable, asserting the value is visible and there is no horizontal scroll (about +25 lines of
+  feature and step code, estimate).
+- **F2. Read-only properties look and link like the editable ones.** One row component with a read-only mode; the
+  read-only list file is deleted, single wiki-link values become links, image values show as images. Covers iPad
+  I4. Effort M to L (needs F1). Line effect (estimate): about -60 to -75, one file fewer. Protecting tests first:
+  read-only component tests for a single wiki-link value, an image value and a Wikidata value (only spec names were
+  checked, not assertions), plus F1's layout scenario.
+- **F3. Typing a key narrows the presets, and the list stays inside its panel and off the value field.** Covers iPad
+  D3; phone D2. Effort M. Line effect (estimate): about -25, one file more. Protecting tests first: a unit test that
+  the preset function filters by typed text (cheap), and a viewport check that the list stays on screen and does not
+  cover the value field at 375 px.
+
+**Fixes to existing behavior, polish (adds code)**
+
+- **F4. The validation message appears under the row that was rejected.** Covers iPad D2. Effort S. Line effect
+  (estimate): about +17, or about +4 for the cheaper "scroll the message into view". Protecting test first: a
+  viewport check with an invalid `note_level` on a long note (message text is already covered).
+- **F5. Touch controls are 44 px high on touch widths.** One rule for the section instead of 21 class edits. Covers
+  iPad I1. Effort S. Line effect (estimate): about +8 CSS; a 19-row note grows by about 230 px (estimate), so it is
+  best after F1. Protecting test: none possible in jsdom; check on a real iPad.
+
+**New capabilities, one reduces code**
+
+- **N1. The owner adds a property through a row that has a visible Add button and says why nothing was added.**
+  Add form deleted; key-only or value-only shows a reason. Covers iPad I6; rest of phone D2. Effort L. Line effect
+  (estimate): about -120 to -150, the largest saving and the highest risk. Protecting tests first: key-only and
+  value-only add tests (none exist); keep the ids `rich-note-property-key` and `rich-note-property-value` or change
+  the page object `noteRichPropertyMethods.ts` in the same commit. Do after F2 and F3.
+- **N2. The user sees a message when the product changes something silently.** Adds a note when a value is appended
+  to a list key ("Added to url"), keeps the upload error until the next action, and shows a result when a typed
+  Wikidata ID cannot be used. Covers iPad I7, I10; the Wikidata silent Save. Effort M. Line effect (estimate): about
+  +10 to +20 in each of three places. Protecting tests first: for the append and the upload message, none exist; the
+  Wikidata combination (typed ID plus empty list) has none. Confirm the Wikidata case is a defect first (open
+  question 4).
+- **N3. Remove is clearly labelled or can be undone.** Covers iPad I8. Effort S. Line effect (estimate): small
+  addition. Protecting test first: a component test for the label or the undo.
+
+#### Open questions for the owner
+
+1. **Read-only panel controls.** Should a read-only viewer ever see the row panel controls (Assimilate, Skip)? Today
+   read-only has no chevron. The answer does not block F1 to F3; F2 keeps today's behavior.
+2. **Assimilate from a row panel.** Tapping Assimilate ran `POST /api/assimilation` and then moved the page to another
+   note (the next one in the sequence). Is that intended when the button is inside a single property's panel? It was
+   observed only on the phone.
+3. **Skip wording.** The panel's Skip asks "Leave this note out of the assimilation sequence?", a wording about the
+   whole note inside a single property's panel. Should it change?
+4. **Wikidata Save with a typed ID and no search results** showed nothing (twice, iPad portrait and phone). Is a
+   typed ID without matching title results meant to be supported? With results, Save asks for Replace title or Add as
+   alias and works.
+5. **Empty state.** `UAT no properties` shows a `type: Note` row. Is that row stored in the note or only shown? The
+   answer decides whether an empty-state message or hiding the row is possible under ADR 0004.
+6. **Density.** After F1, is a collapsed "show all" summary still wanted for notes with many properties (19 rows use
+   84% of an iPad portrait screen)? Slice 4 does not recommend it before F1.
+7. **Not reproduced, listed honestly:** (a) a Replace tap timed out once for 30 s on the iPad right after adding the
+   image; four taps on the phone and one repeat on the iPad gave the file chooser at once (53 to 66 ms on the phone),
+   so it stays "suspected, not reproduced"; (b) a tap on the "Properties" heading was blocked once on the phone right
+   after choosing an image (cause unknown, a busy overlay during the upload is a guess); (c) the Wikidata dialog
+   "stays open" on the iPad is partly explained by the suggested-title question, but the empty-list case remains
+   unexplained; (d) rename to an existing key on the iPad (an earlier attempt renamed by mistake) was checked only on
+   the phone. The yellow "T" Testing button covers controls on the Development stack only and is not a defect.
+
+#### Side effects left in the development database
+
+Remove these if wanted; only UAT items are affected.
+
+- **Notebook 22 "UAT notebook" is shared to the Bazaar** (`POST /api/notebooks/22/share`). It was needed for the
+  read-only view.
+- **Scratch notes 13719 to 13725** were edited destructively: 13719 `UAT edit portrait`, 13720 `UAT edit landscape`,
+  13721 `UAT edit phone`, 13722 `Tokyo`, 13723 `Kyoto`, 13724 `UAT wd noresult xq`, 13725 `UAT edit desktop`. Uploaded files (`photo-b.png`, `photo-ph-c.png`, `photo-ph-d.png`) sit in the
+  notebook.
+- **One assimilation record** was created by tapping Assimilate in a row panel on the phone (`POST /api/assimilation`);
+  the page then moved to a note titled `Perf100`, which is not a UAT note. Its assimilation state changed.
+- Notes 13716 to 13718 (`UAT no properties`, `UAT six properties`, `UAT many properties`) are the fixed test notes;
+  the edit runs used the scratch notes instead.
 
 ### Actual exploration minutes (slice 2)
 
