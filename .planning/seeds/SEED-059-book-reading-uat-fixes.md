@@ -52,6 +52,9 @@ section `## UAT Findings`; "defect N" below refers to its numbering.
   - AI reorganization left 3.2.1–3.2.3 at the depth of 3.2 in one paper
     (defect 17);
   - no progress during MinerU extraction;
+  - attach discoverability (web attach card PDF hint, CLI `/help` and access
+    token guidance, a reader link after a CLI attach): wording and pointers
+    only, with no defect and no technical debt behind them;
   - books named after the file instead of their title;
   - the reading panel and "Now reading" bar covering some book text;
   - the AI preview being hard to check row by row;
@@ -78,7 +81,7 @@ Effort bands: S = 30–60 minutes, M = 1–2 hours, L = 2–4 hours, including d
 
 **Identity:** SEED-059#story-10
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/061-epub-layout-only-working-controls/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"aec7cbe5f61559310cf1136d6afd3774098dd3794421de233542a2b02322d132","plan":"e8ae0ee9c277ede502154cea49625dc410b353e31d7e50217e95ce57e062bf5d"}}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/061-epub-layout-only-working-controls/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"49e97e162b3d07fe2f31b5063cd695286bb747f09d22d4ebda3508a49f36b4dd","plan":"e8ae0ee9c277ede502154cea49625dc410b353e31d7e50217e95ce57e062bf5d"}}
 ```
 
 **Goal:** An EPUB reader is not offered layout controls that do nothing. This is
@@ -116,40 +119,6 @@ web attaches only EPUBs, so EPUB readers are the ones who meet the dead controls
 **Effort hypothesis:** S, medium confidence (one capability check in the layout
 and a component test; an E2E scenario only if a component test cannot show the
 button absent in a real EPUB).
-**Depends on:** none.
-
-<a id="story-11"></a>
-
-### Go from attaching a book to reading it without searching
-
-**Identity:** SEED-059#story-11
-```json dough-story-state
-{"schemaVersion":1,"refinement":"not-refined","approach":"unselected"}
-```
-
-**Goal:** A user can find how to attach a PDF or EPUB and reach the reader in one
-step after attaching.
-
-**Observed friction**
-
-- The web's *Attach book…* accepts only `.epub`, with no hint that PDFs go
-  through the CLI.
-- The CLI's top-level `/help` needs two Enters, does not list `/attach`, and
-  says "Not supported" in notebook context; it does not say where to get an
-  access token (Account → Manage Access Tokens on the web).
-- After a CLI attach, nothing says where to read. On the notebook page the book
-  appears as a plain file with *Download* and *Delete* but no *Read*; the ways in
-  are Settings → *Read* or an unlabelled icon in the notebook list.
-
-**Key examples**
-
-- The web attach card says how to attach a PDF.
-- CLI help lists `/attach` and where to get a token.
-- After attaching, the CLI prints the reader link, and the notebook page offers
-  *Read* where the book is shown.
-
-**Effort hypothesis:** S–M, medium confidence. Open question: should PDFs also be
-attachable on the web?
 **Depends on:** none.
 
 <a id="story-12"></a>
@@ -248,9 +217,9 @@ page indicator step keeps a role for page-1 and page-boundary-free cases.
   delivered.
 - **Next** (reading works but is jerky, records go wrong, or correcting is
   slow): stories 5 and 9.
-- **Then** (completing the feature): stories 10–12.
+- **Then** (completing the feature): stories 10 and 12.
 
-Stories are independent unless stated. First to drop: story 12, then story 11.
+Stories are independent unless stated. First to drop: story 12.
 
 ## Open Decisions
 

@@ -1,9 +1,0 @@
-{
-  "schemaVersion": 1,
-  "agent": "Maki-chan",
-  "email": "maki-chan@example.org",
-  "activity": "preparation",
-  "identity": "SEED-059#story-11",
-  "host": "claude",
-  "model": "claude-sonnet-5-5"
-}
