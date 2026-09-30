@@ -70,4 +70,42 @@ public class PropertyMemoryTrackerService {
               entityPersister.save(tracker);
             });
   }
+
+  /**
+   * Moves every learner's note-level understanding tracker on {@code relationNote} onto {@code
+   * focus} of {@code sourceNote}, unless that learner already tracks that focus there. Every other
+   * tracker on {@code relationNote} (spelling, commissioned, or property-level) is left for the DB
+   * {@code ON DELETE CASCADE} to remove with the relationship note; those are detached here so
+   * Hibernate's persistence context does not keep a managed reference to a note about to be removed
+   * (its own pre-flush transient-dependency check does not know about that DB-level cascade).
+   */
+  public void rehomeNoteLevelTrackersToProperty(
+      Note relationNote, Note sourceNote, PropertyFocus focus) {
+    List<MemoryTracker> sourceTrackers =
+        memoryTrackerRepository.findByNote_IdIn(List.of(sourceNote.getId()));
+    memoryTrackerRepository
+        .findByNote_IdIn(List.of(relationNote.getId()))
+        .forEach(
+            tracker -> {
+              if (tracker.isUnderstanding()
+                  && tracker.isNoteLevelTracker()
+                  && sourceTrackers.stream()
+                      .noneMatch(
+                          existing -> sameLearnersUnderstandingOf(existing, tracker, focus))) {
+                tracker.setNote(sourceNote);
+                tracker.setPropertyKey(focus.key());
+                tracker.setPropertyValue(focus.value());
+                entityPersister.merge(tracker);
+              } else {
+                entityPersister.detach(tracker);
+              }
+            });
+  }
+
+  private static boolean sameLearnersUnderstandingOf(
+      MemoryTracker existing, MemoryTracker tracker, PropertyFocus focus) {
+    return existing.isUnderstanding()
+        && existing.getUser().getId().equals(tracker.getUser().getId())
+        && focus.equals(existing.propertyFocus());
+  }
 }

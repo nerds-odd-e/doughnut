@@ -56,6 +56,14 @@ public final class Frontmatter {
     return rawValueIgnoreCase(key).flatMap(FrontmatterPropertyValues::fromYamlObject);
   }
 
+  /**
+   * Case-insensitive; whether {@code key} holds a non-null value that is neither a supported scalar
+   * nor a supported list, such as a map.
+   */
+  public boolean holdsUnsupportedValue(String key) {
+    return rawValueIgnoreCase(key).isPresent() && getPropertyValue(key).isEmpty();
+  }
+
   /** Key names in insertion order. */
   public Set<String> keys() {
     return Set.copyOf(data.keySet());

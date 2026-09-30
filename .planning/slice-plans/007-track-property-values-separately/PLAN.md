@@ -212,7 +212,12 @@ list, nothing moves.
 
 ### 8. Reducing a relationship note into an existing key adds a value
 Type: Behavior
-Status: planned
+Status: done — `RelationControllerReduceIntoExistingKeyTests` red then green (single value becomes a list, block and flow
+list append, repeated value not added, a map value refused with 400 and nothing changed);
+`RelationControllerReduceToSourcePropertyTests` green. Backend `nextAvailablePropertyKeyForBase` and
+`addPropertyWithAvailableKeyToLeadingFrontmatter` are deleted. When a learner already tracks the reduced (key, value) on
+the source, their relationship tracker goes with the relationship note. Tracker moving lives in
+`PropertyMemoryTrackerService.rehomeNoteLevelTrackersToProperty`.
 Proof: `RelationControllerReduceToSourcePropertyTests` (replace the colliding-key suffix case), red then green.
 
 Behavior: `Sentence` has `example of: "[[run]]"` with a tracker, and the tracked relationship note "Sentence an example

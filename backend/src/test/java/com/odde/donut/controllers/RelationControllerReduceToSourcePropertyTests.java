@@ -96,30 +96,6 @@ class RelationControllerReduceToSourcePropertyTests extends ControllerTestBase {
   }
 
   @Test
-  void collidingKeySuffixesTheNewPropertyWhenTheSourceAlreadyHoldsIt()
-      throws UnexpectedNoAccessRightException {
-    Note source =
-        makeMe
-            .aNote("Moon")
-            .notebookOwnedBy(currentUser.getUser())
-            .content("---\na part of: \"[[Somewhere]]\"\n---\n")
-            .please();
-    Note target = makeMe.aNote("Earth").underSameNotebookAs(source).please();
-    Note relation =
-        makeMe
-            .aNote()
-            .underSameNotebookAs(source)
-            .asRelationship("a part of", source, target)
-            .please();
-    noteReferenceService.refreshDerivedIndexesForNote(relation);
-
-    controller.reduceToSourceProperty(relation);
-
-    assertThat(source.getContent(), containsString("a part of 2"));
-    assertThat(source.getContent(), containsString("[[Earth]]"));
-  }
-
-  @Test
   void appendsOnlyTheNewPropertyLineToTheSourceFrontmatter()
       throws UnexpectedNoAccessRightException {
     String authored =
@@ -174,6 +150,7 @@ class RelationControllerReduceToSourcePropertyTests extends ControllerTestBase {
 
     assertThat(activeTracker.getNote().getId(), equalTo(source.getId()));
     assertThat(activeTracker.getPropertyKey(), equalTo("a part of"));
+    assertThat(activeTracker.getPropertyValue(), equalTo(""));
     assertThat(activeTracker.getStability(), equalTo(activeStability));
     assertThat(activeTracker.getNextRecallAt(), equalTo(activeNextRecallAt));
     assertThat(activeTracker.getRecallCount(), equalTo(1));

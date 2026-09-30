@@ -97,22 +97,59 @@ public final class NoteContentMarkdown {
             });
   }
 
-  public record AddPropertyWithAvailableKeyResult(String content, String resolvedKey) {}
+  /**
+   * The content after {@link #addPropertyValueToLeadingFrontmatter}, the key as authored, the value
+   * a tracker of the added value focuses on ('' for a single value), and the former single value
+   * that became a list item (null when none did).
+   */
+  public record AddedPropertyValue(
+      String content, String key, String trackedValue, String formerSingleValue) {}
 
   /**
-   * Appends a scalar property using the next free key in {@code basePropertyKey}'s family (`key 2`,
-   * `key 3`, … when the base is taken).
+   * Adds {@code value} to {@code key} (matched case-insensitively): a key holding values gets it as
+   * one more list item (a single value becomes a list; a value already there is not repeated);
+   * otherwise (absent or blank) the key is set to it as a single value. Empty when the key holds an
+   * unsupported value such as a map, which is left as authored.
    */
-  public static AddPropertyWithAvailableKeyResult addPropertyWithAvailableKeyToLeadingFrontmatter(
-      String content, String basePropertyKey, String value) {
-    Set<String> existingKeys =
+  public static Optional<AddedPropertyValue> addPropertyValueToLeadingFrontmatter(
+      String content, String key, String value) {
+    Frontmatter frontmatter =
         splitLeadingFrontmatter(content == null ? "" : content)
-            .map(lf -> lf.frontmatter().keys())
-            .orElse(Set.of());
-    String resolvedKey =
-        PropertyKeyNaming.nextAvailablePropertyKeyForBase(basePropertyKey, existingKeys);
-    return new AddPropertyWithAvailableKeyResult(
-        setLeadingFrontmatterProperty(content, resolvedKey, value), resolvedKey);
+            .map(LeadingFrontmatter::frontmatter)
+            .orElse(Frontmatter.empty());
+    if (frontmatter.holdsUnsupportedValue(key)) {
+      return Optional.empty();
+    }
+    String authoredKey =
+        frontmatter.keys().stream().filter(key::equalsIgnoreCase).findFirst().orElse(key);
+    return Optional.of(
+        switch (frontmatter.getPropertyValue(key).orElse(null)) {
+          case FrontmatterPropertyValue.ListItems list when list.items().contains(value) ->
+              new AddedPropertyValue(content, authoredKey, value, null);
+          case FrontmatterPropertyValue.ListItems ignored ->
+              new AddedPropertyValue(
+                  addListItem(content, authoredKey, value), authoredKey, value, null);
+          case FrontmatterPropertyValue.Scalar single when single.value().equals(value) ->
+              new AddedPropertyValue(content, authoredKey, "", null);
+          case FrontmatterPropertyValue.Scalar single when !single.value().isBlank() ->
+              new AddedPropertyValue(
+                  addListItem(content, authoredKey, value), authoredKey, value, single.value());
+          case null, default ->
+              new AddedPropertyValue(
+                  setLeadingFrontmatterProperty(content, authoredKey, value),
+                  authoredKey,
+                  "",
+                  null);
+        });
+  }
+
+  private static String addListItem(String content, String key, String value) {
+    return NoteLeadingFrontmatter.splitVerbatim(content)
+        .map(
+            split ->
+                split.rebuild(
+                    FrontmatterInPlaceEdit.addTopLevelListItem(split.yamlRaw(), key, value)))
+        .orElseThrow();
   }
 
   /**
