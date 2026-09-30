@@ -11,5 +11,5 @@ Bug fixing and general maintenance.
 
 ## Backlog list
 
-- [See reading progress through the book](seeds/SEED-059-book-reading-uat-fixes.md#story-12) — SEED-059#story-12
+- [Make every reading mark visible and explained](seeds/SEED-059-book-reading-uat-fixes.md#story-12) — SEED-059#story-12
 - [Book reading E2E scenarios stay stable at any window size](seeds/SEED-059-book-reading-uat-fixes.md#story-21) — SEED-059#story-21
