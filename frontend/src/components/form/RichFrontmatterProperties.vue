@@ -37,6 +37,8 @@
       :last-saved-markdown="lastSavedMarkdown"
       :note-id="noteId"
       :heading-id="headingId"
+      :validation-message="validationMessage"
+      :validation-row-index="validationRowIndex"
       @row-focus="onRowFocus"
       @commit="commitRow"
       @remove="removeRow"
@@ -46,7 +48,7 @@
       @image-upload-state="emits('image-upload-state', $event)"
     />
     <RichFrontmatterPropertyValidationMessage
-      v-if="validationMessage"
+      v-if="validationMessage && validationRowIndex === undefined"
       :message="validationMessage"
     />
     <button
@@ -147,6 +149,7 @@ const insertOpen = ref(false)
 const draftKey = ref("")
 const draftValue = ref("")
 const validationMessage = ref("")
+const validationRowIndex = ref<number>()
 const rowSnapshots = ref<Record<number, PropertyRow>>({})
 const wikidataSearchKeyForDialog = computed(
   () => props.noteTitleForWikidataSearch ?? ""
@@ -155,11 +158,13 @@ const wikidataAssociationDialogRef = ref<InstanceType<
   typeof WikidataAssociationDialog
 > | null>(null)
 
-const setValidationMessage = (msg: string) => {
+const setValidationMessage = (msg: string, rowIndex?: number) => {
   validationMessage.value = msg
+  validationRowIndex.value = rowIndex
 }
 const clearValidation = () => {
   validationMessage.value = ""
+  validationRowIndex.value = undefined
 }
 
 const {
@@ -229,7 +234,7 @@ watch(
     insertOpen.value = false
     draftKey.value = ""
     draftValue.value = ""
-    validationMessage.value = ""
+    clearValidation()
     rowSnapshots.value = {}
     resetDialog()
   },

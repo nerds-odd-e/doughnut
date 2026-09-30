@@ -1,8 +1,7 @@
 <template>
   <div class="flex flex-col gap-2 text-sm">
+    <template v-for="(row, idx) in propertyRows" :key="rowClientIds[idx]">
     <RichFrontmatterEditablePropertyRow
-      v-for="(row, idx) in propertyRows"
-      :key="rowClientIds[idx]"
       v-model="propertyRows[idx]!"
       :idx="idx"
       :wiki-links="wikiLinks"
@@ -21,11 +20,17 @@
       @relation-type-selected="emit('relation-type-selected', idx, $event)"
       @image-upload-state="emit('image-upload-state', $event)"
     />
+    <RichFrontmatterPropertyValidationMessage
+      v-if="validationMessage && validationRowIndex === idx"
+      :message="validationMessage"
+    />
+    </template>
   </div>
 </template>
 
 <script setup lang="ts">
 import RichFrontmatterEditablePropertyRow from "@/components/form/RichFrontmatterEditablePropertyRow.vue"
+import RichFrontmatterPropertyValidationMessage from "@/components/form/RichFrontmatterPropertyValidationMessage.vue"
 import { useFocusedNoteProperty } from "@/composables/useFocusedNoteProperty"
 import { usePropertyRowClientIds } from "@/composables/usePropertyRowClientIds"
 import type { WikiLink } from "@generated/donut-backend-api"
@@ -39,6 +44,8 @@ const props = defineProps<{
   lastSavedMarkdown?: string
   noteId?: number
   headingId: string
+  validationMessage: string
+  validationRowIndex?: number
 }>()
 
 const emit = defineEmits<{

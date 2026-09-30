@@ -73,7 +73,7 @@ row without copying the markup.
 
 ### 2. A rejected row change is explained directly under that row
 Type: Behavior
-Status: planned
+Status: done
 Proof: the new component tests in `RichMarkdownEditor.propertyRowEditing.spec.ts` (with a small helper in
 `propertiesTestDom.ts` that returns the message element that follows a row), red before the change and green after; then
 the three specs of slice 1 unchanged, run once.
@@ -101,6 +101,9 @@ adjacent, stop and re-read the layout before changing anything.
 
 - Slice 1 (2026-09-30): proof green — the three specs, 27 tests, no assertion changed. `frontend/components.d.ts`
   (tracked, auto-generated) gains the new component's declarations; commit it with the component.
+- Slice 2 (2026-09-30): red run showed 3 of 4 new tests failing (message not adjacent; add-form test passes by design),
+  then green: the three specs 31 passed, `vue-tsc --noEmit` clean. Relation-type path passes `idx`, untested as planned.
+  The real iPad check stays with the owner.
 
 ## Real iPad check (owner, optional)
 

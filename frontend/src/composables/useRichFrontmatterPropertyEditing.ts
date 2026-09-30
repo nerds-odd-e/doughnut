@@ -28,7 +28,7 @@ export function useRichFrontmatterPropertyEditing(options: {
   noteId: () => number | undefined
   isReadmeContext: () => boolean
   onPropertiesChanged: (rows: PropertyRow[]) => void
-  setValidationMessage: (message: string) => void
+  setValidationMessage: (message: string, rowIndex?: number) => void
   clearValidation: () => void
   insertKeyInputId: string
   insertOpen: Ref<boolean>
@@ -136,7 +136,7 @@ export function useRichFrontmatterPropertyEditing(options: {
 
     const result = validatePropertyRowsForRichEdit(options.propertyRows.value)
     if (!result.ok) {
-      options.setValidationMessage(result.message)
+      options.setValidationMessage(result.message, idx)
       if (snapshot) {
         options.propertyRows.value = options.propertyRows.value.map((r, i) =>
           i === idx ? { ...snapshot } : r
@@ -183,7 +183,7 @@ export function useRichFrontmatterPropertyEditing(options: {
     options.propertyRows.value = rows
     const result = validatePropertyRowsForRichEdit(options.propertyRows.value)
     if (!result.ok) {
-      options.setValidationMessage(result.message)
+      options.setValidationMessage(result.message, idx)
       return
     }
     emitProperties(options.propertyRows.value)
