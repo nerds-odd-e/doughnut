@@ -58,15 +58,9 @@
             :tabindex="block.id === tabStopBlockId ? 0 : -1"
             @focusin="lastFocusedBlockId = block.id"
             @click="onBlockRowClick(block, $event)"
-            @pointerdown="blockDrag.onPointerDown(block, $event)"
-            @pointermove="blockDrag.onPointerMove(block, $event)"
-            @pointerup="blockDrag.onPointerUp(block, $event)"
-            @pointercancel="blockDrag.onPointerCancel(block, $event)"
             @keydown.down.exact.prevent="focusRowBy($event, 1)"
             @keydown.up.exact.prevent="focusRowBy($event, -1)"
-            @keydown.alt.shift.right.prevent="changeDepth('blockIndent', block)"
-            @keydown.alt.shift.left.prevent="changeDepth('blockOutdent', block)"
-            @keydown.delete.prevent="emit('blockCancel', block)"
+            v-on="canReorganize ? reorganizeListeners(block) : {}"
           >
             <span
               class="book-reading-book-block-guides"
@@ -199,6 +193,27 @@ const blockDrag = useBookLayoutBlockPointerDrag({
   indent: (block) => changeDepth("blockIndent", block),
   outdent: (block) => changeDepth("blockOutdent", block),
 })
+
+function reorganizeListeners(block: BookBlockFull) {
+  return {
+    pointerdown: (e: PointerEvent) => blockDrag.onPointerDown(block, e),
+    pointermove: (e: PointerEvent) => blockDrag.onPointerMove(block, e),
+    pointerup: (e: PointerEvent) => blockDrag.onPointerUp(block, e),
+    pointercancel: (e: PointerEvent) => blockDrag.onPointerCancel(block, e),
+    keydown: (e: KeyboardEvent) => {
+      if (e.key === "Delete" || e.key === "Backspace") {
+        e.preventDefault()
+        emit("blockCancel", block)
+      } else if (e.altKey && e.shiftKey && e.key === "ArrowRight") {
+        e.preventDefault()
+        changeDepth("blockIndent", block)
+      } else if (e.altKey && e.shiftKey && e.key === "ArrowLeft") {
+        e.preventDefault()
+        changeDepth("blockOutdent", block)
+      }
+    },
+  }
+}
 
 function onBlockRowClick(block: BookBlockFull, e: MouseEvent) {
   if (blockDrag.consumeDragClick(e)) {

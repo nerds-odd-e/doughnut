@@ -2,7 +2,7 @@
 
 Work item: **SEED-059#story-10**
 ([story](../../seeds/SEED-059-book-reading-uat-fixes.md#story-10)).
-Status: **slice 1 done; slice 2 planned.**
+Status: **both slices done.**
 Nothing blocks execution.
 
 ## Goal and scope
@@ -107,7 +107,7 @@ end-to-end-observable outcome, and it introduces the prop slice 2 reuses.
 
 ### 2. An EPUB layout's rows offer no reorganize keys or drag
 Type: Behavior
-Status: planned
+Status: done
 Proof: layout spec cases described under Outside-in proof, written first and
 seen failing. Focused check: `BookReadingBookLayout.spec.ts`; PDF preserved by
 its existing indent, outdent and drag cases and `reorganize_layout.feature`.
@@ -136,3 +136,5 @@ never swallowed. About 5 min.
 ## Learnings
 
 Slice 1 accepted proof: `BookReadingBookLayout.spec.ts` (16/16, incl. "draws AI Reorganize only when reorganizing is offered"); E2E `epub_book.feature` (new scenario failed before, passes after) and `ai_reorganize_layout.feature` (PDF), 22/22. `reorganize_layout.feature` not run.
+
+Slice 2 accepted proof: `BookReadingBookLayout.spec.ts` "without reorganizing" cases (3 failed before; 19/19 after); E2E `reorganize_layout.feature` 10/10 and `epub_book.feature` 21/21. Vue's `.delete` modifier also matches Backspace, so the row handler keeps both. `BookReadingBookLayout.vue` (314 lines) and its spec (409) were already over the 250-line guide before this story.

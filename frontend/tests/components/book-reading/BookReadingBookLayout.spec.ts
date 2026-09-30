@@ -341,6 +341,60 @@ describe("BookReadingBookLayout", () => {
     })
   })
 
+  describe("without reorganizing", () => {
+    const mountRow = () => {
+      const wrapper = mountLayout(
+        [blockStub({ id: 5, depth: 1, title: "E" })],
+        { canReorganize: false }
+      )
+      const row = wrapper.find('[data-testid="book-reading-book-block"]')
+      return { wrapper, row }
+    }
+
+    it("ignores Alt+Shift+Arrow keys", async () => {
+      const { wrapper, row } = mountRow()
+      await row.trigger("keydown", {
+        key: "ArrowRight",
+        altKey: true,
+        shiftKey: true,
+      })
+      await row.trigger("keydown", {
+        key: "ArrowLeft",
+        altKey: true,
+        shiftKey: true,
+      })
+      expect(wrapper.emitted("blockIndent")).toBeUndefined()
+      expect(wrapper.emitted("blockOutdent")).toBeUndefined()
+      wrapper.unmount()
+    })
+
+    it("leaves Delete alone", () => {
+      const { wrapper, row } = mountRow()
+      const event = new KeyboardEvent("keydown", {
+        key: "Delete",
+        bubbles: true,
+        cancelable: true,
+      })
+      row.element.dispatchEvent(event)
+      expect(wrapper.emitted("blockCancel")).toBeUndefined()
+      expect(event.defaultPrevented).toBe(false)
+      wrapper.unmount()
+    })
+
+    it("ignores a horizontal drag and still emits blockClick on click", async () => {
+      const { wrapper, row } = mountRow()
+      const el = row.element as HTMLElement
+      pointerMouse(el, { type: "pointerdown", clientX: 200, clientY: 120 })
+      pointerMouse(el, { type: "pointermove", clientX: 230, clientY: 120 })
+      pointerMouse(el, { type: "pointerup", clientX: 230, clientY: 120 })
+      await row.trigger("click")
+      expect(wrapper.emitted("blockIndent")).toBeUndefined()
+      expect(wrapper.emitted("blockOutdent")).toBeUndefined()
+      expect(wrapper.emitted("blockClick")).toHaveLength(1)
+      wrapper.unmount()
+    })
+  })
+
   it("draws AI Reorganize only when reorganizing is offered", async () => {
     const aiReorganize = '[data-testid="book-reading-ai-reorganize-layout"]'
     const without = mountLayout(undefined, { canReorganize: false })
