@@ -62,6 +62,27 @@ work with it as a relationship while retaining the property's existing trackers.
 - Several learners have trackers for the property → the author reifies it →
   all existing trackers follow, retaining each learner's learning state.
 
+<a id="story-2"></a>
+
+### Reify refuses structural keys
+
+**Identity:** SEED-062#story-2
+```json dough-story-state
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/008-reify-refuses-structural-keys/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"48c27d24a27a1d43b01ae9c775ed25d8a2e847c34297d8a9b872f5c8fc1072ba","plan":"86f9f362284ef46887543741148902a738553a53e0e19e289d873d1b9cb1fc14"}}
+```
+
+**Goal**
+
+As a note author, I cannot break a relationship note, or turn a structural key into a relationship, by reifying one of
+its structural keys; the property row says why instead (correction of SEED-062#story-1).
+
+**Scope**
+
+- Reify is refused for a reserved structural frontmatter key (relationship `type`, `relation`, `source`, `target`, and
+  the other keys the backend already treats as structural rather than properties), even when its value is one link.
+- The property row does not offer an enabled Reify for such a key and states why.
+- No other reify behavior changes. Plan: [008-reify-refuses-structural-keys](../slice-plans/008-reify-refuses-structural-keys/PLAN.md).
+
 ## When to Surface
 
 When selecting note property or relationship improvements from the backlog.

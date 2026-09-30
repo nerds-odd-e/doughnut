@@ -135,6 +135,14 @@ Behavior: a tracked property `related: [[Other]]` → the author reifies it in t
 learner's recall of it is still due. Mirror the step definitions of "Tracked relationship reduced keeps property memory
 tracker on source".
 
+## Execution complete
+
+Product advice: Queue the correction [SEED-062#story-2](../../seeds/SEED-062-reify-property.md#story-2) (plan
+008) ahead of other property work. It is small, and until it lands one click on a relationship note's `source`/`target`
+row can break that relationship note. The rest of the story met its key examples. Reify-then-reduce is not a lossless
+round trip for non-understanding trackers, but the property panel only offers understanding tracking, so no action is
+recommended unless property spelling trackers are introduced.
+
 ## Current decisions
 
 - The operation is one server endpoint on the note, mirroring reduce; the frontend does not compose Markdown for it.
