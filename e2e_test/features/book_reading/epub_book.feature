@@ -19,6 +19,15 @@ Feature: EPUB book
         | 1 | Section Beta-Two  |
       And I should see the text "Opening paragraph for part one." in the EPUB reader
 
+    Scenario: EPUB book layout offers no AI reorganization
+      Then I should see the book layout in the browser:
+        | 0 | Part One          |
+        | 1 | Chapter Alpha     |
+        | 0 | Chapter Beta      |
+        | 1 | Section Beta-One  |
+        | 1 | Section Beta-Two  |
+      And the book layout should not offer AI reorganization
+
     Scenario: Navigate the EPUB via the book layout
       When I choose the book block "Chapter Beta"
       Then I should see the text "Cell One" in the EPUB reader
