@@ -137,7 +137,10 @@ Amend ADR 0001's "Property memory tracker" entry. If past about 10 minutes, spli
 
 ### 2b. Assimilating one value creates only that value's tracker
 Type: Behavior
-Status: planned
+Status: done — `AssimilationControllerAssimilateTests.AssimilateOneListValue`, `AssimilationControllerTests` (next unit
+carries `propertyValue`), `NotePropertyIndexPlannerTest` (a repeated list value is indexed once) red then green; API
+client regenerated. The frontend still sends no value until slice 5, so on this branch a list unit assimilated from the
+UI gets a `''` tracker that matches no list unit.
 Proof: `AssimilationControllerAssimilateTests`, red then green; API client regenerated.
 
 Behavior: `POST assimilate` with `{noteId, propertyKey: "example of", propertyValue: "[[run]]"}` → one tracker with that

@@ -5096,6 +5096,8 @@ components:
           format: int32
         propertyKey:
           type: string
+        propertyValue:
+          type: string
         assimilateAsCommissioned:
           type: boolean
         assimilateAsSpelling:

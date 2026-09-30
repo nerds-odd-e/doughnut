@@ -46,14 +46,19 @@ final class MemoryTrackerAssimilation {
     }
 
     if (isPropertyLevelRequest(request)) {
+      String propertyValue = request.propertyValue == null ? "" : request.propertyValue;
       boolean propertyTrackerExists =
-          existingTrackers.stream().anyMatch(mt -> request.propertyKey.equals(mt.getPropertyKey()));
+          existingTrackers.stream()
+              .anyMatch(
+                  mt ->
+                      request.propertyKey.equals(mt.getPropertyKey())
+                          && propertyValue.equals(mt.getPropertyValue()));
       if (propertyTrackerExists) {
         return List.of();
       }
       return List.of(
           initializeNewTracker(
-              MemoryTracker.buildMemoryTrackerForProperty(note, request.propertyKey),
+              MemoryTracker.buildMemoryTrackerForProperty(note, request.propertyKey, propertyValue),
               currentUser,
               currentTime,
               MemoryTrackerType.UNDERSTANDING));

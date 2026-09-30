@@ -8,6 +8,7 @@ import com.odde.donut.controllers.dto.AssimilationRequestDTO;
 import com.odde.donut.entities.*;
 import com.odde.donut.entities.repositories.AssimilationSequenceSkipRepository;
 import com.odde.donut.entities.repositories.MemoryTrackerRepository;
+import com.odde.donut.services.NotePropertyIndexService;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.Optional;
@@ -21,6 +22,7 @@ class AssimilationControllerAssimilateTests extends ControllerTestBase {
   @Autowired private MemoryTrackerRepository memoryTrackerRepository;
   @Autowired private AssimilationSequenceSkipRepository skipRepository;
   @Autowired AssimilationController controller;
+  @Autowired NotePropertyIndexService notePropertyIndexService;
 
   @BeforeEach
   void setup() {
@@ -65,7 +67,8 @@ class AssimilationControllerAssimilateTests extends ControllerTestBase {
       makeMe.anAssimilationSequenceSkipFor(note).propertyKey("a part of").please();
 
       controller.assimilate(
-          AssimilationControllerTestSupport.assimilatePropertyRequest(note, "a part of"));
+          AssimilationControllerTestSupport.assimilatePropertyValueRequest(
+              note, "a part of", "[[Engine]]"));
 
       assertThat(
           skipRepository.findByUserAndNoteAndPropertyKey(currentUser.getUser(), note, "a part of"),
@@ -148,6 +151,70 @@ class AssimilationControllerAssimilateTests extends ControllerTestBase {
       assertThat(
           memoryTrackerRepository.findByUserAndNote(currentUser.getUser().getId(), note.getId()),
           hasSize(2));
+    }
+  }
+
+  @Nested
+  class AssimilateOneListValue {
+    Note note;
+
+    @BeforeEach
+    void setup() {
+      note =
+          makeMe
+              .aNote()
+              .notebookOwnedBy(currentUser.getUser())
+              .content("---\nexample of:\n  - \"[[run]]\"\n  - \"[[past tense]]\"\n---\n\nbody")
+              .please();
+      notePropertyIndexService.refreshForNote(note);
+    }
+
+    private List<MemoryTracker> assimilateValue(String value) {
+      return controller.assimilate(
+          AssimilationControllerTestSupport.assimilatePropertyValueRequest(
+              note, "example of", value));
+    }
+
+    @Test
+    void createsOneTrackerWithTheKeyAndValue() {
+      List<MemoryTracker> result = assimilateValue("[[run]]");
+
+      assertThat(result, hasSize(1));
+      assertThat(result.get(0).getPropertyKey(), equalTo("example of"));
+      assertThat(result.get(0).getPropertyValue(), equalTo("[[run]]"));
+    }
+
+    @Test
+    void repeatingTheSameValueCreatesNothing() {
+      assimilateValue("[[run]]");
+
+      assertThat(assimilateValue("[[run]]"), empty());
+    }
+
+    @Test
+    void theOtherValueStaysUnassimilated() {
+      controller.assimilate(AssimilationControllerTestSupport.assimilateRequest(note));
+      assimilateValue("[[run]]");
+
+      assertThat(
+          controller.next("Asia/Shanghai").getNextUnit().getPropertyValue(),
+          equalTo("[[past tense]]"));
+    }
+
+    @Test
+    void theOtherValueCanStillBeAssimilated() {
+      assimilateValue("[[run]]");
+
+      assertThat(assimilateValue("[[past tense]]"), hasSize(1));
+    }
+
+    @Test
+    void omittedValueCreatesAScalarTracker() {
+      List<MemoryTracker> result =
+          controller.assimilate(
+              AssimilationControllerTestSupport.assimilatePropertyRequest(note, "example of"));
+
+      assertThat(result.get(0).getPropertyValue(), equalTo(""));
     }
   }
 }

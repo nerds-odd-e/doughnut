@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.odde.donut.controllers.dto.RecalledNote;
-import com.odde.donut.utils.TimestampOperations;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -49,9 +48,11 @@ public class MemoryTracker extends EntityIdentifiedByIdOnly {
     return entity;
   }
 
-  public static MemoryTracker buildMemoryTrackerForProperty(Note note, String propertyKey) {
+  public static MemoryTracker buildMemoryTrackerForProperty(
+      Note note, String propertyKey, String propertyValue) {
     MemoryTracker entity = buildMemoryTrackerForNote(note);
     entity.setPropertyKey(propertyKey);
+    entity.setPropertyValue(propertyValue);
     return entity;
   }
 
@@ -201,17 +202,6 @@ public class MemoryTracker extends EntityIdentifiedByIdOnly {
     return Fsrs.retrievabilityFromHours(getStability(), elapsedHoursUntil(now));
   }
 
-  void scheduleNextRecallFromStability(Timestamp currentUTCTimestamp) {
-    setLastRecalledAt(currentUTCTimestamp);
-    Timestamp scheduled = calculateNextRecallAt();
-    if (!scheduled.after(currentUTCTimestamp)) {
-      scheduled =
-          TimestampOperations.addHoursToTimestamp(
-              currentUTCTimestamp, Fsrs.intervalHours(Fsrs.STRICTLY_FUTURE_FALLBACK_HOURS));
-    }
-    setNextRecallAt(scheduled);
-  }
-
   public void applyGrade(Timestamp now, Grade grade) {
     long elapsed = elapsedHoursUntil(now);
     Float stability = getStability();
@@ -225,7 +215,7 @@ public class MemoryTracker extends EntityIdentifiedByIdOnly {
         };
     setDifficulty(next.difficulty());
     MemoryTrackerNextStability.write(this, next.stability());
-    scheduleNextRecallFromStability(now);
+    MemoryTrackerRecallDue.scheduleNextRecallFromStability(this, now);
   }
 
   public void adjustForConfusion(Timestamp currentUTCTimestamp) {

@@ -56,4 +56,14 @@ class NotePropertyIndexPlannerTest {
         rows.stream().map(NotePropertyIndexPlanner.PlannedRow::propertyValue).toList(),
         contains("short"));
   }
+
+  @Test
+  void plannedRows_keeps_only_the_first_of_a_repeated_list_value() {
+    List<NotePropertyIndexPlanner.PlannedRow> rows =
+        NotePropertyIndexPlanner.plannedRows(
+            Frontmatter.parse("example of:\n  - \"[[A]]\"\n  - \"[[B]]\"\n  - \"[[A]]\"\n"));
+
+    assertThat(
+        rows.stream().map(NotePropertyIndexPlanner.PlannedRow::itemIndex).toList(), contains(0, 1));
+  }
 }
