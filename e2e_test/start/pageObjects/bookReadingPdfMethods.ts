@@ -17,7 +17,7 @@ const START_AT_TOP_TOLERANCE_PX = 15
 
 export const bookReadingPdfMethods = () => ({
   expectPdfPagesUseScreenWidth() {
-    this.expectCurrentPage(1)
+    this.expectPdfPositionAtTopOfReader(1, 0)
     expectUsesScreenWidth('[data-testid="pdf-book-viewer"]')
     return this
   },

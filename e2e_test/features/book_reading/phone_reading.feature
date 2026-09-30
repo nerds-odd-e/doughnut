@@ -52,7 +52,7 @@ Feature: Reading a book on a phone
     When I tap the Book layout toggle
     And I tap outside the book layout
     Then the book layout should be closed
-    And the book reader PDF viewport should be on page 1
+    And the top of the PDF book reader should be at 0 of 1000 down page 1
 
   Scenario: Reopen the book layout on a tablet
     Given I am on a window 768 * 1024

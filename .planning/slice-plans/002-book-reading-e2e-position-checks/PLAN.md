@@ -109,7 +109,7 @@ Enables slice 3 when any row is at risk.
 
 ### 3. At-risk scenarios assert position by start or current block
 Type: Behavior
-Status: todo
+Status: done (`cy:run` green: `book_browsing` 9 at 1200 × 800 and 1200 × 856, `phone_reading` 7 at 390 × 844 and 390 × 900; `book_browsing:52` drops the racy page step, the current-block assertion retries; `phone_reading:11` and `:55` assert the start position)
 At risk (from the margin table): `book_browsing.feature:52` (page-indicator step after the same-page
 scroll; replace with the current-block assertion) and `phone_reading.feature:11` and `:55` at 390 × 844
 (page 1 at the top; assert the start position `expectPdfPositionAtTopOfReader(1, 0)` or the existing
