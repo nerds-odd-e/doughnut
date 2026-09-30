@@ -90,6 +90,14 @@ parts B and C). The slices below are provisional planning input.
    `phone_reading` 7/7.
 4. **Behavior:** a chosen PDF block keeps a shared start (bookmark fixture).
    About 10 min.
+   Status: done, proof only (no product change). The rule's chosen-wins case
+   already covered it; the E2E PDF fixture would need a binary edit to get two
+   headings at one destination, so the proof is a page spec: `it.each` Sections
+   4, 5, 6 (page-only starts sharing one start in the top-maths-like fixture)
+   in `BookReadingPage.spec.ts` stays current when chosen and moves on to
+   "Section 3" when scrolled past. Mutation check: passing `null` for the chosen
+   id fails Sections 4 and 5. Proof: vitest `tests/pages` (236), vue-tsc. Not
+   covered: real pdf.js geometry with bbox-carrying shared starts.
 5. **Behavior:** marking goes on after choosing "Chapter 12" in a no-bookmark
    PDF (new fixture shaped like Think Python). About 10 min if the rule and
    `hasNoTextOfItsOwn` suffice.
