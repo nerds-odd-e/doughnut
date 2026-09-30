@@ -321,6 +321,31 @@ Suspected, not reproduced or not resolved:
   gave the chooser immediately (`h1.mjs`). Conditions tried: the same viewport, testing button hidden in
   both runs. Not reproduced.
 
+**Slice 3 update (2026-09-30, phone 375 px, dev stack; scripts `s11.mjs`, `s12.mjs`, `s10.mjs`).**
+
+- Wikidata, real search result: on a scratch note titled `Tokyo` the dialog showed a search list (from
+  `GET /api/wikidata/search?search=Tokyo`, 200). Tapping "Tokyo - capital and largest city of Japan" filled the
+  ID field with `Q1490`; Save called `GET /api/wikidata/entity-data/Q1490` and `PATCH .../content`, the dialog
+  closed, and the row `wikidata_id: Q1490` was stored. No message was shown. Note content afterwards was only the
+  added property line; **no descriptive body text was inserted** for this entry (observation; whether it should be
+  for a city entry was not checked).
+- Wikidata, typed `Q42`, search list present (note `Kyoto`): `entity-data/Q42` 200; the dialog stayed open and
+  now showed "Suggested Title: Douglas Adams | Replace title | Add as alias | Save | Close". So Save asks a
+  follow-up question when the entry label differs from the note title. This explains part of slice 2 (the dialog
+  stays open), and it is what the frontend tests cover. The follow-up choice was not taken.
+- Wikidata, typed `Q42`, search list empty ("No Wikidata entries found for 'UAT wd noresult xq'"): `entity-data/Q42`
+  200, the dialog stayed open, and neither the suggested-title question nor any message was shown; no row was
+  added. This reproduces slice 2 exactly (twice now, on iPad portrait and on the phone). Observation: Save gives
+  no feedback in this state. Hypothesis (not checked in code): the title question is only drawn with the result list.
+  Status: reproduced as a silent Save; whether it is a defect depends on whether a typed ID without matching title
+  results is meant to be supported.
+- Replace button: four repeated taps on the phone (fresh page loads; once right after the load with only 100 ms
+  wait; the first right after adding the image) gave the file chooser every time in 53 to 66 ms. The timeout of
+  slice 2 was **not reproduced**; it stays "suspected, not reproduced". Conditions tried: iPad portrait (slice 2,
+  once fails, once ok), phone 4 of 4 ok, testability button hidden in all. One unexplained observation: right
+  after choosing the first image on the phone a tap on the "Properties" heading was blocked once ("a div
+  intercepts pointer events") and worked on the next run; a busy overlay during the upload is a hypothesis.
+
 ### iPad UX improvements
 
 Each entry: observed friction, benefit, proportionate recommendation. Observations unless marked.
@@ -406,23 +431,145 @@ Each entry: observed friction, benefit, proportionate recommendation. Observatio
   shortcut bar, hardware keyboard and trackpad, Apple Pencil, Stage Manager / split view widths, safe-area
   insets, Safari's own zoom on focus of inputs smaller than 16 px text, the native file picker and camera
   upload, long-press and text selection in the 32 px inputs, momentum scrolling in the preset list.
-- Not run: the Assimilate and Skip buttons in the panel, list reorder, the relation type selection flow,
+- Not run on the iPad: the Assimilate and Skip buttons in the panel, list reorder, the relation type selection flow,
   portrait list dialog with the keyboard, rename to an existing key (one attempt renamed to `urlmood` by
   mistake and was not repeated), Wikidata Save with a real search result, read-only view of a note in
-  landscape beyond the height measurements, dark mode, very narrow split view.
+  landscape beyond the height measurements, dark mode, very narrow split view. Slice 3 ran the last five items on
+  the phone (see the phone findings); they were not repeated on the iPad.
+- Slice 3 gaps: real phone browser behaviour (keyboard shrinking only the visual viewport, auto-scroll of the
+  focused field, the Wikidata dialog's Save and Close at the bottom edge, momentum scrolling in the dialogs);
+  landscape phone; phone width in dark mode; the Wikidata follow-up choice (Replace title / Add as alias) and
+  what it inserts; whether descriptive text is inserted for other entry types; desktop image upload,
+  relation type, Wikidata and read-only long keys; tapping the clipped wiki-link value on the phone (only its
+  box was measured); list dialog on the phone in landscape; the 44 px target rule on a real finger.
 - The 40-minute budget was not used up (see minutes); the remaining time went to the checks above and to
   clarifying the read-only mode.
 
 ### Phone operability findings (slice 3)
 
-_To be filled in slice 3._
+Phone = 375x812, 3x scale, `isMobile`, touch taps only. Keyboard emulated by cutting the viewport height by 40%
+(812 to 487) after focusing an input. Same limits as on the iPad apply (see Setup). Notes: `UAT six properties`
+/n13717 (five rows), `UAT many properties` /n13718 (19 rows), scratch note `UAT edit phone` /n13721, read-only
+view as `old_learner`. Scripts: `s1.mjs` (control positions), `s3.mjs`, `s4.mjs`, `s5.mjs`, `s6.mjs`, `s7.mjs`,
+`s10.mjs`, `s11.mjs`, `s12.mjs`, `s13.mjs`, `s14.mjs`, `s15.mjs`, `s16.mjs`, `s17.mjs`, `s19.mjs`.
+
+**Operability defects (a journey or control cannot be completed or reached)**
+
+1. **Read-only: the value of a long-key row is lost (worse than on the iPad).**
+   - Expected: the value of every property can be read.
+   - Observed (read-only, `old_learner`, /n13718, 375 px): row `a rather long property key ...` has `dt` 327 px
+     and `dd` 0 px; row `a_rather_long_property_key...` has `dt` 571 px and `dd` 0 px. The values (a
+     200-character text, and `short`) have no width. The note area then scrolls sideways (scroll width 880
+     against 343). After scrolling that area fully to the right (scroll left 537) the value was still 0 px wide,
+     so panning does not reach it. A tall empty gap follows the first long key in the page (the screenshot
+     shows about 1000 px of blank space before the next row).
+   - Reproduce: sign in as a second user, open /n13718 in the Bazaar notebook, viewport 375 px, scroll to the
+     rows after `note_level` (`s13.mjs`, `s14.mjs`).
+   - Impact: values silently disappear for notes with long keys (rare); the user cannot read them at all on a
+     phone. Same cause as iPad defect 1. Hypothesis (from the measured `grid-cols-[auto_minmax(0,...)]` class):
+     the key column is `auto` wide with no maximum.
+   - Evidence: `s13-phone-ro-longkey.png`, `s13-phone-ro-*.png`.
+2. **Editable: the key preset list covers the value field and the Choose image button while the key has focus.**
+   - Expected: after typing a key the user can tap the value field (or Choose image for key `image`).
+   - Observed (insert form, 375 px): the form stacks key above value, and the preset list (6 options, 32 px
+     each, y 459 to 661) is drawn over the value field and over the Choose image button. `elementFromPoint`
+     at the value field returns a preset option; Playwright tapping the value field timed out because "preset
+     option intercepts pointer events"; the same for the Choose image button. Typing more letters does not narrow
+     or close the list. Tab from the key moves focus to the first preset option, not to the value.
+   - Ways out that worked: tap a blank area (the "Properties" heading) so the key loses focus and the list
+     closes, then tap the value or Choose image; or tap a preset (focus then moves to the value). Neither is
+     shown on screen. A user who types a custom key and taps the value field sees nothing happen.
+   - Reproduce: Add property, tap Property key, type `colour`, tap Property value (`s5.mjs`, `s6.mjs`, `s10.mjs`).
+   - Impact: medium. The journey can be completed by a user who finds the workaround; the failing tap gives no
+     feedback. With the keyboard emulated the value field is at y 489 to 521 in a 487 px viewport, so the page has
+     to scroll before the value can be seen (the real browser scrolls a focused field into view; not verified).
+   - Evidence: `s5-phone-preset-overlap.png`, `s4-kb-presets.png`, `s10-image-insert.png`.
+3. **Editable: values are cut to about 50 px, so most plain text values cannot be read in one view.**
+   - Expected: a value is readable, or an obvious way to see all of it.
+   - Observed: the key input is 158 px, the toggle 42 px, the trailing icon 42 px, so the value cell is about
+     60 px (`Note`, `abc`, `2` fit). The `url` row's value input is about 30 px and the edit icon is drawn on top
+     of it (only `ht` is visible). A wiki-link value (`[[UAT no ...`) is cut, and its link element is 261 to 382
+     px wide, that is 23 px past the row and 7 px past the screen edge. Aliases and URL rows can be read through
+     the value dialog (edit icon). For plain text, the only way to see all is to enter the field and move the
+     cursor (the full text is in `title`, hover only).
+   - Impact: low to medium: nothing is unreachable (edit works), but long text values need cursor movement.
+   - Evidence: `s2-phone-five.png`, `s16-relation-insert.png`.
+
+No other control was unreachable. All of these were reached and tapped or measured on the phone: chevron
+(16 to 58 px), key input (74 to 232), value edit icon (317 to 359), open-URL icon, row remove (48 to 90 in
+the panel), Assimilate (204 to 291) and Skip (290 to 342, overlapping Assimilate by 1 px), list dialog (Text /
+List, move up / down, remove, Add item, Cancel, Save, close), image Choose and Replace, relation type button
+and its dialog, Wikidata Set... button, dialog, Save, Close, validation message.
+
+**Optional, lower priority (cosmetic; not defects)**
+
+- The Relation Type button is 248 to 377 px wide: 18 px past the row and 2 px past the screen edge (still tappable).
+- Assimilate and Skip touch (1 px overlap); every control is 32 px high, below the 44 px guide.
+- Row remove/panel layout: the panel repeats the iPad layout; the "Understanding" label is not repeated per row.
+- Tapping the row panel's Assimilate ran `POST /api/assimilation` and then moved the page to a different note
+  (`Perf100`, next in the assimilation sequence), leaving the note being edited. This may be the intended
+  assimilation flow; question for the owner, not a defect. Skip asks "Leave this note out of the assimilation
+  sequence?" (a note-wide wording inside a single property panel).
+- The Wikidata dialog's Save and Close are at y 482 to 522 in the 487 px keyboard viewport (partly below the
+  edge); the taps worked because the automation scrolls first. Needs a real phone.
+
+**Journeys completed OK on the phone (with the keyboard emulated where typing)**
+
+- View: five and nineteen rows, no horizontal page overflow in editable mode (scroll width 375 of 375).
+- Add: `colour` = `blue` (tap a blank area to commit), persisted (stored content and reload). Add via preset
+  tap works. Key only or value only: form stays open (as on iPad).
+- Change: `mood` value changed and saved (`abc`, stored); rename to an existing key (`mood` to `note_level`)
+  showed "Duplicate property keys are not allowed." and kept both rows; note the exact key was typed.
+- Remove: `colour` removed through the panel.
+- List dialog: `aliases` opened, items reordered with move down (`one, two` to `two, one`), Save, stored.
+- Image: add with a new file name (`photo-ph-c.png`), Replace (`photo-ph-d.png`), and four repeats of the
+  Replace tap gave the file chooser every time (53 to 66 ms).
+- Relation: key `relation` with a value creates a row with a Relation Type button; the dialog lists the types
+  (list scrolls inside the dialog); choosing "a part of" stored `relation: a-part-of` and survived reload.
+- Validation: `note_level` 9 reverted with "note_level must be an integer from 1 to 6." visible at y 441 of 812.
+- Wikidata dialog: opens fully in the viewport, search list selectable, Save adds `wikidata_id` (see slice 3 update).
+- Read-only mode: rows are readable except the two long-key rows (defect 1).
+
+### Desktop sanity pass
+
+Desktop 1440x900, mouse, headless Chromium; scratch note `UAT edit desktop` /n13725 (`s18.mjs`). Only
+differences and defects are marked.
+
+- Same behaviour as iPad: presets do not narrow while typing (6 shown after `colour`); validation message
+  appears below the last row (y 450); duplicate-key message; list dialog opens; remove through the panel;
+  Assimilate 87x32 / Skip 52x32 / remove 42x32; value edit saved (`mood` to `calm`, stored).
+- Difference: the key preset list does not cover the value field on desktop (side by side layout), so typing
+  a key and clicking the value works (phone defect 2 does not occur).
+- Difference: rows are 1030 px wide with a wide value column; no cut values in this note; no horizontal
+  overflow (1440 of 1440); the note body starts at y 418 with five rows.
+- No desktop-only defect found. Not run on desktop: image upload, relation type, Wikidata dialog, read-only
+  view, long-key rows.
 
 ### Defects the automated tests do not cover (slice 3 extends)
 
-_To be filled in slice 3. Candidates from the iPad run that have no test known to cover them: read-only long
-key layout (defect 1), validation message placement on long lists (defect 2), preset list width and
-filtering (defect 3), Wikidata Save without visible outcome (suspected), silent append to an existing list
-key (improvement 7), transient upload error message (improvement 10)._
+Coverage was checked with `ls e2e_test/features/note_view e2e_test/features` and
+`grep -ril "frontmatter\|property\|properties" e2e_test/features frontend/tests`. Existing scenarios and specs
+found: `e2e_test/features/note_view/note_frontmatter_image.feature` (header image, upload becomes a file),
+`e2e_test/features/note_topology/note_property.feature` and `property_wiki_link.feature` (property location and
+panel), `e2e_test/features/wikidata/*.feature`, `frontend/tests/components/form/RichMarkdownEditor.*.spec.ts`
+(row editing, list properties, value dialog), `frontend/tests/utils/noteContentPropertyRows*.spec.ts`,
+`frontend/tests/notes/WikidataAssociationDialog*.spec.ts`, `frontend/tests/utils/noteContentPropertyKeyPresets.spec.ts`.
+Only the file names were read, not each test; "no test found" means no name or grep hit for that case.
+The only phone-width feature found is `e2e_test/features/book_reading/phone_reading.feature` (book reading, not
+properties). Component tests run in jsdom, which has no layout, so no width or overlap case can be covered there.
+
+| Defect (slice) | Covered by an automated test? |
+|---|---|
+| Read-only long key hides the value (iPad 1, phone 1) | No test found. Needs a layout check in a real browser; jsdom cannot see widths. `property_wiki_link.feature` "Visiting a read-only property location focuses the property value" covers a short key only. |
+| Validation message far from the row / off screen on long lists (iPad 2) | Message text covered (`RichMarkdownEditor.propertyRowEditing.spec.ts` "rejects duplicate keys ...", `noteContentPropertyRows.validate.spec.ts`). Position and visibility: no test found. |
+| Key preset list does not narrow, wider than its panel (iPad 3) | Preset content covered by `noteContentPropertyKeyPresets.spec.ts`. Narrowing while typing and width: no test found. |
+| Preset list covers the value field and Choose image on a phone (phone 2) | No test found (no phone-width property scenario exists). |
+| Values cut with no cue, value cell about 50 px on a phone (iPad 4, phone 3) | No test found. |
+| Wikidata Save with a typed ID and an empty search list does nothing visible (slice 3 update) | Suggested-title step is covered (`frontend/tests/notes/wikidataAssociationDialogTestSupport.ts`, "Replace title"); "No Wikidata entries" is covered by `WikidataAssociationDialog.search.spec.ts`. The combination typed ID plus empty list: no test found. |
+| Silent append to an existing list key (iPad improvement 7) | The append itself is covered (`noteContentPropertyRows.append.spec.ts`); feedback to the user: nothing to test today. |
+| Transient upload error message (iPad improvement 10) | Successful upload covered by `note_frontmatter_image.feature`; the 409 message duration: no test found. |
+| Row panel Assimilate moves to another note (observation) | Navigation to the next note covered (`frontend/tests/composables/useGoToNextAssimilation.spec.ts`); from a property panel: not checked. |
+| Key-only or value-only add leaves the form open with no message (iPad improvement 6) | No test found for the missing message. |
 
 ### Design and architecture assessment (slice 4)
 
@@ -436,3 +583,9 @@ _To be filled in slice 5._
 
 About 20 minutes of exploration by the wall clock (14:07 to 14:27, 2026-09-30), inside the 40-minute budget
 for this slice.
+
+### Actual exploration minutes (slice 3)
+
+About 15 minutes by the wall clock for slice 3 (14:29 to 14:44, 2026-09-30), including phone and desktop runs, the
+Wikidata and Replace checks, the coverage check and writing this section; the planned budget was 12 minutes plus
+an 8-minute reserve. Slices 2 and 3 together: about 35 minutes of exploration.

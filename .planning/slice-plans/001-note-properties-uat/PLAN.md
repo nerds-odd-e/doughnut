@@ -75,7 +75,7 @@ overflow, density, hierarchy, empty states, and hover-only cues → defects and 
 
 ### 3. Phone operability and defect findings are recorded
 Type: Behavior
-Status: todo
+Status: done
 Size: about 12 minutes of UAT budget plus the 8-minute reserve.
 Proof: the same section gains phone findings (375 px, judged only by operability), a desktop sanity
 pass, and a separate list of defects the automated tests do not cover, each with evidence.
@@ -133,3 +133,9 @@ the session.
   Unresolved for slice 3: Wikidata dialog Save showed no visible result for `Q42`; one Replace tap timeout
   did not reproduce. Not reached: Assimilate/Skip taps, list reorder, relation type selection flow, rename
   to an existing key. About 20 minutes remain in the exploration budget plus the reserve.
+- Slice 3 (about 15 minutes; slices 2 and 3 together about 35 of the 60 UAT minutes): phone, desktop, and
+  the unresolved slice-2 items are recorded in the seed. Read-only long-key rows lose their value on the
+  phone as on the iPad; the key preset list covers the value field on the phone; typed `Q42` with an empty
+  search list gives a silent Save; the Replace timeout stayed unreproduced. Assimilate from a row panel moves
+  the page to another note (recorded as an owner question). Dev data side effects: scratch notes 13721-13725
+  and one assimilation record.
