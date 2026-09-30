@@ -2,7 +2,7 @@
 
 Work item: **SEED-059#story-8**
 ([story](../../seeds/SEED-059-book-reading-uat-fixes.md#story-8)).
-Status: **slices 1 and 2 done; slice 3 planned.**
+Status: **all three slices done.**
 
 ## Goal and scope
 
@@ -95,7 +95,7 @@ boundary to at most 80 characters. About 5 min.
 
 ### 3. The prompt is keyboard-ready
 Type: Behavior
-Status: planned
+Status: done
 Proof: component spec of `NewBookBlockTitleDialog` (first spec for it): on open
 the input has focus with its whole default selected; typing then Enter emits
 `confirm` with the typed text; Escape emits `cancel` and no confirm. No new E2E.
