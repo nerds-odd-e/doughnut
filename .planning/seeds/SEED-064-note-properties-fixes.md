@@ -151,8 +151,8 @@ Effort bands: S = 30–60 minutes, M = 1–2 hours, L = 2–4 hours, including d
 ## Ordering and Scope Reduction
 
 - **Highest priority** (data hidden or a dead end on the primary device): stories 1 to 4, in the order listed.
-- **Then** (structure that removes code and prevents the same defects): story 5, then SEED-062 and SEED-063 (already
-  queued, they act on the row story 5 unifies), then story 6.
+- **Then** (structure that removes code and prevents the same defects): story 5, then SEED-063 (already
+  queued, it acts on the row story 5 unifies), then story 6.
 - Stories 2, 3 and 4 are independent of each other; story 6 needs story 5. Story 6 and SEED-063 no longer depend
   on each other (owner decision, 2026-09-30).
 - First to drop: story 6 (largest risk, the defects it touches are already softened by story 2).
@@ -170,9 +170,8 @@ When the owner selects note properties, iPad or phone comfort, or simplification
 
 - UAT report: `1986473b79:.planning/seeds/SEED-061-note-properties-ux-uat.md`, section `## UAT Findings`
   (screenshots were not committed).
-- Related queued work in the same area: [SEED-062](SEED-062-reify-property.md),
-  [SEED-063](SEED-063-track-property-values-separately.md#story-2). Both add to the properties rows; story 5 gives
-  them one row to extend; story 6 uses whichever rule for repeated keys is current when it is delivered.
+- Related queued work in the same area: [SEED-063](SEED-063-track-property-values-separately.md#story-2). It adds
+  to the properties rows; story 5 gives it one row to extend; story 6 uses whichever rule for repeated keys is current when it is delivered.
 - Code: `frontend/src/components/form/RichFrontmatter*.vue`,
   `frontend/src/composables/useRichFrontmatterPropertyEditing.ts`, `frontend/src/utils/noteContentFrontmatter*.ts`.
 - Protecting tests today: `e2e_test/features/note_view/note_frontmatter_image.feature`,

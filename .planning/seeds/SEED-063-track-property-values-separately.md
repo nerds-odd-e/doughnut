@@ -57,8 +57,8 @@ When selecting note property or memory tracking improvements from the backlog.
 
 - Owner's report and requirement, 2026-09-30: replace the confusing numbered-key
   convention with multiple values of one property, each tracked independently.
-- Related: reifying a single-link property into a relationship note exists in the product; its
-  remaining correction is in [SEED-062](SEED-062-reify-property.md). Neither is a prerequisite of the other.
+- Related: reifying a single-link property into a relationship note exists in the product and refuses
+  structural keys; it is not a prerequisite of this seed.
 - Related UAT fixes: [SEED-064#story-6](SEED-064-note-properties-fixes.md#story-6) (add-property row) uses the
   per-value rule for an existing key. The remaining numbered-key code is `propertyKeyBaseAndSuffix` and
   `nextAvailablePropertyKeyFor*` in `frontend/src/utils/noteContentPropertyKeys.ts`; the backend no longer
