@@ -7,8 +7,6 @@ Bug fixing and general maintenance.
 
 ## Taken
 
-- [Typing a property key narrows the presets, and the list stays on screen](seeds/SEED-064-note-properties-fixes.md#story-2) — SEED-064#story-2 ([plan](slice-plans/002-note-properties-key-presets/PLAN.md))
-
 ## Backlog list
 
 - [A rejected property value is explained next to the row that was rejected](seeds/SEED-064-note-properties-fixes.md#story-3) — SEED-064#story-3
