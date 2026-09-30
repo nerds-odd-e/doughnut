@@ -34,13 +34,31 @@
   <div v-if="loading" class="text-center p-4">
     Searching...
   </div>
+  <div v-else-if="showTitleOptions" class="p-4">
+    <label class="daisy-label">
+      <span class="daisy-label-text"
+        >Suggested Title: {{ selectedItem?.label }}</span
+      >
+    </label>
+    <fieldset :disabled="props.disabled">
+      <RadioButtons
+        v-model="titleAction"
+        scope-name="wikidataTitleAction"
+        :options="[
+          { value: 'Replace', label: 'Replace title' },
+          { value: 'Append', label: 'Add as alias' },
+        ]"
+        @update:model-value="handleTitleAction"
+      />
+    </fieldset>
+  </div>
   <div
     v-else-if="searchResults && searchResults.length === 0 && hasSearched"
     class="text-center p-4"
   >
     <p>No Wikidata entries found for '{{ searchKeyRef }}'</p>
   </div>
-  <div v-else-if="searchResults && searchResults.length > 0 && !showTitleOptions">
+  <div v-else-if="searchResults && searchResults.length > 0">
     <div
       data-testid="wikidata-search-results"
       class="border border-base-300 rounded-lg bg-base-100 w-full"
@@ -63,24 +81,6 @@
         {{ suggestion.label }} - {{ suggestion.description }}
       </div>
     </div>
-  </div>
-  <div v-else-if="showTitleOptions" class="p-4">
-    <label class="daisy-label">
-      <span class="daisy-label-text"
-        >Suggested Title: {{ selectedItem?.label }}</span
-      >
-    </label>
-    <fieldset :disabled="props.disabled">
-      <RadioButtons
-        v-model="titleAction"
-        scope-name="wikidataTitleAction"
-        :options="[
-          { value: 'Replace', label: 'Replace title' },
-          { value: 'Append', label: 'Add as alias' },
-        ]"
-        @update:model-value="handleTitleAction"
-      />
-    </fieldset>
   </div>
   <div class="mt-4 flex gap-2">
     <button

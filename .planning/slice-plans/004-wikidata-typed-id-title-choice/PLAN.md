@@ -56,7 +56,7 @@ Size target is about 10 minutes including proof.
 
 ### 1. A typed ID with an empty search shows the title choice on the first Save
 Type: Behavior
-Status: planned
+Status: done
 Proof: the new spec above (`CURSOR_DEV=true nix develop -c pnpm -C frontend exec vitest run
 tests/components/form/RichMarkdownEditor.propertyWikidataDialog.spec.ts`), red before the change and green after; then
 the existing specs of "Nothing else in the dialog changed", run once.
@@ -79,7 +79,7 @@ first red run does not fail on the missing choice, stop and re-read the flow bef
 
 ## Learnings
 
-_None yet._
+Cause confirmed by the red run: the choice was hidden by the empty-results branch. The fix was the template branch order only; the new spec and the five existing dialog specs (45 tests) are green.
 
 ## Real iPad check (owner, optional)
 
