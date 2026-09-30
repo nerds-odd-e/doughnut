@@ -53,6 +53,23 @@ preserve independently valid accepted evidence. Honor a developer's explicit
 changed promise; do not silently weaken it. Once sufficient current proof is
 supplied, proceed without another approval or blanket rerun.
 
+Read every gap, loss, or limitation the return names, and every fixture or
+setup change that turns a failing scenario green, against the selected story's
+goal, key examples, and stated exclusions before accepting the slice. A named
+gap is input for this check, not a fault. A gap that contradicts the goal or a
+key example returns to implementation in the same slice, even when the story
+never lists it as a promise or an exclusion; recording it as a learning or
+calling it out of scope does not accept it, and a test that pins the loss is
+not proof of the example. Only a gap the story explicitly defers becomes an
+owner decision on whether that deferral still stands, and it stops only that
+path. A gap outside the goal that costs the user nothing is accepted; keep the
+observation only when it changes remaining work. When the return reshapes or
+simplifies a fixture or setup, check the example in its real shape, the real
+file or input it names; green on a fixture the example does not describe does
+not accept it. Examine a limit that could lose the only copy of paused or saved
+work for that consequence; guidance for a neighbouring case does not authorize
+it.
+
 During this slice, accept only observations supported by inspected locations and
 results. Retain the promise, accepted boundary, inspected locations, and literal
 command in the slice wrap-up for refactoring. Expand inspection to the smallest

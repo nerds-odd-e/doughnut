@@ -1,0 +1,17 @@
+{
+  "command": "dough-story-refinement",
+  "default": "Without options, refine straightforwardly: establish Goal, Scope, and Key examples without mandatory alternatives or analogy exercises.",
+  "selection": "Options may be combined. Flag order has no meaning; apply all selected instructions together within one refinement, unless the developer asks in ordinary language for a sequence. Baseline inquiry, evidence checks, and human ownership of goal and scope decisions apply in every mode. When Explore and Borrow are both selected, treat each borrowed mechanism as one candidate in Explore's single comparison, judged against the same goal and constraints as the other options and not favored because it is an analogy.",
+  "options": [
+    {
+      "flag": "--explore",
+      "label": "Explore",
+      "instruction": "Develop materially different ways to achieve the selected story's goal or frame its problem; options that differ only in layout or wording do not count. Include a simpler or existing solution when plausible. Compare credible options against the same goal and genuine constraints, then recommend a direction with reasons. Treat invented alternatives as proposals and uncertain premises as hypotheses; check a decisive one before relying on it. Treat a developer-supplied constraint as fixed: if exploration reveals a possible different outcome, expose it for the developer's decision and continue supported work without silently changing the story's goal or scope."
+    },
+    {
+      "flag": "--borrow",
+      "label": "Borrow",
+      "instruction": "Find a mechanism in another domain that could help achieve the selected story's goal, choosing it from the story's own problem rather than from a supplied example. Map the roles and relationships in that mechanism to this story's, adapt the mechanism to the story, and state a consequential limit where the analogy breaks. A shared label or visual resemblance alone is not a correspondence. Treat the adapted mechanism as a candidate; an analogy is not evidence that it works. If no transfer is defensible, report that limit and continue supported refinement without inventing an analogy or asking the developer to pick an unsuitable one."
+    }
+  ]
+}
