@@ -7,9 +7,10 @@ Bug fixing and general maintenance.
 
 ## Taken
 
+- [Typing a property key narrows the presets, and the list stays on screen](seeds/SEED-064-note-properties-fixes.md#story-2) — SEED-064#story-2 ([plan](slice-plans/002-note-properties-key-presets/PLAN.md))
+
 ## Backlog list
 
-- [Typing a property key narrows the presets, and the list stays on screen](seeds/SEED-064-note-properties-fixes.md#story-2) — SEED-064#story-2
 - [A rejected property value is explained next to the row that was rejected](seeds/SEED-064-note-properties-fixes.md#story-3) — SEED-064#story-3
 - [Saving a typed Wikidata ID that cannot be used tells the user why](seeds/SEED-064-note-properties-fixes.md#story-4) — SEED-064#story-4
 - [Read-only properties look and link like the editable ones, without the row panel](seeds/SEED-064-note-properties-fixes.md#story-5) — SEED-064#story-5
