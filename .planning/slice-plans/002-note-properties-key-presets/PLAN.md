@@ -126,3 +126,7 @@ changing anything.
 
 After slice 3, on a real iPad with the software keyboard, in both orientations: tap Add property, type `ur`, and
 confirm the list and the value field are both visible; tap the value field. Report what still runs off the screen.
+
+## Execution complete
+
+Product advice: no change to the queue. The owner's real iPad check with the software keyboard (above) is the one open observation; if the list still runs off the screen there, treat it as a new finding for the owner. Two small edges are recorded in Learnings and not covered by a test: the existing row's list is in flow below 640 px, and the typed-text reset on focus has no separate assertion.
