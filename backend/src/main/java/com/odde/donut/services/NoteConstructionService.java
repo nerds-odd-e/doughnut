@@ -16,6 +16,7 @@ import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.User;
 import com.odde.donut.entities.repositories.FolderRepository;
+import com.odde.donut.entities.repositories.MemoryTrackerRepository;
 import com.odde.donut.factoryServices.EntityPersister;
 import com.odde.donut.services.ai.NoteExtractionResult;
 import com.odde.donut.testability.TestabilitySettings;
@@ -41,6 +42,7 @@ public class NoteConstructionService {
   private final NoteTitleNameRule noteTitleNameRule;
   private final FolderConstructionService folderConstructionService;
   private final WikiLinkResolver wikiLinkResolver;
+  private final RelationshipMemoryTrackerRehoming memoryTrackerRehoming;
 
   @Autowired
   public NoteConstructionService(
@@ -55,7 +57,8 @@ public class NoteConstructionService {
       AuthoredNoteDocumentPersistence authoredNoteDocumentPersistence,
       NoteTitleNameRule noteTitleNameRule,
       FolderConstructionService folderConstructionService,
-      WikiLinkResolver wikiLinkResolver) {
+      WikiLinkResolver wikiLinkResolver,
+      MemoryTrackerRepository memoryTrackerRepository) {
     this.authorizationService = authorizationService;
     this.testabilitySettings = testabilitySettings;
     this.folderRepository = folderRepository;
@@ -68,6 +71,8 @@ public class NoteConstructionService {
     this.noteTitleNameRule = noteTitleNameRule;
     this.folderConstructionService = folderConstructionService;
     this.wikiLinkResolver = wikiLinkResolver;
+    this.memoryTrackerRehoming =
+        new RelationshipMemoryTrackerRehoming(memoryTrackerRepository, entityPersister);
   }
 
   private Note persistNoteContent(Note note, String content) {
@@ -151,7 +156,8 @@ public class NoteConstructionService {
 
   /**
    * Turns the {@code propertyKey} property of {@code source}, whose value is a wiki link to a note,
-   * into a relationship note beside {@code source}, and removes the property from {@code source}.
+   * into a relationship note beside {@code source}, moves every learner's tracker of that property
+   * onto the new note as a note-level tracker, and removes the property from {@code source}.
    * Returns the new relationship note.
    */
   public Note reifyPropertyIntoRelationshipNote(Note source, String propertyKey, User viewer) {
@@ -189,6 +195,8 @@ public class NoteConstructionService {
         relationshipNote,
         RelationshipNoteComposition.markdown(
             propertyKey, "[[" + source.getTitle() + "]]", targetLink));
+    memoryTrackerRehoming.movePropertyTrackersOntoRelationshipNote(
+        source, propertyKey, relationshipNote);
     persistAuthoredContent(
         source, NoteContentMarkdown.removeFrontmatterProperty(source.getContent(), propertyKey));
     return relationshipNote;

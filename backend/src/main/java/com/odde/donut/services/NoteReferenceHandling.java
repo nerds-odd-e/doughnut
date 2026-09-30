@@ -12,7 +12,6 @@ import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.donut.factoryServices.EntityPersister;
 import com.odde.donut.validators.AuthoredNoteContent;
 import java.sql.Timestamp;
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Pattern;
@@ -32,7 +31,7 @@ final class NoteReferenceHandling {
   private static final Pattern LEGACY_RELATIONSHIP_SENTENCE =
       Pattern.compile("\\[\\[[^\\]]+]][^\\[\\]\n]+\\[\\[[^\\]]+]]\\.");
 
-  private final MemoryTrackerRepository memoryTrackerRepository;
+  private final RelationshipMemoryTrackerRehoming memoryTrackerRehoming;
   private final NoteReferenceService noteReferenceService;
   private final WikiLinkResolver wikiLinkResolver;
   private final AuthorizationService authorizationService;
@@ -44,7 +43,8 @@ final class NoteReferenceHandling {
       WikiLinkResolver wikiLinkResolver,
       AuthorizationService authorizationService,
       EntityPersister entityPersister) {
-    this.memoryTrackerRepository = memoryTrackerRepository;
+    this.memoryTrackerRehoming =
+        new RelationshipMemoryTrackerRehoming(memoryTrackerRepository, entityPersister);
     this.noteReferenceService = noteReferenceService;
     this.wikiLinkResolver = wikiLinkResolver;
     this.authorizationService = authorizationService;
@@ -81,7 +81,8 @@ final class NoteReferenceHandling {
             targetAuthoredFromSourceNotebook(
                 relationship.targetScalar(), relationNote, sourceNote, viewer));
     persistReplacedAuthoredContent(sourceNote, addResult.content(), updatedAt, viewer);
-    rehomeNoteLevelMemoryTrackerToSourceProperty(relationNote, sourceNote, addResult.resolvedKey());
+    memoryTrackerRehoming.moveNoteLevelTrackersOntoSourceProperty(
+        relationNote, sourceNote, addResult.resolvedKey());
     return sourceNote;
   }
 
@@ -155,29 +156,6 @@ final class NoteReferenceHandling {
     note.setUpdatedAt(updatedAt);
     entityPersister.merge(note);
     noteReferenceService.refreshDerivedIndexesForNote(note);
-  }
-
-  /**
-   * Moves every learner's note-level understanding tracker onto the source property. Every other
-   * tracker on {@code relationNote} (spelling, commissioned, or property-level) is left for the DB
-   * {@code ON DELETE CASCADE} to remove with the relationship note; those are detached here so
-   * Hibernate's persistence context does not keep a managed reference to a note about to be removed
-   * (its own pre-flush transient-dependency check does not know about that DB-level cascade).
-   */
-  private void rehomeNoteLevelMemoryTrackerToSourceProperty(
-      Note relationNote, Note sourceNote, String propertyKey) {
-    memoryTrackerRepository
-        .findByNote_IdIn(List.of(relationNote.getId()))
-        .forEach(
-            tracker -> {
-              if (tracker.isUnderstanding() && tracker.isNoteLevelTracker()) {
-                tracker.setNote(sourceNote);
-                tracker.setPropertyKey(propertyKey);
-                entityPersister.merge(tracker);
-              } else {
-                entityPersister.detach(tracker);
-              }
-            });
   }
 
   private record RelationshipFrontmatter(

@@ -89,7 +89,8 @@ note → 400 with a message naming the cause; the note is unchanged and no note 
 
 ### 4. Every learner's trackers follow the relationship note
 Type: Behavior
-Status: planned
+Status: done — `RelationshipMemoryTrackerRehoming` holds both directions (reify forward, reduce reverse); proof
+`NoteReifyPropertyTests.TrackedProperty` + `RelationControllerReduceToSourcePropertyTests` green
 Proof: same test class, two learners, one tracker with a recall log.
 
 Behavior: learners A and B each have a property tracker for `related` on Src → reify → both trackers now belong to the new
@@ -140,6 +141,8 @@ tracker on source".
 - Order of writing inside the accepted change: create note, re-point trackers, remove property.
 - Slice 6 starts from the row as it is on trunk then; if SEED-064#story-2 or story-5 are still in flight, stop after slice 5
   and report.
+- 2026-09-30: execution stopped after slices 1–5 because SEED-064#story-5 is still Taken on trunk (its plan
+  `slice-plans/005-note-property-read-only-row/` has no done slice). Resume at slice 6 once story-5 is delivered.
 
 ## Learnings
 
@@ -149,3 +152,7 @@ tracker on source".
 - Saving authored content adds `type: Note` to the source's frontmatter; assert absence of the key, not exact content.
 - Slice 3's refusals: today a missing key or unresolved link fails via bare `orElseThrow()` in
   `NoteConstructionService.reifyPropertyIntoRelationshipNote`; `WikiLinkResolver.resolveFirstWikiLink` is shared with reduce.
+- Reify moves every tracker type of the key (understanding, spelling, …) to note level, matched case-insensitively;
+  reduce moves back only note-level understanding trackers and drops the rest with the note. Asymmetric by design of
+  each direction; revisit only if the owner wants round-trips to keep spelling trackers.
+- `MemoryTrackerBuilder.recallCount(n)` creates n recall logs.
