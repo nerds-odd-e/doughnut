@@ -148,7 +148,7 @@ occupied list-capable keys may still be visible when renaming and rejected by th
 
 ### 3. Stored-row suggestions respect other rows without hiding their own key
 Type: Behavior
-Status: planned
+Status: done
 Proof: mounted occupied-list-key and current-row cases red then green, retained narrowing/focus and duplicate rename
 cases; final frontend suite and typecheck.
 
@@ -168,7 +168,7 @@ suggestion policy is delivered while legacy authored keys continue to work.
 Focused frontend proof for each slice (add `listProperties` when its rendering boundary changes):
 
 ```bash
-CURSOR_DEV=true nix develop -c pnpm frontend:test tests/components/form/RichMarkdownEditor.propertyEntry.spec.ts tests/components/form/RichMarkdownEditor.propertyPresets.spec.ts tests/components/form/RichMarkdownEditor.propertySlotPresets.spec.ts tests/components/form/RichMarkdownEditor.propertyRowEditing.spec.ts tests/utils/noteContentPropertyKeyPresets.spec.ts tests/utils/noteContentPropertyKeys.spec.ts
+CURSOR_DEV=true nix develop -c pnpm frontend:test tests/components/form/RichMarkdownEditor.propertyEntry.spec.ts tests/components/form/RichMarkdownEditor.propertyPresets.spec.ts tests/components/form/RichMarkdownEditor.propertySlotPresets.spec.ts tests/components/form/RichMarkdownEditor.propertyRowEditing.spec.ts tests/components/form/RichMarkdownEditor.propertyValueControls.spec.ts tests/components/form/RichMarkdownEditor.propertyValidation.spec.ts tests/utils/noteContentPropertyKeyPresets.spec.ts tests/utils/noteContentPropertyKeys.spec.ts
 CURSOR_DEV=true nix develop -c pnpm -C frontend exec vue-tsc --noEmit
 ```
 
@@ -222,3 +222,17 @@ structural availability observations. Existing structural value-control tests an
 Generator-symbol search across frontend source/tests has no matches. Independent refactor returned already clean,
 with unchanged accepted proof and no test rerun; whitespace passed. Selective formatter passed; no generation trigger.
 Stored-row exact list occupancy remains intentionally for slice 3.
+
+Slice 2 publication accepted: `139f3185a4680ab7471ac90aea0779e39f2481dd` on the recorded execution branch;
+managed delivery reused the retained observer. This is slice 3's previously published base.
+Slice 3: about 3 minutes including proof. RED row-editing spec: 1 failed/14 passed because topic still offered
+occupied url. GREEN six-file focused command (before test extraction): 51/51; full frontend suite 311 files,
+1978 tests passed (43.60s); frontend typecheck passed. Row-editing mounted fixtures now own literal topic/url
+options, own-row availability, and manual topic-to-url-list duplicate rejection with unchanged emitted-save count.
+Sibling story 6 delivered branch `71c240d209` passes `draft ? undefined : idx` as exclusion; insertion/stored-row
+semantics remain compatible. Prior matching E2E persistence evidence remains accepted, with no rerun.
+Independent refactor retained the new row-key proof in rowEditing and extracted existing structural value-control
+and rejected-change message cases into `propertyValueControls` and `propertyValidation` specs; no production edits.
+Replacement three-spec focused command passed 15/15; final typecheck and whitespace passed. Full-suite proof
+remains applicable to unchanged product and preserved assertions. Updated focused command includes both extracted
+specs. Coordinator selective formatting passed; no API generation trigger. All ordered slices are done.

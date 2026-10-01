@@ -3,6 +3,7 @@ import {
   README_ONLY_PRESET_PROPERTY_KEYS,
   keysInPresetFamily,
   isListCapablePropertyKey,
+  findPropertyRowIndexByExactKey,
 } from "@/utils/noteContentPropertyKeys"
 
 /**
@@ -44,6 +45,7 @@ export function richModeKeyDropdownPresetKeys(
 
 /**
  * List-capable presets keep their base key so insertion appends another value.
+ * Stored rows omit exact keys occupied by another row.
  * Occupied scalar-only and singleton families are omitted.
  */
 export function richModeKeyDropdownPresetKeysForPropertyRows(
@@ -59,6 +61,11 @@ export function richModeKeyDropdownPresetKeysForPropertyRows(
       if (keysInPresetFamily(preset, rows, options).length > 0) return []
       return [preset]
     }
+    if (
+      options?.excludeRowIndex !== undefined &&
+      findPropertyRowIndexByExactKey(rows, preset, options) !== -1
+    )
+      return []
     return [preset]
   })
 }

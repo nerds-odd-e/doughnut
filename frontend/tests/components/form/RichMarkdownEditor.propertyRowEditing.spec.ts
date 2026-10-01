@@ -1,15 +1,15 @@
-import { CUSTOM_RELATION_RADIO_SENTINEL } from "@/models/relationTypeOptions"
 import { noteShowLocation } from "@/routes/noteShowLocation"
 import { README_ONLY_PRESET_PROPERTY_KEYS } from "@/utils/noteContentFrontmatter"
 import { flushPromises } from "@vue/test-utils"
 import {
   attemptRenamePropertyKey,
+  expectPresetOptions,
   expandPropertyPanel,
   expandPropertyPanelAndClickRemove,
   expectPropertyPanelClosed,
   expectPropertyPanelOpen,
   propertyRowSelector,
-  propertyValidationMessages,
+  propertyInputEl,
   propertyValidationText,
   validationMessageAfterRow,
 } from "./propertiesTestDom"
@@ -40,99 +40,6 @@ describe("RichMarkdownEditor property row editing", () => {
     )
   }
 
-  it("adds an image property from a typed URL", async () => {
-    const wrapper = await h.mountEditor("# Hi")
-
-    await h.openAddProperty()
-    await wrapper
-      .find('[data-testid="rich-note-property-key"]')
-      .setValue("image")
-    await flushPromises()
-
-    const valInput = wrapper.find('[data-testid="rich-note-property-value"]')
-    await valInput.setValue("https://example.com/a.png")
-    await valInput.trigger("blur")
-
-    expect(h.lastEmittedMarkdown()).toContain(
-      "image: https://example.com/a.png"
-    )
-  })
-
-  it("updates an existing image property from typed text", async () => {
-    const wrapper = await h.mountEditor(
-      "---\nimage: https://example.com/old.png\n---\n\n# Hi"
-    )
-
-    const valInput = wrapper.find(
-      '[data-testid="rich-note-property-row-value-input"]'
-    )
-    await valInput.setValue("https://example.com/new.png")
-    await valInput.trigger("blur")
-
-    expect(h.lastEmittedMarkdown()).toContain(
-      "image: https://example.com/new.png"
-    )
-  })
-
-  describe("relation property in rich mode", () => {
-    const mountRelationNote = (relation: string) =>
-      h.mountEditor(
-        `---\nrelation: ${relation}\ntype: Relationship\n---\n\nBody`
-      )
-    const relationTypeButton = () =>
-      h.getWrapper().get('[aria-label="Relation Type"]')
-
-    it.each([
-      {
-        relation: "similar-to",
-        expectedLabel: "similar to",
-        notExpected: "similar-to",
-      },
-      {
-        relation: "my-custom-relation",
-        expectedLabel: "my-custom-relation",
-        notExpected: "related to",
-      },
-    ])(
-      "relation button shows $expectedLabel for $relation",
-      async ({ relation, expectedLabel, notExpected }) => {
-        await mountRelationNote(relation)
-        const text = relationTypeButton().text()
-        expect(text).toContain(expectedLabel)
-        expect(text).not.toContain(notExpected)
-      }
-    )
-
-    it("opens custom relation dialog prefilled and commits updated frontmatter", async () => {
-      await mountRelationNote("xyz-unknown-kebab")
-      await relationTypeButton().trigger("click")
-      await flushPromises()
-
-      expect(document.querySelector("dialog")?.textContent).toContain("Custom…")
-      const input = document.querySelector(
-        "dialog input[type='text'].daisy-input"
-      ) as HTMLInputElement
-      expect(input.value).toBe("xyz-unknown-kebab")
-      expect(
-        document
-          .querySelector(
-            `label[for="rich-note-relation-property-${CUSTOM_RELATION_RADIO_SENTINEL}"]`
-          )
-          ?.classList.contains("bg-primary")
-      ).toBe(true)
-
-      input.value = "novel connector phrase"
-      input.dispatchEvent(new Event("input", { bubbles: true }))
-      input.dispatchEvent(
-        new KeyboardEvent("keydown", { key: "Enter", bubbles: true })
-      )
-      await flushPromises()
-      expect(h.lastEmittedMarkdown()).toContain(
-        "relation: novel-connector-phrase"
-      )
-    })
-  })
-
   it("rejects duplicate keys before emitting valid renamed keys and values", async () => {
     const wrapper = await h.mountEditor(twoPropertyMarkdown)
     const emitCountBefore = wrapper.emitted("update:modelValue")?.length ?? 0
@@ -156,6 +63,60 @@ describe("RichMarkdownEditor property row editing", () => {
     expect(last).toContain("domain:")
     expect(last).toContain("wiki")
     expect(last).not.toContain("alpha:")
+  })
+
+  it("omits another row's list preset while retaining the current row's own preset", async () => {
+    await h.mountEditor(
+      "---\ntopic: grammar\nurl: https://example.com\n---\n\nBody",
+      {
+        attachToBody: true,
+      }
+    )
+    propertyInputEl(
+      `${propertyRowSelector("topic")} [data-testid="rich-note-property-row-key-input"]`
+    ).focus()
+    await flushPromises()
+    expectPresetOptions([
+      "aliases",
+      "overlaps",
+      "note_level",
+      "image",
+      "wikidata_id",
+      "example of",
+      "question_generation_instruction",
+    ])
+
+    propertyInputEl(
+      `${propertyRowSelector("url")} [data-testid="rich-note-property-row-key-input"]`
+    ).focus()
+    await flushPromises()
+    expectPresetOptions([
+      "aliases",
+      "overlaps",
+      "note_level",
+      "image",
+      "wikidata_id",
+      "url",
+      "example of",
+      "question_generation_instruction",
+    ])
+  })
+
+  it("rejects manually renaming topic to an occupied list key without emitting a save", async () => {
+    const wrapper = await h.mountEditor(
+      "---\ntopic: grammar\nurl: [https://one.example, https://two.example]\n---\n\nBody"
+    )
+    const emitCountBefore = wrapper.emitted("update:modelValue")?.length ?? 0
+
+    await attemptRenamePropertyKey(wrapper, 0, "url")
+
+    expect(
+      validationMessageAfterRow(wrapper.element, "topic")?.textContent
+    ).toContain("Duplicate")
+    expect(wrapper.emitted("update:modelValue")?.length ?? 0).toBe(
+      emitCountBefore
+    )
+    expect(propertyRowKeyValues()).toEqual(["topic", "url"])
   })
 
   it("opening one property panel then removing that row leaves the other collapsed", async () => {
@@ -231,84 +192,5 @@ question_generation_instruction: Focus on facts.
     for (const key of README_ONLY_PRESET_PROPERTY_KEYS) {
       expect(nonReadmeKeyValues).not.toContain(key)
     }
-  })
-
-  describe("rejected row change message", () => {
-    const noteLevelMessage = "note_level must be an integer from 1 to 6."
-    const twoRowMarkdown = "---\nnote_level: 3\nbeta: two\n---\n\nBody"
-
-    async function editValue(
-      wrapper: Awaited<ReturnType<typeof h.mountEditor>>,
-      key: string,
-      text: string
-    ) {
-      const field = wrapper.find(
-        `${propertyRowSelector(key)} [data-testid="rich-note-property-row-value-input"]`
-      )
-      await field.trigger("focus")
-      await h.setPropertyValueField(field, text)
-      await field.trigger("blur")
-      await flushPromises()
-      return field
-    }
-
-    it("shows an invalid note_level directly under its row and restores the value", async () => {
-      const wrapper = await h.mountEditor(twoRowMarkdown)
-
-      const field = await editValue(wrapper, "note_level", "7")
-
-      const message = validationMessageAfterRow(wrapper.element, "note_level")
-      expect(message?.textContent?.trim()).toBe(noteLevelMessage)
-      expect(field.element.textContent).toBe("3")
-    })
-
-    it("shows the duplicate-key message directly under the renamed row", async () => {
-      const wrapper = await h.mountEditor(twoRowMarkdown)
-
-      await attemptRenamePropertyKey(wrapper, 1, "note_level")
-
-      const message = validationMessageAfterRow(wrapper.element, "beta")
-      expect(message?.textContent).toContain("Duplicate")
-    })
-
-    it("moves the single message to the latest rejected row and clears it on accepted edit or removal", async () => {
-      const wrapper = await h.mountEditor(twoRowMarkdown)
-
-      await editValue(wrapper, "note_level", "7")
-      await attemptRenamePropertyKey(wrapper, 1, "note_level")
-
-      expect(propertyValidationMessages(wrapper.element)).toHaveLength(1)
-      expect(
-        validationMessageAfterRow(wrapper.element, "beta")?.textContent
-      ).toContain("Duplicate")
-
-      await editValue(wrapper, "note_level", "4")
-      expect(propertyValidationMessages(wrapper.element)).toHaveLength(0)
-
-      await attemptRenamePropertyKey(wrapper, 1, "note_level")
-      expect(propertyValidationMessages(wrapper.element)).toHaveLength(1)
-      await expandPropertyPanelAndClickRemove(
-        wrapper,
-        propertyRowSelector("beta")
-      )
-      expect(propertyValidationMessages(wrapper.element)).toHaveLength(0)
-    })
-
-    it("keeps the add form message above the form and outside any row", async () => {
-      const wrapper = await h.mountEditor(twoRowMarkdown)
-
-      await h.commitInsertProperty("note_level", "7")
-
-      const messages = propertyValidationMessages(wrapper.element)
-      expect(messages).toHaveLength(1)
-      expect(
-        messages[0]!.closest('[data-testid="rich-note-property-row"]')
-      ).toBeNull()
-      expect(
-        messages[0]!.previousElementSibling?.matches(
-          '[data-testid="rich-note-property-row"]'
-        )
-      ).toBe(false)
-    })
   })
 })
