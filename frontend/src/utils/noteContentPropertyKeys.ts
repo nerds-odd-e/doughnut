@@ -140,40 +140,6 @@ export function propertyKeyMatchesPresetFamily(
   }
 }
 
-function propertyKeyBaseMatchesBaseKey(key: string, baseKey: string): boolean {
-  const { base } = propertyKeyBaseAndSuffix(key)
-  return base.trim().toLowerCase() === baseKey.trim().toLowerCase()
-}
-
-function nextAvailablePropertyKeyFromFamilyKeys(
-  baseKey: string,
-  familyKeys: readonly string[]
-): string {
-  const occupied = new Set<number>()
-  for (const k of familyKeys) {
-    const trimmed = k.trim()
-    if (!trimmed) continue
-    const { suffix } = propertyKeyBaseAndSuffix(trimmed)
-    occupied.add(suffix ?? 1)
-  }
-  if (!occupied.has(1)) return baseKey
-  if (isNoteLevelPropertyKey(baseKey)) return baseKey
-  let n = 2
-  while (occupied.has(n)) n++
-  return `${baseKey} ${n}`
-}
-
-/** Next free key in a base-key family, using `key 2`, `key 3`, … when the base is taken. */
-export function nextAvailablePropertyKeyForBase(
-  baseKey: string,
-  existingKeys: readonly string[]
-): string {
-  const familyKeys = existingKeys.filter((k) =>
-    propertyKeyBaseMatchesBaseKey(k, baseKey)
-  )
-  return nextAvailablePropertyKeyFromFamilyKeys(baseKey, familyKeys)
-}
-
 /** Row keys that already occupy `presetKey`'s family, optionally skipping one row. */
 export function keysInPresetFamily(
   presetKey: string,
@@ -189,18 +155,6 @@ export function keysInPresetFamily(
     familyKeys.push(k)
   }
   return familyKeys
-}
-
-/** Next free key for a preset family, using `key 2`, `key 3`, … when the base is taken. */
-export function nextAvailablePropertyKeyForPreset(
-  presetKey: string,
-  rows: readonly PropertyRow[],
-  options?: { excludeRowIndex?: number }
-): string {
-  return nextAvailablePropertyKeyFromFamilyKeys(
-    presetKey,
-    keysInPresetFamily(presetKey, rows, options)
-  )
 }
 
 /** True when a property key uses the text/list property value dialog (not specialized controls). */

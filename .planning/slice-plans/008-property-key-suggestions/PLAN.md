@@ -73,7 +73,7 @@ Observed on product revision `9c1b40d756` on 2026-10-01; preparation prose chang
 | Premise | Consumed by | Literal observation and inspected boundary | Result |
 | --- | --- | --- | --- |
 | Selecting an occupied suggestion creates a numbered key instead of appending | slice 1 | Temporary mounted-editor case in `RichMarkdownEditor.propertyEntry.spec.ts`: mount `example of: "[[A]]"`, open Add property, assert literal options including `example of 2`, select it, enter `[[B]]`, blur; inspect emitted Markdown through the real parser. Command: `CURSOR_DEV=true nix develop -c pnpm frontend:test tests/components/form/RichMarkdownEditor.propertyEntry.spec.ts` | 18/18 passed including two temporary probes; the base stayed scalar and a second scalar key was created. Probe edits were removed afterward. This reproduces the symptom, not the desired remedy. |
-| Exact-key append and duplicate rename already work through the editor | slices 1, 3 | `CURSOR_DEV=true nix develop -c pnpm frontend:test tests/utils/noteContentPropertyKeyPresets.spec.ts tests/components/form/RichMarkdownEditor.propertyEntry.spec.ts tests/components/form/RichMarkdownEditor.propertyPresets.spec.ts tests/components/form/RichMarkdownEditor.propertyRowEditing.spec.ts`; inspect entry's `appends to exact list-capable keys without folding legacy suffixes` and row editing's `rejects duplicate keys before emitting valid renamed keys and values` | 35/35 passed. Append preserves legacy content; duplicate rename emits no change and restores the row. These tests do not prove occupied-preset selection. |
+| Exact-key append and duplicate rename already work through the editor | slices 1, 3 | `CURSOR_DEV=true nix develop -c pnpm frontend:test tests/utils/noteContentPropertyKeyPresets.spec.ts tests/components/form/RichMarkdownEditor.propertyEntry.spec.ts tests/components/form/RichMarkdownEditor.propertyPresets.spec.ts tests/components/form/RichMarkdownEditor.propertySlotPresets.spec.ts tests/components/form/RichMarkdownEditor.propertyRowEditing.spec.ts`; inspect entry's `appends to exact list-capable keys without folding legacy suffixes` and row editing's `rejects duplicate keys before emitting valid renamed keys and values` | 35/35 passed. Append preserves legacy content; duplicate rename emits no change and restores the row. These tests do not prove occupied-preset selection. |
 | Readme context and legacy structural alias reach the preset policy | slice 2 | Second temporary case in the same 18/18 run: mount `titlePattern: "Topic *"` with `isReadmeContext: true`, open Add property, assert literal options | Options contained `title_pattern 2`, without note-only presets. New omission proof must replace this old behavior. |
 | Existing list append preserves order | slice 1 | Read `appendValueToPropertyRow` in `noteContentPropertyRows.ts` and its caller `propertyRowsAfterAppendingValueToExactKey` consumed by `tryCommitInsert` | Existing list spreads its items then appends the trimmed new value; scalar promotion keeps the original value first. Slice 1 will observe existing-list append through preset selection. |
 | One shared policy serves both surfaces and already carries current-row exclusion | slices 1–3 | `rg -n 'richModeKeyDropdownPresetKeysForPropertyRows|exclude-row-index' frontend/src`; read `RichFrontmatterPropertyKeyPresets.vue`, `RichFrontmatterPropertyKeyField.vue`, `RichFrontmatterPropertyRow.vue` and insert form | The shared component calls the policy; stored rows pass their index, insertion passes none. Preserve that distinction in the draft replacement. |
@@ -128,8 +128,8 @@ retain their old behavior until the next slice.
 
 ### 2. Occupied scalar and singleton slots have no numbered substitute
 Type: Behavior
-Status: planned
-Proof: mounted occupied-slot and readme-context cases red then green in `RichMarkdownEditor.propertyPresets.spec.ts`;
+Status: done
+Proof: mounted occupied-slot and readme-context cases red then green in `RichMarkdownEditor.propertySlotPresets.spec.ts`;
 retained recognition and value-control tests plus typecheck.
 
 Behavior: an occupied `image`, `wikidata_id`, instruction or readme title-pattern slot → open suggestions → that
@@ -168,7 +168,7 @@ suggestion policy is delivered while legacy authored keys continue to work.
 Focused frontend proof for each slice (add `listProperties` when its rendering boundary changes):
 
 ```bash
-CURSOR_DEV=true nix develop -c pnpm frontend:test tests/components/form/RichMarkdownEditor.propertyEntry.spec.ts tests/components/form/RichMarkdownEditor.propertyPresets.spec.ts tests/components/form/RichMarkdownEditor.propertyRowEditing.spec.ts tests/utils/noteContentPropertyKeyPresets.spec.ts tests/utils/noteContentPropertyKeys.spec.ts
+CURSOR_DEV=true nix develop -c pnpm frontend:test tests/components/form/RichMarkdownEditor.propertyEntry.spec.ts tests/components/form/RichMarkdownEditor.propertyPresets.spec.ts tests/components/form/RichMarkdownEditor.propertySlotPresets.spec.ts tests/components/form/RichMarkdownEditor.propertyRowEditing.spec.ts tests/utils/noteContentPropertyKeyPresets.spec.ts tests/utils/noteContentPropertyKeys.spec.ts
 CURSOR_DEV=true nix develop -c pnpm -C frontend exec vue-tsc --noEmit
 ```
 
@@ -212,3 +212,13 @@ input/focus helpers through `propertiesTestDom.ts`; production and E2E boundarie
 proof and typecheck passed; whitespace check passed. All relevant focused commands now include the new spec.
 Current draft confirms on value blur; sibling draft redesign was not copied. Coordinator selective formatter passed;
 no API generation trigger. Remaining slices retain their original scope and order.
+
+Slice 1 publication accepted: `b3e12bfc076dc2bff40c754786649f5929609b2e` on the recorded execution branch;
+managed delivery reused the retained observer. This is slice 2's previously published base.
+Slice 2: about 4 minutes including proof waits. RED slot spec: four omission fixtures failed and own-row case
+passed. GREEN six-file focused command above: 49/49; frontend typecheck passed. The new
+`RichMarkdownEditor.propertySlotPresets.spec.ts` owns canonical/legacy note slot, readme alias/suffix and own-row
+structural availability observations. Existing structural value-control tests and useful recognition tests remain.
+Generator-symbol search across frontend source/tests has no matches. Independent refactor returned already clean,
+with unchanged accepted proof and no test rerun; whitespace passed. Selective formatter passed; no generation trigger.
+Stored-row exact list occupancy remains intentionally for slice 3.

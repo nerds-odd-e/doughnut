@@ -3,7 +3,6 @@ import {
   README_ONLY_PRESET_PROPERTY_KEYS,
   keysInPresetFamily,
   isListCapablePropertyKey,
-  nextAvailablePropertyKeyForPreset,
 } from "@/utils/noteContentPropertyKeys"
 
 /**
@@ -45,8 +44,7 @@ export function richModeKeyDropdownPresetKeys(
 
 /**
  * List-capable presets keep their base key so insertion appends another value.
- * Occupied note-only singleton keys are omitted instead of suffixed.
- * Scalar-only structural presets currently resolve to their next available name.
+ * Occupied scalar-only and singleton families are omitted.
  */
 export function richModeKeyDropdownPresetKeysForPropertyRows(
   isReadmeContext: boolean,
@@ -54,11 +52,13 @@ export function richModeKeyDropdownPresetKeysForPropertyRows(
   options?: { excludeRowIndex?: number }
 ): string[] {
   return richModeKeyDropdownPresetKeys(isReadmeContext).flatMap((preset) => {
-    if (isNoteOnlyPresetPropertyKey(preset)) {
+    if (
+      isNoteOnlyPresetPropertyKey(preset) ||
+      !isListCapablePropertyKey(preset)
+    ) {
       if (keysInPresetFamily(preset, rows, options).length > 0) return []
       return [preset]
     }
-    if (isListCapablePropertyKey(preset)) return [preset]
-    return [nextAvailablePropertyKeyForPreset(preset, rows, options)]
+    return [preset]
   })
 }

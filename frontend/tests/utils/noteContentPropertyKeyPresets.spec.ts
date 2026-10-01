@@ -17,18 +17,8 @@ describe("richModeKeyDropdownPresetKeysForPropertyRows", () => {
     ).toEqual(richModeKeyDropdownPresetKeys(false))
   })
 
-  it("retains list-capable base keys while structural presets still use suffixes", () => {
+  it("retains occupied list-capable base keys", () => {
     const defaults = richModeKeyDropdownPresetKeys(false)
-    expect(
-      richModeKeyDropdownPresetKeysForPropertyRows(false, [
-        propertyRowWithScalar("image", "/a.png"),
-      ])
-    ).toEqual(defaults.map((k) => (k === "image" ? "image 2" : k)))
-    expect(
-      richModeKeyDropdownPresetKeysForPropertyRows(false, [
-        propertyRowWithScalar("wikidataId", "Q1"),
-      ])
-    ).toEqual(defaults.map((k) => (k === "wikidata_id" ? "wikidata_id 2" : k)))
     expect(
       richModeKeyDropdownPresetKeysForPropertyRows(false, [
         propertyRowWithScalar("url", "https://x"),

@@ -22,7 +22,6 @@ export {
   isTitlePatternPropertyKey,
   isUrlPropertyKey,
   isWikidataIdPropertyKey,
-  nextAvailablePropertyKeyForPreset,
   propertyKeyBaseAndSuffix,
   propertyKeyMatchesPresetFamily,
   rowFillsReadmeOnlyPresetSlot,
