@@ -27,7 +27,7 @@ confusing, even when the convention is explained in AI instructions.
 
 **Identity:** SEED-063#story-2
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/001-numbered-property-consolidation/PLAN.md","assessment":"not-ready","reasons":["Migration reference-resolution visibility remains a human-owned domain choice; preserve current-reader semantics before selector rewrites"],"basis":{"document":"42ec34c66cf63185acde46dc7e6574b7249b728a9afcf9234fdd7cbc10559d58","plan":"0a1e88733412e7ade187bc994a371f2d0a58b5a604770c4c6f8080016698065f"}}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/001-numbered-property-consolidation/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"b625d5453c886cd4d79244a5ea782f723a73d86530bc7ca6c183992b4d8f9f39","plan":"270ffaa7184cb48d58a6b7372c0d345a4369787f961fddbffceba77db5797978"}}
 ```
 
 - **Goal:** existing notebook authors and learners see multiple associations
@@ -69,6 +69,11 @@ confusing, even when the convention is explained in AI instructions.
     add a separate cleanup story for removing that spent code after confirmed
     migration completion. Select and queue that follow-up when Java migration
     code is introduced; no such code is introduced by this refinement.
+  - Owner decision, 2026-10-02: preserve every current reader’s reference
+    resolution results, including anonymous readers of public sources. Report
+    a rewrite that cannot preserve these results and leave its complete
+    operation unchanged. Use current viewer visibility, not global candidates
+    or only the referrer’s owners.
   - Deferred promises: a recurring author action, a new migration UI, automatic
     merging of learning histories, and deletion of all numbered-key helpers.
     Existing helpers also recognize structural keys; their removal is not

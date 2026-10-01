@@ -30,6 +30,12 @@ Required context for [the executable plan](PLAN.md).
   ambiguous references. Include changed referrers and any trackers of their
   rewritten list values in the complete operation. Derive and recheck the
   complete affected notebook set before mutating; lock in ascending order.
+- Owner decision, 2026-10-02: preserve every current reader’s resolution
+  results. Use the existing viewer-aware resolver and current readability,
+  including anonymous readers of public sources. Compare proposed selectors
+  against projected content before mutation; report inconsistent rewrites and
+  leave the complete operation unchanged. System mutation authority does not
+  replace reader-dependent resolution with global candidate cardinality.
 - Reuse `AcceptedWebChangeService` and `AuthoredNoteDocumentPersistence` for
   the complete operation. Append one Donut System descendant per changed
   bound notebook, atomically with content, tracker changes and derived state.

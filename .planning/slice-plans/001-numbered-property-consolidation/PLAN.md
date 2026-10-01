@@ -22,7 +22,7 @@ publication, observer state and accepted proof. Both remain part of this plan.
 ### 1. Startup services are usable after schema migration
 Type: Behavior
 Status: done
-Accepted proof: see [slice 1](EXECUTION.md#slice-1-accepted-proof).
+Accepted proof: see [slice 1](ACCEPTED-PROOF.md#slice-1-accepted-proof).
 Proof: An isolated bootstrap probe delivers the actual startup event; observes
 Flyway completion before a consumer invokes the real accepted-change service
 and reads the migrated tracker schema. Run `CURSOR_DEV=true nix develop -c pnpm backend:verify`.
@@ -39,7 +39,7 @@ evidence, not a substitute for the later migration journey.
 ### 2. One exact-family transformation owns consolidation
 Type: Structure
 Status: done
-Accepted proof: see [slice 2](EXECUTION.md#slice-2-accepted-proof).
+Accepted proof: see [slice 2](ACCEPTED-PROOF.md#slice-2-accepted-proof).
 Proof: Pure contract tests on the existing authored-frontmatter boundary prove
 numeric grouping/list/ordering and preserve unrelated bytes. Include quoted
 leading/trailing whitespace keys and numeric suffixes beyond Integer range;
@@ -58,7 +58,7 @@ migration framework. Preserve scalar-only structural and word-suffix keys.
 ### 3. Unmappable notebook operations leave all state unchanged
 Type: Behavior
 Status: done
-Accepted proof: see [slice 3](EXECUTION.md#slice-3-accepted-proof).
+Accepted proof: see [slice 3](ACCEPTED-PROOF.md#slice-3-accepted-proof).
 Proof: Invoke the notebook migration on an orphan item focus, an empty source
 list with a persisted scalar focus, a tracked empty destination and an oversized
 tracked destination. Observe a diagnostic and unchanged content/accepted history
@@ -75,7 +75,7 @@ confirmed deployed migration completion.
 ### 4. A learned scalar family becomes one accepted list
 Type: Behavior
 Status: done
-Accepted proof: see [slice 4](EXECUTION.md#slice-4-accepted-proof).
+Accepted proof: see [slice 4](ACCEPTED-PROOF.md#slice-4-accepted-proof).
 Continuation: restore the parked canonical test and read its initial tracker
 state from committed MySQL before migration; do not compare unpersisted FSRS
 floats against rounded database values.
@@ -92,7 +92,7 @@ Keep the startup caller absent until slice 14.
 ### 5. Sparse and already-listed families use the same rule
 Type: Behavior
 Status: done
-Accepted proof: see [slice 5](EXECUTION.md#slice-5-accepted-proof).
+Accepted proof: see [slice 5](ACCEPTED-PROOF.md#slice-5-accepted-proof).
 Proof: Invoke the migration on missing-base/out-of-order suffixes and an
 existing base list; observe the selected order and tracker destinations through
 the same boundary. Include an untracked `url 2` and retained structural/word
@@ -106,7 +106,7 @@ Do not treat a tracked list as a scalar or clone its tracker onto all items.
 ### 6. Every learner's persisted tracker follows
 Type: Behavior
 Status: done
-Accepted proof: see [slice 6](EXECUTION.md#slice-6-accepted-proof).
+Accepted proof: see [slice 6](ACCEPTED-PROOF.md#slice-6-accepted-proof).
 Proof: Two learners with distinct tracking states → one migration operation →
 both query their original tracker IDs at the new focuses; an unrelated tracker
 retains its focus. Run the full backend suite.
@@ -118,7 +118,7 @@ Do not repeatedly assert canonical history fields already owned by slice 4.
 ### 7. Restoring Trash retains the migrated association
 Type: Behavior
 Status: done
-Accepted proof: see [slice 7](EXECUTION.md#slice-7-accepted-proof).
+Accepted proof: see [slice 7](ACCEPTED-PROOF.md#slice-7-accepted-proof).
 Proof: Trash a learned note through `NoteController`, migrate, download its
 `_trash` content, undo Trash through the controller → restored list and retained
 tracker/history. Use the existing real Trash fixture pattern and full suite.
@@ -130,7 +130,7 @@ not only available notes; do not recreate Trash ancestry rules.
 ### 8. Duplicate destinations retain one tracker safely
 Type: Behavior
 Status: done
-Accepted proof: see [slice 8](EXECUTION.md#slice-8-accepted-proof).
+Accepted proof: see [slice 8](ACCEPTED-PROOF.md#slice-8-accepted-proof).
 Proof: Duplicate mapping → migration → the deterministic survivor keeps its
 history/schedule; only redundant trackers and their normal dependent data are
 removed. Seed every tracker FK child and the prompt/conversation edge. Include
@@ -147,22 +147,26 @@ complete accepted operation unchanged, including the deletion fan-out.
 ### 9. Rewritten list focuses must follow authored source items
 Type: Behavior
 Status: planned
-Decision stop: see [reference scope](EXECUTION.md#reference-scope-jidoka-stop).
+Decision: preserve every current reader’s resolution results (BASIS.md).
 Proof: A valid list reference and an orphan persisted focus containing the same
 selector → invoke migration → diagnostic and complete unchanged content,
 trackers and downloaded accepted history. Run the full backend suite.
 
-Behavior: Ground reference-value mappings in exact authored list items before
-mutation. Compose them with family mappings and retain unaffected item focuses;
-report an affected orphan instead of inventing its destination. Reuse the parked
-selector prototype, with this refusal proof; retain the canonical selector
-journey parked until slice 10. Startup remains absent.
+Behavior: Preflight proposed selector rewrites through the existing viewer-aware
+resolver for every current reader, including anonymous public readers. Compare
+against projected target content; refuse the complete operation if any reader’s
+resolved destination or missing/ambiguous result would change. Ground
+reference-value mappings in exact authored list items before mutation. Compose them with family mappings and retain unaffected item focuses;
+report an affected orphan instead of inventing its destination. Reconstruct the unavailable temporary prototype with the refusal proof; keep
+the canonical success journey for slice 10. Include conflicting reader scopes
+in diagnostic/unchanged-operation proof. Startup remains absent.
 
 ### 10. In-notebook selectors still resolve after consolidation
 Type: Behavior
 Status: planned
-Continuation: restore the parked journey, correct controller cardinality
-(unresolved links are omitted), and add stored authored-reference row assertions.
+Continuation: reconstruct the positive journey; unresolved links are omitted
+by controller reads. Add stored authored-reference row assertions and the
+same-name private-notebook visibility regression as a successful journey.
 Proof: A uniquely resolving `#prop:` selector in body/frontmatter → migration →
 controller wiki resolution selects the base, visible text is retained, derived
 source rows match authored content and downloaded Markdown has the new selector.
@@ -171,7 +175,7 @@ at the rewritten value. Run the full backend suite.
 
 Behavior: A note refers to a removed suffixed key → migrate the target family
 and retarget only resolved selectors in the complete operation. Preserve the
-existing resolver's source-scope and ambiguity rules. Use shared reference
+existing resolver's source-scope, current-reader visibility and ambiguity rules. Use shared reference
 rewrites and tracker mapping; add no alternate link syntax or saved destination
 authority.
 
