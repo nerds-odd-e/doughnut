@@ -27,21 +27,37 @@ confusing, even when the convention is explained in AI instructions.
 
 **Identity:** SEED-063#story-2
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"unselected","assessment":"not-ready","reasons":["Owner answers are pending for numeric-family selection/value ordering and notebook-versus-run collision handling.","The executable approach remains unselected: after those answers, write bounded slices with mapped preservation/publication proof and early census/startup probes."],"basis":{"document":"1f814a1627e488ad633e57c61b41188be3a0b5089d55bec97fec97a30465eced"}}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/001-numbered-property-consolidation/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"42ec34c66cf63185acde46dc7e6574b7249b728a9afcf9234fdd7cbc10559d58","plan":"7558e8c205c9455ce1a48784c40c8212fb23c829caa8e0afa8c069ffbebadd02"}}
 ```
 
 - **Goal:** existing notebook authors and learners see multiple associations
   under one meaningful property key, without losing the learning history or next
-  recall of each previously tracked association.
+  recall of each previously tracked association, except redundant trackers
+  explicitly allowed to be dropped below.
 - **Scope:** a one-time migration consolidates existing legacy numbered
   property families into a list under the base key and moves each learner's
   existing trackers to the corresponding key/value focus. Preserve tracker
   identities, histories, schedules, and note identities; do not recreate them.
+  The duplicate-destination exception below permits dropping only redundant
+  trackers and their dependent history, without merging histories.
   Apply the outcome across notebooks, including stored notes in Trash, so
   restoring a note does not restore the old convention. Refresh content-derived
-  property indexes and references alongside content. The family selection and
-  collision rules below remain open; the outcome is not a promise to delete
-  every authored key that happens to end with a number.
+  property indexes and references alongside content. Consolidate list-capable
+  numeric families (suffix at least 2), including `url`, while leaving
+  scalar-only structural and word-suffix keys unchanged. Create a missing
+  unsuffixed base. Keep its values first in authored order, then values from
+  numeric suffixes in ascending order, preserving source-list order and the
+  first occurrence of each duplicate value. Keep case-distinct authored
+  families distinct. These family and ordering rules were accepted by the
+  owner in this session on 2026-10-01.
+  - Owner decision, 2026-10-01: duplicate tracker destinations are not expected
+    in production, but dropping redundant trackers is allowed to keep the
+    logic simple. This supersedes the earlier skip-notebook proposal. Keep a
+    tracker already at the final destination when present; otherwise keep the
+    lowest-ID tracker in that destination group. Drop the other trackers using
+    existing deletion semantics; retain the survivor's own history and schedule
+    and do not merge histories. Match the actual database uniqueness rule,
+    including inactive trackers and collation, not only Java string equality.
   - Owner decision, 2026-10-01: no toggle, feature flag, or migration placeholder
     gate is needed. This overrides the installed migration skill's default
     gate guidance for one-time destructive DML.
@@ -71,6 +87,18 @@ confusing, even when the convention is explained in AI instructions.
     → content and tracker history remain unchanged; no duplicate content commit
     is required. This is a necessary property of a one-time migration that can
     be retried, not a user-controlled toggle.
+  - Only `topic 10: C` and `topic 2: B` exist → migration →
+    `topic: [B, C]`; the missing base is created and each tracker follows its
+    value. With an existing `topic: [A, B]`, the result is `[A, B, C]`.
+  - Two same-learner, same-type trackers target `example of: "[[run]]"` and
+    `example of 2: "[[run]]"` → migration → one value and one retained tracker
+    at that destination. The redundant tracker is dropped, not history-merged.
+  - An authored wiki selector resolves to a migrated suffixed key → migration
+    → retarget that resolved selector to the retained base key and refresh its
+    source-owned reference index in the same accepted change. Preserve the
+    visible link text. Do not guess a destination for ambiguous/unresolved
+    selectors. If a rewritten selector is itself a tracked list value, its
+    tracker follows the rewritten value; the duplicate rule applies there too.
 - **Investigation evidence (2026-10-01):** static inspection, not a production
   census or an executed migration rehearsal.
   - `PropertyMemoryTrackerService.followPropertyValue` finds all learners'
@@ -114,10 +142,10 @@ confusing, even when the convention is explained in AI instructions.
     examples, not evidence of a complete numbered-family migration.
   - `WikiLinkPropertyMatch` resolves a `#prop:` selector only while the exact
     authored key exists. Rebuilding derived indexes does not retarget another
-    note's authored selector. Include inbound selectors in the early census;
-    if any target a proposed removed key, stop that affected path and establish
-    how to preserve those links before migration. Do not claim reference
-    preservation from an index refresh alone.
+    note's authored selector. Reference preservation therefore includes
+    retargeting resolved selectors, through the existing authored-reference
+    rewrite and multi-notebook accepted-change owners; an index refresh alone
+    does not deliver it.
 - **Architecture:** [ADR 0002 — Git-native Portable notebook tree
   synchronization](../../docs/adrs/0002-git-native-portable-notebook-synchronization-accepted.md)
   requires Git publication and atomic projection/identity/derived-state
@@ -125,49 +153,31 @@ confusing, even when the convention is explained in AI instructions.
   profile](../../docs/adrs/0004-okf-compatible-notebook-markdown-accepted.md)
   governs the authored frontmatter and shared Portable codec. The migration
   must use those contracts; it does not justify a second publication model.
-- **Open decisions and observations:**
-  - Family selection (owner answer pending): proposal is all list-capable
-    numeric families, including untracked `url 2`, leaving scalar-only
-    structural and word-suffix keys unchanged. Create the unsuffixed base if
-    missing. Keep existing base values in authored order, then append suffix
-    values in numeric order, preserving each source list's order and keeping
-    the first occurrence of a duplicate value. Confirm whether this matches
-    the owner's intended legacy convention. Do not fold case-distinct authored
-    families together merely because a structural-key recognizer ignores case.
-    The original report's `example of two` is not evidence of persisted word
-    suffixes; a read-only content census would settle that premise.
-  - Destination collisions (owner answer pending): proposal is to leave the
-    entire affected notebook unchanged, report it for manual resolution, and
-    continue independent notebooks. The alternative is to stop the complete
-    migration run. Check all persisted trackers against the actual unique
-    constraint, including inactive trackers; an active-only UI rename check is
-    insufficient. History merging requires an owner-defined rule; do not
-    silently discard either tracker.
-  - Census: production counts and shapes remain unknown. A read-only scan of
-    stored frontmatter and trackers should count affected notes, notebooks,
-    bound notebooks, word suffixes, absent bases, existing lists, unsupported
-    values, inbound removed-key selectors, and destination collisions using
-    the agreed family rule. No
-    production connection or data snapshot was established for this session;
-    source inspection cannot supply these counts.
-    Production access is operator-held, so this observation may be owned by an
-    early read-only probe in the executable plan; missing production counts
-    alone need not prevent planning. Unexpected shapes stop dependent work and
-    revise the same plan before broad implementation. Do not use a development
-    database as a disposable rehearsal environment.
+  [ADR 0007 — Environments and isolation](../../docs/adrs/0007-environments-and-isolation-accepted.md)
+  confines migration rehearsals to disposable test data.
+- **Remaining observations:** no product-policy question is open.
+  - Production counts and shapes are unknown; no production connection or
+    snapshot was established. The owner's expectation that duplicates do not
+    exist is an assumption, not observed evidence, and the duplicate rule makes
+    correctness independent of it. A production census is not a preparation
+    gate. Observe supported shapes, collation, startup ordering, and atomicity
+    against isolated fixtures before enabling the startup caller. Unexpected
+    unsupported or unmappable data stays unchanged and is reported rather than
+    guessing a destructive transformation.
   - [Rich property editing](../../docs/note-content-saving.md#rich-property-editing)
     uses canonical suggestions and exact-key append. This migration remains
     about existing content and preserves the separate learning histories.
-  - After the two owner policy answers, execution planning should map each
-    promise to bounded slices, with an early isolated startup/publication
-    rehearsal and the operator-held census. Prove a downloaded descendant tree,
+  - The executable plan maps each promise to bounded slices, with an early
+    isolated startup/publication rehearsal. Prove a downloaded descendant tree,
     unchanged tracker identities/history/schedules, Trash restoration,
-    collision handling, late-failure rollback, and retry without a new commit.
+    redundant-tracker deletion, reference continuity, late-failure rollback,
+    and retry without a new commit.
     The recommended startup entry point is still static evidence, not a
     completed rehearsal. Refinement does not authorize implementation or a
     live migration.
-- **Effort hypothesis:** M, low confidence until the census and collision policy
-  are known; this refinement does not size executable slices.
+- **Execution plan:** [Numbered property consolidation](../slice-plans/001-numbered-property-consolidation/PLAN.md).
+- **Effort hypothesis:** M, medium confidence after policy selection; startup
+  integration is bounded by the plan's early probe.
 - **Depends on:** per-value trackers are already in the product; no new
   per-value tracking capability is required.
 - **Safe stopping point:** old notes keep working with numbered keys.
