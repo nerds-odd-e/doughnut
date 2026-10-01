@@ -29,6 +29,56 @@ describe("RichMarkdownEditor property entry", () => {
   })
 
   describe("inserting a property", () => {
+    it.each([
+      { key: "topic", value: "", message: "Enter a property value." },
+      { key: "", value: "training", message: "Enter a property key." },
+      { key: "", value: "", message: "Enter a property key and value." },
+    ])(
+      "Add says $message and retains the draft without saving",
+      async ({ key, value, message }) => {
+        const wrapper = await h.mountEditor("# Body")
+        await h.openAddProperty()
+        const keyInput = wrapper.find(INSERT_KEY_INPUT)
+        const valueField = wrapper.find(
+          '[data-testid="rich-note-property-value"]'
+        )
+        await keyInput.setValue(key)
+        await h.setPropertyValueField(valueField, value)
+        await wrapper
+          .find('[data-testid="rich-note-property-insert-add"]')
+          .trigger("click")
+
+        expect(
+          wrapper.find('[data-testid="rich-note-property-validation"]').text()
+        ).toBe(message)
+        expect(wrapper.emitted("update:modelValue")).toBeUndefined()
+        expect(keyInput.element).toHaveProperty("value", key)
+        expect(valueField.text()).toBe(value)
+      }
+    )
+
+    it("clears the missing-field message on a successful Add", async () => {
+      const wrapper = await h.mountEditor("# Body")
+      await h.openAddProperty()
+      await wrapper.find(INSERT_KEY_INPUT).setValue("topic")
+      const add = wrapper.find('[data-testid="rich-note-property-insert-add"]')
+      await add.trigger("click")
+      expect(
+        wrapper.find('[data-testid="rich-note-property-validation"]').text()
+      ).toBe("Enter a property value.")
+
+      await h.setPropertyValueField(
+        wrapper.find('[data-testid="rich-note-property-value"]'),
+        "training"
+      )
+      await add.trigger("click")
+
+      expect(
+        wrapper.find('[data-testid="rich-note-property-validation"]').exists()
+      ).toBe(false)
+      expect(h.lastEmittedMarkdown()).toContain("topic: training")
+    })
+
     it("adds an image property from a typed URL", async () => {
       const wrapper = await h.mountEditor("# Hi")
 

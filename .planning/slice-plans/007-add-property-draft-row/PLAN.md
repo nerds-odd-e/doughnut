@@ -111,7 +111,7 @@ needs Add as well; image upload and Wikidata Save are untouched.
 
 ### 2. Add says what is missing
 Type: Behavior
-Status: planned
+Status: done
 Proof: `propertyEntry.spec.ts` three new cases red then green.
 
 Behavior: key `topic`, value empty → Add → the message "Enter a property value." next to the add form, nothing saved,
@@ -194,6 +194,12 @@ still in place" and "the list renders the draft row and the add form is deleted"
 - Refactor replacement: `./scripts/run.sh pnpm frontend:test tests/components/form/RichMarkdownEditor.propertyEntry.spec.ts tests/components/form/RichMarkdownEditor.propertyFocusAndPresets.spec.ts tests/components/form/RichMarkdownEditor.propertyRowEditing.spec.ts tests/components/form/RichMarkdownEditor.relationPropertyEditing.spec.ts` — 34 tests passed after responsibility-based extraction; production boundary unchanged.
 - `./scripts/run.sh pnpm -C frontend exec vue-tsc --noEmit` passed after refactor.
 - `./scripts/run.sh pnpm cy:run --spec e2e_test/features/note_creation_and_update/note_edit.feature` — 12 scenarios passed, including saved rich properties after reload and Markdown source reflecting the Add action.
+
+### Slice 2
+
+- `./scripts/run.sh pnpm frontend:test tests/components/form/RichMarkdownEditor.propertyEntry.spec.ts`: four missing-field/clear-on-success cases red before change, 13 tests green after implementation and refactor. Mounted editor assertions observe exact messages, no emission, retained key/value, then cleared alert on successful Add.
+- `./scripts/run.sh pnpm -C frontend exec vue-tsc --noEmit` passed on final refactor content. Earlier full-suite and E2E proof unchanged.
+- Slice 1 accepted revision: `c05b83ea2b8a5ed3b0bd1534d720fcd08f8c9539` on the execution branch. Managed delivery reports `pendingCi: unobserved` because the Codex yielded-cell bridge is unavailable; no observer was armed.
 
 ## Learnings
 
