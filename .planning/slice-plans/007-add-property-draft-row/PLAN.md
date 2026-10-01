@@ -3,15 +3,16 @@
 **Identity:** SEED-064#story-6
 **Source:** [story](../../seeds/SEED-064-note-properties-fixes.md#story-6), refined 2026-09-30 with the owner's answers:
 story 6 does not wait for SEED-063; only Add or Enter adds; the draft row has a Cancel control. Planned on 2026-09-30
-at the owner's request **assuming SEED-064#story-5 is on trunk**; its premises were observed on story 5's finished
-branch `exec/seed-064-story-5` at `16a7c73f9f` (execution complete, not yet on trunk when this plan was written).
+at the owner's request; its premises were first observed on story 5's finished branch `exec/seed-064-story-5` at
+`16a7c73f9f`.
 
 ## Start condition
 
-Execute only after SEED-064#story-5 is on trunk (`git fetch origin` and
-`git merge-base --is-ancestor 16a7c73f9f origin/main`, or its landed equivalent: `RichFrontmatterPropertyRow.vue`
-exists with a `readOnly` prop and `RichFrontmatterReadOnlyList.vue` is gone). If not, stop and report. If story 5
-landed with a different row shape than recorded below, re-check the slice 5 premises before slice 5.
+Met on 2026-10-01: SEED-064#story-5 is on trunk (`16a7c73f9f` is an ancestor of `02464698a4`,
+`RichFrontmatterPropertyRow.vue` has the `readOnly` mode, `RichFrontmatterReadOnlyList.vue` is gone). Since
+`16a7c73f9f`, trunk changed only the property panel (reify), one `property-value` prop on the row's panel, a page
+object `reifyRichNoteProperty` method and two new specs; the add form, `PropertyValueField.vue`,
+`useRichFrontmatterPropertyEditing.ts` and the image value are unchanged, so the premises below still hold.
 
 ## Goal and scope
 
@@ -49,11 +50,13 @@ Nothing new is invented. The draft reuses:
 
 ## Decisive premises
 
-Observed on `exec/seed-064-story-5` at `16a7c73f9f` by reading and searching.
+Observed on `exec/seed-064-story-5` at `16a7c73f9f` by reading and searching; re-checked on trunk at
+`02464698a4` (2026-10-01).
 
 | Premise | Consumed by | Observation | Result |
 | --- | --- | --- | --- |
 | Today a property is added only when the value field loses focus | slice 1 | `RichFrontmatterInsertForm.vue`: `PropertyValueField @blur="emit('value-blur')"`, `RichFrontmatterProperties.vue`: `@value-blur="tryCommitInsert"`; no other caller of `tryCommitInsert` | confirmed |
+| The image value's URL input also adds on blur | slice 1 | `RichFrontmatterImagePropertyValue.vue` input `@blur="emit('commit')"`; the add form binds `@commit="emit('value-blur')"` | confirmed on `02464698a4`: slice 1 removes this binding too |
 | Enter in the value field adds today only because it blurs the field | slice 1 (Enter needs its own event once blur stops adding) | `PropertyValueField.vue`: `@keydown.enter.prevent="onEnter"`, `onEnter() { root.value?.blur() }`, `onBlur` emits `blur` | confirmed: Enter must emit a distinct event before blurring |
 | `tryCommitInsert` returns silently when key or value is blank | slice 2 | `if (!key \|\| !value) return` after `trim()` | confirmed; the red test is the missing message |
 | Enter in the key field moves to the value field and does not add | slices 1, 5 | `RichFrontmatterPropertyKeyField.vue` `@keydown.enter.prevent="emit('enter')"` → insert form `focusValueInput` | confirmed |
@@ -103,7 +106,8 @@ Change: an Add button (`daisy-btn-sm`) in `RichFrontmatterInsertForm.vue` calls 
 blur no longer does. `PropertyValueField.vue` emits `enter` before it blurs; the add form turns it into the same add.
 Existing rows keep committing on blur (they listen to `blur`, not `enter`). Update the harness `commitInsertProperty`
 and the two direct blur calls to tap Add, and the e2e page object `addRichNoteProperty` to click Add instead of
-`.blur()`. The image URL case (typed URL) now needs Add as well; image upload and Wikidata Save are untouched.
+`.blur()`. The add form's image value `@commit` (its URL input blur) stops adding too, so the image URL case (typed URL) now
+needs Add as well; image upload and Wikidata Save are untouched.
 
 ### 2. Add says what is missing
 Type: Behavior

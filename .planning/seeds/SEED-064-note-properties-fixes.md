@@ -80,7 +80,7 @@ Effort bands: S = 30–60 minutes, M = 1–2 hours, L = 2–4 hours, including d
 
 **Identity:** SEED-064#story-6
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/007-add-property-draft-row/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"06958f0666f7101fd0d4b1de0a055638e2f45c700c77e70bf5984410d5c513c6","plan":"94c7d3f1dab843d9b67a9033744eeeab491bfa0b2c954fafc78ba5f6daeef1a3"}}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/007-add-property-draft-row/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"e5deb187bf1fe0740962a3ec0c2ad41dad46d2d4890485b7009272c4d02a7d4a","plan":"1eeba0c40ed1a215c981a072d0290490339bbf2ca8feb825ff27c5ce210641f3"}}
 ```
 
 - **Goal:** a note author on an iPad adds a property with a clear, deliberate step and is told why nothing was
@@ -142,7 +142,7 @@ Effort bands: S = 30–60 minutes, M = 1–2 hours, L = 2–4 hours, including d
 - **Boundary with SEED-063:** story 6 no longer depends on SEED-063. SEED-063's per-value rule has landed, so the
   draft's Add uses it for an existing key: the value is appended to that key's list
   (`propertyRowsAfterAppendingValueToExactKey`), and `assimilableListValues` gives the values tracked separately.
-- **Depends on:** story 5 (the shared row the draft is built from; Taken). Story 2 is delivered.
+- **Depends on:** story 5 (the shared row the draft is built from) and story 2, both delivered.
 - **Real-iPad check:** the draft row, its focus and the 44 px Add and Cancel controls on a real iPad keyboard and
   touch.
 - **Safe stopping point:** stories 1 to 5 stand without it; within the story, the missing-value message on the old
