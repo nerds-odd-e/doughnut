@@ -11,4 +11,5 @@ Bug fixing and general maintenance.
 
 ## Backlog list
 
+- [Property key suggestions stop creating numbered keys, and obsolete generation functions are removed](seeds/SEED-063-track-property-values-separately.md#story-3) — SEED-063#story-3
 - [Existing numbered property keys become one list, and their trackers follow](seeds/SEED-063-track-property-values-separately.md#story-2) — SEED-063#story-2
