@@ -8,6 +8,7 @@ import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.User;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -32,22 +33,34 @@ final class WikiLinkCandidateClassifier {
    */
   WikiLinkResolver.CandidateCardinality classify(
       String token, String notebookFallbackName, User viewer) {
+    return classify(token, notebookFallbackName, viewer, Map.of());
+  }
+
+  WikiLinkResolver.CandidateCardinality classify(
+      String token,
+      String notebookFallbackName,
+      User viewer,
+      Map<Integer, String> projectedContent) {
     return resolveRef(token, notebookFallbackName)
         .map(
             ref ->
                 classifyCandidates(
-                    token, readableNotebookMatches(ref.notebookName(), ref.noteTitle(), viewer)))
+                    token,
+                    readableNotebookMatches(
+                        ref.notebookName(), ref.noteTitle(), viewer, projectedContent),
+                    projectedContent))
         .orElseGet(WikiLinkResolver.CandidateCardinality.Unresolved::new);
   }
 
   private static WikiLinkResolver.CandidateCardinality classifyCandidates(
-      String token, List<Note> readable) {
+      String token, List<Note> readable, Map<Integer, String> projectedContent) {
     if (readable.size() > 1) {
       return new WikiLinkResolver.CandidateCardinality.Ambiguous();
     }
     if (readable.size() == 1) {
       Note candidate = readable.getFirst();
-      if (WikiLinkPropertyMatch.matchesTargetNoteContent(token, candidate.getContent())) {
+      if (WikiLinkPropertyMatch.matchesTargetNoteContent(
+          token, projectedContent.getOrDefault(candidate.getId(), candidate.getContent()))) {
         return new WikiLinkResolver.CandidateCardinality.Resolved(candidate);
       }
     }
@@ -74,8 +87,14 @@ final class WikiLinkCandidateClassifier {
   }
 
   List<Note> readableNotebookMatches(String notebookName, String noteTitle, User viewer) {
+    return readableNotebookMatches(notebookName, noteTitle, viewer, Map.of());
+  }
+
+  private List<Note> readableNotebookMatches(
+      String notebookName, String noteTitle, User viewer, Map<Integer, String> projectedContent) {
     List<Note> readable = new ArrayList<>();
-    for (Note candidate : noteCandidates.forNotebookAndTitle(notebookName, noteTitle)) {
+    for (Note candidate :
+        noteCandidates.forNotebookAndTitle(notebookName, noteTitle, projectedContent)) {
       Notebook notebook = candidate.getNotebook();
       if (notebook != null && authorizationService.userMayReadNotebook(viewer, notebook)) {
         readable.add(candidate);

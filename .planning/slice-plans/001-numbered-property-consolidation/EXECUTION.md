@@ -95,3 +95,61 @@ with confirmed shutdown and no unread events; its verdict was unobserved.
 Managed delivery may establish replacement coverage at the next publication.
 Checkout/branch match the retained identity at e0602b1e37; working tree was
 clean. Checkout-bound Node readiness passed through scripts/run.sh (v26.10.0).
+
+## Reader-preflight reconstruction sizing reassessment
+
+The settled policy exposed two independent refusal proof loops: authored-focus
+correspondence and reader-scope compatibility. Reconstruction reached ten active
+minutes and stopped; no refactor/delivery is claimed. Full backend:verify ran
+2759 tests, one failure, zero errors, two skipped. The orphan refusal passed;
+the conflicting-reader fixture failed before migration because its download
+used the wrong private notebook owner. It proves no migration regression.
+Three earlier attempts stopped before tests: MySQL absent, test users absent,
+then incomplete grants after partial schema creation. Documented local services
+were recovered with short macOS sockets and exact isolated-test-schema grants.
+MySQL session 52344 and Redis 43744 remain available for continuation.
+
+Seven tracked production edits and three new files are preserved outside the
+checkout at `/Users/terryyin/.codex/attempts/SEED-063-story-2-reader-preflight`.
+Owned paths were individually restored/removed after verifying the copies.
+No unowned work was changed. The same outcome needs existing classification with
+projected content, reference preparation and complete locks; omitting reader
+checking would weaken the owner’s choice. Split current slice 9 into authored
+orphan refusal (9) and reader compatibility refusal (10); shift later leaves,
+fifteen total. The first continuation reuses production groundwork and its
+passing orphan fixture; reader fixture correction is the next separate loop.
+Each targets five active minutes; original elapsed and failed proof remain.
+
+## Projected candidate correction before slice 9 acceptance
+
+Fresh refactor made no edits and returned Jidoka: consolidating `aliases 2`
+changes the persisted alias index, while projected classification only changed
+property matching. A missing `[[New]]` can become resolved, or a resolved one
+ambiguous. The owner’s settled reader-preservation outcome requires projected
+alias candidates too; no new domain decision is needed. Correct the existing
+candidate owner with current availability/scope/DB equality and obtain real
+migration refusal proof before delivery. The authored-orphan proof remains
+valid for its fixture; it does not establish alias preservation. Continuation
+has spent three active implementation minutes; correct within its remaining
+hard budget or refine again. Refactor review took five active minutes.
+
+## Slice 9 accepted proof
+
+Full `CURSOR_DEV=true nix develop -c pnpm backend:verify` passed: 2760 tests,
+zero failures/errors, two skipped. SelectorRefusalControllerTest (one pass)
+invokes migration with exact authored changed/unchanged list focuses and an
+extra-prefixed orphan. Exact orphan diagnostic leaves fresh controller content,
+serialized tracker/history and downloaded accepted history equal to baseline.
+AliasRefusalControllerTest (two passes) observes initial missing/resolved café
+references, then refuses projected alias-induced cardinality changes unchanged.
+The isolated alias/name columns are utf8mb4_bin; normalization handles case,
+while the café/cafe precondition stays accent-distinct. Shared candidate owner
+projects aliases and exact property matching with DB scope/availability equality.
+Baseline alias run exposed one actual allowed-mutation regression plus one raw
+fixture-index error; the existing aliases builder corrected that setup.
+Continuation: three active minutes plus 5.5 for alias correction, within ten;
+mandatory full-suite waits excluded. Local services restarted under coordinator
+sessions MySQL 12565 / Redis 78862 after prior agent sessions were unavailable.
+Fresh refactor corrected displaced Javadocs only; accepted proof unchanged,
+whitespace passed, tests not repeated. Coordinator formatting passed; no API change.
+Reader-conflict and positive publication proof remain later slices.

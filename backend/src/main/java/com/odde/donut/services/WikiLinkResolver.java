@@ -12,6 +12,7 @@ import com.odde.donut.entities.repositories.NoteAliasIndexRepository;
 import com.odde.donut.entities.repositories.NoteRepository;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import org.springframework.stereotype.Service;
 
@@ -152,6 +153,13 @@ public class WikiLinkResolver {
     String focusNotebookName =
         focusNote.getNotebook() == null ? null : focusNote.getNotebook().getName();
     return classifyToken(token, focusNotebookName, viewer);
+  }
+
+  /** Same reader-aware classification against proposed authored content before it is persisted. */
+  CandidateCardinality classifyProjectedToken(
+      String token, Note source, User viewer, Map<Integer, String> projectedContent) {
+    return candidateClassifier.classify(
+        token, source.getNotebook().getName(), viewer, projectedContent);
   }
 
   /**

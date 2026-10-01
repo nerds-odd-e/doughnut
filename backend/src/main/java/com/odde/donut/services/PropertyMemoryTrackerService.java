@@ -1,5 +1,7 @@
 package com.odde.donut.services;
 
+import com.odde.donut.algorithms.FrontmatterPropertyValue;
+import com.odde.donut.algorithms.NoteContentMarkdown;
 import com.odde.donut.entities.MemoryTracker;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.PropertyFocus;
@@ -7,6 +9,8 @@ import com.odde.donut.entities.repositories.MemoryTrackerRepository;
 import com.odde.donut.factoryServices.EntityPersister;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -76,6 +80,40 @@ public class PropertyMemoryTrackerService {
               tracker.setPropertyValue(propertyValue);
               entityPersister.save(tracker);
             });
+  }
+
+  public record ConsolidatedFocuses(
+      Map<PropertyFocus, PropertyFocus> focuses, Set<String> sourceKeys) {}
+
+  public ConsolidatedFocuses composeConsolidatedFocuses(
+      Note note,
+      NoteContentMarkdown.ConsolidatedProperties transformed,
+      NumberedPropertyReferencePreservation.Rewrites rewrites) {
+    Map<PropertyFocus, PropertyFocus> focuses = new LinkedHashMap<>();
+    transformed
+        .focuses()
+        .forEach(
+            (source, destination) ->
+                focuses.put(
+                    source,
+                    new PropertyFocus(destination.key(), rewrites.apply(destination.value()))));
+    Set<String> keys = new LinkedHashSet<>(transformed.sourceKeys());
+    NoteContentMarkdown.splitLeadingFrontmatter(note.getContent())
+        .ifPresent(
+            split -> {
+              for (String key : split.frontmatter().keys()) {
+                if (split.frontmatter().getPropertyValueExact(key).orElse(null)
+                        instanceof FrontmatterPropertyValue.ListItems list
+                    && list.items().stream().anyMatch(item -> !item.equals(rewrites.apply(item)))) {
+                  keys.add(key);
+                  for (String item : list.items()) {
+                    PropertyFocus source = new PropertyFocus(key, item);
+                    focuses.putIfAbsent(source, new PropertyFocus(key, rewrites.apply(item)));
+                  }
+                }
+              }
+            });
+    return new ConsolidatedFocuses(Map.copyOf(focuses), Set.copyOf(keys));
   }
 
   /** Checks every persisted learner's focus before a complete family change mutates anything. */

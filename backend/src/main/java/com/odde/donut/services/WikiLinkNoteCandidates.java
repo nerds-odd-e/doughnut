@@ -9,6 +9,7 @@ import com.odde.donut.entities.repositories.NoteRepository;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /** Notebook-scoped note candidates for wiki-link title, path-shaped, and alias matching. */
@@ -24,9 +25,14 @@ final class WikiLinkNoteCandidates {
   }
 
   List<Note> forNotebookAndTitle(String notebookName, String noteTitle) {
+    return forNotebookAndTitle(notebookName, noteTitle, Map.of());
+  }
+
+  List<Note> forNotebookAndTitle(
+      String notebookName, String noteTitle, Map<Integer, String> projectedContent) {
     return PathShapedTarget.tryParse(noteTitle)
         .map(path -> pathShaped(notebookName, path))
-        .orElseGet(() -> titleOrAlias(notebookName, noteTitle));
+        .orElseGet(() -> titleOrAlias(notebookName, noteTitle, projectedContent));
   }
 
   static List<Note> distinctByNoteId(List<Note> notes) {
@@ -40,10 +46,11 @@ final class WikiLinkNoteCandidates {
     return distinct;
   }
 
-  private List<Note> titleOrAlias(String notebookName, String noteTitle) {
+  private List<Note> titleOrAlias(
+      String notebookName, String noteTitle, Map<Integer, String> projectedContent) {
     List<Note> byTitle =
         noteRepository.findByNotebookNameAndNoteTitleOrderByIdAsc(notebookName, noteTitle);
-    return unionByNoteId(byTitle, aliasTargets(notebookName, noteTitle));
+    return unionByNoteId(byTitle, aliasTargets(notebookName, noteTitle, projectedContent));
   }
 
   private static List<Note> unionByNoteId(List<Note> first, List<Note> second) {
@@ -67,13 +74,24 @@ final class WikiLinkNoteCandidates {
     return inFolder;
   }
 
-  private List<Note> aliasTargets(String notebookName, String linkToken) {
+  private List<Note> aliasTargets(
+      String notebookName, String linkToken, Map<Integer, String> projectedContent) {
     String lookupKey = FrontmatterAliases.normalizedLookupKey(linkToken);
     List<Note> notes = new ArrayList<>();
     for (NoteAliasIndex row :
         noteAliasIndexRepository.findByNotebookNameAndAliasLookupKeyOrderByNoteIdAsc(
             notebookName, lookupKey)) {
-      notes.add(row.getNote());
+      if (!projectedContent.containsKey(row.getNote().getId())) notes.add(row.getNote());
+    }
+    for (var projected : projectedContent.entrySet()) {
+      for (String alias : FrontmatterAliases.fromNoteContent(projected.getValue())) {
+        notes.addAll(
+            noteAliasIndexRepository.findProjectedAliasTarget(
+                projected.getKey(),
+                notebookName,
+                FrontmatterAliases.normalizedLookupKey(alias),
+                lookupKey));
+      }
     }
     return distinctByNoteId(notes);
   }

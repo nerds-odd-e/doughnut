@@ -36,6 +36,9 @@ Required context for [the executable plan](PLAN.md).
   against projected content before mutation; report inconsistent rewrites and
   leave the complete operation unchanged. System mutation authority does not
   replace reader-dependent resolution with global candidate cardinality.
+  Project title/alias candidate cardinality as well as exact property matching:
+  consolidation of list-capable aliases changes its derived index. Reuse the
+  existing candidate/alias codec and actual DB comparison, retaining availability.
 - Reuse `AcceptedWebChangeService` and `AuthoredNoteDocumentPersistence` for
   the complete operation. Append one Donut System descendant per changed
   bound notebook, atomically with content, tracker changes and derived state.
@@ -99,11 +102,11 @@ require a state-changing disposable run.
 | --- | --- | --- |
 | Family transformation can share existing syntax/codec (slices 2–5) | Read `PropertyKeyNaming`, `FrontmatterPropertyValues`, `FrontmatterInPlaceEdit`, and `NoteContentMarkdown`: numeric suffix >=2 exists; scalar/one-level list parsing and in-place edits exist; append alone does not force exact-family lists. | Slices 2–5 prove the new contract; no claim it already exists. |
 | Destination uniqueness includes inactive rows (slice 8) | Read `V300000352__add_property_value_to_trackers_and_property_index.sql`; then queried the migrated isolated MySQL 8.4.11 schema: exact five-column unique key, both focus columns `varchar(255)` with `utf8mb4_0900_ai_ci`, no active filter. | Slice 8 includes collation-equivalent values; reject unrepresentable focus mappings before mutation. |
-| Spring schema migration finishes before the proposed listener consumes services (slice 14) | Read `FlyWayFreeVersionRealMigration`: synchronous `ApplicationReadyEvent`, highest precedence, `repair()` then `migrate()`. Search other listeners: no existing property migration/startup owner. | Slice 1 observes the real event, consumer and database rather than assuming injection/order. |
-| Complete accepted operations can retain identities and atomically append (slices 4, 11–14) | Read `AcceptedWebChangeService.apply` through `commitIfChanged`, `AuthoredNoteDocumentPersistence.persist`, and `JdbcNotebookGitRepository`: locked operation, flush, derive, append and store share the transaction; unchanged root returns without append. | Slice 1 establishes service wiring; slices 4, 11–14 consume it and prove this migration. |
+| Spring schema migration finishes before the proposed listener consumes services (slice 15) | Read `FlyWayFreeVersionRealMigration`: synchronous `ApplicationReadyEvent`, highest precedence, `repair()` then `migrate()`. Search other listeners: no existing property migration/startup owner. | Slice 1 observes the real event, consumer and database rather than assuming injection/order. |
+| Complete accepted operations can retain identities and atomically append (slices 4, 12–15) | Read `AcceptedWebChangeService.apply` through `commitIfChanged`, `AuthoredNoteDocumentPersistence.persist`, and `JdbcNotebookGitRepository`: locked operation, flush, derive, append and store share the transaction; unchanged root returns without append. | Slice 1 establishes service wiring; slices 4, 12–15 consume it and prove this migration. |
 | Stored-content enumeration includes Trash (slices 6–7) | Read `NoteRepository.findAllByNotebookIdOrderByIdAsc` and `MemoryTrackerRepository.findByNote_IdIn`: complete collections exist; interactive property rename refuses unavailable notes. | Slices 6–7 prove migration enumeration and restore. |
 | Deleting a duplicate has dependent-data effects (slice 8) | Read `MemoryTrackerService.delete`, `MemoryTrackerDeleteControllerTest`, and ERD: tracker cascades to recall logs/prompts and batch requests; prompt-to-conversation uses SET NULL. | Slice 8 seeds the full FK closure and observes survivor/deletion effects in MySQL. |
-| Renamed property selectors require authored rewrites (slices 9–11) | Read `WikiLinkPropertyMatch`, `PortablePath`, `WikiLinkMarkdownRewrite`, `AuthoredNoteDocument`, and `NoteReferenceService.notebooksToLock`: exact-key live matching and multi-notebook coordination exist; index refresh cannot repair old authored keys. | Slices 9–11 consume the current resolver and prove post-rewrite resolution and publication. |
+| Renamed property selectors require authored rewrites (slices 9–12) | Read `WikiLinkPropertyMatch`, `PortablePath`, `WikiLinkMarkdownRewrite`, `AuthoredNoteDocument`, and `NoteReferenceService.notebooksToLock`: exact-key live matching and multi-notebook coordination exist; index refresh cannot repair old authored keys. | Slices 9–12 consume the current resolver and prove post-rewrite resolution and publication. |
 
 Relevant existing proof patterns are
 `MemoryTrackerFollowPropertyValueControllerTest`,
@@ -159,7 +162,7 @@ dependent path and revise this same plan before continuing.
 ## Verification and delivery gates
 
 Each slice targets about 5 minutes including local edits and focused cleanup.
-Slices 4, 8 and 11 are scrutinized cohesive outcomes targeting 5–8 active minutes:
+Slices 4, 8 and 12 are scrutinized cohesive outcomes targeting 5–8 active minutes:
 their content/history or transaction promises must be proved together. The
 mandatory complete backend suite and isolated process boot are explicit
 verification-wait exceptions when they exceed that target; do not use them to

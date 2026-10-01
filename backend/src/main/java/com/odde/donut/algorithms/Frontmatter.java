@@ -48,6 +48,11 @@ public final class Frontmatter {
     return rawValueIgnoreCase(key).flatMap(FrontmatterPropertyValues::scalarStringFromYamlObject);
   }
 
+  /** Exact authored-key lookup; empty when absent or unsupported. */
+  public Optional<FrontmatterPropertyValue> getPropertyValueExact(String key) {
+    return Optional.ofNullable(data.get(key)).flatMap(FrontmatterPropertyValues::fromYamlObject);
+  }
+
   /**
    * Case-insensitive lookup; returns a supported scalar or one-level list value, or empty when
    * absent or unsupported.

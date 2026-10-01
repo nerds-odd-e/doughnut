@@ -146,22 +146,31 @@ complete accepted operation unchanged, including the deletion fan-out.
 
 ### 9. Rewritten list focuses must follow authored source items
 Type: Behavior
+Status: done
+Accepted proof: [slice 9](EXECUTION.md#slice-9-accepted-proof).
+Proof: Valid tracked source items plus an orphan focus containing a selector →
+migration → diagnostic, unchanged controller/tracker/history and accepted bundle.
+Run the full backend suite. Restore the preserved reader-preflight attempt;
+park its conflicting-reader fixture until slice 10.
+Behavior: Ground rewrites in exact authored list items, compose family mappings
+and retain unaffected item focuses. Preflight projected reader results through
+existing classification and discover/recheck the complete notebook set. Refuse
+an affected orphan before mutation. Startup remains absent.
+
+### 10. Incompatible current-reader results refuse the complete operation
+Type: Behavior
 Status: planned
-Decision: preserve every current reader’s resolution results (BASIS.md).
-Proof: A valid list reference and an orphan persisted focus containing the same
-selector → invoke migration → diagnostic and complete unchanged content,
-trackers and downloaded accepted history. Run the full backend suite.
+Proof: Two readers resolve one authored selector to different same-name private
+targets → migrate one target → diagnostic and unchanged notes, learning and
+accepted histories. Assert both baseline destinations. Read private downloads
+as their actual owners. Run the full backend suite.
+Behavior: Preserve every current reader’s results, including anonymous public
+readers, through existing viewer-aware classification of proposed content.
+Refuse a rewrite that changes a reader’s resolved destination/selector meaning
+or missing/ambiguous result. Reconstruct the parked visibility fixture with
+correct authorized observations; no policy change or startup activation.
 
-Behavior: Preflight proposed selector rewrites through the existing viewer-aware
-resolver for every current reader, including anonymous public readers. Compare
-against projected target content; refuse the complete operation if any reader’s
-resolved destination or missing/ambiguous result would change. Ground
-reference-value mappings in exact authored list items before mutation. Compose them with family mappings and retain unaffected item focuses;
-report an affected orphan instead of inventing its destination. Reconstruct the unavailable temporary prototype with the refusal proof; keep
-the canonical success journey for slice 10. Include conflicting reader scopes
-in diagnostic/unchanged-operation proof. Startup remains absent.
-
-### 10. In-notebook selectors still resolve after consolidation
+### 11. In-notebook selectors still resolve after consolidation
 Type: Behavior
 Status: planned
 Continuation: reconstruct the positive journey; unresolved links are omitted
@@ -179,7 +188,7 @@ existing resolver's source-scope, current-reader visibility and ambiguity rules.
 rewrites and tracker mapping; add no alternate link syntax or saved destination
 authority.
 
-### 11. Cross-notebook referrers publish in the same operation
+### 12. Cross-notebook referrers publish in the same operation
 Type: Behavior
 Status: planned
 Proof: Target and referrer in separate bound notebooks → migration → both
@@ -193,7 +202,7 @@ transaction. Include affected source-value trackers, using the same duplicate
 rule. This is system migration authority, not a user web action's ownership
 filter. Do not publish a target change before its required reference rewrites.
 
-### 12. Late publication failure rolls back the whole migration
+### 13. Late publication failure rolls back the whole migration
 Type: Behavior
 Status: planned
 Proof: Reuse the existing failing-binding-save/committed-reader pattern at the
@@ -207,7 +216,7 @@ final accepted binding save → all affected notebooks and private learning
 remain at their pre-operation state. The injected failure verifies the
 business atomicity promise; it adds no generic failure-recovery framework.
 
-### 13. A resumed run changes only remaining legacy content
+### 14. A resumed run changes only remaining legacy content
 Type: Behavior
 Status: planned
 Proof: Run migration twice → stable content, tracker IDs/history and accepted
@@ -220,7 +229,7 @@ no new duplicate commit/deletion/history reset. Use separately proxied
 transactions and derive eligibility from current authored content. A late
 infrastructure failure may surface loudly; the next run resumes safely.
 
-### 14. Startup invokes the proved complete migration
+### 15. Startup invokes the proved complete migration
 Type: Behavior
 Status: planned
 Proof: Extend slice 1's real event probe to seed a learned numbered family and
