@@ -57,7 +57,7 @@
           requires-note-test-id="rich-note-image-insert-requires-note"
           value-wrapper-class="min-w-0 flex-1 basis-48"
           @update:model-value="emit('update:draftValue', $event)"
-          @commit="emit('value-blur')"
+          @enter="emit('add')"
           @image-upload-state="emit('image-upload-state', $event)"
         />
         <div
@@ -80,7 +80,7 @@
               aria-label="Property value"
               data-testid="rich-note-property-value"
               @update:model-value="emit('update:draftValue', $event)"
-              @blur="emit('value-blur')"
+              @enter="emit('add')"
               @dead-wiki-link-click="emit('dead-wiki-link-click', $event)"
             />
           </div>
@@ -91,6 +91,14 @@
           />
         </div>
       </label>
+      <button
+        type="button"
+        class="daisy-btn daisy-btn-sm daisy-btn-primary"
+        data-testid="rich-note-property-insert-add"
+        @click="emit('add')"
+      >
+        Add
+      </button>
     </div>
   </div>
 </template>
@@ -126,7 +134,7 @@ defineProps<{
 const emit = defineEmits<{
   "update:draftKey": [string]
   "update:draftValue": [string]
-  "value-blur": []
+  add: []
   "dead-wiki-link-click": [payload: DeadWikiLinkPayload]
   "wikidata-dialog-open": []
   "image-upload-state": [inProgress: boolean]

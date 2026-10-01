@@ -94,7 +94,7 @@ Size target is about 10 minutes including proof, as in the previous plans of thi
 
 ### 1. Only Add or Enter adds a property
 Type: Behavior
-Status: planned
+Status: done
 Proof: `propertyEntry.spec.ts` new cases red then green; the specs listed in the premise "Every caller" green after their
 helper change; `note_edit.feature` once.
 
@@ -175,6 +175,30 @@ still in place" and "the list renders the draft row and the add form is deleted"
 - The draft is located in tests by the row `data-testid` plus `data-property-draft="true"`, not by separate test ids.
 - Tests do not call `console.log`.
 
+## Execution context
+
+- Mode: story-branch; workspace: `/Users/terryyin/git/doughnut/.worktrees/adding-a-property-uses-a-row-with-a-visible-add`.
+- Branch: `codex/adding-a-property-uses-a-row-with-a-visible-add`; publisher: `dashboard-mac.lan-doughnut`; agent: Maria-chan.
+- Authorized remote: origin; trunk: main; increments target the execution branch.
+- Established claim: `94de559d13059fe233e5fb85f960133f1a751c9d`; starting revision: `e2d621e989fc00cc011bd1eed254af967d6e22ff`.
+- Setup: `./scripts/run.sh bash scripts/worktree_setup.sh`, then `./scripts/run.sh pnpm -C frontend exec vue-tsc --noEmit`, both passed in this checkout.
+- Replanning: existing planned authority retained; slice 5's explicit split remains available.
+- CI source: GitHub Actions, verified push workflow `ci.yml` (donut CI). Claim on trunk is unobserved.
+
+## Accepted proof
+
+### Slice 1
+
+- Red: `./scripts/run.sh pnpm frontend:test tests/components/form/RichMarkdownEditor.propertyEntry.spec.ts` failed for absent Add and saving on text/image blur.
+- Green: `./scripts/run.sh pnpm frontend:test` — 309 files, 1981 tests passed. New insertion cases drive RichMarkdownEditor with a local draft and observe one Markdown emission on Add/Enter (text and image), closure on parent model echo, and no emission with retained draft on blur.
+- Refactor replacement: `./scripts/run.sh pnpm frontend:test tests/components/form/RichMarkdownEditor.propertyEntry.spec.ts tests/components/form/RichMarkdownEditor.propertyFocusAndPresets.spec.ts tests/components/form/RichMarkdownEditor.propertyRowEditing.spec.ts tests/components/form/RichMarkdownEditor.relationPropertyEditing.spec.ts` — 34 tests passed after responsibility-based extraction; production boundary unchanged.
+- `./scripts/run.sh pnpm -C frontend exec vue-tsc --noEmit` passed after refactor.
+- `./scripts/run.sh pnpm cy:run --spec e2e_test/features/note_creation_and_update/note_edit.feature` — 12 scenarios passed, including saved rich properties after reload and Markdown source reflecting the Add action.
+
 ## Learnings
 
-None yet.
+- Current existing-key behavior is per-value append from SEED-063; preserved unchanged.
+- Newly landed `NoteEditableContent.trackerFollowsValue.spec.ts` also used direct blur-to-add; its helper now clicks Add, with assertions unchanged.
+- Image URL Enter requires its own explicit event as text Enter does.
+- Required file-size refactoring extracted `propertyFocusAndPresets.spec.ts` and `relationPropertyEditing.spec.ts`; typed-image insertion now lives in `propertyEntry.spec.ts`. Include these new specs in slice 5 regression proof.
+

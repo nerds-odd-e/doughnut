@@ -44,6 +44,7 @@ const props = defineProps({
 const emit = defineEmits<{
   "update:modelValue": [value: string]
   blur: []
+  enter: []
   deadWikiLinkClick: [payload: DeadWikiLinkPayload]
 }>()
 
@@ -116,6 +117,7 @@ function onBlur() {
 }
 
 function onEnter() {
+  emit("enter")
   root.value?.blur()
 }
 

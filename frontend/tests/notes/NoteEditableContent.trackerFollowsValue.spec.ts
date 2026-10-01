@@ -146,6 +146,8 @@ async function appendInRichRow(
   const valueField = wrapper.find('[data-testid="rich-note-property-value"]')
   valueField.element.textContent = value
   await valueField.trigger("input")
-  await valueField.trigger("blur")
+  await wrapper
+    .find('[data-testid="rich-note-property-insert-add"]')
+    .trigger("click")
   await flushPromises()
 }

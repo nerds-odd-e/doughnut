@@ -1,51 +1,22 @@
 import { NoteController } from "@generated/donut-backend-api/sdk.gen"
 import { mockSdkService, wrapSdkResponse } from "@tests/helpers"
 import { advanceAnimationFrame } from "@tests/helpers/focusTargetTestSupport"
-import { mockCoarsePointer } from "@tests/helpers/mockCoarsePointer"
-import {
-  mountSoftKeyboardPrimer,
-  softKeyboardPrimerElement,
-} from "@tests/helpers/softKeyboardPrimerTestSupport"
 import { flushPromises } from "@vue/test-utils"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
-import { nextTick } from "vue"
 import { noteShowLocation } from "@/routes/noteShowLocation"
 import {
   listPropertyValue,
   parseNoteContentMarkdown,
-  richModeKeyDropdownPresetKeysForPropertyRows,
 } from "@/utils/noteContentFrontmatter"
 import { propertyRowWithScalar } from "@/utils/noteContentPropertyRows"
-import {
-  attemptRenamePropertyKey,
-  expectPresetOptions,
-  selectPresetKey,
-} from "./propertiesTestDom"
+import { attemptRenamePropertyKey } from "./propertiesTestDom"
 import { createRichMarkdownEditorTestHarness } from "./richMarkdownEditorTestHarness"
 
 const INSERT_KEY_INPUT = '[data-testid="rich-note-property-key"]'
-const ROW_KEY_INPUT = '[data-testid="rich-note-property-row-key-input"]'
 const ROW_VALUE_INPUT = '[data-testid="rich-note-property-row-value-input"]'
-
-function inputEl(selector: string): HTMLInputElement {
-  const el = document.querySelector(selector) as HTMLInputElement | null
-  expect(el).not.toBeNull()
-  return el!
-}
-
-function expectElementFocused(selector: string) {
-  expect(document.activeElement).toBe(inputEl(selector))
-}
 
 describe("RichMarkdownEditor property entry", () => {
   const h = createRichMarkdownEditorTestHarness()
-
-  async function mountTouchFocusEditor(markdown: string, coarse: boolean) {
-    mockCoarsePointer(coarse)
-    mountSoftKeyboardPrimer()
-    await h.mountEditor(markdown, { attachToBody: true })
-    return softKeyboardPrimerElement()
-  }
 
   beforeEach(() => {
     vi.useFakeTimers({ toFake: ["requestAnimationFrame"] })
@@ -58,6 +29,26 @@ describe("RichMarkdownEditor property entry", () => {
   })
 
   describe("inserting a property", () => {
+    it("adds an image property from a typed URL", async () => {
+      const wrapper = await h.mountEditor("# Hi")
+
+      await h.openAddProperty()
+      await wrapper
+        .find('[data-testid="rich-note-property-key"]')
+        .setValue("image")
+      await flushPromises()
+
+      const valInput = wrapper.find('[data-testid="rich-note-property-value"]')
+      await valInput.setValue("https://example.com/a.png")
+      await wrapper
+        .find('[data-testid="rich-note-property-insert-add"]')
+        .trigger("click")
+
+      expect(h.lastEmittedMarkdown()).toContain(
+        "image: https://example.com/a.png"
+      )
+    })
+
     it("emits composed frontmatter and preserves body", async () => {
       await h.mountEditor("# Hello Body")
       await h.openAddProperty()
@@ -69,13 +60,88 @@ describe("RichMarkdownEditor property entry", () => {
         .find('[data-testid="rich-note-property-value"]')
       await keyInput.setValue("status")
       await h.setPropertyValueField(valInput, "draft")
-      await valInput.trigger("blur")
+      await h
+        .getWrapper()
+        .find('[data-testid="rich-note-property-insert-add"]')
+        .trigger("click")
 
       const last = h.lastEmittedMarkdown()
       expect(last).toContain("---")
       expect(last).toContain("status: draft")
       expect(last).toContain("Hello Body")
     })
+
+    it("Add saves exactly once and closes the draft", async () => {
+      await h.mountEditor("# Body")
+      await h.openAddProperty()
+      const wrapper = h.getWrapper()
+      await wrapper.find(INSERT_KEY_INPUT).setValue("status")
+      await h.setPropertyValueField(
+        wrapper.find('[data-testid="rich-note-property-value"]'),
+        "draft"
+      )
+      await wrapper
+        .find('[data-testid="rich-note-property-insert-add"]')
+        .trigger("click")
+      expect(wrapper.emitted("update:modelValue")).toHaveLength(1)
+      expect(h.lastEmittedMarkdown()).toContain("status: draft")
+      await wrapper.setProps({ modelValue: h.lastEmittedMarkdown() })
+      expect(wrapper.find(INSERT_KEY_INPUT).exists()).toBe(false)
+    })
+
+    it.each(["status", "image"])(
+      "Enter in the %s value field saves exactly once and closes the draft",
+      async (key) => {
+        await h.mountEditor("# Body", { attachToBody: true })
+        await h.openAddProperty()
+        const wrapper = h.getWrapper()
+        await wrapper.find(INSERT_KEY_INPUT).setValue(key)
+        const field = wrapper.find('[data-testid="rich-note-property-value"]')
+        const value =
+          key === "image" ? "https://example.com/image.png" : "draft"
+        if (key === "image") {
+          await field.setValue(value)
+        } else {
+          await h.setPropertyValueField(field, value)
+        }
+        ;(field.element as HTMLElement).focus()
+        await field.trigger("keydown", { key: "Enter" })
+        expect(wrapper.emitted("update:modelValue")).toHaveLength(1)
+        expect(h.lastEmittedMarkdown()).toContain(`${key}: ${value}`)
+        await wrapper.setProps({ modelValue: h.lastEmittedMarkdown() })
+        expect(wrapper.find(INSERT_KEY_INPUT).exists()).toBe(false)
+      }
+    )
+
+    it.each(["status", "image"])(
+      "leaving the %s value keeps the draft without saving",
+      async (key) => {
+        await h.mountEditor("# Body")
+        await h.openAddProperty()
+        const wrapper = h.getWrapper()
+        await wrapper.find(INSERT_KEY_INPUT).setValue(key)
+        const field = wrapper.find('[data-testid="rich-note-property-value"]')
+        if (key === "image") {
+          await field.setValue("https://example.com/image.png")
+        } else {
+          await h.setPropertyValueField(field, "draft")
+        }
+        await field.trigger("blur")
+        expect(wrapper.emitted("update:modelValue")).toBeUndefined()
+        expect(wrapper.find(INSERT_KEY_INPUT).element).toHaveProperty(
+          "value",
+          key
+        )
+        if (key === "image") {
+          expect(field.element).toHaveProperty(
+            "value",
+            "https://example.com/image.png"
+          )
+        } else {
+          expect(field.text()).toBe("draft")
+        }
+      }
+    )
 
     it("appends to exact list-capable keys without folding legacy suffixes", async () => {
       await h.mountEditor(
@@ -98,180 +164,6 @@ example of 2: "[[B]]"
       expect(parsed.properties["example of 2"]).toEqual(
         propertyRowWithScalar("example of 2", "[[B]]").value
       )
-    })
-  })
-
-  describe("key presets", () => {
-    it("offers available presets and sets keys for existing and inserted rows", async () => {
-      await h.mountEditor(
-        `---
-custom: workshop
-image: /x.png
----
-
-# Body`,
-        { attachToBody: true }
-      )
-      const existingKeyInput = inputEl(ROW_KEY_INPUT)
-      existingKeyInput.focus()
-      await nextTick()
-      await flushPromises()
-      expectPresetOptions(
-        richModeKeyDropdownPresetKeysForPropertyRows(false, [
-          propertyRowWithScalar("custom", "workshop"),
-          propertyRowWithScalar("image", "/x.png"),
-        ])
-      )
-
-      await selectPresetKey("url")
-      expect(existingKeyInput.value).toBe("url")
-      expectElementFocused(`[data-property-key="url"] ${ROW_VALUE_INPUT}`)
-
-      await h.openAddProperty()
-      await advanceAnimationFrame()
-      expectPresetOptions(
-        richModeKeyDropdownPresetKeysForPropertyRows(false, [
-          propertyRowWithScalar("image", "/x.png"),
-          propertyRowWithScalar("url", "workshop"),
-        ])
-      )
-      await selectPresetKey("wikidata_id")
-      expect(inputEl(INSERT_KEY_INPUT).value).toBe("wikidata_id")
-      expectElementFocused(
-        '[data-testid="rich-note-wikidata-property-insert-edit"]'
-      )
-    })
-  })
-
-  describe("key preset narrowing", () => {
-    async function typeKey(selector: string, text: string) {
-      const el = inputEl(selector)
-      el.value = text
-      el.dispatchEvent(new Event("input", { bubbles: true }))
-      await flushPromises()
-    }
-
-    async function openAddFormKey() {
-      await h.mountEditor("# Body", { attachToBody: true })
-      await h.openAddProperty()
-      await advanceAnimationFrame()
-    }
-
-    it.each([
-      { typed: "ur", listed: ["url"] },
-      { typed: "UR", listed: ["url"] },
-      { typed: "of", listed: ["example of"] },
-      { typed: "mo", listed: [] },
-    ])("add form key typed $typed lists $listed", async ({ typed, listed }) => {
-      await openAddFormKey()
-      await typeKey(INSERT_KEY_INPUT, typed)
-      expectPresetOptions(listed)
-    })
-
-    it("add form lists every available preset once the typed text is cleared", async () => {
-      await openAddFormKey()
-      const all = richModeKeyDropdownPresetKeysForPropertyRows(false, [])
-      await typeKey(INSERT_KEY_INPUT, "ur")
-      await typeKey(INSERT_KEY_INPUT, "")
-      expectPresetOptions(all)
-    })
-
-    it("existing row lists every available preset on focus and narrows on typing", async () => {
-      await h.mountEditor("---\ncustom: workshop\n---\n\n# Body", {
-        attachToBody: true,
-      })
-      inputEl(ROW_KEY_INPUT).focus()
-      await flushPromises()
-      expectPresetOptions(
-        richModeKeyDropdownPresetKeysForPropertyRows(false, [
-          propertyRowWithScalar("custom", "workshop"),
-        ])
-      )
-
-      await typeKey(ROW_KEY_INPUT, "ur")
-      expectPresetOptions(["url"])
-    })
-
-    it("choosing a narrowed preset closes the list and focuses the row value", async () => {
-      await h.mountEditor("---\ncustom: workshop\n---\n\n# Body", {
-        attachToBody: true,
-      })
-      inputEl(ROW_KEY_INPUT).focus()
-      await flushPromises()
-      await typeKey(ROW_KEY_INPUT, "ur")
-      await selectPresetKey("url")
-      expectPresetOptions([])
-      expectElementFocused(`[data-property-key="url"] ${ROW_VALUE_INPUT}`)
-    })
-  })
-
-  describe("touch focus", () => {
-    it.each([
-      { case: "no existing rows", markdown: "# Hello Body" },
-      { case: "existing rows", markdown: "---\nstatus: ok\n---\n\n# Body" },
-    ])(
-      "Add property on touch focuses primer then property key with $case",
-      async ({ markdown }) => {
-        const primer = await mountTouchFocusEditor(markdown, true)
-        expect(primer).toBeTruthy()
-
-        h.tapAddProperty()
-        expect(document.activeElement).toBe(primer)
-
-        await flushPromises()
-        await advanceAnimationFrame()
-        expectElementFocused(INSERT_KEY_INPUT)
-      }
-    )
-
-    it("does not focus primer on Add property when pointer is not coarse", async () => {
-      const primer = await mountTouchFocusEditor("# Hello Body", false)
-
-      await h.openAddProperty()
-      await advanceAnimationFrame()
-      expect(document.activeElement).not.toBe(primer)
-      expectElementFocused(INSERT_KEY_INPUT)
-    })
-
-    it("focuses primer then existing value field on touch; skips primer for dead wiki link", async () => {
-      const primer = await mountTouchFocusEditor(
-        `---
-plain: training
-wiki: "[[Missing Note]]"
----
-
-Workshop body.`,
-        true
-      )
-      expect(primer).toBeTruthy()
-
-      h.pointerdownPropertyValueField()
-      expect(document.activeElement).toBe(primer)
-
-      h.completePropertyValueFieldTap()
-      expectElementFocused(ROW_VALUE_INPUT)
-
-      const deadLink = h
-        .getWrapper()
-        .element.querySelector(`${ROW_VALUE_INPUT} a.dead-wiki-link`)
-      expect(deadLink).toBeTruthy()
-      deadLink!.dispatchEvent(
-        new PointerEvent("pointerdown", { bubbles: true })
-      )
-      expect(document.activeElement).not.toBe(primer)
-    })
-
-    it("does not focus primer on an existing value field when pointer is not coarse", async () => {
-      const primer = await mountTouchFocusEditor(
-        "---\ntopic: training\n---\n\nWorkshop body.",
-        false
-      )
-
-      h.pointerdownPropertyValueField()
-      h.completePropertyValueFieldTap()
-
-      expect(document.activeElement).not.toBe(primer)
-      expectElementFocused(ROW_VALUE_INPUT)
     })
   })
 

@@ -23,6 +23,7 @@
       @input="onValueInput"
       @focus="emit('focus')"
       @blur="emit('commit')"
+      @keydown.enter.prevent="emit('enter')"
     />
     <RichFrontmatterPropertyExternalLink
       v-if="modelValue.trim()"
@@ -75,6 +76,7 @@ const emit = defineEmits<{
   "update:modelValue": [value: string]
   focus: []
   commit: []
+  enter: []
   "image-upload-state": [inProgress: boolean]
 }>()
 

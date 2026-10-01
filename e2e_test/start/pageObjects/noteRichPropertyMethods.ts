@@ -17,7 +17,7 @@ export const noteRichPropertyMethods = () => ({
       cy.findByTestId('rich-note-property-value')
         .clear()
         .type(value, { parseSpecialCharSequences: false })
-        .blur()
+      cy.findByTestId('rich-note-property-insert-add').click()
     })
     findNoteContentRegion().within(() => {
       cy.get('.ql-editor[contenteditable="true"]').first().click()

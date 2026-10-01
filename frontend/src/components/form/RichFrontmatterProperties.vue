@@ -68,7 +68,7 @@
       :insert-key-preset-list-id="insertKeyPresetListId"
       @update:draft-key="draftKey = $event"
       @update:draft-value="draftValue = $event"
-      @value-blur="tryCommitInsert"
+      @add="tryCommitInsert"
       @dead-wiki-link-click="emits('deadWikiLinkClick', $event)"
       @wikidata-dialog-open="openWikidataDialog({ type: 'insert' })"
       @image-upload-state="emits('image-upload-state', $event)"

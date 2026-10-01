@@ -149,7 +149,9 @@ export function createRichMarkdownEditorTestHarness() {
     const valInput = wrapper.find('[data-testid="rich-note-property-value"]')
     await keyInput.setValue(key)
     await setPropertyValueField(valInput, value)
-    await valInput.trigger("blur")
+    await wrapper
+      .find('[data-testid="rich-note-property-insert-add"]')
+      .trigger("click")
     await flushPromises()
   }
 
