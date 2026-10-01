@@ -16,19 +16,8 @@ authorized. The published claim is Taken.
 
 ## Execution context
 
-- Workspace: `/Users/terryyin/git/doughnut/.worktrees/existing-numbered-property-keys-become-one-list`
-- Branch: `codex/existing-numbered-property-keys-become-one-list`
-- Mode: story-branch; remote: `origin`; integration target: `main`.
-- Publisher: `dashboard-mac.lan-doughnut`; assigned agent: Rio-chan.
-- Starting revision: `a11dfaee415d7fdbaf4bb916f0d125581da37a03`.
-- Published claim and initial candidate: `28442ce9d9ea3e50d1f002081a6b93907f0f57f1`.
-- Remote execution branch confirmed at the published claim. Claim CI on trunk
-  is unobserved; subsequent increments observe the execution branch.
-- Checkout setup: `./scripts/run.sh bash scripts/worktree_setup.sh` passed;
-  `CURSOR_DEV=true nix develop -c pnpm exec node --version` passed (`v26.10.0`).
-- Replanning remains authorized within this plan's scope and sizing rules.
-- CI source: GitHub Actions, `nerds-odd-e/doughnut`, workflow `ci.yml`
-  (`donut CI`), verified push selector. Managed delivery owns observation setup.
+Read [EXECUTION.md](EXECUTION.md) for retained execution identity, preparation,
+publication and observer state.
 
 ## Required execution basis
 
@@ -71,14 +60,19 @@ evidence, not a substitute for the later migration journey.
 Type: Structure
 Status: planned
 Proof: Pure contract tests on the existing authored-frontmatter boundary prove
-the selected numeric grouping/list/ordering rule and preserve unrelated bytes;
-existing codec tests stay green under the full backend suite.
+numeric grouping/list/ordering and preserve unrelated bytes. Include quoted
+leading/trailing whitespace keys and numeric suffixes beyond Integer range;
+case and whitespace-distinct authored bases stay distinct. Run the full backend
+suite. Slice 3 immediately consumes its transformed content/focus mapping.
 
-Change: Extend the shared frontmatter owner to return transformed content and
-the source-to-final-focus mapping consumed immediately by slice 3. Reuse the
-suffix domain owner. Unsupported or unmappable shapes yield a diagnostic
-without transformed content. No separate preview API or general migration
-framework. Retain scalar-only keys and word suffixes as authored.
+Change: Reuse the parked prototype (see EXECUTION.md), correcting exact authored
+suffix recognition in PropertyKeyNaming without changing trimmed structural
+recognition. Numeric suffix size is not a new eligibility restriction. Keep one
+suffix domain owner. Preserve source ranges through NoteLeadingFrontmatter,
+whose current verbatim split normalizes BOM/line endings. Consolidation retains
+shared codec scalar meanings, returns source-to-final focuses and diagnostic-only
+outcomes for genuinely unsupported or ambiguous shapes. No preview API or
+migration framework. Preserve scalar-only structural and word-suffix keys.
 
 ### 3. A learned scalar family becomes one accepted list
 Type: Behavior
