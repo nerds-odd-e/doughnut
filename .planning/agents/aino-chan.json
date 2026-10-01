@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 1,
+  "agent": "Aino-chan",
+  "email": "aino-chan@example.org",
+  "identity": "SEED-063#story-3",
+  "mode": "story-branch",
+  "branch": "codex/property-key-suggestions-stop-creating-numbered",
+  "host": "codex"
+}
