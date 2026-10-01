@@ -27,7 +27,7 @@ confusing, even when the convention is explained in AI instructions.
 
 **Identity:** SEED-063#story-2
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/001-numbered-property-consolidation/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"42ec34c66cf63185acde46dc7e6574b7249b728a9afcf9234fdd7cbc10559d58","plan":"6390ea07bec57227d6a2a7fd297b13507c165aec6095a9d5c6644c858cc5a5b8"}}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/001-numbered-property-consolidation/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"42ec34c66cf63185acde46dc7e6574b7249b728a9afcf9234fdd7cbc10559d58","plan":"e1a4769b4455729496486f1dd9877b95e2a0ce62b0cfa395b55559f272574c97"}}
 ```
 
 - **Goal:** existing notebook authors and learners see multiple associations
@@ -181,6 +181,29 @@ confusing, even when the convention is explained in AI instructions.
 - **Depends on:** per-value trackers are already in the product; no new
   per-value tracking capability is required.
 - **Safe stopping point:** old notes keep working with numbered keys.
+
+<a id="story-3"></a>
+
+### Remove spent numbered-property migration after confirmed completion
+
+**Identity:** SEED-063#story-3
+
+- **Goal:** developers maintain ordinary application startup without spent
+  one-time migration code after the numbered-property conversion is confirmed.
+- **Scope:** remove the temporary startup caller and migration orchestration,
+  plus migration-only proof harnesses, after confirmed completion in the
+  deployed environments. Retain shared property naming, authored-frontmatter
+  editing and tracker responsibilities that continue to serve product behavior.
+  Preserve accepted history, tracker identities and learning data.
+- **Key example:** all eligible operations have completed and no reported
+  unmapped operation remains → retire the one-time runner → startup no longer
+  scans legacy families, while the consolidated content and learning remain.
+- **Prerequisite:** story 2 is delivered and its migration completion has been
+  confirmed operationally. Unit fixtures alone do not satisfy this prerequisite.
+  Application release and production observation remain separately authorized.
+- **Origin:** the owner's 2026-10-01 instruction to select and queue cleanup
+  when temporary Java migration code is introduced by story 2.
+- **Effort hypothesis:** S; refine the actual removal boundary after confirmation.
 
 ## When to Surface
 

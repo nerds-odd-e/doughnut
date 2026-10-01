@@ -61,4 +61,36 @@ shapes, repeated-run stability and BOM/CRLF/unrelated source preservation.
 structural consumers trim explicitly. Maps reuse the existing PropertyFocus.
 The refactor's full-suite proof also covers existing source-edit callers.
 Independent refactor completed; coordinator formatter passed. Migration tracker
-and accepted-publication integration remain slice 3's obligation.
+and accepted-publication integration remained the original slice 3's obligation,
+now split between slices 3 and 4 as recorded below.
+
+## Slice 1 accepted proof
+
+Accepted proof: `CURSOR_DEV=true nix develop -c pnpm backend:verify` passed;
+`NotebookGitStartupServicesProbeTest` observes the actual ready-event listener,
+Flyway completion, transaction boundaries, live schema and unchanged downloaded
+history/native objects. The probe uses a test-only event context with real
+service proxies; it establishes service/order usability, not production boot.
+
+## Migration operation sizing reassessment
+
+The original slice 3 attempt stopped at ten active minutes. Its six owned
+production/test paths are parked in `/tmp/numbered-property-migration-attempt.patch`
+and `/tmp/numbered-property-migration-attempt/`; all product changes were restored
+or removed individually. Coordinator cleanup-story/backlog edits are preserved.
+
+`CURSOR_DEV=true nix develop -c pnpm backend:verify` ran 2751 tests with one
+failure and two skips. Four diagnostic cases passed (orphan item, zero-item list,
+tracked empty value, oversized tracked destination). Canonical proof stopped at
+FSRS stability: an unpersisted Java float 2.1112142 was compared with MySQL's
+rounded 2.11121. Reloading the committed baseline is the evidenced fixture fix;
+later history/index/download assertions remain unaccepted until observed.
+
+The original leaf hid two independently evaluable risk boundaries: whole-operation
+preflight refusal and successful learning-preserving accepted publication. Split
+it into slices 3 and 4, retaining one migration/mapping owner and the immediate
+next behavior. Both reuse the parked work (target five active minutes each; full
+suite waits excepted). Thirteen slices result; no source outcome or architecture
+change is required. Later slices retain their promises in the same order. The
+prior nine-minute transformation attempt and ten-minute operation attempt remain
+recorded; subdivision does not erase elapsed work or claim missing proof.

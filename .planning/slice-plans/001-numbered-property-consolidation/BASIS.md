@@ -91,13 +91,13 @@ require a state-changing disposable run.
 
 | Premise and consumer | Literal observation and result | Runtime proof owner |
 | --- | --- | --- |
-| Family transformation can share existing syntax/codec (slices 2–4) | Read `PropertyKeyNaming`, `FrontmatterPropertyValues`, `FrontmatterInPlaceEdit`, and `NoteContentMarkdown`: numeric suffix >=2 exists; scalar/one-level list parsing and in-place edits exist; append alone does not force exact-family lists. | Slices 2–4 prove the new contract; no claim it already exists. |
-| Destination uniqueness includes inactive rows (slice 7) | Read `V300000352__add_property_value_to_trackers_and_property_index.sql`; then queried the migrated isolated MySQL 8.4.11 schema: exact five-column unique key, both focus columns `varchar(255)` with `utf8mb4_0900_ai_ci`, no active filter. | Slice 7 includes collation-equivalent values; reject unrepresentable focus mappings before mutation. |
-| Spring schema migration finishes before the proposed listener consumes services (slice 12) | Read `FlyWayFreeVersionRealMigration`: synchronous `ApplicationReadyEvent`, highest precedence, `repair()` then `migrate()`. Search other listeners: no existing property migration/startup owner. | Slice 1 observes the real event, consumer and database rather than assuming injection/order. |
-| Complete accepted operations can retain identities and atomically append (slices 3, 9–12) | Read `AcceptedWebChangeService.apply` through `commitIfChanged`, `AuthoredNoteDocumentPersistence.persist`, and `JdbcNotebookGitRepository`: locked operation, flush, derive, append and store share the transaction; unchanged root returns without append. | Slice 1 establishes service wiring; slices 3, 9–12 consume it and prove this migration. |
-| Stored-content enumeration includes Trash (slices 5–6) | Read `NoteRepository.findAllByNotebookIdOrderByIdAsc` and `MemoryTrackerRepository.findByNote_IdIn`: complete collections exist; interactive property rename refuses unavailable notes. | Slices 5–6 prove migration enumeration and restore. |
-| Deleting a duplicate has dependent-data effects (slice 7) | Read `MemoryTrackerService.delete`, `MemoryTrackerDeleteControllerTest`, and ERD: tracker cascades to recall logs/prompts and batch requests; prompt-to-conversation uses SET NULL. | Slice 7 seeds the full FK closure and observes survivor/deletion effects in MySQL. |
-| Renamed property selectors require authored rewrites (slices 8–9) | Read `WikiLinkPropertyMatch`, `PortablePath`, `WikiLinkMarkdownRewrite`, `AuthoredNoteDocument`, and `NoteReferenceService.notebooksToLock`: exact-key live matching and multi-notebook coordination exist; index refresh cannot repair old authored keys. | Slices 8–9 consume the current resolver and prove post-rewrite resolution and publication. |
+| Family transformation can share existing syntax/codec (slices 2–5) | Read `PropertyKeyNaming`, `FrontmatterPropertyValues`, `FrontmatterInPlaceEdit`, and `NoteContentMarkdown`: numeric suffix >=2 exists; scalar/one-level list parsing and in-place edits exist; append alone does not force exact-family lists. | Slices 2–5 prove the new contract; no claim it already exists. |
+| Destination uniqueness includes inactive rows (slice 8) | Read `V300000352__add_property_value_to_trackers_and_property_index.sql`; then queried the migrated isolated MySQL 8.4.11 schema: exact five-column unique key, both focus columns `varchar(255)` with `utf8mb4_0900_ai_ci`, no active filter. | Slice 8 includes collation-equivalent values; reject unrepresentable focus mappings before mutation. |
+| Spring schema migration finishes before the proposed listener consumes services (slice 13) | Read `FlyWayFreeVersionRealMigration`: synchronous `ApplicationReadyEvent`, highest precedence, `repair()` then `migrate()`. Search other listeners: no existing property migration/startup owner. | Slice 1 observes the real event, consumer and database rather than assuming injection/order. |
+| Complete accepted operations can retain identities and atomically append (slices 4, 10–13) | Read `AcceptedWebChangeService.apply` through `commitIfChanged`, `AuthoredNoteDocumentPersistence.persist`, and `JdbcNotebookGitRepository`: locked operation, flush, derive, append and store share the transaction; unchanged root returns without append. | Slice 1 establishes service wiring; slices 4, 10–13 consume it and prove this migration. |
+| Stored-content enumeration includes Trash (slices 6–7) | Read `NoteRepository.findAllByNotebookIdOrderByIdAsc` and `MemoryTrackerRepository.findByNote_IdIn`: complete collections exist; interactive property rename refuses unavailable notes. | Slices 6–7 prove migration enumeration and restore. |
+| Deleting a duplicate has dependent-data effects (slice 8) | Read `MemoryTrackerService.delete`, `MemoryTrackerDeleteControllerTest`, and ERD: tracker cascades to recall logs/prompts and batch requests; prompt-to-conversation uses SET NULL. | Slice 8 seeds the full FK closure and observes survivor/deletion effects in MySQL. |
+| Renamed property selectors require authored rewrites (slices 9–10) | Read `WikiLinkPropertyMatch`, `PortablePath`, `WikiLinkMarkdownRewrite`, `AuthoredNoteDocument`, and `NoteReferenceService.notebooksToLock`: exact-key live matching and multi-notebook coordination exist; index refresh cannot repair old authored keys. | Slices 9–10 consume the current resolver and prove post-rewrite resolution and publication. |
 
 Relevant existing proof patterns are
 `MemoryTrackerFollowPropertyValueControllerTest`,
@@ -145,6 +145,30 @@ contract. The early probe bounds schema/service/startup uncertainty before
 broad implementation; activation stays last for stop-safe delivery.
 
 No remaining unbounded premise or product decision was identified in this
-review. No slice is done and no live-data census is claimed. If a probe or
-outside-in observation contradicts the basis, preserve its evidence, stop the
+preparation review. No slice was done at preparation and no live-data census
+is claimed. Current statuses and accepted proof live in PLAN.md and EXECUTION.md.
+If a probe or outside-in observation contradicts the basis, preserve its evidence, stop the
 dependent path and revise this same plan before continuing.
+
+## Verification and delivery gates
+
+The [backend testing skill](../../../.agents/skills/backend-testing/SKILL.md)
+requires all backend unit tests, not selected classes. Use
+`CURSOR_DEV=true nix develop -c pnpm backend:test_only` at non-migration-code
+boundaries; use `pnpm backend:verify` under the same Nix prefix when migration
+code is involved. Existing test patterns are starting points; each new test
+invokes the migration operation, uses real collaborators and observes its
+public results. Do not claim that a green existing controller test proves the
+new startup caller. No frontend/API-signature changes are planned.
+
+There is no schema change planned, so no new Flyway version or ERD regeneration
+is required merely for DML. If execution discovers a necessary schema change,
+stop that path, replan and apply the migration/ERD rules. Do not edit committed
+migrations or add a placeholder gate against the owner's explicit direction.
+
+Execution follows AGENTS.md's required Jidoka → fresh
+`dough-post-change-refactor` agent → API generation if needed → coordinator
+`./scripts/run.sh pnpm format:changed` once → update plan → commit with the
+check-only lint hook → push. Implementers and refactorers run neither that
+formatter nor standalone `lint:changed`. Execute-plan owns asynchronous CI
+repair; managed increment delivery owns observer setup and publication.
