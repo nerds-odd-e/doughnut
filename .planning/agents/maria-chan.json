@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 1,
+  "agent": "Maria-chan",
+  "email": "maria-chan@example.org",
+  "identity": "SEED-064#story-6",
+  "mode": "story-branch",
+  "branch": "codex/adding-a-property-uses-a-row-with-a-visible-add",
+  "host": "codex"
+}
