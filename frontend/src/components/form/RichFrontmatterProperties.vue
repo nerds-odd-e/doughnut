@@ -69,6 +69,7 @@
       @update:draft-key="draftKey = $event"
       @update:draft-value="draftValue = $event"
       @add="tryCommitInsert"
+      @cancel="resetPropertyInsert"
       @dead-wiki-link-click="emits('deadWikiLinkClick', $event)"
       @wikidata-dialog-open="openWikidataDialog({ type: 'insert' })"
       @image-upload-state="emits('image-upload-state', $event)"
@@ -161,6 +162,13 @@ const clearValidation = () => {
   validationRowIndex.value = undefined
 }
 
+function resetPropertyInsert() {
+  insertOpen.value = false
+  draftKey.value = ""
+  draftValue.value = ""
+  clearValidation()
+}
+
 const {
   filterForEmit,
   rowsAfterAdding,
@@ -225,10 +233,7 @@ watch(
     propertyRows.value = properties
       ? propertyRowsFromNoteProperties(properties)
       : []
-    insertOpen.value = false
-    draftKey.value = ""
-    draftValue.value = ""
-    clearValidation()
+    resetPropertyInsert()
     rowSnapshots.value = {}
     resetDialog()
   },

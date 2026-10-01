@@ -121,7 +121,7 @@ next successful add, as validation messages do today.
 
 ### 3. Cancel drops the draft
 Type: Behavior
-Status: planned
+Status: done
 Proof: `propertyEntry.spec.ts` new case red then green.
 
 Behavior: add form with key `topic` and value `training` → tap Cancel (× icon, `aria-label="Cancel adding property"`,
@@ -200,6 +200,13 @@ still in place" and "the list renders the draft row and the add form is deleted"
 - `./scripts/run.sh pnpm frontend:test tests/components/form/RichMarkdownEditor.propertyEntry.spec.ts`: four missing-field/clear-on-success cases red before change, 13 tests green after implementation and refactor. Mounted editor assertions observe exact messages, no emission, retained key/value, then cleared alert on successful Add.
 - `./scripts/run.sh pnpm -C frontend exec vue-tsc --noEmit` passed on final refactor content. Earlier full-suite and E2E proof unchanged.
 - Slice 1 accepted revision: `c05b83ea2b8a5ed3b0bd1534d720fcd08f8c9539` on the execution branch. Managed delivery reports `pendingCi: unobserved` because the Codex yielded-cell bridge is unavailable; no observer was armed.
+
+### Slice 3
+
+- `./scripts/run.sh pnpm frontend:test tests/components/form/RichMarkdownEditor.propertyEntry.spec.ts`: Cancel case red for absent control then green. Assertions observe draft closure, no save, cleared alert and empty reopened fields.
+- Refactor replacement: `./scripts/run.sh pnpm frontend:test tests/components/form/RichMarkdownEditor.propertyEntry.spec.ts tests/components/form/RichMarkdownEditor.propertyRenameGuard.spec.ts` — 14 tests passed after sharing draft reset with the parsed-property watcher and extracting unrelated rename-guard coverage.
+- `./scripts/run.sh pnpm -C frontend exec vue-tsc --noEmit` passed. Include `propertyRenameGuard.spec.ts` in slice 5 regression proof.
+- Slice 2 accepted revision: `454bb48eaa208dde9d3a759d59344a41fd585f65` on execution branch; CI remains unobserved.
 
 ## Learnings
 

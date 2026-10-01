@@ -99,11 +99,21 @@
       >
         Add
       </button>
+      <button
+        type="button"
+        class="daisy-btn daisy-btn-sm daisy-btn-ghost"
+        aria-label="Cancel adding property"
+        data-testid="rich-note-property-insert-cancel"
+        @click="emit('cancel')"
+      >
+        <X class="h-4 w-4" aria-hidden="true" />
+      </button>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
+import { X } from "@lucide/vue"
 import { ref } from "vue"
 import RichFrontmatterImagePropertyValue from "@/components/form/RichFrontmatterImagePropertyValue.vue"
 import RichFrontmatterPropertyExternalLink from "@/components/form/RichFrontmatterPropertyExternalLink.vue"
@@ -135,6 +145,7 @@ const emit = defineEmits<{
   "update:draftKey": [string]
   "update:draftValue": [string]
   add: []
+  cancel: []
   "dead-wiki-link-click": [payload: DeadWikiLinkPayload]
   "wikidata-dialog-open": []
   "image-upload-state": [inProgress: boolean]

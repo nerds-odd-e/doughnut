@@ -1,19 +1,14 @@
-import { NoteController } from "@generated/donut-backend-api/sdk.gen"
-import { mockSdkService, wrapSdkResponse } from "@tests/helpers"
 import { advanceAnimationFrame } from "@tests/helpers/focusTargetTestSupport"
 import { flushPromises } from "@vue/test-utils"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
-import { noteShowLocation } from "@/routes/noteShowLocation"
 import {
   listPropertyValue,
   parseNoteContentMarkdown,
 } from "@/utils/noteContentFrontmatter"
 import { propertyRowWithScalar } from "@/utils/noteContentPropertyRows"
-import { attemptRenamePropertyKey } from "./propertiesTestDom"
 import { createRichMarkdownEditorTestHarness } from "./richMarkdownEditorTestHarness"
 
 const INSERT_KEY_INPUT = '[data-testid="rich-note-property-key"]'
-const ROW_VALUE_INPUT = '[data-testid="rich-note-property-row-value-input"]'
 
 describe("RichMarkdownEditor property entry", () => {
   const h = createRichMarkdownEditorTestHarness()
@@ -29,6 +24,37 @@ describe("RichMarkdownEditor property entry", () => {
   })
 
   describe("inserting a property", () => {
+    it("Cancel drops the draft and its message without saving, reopening empty", async () => {
+      const wrapper = await h.mountEditor("# Body")
+      await h.openAddProperty()
+      await wrapper.find(INSERT_KEY_INPUT).setValue("topic")
+      await wrapper
+        .find('[data-testid="rich-note-property-insert-add"]')
+        .trigger("click")
+      expect(
+        wrapper.find('[data-testid="rich-note-property-validation"]').text()
+      ).toBe("Enter a property value.")
+      await h.setPropertyValueField(
+        wrapper.find('[data-testid="rich-note-property-value"]'),
+        "training"
+      )
+
+      await wrapper
+        .find('[aria-label="Cancel adding property"]')
+        .trigger("click")
+
+      expect(wrapper.find(INSERT_KEY_INPUT).exists()).toBe(false)
+      expect(wrapper.emitted("update:modelValue")).toBeUndefined()
+      expect(
+        wrapper.find('[data-testid="rich-note-property-validation"]').exists()
+      ).toBe(false)
+      await h.openAddProperty()
+      expect(wrapper.find(INSERT_KEY_INPUT).element).toHaveProperty("value", "")
+      expect(
+        wrapper.find('[data-testid="rich-note-property-value"]').text()
+      ).toBe("")
+    })
+
     it.each([
       { key: "topic", value: "", message: "Enter a property value." },
       { key: "", value: "training", message: "Enter a property key." },
@@ -215,32 +241,5 @@ example of 2: "[[B]]"
         propertyRowWithScalar("example of 2", "[[B]]").value
       )
     })
-  })
-
-  it("retains a rename and newer value while its guard waits across a body refresh", async () => {
-    const response = wrapSdkResponse({ memoryTrackers: [] })
-    let resolveNoteInfo!: (value: typeof response) => void
-    const noteInfo = new Promise<typeof response>((resolve) => {
-      resolveNoteInfo = resolve
-    })
-    const getNoteInfo = mockSdkService(NoteController, "getNoteInfo", {
-      memoryTrackers: [],
-    }).mockReturnValue(noteInfo)
-    const wrapper = await h.mountEditor("---\ntopic: wiki\n---\n\nBody.", {
-      noteId: 42,
-      route: noteShowLocation(42),
-    })
-    await attemptRenamePropertyKey(wrapper, 0, "domain")
-    expect(getNoteInfo).toHaveBeenCalled()
-    await h.setPropertyValueField(wrapper.find(ROW_VALUE_INPUT), "newer value")
-    await wrapper.setProps({
-      modelValue: '---\ntopic: "wiki"\n---\n\nRefreshed body.',
-    })
-    expect(h.quillEditorEl().textContent).toContain("Refreshed body.")
-    resolveNoteInfo(response)
-    await flushPromises()
-    expect(h.lastEmittedMarkdown()).toBe(
-      "---\ndomain: newer value\n---\n\nRefreshed body."
-    )
   })
 })
