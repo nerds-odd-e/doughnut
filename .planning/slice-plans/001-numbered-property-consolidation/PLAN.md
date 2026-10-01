@@ -90,7 +90,8 @@ confirmed deployed migration completion.
 
 ### 4. A learned scalar family becomes one accepted list
 Type: Behavior
-Status: planned
+Status: done
+Accepted proof: see [slice 4](EXECUTION.md#slice-4-accepted-proof).
 Continuation: restore the parked canonical test and read its initial tracker
 state from committed MySQL before migration; do not compare unpersisted FSRS
 floats against rounded database values.

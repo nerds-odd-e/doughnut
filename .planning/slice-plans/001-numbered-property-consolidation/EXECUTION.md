@@ -109,3 +109,17 @@ The cases cover orphan items, empty source lists, tracked empty values and
 oversized persisted destinations. Independent refactor found no edits; formatter
 passed. Continuation took five active minutes after the recorded ten-minute
 attempt. Successful transformation/publication remains slice 4's proof obligation.
+
+## Slice 4 accepted proof
+
+`CURSOR_DEV=true nix develop -c pnpm backend:verify` passed: 2751 tests,
+zero failures/errors, two skipped; migration XML records five passing cases.
+`learnedScalarsBecomeOneAcceptedListKeepingBothLearningIdentities` restores the
+canonical journey with a committed-state baseline, correcting the recorded
+float precision mismatch. The real notebook operation is followed by controller
+content/identity and tracker focus reads, exact serialized histories, schedules,
+FSRS/type/state, wiki/property index reads, exact downloaded Markdown/path set,
+and one descendant count/parent with Donut System author/message. The fixture
+supplies a bound notebook with two learned scalar associations. Independent
+refactor found no edits; formatter passed. No production/API changes. Continuation
+stayed within five active minutes; prior attempt remains recorded.
