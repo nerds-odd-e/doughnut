@@ -142,48 +142,87 @@ confusing, even when the convention is explained in AI instructions.
 
 **Identity:** SEED-063#story-3
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"not-refined","approach":"unselected"}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/008-property-key-suggestions/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"e3a7398ffaf820e8285802989fe16dee9b0383451e2fb21f92c96167cc3ed51e","plan":"2d149d4e3cf27d4f545b50a842fb7168e377a7550dfd676cba103fcd1e751763"}}
 ```
 
 - **Goal:** notebook authors choose a meaningful property key and add another
   value under that key, without Donut suggesting `url 2` or `example of 2`.
   Close the unfulfilled no-new-numbered-keys promise of completed story 1.
 - **Scope:**
-  - Remove automatic numbered-key generation from rich-mode key suggestions,
-    including the add-property and existing-row key fields that share them.
-    An occupied list-capable preset still names its base key; adding another
-    value uses the existing list-append behavior.
-  - Remove unused numbered-key generation functions and exports once their
-    callers are replaced. Do not preserve tests whose expected output enshrines
-    the retired numbered suggestions.
-  - Preserve scalar-only structural property rules and singleton presets; do
-    not convert `image`, `wikidata_id`, or other structural values into lists.
-    The occupied structural-preset interaction needs refinement before execution.
-  - Keep recognition of authored legacy numbered keys needed by existing notes
-    and story 2. Recognition and generation are different responsibilities;
-    remove only code made obsolete by this outcome.
-  - This is a correction to new authoring behavior, not the existing-content
-    migration, the draft row's Add/Cancel layout, or cleanup of spent Java
-    migration code. The latter remains story 2's conditional follow-up.
+  - Rich-mode preset suggestions use canonical base keys and never generate
+    numbered alternatives, in both Add property and stored-row key fields.
+    Keep the existing note versus folder/notebook-readme preset sets and filtering.
+  - In Add property, an occupied list-capable preset such as `url` or
+    `example of` remains available under its base key. Confirming another value
+    follows the existing exact-key append rule: a scalar becomes a list, and an
+    existing list gains the value in order, preserving earlier values.
+  - Owner decision, 2026-10-01: omit occupied scalar-only and singleton
+    preset slots rather than offering numbered alternatives. This includes
+    `image`, `wikidata_id`, `question_generation_instruction`, `title_pattern`
+    in readme context, and the existing note-only singletons `aliases`,
+    `overlaps`, and `note_level`. Recognized legacy aliases and numbered keys
+    continue to count as occupying these slots, as the current family rules do.
+    Authors edit the existing row to change its value. Preserve scalar-only
+    structural rules; removing suffix generation does not permit structural lists.
+  - Owner decision, 2026-10-01: when editing a stored row's key, omit a
+    preset whose exact base key is already used by another row, including
+    list-capable keys. Ignore the current row when checking occupancy, so its
+    own canonical preset remains available unless another row occupies it.
+    Renaming is not adding a value. Preserve the existing duplicate-key
+    validation if an author manually enters another row's exact key; do not
+    merge rows or move trackers as a new rename behavior. This rejection follows
+    `validatePropertyRowsForRichEdit` and `commitRow`'s current duplicate rule.
+  - Remove numbered-key generation functions and exports made unused by this
+    change, including the `nextAvailablePropertyKeyFor*` responsibility and its
+    obsolete tests. Keep `propertyKeyBaseAndSuffix` and other recognition needed
+    by structural controls, validation, and authored legacy content.
+  - Deferred promises: migrating existing keys or trackers (story 2), merging
+    rows or learning histories, changing exact-key matching or alias/case
+    normalization, prohibiting manually authored numbered keys, changing the
+    draft row's Add/Cancel layout, and cleaning up spent Java migration code.
+    These are delivery exclusions, not additional product rejection rules.
 - **Key examples:**
   - Note has `example of: "[[run]]"` → open Add property's key suggestions →
-    choose `example of`, enter `[[past tense]]`, and add → one `example of` list
-    holds both values; Donut suggests and creates no `example of 2`.
-  - Note has `url: "https://one.example"` → choose the `url` suggestion and add
-    `https://two.example` → both URLs share the `url` list, without a `url 2` key.
-  - Existing note has a legacy `example of 2` → view/edit → it remains readable;
-    this authoring correction does not migrate its content or move its tracker.
-- **Proof gap to close:** drive the mounted editor through an occupied preset
-  selection and observe saved Markdown and suggestions. Expected options must
-  express the product promise directly, not be computed by the same generator
-  under test. Extend the existing authoring journey where it owns this boundary.
-- **Open refinement:** how occupied scalar-only presets are offered or omitted;
-  how choosing an occupied key while renaming an existing row should behave;
-  verify integration with SEED-064#story-6's draft row when delivered.
+    choose `example of`, enter `[[past tense]]`, and confirm → saved Markdown
+    has one `example of` list with both values in that order; neither the
+    suggestions nor saved content gains a generated `example of 2`.
+  - Note has `url: ["https://one.example", "https://two.example"]` → choose
+    `url` in Add property and confirm `https://three.example` → the same list
+    holds all three URLs, without a generated `url 2` key.
+  - Note has `image: "/one.png"` and `wikidataId: "Q1"` → open Add property's
+    suggestions → occupied `image` and `wikidata_id` slots are omitted; no
+    `image 2` or `wikidata_id 2` is offered. Existing values remain editable.
+  - Folder/notebook readme has `titlePattern: "Topic *"` → open Add property's
+    suggestions → the occupied `title_pattern` slot is omitted without a
+    numbered substitute; note-only presets stay absent as today.
+  - Note has separate `topic` and `url` rows → open `topic`'s key suggestions →
+    occupied `url` is omitted; manually renaming `topic` to `url` keeps the
+    current duplicate-key error and leaves saved content unchanged. Opening
+    the `url` row's own suggestions still offers `url` when no other row uses it.
+  - Existing note has a legacy `example of 2` → view/edit → it remains readable
+    and retains its tracker. If no exact `example of` key exists, choosing that
+    base preset adds it without silently consolidating the legacy row.
+- **Proof boundary:** the mounted editor must exercise occupied preset selection
+  and observe saved Markdown and literal option names, rather than deriving
+  expected options from the generator under test. Extend the existing authoring
+  journey for persistence through save/reload. These are refinement examples,
+  not a slice plan or newly executed verification.
+- **Current evidence (2026-10-01):** static inspection confirms Add property
+  appends to an exact occupied list-capable key, while stored-row commit rejects
+  duplicate exact keys. The shared preset component already receives the
+  current row index for occupancy exclusion. The suffix parser remains used by
+  structural-key recognition and note-level validation; it is not obsolete.
+- **Open decisions:** none for the selected outcome. The owner accepted the
+  occupied-preset rules on 2026-10-01 and requested slice planning. No new
+  structural or rename behavior is required to achieve the authoring outcome.
 - **Effort hypothesis:** S–M, medium confidence; the generator is shared, while
-  the list append capability already exists. No executable plan is created here.
+  the list append capability already exists.
+- **Plan:** [Property key suggestions use meaningful base keys](../slice-plans/008-property-key-suggestions/PLAN.md).
 - **Depends on:** per-value tracking and list append already delivered. Coordinate
-  with SEED-064#story-6's shared key field; it does not own this correction.
+  with [SEED-064#story-6](SEED-064-note-properties-fixes.md#story-6)'s shared key
+  field at execution: it is currently Taken and planned, not a prerequisite of
+  this story. Apply the same suggestion rules to whichever Add property surface
+  is current at delivery; this refinement changes no sibling story.
 - **Safe stopping point:** new authoring stops growing the legacy convention;
   existing numbered content continues working until story 2 migrates it.
 
