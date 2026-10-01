@@ -117,22 +117,26 @@ public final class NoteContentMarkdown {
   }
 
   public record ConsolidatedProperties(
-      String content, Map<PropertyFocus, PropertyFocus> focuses, String diagnostic) {}
+      String content,
+      Map<PropertyFocus, PropertyFocus> focuses,
+      Set<String> sourceKeys,
+      String diagnostic) {}
 
   /** Returns exact source-to-list focuses, or a diagnostic without transformed content. */
   public static ConsolidatedProperties consolidateNumberedProperties(String content) {
     if (content == null) {
-      return new ConsolidatedProperties(null, Map.of(), null);
+      return new ConsolidatedProperties(null, Map.of(), Set.of(), null);
     }
     var split = NoteLeadingFrontmatter.splitPreservingSource(content);
     if (split.isEmpty()) {
-      return new ConsolidatedProperties(content, Map.of(), null);
+      return new ConsolidatedProperties(content, Map.of(), Set.of(), null);
     }
     var result = FrontmatterInPlaceEdit.consolidateNumberedProperties(split.get().yamlRaw());
     if (result.diagnostic() != null) {
-      return new ConsolidatedProperties(null, Map.of(), result.diagnostic());
+      return new ConsolidatedProperties(null, Map.of(), Set.of(), result.diagnostic());
     }
-    return new ConsolidatedProperties(split.get().rebuild(result.yaml()), result.focuses(), null);
+    return new ConsolidatedProperties(
+        split.get().rebuild(result.yaml()), result.focuses(), result.sourceKeys(), null);
   }
 
   /**

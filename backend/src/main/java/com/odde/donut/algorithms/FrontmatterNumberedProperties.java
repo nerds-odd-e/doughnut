@@ -15,6 +15,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
@@ -33,7 +34,7 @@ final class FrontmatterNumberedProperties {
     try {
       Node document = new Yaml().compose(new StringReader(yamlRaw));
       if (!(document instanceof MappingNode mapping)) {
-        return new ConsolidatedProperties(null, Map.of(), "Frontmatter is not a mapping");
+        return new ConsolidatedProperties(null, Map.of(), Set.of(), "Frontmatter is not a mapping");
       }
       Object loaded = new Yaml().load(yamlRaw);
       Map<?, ?> values = (Map<?, ?>) loaded;
@@ -41,7 +42,8 @@ final class FrontmatterNumberedProperties {
       for (NodeTuple tuple : mapping.getValue()) {
         if (!(tuple.getKeyNode() instanceof ScalarNode key)
             || entries.putIfAbsent(key.getValue(), tuple) != null) {
-          return new ConsolidatedProperties(null, Map.of(), "Ambiguous authored property key");
+          return new ConsolidatedProperties(
+              null, Map.of(), Set.of(), "Ambiguous authored property key");
         }
       }
       Map<String, List<String>> families = new LinkedHashMap<>();
@@ -52,13 +54,15 @@ final class FrontmatterNumberedProperties {
         }
       }
       if (families.isEmpty()) {
-        return new ConsolidatedProperties(yamlRaw, Map.of(), null);
+        return new ConsolidatedProperties(yamlRaw, Map.of(), Set.of(), null);
       }
       if (mapping.getFlowStyle() == DumperOptions.FlowStyle.FLOW) {
-        return new ConsolidatedProperties(null, Map.of(), "Flow mapping cannot be edited in place");
+        return new ConsolidatedProperties(
+            null, Map.of(), Set.of(), "Flow mapping cannot be edited in place");
       }
       List<Replacement> replacements = new ArrayList<>();
       Map<PropertyFocus, PropertyFocus> focuses = new LinkedHashMap<>();
+      Set<String> sourceKeys = new LinkedHashSet<>();
       Map<Object, Object> expected = new LinkedHashMap<>(values);
       for (var family : families.entrySet()) {
         String base = family.getKey();
@@ -69,10 +73,12 @@ final class FrontmatterNumberedProperties {
           keys.addFirst(base);
         }
         LinkedHashSet<String> items = new LinkedHashSet<>();
+        sourceKeys.addAll(keys);
         for (String key : keys) {
           var value = FrontmatterPropertyValues.fromYamlObject(values.get(key));
           if (value.isEmpty()) {
-            return new ConsolidatedProperties(null, Map.of(), "Unsupported property value: " + key);
+            return new ConsolidatedProperties(
+                null, Map.of(), Set.of(), "Unsupported property value: " + key);
           }
           List<String> sourceItems =
               switch (value.get()) {
@@ -113,12 +119,13 @@ final class FrontmatterNumberedProperties {
       String transformed = splice(yamlRaw, replacements);
       if (!expected.equals(new Yaml().load(transformed))) {
         return new ConsolidatedProperties(
-            null, Map.of(), "Cannot preserve authored property meanings");
+            null, Map.of(), Set.of(), "Cannot preserve authored property meanings");
       }
-      return new ConsolidatedProperties(transformed, Map.copyOf(focuses), null);
+      return new ConsolidatedProperties(
+          transformed, Map.copyOf(focuses), Set.copyOf(sourceKeys), null);
     } catch (YAMLException invalid) {
       return new ConsolidatedProperties(
-          null, Map.of(), "Unsupported YAML: " + invalid.getMessage());
+          null, Map.of(), Set.of(), "Unsupported YAML: " + invalid.getMessage());
     }
   }
 }

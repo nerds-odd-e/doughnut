@@ -94,3 +94,18 @@ suite waits excepted). Thirteen slices result; no source outcome or architecture
 change is required. Later slices retain their promises in the same order. The
 prior nine-minute transformation attempt and ten-minute operation attempt remain
 recorded; subdivision does not erase elapsed work or claim missing proof.
+
+## Slice 3 accepted proof
+
+`CURSOR_DEV=true nix develop -c pnpm backend:verify` passed: 2750 tests,
+zero failures/errors, two skipped. All four parameter cases in
+`NumberedPropertyMigrationControllerTest.anUnmappableFocusLeavesTheWholeNotebookUnchanged`
+passed. Each fixture places a valid learned family before the invalid note.
+The trigger is the real migration notebook operation; committedState captures
+fresh controller content, persisted tracker identities/focus/type/state/schedule/
+FSRS and serialized controller recall histories. Equality after diagnostic plus
+unchanged downloaded acceptedHistory proves complete refusal without mutation.
+The cases cover orphan items, empty source lists, tracked empty values and
+oversized persisted destinations. Independent refactor found no edits; formatter
+passed. Continuation took five active minutes after the recorded ten-minute
+attempt. Successful transformation/publication remains slice 4's proof obligation.

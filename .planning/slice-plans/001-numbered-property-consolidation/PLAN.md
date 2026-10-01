@@ -73,7 +73,8 @@ migration framework. Preserve scalar-only structural and word-suffix keys.
 
 ### 3. Unmappable notebook operations leave all state unchanged
 Type: Behavior
-Status: planned
+Status: done
+Accepted proof: see [slice 3](EXECUTION.md#slice-3-accepted-proof).
 Proof: Invoke the notebook migration on an orphan item focus, an empty source
 list with a persisted scalar focus, a tracked empty destination and an oversized
 tracked destination. Observe a diagnostic and unchanged content/accepted history

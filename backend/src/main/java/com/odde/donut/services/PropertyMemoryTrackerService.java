@@ -6,6 +6,8 @@ import com.odde.donut.entities.PropertyFocus;
 import com.odde.donut.entities.repositories.MemoryTrackerRepository;
 import com.odde.donut.factoryServices.EntityPersister;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -68,6 +70,40 @@ public class PropertyMemoryTrackerService {
             tracker -> {
               tracker.setPropertyValue(propertyValue);
               entityPersister.save(tracker);
+            });
+  }
+
+  /** Checks every persisted learner's focus before a complete family change mutates anything. */
+  public String consolidationDiagnostic(
+      Note note, Map<PropertyFocus, PropertyFocus> focuses, Set<String> sourceKeys) {
+    for (MemoryTracker tracker : memoryTrackerRepository.findByNote_IdIn(List.of(note.getId()))) {
+      PropertyFocus destination = focuses.get(tracker.propertyFocus());
+      if (destination != null
+          && (destination.key().codePointCount(0, destination.key().length()) > 255
+              || destination.value().codePointCount(0, destination.value().length()) > 255)) {
+        return "Property focus exceeds the persisted column limit";
+      }
+      if (sourceKeys.contains(tracker.getPropertyKey())
+          && (!focuses.containsKey(tracker.propertyFocus())
+              || focuses.get(tracker.propertyFocus()).value().isEmpty())) {
+        return "Unmapped tracker focus: " + tracker.getId();
+      }
+    }
+    return null;
+  }
+
+  /** Retains tracker identity and learning fields while applying an already checked mapping. */
+  public void followConsolidatedProperties(Note note, Map<PropertyFocus, PropertyFocus> focuses) {
+    memoryTrackerRepository
+        .findByNote_IdIn(List.of(note.getId()))
+        .forEach(
+            tracker -> {
+              PropertyFocus destination = focuses.get(tracker.propertyFocus());
+              if (destination != null) {
+                tracker.setPropertyKey(destination.key());
+                tracker.setPropertyValue(destination.value());
+                entityPersister.save(tracker);
+              }
             });
   }
 
