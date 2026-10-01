@@ -107,7 +107,8 @@ Keep the startup caller absent until slice 13.
 
 ### 5. Sparse and already-listed families use the same rule
 Type: Behavior
-Status: planned
+Status: done
+Accepted proof: see [slice 5](EXECUTION.md#slice-5-accepted-proof).
 Proof: Invoke the migration on missing-base/out-of-order suffixes and an
 existing base list; observe the selected order and tracker destinations through
 the same boundary. Include an untracked `url 2` and retained structural/word

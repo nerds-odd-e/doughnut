@@ -123,3 +123,15 @@ and one descendant count/parent with Donut System author/message. The fixture
 supplies a bound notebook with two learned scalar associations. Independent
 refactor found no edits; formatter passed. No production/API changes. Continuation
 stayed within five active minutes; prior attempt remains recorded.
+
+## Slice 5 accepted proof
+
+`CURSOR_DEV=true nix develop -c pnpm backend:verify` passed: 2753 tests,
+zero failures/errors, two skipped. Both cases in
+`NumberedPropertyMigrationListControllerTest` passed. Real migration followed
+by fresh committed controller content and exact ID-to-focus maps proves sparse
+numeric order, existing-list precedence, stable deduplication, scalar/item
+destinations and no tracker cloning. The sparse fixture also proves untracked
+url consolidation and structural/word-key preservation. Independent refactor
+found no edits; coordinator formatter passed. No production/API changes;
+implementation took approximately five active minutes.
