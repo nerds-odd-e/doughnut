@@ -27,7 +27,7 @@ confusing, even when the convention is explained in AI instructions.
 
 **Identity:** SEED-063#story-2
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/001-numbered-property-consolidation/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"42ec34c66cf63185acde46dc7e6574b7249b728a9afcf9234fdd7cbc10559d58","plan":"e019e0b4420e8e322848ab94a7fdb677125aeaae3d0f58d9f0d681f2969a78e2"}}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/001-numbered-property-consolidation/PLAN.md","assessment":"not-ready","reasons":["Migration reference-resolution visibility remains a human-owned domain choice; preserve current-reader semantics before selector rewrites"],"basis":{"document":"42ec34c66cf63185acde46dc7e6574b7249b728a9afcf9234fdd7cbc10559d58","plan":"0a1e88733412e7ade187bc994a371f2d0a58b5a604770c4c6f8080016698065f"}}
 ```
 
 - **Goal:** existing notebook authors and learners see multiple associations

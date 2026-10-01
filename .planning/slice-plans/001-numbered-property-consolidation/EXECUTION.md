@@ -208,3 +208,31 @@ duplicates. Remaining reference/atomic/retry/startup promises still form this
 story; the concrete sizing issue is hidden source correspondence and fixture
 observations, not a new beneficiary or outcome. Each continuation targets five
 active minutes; prior elapsed work and failed proof remain recorded.
+
+## Reference scope Jidoka stop
+
+Slice 9 continuation grounded maps in exact authored ListItems and composed
+family/identity mappings. Full backend:verify passed 2758 tests, zero failures,
+two skipped; SelectorRefusalControllerTest proves affected-orphan refusal with
+unchanged committed controller/tracker/history and downloaded accepted history.
+Continuation took five active minutes after the prior nine-minute attempt.
+It is not delivered: fresh refactor returned REFACTOR JIDOKA STOP because the
+new system classifier changes the viewer-dependent resolution of ADR 0004.
+
+The existing candidate lookup spans same-name notebooks across owners; removing
+readability before cardinality adds invisible ambiguity. A distinguishing real
+ReferenceVisibilityControllerTest proves the reader resolves its target before
+migration, then loses the link: target Markdown is consolidated, but live and
+downloaded source retain the removed selector. Final backend:verify ran 2759
+tests, one intended regression failure, two skipped. Its first run exposed an
+observation getFirst() error; complete-list/assertAll observations captured the
+actual regression on the final run. Investigation took four active minutes.
+
+The user visibility choice is pending: preserve every current reader's results,
+reporting inconsistent rewrites unchanged, or resolve using the source notebook's
+current owner(s). No policy, ADR exception, or weakened promise was assumed.
+Current seven owned production edits plus both tests are safely parked in
+`/tmp/numbered-property-selector-scope-attempt/`; owned workspace paths were
+individually restored/removed. Original positive journey remains separately
+parked. Slices 1–8 stay delivered; 9–14 remain unaccepted. Resume only after the
+reference-resolution meaning and matching proof are settled.

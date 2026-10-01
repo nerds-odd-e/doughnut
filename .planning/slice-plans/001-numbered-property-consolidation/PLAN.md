@@ -147,6 +147,7 @@ complete accepted operation unchanged, including the deletion fan-out.
 ### 9. Rewritten list focuses must follow authored source items
 Type: Behavior
 Status: planned
+Decision stop: see [reference scope](EXECUTION.md#reference-scope-jidoka-stop).
 Proof: A valid list reference and an orphan persisted focus containing the same
 selector → invoke migration → diagnostic and complete unchanged content,
 trackers and downloaded accepted history. Run the full backend suite.
