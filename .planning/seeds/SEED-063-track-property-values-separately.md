@@ -59,7 +59,7 @@ When selecting note property or memory tracking improvements from the backlog.
   convention with multiple values of one property, each tracked independently.
 - Related: reifying a single-link property into a relationship note exists in the product and refuses
   structural keys; it is not a prerequisite of this seed.
-- Related UAT fixes: [SEED-064#story-6](SEED-064-note-properties-fixes.md#story-6) (add-property row) uses the
-  per-value rule for an existing key. The remaining numbered-key code is `propertyKeyBaseAndSuffix` and
+- Rich property drafts use the per-value rule for an existing key; see
+  [rich property editing](../../docs/note-content-saving.md#rich-property-editing). The remaining numbered-key code is `propertyKeyBaseAndSuffix` and
   `nextAvailablePropertyKeyFor*` in `frontend/src/utils/noteContentPropertyKeys.ts`; the backend no longer
   creates numbered keys.
