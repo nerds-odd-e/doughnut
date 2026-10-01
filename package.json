@@ -6,8 +6,8 @@
   "author": "Terry Yin <terry.yinzhe@gmail.com>",
   "license": "MIT",
   "engines": {
-    "node": ">=26.7",
-    "pnpm": ">=11.28.2"
+    "node": ">=26.10",
+    "pnpm": ">=11.28.3"
   },
   "scripts": {
     "preinstall": "npx only-allow pnpm",
@@ -123,5 +123,5 @@
   "dependencies": {
     "vue-toastification": "2.0.0-rc.5"
   },
-  "packageManager": "pnpm@11.28.2"
+  "packageManager": "pnpm@11.28.3"
 }
