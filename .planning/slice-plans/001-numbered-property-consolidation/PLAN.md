@@ -121,7 +121,8 @@ Do not treat a tracked list as a scalar or clone its tracker onto all items.
 
 ### 6. Every learner's persisted tracker follows
 Type: Behavior
-Status: planned
+Status: done
+Accepted proof: see [slice 6](EXECUTION.md#slice-6-accepted-proof).
 Proof: Two learners with distinct tracking states → one migration operation →
 both query their original tracker IDs at the new focuses; an unrelated tracker
 retains its focus. Run the full backend suite.

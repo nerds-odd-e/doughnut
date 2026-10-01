@@ -135,3 +135,16 @@ destinations and no tracker cloning. The sparse fixture also proves untracked
 url consolidation and structural/word-key preservation. Independent refactor
 found no edits; coordinator formatter passed. No production/API changes;
 implementation took approximately five active minutes.
+
+## Slice 6 accepted proof
+
+`CURSOR_DEV=true nix develop -c pnpm backend:verify` passed: 2754 tests,
+zero failures/errors, two skipped; LearnersControllerTest XML records one pass.
+The real operation moves two learners' persisted scalar trackers, including an
+inactive one. Fresh committed showMemoryTracker reads under each actual learner
+observe original IDs, ownership, new focuses and retained inactive state; the
+unrelated focus stays unchanged. First verification failed during fixture setup
+on a detached User before migration; reloading it in the fixture transaction
+corrected setup. No product defect inferred. Independent refactor found no
+edits; formatter passed. Six active minutes including correction, waits exempt;
+no production/API changes.
