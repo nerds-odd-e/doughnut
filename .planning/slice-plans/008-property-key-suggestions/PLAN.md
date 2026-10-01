@@ -24,11 +24,10 @@ Continue in the established preparation workspace
 Preparation assignment: Mihiro-chan, SEED-063#story-3. Publication target is `origin/main`; integration checkout is
 `/Users/terryyin/git/doughnut`. This plan does not Take the story or publish the preparation draft.
 
-SEED-064#story-6 is Taken on another worktree and changes the draft's confirmation and selectors. It does not own
-preset availability. Before execution, inspect its current delivered state and adapt the test/page-object confirmation
-to the current surface; do not copy its draft redesign or require its completion. Today's form confirms on value blur;
-its planned replacement confirms with Add/Enter. Preserve this story's preset-selection and saved-content assertions
-through reconciliation. A materially changed append or rename rule returns to story review.
+The [shared property draft](../../../docs/note-content-saving.md#rich-property-editing) now confirms with Add/Enter.
+That delivered change leaves preset availability unchanged. Before execution, adapt test/page-object confirmation
+to the current surface. Preserve this story's preset-selection and saved-content assertions through reconciliation.
+A materially changed append or rename rule returns to story review.
 
 ## Existing solutions and design
 

@@ -219,10 +219,9 @@ confusing, even when the convention is explained in AI instructions.
   the list append capability already exists.
 - **Plan:** [Property key suggestions use meaningful base keys](../slice-plans/008-property-key-suggestions/PLAN.md).
 - **Depends on:** per-value tracking and list append already delivered. Coordinate
-  with [SEED-064#story-6](SEED-064-note-properties-fixes.md#story-6)'s shared key
-  field at execution: it is currently Taken and planned, not a prerequisite of
-  this story. Apply the same suggestion rules to whichever Add property surface
-  is current at delivery; this refinement changes no sibling story.
+  with the [shared property draft](../../docs/note-content-saving.md#rich-property-editing)
+  key field at execution. Apply the same suggestion rules to the current Add
+  property surface; this refinement changes no sibling story.
 - **Safe stopping point:** new authoring stops growing the legacy convention;
   existing numbered content continues working until story 2 migrates it.
 
