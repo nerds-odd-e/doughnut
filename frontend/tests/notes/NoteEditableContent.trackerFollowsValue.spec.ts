@@ -142,10 +142,18 @@ async function appendInRichRow(
     .find((button) => button.text().includes("Add property"))
   ;(addButton!.element as HTMLButtonElement).click()
   await flushPromises()
-  await wrapper.find('[data-testid="rich-note-property-key"]').setValue(key)
-  const valueField = wrapper.find('[data-testid="rich-note-property-value"]')
+  await wrapper
+    .find(
+      '[data-property-draft="true"] [data-testid="rich-note-property-row-key-input"]'
+    )
+    .setValue(key)
+  const valueField = wrapper.find(
+    '[data-property-draft="true"] [data-testid="rich-note-property-row-value-input"]'
+  )
   valueField.element.textContent = value
   await valueField.trigger("input")
-  await valueField.trigger("blur")
+  await wrapper
+    .find('[data-testid="rich-note-property-row-add"]')
+    .trigger("click")
   await flushPromises()
 }

@@ -15,7 +15,8 @@ import {
 } from "./propertiesTestDom"
 import { createRichMarkdownEditorTestHarness } from "./richMarkdownEditorTestHarness"
 
-const INSERT_KEY_INPUT = '[data-testid="rich-note-property-key"]'
+const INSERT_KEY_INPUT =
+  '[data-property-draft="true"] [data-testid="rich-note-property-row-key-input"]'
 const ROW_KEY_INPUT = '[data-testid="rich-note-property-row-key-input"]'
 const ROW_VALUE_INPUT = '[data-testid="rich-note-property-row-value-input"]'
 
@@ -88,9 +89,14 @@ describe("RichMarkdownEditor property presets", () => {
         await selectPresetKey(key)
         const value = h
           .getWrapper()
-          .find('[data-testid="rich-note-property-value"]')
+          .find(
+            '[data-property-draft="true"] [data-testid="rich-note-property-row-value-input"]'
+          )
         await h.setPropertyValueField(value, added)
-        await value.trigger("blur")
+        await h
+          .getWrapper()
+          .find('[data-testid="rich-note-property-row-add"]')
+          .trigger("click")
         await flushPromises()
         const parsed = parseNoteContentMarkdown(h.lastEmittedMarkdown())
         expect(parsed.ok).toBe(true)
@@ -141,7 +147,7 @@ image: /x.png
       await selectPresetKey("wikidata_id")
       expect(propertyInputEl(INSERT_KEY_INPUT).value).toBe("wikidata_id")
       expectPropertyInputFocused(
-        '[data-testid="rich-note-wikidata-property-insert-edit"]'
+        '[data-property-draft="true"] [data-testid="rich-note-wikidata-property-edit"]'
       )
     })
   })

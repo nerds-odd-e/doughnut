@@ -80,7 +80,11 @@ export function useRichFrontmatterPropertyEditing(options: {
   function tryCommitInsert() {
     const key = options.draftKey.value.trim()
     const value = options.draftValue.value.trim()
-    if (!key || !value) return
+    if (!key || !value) {
+      const missingFields = !key ? (value ? "key" : "key and value") : "value"
+      options.setValidationMessage(`Enter a property ${missingFields}.`)
+      return
+    }
 
     let nextRows: PropertyRow[]
     if (findPropertyRowIndexByExactKey(options.propertyRows.value, key) >= 0) {
@@ -216,9 +220,6 @@ export function useRichFrontmatterPropertyEditing(options: {
     })
   }
 
-  const getPropertyRows = (): PropertyRow[] =>
-    filterForEmit(options.propertyRows.value)
-
   const headingVisible = computed(
     () => options.propertyRows.value.length > 0 || options.isReadOnly()
   )
@@ -241,7 +242,7 @@ export function useRichFrontmatterPropertyEditing(options: {
     commitRow,
     onRelationTypeSelected,
     addWikiLinkAsProperty,
-    getPropertyRows,
+    getPropertyRows: () => filterForEmit(options.propertyRows.value),
     headingVisible,
     showSection,
     showInsertChrome,

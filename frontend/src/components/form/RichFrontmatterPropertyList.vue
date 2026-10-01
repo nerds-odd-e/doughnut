@@ -1,5 +1,5 @@
 <template>
-  <component :is="readOnly ? 'dl' : 'div'" class="flex flex-col gap-2 text-sm">
+  <component :is="readOnly ? 'dl' : 'div'" class="flex flex-col gap-2 text-sm" data-testid="rich-note-property-list">
     <template v-for="(row, idx) in propertyRows" :key="rowClientIds[idx]">
     <RichFrontmatterPropertyRow
       v-model="propertyRows[idx]!"
@@ -26,6 +26,30 @@
       :message="validationMessage"
     />
     </template>
+    <RichFrontmatterPropertyRow
+      v-if="draftRow"
+      :model-value="draftRow"
+      :idx="propertyRows.length"
+      draft
+      :wiki-links="wikiLinks"
+      :last-saved-markdown="lastSavedMarkdown"
+      :note-id="noteId"
+      :property-rows="propertyRows"
+      :key-input-id="insertKeyInputId!"
+      :preset-list-id="insertKeyPresetListId!"
+      :is-focused="false"
+      :set-root-ref="() => {}"
+      @update:model-value="emit('update:draftRow', $event)"
+      @add="emit('add')"
+      @cancel="emit('cancel')"
+      @wikidata-dialog-open="emit('draft-wikidata-dialog-open')"
+      @dead-wiki-link-click="emit('dead-wiki-link-click', $event)"
+      @image-upload-state="emit('image-upload-state', $event)"
+    />
+    <RichFrontmatterPropertyValidationMessage
+      v-if="validationMessage && validationRowIndex === undefined"
+      :message="validationMessage"
+    />
   </component>
 </template>
 
@@ -41,6 +65,9 @@ import type { DeadWikiLinkPayload } from "@/utils/wikiLinkMarkup"
 const propertyRows = defineModel<PropertyRow[]>({ required: true })
 
 const props = defineProps<{
+  draftRow?: PropertyRow
+  insertKeyInputId?: string
+  insertKeyPresetListId?: string
   wikiLinks: WikiLink[]
   lastSavedMarkdown?: string
   noteId?: number
@@ -53,6 +80,10 @@ const props = defineProps<{
 const emit = defineEmits<{
   "row-focus": [idx: number]
   commit: [idx: number]
+  "update:draftRow": [row: PropertyRow]
+  add: []
+  cancel: []
+  "draft-wikidata-dialog-open": []
   remove: [idx: number]
   "wikidata-dialog-open": [idx: number]
   "dead-wiki-link-click": [payload: DeadWikiLinkPayload]

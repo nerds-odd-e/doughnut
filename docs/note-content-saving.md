@@ -58,6 +58,22 @@ panel and server-side property writes change only the affected entry's lines,
 so comments, key order, quoting and flow lists elsewhere stay as written, but
 each side makes its own edit.
 
+Add property opens one local draft at the end of the shared property list and
+focuses its key. Selecting Add property again focuses the same draft. Add, or
+Enter in the value field, accepts a complete draft once; Enter in the key field
+moves focus to its value. Leaving a draft field saves nothing. Add with a blank
+key or value (after trimming) names the missing fields beside the draft and
+preserves the entered text. Cancel drops the draft and its message without
+saving; reopening starts empty. Add and Cancel are at least 44 px high on touch
+devices.
+
+Drafts reuse the stored row's key presets and value displays, including wiki
+links, URL links, image upload and Wikidata association. Drafts have Add and
+Cancel controls rather than a property panel or value-dialog opener. A finished
+image upload and Wikidata dialog Save remain explicit confirmations that add the
+property. Drafts stay out of stored Markdown until accepted and are discarded
+when the editor is left or incoming parsed properties change.
+
 The panel edits through its property rows (`composeNoteContentInPlace` in the
 frontend): a changed value rewrites that `key: value`, a removal deletes its
 lines, a new property is appended before the closing fence, and a rename

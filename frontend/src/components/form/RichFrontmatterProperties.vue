@@ -25,8 +25,15 @@
       </button>
     </div>
     <RichFrontmatterPropertyList
-      v-if="propertyRows.length > 0"
+      v-if="propertyRows.length > 0 || insertOpen"
       v-model="propertyRows"
+      :draft-row="showInsertChrome && insertOpen ? draftRow : undefined"
+      :insert-key-input-id="insertKeyInputId"
+      :insert-key-preset-list-id="insertKeyPresetListId"
+      @update:draft-row="draftRow = $event"
+      @add="tryCommitInsert"
+      @cancel="resetPropertyInsert"
+      @draft-wikidata-dialog-open="openWikidataDialog({ type: 'insert' })"
       :wiki-links="wikiLinks"
       :last-saved-markdown="lastSavedMarkdown"
       :note-id="noteId"
@@ -42,12 +49,8 @@
       @relation-type-selected="onRelationTypeSelected"
       @image-upload-state="emits('image-upload-state', $event)"
     />
-    <RichFrontmatterPropertyValidationMessage
-      v-if="validationMessage && validationRowIndex === undefined"
-      :message="validationMessage"
-    />
     <button
-      v-if="showInsertChrome && !insertOpen && propertyRows.length === 0"
+      v-if="showInsertChrome && propertyRows.length === 0"
       type="button"
       class="daisy-btn daisy-btn-ghost daisy-btn-sm inline-flex self-start items-center gap-1"
       @click="openPropertyInsert"
@@ -55,24 +58,6 @@
       <Plus class="h-4 w-4" aria-hidden="true" />
       Add property
     </button>
-    <RichFrontmatterInsertForm
-      v-if="showInsertChrome && insertOpen"
-      :insert-open="insertOpen"
-      :draft-key="draftKey"
-      :draft-value="draftValue"
-      :wiki-links="wikiLinks"
-      :last-saved-markdown="lastSavedMarkdown"
-      :note-id="noteId"
-      :property-rows="propertyRows"
-      :insert-key-input-id="insertKeyInputId"
-      :insert-key-preset-list-id="insertKeyPresetListId"
-      @update:draft-key="draftKey = $event"
-      @update:draft-value="draftValue = $event"
-      @value-blur="tryCommitInsert"
-      @dead-wiki-link-click="emits('deadWikiLinkClick', $event)"
-      @wikidata-dialog-open="openWikidataDialog({ type: 'insert' })"
-      @image-upload-state="emits('image-upload-state', $event)"
-    />
   </section>
   <WikidataAssociationDialog
     v-if="wikidataDialogOpen"
@@ -94,10 +79,8 @@
 import { Plus } from "@lucide/vue"
 import { isEqual } from "es-toolkit"
 import { computed, provide, ref, useId, watch } from "vue"
-import RichFrontmatterInsertForm from "@/components/form/RichFrontmatterInsertForm.vue"
 import RichFrontmatterPropertyList from "@/components/form/RichFrontmatterPropertyList.vue"
 import RichFrontmatterPropertyNotFound from "@/components/form/RichFrontmatterPropertyNotFound.vue"
-import RichFrontmatterPropertyValidationMessage from "@/components/form/RichFrontmatterPropertyValidationMessage.vue"
 import { richFrontmatterIsReadmeContextKey } from "@/components/form/richFrontmatterProvide"
 import WikidataAssociationDialog from "@/components/notes/WikidataAssociationDialog.vue"
 import type { WikiLink } from "@generated/donut-backend-api"
@@ -108,6 +91,10 @@ import {
   propertyRowsFromNoteProperties,
   type PropertyRow,
 } from "@/utils/noteContentFrontmatter"
+import {
+  scalarPropertyValue,
+  scalarStringFromPropertyValue,
+} from "@/utils/noteProperties"
 import type { DeadWikiLinkPayload } from "@/utils/wikiLinkMarkup"
 
 const props = defineProps<{
@@ -142,6 +129,16 @@ const propertyRows = ref<PropertyRow[]>([])
 const insertOpen = ref(false)
 const draftKey = ref("")
 const draftValue = ref("")
+const draftRow = computed<PropertyRow>({
+  get: () => ({
+    key: draftKey.value,
+    value: scalarPropertyValue(draftValue.value),
+  }),
+  set: (row) => {
+    draftKey.value = row.key
+    draftValue.value = scalarStringFromPropertyValue(row.value) ?? ""
+  },
+})
 const validationMessage = ref("")
 const validationRowIndex = ref<number>()
 const rowSnapshots = ref<Record<number, PropertyRow>>({})
@@ -159,6 +156,13 @@ const setValidationMessage = (msg: string, rowIndex?: number) => {
 const clearValidation = () => {
   validationMessage.value = ""
   validationRowIndex.value = undefined
+}
+
+function resetPropertyInsert() {
+  insertOpen.value = false
+  draftKey.value = ""
+  draftValue.value = ""
+  clearValidation()
 }
 
 const {
@@ -225,10 +229,7 @@ watch(
     propertyRows.value = properties
       ? propertyRowsFromNoteProperties(properties)
       : []
-    insertOpen.value = false
-    draftKey.value = ""
-    draftValue.value = ""
-    clearValidation()
+    resetPropertyInsert()
     rowSnapshots.value = {}
     resetDialog()
   },
