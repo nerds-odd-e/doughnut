@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 1,
+  "agent": "Rio-chan",
+  "email": "rio-chan@example.org",
+  "identity": "SEED-063#story-2",
+  "mode": "story-branch",
+  "branch": "codex/existing-numbered-property-keys-become-one-list",
+  "host": "codex"
+}
