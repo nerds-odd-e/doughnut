@@ -145,7 +145,8 @@ not only available notes; do not recreate Trash ancestry rules.
 
 ### 8. Duplicate destinations retain one tracker safely
 Type: Behavior
-Status: planned
+Status: done
+Accepted proof: see [slice 8](EXECUTION.md#slice-8-accepted-proof).
 Proof: Duplicate mapping → migration → the deterministic survivor keeps its
 history/schedule; only redundant trackers and their normal dependent data are
 removed. Seed every tracker FK child and the prompt/conversation edge. Include

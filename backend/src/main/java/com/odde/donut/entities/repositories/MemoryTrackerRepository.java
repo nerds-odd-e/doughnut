@@ -100,6 +100,13 @@ public interface MemoryTrackerRepository extends CrudRepository<MemoryTracker, I
 
   List<MemoryTracker> findByNote_IdIn(List<Integer> noteIds);
 
+  /** Equality of projected focuses under the collation of the persisted unique focus key. */
+  @Query(
+      value =
+          "SELECT CONVERT(:leftKey USING utf8mb4) COLLATE utf8mb4_0900_ai_ci = CONVERT(:rightKey USING utf8mb4) COLLATE utf8mb4_0900_ai_ci AND CONVERT(:leftValue USING utf8mb4) COLLATE utf8mb4_0900_ai_ci = CONVERT(:rightValue USING utf8mb4) COLLATE utf8mb4_0900_ai_ci",
+      nativeQuery = true)
+  long equalPersistedFocus(String leftKey, String leftValue, String rightKey, String rightValue);
+
   String byUserIdFrom =
       " FROM memory_tracker rp "
           + " JOIN note n ON rp.note_id = n.id "

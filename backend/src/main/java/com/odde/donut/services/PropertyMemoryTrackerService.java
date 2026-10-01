@@ -5,6 +5,8 @@ import com.odde.donut.entities.Note;
 import com.odde.donut.entities.PropertyFocus;
 import com.odde.donut.entities.repositories.MemoryTrackerRepository;
 import com.odde.donut.factoryServices.EntityPersister;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -18,14 +20,17 @@ public class PropertyMemoryTrackerService {
   private final EntityPersister entityPersister;
   private final UserService userService;
   private final MemoryTrackerRepository memoryTrackerRepository;
+  private final MemoryTrackerService memoryTrackerService;
 
   public PropertyMemoryTrackerService(
       EntityPersister entityPersister,
       UserService userService,
-      MemoryTrackerRepository memoryTrackerRepository) {
+      MemoryTrackerRepository memoryTrackerRepository,
+      MemoryTrackerService memoryTrackerService) {
     this.entityPersister = entityPersister;
     this.userService = userService;
     this.memoryTrackerRepository = memoryTrackerRepository;
+    this.memoryTrackerService = memoryTrackerService;
   }
 
   public void updatePropertyKey(MemoryTracker memoryTracker, String newPropertyKey) {
@@ -94,17 +99,47 @@ public class PropertyMemoryTrackerService {
 
   /** Retains tracker identity and learning fields while applying an already checked mapping. */
   public void followConsolidatedProperties(Note note, Map<PropertyFocus, PropertyFocus> focuses) {
-    memoryTrackerRepository
-        .findByNote_IdIn(List.of(note.getId()))
-        .forEach(
-            tracker -> {
-              PropertyFocus destination = focuses.get(tracker.propertyFocus());
-              if (destination != null) {
-                tracker.setPropertyKey(destination.key());
-                tracker.setPropertyValue(destination.value());
-                entityPersister.save(tracker);
-              }
-            });
+    List<MemoryTracker> trackers =
+        new ArrayList<>(memoryTrackerRepository.findByNote_IdIn(List.of(note.getId())));
+    trackers.sort(
+        Comparator.comparing(
+                (MemoryTracker tracker) ->
+                    !equalPersistedFocus(tracker.propertyFocus(), destination(tracker, focuses)))
+            .thenComparing(MemoryTracker::getId));
+    List<MemoryTracker> survivors = new ArrayList<>();
+    List<MemoryTracker> redundant = new ArrayList<>();
+    for (MemoryTracker tracker : trackers) {
+      boolean duplicate =
+          survivors.stream()
+              .anyMatch(
+                  retained ->
+                      retained.getUser().getId().equals(tracker.getUser().getId())
+                          && retained.getType() == tracker.getType()
+                          && equalPersistedFocus(
+                              destination(retained, focuses), destination(tracker, focuses)));
+      (duplicate ? redundant : survivors).add(tracker);
+    }
+    redundant.forEach(memoryTrackerService::delete);
+    survivors.forEach(
+        tracker -> {
+          PropertyFocus destination = focuses.get(tracker.propertyFocus());
+          if (destination != null) {
+            tracker.setPropertyKey(destination.key());
+            tracker.setPropertyValue(destination.value());
+            entityPersister.save(tracker);
+          }
+        });
+  }
+
+  private static PropertyFocus destination(
+      MemoryTracker tracker, Map<PropertyFocus, PropertyFocus> focuses) {
+    return focuses.getOrDefault(tracker.propertyFocus(), tracker.propertyFocus());
+  }
+
+  private boolean equalPersistedFocus(PropertyFocus left, PropertyFocus right) {
+    return memoryTrackerRepository.equalPersistedFocus(
+            left.key(), left.value(), right.key(), right.value())
+        == 1;
   }
 
   /**

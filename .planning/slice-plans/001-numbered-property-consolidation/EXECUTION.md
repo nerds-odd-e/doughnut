@@ -161,3 +161,21 @@ only on unquoted expected Markdown; correcting it to the shared transformer's
 double-quoted items passed full verification. Independent refactor found no
 edits; formatter passed. Four active minutes, waits exempt; no production/API
 changes or weakened promise.
+
+## Slice 8 accepted proof
+
+`CURSOR_DEV=true nix develop -c pnpm backend:verify` passed: 2757 tests,
+zero failures/errors, two skipped, both DuplicatesControllerTest cases pass.
+Native MySQL equality drives existing-destination/lowest-ID survivor selection,
+including case/accent equivalents and inactive rows. Committed controller state
+equality retains survivor learning; separate learners/types remain distinct.
+The full live FK closure was rechecked in the current isolated wt schema:
+tracker→batch request/log/prompt CASCADE; prompt→conversation SET NULL. Actual
+deletion assertions cover every edge and the retained conversation. Later
+rollback/retry/startup survivor outcomes are compatible with authorized deletion.
+First verification failed on numeric Boolean adaptation and fixture ownership
+cleanup; second on Hibernate's null embedded subject after SET NULL. Numeric
+adaptation, exact conversation-ID cleanup and corrected observation passed.
+No manual DB deletes. Implementation took 9.5 active minutes; hard limit not
+crossed. Fresh refactor simplified existence assertions to keep the test at
+249 lines and reran the full suite successfully. Formatter passed; no API change.
