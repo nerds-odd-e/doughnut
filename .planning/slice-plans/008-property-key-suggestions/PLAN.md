@@ -30,6 +30,17 @@ to the current surface; do not copy its draft redesign or require its completion
 its planned replacement confirms with Add/Enter. Preserve this story's preset-selection and saved-content assertions
 through reconciliation. A materially changed append or rename rule returns to story review.
 
+Execution resume identity (2026-10-01): Aino-chan, publisher `dashboard-mac.lan-doughnut`, Story Branch Mode;
+workspace and branch above; originating/integration checkout `/Users/terryyin/git/doughnut`.
+Established starting revision `f3662faa23e23e756f9e535cc77c4556ef749cf7`; published claim/base
+`c72f5da520605c11198cad422854549358d2010c`. Increment target is
+`origin/refs/heads/codex/property-key-suggestions-stop-creating-numbered`; closure target remains `origin/main`.
+Checkout setup `./scripts/run.sh bash scripts/worktree_setup.sh` and frontend typecheck passed.
+Existing planning authority permits refining remaining work when new evidence requires it; scope stays fixed.
+CI source: GitHub Actions `ci.yml` (push all branches), yielded Codex stream cell `15`, session `8050`,
+PID `62960`, mailbox `/tmp/dough-ci-501/watch-set2tC`, coordinator `dashboard-mac.lan-doughnut`.
+Claim publication on trunk predates this branch observer and is unobserved by it.
+
 ## Existing solutions and design
 
 PFE search across frontend, backend, CLI and MCP found one rich-mode preset policy:
@@ -62,7 +73,7 @@ Observed on product revision `9c1b40d756` on 2026-10-01; preparation prose chang
 | Premise | Consumed by | Literal observation and inspected boundary | Result |
 | --- | --- | --- | --- |
 | Selecting an occupied suggestion creates a numbered key instead of appending | slice 1 | Temporary mounted-editor case in `RichMarkdownEditor.propertyEntry.spec.ts`: mount `example of: "[[A]]"`, open Add property, assert literal options including `example of 2`, select it, enter `[[B]]`, blur; inspect emitted Markdown through the real parser. Command: `CURSOR_DEV=true nix develop -c pnpm frontend:test tests/components/form/RichMarkdownEditor.propertyEntry.spec.ts` | 18/18 passed including two temporary probes; the base stayed scalar and a second scalar key was created. Probe edits were removed afterward. This reproduces the symptom, not the desired remedy. |
-| Exact-key append and duplicate rename already work through the editor | slices 1, 3 | `CURSOR_DEV=true nix develop -c pnpm frontend:test tests/utils/noteContentPropertyKeyPresets.spec.ts tests/components/form/RichMarkdownEditor.propertyEntry.spec.ts tests/components/form/RichMarkdownEditor.propertyRowEditing.spec.ts`; inspect entry's `appends to exact list-capable keys without folding legacy suffixes` and row editing's `rejects duplicate keys before emitting valid renamed keys and values` | 35/35 passed. Append preserves legacy content; duplicate rename emits no change and restores the row. These tests do not prove occupied-preset selection. |
+| Exact-key append and duplicate rename already work through the editor | slices 1, 3 | `CURSOR_DEV=true nix develop -c pnpm frontend:test tests/utils/noteContentPropertyKeyPresets.spec.ts tests/components/form/RichMarkdownEditor.propertyEntry.spec.ts tests/components/form/RichMarkdownEditor.propertyPresets.spec.ts tests/components/form/RichMarkdownEditor.propertyRowEditing.spec.ts`; inspect entry's `appends to exact list-capable keys without folding legacy suffixes` and row editing's `rejects duplicate keys before emitting valid renamed keys and values` | 35/35 passed. Append preserves legacy content; duplicate rename emits no change and restores the row. These tests do not prove occupied-preset selection. |
 | Readme context and legacy structural alias reach the preset policy | slice 2 | Second temporary case in the same 18/18 run: mount `titlePattern: "Topic *"` with `isReadmeContext: true`, open Add property, assert literal options | Options contained `title_pattern 2`, without note-only presets. New omission proof must replace this old behavior. |
 | Existing list append preserves order | slice 1 | Read `appendValueToPropertyRow` in `noteContentPropertyRows.ts` and its caller `propertyRowsAfterAppendingValueToExactKey` consumed by `tryCommitInsert` | Existing list spreads its items then appends the trimmed new value; scalar promotion keeps the original value first. Slice 1 will observe existing-list append through preset selection. |
 | One shared policy serves both surfaces and already carries current-row exclusion | slices 1–3 | `rg -n 'richModeKeyDropdownPresetKeysForPropertyRows|exclude-row-index' frontend/src`; read `RichFrontmatterPropertyKeyPresets.vue`, `RichFrontmatterPropertyKeyField.vue`, `RichFrontmatterPropertyRow.vue` and insert form | The shared component calls the policy; stored rows pass their index, insertion passes none. Preserve that distinction in the draft replacement. |
@@ -95,8 +106,8 @@ new evidence if a slice overruns; revise remaining work in this plan rather than
 
 ### 1. Adding another value selects the same list-capable base key
 Type: Behavior
-Status: planned
-Proof: new occupied-preset mounted cases red then green in `RichMarkdownEditor.propertyEntry.spec.ts`; persistence
+Status: done
+Proof: new occupied-preset mounted cases red then green, now in `RichMarkdownEditor.propertyPresets.spec.ts`; persistence
 journey in `note_edit.feature`; commands below.
 
 Behavior: an occupied `example of` scalar or `url` list → select that canonical preset in Add property and confirm
@@ -118,7 +129,7 @@ retain their old behavior until the next slice.
 ### 2. Occupied scalar and singleton slots have no numbered substitute
 Type: Behavior
 Status: planned
-Proof: mounted occupied-slot and readme-context cases red then green in `RichMarkdownEditor.propertyEntry.spec.ts`;
+Proof: mounted occupied-slot and readme-context cases red then green in `RichMarkdownEditor.propertyPresets.spec.ts`;
 retained recognition and value-control tests plus typecheck.
 
 Behavior: an occupied `image`, `wikidata_id`, instruction or readme title-pattern slot → open suggestions → that
@@ -157,7 +168,7 @@ suggestion policy is delivered while legacy authored keys continue to work.
 Focused frontend proof for each slice (add `listProperties` when its rendering boundary changes):
 
 ```bash
-CURSOR_DEV=true nix develop -c pnpm frontend:test tests/components/form/RichMarkdownEditor.propertyEntry.spec.ts tests/components/form/RichMarkdownEditor.propertyRowEditing.spec.ts tests/utils/noteContentPropertyKeyPresets.spec.ts tests/utils/noteContentPropertyKeys.spec.ts
+CURSOR_DEV=true nix develop -c pnpm frontend:test tests/components/form/RichMarkdownEditor.propertyEntry.spec.ts tests/components/form/RichMarkdownEditor.propertyPresets.spec.ts tests/components/form/RichMarkdownEditor.propertyRowEditing.spec.ts tests/utils/noteContentPropertyKeyPresets.spec.ts tests/utils/noteContentPropertyKeys.spec.ts
 CURSOR_DEV=true nix develop -c pnpm -C frontend exec vue-tsc --noEmit
 ```
 
@@ -190,4 +201,14 @@ this planning request performs none of those actions.
 
 ## Learnings
 
-None beyond the preparation observations above. Execution has not started.
+Slice 1: about 5 minutes active implementation plus fixed proof waits. RED entry tests: 3 failed/16 passed,
+showing numbered options. GREEN five-file focused command above: 52/52 after independent refactor split;
+frontend typecheck passed. `note_edit.feature` E2E: 13/13 passed using isolated worktree database/origin.
+Observed setup/selection/emitted-property assertions now live in `RichMarkdownEditor.propertyPresets.spec.ts`
+(`preset selection $name`); the feature starts with a scalar, selects the preset, reloads and checks ordered
+values/source with no numbered key. Existing-list append and legacy-only separate base are mounted proof.
+Independent refactor moved the cohesive preset cases from the oversized entry spec to this new spec and shared
+input/focus helpers through `propertiesTestDom.ts`; production and E2E boundaries unchanged. Replacement focused
+proof and typecheck passed; whitespace check passed. All relevant focused commands now include the new spec.
+Current draft confirms on value blur; sibling draft redesign was not copied. Coordinator selective formatter passed;
+no API generation trigger. Remaining slices retain their original scope and order.

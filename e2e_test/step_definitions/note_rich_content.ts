@@ -52,6 +52,23 @@ When(
   }
 )
 
+When(
+  'I add a value {string} using rich note property preset {string}',
+  (value: string, key: string) => {
+    start.assumeNotePage().addRichNotePropertyFromPreset(key, value)
+  }
+)
+
+Then(
+  'rich note property {string} should have these values in order:',
+  (key: string, data: DataTable) => {
+    start.assumeNotePage().expectRichNotePropertyList(
+      key,
+      data.raw().map((row) => row[0]!)
+    )
+  }
+)
+
 Then(
   'I should see rich note property {string} with value {string}',
   (key: string, value: string) => {

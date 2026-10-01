@@ -24,6 +24,27 @@ export const noteRichPropertyMethods = () => ({
     })
     return this.flushPendingContentSave()
   },
+  addRichNotePropertyFromPreset(key: string, value: string) {
+    findNoteContentRegion().within(() => {
+      cy.findByRole('button', { name: 'Add property' }).click()
+      cy.get(
+        `[data-testid="rich-note-property-key-preset-option"][data-preset-key="${key}"]`
+      ).click()
+      cy.findByTestId('rich-note-property-value')
+        .clear()
+        .type(value, { parseSpecialCharSequences: false })
+        .blur()
+    })
+    return this.flushPendingContentSave()
+  },
+  expectRichNotePropertyList(key: string, values: string[]) {
+    findNoteContentRegion().within(() => {
+      cy.get(richNotePropertyRow(key))
+        .find('[data-testid="rich-note-property-row-list-value"]')
+        .should('have.attr', 'title', values.join('\n'))
+    })
+    return this
+  },
   startAddingRichNoteProperty(key: string) {
     findNoteContentRegion().within(() => {
       cy.findByRole('button', { name: 'Add property' }).click()

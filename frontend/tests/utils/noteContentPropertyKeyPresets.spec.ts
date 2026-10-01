@@ -17,7 +17,7 @@ describe("richModeKeyDropdownPresetKeysForPropertyRows", () => {
     ).toEqual(richModeKeyDropdownPresetKeys(false))
   })
 
-  it("resolves occupied presets to the next suffixed key", () => {
+  it("retains list-capable base keys while structural presets still use suffixes", () => {
     const defaults = richModeKeyDropdownPresetKeys(false)
     expect(
       richModeKeyDropdownPresetKeysForPropertyRows(false, [
@@ -33,13 +33,13 @@ describe("richModeKeyDropdownPresetKeysForPropertyRows", () => {
       richModeKeyDropdownPresetKeysForPropertyRows(false, [
         propertyRowWithScalar("url", "https://x"),
       ])
-    ).toEqual(defaults.map((k) => (k === "url" ? "url 2" : k)))
+    ).toEqual(defaults)
     expect(
       richModeKeyDropdownPresetKeysForPropertyRows(false, [
         propertyRowWithScalar("example of", "[[A]]"),
         propertyRowWithScalar("example of 2", "[[B]]"),
       ])
-    ).toEqual(defaults.map((k) => (k === "example of" ? "example of 3" : k)))
+    ).toEqual(defaults)
   })
 
   it("omits occupied aliases, overlaps, and note_level instead of suggesting a suffixed key", () => {

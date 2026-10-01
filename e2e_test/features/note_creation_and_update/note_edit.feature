@@ -144,3 +144,25 @@ Feature: Note Edit
     And the note content markdown source should contain "diligence: high"
     And the note content markdown source should contain "status: draft"
     And the note content markdown source should not contain "topic: training"
+
+  Scenario: Selecting an occupied property preset appends a value and persists
+    Given note "LeSS in Action" has content:
+      """
+      ---
+      example of: "[[run]]"
+      ---
+
+      # Workshop Body
+      """
+    And I visit note "LeSS in Action"
+    When I add a value "[[past tense]]" using rich note property preset "example of"
+    And I reload the current page for note "LeSS in Action"
+    Then rich note property "example of" should have these values in order:
+      | [[run]]        |
+      | [[past tense]] |
+    And I should not see rich note property "example of 2"
+    When I open the note content markdown editor
+    Then the note content markdown source should contain "example of:"
+    And the note content markdown source should contain "[[run]]"
+    And the note content markdown source should contain "[[past tense]]"
+    And the note content markdown source should not contain "example of 2:"

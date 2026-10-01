@@ -2,6 +2,7 @@ import type { PropertyRow } from "@/utils/noteContentPropertyRows"
 import {
   README_ONLY_PRESET_PROPERTY_KEYS,
   keysInPresetFamily,
+  isListCapablePropertyKey,
   nextAvailablePropertyKeyForPreset,
 } from "@/utils/noteContentPropertyKeys"
 
@@ -43,9 +44,9 @@ export function richModeKeyDropdownPresetKeys(
 }
 
 /**
- * Preset keys for the rich-mode property key dropdown, each resolved to the next
- * available name in its family (e.g. `url 2` when `url` already exists).
+ * List-capable presets keep their base key so insertion appends another value.
  * Occupied note-only singleton keys are omitted instead of suffixed.
+ * Scalar-only structural presets currently resolve to their next available name.
  */
 export function richModeKeyDropdownPresetKeysForPropertyRows(
   isReadmeContext: boolean,
@@ -57,6 +58,7 @@ export function richModeKeyDropdownPresetKeysForPropertyRows(
       if (keysInPresetFamily(preset, rows, options).length > 0) return []
       return [preset]
     }
+    if (isListCapablePropertyKey(preset)) return [preset]
     return [nextAvailablePropertyKeyForPreset(preset, rows, options)]
   })
 }

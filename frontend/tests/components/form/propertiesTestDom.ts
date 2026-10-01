@@ -2,6 +2,16 @@ import { advanceAnimationFrame } from "@tests/helpers/focusTargetTestSupport"
 import { flushPromises, type VueWrapper } from "@vue/test-utils"
 import { nextTick } from "vue"
 
+export function propertyInputEl(selector: string): HTMLInputElement {
+  const el = document.querySelector(selector) as HTMLInputElement | null
+  expect(el).not.toBeNull()
+  return el!
+}
+
+export function expectPropertyInputFocused(selector: string) {
+  expect(document.activeElement).toBe(propertyInputEl(selector))
+}
+
 export function propertyRowSelector(key: string): string {
   return `[data-testid="rich-note-property-row"][data-property-key="${key}"]`
 }
