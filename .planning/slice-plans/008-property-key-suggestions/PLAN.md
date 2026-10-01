@@ -236,3 +236,32 @@ and rejected-change message cases into `propertyValueControls` and `propertyVali
 Replacement three-spec focused command passed 15/15; final typecheck and whitespace passed. Full-suite proof
 remains applicable to unchanged product and preserved assertions. Updated focused command includes both extracted
 specs. Coordinator selective formatting passed; no API generation trigger. All ordered slices are done.
+
+Slice 3 publication accepted: `e7aa9754323b2bf790408866e235f9e7264f7993` on the recorded execution branch,
+with managed delivery reusing the retained observer. Implementation delivery is complete; main integration and
+spent-history cleanup remain owned by story wrap-up.
+
+## Execution retrospective
+
+Reviewed original refined story and execution-ready plan against the uncontaminated published manifest:
+`b3e12bfc076dc2bff40c754786649f5929609b2e` (list preset insertion),
+`139f3185a4680ab7471ac90aea0779e39f2481dd` (slot omission/generator retirement), and
+`e7aa9754323b2bf790408866e235f9e7264f7993` (stored-row occupancy). The Take and preparation revisions are
+provenance, not implementation; no sibling changes are attributed to this execution.
+Outcome findings: none. Original goal, examples and exclusions are satisfied by the inspected policy, retained
+recognition/codec/append/duplicate boundaries and mounted/persistence observations. ADR 0004 authored-content
+preservation and the North Star's shared format boundary remain respected. No new architectural decision or
+cross-subsystem responsibility was introduced. The new E2E journey selects an occupied preset and verifies durable
+order after reload; detailed slot/rename variants remain mounted tests. Existing editing/source/undo E2E journeys
+retain distinct integration coverage, and obsolete generator tests are gone. No suite cleanup correction is justified.
+Process review was enabled by project configuration and used the coordinator conversation and agent returns;
+sub-agent internal traces were unavailable, limiting internal-process conclusions. No supported unresolved process
+finding needs recording. Cohesive test extraction required replacement focused proof while unchanged product/E2E
+proof was reused. No correction plan, source or backlog change is required.
+Review completed with branch CI pending for the last accepted implementation revision; final CI verdict is owned by
+the execution completion operation after this record is published.
+
+## Execution complete
+
+Product advice: Keep SEED-063#story-2 next in the existing backlog. This story prevents new numbered suggestions;
+the existing migration story owns consolidation of saved numbered keys and their trackers. No new follow-up is needed.
