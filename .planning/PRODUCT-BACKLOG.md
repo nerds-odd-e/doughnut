@@ -8,8 +8,8 @@ Bug fixing and general maintenance.
 ## Taken
 
 - [Adding a property uses a row with a visible Add button that says why nothing was added](seeds/SEED-064-note-properties-fixes.md#story-6) — SEED-064#story-6 ([plan](slice-plans/007-add-property-draft-row/PLAN.md))
+- [Property key suggestions stop creating numbered keys, and obsolete generation functions are removed](seeds/SEED-063-track-property-values-separately.md#story-3) — SEED-063#story-3 ([plan](slice-plans/008-property-key-suggestions/PLAN.md))
 
 ## Backlog list
 
-- [Property key suggestions stop creating numbered keys, and obsolete generation functions are removed](seeds/SEED-063-track-property-values-separately.md#story-3) — SEED-063#story-3
 - [Existing numbered property keys become one list, and their trackers follow](seeds/SEED-063-track-property-values-separately.md#story-2) — SEED-063#story-2
