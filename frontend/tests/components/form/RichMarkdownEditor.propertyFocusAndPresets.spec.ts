@@ -12,7 +12,8 @@ import { propertyRowWithScalar } from "@/utils/noteContentPropertyRows"
 import { expectPresetOptions, selectPresetKey } from "./propertiesTestDom"
 import { createRichMarkdownEditorTestHarness } from "./richMarkdownEditorTestHarness"
 
-const INSERT_KEY_INPUT = '[data-testid="rich-note-property-key"]'
+const INSERT_KEY_INPUT =
+  '[data-property-draft="true"] [data-testid="rich-note-property-row-key-input"]'
 const ROW_KEY_INPUT = '[data-testid="rich-note-property-row-key-input"]'
 const ROW_VALUE_INPUT = '[data-testid="rich-note-property-row-value-input"]'
 
@@ -44,6 +45,16 @@ describe("RichMarkdownEditor property focus and presets", () => {
     vi.restoreAllMocks()
     h.cleanup()
     vi.useRealTimers()
+  })
+
+  it("Enter in the draft key focuses its value without adding", async () => {
+    const wrapper = await h.mountEditor("# Body", { attachToBody: true })
+    await h.openAddProperty()
+    await wrapper.find(INSERT_KEY_INPUT).setValue("topic")
+    await wrapper.find(INSERT_KEY_INPUT).trigger("keydown", { key: "Enter" })
+    await advanceAnimationFrame()
+    expectElementFocused(`[data-property-draft="true"] ${ROW_VALUE_INPUT}`)
+    expect(wrapper.emitted("update:modelValue")).toBeUndefined()
   })
 
   describe("key presets", () => {
@@ -83,7 +94,7 @@ image: /x.png
       await selectPresetKey("wikidata_id")
       expect(inputEl(INSERT_KEY_INPUT).value).toBe("wikidata_id")
       expectElementFocused(
-        '[data-testid="rich-note-wikidata-property-insert-edit"]'
+        '[data-property-draft="true"] [data-testid="rich-note-wikidata-property-edit"]'
       )
     })
   })

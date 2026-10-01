@@ -11,13 +11,15 @@ export const noteRichPropertyMethods = () => ({
   addRichNoteProperty(key: string, value: string) {
     findNoteContentRegion().within(() => {
       cy.findByRole('button', { name: 'Add property' }).click()
-      cy.findByTestId('rich-note-property-key')
+      cy.get('[data-property-draft="true"]')
+        .findByTestId('rich-note-property-row-key-input')
         .clear()
         .type(key, { parseSpecialCharSequences: false })
-      cy.findByTestId('rich-note-property-value')
+      cy.get('[data-property-draft="true"]')
+        .findByTestId('rich-note-property-row-value-input')
         .clear()
         .type(value, { parseSpecialCharSequences: false })
-      cy.findByTestId('rich-note-property-insert-add').click()
+      cy.findByTestId('rich-note-property-row-add').click()
     })
     findNoteContentRegion().within(() => {
       cy.get('.ql-editor[contenteditable="true"]').first().click()
@@ -27,7 +29,10 @@ export const noteRichPropertyMethods = () => ({
   startAddingRichNoteProperty(key: string) {
     findNoteContentRegion().within(() => {
       cy.findByRole('button', { name: 'Add property' }).click()
-      cy.findByTestId('rich-note-property-key').clear().type(key)
+      cy.get('[data-property-draft="true"]')
+        .findByTestId('rich-note-property-row-key-input')
+        .clear()
+        .type(key)
     })
     return this
   },
@@ -43,11 +48,13 @@ export const noteRichPropertyMethods = () => ({
   uploadRichNoteImagePropertyFromFixture(fixtureRelativePath: string) {
     findNoteContentRegion().within(() => {
       cy.findByRole('button', { name: 'Add property' }).click()
-      cy.findByTestId('rich-note-property-key').clear().type('image')
-      cy.get('[data-testid="rich-note-image-insert-file-input"]').selectFile(
-        `e2e_test/fixtures/${fixtureRelativePath}`,
-        { force: true }
-      )
+      cy.get('[data-property-draft="true"]')
+        .findByTestId('rich-note-property-row-key-input')
+        .clear()
+        .type('image')
+      cy.get(
+        '[data-property-draft="true"] [data-testid="rich-note-image-property-file-input"]'
+      ).selectFile(`e2e_test/fixtures/${fixtureRelativePath}`, { force: true })
     })
     cy.get(richNotePropertyRow('image'), { timeout: 20000 }).should('exist')
     return this.flushPendingContentSave()
@@ -206,8 +213,13 @@ export const noteRichPropertyMethods = () => ({
           cy.wrap(editBtn.first()).click()
         } else {
           cy.findByRole('button', { name: 'Add property' }).click()
-          cy.findByTestId('rich-note-property-key').clear().type('wikidata_id')
-          cy.findByTestId('rich-note-wikidata-property-insert-edit').click()
+          cy.get('[data-property-draft="true"]')
+            .findByTestId('rich-note-property-row-key-input')
+            .clear()
+            .type('wikidata_id')
+          cy.get('[data-property-draft="true"]')
+            .findByTestId('rich-note-wikidata-property-edit')
+            .click()
         }
       })
     })

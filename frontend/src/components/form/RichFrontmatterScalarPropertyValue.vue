@@ -28,12 +28,13 @@
         data-testid="rich-note-property-row-value-input"
         @update:model-value="emit('update:modelValue', $event)"
         @focus="emit('focus')"
-        @blur="emit('commit')"
+        @blur="!draft && emit('commit')"
+        @enter="emit('enter')"
         @dead-wiki-link-click="emit('dead-wiki-link-click', $event)"
       />
     </div>
     <button
-      v-if="textCapable"
+      v-if="textCapable && !draft"
       type="button"
       class="daisy-btn daisy-btn-ghost daisy-btn-sm square shrink-0"
       :aria-label="`Edit property value for ${propertyKey} in the property value dialog`"
@@ -86,6 +87,7 @@ const props = defineProps<{
   wikiLinks: WikiLink[]
   lastSavedMarkdown?: string
   rowIndex: number
+  draft?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -93,6 +95,7 @@ const emit = defineEmits<{
   "update:propertyValue": [value: PropertyValue]
   focus: []
   commit: []
+  enter: []
   "dead-wiki-link-click": [payload: DeadWikiLinkPayload]
 }>()
 
@@ -117,8 +120,10 @@ const rowLayoutClass = computed(() =>
 const valueFieldWrapperClass = computed(() =>
   usesFlexRow.value ? "min-w-0 flex-1" : ""
 )
-const valueAriaLabel = computed(
-  () => `Existing note property value (row ${props.rowIndex + 1})`
+const valueAriaLabel = computed(() =>
+  props.draft
+    ? "Property value"
+    : `Existing note property value (row ${props.rowIndex + 1})`
 )
 
 function onValuePointerDown(event: PointerEvent) {

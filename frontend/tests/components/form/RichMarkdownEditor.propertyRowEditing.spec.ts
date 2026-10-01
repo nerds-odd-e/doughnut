@@ -216,7 +216,7 @@ question_generation_instruction: Focus on facts.
       expect(propertyValidationMessages(wrapper.element)).toHaveLength(0)
     })
 
-    it("keeps the add form message above the form and outside any row", async () => {
+    it("keeps the draft message beneath the draft and outside any row", async () => {
       const wrapper = await h.mountEditor(twoRowMarkdown)
 
       await h.commitInsertProperty("note_level", "7")
@@ -228,9 +228,9 @@ question_generation_instruction: Focus on facts.
       ).toBeNull()
       expect(
         messages[0]!.previousElementSibling?.matches(
-          '[data-testid="rich-note-property-row"]'
+          '[data-testid="rich-note-property-row"][data-property-draft="true"]'
         )
-      ).toBe(false)
+      ).toBe(true)
     })
   })
 })

@@ -8,7 +8,8 @@ import {
 import { propertyRowWithScalar } from "@/utils/noteContentPropertyRows"
 import { createRichMarkdownEditorTestHarness } from "./richMarkdownEditorTestHarness"
 
-const INSERT_KEY_INPUT = '[data-testid="rich-note-property-key"]'
+const INSERT_KEY_INPUT =
+  '[data-property-draft="true"] [data-testid="rich-note-property-row-key-input"]'
 
 describe("RichMarkdownEditor property entry", () => {
   const h = createRichMarkdownEditorTestHarness()
@@ -24,100 +25,54 @@ describe("RichMarkdownEditor property entry", () => {
   })
 
   describe("inserting a property", () => {
-    it("Cancel drops the draft and its message without saving, reopening empty", async () => {
-      const wrapper = await h.mountEditor("# Body")
-      await h.openAddProperty()
-      await wrapper.find(INSERT_KEY_INPUT).setValue("topic")
-      await wrapper
-        .find('[data-testid="rich-note-property-insert-add"]')
-        .trigger("click")
-      expect(
-        wrapper.find('[data-testid="rich-note-property-validation"]').text()
-      ).toBe("Enter a property value.")
-      await h.setPropertyValueField(
-        wrapper.find('[data-testid="rich-note-property-value"]'),
-        "training"
-      )
-
-      await wrapper
-        .find('[aria-label="Cancel adding property"]')
-        .trigger("click")
-
-      expect(wrapper.find(INSERT_KEY_INPUT).exists()).toBe(false)
-      expect(wrapper.emitted("update:modelValue")).toBeUndefined()
-      expect(
-        wrapper.find('[data-testid="rich-note-property-validation"]').exists()
-      ).toBe(false)
-      await h.openAddProperty()
-      expect(wrapper.find(INSERT_KEY_INPUT).element).toHaveProperty("value", "")
-      expect(
-        wrapper.find('[data-testid="rich-note-property-value"]').text()
-      ).toBe("")
-    })
-
-    it.each([
-      { key: "topic", value: "", message: "Enter a property value." },
-      { key: "", value: "training", message: "Enter a property key." },
-      { key: "", value: "", message: "Enter a property key and value." },
-    ])(
-      "Add says $message and retains the draft without saving",
-      async ({ key, value, message }) => {
-        const wrapper = await h.mountEditor("# Body")
+    it.each(["# Body", "---\nstatus: draft\n---\n\n# Body"])(
+      "opens one focused draft row at the end of the list for %s",
+      async (markdown) => {
+        const wrapper = await h.mountEditor(markdown, { attachToBody: true })
         await h.openAddProperty()
-        const keyInput = wrapper.find(INSERT_KEY_INPUT)
-        const valueField = wrapper.find(
-          '[data-testid="rich-note-property-value"]'
+        await advanceAnimationFrame()
+        const list = wrapper.find('[data-testid="rich-note-property-list"]')
+        const draftSelector =
+          '[data-testid="rich-note-property-row"][data-property-draft="true"]'
+        expect(list.findAll(draftSelector)).toHaveLength(1)
+        expect(list.element.lastElementChild).toBe(
+          list.find(draftSelector).element
         )
-        await keyInput.setValue(key)
-        await h.setPropertyValueField(valueField, value)
-        await wrapper
-          .find('[data-testid="rich-note-property-insert-add"]')
-          .trigger("click")
-
+        expect(document.activeElement).toBe(
+          wrapper.find(INSERT_KEY_INPUT).element
+        )
         expect(
-          wrapper.find('[data-testid="rich-note-property-validation"]').text()
-        ).toBe(message)
-        expect(wrapper.emitted("update:modelValue")).toBeUndefined()
-        expect(keyInput.element).toHaveProperty("value", key)
-        expect(valueField.text()).toBe(value)
+          list
+            .find(draftSelector)
+            .find('[data-testid="rich-note-property-value-dialog-open"]')
+            .exists()
+        ).toBe(false)
+        await h.openAddProperty()
+        await advanceAnimationFrame()
+        expect(list.findAll(draftSelector)).toHaveLength(1)
+        expect(document.activeElement).toBe(
+          wrapper.find(INSERT_KEY_INPUT).element
+        )
       }
     )
-
-    it("clears the missing-field message on a successful Add", async () => {
-      const wrapper = await h.mountEditor("# Body")
-      await h.openAddProperty()
-      await wrapper.find(INSERT_KEY_INPUT).setValue("topic")
-      const add = wrapper.find('[data-testid="rich-note-property-insert-add"]')
-      await add.trigger("click")
-      expect(
-        wrapper.find('[data-testid="rich-note-property-validation"]').text()
-      ).toBe("Enter a property value.")
-
-      await h.setPropertyValueField(
-        wrapper.find('[data-testid="rich-note-property-value"]'),
-        "training"
-      )
-      await add.trigger("click")
-
-      expect(
-        wrapper.find('[data-testid="rich-note-property-validation"]').exists()
-      ).toBe(false)
-      expect(h.lastEmittedMarkdown()).toContain("topic: training")
-    })
 
     it("adds an image property from a typed URL", async () => {
       const wrapper = await h.mountEditor("# Hi")
 
       await h.openAddProperty()
       await wrapper
-        .find('[data-testid="rich-note-property-key"]')
+        .find(
+          '[data-property-draft="true"] [data-testid="rich-note-property-row-key-input"]'
+        )
         .setValue("image")
       await flushPromises()
 
-      const valInput = wrapper.find('[data-testid="rich-note-property-value"]')
+      const valInput = wrapper.find(
+        '[data-property-draft="true"] [data-testid="rich-note-property-row-value-input"]'
+      )
       await valInput.setValue("https://example.com/a.png")
       await wrapper
-        .find('[data-testid="rich-note-property-insert-add"]')
+        .find('[data-testid="rich-note-property-row-add"]')
         .trigger("click")
 
       expect(h.lastEmittedMarkdown()).toContain(
@@ -133,12 +88,14 @@ describe("RichMarkdownEditor property entry", () => {
       const keyInput = h.getWrapper().find(INSERT_KEY_INPUT)
       const valInput = h
         .getWrapper()
-        .find('[data-testid="rich-note-property-value"]')
+        .find(
+          '[data-property-draft="true"] [data-testid="rich-note-property-row-value-input"]'
+        )
       await keyInput.setValue("status")
       await h.setPropertyValueField(valInput, "draft")
       await h
         .getWrapper()
-        .find('[data-testid="rich-note-property-insert-add"]')
+        .find('[data-testid="rich-note-property-row-add"]')
         .trigger("click")
 
       const last = h.lastEmittedMarkdown()
@@ -153,11 +110,13 @@ describe("RichMarkdownEditor property entry", () => {
       const wrapper = h.getWrapper()
       await wrapper.find(INSERT_KEY_INPUT).setValue("status")
       await h.setPropertyValueField(
-        wrapper.find('[data-testid="rich-note-property-value"]'),
+        wrapper.find(
+          '[data-property-draft="true"] [data-testid="rich-note-property-row-value-input"]'
+        ),
         "draft"
       )
       await wrapper
-        .find('[data-testid="rich-note-property-insert-add"]')
+        .find('[data-testid="rich-note-property-row-add"]')
         .trigger("click")
       expect(wrapper.emitted("update:modelValue")).toHaveLength(1)
       expect(h.lastEmittedMarkdown()).toContain("status: draft")
@@ -172,7 +131,9 @@ describe("RichMarkdownEditor property entry", () => {
         await h.openAddProperty()
         const wrapper = h.getWrapper()
         await wrapper.find(INSERT_KEY_INPUT).setValue(key)
-        const field = wrapper.find('[data-testid="rich-note-property-value"]')
+        const field = wrapper.find(
+          '[data-property-draft="true"] [data-testid="rich-note-property-row-value-input"]'
+        )
         const value =
           key === "image" ? "https://example.com/image.png" : "draft"
         if (key === "image") {
@@ -196,7 +157,9 @@ describe("RichMarkdownEditor property entry", () => {
         await h.openAddProperty()
         const wrapper = h.getWrapper()
         await wrapper.find(INSERT_KEY_INPUT).setValue(key)
-        const field = wrapper.find('[data-testid="rich-note-property-value"]')
+        const field = wrapper.find(
+          '[data-property-draft="true"] [data-testid="rich-note-property-row-value-input"]'
+        )
         if (key === "image") {
           await field.setValue("https://example.com/image.png")
         } else {

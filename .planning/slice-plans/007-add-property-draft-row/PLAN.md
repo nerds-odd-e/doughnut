@@ -142,7 +142,7 @@ product change (the section class covers every `daisy-btn-sm`); if it is red, th
 
 ### 5. The draft is a property row and the add form is deleted
 Type: Structure
-Status: planned
+Status: done
 Proof: all slice 1–3 cases and the existing `propertyEntry`, `propertyRowEditing`, `listProperties`,
 `changesOnlyTheEdit`, `readOnlyProperties`, `propertyLocation` specs green with only locators changed; one new case: a
 note without properties → Add property → one draft row inside the list; Add property again → still one draft row. Then
@@ -213,6 +213,17 @@ still in place" and "the list renders the draft row and the add form is deleted"
 - `./scripts/run.sh pnpm cy:run --spec e2e_test/features/note_topology/note_property_layout.feature` — 12 scenarios passed before and after test-support extraction. New scenario opens a draft as author on a touch device at 820 × 1000; page object observes Add and Cancel actual bounding rectangles at least 44 px high.
 - No product change. `notePropertyLayoutMethods.ts` now owns the shared height measurements and layout assertions, composed into `notePage.ts`; location methods keep routing/panel behavior.
 - Slice 3 accepted revision: `0470d6be2d222ded20760781691212ec9c754eec` on execution branch; CI remains unobserved.
+
+### Slice 5
+
+- `./scripts/run.sh pnpm frontend:test` — 312 files, 1987 tests passed, including stored row, lists, read-only, location, tracker and prior add behavior.
+- Final additional structural proof: `./scripts/run.sh pnpm frontend:test tests/components/form/RichMarkdownEditor.propertyEntry.spec.ts tests/components/form/RichMarkdownEditor.propertyFocusAndPresets.spec.ts` — 29 tests passed. Empty/populated Markdown notes observe one last draft in the list, key focus, repeated Add refocusing one draft, absent draft value-dialog opener; key Enter moves to value without saving.
+- Refactor replacement: `./scripts/run.sh pnpm frontend:test tests/components/form/RichMarkdownEditor.propertyEntry.spec.ts tests/components/form/RichMarkdownEditor.propertyDraftLifecycle.spec.ts tests/components/form/RichMarkdownEditor.propertyFocusAndPresets.spec.ts tests/components/form/RichMarkdownEditor.propertyRowEditing.spec.ts tests/components/form/RichMarkdownEditor.readOnlyProperties.spec.ts` — 41 tests passed. Validation/Cancel moved unchanged to draft lifecycle spec; shared Wikidata value component preserves rendering; stored-row E2E selectors exclude drafts.
+- `./scripts/run.sh pnpm -C frontend exec vue-tsc --noEmit` passed after refactor.
+- `./scripts/run.sh pnpm cy:run --spec e2e_test/features/note_topology/note_property_layout.feature,e2e_test/features/note_view/note_frontmatter_image.feature,e2e_test/features/wikidata/associate_wikidata.feature,e2e_test/features/note_creation_and_update/note_edit.feature` — 32 scenarios passed before/after refactor (12 layout, 4 image, 4 Wikidata, 12 note edit), proving preset positioning, touch actions, upload/typed image URL, Wikidata Save and rich-edit persistence.
+- `./scripts/run.sh pnpm -C frontend exec vite build --emptyOutDir` passed after coordinator formatting; generated declarations replace InsertForm with WikidataPropertyValue.
+- Implementation converged in ~8 minutes; bounded extra required verification runtime accepted as sizing exception. Initial guessed E2E paths were rejected before startup; correct paths above passed. Initial build was blocked solely by unformatted files; final formatted build passed. Formatter required one mechanical template-literal fix and rerun; no behavior changed.
+- Slice 4 accepted revision: `cb7c47b618bf3969c867f81ecccc2e7ecce865f5` on execution branch; CI remains unobserved with no observer armed.
 
 ## Learnings
 

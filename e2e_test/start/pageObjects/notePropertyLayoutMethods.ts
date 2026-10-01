@@ -112,7 +112,7 @@ export const notePropertyLayoutMethods = () => ({
     findNoteContentRegion().should(($region) => {
       expectPropertyControlHeights(
         $region,
-        ['rich-note-property-insert-add', 'rich-note-property-insert-cancel'],
+        ['rich-note-property-row-add', 'rich-note-property-row-cancel'],
         'the new property',
         true
       )
@@ -120,24 +120,26 @@ export const notePropertyLayoutMethods = () => ({
     return this
   },
   expectNewRichNotePropertyControlNotCovered(testId: string) {
-    cy.findByTestId(testId).should(($control) => {
-      const box = $control[0]!.getBoundingClientRect()
-      const list = $control[0]!.ownerDocument.querySelector(
-        '[data-testid="rich-note-property-key-preset-list"]'
-      )
-      const covering = list
-        ? [list, ...list.querySelectorAll('button')].filter((element) => {
-            const rect = element.getBoundingClientRect()
-            return (
-              rect.left < box.right &&
-              box.left < rect.right &&
-              rect.top < box.bottom &&
-              box.top < rect.bottom
-            )
-          })
-        : []
-      expect(covering.length, `preset list over ${testId}`).to.equal(0)
-    })
+    cy.get('[data-property-draft="true"]')
+      .findByTestId(testId)
+      .should(($control) => {
+        const box = $control[0]!.getBoundingClientRect()
+        const list = $control[0]!.ownerDocument.querySelector(
+          '[data-testid="rich-note-property-key-preset-list"]'
+        )
+        const covering = list
+          ? [list, ...list.querySelectorAll('button')].filter((element) => {
+              const rect = element.getBoundingClientRect()
+              return (
+                rect.left < box.right &&
+                box.left < rect.right &&
+                rect.top < box.bottom &&
+                box.top < rect.bottom
+              )
+            })
+          : []
+        expect(covering.length, `preset list over ${testId}`).to.equal(0)
+      })
     return this
   },
   expectKeyPresetInsideKeyPanel(presetKey: string) {

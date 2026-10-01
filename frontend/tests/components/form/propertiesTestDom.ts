@@ -3,12 +3,14 @@ import { flushPromises, type VueWrapper } from "@vue/test-utils"
 import { nextTick } from "vue"
 
 export function propertyRowSelector(key: string): string {
-  return `[data-testid="rich-note-property-row"][data-property-key="${key}"]`
+  return `[data-testid="rich-note-property-row"]:not([data-property-draft="true"])[data-property-key="${key}"]`
 }
 
 export function propertyRows(root: ParentNode): HTMLElement[] {
   return Array.from(
-    root.querySelectorAll('[data-testid="rich-note-property-row"]')
+    root.querySelectorAll(
+      '[data-testid="rich-note-property-row"]:not([data-property-draft="true"])'
+    )
   ) as HTMLElement[]
 }
 

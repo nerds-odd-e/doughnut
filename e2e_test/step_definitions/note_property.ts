@@ -160,13 +160,17 @@ When(
 Then('the new property value should not be covered', () => {
   start
     .assumeNotePage()
-    .expectNewRichNotePropertyControlNotCovered('rich-note-property-value')
+    .expectNewRichNotePropertyControlNotCovered(
+      'rich-note-property-row-value-input'
+    )
 })
 
 Then('the new property Choose image button should not be covered', () => {
   start
     .assumeNotePage()
-    .expectNewRichNotePropertyControlNotCovered('rich-note-image-insert-choose')
+    .expectNewRichNotePropertyControlNotCovered(
+      'rich-note-image-property-choose'
+    )
 })
 
 Then(

@@ -145,12 +145,16 @@ export function createRichMarkdownEditorTestHarness() {
 
   async function commitInsertProperty(key: string, value: string) {
     await openAddProperty()
-    const keyInput = wrapper.find('[data-testid="rich-note-property-key"]')
-    const valInput = wrapper.find('[data-testid="rich-note-property-value"]')
+    const keyInput = wrapper.find(
+      '[data-property-draft="true"] [data-testid="rich-note-property-row-key-input"]'
+    )
+    const valInput = wrapper.find(
+      '[data-property-draft="true"] [data-testid="rich-note-property-row-value-input"]'
+    )
     await keyInput.setValue(key)
     await setPropertyValueField(valInput, value)
     await wrapper
-      .find('[data-testid="rich-note-property-insert-add"]')
+      .find('[data-testid="rich-note-property-row-add"]')
       .trigger("click")
     await flushPromises()
   }

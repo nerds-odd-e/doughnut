@@ -7,7 +7,7 @@ export const noteContentRegion = {
 }
 
 export const richNotePropertyRow = (key: string) =>
-  `[data-testid="rich-note-property-row"][data-property-key="${key}"]`
+  `[data-testid="rich-note-property-row"]:not([data-property-draft="true"])[data-property-key="${key}"]`
 
 export const richNotePropertyPanelTestId = 'rich-note-property-panel'
 export const richNotePropertyPanelToggleTestId =

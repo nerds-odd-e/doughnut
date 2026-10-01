@@ -7,7 +7,8 @@
       { 'rounded bg-primary/10 ring-1 ring-primary/30': isFocused },
     ]"
     data-testid="rich-note-property-row"
-    :data-row-index="idx"
+    :data-row-index="draft ? undefined : idx"
+    :data-property-draft="draft ? 'true' : undefined"
     :data-property-key="modelValue.key"
     :data-property-focused="isFocused ? 'true' : undefined"
     :ref="setRootRef"
@@ -26,9 +27,10 @@
     </template>
     <div
       v-else
-      class="grid grid-cols-[auto_minmax(8rem,auto)_minmax(0,1fr)] gap-x-4 items-center"
+      :class="draft ? 'grid grid-cols-[minmax(8rem,auto)_minmax(0,1fr)_auto] gap-x-4 items-center' : 'grid grid-cols-[auto_minmax(8rem,auto)_minmax(0,1fr)] gap-x-4 items-center'"
     >
       <button
+        v-if="!draft"
         type="button"
         class="daisy-btn daisy-btn-ghost daisy-btn-sm square shrink-0"
         :aria-label="`Toggle property panel for note property ${modelValue.key}`"
@@ -44,27 +46,30 @@
         :model-value="modelValue.key"
         :input-id="keyInputId"
         :list-id="presetListId"
-        :label="`Existing note property key (row ${idx + 1})`"
+        :label="draft ? 'Property key' : `Existing note property key (row ${idx + 1})`"
         test-id="rich-note-property-row-key-input"
         :property-rows="propertyRows"
-        :exclude-row-index="idx"
+        :exclude-row-index="draft ? undefined : idx"
         @update:model-value="onKeyUpdate"
         @focus="emit('row-focus')"
-        @blur="emit('commit')"
+        @blur="commitStoredRow"
+        @enter="draft && focusValue()"
         @select="focusValue"
       />
       <div ref="valueAreaRef" class="min-w-0">
         <RichFrontmatterScalarPropertyValue
-          v-if="isTextCapablePropertyRow(modelValue)"
+          v-if="isTextCapablePropertyRow(modelValue) || (draft && !isImagePropertyKey(modelValue.key) && !isWikidataIdPropertyKey(modelValue.key))"
           :model-value="scalarValue"
           :property-row="modelValue"
           :wiki-links="wikiLinks"
           :last-saved-markdown="lastSavedMarkdown"
           :row-index="idx"
+          :draft="draft"
           @update:model-value="onValueUpdate"
           @update:property-value="onPropertyValueUpdate"
           @focus="emit('row-focus')"
-          @commit="emit('commit')"
+          @commit="commitStoredRow"
+          @enter="draft && emit('add')"
           @dead-wiki-link-click="emit('dead-wiki-link-click', $event)"
         />
         <RelationTypeSelectCompact
@@ -80,58 +85,30 @@
           v-else-if="isImagePropertyKey(modelValue.key)"
           :model-value="scalarValue"
           :note-id="noteId"
-          :ariaLabel="`Existing note image property value (row ${idx + 1})`"
+          :ariaLabel="draft ? 'Property value' : `Existing note image property value (row ${idx + 1})`"
           value-test-id="rich-note-property-row-value-input"
           file-input-test-id="rich-note-image-property-file-input"
           choose-button-test-id="rich-note-image-property-choose"
           requires-note-test-id="rich-note-image-upload-requires-note"
           @update:model-value="onValueUpdate"
           @focus="emit('row-focus')"
-          @commit="emit('commit')"
+          @commit="commitStoredRow"
+          @enter="draft && emit('add')"
           @image-upload-state="emit('image-upload-state', $event)"
         />
-        <div
+        <RichFrontmatterWikidataPropertyValue
           v-else-if="isWikidataIdPropertyKey(modelValue.key)"
-          class="flex min-w-0 items-center gap-2"
-          :class="scalarValue.trim() ? '' : 'justify-between'"
-        >
-          <template v-if="scalarValue.trim()">
-            <button
-              type="button"
-              class="daisy-btn daisy-btn-ghost daisy-btn-sm h-auto min-h-0 min-w-0 max-w-full shrink truncate justify-start py-0.5 px-1 font-mono text-sm font-normal text-base-content/90 normal-case"
-              :title="scalarValue.trim()"
-              data-testid="rich-note-wikidata-property-edit"
-              :aria-label="`Edit Wikidata ID ${scalarValue.trim()}`"
-              @click="emit('wikidata-dialog-open')"
-            >
-              {{ scalarValue.trim() }}
-            </button>
-            <RichFrontmatterPropertyExternalLink
-              kind="wikidata"
-              :value="scalarValue"
-            />
-          </template>
-          <template v-else>
-            <span
-              class="truncate font-mono text-sm text-base-content/90"
-              aria-hidden="true"
-              >—</span
-            >
-            <button
-              type="button"
-              class="daisy-btn daisy-btn-sm daisy-btn-outline shrink-0"
-              data-testid="rich-note-wikidata-property-edit"
-              aria-label="Set Wikidata ID"
-              @click="emit('wikidata-dialog-open')"
-            >
-              Set…
-            </button>
-          </template>
-        </div>
+          :value="scalarValue"
+          @edit="emit('wikidata-dialog-open')"
+        />
+      </div>
+      <div v-if="draft" class="flex items-center gap-2">
+        <button type="button" class="daisy-btn daisy-btn-sm daisy-btn-primary" data-testid="rich-note-property-row-add" @click="emit('add')">Add</button>
+        <button type="button" class="daisy-btn daisy-btn-sm daisy-btn-ghost" aria-label="Cancel adding property" data-testid="rich-note-property-row-cancel" @click="emit('cancel')"><X class="h-4 w-4" aria-hidden="true" /></button>
       </div>
     </div>
     <RichFrontmatterPropertyPanel
-      v-if="isFocused && !readOnly"
+      v-if="isFocused && !readOnly && !draft"
       :property-key="modelValue.key"
       :property-value="modelValue.value"
       :note-id="noteId"
@@ -141,12 +118,12 @@
 </template>
 
 <script setup lang="ts">
-import { ChevronDown, ChevronRight } from "@lucide/vue"
+import { ChevronDown, ChevronRight, X } from "@lucide/vue"
 import { computed, ref, type ComponentPublicInstance } from "vue"
 import { useNotePropertyPanelLocation } from "@/composables/useNotePropertyPanelLocation"
 import RichFrontmatterPropertyPanel from "@/components/form/RichFrontmatterPropertyPanel.vue"
 import RichFrontmatterImagePropertyValue from "@/components/form/RichFrontmatterImagePropertyValue.vue"
-import RichFrontmatterPropertyExternalLink from "@/components/form/RichFrontmatterPropertyExternalLink.vue"
+import RichFrontmatterWikidataPropertyValue from "@/components/form/RichFrontmatterWikidataPropertyValue.vue"
 import RichFrontmatterPropertyKeyField from "@/components/form/RichFrontmatterPropertyKeyField.vue"
 import RichFrontmatterReadOnlyPropertyValue from "@/components/form/RichFrontmatterReadOnlyPropertyValue.vue"
 import RichFrontmatterScalarPropertyValue from "@/components/form/RichFrontmatterScalarPropertyValue.vue"
@@ -181,6 +158,7 @@ const props = defineProps<{
   noteId?: number
   isFocused: boolean
   readOnly?: boolean
+  draft?: boolean
   setRootRef: (el: Element | ComponentPublicInstance | null) => void
 }>()
 
@@ -188,6 +166,8 @@ const emit = defineEmits<{
   "update:modelValue": [row: PropertyRow]
   "row-focus": []
   commit: []
+  add: []
+  cancel: []
   remove: []
   "wikidata-dialog-open": []
   "dead-wiki-link-click": [payload: DeadWikiLinkPayload]
@@ -215,10 +195,7 @@ function onKeyUpdate(key: string) {
 }
 
 function onValueUpdate(value: string) {
-  emit("update:modelValue", {
-    ...props.modelValue,
-    value: scalarPropertyValue(value),
-  })
+  onPropertyValueUpdate(scalarPropertyValue(value))
 }
 
 function onPropertyValueUpdate(value: PropertyValue) {
@@ -226,6 +203,10 @@ function onPropertyValueUpdate(value: PropertyValue) {
     ...props.modelValue,
     value,
   })
+}
+
+function commitStoredRow() {
+  if (!props.draft) emit("commit")
 }
 
 function focusValue() {
