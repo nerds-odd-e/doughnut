@@ -153,3 +153,17 @@ sessions MySQL 12565 / Redis 78862 after prior agent sessions were unavailable.
 Fresh refactor corrected displaced Javadocs only; accepted proof unchanged,
 whitespace passed, tests not repeated. Coordinator formatting passed; no API change.
 Reader-conflict and positive publication proof remain later slices.
+
+## Slice 10 accepted proof
+
+Full `CURSOR_DEV=true nix develop -c pnpm backend:verify` passed: 2761 tests,
+zero failures/errors, two skipped; SelectorRefusalControllerTest two passes.
+Two owners resolve the public source’s exact selector to different same-name
+private targets, observed under both actual readers before migration. Precise
+note-prefixed diagnostic leaves all three fresh controller states, serialized
+learning/history and authorized downloaded accepted histories unchanged.
+First full run failed only because its diagnostic expectation omitted the note
+prefix; corrected without production changes. Active implementation 5.5 minutes.
+Fresh refactor made no edits; whitespace passed and accepted proof unchanged.
+Coordinator formatting passed. Anonymous current-reader observation remains
+explicitly owned by the next positive visibility journey, not claimed here.

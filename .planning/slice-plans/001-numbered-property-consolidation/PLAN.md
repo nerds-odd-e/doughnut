@@ -159,7 +159,8 @@ an affected orphan before mutation. Startup remains absent.
 
 ### 10. Incompatible current-reader results refuse the complete operation
 Type: Behavior
-Status: planned
+Status: done
+Accepted proof: [slice 10](EXECUTION.md#slice-10-accepted-proof).
 Proof: Two readers resolve one authored selector to different same-name private
 targets → migrate one target → diagnostic and unchanged notes, learning and
 accepted histories. Assert both baseline destinations. Read private downloads

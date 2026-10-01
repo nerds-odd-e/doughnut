@@ -8,7 +8,9 @@ import static org.hamcrest.Matchers.equalTo;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
+import com.odde.donut.entities.User;
 import com.odde.donut.services.NumberedPropertyMigration;
+import com.odde.donut.testability.GitBundleTestReader.AcceptedHistory;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -74,6 +76,102 @@ class NumberedPropertyMigrationSelectorRefusalControllerTest
 
     assertThat(state(notebook), equalTo(state));
     assertThat(acceptedHistory(notebook), equalTo(history));
+  }
+
+  @Test
+  void incompatibleCurrentReaderSelectorsRefuseWithoutChangingAnyAffectedNotebook()
+      throws Exception {
+    User owner = currentUser.getUser();
+    User other = inCommittedTransaction(transactionManager, this::createFixtureUser);
+    Notebook migrating = createGitBackedNotebook("Shared");
+    Note target =
+        makeMe
+            .aNote()
+            .notebook(migrating)
+            .title("Target")
+            .content("---\ntype: Note\ntopic 2: A\n---\nBody")
+            .please();
+    currentUser.setUser(other);
+    Notebook unchanged;
+    Note otherTarget;
+    AcceptedHistory unchangedHistory;
+    List<String> unchangedState;
+    try {
+      unchanged = createGitBackedNotebook("Shared");
+      otherTarget =
+          makeMe
+              .aNote()
+              .notebook(unchanged)
+              .title("Target")
+              .content("---\ntype: Note\ntopic 2: B\n---\nBody")
+              .please();
+      snapshotCurrentPortableTree(unchanged);
+      unchangedHistory = acceptedHistory(unchanged);
+      unchangedState = state(unchanged);
+    } finally {
+      currentUser.setUser(owner);
+    }
+    Notebook source = createGitBackedNotebook("Source");
+    Note referrer =
+        makeMe
+            .aNote()
+            .notebook(source)
+            .title("Referrer")
+            .content("See [[Shared:Target#prop:topic%202|detail]].")
+            .please();
+    inCommittedTransaction(
+        transactionManager,
+        () -> {
+          makeMe
+              .aBazaarNotebook(notebookRepository.findById(source.getId()).orElseThrow())
+              .please();
+          makeMe
+              .aMemoryTrackerFor(noteRepository.findById(target.getId()).orElseThrow())
+              .propertyKey("topic 2")
+              .afterNthStrictRecall(2)
+              .please();
+          makeMe
+              .aMemoryTrackerFor(noteRepository.findById(referrer.getId()).orElseThrow())
+              .afterNthStrictRecall(2)
+              .please();
+        });
+    snapshotCurrentPortableTree(migrating);
+    snapshotCurrentPortableTree(source);
+    var migratingHistory = acceptedHistory(migrating);
+    var sourceHistory = acceptedHistory(source);
+    var sourceState = state(source);
+    var migratingState = state(migrating);
+
+    assertThat(
+        noteController.showNote(referrer).getWikiLinks().getFirst().getDestinationNoteId(),
+        equalTo(target.getId()));
+    currentUser.setUser(other);
+    try {
+      assertThat(
+          noteController.showNote(referrer).getWikiLinks().getFirst().getDestinationNoteId(),
+          equalTo(otherTarget.getId()));
+    } finally {
+      currentUser.setUser(owner);
+    }
+
+    assertThat(
+        migration.migrateNotebook(migrating.getId(), testabilitySettings.getCurrentUTCTimestamp()),
+        equalTo(
+            "Note "
+                + referrer.getId()
+                + ": Inconsistent reader resolution: Shared:Target#prop:topic%202|detail"));
+
+    assertThat(state(migrating), equalTo(migratingState));
+    assertThat(state(source), equalTo(sourceState));
+    assertThat(acceptedHistory(migrating), equalTo(migratingHistory));
+    assertThat(acceptedHistory(source), equalTo(sourceHistory));
+    currentUser.setUser(other);
+    try {
+      assertThat(state(unchanged), equalTo(unchangedState));
+      assertThat(acceptedHistory(unchanged), equalTo(unchangedHistory));
+    } finally {
+      currentUser.setUser(owner);
+    }
   }
 
   private List<String> state(Notebook notebook) {
