@@ -133,7 +133,8 @@ Do not repeatedly assert canonical history fields already owned by slice 4.
 
 ### 7. Restoring Trash retains the migrated association
 Type: Behavior
-Status: planned
+Status: done
+Accepted proof: see [slice 7](EXECUTION.md#slice-7-accepted-proof).
 Proof: Trash a learned note through `NoteController`, migrate, download its
 `_trash` content, undo Trash through the controller → restored list and retained
 tracker/history. Use the existing real Trash fixture pattern and full suite.

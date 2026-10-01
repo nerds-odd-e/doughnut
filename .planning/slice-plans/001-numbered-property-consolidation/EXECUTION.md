@@ -148,3 +148,16 @@ on a detached User before migration; reloading it in the fixture transaction
 corrected setup. No product defect inferred. Independent refactor found no
 edits; formatter passed. Six active minutes including correction, waits exempt;
 no production/API changes.
+
+## Slice 7 accepted proof
+
+`CURSOR_DEV=true nix develop -c pnpm backend:verify` passed: 2755 tests,
+zero failures/errors, two skipped; TrashControllerTest XML records one pass.
+The bound learned-note fixture uses real controller Trash, migration and undo.
+Exact downloaded `_trash/Subject.md` contains the consolidated list; fresh
+committed controller reads after undo retain note/tracker IDs, final focus,
+active learning and exact serialized recall history. Initial verification failed
+only on unquoted expected Markdown; correcting it to the shared transformer's
+double-quoted items passed full verification. Independent refactor found no
+edits; formatter passed. Four active minutes, waits exempt; no production/API
+changes or weakened promise.
