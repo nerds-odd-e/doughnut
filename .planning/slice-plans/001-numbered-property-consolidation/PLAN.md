@@ -3,37 +3,21 @@
 **Identity:** SEED-063#story-2
 **Source:** [Existing numbered property keys become one list, and their trackers follow](../../seeds/SEED-063-track-property-values-separately.md#story-2)
 
-## Goal and authority
+## Goal
 
 Authors see one meaningful property containing their associations. Learners
 retain the identity, history and next recall of each distinct tracked
 association. The owner permits dropping redundant trackers at a duplicate
 destination; the retained tracker keeps its own history without merging.
 
-The owner invoked dough-execute-plan for this story on 2026-10-01. Execution
-is authorized in Story Branch Mode; application release remains separately
-authorized. The published claim is Taken.
-
-## Execution context
-
-Read [EXECUTION.md](EXECUTION.md) for retained execution identity, preparation,
-publication and observer state.
-
 ## Required execution basis
 
 Read [BASIS.md](BASIS.md) for scope, current decisions, architectural
-constraints, decisive premises, baseline proof and review learnings before
-executing these slices. Those requirements remain part of this plan.
+constraints, decisive premises, sizing and verification gates before executing
+these slices. Read [EXECUTION.md](EXECUTION.md) for authority, retained identity,
+publication, observer state and accepted proof. Both remain part of this plan.
 
 ## Ordered slices and outside-in proof
-
-Each slice targets about 5 minutes including local edits and focused cleanup.
-Slices 4, 8 and 10 are scrutinized cohesive outcomes targeting 5–8 active minutes:
-their content/history or transaction promises must be proved together. The
-mandatory complete backend suite and isolated process boot are explicit
-verification-wait exceptions when they exceed that target; do not use them to
-hide more implementation. At >10 active minutes, stop and finer-decompose the
-remaining work with recorded learning before continuing.
 
 ### 1. Startup services are usable after schema migration
 Type: Behavior
@@ -103,7 +87,7 @@ no private learning data in Portable content. Run the full backend suite.
 Behavior: Learned `example of` and `example of 2` with distinct scalar values →
 migrate → both original trackers focus on their values under the base. Apply
 content and learning changes through the existing accepted-change transaction.
-Keep the startup caller absent until slice 13.
+Keep the startup caller absent until slice 14.
 
 ### 5. Sparse and already-listed families use the same rule
 Type: Behavior
@@ -160,9 +144,24 @@ merge histories, or relax uniqueness. Recheck the current FK closure against
 `information_schema` before implementing hard deletion. Failure leaves the
 complete accepted operation unchanged, including the deletion fan-out.
 
-### 9. In-notebook selectors still resolve after consolidation
+### 9. Rewritten list focuses must follow authored source items
 Type: Behavior
 Status: planned
+Proof: A valid list reference and an orphan persisted focus containing the same
+selector → invoke migration → diagnostic and complete unchanged content,
+trackers and downloaded accepted history. Run the full backend suite.
+
+Behavior: Ground reference-value mappings in exact authored list items before
+mutation. Compose them with family mappings and retain unaffected item focuses;
+report an affected orphan instead of inventing its destination. Reuse the parked
+selector prototype, with this refusal proof; retain the canonical selector
+journey parked until slice 10. Startup remains absent.
+
+### 10. In-notebook selectors still resolve after consolidation
+Type: Behavior
+Status: planned
+Continuation: restore the parked journey, correct controller cardinality
+(unresolved links are omitted), and add stored authored-reference row assertions.
 Proof: A uniquely resolving `#prop:` selector in body/frontmatter → migration →
 controller wiki resolution selects the base, visible text is retained, derived
 source rows match authored content and downloaded Markdown has the new selector.
@@ -175,7 +174,7 @@ existing resolver's source-scope and ambiguity rules. Use shared reference
 rewrites and tracker mapping; add no alternate link syntax or saved destination
 authority.
 
-### 10. Cross-notebook referrers publish in the same operation
+### 11. Cross-notebook referrers publish in the same operation
 Type: Behavior
 Status: planned
 Proof: Target and referrer in separate bound notebooks → migration → both
@@ -189,7 +188,7 @@ transaction. Include affected source-value trackers, using the same duplicate
 rule. This is system migration authority, not a user web action's ownership
 filter. Do not publish a target change before its required reference rewrites.
 
-### 11. Late publication failure rolls back the whole migration
+### 12. Late publication failure rolls back the whole migration
 Type: Behavior
 Status: planned
 Proof: Reuse the existing failing-binding-save/committed-reader pattern at the
@@ -203,7 +202,7 @@ final accepted binding save → all affected notebooks and private learning
 remain at their pre-operation state. The injected failure verifies the
 business atomicity promise; it adds no generic failure-recovery framework.
 
-### 12. A resumed run changes only remaining legacy content
+### 13. A resumed run changes only remaining legacy content
 Type: Behavior
 Status: planned
 Proof: Run migration twice → stable content, tracker IDs/history and accepted
@@ -216,7 +215,7 @@ no new duplicate commit/deletion/history reset. Use separately proxied
 transactions and derive eligibility from current authored content. A late
 infrastructure failure may surface loudly; the next run resumes safely.
 
-### 13. Startup invokes the proved complete migration
+### 14. Startup invokes the proved complete migration
 Type: Behavior
 Status: planned
 Proof: Extend slice 1's real event probe to seed a learned numbered family and

@@ -1,5 +1,9 @@
 # Execution context
 
+The owner invoked dough-execute-plan for this story on 2026-10-01. Execution
+is authorized in Story Branch Mode; application release remains separately
+authorized. The published claim is Taken.
+
 - Workspace: `/Users/terryyin/git/doughnut/.worktrees/existing-numbered-property-keys-become-one-list`
 - Branch: `codex/existing-numbered-property-keys-become-one-list`
 - Mode: story-branch; remote: `origin`; integration target: `main`.
@@ -179,3 +183,28 @@ adaptation, exact conversation-ID cleanup and corrected observation passed.
 No manual DB deletes. Implementation took 9.5 active minutes; hard limit not
 crossed. Fresh refactor simplified existence assertions to keep the test at
 249 lines and reran the full suite successfully. Formatter passed; no API change.
+
+## Selector operation sizing reassessment
+
+The original slice 9 attempt stopped at nine active minutes before the hard
+limit; remaining correction/proof could not fit. Six owned production edits are
+parked in `/tmp/numbered-property-selector-attempt.patch`; its test is parked in
+`/tmp/NumberedPropertyMigrationSelectorsControllerTest.java`. Owned product paths
+were individually restored/removed; completed slices are preserved.
+
+Two full backend:verify runs each executed 2758 tests with one failure and two
+skips. First expected YAML quoting incorrectly; second expected unresolved links
+in showNote, which omits them. Exact rewritten content, tracker focus and property
+index assertions passed before the second failure; destination/download proof
+was not reached. The promised stored-reference observation was never inserted.
+Review also found blind string rewrites could invent an orphan tracker's mapping.
+
+Split independent refusal/preflight proof (new slice 9) from accepted resolved
+selector publication (new slice 10); later slices shift by one, fourteen total.
+Reuse the parked prototype while grounding maps in authored items; retain its
+positive journey parked until slice 10. No story/ADR/authority change. Delivered
+value is exact family conversion with preserved learning, Trash and deterministic
+duplicates. Remaining reference/atomic/retry/startup promises still form this
+story; the concrete sizing issue is hidden source correspondence and fixture
+observations, not a new beneficiary or outcome. Each continuation targets five
+active minutes; prior elapsed work and failed proof remain recorded.
