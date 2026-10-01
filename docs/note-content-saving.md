@@ -64,6 +64,24 @@ lines, a new property is appended before the closing fence, and a rename
 changes only the key text. The panel matches keys exactly, including case.
 Removing the last property drops the block.
 
+Key presets use canonical base names and never generate numbered alternatives.
+Add property keeps an occupied list-capable key, such as `url` or `example of`,
+available: accepting another value promotes its scalar to a list or appends to
+its list in order. Matching is exact; an authored `example of 2` remains a
+separate property when `example of` is selected.
+
+Occupied scalar-only and singleton preset slots are omitted. These include
+`image`, `wikidata_id`, `question_generation_instruction`, readme `title_pattern`,
+and ordinary-note `aliases`, `overlaps` and `note_level`. Recognized legacy aliases
+and numbered forms occupy the same slot. Authors change their values in the
+existing row; structural values retain their scalar rules.
+
+A stored row's key suggestions also omit another row's exact base key, including
+list-capable keys, while ignoring the current row when checking occupancy. Manually
+renaming to an existing exact key reports a duplicate and saves nothing; it does
+not merge rows. Note/readme preset scope and typed-text filtering still apply.
+Authored numbered keys remain readable and editable, with their trackers unchanged.
+
 Server-side property writes — setting `image:` or `image_mask:`, reducing a
 relationship note to a source property, and removing a trashed note's links
 from other notes' properties — edit through the backend's
