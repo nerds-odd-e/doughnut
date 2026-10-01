@@ -104,6 +104,13 @@ Then(
   }
 )
 
+Then(
+  'the new property Add and Cancel controls should be at least 44 px high',
+  () => {
+    start.assumeNotePage().expectNewRichNotePropertyControlHeights()
+  }
+)
+
 Then('the note should not scroll sideways', () => {
   start.assumeNotePage().expectNoteWithoutSidewaysScroll()
 })

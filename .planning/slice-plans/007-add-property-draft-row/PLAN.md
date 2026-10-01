@@ -130,7 +130,7 @@ Behavior: add form with key `topic` and value `training` → tap Cancel (× icon
 
 ### 4. Add and Cancel are touch sized
 Type: Behavior
-Status: planned
+Status: done
 Proof: new scenario "A touch device gets new property controls of at least 44 px" in `note_property_layout.feature`
 (`I use a touch device`, window 820 × 1000, `I start adding a property with key "topic"`, then a new step that the new
 property's Add and Cancel controls are at least 44 px high), run with
@@ -207,6 +207,12 @@ still in place" and "the list renders the draft row and the add form is deleted"
 - Refactor replacement: `./scripts/run.sh pnpm frontend:test tests/components/form/RichMarkdownEditor.propertyEntry.spec.ts tests/components/form/RichMarkdownEditor.propertyRenameGuard.spec.ts` — 14 tests passed after sharing draft reset with the parsed-property watcher and extracting unrelated rename-guard coverage.
 - `./scripts/run.sh pnpm -C frontend exec vue-tsc --noEmit` passed. Include `propertyRenameGuard.spec.ts` in slice 5 regression proof.
 - Slice 2 accepted revision: `454bb48eaa208dde9d3a759d59344a41fd585f65` on execution branch; CI remains unobserved.
+
+### Slice 4
+
+- `./scripts/run.sh pnpm cy:run --spec e2e_test/features/note_topology/note_property_layout.feature` — 12 scenarios passed before and after test-support extraction. New scenario opens a draft as author on a touch device at 820 × 1000; page object observes Add and Cancel actual bounding rectangles at least 44 px high.
+- No product change. `notePropertyLayoutMethods.ts` now owns the shared height measurements and layout assertions, composed into `notePage.ts`; location methods keep routing/panel behavior.
+- Slice 3 accepted revision: `0470d6be2d222ded20760781691212ec9c754eec` on execution branch; CI remains unobserved.
 
 ## Learnings
 

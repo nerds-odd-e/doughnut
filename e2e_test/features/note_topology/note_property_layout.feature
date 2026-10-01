@@ -67,6 +67,14 @@ Feature: Note property layout
     And I open the property panel for property "url"
     Then the controls of property "url" should be at least 44 px high
 
+  Scenario: A touch device gets new property controls of at least 44 px
+    Given I am re-logged in as "another_old_learner"
+    And I use a touch device
+    And I am on a window 820 * 1000
+    When I visit note "Long properties"
+    And I start adding a property with key "topic"
+    Then the new property Add and Cancel controls should be at least 44 px high
+
   Scenario: Without a touch device the property controls stay compact
     Given I am re-logged in as "another_old_learner"
     And I have a note "Linked" under notebook "Long property shelf" with content:

@@ -11,6 +11,7 @@ import {
   findNoteContentRegion,
   noteContentRegion,
 } from './notePageContentRegion'
+import { notePropertyLayoutMethods } from './notePropertyLayoutMethods'
 import { notePropertyLocationMethods } from './notePropertyLocationMethods'
 import { noteRelationshipMethods } from './noteRelationshipMethods'
 import { noteRichPropertyAssimilationMethods } from './noteRichPropertyAssimilationMethods'
@@ -177,6 +178,7 @@ export const assumeNotePage = (
     ...noteContentEditingMethods(),
     ...noteRichPropertyMethods(),
     ...notePropertyLocationMethods(),
+    ...notePropertyLayoutMethods(),
     ...noteRichPropertyAssimilationMethods(),
     ...noteRelationshipMethods(),
     ...sidebarChildNotePageMethods(),
