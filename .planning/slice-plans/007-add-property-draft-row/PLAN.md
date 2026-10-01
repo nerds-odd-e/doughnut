@@ -163,6 +163,23 @@ as they are.
 If this runs past about 10 minutes, split at "the row's draft mode, exercised by a component test with the add form
 still in place" and "the list renders the draft row and the add form is deleted".
 
+## Execution complete
+
+Product advice: No additional product work recommended. The optional owner check on a real iPad remains useful for keyboard and touch feel; automated touch sizing, focus and deliberate-add proof passed.
+
+## Retrospective review
+
+All five delivered slices match the original selected story and exclusions. No product correction or architecture conflict found: draft state stays local until accepted, the Markdown add rule remains shared (ADR 0004), stored property routing stays unchanged (ADR 0005), and existing upload/dialog confirmation paths retain integrated proof. E2E protected the add journey; mounted tests own detailed validation and lifecycle cases. Retained meaningful preset, image, Wikidata and persistence scenarios; no unsupported suite cleanup recommended.
+
+Process review: added one occurrence under existing ODF-189 in `DearDough.md` for numeric file-size limits causing test-responsibility moves and replacement proof. No new finding code, instruction changes or backlog item. Log is 401 physical lines. Advice: consider touched-file size capacity during future slice planning.
+
+Attributable published implementation revisions on `origin/codex/adding-a-property-uses-a-row-with-a-visible-add`:
+`c05b83ea2b8a5ed3b0bd1534d720fcd08f8c9539`, `454bb48eaa208dde9d3a759d59344a41fd585f65`,
+`0470d6be2d222ded20760781691212ec9c754eec`, `cb7c47b618bf3969c867f81ecccc2e7ecce865f5`,
+`8532455a2ae612acbe492756feac4411fd37bbde`. Claim revision is provenance, not implementation. No interleaved unrelated commits.
+
+CI limitation: managed delivery reported the Codex yielded-cell bridge unavailable for every increment. No observer was armed, no completion mailbox exists, and no CI success or shutdown is claimed. Local proof is complete; branch integration and story-history cleanup remain story wrap-up responsibilities.
+
 ## Current decisions
 
 - One add path: `tryCommitInsert` stays the single place that turns a draft into a stored property; the Wikidata dialog
