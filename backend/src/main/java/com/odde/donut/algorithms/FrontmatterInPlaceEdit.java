@@ -1,15 +1,21 @@
 package com.odde.donut.algorithms;
 
+import static com.odde.donut.algorithms.YamlSourceEdit.dumpEntry;
+import static com.odde.donut.algorithms.YamlSourceEdit.dumpScalar;
+import static com.odde.donut.algorithms.YamlSourceEdit.entryRemoval;
+import static com.odde.donut.algorithms.YamlSourceEdit.offset;
+import static com.odde.donut.algorithms.YamlSourceEdit.splice;
+
+import com.odde.donut.algorithms.YamlSourceEdit.Replacement;
+import com.odde.donut.entities.PropertyFocus;
 import java.io.StringReader;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.UnaryOperator;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
-import org.yaml.snakeyaml.error.Mark;
 import org.yaml.snakeyaml.nodes.MappingNode;
 import org.yaml.snakeyaml.nodes.Node;
 import org.yaml.snakeyaml.nodes.NodeTuple;
@@ -23,6 +29,15 @@ import org.yaml.snakeyaml.nodes.SequenceNode;
 public final class FrontmatterInPlaceEdit {
 
   private FrontmatterInPlaceEdit() {}
+
+  /** A diagnostic has no transformed YAML or focus mapping. */
+  public record ConsolidatedProperties(
+      String yaml, Map<PropertyFocus, PropertyFocus> focuses, String diagnostic) {}
+
+  /** Consolidates exact authored numeric families without rewriting other source ranges. */
+  public static ConsolidatedProperties consolidateNumberedProperties(String yamlRaw) {
+    return FrontmatterNumberedProperties.consolidate(yamlRaw);
+  }
 
   /**
    * Rewrites supported values — top-level scalars and all-scalar sequence items — with {@code
@@ -158,17 +173,6 @@ public final class FrontmatterInPlaceEdit {
   }
 
   /**
-   * From the key's line start through the end of the line holding {@code last}'s final character (a
-   * block node's end mark already sits at the next line's start).
-   */
-  private static Replacement entryRemoval(String yamlRaw, NodeTuple tuple, Node last) {
-    int start =
-        yamlRaw.lastIndexOf('\n', offset(yamlRaw, tuple.getKeyNode().getStartMark()) - 1) + 1;
-    int lineEnd = yamlRaw.indexOf('\n', offset(yamlRaw, last.getEndMark()) - 1);
-    return new Replacement(start, lineEnd < 0 ? yamlRaw.length() : lineEnd + 1, "");
-  }
-
-  /**
    * Each run of emptied items is cut up to the next kept item's start; a trailing run is cut from
    * the last kept item's end, so block and flow sequences both stay well formed.
    */
@@ -200,12 +204,6 @@ public final class FrontmatterInPlaceEdit {
     return removals;
   }
 
-  private static String dumpEntry(String key, String value) {
-    DumperOptions options = new DumperOptions();
-    options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
-    return stripTrailingNewline(new Yaml(options).dump(Map.of(key, value)));
-  }
-
   private static List<ScalarNode> supportedScalars(Node value) {
     if (value instanceof ScalarNode scalar) {
       return List.of(scalar);
@@ -216,30 +214,4 @@ public final class FrontmatterInPlaceEdit {
     }
     return List.of();
   }
-
-  /** SnakeYAML marks count code points; {@link String} offsets count UTF-16 chars. */
-  private static int offset(String yamlRaw, Mark mark) {
-    return yamlRaw.offsetByCodePoints(0, mark.getIndex());
-  }
-
-  private static String splice(String yamlRaw, List<Replacement> replacements) {
-    StringBuilder rewritten = new StringBuilder(yamlRaw);
-    replacements.stream()
-        .sorted(Comparator.comparingInt(Replacement::start).reversed())
-        .forEach(r -> rewritten.replace(r.start(), r.end(), r.text()));
-    return rewritten.toString();
-  }
-
-  private static String dumpScalar(String value, DumperOptions.ScalarStyle style) {
-    DumperOptions options = new DumperOptions();
-    options.setDefaultScalarStyle(style);
-    options.setSplitLines(false);
-    return stripTrailingNewline(new Yaml(options).dump(value));
-  }
-
-  private static String stripTrailingNewline(String dumped) {
-    return dumped.endsWith("\n") ? dumped.substring(0, dumped.length() - 1) : dumped;
-  }
-
-  private record Replacement(int start, int end, String text) {}
 }

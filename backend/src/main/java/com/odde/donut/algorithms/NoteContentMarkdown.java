@@ -1,5 +1,7 @@
 package com.odde.donut.algorithms;
 
+import com.odde.donut.entities.PropertyFocus;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.UnaryOperator;
@@ -112,6 +114,25 @@ public final class NoteContentMarkdown {
   private static String rebuildDroppingEmptyBlock(
       NoteLeadingFrontmatter.VerbatimSplit split, String yaml) {
     return Frontmatter.parse(yaml).isEmpty() ? split.body() : split.rebuild(yaml);
+  }
+
+  public record ConsolidatedProperties(
+      String content, Map<PropertyFocus, PropertyFocus> focuses, String diagnostic) {}
+
+  /** Returns exact source-to-list focuses, or a diagnostic without transformed content. */
+  public static ConsolidatedProperties consolidateNumberedProperties(String content) {
+    if (content == null) {
+      return new ConsolidatedProperties(null, Map.of(), null);
+    }
+    var split = NoteLeadingFrontmatter.splitPreservingSource(content);
+    if (split.isEmpty()) {
+      return new ConsolidatedProperties(content, Map.of(), null);
+    }
+    var result = FrontmatterInPlaceEdit.consolidateNumberedProperties(split.get().yamlRaw());
+    if (result.diagnostic() != null) {
+      return new ConsolidatedProperties(null, Map.of(), result.diagnostic());
+    }
+    return new ConsolidatedProperties(split.get().rebuild(result.yaml()), result.focuses(), null);
   }
 
   /**

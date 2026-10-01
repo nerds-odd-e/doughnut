@@ -58,7 +58,8 @@ evidence, not a substitute for the later migration journey.
 
 ### 2. One exact-family transformation owns consolidation
 Type: Structure
-Status: planned
+Status: done
+Accepted proof: see [slice 2](EXECUTION.md#slice-2-accepted-proof).
 Proof: Pure contract tests on the existing authored-frontmatter boundary prove
 numeric grouping/list/ordering and preserve unrelated bytes. Include quoted
 leading/trailing whitespace keys and numeric suffixes beyond Integer range;

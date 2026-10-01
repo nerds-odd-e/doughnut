@@ -42,3 +42,23 @@ suite wait remains excepted). Twelve slices remain in this cumulative design;
 no story boundary or ADR change is required. Record the original nine-minute
 attempt when reporting continuation; a retry does not erase it. All later slices
 are retained because this evidence concerns the common transformation contract.
+
+## Slice 2 accepted proof
+
+Corrected continuation took four active minutes after the recorded nine-minute
+attempt. Independent refactoring separated exact family policy from shared YAML
+source-edit mechanics, with the public authored-document contract preserved.
+`CURSOR_DEV=true nix develop -c pnpm backend:test_only` passed after all edits:
+2746 tests, zero failures/errors, two skipped. XML for
+`NoteContentMarkdownNumberedPropertiesTest` confirms twelve selected cases.
+
+The authored-Markdown fixtures and exact output/focus assertions observe forced
+lists, scalar and list-item mappings, stable deduplication and numeric ordering,
+missing bases, case/whitespace distinction, suffixes beyond Long range, url and
+structural/word eligibility, shared scalar meanings, diagnostic-only unsupported
+shapes, repeated-run stability and BOM/CRLF/unrelated source preservation.
+`PropertyKeyNaming` retains one suffix representation using BigInteger;
+structural consumers trim explicitly. Maps reuse the existing PropertyFocus.
+The refactor's full-suite proof also covers existing source-edit callers.
+Independent refactor completed; coordinator formatter passed. Migration tracker
+and accepted-publication integration remain slice 3's obligation.

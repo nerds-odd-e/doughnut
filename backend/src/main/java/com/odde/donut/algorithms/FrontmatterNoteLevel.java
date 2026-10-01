@@ -36,7 +36,7 @@ public final class FrontmatterNoteLevel {
       if (!PropertyKeyNaming.isNoteLevelPropertyKey(key)) {
         continue;
       }
-      if (PropertyKeyNaming.propertyKeyBaseAndSuffix(key).suffix() != null) {
+      if (PropertyKeyNaming.propertyKeyBaseAndSuffix(key.trim()).suffix() != null) {
         return Optional.of(AUTHORED_NOTE_LEVEL_MESSAGE);
       }
       if (frontmatter.getString(key).flatMap(FrontmatterNoteLevel::parseValidLevel).isEmpty()) {

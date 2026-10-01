@@ -1,5 +1,6 @@
 package com.odde.donut.algorithms;
 
+import java.math.BigInteger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -10,23 +11,23 @@ public final class PropertyKeyNaming {
 
   private PropertyKeyNaming() {}
 
-  public record BaseAndSuffix(String base, Integer suffix) {}
+  public record BaseAndSuffix(String base, BigInteger suffix) {}
 
   /** Splits a property key into its base name and optional numeric suffix (`url 2` → suffix 2). */
   public static BaseAndSuffix propertyKeyBaseAndSuffix(String key) {
-    String trimmed = key == null ? "" : key.trim();
-    Matcher matcher = KEY_SUFFIX_PATTERN.matcher(trimmed);
+    String authored = key == null ? "" : key;
+    Matcher matcher = KEY_SUFFIX_PATTERN.matcher(authored);
     if (matcher.matches()) {
-      int n = Integer.parseInt(matcher.group(2));
-      if (n >= 2) {
+      BigInteger n = new BigInteger(matcher.group(2));
+      if (n.compareTo(BigInteger.TWO) >= 0) {
         return new BaseAndSuffix(matcher.group(1), n);
       }
     }
-    return new BaseAndSuffix(trimmed, null);
+    return new BaseAndSuffix(authored, null);
   }
 
   private static boolean propertyKeyBaseMatches(String key, String baseKey) {
-    BaseAndSuffix parts = propertyKeyBaseAndSuffix(key);
+    BaseAndSuffix parts = propertyKeyBaseAndSuffix(key == null ? null : key.trim());
     return parts.base().trim().equalsIgnoreCase(baseKey.trim());
   }
 
@@ -40,7 +41,7 @@ public final class PropertyKeyNaming {
   }
 
   private static String normalizedBaseWithoutUnderscores(String key) {
-    BaseAndSuffix parts = propertyKeyBaseAndSuffix(key);
+    BaseAndSuffix parts = propertyKeyBaseAndSuffix(key == null ? null : key.trim());
     return parts.base().trim().toLowerCase().replace("_", "");
   }
 
@@ -72,7 +73,7 @@ public final class PropertyKeyNaming {
     if (!propertyKeyBaseMatches(key, "an example of")) {
       return key;
     }
-    BaseAndSuffix parts = propertyKeyBaseAndSuffix(key);
+    BaseAndSuffix parts = propertyKeyBaseAndSuffix(key == null ? null : key.trim());
     if (parts.suffix() == null) {
       return "example of";
     }
@@ -113,6 +114,11 @@ public final class PropertyKeyNaming {
         || isQuestionGenerationInstructionPropertyKey(key)
         || isNoteLevelPropertyKey(key)
         || isRelationshipNoteStructuralPropertyKey(key);
+  }
+
+  /** List-capable numbered families include url, unlike property learning indexes. */
+  public static boolean isListCapablePropertyKey(String key) {
+    return !isReservedStructuralKey(key) || isUrlPropertyKey(key);
   }
 
   /** Keys excluded from property indexing and tracker seeding (Obsidian passthrough + overlaps). */
