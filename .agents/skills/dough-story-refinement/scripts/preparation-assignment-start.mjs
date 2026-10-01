@@ -2,100 +2,42 @@
 // preparation, or continues the workspace's existing one, first creating a
 // missing workspace at fetched trunk. The announcement commit adds only the
 // assignment profile; the draft stays in the workspace.
-import { mkdirSync, writeFileSync } from "node:fs";
-import { dirname, join } from "node:path";
-import {
-  agentIdentity,
-  renderAgentProfile,
-} from "../../dough-product-backlog/scripts/product-backlog-agent-profile.mjs";
-import {
-  profileAllocation,
-  selectAgent,
-} from "../../dough-execute-plan/scripts/agent-assignments.mjs";
+import { agentIdentity } from "../../dough-product-backlog/scripts/product-backlog-agent-profile.mjs";
+import { selectAgent } from "../../dough-execute-plan/scripts/agent-assignments.mjs";
 import { maintenance } from "../../dough-execute-plan/scripts/execution-start-maintenance.mjs";
 import { fastForwardToFetchedTrunk } from "../../dough-execute-plan/scripts/maintain-default-checkout.mjs";
 import {
   git,
-  lsRemoteSha,
   revParse,
   tryPushExactRef,
 } from "../../dough-execute-plan/scripts/publication-git.mjs";
 import {
   configureAgentAuthorship,
-  creditDeveloper,
   DeveloperIdentityRefused,
 } from "../../dough-execute-plan/scripts/workspace-agent-authorship.mjs";
 import {
   backlogPath,
-  isAncestor,
   remoteRef,
 } from "../../dough-execute-plan/scripts/workspace-publication-ownership.mjs";
 import {
+  assignedElsewhereError,
   assignmentFields,
   errorText,
-  profilePathOf,
-  recordAllocation,
   recordedAllocation,
   restoreAllocation,
-  requestOf,
   stop,
   workspaceAssignment,
 } from "./preparation-assignment-ownership.mjs";
+import { requestOf } from "./preparation-assignment-request.mjs";
 import {
   fetchQueuedTrunk,
   selectPreparationWorkspace,
 } from "./preparation-assignment-trunk.mjs";
 
-// Commits only the new profile on top of fetched trunk, from a clean
-// workspace already at that trunk; nothing else is staged.
-// The agent authors it and the developer committing it is credited; an
-// unusable developer throws DeveloperIdentityRefused before anything changes.
-async function commitAnnouncement(request, agent) {
-  const { workspace } = request;
-  const identity = agentIdentity(agent.name);
-  const message = await creditDeveloper(
-    workspace,
-    `Announce preparation: ${request.identity}\n\nPreparation-Identity: ${request.identity}\n`,
-    identity,
-  );
-  const path = profilePathOf(agent.name);
-  mkdirSync(dirname(join(workspace, path)), { recursive: true });
-  writeFileSync(
-    join(workspace, path),
-    renderAgentProfile({
-      name: agent.name,
-      identity: request.identity,
-      activity: "preparation",
-      host: agent.host,
-      model: agent.model,
-    }),
-  );
-  await git(workspace, "add", "--", path);
-  await git(
-    workspace,
-    "commit",
-    "--quiet",
-    `--author=${identity.agent} <${identity.email}>`,
-    "-m",
-    message,
-  );
-  const sha = await revParse(workspace, "HEAD");
-  // Recorded before the push, so a rerun after a lost response recognizes
-  // its own announcement instead of making a second one.
-  await recordAllocation(workspace, sha);
-  return { path, sha };
-}
-
-// Whether remote trunk contains `sha` and still records it as the profile's
-// allocation, read from a fresh fetch and the remote's own tip.
-async function acceptedOnRemote(request, ref, sha, path) {
-  const { workspace, remote, target } = request;
-  await git(workspace, "fetch", "--quiet", remote);
-  const url = (await git(workspace, "remote", "get-url", remote)).stdout.trim();
-  const tip = await lsRemoteSha(url, `refs/heads/${target}`);
-  if (!tip || !(await isAncestor(workspace, sha, tip))) return false;
-  return (await profileAllocation(workspace, ref, path)) === sha;
-}
+import {
+  commitAnnouncement,
+  acceptedOnRemote,
+} from "./preparation-announcement.mjs";
 
 // Drops an announcement a stopped earlier run left in the workspace that
 // trunk never took, restoring the workspace it was built from.
@@ -126,6 +68,21 @@ async function announce(request) {
   let base = trunk.fetched;
   const recorded = recordedAllocation(workspace);
   const found = await workspaceAssignment(request, ref, recorded);
+  if (request.continueOnly) {
+    const facts = found.own && assignmentFields(request, found.own);
+    if (
+      found.state !== "held" ||
+      (request.expectedAllocation !== undefined &&
+        request.expectedAllocation !== facts?.allocation) ||
+      (request.expectedAgent !== undefined &&
+        request.expectedAgent !== facts?.agent)
+    )
+      return stop("continuation-refused", {
+        workspace,
+        error:
+          "the retained preparation's exact local allocation and published ownership could not be verified; no announcement was made",
+      });
+  }
   if (found.state === "held") {
     await configureAgentAuthorship(workspace, agentIdentity(found.own.name));
     return {
@@ -141,8 +98,7 @@ async function announce(request) {
       workspace,
       fetched: base,
       ...assignmentFields(found.assigned.profile, found.assigned),
-      error:
-        "this workspace still holds a published assignment this request does not name; end it before preparing another",
+      error: assignedElsewhereError,
     });
   // Only dropping an unconfirmed announcement changes the record.
   let previous = await recorded;
@@ -164,7 +120,12 @@ async function announce(request) {
   const unannounced = async (status, fields) => {
     await git(workspace, "reset", "--keep", "--quiet", startHead);
     await restoreAllocation(workspace, previous);
-    return stop(status, { workspace, fetched: base, ...fields });
+    return stop(status, {
+      workspace,
+      fetched: base,
+      unannounced: true,
+      ...fields,
+    });
   };
   let agent, announced;
   for (let attempt = 1; ; attempt += 1) {

@@ -209,23 +209,23 @@ Do not start execution of the queued work. Later refinement or planning reads
 the same linked expectations, evidence, gaps, and examples; do not invent
 another tracker.
 
-If the backlog or a required canonical home cannot be identified, name the
-missing context and stop rather than inventing a queue entry.
+If the backlog or required canonical home is unknown, name the gap and stop; invent no queue entry.
 
 ## Report the disposition
 
-Return control to the coordinator with an evidence-backed disposition. Name the
-gathered expectation, actual, evidence, and gaps, then what execution returned
-or which remaining-work route was taken.
+Return an evidence-backed disposition to the coordinator: the gathered
+expectation, actual, evidence, and gaps, and execution result or remaining-work route.
 
 - **Repaired:** the reproduction test failed for the reported mismatch, the
   smallest change made that proof green, related verification passed, and
-  shared delivery completed refactoring and delivery. One-shot delivery reached
-  trunk and ends with its [retirement](../dough-execute-plan/references/one-shot.md#retire-the-workspace).
-  Otherwise do not report branch delivery as integrated: the coordinator invokes
+  shared refactoring completed. A one-shot repair is retained for review unless landing was requested or automatic landing was
+  selected; report its workspace and [landing request](../dough-execute-plan/references/one-shot.md#land-the-retained-result).
+  Only a landed result proceeds to [retirement](../dough-execute-plan/references/one-shot.md#retire-the-workspace).
+  For tracked work, complete shared delivery before reporting it; do not report
+  branch delivery as integrated: invoke
   [story wrap-up](../dough-story-wrap-up/SKILL.md#integrate-committed-story-branch-mode-closure)
-  for integration to the selected target (default `main`). Reporter
-  confirmation on main is pending when a repair needs it; never fabricate it.
+  for integration to the selected target (default `main`). Never fabricate pending
+  reporter confirmation on main when a repair needs it.
 - **Explained no-change:** exploration evidence or execute-plan's
   explained-empty-change return shows the actual behavior matches the intended
   behavior. Resolve it without a repair. One-shot work follows its

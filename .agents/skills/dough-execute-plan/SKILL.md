@@ -10,7 +10,7 @@ description: >-
   list holds, such as a standalone review, investigation, or maintenance request,
   into Taken before its work starts. Does not decide story scope or quick-path
   eligibility. `--trunk` selects Trunk Mode; omitted mode keeps Story Branch Mode.
-  `--one-shot` publishes only the result of explicitly selected trivial work.
+  `--one-shot` keeps selected trivial work's result for review; `--auto-land` lands it.
   `--skip-retro` skips the automatic planned-execution retrospective. `--replan` and
   `--no-replan` choose whether an oversized attempt may continue through planning.
 ---
@@ -101,13 +101,13 @@ for omitted/truncated passages or bounded investigations; another step alone nee
 ## Take or admit work
 
 After resolving execution source and authority, inspect the backlog before
-plan-status changes, observer startup, delegation, or implementation. Resolve
-the selective formatter and claim commit hook contract. An absent or understood
-check-only hook permits the transition; an unknown, mutating, failing, or
-disputed hook stops with the queue unchanged. Resolve [publication
+plan-status changes, observer startup, delegation, or implementation. Resolve the
+selective formatter and claim commit hook contract. An absent or understood
+check-only hook permits the transition; an unknown, mutating, failing, or disputed
+hook stops with the queue unchanged. Resolve [publication
 preconditions](references/trunk-publication.md#preconditions), including the
-authorized remote/trunk, before a Story Branch or Trunk Mode startup. Existing
-current-branch and host-owned checkout restrictions still apply.
+authorized remote/trunk, before a Story Branch or Trunk Mode startup that publishes
+a claim. Existing current-branch and host-owned checkout restrictions still apply.
 
 When your instruction carries an established start, follow [established
 start](references/established-start.md) instead of the start command below.
@@ -175,12 +175,11 @@ selected [one-shot work](references/one-shot.md) starts with `--one-shot` instea
 
 ## Choose the execution location
 
-Follow [execution location](references/execution-location.md) for mode,
-workspace creation, project-command readiness, reuse of host-established
-preparation for the selected checkout, retained identity, execution resume, push
-destination, and checkout-bound runtime. That reference applies the shared
-checkout ownership lifecycle for selection, local checkout role, and target
-selection.
+Follow [execution location](references/execution-location.md) for mode, workspace
+creation, project-command readiness, reuse of host-established preparation for the
+selected checkout, retained identity, execution resume, push destination, and
+checkout-bound runtime. That reference applies the shared checkout ownership
+lifecycle for selection, local checkout role, and target selection.
 
 ## Continue or recover at an execution boundary
 

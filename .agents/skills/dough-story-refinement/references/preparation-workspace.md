@@ -79,7 +79,9 @@ For an existing queued story, announce it as **Preparing** before its first
 record write, either after selecting the workspace or as the step that creates
 a new one, and keep that assignment through pauses, under
 [Publish the preparation assignment](preparation-assignment.md). An explicit
-instruction not to publish or commit means announcing nothing.
+instruction not to publish or commit means announcing nothing. An explicitly
+selected [one-shot refinement](one-shot-refinement.md) establishes the
+workspace with its own start instead and announces nothing.
 
 ## Continue related preparation
 

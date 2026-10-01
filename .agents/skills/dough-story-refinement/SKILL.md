@@ -4,8 +4,11 @@ description: >-
   Clarifies selected stories before execution planning by establishing goal,
   scope, and key examples in each story's seed, distinguishing promises from
   rejection constraints. Adds UI or architectural
-  detail only when needed. Use for selected-story refinement, not broad problem
-  decomposition, candidate selection, or slice sizing.
+  detail only when needed. `--one-shot` refines a queued story without
+  publishing an assignment and keeps the result for review, or lands it with
+  `--auto-land`. Use for
+  selected-story refinement, not broad problem decomposition, candidate
+  selection, or slice sizing.
 ---
 
 # Story refinement
@@ -46,7 +49,10 @@ conversation, scope decisions, optional UI and architecture detail, seed updates
 and cleanup after implementation. When your instruction
 carries an established preparation, follow
 [established preparation](references/established-preparation.md) instead of the
-workspace and announcement steps below. Before writing to a story's seed,
+workspace and announcement steps below. When the request explicitly selects
+one-shot (`--one-shot`) for a queued story, follow
+[one-shot refinement](references/one-shot-refinement.md) instead of the
+announcement step and the default disposition. Before writing to a story's seed,
 establish or reuse the required workspace under
 [preparation workspace](references/preparation-workspace.md), then, for a
 queued story, [announce the preparation assignment](references/preparation-assignment.md#announce-the-preparation-assignment);

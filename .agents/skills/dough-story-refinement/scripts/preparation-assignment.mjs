@@ -7,27 +7,49 @@
 // `abandon` publishes its end alone, leaving the draft in the workspace, or,
 // addressed by profile and allocation from the integration checkout, ends a
 // lost workspace's assignment once the developer confirms it abandoned.
+// `continue` is for a retained start: verify the existing workspace/branch and
+// allocation, optionally against its saved receipt, without ever announcing.
+// `start --one-shot` establishes the workspace, or with `--default-main` takes
+// the default checkout as it is, and publishes nothing; `recheck` checks on
+// fetched trunk that no other owner has taken up its story before its result
+// is pushed.
 import { isDirectCliEntry } from "../../dough-execute-plan/scripts/ci-direct-entry.mjs";
+import {
+  sessionPolicy,
+  sessionPolicyToggles,
+} from "../../dough-execute-plan/scripts/session-policy.mjs";
 import { abandonPreparation } from "./preparation-assignment-abandon.mjs";
 import { releasePreparation } from "./preparation-assignment-release.mjs";
 import { startPreparation } from "./preparation-assignment-start.mjs";
+import { recheckOneShotPreparation } from "./preparation-one-shot-recheck.mjs";
+import { startOneShotPreparation } from "./preparation-one-shot-start.mjs";
 
 const operations = {
-  start: startPreparation,
+  start: (input) =>
+    sessionPolicy(input).tracking === "one-shot"
+      ? startOneShotPreparation(input)
+      : startPreparation(input),
+  continue: (input) => startPreparation({ ...input, continueOnly: true }),
   release: releasePreparation,
   abandon: abandonPreparation,
+  recheck: recheckOneShotPreparation,
 };
 
 const usage =
   "usage: preparation-assignment.mjs start [--integration PATH] [--repository PATH] --workspace PATH [--branch NAME] --identity ID --remote NAME --target BRANCH --push-authorized [--host claude|codex|cursor] [--model TEXT]\n" +
+  "       preparation-assignment.mjs continue --workspace PATH --branch NAME --identity ID --remote NAME --target BRANCH --push-authorized [--expected-agent NAME] [--expected-allocation SHA]\n" +
+  "       preparation-assignment.mjs start --one-shot [--default-main] [--integration PATH] [--repository PATH] --workspace PATH [--branch NAME] --identity ID --remote NAME --target BRANCH [--auto-land --push-authorized]\n" +
+  "       preparation-assignment.mjs recheck --workspace PATH --identity ID --remote NAME --target BRANCH\n" +
   "       preparation-assignment.mjs release --workspace PATH --identity ID --remote NAME --target BRANCH\n" +
   "       preparation-assignment.mjs abandon [--integration PATH] --workspace PATH --identity ID --remote NAME --target BRANCH --push-authorized\n" +
   "       preparation-assignment.mjs abandon --integration PATH --profile PATH [--allocation SHA --confirmed-abandoned] --remote NAME --target BRANCH --push-authorized";
 
-// Flags that stand alone: authority and confirmation the developer supplied.
+// Flags that stand alone: authority, confirmation, and session choices the
+// developer supplied.
 const switches = {
   "--push-authorized": "pushAuthorized",
   "--confirmed-abandoned": "confirmedAbandoned",
+  ...sessionPolicyToggles,
 };
 
 function argumentsOf(argv) {

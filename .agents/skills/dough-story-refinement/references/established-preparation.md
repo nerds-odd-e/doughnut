@@ -31,5 +31,26 @@ When the block is present:
 A later skill in the same session that runs `start` for this story in this
 workspace gets `continued`, not a second assignment.
 
+## Continue an established one-shot preparation
+
+A block whose first field is `tracking: one-shot` names a
+[one-shot refinement](one-shot-refinement.md) start that already ran: it
+published no assignment, so it names no agent or `publishedSha`. It names the
+`workspace`, its `workspace role` (`isolated` for an owned workspace,
+`default-checkout` for the default checkout taken as it is), `branch`,
+`remote`, `target`, the selected `landing` (`review` or `auto-land`), and,
+when known, `startingRevision` and the integration checkout.
+
+- Skip the workspace selection and the `start --one-shot` call; make no
+  announcement or second start.
+- Work in the named workspace and branch, retaining `startingRevision`. In the
+  default checkout, its existing changes are part of this session's result,
+  as [Refine in the default checkout](one-shot-refinement.md#refine-in-the-default-checkout)
+  describes.
+- Continue at
+  [Refine, record, and commit](one-shot-refinement.md#refine-record-and-commit).
+  `landing: auto-land` is the selected automatic landing; `landing: review`
+  stops for review.
+
 Without the block, prepare as
 [preparation workspace](preparation-workspace.md) describes.

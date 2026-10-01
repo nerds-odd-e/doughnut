@@ -1,6 +1,5 @@
-// Authoritative startup orchestration for queued work, for admission of
-// accepted work (carrying a grown one-shot attempt's edits when asked), and
-// for one-shot work. The CLI adapter stays in execution-start.mjs.
+// Startup for queued, admitted (with carried edits when requested), or one-shot
+// work. The CLI adapter stays in execution-start.mjs.
 import { git, lsRemoteSha, revParse } from "./publication-git.mjs";
 import {
   maintenance,
@@ -21,7 +20,10 @@ import {
   reselectClaimAgent,
 } from "./execution-start-agent.mjs";
 import { commitWorkspaceClaim } from "./workspace-publication-claim.mjs";
-import { selectOwnedWorkspace } from "./workspace-publication-select.mjs";
+import {
+  mainWorktreeError,
+  selectOwnedWorkspace,
+} from "./workspace-publication-select.mjs";
 import {
   claimMembership,
   publishClaimSha,
@@ -43,8 +45,11 @@ export async function startExecution(requestInput) {
   const result = await startRequested(started.request);
   return started.request.carry ? finishCarry(started.request, result) : result;
 }
-
 async function startRequested(request) {
+  if (!request.retained && !request.defaultMain) {
+    const error = await mainWorktreeError(request.workspace);
+    if (error) return stopped("invalid-request", { error });
+  }
   const remote = remoteOf(request);
   const ref = remoteRef(request);
   const source = startSource(request);
@@ -197,7 +202,6 @@ async function startRequested(request) {
         ...published.recovery,
       },
     };
-  // Independent remote acceptance: containment plus current provenance.
   try {
     await git(selected.workspace, "fetch", remote);
     const remoteTip = await lsRemoteSha(origin, `refs/heads/${request.target}`);

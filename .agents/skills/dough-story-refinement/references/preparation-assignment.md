@@ -25,8 +25,9 @@ with another identity.
 Story refinement, slice planning, and plan refinement of an existing queued
 story with a stable identity announce that story as **Preparing** before
 substantive work. Reading, discussing, answering questions, decomposing a
-candidate without a queued identity, bug triage, and a standalone
-retrospective record announce nothing.
+candidate without a queued identity, bug triage, a standalone retrospective
+record, and an explicitly selected
+[one-shot refinement](one-shot-refinement.md) announce nothing.
 
 After selecting the workspace, or to select a new one, and before its first
 record write, run:
