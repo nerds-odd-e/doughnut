@@ -39,7 +39,5 @@ completed operations keep their accepted heads and learning identities. Repeated
 ready events and concurrent instances use the same transaction and lock boundary.
 
 Before removing the temporary code, confirm operationally that eligible legacy
-content is absent and no outstanding migration diagnostics remain. The queued
-cleanup story `SEED-063#story-3` depends on that confirmation. Passing isolated
-fixtures proves behavior, not completion in a deployed database. Deployment and
-release remain separately authorized; this guide does not authorize either.
+content is absent and no outstanding migration diagnostics remain in the deployed
+environments.
