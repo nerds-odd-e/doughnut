@@ -202,3 +202,41 @@ with `gh run list`. Codex yielded observer: coordinator `/root`, cell 14, sessio
 `nerds-odd-e/doughnut` branch `codex/follow-wiki-links-in-property-lists-from-both-pr`.
 Managed delivery owns accepted-revision registration. Claim CI on origin/main was
 unobserved; story-branch observation covers execution increments.
+
+## Execution retrospective
+
+Manifest: `ba84ee3b0e0b5f8817f46089003c7e65eb78c6b4` is preparation provenance;
+`6e3a03cb585ff113b895c71d0512acb258389690` is the established claim;
+`ed2cdd854148b14aef0581ee0d2c8af5049435d6` is the sole attributable delivered
+implementation. No sibling commits enter the reviewed range.
+
+Outcome findings: none. The aggregate renderer, editable/read-only callers,
+existing parser/resolution/route owners, tests, and permanent docs meet the source
+contract without a new backend or syntax responsibility. ADRs 0004 and 0005 are
+preserved; the local presentation extension aligns with NORTH-STAR direction.
+No speculative parser, route, expanded renderer, or obsolete key gate remains.
+
+E2E cases were added before verification, but no pre-change failing browser run
+was obtained; they did not demonstrably drive implementation. The new saved-list
+journeys retain integration proof that mounted resolved fixtures cannot supply.
+Existing property-target and body/path-link journeys observe different semantics;
+no evidence justifies suite removal or consolidation. Detailed labels, status,
+readonly, keyboard, and mixed-item rules remain at the mounted boundary. No full
+suite was run for retrospective.
+
+Process review was enabled by `.planning/open-dough.json`. Conversation and agent
+returns support DD-199 in DearDough.md: the initial refactor handoff omitted an
+already failed stub-override approach, which the fresh refactorer repeated before
+the follow-up warning. Carry such consequential failed approaches in the initial
+handoff. No product correction plan or backlog change is warranted.
+
+Review completed with CI pending for implementation SHA
+`ed2cdd854148b14aef0581ee0d2c8af5049435d6` on the recorded execution branch and
+observer. Final execution CI remains the coordinator's completion obligation.
+
+## Execution complete
+
+Product advice: no change to product scope or backlog priorities. The shared
+per-item rendering rule satisfies the selected story; retain its deferred pencil
+dialog and resolution-workflow boundaries. Keep the unrelated spent-migration
+story at its existing backlog priority.

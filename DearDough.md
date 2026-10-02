@@ -6,7 +6,7 @@ released response is not proof of effectiveness. Unknown provenance stays unknow
 [Response status](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/finding-names.md).
 Full pre-trim evidence: `8830c682704aac3bbb34bf9b1204da8feba042ca:DearDough.md`. Older narratives live in Git, not a second archive.
 
-- Highest allocated local number: 178. Removed local codes are never reused.
+- Highest allocated local number: 199. Removed local codes are never reused.
 
 ## ODF-034 — CI observer started for a feature branch that this project's workflow never triggers on
 
@@ -399,3 +399,16 @@ A new test failed once in the refactor pass; the agent reran it, saw green twice
 Follow-up: Open, unqueued.
 
 - Execution: SEED-063#story-1 / slice-plans/007-track-property-values-separately / 8eaaf2b720; Timestamp: 2026-09-30, between 20:13 and 20:27+08:00 (slice 1b refactor through commit 21bb042c10); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.50. - Evidence: slice 1b refactor report ("failed once ... could not reproduce ... suspected cause: another session using the shared `doughnut_test` database"); coordinator `--rerun-tasks` run failed `NotePropertyIndexServiceTest ... indexes_every_list_item_with_its_value_and_a_scalar_with_an_empty_value`; instrumented runs printed `topic` rows before `example of` in the failing run; the fix asserts per key (21bb042c10). - Observed effect: a flaky test nearly committed; about five coordinator test runs to diagnose; no defect shipped. - Inference: the refactor delegation carries no "a passing retry does not establish cause" rule from execution-decisions' failed-proof diagnosis; the implementer's own red run showed the same symptom, which masked the flake. Qualified: one occurrence.
+
+## DD-199 — Refactor delegation omitted a known failed approach, which the fresh agent repeated
+
+The implementation return explained that overriding the RouterLink stub through RenderingHelper's deep merge had already failed. The coordinator's fresh refactor assignment mentioned duplicate mount setup but omitted that failed approach. The refactor agent started the same override before a follow-up warning arrived, reproduced the failure, then removed the stub at its owner before merging.
+
+### Occurrences
+- Execution: SEED-065#story-1 / `.planning/slice-plans/001-follow-property-list-wiki-links/PLAN.md` / ed2cdd854148b14aef0581ee0d2c8af5049435d6
+  - Timestamp: unknown (2026-10-02, between implementation return and refactor completion)
+  - Tool: Codex
+  - Open Dough release: unknown
+  - Evidence: implement_property_links final return identifies the failed false-stub override; initial refactor_property_links assignment omits it; refactor progress says the warning arrived after that rerun started; final return confirms the failure was reproduced.
+  - Observed effect: one avoidable failed refactor verification; all final proof passed and no faulty change was delivered.
+  - Inference: include already-disproved approaches in the initial fresh-agent handoff when they constrain the likely simplification. Qualified: one execution; cost was not measured.
