@@ -4,16 +4,20 @@
 
 - **Identity:** SEED-063#story-3
 - **Source:** [Remove spent numbered-property migration after confirmed completion](../../seeds/SEED-063-track-property-values-separately.md#story-3).
-- **Authorization:** planning only. On 2026-10-02 the owner confirmed “the migration
-  is done” and requested a slice plan. Treat that confirmation as satisfying the
-  existing operational prerequisite; no production observation is part of this work.
+- **Authorization:** the owner's 2026-10-02 dough-execute-plan invocation authorizes
+  execution and story-branch delivery. The earlier confirmation “the migration
+  is done” satisfies the operational prerequisite; no production observation is
+  part of this work.
 - **Preparation:** Shunka-chan; reuse the owned worktree
   `/Users/terryyin/git/doughnut/.worktrees/remove-spent-numbered-property-migration-after-c`,
   branch `codex/remove-spent-numbered-property-migration-after-c`, starting revision
   `e9ca70c06289ed6e57bc105b455db72af9de79ee`.
-- **Publication target:** `origin/main`. Integration checkout:
-  `/Users/terryyin/git/doughnut`. Retain the existing Preparing assignment and
-  uncommitted preparation draft until an explicit disposition instruction.
+- **Execution:** Hitomi-chan; publisher `dashboard-territory.local-doughnut`;
+  Story Branch Mode in the preparation worktree and branch above. Established
+  start revision `6e3a03cb585ff113b895c71d0512acb258389690`; published claim and
+  first increment base `443b88ee8b81e7bd40537932081540f30d870ad3`.
+- **Publication target:** execution branch on `origin`; authorized eventual trunk
+  `origin/main`. Integration checkout: `/Users/terryyin/git/doughnut`.
 
 ## Goal and scope
 
@@ -72,7 +76,7 @@ run the full backend suite; execution must run it after edits.
 ### 1. Ordinary startup after migration retirement
 
 Type: Behavior
-Status: planned
+Status: done
 
 Behavior: after the confirmed conversion, application startup runs its ordinary
 Flyway work without scanning or consolidating numbered properties. Existing
@@ -129,6 +133,37 @@ cover implementation thrash or scope growth.
 Safe stopping point: this slice delivers complete retirement with ordinary
 behavior verified. Before proof succeeds, keep attempt-owned changes isolated;
 do not publish partial cleanup that breaks compilation or loses preservation proof.
+
+## Accepted execution proof
+
+- Checkout preparation: `./scripts/run.sh bash scripts/worktree_setup.sh` and
+  `./scripts/run.sh pnpm exec biome --version` succeeded with the current lockfile.
+- Final implementation/refactor proof:
+  `CURSOR_DEV=true nix develop -c pnpm backend:test_only`, exit 0,
+  `BUILD SUCCESSFUL in 57s`; 2,735 tests, zero failures/errors, two skipped.
+  The command owned disposable database
+  `doughnut_wt_3c59e1dc245441e3b23373531cf4a0bb_test`.
+- `NotebookGitStartupServicesProbeTest.readyEventsRunFlywayWithoutChangingConsolidatedContentAcceptedHistoryOrLearning`
+  starts with consolidated `topic: [A, B]`, learned value trackers and an accepted
+  snapshot; two real Flyway ready events produce the callback/consumer sequence
+  while controller content/tracker IDs, learning fields/history and accepted
+  head/history remain equal to their original observations.
+- `NotebookGitWebContentLearningPreservationControllerTest.editingTheBodyOfAListNotePreservesLearnedValueTrackersAndAcceptedAncestry`
+  saves a body change through `TextContentController`; controller read-back and
+  accepted blob contain the edited text, original tracker IDs and learning remain,
+  and new accepted parents equal the original commits. Shared `learnedListTrackers`
+  fixtures and `learning` observations live in `NotebookGitWebContentControllerTestBase`.
+- Retained wiki alias/ambiguity/viewer, property following/rename, unassimilated
+  matching and key-naming tests passed in the full suite. Product-wide caller scan
+  found no retired migration/projection symbols outside retained planning history.
+- Independent refactor removed the now-single-use `TokenCandidates` wrapper and
+  moved the learning-preservation examples into their cohesive test class to meet
+  the 250-line limit. The final suite renewed proof for both changed boundaries.
+- Coordinator ran `./scripts/run.sh pnpm format:changed` once successfully after
+  refactoring. No schema/Flyway-history/API signature changes triggered generation.
+- No production or Development data was observed or changed. No uncovered promise
+  remains; source scans establish removal, while disposable tests establish
+  ordinary startup/editing and learning preservation.
 
 ## Execution gates and current decisions
 

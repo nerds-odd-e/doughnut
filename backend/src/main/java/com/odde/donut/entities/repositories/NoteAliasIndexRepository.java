@@ -15,26 +15,6 @@ public interface NoteAliasIndexRepository extends JpaRepository<NoteAliasIndex, 
 
   List<NoteAliasIndex> findByNote_IdOrderByIdAsc(Integer noteId);
 
-  /**
-   * Tests a proposed lookup key with the same binary collation and availability as stored aliases.
-   */
-  @Query(
-      value =
-          "SELECT "
-              + Note.NATIVE_SELECT
-              + " FROM note n JOIN notebook nb ON nb.id = n.notebook_id "
-              + " WHERE n.id = :noteId AND "
-              + Note.NATIVE_AVAILABLE
-              + " AND nb.deleted_at IS NULL AND LOWER(nb.name) = LOWER(:notebookName) "
-              + " AND CONVERT(:projectedLookupKey USING utf8mb4) COLLATE utf8mb4_bin "
-              + " = CONVERT(:aliasLookupKey USING utf8mb4) COLLATE utf8mb4_bin",
-      nativeQuery = true)
-  List<Note> findProjectedAliasTarget(
-      @Param("noteId") Integer noteId,
-      @Param("notebookName") String notebookName,
-      @Param("projectedLookupKey") String projectedLookupKey,
-      @Param("aliasLookupKey") String aliasLookupKey);
-
   @Query(
       value =
           SELECT_ALIAS_WITH_NOTEBOOK

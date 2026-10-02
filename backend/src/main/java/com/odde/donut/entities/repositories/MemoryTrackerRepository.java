@@ -3,13 +3,10 @@ package com.odde.donut.entities.repositories;
 import com.odde.donut.entities.MemoryTracker;
 import com.odde.donut.entities.MemoryTrackerQueryFragments;
 import com.odde.donut.entities.Note;
-import jakarta.persistence.QueryHint;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.stream.Stream;
-import org.hibernate.jpa.HibernateHints;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.jpa.repository.QueryHints;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 
@@ -102,17 +99,6 @@ public interface MemoryTrackerRepository extends CrudRepository<MemoryTracker, I
   List<MemoryTracker> findLast100RecalledByUser(@Param("userId") Integer userId);
 
   List<MemoryTracker> findByNote_IdIn(List<Integer> noteIds);
-
-  /**
-   * Equality of projected focuses under the collation of the persisted unique focus key. Reads no
-   * table, so it skips the auto-flush that would rescan every loaded entity per comparison.
-   */
-  @QueryHints(@QueryHint(name = HibernateHints.HINT_FLUSH_MODE, value = "MANUAL"))
-  @Query(
-      value =
-          "SELECT CONVERT(:leftKey USING utf8mb4) COLLATE utf8mb4_0900_ai_ci = CONVERT(:rightKey USING utf8mb4) COLLATE utf8mb4_0900_ai_ci AND CONVERT(:leftValue USING utf8mb4) COLLATE utf8mb4_0900_ai_ci = CONVERT(:rightValue USING utf8mb4) COLLATE utf8mb4_0900_ai_ci",
-      nativeQuery = true)
-  long equalPersistedFocus(String leftKey, String leftValue, String rightKey, String rightValue);
 
   String byUserIdFrom =
       " FROM memory_tracker rp "

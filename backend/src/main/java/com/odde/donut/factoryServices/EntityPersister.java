@@ -3,9 +3,6 @@ package com.odde.donut.factoryServices;
 import com.odde.donut.entities.EntityIdentifiedByIdOnly;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
-import java.util.function.Supplier;
-import org.hibernate.FlushMode;
-import org.hibernate.Session;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -52,22 +49,6 @@ public class EntityPersister {
   public void flushAndClear() {
     entityManager.flush();
     entityManager.clear();
-  }
-
-  /**
-   * Runs a pure read without flushing before each query, which otherwise rescans every loaded
-   * entity and makes large reads quadratic. Pending changes are flushed first so queries see them.
-   */
-  public <T> T readWithoutAutoFlush(Supplier<T> read) {
-    Session session = entityManager.unwrap(Session.class);
-    session.flush();
-    FlushMode previous = session.getHibernateFlushMode();
-    session.setHibernateFlushMode(FlushMode.MANUAL);
-    try {
-      return read.get();
-    } finally {
-      session.setHibernateFlushMode(previous);
-    }
   }
 
   public void refresh(Object entity) {

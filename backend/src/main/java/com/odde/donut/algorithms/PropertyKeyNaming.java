@@ -116,11 +116,6 @@ public final class PropertyKeyNaming {
         || isRelationshipNoteStructuralPropertyKey(key);
   }
 
-  /** List-capable numbered families include url, unlike property learning indexes. */
-  public static boolean isListCapablePropertyKey(String key) {
-    return !isReservedStructuralKey(key) || isUrlPropertyKey(key);
-  }
-
   /** Keys excluded from property indexing and tracker seeding (Obsidian passthrough + overlaps). */
   public static boolean isPassthroughPropertyKey(String key) {
     String normalized = normalizedBaseWithoutUnderscores(key);

@@ -8,7 +8,6 @@ import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.User;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.function.Predicate;
 
@@ -34,49 +33,24 @@ final class WikiLinkCandidateClassifier {
    */
   WikiLinkResolver.CandidateCardinality classify(
       String token, String notebookFallbackName, User viewer) {
-    return classify(token, notebookFallbackName, viewer, Map.of());
-  }
-
-  WikiLinkResolver.CandidateCardinality classify(
-      String token,
-      String notebookFallbackName,
-      User viewer,
-      Map<Integer, String> projectedContent) {
-    return candidates(token, notebookFallbackName, projectedContent)
-        .classifyFor(notebook -> authorizationService.userMayReadNotebook(viewer, notebook));
-  }
-
-  /** Looks up {@code token}'s candidates once, so many readers can classify them. */
-  TokenCandidates candidates(
-      String token, String notebookFallbackName, Map<Integer, String> projectedContent) {
-    return new TokenCandidates(
-        token,
+    List<Note> candidates =
         resolveRef(token, notebookFallbackName)
-            .map(
-                ref ->
-                    noteCandidates.forNotebookAndTitle(
-                        ref.notebookName(), ref.noteTitle(), projectedContent))
-            .orElse(List.of()),
-        projectedContent);
-  }
-
-  /** A token's reader-independent candidates, classified per reader's notebook readability. */
-  record TokenCandidates(
-      String token, List<Note> candidates, Map<Integer, String> projectedContent) {
-    WikiLinkResolver.CandidateCardinality classifyFor(Predicate<Notebook> readable) {
-      return classifyCandidates(token, readableOf(candidates, readable), projectedContent);
-    }
+            .map(ref -> noteCandidates.forNotebookAndTitle(ref.notebookName(), ref.noteTitle()))
+            .orElse(List.of());
+    return classifyCandidates(
+        token,
+        readableOf(
+            candidates, notebook -> authorizationService.userMayReadNotebook(viewer, notebook)));
   }
 
   private static WikiLinkResolver.CandidateCardinality classifyCandidates(
-      String token, List<Note> readable, Map<Integer, String> projectedContent) {
+      String token, List<Note> readable) {
     if (readable.size() > 1) {
       return new WikiLinkResolver.CandidateCardinality.Ambiguous();
     }
     if (readable.size() == 1) {
       Note candidate = readable.getFirst();
-      if (WikiLinkPropertyMatch.matchesTargetNoteContent(
-          token, projectedContent.getOrDefault(candidate.getId(), candidate.getContent()))) {
+      if (WikiLinkPropertyMatch.matchesTargetNoteContent(token, candidate.getContent())) {
         return new WikiLinkResolver.CandidateCardinality.Resolved(candidate);
       }
     }
