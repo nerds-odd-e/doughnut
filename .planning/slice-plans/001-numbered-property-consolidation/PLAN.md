@@ -231,7 +231,8 @@ fixture; no new concurrency framework or retry gate. Keep the live startup calle
 
 ### 16. Startup invokes the proved complete migration
 Type: Behavior
-Status: planned
+Status: done
+Accepted proof: [slice 16](EXECUTION.md#slice-16-accepted-proof).
 Proof: Extend slice 1's real event probe to seed a learned numbered family and
 consume the actual production-configured runner. Startup after Flyway →
 controller/database/downloaded-tree observations satisfy slice 4. Deliver

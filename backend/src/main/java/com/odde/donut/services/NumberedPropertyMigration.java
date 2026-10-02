@@ -10,7 +10,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import org.springframework.stereotype.Service;
 
-/** Temporary legacy-content migration; the startup caller follows its proved full journey. */
+/** Temporary legacy-content migration invoked by the post-Flyway startup listener. */
 @Service
 public class NumberedPropertyMigration {
   private final NumberedPropertyMigrationPreparation preparation;

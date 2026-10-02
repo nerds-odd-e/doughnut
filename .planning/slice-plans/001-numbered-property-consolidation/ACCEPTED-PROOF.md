@@ -51,6 +51,8 @@ Accepted proof: `CURSOR_DEV=true nix develop -c pnpm backend:verify` passed;
 Flyway completion, transaction boundaries, live schema and unchanged downloaded
 history/native objects. The probe uses a test-only event context with real
 service proxies; it establishes service/order usability, not production boot.
+Slice 16 replaces this temporary consumer with the actual production caller;
+its accepted proof supersedes the probe while retaining schema/order observations.
 
 ## Migration operation sizing reassessment
 

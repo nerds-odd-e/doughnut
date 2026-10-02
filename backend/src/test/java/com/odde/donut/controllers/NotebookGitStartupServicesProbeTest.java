@@ -1,45 +1,92 @@
 package com.odde.donut.controllers;
 
+import static com.odde.donut.testability.CommittedTransactionTestSupport.inCommittedTransaction;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 
-import com.odde.donut.DonutApplication;
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.core.read.ListAppender;
 import com.odde.donut.configs.FlyWayFreeVersionRealMigration;
-import com.odde.donut.entities.Notebook;
-import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
-import com.odde.donut.services.notebookGit.AcceptedWebChangeService;
-import java.sql.Timestamp;
-import java.time.Duration;
-import java.time.Instant;
+import com.odde.donut.configs.NumberedPropertyStartupMigration;
+import com.odde.donut.entities.Note;
+import com.odde.donut.entities.PropertyFocus;
+import com.odde.donut.services.NumberedPropertyMigration;
+import com.odde.donut.services.notebookGit.NotebookGitCommitBuilder;
+import com.odde.donut.testability.GitBundleTestReader;
 import java.util.ArrayList;
 import java.util.List;
+import org.eclipse.jgit.internal.storage.dfs.DfsRepositoryDescription;
+import org.eclipse.jgit.internal.storage.dfs.InMemoryRepository;
+import org.eclipse.jgit.revwalk.RevWalk;
 import org.flywaydb.core.Flyway;
 import org.flywaydb.core.api.callback.Callback;
 import org.flywaydb.core.api.callback.Context;
 import org.flywaydb.core.api.callback.Event;
 import org.junit.jupiter.api.Test;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-import org.springframework.context.event.EventListener;
-import org.springframework.core.Ordered;
-import org.springframework.core.annotation.Order;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
-/** Real ready-event wiring, kept outside the shared test-profile application context. */
-class NotebookGitStartupServicesProbeTest extends NotebookGitControllerTestBase {
-  @Autowired AcceptedWebChangeService acceptedWebChangeService;
+/** Exact production ready-event listeners with the shared services and isolated database. */
+class NotebookGitStartupServicesProbeTest extends NumberedPropertyStartupTestSupport {
+  @Autowired NumberedPropertyMigration migration;
 
   @Test
-  void readyEventFinishesFlywayBeforeAnIndependentNoChangeAcceptedOperation() throws Exception {
-    Notebook notebook = createGitBackedNotebook();
-    makeMe.aNote().notebook(notebook).title("startup probe").content(NOTE).please();
-    var binding = snapshotCurrentPortableTree(notebook);
+  void readyEventMigratesAfterFlywayReportsRefusalsAndRepeatedEventPreservesAcceptedLearning()
+      throws Exception {
+    var notebook = createGitBackedNotebook("Startup");
+    Note run = makeMe.aNote().notebook(notebook).title("Run").please();
+    Note note =
+        makeMe
+            .aNote()
+            .notebook(notebook)
+            .title("Carrier")
+            .content("---\ntype: Note\ntopic 2: '[[Run]]'\n---\nCarrier")
+            .please();
+    Integer tracker =
+        inCommittedTransaction(
+            transactionManager,
+            () ->
+                makeMe
+                    .aMemoryTrackerFor(noteRepository.findById(note.getId()).orElseThrow())
+                    .propertyKey("topic 2")
+                    .afterNthStrictRecall(2)
+                    .recallCount(2)
+                    .please()
+                    .getId());
+    var refusedBook = createGitBackedNotebook("Refused");
+    Note refused =
+        makeMe
+            .aNote()
+            .notebook(refusedBook)
+            .title("Unmappable")
+            .content("---\ntype: Note\ntopic 2: B\n---\nUnmappable")
+            .please();
+    Integer orphan =
+        inCommittedTransaction(
+            transactionManager,
+            () ->
+                makeMe
+                    .aMemoryTrackerFor(noteRepository.findById(refused.getId()).orElseThrow())
+                    .propertyKey("topic 2")
+                    .propertyValue("orphan")
+                    .please()
+                    .getId());
+    snapshotCurrentPortableTree(notebook);
+    snapshotCurrentPortableTree(refusedBook);
     var historyBefore = acceptedHistory(notebook);
-    long objectsBefore = countNativeObjectStoreRows(binding.getId());
+    var originalLearning = learning(tracker);
+    var refusedBefore = noteState(refused);
+    var refusedLearning = learning(orphan);
+    var refusedBinding = bindingState(refusedBook);
+    var refusedHistory = acceptedHistory(refusedBook);
     List<String> observed = new ArrayList<>();
     Flyway flyway =
         Flyway.configure()
@@ -60,6 +107,10 @@ class NotebookGitStartupServicesProbeTest extends NotebookGitControllerTestBase 
                   public void handle(Event event, Context context) {
                     assertThat(
                         TransactionSynchronizationManager.isActualTransactionActive(), is(false));
+                    // The first Flyway callback still sees legacy content, before the actual
+                    // startup caller.
+                    if (observed.isEmpty())
+                      assertThat(noteState(note).content(), containsString("topic 2:"));
                     observed.add("Flyway complete");
                   }
 
@@ -69,92 +120,93 @@ class NotebookGitStartupServicesProbeTest extends NotebookGitControllerTestBase 
                   }
                 })
             .load();
-
-    // The production listener is disabled in the test profile. This small event context
-    // activates that exact listener, while consuming the suite's real service proxy and
-    // disposable worktree database; it creates no extra backend application/Hikari pool.
+    Logger logger = (Logger) LoggerFactory.getLogger(NumberedPropertyStartupMigration.class);
+    Level previousLevel = logger.getLevel();
+    var log = new ListAppender<ILoggingEvent>();
+    log.start();
+    logger.addAppender(log);
+    logger.setLevel(Level.WARN);
+    // No second Boot context or connection pool: activate the exact production listeners
+    // in a small event context using the suite's actual service proxy and database.
     try (var startup = new AnnotationConfigApplicationContext()) {
       startup.registerBean(Flyway.class, () -> flyway);
-      startup.register(FlyWayFreeVersionRealMigration.class);
+      startup.registerBean(NumberedPropertyMigration.class, () -> migration);
+      startup.register(
+          FlyWayFreeVersionRealMigration.class, NumberedPropertyStartupMigration.class);
       startup.registerBean(
-          ReadyConsumer.class,
+          ReadyObservation.class,
           () ->
-              new ReadyConsumer(
-                  acceptedWebChangeService,
+              new ReadyObservation(
                   new JdbcTemplate(dataSource),
                   flyway,
-                  notebook.getId(),
-                  observed));
+                  observed,
+                  () ->
+                      assertThat(
+                          noteState(note).content(),
+                          equalTo("---\ntype: Note\ntopic: [\"[[Run]]\"]\n---\nCarrier"))));
       startup.refresh();
-      startup.publishEvent(
-          new ApplicationReadyEvent(
-              new SpringApplication(DonutApplication.class),
-              new String[0],
-              startup,
-              Duration.ZERO));
-    }
-
-    assertThat(observed, is(List.of("Flyway complete", "consumer", "accepted operation")));
-    assertThat(TransactionSynchronizationManager.isActualTransactionActive(), is(false));
-    assertThat(acceptedHistory(notebook), equalTo(historyBefore));
-    assertThat(countNativeObjectStoreRows(binding.getId()), is(objectsBefore));
-  }
-
-  static class ReadyConsumer {
-    private final AcceptedWebChangeService acceptedChanges;
-    private final JdbcTemplate database;
-    private final Flyway flyway;
-    private final Integer notebookId;
-    private final List<String> observed;
-
-    ReadyConsumer(
-        AcceptedWebChangeService acceptedChanges,
-        JdbcTemplate database,
-        Flyway flyway,
-        Integer notebookId,
-        List<String> observed) {
-      this.acceptedChanges = acceptedChanges;
-      this.database = database;
-      this.flyway = flyway;
-      this.notebookId = notebookId;
-      this.observed = observed;
-    }
-
-    @EventListener(ApplicationReadyEvent.class)
-    @Order(Ordered.HIGHEST_PRECEDENCE + 1)
-    public void consume() throws UnexpectedNoAccessRightException {
-      assertThat(observed, is(List.of("Flyway complete")));
-      assertThat(flyway.info().pending().length, is(0));
-      assertThat(TransactionSynchronizationManager.isActualTransactionActive(), is(false));
-      observed.add("consumer");
+      publishReady(startup);
+      assertThat(observed, is(List.of("Flyway complete", "migrated consumer")));
+      var completed = noteState(note);
+      var completedLearning = learning(tracker);
+      assertThat(completed.trackerIds(), equalTo(List.of(tracker)));
+      assertThat(completed.properties(), contains(new PropertyFocus("topic", "[[Run]]")));
+      assertThat(completed.references(), contains("Run"));
+      assertThat(completed.links(), containsString("\"destinationNoteId\":" + run.getId()));
+      assertThat(completedLearning.focus(), equalTo(new PropertyFocus("topic", "[[Run]]")));
+      assertThat(completedLearning.history(), equalTo(originalLearning.history()));
+      assertThat(completedLearning.next(), equalTo(originalLearning.next()));
+      assertThat(completedLearning.last(), equalTo(originalLearning.last()));
+      assertThat(completedLearning.assimilated(), equalTo(originalLearning.assimilated()));
+      assertThat(completedLearning.stability(), equalTo(originalLearning.stability()));
+      assertThat(completedLearning.difficulty(), equalTo(originalLearning.difficulty()));
+      var historyAfter = acceptedHistory(notebook);
+      var bindingAfter = bindingState(notebook);
+      assertThat(historyAfter.parents(), equalTo(historyBefore.commits()));
+      assertThat(historyAfter.tipPaths(), contains("Carrier.md", "Run.md"));
+      assertThat(tipText(historyAfter, "Carrier.md"), equalTo(completed.content()));
+      try (var repository = new InMemoryRepository(new DfsRepositoryDescription());
+          var walker = new RevWalk(repository)) {
+        var tip =
+            walker.parseCommit(
+                GitBundleTestReader.fetchHead(repository, acceptedBundleBytes(notebook)));
+        assertThat(
+            tip.getAuthorIdent().getName(), equalTo(NotebookGitCommitBuilder.SYSTEM_AUTHOR_NAME));
+        assertThat(tip.getFullMessage(), equalTo("Consolidate numbered properties"));
+      }
+      publishReady(startup);
       assertThat(
-          database.queryForList(
-              "SELECT CONCAT(column_name, ':', character_maximum_length, ':', collation_name) "
-                  + "FROM information_schema.columns WHERE table_schema = DATABASE() "
-                  + "AND table_name = 'memory_tracker' "
-                  + "AND column_name IN ('property_key', 'property_value') ORDER BY column_name",
-              String.class),
+          observed,
           is(
               List.of(
-                  "property_key:255:utf8mb4_0900_ai_ci", "property_value:255:utf8mb4_0900_ai_ci")));
+                  "Flyway complete", "migrated consumer", "Flyway complete", "migrated consumer")));
+      assertThat(noteState(note), equalTo(completed));
+      assertThat(learning(tracker), equalTo(completedLearning));
+      assertThat(bindingState(notebook), equalTo(bindingAfter));
+      assertThat(acceptedHistory(notebook), equalTo(historyAfter));
+      assertThat(noteState(refused), equalTo(refusedBefore));
+      assertThat(learning(orphan), equalTo(refusedLearning));
+      assertThat(bindingState(refusedBook), equalTo(refusedBinding));
+      assertThat(acceptedHistory(refusedBook), equalTo(refusedHistory));
       assertThat(
-          database.queryForList(
-              "SELECT column_name FROM information_schema.statistics "
-                  + "WHERE table_schema = DATABASE() AND table_name = 'memory_tracker' "
-                  + "AND index_name = 'uq_memory_tracker_user_note_type_property' "
-                  + "AND non_unique = 0 ORDER BY seq_in_index",
-              String.class),
-          is(List.of("user_id", "note_id", "type", "property_key", "property_value")));
-      acceptedChanges.apply(
-          notebookId,
-          () -> {
-            assertThat(TransactionSynchronizationManager.isActualTransactionActive(), is(true));
-            observed.add("accepted operation");
-            return notebookId;
-          },
-          ignored -> "Startup services probe",
-          Timestamp.from(Instant.now()));
-      assertThat(TransactionSynchronizationManager.isActualTransactionActive(), is(false));
+          log.list.stream().map(ILoggingEvent::getFormattedMessage).toList(),
+          contains(
+              "Numbered-property migration left notebook "
+                  + refusedBook.getId()
+                  + " unchanged: Note "
+                  + refused.getId()
+                  + ": Unmapped tracker focus: "
+                  + orphan,
+              "Numbered-property migration left notebook "
+                  + refusedBook.getId()
+                  + " unchanged: Note "
+                  + refused.getId()
+                  + ": Unmapped tracker focus: "
+                  + orphan));
+    } finally {
+      logger.detachAppender(log);
+      log.stop();
+      logger.setLevel(previousLevel);
     }
   }
 }

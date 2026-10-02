@@ -94,6 +94,8 @@ To trigger the test DB migration manually, run `backend/gradlew migrateTestDB`.
 To connect to the local DB: `mysql -S $MYSQL_HOME/mysql.sock -u doughnut -p` (password=doughnut).
 `pnpm backend:test` and `migrateTestDB` use the shared `doughnut_test` database.
 For a checkout-local test database (Git worktrees), see [isolated backend tests](./docs/worktree-backend-tests.md).
+The temporary [numbered-property startup migration](./docs/numbered-property-migration.md)
+runs after Flyway and reports operations that remain unmigrated.
 
 ### 6. Vue3 web-app frontend
 

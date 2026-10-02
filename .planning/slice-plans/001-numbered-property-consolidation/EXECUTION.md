@@ -203,3 +203,24 @@ minutes, moved repeated deletion assertions unchanged into CommittedTestSupport,
 and reran full verification: 2767/0/0/2, including retry/concurrency/rollback.
 Root inspected moved assertions and unchanged coordination; formatting passed
 once, no generation. Same-book concurrency is proved; startup remains slice 16.
+
+## Slice 16 accepted proof
+
+The exact production Flyway and NumberedPropertyStartupMigration listeners
+consume real shared services in NotebookGitStartupServicesProbeTest, replacing
+slice 1's temporary consumer. Flyway callback sees legacy content and no outer
+transaction; later ReadyObservation sees migrated content and actual schema.
+Fresh controller/learning reads retain ID, mapped focus, history, schedule and
+FSRS; authored rows, property index and exact Run destination agree. Reopened
+download has one System descendant, original parent and exact portable Markdown.
+A second actual ready event preserves content, learning, binding/head/native
+objects and download. Actual warning capture reports the refused note/orphan
+on both calls; its complete fresh state and accepted history stay unchanged.
+`CURSOR_DEV=true nix develop -c pnpm backend:verify` passed: 2767 tests,
+zero failures/errors, two skipped; startup testcase 0.684s (suite 5.735s).
+Earlier full verification failed only on expected diagnostic punctuation;
+corrected without changing production behavior. Nine active implementation
+minutes excluding full-suite waits. Fresh refactor took four active minutes,
+made no edits, passed whitespace and retained proof. Coordinator formatter
+passed once; no schema/API generation. Maintained guide is linked from README.
+All implementation is complete; no deployment or operational completion claim.
