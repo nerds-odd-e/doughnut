@@ -224,3 +224,23 @@ minutes excluding full-suite waits. Fresh refactor took four active minutes,
 made no edits, passed whitespace and retained proof. Coordinator formatter
 passed once; no schema/API generation. Maintained guide is linked from README.
 All implementation is complete; no deployment or operational completion claim.
+
+## Completion boundary
+
+All sixteen implementation slices are delivered. Final implementation revision
+23d9caf830b97ba73bd6ba289e90b33ec94fac6d is accepted on the execution branch.
+The uncontaminated a11dfaee41..23d9caf830 range contains this execution's claim,
+planning/decision provenance and capability commits; none are sibling work.
+Review recovered the original ready contract at 28442ce9d9 plus the approved
+reader choice and evidence-based refinements. Aggregate responsibilities and
+proof remain aligned with ADRs 0002/0004/0006/0007 and current North Star.
+No product correction or suite cleanup is justified; existing E2E journeys are
+retained and no E2E run is claimed. Current backend proof is 2767/0/0/2.
+Process review is limited to available resumed conversation/tool results;
+earlier retained sizing/fixture corrections are not invented transcript evidence.
+No additional supported process finding or backlog change is made.
+Managed publication reports CI unobserved: Codex yielded-cell bridge unavailable,
+startReceipt null. No current mailbox/observer exists for complete-revision;
+that operation cannot be invoked for this accepted revision. Earlier observer
+shutdown was confirmed; no replacement was started. CI success is not claimed.
+Retain source, completed plan, branch and worktree for separately invoked wrap-up.
