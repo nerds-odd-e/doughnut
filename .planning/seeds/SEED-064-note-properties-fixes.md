@@ -34,4 +34,4 @@ scope: medium
 
 - UAT report: `1986473b79:.planning/seeds/SEED-061-note-properties-ux-uat.md`, section `## UAT Findings` (screenshots were not committed).
 - Current property editing behavior: [Note-content saving](../../docs/note-content-saving.md#rich-property-editing).
-- Active numbered-key conversion: [SEED-063](SEED-063-track-property-values-separately.md#story-2).
+- Numbered-key conversion behavior: [Numbered-property startup migration](../../docs/numbered-property-migration.md).

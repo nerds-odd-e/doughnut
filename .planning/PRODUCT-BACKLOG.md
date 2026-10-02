@@ -7,8 +7,6 @@ Bug fixing and general maintenance.
 
 ## Taken
 
-- [Existing numbered property keys become one list, and their trackers follow](seeds/SEED-063-track-property-values-separately.md#story-2) — SEED-063#story-2 ([plan](slice-plans/001-numbered-property-consolidation/PLAN.md))
-
 ## Backlog list
 
 - [Remove spent numbered-property migration after confirmed completion](seeds/SEED-063-track-property-values-separately.md#story-3) — SEED-063#story-3
