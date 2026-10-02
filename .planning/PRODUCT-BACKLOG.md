@@ -8,7 +8,6 @@ Bug fixing and general maintenance.
 ## Taken
 
 - [Follow wiki links in property lists from both property views](seeds/SEED-065-clickable-wiki-links-in-property-lists.md#story-1) — SEED-065#story-1 ([plan](slice-plans/001-follow-property-list-wiki-links/PLAN.md))
-- [Remove spent numbered-property migration after confirmed completion](seeds/SEED-063-track-property-values-separately.md#story-3) — SEED-063#story-3 ([plan](slice-plans/001-retire-numbered-property-migration/PLAN.md))
 
 ## Backlog list
 
