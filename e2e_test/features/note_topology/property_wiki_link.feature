@@ -5,6 +5,53 @@ Feature: Property wiki links
   Background:
     Given I am logged in as an existing user
 
+  Scenario Outline: A saved mixed property list opens each referenced note
+    Given I have a notebook "WikiList NB"
+    And I have a note "Grammar" under notebook "WikiList NB" with content:
+      """
+      Grammar body.
+      """
+    And I have a note "Syntax" under notebook "WikiList NB" with content:
+      """
+      Syntax body.
+      """
+    And I have a note "WikiList Carrier" under notebook "WikiList NB" with content:
+      """
+      ---
+      topics: ["[[Grammar]]", "practice", "[[Syntax]]"]
+      ---
+
+      Source body.
+      """
+    When I visit note "WikiList Carrier"
+    Then the wiki link "<target>" should open the note titled "<target>"
+    And I should be at note "<target>"
+
+    Examples:
+      | target  |
+      | Grammar |
+      | Syntax  |
+
+  Scenario: A saved list wiki link stays navigable with its property panel open
+    Given I have a notebook "WikiList Expanded NB"
+    And I have a note "Grammar" under notebook "WikiList Expanded NB" with content:
+      """
+      Grammar body.
+      """
+    And I have a note "WikiList Carrier" under notebook "WikiList Expanded NB" with content:
+      """
+      ---
+      topics: ["[[Grammar]]", "practice"]
+      ---
+
+      Source body.
+      """
+    When I visit note "WikiList Carrier"
+    And I open the property panel for property "topics"
+    Then the rich note property "topics" should be focused with its property panel open
+    And the wiki link "Grammar" should open the note titled "Grammar"
+    And I should be at note "Grammar"
+
   Scenario: A live property wiki link opens the property panel
     Given I have a notebook "WikiProp Live NB"
     And I have a note "WikiProp Moon" under notebook "WikiProp Live NB" with content:

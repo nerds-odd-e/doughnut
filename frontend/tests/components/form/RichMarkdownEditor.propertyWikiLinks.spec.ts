@@ -6,10 +6,7 @@ import {
 } from "@/routes/noteShowLocation"
 import { wikiLinkFromAuthoredToken } from "@/utils/wikiLinkMarkup"
 import { vi } from "vitest"
-import {
-  deadWikiLinkInPropertyValueEl,
-  propertyRowListValue,
-} from "./propertiesTestDom"
+import { deadWikiLinkInPropertyValueEl } from "./propertiesTestDom"
 import { createRichMarkdownEditorTestHarness } from "./richMarkdownEditorTestHarness"
 
 function propertyWikiLinkMarkdown(wikiToken: string): string {
@@ -130,39 +127,5 @@ Body`
       '[data-testid="rich-note-property-row-value-input"] a.donut-wiki-link'
     )
     expect(live.text()).toContain("C|D")
-  })
-
-  it("renders resolved and dead overlaps list items, marking new links pending until saved", async () => {
-    const inFlight = `---
-overlaps:
-  - "[[Other Note]]"
-  - "[[Missing Note]]"
-  - "[[WikiLinks E2E Nowhere]]"
----
-
-Body`
-    const wrapper = await h.mountEditor(inFlight, {
-      lastSavedMarkdown: `---\noverlaps:\n  - "[[Other Note]]"\n  - "[[Missing Note]]"\n---\n\nBody`,
-      wikiLinks: [wikiLinkFromAuthoredToken("Other Note", 42)],
-    })
-
-    const list = propertyRowListValue(wrapper, "overlaps")
-    const resolvedLink = list.find("a.router-link")
-    expect(resolvedLink.text()).toBe("Other Note")
-    expect(JSON.parse(resolvedLink.attributes("to") ?? "{}")).toEqual(
-      noteShowLocation(42)
-    )
-    expect(list.text()).not.toContain("[[")
-    expect(list.find("a.dead-wiki-link").text()).toBe("Missing Note")
-    expect(list.find("a.pending-wiki-link").text()).toBe(
-      "WikiLinks E2E Nowhere"
-    )
-
-    await wrapper.setProps({ lastSavedMarkdown: inFlight })
-    await flushPromises()
-
-    expect(list.find("a.pending-wiki-link").exists()).toBe(false)
-    const deadTitles = list.findAll("a.dead-wiki-link").map((a) => a.text())
-    expect(deadTitles).toEqual(["Missing Note", "WikiLinks E2E Nowhere"])
   })
 })

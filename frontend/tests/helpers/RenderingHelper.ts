@@ -4,7 +4,7 @@ import type { User } from "@generated/donut-backend-api"
 import { render } from "@testing-library/vue"
 import { mount } from "@vue/test-utils"
 import { merge } from "es-toolkit"
-import { ref, type DefineComponent, type Ref } from "vue"
+import { ref, type Component, type DefineComponent, type Ref } from "vue"
 import type { RouteLocationRaw } from "vue-router"
 import { createRouter, createWebHistory } from "vue-router"
 
@@ -21,6 +21,13 @@ class RenderingHelper<T = DefineComponent> {
 
   constructor(comp: T) {
     this.comp = comp
+    const stubs: Record<string, boolean | Component> = {
+      "router-view": true,
+      "router-link": {
+        props: ["to"],
+        template: `<a class="router-link" :to='JSON.stringify(to)' href="#"><slot/></a>`,
+      },
+    }
     this.global = {
       plugins: [],
       directives: {
@@ -32,13 +39,7 @@ class RenderingHelper<T = DefineComponent> {
       provide: {
         currentUser: ref<User | undefined>(),
       },
-      stubs: {
-        "router-view": true,
-        "router-link": {
-          props: ["to"],
-          template: `<a class="router-link" :to='JSON.stringify(to)' href="#"><slot/></a>`,
-        },
-      },
+      stubs,
     }
   }
 
@@ -63,6 +64,11 @@ class RenderingHelper<T = DefineComponent> {
       })
     this.withPlugin(router)
     return this
+  }
+
+  withRealRouter(router: ReturnType<typeof createRouter>) {
+    delete this.global.stubs["router-link"]
+    return this.withRouter(router)
   }
 
   withCurrentUser(user: User) {

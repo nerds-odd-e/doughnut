@@ -168,22 +168,19 @@ export function createRichMarkdownEditorTestHarness() {
   ) {
     const { attachToBody = false, route, ...props } = options
     const builder = helper.component(RichMarkdownEditor)
+    const editorProps = { modelValue: initialValue, wikiLinks: [], ...props }
     if (route !== undefined) {
       const router = createRouter({
         history: createWebHistory(),
         routes,
       })
       await router.push(route)
-      builder.withRouter(router)
+      builder.withRealRouter(router)
     } else {
       builder.withRouter()
     }
     wrapper = builder
-      .withProps({
-        modelValue: initialValue,
-        wikiLinks: [],
-        ...props,
-      })
+      .withProps(editorProps)
       .mount(attachToBody ? { attachTo: document.body } : undefined)
     await flushPromises()
     return wrapper

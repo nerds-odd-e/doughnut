@@ -102,6 +102,17 @@ tags:
     expect(wrapper.find("dl").text()).toContain("alpha")
   })
 
+  it("keeps external URL elements alongside wiki links in a url list", async () => {
+    const wrapper = await h.mountEditor(
+      '---\nurl: ["https://example.com/a", "[[Missing]]"]\n---\n\nBody'
+    )
+    const list = propertyRowListValue(wrapper, "url")
+    expect(
+      list.findAll('[data-testid="rich-note-property-external-link"]')
+    ).toHaveLength(1)
+    expect(list.get("a.dead-wiki-link").text()).toBe("Missing")
+  })
+
   it.each([
     {
       key: "aliases",

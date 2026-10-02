@@ -58,6 +58,12 @@ panel and server-side property writes change only the affected entry's lines,
 so comments, key order, quoting and flow lists elsewhere stay as written, but
 each side makes its own edit.
 
+Each wiki-link element in a property list can be followed independently from
+the row, with its chevron panel closed or open, including in read-only views.
+Mixed lists preserve plain-text elements and their order. Wiki links retain
+their authored display labels, note or property destinations, and pending/dead
+status; URL properties retain external links for non-wiki URL elements.
+
 Add property opens one local draft at the end of the shared property list and
 focuses its key. Selecting Add property again focuses the same draft. Add, or
 Enter in the value field, accepts a complete draft once; Enter in the key field

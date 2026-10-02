@@ -14,12 +14,16 @@ Clickable links in the pencil value dialog, new wiki syntax, new resolution
 workflows, and a property-editing redesign are deferred. This plan introduces
 no new rejection rules or property-key allowlist.
 
-This is planning input only; implementation is not authorized by this request.
-Preparation continues in `/Users/terryyin/git/doughnut/.worktrees/follow-wiki-links-in-property-lists-from-both-pr`,
-branch `codex/follow-wiki-links-in-property-lists-from-both-pr`, under Airi-chan's
-existing assignment. Starting preparation revision: `e242d1f94afba0f9e2613a2f078bfffac6c17e6e`.
-Recorded publication target: `origin/main`; integration checkout:
-`/Users/terryyin/git/doughnut`. The draft stays here pending a keep decision.
+Execution was authorized by the owner's `$dough-execute-plan SEED-065#story-1`
+instruction. Execution checkout:
+`/Users/terryyin/git/doughnut/.worktrees/follow-wiki-links-in-property-lists-from-both-pr`;
+branch `codex/follow-wiki-links-in-property-lists-from-both-pr`.
+Established agent: Eimi-chan; publisher: `dashboard-territory.local-doughnut`.
+Mode: story-branch; remote: origin; trunk: main. The established published
+claim/base is `6e3a03cb585ff113b895c71d0512acb258389690`, with starting revision
+`ba84ee3b0e0b5f8817f46089003c7e65eb78c6b4`. Increments publish to the execution
+branch; integration checkout is `/Users/terryyin/git/doughnut`.
+Existing planning authority is retained for necessary refinement.
 
 ## Existing solution and constraints
 
@@ -72,7 +76,7 @@ body free of duplicate wiki links so the observed click belongs to the list.
 ### 1. Follow each wiki link from the shared property-list row
 
 Type: Behavior
-Status: planned
+Status: done
 Proof: the observations above pass through the mounted editor and real browser.
 
 Behavior: given a saved list containing wiki links and ordinary values, view
@@ -94,7 +98,7 @@ Record the resulting list-navigation behavior in the rich-property section of
 Local verification commands, run from the execution checkout:
 
 ```bash
-CURSOR_DEV=true nix develop -c pnpm frontend:test tests/components/form/RichMarkdownEditor.propertyWikiLinks.spec.ts tests/components/form/RichMarkdownEditor.listProperties.spec.ts
+CURSOR_DEV=true nix develop -c pnpm frontend:test tests/components/form/RichMarkdownEditor.propertyWikiLinks.spec.ts tests/components/form/RichMarkdownEditor.propertyListWikiLinks.spec.ts tests/components/form/RichMarkdownEditor.listProperties.spec.ts
 CURSOR_DEV=true nix develop -c pnpm -C frontend exec vue-tsc --noEmit
 CURSOR_DEV=true nix develop -c pnpm cy:run --spec e2e_test/features/note_topology/property_wiki_link.feature
 ```
@@ -143,3 +147,58 @@ only this story's draft prose was modified.
 - No slice-boundary, cumulative-design, or proof-ownership concern was found
   in this review. Existing baseline proof does not establish the new behavior;
   slice 1 owns that verification.
+
+## Accepted execution proof and learnings
+
+Checkout setup passed through `./scripts/run.sh bash scripts/worktree_setup.sh`;
+the initial applicable list spec passed 9 tests. Implementation used the existing
+whole-token parser and WikiLinkToken, preserving compact plain lists, URL actions,
+and existing editable/read-only consumers. No API or component-generation trigger
+changed. Active implementation took about eight minutes; focused browser startup
+used the stated wait exception.
+
+The initial navigation proof exposed an invalid harness premise: explicit-route
+mounts still retained RenderingHelper's RouterLink stub. An override through its
+deep merge also failed. The final `withRealRouter` helper removes that stub before
+merging; all direct and indirect explicit-route editor consumers were verified.
+Fresh post-change refactoring retained shared provider/directive setup and split
+scalar/list wiki specs along their behavior boundary. It returned
+`## REFACTOR COMPLETE`; production and Cypress observations stayed unchanged.
+
+Final mounted proof, after refactoring, passed 11 files and 62 tests:
+
+```bash
+CURSOR_DEV=true nix develop -c pnpm frontend:test tests/components/form/RichMarkdownEditor.propertyWikiLinks.spec.ts tests/components/form/RichMarkdownEditor.propertyListWikiLinks.spec.ts tests/components/form/RichMarkdownEditor.listProperties.spec.ts tests/components/form/RichMarkdownEditor.propertyMemoryTracking.spec.ts tests/components/form/RichMarkdownEditor.propertyLocation.spec.ts tests/components/form/RichMarkdownEditor.listPropertyMemoryTracking.spec.ts tests/components/form/RichMarkdownEditor.propertyRowEditing.spec.ts tests/components/form/RichMarkdownEditor.propertyReify.spec.ts tests/components/form/RichMarkdownEditor.propertyRenameGuard.spec.ts tests/components/form/RichMarkdownEditor.propertyWikidataDialog.spec.ts tests/components/form/RichMarkdownEditor.propertyValueDialog.spec.ts
+CURSOR_DEV=true nix develop -c pnpm -C frontend exec vue-tsc --noEmit
+```
+
+The typecheck passed. In `RichMarkdownEditor.propertyListWikiLinks.spec.ts`, fresh
+source routes observe independent Grammar/Syntax navigation and exact mixed-list
+order once; the expanded-panel case observes the UI toggle, label, compiled href,
+and named property destination. The readonly case focuses the semantic anchor and
+activates Enter. Pending/dead cases observe inert pending activation, recovery
+payload forwarding, unchanged source route, and the saved-markdown transition.
+Existing scalar/overlaps cases and listProperties retain status, URL, plain-text,
+and readonly behavior. Fixtures supply resolved API data, not backend resolution.
+
+Saved-content integration proof passed all 11 scenarios, none skipped:
+
+```bash
+CURSOR_DEV=true nix develop -c pnpm cy:run --spec e2e_test/features/note_topology/property_wiki_link.feature
+```
+
+The new mixed-list outline observes both target notes independently; the expanded
+scenario observes the open source panel before following Grammar. Source bodies
+have no duplicate wiki links. Existing Given setup supplies saved notes; the real
+application resolves their list references. The follow action waits for app-busy
+completion before destination observations. Eight existing scenarios also passed.
+Pointer and keyboard activation are observed; touch retains normal anchor behavior
+without separate simulation. Full suites were not required for this presentation
+change. Selective formatting passed once after refactoring; whitespace passed.
+
+CI source: GitHub Actions `ci.yml` (pushes include the execution branch), verified
+with `gh run list`. Codex yielded observer: coordinator `/root`, cell 14, session
+91904, PID 77125, mailbox `/tmp/dough-ci-501/watch-1AAZo2`, bound to this checkout and
+`nerds-odd-e/doughnut` branch `codex/follow-wiki-links-in-property-lists-from-both-pr`.
+Managed delivery owns accepted-revision registration. Claim CI on origin/main was
+unobserved; story-branch observation covers execution increments.

@@ -48,6 +48,7 @@ function wikiLinkInNoteContentFluent(
     },
     followAndAssumeNote(noteTitle: string) {
       locator().click()
+      waitUntilAppIsNotBusy()
       cy.url({ timeout: 15000 }).should('match', noteShowPathInUrl)
       return assumeNotePage(noteTitle)
     },
