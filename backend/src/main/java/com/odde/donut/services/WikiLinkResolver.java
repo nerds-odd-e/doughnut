@@ -12,7 +12,6 @@ import com.odde.donut.entities.repositories.NoteAliasIndexRepository;
 import com.odde.donut.entities.repositories.NoteRepository;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import org.springframework.stereotype.Service;
 
@@ -153,15 +152,6 @@ public class WikiLinkResolver {
     String focusNotebookName =
         focusNote.getNotebook() == null ? null : focusNote.getNotebook().getName();
     return classifyToken(token, focusNotebookName, viewer);
-  }
-
-  /**
-   * {@code token}'s candidates from {@code source}'s notebook scope against proposed authored
-   * content, classified per reader without repeating the lookup.
-   */
-  WikiLinkCandidateClassifier.TokenCandidates tokenCandidates(
-      String token, Note source, Map<Integer, String> projectedContent) {
-    return candidateClassifier.candidates(token, source.getNotebook().getName(), projectedContent);
   }
 
   /**

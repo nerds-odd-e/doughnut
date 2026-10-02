@@ -7,13 +7,10 @@ import static com.odde.donut.algorithms.YamlSourceEdit.offset;
 import static com.odde.donut.algorithms.YamlSourceEdit.splice;
 
 import com.odde.donut.algorithms.YamlSourceEdit.Replacement;
-import com.odde.donut.entities.PropertyFocus;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.function.UnaryOperator;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
@@ -30,18 +27,6 @@ import org.yaml.snakeyaml.nodes.SequenceNode;
 public final class FrontmatterInPlaceEdit {
 
   private FrontmatterInPlaceEdit() {}
-
-  /** A diagnostic has no transformed YAML or focus mapping. */
-  public record ConsolidatedProperties(
-      String yaml,
-      Map<PropertyFocus, PropertyFocus> focuses,
-      Set<String> sourceKeys,
-      String diagnostic) {}
-
-  /** Consolidates exact authored numeric families without rewriting other source ranges. */
-  public static ConsolidatedProperties consolidateNumberedProperties(String yamlRaw) {
-    return FrontmatterNumberedProperties.consolidate(yamlRaw);
-  }
 
   /**
    * Rewrites supported values — top-level scalars and all-scalar sequence items — with {@code

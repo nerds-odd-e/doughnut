@@ -10,14 +10,6 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 
 public interface NotebookRepository extends CrudRepository<Notebook, Integer> {
-  @Query("SELECT nb.id FROM Notebook nb ORDER BY nb.id")
-  List<Integer> findAllIdsInOrder();
-
-  @Query(
-      "SELECT COUNT(nb) > 0 FROM Notebook nb"
-          + " WHERE nb.id = :notebookId AND LOWER(nb.name) = LOWER(:name)")
-  boolean nameMatches(@Param("notebookId") Integer notebookId, @Param("name") String name);
-
   List<Notebook> findByOwnership_IdAndDeletedAtIsNull(Integer ownershipId);
 
   Optional<Notebook> findFirstByNameAndDeletedAtIsNullOrderByIdAsc(DisplayName name);

@@ -1,19 +1,11 @@
 package com.odde.donut.services;
 
-import com.odde.donut.algorithms.FrontmatterPropertyValue;
-import com.odde.donut.algorithms.NoteContentMarkdown;
 import com.odde.donut.entities.MemoryTracker;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.PropertyFocus;
 import com.odde.donut.entities.repositories.MemoryTrackerRepository;
 import com.odde.donut.factoryServices.EntityPersister;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -24,17 +16,14 @@ public class PropertyMemoryTrackerService {
   private final EntityPersister entityPersister;
   private final UserService userService;
   private final MemoryTrackerRepository memoryTrackerRepository;
-  private final MemoryTrackerService memoryTrackerService;
 
   public PropertyMemoryTrackerService(
       EntityPersister entityPersister,
       UserService userService,
-      MemoryTrackerRepository memoryTrackerRepository,
-      MemoryTrackerService memoryTrackerService) {
+      MemoryTrackerRepository memoryTrackerRepository) {
     this.entityPersister = entityPersister;
     this.userService = userService;
     this.memoryTrackerRepository = memoryTrackerRepository;
-    this.memoryTrackerService = memoryTrackerService;
   }
 
   public void updatePropertyKey(MemoryTracker memoryTracker, String newPropertyKey) {
@@ -80,109 +69,6 @@ public class PropertyMemoryTrackerService {
               tracker.setPropertyValue(propertyValue);
               entityPersister.save(tracker);
             });
-  }
-
-  public record ConsolidatedFocuses(
-      Map<PropertyFocus, PropertyFocus> focuses, Set<String> sourceKeys) {}
-
-  public ConsolidatedFocuses composeConsolidatedFocuses(
-      Note note,
-      NoteContentMarkdown.ConsolidatedProperties transformed,
-      NumberedPropertyReferencePreservation.Rewrites rewrites) {
-    Map<PropertyFocus, PropertyFocus> focuses = new LinkedHashMap<>();
-    transformed
-        .focuses()
-        .forEach(
-            (source, destination) ->
-                focuses.put(
-                    source,
-                    new PropertyFocus(destination.key(), rewrites.apply(destination.value()))));
-    Set<String> keys = new LinkedHashSet<>(transformed.sourceKeys());
-    NoteContentMarkdown.splitLeadingFrontmatter(note.getContent())
-        .ifPresent(
-            split -> {
-              for (String key : split.frontmatter().keys()) {
-                if (split.frontmatter().getPropertyValueExact(key).orElse(null)
-                        instanceof FrontmatterPropertyValue.ListItems list
-                    && list.items().stream().anyMatch(item -> !item.equals(rewrites.apply(item)))) {
-                  keys.add(key);
-                  for (String item : list.items()) {
-                    PropertyFocus source = new PropertyFocus(key, item);
-                    focuses.putIfAbsent(source, new PropertyFocus(key, rewrites.apply(item)));
-                  }
-                }
-              }
-            });
-    return new ConsolidatedFocuses(Map.copyOf(focuses), Set.copyOf(keys));
-  }
-
-  /** Checks every persisted learner's focus before a complete family change mutates anything. */
-  public String consolidationDiagnostic(
-      Note note, Map<PropertyFocus, PropertyFocus> focuses, Set<String> sourceKeys) {
-    for (MemoryTracker tracker : propertyTrackers(note)) {
-      PropertyFocus destination = focuses.get(tracker.propertyFocus());
-      if (destination != null
-          && (destination.key().codePointCount(0, destination.key().length()) > 255
-              || destination.value().codePointCount(0, destination.value().length()) > 255)) {
-        return "Property focus exceeds the persisted column limit";
-      }
-      if (sourceKeys.contains(tracker.getPropertyKey())
-          && (!focuses.containsKey(tracker.propertyFocus())
-              || focuses.get(tracker.propertyFocus()).value().isEmpty())) {
-        return "Unmapped tracker focus: " + tracker.getId();
-      }
-    }
-    return null;
-  }
-
-  /** Retains tracker identity and learning fields while applying an already checked mapping. */
-  public void followConsolidatedProperties(Note note, Map<PropertyFocus, PropertyFocus> focuses) {
-    List<MemoryTracker> trackers = new ArrayList<>(propertyTrackers(note));
-    trackers.sort(
-        Comparator.comparing(
-                (MemoryTracker tracker) ->
-                    !equalPersistedFocus(tracker.propertyFocus(), destination(tracker, focuses)))
-            .thenComparing(MemoryTracker::getId));
-    List<MemoryTracker> survivors = new ArrayList<>();
-    List<MemoryTracker> redundant = new ArrayList<>();
-    for (MemoryTracker tracker : trackers) {
-      boolean duplicate =
-          survivors.stream()
-              .anyMatch(
-                  retained ->
-                      retained.getUser().getId().equals(tracker.getUser().getId())
-                          && retained.getType() == tracker.getType()
-                          && equalPersistedFocus(
-                              destination(retained, focuses), destination(tracker, focuses)));
-      (duplicate ? redundant : survivors).add(tracker);
-    }
-    redundant.forEach(memoryTrackerService::delete);
-    survivors.forEach(
-        tracker -> {
-          PropertyFocus destination = focuses.get(tracker.propertyFocus());
-          if (destination != null) {
-            tracker.setPropertyKey(destination.key());
-            tracker.setPropertyValue(destination.value());
-            entityPersister.save(tracker);
-          }
-        });
-  }
-
-  private List<MemoryTracker> propertyTrackers(Note note) {
-    return memoryTrackerRepository.findByNote_IdIn(List.of(note.getId())).stream()
-        .filter(tracker -> !tracker.isNoteLevelTracker())
-        .toList();
-  }
-
-  private static PropertyFocus destination(
-      MemoryTracker tracker, Map<PropertyFocus, PropertyFocus> focuses) {
-    return focuses.getOrDefault(tracker.propertyFocus(), tracker.propertyFocus());
-  }
-
-  private boolean equalPersistedFocus(PropertyFocus left, PropertyFocus right) {
-    return memoryTrackerRepository.equalPersistedFocus(
-            left.key(), left.value(), right.key(), right.value())
-        == 1;
   }
 
   /**

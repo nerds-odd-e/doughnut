@@ -109,11 +109,6 @@ public record PortablePath(
   /** Notebook name and note title to resolve a wiki-link to a target note. */
   public record Resolved(String notebookName, String noteTitle) {}
 
-  public PortablePath withPropertyKey(String key) {
-    return new PortablePath(
-        notebookQualifier, notePortion, Optional.of(PropertyKeyPercentEncoding.encode(key)));
-  }
-
   public PortablePath withNoteTitle(String newTitle) {
     if (notebookQualifier.isPresent()) {
       return new PortablePath(notebookQualifier, newTitle, encodedPropertyKey);

@@ -11,12 +11,6 @@ public final class WikiLinkMarkdownRewrite {
 
   private WikiLinkMarkdownRewrite() {}
 
-  public static String retargetProperty(String inner, String key) {
-    return WikiLinkMarkdown.splitInner(inner)
-        .rewriteTargetKeepingVisible(
-            target -> PortablePath.parse(target).withPropertyKey(key).format());
-  }
-
   public static String newInnerForAuthoredPortablePath(
       String storedLinkInner, String authoredPortablePath, boolean keepVisibleText) {
     if (authoredPortablePath == null) {

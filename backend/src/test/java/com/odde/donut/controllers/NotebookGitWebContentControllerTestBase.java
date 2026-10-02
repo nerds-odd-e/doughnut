@@ -5,6 +5,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.donut.controllers.dto.FolderMoveRequest;
 import com.odde.donut.controllers.dto.FolderRenameRequest;
 import com.odde.donut.controllers.dto.NoteRealm;
@@ -16,6 +17,7 @@ import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
 import com.odde.donut.entities.NotebookAttachment;
 import com.odde.donut.entities.NotebookGitBinding;
+import com.odde.donut.entities.PropertyFocus;
 import com.odde.donut.entities.repositories.MemoryTrackerRepository;
 import com.odde.donut.entities.repositories.NotebookAttachmentRepository;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
@@ -26,6 +28,7 @@ import com.odde.donut.services.notebookTree.PortableTreeEntry;
 import com.odde.donut.testability.GitBundleTestReader.AcceptedHistory;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.sql.Timestamp;
 import java.util.List;
 import java.util.Map;
 import org.eclipse.jgit.lib.ObjectId;
@@ -38,10 +41,67 @@ abstract class NotebookGitWebContentControllerTestBase extends NotebookGitContro
   static final String ACCEPTED_CONTENT = "---\ntype: Note\n---\naccepted content";
   static final String EDITED_CONTENT = "---\ntype: Note\n---\nedited content";
 
+  @Autowired ObjectMapper objectMapper;
+  @Autowired MemoryTrackerController memoryTrackerController;
   @Autowired TextContentController textContentController;
   @Autowired NoteController noteController;
   @Autowired MemoryTrackerRepository memoryTrackerRepository;
   @Autowired NotebookAttachmentRepository notebookAttachmentRepository;
+
+  List<Integer> learnedListTrackers(Note note) {
+    return inCommittedTransaction(
+        transactionManager,
+        () ->
+            List.of("A", "B").stream()
+                .map(
+                    value ->
+                        makeMe
+                            .aMemoryTrackerFor(noteRepository.findById(note.getId()).orElseThrow())
+                            .propertyKey("topic")
+                            .propertyValue(value)
+                            .afterNthStrictRecall(2)
+                            .recallCount(2)
+                            .please()
+                            .getId())
+                .toList());
+  }
+
+  Learning learning(Integer trackerId) {
+    return inCommittedTransaction(
+        transactionManager,
+        () -> {
+          try {
+            MemoryTracker tracker =
+                memoryTrackerController.showMemoryTracker(
+                    memoryTrackerRepository.findById(trackerId).orElseThrow());
+            return new Learning(
+                tracker.getId(),
+                tracker.propertyFocus(),
+                tracker.getRecallCount(),
+                tracker.getNextRecallAt(),
+                tracker.getLastRecalledAt(),
+                tracker.getAssimilatedAt(),
+                tracker.getStability(),
+                tracker.getDifficulty(),
+                tracker.getRemovedFromTracking(),
+                objectMapper.writeValueAsString(memoryTrackerController.getRecallHistory(tracker)));
+          } catch (Exception exception) {
+            throw new IllegalStateException(exception);
+          }
+        });
+  }
+
+  record Learning(
+      Integer id,
+      PropertyFocus focus,
+      Integer recallCount,
+      Timestamp next,
+      Timestamp last,
+      Timestamp assimilated,
+      Float stability,
+      Float difficulty,
+      Boolean removed,
+      String history) {}
 
   NotebookGitBinding binding(Notebook notebook) {
     return notebookGitBindingRepository.findByNotebook_Id(notebook.getId()).orElseThrow();

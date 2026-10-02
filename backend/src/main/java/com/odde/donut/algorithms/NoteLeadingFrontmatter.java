@@ -11,30 +11,6 @@ public final class NoteLeadingFrontmatter {
 
   private NoteLeadingFrontmatter() {}
 
-  /** Source ranges for edits that must preserve fence, BOM, body and line-ending bytes. */
-  public record SourceSplit(String prefix, String yamlRaw, String suffix) {
-    String rebuild(String yaml) {
-      return prefix + yaml + suffix;
-    }
-  }
-
-  public static Optional<SourceSplit> splitPreservingSource(String content) {
-    if (content == null) {
-      return Optional.empty();
-    }
-    var fence =
-        Pattern.compile(
-                "\\A\\uFEFF?---(?:\\r\\n|\\n|\\r)(.*?)(?:^---(?:\\r\\n|\\n|\\r|$))",
-                Pattern.DOTALL | Pattern.MULTILINE)
-            .matcher(content);
-    if (!fence.find()) {
-      return Optional.empty();
-    }
-    return Optional.of(
-        new SourceSplit(
-            content.substring(0, fence.start(1)), fence.group(1), content.substring(fence.end(1))));
-  }
-
   public record Split(Frontmatter frontmatter, String body) {}
 
   /**
