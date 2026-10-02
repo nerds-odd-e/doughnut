@@ -1,9 +1,7 @@
 # Numbered-property migration retirement
 
-The one-time conversion of numbered property keys to list properties completed,
-as confirmed by the owner on 2026-10-02. Its startup runner and conversion-only
-helpers have been retired. Ordinary startup still runs Flyway and does not scan,
-consolidate or normalize authored numbered properties.
+The numbered-property converter is retired. Ordinary startup runs Flyway and
+does not scan, consolidate or normalize authored numbered properties.
 
 List properties continue to support one memory tracker per value through ordinary
 editing and learning. Authored legacy keys remain recognizable. Existing
