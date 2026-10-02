@@ -14,15 +14,66 @@ import com.odde.donut.entities.repositories.AuthoredNoteReferenceRowTestSupport;
 import com.odde.donut.entities.repositories.NotePropertyIndexRepository;
 import java.sql.Timestamp;
 import java.util.List;
+import org.junit.jupiter.api.AfterEach;
 import org.springframework.beans.factory.annotation.Autowired;
 
-/** Committed observations of the migration's private, derived and accepted state. */
-abstract class NumberedPropertyMigrationRollbackTestSupport
+/** Committed fixtures and observations for migration atomicity and retry behavior. */
+abstract class NumberedPropertyMigrationCommittedTestSupport
     extends NotebookGitWebContentControllerTestBase {
   @Autowired MemoryTrackerController trackerController;
   @Autowired ObjectMapper objectMapper;
   @Autowired NotePropertyIndexRepository propertyIndexRepository;
   Integer conversationId;
+
+  @AfterEach
+  void resetFailureAndCleanupConversation() {
+    NotebookGitPublicationAtomicTestSupport.FAIL_ON_BINDING_SAVE.set(false);
+    NotebookGitPublicationAtomicTestSupport.FAIL_FOR_NOTEBOOK_ID.set(null);
+    if (conversationId != null) {
+      inCommittedTransaction(
+          transactionManager,
+          () ->
+              entityManager
+                  .createNativeQuery("DELETE FROM conversation WHERE id = :id")
+                  .setParameter("id", conversationId)
+                  .executeUpdate());
+    }
+  }
+
+  List<Integer> seedDuplicateWithClosure(Note note) {
+    return inCommittedTransaction(
+        transactionManager,
+        () -> {
+          Note stored = noteRepository.findById(note.getId()).orElseThrow();
+          MemoryTracker redundant =
+              makeMe
+                  .aMemoryTrackerFor(stored)
+                  .propertyKey("topic 2")
+                  .afterNthStrictRecall(3)
+                  .recallCount(3)
+                  .please();
+          MemoryTracker survivor =
+              makeMe
+                  .aMemoryTrackerFor(stored)
+                  .propertyKey("topic")
+                  .propertyValue("A")
+                  .afterNthStrictRecall(2)
+                  .recallCount(2)
+                  .please();
+          var prompt =
+              makeMe.aRecallPrompt().forMemoryTracker(redundant).withMcqForNote(stored).please();
+          conversationId =
+              makeMe
+                  .aConversation()
+                  .forARecallPrompt(prompt)
+                  .from(redundant.getUser())
+                  .please()
+                  .getId();
+          var batch = makeMe.aQuestionGenerationBatch().forUser(redundant.getUser()).please();
+          makeMe.aQuestionGenerationBatchRequest().batch(batch).memoryTracker(redundant).please();
+          return List.of(redundant.getId(), survivor.getId());
+        });
+  }
 
   NoteState noteState(Note note) {
     return inCommittedTransaction(

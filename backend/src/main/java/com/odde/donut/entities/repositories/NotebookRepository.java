@@ -10,6 +10,9 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 
 public interface NotebookRepository extends CrudRepository<Notebook, Integer> {
+  @Query("SELECT nb.id FROM Notebook nb ORDER BY nb.id")
+  List<Integer> findAllIdsInOrder();
+
   List<Notebook> findByOwnership_IdAndDeletedAtIsNull(Integer ownershipId);
 
   Optional<Notebook> findFirstByNameAndDeletedAtIsNullOrderByIdAsc(DisplayName name);

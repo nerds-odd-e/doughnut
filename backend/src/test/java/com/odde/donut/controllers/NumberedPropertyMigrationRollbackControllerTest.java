@@ -6,14 +6,10 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import com.odde.donut.entities.Conversation;
-import com.odde.donut.entities.MemoryTracker;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Notebook;
-import com.odde.donut.entities.RecallPrompt;
 import com.odde.donut.services.NumberedPropertyMigration;
 import java.util.List;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
@@ -22,23 +18,9 @@ import org.springframework.test.context.ActiveProfiles;
 @ActiveProfiles({"test", "notebook-git-publication-atomic-test"})
 @Import(NotebookGitPublicationAtomicTestSupport.FailingBindingSaveConfig.class)
 class NumberedPropertyMigrationRollbackControllerTest
-    extends NumberedPropertyMigrationRollbackTestSupport {
+    extends NumberedPropertyMigrationCommittedTestSupport {
   private static final String OLD_ITEM = "Read [[Migration Target:Carrier#prop:topic%202|detail]]";
   @Autowired NumberedPropertyMigration migration;
-
-  @AfterEach
-  void resetFailureAndCleanupConversation() {
-    NotebookGitPublicationAtomicTestSupport.FAIL_ON_BINDING_SAVE.set(false);
-    if (conversationId != null) {
-      inCommittedTransaction(
-          transactionManager,
-          () ->
-              entityManager
-                  .createNativeQuery("DELETE FROM conversation WHERE id = :id")
-                  .setParameter("id", conversationId)
-                  .executeUpdate());
-    }
-  }
 
   @Test
   void latePublicationFailureRestoresBothTreesPrivateLearningAndDeletedForeignKeyClosure()
@@ -59,55 +41,21 @@ class NumberedPropertyMigrationRollbackControllerTest
             .title("Source")
             .content("---\ntype: Note\nabout: ['" + OLD_ITEM + "']\n---\nSource")
             .please();
-    List<Integer> trackers =
+    List<Integer> duplicateTrackers = seedDuplicateWithClosure(target);
+    Integer sourceTracker =
         inCommittedTransaction(
             transactionManager,
-            () -> {
-              Note storedTarget = noteRepository.findById(target.getId()).orElseThrow();
-              MemoryTracker redundant =
-                  makeMe
-                      .aMemoryTrackerFor(storedTarget)
-                      .propertyKey("topic 2")
-                      .afterNthStrictRecall(3)
-                      .recallCount(3)
-                      .please();
-              MemoryTracker survivor =
-                  makeMe
-                      .aMemoryTrackerFor(storedTarget)
-                      .propertyKey("topic")
-                      .propertyValue("A")
-                      .afterNthStrictRecall(2)
-                      .recallCount(2)
-                      .please();
-              RecallPrompt prompt =
-                  makeMe
-                      .aRecallPrompt()
-                      .forMemoryTracker(redundant)
-                      .withMcqForNote(storedTarget)
-                      .please();
-              Conversation conversation =
-                  makeMe
-                      .aConversation()
-                      .forARecallPrompt(prompt)
-                      .from(redundant.getUser())
-                      .please();
-              conversationId = conversation.getId();
-              var batch = makeMe.aQuestionGenerationBatch().forUser(redundant.getUser()).please();
-              makeMe
-                  .aQuestionGenerationBatchRequest()
-                  .batch(batch)
-                  .memoryTracker(redundant)
-                  .please();
-              MemoryTracker sourceTracker =
-                  makeMe
-                      .aMemoryTrackerFor(noteRepository.findById(source.getId()).orElseThrow())
-                      .propertyKey("about")
-                      .propertyValue(OLD_ITEM)
-                      .afterNthStrictRecall(2)
-                      .recallCount(2)
-                      .please();
-              return List.of(redundant.getId(), survivor.getId(), sourceTracker.getId());
-            });
+            () ->
+                makeMe
+                    .aMemoryTrackerFor(noteRepository.findById(source.getId()).orElseThrow())
+                    .propertyKey("about")
+                    .propertyValue(OLD_ITEM)
+                    .afterNthStrictRecall(2)
+                    .recallCount(2)
+                    .please()
+                    .getId());
+    List<Integer> trackers =
+        List.of(duplicateTrackers.getFirst(), duplicateTrackers.getLast(), sourceTracker);
     snapshotCurrentPortableTree(targetBook);
     snapshotCurrentPortableTree(sourceBook);
     var targetHistory = acceptedHistory(targetBook);

@@ -137,7 +137,7 @@ hard budget or refine again. Refactor review took five active minutes.
 
 NumberedPropertyMigrationRollbackControllerTest invokes the real migration with
 the existing late binding-save failure injection and separately committed
-readers. NumberedPropertyMigrationRollbackTestSupport snapshots controller
+readers. NumberedPropertyMigrationCommittedTestSupport snapshots controller
 content, references/indexes, tracker identity/history/schedule, the complete
 duplicate-deletion FK closure, both bindings and native object counts, and
 freshly downloaded/reopened accepted histories. All equal their baselines
@@ -149,3 +149,38 @@ before test execution. Implementation took seven active minutes excluding
 verification waits. Fresh refactor took three active minutes, made no edits,
 and preserved proof. Coordinator selective formatting passed once; no API
 generation was triggered. No startup activation or deployed completion claim.
+
+## Slice 14 accepted proof
+
+NumberedPropertyMigrationRetryControllerTest invokes the actual ordered runner:
+first operation commits its full duplicate deletion; second late binding-save
+failure leaves that notebook unchanged. Resumed and repeated actual runs retain
+first content, binding/head/native rows, reopened history and survivor learning;
+second completes with original tracker/history/next recall, then stays unchanged.
+The full FK closure is constructed in CommittedTestSupport and deletion checks
+include conversation SET NULL. Null failure-target preserves existing consumers.
+`CURSOR_DEV=true nix develop -c pnpm backend:verify` passed: 2766 tests,
+zero failures/errors, two skipped. An earlier expectation omitted shared-codec
+quotes; correcting expectations restored the established format contract.
+Implementation took seven active minutes excluding verification waits. Fresh
+refactor took five active minutes, consolidated duplicated full-closure setup
+and cleanup, and renamed shared support; its full verification rerun passed
+2766/0/0/2, including both rollback and retry. Root inspected moved fixtures
+and retained assertions. Coordinator formatting passed once; no generation.
+
+## Startup proof boundary refinement
+
+The remaining startup leaf combined two independent integration proof loops:
+concurrent accepted-operation safety and actual Flyway/event activation. Slice
+14 took seven active minutes with reused committed fixtures; combining both
+remaining loops creates a credible ten-minute sizing risk. No failed attempt
+or discarded work is claimed for this proactive split. The smallest remaining
+outcome still activates the same proved migration after Flyway; skipping the
+concurrency observation would leave an original promise unproved. Reuse the
+existing accepted boundary, fixture and runner rather than adding machinery.
+Preserve completed 1–14 and their proof; replace former 15 with concurrency (15)
+and startup/diagnostic reporting/maintained guidance (16), five-minute targets
+with the existing full-suite wait exception. No scope, policy, ADR, or queue
+change. The cumulative design remains one transform, tracker and accepted owner.
+Story resplit recommended: 16 slices; use dough-resplit-story. This recommendation
+is not a readiness gate; execution may continue under the existing authority.
