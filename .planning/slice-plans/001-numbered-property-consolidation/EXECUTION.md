@@ -133,3 +133,19 @@ valid for its fixture; it does not establish alias preservation. Continuation
 has spent three active implementation minutes; correct within its remaining
 hard budget or refine again. Refactor review took five active minutes.
 
+## Slice 13 accepted proof
+
+NumberedPropertyMigrationRollbackControllerTest invokes the real migration with
+the existing late binding-save failure injection and separately committed
+readers. NumberedPropertyMigrationRollbackTestSupport snapshots controller
+content, references/indexes, tracker identity/history/schedule, the complete
+duplicate-deletion FK closure, both bindings and native object counts, and
+freshly downloaded/reopened accepted histories. All equal their baselines
+after the failure, including the prompt/conversation edge and request rows.
+`CURSOR_DEV=true nix develop -c pnpm backend:verify` passed: 2765 tests,
+zero failures/errors, two skipped; the rollback test passed in 0.087s.
+An earlier compile failure from a raw-list Hamcrest assertion was corrected
+before test execution. Implementation took seven active minutes excluding
+verification waits. Fresh refactor took three active minutes, made no edits,
+and preserved proof. Coordinator selective formatting passed once; no API
+generation was triggered. No startup activation or deployed completion claim.

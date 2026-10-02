@@ -204,7 +204,8 @@ filter. Do not publish a target change before its required reference rewrites.
 
 ### 13. Late publication failure rolls back the whole migration
 Type: Behavior
-Status: planned
+Status: done
+Accepted proof: [slice 13](EXECUTION.md#slice-13-accepted-proof).
 Proof: Reuse the existing failing-binding-save/committed-reader pattern at the
 migration boundary. After late failure, inspect original notes, tracker
 identities/focuses and all deletion fan-out, derived references, accepted heads
