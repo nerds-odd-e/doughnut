@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "agent": "Eimi-chan",
+  "email": "eimi-chan@example.org",
+  "identity": "SEED-065#story-1",
+  "mode": "story-branch",
+  "branch": "codex/follow-wiki-links-in-property-lists-from-both-pr",
+  "host": "codex",
+  "model": "gpt-6.1-sol"
+}
