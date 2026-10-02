@@ -167,3 +167,20 @@ prefix; corrected without production changes. Active implementation 5.5 minutes.
 Fresh refactor made no edits; whitespace passed and accepted proof unchanged.
 Coordinator formatting passed. Anonymous current-reader observation remains
 explicitly owned by the next positive visibility journey, not claimed here.
+
+## Slice 11 accepted proof
+
+Full `CURSOR_DEV=true nix develop -c pnpm backend:verify` passed first run:
+2763 tests, zero failures/errors, two skipped; Selectors and Visibility classes
+one pass each. The canonical migration rewrites body/frontmatter/path and exact
+case variants, retaining visible text and unchanged missing/ambiguous authored
+selectors. Specific stored authored rows and property index agree with content.
+Original target/source tracker IDs retain focus mapping, history, schedule and
+FSRS fields; an untouched source item keeps its focus. Downloaded target/source
+Markdown is one descendant with the original accepted parent.
+The visibility journey observes owner and anonymous resolution and wider-reader
+ambiguity before/after, with public source/target plus another owner’s private
+same-name candidate. Source download retargets; private history stays unchanged
+under its actual owner. This closes the explicit anonymous observation gap.
+Six active implementation minutes; full-suite wait excluded. Fresh refactor made
+no edits, whitespace passed, tests not repeated. Coordinator formatter passed.

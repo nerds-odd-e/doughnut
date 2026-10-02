@@ -173,10 +173,8 @@ correct authorized observations; no policy change or startup activation.
 
 ### 11. In-notebook selectors still resolve after consolidation
 Type: Behavior
-Status: planned
-Continuation: reconstruct the positive journey; unresolved links are omitted
-by controller reads. Add stored authored-reference row assertions and the
-same-name private-notebook visibility regression as a successful journey.
+Status: done
+Accepted proof: [slice 11](EXECUTION.md#slice-11-accepted-proof).
 Proof: A uniquely resolving `#prop:` selector in body/frontmatter → migration →
 controller wiki resolution selects the base, visible text is retained, derived
 source rows match authored content and downloaded Markdown has the new selector.
