@@ -164,6 +164,19 @@ do not publish partial cleanup that breaks compilation or loses preservation pro
 - No production or Development data was observed or changed. No uncovered promise
   remains; source scans establish removal, while disposable tests establish
   ordinary startup/editing and learning preservation.
+- Implementation publication accepted
+  `afd24f50add24f529665223981d01cb6cba73bb1` on
+  `origin/codex/remove-spent-numbered-property-migration-after-c`; no reconciliation
+  changed the candidate. That commit is the execution's attributable implementation;
+  `443b88ee8b81e7bd40537932081540f30d870ad3` is claim provenance. Adjacent
+  SEED-065 work is excluded.
+- CI source: GitHub Actions `ci.yml`, verified push selector for the story branch.
+  Initial managed receipt reported an unavailable bridge. The supplied Codex
+  stream adapter restored one live observer; managed recovery reused it and
+  registered the exact accepted implementation revision. Observer
+  `/tmp/dough-ci-501/watch-d0jtOB`, coordinator
+  `dashboard-territory.local-doughnut`, checkout above, yielded cell `35`,
+  command session `85696`. CI remains pending until the completion receipt.
 
 ## Execution gates and current decisions
 
@@ -181,3 +194,26 @@ do not publish partial cleanup that breaks compilation or loses preservation pro
 - Preparation review found no remaining slice-specific concern. Readiness must
   be recorded against this source and plan after writing; it grants no execution
   or publication authority.
+
+## Execution complete
+
+Product advice: no new product work or backlog reprioritization is justified by
+this retirement. Preserve the existing list-editing, property recall and wiki-link
+journeys and continue the existing product queue.
+
+Automatic retrospective reviewed the source, execution-ready plan, attributable
+implementation, final refactor, accepted proof and relevant whole-product owners
+against North Star and Accepted ADRs 0002, 0003, 0004 and 0007. No outcome defect,
+architectural drift or remaining refactor residue was found. Removed tests exercised
+only the retired converter; permanent startup and controller preservation proof
+replace the continuing obligations. Existing property-recall, property-wiki and
+note-edit E2E journeys remain useful integration documentation and were retained;
+E2E did not drive this removal and no local E2E run is claimed.
+
+Process review used the coordinator conversation and implementation/refactor
+handoffs. Both active-edit attempts stayed within their stated budgets; required
+full-suite waits account for their additional elapsed time. The temporary CI
+attachment gap was recovered before handoff. No lasting process finding or
+correction plan is proposed. Final CI judgment remains conditional on the bounded
+completion receipt; the observer will cover this records-only completion revision
+through its applicable implementation basis.
