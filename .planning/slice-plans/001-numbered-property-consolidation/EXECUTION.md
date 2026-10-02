@@ -184,3 +184,22 @@ with the existing full-suite wait exception. No scope, policy, ADR, or queue
 change. The cumulative design remains one transform, tracker and accepted owner.
 Story resplit recommended: 16 slices; use dough-resplit-story. This recommendation
 is not a readiness gate; execution may continue under the existing authority.
+
+## Slice 15 accepted proof
+
+NumberedPropertyMigrationConcurrencyControllerTest runs two actual migrations
+after two real independently committed legacy preflights finish. Bounded latches
+hold both runners before acceptance; two arrivals and unfinished futures observe
+overlap. Temporary advice wraps the existing transactional proxy and is removed
+with executor cleanup in finally; no mocked result, new context or production hook.
+Both runs return no diagnostics. Fresh reads and reopened history show one
+descendant, the original destination survivor with unchanged complete learning,
+and normal full redundant-tracker FK deletion including conversation SET NULL.
+A third actual run preserves content, binding/head/native rows, history and learning.
+`CURSOR_DEV=true nix develop -c pnpm backend:verify` passed: 2767 tests,
+zero failures/errors, two skipped; concurrency testcase 0.048s. Seven active
+implementation minutes excluding suite waits. Fresh refactor took three active
+minutes, moved repeated deletion assertions unchanged into CommittedTestSupport,
+and reran full verification: 2767/0/0/2, including retry/concurrency/rollback.
+Root inspected moved assertions and unchanged coordination; formatting passed
+once, no generation. Same-book concurrency is proved; startup remains slice 16.

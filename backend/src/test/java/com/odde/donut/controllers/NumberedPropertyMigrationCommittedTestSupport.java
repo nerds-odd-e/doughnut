@@ -3,6 +3,7 @@ package com.odde.donut.controllers;
 import static com.odde.donut.testability.CommittedTransactionTestSupport.inCommittedTransaction;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.donut.entities.AuthoredNoteReferenceRow;
@@ -17,7 +18,7 @@ import java.util.List;
 import org.junit.jupiter.api.AfterEach;
 import org.springframework.beans.factory.annotation.Autowired;
 
-/** Committed fixtures and observations for migration atomicity and retry behavior. */
+/** Committed fixtures and observations for migration atomicity and repeated runs. */
 abstract class NumberedPropertyMigrationCommittedTestSupport
     extends NotebookGitWebContentControllerTestBase {
   @Autowired MemoryTrackerController trackerController;
@@ -72,6 +73,33 @@ abstract class NumberedPropertyMigrationCommittedTestSupport
           var batch = makeMe.aQuestionGenerationBatch().forUser(redundant.getUser()).please();
           makeMe.aQuestionGenerationBatchRequest().batch(batch).memoryTracker(redundant).please();
           return List.of(redundant.getId(), survivor.getId());
+        });
+  }
+
+  void assertDuplicateClosureDeleted(Integer id) {
+    inCommittedTransaction(
+        transactionManager,
+        () -> {
+          assertThat(memoryTrackerRepository.findById(id).isEmpty(), is(true));
+          for (String table :
+              List.of("recall_log", "recall_prompt", "question_generation_batch_request")) {
+            var count =
+                (Number)
+                    entityManager
+                        .createNativeQuery(
+                            "SELECT COUNT(*) FROM " + table + " WHERE memory_tracker_id = :id")
+                        .setParameter("id", id)
+                        .getSingleResult();
+            assertThat(count.longValue(), equalTo(0L));
+          }
+          var count =
+              (Number)
+                  entityManager
+                      .createNativeQuery(
+                          "SELECT COUNT(*) FROM conversation WHERE id = :id AND recall_prompt_id IS NULL")
+                      .setParameter("id", conversationId)
+                      .getSingleResult();
+          assertThat(count.longValue(), equalTo(1L));
         });
   }
 

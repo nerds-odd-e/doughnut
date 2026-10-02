@@ -217,7 +217,8 @@ authored content. A late infrastructure failure may surface loudly; the next run
 
 ### 15. Concurrent runs retain one accepted migration outcome
 Type: Behavior
-Status: planned
+Status: done
+Accepted proof: [slice 15](EXECUTION.md#slice-15-accepted-proof).
 Proof: Two actual runners overlap against the same bound notebook, using
 separately committed operations and deterministic synchronization rather than
 timing sleeps. Observe one accepted descendant, retained survivor learning,
