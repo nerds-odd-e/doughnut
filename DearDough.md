@@ -405,7 +405,7 @@ Follow-up: Open, unqueued.
 The implementation return explained that overriding the RouterLink stub through RenderingHelper's deep merge had already failed. The coordinator's fresh refactor assignment mentioned duplicate mount setup but omitted that failed approach. The refactor agent started the same override before a follow-up warning arrived, reproduced the failure, then removed the stub at its owner before merging.
 
 ### Occurrences
-- Execution: SEED-065#story-1 / `.planning/slice-plans/001-follow-property-list-wiki-links/PLAN.md` / ed2cdd854148b14aef0581ee0d2c8af5049435d6
+- Execution: SEED-065#story-1 / `7b7fd7cce4e6fe0a9551c1599cd28200bf6f643e:.planning/slice-plans/001-follow-property-list-wiki-links/PLAN.md` / ed2cdd854148b14aef0581ee0d2c8af5049435d6
   - Timestamp: unknown (2026-10-02, between implementation return and refactor completion)
   - Tool: Codex
   - Open Dough release: unknown
