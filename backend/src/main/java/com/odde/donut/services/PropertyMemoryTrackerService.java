@@ -119,7 +119,7 @@ public class PropertyMemoryTrackerService {
   /** Checks every persisted learner's focus before a complete family change mutates anything. */
   public String consolidationDiagnostic(
       Note note, Map<PropertyFocus, PropertyFocus> focuses, Set<String> sourceKeys) {
-    for (MemoryTracker tracker : memoryTrackerRepository.findByNote_IdIn(List.of(note.getId()))) {
+    for (MemoryTracker tracker : propertyTrackers(note)) {
       PropertyFocus destination = focuses.get(tracker.propertyFocus());
       if (destination != null
           && (destination.key().codePointCount(0, destination.key().length()) > 255
@@ -137,8 +137,7 @@ public class PropertyMemoryTrackerService {
 
   /** Retains tracker identity and learning fields while applying an already checked mapping. */
   public void followConsolidatedProperties(Note note, Map<PropertyFocus, PropertyFocus> focuses) {
-    List<MemoryTracker> trackers =
-        new ArrayList<>(memoryTrackerRepository.findByNote_IdIn(List.of(note.getId())));
+    List<MemoryTracker> trackers = new ArrayList<>(propertyTrackers(note));
     trackers.sort(
         Comparator.comparing(
                 (MemoryTracker tracker) ->
@@ -167,6 +166,12 @@ public class PropertyMemoryTrackerService {
             entityPersister.save(tracker);
           }
         });
+  }
+
+  private List<MemoryTracker> propertyTrackers(Note note) {
+    return memoryTrackerRepository.findByNote_IdIn(List.of(note.getId())).stream()
+        .filter(tracker -> !tracker.isNoteLevelTracker())
+        .toList();
   }
 
   private static PropertyFocus destination(

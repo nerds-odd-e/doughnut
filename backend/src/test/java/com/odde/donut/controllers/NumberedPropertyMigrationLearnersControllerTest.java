@@ -21,7 +21,8 @@ class NumberedPropertyMigrationLearnersControllerTest
   @Autowired MemoryTrackerController memoryTrackerController;
 
   @Test
-  void everyLearnersPersistedTrackerFollowsIncludingInactiveAndUnrelatedFocuses() throws Exception {
+  void everyLearnersPersistedTrackerFollowsIncludingInactiveUnrelatedAndNoteLevelFocuses()
+      throws Exception {
     User owner = currentUser.getUser();
     User otherLearner = inCommittedTransaction(transactionManager, this::createFixtureUser);
     Notebook notebook = createGitBackedNotebook();
@@ -49,7 +50,8 @@ class NumberedPropertyMigrationLearnersControllerTest
                       .propertyKey("topic 2")
                       .removedFromTracking()
                       .please(),
-                  makeMe.aMemoryTrackerFor(stored).by(storedLearner).propertyKey("other").please());
+                  makeMe.aMemoryTrackerFor(stored).by(storedLearner).propertyKey("other").please(),
+                  makeMe.aMemoryTrackerFor(stored).by(storedLearner).please());
             });
     snapshotCurrentPortableTree(notebook);
 
@@ -61,6 +63,7 @@ class NumberedPropertyMigrationLearnersControllerTest
       assertShownTracker(owner, trackers.get(0), new PropertyFocus("topic", "B"), false);
       assertShownTracker(otherLearner, trackers.get(1), new PropertyFocus("topic", "B"), true);
       assertShownTracker(otherLearner, trackers.get(2), new PropertyFocus("other", ""), false);
+      assertShownTracker(otherLearner, trackers.get(3), null, false);
     } finally {
       currentUser.setUser(owner);
     }
