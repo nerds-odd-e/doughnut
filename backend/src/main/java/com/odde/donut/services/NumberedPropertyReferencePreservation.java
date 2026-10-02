@@ -66,6 +66,8 @@ class NumberedPropertyReferencePreservation {
     private final Map<String, Boolean> namesProjectedNotebook = new HashMap<>();
     private final Map<Integer, List<User>> readersByNotebook = new HashMap<>();
     private final Map<List<Integer>, Boolean> readable = new HashMap<>();
+    private final Map<List<Object>, WikiLinkCandidateClassifier.TokenCandidates> candidates =
+        new HashMap<>();
     private List<User> allUsers;
 
     private Check(Integer notebookId, Map<Integer, ConsolidatedProperties> projected) {
@@ -100,7 +102,7 @@ class NumberedPropertyReferencePreservation {
       Set<String> seen = new HashSet<>();
       for (String original : wikiLinks(source)) {
         if (!seen.add(original)) continue;
-        var before = resolver.tokenCandidates(original, source, Map.of());
+        var before = candidates(original, source, Map.of());
         String rewritten = original;
         String requiredKey = null;
         for (User reader : readers) {
@@ -119,7 +121,7 @@ class NumberedPropertyReferencePreservation {
             }
           }
         }
-        var after = resolver.tokenCandidates(rewritten, source, projectedContent);
+        var after = candidates(rewritten, source, projectedContent);
         for (User reader : readers) {
           if (!sameMeaning(
               before.classifyFor(readableBy(reader)),
@@ -131,6 +133,13 @@ class NumberedPropertyReferencePreservation {
         if (!original.equals(rewritten)) rewrites.put(original, rewritten);
       }
       return new Rewrites(Map.copyOf(rewrites), null);
+    }
+
+    private WikiLinkCandidateClassifier.TokenCandidates candidates(
+        String token, Note source, Map<Integer, String> content) {
+      return candidates.computeIfAbsent(
+          List.of(token, source.getNotebook().getName(), content == projectedContent),
+          key -> resolver.tokenCandidates(token, source, content));
     }
 
     private List<String> wikiLinks(Note source) {

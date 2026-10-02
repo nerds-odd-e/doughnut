@@ -4,6 +4,7 @@ import com.odde.donut.algorithms.NoteContentMarkdown;
 import com.odde.donut.algorithms.NoteContentMarkdown.ConsolidatedProperties;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.repositories.NoteRepository;
+import com.odde.donut.factoryServices.EntityPersister;
 import com.odde.donut.services.PropertyMemoryTrackerService.ConsolidatedFocuses;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -21,14 +22,17 @@ class NumberedPropertyMigrationPreparation {
   private final NoteRepository notes;
   private final PropertyMemoryTrackerService trackers;
   private final NumberedPropertyReferencePreservation references;
+  private final EntityPersister entityPersister;
 
   NumberedPropertyMigrationPreparation(
       NoteRepository notes,
       PropertyMemoryTrackerService trackers,
-      NumberedPropertyReferencePreservation references) {
+      NumberedPropertyReferencePreservation references,
+      EntityPersister entityPersister) {
     this.notes = notes;
     this.trackers = trackers;
     this.references = references;
+    this.entityPersister = entityPersister;
   }
 
   record Change(Note note, String content, ConsolidatedFocuses mapping) {}
@@ -37,6 +41,10 @@ class NumberedPropertyMigrationPreparation {
 
   @Transactional(readOnly = true)
   public Prepared prepare(Integer notebookId) {
+    return entityPersister.readWithoutAutoFlush(() -> prepareUnflushed(notebookId));
+  }
+
+  private Prepared prepareUnflushed(Integer notebookId) {
     Map<Integer, ConsolidatedProperties> projected = new LinkedHashMap<>();
     for (Note note : notes.findAllByNotebookIdOrderByIdAsc(notebookId)) {
       var transformed = NoteContentMarkdown.consolidateNumberedProperties(note.getContent());
