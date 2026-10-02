@@ -28,8 +28,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 class NumberedPropertyMigrationCrossNotebookControllerTest
     extends NotebookGitWebContentControllerTestBase {
-  private static final String OLD_ITEM = "Read [[Migration Target:Carrier#prop:topic%202|detail]]";
-  private static final String NEW_ITEM = "Read [[Migration Target:Carrier#prop:topic|detail]]";
+  private static final String OLD_ITEM = "Read [[migration target:Carrier#prop:topic%202|detail]]";
+  private static final String NEW_ITEM = "Read [[migration target:Carrier#prop:topic|detail]]";
   private static final String TARGET = "---\ntype: Note\ntopic: A\ntopic 2: B\n---\nCarrier";
   private static final String CONSOLIDATED = "---\ntype: Note\ntopic: [\"A\", \"B\"]\n---\nCarrier";
   private static final String SOURCE =
@@ -133,12 +133,12 @@ class NumberedPropertyMigrationCrossNotebookControllerTest
                 contains(target.getId()));
             assertThat(
                 links.stream().map(WikiLink::getTarget).toList(),
-                contains("Migration Target:Carrier#prop:topic"));
+                contains("migration target:Carrier#prop:topic"));
             assertThat(
                 AuthoredNoteReferenceRowTestSupport.rowsFor(entityManager, storedSource).stream()
                     .map(AuthoredNoteReferenceRow::getAuthoredLink)
                     .toList(),
-                contains("Migration Target:Carrier#prop:topic|detail"));
+                contains("migration target:Carrier#prop:topic|detail"));
             assertThat(
                 propertyIndexRepository.findByNote_IdOrderByIdAsc(source.getId()).stream()
                     .map(

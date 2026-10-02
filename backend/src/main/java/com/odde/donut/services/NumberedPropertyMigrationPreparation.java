@@ -46,8 +46,10 @@ class NumberedPropertyMigrationPreparation {
     List<Change> changes = new ArrayList<>();
     Set<Integer> notebookIds = new LinkedHashSet<>(Set.of(notebookId));
     if (!projected.isEmpty()) {
+      var check = references.check(notebookId, projected);
       for (Note source : notes.findAll()) {
-        var rewrites = references.prepare(source, projected);
+        if (!check.mayAffect(source)) continue;
+        var rewrites = check.prepare(source);
         if (rewrites.diagnostic() != null) return refused(source, rewrites.diagnostic());
         var transformed =
             projected.getOrDefault(

@@ -155,11 +155,13 @@ public class WikiLinkResolver {
     return classifyToken(token, focusNotebookName, viewer);
   }
 
-  /** Same reader-aware classification against proposed authored content before it is persisted. */
-  CandidateCardinality classifyProjectedToken(
-      String token, Note source, User viewer, Map<Integer, String> projectedContent) {
-    return candidateClassifier.classify(
-        token, source.getNotebook().getName(), viewer, projectedContent);
+  /**
+   * {@code token}'s candidates from {@code source}'s notebook scope against proposed authored
+   * content, classified per reader without repeating the lookup.
+   */
+  WikiLinkCandidateClassifier.TokenCandidates tokenCandidates(
+      String token, Note source, Map<Integer, String> projectedContent) {
+    return candidateClassifier.candidates(token, source.getNotebook().getName(), projectedContent);
   }
 
   /**

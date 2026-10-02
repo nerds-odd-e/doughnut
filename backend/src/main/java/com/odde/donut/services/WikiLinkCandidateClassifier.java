@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Predicate;
 
 /**
  * Readable-candidate cardinality classification of a wiki Portable-path token against
@@ -41,15 +42,30 @@ final class WikiLinkCandidateClassifier {
       String notebookFallbackName,
       User viewer,
       Map<Integer, String> projectedContent) {
-    return resolveRef(token, notebookFallbackName)
-        .map(
-            ref ->
-                classifyCandidates(
-                    token,
-                    readableNotebookMatches(
-                        ref.notebookName(), ref.noteTitle(), viewer, projectedContent),
-                    projectedContent))
-        .orElseGet(WikiLinkResolver.CandidateCardinality.Unresolved::new);
+    return candidates(token, notebookFallbackName, projectedContent)
+        .classifyFor(notebook -> authorizationService.userMayReadNotebook(viewer, notebook));
+  }
+
+  /** Looks up {@code token}'s candidates once, so many readers can classify them. */
+  TokenCandidates candidates(
+      String token, String notebookFallbackName, Map<Integer, String> projectedContent) {
+    return new TokenCandidates(
+        token,
+        resolveRef(token, notebookFallbackName)
+            .map(
+                ref ->
+                    noteCandidates.forNotebookAndTitle(
+                        ref.notebookName(), ref.noteTitle(), projectedContent))
+            .orElse(List.of()),
+        projectedContent);
+  }
+
+  /** A token's reader-independent candidates, classified per reader's notebook readability. */
+  record TokenCandidates(
+      String token, List<Note> candidates, Map<Integer, String> projectedContent) {
+    WikiLinkResolver.CandidateCardinality classifyFor(Predicate<Notebook> readable) {
+      return classifyCandidates(token, readableOf(candidates, readable), projectedContent);
+    }
   }
 
   private static WikiLinkResolver.CandidateCardinality classifyCandidates(
@@ -87,20 +103,20 @@ final class WikiLinkCandidateClassifier {
   }
 
   List<Note> readableNotebookMatches(String notebookName, String noteTitle, User viewer) {
-    return readableNotebookMatches(notebookName, noteTitle, viewer, Map.of());
+    return readableOf(
+        noteCandidates.forNotebookAndTitle(notebookName, noteTitle),
+        notebook -> authorizationService.userMayReadNotebook(viewer, notebook));
   }
 
-  private List<Note> readableNotebookMatches(
-      String notebookName, String noteTitle, User viewer, Map<Integer, String> projectedContent) {
-    List<Note> readable = new ArrayList<>();
-    for (Note candidate :
-        noteCandidates.forNotebookAndTitle(notebookName, noteTitle, projectedContent)) {
+  private static List<Note> readableOf(List<Note> candidates, Predicate<Notebook> readable) {
+    List<Note> result = new ArrayList<>();
+    for (Note candidate : candidates) {
       Notebook notebook = candidate.getNotebook();
-      if (notebook != null && authorizationService.userMayReadNotebook(viewer, notebook)) {
-        readable.add(candidate);
+      if (notebook != null && readable.test(notebook)) {
+        result.add(candidate);
       }
     }
-    return readable;
+    return result;
   }
 
   private static Note uniqueIfExactlyOne(List<Note> notes) {
