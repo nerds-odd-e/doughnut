@@ -24,7 +24,7 @@ authorized. The published claim is Taken.
   attaching. Extra mailbox `watch-bX3jiL` was stopped with no unread events.
   Current observation status is recorded in the resume section below.
 
-Accepted slice 1–8 proof and sizing history: [ACCEPTED-PROOF.md](ACCEPTED-PROOF.md).
+Accepted slice 1–12 proof and sizing history: [ACCEPTED-PROOF.md](ACCEPTED-PROOF.md).
 
 ## Selector operation sizing reassessment
 
@@ -133,54 +133,3 @@ valid for its fixture; it does not establish alias preservation. Continuation
 has spent three active implementation minutes; correct within its remaining
 hard budget or refine again. Refactor review took five active minutes.
 
-## Slice 9 accepted proof
-
-Full `CURSOR_DEV=true nix develop -c pnpm backend:verify` passed: 2760 tests,
-zero failures/errors, two skipped. SelectorRefusalControllerTest (one pass)
-invokes migration with exact authored changed/unchanged list focuses and an
-extra-prefixed orphan. Exact orphan diagnostic leaves fresh controller content,
-serialized tracker/history and downloaded accepted history equal to baseline.
-AliasRefusalControllerTest (two passes) observes initial missing/resolved café
-references, then refuses projected alias-induced cardinality changes unchanged.
-The isolated alias/name columns are utf8mb4_bin; normalization handles case,
-while the café/cafe precondition stays accent-distinct. Shared candidate owner
-projects aliases and exact property matching with DB scope/availability equality.
-Baseline alias run exposed one actual allowed-mutation regression plus one raw
-fixture-index error; the existing aliases builder corrected that setup.
-Continuation: three active minutes plus 5.5 for alias correction, within ten;
-mandatory full-suite waits excluded. Local services restarted under coordinator
-sessions MySQL 12565 / Redis 78862 after prior agent sessions were unavailable.
-Fresh refactor corrected displaced Javadocs only; accepted proof unchanged,
-whitespace passed, tests not repeated. Coordinator formatting passed; no API change.
-Reader-conflict and positive publication proof remain later slices.
-
-## Slice 10 accepted proof
-
-Full `CURSOR_DEV=true nix develop -c pnpm backend:verify` passed: 2761 tests,
-zero failures/errors, two skipped; SelectorRefusalControllerTest two passes.
-Two owners resolve the public source’s exact selector to different same-name
-private targets, observed under both actual readers before migration. Precise
-note-prefixed diagnostic leaves all three fresh controller states, serialized
-learning/history and authorized downloaded accepted histories unchanged.
-First full run failed only because its diagnostic expectation omitted the note
-prefix; corrected without production changes. Active implementation 5.5 minutes.
-Fresh refactor made no edits; whitespace passed and accepted proof unchanged.
-Coordinator formatting passed. Anonymous current-reader observation remains
-explicitly owned by the next positive visibility journey, not claimed here.
-
-## Slice 11 accepted proof
-
-Full `CURSOR_DEV=true nix develop -c pnpm backend:verify` passed first run:
-2763 tests, zero failures/errors, two skipped; Selectors and Visibility classes
-one pass each. The canonical migration rewrites body/frontmatter/path and exact
-case variants, retaining visible text and unchanged missing/ambiguous authored
-selectors. Specific stored authored rows and property index agree with content.
-Original target/source tracker IDs retain focus mapping, history, schedule and
-FSRS fields; an untouched source item keeps its focus. Downloaded target/source
-Markdown is one descendant with the original accepted parent.
-The visibility journey observes owner and anonymous resolution and wider-reader
-ambiguity before/after, with public source/target plus another owner’s private
-same-name candidate. Source download retargets; private history stays unchanged
-under its actual owner. This closes the explicit anonymous observation gap.
-Six active implementation minutes; full-suite wait excluded. Fresh refactor made
-no edits, whitespace passed, tests not repeated. Coordinator formatter passed.

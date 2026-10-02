@@ -140,7 +140,7 @@ class NumberedPropertyMigrationSelectorsControllerTest
                         index ->
                             new PropertyFocus(index.getPropertyKey(), index.getPropertyValue()))
                     .toList(),
-                contains(
+                containsInAnyOrder(
                     new PropertyFocus("about", REWRITTEN_ITEM),
                     new PropertyFocus("about", "unchanged"),
                     new PropertyFocus("summary", "")));

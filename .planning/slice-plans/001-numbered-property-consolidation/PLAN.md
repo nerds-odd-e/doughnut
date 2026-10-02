@@ -147,7 +147,7 @@ complete accepted operation unchanged, including the deletion fan-out.
 ### 9. Rewritten list focuses must follow authored source items
 Type: Behavior
 Status: done
-Accepted proof: [slice 9](EXECUTION.md#slice-9-accepted-proof).
+Accepted proof: [slice 9](ACCEPTED-PROOF.md#slice-9-accepted-proof).
 Proof: Valid tracked source items plus an orphan focus containing a selector →
 migration → diagnostic, unchanged controller/tracker/history and accepted bundle.
 Run the full backend suite. Restore the preserved reader-preflight attempt;
@@ -160,7 +160,7 @@ an affected orphan before mutation. Startup remains absent.
 ### 10. Incompatible current-reader results refuse the complete operation
 Type: Behavior
 Status: done
-Accepted proof: [slice 10](EXECUTION.md#slice-10-accepted-proof).
+Accepted proof: [slice 10](ACCEPTED-PROOF.md#slice-10-accepted-proof).
 Proof: Two readers resolve one authored selector to different same-name private
 targets → migrate one target → diagnostic and unchanged notes, learning and
 accepted histories. Assert both baseline destinations. Read private downloads
@@ -174,7 +174,7 @@ correct authorized observations; no policy change or startup activation.
 ### 11. In-notebook selectors still resolve after consolidation
 Type: Behavior
 Status: done
-Accepted proof: [slice 11](EXECUTION.md#slice-11-accepted-proof).
+Accepted proof: [slice 11](ACCEPTED-PROOF.md#slice-11-accepted-proof).
 Proof: A uniquely resolving `#prop:` selector in body/frontmatter → migration →
 controller wiki resolution selects the base, visible text is retained, derived
 source rows match authored content and downloaded Markdown has the new selector.
@@ -189,7 +189,8 @@ authority.
 
 ### 12. Cross-notebook referrers publish in the same operation
 Type: Behavior
-Status: planned
+Status: done
+Accepted proof: [slice 12](ACCEPTED-PROOF.md#slice-12-accepted-proof).
 Proof: Target and referrer in separate bound notebooks → migration → both
 downloaded descendant trees agree with controller reads and retained learning.
 The changed notebook set is computed before locking and reverified under lock.
