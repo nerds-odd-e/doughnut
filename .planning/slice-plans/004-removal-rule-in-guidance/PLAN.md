@@ -101,3 +101,11 @@ Delete the test, `.title("Author chosen title")`,
   passes (6 tests). The `startRecording` import was also only used by the
   deleted test and went with it; the helpers stay because
   `NoteAudioTools.recording.spec.ts` uses them.
+
+## Execution complete
+
+Product advice: no change to this story. `frontend/src/components/notes/SuggestTitle.vue`
+is an unused component left by an older Wikidata dialog rework (e729a7aad5), not by the
+dictation-title removal; the owner may choose a small cleanup that deletes it and anything
+only it used under principle 7. The "both titles survived unchanged" phrase in
+`docs/voice-input.md` records an observed bug reproduction and stays as is.
