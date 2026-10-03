@@ -6,9 +6,10 @@ Audio tools, starting with voice input. Make voice input work reliably and easy 
 
 ## Taken
 
+- [Start and keep local app stacks on current backend code](seeds/SEED-067-dependable-local-app-stacks.md#stacks-survive-other-builds) — SEED-067#stacks-survive-other-builds ([plan](slice-plans/005-stacks-survive-other-builds/PLAN.md))
+
 ## Backlog list
 
-- [Start and keep local app stacks on current backend code](seeds/SEED-067-dependable-local-app-stacks.md#stacks-survive-other-builds) — SEED-067#stacks-survive-other-builds
 - [Stop the MainMenu resume specs from failing intermittently in CI](seeds/SEED-039-faster-ci-feedback.md#mainmenu-mock-flake) — SEED-039#mainmenu-mock-flake
 - [Keep every transcribed sentence when dictated text is written](seeds/SEED-066-voice-input.md#keep-every-transcribed-sentence) — SEED-066#keep-every-transcribed-sentence
 - [Join dictated passages to the note in a way that fits the language](seeds/SEED-066-voice-input.md#join-dictated-passages) — SEED-066#join-dictated-passages
