@@ -5,8 +5,8 @@
 ## Source
 
 Retrospective correction of
-[Keep typed corrections when voice results arrive](../../seeds/SEED-066-voice-input.md#preserve-typed-corrections)
-(plan `003-keep-typed-corrections`, reviewed 2026-10-03). Story home:
+Keep typed corrections when voice results arrive (`.planning/seeds/SEED-066-voice-input.md#preserve-typed-corrections` at `34cfbd43`)
+(plan `.planning/slice-plans/003-keep-typed-corrections/PLAN.md` at `34cfbd43`, reviewed 2026-10-03). Story home:
 [Fix two side effects of keeping typed corrections](../../seeds/SEED-066-voice-input.md#typed-corrections-side-effects).
 
 Provenance: reviewed commits on `claude/keep-typed-corrections-when-voice-results-arrive-2`

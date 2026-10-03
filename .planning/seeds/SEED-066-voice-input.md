@@ -119,9 +119,6 @@ revision is `a02dbb2697…`; frontend/runtime revision was not fully established
 - **Completed dictated content lost:** In a 29.168 s passage with an 8.2 s pause, completed orchard facts appeared, Flush replaced them with a middle
   fragment, and the final update retained only the last sentences. Reload confirmed the loss while preexisting Harvard content survived. Reproduction
   and intermediate text are in the [voice-input documentation](../../docs/voice-input.md#completed-dictated-content-can-disappear).
-- **Visible manual typing lost during processing:** Supported body editing while a real audio request was pending displayed a recognizable sentence;
-  the arriving result removed it. A later paste after settlement persisted. This demonstrates loss of pending visible typing; an already-saved edit race
-  was not observed. The [voice-input documentation](../../docs/voice-input.md#typing-while-audio-processing-is-pending) retains the input, pending-edit boundary and reload comparison.
 - **Existing paragraph truncated during navigation journey:** Navigate from source `13726` while processing to destination `13727`, then return/reload.
   Both results persisted to the source, whose first paragraph became literal `...uesday.`; the other four paragraphs and destination sentinel survived.
   An independent fresh page confirmed the saved state. The [voice-input documentation](../../docs/voice-input.md#existing-content-can-be-truncated-during-a-navigation-journey) retains before/after text. The causal role of navigation remains unproved.
@@ -211,98 +208,6 @@ technical redesign, or speculative infrastructure.
 - **Safe stopping point:** Dictated passages join existing text correctly for
   space-separated languages and for Japanese and Chinese.
 
-<a id="preserve-typed-corrections"></a>
-### Keep typed corrections when voice results arrive
-
-**Identity:** SEED-066#preserve-typed-corrections
-```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/003-keep-typed-corrections/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"c53e624758fa5d5ef04955f19c6fbf07de8296a3155584932a8754720dcb991a","plan":"a731614d070fbe351554ae6d601c68da5bbba7969a31c86fb1cde0c5da361bac"}}
-```
-
-- **Goal:** Let a note author keep typing in a note, for example fixing a
-  misheard word or adding a thought, while their speech is still being
-  processed, and end up with both their typing and the dictated passage.
-  Today the arriving passage replaces what the editor shows, so unsaved typing
-  disappears and the caret jumps. Typing while waiting becomes safe, which is
-  the next step after keeping completed speech.
-- **Scope (required):**
-  - **Join the typing:** when a dictated passage arrives for a note whose body
-    editor is open, it is added to the end of what that editor currently
-    shows, including unsaved typing, and saved with it through the ordinary
-    autosave. The author is never blocked from typing while a result is
-    pending or arriving.
-  - Typing that is already saved, or whose save is still in flight when the
-    passage arrives, is also kept. The passage follows it once.
-  - **Caret stays put:** after the passage lands, the author's caret and
-    selection stay where they were, so continued typing goes where the author
-    was typing.
-  - When no body editor for the originating note is open (the author moved to
-    another note), the passage is added to the saved body as today.
-  - Update the [voice-input documentation](../../docs/voice-input.md), which
-    currently says the append ignores unsaved editor drafts.
-- **Decision (owner, 2026-10-03):** Join the typing rather than pausing the
-  editor to save the typing first and then add the passage. The pause would
-  reuse the existing save-then-change pause used by note removal and image
-  upload, but it would lock the editor each time a result arrives.
-- **Decision (owner, 2026-10-03):** Keeping the caret where the author was
-  typing is part of this story, not deferred. Without it, a correction can end
-  up split across the note even though nothing is erased.
-- **Boundary assumptions:** The passage always goes at the end of the body,
-  after any text the author typed there, in the order things arrive. It is
-  not put back where earlier dictation ended. Both body editors (rich and
-  Markdown) are covered, because they share the same draft and autosave.
-  Undo follows ordinary editing saves: one undo may remove typing and a
-  passage that were saved together. Undoing only the passage is not promised.
-- **Deferred:** The model gets its "previous content" excerpt when the request
-  starts, so typing added at the end afterwards may join the passage with
-  imperfect spacing. Fixing that is not promised. Several authors editing the
-  same note at once is out of scope. If saving the typing fails, the
-  existing editor error shows; no new recovery is added (failure handling,
-  [ADR 0006](../../docs/adrs/0006-failure-handling-accepted.md)).
-- **Key examples:**
-  1. **Red bicycle:** A note with the two original paragraphs and the
-     lighthouse addition. Start the orchard recording. While the first audio
-     request is pending, type "MANUAL EDIT: Keep this red bicycle sentence."
-     at the end of the body in the rich editor. When the result arrives, the
-     typed sentence stays visible and the orchard passage follows it. After
-     reload: both originals, the lighthouse addition, the red-bicycle
-     sentence, and the orchard passage, each once.
-  2. **Fix a misheard word:** An earlier dictated sentence says "a gift from
-     my sister". While the next request is pending, change "from" to "for"
-     and keep typing. When the passage arrives, "for my sister" stays, the new
-     passage is at the end, and the caret is still right after the edit, so
-     the next typed character lands there.
-  3. **Edit already saved:** Type a sentence and wait until it autosaves while
-     a request is still pending (or let the result arrive while that save is
-     still in progress). After reload, the sentence and the passage are both
-     there, the passage once, after it.
-  4. **Moved to another note:** Start recording on one note, open another
-     note while the request is pending. The passage is added to the
-     originating note's saved body, as today, and the other note is
-     unchanged.
-- **Architecture:** While a body editor for the note is open, its draft is the
-  one owner of that note's in-progress body. A dictated passage is applied to
-  that draft as an edit and saved by its autosave, instead of being saved
-  separately and pushed into the editor, which today discards the draft. The
-  saved-body append stays only for a note with no open editor. This adds a
-  way to hand a passage to the open editor for a given note; the existing
-  per-note registration of open body editors (used by the save-then-change
-  pause) is a likely place for it. No Accepted ADR is contradicted; ADR 0006
-  applies to save failures.
-- **Evidence:** The visible red-bicycle sentence was erased by the arriving
-  result, and the final typed period landed at the start of an older
-  paragraph. No earlier manual-content save was observed, so the
-  already-saved race was not reproduced
-  ([recorded journey](../../docs/voice-input.md#typing-while-audio-processing-is-pending)).
-  Code reading shows the cause: the append saves store content and the
-  editor then replaces its unsaved draft with the new saved body.
-- **Effort hypothesis:** M, medium confidence (was L). Assumes the existing
-  draft and autosave can take the passage as an ordinary edit, and that
-  keeping the caret in the rich editor needs no editor redesign.
-- **Depends on:** The safe existing-content addition outcome (delivered).
-- **Safe stopping point:** Authors can type while waiting for speech results;
-  delayed processing cannot silently erase their visible or saved corrections.
-
 <a id="typed-corrections-side-effects"></a>
 ### Fix two side effects of keeping typed corrections
 
@@ -315,7 +220,7 @@ technical redesign, or speculative infrastructure.
   has the caret right after the pasted text again, and a dictated passage that
   arrives while an image upload or note removal is pausing the editor is saved
   as it was before
-  [keeping typed corrections](#preserve-typed-corrections), instead of being
+  keeping typed corrections (`.planning/seeds/SEED-066-voice-input.md#preserve-typed-corrections` at `34cfbd43`), instead of being
   dropped without a trace. Retrospective correction; no new feature promise.
 - **Scope:** Only these two regressions from that story's delivery. The
   save-then-change overlap stays "nothing added" as that story decided: the

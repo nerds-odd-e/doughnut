@@ -1,9 +1,0 @@
-{
-  "schemaVersion": 1,
-  "agent": "Yumi-chan",
-  "email": "yumi-chan@example.org",
-  "identity": "SEED-066#preserve-typed-corrections",
-  "mode": "story-branch",
-  "branch": "claude/keep-typed-corrections-when-voice-results-arrive-2",
-  "host": "claude"
-}
