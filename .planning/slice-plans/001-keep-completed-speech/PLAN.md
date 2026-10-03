@@ -39,7 +39,7 @@ keeps all of that audio. No separate recognizer or revision path is added.
 | A truthy end timestamp of `00:00:00,000` advances no audio | Slice 2 | Read `rawSampleAudioBuffer.ts` `processUnprocessedData`: an empty timestamp marks all audio processed; a parsed 0 s advances no samples | Confirmed. An empty timestamp must not be returned for held audio. |
 | The mocked live-audio journey returns one SRT segment for every request and asserts text after the 2-minute timer | Slice 2 | Read `record_live_audio.feature` | Confirmed. After slice 2, the timer step writes nothing and Stop appends once, so the scenario's expectation changes. |
 | Focused frontend specs run locally | Slices 2–3 | `CURSOR_DEV=true nix develop -c pnpm frontend:test tests/models/audioProcessingScheduler.flush.spec.ts tests/models/audioBuffer.spec.ts` | 14 passed |
-| Since the append change, completed orchard passages survive, and the real transcription ends a segment at the eight-second pause | Slices 1 and 4 | Needs paid real OpenAI services and a manual Chrome session | Not observed; slice 1 is the probe |
+| Since the append change, completed orchard passages survive, and the real transcription ends a segment at the eight-second pause | Slices 1 and 4 | Slice 1 real-service orchard journey, 2026-10-03 | Confirmed; see Learnings |
 
 ## Outside-in proof
 
@@ -58,7 +58,7 @@ focused specs and feature named below. No broader suite is required.
 
 ### 1. Observe the orchard journey on the current append behavior
 Type: Structure (probe)
-Status: planned
+Status: done
 Proof: Recorded observation in this plan's Learnings.
 
 Use [dough-manual-testing](../../../.agents/skills/dough-manual-testing/SKILL.md)
@@ -133,4 +133,22 @@ sentence detection.
 
 ## Learnings
 
-None yet.
+- **Slice 1 baseline (2026-10-03).** Development at `e6134c419f`, Chrome/macOS,
+  `manual`, note 13728 with a six-sentence paragraph. Input: `say -r 150` in two
+  parts joined by 8.000 s of digital silence (29.211 s, mono 48 kHz), fed
+  through a synthetic `getUserMedia` stream; Flush clicked at 22.2 s, Stop at
+  31.2 s. Each write appended once and nothing was revised; after reload the
+  original paragraph and both orchard facts appear once. The append premise
+  holds.
+  - Pause flush (11.4 s; one request, none later in the pause) wrote all three
+    segments, ending with the finished sentence "The book that I bought
+    yesterday." The transcription ended a segment at the pause.
+  - Flush wrote " After reading several reviews and comparing different
+    editions is a gift from my sister because she" (segments end at "sister"
+    and "because she").
+  - Stop wrote " enjoys learning about the history of gardens. The meeting is
+    on Friday afternoon. We should bring a notebook and a pencil."
+  - The complete book sentence never appears. Slice 4 expects the pause flush
+    to hold back the "yesterday" segment and Flush to hold back "because she".
+  - Outside this story: the first passage had no leading whitespace, so the
+    saved body reads "every hour.The orchard".
