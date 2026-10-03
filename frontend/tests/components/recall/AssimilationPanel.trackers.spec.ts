@@ -13,8 +13,8 @@ import {
   clickVerifySpelling,
   closeSpellingVerificationPopup,
   commissionedStatusSelector,
-  mockedRequestDueRecallsRefresh,
-  mockedTotalAssimilatedCount,
+  dueRecallsRefreshRequested,
+  totalAssimilatedCount,
   mountAssimilationPanelReady,
   note,
   opaqueContentBlockerEl,
@@ -25,7 +25,6 @@ import {
   understandingStatusSelector,
 } from "./assimilationPanelTestSupport"
 
-vi.mock("@/composables/useRecallData")
 vi.mock("@/composables/useGoToNextAssimilation", () => ({
   useGoToNextAssimilation: () => ({
     goToNextAssimilation: mockedGoToNextAssimilation,
@@ -42,9 +41,9 @@ function expectStaysOnNoteAfterAssimilateAs(body: object) {
     body: { noteId: note.id, ...body },
   })
   expect(mockedGoToNextAssimilation).not.toHaveBeenCalled()
-  expect(mockedTotalAssimilatedCount.value).toBe(0)
+  expect(totalAssimilatedCount.value).toBe(0)
   expect(assimilatedCountOfTheDay.value).toBe(0)
-  expect(mockedRequestDueRecallsRefresh).toHaveBeenCalled()
+  expect(dueRecallsRefreshRequested()).toBe(true)
 }
 
 describe("AssimilationPanel actions offered for existing memory trackers", () => {

@@ -17,8 +17,6 @@ import {
   skipSequenceSpy,
 } from "./assimilationPanelTestSupport"
 
-vi.mock("@/composables/useRecallData")
-
 setupAssimilationPanelTests()
 
 describe("AssimilationPanel loading modal", () => {

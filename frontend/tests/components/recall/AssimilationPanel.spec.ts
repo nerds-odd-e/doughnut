@@ -17,8 +17,8 @@ import {
   clickAssimilate,
   clickReturnToSequence,
   clickSkipAndConfirm,
-  mockedRequestDueRecallsRefresh,
-  mockedTotalAssimilatedCount,
+  dueRecallsRefreshRequested,
+  totalAssimilatedCount,
   mountAssimilationPanelReady,
   note,
   returnToSequenceButtonEl,
@@ -28,7 +28,6 @@ import {
   understandingStatusSelector,
 } from "./assimilationPanelTestSupport"
 
-vi.mock("@/composables/useRecallData")
 vi.mock("@/composables/useGoToNextAssimilation", () => ({
   useGoToNextAssimilation: () => ({
     goToNextAssimilation: mockedGoToNextAssimilation,
@@ -65,9 +64,9 @@ describe("AssimilationPanel", () => {
       body: { noteId: note.id },
     })
     expect(mockedGoToNextAssimilation).toHaveBeenCalled()
-    expect(mockedTotalAssimilatedCount.value).toBe(1)
+    expect(totalAssimilatedCount.value).toBe(1)
     expect(assimilatedCountOfTheDay.value).toBe(1)
-    expect(mockedRequestDueRecallsRefresh).toHaveBeenCalled()
+    expect(dueRecallsRefreshRequested()).toBe(true)
   })
 
   it("skips the sequence without creating a tracker or incrementing daily count", async () => {
@@ -80,9 +79,9 @@ describe("AssimilationPanel", () => {
     })
     expect(assimilateSpy).not.toHaveBeenCalled()
     expect(mockedGoToNextAssimilation).toHaveBeenCalled()
-    expect(mockedTotalAssimilatedCount.value).toBe(0)
+    expect(totalAssimilatedCount.value).toBe(0)
     expect(assimilatedCountOfTheDay.value).toBe(0)
-    expect(mockedRequestDueRecallsRefresh).not.toHaveBeenCalled()
+    expect(dueRecallsRefreshRequested()).toBe(false)
   })
 
   it("shows Return to sequence instead of Skip when the note is sequence-skipped", async () => {

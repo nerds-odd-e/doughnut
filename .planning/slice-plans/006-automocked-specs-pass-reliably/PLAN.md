@@ -94,7 +94,13 @@ Type: Structure
 
 Use `resetRecallData()`. If a mounted panel reacts to a later test's state,
 unmount it automatically after each test, as `recallPageTestSupport.ts` does.
-Status: planned
+Status: done (2026-10-03). `assimilationPanelTestSupport.ts` resets with
+`resetRecallData()`, then sets `totalAssimilatedCount` to 0 (the count is only
+incremented once loaded). `dueRecallsRefreshRequested()` compares the real
+refresh counter with a baseline recorded before each test. No auto-unmount was
+needed. No `vi.mock` of `useRecallData` or `useResumeRecall` remains in
+`frontend/tests`. Full `pnpm frontend:test` with `CI=true`: 319 files, 2002
+tests pass, no retries.
 Proof: the three `AssimilationPanel*.spec.ts` files pass; the no-mock grep
 prints nothing; the full focused check passes.
 
