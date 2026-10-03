@@ -1,3 +1,4 @@
+import { closeAndFlushNoteContentMutations } from "@/composables/noteContentMutationBarrier"
 import { useNoteStore } from "@/store/noteStore"
 import makeMe from "donut-test-fixtures/makeMe"
 import { advanceNoteContentSaveDebounce } from "@tests/helpers/noteContentDebounceTestSupport"
@@ -169,6 +170,16 @@ describe("NoteAudioTools while the author types in the open body editor", () => 
     await flushPromises()
 
     expect(lastSavedContent()).toBe(`${redBicycleBody}${typed}${passage}`)
+  })
+
+  it("adds the passage to the saved body while a save-then-change pause holds the editor", async () => {
+    const { note } = mountEditorAndAudioTools(redBicycleBody, true)
+
+    await whileAudioIsPending(async () => {
+      await closeAndFlushNoteContentMutations(note.id)
+    })
+
+    expect(lastSavedContent()).toBe(`${redBicycleBody}${passage}`)
   })
 
   it("adds the passage to the saved body of a note the author has left", async () => {

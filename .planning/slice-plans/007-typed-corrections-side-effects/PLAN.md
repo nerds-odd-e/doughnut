@@ -95,9 +95,14 @@ assertion for it in the same spec file.
 
 ### 2. A passage that arrives during a save-then-change pause goes to the saved body
 Type: Behavior
-Status: planned
+Status: done
 Proof: the new mounted case fails first with no save, then passes; focused
 command green; `vue-tsc` clean.
+
+Accepted proof: `NoteAudioTools.typingWhilePending.spec.ts` "adds the passage
+to the saved body while a save-then-change pause holds the editor" (red: no
+save; green: saved body + passage); focused command 59 files / 438 tests
+green; `vue-tsc` clean.
 
 `appendToOpenNoteContentDraft` hands the passage to the open editor only while
 admission is open; otherwise it returns `false`, so `appendDictatedText` keeps
