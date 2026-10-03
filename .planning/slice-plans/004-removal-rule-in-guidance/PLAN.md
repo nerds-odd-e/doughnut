@@ -67,7 +67,7 @@ It names the three parts, the role duties, and the enforced-refusal boundary.
 
 ### 2. Delete the leftover title test
 Type: Behavior
-Status: planned
+Status: done
 Proof: the grep and focused spec run in Outside-in proof.
 
 Behavior: main follows the rule → `NoteAudioTools.processing.spec.ts` has no
@@ -96,3 +96,8 @@ Delete the test, `.title("Author chosen title")`,
   excludes searching for other old traces: an unused
   `frontend/src/components/notes/SuggestTitle.vue` and a "both titles survived
   unchanged" phrase in `docs/voice-input.md`. Reported to the owner; not acted on.
+- Slice 2 proof (2026-10-03): the title grep on
+  `NoteAudioTools.processing.spec.ts` returns nothing and the focused spec
+  passes (6 tests). The `startRecording` import was also only used by the
+  deleted test and went with it; the helpers stay because
+  `NoteAudioTools.recording.spec.ts` uses them.

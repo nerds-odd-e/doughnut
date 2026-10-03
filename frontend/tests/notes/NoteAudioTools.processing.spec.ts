@@ -15,12 +15,9 @@ import {
   dictatedTextResponse,
   mountNoteAudioTools,
   processAudio,
-  startRecording,
-  stopRecording,
   useNoteAudioToolsTestLifecycle,
   type NoteAudioToolsWrapper,
 } from "@tests/notes/noteAudioToolsTestSupport"
-import { flushPromises } from "@vue/test-utils"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 
 vi.mock("@/models/audio/recorderWorklet", async () => {
@@ -50,10 +47,7 @@ describe("NoteAudioTools audio processing", () => {
   let wrapper: NoteAudioToolsWrapper
   let audioToTextMock: ReturnType<typeof mockSdkService>
   let updateContentMock: ReturnType<typeof mockSdkService>
-  const originalRealm = makeMe.aNoteRealm
-    .title("Author chosen title")
-    .content("Original body.")
-    .please()
+  const originalRealm = makeMe.aNoteRealm.content("Original body.").please()
   const note = originalRealm.note
   const noteStore = useNoteStore()
   beforeEach(() => {
@@ -70,7 +64,6 @@ describe("NoteAudioTools audio processing", () => {
       (options) =>
         makeMe.aNoteRealm
           .id(options.path.note)
-          .title(note.noteTopology.title)
           .content(options.body.content ?? "")
           .please()
     )
@@ -157,27 +150,5 @@ describe("NoteAudioTools audio processing", () => {
       path: { note: note.id },
       body: { content: `${loadedBody}text` },
     })
-  })
-
-  it("never changes the title across many chunks and a later recording", async () => {
-    const updateNoteTitle = mockSdkService(
-      TextContentController,
-      "updateNoteTitle",
-      {} as never
-    )
-
-    await startRecording(wrapper)
-    for (let i = 0; i < 9; i++) {
-      await processAudio(wrapper)
-    }
-    await stopRecording(wrapper)
-    await startRecording(wrapper)
-    await processAudio(wrapper)
-    await flushPromises()
-
-    expect(updateNoteTitle).not.toHaveBeenCalled()
-    expect(
-      noteStore.refOfNoteRealm(note.id).value?.note.noteTopology.title
-    ).toBe("Author chosen title")
   })
 })
