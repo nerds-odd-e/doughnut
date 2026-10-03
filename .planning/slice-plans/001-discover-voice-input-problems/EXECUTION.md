@@ -44,6 +44,8 @@ Slice 5 published as `f968a52233f4682ae97e1d405817824e421f6ebc` using matching
 consecutive-session proof below. Slice 6 observed live pending navigation:
 destination `13727` survived, both results persisted to source `13726`, whose
 first paragraph became `...uesday.` after reload. Cause remains unproved.
+Slice 6 published as `e4b434ed41069e5a0774e506152ce49debc5fd2c`.
+Slice 7 accepted the existing title sequences below without another recording.
 Independent refactor found the records clean, whitespace and formatting passed.
 Publication receipts stay in the execution conversation before each next slice.
 Hardware capture, permission and frequency remain uncovered.
@@ -79,3 +81,32 @@ The two reports retain network/DOM timing, reload proof, revision limitations,
 and cleanup. No new probe, fixture, tab, or product change was needed for this
 mapping; the disposable note remains for later slices. Review took about one
 minute, charged to the existing exploration budget.
+
+## Automatic-title proof mapping
+
+Slice 7 reuses accepted Chrome/macOS `manual` observations on disposable note
+`13726`, notebook `23`, real-service localhost Development. Both required title
+starting states and a repeat session are covered:
+
+- [Initially Untitled and repeat recording](../../seeds/SEED-066-voice-input-manual-evidence.md#recording-route-and-short-speech-baseline):
+  capture began at 01:40:26.708 UTC; `Untitled` became “Sensory Notes on Food
+  and Drink” at 01:40:56.033. A second recording began at 01:41:05.341 and
+  changed it to “Sensory Impressions of Foods and Drinks” at 01:41:33.405,
+  although the final body was identical. Reload confirmed the second title.
+- [User-chosen title during a later recording](../../seeds/SEED-066-voice-input-manual-evidence.md#manual-edit-preservation-during-processing):
+  the author set “Author chosen preservation title” through the title UI before
+  capture at 02:02:23.592. It became “Example Paragraphs for Preservation” at
+  02:02:41.563, then “Sample Paragraphs for Preservation” at 02:03:02.520.
+  Reload around 02:03:44 confirmed the saved result. These changes reproduce
+  unwanted ongoing title updates and loss of the chosen title's control, as
+  described in the [owner's title expectations](../../seeds/SEED-066-voice-input.md#title-behavior).
+- [Navigation observation](../../seeds/SEED-066-voice-input-navigation-evidence.md#late-result-after-supported-navigation)
+  retains the variability: two source suggest-title requests returned HTTP 200,
+  but no title PATCH or visible change was observed; both titles survived reload.
+  This does not establish a general title-preservation guarantee or its cause.
+
+The linked reports retain input durations, body/title timing separation, capture
+labels, revision limits and cleanup. No new recording or UI probe was needed;
+review and mapping took about one minute. Hardware capture remains uncovered,
+and disabling automatic titles versus delayed one-time generation remains the
+owner's later decision. No product source or disposable-note state changed.

@@ -158,7 +158,7 @@ unexpectedly changed. Record the supported navigation and recording state.
 
 ### 7. Automatic-title behavior evidence
 Type: Behavior
-Status: planned
+Status: done — [Accepted Untitled/repeat and user-chosen title sequences](EXECUTION.md#automatic-title-proof-mapping), ~1 min reuse; title policy remains undecided.
 Proof: Timestamped title sequences for `Untitled` and user-chosen titles across
 updates, with a repeat session where the budget permits.
 
