@@ -148,7 +148,7 @@ Observe accumulation, duplication, or stale content across those sessions.
 
 ### 6. Late-result behavior after navigation
 Type: Behavior
-Status: planned
+Status: done — [Accepted pending navigation, destination preservation and source truncation](../../seeds/SEED-066-voice-input-navigation-evidence.md), ~4 min; causality remains unproved.
 Proof: Original/destination note identities and text before navigation and after
 the pending result settles, or a gap if no pending result can be reached.
 

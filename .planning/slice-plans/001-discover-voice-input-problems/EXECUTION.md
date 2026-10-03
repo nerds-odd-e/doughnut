@@ -40,8 +40,11 @@ paragraphs preserved with a distinct addition after reload. Slice 4 records
 real pending-result loss of visible typing; an already-saved edit race remains
 unobserved. Its later paste was after settlement. Chosen title changed twice.
 Slice 4 published as `c66d7874a6a02c7b0f19325f48387943705f3953`.
-Slice 5 accepted matching consecutive-session proof below; independent
-refactor found the records clean, whitespace and formatting passed.
+Slice 5 published as `f968a52233f4682ae97e1d405817824e421f6ebc` using matching
+consecutive-session proof below. Slice 6 observed live pending navigation:
+destination `13727` survived, both results persisted to source `13726`, whose
+first paragraph became `...uesday.` after reload. Cause remains unproved.
+Independent refactor found the records clean, whitespace and formatting passed.
 Publication receipts stay in the execution conversation before each next slice.
 Hardware capture, permission and frequency remain uncovered.
 
