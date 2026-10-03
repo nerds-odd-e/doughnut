@@ -1,9 +1,0 @@
-{
-  "schemaVersion": 1,
-  "agent": "Kirara-chan",
-  "email": "kirara-chan@example.org",
-  "identity": "SEED-067#stacks-survive-other-builds",
-  "mode": "story-branch",
-  "branch": "claude/start-and-keep-local-app-stacks-on-current-backe",
-  "host": "claude"
-}
