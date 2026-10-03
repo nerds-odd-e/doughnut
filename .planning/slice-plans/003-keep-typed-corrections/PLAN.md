@@ -132,8 +132,11 @@ section describe the kept typing.
 
 ### 3. Typing already saved or still saving is kept
 Type: Behavior
-Status: planned
+Status: done
 Proof: new spec cases for example 3.
+Accepted: two Markdown cases in `NoteAudioTools.typingWhilePending.spec.ts`
+passed first time on slice 2's rule (no source change); each asserts the exact
+final saved body. Focused command → 19 files, 102 tests; `vue-tsc` clean.
 
 Behavior: (a) typing autosaved while `audioToText` is held, then release;
 (b) a typing save held with `holdNoteContentSave` while the passage arrives,

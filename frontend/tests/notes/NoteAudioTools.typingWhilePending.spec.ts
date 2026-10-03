@@ -8,6 +8,7 @@ import { useNoteStore } from "@/store/noteStore"
 import makeMe from "donut-test-fixtures/makeMe"
 import helper, { mockSdkServiceWithImplementation } from "@tests/helpers"
 import { advanceNoteContentSaveDebounce } from "@tests/helpers/noteContentDebounceTestSupport"
+import { holdNoteContentSave } from "@tests/notes/noteTextContentTestSupport"
 import {
   dictatedTextResponse,
   processAudio,
@@ -105,6 +106,7 @@ describe("NoteAudioTools while the author types in the open body editor", () => 
       .withRouter()
     noteStore.refreshNoteRealm(realm)
     wrapper = builder.mount({ attachTo: document.body })
+    return realm
   }
 
   async function whileAudioIsPending(type: () => Promise<void>) {
@@ -173,5 +175,36 @@ describe("NoteAudioTools while the author types in the open body editor", () => 
     expect(lastSavedContent()).toBe(
       `${body.replace("from my sister", "for my sister")}${passage}`
     )
+  })
+
+  it("keeps typing that was already saved and saves the passage after it once", async () => {
+    mountEditorAndAudioTools(redBicycleBody, true)
+
+    await whileAudioIsPending(async () => {
+      await setTextareaValue(wrapper, `${redBicycleBody}${typed}`)
+      await advanceNoteContentSaveDebounce()
+      expect(lastSavedContent()).toBe(`${redBicycleBody}${typed}`)
+    })
+
+    expect(textareaEl(wrapper).value).toBe(
+      `${redBicycleBody}${typed}${passage}`
+    )
+    expect(lastSavedContent()).toBe(`${redBicycleBody}${typed}${passage}`)
+  })
+
+  it("keeps typing whose save is still in flight and saves the passage after it once", async () => {
+    const realm = mountEditorAndAudioTools(redBicycleBody, true)
+    const releaseSave = holdNoteContentSave((saved) =>
+      makeMe.aNoteRealm.id(realm.id).content(saved).please()
+    )
+
+    await whileAudioIsPending(async () => {
+      await setTextareaValue(wrapper, `${redBicycleBody}${typed}`)
+      await advanceNoteContentSaveDebounce()
+    })
+    releaseSave()
+    await flushPromises()
+
+    expect(lastSavedContent()).toBe(`${redBicycleBody}${typed}${passage}`)
   })
 })
