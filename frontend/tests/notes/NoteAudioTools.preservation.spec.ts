@@ -1,6 +1,5 @@
 import {
   AiAudioController,
-  AiController,
   TextContentController,
 } from "@generated/donut-backend-api/sdk.gen"
 import makeMe from "donut-test-fixtures/makeMe"
@@ -65,7 +64,6 @@ describe("NoteAudioTools content preservation", () => {
       "audioToText",
       dictatedTextResponse("text")
     )
-    mockSdkService(AiController, "suggestTitle", { title: "" })
     wrapper = mountNoteAudioTools(note)
     noteStore.refreshNoteRealm(originalRealm)
     updateContentMock = mockSdkServiceWithImplementation(

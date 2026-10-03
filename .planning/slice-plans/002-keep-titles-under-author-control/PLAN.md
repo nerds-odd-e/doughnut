@@ -60,8 +60,12 @@ required by the `frontend` skill, and API regeneration through the
 
 ### 1. Body dictation never changes the title
 Type: Behavior
-Status: planned
+Status: done
 Proof: `env -u NODE_ENV CURSOR_DEV=true nix develop -c pnpm frontend:test tests/notes/NoteAudioTools`
+Accepted: 27 passed; `NoteAudioTools.processing.spec.ts` "never changes the
+title across many chunks and a later recording" asserts no `updateNoteTitle`
+call and an unchanged store title, and fails against the old composable.
+`vue-tsc --noEmit` clean.
 
 Behavior: a note with a chosen title → nine audio chunks processed, stop, then
 a second recording → no `updateNoteTitle` request, store title unchanged.

@@ -2,10 +2,8 @@
 
 Authors open Audio tools on an existing note to Record Audio, Flush Audio,
 Stop Recording, or Save Audio Locally. Advanced Options exposes Processing
-Instructions and full-screen editing. Body processing and automatic title
-updates settle separately. No explicit voice-title control was found in the
-existing-note title editor, Audio tools, Advanced Options, or New note form.
-OS dictation, browser extensions and title instructions were not assessed.
+Instructions and full-screen editing. Dictation writes only to the note body;
+the title stays as the author set it.
 
 ## Adding dictated text to a note
 
@@ -31,8 +29,7 @@ processed audio position to that segment's start. Its audio is retained for the
 next chunk, so appending a result does not re-add already processed audio.
 The model controls transcription quality and passage whitespace. Recent
 unfinished-sentence revision and unsaved editor drafts have separate behavior;
-the append operates on current store content. Automatic title suggestions
-continue on the existing schedule.
+the append operates on current store content.
 
 The mounted audio preservation tests assert exact saved content for long and
 empty bodies, repeated additions, originating-note targeting, and undo. The
@@ -145,20 +142,11 @@ orchard content was absent. An independent fresh page confirmed the saved loss.
 The destination body and both titles survived unchanged, despite successful
 source title-suggestion responses. Navigation's causal role is unknown.
 
-## Automatic titles can overwrite author choice
+## Dictation does not change titles
 
-Recording `e2e_test/fixtures/harvard.wav` (18.3561875 s) into an initially
-visually empty body with its default `type: Note` property changed `Untitled`
-to “Sensory Notes on Food and Drink”. Repeating the same passage changed it
-to “Sensory Impressions of Foods and Drinks”, although the saved final bodies
-were identical. Reload confirmed the second title.
-
-Setting “Author chosen preservation title” before the orchard recording did
-not protect it: processing changed it to “Example Paragraphs for Preservation”,
-then “Sample Paragraphs for Preservation”. Reload confirmed the last title.
-The choice between disabling automatic titles and delayed one-time generation
-for an `Untitled` note remains unresolved. Explicitly chosen titles need a
-product policy that preserves author control.
+Dictation never changes a note's title, whether it is `Untitled` or chosen by
+the author, in the current recording or later ones. The observations above
+that mention title requests predate this.
 
 ## Responsiveness and positive comparisons
 
