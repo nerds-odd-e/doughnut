@@ -65,7 +65,7 @@ removed.
 
 ### 1. The failed automock is produced on demand and explained
 Type: Behavior
-Status: planned
+Status: stopped (2026-10-03): not reproduced after the listed attempts; awaiting the owner's decision on further reproduction (for example hosted-runner or Linux reruns)
 Proof: a literal command and condition under which
 `MainMenu.resume.spec.ts` fails with
 `vi.mocked(...).mockReturnValue is not a function` at `setupMainMenuTests`,
@@ -148,4 +148,53 @@ slice when slice 1 updates the plan. The reduced spec is not committed to
 
 ## Learnings
 
-None yet.
+Slice 1 (2026-10-03, at `9e55e8eba3`): **not reproduced.** Every attempt below
+used CI's settings (`CI=true`: files one at a time, one retry) and passed. The
+provider copy was instrumented temporarily and restored; it matches the saved
+original.
+
+How the mocker behaves, from logging in the provider's `createMocker` plus a
+context `request` listener:
+
+- Files run one at a time, each in a new iframe. The previous file's `clear`
+  finishes before the next file's `register` starts, because the tester
+  awaits `clear` inside `onAfterRunFiles` before it answers `execute`. Seen in
+  every run (for example `CLEAR done 11:25:18.773`, next `REGISTER start
+  11:25:18.836`). A `clear` that overlaps the next `register` cannot happen in
+  this flow, which rules out the shared-map race named in the premises.
+- Imports wait for every `register`: the browser runner's `wrapModule` waits
+  for the mocker's queue. The request for `useRecallData.ts` came after all
+  `REGISTER done` lines in every run. It was answered with a 302 to
+  `?mock=automock`, and that redirect then returned 200.
+- Only the mock routes exist, so Playwright turns request interception (and
+  the cache-disable flag) off after each file's `clear` and on again at the
+  next file's first `register`.
+- **What makes `MainMenu.resume.spec.ts` different:** it imports
+  `useRecallData` itself, as its first import, so it asks for the automocked
+  module about 0-30 ms after the routes are registered. That held in all ten
+  runs under CPU contention as well. `MainMenu.spec.ts` asks for the module
+  only through `mainMenuTestSupport.ts`, about 94 ms after its `register`.
+  If a request sent just after interception is turned back on can miss the
+  route, only a file shaped like the resume spec is exposed. This is a
+  hypothesis: no run showed such a miss.
+- The CI log of run 37108823838 shows no unhandled error or rejection. A
+  failed `register` would continue the import (`prepare().finally`) and leave
+  an unhandled rejection, so the log argues against a failed `register`.
+
+Attempts, in order (all `env -u NODE_ENV CI=true CURSOR_DEV=true nix develop -c …`):
+
+| # | Condition | Result | Rules out |
+| --- | --- | --- | --- |
+| 1 | Instrumented provider; `pnpm -C frontend test` on MainMenu.spec, pdfBookViewerGeometryResample, MainMenu.resume | pass; order of register, request, and clear recorded as above | The route premise holds: 302 to `?mock=automock` for each request |
+| 2 | The same files forced into CI's order with a scratch config whose sequencer keeps the command-line order | pass | File order alone |
+| 2b | DonutApp.searchHistoryMigration (loads the real `useRecallData.ts` with no routes), then pdf, then resume | pass; the real load went to the network, and the later request was still caught by the route | A cached real module from an earlier unmocked file |
+| 2c | All 159 files of CI's shard 2/2 in the exact order from the CI log | pass | CI's full order on this machine (7 frontend files have changed since `afc9f1163d`) |
+| 3a | 1500 ms delay before `route()` in `register` | pass | A slow `route()`: imports wait for it |
+| 3b | 1500 ms delay before `unroute()` in `clear` | pass; the next `register` waited for `CLEAR done` | Cleanup of the previous file overlapping the next `register` |
+| 3c | `register` returns without awaiting `route()` | pass; the handler is added on the client side immediately and the request was still routed | A request that arrives before Playwright's client sees the route |
+| 4 | `pnpm frontend:test --shard=2/2`, 10 runs with 32 busy-loop processes on 16 cores (load average 29-50) | 10/10 pass (resume 35-56 ms) | Plain CPU contention on macOS |
+
+Not tried, because it is outside the bounded attempts or needs the owner:
+hosted-runner reruns; Linux/CI Chromium; a gap inside Chromium between
+`Fetch.enable` being acknowledged and the renderer using the intercepting
+loader. Slices 2 and 3 do not start without a reproduction.
