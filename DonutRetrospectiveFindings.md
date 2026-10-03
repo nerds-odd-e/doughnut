@@ -66,6 +66,19 @@ The plan's manual slice needed real MinerU and a running app to `/attach` real P
   - Observed effect: about 28 minutes for one manual slice, most of it environment repair and stack scaffolding rather than observation.
   - Inference: much of the cost was necessary once; a pinned MinerU install and a documented "hold a disposable stack" command would make the next real-book acceptance cheaper. Donut tooling, so correction belongs to Donut, not shared guidance.
 
+### Open, not queued: Stopping the Development stack
+
+#### DD-203 — No repo command stops the Development stack, and its `dev.pid` did not name the running stack
+
+`package.json` has `dev` and `dev:restart` but no stop. To stop the owner's stack for an owner-approved probe, the coordinator walked the process tree and called `stopOwnedDevelopmentProcessTree` from `scripts/development-owned-process-tree.mjs` through `node -e`.
+
+##### Occurrences
+
+- Execution: SEED-067#stacks-survive-other-builds / slice-plans/005-stacks-survive-other-builds / 4122c07c06; Timestamp: 2026-10-03T18:46+08:00 (slice 2 start); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.56.
+  - Evidence: the default checkout's `dev.pid` held `1034265`, which `ps` rejected as out of range, while the live stack was `scripts/development-services.mjs` (PID 10342, started 15:57). After `pnpm dev`, `dev.pid` named the new stack and stopping it took one call.
+  - Observed effect: about six extra tool calls to find and stop the stack; nothing broke.
+  - Inference: a `pnpm dev:stop` sharing `dev:restart`'s ownership checks would make owner-approved Development probes cheaper. How `dev.pid` came to hold a non-PID value is unknown. The stale-`dev.pid` restart failure on the unlanded branch below was a reused PID, so this is a different symptom. Qualified: one occurrence.
+
 ## Review — 2026-10-03
 
 Reviewed `DearDough.md` at `857425b04a`, then again after

@@ -158,3 +158,13 @@ Slice 2 is independent of slice 1. Either can land alone.
 - The fix for the batch case removes needless rewrites at the writer. It does
   not mask them in the stack (see "Considered, not added").
 - No Development stack fix until slice 2 reproduces the symptom.
+
+## Execution complete
+
+Product advice:
+- The batch E2E promise (DD-200) is delivered by `4122c07c06`; wrap-up can
+  resolve DD-200.
+- The Development-start promise (DD-159) was not reproduced and no writer was
+  found. The owner decides whether to keep watching DD-159 or drop that part of
+  the story's goal; no fix work is advised without a reproduced symptom.
+- DD-203 (no `pnpm dev:stop`) is a small tooling candidate, not queued.
