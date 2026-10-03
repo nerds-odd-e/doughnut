@@ -116,7 +116,7 @@ paragraph on mid-speech processing to state the common rule.
 
 ### 4. The orchard passage survives whole
 Type: Behavior
-Status: in progress
+Status: awaiting owner decision
 Proof: Repeat slice 1's real-service orchard journey and reload, recording the
 result here.
 
@@ -194,3 +194,26 @@ sentence detection.
   silence transcribed as "You" (a separate transcription quality issue, not
   in this story). Flush and Stop clicks were about 1.1 s late, so a pause
   flush fired 80 ms before Stop.
+- **Slice 4, second run (2026-10-03).** Development at `1a981673` (the
+  trailing-blank-line fix), note 13731, Flush at 23.0 s and Stop at 31.0 s.
+  The response `rawSRT` is the SRT after hold-back. Hold-back worked:
+  - Pause flush (one request): processed SRT "The orchard contains … bench." /
+    "These facts are finished.", end `00:00:06,720`; the "yesterday" segment
+    was held back.
+  - Flush: processed SRT "The book that I bought yesterday after reading
+    several reviews and comparing different editions", end `00:00:13,440`;
+    the next segment was held back.
+  - Stop: "is a gift from my sister because she enjoys learning about the
+    history of gardens." / meeting sentences.
+  - After reload: the original paragraph, the complete book sentence (without
+    its commas, and "from" for "for") and the meeting sentences appear once;
+    "yesterday" is not a finished sentence.
+  - **Gap:** "These facts are finished." was in the pause flush's processed
+    SRT, but the retouch model's `dictatedText` left it out, so it never
+    reached the note. The hold-back did not lose it; the
+    `transcriptionToTextAiTool` completion dropped it. One run only; slice 1
+    and the first slice 4 run kept it. This contradicts the key example that
+    the orchard facts appear once, and the story does not cover retouch
+    quality. Owner decision needed.
+  - The primary checkout was returned to `main` (`aaa17f6a`). Development
+    then needed a fresh start: `dev.pid` held a PID that macOS had reused.
