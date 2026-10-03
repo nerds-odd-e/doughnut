@@ -3,7 +3,7 @@ id: SEED-066
 status: dormant
 planted: 2026-10-03
 planted_during: owner shift of near-future direction from maintenance and bug fixing to audio tools, starting with voice input
-trigger_when: selecting the voice-input improvement epic for decomposition using the recorded findings
+trigger_when: selecting a queued voice-input story for refinement using the recorded findings
 scope: large
 ---
 
@@ -17,18 +17,20 @@ The owner reports that it has existed for a long time, is rarely used, and is
 extremely buggy. Audio tools, beginning with usable voice input, are now the
 [near-future direction](../PRODUCT-BACKLOG.md#near-future-direction).
 
-## Backlog Items
-
-Keep the improvement item as one broad epic until it is decomposed using the
-recorded findings below.
+## Parent Problem
 
 <a id="usable-voice-input"></a>
 ### Make voice input fast, reliable, and easy to use
 
-**Identity:** SEED-066#usable-voice-input
-```json dough-story-state
-{"schemaVersion":1,"refinement":"not-refined","approach":"unselected"}
-```
+**Former epic identity:** SEED-066#usable-voice-input
+
+On 2026-10-03 the owner accepted all nine proposed stories below and their
+priority order. They replace this broad epic in the product backlog; the epic
+is decomposed, not delivered. Keep this anchor for existing references.
+
+For note authors, unreliable and slow spoken capture should become a dependable
+way to add their thoughts, preserve their content and intent, and explicitly
+author titles, with understandable controls.
 
 - **For / why:** Let note authors capture their thoughts by voice without long
   waits, lost content, distracting title changes, or confusing controls.
@@ -38,8 +40,31 @@ recorded findings below.
   evaluate the resulting experience by dictating and reviewing notes.
 - **Evidence:** The recorded findings below inform decomposition. Owner reports
   remain distinct from reproduced observations and suspected causes.
-- **Effort / preparation:** Broad epic; sizing, story decomposition, refinement,
-  and execution planning remain later work, informed by the recorded findings.
+- **Preparation:** The accepted decomposition is non-executable planning input.
+  Each selected story still needs refinement and approach selection before
+  execution planning or implementation.
+
+## Alternatives and Decision
+
+- **Defer or do nothing:** Leaves reproduced saved-content loss and title
+  overwrites in the existing feature. The owner's current audio-tools direction
+  makes repairing trustworthy capture valuable now.
+- **Only stop automatic titles:** A small useful improvement, retained as its
+  own story, but it does not address body preservation or responsiveness.
+- **OS dictation or external transcription pasted into the editor:** The
+  strongest simpler workflow. Its adequacy has not been assessed; compare it
+  before investing heavily in explicit title controls. It supplies a useful
+  benchmark but leaves the reported Donut voice-input defects unresolved.
+- **Accepted direction:** Keep all nine stories, ordered around preservation,
+  everyday dictation, then title authoring. Lower-priority stories can be dropped
+  by a later owner decision. Start with safe short dictation to test whether
+  useful spoken capture can preserve existing work; retain that value even if
+  the remaining stories are cancelled.
+
+## Known Reports and Discovery Evidence
+
+These retain the original report and bounded observations. The story sections
+below record the accepted scope; unresolved causes remain hypotheses.
 
 #### Reported responsiveness problem and processing direction
 
@@ -76,9 +101,9 @@ recorded findings below.
   only if the title starts with `Untitled`, wait until some amount of dictation
   has accumulated, choose a title once for that note, and never automatically
   update it again, including in later dictation sessions.
-- The owner has not prescribed which of those choices must come first. Whether
-  to retain the one-time option and its delay remain decisions for later
-  refinement.
+- The accepted decomposition starts by disabling automatic title updates.
+  Delayed one-time generation is deferred and has no queued story; adding it
+  would require a later owner decision about its value and timing.
 - Voice input should also be useful for explicitly dictating the title. In
   particular, being able to dictate the note title while creating a note would
   be valuable. Explicitly dictated or otherwise user-chosen titles must remain
@@ -124,6 +149,280 @@ were skipped to reserve time for saved-loss confirmation and cleanup. The planni
 An empty-body UI baseline did succeed. Causes, frequency, the acceptable recent revision boundary, and quantitative latency expectations remain unresolved.
 
 
+## Story Decomposition
+
+Effort bands are S = 30–60 minutes, M = 1–2 hours, and L = 2–4 hours, including
+delivery, following this project's existing seed convention. The distribution
+is one S, four M, and four L. These are comparative hypotheses, not a delivery
+schedule. Refine or resplit any story likely to exceed L before execution.
+
+Every story is evaluated by the note author through the product. Preservation
+includes saved state after reload, rather than only a transient editor result.
+The accepted order is global priority; it does not require serial technical
+implementation of independent stories. No story authorizes a model choice,
+technical redesign, or speculative infrastructure.
+
+<a id="preserve-existing-content"></a>
+### Add a dictated passage without changing existing note content
+
+**Identity:** SEED-066#preserve-existing-content
+```json dough-story-state
+{"schemaVersion":1,"refinement":"not-refined","approach":"unselected"}
+```
+
+- **For / why:** Let an author add a thought by speaking without risking text
+  they already wrote.
+- **Evaluation:** Given an existing note, record a short passage and stop.
+  The addition appears once and every original passage survives reload.
+  Include a long existing body so retaining only its end cannot satisfy this
+  outcome. An empty-body note remains a usable capture starting point.
+- **Evidence / learning:** Original paragraphs and a short lighthouse addition
+  survived some sessions, but an existing paragraph was truncated during the
+  recorded navigation journey. Establish a repeatable preservation guarantee
+  without treating navigation as the proved cause.
+- **Boundary:** This story owns a short addition and untouched existing text.
+  Cumulative speech and concurrent typed changes have separate stories. Evaluate
+  preservation on the originating note when a result arrives after in-app
+  navigation; the destination must remain untouched.
+- **Effort hypothesis:** M — low confidence; assumes the short-addition workflow
+  can be bounded without a broader recording redesign.
+- **Depends on:** None; dictating into an existing note already exists.
+- **Safe stopping point:** Authors have a dependable short-addition journey.
+  Its saved result must preserve existing text and the intended destination even
+  if later stories are cancelled; it does not claim all longer-session or
+  simultaneous-edit behavior is repaired.
+
+<a id="preserve-completed-speech"></a>
+### Keep completed speech as dictation continues
+
+**Identity:** SEED-066#preserve-completed-speech
+```json dough-story-state
+{"schemaVersion":1,"refinement":"not-refined","approach":"unselected"}
+```
+
+- **For / why:** Let an author develop a longer thought without earlier spoken
+  facts disappearing as later speech is processed.
+- **Evaluation:** Dictate several passages, pause, flush, continue, and stop.
+  Completed passages remain present once after reload. Use the recorded orchard
+  passage: its completed facts survive the later book and meeting sentences,
+  including the eight-second pause inside the book sentence.
+- **Evidence / learning:** Flush replaced completed orchard facts with a middle
+  fragment; the final saved body retained only the last sentences. Test whether
+  useful recent revision can coexist with stable completed content.
+- **Boundary:** Completed passages remain fixed automatically; only the current
+  unfinished sentence may be revised to interpret continuing speech. A pause
+  alone does not settle whether a sentence is finished. The operational revision
+  boundary needs refinement. Author-requested edits remain author-controlled.
+- **Effort hypothesis:** L — low confidence; assumes one cohesive revision rule
+  can cover the observed pause/flush/stop journey without a larger redesign.
+- **Depends on:** Safe addition to existing content, the outcome of
+  [preserve existing content](#preserve-existing-content).
+- **Safe stopping point:** Longer dictation retains completed thoughts and
+  original content once after reload, independently of later speed or UI work.
+
+<a id="author-controlled-titles"></a>
+### Keep note titles under the author's control
+
+**Identity:** SEED-066#author-controlled-titles
+```json dough-story-state
+{"schemaVersion":1,"refinement":"not-refined","approach":"unselected"}
+```
+
+- **For / why:** Let authors keep their chosen titles while dictating the body.
+- **Evaluation:** Choose a title, dictate through multiple updates, then record
+  again. The title remains unchanged after reload. Body dictation also leaves an
+  initially Untitled title unchanged.
+- **Evidence:** Repeated identical Harvard speech changed an Untitled note's
+  title twice; later dictation overwrote an explicitly chosen title twice.
+- **Boundary:** Disable automatic title updates during body dictation initially.
+  Explicit title authoring remains available. One-time automatic generation is
+  deferred; neither explicit title dictation story is required for this fix.
+- **Effort hypothesis:** S — high confidence; assumes removing the automatic
+  behavior is bounded and existing explicit title editing is preserved.
+- **Depends on:** None; this can deliver value early alongside body repair.
+- **Safe stopping point:** Body dictation stops surprising authors with title
+  changes, even if no new voice-title controls are delivered.
+
+<a id="preserve-typed-corrections"></a>
+### Keep typed corrections when voice results arrive
+
+**Identity:** SEED-066#preserve-typed-corrections
+```json dough-story-state
+{"schemaVersion":1,"refinement":"not-refined","approach":"unselected"}
+```
+
+- **For / why:** Let an author correct or supplement a note while spoken text
+  is being processed without losing either contribution.
+- **Evaluation:** With a real audio request pending, type a recognizable
+  correction in the supported body editor. The arriving result keeps that text
+  and the dictated addition; both survive reload. Include visible edits still
+  awaiting autosave and edits already saved before the result arrives.
+- **Evidence:** The visible red-bicycle sentence was erased by the arriving
+  result. No earlier manual-content save was observed, so an already-saved edit
+  race remains unassessed rather than a reproduced defect.
+- **Boundary:** One author's supported editor and dictation journey. This does
+  not introduce multi-user collaborative editing. Reusing existing edit/save
+  behavior is a refinement concern, not a separate preparation story.
+- **Effort hypothesis:** L — low confidence; assumes the in-progress editor
+  draft and arriving spoken addition can be coordinated within that journey.
+- **Depends on:** The safe existing-content addition outcome.
+- **Safe stopping point:** Authors can type while waiting for speech results;
+  delayed processing cannot silently erase their visible or saved corrections.
+
+<a id="recover-failed-transcription"></a>
+### Recover a failed transcription without repeating the speech
+
+**Identity:** SEED-066#recover-failed-transcription
+```json dough-story-state
+{"schemaVersion":1,"refinement":"not-refined","approach":"unselected"}
+```
+
+- **For / why:** Let an author recover already-spoken material after conversion
+  fails rather than recreating the thought from memory.
+- **Evaluation:** When conversion fails before its text is inserted, show
+  understandable feedback and let the author retry the captured passage in the
+  same open session. The recovered addition appears once and saved content
+  remains intact.
+- **Evidence / learning:** A risk-driven reliability candidate. Discovery did
+  not exercise service failures or recovery; observe the actual failure journey
+  during refinement before prescribing a recovery interaction.
+- **Boundary:** Conversion failure before successful text insertion, within the
+  same open session. Refresh/crash recovery, offline operation, and an ambiguous
+  save outcome are outside this candidate's promise.
+- **Effort hypothesis:** L — low confidence; assumes captured speech remains
+  available for a bounded retry journey.
+- **Depends on:** The safe successful-addition outcome.
+- **Safe stopping point:** A failed conversion has an actionable recovery path;
+  retrying neither discards the passage nor duplicates successful additions.
+
+<a id="prompt-dictation-results"></a>
+### See submitted dictation promptly
+
+**Identity:** SEED-066#prompt-dictation-results
+```json dough-story-state
+{"schemaVersion":1,"refinement":"not-refined","approach":"unselected"}
+```
+
+- **For / why:** Let an author finish a short spoken thought and use its text
+  without a frustrating wait after submission or Stop.
+- **Evaluation:** Agree a measurable submission/Stop-to-useful-body target,
+  then compare the same naturally paced recordings across repeated real-service
+  runs. Useful text appears within that agreed delay while preservation remains
+  intact. Separate first visible text from final settled content when needed.
+- **Evidence / learning:** The first 18.356-second Harvard recording showed body
+  text at 25.17 seconds from capture, approximately 3.96 seconds after Stop.
+  Audio requests took 4.42/4.61 seconds and titles settled separately. Other
+  journeys do not supply a reliable Stop-to-final baseline.
+- **Boundary:** Own diagnosis and user-visible improvement together. The retouch
+  stage and excessive thinking are owner hypotheses, not established causes.
+  Preserve the requested lightweight-processing direction; choose a model or
+  processing change only after understanding the path. No numerical target or
+  continuous live-text promise has been decided.
+- **Effort hypothesis:** L — low confidence; assumes a meaningful bounded
+  improvement can meet the agreed target without a larger delivery.
+- **Depends on:** No additional capability; the earlier integrity stories are
+  priority choices. Speed changes must retain accepted preservation behavior.
+- **Safe stopping point:** Short submitted dictation meets its measured target
+  without sacrificing content or title control; later UI/title stories add
+  independent value.
+
+<a id="understandable-first-dictation"></a>
+### Complete a first dictation with understandable controls
+
+**Identity:** SEED-066#understandable-first-dictation
+```json dough-story-state
+{"schemaVersion":1,"refinement":"not-refined","approach":"unselected"}
+```
+
+- **For / why:** Let an author unfamiliar with Audio tools complete spoken
+  capture without deciphering confusing controls.
+- **Evaluation:** From an existing note, find voice input, start recording, stop,
+  and recognize when the resulting text is saved. Recording, processing, and
+  completion states are understandable through the product.
+- **Evidence / learning:** The owner reports an ugly and unintuitive UI. The
+  observed journey uses Record Audio, Flush Audio, Stop Recording, Save Audio
+  Locally, and Advanced Options. Observe the journey to decide the smallest
+  useful interaction change rather than assuming a full redesign.
+- **Boundary:** One first-dictation journey on an existing note. Hardware capture
+  and permission behavior remain discovery gaps to check during refinement;
+  this does not preselect new device-management or advanced-processing features.
+- **Effort hypothesis:** M — medium confidence; assumes the existing workflow
+  can become understandable through a bounded interaction change.
+- **Depends on:** An existing usable capture workflow; broader promotion should
+  follow the earlier integrity outcomes rather than expose silent loss.
+- **Safe stopping point:** A newcomer can complete and recognize a saved spoken
+  addition without needing the later title-authoring capabilities.
+
+<a id="create-with-spoken-title"></a>
+### Create a note using a spoken title
+
+**Identity:** SEED-066#create-with-spoken-title
+```json dough-story-state
+{"schemaVersion":1,"refinement":"not-refined","approach":"unselected"}
+```
+
+- **For / why:** Let an author capture a new note's subject by speaking its title
+  during creation, an explicitly requested valuable journey.
+- **Evaluation:** In New note, speak a title, review or correct it, and submit.
+  The note is created once in the chosen location with that title.
+- **Evidence / learning:** No explicit voice-title control was discovered in
+  New note. OS dictation and extensions remain unassessed; compare their adequacy
+  before investing heavily in a native control.
+- **Boundary:** Explicit title input within the existing creation journey.
+  Preserve ordinary title validation and location selection. This does not
+  introduce voice commands for folder choice or automatic note submission.
+- **Effort hypothesis:** M — medium confidence; assumes a short title capture
+  can fit the existing creation workflow.
+- **Depends on:** Existing note creation; existing-note voice renaming is not
+  a product prerequisite. Body dictation must respect the chosen title.
+- **Safe stopping point:** Authors can create a note with a reviewed spoken
+  title even if existing-note title dictation is cancelled.
+
+<a id="rename-with-spoken-title"></a>
+### Change an existing note's title by speaking
+
+**Identity:** SEED-066#rename-with-spoken-title
+```json dough-story-state
+{"schemaVersion":1,"refinement":"not-refined","approach":"unselected"}
+```
+
+- **For / why:** Let an author explicitly name or rename an existing note by
+  speaking, with the same control they have when typing.
+- **Evaluation:** Dictate a replacement title, review or correct it, then save
+  through the normal rename rules. The title survives reload and the note body
+  remains unchanged, including when the note has inbound references.
+- **Evidence / learning:** No explicit voice-title control was discovered in
+  the existing title editor or Audio tools. Compare the simpler OS-dictation
+  workflow during refinement; its adequacy is unknown.
+- **Boundary:** Explicit author-controlled rename, preserving ordinary title
+  validation and reference-handling choices. It does not infer a title from body
+  speech or change the rules for linked notes.
+- **Effort hypothesis:** M — medium confidence; assumes short-title capture can
+  reuse the normal title-editing journey without a larger rename redesign.
+- **Depends on:** Existing title editing; spoken-title creation is independently
+  useful and is not a product prerequisite.
+- **Safe stopping point:** Authors can rename an existing note by speaking and
+  keep body content and normal reference handling intact.
+
+## Ordering and Scope Reduction
+
+The owner accepted the nine-story order above on 2026-10-03. The product backlog
+owns their global priority. Preservation of existing content and completed speech
+comes first; title control is a small independent trust improvement. Concurrent
+editing and failure recovery extend reliability before responsiveness and the
+first-use journey. Title creation and renaming then extend explicit authoring.
+
+Navigation is preservation evidence for the first two stories: source-note
+content was damaged while the destination survived. Its causal role is unknown.
+Recheck that journey after preservation changes and propose a separate navigation
+story only if a distinct remaining problem is established. Background dictation
+across notes is not a selected capability.
+
+Keep all nine queued unless the owner later reduces scope. First-to-drop order
+starts with existing-note title dictation, then spoken-title creation. Preserve
+the dependable capture outcomes if those extensions are cancelled. Optional
+one-time automatic title generation has no queued story.
+
 ## Open Decisions for Later Work
 
 - The controlled browser route is established at `localhost:5175`; genuine
@@ -131,13 +430,21 @@ An empty-body UI baseline did succeed. Causes, frequency, the acceptable recent 
   and account only if that alternative is used.
 - Measurable responsiveness expectations and the actual contribution of audio
   capture, transcription, retouching, and applying results to the note.
-- The boundary between useful recent-sentence revision and destructive rewriting.
-- No automatic title versus a one-time title for an `Untitled` note, and the
-  timing of that one-time behavior.
+- How to recognize the current unfinished sentence versus completed passages,
+  including a long pause inside a sentence, while preserving author intent.
+- The actual conversion-failure journey and the bounded same-session retry
+  interaction; service failures remain unobserved.
+- Any distinct navigation problem left after source-content preservation fixes.
+- The adequacy of OS dictation or external transcription for explicit title
+  input. Optional one-time automatic title generation stays deferred.
 - The interaction for explicit title dictation, including during note creation.
 
 ## Breadcrumbs
 
 - Owner's voice-input problem report, 2026-10-03, in this conversation.
+- Owner's acceptance of all nine proposed stories and their priority, with
+  authorization to record them on main and sync origin, 2026-10-03.
+- Effort-band convention:
+  [SEED-039](SEED-039-faster-ci-feedback.md#story-decomposition).
 - Later decomposition workflow:
   [dough-story-decomposition](../../.agents/skills/dough-story-decomposition/SKILL.md).
