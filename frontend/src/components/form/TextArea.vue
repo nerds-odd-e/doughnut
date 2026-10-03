@@ -82,8 +82,13 @@ const resize = () => {
 
 watch(
   () => props.modelValue,
-  async () => {
+  async (value) => {
+    const el = input.value
+    const keepCaret =
+      el !== null && el === document.activeElement && el.value !== value
+    const { selectionStart, selectionEnd } = el ?? {}
     await nextTick()
+    if (keepCaret) el.setSelectionRange(selectionStart!, selectionEnd!)
     resize()
   }
 )

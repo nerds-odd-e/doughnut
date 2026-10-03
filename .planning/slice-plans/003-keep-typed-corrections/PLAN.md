@@ -178,7 +178,13 @@ attempt: focused command plus `tests/components/form` → 54 files, 408 tests.
 
 ### 5. The Markdown editor keeps the caret
 Type: Behavior
-Status: planned
+Status: done
+Accepted: case "keeps the Markdown editor's caret where the author was
+typing" failed first with `[114, 114]`, then keeps `[41, 41]`; `TextArea`'s
+modelValue watch restores the selection when a focused textarea receives an
+outside value. Focused command plus `tests/components/form` → 54 files, 409
+tests; `tests/components/conversation tests/notes/NoteAddQuestion` → 7 files,
+39 tests; `vue-tsc` exit 0.
 Proof: new case in `NoteAudioTools.typingWhilePending.spec.ts`, Markdown
 mode: focus the textarea, change "from" to "for" with `setTextareaValue`
 while `audioToText` is held, put the caret right after "for" with

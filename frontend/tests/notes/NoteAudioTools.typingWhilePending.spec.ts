@@ -56,6 +56,9 @@ describe("NoteAudioTools while the author types in the open body editor", () => 
     "The lighthouse keeper painted the front door bright yellow. Tomorrow we will bring fresh oranges to the beach.",
   ].join("\n\n")
   const typed = " MANUAL EDIT: Keep this red bicycle sentence."
+  const giftBody =
+    "The book I bought yesterday is a gift from my sister. She enjoys gardens."
+  const correctedGiftBody = giftBody.replace("from my sister", "for my sister")
 
   it("keeps typing at the end of the rich editor and saves the passage after it", async () => {
     const { wrapper } = mountEditorAndAudioTools(redBicycleBody, false)
@@ -84,9 +87,7 @@ describe("NoteAudioTools while the author types in the open body editor", () => 
   })
 
   it("keeps a correction in the middle and puts the passage at the end", async () => {
-    const body =
-      "The book I bought yesterday is a gift from my sister. She enjoys gardens."
-    const { wrapper } = mountEditorAndAudioTools(body, false)
+    const { wrapper } = mountEditorAndAudioTools(giftBody, false)
     const quill = () => richQuillInstance(wrapper)
 
     await whileAudioIsPending(async () => {
@@ -96,9 +97,22 @@ describe("NoteAudioTools while the author types in the open body editor", () => 
       await flushPromises()
     })
 
-    expect(lastSavedContent()).toBe(
-      `${body.replace("from my sister", "for my sister")}${passage}`
-    )
+    expect(lastSavedContent()).toBe(`${correctedGiftBody}${passage}`)
+  })
+
+  it("keeps the Markdown editor's caret where the author was typing", async () => {
+    const caret = correctedGiftBody.indexOf("for my sister") + "for".length
+    const { wrapper } = mountEditorAndAudioTools(giftBody, true)
+
+    await whileAudioIsPending(async () => {
+      textareaEl(wrapper).focus()
+      const el = await setTextareaValue(wrapper, correctedGiftBody)
+      el.setSelectionRange(caret, caret)
+    })
+
+    const el = textareaEl(wrapper)
+    expect(el.value).toBe(`${correctedGiftBody}${passage}`)
+    expect([el.selectionStart, el.selectionEnd]).toEqual([caret, caret])
   })
 
   it("saves the passage as soon as it joins the open editor's draft", async () => {
