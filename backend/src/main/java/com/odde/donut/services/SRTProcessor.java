@@ -16,7 +16,7 @@ public class SRTProcessor {
       return new SRTProcessingResult(rawSRT, extractLastTimestamp(rawSRT));
     }
 
-    String[] segments = rawSRT.split("\n\n");
+    String[] segments = rawSRT.strip().split("\n\n");
     if (segments.length <= 1) {
       return new SRTProcessingResult("", "00:00:00,000");
     }

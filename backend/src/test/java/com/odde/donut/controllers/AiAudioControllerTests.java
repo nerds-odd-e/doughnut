@@ -118,7 +118,7 @@ class AiAudioControllerTests extends ControllerTestBase {
 
     @Test
     void shouldHoldBackSingleSegmentOfMidSpeechUploadWithoutCompletion() throws Exception {
-      mockTranscriptionSrtResponse("1\n00:00:00,000 --> 00:00:03,000\nunfinished sentence");
+      mockTranscriptionSrtResponse("1\n00:00:00,000 --> 00:00:03,000\nunfinished sentence\n\n\n");
 
       mockMvc
           .perform(

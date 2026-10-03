@@ -34,6 +34,7 @@ keeps all of that audio. No separate recognizer or revision path is added.
 | --- | --- | --- | --- |
 | A pause flush and a Flush click send `isMidSpeech: false`, so the whole tail is written | Slice 3 | Read `audioProcessingScheduler.ts`: `tryFlush()` calls `processAndCallback(false)`; `wireAudioProcessingScheduler` wires the silence callback to `tryFlush()`; the `NoteAudioTools.vue` Flush button calls `audioRecorder.tryFlush()` | Confirmed |
 | Silence re-triggers a flush every 3 s of continued silence | Slice 3 | Read `rawSampleAudioBuffer.ts` `push()`: the counter resets to 0 after firing, so the 8 s orchard pause fires twice | Confirmed. Before, the second flush found only silence and made no request. With hold-back, it would re-send the held segment. |
+| The real transcription's SRT splits into segments on blank lines | Slice 4 | Direct multipart requests to Development at `fd904bc2`: the raw SRT ends with `\n\n\n`, so `split("\n\n")` yields a trailing whitespace segment | False. Mid-speech removed that empty segment, so nothing real was held back and a lone segment was written. Fixed in slice 4. |
 | Timed chunks reach the backend as mid-speech | Slices 2–4 | Slice 2 return: `AudioUploadDTO` binds the form property `midSpeech` (Lombok `setMidSpeech`; `@JsonProperty` does not affect form binding), but the frontend sends `isMidSpeech`; a `WebDataBinder` probe bound `false`; generated `types.gen.ts` lists both fields; every slice 1 response had an empty end timestamp | False. Every chunk is processed as not mid-speech, so the hold-back never runs. Slice 2 fixes the binding. |
 | A mid-speech chunk with a single segment is written in full | Slice 2 | Read `SRTProcessor.process`: `segments.length <= 1` returns the whole SRT; `SRTProcessorTests.shouldHandleSingleSegmentWhenIncomplete` asserts it | Confirmed. Without slice 2, the second pause flush would still write the held half sentence. |
 | An empty `dictatedText` leaves the note unchanged | Slice 2 | Read `noteTextEditing.ts` `appendDictatedText`: returns early when `dictatedText` is empty | Confirmed |
@@ -115,7 +116,7 @@ paragraph on mid-speech processing to state the common rule.
 
 ### 4. The orchard passage survives whole
 Type: Behavior
-Status: planned
+Status: in progress
 Proof: Repeat slice 1's real-service orchard journey and reload, recording the
 result here.
 
@@ -184,3 +185,12 @@ sentence detection.
   `audioProcessingScheduler.stop.spec.ts`. No E2E uses audio Flush or silence.
   A continued-silence test only catches re-sending when its callback returns a
   timestamp that holds back audio.
+- **Slice 4, first run (2026-10-03).** Primary checkout detached at
+  `fd904bc2` with the owner's approval (it was on `main` at `aaa17f6a`). Note
+  13730: requests carried `midSpeech: "true"` and the long pause sent one
+  request, but every chunk wrote its whole tail ("The book that I bought
+  yesterday." was written, and a lone segment was written). The cause was the
+  trailing blank lines in the real SRT (see premises). Stop's last 3 s of
+  silence transcribed as "You" (a separate transcription quality issue, not
+  in this story). Flush and Stop clicks were about 1.1 s late, so a pause
+  flush fired 80 ms before Stop.
