@@ -162,73 +162,6 @@ The accepted order is global priority; it does not require serial technical
 implementation of independent stories. No story authorizes a model choice,
 technical redesign, or speculative infrastructure.
 
-<a id="preserve-completed-speech"></a>
-### Keep completed speech as dictation continues
-
-**Identity:** SEED-066#preserve-completed-speech
-```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/001-keep-completed-speech/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"9eb09e72a73cf3d926b575a0e816ec5f3d6beb0b2806578bc44ed9f39fdf4b79","plan":"1665d6a9c0178f525dab992786335ea1491010450b229a4b62f94974ffb0d8f8"}}
-```
-
-- **Goal:** Let a note author develop a longer spoken thought, with pauses and
-  Flush, and end up with every completed sentence once and each sentence whole,
-  instead of earlier facts disappearing or a sentence broken at a pause. This
-  makes longer dictation trustworthy, the next step after safe additions to
-  existing content.
-- **Scope (required):**
-  - Completed passages written during a recording stay unchanged through later
-    pauses, Flush, and Stop, and appear once after reload. The preceding
-    [append-only addition](../../docs/voice-input.md#adding-dictated-text-to-a-note)
-    likely already provides this; this story confirms it with the orchard
-    journey rather than assuming it.
-  - **Hold back the unfinished tail:** an automatic pause flush or a Flush click
-    writes only the speech before the last transcription segment. That
-    segment's audio is kept for the next chunk, as timed mid-speech processing
-    already does. Only Stop writes all remaining speech.
-  - Written dictated text is never revised later. The note stays add-only, as
-    the append behavior promises.
-- **Decision (owner, 2026-10-03):** Hold back the unfinished sentence instead of
-  showing it early and revising it. Showing then revising would bring back
-  replacement and the need to track which text may still be revised.
-- **Boundary assumptions:** The held-back unit is the existing last
-  transcription segment. Recognizing whether a sentence is finished is not
-  promised, so a finished last sentence may also wait until the next chunk or
-  Stop. A pause alone never forces an unfinished sentence to be written as
-  finished. Author-made edits stay under the author's control.
-- **Deferred:** Faster appearance of the held-back text belongs to
-  [See submitted dictation promptly](#prompt-dictation-results). Typing during
-  processing belongs to
-  [Keep typed corrections](#preserve-typed-corrections). Correcting individual
-  words the model mishears (such as "from my sister" instead of "for my
-  sister") is not promised.
-- **Key examples:**
-  1. **Orchard journey:** A note has an existing paragraph. Dictate the
-     [recorded orchard passage](../../docs/voice-input.md#completed-dictated-content-can-disappear)
-     at natural pace, with the eight-second pause after "yesterday", click
-     Flush about 22 seconds in, continue, then Stop. After reload: the original
-     paragraph, then the orchard facts, the complete book sentence, and the
-     meeting sentences, each once. "The book that I bought yesterday" is not
-     written as a separate finished sentence.
-  2. **Pause in the middle of a sentence:** Saying "The book that I bought
-     yesterday," then staying silent until the automatic flush writes nothing
-     from that half sentence. When speech continues and the next chunk
-     finishes, the sentence appears whole.
-  3. **Stop writes the rest:** Stopping right after a Flush writes the held-back
-     segment once. Nothing that was spoken is left out of the saved body.
-- **Evidence / learning:** Before the append change, Flush replaced the
-  completed orchard facts with a middle fragment, and the final save kept only
-  the last sentences. The pause (a silence-threshold flush) and Flush both
-  processed audio as not mid-speech, which finished the half sentence early.
-- **Effort hypothesis:** M, medium confidence. Assumes that holding back the
-  last segment on pause or Flush reuses the existing mid-speech path, and that
-  the real-service orchard journey confirms the append change preserves
-  completed passages.
-- **Depends on:** Safe addition to existing content, the outcome of
-  [dictated-text additions](../../docs/voice-input.md#adding-dictated-text-to-a-note).
-- **Safe stopping point:** Longer dictation keeps completed thoughts and
-  original content once after reload, and pauses no longer break sentences,
-  regardless of later speed or UI work.
-
 <a id="keep-every-transcribed-sentence"></a>
 ### Keep every transcribed sentence when dictated text is written
 
@@ -244,8 +177,7 @@ technical redesign, or speculative infrastructure.
   [voice-input documentation](../../docs/voice-input.md#completed-dictated-content-can-disappear).
   Every transcribed completed sentence, including "These facts are finished.",
   appears once in the saved note after reload.
-- **Evidence:** In the second real-service orchard run of
-  [Keep completed speech as dictation continues](#preserve-completed-speech)
+- **Evidence:** In the second real-service orchard run after hold-back
   (2026-10-03, note 13731), the pause flush's transcription held "These facts
   are finished.", but the dictated text returned by `transcriptionToTextAiTool`
   left it out, so it never reached the note. Two earlier runs kept it, so the
@@ -254,7 +186,7 @@ technical redesign, or speculative infrastructure.
   Correcting misheard words and transcription quality stay out of scope.
 - **Effort hypothesis:** M — low confidence; the cause and frequency are
   unknown.
-- **Depends on:** Keep completed speech as dictation continues.
+- **Depends on:** None.
 - **Safe stopping point:** Completed transcribed sentences are not silently
   dropped before they reach the note.
 
@@ -286,7 +218,7 @@ technical redesign, or speculative infrastructure.
 - **Effort hypothesis:** M — low confidence; the rule for mixed or unknown
   languages, and whether the join is decided in code or by the model, are
   refinement questions.
-- **Depends on:** Keep completed speech as dictation continues.
+- **Depends on:** None.
 - **Safe stopping point:** Dictated passages join existing text correctly for
   space-separated languages and for Japanese and Chinese.
 

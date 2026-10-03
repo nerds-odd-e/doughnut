@@ -6,8 +6,6 @@ Audio tools, starting with voice input. Make voice input work reliably and easy 
 
 ## Taken
 
-- [Keep completed speech as dictation continues](seeds/SEED-066-voice-input.md#preserve-completed-speech) — SEED-066#preserve-completed-speech ([plan](slice-plans/001-keep-completed-speech/PLAN.md))
-
 ## Backlog list
 
 - [Keep every transcribed sentence when dictated text is written](seeds/SEED-066-voice-input.md#keep-every-transcribed-sentence) — SEED-066#keep-every-transcribed-sentence
