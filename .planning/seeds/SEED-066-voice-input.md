@@ -258,6 +258,38 @@ technical redesign, or speculative infrastructure.
 - **Safe stopping point:** Completed transcribed sentences are not silently
   dropped before they reach the note.
 
+<a id="join-dictated-passages"></a>
+### Join dictated passages to the note in a way that fits the language
+
+**Identity:** SEED-066#join-dictated-passages
+```json dough-story-state
+{"schemaVersion":1,"refinement":"not-refined","approach":"unselected"}
+```
+
+- **For / why:** An author adding speech to a note expects each new passage
+  to join the existing text the way that language is written, without fixing
+  the join by hand.
+- **Evaluation:** Dictate into a note whose body ends with an English sentence:
+  the new passage starts after one space, not "every hour.The orchard". Dictate
+  Japanese or Chinese after Japanese or Chinese text: no space is inserted
+  between sentences. Successive passages in one recording join the same way.
+  The saved body after reload matches.
+- **Evidence:** The real-service orchard runs on 2026-10-03 (notes
+  13728–13731) all saved "every hour.The orchard". The mocked recording journey
+  pins the same join ("This is class 1.Let's talk about data structure
+  today."). Leading whitespace is currently left to the text-writing model.
+- **Boundary:** How a dictated passage is joined to the note's existing text,
+  including when the note is empty. Be mindful of the language: languages
+  written with spaces between words and sentences (such as English) need a
+  space, while Japanese and Chinese do not, and mixed-language notes exist.
+  Paragraph breaks are not decided here, and nothing already written is changed.
+- **Effort hypothesis:** M — low confidence; the rule for mixed or unknown
+  languages, and whether the join is decided in code or by the model, are
+  refinement questions.
+- **Depends on:** Keep completed speech as dictation continues.
+- **Safe stopping point:** Dictated passages join existing text correctly for
+  space-separated languages and for Japanese and Chinese.
+
 <a id="author-controlled-titles"></a>
 ### Keep note titles under the author's control
 
@@ -470,6 +502,9 @@ one-time automatic title generation has no queued story.
   capture, transcription, retouching, and applying results to the note.
 - How to recognize the current unfinished sentence versus completed passages,
   including a long pause inside a sentence, while preserving author intent.
+  Partly decided on 2026-10-03: the last transcription segment is held back
+  until the next chunk or Stop, and written text is never revised. Sentence
+  recognition itself remains undecided.
 - The actual conversion-failure journey and the bounded same-session retry
   interaction; service failures remain unobserved.
 - Any distinct navigation problem left after source-content preservation fixes.
