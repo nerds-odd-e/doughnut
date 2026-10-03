@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 1,
+  "agent": "Tsubomi-chan",
+  "email": "tsubomi-chan@example.org",
+  "identity": "SEED-039#mainmenu-mock-flake",
+  "mode": "story-branch",
+  "branch": "claude/stop-the-mainmenu-resume-specs-from-failing-inte",
+  "host": "claude"
+}

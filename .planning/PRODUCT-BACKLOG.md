@@ -6,9 +6,10 @@ Audio tools, starting with voice input. Make voice input work reliably and easy 
 
 ## Taken
 
+- [Stop the MainMenu resume specs from failing intermittently in CI](seeds/SEED-039-faster-ci-feedback.md#mainmenu-mock-flake) — SEED-039#mainmenu-mock-flake ([plan](slice-plans/006-automocked-specs-pass-reliably/PLAN.md))
+
 ## Backlog list
 
-- [Stop the MainMenu resume specs from failing intermittently in CI](seeds/SEED-039-faster-ci-feedback.md#mainmenu-mock-flake) — SEED-039#mainmenu-mock-flake
 - [Keep every transcribed sentence when dictated text is written](seeds/SEED-066-voice-input.md#keep-every-transcribed-sentence) — SEED-066#keep-every-transcribed-sentence
 - [Join dictated passages to the note in a way that fits the language](seeds/SEED-066-voice-input.md#join-dictated-passages) — SEED-066#join-dictated-passages
 - [Keep typed corrections when voice results arrive](seeds/SEED-066-voice-input.md#preserve-typed-corrections) — SEED-066#preserve-typed-corrections
