@@ -223,7 +223,7 @@ technical redesign, or speculative infrastructure.
 
 **Identity:** SEED-066#preserve-typed-corrections
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"unselected"}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/003-keep-typed-corrections/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"9d6a5b77e4a4a33deffd3b3965227ee1e83d4637f8464b740fb50a8a9d7c8e60","plan":"15ea1a67621a1e3c9020aa9f3404c52976daedd3d469a5bc309f52a22def9111"}}
 ```
 
 - **Goal:** Let a note author keep typing in a note, for example fixing a
