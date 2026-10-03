@@ -1,15 +1,15 @@
 import { UserController } from "@generated/donut-backend-api/sdk.gen"
 import MainMenu from "@/components/toolbars/MainMenu.vue"
-import { useRecallData } from "@/composables/useRecallData"
 import { useGoToNextAssimilation } from "@/composables/useGoToNextAssimilation"
 import routes from "@/routes/routes"
 import type { User } from "@generated/donut-backend-api"
 import { fireEvent, screen } from "@testing-library/vue"
 import makeMe from "donut-test-fixtures/makeMe"
 import helper, { mockSdkService } from "@tests/helpers"
+import { resetRecallData } from "@tests/helpers/recallDataTestSupport"
 import { beforeEach, afterEach, vi } from "vitest"
 import { createMemoryHistory, createRouter, type Router } from "vue-router"
-import { createUseRecallDataMock, defaultMenuData } from "./mainMenuMocks"
+import { defaultMenuData } from "./mainMenuMocks"
 
 export let router: Router
 export let user: User
@@ -59,7 +59,7 @@ export function setupMainMenuTests() {
     })
     createMatchMediaSpy(true)
     mockSdkService(UserController, "getMenuData", defaultMenuData)
-    vi.mocked(useRecallData).mockReturnValue(createUseRecallDataMock())
+    resetRecallData()
     vi.mocked(useGoToNextAssimilation).mockReturnValue({
       goToNextAssimilation: vi.fn(),
     })

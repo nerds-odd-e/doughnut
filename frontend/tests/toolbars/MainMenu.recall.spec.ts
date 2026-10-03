@@ -7,19 +7,13 @@ import { screen } from "@testing-library/vue"
 import { mockSdkService } from "@tests/helpers"
 import { flushPromises } from "@vue/test-utils"
 import { describe, it, expect, vi, afterEach } from "vitest"
-import {
-  createMenuData,
-  createUseRecallDataMock,
-  memoryTrackerLitesStub,
-} from "./mainMenuMocks"
+import { createMenuData, memoryTrackerLitesStub } from "./mainMenuMocks"
 import {
   mountMainMenu,
   renderComponent,
   setupMainMenuTests,
-  user,
 } from "./mainMenuTestSupport"
 
-vi.mock("@/composables/useRecallData")
 vi.mock("@/composables/useGoToNextAssimilation")
 vi.mock("@/managedApi/AiReplyEventSource", async () => {
   const { aiReplyEventSourceMockExports } = await import("./mainMenuMocks")
@@ -47,12 +41,7 @@ describe("MainMenu recall count", () => {
         })
       )
 
-      vi.mocked(useRecallData).mockReturnValue(
-        createUseRecallDataMock({
-          isRecallPaused,
-          toRepeat: memoryTrackerLitesStub(789),
-        })
-      )
+      useRecallData().setIsRecallPaused(isRecallPaused)
 
       mountMainMenu()
       await flushPromises()
@@ -73,20 +62,15 @@ describe("MainMenu recall count", () => {
   })
 
   it("decreases recall count when currentIndex increases", async () => {
-    const mockData = createUseRecallDataMock({
-      toRepeat: memoryTrackerLitesStub(10),
-      currentIndex: 0,
-    })
+    const { setToRepeat, setCurrentIndex } = useRecallData()
+    setToRepeat(memoryTrackerLitesStub(10))
 
-    vi.mocked(useRecallData).mockReturnValue(mockData)
-
-    const { getAllByText, rerender } = mountMainMenu()
+    const { getAllByText } = mountMainMenu()
     await flushPromises()
 
     expect(getAllByText("10").length).toBeGreaterThan(0)
 
-    mockData.currentIndex.value = 3
-    await rerender({ user })
+    setCurrentIndex(3)
     await flushPromises()
 
     expect(getAllByText("7").length).toBeGreaterThan(0)
@@ -115,13 +99,11 @@ describe("MainMenu recall count", () => {
   ])(
     "applies diligent-mode class on $linkLabel badge when diligentMode=$diligentMode",
     async ({ linkLabel, isRecallPaused, diligentMode, expectDiligent }) => {
-      vi.mocked(useRecallData).mockReturnValue(
-        createUseRecallDataMock({
-          isRecallPaused,
-          toRepeat: memoryTrackerLitesStub(5),
-          diligentMode,
-        })
-      )
+      const { setIsRecallPaused, setToRepeat, setDiligentMode } =
+        useRecallData()
+      setIsRecallPaused(isRecallPaused)
+      setToRepeat(memoryTrackerLitesStub(5))
+      setDiligentMode(diligentMode)
 
       await renderComponent()
 
@@ -141,10 +123,6 @@ describe("MainMenu recall count", () => {
     it("catches up due recalls once and updates the count", async () => {
       vi.useFakeTimers({ toFake: ["setTimeout", "clearTimeout", "Date"] })
       vi.setSystemTime("2026-09-29T11:00:00Z")
-      const { useRecallData: realUseRecallData } = await vi.importActual<
-        typeof import("@/composables/useRecallData")
-      >("@/composables/useRecallData")
-      vi.mocked(useRecallData).mockImplementation(realUseRecallData)
       mockSdkService(
         UserController,
         "getMenuData",

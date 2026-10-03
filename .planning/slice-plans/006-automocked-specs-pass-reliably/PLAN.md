@@ -51,7 +51,13 @@ slices.
 
 ### 2. MainMenu specs run on the real recall state
 Type: Structure
-Status: planned
+Status: done (2026-10-03). Shared reset: `resetRecallData()` in
+`frontend/tests/helpers/recallDataTestSupport.ts`, also used by
+`useRecallData.spec.ts`. The Resume click asserts the `recall` route and that
+`.menu-wrapper` keeps `is-collapsed`. `createUseRecallDataMock` left
+`mainMenuMocks.ts`; RecallPage specs use their own copy in
+`tests/pages/recallPageTestSupport.ts`. Focused set: 40 files, 232 tests pass;
+`vue-tsc --noEmit` passes.
 Proof: `MainMenu.spec.ts`, `MainMenu.recall.spec.ts`, and
 `MainMenu.resume.spec.ts` pass under the focused command; none of them mocks
 `useRecallData` or `useResumeRecall`.
@@ -72,8 +78,8 @@ Proof: `MainMenu.spec.ts`, `MainMenu.recall.spec.ts`, and
 Type: Structure
 Status: planned
 Proof: the six `RecallPage*.spec.ts` files pass under the focused command; none
-mocks `useRecallData`; `createUseRecallDataMock` and any helper only it used are
-deleted.
+mocks `useRecallData`; `createUseRecallDataMock` in
+`tests/pages/recallPageTestSupport.ts` and any helper only it used are deleted.
 
 Where a spec asserted a call on a fake setter, assert the resulting state or
 rendering instead. Use slice 2's reset helper.

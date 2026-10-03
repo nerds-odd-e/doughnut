@@ -2,6 +2,7 @@ import { useRecallData } from "@/composables/useRecallData"
 import { useResumeRecall } from "@/composables/useResumeRecall"
 import { dummyRouteRecordsFromMetadata } from "@/routes/dummyRouteRecords"
 import { mockCoarsePointer } from "@tests/helpers/mockCoarsePointer"
+import { resetRecallData } from "@tests/helpers/recallDataTestSupport"
 import {
   expectSoftKeyboardPrimerIsFocused,
   expectSoftKeyboardPrimerIsNotFocused,
@@ -57,29 +58,6 @@ function mountResumeHarness(options?: {
   })
 }
 
-function resetRecallDataState() {
-  const ResetHarness = defineComponent({
-    setup() {
-      const {
-        setToRepeat,
-        setCurrentIndex,
-        setTreadmillMode,
-        clearShouldResumeRecall,
-      } = useRecallData()
-      setToRepeat(undefined)
-      setCurrentIndex(0)
-      setTreadmillMode(false)
-      clearShouldResumeRecall()
-      return () => null
-    },
-    template: "<div />",
-  })
-  const wrapper = mount(ResetHarness, {
-    global: { plugins: [createRecallDataTestRouter()] },
-  })
-  wrapper.unmount()
-}
-
 describe("useResumeRecall", () => {
   let matchMediaSpy: ReturnType<typeof mockCoarsePointer> | undefined
 
@@ -87,7 +65,7 @@ describe("useResumeRecall", () => {
     matchMediaSpy?.mockRestore()
     matchMediaSpy = undefined
     document.body.innerHTML = ""
-    resetRecallDataState()
+    resetRecallData()
   })
 
   it.each([
@@ -146,7 +124,7 @@ describe("useResumeRecall", () => {
 
 describe("useRecallData potentialLearningSessions", () => {
   beforeEach(() => {
-    resetRecallDataState()
+    resetRecallData()
   })
 
   it("groups dueCommissioned by notebookId without affecting toRepeatCount", () => {

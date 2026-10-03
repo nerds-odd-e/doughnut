@@ -1,12 +1,8 @@
 import { useRecallData } from "@/composables/useRecallData"
-import { useResumeRecall } from "@/composables/useResumeRecall"
 import { fireEvent } from "@testing-library/vue"
 import { flushPromises } from "@vue/test-utils"
 import { beforeEach, describe, it, expect, vi } from "vitest"
-import {
-  createUseRecallDataMock,
-  memoryTrackerLitesStub,
-} from "./mainMenuMocks"
+import { memoryTrackerLitesStub } from "./mainMenuMocks"
 import {
   createMatchMediaSpy,
   mountMainMenu,
@@ -15,8 +11,6 @@ import {
   setupMainMenuTests,
 } from "./mainMenuTestSupport"
 
-vi.mock("@/composables/useRecallData")
-vi.mock("@/composables/useResumeRecall")
 vi.mock("@/composables/useGoToNextAssimilation")
 vi.mock("@/managedApi/AiReplyEventSource", async () => {
   const { aiReplyEventSourceMockExports } = await import("./mainMenuMocks")
@@ -29,19 +23,15 @@ function resumeLink() {
   return document.querySelector('[aria-label="Resume"]')
 }
 
-function toggleMenuButton() {
-  return document.querySelector('[aria-label="Toggle menu"]')
+function menuWrapper() {
+  return document.querySelector(".menu-wrapper")
 }
 
 describe("MainMenu resume recall", () => {
   beforeEach(() => {
-    vi.mocked(useRecallData).mockReturnValue(
-      createUseRecallDataMock({
-        isRecallPaused: true,
-        toRepeat: memoryTrackerLitesStub(5),
-      })
-    )
-    vi.mocked(useResumeRecall).mockReturnValue({ resumeRecall: vi.fn() })
+    const { setIsRecallPaused, setToRepeat } = useRecallData()
+    setIsRecallPaused(true)
+    setToRepeat(memoryTrackerLitesStub(5))
   })
 
   it("shows highlighted Resume before Note when recall is paused; hides when not", async () => {
@@ -65,44 +55,25 @@ describe("MainMenu resume recall", () => {
       allNavItems.indexOf(noteNavItem!)
     )
 
-    document.body.innerHTML = ""
-    vi.mocked(useRecallData).mockReturnValue(
-      createUseRecallDataMock({
-        isRecallPaused: false,
-      })
-    )
-    await renderComponent()
+    useRecallData().setIsRecallPaused(false)
+    await flushPromises()
     expect(resumeLink()).toBeNull()
   })
 
   it("resumes recall from collapsed horizontal menu without expanding", async () => {
     createMatchMediaSpy(false)
-    const resumeRecallSpy = vi.fn()
-    vi.mocked(useRecallData).mockReturnValue(
-      createUseRecallDataMock({
-        isRecallPaused: true,
-        toRepeat: memoryTrackerLitesStub(5),
-      })
-    )
-    vi.mocked(useResumeRecall).mockReturnValue({
-      resumeRecall: resumeRecallSpy,
-    })
-
     mountMainMenu()
+    expect(menuWrapper()).toHaveClass("is-collapsed")
 
-    expect(toggleMenuButton()).not.toBeNull()
     await fireEvent.click(resumeLink()!)
+    await flushPromises()
 
-    expect(resumeRecallSpy).toHaveBeenCalled()
+    expect(router.currentRoute.value.name).toBe("recall")
+    expect(menuWrapper()).toHaveClass("is-collapsed")
   })
 
   it("does not show zero recall count badge on Resume", async () => {
-    vi.mocked(useRecallData).mockReturnValue(
-      createUseRecallDataMock({
-        isRecallPaused: true,
-        toRepeat: [],
-      })
-    )
+    useRecallData().setToRepeat([])
 
     const { queryByText } = mountMainMenu()
     await flushPromises()
@@ -171,13 +142,11 @@ describe("MainMenu resume recall", () => {
       await router.push({ name: routeName })
       await flushPromises()
 
-      vi.mocked(useRecallData).mockReturnValue(
-        createUseRecallDataMock({
-          isRecallPaused,
-          currentIndex,
-          toRepeat,
-        })
-      )
+      const { setIsRecallPaused, setCurrentIndex, setToRepeat } =
+        useRecallData()
+      setIsRecallPaused(isRecallPaused)
+      setCurrentIndex(currentIndex)
+      setToRepeat(toRepeat)
 
       await renderComponent()
 
