@@ -131,99 +131,6 @@ authorizes no implementation, profiling run, or executable slice plan.
   If the resulting timings no longer justify rebalancing, bring that evidence
   back for an owner decision rather than inventing work or silently cancelling it.
 
-<a id="mainmenu-mock-flake"></a>
-
-### Stop the MainMenu resume specs from failing intermittently in CI
-
-**Identity:** SEED-039#mainmenu-mock-flake
-```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/006-automocked-specs-pass-reliably/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"3c8374774298450fe71f9eeb35f656ba43ef33a9be2e0eaffa7fde8539050501","plan":"062e2a4b1a975fcaa097121036d74aa5503c087c64cf0f7661bd4e36b9fbc532"}}
-```
-
-- **For / why:** Contributors trust a red frontend unit-test job only when it
-  points at a real defect. An intermittent failure on `main` blocks story
-  wrap-up and costs diagnosis time.
-- **Effort hypothesis:** S–M; the cost is rewriting twelve spec files.
-- **Depends on:** None.
-- **Safe stopping point:** Any group of the twelve spec files (MainMenu,
-  RecallPage, AssimilationPanel) on the real recall state, passing.
-
-**Goal:** Donut contributors can rely on the frontend unit-test job: the
-specs that failed through a module mock of the recall state use the real
-recall state instead, so that mock mechanism is no longer in their path. This
-contributes to the seed's aim of trustworthy CI feedback; it does not promise
-shorter CI time.
-
-**Owner decision (2026-10-03):** the failure was not reproduced (see the plan's
-Learnings). `useRecallData` is internal, in-process state with no external
-dependency, and `useResumeRecall` only sets a flag and navigates. Under the
-project's test principle (mock only external dependencies), mocking them was
-wrong from the start. The story removes those mocks instead of finding the
-cause.
-
-**Observed failure:**
-
-- [Run 37108823838](https://github.com/nerds-odd-e/doughnut/actions/runs/37108823838)
-  on `main` at `afc9f1163d`, frontend shard 2/2 (`pnpm frontend:test --shard=2/2`,
-  Vitest 5.0.3 browser mode, chromium): all 9 tests of
-  `frontend/tests/toolbars/MainMenu.resume.spec.ts` failed with
-  `vi.mocked(...).mockReturnValue is not a function` at
-  `tests/toolbars/mainMenuTestSupport.ts:62` (`setupMainMenuTests`). The bare
-  automock `vi.mock("@/composables/useRecallData")` did not apply to that file.
-  It was the only failed file of 159 in the shard.
-- Each test failed again on its retry. The retry reruns the test inside the
-  same loaded file, so it cannot recover a mock that was not applied when the
-  file loaded.
-- `tests/toolbars/MainMenu.spec.ts`, which declares the same bare automock and
-  uses the same `setupMainMenuTests`, passed in the same shard six seconds
-  earlier. Eleven other spec files declare the same automock; none failed.
-- The same frontend tree passed at `294ef10aaf`
-  ([run 37108365967](https://github.com/nerds-odd-e/doughnut/actions/runs/37108365967));
-  the commits between the two changed planning files only.
-- One occurrence is known as of 2026-10-03. The six earlier failed runs and the
-  later failed [run 37114394639](https://github.com/nerds-odd-e/doughnut/actions/runs/37114394639)
-  (a lint job) do not show this error.
-- Locally, 3 runs of `tests/toolbars/` and 6 runs of `--shard=2/2` all passed.
-  Whether those local runs used CI's settings (`CI` set, so files run one at a
-  time with one retry) was not recorded.
-- **Hypotheses (unproven):** the Playwright mocker answers bare automocks
-  through per-session routes with a redirect. On a slow runner, either a cached
-  or in-flight module request bypasses the new route, or the previous file's
-  route cleanup for the same URL removes it. Explicit factory mocks might avoid
-  this but still go through a route.
-
-**Scope:**
-
-- Every spec file that declares `vi.mock("@/composables/useRecallData")` or
-  `vi.mock("@/composables/useResumeRecall")` (twelve files: three MainMenu,
-  six RecallPage, three AssimilationPanel) drives the real `useRecallData`
-  state through its setters and observes results through the component: the
-  rendered menu or page, and the router's current route instead of a spy on
-  `resumeRecall`.
-- Shared recall state is reset between tests in one place in the test
-  support, so no test sees another's state.
-- Test-only fakes that only these mocks used (for example
-  `createUseRecallDataMock`) are deleted.
-- The behavior each spec checked is kept; where a spec asserted a call on a
-  fake setter, it asserts the resulting state or rendering instead.
-- The failure is not hidden: retry count, shard count, and skip markers are
-  unchanged.
-- Not in this story: other module mocks in these files (for example
-  `useGoToNextAssimilation`), a general review of how frontend specs mock
-  modules, a Vitest upstream report, and any CI-time saving.
-
-**Key examples:**
-
-- **Resume shown.** Given recall is paused with 5 items remaining in the real
-  recall state → render the main menu → the Resume item is highlighted and
-  placed before Note.
-- **Resume clicked.** Given the collapsed horizontal menu and a paused recall →
-  click Resume → the router is on the `recall` route and the menu did not
-  expand.
-- **No mock left.** Given the fixed tree → search `frontend/tests` → no
-  `vi.mock` of `@/composables/useRecallData` or `@/composables/useResumeRecall`
-  remains, and the twelve files pass with CI's settings.
-
 <a id="internal-mocks-to-real-modules"></a>
 
 ### Replace frontend unit-test mocks of internal code with the real modules
@@ -236,8 +143,9 @@ cause.
 - **For / why:** Contributors trust a frontend unit test when it exercises the
   real code it depends on. A module mock of internal code tests the mock,
   hides real interactions, and adds a module-mocking mechanism that can fail
-  on its own. That mechanism produced the unexplained CI failure in
-  [mainmenu-mock-flake](#mainmenu-mock-flake). The project's `unit-testing`
+  on its own. That mechanism produced an unexplained CI failure (story
+  SEED-039#mainmenu-mock-flake, recoverable at
+  `263eb09a03:.planning/seeds/SEED-039-faster-ci-feedback.md`). The project's `unit-testing`
   skill already says to mock only external dependencies.
 - **Outcome:** Frontend unit tests (`frontend/tests`) mock only external
   dependencies: the backend API through `mockSdkService`, browser and device
@@ -250,7 +158,7 @@ cause.
   needs a judgment call: whether it is internal or an allowed exception. Other
   mocked modules, such as audio recording, wake lock, the AI event stream,
   `pdfjs-dist` and `file-saver`, may be external. The recall-state mocks were
-  already removed by mainmenu-mock-flake.
+  already removed (commits 74b20fdcac, c7944701f2, 330cd1820b).
 - **Effort hypothesis:** M, low confidence; refinement should first list the
   internal mocks and group them.
 - **Depends on:** None.

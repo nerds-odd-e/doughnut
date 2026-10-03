@@ -6,8 +6,6 @@ Audio tools, starting with voice input. Make voice input work reliably and easy 
 
 ## Taken
 
-- [Stop the MainMenu resume specs from failing intermittently in CI](seeds/SEED-039-faster-ci-feedback.md#mainmenu-mock-flake) — SEED-039#mainmenu-mock-flake ([plan](slice-plans/006-automocked-specs-pass-reliably/PLAN.md))
-
 ## Backlog list
 
 - [Replace frontend unit-test mocks of internal code with the real modules](seeds/SEED-039-faster-ci-feedback.md#internal-mocks-to-real-modules) — SEED-039#internal-mocks-to-real-modules
