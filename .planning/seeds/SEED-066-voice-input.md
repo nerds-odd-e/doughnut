@@ -94,16 +94,9 @@ below record the accepted scope; unresolved causes remain hypotheses.
 
 #### Title behavior
 
-- A title is automatically generated from the dictated content, and its ongoing
-  changes are annoying. Continuous automatic title generation or updating should
-  stop.
-- Disabling automatic titles is acceptable. The owner also accepts an alternative:
-  only if the title starts with `Untitled`, wait until some amount of dictation
-  has accumulated, choose a title once for that note, and never automatically
-  update it again, including in later dictation sessions.
-- The accepted decomposition starts by disabling automatic title updates.
-  Delayed one-time generation is deferred and has no queued story; adding it
-  would require a later owner decision about its value and timing.
+- One-time automatic title generation for an `Untitled` note after enough
+  dictation is deferred and has no queued story; adding it would require a
+  later owner decision about its value and timing.
 - Voice input should also be useful for explicitly dictating the title. In
   particular, being able to dictate the note title while creating a note would
   be valuable. Explicitly dictated or otherwise user-chosen titles must remain
@@ -132,14 +125,10 @@ revision is `a02dbb2697…`; frontend/runtime revision was not fully established
 - **Existing paragraph truncated during navigation journey:** Navigate from source `13726` while processing to destination `13727`, then return/reload.
   Both results persisted to the source, whose first paragraph became literal `...uesday.`; the other four paragraphs and destination sentinel survived.
   An independent fresh page confirmed the saved state. The [voice-input documentation](../../docs/voice-input.md#existing-content-can-be-truncated-during-a-navigation-journey) retains before/after text. The causal role of navigation remains unproved.
-- **Titles repeatedly change and overwrite author choice:** Repeating the identical 18.356 s Harvard input changed an initially `Untitled` note twice
-  despite identical final bodies. A later recording overwrote “Author chosen preservation title” twice. This reproduces the owner's loss of title control;
-  one-time generation versus disabling titles remains undecided. Title sequences
-  are retained in the [voice-input documentation](../../docs/voice-input.md#automatic-titles-can-overwrite-author-choice).
 - **Explicit voice-title entry was not discovered:** Inspecting supported title editing, Audio tools/Advanced Options and New note revealed no voice-title
   control. This is a bounded improvement opportunity, not a failed promise; OS dictation, extensions and processing instructions remain unobserved.
 - **Responsiveness baseline:** First body text appeared 25.17 s after capture began, approximately 3.96 s after Stop, for the 18.356 s short input. Real
-  audio requests took 4.42/4.61 s; titles settled separately. Sustained requests took 5.25/3.14/3.53 s and the body settled before Stop. Other journeys lack
+  audio requests took 4.42/4.61 s. Sustained requests took 5.25/3.14/3.53 s and the body settled before Stop. Other journeys lack
   reliable Stop-to-final measurements. Timings establish neither cause nor a numeric acceptance target.
 - **Scoped preservation succeeded:** Two recognizable original paragraphs and a distinct lighthouse addition survived reload and the next distinct session;
   no duplication or stale prior addition was observed in those sessions. The navigation destination survived. These comparisons do not establish a general preservation guarantee or defect frequency.
