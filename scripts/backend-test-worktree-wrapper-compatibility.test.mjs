@@ -57,7 +57,7 @@ test('unconfigured primary test does not migrate first or isolate', (t) => {
   assert.equal(invocations[0].url, '')
   assert.equal(invocations[0].args.includes('test'), true)
   assert.equal(invocations[0].args.includes('migrateTestDB'), false)
-  assert.equal(invocations[0].args.includes('--rerun-tasks'), false)
+  assert.equal(invocations[0].args.includes('--rerun'), false)
 })
 
 test('unconfigured primary preserves an explicit SPRING_DATASOURCE_URL', (t) => {
@@ -157,7 +157,7 @@ test('unconfigured primary CI-shaped test does not isolate', (t) => {
   assert.equal(args.includes('-Dspring.profiles.active=test'), true)
   assert.equal(args.includes('--build-cache'), true)
   assert.equal(args.includes('--parallel'), true)
-  assert.equal(args.includes('--rerun-tasks'), false)
+  assert.equal(args.includes('--rerun'), false)
   assert.equal(args.includes('--no-build-cache'), false)
   assert.equal(args.includes('--no-daemon'), false)
 })

@@ -6,8 +6,6 @@ Audio tools, starting with voice input. Make voice input work reliably and easy 
 
 ## Taken
 
-- [Start and keep local app stacks on current backend code](seeds/SEED-067-dependable-local-app-stacks.md#stacks-survive-other-builds) — SEED-067#stacks-survive-other-builds ([plan](slice-plans/005-stacks-survive-other-builds/PLAN.md))
-
 ## Backlog list
 
 - [Stop the MainMenu resume specs from failing intermittently in CI](seeds/SEED-039-faster-ci-feedback.md#mainmenu-mock-flake) — SEED-039#mainmenu-mock-flake

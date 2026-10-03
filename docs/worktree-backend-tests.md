@@ -147,9 +147,11 @@ testing. Both reuse the same exclusive invocation lock as
 
 When `.worktree.local.json` is already present, the repository Gradle wrapper
 migrates the assigned database once, then runs the requested tests against it
-with the test profile and actual-run flags (`--rerun-tasks --no-build-cache
---no-daemon`). A failed migration stops the command before tests start, even
-when the caller passed `--continue`.
+with the test profile and actual-run flags (`test --rerun`,
+`--no-build-cache`, `--no-daemon`). `--rerun` reruns only the test task, so the
+build leaves `build/classes` and `build/resources` alone and a batch E2E stack
+in the same checkout does not restart. A failed migration stops the command
+before tests start, even when the caller passed `--continue`.
 
 From the checkout root:
 

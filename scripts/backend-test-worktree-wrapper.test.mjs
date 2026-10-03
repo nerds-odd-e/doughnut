@@ -102,7 +102,7 @@ test('configured wrapper test from root migrates once then runs tests', (t) => {
   assert.equal(testRun.args.includes('test'), true)
   assert.equal(testRun.args.includes('migrateTestDB'), false)
   assert.equal(testRun.args.includes('-Dspring.profiles.active=test'), true)
-  assert.equal(testRun.args.includes('--rerun-tasks'), true)
+  assert.equal(testRun.args[testRun.args.indexOf('test') + 1], '--rerun')
   assert.equal(testRun.args.includes('--no-build-cache'), true)
   assert.equal(testRun.args.includes('--no-daemon'), true)
 })
@@ -126,7 +126,7 @@ test('configured wrapper test from backend/ preserves that cwd', (t) => {
   assert.equal(testRun.args.includes('test'), true)
 })
 
-test('configured wrapper test preserves the --tests token after test', (t) => {
+test('configured wrapper test preserves the --tests token after the test rerun', (t) => {
   const checkout = makeCheckout(t, {
     config: JSON.stringify({ id: 'wt_a7c2' }),
   })
@@ -137,8 +137,9 @@ test('configured wrapper test preserves the --tests token after test', (t) => {
   assert.equal(result.status, 0, outputOf(result))
   const { args } = readGradleInvocations(checkout)[1]
   const testAt = args.indexOf('test')
-  assert.equal(args[testAt + 1], '--tests')
-  assert.equal(args[testAt + 2], 'com.odde.donut.controllers.*')
+  assert.equal(args[testAt + 1], '--rerun')
+  assert.equal(args[testAt + 2], '--tests')
+  assert.equal(args[testAt + 3], 'com.odde.donut.controllers.*')
 })
 
 test('configured wrapper unmatched --tests filter keeps gradle failure', (t) => {

@@ -52,7 +52,14 @@ if [[ "${is_backend_project}" == true ]] \
 fi
 
 if [[ "${isolate_backend}" == true && ( -n "${test_task}" || "${has_migrate}" == true ) ]]; then
-  gradle_args=("$@")
+  # --rerun is a task option: it must follow the test task to bind to it.
+  gradle_args=()
+  for arg in "$@"; do
+    gradle_args+=("${arg}")
+    if [[ "${arg}" == "${test_task}" ]]; then
+      gradle_args+=(--rerun)
+    fi
+  done
 
   run_routed_backend_workload() {
     if [[ -n "${test_task}" ]]; then
@@ -67,7 +74,7 @@ if [[ "${isolate_backend}" == true && ( -n "${test_task}" || "${has_migrate}" ==
       migrate_args+=(--no-daemon)
       "${backend_dir}/gradlew" "${migrate_args[@]}" || return $?
 
-      gradle_args+=(-Dspring.profiles.active=test --rerun-tasks --no-build-cache --no-daemon)
+      gradle_args+=(-Dspring.profiles.active=test --no-build-cache --no-daemon)
     else
       gradle_args+=(--no-daemon)
     fi

@@ -94,7 +94,6 @@ test('valid configuration execs one gradle migrate-then-test run', (t) => {
   assert.equal(args[args.indexOf('-p') + 1], 'backend')
   assert.equal(args.includes('-PworktreeTestRun'), true)
   assert.equal(args.includes('-Dspring.profiles.active=test'), true)
-  assert.equal(args.includes('--rerun-tasks'), true)
   assert.equal(args.includes('--no-build-cache'), true)
   assert.equal(args.includes('--no-daemon'), true)
   assert.equal(args.includes('--continue'), false)
@@ -102,6 +101,7 @@ test('valid configuration execs one gradle migrate-then-test run', (t) => {
   const testAt = args.indexOf('test')
   assert.ok(migrateAt >= 0, args.join(' '))
   assert.ok(testAt > migrateAt, args.join(' '))
+  assert.equal(args[testAt + 1], '--rerun')
   assert.equal(args.includes('--tests'), false)
 })
 
@@ -166,7 +166,7 @@ test('worktreeTestRun opts test into mustRunAfter migrateTestDB', () => {
   assert.doesNotMatch(unguarded, /dependsOn\(?\s*['"]migrateTestDB['"]/)
 })
 
-test('focused --tests pattern is one token after the test task', (t) => {
+test('focused --tests pattern is one token after the test task rerun', (t) => {
   const checkout = makeCheckout(t, {
     config: JSON.stringify({ id: 'wt_a7c2' }),
   })
@@ -174,8 +174,9 @@ test('focused --tests pattern is one token after the test task', (t) => {
   assert.equal(result.status, 0, result.stderr)
   const { args } = readGradleInvocation(checkout)
   const testAt = args.indexOf('test')
-  assert.equal(args[testAt + 1], '--tests')
-  assert.equal(args[testAt + 2], '*.FooTest')
+  assert.equal(args[testAt + 1], '--rerun')
+  assert.equal(args[testAt + 2], '--tests')
+  assert.equal(args[testAt + 3], '*.FooTest')
 })
 
 test('unmatched --tests filter keeps gradle failure', (t) => {
