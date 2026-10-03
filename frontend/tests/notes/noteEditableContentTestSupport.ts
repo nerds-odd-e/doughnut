@@ -4,7 +4,6 @@ import usePopups from "@/components/commons/Popups/usePopups"
 import { flushPromises, type VueWrapper } from "@vue/test-utils"
 import type { ComponentPublicInstance } from "vue"
 import type Quill from "quill"
-import type { Range as QuillRange } from "quill"
 import makeMe from "donut-test-fixtures/makeMe"
 import helper, { mockSdkService } from "@tests/helpers"
 import { vi } from "vitest"
@@ -106,17 +105,6 @@ export function richQuillEditorEl(
   return wrapper.find(".ql-editor").element as HTMLElement
 }
 
-/** Clears any native DOM selection before a second Quill mutation in a test. Quill's own
- * `modify()` wrapper (run by every mutating Quill API) reads the current native selection to
- * restore it after the change; in this headless browser-mode environment, a *stale* native
- * range left over from an earlier real DOM mutation can no longer be resolved back to a blot
- * and throws. With zero ranges, Quill's read returns null and skips that restore step instead,
- * while the content mutation itself still applies normally - matching the plan's own recorded
- * limitation that only Quill's selection-read APIs are unreliable here, not Delta application. */
-export function clearNativeSelectionForQuillMutation() {
-  document.getSelection()?.removeAllRanges()
-}
-
 export function richQuillInstance(
   wrapper: VueWrapper<ComponentPublicInstance>
 ): Quill {
@@ -125,9 +113,7 @@ export function richQuillInstance(
   return (quillComponent.vm as any).quill as Quill
 }
 
-/** Dispatches a real rich (Quill) paste `ClipboardEvent`, stubbing `getSelection` for the
- * given selection the way `QuillEditor.paste.spec.ts` does, since Quill's own selection-read
- * APIs are unreliable for a real native caret in this headless browser-mode test run. */
+/** Dispatches a real rich (Quill) paste `ClipboardEvent` over the given selection. */
 export async function dispatchRichPaste(
   wrapper: VueWrapper<ComponentPublicInstance>,
   html: string,
@@ -136,9 +122,7 @@ export async function dispatchRichPaste(
   const editorEl = richQuillEditorEl(wrapper)
   editorEl.focus()
   const { index, length = 0 } = options.selection
-  const getSelectionSpy = vi
-    .spyOn(richQuillInstance(wrapper), "getSelection")
-    .mockReturnValue({ index, length } as QuillRange)
+  richQuillInstance(wrapper).setSelection(index, length)
 
   const clipboardData = new DataTransfer()
   clipboardData.setData("text/html", html)
@@ -153,10 +137,6 @@ export async function dispatchRichPaste(
     })
   )
   await flushPromises()
-  // Only needed to make the capture above deterministic; a stale stub would
-  // otherwise feed a fake range into Quill's own selection-restore machinery
-  // on any later mutation in the same test.
-  getSelectionSpy.mockRestore()
 }
 
 export function setupUpdateNoteContentMock() {

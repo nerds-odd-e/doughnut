@@ -1,5 +1,4 @@
 import type Quill from "quill"
-import type { Range } from "quill"
 import markdownizer from "./markdownizer"
 
 /**
@@ -25,16 +24,7 @@ export const interceptRichPaste = (
 ): Omit<QuillPasteContext, "insertedLength"> | null => {
   const originalGetData = clipboardData.getData.bind(clipboardData)
 
-  // Quill's own getSelection() can throw when the browser's native
-  // selection doesn't map onto a blot (e.g. no real caret was ever
-  // placed); when that happens there is simply no paste context to
-  // capture, matching QuillEditor.vue's insertTextAtCursor precedent.
-  let range: Range | null = null
-  try {
-    range = quill.getSelection(true)
-  } catch {
-    range = null
-  }
+  const range = quill.getSelection(true)
 
   clipboardData.getData = (format: string) => {
     if (format === "text/html") {

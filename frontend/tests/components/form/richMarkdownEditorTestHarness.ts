@@ -4,7 +4,6 @@ import routes from "@/routes/routes"
 import helper from "@tests/helpers"
 import { flushPromises, type VueWrapper } from "@vue/test-utils"
 import type Quill from "quill"
-import type { Range } from "quill"
 import {
   createRouter,
   createWebHistory,
@@ -83,16 +82,8 @@ export function createRichMarkdownEditorTestHarness() {
     const qlEditor = quillEditorEl()
     qlEditor.focus()
     if (options?.selection) {
-      // Quill's own selection-resolution (getRange/normalizedToRange) is
-      // unreliable for a real caret in this headless browser-mode test run;
-      // stub only that one read so the real paste-capture code under test
-      // still runs end-to-end against a real ClipboardEvent, with Quill
-      // applying the paste through its real Delta model.
       const { index, length = 0 } = options.selection
-      vi.spyOn(quillInstance(), "getSelection").mockReturnValue({
-        index,
-        length,
-      } as Range)
+      quillInstance().setSelection(index, length)
     }
     const clipboardData = new DataTransfer()
     clipboardData.setData("text/html", html)

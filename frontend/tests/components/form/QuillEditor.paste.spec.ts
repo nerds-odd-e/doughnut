@@ -1,6 +1,5 @@
 import { describe, it, expect, afterEach } from "vitest"
 import { nextTick } from "vue"
-import type { Range as QuillRange } from "quill"
 import { createQuillEditorTestHarness } from "./quillEditorTestHarness"
 
 describe("QuillEditor paste", () => {
@@ -43,16 +42,7 @@ describe("QuillEditor paste", () => {
     const editor = document.querySelector(".ql-editor") as HTMLElement
     editor.focus()
 
-    // Quill's own selection-resolution (getRange/normalizedToRange) is
-    // unreliable for a real caret in this headless browser-mode test run,
-    // even for Quill's own untouched content and internal MutationObserver
-    // reconciliation - a pre-existing environment issue, not something this
-    // change introduces. Stub only that one read so the real capture code
-    // under test still runs end-to-end against a real ClipboardEvent, with
-    // Quill applying the paste through its real Delta model.
-    const getSelectionSpy = vi
-      .spyOn(quill, "getSelection")
-      .mockReturnValue({ index: 6, length: 5 } as QuillRange)
+    quill.setSelection(6, 5)
 
     const clipboardData = new DataTransfer()
     clipboardData.setData("text/html", "<p><strong>Earth</strong></p>")
@@ -75,8 +65,6 @@ describe("QuillEditor paste", () => {
       range: { index: 6, length: 5 },
       insertedLength: 5,
     })
-
-    getSelectionSpy.mockRestore()
   })
 
   it("passes preserve_pre: true when pasting HTML with code blocks", async () => {

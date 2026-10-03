@@ -3,7 +3,14 @@
 </template>
 
 <script setup lang="ts">
-import { getCurrentInstance, nextTick, ref, onMounted, watch } from "vue"
+import {
+  getCurrentInstance,
+  nextTick,
+  ref,
+  onMounted,
+  shallowRef,
+  watch,
+} from "vue"
 import type { Router } from "vue-router"
 import Quill, { Delta } from "quill"
 import "quill/dist/quill.bubble.css"
@@ -40,7 +47,7 @@ const emits = defineEmits<{
 const router = getCurrentInstance()?.appContext.config.globalProperties
   .$router as Router | undefined
 const editor = ref<HTMLElement | null>(null)
-const quill = ref<Quill | null>(null)
+const quill = shallowRef<Quill | null>(null)
 const isPasting = ref(false)
 const lastRange = ref<{ index: number; length: number } | null>(null)
 let pendingPaste: Omit<QuillPasteContext, "insertedLength"> | null = null
@@ -163,15 +170,9 @@ onMounted(async () => {
 
 watch(() => props.modelValue, syncQuillFromModel)
 
-/** Places the caret at `index` without emitting a selection-change event.
- * Swallows a "DOM not ready" failure: both callers have already applied
- * their content change, so a caret placement issue must not undo that. */
+/** Places the caret at `index` without emitting a selection-change event. */
 function setSelectionSilently(index: number) {
-  try {
-    quill.value?.setSelection(index, 0, Quill.sources.SILENT)
-  } catch {
-    // ignore if editor DOM is not ready
-  }
+  quill.value?.setSelection(index, 0, Quill.sources.SILENT)
 }
 
 function insertTextAtCursor(text: string) {

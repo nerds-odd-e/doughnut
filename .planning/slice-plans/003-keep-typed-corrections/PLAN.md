@@ -197,7 +197,13 @@ Appending at the end keeps earlier offsets valid.
 
 ### 6. The rich editor holds its Quill instance raw
 Type: Structure
-Status: planned
+Status: done
+Accepted: `QuillEditor` holds Quill in a `shallowRef`; the refactor removed the
+proxy-error workarounds (try/catch in `setSelectionSilently` and
+`interceptRichPaste`, `getSelection` stubs, `clearNativeSelectionForQuillMutation`),
+so paste specs set a real Quill selection. Focused command plus
+`tests/components/form` → 54 files, 409 tests; other QuillEditor consumers →
+47 files, 235 tests; `vue-tsc` exit 0.
 Proof: focused command plus `tests/components/form` stay green (baseline 54
 files, 408 tests); `vue-tsc` clean.
 

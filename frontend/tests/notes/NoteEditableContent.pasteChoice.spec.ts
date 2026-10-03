@@ -3,7 +3,6 @@ import type { ComponentPublicInstance } from "vue"
 import { vi, describe, it, expect, beforeEach, afterEach } from "vitest"
 import {
   choiceShown,
-  clearNativeSelectionForQuillMutation,
   dispatchRichPaste,
   mountAndPaste,
   mountNoteEditableContent,
@@ -143,7 +142,6 @@ describe("NoteEditableContent paste choice", () => {
         "---\ntopic: training\n---\n\nHello world today"
       )
       await pasteLosingOriginal(wrapper)
-      clearNativeSelectionForQuillMutation()
       return wrapper
     }
 
@@ -205,7 +203,6 @@ describe("NoteEditableContent paste choice", () => {
         barRect.top < anchor.bottom && barRect.bottom > anchor.top
       expect(overlapsVertically).toBe(false)
 
-      clearNativeSelectionForQuillMutation()
       wrapper.unmount()
     })
   })
