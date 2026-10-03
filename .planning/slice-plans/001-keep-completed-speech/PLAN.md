@@ -220,3 +220,15 @@ sentence detection.
     as a separate story.
   - The primary checkout was returned to `main` (`aaa17f6a`). Development
     then needed a fresh start: `dev.pid` held a PID that macOS had reused.
+
+## Execution complete
+
+Product advice: Keep "Keep every transcribed sentence when dictated text is
+written" first; it is the only remaining gap against this story's key example.
+Candidate stories for the owner at wrap-up: join dictated passages with
+deterministic whitespace ("every hour.The orchard"; the mocked journey pins the
+same join), and avoid words invented from silence at Stop ("You"). Unobserved
+risk: while a segment is held back, the 60-second timer may re-send it during
+a long silence. Wrap-up should update `docs/voice-input.md`: the revision
+boundary is now decided (hold back, never revise), and mid-speech advances to
+the end of the previous segment.
