@@ -261,3 +261,16 @@ switching to Quill's content API in the same slice.
 - Run local frontend tests with `NODE_ENV` unset; this shell sets
   `NODE_ENV=production`, which hides `<script setup>` bindings from
   `wrapper.vm` in browser-mode tests.
+
+## Execution complete
+
+Product advice: Delivered: typing and the dictated passage are both kept and
+saved once, and the caret stays put in both editors. The retrospective found
+two regressions: a Markdown HTML paste in a focused editor now leaves a wrong
+selection (slice 5's `TextArea` restore runs after the paste places the caret),
+and a passage arriving while image upload or note removal has paused the editor
+is now dropped instead of written to the saved body. Correction
+`SEED-066#typed-corrections-side-effects` (plan
+`slice-plans/007-typed-corrections-side-effects/PLAN.md`) fixes both; put it at
+the top of the backlog, ahead of the remaining SEED-066 stories. No other
+change to the SEED-066 order.
