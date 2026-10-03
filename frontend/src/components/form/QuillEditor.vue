@@ -64,7 +64,12 @@ const syncQuillFromModel = () => {
   const html = modelHtml()
   if (quill.value.root.innerHTML === html) return
   syncingModel = true
+  const range = quill.value.getSelection()
   quill.value.root.innerHTML = html
+  if (range) {
+    quill.value.update(Quill.sources.SILENT)
+    setSelectionSilently(range.index, range.length)
+  }
   queueMicrotask(() => {
     syncingModel = false
     emits("modelLoaded", quill.value!.root.innerHTML)
@@ -170,9 +175,9 @@ onMounted(async () => {
 
 watch(() => props.modelValue, syncQuillFromModel)
 
-/** Places the caret at `index` without emitting a selection-change event. */
-function setSelectionSilently(index: number) {
-  quill.value?.setSelection(index, 0, Quill.sources.SILENT)
+/** Places the selection at `index` without emitting a selection-change event. */
+function setSelectionSilently(index: number, length = 0) {
+  quill.value?.setSelection(index, length, Quill.sources.SILENT)
 }
 
 function insertTextAtCursor(text: string) {

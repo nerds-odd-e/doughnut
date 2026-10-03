@@ -215,7 +215,13 @@ slice; the post-change refactor may judge it.
 
 ### 7. The rich editor keeps the caret
 Type: Behavior
-Status: planned
+Status: done
+Accepted: case "keeps the rich editor's caret where the author was typing"
+(real Quill selection) failed first with index 0, then keeps `{index: 41,
+length: 0}`; `syncQuillFromModel` reads the selection, sets `innerHTML`,
+updates silently and restores it. Focused command plus `tests/components/form`
+→ 54 files, 410 tests; other QuillEditor consumers → 47 files, 235 tests;
+`vue-tsc` exit 0. `docs/voice-input.md` states the caret stays put.
 Proof: new case in `NoteAudioTools.typingWhilePending.spec.ts`, rich mode,
 real Quill selection (no stub): while `audioToText` is held, replace "from"
 with "for" through `deleteText`/`insertText` (source `user`) and

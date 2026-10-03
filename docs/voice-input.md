@@ -136,11 +136,11 @@ focus the body editor and type at the end:
 
 When the result arrives, the typed sentence stays visible and the orchard
 passage follows it. A correction made elsewhere in the body, such as changing
-"from" to "for", also stays, and the passage still goes at the end. The draft
-with the passage is saved as soon as the passage joins it, so both originals,
-the lighthouse addition, the typed sentence and the passage are saved once
-each. The mounted typing-while-pending tests cover the rich and Markdown
-editors.
+"from" to "for", also stays, and the passage still goes at the end. The caret
+stays where the author was typing. The draft with the passage is saved as
+soon as the passage joins it, so both originals, the lighthouse addition, the
+typed sentence and the passage are saved once each. The mounted
+typing-while-pending tests cover the rich and Markdown editors.
 
 ## Existing content can be truncated during a navigation journey
 

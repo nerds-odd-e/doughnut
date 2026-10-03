@@ -115,6 +115,23 @@ describe("NoteAudioTools while the author types in the open body editor", () => 
     expect([el.selectionStart, el.selectionEnd]).toEqual([caret, caret])
   })
 
+  it("keeps the rich editor's caret where the author was typing", async () => {
+    const caret = correctedGiftBody.indexOf("for my sister") + "for".length
+    const { wrapper } = mountEditorAndAudioTools(giftBody, false)
+    const quill = () => richQuillInstance(wrapper)
+
+    await whileAudioIsPending(async () => {
+      const at = quill().getText().indexOf("from my sister")
+      quill().deleteText(at, "from".length, "user")
+      quill().insertText(at, "for", "user")
+      quill().setSelection(caret, 0, "user")
+      await flushPromises()
+    })
+
+    expect(quill().getText()).toBe(`${correctedGiftBody}${passage}\n`)
+    expect(quill().getSelection()).toEqual({ index: caret, length: 0 })
+  })
+
   it("saves the passage as soon as it joins the open editor's draft", async () => {
     mountEditorAndAudioTools(redBicycleBody, true)
 
