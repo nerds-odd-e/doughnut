@@ -33,6 +33,14 @@ attachment store of truth or synchronization path.
 See [ADR 0002](../docs/adrs/0002-git-native-portable-notebook-synchronization-accepted.md)
 and [domain operation ownership](../docs/notebook-git-synchronization.md#domain-operation-ownership).
 
+## One real-service audio test
+
+At most one end-to-end test calls the real OpenAI API for audio features:
+[record_live_audio_with_real_open_ai_service.feature](../e2e_test/features/note_creation_and_update/record_live_audio_with_real_open_ai_service.feature).
+Every other audio end-to-end test uses `@usingMockedOpenAiService`. Prove new
+audio behavior with mocked services or mounted frontend tests instead of adding
+real-service scenarios.
+
 ## One attachment content model
 
 This governs every attachment story: LFS conversion, web image upload,
