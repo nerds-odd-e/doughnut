@@ -239,3 +239,10 @@ transcription-plus-retouch request succeeds. The remaining premise, a controlled
 audio route through the browser UI, is bounded by slice 1, whose failure stops
 dependent journeys and keeps the gap. No slice-boundary, proof-mapping, or
 product-design concern remains. The plan itself grants no execution authority.
+
+## Execution complete
+
+Product advice: Return to the queued voice-input epic for decomposition using
+the linked evidence; prioritize completed/authored content preservation and title
+control. Retain hardware/failure and saved-edit race gaps. Choose revision policy
+and latency expectations during refinement; these observations establish no cause.

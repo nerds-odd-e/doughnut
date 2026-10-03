@@ -151,3 +151,27 @@ planning's empty-content API failure is not a reproduced UI defect.
 
 At 02:32 UTC, `rg --files --hidden -g ".voice-discovery*" -g "!node_modules" -g "!.git" .` found no owned temporary files; Git listed only these two records.
 `./scripts/run.sh bash scripts/check_diff_whitespace.sh` completed with exit 0. UI ended before the 02:33:26 deadline; final review took about 3 minutes.
+
+## Execution retrospective
+
+Slice 10 published as `0fe506f4e792b28ab99b46a05ae142d28167828a`. The ten
+published slice revisions identified above are the related implementation set;
+their commit messages and linked proofs establish each observation/disposition.
+The earlier claim/refinement commits are provenance, with no interleaved work.
+Aggregate diff from `f2e4076dd720706fec888074b4919ec2149dc7a9` changes six
+planning/evidence records only. Original outcome and scope remain intact; all
+ten slices have accepted proof, including the explicitly permitted failure skip.
+No execution-introduced product regression, architectural drift or correction
+plan was found. Production boundaries and APIs are unchanged.
+
+E2E did not drive this discovery. Focused whole-suite assessment retained the
+existing recording journeys: the mocked feature supplies complete appended text,
+while the real-service feature expects only the new sentence despite old content.
+Neither proves real consecutive-chunk or authored-content preservation. Future
+epic work should own regression proof; no suite cleanup is justified here.
+Process review updated existing [DD-176](../../../DearDough.md#dd-176--a-fresh-refactor-agent-per-slice-returned-no-edits-on-three-of-eight-small-slices)
+with one occurrence (422 physical lines, no retention changes). Product advice
+is recorded in PLAN; backlog and follow-up plans remain unchanged.
+Review complete, with hardware/failure/saved-edit and runtime-revision limits
+retained. CI is unobserved: managed delivery started no observer because the
+Codex yielded-cell bridge was unavailable; no mailbox exists to await/shut down.
