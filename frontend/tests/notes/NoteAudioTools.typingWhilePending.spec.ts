@@ -1,28 +1,20 @@
-import {
-  AiAudioController,
-  TextContentController,
-} from "@generated/donut-backend-api/sdk.gen"
-import NoteTextContent from "@/components/notes/core/NoteTextContent.vue"
-import NoteAudioTools from "@/components/notes/widgets/NoteAudioTools.vue"
 import { useNoteStore } from "@/store/noteStore"
 import makeMe from "donut-test-fixtures/makeMe"
-import helper, { mockSdkServiceWithImplementation } from "@tests/helpers"
 import { advanceNoteContentSaveDebounce } from "@tests/helpers/noteContentDebounceTestSupport"
 import { holdNoteContentSave } from "@tests/notes/noteTextContentTestSupport"
+import { useNoteAudioToolsTestLifecycle } from "@tests/notes/noteAudioToolsTestSupport"
 import {
-  dictatedTextResponse,
-  processAudio,
-  useNoteAudioToolsTestLifecycle,
-  type NoteAudioToolsWrapper,
-} from "@tests/notes/noteAudioToolsTestSupport"
+  dictatedPassage as passage,
+  useBodyEditorWithHeldDictation,
+} from "@tests/notes/noteAudioToolsTypingTestSupport"
 import {
+  blurTextarea,
   richQuillInstance,
   setTextareaValue,
   textareaEl,
 } from "@tests/notes/noteEditableContentTestSupport"
-import { flushPromises, type VueWrapper } from "@vue/test-utils"
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
-import { defineComponent, h, type ComponentPublicInstance } from "vue"
+import { flushPromises } from "@vue/test-utils"
+import { describe, expect, it, vi } from "vitest"
 
 vi.mock("@/models/audio/recorderWorklet", async () => {
   const { recorderWorkletMockExports } = await import(
@@ -47,84 +39,16 @@ vi.mock("@/models/wakeLocker", async () => {
 
 useNoteAudioToolsTestLifecycle()
 
-const passage = " The orchard path leads down to the river."
-
 describe("NoteAudioTools while the author types in the open body editor", () => {
   const noteStore = useNoteStore()
-  let wrapper: VueWrapper<ComponentPublicInstance>
-  let updateContentMock: ReturnType<typeof mockSdkServiceWithImplementation>
-  let releaseAudio: () => void
-
-  beforeEach(() => {
-    const audioHeld = new Promise<void>((resolve) => {
-      releaseAudio = resolve
-    })
-    mockSdkServiceWithImplementation(
-      AiAudioController,
-      "audioToText",
-      async () => {
-        await audioHeld
-        return dictatedTextResponse(passage)
-      }
-    )
-    updateContentMock = mockSdkServiceWithImplementation(
-      TextContentController,
-      "updateNoteContent",
-      async (options) =>
-        makeMe.aNoteRealm
-          .id(options.path.note)
-          .content(options.body?.content ?? "")
-          .please()
-    )
-  })
-
-  afterEach(() => {
-    wrapper?.unmount()
-  })
-
-  function mountEditorAndAudioTools(body: string, asMarkdown: boolean) {
-    const realm = makeMe.aNoteRealm.content(body).please()
-    const builder = helper
-      .component(
-        defineComponent({
-          setup() {
-            const current = noteStore.refOfNoteRealm(realm.id)
-            return () =>
-              h("div", [
-                h(NoteTextContent, {
-                  note: current.value!.note,
-                  readonly: false,
-                  asMarkdown,
-                  wikiLinks: [],
-                }),
-                h(NoteAudioTools, { note: current.value!.note }),
-              ])
-          },
-        })
-      )
-      .withCleanStorage()
-      .withRouter()
-    noteStore.refreshNoteRealm(realm)
-    wrapper = builder.mount({ attachTo: document.body })
-    return realm
-  }
-
-  async function whileAudioIsPending(type: () => Promise<void>) {
-    await flushPromises()
-    const processing = processAudio(
-      wrapper.findComponent(NoteAudioTools) as NoteAudioToolsWrapper
-    )
-    await flushPromises()
-    await type()
-    releaseAudio()
-    await processing
-    await flushPromises()
-    await advanceNoteContentSaveDebounce()
-  }
-
-  function lastSavedContent() {
-    return updateContentMock.mock.lastCall?.[0].body?.content
-  }
+  const {
+    mountEditorAndAudioTools,
+    showInEditor,
+    dictate,
+    whileAudioIsPending,
+    savedContents,
+    lastSavedContent,
+  } = useBodyEditorWithHeldDictation()
 
   const redBicycleBody = [
     "Original paragraph one: The museum opens at nine each morning. Our tickets are booked for Tuesday.",
@@ -134,7 +58,7 @@ describe("NoteAudioTools while the author types in the open body editor", () => 
   const typed = " MANUAL EDIT: Keep this red bicycle sentence."
 
   it("keeps typing at the end of the rich editor and saves the passage after it", async () => {
-    mountEditorAndAudioTools(redBicycleBody, false)
+    const { wrapper } = mountEditorAndAudioTools(redBicycleBody, false)
     const quill = () => richQuillInstance(wrapper)
 
     await whileAudioIsPending(async () => {
@@ -147,7 +71,7 @@ describe("NoteAudioTools while the author types in the open body editor", () => 
   })
 
   it("keeps typing at the end of the Markdown editor and saves the passage after it", async () => {
-    mountEditorAndAudioTools(redBicycleBody, true)
+    const { wrapper } = mountEditorAndAudioTools(redBicycleBody, true)
 
     await whileAudioIsPending(async () => {
       await setTextareaValue(wrapper, `${redBicycleBody}${typed}`)
@@ -162,7 +86,7 @@ describe("NoteAudioTools while the author types in the open body editor", () => 
   it("keeps a correction in the middle and puts the passage at the end", async () => {
     const body =
       "The book I bought yesterday is a gift from my sister. She enjoys gardens."
-    mountEditorAndAudioTools(body, false)
+    const { wrapper } = mountEditorAndAudioTools(body, false)
     const quill = () => richQuillInstance(wrapper)
 
     await whileAudioIsPending(async () => {
@@ -179,19 +103,14 @@ describe("NoteAudioTools while the author types in the open body editor", () => 
 
   it("saves the passage as soon as it joins the open editor's draft", async () => {
     mountEditorAndAudioTools(redBicycleBody, true)
-    await flushPromises()
-    const processing = processAudio(
-      wrapper.findComponent(NoteAudioTools) as NoteAudioToolsWrapper
-    )
-    releaseAudio()
-    await processing
-    await flushPromises()
+
+    await dictate()
 
     expect(lastSavedContent()).toBe(`${redBicycleBody}${passage}`)
   })
 
   it("keeps typing that was already saved and saves the passage after it once", async () => {
-    mountEditorAndAudioTools(redBicycleBody, true)
+    const { wrapper } = mountEditorAndAudioTools(redBicycleBody, true)
 
     await whileAudioIsPending(async () => {
       await setTextareaValue(wrapper, `${redBicycleBody}${typed}`)
@@ -206,9 +125,9 @@ describe("NoteAudioTools while the author types in the open body editor", () => 
   })
 
   it("keeps typing whose save is still in flight and saves the passage after it once", async () => {
-    const realm = mountEditorAndAudioTools(redBicycleBody, true)
+    const { wrapper, note } = mountEditorAndAudioTools(redBicycleBody, true)
     const releaseSave = holdNoteContentSave((saved) =>
-      makeMe.aNoteRealm.id(realm.id).content(saved).please()
+      makeMe.aNoteRealm.id(note.id).content(saved).please()
     )
 
     await whileAudioIsPending(async () => {
@@ -219,5 +138,28 @@ describe("NoteAudioTools while the author types in the open body editor", () => 
     await flushPromises()
 
     expect(lastSavedContent()).toBe(`${redBicycleBody}${typed}${passage}`)
+  })
+
+  it("adds the passage to the saved body of a note the author has left", async () => {
+    const { wrapper, note: noteA } = mountEditorAndAudioTools(
+      redBicycleBody,
+      true
+    )
+    const noteB = makeMe.aNoteRealm.content("Note B body.").please()
+
+    await whileAudioIsPending(async () => {
+      await setTextareaValue(wrapper, `${redBicycleBody}${typed}`)
+      await blurTextarea(wrapper)
+      await showInEditor(noteB)
+    })
+
+    expect(lastSavedContent(noteA.id)).toBe(
+      `${redBicycleBody}${typed}${passage}`
+    )
+    expect(noteStore.refOfNoteRealm(noteA.id).value?.note.content).toBe(
+      `${redBicycleBody}${typed}${passage}`
+    )
+    expect(textareaEl(wrapper).value).toBe("Note B body.")
+    expect(savedContents(noteB.id)).toHaveLength(0)
   })
 })

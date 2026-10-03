@@ -146,13 +146,19 @@ fails.
 
 ### 4. A passage for a note the author has left goes to its saved body
 Type: Behavior
-Status: planned
+Status: done
 Proof: new spec case for example 4; existing `NoteAudioTools.preservation.spec.ts`
 stays green.
 
 Behavior: type into note A, switch the same editor to note B with `setProps`,
 release → A's saved body gains the passage; B's editor shows no passage and
 B gets no content save.
+Accepted: mounted case "adds the passage to the saved body of a
+note the author has left" (types into A, blurs as a navigation click does,
+switches the same editor to B) → A's last save and store content are typing +
+passage, B shows no passage and gets no save; focused command → 20 files, 114
+tests; `vue-tsc` clean. The harness moved to
+`noteAudioToolsTypingTestSupport.ts` for slices 5–6.
 
 ### 5. The rich editor keeps the caret
 Type: Behavior
@@ -188,6 +194,9 @@ value while focused.
   browser time): a passage joining the open draft waited for the autosave
   debounce. The editor's `appendToDraft` now flushes right away; mounted case
   "saves the passage as soon as it joins the open editor's draft" failed first.
+- Switching the same editor instance to another note without a blur drops
+  unsaved typing still inside the debounce (draft replaced by the new note's
+  content). Pre-existing and outside this story; a navigation click blurs first.
 - A passage arriving while removal or image upload has closed admission is
   ignored by the editor's `onUpdate` and not written elsewhere — the
   save-then-change overlap the plan leaves unaddressed.
