@@ -80,17 +80,28 @@ const resize = () => {
   }
 }
 
+// An outside value change keeps the user's caret. It is restored within the
+// same render flush, so a caller's own nextTick caret placement wins.
+let keptSelection: [number, number] | null = null
+
 watch(
   () => props.modelValue,
-  async (value) => {
+  (value) => {
     const el = input.value
-    const keepCaret =
+    keptSelection =
       el !== null && el === document.activeElement && el.value !== value
-    const { selectionStart, selectionEnd } = el ?? {}
-    await nextTick()
-    if (keepCaret) el.setSelectionRange(selectionStart!, selectionEnd!)
-    resize()
+        ? [el.selectionStart, el.selectionEnd]
+        : null
   }
+)
+
+watch(
+  () => props.modelValue,
+  () => {
+    if (keptSelection) input.value!.setSelectionRange(...keptSelection)
+    resize()
+  },
+  { flush: "post" }
 )
 
 onMounted(async () => {

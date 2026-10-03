@@ -75,9 +75,16 @@ Focused command:
 
 ### 1. A Markdown paste leaves the caret after the pasted text
 Type: Behavior
-Status: planned
+Status: done
 Proof: the new paste case fails first with `[7, 17]`, then passes; focused
 command green; `vue-tsc` clean.
+
+Accepted proof: `NoteEditableContent.paste.spec.ts` "leaves the caret after
+the pasted markdown in a focused textarea" (red `[7, 17]`, green `[22, 22]`)
+and "leaves the caret after the original text when the paste choice replaces
+it" (the `replace` path shared the symptom: red `[7, 17]`, green `[14, 14]`);
+focused command 59 files / 437 tests green; `vue-tsc` clean.
+`mountAndPaste` now focuses the textarea before pasting.
 
 `TextArea` keeps the caret for an outside value, but a caller that places the
 caret after its own change must win. Suggested approach: capture the
