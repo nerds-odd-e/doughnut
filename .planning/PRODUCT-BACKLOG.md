@@ -6,8 +6,6 @@ Audio tools, starting with voice input. Make voice input work reliably and easy 
 
 ## Taken
 
-- [Removals leave no trace without the owner restating the rule](seeds/SEED-068-owner-rules-reach-every-agent.md#removal-rule-in-guidance) — SEED-068#removal-rule-in-guidance ([plan](slice-plans/004-removal-rule-in-guidance/PLAN.md))
-
 ## Backlog list
 
 - [Start and keep local app stacks on current backend code](seeds/SEED-067-dependable-local-app-stacks.md#stacks-survive-other-builds) — SEED-067#stacks-survive-other-builds
