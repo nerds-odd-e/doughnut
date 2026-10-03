@@ -59,6 +59,12 @@ report. Do not create a parallel registry. Missing identity needed by a later
 action stops that action instead of reconstructing or guessing it after plan
 deletion.
 
+With supplied dashboard reporting context, read and retain
+[dashboard completion](../dough-land/references/dashboard-completion.md), its
+command and a surviving working directory now, before either Trunk Mode `finish`
+or Story Branch retirement can remove the checkout. Prepare any attention file
+outside it; reporting itself remains the final operation.
+
 ## Establish execution completion
 
 Judge completion from the selected work and available execution evidence.
@@ -127,6 +133,11 @@ record that revision as the before-cleanup commit, even when the current
 revision was already suitable. If commit conventions, ownership, or recovery
 cannot be resolved, leave the material intact, report the gap, and do not claim
 closure. In Trunk Mode, publish that commit through [wrap-up closure publication](../dough-execute-plan/references/wrap-up-closure-publication.md) before deleting spent history.
+
+Before deletion, follow the shared [supplier dependency procedure](../dough-product-backlog/references/supplier-dependencies.md)
+to discover current consumers and retain recoverable completion evidence. In Trunk
+Mode, resolve and publish consumer changes after accepted before-cleanup publication
+and before `finish` can retire the workspace.
 
 ## Delete spent history, including shared records
 
@@ -207,6 +218,11 @@ is the accepted candidate SHA and the remote trunk ref. A superseded candidate
 is not the receipt. Unresolved integration preserves the execution resources
 and blocks completion. Do not force-push.
 
+After accepted Story Branch supplier integration, [resolve and publish consumers](../dough-product-backlog/references/supplier-dependencies.md#apply-and-publish-a-direct-resolution)
+through the same closure publication/completion procedure before retirement, using
+the resulting accepted SHA and shutdown receipt. Finish or explicitly retain
+unresolved dependency work and evidence in existing active context; report gaps.
+
 ## Remove execution resources safely
 
 Retirement removes the worktree only when its [creation record](../dough-manual-testing/references/exploration-workspace.md#close-or-retain-it)
@@ -221,17 +237,17 @@ partial cleanup without repeating already-completed closure. Skip cleanup in dir
 
 ## Report
 
-Report selected work and identity, completion judgment, mode and retained
-checkout/branch/remote/target, before-cleanup and final-closure commits when
-deletion happened, Trunk Mode published closure SHAs, the
-completion receipt (CI verdict or exact unresolved reason with shutdown
-evidence), remaining CI coverage, assimilated knowledge, deleted paths, Story
-Branch saved tip and integration/push results to the authorized trunk target,
-each refresh result (including not applicable), worktree and branch cleanup
-results (remote deletion only when verified absent), preserved material and
-resources, and any gap. Distinguish a new merge from an already-integrated tip,
-integration from refused cleanup, an accepted trunk receipt from a superseded
-candidate, committed pending publication from an accepted receipt, and completed
+Apply Dough Land's shared [completion attention](../dough-land/SKILL.md#completion-attention)
+rule and its [final dashboard operation](../dough-land/references/dashboard-completion.md)
+with the supplied launch context, after either closure path has settled. Keep the selected identity, mode and retained execution context,
+before-cleanup and final-closure commits, accepted publication and completion
+receipts, remaining coverage, knowledge and cleanup dispositions in their
+existing operational evidence and lasting homes. Do not produce a success recap
+solely to repeat them.
+
+When attention is needed, report the affected facts and next action. Distinguish
+accepted trunk publication from a superseded candidate, integration from refused
+cleanup, committed pending publication from an accepted receipt, and completed
 wrap-up from a refusal that left files intact. End successful closure with
 `## STORY WRAP-UP COMPLETE`. Missing context, unfinished work, unresolved
 recovery/integration, required push, unpublished Trunk Mode closure, retained
