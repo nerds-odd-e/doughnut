@@ -34,7 +34,7 @@ export function registerOpenNoteContentEditor(
   }
 }
 
-/** Appends to the open body editor's draft for the note; false when none is open. */
+/** Appends to the open body editor's draft for the note and saves it; false when none is open. */
 export function appendToOpenNoteContentDraft(
   noteId: number,
   text: string

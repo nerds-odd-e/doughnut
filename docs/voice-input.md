@@ -35,7 +35,7 @@ once written, is never revised: holding back the unfinished sentence replaces
 revising it. Audio that is entirely silent is not sent.
 The model controls transcription quality and passage whitespace. When a body
 editor for the note is open, the passage is added to the end of that editor's
-draft, including unsaved typing, and saved by its ordinary autosave; otherwise
+draft, including unsaved typing, and that draft is saved right away; otherwise
 it is added to the note's saved body.
 
 The mounted audio preservation tests assert exact saved content for long and
@@ -137,7 +137,7 @@ focus the body editor and type at the end:
 When the result arrives, the typed sentence stays visible and the orchard
 passage follows it. A correction made elsewhere in the body, such as changing
 "from" to "for", also stays, and the passage still goes at the end. The draft
-with the passage is saved by the editor's ordinary autosave, so both originals,
+with the passage is saved as soon as the passage joins it, so both originals,
 the lighthouse addition, the typed sentence and the passage are saved once
 each. The mounted typing-while-pending tests cover the rich and Markdown
 editors.

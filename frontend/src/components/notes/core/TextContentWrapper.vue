@@ -157,7 +157,10 @@ if (props.field === "edit content") {
       unregisterContentEditor?.()
       unregisterContentEditor = registerOpenNoteContentEditor(noteId, {
         flushAndWait,
-        appendToDraft: (text) => onUpdate(localValue.value + text),
+        appendToDraft: (text) => {
+          onUpdate(localValue.value + text)
+          flush()
+        },
       })
     },
     { immediate: true }

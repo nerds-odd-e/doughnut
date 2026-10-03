@@ -184,9 +184,10 @@ value while focused.
 
 ## Learnings
 
-- With an editor open, the passage is saved after the editor's debounce, so a
-  next audio request starting within it builds its "previous content" excerpt
-  without the previous passage (spacing only, excluded scope).
+- CI repair (run 37124860341, `record_live_audio.feature` under mocked
+  browser time): a passage joining the open draft waited for the autosave
+  debounce. The editor's `appendToDraft` now flushes right away; mounted case
+  "saves the passage as soon as it joins the open editor's draft" failed first.
 - A passage arriving while removal or image upload has closed admission is
   ignored by the editor's `onUpdate` and not written elsewhere — the
   save-then-change overlap the plan leaves unaddressed.

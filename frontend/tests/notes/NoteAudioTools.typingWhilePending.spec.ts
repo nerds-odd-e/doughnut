@@ -177,6 +177,19 @@ describe("NoteAudioTools while the author types in the open body editor", () => 
     )
   })
 
+  it("saves the passage as soon as it joins the open editor's draft", async () => {
+    mountEditorAndAudioTools(redBicycleBody, true)
+    await flushPromises()
+    const processing = processAudio(
+      wrapper.findComponent(NoteAudioTools) as NoteAudioToolsWrapper
+    )
+    releaseAudio()
+    await processing
+    await flushPromises()
+
+    expect(lastSavedContent()).toBe(`${redBicycleBody}${passage}`)
+  })
+
   it("keeps typing that was already saved and saves the passage after it once", async () => {
     mountEditorAndAudioTools(redBicycleBody, true)
 
