@@ -167,29 +167,111 @@ technical redesign, or speculative infrastructure.
 
 **Identity:** SEED-066#preserve-existing-content
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"not-refined","approach":"unselected"}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/001-preserve-existing-content/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"4cefb64119caf23172921e7ea0508ed854840c2333375133e3b74324fe6040dc","plan":"3f3d2b9772e45ca0087ba58dbc8fca4f7816e953e6e9c5a48169e04972209a2e"}}
 ```
 
-- **For / why:** Let an author add a thought by speaking without risking text
-  they already wrote.
-- **Evaluation:** Given an existing note, record a short passage and stop.
-  The addition appears once and every original passage survives reload.
-  Include a long existing body so retaining only its end cannot satisfy this
-  outcome. An empty-body note remains a usable capture starting point.
-- **Evidence / learning:** Original paragraphs and a short lighthouse addition
-  survived some sessions, but an existing paragraph was truncated during the
-  recorded navigation journey. Establish a repeatable preservation guarantee
-  without treating navigation as the proved cause.
-- **Boundary:** This story owns a short addition and untouched existing text.
-  Cumulative speech and concurrent typed changes have separate stories. Evaluate
-  preservation on the originating note when a result arrives after in-app
-  navigation; the destination must remain untouched.
-- **Effort hypothesis:** M — low confidence; assumes the short-addition workflow
-  can be bounded without a broader recording redesign.
+#### Goal
+
+A note author who opens Audio tools on an existing note can speak a short
+thought and get it added to the note without any risk to what they already
+wrote. Every passage that existed before the recording started is still there,
+word for word, after the result arrives and after reload. This makes spoken
+capture trustworthy enough to use on real notes. It is the first step toward
+the epic's dependable voice capture; it does not yet promise stable longer
+dictation, typing during processing, titles, speed, or new controls.
+
+#### Scope
+
+- **Required:**
+  - Text that existed in the body when recording started is never changed,
+    shortened, reordered, or removed by a voice result. This holds for any
+    body length, including bodies far longer than the excerpt sent as context.
+  - The dictated passage appears once, after the existing content, separated
+    so it reads as new text. Paragraph or space separation is not a promise.
+  - The result is saved to the note where recording started, even if the
+    author has moved to another note in the app. The other note is untouched.
+  - An empty-body note still works: the body becomes the dictated passage.
+  - The normal undo for a content edit stays available for the addition. This
+    already exists; it is not new work.
+- **Rejection constraint:** A voice result must not revise text that existed
+  before the recording started, even to join or fix an unfinished last
+  sentence. The story's own promise, "without changing existing note content",
+  justifies this. The author's own typing and undo still change any text.
+- **Deferred promises (other stories own them):**
+  - What happens between Flush updates inside one recording, including
+    revision of the current unfinished sentence:
+    [keep completed speech](#preserve-completed-speech).
+  - Text typed in the editor while a result is pending:
+    [keep typed corrections](#preserve-typed-corrections).
+  - Automatic title changes during dictation:
+    [author-controlled titles](#author-controlled-titles).
+  - Speed, failure recovery and controls follow their own stories.
+- **Assumptions:** The existing Record Audio and Stop Recording controls are
+  the entry point. No new UI is needed for this story. The transcription
+  quality of the passage itself is not part of the promise.
+
+#### Key examples
+
+1. **Long existing body.** A note has five saved paragraphs, more than 500
+   characters in total. The first is “Original paragraph one: The museum
+   opens at nine each morning. Our tickets are booked for Tuesday.” The
+   author records the 6-second lighthouse passage and stops. → The body is the
+   five original paragraphs unchanged, followed by the lighthouse sentences
+   once. Reload shows the same. (In discovery, the first paragraph became
+   literal `...uesday.`)
+2. **Empty body.** A note has an empty body. The author records the Harvard
+   passage and stops. → The body holds that passage once, and it survives
+   reload.
+3. **Moving to another note while processing.** The author starts recording
+   on note A. While the audio is being processed, they open note B, then stop.
+   → After reload, note A has its original body plus the addition. Note B's
+   body “DESTINATION ORIGINAL: The violet umbrella stays on shelf seven…” is
+   unchanged.
+4. **Second short recording.** After example 1, the author records another
+   short passage on the same note. → The original paragraphs and the
+   lighthouse addition remain unchanged and appear once. The new passage
+   follows them once.
+
+#### Architecture
+
+Current behavior, from code reading on 2026-10-03:
+
+- The frontend sends only the last 500 characters of the body, with a literal
+  `...` prefix, as `previousNoteContentToAppendTo`
+  (`useNoteAudioProcessing.ts`).
+- The model's prompt asks for an append diff, but its result schema is
+  `NoteContentCompletion.content`, described as complete new content.
+- `noteStore.completeContent` saves that value as the **whole** body.
+- So a model answer that repeats the excerpt it was given replaces the full
+  body with that excerpt. This matches the observed `...uesday.` truncation and
+  the source payload that held only new content.
+- The note id is captured when Audio tools open, so results already go to the
+  originating note. The `note.content` read for the excerpt may be stale; that
+  is unconfirmed.
+
+Design direction for planning:
+
+- A voice result becomes an **addition**, not complete note content.
+- Combining it with the note body is a deterministic append to the note's
+  current content. It is not a model-generated replacement or diff.
+- The excerpt remains context only, so its length no longer limits safety.
+- Whether the append runs on the client or the server is a planning choice.
+  Planning should weigh it against the deferred typed-corrections story,
+  without promising that story's behavior here.
+- No Accepted ADR conflicts with this direction. Under
+  [ADR 0006](../../docs/adrs/0006-failure-handling-accepted.md), a failed or
+  empty result fails loudly rather than falling back to a replacement. The
+  addition is saved through the ordinary note-content path, so
+  [ADR 0002](../../docs/adrs/0002-git-native-portable-notebook-synchronization-accepted.md)
+  synchronization is unaffected.
+
+- **Effort hypothesis:** M — medium confidence. The cause is now localized to
+  how the result is merged; the remaining risk is keeping each Flush update
+  sensible without taking on the completed-speech story.
 - **Depends on:** None; dictating into an existing note already exists.
 - **Safe stopping point:** Authors have a dependable short-addition journey.
-  Its saved result must preserve existing text and the intended destination even
-  if later stories are cancelled; it does not claim all longer-session or
+  Its saved result keeps existing text and the intended note safe even if
+  later stories are cancelled. It does not claim that all longer-session or
   simultaneous-edit behavior is repaired.
 
 <a id="preserve-completed-speech"></a>
