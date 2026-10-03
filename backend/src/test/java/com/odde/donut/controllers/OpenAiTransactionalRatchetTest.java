@@ -47,8 +47,7 @@ class OpenAiTransactionalRatchetTest {
   private static final Set<Method> CANDIDATES =
       new LinkedHashSet<>(
           Set.of(
-              // AiNoteAutomationService (suggestTitle / refinement / extract) call chain
-              method(AiController.class, "suggestTitle", Note.class),
+              // AiNoteAutomationService (refinement / extract) call chain
               method(
                   AiController.class,
                   "generateRefinementSuggestions",
@@ -88,7 +87,6 @@ class OpenAiTransactionalRatchetTest {
   // stops holding a transaction across the OpenAI call.
   private static final Set<Method> ALLOWLIST =
       Set.of(
-          method(AiController.class, "suggestTitle", Note.class),
           method(
               AiController.class,
               "generateRefinementSuggestions",

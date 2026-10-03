@@ -233,7 +233,6 @@ Use this for endpoint lookup; open `sdk.gen.ts` or `types.gen.ts` only for exact
 
 ## Ai Controller
 
-- `suggestTitle`: POST `/api/ai/suggest-title/{note}` -> `SuggestTitleResponse` (request: `SuggestTitleData`; path: note; response body: SuggestedTitleDto)
 - `removeRefinementSuggestion`: POST `/api/ai/remove-refinement-suggestion/{note}` -> `RemoveRefinementSuggestionResponse` (request: `RemoveRefinementSuggestionData`; path: note; body: NoteRefinementLayoutSelectionRequestDto; response body: RefinedContentResponseDto)
 - `generateRefinementSuggestions`: POST `/api/ai/generate-refinement-suggestions/{note}` -> `GenerateRefinementSuggestionsResponse` (request: `GenerateRefinementSuggestionsData`; path: note; body: NoteRefinementQuestionContextDto; response body: NoteRefinementLayout)
 - `extractNotePreview`: POST `/api/ai/extract-note-preview/{note}` -> `ExtractNotePreviewResponse` (request: `ExtractNotePreviewData`; path: note; body: NoteRefinementLayoutSelectionRequestDto; response body: NoteExtractionResult)

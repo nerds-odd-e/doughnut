@@ -60,17 +60,6 @@ public class AiController {
     return otherAiServices.getAvailableGptModels();
   }
 
-  @PostMapping("/suggest-title/{note}")
-  @Transactional
-  public SuggestedTitleDTO suggestTitle(
-      @PathVariable(value = "note") @Schema(type = "integer") Note note)
-      throws UnexpectedNoAccessRightException, JsonProcessingException {
-    authorizationService.assertAuthorization(note);
-    String title =
-        notebookAssistantForNoteServiceFactory.createNoteAutomationService(note).suggestTitle();
-    return new SuggestedTitleDTO(title);
-  }
-
   @PostMapping("/generate-refinement-suggestions/{note}")
   @Transactional
   public NoteRefinementLayout generateRefinementSuggestions(

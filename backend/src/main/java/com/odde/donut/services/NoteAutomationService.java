@@ -15,10 +15,6 @@ public final class NoteAutomationService {
     this.aiNoteAutomationService = aiNoteAutomationService;
   }
 
-  public String suggestTitle() throws JsonProcessingException {
-    return aiNoteAutomationService.suggestTitle();
-  }
-
   public NoteRefinementLayout generateRefinementSuggestions(
       NoteRefinementQuestionContextDTO questionContext) throws JsonProcessingException {
     return aiNoteAutomationService.generateRefinementSuggestions(questionContext);

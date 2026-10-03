@@ -80,7 +80,7 @@ dictation no longer changes titles.
 
 ### 2. Remove the suggest-title endpoint and its dead code
 Type: Structure (owned cleanup of the removal above)
-Status: planned
+Status: done
 Proof: focused backend tests, API regeneration, and frontend typecheck, as
 listed in Outside-in proof.
 
@@ -91,6 +91,12 @@ and its now-unused 4-argument `executeWithTool` overload,
 `AiControllerTest` with imports they alone used, and the ratchet entries. Then
 regenerate `open_api_docs.yaml` and the generated client. Remove any import or
 helper that compilation or Biome then reports unused.
+
+Accepted: focused backend tests (6) passed, API regenerated, `vue-tsc` clean,
+no remaining `suggestTitle`/`SuggestedTitleDTO`/`suggestNoteTitleAiTool`
+references. The refactor pass also inlined the last `executeWithTool` overload
+and made `maxOutputTokens` non-nullable; `AiController*` and
+`AiNoteAutomationServiceTest` (36 tests) passed after it.
 
 ## Current decisions
 
