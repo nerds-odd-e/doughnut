@@ -167,28 +167,67 @@ technical redesign, or speculative infrastructure.
 
 **Identity:** SEED-066#preserve-completed-speech
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"not-refined","approach":"unselected"}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/001-keep-completed-speech/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"9eb09e72a73cf3d926b575a0e816ec5f3d6beb0b2806578bc44ed9f39fdf4b79","plan":"1665d6a9c0178f525dab992786335ea1491010450b229a4b62f94974ffb0d8f8"}}
 ```
 
-- **For / why:** Let an author develop a longer thought without earlier spoken
-  facts disappearing as later speech is processed.
-- **Evaluation:** Dictate several passages, pause, flush, continue, and stop.
-  Completed passages remain present once after reload. Use the recorded orchard
-  passage: its completed facts survive the later book and meeting sentences,
-  including the eight-second pause inside the book sentence.
-- **Evidence / learning:** Flush replaced completed orchard facts with a middle
-  fragment; the final saved body retained only the last sentences. Test whether
-  useful recent revision can coexist with stable completed content.
-- **Boundary:** Completed passages remain fixed automatically; only the current
-  unfinished sentence may be revised to interpret continuing speech. A pause
-  alone does not settle whether a sentence is finished. The operational revision
-  boundary needs refinement. Author-requested edits remain author-controlled.
-- **Effort hypothesis:** L — low confidence; assumes one cohesive revision rule
-  can cover the observed pause/flush/stop journey without a larger redesign.
+- **Goal:** Let a note author develop a longer spoken thought, with pauses and
+  Flush, and end up with every completed sentence once and each sentence whole,
+  instead of earlier facts disappearing or a sentence broken at a pause. This
+  makes longer dictation trustworthy, the next step after safe additions to
+  existing content.
+- **Scope (required):**
+  - Completed passages written during a recording stay unchanged through later
+    pauses, Flush, and Stop, and appear once after reload. The preceding
+    [append-only addition](../../docs/voice-input.md#adding-dictated-text-to-a-note)
+    likely already provides this; this story confirms it with the orchard
+    journey rather than assuming it.
+  - **Hold back the unfinished tail:** an automatic pause flush or a Flush click
+    writes only the speech before the last transcription segment. That
+    segment's audio is kept for the next chunk, as timed mid-speech processing
+    already does. Only Stop writes all remaining speech.
+  - Written dictated text is never revised later. The note stays add-only, as
+    the append behavior promises.
+- **Decision (owner, 2026-10-03):** Hold back the unfinished sentence instead of
+  showing it early and revising it. Showing then revising would bring back
+  replacement and the need to track which text may still be revised.
+- **Boundary assumptions:** The held-back unit is the existing last
+  transcription segment. Recognizing whether a sentence is finished is not
+  promised, so a finished last sentence may also wait until the next chunk or
+  Stop. A pause alone never forces an unfinished sentence to be written as
+  finished. Author-made edits stay under the author's control.
+- **Deferred:** Faster appearance of the held-back text belongs to
+  [See submitted dictation promptly](#prompt-dictation-results). Typing during
+  processing belongs to
+  [Keep typed corrections](#preserve-typed-corrections). Correcting individual
+  words the model mishears (such as "from my sister" instead of "for my
+  sister") is not promised.
+- **Key examples:**
+  1. **Orchard journey:** A note has an existing paragraph. Dictate the
+     [recorded orchard passage](../../docs/voice-input.md#completed-dictated-content-can-disappear)
+     at natural pace, with the eight-second pause after "yesterday", click
+     Flush about 22 seconds in, continue, then Stop. After reload: the original
+     paragraph, then the orchard facts, the complete book sentence, and the
+     meeting sentences, each once. "The book that I bought yesterday" is not
+     written as a separate finished sentence.
+  2. **Pause in the middle of a sentence:** Saying "The book that I bought
+     yesterday," then staying silent until the automatic flush writes nothing
+     from that half sentence. When speech continues and the next chunk
+     finishes, the sentence appears whole.
+  3. **Stop writes the rest:** Stopping right after a Flush writes the held-back
+     segment once. Nothing that was spoken is left out of the saved body.
+- **Evidence / learning:** Before the append change, Flush replaced the
+  completed orchard facts with a middle fragment, and the final save kept only
+  the last sentences. The pause (a silence-threshold flush) and Flush both
+  processed audio as not mid-speech, which finished the half sentence early.
+- **Effort hypothesis:** M, medium confidence. Assumes that holding back the
+  last segment on pause or Flush reuses the existing mid-speech path, and that
+  the real-service orchard journey confirms the append change preserves
+  completed passages.
 - **Depends on:** Safe addition to existing content, the outcome of
   [dictated-text additions](../../docs/voice-input.md#adding-dictated-text-to-a-note).
-- **Safe stopping point:** Longer dictation retains completed thoughts and
-  original content once after reload, independently of later speed or UI work.
+- **Safe stopping point:** Longer dictation keeps completed thoughts and
+  original content once after reload, and pauses no longer break sentences,
+  regardless of later speed or UI work.
 
 <a id="author-controlled-titles"></a>
 ### Keep note titles under the author's control
