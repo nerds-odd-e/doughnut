@@ -272,4 +272,19 @@ History check (2026-10-03): the resume spec, `mainMenuTestSupport.ts`,
 settings in `vitest.config.ts` are unchanged. The one nearby change is
 `3624e353a8` on 2026-10-02, which moved `vitest`, `@vitest/browser-playwright`
 and `@vitest/ui` from 5.0.2 to 5.0.3, the day before the only known failure.
-The mocker's changes between those versions have not been compared.
+Comparing the published 5.0.2 and 5.0.3 packages (`vitest`, `@vitest/browser`,
+`@vitest/browser-playwright`, `@vitest/mocker`) and the upstream commits
+`v5.0.2...v5.0.3` found nothing that changes when or how a mock is applied:
+- the mocker now checks a path boundary when stripping the root (`1c3888bce`).
+  That changes only paths in a sibling folder whose name starts with the root's
+  name. It is deterministic, so it would fail every time;
+- `prepare()` passes the queue iterator to `Promise.all` without spreading it.
+  It behaves the same;
+- the Playwright provider changes only the error type for a page crash;
+- the browser server now starts listening at the first browser launch rather
+  than at startup (`7d8ed3e9b`), which is once per run, not per file;
+- the module-cache fix (`38f98855f`) is in Node-side module fetching, which
+  browser mode does not use for spec modules;
+- the remaining changes are build-tool output.
+
+The update is not a supported cause.
