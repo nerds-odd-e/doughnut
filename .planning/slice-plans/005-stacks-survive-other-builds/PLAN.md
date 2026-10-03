@@ -108,7 +108,25 @@ external-wait exception).
 
 ### 2. Development start after deleted sources: reproduce or explain
 Type: Behavior (probe)
-Status: planned
+Status: done (not reproduced)
+Observation (2026-10-03, default checkout on `main` at `a18969b16d`, owner's
+go-ahead; probe edits restored, checkout clean, Development left running):
+- A: added `@Service ProbeGoneService`, injected it into
+  `AuthoredNoteDocumentPersistence`, ran `backend/gradlew -p backend classes
+  --build-cache` (class written), deleted the service and reverted the
+  consumer with the stack stopped, ran `pnpm dev`. Healthy at 18:47:38; no
+  `APPLICATION FAILED TO START`; `ProbeGoneService.class` gone.
+- C: same pair (compile came `FROM-CACHE`), deleted, then `pnpm dev` started
+  2 s after a concurrent `backend/gradlew -p backend classes --rerun-tasks
+  --no-daemon`. Healthy at 18:48:44; class gone; no restart.
+- B (start after `git checkout` across the removal): not run. To Gradle a
+  checkout that deletes a source is the same deletion as A, and checking out a
+  pre-removal revision would run old code against the owner's Development
+  database.
+- Other writers: `backend/bin` is IDE output (last written 2026-09-04), not on
+  the `bootRunDev` classpath, and holds no `NotebookGitCutover*` class.
+Result: no reproduced symptom and no writer found; the Development promise
+returns to the owner (keep watching DD-159 or drop it). No fix slice.
 Proof: an owner-held observation in the default checkout, recorded here. It
 either reproduces the stale-class start with its writer, or reports the
 attempts that did not reproduce it.

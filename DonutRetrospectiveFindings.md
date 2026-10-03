@@ -30,6 +30,7 @@ runner's own compiler as the writer; its correction still holds.
   - Evidence: `dev.log` "APPLICATION FAILED TO START" with the missing-bean message; `git grep NotebookGitCutoverService -- backend/src` found nothing; the next `pnpm dev` was healthy.
   - Observed effect: one failed start and a short diagnosis before the UAT setup could continue.
   - Inference: the Development start's incremental build did not drop classes whose sources were deleted. Qualified: cause not investigated further.
+- Investigation (2026-10-03, SEED-067#stacks-survive-other-builds slice 2): not reproduced. In the default checkout, a compiled `@Service` and its injecting consumer were deleted with the stack stopped, then `pnpm dev` started healthy and Gradle removed the stale class; the same held with a concurrent `classes --rerun-tasks` build and with a build-cache restore. Earlier linked-worktree probes (single, concurrent, after a failed compile) also removed the classes. No writer found; the cause remains unknown. Owner decides whether to keep watching or drop.
 
 #### DD-200 — Concurrent backend verification disrupted an E2E hot-reloading runtime
 
