@@ -6,7 +6,7 @@ released response is not proof of effectiveness. Unknown provenance stays unknow
 [Response status](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/finding-names.md).
 Full pre-trim evidence: `8830c682704aac3bbb34bf9b1204da8feba042ca:DearDough.md`. Older narratives live in Git, not a second archive.
 
-- Highest allocated local number: 201. Removed local codes are never reused.
+- Highest allocated local number: 202. Removed local codes are never reused.
 
 ## ODF-034 — CI observer started for a feature branch that this project's workflow never triggers on
 
@@ -375,6 +375,7 @@ Follow-up: Open, unqueued.
 
 - Execution: SEED-059#story-18 / slice-plans/060-panel-after-one-paragraph-epub-block / d439c05234; Timestamp: 2026-09-30, ~10:25+08:00 (slice 1 delivery); Tool: Claude Code; Model: claude-sonnet-5-5; Open Dough release: unknown. - Evidence: `deliver --target-ref origin/story/SEED-059-story-18` exited with "authorized target must be a branch ref: origin/story/SEED-059-story-18"; retry with `refs/heads/story/SEED-059-story-18` was accepted (sha d439c05234). - Observed effect: one rejected delivery call, nothing published. - Inference: a second coordinator made the same first-try mistake, so the form is not discoverable from trunk-publication.md alone.
 - Execution: SEED-062#story-1 / slice-plans/006-reify-property / 508d4909b5; Timestamp: unknown (slice 1 delivery on 2026-09-30, about 18:50 +08:00); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.50. - Evidence: `deliver --target-ref claude/reify-a-property` exited with "authorized target must be a branch ref: claude/reify-a-property"; retry with `refs/heads/claude/reify-a-property` accepted 508d4909b5. - Observed effect: one rejected call, nothing published. - Inference: a bare branch name is as natural a first guess as a remote-tracking ref; the form still is not shown next to the step.
+- Execution: SEED-066#author-controlled-titles / slice-plans/002-keep-titles-under-author-control / aa093fffeb; Timestamp: unknown (slice 1 delivery on 2026-10-03, shortly after 14:55 +08:00); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.54. - Evidence: `deliver --target-ref claude/keep-note-titles-under-the-author-s-control` exited with "authorized target must be a branch ref"; retry with `refs/heads/...` accepted aa093fffeb. - Observed effect: one rejected call, nothing published. - Inference: third occurrence; the coordinator had read the `--help` usage, which also says only `--target-ref REF`.
 
 ## DD-176 — A fresh refactor agent per slice returned "no edits" on three of eight small slices
 
@@ -392,6 +393,15 @@ Follow-up: Open, unqueued.
   - Evidence: 2026-10-03 execution conversation and `2533d739a16f025d612a38b405e63a30e804d65c:.planning/slice-plans/001-discover-voice-input-problems/PLAN.md`, fresh post-change-refactor reports for slices 3–10; all eight returned “none — already clean,” with reported active durations of about 20 seconds to one minute. Slice 1 split detailed evidence/context; slice 2 shortened the epic summary.
   - Observed effect: eight consecutive documentation-only slices required independent refactor handoffs without edits; accepted manual proof needed no rerun. The first two reviews made useful record changes. Token usage was not supplied.
   - Inference: the mandatory handoffs consume some of a bounded discovery mission, although this record does not establish net review value or measured token cost. Consider a cheaper review route for documentation-only slices; no current execution requirement was waived.
+
+- Execution: SEED-066#author-controlled-titles / slice-plans/002-keep-titles-under-author-control / aa093fffeb
+  - Timestamp: unknown (slice 1 refactor on 2026-10-03, between 14:53 and 14:55 +08:00)
+  - Tool: Claude Code
+  - Model: claude-opus-5-5
+  - Open Dough release: 0.3.54
+  - Evidence: slice 1 (one composable removal, two specs, one doc) refactor agent reported "no refactor edits" (52,715 subagent tokens, 30 s); slice 2's refactor agent did find useful residue (inlined the last `executeWithTool` overload, made `maxOutputTokens` non-nullable).
+  - Observed effect: one of two refactor passes changed nothing.
+  - Inference: again, diff size did not predict value: slice 2 was a pure deletion and still left residue.
 
 ## DD-177 — The plan put API regeneration in a later slice than the endpoint that requires it
 
@@ -448,3 +458,18 @@ The managed delivery CLI can declare the Codex bridge ready, while the documente
   - Evidence: coordinator had functions.exec/notify/yield_control and exec/write_stdin available, but invoked deliver without `--codex-bridge-available`; both receipts reported unobserved. `ci-host-bridge.mjs` tests that flag and describes binding as retained by caller; `ci-mailbox.mjs stream` creates a mailbox. Guidance prohibits a separate observer start for managed ordinary increments.
   - Observed effect: commits 64173ad25f and 6c2ed996f7 were accepted without a live observer, failure notifications, or a CI completion verdict. Local proof passed; remote CI success was never claimed.
   - Inference: the unavailable receipt reflects the omitted flag, not proof that host tools were unavailable. Clarify or provide one supported managed-delivery-to-yielded-stream binding before treating that flag as notification readiness. This is a process/integration gap, not a product defect; no workaround or guidance edit was made here.
+
+## DD-202 — A plan asked for a "no longer changes titles" docs note, against the owner's no-trace rule for removals
+
+The plan for a feature removal told the implementer to turn a docs section into a short note that the removed behavior no longer happens. The owner's standing rule is that a removal leaves no negation or historical note in docs. The implementer, the refactor agent and the coordinator all accepted the note; only the retrospective caught it, and it needs a correction story.
+
+Follow-up: Open, unqueued.
+
+- Execution: SEED-066#author-controlled-titles / slice-plans/002-keep-titles-under-author-control / aa093fffeb
+  - Timestamp: unknown (slice 1 accepted on 2026-10-03, about 14:53 +08:00)
+  - Tool: Claude Code
+  - Model: claude-opus-5-5
+  - Open Dough release: 0.3.54
+  - Evidence: `0df1788796:.planning/slice-plans/002-keep-titles-under-author-control/PLAN.md` slice 1 ("becomes a short note that dictation no longer changes titles"); `aa093fffeb:docs/voice-input.md` section "Dictation does not change titles" ("The observations above that mention title requests predate this"), plus five other title-service mentions left in the same file; owner memory `doughnut-removal-leaves-no-trace`; correction `SEED-066#voice-docs-title-trace`.
+  - Observed effect: a docs-only correction story and plan were needed after delivery.
+  - Inference: the rule lives only in the coordinator's memory, which delegated planners, implementers and refactor agents do not see, and the plan's explicit wording outranked it. Removal plans may need a "clean the whole product scope, including docs" check written into the plan.

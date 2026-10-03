@@ -98,6 +98,16 @@ references. The refactor pass also inlined the last `executeWithTool` overload
 and made `maxOutputTokens` non-nullable; `AiController*` and
 `AiNoteAutomationServiceTest` (36 tests) passed after it.
 
+## Execution complete
+
+Product advice: no change to the queue order. Dictation now writes only to
+the body. The spoken-title stories stay as queued, and a future spoken-title
+service can be built new. Queue the docs-only correction
+[SEED-066#voice-docs-title-trace](../003-remove-title-trace-from-voice-docs/PLAN.md)
+ahead of the next voice story; it is a few minutes of work. At wrap-up, this
+story's Evidence link to `docs/voice-input.md#automatic-titles-can-overwrite-author-choice`
+no longer resolves.
+
 ## Current decisions
 
 - Delete, do not deprecate. A later spoken-title story may build a similar

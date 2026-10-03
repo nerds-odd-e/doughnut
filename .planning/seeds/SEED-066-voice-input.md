@@ -289,6 +289,22 @@ technical redesign, or speculative infrastructure.
 - **Safe stopping point:** Body dictation never changes titles, even if no
   voice-title controls are delivered.
 
+<a id="voice-docs-title-trace"></a>
+### Remove the title-service trace from the voice-input notes
+
+**Identity:** SEED-066#voice-docs-title-trace
+```json dough-story-state
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/003-remove-title-trace-from-voice-docs/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"8af1e8d785190dbfebe43e605cc7f173432f73e5a18ef1e1b339ee0f401ebba8","plan":"7f919dfebd29861d89087051c9144c54e22c18cf64a97b4ae57891cd59fca9cc"}}
+```
+
+- **Goal:** A reader of the [voice-input notes](../../docs/voice-input.md)
+  sees only how dictation works now. The notes still describe the removed
+  automatic title service and add a section saying dictation no longer
+  changes titles. The owner wants a removed feature to leave no trace.
+- **Scope:** Edit `docs/voice-input.md` only, so it reads as if automatic
+  titles never existed. No product code or test changes.
+- **Plan:** [003-remove-title-trace-from-voice-docs](../slice-plans/003-remove-title-trace-from-voice-docs/PLAN.md)
+
 <a id="preserve-typed-corrections"></a>
 ### Keep typed corrections when voice results arrive
 
