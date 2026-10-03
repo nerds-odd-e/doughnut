@@ -39,6 +39,40 @@ Slice 3 published as `51331973c78a7040a05d664dba3e527092f6e61d`: two finished
 paragraphs preserved with a distinct addition after reload. Slice 4 records
 real pending-result loss of visible typing; an already-saved edit race remains
 unobserved. Its later paste was after settlement. Chosen title changed twice.
-Independent refactor found the scoped records clean; whitespace and formatting passed.
+Slice 4 published as `c66d7874a6a02c7b0f19325f48387943705f3953`.
+Slice 5 accepted matching consecutive-session proof below; independent
+refactor found the records clean, whitespace and formatting passed.
 Publication receipts stay in the execution conversation before each next slice.
 Hardware capture, permission and frequency remain uncovered.
+
+## Repeated-session proof mapping
+
+Slice 5 reuses two completed, distinguishable sessions on the same disposable
+note `13726` in notebook `23`, Chrome/macOS, `manual`, localhost Development:
+
+- [First session and saved comparison](../../seeds/SEED-066-voice-input-manual-evidence.md#existing-content-preservation):
+  6.2826667 s lighthouse/oranges input, content PATCH at 01:56:33.252 UTC,
+  Stop after settlement at 01:56:40.251, then reload around 01:56:50 confirmed
+  both original paragraphs unchanged and the distinct addition exactly once.
+- [Next session and saved comparison](../../seeds/SEED-066-voice-input-manual-evidence.md#manual-edit-preservation-during-processing):
+  its recorded starting body is exactly that saved body, with no intervening
+  body reset. Record Audio started the distinct 29.168 s orchard/book/garden/
+  meeting passage at 02:02:23.592. The linked
+  [sustained input](../../seeds/SEED-066-voice-input-sustained-evidence.md#sustained-speech-and-revision-evidence)
+  retains its literal audio-generation command and capture setup. Stop was
+  reached after audio settlement; reload around 02:03:44 confirmed both
+  originals and the prior lighthouse addition, plus the later book fragment
+  and meeting sentences. New orchard content was absent. A manual sentence
+  pasted after settlement also persisted, prefixed to the lighthouse paragraph;
+  that edit is distinguished from the lost typing during the pending result.
+
+This establishes accumulation and preservation of the prior distinct addition
+across the observed start/stop sessions, alongside loss within the later
+recording. The evidence identifies no duplication or stale result across these
+two sessions; it establishes neither defect frequency nor a general preservation
+guarantee. Capture was paced synthetic MediaStream input through the actual
+worklet and real services; hardware/permission behavior remains uncovered.
+The two reports retain network/DOM timing, reload proof, revision limitations,
+and cleanup. No new probe, fixture, tab, or product change was needed for this
+mapping; the disposable note remains for later slices. Review took about one
+minute, charged to the existing exploration budget.

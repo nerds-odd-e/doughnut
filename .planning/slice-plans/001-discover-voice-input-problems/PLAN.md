@@ -140,7 +140,7 @@ service delay without labelling the narrower race observation.
 
 ### 5. Repeated-session content evidence
 Type: Behavior
-Status: planned
+Status: done — [Accepted reuse of consecutive distinct inputs and saved states](EXECUTION.md#repeated-session-proof-mapping), ~1 min; no new recording needed.
 Proof: Two distinguishable dictated inputs and saved content after each session.
 
 Behavior: Given a completed session, start and stop another on the same note.
