@@ -109,8 +109,11 @@ or capability gap, without counting the unsuccessful journey as covered.
 
 ### 2. Sustained speech and revision evidence
 Type: Behavior
-Status: planned
+Status: done
 Proof: Audio duration plus intermediate/final text snapshots and update timings.
+Accepted: [A → B → C erasure, Flush and Stop evidence](../../seeds/SEED-066-voice-input-sustained-evidence.md);
+~4 min observation. Root inspected persisted baseline plus C; exact input,
+29.168 s duration, pause, network and DOM timings retain the scoped proof.
 
 Behavior: Given the verified route, dictate a longer passage with pauses and a
 sentence resolved near its end. Compare recent-sentence revisions with changes

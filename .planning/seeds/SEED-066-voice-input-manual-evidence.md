@@ -136,3 +136,5 @@ or product-code change remains. The disposable notebook/note remain useful
 for subsequent observation. Slice 1 spent approximately nine minutes including
 the initial failed origin route and cleanup, within its audio-setup exception.
 
+[Sustained speech and revision evidence](SEED-066-voice-input-sustained-evidence.md#sustained-speech-and-revision-evidence)
+records the subsequent longer-passage observation.

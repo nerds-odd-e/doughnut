@@ -215,6 +215,20 @@ and cleanup](SEED-066-voice-input-manual-evidence.md#recording-route-and-short-s
 retain the proof and its revision/source limitations. No product edits or owned
 harness files remain; the disposable note is available for subsequent probes.
 
+**2026-10-03 sustained-speech finding:** A naturally paced 29.168-second
+synthetic passage with an 8.2-second pause produced three real-service body
+updates. After 16.73 s the note showed completed orchard facts plus an
+unfinished book clause. Flush at about 22 s replaced that paragraph with a
+middle fragment; the final update at 35.75 s replaced it with the last three
+sentences. Reload confirmed loss of completed orchard facts and preservation
+of the preexisting Harvard paragraph. Cause and the acceptable unfinished-sentence
+revision boundary remain unresolved. Body requests took 5.25, 3.14 and 3.53 s;
+the final body settled before Stop. Titles changed twice during the session.
+
+[Exact input, intermediate/final text, Flush/Stop timings and capture limits](SEED-066-voice-input-sustained-evidence.md#sustained-speech-and-revision-evidence)
+retain this proof. Hardware microphone behavior and defect frequency remain
+unobserved; no product repair was attempted.
+
 ## Open Decisions for Later Work
 
 - A browser audio-input route for the local app (sign-in and real services are

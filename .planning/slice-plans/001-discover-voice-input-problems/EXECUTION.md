@@ -28,11 +28,12 @@
 
 ## Current observation
 
-Slice 1 recording-route and short-speech evidence has been recorded in the
-[manual evidence report](../../seeds/SEED-066-voice-input-manual-evidence.md#recording-route-and-short-speech-baseline).
-The localhost retry reached the documented account and usable recording route;
-hardware capture and permission remain uncovered. Root inspected the saved
-note's DOM, passage and title; the independent record refactor completed,
-whitespace verification passed, and coordinator formatting succeeded.
-Slice 1's records are ready for managed publication; the accepted publication
-receipt is retained in the execution conversation before the next slice starts.
+Slice 1 published as `2eec224d133f9bfa081e5918a55c46f4de3827a1` on the remote
+story branch. Managed delivery reported unobserved CI: it did not bind the
+Codex yielded-cell bridge and started no observer. The verified GitHub selector
+is `ci.yml` (pushes on all branches; `.planning/**` is ignored).
+Slice 2's [sustained evidence](../../seeds/SEED-066-voice-input-sustained-evidence.md)
+records completed orchard-content loss while the prior paragraph survived.
+Root inspected final note DOM; record refactor, whitespace and formatting passed.
+Publication receipts stay in the execution conversation before each next slice.
+Hardware capture, permission and frequency remain uncovered.
