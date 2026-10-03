@@ -93,9 +93,12 @@ retain gaps and use the final slice for evidence and cleanup.
 
 ### 1. Usable recording route and short-speech baseline
 Type: Behavior
-Status: planned
+Status: done
 Proof: Identified app/session/audio route, visible controls, one short passage's
 result or exact blocked step, and a labelled timing baseline.
+Accepted: [Paced real-service baseline and persisted text/title](../../seeds/SEED-066-voice-input-manual-evidence.md#recording-route-and-short-speech-baseline);
+~9 min including the bounded origin retry. Root inspected the saved note's
+DOM, passage, and title. Hardware capture remains a labelled gap.
 
 Behavior: Given the selected app and disposable note, sign in, find Audio tools,
 feed a known short passage, and stop, once into an empty body and once after
@@ -197,6 +200,8 @@ coverage with no actionable findings or material uncertainty.
 
 ## Current decisions and execution gates
 
+- [Execution identity, setup, budget clock, and publication base](EXECUTION.md)
+  are retained for resume; execution is authorized by the established start.
 - Preparation is a one-shot refinement in the default checkout
   `/Users/terryyin/git/doughnut` on `main`, with no preparation assignment; remote
   target remains `origin/main`. This planning request authorizes no testing,
@@ -218,8 +223,10 @@ coverage with no actionable findings or material uncertainty.
 
 ## Learnings
 
-No exploration has run. The live probes and static inspections above are
-planning observations only; there are no accepted manual-test results yet.
+Slice 1 recording-route and short-speech evidence is recorded in the linked
+[manual evidence report](../../seeds/SEED-066-voice-input-manual-evidence.md#recording-route-and-short-speech-baseline).
+Proof and the record refactor were accepted; whitespace check passed. The earlier live probes and static inspections
+above remain planning evidence with their narrower boundaries.
 
 ## Preparation review
 

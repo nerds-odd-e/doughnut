@@ -187,10 +187,33 @@ decomposition, and does not prescribe an implementation sequence within the epic
 <a id="manual-discovery-findings"></a>
 #### Findings supplied by manual discovery
 
-No manual exploration has been performed for these queued items yet. Add the
-first item's observed findings, evidence, unresolved expectations, and material
-coverage gaps here before decomposition, with links to any separate report.
-Do not replace the owner's original report with unverified causal assumptions.
+**2026-10-03 short-speech baseline:** Chrome on macOS against the reused
+local Development app, signed in as `manual`. The initial `127.0.0.1:5175`
+automation route could sign in but did not activate Note/New Notebook controls;
+the `localhost:5175` route reached Audio tools and created disposable note
+`13726` in notebook `23`. The origin-specific automation observation has no
+established cause and does not prove a human click fails.
+
+- **Ongoing automatic titles reproduced:** Two identical 18.356-second
+  `harvard.wav` recordings changed `Untitled` to “Sensory Notes on Food and
+  Drink”, then “Sensory Impressions of Foods and Drinks”, while the second
+  body stayed identical. This confirms the owner's unwanted title changes;
+  the future automatic-title policy remains undecided.
+- **Responsiveness baseline:** The empty-body run first showed text 25.17 s
+  after controlled capture began, approximately 3.96 s after Stop. Audio
+  requests took 4.42 s and 4.61 s; final titles settled separately from body
+  persistence. No intermediate body updates appeared during these short inputs.
+  Timings identify stages without establishing a cause or acceptance target.
+- **Persistence and limits:** Reload confirmed the final six-sentence body and
+  second title. Repeating identical speech cannot establish preservation of a
+  distinct addition or a duplication defect. Capture used naturally paced
+  synthetic MediaStreams with the real worklet and real services; hardware
+  microphone capture, device selection and permission remain uncovered.
+
+[Detailed reproduction, timestamps, exact saved text, temporary capture setup,
+and cleanup](SEED-066-voice-input-manual-evidence.md#recording-route-and-short-speech-baseline)
+retain the proof and its revision/source limitations. No product edits or owned
+harness files remain; the disposable note is available for subsequent probes.
 
 ## Open Decisions for Later Work
 
