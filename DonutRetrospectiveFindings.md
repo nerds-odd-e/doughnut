@@ -12,13 +12,11 @@ illustrate a shared lesson stay in DearDough as occurrence evidence.
 
 ## Open findings
 
-### Queued: Local app stacks broken by backend build output
+### Open, not queued: Stale classes at a Development start
 
-Story: [Start and keep local app stacks on current backend code](.planning/seeds/SEED-067-dependable-local-app-stacks.md#stacks-survive-other-builds) — SEED-067#stacks-survive-other-builds.
-
-Both findings are a running stack reading `backend/build` output that something
-else left or rewrote. Resolved DD-103 was the same shared output with the E2E
-runner's own compiler as the writer; its correction still holds.
+A running stack reads `backend/build` output that something else left behind.
+Resolved DD-103 and DD-200 had other writers on the same output; their
+corrections still hold.
 
 #### DD-159 — The Development stack failed to start on stale compiled backend classes in the default checkout
 
@@ -31,20 +29,6 @@ runner's own compiler as the writer; its correction still holds.
   - Observed effect: one failed start and a short diagnosis before the UAT setup could continue.
   - Inference: the Development start's incremental build did not drop classes whose sources were deleted. Qualified: cause not investigated further.
 - Investigation (2026-10-03, SEED-067#stacks-survive-other-builds slice 2): not reproduced. In the default checkout, a compiled `@Service` and its injecting consumer were deleted with the stack stopped, then `pnpm dev` started healthy and Gradle removed the stale class; the same held with a concurrent `classes --rerun-tasks` build and with a build-cache restore. Earlier linked-worktree probes (single, concurrent, after a failed compile) also removed the classes. No writer found; the cause remains unknown. Owner decides whether to keep watching or drop.
-
-#### DD-200 — Concurrent backend verification disrupted an E2E hot-reloading runtime
-
-Backend Gradle resource processing and the E2E application shared one checkout's build output. A resource refresh provoked an application restart while the browser journey was beginning.
-
-##### Occurrences
-
-- Execution: SEED-066#preserve-existing-content / `979cac31fc19f756bdfc480d9b24f1ab7dfeec34:.planning/slice-plans/001-preserve-existing-content/PLAN.md` / 64173ad25fbbe7457705aeea972a959d9d3f8dd4
-  - Timestamp: unknown (2026-10-03, slice 2 verification; runtime log shows 13:26:20)
-  - Tool: Codex
-  - Open Dough release: 0.3.54 (unchanged execution-checkout VERSION)
-  - Evidence: preserve_body proof handoff; `sut.log:522–564` reports hot-restart Flyway missing migration resources and LB connection refusal; backend `processResources` was concurrent. The E2E attempt failed with Bad Gateway before setup. Serial retry after Gradle terminated passed.
-  - Observed effect: one failed setup and one extra integrated run; no failed product assertion was dismissed.
-  - Inference: serialize Gradle resource writes and hot-reloading E2E in the same checkout, or provide genuinely separate build output. Database and port isolation alone did not prevent this overlap. Qualified: one evidenced occurrence.
 
 ### Open, not queued: Observing branch code in a held app stack
 
@@ -90,7 +74,7 @@ Reviewed `DearDough.md` at `857425b04a`, then again after
   in no Donut guidance (`AGENTS.md`, `CLAUDE.md`, `.agents/`), and shared
   Open Dough guidance keeps absence assertions when absence is the promise. So
   the correction lands in Donut.
-- DD-200 (open; above). Donut’s scripts own the shared `backend/build` output
+- DD-200 (resolved; below). Donut’s scripts own the shared `backend/build` output
   and its documented concurrency (`docs/worktree-backend-tests.md` covers only
   database isolation), so the correction lands in Donut.
 - DD-177 — the plan put API regeneration in a later slice than the controller
@@ -132,10 +116,9 @@ Donut tooling; record it here if it recurs.
 A finding group is queued only for high impact or high frequency, with impact
 ranked first.
 
-1. SEED-067#stacks-survive-other-builds: highest frequency. Two open
-   occurrences in five days across Claude Code and Codex (DD-159, DD-200),
-   following resolved DD-103 on the same build output; each cost a failed
-   start or run and a diagnosis, so impact is low.
+Not queued: DD-159. An investigation on 2026-10-03 did not reproduce it and
+found no writer, so there is nothing to fix yet. The owner has not yet decided
+whether to keep watching it or drop it.
 
 Not queued: DD-161. Its remaining part is one occurrence; most of its
 28 minutes was rebuilding the MinerU environment, whose version part is
@@ -148,7 +131,8 @@ planning feedback (ODF-190), not as Donut tooling.
 Recheck these when a new occurrence arrives; none is contradicted today:
 
 - DD-073 — frontend proof typechecks (`7b1d80b4e8`).
-- DD-103 — E2E runner backend race (`d86864023c`); DD-200 is a different writer.
+- DD-103 — E2E runner backend race (`d86864023c`).
+- DD-200 — backend test reruns in a linked worktree restarted a batch E2E stack (`4122c07c06`).
 - DD-121 — commit hook and other slices’ unstaged files (`574d61b52c`,
   `c76f69b62e`, `120753a097`).
 - DD-165 — script tests coupled to a live spec name (`7580fceccc`).
