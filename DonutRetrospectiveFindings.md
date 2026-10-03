@@ -33,6 +33,7 @@ The plan for a feature removal told the implementer to turn a docs section into 
   - Evidence: `0df1788796:.planning/slice-plans/002-keep-titles-under-author-control/PLAN.md` slice 1 ("becomes a short note that dictation no longer changes titles"); `aa093fffeb:docs/voice-input.md` section "Dictation does not change titles" ("The observations above that mention title requests predate this"), plus five other title-service mentions left in the same file; owner memory `doughnut-removal-leaves-no-trace`; correction `SEED-066#voice-docs-title-trace` (`ac59c040e5`).
   - Observed effect: a docs-only correction story and plan were needed after delivery.
   - Inference: the rule lives only in the coordinator's memory, which delegated planners, implementers and refactor agents do not see, and the plan's explicit wording outranked it. Removal plans may need a "clean the whole product scope, including docs" check written into the plan.
+  - Later check (story refinement, 2026-10-03): the trace began in the refined story scope ("They never change the title … during this recording or later ones"), which also produced the test `never changes the title across many chunks and a later recording` in `NoteAudioTools.processing.spec.ts`; the retrospective missed it, and it is still on main.
 
 ### Queued: Local app stacks broken by backend build output
 
