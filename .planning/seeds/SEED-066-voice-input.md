@@ -32,7 +32,7 @@ decomposition, and does not prescribe an implementation sequence within the epic
 
 **Identity:** SEED-066#discover-voice-input-problems
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/001-discover-voice-input-problems/PLAN.md","assessment":"not-ready","reasons":["Slice 1 still needs fresh live evidence of login, usable audio input, and real-service results; static inspection and homepage availability do not clear the earlier access concern."],"basis":{"document":"9fe720fbb7ddae3783e8096ef1d442593bd3dbcae553013e748bc182fe6e7e8b","plan":"a72765eb588b09ca88e5f27b037436cf347d884db229cdfcb4643aaf886d7655"}}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/001-discover-voice-input-problems/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"f5120459373a4f39c5bb88108b68cb723490e396e31b1c4143c5afa8dbe5d0be","plan":"ee2671b080a8e2de00fab4f2dc2306467e955ed298e52dde17385b7b947a62d4"}}
 ```
 
 - **Goal:** Give the product owner evidence of how voice input actually
@@ -101,10 +101,10 @@ decomposition, and does not prescribe an implementation sequence within the epic
   documented test sign-in `manual` / `password` and disposable notes, with a
   60-minute total exploration budget including preparation and cleanup. The
   deployed app is an acceptable alternative once its URL and access are resolved;
-  this does not commit to testing both environments. The linked preparation
-  worktree cannot host the persistent Development stack. Verify a supported
-  observation route, login, microphone or controlled-audio input, and service
-  access before exploration; none has been verified by this refinement. Real
+  this does not commit to testing both environments. Live checks on 2026-10-03
+  confirmed `manual` sign-in and a real transcription-plus-retouch request in that
+  app; a browser controlled-audio route remains to be established at the start
+  of exploration. Real
   transcription and retouching are needed to assess actual quality and latency.
   If access is unavailable, stop the affected observation and retain a coverage
   gap instead of substituting simulated-service conclusions.
@@ -194,8 +194,8 @@ Do not replace the owner's original report with unverified causal assumptions.
 
 ## Open Decisions for Later Work
 
-- Access to the selected manual-testing environment, audio input, and real
-  services; resolve the deployed URL and account only if that alternative is used.
+- A browser audio-input route for the local app (sign-in and real services are
+  confirmed); resolve the deployed URL and account only if that alternative is used.
 - Measurable responsiveness expectations and the actual contribution of audio
   capture, transcription, retouching, and applying results to the note.
 - The boundary between useful recent-sentence revision and destructive rewriting.

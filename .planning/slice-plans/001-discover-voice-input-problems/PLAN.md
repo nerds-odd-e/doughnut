@@ -64,10 +64,14 @@ add no permanent recorder or testing abstraction. Inspection found:
 | Existing UI has a recording journey | Read `frontend/src/components/notes/widgets/NoteAudioTools.vue`, `frontend/src/composables/useNoteAudioProcessing.ts`, and `frontend/src/store/noteStore.ts`: Record Audio → recorder → audio-to-text → completeContent → persisted content; title suggestions run separately | Slice 1 observes this full journey, including real-service access and a resulting note update |
 | Existing controlled audio can support a temporary observation route | Read `e2e_test/step_definitions/audio.ts`, `e2e_test/start/mock_services/browserService.ts`, and `audioToolsPage.ts`; `lecture.wav` and `harvard.wav` exist. The helper mocks media/worklet objects and delivers all decoded samples at once | Slice 1 establishes a usable route; this helper alone cannot prove hardware capture, paced streaming, or real end-to-end latency |
 | Existing automated evidence has limited scope | Read `record_live_audio.feature`, `record_live_audio_with_real_open_ai_service.feature`, `NoteToolbar.panels.spec.ts`, and `NoteAudioTools.processing.spec.ts`: mocked-service continuous append, one real-service fixture journey, toolbar toggling, and SDK-mocked title/content behavior | No tests were run for this plan. These are reuse candidates, not current coverage; the feature's 20-second assertion is not an owner-approved latency target |
-| Persistent Development cannot start in this worktree | `.agents/agent-map.md` and `scripts/dev-start.mjs` explicitly refuse linked-worktree Development startup. `git worktree list` and primary `git rev-parse HEAD` show the established primary and owned branch at `6d976e7df2de0491659da88912a9d873def48924`; primary `git status --short` was empty | Reuse the live app. If it is unsuitable, stop the affected path and resolve a supported route rather than restarting a shared stack |
+| Sign-in and note access in the running app | 2026-10-03 against `http://127.0.0.1:5175/`: `curl -u manual:password /api/healthcheck` returned `OK. Active Profile: dev. Commit: a02dbb2697…`; with that session `/api/notebooks` returned 200 and `/api/user/current-user-info` returned user `manual` | Settled. The running backend's commit is behind checkout `HEAD` only by planning records |
+| Real transcription and retouch services | Same session, `POST /api/audio/audio-to-text` with `e2e_test/fixtures/harvard.wav` (18.4 s) and non-empty `previousNoteContentToAppendTo`: HTTP 200 in 4.7 s with real Whisper SRT and retouched content appended to the previous text. The backend process has `OPENAI_API_TOKEN` set | Settled for the service path. Endpoint timing excludes browser capture, chunking, and applying results to the note |
+| Empty previous content | The same request with empty `previousNoteContentToAppendTo` returned HTTP 500: OpenAI 400, `One of "input" or "previous_response_id" or 'prompt' or 'conversation' must be provided`. Transcription succeeded first; `OtherAiServices.getTextFromAudio` adds a user message only for non-empty previous content | API-level observation, not yet a UI finding. Slice 1 dictates into an empty body as well as a non-empty one and records what the author sees |
+| Browser route for the UI | One local Chrome (macOS) is connected to Claude in Chrome. Agents cannot speak into a hardware microphone | Slice 1 feeds a fixture through a temporary page-level `getUserMedia` replacement, labelled as controlled audio; hardware capture and permission prompts remain gaps unless the owner speaks |
+| Persistent Development is reused, not started | The established preparation is the default checkout on `main` at `ae23d73c9e`, which hosts the running Development stack | Reuse the live app; do not restart it. If it becomes unsuitable, stop the affected path |
 
-Login, microphone/controlled audio, and credentialed OpenAI calls are not established
-by static inspection. Slice 1 owns those premises. A failed premise stops dependent
+Login and credentialed OpenAI calls were observed live on 2026-10-03. Slice 1 owns
+the remaining premise: a usable controlled-audio route through the browser UI. A failed premise stops dependent
 real-service observations and requires revising the route or reporting the gap.
 Independent UI observations may continue within the budget, labelled accurately.
 
@@ -94,7 +98,8 @@ Proof: Identified app/session/audio route, visible controls, one short passage's
 result or exact blocked step, and a labelled timing baseline.
 
 Behavior: Given the selected app and disposable note, sign in, find Audio tools,
-feed a known short passage, and stop. Observe recording/processing feedback,
+feed a known short passage, and stop, once into an empty body and once after
+existing text. Observe recording/processing feedback,
 first text, final persisted body, and any later title update. Confirm the service
 mode and input path. Failure stops dependent journeys; preserve a useful access
 or capability gap, without counting the unsuccessful journey as covered.
@@ -192,9 +197,9 @@ coverage with no actionable findings or material uncertainty.
 
 ## Current decisions and execution gates
 
-- Preparation continues in the established workspace and branch, with Hibiki-chan's
-  existing assignment; remote target remains `origin/main` and integration checkout
-  `/Users/terryyin/git/doughnut`. This planning request authorizes no testing,
+- Preparation is a one-shot refinement in the default checkout
+  `/Users/terryyin/git/doughnut` on `main`, with no preparation assignment; remote
+  target remains `origin/main`. This planning request authorizes no testing,
   Take, implementation, commit, or publication.
 - Real-service observations are gated by slice 1. Gaps remain visible and do not
   establish transcription quality or latency. Preserve useful independent evidence
@@ -213,14 +218,14 @@ coverage with no actionable findings or material uncertainty.
 
 ## Learnings
 
-No exploration has run. HTTP reachability and static inspections above are
+No exploration has run. The live probes and static inspections above are
 planning observations only; there are no accepted manual-test results yet.
 
 ## Preparation review
 
-No remaining slice-boundary, proof-mapping, or product-design concern was identified
-in this review. The earlier access concern remains: login, a usable audio-input
-route, and real-service results have not been freshly observed. Slice 1 bounds
-that probe, but static inspection and homepage availability do not clear the
-previous premise-based Not ready assessment. Retain Not ready until fresh live
-evidence settles that concern; the plan itself grants no execution authority.
+The earlier access concern is cleared by fresh live observation on 2026-10-03:
+`manual` sign-in and note access work in the running Development app, and a real
+transcription-plus-retouch request succeeds. The remaining premise, a controlled
+audio route through the browser UI, is bounded by slice 1, whose failure stops
+dependent journeys and keeps the gap. No slice-boundary, proof-mapping, or
+product-design concern remains. The plan itself grants no execution authority.
