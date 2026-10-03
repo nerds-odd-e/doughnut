@@ -38,9 +38,9 @@ are kept, and the caret stays where they were typing.
 | The store write then discards the unsaved draft | Slice 2 | Read `useDebouncedTextAutosave.ts` `syncFromExternal`: with an unsaved draft and no save in flight, a new external value that differs from both draft and last saved calls `replaceFromExternal`, which replaces the draft | Confirmed by reading. Slice 2's new spec must fail on unchanged code before the fix (symptom reproduced; the [recorded journey](../../../docs/voice-input.md#typing-while-audio-processing-is-pending) is the earlier field observation) |
 | The per-note body-editor registry exists and holds `flushAndWait` | Slice 1 | Read `frontend/src/composables/noteContentMutationBarrier.ts`; only `TextContentWrapper.vue` registers; `useNoteRemovalFlow.ts` and `RichFrontmatterImagePropertyValue.vue` call `closeAndFlushNoteContentMutations` | Confirmed |
 | The registry follows the note last typed into, not the note displayed | Slice 1 | Read `TextContentWrapper.vue`: `registerContentAutosave(noteId)` runs only from `onUpdate`. `NoteShowPage.vue`, `NoteShow.vue`, `NoteTextContent.vue` and the `RouterView` in `NotebookSidebarLayout.vue` have no `:key`, so the same editor instance is reused when the author opens another note | Confirmed. Handing a passage to this registration as-is could put note A's passage into note B's draft and save it to A. Slice 1 registers by the displayed note instead |
-| The rich editor loses the caret when the model changes | Slice 5 | Read `QuillEditor.vue` `syncQuillFromModel`: sets `quill.root.innerHTML` with no selection restore | Confirmed |
-| The Markdown editor binds `:value` on a native textarea | Slice 6 | Read `TextArea.vue` | Binding confirmed. Whether a programmatic value change moves the caret in the Chromium browser-mode specs was not observed; slice 6 writes its Markdown caret case first and adds the restore only if that case fails |
-| Existing Quill caret placement can be reused | Slice 5 | Read `QuillEditor.vue` `setSelectionSilently` | Confirmed |
+| The rich editor loses the caret when the passage lands | Slice 7 | Throwaway mounted probe (deleted) in this harness on the raw Quill instance: caret placed after "for" reads `{ index: 41, length: 0 }`; after release, the passage is in the editor and `getSelection()` reads `{ index: 0, length: 0 }` (`syncQuillFromModel` sets `root.innerHTML` with no restore) | Confirmed red |
+| Quill's selection API works in the mounted spec on the instance `QuillEditor` holds | Slices 6, 7 | Same probe. Through `richQuillInstance` (the `ref<Quill>` value, a Vue reactive proxy), `getSelection`, `setSelection`, `deleteText` and `insertText` all throw `Cannot read properties of null (reading 'offset')`, even before any model sync; through `toRaw(...)` every call works. Parchment's `ScrollBlot.find` checks `blot.scroll === this`, and `this` is the proxy | Fails as held today; works on the raw instance. Slice 6 holds it raw. `QuillEditor`'s own `setSelectionSilently` goes through the same proxy and its `try/catch` hides the throw |
+| The Markdown editor loses the caret when the passage lands | Slice 5 | Same probe, Markdown mode: textarea focused, caret set after "for" (41), release → passage at the end, textarea still focused, `selectionStart/End` = 114/114 (the end) | Confirmed red; `TextArea.vue` binds `:value` with no restore |
 | Focused frontend specs run locally on this revision | All slices | `env -u NODE_ENV CURSOR_DEV=true nix develop -c pnpm frontend:test tests/notes/NoteAudioTools tests/notes/NoteEditableContent` | 11 files, 76 tests passed |
 | The save-then-change pause is covered by page-level specs | Slice 1 | `env -u NODE_ENV CURSOR_DEV=true nix develop -c pnpm frontend:test tests/pages/NoteShowPage.autosaveTrash tests/pages/NoteShowPage.imageUpload tests/notes/NoteTextContent tests/components/notes/NoteTextContentUndo` | 6 files, 19 tests passed |
 
@@ -69,7 +69,7 @@ request body and the store's note content, which is what reload reads.
 | With the author on another note, the passage goes to the originating note's saved body and the other note's editor is unchanged | 4 Moved to another note | 1, 4 | New spec: type into note A, switch the same editor to note B with `setProps`, then release. A's saved body gains the passage; B's editor and saves are untouched. Existing `NoteAudioTools.preservation.spec.ts` (no editor open) stays green |
 | An edit in the middle stays, the passage goes to the end | 2 Fix a misheard word (content) | 2 | New spec: change "from" to "for" mid-body while held; after release "for my sister" stays and the passage is at the end |
 | Typing is never blocked while a result is pending or arriving | Scope | 2 | Covered by the typing steps above succeeding while `audioToText` is held |
-| Caret and selection stay where they were, in both editors | 2 Fix a misheard word (caret) | 5, 6 | New spec cases: caret placed right after "for" in a focused editor; after the passage lands, the rich editor's `getSelection()` index and the textarea's `selectionStart/End` are unchanged |
+| Caret and selection stay where they were, in both editors | 2 Fix a misheard word (caret) | 5, 7 | New spec cases: caret placed right after "for" in a focused editor; after the passage lands, the rich editor's `getSelection()` index and the textarea's `selectionStart/End` are unchanged |
 | Documentation describes the new behavior | Scope | 2 | `docs/voice-input.md` no longer says the append ignores unsaved drafts |
 
 No e2e change. The mocked live-audio feature returns results immediately and
@@ -82,7 +82,7 @@ No API change, so no client regeneration.
 ## Slices
 
 Focused command for every slice (add `tests/components/form` in slices 5
-and 6, whose editors are shared):
+to 7, whose editors are shared):
 `env -u NODE_ENV CURSOR_DEV=true nix develop -c pnpm frontend:test tests/notes/NoteAudioTools tests/notes/NoteEditableContent tests/notes/NoteTextContent tests/components/notes/NoteTextContentUndo tests/pages/NoteShowPage.autosaveTrash tests/pages/NoteShowPage.imageUpload`
 
 ### 1. The body-editor registration follows the displayed note
@@ -160,25 +160,64 @@ passage, B shows no passage and gets no save; focused command → 20 files, 114
 tests; `vue-tsc` clean. The harness moved to
 `noteAudioToolsTypingTestSupport.ts` for slices 5–6.
 
-### 5. The rich editor keeps the caret
+Remaining order: the Markdown caret goes first because it is independent and
+its red case is already observed. The rich caret needs a preparation step
+(slice 6) before its proof can read the caret at all.
+
+Attempt 1 at the rich caret (2026-10-03, about 6 min, reverted; it was then
+numbered slice 5): the planned case (caret placed with `quill.setSelection`
+after "for", read back with `getSelection()`) threw `Cannot read properties of
+null (reading 'offset')` in `normalizedToRange`. Thrash point: it was read as
+Parchment's blot lookup being empty after `root.innerHTML` is set. Follow-up
+probe: the throw happens on every selection call made through the reactive
+proxy, before any sync, and none on the raw instance (premise table). False
+sizing assumption: the instance `QuillEditor` exposes could be driven through
+Quill's selection API. Existing specs that stub `getSelection` (for example
+`dispatchRichPaste`) worked around the same proxy. Baseline before the
+attempt: focused command plus `tests/components/form` → 54 files, 408 tests.
+
+### 5. The Markdown editor keeps the caret
 Type: Behavior
 Status: planned
-Proof: new spec case: focused rich editor, caret right after "for", passage
-lands → `getSelection()` index and length unchanged.
+Proof: new case in `NoteAudioTools.typingWhilePending.spec.ts`, Markdown
+mode: focus the textarea, change "from" to "for" with `setTextareaValue`
+while `audioToText` is held, put the caret right after "for" with
+`setSelectionRange`, release → the textarea ends with the passage and its
+`selectionStart/End` are unchanged. Observed red: they move to the end.
 
-When `QuillEditor` applies a new model value while it holds a selection,
-restore that selection with `setSelectionSilently`. Appending at the end keeps
-earlier offsets valid.
+`TextArea` keeps `selectionStart/End` when it receives a new value while it
+has focus (read them before Vue patches `value`, set them back after).
+Appending at the end keeps earlier offsets valid.
 
-### 6. The Markdown editor keeps the caret
+### 6. The rich editor holds its Quill instance raw
+Type: Structure
+Status: planned
+Proof: focused command plus `tests/components/form` stay green (baseline 54
+files, 408 tests); `vue-tsc` clean.
+
+`QuillEditor` keeps its Quill instance in a `shallowRef` (not a deep `ref`),
+so its own calls and `richQuillInstance` in specs reach the raw instance and
+Quill's selection API works. Enables slice 7. Removing the specs' now-needless
+`getSelection` stubs or the `setSelectionSilently` swallow is not part of this
+slice; the post-change refactor may judge it.
+
+### 7. The rich editor keeps the caret
 Type: Behavior
 Status: planned
-Proof: new spec case: focused textarea, caret right after "for", passage
-lands → `selectionStart/End` unchanged.
+Proof: new case in `NoteAudioTools.typingWhilePending.spec.ts`, rich mode,
+real Quill selection (no stub): while `audioToText` is held, replace "from"
+with "for" through `deleteText`/`insertText` (source `user`) and
+`setSelection` right after "for" (source `user`, which focuses the editor);
+release → the editor text ends with the passage and `getSelection()` equals
+the placed caret. Observed red on the raw instance: it reads index 0.
 
-Write the case first. If it already passes, the slice is the case alone.
-Otherwise `TextArea` restores `selectionStart/End` when it receives a new
-value while focused.
+In `syncQuillFromModel`, when Quill holds a selection, read it before setting
+`root.innerHTML`, bring Quill's blots up to date (`quill.update` with the
+silent source), then put the same index and length back silently. Do it
+synchronously, before the browser's selection-change event, so the editor
+does not report a blur that would flush mid-change. If the case fails because
+the restore lands before the blots match, stop and record it rather than
+switching to Quill's content API in the same slice.
 
 ## Current decisions
 
