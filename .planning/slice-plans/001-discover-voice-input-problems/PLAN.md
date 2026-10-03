@@ -130,7 +130,7 @@ and inspect whether old text is preserved, replaced, erased, or duplicated.
 
 ### 4. Manual-edit preservation during processing
 Type: Behavior
-Status: planned
+Status: done — [Accepted pending visible-edit loss and saved-edit race gap](../../seeds/SEED-066-voice-input-manual-evidence.md#manual-edit-preservation-during-processing), ~5 min.
 Proof: Identifiable manual edit, its timing relative to pending audio processing,
 and the final saved text, or an explicit inability to reach that precondition.
 

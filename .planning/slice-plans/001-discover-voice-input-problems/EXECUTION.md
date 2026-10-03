@@ -35,8 +35,10 @@ is `ci.yml` (pushes on all branches; `.planning/**` is ignored).
 Slice 2 published as `be8f93f99b8337e82bc4baa5cecf4a202b1f8337`; its
 [sustained evidence](../../seeds/SEED-066-voice-input-sustained-evidence.md)
 records completed orchard-content loss while the prior paragraph survived.
-Slice 3 records two finished original paragraphs preserved with a distinct
-addition after reload. Manual signals inspected; independent refactor found
-the records clean, whitespace and formatting passed.
+Slice 3 published as `51331973c78a7040a05d664dba3e527092f6e61d`: two finished
+paragraphs preserved with a distinct addition after reload. Slice 4 records
+real pending-result loss of visible typing; an already-saved edit race remains
+unobserved. Its later paste was after settlement. Chosen title changed twice.
+Independent refactor found the scoped records clean; whitespace and formatting passed.
 Publication receipts stay in the execution conversation before each next slice.
 Hardware capture, permission and frequency remain uncovered.

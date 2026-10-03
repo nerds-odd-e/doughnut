@@ -195,3 +195,55 @@ stopped sources/tracks and closed AudioContext. Network observation was disabled
 reload cleared page state. The owned WAV and tab were removed/closed; note `13726`
 remains disposable for later slices. No product source changed. This slice spent
 about three minutes including evidence and cleanup.
+
+## Manual-edit preservation during processing
+
+**2026-10-03, 02:01–02:04 UTC:** Same Chrome/macOS localhost Development,
+`manual` session, notebook `23`, note `13726`; evidence base
+`51331973c78a7040a05d664dba3e527092f6e61d`. Reused backend revision observation
+`a02dbb2697…` and real services without restart. Before capture, the saved body
+was exactly the two original paragraphs and lighthouse addition above. Through
+the contenteditable title UI, set “Author chosen preservation title”.
+
+**Input and reproduction:** Reuse the baseline harness and sustained report's
+literal `say` command, changing only the output filename to
+`.voice-discovery-edit.wav` and its same-worktree fetch URL accordingly; device
+label `Controlled edit preservation speech`. Identical sustained input: 29.168 s,
+48 kHz, including its eight-second pause. Synthetic paced MediaStream fed the
+actual worklet and real transcription/retouch; no clocks/responses were mocked.
+Reuse the sustained report's MutationObserver and CDP Network timing setup.
+After Record Audio, read `Network.requestWillBeSent` live, then immediately
+focus `.ql-editor` using supported Playwright UI input, press
+`ControlOrMeta+End`, Enter, and `pressSequentially` with
+`MANUAL EDIT: Keep this red bicycle sentence.`. The visible insertion occurred
+at the beginning despite the attempted end shortcut; no programmatic body
+mutation was used. The recorder remained active and the body was editable.
+
+| UTC | Observed event |
+| --- | --- |
+| 02:02:23.592 | Controlled capture begins |
+| 02:02:34.980 → 02:02:39.375 | First audio request → HTTP 200, 4.395 s |
+| 02:02:36.225 | Manual `M` first appears while request remains pending |
+| 02:02:39.452 | `MANUAL EDIT: Keep this red bicycle sentence` visible without period |
+| 02:02:39.494 / 02:02:39.505 | Audio content PATCH completes / visible result erases manual text |
+| 02:02:39.515 | Remaining typed period appears as `.Original paragraph one…` |
+| 02:02:41.563 | Author title replaced by “Example Paragraphs for Preservation” |
+| 02:02:52.759 | Source playback ends |
+| 02:02:55.742 → 02:03:00.662 | Second audio request → HTTP 200 |
+| 02:03:00.900 / 02:03:02.520 | Final audio body visible / title “Sample Paragraphs for Preservation” |
+| 02:03:19.223 / 02:03:19.520 | Later complete UI paste visible / its content PATCH completes HTTP 200 |
+
+**Discrepancy and limits:** The story expects manual edits to survive processing.
+Visible typed text was erased by the first result before its manual save; no
+manual-content PATCH preceded that result. This proves loss of an in-progress
+visible edit, not overwrite of an already persisted edit. A second attempt read
+an already-settled request batch, then clicked the body, pressed Home, pasted the
+complete sentence and clicked Stop. It therefore proves only post-result editing,
+not a second pending race. Reload at approximately 02:03:44 confirmed both
+original paragraphs, the manual sentence prefixed to the lighthouse paragraph,
+then the second-result book fragment and meeting sentences; orchard content and
+the first manual typing were absent. The later paste surviving reload does not
+cancel the first observed loss. Already-saved-edit race remains a coverage gap.
+At 02:03:43.151 media methods were restored, sources/tracks stopped, observer
+disconnected and AudioContext closed; Network disabled, reload and screenshot
+verified persistence, owned tab/WAV removed. Product source unchanged; ~4 min.
