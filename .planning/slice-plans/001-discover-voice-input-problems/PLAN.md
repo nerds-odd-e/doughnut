@@ -168,7 +168,7 @@ of disabling titles versus one-time generation to the improvement epic.
 
 ### 8. Explicit title-entry discovery
 Type: Behavior
-Status: planned
+Status: done — [Accepted bounded title-editor and New note UI discovery](../../seeds/SEED-066-voice-input-navigation-evidence.md#explicit-title-entry-discovery), ~3 min; absence is an improvement opportunity.
 Proof: Available route or absent capability for explicit title dictation,
 including the note-creation journey, and the usability evidence supporting it.
 

@@ -45,7 +45,10 @@ consecutive-session proof below. Slice 6 observed live pending navigation:
 destination `13727` survived, both results persisted to source `13726`, whose
 first paragraph became `...uesday.` after reload. Cause remains unproved.
 Slice 6 published as `e4b434ed41069e5a0774e506152ce49debc5fd2c`.
-Slice 7 accepted the existing title sequences below without another recording.
+Slice 7 published as `a2f401883067fd244837ed12ea1a1603e5a623d5` using existing
+title sequences below. Slice 8 inspected title editing, Audio tools/Advanced
+Options, and New note controls; no explicit voice-title route was discovered.
+OS dictation, extensions and processing-instruction routes remain unobserved.
 Independent refactor found the records clean, whitespace and formatting passed.
 Publication receipts stay in the execution conversation before each next slice.
 Hardware capture, permission and frequency remain uncovered.

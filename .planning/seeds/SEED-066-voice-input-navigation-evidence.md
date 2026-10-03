@@ -105,3 +105,43 @@ its page variable. Network observation was disabled; reload cleared page state.
 The owned WAV and tab were removed/closed. Source `13726` and destination
 `13727`, both in notebook `23`, remain disposable for final-session cleanup.
 No product source changed. Observation and evidence took about four minutes.
+
+## Explicit title-entry discovery
+
+**2026-10-03, 02:22–02:23 UTC:** Same Chrome/macOS Development environment
+and signed-in `manual` session; evidence checkout base
+`a2f401883067fd244837ed12ea1a1603e5a623d5`. Reused the earlier backend revision
+observation; no new service or recording request was made.
+
+**Improvement opportunity:** The owner's [title-entry goal](SEED-066-voice-input.md#usable-voice-input)
+includes dictating a title and creating a note by speaking its title. No explicit
+voice-title action or title destination selector was discoverable in the inspected
+existing-note title, Audio tools, Advanced Options, or New note form. This is a
+bounded UI capability observation, not a regression or an exhaustive absence claim.
+
+**Steps and signals:** Open Note → “Voice discovery 20261003 baseline” →
+“Sample Paragraphs for Preservation” (`/n13726`). Click its displayed title:
+the text gains focus without opening a separate form. DOM inspection identifies
+the title as `contenteditable="true"`, `role="title"`, `data-test="note-title"`;
+no title-specific microphone action is shown. Open Audio tools: Record Audio is
+enabled; Flush Audio, Stop Recording, and Save Audio Locally are disabled while
+idle. Advanced Options reveals “Processing Instructions:” and Toggle Full Screen,
+with no explicit title destination. Prior [baseline evidence](SEED-066-voice-input-manual-evidence.md#recording-route-and-short-speech-baseline)
+already establishes body transcription and separate automatic title generation;
+that journey was not repeated or interpreted as explicit title dictation.
+
+Click New note (n): the modal shows Folder (“Notebook root”), Search folders,
+Relationship (None / Under current), a focused Title containing `Untitled`,
+Wikidata Id, Recently updated notes, and Submit. Its Title has the same editable
+semantics and an `aria-label="Title"`. Filling it with `Explicit title entry probe`
+changes the visible Title value. No recording or voice-title control is present
+in this form; the existing Audio tools panel remains behind the modal. Dismiss
+with the visible × close button without Submit. The modal disappears and the
+existing note title remains “Sample Paragraphs for Preservation”.
+
+Tool screenshots captured the existing-note view and creation form; no standalone
+screenshot artifact was retained. OS dictation, browser extensions, title entry
+through processing instructions, and speaking-to-create remain unobserved.
+No new note or audio artifact was created, no microphone stream was started, and
+the owned tab was closed. Existing disposable notes remain for final cleanup.
+Observation plus recording of evidence took about three minutes.
