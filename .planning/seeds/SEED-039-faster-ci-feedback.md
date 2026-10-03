@@ -224,6 +224,39 @@ cause.
   `vi.mock` of `@/composables/useRecallData` or `@/composables/useResumeRecall`
   remains, and the twelve files pass with CI's settings.
 
+<a id="internal-mocks-to-real-modules"></a>
+
+### Replace frontend unit-test mocks of internal code with the real modules
+
+**Identity:** SEED-039#internal-mocks-to-real-modules
+```json dough-story-state
+{"schemaVersion":1,"refinement":"not-refined","approach":"unselected"}
+```
+
+- **For / why:** Contributors trust a frontend unit test when it exercises the
+  real code it depends on. A module mock of internal code tests the mock,
+  hides real interactions, and adds a module-mocking mechanism that can fail
+  on its own. That mechanism produced the unexplained CI failure in
+  [mainmenu-mock-flake](#mainmenu-mock-flake). The project's `unit-testing`
+  skill already says to mock only external dependencies.
+- **Outcome:** Frontend unit tests (`frontend/tests`) mock only external
+  dependencies: the backend API through `mockSdkService`, browser and device
+  APIs, third-party services, and the exceptions the frontend testing skill
+  names. Mocks of internal code and state are replaced by plain unit tests on
+  the real modules. Each test keeps the behavior it checked.
+- **Starting evidence (2026-10-03):** `vi.mock` of internal modules remains,
+  for example `vue-router` (28 files), `@/components/commons/Popups/usePopups`
+  (20), and `@/composables/useGoToNextAssimilation` (7). Each one remaining
+  needs a judgment call: whether it is internal or an allowed exception. Other
+  mocked modules, such as audio recording, wake lock, the AI event stream,
+  `pdfjs-dist` and `file-saver`, may be external. The recall-state mocks were
+  already removed by mainmenu-mock-flake.
+- **Effort hypothesis:** M, low confidence; refinement should first list the
+  internal mocks and group them.
+- **Depends on:** None.
+- **Safe stopping point:** any group of mocked modules replaced, with its
+  specs passing.
+
 ## Ordering and Scope Reduction
 
 Follow story 2, then story 3. Test optimization removes shared cost before shard
