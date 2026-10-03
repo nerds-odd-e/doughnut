@@ -68,6 +68,7 @@ Useful focused checks:
 - Backend: `CURSOR_DEV=true nix develop -c pnpm backend:test_only`
 - Isolated worktree backend tests: [`docs/worktree-backend-tests.md`](../docs/worktree-backend-tests.md). Linked worktrees isolate ordinary `pnpm backend:test` / `backend:test_only` and wrapper `test` / `migrateTestDB` automatically. Opt-in remains: `CURSOR_DEV=true nix develop -c pnpm backend:test:worktree`
 - Frontend single file: `CURSOR_DEV=true nix develop -c pnpm frontend:test tests/path/to/TestFile.spec.ts`.
+  If the shell sets `NODE_ENV=production`, prefix `env -u NODE_ENV`; otherwise Vue hides `<script setup>` bindings from `wrapper.vm` and mounted specs fail.
   This runs Vitest only; frontend proof also requires the typecheck in the
   `frontend` skill's "Frontend proof" rule before acceptance.
 - E2E single feature: `CURSOR_DEV=true nix develop -c pnpm cy:run --spec e2e_test/features/path/to.feature`

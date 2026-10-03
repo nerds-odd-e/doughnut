@@ -45,15 +45,6 @@ public class AiNoteAutomationService {
     this.note = note;
   }
 
-  public String suggestTitle() throws JsonProcessingException {
-    return DisplayNamePathSeparators.normalizeNoteTitle(
-        executeWithTool(
-            AiToolFactory.suggestNoteTitleAiTool(),
-            TitleReplacement.class,
-            TitleReplacement::getNewTitle,
-            null));
-  }
-
   public StructuredResponseCreateParams<NoteRefinementLayout> buildRefinementLayoutRequest(
       NoteRefinementQuestionContextDTO questionContext) {
     InstructionAndSchema tool = AiToolFactory.generateNoteRefinementLayoutAiTool(questionContext);
@@ -99,24 +90,6 @@ public class AiNoteAutomationService {
     return result;
   }
 
-  private <T, R> R executeWithTool(
-      InstructionAndSchema tool, Class<T> resultClass, Function<T, R> extractor, R defaultValue) {
-    StructuredResponseCreateParams<T> params =
-        buildStructuredResponseParams(resultClass, tool, null);
-    return executeWithParams(params, extractor, defaultValue);
-  }
-
-  private <T, R> R executeWithTool(
-      InstructionAndSchema tool,
-      Class<T> resultClass,
-      Function<T, R> extractor,
-      R defaultValue,
-      long maxOutputTokens) {
-    StructuredResponseCreateParams<T> params =
-        buildStructuredResponseParams(resultClass, tool, maxOutputTokens);
-    return executeWithParams(params, extractor, defaultValue);
-  }
-
   private <T, R> R executeWithParams(
       StructuredResponseCreateParams<T> params, Function<T, R> extractor, R defaultValue) {
     return openAiApiHandler
@@ -126,7 +99,7 @@ public class AiNoteAutomationService {
   }
 
   private <T> StructuredResponseCreateParams<T> buildStructuredResponseParams(
-      Class<T> resultClass, InstructionAndSchema tool, Long maxOutputTokens) {
+      Class<T> resultClass, InstructionAndSchema tool, long maxOutputTokens) {
     String modelName = globalSettingsService.globalSettingEvaluation().getValue();
     RetrievalConfig config = RetrievalConfig.defaultMaxDepth();
     FocusContextResult focusContextResult = focusContextRetrievalService.retrieve(note, config);
@@ -136,9 +109,7 @@ public class AiNoteAutomationService {
         new OpenAIResponseRequestBuilder<>(resultClass).model(modelName);
     builder.addInstruction(OpenAIResponseRequestBuilder.systemInstruction);
     builder.addInstruction(focusMarkdown);
-    if (maxOutputTokens != null) {
-      builder.maxOutputTokens(maxOutputTokens);
-    }
+    builder.maxOutputTokens(maxOutputTokens);
     builder.addInstruction(tool.getMessageBody());
     builder.addUserMessage(STRUCTURED_RESPONSE_INPUT);
     return builder.build();
@@ -149,11 +120,12 @@ public class AiNoteAutomationService {
     if (selectedItemIds == null || selectedItemIds.isEmpty()) {
       return note.getContent();
     }
-    return executeWithTool(
-        AiToolFactory.removeSelectedLayoutPointsFromContentAiTool(layout, selectedItemIds),
-        RegeneratedNoteContent.class,
+    return executeWithParams(
+        buildStructuredResponseParams(
+            RegeneratedNoteContent.class,
+            AiToolFactory.removeSelectedLayoutPointsFromContentAiTool(layout, selectedItemIds),
+            REMOVE_LAYOUT_POINTS_MAX_OUTPUT_TOKENS),
         r -> r.content,
-        note.getContent(),
-        REMOVE_LAYOUT_POINTS_MAX_OUTPUT_TOKENS);
+        note.getContent());
   }
 }

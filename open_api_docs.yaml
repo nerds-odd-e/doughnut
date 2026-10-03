@@ -1852,24 +1852,6 @@ paths:
       responses:
         "200":
           description: OK
-  /api/ai/suggest-title/{note}:
-    post:
-      tags:
-      - ai-controller
-      operationId: suggestTitle
-      parameters:
-      - name: note
-        in: path
-        required: true
-        schema:
-          type: integer
-      responses:
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/SuggestedTitleDTO"
   /api/ai/remove-refinement-suggestion/{note}:
     post:
       tags:
@@ -5173,11 +5155,6 @@ components:
           format: int32
       required:
       - id
-    SuggestedTitleDTO:
-      type: object
-      properties:
-        title:
-          type: string
     NoteRefinementLayout:
       type: object
       properties:

@@ -152,12 +152,6 @@ Please assume the role of a Memory Assistant, which involves helping me recall a
         DictatedText.class);
   }
 
-  public static InstructionAndSchema suggestNoteTitleAiTool() {
-    return new InstructionAndSchema(
-        "Please suggest a better title for the note. Don't change it if it's already good enough.",
-        suggestNoteTitle());
-  }
-
   public static InstructionAndSchema generateNoteRefinementLayoutAiTool(
       NoteRefinementQuestionContextDTO questionContext) {
     return NoteRefinementAiToolFactory.generateNoteRefinementLayoutAiTool(questionContext);

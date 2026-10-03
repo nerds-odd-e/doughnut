@@ -94,16 +94,9 @@ below record the accepted scope; unresolved causes remain hypotheses.
 
 #### Title behavior
 
-- A title is automatically generated from the dictated content, and its ongoing
-  changes are annoying. Continuous automatic title generation or updating should
-  stop.
-- Disabling automatic titles is acceptable. The owner also accepts an alternative:
-  only if the title starts with `Untitled`, wait until some amount of dictation
-  has accumulated, choose a title once for that note, and never automatically
-  update it again, including in later dictation sessions.
-- The accepted decomposition starts by disabling automatic title updates.
-  Delayed one-time generation is deferred and has no queued story; adding it
-  would require a later owner decision about its value and timing.
+- One-time automatic title generation for an `Untitled` note after enough
+  dictation is deferred and has no queued story; adding it would require a
+  later owner decision about its value and timing.
 - Voice input should also be useful for explicitly dictating the title. In
   particular, being able to dictate the note title while creating a note would
   be valuable. Explicitly dictated or otherwise user-chosen titles must remain
@@ -132,14 +125,10 @@ revision is `a02dbb2697…`; frontend/runtime revision was not fully established
 - **Existing paragraph truncated during navigation journey:** Navigate from source `13726` while processing to destination `13727`, then return/reload.
   Both results persisted to the source, whose first paragraph became literal `...uesday.`; the other four paragraphs and destination sentinel survived.
   An independent fresh page confirmed the saved state. The [voice-input documentation](../../docs/voice-input.md#existing-content-can-be-truncated-during-a-navigation-journey) retains before/after text. The causal role of navigation remains unproved.
-- **Titles repeatedly change and overwrite author choice:** Repeating the identical 18.356 s Harvard input changed an initially `Untitled` note twice
-  despite identical final bodies. A later recording overwrote “Author chosen preservation title” twice. This reproduces the owner's loss of title control;
-  one-time generation versus disabling titles remains undecided. Title sequences
-  are retained in the [voice-input documentation](../../docs/voice-input.md#automatic-titles-can-overwrite-author-choice).
 - **Explicit voice-title entry was not discovered:** Inspecting supported title editing, Audio tools/Advanced Options and New note revealed no voice-title
   control. This is a bounded improvement opportunity, not a failed promise; OS dictation, extensions and processing instructions remain unobserved.
 - **Responsiveness baseline:** First body text appeared 25.17 s after capture began, approximately 3.96 s after Stop, for the 18.356 s short input. Real
-  audio requests took 4.42/4.61 s; titles settled separately. Sustained requests took 5.25/3.14/3.53 s and the body settled before Stop. Other journeys lack
+  audio requests took 4.42/4.61 s. Sustained requests took 5.25/3.14/3.53 s and the body settled before Stop. Other journeys lack
   reliable Stop-to-final measurements. Timings establish neither cause nor a numeric acceptance target.
 - **Scoped preservation succeeded:** Two recognizable original paragraphs and a distinct lighthouse addition survived reload and the next distinct session;
   no duplication or stale prior addition was observed in those sessions. The navigation destination survived. These comparisons do not establish a general preservation guarantee or defect frequency.
@@ -228,66 +217,6 @@ technical redesign, or speculative infrastructure.
 - **Safe stopping point:** Longer dictation keeps completed thoughts and
   original content once after reload, and pauses no longer break sentences,
   regardless of later speed or UI work.
-
-<a id="author-controlled-titles"></a>
-### Keep note titles under the author's control
-
-**Identity:** SEED-066#author-controlled-titles
-```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/002-keep-titles-under-author-control/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"53a0dc9a4e2bc6e9da4b3d1a4fdcc4cf0c614821cb0b661895d9eb8b7971724e","plan":"8698cea55a9796dfc26452ef2672c22a182b0ead5f940a63be77bdb2002c43fc"}}
-```
-
-- **Goal:** Let a note author dictate into a note's body without its title
-  changing. Today processed audio repeatedly asks the model for a new title
-  (after the 1st, 2nd, 4th, 8th… chunk), so a chosen title is overwritten and
-  an `Untitled` note gets a different title on each repeat. Body dictation becomes a predictable way to add content, and
-  the title is something the author sets.
-- **Scope (required):**
-  - Recording, Flush, pause flushes, and Stop add to the body only. They
-    never change the title, whether it is `Untitled` or author-chosen, during
-    this recording or later ones.
-  - Ordinary title editing works as before.
-  - **Remove automatic title generation from voice input outright.** Body
-    dictation is the only caller of the suggest-title service, so the whole
-    chain goes: the frontend call and its schedule, the suggest-title
-    endpoint, its DTO, the AI title-suggestion service code, the API docs and
-    generated client, and their tests and mocks.
-  - **Delete code this removal leaves dead,** across every part it touches:
-    anything used only by that chain goes too, such as prompts, request or
-    response types, and test helpers or ratchet entries. Shared code that
-    still has other callers stays. The conversation tool's separate
-    "Suggested title" reply stays unchanged.
-  - Update the [voice-input documentation](../../docs/voice-input.md) so it
-    no longer describes automatic title updates.
-- **Decision (owner, 2026-10-03):** Turn off automatic titles instead of
-  generating one once for an `Untitled` note. Adding one-time generation later
-  would need a new owner decision.
-- **Decision (owner, 2026-10-03):** Remove the suggest-title service outright
-  rather than leaving it unused. Later spoken-title stories may need a similar
-  service; re-implementing it then is acceptable.
-- **Deferred:** Speaking a title, covered by
-  [Create a note using a spoken title](#create-with-spoken-title) and
-  [Change an existing note's title by speaking](#rename-with-spoken-title).
-  Automatic titles that are generated only once are not planned.
-- **Key examples:**
-  1. **Chosen title kept:** A note titled “Author chosen preservation title”.
-     Record the orchard passage with a Flush, Stop, then record a second
-     passage. After reload the title is still “Author chosen preservation
-     title” and the body has both additions.
-  2. **Untitled stays Untitled:** A new `Untitled` note with an empty body.
-     Record the Harvard passage, then record it again. After reload the title
-     is still `Untitled`.
-  3. **Typed title still works:** After dictating, rename the note by typing.
-     The new title survives reload, and the next recording does not change it.
-- **Evidence:** Repeated identical Harvard speech changed an `Untitled` note's
-  title twice; later dictation overwrote an explicitly chosen title twice
-  ([recorded sequences](../../docs/voice-input.md#automatic-titles-can-overwrite-author-choice)).
-- **Effort hypothesis:** S, high confidence. Assumes the dead chain is limited
-  to the voice-input title call, the suggest-title endpoint and AI service
-  code, the generated client, and their tests.
-- **Depends on:** None.
-- **Safe stopping point:** Body dictation never changes titles, even if no
-  voice-title controls are delivered.
 
 <a id="preserve-typed-corrections"></a>
 ### Keep typed corrections when voice results arrive

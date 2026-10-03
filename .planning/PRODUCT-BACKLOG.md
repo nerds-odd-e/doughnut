@@ -7,7 +7,6 @@ Audio tools, starting with voice input. Make voice input work reliably and easy 
 ## Taken
 
 - [Keep completed speech as dictation continues](seeds/SEED-066-voice-input.md#preserve-completed-speech) — SEED-066#preserve-completed-speech ([plan](slice-plans/001-keep-completed-speech/PLAN.md))
-- [Keep note titles under the author's control](seeds/SEED-066-voice-input.md#author-controlled-titles) — SEED-066#author-controlled-titles ([plan](slice-plans/002-keep-titles-under-author-control/PLAN.md))
 
 ## Backlog list
 

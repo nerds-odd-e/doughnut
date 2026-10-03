@@ -808,10 +808,6 @@ export type AssimilationSequenceSkip = {
     noteId?: number;
 };
 
-export type SuggestedTitleDto = {
-    title?: string;
-};
-
 export type NoteRefinementLayout = {
     items: Array<NoteRefinementLayoutItem>;
 };
@@ -2943,24 +2939,6 @@ export type CreateResponses = {
 };
 
 export type CreateResponse = CreateResponses[keyof CreateResponses];
-
-export type SuggestTitleData = {
-    body?: never;
-    path: {
-        note: number;
-    };
-    query?: never;
-    url: '/api/ai/suggest-title/{note}';
-};
-
-export type SuggestTitleResponses = {
-    /**
-     * OK
-     */
-    200: SuggestedTitleDto;
-};
-
-export type SuggestTitleResponse = SuggestTitleResponses[keyof SuggestTitleResponses];
 
 export type RemoveRefinementSuggestionData = {
     body: NoteRefinementLayoutSelectionRequestDto;

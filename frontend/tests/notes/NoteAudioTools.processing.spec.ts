@@ -1,6 +1,5 @@
 import {
   AiAudioController,
-  AiController,
   NoteController,
   TextContentController,
 } from "@generated/donut-backend-api/sdk.gen"
@@ -16,9 +15,12 @@ import {
   dictatedTextResponse,
   mountNoteAudioTools,
   processAudio,
+  startRecording,
+  stopRecording,
   useNoteAudioToolsTestLifecycle,
   type NoteAudioToolsWrapper,
 } from "@tests/notes/noteAudioToolsTestSupport"
+import { flushPromises } from "@vue/test-utils"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 
 vi.mock("@/models/audio/recorderWorklet", async () => {
@@ -48,7 +50,10 @@ describe("NoteAudioTools audio processing", () => {
   let wrapper: NoteAudioToolsWrapper
   let audioToTextMock: ReturnType<typeof mockSdkService>
   let updateContentMock: ReturnType<typeof mockSdkService>
-  const originalRealm = makeMe.aNoteRealm.content("Original body.").please()
+  const originalRealm = makeMe.aNoteRealm
+    .title("Author chosen title")
+    .content("Original body.")
+    .please()
   const note = originalRealm.note
   const noteStore = useNoteStore()
   beforeEach(() => {
@@ -57,7 +62,6 @@ describe("NoteAudioTools audio processing", () => {
       "audioToText",
       dictatedTextResponse("text")
     )
-    mockSdkService(AiController, "suggestTitle", { title: "" })
     wrapper = mountNoteAudioTools(note)
     noteStore.refreshNoteRealm(originalRealm)
     updateContentMock = mockSdkServiceWithImplementation(
@@ -66,6 +70,7 @@ describe("NoteAudioTools audio processing", () => {
       (options) =>
         makeMe.aNoteRealm
           .id(options.path.note)
+          .title(note.noteTopology.title)
           .content(options.body.content ?? "")
           .please()
     )
@@ -154,44 +159,25 @@ describe("NoteAudioTools audio processing", () => {
     })
   })
 
-  describe("title suggestion", () => {
-    let updateNoteTitleSpy: ReturnType<typeof mockSdkService>
+  it("never changes the title across many chunks and a later recording", async () => {
+    const updateNoteTitle = mockSdkService(
+      TextContentController,
+      "updateNoteTitle",
+      {} as never
+    )
 
-    beforeEach(() => {
-      updateNoteTitleSpy = mockSdkService(
-        TextContentController,
-        "updateNoteTitle",
-        {} as never
-      )
-      mockSdkService(
-        TextContentController,
-        "updateNoteContent",
-        makeMe.aNoteRealm.please()
-      )
-    })
-
-    it("suggests title on power-of-2 audio processes", async () => {
-      const suggestTitleSpy = mockSdkService(AiController, "suggestTitle", {
-        title: "Suggested Title",
-      })
-
-      for (let i = 0; i < 9; i++) {
-        await processAudio(wrapper)
-      }
-
-      expect(suggestTitleSpy).toHaveBeenCalledTimes(4)
-      expect(updateNoteTitleSpy).toHaveBeenCalledTimes(4)
-    })
-
-    it("does not update title when suggestion is empty", async () => {
-      const suggestTitleSpy = mockSdkService(AiController, "suggestTitle", {
-        title: "",
-      })
-
+    await startRecording(wrapper)
+    for (let i = 0; i < 9; i++) {
       await processAudio(wrapper)
+    }
+    await stopRecording(wrapper)
+    await startRecording(wrapper)
+    await processAudio(wrapper)
+    await flushPromises()
 
-      expect(suggestTitleSpy).toHaveBeenCalled()
-      expect(updateNoteTitleSpy).not.toHaveBeenCalled()
-    })
+    expect(updateNoteTitle).not.toHaveBeenCalled()
+    expect(
+      noteStore.refOfNoteRealm(note.id).value?.note.noteTopology.title
+    ).toBe("Author chosen title")
   })
 })
