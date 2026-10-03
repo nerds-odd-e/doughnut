@@ -5119,18 +5119,18 @@ components:
           type: boolean
         isMidSpeech:
           type: boolean
-    NoteContentCompletion:
+    DictatedText:
       type: object
       properties:
-        content:
+        dictatedText:
           type: string
       required:
-      - content
+      - dictatedText
     TextFromAudioWithCallInfo:
       type: object
       properties:
         completionFromAudio:
-          $ref: "#/components/schemas/NoteContentCompletion"
+          $ref: "#/components/schemas/DictatedText"
         rawSRT:
           type: string
         endTimestamp:
@@ -6217,6 +6217,13 @@ components:
           $ref: "#/components/schemas/NoteContentCompletion"
         titleReplacement:
           $ref: "#/components/schemas/TitleReplacement"
+    NoteContentCompletion:
+      type: object
+      properties:
+        content:
+          type: string
+      required:
+      - content
     TitleReplacement:
       type: object
       properties:

@@ -42,7 +42,7 @@ describe("NoteAudioTools audio processing", () => {
   let audioToTextMock: ReturnType<typeof mockSdkService>
   const note = makeMe.aNote.please()
   const textResponse = (content: string, endTimestamp = "00:00:37,270") => ({
-    completionFromAudio: { content },
+    completionFromAudio: { dictatedText: content },
     endTimestamp,
   })
 

@@ -149,7 +149,7 @@ Please assume the role of a Memory Assistant, which involves helping me recall a
              ------------
             """
             + transcriptionFromAudio,
-        completeNoteContent());
+        DictatedText.class);
   }
 
   public static InstructionAndSchema suggestNoteTitleAiTool() {

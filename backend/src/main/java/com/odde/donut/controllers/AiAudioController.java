@@ -48,9 +48,9 @@ class AiAudioController {
             audioFile.getAdditionalProcessingInstructions(),
             audioFile.getPreviousNoteContentToAppendTo())
         .map(
-            noteContentCompletion -> {
+            dictatedText -> {
               TextFromAudioWithCallInfo textFromAudioWithCallInfo = new TextFromAudioWithCallInfo();
-              textFromAudioWithCallInfo.setCompletionFromAudio(noteContentCompletion);
+              textFromAudioWithCallInfo.setCompletionFromAudio(dictatedText);
               textFromAudioWithCallInfo.setEndTimestamp(processedResult.getEndTimestamp());
               textFromAudioWithCallInfo.setRawSRT(processedResult.getProcessedSRT());
               return textFromAudioWithCallInfo;

@@ -6,7 +6,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.odde.donut.controllers.dto.AudioUploadDTO;
-import com.odde.donut.services.ai.NoteContentCompletion;
+import com.odde.donut.services.ai.DictatedText;
 import com.odde.donut.services.ai.TextFromAudioWithCallInfo;
 import com.odde.donut.testability.OpenAiStructuredResponseMock;
 import com.openai.models.audio.transcriptions.Transcription;
@@ -34,7 +34,7 @@ class AiAudioControllerTests extends ControllerTestBase {
   @BeforeEach
   void commonSetup() {
     openAiStructuredResponseMock = new OpenAiStructuredResponseMock(officialClient);
-    openAiStructuredResponseMock.stubStructuredResponse(new NoteContentCompletion("test123"));
+    openAiStructuredResponseMock.stubStructuredResponse(new DictatedText("test123"));
     mockTranscriptionSrtResponse("test transcription");
   }
 
@@ -67,12 +67,12 @@ class AiAudioControllerTests extends ControllerTestBase {
     @ParameterizedTest
     @ValueSource(strings = {"podcast.mp3", "podcast.m4a", "podcast.wav"})
     void convertingFormat(String filename) throws Exception {
-      NoteContentCompletion result =
+      DictatedText result =
           controller
               .audioToText(audioUpload(filename))
               .map(TextFromAudioWithCallInfo::getCompletionFromAudio)
               .orElseThrow();
-      assertThat(result.content).isEqualTo("test123");
+      assertThat(result.dictatedText).isEqualTo("test123");
     }
 
     @Test
@@ -81,7 +81,7 @@ class AiAudioControllerTests extends ControllerTestBase {
 
       controller.audioToText(audioUploadDTO);
 
-      StructuredResponseCreateParams<NoteContentCompletion> params = captureCompletionParams();
+      StructuredResponseCreateParams<DictatedText> params = captureCompletionParams();
       assertThat(params.rawParams().instructions().orElse(""))
           .contains("Additional instruction:\nTranslate to Spanish");
       assertThat(params.rawParams().text().flatMap(ResponseTextConfig::format)).isPresent();
@@ -111,8 +111,8 @@ class AiAudioControllerTests extends ControllerTestBase {
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    private StructuredResponseCreateParams<NoteContentCompletion> captureCompletionParams() {
-      ArgumentCaptor<StructuredResponseCreateParams<NoteContentCompletion>> paramsCaptor =
+    private StructuredResponseCreateParams<DictatedText> captureCompletionParams() {
+      ArgumentCaptor<StructuredResponseCreateParams<DictatedText>> paramsCaptor =
           ArgumentCaptor.forClass((Class) StructuredResponseCreateParams.class);
       verify(openAiStructuredResponseMock.responseService()).create(paramsCaptor.capture());
       return paramsCaptor.getValue();

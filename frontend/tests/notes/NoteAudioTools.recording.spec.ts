@@ -157,7 +157,7 @@ describe("NoteAudioTools recording controls", () => {
     const flushButton = findButtonByTitle(wrapper, "Flush Audio")!
 
     type AudioResponse = {
-      completionFromAudio: { content: string }
+      completionFromAudio: { dictatedText: string }
       endTimestamp: string
     }
     let resolveProcess!: (value: AudioResponse) => void
@@ -175,7 +175,7 @@ describe("NoteAudioTools recording controls", () => {
     expect(flushButton.attributes("disabled")).toBeDefined()
 
     resolveProcess({
-      completionFromAudio: { content: "test" },
+      completionFromAudio: { dictatedText: "test" },
       endTimestamp: "00:00:37,270",
     })
     await processing

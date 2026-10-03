@@ -34,15 +34,15 @@ public final class OtherAiServices {
     return modelVersionOptions;
   }
 
-  public Optional<NoteContentCompletion> getTextFromAudio(
+  public Optional<DictatedText> getTextFromAudio(
       String modelName,
       String transcriptionFromAudio,
       String additionalInstructions,
       String previousContent) {
 
     InstructionAndSchema tool = AiToolFactory.transcriptionToTextAiTool(transcriptionFromAudio);
-    OpenAIResponseRequestBuilder<NoteContentCompletion> builder =
-        new OpenAIResponseRequestBuilder<>(NoteContentCompletion.class).model(modelName);
+    OpenAIResponseRequestBuilder<DictatedText> builder =
+        new OpenAIResponseRequestBuilder<>(DictatedText.class).model(modelName);
 
     if (additionalInstructions != null && !additionalInstructions.isEmpty()) {
       builder.addInstruction("Additional instruction:\n" + additionalInstructions);
@@ -61,7 +61,7 @@ public final class OtherAiServices {
       }
     }
 
-    StructuredResponseCreateParams<NoteContentCompletion> params = builder.build();
+    StructuredResponseCreateParams<DictatedText> params = builder.build();
     return openAiApiHandler.requestAndGetStructuredResponseResult(params);
   }
 

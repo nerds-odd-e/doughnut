@@ -778,12 +778,12 @@ export type AudioUploadDto = {
     isMidSpeech?: boolean;
 };
 
-export type NoteContentCompletion = {
-    content: string;
+export type DictatedText = {
+    dictatedText: string;
 };
 
 export type TextFromAudioWithCallInfo = {
-    completionFromAudio?: NoteContentCompletion;
+    completionFromAudio?: DictatedText;
     rawSRT?: string;
     endTimestamp?: string;
 };
@@ -1329,6 +1329,10 @@ export type AssimilationNextUnitDto = {
 export type DummyForGeneratingTypes = {
     noteContentCompletion?: NoteContentCompletion;
     titleReplacement?: TitleReplacement;
+};
+
+export type NoteContentCompletion = {
+    content: string;
 };
 
 export type TitleReplacement = {

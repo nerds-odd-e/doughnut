@@ -60,6 +60,21 @@ setup>` bindings from `wrapper.vm`, so every `NoteAudioTools` spec fails with
 `processAudio is not a function`. Run frontend tests with `NODE_ENV` unset. CI
 is green on main.
 
+## Execution context
+
+- Mode: story-branch; execution checkout:
+  `/Users/terryyin/git/doughnut/.worktrees/add-a-dictated-passage-without-changing-existing`.
+- Branch: `codex/add-a-dictated-passage-without-changing-existing`; publisher:
+  `dashboard-territory.local-doughnut`; agent: Honoka-chan.
+- Claim published on `origin/main` and the execution branch:
+  `60199c1e3d4b7b9f1e01fae2b8ebdf81ded42313`; starting revision:
+  `6a56058009bfbedcde32605b382d6ae974ac2279`.
+- Increment target: `origin/refs/heads/codex/add-a-dictated-passage-without-changing-existing`.
+- Setup: `./scripts/run.sh bash scripts/worktree_setup.sh` succeeded in this
+  checkout against the locked dependencies; initial `vue-tsc --noEmit` passed.
+- Replanning remains authorized for the existing planned scope. Focused proof
+  and generation waits are the sizing exception for these cohesive slices.
+
 ## Proof commands
 
 - Frontend: `env -u NODE_ENV CURSOR_DEV=true nix develop -c sh -c 'unset NODE_ENV; pnpm -C frontend test tests/notes/NoteAudioTools tests/store/noteStore.spec.ts'`
@@ -84,9 +99,20 @@ it, along with the owner's evaluation dictation of example 1.
 
 ### 1. Voice results carry only dictated text
 Type: Structure
-Status: planned
+Status: done
 Proof: backend `AiAudioControllerTests`, the frontend audio and store specs,
 and the e2e `record_live_audio.feature` stay green after API regeneration.
+
+Accepted proof: the listed frontend command passed 33 tests; the backend command
+passed six audio-controller cases; the E2E command passed its one scenario.
+`pnpm generateTypeScript`, `pnpm -C frontend exec vue-tsc --noEmit`, and
+`pnpm openapi:lint`, each through the repository Nix wrapper, passed. Inspected
+`AiAudioControllerTests.convertingFormat` observes `dictatedText`, the instruction
+and context cases observe model inputs, `noteStore.spec.ts` observes unchanged
+replacement/loading, and the mounted audio specs and mocked journey exercise the
+new response field. The journey still supplies the whole old body; preservation
+is slice 2 proof. Real OpenAI remains hosted proof. Independent refactoring found
+no changes; accepted proof remained valid. Selective formatting passed.
 
 Internal change:
 

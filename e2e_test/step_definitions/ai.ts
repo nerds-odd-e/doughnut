@@ -112,7 +112,7 @@ Given(
   'the OpenAI completion service will return the following response for the transcription to text request:',
   (data: DataTable) => {
     const row = data.hashes()[0]!
-    const reply = JSON.stringify({ content: row.response! })
+    const reply = JSON.stringify({ dictatedText: row.response! })
     mock_services
       .openAi()
       .responses()

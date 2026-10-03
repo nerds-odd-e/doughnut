@@ -64,7 +64,12 @@ export function useNoteAudioProcessing(
         throw new Error("Failed to process audio")
       }
 
-      await noteStore.completeContent(note.id, response.completionFromAudio)
+      await noteStore.completeContent(
+        note.id,
+        response.completionFromAudio && {
+          content: response.completionFromAudio.dictatedText,
+        }
+      )
 
       callCount.value++
       if (shouldSuggestTitle(callCount.value)) {

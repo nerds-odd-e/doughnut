@@ -42,7 +42,7 @@ describe("NoteAudioTools advanced options", () => {
 
   beforeEach(() => {
     audioToTextMock = mockSdkService(AiAudioController, "audioToText", {
-      completionFromAudio: { content: "text" },
+      completionFromAudio: { dictatedText: "text" },
       endTimestamp: "00:00:37,270",
     })
     wrapper = mountNoteAudioTools(note)
