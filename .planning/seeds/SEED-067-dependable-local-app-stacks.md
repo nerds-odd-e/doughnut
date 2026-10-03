@@ -2,7 +2,7 @@
 id: SEED-067
 status: dormant
 planted: 2026-10-03
-planted_during: owner review of project retrospective findings, grouping the open Donut-specific findings and queueing the two highest-priority groups first
+planted_during: owner review of project retrospective findings, queueing the most frequent Donut-specific finding group
 trigger_when: refining a queued story that corrects a local app-stack finding in DonutRetrospectiveFindings.md
 scope: medium
 ---
@@ -12,46 +12,13 @@ scope: medium
 ## Why This Matters
 
 Developers and coding agents working on Donut need a running app to observe and
-prove a change. The open project findings show two ways the local stacks get in
-the way: branch code cannot be observed in a held stack from its own worktree,
-and other builds in the same checkout break or restart a running stack. Both
-cost execution time, and the first also costs owner time. Priority follows the
-findings' frequency and impact; see
+prove a change. The open project findings show the local stacks failing to
+start or restarting mid-run because of backend build output that something else
+left or rewrote in the same checkout. Each costs a failed start or run and a
+diagnosis. Priority follows the findings' frequency; see
 [Donut retrospective findings](../../DonutRetrospectiveFindings.md#open-findings).
 
 ## Story Decomposition
-
-<a id="hold-branch-stack"></a>
-### Observe branch code in a held app stack from its own worktree
-
-**Identity:** SEED-067#hold-branch-stack
-```json dough-story-state
-{"schemaVersion":1,"refinement":"not-refined","approach":"unselected"}
-```
-
-- **For / why:** Let a developer or agent observe unmerged branch code by hand,
-  including journeys that need real local tools or real external services,
-  without moving the primary checkout or writing a throwaway stack script.
-- **Evaluation:** From a linked worktree, one documented command starts the app
-  on that worktree's code and keeps it up until it is stopped. The primary
-  checkout and its Development stack stay untouched.
-- **Key examples (from findings):**
-  - Attach a real PDF through the CLI, with real MinerU, to a held stack on
-    branch code (DD-161: the agent wrapped `runE2eInteractive` in a temporary
-    `hold-stack.mjs`; about 28 minutes for one manual slice).
-  - Dictate with real transcription against unmerged branch code (related
-    evidence on `origin/claude/keep-completed-speech-as-dictation-continues`,
-    `cb4b71c8f4:DearDough.md`, ODF-190 row: linked worktrees refuse Development,
-    so the owner was asked mid-execution and waited about 30 minutes, and the
-    primary checkout was detached onto branch code).
-- **Open for refinement:** whether the held stack reaches real external
-  services (the E2E stack mocks them) and how service keys are supplied.
-- **Boundary:** Manual observation only. Rebuilding a stale `.venv-mineru` (the
-  rest of DD-161) and automated E2E runs are outside this story.
-- **Effort hypothesis:** M — low confidence; the E2E runner already isolates a
-  stack per checkout.
-- **Safe stopping point:** A held stack on branch code serves manual
-  observation; real-service access may follow as its own story.
 
 <a id="stacks-survive-other-builds"></a>
 ### Start and keep local app stacks on current backend code
