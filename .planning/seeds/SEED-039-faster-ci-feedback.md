@@ -143,16 +143,23 @@ authorizes no implementation, profiling run, or executable slice plan.
 - **For / why:** Contributors trust a red frontend unit-test job only when it
   points at a real defect. An intermittent failure on `main` blocks story
   wrap-up and costs diagnosis time.
-- **Effort hypothesis:** S–M, low confidence; the cost is mostly reproducing it.
+- **Effort hypothesis:** S–M; the cost is rewriting twelve spec files.
 - **Depends on:** None.
-- **Safe stopping point:** A reproduced cause with a fix, or evidence that it
-  is a Vitest defect, with a drafted upstream report and a project workaround.
+- **Safe stopping point:** Any group of the twelve spec files (MainMenu,
+  RecallPage, AssimilationPanel) on the real recall state, passing.
 
 **Goal:** Donut contributors can rely on the frontend unit-test job: the
-MainMenu resume specs stop failing for a reason unrelated to the code under
-test, because the cause of the failed mock is known and removed. This
+specs that failed through a module mock of the recall state use the real
+recall state instead, so that mock mechanism is no longer in their path. This
 contributes to the seed's aim of trustworthy CI feedback; it does not promise
 shorter CI time.
+
+**Owner decision (2026-10-03):** the failure was not reproduced (see the plan's
+Learnings). `useRecallData` is internal, in-process state with no external
+dependency, and `useResumeRecall` only sets a flag and navigates. Under the
+project's test principle (mock only external dependencies), mocking them was
+wrong from the start. The story removes those mocks instead of finding the
+cause.
 
 **Observed failure:**
 
@@ -187,50 +194,35 @@ shorter CI time.
 
 **Scope:**
 
-- Reproduce the failure on demand: a recorded command and condition under which
-  `MainMenu.resume.spec.ts` fails with the observed error, using CI's settings.
-- Establish the cause from that reproduction, and say why this file failed
-  while `MainMenu.spec.ts` passed in the same shard.
-- Remove the cause. The fix covers every spec the cause can reach, not only
-  `MainMenu.resume.spec.ts`: the same automock is declared in twelve spec files
-  and nothing known makes the resume file special.
-- If the cause is a Vitest defect: a minimal reproduction that does not depend
-  on Donut's components, a drafted upstream report, and a project workaround
-  under which the reproduction passes. Posting the report to the Vitest project
-  is the owner's action or needs the owner's instruction at that time.
-- The failure is not hidden. The story does not raise the retry count, rerun
-  the job or the file on failure, skip or quarantine the specs, or move them to
-  another shard to avoid the condition. The seed's evaluation of this story
-  requires the cause to be established rather than retried away, and the
-  observed retry already could not recover.
-- A change to the mocks made without a reproduced cause is not a delivery of
-  this story. If the failure cannot be reproduced, the attempts and what they
-  rule out come back to the owner for a decision, and mocks and retry settings
-  stay as they are.
-- Not committed here: extra diagnostic output for a future occurrence, a
-  general review of how frontend specs mock modules, the browser-orchestrator
-  crash handling already in `frontend/vitest.config.ts`, and any CI-time
-  saving.
+- Every spec file that declares `vi.mock("@/composables/useRecallData")` or
+  `vi.mock("@/composables/useResumeRecall")` (twelve files: three MainMenu,
+  six RecallPage, three AssimilationPanel) drives the real `useRecallData`
+  state through its setters and observes results through the component: the
+  rendered menu or page, and the router's current route instead of a spy on
+  `resumeRecall`.
+- Shared recall state is reset between tests in one place in the test
+  support, so no test sees another's state.
+- Test-only fakes that only these mocks used (for example
+  `createUseRecallDataMock`) are deleted.
+- The behavior each spec checked is kept; where a spec asserted a call on a
+  fake setter, it asserts the resulting state or rendering instead.
+- The failure is not hidden: retry count, shard count, and skip markers are
+  unchanged.
+- Not in this story: other module mocks in these files (for example
+  `useGoToNextAssimilation`), a general review of how frontend specs mock
+  modules, a Vitest upstream report, and any CI-time saving.
 
 **Key examples:**
 
-- **Reproduced, cause in Donut's tests or configuration.** Given the recorded
-  triggering condition and the tree before the fix → run the recorded command →
-  `MainMenu.resume.spec.ts` fails with `mockReturnValue is not a function` at
-  `setupMainMenuTests`. Given the same condition and the fixed tree → run the
-  same command repeatedly → all 9 tests pass every time.
-- **Other specs that share the mock.** Given the same triggering condition and
-  the fixed tree → run the specs that automock `@/composables/useRecallData`
-  (MainMenu, RecallPage, AssimilationPanel) → they pass, and the frontend
-  shards pass in CI.
-- **Cause in Vitest.** Given the reproduction points at Vitest's browser mocker
-  → reduce it to a spec that needs no Donut component → that spec fails the
-  same way on Vitest 5.0.3; the project workaround makes the recorded
-  reproduction pass; the drafted report holds the minimal reproduction and the
-  versions.
-- **Not reproduced.** Given the attempts under CI's settings never produce the
-  error → stop → the owner receives the list of conditions tried and what each
-  rules out; no mock, retry, or shard setting has changed.
+- **Resume shown.** Given recall is paused with 5 items remaining in the real
+  recall state → render the main menu → the Resume item is highlighted and
+  placed before Note.
+- **Resume clicked.** Given the collapsed horizontal menu and a paused recall →
+  click Resume → the router is on the `recall` route and the menu did not
+  expand.
+- **No mock left.** Given the fixed tree → search `frontend/tests` → no
+  `vi.mock` of `@/composables/useRecallData` or `@/composables/useResumeRecall`
+  remains, and the twelve files pass with CI's settings.
 
 ## Ordering and Scope Reduction
 
