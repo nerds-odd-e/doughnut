@@ -104,6 +104,19 @@ tests pass, no retries.
 Proof: the three `AssimilationPanel*.spec.ts` files pass; the no-mock grep
 prints nothing; the full focused check passes.
 
+## Execution complete
+
+Product advice: no correction. The other module mocks of internal code in
+`frontend/tests` go against the same rule as the recall mocks. Examples:
+- `vue-router` in 28 files; it is why two RecallPage specs set
+  `shouldResumeRecall` directly instead of calling the real resume action;
+- `usePopups` in 20 files;
+- `useGoToNextAssimilation` in 7 files.
+
+Consider a follow-up story that replaces them with the real modules, owner's
+call. One leftover test name in `RecallPage.spec.ts` ("…when useRecallData has
+potential sessions") names internal code and could be reworded then.
+
 ## Current decisions
 
 - Owner decision (2026-10-03): mock only external dependencies. Recall state
