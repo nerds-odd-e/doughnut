@@ -18,11 +18,10 @@ import { beforeEach, describe, expect, it, vi } from "vitest"
 import { nextTick } from "vue"
 import {
   createMemoryTrackerLite,
-  createUseRecallDataMock,
+  givenRecallQueue,
   useRecallPageSpecContext,
 } from "./recallPageTestSupport"
 
-vi.mock("@/composables/useRecallData")
 vi.mock("@/components/commons/Popups/usePopups")
 
 vi.mock("vue-router", async (importOriginal) => {
@@ -55,11 +54,7 @@ beforeEach(() => {
     "getThresholdExceeded",
     { thresholdExceeded: false }
   )
-  vi.mocked(useRecallData).mockReturnValue(
-    createUseRecallDataMock({
-      toRepeat: [createMemoryTrackerLite(memoryTrackerId, true)],
-    })
-  )
+  givenRecallQueue(createMemoryTrackerLite(memoryTrackerId, true))
 })
 
 function hasNoteShowLink(wrapper: VueWrapper, noteId: number) {
@@ -147,11 +142,6 @@ Inciting rebellion against authority.`)
     ctx.previouslyAnsweredSpy.mockResolvedValueOnce(
       wrapSdkResponse([previousQuestion])
     )
-    const recallData = createUseRecallDataMock({
-      toRepeat: [createMemoryTrackerLite(memoryTrackerId, true)],
-    })
-    vi.mocked(useRecallData).mockReturnValue(recallData)
-
     const wrapper = mountAttachedToBody()
     await flushPromises()
     await nextTick()
@@ -177,25 +167,20 @@ Inciting rebellion against authority.`)
     spellingInput.blur()
     expect(document.activeElement).not.toBe(spellingInput)
 
-    recallData.shouldResumeRecall.value = true
+    useRecallData().shouldResumeRecall.value = true
     await flushPromises()
     await nextTick()
     flushCapturedAnimationFrames(rafCallbacks)
     await flushPromises()
 
     expect(document.activeElement).toBe(spellingInput)
-    wrapper.unmount()
   })
 
   describe("answer overlapping another note", () => {
     beforeEach(() => {
-      vi.mocked(useRecallData).mockReturnValue(
-        createUseRecallDataMock({
-          toRepeat: [
-            createMemoryTrackerLite(memoryTrackerId, true),
-            createMemoryTrackerLite(456, true),
-          ],
-        })
+      givenRecallQueue(
+        createMemoryTrackerLite(memoryTrackerId, true),
+        createMemoryTrackerLite(456, true)
       )
     })
 

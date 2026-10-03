@@ -76,7 +76,12 @@ Proof: `MainMenu.spec.ts`, `MainMenu.recall.spec.ts`, and
 
 ### 3. RecallPage specs run on the real recall state
 Type: Structure
-Status: planned
+Status: done (2026-10-03). `createUseRecallDataMock` is deleted;
+`givenRecallQueue(...)` in `recallPageTestSupport.ts` sets the real queue. With
+real shared state, pages left mounted reacted to the next test's state, so
+`recallPageTestSupport.ts` now uses `enableAutoUnmount(afterEach)`. Fake-call
+checks became state checks (for example `diligentMode.value`). RecallPage: 6
+files, 37 tests pass; `vue-tsc --noEmit` passes.
 Proof: the six `RecallPage*.spec.ts` files pass under the focused command; none
 mocks `useRecallData`; `createUseRecallDataMock` in
 `tests/pages/recallPageTestSupport.ts` and any helper only it used are deleted.
@@ -86,6 +91,9 @@ rendering instead. Use slice 2's reset helper.
 
 ### 4. AssimilationPanel specs run on the real recall state
 Type: Structure
+
+Use `resetRecallData()`. If a mounted panel reacts to a later test's state,
+unmount it automatically after each test, as `recallPageTestSupport.ts` does.
 Status: planned
 Proof: the three `AssimilationPanel*.spec.ts` files pass; the no-mock grep
 prints nothing; the full focused check passes.

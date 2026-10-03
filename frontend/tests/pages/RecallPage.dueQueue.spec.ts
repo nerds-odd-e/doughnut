@@ -9,11 +9,10 @@ import { beforeEach, describe, expect, it, vi } from "vitest"
 import type { MemoryTrackerLite } from "@generated/donut-backend-api"
 import {
   createMemoryTrackerLite,
-  createUseRecallDataMock,
+  givenRecallQueue,
   useRecallPageSpecContext,
 } from "./recallPageTestSupport"
 
-vi.mock("@/composables/useRecallData")
 vi.mock("@/components/commons/Popups/usePopups")
 
 vi.mock("vue-router", async (importOriginal) => {
@@ -50,21 +49,17 @@ describe("RecallPage KeepAlive activation", () => {
   it("loads the due queue on first activation when there is no queue yet", async () => {
     const loadedTracker = createMemoryTrackerLite(7)
     ctx.recallingSpy.mockResolvedValue(dueRecallsWith([loadedTracker]))
-    const mockData = createUseRecallDataMock({ toRepeat: undefined })
-    vi.mocked(useRecallData).mockReturnValue(mockData)
-
     mountWithKeepAlive()
     await flushPromises()
 
-    expect(mockData.toRepeat.value).toEqual([loadedTracker])
+    expect(useRecallData().toRepeat.value).toEqual([loadedTracker])
   })
 
   it("keeps the queue and position on return and adds newly due trackers, including answered ones due again, at the end", async () => {
     const tracker1 = createMemoryTrackerLite(1)
     const tracker2 = createMemoryTrackerLite(2)
     const tracker3 = createMemoryTrackerLite(3)
-    const mockData = createUseRecallDataMock({ toRepeat: [tracker1, tracker2] })
-    vi.mocked(useRecallData).mockReturnValue(mockData)
+    givenRecallQueue(tracker1, tracker2)
     ctx.recallingSpy.mockResolvedValue(dueRecallsWith([tracker1, tracker2]))
     const wrapper = mountWithKeepAlive()
     await flushPromises()
@@ -83,21 +78,15 @@ describe("RecallPage KeepAlive activation", () => {
     ;(wrapper.vm as any).show = true
     await flushPromises()
 
-    expect(mockData.toRepeat.value).toEqual([
-      tracker1,
-      tracker2,
-      tracker1,
-      tracker3,
-    ])
-    expect(mockData.currentIndex.value).toBe(1)
+    const { toRepeat, currentIndex } = useRecallData()
+    expect(toRepeat.value).toEqual([tracker1, tracker2, tracker1, tracker3])
+    expect(currentIndex.value).toBe(1)
   })
 })
 
 describe("RecallPage load more buttons", () => {
   it("should show loading indicator when load more button is clicked", async () => {
-    vi.mocked(useRecallData).mockReturnValue(
-      createUseRecallDataMock({ toRepeat: [] })
-    )
+    givenRecallQueue()
     const wrapper = await ctx.mountPage()
     expect(wrapper.text()).toContain(
       "You have finished all recalls for this half a day!"
@@ -133,11 +122,12 @@ describe("RecallPage diligent mode", () => {
     )
   })
 
-  async function callLoadMore(dueInDays?: number) {
-    const mockData = createUseRecallDataMock({
-      toRepeat: [createMemoryTrackerLite(123)],
-    })
-    vi.mocked(useRecallData).mockReturnValue(mockData)
+  async function callLoadMore(
+    dueInDays: number | undefined,
+    initialDiligentMode: boolean
+  ) {
+    givenRecallQueue(createMemoryTrackerLite(123))
+    useRecallData().setDiligentMode(initialDiligentMode)
     const wrapper = await ctx.mountPage()
     ctx.recallingSpy.mockResolvedValueOnce(
       wrapSdkResponse(makeMe.aDueMemoryTrackersList.please())
@@ -145,7 +135,6 @@ describe("RecallPage diligent mode", () => {
     type ExposedVM = { loadMore: (dueInDays?: number) => Promise<unknown> }
     await (wrapper.vm as unknown as ExposedVM).loadMore(dueInDays)
     await flushPromises()
-    return mockData
   }
 
   it.each([
@@ -155,18 +144,14 @@ describe("RecallPage diligent mode", () => {
   ])(
     "sets diligent mode to $expected when loadMore dueInDays is $dueInDays",
     async ({ dueInDays, expected }) => {
-      const mockData = await callLoadMore(dueInDays)
-      expect(mockData.setDiligentMode).toHaveBeenCalledWith(expected)
+      await callLoadMore(dueInDays, !expected)
+      expect(useRecallData().diligentMode.value).toBe(expected)
     }
   )
 
   it("shows red background on progress bar when in diligent mode", async () => {
-    vi.mocked(useRecallData).mockReturnValue(
-      createUseRecallDataMock({
-        toRepeat: [createMemoryTrackerLite(123)],
-        diligentMode: true,
-      })
-    )
+    givenRecallQueue(createMemoryTrackerLite(123))
+    useRecallData().setDiligentMode(true)
     const wrapper = await ctx.mountPage()
     expect(wrapper.find(".progress-bar").classes()).toContain("diligent-mode")
   })
