@@ -59,7 +59,23 @@ code.
 
 ### 1. Backend tests leave a running batch E2E stack alone
 Type: Behavior
-Status: planned
+Status: done
+Accepted proof (2026-10-03):
+- Red, unchanged scripts: batch `cy:run --spec
+  e2e_test/features/note_creation_and_update/note_edit.feature` overlapped
+  with routed `backend/gradlew -p backend test --tests
+  com.odde.donut.utils.TimezoneUtilsTest`. The test run executed
+  `compileJava`, `bootBuildInfo`, `processResources`; `sut.log` showed
+  `Restarting due to 800 class path changes (0 additions, 800 deletions…)`,
+  then Flyway `Detected applied migration not resolved locally`; 3 of 13
+  scenarios failed with Bad Gateway.
+- Green: focused script tests 29/29 (the arg after `test` is `--rerun`,
+  followed by `--tests <pattern>`; `--rerun` absent outside isolation). Same
+  overlap, routed test run twice: main-output tasks `UP-TO-DATE`, `:test`
+  executed both times; no restart in `sut.log`; 13/13 passed. DevTools restart
+  stays on (see "Considered, not added").
+- Not observed live: `pnpm backend:test:worktree` overlap; it uses the same
+  `test --rerun` placement, covered at the script boundary.
 Proof: script tests assert that routed and `backend:test:worktree` test
 invocations carry a test-scoped `--rerun` and no `--rerun-tasks`. A real
 overlap run shows no restart and a passing feature.

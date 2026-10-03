@@ -35,11 +35,11 @@ gradle_cmd=(
   -p backend
   -PworktreeTestRun
   -Dspring.profiles.active=test
-  --rerun-tasks
   --no-build-cache
   --no-daemon
   migrateTestDB
   test
+  --rerun
 )
 if [[ -n "${test_pattern}" ]]; then
   gradle_cmd+=(--tests "${test_pattern}")
