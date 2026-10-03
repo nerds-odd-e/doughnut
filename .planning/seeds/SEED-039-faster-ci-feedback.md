@@ -137,34 +137,100 @@ authorizes no implementation, profiling run, or executable slice plan.
 
 **Identity:** SEED-039#mainmenu-mock-flake
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"not-refined","approach":"unselected"}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/006-automocked-specs-pass-reliably/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"3c8374774298450fe71f9eeb35f656ba43ef33a9be2e0eaffa7fde8539050501","plan":"062e2a4b1a975fcaa097121036d74aa5503c087c64cf0f7661bd4e36b9fbc532"}}
 ```
 
 - **For / why:** Contributors trust a red frontend unit-test job only when it
   points at a real defect. An intermittent failure on `main` blocks story
   wrap-up and costs diagnosis time.
-- **Evaluation:** `frontend/tests/toolbars/MainMenu.resume.spec.ts` (and the
-  MainMenu specs sharing its support) pass reliably in CI's frontend shard, with
-  the cause established rather than retried away.
-- **Evidence:** [Run 37108823838](https://github.com/nerds-odd-e/doughnut/actions/runs/37108823838)
-  on `main` at `afc9f1163d`, shard 2/2: all 9 tests failed, and failed again on
-  retry, with `vi.mocked(...).mockReturnValue is not a function` at
-  `tests/toolbars/mainMenuTestSupport.ts:62` (`setupMainMenuTests`). So the
-  bare automock `vi.mock("@/composables/useRecallData")` did not apply for that
-  file. The same frontend tree passed at `294ef10aaf`
-  ([run 37108365967](https://github.com/nerds-odd-e/doughnut/actions/runs/37108365967)),
-  and none of the six earlier failed runs showed this error. Locally, 3 runs of
-  `tests/toolbars/` and 6 runs of `--shard=2/2` (Vitest 5.0.3 browser mode,
-  chromium) all passed.
+- **Effort hypothesis:** S–M, low confidence; the cost is mostly reproducing it.
+- **Depends on:** None.
+- **Safe stopping point:** A reproduced cause with a fix, or evidence that it
+  is a Vitest defect, with a drafted upstream report and a project workaround.
+
+**Goal:** Donut contributors can rely on the frontend unit-test job: the
+MainMenu resume specs stop failing for a reason unrelated to the code under
+test, because the cause of the failed mock is known and removed. This
+contributes to the seed's aim of trustworthy CI feedback; it does not promise
+shorter CI time.
+
+**Observed failure:**
+
+- [Run 37108823838](https://github.com/nerds-odd-e/doughnut/actions/runs/37108823838)
+  on `main` at `afc9f1163d`, frontend shard 2/2 (`pnpm frontend:test --shard=2/2`,
+  Vitest 5.0.3 browser mode, chromium): all 9 tests of
+  `frontend/tests/toolbars/MainMenu.resume.spec.ts` failed with
+  `vi.mocked(...).mockReturnValue is not a function` at
+  `tests/toolbars/mainMenuTestSupport.ts:62` (`setupMainMenuTests`). The bare
+  automock `vi.mock("@/composables/useRecallData")` did not apply to that file.
+  It was the only failed file of 159 in the shard.
+- Each test failed again on its retry. The retry reruns the test inside the
+  same loaded file, so it cannot recover a mock that was not applied when the
+  file loaded.
+- `tests/toolbars/MainMenu.spec.ts`, which declares the same bare automock and
+  uses the same `setupMainMenuTests`, passed in the same shard six seconds
+  earlier. Eleven other spec files declare the same automock; none failed.
+- The same frontend tree passed at `294ef10aaf`
+  ([run 37108365967](https://github.com/nerds-odd-e/doughnut/actions/runs/37108365967));
+  the commits between the two changed planning files only.
+- One occurrence is known as of 2026-10-03. The six earlier failed runs and the
+  later failed [run 37114394639](https://github.com/nerds-odd-e/doughnut/actions/runs/37114394639)
+  (a lint job) do not show this error.
+- Locally, 3 runs of `tests/toolbars/` and 6 runs of `--shard=2/2` all passed.
+  Whether those local runs used CI's settings (`CI` set, so files run one at a
+  time with one retry) was not recorded.
 - **Hypotheses (unproven):** the Playwright mocker answers bare automocks
   through per-session routes with a redirect. On a slow runner, either a cached
   or in-flight module request bypasses the new route, or the previous file's
   route cleanup for the same URL removes it. Explicit factory mocks might avoid
   this but still go through a route.
-- **Effort hypothesis:** S–M, low confidence; the cost is mostly reproducing it.
-- **Depends on:** None.
-- **Safe stopping point:** A reproduced cause with a fix, or evidence that it
-  is a Vitest defect, with an upstream report and a project workaround.
+
+**Scope:**
+
+- Reproduce the failure on demand: a recorded command and condition under which
+  `MainMenu.resume.spec.ts` fails with the observed error, using CI's settings.
+- Establish the cause from that reproduction, and say why this file failed
+  while `MainMenu.spec.ts` passed in the same shard.
+- Remove the cause. The fix covers every spec the cause can reach, not only
+  `MainMenu.resume.spec.ts`: the same automock is declared in twelve spec files
+  and nothing known makes the resume file special.
+- If the cause is a Vitest defect: a minimal reproduction that does not depend
+  on Donut's components, a drafted upstream report, and a project workaround
+  under which the reproduction passes. Posting the report to the Vitest project
+  is the owner's action or needs the owner's instruction at that time.
+- The failure is not hidden. The story does not raise the retry count, rerun
+  the job or the file on failure, skip or quarantine the specs, or move them to
+  another shard to avoid the condition. The seed's evaluation of this story
+  requires the cause to be established rather than retried away, and the
+  observed retry already could not recover.
+- A change to the mocks made without a reproduced cause is not a delivery of
+  this story. If the failure cannot be reproduced, the attempts and what they
+  rule out come back to the owner for a decision, and mocks and retry settings
+  stay as they are.
+- Not committed here: extra diagnostic output for a future occurrence, a
+  general review of how frontend specs mock modules, the browser-orchestrator
+  crash handling already in `frontend/vitest.config.ts`, and any CI-time
+  saving.
+
+**Key examples:**
+
+- **Reproduced, cause in Donut's tests or configuration.** Given the recorded
+  triggering condition and the tree before the fix → run the recorded command →
+  `MainMenu.resume.spec.ts` fails with `mockReturnValue is not a function` at
+  `setupMainMenuTests`. Given the same condition and the fixed tree → run the
+  same command repeatedly → all 9 tests pass every time.
+- **Other specs that share the mock.** Given the same triggering condition and
+  the fixed tree → run the specs that automock `@/composables/useRecallData`
+  (MainMenu, RecallPage, AssimilationPanel) → they pass, and the frontend
+  shards pass in CI.
+- **Cause in Vitest.** Given the reproduction points at Vitest's browser mocker
+  → reduce it to a spec that needs no Donut component → that spec fails the
+  same way on Vitest 5.0.3; the project workaround makes the recorded
+  reproduction pass; the drafted report holds the minimal reproduction and the
+  versions.
+- **Not reproduced.** Given the attempts under CI's settings never produce the
+  error → stop → the owner receives the list of conditions tried and what each
+  rules out; no mock, retry, or shard setting has changed.
 
 ## Ordering and Scope Reduction
 
