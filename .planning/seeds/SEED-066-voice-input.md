@@ -3,7 +3,7 @@ id: SEED-066
 status: dormant
 planted: 2026-10-03
 planted_during: owner shift of near-future direction from maintenance and bug fixing to audio tools, starting with voice input
-trigger_when: selecting voice-input discovery, then returning to decompose the improvement epic with the discovery evidence
+trigger_when: selecting the voice-input improvement epic for decomposition using the recorded findings
 scope: large
 ---
 
@@ -17,102 +17,10 @@ The owner reports that it has existed for a long time, is rarely used, and is
 extremely buggy. Audio tools, beginning with usable voice input, are now the
 [near-future direction](../PRODUCT-BACKLOG.md#near-future-direction).
 
-## Owner's Requested Order
-
-Queue the two items below in this order. First discover more problems through
-creative manual testing and add the evidence to the epic. Keep the second item
-as one broad epic documenting the whole problem; return to it for decomposition
-later. Capturing these items does not start testing, implementation, or
-decomposition, and does not prescribe an implementation sequence within the epic.
-
 ## Backlog Items
 
-<a id="discover-voice-input-problems"></a>
-### Discover voice-input problems through manual testing
-
-**Identity:** SEED-066#discover-voice-input-problems
-```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/001-discover-voice-input-problems/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"f5120459373a4f39c5bb88108b68cb723490e396e31b1c4143c5afa8dbe5d0be","plan":"ee2671b080a8e2de00fab4f2dc2306467e955ed298e52dde17385b7b947a62d4"}}
-```
-
-- **Goal:** Give the product owner evidence of how voice input actually
-  behaves, including problems beyond those already reported, so the next
-  product decisions rest on observed user journeys.
-- **Outcome / evaluation:** A manual exploration report with expected versus
-  actual behavior, reproduction steps, relevant timings and evidence, and
-  explicit coverage gaps. Feed confirmed findings and unresolved questions into
-  the epic below before its later decomposition. Keep owner reports distinct
-  from newly reproduced observations and suspected causes.
-- **Scope:** Explore the existing web note-authoring journey through Audio tools.
-  Prioritize responsiveness, preservation of content, title behavior, and the
-  discoverability and clarity of controls. Record findings in the epic's
-  [manual-discovery section](#manual-discovery-findings), linking a separate
-  report only when needed to retain useful evidence. Each finding distinguishes
-  the source of its expectation, actual observation, reproduction steps,
-  environment and service mode, and supporting evidence. An unreproduced owner
-  report remains an owner report; an ambiguous expectation remains a question.
-- **Coverage priority:** Observe the core journeys in the examples below first;
-  deepen the most consequential surprises within the exploration budget.
-  Permission, device selection, interruption, and failure feedback are secondary
-  probes as the environment and remaining time allow. Report skipped journeys.
-- **Creative testing:** Real speech and microphone input may be difficult for an
-  agent to exercise. Try the cheapest credible observation route, such as
-  prerecorded speech through a browser's test microphone or a temporary audio
-  harness, alongside actual UI interaction. State which parts use real services,
-  controlled audio, or simulated responses. Simulated responses cannot establish
-  real transcription quality or end-to-end service latency. Record any remaining
-  gap rather than claiming full manual coverage.
-- **Key examples:** These describe useful discovery evidence, rather than
-  acceptance of a repaired product.
-  - Given a signed-in author with a disposable note, when they find Audio tools
-    and try a short spoken passage, record the route, visible recording and
-    processing states, resulting text, audio duration, time to first text, and
-    time from stopping or submission to the final visible result. State which
-    services were real and which timings were observable.
-  - Given a longer passage with pauses and a sentence whose meaning becomes
-    clear near its end, when intermediate and final results appear, retain
-    enough before/after evidence to distinguish recent-sentence revision from
-    changes to completed passages. Treat the exact acceptable revision boundary
-    as unresolved, while recording any whole-body erasure or replacement.
-  - Given a note with recognizable existing text, when the author dictates,
-    manually edits while processing, or repeats a supported start/stop journey,
-    compare the final content with those inputs and report any lost edits,
-    duplication, or stale result, including results after navigating away.
-    Record unsupported interactions as gaps or
-    improvement opportunities, without inventing a promise to support them.
-  - Given an `Untitled` note and a note with a user-chosen title, when dictation
-    results arrive, record the title sequence for each. Explore explicit title
-    dictation and note creation; absence of those capabilities is an improvement
-    opportunity. Automatic-title policy remains a later product decision.
-  - Given denied microphone permission, an interruption, or an unavailable
-    service that the environment permits exercising, when dictation cannot
-    proceed, record the visible feedback and recovery options. If a journey
-    cannot be observed, record the blocked step and the resulting coverage gap;
-    simulated transcription does not count as real-service coverage.
-- **Boundaries:** Discovery and documentation only. Do not repair product code,
-  make permanent test-tool changes, or decompose the epic in this item. The
-  coverage suggestions are questions to explore, not additional reported bugs.
-  Numeric latency targets, model selection, redesign, and choosing an automatic
-  title policy are deferred to later work. Device/browser matrices and exhaustive
-  failure coverage are not commitments of this bounded exploration.
-- **Environment and budget:** The owner accepts local Development or the deployed
-  app. Use one local browser first against the
-  primary checkout's Development app at `http://127.0.0.1:5175/`, using the
-  documented test sign-in `manual` / `password` and disposable notes, with a
-  60-minute total exploration budget including preparation and cleanup. The
-  deployed app is an acceptable alternative once its URL and access are resolved;
-  this does not commit to testing both environments. Live checks on 2026-10-03
-  confirmed `manual` sign-in and a real transcription-plus-retouch request in that
-  app; a browser controlled-audio route remains to be established at the start
-  of exploration. Real
-  transcription and retouching are needed to assess actual quality and latency.
-  If access is unavailable, stop the affected observation and retain a coverage
-  gap instead of substituting simulated-service conclusions.
-- **Depends on:** No prior product delivery. Environment and access verification
-  remain preparation premises for the later exploration.
-- **Safe stopping point:** The evidence remains useful even if implementation is
-  deferred; leave product behavior unchanged and remove owned temporary artifacts.
-- **Execution plan:** [Bounded manual exploration](../slice-plans/001-discover-voice-input-problems/PLAN.md).
+Keep the improvement item as one broad epic until it is decomposed using the
+recorded findings below.
 
 <a id="usable-voice-input"></a>
 ### Make voice input fast, reliable, and easy to use
@@ -128,11 +36,10 @@ decomposition, and does not prescribe an implementation sequence within the epic
   content and intent, and supports an intuitive note-authoring journey, including
   dictating titles and creating a note by speaking its title. The owner can
   evaluate the resulting experience by dictating and reviewing notes.
-- **Depends on:** The manual-discovery item above supplies additional evidence
-  before this epic is decomposed. The owner's report is captured now and does
-  not depend on reproduction to remain recorded.
+- **Evidence:** The recorded findings below inform decomposition. Owner reports
+  remain distinct from reproduced observations and suspected causes.
 - **Effort / preparation:** Broad epic; sizing, story decomposition, refinement,
-  and execution planning are deferred until the discovery evidence is available.
+  and execution planning remain later work, informed by the recorded findings.
 
 #### Reported responsiveness problem and processing direction
 
@@ -231,9 +138,6 @@ An empty-body UI baseline did succeed. Causes, frequency, the acceptable recent 
 
 ## Breadcrumbs
 
-- Owner's voice-input problem report and explicit two-item backlog order,
-  2026-10-03, in this conversation.
-- Manual exploration workflow:
-  [dough-manual-testing](../../.agents/skills/dough-manual-testing/SKILL.md).
+- Owner's voice-input problem report, 2026-10-03, in this conversation.
 - Later decomposition workflow:
   [dough-story-decomposition](../../.agents/skills/dough-story-decomposition/SKILL.md).
