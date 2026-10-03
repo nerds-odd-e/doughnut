@@ -53,7 +53,7 @@ entry point, and the story's deferred promises exclude an automated trace check.
 
 ### 1. Removal rule in always-loaded guidance
 Type: Behavior
-Status: planned
+Status: done
 Proof: inspection of both files plus the fresh-subagent demonstration above;
 `diff AGENTS.md CLAUDE.md` still shows only lines 1 and 3.
 
@@ -83,3 +83,16 @@ Delete the test, `.title("Author chosen title")`,
 - The principle lives only in `AGENTS.md` and `CLAUDE.md`; it cites no skill,
   because the stack skills do not own removal and the `dough-*` skills are
   shared.
+
+## Learnings
+
+- Slice 1 proof (2026-10-03): principle 7 is identical in both files and
+  `diff AGENTS.md CLAUDE.md` still shows only lines 1 and 3. A fresh
+  general-purpose subagent, given only the SEED-066 goal, found the behavior
+  already gone and planned only deletion plus sweep: it named the leftover
+  title test as a trace to delete and wrote no negative promise, absence test,
+  or "no longer" note.
+- That agent also noticed possible traces outside this story's scope, which
+  excludes searching for other old traces: an unused
+  `frontend/src/components/notes/SuggestTitle.vue` and a "both titles survived
+  unchanged" phrase in `docs/voice-input.md`. Reported to the owner; not acted on.
