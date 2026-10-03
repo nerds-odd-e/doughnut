@@ -100,6 +100,9 @@ workload failure or cancellation. An uncatchable crash, surviving work, or
 otherwise unverified shutdown retains the record; a later invocation may
 reclaim that stale record, but retirement still refuses it. Commands in
 different checkouts remain fully independent and may run concurrently.
+Within one checkout, run these backend tests and `pnpm cy:run` one after the
+other: both build into that checkout's `backend/build`, so a concurrent run can
+remove classes the other is using.
 
 ## Ordinary migration in a configured checkout
 

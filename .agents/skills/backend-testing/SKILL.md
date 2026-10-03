@@ -54,6 +54,8 @@ void shouldBeAbleToSaveNoteWhenValid() throws UnexpectedNoAccessRightException {
 
 Prefer injecting the controller on `ControllerTestBase` (as above). Every Spring test of the `test` profile extends `SpringTestBase` (`testability` package), directly or through `ControllerTestBase`, so the suite shares one application context. Do not add `@AutoConfigureMockMvc` or extra `@MockitoBean` / `@TestBean` on a subclass unless that **exact** annotation mix already exists — each unique mix caches another ApplicationContext and Hikari pool; CI MySQL then fails with `Too many connections` while a local run still passes. To observe a package-private persistence table, query through `EntityManager` rather than opening a new MockMvc context.
 
+Calling a controller method directly skips request binding. When a multipart or form DTO field name matters (for example a boolean the frontend sends by name), prove it with a request through an `@Autowired MockMvc` (`multipart(...)` with the real field name); `SpringTestBase` already configures MockMvc, so this adds no context.
+
 Independent algorithm example:
 
 ```java
