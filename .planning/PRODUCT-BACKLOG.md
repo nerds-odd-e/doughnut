@@ -6,8 +6,6 @@ Audio tools, starting with voice input. Make voice input work reliably and easy 
 
 ## Taken
 
-- [Add a dictated passage without changing existing note content](seeds/SEED-066-voice-input.md#preserve-existing-content) — SEED-066#preserve-existing-content ([plan](slice-plans/001-preserve-existing-content/PLAN.md))
-
 ## Backlog list
 
 - [Keep completed speech as dictation continues](seeds/SEED-066-voice-input.md#preserve-completed-speech) — SEED-066#preserve-completed-speech
