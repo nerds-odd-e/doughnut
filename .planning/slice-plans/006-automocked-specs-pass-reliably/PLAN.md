@@ -65,7 +65,7 @@ removed.
 
 ### 1. The failed automock is produced on demand and explained
 Type: Behavior
-Status: stopped (2026-10-03): not reproduced after the listed attempts; a standalone reproduction (1,940 runs) also passed; awaiting the owner's decision on hosted-runner or Linux reruns, or closing the story
+Status: stopped (2026-10-03): not reproduced after the listed attempts; a standalone reproduction (1,940 runs) and an arm64 Linux container matched to CI (23 shard runs) also passed; awaiting the owner's decision
 Proof: a literal command and condition under which
 `MainMenu.resume.spec.ts` fails with
 `vi.mocked(...).mockReturnValue is not a function` at `setupMainMenuTests`,
@@ -237,3 +237,39 @@ mocked module requested first, right after routes are registered, is not
 missed often enough to show up even under heavy CPU load and frequent forced
 GC. The remaining place to look is the CI runner itself (Linux, its Chromium,
 its load), which is a hosted-CI decision for the owner.
+
+Linux container attempt (owner's instruction, 2026-10-03, at `196e38cf5a`):
+**not reproduced.** The image `doughnut-mockflake-ci:arm64` is Ubuntu 24.04
+(CI uses `ubuntu-24.04`) with Node v26.10.0 and pnpm 11.28.3, the same
+versions as the CI log, plus `playwright@1.63.0 install-deps chromium`. It
+ran under colima's default profile. The tracked tree went in through
+`git archive HEAD`, and `pnpm --frozen-lockfile recursive install` ran
+inside the container. `pnpm frontend:test` then installed Chrome Headless
+Shell 153.0.8010.12 (Playwright chromium v1243), the same version CI
+downloaded.
+
+- **Architecture differs from CI.** An amd64 image under emulation crashed
+  Chromium at launch (SIGSEGV), so the runs used native arm64 Linux and
+  Playwright's linux-arm64 build of the same Chromium version. CI is x86_64.
+
+| Run | Container CPUs | Load | Runs | Shard duration | Result |
+| --- | --- | --- | --- | --- | --- |
+| `CI=true pnpm frontend:test --shard=2/2` | 4 | idle | 12 | 47–53 s | 12/12 pass |
+| same | 2 | idle | 6 | 81–90 s (CI: 87.7 s) | 6/6 pass |
+| same | 2 | 4 busy loops | 5 | 270–287 s | 5/5 pass |
+| standalone suite, B,P,A × 60 files | 2 | idle | 15 (300 mocked-first files) | — | 0 failures |
+| standalone suite, B,P,M × 60 files | 2 | 4 busy loops + GC every 30 ms | 15 (300 mocked-first files) | — | 0 failures |
+
+In total, 23 shard runs (207 runs of `MainMenu.resume.spec.ts`) and 600
+standalone mocked-first file runs, with no failed automock. The 2-CPU idle
+runs take as long as the CI shard did. The same Chromium version on Linux,
+the same Node and pnpm, and hosted-runner speed or heavier load do not
+produce the failure here. What remains untested is x86_64 Chromium on a
+hosted runner, which only hosted CI reruns can cover.
+
+History check (2026-10-03): the resume spec, `mainMenuTestSupport.ts`,
+`useRecallData.ts` and `useResumeRecall.ts` last changed in August, and the CI
+settings in `vitest.config.ts` are unchanged. The one nearby change is
+`3624e353a8` on 2026-10-02, which moved `vitest`, `@vitest/browser-playwright`
+and `@vitest/ui` from 5.0.2 to 5.0.3, the day before the only known failure.
+The mocker's changes between those versions have not been compared.
