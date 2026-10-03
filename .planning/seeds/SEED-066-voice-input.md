@@ -32,10 +32,10 @@ decomposition, and does not prescribe an implementation sequence within the epic
 
 **Identity:** SEED-066#discover-voice-input-problems
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"not-refined","approach":"unselected"}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/001-discover-voice-input-problems/PLAN.md","assessment":"not-ready","reasons":["Slice 1 still needs fresh live evidence of login, usable audio input, and real-service results; static inspection and homepage availability do not clear the earlier access concern."],"basis":{"document":"9fe720fbb7ddae3783e8096ef1d442593bd3dbcae553013e748bc182fe6e7e8b","plan":"a72765eb588b09ca88e5f27b037436cf347d884db229cdfcb4643aaf886d7655"}}
 ```
 
-- **For / why:** Give the product owner evidence of how voice input actually
+- **Goal:** Give the product owner evidence of how voice input actually
   behaves, including problems beyond those already reported, so the next
   product decisions rest on observed user journeys.
 - **Outcome / evaluation:** A manual exploration report with expected versus
@@ -43,24 +43,18 @@ decomposition, and does not prescribe an implementation sequence within the epic
   explicit coverage gaps. Feed confirmed findings and unresolved questions into
   the epic below before its later decomposition. Keep owner reports distinct
   from newly reproduced observations and suspected causes.
-- **Coverage to consider when selecting the mission:**
-  - Find Audio tools and start dictating into a note; observe whether controls,
-    recording state, processing state, and resulting content are understandable.
-  - Measure time to first visible text, subsequent updates, and especially the
-    time from submission or stopping to seeing the resulting note content.
-    Record the audio duration and journey used for each measurement.
-  - Dictate short and long passages, pauses, and sentences whose meaning becomes
-    clear only near the end. Observe which recent words are revised and whether
-    completed passages or the whole body are rewritten or erased.
-  - Try a note with existing content, manual edits during processing, and repeated
-    start/stop or submission where supported; look for lost text, duplication,
-    stale results, and results arriving after the user has moved on.
-  - Observe title changes with an `Untitled` title and with a title chosen by the
-    user. Explore whether voice input is available and usable for title editing
-    and while creating a note; record absent capabilities as improvements rather
-    than inventing existing promises.
-  - Explore microphone permission, device selection, interruption, and failure
-    feedback as the available environment and agreed mission budget allow.
+- **Scope:** Explore the existing web note-authoring journey through Audio tools.
+  Prioritize responsiveness, preservation of content, title behavior, and the
+  discoverability and clarity of controls. Record findings in the epic's
+  [manual-discovery section](#manual-discovery-findings), linking a separate
+  report only when needed to retain useful evidence. Each finding distinguishes
+  the source of its expectation, actual observation, reproduction steps,
+  environment and service mode, and supporting evidence. An unreproduced owner
+  report remains an owner report; an ambiguous expectation remains a question.
+- **Coverage priority:** Observe the core journeys in the examples below first;
+  deepen the most consequential surprises within the exploration budget.
+  Permission, device selection, interruption, and failure feedback are secondary
+  probes as the environment and remaining time allow. Report skipped journeys.
 - **Creative testing:** Real speech and microphone input may be difficult for an
   agent to exercise. Try the cheapest credible observation route, such as
   prerecorded speech through a browser's test microphone or a temporary audio
@@ -68,13 +62,57 @@ decomposition, and does not prescribe an implementation sequence within the epic
   controlled audio, or simulated responses. Simulated responses cannot establish
   real transcription quality or end-to-end service latency. Record any remaining
   gap rather than claiming full manual coverage.
+- **Key examples:** These describe useful discovery evidence, rather than
+  acceptance of a repaired product.
+  - Given a signed-in author with a disposable note, when they find Audio tools
+    and try a short spoken passage, record the route, visible recording and
+    processing states, resulting text, audio duration, time to first text, and
+    time from stopping or submission to the final visible result. State which
+    services were real and which timings were observable.
+  - Given a longer passage with pauses and a sentence whose meaning becomes
+    clear near its end, when intermediate and final results appear, retain
+    enough before/after evidence to distinguish recent-sentence revision from
+    changes to completed passages. Treat the exact acceptable revision boundary
+    as unresolved, while recording any whole-body erasure or replacement.
+  - Given a note with recognizable existing text, when the author dictates,
+    manually edits while processing, or repeats a supported start/stop journey,
+    compare the final content with those inputs and report any lost edits,
+    duplication, or stale result, including results after navigating away.
+    Record unsupported interactions as gaps or
+    improvement opportunities, without inventing a promise to support them.
+  - Given an `Untitled` note and a note with a user-chosen title, when dictation
+    results arrive, record the title sequence for each. Explore explicit title
+    dictation and note creation; absence of those capabilities is an improvement
+    opportunity. Automatic-title policy remains a later product decision.
+  - Given denied microphone permission, an interruption, or an unavailable
+    service that the environment permits exercising, when dictation cannot
+    proceed, record the visible feedback and recovery options. If a journey
+    cannot be observed, record the blocked step and the resulting coverage gap;
+    simulated transcription does not count as real-service coverage.
 - **Boundaries:** Discovery and documentation only. Do not repair product code,
   make permanent test-tool changes, or decompose the epic in this item. The
   coverage suggestions are questions to explore, not additional reported bugs.
-- **Depends on:** None. Resolve the supported environment, access, and a bounded
-  exploration budget when this item is selected.
+  Numeric latency targets, model selection, redesign, and choosing an automatic
+  title policy are deferred to later work. Device/browser matrices and exhaustive
+  failure coverage are not commitments of this bounded exploration.
+- **Environment and budget:** The owner accepts local Development or the deployed
+  app. Use one local browser first against the
+  primary checkout's Development app at `http://127.0.0.1:5175/`, using the
+  documented test sign-in `manual` / `password` and disposable notes, with a
+  60-minute total exploration budget including preparation and cleanup. The
+  deployed app is an acceptable alternative once its URL and access are resolved;
+  this does not commit to testing both environments. The linked preparation
+  worktree cannot host the persistent Development stack. Verify a supported
+  observation route, login, microphone or controlled-audio input, and service
+  access before exploration; none has been verified by this refinement. Real
+  transcription and retouching are needed to assess actual quality and latency.
+  If access is unavailable, stop the affected observation and retain a coverage
+  gap instead of substituting simulated-service conclusions.
+- **Depends on:** No prior product delivery. Environment and access verification
+  remain preparation premises for the later exploration.
 - **Safe stopping point:** The evidence remains useful even if implementation is
   deferred; leave product behavior unchanged and remove owned temporary artifacts.
+- **Execution plan:** [Bounded manual exploration](../slice-plans/001-discover-voice-input-problems/PLAN.md).
 
 <a id="usable-voice-input"></a>
 ### Make voice input fast, reliable, and easy to use
@@ -146,6 +184,7 @@ decomposition, and does not prescribe an implementation sequence within the epic
   changes should follow observation of the current experience rather than an
   assumed redesign.
 
+<a id="manual-discovery-findings"></a>
 #### Findings supplied by manual discovery
 
 No manual exploration has been performed for these queued items yet. Add the
@@ -155,7 +194,8 @@ Do not replace the owner's original report with unverified causal assumptions.
 
 ## Open Decisions for Later Work
 
-- The manual-testing environment, access, supported surfaces, and time budget.
+- Access to the selected manual-testing environment, audio input, and real
+  services; resolve the deployed URL and account only if that alternative is used.
 - Measurable responsiveness expectations and the actual contribution of audio
   capture, transcription, retouching, and applying results to the note.
 - The boundary between useful recent-sentence revision and destructive rewriting.
