@@ -87,10 +87,16 @@ and 6, whose editors are shared):
 
 ### 1. The body-editor registration follows the displayed note
 Type: Structure
-Status: planned
+Status: done
 Proof: existing focused specs stay green, including
 `NoteShowPage.autosaveTrash` and `NoteShowPage.imageUpload`, which pause the
 registered draft and flush it before changing the note.
+Accepted: the focused command plus `tests/notes/TextContentWrapper
+tests/notes/NoteEditableTitle` → 18 files, 97 tests; `vue-tsc` clean.
+`TextContentWrapper` takes a required `noteId` (the former `titleEditNoteId`
+merged into it); the slot's `update` takes only the new value. The registry now
+holds a registration from mount, so removal and image upload pause even an
+untouched editor.
 
 `TextContentWrapper` registers its content autosave in
 `noteContentMutationBarrier.ts` for the note it displays, from mount and

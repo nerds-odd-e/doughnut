@@ -1,6 +1,7 @@
-import { nextTick, onMounted, onUnmounted, ref, watch, type Ref } from "vue"
+import { nextTick, onMounted, onUnmounted, watch, type Ref } from "vue"
 import type { QuillPasteContext } from "@/components/form/quillPasteContext"
 import type TextArea from "@/components/form/TextArea.vue"
+import { usePasteChoice } from "@/composables/usePasteChoice"
 import { usePasteWithLinkImageOptions } from "@/composables/usePasteWithLinkImageOptions"
 import {
   toPasteChoiceAnchorRect,
@@ -8,18 +9,7 @@ import {
 } from "@/composables/pasteChoicePosition"
 import { countMarkdownLinksAndImagesInNoteContent } from "@/utils/stripPastedMarkdownLinks"
 
-type NoteContentUpdate = (noteId: number, newValue: string) => void
-
-/** A just-completed Markdown-converting paste that can still be replaced with the original
- * clipboard text. `anchorRect` is the just-pasted content's own viewport geometry, captured
- * at paste time, used to keep the action reachable without covering that content. */
-export type PasteChoice = {
-  originalText: string
-  anchorRect: PasteChoiceAnchorRect | null
-  replace: () => void
-}
-
-const EXPIRY_MS = 10_000
+type NoteContentUpdate = (newValue: string) => void
 
 export function useNoteContentPaste(options: {
   noteId: () => number
@@ -36,40 +26,15 @@ export function useNoteContentPaste(options: {
   const { htmlToMarkdown, processContentAfterPaste } =
     usePasteWithLinkImageOptions()
 
-  const pasteChoice = ref<PasteChoice | null>(null)
+  const {
+    pasteChoice,
+    setPasteChoice,
+    clearPasteChoice,
+    pausePasteChoiceExpiry,
+    resumePasteChoiceExpiry,
+  } = usePasteChoice()
   /** The value this composable itself last produced, to tell a save-round-trip echo from an actual external change. */
   let lastAppliedValue: string | undefined
-  let expiryTimer: ReturnType<typeof setTimeout> | undefined
-
-  const stopExpiryTimer = () => {
-    clearTimeout(expiryTimer)
-    expiryTimer = undefined
-  }
-
-  const clearPasteChoice = () => {
-    stopExpiryTimer()
-    pasteChoice.value = null
-  }
-
-  const startExpiryTimer = () => {
-    stopExpiryTimer()
-    expiryTimer = setTimeout(clearPasteChoice, EXPIRY_MS)
-  }
-
-  /** Both paste-completion sites (Markdown textarea and rich Quill) offer their choice the same way. */
-  const setPasteChoice = (choice: PasteChoice) => {
-    pasteChoice.value = choice
-    startExpiryTimer()
-  }
-
-  /** Hover or keyboard focus on the action pauses expiry until it is left/blurred. */
-  const pausePasteChoiceExpiry = () => {
-    if (pasteChoice.value) stopExpiryTimer()
-  }
-
-  const resumePasteChoiceExpiry = () => {
-    if (pasteChoice.value) startExpiryTimer()
-  }
 
   const contentOpensLinkImagePrompt = (content: string): boolean => {
     const { linkCount, imageCount } =
@@ -91,7 +56,7 @@ export function useNoteContentPaste(options: {
     const processedContent = await processContentAfterPaste(content)
     if (processedContent !== null) {
       lastAppliedValue = processedContent
-      update(options.noteId(), processedContent)
+      update(processedContent)
     } else if (suspendedChoice && pasteChoice.value === null) {
       // Nothing else claimed pasteChoice while the modal was open, so it is still current.
       setPasteChoice(suspendedChoice)
@@ -124,7 +89,7 @@ export function useNoteContentPaste(options: {
     const newValue = before + markdown + after
 
     lastAppliedValue = newValue
-    update(options.noteId(), newValue)
+    update(newValue)
     nextTick(() => {
       textarea.selectionStart = textarea.selectionEnd =
         before.length + markdown.length
@@ -137,7 +102,7 @@ export function useNoteContentPaste(options: {
         replace: () => {
           const replacedValue = before + originalText + after
           lastAppliedValue = replacedValue
-          update(options.noteId(), replacedValue)
+          update(replacedValue)
           clearPasteChoice()
           nextTick(() => {
             textarea.selectionStart = textarea.selectionEnd =
@@ -206,7 +171,7 @@ export function useNoteContentPaste(options: {
    * in the rich path, which is harmless since `replace()` clears the choice itself too. */
   const handleModelUpdate = (update: NoteContentUpdate, newValue: string) => {
     clearPasteChoice()
-    update(options.noteId(), newValue)
+    update(newValue)
   }
 
   const handleEscapeKey = (event: KeyboardEvent) => {

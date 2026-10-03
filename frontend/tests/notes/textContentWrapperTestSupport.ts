@@ -22,27 +22,27 @@ export const contentSlotTextareaSelector = "[data-testid=content-slot-textarea]"
 
 export const titleSlot = (slotProps: {
   value: string
-  update: (noteId: number, v: string) => void
+  update: (v: string) => void
   blur: () => void
 }) =>
   h("input", {
     "data-testid": "title-slot-input",
     value: slotProps.value,
     onInput: (e: Event) =>
-      slotProps.update(1, (e.target as HTMLInputElement).value),
+      slotProps.update((e.target as HTMLInputElement).value),
     onBlur: slotProps.blur,
   })
 
 export const contentSlot = (slotProps: {
   value: string
-  update: (noteId: number, v: string) => void
+  update: (v: string) => void
   blur: () => void
 }) =>
   h("textarea", {
     "data-testid": "content-slot-textarea",
     value: slotProps.value,
     onInput: (e: Event) =>
-      slotProps.update(1, (e.target as HTMLTextAreaElement).value),
+      slotProps.update((e.target as HTMLTextAreaElement).value),
     onBlur: slotProps.blur,
   })
 
@@ -91,7 +91,7 @@ export function mountReferencedTitle() {
       field: "edit title",
       value: referencedTitleOriginal,
       titleRenameNeedsExplicitReferenceChoice: true,
-      titleEditNoteId: referencedTitleNoteId,
+      noteId: referencedTitleNoteId,
     })
     .mount({
       slots: { default: titleSlot },
@@ -137,6 +137,7 @@ export function mountContentWrapper(
     .withCleanStorage()
     .withProps({
       field: "edit content",
+      noteId: 1,
       ...props,
     })
   wrapper = options?.attachTo

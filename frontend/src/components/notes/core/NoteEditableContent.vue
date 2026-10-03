@@ -3,6 +3,7 @@
     <TextContentWrapper
       :value="noteContent"
       field="edit content"
+      :note-id="noteId"
       :before-save-content="beforeSaveContent"
     >
       <template #default="{ value, update, blur }">

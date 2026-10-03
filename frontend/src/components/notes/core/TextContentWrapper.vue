@@ -35,7 +35,7 @@
 
 <script setup lang="ts">
 import type { PropType } from "vue"
-import { computed, onUnmounted, ref, toRef } from "vue"
+import { computed, onUnmounted, ref, toRef, watch } from "vue"
 import type { TitleRenameReferenceHandling } from "@/store/noteStore"
 import { useNoteStore } from "@/store/noteStore"
 import { useDebouncedTextAutosave } from "@/composables/useDebouncedTextAutosave"
@@ -75,7 +75,7 @@ const props = defineProps({
     required: false,
   },
   titleRenameNeedsExplicitReferenceChoice: { type: Boolean, default: false },
-  titleEditNoteId: { type: Number, required: false },
+  noteId: { type: Number, required: true },
   beforeSaveContent: {
     type: Function as PropType<
       (lastSaved: string, newValue: string) => Promise<boolean>
@@ -149,20 +149,20 @@ const {
 } = autosave
 
 let unregisterContentAutosave: (() => void) | undefined
-let registeredContentNoteId: number | undefined
 
-const registerContentAutosave = (noteId: number) => {
-  if (props.field !== "edit content" || registeredContentNoteId === noteId) {
-    return
-  }
-  unregisterContentAutosave?.()
-  registeredContentNoteId = noteId
-  unregisterContentAutosave = registerNoteContentAutosave(noteId, {
-    flushAndWait,
-  })
+if (props.field === "edit content") {
+  watch(
+    () => props.noteId,
+    (noteId) => {
+      unregisterContentAutosave?.()
+      unregisterContentAutosave = registerNoteContentAutosave(noteId, {
+        flushAndWait,
+      })
+    },
+    { immediate: true }
+  )
+  onUnmounted(() => unregisterContentAutosave?.())
 }
-
-onUnmounted(() => unregisterContentAutosave?.())
 
 const showReferencedTitleSavePanel = computed(
   () => needsExplicitReferencedTitleSave() && hasUnsavedChanges()
@@ -170,20 +170,19 @@ const showReferencedTitleSavePanel = computed(
 
 const wrapperClass = computed(() => (isDirty.value ? "dirty" : ""))
 
-const onUpdate = (noteId: number, newValue: string) => {
+const onUpdate = (newValue: string) => {
   if (props.field === "edit title" && !newValue.trim()) {
     return
   }
 
-  registerContentAutosave(noteId)
   if (
     props.field === "edit content" &&
-    !noteContentMutationAdmissionIsOpen(noteId)
+    !noteContentMutationAdmissionIsOpen(props.noteId)
   ) {
     return
   }
 
-  activeNoteId.value = noteId
+  activeNoteId.value = props.noteId
 
   if (needsExplicitReferencedTitleSave()) {
     errors.value = {}
@@ -226,14 +225,17 @@ const saveReferencedTitleWithChoice = async (
   referenceHandling: TitleRenameReferenceHandling
 ) => {
   if (!needsExplicitReferencedTitleSave() || !hasUnsavedChanges()) return
-  const noteId = props.titleEditNoteId
-  if (noteId == null) return
   savingReferencedTitle.value = true
   errors.value = {}
   try {
-    await noteStore.updateTextField(noteId, "edit title", localValue.value, {
-      titleReferenceHandling: referenceHandling,
-    })
+    await noteStore.updateTextField(
+      props.noteId,
+      "edit title",
+      localValue.value,
+      {
+        titleReferenceHandling: referenceHandling,
+      }
+    )
     markSaved(localValue.value)
   } catch (errs: unknown) {
     setError(errs)

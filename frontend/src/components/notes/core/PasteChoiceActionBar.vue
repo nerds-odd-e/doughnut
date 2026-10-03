@@ -35,7 +35,7 @@
 <script setup lang="ts">
 import { X } from "@lucide/vue"
 import { computed, ref, type PropType } from "vue"
-import type { PasteChoice } from "@/composables/useNoteContentPaste"
+import type { PasteChoice } from "@/composables/usePasteChoice"
 import { usePasteChoicePosition } from "@/composables/usePasteChoicePosition"
 
 const props = defineProps({

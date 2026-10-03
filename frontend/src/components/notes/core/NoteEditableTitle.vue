@@ -3,7 +3,7 @@
     :value="noteTopology.title"
     field="edit title"
     :title-rename-needs-explicit-reference-choice="hasInboundReferences"
-    :title-edit-note-id="noteId"
+    :note-id="noteId"
   >
     <template #default="{ value, update, blur, errors }">
       <PathNameEditor
@@ -12,7 +12,7 @@
         :readonly="readonly"
         hide-label
         warn-on-note-title-compatibility
-        @update:model-value="update(noteId, $event)"
+        @update:model-value="update"
         @blur="blur"
       >
         <template #title="{ bindings, editor }">
