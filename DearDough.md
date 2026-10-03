@@ -6,7 +6,7 @@ released response is not proof of effectiveness. Unknown provenance stays unknow
 [Response status](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/finding-names.md).
 Full pre-trim evidence: `8830c682704aac3bbb34bf9b1204da8feba042ca:DearDough.md`. Older narratives live in Git, not a second archive.
 
-- Highest allocated local number: 199. Removed local codes are never reused.
+- Highest allocated local number: 201. Removed local codes are never reused.
 
 ## ODF-034 — CI observer started for a feature branch that this project's workflow never triggers on
 
@@ -285,6 +285,8 @@ Follow-up: Open, unqueued.
 
 - Execution: SEED-064#story-6 / `f347df3d514feccaeaff8dbce062bce1992e0cff:.planning/slice-plans/007-add-property-draft-row/PLAN.md` / c05b83ea2b8a5ed3b0bd1534d720fcd08f8c9539; Timestamp: unknown (2026-10-01, slice 3 and 4 refactor handoffs before 0470d6be2d and cb7c47b618); Tool: Codex; Open Dough release: 0.3.52 (unchanged VERSION in the established execution checkout). - Evidence: coordinator conversation, refactor3 reported propertyEntry at 271 lines and moved the unchanged rename/body-refresh guard into propertyRenameGuard.spec.ts; refactor4 reported notePropertyLocationMethods at 281 lines and extracted layout assertions into notePropertyLayoutMethods.ts. Commits 0470d6be2d and cb7c47b618 contain those moves; dough-post-change-refactor/references/refactor-checks.md requires every changed file to fit 250 lines. - Observed effect: two responsibility extractions plus replacement mounted and layout E2E proof, each refactor reporting about 3 minutes. - Inference: same numeric tip-over pattern on test support; the seams were cohesive, but proof relocation added work beyond the small Cancel and touch-height outcomes. Consider anticipating file-size capacity during slice planning; no product defect or instruction change is implied.
 
+- Execution: SEED-066#preserve-existing-content / slice-plans/001-preserve-existing-content / 64173ad25fbbe7457705aeea972a959d9d3f8dd4; Timestamp: unknown (2026-10-03, slice 2 refactor); Tool: Codex; Open Dough release: 0.3.54 (VERSION unchanged from claim through implementation). - Evidence: refactor_append decision and return; noteStore was 252 lines before append, 265 after; processing spec reached 267. Commit 6c2ed996f7 extracts noteTextEditing and splits audio preservation tests. - Observed effect: the mandatory ceiling prompted an 80-line text-edit extraction, a test split, and expanded proof from 38 to 63 frontend tests plus integrated E2E; refactor reported about seven active minutes. - Inference: the seams were relevant and coherent, but the numeric gate expanded verification beyond the append change. This occurrence does not establish a net cost or an unrelated production move.
+
 ## ODF-190 — The plan prescribed production observations whose access route or log source did not exist, and whose results could not change the approach
 
 Former local code: DD-145.
@@ -420,3 +422,29 @@ The implementation return explained that overriding the RouterLink stub through 
   - Evidence: implement_property_links final return identifies the failed false-stub override; initial refactor_property_links assignment omits it; refactor progress says the warning arrived after that rerun started; final return confirms the failure was reproduced.
   - Observed effect: one avoidable failed refactor verification; all final proof passed and no faulty change was delivered.
   - Inference: include already-disproved approaches in the initial fresh-agent handoff when they constrain the likely simplification. Qualified: one execution; cost was not measured.
+
+## DD-200 — Concurrent backend verification disrupted an E2E hot-reloading runtime
+
+Backend Gradle resource processing and the E2E application shared one checkout's build output. A resource refresh provoked an application restart while the browser journey was beginning.
+
+### Occurrences
+- Execution: SEED-066#preserve-existing-content / slice-plans/001-preserve-existing-content / 64173ad25fbbe7457705aeea972a959d9d3f8dd4
+  - Timestamp: unknown (2026-10-03, slice 2 verification; runtime log shows 13:26:20)
+  - Tool: Codex
+  - Open Dough release: 0.3.54 (unchanged execution-checkout VERSION)
+  - Evidence: preserve_body proof handoff; `sut.log:522–564` reports hot-restart Flyway missing migration resources and LB connection refusal; backend `processResources` was concurrent. The E2E attempt failed with Bad Gateway before setup. Serial retry after Gradle terminated passed.
+  - Observed effect: one failed setup and one extra integrated run; no failed product assertion was dismissed.
+  - Inference: serialize Gradle resource writes and hot-reloading E2E in the same checkout, or provide genuinely separate build output. Database and port isolation alone did not prevent this overlap. Qualified: one evidenced occurrence.
+
+## DD-201 — Managed Codex delivery left CI unobserved without a retained stream binding
+
+The managed delivery CLI can declare the Codex bridge ready, while the documented yielded adapter launches its own stream observer. This execution did not establish a supported binding between those paths and published without observation.
+
+### Occurrences
+- Execution: SEED-066#preserve-existing-content / slice-plans/001-preserve-existing-content / 64173ad25fbbe7457705aeea972a959d9d3f8dd4
+  - Timestamp: unknown (2026-10-03, slice 1 and 2 managed delivery)
+  - Tool: Codex
+  - Open Dough release: 0.3.54 (unchanged execution-checkout VERSION)
+  - Evidence: coordinator had functions.exec/notify/yield_control and exec/write_stdin available, but invoked deliver without `--codex-bridge-available`; both receipts reported unobserved. `ci-host-bridge.mjs` tests that flag and describes binding as retained by caller; `ci-mailbox.mjs stream` creates a mailbox. Guidance prohibits a separate observer start for managed ordinary increments.
+  - Observed effect: commits 64173ad25f and 6c2ed996f7 were accepted without a live observer, failure notifications, or a CI completion verdict. Local proof passed; remote CI success was never claimed.
+  - Inference: the unavailable receipt reflects the omitted flag, not proof that host tools were unavailable. Clarify or provide one supported managed-delivery-to-yielded-stream binding before treating that flag as notification readiness. This is a process/integration gap, not a product defect; no workaround or guidance edit was made here.

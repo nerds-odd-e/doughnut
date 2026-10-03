@@ -72,8 +72,12 @@ is green on main.
 - Increment target: `origin/refs/heads/codex/add-a-dictated-passage-without-changing-existing`.
 - Slice 1 accepted revision: `64173ad25fbbe7457705aeea972a959d9d3f8dd4` on
   that increment target. Managed delivery reported CI unobserved because the
-  Codex yielded-cell bridge did not attach. No observer or shutdown obligation
-  exists; no CI success is claimed. Default-checkout maintenance is not applicable.
+  delivery invocation omitted the Codex bridge flag and established no stream
+  binding. This receipt does not prove host tools were unavailable. No observer
+  or shutdown obligation exists; no CI success is claimed. Default-checkout
+  maintenance is not applicable.
+- Slice 2 accepted revision: `6c2ed996f76960acf2d38b8cb2c810dcac24b915` on
+  the same target, with the same explicit observation gap and no rebase.
 - Setup: `./scripts/run.sh bash scripts/worktree_setup.sh` succeeded in this
   checkout against the locked dependencies; initial `vue-tsc --noEmit` passed.
 - Replanning remains authorized for the existing planned scope. Focused proof
@@ -183,3 +187,39 @@ Accepted proof and delivery preparation:
 - Paid real-OpenAI and owner evaluation remain external proof. Local E2E does
   not explicitly reload; exact saved PATCH bodies and the integrated save/display
   journey provide local persistence-boundary evidence.
+
+## Execution retrospective
+
+Reviewed the original story and plan at the published claim, implementation
+commits `64173ad25f` and `6c2ed996f7`, their aggregate change, the current audio
+and conversation consumers, and inspected proof. Both slices are done; no
+unrelated commit is included. Product findings: none requiring correction.
+The audio-only schema and deterministic append keep existing content outside
+model replacement, while the conversation retains its complete-content meaning.
+The text-edit seam owns persistence/undo; there are no intermediate bridges or
+diff instructions left in the audio path.
+
+The mocked journey drove the red change and retains integrated recording/save
+proof. Long/empty/current-body/undo variations remain mounted unit tests;
+shared title saves and store replacement retain focused coverage. The real-model
+journey remains external proof. No test consolidation is justified by current
+coverage/cost evidence; no follow-up plan was created.
+
+Accepted ADRs 0001–0007 and 0000 were classified from the current index. Relevant
+ADR 0002 publication remains on the ordinary content PATCH; ADR 0006 failure
+handling gains no replacement fallback; ADR 0007 disposable test isolation was
+retained. No ADR conflict or North Star topic applies.
+
+Process review was enabled by `skipProcessRetrospective: false`. The available
+conversation, agent handoffs, and runtime logs support an ODF-189 occurrence and
+new DD-200 (overlapping backend resource writes/E2E) and DD-201 (managed Codex
+stream-binding gap) in `DearDough.md`, 450 physical lines. Delegated private tool
+history and token cost were not available, so no exact token or net cost is claimed.
+CI is unobserved; review asserts no remote verdict or observer shutdown.
+
+## Execution complete
+
+Product advice: retain the current queue order. Completed-speech stability is
+still the next selected opportunity; this append change does not settle recent
+unfinished-sentence revision, pending editor drafts, or author-controlled titles.
+No new product story, correction, or priority change is supported by this execution.
