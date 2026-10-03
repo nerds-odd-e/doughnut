@@ -403,15 +403,6 @@ Follow-up: Open, unqueued.
   - Observed effect: one of two refactor passes changed nothing.
   - Inference: again, diff size did not predict value: slice 2 was a pure deletion and still left residue.
 
-## DD-177 — The plan put API regeneration in a later slice than the endpoint that requires it
-
-`RobotsTests.openApiDocsMatchCommittedYaml` fails whenever a controller signature changes without regenerating
-`open_api_docs.yaml`, so an endpoint slice and its regeneration cannot be delivered separately while CI stays green.
-
-Follow-up: Open, unqueued.
-
-- Execution: SEED-062#story-1 / slice-plans/006-reify-property / 508d4909b5; Timestamp: unknown (slice 2 return on 2026-09-30, about 19:10 +08:00); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.50. - Evidence: PLAN.md slice 5 "Regenerate the client after slice 2's controller signature"; slice 2 implementer reported `pnpm backend:test_only` 2698 tests, 1 failure `RobotsTests > openApiDocsMatchCommittedYaml()`; coordinator regenerated in slice 2 delivery (2f33e3e0ae) and marked slice 5 absorbed. - Observed effect: plan order had to be changed during execution; no red push. - Inference: the planner treated generation as an optional follow-up Structure slice; the project's generation trigger belongs in the same slice as the signature change.
-
 ## DD-178 — A refactor agent reran a failing new test until green and suggested an environment cause; the failure was a real flake
 
 A new test failed once in the refactor pass; the agent reran it, saw green twice, and reported a suspected shared-database or build cause without evidence. The coordinator's forced rerun reproduced it: the test assumed index row order across frontmatter keys, and `Frontmatter.keys()` is `Set.copyOf`, whose order varies per JVM run.
@@ -432,19 +423,6 @@ The implementation return explained that overriding the RouterLink stub through 
   - Evidence: implement_property_links final return identifies the failed false-stub override; initial refactor_property_links assignment omits it; refactor progress says the warning arrived after that rerun started; final return confirms the failure was reproduced.
   - Observed effect: one avoidable failed refactor verification; all final proof passed and no faulty change was delivered.
   - Inference: include already-disproved approaches in the initial fresh-agent handoff when they constrain the likely simplification. Qualified: one execution; cost was not measured.
-
-## DD-200 — Concurrent backend verification disrupted an E2E hot-reloading runtime
-
-Backend Gradle resource processing and the E2E application shared one checkout's build output. A resource refresh provoked an application restart while the browser journey was beginning.
-
-### Occurrences
-- Execution: SEED-066#preserve-existing-content / `979cac31fc19f756bdfc480d9b24f1ab7dfeec34:.planning/slice-plans/001-preserve-existing-content/PLAN.md` / 64173ad25fbbe7457705aeea972a959d9d3f8dd4
-  - Timestamp: unknown (2026-10-03, slice 2 verification; runtime log shows 13:26:20)
-  - Tool: Codex
-  - Open Dough release: 0.3.54 (unchanged execution-checkout VERSION)
-  - Evidence: preserve_body proof handoff; `sut.log:522–564` reports hot-restart Flyway missing migration resources and LB connection refusal; backend `processResources` was concurrent. The E2E attempt failed with Bad Gateway before setup. Serial retry after Gradle terminated passed.
-  - Observed effect: one failed setup and one extra integrated run; no failed product assertion was dismissed.
-  - Inference: serialize Gradle resource writes and hot-reloading E2E in the same checkout, or provide genuinely separate build output. Database and port isolation alone did not prevent this overlap. Qualified: one evidenced occurrence.
 
 ## DD-201 — Managed Codex delivery left CI unobserved without a retained stream binding
 

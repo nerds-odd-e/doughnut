@@ -10,6 +10,8 @@ Audio tools, starting with voice input. Make voice input work reliably and easy 
 
 ## Backlog list
 
+- [Observe branch code in a held app stack from its own worktree](seeds/SEED-067-dependable-local-app-stacks.md#hold-branch-stack) — SEED-067#hold-branch-stack
+- [Start and keep local app stacks on current backend code](seeds/SEED-067-dependable-local-app-stacks.md#stacks-survive-other-builds) — SEED-067#stacks-survive-other-builds
 - [Keep typed corrections when voice results arrive](seeds/SEED-066-voice-input.md#preserve-typed-corrections) — SEED-066#preserve-typed-corrections
 - [Recover a failed transcription without repeating the speech](seeds/SEED-066-voice-input.md#recover-failed-transcription) — SEED-066#recover-failed-transcription
 - [See submitted dictation promptly](seeds/SEED-066-voice-input.md#prompt-dictation-results) — SEED-066#prompt-dictation-results
