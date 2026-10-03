@@ -108,6 +108,13 @@ green; `vue-tsc` clean.
 admission is open; otherwise it returns `false`, so `appendDictatedText` keeps
 the saved-body append it had before the story.
 
+## Execution complete
+
+Product advice: no change. This correction restored pre-plan-003 behavior and
+taught nothing new about the product; the remaining voice-input backlog order
+still fits the direction. The save-then-change race stays as plan 003 left it;
+fixing it would be a new owner decision.
+
 ## Current decisions
 
 - Restoring the pre-story saved-body write is the whole of slice 2; the
