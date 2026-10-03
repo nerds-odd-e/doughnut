@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 1,
+  "agent": "Hibiki-chan",
+  "email": "hibiki-chan@example.org",
+  "activity": "preparation",
+  "identity": "SEED-066#discover-voice-input-problems",
+  "host": "codex",
+  "model": "gpt-6.1-sol"
+}
