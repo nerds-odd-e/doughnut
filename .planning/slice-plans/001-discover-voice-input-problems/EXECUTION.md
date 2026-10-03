@@ -48,7 +48,9 @@ Slice 6 published as `e4b434ed41069e5a0774e506152ce49debc5fd2c`.
 Slice 7 published as `a2f401883067fd244837ed12ea1a1603e5a623d5` using existing
 title sequences below. Slice 8 inspected title editing, Audio tools/Advanced
 Options, and New note controls; no explicit voice-title route was discovered.
+Slice 8 published as `0aac20658726185004897491063cbb9bfe142af8`.
 OS dictation, extensions and processing-instruction routes remain unobserved.
+Slice 9's allowed skip and remaining reserve are recorded below.
 Independent refactor found the records clean, whitespace and formatting passed.
 Publication receipts stay in the execution conversation before each next slice.
 Hardware capture, permission and frequency remain uncovered.
@@ -113,3 +115,18 @@ labels, revision limits and cleanup. No new recording or UI probe was needed;
 review and mapping took about one minute. Hardware capture remains uncovered,
 and disabling automatic titles versus delayed one-time generation remains the
 owner's later decision. No product source or disposable-note state changed.
+
+## Failure-probe budget disposition
+
+Slice 9 uses the plan's explicit permission to skip this secondary probe to
+confirm a higher-value finding. At 02:26:46 UTC, about 6 minutes 40 seconds
+remained before the 02:33:26 mission deadline. Preserve that reserve for
+independent confirmation of the saved source-paragraph loss and final evidence
+review and cleanup in slice 10. No new browser or service probe was performed.
+
+Denied permission, device failure, recording interruption, and service-failure
+feedback and recovery remain unobserved. The paced synthetic MediaStream route
+used in earlier observations does not establish genuine hardware or browser
+permission behavior. No failure-feedback or recovery claim, or absence of a
+defect, follows from this disposition. Discovery scope is unchanged; recording
+this permitted gap took less than one minute and changed no app state.

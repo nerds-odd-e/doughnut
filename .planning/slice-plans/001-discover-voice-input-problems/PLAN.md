@@ -178,7 +178,7 @@ not a regression against an invented existing promise.
 
 ### 9. Available interruption or failure feedback
 Type: Behavior
-Status: planned
+Status: done — [Allowed secondary-probe skip and explicit unobserved failure paths](EXECUTION.md#failure-probe-budget-disposition), <1 min; reserve retained for loss confirmation and cleanup.
 Proof: One safely reachable denied-permission, device, interruption, or service
 failure journey, visible feedback/recovery, and remaining unobserved cases.
 
