@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 1,
+  "agent": "Ai-chan",
+  "email": "ai-chan@example.org",
+  "identity": "SEED-068#removal-rule-in-guidance",
+  "mode": "story-branch",
+  "branch": "claude/removals-leave-no-trace-without-the-owner-restat",
+  "host": "claude"
+}

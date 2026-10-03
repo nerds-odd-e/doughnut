@@ -6,9 +6,10 @@ Audio tools, starting with voice input. Make voice input work reliably and easy 
 
 ## Taken
 
+- [Removals leave no trace without the owner restating the rule](seeds/SEED-068-owner-rules-reach-every-agent.md#removal-rule-in-guidance) — SEED-068#removal-rule-in-guidance ([plan](slice-plans/004-removal-rule-in-guidance/PLAN.md))
+
 ## Backlog list
 
-- [Removals leave no trace without the owner restating the rule](seeds/SEED-068-owner-rules-reach-every-agent.md#removal-rule-in-guidance) — SEED-068#removal-rule-in-guidance
 - [Start and keep local app stacks on current backend code](seeds/SEED-067-dependable-local-app-stacks.md#stacks-survive-other-builds) — SEED-067#stacks-survive-other-builds
 - [Stop the MainMenu resume specs from failing intermittently in CI](seeds/SEED-039-faster-ci-feedback.md#mainmenu-mock-flake) — SEED-039#mainmenu-mock-flake
 - [Keep every transcribed sentence when dictated text is written](seeds/SEED-066-voice-input.md#keep-every-transcribed-sentence) — SEED-066#keep-every-transcribed-sentence
