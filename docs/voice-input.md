@@ -7,6 +7,39 @@ updates settle separately. No explicit voice-title control was found in the
 existing-note title editor, Audio tools, Advanced Options, or New note form.
 OS dictation, browser extensions and title instructions were not assessed.
 
+## Adding dictated text to a note
+
+Audio processing returns `DictatedText.dictatedText`: only the new passage,
+formatted as Markdown, including any leading whitespace needed to join it to
+the note. Existing content is context only; the model is instructed never to
+repeat or revise it. Audio responses do not use the conversation tool's
+`NoteContentCompletion`, which continues to replace complete note content.
+
+The client retains the originating note id. It reads that note's current store
+body, loading its realm when absent, and sends only the last 500 characters as
+context, prefixed with `...` when truncated. The full body stays in the store;
+the excerpt never becomes the saved replacement.
+
+Each returned passage is appended deterministically to the originating note's
+current body and saved through the ordinary content PATCH. Existing characters
+remain unchanged, an empty body becomes the passage, and successive additions
+follow earlier additions once. Navigating to another note does not redirect the
+result. The normal content-edit undo restores the prior body.
+
+Mid-speech processing excludes the last transcription segment and advances the
+processed audio position to that segment's start. Its audio is retained for the
+next chunk, so appending a result does not re-add already processed audio.
+The model controls transcription quality and passage whitespace. Recent
+unfinished-sentence revision and unsaved editor drafts have separate behavior;
+the append operates on current store content. Automatic title suggestions
+continue on the existing schedule.
+
+The mounted audio preservation tests assert exact saved content for long and
+empty bodies, repeated additions, originating-note targeting, and undo. The
+mocked recording journey supplies only new text and observes the original body
+plus that addition. The real-OpenAI journey checks both its original text and
+the dictated passage.
+
 ## Observation boundary
 
 The observations below are from Chrome/macOS on 2026-10-03, signed in as
