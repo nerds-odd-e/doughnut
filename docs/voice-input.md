@@ -26,9 +26,12 @@ remain unchanged, an empty body becomes the passage, and successive additions
 follow earlier additions once. Navigating to another note does not redirect the
 result. The normal content-edit undo restores the prior body.
 
-Mid-speech processing excludes the last transcription segment and advances the
-processed audio position to that segment's start. Its audio is retained for the
-next chunk, so appending a result does not re-add already processed audio.
+Timed chunks, pause flushes (after more than 3 s of silence, once per pause)
+and Flush clicks are processed mid-speech. Mid-speech processing never writes
+the last transcription segment and advances the processed audio position to
+that segment's start. Its audio is retained for the next chunk, so appending a
+result does not re-add already processed audio. A lone segment writes nothing
+and all its audio is kept. Only Stop writes everything that remains.
 The model controls transcription quality and passage whitespace. Recent
 unfinished-sentence revision and unsaved editor drafts have separate behavior;
 the append operates on current store content. Automatic title suggestions

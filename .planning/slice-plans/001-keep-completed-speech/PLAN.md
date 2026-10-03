@@ -98,7 +98,7 @@ single append after Stop.
 
 ### 3. A pause or Flush holds back the unfinished tail
 Type: Behavior
-Status: planned
+Status: done
 Proof: `CURSOR_DEV=true nix develop -c pnpm frontend:test tests/models/audioProcessingScheduler.flush.spec.ts tests/models/audioBuffer.spec.ts`, plus the frontend typecheck
 
 Behavior: Speech is followed by a silence longer than 3 s, or the author clicks
@@ -176,3 +176,11 @@ sentence detection.
     multipart DTO field name needs a MockMvc test.
   - `backend:test:worktree` takes one `--tests` pattern, and it shares
     `backend/build` with `cy:run`, so run them one after another.
+- **Slice 3 (2026-10-03).** Accepted proof:
+  `audioProcessingScheduler.flush.spec.ts` ("marks chunk as isMidSpeech when
+  the author flushes", "sends one isMidSpeech chunk for a pause, however long
+  it lasts") and `audioBuffer.spec.ts` ("should trigger silence callback once
+  per silent run"); Stop stays not mid-speech in
+  `audioProcessingScheduler.stop.spec.ts`. No E2E uses audio Flush or silence.
+  A continued-silence test only catches re-sending when its callback returns a
+  timestamp that holds back audio.

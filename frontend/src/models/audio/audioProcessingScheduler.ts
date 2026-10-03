@@ -24,13 +24,6 @@ class AudioProcessingSchedulerImpl implements AudioProcessingScheduler {
     ) => Promise<string | undefined>
   ) {}
 
-  private async processDataChunk(isMidSpeech = true): Promise<void> {
-    await this.audioBuffer.processUnprocessedData(
-      this.processorCallback,
-      isMidSpeech
-    )
-  }
-
   private startTimer(): void {
     this.processorTimer = setInterval(() => {
       this.processAndCallback(true)
@@ -40,7 +33,10 @@ class AudioProcessingSchedulerImpl implements AudioProcessingScheduler {
   private async processAndCallback(isMidSpeech: boolean): Promise<void> {
     if (this.processing) return
 
-    this.processing = this.processDataChunk(isMidSpeech)
+    this.processing = this.audioBuffer.processUnprocessedData(
+      this.processorCallback,
+      isMidSpeech
+    )
     try {
       await this.processing
     } finally {
@@ -76,7 +72,7 @@ class AudioProcessingSchedulerImpl implements AudioProcessingScheduler {
       clearInterval(this.processorTimer)
       this.startTimer()
     }
-    await this.processAndCallback(false)
+    await this.processAndCallback(true)
   }
 }
 

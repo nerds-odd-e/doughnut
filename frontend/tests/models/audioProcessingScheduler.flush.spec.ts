@@ -58,7 +58,7 @@ describe("AudioProcessingScheduler flush", () => {
     )
   })
 
-  it("marks chunk as not isMidSpeech when silence triggers callback", async () => {
+  it("marks chunk as isMidSpeech when the author flushes", async () => {
     const mockCallback = vi.fn().mockResolvedValue(undefined)
     const { audioBuffer, scheduler } = createBufferAndScheduler(
       44100,
@@ -67,15 +67,31 @@ describe("AudioProcessingScheduler flush", () => {
 
     audioBuffer.receiveAudioData([new Float32Array(44100).fill(0.5)])
     scheduler.start()
-    audioBuffer.receiveAudioData([new Float32Array(44100 * 3).fill(0)])
+    await scheduler.tryFlush()
 
     expect(mockCallback).toHaveBeenCalledWith(
-      expect.objectContaining({
-        isMidSpeech: false,
-        data: expect.any(File),
-      })
+      expect.objectContaining({ isMidSpeech: true })
     )
+  })
+
+  it("sends one isMidSpeech chunk for a pause, however long it lasts", async () => {
+    const mockCallback = vi.fn().mockResolvedValue("00:00:00,500")
+    const { audioBuffer, scheduler } = createBufferAndScheduler(
+      44100,
+      mockCallback
+    )
+
+    audioBuffer.receiveAudioData([new Float32Array(44100).fill(0.5)])
+    scheduler.start()
+    audioBuffer.receiveAudioData([new Float32Array(44100 * 3).fill(0)])
+    await vi.advanceTimersByTimeAsync(0)
+    audioBuffer.receiveAudioData([new Float32Array(44100 * 6).fill(0)])
+    await vi.advanceTimersByTimeAsync(0)
+
     expect(mockCallback).toHaveBeenCalledTimes(1)
+    expect(mockCallback).toHaveBeenCalledWith(
+      expect.objectContaining({ isMidSpeech: true })
+    )
   })
 
   it("accumulates processed samples across multiple flushes", async () => {
