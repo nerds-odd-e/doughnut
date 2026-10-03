@@ -116,7 +116,7 @@ paragraph on mid-speech processing to state the common rule.
 
 ### 4. The orchard passage survives whole
 Type: Behavior
-Status: awaiting owner decision
+Status: done
 Proof: Repeat slice 1's real-service orchard journey and reload, recording the
 result here.
 
@@ -214,6 +214,9 @@ sentence detection.
     `transcriptionToTextAiTool` completion dropped it. One run only; slice 1
     and the first slice 4 run kept it. This contradicts the key example that
     the orchard facts appear once, and the story does not cover retouch
-    quality. Owner decision needed.
+    quality. Owner decision (2026-10-03): accept slice 4 for hold-back and
+    queue [Keep every transcribed sentence when dictated text is
+    written](../../seeds/SEED-066-voice-input.md#keep-every-transcribed-sentence)
+    as a separate story.
   - The primary checkout was returned to `main` (`aaa17f6a`). Development
     then needed a fresh start: `dev.pid` held a PID that macOS had reused.

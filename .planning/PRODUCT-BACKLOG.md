@@ -10,6 +10,7 @@ Audio tools, starting with voice input. Make voice input work reliably and easy 
 
 ## Backlog list
 
+- [Keep every transcribed sentence when dictated text is written](seeds/SEED-066-voice-input.md#keep-every-transcribed-sentence) — SEED-066#keep-every-transcribed-sentence
 - [Keep note titles under the author's control](seeds/SEED-066-voice-input.md#author-controlled-titles) — SEED-066#author-controlled-titles
 - [Keep typed corrections when voice results arrive](seeds/SEED-066-voice-input.md#preserve-typed-corrections) — SEED-066#preserve-typed-corrections
 - [Recover a failed transcription without repeating the speech](seeds/SEED-066-voice-input.md#recover-failed-transcription) — SEED-066#recover-failed-transcription

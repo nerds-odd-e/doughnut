@@ -229,6 +229,35 @@ technical redesign, or speculative infrastructure.
   original content once after reload, and pauses no longer break sentences,
   regardless of later speed or UI work.
 
+<a id="keep-every-transcribed-sentence"></a>
+### Keep every transcribed sentence when dictated text is written
+
+**Identity:** SEED-066#keep-every-transcribed-sentence
+```json dough-story-state
+{"schemaVersion":1,"refinement":"not-refined","approach":"unselected"}
+```
+
+- **For / why:** An author dictating a passage expects every sentence they
+  finished to reach the note, not only the sentences the text-writing step
+  chooses to keep.
+- **Evaluation:** With real services, dictate the orchard passage from the
+  [voice-input documentation](../../docs/voice-input.md#completed-dictated-content-can-disappear).
+  Every transcribed completed sentence, including "These facts are finished.",
+  appears once in the saved note after reload.
+- **Evidence:** In the second real-service orchard run of
+  [Keep completed speech as dictation continues](#preserve-completed-speech)
+  (2026-10-03, note 13731), the pause flush's transcription held "These facts
+  are finished.", but the dictated text returned by `transcriptionToTextAiTool`
+  left it out, so it never reached the note. Two earlier runs kept it, so the
+  frequency is unknown.
+- **Boundary:** The step that turns a transcription into dictated text.
+  Correcting misheard words and transcription quality stay out of scope.
+- **Effort hypothesis:** M — low confidence; the cause and frequency are
+  unknown.
+- **Depends on:** Keep completed speech as dictation continues.
+- **Safe stopping point:** Completed transcribed sentences are not silently
+  dropped before they reach the note.
+
 <a id="author-controlled-titles"></a>
 ### Keep note titles under the author's control
 
