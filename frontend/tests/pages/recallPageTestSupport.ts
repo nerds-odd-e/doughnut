@@ -5,88 +5,18 @@ import {
   RecallsController,
 } from "@generated/donut-backend-api/sdk.gen"
 import { useRecallData } from "@/composables/useRecallData"
-import type { PotentialLearningSession } from "@/composables/useRecallData"
 import RecallPage from "@/pages/RecallPage.vue"
-import type {
-  DueCommissionedMemoryTrackerLite,
-  MemoryTrackerLite,
-} from "@generated/donut-backend-api"
+import type { MemoryTrackerLite } from "@generated/donut-backend-api"
 import makeMe from "donut-test-fixtures/makeMe"
 import helper, { mockSdkService } from "@tests/helpers"
-import { flushPromises } from "@vue/test-utils"
-import { computed, ref } from "vue"
+import { enableAutoUnmount, flushPromises } from "@vue/test-utils"
 import { afterEach, beforeEach, vi } from "vitest"
 import mockBrowserTimeZone from "@tests/helpers/mockBrowserTimeZone"
+import { resetRecallData } from "@tests/helpers/recallDataTestSupport"
 
-export function createUseRecallDataMock(overrides?: {
-  toRepeat?: MemoryTrackerLite[]
-  dueCommissioned?: DueCommissionedMemoryTrackerLite[]
-  potentialLearningSessions?: PotentialLearningSession[]
-  currentRecallWindowEndAt?: string
-  totalAssimilatedCount?: number
-  isRecallPaused?: boolean
-  isViewingAnsweredQuestion?: boolean
-  shouldResumeRecall?: boolean
-  treadmillMode?: boolean
-  currentIndex?: number
-  diligentMode?: boolean
-}) {
-  const toRepeatRef = ref<MemoryTrackerLite[] | undefined>(overrides?.toRepeat)
-  const dueCommissionedRef = ref<
-    DueCommissionedMemoryTrackerLite[] | undefined
-  >(overrides?.dueCommissioned)
-  const treadmillModeRef = ref(overrides?.treadmillMode ?? false)
-  const currentIndexRef = ref(overrides?.currentIndex ?? 0)
-  const diligentModeRef = ref(overrides?.diligentMode ?? false)
-  const isViewingAnsweredQuestionRef = ref(
-    overrides?.isViewingAnsweredQuestion ?? false
-  )
-  const dueRecallsRefreshNonce = ref(0)
-  const potentialLearningSessions = computed(
-    () => overrides?.potentialLearningSessions ?? []
-  )
-  return {
-    toRepeatCount: computed(() => toRepeatRef.value?.length ?? 0),
-    toRepeat: toRepeatRef,
-    dueCommissioned: dueCommissionedRef,
-    potentialLearningSessions,
-    currentRecallWindowEndAt: ref(overrides?.currentRecallWindowEndAt),
-    totalAssimilatedCount: ref(overrides?.totalAssimilatedCount ?? 0),
-    isRecallPaused: ref(overrides?.isRecallPaused ?? false),
-    isViewingAnsweredQuestion: isViewingAnsweredQuestionRef,
-    shouldResumeRecall: ref(overrides?.shouldResumeRecall ?? false),
-    treadmillMode: treadmillModeRef,
-    currentIndex: currentIndexRef,
-    diligentMode: diligentModeRef,
-    setToRepeat: vi.fn((trackers: MemoryTrackerLite[] | undefined) => {
-      toRepeatRef.value = trackers
-    }),
-    setDueCommissioned: vi.fn(
-      (trackers: DueCommissionedMemoryTrackerLite[] | undefined) => {
-        dueCommissionedRef.value = trackers
-      }
-    ),
-    setCurrentRecallWindowEndAt: vi.fn(),
-    setTotalAssimilatedCount: vi.fn(),
-    setIsRecallPaused: vi.fn(),
-    setIsViewingAnsweredQuestion: vi.fn((viewing: boolean) => {
-      isViewingAnsweredQuestionRef.value = viewing
-    }),
-    clearShouldResumeRecall: vi.fn(),
-    setTreadmillMode: vi.fn((enabled: boolean) => {
-      treadmillModeRef.value = enabled
-    }),
-    setCurrentIndex: vi.fn((index: number) => {
-      currentIndexRef.value = index
-    }),
-    setDiligentMode: vi.fn((enabled: boolean) => {
-      diligentModeRef.value = enabled
-    }),
-    dueRecallsRefreshNonce,
-    requestDueRecallsRefresh: vi.fn(() => {
-      dueRecallsRefreshNonce.value += 1
-    }),
-  }
+/** Puts the given trackers in the real recall queue. */
+export function givenRecallQueue(...trackers: MemoryTrackerLite[]) {
+  useRecallData().setToRepeat(trackers)
 }
 
 export function createMemoryTrackerLite(
@@ -126,7 +56,7 @@ function mockRecallPageDefaults() {
     "getRecallPrompt",
     makeMe.aRecallPrompt.withSpellingStem("Spell").please()
   )
-  vi.mocked(useRecallData).mockReturnValue(createUseRecallDataMock())
+  resetRecallData()
   return { recallingSpy, previouslyAnsweredSpy }
 }
 
@@ -142,6 +72,9 @@ export function useRecallPageSpecContext(options?: { fakeTimers?: boolean }) {
     document.body.innerHTML = ""
     if (options?.fakeTimers) vi.useRealTimers()
   })
+  // Recall state is shared, so a page left mounted would react to the next test.
+  // Registered after the cleanup above so it unmounts before the DOM is cleared.
+  enableAutoUnmount(afterEach)
 
   beforeEach(() => {
     vi.resetAllMocks()

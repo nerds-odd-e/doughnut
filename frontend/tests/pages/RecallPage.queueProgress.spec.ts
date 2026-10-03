@@ -1,5 +1,4 @@
 import { MemoryTrackerController } from "@generated/donut-backend-api/sdk.gen"
-import { useRecallData } from "@/composables/useRecallData"
 import type { MemoryTrackerLite } from "@generated/donut-backend-api"
 import makeMe from "donut-test-fixtures/makeMe"
 import { mockSdkService, wrapSdkError, wrapSdkResponse } from "@tests/helpers"
@@ -7,11 +6,10 @@ import { flushPromises, type VueWrapper } from "@vue/test-utils"
 import { beforeEach, describe, expect, it, vi } from "vitest"
 import {
   createMemoryTrackerLite,
-  createUseRecallDataMock,
+  givenRecallQueue,
   useRecallPageSpecContext,
 } from "./recallPageTestSupport"
 
-vi.mock("@/composables/useRecallData")
 vi.mock("@/components/commons/Popups/usePopups")
 
 vi.mock("vue-router", async (importOriginal) => {
@@ -28,11 +26,6 @@ const exposed = (wrapper: VueWrapper) => wrapper.vm as unknown as ExposedVM
 
 const ctx = useRecallPageSpecContext({ fakeTimers: true })
 let getRecallPromptSpy: ReturnType<typeof mockSdkService>
-
-const givenQueue = (...trackers: MemoryTrackerLite[]) =>
-  vi
-    .mocked(useRecallData)
-    .mockReturnValue(createUseRecallDataMock({ toRepeat: trackers }))
 
 beforeEach(() => {
   mockSdkService(
@@ -53,7 +46,7 @@ describe('RecallPage "just review" quiz', () => {
 
   beforeEach(() => {
     getRecallPromptSpy.mockResolvedValueOnce(wrapSdkError("API Error"))
-    givenQueue(
+    givenRecallQueue(
       createMemoryTrackerLite(firstMemoryTrackerId),
       createMemoryTrackerLite(secondMemoryTrackerId),
       createMemoryTrackerLite(3)
@@ -157,7 +150,7 @@ describe("RecallPage treadmill mode", () => {
   }
 
   beforeEach(() => {
-    givenQueue(
+    givenRecallQueue(
       createMemoryTrackerLite(normalId, false),
       createMemoryTrackerLite(spellingId, true),
       createMemoryTrackerLite(anotherNormalId, false)
@@ -195,7 +188,7 @@ describe("RecallPage treadmill mode", () => {
 
   it("moves unanswered spelling trackers to the end when treadmill is turned off", async () => {
     const fourthNormalId = 111
-    givenQueue(
+    givenRecallQueue(
       createMemoryTrackerLite(normalId, false),
       createMemoryTrackerLite(anotherNormalId, false),
       createMemoryTrackerLite(spellingId, true),

@@ -8,11 +8,10 @@ import { describe, expect, it, vi } from "vitest"
 import { ref } from "vue"
 import {
   createMemoryTrackerLite,
-  createUseRecallDataMock,
+  givenRecallQueue,
   useRecallPageSpecContext,
 } from "./recallPageTestSupport"
 
-vi.mock("@/composables/useRecallData")
 vi.mock("@/components/commons/Popups/usePopups")
 
 vi.mock("vue-router", async (importOriginal) => {
@@ -54,11 +53,9 @@ describe("repeat page loading", () => {
   })
 
   it("calls recalling when dueRecallsRefreshNonce increments", async () => {
-    const mockData = createUseRecallDataMock({ toRepeat: undefined })
-    vi.mocked(useRecallData).mockReturnValue(mockData)
     await ctx.mountPage()
     ctx.recallingSpy.mockClear()
-    mockData.dueRecallsRefreshNonce.value += 1
+    useRecallData().requestDueRecallsRefresh()
     await flushPromises()
     expect(ctx.recallingSpy).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -70,27 +67,21 @@ describe("repeat page loading", () => {
     )
   })
 
-  it("redirect to recall page if nothing to repeat", async () => {
-    const repetition = makeMe.aDueMemoryTrackersList.please()
-    vi.mocked(useRecallData).mockReturnValue(
-      createUseRecallDataMock({ toRepeat: repetition.toRepeat })
-    )
+  it("does not reload the due queue when one is already loaded", async () => {
+    givenRecallQueue()
     await ctx.mountPage()
     expect(ctx.recallingSpy).not.toHaveBeenCalled()
   })
 
   it("shows learning session actions when useRecallData has potential sessions", async () => {
-    vi.mocked(useRecallData).mockReturnValue(
-      createUseRecallDataMock({
-        toRepeat: [],
-        potentialLearningSessions: [
-          {
-            notebookId: 10,
-            notebookName: "Spanish conversation",
-          },
-        ],
-      })
-    )
+    givenRecallQueue()
+    useRecallData().setDueCommissioned([
+      {
+        memoryTrackerId: 1,
+        notebookId: 10,
+        notebookName: "Spanish conversation",
+      },
+    ])
     const wrapper = await ctx.mountPage()
     expect(
       wrapper.find('[data-test="learning-session-actions"]').exists()
@@ -103,11 +94,7 @@ describe("RecallPage Daily probe entry", () => {
     ctx.renderer.withCurrentUserRef(
       ref(makeMe.aUser.dailyProbeEnabled(dailyProbeEnabled).please())
     )
-    vi.mocked(useRecallData).mockReturnValue(
-      createUseRecallDataMock({
-        toRepeat: [createMemoryTrackerLite(1)],
-      })
-    )
+    givenRecallQueue(createMemoryTrackerLite(1))
     return ctx.mountPage()
   }
 

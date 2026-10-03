@@ -11,13 +11,12 @@ import helper, { mockSdkService } from "@tests/helpers"
 import RenderingHelper from "@tests/helpers/RenderingHelper"
 import { useRecallData } from "@/composables/useRecallData"
 import { useAssimilationCount } from "@/composables/useAssimilationCount"
-import type { MemoryTrackerLite } from "@generated/donut-backend-api"
-import { computed, ref } from "vue"
 import usePopups from "@/components/commons/Popups/usePopups"
 import { closeButtonEl } from "@tests/commons/modalTestSupport"
 import { afterEach, beforeEach, vi } from "vitest"
 import { mockedGoToNextAssimilation } from "./assimilationPanelMocks"
 import { refinementLayoutItems } from "./noteRefinementTestSupport"
+import { resetRecallData } from "@tests/helpers/recallDataTestSupport"
 
 export const assimilateButtonSelector =
   '[data-test="assimilate-UNDERSTANDING"]' as const
@@ -70,9 +69,11 @@ let renderer: RenderingHelper<typeof AssimilationPanel>
 export let assimilateSpy: ReturnType<typeof mockSdkService>
 export let skipSequenceSpy: ReturnType<typeof mockSdkService>
 
-export const mockedRequestDueRecallsRefresh = vi.fn()
-export const mockedTotalAssimilatedCount = ref(0)
-const toRepeat = ref<MemoryTrackerLite[] | undefined>(undefined)
+const recallData = useRecallData()
+export const { totalAssimilatedCount } = recallData
+let refreshNonceAtStart = 0
+export const dueRecallsRefreshRequested = () =>
+  recallData.dueRecallsRefreshNonce.value > refreshNonceAtStart
 
 const assimilationCount = useAssimilationCount()
 export const { assimilatedCountOfTheDay } = assimilationCount
@@ -90,7 +91,9 @@ export function setupAssimilationPanelTests() {
   beforeEach(() => {
     mockedGoToNextAssimilation.mockClear()
     mockedGoToNextAssimilation.mockResolvedValue(true)
-    mockedTotalAssimilatedCount.value = 0
+    resetRecallData()
+    recallData.setTotalAssimilatedCount(0)
+    refreshNonceAtStart = recallData.dueRecallsRefreshNonce.value
     assimilationCount.setAssimilatedCountOfTheDay(0)
     assimilationCount.setDueCount(0)
     assimilationCount.setTotalUnassimilatedCount(0)
@@ -104,33 +107,6 @@ export function setupAssimilationPanelTests() {
     mockSdkService(NoteController, "getNoteInfo", {})
     mockSdkService(AiController, "generateRefinementSuggestions", {
       items: refinementLayoutItems([]),
-    })
-
-    vi.mocked(useRecallData).mockReturnValue({
-      totalAssimilatedCount: mockedTotalAssimilatedCount,
-      toRepeatCount: computed(() => toRepeat.value?.length ?? 0),
-      toRepeat: ref(undefined),
-      dueCommissioned: ref(undefined),
-      potentialLearningSessions: computed(() => []),
-      currentRecallWindowEndAt: ref(undefined),
-      isRecallPaused: ref(false),
-      isViewingAnsweredQuestion: ref(false),
-      shouldResumeRecall: ref(false),
-      treadmillMode: ref(false),
-      currentIndex: ref(0),
-      diligentMode: ref(false),
-      setToRepeat: vi.fn(),
-      setDueCommissioned: vi.fn(),
-      setCurrentRecallWindowEndAt: vi.fn(),
-      setTotalAssimilatedCount: vi.fn(),
-      setIsRecallPaused: vi.fn(),
-      setIsViewingAnsweredQuestion: vi.fn(),
-      clearShouldResumeRecall: vi.fn(),
-      setTreadmillMode: vi.fn(),
-      setCurrentIndex: vi.fn(),
-      setDiligentMode: vi.fn(),
-      dueRecallsRefreshNonce: ref(0),
-      requestDueRecallsRefresh: mockedRequestDueRecallsRefresh,
     })
 
     renderer = helper.component(AssimilationPanel)

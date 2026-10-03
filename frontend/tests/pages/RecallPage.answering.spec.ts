@@ -12,11 +12,10 @@ import { flushPromises, type VueWrapper } from "@vue/test-utils"
 import { beforeEach, describe, expect, it, vi } from "vitest"
 import {
   createMemoryTrackerLite,
-  createUseRecallDataMock,
+  givenRecallQueue,
   useRecallPageSpecContext,
 } from "./recallPageTestSupport"
 
-vi.mock("@/composables/useRecallData")
 vi.mock("@/components/commons/Popups/usePopups")
 
 vi.mock("vue-router", async (importOriginal) => {
@@ -48,11 +47,7 @@ beforeEach(() => {
     "getThresholdExceeded",
     { thresholdExceeded: false }
   )
-  vi.mocked(useRecallData).mockReturnValue(
-    createUseRecallDataMock({
-      toRepeat: [createMemoryTrackerLite(memoryTrackerId)],
-    })
-  )
+  givenRecallQueue(createMemoryTrackerLite(memoryTrackerId))
 })
 
 const answeredMcq = (correct: boolean) =>
@@ -178,10 +173,7 @@ describe("thinking time while viewing a previously answered question", () => {
   }
 
   it("excludes time spent viewing the last answered question from the current question's thinking time", async () => {
-    const mockData = createUseRecallDataMock({
-      toRepeat: [createMemoryTrackerLite(1, false)],
-    })
-    vi.mocked(useRecallData).mockReturnValue(mockData)
+    givenRecallQueue(createMemoryTrackerLite(1, false))
     ctx.previouslyAnsweredSpy.mockResolvedValueOnce(
       wrapSdkResponse([
         makeMe.anAnsweredQuestion.withId(1).withMemoryTrackerId(99).please(),
@@ -219,7 +211,7 @@ describe("thinking time while viewing a previously answered question", () => {
     setTime(7000)
 
     // Return to the current question the same way the app does: via resumeRecall.
-    mockData.shouldResumeRecall.value = true
+    useRecallData().shouldResumeRecall.value = true
     await flushPromises()
 
     setTime(7500)

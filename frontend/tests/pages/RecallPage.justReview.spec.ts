@@ -2,7 +2,6 @@ import {
   MemoryTrackerController,
   NoteController,
 } from "@generated/donut-backend-api/sdk.gen"
-import { useRecallData } from "@/composables/useRecallData"
 import { notePropertyLocation } from "@/routes/noteShowLocation"
 import makeMe from "donut-test-fixtures/makeMe"
 import { mockSdkService, wrapSdkError } from "@tests/helpers"
@@ -11,11 +10,10 @@ import { describe, expect, it, onTestFinished, vi } from "vitest"
 import { page, server } from "vitest/browser"
 import {
   createMemoryTrackerLite,
-  createUseRecallDataMock,
+  givenRecallQueue,
   useRecallPageSpecContext,
 } from "./recallPageTestSupport"
 
-vi.mock("@/composables/useRecallData")
 vi.mock("@/components/commons/Popups/usePopups")
 
 vi.mock("vue-router", async (importOriginal) => {
@@ -50,11 +48,7 @@ describe("RecallPage Just review", () => {
     vi.mocked(MemoryTrackerController.getRecallPrompt).mockResolvedValue(
       wrapSdkError("No recall prompt")
     )
-    vi.mocked(useRecallData).mockReturnValue(
-      createUseRecallDataMock({
-        toRepeat: [createMemoryTrackerLite(123), createMemoryTrackerLite(456)],
-      })
-    )
+    givenRecallQueue(createMemoryTrackerLite(123), createMemoryTrackerLite(456))
     const markAsRecalled = mockSdkService(
       MemoryTrackerController,
       "markAsRecalled",
@@ -87,7 +81,6 @@ describe("RecallPage Just review", () => {
       path: { memoryTracker: 123 },
       query: { grade: "AGAIN" },
     })
-    wrapper.unmount()
   })
 
   it("identifies a tracked property in the complete note and opens it on its note route", async () => {
@@ -104,9 +97,7 @@ describe("RecallPage Just review", () => {
     vi.mocked(MemoryTrackerController.getRecallPrompt).mockResolvedValue(
       wrapSdkError("No recall prompt")
     )
-    vi.mocked(useRecallData).mockReturnValue(
-      createUseRecallDataMock({ toRepeat: [createMemoryTrackerLite(123)] })
-    )
+    givenRecallQueue(createMemoryTrackerLite(123))
 
     const wrapper = ctx.renderer.currentRoute({ name: "recall" }).mount()
     await flushPromises()
@@ -129,6 +120,5 @@ describe("RecallPage Just review", () => {
         .find((a) => a.text() === "Open full note")
         ?.attributes("to")
     ).toBe(JSON.stringify(notePropertyLocation(noteRealm.id, "color")))
-    wrapper.unmount()
   })
 })

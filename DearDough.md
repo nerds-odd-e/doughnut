@@ -6,7 +6,7 @@ released response is not proof of effectiveness. Unknown provenance stays unknow
 [Response status](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/finding-names.md).
 Full pre-trim evidence: `8830c682704aac3bbb34bf9b1204da8feba042ca:DearDough.md`. Older narratives live in Git, not a second archive.
 
-- Highest allocated local number: 203. Removed local codes are never reused.
+- Highest allocated local number: 204. Removed local codes are never reused.
 
 ## ODF-110 — A readiness replay observed only the plan's named seam, not the rest of the slice's journey
 
@@ -224,3 +224,21 @@ Mid-execution, the delivery hook reported that the observer's worker had exited 
   - Evidence: PostToolUse hook "CI observer lost its worker for this coordinator: /tmp/dough-ci-501/watch-ZXmzAO (CI observer worker exited without recording a normal terminal result)"; coordinator then read results with `gh run list --branch claude/keep-completed-speech-as-dictation-continues`.
   - Observed effect: notification coverage ended for the published slices; the coordinator confirmed CI manually. No failure was missed.
   - Inference: the cause is unknown and is not established as the transient-network ending of ODF-121. The stale `dev.pid` seen minutes later (see ODF-190) suggests process churn on the machine, but no link is shown. Qualified: one occurrence.
+
+## DD-204 — Refinement planned a search to reproduce a flaky mock, but the project's test rules already forbade that mock
+
+A story about an intermittent CI failure in a module mock planned a bounded
+search to reproduce it ("no fix without a reproduction"; mock changes excluded).
+Nobody first checked whether the mocked module should be mocked under the
+project's own test rules. The `unit-testing` skill says to mock only external
+dependencies, and the mocked `useRecallData` is in-process state with setters.
+
+### Occurrences
+- Execution: SEED-039#mainmenu-mock-flake / `8ab270cae5:.planning/slice-plans/006-automocked-specs-pass-reliably/PLAN.md` / 74b20fdcac
+  - Timestamp: 2026-10-03T18:54:53+08:00 (plan committed) through 2026-10-03T22:00:06+08:00 (owner rescope committed)
+  - Tool: Claude Code
+  - Model: claude-opus-5-5
+  - Open Dough release: 0.3.56 (execution-checkout VERSION, unchanged during execution)
+  - Evidence: plan premises and scope excluded "a change to the mocks without a reproduced cause". Slice 1 ran four owner-approved reproduction rounds: local instrumentation, a standalone suite with 1,940 runs, a Linux container with 23 shard runs, and a Vitest version diff. None reproduced the failure (Learnings in 99089600b4). The owner then asked "what is the feature it is testing? Does it have to be implemented in this way?" and said "this test is wrong from the very beginning". `.agents/skills/unit-testing/SKILL.md` already says "Do not mock unless external or exceptional". Slices 2–4 removed the mocks in about 30 minutes of agent work (74b20fdcac, c7944701f2, 330cd1820b).
+  - Observed effect: about 107 minutes and about 630k tokens of reproduction-agent work (1,465 s + 674 s + 4,256 s by the hand-back records), three owner round-trips, and Docker cleanup, before a fix that needed no reproduction.
+  - Inference: when refining a story about a failing test mechanism, check the failing mechanism against the project's test rules first. A mechanism the rules forbid is a removal story, not a reproduction search. Qualified: one execution. The reproduction search was owner-approved at each round, so the cost comes from how the story was framed, not from a broken execution step.
