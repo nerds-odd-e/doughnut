@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 1,
+  "agent": "Koharu-chan",
+  "email": "koharu-chan@example.org",
+  "identity": "SEED-066#preserve-completed-speech",
+  "mode": "story-branch",
+  "branch": "claude/keep-completed-speech-as-dictation-continues",
+  "host": "claude"
+}
