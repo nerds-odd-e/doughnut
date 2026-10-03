@@ -187,52 +187,46 @@ decomposition, and does not prescribe an implementation sequence within the epic
 <a id="manual-discovery-findings"></a>
 #### Findings supplied by manual discovery
 
-**2026-10-03 short-speech baseline:** Chrome on macOS against the reused
-local Development app, signed in as `manual`. The initial `127.0.0.1:5175`
-automation route could sign in but did not activate Note/New Notebook controls;
-the `localhost:5175` route reached Audio tools and created disposable note
-`13726` in notebook `23`. The origin-specific automation observation has no
-established cause and does not prove a human click fails.
+**2026-10-03 bounded discovery:** Chrome/macOS, `manual`, reused local Development at `localhost:5175`, disposable notebook `23`. Naturally paced
+synthetic MediaStreams exercised the real recorder/worklet, transcription and retouch services. No service response or clock was simulated. The known backend
+revision is `a02dbb2697…`; frontend/runtime revision was not fully established. The initial `127.0.0.1` automation-control failure has no established cause and is not evidence that a human click fails.
 
-- **Ongoing automatic titles reproduced:** Two identical 18.356-second
-  `harvard.wav` recordings changed `Untitled` to “Sensory Notes on Food and
-  Drink”, then “Sensory Impressions of Foods and Drinks”, while the second
-  body stayed identical. This confirms the owner's unwanted title changes;
-  the future automatic-title policy remains undecided.
-- **Responsiveness baseline:** The empty-body run first showed text 25.17 s
-  after controlled capture began, approximately 3.96 s after Stop. Audio
-  requests took 4.42 s and 4.61 s; final titles settled separately from body
-  persistence. No intermediate body updates appeared during these short inputs.
-  Timings identify stages without establishing a cause or acceptance target.
-- **Persistence and limits:** Reload confirmed the final six-sentence body and
-  second title. Repeating identical speech cannot establish preservation of a
-  distinct addition or a duplication defect. Capture used naturally paced
-  synthetic MediaStreams with the real worklet and real services; hardware
-  microphone capture, device selection and permission remain uncovered.
+- **Completed dictated content lost:** In a 29.168 s passage with an 8.2 s pause, completed orchard facts appeared, Flush replaced them with a middle
+  fragment, and the final update retained only the last sentences. Reload confirmed the loss while preexisting Harvard content survived. Reproduction
+  and intermediate text are in the [sustained report](SEED-066-voice-input-sustained-evidence.md).
+- **Visible manual typing lost during processing:** Supported body editing while a real audio request was pending displayed a recognizable sentence;
+  the arriving result removed it. A later paste after settlement persisted. This demonstrates loss of pending visible typing; an already-saved edit race
+  was not observed. The [baseline and preservation report](SEED-066-voice-input-manual-evidence.md) retains exact input, edit timing and reload comparison.
+- **Existing paragraph truncated during navigation journey:** Navigate from source `13726` while processing to destination `13727`, then return/reload.
+  Both results persisted to the source, whose first paragraph became literal `...uesday.`; the other four paragraphs and destination sentinel survived.
+  Fresh independent navigation confirmed the saved state at 02:30:26 UTC. The [navigation and controls report](SEED-066-voice-input-navigation-evidence.md)
+  retains before/after text. The causal role of navigation remains unproved.
+- **Titles repeatedly change and overwrite author choice:** Repeating the identical 18.356 s Harvard input changed an initially `Untitled` note twice
+  despite identical final bodies. A later recording overwrote “Author chosen preservation title” twice. This reproduces the owner's loss of title control;
+  one-time generation versus disabling titles remains undecided. Title sequences
+  are in the baseline report and [proof mapping](../slice-plans/001-discover-voice-input-problems/EXECUTION.md#automatic-title-proof-mapping).
+- **Explicit voice-title entry was not discovered:** Inspecting supported title editing, Audio tools/Advanced Options and New note revealed no voice-title
+  control. This is a bounded improvement opportunity, not a failed promise; OS dictation, extensions and processing instructions remain unobserved.
+- **Responsiveness baseline:** First body text appeared 25.17 s after capture began, approximately 3.96 s after Stop, for the 18.356 s short input. Real
+  audio requests took 4.42/4.61 s; titles settled separately. Sustained requests took 5.25/3.14/3.53 s and the body settled before Stop. Other journeys lack
+  reliable Stop-to-final measurements. Timings establish neither cause nor a numeric acceptance target.
+- **Scoped preservation succeeded:** Two recognizable original paragraphs and a distinct lighthouse addition survived reload and the next distinct session;
+  no duplication or stale prior addition was observed in those sessions. The navigation destination survived. These comparisons do not establish a general preservation guarantee or defect frequency.
 
-[Detailed reproduction, timestamps, exact saved text, temporary capture setup,
-and cleanup](SEED-066-voice-input-manual-evidence.md#recording-route-and-short-speech-baseline)
-retain the proof and its revision/source limitations. No product edits or owned
-harness files remain; the disposable note is available for subsequent probes.
+**Material gaps:** Hardware capture, permission/device behavior, interruption, service-failure feedback and recovery were not exercised; secondary failures
+were skipped to reserve time for saved-loss confirmation and cleanup. The planning-stage empty-content API HTTP 500 was not reproduced through the UI.
+An empty-body UI baseline did succeed. Causes, frequency, the acceptable recent revision boundary, and quantitative latency expectations remain unresolved.
 
-**2026-10-03 sustained-speech finding:** A naturally paced 29.168-second
-synthetic passage with an 8.2-second pause produced three real-service body
-updates. After 16.73 s the note showed completed orchard facts plus an
-unfinished book clause. Flush at about 22 s replaced that paragraph with a
-middle fragment; the final update at 35.75 s replaced it with the last three
-sentences. Reload confirmed loss of completed orchard facts and preservation
-of the preexisting Harvard paragraph. Cause and the acceptable unfinished-sentence
-revision boundary remain unresolved. Body requests took 5.25, 3.14 and 3.53 s;
-the final body settled before Stop. Titles changed twice during the session.
+**Clean stopping point:** By 02:31:09 UTC, owned notes `13726` and `13727` were verified in recoverable `_trash` folder `4965`; no purge occurred. Notebook
+`23` (“Voice discovery 20261003 baseline”) remains because no recoverable notebook deletion was verified. Owned temporary WAVs/harnesses were removed, streams
+released and owned tabs closed. Product source remains unchanged. Full coverage is not claimed; the three linked reports preserve actionable findings and gaps.
 
-[Exact input, intermediate/final text, Flush/Stop timings and capture limits](SEED-066-voice-input-sustained-evidence.md#sustained-speech-and-revision-evidence)
-retain this proof. Hardware microphone behavior and defect frequency remain
-unobserved; no product repair was attempted.
 
 ## Open Decisions for Later Work
 
-- A browser audio-input route for the local app (sign-in and real services are
-  confirmed); resolve the deployed URL and account only if that alternative is used.
+- The controlled browser route is established at `localhost:5175`; genuine
+  hardware capture and permission behavior remain gaps. Resolve the deployed URL
+  and account only if that alternative is used.
 - Measurable responsiveness expectations and the actual contribution of audio
   capture, transcription, retouching, and applying results to the note.
 - The boundary between useful recent-sentence revision and destructive rewriting.

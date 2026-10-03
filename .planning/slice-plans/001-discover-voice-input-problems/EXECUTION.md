@@ -50,7 +50,10 @@ title sequences below. Slice 8 inspected title editing, Audio tools/Advanced
 Options, and New note controls; no explicit voice-title route was discovered.
 Slice 8 published as `0aac20658726185004897491063cbb9bfe142af8`.
 OS dictation, extensions and processing-instruction routes remain unobserved.
-Slice 9's allowed skip and remaining reserve are recorded below.
+Slice 9 published as `15221111d4ea26b3cf4dfd30987c0a59c58486ae`; its allowed
+skip and remaining reserve are recorded below. All ten observation/disposition
+outcomes are accepted; slice 10 finished its evidence at 02:32:56 UTC, 59 min
+30 s from the budget start. Final refactor found the records clean.
 Independent refactor found the records clean, whitespace and formatting passed.
 Publication receipts stay in the execution conversation before each next slice.
 Hardware capture, permission and frequency remain uncovered.
@@ -130,3 +133,21 @@ used in earlier observations does not establish genuine hardware or browser
 permission behavior. No failure-feedback or recovery claim, or absence of a
 defect, follows from this disposition. Discovery scope is unchanged; recording
 this permitted gap took less than one minute and changed no app state.
+
+## Final findings and cleanup proof
+
+Slice 10 independently opened a fresh Chrome tab at `localhost:5175/n13726` on 2026-10-03 around 02:30:26 UTC. Saved source body began literal `...uesday.`;
+the other four paragraphs matched the navigation report. This confirms the persisted loss without establishing its cause. After source Trash, destination
+`13727` visibly retained its exact original violet-umbrella sentinel.
+
+At 02:30:57 UTC, both notes were visible under recoverable `_trash` folder `4965` in notebook `23`, with an undo-trash control. No purge occurred. Notebook
+`23` (“Voice discovery 20261003 baseline”) remains: Settings supplied no verified recoverable notebook deletion. No other resource IDs were guessed or deleted.
+The cleanup screenshot and AX tree are retained in the execution conversation. The owned fresh tab closed at 02:31:09 UTC; no new audio/stream or harness was
+created. Earlier reports record their owned stream, tab and WAV cleanup.
+
+The epic now links all three evidence reports, with actionable content/title findings, timings, positive comparisons and material gaps. Owner reports and
+selected-story scope remain unchanged. Hardware/permission, failure feedback, already-saved edit races, causes/frequency and latency expectations remain open;
+planning's empty-content API failure is not a reproduced UI defect.
+
+At 02:32 UTC, `rg --files --hidden -g ".voice-discovery*" -g "!node_modules" -g "!.git" .` found no owned temporary files; Git listed only these two records.
+`./scripts/run.sh bash scripts/check_diff_whitespace.sh` completed with exit 0. UI ended before the 02:33:26 deadline; final review took about 3 minutes.
