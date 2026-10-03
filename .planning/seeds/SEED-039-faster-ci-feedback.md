@@ -131,6 +131,41 @@ authorizes no implementation, profiling run, or executable slice plan.
   If the resulting timings no longer justify rebalancing, bring that evidence
   back for an owner decision rather than inventing work or silently cancelling it.
 
+<a id="mainmenu-mock-flake"></a>
+
+### Stop the MainMenu resume specs from failing intermittently in CI
+
+**Identity:** SEED-039#mainmenu-mock-flake
+```json dough-story-state
+{"schemaVersion":1,"refinement":"not-refined","approach":"unselected"}
+```
+
+- **For / why:** Contributors trust a red frontend unit-test job only when it
+  points at a real defect. An intermittent failure on `main` blocks story
+  wrap-up and costs diagnosis time.
+- **Evaluation:** `frontend/tests/toolbars/MainMenu.resume.spec.ts` (and the
+  MainMenu specs sharing its support) pass reliably in CI's frontend shard, with
+  the cause established rather than retried away.
+- **Evidence:** [Run 37108823838](https://github.com/nerds-odd-e/doughnut/actions/runs/37108823838)
+  on `main` at `afc9f1163d`, shard 2/2: all 9 tests failed, and failed again on
+  retry, with `vi.mocked(...).mockReturnValue is not a function` at
+  `tests/toolbars/mainMenuTestSupport.ts:62` (`setupMainMenuTests`). So the
+  bare automock `vi.mock("@/composables/useRecallData")` did not apply for that
+  file. The same frontend tree passed at `294ef10aaf`
+  ([run 37108365967](https://github.com/nerds-odd-e/doughnut/actions/runs/37108365967)),
+  and none of the six earlier failed runs showed this error. Locally, 3 runs of
+  `tests/toolbars/` and 6 runs of `--shard=2/2` (Vitest 5.0.3 browser mode,
+  chromium) all passed.
+- **Hypotheses (unproven):** the Playwright mocker answers bare automocks
+  through per-session routes with a redirect. On a slow runner, either a cached
+  or in-flight module request bypasses the new route, or the previous file's
+  route cleanup for the same URL removes it. Explicit factory mocks might avoid
+  this but still go through a route.
+- **Effort hypothesis:** S–M, low confidence; the cost is mostly reproducing it.
+- **Depends on:** None.
+- **Safe stopping point:** A reproduced cause with a fix, or evidence that it
+  is a Vitest defect, with an upstream report and a project workaround.
+
 ## Ordering and Scope Reduction
 
 Follow story 2, then story 3. Test optimization removes shared cost before shard
