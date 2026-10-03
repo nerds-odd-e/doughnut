@@ -12,29 +12,6 @@ illustrate a shared lesson stay in DearDough as occurrence evidence.
 
 ## Open findings
 
-### Queued: The owner's removal rule does not reach delegated agents
-
-Story: [Removals leave no trace without the owner restating the rule](.planning/seeds/SEED-068-owner-rules-reach-every-agent.md#removal-rule-in-guidance) — SEED-068#removal-rule-in-guidance.
-
-Related: DD-142, now part of shared ODF-187 in DearDough, where a plan also
-prescribed an absence assertion for removed UI against the same rule.
-
-#### DD-202 — A plan asked for a "no longer changes titles" docs note, against the owner's no-trace rule for removals
-
-The plan for a feature removal told the implementer to turn a docs section into a short note that the removed behavior no longer happens. The owner's standing rule is that a removal leaves no negation or historical note in docs. The implementer, the refactor agent and the coordinator all accepted the note; only the retrospective caught it, and it needed a correction story.
-
-##### Occurrences
-
-- Execution: SEED-066#author-controlled-titles / slice-plans/002-keep-titles-under-author-control / aa093fffeb
-  - Timestamp: unknown (slice 1 accepted on 2026-10-03, about 14:53 +08:00)
-  - Tool: Claude Code
-  - Model: claude-opus-5-5
-  - Open Dough release: 0.3.54
-  - Evidence: `0df1788796:.planning/slice-plans/002-keep-titles-under-author-control/PLAN.md` slice 1 ("becomes a short note that dictation no longer changes titles"); `aa093fffeb:docs/voice-input.md` section "Dictation does not change titles" ("The observations above that mention title requests predate this"), plus five other title-service mentions left in the same file; owner memory `doughnut-removal-leaves-no-trace`; correction `SEED-066#voice-docs-title-trace` (`ac59c040e5`).
-  - Observed effect: a docs-only correction story and plan were needed after delivery.
-  - Inference: the rule lives only in the coordinator's memory, which delegated planners, implementers and refactor agents do not see, and the plan's explicit wording outranked it. Removal plans may need a "clean the whole product scope, including docs" check written into the plan.
-  - Later check (story refinement, 2026-10-03): the trace began in the refined story scope ("They never change the title … during this recording or later ones"), which also produced the test `never changes the title across many chunks and a later recording` in `NoteAudioTools.processing.spec.ts`; the retrospective missed it, and it is still on main.
-
 ### Queued: Local app stacks broken by backend build output
 
 Story: [Start and keep local app stacks on current backend code](.planning/seeds/SEED-067-dependable-local-app-stacks.md#stacks-survive-other-builds) — SEED-067#stacks-survive-other-builds.
@@ -141,10 +118,7 @@ Donut tooling; record it here if it recurs.
 A finding group is queued only for high impact or high frequency, with impact
 ranked first.
 
-1. SEED-068#removal-rule-in-guidance: highest impact. A wrong docs change
-   reached main and needed its own correction story and plan (DD-202); the
-   same rule was broken in planning before (DD-142). Two occurrences.
-2. SEED-067#stacks-survive-other-builds: highest frequency. Two open
+1. SEED-067#stacks-survive-other-builds: highest frequency. Two open
    occurrences in five days across Claude Code and Codex (DD-159, DD-200),
    following resolved DD-103 on the same build output; each cost a failed
    start or run and a diagnosis, so impact is low.
@@ -165,6 +139,8 @@ Recheck these when a new occurrence arrives; none is contradicted today:
   `c76f69b62e`, `120753a097`).
 - DD-165 — script tests coupled to a live spec name (`7580fceccc`).
 - DD-177 — API regeneration in the controller’s slice (`c3a7e2f826`).
+- DD-202 — removal rule in always-loaded agent guidance (`18b99b6424`,
+  `52460a4077`); DD-142 stays with shared ODF-187 in DearDough.
 
 ### Reopening
 
