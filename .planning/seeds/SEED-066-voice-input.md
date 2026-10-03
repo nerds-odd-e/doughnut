@@ -208,25 +208,6 @@ technical redesign, or speculative infrastructure.
 - **Safe stopping point:** Dictated passages join existing text correctly for
   space-separated languages and for Japanese and Chinese.
 
-<a id="typed-corrections-side-effects"></a>
-### Fix two side effects of keeping typed corrections
-
-**Identity:** SEED-066#typed-corrections-side-effects
-```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/007-typed-corrections-side-effects/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"113f997940f078bde472fe054f14a13ebc41f235d432f71941ea824bcf43081d","plan":"947a300771d52946319aa8c6d85619a22360858aedc969acf728b6b32dc001b5"}}
-```
-
-- **Goal:** A note author who pastes formatted text into the Markdown editor
-  has the caret right after the pasted text again, and a dictated passage that
-  arrives while an image upload or note removal is pausing the editor is saved
-  as it was before
-  keeping typed corrections (`.planning/seeds/SEED-066-voice-input.md#preserve-typed-corrections` at `34cfbd43`), instead of being
-  dropped without a trace. Retrospective correction; no new feature promise.
-- **Scope:** Only these two regressions from that story's delivery. The
-  save-then-change overlap stays "nothing added" as that story decided: the
-  passage goes to the saved body, with the same race as before.
-- **Plan:** [slice plan](../slice-plans/007-typed-corrections-side-effects/PLAN.md)
-
 <a id="recover-failed-transcription"></a>
 ### Recover a failed transcription without repeating the speech
 
