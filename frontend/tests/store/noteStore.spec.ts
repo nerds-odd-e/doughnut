@@ -104,6 +104,28 @@ describe("noteStore", () => {
     })
   })
 
+  describe("appendDictatedText", () => {
+    it("loads the original body before appending when the note is absent", async () => {
+      const original = makeMe.aNoteRealm.content("Original body.").please()
+      const showNoteSpy = mockSdkService(NoteController, "showNote", original)
+      const updateContentSpy = mockSdkService(
+        TextContentController,
+        "updateNoteContent",
+        original
+      )
+
+      await noteStore.appendDictatedText(original.id, {
+        dictatedText: " New passage.",
+      })
+
+      expect(showNoteSpy).toHaveBeenCalledWith({ path: { note: original.id } })
+      expect(updateContentSpy).toHaveBeenCalledWith({
+        path: { note: original.id },
+        body: { content: "Original body. New passage." },
+      })
+    })
+  })
+
   describe("move note", () => {
     it("refreshes sidebar structural listings after moving to a folder", async () => {
       mockSdkService(RelationController, "moveNoteToFolder", [note])

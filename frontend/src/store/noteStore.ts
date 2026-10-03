@@ -1,4 +1,5 @@
 import type {
+  DictatedText,
   NoteContentCompletion,
   NoteCreationDto,
   NoteTrashDto,
@@ -9,9 +10,9 @@ import { noteShowLocation } from "@/routes/noteShowLocation"
 import { refreshSidebarStructuralListings } from "@/components/notes/sidebarStructuralRefresh"
 import type { Router } from "vue-router"
 import NoteUndo from "./noteUndo"
+import NoteTextEditing from "./noteTextEditing"
 import { StorageImplementation } from "./NoteStorage"
 import {
-  updateTextContentRequest,
   loadNoteRequest,
   createNoteRequest,
   placeNoteRequest,
@@ -35,6 +36,7 @@ function containingFolderId(realm: NoteRealm) {
 
 class NoteStore extends StorageImplementation {
   noteUndo = new NoteUndo(this)
+  private textEditing = new NoteTextEditing(this)
 
   peekUndo() {
     return this.noteUndo.peekUndo() ?? null
@@ -43,29 +45,13 @@ class NoteStore extends StorageImplementation {
     this.noteUndo.discardUndo()
   }
 
-  private async updateTextContentWithoutUndo(
-    noteId: Donut.ID,
-    field: "edit title" | "edit content",
-    content: string,
-    titleReferenceHandling?: TitleRenameReferenceHandling
-  ) {
-    const realm = this.refreshNoteRealm(
-      await updateTextContentRequest(
-        noteId,
-        field,
-        content,
-        titleReferenceHandling
-      )
-    )
-    if (field === "edit title") {
-      refreshSidebarStructuralListings()
-    }
-    return realm
-  }
-
   async loadNoteRealm(noteId: Donut.ID): Promise<NoteRealm> {
     const noteRealm = await loadNoteRequest(noteId)
     return this.refreshNoteRealm(noteRealm)
+  }
+
+  async getOrLoadNoteRealm(noteId: Donut.ID): Promise<NoteRealm> {
+    return this.refOfNoteRealm(noteId).value ?? this.loadNoteRealm(noteId)
   }
 
   getNoteRealmRefAndLoadWhenNeeded(noteId: Donut.ID) {
@@ -134,43 +120,25 @@ class NoteStore extends StorageImplementation {
     return noteRealms[0]!
   }
 
-  async updateTextField(
+  updateTextField(
     noteId: Donut.ID,
     field: "edit title" | "edit content",
     value: string,
     options?: { titleReferenceHandling?: TitleRenameReferenceHandling }
   ) {
-    const currentNote = this.refOfNoteRealm(noteId).value?.note
-    if (currentNote) {
-      const old =
-        field === "edit title"
-          ? currentNote.noteTopology.title
-          : (currentNote.content ?? "")
-      if (old === value) {
-        return
-      }
-      this.noteUndo.addEditingToUndoHistory(noteId, field, old)
-    }
-    await this.updateTextContentWithoutUndo(
-      noteId,
-      field,
-      value,
-      field === "edit title" ? options?.titleReferenceHandling : undefined
-    )
+    return this.textEditing.updateTextField(noteId, field, value, options)
   }
 
-  async setNoteContentWithoutUndo(noteId: Donut.ID, content: string) {
-    await this.updateTextContentWithoutUndo(noteId, "edit content", content)
+  setNoteContentWithoutUndo(noteId: Donut.ID, content: string) {
+    return this.textEditing.setNoteContentWithoutUndo(noteId, content)
   }
 
-  async completeContent(noteId: Donut.ID, value?: NoteContentCompletion) {
-    if (!value || !value.content) return
+  completeContent(noteId: Donut.ID, value?: NoteContentCompletion) {
+    return this.textEditing.completeContent(noteId, value)
+  }
 
-    if (!this.refOfNoteRealm(noteId).value) {
-      await this.loadNoteRealm(noteId)
-    }
-
-    await this.updateTextField(noteId, "edit content", value.content)
+  appendDictatedText(noteId: Donut.ID, value?: DictatedText) {
+    return this.textEditing.appendDictatedText(noteId, value)
   }
 
   async uploadNoteImage(noteId: Donut.ID, file: File) {

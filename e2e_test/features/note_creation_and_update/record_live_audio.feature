@@ -13,7 +13,7 @@ Feature: Record live audio onto a note
       """
     And the OpenAI completion service will return the following response for the transcription to text request:
       | request contains                | response                                                          |
-      | its talk about dada struct day. | This is class 1.Let's talk about data structure today.            |
+      | its talk about dada struct day. | Let's talk about data structure today.                           |
     And the browser is mocked to give permission to record audio
 
   @mockBrowserTime

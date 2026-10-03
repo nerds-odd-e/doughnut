@@ -28,6 +28,7 @@ export function useNoteAudioProcessing(
   errors: Ref<Record<string, string | undefined> | undefined>
 ) {
   const noteStore = useNoteStore()
+  const noteId = note.id
   const isProcessing = ref(false)
   const callCount = ref(0)
 
@@ -51,12 +52,15 @@ export function useNoteAudioProcessing(
   ): Promise<string | undefined> => {
     isProcessing.value = true
     try {
+      const realm = await noteStore.getOrLoadNoteRealm(noteId)
       const { data: response, error } = await AiAudioController.audioToText({
         body: {
           uploadAudioFile: chunk.data,
           additionalProcessingInstructions: processingInstructions.value,
           isMidSpeech: chunk.isMidSpeech,
-          previousNoteContentToAppendTo: getLastContentChunk(note.content),
+          previousNoteContentToAppendTo: getLastContentChunk(
+            realm.note.content
+          ),
         },
       })
 
@@ -64,16 +68,11 @@ export function useNoteAudioProcessing(
         throw new Error("Failed to process audio")
       }
 
-      await noteStore.completeContent(
-        note.id,
-        response.completionFromAudio && {
-          content: response.completionFromAudio.dictatedText,
-        }
-      )
+      await noteStore.appendDictatedText(noteId, response.completionFromAudio)
 
       callCount.value++
       if (shouldSuggestTitle(callCount.value)) {
-        updateTopicIfSuggested(note.id)
+        updateTopicIfSuggested(noteId)
       }
 
       return response.endTimestamp

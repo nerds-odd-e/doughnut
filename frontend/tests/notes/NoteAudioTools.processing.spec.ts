@@ -1,12 +1,19 @@
 import {
   AiAudioController,
   AiController,
+  NoteController,
   TextContentController,
 } from "@generated/donut-backend-api/sdk.gen"
 import makeMe from "donut-test-fixtures/makeMe"
-import { mockSdkService, wrapSdkError, wrapSdkResponse } from "@tests/helpers"
+import {
+  mockSdkService,
+  mockSdkServiceWithImplementation,
+  wrapSdkResponse,
+} from "@tests/helpers"
+import { useNoteStore } from "@/store/noteStore"
 import {
   midSpeechChunk,
+  dictatedTextResponse,
   mountNoteAudioTools,
   processAudio,
   useNoteAudioToolsTestLifecycle,
@@ -40,62 +47,32 @@ useNoteAudioToolsTestLifecycle()
 describe("NoteAudioTools audio processing", () => {
   let wrapper: NoteAudioToolsWrapper
   let audioToTextMock: ReturnType<typeof mockSdkService>
-  const note = makeMe.aNote.please()
-  const textResponse = (content: string, endTimestamp = "00:00:37,270") => ({
-    completionFromAudio: { dictatedText: content },
-    endTimestamp,
-  })
-
+  let updateContentMock: ReturnType<typeof mockSdkService>
+  const originalRealm = makeMe.aNoteRealm.content("Original body.").please()
+  const note = originalRealm.note
+  const noteStore = useNoteStore()
   beforeEach(() => {
     audioToTextMock = mockSdkService(
       AiAudioController,
       "audioToText",
-      textResponse("text")
+      dictatedTextResponse("text")
     )
+    mockSdkService(AiController, "suggestTitle", { title: "" })
     wrapper = mountNoteAudioTools(note)
+    noteStore.refreshNoteRealm(originalRealm)
+    updateContentMock = mockSdkServiceWithImplementation(
+      TextContentController,
+      "updateNoteContent",
+      (options) =>
+        makeMe.aNoteRealm
+          .id(options.path.note)
+          .content(options.body.content ?? "")
+          .please()
+    )
   })
 
   afterEach(() => {
     wrapper?.unmount()
-  })
-
-  it("reuses previous note content between calls", async () => {
-    audioToTextMock
-      .mockResolvedValueOnce(wrapSdkResponse(textResponse("text1")))
-      .mockResolvedValueOnce(
-        wrapSdkResponse(textResponse("text2", "00:00:47,270"))
-      )
-
-    await processAudio(wrapper)
-    expect(audioToTextMock).toHaveBeenLastCalledWith({
-      body: expect.objectContaining({
-        previousNoteContentToAppendTo: note.content,
-      }),
-    })
-
-    await processAudio(wrapper)
-    expect(audioToTextMock).toHaveBeenLastCalledWith({
-      body: expect.objectContaining({
-        previousNoteContentToAppendTo: note.content,
-      }),
-    })
-  })
-
-  it("keeps previous content after an API error", async () => {
-    audioToTextMock
-      .mockResolvedValueOnce(wrapSdkResponse(textResponse("text1")))
-      .mockResolvedValueOnce(wrapSdkError("API Error"))
-      .mockResolvedValueOnce(wrapSdkResponse(textResponse("text1")))
-
-    await processAudio(wrapper)
-    await processAudio(wrapper)
-    await processAudio(wrapper)
-
-    expect(audioToTextMock).toHaveBeenLastCalledWith({
-      body: expect.objectContaining({
-        previousNoteContentToAppendTo: note.content,
-      }),
-    })
   })
 
   it("passes isMidSpeech for timer-triggered chunks", async () => {
@@ -114,7 +91,7 @@ describe("NoteAudioTools audio processing", () => {
 
   it("returns endTimestamp from audio processing", async () => {
     audioToTextMock.mockResolvedValue(
-      wrapSdkResponse(textResponse("--- a\n+++ b\n@@ -0,0 +1 @@\n+text\n"))
+      wrapSdkResponse(dictatedTextResponse("text"))
     )
     mockSdkService(
       TextContentController,
@@ -142,7 +119,9 @@ describe("NoteAudioTools audio processing", () => {
     "sends previous content, truncated with ellipsis, when $when",
     async ({ content, sent }) => {
       wrapper.unmount()
-      wrapper = mountNoteAudioTools(makeMe.aNote.content(content).please())
+      const contextRealm = makeMe.aNoteRealm.content(content).please()
+      wrapper = mountNoteAudioTools(contextRealm.note)
+      noteStore.refreshNoteRealm(contextRealm)
 
       await processAudio(wrapper, midSpeechChunk())
 
@@ -151,6 +130,29 @@ describe("NoteAudioTools audio processing", () => {
       })
     }
   )
+
+  it("loads an absent originating realm for both context and append", async () => {
+    noteStore.refOfNoteRealm(note.id).value = undefined
+    const loadedBody = "Loaded current body."
+    const showNote = mockSdkService(
+      NoteController,
+      "showNote",
+      makeMe.aNoteRealm.id(note.id).content(loadedBody).please()
+    )
+    await processAudio(wrapper)
+    expect(showNote).toHaveBeenCalledExactlyOnceWith({
+      path: { note: note.id },
+    })
+    expect(audioToTextMock).toHaveBeenCalledWith({
+      body: expect.objectContaining({
+        previousNoteContentToAppendTo: loadedBody,
+      }),
+    })
+    expect(updateContentMock).toHaveBeenCalledWith({
+      path: { note: note.id },
+      body: { content: `${loadedBody}text` },
+    })
+  })
 
   describe("title suggestion", () => {
     let updateNoteTitleSpy: ReturnType<typeof mockSdkService>

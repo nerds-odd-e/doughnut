@@ -47,6 +47,13 @@ export function midSpeechChunk(
   return audioChunk(data, true)
 }
 
+export function dictatedTextResponse(
+  dictatedText: string,
+  endTimestamp = "00:00:37,270"
+) {
+  return { completionFromAudio: { dictatedText }, endTimestamp }
+}
+
 export function processAudio(
   wrapper: NoteAudioToolsWrapper,
   chunk: AudioChunk = audioChunk()

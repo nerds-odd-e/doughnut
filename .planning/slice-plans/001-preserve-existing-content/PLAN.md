@@ -70,6 +70,10 @@ is green on main.
   `60199c1e3d4b7b9f1e01fae2b8ebdf81ded42313`; starting revision:
   `6a56058009bfbedcde32605b382d6ae974ac2279`.
 - Increment target: `origin/refs/heads/codex/add-a-dictated-passage-without-changing-existing`.
+- Slice 1 accepted revision: `64173ad25fbbe7457705aeea972a959d9d3f8dd4` on
+  that increment target. Managed delivery reported CI unobserved because the
+  Codex yielded-cell bridge did not attach. No observer or shutdown obligation
+  exists; no CI success is claimed. Default-checkout maintenance is not applicable.
 - Setup: `./scripts/run.sh bash scripts/worktree_setup.sh` succeeded in this
   checkout against the locked dependencies; initial `vue-tsc --noEmit` passed.
 - Replanning remains authorized for the existing planned scope. Focused proof
@@ -129,7 +133,7 @@ enables slice 2 without touching the conversation tool's `NoteContentCompletion`
 
 ### 2. Dictated passage is appended to the originating note's current body
 Type: Behavior
-Status: planned
+Status: done
 Proof: write red first. Change the e2e mock to return only "Let's talk about
 data structure today."; under the current replacement code, "This is class 1."
 disappears. Then add frontend `NoteAudioTools.processing` cases for examples 1–4
@@ -147,3 +151,35 @@ Changes:
 - Add a store append operation that reuses `updateTextField`.
 - Replace the stale-prop excerpt and its "reuses previous note content between
   calls" expectation.
+
+Accepted proof and delivery preparation:
+
+- The addition-only E2E fixture first failed with only the new text visible,
+  losing `This is class 1.`. After append and independent refactoring, the same
+  listed E2E command passed its one scenario.
+- The listed frontend command passed 38 tests before refactoring. Replacement
+  proof after extracting undo-aware text editing and splitting the preservation
+  specs passed 63 tests across 11 files with:
+  `env -u NODE_ENV CURSOR_DEV=true nix develop -c sh -c 'unset NODE_ENV; pnpm -C frontend test tests/notes/NoteAudioTools tests/store/noteStore tests/store/noteUndo.spec.ts tests/notes/TextContentWrapper.spec.ts tests/notes/NoteTextContent.titleEdit'`.
+- `NoteAudioTools.preservation.spec.ts` observes exact long/empty PATCH bodies,
+  two additions once, actual undo restoring the five original paragraphs, and
+  originating-note PATCH plus untouched destination sentinel. The processing
+  spec observes loaded current context and append. `noteStore.spec.ts` observes
+  absent-realm append and unchanged conversation replacement. Shared title
+  saves, save races, wrapper behavior, and undo also passed.
+- The listed backend command passed six cases; refactoring left that boundary
+  unchanged. Final `CURSOR_DEV=true nix develop -c pnpm -C frontend exec vue-tsc --noEmit`
+  passed. No API signature changed in this slice, so generation was not needed.
+- Independent refactoring centralized realm loading and extracted text editing
+  behind the existing store API; all checked files are below 250 lines. Selective
+  formatting passed. The fixture builder accepts undefined content consistently
+  with its underlying note builder.
+- A green E2E attempt failed before setup during concurrent Gradle
+  `processResources` and backend hot reload (`sut.log:522–564`: temporary Flyway
+  resource validation failure, then LB connection refusal). A serial retry after
+  Gradle terminated passed. Do not overlap backend Gradle resource processing
+  with the E2E hot-reloading stack. Verification waits and this diagnosis explain
+  the slice's over-target duration; the outcome stayed cohesive.
+- Paid real-OpenAI and owner evaluation remain external proof. Local E2E does
+  not explicitly reload; exact saved PATCH bodies and the integrated save/display
+  journey provide local persistence-boundary evidence.
