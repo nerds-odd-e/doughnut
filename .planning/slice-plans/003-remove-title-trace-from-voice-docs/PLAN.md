@@ -49,7 +49,7 @@ Documentation only; no test or typecheck gate applies.
 
 ### 1. Voice-input notes describe only body dictation
 Type: Structure
-Status: planned
+Status: done
 Proof: the `grep` above, read against the findings list.
 
 Make the edits listed in Goal and scope.

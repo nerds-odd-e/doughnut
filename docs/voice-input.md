@@ -2,8 +2,7 @@
 
 Authors open Audio tools on an existing note to Record Audio, Flush Audio,
 Stop Recording, or Save Audio Locally. Advanced Options exposes Processing
-Instructions and full-screen editing. Dictation writes only to the note body;
-the title stays as the author set it.
+Instructions and full-screen editing. Dictation writes only to the note body.
 
 ## Adding dictated text to a note
 
@@ -46,7 +45,7 @@ They describe observed behavior, not a guarantee about later revisions.
 
 Naturally paced prerecorded or synthesized speech entered a synthetic browser
 MediaStream through AudioContext → MediaStreamDestination. The real recorder,
-worklet, transcription, retouch, persistence and title services were exercised.
+worklet, transcription, retouch and persistence services were exercised.
 No clocks, worklets, request delays or service responses were simulated.
 Hardware capture, permission/device behavior, interruption and service-failure
 feedback/recovery remain unassessed. An automation route at `127.0.0.1:5175`
@@ -131,7 +130,7 @@ Prepare a second note with a distinct title and this saved body:
 Start the orchard recording on the source. When the first audio request is
 pending, click the destination's sidebar link. Recording continued while the
 destination was selected, and Stop remained available. Both content PATCHes
-and title requests targeted the source; no destination content PATCH appeared.
+targeted the source; no destination content PATCH appeared.
 
 The first source PATCH contained only new orchard/book content, with none of
 the old source body. The source was hidden then, so this is request-payload
@@ -139,23 +138,17 @@ evidence rather than a visible intermediate snapshot. After the second result,
 returning and reloading showed the source's first paragraph as literal
 `...uesday.`; its other four paragraphs were unchanged. The newly dictated
 orchard content was absent. An independent fresh page confirmed the saved loss.
-The destination body and both titles survived unchanged, despite successful
-source title-suggestion responses. Navigation's causal role is unknown.
-
-## Dictation does not change titles
-
-Dictation never changes a note's title, whether it is `Untitled` or chosen by
-the author, in the current recording or later ones. The observations above
-that mention title requests predate this.
+The destination body and both titles survived unchanged. Navigation's causal
+role is unknown.
 
 ## Responsiveness and positive comparisons
 
 | Input | Observed timing |
 | --- | --- |
-| 18.356 s Harvard passage, first recording | First body at 25.17 s from capture, approximately 3.96 s after Stop; audio request 4.42 s; title settled separately |
-| Identical Harvard repeat | Audio request 4.61 s; body stayed identical; body/title settled before Stop |
+| 18.356 s Harvard passage, first recording | First body at 25.17 s from capture, approximately 3.96 s after Stop; audio request 4.42 s |
+| Identical Harvard repeat | Audio request 4.61 s; body stayed identical and settled before Stop |
 | 29.168 s orchard passage with Flush | Audio requests 5.25 / 3.14 / 3.53 s; visible results at 16.73 / 25.30 / 35.75 s from capture; final body settled before Stop |
-| 6.2827 s lighthouse addition | Audio request 2.79 s; visible addition at 12.16 s from capture, 5.88 s after speech ended; body/title settled before Stop |
+| 6.2827 s lighthouse addition | Audio request 2.79 s; visible addition at 12.16 s from capture, 5.88 s after speech ended; body settled before Stop |
 
 The lighthouse addition and both original paragraphs survived reload exactly
 once and unchanged. They also survived the next distinct recording, despite
