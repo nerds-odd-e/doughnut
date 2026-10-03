@@ -34,6 +34,7 @@ keeps all of that audio. No separate recognizer or revision path is added.
 | --- | --- | --- | --- |
 | A pause flush and a Flush click send `isMidSpeech: false`, so the whole tail is written | Slice 3 | Read `audioProcessingScheduler.ts`: `tryFlush()` calls `processAndCallback(false)`; `wireAudioProcessingScheduler` wires the silence callback to `tryFlush()`; the `NoteAudioTools.vue` Flush button calls `audioRecorder.tryFlush()` | Confirmed |
 | Silence re-triggers a flush every 3 s of continued silence | Slice 3 | Read `rawSampleAudioBuffer.ts` `push()`: the counter resets to 0 after firing, so the 8 s orchard pause fires twice | Confirmed. Before, the second flush found only silence and made no request. With hold-back, it would re-send the held segment. |
+| Timed chunks reach the backend as mid-speech | Slices 2–4 | Slice 2 return: `AudioUploadDTO` binds the form property `midSpeech` (Lombok `setMidSpeech`; `@JsonProperty` does not affect form binding), but the frontend sends `isMidSpeech`; a `WebDataBinder` probe bound `false`; generated `types.gen.ts` lists both fields; every slice 1 response had an empty end timestamp | False. Every chunk is processed as not mid-speech, so the hold-back never runs. Slice 2 fixes the binding. |
 | A mid-speech chunk with a single segment is written in full | Slice 2 | Read `SRTProcessor.process`: `segments.length <= 1` returns the whole SRT; `SRTProcessorTests.shouldHandleSingleSegmentWhenIncomplete` asserts it | Confirmed. Without slice 2, the second pause flush would still write the held half sentence. |
 | An empty `dictatedText` leaves the note unchanged | Slice 2 | Read `noteTextEditing.ts` `appendDictatedText`: returns early when `dictatedText` is empty | Confirmed |
 | A truthy end timestamp of `00:00:00,000` advances no audio | Slice 2 | Read `rawSampleAudioBuffer.ts` `processUnprocessedData`: an empty timestamp marks all audio processed; a parsed 0 s advances no samples | Confirmed. An empty timestamp must not be returned for held audio. |
@@ -75,13 +76,18 @@ flush rule.
 
 ### 2. A lone segment waits until Stop
 Type: Behavior
-Status: planned
+Status: done
 Proof: `SRTProcessorTests`, `AiAudioControllerTests`, and
 `CURSOR_DEV=true nix develop -c pnpm cy:run --spec e2e_test/features/note_creation_and_update/record_live_audio.feature`
 
 Behavior: A note is recording, and one transcription segment has been spoken
 → the 60-second mid-speech timer fires → the note body is unchanged and no
 completion request is made. Stop then appends that passage once.
+
+The audio upload binds the mid-speech flag the frontend sends: rename the DTO
+field to `midSpeech` without the `@JsonProperty`, regenerate the API client,
+and send `midSpeech` from `useNoteAudioProcessing`. Without this, the timer
+chunk is processed as not mid-speech and writes everything.
 
 `SRTProcessor` returns no SRT and end timestamp `00:00:00,000` for a mid-speech
 transcription with one segment, including an empty one. `AiAudioController`
@@ -128,6 +134,9 @@ sentence detection.
 - Hold back rather than revise (owner, 2026-10-03).
 - One rule for all mid-speech chunks. The single-segment change also affects the
   60-second timer, which the story's boundary assumption covers.
+- The mid-speech binding fix belongs to slice 2: the story's common rule
+  requires timed chunks to be mid-speech, and the mocked timer journey is the
+  first proof that observes it (coordinator, 2026-10-03).
 - Firing the silence callback once per silent run is part of slice 3. It keeps
   an existing pause from repeatedly re-sending the held segment.
 
@@ -150,5 +159,20 @@ sentence detection.
     on Friday afternoon. We should bring a notebook and a pencil."
   - The complete book sentence never appears. Slice 4 expects the pause flush
     to hold back the "yesterday" segment and Flush to hold back "because she".
+  - Every chunk in this run was processed as not mid-speech (see the binding
+    premise), so the pause flush and Flush wrote the whole tail as planned,
+    and no timer chunk occurred.
   - Outside this story: the first passage had no leading whitespace, so the
     saved body reads "every hour.The orchard".
+- **Slice 2 (2026-10-03).** Accepted proof: `AiAudioControllerTests`
+  `shouldHoldBackSingleSegmentOfMidSpeechUploadWithoutCompletion` (MockMvc
+  multipart with `midSpeech=true`; fails with the old field name),
+  `SRTProcessorTests`, and `record_live_audio.feature`, whose exact saved-body
+  step after Stop rules out both a mid-speech write and a double append.
+  - Stop hung under `@mockBrowserTime` when clicked during an in-flight chunk:
+    `stop()` polled with `setTimeout`. The scheduler now awaits the in-flight
+    promise (`audioProcessingScheduler.stop.spec.ts`).
+  - Controller tests that call the method directly skip form binding; a
+    multipart DTO field name needs a MockMvc test.
+  - `backend:test:worktree` takes one `--tests` pattern, and it shares
+    `backend/build` with `cy:run`, so run them one after another.

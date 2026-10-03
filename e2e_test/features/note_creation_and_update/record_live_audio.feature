@@ -17,10 +17,11 @@ Feature: Record live audio onto a note
     And the browser is mocked to give permission to record audio
 
   @mockBrowserTime
-  Scenario: Continuous mid-recording transcription then append on stop
+  Scenario: A lone transcription segment waits until stop before it is appended
     Given I start recording audio for the note "Data Structure Lecture"
     And the browser records audio input from the microphone as in "lecture.wav"
     When it is 2 minutes later in the browser
-    Then the note content on the current page should be "This is class 1.Let's talk about data structure today."
+    Then the note content on the current page should be "This is class 1."
     When I stop recording audio
     Then the note content on the current page should be "This is class 1.Let's talk about data structure today."
+    And the note "DS lecture/Data Structure Lecture" in Donut should have content "This is class 1.Let's talk about data structure today."

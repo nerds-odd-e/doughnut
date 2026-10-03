@@ -15,7 +15,7 @@ class AudioProcessingSchedulerImpl implements AudioProcessingScheduler {
   private readonly PROCESSOR_INTERVAL = 60 * 1000 // 60 seconds
 
   private processorTimer: NodeJS.Timeout | null = null
-  private isProcessing = false
+  private processing: Promise<void> | null = null
 
   constructor(
     protected readonly audioBuffer: AudioBuffer,
@@ -38,13 +38,13 @@ class AudioProcessingSchedulerImpl implements AudioProcessingScheduler {
   }
 
   private async processAndCallback(isMidSpeech: boolean): Promise<void> {
-    if (this.isProcessing) return
+    if (this.processing) return
 
-    this.isProcessing = true
+    this.processing = this.processDataChunk(isMidSpeech)
     try {
-      await this.processDataChunk(isMidSpeech)
+      await this.processing
     } finally {
-      this.isProcessing = false
+      this.processing = null
     }
   }
 
@@ -59,8 +59,8 @@ class AudioProcessingSchedulerImpl implements AudioProcessingScheduler {
     }
 
     // Wait for any ongoing processing to complete
-    while (this.isProcessing) {
-      await new Promise((resolve) => setTimeout(resolve, 10))
+    while (this.processing) {
+      await this.processing
     }
 
     // Process any remaining data

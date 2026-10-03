@@ -773,9 +773,8 @@ export type BazaarNotebook = {
 export type AudioUploadDto = {
     uploadAudioFile?: Blob | File;
     additionalProcessingInstructions?: string;
-    previousNoteContentToAppendTo?: string;
     midSpeech?: boolean;
-    isMidSpeech?: boolean;
+    previousNoteContentToAppendTo?: string;
 };
 
 export type DictatedText = {

@@ -5113,12 +5113,10 @@ components:
           format: binary
         additionalProcessingInstructions:
           type: string
-        previousNoteContentToAppendTo:
-          type: string
         midSpeech:
           type: boolean
-        isMidSpeech:
-          type: boolean
+        previousNoteContentToAppendTo:
+          type: string
     DictatedText:
       type: object
       properties:

@@ -2,8 +2,12 @@ package com.odde.donut.controllers;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.odde.donut.controllers.dto.AudioUploadDTO;
 import com.odde.donut.services.ai.DictatedText;
@@ -25,9 +29,11 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.test.web.servlet.MockMvc;
 
 class AiAudioControllerTests extends ControllerTestBase {
   @Autowired AiAudioController controller;
+  @Autowired MockMvc mockMvc;
 
   OpenAiStructuredResponseMock openAiStructuredResponseMock;
 
@@ -108,6 +114,25 @@ class AiAudioControllerTests extends ControllerTestBase {
       String input =
           captureCompletionParams().rawParams().input().flatMap(i -> i.text()).orElse("");
       assertThat(input).doesNotContain("Previous note content (in JSON format):");
+    }
+
+    @Test
+    void shouldHoldBackSingleSegmentOfMidSpeechUploadWithoutCompletion() throws Exception {
+      mockTranscriptionSrtResponse("1\n00:00:00,000 --> 00:00:03,000\nunfinished sentence");
+
+      mockMvc
+          .perform(
+              multipart("/api/audio/audio-to-text")
+                  .file(
+                      new MockMultipartFile(
+                          "uploadAudioFile", "test.mp3", "audio/mpeg", "test".getBytes()))
+                  .param("midSpeech", "true"))
+          .andExpect(status().isOk())
+          .andExpect(jsonPath("$.completionFromAudio.dictatedText").value(""))
+          .andExpect(jsonPath("$.endTimestamp").value("00:00:00,000"));
+
+      verify(openAiStructuredResponseMock.responseService(), never())
+          .create(any(StructuredResponseCreateParams.class));
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})

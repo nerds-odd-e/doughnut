@@ -57,7 +57,7 @@ export function useNoteAudioProcessing(
         body: {
           uploadAudioFile: chunk.data,
           additionalProcessingInstructions: processingInstructions.value,
-          isMidSpeech: chunk.isMidSpeech,
+          midSpeech: chunk.isMidSpeech,
           previousNoteContentToAppendTo: getLastContentChunk(
             realm.note.content
           ),

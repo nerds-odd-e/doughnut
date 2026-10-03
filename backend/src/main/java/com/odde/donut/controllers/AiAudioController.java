@@ -3,6 +3,7 @@ package com.odde.donut.controllers;
 import com.odde.donut.controllers.dto.*;
 import com.odde.donut.services.GlobalSettingsService;
 import com.odde.donut.services.SRTProcessor;
+import com.odde.donut.services.ai.DictatedText;
 import com.odde.donut.services.ai.OtherAiServices;
 import com.odde.donut.services.ai.TextFromAudioWithCallInfo;
 import jakarta.validation.Valid;
@@ -41,19 +42,22 @@ class AiAudioController {
     SRTProcessor.SRTProcessingResult processedResult =
         srtProcessor.process(transcriptionFromAudio, audioFile.isMidSpeech());
 
-    return otherAiServices
-        .getTextFromAudio(
-            globalSettingsService.globalSettingOthers().getValue(),
-            processedResult.getProcessedSRT(),
-            audioFile.getAdditionalProcessingInstructions(),
-            audioFile.getPreviousNoteContentToAppendTo())
-        .map(
-            dictatedText -> {
-              TextFromAudioWithCallInfo textFromAudioWithCallInfo = new TextFromAudioWithCallInfo();
-              textFromAudioWithCallInfo.setCompletionFromAudio(dictatedText);
-              textFromAudioWithCallInfo.setEndTimestamp(processedResult.getEndTimestamp());
-              textFromAudioWithCallInfo.setRawSRT(processedResult.getProcessedSRT());
-              return textFromAudioWithCallInfo;
-            });
+    Optional<DictatedText> dictatedText =
+        processedResult.getProcessedSRT().isEmpty()
+            ? Optional.of(new DictatedText(""))
+            : otherAiServices.getTextFromAudio(
+                globalSettingsService.globalSettingOthers().getValue(),
+                processedResult.getProcessedSRT(),
+                audioFile.getAdditionalProcessingInstructions(),
+                audioFile.getPreviousNoteContentToAppendTo());
+
+    return dictatedText.map(
+        text -> {
+          TextFromAudioWithCallInfo textFromAudioWithCallInfo = new TextFromAudioWithCallInfo();
+          textFromAudioWithCallInfo.setCompletionFromAudio(text);
+          textFromAudioWithCallInfo.setEndTimestamp(processedResult.getEndTimestamp());
+          textFromAudioWithCallInfo.setRawSRT(processedResult.getProcessedSRT());
+          return textFromAudioWithCallInfo;
+        });
   }
 }

@@ -28,7 +28,7 @@ describe("AudioProcessingScheduler stop", () => {
     )
   })
 
-  it("waits for ongoing processing to complete before stopping", async () => {
+  it("waits for ongoing processing to complete before stopping, without needing timers", async () => {
     let resolveProcessing: (() => void) | null = null
     const processingPromise = new Promise<void>((resolve) => {
       resolveProcessing = resolve
@@ -52,7 +52,6 @@ describe("AudioProcessingScheduler stop", () => {
     const stopPromise = scheduler.stop()
     resolveProcessing!()
 
-    await vi.advanceTimersByTimeAsync(20)
     await Promise.all([flushPromise, stopPromise])
 
     expect(mockCallback).toHaveBeenCalledTimes(2)
