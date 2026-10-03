@@ -138,3 +138,60 @@ the initial failed origin route and cleanup, within its audio-setup exception.
 
 [Sustained speech and revision evidence](SEED-066-voice-input-sustained-evidence.md#sustained-speech-and-revision-evidence)
 records the subsequent longer-passage observation.
+
+## Existing-content preservation
+
+**2026-10-03, 01:54–01:57 UTC:** Chrome on macOS, same real-service localhost
+Development session as `manual`, notebook `23`, disposable note `13726`.
+Preparation's backend revision `a02dbb2697…` was reused; evidence checkout base
+was `be8f93f99b8337e82bc4baa5cecf4a202b1f8337`. No service was restarted.
+
+**Before and after:** Through Edit as markdown, replace the owned note body with
+the following two finished paragraphs, return to rich content, then reload to
+verify that both are saved before dictation:
+
+> Original paragraph one: The museum opens at nine each morning. Our tickets are booked for Tuesday.
+>
+> Original paragraph two: The blue notebook contains the garden measurements. Keep the oak tree map beside it.
+
+Record this distinct addition using the baseline capture harness and a temporary
+fixture generated in the execution checkout:
+
+```bash
+/usr/bin/say --file-format=WAVE --data-format=LEI16@48000 -r 150 -o .voice-discovery-preserve.wav 'The lighthouse keeper painted the front door bright yellow. Tomorrow we will bring fresh oranges to the beach.'
+```
+
+Use fetch URL
+`/@fs/Users/terryyin/git/doughnut/.worktrees/discover-voice-input-problems-through-manual-tes/.voice-discovery-preserve.wav`
+and device label `Controlled preservation speech`. The decoded input was
+6.2826667 s at 48 kHz, naturally paced synthetic MediaStream capture through the
+actual worklet; transcription, retouch, persistence and title services were real.
+The baseline MutationObserver/CDP timing route was reused. No clock or service
+response was mocked; microphone hardware and permissions remain gaps.
+
+| Stage (UTC) | Observation |
+| --- | --- |
+| 01:56:09.357 | Both original paragraphs visibly saved before capture |
+| 01:56:21.100 → 01:56:27.377 | Capture start → source playback end |
+| 01:56:30.375 → 01:56:33.164 | Audio request → HTTP 200 response, 2.79 s |
+| 01:56:33.252 | Content PATCH completed HTTP 200 |
+| 01:56:33.260 | First visible addition, 12.16 s from capture; 5.88 s after speech end |
+| 01:56:35.519 | Final visible title “Sample Sentences for Sensory and Contextual Descriptions”; title PATCH HTTP 200 |
+| 01:56:40.251 | Stop marker; body/title had already settled |
+| 01:56:50 approximately | Reload and screenshot confirmed persisted comparison |
+
+Final saved body retained **both original paragraphs exactly once and unchanged**,
+then a blank line and the exact spoken addition: “The lighthouse keeper painted
+the front door bright yellow. Tomorrow we will bring fresh oranges to the beach.”
+No original-content discrepancy was observed in this short journey. This result
+narrows the sustained-speech erasure evidence to newly generated current-session
+content; it does not establish preservation across longer recordings or edits.
+Stop was reached after settlement, so pending-result versus post-Stop settlement
+remains unmeasured here. The separate title change repeats the known ongoing-title
+observation; title policy remains unresolved.
+
+At 01:56:49.865 the harness restored media methods, disconnected its observer,
+stopped sources/tracks and closed AudioContext. Network observation was disabled;
+reload cleared page state. The owned WAV and tab were removed/closed; note `13726`
+remains disposable for later slices. No product source changed. This slice spent
+about three minutes including evidence and cleanup.

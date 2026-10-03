@@ -32,8 +32,11 @@ Slice 1 published as `2eec224d133f9bfa081e5918a55c46f4de3827a1` on the remote
 story branch. Managed delivery reported unobserved CI: it did not bind the
 Codex yielded-cell bridge and started no observer. The verified GitHub selector
 is `ci.yml` (pushes on all branches; `.planning/**` is ignored).
-Slice 2's [sustained evidence](../../seeds/SEED-066-voice-input-sustained-evidence.md)
+Slice 2 published as `be8f93f99b8337e82bc4baa5cecf4a202b1f8337`; its
+[sustained evidence](../../seeds/SEED-066-voice-input-sustained-evidence.md)
 records completed orchard-content loss while the prior paragraph survived.
-Root inspected final note DOM; record refactor, whitespace and formatting passed.
+Slice 3 records two finished original paragraphs preserved with a distinct
+addition after reload. Manual signals inspected; independent refactor found
+the records clean, whitespace and formatting passed.
 Publication receipts stay in the execution conversation before each next slice.
 Hardware capture, permission and frequency remain uncovered.

@@ -122,7 +122,7 @@ well as the final stop where available, separating their timings.
 
 ### 3. Existing-content preservation evidence
 Type: Behavior
-Status: planned
+Status: done — [Accepted original/addition/reload comparison](../../seeds/SEED-066-voice-input-manual-evidence.md#existing-content-preservation), ~3 min; scoped timing gaps retained.
 Proof: Original body, spoken addition, and final saved body comparison.
 
 Behavior: Given a note with recognizable existing paragraphs, dictate an addition
