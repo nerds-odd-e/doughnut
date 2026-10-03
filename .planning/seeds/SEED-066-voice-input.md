@@ -193,18 +193,17 @@ revision is `a02dbb2697…`; frontend/runtime revision was not fully established
 
 - **Completed dictated content lost:** In a 29.168 s passage with an 8.2 s pause, completed orchard facts appeared, Flush replaced them with a middle
   fragment, and the final update retained only the last sentences. Reload confirmed the loss while preexisting Harvard content survived. Reproduction
-  and intermediate text are in the [sustained report](SEED-066-voice-input-sustained-evidence.md).
+  and intermediate text are in the [voice-input documentation](../../docs/voice-input.md#completed-dictated-content-can-disappear).
 - **Visible manual typing lost during processing:** Supported body editing while a real audio request was pending displayed a recognizable sentence;
   the arriving result removed it. A later paste after settlement persisted. This demonstrates loss of pending visible typing; an already-saved edit race
-  was not observed. The [baseline and preservation report](SEED-066-voice-input-manual-evidence.md) retains exact input, edit timing and reload comparison.
+  was not observed. The [voice-input documentation](../../docs/voice-input.md#visible-typing-can-be-lost-while-audio-processing-is-pending) retains the input, pending-edit boundary and reload comparison.
 - **Existing paragraph truncated during navigation journey:** Navigate from source `13726` while processing to destination `13727`, then return/reload.
   Both results persisted to the source, whose first paragraph became literal `...uesday.`; the other four paragraphs and destination sentinel survived.
-  Fresh independent navigation confirmed the saved state at 02:30:26 UTC. The [navigation and controls report](SEED-066-voice-input-navigation-evidence.md)
-  retains before/after text. The causal role of navigation remains unproved.
+  An independent fresh page confirmed the saved state. The [voice-input documentation](../../docs/voice-input.md#existing-content-can-be-truncated-during-a-navigation-journey) retains before/after text. The causal role of navigation remains unproved.
 - **Titles repeatedly change and overwrite author choice:** Repeating the identical 18.356 s Harvard input changed an initially `Untitled` note twice
   despite identical final bodies. A later recording overwrote “Author chosen preservation title” twice. This reproduces the owner's loss of title control;
   one-time generation versus disabling titles remains undecided. Title sequences
-  are in the baseline report and [proof mapping](../slice-plans/001-discover-voice-input-problems/EXECUTION.md#automatic-title-proof-mapping).
+  are retained in the [voice-input documentation](../../docs/voice-input.md#automatic-titles-can-overwrite-author-choice).
 - **Explicit voice-title entry was not discovered:** Inspecting supported title editing, Audio tools/Advanced Options and New note revealed no voice-title
   control. This is a bounded improvement opportunity, not a failed promise; OS dictation, extensions and processing instructions remain unobserved.
 - **Responsiveness baseline:** First body text appeared 25.17 s after capture began, approximately 3.96 s after Stop, for the 18.356 s short input. Real
@@ -216,10 +215,6 @@ revision is `a02dbb2697…`; frontend/runtime revision was not fully established
 **Material gaps:** Hardware capture, permission/device behavior, interruption, service-failure feedback and recovery were not exercised; secondary failures
 were skipped to reserve time for saved-loss confirmation and cleanup. The planning-stage empty-content API HTTP 500 was not reproduced through the UI.
 An empty-body UI baseline did succeed. Causes, frequency, the acceptable recent revision boundary, and quantitative latency expectations remain unresolved.
-
-**Clean stopping point:** By 02:31:09 UTC, owned notes `13726` and `13727` were verified in recoverable `_trash` folder `4965`; no purge occurred. Notebook
-`23` (“Voice discovery 20261003 baseline”) remains because no recoverable notebook deletion was verified. Owned temporary WAVs/harnesses were removed, streams
-released and owned tabs closed. Product source remains unchanged. Full coverage is not claimed; the three linked reports preserve actionable findings and gaps.
 
 
 ## Open Decisions for Later Work
