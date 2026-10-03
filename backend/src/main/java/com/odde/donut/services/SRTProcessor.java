@@ -1,30 +1,24 @@
 package com.odde.donut.services;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.Setter;
 
 public class SRTProcessor {
   @Getter
-  @Setter
+  @AllArgsConstructor
   public static class SRTProcessingResult {
     private String processedSRT;
     private String endTimestamp;
   }
 
-  public SRTProcessingResult process(String rawSRT, boolean incomplete) {
-    if (!incomplete) {
-      SRTProcessingResult result = new SRTProcessingResult();
-      result.setProcessedSRT(rawSRT);
-      result.setEndTimestamp(extractLastTimestamp(rawSRT));
-      return result;
+  public SRTProcessingResult process(String rawSRT, boolean midSpeech) {
+    if (!midSpeech) {
+      return new SRTProcessingResult(rawSRT, extractLastTimestamp(rawSRT));
     }
 
-    String[] segments = rawSRT.split("\n\n");
+    String[] segments = rawSRT.strip().split("\n\n");
     if (segments.length <= 1) {
-      SRTProcessingResult result = new SRTProcessingResult();
-      result.setProcessedSRT(rawSRT);
-      result.setEndTimestamp(extractLastTimestamp(rawSRT));
-      return result;
+      return new SRTProcessingResult("", "00:00:00,000");
     }
 
     // Remove the last segment and join the rest
@@ -36,10 +30,8 @@ public class SRTProcessor {
       processedSRT.append(segments[i]);
     }
 
-    SRTProcessingResult result = new SRTProcessingResult();
-    result.setProcessedSRT(processedSRT.toString());
-    result.setEndTimestamp(extractTimestampFromSegment(segments[segments.length - 2]));
-    return result;
+    return new SRTProcessingResult(
+        processedSRT.toString(), extractTimestampFromSegment(segments[segments.length - 2]));
   }
 
   private String extractLastTimestamp(String srt) {

@@ -35,24 +35,40 @@ class SRTProcessorTests {
   }
 
   @Test
-  void shouldHandleSingleSegmentWhenIncomplete() {
+  void shouldHoldBackSingleSegmentWhenIncomplete() {
     String singleSegment = "1\n00:00:00,000 --> 00:00:03,000\nOnly segment";
     SRTProcessor.SRTProcessingResult result = processor.process(singleSegment, true);
-    assertThat(result.getProcessedSRT(), equalTo(singleSegment));
-    assertThat(result.getEndTimestamp(), equalTo("00:00:03,000"));
+    assertThat(result.getProcessedSRT(), equalTo(""));
+    assertThat(result.getEndTimestamp(), equalTo("00:00:00,000"));
   }
 
   @Test
-  void shouldHandleEmptySRT() {
+  void shouldRemoveRealLastSegmentWhenIncompleteSRTEndsWithBlankLines() {
+    SRTProcessor.SRTProcessingResult result = processor.process(sampleSRT + "\n\n\n", true);
+    assertThat(result.getProcessedSRT(), not(containsString("Last segment")));
+    assertThat(result.getProcessedSRT(), containsString("Second segment"));
+    assertThat(result.getEndTimestamp(), equalTo("00:00:06,000"));
+  }
+
+  @Test
+  void shouldHoldBackSingleSegmentEndingWithBlankLinesWhenIncomplete() {
+    String singleSegment = "1\n00:00:00,000 --> 00:00:03,000\nOnly segment\n\n\n";
+    SRTProcessor.SRTProcessingResult result = processor.process(singleSegment, true);
+    assertThat(result.getProcessedSRT(), equalTo(""));
+    assertThat(result.getEndTimestamp(), equalTo("00:00:00,000"));
+  }
+
+  @Test
+  void shouldHoldBackEmptySRTWhenIncomplete() {
     SRTProcessor.SRTProcessingResult result = processor.process("", true);
     assertThat(result.getProcessedSRT(), equalTo(""));
-    assertThat(result.getEndTimestamp(), equalTo(""));
+    assertThat(result.getEndTimestamp(), equalTo("00:00:00,000"));
   }
 
   @Test
   void shouldHandleInvalidSRTFormat() {
     String invalidSRT = "Invalid SRT format";
-    SRTProcessor.SRTProcessingResult result = processor.process(invalidSRT, true);
+    SRTProcessor.SRTProcessingResult result = processor.process(invalidSRT, false);
     assertThat(result.getProcessedSRT(), equalTo(invalidSRT));
     assertThat(result.getEndTimestamp(), equalTo(""));
   }

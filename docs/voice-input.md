@@ -23,12 +23,19 @@ remain unchanged, an empty body becomes the passage, and successive additions
 follow earlier additions once. Navigating to another note does not redirect the
 result. The normal content-edit undo restores the prior body.
 
-Mid-speech processing excludes the last transcription segment and advances the
-processed audio position to that segment's start. Its audio is retained for the
-next chunk, so appending a result does not re-add already processed audio.
-The model controls transcription quality and passage whitespace. Recent
-unfinished-sentence revision and unsaved editor drafts have separate behavior;
-the append operates on current store content.
+Timed chunks, pause flushes (after more than 3 s of silence, once per pause)
+and Flush clicks are processed mid-speech. Mid-speech processing never writes
+the last transcription segment, because it may be an unfinished sentence. The
+processed audio position advances to the end of the segment before it, and
+the held segment's audio is sent again with the next chunk, so appending a
+result does not re-add already processed audio. Blank lines at the end of the
+transcription do not count as a segment. A lone segment writes nothing and all
+its audio is kept. Only Stop writes everything that remains. Dictated text,
+once written, is never revised: holding back the unfinished sentence replaces
+revising it. Audio that is entirely silent is not sent.
+The model controls transcription quality and passage whitespace. Unsaved
+editor drafts have separate behavior; the append operates on current store
+content.
 
 The mounted audio preservation tests assert exact saved content for long and
 empty bodies, repeated additions, originating-note targeting, and undo. The
@@ -81,8 +88,32 @@ changed as follows:
 Completed orchard facts were lost, and the complete book sentence was never
 recovered. The intermediate “from my sister” differs from the input “for my
 sister”. This is loss within the current recording, not whole-note erasure.
-The cause and frequency are unknown. The acceptable boundary for revising a
-recent unfinished sentence remains a product decision.
+The cause and frequency are unknown.
+
+The owner decided on 2026-10-03 to hold back the unfinished sentence rather
+than revise written text. With append and hold-back in place, the same
+passage at Development `1a981673` (Flush at 23 s, Stop at 31 s) wrote:
+
+1. “The orchard contains apple trees, peach trees, and a small wooden bench.”
+   The transcription also held “These facts are finished.”, and the
+   “yesterday” segment was held back.
+2. Flush: “The book that I bought yesterday after reading several reviews and
+   comparing different editions”, with the next segment held back.
+3. Stop: “is a gift from my sister because she enjoys learning about the
+   history of gardens. The meeting is on Friday afternoon. We should bring a
+   notebook and a pencil.”
+
+After reload the original paragraph, the complete book sentence and the
+meeting sentences appeared once, and nothing written was revised. “These facts
+are finished.” never reached the note: the text-writing model left it out of
+its result although it was in the transcription. Two earlier runs kept that
+sentence, so its frequency is unknown. The first passage joined the original
+paragraph without a space (“every hour.The orchard”).
+
+In an earlier run of this passage, before the transcription's trailing blank
+lines were handled, a short remainder of near-silent audio sent at Stop was
+transcribed as “You” and appended. Speech models are known to invent such
+words from near-silence; it has not been observed since hold-back.
 
 ## Visible typing can be lost while audio processing is pending
 

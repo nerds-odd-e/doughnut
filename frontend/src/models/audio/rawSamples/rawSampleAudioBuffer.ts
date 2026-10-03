@@ -17,7 +17,7 @@ class RawAudioBuffer implements AudioBuffer {
   private lastProcessedArrayIndex = 0
   private lastProcessedInternalIndex = 0
   public readonly sampleRate: number
-  public silenceCounter = 0
+  private silenceCounter = 0
   private onSilenceThresholdReached: () => void = () => {
     /* intentionally empty */
   }
@@ -85,10 +85,13 @@ class RawAudioBuffer implements AudioBuffer {
 
   private push(chunk: Float32Array): void {
     if (isSilent(chunk)) {
+      const silenceBefore = this.silenceCounter
       this.silenceCounter += chunk.length
-      if (this.silenceCounter >= this.SILENCE_DURATION_THRESHOLD) {
+      if (
+        silenceBefore < this.SILENCE_DURATION_THRESHOLD &&
+        this.silenceCounter >= this.SILENCE_DURATION_THRESHOLD
+      ) {
         this.onSilenceThresholdReached()
-        this.silenceCounter = 0
       }
     } else {
       this.silenceCounter = 0

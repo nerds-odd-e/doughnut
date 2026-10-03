@@ -1,6 +1,5 @@
 package com.odde.donut.controllers.dto;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.odde.donut.validators.ValidateMultipartFile;
 import lombok.Getter;
 import lombok.Setter;
@@ -23,8 +22,7 @@ public class AudioUploadDTO {
 
   private String additionalProcessingInstructions;
 
-  @JsonProperty("isMidSpeech")
-  private boolean isMidSpeech;
+  private boolean midSpeech;
 
   private String previousNoteContentToAppendTo;
 }

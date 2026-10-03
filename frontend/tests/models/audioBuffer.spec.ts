@@ -28,6 +28,22 @@ describe("AudioBuffer", () => {
     expect(mockCallback).toHaveBeenCalledTimes(1)
   })
 
+  it("should trigger silence callback once per silent run", () => {
+    const audioBuffer = createAudioBuffer(44100)
+    const mockCallback = vi.fn()
+    audioBuffer.setOnSilenceThresholdReached(mockCallback)
+    const threeSecondsOfSilence = new Float32Array(44100 * 3).fill(0)
+
+    audioBuffer.receiveAudioData([threeSecondsOfSilence, threeSecondsOfSilence])
+    expect(mockCallback).toHaveBeenCalledTimes(1)
+
+    audioBuffer.receiveAudioData([
+      new Float32Array(44100).fill(0.5),
+      threeSecondsOfSilence,
+    ])
+    expect(mockCallback).toHaveBeenCalledTimes(2)
+  })
+
   it("should reset silence counter when non-silent data is received", () => {
     const audioBuffer = createAudioBuffer(44100)
     const mockCallback = vi.fn()

@@ -80,7 +80,7 @@ describe("NoteAudioTools audio processing", () => {
     wrapper?.unmount()
   })
 
-  it("passes isMidSpeech for timer-triggered chunks", async () => {
+  it("sends timer-triggered chunks as mid-speech", async () => {
     await processAudio(
       wrapper,
       midSpeechChunk(new File(["test2"], "test.webm"))
@@ -88,7 +88,7 @@ describe("NoteAudioTools audio processing", () => {
 
     expect(audioToTextMock).toHaveBeenCalledWith({
       body: expect.objectContaining({
-        isMidSpeech: true,
+        midSpeech: true,
         previousNoteContentToAppendTo: note.content,
       }),
     })
