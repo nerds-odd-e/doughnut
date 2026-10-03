@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "agent": "Maki-chan",
+  "email": "maki-chan@example.org",
+  "identity": "SEED-066#discover-voice-input-problems",
+  "mode": "story-branch",
+  "branch": "codex/discover-voice-input-problems-through-manual-tes",
+  "host": "codex",
+  "model": "gpt-6.1-sol"
+}
