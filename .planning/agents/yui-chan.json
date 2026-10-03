@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 1,
+  "agent": "Yui-chan",
+  "email": "yui-chan@example.org",
+  "identity": "SEED-066#author-controlled-titles",
+  "mode": "story-branch",
+  "branch": "claude/keep-note-titles-under-the-author-s-control",
+  "host": "claude"
+}
