@@ -1,9 +1,0 @@
-{
-  "schemaVersion": 1,
-  "agent": "Julia-chan",
-  "email": "julia-chan@example.org",
-  "identity": "SEED-066#typed-corrections-side-effects",
-  "mode": "story-branch",
-  "branch": "claude/fix-two-side-effects-of-keeping-typed-correction",
-  "host": "claude"
-}

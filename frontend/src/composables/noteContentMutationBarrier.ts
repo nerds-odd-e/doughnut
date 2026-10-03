@@ -34,14 +34,14 @@ export function registerOpenNoteContentEditor(
   }
 }
 
-/** Appends to the open body editor's draft for the note and saves it; false when none is open. */
+/** Appends to the open body editor's draft for the note and saves it; false when none is open or admission is closed. */
 export function appendToOpenNoteContentDraft(
   noteId: number,
   text: string
 ): boolean {
-  const editor = noteMutations.get(noteId)?.editor
-  if (!editor) return false
-  editor.appendToDraft(text)
+  const state = noteMutations.get(noteId)
+  if (!state?.editor || !state.admissionOpen) return false
+  state.editor.appendToDraft(text)
   return true
 }
 

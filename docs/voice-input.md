@@ -35,8 +35,9 @@ once written, is never revised: holding back the unfinished sentence replaces
 revising it. Audio that is entirely silent is not sent.
 The model controls transcription quality and passage whitespace. When a body
 editor for the note is open, the passage is added to the end of that editor's
-draft, including unsaved typing, and that draft is saved right away; otherwise
-it is added to the note's saved body.
+draft, including unsaved typing, and that draft is saved right away; otherwise,
+including while an image upload or note removal is pausing the editor, it is
+added to the note's saved body.
 
 The mounted audio preservation tests assert exact saved content for long and
 empty bodies, repeated additions, originating-note targeting, and undo. The

@@ -70,8 +70,8 @@ export async function pasteIntoTextarea(
   await flushPromises()
 }
 
-/** Mounts note 1 in Markdown mode, selects `selection` (default: the end),
- * and pastes into its textarea. */
+/** Mounts note 1 in Markdown mode, focuses its textarea, selects `selection`
+ * (default: the end), and pastes into it. */
 export async function mountAndPaste(
   noteContent: string,
   html: string,
@@ -82,6 +82,7 @@ export async function mountAndPaste(
     { attachTo: document.body }
   )
   const textarea = textareaEl(wrapper)
+  textarea.focus()
   if (options.selection) textarea.setSelectionRange(...options.selection)
   await pasteIntoTextarea(textarea, html, options.plainText)
   return { wrapper, textarea }

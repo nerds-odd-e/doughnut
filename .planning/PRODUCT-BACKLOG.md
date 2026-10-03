@@ -6,8 +6,6 @@ Audio tools, starting with voice input. Make voice input work reliably and easy 
 
 ## Taken
 
-- [Fix two side effects of keeping typed corrections](seeds/SEED-066-voice-input.md#typed-corrections-side-effects) — SEED-066#typed-corrections-side-effects ([plan](slice-plans/007-typed-corrections-side-effects/PLAN.md))
-
 ## Backlog list
 
 - [Replace frontend unit-test mocks of internal code with the real modules](seeds/SEED-039-faster-ci-feedback.md#internal-mocks-to-real-modules) — SEED-039#internal-mocks-to-real-modules

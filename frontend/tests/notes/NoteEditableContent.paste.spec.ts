@@ -39,6 +39,32 @@ describe("NoteEditableContent paste", () => {
     wrapper.unmount()
   })
 
+  it("leaves the caret after the pasted markdown in a focused textarea", async () => {
+    const { wrapper, textarea } = await mountAndPaste(
+      "before [SELECTED] after",
+      "<p><b>Styled</b> text</p>",
+      { selection: [7, 17] }
+    )
+
+    expect(textarea.value).toBe("before **Styled** text after")
+    expect([textarea.selectionStart, textarea.selectionEnd]).toEqual([22, 22])
+    wrapper.unmount()
+  })
+
+  it("leaves the caret after the original text when the paste choice replaces it", async () => {
+    const { wrapper, textarea } = await mountAndPaste(
+      "before [SELECTED] after",
+      "<p>Styled text</p>",
+      { plainText: "**RAW**", selection: [7, 17] }
+    )
+
+    await useOriginalText(wrapper)
+
+    expect(textarea.value).toBe("before **RAW** after")
+    expect([textarea.selectionStart, textarea.selectionEnd]).toEqual([14, 14])
+    wrapper.unmount()
+  })
+
   describe("link removal prompt", () => {
     it("shows options popup when pasted content contains links and removes them when chosen", async () => {
       mockPopupsOptions.mockResolvedValue("links")
