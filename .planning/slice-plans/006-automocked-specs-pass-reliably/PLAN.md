@@ -65,7 +65,7 @@ removed.
 
 ### 1. The failed automock is produced on demand and explained
 Type: Behavior
-Status: stopped (2026-10-03): not reproduced after the listed attempts; awaiting the owner's decision on further reproduction (for example hosted-runner or Linux reruns)
+Status: stopped (2026-10-03): not reproduced after the listed attempts; a standalone reproduction (1,940 runs) also passed; awaiting the owner's decision on hosted-runner or Linux reruns, or closing the story
 Proof: a literal command and condition under which
 `MainMenu.resume.spec.ts` fails with
 `vi.mocked(...).mockReturnValue is not a function` at `setupMainMenuTests`,
@@ -198,3 +198,42 @@ Not tried, because it is outside the bounded attempts or needs the owner:
 hosted-runner reruns; Linux/CI Chromium; a gap inside Chromium between
 `Fetch.enable` being acknowledged and the renderer using the intercepting
 loader. Slices 2 and 3 do not start without a reproduction.
+
+Standalone reproduction attempt (owner's instruction, 2026-10-03, at
+`ba6581f1b5`): **not reproduced.** The suite uses no Donut code: Vitest 5.0.3
+browser mode with Playwright and Chromium, headless,
+`fileParallelism: false`, `retry: 1`, one instance, and a sequencer that runs
+files by name. Its modules are a target module, a second module, and a chain
+of 120 modules ("heavy").
+
+Spec shapes:
+
+- **A:** bare `vi.mock` of the target and the second module. The mocked
+  target is the first import, and `vi.mocked(fn).mockReturnValue` runs in
+  `beforeEach`.
+- **B:** loads the real target and the heavy chain unmocked, like
+  `DonutApp.searchHistoryMigration`.
+- **C:** mocked target reached through a helper, like `MainMenu.spec.ts`.
+- **M:** A plus a factory mock, like the resume spec's
+  `AiReplyEventSource`.
+- **P:** plain, no mocks.
+
+The suite ran inside the frontend directory and was deleted afterwards. The
+generator lives outside the repo.
+
+| Variant | Files × runs | Condition | Mocked-first executions | Failures |
+| --- | --- | --- | --- | --- |
+| v1 | 60 (B,P,A repeating) × 15 | idle | 300 A | 0 |
+| v2 | 60 (B,A,C,A,P) × 15 | idle | 360 A + 180 C | 0 |
+| v3 | 60 (B,P,A) × 15 | 32 busy loops on 16 cores | 300 A | 0 |
+| v4 | 150 (B,P,A) × 6 | busy loops + Donut's `orchestratorGcReporter` (5 s) | 300 A | 0 |
+| v5 | 60 (B,P,A) × 10 | busy loops + the same reporter every 30 ms (110 GCs counted in one run) | 200 A | 0 |
+| v6 | 60 (B,P,M) × 15 | busy loops + GC every 30 ms | 300 M | 0 |
+
+In total, 1,760 mocked-first file runs and 180 mocked-via-helper runs, with no
+failed automock. The B → P → A order switches interception off and on before
+every mocked-first file. On this macOS machine with the bundled Chromium, a
+mocked module requested first, right after routes are registered, is not
+missed often enough to show up even under heavy CPU load and frequent forced
+GC. The remaining place to look is the CI runner itself (Linux, its Chromium,
+its load), which is a hosted-CI decision for the owner.
