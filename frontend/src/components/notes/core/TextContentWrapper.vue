@@ -43,7 +43,7 @@ import { normalizeNoteContent } from "@/utils/normalizeNoteContent"
 import { hasNewWikiLinkTexts } from "@/utils/noteContentWikiLinks"
 import {
   noteContentMutationAdmissionIsOpen,
-  registerNoteContentAutosave,
+  registerOpenNoteContentEditor,
 } from "@/composables/noteContentMutationBarrier"
 
 const noteStore = useNoteStore()
@@ -148,20 +148,21 @@ const {
   markSaved,
 } = autosave
 
-let unregisterContentAutosave: (() => void) | undefined
+let unregisterContentEditor: (() => void) | undefined
 
 if (props.field === "edit content") {
   watch(
     () => props.noteId,
     (noteId) => {
-      unregisterContentAutosave?.()
-      unregisterContentAutosave = registerNoteContentAutosave(noteId, {
+      unregisterContentEditor?.()
+      unregisterContentEditor = registerOpenNoteContentEditor(noteId, {
         flushAndWait,
+        appendToDraft: (text) => onUpdate(localValue.value + text),
       })
     },
     { immediate: true }
   )
-  onUnmounted(() => unregisterContentAutosave?.())
+  onUnmounted(() => unregisterContentEditor?.())
 }
 
 const showReferencedTitleSavePanel = computed(

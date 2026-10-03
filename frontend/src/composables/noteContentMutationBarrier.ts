@@ -1,10 +1,11 @@
-type NoteContentAutosave = {
+type OpenNoteContentEditor = {
   flushAndWait: () => Promise<boolean>
+  appendToDraft: (text: string) => void
 }
 
 type NoteMutationState = {
   admissionOpen: boolean
-  autosave?: NoteContentAutosave
+  editor?: OpenNoteContentEditor
 }
 
 const noteMutations = new Map<number, NoteMutationState>()
@@ -17,20 +18,31 @@ function stateFor(noteId: number): NoteMutationState {
   return created
 }
 
-export function registerNoteContentAutosave(
+export function registerOpenNoteContentEditor(
   noteId: number,
-  autosave: NoteContentAutosave
+  editor: OpenNoteContentEditor
 ): () => void {
   const state = stateFor(noteId)
-  state.autosave = autosave
+  state.editor = editor
   return () => {
-    if (state.autosave === autosave) {
-      state.autosave = undefined
+    if (state.editor === editor) {
+      state.editor = undefined
     }
-    if (!state.autosave) {
+    if (!state.editor) {
       noteMutations.delete(noteId)
     }
   }
+}
+
+/** Appends to the open body editor's draft for the note; false when none is open. */
+export function appendToOpenNoteContentDraft(
+  noteId: number,
+  text: string
+): boolean {
+  const editor = noteMutations.get(noteId)?.editor
+  if (!editor) return false
+  editor.appendToDraft(text)
+  return true
 }
 
 export function noteContentMutationAdmissionIsOpen(noteId: number): boolean {
@@ -43,7 +55,7 @@ export async function closeAndFlushNoteContentMutations(
   const state = noteMutations.get(noteId)
   if (!state) return true
   state.admissionOpen = false
-  const saved = (await state.autosave?.flushAndWait()) ?? true
+  const saved = (await state.editor?.flushAndWait()) ?? true
   if (!saved) {
     reopenNoteContentMutations(noteId)
   }
@@ -54,7 +66,7 @@ export function reopenNoteContentMutations(noteId: number): void {
   const state = noteMutations.get(noteId)
   if (!state) return
   state.admissionOpen = true
-  if (!state.autosave) {
+  if (!state.editor) {
     noteMutations.delete(noteId)
   }
 }

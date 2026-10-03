@@ -2,6 +2,7 @@ import type {
   DictatedText,
   NoteContentCompletion,
 } from "@generated/donut-backend-api"
+import { appendToOpenNoteContentDraft } from "@/composables/noteContentMutationBarrier"
 import { refreshSidebarStructuralListings } from "@/components/notes/sidebarStructuralRefresh"
 import { updateTextContentRequest } from "./noteRequests"
 import type { NoteStore, TitleRenameReferenceHandling } from "./noteStore"
@@ -69,6 +70,7 @@ export default class NoteTextEditing {
 
   async appendDictatedText(noteId: Donut.ID, value?: DictatedText) {
     if (!value?.dictatedText) return
+    if (appendToOpenNoteContentDraft(noteId, value.dictatedText)) return
 
     const realm = await this.store.getOrLoadNoteRealm(noteId)
     await this.updateTextField(

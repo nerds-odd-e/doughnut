@@ -33,9 +33,10 @@ transcription do not count as a segment. A lone segment writes nothing and all
 its audio is kept. Only Stop writes everything that remains. Dictated text,
 once written, is never revised: holding back the unfinished sentence replaces
 revising it. Audio that is entirely silent is not sent.
-The model controls transcription quality and passage whitespace. Unsaved
-editor drafts have separate behavior; the append operates on current store
-content.
+The model controls transcription quality and passage whitespace. When a body
+editor for the note is open, the passage is added to the end of that editor's
+draft, including unsaved typing, and saved by its ordinary autosave; otherwise
+it is added to the note's saved body.
 
 The mounted audio preservation tests assert exact saved content for long and
 empty bodies, repeated additions, originating-note targeting, and undo. The
@@ -115,7 +116,7 @@ lines were handled, a short remainder of near-silent audio sent at Stop was
 transcribed as “You” and appended. Speech models are known to invent such
 words from near-silence; it has not been observed since hold-back.
 
-## Visible typing can be lost while audio processing is pending
+## Typing while audio processing is pending
 
 Save two recognizable paragraphs and a distinct spoken addition:
 
@@ -129,19 +130,17 @@ Save two recognizable paragraphs and a distinct spoken addition:
 > will bring fresh oranges to the beach.
 
 Start the longer orchard passage. When its first real audio request is pending,
-focus the supported rich body editor and type:
+focus the body editor and type at the end:
 
 > MANUAL EDIT: Keep this red bicycle sentence.
 
-Typing began 1.245 s after the request started. The whole sentence without its
-period was visible before the audio content PATCH completed; the arriving
-result erased it. The final typed period remained at the beginning of the old
-paragraph. No manual-content PATCH preceded that result, so this establishes
-loss of visible in-progress typing, not overwrite of an already-saved edit.
-
-A complete paste after audio settlement persisted through reload, along with
-both original paragraphs and the prior lighthouse addition. New orchard
-content was absent. An already-saved edit race remains unassessed.
+When the result arrives, the typed sentence stays visible and the orchard
+passage follows it. A correction made elsewhere in the body, such as changing
+"from" to "for", also stays, and the passage still goes at the end. The draft
+with the passage is saved by the editor's ordinary autosave, so both originals,
+the lighthouse addition, the typed sentence and the passage are saved once
+each. The mounted typing-while-pending tests cover the rich and Markdown
+editors.
 
 ## Existing content can be truncated during a navigation journey
 

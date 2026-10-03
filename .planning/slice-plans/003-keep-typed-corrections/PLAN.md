@@ -35,7 +35,7 @@ are kept, and the caret stays where they were typing.
 | Premise | Consumed by | Observation | Result |
 | --- | --- | --- | --- |
 | The arriving passage is written from store content, not from the editor draft | Slice 2 | Read `frontend/src/store/noteTextEditing.ts` `appendDictatedText`: `(realm.note.content ?? "") + value.dictatedText` through `updateTextField` | Confirmed |
-| The store write then discards the unsaved draft | Slice 2 | Read `useDebouncedTextAutosave.ts` `syncFromExternal`: with an unsaved draft and no save in flight, a new external value that differs from both draft and last saved calls `replaceFromExternal`, which replaces the draft | Confirmed by reading. Slice 2's new spec must fail on unchanged code before the fix (symptom reproduced; the [recorded journey](../../../docs/voice-input.md#visible-typing-can-be-lost-while-audio-processing-is-pending) is the earlier field observation) |
+| The store write then discards the unsaved draft | Slice 2 | Read `useDebouncedTextAutosave.ts` `syncFromExternal`: with an unsaved draft and no save in flight, a new external value that differs from both draft and last saved calls `replaceFromExternal`, which replaces the draft | Confirmed by reading. Slice 2's new spec must fail on unchanged code before the fix (symptom reproduced; the [recorded journey](../../../docs/voice-input.md#typing-while-audio-processing-is-pending) is the earlier field observation) |
 | The per-note body-editor registry exists and holds `flushAndWait` | Slice 1 | Read `frontend/src/composables/noteContentMutationBarrier.ts`; only `TextContentWrapper.vue` registers; `useNoteRemovalFlow.ts` and `RichFrontmatterImagePropertyValue.vue` call `closeAndFlushNoteContentMutations` | Confirmed |
 | The registry follows the note last typed into, not the note displayed | Slice 1 | Read `TextContentWrapper.vue`: `registerContentAutosave(noteId)` runs only from `onUpdate`. `NoteShowPage.vue`, `NoteShow.vue`, `NoteTextContent.vue` and the `RouterView` in `NotebookSidebarLayout.vue` have no `:key`, so the same editor instance is reused when the author opens another note | Confirmed. Handing a passage to this registration as-is could put note A's passage into note B's draft and save it to A. Slice 1 registers by the displayed note instead |
 | The rich editor loses the caret when the model changes | Slice 5 | Read `QuillEditor.vue` `syncQuillFromModel`: sets `quill.root.innerHTML` with no selection restore | Confirmed |
@@ -107,9 +107,16 @@ draft showing another note.
 
 ### 2. Unsaved typing stays and the passage follows it
 Type: Behavior
-Status: planned
+Status: done
 Proof: new spec (example 1, rich and Markdown; content half of example 2),
 failing first on unchanged code with the typed sentence missing.
+Accepted: `NoteAudioTools.typingWhilePending.spec.ts` (3 cases, all failed
+before the fix with the typing missing) asserts editor text and the exact last
+`updateNoteContent` body; focused command → 19 files, 100 tests;
+`tests/store/noteStore.spec.ts` 10 tests; `vue-tsc` clean. The registry entry
+is `OpenNoteContentEditor` (`registerOpenNoteContentEditor`, `appendToDraft`);
+`appendToOpenNoteContentDraft` routes the passage. The spec's harness renders
+the editor from the store realm; slices 3–6 reuse it.
 
 Behavior: an open body editor with unsaved typing (at the end, or "from"
 changed to "for" mid-body) and a held `audioToText` → release → the editor
@@ -173,6 +180,13 @@ value while focused.
   into, because the note page reuses one editor instance across notes.
 
 ## Learnings
+
+- With an editor open, the passage is saved after the editor's debounce, so a
+  next audio request starting within it builds its "previous content" excerpt
+  without the previous passage (spacing only, excluded scope).
+- A passage arriving while removal or image upload has closed admission is
+  ignored by the editor's `onUpdate` and not written elsewhere — the
+  save-then-change overlap the plan leaves unaddressed.
 
 - Run local frontend tests with `NODE_ENV` unset; this shell sets
   `NODE_ENV=production`, which hides `<script setup>` bindings from

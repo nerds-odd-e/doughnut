@@ -121,7 +121,7 @@ revision is `a02dbb2697…`; frontend/runtime revision was not fully established
   and intermediate text are in the [voice-input documentation](../../docs/voice-input.md#completed-dictated-content-can-disappear).
 - **Visible manual typing lost during processing:** Supported body editing while a real audio request was pending displayed a recognizable sentence;
   the arriving result removed it. A later paste after settlement persisted. This demonstrates loss of pending visible typing; an already-saved edit race
-  was not observed. The [voice-input documentation](../../docs/voice-input.md#visible-typing-can-be-lost-while-audio-processing-is-pending) retains the input, pending-edit boundary and reload comparison.
+  was not observed. The [voice-input documentation](../../docs/voice-input.md#typing-while-audio-processing-is-pending) retains the input, pending-edit boundary and reload comparison.
 - **Existing paragraph truncated during navigation journey:** Navigate from source `13726` while processing to destination `13727`, then return/reload.
   Both results persisted to the source, whose first paragraph became literal `...uesday.`; the other four paragraphs and destination sentinel survived.
   An independent fresh page confirmed the saved state. The [voice-input documentation](../../docs/voice-input.md#existing-content-can-be-truncated-during-a-navigation-journey) retains before/after text. The causal role of navigation remains unproved.
@@ -293,7 +293,7 @@ technical redesign, or speculative infrastructure.
   result, and the final typed period landed at the start of an older
   paragraph. No earlier manual-content save was observed, so the
   already-saved race was not reproduced
-  ([recorded journey](../../docs/voice-input.md#visible-typing-can-be-lost-while-audio-processing-is-pending)).
+  ([recorded journey](../../docs/voice-input.md#typing-while-audio-processing-is-pending)).
   Code reading shows the cause: the append saves store content and the
   editor then replaces its unsaved draft with the new saved body.
 - **Effort hypothesis:** M, medium confidence (was L). Assumes the existing
