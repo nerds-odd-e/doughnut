@@ -7,21 +7,8 @@ import NoteNewButton from "@/components/notes/core/NoteNewButton.vue"
 import makeMe from "donut-test-fixtures/makeMe"
 import helper, { mockSdkService } from "@tests/helpers"
 import { flushPromises } from "@vue/test-utils"
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
+import { afterEach, beforeEach, describe, expect, it } from "vitest"
 import { screen } from "@testing-library/vue"
-
-vi.mock("@/components/commons/Popups/usePopups", () => ({
-  default: () => ({
-    popups: {
-      confirm: vi.fn().mockResolvedValue(false),
-      alert: vi.fn(),
-      options: vi.fn(),
-      done: vi.fn(),
-      register: vi.fn(),
-      peek: vi.fn(),
-    },
-  }),
-}))
 
 function dispatchNoteNewShortcut() {
   document.dispatchEvent(

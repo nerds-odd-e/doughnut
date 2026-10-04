@@ -124,7 +124,7 @@ Mount with a real router placed at the `recall` location (in
 
 ### 4. Note-creation specs run a real router and real popups
 Type: Structure
-Status: planned
+Status: done
 Proof: `NoteNewForm.spec.ts`, `NoteNewForm.submit.spec.ts`,
 `NoteNewButton.spec.ts`, `FolderNewForm.spec.ts`, and
 `NoteUnresolvedWikiLinkModal.spec.ts` pass with no mock of `vue-router` or

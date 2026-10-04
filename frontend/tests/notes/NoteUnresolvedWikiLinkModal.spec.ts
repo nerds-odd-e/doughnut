@@ -15,6 +15,7 @@ import {
 } from "@tests/helpers/softKeyboardPrimerTestSupport"
 import makeMe from "donut-test-fixtures/makeMe"
 import { mockSdkService } from "@tests/helpers"
+import { answerOnlyPendingPopup } from "@tests/helpers/popupStackTestSupport"
 import { resetNoteStore } from "@/store/noteStore"
 import { useNoteStore } from "@/store/noteStore"
 import { flushPromises, mount, type VueWrapper } from "@vue/test-utils"
@@ -22,23 +23,6 @@ import { screen } from "@testing-library/vue"
 import { createRouter, createWebHistory } from "vue-router"
 import routes from "@/routes/routes"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
-
-const { alertMock } = vi.hoisted(() => ({
-  alertMock: vi.fn(),
-}))
-
-vi.mock("@/components/commons/Popups/usePopups", () => ({
-  default: () => ({
-    popups: {
-      confirm: vi.fn().mockResolvedValue(false),
-      alert: alertMock,
-      options: vi.fn(),
-      done: vi.fn(),
-      register: vi.fn(),
-      peek: vi.fn(),
-    },
-  }),
-}))
 
 const router = createRouter({
   history: createWebHistory(),
@@ -65,7 +49,6 @@ describe("NoteUnresolvedWikiLinkModal", () => {
 
   beforeEach(() => {
     vi.useFakeTimers({ toFake: ["requestAnimationFrame"] })
-    alertMock.mockReset()
     const noteStore = useNoteStore()
     resetNoteStore()
     noteStore.refreshNoteRealm(noteRealm)
@@ -161,9 +144,12 @@ describe("NoteUnresolvedWikiLinkModal", () => {
 
     await tapChooserAndSettle(createNoteLabel)
 
-    expect(alertMock).toHaveBeenCalledWith(
-      "Cannot create a note from a path. You can point at an existing note instead."
-    )
+    const alert = await answerOnlyPendingPopup(true)
+    expect(alert).toMatchObject({
+      type: "alert",
+      message:
+        "Cannot create a note from a path. You can point at an existing note instead.",
+    })
     expect(screen.queryByTestId("note-new-form")).toBeNull()
     expect(screen.getByText(pointAtExistingNoteLabel)).toBeTruthy()
   })

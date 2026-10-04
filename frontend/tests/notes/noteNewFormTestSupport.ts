@@ -6,6 +6,7 @@ import {
 } from "@generated/donut-backend-api/sdk.gen"
 import NoteNewForm from "@/components/notes/NoteNewForm.vue"
 import type { ComponentPublicInstance } from "vue"
+import type { Router } from "vue-router"
 import { flushPromises, type VueWrapper } from "@vue/test-utils"
 import makeMe from "donut-test-fixtures/makeMe"
 import helper, { mockSdkService, wrapSdkResponse } from "@tests/helpers"
@@ -55,11 +56,12 @@ export function setupNoteNewFormSdkMocks(): NoteNewFormSdkSpies {
 
 export function mountNoteNewForm(
   props: Record<string, unknown> = notebookRootProps,
-  options?: { attachTo?: HTMLElement }
+  options?: { attachTo?: HTMLElement; router?: Router }
 ) {
   const chain = helper
     .component(NoteNewForm)
     .withCleanStorage()
+    .withRouter(options?.router)
     .withProps(props)
   return options?.attachTo
     ? chain.mount({ attachTo: options.attachTo })

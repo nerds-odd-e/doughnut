@@ -2,7 +2,12 @@ import { NotebookFolderController } from "@generated/donut-backend-api/sdk.gen"
 import { type VueWrapper, flushPromises } from "@vue/test-utils"
 import type { ComponentPublicInstance } from "vue"
 import makeMe from "donut-test-fixtures/makeMe"
-import { mockSdkService, testFolderStub } from "@tests/helpers"
+import {
+  mockSdkService,
+  productionRouterAt,
+  testFolderStub,
+  wrapSdkResponse,
+} from "@tests/helpers"
 import {
   mountNoteNewForm,
   noteNewFormNote,
@@ -12,30 +17,9 @@ import {
   setupNoteNewFormSdkMocks,
   type NoteNewFormSdkSpies,
 } from "@tests/notes/noteNewFormTestSupport"
+import { noteShowLocation } from "@/routes/noteShowLocation"
 import { RESERVED_README_TITLE_MESSAGE } from "@/utils/reservedReadmeTitles"
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest"
-
-vi.mock("@/components/commons/Popups/usePopups", () => ({
-  default: () => ({
-    popups: {
-      confirm: vi.fn().mockResolvedValue(false),
-      alert: vi.fn(),
-      options: vi.fn(),
-      done: vi.fn(),
-      register: vi.fn(),
-      peek: vi.fn(),
-    },
-  }),
-}))
-
-vi.mock("vue-router", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("vue-router")>()
-  return {
-    ...actual,
-    useRouter: () => ({ currentRoute: { value: {} } }),
-    useRoute: () => ({ path: "/", fullPath: "/" }),
-  }
-})
 
 const notebook = noteNewFormRealm.notebookRealm.notebook.id
 
@@ -65,16 +49,26 @@ describe("NoteNewForm submit", () => {
   })
 
   it("call the api without a folder", async () => {
-    wrapper = mountNoteNewForm(notebookRootProps, { attachTo: document.body })
+    const created = makeMe.aNoteRealm.title("note title").please()
+    sdkSpies.mockedCreateNoteAtRoot.mockResolvedValue(wrapSdkResponse(created))
+    const router = await productionRouterAt({ name: "root" })
+    wrapper = mountNoteNewForm(notebookRootProps, {
+      attachTo: document.body,
+      router,
+    })
     await setNoteNewFormTitle(wrapper, "note title")
     vi.clearAllTimers()
 
     await submit()
+    await flushPromises()
     expectCreatedWith({ newTitle: "note title" })
     const createArgs = sdkSpies.mockedCreateNoteAtRoot.mock.calls[0]![0] as {
       body: Record<string, unknown>
     }
     expect(createArgs.body).not.toHaveProperty("folderId")
+    expect(router.currentRoute.value).toMatchObject(
+      noteShowLocation(created.id)
+    )
   })
 
   it("call the api once only", async () => {
