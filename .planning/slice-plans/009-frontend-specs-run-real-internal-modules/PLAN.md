@@ -284,3 +284,12 @@ decision, not tuned away here.
   pass in 42.9 s and 41.5 s wall (Vitest 39.1 s and 38.5 s), against the
   59.8 s / 63.5 s baseline. No slowdown; part of the gain may be a quieter
   machine.
+
+## Execution complete
+
+Product advice: no backlog change needed for this story. About 25 older test
+files still build their own production router instead of using
+`productionRouterAt`, and plain `withRouter()` starts wherever the previous test
+in the same file left the URL. Both predate this story and caused no failure;
+moving them onto the shared helper could become a small test-structure story if
+the owner wants it (hypothesis, not queued).
