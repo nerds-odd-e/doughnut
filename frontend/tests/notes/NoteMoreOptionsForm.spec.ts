@@ -3,10 +3,9 @@ import NoteMoreOptionsForm from "@/components/notes/widgets/NoteMoreOptionsForm.
 import { flushPromises } from "@vue/test-utils"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import makeMe from "donut-test-fixtures/makeMe"
-import helper, { mockSdkService } from "@tests/helpers"
-import RenderingHelper from "@tests/helpers/RenderingHelper"
-import { createRouter, createWebHistory } from "vue-router"
-import routes from "@/routes/routes"
+import helper, { mockSdkService, productionRouterAt } from "@tests/helpers"
+import type RenderingHelper from "@tests/helpers/RenderingHelper"
+import type { Router } from "vue-router"
 import { useAssimilationView } from "@/composables/useAssimilationView"
 import { useNoteToolbarPanel } from "@/composables/useNoteToolbarPanel"
 import { noteMoreOptionsTitles } from "@/components/notes/widgets/noteMoreOptionsTitles"
@@ -14,7 +13,7 @@ import type { ApiStatus } from "@/managedApi/ApiStatusHandler"
 import { setupGlobalClient } from "@/managedApi/clientSetup"
 
 let renderer: RenderingHelper<typeof NoteMoreOptionsForm>
-let router: ReturnType<typeof createRouter>
+let router: Router
 const apiStatus: ApiStatus = { states: [] }
 
 afterEach(() => {
@@ -22,15 +21,12 @@ afterEach(() => {
   vi.clearAllMocks()
 })
 
-beforeEach(() => {
+beforeEach(async () => {
   useAssimilationView().dismiss()
   useNoteToolbarPanel().close()
   setupGlobalClient(apiStatus)
   mockSdkService(NoteController, "trashNote", undefined)
-  router = createRouter({
-    history: createWebHistory(),
-    routes,
-  })
+  router = await productionRouterAt({ name: "root" })
   renderer = helper
     .component(NoteMoreOptionsForm)
     .withRouter(router)
@@ -126,7 +122,6 @@ describe("NoteMoreOptionsForm", () => {
 
   describe("assimilation settings toggle", () => {
     it("turns assimilation settings on without changing route and closes the menu", async () => {
-      await router.push("/")
       const wrapper = renderer.withProps({ note }).mount()
 
       await flushPromises()

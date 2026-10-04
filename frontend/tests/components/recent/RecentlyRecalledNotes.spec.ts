@@ -1,10 +1,8 @@
 import { MemoryTrackerController } from "@generated/donut-backend-api/sdk.gen"
 import RecentlyRecalledNotes from "@/components/recent/RecentlyRecalledNotes.vue"
 import { flushPromises } from "@vue/test-utils"
-import helper, { mockSdkService } from "@tests/helpers"
+import helper, { mockSdkService, productionRouterAt } from "@tests/helpers"
 import makeMe from "donut-test-fixtures/makeMe"
-import { createRouter, createWebHistory } from "vue-router"
-import routes from "@/routes/routes"
 import { describe, it, expect, beforeEach, vi } from "vitest"
 
 describe("RecentlyRecalledNotes", () => {
@@ -60,10 +58,7 @@ describe("RecentlyRecalledNotes", () => {
   })
 
   it("navigates to memory tracker page when row is clicked", async () => {
-    const router = createRouter({
-      history: createWebHistory(),
-      routes,
-    })
+    const router = await productionRouterAt({ name: "settingsRecent" })
     const pushSpy = vi.spyOn(router, "push")
 
     mockSdkService(

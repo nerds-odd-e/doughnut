@@ -82,9 +82,14 @@ current history state.
 
 ### 2. Spec-local browser-history routers come from the shared helper
 Type: Structure
-Status: planned
+Status: done
 Proof: the six touched specs and the `QuillEditor*` specs that use the harness
 pass with unchanged test names and assertions.
+Accepted proof: the six files plus `QuillEditor.spec.ts` and
+`QuillEditor.paste.spec.ts`, 7 files and 34 tests, passed; no added or removed
+line holds an `it(` or `expect`; whole suite 321 files, 2014 tests passed
+before the import-only refactor; `vue-tsc --noEmit` clean. Specs import
+`productionRouterAt` from the `@tests/helpers` barrel.
 
 Internal change: `quillEditorTestHarness.ts`, `RecentlyRecalledNotes.spec.ts`,
 `FolderSelector.spec.ts`, `NoteMoreOptionsForm.spec.ts`,

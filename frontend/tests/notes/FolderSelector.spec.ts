@@ -1,15 +1,18 @@
 import { NotebookFolderController } from "@generated/donut-backend-api/sdk.gen"
 import FolderSelector from "@/components/notes/FolderSelector.vue"
 import { mockCoarsePointer } from "@tests/helpers/mockCoarsePointer"
-import { mockSdkService, testFolderStub } from "@tests/helpers"
+import {
+  mockSdkService,
+  productionRouterAt,
+  testFolderStub,
+} from "@tests/helpers"
 import {
   mountSoftKeyboardPrimer,
   softKeyboardPrimerElement,
   waitUntilFocused,
 } from "@tests/helpers/softKeyboardPrimerTestSupport"
 import { flushPromises, mount, type VueWrapper } from "@vue/test-utils"
-import { createRouter, createWebHistory } from "vue-router"
-import routes from "@/routes/routes"
+import type { Router } from "vue-router"
 import { folderSearchResultTestId } from "@/utils/searchDialogKeyboard"
 import {
   dispatchArrowKey,
@@ -25,11 +28,6 @@ function allFolderSearchResults(): HTMLButtonElement[] {
   )
 }
 
-const router = createRouter({
-  history: createWebHistory(),
-  routes,
-})
-
 describe("FolderSelector", () => {
   const commonProps = {
     notebookId: 301,
@@ -40,8 +38,10 @@ describe("FolderSelector", () => {
 
   let matchMediaSpy: ReturnType<typeof mockCoarsePointer> | undefined
   let wrapper: VueWrapper | undefined
+  let router: Router
 
-  beforeEach(() => {
+  beforeEach(async () => {
+    router = await productionRouterAt({ name: "root" })
     vi.useFakeTimers({ toFake: ["requestAnimationFrame"] })
     mockSdkService(NotebookFolderController, "listNotebookFolderListing", {
       folders: [],
