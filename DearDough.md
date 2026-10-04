@@ -6,7 +6,7 @@ released response is not proof of effectiveness. Unknown provenance stays unknow
 [Response status](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/finding-names.md).
 Full pre-trim evidence: `8830c682704aac3bbb34bf9b1204da8feba042ca:DearDough.md`. Older narratives live in Git, not a second archive.
 
-- Highest allocated local number: 204. Removed local codes are never reused.
+- Highest allocated local number: 205. Removed local codes are never reused.
 
 ## ODF-110 — A readiness replay observed only the plan's named seam, not the rest of the slice's journey
 
@@ -192,6 +192,15 @@ Follow-up: Open, unqueued.
   - Observed effect: one of two refactor passes changed nothing.
   - Inference: again, diff size did not predict value: slice 2 was a pure deletion and still left residue.
 
+- Execution: SEED-039#internal-mocks-to-real-modules / slice-plans/009-frontend-specs-run-real-internal-modules / a70529a3fb
+  - Timestamp: unknown (refactor passes on 2026-10-04, between about 09:20 and 10:15 +08:00)
+  - Tool: Claude Code
+  - Model: claude-opus-5-5
+  - Open Dough release: 0.3.56 (execution-checkout VERSION, unchanged during execution)
+  - Evidence: 13 test-only slices. Refactor agents for slices 4, 7, 10, 13 returned "no refactor edits" (54,847 + 50,344 + 55,406 + 60,542 subagent tokens). The other nine made edits later slices reused: shared `answerOnlyPendingPopup`, `productionRouterAt` replacing four local router builders, `countHistoryEntriesAdded` shared by three specs, toast readers moved into the toast helper.
+  - Observed effect: about 221k subagent tokens on passes without edits; nine of thirteen passes changed code.
+  - Inference: in a test-only story that grows shared helpers slice by slice, the passes mostly paid off; the no-edit passes came on slices that only applied helpers already in place. Qualified: one execution.
+
 ## ODF-202 — Managed Codex delivery left CI unobserved without a retained stream binding
 
 Former local code: DD-201.
@@ -242,3 +251,19 @@ dependencies, and the mocked `useRecallData` is in-process state with setters.
   - Evidence: plan premises and scope excluded "a change to the mocks without a reproduced cause". Slice 1 ran four owner-approved reproduction rounds: local instrumentation, a standalone suite with 1,940 runs, a Linux container with 23 shard runs, and a Vitest version diff. None reproduced the failure (Learnings in 99089600b4). The owner then asked "what is the feature it is testing? Does it have to be implemented in this way?" and said "this test is wrong from the very beginning". `.agents/skills/unit-testing/SKILL.md` already says "Do not mock unless external or exceptional". Slices 2–4 removed the mocks in about 30 minutes of agent work (74b20fdcac, c7944701f2, 330cd1820b).
   - Observed effect: about 107 minutes and about 630k tokens of reproduction-agent work (1,465 s + 674 s + 4,256 s by the hand-back records), three owner round-trips, and Docker cleanup, before a fix that needed no reproduction.
   - Inference: when refining a story about a failing test mechanism, check the failing mechanism against the project's test rules first. A mechanism the rules forbid is a removal story, not a reproduction search. Qualified: one execution. The reproduction search was owner-approved at each round, so the cost comes from how the story was framed, not from a broken execution step.
+
+## DD-205 — A slice plan told the implementer to replace a push/replace assertion with a current-location check, which drops the replace
+
+The plan said to assert the router's current location instead of a captured
+`replace`/`push`. A location check cannot tell a replace from a push, so
+following the plan weakened an assertion the same plan forbade weakening.
+
+### Occurrences
+- Execution: SEED-039#internal-mocks-to-real-modules / slice-plans/009-frontend-specs-run-real-internal-modules / a70529a3fb
+  - Timestamp: unknown (slice 10 acceptance on 2026-10-04, about 09:55 +08:00)
+  - Tool: Claude Code
+  - Model: claude-opus-5-5
+  - Open Dough release: 0.3.56 (execution-checkout VERSION, unchanged during execution)
+  - Evidence: plan slice 10: "`AddRelationship.spec.ts` and `WikidataAssociationDialog.titleActions.spec.ts` assert `replace`/`push`; assert the current location instead." Plan Goal and scope: "without weaker assertions". The implementer reported the loss as a gap; the coordinator returned the slice, and the implementer added a history-position check (later `countHistoryEntriesAdded`), shown to fail for a push. Commit f7cc9a2293.
+  - Observed effect: one extra implementation round (about 3 minutes, 76,592 subagent tokens in total for the slice's implementer). No weakened assertion was delivered.
+  - Inference: when a plan swaps a mock observation for a real one, check that the real observation still tells apart every case the mock did. Qualified: one occurrence.
