@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 1,
+  "agent": "Shunka-chan",
+  "email": "shunka-chan@example.org",
+  "activity": "preparation",
+  "identity": "SEED-069#observe-branch-code-against-real-services",
+  "host": "claude",
+  "model": "fable"
+}
