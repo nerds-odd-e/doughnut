@@ -137,7 +137,7 @@ authorizes no implementation, profiling run, or executable slice plan.
 
 **Identity:** SEED-039#internal-mocks-to-real-modules
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"not-refined","approach":"unselected"}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/009-frontend-specs-run-real-internal-modules/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"f05317652e859b2d7049cbf0368c0ec920539e3f840fb0a2540043addb0f843a","plan":"9a22df70017a532f959818112b7ddeba0627d875bac16cc327df41d05c55c501"}}
 ```
 
 - **For / why:** Contributors trust a frontend unit test when it exercises the
@@ -147,23 +147,115 @@ authorizes no implementation, profiling run, or executable slice plan.
   SEED-039#mainmenu-mock-flake, recoverable at
   `263eb09a03:.planning/seeds/SEED-039-faster-ci-feedback.md`). The project's `unit-testing`
   skill already says to mock only external dependencies.
-- **Outcome:** Frontend unit tests (`frontend/tests`) mock only external
-  dependencies: the backend API through `mockSdkService`, browser and device
-  APIs, third-party services, and the exceptions the frontend testing skill
-  names. Mocks of internal code and state are replaced by plain unit tests on
-  the real modules. Each test keeps the behavior it checked.
-- **Starting evidence (2026-10-03):** `vi.mock` of internal modules remains,
-  for example `vue-router` (28 files), `@/components/commons/Popups/usePopups`
-  (20), and `@/composables/useGoToNextAssimilation` (7). Each one remaining
-  needs a judgment call: whether it is internal or an allowed exception. Other
-  mocked modules, such as audio recording, wake lock, the AI event stream,
-  `pdfjs-dist` and `file-saver`, may be external. The recall-state mocks were
-  already removed (commits 74b20fdcac, c7944701f2, 330cd1820b).
-- **Effort hypothesis:** M, low confidence; refinement should first list the
-  internal mocks and group them.
+- **Effort hypothesis:** L or larger, low confidence: 52 spec and support
+  files in six groups, planned as 13 slices by spec family.
 - **Depends on:** None.
 - **Safe stopping point:** any group of mocked modules replaced, with its
   specs passing.
+
+**Goal:** Donut contributors can trust a passing or failing frontend unit
+test, because it runs the real in-process code and replaces only what lies
+outside the browser page under test. This serves the seed's aim of trustworthy
+CI feedback. It does not promise shorter CI time.
+
+**Scope:**
+
+Required: in `frontend/tests`, every `vi.mock` of in-process code is removed
+and the spec runs the real module. Each test keeps the behavior it checked.
+Inventory on 2026-10-04 (64 files use `vi.mock`; 52 of them mock in-process
+code):
+
+| Group | Mocked module | Files | Real replacement |
+| --- | --- | --- | --- |
+| Routing | `vue-router` | 28 | A real router on the mounted component; navigation is read from the router's current location |
+| Popups | `@/components/commons/Popups/usePopups` | 20 | The real popup stack; the spec reads the pending popup and answers it |
+| Next assimilation | `@/composables/useGoToNextAssimilation` | 7 | The real composable, with `AssimilationController.next` given through `mockSdkService` |
+| Toasts | `vue-toastification`, `@/composables/useToast` | 7 | The real toast library; the spec reads the toast message on the page |
+| Time zone | `@/managedApi/window/timezoneParam` | 1 | The real function, with the browser time zone set by the existing `mockBrowserTimeZone` helper |
+| Sign-in redirect | `@/managedApi/window/loginOrRegisterAndHaltThisThread` | 1 | The real function, observed at `browserLocation` |
+
+With the popups group, `frontend/src/components/commons/Popups/__mocks__/usePopups.ts`
+is deleted, along with test-support code that only served a removed mock.
+
+Required: the frontend testing skill
+(`.agents/skills/frontend-testing/SKILL.md`) names every allowed mock, so the
+judgment is made once and not per spec.
+
+Allowed mocks that stay (14 files):
+
+- `@/managedApi/AiReplyEventSource`: the streaming part of the backend HTTP
+  API, the same boundary `mockSdkService` covers for ordinary calls.
+- `@/models/audio/audioRecorder`, `@/models/audio/recorderWorklet`,
+  `@/models/wakeLocker`: microphone, audio worklet, and screen wake lock,
+  which headless Chromium does not provide.
+- `file-saver`: starts a browser download.
+- `pdfjs-dist` in the gesture-zoom support file: the PDF engine and its
+  worker, whose page geometry the spec must control.
+
+Not committed in this delivery:
+
+- Moving the allowed mocks from the wrapper module down to the browser API
+  (for example faking `getUserMedia` or the streaming `fetch`).
+- Replacing `vi.spyOn` on a real object, such as `vi.spyOn(router, "push")`.
+- A lint rule or count limit on `vi.mock`.
+- Changes to production code, except where a real module cannot be used in a
+  spec without one.
+
+Boundary assumption: an in-process library that renders or navigates inside
+the page (`vue-router`, `vue-toastification`) counts as internal. The existing
+rule supports this: the `unit-testing` skill limits mocks to third-party APIs
+and network services, and prefers real in-process collaborators and real
+browser rendering.
+
+**Key examples:**
+
+- Navigation. `NoteNewForm.submit.spec.ts` mocks `vue-router` to capture
+  `push`. → The form is mounted with a real router and submitted. → The
+  router's current location is the new note's show location.
+- Route as a precondition. The `RecallPage` specs mock `useRouter` to report
+  the route name `recall`. → The page is mounted with a real router placed at
+  the recall location. → The specs pass without the mock.
+- Popup that the spec answers. `RecallPage.answering.spec.ts` replaces
+  `confirm` through `vi.mocked(usePopups)`. → The spec triggers the action,
+  finds the confirm with its message on the real popup stack, and answers it.
+  → The result of that answer shows on the page.
+- Popup that the spec only silenced. The `NoteEditableContent` specs call
+  `vi.mock` on `usePopups` with no assertion on it. → The line is removed. →
+  The specs pass, and each test starts with an empty popup stack.
+- Internal composable. The `MainMenu` specs automock
+  `useGoToNextAssimilation`. → `AssimilationController.next` returns a next
+  note through `mockSdkService` and the user chooses the assimilation entry.
+  → The real router is at that note's show location.
+- Toast. `NoteMoreOptionsForm.spec.ts` mocks `vue-toastification` to capture
+  `error`. → The component runs with the real toast library. → The message
+  text is visible on the page.
+- Allowed mock. The `NoteAudioTools` specs keep their mocks of the audio
+  recorder, recorder worklet, and wake locker, and the frontend testing skill
+  names them.
+- Finished state. A reviewer lists `vi.mock` in `frontend/tests` and finds
+  only the allowed modules above.
+
+**Architecture:**
+
+- One owner for the boundary. The `unit-testing` skill leaves the list of
+  allowed mocks to each package. The frontend testing skill becomes that list
+  for the frontend; today it names only `mockSdkService`.
+- Shared state moves into the tests. The real popup stack is module-level
+  state with a document key listener, and a real router with web history
+  changes the browser URL of the test page. Tests therefore depend on a clean
+  start: shared test support gives each test an empty popup stack and a known
+  route. This cleanup lives in one helper, not in each spec.
+- Routing follows ADR 0005 (web routes) and the frontend testing skill's
+  routing rule: test routers use production `routes` or
+  `dummyRouteRecordsFromMetadata`, and navigation is asserted by named
+  location. Removing the `useRoute` and `useRouter` stubs brings these 28
+  files under that rule. No Accepted ADR conflicts with this story.
+- Toasts need the toast plugin installed on the mounted test app to appear on
+  the page; production installs it in `main.ts`. Toasts stay on the page
+  between tests, so the clean start also clears them.
+- Speed. Real routers and real toasts add work to 52 files in a suite this
+  seed wants fast. Delivery reports `pnpm frontend:test` wall time before and
+  after; a material slowdown is brought back for an owner decision.
 
 ## Ordering and Scope Reduction
 
