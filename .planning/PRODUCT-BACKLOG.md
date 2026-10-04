@@ -10,6 +10,7 @@ Audio tools, starting with voice input. Make voice input work reliably and easy 
 
 ## Backlog list
 
+- [Build the test router over production routes in one place](seeds/SEED-039-faster-ci-feedback.md#one-production-router-builder) — SEED-039#one-production-router-builder
 - [Join dictated passages to the note in a way that fits the language](seeds/SEED-066-voice-input.md#join-dictated-passages) — SEED-066#join-dictated-passages
 - [Recover a failed transcription without repeating the speech](seeds/SEED-066-voice-input.md#recover-failed-transcription) — SEED-066#recover-failed-transcription
 - [See submitted dictation promptly](seeds/SEED-066-voice-input.md#prompt-dictation-results) — SEED-066#prompt-dictation-results
