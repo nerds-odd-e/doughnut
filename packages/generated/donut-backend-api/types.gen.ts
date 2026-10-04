@@ -772,17 +772,11 @@ export type BazaarNotebook = {
 
 export type AudioUploadDto = {
     uploadAudioFile?: Blob | File;
-    additionalProcessingInstructions?: string;
     midSpeech?: boolean;
-    previousNoteContentToAppendTo?: string;
-};
-
-export type DictatedText = {
-    dictatedText: string;
 };
 
 export type TextFromAudioWithCallInfo = {
-    completionFromAudio?: DictatedText;
+    dictatedText?: string;
     rawSRT?: string;
     endTimestamp?: string;
 };

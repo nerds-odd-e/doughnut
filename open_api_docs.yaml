@@ -5093,24 +5093,13 @@ components:
         uploadAudioFile:
           type: string
           format: binary
-        additionalProcessingInstructions:
-          type: string
         midSpeech:
           type: boolean
-        previousNoteContentToAppendTo:
-          type: string
-    DictatedText:
+    TextFromAudioWithCallInfo:
       type: object
       properties:
         dictatedText:
           type: string
-      required:
-      - dictatedText
-    TextFromAudioWithCallInfo:
-      type: object
-      properties:
-        completionFromAudio:
-          $ref: "#/components/schemas/DictatedText"
         rawSRT:
           type: string
         endTimestamp:

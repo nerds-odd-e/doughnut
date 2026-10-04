@@ -118,7 +118,7 @@ revision is `a02dbb2697…`; frontend/runtime revision was not fully established
 
 - **Completed dictated content lost:** In a 29.168 s passage with an 8.2 s pause, completed orchard facts appeared, Flush replaced them with a middle
   fragment, and the final update retained only the last sentences. Reload confirmed the loss while preexisting Harvard content survived. Reproduction
-  and intermediate text are in the [voice-input documentation](../../docs/voice-input.md#completed-dictated-content-can-disappear).
+  and intermediate text are in the [voice-input documentation](../../docs/voice-input.md#dictating-a-passage-with-a-pause-and-flush).
 - **Existing paragraph truncated during navigation journey:** Navigate from source `13726` while processing to destination `13727`, then return/reload.
   Both results persisted to the source, whose first paragraph became literal `...uesday.`; the other four paragraphs and destination sentinel survived.
   An independent fresh page confirmed the saved state. The [voice-input documentation](../../docs/voice-input.md#existing-content-can-be-truncated-during-a-navigation-journey) retains before/after text. The causal role of navigation remains unproved.
@@ -148,74 +148,6 @@ The accepted order is global priority; it does not require serial technical
 implementation of independent stories. No story authorizes a model choice,
 technical redesign, or speculative infrastructure.
 
-<a id="keep-every-transcribed-sentence"></a>
-### Keep every transcribed sentence when dictated text is written
-
-**Identity:** SEED-066#keep-every-transcribed-sentence
-```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/008-keep-every-transcribed-sentence/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"5d9fcde73b3c3301429979a85240143068190b67401d22bc7fd9e2d2dd264439","plan":"c3d0a2de0648c0f65b8a41c0560d639dae468f0e5352bfa7dee42d689fe29a15"}}
-```
-
-- **Goal:** An author dictating a passage finds every sentence the
-  transcription holds in the note, because the transcription's own text is
-  what gets written. This serves the seed's aim that voice input preserves
-  the author's content, and removes one model call from every passage.
-- **Scope:**
-  - *Decision (owner, 2026-10-04):* write the transcription itself. Remove
-    the step that has a model rewrite the transcription into dictated text.
-    The alternatives considered were keeping the rewrite and checking its
-    result in code, and only instructing the model to keep every sentence;
-    the first adds comparison code and special cases, the second gives no
-    guarantee.
-  - *Required behavior:* the passage written for a chunk is the text of that
-    chunk's written transcription segments, in order, with nothing left out,
-    added, or reworded. Hold-back, append-only writing, the originating-note
-    target, the open-editor draft, saving, and undo stay as they are.
-  - *Removal:* delete the rewrite step and everything only it used, and sweep
-    the product so it reads as if they never existed: the rewriting
-    instruction and its result schema, Processing Instructions in Advanced
-    Options together with the request field that carries them, the note
-    excerpt sent as context, their tests and mocks, and their documentation.
-    Full-screen editing stays in Advanced Options.
-  - *Boundary assumption:* something other than the model must now join text.
-    Segments within a passage, and a passage added to text that does not end
-    in whitespace, are joined with one space; a passage added to an empty
-    body starts without one. Joining that fits Japanese, Chinese, and mixed
-    languages stays with
-    [join dictated passages](#join-dictated-passages).
-  - *Deferred:* correcting misheard words, transcription quality, Markdown
-    shaping and paragraph breaks, translation or any other instructed
-    processing, and recognizing sentence ends for hold-back.
-- **Key examples:**
-  - A mid-speech chunk transcribed as three segments, "The orchard contains
-    apple trees, peach trees, and a small wooden bench.", "These facts are
-    finished.", and "The book that I bought yesterday" → the note gains "The
-    orchard contains apple trees, peach trees, and a small wooden bench.
-    These facts are finished." and the third segment is held back.
-  - Stop with the transcription "its talk about dada struct day." on a note
-    whose body is "This is class 1." → the saved body is "This is class 1.
-    its talk about dada struct day."; the words are written as transcribed.
-  - Stop on a note with an empty body → the body becomes the transcription
-    text with no leading space.
-  - A recording whose passages are written by a timed chunk, a Flush, and
-    Stop → after reload each transcribed segment appears once, in spoken
-    order, with one space between passages.
-  - With real services, the orchard passage from the
-    [voice-input documentation](../../docs/voice-input.md#completed-dictated-content-can-disappear)
-    → every transcribed sentence, including "These facts are finished.",
-    appears once in the saved note after reload.
-  - Advanced Options on a note → it offers full-screen editing and no
-    Processing Instructions field.
-- **Evidence:** In the second real-service orchard run after hold-back
-  (2026-10-03, note 13731), the pause flush's transcription held "These facts
-  are finished.", but the dictated text returned by the rewriting step left
-  it out, so it never reached the note. Two earlier runs kept it.
-- **Effort hypothesis:** M — medium confidence; a removal across backend,
-  frontend, end-to-end journeys, and documentation, plus a small text join.
-- **Depends on:** None.
-- **Safe stopping point:** Every written transcription segment reaches the
-  note unchanged, and no model rewrites dictated text.
-
 <a id="join-dictated-passages"></a>
 ### Join dictated passages to the note in a way that fits the language
 
@@ -234,16 +166,17 @@ technical redesign, or speculative infrastructure.
   The saved body after reload matches.
 - **Evidence:** The real-service orchard runs on 2026-10-03 (notes
   13728–13731) all saved "every hour.The orchard". The mocked recording journey
-  pins the same join ("This is class 1.Let's talk about data structure
-  today."). Leading whitespace is currently left to the text-writing model.
+  pinned the same join. The client now joins every passage with one space
+  (none on an empty body or after trailing whitespace) and writes the
+  transcription's own text, so English already joins correctly; Japanese,
+  Chinese, and mixed-language joining remain.
 - **Boundary:** How a dictated passage is joined to the note's existing text,
   including when the note is empty. Be mindful of the language: languages
   written with spaces between words and sentences (such as English) need a
   space, while Japanese and Chinese do not, and mixed-language notes exist.
   Paragraph breaks are not decided here, and nothing already written is changed.
 - **Effort hypothesis:** M — low confidence; the rule for mixed or unknown
-  languages, and whether the join is decided in code or by the model, are
-  refinement questions.
+  languages is the refinement question. The join is decided in code.
 - **Depends on:** None.
 - **Safe stopping point:** Dictated passages join existing text correctly for
   space-separated languages and for Japanese and Chinese.
@@ -292,8 +225,10 @@ technical redesign, or speculative infrastructure.
   text at 25.17 seconds from capture, approximately 3.96 seconds after Stop.
   Audio requests took 4.42/4.61 seconds and titles settled separately. Other
   journeys do not supply a reliable Stop-to-final baseline.
-- **Boundary:** Own diagnosis and user-visible improvement together. The retouch
-  stage and excessive thinking are owner hypotheses, not established causes.
+- **Boundary:** Own diagnosis and user-visible improvement together. The
+  recorded timings predate deleting the model rewrite of transcriptions, so
+  re-measure the baseline first; excessive thinking was an owner hypothesis,
+  not an established cause.
   Preserve the requested lightweight-processing direction; choose a model or
   processing change only after understanding the path. No numerical target or
   continuous live-text promise has been decided.
@@ -408,7 +343,7 @@ one-time automatic title generation has no queued story.
   hardware capture and permission behavior remain gaps. Resolve the deployed URL
   and account only if that alternative is used.
 - Measurable responsiveness expectations and the actual contribution of audio
-  capture, transcription, retouching, and applying results to the note.
+  capture, transcription, and applying results to the note.
 - How to recognize the current unfinished sentence versus completed passages,
   including a long pause inside a sentence, while preserving author intent.
   Partly decided on 2026-10-03: the last transcription segment is held back

@@ -1,12 +1,6 @@
 package com.odde.donut.services.ai;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.odde.donut.configs.ObjectMapperConfig;
-import com.odde.donut.services.ai.builder.OpenAIResponseRequestBuilder;
-import com.odde.donut.services.ai.tools.AiToolFactory;
-import com.odde.donut.services.ai.tools.InstructionAndSchema;
 import com.odde.donut.services.openAiApis.OpenAiApiHandler;
-import com.openai.models.responses.StructuredResponseCreateParams;
 import java.io.IOException;
 import java.util.*;
 import org.springframework.stereotype.Service;
@@ -32,37 +26,6 @@ public final class OtherAiServices {
             });
 
     return modelVersionOptions;
-  }
-
-  public Optional<DictatedText> getTextFromAudio(
-      String modelName,
-      String transcriptionFromAudio,
-      String additionalInstructions,
-      String previousContent) {
-
-    InstructionAndSchema tool = AiToolFactory.transcriptionToTextAiTool(transcriptionFromAudio);
-    OpenAIResponseRequestBuilder<DictatedText> builder =
-        new OpenAIResponseRequestBuilder<>(DictatedText.class).model(modelName);
-
-    if (additionalInstructions != null && !additionalInstructions.isEmpty()) {
-      builder.addInstruction("Additional instruction:\n" + additionalInstructions);
-    }
-    builder.addInstruction(tool.getMessageBody());
-
-    if (previousContent != null && !previousContent.isEmpty()) {
-      try {
-        String jsonContent =
-            String.format(
-                "{\"previousNoteContentToAppendTo\": %s}",
-                new ObjectMapperConfig().objectMapper().writeValueAsString(previousContent));
-        builder.addUserMessage("Previous note content (in JSON format):\n" + jsonContent);
-      } catch (JsonProcessingException e) {
-        return Optional.empty();
-      }
-    }
-
-    StructuredResponseCreateParams<DictatedText> params = builder.build();
-    return openAiApiHandler.requestAndGetStructuredResponseResult(params);
   }
 
   public String getTranscriptionFromAudio(String filename, byte[] bytes) throws IOException {

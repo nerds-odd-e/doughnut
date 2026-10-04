@@ -70,8 +70,8 @@ describe("NoteAudioTools while the author types in the open body editor", () => 
       await flushPromises()
     })
 
-    expect(quill().getText()).toContain(`${typed}${passage}\n`)
-    expect(lastSavedContent()).toBe(`${redBicycleBody}${typed}${passage}`)
+    expect(quill().getText()).toContain(`${typed} ${passage}\n`)
+    expect(lastSavedContent()).toBe(`${redBicycleBody}${typed} ${passage}`)
   })
 
   it("keeps typing at the end of the Markdown editor and saves the passage after it", async () => {
@@ -82,9 +82,9 @@ describe("NoteAudioTools while the author types in the open body editor", () => 
     })
 
     expect(textareaEl(wrapper).value).toBe(
-      `${redBicycleBody}${typed}${passage}`
+      `${redBicycleBody}${typed} ${passage}`
     )
-    expect(lastSavedContent()).toBe(`${redBicycleBody}${typed}${passage}`)
+    expect(lastSavedContent()).toBe(`${redBicycleBody}${typed} ${passage}`)
   })
 
   it("keeps a correction in the middle and puts the passage at the end", async () => {
@@ -98,7 +98,7 @@ describe("NoteAudioTools while the author types in the open body editor", () => 
       await flushPromises()
     })
 
-    expect(lastSavedContent()).toBe(`${correctedGiftBody}${passage}`)
+    expect(lastSavedContent()).toBe(`${correctedGiftBody} ${passage}`)
   })
 
   it("keeps the Markdown editor's caret where the author was typing", async () => {
@@ -112,7 +112,7 @@ describe("NoteAudioTools while the author types in the open body editor", () => 
     })
 
     const el = textareaEl(wrapper)
-    expect(el.value).toBe(`${correctedGiftBody}${passage}`)
+    expect(el.value).toBe(`${correctedGiftBody} ${passage}`)
     expect([el.selectionStart, el.selectionEnd]).toEqual([caret, caret])
   })
 
@@ -129,7 +129,7 @@ describe("NoteAudioTools while the author types in the open body editor", () => 
       await flushPromises()
     })
 
-    expect(quill().getText()).toBe(`${correctedGiftBody}${passage}\n`)
+    expect(quill().getText()).toBe(`${correctedGiftBody} ${passage}\n`)
     expect(quill().getSelection()).toEqual({ index: caret, length: 0 })
   })
 
@@ -138,7 +138,7 @@ describe("NoteAudioTools while the author types in the open body editor", () => 
 
     await dictate()
 
-    expect(lastSavedContent()).toBe(`${redBicycleBody}${passage}`)
+    expect(lastSavedContent()).toBe(`${redBicycleBody} ${passage}`)
   })
 
   it("keeps typing that was already saved and saves the passage after it once", async () => {
@@ -151,9 +151,9 @@ describe("NoteAudioTools while the author types in the open body editor", () => 
     })
 
     expect(textareaEl(wrapper).value).toBe(
-      `${redBicycleBody}${typed}${passage}`
+      `${redBicycleBody}${typed} ${passage}`
     )
-    expect(lastSavedContent()).toBe(`${redBicycleBody}${typed}${passage}`)
+    expect(lastSavedContent()).toBe(`${redBicycleBody}${typed} ${passage}`)
   })
 
   it("keeps typing whose save is still in flight and saves the passage after it once", async () => {
@@ -169,7 +169,7 @@ describe("NoteAudioTools while the author types in the open body editor", () => 
     releaseSave()
     await flushPromises()
 
-    expect(lastSavedContent()).toBe(`${redBicycleBody}${typed}${passage}`)
+    expect(lastSavedContent()).toBe(`${redBicycleBody}${typed} ${passage}`)
   })
 
   it("adds the passage to the saved body while a save-then-change pause holds the editor", async () => {
@@ -179,7 +179,7 @@ describe("NoteAudioTools while the author types in the open body editor", () => 
       await closeAndFlushNoteContentMutations(note.id)
     })
 
-    expect(lastSavedContent()).toBe(`${redBicycleBody}${passage}`)
+    expect(lastSavedContent()).toBe(`${redBicycleBody} ${passage}`)
   })
 
   it("adds the passage to the saved body of a note the author has left", async () => {
@@ -196,10 +196,10 @@ describe("NoteAudioTools while the author types in the open body editor", () => 
     })
 
     expect(lastSavedContent(noteA.id)).toBe(
-      `${redBicycleBody}${typed}${passage}`
+      `${redBicycleBody}${typed} ${passage}`
     )
     expect(noteStore.refOfNoteRealm(noteA.id).value?.note.content).toBe(
-      `${redBicycleBody}${typed}${passage}`
+      `${redBicycleBody}${typed} ${passage}`
     )
     expect(textareaEl(wrapper).value).toBe("Note B body.")
     expect(savedContents(noteB.id)).toHaveLength(0)

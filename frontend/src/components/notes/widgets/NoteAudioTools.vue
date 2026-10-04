@@ -54,11 +54,13 @@
         </svg>
       </button>
     </div>
-    <NoteAudioToolsAdvancedOptions
-      v-if="showAdvancedOptions"
-      v-model:processing-instructions="processingInstructions"
-      :errors="errors"
-    />
+    <div v-if="showAdvancedOptions" class="advanced-options">
+      <FullScreen>
+        <div v-if="errors" class="fullscreen-error">
+          {{ Object.values(errors)[0] }}
+        </div>
+      </FullScreen>
+    </div>
   </div>
 </template>
 
@@ -68,7 +70,7 @@ import { createAudioRecorder } from "../../../models/audio/audioRecorder"
 import { createWakeLocker } from "../../../models/wakeLocker"
 import type { Note } from "@generated/donut-backend-api"
 import Waveform from "./Waveform.vue"
-import NoteAudioToolsAdvancedOptions from "./NoteAudioToolsAdvancedOptions.vue"
+import FullScreen from "@/components/common/FullScreen.vue"
 import { Mic } from "@lucide/vue"
 import { useNoteAudioProcessing } from "@/composables/useNoteAudioProcessing"
 
@@ -81,13 +83,8 @@ const errors = ref<Record<string, string | undefined>>()
 const isRecording = ref(false)
 const wakeLocker = createWakeLocker()
 const showAdvancedOptions = ref(false)
-const processingInstructions = ref("")
 
-const { processAudio, isProcessing } = useNoteAudioProcessing(
-  note,
-  processingInstructions,
-  errors
-)
+const { processAudio, isProcessing } = useNoteAudioProcessing(note, errors)
 
 const toggleAdvancedOptions = () => {
   showAdvancedOptions.value = !showAdvancedOptions.value
@@ -189,6 +186,19 @@ const tryFlushAudio = async () => {
   .daisy-btn {
     padding: 8px;
   }
+}
+
+.advanced-options {
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.fullscreen-error {
+  color: #fc8181;
+  font-size: 14px;
+  text-align: center;
+  max-width: 80%;
 }
 
 .device-select {

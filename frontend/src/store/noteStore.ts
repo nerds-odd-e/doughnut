@@ -1,5 +1,4 @@
 import type {
-  DictatedText,
   NoteContentCompletion,
   NoteCreationDto,
   NoteTrashDto,
@@ -137,8 +136,8 @@ class NoteStore extends StorageImplementation {
     return this.textEditing.completeContent(noteId, value)
   }
 
-  appendDictatedText(noteId: Donut.ID, value?: DictatedText) {
-    return this.textEditing.appendDictatedText(noteId, value)
+  appendDictatedText(noteId: Donut.ID, passage?: string) {
+    return this.textEditing.appendDictatedText(noteId, passage)
   }
 
   async uploadNoteImage(noteId: Donut.ID, file: File) {

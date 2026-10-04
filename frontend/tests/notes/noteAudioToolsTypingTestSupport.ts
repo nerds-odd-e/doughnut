@@ -18,7 +18,7 @@ import { flushPromises } from "@vue/test-utils"
 import { afterEach, beforeEach } from "vitest"
 import { defineComponent, h, ref } from "vue"
 
-export const dictatedPassage = " The orchard path leads down to the river."
+export const dictatedPassage = "The orchard path leads down to the river."
 
 /**
  * Mounts the editable body editor beside NoteAudioTools, with the dictation

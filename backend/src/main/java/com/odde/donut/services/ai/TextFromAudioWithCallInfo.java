@@ -6,7 +6,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class TextFromAudioWithCallInfo {
-  private DictatedText completionFromAudio;
+  private String dictatedText;
 
   private String rawSRT;
 

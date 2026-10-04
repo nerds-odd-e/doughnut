@@ -66,6 +66,25 @@ class SRTProcessorTests {
   }
 
   @Test
+  void textIsTheWrittenSegmentsJoinedByOneSpace() {
+    assertThat(
+        processor.process(sampleSRT, false).getText(),
+        equalTo("First segment Second segment Last segment"));
+    assertThat(
+        processor.process(sampleSRT, true).getText(), equalTo("First segment Second segment"));
+  }
+
+  @Test
+  void textIsTheLinesAfterTheTimestampLineWithoutAnIndexLine() {
+    String srt =
+        "00:00:00,000 --> 00:00:01,000\nits talk about\ndada struct day.\n\n"
+            + "00:00:01,000 --> 00:00:02,000\nNext one.\n\n";
+    assertThat(
+        processor.process(srt, false).getText(),
+        equalTo("its talk about dada struct day. Next one."));
+  }
+
+  @Test
   void shouldHandleInvalidSRTFormat() {
     String invalidSRT = "Invalid SRT format";
     SRTProcessor.SRTProcessingResult result = processor.process(invalidSRT, false);

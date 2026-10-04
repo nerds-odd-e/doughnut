@@ -5,7 +5,6 @@ import {
   audioToolsVm,
   findButtonByTitle,
   mountNoteAudioTools,
-  processAudio,
   useNoteAudioToolsTestLifecycle,
   type NoteAudioToolsWrapper,
 } from "@tests/notes/noteAudioToolsTestSupport"
@@ -38,11 +37,10 @@ useNoteAudioToolsTestLifecycle()
 describe("NoteAudioTools advanced options", () => {
   let wrapper: NoteAudioToolsWrapper
   const note = makeMe.aNote.please()
-  let audioToTextMock: ReturnType<typeof mockSdkService>
 
   beforeEach(() => {
-    audioToTextMock = mockSdkService(AiAudioController, "audioToText", {
-      completionFromAudio: { dictatedText: "text" },
+    mockSdkService(AiAudioController, "audioToText", {
+      dictatedText: "text",
       endTimestamp: "00:00:37,270",
     })
     wrapper = mountNoteAudioTools(note)
@@ -60,36 +58,6 @@ describe("NoteAudioTools advanced options", () => {
     expect(wrapper.find(".advanced-options").exists()).toBe(true)
     await advancedButton.trigger("click")
     expect(wrapper.find(".advanced-options").exists()).toBe(false)
-  })
-
-  it("includes processing instructions in audio API calls", async () => {
-    await findButtonByTitle(wrapper, "Advanced Options")!.trigger("click")
-    await wrapper.find("#processingInstructions").setValue("Test instructions")
-
-    await processAudio(wrapper)
-
-    expect(audioToTextMock).toHaveBeenCalledWith({
-      body: expect.objectContaining({
-        additionalProcessingInstructions: "Test instructions",
-        previousNoteContentToAppendTo: note.content,
-      }),
-    })
-  })
-
-  it("keeps processing instructions across recordings", async () => {
-    await findButtonByTitle(wrapper, "Advanced Options")!.trigger("click")
-    await wrapper.find("#processingInstructions").setValue("Test instructions")
-
-    await processAudio(wrapper)
-    await processAudio(wrapper)
-
-    expect(audioToTextMock.mock.calls.length).toBeGreaterThanOrEqual(2)
-    expect(audioToTextMock.mock.calls[1]?.[0]).toMatchObject({
-      body: {
-        additionalProcessingInstructions: "Test instructions",
-        previousNoteContentToAppendTo: note.content,
-      },
-    })
   })
 
   describe("fullscreen errors", () => {
@@ -132,9 +100,14 @@ describe("NoteAudioTools advanced options", () => {
       vi.useFakeTimers()
     })
 
-    it("shows FullScreen control in advanced options", async () => {
+    it("offers full-screen editing as the only advanced option", async () => {
       await findButtonByTitle(wrapper, "Advanced Options")!.trigger("click")
-      expect(wrapper.find(".fullscreen-btn").exists()).toBe(true)
+      const controls = wrapper
+        .find(".advanced-options")
+        .findAll("button, input, select, textarea")
+      expect(controls.map((control) => control.attributes("title"))).toEqual([
+        "Toggle Full Screen",
+      ])
     })
 
     it("displays error message in fullscreen overlay", async () => {

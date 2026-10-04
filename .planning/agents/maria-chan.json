@@ -1,9 +1,0 @@
-{
-  "schemaVersion": 1,
-  "agent": "Maria-chan",
-  "email": "maria-chan@example.org",
-  "identity": "SEED-066#keep-every-transcribed-sentence",
-  "mode": "story-branch",
-  "branch": "claude/keep-every-transcribed-sentence-when-dictated-te",
-  "host": "claude"
-}

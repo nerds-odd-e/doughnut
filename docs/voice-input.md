@@ -1,27 +1,28 @@
 # Voice input
 
 Authors open Audio tools on an existing note to Record Audio, Flush Audio,
-Stop Recording, or Save Audio Locally. Advanced Options exposes Processing
-Instructions and full-screen editing. Dictation writes only to the note body.
+Stop Recording, or Save Audio Locally. Advanced Options offers full-screen
+editing. Dictation writes only to the note body.
 
 ## Adding dictated text to a note
 
-Audio processing returns `DictatedText.dictatedText`: only the new passage,
-formatted as Markdown, including any leading whitespace needed to join it to
-the note. Existing content is context only; the model is instructed never to
-repeat or revise it. Audio responses do not use the conversation tool's
-`NoteContentCompletion`, which continues to replace complete note content.
+Audio processing returns `dictatedText`: the passage for the uploaded chunk.
+The passage is the transcription's own text, as is: the text of each written
+transcription segment (the lines after its timestamp line), in order, joined
+by one space. Nothing is left out, added, or reworded. Audio responses do not
+use the conversation tool's `NoteContentCompletion`, which continues to
+replace complete note content.
 
-The client retains the originating note id. It reads that note's current store
-body, loading its realm when absent, and sends only the last 500 characters as
-context, prefixed with `...` when truncated. The full body stays in the store;
-the excerpt never becomes the saved replacement.
-
-Each returned passage is appended deterministically to the originating note's
-current body and saved through the ordinary content PATCH. Existing characters
-remain unchanged, an empty body becomes the passage, and successive additions
-follow earlier additions once. Navigating to another note does not redirect the
-result. The normal content-edit undo restores the prior body.
+The audio request carries only the audio and the mid-speech flag. The client
+retains the originating note id, and each returned passage is appended
+deterministically to that note's current store body, loading its realm when
+absent, and saved through the ordinary content PATCH. One join rule
+serves both the saved body and an open editor's draft: text that does not end
+in whitespace is followed by one space and then the passage, text already
+ending in whitespace is followed directly by the passage, and an empty body
+becomes the passage alone. Existing characters remain unchanged, and
+successive additions follow earlier additions once. Navigating to another note
+does not redirect the result. The normal content-edit undo restores the prior body.
 
 Timed chunks, pause flushes (after more than 3 s of silence, once per pause)
 and Flush clicks are processed mid-speech. Mid-speech processing never writes
@@ -33,16 +34,16 @@ transcription do not count as a segment. A lone segment writes nothing and all
 its audio is kept. Only Stop writes everything that remains. Dictated text,
 once written, is never revised: holding back the unfinished sentence replaces
 revising it. Audio that is entirely silent is not sent.
-The model controls transcription quality and passage whitespace. When a body
-editor for the note is open, the passage is added to the end of that editor's
-draft, including unsaved typing, and that draft is saved right away; otherwise,
-including while an image upload or note removal is pausing the editor, it is
-added to the note's saved body.
+The transcription service controls transcription quality. When a body editor for the note is
+open, the passage is joined to the end of that editor's draft, including
+unsaved typing, and that draft is saved right away; otherwise, including while
+an image upload or note removal is pausing the editor, it is joined to the
+note's saved body.
 
-The mounted audio preservation tests assert exact saved content for long and
-empty bodies, repeated additions, originating-note targeting, and undo. The
-mocked recording journey supplies only new text and observes the original body
-plus that addition. The real-OpenAI journey checks both its original text and
+The mounted audio preservation tests assert exact saved content for long,
+empty, and whitespace-ending bodies, repeated additions, originating-note targeting, and undo. The
+mocked recording journey supplies a transcription and observes the original
+body, one space, and the transcription's text. The real-OpenAI journey checks both its original text and
 the dictated passage.
 
 ## Observation boundary
@@ -54,14 +55,14 @@ They describe observed behavior, not a guarantee about later revisions.
 
 Naturally paced prerecorded or synthesized speech entered a synthetic browser
 MediaStream through AudioContext → MediaStreamDestination. The real recorder,
-worklet, transcription, retouch and persistence services were exercised.
+worklet, transcription and persistence services were exercised.
 No clocks, worklets, request delays or service responses were simulated.
 Hardware capture, permission/device behavior, interruption and service-failure
 feedback/recovery remain unassessed. An automation route at `127.0.0.1:5175`
 could sign in but did not activate Note/New notebook; localhost worked. That
 observation does not establish a human-click defect or its cause.
 
-## Completed dictated content can disappear
+## Dictating a passage with a pause and Flush
 
 With an existing six-sentence paragraph, record this known passage at natural
 pace, retaining the eight-second pause after “yesterday”:
@@ -106,11 +107,11 @@ passage at Development `1a981673` (Flush at 23 s, Stop at 31 s) wrote:
    notebook and a pencil.”
 
 After reload the original paragraph, the complete book sentence and the
-meeting sentences appeared once, and nothing written was revised. “These facts
-are finished.” never reached the note: the text-writing model left it out of
-its result although it was in the transcription. Two earlier runs kept that
-sentence, so its frequency is unknown. The first passage joined the original
-paragraph without a space (“every hour.The orchard”).
+meeting sentences appeared once, and nothing written was revised. The written
+passage is the transcription's own text, joined as
+[Adding dictated text to a note](#adding-dictated-text-to-a-note) describes,
+so a completed sentence such as “These facts are finished.” reaches the note
+whenever the transcription holds it.
 
 In an earlier run of this passage, before the transcription's trailing blank
 lines were handled, a short remainder of near-silent audio sent at Stop was
@@ -188,7 +189,5 @@ identified in those two sessions. The navigation destination survived.
 These comparisons establish neither a general preservation guarantee nor
 failure frequency.
 
-The empty-body UI baseline succeeded. A separate request with an empty
-serialized previous-content value returned HTTP 500 during an API probe;
-that failure was not reproduced through the UI. Timing identifies stages,
+The empty-body UI baseline succeeded. Timing identifies stages,
 not the cause of delay, model suitability or a numeric acceptance target.

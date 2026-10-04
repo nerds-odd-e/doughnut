@@ -73,17 +73,12 @@ describe("NoteAudioTools audio processing", () => {
     wrapper?.unmount()
   })
 
-  it("sends timer-triggered chunks as mid-speech", async () => {
-    await processAudio(
-      wrapper,
-      midSpeechChunk(new File(["test2"], "test.webm"))
-    )
+  it("sends only the audio and the mid-speech flag", async () => {
+    const audio = new File(["test2"], "test.webm")
+    await processAudio(wrapper, midSpeechChunk(audio))
 
-    expect(audioToTextMock).toHaveBeenCalledWith({
-      body: expect.objectContaining({
-        midSpeech: true,
-        previousNoteContentToAppendTo: note.content,
-      }),
+    expect(audioToTextMock).toHaveBeenCalledExactlyOnceWith({
+      body: { uploadAudioFile: audio, midSpeech: true },
     })
   })
 
@@ -105,31 +100,7 @@ describe("NoteAudioTools audio processing", () => {
     expect(result).toBe("00:00:37,270")
   })
 
-  it.each([
-    { when: "under 500 chars", content: "Short", sent: "Short" },
-    {
-      when: "over 500 chars",
-      content: "a".repeat(600),
-      sent: `...${"a".repeat(500)}`,
-    },
-    { when: "undefined", content: undefined, sent: "" },
-  ])(
-    "sends previous content, truncated with ellipsis, when $when",
-    async ({ content, sent }) => {
-      wrapper.unmount()
-      const contextRealm = makeMe.aNoteRealm.content(content).please()
-      wrapper = mountNoteAudioTools(contextRealm.note)
-      noteStore.refreshNoteRealm(contextRealm)
-
-      await processAudio(wrapper, midSpeechChunk())
-
-      expect(audioToTextMock).toHaveBeenCalledWith({
-        body: expect.objectContaining({ previousNoteContentToAppendTo: sent }),
-      })
-    }
-  )
-
-  it("loads an absent originating realm for both context and append", async () => {
+  it("loads an absent originating realm to append to it", async () => {
     noteStore.refOfNoteRealm(note.id).value = undefined
     const loadedBody = "Loaded current body."
     const showNote = mockSdkService(
@@ -141,14 +112,9 @@ describe("NoteAudioTools audio processing", () => {
     expect(showNote).toHaveBeenCalledExactlyOnceWith({
       path: { note: note.id },
     })
-    expect(audioToTextMock).toHaveBeenCalledWith({
-      body: expect.objectContaining({
-        previousNoteContentToAppendTo: loadedBody,
-      }),
-    })
     expect(updateContentMock).toHaveBeenCalledWith({
       path: { note: note.id },
-      body: { content: `${loadedBody}text` },
+      body: { content: `${loadedBody} text` },
     })
   })
 })

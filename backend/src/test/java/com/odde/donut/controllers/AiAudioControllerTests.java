@@ -1,48 +1,32 @@
 package com.odde.donut.controllers;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.odde.donut.controllers.dto.AudioUploadDTO;
-import com.odde.donut.services.ai.DictatedText;
-import com.odde.donut.services.ai.TextFromAudioWithCallInfo;
-import com.odde.donut.testability.OpenAiStructuredResponseMock;
 import com.openai.models.audio.transcriptions.Transcription;
 import com.openai.models.audio.transcriptions.TranscriptionCreateParams;
 import com.openai.models.audio.transcriptions.TranscriptionCreateResponse;
-import com.openai.models.responses.ResponseTextConfig;
-import com.openai.models.responses.StructuredResponseCreateParams;
 import com.openai.services.blocking.AudioService;
-import java.io.IOException;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultActions;
 
 class AiAudioControllerTests extends ControllerTestBase {
-  @Autowired AiAudioController controller;
   @Autowired MockMvc mockMvc;
 
-  OpenAiStructuredResponseMock openAiStructuredResponseMock;
-
-  @BeforeEach
-  void commonSetup() {
-    openAiStructuredResponseMock = new OpenAiStructuredResponseMock(officialClient);
-    openAiStructuredResponseMock.stubStructuredResponse(new DictatedText("test123"));
-    mockTranscriptionSrtResponse("test transcription");
-  }
+  private static final String THREE_SEGMENTS =
+      "1\n00:00:00,000 --> 00:00:03,000\nThe orchard has apple trees.\n\n"
+          + "2\n00:00:03,000 --> 00:00:06,000\nThese facts are finished.\n\n"
+          + "3\n00:00:06,000 --> 00:00:09,000\nThe book that I";
 
   private void mockTranscriptionSrtResponse(String responseBody) {
     var audioService = Mockito.mock(AudioService.class, Mockito.RETURNS_DEEP_STUBS);
@@ -54,93 +38,57 @@ class AiAudioControllerTests extends ControllerTestBase {
         .thenReturn(transcriptionResponse);
   }
 
-  private AudioUploadDTO audioUpload(String filename) {
-    var dto = new AudioUploadDTO();
-    dto.setUploadAudioFile(
-        new MockMultipartFile(filename, filename, "audio/mp3", "test".getBytes()));
-    return dto;
+  private ResultActions upload(String filename, boolean midSpeech) throws Exception {
+    return mockMvc
+        .perform(
+            multipart("/api/audio/audio-to-text")
+                .file(
+                    new MockMultipartFile(
+                        "uploadAudioFile", filename, "audio/mpeg", "test".getBytes()))
+                .param("midSpeech", String.valueOf(midSpeech)))
+        .andExpect(status().isOk());
   }
 
   @Nested
   class ConvertAudioToTextTests {
-    private AudioUploadDTO audioUploadDTO;
-
-    @BeforeEach
-    void setup() {
-      audioUploadDTO = audioUpload("test.mp3");
-    }
 
     @ParameterizedTest
     @ValueSource(strings = {"podcast.mp3", "podcast.m4a", "podcast.wav"})
     void convertingFormat(String filename) throws Exception {
-      DictatedText result =
-          controller
-              .audioToText(audioUpload(filename))
-              .map(TextFromAudioWithCallInfo::getCompletionFromAudio)
-              .orElseThrow();
-      assertThat(result.dictatedText).isEqualTo("test123");
+      mockTranscriptionSrtResponse("1\n00:00:00,000 --> 00:00:03,000\ntest transcription");
+
+      upload(filename, false).andExpect(jsonPath("$.dictatedText").value("test transcription"));
     }
 
     @Test
-    void shouldIncludeAdditionalInstructions() throws IOException {
-      audioUploadDTO.setAdditionalProcessingInstructions("Translate to Spanish");
+    void midSpeechWritesTheTranscriptionOfAllButTheLastSegment() throws Exception {
+      mockTranscriptionSrtResponse(THREE_SEGMENTS);
 
-      controller.audioToText(audioUploadDTO);
-
-      StructuredResponseCreateParams<DictatedText> params = captureCompletionParams();
-      assertThat(params.rawParams().instructions().orElse(""))
-          .contains("Additional instruction:\nTranslate to Spanish");
-      assertThat(params.rawParams().text().flatMap(ResponseTextConfig::format)).isPresent();
+      upload("test.mp3", true)
+          .andExpect(
+              jsonPath("$.dictatedText")
+                  .value("The orchard has apple trees. These facts are finished."))
+          .andExpect(jsonPath("$.endTimestamp").value("00:00:06,000"));
     }
 
     @Test
-    void shouldIncludePreviousContentAsUserMessage() throws IOException {
-      audioUploadDTO.setPreviousNoteContentToAppendTo("Previous text with trailing space ");
+    void stopWritesTheTranscriptionOfEverySegment() throws Exception {
+      mockTranscriptionSrtResponse(THREE_SEGMENTS);
 
-      controller.audioToText(audioUploadDTO);
-
-      String input =
-          captureCompletionParams().rawParams().input().flatMap(i -> i.text()).orElse("");
-      assertThat(input)
-          .isEqualTo(
-              "Previous note content (in JSON format):\n"
-                  + "{\"previousNoteContentToAppendTo\": \"Previous text with trailing space \"}");
+      upload("test.mp3", false)
+          .andExpect(
+              jsonPath("$.dictatedText")
+                  .value("The orchard has apple trees. These facts are finished. The book that I"))
+          .andExpect(jsonPath("$.endTimestamp").value("00:00:09,000"));
     }
 
     @Test
-    void shouldWorkWithoutPreviousContent() throws IOException {
-      controller.audioToText(audioUploadDTO);
-
-      String input =
-          captureCompletionParams().rawParams().input().flatMap(i -> i.text()).orElse("");
-      assertThat(input).doesNotContain("Previous note content (in JSON format):");
-    }
-
-    @Test
-    void shouldHoldBackSingleSegmentOfMidSpeechUploadWithoutCompletion() throws Exception {
+    void shouldHoldBackSingleSegmentOfMidSpeechUpload() throws Exception {
       mockTranscriptionSrtResponse("1\n00:00:00,000 --> 00:00:03,000\nunfinished sentence\n\n\n");
 
-      mockMvc
-          .perform(
-              multipart("/api/audio/audio-to-text")
-                  .file(
-                      new MockMultipartFile(
-                          "uploadAudioFile", "test.mp3", "audio/mpeg", "test".getBytes()))
-                  .param("midSpeech", "true"))
-          .andExpect(status().isOk())
-          .andExpect(jsonPath("$.completionFromAudio.dictatedText").value(""))
+      upload("test.mp3", true)
+          .andExpect(jsonPath("$.dictatedText").value(""))
           .andExpect(jsonPath("$.endTimestamp").value("00:00:00,000"));
-
-      verify(openAiStructuredResponseMock.responseService(), never())
-          .create(any(StructuredResponseCreateParams.class));
-    }
-
-    @SuppressWarnings({"unchecked", "rawtypes"})
-    private StructuredResponseCreateParams<DictatedText> captureCompletionParams() {
-      ArgumentCaptor<StructuredResponseCreateParams<DictatedText>> paramsCaptor =
-          ArgumentCaptor.forClass((Class) StructuredResponseCreateParams.class);
-      verify(openAiStructuredResponseMock.responseService()).create(paramsCaptor.capture());
-      return paramsCaptor.getValue();
     }
   }
 }

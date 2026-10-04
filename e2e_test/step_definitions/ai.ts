@@ -109,22 +109,6 @@ Given('OpenAI will reply below for user messages:', (data: DataTable) => {
 })
 
 Given(
-  'the OpenAI completion service will return the following response for the transcription to text request:',
-  (data: DataTable) => {
-    const row = data.hashes()[0]!
-    const reply = JSON.stringify({ dictatedText: row.response! })
-    mock_services
-      .openAi()
-      .responses()
-      .requestMessageMatches({
-        role: 'developer',
-        content: `.*${row['request contains']}.*`,
-      })
-      .stubOutputText(reply)
-  }
-)
-
-Given(
   'the OpenAI transcription service will return the following srt transcript:',
   (transcript: string) => {
     mock_services.openAi().stubTranscription(transcript)
