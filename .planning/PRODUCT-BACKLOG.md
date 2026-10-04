@@ -7,7 +7,6 @@ Audio tools, starting with voice input. Make voice input work reliably and easy 
 ## Taken
 
 - [Replace frontend unit-test mocks of internal code with the real modules](seeds/SEED-039-faster-ci-feedback.md#internal-mocks-to-real-modules) — SEED-039#internal-mocks-to-real-modules ([plan](slice-plans/009-frontend-specs-run-real-internal-modules/PLAN.md))
-- [Keep every transcribed sentence when dictated text is written](seeds/SEED-066-voice-input.md#keep-every-transcribed-sentence) — SEED-066#keep-every-transcribed-sentence ([plan](slice-plans/008-keep-every-transcribed-sentence/PLAN.md))
 
 ## Backlog list
 
