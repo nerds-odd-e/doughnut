@@ -257,6 +257,41 @@ browser rendering.
   seed wants fast. Delivery reports `pnpm frontend:test` wall time before and
   after; a material slowdown is brought back for an owner decision.
 
+<a id="specs-share-production-router"></a>
+
+### Start every frontend spec's real router from one shared helper
+
+**Identity:** SEED-039#specs-share-production-router
+```json dough-story-state
+{"schemaVersion":1,"refinement":"not-refined","approach":"unselected"}
+```
+
+- **For / why:** Contributors can trust and read a frontend spec's routing:
+  every real router starts from a known page in one way. Today about 25 test
+  files build their own production router, and plain
+  `RenderingHelper.withRouter()` starts wherever the previous test in the same
+  file left the browser URL, so a test can depend on test order. Found by the
+  retrospective of SEED-039#internal-mocks-to-real-modules, which added the
+  shared `productionRouterAt` helper.
+- **Scope:** Test code only. Move the specs and support files under
+  `frontend/tests` that call `createRouter(` over the production routes onto
+  `productionRouterAt` (or `withRouter`), and give `withRouter()` without an
+  argument a known start. Specs that test the route table itself
+  (`tests/routes/*.spec.ts`) or need a router of their own keep it with a
+  reason. No production code changes.
+- **Evaluation:** `grep -rln 'createRouter(' frontend/tests` lists only
+  `RenderingHelper.ts` and the files kept with a reason; a test that mounts
+  with `withRouter()` sees the same starting route whatever ran before it; the
+  whole frontend suite passes with unchanged test names and no weaker
+  assertions.
+- **Value / learning:** One way to start a real router in specs, and no
+  order-dependent routing state.
+- **Effort hypothesis:** S to M, medium confidence: mostly mechanical edits to
+  about 25 files.
+- **Depends on:** None.
+- **Safe stopping point:** any group of files moved onto the shared helper,
+  with their specs passing.
+
 ## Ordering and Scope Reduction
 
 Follow story 2, then story 3. Test optimization removes shared cost before shard
