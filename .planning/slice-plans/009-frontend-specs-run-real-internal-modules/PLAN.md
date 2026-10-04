@@ -189,7 +189,7 @@ Proof: the three `tests/toolbars/NoteUndoButton*.spec.ts` files pass with no
 
 ### 10. Wikidata, question-export, and relationship specs run a real router
 Type: Structure
-Status: planned
+Status: done
 Proof: the three `WikidataAssociationDialog*.spec.ts` files,
 `WikidataSearchByLabel.spec.ts`, `QuestionExportDialog.spec.ts`, and
 `AddRelationship.spec.ts` pass with no `vue-router` mock.
@@ -277,3 +277,6 @@ decision, not tuned away here.
   every call; a spec calling it before each test stacks duplicate toasts and
   redirects. `clientSetup.spec.ts` sets it up once in `beforeAll`. The toast
   helper also offers `toastShown(type)` and `toastTimeout(toast)`.
+- A real router shows replace versus push through
+  `router.options.history.state.position`: a push raises it, a replace keeps
+  it (`AddRelationship.spec.ts`).

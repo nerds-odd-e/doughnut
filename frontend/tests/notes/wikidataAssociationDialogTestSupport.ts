@@ -98,6 +98,7 @@ export function mountWikidataAssociationDialog(
       searchKey,
       ...options,
     })
+    .withRouter()
     .mount({ attachTo: document.body })
 }
 

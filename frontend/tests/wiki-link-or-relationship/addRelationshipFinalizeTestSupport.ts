@@ -13,6 +13,7 @@ import GlobalApiLoadingModal from "@tests/helpers/GlobalApiLoadingModal"
 import { useNoteStore } from "@/store/noteStore"
 import { flushPromises, type VueWrapper } from "@vue/test-utils"
 import { defineComponent, type PropType } from "vue"
+import type { Router } from "vue-router"
 import makeMe from "donut-test-fixtures/makeMe"
 import { expect } from "vitest"
 
@@ -26,12 +27,14 @@ export function mountAddRelationshipFinalize({
   seedRealm,
   navigateOnSuccess = true,
   withLoadingModal = false,
+  router,
 }: {
   note: Note
   targetSearchResult: NoteSearchResult
   seedRealm?: NoteRealm
   navigateOnSuccess?: boolean
   withLoadingModal?: boolean
+  router?: Router
 }) {
   const Host = defineComponent({
     components: withLoadingModal
@@ -63,6 +66,7 @@ export function mountAddRelationshipFinalize({
   }
   return renderer
     .withProps({ note, targetSearchResult, navigateOnSuccess })
+    .withRouter(router)
     .mount(withLoadingModal ? { attachTo: document.body } : undefined)
 }
 
