@@ -4,9 +4,9 @@
 
 - Story: [Build the test router over production routes in one place](../../seeds/SEED-039-faster-ci-feedback.md#one-production-router-builder)
 - Identity: SEED-039#one-production-router-builder
-- Provenance: retrospective of
-  [SEED-039#specs-share-production-router](../../seeds/SEED-039-faster-ci-feedback.md#specs-share-production-router),
-  plan `slice-plans/002-specs-share-production-router`, reviewed commits
+- Provenance: retrospective of SEED-039#specs-share-production-router
+  (`70c937334e:.planning/seeds/SEED-039-faster-ci-feedback.md#specs-share-production-router`,
+  plan `70c937334e:.planning/slice-plans/002-specs-share-production-router/PLAN.md`), reviewed commits
   98728709f1, fb541c485a, 3a412044e8, 863553ca54.
 
 ## Findings

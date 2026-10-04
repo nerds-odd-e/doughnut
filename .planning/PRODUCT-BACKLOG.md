@@ -6,8 +6,6 @@ Audio tools, starting with voice input. Make voice input work reliably and easy 
 
 ## Taken
 
-- [Start every frontend spec's real router from one shared helper](seeds/SEED-039-faster-ci-feedback.md#specs-share-production-router) — SEED-039#specs-share-production-router ([plan](slice-plans/002-specs-share-production-router/PLAN.md))
-
 ## Backlog list
 
 - [Build the test router over production routes in one place](seeds/SEED-039-faster-ci-feedback.md#one-production-router-builder) — SEED-039#one-production-router-builder

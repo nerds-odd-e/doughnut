@@ -131,106 +131,17 @@ authorizes no implementation, profiling run, or executable slice plan.
   If the resulting timings no longer justify rebalancing, bring that evidence
   back for an owner decision rather than inventing work or silently cancelling it.
 
-<a id="specs-share-production-router"></a>
-
-### Start every frontend spec's real router from one shared helper
-
-**Identity:** SEED-039#specs-share-production-router
-```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/002-specs-share-production-router/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"ba78782eb99ddb8daed0401c1421f54ed7e35cf98d0ccf49d3e04873b430a6c6","plan":"2b2b448dc4193e631fd68be93eefa7fd9fbbccbe2c9bfcc8ee32cca7ce66d9a5"}}
-```
-
-- **For / why:** Contributors can trust and read a frontend spec's routing:
-  every real router starts from a known page in one way. Today 11 test
-  files build their own production router, and plain
-  `RenderingHelper.withRouter()` starts wherever the previous test in the same
-  file left the browser URL, so a test can depend on test order. Found by the
-  retrospective of the story that added the shared `productionRouterAt` helper
-  (`8cb73fa479:.planning/seeds/SEED-039-faster-ci-feedback.md#internal-mocks-to-real-modules`).
-- **Effort hypothesis:** S to M, medium confidence: mostly mechanical edits to
-  11 files, plus one shared reset.
-- **Depends on:** None.
-- **Safe stopping point:** any group of files moved onto the shared helper,
-  with their specs passing.
-
-**Goal:** Donut contributors can read and trust the routing in a frontend
-spec: a router over the production routes is always started by the shared
-helper, at a start the spec can see, and no test's starting route depends on
-the test that ran before it. This serves the seed's aim of trustworthy
-feedback. It does not promise shorter test time.
-
-**Scope:**
-
-Required: in `frontend/tests`, the files that build their own router over the
-production `routes` get it from `productionRouterAt(location)`, or from plain
-`withRouter()` when the start does not matter to the spec. Inventory on
-2026-10-04 (26 files call `createRouter(`; 11 are in scope):
-
-| Today | Files |
-| --- | --- |
-| Production routes, browser history | `components/form/quillEditorTestHarness.ts`, `components/recent/RecentlyRecalledNotes.spec.ts`, `notes/FolderSelector.spec.ts`, `notes/NoteMoreOptionsForm.spec.ts`, `notes/NoteUnresolvedWikiLinkModal.spec.ts`, `pages/NotebookCatalogReadBook.spec.ts`, `pages/folderPageTestSupport.ts`, `pages/noteShowPageTestSupport.ts` |
-| Production routes, memory history | `pages/MessageCenterPage.spec.ts`, `pages/settings/RecentSettingsTab.spec.ts`, `toolbars/mainMenuTestSupport.ts` |
-
-Required: a router from `withRouter()` without an argument starts at the root
-location (`{ name: "root" }`) in every test, whatever ran before. Any router
-with browser history that a test creates gets the same start, because the
-reset lives in shared test support, in one place, like the popup stack reset.
-
-Required: test names stay, and no assertion is weakened. A spec that relied on
-a leftover URL states its start explicitly.
-
-Required: the frontend testing skill
-(`.agents/skills/frontend-testing/SKILL.md`) says that a production-routes
-router in a spec comes from `productionRouterAt` or `withRouter()`.
-
-Stay as they are (15 files), under the routing rule that skill already has:
-
-- `tests/routes/routes.spec.ts` and `tests/routes/noteRouteFamily.spec.ts`:
-  they test the route table itself.
-- Routers over `dummyRouteRecordsFromMetadata` (9 files, counting
-  `routes.spec.ts` once more): the skill allows them for resolving named
-  locations without page imports.
-- Routers with a single stand-in route (`commons/modalTestSupport.ts`,
-  `commons/Popups/popButtonTestSupport.ts`, `notes/mcqsTestSupport.ts`,
-  `pages/bookReadingPageTestSupport.ts`).
-
-Not committed in this delivery:
-
-- Moving the dummy-route and stand-in routers onto a shared helper, or
-  removing them.
-- Removing `createRouter(` from every file but `RenderingHelper.ts`.
-- A lint rule on `createRouter(` in tests.
-- Production code changes.
-
-**Key examples:**
-
-- Own router replaced. `FolderSelector.spec.ts` builds
-  `createRouter({ history: createWebHistory(), routes })`. → It uses
-  `productionRouterAt` with the location it needs. → Its tests pass with the
-  same names and assertions.
-- Memory history replaced. `MessageCenterPage.spec.ts` builds a production
-  router on memory history and pushes a location. → It uses
-  `productionRouterAt` with that location. → The tests pass.
-- Known start. One test in a file navigates its router to a note's show
-  location. → The next test in the same file mounts with `withRouter()`. →
-  Its current route is root.
-- Kept router. `SidebarFolderItem.spec.ts` keeps its router over
-  `dummyRouteRecordsFromMetadata`, and `routes.spec.ts` keeps its own routers.
-- Finished state. A reviewer lists `createRouter(` in `frontend/tests`. → Only
-  `RenderingHelper.ts` and the two `tests/routes` specs pass the production
-  `routes`. → The whole frontend suite passes.
-
 <a id="one-production-router-builder"></a>
 
 ### Build the test router over production routes in one place
 
 **Identity:** SEED-039#one-production-router-builder
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/003-one-production-router-builder/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"3a6a0ff345c3e5b2bec3e0a0207b3eed135d3c30e10712ce4dd5457c1102aec3","plan":"d4148e4a8588e5185fcad49854b514a4489308cc41a21eae6140d94fac29cc53"}}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/003-one-production-router-builder/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"f20a7b6d221aa85b97c34b4c39d843c2c62386340df0c9af52184d65a97c5705","plan":"ce6f5af5f20d9b64f873007ae7f0b30b8530728871e75f94537d51e57322e8cf"}}
 ```
 
-Correction from the retrospective of
-[SEED-039#specs-share-production-router](#specs-share-production-router).
+Correction from the retrospective of SEED-039#specs-share-production-router
+(`70c937334e:.planning/seeds/SEED-039-faster-ci-feedback.md#specs-share-production-router`).
 Plan: [003-one-production-router-builder](../slice-plans/003-one-production-router-builder/PLAN.md).
 
 **Goal:** Donut contributors reading frontend test support find one way to
