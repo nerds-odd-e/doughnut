@@ -234,16 +234,17 @@ technical redesign, or speculative infrastructure.
   The saved body after reload matches.
 - **Evidence:** The real-service orchard runs on 2026-10-03 (notes
   13728–13731) all saved "every hour.The orchard". The mocked recording journey
-  pins the same join ("This is class 1.Let's talk about data structure
-  today."). Leading whitespace is currently left to the text-writing model.
+  pinned the same join. The client now joins every passage with one space
+  (none on an empty body or after trailing whitespace) and writes the
+  transcription's own text, so English already joins correctly; Japanese,
+  Chinese, and mixed-language joining remain.
 - **Boundary:** How a dictated passage is joined to the note's existing text,
   including when the note is empty. Be mindful of the language: languages
   written with spaces between words and sentences (such as English) need a
   space, while Japanese and Chinese do not, and mixed-language notes exist.
   Paragraph breaks are not decided here, and nothing already written is changed.
 - **Effort hypothesis:** M — low confidence; the rule for mixed or unknown
-  languages, and whether the join is decided in code or by the model, are
-  refinement questions.
+  languages is the refinement question. The join is decided in code.
 - **Depends on:** None.
 - **Safe stopping point:** Dictated passages join existing text correctly for
   space-separated languages and for Japanese and Chinese.
@@ -292,8 +293,10 @@ technical redesign, or speculative infrastructure.
   text at 25.17 seconds from capture, approximately 3.96 seconds after Stop.
   Audio requests took 4.42/4.61 seconds and titles settled separately. Other
   journeys do not supply a reliable Stop-to-final baseline.
-- **Boundary:** Own diagnosis and user-visible improvement together. The retouch
-  stage and excessive thinking are owner hypotheses, not established causes.
+- **Boundary:** Own diagnosis and user-visible improvement together. The
+  recorded timings predate deleting the model rewrite of transcriptions, so
+  re-measure the baseline first; excessive thinking was an owner hypothesis,
+  not an established cause.
   Preserve the requested lightweight-processing direction; choose a model or
   processing change only after understanding the path. No numerical target or
   continuous live-text promise has been decided.
@@ -408,7 +411,7 @@ one-time automatic title generation has no queued story.
   hardware capture and permission behavior remain gaps. Resolve the deployed URL
   and account only if that alternative is used.
 - Measurable responsiveness expectations and the actual contribution of audio
-  capture, transcription, retouching, and applying results to the note.
+  capture, transcription, and applying results to the note.
 - How to recognize the current unfinished sentence versus completed passages,
   including a long pause inside a sentence, while preserving author intent.
   Partly decided on 2026-10-03: the last transcription segment is held back
