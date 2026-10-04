@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 1,
+  "agent": "Nao-chan",
+  "email": "nao-chan@example.org",
+  "identity": "SEED-039#internal-mocks-to-real-modules",
+  "mode": "story-branch",
+  "branch": "claude/replace-frontend-unit-test-mocks-of-internal-cod",
+  "host": "claude"
+}
