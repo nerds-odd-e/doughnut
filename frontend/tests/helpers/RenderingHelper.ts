@@ -8,6 +8,13 @@ import { ref, type Component, type DefineComponent, type Ref } from "vue"
 import type { RouteLocationRaw } from "vue-router"
 import { createRouter, createWebHistory } from "vue-router"
 
+/** A real router over the production routes, placed at `location`. */
+export async function productionRouterAt(location: RouteLocationRaw) {
+  const router = createRouter({ history: createWebHistory(), routes })
+  await router.push(location)
+  return router
+}
+
 interface NoteStorageProps {
   [key: string]: unknown
 }

@@ -7,7 +7,7 @@ import { useRecallData } from "@/composables/useRecallData"
 import type { AnsweredQuestion, AnswerData } from "@generated/donut-backend-api"
 import makeMe from "donut-test-fixtures/makeMe"
 import { mockSdkService, wrapSdkResponse } from "@tests/helpers"
-import usePopups from "@/components/commons/Popups/usePopups"
+import { answerOnlyPendingPopup } from "@tests/helpers/popupStackTestSupport"
 import { flushPromises, type VueWrapper } from "@vue/test-utils"
 import { beforeEach, describe, expect, it, vi } from "vitest"
 import {
@@ -15,17 +15,6 @@ import {
   givenRecallQueue,
   useRecallPageSpecContext,
 } from "./recallPageTestSupport"
-
-vi.mock("@/components/commons/Popups/usePopups")
-
-vi.mock("vue-router", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("vue-router")>()
-  return {
-    ...actual,
-    useRoute: () => ({ path: "/", fullPath: "/" }),
-    useRouter: () => ({ currentRoute: { value: { name: "recall" } } }),
-  }
-})
 
 const memoryTrackerId = 123
 const ctx = useRecallPageSpecContext({ fakeTimers: true })
@@ -65,24 +54,6 @@ const answer = async (wrapper: VueWrapper, answered: AnsweredQuestion) => {
 }
 
 describe("RecallPage frequent failure warning", () => {
-  let alertMock: ReturnType<typeof vi.fn<(msg: string) => Promise<boolean>>>
-
-  beforeEach(() => {
-    alertMock = vi
-      .fn<(msg: string) => Promise<boolean>>()
-      .mockResolvedValue(true)
-    vi.mocked(usePopups).mockReturnValue({
-      popups: {
-        options: vi.fn().mockResolvedValue(null),
-        alert: alertMock,
-        confirm: vi.fn(),
-        done: vi.fn(),
-        register: vi.fn(),
-        peek: vi.fn(),
-      },
-    })
-  })
-
   const thresholdExceeded = (wrongCount: number) =>
     getThresholdExceededSpy.mockResolvedValue(
       wrapSdkResponse({ thresholdExceeded: true, wrongCount, periodDays: 14 })
@@ -105,9 +76,10 @@ describe("RecallPage frequent failure warning", () => {
   it("should show note-level frequent failure warning when threshold exceeded", async () => {
     thresholdExceeded(5)
     await answer(await ctx.mountPage(), answeredMcq(false).please())
-    expect(alertMock).toHaveBeenCalledWith(
-      "You've answered incorrectly 5 times within the last 14 days."
-    )
+    expect(await answerOnlyPendingPopup(true)).toMatchObject({
+      type: "alert",
+      message: "You've answered incorrectly 5 times within the last 14 days.",
+    })
   })
 
   it("should show property-aware frequent failure warning when threshold exceeded", async () => {
@@ -116,9 +88,11 @@ describe("RecallPage frequent failure warning", () => {
       await ctx.mountPage(),
       answeredMcq(false).withPropertyKey("topic").please()
     )
-    expect(alertMock).toHaveBeenCalledWith(
-      'You\'ve answered the "topic" property incorrectly 7 times within the last 14 days.'
-    )
+    expect(await answerOnlyPendingPopup(true)).toMatchObject({
+      type: "alert",
+      message:
+        'You\'ve answered the "topic" property incorrectly 7 times within the last 14 days.',
+    })
   })
 
   it("names the list value in the frequent failure warning", async () => {
@@ -127,9 +101,11 @@ describe("RecallPage frequent failure warning", () => {
       await ctx.mountPage(),
       answeredMcq(false).withPropertyKey("example of", "[[run]]").please()
     )
-    expect(alertMock).toHaveBeenCalledWith(
-      'You\'ve answered the "example of" property value "[[run]]" incorrectly 7 times within the last 14 days.'
-    )
+    expect(await answerOnlyPendingPopup(true)).toMatchObject({
+      type: "alert",
+      message:
+        'You\'ve answered the "example of" property value "[[run]]" incorrectly 7 times within the last 14 days.',
+    })
   })
 })
 

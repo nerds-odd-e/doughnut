@@ -8,7 +8,7 @@ import { useRecallData } from "@/composables/useRecallData"
 import RecallPage from "@/pages/RecallPage.vue"
 import type { MemoryTrackerLite } from "@generated/donut-backend-api"
 import makeMe from "donut-test-fixtures/makeMe"
-import helper, { mockSdkService } from "@tests/helpers"
+import helper, { mockSdkService, productionRouterAt } from "@tests/helpers"
 import { enableAutoUnmount, flushPromises } from "@vue/test-utils"
 import { afterEach, beforeEach, vi } from "vitest"
 import mockBrowserTimeZone from "@tests/helpers/mockBrowserTimeZone"
@@ -28,6 +28,9 @@ export function createMemoryTrackerLite(
     spelling,
   }
 }
+
+/** A real router placed at the `recall` location. */
+export const routerAtRecall = () => productionRouterAt({ name: "recall" })
 
 function createRecallPageRenderer() {
   return helper
@@ -91,8 +94,10 @@ export function useRecallPageSpecContext(options?: { fakeTimers?: boolean }) {
     renderer = createRecallPageRenderer()
   })
 
-  const mountPage = async () => {
-    const wrapper = renderer.currentRoute({ name: "recall" }).mount()
+  const mountPage = async (mountOptions?: Record<string, unknown>) => {
+    const wrapper = renderer
+      .withRouter(await routerAtRecall())
+      .mount(mountOptions)
     await flushPromises()
     return wrapper
   }

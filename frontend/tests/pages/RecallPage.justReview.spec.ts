@@ -14,17 +14,6 @@ import {
   useRecallPageSpecContext,
 } from "./recallPageTestSupport"
 
-vi.mock("@/components/commons/Popups/usePopups")
-
-vi.mock("vue-router", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("vue-router")>()
-  return {
-    ...actual,
-    useRoute: () => ({ path: "/", fullPath: "/" }),
-    useRouter: () => ({ currentRoute: { value: { name: "recall" } } }),
-  }
-})
-
 const ctx = useRecallPageSpecContext()
 
 describe("RecallPage Just review", () => {
@@ -58,10 +47,7 @@ describe("RecallPage Just review", () => {
     host.style.cssText = "display: grid; grid-template-rows: 100vh"
     document.body.appendChild(host)
 
-    const wrapper = ctx.renderer
-      .currentRoute({ name: "recall" })
-      .mount({ attachTo: host })
-    await flushPromises()
+    const wrapper = await ctx.mountPage({ attachTo: host })
 
     const context = document.querySelector('article[aria-label="Note context"]')
     expect(context?.textContent).toContain("Sedition")
@@ -99,8 +85,7 @@ describe("RecallPage Just review", () => {
     )
     givenRecallQueue(createMemoryTrackerLite(123))
 
-    const wrapper = ctx.renderer.currentRoute({ name: "recall" }).mount()
-    await flushPromises()
+    const wrapper = await ctx.mountPage()
 
     const context = wrapper.find('article[aria-label="Note context"]')
     expect(context.text()).toContain("Inciting rebellion.")

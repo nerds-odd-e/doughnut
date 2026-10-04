@@ -1,6 +1,6 @@
 import { NoteController } from "@generated/donut-backend-api/sdk.gen"
 import makeMe from "donut-test-fixtures/makeMe"
-import helper, { mockSdkService } from "@tests/helpers"
+import helper, { mockSdkService, productionRouterAt } from "@tests/helpers"
 import {
   allMoreOptionsFitNavWidth,
   installMockResizeObserver,
@@ -18,17 +18,11 @@ import {
 } from "@tests/notes/noteToolbarTestHelpers"
 import { useAssimilationView } from "@/composables/useAssimilationView"
 import { useNoteToolbarPanel } from "@/composables/useNoteToolbarPanel"
-import routes from "@/routes/routes"
 import {
   notePropertyLocation,
   noteShowLocation,
 } from "@/routes/noteShowLocation"
-import {
-  createRouter,
-  createWebHistory,
-  type RouteLocationNamedRaw,
-  type Router,
-} from "vue-router"
+import type { Router } from "vue-router"
 import { describe, it, expect, afterEach, beforeEach, vi } from "vitest"
 import { type VueWrapper, flushPromises } from "@vue/test-utils"
 
@@ -159,19 +153,15 @@ describe("NoteToolbar panels", () => {
   })
 
   describe("conversation", () => {
-    async function routerAt(location: RouteLocationNamedRaw) {
-      const router = createRouter({ history: createWebHistory(), routes })
-      await router.push(location)
-      return router
-    }
-
     const startConversation = async () => {
       await wrapper.find(`[title="${titles.conversation}"]`).trigger("click")
       await flushPromises()
     }
 
     it("replaces conversation query on the current note location", async () => {
-      const router = await routerAt(noteShowLocation(noteRealm.note.id))
+      const router = await productionRouterAt(
+        noteShowLocation(noteRealm.note.id)
+      )
       wrapper = await mountNoteToolbar(noteRealm, { router })
       const replaceSpy = vi.spyOn(router, "replace")
       const pushSpy = vi.spyOn(router, "push")
@@ -204,7 +194,7 @@ describe("NoteToolbar panels", () => {
       "keeps the focused property when starting a conversation from $from",
       async ({ mount }) => {
         const location = notePropertyLocation(noteRealm.note.id, "topic")
-        const router = await routerAt(location)
+        const router = await productionRouterAt(location)
         wrapper = await mount(router)
 
         await startConversation()

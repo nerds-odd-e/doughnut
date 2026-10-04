@@ -114,7 +114,7 @@ helper's router.
 
 ### 3. RecallPage specs run a real router and real popups
 Type: Structure
-Status: planned
+Status: done
 Proof: the six `tests/pages/RecallPage*.spec.ts` files pass with no mock of
 `vue-router` or `usePopups`.
 
@@ -253,3 +253,8 @@ decision, not tuned away here.
   assimilation moves to another note's property, the open panel closes. Give
   `AssimilationController.next` the same note and key when later checks read
   the panel (slice 5 may meet this).
+- `productionRouterAt(location)` in `@tests/helpers` builds a real router over the
+  production routes and pushes to a named location; use it instead of a local
+  router builder. A page containing `GlobalBar` needs a real router on every
+  mount (its `NoteUndoButton` injects the router), including custom wrapper
+  mounts.

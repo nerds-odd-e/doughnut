@@ -4,16 +4,15 @@ import {
 } from "@generated/donut-backend-api/sdk.gen"
 import NotebookSidebarLayout from "@/layouts/NotebookSidebarLayout.vue"
 import { noteShowLocation } from "@/routes/noteShowLocation"
-import routes from "@/routes/routes"
 import { useNoteStore } from "@/store/noteStore"
 import makeMe from "donut-test-fixtures/makeMe"
 import helper, {
   mockSdkServiceWithImplementation,
+  productionRouterAt,
   wrapSdkError,
 } from "@tests/helpers"
 import { flushPromises } from "@vue/test-utils"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
-import { createRouter, createWebHistory } from "vue-router"
 import { sidebarDefaultTreeFixtures } from "./sidebarDefaultTree"
 import {
   neverResolving,
@@ -40,8 +39,7 @@ describe("Sidebar route navigation: sticky realm during uncached note load", () 
   })
 
   async function mountLayoutAtNote(noteId: number) {
-    const router = createRouter({ history: createWebHistory(), routes })
-    await router.push(noteShowLocation(noteId))
+    const router = await productionRouterAt(noteShowLocation(noteId))
     wrapper = helper
       .component(NotebookSidebarLayout)
       .withRouter(router)
@@ -113,8 +111,7 @@ describe("Sidebar route navigation: sticky realm during uncached note load", () 
       "getAttachmentPage"
     ).mockResolvedValue(wrapSdkError("not found"))
 
-    const router = createRouter({ history: createWebHistory(), routes })
-    await router.push({
+    const router = await productionRouterAt({
       name: "attachmentPage",
       params: {
         notebookId: String(fixtures.topNoteRealm.notebookRealm.notebook.id),

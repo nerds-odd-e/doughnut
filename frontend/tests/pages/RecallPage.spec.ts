@@ -4,24 +4,13 @@ import type { AnsweredQuestion } from "@generated/donut-backend-api"
 import makeMe from "donut-test-fixtures/makeMe"
 import { mockSdkService, wrapSdkError, wrapSdkResponse } from "@tests/helpers"
 import { flushPromises } from "@vue/test-utils"
-import { describe, expect, it, vi } from "vitest"
+import { describe, expect, it } from "vitest"
 import { ref } from "vue"
 import {
   createMemoryTrackerLite,
   givenRecallQueue,
   useRecallPageSpecContext,
 } from "./recallPageTestSupport"
-
-vi.mock("@/components/commons/Popups/usePopups")
-
-vi.mock("vue-router", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("vue-router")>()
-  return {
-    ...actual,
-    useRoute: () => ({ path: "/", fullPath: "/" }),
-    useRouter: () => ({ currentRoute: { value: { name: "recall" } } }),
-  }
-})
 
 const ctx = useRecallPageSpecContext()
 
