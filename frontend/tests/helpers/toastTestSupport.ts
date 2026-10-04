@@ -16,7 +16,20 @@ function mountToastContainerOnce() {
 }
 
 export const toastOnPage = () =>
-  document.querySelector(".Vue-Toastification__toast")
+  document.querySelector<HTMLElement>(".Vue-Toastification__toast")
+
+/** Waits for a toast of the given type and returns it. */
+export async function toastShown(type: "error" | "warning") {
+  await vi.waitFor(() => expect(toastOnPage()).not.toBeNull())
+  const toast = toastOnPage()!
+  expect(toast).toHaveClass(`Vue-Toastification__toast--${type}`)
+  return toast
+}
+
+/** How long the toast stays, e.g. "3000ms", read from its progress bar. */
+export const toastTimeout = (toast: HTMLElement) =>
+  toast.querySelector<HTMLElement>(".Vue-Toastification__progress-bar")?.style
+    .animationDuration
 
 /**
  * Shows the real toasts on the page: production code's `useToast` reaches one

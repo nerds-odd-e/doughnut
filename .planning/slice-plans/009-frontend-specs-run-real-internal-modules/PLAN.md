@@ -172,7 +172,7 @@ toast; remove the mock.
 
 ### 8. clientSetup spec observes real toasts and the real sign-in redirect
 Type: Structure
-Status: planned
+Status: done
 Proof: `tests/managedApi/clientSetup.spec.ts` passes with no `vi.mock`.
 
 `clientSetup` shows toasts outside a component, so read them from the page
@@ -273,3 +273,7 @@ decision, not tuned away here.
 - `NoteMoreOptionsForm.spec.ts` never asserted on its toast mock (the story's
   key example assumed it captured `error`); removing the mock lost no check.
   `toastOnPage()` in the toast helper checks that no toast shows.
+- `setupGlobalClient` adds another 401 interceptor to the shared client on
+  every call; a spec calling it before each test stacks duplicate toasts and
+  redirects. `clientSetup.spec.ts` sets it up once in `beforeAll`. The toast
+  helper also offers `toastShown(type)` and `toastTimeout(toast)`.
