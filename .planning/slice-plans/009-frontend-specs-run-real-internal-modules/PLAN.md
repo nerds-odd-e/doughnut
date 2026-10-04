@@ -183,7 +183,7 @@ through the spec's fetch mock.
 
 ### 9. NoteUndoButton specs run a real router
 Type: Structure
-Status: planned
+Status: done
 Proof: the three `tests/toolbars/NoteUndoButton*.spec.ts` files pass with no
 `vue-router` mock; `noteUndoButtonRouterMockExports` is deleted.
 

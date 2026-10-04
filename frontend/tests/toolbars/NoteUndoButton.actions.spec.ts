@@ -4,6 +4,7 @@ import {
 } from "@generated/donut-backend-api/sdk.gen"
 import makeMe from "donut-test-fixtures/makeMe"
 import { mockSdkService } from "@tests/helpers"
+import { noteShowLocation } from "@/routes/noteShowLocation"
 import { describe, it, expect, vi } from "vitest"
 import {
   clickDialogCancel,
@@ -14,21 +15,12 @@ import {
   expectConfirmUndoVisible,
   expectNoteTitleHidden,
   expectNoteTitleVisible,
-  mockedPush,
   noteEditingHistory,
   refreshNoteRealms,
   renderNoteUndoButton,
   setupNoteUndoButtonTests,
   setupTwoCachedNotes,
 } from "./noteUndoButtonTestSupport"
-
-vi.mock("vue-router", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("vue-router")>()
-  const { noteUndoButtonRouterMockExports } = await import(
-    "./noteUndoButtonMocks"
-  )
-  return noteUndoButtonRouterMockExports(actual)
-})
 
 setupNoteUndoButtonTests()
 
@@ -75,17 +67,16 @@ describe("NoteUndoButton actions", () => {
     "navigates to note after confirming undo for $label",
     async ({ setup }) => {
       const { noteRealm, undoTitle } = setup()
-      renderNoteUndoButton()
+      const router = await renderNoteUndoButton()
 
       await clickUndoButton(undoTitle)
       await clickDialogOk()
 
-      expect(mockedPush).toHaveBeenCalledWith({
-        name: "noteShow",
-        params: {
-          noteId: String(noteRealm.id),
-        },
-      })
+      await vi.waitFor(() =>
+        expect(router.currentRoute.value).toMatchObject(
+          noteShowLocation(noteRealm.id)
+        )
+      )
     }
   )
 
@@ -95,7 +86,7 @@ describe("NoteUndoButton actions", () => {
     noteEditingHistory.createNote(noteRealm.id)
     const trashSpy = mockSdkService(NoteController, "trashNote", noteRealm)
 
-    renderNoteUndoButton()
+    const router = await renderNoteUndoButton()
     await clickUndoButton("undo create note")
     await clickDialogOk()
 
@@ -103,22 +94,24 @@ describe("NoteUndoButton actions", () => {
       path: { note: noteRealm.id },
       body: { referenceHandling: "LEAVE_DEAD_LINKS" },
     })
-    expect(mockedPush).toHaveBeenCalledWith({
-      name: "notebookPage",
-      params: { notebookId: noteRealm.notebookRealm.notebook.id },
-    })
+    await vi.waitFor(() =>
+      expect(router.currentRoute.value).toMatchObject({
+        name: "notebookPage",
+        params: { notebookId: String(noteRealm.notebookRealm.notebook.id) },
+      })
+    )
   })
 
   it("does not navigate when confirmation is cancelled", async () => {
     const noteRealm = makeMe.aNoteRealm.title("Original title").please()
     noteEditingHistory.trashNote(noteRealm.id, "Original title", null)
     mockSdkService(NoteController, "undoTrashNote", noteRealm)
-    renderNoteUndoButton()
+    const router = await renderNoteUndoButton()
 
     await clickUndoButton("undo trash note")
     await clickDialogCancel()
 
-    expect(mockedPush).not.toHaveBeenCalled()
+    expect(router.currentRoute.value.name).toBe("root")
   })
 
   describe("discard", () => {
@@ -166,7 +159,7 @@ describe("NoteUndoButton actions", () => {
       async ({ setup, undoTitle }) => {
         const { noteRealm1, noteRealm2 } = setupTwoCachedNotes()
         setup(noteRealm1, noteRealm2)
-        renderNoteUndoButton()
+        await renderNoteUndoButton()
 
         await clickUndoButton(undoTitle)
 
@@ -184,7 +177,7 @@ describe("NoteUndoButton actions", () => {
     it("closes dialog when discarding the last undo item", async () => {
       const note = makeMe.aNote.please()
       noteEditingHistory.addEditingToUndoHistory(note.id, "edit title", "Old")
-      renderNoteUndoButton()
+      await renderNoteUndoButton()
 
       await clickUndoButton("undo edit title")
       expectConfirmUndoVisible()
