@@ -148,7 +148,7 @@ at the next note's location, given through
 
 ### 6. useGoToNextAssimilation spec runs the real router, toast, and time zone
 Type: Structure
-Status: planned
+Status: done
 Proof: `tests/composables/useGoToNextAssimilation.spec.ts` passes on the first
 attempt with none of its three mocks.
 
@@ -264,3 +264,9 @@ decision, not tuned away here.
 - `withRouter()` with no argument uses web history, so the route carries over
   between tests; start from `productionRouterAt(...)` when a test checks that
   the route stays put.
+- Toast premise holds without retry. `showToastsOnPage()` in
+  `tests/helpers/toastTestSupport.ts` mounts one real toast container per spec
+  file and waits a tick for it (a toast shown before the container mounts is
+  lost, which caused the earlier first-attempt timeout), then clears toasts
+  before each test. It is not global: a spec that still mocks
+  `vue-toastification` must not call it.
