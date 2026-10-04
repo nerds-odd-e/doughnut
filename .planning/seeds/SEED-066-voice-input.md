@@ -153,30 +153,61 @@ technical redesign, or speculative infrastructure.
 
 **Identity:** SEED-066#join-dictated-passages
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"not-refined","approach":"unselected"}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/001-join-dictated-passages/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"e4d8759845dfbffb2508a9f7e8e4c1d5da7ab4368cbc7a2c5caacdf353ed3764","plan":"2baa03fbcecd5422b8e79f57e930b2bab358e0c92a5313a2e0bb74ff5e5999de"}}
 ```
 
-- **For / why:** An author adding speech to a note expects each new passage
-  to join the existing text the way that language is written, without fixing
-  the join by hand.
-- **Evaluation:** Dictate into a note whose body ends with an English sentence:
-  the new passage starts after one space, not "every hour.The orchard". Dictate
-  Japanese or Chinese after Japanese or Chinese text: no space is inserted
-  between sentences. Successive passages in one recording join the same way.
-  The saved body after reload matches.
+- **Goal:** An author adding speech to a note gets text joined the way its
+  language is written, so no join needs fixing by hand. English already joins
+  with one space; this story makes Japanese and Chinese dictation usable, one
+  step toward dependable everyday dictation.
+- **Scope:**
+  - One join rule decides, in code, every place dictated text meets other
+    text: a passage joining the note's existing text (the saved body or an
+    open editor's draft), successive passages of one recording, and the
+    transcription segments inside one passage.
+  - Kept as today: nothing is added to an empty body or after text that ends
+    in whitespace, and two texts written with spaces (such as English) are
+    joined by one space.
+  - New: no space is added when the join touches Japanese or Chinese writing,
+    meaning a kanji/hanzi, hiragana, or katakana character, or full-width
+    punctuation such as `。`, `、`, `！`, `？`, `「`, `」`.
+  - A mixed join looks at both sides: a space is added only when neither the
+    character before nor the character after the join is Japanese or Chinese
+    writing (owner decision, 2026-10-04).
+  - Other scripts need no separate handling: they are joined with one space, as
+    today. Korean is written with spaces and so fits that naturally.
+  - Deferred: paragraph breaks, spacing inside a transcription segment (the
+    transcription's own text is written as is), and changing characters that
+    are already written. Language detection of the note or of the speech is
+    not needed and not added.
+  - Assumption, not observed: the transcription service returns Japanese and
+    Chinese segments without spaces of its own. It has only been observed with
+    English, and this story does not depend on it.
+- **Key examples:**
+  - Body `The bell rings every hour.`, dictated `The orchard is old.` →
+    `The bell rings every hour. The orchard is old.` (unchanged behavior).
+  - Body `鐘は毎時間鳴ります。`, dictated `果樹園は古いです。` →
+    `鐘は毎時間鳴ります。果樹園は古いです。`; the saved body after reload
+    matches.
+  - Body `钟每小时响一次。`, dictated `果园很古老。` →
+    `钟每小时响一次。果园很古老。`
+  - One recording whose transcription holds the segments `果樹園は古いです。`
+    and `ベンチがあります。` in one passage → `果樹園は古いです。ベンチがあります。`,
+    and a later passage of the same recording joins the same way.
+  - Empty body, dictated `果樹園は古いです。` → the body is exactly the passage.
+  - Mixed: body `私はPython`, dictated `が好きです。` →
+    `私はPythonが好きです。`; body `鐘は毎時間鳴ります。`, dictated
+    `The orchard is old.` → `鐘は毎時間鳴ります。The orchard is old.`; body
+    `The bell rings every hour.`, dictated `果樹園は古いです。` →
+    `The bell rings every hour.果樹園は古いです。`
 - **Evidence:** The real-service orchard runs on 2026-10-03 (notes
   13728–13731) all saved "every hour.The orchard". The mocked recording journey
   pinned the same join. The client now joins every passage with one space
-  (none on an empty body or after trailing whitespace) and writes the
-  transcription's own text, so English already joins correctly; Japanese,
-  Chinese, and mixed-language joining remain.
-- **Boundary:** How a dictated passage is joined to the note's existing text,
-  including when the note is empty. Be mindful of the language: languages
-  written with spaces between words and sentences (such as English) need a
-  space, while Japanese and Chinese do not, and mixed-language notes exist.
-  Paragraph breaks are not decided here, and nothing already written is changed.
-- **Effort hypothesis:** M — low confidence; the rule for mixed or unknown
-  languages is the refinement question. The join is decided in code.
+  (none on an empty body or after trailing whitespace), and a passage's
+  segments are joined by one space, so English already joins correctly;
+  Japanese, Chinese, and mixed-language joining remain.
+- **Effort hypothesis:** S to M — medium confidence.
+- **Plan:** [001-join-dictated-passages](../slice-plans/001-join-dictated-passages/PLAN.md)
 - **Depends on:** None.
 - **Safe stopping point:** Dictated passages join existing text correctly for
   space-separated languages and for Japanese and Chinese.
