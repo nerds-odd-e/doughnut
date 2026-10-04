@@ -10,137 +10,116 @@ A finding is Donut’s when its correction lands in Donut’s product, scripts, 
 Donut-authored skills and `.agents/agent-map.md`; Donut details that only
 illustrate a shared lesson stay in DearDough as occurrence evidence.
 
-## Open findings
+Groups are ordered by priority: impact first, then frequency.
 
-### Open, not queued: Stale classes at a Development start
+## Queued: Observing branch code against real services from an execution worktree
 
-A running stack reads `backend/build` output that something else left behind.
-Resolved DD-103 and DD-200 had other writers on the same output; their
-corrections still hold.
+Story: [Observe unmerged branch code against real services from an execution worktree](.planning/seeds/SEED-069-agent-development-tooling.md#observe-branch-code-against-real-services)
+— SEED-069#observe-branch-code-against-real-services.
 
-#### DD-159 — The Development stack failed to start on stale compiled backend classes in the default checkout
+Linked worktrees refuse the persistent Development stack, and
+`scripts/isolated-cypress-spec-selection.mjs` refuses live-OpenAI specs there.
+No repo command keeps a disposable stack up for manual use. A real-service or
+manual proof of unmerged branch code therefore has no supported route.
 
-`pnpm dev` from the default checkout failed with `No qualifying bean of type NotebookGitCutoverService`: `backend/build/classes` still held classes from before that service was removed. Deleting `backend/build/classes` let the next start succeed.
+The planning half of this pattern (check that a named observation route exists
+before Take) is shared ODF-190 in DearDough; its SEED-059#story-5,
+SEED-066#preserve-completed-speech and SEED-066#keep-every-transcribed-sentence
+occurrences are this group’s Donut-side evidence:
 
-##### Occurrences
+- 2026-09-29, SEED-059#story-5: a real mouse-wheel observation had no route from
+  the worktree; about 15 minutes, and the key example shipped unobserved.
+- 2026-10-03, SEED-066#preserve-completed-speech: about 30 minutes waiting for the
+  owner, then the primary checkout detached onto branch code twice.
+- 2026-10-04, SEED-066#keep-every-transcribed-sentence: the planned local live
+  spec run was refused; one owner round-trip, two paid calls the owner had not
+  specifically authorized, and the proof moved to CI.
+
+### DD-161 — Real-book manual acceptance had no supported way to hold a disposable stack
+
+No repo command keeps a disposable E2E stack up for manual use, and a
+`.venv-mineru` whose Python lived in a garbage-collected Nix store path must be
+rebuilt by hand.
+
+The plan's manual slice needed real MinerU and a running app to `/attach` real
+PDFs through the CLI, so the agent wrote a temporary `hold-stack.mjs` around
+`runE2eInteractive`.
+
+#### Occurrences
+
+- Execution: SEED-059#story-3 / slice-plans/051-pdf-layout-from-bookmarks / 946e2a70e3; Timestamp: 2026-09-29 (slice 6, after 6f36cb2952); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.46.
+  - Evidence: slice 6 agent report (1,692 s, about 197k tokens, 96 tool uses); plan premise "`.venv-mineru/bin` has no `python`"; venv rebuilt with Homebrew Python 3.12, `mineru[pipeline]==3.4.5` and `six`.
+  - Observed effect: about 28 minutes for one manual slice, most of it environment repair and stack scaffolding rather than observation.
+  - Inference: a documented "hold a disposable stack" command would make the next real-service acceptance cheaper. Donut tooling, so correction belongs to Donut, not shared guidance.
+
+## Queued: Starting, stopping and restarting the Development stack
+
+Story: [Stop and restart the Development stack without hunting for its processes](.planning/seeds/SEED-069-agent-development-tooling.md#reliable-development-stack-lifecycle)
+— SEED-069#reliable-development-stack-lifecycle.
+
+`package.json` has `dev` and `dev:restart` but no stop, and `dev.pid` has twice
+named something other than the running stack: DD-203 below, and a stale
+`dev.pid` whose PID the OS had reused, recorded in DearDough under ODF-190
+(SEED-066#preserve-completed-speech, 2026-10-03): `dev:restart` failed on
+PID 597, reused by `accountsd`, and restoring Development took about 7 minutes.
+No `scripts/dev-*` or `scripts/development-*` change since 2026-10-02 addresses
+either symptom.
+
+### DD-203 — No repo command stops the Development stack, and its `dev.pid` did not name the running stack
+
+To stop the owner's stack for an owner-approved probe, the coordinator walked the
+process tree and called `stopOwnedDevelopmentProcessTree` from
+`scripts/development-owned-process-tree.mjs` through `node -e`.
+
+#### Occurrences
+
+- Execution: SEED-067#stacks-survive-other-builds / slice-plans/005-stacks-survive-other-builds / 4122c07c06; Timestamp: 2026-10-03T18:46+08:00 (slice 2 start); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.56.
+  - Evidence: the default checkout's `dev.pid` held `1034265`, which `ps` rejected as out of range, while the live stack was `scripts/development-services.mjs` (PID 10342, started 15:57). After `pnpm dev`, `dev.pid` named the new stack and stopping it took one call.
+  - Observed effect: about six extra tool calls to find and stop the stack; nothing broke.
+  - Inference: a `pnpm dev:stop` sharing `dev:restart`'s ownership checks would make owner-approved Development probes cheaper. How `dev.pid` came to hold a non-PID value is unknown. Qualified: one occurrence.
+
+### DD-159 — The Development stack failed to start on stale compiled backend classes in the default checkout
+
+`pnpm dev` from the default checkout failed with `No qualifying bean of type NotebookGitCutoverService`: `backend/build/classes` still held classes from before that service was removed. Deleting `backend/build/classes` let the next start succeed. Not part of the queued story’s promise: its cause is unknown.
+
+#### Occurrences
 
 - Execution: SEED-054#story-1 / `4f2f230505:.planning/slice-plans/011-book-reading-uat/PLAN.md` / 681768a71b; Timestamp: 2026-09-29T07:25:42+08:00; Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.46.
   - Evidence: `dev.log` "APPLICATION FAILED TO START" with the missing-bean message; `git grep NotebookGitCutoverService -- backend/src` found nothing; the next `pnpm dev` was healthy.
   - Observed effect: one failed start and a short diagnosis before the UAT setup could continue.
   - Inference: the Development start's incremental build did not drop classes whose sources were deleted. Qualified: cause not investigated further.
-- Investigation (2026-10-03, SEED-067#stacks-survive-other-builds slice 2): not reproduced. In the default checkout, a compiled `@Service` and its injecting consumer were deleted with the stack stopped, then `pnpm dev` started healthy and Gradle removed the stale class; the same held with a concurrent `classes --rerun-tasks` build and with a build-cache restore. Earlier linked-worktree probes (single, concurrent, after a failed compile) also removed the classes. No writer found; the cause remains unknown. Owner decides whether to keep watching or drop.
+- Investigation (2026-10-03, SEED-067#stacks-survive-other-builds slice 2): not reproduced. In the default checkout, a compiled `@Service` and its injecting consumer were deleted with the stack stopped, then `pnpm dev` started healthy and Gradle removed the stale class; the same held with a concurrent `classes --rerun-tasks` build and with a build-cache restore. Linked-worktree probes also removed the classes. No writer found; the cause remains unknown. Owner decides whether to keep watching or drop.
 
-### Open, not queued: Observing branch code in a held app stack
+## Open, not queued: Plans prescribe absence checks that Donut’s removal rule forbids
 
-Not queued: one occurrence whose cost was mostly one-time environment repair (see Priority). Related evidence not yet on main, recorded there under shared ODF-190: `origin/claude/keep-completed-speech-as-dictation-continues`
-at `cb4b71c8f4`, DearDough.md ODF-190 row — linked worktrees refuse the
-Development stack, so a real-service proof of branch code waited about
-30 minutes for the owner and detached the primary checkout onto branch code.
+Recurrence of resolved Donut finding DD-202 (not the DD-202 that became ODF-208),
+whose correction put the removal rule in always-loaded agent guidance
+(`CLAUDE.md` principle 7, `18b99b6424` and `52460a4077`, 2026-10-03). DD-205 happened the next day, so that correction did not reach
+slice planning. Shared Open Dough guidance keeps absence assertions when absence
+is the promise; the rule is Donut’s, so the correction lands in Donut.
 
-#### DD-161 — Real-book manual acceptance had no supported way to hold a disposable stack or run MinerU
+Not queued: two occurrences, each costing one assertion written and removed.
+It is the next candidate if it recurs.
 
-The MinerU version part is resolved: every install hint now names `pip install 'mineru[pipeline]==3.4.5' six` on Python 3.10–3.13. Still open: no repo command keeps a disposable E2E stack up for manual use, and a `.venv-mineru` whose Python lived in a garbage-collected Nix store path must be rebuilt by hand.
+### DD-205 — A plan's proof named an absence check that the project's removal rule forbids
 
-The plan's manual slice needed real MinerU and a running app to `/attach` real PDFs through the CLI. `.venv-mineru`'s Python pointed into a garbage-collected Nix store path, the unpinned `pip install 'mineru[pipeline]'` in the repo's docstrings installs MinerU 4.x (no `pipeline` extra, no `mineru.cli.common`), and no repo command keeps a disposable E2E stack up without Cypress, so the agent wrote a temporary `hold-stack.mjs` around `runE2eInteractive`.
+A removal slice's proof listed "no Responses API call is made" for the deleted
+model rewrite. CLAUDE.md principle 7 says a removal leaves no check that the
+removed thing is absent, so the check was written by one agent and deleted by
+the next.
 
-##### Occurrences
+#### Occurrences
 
-- Execution: SEED-059#story-3 / slice-plans/051-pdf-layout-from-bookmarks / 946e2a70e3; Timestamp: 2026-09-29 (slice 6, after 6f36cb2952); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.46.
-  - Evidence: slice 6 agent report (1,692 s, about 197k tokens, 96 tool uses); plan premise "`.venv-mineru/bin` has no `python`"; venv rebuilt with Homebrew Python 3.12, `mineru[pipeline]==3.4.5` and `six`; `cli/python/mineru_book_outline.py` and `regenerate_mineru_output_for_refactoring.sh` still say unpinned.
-  - Observed effect: about 28 minutes for one manual slice, most of it environment repair and stack scaffolding rather than observation.
-  - Inference: much of the cost was necessary once; a pinned MinerU install and a documented "hold a disposable stack" command would make the next real-book acceptance cheaper. Donut tooling, so correction belongs to Donut, not shared guidance.
+- Execution: SEED-066#keep-every-transcribed-sentence / `9ad1cedcc0:.planning/slice-plans/008-keep-every-transcribed-sentence/PLAN.md` / d68937a0d2
+  - Timestamp: 2026-10-04 (slice 2 implementation and refactor, before b233c0e7f3)
+  - Tool: Claude Code
+  - Model: claude-opus-5-5
+  - Open Dough release: 0.3.56 (execution-checkout VERSION, unchanged during execution)
+  - Evidence: plan 008 slice 2 Proof "no Responses API call is made"; the slice 2 implementer added `verify(officialClient, never()).responses()` to `AiAudioControllerTests`; the refactor report removed it citing principle 7; the coordinator recorded the drop in the plan (b233c0e7f3).
+  - Observed effect: one assertion written and removed, and a plan proof item the delivered tests do not carry. Small cost.
+  - Inference: when planning a removal, check each proof item against the removal rule; prove the replacement behavior instead of the absence. Qualified: one execution.
 
-### Open, not queued: Stopping the Development stack
-
-#### DD-203 — No repo command stops the Development stack, and its `dev.pid` did not name the running stack
-
-`package.json` has `dev` and `dev:restart` but no stop. To stop the owner's stack for an owner-approved probe, the coordinator walked the process tree and called `stopOwnedDevelopmentProcessTree` from `scripts/development-owned-process-tree.mjs` through `node -e`.
-
-##### Occurrences
-
-- Execution: SEED-067#stacks-survive-other-builds / slice-plans/005-stacks-survive-other-builds / 4122c07c06; Timestamp: 2026-10-03T18:46+08:00 (slice 2 start); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.56.
-  - Evidence: the default checkout's `dev.pid` held `1034265`, which `ps` rejected as out of range, while the live stack was `scripts/development-services.mjs` (PID 10342, started 15:57). After `pnpm dev`, `dev.pid` named the new stack and stopping it took one call.
-  - Observed effect: about six extra tool calls to find and stop the stack; nothing broke.
-  - Inference: a `pnpm dev:stop` sharing `dev:restart`'s ownership checks would make owner-approved Development probes cheaper. How `dev.pid` came to hold a non-PID value is unknown. The stale-`dev.pid` restart failure on the unlanded branch below was a reused PID, so this is a different symptom. Qualified: one occurrence.
-
-## Review — 2026-10-03
-
-Reviewed `DearDough.md` at `857425b04a`, then again after
-`origin/claude/keep-note-titles-under-the-author-s-control` landed (`afc9f1163d`).
-
-### Moved from DearDough
-
-- DD-202 (open; above). The removal rule is the owner’s Donut convention; it is
-  in no Donut guidance (`AGENTS.md`, `CLAUDE.md`, `.agents/`), and shared
-  Open Dough guidance keeps absence assertions when absence is the promise. So
-  the correction lands in Donut.
-- DD-200 (resolved; below). Donut’s scripts own the shared `backend/build` output
-  and its documented concurrency (`docs/worktree-backend-tests.md` covers only
-  database isolation), so the correction lands in Donut.
-- DD-177 — the plan put API regeneration in a later slice than the controller
-  change that `RobotsTests.openApiDocsMatchCommittedYaml` requires
-  (SEED-062#story-1, plan 006). Donut’s generation trigger, so Donut’s finding.
-  Resolved by `c3a7e2f826`, which says in the `generate-api-client` skill to
-  regenerate in the same change as the controller edit; no later occurrence.
-  Removed here; Git history keeps its evidence.
-
-### Kept in DearDough
-
-All other entries’ corrections land in shared guidance, scripts or the host.
-The Donut facts in them behaved as documented:
-
-- ODF-100: `frontend/tsconfig.json` includes `tests/**`, so the `frontend`
-  skill’s plain `vue-tsc --noEmit` covers test files; the agents piped it
-  into `tail`.
-- ODF-150, ODF-190, ODF-074: Donut specs, viewports and the agent map were the
-  facts that planning or proof selection did not check. ODF-150’s phone
-  viewport failure was a fragile assertion, repaired in `5206b08370`.
-- ODF-187: its unfailable-case half is shared; its absence-check half is
-  related evidence for DD-202 above.
-- ODF-152, ODF-189, ODF-195: the file-size rule is in the shared
-  `dough-post-change-refactor` references.
-- DD-176: the shared `dough-execute-plan` wrap-up requires a fresh refactor
-  agent per slice; Donut’s `CLAUDE.md` only mirrors it.
-- DD-174, DD-175, DD-201 and the CI observer entries: shared delivery and
-  observation scripts. DD-178, DD-199: shared refactor delegation.
-
-### Pending on an unlanded branch
-
-`origin/claude/keep-completed-speech-as-dictation-continues` (`cb4b71c8f4`)
-also allocates DD-202, for a different finding (a CI observer worker exit);
-renumber it when that branch lands. Its stale `dev.pid` restart failure is
-Donut tooling; record it here if it recurs.
-
-### Priority
-
-A finding group is queued only for high impact or high frequency, with impact
-ranked first.
-
-Not queued: DD-159. An investigation on 2026-10-03 did not reproduce it and
-found no writer, so there is nothing to fix yet. The owner has not yet decided
-whether to keep watching it or drop it.
-
-Not queued: DD-161. Its remaining part is one occurrence; most of its
-28 minutes was rebuilding the MinerU environment, whose version part is
-fixed. The owner already declined to queue that remainder on 2026-09-29. The
-related 30-minute owner wait on the unlanded branch was recorded as shared
-planning feedback (ODF-190), not as Donut tooling.
-
-### Resolved findings
-
-Recheck these when a new occurrence arrives; none is contradicted today:
-
-- DD-073 — frontend proof typechecks (`7b1d80b4e8`).
-- DD-103 — E2E runner backend race (`d86864023c`).
-- DD-200 — backend test reruns in a linked worktree restarted a batch E2E stack (`4122c07c06`).
-- DD-121 — commit hook and other slices’ unstaged files (`574d61b52c`,
-  `c76f69b62e`, `120753a097`).
-- DD-165 — script tests coupled to a live spec name (`7580fceccc`).
-- DD-177 — API regeneration in the controller’s slice (`c3a7e2f826`).
-- DD-202 — removal rule in always-loaded agent guidance (`18b99b6424`,
-  `52460a4077`); DD-142 stays with shared ODF-187 in DearDough.
-
-### Reopening
+## Reopening
 
 Reopen a project finding when a new occurrence contradicts its actual correction,
 link that evidence to the existing story or correction if still active, and

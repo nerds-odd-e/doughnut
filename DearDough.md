@@ -254,23 +254,6 @@ dependencies, and the mocked `useRecallData` is in-process state with setters.
   - Observed effect: about 107 minutes and about 630k tokens of reproduction-agent work (1,465 s + 674 s + 4,256 s by the hand-back records), three owner round-trips, and Docker cleanup, before a fix that needed no reproduction.
   - Inference: when refining a story about a failing test mechanism, check the failing mechanism against the project's test rules first. A mechanism the rules forbid is a removal story, not a reproduction search. Qualified: one execution. The reproduction search was owner-approved at each round, so the cost comes from how the story was framed, not from a broken execution step.
 
-## DD-205 — A plan's proof named an absence check that the project's removal rule forbids
-
-A removal slice's proof listed "no Responses API call is made" for the deleted
-model rewrite. CLAUDE.md principle 7 says a removal leaves no check that the
-removed thing is absent, so the check was written by one agent and deleted by
-the next.
-
-### Occurrences
-- Execution: SEED-066#keep-every-transcribed-sentence / `9ad1cedcc0:.planning/slice-plans/008-keep-every-transcribed-sentence/PLAN.md` / d68937a0d2
-  - Timestamp: 2026-10-04 (slice 2 implementation and refactor, before b233c0e7f3)
-  - Tool: Claude Code
-  - Model: claude-opus-5-5
-  - Open Dough release: 0.3.56 (execution-checkout VERSION, unchanged during execution)
-  - Evidence: plan 008 slice 2 Proof "no Responses API call is made"; the slice 2 implementer added `verify(officialClient, never()).responses()` to `AiAudioControllerTests`; the refactor report removed it citing principle 7; the coordinator recorded the drop in the plan (b233c0e7f3).
-  - Observed effect: one assertion written and removed, and a plan proof item the delivered tests do not carry. Small cost.
-  - Inference: when planning a removal, check each proof item against the removal rule; prove the replacement behavior instead of the absence. Qualified: one execution.
-
 ## DD-206 — A slice plan told the implementer to replace a push/replace assertion with a current-location check, which drops the replace
 
 The plan said to assert the router's current location instead of a captured
