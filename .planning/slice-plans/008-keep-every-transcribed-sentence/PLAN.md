@@ -70,7 +70,8 @@ Commands (from `.agents/agent-map.md`):
 
 ### 1. Dictated passages join existing text with one space
 Type: Behavior
-Status: planned
+Status: done
+Accepted proof: `env -u NODE_ENV pnpm frontend:test` over the preservation, typing-while-pending, processing, recording, and advanced-options NoteAudioTools specs and `tests/store/noteStore.spec.ts` (48 passed), plus `vue-tsc --noEmit`. The join lives in `NoteTextEditing.appendDictatedText`; the open editor exposes `changeDraft`. The e2e expected body was updated but runs only in CI.
 Proof: `NoteAudioTools.preservation.spec.ts`, the typing-while-pending specs, and `tests/store/noteStore.spec.ts` assert exact saved bodies; fixtures supply passages without leading whitespace.
 
 Behavior: a note body or open editor draft that does not end in whitespace →

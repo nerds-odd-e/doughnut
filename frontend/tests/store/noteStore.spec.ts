@@ -115,7 +115,7 @@ describe("noteStore", () => {
       )
 
       await noteStore.appendDictatedText(original.id, {
-        dictatedText: " New passage.",
+        dictatedText: "New passage.",
       })
 
       expect(showNoteSpy).toHaveBeenCalledWith({ path: { note: original.id } })

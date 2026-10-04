@@ -148,7 +148,7 @@ describe("NoteAudioTools audio processing", () => {
     })
     expect(updateContentMock).toHaveBeenCalledWith({
       path: { note: note.id },
-      body: { content: `${loadedBody}text` },
+      body: { content: `${loadedBody} text` },
     })
   })
 })

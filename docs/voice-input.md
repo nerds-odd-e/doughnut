@@ -7,9 +7,8 @@ Instructions and full-screen editing. Dictation writes only to the note body.
 ## Adding dictated text to a note
 
 Audio processing returns `DictatedText.dictatedText`: only the new passage,
-formatted as Markdown, including any leading whitespace needed to join it to
-the note. Existing content is context only; the model is instructed never to
-repeat or revise it. Audio responses do not use the conversation tool's
+formatted as Markdown. Existing content is context only; the model is
+instructed never to repeat or revise it. Audio responses do not use the conversation tool's
 `NoteContentCompletion`, which continues to replace complete note content.
 
 The client retains the originating note id. It reads that note's current store
@@ -18,10 +17,13 @@ context, prefixed with `...` when truncated. The full body stays in the store;
 the excerpt never becomes the saved replacement.
 
 Each returned passage is appended deterministically to the originating note's
-current body and saved through the ordinary content PATCH. Existing characters
-remain unchanged, an empty body becomes the passage, and successive additions
-follow earlier additions once. Navigating to another note does not redirect the
-result. The normal content-edit undo restores the prior body.
+current body and saved through the ordinary content PATCH. One join rule
+serves both the saved body and an open editor's draft: text that does not end
+in whitespace is followed by one space and then the passage, text already
+ending in whitespace is followed directly by the passage, and an empty body
+becomes the passage alone. Existing characters remain unchanged, and
+successive additions follow earlier additions once. Navigating to another note
+does not redirect the result. The normal content-edit undo restores the prior body.
 
 Timed chunks, pause flushes (after more than 3 s of silence, once per pause)
 and Flush clicks are processed mid-speech. Mid-speech processing never writes
@@ -33,14 +35,14 @@ transcription do not count as a segment. A lone segment writes nothing and all
 its audio is kept. Only Stop writes everything that remains. Dictated text,
 once written, is never revised: holding back the unfinished sentence replaces
 revising it. Audio that is entirely silent is not sent.
-The model controls transcription quality and passage whitespace. When a body
-editor for the note is open, the passage is added to the end of that editor's
-draft, including unsaved typing, and that draft is saved right away; otherwise,
-including while an image upload or note removal is pausing the editor, it is
-added to the note's saved body.
+The model controls transcription quality. When a body editor for the note is
+open, the passage is joined to the end of that editor's draft, including
+unsaved typing, and that draft is saved right away; otherwise, including while
+an image upload or note removal is pausing the editor, it is joined to the
+note's saved body.
 
-The mounted audio preservation tests assert exact saved content for long and
-empty bodies, repeated additions, originating-note targeting, and undo. The
+The mounted audio preservation tests assert exact saved content for long,
+empty, and whitespace-ending bodies, repeated additions, originating-note targeting, and undo. The
 mocked recording journey supplies only new text and observes the original body
 plus that addition. The real-OpenAI journey checks both its original text and
 the dictated passage.
