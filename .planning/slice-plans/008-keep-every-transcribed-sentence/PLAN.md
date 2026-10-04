@@ -88,7 +88,8 @@ today." here and to its final text in slice 2.
 
 ### 2. The written passage is the transcription's own text
 Type: Behavior
-Status: planned
+Status: done
+Accepted proof: full `pnpm backend:test_only` (`AiAudioControllerTests` mid-speech/Stop/lone-segment cases, `SRTProcessorTests` text extraction with and without index lines), `env -u NODE_ENV pnpm frontend:test tests/notes/ tests/store/noteStore.spec.ts` (282 passed), `vue-tsc --noEmit`, and `record_live_audio.feature` run locally (1 passing). The "no Responses API call" assertion was dropped under CLAUDE.md principle 7 (no absence checks).
 Proof: `AiAudioControllerTests` (three-segment mid-speech response is the first two segments' text joined by one space with the end position of the second; Stop writes all segments; no Responses API call is made), `SRTProcessorTests`, and `record_live_audio.feature` saving "This is class 1. its talk about dada struct day.".
 
 Behavior: an audio chunk is uploaded → the response's passage is the text of
@@ -134,4 +135,5 @@ current behavior.
 
 ## Learnings
 
-None yet.
+- The e2e transcription mock wrapped the SRT in a JSON body; the rewrite hid it. `stubTranscription` now returns plain-text SRT, as Whisper does for `response_format=srt`.
+- `SRTProcessor` reads a segment's end timestamp from its second line, so a segment without an index line (the mocked e2e transcript) yields an empty end timestamp. Real Whisper SRT carries index lines; left unchanged.

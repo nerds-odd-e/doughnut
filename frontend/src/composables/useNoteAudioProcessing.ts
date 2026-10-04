@@ -43,7 +43,7 @@ export function useNoteAudioProcessing(
         throw new Error("Failed to process audio")
       }
 
-      await noteStore.appendDictatedText(noteId, response.completionFromAudio)
+      await noteStore.appendDictatedText(noteId, response.dictatedText)
 
       return response.endTimestamp
     } catch (error) {

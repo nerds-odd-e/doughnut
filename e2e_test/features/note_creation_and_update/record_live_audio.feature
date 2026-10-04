@@ -11,9 +11,6 @@ Feature: Record live audio onto a note
       its talk about dada struct day.
 
       """
-    And the OpenAI completion service will return the following response for the transcription to text request:
-      | request contains                | response                                                          |
-      | its talk about dada struct day. | Let's talk about data structure today.                           |
     And the browser is mocked to give permission to record audio
 
   @mockBrowserTime
@@ -23,5 +20,5 @@ Feature: Record live audio onto a note
     When it is 2 minutes later in the browser
     Then the note content on the current page should be "This is class 1."
     When I stop recording audio
-    Then the note content on the current page should be "This is class 1. Let's talk about data structure today."
-    And the note "DS lecture/Data Structure Lecture" in Donut should have content "This is class 1. Let's talk about data structure today."
+    Then the note content on the current page should be "This is class 1. its talk about dada struct day."
+    And the note "DS lecture/Data Structure Lecture" in Donut should have content "This is class 1. its talk about dada struct day."

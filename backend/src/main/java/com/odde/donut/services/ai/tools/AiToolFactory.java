@@ -133,25 +133,6 @@ Please assume the role of a Memory Assistant, which involves helping me recall a
     return new InstructionAndSchema(messageBody, GeneratedMcq.class);
   }
 
-  public static InstructionAndSchema transcriptionToTextAiTool(String transcriptionFromAudio) {
-    return new InstructionAndSchema(
-        """
-            You convert SRT-format audio transcriptions into coherent paragraphs with proper punctuation, formatted in Markdown. Guidelines:
-              •	Return only the newly dictated text in the provided schema, including any whitespace or a new line needed at the beginning to append it to the existing note.
-              •	Existing note content is context only. Never repeat or revise it in the result.
-              •	Do not translate the text unless requested.
-              • Do not interpret the text. Do not use reported speech.
-              •	Leave unclear parts unchanged.
-              •	Do not add any information not present in the transcription.
-              •	The transcription may be truncated; do not add new lines or whitespace at the end.
-
-             Here's the new transcription from audio:
-             ------------
-            """
-            + transcriptionFromAudio,
-        DictatedText.class);
-  }
-
   public static InstructionAndSchema generateNoteRefinementLayoutAiTool(
       NoteRefinementQuestionContextDTO questionContext) {
     return NoteRefinementAiToolFactory.generateNoteRefinementLayoutAiTool(questionContext);

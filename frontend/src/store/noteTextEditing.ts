@@ -1,7 +1,4 @@
-import type {
-  DictatedText,
-  NoteContentCompletion,
-} from "@generated/donut-backend-api"
+import type { NoteContentCompletion } from "@generated/donut-backend-api"
 import { changeOpenNoteContentDraft } from "@/composables/noteContentMutationBarrier"
 import { refreshSidebarStructuralListings } from "@/components/notes/sidebarStructuralRefresh"
 import { updateTextContentRequest } from "./noteRequests"
@@ -68,8 +65,7 @@ export default class NoteTextEditing {
     await this.updateTextField(noteId, "edit content", value.content)
   }
 
-  async appendDictatedText(noteId: Donut.ID, value?: DictatedText) {
-    const passage = value?.dictatedText
+  async appendDictatedText(noteId: Donut.ID, passage?: string) {
     if (!passage) return
     const join = (text: string) =>
       text === "" || /\s$/.test(text) ? text + passage : `${text} ${passage}`

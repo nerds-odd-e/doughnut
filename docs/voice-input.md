@@ -6,10 +6,12 @@ Instructions and full-screen editing. Dictation writes only to the note body.
 
 ## Adding dictated text to a note
 
-Audio processing returns `DictatedText.dictatedText`: only the new passage,
-formatted as Markdown. Existing content is context only; the model is
-instructed never to repeat or revise it. Audio responses do not use the conversation tool's
-`NoteContentCompletion`, which continues to replace complete note content.
+Audio processing returns `dictatedText`: the passage for the uploaded chunk.
+The passage is the transcription's own text, as is: the text of each written
+transcription segment (the lines after its timestamp line), in order, joined
+by one space. Nothing is left out, added, or reworded. Audio responses do not
+use the conversation tool's `NoteContentCompletion`, which continues to
+replace complete note content.
 
 The client retains the originating note id. It reads that note's current store
 body, loading its realm when absent, and sends only the last 500 characters as
@@ -35,7 +37,7 @@ transcription do not count as a segment. A lone segment writes nothing and all
 its audio is kept. Only Stop writes everything that remains. Dictated text,
 once written, is never revised: holding back the unfinished sentence replaces
 revising it. Audio that is entirely silent is not sent.
-The model controls transcription quality. When a body editor for the note is
+The transcription service controls transcription quality. When a body editor for the note is
 open, the passage is joined to the end of that editor's draft, including
 unsaved typing, and that draft is saved right away; otherwise, including while
 an image upload or note removal is pausing the editor, it is joined to the
@@ -43,8 +45,8 @@ note's saved body.
 
 The mounted audio preservation tests assert exact saved content for long,
 empty, and whitespace-ending bodies, repeated additions, originating-note targeting, and undo. The
-mocked recording journey supplies only new text and observes the original body
-plus that addition. The real-OpenAI journey checks both its original text and
+mocked recording journey supplies a transcription and observes the original
+body, one space, and the transcription's text. The real-OpenAI journey checks both its original text and
 the dictated passage.
 
 ## Observation boundary

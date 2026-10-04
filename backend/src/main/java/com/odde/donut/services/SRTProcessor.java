@@ -1,5 +1,8 @@
 package com.odde.donut.services;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -8,38 +11,34 @@ public class SRTProcessor {
   @AllArgsConstructor
   public static class SRTProcessingResult {
     private String processedSRT;
+    private String text;
     private String endTimestamp;
   }
 
   public SRTProcessingResult process(String rawSRT, boolean midSpeech) {
+    List<String> segments = Arrays.asList(rawSRT.strip().split("\n\n"));
     if (!midSpeech) {
-      return new SRTProcessingResult(rawSRT, extractLastTimestamp(rawSRT));
+      return new SRTProcessingResult(
+          rawSRT, textOf(segments), extractTimestampFromSegment(segments.getLast()));
     }
 
-    String[] segments = rawSRT.strip().split("\n\n");
-    if (segments.length <= 1) {
-      return new SRTProcessingResult("", "00:00:00,000");
+    if (segments.size() <= 1) {
+      return new SRTProcessingResult("", "", "00:00:00,000");
     }
 
-    // Remove the last segment and join the rest
-    StringBuilder processedSRT = new StringBuilder();
-    for (int i = 0; i < segments.length - 1; i++) {
-      if (i > 0) {
-        processedSRT.append("\n\n");
-      }
-      processedSRT.append(segments[i]);
-    }
-
+    List<String> written = segments.subList(0, segments.size() - 1);
     return new SRTProcessingResult(
-        processedSRT.toString(), extractTimestampFromSegment(segments[segments.length - 2]));
+        String.join("\n\n", written),
+        textOf(written),
+        extractTimestampFromSegment(written.getLast()));
   }
 
-  private String extractLastTimestamp(String srt) {
-    String[] segments = srt.split("\n\n");
-    if (segments.length == 0) {
-      return "";
-    }
-    return extractTimestampFromSegment(segments[segments.length - 1]);
+  private static String textOf(List<String> segments) {
+    return segments.stream().map(SRTProcessor::segmentText).collect(Collectors.joining(" "));
+  }
+
+  private static String segmentText(String segment) {
+    return segment.replaceFirst("(?s)\\A.*?-->[^\\n]*", "").strip().replace('\n', ' ');
   }
 
   private String extractTimestampFromSegment(String segment) {

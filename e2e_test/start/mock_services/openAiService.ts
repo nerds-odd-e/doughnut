@@ -113,14 +113,9 @@ const openAiService = (
         .withMethod(HttpMethod.POST)
         .withHeader('Content-Type', 'multipart/form-data')
 
-      return serviceMocker.mockWithPredicates(
-        [predicate],
-        [
-          {
-            text: transcript,
-          },
-        ]
-      )
+      return serviceMocker.mockWithPredicates([predicate], [transcript], {
+        'Content-Type': 'text/plain',
+      })
     },
   }
 }

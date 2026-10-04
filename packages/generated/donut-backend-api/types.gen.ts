@@ -777,12 +777,8 @@ export type AudioUploadDto = {
     previousNoteContentToAppendTo?: string;
 };
 
-export type DictatedText = {
-    dictatedText: string;
-};
-
 export type TextFromAudioWithCallInfo = {
-    completionFromAudio?: DictatedText;
+    dictatedText?: string;
     rawSRT?: string;
     endTimestamp?: string;
 };
