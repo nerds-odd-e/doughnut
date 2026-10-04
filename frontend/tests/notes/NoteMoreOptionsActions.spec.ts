@@ -36,7 +36,6 @@ describe("NoteMoreOptionsActions keyboard shortcut", () => {
   let wrapper: VueWrapper<any> | undefined
 
   beforeEach(() => {
-    usePopups().popups.register({ popupInfo: [] })
     mockSdkService(NoteController, "getAiContextMarkdown", aiMarkdownStub)
     mockSdkService(NoteController, "trashNote", undefined)
   })

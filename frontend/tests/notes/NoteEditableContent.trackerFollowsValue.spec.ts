@@ -8,10 +8,10 @@ import {
   NoteController,
 } from "@generated/donut-backend-api/sdk.gen"
 import { advanceNoteContentSaveDebounce } from "@tests/helpers/noteContentDebounceTestSupport"
+import { pendingPopups } from "@tests/helpers/popupStackTestSupport"
 import {
   mountNoteEditableContent,
   setTextareaValue,
-  setupPopupsMock,
   setupUpdateNoteContentMock,
 } from "./noteEditableContentTestSupport"
 import {
@@ -22,21 +22,16 @@ import {
   setListItemValue,
 } from "../components/form/propertyValueDialogTestDom"
 
-vi.mock("@/components/commons/Popups/usePopups")
-
 describe("NoteEditableContent: a tracked single value that becomes a list", () => {
   const noteId = 1
   const singleValue = `---\nexample of: "[[run]]"\n---\n\nBody.`
   let followSpy: ReturnType<typeof mockSdkService>
   let updateNoteContentSpy: ReturnType<typeof setupUpdateNoteContentMock>
-  let confirmMock: ReturnType<typeof vi.fn<(msg: string) => Promise<boolean>>>
 
   beforeEach(() => {
     vi.resetAllMocks()
     vi.useFakeTimers()
     updateNoteContentSpy = setupUpdateNoteContentMock()
-    confirmMock = vi.fn<(msg: string) => Promise<boolean>>()
-    setupPopupsMock(vi.fn().mockResolvedValue(null), { confirm: confirmMock })
     mockSdkService(
       NoteController,
       "getNoteInfo",
@@ -82,7 +77,7 @@ describe("NoteEditableContent: a tracked single value that becomes a list", () =
 
     expect(followSpy).toHaveBeenCalledOnce()
     expect(followSpy).toHaveBeenCalledWith(followedTo("[[run]]"))
-    expect(confirmMock).not.toHaveBeenCalled()
+    expect(pendingPopups()).toHaveLength(0)
   })
 
   it("moves nothing when the former value is not in the new list", async () => {

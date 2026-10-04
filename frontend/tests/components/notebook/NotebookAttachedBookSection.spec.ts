@@ -15,9 +15,6 @@ import {
 
 describe("NotebookAttachedBookSection", () => {
   afterEach(() => {
-    while (usePopups().popups.peek()?.length) {
-      usePopups().popups.done(false)
-    }
     vi.restoreAllMocks()
     teardownGlobalClientForTesting()
   })

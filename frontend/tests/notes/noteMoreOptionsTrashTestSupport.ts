@@ -7,7 +7,6 @@ import NoteMoreOptionsForm from "@/components/notes/widgets/NoteMoreOptionsForm.
 import { useNoteStore } from "@/store/noteStore"
 import GlobalApiLoadingModal from "@tests/helpers/GlobalApiLoadingModal"
 import { teardownGlobalClientForTesting } from "@/managedApi/clientSetup"
-import usePopups from "@/components/commons/Popups/usePopups"
 import { wikiLinkFromAuthoredToken } from "@/utils/wikiLinkMarkup"
 import makeMe from "donut-test-fixtures/makeMe"
 import helper, { mockSdkService } from "@tests/helpers"
@@ -84,7 +83,6 @@ export function setupNoteMoreOptionsTrashFormTests() {
   })
 
   beforeEach(() => {
-    usePopups().popups.register({ popupInfo: [] })
     mockToast.error.mockClear()
     mockToast.warning.mockClear()
     trashNoteSpy = mockSdkService(

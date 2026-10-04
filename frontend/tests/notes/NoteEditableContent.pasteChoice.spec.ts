@@ -9,13 +9,10 @@ import {
   pasteIntoTextarea,
   richQuillEditorEl,
   richQuillInstance,
-  setupPopupsMock,
   setupUpdateNoteContentMock,
   textareaEl,
   useOriginalText,
 } from "./noteEditableContentTestSupport"
-
-vi.mock("@/components/commons/Popups/usePopups")
 
 const convertedHtml = "<p>Styled text</p>"
 const originalMarkdown = "**RAW markdown**"
@@ -24,7 +21,6 @@ describe("NoteEditableContent paste choice", () => {
   beforeEach(() => {
     vi.resetAllMocks()
     setupUpdateNoteContentMock()
-    setupPopupsMock(vi.fn().mockResolvedValue(null))
   })
 
   afterEach(() => {

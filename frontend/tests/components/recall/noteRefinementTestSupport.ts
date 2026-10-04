@@ -9,7 +9,6 @@ import makeMe from "donut-test-fixtures/makeMe"
 import helper, { mockSdkService } from "@tests/helpers"
 import GlobalApiLoadingModal from "@tests/helpers/GlobalApiLoadingModal"
 import RenderingHelper from "@tests/helpers/RenderingHelper"
-import usePopups from "@/components/commons/Popups/usePopups"
 import { teardownGlobalClientForTesting } from "@/managedApi/clientSetup"
 import type {
   Note,
@@ -90,10 +89,6 @@ export function setupNoteRefinementTests() {
     document.body.innerHTML = ""
     vi.clearAllMocks()
     teardownGlobalClientForTesting()
-    const popups = usePopups()
-    while (popups.popups.peek().length) {
-      popups.popups.done(false)
-    }
   })
 }
 

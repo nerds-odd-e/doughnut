@@ -82,10 +82,6 @@ export function setupAssimilationPanelTests() {
   afterEach(() => {
     document.body.innerHTML = ""
     vi.clearAllMocks()
-    const popups = usePopups()
-    while (popups.popups.peek().length) {
-      popups.popups.done(false)
-    }
   })
 
   beforeEach(() => {

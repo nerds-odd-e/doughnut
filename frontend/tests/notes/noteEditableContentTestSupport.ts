@@ -1,12 +1,10 @@
 import { TextContentController } from "@generated/donut-backend-api/sdk.gen"
 import NoteEditableContent from "@/components/notes/core/NoteEditableContent.vue"
-import usePopups from "@/components/commons/Popups/usePopups"
 import { flushPromises, type VueWrapper } from "@vue/test-utils"
 import type { ComponentPublicInstance } from "vue"
 import type Quill from "quill"
 import makeMe from "donut-test-fixtures/makeMe"
 import helper, { mockSdkService } from "@tests/helpers"
-import { vi } from "vitest"
 
 /** Mounts an editable note (Markdown mode unless overridden) and lets it settle. */
 export async function mountNoteEditableContent(
@@ -146,23 +144,4 @@ export function setupUpdateNoteContentMock() {
     "updateNoteContent",
     makeMe.aNoteRealm.please()
   )
-}
-
-export function setupPopupsMock(
-  // biome-ignore lint/suspicious/noExplicitAny: Mock type for testing
-  mockPopupsOptions: any,
-  overrides?: {
-    confirm?: (msg: string) => Promise<boolean>
-  }
-) {
-  vi.mocked(usePopups).mockReturnValue({
-    popups: {
-      options: mockPopupsOptions,
-      alert: vi.fn(),
-      confirm: overrides?.confirm ?? vi.fn(),
-      done: vi.fn(),
-      register: vi.fn(),
-      peek: vi.fn(),
-    },
-  })
 }

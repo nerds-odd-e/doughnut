@@ -14,12 +14,9 @@ import {
   blurTextarea,
   mountNoteEditableContent,
   setTextareaValue,
-  setupPopupsMock,
   setupUpdateNoteContentMock,
   textareaEl,
 } from "./noteEditableContentTestSupport"
-
-vi.mock("@/components/commons/Popups/usePopups")
 
 describe("NoteEditableContent save response", () => {
   const noteId = 1
@@ -28,7 +25,6 @@ describe("NoteEditableContent save response", () => {
     vi.resetAllMocks()
     vi.useFakeTimers()
     setupUpdateNoteContentMock()
-    setupPopupsMock(vi.fn().mockResolvedValue(null))
   })
 
   afterEach(() => {

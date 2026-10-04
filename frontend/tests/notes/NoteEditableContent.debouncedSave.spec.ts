@@ -8,26 +8,24 @@ import {
 } from "@generated/donut-backend-api/sdk.gen"
 import { advanceNoteContentSaveDebounce } from "@tests/helpers/noteContentDebounceTestSupport"
 import {
+  answerPopup,
+  onlyPendingPopup,
+} from "@tests/helpers/popupStackTestSupport"
+import {
   mountNoteEditableContent,
   setTextareaValue,
-  setupPopupsMock,
   setupUpdateNoteContentMock,
   textareaEl,
 } from "./noteEditableContentTestSupport"
 
-vi.mock("@/components/commons/Popups/usePopups")
-
 describe("NoteEditableContent debounced save", () => {
   const noteId = 1
   let updateNoteContentSpy: ReturnType<typeof setupUpdateNoteContentMock>
-  let confirmMock: ReturnType<typeof vi.fn<(msg: string) => Promise<boolean>>>
 
   beforeEach(() => {
     vi.resetAllMocks()
     vi.useFakeTimers()
     updateNoteContentSpy = setupUpdateNoteContentMock()
-    confirmMock = vi.fn<(msg: string) => Promise<boolean>>()
-    setupPopupsMock(vi.fn().mockResolvedValue(null), { confirm: confirmMock })
   })
 
   afterEach(() => {
@@ -156,9 +154,9 @@ topic: Japanese
         "updatePropertyKey",
         undefined
       )
-      confirmMock.mockResolvedValueOnce(true)
     })
 
+    /** Edits the tracked property, confirms the prompt, and returns that prompt. */
     async function editTrackedProperty(edited: string) {
       const wrapper = await mountNoteEditableContent({
         noteId,
@@ -166,27 +164,38 @@ topic: Japanese
       })
       await setTextareaValue(wrapper, edited)
       await advanceNoteContentSaveDebounce()
+      const confirmation = onlyPendingPopup()
+      await answerPopup(true)
       expectSaved(edited)
       wrapper.unmount()
+      return confirmation
     }
 
     it("hard-deletes the tracker and saves when the user confirms removing a tracked property", async () => {
-      await editTrackedProperty("---\n---\n\nWorkshop body.")
-
-      expect(confirmMock).toHaveBeenCalledWith(
-        'Property "topic" has a memory tracker. Deleting it will also delete that tracker. Continue?'
+      const confirmation = await editTrackedProperty(
+        "---\n---\n\nWorkshop body."
       )
+
+      expect(confirmation).toMatchObject({
+        type: "confirm",
+        message:
+          'Property "topic" has a memory tracker. Deleting it will also delete that tracker. Continue?',
+      })
       expect(deleteSpy).toHaveBeenCalledWith({
         path: { memoryTracker: tracker.id },
       })
     })
 
     it("updates the tracker property key and saves when the user confirms renaming", async () => {
-      await editTrackedProperty("---\nsubject: training\n---\n\nWorkshop body.")
-
-      expect(confirmMock).toHaveBeenCalledWith(
-        'Property "topic" has a memory tracker. Renaming it to "subject" will update the tracker. Continue?'
+      const confirmation = await editTrackedProperty(
+        "---\nsubject: training\n---\n\nWorkshop body."
       )
+
+      expect(confirmation).toMatchObject({
+        type: "confirm",
+        message:
+          'Property "topic" has a memory tracker. Renaming it to "subject" will update the tracker. Continue?',
+      })
       expect(updatePropertyKeySpy).toHaveBeenCalledWith({
         path: { memoryTracker: tracker.id },
         body: { propertyKey: "subject" },

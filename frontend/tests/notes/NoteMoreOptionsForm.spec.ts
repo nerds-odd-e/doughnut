@@ -5,7 +5,6 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import makeMe from "donut-test-fixtures/makeMe"
 import helper, { mockSdkService } from "@tests/helpers"
 import RenderingHelper from "@tests/helpers/RenderingHelper"
-import usePopups from "@/components/commons/Popups/usePopups"
 import { createRouter, createWebHistory } from "vue-router"
 import routes from "@/routes/routes"
 import { useAssimilationView } from "@/composables/useAssimilationView"
@@ -35,7 +34,6 @@ afterEach(() => {
 beforeEach(() => {
   useAssimilationView().dismiss()
   useNoteToolbarPanel().close()
-  usePopups().popups.register({ popupInfo: [] })
   setupGlobalClient(apiStatus)
   mockToast.error.mockClear()
   mockToast.warning.mockClear()

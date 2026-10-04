@@ -84,7 +84,7 @@ that reason.
 
 ### 1. NoteEditableContent specs answer the real popup stack
 Type: Structure
-Status: planned
+Status: done
 Proof: the seven `tests/notes/NoteEditableContent*.spec.ts` files pass; no
 `usePopups` mock in them or in `noteEditableContentTestSupport.ts`.
 
@@ -216,6 +216,7 @@ Proof: `ConversationComponent.spec.ts`, `NoteConversation.spec.ts`,
 Type: Structure
 Status: planned
 Proof: `src/components/commons/Popups/__mocks__/usePopups.ts` is deleted; the
+popup helper import in `tests/setupVitest.ts` moves to the top of the file; the
 frontend testing skill names the allowed mocks from the story with one reason
 each; the `sort -u` listing in *Outside-in proof* shows only those modules;
 the whole suite passes; wall time is reported against the baseline under the
@@ -237,4 +238,12 @@ decision, not tuned away here.
 
 ## Learnings
 
-None yet.
+- Popup clean start is global: `tests/setupVitest.ts` empties the real stack
+  before every test through `tests/helpers/popupStackTestSupport.ts`
+  (`emptyPopupStack`, `pendingPopups`, `onlyPendingPopup`, `answerPopup`).
+  Later popup slices use these helpers and need no per-spec reset.
+- The setup file imports that helper inside `beforeEach`: a top-level import
+  loads the real popup module before a spec's `vi.mock` of it applies, and
+  those specs time out. Slice 13 moves the import to the top once no spec
+  mocks `usePopups`.
+- Whole suite after slice 1: 320 files, 2014 tests pass in 43.1 s (no `CI`).

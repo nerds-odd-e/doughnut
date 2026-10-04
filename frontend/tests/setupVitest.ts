@@ -21,12 +21,19 @@ if (typeof process === "undefined") {
 // Import CSS for proper rendering with Tailwind and DaisyUI
 import "../src/assets/daisyui.css"
 
-import { vi } from "vitest"
+import { beforeEach, vi } from "vitest"
 import createFetchMock from "vitest-fetch-mock"
 
 const fetchMock = createFetchMock(vi)
 fetchMock.enableMocks()
 fetchMock.doMock()
+
+// Imported per test, not at the top: a static import here would load the real
+// popup module before a spec's `vi.mock` of it could take effect.
+beforeEach(async () => {
+  const { emptyPopupStack } = await import("./helpers/popupStackTestSupport")
+  emptyPopupStack()
+})
 
 // Fail tests on Vue warnings and console.log usage
 // Allow console.warn and console.error from libraries to pass through

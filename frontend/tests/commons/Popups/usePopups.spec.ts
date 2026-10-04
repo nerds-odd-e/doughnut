@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, afterEach } from "vitest"
+import { describe, it, expect, beforeEach } from "vitest"
 import usePopups from "@/components/commons/Popups/usePopups"
 import type { OptionsPopupInfo } from "@/components/commons/Popups/usePopups"
 
@@ -9,15 +9,6 @@ describe("usePopups", () => {
 
   beforeEach(() => {
     popups = usePopups().popups
-    while (popups.peek()?.length) {
-      popups.done(true)
-    }
-  })
-
-  afterEach(() => {
-    while (popups.peek()?.length) {
-      popups.done(true)
-    }
   })
 
   describe("options popup", () => {
