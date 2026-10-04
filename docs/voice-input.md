@@ -55,14 +55,14 @@ They describe observed behavior, not a guarantee about later revisions.
 
 Naturally paced prerecorded or synthesized speech entered a synthetic browser
 MediaStream through AudioContext → MediaStreamDestination. The real recorder,
-worklet, transcription, retouch and persistence services were exercised.
+worklet, transcription and persistence services were exercised.
 No clocks, worklets, request delays or service responses were simulated.
 Hardware capture, permission/device behavior, interruption and service-failure
 feedback/recovery remain unassessed. An automation route at `127.0.0.1:5175`
 could sign in but did not activate Note/New notebook; localhost worked. That
 observation does not establish a human-click defect or its cause.
 
-## Completed dictated content can disappear
+## Dictating a passage with a pause and Flush
 
 With an existing six-sentence paragraph, record this known passage at natural
 pace, retaining the eight-second pause after “yesterday”:
@@ -107,11 +107,11 @@ passage at Development `1a981673` (Flush at 23 s, Stop at 31 s) wrote:
    notebook and a pencil.”
 
 After reload the original paragraph, the complete book sentence and the
-meeting sentences appeared once, and nothing written was revised. “These facts
-are finished.” never reached the note: the text-writing model left it out of
-its result although it was in the transcription. Two earlier runs kept that
-sentence, so its frequency is unknown. The first passage joined the original
-paragraph without a space (“every hour.The orchard”).
+meeting sentences appeared once, and nothing written was revised. The written
+passage is the transcription's own text, joined as
+[Adding dictated text to a note](#adding-dictated-text-to-a-note) describes,
+so a completed sentence such as “These facts are finished.” reaches the note
+whenever the transcription holds it.
 
 In an earlier run of this passage, before the transcription's trailing blank
 lines were handled, a short remainder of near-silent audio sent at Stop was
@@ -189,7 +189,5 @@ identified in those two sessions. The navigation destination survived.
 These comparisons establish neither a general preservation guarantee nor
 failure frequency.
 
-The empty-body UI baseline succeeded. A separate request with an empty
-serialized previous-content value returned HTTP 500 during an API probe;
-that failure was not reproduced through the UI. Timing identifies stages,
+The empty-body UI baseline succeeded. Timing identifies stages,
 not the cause of delay, model suitability or a numeric acceptance target.

@@ -118,7 +118,7 @@ revision is `a02dbb2697…`; frontend/runtime revision was not fully established
 
 - **Completed dictated content lost:** In a 29.168 s passage with an 8.2 s pause, completed orchard facts appeared, Flush replaced them with a middle
   fragment, and the final update retained only the last sentences. Reload confirmed the loss while preexisting Harvard content survived. Reproduction
-  and intermediate text are in the [voice-input documentation](../../docs/voice-input.md#completed-dictated-content-can-disappear).
+  and intermediate text are in the [voice-input documentation](../../docs/voice-input.md#dictating-a-passage-with-a-pause-and-flush).
 - **Existing paragraph truncated during navigation journey:** Navigate from source `13726` while processing to destination `13727`, then return/reload.
   Both results persisted to the source, whose first paragraph became literal `...uesday.`; the other four paragraphs and destination sentinel survived.
   An independent fresh page confirmed the saved state. The [voice-input documentation](../../docs/voice-input.md#existing-content-can-be-truncated-during-a-navigation-journey) retains before/after text. The causal role of navigation remains unproved.
@@ -201,7 +201,7 @@ technical redesign, or speculative infrastructure.
     Stop → after reload each transcribed segment appears once, in spoken
     order, with one space between passages.
   - With real services, the orchard passage from the
-    [voice-input documentation](../../docs/voice-input.md#completed-dictated-content-can-disappear)
+    [voice-input documentation](../../docs/voice-input.md#dictating-a-passage-with-a-pause-and-flush)
     → every transcribed sentence, including "These facts are finished.",
     appears once in the saved note after reload.
   - Advanced Options on a note → it offers full-screen editing and no

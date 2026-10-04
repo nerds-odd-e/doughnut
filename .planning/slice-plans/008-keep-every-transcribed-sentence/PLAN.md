@@ -64,7 +64,7 @@ Commands (from `.agents/agent-map.md`):
 | A segment's text is the lines after its timestamp line, with or without a leading index line | Slice 2 text extraction | Read `SRTProcessorTests` sample (index line present) and the mocked transcript in `record_live_audio.feature` (no index line) | Both forms exist in tests; extraction must take the lines after the `-->` line |
 | Processing Instructions and the context excerpt are used only by the audio request | Slice 3 removal | `grep -rnil "processingInstructions\|Processing Instructions\|previousNoteContentToAppendTo"` over frontend, backend, e2e, docs, cli, mcp-server | True: `NoteAudioTools.vue`, `NoteAudioToolsAdvancedOptions.vue`, `useNoteAudioProcessing.ts`, `AudioUploadDTO`, `AiAudioController`, `OtherAiServices`, three frontend specs, `AiAudioControllerTests` |
 | The e2e content step matches text contained in the body | Slice 4 | Read `e2e_test/step_definitions/note.ts:48-59` (`findNoteContent`) | True, so the real-service assertions do not depend on the join |
-| Whisper's own text for `lecture.wav` contains "Please be quiet." | Slice 4 | Not observed: needs a paid real-service call | Open; slice 4 observes it and adjusts the expected text to what Whisper returns |
+| Whisper's own text for `lecture.wav` contains "Please be quiet." | Slice 4 | Direct whisper-1 SRT call, 2026-10-04 | True: one segment, "Please be quiet." |
 
 ## Slices
 
@@ -117,7 +117,8 @@ paragraph and context excerpt paragraph) and code comments.
 
 ### 4. Real-service dictation keeps every sentence
 Type: Behavior
-Status: planned
+Status: done, owner manual orchard run pending
+Accepted proof: a direct whisper-1 SRT call on `lecture.wav` (2026-10-04, owner-authorized real-service use) returned the single segment "Please be quiet.", which the feature already expects, so the feature is unchanged. Linked worktrees refuse live-OpenAI specs, so the feature's run is the CI `note_creation_and_update` shard. The manual orchard run on local Development remains with the owner. The docs section is renamed "Dictating a passage with a pause and Flush".
 Proof: `record_live_audio_with_real_open_ai_service.feature` passes, and one manual orchard run on local Development saves every transcribed sentence, including "These facts are finished.", once after reload.
 
 Behavior: with real services, the orchard passage is dictated with a Flush →
@@ -138,3 +139,4 @@ current behavior.
 
 - The e2e transcription mock wrapped the SRT in a JSON body; the rewrite hid it. `stubTranscription` now returns plain-text SRT, as Whisper does for `response_format=srt`.
 - `SRTProcessor` reads a segment's end timestamp from its second line, so a segment without an index line (the mocked e2e transcript) yields an empty end timestamp. Real Whisper SRT carries index lines; left unchanged.
+- Real-service e2e features cannot run from a linked worktree; their branch proof is CI or the owner's Development run.
