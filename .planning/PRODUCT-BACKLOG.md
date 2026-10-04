@@ -6,8 +6,6 @@ Audio tools, starting with voice input. Make voice input work reliably and easy 
 
 ## Taken
 
-- [Replace frontend unit-test mocks of internal code with the real modules](seeds/SEED-039-faster-ci-feedback.md#internal-mocks-to-real-modules) — SEED-039#internal-mocks-to-real-modules ([plan](slice-plans/009-frontend-specs-run-real-internal-modules/PLAN.md))
-
 ## Backlog list
 
 - [Start every frontend spec's real router from one shared helper](seeds/SEED-039-faster-ci-feedback.md#specs-share-production-router) — SEED-039#specs-share-production-router
