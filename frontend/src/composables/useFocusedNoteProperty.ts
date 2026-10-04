@@ -1,16 +1,23 @@
-import { notePropertyKeyFromRoute } from "@/routes/noteShowLocation"
+import { noteRouteFamilyNoteId } from "@/routes/noteRouteFamily"
+import {
+  locationKeepingQuery,
+  notePropertyKeyFromRoute,
+  notePropertyLocation,
+  noteShowLocation,
+} from "@/routes/noteShowLocation"
 import {
   computed,
   inject,
   nextTick,
   provide,
+  ref,
   toValue,
   watch,
   type ComponentPublicInstance,
   type InjectionKey,
   type MaybeRefOrGetter,
 } from "vue"
-import { useRoute } from "vue-router"
+import { useRoute, useRouter } from "vue-router"
 
 const focusedPropertyKeyKey: InjectionKey<
   MaybeRefOrGetter<string | undefined>
@@ -33,13 +40,19 @@ export function useFocusedNoteProperty(
   propertyKeys?: MaybeRefOrGetter<readonly string[]>
 ) {
   const route = useRoute()
+  const router = useRouter()
   const providedPropertyKey = inject(focusedPropertyKeyKey, undefined)
   const propertyRowElements = new Map<string, HTMLElement>()
-  const focusedPropertyKey = computed(() =>
-    providedPropertyKey === undefined
-      ? notePropertyKeyFromRoute(route)
-      : toValue(providedPropertyKey)
-  )
+  // Off note routes (notebook/folder readme) there is no property location.
+  const offNoteRoutePropertyKey = ref<string>()
+  const focusedPropertyKey = computed(() => {
+    if (providedPropertyKey !== undefined) {
+      return toValue(providedPropertyKey)
+    }
+    return noteRouteFamilyNoteId(route) === undefined
+      ? offNoteRoutePropertyKey.value
+      : notePropertyKeyFromRoute(route)
+  })
   const unresolvedPropertyKey = computed(() => {
     if (propertyKeys === undefined) {
       return
@@ -53,6 +66,23 @@ export function useFocusedNoteProperty(
 
   const isFocusedProperty = (propertyKey: string) =>
     focusedPropertyKey.value === propertyKey
+
+  const togglePropertyPanel = (propertyKey: string) => {
+    const closing = isFocusedProperty(propertyKey)
+    const noteId = noteRouteFamilyNoteId(route)
+    if (noteId === undefined) {
+      offNoteRoutePropertyKey.value = closing ? undefined : propertyKey
+      return
+    }
+    return router.replace(
+      locationKeepingQuery(
+        route,
+        closing
+          ? noteShowLocation(Number(noteId))
+          : notePropertyLocation(Number(noteId), propertyKey)
+      )
+    )
+  }
 
   const setPropertyRowRef = (
     propertyKey: string,
@@ -82,6 +112,7 @@ export function useFocusedNoteProperty(
   return {
     isFocusedProperty,
     setPropertyRowRef,
+    togglePropertyPanel,
     unresolvedPropertyKey,
   }
 }

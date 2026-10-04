@@ -14,6 +14,7 @@
       :read-only="readOnly"
       :set-root-ref="(el) => setPropertyRowRef(row!.key, el)"
       @row-focus="emit('row-focus', idx)"
+      @toggle-panel="togglePropertyPanel(row!.key)"
       @commit="emit('commit', idx)"
       @remove="emit('remove', idx)"
       @wikidata-dialog-open="emit('wikidata-dialog-open', idx)"
@@ -92,7 +93,8 @@ const emit = defineEmits<{
 }>()
 
 const rowClientIds = usePropertyRowClientIds(propertyRows)
-const { isFocusedProperty, setPropertyRowRef } = useFocusedNoteProperty()
+const { isFocusedProperty, setPropertyRowRef, togglePropertyPanel } =
+  useFocusedNoteProperty()
 
 const rowKeyInputId = (idx: number) => `${props.headingId}-row-${idx}-key`
 const rowKeyPresetListId = (idx: number) =>

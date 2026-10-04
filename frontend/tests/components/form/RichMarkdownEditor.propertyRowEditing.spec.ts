@@ -141,6 +141,21 @@ describe("RichMarkdownEditor property row editing", () => {
     expectPropertyPanelClosed(wrapper.find(betaRow).element)
   })
 
+  it("removes a readme property on the notebook page without leaving it", async () => {
+    const wrapper = await h.mountEditor(twoPropertyMarkdown, {
+      route: { name: "notebookPage", params: { notebookId: "1" } },
+      isReadmeContext: true,
+    })
+
+    await expandPropertyPanelAndClickRemove(
+      wrapper,
+      propertyRowSelector("alpha")
+    )
+
+    expect(h.lastEmittedMarkdown()).not.toContain("alpha:")
+    expect(window.location.pathname).toBe("/notebooks/1")
+  })
+
   it("removing every property row emits body-only markdown and shows add-only chrome without Properties heading", async () => {
     const wrapper = await h.mountEditor("---\nonly: x\n---\n\nParagraph.\n", {
       route: noteShowLocation(42),

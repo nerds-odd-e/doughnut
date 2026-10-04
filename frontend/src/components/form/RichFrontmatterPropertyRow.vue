@@ -36,7 +36,7 @@
         :aria-label="`Toggle property panel for note property ${modelValue.key}`"
         :aria-expanded="isFocused"
         data-testid="rich-note-property-panel-toggle"
-        @click="togglePropertyPanel"
+        @click="emit('toggle-panel')"
       >
         <ChevronRight v-if="!isFocused" class="h-4 w-4" aria-hidden="true" />
         <ChevronDown v-else class="h-4 w-4" aria-hidden="true" />
@@ -120,7 +120,6 @@
 <script setup lang="ts">
 import { ChevronDown, ChevronRight, X } from "@lucide/vue"
 import { computed, ref, type ComponentPublicInstance } from "vue"
-import { useNotePropertyPanelLocation } from "@/composables/useNotePropertyPanelLocation"
 import RichFrontmatterPropertyPanel from "@/components/form/RichFrontmatterPropertyPanel.vue"
 import RichFrontmatterImagePropertyValue from "@/components/form/RichFrontmatterImagePropertyValue.vue"
 import RichFrontmatterWikidataPropertyValue from "@/components/form/RichFrontmatterWikidataPropertyValue.vue"
@@ -165,6 +164,7 @@ const props = defineProps<{
 const emit = defineEmits<{
   "update:modelValue": [row: PropertyRow]
   "row-focus": []
+  "toggle-panel": []
   commit: []
   add: []
   cancel: []
@@ -175,9 +175,6 @@ const emit = defineEmits<{
   "image-upload-state": [inProgress: boolean]
 }>()
 
-const { togglePropertyPanel } = useNotePropertyPanelLocation(
-  () => props.modelValue.key
-)
 const valueAreaRef = ref<HTMLElement | null>(null)
 
 const scalarValue = computed(
