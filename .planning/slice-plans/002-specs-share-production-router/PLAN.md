@@ -117,7 +117,7 @@ location. Same weakness as slice 2.
 
 ### 4. Memory-history production routers come from the shared helper
 Type: Structure
-Status: planned
+Status: done
 Proof: `MessageCenterPage.spec.ts`, `RecentSettingsTab.spec.ts`, and the
 `MainMenu*.spec.ts` files pass unchanged; the finished-state listing returns
 only `RenderingHelper.ts`, `routes.spec.ts`, and `noteRouteFamily.spec.ts`;
@@ -129,6 +129,10 @@ Internal change: `MessageCenterPage.spec.ts`, `RecentSettingsTab.spec.ts`, and
 from `productionRouterAt` or `withRouter()`, and that every test starts at
 root. Same weakness as slice 2. Depends on slice 1: these routers move from
 memory history to browser history, so they need the shared reset.
+Accepted proof: `MessageCenterPage.spec.ts`, `RecentSettingsTab.spec.ts`, and
+the three `MainMenu*` specs, 5 files and 38 tests, passed; no added or removed
+line holds an `it(` or `expect`; the listing returns only the three expected
+files; whole suite 321 files, 2014 tests passed; `vue-tsc --noEmit` clean.
 
 ## Current decisions
 
