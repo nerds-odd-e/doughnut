@@ -140,3 +140,11 @@ files; whole suite 321 files, 2014 tests passed; `vue-tsc --noEmit` clean.
   the history state; no router is created in shared setup.
 - Slices 2–4 are Structure slices that own the retrospective correction
   directly; they add no product behavior.
+
+## Execution complete
+
+Product advice: no change to priorities. The retrospective planned one small
+correction, [SEED-039#one-production-router-builder](../../seeds/SEED-039-faster-ci-feedback.md#one-production-router-builder):
+one production-router construction in `RenderingHelper.ts` and deletion of
+unused NoteShowPage sidebar-layout test support. It is not queued; wrap-up
+decides whether to queue it.

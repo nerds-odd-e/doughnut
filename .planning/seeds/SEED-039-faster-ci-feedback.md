@@ -220,6 +220,29 @@ Not committed in this delivery:
   `RenderingHelper.ts` and the two `tests/routes` specs pass the production
   `routes`. → The whole frontend suite passes.
 
+<a id="one-production-router-builder"></a>
+
+### Build the test router over production routes in one place
+
+**Identity:** SEED-039#one-production-router-builder
+```json dough-story-state
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/003-one-production-router-builder/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"3a6a0ff345c3e5b2bec3e0a0207b3eed135d3c30e10712ce4dd5457c1102aec3","plan":"d4148e4a8588e5185fcad49854b514a4489308cc41a21eae6140d94fac29cc53"}}
+```
+
+Correction from the retrospective of
+[SEED-039#specs-share-production-router](#specs-share-production-router).
+Plan: [003-one-production-router-builder](../slice-plans/003-one-production-router-builder/PLAN.md).
+
+**Goal:** Donut contributors reading frontend test support find one way to
+build a router over the production routes, and no NoteShowPage support that
+nothing uses.
+
+**Scope:** `frontend/tests/helpers/RenderingHelper.ts` builds the
+production-routes router once, shared by `productionRouterAt` and the default
+of `withRouter()`. The unused sidebar-layout render path in
+`frontend/tests/pages/noteShowPageTestSupport.ts` and the fixture only it
+uses are deleted. No test name or assertion changes; no production code.
+
 ## Ordering and Scope Reduction
 
 Follow story 2, then story 3. Test optimization removes shared cost before shard

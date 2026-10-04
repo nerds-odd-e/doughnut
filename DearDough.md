@@ -203,6 +203,15 @@ Follow-up: Open, unqueued.
   - Observed effect: about 221k subagent tokens on passes without edits; nine of thirteen passes changed code.
   - Inference: in a test-only story that grows shared helpers slice by slice, the passes mostly paid off; the no-edit passes came on slices that only applied helpers already in place. Qualified: one execution.
 
+- Execution: SEED-039#specs-share-production-router / slice-plans/002-specs-share-production-router / 98728709f1
+  - Timestamp: unknown (refactor passes on 2026-10-05, between about 06:40 and 06:58 +09:00)
+  - Tool: Claude Code
+  - Model: claude-opus-5-5
+  - Open Dough release: 0.3.56 (execution-checkout VERSION, unchanged during execution)
+  - Evidence: 4 test-only slices. Refactor agents for slice 1 (one-line reset plus a new spec; 50,313 subagent tokens) and slice 4 (three files plus one skill sentence; 53,730 tokens) returned "no refactor edits". Slice 2's pass moved imports to the `@tests/helpers` barrel and dropped a redundant `router.push("/")`; slice 3's pass removed a redundant `$route` mock.
+  - Observed effect: about 104k subagent tokens on passes without edits; two of four passes changed code.
+  - Inference: as in the previous row, passes on slices that only applied an established pattern found nothing. Qualified: one execution.
+
 ## ODF-202 — Managed Codex delivery left CI unobserved without a retained stream binding
 
 Former local code: DD-201.
