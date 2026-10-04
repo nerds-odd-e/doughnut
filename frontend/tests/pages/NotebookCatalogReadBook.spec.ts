@@ -1,6 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest"
-import { createRouter, createWebHistory } from "vue-router"
-import routes from "@/routes/routes"
+import { productionRouterAt } from "@tests/helpers"
 import makeMe from "donut-test-fixtures/makeMe"
 import {
   clearNotebooksPageStorage,
@@ -34,7 +33,7 @@ describe("read book catalog button", () => {
   it("navigates to book reading when read book is clicked", async () => {
     const nb = makeMe.aNotebook.please()
     mockMyNotebooks({ notebooks: [{ notebook: nb, hasAttachedBook: true }] })
-    const router = createRouter({ history: createWebHistory(), routes })
+    const router = await productionRouterAt({ name: "notebooks" })
     const pushSpy = vi.spyOn(router, "push")
     const wrapper = await mountNotebooksPage(router)
     await wrapper

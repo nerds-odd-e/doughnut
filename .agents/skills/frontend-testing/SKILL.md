@@ -95,7 +95,10 @@ Rendered-href assertions use `noteShowHref`. Path strings belong only in
 `routes.spec.ts` (matching / redirects) and inbound URL classifiers. Test
 routers that resolve named screen locations use production `routes` or
 `dummyRouteRecordsFromMetadata` (the `routeMetadata` table with dummy
-components; no page imports). Catch-all `/` or `/:pathMatch(.*)*` routers
+components; no page imports). A spec's router over production `routes`
+comes from `productionRouterAt(location)` (from `@tests/helpers`) or plain
+`withRouter()`; every test starts at the root location, reset in shared test
+setup. Catch-all `/` or `/:pathMatch(.*)*` routers
 and `useRoute` stubs with `path: "/"` are not a second screen dialect
 (ADR 0005).
 

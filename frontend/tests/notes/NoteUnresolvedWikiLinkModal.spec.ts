@@ -14,20 +14,14 @@ import {
   waitUntilFocused,
 } from "@tests/helpers/softKeyboardPrimerTestSupport"
 import makeMe from "donut-test-fixtures/makeMe"
-import { mockSdkService } from "@tests/helpers"
+import { mockSdkService, productionRouterAt } from "@tests/helpers"
 import { answerOnlyPendingPopup } from "@tests/helpers/popupStackTestSupport"
 import { resetNoteStore } from "@/store/noteStore"
 import { useNoteStore } from "@/store/noteStore"
 import { flushPromises, mount, type VueWrapper } from "@vue/test-utils"
 import { screen } from "@testing-library/vue"
-import { createRouter, createWebHistory } from "vue-router"
-import routes from "@/routes/routes"
+import type { Router } from "vue-router"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
-
-const router = createRouter({
-  history: createWebHistory(),
-  routes,
-})
 
 const createNoteLabel = /Create a new note named/
 const pointAtExistingNoteLabel = "Point at an existing note"
@@ -46,8 +40,10 @@ describe("NoteUnresolvedWikiLinkModal", () => {
 
   let matchMediaSpy: ReturnType<typeof mockCoarsePointer> | undefined
   let wrapper: VueWrapper | undefined
+  let router: Router
 
-  beforeEach(() => {
+  beforeEach(async () => {
+    router = await productionRouterAt({ name: "root" })
     vi.useFakeTimers({ toFake: ["requestAnimationFrame"] })
     const noteStore = useNoteStore()
     resetNoteStore()

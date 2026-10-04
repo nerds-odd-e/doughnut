@@ -4,13 +4,13 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import type { Router } from "vue-router"
 import {
   mockSdkServiceWithImplementation,
+  productionRouterAt,
   testFolderStub,
   wrapSdkError,
   wrapSdkResponse,
 } from "@tests/helpers"
 import usePopups from "@/components/commons/Popups/usePopups"
 import {
-  createFolderPageRouter,
   type MountFolderPageOptions,
   mountFolderPageReady,
   openFolderSettingsTab,
@@ -51,8 +51,8 @@ afterEach(() => {
 describe("FolderPage removal", () => {
   let router: Router
 
-  beforeEach(() => {
-    router = createFolderPageRouter()
+  beforeEach(async () => {
+    router = await productionRouterAt({ name: "root" })
   })
 
   const mountTopic = (options?: MountFolderPageOptions) =>

@@ -1,9 +1,0 @@
-{
-  "schemaVersion": 1,
-  "agent": "Airi-chan",
-  "email": "airi-chan@example.org",
-  "identity": "SEED-039#specs-share-production-router",
-  "mode": "story-branch",
-  "branch": "claude/start-every-frontend-spec-s-real-router-from-one",
-  "host": "claude"
-}

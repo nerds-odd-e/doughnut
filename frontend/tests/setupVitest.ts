@@ -31,6 +31,7 @@ fetchMock.doMock()
 
 beforeEach(() => {
   emptyPopupStack()
+  window.history.replaceState(window.history.state, "", "/")
 })
 
 // Fail tests on Vue warnings and console.log usage

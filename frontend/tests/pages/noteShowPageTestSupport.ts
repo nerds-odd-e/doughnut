@@ -6,26 +6,13 @@ import type { Circle } from "@generated/donut-backend-api"
 import { noteShowLocation } from "@/routes/noteShowLocation"
 import NoteShowPage from "@/pages/NoteShowPage.vue"
 import NoteShowPageWithNotebookSidebarLayout from "@tests/fixtures/NoteShowPageWithNotebookSidebarLayout.vue"
-import {
-  createRouter,
-  createWebHistory,
-  type RouteLocationNamedRaw,
-  type Router,
-} from "vue-router"
-import routes from "@/routes/routes"
+import type { RouteLocationNamedRaw, Router } from "vue-router"
 import makeMe from "donut-test-fixtures/makeMe"
 import helper, {
   mockNotebookGetForNoteRealm,
   mockSdkService,
 } from "@tests/helpers"
 import { flushPromises } from "@vue/test-utils"
-
-export function createNoteShowPageRouter() {
-  return createRouter({
-    history: createWebHistory(),
-    routes,
-  })
-}
 
 export function noteShowConversationLocation(
   noteId: number
@@ -76,7 +63,7 @@ function noteShowPageMount(router: Router, noteId: number) {
   return noteShowPageHelper(NoteShowPage, router, noteId)
 }
 
-async function renderNoteShowAtNoteLocation(
+async function renderNoteShowWith(
   mount: (
     router: Router,
     noteId: number
@@ -84,23 +71,19 @@ async function renderNoteShowAtNoteLocation(
   router: Router,
   noteId: number
 ) {
-  mount(router, noteId).currentRoute(noteShowLocation(noteId)).render()
+  mount(router, noteId).render()
   await flushPromises()
 }
 
 export async function renderNoteShowPage(router: Router, noteId: number) {
-  await renderNoteShowAtNoteLocation(
-    noteShowPageWithSidebarLayoutMount,
-    router,
-    noteId
-  )
+  await renderNoteShowWith(noteShowPageWithSidebarLayoutMount, router, noteId)
 }
 
 export async function renderNoteShowPageWithoutSidebar(
   router: Router,
   noteId: number
 ) {
-  await renderNoteShowAtNoteLocation(noteShowPageMount, router, noteId)
+  await renderNoteShowWith(noteShowPageMount, router, noteId)
 }
 
 export async function renderNoteShowPageWithConversation(

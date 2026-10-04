@@ -4,13 +4,13 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import makeMe from "donut-test-fixtures/makeMe"
 import {
   mockSdkService,
+  productionRouterAt,
   testFolderStub,
   wrapSdkError,
   wrapSdkResponse,
 } from "@tests/helpers"
 import usePopups from "@/components/commons/Popups/usePopups"
 import {
-  createFolderPageRouter,
   folderNameConflictMessage,
   mountCrossNotebookFolderMovePage,
   mountCrossNotebookRootMovePage,
@@ -32,8 +32,8 @@ afterEach(() => {
 describe("FolderPage move", () => {
   let router: Router
 
-  beforeEach(() => {
-    router = createFolderPageRouter()
+  beforeEach(async () => {
+    router = await productionRouterAt({ name: "root" })
   })
 
   it("re-enables organize controls after moving into a neighbour folder", async () => {

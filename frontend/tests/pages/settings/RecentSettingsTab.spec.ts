@@ -1,10 +1,8 @@
 import { MemoryTrackerController } from "@generated/donut-backend-api/sdk.gen"
 import { describe, it, expect, beforeEach, vi } from "vitest"
 import RecentSettingsTab from "@/pages/settings/RecentSettingsTab.vue"
-import routes from "@/routes/routes"
-import helper, { mockSdkService } from "@tests/helpers"
+import helper, { mockSdkService, productionRouterAt } from "@tests/helpers"
 import { flushPromises } from "@vue/test-utils"
-import { createMemoryHistory, createRouter } from "vue-router"
 
 describe("RecentSettingsTab", () => {
   beforeEach(() => {
@@ -13,15 +11,10 @@ describe("RecentSettingsTab", () => {
   })
 
   async function mountWithTabQuery(tab?: string) {
-    const router = createRouter({
-      history: createMemoryHistory(),
-      routes,
-    })
-    await router.push({
+    const router = await productionRouterAt({
       name: "settingsRecent",
       query: tab === undefined ? {} : { tab },
     })
-    await router.isReady()
     const pushSpy = vi.spyOn(router, "push")
     const wrapper = helper
       .component(RecentSettingsTab)

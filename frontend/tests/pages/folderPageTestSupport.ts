@@ -9,17 +9,12 @@ import { flushPromises, type VueWrapper } from "@vue/test-utils"
 import makeMe from "donut-test-fixtures/makeMe"
 import helper, { mockSdkService, testFolderStub } from "@tests/helpers"
 import usePopups from "@/components/commons/Popups/usePopups"
-import { createRouter, createWebHistory, type Router } from "vue-router"
-import routes from "@/routes/routes"
+import type { Router } from "vue-router"
 import { vi } from "vitest"
 import { editPageName } from "./pageNameEditorTestSupport"
 
 export const folderNameConflictMessage =
   "A folder with this name already exists here."
-
-export function createFolderPageRouter() {
-  return createRouter({ history: createWebHistory(), routes })
-}
 
 export function stubFolderPageListingMocks(
   catalogItems: NotebookCatalogEntry[]

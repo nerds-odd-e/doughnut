@@ -2,12 +2,16 @@ import { mount, type VueWrapper } from "@vue/test-utils"
 import QuillEditor from "@/components/form/QuillEditor.vue"
 import { nextTick } from "vue"
 import type Quill from "quill"
-import routes from "@/routes/routes"
-import { createRouter, createWebHistory } from "vue-router"
+import type { Router } from "vue-router"
+import { productionRouterAt } from "@tests/helpers"
 
 export function createQuillEditorTestHarness() {
-  const router = createRouter({ history: createWebHistory(), routes })
+  let router: Router
   let wrapper: VueWrapper
+
+  beforeEach(async () => {
+    router = await productionRouterAt({ name: "root" })
+  })
 
   async function mountEditor(
     props: Record<string, unknown> = { modelValue: "" }
@@ -43,7 +47,9 @@ export function createQuillEditorTestHarness() {
   }
 
   return {
-    router,
+    get router() {
+      return router
+    },
     mountEditor,
     quillInstance,
     clickEditorAnchor,

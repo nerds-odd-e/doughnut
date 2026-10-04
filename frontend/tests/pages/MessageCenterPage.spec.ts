@@ -1,11 +1,9 @@
 import { ConversationMessageController } from "@generated/donut-backend-api/sdk.gen"
 import MessageCenterPage from "@/pages/MessageCenterPage.vue"
-import routes from "@/routes/routes"
 import { describe, it, expect, beforeEach, vi } from "vitest"
-import helper, { mockSdkService } from "@tests/helpers"
+import helper, { mockSdkService, productionRouterAt } from "@tests/helpers"
 import makeMe from "donut-test-fixtures/makeMe"
 import { flushPromises } from "@vue/test-utils"
-import { createMemoryHistory, createRouter } from "vue-router"
 
 describe("MessageCenterPage", () => {
   it("fetch API to be called ONCE on mount", async () => {
@@ -79,10 +77,7 @@ describe("MessageCenterPage", () => {
     })
 
     it("should navigate when conversation clicked", async () => {
-      const router = createRouter({
-        history: createMemoryHistory(),
-        routes,
-      })
+      const router = await productionRouterAt({ name: "root" })
       const pushSpy = vi.spyOn(router, "push")
       helper
         .component(MessageCenterPage)
