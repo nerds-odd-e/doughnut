@@ -9,17 +9,16 @@ import {
   mockNotebookGetForNoteRealm,
   mockSdkService,
   mockSdkServiceWithImplementation,
+  productionRouterAt,
 } from "@tests/helpers"
 import {
   installMockResizeObserver,
   restoreNoteToolbarWidthMocks,
 } from "@tests/helpers/mockNoteToolbarNavWidth"
+import { noteShowLocation } from "@/routes/noteShowLocation"
 import makeMe from "donut-test-fixtures/makeMe"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
-import {
-  createNoteShowPageRouter,
-  renderNoteShowPageWithoutSidebar,
-} from "./noteShowPageTestSupport"
+import { renderNoteShowPageWithoutSidebar } from "./noteShowPageTestSupport"
 
 const noteRealm = makeMe.aNoteRealm
   .content("---\nimage: old.png\n---\n\nHi")
@@ -101,7 +100,7 @@ describe("note show image upload", () => {
 
   it("saves pending text before the upload request", async () => {
     await renderNoteShowPageWithoutSidebar(
-      createNoteShowPageRouter(),
+      await productionRouterAt(noteShowLocation(noteRealm.id)),
       noteRealm.id
     )
     await editBodyAsMarkdownThenReturnToRich(editedContent)
@@ -113,7 +112,7 @@ describe("note show image upload", () => {
 
   it("shows the uploaded note without saving its content again", async () => {
     await renderNoteShowPageWithoutSidebar(
-      createNoteShowPageRouter(),
+      await productionRouterAt(noteShowLocation(noteRealm.id)),
       noteRealm.id
     )
 

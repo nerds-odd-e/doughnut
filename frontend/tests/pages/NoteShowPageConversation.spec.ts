@@ -1,23 +1,28 @@
 import {
   closeConversationButtonEl,
   conversationContainerEl,
-  createNoteShowPageRouter,
   noteContentWrapperEl,
   renderNoteShowPageWithConversation,
   setupNoteShowPageConversationMocks,
   toggleMaximizeButtonEl,
 } from "@tests/pages/noteShowPageTestSupport"
-import { notePropertyLocation } from "@/routes/noteShowLocation"
+import { productionRouterAt } from "@tests/helpers"
+import {
+  noteShowLocation,
+  notePropertyLocation,
+} from "@/routes/noteShowLocation"
 import { flushPromises } from "@vue/test-utils"
 import { nextTick } from "vue"
+import type { Router } from "vue-router"
 import { beforeEach, describe, expect, it } from "vitest"
 
 describe("note show page conversation", () => {
-  const router = createNoteShowPageRouter()
+  let router: Router
   let noteId: number
 
-  beforeEach(() => {
+  beforeEach(async () => {
     noteId = setupNoteShowPageConversationMocks().id
+    router = await productionRouterAt(noteShowLocation(noteId))
   })
 
   it("maximizes, restores, and closes the conversation", async () => {

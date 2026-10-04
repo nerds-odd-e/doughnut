@@ -11,6 +11,7 @@ import {
   mockNotebookGetForNoteRealm,
   mockSdkService,
   mockSdkServiceWithImplementation,
+  productionRouterAt,
   wrapSdkError,
 } from "@tests/helpers"
 import {
@@ -21,13 +22,11 @@ import {
   advanceNoteContentSaveDebounce,
   deferred,
 } from "@tests/helpers/noteContentDebounceTestSupport"
+import { noteShowLocation } from "@/routes/noteShowLocation"
 import { normalizeNoteContent } from "@/utils/normalizeNoteContent"
 import makeMe from "donut-test-fixtures/makeMe"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
-import {
-  createNoteShowPageRouter,
-  renderNoteShowPageWithoutSidebar,
-} from "./noteShowPageTestSupport"
+import { renderNoteShowPageWithoutSidebar } from "./noteShowPageTestSupport"
 import { qualifyingRelationRealmForTrash } from "../notes/noteMoreOptionsTrashTestSupport"
 
 async function editBody(content: string) {
@@ -82,7 +81,7 @@ describe("note show autosave before trashing", () => {
 
   it("reopens mutations after trash failure and skips trashing after save failure", async () => {
     const { relationRealm } = qualifyingRelationRealmForTrash()
-    const router = createNoteShowPageRouter()
+    const router = await productionRouterAt(noteShowLocation(relationRealm.id))
     mockSdkService(NoteController, "showNote", relationRealm)
     mockNotebookGetForNoteRealm(relationRealm)
     const firstSave = deferred()

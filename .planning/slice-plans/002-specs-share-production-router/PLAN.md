@@ -101,9 +101,15 @@ own. Weakness removed: several ways to start a production router in specs.
 
 ### 3. Page support routers come from the shared helper
 Type: Structure
-Status: planned
+Status: done
 Proof: the `FolderPage*.spec.ts` and `NoteShowPage*.spec.ts` files pass with
 unchanged test names and assertions.
+Accepted proof: 7 files (3 `FolderPage*`, 4 `NoteShowPage*`), 28 tests,
+passed; no added or removed line holds an `it(` or `expect`; whole suite 321
+files, 2014 tests passed; `vue-tsc --noEmit` clean. NoteShowPage specs start
+at `noteShowLocation(id)`, and the support's redundant `$route` mock is gone.
+FolderPage specs start at root: they never read the route, and the folder ids
+exist only once `mountFolderPage` builds the realm.
 
 Internal change: `createFolderPageRouter` and `createNoteShowPageRouter` are
 deleted; their callers call `productionRouterAt` with the page's own named

@@ -2,10 +2,14 @@ import { NotebookFolderController } from "@generated/donut-backend-api/sdk.gen"
 import { flushPromises } from "@vue/test-utils"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import type { Router } from "vue-router"
-import { testFolderStub, wrapSdkError, wrapSdkResponse } from "@tests/helpers"
+import {
+  productionRouterAt,
+  testFolderStub,
+  wrapSdkError,
+  wrapSdkResponse,
+} from "@tests/helpers"
 import usePopups from "@/components/commons/Popups/usePopups"
 import {
-  createFolderPageRouter,
   editFolderPageName,
   folderNameConflictMessage,
   folderPageNameEditor,
@@ -22,8 +26,8 @@ afterEach(() => {
 describe("FolderPage", () => {
   let router: Router
 
-  beforeEach(() => {
-    router = createFolderPageRouter()
+  beforeEach(async () => {
+    router = await productionRouterAt({ name: "root" })
   })
 
   it("shows Readme and Settings tabs but not Health", async () => {
