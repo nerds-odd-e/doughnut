@@ -10,12 +10,6 @@ import { noteShowLocation } from "@/routes/noteShowLocation"
 import { expandPropertyPanel, propertyRowSelector } from "./propertiesTestDom"
 import { createRichMarkdownEditorTestHarness } from "./richMarkdownEditorTestHarness"
 
-vi.mock("@/composables/useGoToNextAssimilation", () => ({
-  useGoToNextAssimilation: () => ({
-    goToNextAssimilation: vi.fn().mockResolvedValue(true),
-  }),
-}))
-
 describe("RichMarkdownEditor list property memory tracking", () => {
   const h = createRichMarkdownEditorTestHarness()
   const noteId = 42
@@ -78,6 +72,10 @@ Workshop body.`
     const assimilateSpy = mockSdkService(AssimilationController, "assimilate", [
       runTracker,
     ])
+    mockSdkService(AssimilationController, "next", {
+      nextUnit: { noteId, propertyKey: "example of" },
+      counts: { dueCount: 1 },
+    })
     const wrapper = await mountListEditor()
     getNoteInfoSpy.mockResolvedValue(
       wrapSdkResponse(

@@ -7,10 +7,7 @@ import {
   NoteController,
 } from "@generated/donut-backend-api/sdk.gen"
 import { advanceNoteContentSaveDebounce } from "@tests/helpers/noteContentDebounceTestSupport"
-import {
-  answerPopup,
-  onlyPendingPopup,
-} from "@tests/helpers/popupStackTestSupport"
+import { answerOnlyPendingPopup } from "@tests/helpers/popupStackTestSupport"
 import {
   mountNoteEditableContent,
   setTextareaValue,
@@ -164,8 +161,7 @@ topic: Japanese
       })
       await setTextareaValue(wrapper, edited)
       await advanceNoteContentSaveDebounce()
-      const confirmation = onlyPendingPopup()
-      await answerPopup(true)
+      const confirmation = await answerOnlyPendingPopup(true)
       expectSaved(edited)
       wrapper.unmount()
       return confirmation

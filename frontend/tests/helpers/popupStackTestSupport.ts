@@ -24,3 +24,11 @@ export async function answerPopup(result: unknown) {
   usePopups().popups.done(result)
   await flushPromises()
 }
+
+/** Waits for the one pending popup, answers it, and returns that popup. */
+export async function answerOnlyPendingPopup(result: unknown) {
+  await flushPromises()
+  const popup = onlyPendingPopup()
+  await answerPopup(result)
+  return popup
+}

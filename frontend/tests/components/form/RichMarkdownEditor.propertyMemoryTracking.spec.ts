@@ -7,37 +7,18 @@ import {
 import { flushPromises } from "@vue/test-utils"
 import makeMe from "donut-test-fixtures/makeMe"
 import { mockSdkService, wrapSdkResponse } from "@tests/helpers"
+import { answerOnlyPendingPopup } from "@tests/helpers/popupStackTestSupport"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
-import { noteShowLocation } from "@/routes/noteShowLocation"
+import {
+  notePropertyLocation,
+  noteShowLocation,
+} from "@/routes/noteShowLocation"
 import {
   expandPropertyPanel,
   expandPropertyPanelAndClickRemove,
   propertyRowSelector,
 } from "./propertiesTestDom"
 import { createRichMarkdownEditorTestHarness } from "./richMarkdownEditorTestHarness"
-
-const confirmMock = vi.fn()
-
-vi.mock("@/components/commons/Popups/usePopups", () => ({
-  default: () => ({
-    popups: {
-      confirm: confirmMock,
-      alert: vi.fn(),
-      options: vi.fn(),
-      done: vi.fn(),
-      register: vi.fn(),
-      peek: vi.fn(),
-    },
-  }),
-}))
-
-const mockedGoToNextAssimilation = vi.fn()
-
-vi.mock("@/composables/useGoToNextAssimilation", () => ({
-  useGoToNextAssimilation: () => ({
-    goToNextAssimilation: mockedGoToNextAssimilation,
-  }),
-}))
 
 describe("RichMarkdownEditor property memory tracking", () => {
   const h = createRichMarkdownEditorTestHarness()
@@ -58,7 +39,6 @@ Workshop body.`
     getNoteInfoSpy = mockSdkService(NoteController, "getNoteInfo", {
       memoryTrackers: [],
     })
-    confirmMock.mockReset()
   })
 
   afterEach(() => {
@@ -67,9 +47,14 @@ Workshop body.`
   })
 
   describe("assimilation controls", () => {
+    const nextNoteId = 43
+    const nextPropertyKey = "level"
+
     beforeEach(() => {
-      mockedGoToNextAssimilation.mockReset()
-      mockedGoToNextAssimilation.mockResolvedValue(true)
+      mockSdkService(AssimilationController, "next", {
+        nextUnit: { noteId: nextNoteId, propertyKey: nextPropertyKey },
+        counts: { dueCount: 1 },
+      })
     })
 
     it("assimilates the property from its own property panel", async () => {
@@ -90,7 +75,9 @@ Workshop body.`
       expect(assimilateSpy).toHaveBeenCalledWith({
         body: { noteId, propertyKey: "topic" },
       })
-      expect(mockedGoToNextAssimilation).toHaveBeenCalled()
+      expect(wrapper.vm.$router.currentRoute.value).toMatchObject(
+        notePropertyLocation(nextNoteId, nextPropertyKey)
+      )
     })
 
     it("hides assimilation buttons on the note_level property row", async () => {
@@ -153,7 +140,6 @@ Workshop body.`
         "create",
         { id: 1 }
       )
-      confirmMock.mockImplementationOnce(() => Promise.resolve(true))
 
       const wrapper = await mountTopicEditor()
       await expandPropertyPanel(wrapper, topicRowSelector)
@@ -161,7 +147,9 @@ Workshop body.`
       await wrapper
         .find(`${topicRowSelector} [data-test="skip"]`)
         .trigger("click")
-      await flushPromises()
+      expect(await answerOnlyPendingPopup(true)).toMatchObject({
+        type: "confirm",
+      })
 
       expect(skipSpy).toHaveBeenCalledWith({
         body: { noteId, propertyKey: "topic" },
@@ -196,12 +184,13 @@ Workshop body.`
 
     it("hard-deletes the tracker and removes the property when the user confirms", async () => {
       const tracker = mockNoteInfoWithPropertyTracker("topic", 99)
-      confirmMock.mockImplementationOnce(() => Promise.resolve(true))
 
       const wrapper = await mountTopicEditor()
 
       await expandPropertyPanelAndClickRemove(wrapper, topicRowSelector)
-      await flushPromises()
+      expect(await answerOnlyPendingPopup(true)).toMatchObject({
+        type: "confirm",
+      })
 
       await vi.waitFor(() => {
         expect(deleteSpy).toHaveBeenCalledWith({
@@ -215,7 +204,6 @@ Workshop body.`
 
     it("reverts a canceled rename, then keeps the property after a canceled removal without emitting", async () => {
       mockNoteInfoWithPropertyTracker("topic", 99)
-      confirmMock.mockResolvedValue(false)
 
       const wrapper = await mountTopicEditor()
       const emitCountBefore = wrapper.emitted("update:modelValue")?.length ?? 0
@@ -224,9 +212,10 @@ Workshop body.`
       await keyInput.trigger("focus")
       await keyInput.setValue("subject")
       await keyInput.trigger("blur")
-      await flushPromises()
 
-      expect(confirmMock).toHaveBeenCalledOnce()
+      expect(await answerOnlyPendingPopup(false)).toMatchObject({
+        type: "confirm",
+      })
       expect(updatePropertyKeySpy).not.toHaveBeenCalled()
       expect(wrapper.emitted("update:modelValue")?.length ?? 0).toBe(
         emitCountBefore
@@ -235,7 +224,9 @@ Workshop body.`
 
       await expandPropertyPanelAndClickRemove(wrapper, topicRowSelector)
 
-      expect(confirmMock).toHaveBeenCalledTimes(2)
+      expect(await answerOnlyPendingPopup(false)).toMatchObject({
+        type: "confirm",
+      })
       expect(deleteSpy).not.toHaveBeenCalled()
       expect(wrapper.emitted("update:modelValue")?.length ?? 0).toBe(
         emitCountBefore

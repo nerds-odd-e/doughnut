@@ -100,7 +100,7 @@ Proof: the seven `tests/notes/NoteEditableContent*.spec.ts` files pass; no
 
 ### 2. Property memory-tracking specs run real popups and next assimilation
 Type: Structure
-Status: planned
+Status: done
 Proof: `usePropertyMemoryTrackerGuard.spec.ts`,
 `usePropertyMemoryTrackerGuard.listProperty.spec.ts`,
 `RichMarkdownEditor.propertyMemoryTracking.spec.ts`, and
@@ -247,3 +247,9 @@ decision, not tuned away here.
   those specs time out. Slice 13 moves the import to the top once no spec
   mocks `usePopups`.
 - Whole suite after slice 1: 320 files, 2014 tests pass in 43.1 s (no `CI`).
+- `answerOnlyPendingPopup(result)` in the popup helper waits, checks exactly one
+  popup is pending, answers it, and returns it; prefer it over local copies.
+- A RichMarkdownEditor property panel follows the route: when the real next
+  assimilation moves to another note's property, the open panel closes. Give
+  `AssimilationController.next` the same note and key when later checks read
+  the panel (slice 5 may meet this).
