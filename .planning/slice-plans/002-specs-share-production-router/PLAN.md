@@ -69,8 +69,11 @@ The trial edits were removed after the observations.
 
 ### 1. Every test starts at the root location
 Type: Behavior
-Status: planned
+Status: done
 Proof: the new `RenderingHelper.spec.ts` cases, then the whole frontend suite.
+Accepted proof: `RenderingHelper.spec.ts` failed first with `expected 'recall'
+to be 'root'`, then passed with the reset; whole suite 321 files, 2014 tests
+passed; `vue-tsc --noEmit` clean.
 
 Behavior: an earlier test in the same file left a router at the recall
 location → a test mounts a component with `withRouter()` → its current route
