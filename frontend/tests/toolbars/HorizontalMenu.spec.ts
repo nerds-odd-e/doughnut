@@ -8,11 +8,11 @@ import {
   expectAllNavLabelsVisible,
   expectMenuCollapsed,
   expectMenuExpanded,
+  goToRoute,
   menuContentEl,
   menuWrapperEl,
   renderHorizontalMenu,
   setupHorizontalMenuTests,
-  useRouteValue,
 } from "@tests/toolbars/horizontalMenuTestSupport"
 
 describe("HorizontalMenu", () => {
@@ -128,9 +128,7 @@ describe("HorizontalMenu", () => {
       await clickToggleMenu()
       expectMenuExpanded()
 
-      useRouteValue.fullPath = "/recall"
-      useRouteValue.name = "recall"
-      await nextTick()
+      await goToRoute({ name: "recall" })
 
       expectMenuCollapsed()
     })

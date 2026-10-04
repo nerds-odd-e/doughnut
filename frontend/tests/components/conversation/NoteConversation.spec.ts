@@ -6,17 +6,6 @@ import { flushPromises } from "@vue/test-utils"
 import { expect, vi, describe, beforeEach, afterEach } from "vitest"
 import AiReplyEventSource from "@/managedApi/AiReplyEventSource"
 
-const mockedPush = vi.fn()
-vi.mock("vue-router", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("vue-router")>()
-  return {
-    ...actual,
-    useRouter: () => ({
-      push: mockedPush,
-    }),
-  }
-})
-
 afterEach(() => {
   vi.clearAllMocks()
   vi.clearAllTimers()
@@ -33,6 +22,7 @@ describe("NoteConversation", () => {
       .component(NoteConversation)
       .withCurrentUser(user)
       .withCleanStorage()
+      .withRouter()
       .withProps({
         noteId: note.id,
       })

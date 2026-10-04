@@ -207,7 +207,7 @@ Proof: `NoteRefinement.extractNote.spec.ts`, `ViewMemoryTrackerLink.spec.ts`,
 
 ### 12. Conversation and global-bar specs run a real router
 Type: Structure
-Status: planned
+Status: done
 Proof: `ConversationComponent.spec.ts`, `NoteConversation.spec.ts`,
 `GlobalBar.spec.ts`, and every spec that loads
 `tests/toolbars/horizontalMenuTestSupport.ts` pass with no `vue-router` mock.
