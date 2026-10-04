@@ -14,7 +14,6 @@ import {
   setupMainMenuTests,
 } from "./mainMenuTestSupport"
 
-vi.mock("@/composables/useGoToNextAssimilation")
 vi.mock("@/managedApi/AiReplyEventSource", async () => {
   const { aiReplyEventSourceMockExports } = await import("./mainMenuMocks")
   return aiReplyEventSourceMockExports()

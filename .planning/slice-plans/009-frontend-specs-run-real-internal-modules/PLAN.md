@@ -135,7 +135,7 @@ Navigation after submit is asserted as the router's current named location
 
 ### 5. MainMenu and AssimilationPanel specs run the real next-assimilation action
 Type: Structure
-Status: planned
+Status: done
 Proof: the three `tests/toolbars/MainMenu*.spec.ts` files,
 `AssimilationPanel.spec.ts`, and `AssimilationPanel.trackers.spec.ts` pass
 with no mock of `useGoToNextAssimilation`; `mainMenuTestSupport.ts` no longer
@@ -258,3 +258,9 @@ decision, not tuned away here.
   router builder. A page containing `GlobalBar` needs a real router on every
   mount (its `NoteUndoButton` injects the router), including custom wrapper
   mounts.
+- Slice 5 renamed one MainMenu test from "calls goToNextAssimilation …" to
+  "goes to the next note to assimilate …": the test now checks the route, so
+  its name follows; coverage is unchanged.
+- `withRouter()` with no argument uses web history, so the route carries over
+  between tests; start from `productionRouterAt(...)` when a test checks that
+  the route stays put.

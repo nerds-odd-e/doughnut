@@ -1,8 +1,7 @@
 import { NoteController } from "@generated/donut-backend-api/sdk.gen"
-import { describe, expect, it, vi } from "vitest"
+import { describe, expect, it } from "vitest"
 import makeMe from "donut-test-fixtures/makeMe"
 import { mockSdkService, wrapSdkResponse } from "@tests/helpers"
-import { mockedGoToNextAssimilation } from "./assimilationPanelMocks"
 import {
   assimilateAsCommissionedButtonSelector,
   assimilateButtonSelector,
@@ -14,6 +13,7 @@ import {
   closeSpellingVerificationPopup,
   commissionedStatusSelector,
   dueRecallsRefreshRequested,
+  expectAtNoteOf,
   totalAssimilatedCount,
   mountAssimilationPanelReady,
   note,
@@ -25,12 +25,6 @@ import {
   understandingStatusSelector,
 } from "./assimilationPanelTestSupport"
 
-vi.mock("@/composables/useGoToNextAssimilation", () => ({
-  useGoToNextAssimilation: () => ({
-    goToNextAssimilation: mockedGoToNextAssimilation,
-  }),
-}))
-
 setupAssimilationPanelTests()
 
 const tracker = () => makeMe.aMemoryTracker.id(1)
@@ -40,7 +34,7 @@ function expectStaysOnNoteAfterAssimilateAs(body: object) {
   expect(assimilateSpy).toHaveBeenCalledWith({
     body: { noteId: note.id, ...body },
   })
-  expect(mockedGoToNextAssimilation).not.toHaveBeenCalled()
+  expectAtNoteOf(note.id)
   expect(totalAssimilatedCount.value).toBe(0)
   expect(assimilatedCountOfTheDay.value).toBe(0)
   expect(dueRecallsRefreshRequested()).toBe(true)

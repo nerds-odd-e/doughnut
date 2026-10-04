@@ -1,5 +1,8 @@
-import { UserController } from "@generated/donut-backend-api/sdk.gen"
-import { useGoToNextAssimilation } from "@/composables/useGoToNextAssimilation"
+import {
+  AssimilationController,
+  UserController,
+} from "@generated/donut-backend-api/sdk.gen"
+import { noteShowLocation } from "@/routes/noteShowLocation"
 import timezoneParam from "@/managedApi/window/timezoneParam"
 import { fireEvent, screen } from "@testing-library/vue"
 import { mockSdkService } from "@tests/helpers"
@@ -17,7 +20,6 @@ import {
   user,
 } from "./mainMenuTestSupport"
 
-vi.mock("@/composables/useGoToNextAssimilation")
 vi.mock("@/managedApi/AiReplyEventSource", async () => {
   const { aiReplyEventSourceMockExports } = await import("./mainMenuMocks")
   return aiReplyEventSourceMockExports()
@@ -44,10 +46,10 @@ function mockAssimilationCount(
 }
 
 describe("MainMenu navigation", () => {
-  it("calls goToNextAssimilation from the assimilate menu action link", async () => {
-    const goToNextSpy = vi.fn()
-    vi.mocked(useGoToNextAssimilation).mockReturnValue({
-      goToNextAssimilation: goToNextSpy,
+  it("goes to the next note to assimilate from the assimilate menu action link", async () => {
+    const nextNoteId = 7
+    mockSdkService(AssimilationController, "next", {
+      nextUnit: { noteId: nextNoteId },
     })
 
     await renderComponent()
@@ -56,8 +58,11 @@ describe("MainMenu navigation", () => {
     expect(assimilateLink.getAttribute("href")).toBeNull()
 
     await fireEvent.click(assimilateLink)
+    await flushPromises()
 
-    expect(goToNextSpy).toHaveBeenCalled()
+    expect(router.currentRoute.value).toMatchObject(
+      noteShowLocation(nextNoteId)
+    )
   })
 
   it.each([
