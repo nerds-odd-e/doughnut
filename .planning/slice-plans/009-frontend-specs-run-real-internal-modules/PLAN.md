@@ -214,7 +214,7 @@ Proof: `ConversationComponent.spec.ts`, `NoteConversation.spec.ts`,
 
 ### 13. Only the named allowed mocks remain
 Type: Structure
-Status: planned
+Status: done
 Proof: `src/components/commons/Popups/__mocks__/usePopups.ts` is deleted; the
 popup helper import in `tests/setupVitest.ts` moves to the top of the file; the
 frontend testing skill names the allowed mocks from the story with one reason
@@ -280,3 +280,7 @@ decision, not tuned away here.
 - A real router shows replace versus push through its history position:
   `countHistoryEntriesAdded(router)` from `@tests/helpers` returns how many
   entries were added since it was called (push 1, replace 0).
+- Whole suite after slice 13 (2026-10-04, no `CI`): 320 files, 2014 tests
+  pass in 42.9 s and 41.5 s wall (Vitest 39.1 s and 38.5 s), against the
+  59.8 s / 63.5 s baseline. No slowdown; part of the gain may be a quieter
+  machine.

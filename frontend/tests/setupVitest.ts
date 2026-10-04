@@ -23,15 +23,13 @@ import "../src/assets/daisyui.css"
 
 import { beforeEach, vi } from "vitest"
 import createFetchMock from "vitest-fetch-mock"
+import { emptyPopupStack } from "./helpers/popupStackTestSupport"
 
 const fetchMock = createFetchMock(vi)
 fetchMock.enableMocks()
 fetchMock.doMock()
 
-// Imported per test, not at the top: a static import here would load the real
-// popup module before a spec's `vi.mock` of it could take effect.
-beforeEach(async () => {
-  const { emptyPopupStack } = await import("./helpers/popupStackTestSupport")
+beforeEach(() => {
   emptyPopupStack()
 })
 
