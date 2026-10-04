@@ -199,7 +199,7 @@ assert `replace`/`push`; assert the current location instead.
 
 ### 11. Recall component specs run a real router
 Type: Structure
-Status: planned
+Status: done
 Proof: `NoteRefinement.extractNote.spec.ts`, `ViewMemoryTrackerLink.spec.ts`,
 `RecallSessionOptionsDialog.spec.ts`,
 `MatchedNoteWikiLinkOrRelationshipOffer.spec.ts`, and
@@ -277,6 +277,6 @@ decision, not tuned away here.
   every call; a spec calling it before each test stacks duplicate toasts and
   redirects. `clientSetup.spec.ts` sets it up once in `beforeAll`. The toast
   helper also offers `toastShown(type)` and `toastTimeout(toast)`.
-- A real router shows replace versus push through
-  `router.options.history.state.position`: a push raises it, a replace keeps
-  it (`AddRelationship.spec.ts`).
+- A real router shows replace versus push through its history position:
+  `countHistoryEntriesAdded(router)` from `@tests/helpers` returns how many
+  entries were added since it was called (push 1, replace 0).

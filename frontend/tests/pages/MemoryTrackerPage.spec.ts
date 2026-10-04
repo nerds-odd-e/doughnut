@@ -17,16 +17,6 @@ import {
   skippedMemoryTracker,
 } from "./memoryTrackerPageViewTestSupport"
 
-vi.mock("vue-router", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("vue-router")>()
-  return {
-    ...actual,
-    useRouter: () => ({
-      push: vi.fn(),
-    }),
-  }
-})
-
 describe("MemoryTrackerPage", () => {
   it("fetches memory tracker data on mount", async () => {
     const { getRecallHistorySpy, showMemoryTrackerSpy } =

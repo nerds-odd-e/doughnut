@@ -43,6 +43,7 @@ export function mountMemoryTrackerPage(id = memoryTrackerId) {
   return helper
     .component(MemoryTrackerPage)
     .withProps({ memoryTrackerId: id })
+    .withRouter()
     .mount()
 }
 

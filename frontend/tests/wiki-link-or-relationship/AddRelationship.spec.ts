@@ -1,7 +1,7 @@
 import { noteShowLocation } from "@/routes/noteShowLocation"
 import { formatRelationshipNoteTitle } from "@/utils/relationshipNoteCompose"
 import makeMe from "donut-test-fixtures/makeMe"
-import { productionRouterAt } from "@tests/helpers"
+import { countHistoryEntriesAdded, productionRouterAt } from "@tests/helpers"
 import { sidebarStructuralRefreshKey } from "@/components/notes/sidebarStructuralRefresh"
 import { teardownGlobalClientForTesting } from "@/managedApi/clientSetup"
 import { nextTick } from "vue"
@@ -88,7 +88,7 @@ describe("AddRelationshipFinalize", () => {
       seedRealm: sourceRealm,
       router,
     })
-    const historyPositionBefore = router.options.history.state.position
+    const historyEntriesAdded = countHistoryEntriesAdded(router)
     await selectRelationType(navigating, "related to")
 
     const expectedTitle = formatRelationshipNoteTitle(
@@ -106,7 +106,7 @@ describe("AddRelationshipFinalize", () => {
     expect(router.currentRoute.value).toMatchObject(
       noteShowLocation(createdRealm.id)
     )
-    expect(router.options.history.state.position).toBe(historyPositionBefore)
+    expect(historyEntriesAdded()).toBe(0)
     expect(navigating.emitted().success).toHaveLength(1)
 
     createNoteSpy.mockClear()

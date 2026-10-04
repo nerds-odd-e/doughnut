@@ -1,27 +1,9 @@
 import { flushPromises } from "@vue/test-utils"
-import { vi, describe, it, expect } from "vitest"
-import helper from "@tests/helpers"
+import { describe, it, expect } from "vitest"
+import helper, { productionRouterAt } from "@tests/helpers"
 import RecallSessionOptionsDialog from "@/components/recall/RecallSessionOptionsDialog.vue"
 import makeMe from "donut-test-fixtures/makeMe"
 import type { AnsweredQuestion } from "@generated/donut-backend-api"
-
-vi.mock("vue-router", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("vue-router")>()
-  return {
-    ...actual,
-    useRoute: () => ({
-      path: "/",
-      fullPath: "/",
-    }),
-    useRouter: () => ({
-      currentRoute: {
-        value: {
-          name: "recall",
-        },
-      },
-    }),
-  }
-})
 
 describe("RecallSessionOptionsDialog", () => {
   const defaultProps = {
@@ -34,13 +16,14 @@ describe("RecallSessionOptionsDialog", () => {
     previousAnsweredQuestions: [] as (AnsweredQuestion | undefined)[],
   }
 
-  const mountWithTeleportStub = (
+  const mountWithTeleportStub = async (
     component: typeof RecallSessionOptionsDialog,
     props: typeof defaultProps
   ) =>
     helper
       .component(component)
       .withProps(props)
+      .withRouter(await productionRouterAt({ name: "recall" }))
       .mount({
         global: {
           stubs: {
@@ -77,7 +60,7 @@ describe("RecallSessionOptionsDialog", () => {
       .withMemoryTrackerId(2)
       .please()
 
-    const wrapper = mountWithTeleportStub(RecallSessionOptionsDialog, {
+    const wrapper = await mountWithTeleportStub(RecallSessionOptionsDialog, {
       ...defaultProps,
       previousAnsweredQuestions: [questionResult1, questionResult2],
     })
@@ -97,7 +80,7 @@ describe("RecallSessionOptionsDialog", () => {
       .withMemoryTrackerId(1)
       .please()
 
-    const wrapper = mountWithTeleportStub(RecallSessionOptionsDialog, {
+    const wrapper = await mountWithTeleportStub(RecallSessionOptionsDialog, {
       ...defaultProps,
       previousAnsweredQuestions: [spellingResult],
     })
@@ -118,7 +101,7 @@ describe("RecallSessionOptionsDialog", () => {
       .withMemoryTrackerId(1)
       .please()
 
-    const wrapper = mountWithTeleportStub(RecallSessionOptionsDialog, {
+    const wrapper = await mountWithTeleportStub(RecallSessionOptionsDialog, {
       ...defaultProps,
       previousAnsweredQuestions: [questionResult],
     })
@@ -144,7 +127,7 @@ describe("RecallSessionOptionsDialog", () => {
       .withMemoryTrackerId(1)
       .please()
 
-    const wrapper = mountWithTeleportStub(RecallSessionOptionsDialog, {
+    const wrapper = await mountWithTeleportStub(RecallSessionOptionsDialog, {
       ...defaultProps,
       previousAnsweredQuestions: [questionResult],
     })
@@ -170,7 +153,7 @@ describe("RecallSessionOptionsDialog", () => {
       .withMemoryTrackerId(1)
       .please()
 
-    const wrapper = mountWithTeleportStub(RecallSessionOptionsDialog, {
+    const wrapper = await mountWithTeleportStub(RecallSessionOptionsDialog, {
       ...defaultProps,
       previousAnsweredQuestions: [questionResult],
     })
@@ -196,7 +179,7 @@ describe("RecallSessionOptionsDialog", () => {
       .withMemoryTrackerId(1)
       .please()
 
-    const wrapper = mountWithTeleportStub(RecallSessionOptionsDialog, {
+    const wrapper = await mountWithTeleportStub(RecallSessionOptionsDialog, {
       ...defaultProps,
       previousAnsweredQuestions: [questionResult, undefined],
     })
