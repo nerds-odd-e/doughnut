@@ -4,18 +4,8 @@ import { AiAudioController } from "@generated/donut-backend-api/sdk.gen"
 import type { AudioChunk } from "@/models/audio/audioProcessingScheduler"
 import { useNoteStore } from "@/store/noteStore"
 
-const getLastContentChunk = (
-  content: string | undefined,
-  maxLength = 500
-): string => {
-  if (!content) return ""
-  if (content.length <= maxLength) return content
-  return `...${content.slice(-maxLength)}`
-}
-
 export function useNoteAudioProcessing(
   note: Note,
-  processingInstructions: Ref<string>,
   errors: Ref<Record<string, string | undefined> | undefined>
 ) {
   const noteStore = useNoteStore()
@@ -27,15 +17,10 @@ export function useNoteAudioProcessing(
   ): Promise<string | undefined> => {
     isProcessing.value = true
     try {
-      const realm = await noteStore.getOrLoadNoteRealm(noteId)
       const { data: response, error } = await AiAudioController.audioToText({
         body: {
           uploadAudioFile: chunk.data,
-          additionalProcessingInstructions: processingInstructions.value,
           midSpeech: chunk.isMidSpeech,
-          previousNoteContentToAppendTo: getLastContentChunk(
-            realm.note.content
-          ),
         },
       })
 

@@ -83,7 +83,7 @@ describe("NoteAudioTools content preservation", () => {
     wrapper?.unmount()
   })
 
-  it("appends successive results once and sends the current body as context", async () => {
+  it("appends successive results once", async () => {
     audioToTextMock
       .mockResolvedValueOnce(
         wrapSdkResponse(
@@ -97,11 +97,6 @@ describe("NoteAudioTools content preservation", () => {
     await processAudio(wrapper)
     await processAudio(wrapper)
 
-    expect(audioToTextMock).toHaveBeenLastCalledWith({
-      body: expect.objectContaining({
-        previousNoteContentToAppendTo: `...${`${note.content} The lighthouse beam sweeps across the bay.`.slice(-500)}`,
-      }),
-    })
     expect(updateContentMock).toHaveBeenNthCalledWith(2, {
       path: { note: note.id },
       body: {
@@ -153,7 +148,7 @@ describe("NoteAudioTools content preservation", () => {
 
   it.each([
     {
-      when: "longer than the context excerpt",
+      when: "several paragraphs long",
       body: longBody,
       saved: `${longBody} text`,
     },
@@ -190,9 +185,6 @@ describe("NoteAudioTools content preservation", () => {
     noteStore.refreshNoteRealm(destination)
     await wrapper.setProps({ note: destination.note })
     await processAudio(wrapper)
-    expect(audioToTextMock).toHaveBeenCalledWith({
-      body: expect.objectContaining({ previousNoteContentToAppendTo: current }),
-    })
     expect(updateContentMock).toHaveBeenCalledExactlyOnceWith({
       path: { note: note.id },
       body: { content: `${current} text` },
@@ -216,10 +208,11 @@ describe("NoteAudioTools content preservation", () => {
     await processAudio(wrapper)
     await processAudio(wrapper)
     await processAudio(wrapper)
-    expect(audioToTextMock).toHaveBeenLastCalledWith({
-      body: expect.objectContaining({
-        previousNoteContentToAppendTo: `...${`${note.content} The lighthouse beam sweeps across the bay.`.slice(-500)}`,
-      }),
+    expect(updateContentMock).toHaveBeenLastCalledWith({
+      path: { note: note.id },
+      body: {
+        content: `${note.content} The lighthouse beam sweeps across the bay. The ferry arrives after sunset.`,
+      },
     })
   })
 })

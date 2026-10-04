@@ -1,8 +1,8 @@
 # Voice input
 
 Authors open Audio tools on an existing note to Record Audio, Flush Audio,
-Stop Recording, or Save Audio Locally. Advanced Options exposes Processing
-Instructions and full-screen editing. Dictation writes only to the note body.
+Stop Recording, or Save Audio Locally. Advanced Options offers full-screen
+editing. Dictation writes only to the note body.
 
 ## Adding dictated text to a note
 
@@ -13,13 +13,10 @@ by one space. Nothing is left out, added, or reworded. Audio responses do not
 use the conversation tool's `NoteContentCompletion`, which continues to
 replace complete note content.
 
-The client retains the originating note id. It reads that note's current store
-body, loading its realm when absent, and sends only the last 500 characters as
-context, prefixed with `...` when truncated. The full body stays in the store;
-the excerpt never becomes the saved replacement.
-
-Each returned passage is appended deterministically to the originating note's
-current body and saved through the ordinary content PATCH. One join rule
+The audio request carries only the audio and the mid-speech flag. The client
+retains the originating note id, and each returned passage is appended
+deterministically to that note's current store body, loading its realm when
+absent, and saved through the ordinary content PATCH. One join rule
 serves both the saved body and an open editor's draft: text that does not end
 in whitespace is followed by one space and then the passage, text already
 ending in whitespace is followed directly by the passage, and an empty body

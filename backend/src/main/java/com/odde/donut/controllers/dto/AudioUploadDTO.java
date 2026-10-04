@@ -20,9 +20,5 @@ public class AudioUploadDTO {
       })
   private MultipartFile uploadAudioFile;
 
-  private String additionalProcessingInstructions;
-
   private boolean midSpeech;
-
-  private String previousNoteContentToAppendTo;
 }

@@ -5093,12 +5093,8 @@ components:
         uploadAudioFile:
           type: string
           format: binary
-        additionalProcessingInstructions:
-          type: string
         midSpeech:
           type: boolean
-        previousNoteContentToAppendTo:
-          type: string
     TextFromAudioWithCallInfo:
       type: object
       properties:

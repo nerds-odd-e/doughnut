@@ -104,7 +104,8 @@ frontend fixtures for the old shape. Regenerate the API client
 
 ### 3. Audio tools send only the audio
 Type: Behavior
-Status: planned
+Status: done
+Accepted proof: `env -u NODE_ENV pnpm frontend:test tests/notes/ tests/store/noteStore.spec.ts` (advanced-options "offers full-screen editing as the only advanced option"; processing "sends only the audio and the mid-speech flag"), `vue-tsc --noEmit`, and full `pnpm backend:test_only`. The advanced-options component was folded into `NoteAudioTools.vue`.
 Proof: `NoteAudioTools.advancedOptions.spec.ts` shows full-screen editing and no Processing Instructions field; `NoteAudioTools.processing.spec.ts` and `AiAudioControllerTests` show the request carries only the audio and the mid-speech flag.
 
 Behavior: an author opens Advanced Options → it offers full-screen editing
