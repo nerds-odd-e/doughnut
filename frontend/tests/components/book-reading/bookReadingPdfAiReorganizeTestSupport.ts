@@ -2,12 +2,7 @@ import BookReadingPdf from "@/components/book-reading/BookReadingPdf.vue"
 import GlobalApiLoadingModal from "@tests/helpers/GlobalApiLoadingModal"
 import helper from "@tests/helpers"
 import makeMe from "donut-test-fixtures/makeMe"
-import { vi } from "vitest"
 import { defineComponent } from "vue"
-
-export const mockToast = {
-  error: vi.fn(),
-}
 
 export const bookReadingPdfStubs = {
   GlobalBar: { template: "<div><slot /></div>" },

@@ -18,15 +18,6 @@ import { afterEach, beforeEach, vi } from "vitest"
 import { defineComponent, type PropType } from "vue"
 import { relationshipNoteContent } from "./relationshipNoteTestContent"
 
-export const mockToast = {
-  error: vi.fn(),
-  warning: vi.fn(),
-}
-
-vi.mock("vue-toastification", () => ({
-  useToast: () => mockToast,
-}))
-
 export const noteMoreOptionsTrashFormNoteRealm = makeMe.aNoteRealm.please()
 export const noteMoreOptionsTrashFormNote =
   noteMoreOptionsTrashFormNoteRealm.note
@@ -83,8 +74,6 @@ export function setupNoteMoreOptionsTrashFormTests() {
   })
 
   beforeEach(() => {
-    mockToast.error.mockClear()
-    mockToast.warning.mockClear()
     trashNoteSpy = mockSdkService(
       NoteController,
       "trashNote",

@@ -13,15 +13,6 @@ import { noteMoreOptionsTitles } from "@/components/notes/widgets/noteMoreOption
 import type { ApiStatus } from "@/managedApi/ApiStatusHandler"
 import { setupGlobalClient } from "@/managedApi/clientSetup"
 
-const mockToast = {
-  error: vi.fn(),
-  warning: vi.fn(),
-}
-
-vi.mock("vue-toastification", () => ({
-  useToast: () => mockToast,
-}))
-
 let renderer: RenderingHelper<typeof NoteMoreOptionsForm>
 let router: ReturnType<typeof createRouter>
 const apiStatus: ApiStatus = { states: [] }
@@ -35,8 +26,6 @@ beforeEach(() => {
   useAssimilationView().dismiss()
   useNoteToolbarPanel().close()
   setupGlobalClient(apiStatus)
-  mockToast.error.mockClear()
-  mockToast.warning.mockClear()
   mockSdkService(NoteController, "trashNote", undefined)
   router = createRouter({
     history: createWebHistory(),

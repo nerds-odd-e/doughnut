@@ -1,7 +1,7 @@
 import { AiController } from "@generated/donut-backend-api/sdk.gen"
 import { flushPromises, type VueWrapper } from "@vue/test-utils"
 import { nextTick } from "vue"
-import { describe, expect, it, vi } from "vitest"
+import { describe, expect, it } from "vitest"
 import { mockSdkServiceWithImplementation } from "@tests/helpers"
 import {
   clickLoadingModalCancel,
@@ -26,17 +26,10 @@ import {
   mountNoteRefinementPendingExtractionPreview,
   openExtractionPreview,
 } from "./noteRefinementExtractionTestSupport"
-
-const mockToast = {
-  error: vi.fn(),
-  warning: vi.fn(),
-}
-
-vi.mock("vue-toastification", () => ({
-  useToast: () => mockToast,
-}))
+import { showToastsOnPage, toastOnPage } from "@tests/helpers/toastTestSupport"
 
 setupNoteRefinementTests()
+showToastsOnPage()
 
 const exists = (wrapper: VueWrapper, testId: string) =>
   wrapper.find(`[data-test-id="${testId}"]`).exists()
@@ -56,7 +49,7 @@ describe("NoteRefinement layout generation cancel", () => {
     await flushPromises()
 
     expect(loadingModalMask()).toBeNull()
-    expect(mockToast.error).not.toHaveBeenCalled()
+    expect(toastOnPage()).toBeNull()
     expect(wrapper.emitted("contentUpdated")).toBeUndefined()
     expectEmptyLayoutWithRetry(wrapper)
 
@@ -87,7 +80,7 @@ describe("NoteRefinement layout generation cancel", () => {
     await flushPromises()
 
     expect(loadingModalMask()).toBeNull()
-    expect(mockToast.error).not.toHaveBeenCalled()
+    expect(toastOnPage()).toBeNull()
     expectEmptyLayoutWithRetry(wrapper)
 
     resolve()
@@ -123,7 +116,7 @@ describe("NoteRefinement extraction preview cancel", () => {
           .element as HTMLButtonElement
       ).disabled
     ).toBe(false)
-    expect(mockToast.error).not.toHaveBeenCalled()
+    expect(toastOnPage()).toBeNull()
     expect(wrapper.emitted("contentUpdated")).toBeUndefined()
 
     resolve()

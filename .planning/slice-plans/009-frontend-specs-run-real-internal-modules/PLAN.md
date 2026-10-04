@@ -161,7 +161,7 @@ attempt with none of its three mocks.
 
 ### 7. Component specs read real toasts on the page
 Type: Structure
-Status: planned
+Status: done
 Proof: `NoteMoreOptionsForm.spec.ts` (with `noteMoreOptionsTrashTestSupport.ts`
 and the specs that load it), `NoteRefinement.cancel.spec.ts`,
 `BookReadingPdfAiReorganize.spec.ts`, and `BookReadingPdfUndoShortcut.spec.ts`
@@ -270,3 +270,6 @@ decision, not tuned away here.
   lost, which caused the earlier first-attempt timeout), then clears toasts
   before each test. It is not global: a spec that still mocks
   `vue-toastification` must not call it.
+- `NoteMoreOptionsForm.spec.ts` never asserted on its toast mock (the story's
+  key example assumed it captured `error`); removing the mock lost no check.
+  `toastOnPage()` in the toast helper checks that no toast shows.

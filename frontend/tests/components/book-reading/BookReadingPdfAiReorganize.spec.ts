@@ -12,14 +12,11 @@ import {
   bookReadingPdfProps,
   clickAiReorganize,
   loadingModal,
-  mockToast,
   mountBookReadingPdf,
   mountBookReadingWithGlobalModal,
 } from "./bookReadingPdfAiReorganizeTestSupport"
-
-vi.mock("vue-toastification", () => ({
-  useToast: () => mockToast,
-}))
+import { showToastsOnPage } from "@tests/helpers/toastTestSupport"
+import { page } from "vitest/browser"
 
 type SuggestResult = Awaited<
   ReturnType<typeof NotebookBooksController.suggestBookLayoutReorganization>
@@ -64,12 +61,12 @@ function mockPendingApply() {
 }
 
 describe("BookReadingPdf AI reorganize suggest", () => {
+  showToastsOnPage()
   const apiStatus: ApiStatus = { states: [] }
   let innerWidthDesc: PropertyDescriptor | undefined
 
   beforeEach(() => {
     apiStatus.states = []
-    mockToast.error.mockClear()
     setupGlobalClient(apiStatus)
 
     innerWidthDesc = Object.getOwnPropertyDescriptor(window, "innerWidth")
@@ -109,7 +106,7 @@ describe("BookReadingPdf AI reorganize suggest", () => {
     await clickAiReorganize(wrapper)
     await flushPromises()
 
-    expect(mockToast.error).toHaveBeenCalled()
+    await expect.element(page.getByText("suggest failed")).toBeInTheDocument()
     wrapper.unmount()
   })
 

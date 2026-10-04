@@ -15,6 +15,9 @@ function mountToastContainerOnce() {
   return toastContainerMounted
 }
 
+export const toastOnPage = () =>
+  document.querySelector(".Vue-Toastification__toast")
+
 /**
  * Shows the real toasts on the page: production code's `useToast` reaches one
  * toast container, emptied before each test so earlier toasts do not leak.
@@ -23,8 +26,6 @@ export function showToastsOnPage() {
   beforeEach(async () => {
     await mountToastContainerOnce()
     useToast().clear()
-    await vi.waitFor(() =>
-      expect(document.querySelector(".Vue-Toastification__toast")).toBeNull()
-    )
+    await vi.waitFor(() => expect(toastOnPage()).toBeNull())
   })
 }
