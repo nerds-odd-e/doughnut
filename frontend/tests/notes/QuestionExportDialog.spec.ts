@@ -10,19 +10,6 @@ import makeMe from "donut-test-fixtures/makeMe"
 import QuestionExportDialog from "@/components/notes/QuestionExportDialog.vue"
 import { type VueWrapper } from "@vue/test-utils"
 import { flushPromises } from "@vue/test-utils"
-import { reactive } from "vue"
-
-const mockRoute = reactive({ name: "", path: "", params: {}, query: {} })
-vi.mock("vue-router", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("vue-router")>()
-  return {
-    ...actual,
-    useRoute: () => mockRoute,
-    useRouter: () => ({
-      push: vi.fn(),
-    }),
-  }
-})
 
 describe("QuestionExportDialog", () => {
   // biome-ignore lint/suspicious/noExplicitAny: wrapper for testing
@@ -59,6 +46,7 @@ describe("QuestionExportDialog", () => {
     wrapper = helper
       .component(QuestionExportDialog)
       .withProps({ noteId: note.id })
+      .withRouter()
       .mount({ attachTo: document.body })
 
     await nextTick()
@@ -94,6 +82,7 @@ describe("QuestionExportDialog", () => {
     wrapper = helper
       .component(QuestionExportDialog)
       .withProps({ noteId: note.id })
+      .withRouter()
       .mount({ attachTo: document.body })
 
     await flushPromises()
@@ -120,6 +109,7 @@ describe("QuestionExportDialog", () => {
     wrapper = helper
       .component(QuestionExportDialog)
       .withProps({ noteId: note.id })
+      .withRouter()
       .mount({ attachTo: document.body })
 
     await flushPromises()

@@ -1,25 +1,16 @@
 import { NotebookFolderController } from "@generated/donut-backend-api/sdk.gen"
 import FolderNewForm from "@/components/notes/FolderNewForm.vue"
 import { flushPromises } from "@vue/test-utils"
-import helper, { mockSdkService, testFolderStub } from "@tests/helpers"
+import helper, {
+  mockSdkService,
+  productionRouterAt,
+  testFolderStub,
+} from "@tests/helpers"
 import { describe, it, expect, beforeEach, vi } from "vitest"
-
-const routerPush = vi.fn()
-
-vi.mock("vue-router", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("vue-router")>()
-  return {
-    ...actual,
-    useRouter: () => ({
-      push: routerPush,
-    }),
-  }
-})
 
 describe("FolderNewForm", () => {
   beforeEach(() => {
     vi.resetAllMocks()
-    routerPush.mockResolvedValue(undefined)
     mockSdkService(NotebookFolderController, "listNotebookFolderIndex", [])
     mockSdkService(NotebookFolderController, "listNotebookFolderListing", {
       folders: [],
@@ -30,6 +21,7 @@ describe("FolderNewForm", () => {
     const wrapper = helper
       .component(FolderNewForm)
       .withCleanStorage()
+      .withRouter()
       .withProps({
         notebookId: 301,
         ancestorFolders: [],
@@ -56,9 +48,11 @@ describe("FolderNewForm", () => {
       "createFolder",
       testFolderStub(901, "New Folder")
     )
+    const router = await productionRouterAt({ name: "root" })
     const wrapper = helper
       .component(FolderNewForm)
       .withCleanStorage()
+      .withRouter(router)
       .withProps({
         notebookId: 301,
         ancestorFolders: [],
@@ -80,7 +74,7 @@ describe("FolderNewForm", () => {
     await flushPromises()
 
     expect(createFolderSpy).toHaveBeenCalled()
-    expect(routerPush).toHaveBeenCalledWith({
+    expect(router.currentRoute.value).toMatchObject({
       name: "folderPage",
       params: {
         notebookId: "301",

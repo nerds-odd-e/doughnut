@@ -1,4 +1,5 @@
-import { describe, it, expect, beforeEach, vi } from "vitest"
+import { describe, it, expect, beforeEach, afterEach } from "vitest"
+import { page } from "vitest/browser"
 import type { AssimilationNextDto } from "@generated/donut-backend-api"
 import { AssimilationController } from "@generated/donut-backend-api/sdk.gen"
 import {
@@ -21,40 +22,39 @@ import {
   setupGlobalClient,
   teardownGlobalClientForTesting,
 } from "@/managedApi/clientSetup"
-import { fireEvent, render } from "@testing-library/vue"
+import { fireEvent } from "@testing-library/vue"
 import { flushPromises } from "@vue/test-utils"
 import { computed, defineComponent, ref } from "vue"
-import {
+import helper, {
   mockSdkService,
   mockSdkServiceWithImplementation,
+  productionRouterAt,
 } from "@tests/helpers"
+import mockBrowserTimeZone from "@tests/helpers/mockBrowserTimeZone"
+import { showToastsOnPage } from "@tests/helpers/toastTestSupport"
 
-const routerPush = vi.fn()
-const showSuccessToast = vi.fn()
-
-vi.mock("vue-router", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("vue-router")>()
-  return {
-    ...actual,
-    useRouter: () => ({ push: routerPush }),
-  }
-})
-
-vi.mock("@/managedApi/window/timezoneParam", () => ({
-  default: () => "Asia/Shanghai",
-}))
-
-vi.mock("@/composables/useToast", () => ({
-  useToast: () => ({
-    showSuccessToast,
-    showErrorToast: vi.fn(),
-  }),
-}))
+async function mountGoToNextAssimilation() {
+  const router = await productionRouterAt({ name: "root" })
+  let goToNextAssimilation!: () => Promise<boolean>
+  helper
+    .component(
+      defineComponent({
+        setup() {
+          ;({ goToNextAssimilation } = useGoToNextAssimilation())
+          return () => null
+        },
+      })
+    )
+    .withRouter(router)
+    .mount()
+  return { router, goToNextAssimilation }
+}
 
 describe("useGoToNextAssimilation", () => {
+  mockBrowserTimeZone("Asia/Shanghai", beforeEach, afterEach)
+  showToastsOnPage()
+
   beforeEach(() => {
-    routerPush.mockReset()
-    showSuccessToast.mockReset()
     useAssimilationView().dismiss()
     const {
       setDueCount,
@@ -77,7 +77,7 @@ describe("useGoToNextAssimilation", () => {
       },
     })
 
-    const { goToNextAssimilation } = useGoToNextAssimilation()
+    const { router, goToNextAssimilation } = await mountGoToNextAssimilation()
     const navigated = await goToNextAssimilation()
     expect(navigated).toBe(true)
 
@@ -91,7 +91,7 @@ describe("useGoToNextAssimilation", () => {
     expect(showAssimilationPanel.value).toBe(true)
     expect(targetNoteId.value).toBe(42)
 
-    expect(routerPush).toHaveBeenCalledWith(noteShowLocation(42))
+    expect(router.currentRoute.value).toMatchObject(noteShowLocation(42))
   })
 
   it("pushes noteProperty and leaves settings off when nextUnit includes propertyKey", async () => {
@@ -105,12 +105,12 @@ describe("useGoToNextAssimilation", () => {
       },
     })
 
-    const { goToNextAssimilation } = useGoToNextAssimilation()
+    const { router, goToNextAssimilation } = await mountGoToNextAssimilation()
     await goToNextAssimilation()
 
     const { showAssimilationPanel } = useAssimilationView()
     expect(showAssimilationPanel.value).toBe(false)
-    expect(routerPush).toHaveBeenCalledWith(
+    expect(router.currentRoute.value).toMatchObject(
       notePropertyLocation(42, "example of")
     )
   })
@@ -125,10 +125,10 @@ describe("useGoToNextAssimilation", () => {
       },
     })
 
-    const { goToNextAssimilation } = useGoToNextAssimilation()
+    const { goToNextAssimilation } = await mountGoToNextAssimilation()
     await goToNextAssimilation()
 
-    expect(showSuccessToast).toHaveBeenCalledWith(DAILY_GOAL_TOAST)
+    await expect.element(page.getByText(DAILY_GOAL_TOAST)).toBeInTheDocument()
   })
 
   it("shows no-more toast and does not navigate when nextUnit is null", async () => {
@@ -141,12 +141,12 @@ describe("useGoToNextAssimilation", () => {
       },
     })
 
-    const { goToNextAssimilation } = useGoToNextAssimilation()
+    const { router, goToNextAssimilation } = await mountGoToNextAssimilation()
     const navigated = await goToNextAssimilation()
     expect(navigated).toBe(false)
 
-    expect(routerPush).not.toHaveBeenCalled()
-    expect(showSuccessToast).toHaveBeenCalledWith(NO_MORE_TOAST)
+    expect(router.currentRoute.value).toMatchObject({ name: "root" })
+    await expect.element(page.getByText(NO_MORE_TOAST)).toBeInTheDocument()
   })
 
   it("shows the global loading modal while the next assimilation API is pending", async () => {
@@ -181,7 +181,8 @@ describe("useGoToNextAssimilation", () => {
       `,
     })
 
-    const { getByText } = render(Starter)
+    const router = await productionRouterAt({ name: "root" })
+    const { getByText } = helper.component(Starter).withRouter(router).render()
 
     await fireEvent.click(getByText("Start assimilation"))
 

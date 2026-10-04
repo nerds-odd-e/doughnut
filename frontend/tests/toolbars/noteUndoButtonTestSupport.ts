@@ -3,12 +3,10 @@ import type { NoteRealm } from "@generated/donut-backend-api"
 import type NoteUndo from "@/store/noteUndo"
 import { resetNoteStore } from "@/store/noteStore"
 import makeMe from "donut-test-fixtures/makeMe"
-import helper from "@tests/helpers"
+import helper, { productionRouterAt } from "@tests/helpers"
 import { flushPromises } from "@vue/test-utils"
 import { beforeEach, expect, vi } from "vitest"
 import NoteUndoButton from "@/components/toolbars/NoteUndoButton.vue"
-
-export { mockedPush } from "./noteUndoButtonMocks"
 
 export let noteEditingHistory: NoteUndo
 
@@ -20,12 +18,15 @@ export function setupNoteUndoButtonTests() {
   })
 }
 
-export function mountNoteUndoButton() {
-  return helper.component(NoteUndoButton).mount()
+export async function mountNoteUndoButton() {
+  const router = await productionRouterAt({ name: "root" })
+  return helper.component(NoteUndoButton).withRouter(router).mount()
 }
 
-export function renderNoteUndoButton() {
-  return helper.component(NoteUndoButton).render()
+export async function renderNoteUndoButton() {
+  const router = await productionRouterAt({ name: "root" })
+  helper.component(NoteUndoButton).withRouter(router).render()
+  return router
 }
 
 export function refreshNoteRealms(...noteRealms: NoteRealm[]) {

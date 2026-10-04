@@ -6,7 +6,7 @@ released response is not proof of effectiveness. Unknown provenance stays unknow
 [Response status](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/finding-names.md).
 Full pre-trim evidence: `8830c682704aac3bbb34bf9b1204da8feba042ca:DearDough.md`. Older narratives live in Git, not a second archive.
 
-- Highest allocated local number: 205. Removed local codes are never reused.
+- Highest allocated local number: 206. Removed local codes are never reused.
 
 ## ODF-110 — A readiness replay observed only the plan's named seam, not the rest of the slice's journey
 
@@ -194,6 +194,15 @@ Follow-up: Open, unqueued.
   - Observed effect: one of two refactor passes changed nothing.
   - Inference: again, diff size did not predict value: slice 2 was a pure deletion and still left residue.
 
+- Execution: SEED-039#internal-mocks-to-real-modules / slice-plans/009-frontend-specs-run-real-internal-modules / a70529a3fb
+  - Timestamp: unknown (refactor passes on 2026-10-04, between about 09:20 and 10:15 +08:00)
+  - Tool: Claude Code
+  - Model: claude-opus-5-5
+  - Open Dough release: 0.3.56 (execution-checkout VERSION, unchanged during execution)
+  - Evidence: 13 test-only slices. Refactor agents for slices 4, 7, 10, 13 returned "no refactor edits" (54,847 + 50,344 + 55,406 + 60,542 subagent tokens). The other nine made edits later slices reused: shared `answerOnlyPendingPopup`, `productionRouterAt` replacing four local router builders, `countHistoryEntriesAdded` shared by three specs, toast readers moved into the toast helper.
+  - Observed effect: about 221k subagent tokens on passes without edits; nine of thirteen passes changed code.
+  - Inference: in a test-only story that grows shared helpers slice by slice, the passes mostly paid off; the no-edit passes came on slices that only applied helpers already in place. Qualified: one execution.
+
 ## ODF-202 — Managed Codex delivery left CI unobserved without a retained stream binding
 
 Former local code: DD-201.
@@ -261,3 +270,19 @@ the next.
   - Evidence: plan 008 slice 2 Proof "no Responses API call is made"; the slice 2 implementer added `verify(officialClient, never()).responses()` to `AiAudioControllerTests`; the refactor report removed it citing principle 7; the coordinator recorded the drop in the plan (b233c0e7f3).
   - Observed effect: one assertion written and removed, and a plan proof item the delivered tests do not carry. Small cost.
   - Inference: when planning a removal, check each proof item against the removal rule; prove the replacement behavior instead of the absence. Qualified: one execution.
+
+## DD-206 — A slice plan told the implementer to replace a push/replace assertion with a current-location check, which drops the replace
+
+The plan said to assert the router's current location instead of a captured
+`replace`/`push`. A location check cannot tell a replace from a push, so
+following the plan weakened an assertion the same plan forbade weakening.
+
+### Occurrences
+- Execution: SEED-039#internal-mocks-to-real-modules / slice-plans/009-frontend-specs-run-real-internal-modules / a70529a3fb
+  - Timestamp: unknown (slice 10 acceptance on 2026-10-04, about 09:55 +08:00)
+  - Tool: Claude Code
+  - Model: claude-opus-5-5
+  - Open Dough release: 0.3.56 (execution-checkout VERSION, unchanged during execution)
+  - Evidence: plan slice 10: "`AddRelationship.spec.ts` and `WikidataAssociationDialog.titleActions.spec.ts` assert `replace`/`push`; assert the current location instead." Plan Goal and scope: "without weaker assertions". The implementer reported the loss as a gap; the coordinator returned the slice, and the implementer added a history-position check (later `countHistoryEntriesAdded`), shown to fail for a push. Commit f7cc9a2293.
+  - Observed effect: one extra implementation round (about 3 minutes, 76,592 subagent tokens in total for the slice's implementer). No weakened assertion was delivered.
+  - Inference: when a plan swaps a mock observation for a real one, check that the real observation still tells apart every case the mock did. Qualified: one occurrence.

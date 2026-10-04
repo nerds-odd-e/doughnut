@@ -4,20 +4,15 @@ import {
 } from "@generated/donut-backend-api/sdk.gen"
 import { expect, vi, beforeEach, afterEach, describe, it } from "vitest"
 import ConversationComponent from "@/components/conversations/ConversationComponent.vue"
-import helper, { mockSdkService } from "@tests/helpers"
+import helper, {
+  countHistoryEntriesAdded,
+  mockSdkService,
+  productionRouterAt,
+} from "@tests/helpers"
+import { flushPromises } from "@vue/test-utils"
+import type { Router } from "vue-router"
 import { noteShowLocation } from "@/routes/noteShowLocation"
 import makeMe from "donut-test-fixtures/makeMe"
-
-const mockedPush = vi.fn()
-vi.mock("vue-router", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("vue-router")>()
-  return {
-    ...actual,
-    useRouter: () => ({
-      push: mockedPush,
-    }),
-  }
-})
 
 beforeEach(() => {
   vi.useFakeTimers()
@@ -32,7 +27,7 @@ describe("ConversationComponent", () => {
   const conversation = makeMe.aConversation.forANote(note).please()
   const user = makeMe.aUser.please()
 
-  const mountConversation = () => {
+  const mountConversation = (router?: Router) => {
     mockSdkService(
       ConversationMessageController,
       "getConversationsAboutNote",
@@ -43,6 +38,7 @@ describe("ConversationComponent", () => {
     return helper
       .component(ConversationComponent)
       .withCleanStorage()
+      .withRouter(router)
       .withProps({
         conversation,
         user,
@@ -50,17 +46,17 @@ describe("ConversationComponent", () => {
       .mount()
   }
 
-  beforeEach(() => {
-    mockedPush.mockClear()
-  })
-
   it("routes to note show page when minimize button is clicked and subject is a note", async () => {
-    const wrapper = mountConversation()
+    const router = await productionRouterAt({ name: "root" })
+    const historyEntriesAdded = countHistoryEntriesAdded(router)
+    const wrapper = mountConversation(router)
     await wrapper.find("button.minimize-button").trigger("click")
+    await flushPromises()
 
-    expect(mockedPush).toHaveBeenCalledWith(
+    expect(router.currentRoute.value).toMatchObject(
       noteShowLocation(note.noteTopology.id)
     )
+    expect(historyEntriesAdded()).toBe(1)
   })
 
   it("toggles maximize state when maximize button is clicked", async () => {

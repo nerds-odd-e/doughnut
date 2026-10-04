@@ -1,6 +1,5 @@
 import { UserController } from "@generated/donut-backend-api/sdk.gen"
 import MainMenu from "@/components/toolbars/MainMenu.vue"
-import { useGoToNextAssimilation } from "@/composables/useGoToNextAssimilation"
 import routes from "@/routes/routes"
 import type { User } from "@generated/donut-backend-api"
 import { fireEvent, screen } from "@testing-library/vue"
@@ -60,9 +59,6 @@ export function setupMainMenuTests() {
     createMatchMediaSpy(true)
     mockSdkService(UserController, "getMenuData", defaultMenuData)
     resetRecallData()
-    vi.mocked(useGoToNextAssimilation).mockReturnValue({
-      goToNextAssimilation: vi.fn(),
-    })
     user = makeMe.aUser.please()
   })
 

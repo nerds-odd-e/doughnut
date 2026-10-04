@@ -13,10 +13,6 @@ import {
   mountBookReadingPdf,
 } from "./bookReadingPdfAiReorganizeTestSupport"
 
-vi.mock("vue-toastification", () => ({
-  useToast: () => ({ error: vi.fn() }),
-}))
-
 describe("BookReadingPdf undo shortcut", () => {
   const blockRow = (
     wrapper: ReturnType<typeof mountBookReadingPdf>,

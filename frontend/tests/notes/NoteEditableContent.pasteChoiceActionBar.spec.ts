@@ -4,11 +4,8 @@ import { vi, describe, it, expect, beforeEach, afterEach } from "vitest"
 import {
   choiceShown,
   mountAndPaste,
-  setupPopupsMock,
   setupUpdateNoteContentMock,
 } from "./noteEditableContentTestSupport"
-
-vi.mock("@/components/commons/Popups/usePopups")
 
 const TOUCH_TARGET_MIN_PX = 44
 const EXPIRY_MS = 10_000
@@ -24,7 +21,6 @@ describe("NoteEditableContent paste choice action bar", () => {
   beforeEach(() => {
     vi.resetAllMocks()
     setupUpdateNoteContentMock()
-    setupPopupsMock(vi.fn().mockResolvedValue(null))
   })
 
   afterEach(() => {

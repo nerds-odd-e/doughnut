@@ -2,7 +2,7 @@ import { NoteController } from "@generated/donut-backend-api/sdk.gen"
 import { useNoteStore } from "@/store/noteStore"
 import { mockSdkService } from "@tests/helpers"
 import makeMe from "donut-test-fixtures/makeMe"
-import { describe, it, expect, vi } from "vitest"
+import { describe, it, expect } from "vitest"
 import {
   mountNoteUndoButton,
   noteEditingHistory,
@@ -10,19 +10,11 @@ import {
   setupNoteUndoButtonTests,
 } from "./noteUndoButtonTestSupport"
 
-vi.mock("vue-router", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("vue-router")>()
-  const { noteUndoButtonRouterMockExports } = await import(
-    "./noteUndoButtonMocks"
-  )
-  return noteUndoButtonRouterMockExports(actual)
-})
-
 setupNoteUndoButtonTests()
 
 describe("NoteUndoButton visibility", () => {
-  it("does not show when there is nothing to undo", () => {
-    const wrapper = mountNoteUndoButton()
+  it("does not show when there is nothing to undo", async () => {
+    const wrapper = await mountNoteUndoButton()
     expect(wrapper.find("button").exists()).toBe(false)
   })
 
@@ -43,10 +35,10 @@ describe("NoteUndoButton visibility", () => {
     },
   ])(
     "shows with title $expectedTitle when undo is available",
-    ({ setup, expectedTitle }) => {
+    async ({ setup, expectedTitle }) => {
       const note = makeMe.aNote.please()
       setup(note.id)
-      const wrapper = mountNoteUndoButton()
+      const wrapper = await mountNoteUndoButton()
       expect(wrapper.find("button").attributes("title")).toBe(expectedTitle)
     }
   )
@@ -73,7 +65,7 @@ describe("NoteUndoButton visibility", () => {
       })
       await storedApi.permanentlyDeleteNote(noteRealm1.id)
 
-      const wrapper = mountNoteUndoButton()
+      const wrapper = await mountNoteUndoButton()
       expect(wrapper.find("button").attributes("title")).toBe(
         "undo edit content"
       )
@@ -96,7 +88,7 @@ describe("NoteUndoButton visibility", () => {
       })
       await storedApi.permanentlyDeleteNote(noteRealm.id)
 
-      const wrapper = mountNoteUndoButton()
+      const wrapper = await mountNoteUndoButton()
       expect(wrapper.find("button").exists()).toBe(false)
     })
   })

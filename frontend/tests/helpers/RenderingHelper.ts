@@ -5,8 +5,25 @@ import { render } from "@testing-library/vue"
 import { mount } from "@vue/test-utils"
 import { merge } from "es-toolkit"
 import { ref, type Component, type DefineComponent, type Ref } from "vue"
-import type { RouteLocationRaw } from "vue-router"
+import type { RouteLocationRaw, Router } from "vue-router"
 import { createRouter, createWebHistory } from "vue-router"
+
+/** A real router over the production routes, placed at `location`. */
+export async function productionRouterAt(location: RouteLocationRaw) {
+  const router = createRouter({ history: createWebHistory(), routes })
+  await router.push(location)
+  return router
+}
+
+/**
+ * Starts counting browser history entries the router adds from now on:
+ * a push adds one, a replace adds none.
+ */
+export function countHistoryEntriesAdded(router: Router) {
+  const position = () => router.options.history.state.position as number
+  const before = position()
+  return () => position() - before
+}
 
 interface NoteStorageProps {
   [key: string]: unknown

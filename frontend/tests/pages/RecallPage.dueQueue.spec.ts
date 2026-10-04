@@ -5,29 +5,19 @@ import makeMe from "donut-test-fixtures/makeMe"
 import helper, { mockSdkService, wrapSdkResponse } from "@tests/helpers"
 import { flushPromises } from "@vue/test-utils"
 import { defineComponent, KeepAlive, nextTick } from "vue"
-import { beforeEach, describe, expect, it, vi } from "vitest"
+import { beforeEach, describe, expect, it } from "vitest"
 import type { MemoryTrackerLite } from "@generated/donut-backend-api"
 import {
   createMemoryTrackerLite,
   givenRecallQueue,
+  routerAtRecall,
   useRecallPageSpecContext,
 } from "./recallPageTestSupport"
-
-vi.mock("@/components/commons/Popups/usePopups")
-
-vi.mock("vue-router", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("vue-router")>()
-  return {
-    ...actual,
-    useRoute: () => ({ path: "/", fullPath: "/" }),
-    useRouter: () => ({ currentRoute: { value: { name: "recall" } } }),
-  }
-})
 
 const ctx = useRecallPageSpecContext({ fakeTimers: true })
 
 describe("RecallPage KeepAlive activation", () => {
-  const mountWithKeepAlive = () => {
+  const mountWithKeepAlive = async () => {
     const WrapperComponent = defineComponent({
       components: { RecallPage, KeepAlive },
       data() {
@@ -39,7 +29,7 @@ describe("RecallPage KeepAlive activation", () => {
     return helper
       .component(WrapperComponent)
       .withCleanStorage()
-      .currentRoute({ name: "recall" })
+      .withRouter(await routerAtRecall())
       .mount()
   }
 
@@ -49,7 +39,7 @@ describe("RecallPage KeepAlive activation", () => {
   it("loads the due queue on first activation when there is no queue yet", async () => {
     const loadedTracker = createMemoryTrackerLite(7)
     ctx.recallingSpy.mockResolvedValue(dueRecallsWith([loadedTracker]))
-    mountWithKeepAlive()
+    await mountWithKeepAlive()
     await flushPromises()
 
     expect(useRecallData().toRepeat.value).toEqual([loadedTracker])
@@ -61,7 +51,7 @@ describe("RecallPage KeepAlive activation", () => {
     const tracker3 = createMemoryTrackerLite(3)
     givenRecallQueue(tracker1, tracker2)
     ctx.recallingSpy.mockResolvedValue(dueRecallsWith([tracker1, tracker2]))
-    const wrapper = mountWithKeepAlive()
+    const wrapper = await mountWithKeepAlive()
     await flushPromises()
     const recallPage = wrapper.findComponent(RecallPage).vm as unknown as {
       currentIndex: number

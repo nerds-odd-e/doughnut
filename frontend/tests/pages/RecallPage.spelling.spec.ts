@@ -14,24 +14,13 @@ import {
   flushCapturedAnimationFrames,
 } from "@tests/components/recall/spellingQuestionDisplayTestSupport"
 import { flushPromises, type VueWrapper } from "@vue/test-utils"
-import { beforeEach, describe, expect, it, vi } from "vitest"
+import { beforeEach, describe, expect, it } from "vitest"
 import { nextTick } from "vue"
 import {
   createMemoryTrackerLite,
   givenRecallQueue,
   useRecallPageSpecContext,
 } from "./recallPageTestSupport"
-
-vi.mock("@/components/commons/Popups/usePopups")
-
-vi.mock("vue-router", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("vue-router")>()
-  return {
-    ...actual,
-    useRoute: () => ({ path: "/", fullPath: "/" }),
-    useRouter: () => ({ currentRoute: { value: { name: "recall" } } }),
-  }
-})
 
 const memoryTrackerId = 123
 const ctx = useRecallPageSpecContext({ fakeTimers: true })
@@ -66,7 +55,7 @@ function hasNoteShowLink(wrapper: VueWrapper, noteId: number) {
 
 describe("RecallPage spelling quiz", () => {
   const mountAttachedToBody = () =>
-    ctx.renderer.currentRoute({ name: "recall" }).mount({
+    ctx.mountPage({
       attachTo: document.body,
       global: { directives: { focus: focusDirective } },
     })
@@ -142,7 +131,7 @@ Inciting rebellion against authority.`)
     ctx.previouslyAnsweredSpy.mockResolvedValueOnce(
       wrapSdkResponse([previousQuestion])
     )
-    const wrapper = mountAttachedToBody()
+    const wrapper = await mountAttachedToBody()
     await flushPromises()
     await nextTick()
     flushCapturedAnimationFrames(rafCallbacks)
@@ -196,7 +185,7 @@ Inciting rebellion against authority.`)
       )
       const rafCallbacks = captureRequestAnimationFrame()
 
-      const wrapper = mountAttachedToBody()
+      const wrapper = await mountAttachedToBody()
       await flushPromises()
       await nextTick()
       flushCapturedAnimationFrames(rafCallbacks)

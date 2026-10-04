@@ -7,16 +7,17 @@ import {
 import AssimilationPanel from "@/components/recall/AssimilationPanel.vue"
 import { flushPromises, type VueWrapper } from "@vue/test-utils"
 import makeMe from "donut-test-fixtures/makeMe"
-import helper, { mockSdkService } from "@tests/helpers"
+import helper, { mockSdkService, productionRouterAt } from "@tests/helpers"
 import RenderingHelper from "@tests/helpers/RenderingHelper"
 import { useRecallData } from "@/composables/useRecallData"
 import { useAssimilationCount } from "@/composables/useAssimilationCount"
 import usePopups from "@/components/commons/Popups/usePopups"
 import { closeButtonEl } from "@tests/commons/modalTestSupport"
-import { afterEach, beforeEach, vi } from "vitest"
-import { mockedGoToNextAssimilation } from "./assimilationPanelMocks"
+import { afterEach, beforeEach, expect, vi } from "vitest"
 import { refinementLayoutItems } from "./noteRefinementTestSupport"
 import { resetRecallData } from "@tests/helpers/recallDataTestSupport"
+import { noteShowLocation } from "@/routes/noteShowLocation"
+import type { Router } from "vue-router"
 
 export const assimilateButtonSelector =
   '[data-test="assimilate-UNDERSTANDING"]' as const
@@ -65,6 +66,12 @@ export const { note } = makeMe.aMemoryTracker
   .ofNote(makeMe.aNoteRealm.please())
   .please()
 
+export const nextNoteId = note.id + 1
+
+let router: Router
+export const expectAtNoteOf = (noteId: number) =>
+  expect(router.currentRoute.value).toMatchObject(noteShowLocation(noteId))
+
 let renderer: RenderingHelper<typeof AssimilationPanel>
 export let assimilateSpy: ReturnType<typeof mockSdkService>
 export let skipSequenceSpy: ReturnType<typeof mockSdkService>
@@ -82,15 +89,9 @@ export function setupAssimilationPanelTests() {
   afterEach(() => {
     document.body.innerHTML = ""
     vi.clearAllMocks()
-    const popups = usePopups()
-    while (popups.popups.peek().length) {
-      popups.popups.done(false)
-    }
   })
 
   beforeEach(() => {
-    mockedGoToNextAssimilation.mockClear()
-    mockedGoToNextAssimilation.mockResolvedValue(true)
     resetRecallData()
     recallData.setTotalAssimilatedCount(0)
     refreshNonceAtStart = recallData.dueRecallsRefreshNonce.value
@@ -104,6 +105,9 @@ export function setupAssimilationPanelTests() {
       "create",
       { id: 1 }
     )
+    mockSdkService(AssimilationController, "next", {
+      nextUnit: { noteId: nextNoteId },
+    })
     mockSdkService(NoteController, "getNoteInfo", {})
     mockSdkService(AiController, "generateRefinementSuggestions", {
       items: refinementLayoutItems([]),
@@ -126,10 +130,11 @@ export function spellingVerificationPopupEl() {
 }
 
 export async function mountAssimilationPanelReady() {
+  router = await productionRouterAt(noteShowLocation(note.id))
   const wrapper = renderer
     .withCleanStorage()
     .withProps({ note })
-    .withRouter()
+    .withRouter(router)
     .mount()
   await flushPromises()
   return wrapper

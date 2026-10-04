@@ -7,24 +7,17 @@ import {
 import MatchedNoteWikiLinkOrRelationshipOffer from "@/components/recall/MatchedNoteWikiLinkOrRelationshipOffer.vue"
 import RelationTypeSelect from "@/components/wiki-link-or-relationship/RelationTypeSelect.vue"
 import { useNoteStore } from "@/store/noteStore"
-import helper, { mockSdkService, testFolderStub } from "@tests/helpers"
+import helper, {
+  mockSdkService,
+  productionRouterAt,
+  testFolderStub,
+} from "@tests/helpers"
+import { noteShowLocation } from "@/routes/noteShowLocation"
 import { teardownGlobalClientForTesting } from "@/managedApi/clientSetup"
 import makeMe from "donut-test-fixtures/makeMe"
 import type { NoteRealm } from "@generated/donut-backend-api"
 import { flushPromises, type VueWrapper } from "@vue/test-utils"
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest"
-
-const routerReplace = vi.fn()
-
-vi.mock("vue-router", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("vue-router")>()
-  return {
-    ...actual,
-    useRouter: () => ({
-      replace: routerReplace,
-    }),
-  }
-})
 
 function buildReviewedAndMatched(): {
   reviewedRealm: NoteRealm
@@ -45,18 +38,21 @@ function buildReviewedAndMatched(): {
   return { reviewedRealm, matchedRealm }
 }
 
-function mountOffer(reviewedRealm: NoteRealm, matchedRealm: NoteRealm) {
+async function mountOffer(reviewedRealm: NoteRealm, matchedRealm: NoteRealm) {
+  const router = await productionRouterAt(noteShowLocation(reviewedRealm.id))
   const chain = helper
     .component(MatchedNoteWikiLinkOrRelationshipOffer)
     .withCleanStorage()
   useNoteStore().refreshNoteRealm(reviewedRealm)
   useNoteStore().refreshNoteRealm(matchedRealm)
-  return chain
+  const wrapper = chain
     .withProps({
       reviewedNoteId: reviewedRealm.id,
       matchedNoteId: matchedRealm.id,
     })
+    .withRouter(router)
     .mount()
+  return { wrapper, router }
 }
 
 async function selectRelationType(wrapper: VueWrapper, relationType: string) {
@@ -98,7 +94,6 @@ function mockRelationshipCreate(
 describe("MatchedNoteWikiLinkOrRelationshipOffer", () => {
   beforeEach(() => {
     vi.resetAllMocks()
-    routerReplace.mockResolvedValue(undefined)
     mockSdkService(NoteController, "showNote", makeMe.aNoteRealm.please())
   })
 
@@ -109,7 +104,7 @@ describe("MatchedNoteWikiLinkOrRelationshipOffer", () => {
   it("shows Target: with matched title, property and relationship options, hides bare wiki", async () => {
     const { reviewedRealm, matchedRealm } = buildReviewedAndMatched()
 
-    const wrapper = mountOffer(reviewedRealm, matchedRealm)
+    const { wrapper } = await mountOffer(reviewedRealm, matchedRealm)
     await flushPromises()
 
     expect(wrapper.text()).toContain("Target:")
@@ -133,7 +128,7 @@ describe("MatchedNoteWikiLinkOrRelationshipOffer", () => {
       reviewedRealm
     )
 
-    const wrapper = mountOffer(reviewedRealm, matchedRealm)
+    const { wrapper } = await mountOffer(reviewedRealm, matchedRealm)
     await flushPromises()
 
     await clickInsertWikiLinkAsProperty(wrapper)
@@ -155,7 +150,7 @@ describe("MatchedNoteWikiLinkOrRelationshipOffer", () => {
       .please()
     const createSpy = mockRelationshipCreate(reviewedRealm, createdRealm)
 
-    const wrapper = mountOffer(reviewedRealm, matchedRealm)
+    const { wrapper } = await mountOffer(reviewedRealm, matchedRealm)
     await flushPromises()
 
     await wrapper
@@ -175,7 +170,7 @@ describe("MatchedNoteWikiLinkOrRelationshipOffer", () => {
       .please()
     const createSpy = mockRelationshipCreate(reviewedRealm, createdRealm)
 
-    const wrapper = mountOffer(reviewedRealm, matchedRealm)
+    const { wrapper, router } = await mountOffer(reviewedRealm, matchedRealm)
     await flushPromises()
 
     await wrapper
@@ -187,7 +182,9 @@ describe("MatchedNoteWikiLinkOrRelationshipOffer", () => {
     await selectRelationType(wrapper, "related to")
 
     expect(createSpy).toHaveBeenCalledTimes(1)
-    expect(routerReplace).not.toHaveBeenCalled()
+    expect(router.currentRoute.value).toMatchObject(
+      noteShowLocation(reviewedRealm.id)
+    )
     expect(wrapper.emitted("closeDialog")).toHaveLength(1)
   })
 })

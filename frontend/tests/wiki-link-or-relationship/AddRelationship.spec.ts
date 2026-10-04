@@ -1,6 +1,7 @@
 import { noteShowLocation } from "@/routes/noteShowLocation"
 import { formatRelationshipNoteTitle } from "@/utils/relationshipNoteCompose"
 import makeMe from "donut-test-fixtures/makeMe"
+import { countHistoryEntriesAdded, productionRouterAt } from "@tests/helpers"
 import { sidebarStructuralRefreshKey } from "@/components/notes/sidebarStructuralRefresh"
 import { teardownGlobalClientForTesting } from "@/managedApi/clientSetup"
 import { nextTick } from "vue"
@@ -13,22 +14,9 @@ import {
   targetSearchResult,
 } from "./addRelationshipFinalizeTestSupport"
 
-const routerReplace = vi.fn()
-
-vi.mock("vue-router", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("vue-router")>()
-  return {
-    ...actual,
-    useRouter: () => ({
-      replace: routerReplace,
-    }),
-  }
-})
-
 describe("AddRelationshipFinalize", () => {
   beforeEach(() => {
     vi.resetAllMocks()
-    routerReplace.mockResolvedValue(undefined)
   })
 
   afterEach(() => {
@@ -92,12 +80,15 @@ describe("AddRelationshipFinalize", () => {
       sourceAndCreatedRelationshipRealms()
     const target = targetSearchResult()
     const createNoteSpy = mockRelationshipNoteCreation(createdRealm)
+    const router = await productionRouterAt(noteShowLocation(note.id))
 
     const navigating = mountAddRelationshipFinalize({
       note,
       targetSearchResult: target,
       seedRealm: sourceRealm,
+      router,
     })
+    const historyEntriesAdded = countHistoryEntriesAdded(router)
     await selectRelationType(navigating, "related to")
 
     const expectedTitle = formatRelationshipNoteTitle(
@@ -112,23 +103,27 @@ describe("AddRelationshipFinalize", () => {
         content: expect.stringContaining("type: Relationship"),
       }),
     })
-    expect(routerReplace).toHaveBeenCalledWith(
+    expect(router.currentRoute.value).toMatchObject(
       noteShowLocation(createdRealm.id)
     )
+    expect(historyEntriesAdded()).toBe(0)
     expect(navigating.emitted().success).toHaveLength(1)
 
-    routerReplace.mockClear()
     createNoteSpy.mockClear()
+    const stayingRouter = await productionRouterAt(noteShowLocation(note.id))
 
     const withoutNav = mountAddRelationshipFinalize({
       note,
       targetSearchResult: target,
       seedRealm: sourceRealm,
       navigateOnSuccess: false,
+      router: stayingRouter,
     })
     await selectRelationType(withoutNav, "related to")
 
-    expect(routerReplace).not.toHaveBeenCalled()
+    expect(stayingRouter.currentRoute.value).toMatchObject(
+      noteShowLocation(note.id)
+    )
     expect(withoutNav.emitted().success).toHaveLength(1)
   })
 

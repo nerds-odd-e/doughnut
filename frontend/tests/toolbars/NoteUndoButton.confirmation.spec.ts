@@ -1,5 +1,5 @@
 import makeMe from "donut-test-fixtures/makeMe"
-import { describe, it, expect, vi } from "vitest"
+import { describe, it, expect } from "vitest"
 import { screen } from "@testing-library/vue"
 import {
   clickUndoButton,
@@ -10,14 +10,6 @@ import {
   renderNoteUndoButton,
   setupNoteUndoButtonTests,
 } from "./noteUndoButtonTestSupport"
-
-vi.mock("vue-router", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("vue-router")>()
-  const { noteUndoButtonRouterMockExports } = await import(
-    "./noteUndoButtonMocks"
-  )
-  return noteUndoButtonRouterMockExports(actual)
-})
 
 setupNoteUndoButtonTests()
 
@@ -59,7 +51,7 @@ describe("NoteUndoButton confirmation dialog", () => {
         const noteRealm = makeMe.aNoteRealm.title("My Note").please()
         refreshNoteRealms(noteRealm)
         setup(noteRealm)
-        renderNoteUndoButton()
+        await renderNoteUndoButton()
 
         await clickUndoButton(undoTitle)
 
@@ -77,7 +69,7 @@ describe("NoteUndoButton confirmation dialog", () => {
         "edit title",
         "Old Title"
       )
-      renderNoteUndoButton()
+      await renderNoteUndoButton()
 
       await clickUndoButton("undo edit title")
 
@@ -97,7 +89,7 @@ describe("NoteUndoButton confirmation dialog", () => {
         "edit content",
         "Old Content"
       )
-      renderNoteUndoButton()
+      await renderNoteUndoButton()
 
       await clickUndoButton("undo edit content")
 
@@ -119,7 +111,7 @@ describe("NoteUndoButton confirmation dialog", () => {
         "edit content",
         "<p>Old <strong>Content</strong> with <em>HTML</em></p>"
       )
-      renderNoteUndoButton()
+      await renderNoteUndoButton()
 
       await clickUndoButton("undo edit content")
 
@@ -161,7 +153,7 @@ describe("NoteUndoButton confirmation dialog", () => {
       async ({ setup, undoTitle, message }) => {
         const note = makeMe.aNote.please()
         setup(note.id)
-        renderNoteUndoButton()
+        await renderNoteUndoButton()
 
         await clickUndoButton(undoTitle)
 

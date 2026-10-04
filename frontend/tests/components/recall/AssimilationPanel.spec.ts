@@ -2,14 +2,13 @@ import {
   AssimilationSequenceSkipController,
   NoteController,
 } from "@generated/donut-backend-api/sdk.gen"
-import { describe, expect, it, vi } from "vitest"
+import { describe, expect, it } from "vitest"
 import makeMe from "donut-test-fixtures/makeMe"
 import {
   mockSdkService,
   mockSdkServiceWithImplementation,
   wrapSdkResponse,
 } from "@tests/helpers"
-import { mockedGoToNextAssimilation } from "./assimilationPanelMocks"
 import {
   assimilateButtonEl,
   assimilateSpy,
@@ -18,8 +17,10 @@ import {
   clickReturnToSequence,
   clickSkipAndConfirm,
   dueRecallsRefreshRequested,
+  expectAtNoteOf,
   totalAssimilatedCount,
   mountAssimilationPanelReady,
+  nextNoteId,
   note,
   returnToSequenceButtonEl,
   setupAssimilationPanelTests,
@@ -27,12 +28,6 @@ import {
   skipSequenceSpy,
   understandingStatusSelector,
 } from "./assimilationPanelTestSupport"
-
-vi.mock("@/composables/useGoToNextAssimilation", () => ({
-  useGoToNextAssimilation: () => ({
-    goToNextAssimilation: mockedGoToNextAssimilation,
-  }),
-}))
 
 setupAssimilationPanelTests()
 
@@ -63,7 +58,7 @@ describe("AssimilationPanel", () => {
     expect(assimilateSpy).toHaveBeenCalledWith({
       body: { noteId: note.id },
     })
-    expect(mockedGoToNextAssimilation).toHaveBeenCalled()
+    expectAtNoteOf(nextNoteId)
     expect(totalAssimilatedCount.value).toBe(1)
     expect(assimilatedCountOfTheDay.value).toBe(1)
     expect(dueRecallsRefreshRequested()).toBe(true)
@@ -78,7 +73,7 @@ describe("AssimilationPanel", () => {
       body: { noteId: note.id },
     })
     expect(assimilateSpy).not.toHaveBeenCalled()
-    expect(mockedGoToNextAssimilation).toHaveBeenCalled()
+    expectAtNoteOf(nextNoteId)
     expect(totalAssimilatedCount.value).toBe(0)
     expect(assimilatedCountOfTheDay.value).toBe(0)
     expect(dueRecallsRefreshRequested()).toBe(false)
@@ -118,7 +113,7 @@ describe("AssimilationPanel", () => {
       body: { noteId: note.id },
     })
     expect(assimilateSpy).not.toHaveBeenCalled()
-    expect(mockedGoToNextAssimilation).not.toHaveBeenCalled()
+    expectAtNoteOf(note.id)
     expect(skipButtonEl(wrapper)).not.toBeNull()
     expect(returnToSequenceButtonEl(wrapper)).toBeNull()
   })
@@ -144,7 +139,7 @@ describe("AssimilationPanel", () => {
 
     await clickAssimilate(wrapper)
 
-    expect(mockedGoToNextAssimilation).toHaveBeenCalled()
+    expectAtNoteOf(nextNoteId)
     expect(assimilateButtonEl(wrapper)).toBeNull()
     expect(
       wrapper.element.querySelector(understandingStatusSelector)

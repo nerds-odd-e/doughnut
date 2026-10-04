@@ -1,9 +1,10 @@
 import HorizontalMenu from "@/components/toolbars/HorizontalMenu.vue"
 import type { User } from "@generated/donut-backend-api"
 import makeMe from "donut-test-fixtures/makeMe"
-import helper from "@tests/helpers"
-import { beforeEach, expect, vi } from "vitest"
-import { markRaw, reactive, nextTick } from "vue"
+import helper, { productionRouterAt } from "@tests/helpers"
+import { beforeEach, expect } from "vitest"
+import { markRaw, nextTick } from "vue"
+import type { RouteLocationRaw, Router } from "vue-router"
 import {
   BookText,
   CalendarCheck,
@@ -14,19 +15,12 @@ import {
 } from "@lucide/vue"
 import type { Component } from "vue"
 
-export const useRouteValue = reactive({ name: "", fullPath: "/" })
+let router: Router
 
-vi.mock("vue-router", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("vue-router")>()
-  return {
-    ...actual,
-    useRoute: () => useRouteValue,
-    useRouter: () => ({
-      push: vi.fn(),
-      replace: vi.fn(),
-    }),
-  }
-})
+export async function goToRoute(location: RouteLocationRaw) {
+  await router.push(location)
+  await nextTick()
+}
 
 type NavigationItemType = {
   name?: string
@@ -112,6 +106,7 @@ export function renderHorizontalMenu(
   const navItems = createMockNavItems(options.activeItemName)
   helper
     .component(HorizontalMenu)
+    .withRouter(router)
     .withProps({
       user,
       ...navItems,
@@ -161,9 +156,7 @@ export function expectAllNavLabelsVisible() {
 }
 
 export function setupHorizontalMenuTests() {
-  beforeEach(() => {
-    vi.clearAllMocks()
-    useRouteValue.name = ""
-    useRouteValue.fullPath = "/"
+  beforeEach(async () => {
+    router = await productionRouterAt({ name: "root" })
   })
 }

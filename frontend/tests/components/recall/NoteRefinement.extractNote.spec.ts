@@ -3,9 +3,13 @@ import usePopups from "@/components/commons/Popups/usePopups"
 import { noteShowLocation } from "@/routes/noteShowLocation"
 import { flushPromises } from "@vue/test-utils"
 import { nextTick } from "vue"
-import { beforeEach, describe, expect, it, vi } from "vitest"
+import { describe, expect, it } from "vitest"
 import makeMe from "donut-test-fixtures/makeMe"
-import { mockSdkService, wrapSdkError } from "@tests/helpers"
+import {
+  countHistoryEntriesAdded,
+  mockSdkService,
+  wrapSdkError,
+} from "@tests/helpers"
 import {
   clickRetryExtractionPreview,
   createNoteFromExtractionPreview,
@@ -26,30 +30,15 @@ import {
   note,
   refinementLayoutItems,
   refinementLayoutSelectionApiCall,
+  router,
   sampleExtractionPreview,
   setupNoteRefinementTests,
   threePointLayoutTexts,
 } from "./noteRefinementTestSupport"
 
-const routerReplace = vi.fn()
-
-vi.mock("vue-router", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("vue-router")>()
-  return {
-    ...actual,
-    useRouter: () => ({
-      replace: routerReplace,
-    }),
-  }
-})
-
 setupNoteRefinementTests()
 
 describe("NoteRefinement extract note preview", () => {
-  beforeEach(() => {
-    routerReplace.mockResolvedValue(undefined)
-  })
-
   it("displays one extract button and no per-item extract buttons", async () => {
     const wrapper = await mountNoteRefinementReady([...threePointLayoutTexts])
 
@@ -142,6 +131,7 @@ describe("NoteRefinement extract note preview", () => {
       createdRealm
     )
     const wrapper = await mountNoteRefinementReady([...threePointLayoutTexts])
+    const historyEntriesAdded = countHistoryEntriesAdded(router)
     await openExtractionPreview(wrapper, "p2")
     const createButton = wrapper.find(
       '[data-test-id="extraction-preview-create"]'
@@ -165,9 +155,10 @@ describe("NoteRefinement extract note preview", () => {
         updatedOriginalNoteContent: "Edited original content",
       })
     )
-    expect(routerReplace).toHaveBeenCalledWith(
+    expect(router.currentRoute.value).toMatchObject(
       noteShowLocation(createdRealm.id)
     )
+    expect(historyEntriesAdded()).toBe(0)
   })
 
   it("shows create errors in the preview", async () => {
@@ -183,6 +174,6 @@ describe("NoteRefinement extract note preview", () => {
 
     expectExtractionPreviewVisible(wrapper)
     expectExtractionPreviewError(wrapper, "Title is reserved")
-    expect(routerReplace).not.toHaveBeenCalled()
+    expect(router.currentRoute.value).toMatchObject(noteShowLocation(note.id))
   })
 })

@@ -1,38 +1,56 @@
 import type { ApiStatus } from "@/managedApi/ApiStatusHandler"
 import { apiCallWithLoading, setupGlobalClient } from "@/managedApi/clientSetup"
-import loginOrRegisterAndHaltThisThread from "@/managedApi/window/loginOrRegisterAndHaltThisThread"
-import { UserController } from "@generated/donut-backend-api/sdk.gen"
-import { beforeEach, describe, expect, it, vi } from "vitest"
+import { browserLocation } from "@/managedApi/window/browserLocation"
+import {
+  HealthCheckController,
+  UserController,
+} from "@generated/donut-backend-api/sdk.gen"
+import { healthcheckPingBody, mockSdkService } from "@tests/helpers"
+import {
+  showToastsOnPage,
+  toastOnPage,
+  toastShown,
+  toastTimeout,
+} from "@tests/helpers/toastTestSupport"
+import { flushPromises } from "@vue/test-utils"
+import { page } from "vitest/browser"
+import {
+  afterEach,
+  beforeAll,
+  beforeEach,
+  describe,
+  expect,
+  it,
+  vi,
+} from "vitest"
 import createFetchMock from "vitest-fetch-mock"
 
 const fetchMock = createFetchMock(vi)
 fetchMock.enableMocks()
 
-const mockToast = {
-  error: vi.fn(),
-  warning: vi.fn(),
+const noToastShown = async () => {
+  await flushPromises()
+  expect(toastOnPage()).toBeNull()
 }
-
-vi.mock("vue-toastification", () => ({
-  useToast: () => mockToast,
-}))
-
-vi.mock("@/managedApi/window/loginOrRegisterAndHaltThisThread", () => ({
-  default: vi.fn(),
-}))
 
 describe("clientSetup", () => {
   const apiStatus: ApiStatus = { states: [] }
   const baseUrl = "http://localhost:9081"
 
+  showToastsOnPage()
+
+  // Each setup adds another 401 interceptor to the shared client, so it runs once
+  beforeAll(() => {
+    setupGlobalClient(apiStatus)
+  })
+
   beforeEach(() => {
     fetchMock.resetMocks()
     apiStatus.states = []
-    mockToast.error.mockClear()
-    mockToast.warning.mockClear()
-    vi.mocked(loginOrRegisterAndHaltThisThread).mockClear()
-    // Setup global client before each test
-    setupGlobalClient(apiStatus)
+  })
+
+  afterEach(() => {
+    vi.restoreAllMocks()
   })
 
   describe("error handling - silent vs with-loading behavior", () => {
@@ -47,7 +65,7 @@ describe("clientSetup", () => {
       )
 
       expect(error).toBeDefined()
-      expect(mockToast.error).toHaveBeenCalled()
+      await toastShown("error")
     })
 
     it("does NOT show error toast for non-wrapped (silent) calls", async () => {
@@ -59,7 +77,7 @@ describe("clientSetup", () => {
       const { error } = await UserController.getUserProfile({})
 
       expect(error).toBeDefined()
-      expect(mockToast.error).not.toHaveBeenCalled()
+      await noToastShown()
     })
 
     it("does NOT show error toast for 404 errors in wrapped calls", async () => {
@@ -73,7 +91,7 @@ describe("clientSetup", () => {
       )
 
       expect(error).toBeDefined()
-      expect(mockToast.error).not.toHaveBeenCalled()
+      await noToastShown()
     })
 
     it("does NOT show 404 errors for non-wrapped (silent) calls", async () => {
@@ -85,7 +103,7 @@ describe("clientSetup", () => {
       const { error } = await UserController.getUserProfile({})
 
       expect(error).toBeDefined()
-      expect(mockToast.error).not.toHaveBeenCalled()
+      await noToastShown()
     })
 
     it("uses 3 second timeout for non-404 errors in wrapped calls", async () => {
@@ -99,12 +117,7 @@ describe("clientSetup", () => {
       )
 
       expect(error).toBeDefined()
-      expect(mockToast.error).toHaveBeenCalledWith(
-        expect.any(String),
-        expect.objectContaining({
-          timeout: 3000,
-        })
-      )
+      expect(toastTimeout(await toastShown("error"))).toBe("3000ms")
     })
 
     it("handles nested apiCallWithLoading correctly", async () => {
@@ -120,7 +133,7 @@ describe("clientSetup", () => {
 
       // Should show error toast for the inner call
       expect(result.error).toBeDefined()
-      expect(mockToast.error).toHaveBeenCalled()
+      await toastShown("error")
     })
 
     it("does not toast a late error after cancellation", async () => {
@@ -143,61 +156,77 @@ describe("clientSetup", () => {
       resolveCall({ error: "request aborted", response: { status: 500 } })
       await Promise.resolve()
 
-      expect(mockToast.error).not.toHaveBeenCalled()
+      await noToastShown()
     })
   })
 
   describe("401 unauthorized — redirect to sign-in", () => {
+    const answerUnauthorizedWithPing = () => {
+      fetchMock.mockResponse(JSON.stringify({}), { status: 401 })
+      mockSdkService(HealthCheckController, "ping", healthcheckPingBody("test"))
+      return vi
+        .spyOn(browserLocation, "assign")
+        .mockImplementation(() => undefined)
+    }
+
     it("shows warning toast with API path then redirects on GET 401", async () => {
-      const confirmSpy = vi.spyOn(window, "confirm").mockImplementation(() => {
+      vi.spyOn(window, "confirm").mockImplementation(() => {
         throw new Error("confirm must not be used for GET")
       })
-      fetchMock.mockResponse(JSON.stringify({}), {
-        url: `${baseUrl}/api/user`,
-        status: 401,
-      })
+      const assignSpy = answerUnauthorizedWithPing()
 
       await UserController.getUserProfile({})
 
-      expect(mockToast.warning).toHaveBeenCalledWith(
-        expect.stringContaining("GET /api/user"),
-        expect.objectContaining({ timeout: 8000 })
+      const toast = await toastShown("warning")
+      await expect
+        .element(
+          page.getByText(
+            "This page will reload to sign you in again. Reason: unauthorized response from GET /api/user."
+          )
+        )
+        .toBeInTheDocument()
+      expect(toastTimeout(toast)).toBe("8000ms")
+      await vi.waitFor(() =>
+        expect(assignSpy).toHaveBeenCalledWith(
+          `/users/identify?from=${window.location.href}`
+        )
       )
-      expect(loginOrRegisterAndHaltThisThread).toHaveBeenCalled()
-      confirmSpy.mockRestore()
     })
 
     it("does not redirect when user declines login on mutating 401", async () => {
       vi.spyOn(window, "confirm").mockReturnValue(false)
-      fetchMock.mockResponse(JSON.stringify({}), {
-        url: `${baseUrl}/api/user`,
-        status: 401,
-      })
+      const assignSpy = answerUnauthorizedWithPing()
 
       await UserController.createUser({
         body: { name: "x" } as never,
       })
 
-      expect(mockToast.warning).not.toHaveBeenCalled()
-      expect(loginOrRegisterAndHaltThisThread).not.toHaveBeenCalled()
+      await noToastShown()
+      expect(assignSpy).not.toHaveBeenCalled()
     })
 
     it("shows warning toast and redirects when user accepts login on mutating 401", async () => {
       vi.spyOn(window, "confirm").mockReturnValue(true)
-      fetchMock.mockResponse(JSON.stringify({}), {
-        url: `${baseUrl}/api/user`,
-        status: 401,
-      })
+      const assignSpy = answerUnauthorizedWithPing()
 
       await UserController.createUser({
         body: { name: "x" } as never,
       })
 
-      expect(mockToast.warning).toHaveBeenCalledWith(
-        expect.stringContaining("POST /api/user"),
-        expect.objectContaining({ timeout: 8000 })
+      const toast = await toastShown("warning")
+      await expect
+        .element(
+          page.getByText(
+            "This page will reload to sign you in again. Reason: unauthorized response from POST /api/user."
+          )
+        )
+        .toBeInTheDocument()
+      expect(toastTimeout(toast)).toBe("8000ms")
+      await vi.waitFor(() =>
+        expect(assignSpy).toHaveBeenCalledWith(
+          `/users/identify?from=${window.location.href}`
+        )
       )
-      expect(loginOrRegisterAndHaltThisThread).toHaveBeenCalled()
     })
   })
 })

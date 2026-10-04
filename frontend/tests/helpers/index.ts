@@ -176,3 +176,4 @@ export function mockSdkServiceWithImplementation<
 
 export default new StoredComponentTestHelper()
 export { matchByText }
+export { countHistoryEntriesAdded, productionRouterAt } from "./RenderingHelper"

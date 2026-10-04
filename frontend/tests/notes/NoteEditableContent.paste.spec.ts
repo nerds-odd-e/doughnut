@@ -2,25 +2,32 @@ import { flushPromises } from "@vue/test-utils"
 import { vi, describe, it, expect, beforeEach, afterEach } from "vitest"
 import { notePropertyHref, noteShowHref } from "@/routes/noteShowLocation"
 import {
+  answerPopup,
+  onlyPendingPopup,
+  pendingPopups,
+} from "@tests/helpers/popupStackTestSupport"
+import {
   mountAndPaste,
   mountNoteEditableContent,
-  setupPopupsMock,
   setupUpdateNoteContentMock,
   useOriginalText,
 } from "./noteEditableContentTestSupport"
 
-vi.mock("@/components/commons/Popups/usePopups")
-
 describe("NoteEditableContent paste", () => {
-  // biome-ignore lint/suspicious/noExplicitAny: Mock type for testing
-  let mockPopupsOptions: any
-
   beforeEach(() => {
     vi.resetAllMocks()
     setupUpdateNoteContentMock()
-    mockPopupsOptions = vi.fn().mockResolvedValue(null)
-    setupPopupsMock(mockPopupsOptions)
   })
+
+  function expectLinkRemovalPrompt(linkCount: number) {
+    expect(onlyPendingPopup()).toMatchObject({
+      type: "options",
+      message: `The content contains ${linkCount} links.`,
+      options: expect.arrayContaining([
+        { label: `Remove ${linkCount} links`, value: "links" },
+      ]),
+    })
+  }
 
   afterEach(() => {
     document.body.innerHTML = ""
@@ -35,7 +42,7 @@ describe("NoteEditableContent paste", () => {
 
     expect(textarea.value).toContain("Bold text")
     expect(textarea.value).toContain("existing")
-    expect(mockPopupsOptions).not.toHaveBeenCalled()
+    expect(pendingPopups()).toHaveLength(0)
     wrapper.unmount()
   })
 
@@ -67,17 +74,14 @@ describe("NoteEditableContent paste", () => {
 
   describe("link removal prompt", () => {
     it("shows options popup when pasted content contains links and removes them when chosen", async () => {
-      mockPopupsOptions.mockResolvedValue("links")
-
       const { wrapper, textarea } = await mountAndPaste(
         "[existing link](https://existing.com) ",
         '<p><a href="https://example.com">new link</a></p>'
       )
 
-      expect(mockPopupsOptions).toHaveBeenCalledWith(
-        "The content contains 2 links.",
-        expect.arrayContaining([{ label: "Remove 2 links", value: "links" }])
-      )
+      expectLinkRemovalPrompt(2)
+      await answerPopup("links")
+
       expect(textarea.value).toContain("existing link")
       expect(textarea.value).toContain("new link")
       expect(textarea.value).not.toContain("https://existing.com")
@@ -94,15 +98,13 @@ describe("NoteEditableContent paste", () => {
         `<p><a href="${relative}">rel</a> <a href="${absolute}">abs</a> <a href="${property}">prop</a></p>`,
         { selection: [4, 4] }
       )
+      expectLinkRemovalPrompt(3)
+      await answerPopup(null)
 
       expect(textarea.value).toContain(`[rel](${relative})`)
       expect(textarea.value).toContain(`[abs](${absolute})`)
       expect(textarea.value).toContain(`[prop](${property})`)
       expect(textarea.value).not.toContain("[[")
-      expect(mockPopupsOptions).toHaveBeenCalledWith(
-        "The content contains 3 links.",
-        expect.arrayContaining([{ label: "Remove 3 links", value: "links" }])
-      )
       wrapper.unmount()
     })
 
@@ -118,10 +120,7 @@ describe("NoteEditableContent paste", () => {
       richEditor.vm.$emit("pasteComplete", newContent)
       await flushPromises()
 
-      expect(mockPopupsOptions).toHaveBeenCalledWith(
-        "The content contains 1 links.",
-        expect.arrayContaining([{ label: "Remove 1 links", value: "links" }])
-      )
+      expectLinkRemovalPrompt(1)
       wrapper.unmount()
     })
   })
@@ -132,16 +131,17 @@ describe("NoteEditableContent paste", () => {
     const linkHtml = '<p><a href="https://example.com">new link</a></p>'
     const rawOriginal = "RAW original text"
 
-    async function mountAndPasteLinkHtml() {
+    async function mountAndPasteLinkHtml(removalAnswer: "links" | null) {
       const pasted = await mountAndPaste("", linkHtml, {
         plainText: rawOriginal,
       })
-      expect(mockPopupsOptions).toHaveBeenCalled()
+      expectLinkRemovalPrompt(1)
+      await answerPopup(removalAnswer)
       return pasted
     }
 
     it("resumes the paste choice after the removal prompt is cancelled", async () => {
-      const { wrapper, textarea } = await mountAndPasteLinkHtml()
+      const { wrapper, textarea } = await mountAndPasteLinkHtml(null)
 
       await useOriginalText(wrapper)
 
@@ -150,9 +150,7 @@ describe("NoteEditableContent paste", () => {
     })
 
     it("consumes the paste choice when the removal prompt's removal is applied", async () => {
-      mockPopupsOptions.mockResolvedValue("links")
-
-      const { wrapper, textarea } = await mountAndPasteLinkHtml()
+      const { wrapper, textarea } = await mountAndPasteLinkHtml("links")
 
       expect(wrapper.find('[data-testid="paste-choice"]').exists()).toBe(false)
       expect(textarea.value).toContain("new link")
@@ -165,11 +163,11 @@ describe("NoteEditableContent paste", () => {
       const { wrapper } = await mountAndPaste("", "<p>Styled text</p>", {
         plainText: "**RAW markdown**",
       })
-      expect(mockPopupsOptions).not.toHaveBeenCalled()
+      expect(pendingPopups()).toHaveLength(0)
 
       await useOriginalText(wrapper)
 
-      expect(mockPopupsOptions).not.toHaveBeenCalled()
+      expect(pendingPopups()).toHaveLength(0)
       wrapper.unmount()
     })
   })

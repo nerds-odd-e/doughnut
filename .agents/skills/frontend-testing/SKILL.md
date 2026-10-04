@@ -73,6 +73,21 @@ the normal browser-mode command and do not compare its wall time directly with
 - Use `data-testid` for test selectors.
 - Use Vitest browser mode and prefer real browser rendering over mocking sibling components or internal modules; stop using jsdom.
 
+## Allowed Mocks
+
+`vi.mock` is limited to these modules; everything else in-process runs for real:
+
+- `@/managedApi/AiReplyEventSource`: the streaming backend API (same boundary as `mockSdkService`).
+- `@/models/audio/audioRecorder`, `@/models/audio/recorderWorklet`, `@/models/wakeLocker`: microphone, audio worklet, and screen wake lock, which headless Chromium lacks.
+- `file-saver`: starts a browser download.
+- `pdfjs-dist` (gesture-zoom support file only): the PDF engine and worker, whose page geometry the spec must control.
+
+Real in-process code, observed through shared helpers:
+
+- Popups: the real `usePopups` stack, emptied before each test; answer and inspect with `@tests/helpers/popupStackTestSupport`.
+- Router: `productionRouterAt(location)` and `countHistoryEntriesAdded(router)` from `@tests/helpers`; assert the router's current named location.
+- Toasts: `showToastsOnPage()` from `@tests/helpers/toastTestSupport`; assert the toast on the page.
+
 ## Routing assertions
 
 Navigation assertions use named locations (or helpers that return them).

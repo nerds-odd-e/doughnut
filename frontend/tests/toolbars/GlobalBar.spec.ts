@@ -15,24 +15,10 @@ import { mockCoarsePointer } from "@tests/helpers/mockCoarsePointer"
 import { screen } from "@testing-library/vue"
 import { mount } from "@vue/test-utils"
 import makeMe from "donut-test-fixtures/makeMe"
-import helper, { mockSdkService } from "@tests/helpers"
+import helper, { mockSdkService, productionRouterAt } from "@tests/helpers"
 import { beforeEach, vi, describe, it, expect, afterEach } from "vitest"
 import { flushPromises } from "@vue/test-utils"
 import { defineComponent, h, nextTick, provide, ref } from "vue"
-import { createRouter, createWebHistory } from "vue-router"
-import routes from "@/routes/routes"
-
-const mockedPush = vi.fn()
-vi.mock("vue-router", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("vue-router")>()
-  return {
-    ...actual,
-    useRoute: () => ({ path: "/" }),
-    useRouter: () => ({
-      push: mockedPush,
-    }),
-  }
-})
 
 function dispatchNoteSearchShortcut(modifiers: KeyboardEventInit) {
   document.dispatchEvent(
@@ -54,7 +40,7 @@ function renderGlobalBarWithSearchShortcut(loggedInUser?: User) {
       return () => h(GlobalBar)
     },
   })
-  return helper.component(Harness).withCleanStorage().render()
+  return helper.component(Harness).withCleanStorage().withRouter().render()
 }
 
 describe("global bar", () => {
@@ -79,7 +65,7 @@ describe("global bar", () => {
   })
 
   it("hides undo when there is nothing to undo", async () => {
-    helper.component(GlobalBar).withCurrentUser(user).render()
+    helper.component(GlobalBar).withCurrentUser(user).withRouter().render()
 
     expect(screen.queryByTitle("undo")).toBeNull()
   })
@@ -87,7 +73,7 @@ describe("global bar", () => {
   it("show undo when there is something to undo", async () => {
     const note = makeMe.aNote.please()
     noteEditingHistory.trashNote(note.id, "Note", null)
-    helper.component(GlobalBar).withCurrentUser(user).render()
+    helper.component(GlobalBar).withCurrentUser(user).withRouter().render()
 
     expect(await screen.findByTitle("undo trash note")).not.toBeDisabled()
   })
@@ -118,10 +104,7 @@ describe("global bar", () => {
   it("focuses primer synchronously when search button is tapped on touch device", async () => {
     matchMediaSpy = mockCoarsePointer(true)
 
-    const router = createRouter({
-      history: createWebHistory(),
-      routes,
-    })
+    const router = await productionRouterAt({ name: "root" })
     const GlobalBarWithPrimer = defineComponent({
       components: { SoftKeyboardPrimer, GlobalBar },
       template: "<SoftKeyboardPrimer /><GlobalBar />",

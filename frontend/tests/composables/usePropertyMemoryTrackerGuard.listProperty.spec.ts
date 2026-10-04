@@ -5,22 +5,11 @@ import {
 import { usePropertyMemoryTrackerGuard } from "@/composables/usePropertyMemoryTrackerGuard"
 import makeMe from "donut-test-fixtures/makeMe"
 import { mockSdkService } from "@tests/helpers"
+import {
+  answerOnlyPendingPopup,
+  pendingPopups,
+} from "@tests/helpers/popupStackTestSupport"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
-
-const confirmMock = vi.fn()
-
-vi.mock("@/components/commons/Popups/usePopups", () => ({
-  default: () => ({
-    popups: {
-      confirm: confirmMock,
-      alert: vi.fn(),
-      options: vi.fn(),
-      done: vi.fn(),
-      register: vi.fn(),
-      peek: vi.fn(),
-    },
-  }),
-}))
 
 describe("usePropertyMemoryTrackerGuard on a list key with tracked values", () => {
   const noteId = 42
@@ -43,8 +32,6 @@ describe("usePropertyMemoryTrackerGuard on a list key with tracked values", () =
       "updatePropertyKey",
       undefined
     )
-    confirmMock.mockReset()
-    confirmMock.mockResolvedValue(true)
   })
 
   afterEach(() => {
@@ -53,12 +40,21 @@ describe("usePropertyMemoryTrackerGuard on a list key with tracked values", () =
 
   const guard = () => usePropertyMemoryTrackerGuard(() => noteId)
 
+  /** Confirms the one prompt the action raises, then waits for its result. */
+  async function confirmingOnce<T>(action: Promise<T>) {
+    expect(await answerOnlyPendingPopup(true)).toMatchObject({
+      type: "confirm",
+    })
+    const result = await action
+    expect(pendingPopups()).toEqual([])
+    return result
+  }
+
   it("renames every value's tracker after one confirmation", async () => {
     await expect(
-      guard().confirmAndApplyRename("example of", "sample of")
+      confirmingOnce(guard().confirmAndApplyRename("example of", "sample of"))
     ).resolves.toBe(true)
 
-    expect(confirmMock).toHaveBeenCalledOnce()
     expect(updatePropertyKeySpy.mock.calls.map(([options]) => options)).toEqual(
       [
         { path: { memoryTracker: 1 }, body: { propertyKey: "sample of" } },
@@ -68,11 +64,10 @@ describe("usePropertyMemoryTrackerGuard on a list key with tracked values", () =
   })
 
   it("deletes every value's tracker after one confirmation", async () => {
-    await expect(guard().confirmAndApplyRemoval("example of")).resolves.toBe(
-      true
-    )
+    await expect(
+      confirmingOnce(guard().confirmAndApplyRemoval("example of"))
+    ).resolves.toBe(true)
 
-    expect(confirmMock).toHaveBeenCalledOnce()
     expect(deleteSpy.mock.calls.map(([options]) => options)).toEqual([
       { path: { memoryTracker: 1 } },
       { path: { memoryTracker: 2 } },
@@ -81,12 +76,13 @@ describe("usePropertyMemoryTrackerGuard on a list key with tracked values", () =
 
   it("carries every value's tracker for Markdown key changes", async () => {
     await expect(
-      guard().confirmAndApplyPropertyKeyChanges([
-        { type: "rename", fromKey: "example of", toKey: "sample of" },
-      ])
+      confirmingOnce(
+        guard().confirmAndApplyPropertyKeyChanges([
+          { type: "rename", fromKey: "example of", toKey: "sample of" },
+        ])
+      )
     ).resolves.toBe(true)
 
-    expect(confirmMock).toHaveBeenCalledOnce()
     expect(updatePropertyKeySpy).toHaveBeenCalledTimes(2)
   })
 })

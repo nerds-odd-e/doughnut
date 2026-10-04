@@ -6,10 +6,9 @@ import {
 import NoteRefinement from "@/components/recall/NoteRefinement.vue"
 import { flushPromises } from "@vue/test-utils"
 import makeMe from "donut-test-fixtures/makeMe"
-import helper, { mockSdkService } from "@tests/helpers"
+import helper, { mockSdkService, productionRouterAt } from "@tests/helpers"
 import GlobalApiLoadingModal from "@tests/helpers/GlobalApiLoadingModal"
 import RenderingHelper from "@tests/helpers/RenderingHelper"
-import usePopups from "@/components/commons/Popups/usePopups"
 import { teardownGlobalClientForTesting } from "@/managedApi/clientSetup"
 import type {
   Note,
@@ -18,6 +17,8 @@ import type {
 } from "@generated/donut-backend-api"
 import { afterEach, beforeEach, vi } from "vitest"
 import { defineComponent, type PropType } from "vue"
+import type { Router } from "vue-router"
+import { noteShowLocation } from "@/routes/noteShowLocation"
 import {
   refinementLayoutItems,
   sampleExtractionPreview,
@@ -61,9 +62,10 @@ const NoteRefinementWithGlobalLoading = defineComponent({
 })
 
 export let renderer: RenderingHelper<typeof NoteRefinementWithGlobalLoading>
+export let router: Router
 
 export function setupNoteRefinementTests() {
-  beforeEach(() => {
+  beforeEach(async () => {
     mockSdkService(AiController, "removeRefinementSuggestion", {
       content: "Updated content",
     })
@@ -83,17 +85,16 @@ export function setupNoteRefinementTests() {
       "createExtractedNote",
       makeMe.aNoteRealm.please()
     )
-    renderer = helper.component(NoteRefinementWithGlobalLoading).withRouter()
+    router = await productionRouterAt(noteShowLocation(note.id))
+    renderer = helper
+      .component(NoteRefinementWithGlobalLoading)
+      .withRouter(router)
   })
 
   afterEach(() => {
     document.body.innerHTML = ""
     vi.clearAllMocks()
     teardownGlobalClientForTesting()
-    const popups = usePopups()
-    while (popups.popups.peek().length) {
-      popups.popups.done(false)
-    }
   })
 }
 

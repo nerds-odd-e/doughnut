@@ -5,18 +5,8 @@ import {
   mountSoftKeyboardPrimer,
   softKeyboardPrimerElement,
 } from "@tests/helpers/softKeyboardPrimerTestSupport"
-import { describe, it, expect, vi, afterEach, beforeEach } from "vitest"
+import { describe, it, expect, afterEach, beforeEach } from "vitest"
 import { flushPromises, type VueWrapper } from "@vue/test-utils"
-
-vi.mock("vue-router", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("vue-router")>()
-  return {
-    ...actual,
-    useRoute: () => ({
-      path: "/",
-    }),
-  }
-})
 
 describe("WikidataSearchByLabel", () => {
   // biome-ignore lint/suspicious/noExplicitAny: wrapper for testing
@@ -37,6 +27,7 @@ describe("WikidataSearchByLabel", () => {
         searchKey: "test",
         modelValue,
       })
+      .withRouter()
       .mount({ attachTo: document.body })
     return wrapper
   }

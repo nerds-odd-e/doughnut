@@ -6,16 +6,6 @@ import {
 } from "@tests/notes/wikidataAssociationDialogTestSupport"
 import { describe, it, expect, vi } from "vitest"
 
-vi.mock("vue-router", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("vue-router")>()
-  return {
-    ...actual,
-    useRoute: () => ({
-      path: "/",
-    }),
-  }
-})
-
 function openLinkButton(): HTMLButtonElement | null {
   return wikidataModal()?.querySelector(
     'button[title="open link"]'

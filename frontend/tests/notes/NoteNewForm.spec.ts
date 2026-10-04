@@ -19,28 +19,6 @@ import {
 } from "@tests/notes/noteNewFormTestSupport"
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest"
 
-vi.mock("@/components/commons/Popups/usePopups", () => ({
-  default: () => ({
-    popups: {
-      confirm: vi.fn().mockResolvedValue(false),
-      alert: vi.fn(),
-      options: vi.fn(),
-      done: vi.fn(),
-      register: vi.fn(),
-      peek: vi.fn(),
-    },
-  }),
-}))
-
-vi.mock("vue-router", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("vue-router")>()
-  return {
-    ...actual,
-    useRouter: () => ({ currentRoute: { value: {} } }),
-    useRoute: () => ({ path: "/", fullPath: "/" }),
-  }
-})
-
 describe("adding new note", () => {
   let sdkSpies: NoteNewFormSdkSpies
   let wrapper: VueWrapper<ComponentPublicInstance>

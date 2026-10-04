@@ -21,12 +21,17 @@ if (typeof process === "undefined") {
 // Import CSS for proper rendering with Tailwind and DaisyUI
 import "../src/assets/daisyui.css"
 
-import { vi } from "vitest"
+import { beforeEach, vi } from "vitest"
 import createFetchMock from "vitest-fetch-mock"
+import { emptyPopupStack } from "./helpers/popupStackTestSupport"
 
 const fetchMock = createFetchMock(vi)
 fetchMock.enableMocks()
 fetchMock.doMock()
+
+beforeEach(() => {
+  emptyPopupStack()
+})
 
 // Fail tests on Vue warnings and console.log usage
 // Allow console.warn and console.error from libraries to pass through

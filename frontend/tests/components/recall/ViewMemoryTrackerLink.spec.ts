@@ -1,41 +1,39 @@
-import { describe, it, expect, vi } from "vitest"
-import helper from "@tests/helpers"
+import { flushPromises } from "@vue/test-utils"
+import { describe, it, expect } from "vitest"
+import helper, {
+  countHistoryEntriesAdded,
+  productionRouterAt,
+} from "@tests/helpers"
 import ViewMemoryTrackerLink from "@/components/recall/ViewMemoryTrackerLink.vue"
-
-const mockedPush = vi.fn()
-vi.mock("vue-router", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("vue-router")>()
-  return {
-    ...actual,
-    useRouter: () => ({
-      push: mockedPush,
-    }),
-  }
-})
 
 describe("ViewMemoryTrackerLink", () => {
   it("renders a button that navigates to the memory tracker page", async () => {
-    mockedPush.mockClear()
+    const router = await productionRouterAt({ name: "recall" })
     const wrapper = helper
       .component(ViewMemoryTrackerLink)
       .withProps({ memoryTrackerId: 123 })
+      .withRouter(router)
       .mount()
 
     const button = wrapper.find("button")
     expect(button.exists()).toBe(true)
     expect(button.text()).toBe("View Memory Tracker")
 
+    const historyEntriesAdded = countHistoryEntriesAdded(router)
     await button.trigger("click")
-    expect(mockedPush).toHaveBeenCalledWith({
+    await flushPromises()
+    expect(router.currentRoute.value).toMatchObject({
       name: "memoryTrackerShow",
-      params: { memoryTrackerId: 123 },
+      params: { memoryTrackerId: "123" },
     })
+    expect(historyEntriesAdded()).toBe(1)
   })
 
-  it("has the correct CSS classes", () => {
+  it("has the correct CSS classes", async () => {
     const wrapper = helper
       .component(ViewMemoryTrackerLink)
       .withProps({ memoryTrackerId: 456 })
+      .withRouter(await productionRouterAt({ name: "recall" }))
       .mount()
 
     const button = wrapper.find("button")

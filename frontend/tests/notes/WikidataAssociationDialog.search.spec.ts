@@ -8,17 +8,7 @@ import {
   wikidataSearchResultItem,
   wikidataSearchResults,
 } from "@tests/notes/wikidataAssociationDialogTestSupport"
-import { describe, it, expect, vi } from "vitest"
-
-vi.mock("vue-router", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("vue-router")>()
-  return {
-    ...actual,
-    useRoute: () => ({
-      path: "/",
-    }),
-  }
-})
+import { describe, it, expect } from "vitest"
 
 const { mountDialog, getSdkSpies } = useWikidataAssociationDialogTestLifecycle()
 

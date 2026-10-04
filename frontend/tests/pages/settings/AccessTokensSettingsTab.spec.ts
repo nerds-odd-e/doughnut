@@ -10,7 +10,6 @@ describe("AccessTokensSettingsTab", () => {
 
   beforeEach(() => {
     vi.clearAllMocks()
-    usePopups().popups.register({ popupInfo: [] })
   })
 
   afterEach(() => {

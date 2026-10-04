@@ -10,17 +10,6 @@ import {
   useRecallPageSpecContext,
 } from "./recallPageTestSupport"
 
-vi.mock("@/components/commons/Popups/usePopups")
-
-vi.mock("vue-router", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("vue-router")>()
-  return {
-    ...actual,
-    useRoute: () => ({ path: "/", fullPath: "/" }),
-    useRouter: () => ({ currentRoute: { value: { name: "recall" } } }),
-  }
-})
-
 type ExposedVM = { toRepeat?: MemoryTrackerLite[]; currentIndex: number }
 const exposed = (wrapper: VueWrapper) => wrapper.vm as unknown as ExposedVM
 

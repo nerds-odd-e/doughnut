@@ -1,14 +1,9 @@
 import RichMarkdownEditor from "@/components/form/RichMarkdownEditor.vue"
 import type { QuillPasteContext } from "@/components/form/quillPasteContext"
-import routes from "@/routes/routes"
-import helper from "@tests/helpers"
+import helper, { productionRouterAt } from "@tests/helpers"
 import { flushPromises, type VueWrapper } from "@vue/test-utils"
 import type Quill from "quill"
-import {
-  createRouter,
-  createWebHistory,
-  type RouteLocationRaw,
-} from "vue-router"
+import type { RouteLocationRaw } from "vue-router"
 
 export function createRichMarkdownEditorTestHarness() {
   let wrapper: VueWrapper
@@ -161,12 +156,7 @@ export function createRichMarkdownEditorTestHarness() {
     const builder = helper.component(RichMarkdownEditor)
     const editorProps = { modelValue: initialValue, wikiLinks: [], ...props }
     if (route !== undefined) {
-      const router = createRouter({
-        history: createWebHistory(),
-        routes,
-      })
-      await router.push(route)
-      builder.withRealRouter(router)
+      builder.withRealRouter(await productionRouterAt(route))
     } else {
       builder.withRouter()
     }
