@@ -129,6 +129,22 @@ quiet.", set the feature's expected text to what Whisper returns. Replace the
 "never reached the note" observation in `docs/voice-input.md` with the
 current behavior.
 
+## Execution complete
+
+Product advice:
+- For wrap-up: [join dictated passages](../../seeds/SEED-066-voice-input.md#join-dictated-passages)
+  should note that English passages now join with one space; the remaining
+  question is Japanese, Chinese, and mixed-language joining.
+- For wrap-up: [see submitted dictation promptly](../../seeds/SEED-066-voice-input.md#prompt-dictation-results)
+  cites the retouch stage as a delay hypothesis; that stage is deleted, so its
+  baseline needs re-measuring before any work.
+- No correction planned. `SRTProcessor` reads a segment's text from after its
+  `-->` line but its end timestamp from the second line. They diverge only for
+  SRT without index lines, which only the mocked e2e transcript produces; real
+  Whisper always numbers segments.
+- Owner: run the manual orchard dictation on local Development after landing
+  to finish slice 4's proof.
+
 ## Current decisions
 
 - The rewrite is removed, not checked or re-instructed (owner, 2026-10-04).
