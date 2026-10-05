@@ -1,9 +1,0 @@
-{
-  "schemaVersion": 1,
-  "agent": "Eimi-chan",
-  "email": "eimi-chan@example.org",
-  "identity": "SEED-039#one-production-router-builder",
-  "mode": "story-branch",
-  "branch": "claude/build-the-test-router-over-production-routes-in",
-  "host": "claude"
-}

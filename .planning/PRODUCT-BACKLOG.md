@@ -6,8 +6,6 @@ Audio tools, starting with voice input. Make voice input work reliably and easy 
 
 ## Taken
 
-- [Build the test router over production routes in one place](seeds/SEED-039-faster-ci-feedback.md#one-production-router-builder) — SEED-039#one-production-router-builder ([plan](slice-plans/003-one-production-router-builder/PLAN.md))
-
 ## Backlog list
 
 - [Observe unmerged branch code against real services from an execution worktree](seeds/SEED-069-agent-development-tooling.md#observe-branch-code-against-real-services) — SEED-069#observe-branch-code-against-real-services
