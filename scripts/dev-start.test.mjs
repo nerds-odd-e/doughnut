@@ -1,13 +1,12 @@
 import assert from 'node:assert/strict'
 import { writeFileSync } from 'node:fs'
 import { readFile } from 'node:fs/promises'
-import path from 'node:path'
 import { test } from 'node:test'
 import {
   makeLinkedWorktreeCheckout,
   makePrimaryCheckout,
 } from './backend-test-worktree-linked-fixtures.mjs'
-import { DEVELOPMENT_RUNTIME_TARGET } from './development-runtime.mjs'
+import { targetFor } from './dev-stack-fixtures.mjs'
 import { runDevStart } from './dev-start.mjs'
 import {
   allocateFreePort,
@@ -22,15 +21,6 @@ import {
   makeStartSpy,
   neverHealthy,
 } from './sut-start-fixtures.mjs'
-
-function targetFor(checkoutRoot, ports = {}) {
-  return {
-    ...DEVELOPMENT_RUNTIME_TARGET,
-    ...ports,
-    logFile: path.join(checkoutRoot, 'dev.log'),
-    pidFile: path.join(checkoutRoot, 'dev.pid'),
-  }
-}
 
 test('linked worktree refuses Development start without spawning', async (t) => {
   const checkout = makeLinkedWorktreeCheckout(t)

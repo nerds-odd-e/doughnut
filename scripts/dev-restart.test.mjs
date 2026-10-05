@@ -1,176 +1,108 @@
 import assert from 'node:assert/strict'
-import { writeFileSync } from 'node:fs'
 import { test } from 'node:test'
-import { makePrimaryCheckout } from './backend-test-worktree-linked-fixtures.mjs'
-import { runDevRestart } from './dev-restart.mjs'
 import {
-  assertRefuseWithoutSignalOrStart,
-  listenersForPorts,
   makeLinkedWorktreeCheckout,
-  makeStartSpy,
-  occupiedPrimaryPorts,
+  makePrimaryCheckout,
+} from './backend-test-worktree-linked-fixtures.mjs'
+import {
+  startStandInDevelopmentStack,
   targetFor,
-  trackingKill,
-  withRefuseDeps,
-} from './dev-restart-fixtures.mjs'
+} from './dev-stack-fixtures.mjs'
+import { runDevRestart } from './dev-restart.mjs'
+import { runDevStart } from './dev-start.mjs'
 import {
   allocateFreePort,
   closeServer,
-  identityOnlyConfig,
+  isPidAlive,
+  isTcpListening,
   listenTcp,
 } from './sut-isolated-fixtures.mjs'
+import { makeStartSpy } from './sut-start-fixtures.mjs'
 
-test('occupied Development ports with missing dev.pid refuse without signalling or starting', async (t) => {
-  const { checkout, port, runtimeTarget } = await occupiedPrimaryPorts(t)
-  const kill = trackingKill()
-  const start = makeStartSpy()
+function startSpy() {
+  const calls = []
+  return {
+    calls,
+    runDevStartFn: async (options) => {
+      calls.push(options)
+      return 0
+    },
+  }
+}
 
-  await assertRefuseWithoutSignalOrStart(
-    withRefuseDeps({
-      checkoutRoot: checkout.root,
-      runtimeTarget,
-      kill,
-      start,
-      getListenerPidsFn: listenersForPorts(new Map([[port, [55501]]])),
-    }),
-    /missing|Refusing restart/i,
-    { kill, start, listeningPorts: [port] }
-  )
-})
-
-test('occupied Development ports with stale dev.pid refuse without signalling or starting', async (t) => {
-  const { checkout, port, runtimeTarget } = await occupiedPrimaryPorts(t)
-  writeFileSync(runtimeTarget.pidFile, '424242')
-  const kill = trackingKill()
-  const start = makeStartSpy()
-
-  await assertRefuseWithoutSignalOrStart(
-    withRefuseDeps({
-      checkoutRoot: checkout.root,
-      runtimeTarget,
-      kill,
-      start,
-      isProcessAliveFn: () => false,
-      getListenerPidsFn: listenersForPorts(new Map([[port, [55502]]])),
-    }),
-    /stale|Refusing restart/i,
-    { kill, start, listeningPorts: [port] }
-  )
-})
-
-test('live dev.pid with foreign listener refuses without signalling the foreign process', async (t) => {
-  const { checkout, port, runtimeTarget } = await occupiedPrimaryPorts(t)
-  writeFileSync(runtimeTarget.pidFile, String(process.pid))
-  const kill = trackingKill()
-  const start = makeStartSpy()
-
-  await assertRefuseWithoutSignalOrStart(
-    withRefuseDeps({
-      checkoutRoot: checkout.root,
-      runtimeTarget,
-      kill,
-      start,
-      getListenerPidsFn: listenersForPorts(new Map([[port, [77701]]])),
-      isOwnedByApplicationTreeFn: async () => false,
-    }),
-    /not owned|Refusing restart/i,
-    { kill, start, listeningPorts: [port] }
-  )
-})
-
-test('incomplete ownership (owned + foreign listeners) refuses without signalling either', async (t) => {
+test('restart stops the running stack before starting', async (t) => {
   const checkout = makePrimaryCheckout(t)
-  const backend = await listenTcp()
-  t.after(() => closeServer(backend.server))
-  const vite = await listenTcp()
-  t.after(() => closeServer(vite.server))
-  const runtimeTarget = targetFor(checkout.root, {
-    backendPort: backend.port,
-    vitePort: vite.port,
-    lbListenPort: await allocateFreePort(),
-  })
-  writeFileSync(runtimeTarget.pidFile, String(process.pid))
-  const ownedPid = 88801
-  const kill = trackingKill()
-  const start = makeStartSpy()
-
-  await assertRefuseWithoutSignalOrStart(
-    withRefuseDeps({
-      checkoutRoot: checkout.root,
-      runtimeTarget,
-      kill,
-      start,
-      getListenerPidsFn: listenersForPorts(
-        new Map([
-          [backend.port, [ownedPid]],
-          [vite.port, [88802]],
-        ])
-      ),
-      isOwnedByApplicationTreeFn: async (pid) => pid === ownedPid,
-    }),
-    /not owned|Refusing restart/i,
-    { kill, start, listeningPorts: [backend.port, vite.port] }
-  )
-})
-
-test('invalid non-numeric dev.pid with occupied ports refuses without signalling', async (t) => {
-  const { checkout, port, runtimeTarget } = await occupiedPrimaryPorts(t)
-  writeFileSync(runtimeTarget.pidFile, 'not-a-pid')
-  const kill = trackingKill()
-  const start = makeStartSpy()
-
-  await assertRefuseWithoutSignalOrStart(
-    withRefuseDeps({
-      checkoutRoot: checkout.root,
-      runtimeTarget,
-      kill,
-      start,
-      getListenerPidsFn: listenersForPorts(new Map([[port, [55503]]])),
-    }),
-    /missing|unreadable|Refusing restart/i,
-    { kill, start }
-  )
-})
-
-test('linked worktree refuses Development restart without signalling', async (t) => {
-  const checkout = makeLinkedWorktreeCheckout(t)
-  const kill = trackingKill()
-  const start = makeStartSpy()
-
-  await assertRefuseWithoutSignalOrStart(
-    withRefuseDeps({
-      checkoutRoot: checkout.root,
-      runtimeTarget: targetFor(checkout.root),
-      kill,
-      start,
-      getListenerPidsFn: async () => {
-        throw new Error('must not probe listeners for linked worktree')
-      },
-    }),
-    /primary checkout.*linked worktree isolation/,
-    { kill, start }
-  )
-})
-
-test('configured primary restarts Development', async (t) => {
-  const checkout = makePrimaryCheckout(t, {
-    config: JSON.stringify(identityOnlyConfig),
-  })
+  const { pids } = await startStandInDevelopmentStack(t, checkout.root)
   const runtimeTarget = targetFor(checkout.root)
-  const start = makeStartSpy()
+  const start = startSpy()
+  let aliveWhenStarting
 
-  const code = await runDevRestart({
+  await runDevRestart({
     checkoutRoot: checkout.root,
     runtimeTarget,
-    getListenerPidsFn: async () => [],
-    runDevStartFn: async (options) => {
-      start.calls.push(options)
-      return 0
+    runDevStartFn: (options) => {
+      aliveWhenStarting = Object.values(pids).filter(isPidAlive)
+      return start.runDevStartFn(options)
     },
   })
 
-  assert.equal(code, 0)
+  assert.deepEqual(aliveWhenStarting, [])
   assert.deepEqual(start.calls, [
     { checkoutRoot: checkout.root, runtimeTarget },
   ])
+})
+
+test('restart with nothing running starts Development', async (t) => {
+  const checkout = makePrimaryCheckout(t)
+  const start = startSpy()
+
+  assert.equal(
+    await runDevRestart({
+      checkoutRoot: checkout.root,
+      runtimeTarget: targetFor(checkout.root),
+      runDevStartFn: start.runDevStartFn,
+    }),
+    0
+  )
+
+  assert.equal(start.calls.length, 1)
+})
+
+test('a port held by another process makes restart refuse to start and leaves the listener', async (t) => {
+  const checkout = makePrimaryCheckout(t)
+  const { server, port } = await listenTcp()
+  t.after(() => closeServer(server))
+  const spawn = makeStartSpy()
+
+  await assert.rejects(
+    runDevRestart({
+      checkoutRoot: checkout.root,
+      runtimeTarget: targetFor(checkout.root, {
+        backendPort: port,
+        vitePort: await allocateFreePort(),
+        lbListenPort: await allocateFreePort(),
+      }),
+      runDevStartFn: (options) =>
+        runDevStart({ ...options, spawnFn: spawn.spawnFn }),
+    }),
+    new RegExp(`occupied \\(backend ${port}\\)`)
+  )
+
+  assert.equal(await isTcpListening(port), true)
+  assert.equal(spawn.calls.length, 0)
+})
+
+test('linked worktree refuses Development restart', async (t) => {
+  const checkout = makeLinkedWorktreeCheckout(t)
+  const start = startSpy()
+
+  await assert.rejects(
+    runDevRestart({
+      checkoutRoot: checkout.root,
+      runtimeTarget: targetFor(checkout.root),
+      runDevStartFn: start.runDevStartFn,
+    }),
+    /primary checkout.*linked worktree isolation/
+  )
+  assert.equal(start.calls.length, 0)
 })

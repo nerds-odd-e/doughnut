@@ -67,7 +67,7 @@
     "dev:restart": "node scripts/dev-restart.mjs",
     "dev:stop": "node scripts/dev-stop.mjs",
     "logs:tail": "node scripts/logs-tail.mjs",
-    "test:development-stack": "node --test scripts/dev-stop.test.mjs scripts/dev-start.test.mjs scripts/dev-restart.test.mjs scripts/dev-restart-owned.test.mjs scripts/development-services.test.mjs scripts/development-runtime.test.mjs",
+    "test:development-stack": "node --test scripts/dev-stop.test.mjs scripts/dev-start.test.mjs scripts/dev-restart.test.mjs scripts/development-services.test.mjs scripts/development-runtime.test.mjs",
     "test:api-summary": "node --test scripts/generate-api-summary.test.mjs",
     "test:workspace-syncpack-lifecycle": "node --test scripts/workspace-syncpack-lifecycle.test.mjs",
     "test:log-utils": "node --test scripts/log-utils.test.mjs scripts/logs-tail.test.mjs",

@@ -163,7 +163,7 @@ unnamed or untested in CI.
 
 ### 2. `pnpm dev:restart` stops by the same rule, then starts
 Type: Behavior
-Status: planned
+Status: done
 Proof: rewritten restart cases on the real stand-in stack (rows 7–9). The cases about missing, stale, invalid, and foreign-listener `dev.pid` are deleted with the code they covered.
 
 Behavior: a running Development stack, whatever `dev.pid` holds → `pnpm
@@ -218,3 +218,16 @@ If the run disagrees with slices 1–3, stop and change the plan.
   now exported from `scripts/worktree-retirement-checkout-processes.mjs`.
 - Production lines after slice 1: 821 → 986 (`dev-stop.mjs`, the stand-in fixture,
   and `development-primary-checkout.mjs` added; slices 2–3 delete the `dev.pid` code).
+- Slice 2 (accepted proof): `CURSOR_DEV=true nix develop -c pnpm test:development-stack`
+  → 17 pass; `scripts/dev-restart.test.mjs` covers rows 7–9 and the linked-worktree
+  refusal. `runDevRestart` is refuse → `stopDevelopmentServices` (exported from
+  `scripts/dev-stop.mjs`) → `runDevStart`. No wait for free ports was needed: the
+  listener's port is free when stop returns, so the bounded wait was deleted.
+  The stop rule now lives entirely in `scripts/dev-stop.mjs`;
+  `scripts/development-owned-process-tree.mjs`, `scripts/dev-restart-fixtures.mjs`
+  and `scripts/dev-restart-owned.test.mjs` are deleted. The SIGTERM→SIGKILL
+  escalation stays in the shared `terminateOwnedProcessTree`, exercised by the
+  E2E stack's tests. Slice 3: `dev-stop.mjs` still imports `isProcessAlive` from
+  `scripts/development-pid.mjs`; give it a home when that module's readers go.
+  `targetFor` is in `scripts/dev-stack-fixtures.mjs`.
+- Production lines after slice 2: 707.

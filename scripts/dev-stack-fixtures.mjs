@@ -1,9 +1,21 @@
 import { spawn } from 'node:child_process'
 import { readFile, writeFile } from 'node:fs/promises'
 import path from 'node:path'
-import { developmentServicesScript } from './development-runtime.mjs'
+import {
+  DEVELOPMENT_RUNTIME_TARGET,
+  developmentServicesScript,
+} from './development-runtime.mjs'
 import { allocateFreePort } from './sut-isolated-fixtures.mjs'
 import { waitUntil } from './sut-owned-supervisor-fixtures.mjs'
+
+export function targetFor(checkoutRoot, ports = {}) {
+  return {
+    ...DEVELOPMENT_RUNTIME_TARGET,
+    ...ports,
+    logFile: path.join(checkoutRoot, 'dev.log'),
+    pidFile: path.join(checkoutRoot, 'dev.pid'),
+  }
+}
 
 function killQuietly(target) {
   try {
