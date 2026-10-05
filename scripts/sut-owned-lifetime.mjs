@@ -81,6 +81,7 @@ async function releaseOwnedLifetime({ child, checkoutRoot, ownerRef }) {
  *   isPortOccupiedFn?: (port: number) => Promise<boolean>,
  *   portClaimRoot?: string,
  *   backendReload?: boolean,
+ *   paidOpenAi?: boolean,
  *   retainOwnership?: boolean,
  *   signal?: AbortSignal,
  * }} [opts]
@@ -103,6 +104,7 @@ export async function startOwnedSutLifetime({
   isPortOccupiedFn,
   portClaimRoot,
   backendReload,
+  paidOpenAi,
   retainOwnership = false,
   signal,
 } = {}) {
@@ -172,6 +174,7 @@ export async function startOwnedSutLifetime({
       logFile,
       runtimeTarget: target,
       backendReload,
+      paidOpenAi,
       owner: ownerRef.owner,
       checkoutRoot,
     })

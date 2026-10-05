@@ -20,7 +20,10 @@ export const PID_FILE = path.join(repoRoot, 'sut.pid')
  * Spawn the SUT service group detached. The wrapper keeps running after this
  * startup helper exits and writes stdout+stderr through a rotating log.
  *
- * @param {{ spawnFn?: typeof spawn, logFile?: string, runtimeTarget?: object, backendReload?: boolean }} [opts]
+ * The services inherit this process's environment; without `paidOpenAi` the
+ * shell's `OPENAI_API_TOKEN` is withheld so they cannot make paid OpenAI calls.
+ *
+ * @param {{ spawnFn?: typeof spawn, logFile?: string, runtimeTarget?: object, backendReload?: boolean, paidOpenAi?: boolean }} [opts]
  * @returns {{ child: import('node:child_process').ChildProcess, logFile: string }}
  */
 export function spawnSutServices({
@@ -28,10 +31,13 @@ export function spawnSutServices({
   logFile = LOG_FILE,
   runtimeTarget,
   backendReload = true,
+  paidOpenAi = true,
   owner,
   checkoutRoot = repoRoot,
 } = {}) {
   const target = resolveSutRuntimeTarget({ runtimeTarget })
+  const { OPENAI_API_TOKEN, ...envWithoutOpenAi } = process.env
+  const inheritedEnv = paidOpenAi ? process.env : envWithoutOpenAi
   const ownerEnv = {
     SUT_CHECKOUT_ROOT: checkoutRoot,
     SUT_BACKEND_RELOAD: String(backendReload),
@@ -49,7 +55,7 @@ export function spawnSutServices({
       cwd: repoRoot,
       detached: true,
       env: withSutRuntimeTargetEnv(
-        { ...process.env, SUT_LOG_FILE: logFile, ...ownerEnv },
+        { ...inheritedEnv, SUT_LOG_FILE: logFile, ...ownerEnv },
         target
       ),
       stdio: 'ignore',

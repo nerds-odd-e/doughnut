@@ -127,8 +127,9 @@ command is not named in any guidance until slice 4.
 
 ### 2. Keep paid OpenAI calls off unless `--paid-openai` is given
 Type: Behavior
-Status: planned
+Status: done
 Proof: two cases at the SUT spawn seam; one unpaid real run (rows 4–6 above).
+Accepted proof: `scripts/e2e-runner-hold.cases.mjs` "hold: withholds the shell's OpenAI token to the services" and "hold: with paid OpenAI passes the shell's OpenAI token to the services" record the `spawnFn` env with the shell token set (`node --test scripts/e2e-runner.test.mjs` 69/69); `pnpm test:browser-worktree-isolation` 110/110; `pnpm test:sut-start` 71/71. Unpaid real run (2026-10-05) with the shell token set: after one manual reset, `GET /api/ai/available-gpt-models` answered 503 "OpenAI is not available (no API key configured)"; SIGINT exited 0 and `worktree:retire --check` was idle. The `--paid-openai` argv mapping is one line in `scripts/e2e-runner.mjs` and has no unit case or real run.
 
 Behavior: a shell with `OPENAI_API_TOKEN` set → `pnpm e2e:hold` → the stack's
 services run without the token, and an AI request in the held app answers that
@@ -166,5 +167,9 @@ defaults.
   the stand-in cases stay alive under `node:test`.
 - Shutdown kills the supervisor after a cancel; the hold ignores that exit so a
   clean interrupt reports no service failure.
+- `spawnSutServices` decides the token (`paidOpenAi`, default on for
+  `cy:run`, `cy:open`, and `pnpm sut`); the hold turns it off unless
+  `--paid-openai`. The hold itself lives in `scripts/e2e-hold.mjs`;
+  `scripts/e2e-runner.mjs` keeps the `--hold` dispatch.
 - Signal the `node scripts/e2e-runner.mjs --hold` process, not the pnpm
   `sh -c` wrapper, when stopping a backgrounded real run.

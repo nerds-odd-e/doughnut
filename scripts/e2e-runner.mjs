@@ -21,6 +21,7 @@ import {
   resolveInvocationCheckout,
 } from './e2e-invocation-selection.mjs'
 import { runOwnedE2eInvocation } from './e2e-owned-invocation.mjs'
+import { runE2eHold } from './e2e-hold.mjs'
 
 export { defaultSpawnCypress, defaultSpawnCypressOpen, wireBatchCancellation }
 export {
@@ -197,61 +198,6 @@ export async function runE2eInteractive({
   })
 }
 
-function holdUntilCancelled({ cancel, childExit, log, errLog }) {
-  log('E2E stack is ready and held; interrupt (Ctrl-C) to stop it.')
-  // The SUT supervisor is detached, so nothing else keeps this process alive.
-  const keepAlive = setInterval(() => undefined, 1 << 30)
-  return new Promise((resolve) => {
-    cancel.onTriggered(() => resolve(0))
-    childExit.exited.then(() => {
-      if (cancel.isTriggered()) return
-      errLog(
-        'Required SUT service exited during the hold; ending with failure.'
-      )
-      resolve(1)
-    })
-  }).finally(() => clearInterval(keepAlive))
-}
-
-/**
- * Hold this checkout's owned E2E stack for manual, CLI, or HTTP observation:
- * the same owned invocation as `runE2eInteractive`, with a wait for
- * cancellation in place of Cypress. A clean interrupt is the normal end and
- * returns 0; a required service exit or a failed cleanup returns nonzero.
- *
- * @returns {Promise<number>}
- */
-export async function runE2eHold({
-  checkoutRoot = repoRoot,
-  startLifetime = startOwnedSutLifetime,
-  log = (s) => process.stdout.write(`${s}\n`),
-  errLog = (s) => process.stderr.write(`${s}\n`),
-  cancel = NO_CANCEL,
-  isIsolatedCheckoutFn = worktreeIsolationApplies,
-  ...lifetimeOpts
-} = {}) {
-  const { isolated, resolvedCheckoutTarget } = resolveInvocationCheckout({
-    checkoutRoot,
-    runtimeTarget: lifetimeOpts.runtimeTarget,
-    isIsolatedCheckoutFn,
-  })
-  return runOwnedE2eInvocation({
-    specs: [],
-    approved: null,
-    checkoutRoot,
-    startLifetime,
-    log,
-    errLog,
-    cancel,
-    label: 'E2E hold',
-    session: holdUntilCancelled,
-    backendReload: true,
-    isolated,
-    resolvedCheckoutTarget,
-    ...lifetimeOpts,
-  })
-}
-
 const isMain = process.argv[1]
   ? fileURLToPath(import.meta.url) === path.resolve(process.argv[1])
   : false
@@ -259,7 +205,10 @@ const isMain = process.argv[1]
 if (isMain) {
   const cancel = wireBatchCancellation()
   const code = process.argv.includes('--hold')
-    ? await runE2eHold({ cancel })
+    ? await runE2eHold({
+        cancel,
+        paidOpenAi: process.argv.includes('--paid-openai'),
+      })
     : process.argv.includes('--open')
       ? await runE2eInteractive({ cancel })
       : await runE2eBatch({ cancel })
