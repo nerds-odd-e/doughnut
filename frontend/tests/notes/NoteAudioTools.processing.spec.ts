@@ -12,7 +12,7 @@ import {
 import { useNoteStore } from "@/store/noteStore"
 import {
   midSpeechChunk,
-  dictatedTextResponse,
+  audioTextResponse,
   mountNoteAudioTools,
   processAudio,
   useNoteAudioToolsTestLifecycle,
@@ -54,7 +54,7 @@ describe("NoteAudioTools audio processing", () => {
     audioToTextMock = mockSdkService(
       AiAudioController,
       "audioToText",
-      dictatedTextResponse("text")
+      audioTextResponse("text")
     )
     wrapper = mountNoteAudioTools(note)
     noteStore.refreshNoteRealm(originalRealm)
@@ -84,7 +84,7 @@ describe("NoteAudioTools audio processing", () => {
 
   it("returns endTimestamp from audio processing", async () => {
     audioToTextMock.mockResolvedValue(
-      wrapSdkResponse(dictatedTextResponse("text"))
+      wrapSdkResponse(audioTextResponse("text"))
     )
     mockSdkService(
       TextContentController,

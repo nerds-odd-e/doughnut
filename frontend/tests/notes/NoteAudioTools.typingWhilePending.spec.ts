@@ -40,6 +40,26 @@ vi.mock("@/models/wakeLocker", async () => {
 
 useNoteAudioToolsTestLifecycle()
 
+describe("Japanese dictation while the author edits the open body", () => {
+  const { mountEditorAndAudioTools, whileAudioIsPending, lastSavedContent } =
+    useBodyEditorWithHeldDictation("果樹園は古いです。")
+
+  it("joins the Japanese passage to the current draft without a space", async () => {
+    const { wrapper } = mountEditorAndAudioTools("鐘は毎時間鳴ります。", true)
+
+    await whileAudioIsPending(async () => {
+      await setTextareaValue(wrapper, "鐘は毎時間鳴ります。ベンチがあります。")
+    })
+
+    expect(textareaEl(wrapper).value).toBe(
+      "鐘は毎時間鳴ります。ベンチがあります。果樹園は古いです。"
+    )
+    expect(lastSavedContent()).toBe(
+      "鐘は毎時間鳴ります。ベンチがあります。果樹園は古いです。"
+    )
+  })
+})
+
 describe("NoteAudioTools while the author types in the open body editor", () => {
   const noteStore = useNoteStore()
   const {

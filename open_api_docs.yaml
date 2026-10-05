@@ -5098,8 +5098,10 @@ components:
     TextFromAudioWithCallInfo:
       type: object
       properties:
-        dictatedText:
-          type: string
+        segmentTexts:
+          type: array
+          items:
+            type: string
         rawSRT:
           type: string
         endTimestamp:

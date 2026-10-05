@@ -47,11 +47,14 @@ export function midSpeechChunk(
   return audioChunk(data, true)
 }
 
-export function dictatedTextResponse(
-  dictatedText: string,
+export function audioTextResponse(
+  passage: string | string[],
   endTimestamp = "00:00:37,270"
 ) {
-  return { dictatedText, endTimestamp }
+  return {
+    segmentTexts: typeof passage === "string" ? [passage] : passage,
+    endTimestamp,
+  }
 }
 
 export function processAudio(
