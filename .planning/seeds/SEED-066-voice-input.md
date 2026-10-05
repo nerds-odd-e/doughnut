@@ -354,8 +354,11 @@ technical redesign, or speculative infrastructure.
   completion states are understandable through the product.
 - **Evidence / learning:** The owner reports an ugly and unintuitive UI. The
   observed journey uses Record Audio, Flush Audio, Stop Recording, Save Audio
-  Locally, and Advanced Options. Observe the journey to decide the smallest
-  useful interaction change rather than assuming a full redesign.
+  Locally, and Advanced Options, plus Retry and the failure message after a
+  failed conversion. The owner has not yet reviewed Retry's interaction or
+  that message's wording; settle Retry's place among the controls here.
+  Observe the journey to decide the smallest useful interaction change rather
+  than assuming a full redesign.
 - **Boundary:** One first-dictation journey on an existing note. Hardware capture
   and permission behavior remain discovery gaps to check during refinement;
   this does not preselect new device-management or advanced-processing features.

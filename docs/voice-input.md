@@ -76,7 +76,8 @@ No clocks, worklets, request delays or service responses were simulated.
 Hardware capture, permission/device behavior and interruption remain
 unassessed. Failure feedback and recovery are covered by the mocked and model
 tests described above; a failure of the real transcription service has not
-been observed. An automation route at `127.0.0.1:5175`
+been observed. Kept audio is sent again in one request; whether a long outage
+makes it larger than the transcription service accepts has not been observed. An automation route at `127.0.0.1:5175`
 could sign in but did not activate Note/New notebook; localhost worked. That
 observation does not establish a human-click defect or its cause.
 
