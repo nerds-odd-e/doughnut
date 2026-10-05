@@ -7,7 +7,6 @@ Audio tools, starting with voice input. Make voice input work reliably and easy 
 ## Taken
 
 - [Observe unmerged branch code against real services from an execution worktree](seeds/SEED-069-agent-development-tooling.md#observe-branch-code-against-real-services) — SEED-069#observe-branch-code-against-real-services ([plan](slice-plans/004-hold-worktree-e2e-stack/PLAN.md))
-- [Join dictated passages to the note in a way that fits the language](seeds/SEED-066-voice-input.md#join-dictated-passages) — SEED-066#join-dictated-passages ([plan](slice-plans/001-join-dictated-passages/PLAN.md))
 
 ## Backlog list
 
