@@ -308,6 +308,6 @@ The story's key example (DD-161) had an agent point the CLI at the held app and 
   - Tool: Claude Code
   - Model: claude-opus-5-5
   - Open Dough release: 0.3.56
-  - Evidence: `.planning/slice-plans/004-hold-worktree-e2e-stack/PLAN.md` proof row "The CLI reaches the held app"; slice 4 implementer report listed "No CLI token route" as a gap after using curl `generate-token` by hand; the coordinator returned the slice once, and `1ae39ec64f` adds the token route to `.agents/agent-map.md`.
+  - Evidence: `b7ae807ce5:.planning/slice-plans/004-hold-worktree-e2e-stack/PLAN.md` proof row "The CLI reaches the held app"; slice 4 implementer report listed "No CLI token route" as a gap after using curl `generate-token` by hand; the coordinator returned the slice once, and `1ae39ec64f` adds the token route to `.agents/agent-map.md`.
   - Observed effect: one extra implementation round (about 49 s); caught only by reading the return's named gaps against the key examples.
   - Inference: a proof row that checks reachability can pass while the example's real shape (an authenticated write) stays unguided. Qualified: one occurrence.

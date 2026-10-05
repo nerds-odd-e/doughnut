@@ -6,8 +6,6 @@ Audio tools, starting with voice input. Make voice input work reliably and easy 
 
 ## Taken
 
-- [Observe unmerged branch code against real services from an execution worktree](seeds/SEED-069-agent-development-tooling.md#observe-branch-code-against-real-services) — SEED-069#observe-branch-code-against-real-services ([plan](slice-plans/004-hold-worktree-e2e-stack/PLAN.md))
-
 ## Backlog list
 
 - [Stop and restart the Development stack without hunting for its processes](seeds/SEED-069-agent-development-tooling.md#reliable-development-stack-lifecycle) — SEED-069#reliable-development-stack-lifecycle
