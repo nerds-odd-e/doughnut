@@ -65,10 +65,20 @@ export default class NoteTextEditing {
     await this.updateTextField(noteId, "edit content", value.content)
   }
 
-  async appendDictatedText(noteId: Donut.ID, passage?: string) {
-    if (!passage) return
+  async appendDictatedText(noteId: Donut.ID, segmentTexts: string[]) {
+    if (segmentTexts.length === 0) return
+    const japaneseOrChineseWriting =
+      /[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}\u30FC\u3000-\u303F\uFF00-\uFFEF]/u
     const join = (text: string) =>
-      text === "" || /\s$/.test(text) ? text + passage : `${text} ${passage}`
+      segmentTexts.reduce((body, segment) => {
+        const before = body.match(/.$/u)?.[0] ?? ""
+        const after = segment.match(/^./u)?.[0] ?? ""
+        return body === "" ||
+          /\s$/.test(body) ||
+          japaneseOrChineseWriting.test(before + after)
+          ? body + segment
+          : `${body} ${segment}`
+      }, text)
     if (changeOpenNoteContentDraft(noteId, join)) return
 
     const realm = await this.store.getOrLoadNoteRealm(noteId)

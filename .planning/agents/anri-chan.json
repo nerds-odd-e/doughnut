@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 1,
+  "agent": "Anri-chan",
+  "email": "anri-chan@example.org",
+  "identity": "SEED-066#recover-failed-transcription",
+  "mode": "story-branch",
+  "branch": "claude/recover-a-failed-transcription-without-repeating",
+  "host": "claude"
+}

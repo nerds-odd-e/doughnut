@@ -1,5 +1,7 @@
 package com.odde.donut.controllers;
 
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.empty;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
@@ -57,7 +59,8 @@ class AiAudioControllerTests extends ControllerTestBase {
     void convertingFormat(String filename) throws Exception {
       mockTranscriptionSrtResponse("1\n00:00:00,000 --> 00:00:03,000\ntest transcription");
 
-      upload(filename, false).andExpect(jsonPath("$.dictatedText").value("test transcription"));
+      upload(filename, false)
+          .andExpect(jsonPath("$.segmentTexts").value(contains("test transcription")));
     }
 
     @Test
@@ -66,8 +69,8 @@ class AiAudioControllerTests extends ControllerTestBase {
 
       upload("test.mp3", true)
           .andExpect(
-              jsonPath("$.dictatedText")
-                  .value("The orchard has apple trees. These facts are finished."))
+              jsonPath("$.segmentTexts")
+                  .value(contains("The orchard has apple trees.", "These facts are finished.")))
           .andExpect(jsonPath("$.endTimestamp").value("00:00:06,000"));
     }
 
@@ -77,9 +80,32 @@ class AiAudioControllerTests extends ControllerTestBase {
 
       upload("test.mp3", false)
           .andExpect(
-              jsonPath("$.dictatedText")
-                  .value("The orchard has apple trees. These facts are finished. The book that I"))
+              jsonPath("$.segmentTexts")
+                  .value(
+                      contains(
+                          "The orchard has apple trees.",
+                          "These facts are finished.",
+                          "The book that I")))
           .andExpect(jsonPath("$.endTimestamp").value("00:00:09,000"));
+    }
+
+    @Test
+    void segmentTextNormalizesLinesAfterTheTimestampWithoutAnIndex() throws Exception {
+      mockTranscriptionSrtResponse(
+          "00:00:00,000 --> 00:00:01,000\nits talk about\ndada struct day.\n\n"
+              + "00:00:01,000 --> 00:00:02,000\nNext one.\n\n");
+
+      upload("test.mp3", false)
+          .andExpect(
+              jsonPath("$.segmentTexts")
+                  .value(contains("its talk about dada struct day.", "Next one.")));
+    }
+
+    @Test
+    void transcriptionWithoutTextHasNoWrittenSegments() throws Exception {
+      mockTranscriptionSrtResponse("1\n00:00:00,000 --> 00:00:03,000\n");
+
+      upload("test.mp3", false).andExpect(jsonPath("$.segmentTexts").value(empty()));
     }
 
     @Test
@@ -87,7 +113,7 @@ class AiAudioControllerTests extends ControllerTestBase {
       mockTranscriptionSrtResponse("1\n00:00:00,000 --> 00:00:03,000\nunfinished sentence\n\n\n");
 
       upload("test.mp3", true)
-          .andExpect(jsonPath("$.dictatedText").value(""))
+          .andExpect(jsonPath("$.segmentTexts").value(empty()))
           .andExpect(jsonPath("$.endTimestamp").value("00:00:00,000"));
     }
   }

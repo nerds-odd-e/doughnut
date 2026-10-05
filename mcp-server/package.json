@@ -20,7 +20,7 @@
     "donut-api": "workspace:*"
   },
   "devDependencies": {
-    "@modelcontextprotocol/sdk": "1.31.0",
+    "@modelcontextprotocol/sdk": "1.32.0",
     "@types/node": "26.6.3",
     "donut-test-fixtures": "workspace:*",
     "esbuild": "0.28.2",

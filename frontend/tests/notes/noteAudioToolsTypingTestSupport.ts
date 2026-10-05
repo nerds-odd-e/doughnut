@@ -10,7 +10,7 @@ import makeMe from "donut-test-fixtures/makeMe"
 import helper, { mockSdkServiceWithImplementation } from "@tests/helpers"
 import { advanceNoteContentSaveDebounce } from "@tests/helpers/noteContentDebounceTestSupport"
 import {
-  dictatedTextResponse,
+  audioTextResponse,
   processAudio,
   type NoteAudioToolsWrapper,
 } from "@tests/notes/noteAudioToolsTestSupport"
@@ -25,7 +25,7 @@ export const dictatedPassage = "The orchard path leads down to the river."
  * request held until the test has typed. Call inside a describe block, after
  * useNoteAudioToolsTestLifecycle().
  */
-export function useBodyEditorWithHeldDictation() {
+export function useBodyEditorWithHeldDictation(passage = dictatedPassage) {
   const noteStore = useNoteStore()
   const editorNoteId = ref(0)
   let wrapper: NoteAudioToolsWrapper | undefined
@@ -41,7 +41,7 @@ export function useBodyEditorWithHeldDictation() {
       "audioToText",
       async () => {
         await audioHeld
-        return dictatedTextResponse(dictatedPassage)
+        return audioTextResponse(passage)
       }
     )
     updateContentMock = mockSdkServiceWithImplementation(
