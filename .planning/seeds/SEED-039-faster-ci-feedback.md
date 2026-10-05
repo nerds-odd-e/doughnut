@@ -131,29 +131,6 @@ authorizes no implementation, profiling run, or executable slice plan.
   If the resulting timings no longer justify rebalancing, bring that evidence
   back for an owner decision rather than inventing work or silently cancelling it.
 
-<a id="one-production-router-builder"></a>
-
-### Build the test router over production routes in one place
-
-**Identity:** SEED-039#one-production-router-builder
-```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/003-one-production-router-builder/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"f20a7b6d221aa85b97c34b4c39d843c2c62386340df0c9af52184d65a97c5705","plan":"ce6f5af5f20d9b64f873007ae7f0b30b8530728871e75f94537d51e57322e8cf"}}
-```
-
-Correction from the retrospective of SEED-039#specs-share-production-router
-(`70c937334e:.planning/seeds/SEED-039-faster-ci-feedback.md#specs-share-production-router`).
-Plan: [003-one-production-router-builder](../slice-plans/003-one-production-router-builder/PLAN.md).
-
-**Goal:** Donut contributors reading frontend test support find one way to
-build a router over the production routes, and no NoteShowPage support that
-nothing uses.
-
-**Scope:** `frontend/tests/helpers/RenderingHelper.ts` builds the
-production-routes router once, shared by `productionRouterAt` and the default
-of `withRouter()`. The unused sidebar-layout render path in
-`frontend/tests/pages/noteShowPageTestSupport.ts` and the fixture only it
-uses are deleted. No test name or assertion changes; no production code.
-
 ## Ordering and Scope Reduction
 
 Follow story 2, then story 3. Test optimization removes shared cost before shard
