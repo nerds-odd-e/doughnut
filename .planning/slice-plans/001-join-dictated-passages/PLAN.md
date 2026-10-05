@@ -79,7 +79,7 @@ Focused commands (from `.agents/agent-map.md`):
 
 ### 1. One client rule joins a passage's segments
 Type: Structure
-Status: planned
+Status: done
 Proof: existing audio behavior stays green — the mounted `NoteAudioTools.*.spec.ts`
 files, `AiAudioControllerTests`, `SRTProcessorTests`, and the mocked recording
 journey.
@@ -129,6 +129,52 @@ Update `docs/voice-input.md` to state the rule.
   language of the note or the speech.
 - Korean and other scripts keep the one-space join.
 
+## Execution context
+
+- Identity: `SEED-066#join-dictated-passages`; agent: Nana-chan;
+  publisher: `dashboard-territory.local-doughnut`.
+- Mode: story-branch; execution checkout:
+  `/Users/terryyin/git/doughnut/.worktrees/join-dictated-passages-to-the-note-in-a-way-that-2`.
+- Branch: `codex/join-dictated-passages-to-the-note-in-a-way-that-2`;
+  authorized remote: `origin`; integration target: `main`.
+- Established published claim: `a0a0514ac372b71e157a387230f2f1ec4b19030a`;
+  starting revision: `14efa56789d8d374bc9c53389d7e668ad94033ea`.
+- Checkout setup and baseline frontend typecheck passed on 2026-10-05.
+- Replanning remains authorized within the selected story. Slice target is
+  five minutes, hard limit ten minutes; cross-stack generation and required
+  full-suite verification are external-wait exceptions when edits converge.
+- CI source: GitHub Actions, `nerds-odd-e/doughnut`, verified `ci.yml`
+  push workflow. Story increments publish to the execution branch; the trunk
+  claim has no matching observer and is unobserved.
+
 ## Learnings
 
-None yet.
+- Slice 1 passed `CURSOR_DEV=true nix develop -c pnpm generateTypeScript`,
+  `env -u NODE_ENV CURSOR_DEV=true nix develop -c pnpm frontend:test`
+  (321 files, 2016 tests),
+  `CURSOR_DEV=true nix develop -c pnpm -C frontend exec vue-tsc --noEmit`,
+  `CURSOR_DEV=true nix develop -c pnpm backend:test_only`
+  (2734 tests, zero failures, two skipped), and
+  `CURSOR_DEV=true nix develop -c pnpm cy:run --spec e2e_test/features/note_creation_and_update/record_live_audio.feature`
+  (one scenario).
+- Accepted observations: mounted preservation tests save multiple segments
+  exactly once and leave an empty response unchanged; controller multipart
+  tests observe ordered Stop/mid-speech lists, holdback and normalized segment
+  lines. Existing mounted draft, origin, whitespace, undo and store-load cases
+  remain green. The mocked recording journey observes both page and stored
+  English content through the regenerated API.
+- The first backend run exposed an impossible blank OpenAI fixture, rejected
+  by the existing transcription contract. Timestamp-only SRT supplies the
+  correct no-written-text precondition; the full rerun passed. E2E startup
+  first encountered the concurrent backend admission gate, then check-only
+  formatting findings; normal gate release and source line wrapping resolved
+  those causes before the successful journey.
+- Active slice 1 edits converged in approximately 2.5 minutes. Generation and
+  required full-suite/E2E waits used the stated verification exception.
+- Independent slice 1 refactor review: already clean, no edits or proof
+  invalidations. Coordinator selective format passed; generation-owned
+  artifacts remain untouched by hand.
+- CI observer: Codex yielded cell `21`, PTY session `16280`, stream PID
+  `63999`, mailbox `/tmp/dough-ci-501/watch-9hiMk4`; coordinator launch
+  `91fb497f-d824-43f7-801f-ef7934909b7c`, bound to this checkout and the
+  remote execution branch above. Managed delivery owns revision attachment.

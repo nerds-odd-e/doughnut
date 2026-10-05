@@ -6,21 +6,22 @@ editing. Dictation writes only to the note body.
 
 ## Adding dictated text to a note
 
-Audio processing returns `dictatedText`: the passage for the uploaded chunk.
-The passage is the transcription's own text, as is: the text of each written
-transcription segment (the lines after its timestamp line), in order, joined
-by one space. Nothing is left out, added, or reworded. Audio responses do not
+Audio processing returns `segmentTexts`: the written transcription segments
+for the uploaded chunk, in order. Each segment contains the lines after its
+timestamp line, with line breaks replaced by spaces. The client joins these
+segments to the note using the same rule as successive passages, then saves
+once per response. Nothing is left out, added, or reworded. Audio responses do not
 use the conversation tool's `NoteContentCompletion`, which continues to
 replace complete note content.
 
 The audio request carries only the audio and the mid-speech flag. The client
-retains the originating note id, and each returned passage is appended
+retains the originating note id, and each returned segment is appended
 deterministically to that note's current store body, loading its realm when
 absent, and saved through the ordinary content PATCH. One join rule
 serves both the saved body and an open editor's draft: text that does not end
-in whitespace is followed by one space and then the passage, text already
-ending in whitespace is followed directly by the passage, and an empty body
-becomes the passage alone. Existing characters remain unchanged, and
+in whitespace is followed by one space and then the segment, text already
+ending in whitespace is followed directly by the segment, and an empty body
+becomes the segment alone. Existing characters remain unchanged, and
 successive additions follow earlier additions once. Navigating to another note
 does not redirect the result. The normal content-edit undo restores the prior body.
 

@@ -776,7 +776,7 @@ export type AudioUploadDto = {
 };
 
 export type TextFromAudioWithCallInfo = {
-    dictatedText?: string;
+    segmentTexts?: Array<string>;
     rawSRT?: string;
     endTimestamp?: string;
 };

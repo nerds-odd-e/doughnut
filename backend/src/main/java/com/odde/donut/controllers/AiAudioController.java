@@ -36,7 +36,7 @@ class AiAudioController {
         new SRTProcessor().process(transcriptionFromAudio, audioFile.isMidSpeech());
 
     TextFromAudioWithCallInfo textFromAudioWithCallInfo = new TextFromAudioWithCallInfo();
-    textFromAudioWithCallInfo.setDictatedText(processedResult.getText());
+    textFromAudioWithCallInfo.setSegmentTexts(processedResult.getSegmentTexts());
     textFromAudioWithCallInfo.setEndTimestamp(processedResult.getEndTimestamp());
     textFromAudioWithCallInfo.setRawSRT(processedResult.getProcessedSRT());
     return textFromAudioWithCallInfo;

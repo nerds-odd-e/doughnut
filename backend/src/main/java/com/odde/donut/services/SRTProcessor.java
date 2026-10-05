@@ -2,7 +2,6 @@ package com.odde.donut.services;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -11,7 +10,7 @@ public class SRTProcessor {
   @AllArgsConstructor
   public static class SRTProcessingResult {
     private String processedSRT;
-    private String text;
+    private List<String> segmentTexts;
     private String endTimestamp;
   }
 
@@ -19,22 +18,25 @@ public class SRTProcessor {
     List<String> segments = Arrays.asList(rawSRT.strip().split("\n\n"));
     if (!midSpeech) {
       return new SRTProcessingResult(
-          rawSRT, textOf(segments), extractTimestampFromSegment(segments.getLast()));
+          rawSRT, segmentTextsOf(segments), extractTimestampFromSegment(segments.getLast()));
     }
 
     if (segments.size() <= 1) {
-      return new SRTProcessingResult("", "", "00:00:00,000");
+      return new SRTProcessingResult("", List.of(), "00:00:00,000");
     }
 
     List<String> written = segments.subList(0, segments.size() - 1);
     return new SRTProcessingResult(
         String.join("\n\n", written),
-        textOf(written),
+        segmentTextsOf(written),
         extractTimestampFromSegment(written.getLast()));
   }
 
-  private static String textOf(List<String> segments) {
-    return segments.stream().map(SRTProcessor::segmentText).collect(Collectors.joining(" "));
+  private static List<String> segmentTextsOf(List<String> segments) {
+    return segments.stream()
+        .map(SRTProcessor::segmentText)
+        .filter(text -> !text.isEmpty())
+        .toList();
   }
 
   private static String segmentText(String segment) {

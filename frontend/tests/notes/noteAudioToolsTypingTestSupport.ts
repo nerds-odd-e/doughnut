@@ -10,7 +10,7 @@ import makeMe from "donut-test-fixtures/makeMe"
 import helper, { mockSdkServiceWithImplementation } from "@tests/helpers"
 import { advanceNoteContentSaveDebounce } from "@tests/helpers/noteContentDebounceTestSupport"
 import {
-  dictatedTextResponse,
+  audioTextResponse,
   processAudio,
   type NoteAudioToolsWrapper,
 } from "@tests/notes/noteAudioToolsTestSupport"
@@ -41,7 +41,7 @@ export function useBodyEditorWithHeldDictation() {
       "audioToText",
       async () => {
         await audioHeld
-        return dictatedTextResponse(dictatedPassage)
+        return audioTextResponse(dictatedPassage)
       }
     )
     updateContentMock = mockSdkServiceWithImplementation(
