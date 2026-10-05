@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "agent": "Nana-chan",
+  "email": "nana-chan@example.org",
+  "identity": "SEED-066#join-dictated-passages",
+  "mode": "story-branch",
+  "branch": "codex/join-dictated-passages-to-the-note-in-a-way-that-2",
+  "host": "codex",
+  "model": "gpt-6.1-sol"
+}
