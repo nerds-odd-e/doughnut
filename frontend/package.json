@@ -57,7 +57,7 @@
     "gsap": "^3.15.0",
     "marked": "^18.0.14",
     "optionator": "^0.9.4",
-    "pdfjs-dist": "6.3.289",
+    "pdfjs-dist": "6.4.299",
     "playwright": "^1.63.0",
     "sass": "1.105.1",
     "storybook": "10.6.1",
