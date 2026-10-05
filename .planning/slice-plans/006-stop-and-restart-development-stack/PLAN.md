@@ -137,6 +137,10 @@ Commands (run from the repository root of the execution worktree):
   and record that under Learnings.
 - The stop command prints one line: what it stopped (services PID) or that
   Development is not running.
+- Slice 4 runs after this story branch lands on `main` (owner decision,
+  2026-10-05): the primary checkout gets the commits by landing, not by switching
+  branches. The run still waits for the owner's go-ahead because it stops their
+  Development stack.
 
 ## Slices
 
@@ -189,7 +193,7 @@ are deleted.
 
 ### 4. The real Development stack obeys the three commands
 Type: Behavior
-Status: planned
+Status: planned — after landing on `main`, with the owner's go-ahead
 Proof: one real run in the primary checkout, recorded in this plan.
 
 Behavior: the primary checkout holds this story's commits and Development is
