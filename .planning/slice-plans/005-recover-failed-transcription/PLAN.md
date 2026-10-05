@@ -215,3 +215,21 @@ tests, keeping real-service failure as unobserved.
   harmless.
 - E2E stack startup runs a Biome format check, so an unformatted frontend
   file stops `cy:run` before any scenario runs.
+
+## Execution complete
+
+Product advice: Failed transcriptions now keep their audio, show a plain
+error message, and offer Retry after Stop. Model tests, mounted tests, and
+one mocked E2E scenario prove this. The owner has not yet reviewed the Retry
+interaction or the message wording; review those first, and let
+SEED-066#understandable-first-dictation decide where Retry sits among the
+Audio tools controls. Still unobserved and not queued: a failure of the real
+transcription service, and whether a long outage makes the kept audio larger
+than the service accepts. Before
+[001-join-dictated-passages](../001-join-dictated-passages/PLAN.md) runs,
+refresh its premise about `useNoteAudioProcessing.ts`. That file now has a
+nested try for saving and rethrows when a conversion fails. Optional small
+cleanups, not queued:
+- make Retry's visibility reactive;
+- narrow the scheduler's catch to conversion failures;
+- drop the call-count check in the retry spec.
