@@ -13,4 +13,13 @@ export const createBufferAndScheduler = (
   return { audioBuffer, scheduler }
 }
 
+export const oneSecondOfSound = () => new Float32Array(44100).fill(0.5)
+
+export const wavSizeOfSeconds = (seconds: number) => 44 + seconds * 44100 * 2
+
+export const sentFile = (
+  callback: { mock: { calls: unknown[][] } },
+  call: number
+) => (callback.mock.calls[call]![0] as AudioChunk).data
+
 export type { AudioChunk }

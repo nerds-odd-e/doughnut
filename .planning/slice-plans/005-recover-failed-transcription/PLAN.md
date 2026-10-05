@@ -98,7 +98,14 @@ owner's shell sets `NODE_ENV=production`, which breaks these specs locally):
 
 ### 1. A failed conversion keeps its audio for the next conversion
 Type: Behavior
-Status: planned
+Status: done
+Accepted proof: `audioProcessingScheduler.flush.spec.ts` "when a conversion
+fails" (three tests: sent file sizes 1 s then 2 s; timed and Flush still call
+after a failure; last file 3 s after success, failure, success) and
+`audioProcessingScheduler.stop.spec.ts` "keeps the audio of a failed
+conversion at Stop for the next recording" and "stops with the whole
+recording when a conversion in progress fails"; `NoteAudioTools.*` specs and
+`vue-tsc --noEmit` green.
 Proof: `audioProcessingScheduler.flush.spec.ts` and
 `audioProcessingScheduler.stop.spec.ts` with the real buffer and a callback
 that rejects, then resolves; existing `audioBuffer.spec.ts`,
@@ -182,4 +189,10 @@ tests, keeping real-service failure as unobserved.
 
 ## Learnings
 
-None yet.
+- Only a failed conversion rejects. A save failure in `appendDictatedText`
+  after a good conversion keeps its earlier behavior (message set, resolves
+  `undefined`, audio counted as converted), so text is never joined twice.
+- The scheduler's `processing` promise never rejects: the catch sits on the
+  promise itself, so `stop()` waiting on a conversion in progress also
+  survives a failure. Slice 3's Retry goes through the scheduler's existing
+  final conversion, not around it.

@@ -28,12 +28,17 @@ export function useNoteAudioProcessing(
         throw new Error("Failed to process audio")
       }
 
-      await noteStore.appendDictatedText(noteId, response.dictatedText)
+      try {
+        await noteStore.appendDictatedText(noteId, response.dictatedText)
+      } catch (saveError) {
+        errors.value = saveError as Record<string, string | undefined>
+        return
+      }
 
       return response.endTimestamp
     } catch (error) {
       errors.value = error as Record<string, string | undefined>
-      return
+      throw error
     } finally {
       isProcessing.value = false
     }

@@ -34,6 +34,11 @@ transcription do not count as a segment. A lone segment writes nothing and all
 its audio is kept. Only Stop writes everything that remains. Dictated text,
 once written, is never revised: holding back the unfinished sentence replaces
 revising it. Audio that is entirely silent is not sent.
+A conversion that fails (an error answer or no answer) keeps its audio as
+not yet converted, and recording goes on. That audio is sent again, together
+with the later audio, with the next conversion: timed, pause, Flush, or Stop,
+including the first conversion of a new recording in the same Audio tools.
+Text already written is not written again.
 The transcription service controls transcription quality. When a body editor for the note is
 open, the passage is joined to the end of that editor's draft, including
 unsaved typing, and that draft is saved right away; otherwise, including while
