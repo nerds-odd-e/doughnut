@@ -212,6 +212,15 @@ Follow-up: Open, unqueued.
   - Observed effect: about 104k subagent tokens on passes without edits; two of four passes changed code.
   - Inference: as in the previous row, passes on slices that only applied an established pattern found nothing. Qualified: one execution.
 
+- Execution: SEED-039#one-production-router-builder / slice-plans/003-one-production-router-builder / 20f253b39d
+  - Timestamp: unknown (slice 1 refactor on 2026-10-05, shortly before 10:45 +09:00)
+  - Tool: Claude Code
+  - Model: claude-opus-5-5
+  - Open Dough release: 0.3.56 (execution-checkout VERSION, unchanged during execution)
+  - Evidence: one-slice test-support correction (one extracted router builder, deletion of an unused render path and fixture). The refactor agent returned "none — already clean" (50,844 subagent tokens, about 20 s); the implementer had already removed the leftovers the plan named.
+  - Observed effect: the only refactor pass changed nothing.
+  - Inference: when the plan itself is a cleanup correction that lists exact leftovers, the separate pass has little left to find. Qualified: one execution.
+
 ## ODF-202 — Managed Codex delivery left CI unobserved without a retained stream binding
 
 Former local code: DD-201.

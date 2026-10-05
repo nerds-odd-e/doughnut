@@ -73,3 +73,8 @@ construction and dead test support.
 
 - Keep `renderNoteShowPageWithoutSidebar`'s name; renaming its callers is
   outside this correction.
+
+## Execution complete
+
+Product advice: no change — the correction met its goal; SEED-039's remaining
+candidate stories keep their order.
