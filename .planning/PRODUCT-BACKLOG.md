@@ -7,10 +7,10 @@ Audio tools, starting with voice input. Make voice input work reliably and easy 
 ## Taken
 
 - [Join dictated passages to the note in a way that fits the language](seeds/SEED-066-voice-input.md#join-dictated-passages) — SEED-066#join-dictated-passages ([plan](slice-plans/001-join-dictated-passages/PLAN.md))
+- [Stop and restart the Development stack without hunting for its processes](seeds/SEED-069-agent-development-tooling.md#reliable-development-stack-lifecycle) — SEED-069#reliable-development-stack-lifecycle ([plan](slice-plans/006-stop-and-restart-development-stack/PLAN.md))
 
 ## Backlog list
 
-- [Stop and restart the Development stack without hunting for its processes](seeds/SEED-069-agent-development-tooling.md#reliable-development-stack-lifecycle) — SEED-069#reliable-development-stack-lifecycle
 - [Recover a failed transcription without repeating the speech](seeds/SEED-066-voice-input.md#recover-failed-transcription) — SEED-066#recover-failed-transcription
 - [See submitted dictation promptly](seeds/SEED-066-voice-input.md#prompt-dictation-results) — SEED-066#prompt-dictation-results
 - [Complete a first dictation with understandable controls](seeds/SEED-066-voice-input.md#understandable-first-dictation) — SEED-066#understandable-first-dictation

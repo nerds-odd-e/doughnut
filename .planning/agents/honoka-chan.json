@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 1,
+  "agent": "Honoka-chan",
+  "email": "honoka-chan@example.org",
+  "identity": "SEED-069#reliable-development-stack-lifecycle",
+  "mode": "story-branch",
+  "branch": "claude/stop-and-restart-the-development-stack-without-h",
+  "host": "claude"
+}
