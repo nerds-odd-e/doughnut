@@ -34,10 +34,9 @@ Assumptions:
 
 - Not observed and not relied on by any slice: the kept audio stays within the
   transcription service's request limit.
-- [001-join-dictated-passages](../001-join-dictated-passages/PLAN.md) is
-  planned and also edits `useNoteAudioProcessing.ts` (the response's text
-  field). The two plans are independent; whichever runs second adapts to the
-  other's shape of that file.
+- [Dictation joining](../../../docs/voice-input.md#adding-dictated-text-to-a-note)
+  receives ordered `segmentTexts`. `useNoteAudioProcessing.ts` passes those
+  segments to the shared append rule; recovery preserves that response contract.
 
 ## Architecture
 
