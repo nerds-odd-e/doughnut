@@ -179,3 +179,12 @@ defaults.
   before its pids file exists.
 - Signal the `node scripts/e2e-runner.mjs --hold` process, not the pnpm
   `sh -c` wrapper, when stopping a backgrounded real run.
+
+## Execution complete
+
+Product advice: no correction and no backlog change. The four slices deliver
+the story's outcome: a linked worktree holds its own seeded, unpaid E2E stack
+with `pnpm e2e:hold`, the CLI and a browser can reach it, and the agent map
+names CI for real-service specs. Not exercised for real: a `--paid-openai`
+run (needs the owner's authorization) and a PDF attach through the CLI; both
+use the routes the guidance names.

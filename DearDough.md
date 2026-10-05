@@ -6,7 +6,7 @@ released response is not proof of effectiveness. Unknown provenance stays unknow
 [Response status](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/finding-names.md).
 Full pre-trim evidence: `8830c682704aac3bbb34bf9b1204da8feba042ca:DearDough.md`. Older narratives live in Git, not a second archive.
 
-- Highest allocated local number: 206. Removed local codes are never reused.
+- Highest allocated local number: 207. Removed local codes are never reused.
 
 ## ODF-110 — A readiness replay observed only the plan's named seam, not the rest of the slice's journey
 
@@ -165,6 +165,7 @@ Follow-up: Open, unqueued.
 - Execution: SEED-066#author-controlled-titles / slice-plans/002-keep-titles-under-author-control / aa093fffeb; Timestamp: unknown (slice 1 delivery on 2026-10-03, shortly after 14:55 +08:00); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.54. - Evidence: `deliver --target-ref claude/keep-note-titles-under-the-author-s-control` exited with "authorized target must be a branch ref"; retry with `refs/heads/...` accepted aa093fffeb. - Observed effect: one rejected call, nothing published. - Inference: third occurrence; the coordinator had read the `--help` usage, which also says only `--target-ref REF`.
 - Execution: SEED-067#stacks-survive-other-builds / slice-plans/005-stacks-survive-other-builds / 4122c07c06; Timestamp: 2026-10-03, ~18:45+08:00 (slice 1 delivery); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.56. - Evidence: after `--help` showed only `--target-ref REF`, the coordinator read `execution-increment-delivery.mjs` and `publication-git.mjs` (`targetBranchName` requires `refs/heads/`) and also had to infer that Story Branch Mode targets the execution branch, not `main`; first call with `refs/heads/claude/start-and-keep-local-app-stacks-on-current-backe` was accepted. - Observed effect: no rejected call, but three extra source-reading calls before delivery. - Inference: fourth occurrence; avoiding the rejection still cost source reading, so the form and the story-branch target belong next to the step.
 - Execution: SEED-066#keep-every-transcribed-sentence / slice-plans/008-keep-every-transcribed-sentence / d68937a0d2; Timestamp: 2026-10-04 (slice 1 delivery); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.56. - Evidence: coordinator ran `deliver --help` (only `--target-ref REF`), then read `execution-increment-delivery.mjs` and grepped `publication-git.mjs` `targetBranchName` before the first accepted call with `refs/heads/claude/keep-every-transcribed-sentence-when-dictated-te`. - Observed effect: no rejected call; two extra source-reading calls. - Inference: fifth occurrence; same as the fourth.
+- Execution: SEED-069#observe-branch-code-against-real-services / slice-plans/004-hold-worktree-e2e-stack / ee414fbdf1; Timestamp: 2026-10-05, ~12:16+09:00 (slice 1 delivery); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.56. - Evidence: coordinator ran `deliver --help` (only `--target-ref REF`), then grepped `targetBranchName` in `publication-git.mjs` before the first accepted call with `refs/heads/claude/observe-unmerged-branch-code-against-real-servic`. - Observed effect: no rejected call; two extra lookup calls. - Inference: sixth occurrence; same as the fourth and fifth.
 
 ## ODF-141 — A fresh refactor agent per slice returned "no edits" on three of eight small slices
 
@@ -220,6 +221,15 @@ Follow-up: Open, unqueued.
   - Evidence: one-slice test-support correction (one extracted router builder, deletion of an unused render path and fixture). The refactor agent returned "none — already clean" (50,844 subagent tokens, about 20 s); the implementer had already removed the leftovers the plan named.
   - Observed effect: the only refactor pass changed nothing.
   - Inference: when the plan itself is a cleanup correction that lists exact leftovers, the separate pass has little left to find. Qualified: one execution.
+
+- Execution: SEED-069#observe-branch-code-against-real-services / slice-plans/004-hold-worktree-e2e-stack / ee414fbdf1
+  - Timestamp: unknown (refactor passes on 2026-10-05, between about 12:12 and 12:38 +09:00)
+  - Tool: Claude Code
+  - Model: claude-opus-5-5
+  - Open Dough release: 0.3.56 (execution-checkout VERSION, unchanged during execution)
+  - Evidence: 4 slices of runner scripts and guidance. Refactor agents for slice 1 (new hold entry, one session seam; 54,309 subagent tokens) and slice 3 (one reset call, one passed field; 55,041 tokens) returned no edits. Slice 2's pass shared a `withEnv` test fixture across three callers and split `scripts/e2e-hold.mjs` out of an over-limit file; slice 4's pass linked the guidance to its one detailed home and added a missing pointer in `docs/development-setup.md`.
+  - Observed effect: about 109k subagent tokens on passes without edits; two of four passes changed files.
+  - Inference: as in earlier rows, diff size did not predict value. Qualified: one execution.
 
 ## ODF-202 — Managed Codex delivery left CI unobserved without a retained stream binding
 
@@ -287,3 +297,17 @@ following the plan weakened an assertion the same plan forbade weakening.
   - Evidence: plan slice 10: "`AddRelationship.spec.ts` and `WikidataAssociationDialog.titleActions.spec.ts` assert `replace`/`push`; assert the current location instead." Plan Goal and scope: "without weaker assertions". The implementer reported the loss as a gap; the coordinator returned the slice, and the implementer added a history-position check (later `countHistoryEntriesAdded`), shown to fail for a push. Commit f7cc9a2293.
   - Observed effect: one extra implementation round (about 3 minutes, 76,592 subagent tokens in total for the slice's implementer). No weakened assertion was delivered.
   - Inference: when a plan swaps a mock observation for a real one, check that the real observation still tells apart every case the mock did. Qualified: one occurrence.
+
+## DD-207 — A plan's proof for a CLI key example checked only that the server answered, not the authenticated step the example needed
+
+The story's key example (DD-161) had an agent point the CLI at the held app and attach a PDF. The plan's proof row asked only that a CLI command get an answer rather than "Donut service is not available", and slice 4's guidance named the base URL but no access-token route.
+
+### Occurrences
+- Execution: SEED-069#observe-branch-code-against-real-services / slice-plans/004-hold-worktree-e2e-stack / ee414fbdf1
+  - Timestamp: 2026-10-05, between about 12:33 and 12:36 +09:00 (slice 4 acceptance)
+  - Tool: Claude Code
+  - Model: claude-opus-5-5
+  - Open Dough release: 0.3.56
+  - Evidence: `.planning/slice-plans/004-hold-worktree-e2e-stack/PLAN.md` proof row "The CLI reaches the held app"; slice 4 implementer report listed "No CLI token route" as a gap after using curl `generate-token` by hand; the coordinator returned the slice once, and `1ae39ec64f` adds the token route to `.agents/agent-map.md`.
+  - Observed effect: one extra implementation round (about 49 s); caught only by reading the return's named gaps against the key examples.
+  - Inference: a proof row that checks reachability can pass while the example's real shape (an authenticated write) stays unguided. Qualified: one occurrence.
