@@ -21,7 +21,7 @@
   },
   "devDependencies": {
     "@modelcontextprotocol/sdk": "1.32.0",
-    "@types/node": "26.6.3",
+    "@types/node": "26.6.4",
     "donut-test-fixtures": "workspace:*",
     "esbuild": "0.28.2",
     "typescript": "6.0.3",
