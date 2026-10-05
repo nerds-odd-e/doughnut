@@ -115,6 +115,17 @@ Given(
   }
 )
 
+Given('the OpenAI transcription service fails', () => {
+  mock_services.openAi().stubTranscriptionFailure()
+})
+
+Given(
+  'the OpenAI transcription service now returns the following srt transcript:',
+  (transcript: string) => {
+    mock_services.openAi().replaceTranscriptionFailureWithTranscript(transcript)
+  }
+)
+
 Then('I should see the suggested completion', () => {
   start.assumeConversationAboutNotePage().shouldShowCompletion()
 })

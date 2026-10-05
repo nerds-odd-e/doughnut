@@ -1,5 +1,8 @@
 import { waitUntilAppIsNotBusy } from '../pageBase'
 
+const conversionFailure =
+  'Could not turn your speech into text. Your recording is kept.'
+
 const audioToolsPage = () => {
   return {
     startRecording() {
@@ -14,6 +17,20 @@ const audioToolsPage = () => {
         timeout: 30000,
       }).should('not.be.disabled')
       waitUntilAppIsNotBusy()
+      return this
+    },
+    expectConversionFailureWithRetry() {
+      cy.findByText(conversionFailure).should('be.visible')
+      cy.findByRole('button', { name: 'Retry' }).should('not.be.disabled')
+      return this
+    },
+    retry() {
+      cy.findByRole('button', { name: 'Retry' }).click()
+      return this
+    },
+    expectNoConversionFailure() {
+      cy.findByText(conversionFailure).should('not.exist')
+      cy.findByRole('button', { name: 'Retry' }).should('not.exist')
       return this
     },
   }

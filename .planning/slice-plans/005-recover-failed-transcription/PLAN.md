@@ -153,7 +153,13 @@ switch) keep their current text and are outside this slice.
 
 ### 3. Retry converts what is left after Stop
 Type: Behavior
-Status: planned
+Status: done
+Accepted proof: `record_live_audio.feature` "Retry converts the kept
+recording after the transcription failed" (mocked, passing);
+`audioProcessingScheduler.stop.spec.ts` "converts what is left once after
+repeated failing final conversions"; `NoteAudioTools.retry.spec.ts` (Retry
+offered after Stop, not while recording, not when nothing remains, kept after
+a failed Retry); `vue-tsc --noEmit` green.
 Proof: new scenario in `record_live_audio.feature`; `NoteAudioTools.recording.spec.ts`
 for when Retry is shown; `audioProcessingScheduler.stop.spec.ts` for repeated
 failing final conversions.
@@ -204,3 +210,8 @@ tests, keeping real-service failure as unobserved.
 - The conversion failure is held as `errors.conversion`; a success clears
   only that key, so start-recording and device-switch messages stay. Retry's
   visibility can key on the same field plus the buffer's unconverted audio.
+- Retry reuses the Stop handler: Stop's final conversion is exactly "convert
+  everything that remains", and running it again when not recording is
+  harmless.
+- E2E stack startup runs a Biome format check, so an unformatted frontend
+  file stops `cy:run` before any scenario runs.

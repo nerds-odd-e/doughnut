@@ -2,7 +2,7 @@
 /// <reference types="../support" />
 // @ts-check
 
-import { Given, When } from '@badeball/cypress-cucumber-preprocessor'
+import { Given, Then, When } from '@badeball/cypress-cucumber-preprocessor'
 import start, { mock_services } from '../start'
 
 Given('the browser is mocked to give permission to record audio', () => {
@@ -28,3 +28,21 @@ When(
 When('I stop recording audio', () => {
   start.assumeAudioTools().stopRecording()
 })
+
+Then(
+  'I should be told my speech could not be turned into text, with Retry',
+  () => {
+    start.assumeAudioTools().expectConversionFailureWithRetry()
+  }
+)
+
+When('I retry converting my speech', () => {
+  start.assumeAudioTools().retry()
+})
+
+Then(
+  'I should no longer be told my speech could not be turned into text',
+  () => {
+    start.assumeAudioTools().expectNoConversionFailure()
+  }
+)

@@ -162,4 +162,29 @@ describe("AudioProcessingScheduler stop", () => {
     expect((await stopPromise).size).toBe(wavSizeOfSeconds(1))
     expect(sentFile(mockCallback, 1).size).toBe(wavSizeOfSeconds(1))
   })
+  it("converts what is left once after repeated failing final conversions", async () => {
+    const mockCallback = vi
+      .fn()
+      .mockRejectedValueOnce(new Error("failed"))
+      .mockRejectedValueOnce(new Error("failed again"))
+      .mockResolvedValue(undefined)
+    const { audioBuffer, scheduler } = createBufferAndScheduler(
+      44100,
+      mockCallback
+    )
+    audioBuffer.receiveAudioData([oneSecondOfSound()])
+    scheduler.start()
+
+    await scheduler.stop()
+    await scheduler.stop()
+    await scheduler.stop()
+    await scheduler.stop()
+
+    expect(mockCallback).toHaveBeenCalledTimes(3)
+    for (const call of [0, 1, 2]) {
+      expect(sentFile(mockCallback, call).size).toBe(wavSizeOfSeconds(1))
+      expect(mockCallback.mock.calls[call]?.[0].isMidSpeech).toBe(false)
+    }
+    expect(audioBuffer.hasUnprocessedData()).toBe(false)
+  })
 })

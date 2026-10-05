@@ -10,6 +10,13 @@
       class="daisy-alert"
       :class="errors.conversion ? 'daisy-alert-error' : 'daisy-alert-info'"
     >{{ errors.conversion ?? errors }}</div>
+    <button
+      v-if="!isRecording && errors?.conversion && audioRecorder.hasUnconvertedAudio()"
+      class="daisy-btn daisy-btn-sm retry-button"
+      @click="stopRecording"
+      :disabled="isProcessing"
+      title="Retry"
+    >Retry</button>
     <div class="button-group">
       <template v-if="!isRecording">
         <button class="daisy-btn" @click="startRecording" title="Record Audio">
@@ -190,6 +197,12 @@ const tryFlushAudio = async () => {
   .daisy-btn {
     padding: 8px;
   }
+}
+
+.retry-button {
+  display: block;
+  margin: 8px auto;
+  border-radius: 8px;
 }
 
 .advanced-options {
