@@ -129,6 +129,14 @@ Follow-up: Open, unqueued.
 
 - Execution: SEED-066#preserve-existing-content / `979cac31fc19f756bdfc480d9b24f1ab7dfeec34:.planning/slice-plans/001-preserve-existing-content/PLAN.md` / 64173ad25fbbe7457705aeea972a959d9d3f8dd4; Timestamp: unknown (2026-10-03, slice 2 refactor); Tool: Codex; Open Dough release: 0.3.54 (VERSION unchanged from claim through implementation). - Evidence: refactor_append decision and return; noteStore was 252 lines before append, 265 after; processing spec reached 267. Commit 6c2ed996f7 extracts noteTextEditing and splits audio preservation tests. - Observed effect: the mandatory ceiling prompted an 80-line text-edit extraction, a test split, and expanded proof from 38 to 63 frontend tests plus integrated E2E; refactor reported about seven active minutes. - Inference: the seams were relevant and coherent, but the numeric gate expanded verification beyond the append change. This occurrence does not establish a net cost or an unrelated production move.
 
+- Execution: SEED-066#join-dictated-passages / slice-plans/001-join-dictated-passages / ba66d94ad393c23015ae855375133c7a67779a5a
+  - Timestamp: unknown (2026-10-05, slice 2 refactor)
+  - Tool: Codex
+  - Open Dough release: unknown
+  - Evidence: `refactor_language` decision/return in the execution conversation; preservation spec was 249 lines at ba66d94ad3, grew to 304, then e769c06a99 extracted language cases and shared saved-body test support.
+  - Observed effect: approximately four active refactor minutes, two new test files, and replacement proof of 27 mounted tests plus typecheck; production code stayed unchanged.
+  - Inference: the numeric ceiling prompted a cohesive test split and extra proof. Consider test-file capacity while planning; net review value and token cost were not measured.
+
 ## ODF-190 — The plan prescribed production observations whose access route or log source did not exist, and whose results could not change the approach
 
 Former local code: DD-145.
@@ -220,6 +228,14 @@ Follow-up: Open, unqueued.
   - Evidence: one-slice test-support correction (one extracted router builder, deletion of an unused render path and fixture). The refactor agent returned "none — already clean" (50,844 subagent tokens, about 20 s); the implementer had already removed the leftovers the plan named.
   - Observed effect: the only refactor pass changed nothing.
   - Inference: when the plan itself is a cleanup correction that lists exact leftovers, the separate pass has little left to find. Qualified: one execution.
+
+- Execution: SEED-066#join-dictated-passages / slice-plans/001-join-dictated-passages / ba66d94ad393c23015ae855375133c7a67779a5a
+  - Timestamp: unknown (2026-10-05, slice 1 refactor)
+  - Tool: Codex
+  - Open Dough release: unknown
+  - Evidence: `refactor_segments` returned “none — already clean” and `## REFACTOR COMPLETE`, reporting approximately three active minutes, no edits, and no proof reruns; ba66d94ad3 carries the reviewed slice.
+  - Observed effect: one of this execution's two mandatory independent refactors produced no edits; slice 2's review made the test split recorded under ODF-189.
+  - Inference: this bounds handoff cost but does not establish that the independent review lacked value. No execution requirement was waived.
 
 ## ODF-202 — Managed Codex delivery left CI unobserved without a retained stream binding
 

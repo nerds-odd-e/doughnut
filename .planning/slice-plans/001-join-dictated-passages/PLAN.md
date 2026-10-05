@@ -199,3 +199,31 @@ Update `docs/voice-input.md` to state the rule.
   wait used the verification exception. No source scope or direction changed.
 - Slice 1 publication accepted: `ba66d94ad393c23015ae855375133c7a67779a5a`
   on the remote execution branch, with the retained CI observer reused.
+
+## Retrospective
+
+- Planned execution manifest: claim `a0a0514ac3` is provenance;
+  `ba66d94ad393c23015ae855375133c7a67779a5a` delivers client segment ownership;
+  `e769c06a99cf0641dfe85de765f2343a73e2b9fe` delivers language joining.
+  The preceding SEED-069 claim and earlier product work are excluded.
+- Product/code findings: none. One client rule owns all requested joins; the
+  server retains transcription extraction and holdback. Generated types, all
+  consumers, fixtures and documentation agree. Relevant Accepted ADR 0006
+  failure handling and ADR 0007 environment isolation remain respected.
+- Proof meets the original story without scope changes. Mounted tests drove
+  detailed cases; existing mocked E2E retains recording/API/persistence journey
+  proof, and the one real-service E2E is retained unchanged. Real-service
+  Japanese/Chinese segmentation remains unobserved and outside this plan.
+- Process review used coordinator conversation and agent handoffs; no token
+  cost was inferred. Existing ODF-189 and ODF-141 received one occurrence each
+  in DearDough.md for the numeric test split and the no-edit independent review.
+  Startup gate contention and the impossible blank fixture were diagnosed and
+  corrected; the plan's verification exceptions accounted for suite waits.
+- Review planning unchanged: no correction plan required. CI was pending for
+  the published slice 2 revision during review; completion receipt follows.
+
+## Execution complete
+
+Product advice: Keep the current backlog order. The delivered language join
+fulfills this story; failed-transcription recovery remains the next audio
+priority, and these results provide no evidence to change its scope or priority.
