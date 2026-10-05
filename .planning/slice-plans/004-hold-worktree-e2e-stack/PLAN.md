@@ -138,8 +138,9 @@ with the shell's token.
 
 ### 3. Seeded accounts can sign in when the hold reports ready
 Type: Behavior
-Status: planned
+Status: done
 Proof: two cases with a stand-in HTTP listener; one real run (rows 7–8 above).
+Accepted proof: `scripts/e2e-runner-hold.cases.mjs` "hold: seeds the accounts through the testability reset on the held origin before reporting ready" (recorded order is the reset POST, then ready) and "hold: a failed testability reset ends it nonzero, visibly, and stops the stack" (500 → exit 1, no ready, error logged, tree gone, lock removed) in `node --test scripts/e2e-runner.test.mjs` (71/71); `pnpm test:browser-worktree-isolation` 112/112. Real run (2026-10-05): with no manual step, `current-user-info` for `old_learner` returned `Old Learner`; SIGINT exited 0 and `worktree:retire --check` was idle. The real run reused the database slice 2 left, not a fresh one; the reset cleans either way.
 
 Behavior: a worktree whose E2E database is fresh → `pnpm e2e:hold` reports
 ready → `old_learner` / `password` signs in with no further step. If the reset
@@ -171,5 +172,9 @@ defaults.
   `cy:run`, `cy:open`, and `pnpm sut`); the hold turns it off unless
   `--paid-openai`. The hold itself lives in `scripts/e2e-hold.mjs`;
   `scripts/e2e-runner.mjs` keeps the `--hold` dispatch.
+- The owned invocation passes the lifetime's `target` to its session; the
+  hold resets through `browserOrigin(target)`. Hold cases that end before a
+  cancel need `healthcheckWaitingForPids`, or the tree can be torn down
+  before its pids file exists.
 - Signal the `node scripts/e2e-runner.mjs --hold` process, not the pnpm
   `sh -c` wrapper, when stopping a backgrounded real run.

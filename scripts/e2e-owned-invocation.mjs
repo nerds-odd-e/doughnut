@@ -201,6 +201,7 @@ export async function runOwnedE2eInvocation({
         cancel,
         childExit,
         mockExit,
+        target: lifetime.target,
         errLog,
         cancelEscalationMs,
         browser,

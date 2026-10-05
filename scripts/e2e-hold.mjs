@@ -5,13 +5,29 @@ import { worktreeIsolationApplies } from './browser-worktree-isolation.mjs'
 import { NO_CANCEL } from './e2e-invocation-signals.mjs'
 import { resolveInvocationCheckout } from './e2e-invocation-selection.mjs'
 import { runOwnedE2eInvocation } from './e2e-owned-invocation.mjs'
+import { browserOrigin } from './local-runtime-target.mjs'
 
 const repoRoot = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),
   '..'
 )
 
-function holdUntilCancelled({ cancel, childExit, log, errLog }) {
+// The same product call each Cypress scenario starts with: it seeds the
+// accounts (`old_learner` / `password`, ...) and testability defaults.
+async function resetTestability(target) {
+  const response = await fetch(
+    `${browserOrigin(target)}/api/testability/clean_db_and_reset_testability_settings`,
+    { method: 'POST' }
+  )
+  if (!response.ok) {
+    throw new Error(
+      `testability reset returned HTTP ${response.status}: ${await response.text()}`
+    )
+  }
+}
+
+async function holdUntilCancelled({ cancel, childExit, target, log, errLog }) {
+  await resetTestability(target)
   log('E2E stack is ready and held; interrupt (Ctrl-C) to stop it.')
   // The SUT supervisor is detached, so nothing else keeps this process alive.
   const keepAlive = setInterval(() => undefined, 1 << 30)
@@ -30,8 +46,10 @@ function holdUntilCancelled({ cancel, childExit, log, errLog }) {
 /**
  * Hold this checkout's owned E2E stack for manual, CLI, or HTTP observation:
  * the same owned invocation as `runE2eInteractive`, with a wait for
- * cancellation in place of Cypress. A clean interrupt is the normal end and
- * returns 0; a required service exit or a failed cleanup returns nonzero.
+ * cancellation in place of Cypress. Before reporting ready it seeds the
+ * database through the testability reset. A clean interrupt is the normal
+ * end and returns 0; a failed reset, a required service exit, or a failed
+ * cleanup returns nonzero.
  * The services make paid OpenAI calls only when `paidOpenAi` is set.
  *
  * @returns {Promise<number>}
