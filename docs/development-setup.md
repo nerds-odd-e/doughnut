@@ -53,9 +53,10 @@ This starts the reload-capable Development stack (Spring profile `dev`, database
 `doughnut_development`) on backend **8081**, browser/LB **5175**, and Vite
 **5176**. Open **http://127.0.0.1:5175/**. Sign in with a local account such as
 `manual` / `password`. Logs: `dev.log`; PID: `dev.pid`. Restart only that stack
-(without deleting Development data) with `pnpm dev:restart`.
+(without deleting Development data) with `pnpm dev:restart`; stop it with
+`pnpm dev:stop`.
 
-Git linked worktrees refuse `pnpm dev` / `pnpm dev:restart`; to observe branch
+Git linked worktrees refuse `pnpm dev` / `pnpm dev:restart` / `pnpm dev:stop`; to observe branch
 code from one, use `pnpm e2e:hold` (see
 [`worktree-browser-tests.md`](worktree-browser-tests.md)). A configured
 primary keeps its isolated Unit Test and E2E resources while using the

@@ -80,7 +80,7 @@ function parseLsofCwdMap(stdout) {
   return cwdByPid
 }
 
-async function listProcessTable({ execFileFn = execFileAsync } = {}) {
+export async function listProcessTable({ execFileFn = execFileAsync } = {}) {
   const { stdout } = await execFileFn('ps', ['-axo', 'pid=,ppid=,command='])
   return parseProcessTable(stdout)
 }

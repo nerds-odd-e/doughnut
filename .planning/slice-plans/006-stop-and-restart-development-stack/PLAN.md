@@ -142,7 +142,7 @@ Commands (run from the repository root of the execution worktree):
 
 ### 1. `pnpm dev:stop` ends this checkout's Development stack
 Type: Behavior
-Status: planned
+Status: done
 Proof: new `scripts/dev-stop.test.mjs` with the real stand-in stack (rows 1–4); reading the two guidance files; `pnpm test:development-stack` green and called from `lint:all`.
 
 Behavior: a primary checkout whose Development stack is running, with no file
@@ -206,4 +206,15 @@ If the run disagrees with slices 1–3, stop and change the plan.
 
 ## Learnings
 
-None yet.
+- Slice 1 (accepted proof): `CURSOR_DEV=true nix develop -c pnpm test:development-stack`
+  → 26 pass; `scripts/dev-stop.test.mjs` covers rows 1–4 on the real stand-in stack
+  from `startStandInDevelopmentStack` in `scripts/dev-stack-fixtures.mjs` (reuse it in
+  slices 2–3). The finder is `findDevelopmentServicesPids` in `scripts/dev-stop.mjs`;
+  the services path is `developmentServicesScript` in `scripts/development-runtime.mjs`;
+  the linked-worktree refusal for all three commands is
+  `refuseDevelopmentInLinkedWorktree` in `scripts/development-primary-checkout.mjs`
+  (its own module: putting it in `development-runtime.mjs` makes an import cycle
+  through `browser-worktree-isolation` and `sut-e2e-ports`). `listProcessTable` is
+  now exported from `scripts/worktree-retirement-checkout-processes.mjs`.
+- Production lines after slice 1: 821 → 986 (`dev-stop.mjs`, the stand-in fixture,
+  and `development-primary-checkout.mjs` added; slices 2–3 delete the `dev.pid` code).

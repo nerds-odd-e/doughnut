@@ -16,3 +16,8 @@ export const DEVELOPMENT_RUNTIME_TARGET = Object.freeze({
   logFile: path.join(repoRoot, 'dev.log'),
   pidFile: path.join(repoRoot, 'dev.pid'),
 })
+
+/** The services entry script a checkout's Development stack runs as. */
+export function developmentServicesScript(checkoutRoot) {
+  return path.join(checkoutRoot, 'scripts/development-services.mjs')
+}

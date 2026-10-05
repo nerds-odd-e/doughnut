@@ -89,7 +89,7 @@ Raw profiles are local evidence and must not be committed.
 
 **Development vs E2E:** For manual product feedback from the primary checkout,
 prefer `pnpm dev` (http://127.0.0.1:5175/, profile `dev`,
-`doughnut_development`, `dev.log` / `dev.pid`; restart with `pnpm dev:restart`;
+`doughnut_development`, `dev.log` / `dev.pid`; restart with `pnpm dev:restart`, stop with `pnpm dev:stop`;
 local sign-in e.g. `manual` / `password`). This includes a configured primary;
 Git linked worktrees refuse the persistent Development stack. To observe branch
 code from a linked worktree by hand, from the CLI, or against real services, run

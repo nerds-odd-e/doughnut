@@ -6,10 +6,13 @@
 import { spawn } from 'node:child_process'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { isLinkedGitWorktree } from './browser-worktree-isolation.mjs'
 import { runDevelopmentHealthcheck } from './dev-healthcheck.mjs'
 import { isProcessAlive, readLiveDevelopmentPid } from './development-pid.mjs'
-import { DEVELOPMENT_RUNTIME_TARGET } from './development-runtime.mjs'
+import { refuseDevelopmentInLinkedWorktree } from './development-primary-checkout.mjs'
+import {
+  DEVELOPMENT_RUNTIME_TARGET,
+  developmentServicesScript,
+} from './development-runtime.mjs'
 import {
   browserOrigin,
   listOccupiedApplicationPorts,
@@ -24,27 +27,26 @@ const repoRoot = path.resolve(
   '..'
 )
 
-const DEVELOPMENT_SERVICES_SCRIPT = path.join(
-  repoRoot,
-  'scripts/development-services.mjs'
-)
-
 export function spawnDevelopmentServices({
   spawnFn = spawn,
   checkoutRoot = repoRoot,
   runtimeTarget = DEVELOPMENT_RUNTIME_TARGET,
   logFile = runtimeTarget.logFile,
 } = {}) {
-  const child = spawnFn(process.execPath, [DEVELOPMENT_SERVICES_SCRIPT], {
-    cwd: checkoutRoot,
-    detached: true,
-    env: withRuntimeTargetEnv(
-      { ...process.env, DEV_LOG_FILE: logFile },
-      runtimeTarget
-    ),
-    stdio: 'ignore',
-    shell: false,
-  })
+  const child = spawnFn(
+    process.execPath,
+    [developmentServicesScript(checkoutRoot)],
+    {
+      cwd: checkoutRoot,
+      detached: true,
+      env: withRuntimeTargetEnv(
+        { ...process.env, DEV_LOG_FILE: logFile },
+        runtimeTarget
+      ),
+      stdio: 'ignore',
+      shell: false,
+    }
+  )
   child.unref?.()
   return { child, logFile }
 }
@@ -66,12 +68,11 @@ export async function runDevStart({
   log = (s) => process.stdout.write(`${s}\n`),
   errLog = (s) => process.stderr.write(`${s}\n`),
 } = {}) {
-  if (isLinkedGitWorktree(checkoutRoot)) {
-    throw new Error(
-      'Development (`pnpm dev`) is only supported in the primary checkout. ' +
-        'This checkout uses linked worktree isolation; refusing to start. Resources were left unchanged.'
-    )
-  }
+  refuseDevelopmentInLinkedWorktree(
+    checkoutRoot,
+    'pnpm dev',
+    'refusing to start'
+  )
 
   const livePid = readLiveDevelopmentPid(
     runtimeTarget.pidFile,
