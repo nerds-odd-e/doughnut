@@ -386,7 +386,7 @@ the unfinished execution's saved workspace and branch were removed. The story
 remained Taken while its terminal session later stopped.
 
 ### Occurrences
-- Execution: SEED-069#reliable-development-stack-lifecycle / `.planning/slice-plans/006-stop-and-restart-development-stack/PLAN.md` / 4101f03be4
+- Execution: SEED-069#reliable-development-stack-lifecycle / `404892b54af9d40804a0309c8bd92204d41c3e7d:.planning/slice-plans/006-stop-and-restart-development-stack/PLAN.md` / 4101f03be4
   - Timestamp: 2026-10-05T17:05:29+09:00 (retirement)
   - Tool: Claude Code
   - Model: claude-opus-5-5

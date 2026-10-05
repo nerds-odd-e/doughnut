@@ -12,35 +12,11 @@ illustrate a shared lesson stay in DearDough as occurrence evidence.
 
 Groups are ordered by priority: impact first, then frequency.
 
-## Queued: Starting, stopping and restarting the Development stack
-
-Story: [Stop and restart the Development stack without hunting for its processes](.planning/seeds/SEED-069-agent-development-tooling.md#reliable-development-stack-lifecycle)
-— SEED-069#reliable-development-stack-lifecycle.
-
-`package.json` has `dev` and `dev:restart` but no stop, and `dev.pid` has twice
-named something other than the running stack: DD-203 below, and a stale
-`dev.pid` whose PID the OS had reused, recorded in DearDough under ODF-190
-(SEED-066#preserve-completed-speech, 2026-10-03): `dev:restart` failed on
-PID 597, reused by `accountsd`, and restoring Development took about 7 minutes.
-No `scripts/dev-*` or `scripts/development-*` change since 2026-10-02 addresses
-either symptom.
-
-### DD-203 — No repo command stops the Development stack, and its `dev.pid` did not name the running stack
-
-To stop the owner's stack for an owner-approved probe, the coordinator walked the
-process tree and called `stopOwnedDevelopmentProcessTree` from
-`scripts/development-owned-process-tree.mjs` through `node -e`.
-
-#### Occurrences
-
-- Execution: SEED-067#stacks-survive-other-builds / slice-plans/005-stacks-survive-other-builds / 4122c07c06; Timestamp: 2026-10-03T18:46+08:00 (slice 2 start); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.56.
-  - Evidence: the default checkout's `dev.pid` held `1034265`, which `ps` rejected as out of range, while the live stack was `scripts/development-services.mjs` (PID 10342, started 15:57). After `pnpm dev`, `dev.pid` named the new stack and stopping it took one call.
-  - Observed effect: about six extra tool calls to find and stop the stack; nothing broke.
-  - Inference: a `pnpm dev:stop` sharing `dev:restart`'s ownership checks would make owner-approved Development probes cheaper. How `dev.pid` came to hold a non-PID value is unknown. Qualified: one occurrence.
+## Open, not queued: Development startup on stale compiled classes
 
 ### DD-159 — The Development stack failed to start on stale compiled backend classes in the default checkout
 
-`pnpm dev` from the default checkout failed with `No qualifying bean of type NotebookGitCutoverService`: `backend/build/classes` still held classes from before that service was removed. Deleting `backend/build/classes` let the next start succeed. Not part of the queued story’s promise: its cause is unknown.
+`pnpm dev` from the default checkout failed with `No qualifying bean of type NotebookGitCutoverService`: `backend/build/classes` still held classes from before that service was removed. Deleting `backend/build/classes` let the next start succeed. Its cause is unknown.
 
 #### Occurrences
 
@@ -78,7 +54,7 @@ the next.
   - Evidence: plan 008 slice 2 Proof "no Responses API call is made"; the slice 2 implementer added `verify(officialClient, never()).responses()` to `AiAudioControllerTests`; the refactor report removed it citing principle 7; the coordinator recorded the drop in the plan (b233c0e7f3).
   - Observed effect: one assertion written and removed, and a plan proof item the delivered tests do not carry. Small cost.
   - Inference: when planning a removal, check each proof item against the removal rule; prove the replacement behavior instead of the absence. Qualified: one execution.
-- Execution: SEED-069#reliable-development-stack-lifecycle / `.planning/slice-plans/006-stop-and-restart-development-stack/PLAN.md` / 62035934b9
+- Execution: SEED-069#reliable-development-stack-lifecycle / `404892b54af9d40804a0309c8bd92204d41c3e7d:.planning/slice-plans/006-stop-and-restart-development-stack/PLAN.md` / 62035934b9
   - Timestamp: 2026-10-05, slice 3 before the 14:54+09:00 commit
   - Tool: Claude Code
   - Model: claude-opus-5-5
