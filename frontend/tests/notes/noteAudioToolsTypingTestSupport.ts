@@ -25,7 +25,7 @@ export const dictatedPassage = "The orchard path leads down to the river."
  * request held until the test has typed. Call inside a describe block, after
  * useNoteAudioToolsTestLifecycle().
  */
-export function useBodyEditorWithHeldDictation() {
+export function useBodyEditorWithHeldDictation(passage = dictatedPassage) {
   const noteStore = useNoteStore()
   const editorNoteId = ref(0)
   let wrapper: NoteAudioToolsWrapper | undefined
@@ -41,7 +41,7 @@ export function useBodyEditorWithHeldDictation() {
       "audioToText",
       async () => {
         await audioHeld
-        return audioTextResponse(dictatedPassage)
+        return audioTextResponse(passage)
       }
     )
     updateContentMock = mockSdkServiceWithImplementation(

@@ -51,9 +51,9 @@ service returns Japanese and Chinese segments without spaces of its own.
 | --- | --- | --- |
 | English body and passage keep the one-space join; empty and whitespace-ending bodies add nothing | 1, 2 | Existing cases in `frontend/tests/notes/NoteAudioTools.preservation.spec.ts` and `e2e_test/features/note_creation_and_update/record_live_audio.feature` stay green |
 | Segments inside one passage are joined by the client's rule | 1 | Preservation spec: a response with several segments saves them joined to the body by one space each; `AiAudioControllerTests` observes the segment texts for mid-speech and Stop |
-| Japanese body + Japanese passage, Chinese body + Chinese passage: no space in the saved content | 2 | Preservation spec asserts the exact saved content |
-| Japanese segments in one passage, and a later passage of the same recording, join without spaces | 2 | Preservation spec asserts the exact saved content |
-| Mixed joins add a space only when neither side is Japanese or Chinese writing (the three seed examples) | 2 | Preservation spec asserts the exact saved content |
+| Japanese body + Japanese passage, Chinese body + Chinese passage: no space in the saved content | 2 | Language-joining spec asserts the exact saved content |
+| Japanese segments in one passage, and a later passage of the same recording, join without spaces | 2 | Language-joining spec asserts the exact saved content |
+| Mixed joins add a space only when neither side is Japanese or Chinese writing (the three seed examples) | 2 | Language-joining spec asserts the exact saved content |
 | An open editor's draft joins the same way | 2 | One Japanese case in `frontend/tests/notes/NoteAudioTools.typingWhilePending.spec.ts` |
 | Documentation describes the rule | 2 | `docs/voice-input.md` section "Adding dictated text to a note" |
 
@@ -100,8 +100,8 @@ segment join.
 
 ### 2. Japanese and Chinese text joins without a space
 Type: Behavior
-Status: planned
-Proof: exact saved content in `NoteAudioTools.preservation.spec.ts` for the
+Status: done
+Proof: exact saved content in `NoteAudioTools.languageJoining.spec.ts` for the
 seed's key examples; one open-draft case in
 `NoteAudioTools.typingWhilePending.spec.ts`; English cases unchanged.
 
@@ -178,3 +178,24 @@ Update `docs/voice-input.md` to state the rule.
   `63999`, mailbox `/tmp/dough-ci-501/watch-9hiMk4`; coordinator launch
   `91fb497f-d824-43f7-801f-ef7934909b7c`, bound to this checkout and the
   remote execution branch above. Managed delivery owns revision attachment.
+
+- Slice 2 passed `env -u NODE_ENV CURSOR_DEV=true nix develop -c pnpm frontend:test`
+  (321 files, 2035 tests) and
+  `CURSOR_DEV=true nix develop -c pnpm -C frontend exec vue-tsc --noEmit`.
+  Exact saved-content observations cover all seed examples, adjacent Latin and
+  Korean spacing, scripts, punctuation, prolonged sound mark, supplementary
+  Han on either side, empty/trailing-whitespace bodies and successive Japanese
+  segments/responses. The held-response draft case observes the typed textarea
+  and saved content after Japanese dictation arrives.
+- Independent slice 2 refactoring split language cases into
+  `frontend/tests/notes/NoteAudioTools.languageJoining.spec.ts` and extracted
+  `noteAudioToolsSavedContentTestSupport.ts` shared with preservation tests;
+  no production edits. Its affected proof passed
+  `env -u NODE_ENV CURSOR_DEV=true nix develop -c pnpm frontend:test tests/notes/NoteAudioTools.preservation.spec.ts tests/notes/NoteAudioTools.languageJoining.spec.ts`
+  (27 tests), the frontend typecheck, and whitespace check. Unchanged typing,
+  other frontend, backend and E2E proof remains accepted. Coordinator selective
+  formatting passed; nongenerated affected files remain below 250 lines.
+- Slice 2 edits converged in approximately four to five minutes; full-suite
+  wait used the verification exception. No source scope or direction changed.
+- Slice 1 publication accepted: `ba66d94ad393c23015ae855375133c7a67779a5a`
+  on the remote execution branch, with the retained CI observer reused.

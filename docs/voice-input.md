@@ -18,10 +18,15 @@ The audio request carries only the audio and the mid-speech flag. The client
 retains the originating note id, and each returned segment is appended
 deterministically to that note's current store body, loading its realm when
 absent, and saved through the ordinary content PATCH. One join rule
-serves both the saved body and an open editor's draft: text that does not end
-in whitespace is followed by one space and then the segment, text already
-ending in whitespace is followed directly by the segment, and an empty body
-becomes the segment alone. Existing characters remain unchanged, and
+serves both the saved body and an open editor's draft, successive passages,
+and segments within a passage. An empty body becomes the segment alone;
+after existing whitespace the segment joins directly. Otherwise the client
+looks at the two characters on either side of the join. If either is
+kanji/hanzi, hiragana, katakana (including `ー`), or punctuation in
+U+3000–303F or U+FF00–FFEF, the segment joins directly. All other joins,
+including English and Korean, add one space. For example, `私はPython` plus
+`が好きです。` becomes `私はPythonが好きです。`, while `私はPython` plus
+`is useful.` becomes `私はPython is useful.`. Existing characters remain unchanged, and
 successive additions follow earlier additions once. Navigating to another note
 does not redirect the result. The normal content-edit undo restores the prior body.
 

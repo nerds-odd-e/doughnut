@@ -1,27 +1,16 @@
-import {
-  AiAudioController,
-  TextContentController,
-} from "@generated/donut-backend-api/sdk.gen"
+import { wrapSdkError, wrapSdkResponse } from "@tests/helpers"
 import makeMe from "donut-test-fixtures/makeMe"
-import {
-  mockSdkService,
-  mockSdkServiceWithImplementation,
-  wrapSdkError,
-  wrapSdkResponse,
-} from "@tests/helpers"
-import { useNoteStore } from "@/store/noteStore"
 import { createRouter, createMemoryHistory } from "vue-router"
 import { dummyRouteRecordsFromMetadata } from "@/routes/dummyRouteRecords"
 import {
   audioChunk,
   audioTextResponse,
   midSpeechChunk,
-  mountNoteAudioTools,
   processAudio,
   useNoteAudioToolsTestLifecycle,
-  type NoteAudioToolsWrapper,
 } from "@tests/notes/noteAudioToolsTestSupport"
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
+import { useSavedBodyDictation } from "@tests/notes/noteAudioToolsSavedContentTestSupport"
+import { describe, expect, it, vi } from "vitest"
 
 vi.mock("@/models/audio/recorderWorklet", async () => {
   const { recorderWorkletMockExports } = await import(
@@ -47,8 +36,6 @@ vi.mock("@/models/wakeLocker", async () => {
 useNoteAudioToolsTestLifecycle()
 
 describe("NoteAudioTools content preservation", () => {
-  let wrapper: NoteAudioToolsWrapper
-  let audioToTextMock: ReturnType<typeof mockSdkService>
   const longBody = [
     "Original paragraph one: The museum opens at nine each morning. Our tickets are booked for Tuesday.",
     "Original paragraph two: The library holds maps of the northern coast. We marked each of the harbours and their walking routes on our paper copy.",
@@ -56,35 +43,11 @@ describe("NoteAudioTools content preservation", () => {
     "Original paragraph four: The garden paths wind through old cedar trees. The gardener has reserved the western gate for our afternoon visit.",
     "Original paragraph five: The evening ferry returns across the bay at six. Our hotel is on the hill above the harbour, near the bakery and the post office.",
   ].join("\n\n")
-  const originalRealm = makeMe.aNoteRealm.content(longBody).please()
-  const note = originalRealm.note
-  const noteStore = useNoteStore()
-  let updateContentMock: ReturnType<typeof mockSdkService>
-  beforeEach(() => {
-    audioToTextMock = mockSdkService(
-      AiAudioController,
-      "audioToText",
-      audioTextResponse("text")
-    )
-    wrapper = mountNoteAudioTools(note)
-    noteStore.refreshNoteRealm(originalRealm)
-    updateContentMock = mockSdkServiceWithImplementation(
-      TextContentController,
-      "updateNoteContent",
-      (options) =>
-        makeMe.aNoteRealm
-          .id(options.path.note)
-          .content(options.body.content ?? "")
-          .please()
-    )
-  })
-
-  afterEach(() => {
-    wrapper?.unmount()
-  })
+  const dictation = useSavedBodyDictation(longBody)
+  const { note, noteStore } = dictation
 
   it("appends successive results once", async () => {
-    audioToTextMock
+    dictation.audioToTextMock
       .mockResolvedValueOnce(
         wrapSdkResponse(
           audioTextResponse("The lighthouse beam sweeps across the bay.")
@@ -94,16 +57,16 @@ describe("NoteAudioTools content preservation", () => {
         wrapSdkResponse(audioTextResponse("The ferry arrives after sunset."))
       )
 
-    await processAudio(wrapper)
-    await processAudio(wrapper)
+    await processAudio(dictation.wrapper)
+    await processAudio(dictation.wrapper)
 
-    expect(updateContentMock).toHaveBeenNthCalledWith(2, {
+    expect(dictation.updateContentMock).toHaveBeenNthCalledWith(2, {
       path: { note: note.id },
       body: {
         content: `${note.content} The lighthouse beam sweeps across the bay. The ferry arrives after sunset.`,
       },
     })
-    expect(updateContentMock).toHaveBeenCalledTimes(2)
+    expect(dictation.updateContentMock).toHaveBeenCalledTimes(2)
 
     await noteStore.undo(
       createRouter({
@@ -111,14 +74,14 @@ describe("NoteAudioTools content preservation", () => {
         routes: dummyRouteRecordsFromMetadata,
       })
     )
-    expect(updateContentMock).toHaveBeenLastCalledWith({
+    expect(dictation.updateContentMock).toHaveBeenLastCalledWith({
       path: { note: note.id },
       body: { content: note.content },
     })
   })
 
   it("joins every segment of a response to the body and saves once", async () => {
-    audioToTextMock.mockResolvedValueOnce(
+    dictation.audioToTextMock.mockResolvedValueOnce(
       wrapSdkResponse(
         audioTextResponse([
           "The lighthouse beam sweeps across the bay.",
@@ -128,9 +91,9 @@ describe("NoteAudioTools content preservation", () => {
       )
     )
 
-    await processAudio(wrapper)
+    await processAudio(dictation.wrapper)
 
-    expect(updateContentMock).toHaveBeenCalledExactlyOnceWith({
+    expect(dictation.updateContentMock).toHaveBeenCalledExactlyOnceWith({
       path: { note: note.id },
       body: {
         content: `${note.content} The lighthouse beam sweeps across the bay. The ferry arrives after sunset. The harbour lights stay on.`,
@@ -139,17 +102,17 @@ describe("NoteAudioTools content preservation", () => {
   })
 
   it("keeps the body when a response has no written segments", async () => {
-    audioToTextMock.mockResolvedValueOnce(
+    dictation.audioToTextMock.mockResolvedValueOnce(
       wrapSdkResponse(audioTextResponse([]))
     )
 
-    await processAudio(wrapper)
+    await processAudio(dictation.wrapper)
 
-    expect(updateContentMock).not.toHaveBeenCalled()
+    expect(dictation.updateContentMock).not.toHaveBeenCalled()
   })
 
   it("writes the timed chunk, Flush, and Stop passages once each, in order, one space apart", async () => {
-    audioToTextMock
+    dictation.audioToTextMock
       .mockResolvedValueOnce(
         wrapSdkResponse(audioTextResponse("The museum opens at nine."))
       )
@@ -160,17 +123,17 @@ describe("NoteAudioTools content preservation", () => {
         wrapSdkResponse(audioTextResponse("The ferry returns at six."))
       )
 
-    await processAudio(wrapper, midSpeechChunk())
-    await processAudio(wrapper, midSpeechChunk())
-    await processAudio(wrapper, audioChunk())
+    await processAudio(dictation.wrapper, midSpeechChunk())
+    await processAudio(dictation.wrapper, midSpeechChunk())
+    await processAudio(dictation.wrapper, audioChunk())
 
-    expect(updateContentMock).toHaveBeenCalledTimes(3)
+    expect(dictation.updateContentMock).toHaveBeenCalledTimes(3)
     ;[
       `${note.content} The museum opens at nine.`,
       `${note.content} The museum opens at nine. The train leaves at noon.`,
       `${note.content} The museum opens at nine. The train leaves at noon. The ferry returns at six.`,
     ].forEach((content, index) =>
-      expect(updateContentMock).toHaveBeenNthCalledWith(index + 1, {
+      expect(dictation.updateContentMock).toHaveBeenNthCalledWith(index + 1, {
         path: { note: note.id },
         body: { content },
       })
@@ -195,8 +158,8 @@ describe("NoteAudioTools content preservation", () => {
       noteStore.refreshNoteRealm(
         makeMe.aNoteRealm.id(note.id).content(body).please()
       )
-      await processAudio(wrapper)
-      expect(updateContentMock).toHaveBeenCalledExactlyOnceWith({
+      await processAudio(dictation.wrapper)
+      expect(dictation.updateContentMock).toHaveBeenCalledExactlyOnceWith({
         path: { note: note.id },
         body: { content: saved },
       })
@@ -214,9 +177,9 @@ describe("NoteAudioTools content preservation", () => {
       )
       .please()
     noteStore.refreshNoteRealm(destination)
-    await wrapper.setProps({ note: destination.note })
-    await processAudio(wrapper)
-    expect(updateContentMock).toHaveBeenCalledExactlyOnceWith({
+    await dictation.wrapper.setProps({ note: destination.note })
+    await processAudio(dictation.wrapper)
+    expect(dictation.updateContentMock).toHaveBeenCalledExactlyOnceWith({
       path: { note: note.id },
       body: { content: `${current} text` },
     })
@@ -226,7 +189,7 @@ describe("NoteAudioTools content preservation", () => {
   })
 
   it("keeps appended content after an API error", async () => {
-    audioToTextMock
+    dictation.audioToTextMock
       .mockResolvedValueOnce(
         wrapSdkResponse(
           audioTextResponse("The lighthouse beam sweeps across the bay.")
@@ -236,10 +199,10 @@ describe("NoteAudioTools content preservation", () => {
       .mockResolvedValueOnce(
         wrapSdkResponse(audioTextResponse("The ferry arrives after sunset."))
       )
-    await processAudio(wrapper)
-    await processAudio(wrapper)
-    await processAudio(wrapper)
-    expect(updateContentMock).toHaveBeenLastCalledWith({
+    await processAudio(dictation.wrapper)
+    await processAudio(dictation.wrapper)
+    await processAudio(dictation.wrapper)
+    expect(dictation.updateContentMock).toHaveBeenLastCalledWith({
       path: { note: note.id },
       body: {
         content: `${note.content} The lighthouse beam sweeps across the bay. The ferry arrives after sunset.`,
