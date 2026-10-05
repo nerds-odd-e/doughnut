@@ -116,6 +116,7 @@ export function audioRecorderMockExports() {
       }),
       getAudioData: vi.fn(() => 0),
       tryFlush: vi.fn().mockResolvedValue(undefined),
+      hasUnconvertedAudio: vi.fn(() => false),
       getAudioDevices: vi.fn().mockImplementation(() => {
         mockMediaDevices.enumerateDevices()
         return ref(mockDevices) as Ref<MediaDeviceInfo[]>

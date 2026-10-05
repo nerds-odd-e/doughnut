@@ -12,6 +12,15 @@ import {
   resolveOpenAiMockEndpointContext,
 } from './openAiMockEndpointContext'
 
+const transcriptionPath = `/audio/transcriptions`
+const transcriptHeaders = { 'Content-Type': 'text/plain' }
+const transcriptionPredicate = () =>
+  new FlexiPredicate()
+    .withOperator(Operator.matches)
+    .withPath(transcriptionPath)
+    .withMethod(HttpMethod.POST)
+    .withHeader('Content-Type', 'multipart/form-data')
+
 const openAiService = (
   endpoint: OpenAiMockEndpointContext = resolveOpenAiMockEndpointContext()
 ) => {
@@ -107,15 +116,25 @@ const openAiService = (
     },
 
     stubTranscription(transcript: string) {
-      const predicate = new FlexiPredicate()
-        .withOperator(Operator.matches)
-        .withPath(`/audio/transcriptions`)
-        .withMethod(HttpMethod.POST)
-        .withHeader('Content-Type', 'multipart/form-data')
+      return serviceMocker.mockWithPredicates(
+        [transcriptionPredicate()],
+        [transcript],
+        transcriptHeaders
+      )
+    },
 
-      return serviceMocker.mockWithPredicates([predicate], [transcript], {
-        'Content-Type': 'text/plain',
-      })
+    stubTranscriptionFailure() {
+      return serviceMocker.stubPosterWithError500Response(transcriptionPath, {})
+    },
+
+    // The failure must be the scenario's first OpenAI stub.
+    replaceTranscriptionFailureWithTranscript(transcript: string) {
+      return serviceMocker.replaceWithPredicatesAt(
+        0,
+        [transcriptionPredicate()],
+        [transcript],
+        transcriptHeaders
+      )
     },
   }
 }

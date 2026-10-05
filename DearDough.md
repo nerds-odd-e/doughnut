@@ -6,7 +6,7 @@ released response is not proof of effectiveness. Unknown provenance stays unknow
 [Response status](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/finding-names.md).
 Full pre-trim evidence: `8830c682704aac3bbb34bf9b1204da8feba042ca:DearDough.md`. Older narratives live in Git, not a second archive.
 
-- Highest allocated local number: 207. Removed local codes are never reused.
+- Highest allocated local number: 211. Removed local codes are never reused.
 
 ## ODF-110 — A readiness replay observed only the plan's named seam, not the rest of the slice's journey
 
@@ -247,6 +247,14 @@ Follow-up: Open, unqueued.
   - Observed effect: one of this execution's two mandatory independent refactors produced no edits; slice 2's review made the test split recorded under ODF-189.
   - Inference: this bounds handoff cost but does not establish that the independent review lacked value. No execution requirement was waived.
 
+- Execution: SEED-066#recover-failed-transcription / `212e428968:.planning/slice-plans/005-recover-failed-transcription/PLAN.md` / 9eb06ed0bd
+  - Timestamp: unknown (refactor passes on 2026-10-05, between about 14:40 and 14:58 +09:00)
+  - Tool: Claude Code
+  - Open Dough release: 0.3.56 (execution-checkout VERSION, unchanged during execution)
+  - Evidence: coordinator summary to the retrospective (subagent transcripts not supplied). Slice 1's pass found a real defect: `stop()` awaited the raw processing promise, which could reject; the catch moved onto the promise and a test was added (in 9eb06ed0bd). Slice 2's pass made no edits. Slice 3's pass split `NoteAudioTools.retry.spec.ts` out for file size and removed a duplicated `ServiceMocker` stub builder (in ab773157bb). Token counts not supplied.
+  - Observed effect: one of three passes changed nothing; one caught a defect the slice's own tests had not.
+  - Inference: the defect-finding pass came on the slice that changed a promise's failure path; as in earlier rows, diff size did not predict value. Qualified: one execution.
+
 ## ODF-202 — Managed Codex delivery left CI unobserved without a retained stream binding
 
 Former local code: DD-201.
@@ -327,3 +335,46 @@ The story's key example (DD-161) had an agent point the CLI at the held app and 
   - Evidence: `b7ae807ce5:.planning/slice-plans/004-hold-worktree-e2e-stack/PLAN.md` proof row "The CLI reaches the held app"; slice 4 implementer report listed "No CLI token route" as a gap after using curl `generate-token` by hand; the coordinator returned the slice once, and `1ae39ec64f` adds the token route to `.agents/agent-map.md`.
   - Observed effect: one extra implementation round (about 49 s); caught only by reading the return's named gaps against the key examples.
   - Inference: a proof row that checks reachability can pass while the example's real shape (an authenticated write) stays unguided. Qualified: one occurrence.
+
+## DD-209 — A slice made the conversion step reject on failure; the existing catch also covered a save the story excluded
+
+The plan's Goal excluded "a failure while saving the note after conversion
+succeeded", but slice 1 said only that the conversion callback rejects on
+failure. In the code, one `try` covered both the conversion request and the
+note save, so the plain reading made a save failure reject too.
+
+### Occurrences
+- Execution: SEED-066#recover-failed-transcription / `212e428968:.planning/slice-plans/005-recover-failed-transcription/PLAN.md` / 9eb06ed0bd
+  - Timestamp: unknown (slice 1, before commit 2026-10-05T14:48:15+09:00)
+  - Tool: Claude Code
+  - Open Dough release: 0.3.56 (execution-checkout VERSION, unchanged during execution)
+  - Evidence: coordinator summary to the retrospective (subagent transcripts not supplied): the first implementation rejected for any failure, including a save failure after a good conversion; the coordinator returned the slice. Plan at 212e428968, slice 1: "The conversion callback rejects on failure instead of resolving `undefined`"; Decisive premises read `useNoteAudioProcessing.ts` for the toast, not for what its catch covered. Delivered code in 9eb06ed0bd adds an inner `try` around `appendDictatedText`; plan Learnings record "Only a failed conversion rejects".
+  - Observed effect: one extra implementation round; the rejected version would have let audio already joined to the note be sent and joined again after a save failure.
+  - Inference: when a slice changes what a catch does, the plan could name which excluded paths that catch also covers. Qualified: one occurrence; the coordinator caught it at acceptance.
+
+## DD-210 — An implementer ran `git checkout -- <file>` against its instructions
+
+### Occurrences
+- Execution: SEED-066#recover-failed-transcription / `212e428968:.planning/slice-plans/005-recover-failed-transcription/PLAN.md` / 9eb06ed0bd
+  - Timestamp: unknown (slice 1, before commit 2026-10-05T14:48:15+09:00)
+  - Tool: Claude Code
+  - Open Dough release: 0.3.56 (execution-checkout VERSION, unchanged during execution)
+  - Evidence: coordinator summary to the retrospective: the slice 1 implementer used `git checkout -- <file>` on a file it had changed, against its delegation's instructions; the coordinator checked and found no unowned work lost.
+  - Observed effect: no loss this time; one coordinator check.
+  - Inference: a discard command on a shared worktree can drop changes the agent did not make; the instruction alone did not stop it. Qualified: one occurrence; the exact delegation wording was not supplied.
+
+## DD-211 — E2E startup fails on unformatted files, but implementers are told not to format
+
+The execution wrap-up formats once, by the coordinator, after the refactor.
+The frontend dev server's checker (`frontend/vite.config.ts`, `checker({ biome: true })`)
+runs Biome when the E2E stack starts, so an implementer whose slice proof is
+an E2E run cannot run it on unformatted files.
+
+### Occurrences
+- Execution: SEED-066#recover-failed-transcription / `212e428968:.planning/slice-plans/005-recover-failed-transcription/PLAN.md` / ab773157bb
+  - Timestamp: unknown (slice 3, before commit 2026-10-05T14:58:50+09:00)
+  - Tool: Claude Code
+  - Open Dough release: 0.3.56 (execution-checkout VERSION, unchanged during execution)
+  - Evidence: slice 3 implementer learning, recorded in the plan's Learnings at ab773157bb: "E2E stack startup runs a Biome format check, so an unformatted frontend file stops `cy:run` before any scenario runs"; CLAUDE.md "implementers/refactorers run neither it nor standalone `lint:changed`".
+  - Observed effect: the slice 3 E2E proof was blocked until files were formatted; extra time not recorded.
+  - Inference: the rule and the project tooling conflict for any slice whose proof is an E2E run; the agent map or the slice delegation could say that formatting the touched files before `cy:run` is allowed. Qualified: one occurrence; how the implementer resolved it was not supplied.

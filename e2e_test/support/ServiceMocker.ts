@@ -144,12 +144,12 @@ class ServiceMocker {
     responses: unknown[],
     headers?: Record<string, string>
   ): Promise<void> {
-    const stub = this.mountebankStubBuilder.stubWithPredicates(
+    return this.replaceWithPredicatesAt(
+      index,
       this.postMatchPredicates(path, bodyToMatch, bodyNotToMatch),
       responses,
       headers
     )
-    return this.replaceStubAt(index, stub)
   }
 
   public stubPosterUnauthorized(pathMatcher: string, response: unknown) {
@@ -199,6 +199,20 @@ class ServiceMocker {
       headers
     )
     return this.addStubToMountebank(stub)
+  }
+
+  public replaceWithPredicatesAt(
+    index: number,
+    predicates: Predicate[],
+    responses: unknown[],
+    headers?: Record<string, string>
+  ): Promise<void> {
+    const stub = this.mountebankStubBuilder.stubWithPredicates(
+      predicates,
+      responses,
+      headers
+    )
+    return this.replaceStubAt(index, stub)
   }
 
   private addStubToMountebank(stub: Stub): Promise<void> {

@@ -18,6 +18,7 @@ export type NoteAudioToolsVm = {
     startRecording: ReturnType<typeof vi.fn>
     stopRecording: ReturnType<typeof vi.fn>
     tryFlush: ReturnType<typeof vi.fn>
+    hasUnconvertedAudio: ReturnType<typeof vi.fn>
     switchAudioDevice: ReturnType<typeof vi.fn>
   }
   wakeLocker: {

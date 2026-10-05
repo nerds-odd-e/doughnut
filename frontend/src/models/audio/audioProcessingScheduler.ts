@@ -33,15 +33,15 @@ class AudioProcessingSchedulerImpl implements AudioProcessingScheduler {
   private async processAndCallback(isMidSpeech: boolean): Promise<void> {
     if (this.processing) return
 
-    this.processing = this.audioBuffer.processUnprocessedData(
-      this.processorCallback,
-      isMidSpeech
-    )
-    try {
-      await this.processing
-    } finally {
-      this.processing = null
-    }
+    this.processing = this.audioBuffer
+      .processUnprocessedData(this.processorCallback, isMidSpeech)
+      .catch(() => {
+        // A failed conversion leaves its audio unprocessed for the next one.
+      })
+      .finally(() => {
+        this.processing = null
+      })
+    await this.processing
   }
 
   start(): void {

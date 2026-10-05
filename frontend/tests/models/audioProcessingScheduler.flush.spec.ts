@@ -2,6 +2,9 @@ import { describe, it, expect, vi, beforeEach } from "vitest"
 import {
   type AudioChunk,
   createBufferAndScheduler,
+  oneSecondOfSound,
+  sentFile,
+  wavSizeOfSeconds,
 } from "./audioProcessingSchedulerTestSupport"
 
 describe("AudioProcessingScheduler flush", () => {
@@ -139,5 +142,66 @@ describe("AudioProcessingScheduler flush", () => {
     await Promise.all([promise1, promise2, promise3])
 
     expect(mockCallback).toHaveBeenCalledTimes(1)
+  })
+  describe("when a conversion fails", () => {
+    it("sends the failed audio again together with the later audio", async () => {
+      const mockCallback = vi
+        .fn()
+        .mockRejectedValueOnce(new Error("failed"))
+        .mockResolvedValue(undefined)
+      const { audioBuffer, scheduler } = createBufferAndScheduler(
+        44100,
+        mockCallback
+      )
+
+      audioBuffer.receiveAudioData([oneSecondOfSound()])
+      await scheduler.tryFlush()
+      audioBuffer.receiveAudioData([oneSecondOfSound()])
+      await scheduler.tryFlush()
+
+      expect(sentFile(mockCallback, 0).size).toBe(wavSizeOfSeconds(1))
+      expect(sentFile(mockCallback, 1).size).toBe(wavSizeOfSeconds(2))
+    })
+
+    it("keeps the timed conversion and Flush going after the failure", async () => {
+      const mockCallback = vi
+        .fn()
+        .mockRejectedValueOnce(new Error("failed"))
+        .mockResolvedValue(undefined)
+      const { audioBuffer, scheduler } = createBufferAndScheduler(
+        44100,
+        mockCallback
+      )
+
+      audioBuffer.receiveAudioData([oneSecondOfSound()])
+      scheduler.start()
+      await vi.advanceTimersByTimeAsync(60 * 1000)
+      await vi.advanceTimersByTimeAsync(60 * 1000)
+      audioBuffer.receiveAudioData([oneSecondOfSound()])
+      await scheduler.tryFlush()
+
+      expect(mockCallback).toHaveBeenCalledTimes(3)
+    })
+
+    it("does not send again the audio an earlier success converted", async () => {
+      const mockCallback = vi
+        .fn()
+        .mockResolvedValueOnce("00:00:01,000")
+        .mockRejectedValueOnce(new Error("failed"))
+        .mockResolvedValue(undefined)
+      const { audioBuffer, scheduler } = createBufferAndScheduler(
+        44100,
+        mockCallback
+      )
+
+      audioBuffer.receiveAudioData([oneSecondOfSound(), oneSecondOfSound()])
+      await scheduler.tryFlush()
+      audioBuffer.receiveAudioData([oneSecondOfSound()])
+      await scheduler.tryFlush()
+      audioBuffer.receiveAudioData([oneSecondOfSound()])
+      await scheduler.tryFlush()
+
+      expect(sentFile(mockCallback, 2).size).toBe(wavSizeOfSeconds(3))
+    })
   })
 })

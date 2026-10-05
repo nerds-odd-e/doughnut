@@ -1,8 +1,8 @@
 # Voice input
 
 Authors open Audio tools on an existing note to Record Audio, Flush Audio,
-Stop Recording, or Save Audio Locally. Advanced Options offers full-screen
-editing. Dictation writes only to the note body.
+Stop Recording, or Save Audio Locally, and after a failed conversion to Retry.
+Advanced Options offers full-screen editing. Dictation writes only to the note body.
 
 ## Adding dictated text to a note
 
@@ -40,6 +40,17 @@ transcription do not count as a segment. A lone segment writes nothing and all
 its audio is kept. Only Stop writes everything that remains. Dictated text,
 once written, is never revised: holding back the unfinished sentence replaces
 revising it. Audio that is entirely silent is not sent.
+A conversion that fails (an error answer or no answer) keeps its audio as
+not yet converted, and recording goes on. That audio is sent again, together
+with the later audio, with the next conversion: timed, pause, Flush, or Stop,
+including the first conversion of a new recording in the same Audio tools.
+Text already written is not written again. A failure shows "Could not turn
+your speech into text. Your recording is kept." until a later conversion
+succeeds. After Stop, while audio is still not converted, Retry appears beside
+that message; it converts everything that remains as Stop does, nothing held
+back, and joins the passage once. A Retry that fails leaves the body, the
+message and Retry in place. Recovery lasts while Audio tools stays open; it
+does not survive a reload or closing Audio tools.
 The transcription service controls transcription quality. When a body editor for the note is
 open, the passage is joined to the end of that editor's draft, including
 unsaved typing, and that draft is saved right away; otherwise, including while
@@ -49,7 +60,12 @@ note's saved body.
 The mounted audio preservation tests assert exact saved content for long,
 empty, and whitespace-ending bodies, repeated additions, originating-note targeting, and undo. The
 mocked recording journey supplies a transcription and observes the original
-body, one space, and the transcription's text. The real-OpenAI journey checks both its original text and
+body, one space, and the transcription's text. A second mocked journey makes
+the transcription fail at Stop, observes the unchanged body, the message and
+Retry, then lets the transcription succeed and observes Retry joining the
+passage once and the message going away. Model tests with the real audio
+buffer cover kept audio across failures, and mounted tests cover when Retry is
+offered. The real-OpenAI journey checks both its original text and
 the dictated passage.
 
 ## Observation boundary
@@ -63,8 +79,11 @@ Naturally paced prerecorded or synthesized speech entered a synthetic browser
 MediaStream through AudioContext → MediaStreamDestination. The real recorder,
 worklet, transcription and persistence services were exercised.
 No clocks, worklets, request delays or service responses were simulated.
-Hardware capture, permission/device behavior, interruption and service-failure
-feedback/recovery remain unassessed. An automation route at `127.0.0.1:5175`
+Hardware capture, permission/device behavior and interruption remain
+unassessed. Failure feedback and recovery are covered by the mocked and model
+tests described above; a failure of the real transcription service has not
+been observed. Kept audio is sent again in one request; whether a long outage
+makes it larger than the transcription service accepts has not been observed. An automation route at `127.0.0.1:5175`
 could sign in but did not activate Note/New notebook; localhost worked. That
 observation does not establish a human-click defect or its cause.
 

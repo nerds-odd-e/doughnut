@@ -2,6 +2,9 @@ import { describe, it, expect, vi, beforeEach } from "vitest"
 import {
   type AudioChunk,
   createBufferAndScheduler,
+  oneSecondOfSound,
+  sentFile,
+  wavSizeOfSeconds,
 } from "./audioProcessingSchedulerTestSupport"
 
 describe("AudioProcessingScheduler stop", () => {
@@ -110,5 +113,78 @@ describe("AudioProcessingScheduler stop", () => {
     expect(mockCallback).toHaveBeenCalledTimes(1)
     const lastCall = mockCallback.mock.calls[0]?.[0] as AudioChunk
     expect(lastCall.data.size).toBeLessThan(44100 * 4)
+  })
+  it("keeps the audio of a failed conversion at Stop for the next recording", async () => {
+    const mockCallback = vi
+      .fn()
+      .mockRejectedValueOnce(new Error("failed"))
+      .mockResolvedValue(undefined)
+    const { audioBuffer, scheduler } = createBufferAndScheduler(
+      44100,
+      mockCallback
+    )
+    audioBuffer.receiveAudioData([oneSecondOfSound()])
+    scheduler.start()
+
+    const recording = await scheduler.stop()
+    expect(recording.size).toBe(wavSizeOfSeconds(1))
+    expect(audioBuffer.hasUnprocessedData()).toBe(true)
+
+    audioBuffer.receiveAudioData([oneSecondOfSound()])
+    scheduler.start()
+    await scheduler.tryFlush()
+
+    expect(sentFile(mockCallback, 1).size).toBe(wavSizeOfSeconds(2))
+  })
+
+  it("stops with the whole recording when a conversion in progress fails", async () => {
+    let failProcessing: (() => void) | null = null
+    const mockCallback = vi
+      .fn()
+      .mockImplementationOnce(
+        () =>
+          new Promise((_, reject) => {
+            failProcessing = () => reject(new Error("failed"))
+          })
+      )
+      .mockResolvedValue(undefined)
+    const { audioBuffer, scheduler } = createBufferAndScheduler(
+      44100,
+      mockCallback
+    )
+    audioBuffer.receiveAudioData([oneSecondOfSound()])
+
+    const flushPromise = scheduler.tryFlush()
+    const stopPromise = scheduler.stop()
+    failProcessing!()
+
+    await flushPromise
+    expect((await stopPromise).size).toBe(wavSizeOfSeconds(1))
+    expect(sentFile(mockCallback, 1).size).toBe(wavSizeOfSeconds(1))
+  })
+  it("converts what is left once after repeated failing final conversions", async () => {
+    const mockCallback = vi
+      .fn()
+      .mockRejectedValueOnce(new Error("failed"))
+      .mockRejectedValueOnce(new Error("failed again"))
+      .mockResolvedValue(undefined)
+    const { audioBuffer, scheduler } = createBufferAndScheduler(
+      44100,
+      mockCallback
+    )
+    audioBuffer.receiveAudioData([oneSecondOfSound()])
+    scheduler.start()
+
+    await scheduler.stop()
+    await scheduler.stop()
+    await scheduler.stop()
+    await scheduler.stop()
+
+    expect(mockCallback).toHaveBeenCalledTimes(3)
+    for (const call of [0, 1, 2]) {
+      expect(sentFile(mockCallback, call).size).toBe(wavSizeOfSeconds(1))
+      expect(mockCallback.mock.calls[call]?.[0].isMidSpeech).toBe(false)
+    }
+    expect(audioBuffer.hasUnprocessedData()).toBe(false)
   })
 })

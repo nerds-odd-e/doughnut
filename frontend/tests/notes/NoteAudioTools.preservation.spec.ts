@@ -200,7 +200,7 @@ describe("NoteAudioTools content preservation", () => {
         wrapSdkResponse(audioTextResponse("The ferry arrives after sunset."))
       )
     await processAudio(dictation.wrapper)
-    await processAudio(dictation.wrapper)
+    await expect(processAudio(dictation.wrapper)).rejects.toThrow()
     await processAudio(dictation.wrapper)
     expect(dictation.updateContentMock).toHaveBeenLastCalledWith({
       path: { note: note.id },

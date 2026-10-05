@@ -10,6 +10,7 @@ export interface AudioRecorder {
   stopRecording: () => Promise<File>
   getAudioData: () => number
   tryFlush: () => Promise<void>
+  hasUnconvertedAudio: () => boolean
   getAudioDevices: () => Ref<MediaDeviceInfo[]>
   getSelectedDevice: () => Ref<string>
   switchAudioDevice: (deviceId: string) => Promise<void>
@@ -68,6 +69,10 @@ export const createAudioRecorder = (
 
     tryFlush: async function (): Promise<void> {
       await audioProcessingScheduler.tryFlush()
+    },
+
+    hasUnconvertedAudio: function (): boolean {
+      return audioReceiver.getBuffer().hasUnprocessedData()
     },
 
     getAudioDevices: function (): Ref<MediaDeviceInfo[]> {
