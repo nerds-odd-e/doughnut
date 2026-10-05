@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 1,
+  "agent": "Yui-chan",
+  "email": "yui-chan@example.org",
+  "identity": "SEED-066#prompt-dictation-results",
+  "mode": "story-branch",
+  "branch": "claude/see-submitted-dictation-promptly",
+  "host": "claude"
+}
