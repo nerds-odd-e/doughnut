@@ -153,30 +153,86 @@ technical redesign, or speculative infrastructure.
 
 **Identity:** SEED-066#prompt-dictation-results
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"not-refined","approach":"unselected"}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/007-see-submitted-dictation-promptly/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"231fb644ba4316fa83c6a2bd0b106510ac31950c9fa1e1843e4b61f59faea6cf","plan":"e61c58564fa8d06db9e924dc24f628be80335a8c62848fc7447ef456eaf4f433"}}
 ```
 
-- **For / why:** Let an author finish a short spoken thought and use its text
-  without a frustrating wait after submission or Stop.
-- **Evaluation:** Agree a measurable submission/Stop-to-useful-body target,
-  then compare the same naturally paced recordings across repeated real-service
-  runs. Useful text appears within that agreed delay while preservation remains
-  intact. Separate first visible text from final settled content when needed.
-- **Evidence / learning:** The first 18.356-second Harvard recording showed body
-  text at 25.17 seconds from capture, approximately 3.96 seconds after Stop.
-  Audio requests took 4.42/4.61 seconds and titles settled separately. Other
-  journeys do not supply a reliable Stop-to-final baseline.
-- **Boundary:** Own diagnosis and user-visible improvement together. The
-  recorded timings predate deleting the model rewrite of transcriptions, so
-  re-measure the baseline first; excessive thinking was an owner hypothesis,
-  not an established cause.
-  Preserve the requested lightweight-processing direction; choose a model or
-  processing change only after understanding the path. No numerical target or
-  continuous live-text promise has been decided.
+**Goal:** A note author who has finished a short spoken thought sees its text
+in the note body soon after Stop, and can read it and go on working without a
+frustrating wait. This is one part of voice input feeling responsive. The
+story's outcome is the measured wait after Stop for a short dictation; text
+that appears continuously while speaking is the wider ambition, not this story.
+
+**Scope:**
+
+- **Required:** For one short recording on an existing note, the wait from
+  clicking Stop until the complete dictated passage is visible in the body
+  meets the target the owner accepted on 2026-10-05: across five runs the
+  middle wait is at most 2 seconds and none exceeds 3 seconds, measured on
+  local Development with the real transcription service. "Short" is up to
+  about 20 seconds of speech with no pause long enough to start a conversion.
+- **Measure first:** The recorded timings predate deleting the model rewrite
+  of transcriptions, so they are not the current baseline. Repeat the same
+  naturally paced recordings (the 18.356 s Harvard passage and the 6.2827 s
+  lighthouse addition) on local Development with the real transcription
+  service, and record where the wait goes: waiting for a conversion already
+  running, uploading the audio, the transcription request, and saving the
+  note. Choose the change from that measurement. Excessive thinking was an
+  owner hypothesis about the deleted rewrite, not an established cause.
+- **Already fast enough:** If the fresh measurement meets the target, the
+  story makes no product change; it records the measurement in the
+  [voice-input documentation](../../docs/voice-input.md#responsiveness-and-positive-comparisons)
+  and ends.
+- **Not yet known to be reachable:** No current baseline exists, so the
+  target may prove out of reach.
+- **Cannot be reached:** If no bounded change meets the target, stop and
+  report the measured breakdown. The owner then decides between a different
+  target and a larger delivery.
+- **Keep:** Every preservation behavior in the voice-input documentation: the
+  written text is the transcription's own, joined once, the unfinished sentence
+  is held back during speech, written text is never revised, a failed
+  conversion keeps its audio and offers Retry, and titles are not changed.
+- **Processing direction:** Keep processing light. This story adds no model
+  step between the transcription and the note. A different transcription model
+  or setting is allowed only when the measurement shows the transcription
+  request is where the wait goes.
+- **Deferred, not promised:** Text appearing while the author is still
+  speaking, which the owner decided on 2026-10-05 to leave out of this story
+  and to queue separately only if wanted after trying it; the wait after a pause or Flush; dictations
+  longer than the agreed short length; production network conditions; and
+  hardware microphone capture. Changes that naturally make these faster are
+  welcome but are not measured here.
+
+**Current path (read from the code, 2026-10-05):** After Stop the client waits
+for any conversion already running, then sends all remaining audio in one
+request as an uncompressed 16 kHz mono WAV file. The server asks `whisper-1`
+for an SRT transcription and returns its segments; the client joins them to
+the body and saves once. During speech a conversion starts only every 60
+seconds, after more than 3 seconds of silence, or on Flush. A dictation
+shorter than 60 seconds without a pause is therefore converted entirely after
+Stop. This describes the path; it does not establish where the wait goes.
+
+**Key examples:**
+
+1. **Short thought:** A note has one saved paragraph. The author records the
+   18.356 s Harvard passage and clicks Stop. The complete passage is visible
+   in the body within 2 seconds. After reload the original paragraph and the passage
+   each appear once.
+2. **Very short addition:** The author records the 6.2827 s lighthouse
+   addition and clicks Stop. The addition is visible within 2 seconds.
+3. **Repeated runs:** The same Harvard recording is run five times against the
+   real transcription service. The middle wait of the five is at most 2 seconds
+   and none exceeds 3 seconds.
+4. **Preservation boundary:** The 29.168 s orchard passage with its
+   eight-second pause and a Flush still writes the three passages recorded in
+   the voice-input documentation: nothing lost, repeated or revised.
+5. **Failure boundary:** The transcription fails at Stop. The body is
+   unchanged, the message and Retry appear, and Retry joins the passage once,
+   as before.
+
 - **Effort hypothesis:** L — low confidence; assumes a meaningful bounded
   improvement can meet the agreed target without a larger delivery.
-- **Depends on:** No additional capability; the earlier integrity stories are
-  priority choices. Speed changes must retain accepted preservation behavior.
+- **Depends on:** No additional capability. Speed changes must retain accepted
+  preservation behavior.
 - **Safe stopping point:** Short submitted dictation meets its measured target
   without sacrificing content or title control; later UI/title stories add
   independent value.
