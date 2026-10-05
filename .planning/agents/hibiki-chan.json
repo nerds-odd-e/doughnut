@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 1,
+  "agent": "Hibiki-chan",
+  "email": "hibiki-chan@example.org",
+  "activity": "preparation",
+  "identity": "SEED-069#reliable-development-stack-lifecycle",
+  "host": "claude",
+  "model": "fable"
+}
