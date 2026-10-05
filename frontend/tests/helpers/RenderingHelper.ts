@@ -8,9 +8,13 @@ import { ref, type Component, type DefineComponent, type Ref } from "vue"
 import type { RouteLocationRaw, Router } from "vue-router"
 import { createRouter, createWebHistory } from "vue-router"
 
+function productionRouter() {
+  return createRouter({ history: createWebHistory(), routes })
+}
+
 /** A real router over the production routes, placed at `location`. */
 export async function productionRouterAt(location: RouteLocationRaw) {
-  const router = createRouter({ history: createWebHistory(), routes })
+  const router = productionRouter()
   await router.push(location)
   return router
 }
@@ -73,13 +77,7 @@ class RenderingHelper<T = DefineComponent> {
   }
 
   withRouter(routerParam?: ReturnType<typeof createRouter>) {
-    const router =
-      routerParam ??
-      createRouter({
-        history: createWebHistory(),
-        routes,
-      })
-    this.withPlugin(router)
+    this.withPlugin(routerParam ?? productionRouter())
     return this
   }
 

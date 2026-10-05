@@ -5,7 +5,6 @@ import {
 import type { Circle } from "@generated/donut-backend-api"
 import { noteShowLocation } from "@/routes/noteShowLocation"
 import NoteShowPage from "@/pages/NoteShowPage.vue"
-import NoteShowPageWithNotebookSidebarLayout from "@tests/fixtures/NoteShowPageWithNotebookSidebarLayout.vue"
 import type { RouteLocationNamedRaw, Router } from "vue-router"
 import makeMe from "donut-test-fixtures/makeMe"
 import helper, {
@@ -38,52 +37,21 @@ export function setupNoteShowPageConversationMocks() {
   return noteRealm
 }
 
-function noteShowPageHelper(
-  component: typeof NoteShowPage | typeof NoteShowPageWithNotebookSidebarLayout,
-  router: Router,
-  noteId: number
-) {
+function noteShowPageMount(router: Router, noteId: number) {
   return helper
-    .component(component)
+    .component(NoteShowPage)
     .withCurrentUser(makeMe.aUser.please())
     .withCleanStorage()
     .withProps({ noteId })
     .withRouter(router)
 }
 
-function noteShowPageWithSidebarLayoutMount(router: Router, noteId: number) {
-  return noteShowPageHelper(
-    NoteShowPageWithNotebookSidebarLayout,
-    router,
-    noteId
-  )
-}
-
-function noteShowPageMount(router: Router, noteId: number) {
-  return noteShowPageHelper(NoteShowPage, router, noteId)
-}
-
-async function renderNoteShowWith(
-  mount: (
-    router: Router,
-    noteId: number
-  ) => ReturnType<typeof noteShowPageHelper>,
-  router: Router,
-  noteId: number
-) {
-  mount(router, noteId).render()
-  await flushPromises()
-}
-
-export async function renderNoteShowPage(router: Router, noteId: number) {
-  await renderNoteShowWith(noteShowPageWithSidebarLayoutMount, router, noteId)
-}
-
 export async function renderNoteShowPageWithoutSidebar(
   router: Router,
   noteId: number
 ) {
-  await renderNoteShowWith(noteShowPageMount, router, noteId)
+  noteShowPageMount(router, noteId).render()
+  await flushPromises()
 }
 
 export async function renderNoteShowPageWithConversation(

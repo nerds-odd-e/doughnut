@@ -54,8 +54,12 @@ Commands (from the repository root):
 
 ### 1. One production router builder, no unused NoteShowPage support
 Type: Structure
-Status: planned
+Status: done
 Proof: the focused command, the typecheck, then the whole suite.
+Accepted proof: one `createRouter(` in `RenderingHelper.ts` (private
+`productionRouter()`); focused run 5 files / 8 tests pass; `vue-tsc --noEmit`
+exit 0; whole frontend suite 321 files / 2014 tests pass. Refactor pass: no
+edits.
 
 Internal change: one private function in `RenderingHelper.ts` builds the
 production-routes router; `productionRouterAt` and `withRouter()` use it.
