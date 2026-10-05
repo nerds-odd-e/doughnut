@@ -59,6 +59,7 @@
     "cy:open": "node scripts/e2e-runner.mjs --open",
     "cy:open:raw": "cypress open --e2e",
     "cy:run": "node scripts/e2e-runner.mjs",
+    "e2e:hold": "node scripts/e2e-runner.mjs --hold",
     "local:lb": "node scripts/local-lb.mjs",
     "local:lb:vite": "node scripts/local-lb.mjs",
     "test": "pnpm --frozen-lockfile --silent recursive install && pnpm cli:bundle && pnpm frontend:build && SUT_RUNTIME_TARGET='{\"built\":true}' node scripts/e2e-runner.mjs --spec 'e2e_test/features/**/*.feature'",

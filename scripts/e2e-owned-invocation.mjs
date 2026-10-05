@@ -22,7 +22,12 @@ import {
 } from './e2e-invocation-signals.mjs'
 import { runCypressOnce } from './e2e-cypress-process.mjs'
 
-/** Own readiness, required mocks, Cypress, and cleanup for a batch or interactive session. */
+async function runCypressSession(opts) {
+  const cypressExitCode = await runCypressOnce(opts)
+  return opts.cancel.isTriggered() ? 1 : cypressExitCode
+}
+
+/** Own readiness, required mocks, the session (Cypress by default), and cleanup for one E2E invocation. */
 export async function runOwnedE2eInvocation({
   specs,
   approved,
@@ -39,6 +44,7 @@ export async function runOwnedE2eInvocation({
   startPrivateOpenAiMockFn,
   startPrivateWikidataMockFn,
   label,
+  session = runCypressSession,
   cancelEscalationMs,
   browser,
   isolated,
@@ -184,7 +190,7 @@ export async function runOwnedE2eInvocation({
 
       const mockExit = combineChildExits(mockExitObservers)
 
-      const cypressExitCode = await runCypressOnce({
+      return await session({
         specs,
         spawnCypress,
         cypressBin,
@@ -198,9 +204,8 @@ export async function runOwnedE2eInvocation({
         errLog,
         cancelEscalationMs,
         browser,
+        log,
       })
-      if (cancel.isTriggered()) return 1
-      return cypressExitCode
     } catch (error) {
       errLog(`${label} failed: ${error.message}`)
       return 1

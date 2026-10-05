@@ -112,8 +112,9 @@ execution uses its own worktree.
 
 ### 1. Hold this checkout's E2E stack until interrupted
 Type: Behavior
-Status: planned
+Status: done
 Proof: new hold cases in the runner test group; one real run from the execution worktree (rows 1–3 above).
+Accepted proof: `scripts/e2e-runner-hold.cases.mjs` (held-then-cancelled exits 0 with tree gone and owner lock removed; leader SIGKILL during the hold exits 1) in `node --test scripts/e2e-runner.test.mjs` (67/67); `pnpm test:browser-worktree-isolation` 108/108 and `scripts/dev-start.test.mjs` 6/6 unchanged. Real run (2026-10-05, execution worktree): origin `http://127.0.0.1:50758` served `/` with 200 while held; SIGINT to the `node scripts/e2e-runner.mjs --hold` process exited 0, the origin then refused connections, and `pnpm worktree:retire --check` reported an idle snapshot. SIGTERM shares the same cancellation path and was not run for real.
 
 Behavior: a linked worktree with MySQL up → `pnpm e2e:hold` → the worktree's
 E2E stack starts, the browser origin and a ready line are printed, and the
@@ -159,4 +160,11 @@ defaults.
 
 ## Learnings
 
-None yet.
+- The SUT supervisor is detached, so a hold that only awaits a promise lets
+  node exit at the ready line (code 13) and orphans the stack. The hold keeps
+  the event loop alive with a timer until it ends. Only a real run shows this;
+  the stand-in cases stay alive under `node:test`.
+- Shutdown kills the supervisor after a cancel; the hold ignores that exit so a
+  clean interrupt reports no service failure.
+- Signal the `node scripts/e2e-runner.mjs --hold` process, not the pnpm
+  `sh -c` wrapper, when stopping a backgrounded real run.
