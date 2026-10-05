@@ -77,14 +77,11 @@ export async function assertReadersRefuseIncompleteAllocation(
   assert.equal(hooks.reset, false)
 }
 
-export function withCiEnv(t) {
-  const previous = process.env.CI
-  process.env.CI = 'true'
+export function withEnv(t, name, value) {
+  const previous = process.env[name]
+  process.env[name] = value
   t.after(() => {
-    if (previous === undefined) {
-      delete process.env.CI
-    } else {
-      process.env.CI = previous
-    }
+    if (previous === undefined) delete process.env[name]
+    else process.env[name] = previous
   })
 }

@@ -12,46 +12,6 @@ illustrate a shared lesson stay in DearDough as occurrence evidence.
 
 Groups are ordered by priority: impact first, then frequency.
 
-## Queued: Observing branch code against real services from an execution worktree
-
-Story: [Observe unmerged branch code against real services from an execution worktree](.planning/seeds/SEED-069-agent-development-tooling.md#observe-branch-code-against-real-services)
-— SEED-069#observe-branch-code-against-real-services.
-
-Linked worktrees refuse the persistent Development stack, and
-`scripts/isolated-cypress-spec-selection.mjs` refuses live-OpenAI specs there.
-No repo command keeps a disposable stack up for manual use. A real-service or
-manual proof of unmerged branch code therefore has no supported route.
-
-The planning half of this pattern (check that a named observation route exists
-before Take) is shared ODF-190 in DearDough; its SEED-059#story-5,
-SEED-066#preserve-completed-speech and SEED-066#keep-every-transcribed-sentence
-occurrences are this group’s Donut-side evidence:
-
-- 2026-09-29, SEED-059#story-5: a real mouse-wheel observation had no route from
-  the worktree; about 15 minutes, and the key example shipped unobserved.
-- 2026-10-03, SEED-066#preserve-completed-speech: about 30 minutes waiting for the
-  owner, then the primary checkout detached onto branch code twice.
-- 2026-10-04, SEED-066#keep-every-transcribed-sentence: the planned local live
-  spec run was refused; one owner round-trip, two paid calls the owner had not
-  specifically authorized, and the proof moved to CI.
-
-### DD-161 — Real-book manual acceptance had no supported way to hold a disposable stack
-
-No repo command keeps a disposable E2E stack up for manual use, and a
-`.venv-mineru` whose Python lived in a garbage-collected Nix store path must be
-rebuilt by hand.
-
-The plan's manual slice needed real MinerU and a running app to `/attach` real
-PDFs through the CLI, so the agent wrote a temporary `hold-stack.mjs` around
-`runE2eInteractive`.
-
-#### Occurrences
-
-- Execution: SEED-059#story-3 / slice-plans/051-pdf-layout-from-bookmarks / 946e2a70e3; Timestamp: 2026-09-29 (slice 6, after 6f36cb2952); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.46.
-  - Evidence: slice 6 agent report (1,692 s, about 197k tokens, 96 tool uses); plan premise "`.venv-mineru/bin` has no `python`"; venv rebuilt with Homebrew Python 3.12, `mineru[pipeline]==3.4.5` and `six`.
-  - Observed effect: about 28 minutes for one manual slice, most of it environment repair and stack scaffolding rather than observation.
-  - Inference: a documented "hold a disposable stack" command would make the next real-service acceptance cheaper. Donut tooling, so correction belongs to Donut, not shared guidance.
-
 ## Queued: Starting, stopping and restarting the Development stack
 
 Story: [Stop and restart the Development stack without hunting for its processes](.planning/seeds/SEED-069-agent-development-tooling.md#reliable-development-stack-lifecycle)
@@ -118,6 +78,21 @@ the next.
   - Evidence: plan 008 slice 2 Proof "no Responses API call is made"; the slice 2 implementer added `verify(officialClient, never()).responses()` to `AiAudioControllerTests`; the refactor report removed it citing principle 7; the coordinator recorded the drop in the plan (b233c0e7f3).
   - Observed effect: one assertion written and removed, and a plan proof item the delivered tests do not carry. Small cost.
   - Inference: when planning a removal, check each proof item against the removal rule; prove the replacement behavior instead of the absence. Qualified: one execution.
+
+## Open, not queued: Rebuilding a stale MinerU virtual environment
+
+### DD-161 — A `.venv-mineru` whose Python was garbage-collected had to be rebuilt by hand
+
+A `.venv-mineru` whose Python lived in a garbage-collected Nix store path must
+be rebuilt by hand. The plan's manual slice needed real MinerU to `/attach` real
+PDFs through the CLI.
+
+#### Occurrences
+
+- Execution: SEED-059#story-3 / slice-plans/051-pdf-layout-from-bookmarks / 946e2a70e3; Timestamp: 2026-09-29 (slice 6, after 6f36cb2952); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.46.
+  - Evidence: slice 6 agent report (1,692 s, about 197k tokens, 96 tool uses); plan premise "`.venv-mineru/bin` has no `python`"; venv rebuilt with Homebrew Python 3.12, `mineru[pipeline]==3.4.5` and `six`.
+  - Observed effect: about 28 minutes for one manual slice, most of it environment repair and stack scaffolding rather than observation.
+  - Inference: a documented "hold a disposable stack" command would make the next real-service acceptance cheaper. Donut tooling, so correction belongs to Donut, not shared guidance.
 
 ## Reopening
 

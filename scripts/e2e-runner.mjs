@@ -21,6 +21,7 @@ import {
   resolveInvocationCheckout,
 } from './e2e-invocation-selection.mjs'
 import { runOwnedE2eInvocation } from './e2e-owned-invocation.mjs'
+import { runE2eHold } from './e2e-hold.mjs'
 
 export { defaultSpawnCypress, defaultSpawnCypressOpen, wireBatchCancellation }
 export {
@@ -203,9 +204,13 @@ const isMain = process.argv[1]
 
 if (isMain) {
   const cancel = wireBatchCancellation()
-  const interactive = process.argv.includes('--open')
-  const code = interactive
-    ? await runE2eInteractive({ cancel })
-    : await runE2eBatch({ cancel })
+  const code = process.argv.includes('--hold')
+    ? await runE2eHold({
+        cancel,
+        paidOpenAi: process.argv.includes('--paid-openai'),
+      })
+    : process.argv.includes('--open')
+      ? await runE2eInteractive({ cancel })
+      : await runE2eBatch({ cancel })
   process.exit(code)
 }

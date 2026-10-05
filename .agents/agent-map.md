@@ -91,12 +91,23 @@ Raw profiles are local evidence and must not be committed.
 prefer `pnpm dev` (http://127.0.0.1:5175/, profile `dev`,
 `doughnut_development`, `dev.log` / `dev.pid`; restart with `pnpm dev:restart`;
 local sign-in e.g. `manual` / `password`). This includes a configured primary;
-Git linked worktrees refuse the persistent Development stack. `pnpm cy:run` is
-the disposable E2E stack (http://localhost:5173/, profile `e2e`): each
-invocation starts and stops its own services. `pnpm cy:open` owns services for
-the interactive session. Do not ask developers to manage E2E services
-separately or restart Development after normal code changes; backend and
-frontend auto-reload.
+Git linked worktrees refuse the persistent Development stack. To observe branch
+code from a linked worktree by hand, from the CLI, or against real services, run
+`pnpm e2e:hold` ([`docs/worktree-browser-tests.md`](../docs/worktree-browser-tests.md)):
+it prints `Browser origin:`, seeds accounts such as `old_learner` / `password`,
+and holds the stack until Ctrl-C. Point
+the CLI at it with `DONUT_API_BASE_URL=<origin>`; for a token, take `token` from
+`curl -u old_learner:password -X POST <origin>/api/user/generate-token -H 'Content-Type: application/json' -d '{"label":"cli"}'`
+and write `{"token":"<token>"}` to `access-tokens.json` in a temporary
+`DONUT_CONFIG_DIR`, which keeps your own CLI config untouched. The held stack
+makes no paid OpenAI calls; `pnpm e2e:hold --paid-openai` needs the owner's
+authorization each time.
+Real-service Cypress specs on branch code run in CI after a push (CI runs on
+every pushed branch with the OpenAI secret). `pnpm cy:run` is the disposable
+E2E stack (http://localhost:5173/, profile `e2e`): each invocation starts and
+stops its own services. `pnpm cy:open` owns services for the interactive
+session. Do not ask developers to manage E2E services separately or restart
+Development after normal code changes; backend and frontend auto-reload.
 
 ## Architectural decisions (ADRs)
 

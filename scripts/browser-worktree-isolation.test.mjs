@@ -13,7 +13,7 @@ import {
   malformedJson,
   runHealth,
   runStart,
-  withCiEnv,
+  withEnv,
 } from './browser-worktree-isolation-fixtures.mjs'
 import { loadIsolatedE2eStartAllocation } from './browser-worktree-isolation.mjs'
 import { guardCypressNodeSetup } from './isolated-cypress.mjs'
@@ -24,7 +24,7 @@ import {
 import { makeStartSpy } from './sut-start-fixtures.mjs'
 
 test('unconfigured primary and CI keep shared SUT and Cypress defaults', async (t) => {
-  withCiEnv(t)
+  withEnv(t, 'CI', 'true')
   const checkout = makePrimaryCheckout(t)
   const start = makeStartSpy()
   const healthLogs = []
@@ -41,7 +41,7 @@ test('unconfigured primary and CI keep shared SUT and Cypress defaults', async (
 })
 
 test('configured primary identity-only can start; linked checkouts without identity refuse health and Cypress', async (t) => {
-  withCiEnv(t)
+  withEnv(t, 'CI', 'true')
   const configured = makePrimaryCheckout(t, {
     config: JSON.stringify(identityOnlyConfig),
   })

@@ -17,6 +17,7 @@ import { sutOwnerLockDir } from './sut-owner.mjs'
 import { healthyOnce } from './sut-start-fixtures.mjs'
 import { E2E_RUNNER_OWNS_LIFETIME_ENV_KEY } from './isolated-cypress.mjs'
 import { runE2eBatch } from './e2e-runner.mjs'
+import { withEnv } from './browser-worktree-isolation-fixtures.mjs'
 import { LEGACY_SUT_RUNTIME_TARGET } from './sut-runtime-target.mjs'
 import {
   makeCypressChild,
@@ -121,12 +122,7 @@ test('built-asset batch: foreign listener on the Vite port does NOT refuse (buil
 })
 
 test('CI built overlay: SUT_RUNTIME_TARGET {"built":true} probes legacy application ports', async (t) => {
-  const previous = process.env.SUT_RUNTIME_TARGET
-  process.env.SUT_RUNTIME_TARGET = '{"built":true}'
-  t.after(() => {
-    if (previous === undefined) delete process.env.SUT_RUNTIME_TARGET
-    else process.env.SUT_RUNTIME_TARGET = previous
-  })
+  withEnv(t, 'SUT_RUNTIME_TARGET', '{"built":true}')
 
   const checkout = makePrimaryCheckout(t)
   const standIn = spawnOwnedTreeStandIn(checkout.root)
