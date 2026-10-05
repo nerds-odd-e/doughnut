@@ -148,8 +148,9 @@ fails, the command stops the stack and exits nonzero with the failure.
 
 ### 4. Guidance names the routes for observing branch code
 Type: Behavior
-Status: planned
+Status: done
 Proof: one real CLI run against a held origin; reading the two documents (rows 9–10 above).
+Accepted proof: real run (2026-10-05): with a token from `generate-token` (basic auth on the held origin) in a temporary `DONUT_CONFIG_DIR`, `DONUT_API_BASE_URL=http://127.0.0.1:50758 … notebook clone 1 /tmp/slice4-clone` printed "Cloned notebook 1 into /tmp/slice4-clone." from the held app; SIGINT exited 0 and `worktree:retire --check` was idle. `.agents/agent-map.md` "Development vs E2E" names the hold route, the CLI base URL and token route, the per-use owner authorization for `--paid-openai`, and CI for real-service specs; `docs/worktree-browser-tests.md` describes the hold beside `cy:run` / `cy:open` with the reset's defaults; `docs/development-setup.md` points worktree readers to it. A PDF attach through the CLI was not run.
 
 Behavior: an agent in a linked worktree reads `.agents/agent-map.md`
 "Development vs E2E" → it finds `pnpm e2e:hold` as the route for manual, CLI,

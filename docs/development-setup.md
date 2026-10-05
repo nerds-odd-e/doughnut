@@ -55,7 +55,9 @@ This starts the reload-capable Development stack (Spring profile `dev`, database
 `manual` / `password`. Logs: `dev.log`; PID: `dev.pid`. Restart only that stack
 (without deleting Development data) with `pnpm dev:restart`.
 
-Git linked worktrees refuse `pnpm dev` / `pnpm dev:restart`. A configured
+Git linked worktrees refuse `pnpm dev` / `pnpm dev:restart`; to observe branch
+code from one, use `pnpm e2e:hold` (see
+[`worktree-browser-tests.md`](worktree-browser-tests.md)). A configured
 primary keeps its isolated Unit Test and E2E resources while using the
 persistent Development stack. E2E testability and reset endpoints are
 unavailable under `dev`.

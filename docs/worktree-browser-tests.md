@@ -27,9 +27,15 @@ recorded, adopt a name that already exists in MySQL, or modify `doughnut_test` /
 Each `pnpm cy:run --spec <features>` invocation starts its own application stack,
 waits for readiness, runs the selected features, and shuts down its owned
 application and mock processes before returning. `pnpm cy:open` keeps its stack
-for the interactive session and stops it when the session closes. Worktree
-identity, database, and allocated application ports persist between invocations.
-There is no separate SUT start, stop, or restart command.
+for the interactive session and stops it when the session closes.
+`pnpm e2e:hold` starts the same stack without Cypress for manual or CLI use: it
+prints `Browser origin:`, runs the testability reset (seeded accounts such as
+`old_learner` / `password`; first-choice randomizer, GitHub stand-in, and
+feature toggle off), reports ready, and stops the stack on Ctrl-C with exit 0.
+It withholds `OPENAI_API_TOKEN` from the stack unless given `--paid-openai`.
+Worktree identity, database, and allocated application ports persist between
+invocations. Each of these commands owns its stack for its own lifetime; there
+is no separate SUT start, stop, or restart command.
 
 ## Start and health
 
