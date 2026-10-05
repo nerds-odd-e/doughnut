@@ -193,7 +193,7 @@ are deleted.
 
 ### 4. The real Development stack obeys the three commands
 Type: Behavior
-Status: planned — after landing on `main`, with the owner's go-ahead
+Status: done
 Proof: one real run in the primary checkout, recorded in this plan.
 
 Behavior: the primary checkout holds this story's commits and Development is
@@ -251,3 +251,41 @@ If the run disagrees with slices 1–3, stop and change the plan.
   refer to that module now.
 - Production lines (`scripts/dev-*.mjs` + `scripts/development-*.mjs`, excluding
   `*.test.mjs`, counting the stand-in fixture): 821 before → 672 after slice 3.
+- Slice 4 (2026-10-05, Codex takeover authorized by the owner): primary checkout
+  `main` at landed revision `77df78ed15680597bd3ad60cf8a546a16afd02a3`.
+  `CURSOR_DEV=true nix develop -c pnpm test:development-stack` → 17 pass.
+  `pnpm dev:stop` stopped services PID 21603; TCP connections to 8081, 5175
+  and 5176 were refused and the services process was gone. `pnpm dev` was
+  healthy after six polls (PID 36540); `pnpm dev:restart` was healthy after
+  five polls (PID 62744), with both previous services PIDs gone.
+  Authenticated `GET /api/notes/13731` through the browser origin returned
+  the identical note object before stop, after start and after restart
+  (SHA256 `efdf673ad6ef0b9419af4717194efbb0943f46ddf0d1c26038ac2cbac58a4cf0`).
+  `node scripts/dev-healthcheck.mjs` passed all three ports, LB readiness and
+  the `dev` profile. The leftover untracked `dev.pid` was deleted. Development
+  was left running. The fresh refactor pass found no uncommitted code changes.
+- Continuation: the retired Claude execution worktree and branch were already
+  contained in `main`; owner-authorized completion continues directly in
+  `/Users/terryyin/git/doughnut` on `main`, publishing to `origin/main`.
+  After the proof and removal of `dev.pid`, the clean checkout fast-forwarded
+  to `5f2c5b2ff7`; intervening voice-input and dependency work is unrelated.
+- Closure dependency discovery found no consumers. Its only diagnostic is the
+  existing `SEED-066` manual-discovery findings anchor, a `####` evidence section
+  rather than a canonical story. It has no dependency agreement and is retained.
+- CI: GitHub Actions `ci.yml` (`donut CI`), target `origin/main`; Codex observer
+  cell 28, PTY 71670, PID 44366, mailbox `/tmp/dough-ci-501/watch-KnjKvL`,
+  coordinator `01a10c3a-cdc6-7420-bce8-e21dad11a7a0`, root this checkout.
+
+## Execution complete
+
+Product advice: no new product work. The commands and maintained documentation
+cover the promised Development lifecycle; keep the voice-input queue's order.
+
+Retrospective: implementation commits `4101f03be4`, `e9e5feefc3` and
+`62035934b9` supply the outcome; `73f538a2a5` records the approved after-landing
+proof and `77df78ed15` integrates it. Planning and interleaved sibling commits
+are excluded from implementation attribution. No implementation correction was
+found. Real-process command tests cover ownership, refusal, idle stop and restart
+ordering; the real-stack check covers persistence and startup. ADRs 0006 and
+0007 remain satisfied. Process findings: DD-212 records retirement before the
+last slice; Donut DD-205 gains this execution's removal-test recurrence.

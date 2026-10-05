@@ -58,7 +58,7 @@ whose correction put the removal rule in always-loaded agent guidance
 slice planning. Shared Open Dough guidance keeps absence assertions when absence
 is the promise; the rule is Donut’s, so the correction lands in Donut.
 
-Not queued: two occurrences, each costing one assertion written and removed.
+Not queued: three occurrences, each costing one test or assertion written and removed.
 It is the next candidate if it recurs.
 
 ### DD-205 — A plan's proof named an absence check that the project's removal rule forbids
@@ -78,6 +78,14 @@ the next.
   - Evidence: plan 008 slice 2 Proof "no Responses API call is made"; the slice 2 implementer added `verify(officialClient, never()).responses()` to `AiAudioControllerTests`; the refactor report removed it citing principle 7; the coordinator recorded the drop in the plan (b233c0e7f3).
   - Observed effect: one assertion written and removed, and a plan proof item the delivered tests do not carry. Small cost.
   - Inference: when planning a removal, check each proof item against the removal rule; prove the replacement behavior instead of the absence. Qualified: one execution.
+- Execution: SEED-069#reliable-development-stack-lifecycle / `.planning/slice-plans/006-stop-and-restart-development-stack/PLAN.md` / 62035934b9
+  - Timestamp: 2026-10-05, slice 3 before the 14:54+09:00 commit
+  - Tool: Claude Code
+  - Model: claude-opus-5-5
+  - Open Dough release: unknown
+  - Evidence: plan proof row 10 prescribed writing a leftover `dev.pid` holding the test process's PID. The test was run red, then green, and deleted once no code read that file; the coordinator's Learnings explicitly cite principle 7. The existing free-primary start test carries the replacement outcome.
+  - Observed effect: another test written and deleted during one slice; the plan's prescribed permanent proof did not survive.
+  - Inference: third recorded occurrence of the same Donut planning gap; use the replacement start behavior as retained proof.
 
 ## Open, not queued: Rebuilding a stale MinerU virtual environment
 

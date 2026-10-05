@@ -378,3 +378,19 @@ an E2E run cannot run it on unformatted files.
   - Evidence: slice 3 implementer learning, recorded in the plan's Learnings at ab773157bb: "E2E stack startup runs a Biome format check, so an unformatted frontend file stops `cy:run` before any scenario runs"; CLAUDE.md "implementers/refactorers run neither it nor standalone `lint:changed`".
   - Observed effect: the slice 3 E2E proof was blocked until files were formatted; extra time not recorded.
   - Inference: the rule and the project tooling conflict for any slice whose proof is an E2E run; the agent map or the slice delegation could say that formatting the touched files before `cy:run` is allowed. Qualified: one occurrence; how the implementer resolved it was not supplied.
+
+## DD-212 — Landing retired the execution workspace while its final slice still needed a continuation
+
+Landing and story completion were correctly distinguished in the response, but
+the unfinished execution's saved workspace and branch were removed. The story
+remained Taken while its terminal session later stopped.
+
+### Occurrences
+- Execution: SEED-069#reliable-development-stack-lifecycle / `.planning/slice-plans/006-stop-and-restart-development-stack/PLAN.md` / 4101f03be4
+  - Timestamp: 2026-10-05T17:05:29+09:00 (retirement)
+  - Tool: Claude Code
+  - Model: claude-opus-5-5
+  - Open Dough release: unknown
+  - Evidence: native session `26f67388-7040-4fff-b68a-786f5f7e7b95` landed `77df78ed15` after the owner's `/dough-land`, then received `worktree: removed`, `branch: removed`, `remoteBranch: removed`. Its completion message explicitly retained slice 4 and wrap-up; the saved session cwd and dashboard start still name the removed worktree. Dashboard `doneAt` is 2026-10-05T21:52:08+09:00; native job state is `stopped`. The owner subsequently asked why the Taken story had neither a worktree nor an attached session.
+  - Observed effect: an investigation and takeover were needed to recover the remaining real-stack check and closure. Implementation was preserved on main; no code or data was lost.
+  - Inference: when an approved proof runs after landing, the workflow could retain a usable continuation checkout and its remaining obligation before retiring the execution workspace. Qualified: one execution; who marked the dashboard session done is not established.
