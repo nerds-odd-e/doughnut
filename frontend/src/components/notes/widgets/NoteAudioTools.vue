@@ -5,7 +5,11 @@
       :audioRecorder="audioRecorder"
       :isRecording="isRecording"
     />
-    <div class="daisy-alert daisy-alert-info" v-if="errors">{{ errors }}</div>
+    <div
+      v-if="errors"
+      class="daisy-alert"
+      :class="errors.conversion ? 'daisy-alert-error' : 'daisy-alert-info'"
+    >{{ errors.conversion ?? errors }}</div>
     <div class="button-group">
       <template v-if="!isRecording">
         <button class="daisy-btn" @click="startRecording" title="Record Audio">

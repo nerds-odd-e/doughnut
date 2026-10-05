@@ -132,7 +132,12 @@ audio short of recording again; slice 3 adds Retry.
 
 ### 2. A failed conversion tells the author in plain words
 Type: Behavior
-Status: planned
+Status: done
+Accepted proof: `NoteAudioTools.processing.spec.ts` "tells the author in
+plain words when a conversion fails, until one succeeds" (exact text,
+`daisy-alert-error`, no `updateNoteContent` call, store content unchanged;
+alert absent after the next success); `NoteAudioTools.*` specs and
+`vue-tsc --noEmit` green. The full-screen view is not covered by a test.
 Proof: `NoteAudioTools.processing.spec.ts` — after a failed response the alert
 reads exactly "Could not turn your speech into text. Your recording is kept.",
 is styled as an error, and no content update was sent; after a following
@@ -196,3 +201,6 @@ tests, keeping real-service failure as unobserved.
   promise itself, so `stop()` waiting on a conversion in progress also
   survives a failure. Slice 3's Retry goes through the scheduler's existing
   final conversion, not around it.
+- The conversion failure is held as `errors.conversion`; a success clears
+  only that key, so start-recording and device-switch messages stay. Retry's
+  visibility can key on the same field plus the buffer's unconverted audio.

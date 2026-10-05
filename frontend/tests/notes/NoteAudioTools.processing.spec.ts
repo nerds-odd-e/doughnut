@@ -7,6 +7,7 @@ import makeMe from "donut-test-fixtures/makeMe"
 import {
   mockSdkService,
   mockSdkServiceWithImplementation,
+  wrapSdkError,
   wrapSdkResponse,
 } from "@tests/helpers"
 import { useNoteStore } from "@/store/noteStore"
@@ -19,6 +20,7 @@ import {
   type NoteAudioToolsWrapper,
 } from "@tests/notes/noteAudioToolsTestSupport"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
+import { flushPromises } from "@vue/test-utils"
 
 vi.mock("@/models/audio/recorderWorklet", async () => {
   const { recorderWorkletMockExports } = await import(
@@ -116,5 +118,26 @@ describe("NoteAudioTools audio processing", () => {
       path: { note: note.id },
       body: { content: `${loadedBody} text` },
     })
+  })
+
+  it("tells the author in plain words when a conversion fails, until one succeeds", async () => {
+    audioToTextMock.mockResolvedValueOnce(wrapSdkError("API Error"))
+    await expect(processAudio(wrapper)).rejects.toThrow()
+    await flushPromises()
+
+    const alert = wrapper.find(".daisy-alert")
+    expect(alert.text()).toBe(
+      "Could not turn your speech into text. Your recording is kept."
+    )
+    expect(alert.classes()).toContain("daisy-alert-error")
+    expect(updateContentMock).not.toHaveBeenCalled()
+    expect(noteStore.refOfNoteRealm(note.id).value?.note.content).toBe(
+      "Original body."
+    )
+
+    await processAudio(wrapper)
+    await flushPromises()
+
+    expect(wrapper.find(".daisy-alert").exists()).toBe(false)
   })
 })
