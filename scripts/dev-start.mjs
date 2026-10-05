@@ -1,18 +1,18 @@
 #!/usr/bin/env node
 /**
  * Start the Development stack after refusing unsafe checkouts and occupied targets.
- * Spawns services, writes `dev.pid`, waits until healthy `dev`, prints browser origin.
+ * Spawns services, waits until healthy `dev`, prints browser origin.
  */
 import { spawn } from 'node:child_process'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { runDevelopmentHealthcheck } from './dev-healthcheck.mjs'
-import { isProcessAlive, readLiveDevelopmentPid } from './development-pid.mjs'
 import { refuseDevelopmentInLinkedWorktree } from './development-primary-checkout.mjs'
 import {
   DEVELOPMENT_RUNTIME_TARGET,
   developmentServicesScript,
 } from './development-runtime.mjs'
+import { findDevelopmentServicesPids } from './development-stack-processes.mjs'
 import {
   browserOrigin,
   listOccupiedApplicationPorts,
@@ -20,7 +20,6 @@ import {
 } from './local-runtime-target.mjs'
 import { isTcpPortOccupied } from './sut-healthcheck.mjs'
 import { waitForSutHealthy } from './sut-start-health-wait.mjs'
-import { writePidFile } from './sut-start-spawn.mjs'
 
 const repoRoot = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),
@@ -61,7 +60,6 @@ export async function runDevStart({
   runtimeTarget = DEVELOPMENT_RUNTIME_TARGET,
   spawnFn = spawn,
   isPortOccupiedFn,
-  isProcessAliveFn = isProcessAlive,
   healthcheckFn = runDevelopmentHealthcheck,
   timeoutMs,
   pollMs,
@@ -74,13 +72,10 @@ export async function runDevStart({
     'refusing to start'
   )
 
-  const livePid = readLiveDevelopmentPid(
-    runtimeTarget.pidFile,
-    isProcessAliveFn
-  )
-  if (livePid !== null) {
+  const runningPids = await findDevelopmentServicesPids(checkoutRoot)
+  if (runningPids.length > 0) {
     throw new Error(
-      `Development is already running (live process ${livePid} in ${runtimeTarget.pidFile}). ` +
+      `Development is already running (services pid ${runningPids.join(', ')}). ` +
         'Refusing to start; resources were left unchanged.'
     )
   }
@@ -104,7 +99,6 @@ export async function runDevStart({
     runtimeTarget,
     logFile,
   })
-  await writePidFile(child.pid, { pidFile: runtimeTarget.pidFile })
 
   const { exitCode } = await waitForSutHealthy({
     child,

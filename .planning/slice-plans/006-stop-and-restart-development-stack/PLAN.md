@@ -177,7 +177,7 @@ live unrelated process.
 
 ### 3. `pnpm dev` recognises a running stack from the process table, and `dev.pid` is gone
 Type: Behavior
-Status: planned
+Status: done
 Proof: first a failing case for the reused-PID symptom (row 10), then rows 11–12; the sweep reading in row 12.
 
 Behavior: no stack running and a leftover `dev.pid` naming a live unrelated
@@ -231,3 +231,19 @@ If the run disagrees with slices 1–3, stop and change the plan.
   `scripts/development-pid.mjs`; give it a home when that module's readers go.
   `targetFor` is in `scripts/dev-stack-fixtures.mjs`.
 - Production lines after slice 2: 707.
+- Slice 3 (accepted proof): failing first, `CURSOR_DEV=true nix develop -c node --test
+  --test-name-pattern=row10 scripts/dev-start.test.mjs` with `dev.pid` holding the test
+  process's PID failed "Development is already running (live process …)", then passed
+  after the change. That case was then deleted: once nothing reads `dev.pid`, a test
+  writing one only proves a removed thing has no effect (principle 7); row 10's
+  outcome stays covered by "free unconfigured primary starts Development, prints
+  browser origin when healthy". Row 11 is "this checkout's running stack refuses
+  start, naming its services pid" on the real stand-in stack.
+  `CURSOR_DEV=true nix develop -c pnpm test:development-stack` → 17 pass. Row 12
+  reading returns nothing. `scripts/development-pid.mjs` is deleted.
+- The ownership rule (`findDevelopmentServicesPids`, `stopDevelopmentServices`) now
+  lives in `scripts/development-stack-processes.mjs`; `dev-start`, `dev-stop` and
+  `dev-restart` import it. Earlier learnings naming `scripts/dev-stop.mjs` for these
+  refer to that module now.
+- Production lines (`scripts/dev-*.mjs` + `scripts/development-*.mjs`, excluding
+  `*.test.mjs`, counting the stand-in fixture): 821 before → 672 after slice 3.

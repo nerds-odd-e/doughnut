@@ -6,9 +6,9 @@
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { runDevStart } from './dev-start.mjs'
-import { stopDevelopmentServices } from './dev-stop.mjs'
 import { refuseDevelopmentInLinkedWorktree } from './development-primary-checkout.mjs'
 import { DEVELOPMENT_RUNTIME_TARGET } from './development-runtime.mjs'
+import { stopDevelopmentServices } from './development-stack-processes.mjs'
 
 const repoRoot = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),

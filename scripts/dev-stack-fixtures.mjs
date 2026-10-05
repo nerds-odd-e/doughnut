@@ -13,7 +13,6 @@ export function targetFor(checkoutRoot, ports = {}) {
     ...DEVELOPMENT_RUNTIME_TARGET,
     ...ports,
     logFile: path.join(checkoutRoot, 'dev.log'),
-    pidFile: path.join(checkoutRoot, 'dev.pid'),
   }
 }
 

@@ -26,10 +26,6 @@ test('Development runtime fixes profile, database, ports, and artifact paths', (
     path.join(repoRoot, 'dev.log')
   )
   assert.equal(
-    DEVELOPMENT_RUNTIME_TARGET.pidFile,
-    path.join(repoRoot, 'dev.pid')
-  )
-  assert.equal(
     browserOrigin(DEVELOPMENT_RUNTIME_TARGET),
     'http://127.0.0.1:5175'
   )

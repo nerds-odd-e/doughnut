@@ -14,7 +14,6 @@ export const DEVELOPMENT_RUNTIME_TARGET = Object.freeze({
   vitePort: 5176,
   lbListenPort: 5175,
   logFile: path.join(repoRoot, 'dev.log'),
-  pidFile: path.join(repoRoot, 'dev.pid'),
 })
 
 /** The services entry script a checkout's Development stack runs as. */

@@ -157,7 +157,6 @@ sut.pid
 # Development background process artifacts
 dev.log
 dev.log.*
-dev.pid
 
 # checkout-local worktree identity and leftover lock (opt-in backend tests)
 /.worktree.local.json

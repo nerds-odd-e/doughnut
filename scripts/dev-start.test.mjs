@@ -1,17 +1,19 @@
 import assert from 'node:assert/strict'
-import { writeFileSync } from 'node:fs'
-import { readFile } from 'node:fs/promises'
 import { test } from 'node:test'
 import {
   makeLinkedWorktreeCheckout,
   makePrimaryCheckout,
 } from './backend-test-worktree-linked-fixtures.mjs'
-import { targetFor } from './dev-stack-fixtures.mjs'
+import {
+  startStandInDevelopmentStack,
+  targetFor,
+} from './dev-stack-fixtures.mjs'
 import { runDevStart } from './dev-start.mjs'
 import {
   allocateFreePort,
   closeServer,
   identityOnlyConfig,
+  isPidAlive,
   isTcpListening,
   listenTcp,
 } from './sut-isolated-fixtures.mjs'
@@ -55,26 +57,21 @@ test('configured primary starts Development', async (t) => {
   assert.equal(spawn.calls.length, 1)
 })
 
-test('live Development pid refuses duplicate start without signalling', async (t) => {
+test("this checkout's running stack refuses start, naming its services pid", async (t) => {
   const checkout = makePrimaryCheckout(t)
-  const runtimeTarget = targetFor(checkout.root)
-  writeFileSync(runtimeTarget.pidFile, String(process.pid))
+  const { pids } = await startStandInDevelopmentStack(t, checkout.root)
   const spawn = makeStartSpy()
   await assert.rejects(
     runDevStart({
       checkoutRoot: checkout.root,
-      runtimeTarget,
+      runtimeTarget: targetFor(checkout.root),
       spawnFn: spawn.spawnFn,
       isPortOccupiedFn: async () => false,
     }),
-    /already running/
+    new RegExp(`already running \\(services pid ${pids.services}\\)`)
   )
   assert.equal(spawn.calls.length, 0)
-  try {
-    process.kill(process.pid, 0)
-  } catch {
-    assert.fail('live Development pid must not be signalled')
-  }
+  assert.equal(isPidAlive(pids.services), true)
 })
 
 test('occupied Development port refuses without terminating the listener', async (t) => {
@@ -100,10 +97,10 @@ test('occupied Development port refuses without terminating the listener', async
   assert.equal(await isTcpListening(port), true)
 })
 
-test('free unconfigured primary starts Development, writes pid, prints browser origin when healthy', async (t) => {
+test('free unconfigured primary starts Development, prints browser origin when healthy', async (t) => {
   const checkout = makePrimaryCheckout(t)
   const runtimeTarget = targetFor(checkout.root, { lbListenPort: 5175 })
-  const spawn = makeStartSpy(9090)
+  const spawn = makeStartSpy()
   const logs = makeLogs()
   const code = await runDevStart({
     checkoutRoot: checkout.root,
@@ -122,7 +119,6 @@ test('free unconfigured primary starts Development, writes pid, prints browser o
   assert.match(spawn.calls[0][1][0], /development-services\.mjs$/)
   assert.equal(spawn.calls[0][2].cwd, checkout.root)
   assert.equal(spawn.calls[0][2].detached, true)
-  assert.equal(await readFile(runtimeTarget.pidFile, 'utf8'), '9090')
   assert.ok(logs.out.some((line) => /Development healthy/.test(line)))
   assert.ok(
     logs.out.some((line) => line === 'Browser origin: http://127.0.0.1:5175')
@@ -132,7 +128,7 @@ test('free unconfigured primary starts Development, writes pid, prints browser o
 test('Development start exits 1 when healthcheck never passes', async (t) => {
   const checkout = makePrimaryCheckout(t)
   const runtimeTarget = targetFor(checkout.root)
-  const spawn = makeStartSpy(7070)
+  const spawn = makeStartSpy()
   const logs = makeLogs()
   const code = await runDevStart({
     checkoutRoot: checkout.root,
@@ -147,7 +143,6 @@ test('Development start exits 1 when healthcheck never passes', async (t) => {
   })
   assert.equal(code, 1)
   assert.equal(spawn.calls.length, 1)
-  assert.equal(await readFile(runtimeTarget.pidFile, 'utf8'), '7070')
   assert.ok(
     logs.err.some((line) =>
       /Development did not become healthy within the timeout/.test(line)
