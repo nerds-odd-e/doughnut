@@ -217,26 +217,94 @@ technical redesign, or speculative infrastructure.
 
 **Identity:** SEED-066#recover-failed-transcription
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"not-refined","approach":"unselected"}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/005-recover-failed-transcription/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"a41aa74ac9d575f7d547e224823d8778756b48b427b839e95312872a2dce3048","plan":"d6930319b7aadbd672e3996e0c3c7e7805a1ac4e36294a766ce60603e7d66772"}}
 ```
 
-- **For / why:** Let an author recover already-spoken material after conversion
-  fails rather than recreating the thought from memory.
-- **Evaluation:** When conversion fails before its text is inserted, show
-  understandable feedback and let the author retry the captured passage in the
-  same open session. The recovered addition appears once and saved content
-  remains intact.
-- **Evidence / learning:** A risk-driven reliability candidate. Discovery did
-  not exercise service failures or recovery; observe the actual failure journey
-  during refinement before prescribing a recovery interaction.
-- **Boundary:** Conversion failure before successful text insertion, within the
-  same open session. Refresh/crash recovery, offline operation, and an ambiguous
-  save outcome are outside this candidate's promise.
-- **Effort hypothesis:** L — low confidence; assumes captured speech remains
-  available for a bounded retry journey.
-- **Depends on:** The safe successful-addition outcome.
-- **Safe stopping point:** A failed conversion has an actionable recovery path;
-  retrying neither discards the passage nor duplicates successful additions.
+- **Goal:** An author whose speech could not be turned into text keeps that
+  speech and gets its text without saying it again. Today a failed conversion
+  silently drops the passage, so the author must notice the gap and recreate
+  the thought from memory. This makes dictation dependable when the
+  transcription service or the network fails for a moment.
+- **Scope:**
+  - A conversion that fails keeps its audio: that audio counts as not yet
+    converted, exactly like speech that has not been sent.
+  - While recording, a failure does not stop the recording. The kept audio is
+    sent again with the next conversion, whichever comes first: the timed
+    one, a pause, a Flush click, or Stop. The author needs no new control
+    here; Flush already asks for a conversion now.
+  - After Stop, when audio is still not converted, Audio tools offers Retry.
+    Retry converts everything that is still not converted and writes all of
+    it, the same way Stop does.
+  - The recovered text is joined to the note once, in the order it was
+    spoken, by the same rule as any dictated passage. Text already written
+    is not written again, and the note's saved content is unchanged by a
+    failure.
+  - Feedback: a failure shows a plain sentence that says the speech was not
+    turned into text and that the recording is kept. It replaces today's raw
+    `Error: Failed to process audio`. The message goes away when a later
+    conversion succeeds, and stays, with Retry after Stop, while conversion
+    keeps failing.
+  - Follows from the rule, not a separate feature: starting a new recording
+    instead of pressing Retry does not drop the kept audio; it is converted
+    together with the new recording's first conversion.
+  - "Failure" here means the conversion request did not return a
+    transcription: an error answer from the server or no answer at all.
+  - Unchanged: Save Audio Locally still gives the whole recording after Stop.
+  - Deferred: recovery after a reload, a crash, closing Audio tools, or
+    leaving the page; working offline; automatic retries on a timer; a
+    failure while saving the note after conversion succeeded, including a
+    save whose outcome is unknown; different messages for different causes;
+    and any wider change to the Audio tools controls, which
+    [Complete a first dictation with understandable controls](#understandable-first-dictation)
+    owns.
+  - Assumption, not observed: the kept audio stays small enough to send in
+    one request. It grows by about 2 MB a minute (16 kHz mono WAV) and the
+    server accepts 100 MB, but the transcription service's own limit was not
+    observed. A long outage during a long recording is not covered.
+  - The interaction above was chosen during refinement on 2026-10-05 from the
+    observed failure journey; the owner has not yet reviewed it.
+- **Key examples:** Each uses a note with the body `This is class 1.` and
+  speech whose transcription is `its talk about dada struct day.`
+  - Failure at Stop, then recovery: the author records and presses Stop, and
+    the conversion fails → the body is still `This is class 1.`, the message
+    says the speech was not turned into text and the recording is kept, and
+    Retry is offered. The service works again and the author presses Retry →
+    the body is `This is class 1. its talk about dada struct day.`, the
+    message and Retry are gone, and the saved body after reload matches.
+  - Retry fails again: the author presses Retry while the service is still
+    failing → the body is unchanged and the message and Retry remain. A later
+    Retry that succeeds adds the passage once.
+  - Failure while recording: a conversion fails during recording → recording
+    continues and the message is shown. The author keeps speaking, and the
+    next conversion succeeds → the speech from before the failure and the
+    speech after it are both in the note, once each, in spoken order, and
+    the message is gone.
+  - No duplicate: one passage was already written to the note, then a later
+    conversion fails and is recovered → the earlier passage appears once, not
+    twice.
+- **UI:** The message sits where the Audio tools error is shown today, styled
+  as an error rather than as information. Proposed wording: "Could not turn
+  your speech into text. Your recording is kept." Retry is one more control
+  in Audio tools, shown only after Stop while audio is still not converted.
+- **Evidence:** Observed on 2026-10-05 at revision `9e74df4a28` with a
+  throwaway mounted test and the real audio buffer; a real service failure
+  through the product was not observed.
+  - A failed conversion showed `Error: Failed to process audio` in an
+    information-styled box, with no toast. Nothing clears it until the next
+    Record click.
+  - The buffer treated the failed audio as converted: after a failed
+    one-second chunk, nothing was left to convert, and the next conversion
+    sent only the next second. The failed passage therefore never reaches the
+    note, and no control sends it again.
+  - The whole recording stays in memory while Audio tools is open, which is
+    why Save Audio Locally works after Stop. The premise that the captured
+    speech is still available for a retry holds.
+- **Effort hypothesis:** M — medium confidence.
+- **Plan:** [005-recover-failed-transcription](../slice-plans/005-recover-failed-transcription/PLAN.md)
+- **Depends on:** None.
+- **Safe stopping point:** A failed conversion keeps its speech and has a
+  recovery path; recovering neither drops the passage nor repeats text that
+  was already written.
 
 <a id="prompt-dictation-results"></a>
 ### See submitted dictation promptly
@@ -380,8 +448,6 @@ one-time automatic title generation has no queued story.
   Partly decided on 2026-10-03: the last transcription segment is held back
   until the next chunk or Stop, and written text is never revised. Sentence
   recognition itself remains undecided.
-- The actual conversion-failure journey and the bounded same-session retry
-  interaction; service failures remain unobserved.
 - Any distinct navigation problem left after source-content preservation fixes.
 - The adequacy of OS dictation or external transcription for explicit title
   input. Optional one-time automatic title generation stays deferred.
