@@ -68,8 +68,61 @@ describe("NoteAudioTools dictation status", () => {
 
     finishStop(new File([], "test.webm"))
     await flushPromises()
-    expect(dictationStatus(wrapper)).toBe("Ready to record")
+    expect(dictationStatus(wrapper)).toBe("No speech was turned into text.")
     expect(findButtonByText(wrapper, "Record")).toBeTruthy()
+  })
+
+  describe("after Stop", () => {
+    const stopConverting = (segmentTexts: string[]) => {
+      audioToolsVm(wrapper).audioRecorder.stopRecording.mockImplementation(
+        async () => {
+          await processAudio(wrapper)
+          return new File([], "test.webm")
+        }
+      )
+      mockSdkService(AiAudioController, "audioToText", {
+        segmentTexts,
+        endTimestamp: "00:00:37,270",
+      })
+    }
+
+    let saveContent: ReturnType<typeof mockSdkService>
+
+    beforeEach(() => {
+      useNoteStore().refreshNoteRealm(realm)
+      saveContent = mockSdkService(
+        TextContentController,
+        "updateNoteContent",
+        makeMe.aNoteRealm.please()
+      )
+    })
+
+    it("says text was added when a passage was written", async () => {
+      await startRecording(wrapper)
+      stopConverting(["hello"])
+      await stopRecording(wrapper)
+      expect(dictationStatus(wrapper)).toBe("Added to your note.")
+    })
+
+    it("says no speech was turned into text when the conversion returned none", async () => {
+      await startRecording(wrapper)
+      stopConverting([])
+      await stopRecording(wrapper)
+      expect(dictationStatus(wrapper)).toBe("No speech was turned into text.")
+      expect(saveContent).not.toHaveBeenCalled()
+    })
+
+    it("starts a new recording with nothing counted", async () => {
+      await startRecording(wrapper)
+      stopConverting(["hello"])
+      await stopRecording(wrapper)
+
+      await startRecording(wrapper)
+      expect(dictationStatus(wrapper)).toBe("Recording. Speak now.")
+      stopConverting([])
+      await stopRecording(wrapper)
+      expect(dictationStatus(wrapper)).toBe("No speech was turned into text.")
+    })
   })
 
   it("keeps recording status and Stop when a mid-speech conversion finishes", async () => {

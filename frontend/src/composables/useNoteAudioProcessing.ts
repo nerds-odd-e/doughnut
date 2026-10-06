@@ -11,6 +11,7 @@ export function useNoteAudioProcessing(
   const noteStore = useNoteStore()
   const noteId = note.id
   const isProcessing = ref(false)
+  const wroteText = ref(false)
 
   const processAudio = async (
     chunk: AudioChunk
@@ -32,7 +33,9 @@ export function useNoteAudioProcessing(
       }
 
       try {
-        await noteStore.appendDictatedText(noteId, response.segmentTexts ?? [])
+        const segmentTexts = response.segmentTexts ?? []
+        await noteStore.appendDictatedText(noteId, segmentTexts)
+        if (segmentTexts.length) wroteText.value = true
       } catch (saveError) {
         errors.value = saveError as Record<string, string | undefined>
         return
@@ -50,5 +53,5 @@ export function useNoteAudioProcessing(
     }
   }
 
-  return { processAudio, isProcessing }
+  return { processAudio, isProcessing, wroteText }
 }

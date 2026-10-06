@@ -46,7 +46,7 @@
       </button>
       <button
         class="daisy-btn"
-        @click="saveAudioLocally"
+        @click="saveAudioLocally(audioFile as Blob)"
         :disabled="isRecording || !audioFile"
         title="Save Audio Locally"
       >
@@ -78,6 +78,7 @@
 import { computed, onBeforeUnmount, ref, type PropType } from "vue"
 import { createAudioRecorder } from "../../../models/audio/audioRecorder"
 import { createWakeLocker } from "../../../models/wakeLocker"
+import { saveAudioLocally } from "@/models/audio/saveAudioLocally"
 import type { Note } from "@generated/donut-backend-api"
 import Waveform from "./Waveform.vue"
 import FullScreen from "@/components/common/FullScreen.vue"
@@ -95,6 +96,8 @@ const statusByPhase = {
   ready: "Ready to record",
   recording: "Recording. Speak now.",
   stopping: "Turning your speech into text…",
+  added: "Added to your note.",
+  nothingAdded: "No speech was turned into text.",
 } as const
 const phase = ref<keyof typeof statusByPhase>("ready")
 const isRecording = computed(() => phase.value === "recording")
@@ -102,7 +105,10 @@ const status = computed(() => statusByPhase[phase.value])
 const wakeLocker = createWakeLocker()
 const showAdvancedOptions = ref(false)
 
-const { processAudio, isProcessing } = useNoteAudioProcessing(note, errors)
+const { processAudio, isProcessing, wroteText } = useNoteAudioProcessing(
+  note,
+  errors
+)
 
 const audioRecorder = createAudioRecorder(processAudio)
 const audioDevices = audioRecorder.getAudioDevices()
@@ -119,6 +125,7 @@ const onDeviceChange = async (event: Event) => {
 
 const startRecording = async () => {
   errors.value = undefined
+  wroteText.value = false
   try {
     await wakeLocker.request()
     await audioRecorder.startRecording()
@@ -134,21 +141,12 @@ const stopRecording = async () => {
   try {
     audioFile.value = await audioRecorder.stopRecording()
   } finally {
-    phase.value = "ready"
+    phase.value = errors.value?.conversion
+      ? "ready"
+      : wroteText.value
+        ? "added"
+        : "nothingAdded"
     await wakeLocker.release()
-  }
-}
-
-const saveAudioLocally = () => {
-  if (audioFile.value) {
-    const url = URL.createObjectURL(audioFile.value)
-    const a = document.createElement("a")
-    a.href = url
-    a.download = "recorded_audio.wav"
-    document.body.appendChild(a)
-    a.click()
-    document.body.removeChild(a)
-    URL.revokeObjectURL(url)
   }
 }
 

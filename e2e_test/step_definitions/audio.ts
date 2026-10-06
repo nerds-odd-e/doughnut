@@ -29,6 +29,10 @@ When('I stop recording audio', () => {
   start.assumeAudioTools().stopRecording()
 })
 
+Then('I should be told my speech was added to my note', () => {
+  start.assumeAudioTools().expectAddedToNote()
+})
+
 Then(
   'I should be told my speech could not be turned into text, with Retry',
   () => {

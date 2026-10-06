@@ -15,13 +15,19 @@ const audioToolsPage = () => {
       return this
     },
     stopRecording() {
-      cy.findByRole('button', { name: 'Stop' }).click()
-      // Final transcription (audio-to-text) raises no busy marker; the saved file appears once it finishes.
-      cy.findByRole('button', {
-        name: 'Save Audio Locally',
-        timeout: 30000,
-      }).should('not.be.disabled')
+      audioToolsPanel().within(() => {
+        cy.findByRole('button', { name: 'Stop' }).click()
+        cy.findByRole('status', { timeout: 30000 })
+          .should('not.have.text', 'Recording. Speak now.')
+          .and('not.have.text', 'Turning your speech into text…')
+      })
       waitUntilAppIsNotBusy()
+      return this
+    },
+    expectAddedToNote() {
+      audioToolsPanel()
+        .findByRole('status')
+        .should('have.text', 'Added to your note.')
       return this
     },
     expectConversionFailureWithRetry() {

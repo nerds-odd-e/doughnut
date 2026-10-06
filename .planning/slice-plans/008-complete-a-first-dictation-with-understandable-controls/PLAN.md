@@ -172,7 +172,8 @@ check something present in every state.
 
 ### 2. After Stop the panel says whether text was added
 Type: Behavior
-Status: planned
+Status: done
+Accepted proof: frontend audio command, 13 files, 99 tests passed (`NoteAudioTools.status.spec.ts` "after Stop" cases for added, no segments with no save, and a new Record counting nothing); mocked journey 2 passing, scenario 1 observes "Added to your note." after Stop, then the saved content.
 Proof: first scenario of the mocked journey observes "Added to your note." after Stop and then the saved content; mounted tests for Stop with no conversion and for a conversion with no segments; frontend audio tests green.
 
 Behavior: a recording in which at least one passage was written → Stop
@@ -266,3 +267,7 @@ under a name that matches.
 - The mocked journey's dev server stops on a Biome format error, so edits must
   be Biome-clean before that journey runs.
 - While Stop is finishing, the main action already shows Record again.
+- "Written" is `wroteText` in `useNoteAudioProcessing`, reset by Record. Until
+  slice 3, a failed save after Stop shows "No speech was turned into text.";
+  slice 3 must make that claim nothing. After a conversion failure at Stop
+  the status returns to "Ready to record" until slice 4.

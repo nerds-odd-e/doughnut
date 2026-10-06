@@ -6,8 +6,10 @@ Options offers full-screen editing. The one main action is Record when ready
 and Stop while recording; the microphone chooser sits beside Stop. A status
 that assistive technology announces says "Ready to record", "Recording. Speak
 now." (a mid-speech conversion does not change it), or "Turning your speech
-into text…" until Stop has finished, then "Ready to record" again. Dictation
-writes only to the note body.
+into text…" until Stop has finished. Then it says "Added to your note." when
+the recording wrote at least one passage, or "No speech was turned into text."
+when it wrote nothing; after a failed conversion it says "Ready to record".
+Each Record starts counting afresh. Dictation writes only to the note body.
 
 ## Adding dictated text to a note
 
