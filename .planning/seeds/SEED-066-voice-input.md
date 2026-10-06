@@ -153,7 +153,7 @@ technical redesign, or speculative infrastructure.
 
 **Identity:** SEED-066#no-record-while-stopping
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/010-keep-the-dictation-result-true-while-stop-finishes/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"0e2fc18a0c59bac414e12b00e30403df0224c78015dc50ff33e6d1c1539e01ad","plan":"6515b7fa08928d226bd524fd0dc279f82d6295f60821e45f5473477b5323c6b4"}}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/010-keep-the-dictation-result-true-while-stop-finishes/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"0e2fc18a0c59bac414e12b00e30403df0224c78015dc50ff33e6d1c1539e01ad","plan":"203e66e2a982bdf10faadfbd970784510571d442732832a6be98b20bd4cc37c5"}}
 ```
 
 **Goal:** A retrospective correction of
