@@ -159,7 +159,7 @@ if (props.field === "edit content") {
         flushAndWait,
         changeDraft: (change) => {
           onUpdate(change(localValue.value))
-          flush()
+          return autosave.flushAndConfirmDraftSaved()
         },
       })
     },

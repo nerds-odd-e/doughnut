@@ -65,8 +65,11 @@ export default class NoteTextEditing {
     await this.updateTextField(noteId, "edit content", value.content)
   }
 
-  async appendDictatedText(noteId: Donut.ID, segmentTexts: string[]) {
-    if (segmentTexts.length === 0) return
+  /** Joins the passage to the body; `saved` settles once the body holding it is saved. Without an open body editor the save happens here, and its failure throws. */
+  async appendDictatedText(
+    noteId: Donut.ID,
+    segmentTexts: string[]
+  ): Promise<{ saved: boolean | Promise<boolean> }> {
     const japaneseOrChineseWriting =
       /[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}\u30FC\u3000-\u303F\uFF00-\uFFEF]/u
     const join = (text: string) =>
@@ -79,7 +82,8 @@ export default class NoteTextEditing {
           ? body + segment
           : `${body} ${segment}`
       }, text)
-    if (changeOpenNoteContentDraft(noteId, join)) return
+    const draftSaved = changeOpenNoteContentDraft(noteId, join)
+    if (draftSaved) return { saved: draftSaved }
 
     const realm = await this.store.getOrLoadNoteRealm(noteId)
     await this.updateTextField(
@@ -87,5 +91,6 @@ export default class NoteTextEditing {
       "edit content",
       join(realm.note.content ?? "")
     )
+    return { saved: true }
   }
 }

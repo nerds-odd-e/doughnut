@@ -1,88 +1,69 @@
 <template>
-  <div>
+  <section :aria-label="noteMoreOptionsTitles.audio">
     <Waveform
       class="mb-5"
       :audioRecorder="audioRecorder"
       :isRecording="isRecording"
     />
+    <div class="flex justify-center items-center gap-2 text-center mb-3">
+      <p role="status" :class="{ 'text-error': isProblem }">{{ status }}</p>
+      <button v-if="phase === 'notConverted'" class="daisy-btn daisy-btn-sm retry-button" @click="retry">Retry</button>
+    </div>
     <div
-      v-if="errors"
+      v-if="errors && phase !== 'notConverted'"
       class="daisy-alert"
       :class="errors.conversion ? 'daisy-alert-error' : 'daisy-alert-info'"
     >{{ errors.conversion ?? errors }}</div>
-    <button
-      v-if="!isRecording && errors?.conversion && audioRecorder.hasUnconvertedAudio()"
-      class="daisy-btn daisy-btn-sm retry-button"
-      @click="stopRecording"
-      :disabled="isProcessing"
-      title="Retry"
-    >Retry</button>
     <div class="button-group">
-      <template v-if="!isRecording">
-        <button class="daisy-btn" @click="startRecording" title="Record Audio">
-          <Mic :size="24" />
-        </button>
-      </template>
+      <button v-if="!isRecording" class="daisy-btn labeled-action" @click="startRecording">
+        <Mic :size="24" />
+        Record
+      </button>
       <template v-else>
         <select
           class="device-select"
           :value="selectedDevice"
           @change="onDeviceChange"
-          title="Select Audio Device"
+          aria-label="Microphone"
         >
           <option v-for="device in audioDevices" :key="device.deviceId" :value="device.deviceId">
             {{ device.label || `Microphone ${device.deviceId.slice(0, 4)}...` }}
           </option>
         </select>
+        <button class="daisy-btn labeled-action" @click="stopRecording">
+          <Square :size="24" />
+          Stop
+        </button>
+        <button class="daisy-btn labeled-action" @click="audioRecorder.tryFlush()" :disabled="isProcessing">Write text now</button>
       </template>
-      <button class="daisy-btn" @click="tryFlushAudio" :disabled="!isRecording || isProcessing" title="Flush Audio">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="24" height="24">
-          <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
-        </svg>
-      </button>
-      <button class="daisy-btn" @click="stopRecording" :disabled="!isRecording" title="Stop Recording">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="24" height="24">
-          <path d="M6 6h12v12H6z"/>
-        </svg>
-      </button>
-      <button
-        class="daisy-btn"
-        @click="saveAudioLocally"
-        :disabled="isRecording || !audioFile"
-        title="Save Audio Locally"
-      >
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="24" height="24">
-          <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
-        </svg>
-      </button>
-      <button
-        class="daisy-btn"
-        @click="toggleAdvancedOptions"
-        title="Advanced Options"
-      >
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="24" height="24">
-          <path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.07.62-.07.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/>
-        </svg>
-      </button>
     </div>
-    <div v-if="showAdvancedOptions" class="advanced-options">
+    <div class="secondary-actions">
+      <button
+        @click="saveAudioLocally(audioFile as Blob)"
+        :disabled="isRecording || !audioFile"
+      >
+        <Download :size="18" />
+        Save audio
+      </button>
       <FullScreen>
         <div v-if="errors" class="fullscreen-error">
           {{ Object.values(errors)[0] }}
         </div>
       </FullScreen>
     </div>
-  </div>
+  </section>
 </template>
 
 <script setup lang="ts">
-import { onBeforeUnmount, ref, type PropType } from "vue"
+import { computed, onBeforeUnmount, ref, type PropType } from "vue"
 import { createAudioRecorder } from "../../../models/audio/audioRecorder"
 import { createWakeLocker } from "../../../models/wakeLocker"
+import { saveAudioLocally } from "@/models/audio/saveAudioLocally"
 import type { Note } from "@generated/donut-backend-api"
 import Waveform from "./Waveform.vue"
 import FullScreen from "@/components/common/FullScreen.vue"
-import { Mic } from "@lucide/vue"
+import { noteMoreOptionsTitles } from "./noteMoreOptionsTitles"
+import { Download, Mic, Square } from "@lucide/vue"
 import { useNoteAudioProcessing } from "@/composables/useNoteAudioProcessing"
 
 const { note } = defineProps({
@@ -91,15 +72,27 @@ const { note } = defineProps({
 
 const audioFile = ref<Blob | undefined>()
 const errors = ref<Record<string, string | undefined>>()
-const isRecording = ref(false)
+const statusByPhase = {
+  ready: "Ready to record",
+  recording: "Recording. Speak now.",
+  stopping: "Turning your speech into text…",
+  added: "Added to your note.",
+  nothingAdded: "No speech was turned into text.",
+  notConverted:
+    "Could not turn your speech into text. Your recording is kept until you close Audio tools.",
+  micUnavailable:
+    "Could not use the microphone. Allow microphone access in your browser, then try again.",
+} as const
+const phase = ref<keyof typeof statusByPhase>("ready")
+const isRecording = computed(() => phase.value === "recording")
+const status = computed(() => statusByPhase[phase.value])
+const isProblem = computed(
+  () => phase.value === "notConverted" || phase.value === "micUnavailable"
+)
 const wakeLocker = createWakeLocker()
-const showAdvancedOptions = ref(false)
 
-const { processAudio, isProcessing } = useNoteAudioProcessing(note, errors)
-
-const toggleAdvancedOptions = () => {
-  showAdvancedOptions.value = !showAdvancedOptions.value
-}
+const { processAudio, isProcessing, startNewRecording, writtenResult } =
+  useNoteAudioProcessing(note, errors)
 
 const audioRecorder = createAudioRecorder(processAudio)
 const audioDevices = audioRecorder.getAudioDevices()
@@ -116,36 +109,35 @@ const onDeviceChange = async (event: Event) => {
 
 const startRecording = async () => {
   errors.value = undefined
+  startNewRecording()
   try {
     await wakeLocker.request()
     await audioRecorder.startRecording()
-    isRecording.value = true
+    phase.value = "recording"
   } catch (error) {
-    errors.value = { recording: "Failed to start recording" }
+    phase.value = "micUnavailable"
     await wakeLocker.release()
   }
 }
 
 const stopRecording = async () => {
-  isRecording.value = false
+  phase.value = "stopping"
   try {
     audioFile.value = await audioRecorder.stopRecording()
   } finally {
+    const written = await writtenResult()
+    if (errors.value?.conversion && audioRecorder.hasUnconvertedAudio()) {
+      phase.value = "notConverted"
+    } else {
+      phase.value = written === "notSaved" ? "ready" : written
+    }
     await wakeLocker.release()
   }
 }
 
-const saveAudioLocally = () => {
-  if (audioFile.value) {
-    const url = URL.createObjectURL(audioFile.value)
-    const a = document.createElement("a")
-    a.href = url
-    a.download = "recorded_audio.wav"
-    document.body.appendChild(a)
-    a.click()
-    document.body.removeChild(a)
-    URL.revokeObjectURL(url)
-  }
+const retry = () => {
+  errors.value = undefined
+  return stopRecording()
 }
 
 onBeforeUnmount(() => {
@@ -153,12 +145,6 @@ onBeforeUnmount(() => {
     stopRecording()
   }
 })
-
-const tryFlushAudio = async () => {
-  if (isRecording.value) {
-    await audioRecorder.tryFlush()
-  }
-}
 </script>
 
 <style scoped>
@@ -179,12 +165,21 @@ const tryFlushAudio = async () => {
   flex-shrink: 0;
 }
 
+.labeled-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border-radius: 9999px;
+  padding: 10px 18px;
+}
+
 .daisy-btn:hover:not(:disabled) {
   background-color: #3182ce;
   transform: scale(1.05);
 }
 
-.daisy-btn:disabled {
+.daisy-btn:disabled,
+.secondary-actions :deep(button:disabled) {
   background-color: #a0aec0;
   cursor: not-allowed;
 }
@@ -200,15 +195,33 @@ const tryFlushAudio = async () => {
 }
 
 .retry-button {
-  display: block;
-  margin: 8px auto;
   border-radius: 8px;
 }
 
-.advanced-options {
+.secondary-actions {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
   margin-top: 20px;
-  padding-top: 20px;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.secondary-actions :deep(button) {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border: none;
+  border-radius: 9999px;
+  background-color: #2d3748;
+  color: white;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.secondary-actions :deep(button:hover:not(:disabled)) {
+  background-color: #4a5568;
+  transform: scale(1.05);
 }
 
 .fullscreen-error {

@@ -2,7 +2,6 @@ import FullScreen from "@/components/common/FullScreen.vue"
 import { flushPromises, mount, type VueWrapper } from "@vue/test-utils"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 
-const TOGGLE_FULL_SCREEN_TITLE = "Toggle Full Screen"
 const SLOT_CONTENT = "Test Error Message"
 
 describe("FullScreen", () => {
@@ -77,9 +76,7 @@ describe("FullScreen", () => {
 
   it("enters fullscreen mode when button is clicked", async () => {
     const w = mountFullScreen(`<div class="test-error">${SLOT_CONTENT}</div>`)
-    expect(w.find(".fullscreen-btn").attributes("title")).toBe(
-      TOGGLE_FULL_SCREEN_TITLE
-    )
+    expect(w.find(".fullscreen-btn").text()).toBe("Full screen")
 
     await enterFullscreen(w)
 
