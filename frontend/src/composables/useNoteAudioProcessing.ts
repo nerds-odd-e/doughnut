@@ -11,7 +11,19 @@ export function useNoteAudioProcessing(
   const noteStore = useNoteStore()
   const noteId = note.id
   const isProcessing = ref(false)
-  const wroteText = ref(false)
+  let passageSaves: (boolean | Promise<boolean>)[] = []
+
+  const startNewRecording = () => {
+    passageSaves = []
+  }
+
+  /** "notSaved" when this recording wrote passages but none of their saves succeeded. */
+  const writtenResult = async () => {
+    if (!passageSaves.length) return "nothingAdded"
+    return (await Promise.all(passageSaves)).some(Boolean)
+      ? "added"
+      : "notSaved"
+  }
 
   const processAudio = async (
     chunk: AudioChunk
@@ -34,9 +46,15 @@ export function useNoteAudioProcessing(
 
       try {
         const segmentTexts = response.segmentTexts ?? []
-        await noteStore.appendDictatedText(noteId, segmentTexts)
-        if (segmentTexts.length) wroteText.value = true
+        if (segmentTexts.length) {
+          const { saved } = await noteStore.appendDictatedText(
+            noteId,
+            segmentTexts
+          )
+          passageSaves.push(saved)
+        }
       } catch (saveError) {
+        passageSaves.push(false)
         errors.value = saveError as Record<string, string | undefined>
         return
       }
@@ -53,5 +71,5 @@ export function useNoteAudioProcessing(
     }
   }
 
-  return { processAudio, isProcessing, wroteText }
+  return { processAudio, isProcessing, startNewRecording, writtenResult }
 }

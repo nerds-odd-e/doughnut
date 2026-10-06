@@ -105,10 +105,8 @@ const status = computed(() => statusByPhase[phase.value])
 const wakeLocker = createWakeLocker()
 const showAdvancedOptions = ref(false)
 
-const { processAudio, isProcessing, wroteText } = useNoteAudioProcessing(
-  note,
-  errors
-)
+const { processAudio, isProcessing, startNewRecording, writtenResult } =
+  useNoteAudioProcessing(note, errors)
 
 const audioRecorder = createAudioRecorder(processAudio)
 const audioDevices = audioRecorder.getAudioDevices()
@@ -125,7 +123,7 @@ const onDeviceChange = async (event: Event) => {
 
 const startRecording = async () => {
   errors.value = undefined
-  wroteText.value = false
+  startNewRecording()
   try {
     await wakeLocker.request()
     await audioRecorder.startRecording()
@@ -141,11 +139,9 @@ const stopRecording = async () => {
   try {
     audioFile.value = await audioRecorder.stopRecording()
   } finally {
-    phase.value = errors.value?.conversion
-      ? "ready"
-      : wroteText.value
-        ? "added"
-        : "nothingAdded"
+    const written = await writtenResult()
+    phase.value =
+      errors.value?.conversion || written === "notSaved" ? "ready" : written
     await wakeLocker.release()
   }
 }

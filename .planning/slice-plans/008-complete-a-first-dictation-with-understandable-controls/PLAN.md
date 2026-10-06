@@ -189,7 +189,8 @@ completes; slice 3 removes that.
 
 ### 3. "Added to your note" waits for the save and is not claimed when it fails
 Type: Behavior
-Status: planned
+Status: done
+Accepted proof: `NoteAudioTools.savedStatus.spec.ts` (6 tests: pending, done, failed with and without an open editor, typing after the join, typing that replaces the passage's draft before it is sent); frontend audio and shared autosave consumers 44 files, 271 tests, plus image upload, removal and notebook readme 4 files, 24 tests; vue-tsc clean; mocked journey 2 passing.
 Proof: mounted tests with an open body editor (save pending, done, failed; typing after the join) and without one (failed save); typing-while-pending and preservation tests green; mocked journey green.
 
 Behavior: a body editor is open and the passage has joined its draft → while
@@ -267,7 +268,9 @@ under a name that matches.
 - The mocked journey's dev server stops on a Biome format error, so edits must
   be Biome-clean before that journey runs.
 - While Stop is finishing, the main action already shows Record again.
-- "Written" is `wroteText` in `useNoteAudioProcessing`, reset by Record. Until
-  slice 3, a failed save after Stop shows "No speech was turned into text.";
-  slice 3 must make that claim nothing. After a conversion failure at Stop
-  the status returns to "Ready to record" until slice 4.
+- "Written" is the passage saves kept by `useNoteAudioProcessing`
+  (`startNewRecording`, `writtenResult`); Stop waits for them. With an open
+  editor each save is confirmed by `flushAndConfirmDraftSaved` in
+  `useDebouncedTextAutosave`, which follows a newer draft that replaced the
+  passage's draft. A failed save, and a conversion failure at Stop until
+  slice 4, leave the status at "Ready to record".
