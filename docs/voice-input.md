@@ -7,8 +7,11 @@ Advanced Options offers full-screen editing. Dictation writes only to the note b
 ## Adding dictated text to a note
 
 Audio processing returns `segmentTexts`: the written transcription segments
-for the uploaded chunk, in order. Each segment contains the lines after its
-timestamp line, with line breaks replaced by spaces. The client joins these
+for the uploaded chunk, in order. A mid-speech chunk is transcribed by
+`whisper-1` as SRT; each segment contains the lines after its timestamp line,
+with line breaks replaced by spaces. The conversion at Stop (and Retry) is
+transcribed by `gpt-4o-mini-transcribe` as plain text, which is faster, and
+its stripped text is the one segment. The client joins these
 segments to the note using the same rule as successive passages, then saves
 once per response. Nothing is left out, added, or reworded. Audio responses do not
 use the conversation tool's `NoteContentCompletion`, which continues to
@@ -200,19 +203,36 @@ role is unknown.
 
 ## Responsiveness and positive comparisons
 
-| Input | Observed timing |
-| --- | --- |
-| 18.356 s Harvard passage, first recording | First body at 25.17 s from capture, approximately 3.96 s after Stop; audio request 4.42 s |
-| Identical Harvard repeat | Audio request 4.61 s; body stayed identical and settled before Stop |
-| 29.168 s orchard passage with Flush | Audio requests 5.25 / 3.14 / 3.53 s; visible results at 16.73 / 25.30 / 35.75 s from capture; final body settled before Stop |
-| 6.2827 s lighthouse addition | Audio request 2.79 s; visible addition at 12.16 s from capture, 5.88 s after speech ended; body settled before Stop |
+Wait from the Stop click to the complete passage being visible, measured on
+2026-10-06 on local Development at `b86f649322` (Chrome via Playwright on
+macOS, signed in as `manual`, a note with one saved paragraph, the real
+transcription service). Naturally paced recordings entered the synthetic
+MediaStream described under [Observation boundary](#observation-boundary)
+with no pause long enough to start a conversion; Stop was clicked about
+250 ms after the recording ended. Five runs each:
 
-The lighthouse addition and both original paragraphs survived reload exactly
-once and unchanged. They also survived the next distinct recording, despite
+| Input | Median | Slowest | Runs (s) |
+| --- | --- | --- | --- |
+| 18.356 s Harvard passage | 1.39 s | 1.86 s | 1.84, 1.03, 1.86, 1.39, 1.27 |
+| 6.283 s lighthouse addition | 1.09 s | 1.65 s | 0.75, 1.09, 1.65, 0.87, 1.45 |
+
+Nearly all of the wait is the one `audio-to-text` request: under 10 ms passes
+before it starts and under 10 ms after it ends. Before the Stop conversion
+moved from `whisper-1` SRT to `gpt-4o-mini-transcribe` plain text, the same
+Harvard runs on a held stack took a median 2.60 s (slowest 3.62 s), and the
+lighthouse runs 1.97 s (slowest 2.97 s); uploading the 16 kHz WAV took about
+60 ms of that. After reload, the original paragraph and the passage each
+appeared once.
+
+With the faster Stop transcription, a Stop passage that continues a sentence
+held back or flushed earlier starts with a capital letter, for example
+"…comparing different editions Is a gift for my sister…".
+
+In the 2026-10-03 sessions, the lighthouse addition and both original
+paragraphs survived reload exactly once and unchanged. They also survived the next distinct recording, despite
 loss within that later recording. No duplication or stale prior addition was
 identified in those two sessions. The navigation destination survived.
 These comparisons establish neither a general preservation guarantee nor
 failure frequency.
 
-The empty-body UI baseline succeeded. Timing identifies stages,
-not the cause of delay, model suitability or a numeric acceptance target.
+The empty-body UI baseline succeeded.

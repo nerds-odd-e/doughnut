@@ -273,7 +273,14 @@ without a new breakdown.
 
 ### 3. Development meets the target, and the documentation states the measured wait
 Type: Behavior
-Status: planned — after landing on `main`, with the owner's go-ahead for paid calls
+Status: done — measured 2026-10-06 on Development at `b86f649322` (synced to `main` by the owner), owner's go-ahead
+
+Results (ms, total from Stop to visible; every run one request after Stop):
+Harvard 1844, 1028, 1855, 1392, 1270 — median 1392, slowest 1855; lighthouse
+749, 1090, 1647, 869, 1448 — median 1090, slowest 1647. Target met for both.
+Reload after run 1 of each showed the original paragraph and the passage
+once. docs/voice-input.md "Responsiveness and positive comparisons" now
+states these results, their conditions, the breakdown and the change.
 Proof: five Harvard and five lighthouse runs on Development at the landed revision; reading docs/voice-input.md.
 
 Behavior: Development runs the landed revision → the same runs as slice 1 →
