@@ -65,15 +65,6 @@ export function processAudio(
   return audioToolsVm(wrapper).processAudio(chunk)
 }
 
-export function findButtonByTitle(
-  wrapper: NoteAudioToolsWrapper,
-  title: string
-) {
-  return wrapper
-    .findAll("button")
-    .find((button) => button.attributes("title") === title)
-}
-
 export function findButtonByText(wrapper: NoteAudioToolsWrapper, text: string) {
   return wrapper.findAll("button").find((button) => button.text() === text)
 }

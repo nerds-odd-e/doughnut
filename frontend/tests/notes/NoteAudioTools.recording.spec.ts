@@ -5,7 +5,6 @@ import {
   audioToolsVm,
   dictationStatus,
   findButtonByText,
-  findButtonByTitle,
   midSpeechChunk,
   mountNoteAudioTools,
   processAudio,
@@ -68,7 +67,7 @@ describe("NoteAudioTools recording controls", () => {
       findButtonByText(wrapper, "Write text now")!.attributes("disabled")
     ).toBeUndefined()
     expect(
-      findButtonByTitle(wrapper, "Save Audio Locally")!.attributes("disabled")
+      findButtonByText(wrapper, "Save audio")!.attributes("disabled")
     ).toBeDefined()
   })
 
@@ -193,8 +192,8 @@ describe("NoteAudioTools recording controls", () => {
     expect(vm.audioRecorder.stopRecording).toHaveBeenCalled()
   })
 
-  it("enables Save Audio Locally after a recording produces a file", async () => {
-    const saveButton = findButtonByTitle(wrapper, "Save Audio Locally")!
+  it("enables Save audio after a recording produces a file", async () => {
+    const saveButton = findButtonByText(wrapper, "Save audio")!
     expect(saveButton.attributes("disabled")).toBeDefined()
 
     await startRecording(wrapper)
@@ -205,7 +204,7 @@ describe("NoteAudioTools recording controls", () => {
     expect(saveButton.attributes("disabled")).toBeFalsy()
   })
 
-  it("downloads audio via object URL when Save Audio Locally is clicked", async () => {
+  it("downloads audio via object URL when Save audio is clicked", async () => {
     const { mockCreateObjectURL } = await import(
       "@tests/notes/noteAudioToolsMocks"
     )
@@ -217,7 +216,7 @@ describe("NoteAudioTools recording controls", () => {
     const mockRemoveChild = vi.spyOn(document.body, "removeChild")
     const mockClick = vi.spyOn(HTMLAnchorElement.prototype, "click")
 
-    await findButtonByTitle(wrapper, "Save Audio Locally")!.trigger("click")
+    await findButtonByText(wrapper, "Save audio")!.trigger("click")
 
     expect(URL.createObjectURL).toHaveBeenCalledWith(audioFile)
     expect(mockAppendChild).toHaveBeenCalled()

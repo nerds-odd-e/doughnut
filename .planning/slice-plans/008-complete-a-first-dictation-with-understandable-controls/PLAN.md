@@ -247,7 +247,8 @@ describing the same action under its new name.
 
 ### 7. Saving the audio, full screen, and the microphone chooser are named in words
 Type: Behavior
-Status: planned
+Status: done
+Accepted proof: frontend audio command, 14 files, 107 tests: "Save audio" download and enable cases in `NoteAudioTools.recording.spec.ts`, `NoteAudioTools.fullScreen.spec.ts`, `FullScreen.spec.ts`, and "names every control in words when ready, recording, and failed after Stop" in `NoteAudioTools.retry.spec.ts`; vue-tsc clean. No browser test reads these controls.
 Proof: the download and full-screen mounted cases green under the new names; a mounted test that, in the ready, recording, and failed-after-Stop states, every control in the panel has readable text or a label; `tests/common/FullScreen` green.
 
 Behavior: Audio tools open → saving the recorded audio and full screen are
@@ -283,5 +284,7 @@ under a name that matches.
   renames its errors.
 - "Write text now" calls `audioRecorder.tryFlush()` directly and shares the
   `.labeled-action` style with Record and Stop.
+- "Save audio" and "Full screen" sit in a `.secondary-actions` row styled by
+  `NoteAudioTools.vue`; `FullScreen.vue` keeps only the overlay's styles.
 - A mounted test that sets the note realm calls `refreshNoteRealm` after
   mounting, because mounting reloads the note.

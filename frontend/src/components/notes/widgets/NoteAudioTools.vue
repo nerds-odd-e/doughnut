@@ -7,7 +7,7 @@
     />
     <div class="flex justify-center items-center gap-2 text-center mb-3">
       <p role="status" :class="{ 'text-error': isProblem }">{{ status }}</p>
-      <button v-if="phase === 'notConverted'" class="daisy-btn daisy-btn-sm retry-button" @click="retry" title="Retry">Retry</button>
+      <button v-if="phase === 'notConverted'" class="daisy-btn daisy-btn-sm retry-button" @click="retry">Retry</button>
     </div>
     <div
       v-if="errors && phase !== 'notConverted'"
@@ -24,7 +24,7 @@
           class="device-select"
           :value="selectedDevice"
           @change="onDeviceChange"
-          title="Select Audio Device"
+          aria-label="Microphone"
         >
           <option v-for="device in audioDevices" :key="device.deviceId" :value="device.deviceId">
             {{ device.label || `Microphone ${device.deviceId.slice(0, 4)}...` }}
@@ -36,27 +36,15 @@
         </button>
         <button class="daisy-btn labeled-action" @click="audioRecorder.tryFlush()" :disabled="isProcessing">Write text now</button>
       </template>
+    </div>
+    <div class="secondary-actions">
       <button
-        class="daisy-btn"
         @click="saveAudioLocally(audioFile as Blob)"
         :disabled="isRecording || !audioFile"
-        title="Save Audio Locally"
       >
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="24" height="24">
-          <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
-        </svg>
+        <Download :size="18" />
+        Save audio
       </button>
-      <button
-        class="daisy-btn"
-        @click="showAdvancedOptions = !showAdvancedOptions"
-        title="Advanced Options"
-      >
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="24" height="24">
-          <path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.07.62-.07.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/>
-        </svg>
-      </button>
-    </div>
-    <div v-if="showAdvancedOptions" class="advanced-options">
       <FullScreen>
         <div v-if="errors" class="fullscreen-error">
           {{ Object.values(errors)[0] }}
@@ -75,7 +63,7 @@ import type { Note } from "@generated/donut-backend-api"
 import Waveform from "./Waveform.vue"
 import FullScreen from "@/components/common/FullScreen.vue"
 import { noteMoreOptionsTitles } from "./noteMoreOptionsTitles"
-import { Mic, Square } from "@lucide/vue"
+import { Download, Mic, Square } from "@lucide/vue"
 import { useNoteAudioProcessing } from "@/composables/useNoteAudioProcessing"
 
 const { note } = defineProps({
@@ -102,7 +90,6 @@ const isProblem = computed(
   () => phase.value === "notConverted" || phase.value === "micUnavailable"
 )
 const wakeLocker = createWakeLocker()
-const showAdvancedOptions = ref(false)
 
 const { processAudio, isProcessing, startNewRecording, writtenResult } =
   useNoteAudioProcessing(note, errors)
@@ -191,7 +178,8 @@ onBeforeUnmount(() => {
   transform: scale(1.05);
 }
 
-.daisy-btn:disabled {
+.daisy-btn:disabled,
+.secondary-actions :deep(button:disabled) {
   background-color: #a0aec0;
   cursor: not-allowed;
 }
@@ -210,10 +198,30 @@ onBeforeUnmount(() => {
   border-radius: 8px;
 }
 
-.advanced-options {
+.secondary-actions {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
   margin-top: 20px;
-  padding-top: 20px;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.secondary-actions :deep(button) {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border: none;
+  border-radius: 9999px;
+  background-color: #2d3748;
+  color: white;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.secondary-actions :deep(button:hover:not(:disabled)) {
+  background-color: #4a5568;
+  transform: scale(1.05);
 }
 
 .fullscreen-error {

@@ -11,7 +11,6 @@ import {
   audioToolsVm,
   dictationStatus,
   findButtonByText,
-  findButtonByTitle,
   mountNoteAudioTools,
   processAudio,
   startRecording,
@@ -78,11 +77,29 @@ describe("NoteAudioTools Retry after a failed conversion", () => {
     wrapper?.unmount()
   })
 
-  const retryButton = () => findButtonByTitle(wrapper, "Retry")
+  const retryButton = () => findButtonByText(wrapper, "Retry")
   const failAtStop = async () => {
     await startRecording(wrapper)
     await stopRecording(wrapper)
   }
+
+  it("names every control in words when ready, recording, and failed after Stop", async () => {
+    const unnamedControls = () =>
+      wrapper
+        .findAll("button, select")
+        .filter(
+          (control) =>
+            !control.text().trim() && !control.attributes("aria-label")
+        )
+
+    expect(unnamedControls()).toEqual([])
+    await startRecording(wrapper)
+    expect(wrapper.find("select").attributes("aria-label")).toBe("Microphone")
+    expect(unnamedControls()).toEqual([])
+    await stopRecording(wrapper)
+    expect(dictationStatus(wrapper)).toBe(failedAtStop)
+    expect(unnamedControls()).toEqual([])
+  })
 
   it("keeps recording without Retry when a conversion fails mid-speech", async () => {
     await startRecording(wrapper)
