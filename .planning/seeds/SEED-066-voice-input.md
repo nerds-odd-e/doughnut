@@ -418,7 +418,7 @@ failed. Today that is spread over separate flags.
 
 **Identity:** SEED-066#create-with-spoken-title
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"unselected"}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/009-create-a-note-using-a-spoken-title/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"2f1125acaf59cbbcec2cc34abe4aeb454ecbd08cca6255abacbbae303e9bff3b","plan":"d106c12dc330094fb40c186deee427d0e6429b2817f6a02641819f884edc4d1e"}}
 ```
 
 **Goal:** A note author who is creating a note names it by speaking instead
