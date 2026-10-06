@@ -151,7 +151,7 @@ record its actual duration with the results.
 
 ### 1. The current wait after Stop and where it goes are measured
 Type: Behavior
-Status: planned — needs the owner's go-ahead for paid transcription calls
+Status: done — measured 2026-10-06 with the owner's go-ahead
 Proof: the results table below this slice, filled from five Harvard and five lighthouse runs.
 
 Behavior: the held stack runs this branch's code with the real transcription
@@ -165,9 +165,51 @@ This is the probe for the last two premises. If the held stack cannot reach
 the transcription service, or the synthetic MediaStream method does not work
 on it, stop and change the plan before slice 2. No product code changes here.
 
+#### Slice 1 results
+
+Held stack (`pnpm e2e:hold --paid-openai`) from this worktree at
+`52dff779b9`, real `whisper-1`, headless Chromium (Playwright) with the
+synthetic MediaStream method. Stop was clicked about 250 ms after the
+recording ended. "Visible" is the last change to the note body after Stop.
+Every run sent exactly one `audio-to-text` request, after Stop. Times in ms.
+
+| Recording | Run | Stop → request start | Request | Request end → visible | Total |
+| --- | --- | --- | --- | --- | --- |
+| Harvard 18.356 s | 1 | 5 | 2456 | 46 | 2506 |
+| Harvard | 2 | 4 | 3045 | 29 | 3077 |
+| Harvard | 3 | 4 | 3583 | 31 | 3618 |
+| Harvard | 4 | 7 | 2189 | 35 | 2232 |
+| Harvard | 5 | 6 | 2557 | 38 | 2600 |
+| Lighthouse 6.283 s | 1 | 5 | 2728 | 62 | 2794 |
+| Lighthouse | 2 | 3 | 2940 | 29 | 2971 |
+| Lighthouse | 3 | 2 | 1786 | 26 | 1815 |
+| Lighthouse | 4 | 2 | 1880 | 25 | 1908 |
+| Lighthouse | 5 | 3 | 1936 | 28 | 1967 |
+
+- Harvard: median 2600, slowest 3618 — target missed.
+- Lighthouse: median 1967, slowest 2971 — target met, narrowly.
+- About 98% of the wait is the `audio-to-text` request. Before it: under
+  10 ms. After it (join, render): under 70 ms.
+- Upload is not the cost: macOS `networkQuality` measured 75 Mbps uplink, so
+  the ~590 kB WAV takes about 60 ms to send to OpenAI. The time is the
+  `whisper-1` transcription call itself.
+- Reload after Harvard run 1 showed "This is class 1." and the passage once
+  each.
+- The lighthouse recording was synthesized with `say -r 150`, converted to
+  mono 48 kHz WAV, 6.282667 s.
+
 ### 2. A short dictation is visible within the target after Stop
 Type: Behavior
-Status: planned — its change is written here after slice 1
+Status: planned — candidate chosen from slice 1; transcription option probe awaits the owner's go-ahead
+
+Chosen candidate (from slice 1): change the transcription request made at
+Stop. Upload, the wait before the request, and the join are each too small to
+matter. Mid-speech requests keep `whisper-1` SRT, because hold-back needs
+segment end times. Before any product code changes, a direct probe compares
+the Stop request's options on the 16 kHz mono Harvard and lighthouse WAVs
+(five calls each): `whisper-1` SRT (today), and transcription models that
+return plain text. The change is written here only when one option meets the
+target in that probe.
 Proof: five Harvard and five lighthouse runs on the held stack with branch code (median ≤ 2 s, none > 3 s); reload shows the original paragraph and the passage once; one orchard run matches the documented passages; the frontend audio tests, the mocked journey, and (when backend code changes) the backend audio tests are green. Run those tests once before changing code.
 
 Behavior: a note with one saved paragraph, and an author who has recorded up
@@ -200,4 +242,8 @@ results and report to the owner; do not change code under this slice.
 
 ## Learnings
 
-None yet.
+- The synthetic MediaStream method works in headless Playwright Chromium
+  against the held stack (`--autoplay-policy=no-user-gesture-required`; log
+  in by calling `/api/healthcheck` with Basic auth to get a session cookie).
+- The Stop wait is almost entirely the `whisper-1` call, and it varies by
+  about 1.4 s from run to run for the same audio.
