@@ -1,12 +1,12 @@
 # DearDough Process Findings
 
-Retained material shared-process findings, reviewed 2026-10-03. Only an explicit
+Retained material shared-process findings, reviewed 2026-10-06. Only an explicit
 queued follow-up is planned work; other entries are open and unqueued. A retained
 released response is not proof of effectiveness. Unknown provenance stays unknown.
 [Response status](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/finding-names.md).
 Full pre-trim evidence: `8830c682704aac3bbb34bf9b1204da8feba042ca:DearDough.md`. Older narratives live in Git, not a second archive.
 
-- Highest allocated local number: 211. Removed local codes are never reused.
+- Highest allocated local number: 212. Removed local codes are never reused.
 
 ## ODF-110 — A readiness replay observed only the plan's named seam, not the rest of the slice's journey
 
@@ -17,7 +17,7 @@ Former local code: DD-171.
 
 A replay resolves the named readiness seam without exercising the rest of the slice's promised journey, leaving a later operation to force a scope stop.
 
-Follow-up: Open, unqueued. Responses 2c5ff71 (0.3.43) and fcc29fad (0.3.48) are released; the same class of unobserved premise is reported again on 0.3.51 and 0.3.52, so neither is shown to resolve it.
+Follow-up: queued, not resolved: [Observe decisive planning premises through the full promised journey](../open-dough/.planning/seeds/SEED-108-planning-observations-cover-promised-journeys.md#observe-promised-journey) — SEED-108#observe-promised-journey. Responses 2c5ff71 (0.3.43) and fcc29fad (0.3.48) are released; the same class of unobserved premise is reported again on 0.3.51–0.3.56, so neither is shown to resolve it.
 
 - Execution: SEED-035 story 14 / slice-plans/025-convert-raw-notebooks-to-lfs / 071d0e0861; Timestamp: 2026-09-24, ~15:35+08:00 (replay and readiness record 47df9474c2), failure observed ~16:05+08:00 (slice 3 E2E); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.37. - Evidence: research prompt scoped to "pull" risks only; its report noted "the publish check went only as far as the pointer blob being committed"; slice 3 E2E then failed at the second `donut notebook publish` ("Attachment at <commit> must be a Git LFS pointer…", `cli/src/commands/notebook/notebookPublishLfsSelection.ts`); plan recorded the stop in 1e2ed84c35. - Observed effect: one human round-trip and a scope change (CLI change, option A) that preparation could have surfaced before Take. - Inference: when resolving a readiness concern by observation, replay the slice's full promised journey (here pull, then publish), not only the mechanism the concern names; the replay's own "not covered" list was the signal.
 - Execution: SEED-059#story-6 / slice-plans/056-change-or-clear-reading-mark / 7c9935b2c2; Timestamp: 2026-09-29 (slice 2 implementation, between 17:53 and 18:12 +08:00); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.47. - Evidence: plan *Decisive premises* "E2E setup and steps exist … Confirmed by grep"; slice 2 implementation report ("My first green run failed on `no book block should be marked` (found 1)"); new step "book block {string} should not be marked in the book layout" in 5cab6e8827. - Observed effect: one failed EPUB feature run and a new step; the plan's slice 2 behavior text was corrected during delivery. Small cost. - Inference: the premise checked that a step exists, not that it holds for the chosen fixture path. Related to DD-162 (a grep premise that did not reach the changed path).
@@ -59,7 +59,7 @@ Former local code: DD-167.
 
 Concrete only-caller and host-state premises enter a plan without inspection, forcing a changed decision or stopped implementation when checked.
 
-Follow-up: Open, unqueued. Responses 2c5ff71 (0.3.43) and fcc29fad (0.3.48) are released; the same class of unobserved premise is reported again on 0.3.51 and 0.3.52, so neither is shown to resolve it.
+Follow-up: queued, not resolved: [Observe decisive planning premises through the full promised journey](../open-dough/.planning/seeds/SEED-108-planning-observations-cover-promised-journeys.md#observe-promised-journey) — SEED-108#observe-promised-journey. Responses 2c5ff71 (0.3.43) and fcc29fad (0.3.48) are released; the same class of unobserved premise is reported again on 0.3.51–0.3.56, so neither is shown to resolve it.
 
 - Execution: SEED-043 story 1 / slice-plans/045-commit-gate-checks-committed-content / 574d61b52c; Timestamp: 2026-09-26T16:06:02+08:00 (CI step failure); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.40. - Evidence: plan "Current decisions" before 120753a097; CI run 36228685291 job "Other Unit Tests" failed `quality_changed.test` ("shared biome config selects every affected component": expected `pnpm frontend:lint`, got the install line after `ln` failed); repair 120753a097 updated and extended the test. - Observed effect: one red story-branch CI run, a stash/repair/restore cycle around slice 2, and two extra agents (repair ~49k and refactor ~48k subagent tokens). - Inference: a negative claim that code has no test needs a search of the test tree (here `grep -rl quality_changed scripts/test`) at planning or delegation; naming the stack skill for `scripts/` in the delegation would likely have surfaced it.
 - Execution: SEED-059#story-3 / slice-plans/051-pdf-layout-from-bookmarks / 946e2a70e3; Timestamp: 2026-09-29 (slice 1); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.46. - Evidence: plan *Decisive premises* row "Backend tests attach fake PDF bytes" (`grep -rn "0x25, 0x50"`); slice 1 refactor report item 2 (`BooksControllerTest`, `NotebookGitWebAttachmentDeleteControllerTest` back to HEAD). - Observed effect: two files changed and reverted within one slice; small cost. - Inference: the premise matched a symptom (fake bytes) rather than the path (attach callers). Related to the planning-premise family (DD-128, DD-137).
@@ -96,7 +96,7 @@ Former local code: DD-136.
 
 Proof selection follows edited store areas rather than the changed operation’s whole caller flow, missing a consumer’s failure scenario.
 
-Follow-up: queued, not resolved: [Prove a slice through the consumers of what it changes](../open-dough/.planning/seeds/SEED-095-slice-proof-through-consumers.md#prove-slices-through-consumers) — SEED-095#prove-slices-through-consumers.
+Follow-up: delivered, unreleased: SEED-095#prove-slices-through-consumers (recoverable at `56ed987b:.planning/seeds/SEED-095-slice-proof-through-consumers.md`). Response `cca9bff4` is on main; no release tag contains the complete response as of 2026-10-06.
 
 - Execution: SEED-047#story-1 / `edfd7ba92a:.planning/slice-plans/014-continue-to-neighboring-note-after-deletion/PLAN.md` / a41b1e0507; Timestamp: unknown (before slice 1 commit 2026-09-27T10:59:16+08:00); Tool: Claude Code; Open Dough release: 0.3.42 (VERSION in the execution checkout). - Evidence: coordinator summary to the retrospective (subagent transcripts not supplied): coordinator consumer check found 2 failing tests in `NoteMoreOptionsForm.trashNote.spec.ts`; fixed by an empty listing mock in `tests/notes/noteMoreOptionsTrashTestSupport.ts` (in a41b1e0507), then `tests/notes tests/store tests/toolbars` 353/353. - Observed effect: one coordinator repair before commit; no defect shipped. - Inference: a `grep` for callers of the changed method across `tests/` when choosing slice proof would have included the spec.
 - Execution: SEED-059#story-16 / `dfec19ca03:.planning/slice-plans/058-current-block-same-in-pdf-and-epub/PLAN.md` / d3eec9db16; Timestamp: 2026-09-30T00:01:40Z (CI job log time of the failure); Tool: Claude Code; Model: claude-sonnet-5-5; Open Dough release: unknown. - Evidence: slice 2 removed the 40-point landing padding; its delegation named `book_browsing.feature` and `reading_record.feature`, and the report ran only those. CI run 36647846005 attempt 1 failed `phone_reading.feature` "Choosing a book block closes the book layout and moves the book there" (`expected ... to contain '2 /'`); the slice 3 agent ran `phone_reading` (7/7 locally at 390*844); the repair agent reproduced the failure only at 390*900 and repaired in 5206b08370. - Observed effect: one failed published E2E job, a paused slice 3 (stash, repair agent about 10 min, restore) and one test repair. - Inference: `phone_reading.feature` also chooses PDF blocks, so a search of `e2e_test/features/book_reading/` for scenarios that choose a block would have listed it. Same root cause as the entries above (proof chosen by edited area); the actor was the coordinator's delegation. The failure itself needed a taller-than-stock window, so local runs could not have shown it.
@@ -143,7 +143,7 @@ Former local code: DD-145.
 
 Planning names an observation route or log source that is not available to the executing project, causing owner probing or loss of the intended proof.
 
-Follow-up: Open, unqueued.
+Follow-up: queued, not resolved: [Observe decisive planning premises through the full promised journey](../open-dough/.planning/seeds/SEED-108-planning-observations-cover-promised-journeys.md#observe-promised-journey) — SEED-108#observe-promised-journey.
 
 - Execution: SEED-051#story-1 / `f35fa810f1:.planning/slice-plans/009-retire-note-embeddings/PLAN.md` / 5003fbecc8; Timestamp: 2026-09-28T05:36:39Z–06:03:39Z (slice 1/3) and 2026-09-28T07:17:43Z–07:18:10Z (slice 10); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.45. - Evidence: four auto-mode denials while seeking a DB route (credential lookup, SSH to the app VM, probe edit to root, bucket IAM); owner: "But this wasn't needed uh, previously. Um, or can we skip this?"; coordinator's covering reasoning and skip recorded in d111968b62; slice 10 `gcloud logging read` found no Flyway lines, so sustained health became the D/P evidence (8e03ac5f5f). - Observed effect: about 27 minutes of owner-attended probing ended in skipping slice 1's SQL part and dropping slice 3; slice 10's named proof was replaced during delivery. No product defect. - Inference: planning could have asked, for each production observation, whether any result would change the approach, and whether the access route and log source exist (both checkable cheaply once `gcloud` auth worked). Related to DD-142 (prescribed observations dropped in execution), but here the cost was production access and owner time. Qualified: one execution; planning-time `gcloud` auth had failed.
 - Execution: SEED-059#story-5 / slice-plans/053-pdf-smooth-scroll-after-choosing-block / 5989892325; Timestamp: 2026-09-29T21:45+08:00 through 22:10+08:00 (slice 1 attempts); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.47. - Evidence: plan 053's proof row "Manual observation … Chromium DevTools protocol or Playwright `mouse.wheel`" on the dev stack; the repo has no Playwright/Puppeteer, `.agents/agent-map.md` says linked worktrees refuse the persistent Development stack, and a throwaway Cypress spec sending CDP `mouseWheel` reached the DOM but scrolled 0 px in headless Electron and Chrome. - Observed effect: about 15 minutes of implementer time; the story's key example (every wheel step moves down) was delivered without its real-wheel observation. - Inference: same pattern in a local setting: the observation route could have been checked at planning from the agent map and `package.json`.
@@ -259,7 +259,7 @@ Follow-up: Open, unqueued.
 
 Former local code: DD-201.
 
-Follow-up: queued, not resolved: [Keep CI observed for Codex and Cursor executions](../open-dough/.planning/seeds/SEED-094-ci-observation-for-codex-and-cursor.md#observe-ci-on-codex-and-cursor) — SEED-094#observe-ci-on-codex-and-cursor.
+Follow-up: delivered, unreleased: SEED-094#observe-ci-on-codex-and-cursor (recoverable at `0dc71704:.planning/seeds/SEED-094-ci-observation-for-codex-and-cursor.md`). Response `abeb79f9` arms and reuses the Codex stream; no release tag contains it as of 2026-10-06. Native evaluation remains pending.
 
 The managed delivery CLI can declare the Codex bridge ready, while the documented yielded adapter launches its own stream observer. This execution did not establish a supported binding between those paths and published without observation.
 
@@ -288,7 +288,9 @@ Mid-execution, the delivery hook reported that the observer's worker had exited 
   - Observed effect: notification coverage ended for the published slices; the coordinator confirmed CI manually. No failure was missed.
   - Inference: the cause is unknown and is not established as the transient-network ending of ODF-121. The stale `dev.pid` seen minutes later (see ODF-190) suggests process churn on the machine, but no link is shown. Qualified: one occurrence.
 
-## DD-204 — Refinement planned a search to reproduce a flaky mock, but the project's test rules already forbade that mock
+## ODF-213 — Refinement planned a search to reproduce a flaky mock, but the project's test rules already forbade that mock
+
+Former local code: DD-204.
 
 A story about an intermittent CI failure in a module mock planned a bounded
 search to reproduce it ("no fix without a reproduction"; mock changes excluded).
@@ -306,7 +308,9 @@ dependencies, and the mocked `useRecallData` is in-process state with setters.
   - Observed effect: about 107 minutes and about 630k tokens of reproduction-agent work (1,465 s + 674 s + 4,256 s by the hand-back records), three owner round-trips, and Docker cleanup, before a fix that needed no reproduction.
   - Inference: when refining a story about a failing test mechanism, check the failing mechanism against the project's test rules first. A mechanism the rules forbid is a removal story, not a reproduction search. Qualified: one execution. The reproduction search was owner-approved at each round, so the cost comes from how the story was framed, not from a broken execution step.
 
-## DD-206 — A slice plan told the implementer to replace a push/replace assertion with a current-location check, which drops the replace
+## ODF-214 — A slice plan told the implementer to replace a push/replace assertion with a current-location check, which drops the replace
+
+Former local code: DD-206.
 
 The plan said to assert the router's current location instead of a captured
 `replace`/`push`. A location check cannot tell a replace from a push, so
@@ -322,7 +326,9 @@ following the plan weakened an assertion the same plan forbade weakening.
   - Observed effect: one extra implementation round (about 3 minutes, 76,592 subagent tokens in total for the slice's implementer). No weakened assertion was delivered.
   - Inference: when a plan swaps a mock observation for a real one, check that the real observation still tells apart every case the mock did. Qualified: one occurrence.
 
-## DD-207 — A plan's proof for a CLI key example checked only that the server answered, not the authenticated step the example needed
+## ODF-110 — A plan's proof for a CLI key example checked only that the server answered, not the authenticated step the example needed
+
+Former local code: DD-207.
 
 The story's key example (DD-161) had an agent point the CLI at the held app and attach a PDF. The plan's proof row asked only that a CLI command get an answer rather than "Donut service is not available", and slice 4's guidance named the base URL but no access-token route.
 
@@ -336,7 +342,9 @@ The story's key example (DD-161) had an agent point the CLI at the held app and 
   - Observed effect: one extra implementation round (about 49 s); caught only by reading the return's named gaps against the key examples.
   - Inference: a proof row that checks reachability can pass while the example's real shape (an authenticated write) stays unguided. Qualified: one occurrence.
 
-## DD-209 — A slice made the conversion step reject on failure; the existing catch also covered a save the story excluded
+## ODF-074 — A slice made the conversion step reject on failure; the existing catch also covered a save the story excluded
+
+Former local code: DD-209.
 
 The plan's Goal excluded "a failure while saving the note after conversion
 succeeded", but slice 1 said only that the conversion callback rejects on
@@ -352,18 +360,9 @@ note save, so the plain reading made a save failure reject too.
   - Observed effect: one extra implementation round; the rejected version would have let audio already joined to the note be sent and joined again after a save failure.
   - Inference: when a slice changes what a catch does, the plan could name which excluded paths that catch also covers. Qualified: one occurrence; the coordinator caught it at acceptance.
 
-## DD-210 — An implementer ran `git checkout -- <file>` against its instructions
+## ODF-215 — E2E startup fails on unformatted files, but implementers are told not to format
 
-### Occurrences
-- Execution: SEED-066#recover-failed-transcription / `212e428968:.planning/slice-plans/005-recover-failed-transcription/PLAN.md` / 9eb06ed0bd
-  - Timestamp: unknown (slice 1, before commit 2026-10-05T14:48:15+09:00)
-  - Tool: Claude Code
-  - Open Dough release: 0.3.56 (execution-checkout VERSION, unchanged during execution)
-  - Evidence: coordinator summary to the retrospective: the slice 1 implementer used `git checkout -- <file>` on a file it had changed, against its delegation's instructions; the coordinator checked and found no unowned work lost.
-  - Observed effect: no loss this time; one coordinator check.
-  - Inference: a discard command on a shared worktree can drop changes the agent did not make; the instruction alone did not stop it. Qualified: one occurrence; the exact delegation wording was not supplied.
-
-## DD-211 — E2E startup fails on unformatted files, but implementers are told not to format
+Former local code: DD-211.
 
 The execution wrap-up formats once, by the coordinator, after the refactor.
 The frontend dev server's checker (`frontend/vite.config.ts`, `checker({ biome: true })`)
@@ -379,7 +378,9 @@ an E2E run cannot run it on unformatted files.
   - Observed effect: the slice 3 E2E proof was blocked until files were formatted; extra time not recorded.
   - Inference: the rule and the project tooling conflict for any slice whose proof is an E2E run; the agent map or the slice delegation could say that formatting the touched files before `cy:run` is allowed. Qualified: one occurrence; how the implementer resolved it was not supplied.
 
-## DD-212 — Landing retired the execution workspace while its final slice still needed a continuation
+## ODF-216 — Landing retired the execution workspace while its final slice still needed a continuation
+
+Former local code: DD-212.
 
 Landing and story completion were correctly distinguished in the response, but
 the unfinished execution's saved workspace and branch were removed. The story
