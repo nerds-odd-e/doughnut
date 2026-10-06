@@ -232,7 +232,10 @@ macOS, signed in as `manual`, a note with one saved paragraph, the real
 transcription service). Naturally paced recordings entered the synthetic
 MediaStream described under [Observation boundary](#observation-boundary)
 with no pause long enough to start a conversion; Stop was clicked about
-250 ms after the recording ended. Five runs each:
+250 ms after the recording ended. The accepted target for up to about 20
+seconds of such speech is a middle wait of at most 2 s across five runs, with
+none above 3 s. No automated test asserts it, because the wait depends on the
+paid transcription service. Five runs each:
 
 | Input | Median | Slowest | Runs (s) |
 | --- | --- | --- | --- |
