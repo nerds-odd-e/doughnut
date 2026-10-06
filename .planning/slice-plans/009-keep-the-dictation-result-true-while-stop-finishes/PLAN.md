@@ -5,7 +5,7 @@
 - Story: [Keep the dictation result true while Stop finishes](../../seeds/SEED-066-voice-input.md#no-record-while-stopping)
 - Identity: SEED-066#no-record-while-stopping
 - Kind: retrospective correction of SEED-066#understandable-first-dictation
-  (plan [008](../008-complete-a-first-dictation-with-understandable-controls/PLAN.md)).
+  (plan `0662bac730:.planning/slice-plans/008-complete-a-first-dictation-with-understandable-controls/PLAN.md`).
 - Provenance: the execution of 008 produced commits 31b9b7b7, ef95c980, 708f43f4,
   18e10d46, ea48c9ef, 07c4e146 and 9f8a52c7, on top of 9525968b. Slice 1 kept Record
   visible while Stop finished, and its plan Learnings note that; slices 2–3

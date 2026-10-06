@@ -378,7 +378,7 @@ an E2E run cannot run it on unformatted files.
   - Evidence: slice 3 implementer learning, recorded in the plan's Learnings at ab773157bb: "E2E stack startup runs a Biome format check, so an unformatted frontend file stops `cy:run` before any scenario runs"; CLAUDE.md "implementers/refactorers run neither it nor standalone `lint:changed`".
   - Observed effect: the slice 3 E2E proof was blocked until files were formatted; extra time not recorded.
   - Inference: the rule and the project tooling conflict for any slice whose proof is an E2E run; the agent map or the slice delegation could say that formatting the touched files before `cy:run` is allowed. Qualified: one occurrence; how the implementer resolved it was not supplied.
-- Execution: SEED-066#understandable-first-dictation / `.planning/slice-plans/008-complete-a-first-dictation-with-understandable-controls/PLAN.md` / 31b9b7b7bb
+- Execution: SEED-066#understandable-first-dictation / `0662bac730:.planning/slice-plans/008-complete-a-first-dictation-with-understandable-controls/PLAN.md` / 31b9b7b7bb
   - Timestamp: unknown (slice 1, before commit 2026-10-06T09:18:48+09:00)
   - Tool: Claude Code
   - Model: claude-opus-5-5
@@ -410,11 +410,11 @@ harmless without checking it against the story's examples, and later slices
 built the result status on top of it.
 
 ### Occurrences
-- Execution: SEED-066#understandable-first-dictation / `.planning/slice-plans/008-complete-a-first-dictation-with-understandable-controls/PLAN.md` / 31b9b7b7bb
+- Execution: SEED-066#understandable-first-dictation / `0662bac730:.planning/slice-plans/008-complete-a-first-dictation-with-understandable-controls/PLAN.md` / 31b9b7b7bb
   - Timestamp: unknown (slice 1 acceptance, before commit 2026-10-06T09:18:48+09:00)
   - Tool: Claude Code
   - Model: claude-opus-5-5
   - Open Dough release: 0.3.56 (execution-checkout VERSION)
-  - Evidence: slice 1 return "while Stop is still finishing, the main action already shows Record again", recorded in plan 008 Learnings. At 9f8a52c7, `NoteAudioTools.vue` `startRecording` clears the passage saves, and the pending `stopRecording` `finally` overwrites `phase`. The correction is planned as `.planning/slice-plans/009-keep-the-dictation-result-true-while-stop-finishes/PLAN.md`.
+  - Evidence: slice 1 return "while Stop is still finishing, the main action already shows Record again", recorded in that plan's Learnings. At 9f8a52c7, `NoteAudioTools.vue` `startRecording` clears the passage saves, and the pending `stopRecording` `finally` overwrites `phase`. The correction is planned as `.planning/slice-plans/009-keep-the-dictation-result-true-while-stop-finishes/PLAN.md`.
   - Observed effect: none in use; the retrospective found it in the code. Pressing Record during "Turning your speech into text…" can report "No speech was turned into text." for added text, or hide Stop while recording.
   - Inference: proof acceptance reads named gaps against the goal. A named interim that later slices depend on needs the same reading when those slices are accepted. Qualified: one execution. In the same execution the coordinator did return slice 3's self-declared superseded-save gap for a same-slice fix.
