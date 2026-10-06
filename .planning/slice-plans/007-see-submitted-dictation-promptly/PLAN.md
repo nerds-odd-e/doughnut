@@ -304,3 +304,14 @@ results and report to the owner; do not change code under this slice.
   continues a sentence held back or flushed earlier. Whether to address it
   (for example with the transcription `prompt`) is an owner decision outside
   this story's target.
+
+## Execution complete
+
+Product advice: The target is met on Development (Harvard median 1.39 s,
+slowest 1.86 s; lighthouse 1.09 s, 1.65 s). No correction is needed. One owner
+decision goes to story wrap-up: with `gpt-4o-mini-transcribe` at Stop, a
+passage that continues a sentence held back or flushed earlier starts with a
+capital letter ("…editions Is a gift…"). Accept it, or address it in a
+separate story (for example by passing the preceding text as the
+transcription `prompt`). Text that appears while speaking stays the wider
+ambition, outside this story.
