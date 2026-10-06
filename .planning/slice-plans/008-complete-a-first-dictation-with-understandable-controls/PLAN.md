@@ -288,3 +288,16 @@ under a name that matches.
   `NoteAudioTools.vue`; `FullScreen.vue` keeps only the overlay's styles.
 - A mounted test that sets the note realm calls `refreshNoteRealm` after
   mounting, because mounting reloads the note.
+
+## Execution complete
+
+Product advice: Queue the correction
+[SEED-066#no-record-while-stopping](../../seeds/SEED-066-voice-input.md#no-record-while-stopping)
+([plan 009](../009-keep-the-dictation-result-true-while-stop-finishes/PLAN.md))
+ahead of the spoken-title stories. Record can still be pressed while Stop is
+turning speech into text, which can report a false result or hide Stop while
+recording; it is a one-slice fix. The panel's state now lives in one place
+(`phase` / `statusByPhase` in `NoteAudioTools.vue`), so later voice stories
+should extend it rather than add flags. SEED-066#prompt-dictation-results is
+also Taken and touches the same panel; expect to reconcile with it on
+integration.

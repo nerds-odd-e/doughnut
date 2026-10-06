@@ -413,6 +413,26 @@ failed. Today that is spread over separate flags.
 - **Safe stopping point:** A newcomer can complete and recognize a saved spoken
   addition without needing the later title-authoring capabilities.
 
+<a id="no-record-while-stopping"></a>
+### Keep the dictation result true while Stop finishes
+
+**Identity:** SEED-066#no-record-while-stopping
+```json dough-story-state
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/009-keep-the-dictation-result-true-while-stop-finishes/PLAN.md"}
+```
+
+**Goal:** A retrospective correction of
+[Complete a first dictation with understandable controls](#understandable-first-dictation).
+A note author who presses Stop is told the true result of that recording.
+Pressing Record while Stop is still turning their speech into text must not
+reset what this recording wrote or replace the result status of a new
+recording.
+
+**Scope:** Record cannot be started while the panel says "Turning your speech
+into text…", during either Stop or Retry. It is available again once the
+result shows. The correction adds no feature promise. Plan:
+[009](../slice-plans/009-keep-the-dictation-result-true-while-stop-finishes/PLAN.md).
+
 <a id="create-with-spoken-title"></a>
 ### Create a note using a spoken title
 
