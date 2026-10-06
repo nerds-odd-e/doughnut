@@ -220,7 +220,8 @@ on failure the message and Retry stay. A failure while still recording keeps
 
 ### 5. A microphone that cannot be used is explained
 Type: Behavior
-Status: planned
+Status: done
+Accepted proof: `NoteAudioTools.status.spec.ts` "explains a microphone that cannot be used until a later Record starts" in the frontend audio command, 14 files, 108 tests; vue-tsc clean; mocked journey 2 passing after the recorder's start catch was deleted.
 Proof: mounted test in which the recorder refuses to start; frontend audio tests green.
 
 Behavior: Audio tools open → Record → recording cannot start → nothing is
@@ -276,5 +277,9 @@ under a name that matches.
   passage's draft. A failed save leaves the status at "Ready to record".
 - A conversion failure at Stop is the `notConverted` phase: its message is
   the status, with Retry beside it; the error alert is hidden then.
+- A start failure is the `micUnavailable` phase; `isProblem` styles it and
+  `notConverted` as a problem. `audioRecorder.startRecording` no longer
+  renames its errors. `NoteAudioTools.vue` is at 251 lines; slices 6 and 7
+  should bring it under 250.
 - A mounted test that sets the note realm calls `refreshNoteRealm` after
   mounting, because mounting reloads the note.

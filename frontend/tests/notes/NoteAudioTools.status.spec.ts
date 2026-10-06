@@ -72,6 +72,25 @@ describe("NoteAudioTools dictation status", () => {
     expect(findButtonByText(wrapper, "Record")).toBeTruthy()
   })
 
+  it("explains a microphone that cannot be used until a later Record starts", async () => {
+    audioToolsVm(wrapper).audioRecorder.startRecording.mockRejectedValueOnce(
+      new Error("Permission denied")
+    )
+    await startRecording(wrapper)
+
+    const status = wrapper.get('[role="status"]')
+    expect(status.text()).toBe(
+      "Could not use the microphone. Allow microphone access in your browser, then try again."
+    )
+    expect(status.classes()).toContain("text-error")
+    expect(findButtonByText(wrapper, "Record")).toBeTruthy()
+    expect(findButtonByText(wrapper, "Stop")).toBeUndefined()
+
+    await startRecording(wrapper)
+    expect(dictationStatus(wrapper)).toBe("Recording. Speak now.")
+    expect(wrapper.get('[role="status"]').classes()).not.toContain("text-error")
+  })
+
   describe("after Stop", () => {
     const stopConverting = (segmentTexts: string[]) => {
       audioToolsVm(wrapper).audioRecorder.stopRecording.mockImplementation(

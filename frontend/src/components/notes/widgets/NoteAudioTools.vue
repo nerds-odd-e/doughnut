@@ -6,7 +6,7 @@
       :isRecording="isRecording"
     />
     <div class="flex justify-center items-center gap-2 text-center mb-3">
-      <p role="status" :class="{ 'text-error': phase === 'notConverted' }">{{ status }}</p>
+      <p role="status" :class="{ 'text-error': isProblem }">{{ status }}</p>
       <button v-if="phase === 'notConverted'" class="daisy-btn daisy-btn-sm retry-button" @click="retry" title="Retry">Retry</button>
     </div>
     <div
@@ -96,10 +96,15 @@ const statusByPhase = {
   nothingAdded: "No speech was turned into text.",
   notConverted:
     "Could not turn your speech into text. Your recording is kept until you close Audio tools.",
+  micUnavailable:
+    "Could not use the microphone. Allow microphone access in your browser, then try again.",
 } as const
 const phase = ref<keyof typeof statusByPhase>("ready")
 const isRecording = computed(() => phase.value === "recording")
 const status = computed(() => statusByPhase[phase.value])
+const isProblem = computed(
+  () => phase.value === "notConverted" || phase.value === "micUnavailable"
+)
 const wakeLocker = createWakeLocker()
 const showAdvancedOptions = ref(false)
 
@@ -127,7 +132,7 @@ const startRecording = async () => {
     await audioRecorder.startRecording()
     phase.value = "recording"
   } catch (error) {
-    errors.value = { recording: "Failed to start recording" }
+    phase.value = "micUnavailable"
     await wakeLocker.release()
   }
 }

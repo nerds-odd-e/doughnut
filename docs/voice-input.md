@@ -12,7 +12,10 @@ the recording was written and saved, or "No speech was turned into text."
 when it wrote nothing. When a conversion at Stop failed and audio is still
 not converted, it says, shown as a problem, "Could not turn your speech into
 text. Your recording is kept until you close Audio tools." with Retry beside
-it; Record stays available. When every save of the recording's passages
+it; Record stays available. When recording cannot start, nothing is recorded
+and it says, shown as a problem, "Could not use the microphone. Allow
+microphone access in your browser, then try again."; Record stays the main
+action, and a later Record that starts clears it. When every save of the recording's passages
 failed (the save error shows as usual), it says "Ready to record". Dictated
 text shows in an open body editor as soon as it joins; typing after that does not hold back "Added to your note." once the body
 holding the passage is saved. Each Record starts counting afresh. Dictation
