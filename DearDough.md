@@ -255,7 +255,7 @@ Follow-up: Open, unqueued.
   - Observed effect: one of three passes changed nothing; one caught a defect the slice's own tests had not.
   - Inference: the defect-finding pass came on the slice that changed a promise's failure path; as in earlier rows, diff size did not predict value. Qualified: one execution.
 
-- Execution: SEED-066#prompt-dictation-results / slice-plans/007-see-submitted-dictation-promptly / dd875812e5
+- Execution: SEED-066#prompt-dictation-results / `a4c70254e7:.planning/slice-plans/007-see-submitted-dictation-promptly/PLAN.md` / dd875812e5
   - Timestamp: unknown (2026-10-06; slice 2 refactor between about 09:30 and 09:36 +09:00)
   - Tool: Claude Code
   - Model: claude-opus-5-5
@@ -412,7 +412,7 @@ remained Taken while its terminal session later stopped.
   - Evidence: native session `26f67388-7040-4fff-b68a-786f5f7e7b95` landed `77df78ed15` after the owner's `/dough-land`, then received `worktree: removed`, `branch: removed`, `remoteBranch: removed`. Its completion message explicitly retained slice 4 and wrap-up; the saved session cwd and dashboard start still name the removed worktree. Dashboard `doneAt` is 2026-10-05T21:52:08+09:00; native job state is `stopped`. The owner subsequently asked why the Taken story had neither a worktree nor an attached session.
   - Observed effect: an investigation and takeover were needed to recover the remaining real-stack check and closure. Implementation was preserved on main; no code or data was lost.
   - Inference: when an approved proof runs after landing, the workflow could retain a usable continuation checkout and its remaining obligation before retiring the execution workspace. Qualified: one execution; who marked the dashboard session done is not established.
-- Execution: SEED-066#prompt-dictation-results / slice-plans/007-see-submitted-dictation-promptly / dd875812e5
+- Execution: SEED-066#prompt-dictation-results / `a4c70254e7:.planning/slice-plans/007-see-submitted-dictation-promptly/PLAN.md` / dd875812e5
   - Timestamp: 2026-10-06T11:12:06+09:00 (owner's merge b86f649322, pushed to `main` and the story branch)
   - Tool: Claude Code
   - Model: claude-opus-5-5
@@ -467,7 +467,7 @@ separately approved batches, the coordinator wrote that the next batch was
 Follow-up: Open, unqueued.
 
 ### Occurrences
-- Execution: SEED-066#prompt-dictation-results / slice-plans/007-see-submitted-dictation-promptly / dd875812e5
+- Execution: SEED-066#prompt-dictation-results / `a4c70254e7:.planning/slice-plans/007-see-submitted-dictation-promptly/PLAN.md` / dd875812e5
   - Timestamp: unknown (2026-10-06, between about 09:00 and 09:30 +09:00, before dd875812e5)
   - Tool: Claude Code
   - Model: claude-opus-5-5
@@ -486,7 +486,7 @@ pre-rebase SHA as the candidate".
 Follow-up: Open, unqueued.
 
 ### Occurrences
-- Execution: SEED-066#prompt-dictation-results / slice-plans/007-see-submitted-dictation-promptly / dd875812e5
+- Execution: SEED-066#prompt-dictation-results / `a4c70254e7:.planning/slice-plans/007-see-submitted-dictation-promptly/PLAN.md` / dd875812e5
   - Timestamp: 2026-10-06, shortly after 11:18:17+09:00 (commit f50c7dcef6)
   - Tool: Claude Code
   - Model: claude-opus-5-5

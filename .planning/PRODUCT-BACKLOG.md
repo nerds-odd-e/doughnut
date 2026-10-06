@@ -6,8 +6,6 @@ Audio tools, starting with voice input. Make voice input work reliably and easy 
 
 ## Taken
 
-- [See submitted dictation promptly](seeds/SEED-066-voice-input.md#prompt-dictation-results) — SEED-066#prompt-dictation-results ([plan](slice-plans/007-see-submitted-dictation-promptly/PLAN.md))
-
 ## Backlog list
 
 - [Keep the dictation result true while Stop finishes](seeds/SEED-066-voice-input.md#no-record-while-stopping) — SEED-066#no-record-while-stopping
