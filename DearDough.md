@@ -6,7 +6,7 @@ released response is not proof of effectiveness. Unknown provenance stays unknow
 [Response status](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/finding-names.md).
 Full pre-trim evidence: `8830c682704aac3bbb34bf9b1204da8feba042ca:DearDough.md`. Older narratives live in Git, not a second archive.
 
-- Highest allocated local number: 212. Removed local codes are never reused.
+- Highest allocated local number: 213. Removed local codes are never reused.
 
 ## ODF-110 — A readiness replay observed only the plan's named seam, not the rest of the slice's journey
 
@@ -395,3 +395,24 @@ remained Taken while its terminal session later stopped.
   - Evidence: native session `26f67388-7040-4fff-b68a-786f5f7e7b95` landed `77df78ed15` after the owner's `/dough-land`, then received `worktree: removed`, `branch: removed`, `remoteBranch: removed`. Its completion message explicitly retained slice 4 and wrap-up; the saved session cwd and dashboard start still name the removed worktree. Dashboard `doneAt` is 2026-10-05T21:52:08+09:00; native job state is `stopped`. The owner subsequently asked why the Taken story had neither a worktree nor an attached session.
   - Observed effect: an investigation and takeover were needed to recover the remaining real-stack check and closure. Implementation was preserved on main; no code or data was lost.
   - Inference: when an approved proof runs after landing, the workflow could retain a usable continuation checkout and its remaining obligation before retiring the execution workspace. Qualified: one execution; who marked the dashboard session done is not established.
+
+## DD-213 — A worktree landing's default-checkout refresh stopped as diverged because the owner committed there during the landing
+
+A preparation keep landed from a worktree while the owner's own session
+committed on the default checkout's `main`. Publication succeeded; the refresh
+correctly stopped (`diverged`) and left the owner's commit untouched, and the
+owner's session then had to rebase and push it. Every skill script in the
+landing session returned `ok`; no script failed. The owner read the attention
+message as a script failure.
+
+Follow-up: Open, unqueued.
+
+### Occurrences
+- Execution: SEED-066#create-with-spoken-title / preparation keep through Dough Land / 2e3a630c1a
+  - Timestamp: 2026-10-06T09:17:24+09:00 (owner commit 5ec0d443f4 on the default checkout), 2026-10-06T09:18:28+09:00 (landing commit, pushed and accepted before 09:19), 2026-10-06T09:20:04+09:00 (owner's rebase onto 2e3a630c1a, now a2bf875430 on `main`)
+  - Tool: Claude Code
+  - Model: claude-fable-5-1
+  - Open Dough release: 0.3.56
+  - Evidence: `preparation-assignment.mjs release`, `agent-commit.mjs`, `queued-closure-check.mjs` (`clear`), `git push`, and `worktree-retirement.mjs` (`ok: true`) all succeeded; refresh inspection found the default checkout clean on `main` with 5ec0d443f4 not contained in fetched `origin/main` and `origin/main` not contained in `HEAD`; the default checkout's reflog shows `rebase (start): checkout origin/main` at 09:20:04. The dashboard report was `completed` with that refresh as the attention message. Side note: `dashboard-completion.mjs --help` answers "Completion delivery was not acknowledged: Malformed reporting arguments" and exits 1; it has no usage text.
+  - Observed effect: one owner rebase and push, and one attention message that was read as a failure. No work was lost and nothing was retried.
+  - Inference: the refresh rule behaved as designed; the cost came from two writers on the same `main` within three minutes. The attention wording could say plainly that the stop is expected when the owner has a local commit, and what the owner's next command is. Qualified: one occurrence.
