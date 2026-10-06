@@ -7,7 +7,9 @@ description: >-
   decisions, removes that work's spent plan and history so Git can recover it,
   and reports truthfully when required inputs are missing or unfinished. Use to
   wrap up a story, correction, or completed contextual instruction, close
-  completed work, or delete spent plan and execution history.
+  completed work, or delete spent plan and execution history. With
+  `--process-retrospective`, it also reviews the wrap-up's own process and
+  records supported findings in `DearDough.md`.
 ---
 
 # Story wrap-up
@@ -16,7 +18,9 @@ Close one selected feature story, bounded retrospective correction, or contextua
 instruction when the coordinator invokes wrap-up. Use available execution context
 and optional retrospective advice. Leave this project with maintained product knowledge
 and no spent source or plan history in the current snapshot. Do not invent findings,
-records, or a requirement for another conversation.
+records, or a requirement for another conversation. With
+`--process-retrospective`, also
+[review this wrap-up's process](#review-this-wrap-ups-process).
 
 ## Resolve this project's context
 
@@ -151,12 +155,13 @@ Mode before-cleanup publication — delete the selected work's spent history und
   remaining section is spent;
 - its **Taken** or **Backlog list** entry when one exists, through the
   [dough-product-backlog](../dough-product-backlog/SKILL.md) `complete` command,
-  which also deletes that work's agent profile, an owned closure change; and
+  which also deletes that work's agent profile, writes its done record, and
+  removes expired done records, all owned closure changes; and
 - links whose sole purpose is preserving that history.
 
-Also remove the owned follow-up records and entry selected for explicit drop
-above, after their Git recovery is established. Otherwise preserve active
-follow-ups and their queue entries.
+Also remove the owned follow-up records selected for explicit drop above, after
+their Git recovery is established, and their entry with `complete --dropped`.
+Otherwise preserve active follow-ups and their queue entries.
 
 Remove empty directories belonging to the spent work, including untracked ones.
 The current snapshot must be free of that history, both tracked and untracked,
@@ -177,6 +182,17 @@ with the before-cleanup commit and repository-relative path. Repair Markdown
 links broken by cleanup without recreating spent history. Repeating wrap-up
 must recognize already-completed cleanup without duplicating edits. Missing
 artifacts alone do not establish completion of another work item.
+
+## Review this wrap-up's process
+
+Only with `--process-retrospective`, after spent history is deleted, apply the
+shared
+[process review of a run](../dough-execution-retrospective/references/process-review-of-a-run.md)
+once per wrap-up, with the execution checkout as the write location. Point
+evidence in deleted sources at the before-cleanup commit, as an active
+follow-up's locator does above. Recorded findings are owned closure changes for
+[Commit final closure](#commit-final-closure) and travel with that commit. A
+rerun that finds the final closure already committed does not review again.
 
 ## Commit final closure
 

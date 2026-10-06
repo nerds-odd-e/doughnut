@@ -159,12 +159,20 @@ decision; this gate does not interrupt that execution automatically.
 - Standalone maintenance may remove a completed item from either active list
   when the human asks only for backlog maintenance. The applicable seed, plan,
   and proof remain available for later story wrap-up.
+- Work a human drops rather than finishes is removed with `complete --dropped`,
+  which removes the entry and releases its profile as below and leaves the done
+  records to finished work.
 
 Either path removes the entry with the installed `scripts/product-backlog.mjs
 complete` operation. It also deletes the execution agent profile under
 `agents/` beside the backlog that names the same identity, releasing that agent
-name; commit that deletion with the backlog change. A preparation assignment
-profile stays until its own release.
+name, and writes the work's done record under `done/` beside the backlog: its
+identity, title, completion time, the developer configured in this workspace's
+Git, and that profile's agent, host, and model when one existed. The same run
+removes done records completed more than 30 days before, and its report names
+each file it wrote or removed. Commit those files with the backlog change; the
+done record stays in the project as the published fact that the work was done.
+A preparation assignment profile stays until its own release.
 
 ## Direct edits may be denied in Claude Code, Codex, or Cursor
 

@@ -5,6 +5,10 @@
 
 import { directionHeading } from "./product-backlog-direction.mjs";
 import { queueHeading, takenHeading } from "./product-backlog-document.mjs";
+import {
+  doneRecordDirectory,
+  doneRecordWindowDays,
+} from "./product-backlog-done-record.mjs";
 import { defaultBacklogPath } from "./product-backlog-store.mjs";
 
 export const usage = `Usage: product-backlog.mjs add --identity <id> --title <title> --link <href>
@@ -15,7 +19,7 @@ export const usage = `Usage: product-backlog.mjs add --identity <id> --title <ti
                              [--return] [--file <path>]
        product-backlog.mjs take --identity <id> (--plan <path> | --no-plan)
                              [--file <path>]
-       product-backlog.mjs complete --identity <id> [--file <path>]
+       product-backlog.mjs complete --identity <id> [--dropped] [--file <path>]
        product-backlog.mjs refresh --identity <id>
                              [--title <title>] [--link <href>] [--plan <path>]
                              [--file <path>]
@@ -60,7 +64,13 @@ work is complete, and it never deletes a story or plan file: closing those
 canonical homes stays with the caller's wrap-up. Removal happens only on this
 explicit request naming the identity. It also removes the execution agent
 profile under agents/ beside the backlog that names the same identity,
-releasing that agent name; include that removal in the same commit as the
+releasing that agent name, and writes the work's done record under ${doneRecordDirectory}/
+beside the backlog: its identity, title, completion time, the developer Git is
+configured with, and the released profile's agent, host, and model. Completing
+the same identity again replaces its record. --dropped removes work that was
+dropped rather than finished: the entry and profile go as above and the done
+record is left out. Either way it removes done records completed
+more than ${doneRecordWindowDays} days before. Include those files in the same commit as the
 backlog change. A preparation profile is left for its own release.
 
 refresh updates what one listed entry says about itself — its title, the

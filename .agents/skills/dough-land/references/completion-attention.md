@@ -10,11 +10,12 @@ Dough Land and Story Wrap Up use this rule after their operations settle:
   does not acquire one or report uncertain coverage solely from its absence.
 - Report a material concern, reminder, failure, unfinished step, lost or uncertain
   CI coverage required by this invocation, deferred or stopped refresh, or blocked,
-  partial, or unverified retirement. Give the useful facts, their consequence,
-  and the next action, naming its responsible owner when known. Distinguish
-  accepted publication from an unfinished later
-  step so recovery repeats only unfinished work. Report a follow-up when it is
-  a useful reminder, without recapping settled work.
+  partial, or unverified retirement. Recorded process-finding IDs, and a process
+  review that was unavailable or could not record its findings, are reminders.
+  Give the useful facts, their consequence, and the next action, naming its
+  responsible owner when known. Distinguish accepted publication from an
+  unfinished later step so recovery repeats only unfinished work. Report a
+  follow-up when it is a useful reminder, without recapping settled work.
 - When the developer explicitly requests details, provide the requested facts.
   Keep operational evidence in command results, available conversation context,
   and its existing lasting homes; silence and a marker never prove completion

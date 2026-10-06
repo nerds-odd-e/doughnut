@@ -33,7 +33,7 @@ When explicitly instructed to drop the follow-up, identify its owned plan,
 canonical story section when applicable, associated records, and any queue
 entry. Preserve them in the
 [before-cleanup commit](../SKILL.md#commit-closure-inputs-and-preserve-git-recovery),
-then remove that entry through the backlog `complete` operation and delete only those owned follow-up
+then remove that entry through the backlog `complete --dropped` operation and delete only those owned follow-up
 records during cleanup. Dropping does not claim that the follow-up was
 implemented. Preserve sibling stories and unrelated work. Unresolved ownership
 stops the affected deletion and blocks closure; do not leave an unlisted plan

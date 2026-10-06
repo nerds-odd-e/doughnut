@@ -10,7 +10,9 @@ description: >-
   "land this worktree", or "land" for changes made on the default checkout, or
   when another skill's validated keep instruction links here. A casual
   "keep", "looks good", or approval does not invoke it.
-  Hosted merges and pull requests are out of scope.
+  Hosted merges and pull requests are out of scope. With
+  `--process-retrospective`, it also reviews the landing's own process and
+  records supported findings in `DearDough.md`.
 ---
 
 # Dough Land
@@ -21,6 +23,8 @@ trunk, refresh a supplied default checkout when safe, and retire the worktree
 when it is one. Apply [completion attention](#completion-attention) to the final
 response. Publication, refresh, and cleanup are separate results.
 A later step that stops or is deferred never undoes an earlier one.
+With `--process-retrospective`, also
+[review this landing's process](#review-this-landings-process).
 
 Run only when the developer explicitly invokes Dough Land, or when a calling
 skill's own validated keep instruction links here. Reviewing, approving,
@@ -126,6 +130,16 @@ when retained context establishes a selected completed supplier. Preserve its
 recoverable outcome before cleanup, publish directly justified consumer updates
 through this authorized landing workflow, and report unresolved work. A generic
 landing or an unfinished increment establishes no supplier completion.
+
+## Review this landing's process
+
+Only with `--process-retrospective`, after accepted publication and any
+consumer visit, apply the shared
+[process review of a run](../dough-execution-retrospective/references/process-review-of-a-run.md)
+once per landing, with the landing checkout as the write location. Recorded
+findings are uncommitted changes: continue through
+[Commit everything](#commit-everything-in-the-checkout) and [Publish](#publish)
+before refresh and retirement.
 
 ## Refresh the default checkout
 

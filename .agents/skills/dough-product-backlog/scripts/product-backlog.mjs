@@ -8,8 +8,8 @@ import { parseArgs } from "node:util";
 import { addQueueEntry } from "./product-backlog-add.mjs";
 import { adoptIdentities } from "./product-backlog-adopt.mjs";
 import {
+  closeBesideBacklog,
   completeEntry,
-  releaseAgentProfiles,
 } from "./product-backlog-complete.mjs";
 import { setDirection } from "./product-backlog-direction.mjs";
 import { mergeBacklogs } from "./product-backlog-merge.mjs";
@@ -18,6 +18,7 @@ import { refreshEntry } from "./product-backlog-refresh.mjs";
 import { BacklogError } from "./product-backlog-refusal.mjs";
 import {
   options,
+  readCompletionTime,
   readPlacement,
   readPlan,
   resolvePath,
@@ -99,11 +100,16 @@ async function take(file, values) {
 }
 
 async function complete(file, values) {
+  const now = readCompletionTime();
   const outcome = await applyReportedChange(file, (source) =>
     completeEntry(source, { identity: values.identity }),
   );
-  const released = releaseAgentProfiles(dirname(file), outcome.entry.identity);
-  console.log(reportComplete({ ...outcome, released }, values.file));
+  const closed = closeBesideBacklog(dirname(file), {
+    entry: outcome.entry,
+    dropped: values.dropped,
+    now,
+  });
+  console.log(reportComplete({ ...outcome, ...closed }, values.file));
 }
 
 // Dropping a reference is not on offer, so a caller who asks for it is told
