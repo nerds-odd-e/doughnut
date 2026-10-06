@@ -32,7 +32,10 @@ Consequences when Record is pressed while Stop or Retry is still running:
   recording.
 
 Not observed in a browser; the trace is read from the code. No mounted test
-presses Record while Stop is pending.
+presses Record while Stop is pending. Re-read on 2026-10-06 at e5d09b3b: the
+component is unchanged since 9f8a52c7, and `NoteAudioTools.status.spec.ts`
+already holds the recorder's `stopRecording` pending with a resolver, which
+the proof below reuses.
 
 ## Preserved promises and constraints
 
@@ -49,7 +52,7 @@ presses Record while Stop is pending.
 
 | Promise | Slice | Proof |
 | --- | --- | --- |
-| Record cannot be started while turning speech into text, after Stop or Retry; available again at the result | 1 | Mounted test in `NoteAudioTools.status.spec.ts`: `stopRecording` mock held pending → Record is absent or disabled, and the recorder's `startRecording` is not called if it is clicked → release → result shown and Record available. Same for Retry in `NoteAudioTools.retry.spec.ts`. |
+| Record cannot be started while turning speech into text, after Stop or Retry; available again at the result | 1 | Mounted test in `NoteAudioTools.status.spec.ts`: the recorder's `stopRecording` mock held pending → the Record button is disabled, and the recorder's `startRecording` is not called when it is clicked → release → result shown and Record enabled. Same for Retry in `NoteAudioTools.retry.spec.ts`, holding the second `stopRecording` pending. |
 | Existing behavior unchanged | 1 | Frontend audio command green; mocked journey green |
 
 Commands (from the worktree root):
@@ -63,7 +66,23 @@ Commands (from the worktree root):
 
 - The smallest change: Record is disabled while `phase === "stopping"`.
   Hiding it would leave the panel with no main action shown.
-- Update docs/voice-input.md where it describes Record during the status.
+- Update docs/voice-input.md where it describes Record during the status:
+  the first paragraph names Record as the main action when ready and says
+  "Record stays available" beside Retry; add that Record is unavailable while
+  the status says "Turning your speech into text…".
+
+## Decisive premises
+
+Observed on 2026-10-06 at e5d09b3b, before readiness was recorded.
+
+| Premise | Consumed by | Observation | Result |
+| --- | --- | --- | --- |
+| Record is clickable while `phase === "stopping"` | Slice 1's change | Read `NoteAudioTools.vue`: Record renders under `v-if="!isRecording"`, and `isRecording` is `phase === "recording"` | True |
+| Pressing Record then discards this recording's result | Slice 1's goal | Read `startRecording` → `startNewRecording()` in `composables/useNoteAudioProcessing.ts`: `passageSaves = []`, so the pending Stop's `writtenResult()` returns `nothingAdded` | True |
+| The mounted tests can hold Stop pending | Proof | `NoteAudioTools.status.spec.ts` already replaces `stopRecording` with a promise resolved by `finishStop`; `NoteAudioTools.retry.spec.ts` replaces it per test and clicks Retry | True |
+| A disabled Record is not triggered by the test helper | Proof | `startRecording(wrapper)` triggers `click` on the "Record" button; vue-test-utils does not dispatch on a disabled element, and `.daisy-btn:disabled` styling exists | True |
+| The mocked journey presses Record only when ready | Existing behavior unchanged | `audioToolsPage.ts` clicks Record and waits for "Recording. Speak now."; `stopRecording()` waits until the status is neither recording nor turning | True |
+| The named frontend command runs green now | Proof baseline | Ran `env -u NODE_ENV CURSOR_DEV=true nix develop -c pnpm -C frontend test tests/notes/NoteAudioTools tests/models/audio tests/notes/NoteToolbar.panels tests/common/FullScreen` | 14 files, 107 tests passed, 6.4 s |
 
 ## Slices
 
