@@ -56,9 +56,7 @@ describe("NoteAudioTools recording controls", () => {
     expect(dictationStatus(wrapper)).toBe("Ready to record")
     expect(findButtonByText(wrapper, "Record")).toBeTruthy()
     expect(findButtonByText(wrapper, "Stop")).toBeUndefined()
-    expect(
-      findButtonByTitle(wrapper, "Flush Audio")!.attributes("disabled")
-    ).toBeDefined()
+    expect(findButtonByText(wrapper, "Write text now")).toBeUndefined()
 
     await startRecording(wrapper)
 
@@ -67,8 +65,8 @@ describe("NoteAudioTools recording controls", () => {
     expect(findButtonByText(wrapper, "Stop")).toBeTruthy()
     expect(wrapper.find(".device-select").exists()).toBe(true)
     expect(
-      findButtonByTitle(wrapper, "Flush Audio")!.attributes("disabled")
-    ).toBeFalsy()
+      findButtonByText(wrapper, "Write text now")!.attributes("disabled")
+    ).toBeUndefined()
     expect(
       findButtonByTitle(wrapper, "Save Audio Locally")!.attributes("disabled")
     ).toBeDefined()
@@ -146,16 +144,16 @@ describe("NoteAudioTools recording controls", () => {
     ).toHaveBeenCalledTimes(2)
   })
 
-  it("flushes audio while recording", async () => {
+  it("converts what has been said so far with Write text now", async () => {
     await startRecording(wrapper)
-    await findButtonByTitle(wrapper, "Flush Audio")!.trigger("click")
+    await findButtonByText(wrapper, "Write text now")!.trigger("click")
 
     expect(audioToolsVm(wrapper).audioRecorder.tryFlush).toHaveBeenCalled()
   })
 
-  it("disables Flush while audio is processing", async () => {
+  it("disables Write text now during a conversion", async () => {
     await startRecording(wrapper)
-    const flushButton = findButtonByTitle(wrapper, "Flush Audio")!
+    const writeNowButton = findButtonByText(wrapper, "Write text now")!
 
     type AudioResponse = {
       segmentTexts: string[]
@@ -173,7 +171,7 @@ describe("NoteAudioTools recording controls", () => {
 
     const processing = processAudio(wrapper, midSpeechChunk())
     await flushPromises()
-    expect(flushButton.attributes("disabled")).toBeDefined()
+    expect(writeNowButton.attributes("disabled")).toBeDefined()
 
     resolveProcess({
       segmentTexts: ["test"],
@@ -181,7 +179,7 @@ describe("NoteAudioTools recording controls", () => {
     })
     await processing
     await flushPromises()
-    expect(flushButton.attributes("disabled")).toBeFalsy()
+    expect(writeNowButton.attributes("disabled")).toBeFalsy()
   })
 
   it("stops recording when unmounted while recording", async () => {

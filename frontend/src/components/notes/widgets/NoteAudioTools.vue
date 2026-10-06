@@ -15,7 +15,7 @@
       :class="errors.conversion ? 'daisy-alert-error' : 'daisy-alert-info'"
     >{{ errors.conversion ?? errors }}</div>
     <div class="button-group">
-      <button v-if="!isRecording" class="daisy-btn main-action" @click="startRecording">
+      <button v-if="!isRecording" class="daisy-btn labeled-action" @click="startRecording">
         <Mic :size="24" />
         Record
       </button>
@@ -30,16 +30,12 @@
             {{ device.label || `Microphone ${device.deviceId.slice(0, 4)}...` }}
           </option>
         </select>
-        <button class="daisy-btn main-action" @click="stopRecording">
+        <button class="daisy-btn labeled-action" @click="stopRecording">
           <Square :size="24" />
           Stop
         </button>
+        <button class="daisy-btn labeled-action" @click="audioRecorder.tryFlush()" :disabled="isProcessing">Write text now</button>
       </template>
-      <button class="daisy-btn" @click="tryFlushAudio" :disabled="!isRecording || isProcessing" title="Flush Audio">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="24" height="24">
-          <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
-        </svg>
-      </button>
       <button
         class="daisy-btn"
         @click="saveAudioLocally(audioFile as Blob)"
@@ -162,12 +158,6 @@ onBeforeUnmount(() => {
     stopRecording()
   }
 })
-
-const tryFlushAudio = async () => {
-  if (isRecording.value) {
-    await audioRecorder.tryFlush()
-  }
-}
 </script>
 
 <style scoped>
@@ -188,7 +178,7 @@ const tryFlushAudio = async () => {
   flex-shrink: 0;
 }
 
-.main-action {
+.labeled-action {
   display: inline-flex;
   align-items: center;
   gap: 6px;

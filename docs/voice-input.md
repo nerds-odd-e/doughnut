@@ -1,9 +1,11 @@
 # Voice input
 
-Authors open Audio tools on an existing note to Record, Flush Audio, Stop,
-or Save Audio Locally, and after a failed conversion to Retry. Advanced
-Options offers full-screen editing. The one main action is Record when ready
-and Stop while recording; the microphone chooser sits beside Stop. A status
+Authors open Audio tools on an existing note to Record, Stop, or Save Audio
+Locally, and after a failed conversion to Retry. Advanced Options offers
+full-screen editing. The one main action is Record when ready and Stop while
+recording; only while recording, the microphone chooser and Write text now
+(converts what has been said so far, unavailable during a conversion) sit
+beside Stop. A status
 that assistive technology announces says "Ready to record", "Recording. Speak
 now." (a mid-speech conversion does not change it), or "Turning your speech
 into text…" until Stop has finished and the body holding the recording's
@@ -48,7 +50,7 @@ successive additions follow earlier additions once. Navigating to another note
 does not redirect the result. The normal content-edit undo restores the prior body.
 
 Timed chunks, pause flushes (after more than 3 s of silence, once per pause)
-and Flush clicks are processed mid-speech. Mid-speech processing never writes
+and Write text now clicks are processed mid-speech. Mid-speech processing never writes
 the last transcription segment, because it may be an unfinished sentence. The
 processed audio position advances to the end of the segment before it, and
 the held segment's audio is sent again with the next chunk, so appending a
@@ -59,7 +61,7 @@ once written, is never revised: holding back the unfinished sentence replaces
 revising it. Audio that is entirely silent is not sent.
 A conversion that fails (an error answer or no answer) keeps its audio as
 not yet converted, and recording goes on. That audio is sent again, together
-with the later audio, with the next conversion: timed, pause, Flush, or Stop,
+with the later audio, with the next conversion: timed, pause, Write text now, or Stop,
 including the first conversion of a new recording in the same Audio tools.
 Text already written is not written again. A failure while recording shows
 "Could not turn your speech into text. Your recording is kept." without Retry
@@ -107,7 +109,7 @@ makes it larger than the transcription service accepts has not been observed. An
 could sign in but did not activate Note/New notebook; localhost worked. That
 observation does not establish a human-click defect or its cause.
 
-## Dictating a passage with a pause and Flush
+## Dictating a passage with a pause and Write text now
 
 With an existing six-sentence paragraph, record this known passage at natural
 pace, retaining the eight-second pause after “yesterday”:
@@ -120,14 +122,14 @@ pace, retaining the eight-second pause after “yesterday”:
 > and a pencil.
 
 The macOS input was synthesized at 150 words/minute, mono 48 kHz, duration
-29.168 s. Record produced an intermediate paragraph; activate Flush
+29.168 s. Record produced an intermediate paragraph; activate Write text now
 about 22 seconds into capture, continue until the source ends, then Stop.
 The preexisting paragraph survived every update and reload, but new content
 changed as follows:
 
 1. “The orchard contains apple trees, peach trees, and a small wooden bench.
    These facts are finished. The book that I bought yesterday.”
-2. Flush replaced that paragraph with “After reading several reviews and
+2. Write text now replaced that paragraph with “After reading several reviews and
    comparing different editions, is a gift from my sister because she”.
 3. The final update replaced it with “She enjoys learning about the history
    of gardens. The meeting is on Friday afternoon. We should bring a notebook
@@ -140,12 +142,12 @@ The cause and frequency are unknown.
 
 The owner decided on 2026-10-03 to hold back the unfinished sentence rather
 than revise written text. With append and hold-back in place, the same
-passage at Development `1a981673` (Flush at 23 s, Stop at 31 s) wrote:
+passage at Development `1a981673` (Write text now at 23 s, Stop at 31 s) wrote:
 
 1. “The orchard contains apple trees, peach trees, and a small wooden bench.”
    The transcription also held “These facts are finished.”, and the
    “yesterday” segment was held back.
-2. Flush: “The book that I bought yesterday after reading several reviews and
+2. Write text now: “The book that I bought yesterday after reading several reviews and
    comparing different editions”, with the next segment held back.
 3. Stop: “is a gift from my sister because she enjoys learning about the
    history of gardens. The meeting is on Friday afternoon. We should bring a
@@ -224,7 +226,7 @@ role is unknown.
 | --- | --- |
 | 18.356 s Harvard passage, first recording | First body at 25.17 s from capture, approximately 3.96 s after Stop; audio request 4.42 s |
 | Identical Harvard repeat | Audio request 4.61 s; body stayed identical and settled before Stop |
-| 29.168 s orchard passage with Flush | Audio requests 5.25 / 3.14 / 3.53 s; visible results at 16.73 / 25.30 / 35.75 s from capture; final body settled before Stop |
+| 29.168 s orchard passage with Write text now | Audio requests 5.25 / 3.14 / 3.53 s; visible results at 16.73 / 25.30 / 35.75 s from capture; final body settled before Stop |
 | 6.2827 s lighthouse addition | Audio request 2.79 s; visible addition at 12.16 s from capture, 5.88 s after speech ended; body settled before Stop |
 
 The lighthouse addition and both original paragraphs survived reload exactly

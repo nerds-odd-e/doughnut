@@ -233,7 +233,8 @@ is still "Record"; a later successful Record clears the message.
 
 ### 6. The mid-speech control says what it does and appears only while recording
 Type: Behavior
-Status: planned
+Status: done
+Accepted proof: `NoteAudioTools.recording.spec.ts` (absent before Record, present while recording, "converts what has been said so far with Write text now", "disables Write text now during a conversion") in the frontend audio command, 14 files, 108 tests; vue-tsc clean. No browser test uses the control.
 Proof: `NoteAudioTools.recording.spec.ts` cases for the control under its new name: absent when not recording, present while recording, unavailable during a conversion, and still triggering a conversion.
 
 Behavior: not recording → no mid-speech control is shown. Recording → a
@@ -279,7 +280,8 @@ under a name that matches.
   the status, with Retry beside it; the error alert is hidden then.
 - A start failure is the `micUnavailable` phase; `isProblem` styles it and
   `notConverted` as a problem. `audioRecorder.startRecording` no longer
-  renames its errors. `NoteAudioTools.vue` is at 251 lines; slices 6 and 7
-  should bring it under 250.
+  renames its errors.
+- "Write text now" calls `audioRecorder.tryFlush()` directly and shares the
+  `.labeled-action` style with Record and Stop.
 - A mounted test that sets the note realm calls `refreshNoteRealm` after
   mounting, because mounting reloads the note.
