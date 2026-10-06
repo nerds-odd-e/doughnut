@@ -1,8 +1,13 @@
 # Voice input
 
-Authors open Audio tools on an existing note to Record Audio, Flush Audio,
-Stop Recording, or Save Audio Locally, and after a failed conversion to Retry.
-Advanced Options offers full-screen editing. Dictation writes only to the note body.
+Authors open Audio tools on an existing note to Record, Flush Audio, Stop,
+or Save Audio Locally, and after a failed conversion to Retry. Advanced
+Options offers full-screen editing. The one main action is Record when ready
+and Stop while recording; the microphone chooser sits beside Stop. A status
+that assistive technology announces says "Ready to record", "Recording. Speak
+now." (a mid-speech conversion does not change it), or "Turning your speech
+into text…" until Stop has finished, then "Ready to record" again. Dictation
+writes only to the note body.
 
 ## Adding dictated text to a note
 
@@ -100,7 +105,7 @@ pace, retaining the eight-second pause after “yesterday”:
 > and a pencil.
 
 The macOS input was synthesized at 150 words/minute, mono 48 kHz, duration
-29.168 s. Record Audio produced an intermediate paragraph; activate Flush
+29.168 s. Record produced an intermediate paragraph; activate Flush
 about 22 seconds into capture, continue until the source ends, then Stop.
 The preexisting paragraph survived every update and reload, but new content
 changed as follows:

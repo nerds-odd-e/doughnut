@@ -74,6 +74,14 @@ export function findButtonByTitle(
     .find((button) => button.attributes("title") === title)
 }
 
+export function findButtonByText(wrapper: NoteAudioToolsWrapper, text: string) {
+  return wrapper.findAll("button").find((button) => button.text() === text)
+}
+
+export function dictationStatus(wrapper: NoteAudioToolsWrapper) {
+  return wrapper.get('[role="status"]').text()
+}
+
 export function mountNoteAudioTools(
   note: Note = makeMe.aNote.please(),
   options?: { attachToBody?: boolean }
@@ -88,13 +96,13 @@ export function mountNoteAudioTools(
 }
 
 export async function startRecording(wrapper: NoteAudioToolsWrapper) {
-  await findButtonByTitle(wrapper, "Record Audio")!.trigger("click")
+  await findButtonByText(wrapper, "Record")!.trigger("click")
   await flushPromises()
   await wrapper.vm.$nextTick()
 }
 
 export async function stopRecording(wrapper: NoteAudioToolsWrapper) {
-  await findButtonByTitle(wrapper, "Stop Recording")!.trigger("click")
+  await findButtonByText(wrapper, "Stop")!.trigger("click")
   await flushPromises()
   await wrapper.vm.$nextTick()
 }

@@ -1,10 +1,11 @@
 <template>
-  <div>
+  <section :aria-label="noteMoreOptionsTitles.audio">
     <Waveform
       class="mb-5"
       :audioRecorder="audioRecorder"
       :isRecording="isRecording"
     />
+    <p role="status" class="text-center mb-3">{{ status }}</p>
     <div
       v-if="errors"
       class="daisy-alert"
@@ -18,11 +19,10 @@
       title="Retry"
     >Retry</button>
     <div class="button-group">
-      <template v-if="!isRecording">
-        <button class="daisy-btn" @click="startRecording" title="Record Audio">
-          <Mic :size="24" />
-        </button>
-      </template>
+      <button v-if="!isRecording" class="daisy-btn main-action" @click="startRecording">
+        <Mic :size="24" />
+        Record
+      </button>
       <template v-else>
         <select
           class="device-select"
@@ -34,15 +34,14 @@
             {{ device.label || `Microphone ${device.deviceId.slice(0, 4)}...` }}
           </option>
         </select>
+        <button class="daisy-btn main-action" @click="stopRecording">
+          <Square :size="24" />
+          Stop
+        </button>
       </template>
       <button class="daisy-btn" @click="tryFlushAudio" :disabled="!isRecording || isProcessing" title="Flush Audio">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="24" height="24">
           <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
-        </svg>
-      </button>
-      <button class="daisy-btn" @click="stopRecording" :disabled="!isRecording" title="Stop Recording">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="24" height="24">
-          <path d="M6 6h12v12H6z"/>
         </svg>
       </button>
       <button
@@ -57,7 +56,7 @@
       </button>
       <button
         class="daisy-btn"
-        @click="toggleAdvancedOptions"
+        @click="showAdvancedOptions = !showAdvancedOptions"
         title="Advanced Options"
       >
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="24" height="24">
@@ -72,17 +71,18 @@
         </div>
       </FullScreen>
     </div>
-  </div>
+  </section>
 </template>
 
 <script setup lang="ts">
-import { onBeforeUnmount, ref, type PropType } from "vue"
+import { computed, onBeforeUnmount, ref, type PropType } from "vue"
 import { createAudioRecorder } from "../../../models/audio/audioRecorder"
 import { createWakeLocker } from "../../../models/wakeLocker"
 import type { Note } from "@generated/donut-backend-api"
 import Waveform from "./Waveform.vue"
 import FullScreen from "@/components/common/FullScreen.vue"
-import { Mic } from "@lucide/vue"
+import { noteMoreOptionsTitles } from "./noteMoreOptionsTitles"
+import { Mic, Square } from "@lucide/vue"
 import { useNoteAudioProcessing } from "@/composables/useNoteAudioProcessing"
 
 const { note } = defineProps({
@@ -91,15 +91,18 @@ const { note } = defineProps({
 
 const audioFile = ref<Blob | undefined>()
 const errors = ref<Record<string, string | undefined>>()
-const isRecording = ref(false)
+const statusByPhase = {
+  ready: "Ready to record",
+  recording: "Recording. Speak now.",
+  stopping: "Turning your speech into text…",
+} as const
+const phase = ref<keyof typeof statusByPhase>("ready")
+const isRecording = computed(() => phase.value === "recording")
+const status = computed(() => statusByPhase[phase.value])
 const wakeLocker = createWakeLocker()
 const showAdvancedOptions = ref(false)
 
 const { processAudio, isProcessing } = useNoteAudioProcessing(note, errors)
-
-const toggleAdvancedOptions = () => {
-  showAdvancedOptions.value = !showAdvancedOptions.value
-}
 
 const audioRecorder = createAudioRecorder(processAudio)
 const audioDevices = audioRecorder.getAudioDevices()
@@ -119,7 +122,7 @@ const startRecording = async () => {
   try {
     await wakeLocker.request()
     await audioRecorder.startRecording()
-    isRecording.value = true
+    phase.value = "recording"
   } catch (error) {
     errors.value = { recording: "Failed to start recording" }
     await wakeLocker.release()
@@ -127,10 +130,11 @@ const startRecording = async () => {
 }
 
 const stopRecording = async () => {
-  isRecording.value = false
+  phase.value = "stopping"
   try {
     audioFile.value = await audioRecorder.stopRecording()
   } finally {
+    phase.value = "ready"
     await wakeLocker.release()
   }
 }
@@ -177,6 +181,14 @@ const tryFlushAudio = async () => {
   cursor: pointer;
   transition: background-color 0.3s ease, transform 0.2s ease;
   flex-shrink: 0;
+}
+
+.main-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border-radius: 9999px;
+  padding: 10px 18px;
 }
 
 .daisy-btn:hover:not(:disabled) {

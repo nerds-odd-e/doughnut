@@ -3,14 +3,19 @@ import { waitUntilAppIsNotBusy } from '../pageBase'
 const conversionFailure =
   'Could not turn your speech into text. Your recording is kept.'
 
+const audioToolsPanel = () => cy.findByRole('region', { name: 'Audio tools' })
+
 const audioToolsPage = () => {
   return {
     startRecording() {
-      cy.findByRole('button', { name: 'Record Audio' }).click()
+      audioToolsPanel().within(() => {
+        cy.findByRole('button', { name: 'Record' }).click()
+        cy.findByRole('status').should('have.text', 'Recording. Speak now.')
+      })
       return this
     },
     stopRecording() {
-      cy.findByRole('button', { name: 'Stop Recording' }).click()
+      cy.findByRole('button', { name: 'Stop' }).click()
       // Final transcription (audio-to-text) raises no busy marker; the saved file appears once it finishes.
       cy.findByRole('button', {
         name: 'Save Audio Locally',
@@ -39,6 +44,6 @@ const audioToolsPage = () => {
 export default audioToolsPage
 
 export const assumeAudioTools = () => {
-  cy.findByRole('button', { name: 'Stop Recording' }).should('exist')
+  audioToolsPanel().should('be.visible')
   return audioToolsPage()
 }

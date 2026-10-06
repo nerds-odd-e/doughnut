@@ -153,7 +153,8 @@ Commands (from the story worktree root):
 
 ### 1. The panel names its main action and says ready, recording, and turning speech into text
 Type: Behavior
-Status: planned
+Status: done
+Accepted proof: frontend audio command, 13 files, 96 tests passed (status cases in `NoteAudioTools.status.spec.ts`, Record/Stop and chooser in `NoteAudioTools.recording.spec.ts`); mocked journey 2 passing, `audioToolsPage.startRecording` asserts "Recording. Speak now." in the "Audio tools" region.
 Proof: mocked journey green with "Record" and "Stop" and the recording status observed before Stop; mounted tests for the three statuses, the single main action, and a mid-speech conversion leaving the status on recording; frontend audio tests green.
 
 Behavior: Audio tools open on a note, nothing recording → the status says
@@ -257,4 +258,11 @@ under a name that matches.
 
 ## Learnings
 
-None yet.
+- The panel state lives in `phase` with its wording in `statusByPhase`
+  (`NoteAudioTools.vue`); later slices add a phase there. Status tests live in
+  `NoteAudioTools.status.spec.ts`.
+- The panel is a region named by `noteMoreOptionsTitles.audio`;
+  `assumeAudioTools` checks that region, and `openAudioTools` calls it.
+- The mocked journey's dev server stops on a Biome format error, so edits must
+  be Biome-clean before that journey runs.
+- While Stop is finishing, the main action already shows Record again.

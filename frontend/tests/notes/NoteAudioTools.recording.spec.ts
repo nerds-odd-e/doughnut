@@ -3,6 +3,8 @@ import makeMe from "donut-test-fixtures/makeMe"
 import { mockSdkServiceWithImplementation } from "@tests/helpers"
 import {
   audioToolsVm,
+  dictationStatus,
+  findButtonByText,
   findButtonByTitle,
   midSpeechChunk,
   mountNoteAudioTools,
@@ -50,21 +52,20 @@ describe("NoteAudioTools recording controls", () => {
     wrapper?.unmount()
   })
 
-  it("shows Record initially, then hides it and enables Stop and Flush while recording", async () => {
-    expect(findButtonByTitle(wrapper, "Record Audio")).toBeTruthy()
-    expect(
-      findButtonByTitle(wrapper, "Stop Recording")!.attributes("disabled")
-    ).toBeDefined()
+  it("offers Record when ready, then Stop while recording, with the status announced", async () => {
+    expect(dictationStatus(wrapper)).toBe("Ready to record")
+    expect(findButtonByText(wrapper, "Record")).toBeTruthy()
+    expect(findButtonByText(wrapper, "Stop")).toBeUndefined()
     expect(
       findButtonByTitle(wrapper, "Flush Audio")!.attributes("disabled")
     ).toBeDefined()
 
     await startRecording(wrapper)
 
-    expect(findButtonByTitle(wrapper, "Record Audio")).toBeUndefined()
-    expect(
-      findButtonByTitle(wrapper, "Stop Recording")!.attributes("disabled")
-    ).toBeFalsy()
+    expect(dictationStatus(wrapper)).toBe("Recording. Speak now.")
+    expect(findButtonByText(wrapper, "Record")).toBeUndefined()
+    expect(findButtonByText(wrapper, "Stop")).toBeTruthy()
+    expect(wrapper.find(".device-select").exists()).toBe(true)
     expect(
       findButtonByTitle(wrapper, "Flush Audio")!.attributes("disabled")
     ).toBeFalsy()
