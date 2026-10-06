@@ -418,23 +418,161 @@ failed. Today that is spread over separate flags.
 
 **Identity:** SEED-066#create-with-spoken-title
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"not-refined","approach":"unselected"}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/009-create-a-note-using-a-spoken-title/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"2f1125acaf59cbbcec2cc34abe4aeb454ecbd08cca6255abacbbae303e9bff3b","plan":"d106c12dc330094fb40c186deee427d0e6429b2817f6a02641819f884edc4d1e"}}
 ```
 
-- **For / why:** Let an author capture a new note's subject by speaking its title
-  during creation, an explicitly requested valuable journey.
-- **Evaluation:** In New note, speak a title, review or correct it, and submit.
-  The note is created once in the chosen location with that title.
-- **Evidence / learning:** No explicit voice-title control was discovered in
-  New note. OS dictation and extensions remain unassessed; compare their adequacy
-  before investing heavily in a native control.
-- **Boundary:** Explicit title input within the existing creation journey.
-  Preserve ordinary title validation and location selection. This does not
-  introduce voice commands for folder choice or automatic note submission.
-- **Effort hypothesis:** M — medium confidence; assumes a short title capture
-  can fit the existing creation workflow.
-- **Depends on:** Existing note creation; existing-note voice renaming is not
-  a product prerequisite. Body dictation must respect the chosen title.
+**Goal:** A note author who is creating a note names it by speaking instead
+of typing, sees the heard words in the title field, corrects them if needed,
+and submits as usual. The note is created once, in the chosen location, with
+the title the author reviewed. This is the "dictating titles" part of voice
+input; renaming an existing note by speaking is the sibling story, not this
+one.
+
+**The user:** The same note author as
+[Complete a first dictation](#understandable-first-dictation): someone who
+opens New note from the notebook sidebar or from a note's toolbar, perhaps on
+a phone, and would rather say a title than type it. A title is a few words,
+so they expect to speak once and see the whole title, not fragments.
+
+**What the author meets today (read from the code, 2026-10-06):** New note is
+a dialog with a folder chooser, an optional parent relationship, a title
+field, a Wikidata lookup beside the title, a list of existing notes whose
+titles match what has been typed, and Submit. The title field opens as
+"Untitled" with the text selected, so typing replaces it; when the parent
+folder's README sets a title pattern, the field opens with that rendered
+pattern followed by a space for the author to continue. The title field is an
+editable text area, so dictation built into the operating system can already
+type into it; nothing in the dialog offers to listen. Audio tools exists only
+on an existing note's toolbar and writes only to the body.
+
+**Compared alternative — operating-system dictation:** The seed asked for
+this comparison before building a native control. Dictation built into
+macOS, iOS, Android and Windows types into any focused text field, so an
+author who has it turned on can already speak a title in New note; this has
+not been observed in Donut. It costs nothing to build, shows words as they
+are spoken, and uses the author's own setup. Against it: it is absent or
+turned off on many machines and browsers, its language is set in the
+operating system rather than heard, it is a second, different dictation next
+to Donut's own within one note-writing session, and the product can neither
+name it nor help when it is missing. Recommendation: build the native
+control, so one voice-input journey with one set of words and one
+transcription quality covers both the title and the body. The owner accepted
+this on 2026-10-06.
+
+**Scope:**
+
+- **Required — speak the title in New note:** New note offers one control,
+  named in words, that listens for the title: "Speak the title". The author
+  chooses it, allows the microphone, speaks, and chooses Stop. The heard
+  words arrive in the title field once, after Stop, as one line, exactly as
+  the transcription heard them, its segments joined as body passages are
+  joined. No part appears while the author is still speaking.
+- **Required — the spoken words go where typing goes:** They replace the
+  untouched default "Untitled" and otherwise join the end of the title the
+  author already has, including a title pattern the dialog opened with. The
+  author corrects the title by typing or by speaking again, as with a typed
+  title.
+- **Required — a spoken title is an ordinary title:** It drives the same
+  search for existing notes, the same Wikidata lookup, the same illegal
+  character replacement, warnings and validation, and is submitted by the
+  same Submit. Nothing is created until the author submits; the note is
+  created once, in the chosen folder with the chosen parent relationship,
+  with the title shown at that moment.
+- **Required — the state in words:** While listening, the control becomes
+  Stop and a status the author can read, and that assistive technology
+  announces when it changes, says the dialog is recording; after Stop it
+  says the speech is being turned into text until the words are in the
+  field. When nothing was heard, it says so and the title field is
+  unchanged. Colour or movement alone never carries the state. Wording
+  follows [Complete a first dictation](#understandable-first-dictation).
+- **Required — submit after the title is heard:** While the dialog is
+  listening or turning speech into text, Submit is not offered.
+  Justification: the note must be created once with the title the author
+  reviewed; submitting then would create it under the old title and lose the
+  spoken one.
+- **Required — failure leaves the title alone:** When the microphone cannot
+  be used, the first-dictation story's message is shown as a problem and
+  "Speak the title" stays available. When the speech could not be turned
+  into text, the message says so, the title field is unchanged, and speaking
+  again sends only the new recording: a failed attempt's audio is not
+  carried into the next one. There is no Retry control; speaking again is
+  the retry.
+- **Keep:** Body dictation on the created note behaves as the
+  [voice-input documentation](../../docs/voice-input.md) describes and never
+  changes the title. Every New note behavior above that is not about speech
+  is unchanged, including a title prefilled from an unresolved wiki link.
+- **Deferred, not promised:** Listening ending by itself when the author
+  falls silent; tidying the heard words, such as removing a closing full
+  stop or changing capitals; speaking the folder or parent relationship;
+  submitting by voice; a spoken title in the existing-note title editor (the
+  sibling story); keeping a failed recording for Retry; a microphone chooser
+  or Write text now in New note; and observing operating-system dictation or
+  hardware capture, which stay gaps.
+- **No other rejection constraints:** Nothing else makes the product refuse
+  an action New note accepts today.
+
+**Key examples:**
+
+1. **Spoken title:** From the sidebar, the author opens New note; the title
+   field shows "Untitled". They choose "Speak the title", allow the
+   microphone, say "Photosynthesis in desert plants", and choose Stop. The
+   status says the speech is being turned into text; then the title field
+   reads what was heard, "Photosynthesis in desert plants", and existing
+   notes matching it are listed, as after typing. The author chooses Submit.
+   The note exists once in the notebook root with that title, and after
+   reload the title is unchanged.
+2. **Correct before submitting:** The field reads "Photosynthesis in dessert
+   plants". The author fixes "dessert" by typing and submits. The note has
+   the corrected title.
+3. **Continue a title pattern:** New note opens with "2026-10-06 " from the
+   folder's title pattern. The author speaks "weekly review" and the title
+   reads "2026-10-06 weekly review".
+4. **Nothing heard:** The author chooses "Speak the title", says nothing, and
+   chooses Stop. The status says no speech was turned into text; the title
+   still reads "Untitled"; Submit is offered again.
+5. **Failure, then success:** The transcription fails at Stop. The message
+   says the speech could not be turned into text; the title is unchanged;
+   Submit is offered again. The author chooses "Speak the title" once more
+   and says "Lighthouse keepers". The title reads "Lighthouse keepers" only.
+6. **Child note on a phone:** From a note's toolbar on a touch screen, the
+   author opens New note, and every control, including "Speak the title",
+   can be told apart by a name they can read. The spoken title is created
+   under the chosen folder with the chosen parent relationship.
+7. **Body stays separate:** After creating "Lighthouse keepers", the author
+   dictates a paragraph with Audio tools. The paragraph goes to the body and
+   the title stays "Lighthouse keepers".
+
+**UI:** Words only; layout and exact wording are for execution and the
+owner's review. "Speak the title" sits with the title field inside New note
+and becomes "Stop" while listening. Status wording reuses the first-dictation
+story: "Recording. Speak now.", "Turning your speech into text…", "No speech
+was turned into text.", "Could not use the microphone. Allow microphone
+access in your browser, then try again.", and "Could not turn your speech
+into text." Once the words are in the field, the field itself is the result;
+no "added" status is needed.
+
+**Decided by the owner on 2026-10-06:**
+
+1. **Native control:** build "Speak the title" in New note rather than
+   relying on operating-system dictation, as compared above.
+2. **The author chooses Stop:** listening does not end by itself after a
+   silence, consistent with Audio tools and with no silence threshold to
+   tune. Automatic stop stays deferred.
+3. **Heard words stay as transcribed:** the transcription commonly ends
+   speech with a full stop; it stays in the field and the author reviews
+   before Submit. Tidying is decided after the owner has tried it.
+
+- **Evidence / learning:** No voice-title control exists in New note (code,
+  2026-10-06). The audio request carries only the audio and the mid-speech
+  flag and returns segment texts without touching a note, so title capture
+  can reuse it. Operating-system dictation in Donut remains unobserved.
+- **Effort hypothesis:** M — medium confidence; assumes the recorder and
+  transcription request that Audio tools uses can be driven from New note,
+  converting only at Stop, without a backend change.
+- **Depends on:** Existing note creation. Not a prerequisite, but reuse the
+  status wording and state handling from
+  [Complete a first dictation](#understandable-first-dictation) once it has
+  landed. Renaming by speech is independent.
 - **Safe stopping point:** Authors can create a note with a reviewed spoken
   title even if existing-note title dictation is cancelled.
 
@@ -497,8 +635,13 @@ one-time automatic title generation has no queued story.
   recognition itself remains undecided.
 - Any distinct navigation problem left after source-content preservation fixes.
 - The adequacy of OS dictation or external transcription for explicit title
-  input. Optional one-time automatic title generation stays deferred.
-- The interaction for explicit title dictation, including during note creation.
+  input: compared in [Create a note using a spoken title](#create-with-spoken-title),
+  where the owner chose a native control on 2026-10-06; still open for
+  renaming an existing note. Optional one-time automatic title generation
+  stays deferred.
+- The interaction for explicit title dictation on an existing note; the New
+  note interaction is proposed in
+  [Create a note using a spoken title](#create-with-spoken-title).
 
 ## Breadcrumbs
 
