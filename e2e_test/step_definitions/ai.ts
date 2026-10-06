@@ -109,9 +109,16 @@ Given('OpenAI will reply below for user messages:', (data: DataTable) => {
 })
 
 Given(
-  'the OpenAI transcription service will return the following srt transcript:',
+  'the OpenAI transcription service will return the following srt transcript while I am speaking:',
   (transcript: string) => {
-    mock_services.openAi().stubTranscription(transcript)
+    mock_services.openAi().stubMidSpeechTranscription(transcript)
+  }
+)
+
+Given(
+  'the OpenAI transcription service will return the text {string} when I stop',
+  (transcript: string) => {
+    mock_services.openAi().stubStopTranscription(transcript)
   }
 )
 
@@ -120,7 +127,7 @@ Given('the OpenAI transcription service fails', () => {
 })
 
 Given(
-  'the OpenAI transcription service now returns the following srt transcript:',
+  'the OpenAI transcription service now returns the text {string}',
   (transcript: string) => {
     mock_services.openAi().replaceTranscriptionFailureWithTranscript(transcript)
   }

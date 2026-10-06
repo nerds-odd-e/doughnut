@@ -9,27 +9,19 @@ public class SRTProcessor {
   @Getter
   @AllArgsConstructor
   public static class SRTProcessingResult {
-    private String processedSRT;
     private List<String> segmentTexts;
     private String endTimestamp;
   }
 
-  public SRTProcessingResult process(String rawSRT, boolean midSpeech) {
+  public SRTProcessingResult process(String rawSRT) {
     List<String> segments = Arrays.asList(rawSRT.strip().split("\n\n"));
-    if (!midSpeech) {
-      return new SRTProcessingResult(
-          rawSRT, segmentTextsOf(segments), extractTimestampFromSegment(segments.getLast()));
-    }
-
     if (segments.size() <= 1) {
-      return new SRTProcessingResult("", List.of(), "00:00:00,000");
+      return new SRTProcessingResult(List.of(), "00:00:00,000");
     }
 
     List<String> written = segments.subList(0, segments.size() - 1);
     return new SRTProcessingResult(
-        String.join("\n\n", written),
-        segmentTextsOf(written),
-        extractTimestampFromSegment(written.getLast()));
+        segmentTextsOf(written), extractTimestampFromSegment(written.getLast()));
   }
 
   private static List<String> segmentTextsOf(List<String> segments) {

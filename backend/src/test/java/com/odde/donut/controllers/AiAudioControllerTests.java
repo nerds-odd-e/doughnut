@@ -1,21 +1,26 @@
 package com.odde.donut.controllers;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.empty;
-import static org.mockito.ArgumentMatchers.any;
+import static org.hamcrest.Matchers.equalTo;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.openai.models.audio.AudioResponseFormat;
 import com.openai.models.audio.transcriptions.Transcription;
 import com.openai.models.audio.transcriptions.TranscriptionCreateParams;
 import com.openai.models.audio.transcriptions.TranscriptionCreateResponse;
 import com.openai.services.blocking.AudioService;
+import java.util.Optional;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mock.web.MockMultipartFile;
@@ -30,14 +35,15 @@ class AiAudioControllerTests extends ControllerTestBase {
           + "2\n00:00:03,000 --> 00:00:06,000\nThese facts are finished.\n\n"
           + "3\n00:00:06,000 --> 00:00:09,000\nThe book that I";
 
-  private void mockTranscriptionSrtResponse(String responseBody) {
+  private ArgumentCaptor<TranscriptionCreateParams> mockTranscriptionResponse(String responseBody) {
     var audioService = Mockito.mock(AudioService.class, Mockito.RETURNS_DEEP_STUBS);
     when(officialClient.audio()).thenReturn(audioService);
     var transcriptionResponse =
         TranscriptionCreateResponse.ofTranscription(
             Transcription.builder().text(responseBody).build());
-    when(audioService.transcriptions().create(any(TranscriptionCreateParams.class)))
-        .thenReturn(transcriptionResponse);
+    var params = ArgumentCaptor.forClass(TranscriptionCreateParams.class);
+    when(audioService.transcriptions().create(params.capture())).thenReturn(transcriptionResponse);
+    return params;
   }
 
   private ResultActions upload(String filename, boolean midSpeech) throws Exception {
@@ -57,15 +63,54 @@ class AiAudioControllerTests extends ControllerTestBase {
     @ParameterizedTest
     @ValueSource(strings = {"podcast.mp3", "podcast.m4a", "podcast.wav"})
     void convertingFormat(String filename) throws Exception {
-      mockTranscriptionSrtResponse("1\n00:00:00,000 --> 00:00:03,000\ntest transcription");
+      mockTranscriptionResponse("test transcription");
 
       upload(filename, false)
           .andExpect(jsonPath("$.segmentTexts").value(contains("test transcription")));
     }
 
     @Test
+    void stopAsksTheFastModelForPlainText() throws Exception {
+      var params = mockTranscriptionResponse("The orchard has apple trees.");
+
+      upload("test.wav", false);
+
+      assertThat(params.getValue().model().asString(), equalTo("gpt-4o-mini-transcribe"));
+      assertThat(
+          params.getValue().responseFormat(), equalTo(Optional.of(AudioResponseFormat.TEXT)));
+    }
+
+    @Test
+    void stopWritesTheWholeTranscriptionAsOneSegmentWithoutEndTimestamp() throws Exception {
+      mockTranscriptionResponse("The orchard has apple trees. The book that I read.\n");
+
+      upload("test.wav", false)
+          .andExpect(
+              jsonPath("$.segmentTexts")
+                  .value(contains("The orchard has apple trees. The book that I read.")))
+          .andExpect(jsonPath("$.endTimestamp").doesNotExist());
+    }
+
+    @Test
+    void blankStopTranscriptionFails() {
+      mockTranscriptionResponse("  \n");
+
+      assertThrows(Exception.class, () -> upload("test.wav", false));
+    }
+
+    @Test
+    void midSpeechAsksWhisperForSrt() throws Exception {
+      var params = mockTranscriptionResponse(THREE_SEGMENTS);
+
+      upload("test.wav", true);
+
+      assertThat(params.getValue().model().asString(), equalTo("whisper-1"));
+      assertThat(params.getValue().responseFormat(), equalTo(Optional.of(AudioResponseFormat.SRT)));
+    }
+
+    @Test
     void midSpeechWritesTheTranscriptionOfAllButTheLastSegment() throws Exception {
-      mockTranscriptionSrtResponse(THREE_SEGMENTS);
+      mockTranscriptionResponse(THREE_SEGMENTS);
 
       upload("test.mp3", true)
           .andExpect(
@@ -75,42 +120,30 @@ class AiAudioControllerTests extends ControllerTestBase {
     }
 
     @Test
-    void stopWritesTheTranscriptionOfEverySegment() throws Exception {
-      mockTranscriptionSrtResponse(THREE_SEGMENTS);
-
-      upload("test.mp3", false)
-          .andExpect(
-              jsonPath("$.segmentTexts")
-                  .value(
-                      contains(
-                          "The orchard has apple trees.",
-                          "These facts are finished.",
-                          "The book that I")))
-          .andExpect(jsonPath("$.endTimestamp").value("00:00:09,000"));
-    }
-
-    @Test
     void segmentTextNormalizesLinesAfterTheTimestampWithoutAnIndex() throws Exception {
-      mockTranscriptionSrtResponse(
+      mockTranscriptionResponse(
           "00:00:00,000 --> 00:00:01,000\nits talk about\ndada struct day.\n\n"
-              + "00:00:01,000 --> 00:00:02,000\nNext one.\n\n");
+              + "00:00:01,000 --> 00:00:02,000\nNext one.\n\n"
+              + "00:00:02,000 --> 00:00:03,000\nThe book that I");
 
-      upload("test.mp3", false)
+      upload("test.mp3", true)
           .andExpect(
               jsonPath("$.segmentTexts")
                   .value(contains("its talk about dada struct day.", "Next one.")));
     }
 
     @Test
-    void transcriptionWithoutTextHasNoWrittenSegments() throws Exception {
-      mockTranscriptionSrtResponse("1\n00:00:00,000 --> 00:00:03,000\n");
+    void segmentWithoutTextIsNotWritten() throws Exception {
+      mockTranscriptionResponse(
+          "1\n00:00:00,000 --> 00:00:03,000\n\n"
+              + "2\n00:00:03,000 --> 00:00:06,000\nThe book that I");
 
-      upload("test.mp3", false).andExpect(jsonPath("$.segmentTexts").value(empty()));
+      upload("test.mp3", true).andExpect(jsonPath("$.segmentTexts").value(empty()));
     }
 
     @Test
     void shouldHoldBackSingleSegmentOfMidSpeechUpload() throws Exception {
-      mockTranscriptionSrtResponse("1\n00:00:00,000 --> 00:00:03,000\nunfinished sentence\n\n\n");
+      mockTranscriptionResponse("1\n00:00:00,000 --> 00:00:03,000\nunfinished sentence\n\n\n");
 
       upload("test.mp3", true)
           .andExpect(jsonPath("$.segmentTexts").value(empty()))

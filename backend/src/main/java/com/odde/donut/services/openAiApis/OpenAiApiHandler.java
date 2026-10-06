@@ -112,7 +112,9 @@ public class OpenAiApiHandler {
     return new ArrayList<>();
   }
 
-  public String getTranscription(String filename, byte[] audioBytes) throws IOException {
+  public String getTranscription(
+      String filename, byte[] audioBytes, String model, AudioResponseFormat responseFormat)
+      throws IOException {
     assertOpenAiAvailable();
     String effectiveFilename = filename != null && !filename.isBlank() ? filename : "audio.wav";
     TranscriptionCreateParams params =
@@ -122,8 +124,8 @@ public class OpenAiApiHandler {
                     .value(new ByteArrayInputStream(audioBytes))
                     .filename(effectiveFilename)
                     .build())
-            .model("whisper-1")
-            .responseFormat(AudioResponseFormat.SRT)
+            .model(model)
+            .responseFormat(responseFormat)
             .build();
     var transcription = officialClient.audio().transcriptions().create(params);
     return transcription

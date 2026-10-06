@@ -6,6 +6,7 @@ import com.odde.donut.services.ai.OtherAiServices;
 import com.odde.donut.services.ai.TextFromAudioWithCallInfo;
 import jakarta.validation.Valid;
 import java.io.IOException;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,15 +31,16 @@ class AiAudioController {
       throws IOException {
     String filename = audioFile.getUploadAudioFile().getOriginalFilename();
     byte[] bytes = audioFile.getUploadAudioFile().getBytes();
-    String transcriptionFromAudio = otherAiServices.getTranscriptionFromAudio(filename, bytes);
-
-    SRTProcessor.SRTProcessingResult processedResult =
-        new SRTProcessor().process(transcriptionFromAudio, audioFile.isMidSpeech());
-
     TextFromAudioWithCallInfo textFromAudioWithCallInfo = new TextFromAudioWithCallInfo();
-    textFromAudioWithCallInfo.setSegmentTexts(processedResult.getSegmentTexts());
-    textFromAudioWithCallInfo.setEndTimestamp(processedResult.getEndTimestamp());
-    textFromAudioWithCallInfo.setRawSRT(processedResult.getProcessedSRT());
+    if (audioFile.isMidSpeech()) {
+      SRTProcessor.SRTProcessingResult processedResult =
+          new SRTProcessor().process(otherAiServices.getSrtTranscription(filename, bytes));
+      textFromAudioWithCallInfo.setSegmentTexts(processedResult.getSegmentTexts());
+      textFromAudioWithCallInfo.setEndTimestamp(processedResult.getEndTimestamp());
+    } else {
+      textFromAudioWithCallInfo.setSegmentTexts(
+          List.of(otherAiServices.getTextTranscription(filename, bytes).strip()));
+    }
     return textFromAudioWithCallInfo;
   }
 }

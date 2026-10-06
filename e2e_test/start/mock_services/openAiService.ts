@@ -115,7 +115,15 @@ const openAiService = (
       })
     },
 
-    stubTranscription(transcript: string) {
+    stubMidSpeechTranscription(srtTranscript: string) {
+      return serviceMocker.mockWithPredicates(
+        [transcriptionPredicate().withBody('whisper-1')],
+        [srtTranscript],
+        transcriptHeaders
+      )
+    },
+
+    stubStopTranscription(transcript: string) {
       return serviceMocker.mockWithPredicates(
         [transcriptionPredicate()],
         [transcript],

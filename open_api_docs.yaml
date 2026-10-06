@@ -5102,8 +5102,6 @@ components:
           type: array
           items:
             type: string
-        rawSRT:
-          type: string
         endTimestamp:
           type: string
     AssimilationRequestDTO:

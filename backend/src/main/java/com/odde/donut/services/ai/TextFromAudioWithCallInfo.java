@@ -9,7 +9,5 @@ import lombok.Setter;
 public class TextFromAudioWithCallInfo {
   private List<String> segmentTexts;
 
-  private String rawSRT;
-
   private String endTimestamp;
 }

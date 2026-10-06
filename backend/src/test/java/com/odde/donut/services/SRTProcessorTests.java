@@ -19,57 +19,39 @@ class SRTProcessorTests {
   }
 
   @Test
-  void shouldNotModifySRTWhenNotIncomplete() {
-    SRTProcessor.SRTProcessingResult result = processor.process(sampleSRT, false);
-    assertThat(result.getProcessedSRT(), equalTo(sampleSRT));
-    assertThat(result.getEndTimestamp(), equalTo("00:00:09,000"));
-  }
-
-  @Test
-  void shouldRemoveLastSegmentWhenIncomplete() {
-    SRTProcessor.SRTProcessingResult result = processor.process(sampleSRT, true);
-    assertThat(result.getProcessedSRT(), not(containsString("Last segment")));
-    assertThat(result.getProcessedSRT(), containsString("First segment"));
-    assertThat(result.getProcessedSRT(), containsString("Second segment"));
+  void shouldRemoveLastSegment() {
+    SRTProcessor.SRTProcessingResult result = processor.process(sampleSRT);
+    assertThat(result.getSegmentTexts(), contains("First segment", "Second segment"));
     assertThat(result.getEndTimestamp(), equalTo("00:00:06,000"));
   }
 
   @Test
-  void shouldHoldBackSingleSegmentWhenIncomplete() {
+  void shouldHoldBackSingleSegment() {
     String singleSegment = "1\n00:00:00,000 --> 00:00:03,000\nOnly segment";
-    SRTProcessor.SRTProcessingResult result = processor.process(singleSegment, true);
-    assertThat(result.getProcessedSRT(), equalTo(""));
+    SRTProcessor.SRTProcessingResult result = processor.process(singleSegment);
+    assertThat(result.getSegmentTexts(), empty());
     assertThat(result.getEndTimestamp(), equalTo("00:00:00,000"));
   }
 
   @Test
-  void shouldRemoveRealLastSegmentWhenIncompleteSRTEndsWithBlankLines() {
-    SRTProcessor.SRTProcessingResult result = processor.process(sampleSRT + "\n\n\n", true);
-    assertThat(result.getProcessedSRT(), not(containsString("Last segment")));
-    assertThat(result.getProcessedSRT(), containsString("Second segment"));
+  void shouldRemoveRealLastSegmentWhenSRTEndsWithBlankLines() {
+    SRTProcessor.SRTProcessingResult result = processor.process(sampleSRT + "\n\n\n");
+    assertThat(result.getSegmentTexts(), contains("First segment", "Second segment"));
     assertThat(result.getEndTimestamp(), equalTo("00:00:06,000"));
   }
 
   @Test
-  void shouldHoldBackSingleSegmentEndingWithBlankLinesWhenIncomplete() {
+  void shouldHoldBackSingleSegmentEndingWithBlankLines() {
     String singleSegment = "1\n00:00:00,000 --> 00:00:03,000\nOnly segment\n\n\n";
-    SRTProcessor.SRTProcessingResult result = processor.process(singleSegment, true);
-    assertThat(result.getProcessedSRT(), equalTo(""));
+    SRTProcessor.SRTProcessingResult result = processor.process(singleSegment);
+    assertThat(result.getSegmentTexts(), empty());
     assertThat(result.getEndTimestamp(), equalTo("00:00:00,000"));
   }
 
   @Test
-  void shouldHoldBackEmptySRTWhenIncomplete() {
-    SRTProcessor.SRTProcessingResult result = processor.process("", true);
-    assertThat(result.getProcessedSRT(), equalTo(""));
+  void shouldHoldBackEmptySRT() {
+    SRTProcessor.SRTProcessingResult result = processor.process("");
+    assertThat(result.getSegmentTexts(), empty());
     assertThat(result.getEndTimestamp(), equalTo("00:00:00,000"));
-  }
-
-  @Test
-  void shouldHandleInvalidSRTFormat() {
-    String invalidSRT = "Invalid SRT format";
-    SRTProcessor.SRTProcessingResult result = processor.process(invalidSRT, false);
-    assertThat(result.getProcessedSRT(), equalTo(invalidSRT));
-    assertThat(result.getEndTimestamp(), equalTo(""));
   }
 }

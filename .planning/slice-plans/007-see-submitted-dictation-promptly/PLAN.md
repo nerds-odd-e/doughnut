@@ -200,17 +200,63 @@ Every run sent exactly one `audio-to-text` request, after Stop. Times in ms.
 
 ### 2. A short dictation is visible within the target after Stop
 Type: Behavior
-Status: planned — candidate chosen from slice 1; transcription option probe awaits the owner's go-ahead
+Status: done — target met on the held stack, 2026-10-06
 
-Chosen candidate (from slice 1): change the transcription request made at
-Stop. Upload, the wait before the request, and the join are each too small to
-matter. Mid-speech requests keep `whisper-1` SRT, because hold-back needs
-segment end times. Before any product code changes, a direct probe compares
-the Stop request's options on the 16 kHz mono Harvard and lighthouse WAVs
-(five calls each): `whisper-1` SRT (today), and transcription models that
-return plain text. The change is written here only when one option meets the
-target in that probe.
-Proof: five Harvard and five lighthouse runs on the held stack with branch code (median ≤ 2 s, none > 3 s); reload shows the original paragraph and the passage once; one orchard run matches the documented passages; the frontend audio tests, the mocked journey, and (when backend code changes) the backend audio tests are green. Run those tests once before changing code.
+Change: the conversion made at Stop (and Retry, which runs the same Stop
+conversion; `midSpeech=false`) asks `gpt-4o-mini-transcribe` for plain text
+instead of `whisper-1` SRT. The returned text, stripped, is the one segment
+appended. That request returns no end timestamp, so the frontend treats all
+sent audio as converted, as it already does when no timestamp comes back.
+Mid-speech conversions (the 60 s timer and Flush; `midSpeech=true`) keep
+`whisper-1` SRT and hold-back unchanged. The mocked OpenAI service answers
+the Stop request with plain text, so `record_live_audio.feature` keeps its
+expected note content.
+
+Probe (direct calls to OpenAI with the 16 kHz mono Harvard WAV, 591 494
+bytes, from this machine; seconds, five calls each):
+
+| Request | Calls | Median | Slowest |
+| --- | --- | --- | --- |
+| `whisper-1`, SRT (today) | 2.56, 1.43, 1.36, 2.35, 2.68 | 2.35 | 2.68 |
+| `gpt-4o-mini-transcribe`, text | 1.37, 1.38, 1.01, 1.14, 0.97 | 1.14 | 1.38 |
+| `gpt-transcribe`, text | 1.53, 1.07, 1.08, 1.10, 1.04 | 1.08 | 1.53 |
+
+All fifteen returned the same six Harvard sentences word for word.
+`gpt-4o-mini-transcribe` was chosen over `gpt-transcribe`: the same speed in
+this probe, and the lower price.
+
+#### Slice 2 results
+
+Held stack from this worktree with the slice 2 change (uncommitted, on
+`99962fbf99`), the same method as slice 1, owner's go-ahead 2026-10-06. Times in ms;
+every run sent exactly one `audio-to-text` request, after Stop.
+
+| Recording | Stop → request start | Request | Request end → visible | Total |
+| --- | --- | --- | --- | --- |
+| Harvard run 1 | 5 | 2284 | 88 | 2377 |
+| Harvard run 2 | 23 | 1366 | 84 | 1473 |
+| Harvard run 3 | 4 | 1138 | 42 | 1185 |
+| Harvard run 4 | 4 | 1319 | 53 | 1376 |
+| Harvard run 5 | 5 | 1129 | 35 | 1169 |
+| Lighthouse run 1 | 3 | 603 | 51 | 657 |
+| Lighthouse run 2 | 2 | 618 | 41 | 662 |
+| Lighthouse run 3 | 3 | 853 | 32 | 887 |
+| Lighthouse run 4 | 3 | 909 | 33 | 945 |
+| Lighthouse run 5 | 4 | 980 | 24 | 1007 |
+
+- Harvard: median 1376, slowest 2377 — target met.
+- Lighthouse: median 887, slowest 1007 — target met.
+- Reload after run 1 of each showed "This is class 1." and the passage once.
+- Orchard (synthesized at 150 words/minute, 8 s pause after "yesterday,",
+  29.21 s; Flush 22 s after Record; Stop after the end): three requests. The
+  pause wrote "The orchard contains apple trees, peach trees, and a small
+  wooden bench. These facts are finished."; Flush wrote "The book that I
+  bought yesterday after reading several reviews and comparing different
+  editions"; Stop wrote "Is a gift for my sister because she enjoys learning
+  about the history of gardens. The meeting is on Friday afternoon. We should
+  bring a notebook and a pencil.", visible 945 ms after Stop. Nothing was
+  revised; reload showed each once. Unlike `whisper-1`, the Stop passage
+  starts with a capital ("editions Is a gift").
 
 Behavior: a note with one saved paragraph, and an author who has recorded up
 to about 20 seconds of speech without a long pause → Stop → the complete
@@ -247,3 +293,7 @@ results and report to the owner; do not change code under this slice.
   in by calling `/api/healthcheck` with Basic auth to get a session cookie).
 - The Stop wait is almost entirely the `whisper-1` call, and it varies by
   about 1.4 s from run to run for the same audio.
+- `gpt-4o-mini-transcribe` capitalizes the first word of a Stop passage that
+  continues a sentence held back or flushed earlier. Whether to address it
+  (for example with the transcription `prompt`) is an owner decision outside
+  this story's target.
