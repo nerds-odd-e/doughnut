@@ -6,7 +6,7 @@ released response is not proof of effectiveness. Unknown provenance stays unknow
 [Response status](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/finding-names.md).
 Full pre-trim evidence: `8830c682704aac3bbb34bf9b1204da8feba042ca:DearDough.md`. Older narratives live in Git, not a second archive.
 
-- Highest allocated local number: 213. Removed local codes are never reused.
+- Highest allocated local number: 214. Removed local codes are never reused.
 
 ## ODF-110 — A readiness replay observed only the plan's named seam, not the rest of the slice's journey
 
@@ -377,6 +377,14 @@ an E2E run cannot run it on unformatted files.
   - Evidence: slice 3 implementer learning, recorded in the plan's Learnings at ab773157bb: "E2E stack startup runs a Biome format check, so an unformatted frontend file stops `cy:run` before any scenario runs"; CLAUDE.md "implementers/refactorers run neither it nor standalone `lint:changed`".
   - Observed effect: the slice 3 E2E proof was blocked until files were formatted; extra time not recorded.
   - Inference: the rule and the project tooling conflict for any slice whose proof is an E2E run; the agent map or the slice delegation could say that formatting the touched files before `cy:run` is allowed. Qualified: one occurrence; how the implementer resolved it was not supplied.
+- Execution: SEED-066#understandable-first-dictation / `0662bac730:.planning/slice-plans/008-complete-a-first-dictation-with-understandable-controls/PLAN.md` / 31b9b7b7bb
+  - Timestamp: unknown (slice 1, before commit 2026-10-06T09:18:48+09:00)
+  - Tool: Claude Code
+  - Model: claude-opus-5-5
+  - Open Dough release: 0.3.56 (execution-checkout VERSION)
+  - Evidence: slice 1 implementer return: the first mocked-journey run failed on a Biome line-length error in `NoteToolbar.panels.spec.ts`; it was rewrapped by hand. The coordinator then told later implementers they may run `biome check --linter-enabled=false` on their files, and the slice 3 and slice 4 E2E runs passed first time.
+  - Observed effect: one failed E2E run in slice 1; extra time not recorded.
+  - Inference: a read-only format check of touched files before `cy:run` avoided a repeat without breaking the coordinator-only formatting rule. Qualified: the delegation prompt supplied it, not the guidance.
 
 ## ODF-216 — Landing retired the execution workspace while its final slice still needed a continuation
 
@@ -416,3 +424,19 @@ Follow-up: Open, unqueued.
   - Evidence: `preparation-assignment.mjs release`, `agent-commit.mjs`, `queued-closure-check.mjs` (`clear`), `git push`, and `worktree-retirement.mjs` (`ok: true`) all succeeded; refresh inspection found the default checkout clean on `main` with 5ec0d443f4 not contained in fetched `origin/main` and `origin/main` not contained in `HEAD`; the default checkout's reflog shows `rebase (start): checkout origin/main` at 09:20:04. The dashboard report was `completed` with that refresh as the attention message. Side note: `dashboard-completion.mjs --help` answers "Completion delivery was not acknowledged: Malformed reporting arguments" and exits 1; it has no usage text.
   - Observed effect: one owner rebase and push, and one attention message that was read as a failure. No work was lost and nothing was retried.
   - Inference: the refresh rule behaved as designed; the cost came from two writers on the same `main` within three minutes. The attention wording could say plainly that the stop is expected when the owner has a local commit, and what the owner's next command is. Qualified: one occurrence.
+
+## DD-214 — The coordinator accepted an interim "Record shows again during Stop" note; a later slice made it a wrong-result race
+
+An implementer named an interim behavior as a learning. It was accepted as
+harmless without checking it against the story's examples, and later slices
+built the result status on top of it.
+
+### Occurrences
+- Execution: SEED-066#understandable-first-dictation / `0662bac730:.planning/slice-plans/008-complete-a-first-dictation-with-understandable-controls/PLAN.md` / 31b9b7b7bb
+  - Timestamp: unknown (slice 1 acceptance, before commit 2026-10-06T09:18:48+09:00)
+  - Tool: Claude Code
+  - Model: claude-opus-5-5
+  - Open Dough release: 0.3.56 (execution-checkout VERSION)
+  - Evidence: slice 1 return "while Stop is still finishing, the main action already shows Record again", recorded in that plan's Learnings. At 9f8a52c7, `NoteAudioTools.vue` `startRecording` clears the passage saves, and the pending `stopRecording` `finally` overwrites `phase`. The correction is planned as `.planning/slice-plans/010-keep-the-dictation-result-true-while-stop-finishes/PLAN.md`.
+  - Observed effect: none in use; the retrospective found it in the code. Pressing Record during "Turning your speech into text…" can report "No speech was turned into text." for added text, or hide Stop while recording.
+  - Inference: proof acceptance reads named gaps against the goal. A named interim that later slices depend on needs the same reading when those slices are accepted. Qualified: one execution. In the same execution the coordinator did return slice 3's self-declared superseded-save gap for a same-slice fix.

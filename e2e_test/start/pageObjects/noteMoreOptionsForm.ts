@@ -1,4 +1,5 @@
 import { waitUntilAppIsNotBusy } from '../pageBase'
+import { assumeAudioTools } from './audioToolsPage'
 import {
   assumeAssimilationPage,
   assimilationModesSelector,
@@ -65,7 +66,7 @@ export const noteMoreOptions = () => {
     },
     openAudioTools() {
       clickMoreOption(titles.audio)
-      cy.findByRole('button', { name: 'Record Audio' }).should('be.visible')
+      assumeAudioTools()
       waitUntilAppIsNotBusy()
     },
     openAssimilationPanel() {

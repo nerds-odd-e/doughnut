@@ -3,7 +3,8 @@ import makeMe from "donut-test-fixtures/makeMe"
 import { mockSdkServiceWithImplementation } from "@tests/helpers"
 import {
   audioToolsVm,
-  findButtonByTitle,
+  dictationStatus,
+  findButtonByText,
   midSpeechChunk,
   mountNoteAudioTools,
   processAudio,
@@ -50,26 +51,23 @@ describe("NoteAudioTools recording controls", () => {
     wrapper?.unmount()
   })
 
-  it("shows Record initially, then hides it and enables Stop and Flush while recording", async () => {
-    expect(findButtonByTitle(wrapper, "Record Audio")).toBeTruthy()
-    expect(
-      findButtonByTitle(wrapper, "Stop Recording")!.attributes("disabled")
-    ).toBeDefined()
-    expect(
-      findButtonByTitle(wrapper, "Flush Audio")!.attributes("disabled")
-    ).toBeDefined()
+  it("offers Record when ready, then Stop while recording, with the status announced", async () => {
+    expect(dictationStatus(wrapper)).toBe("Ready to record")
+    expect(findButtonByText(wrapper, "Record")).toBeTruthy()
+    expect(findButtonByText(wrapper, "Stop")).toBeUndefined()
+    expect(findButtonByText(wrapper, "Write text now")).toBeUndefined()
 
     await startRecording(wrapper)
 
-    expect(findButtonByTitle(wrapper, "Record Audio")).toBeUndefined()
+    expect(dictationStatus(wrapper)).toBe("Recording. Speak now.")
+    expect(findButtonByText(wrapper, "Record")).toBeUndefined()
+    expect(findButtonByText(wrapper, "Stop")).toBeTruthy()
+    expect(wrapper.find(".device-select").exists()).toBe(true)
     expect(
-      findButtonByTitle(wrapper, "Stop Recording")!.attributes("disabled")
-    ).toBeFalsy()
+      findButtonByText(wrapper, "Write text now")!.attributes("disabled")
+    ).toBeUndefined()
     expect(
-      findButtonByTitle(wrapper, "Flush Audio")!.attributes("disabled")
-    ).toBeFalsy()
-    expect(
-      findButtonByTitle(wrapper, "Save Audio Locally")!.attributes("disabled")
+      findButtonByText(wrapper, "Save audio")!.attributes("disabled")
     ).toBeDefined()
   })
 
@@ -145,16 +143,16 @@ describe("NoteAudioTools recording controls", () => {
     ).toHaveBeenCalledTimes(2)
   })
 
-  it("flushes audio while recording", async () => {
+  it("converts what has been said so far with Write text now", async () => {
     await startRecording(wrapper)
-    await findButtonByTitle(wrapper, "Flush Audio")!.trigger("click")
+    await findButtonByText(wrapper, "Write text now")!.trigger("click")
 
     expect(audioToolsVm(wrapper).audioRecorder.tryFlush).toHaveBeenCalled()
   })
 
-  it("disables Flush while audio is processing", async () => {
+  it("disables Write text now during a conversion", async () => {
     await startRecording(wrapper)
-    const flushButton = findButtonByTitle(wrapper, "Flush Audio")!
+    const writeNowButton = findButtonByText(wrapper, "Write text now")!
 
     type AudioResponse = {
       segmentTexts: string[]
@@ -172,7 +170,7 @@ describe("NoteAudioTools recording controls", () => {
 
     const processing = processAudio(wrapper, midSpeechChunk())
     await flushPromises()
-    expect(flushButton.attributes("disabled")).toBeDefined()
+    expect(writeNowButton.attributes("disabled")).toBeDefined()
 
     resolveProcess({
       segmentTexts: ["test"],
@@ -180,7 +178,7 @@ describe("NoteAudioTools recording controls", () => {
     })
     await processing
     await flushPromises()
-    expect(flushButton.attributes("disabled")).toBeFalsy()
+    expect(writeNowButton.attributes("disabled")).toBeFalsy()
   })
 
   it("stops recording when unmounted while recording", async () => {
@@ -194,8 +192,8 @@ describe("NoteAudioTools recording controls", () => {
     expect(vm.audioRecorder.stopRecording).toHaveBeenCalled()
   })
 
-  it("enables Save Audio Locally after a recording produces a file", async () => {
-    const saveButton = findButtonByTitle(wrapper, "Save Audio Locally")!
+  it("enables Save audio after a recording produces a file", async () => {
+    const saveButton = findButtonByText(wrapper, "Save audio")!
     expect(saveButton.attributes("disabled")).toBeDefined()
 
     await startRecording(wrapper)
@@ -206,7 +204,7 @@ describe("NoteAudioTools recording controls", () => {
     expect(saveButton.attributes("disabled")).toBeFalsy()
   })
 
-  it("downloads audio via object URL when Save Audio Locally is clicked", async () => {
+  it("downloads audio via object URL when Save audio is clicked", async () => {
     const { mockCreateObjectURL } = await import(
       "@tests/notes/noteAudioToolsMocks"
     )
@@ -218,7 +216,7 @@ describe("NoteAudioTools recording controls", () => {
     const mockRemoveChild = vi.spyOn(document.body, "removeChild")
     const mockClick = vi.spyOn(HTMLAnchorElement.prototype, "click")
 
-    await findButtonByTitle(wrapper, "Save Audio Locally")!.trigger("click")
+    await findButtonByText(wrapper, "Save audio")!.trigger("click")
 
     expect(URL.createObjectURL).toHaveBeenCalledWith(audioFile)
     expect(mockAppendChild).toHaveBeenCalled()

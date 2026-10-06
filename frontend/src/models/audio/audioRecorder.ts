@@ -31,26 +31,21 @@ export const createAudioRecorder = (
 
   const audioRecorder: AudioRecorder = {
     startRecording: async function (): Promise<void> {
-      try {
-        const devices = await navigator.mediaDevices.enumerateDevices()
-        audioDevices.value = devices.filter(
-          (device) => device.kind === "audioinput"
-        )
+      const devices = await navigator.mediaDevices.enumerateDevices()
+      audioDevices.value = devices.filter(
+        (device) => device.kind === "audioinput"
+      )
 
-        mediaStream = await navigator.mediaDevices.getUserMedia({
-          audio: true,
-        })
-        const currentTrack = mediaStream.getAudioTracks()[0]
-        const currentDeviceId = currentTrack?.getSettings().deviceId
-        selectedDevice.value = currentDeviceId || ""
+      mediaStream = await navigator.mediaDevices.getUserMedia({
+        audio: true,
+      })
+      const currentTrack = mediaStream.getAudioTracks()[0]
+      const currentDeviceId = currentTrack?.getSettings().deviceId
+      selectedDevice.value = currentDeviceId || ""
 
-        await audioReceiver.connect(mediaStream)
-        audioProcessingScheduler.start()
-        isRecording = true
-      } catch (error) {
-        console.error("Error starting recording:", error)
-        throw new Error("Failed to start recording")
-      }
+      await audioReceiver.connect(mediaStream)
+      audioProcessingScheduler.start()
+      isRecording = true
     },
 
     stopRecording: async function (): Promise<File> {

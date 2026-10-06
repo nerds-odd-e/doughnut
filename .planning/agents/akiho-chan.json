@@ -1,9 +1,0 @@
-{
-  "schemaVersion": 1,
-  "agent": "Akiho-chan",
-  "email": "akiho-chan@example.org",
-  "identity": "SEED-066#understandable-first-dictation",
-  "mode": "story-branch",
-  "branch": "claude/complete-a-first-dictation-with-understandable-c",
-  "host": "claude"
-}

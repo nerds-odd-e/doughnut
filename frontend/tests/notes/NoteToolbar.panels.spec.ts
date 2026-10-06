@@ -36,6 +36,7 @@ describe("NoteToolbar panels", () => {
     wrapper.find('[data-testid="note-toolbar-panel-shell"]')
   const assimilationModes = () =>
     wrapper.find('[data-testid="note-assimilation-modes"]')
+  const audioTools = () => wrapper.find(`section[aria-label="${titles.audio}"]`)
 
   afterEach(() => {
     wrapper?.unmount()
@@ -143,13 +144,13 @@ describe("NoteToolbar panels", () => {
     await flushPromises()
 
     expect(assimilationModes().exists()).toBe(false)
-    expect(wrapper.find('button[title="Record Audio"]').exists()).toBe(true)
+    expect(audioTools().exists()).toBe(true)
 
     useAssimilationView().openForNote(noteRealm.note.id)
     await flushPromises()
 
     expect(assimilationModes().exists()).toBe(true)
-    expect(wrapper.find('button[title="Record Audio"]').exists()).toBe(false)
+    expect(audioTools().exists()).toBe(false)
   })
 
   describe("conversation", () => {

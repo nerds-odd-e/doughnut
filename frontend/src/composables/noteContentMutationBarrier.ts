@@ -1,6 +1,7 @@
 type OpenNoteContentEditor = {
   flushAndWait: () => Promise<boolean>
-  changeDraft: (change: (draft: string) => string) => void
+  /** Resolves whether the changed draft was saved. */
+  changeDraft: (change: (draft: string) => string) => Promise<boolean>
 }
 
 type NoteMutationState = {
@@ -34,15 +35,14 @@ export function registerOpenNoteContentEditor(
   }
 }
 
-/** Changes the open body editor's draft for the note and saves it; false when none is open or admission is closed. */
+/** Changes the open body editor's draft for the note and saves it, returning whether that save succeeded; undefined when none is open or admission is closed. */
 export function changeOpenNoteContentDraft(
   noteId: number,
   change: (draft: string) => string
-): boolean {
+): Promise<boolean> | undefined {
   const state = noteMutations.get(noteId)
-  if (!state?.editor || !state.admissionOpen) return false
-  state.editor.changeDraft(change)
-  return true
+  if (!state?.editor || !state.admissionOpen) return undefined
+  return state.editor.changeDraft(change)
 }
 
 export function noteContentMutationAdmissionIsOpen(noteId: number): boolean {
