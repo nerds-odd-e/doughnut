@@ -206,7 +206,8 @@ the status waits.
 
 ### 4. A failed conversion at Stop offers Retry as the next step
 Type: Behavior
-Status: planned
+Status: done
+Accepted proof: `NoteAudioTools.retry.spec.ts` (5 cases) and the mid-speech failure case in `NoteAudioTools.processing.spec.ts` in the frontend audio command, 14 files, 107 tests; vue-tsc clean; mocked journey 2 passing, the Retry scenario observes the new wording with Retry and Record, then "Added to your note." after Retry.
 Proof: Retry scenario of the mocked journey with the new wording, then "Added to your note." after Retry; `NoteAudioTools.retry.spec.ts` and the mid-speech failure case in `NoteAudioTools.processing.spec.ts` green.
 
 Behavior: the transcription fails at Stop → the body is unchanged; where the
@@ -272,5 +273,8 @@ under a name that matches.
   (`startNewRecording`, `writtenResult`); Stop waits for them. With an open
   editor each save is confirmed by `flushAndConfirmDraftSaved` in
   `useDebouncedTextAutosave`, which follows a newer draft that replaced the
-  passage's draft. A failed save, and a conversion failure at Stop until
-  slice 4, leave the status at "Ready to record".
+  passage's draft. A failed save leaves the status at "Ready to record".
+- A conversion failure at Stop is the `notConverted` phase: its message is
+  the status, with Retry beside it; the error alert is hidden then.
+- A mounted test that sets the note realm calls `refreshNoteRealm` after
+  mounting, because mounting reloads the note.

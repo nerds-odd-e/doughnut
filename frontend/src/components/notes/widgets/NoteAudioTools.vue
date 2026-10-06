@@ -5,19 +5,15 @@
       :audioRecorder="audioRecorder"
       :isRecording="isRecording"
     />
-    <p role="status" class="text-center mb-3">{{ status }}</p>
+    <div class="flex justify-center items-center gap-2 text-center mb-3">
+      <p role="status" :class="{ 'text-error': phase === 'notConverted' }">{{ status }}</p>
+      <button v-if="phase === 'notConverted'" class="daisy-btn daisy-btn-sm retry-button" @click="retry" title="Retry">Retry</button>
+    </div>
     <div
-      v-if="errors"
+      v-if="errors && phase !== 'notConverted'"
       class="daisy-alert"
       :class="errors.conversion ? 'daisy-alert-error' : 'daisy-alert-info'"
     >{{ errors.conversion ?? errors }}</div>
-    <button
-      v-if="!isRecording && errors?.conversion && audioRecorder.hasUnconvertedAudio()"
-      class="daisy-btn daisy-btn-sm retry-button"
-      @click="stopRecording"
-      :disabled="isProcessing"
-      title="Retry"
-    >Retry</button>
     <div class="button-group">
       <button v-if="!isRecording" class="daisy-btn main-action" @click="startRecording">
         <Mic :size="24" />
@@ -98,6 +94,8 @@ const statusByPhase = {
   stopping: "Turning your speech into text…",
   added: "Added to your note.",
   nothingAdded: "No speech was turned into text.",
+  notConverted:
+    "Could not turn your speech into text. Your recording is kept until you close Audio tools.",
 } as const
 const phase = ref<keyof typeof statusByPhase>("ready")
 const isRecording = computed(() => phase.value === "recording")
@@ -140,10 +138,18 @@ const stopRecording = async () => {
     audioFile.value = await audioRecorder.stopRecording()
   } finally {
     const written = await writtenResult()
-    phase.value =
-      errors.value?.conversion || written === "notSaved" ? "ready" : written
+    if (errors.value?.conversion && audioRecorder.hasUnconvertedAudio()) {
+      phase.value = "notConverted"
+    } else {
+      phase.value = written === "notSaved" ? "ready" : written
+    }
     await wakeLocker.release()
   }
+}
+
+const retry = () => {
+  errors.value = undefined
+  return stopRecording()
 }
 
 onBeforeUnmount(() => {
@@ -206,8 +212,6 @@ const tryFlushAudio = async () => {
 }
 
 .retry-button {
-  display: block;
-  margin: 8px auto;
   border-radius: 8px;
 }
 

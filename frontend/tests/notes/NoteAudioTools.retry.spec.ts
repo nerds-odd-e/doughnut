@@ -1,9 +1,16 @@
-import { AiAudioController } from "@generated/donut-backend-api/sdk.gen"
+import {
+  AiAudioController,
+  TextContentController,
+} from "@generated/donut-backend-api/sdk.gen"
 import makeMe from "donut-test-fixtures/makeMe"
-import { wrapSdkError } from "@tests/helpers"
+import { mockSdkService, wrapSdkError, wrapSdkResponse } from "@tests/helpers"
+import { useNoteStore } from "@/store/noteStore"
 import {
   audioChunk,
+  audioTextResponse,
   audioToolsVm,
+  dictationStatus,
+  findButtonByText,
   findButtonByTitle,
   mountNoteAudioTools,
   processAudio,
@@ -39,65 +46,104 @@ vi.mock("@/models/wakeLocker", async () => {
 useNoteAudioToolsTestLifecycle()
 
 describe("NoteAudioTools Retry after a failed conversion", () => {
+  const failedAtStop =
+    "Could not turn your speech into text. Your recording is kept until you close Audio tools."
   let wrapper: NoteAudioToolsWrapper
-  const note = makeMe.aNote.please()
+  let audioToText: ReturnType<typeof mockSdkService>
+  let saveContent: ReturnType<typeof mockSdkService>
+  const realm = makeMe.aNoteRealm.content("Original body.").please()
 
   beforeEach(() => {
-    wrapper = mountNoteAudioTools(note)
-    audioToolsVm(wrapper).audioRecorder.hasUnconvertedAudio.mockReturnValue(
-      true
+    saveContent = mockSdkService(
+      TextContentController,
+      "updateNoteContent",
+      makeMe.aNoteRealm.please()
     )
+    audioToText = mockSdkService(
+      AiAudioController,
+      "audioToText",
+      audioTextResponse("hello")
+    ).mockResolvedValue(wrapSdkError("API Error"))
+    wrapper = mountNoteAudioTools(realm.note)
+    useNoteStore().refreshNoteRealm(realm)
+    const recorder = audioToolsVm(wrapper).audioRecorder
+    recorder.hasUnconvertedAudio.mockReturnValue(true)
+    recorder.stopRecording.mockImplementation(async () => {
+      await processAudio(wrapper, audioChunk()).catch(() => undefined)
+      return new File([], "test.webm")
+    })
   })
 
   afterEach(() => {
     wrapper?.unmount()
   })
 
-  const failConversion = async () => {
-    vi.spyOn(AiAudioController, "audioToText").mockResolvedValue(
-      wrapSdkError("API Error")
-    )
+  const retryButton = () => findButtonByTitle(wrapper, "Retry")
+  const failAtStop = async () => {
+    await startRecording(wrapper)
+    await stopRecording(wrapper)
+  }
+
+  it("keeps recording without Retry when a conversion fails mid-speech", async () => {
+    await startRecording(wrapper)
     await expect(processAudio(wrapper, audioChunk())).rejects.toThrow()
     await flushPromises()
-  }
-  const retryButton = () => findButtonByTitle(wrapper, "Retry")
 
-  it("offers Retry after Stop while audio is not converted", async () => {
-    await startRecording(wrapper)
-    await failConversion()
+    expect(dictationStatus(wrapper)).toBe("Recording. Speak now.")
+    expect(wrapper.find(".daisy-alert-error").text()).toBe(
+      "Could not turn your speech into text. Your recording is kept."
+    )
     expect(retryButton()).toBeUndefined()
+  })
 
-    await stopRecording(wrapper)
+  it("says at Stop that the recording is kept, with Retry beside it and Record available", async () => {
+    await failAtStop()
 
-    expect(retryButton()).toBeTruthy()
+    expect(dictationStatus(wrapper)).toBe(failedAtStop)
+    expect(retryButton()!.element.parentElement).toBe(
+      wrapper.get('[role="status"]').element.parentElement
+    )
+    expect(findButtonByText(wrapper, "Record")).toBeTruthy()
+    expect(wrapper.find(".daisy-alert").exists()).toBe(false)
+    expect(saveContent).not.toHaveBeenCalled()
   })
 
   it("does not offer Retry when nothing remains to convert", async () => {
     audioToolsVm(wrapper).audioRecorder.hasUnconvertedAudio.mockReturnValue(
       false
     )
-    await startRecording(wrapper)
-    await failConversion()
-    await stopRecording(wrapper)
+    await failAtStop()
 
     expect(retryButton()).toBeUndefined()
   })
 
-  it("converts what is left again and keeps Retry when it fails again", async () => {
-    await startRecording(wrapper)
-    await failConversion()
-    await stopRecording(wrapper)
-    const recorder = audioToolsVm(wrapper).audioRecorder
-    recorder.stopRecording.mockImplementationOnce(async () => {
-      await processAudio(wrapper, audioChunk()).catch(() => undefined)
-      return new File([], "test.webm")
+  it("turns the kept recording into text once and says it was added", async () => {
+    await failAtStop()
+    audioToText.mockResolvedValue(wrapSdkResponse(audioTextResponse("hello")))
+
+    await retryButton()!.trigger("click")
+    expect(dictationStatus(wrapper)).toBe("Turning your speech into text…")
+    await flushPromises()
+
+    expect(dictationStatus(wrapper)).toBe("Added to your note.")
+    expect(retryButton()).toBeUndefined()
+    expect(saveContent).toHaveBeenCalledExactlyOnceWith({
+      path: { note: realm.note.id },
+      body: { content: "Original body. hello" },
     })
+  })
+
+  it("keeps the message and Retry when Retry fails again", async () => {
+    await failAtStop()
 
     await retryButton()!.trigger("click")
     await flushPromises()
 
-    expect(recorder.stopRecording).toHaveBeenCalledTimes(2)
+    expect(
+      audioToolsVm(wrapper).audioRecorder.stopRecording
+    ).toHaveBeenCalledTimes(2)
+    expect(dictationStatus(wrapper)).toBe(failedAtStop)
     expect(retryButton()).toBeTruthy()
-    expect(wrapper.find(".daisy-alert-error").exists()).toBe(true)
+    expect(saveContent).not.toHaveBeenCalled()
   })
 })

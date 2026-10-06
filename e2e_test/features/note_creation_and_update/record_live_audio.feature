@@ -39,6 +39,6 @@ Feature: Record live audio onto a note
 
       """
     When I retry converting my speech
-    Then the note content on the current page should be "This is class 1. its talk about dada struct day."
+    Then I should be told my speech was added to my note
+    And the note content on the current page should be "This is class 1. its talk about dada struct day."
     And the note "DS lecture/Data Structure Lecture" in Donut should have content "This is class 1. its talk about dada struct day."
-    And I should no longer be told my speech could not be turned into text

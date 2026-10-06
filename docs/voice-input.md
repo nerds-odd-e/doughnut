@@ -9,10 +9,12 @@ now." (a mid-speech conversion does not change it), or "Turning your speech
 into text…" until Stop has finished and the body holding the recording's
 passages has been saved. Then it says "Added to your note." when a passage of
 the recording was written and saved, or "No speech was turned into text."
-when it wrote nothing. After a failed conversion, or when every save of the
-recording's passages failed (the save error shows as usual), it says "Ready
-to record". Dictated text shows in an open body editor as soon as it joins;
-typing after that does not hold back "Added to your note." once the body
+when it wrote nothing. When a conversion at Stop failed and audio is still
+not converted, it says, shown as a problem, "Could not turn your speech into
+text. Your recording is kept until you close Audio tools." with Retry beside
+it; Record stays available. When every save of the recording's passages
+failed (the save error shows as usual), it says "Ready to record". Dictated
+text shows in an open body editor as soon as it joins; typing after that does not hold back "Added to your note." once the body
 holding the passage is saved. Each Record starts counting afresh. Dictation
 writes only to the note body.
 
@@ -56,13 +58,16 @@ A conversion that fails (an error answer or no answer) keeps its audio as
 not yet converted, and recording goes on. That audio is sent again, together
 with the later audio, with the next conversion: timed, pause, Flush, or Stop,
 including the first conversion of a new recording in the same Audio tools.
-Text already written is not written again. A failure shows "Could not turn
-your speech into text. Your recording is kept." until a later conversion
-succeeds. After Stop, while audio is still not converted, Retry appears beside
-that message; it converts everything that remains as Stop does, nothing held
-back, and joins the passage once. A Retry that fails leaves the body, the
-message and Retry in place. Recovery lasts while Audio tools stays open; it
-does not survive a reload or closing Audio tools.
+Text already written is not written again. A failure while recording shows
+"Could not turn your speech into text. Your recording is kept." without Retry
+until a later conversion succeeds. After Stop, while audio is still not
+converted, the status shows the failure message and Retry beside it. Retry
+belongs to the recording it follows: the status says "Turning your speech
+into text…", Retry converts everything that remains as Stop does, nothing
+held back, joins the passage once, and then says "Added to your note.". A
+Retry that fails leaves the body, the message and Retry in place. Recovery
+lasts while Audio tools stays open; it does not survive a reload or closing
+Audio tools.
 The transcription service controls transcription quality. When a body editor for the note is
 open, the passage is joined to the end of that editor's draft, including
 unsaved typing, and that draft is saved right away; otherwise, including while
@@ -73,10 +78,10 @@ The mounted audio preservation tests assert exact saved content for long,
 empty, and whitespace-ending bodies, repeated additions, originating-note targeting, and undo. The
 mocked recording journey supplies a transcription and observes the original
 body, one space, and the transcription's text. A second mocked journey makes
-the transcription fail at Stop, observes the unchanged body, the message and
-Retry, then lets the transcription succeed and observes Retry joining the
-passage once and the message going away. Model tests with the real audio
-buffer cover kept audio across failures, and mounted tests cover when Retry is
+the transcription fail at Stop, observes the unchanged body, the message in
+the status with Retry and Record, then lets the transcription succeed and
+observes "Added to your note." and Retry joining the passage once. Model
+tests with the real audio buffer cover kept audio across failures, and mounted tests cover when Retry is
 offered. The real-OpenAI journey checks both its original text and
 the dictated passage.
 
