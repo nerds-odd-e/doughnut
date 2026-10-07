@@ -487,7 +487,7 @@ during the hook (pre-existing).
 
 ### 7. Prove staged frontend checks decide the result
 Type: Behavior
-Status: planned
+Status: done
 Proof: real installed-hook sequence in the driver's disposable fixture with
 valid → newly staged lint/type error → repair (slice 2 negative examples 1–2),
 opposed staged/unstaged versions and invalid untracked/unstaged source
@@ -507,6 +507,30 @@ and partial-refresh risks the target does not need. Slice 8 measures the full
 corpus; if its mean misses the target, return to this plan with that evidence
 before adding compiler state. The correctness promises this slice owned stay.
 Sizing: ~5 minutes; a proof loop over the existing path.
+
+Accepted proof (no repo change; disposable worktree at `66e7aad84c`, real hook
+dispatch outside Nix; status/index/staged/working-tree/untracked hashes equal
+before and after all 16 runs; every run is a fresh check):
+sequence pass → staged unformatted `debugger;` fail (Biome formatter error) →
+repair pass → staged TS2322 fail → repair pass; staged TS2322 with unstaged
+correction fails; valid staged plus invalid unstaged
+`modalTopAnchor.ts` and invalid untracked file passes with that state
+untouched; `git rm` and `git rm --cached` of imported `modalTopAnchor.ts` both
+fail with 5× TS2307; staged rename with importers passes, and with one
+importer update left unstaged fails TS2307; staged stricter
+`useBlockStatements` fails, harmless staged config passes, stricter rule only
+in the working tree does not affect the result. Changed dependency input:
+slice 6's `ERR_PNPM_OUTDATED_LOCKFILE` proof. Existing `quality_changed.test`
+(`staged-frontend` asserts the copy holds the staged content and is removed)
+and `pre-commit.test` already hold the dispatcher observations; no test added.
+`quality_changed.test` 6/6, `pre-commit.test` 2/2, `run_all_script_tests.sh`
+21/21. Warm frontend runs 7.9–8.9 s.
+
+Correction to slice 2's negative example 1: `frontend/biome.json` sets
+`noDebugger: "warn"`, so a formatted `debugger` passes the frontend gate with
+a Biome lint warning (the configured behavior; unchanged here). Use a
+type error or a formatter/error-level rule for frontend lint failures;
+`mcp-server` `noDebugger` is an error (slice 6).
 
 ### 8. Demonstrate fast, clean ordinary commits across the fixed mix
 Type: Behavior
