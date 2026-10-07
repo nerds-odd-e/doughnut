@@ -69,9 +69,13 @@ This runs:
   components. It is check-only: it does not format files or mutate the Git
   index. Implementers and refactorers do not run `format:changed` or standalone
   `lint:changed`; the coordinator owns formatting and the hook owns the
-  independent lint check. The frontend check reads the committed (index)
-  content from a temporary copy, so unrelated unstaged or untracked work does
-  not affect it. The copy reuses the checkout's `node_modules`, so workspace
+  independent lint check. When a selected component needs workspace tools, the
+  hook first validates one installation through `setup_pnpm_deps`
+  (`scripts/dev_setup.sh`) with a frozen lockfile and the checks reuse it; a
+  manifest change missing from `pnpm-lock.yaml` fails with
+  `ERR_PNPM_OUTDATED_LOCKFILE` (run `pnpm install` and stage the lockfile).
+  The frontend check reads the committed (index) content from a temporary copy,
+  so unrelated unstaged or untracked work does not affect it. The copy reuses the checkout's `node_modules`, so workspace
   packages linked there (such as `donut-test-fixtures`) are still read from the
   working tree; the cold `vue-tsc` run adds roughly 15–20 s per frontend commit.
   Other components still check the working tree.

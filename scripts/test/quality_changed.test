@@ -24,12 +24,20 @@ trap 'rm -rf "$work"' EXIT
 git -C "$work" init -q
 git -C "$work" config user.email test@example.com
 git -C "$work" config user.name "Test User"
+printf 'lockfileVersion: 9.0\n' >"$work/pnpm-lock.yaml"
+printf '{}\n' >"$work/package.json"
+printf 'packages:\n' >"$work/pnpm-workspace.yaml"
 mkdir -p "$work/fake-bin"
 cat >"$work/fake-bin/pnpm" <<'PNPM'
 #!/usr/bin/env bash
-if [[ "$1" == -C ]]; then
+if [[ "$1" == --frozen-lockfile ]]; then
+  mkdir -p node_modules
+  : >node_modules/.modules.yaml
+  printf 'pnpm %s\n' "$*"
+elif [[ "$1" == -C ]] && [[ "$2" == *donut-frontend-index* ]]; then
   printf '%s\n' "$2" >"$(dirname "$0")/lint-directory"
-  printf 'pnpm %s in copy with example.ts: %s\n' "${*:3}" "$(cat "$2/example.ts")"
+  printf 'pnpm %s in copy with example.ts: %s (verify deps: %s)\n' "${*:3}" \
+    "$(cat "$2/example.ts")" "${pnpm_config_verify_deps_before_run:-default}"
 else
   printf 'pnpm %s\n' "$*"
 fi
@@ -91,6 +99,14 @@ case "$DONUT_TEST_SCENARIO" in
     printf '{ "formatter": { "enabled": true } }\n' >"$work/biome.json"
     git -C "$work" add biome.json
     ;;
+  staged-backend)
+    mkdir -p "$work/backend"
+    printf 'class Example {}\n' >"$work/backend/Example.java"
+    git -C "$work" add .
+    git -C "$work" commit -qm initial
+    printf 'class Example { int changed; }\n' >"$work/backend/Example.java"
+    git -C "$work" add backend/Example.java
+    ;;
   openapi-config)
     printf 'extends: []\n' >"$work/redocly.yaml"
     git -C "$work" add redocly.yaml
@@ -128,7 +144,7 @@ test-lint-selects-only-staged-components() {
   output="$(run-in-temporary-repository lint staged)"
 
   @assert-equals \
-    $'pnpm mcp-server:lint\npnpm test-fixtures:lint' \
+    $'pnpm --frozen-lockfile recursive install\npnpm -C mcp-server lint\npnpm -C packages/donut-test-fixtures lint' \
     "$output"
 }
 
@@ -137,7 +153,7 @@ test-lint-checks-frontend-in-a-removed-copy-of-the-index() {
   output="$(run-in-temporary-repository lint staged-frontend)"
 
   @assert-equals \
-    $'pnpm --frozen-lockfile --silent recursive install\npnpm lint in copy with example.ts: const staged = true' \
+    $'pnpm --frozen-lockfile recursive install\npnpm lint in copy with example.ts: const staged = true (verify deps: false)' \
     "$output"
 }
 
@@ -146,13 +162,22 @@ test-shared-biome-config-selects-every-affected-component() {
   output="$(run-in-temporary-repository lint shared-biome-config)"
 
   @assert-equals \
-    $'pnpm --frozen-lockfile --silent recursive install\npnpm lint in copy with example.ts: const original = true\npnpm mcp-server:lint\npnpm cli:lint\npnpm test-fixtures:lint\npnpm cy:lint' \
+    $'pnpm --frozen-lockfile recursive install\npnpm lint in copy with example.ts: const original = true (verify deps: false)\npnpm -C mcp-server lint\npnpm -C cli lint\npnpm -C packages/donut-test-fixtures lint\npnpm biome check .' \
     "$output"
+}
+
+test-backend-lint-needs-no-workspace-installation() {
+  local output
+  output="$(run-in-temporary-repository lint staged-backend)"
+
+  @assert-equals 'pnpm backend:lint' "$output"
 }
 
 test-openapi-config-selects-openapi-lint() {
   local output
   output="$(run-in-temporary-repository lint openapi-config)"
 
-  @assert-equals 'pnpm openapi:lint' "$output"
+  @assert-equals \
+    $'pnpm --frozen-lockfile recursive install\npnpm openapi:lint' \
+    "$output"
 }

@@ -427,7 +427,7 @@ change; another checkout's modules never touched):
 
 ### 6. Validate one installation before checking borrowed staged source
 Type: Behavior
-Status: planned
+Status: done
 Proof: public preparation/quality boundaries, matching/stale/incomplete
 installation cases, the reproduced pnpm condition from slice 5 with real tools,
 all selected-component routing, visible failure and source/index preservation;
@@ -453,25 +453,60 @@ Sizing: 5–8 minutes, one dependency-readiness proof loop; the real warning
 condition and required freshness inputs must already be established in slice 5.
 Frontend performance remains provisional until slice 7.
 
-### 7. Check successive staged frontend versions with reusable compiler state
+Accepted proof: `setup_pnpm_deps` fingerprint now covers lockfile, root
+manifest, `pnpm-workspace.yaml`, every workspace project manifest and the
+resolved `node`/`pnpm` paths; completeness requires `.modules.yaml` and a
+`node_modules` per project with dependencies; the frozen install is no longer
+silent and the fingerprint is written only after success.
+`quality_changed.sh` lint mode runs the owner once when a workspace-tool
+component is selected (not for backend-only), routes to the check commands
+directly (public `*:lint`/`cy:lint` scripts unchanged for manual use), and
+scopes `pnpm_config_verify_deps_before_run=false` to the borrowed-copy
+command. The hook also scopes it to its outer `pnpm lint:changed`: in real
+proof, pnpm's automatic verification otherwise ran a non-frozen install that
+rewrote `pnpm-lock.yaml` for a manifest change missing from the lockfile and
+the hook passed (pre-existing check-only breach). Suites:
+`dev_setup.sh.test` 11/11 (manifest/pnpm/incomplete → reinstall, visible
+failure not recorded), `quality_changed.test` 6/6 (exact order, owner once,
+`verify deps: false` in the copy, backend-only needs no install),
+`pre-commit.test` 2/2, `worktree_setup.sh.test`, `nix_shell_hook.sh.test`,
+`profile-commit-hook.test`, `run_all_script_tests.sh` 21/21. Real outside-Nix
+disposable worktrees: slice-5 direct command → no ERR/WARN and
+installation state/links unchanged (old script reproduced both the warning
+and the silent relink); one hook run per class, warning-free: frontend 7.58,
+backend 1.62, cli 1.23, mcp-server 1.18, test-fixtures 1.32, root 1.35,
+openapi 1.44, mixed 7.96 s (single uncontrolled runs, not acceptance data);
+negatives block (`noDebugger`, `spotlessJavaCheck`, `ERR_PNPM_OUTDATED_LOCKFILE`
+with lockfile unchanged); source/index/lockfile hashes preserved. Elapsed
+~12 min implementation + ~3 min refactor: hard-limit overrun, recorded; the
+slice converged with complete proof, so it was not refined. Remaining gaps: a
+deleted link inside a project's `node_modules` is not detected; an in-place
+tool upgrade at the same path outside Nix is not detected; the root
+`postinstall: syncpack fix` can still run when a stale install is repaired
+during the hook (pre-existing).
+
+### 7. Prove staged frontend checks decide the result
 Type: Behavior
 Status: planned
-Proof: real installed-hook sequence with valid → newly staged lint/type error
-→ repair, opposed staged/unstaged versions and invalid untracked source,
-removed/renamed inputs and changed configuration/dependency inputs; compare
-reused-state outcomes to fresh checks and verify source/index preservation.
-Run the full affected hook/dispatcher boundary suites, not helper-only tests.
+Proof: real installed-hook sequence in the driver's disposable fixture with
+valid → newly staged lint/type error → repair (slice 2 negative examples 1–2),
+opposed staged/unstaged versions and invalid untracked/unstaged source
+(example 3), and a removed/renamed imported frontend file and a changed
+configuration/dependency input; verify source/index preservation. Run the full
+affected hook/dispatcher boundary suites.
 
-Behavior: the frontend index changes between commits → refresh one owned,
-complete staged view and run Biome plus the real incremental compiler → the
-current staged version decides success/failure while usable compiler work is
-retained. Eliminate stale source paths and partial-refresh exposure in this
-same change. Keep private bookkeeping outside source/the real index and scoped
-to the worktree. Update lint guidance that currently describes disposable copies
-and cold typechecking; keep the scope of workspace dependency reads accurate.
-Sizing: 5–8 minutes after the observed compiler mechanism and preceding probes;
-one staged-check correctness/reuse loop. If safe snapshot synchronization cannot
-fit the hard limit, stop and refine this leaf before continuing.
+Behavior: the frontend index changes between commits → the existing complete
+staged copy is checked by Biome and the real compiler → the current staged
+version decides success/failure. Add a test only where an existing boundary
+suite lacks the observation.
+
+Reassessment (after slice 6): one warning-free run per class now averages
+~2.96 s (frontend 7.58, mixed 7.96, others 1.2–1.6 s), well below the 5 s
+target, so reusable compiler state is not added: it would introduce stale-view
+and partial-refresh risks the target does not need. Slice 8 measures the full
+corpus; if its mean misses the target, return to this plan with that evidence
+before adding compiler state. The correctness promises this slice owned stay.
+Sizing: ~5 minutes; a proof loop over the existing path.
 
 ### 8. Demonstrate fast, clean ordinary commits across the fixed mix
 Type: Behavior

@@ -16,5 +16,7 @@ REPO_ROOT="$(git rev-parse --show-toplevel)"
 cd "$REPO_ROOT"
 
 # Lint only the components affected by staged changes. The hook intentionally
-# leaves both the working tree and index unchanged.
-exec ./scripts/run.sh pnpm lint:changed
+# leaves both the working tree and index unchanged. pnpm's automatic dependency
+# verification would install (and rewrite pnpm-lock.yaml) before the script runs;
+# lint:changed validates the installation itself with a frozen lockfile instead.
+exec env pnpm_config_verify_deps_before_run=false ./scripts/run.sh pnpm lint:changed
