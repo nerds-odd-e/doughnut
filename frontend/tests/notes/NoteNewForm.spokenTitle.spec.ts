@@ -3,10 +3,6 @@ import { createAudioRecorder } from "@/models/audio/audioRecorder"
 import { flushPromises, type VueWrapper } from "@vue/test-utils"
 import type { ComponentPublicInstance } from "vue"
 import { mockSdkService, wrapSdkResponse } from "@tests/helpers"
-import {
-  clearAudioHardwareMocks,
-  installAudioBrowserSpies,
-} from "@tests/notes/noteAudioToolsMocks"
 import { audioTextResponse } from "@tests/notes/noteAudioToolsTestSupport"
 import {
   findNoteNewFormButtonByText,
@@ -22,6 +18,7 @@ import {
   speakTheTitle,
   speakTitleStatus,
   stopSpeaking,
+  useNoteNewFormSpokenTitleTestLifecycle,
   type NoteNewFormSdkSpies,
 } from "@tests/notes/noteNewFormTestSupport"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
@@ -40,29 +37,18 @@ vi.mock("@/models/audio/audioRecorder", async () => {
   return audioRecorderInvokingCallbackMockExports()
 })
 
+useNoteNewFormSpokenTitleTestLifecycle()
+
 describe("NoteNewForm spoken title", () => {
   let wrapper: VueWrapper<ComponentPublicInstance>
   let sdkSpies: NoteNewFormSdkSpies
 
   beforeEach(() => {
-    vi.useFakeTimers()
-    vi.resetAllMocks()
     sdkSpies = setupNoteNewFormSdkMocks()
-    installAudioBrowserSpies()
-    clearAudioHardwareMocks()
-    mockSdkService(
-      AiAudioController,
-      "audioToText",
-      audioTextResponse("Photosynthesis in desert plants.")
-    )
   })
 
   afterEach(() => {
     wrapper?.unmount()
-    vi.restoreAllMocks()
-    vi.runOnlyPendingTimers()
-    vi.useRealTimers()
-    document.body.innerHTML = ""
   })
 
   it("names the control in words when idle and while listening", async () => {

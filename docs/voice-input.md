@@ -41,9 +41,17 @@ The search for existing notes runs for the heard title. The author may type
 corrections before Submit. While the dialog is listening or turning speech into
 text, Submit is not offered and Enter in the title field does nothing;
 afterwards Submit is offered again. Closing New note while listening stops the
-recorder. The author reviews the title and chooses Submit as usual; the note is
-created once with that title. Body dictation on an existing note never changes
-the title.
+recorder. When nothing was heard (a silent recording that runs no conversion, or
+a response of no segments), the status says "No speech was turned into text.",
+the title is unchanged, and Submit is offered. When the microphone cannot be
+used, the status says, shown as a problem, "Could not use the microphone. Allow
+microphone access in your browser, then try again." and "Speak the title" stays
+available. When conversion at Stop fails, the status says, shown as a problem,
+"Could not turn your speech into text.", the title is unchanged, and Submit is
+offered; there is no Retry. Speaking again creates a fresh recorder so only the
+new recording's words reach the title. The author reviews the title and chooses
+Submit as usual; the note is created once with that title. Body dictation on an
+existing note never changes the title.
 
 ## Adding dictated text to a note
 

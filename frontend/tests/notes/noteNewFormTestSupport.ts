@@ -1,4 +1,5 @@
 import {
+  AiAudioController,
   NoteController,
   NotebookController,
   NotebookFolderController,
@@ -12,11 +13,16 @@ import { flushPromises, type VueWrapper } from "@vue/test-utils"
 import makeMe from "donut-test-fixtures/makeMe"
 import helper, { mockSdkService, wrapSdkResponse } from "@tests/helpers"
 import {
+  clearAudioHardwareMocks,
+  installAudioBrowserSpies,
+} from "@tests/notes/noteAudioToolsMocks"
+import { audioTextResponse } from "@tests/notes/noteAudioToolsTestSupport"
+import {
   clickWikidataSearchResult,
   clickWikidataTitleAction,
   wikidataModal,
 } from "@tests/notes/wikidataAssociationDialogTestSupport"
-import { expect, vi } from "vitest"
+import { afterEach, beforeEach, expect, vi } from "vitest"
 
 export const noteNewFormRealm = makeMe.aNoteRealm.title("mythical").please()
 export const noteNewFormNote = noteNewFormRealm.note
@@ -93,11 +99,41 @@ export function findNoteNewFormButtonByText(
   return wrapper.findAll("button").find((button) => button.text() === text)
 }
 
+export function speakTitleStatusNode(
+  wrapper: VueWrapper<ComponentPublicInstance>
+) {
+  return wrapper.find(".speak-title-control [role='status']")
+}
+
 export function speakTitleStatus(
   wrapper: VueWrapper<ComponentPublicInstance>
 ): string | undefined {
-  const status = wrapper.find(".speak-title-control [role='status']")
+  const status = speakTitleStatusNode(wrapper)
   return status.exists() ? status.text() : undefined
+}
+
+/** Shared timers, audio mocks, and default transcription for spoken-title specs. */
+export function useNoteNewFormSpokenTitleTestLifecycle(
+  defaultTranscript = "Photosynthesis in desert plants."
+) {
+  beforeEach(() => {
+    vi.useFakeTimers()
+    vi.resetAllMocks()
+    installAudioBrowserSpies()
+    clearAudioHardwareMocks()
+    mockSdkService(
+      AiAudioController,
+      "audioToText",
+      audioTextResponse(defaultTranscript)
+    )
+  })
+
+  afterEach(() => {
+    vi.restoreAllMocks()
+    vi.runOnlyPendingTimers()
+    vi.useRealTimers()
+    document.body.innerHTML = ""
+  })
 }
 
 export async function speakTheTitle(

@@ -243,8 +243,13 @@ listening stops the recorder.
 
 ### 5. Nothing heard and failures leave the title alone
 Type: Behavior
-Status: planned
-Proof: mounted tests: Stop after a silent recording (no conversion) and Stop with a response of no segments both show "No speech was turned into text." with the title unchanged and Submit offered; the recorder refuses to start → the microphone message styled as a problem, "Speak the title" still offered; `audioToText` rejects at Stop → "Could not turn your speech into text.", title unchanged, Submit offered; a second Speak the title creates a second recorder and its words alone reach the title; frontend tests green.
+Status: done
+Proof: accepted — `SpeakTitleControl` phases `nothingHeard` / `micUnavailable` / `conversionFailed`. `NoteNewForm.spokenTitle.outcomes`: silent Stop, empty segments, mic refuse, fail-then-fresh-recorder success. Docs record the three outcomes. `vue-tsc` green.
+```bash
+env -u NODE_ENV CURSOR_DEV=true nix develop -c pnpm -C frontend test tests/notes/NoteNewForm.spokenTitle
+CURSOR_DEV=true nix develop -c pnpm -C frontend exec vue-tsc --noEmit
+```
+
 
 Behavior: New note → Speak the title → Stop with nothing heard → "No speech
 was turned into text.", title unchanged. Speak the title when the microphone
@@ -256,4 +261,5 @@ the three outcomes.
 
 ## Learnings
 
-None yet.
+- Status/control wording still duplicated with `NoteAudioTools`; share after plan 008 lands (as planned Current decisions / Architecture).
+- CI observer: GitHub Actions `ci.yml` (display name `donut CI`), directory `/tmp/dough-ci-501/watch-0fnUY4`, target branch `cursor/create-a-note-using-a-spoken-title`.
