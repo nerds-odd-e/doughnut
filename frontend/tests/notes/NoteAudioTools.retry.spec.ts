@@ -150,6 +150,34 @@ describe("NoteAudioTools Retry after a failed conversion", () => {
     })
   })
 
+  it("does not let Record start while Retry finishes", async () => {
+    await failAtStop()
+    audioToText.mockResolvedValue(wrapSdkResponse(audioTextResponse("hello")))
+    const recorder = audioToolsVm(wrapper).audioRecorder
+    let finishRetry!: () => void
+    recorder.stopRecording.mockImplementation(async () => {
+      await new Promise<void>((resolve) => (finishRetry = resolve))
+      await processAudio(wrapper, audioChunk())
+      return new File([], "test.webm")
+    })
+
+    await retryButton()!.trigger("click")
+    await flushPromises()
+    expect(findButtonByText(wrapper, "Record")!.attributes()).toHaveProperty(
+      "disabled"
+    )
+    await startRecording(wrapper)
+    expect(dictationStatus(wrapper)).toBe("Turning your speech into text…")
+    expect(recorder.startRecording).toHaveBeenCalledTimes(1)
+
+    finishRetry()
+    await flushPromises()
+    expect(dictationStatus(wrapper)).toBe("Added to your note.")
+    expect(
+      findButtonByText(wrapper, "Record")!.attributes()
+    ).not.toHaveProperty("disabled")
+  })
+
   it("keeps the message and Retry when Retry fails again", async () => {
     await failAtStop()
 

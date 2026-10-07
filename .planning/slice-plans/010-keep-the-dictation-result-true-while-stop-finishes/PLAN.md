@@ -112,7 +112,7 @@ before readiness was recorded.
 
 ### 1. Record waits until Stop has given its result
 Type: Behavior
-Status: planned
+Status: done
 Proof: the two mounted tests above, red before the change and green after;
 frontend audio command and mocked journey green.
 
@@ -122,6 +122,14 @@ note.", "No speech was turned into text.", "Ready to record" after failed
 saves, or the failure with Retry) → Record is available. The same applies
 while Retry runs. docs/voice-input.md says so.
 
+Accepted proof (2026-10-07): the two new mounted tests, "tells the result of
+its recording when Record is pressed while Stop finishes"
+(`NoteAudioTools.status.spec.ts`) and "does not let Record start while Retry
+finishes" (`NoteAudioTools.retry.spec.ts`), failed before the change on the
+Record-disabled assertion and pass after it; the frontend audio command passed
+(14 files, 109 tests) and the mocked journey passed (2 scenarios).
+
 ## Learnings
 
-None yet.
+- The mocked journey's Vite dev server refuses to start while a changed file is
+  not Biome-formatted; format changed files before running it.

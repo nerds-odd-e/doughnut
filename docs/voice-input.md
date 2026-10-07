@@ -10,9 +10,10 @@ shows the current error in a full-screen overlay. A status
 that assistive technology announces says "Ready to record", "Recording. Speak
 now." (a mid-speech conversion does not change it), or "Turning your speech
 into text…" until Stop has finished and the body holding the recording's
-passages has been saved. Then it says "Added to your note." when a passage of
-the recording was written and saved, or "No speech was turned into text."
-when it wrote nothing. When a conversion at Stop failed and audio is still
+passages has been saved; Record is unavailable while it says so. Then it
+says "Added to your note." when a passage of the recording was written and
+saved, or "No speech was turned into text." when it wrote nothing.
+When a conversion at Stop failed and audio is still
 not converted, it says, shown as a problem, "Could not turn your speech into
 text. Your recording is kept until you close Audio tools." with Retry beside
 it; Record stays available. When recording cannot start, nothing is recorded

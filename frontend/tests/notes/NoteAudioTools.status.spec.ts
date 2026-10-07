@@ -131,6 +131,37 @@ describe("NoteAudioTools dictation status", () => {
       expect(saveContent).not.toHaveBeenCalled()
     })
 
+    it("tells the result of its recording when Record is pressed while Stop finishes", async () => {
+      mockSdkService(
+        AiAudioController,
+        "audioToText",
+        audioTextResponse("hello")
+      )
+      await startRecording(wrapper)
+      await processAudio(wrapper, midSpeechChunk())
+      await flushPromises()
+      const recorder = audioToolsVm(wrapper).audioRecorder
+      let finishStop!: (file: File) => void
+      recorder.stopRecording.mockImplementation(
+        () => new Promise<File>((resolve) => (finishStop = resolve))
+      )
+      await stopRecording(wrapper)
+
+      expect(findButtonByText(wrapper, "Record")!.attributes()).toHaveProperty(
+        "disabled"
+      )
+      await startRecording(wrapper)
+      expect(dictationStatus(wrapper)).toBe("Turning your speech into text…")
+      expect(recorder.startRecording).toHaveBeenCalledTimes(1)
+
+      finishStop(new File([], "test.webm"))
+      await flushPromises()
+      expect(dictationStatus(wrapper)).toBe("Added to your note.")
+      expect(
+        findButtonByText(wrapper, "Record")!.attributes()
+      ).not.toHaveProperty("disabled")
+    })
+
     it("starts a new recording with nothing counted", async () => {
       await startRecording(wrapper)
       stopConverting(["hello"])

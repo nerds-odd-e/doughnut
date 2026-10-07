@@ -15,7 +15,12 @@
       :class="errors.conversion ? 'daisy-alert-error' : 'daisy-alert-info'"
     >{{ errors.conversion ?? errors }}</div>
     <div class="button-group">
-      <button v-if="!isRecording" class="daisy-btn labeled-action" @click="startRecording">
+      <button
+        v-if="!isRecording"
+        class="daisy-btn labeled-action"
+        :disabled="phase === 'stopping'"
+        @click="startRecording"
+      >
         <Mic :size="24" />
         Record
       </button>
