@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "agent": "Tsubomi-chan",
+  "email": "tsubomi-chan@example.org",
+  "identity": "SEED-066#create-with-spoken-title",
+  "mode": "story-branch",
+  "branch": "cursor/create-a-note-using-a-spoken-title",
+  "host": "cursor",
+  "model": "auto"
+}
