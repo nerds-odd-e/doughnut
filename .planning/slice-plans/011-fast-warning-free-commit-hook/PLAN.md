@@ -331,7 +331,7 @@ directory, so hook-script edits need no rebuild).
 
 ### 4. Enter the current development environment without dirty-source warnings
 Type: Behavior
-Status: planned
+Status: done
 Proof: real runner/installed-hook calls outside and inside Nix, changed
 environment-definition inputs, visible preparation/child-command failure,
 source/index preservation, and the affected runner/shell-hook boundary suites.
@@ -352,6 +352,23 @@ consume it with `--inputs-from path:<snapshot> --option flake-registry ""`.
 Sizing: 5–8 minutes; scrutinized as one environment-entry proof loop, with
 probe results already available. Interim hook still has dependency/typecheck
 costs, addressed by slices 6 and 7.
+
+Accepted proof: `scripts/run.sh` keys a per-worktree profile under
+`git rev-parse --git-path donut-nix-env/<git hash of flake.nix+flake.lock>`,
+removes stale sibling keys, snapshots the definition by temp file + rename,
+populates on miss and consumes with `--inputs-from`/empty registry.
+`CURSOR_DEV=true nix develop -c bash scripts/test/run.sh.test` 6/6 (real
+runner copy, only `nix` substituted: no-Nix, inside-Nix, populate once then
+reuse with exact args/snapshot/cwd/args, changed definition, visible populate
+failure running nothing, child exit 7); pre-commit 2/2; nix_shell_hook 2/2;
+`run_all_script_tests.sh` 21/21. Real outside-Nix disposable worktree: no
+dirty-tree warning; backend hook 6.08 s populate → 2.03/1.76 s reuse
+(baseline 3.82); frontend 9.19/8.42 s (baseline 10.12); staged `debugger;`
+in `mcp-server/src/helpers.ts` → exit 1 with Biome diagnostic; source/index
+hashes unchanged; changed definition rebuilt (3.42 s) then hit (0.52 s);
+inside Nix runs directly. CI workflows do not use Nix (no-Nix path).
+Remaining: a populate run prints `<<running within nix env>>` twice (once to
+stderr); flipping between two definitions rebuilds each time (~2.6 s, cached).
 
 ### 5. Explain the borrowed-snapshot installation warning
 Type: Behavior
