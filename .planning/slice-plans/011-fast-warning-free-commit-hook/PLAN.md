@@ -187,7 +187,7 @@ dependent slices and requires changing this plan before broader implementation.
 
 ### 1. Repeatable installed-hook workload
 Type: Structure
-Status: planned
+Status: done
 Proof: focused Bach driver test verifies actual staged/checked input variation,
 outer-hook invocation, preservation of all sample results, and owned cleanup;
 no performance threshold is asserted with substituted tools.
@@ -200,6 +200,19 @@ test together. This immediately enables slice 2's baseline without changing
 the gate. Do not build a general benchmarking framework or automatic optimizer.
 Sizing hypothesis: 5–8 minutes including focused proof. Keep setup narrow; if
 the driver itself exceeds 10 minutes, finer-decompose before continuing.
+
+Accepted proof: `CURSOR_DEV=true nix develop -c bash scripts/test/profile-commit-hook.test`
+(1/1; `test-profiles-every-corpus-case-through-the-installed-hook-and-cleans-up`
+runs the driver with host `/bin/bash` against a `git clone --shared` of HEAD,
+real `worktree_setup.sh`, hook and runner, substituting only `nix`/`pnpm`; one
+exact-match assertion over 8×5 corpus, 40 distinct inputs including `.ts`/`.vue`,
+57 hook calls in the fixture whose checked input equals each recorded input,
+kept failing/warning run, recorded preservation violation, summary contents
+and fixture cleanup). `run_all_script_tests.sh`: 21/21. Implemented in
+`scripts/profiling/profile-commit-hook.sh` and its fixed corpus
+`scripts/profiling/commit-hook-corpus.sh`. Elapsed ~10.5 min implementation
+plus ~1.5 min refactor: a marginal hard-limit overrun on one coherent driver;
+not refined because the slice converged with complete proof.
 
 ### 2. Establish the current representative hook baseline
 Type: Behavior
@@ -369,5 +382,28 @@ Keep spent source/plan history for retrospective and story wrap-up.
 
 ## Learnings
 
-Planning observations above narrow the candidates. No execution slice is done;
-no acceptance mean or historical warning remedy has been established.
+Planning observations above narrow the candidates. No acceptance mean or
+historical warning remedy has been established.
+
+- Driver (slice 1): the fixture is a disposable linked worktree detached at
+  the execution checkout's **committed HEAD**, so hook/runner changes must be
+  committed before the driver measures them. It invokes
+  `git -c core.hooksPath=<fixture>/scripts/git-hooks hook run pre-commit`
+  (Git's dispatch of the fixture's tracked hook; the shared installed hook is
+  never replaced). Hook stdout arrives in `hook.stderr`. The `warnings`
+  column is a plain `warn|ERR_PNPM` line count: read flagged logs (Nix's
+  dirty-tree warning is expected in the baseline). Fresh-cache resets only
+  `CHECK_CACHE_PATHS` (`dist backend/build backend/.gradle`); slice 7 adds its
+  compiler-state location. Java/Redocly/vue-tsc validity of corpus edits is
+  unproven with real tools until slice 2; an unhealthy case is fixed in the
+  corpus before the baseline is recorded. Expect 57 hook runs, ~10–20+ min.
+
+## Execution
+
+- Mode: Story Branch; checkout
+  `/Users/terryyin/git/doughnut/.worktrees/commit-with-trustworthy-checks-averaging-under-f`,
+  branch `claude/commit-with-trustworthy-checks-averaging-under-f`, remote
+  `origin`, target `main`; agent Mana-chan; publisher
+  `dashboard-territory.local-doughnut`.
+- Claim published on `origin/main` at `018dd21603f2b2014d6c292268dd7ffcc9dfb33a`
+  (starting revision `075510bd7347b2cde5dd45467c28409e0070d936`).
