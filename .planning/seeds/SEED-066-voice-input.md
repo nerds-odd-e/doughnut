@@ -153,7 +153,7 @@ technical redesign, or speculative infrastructure.
 
 **Identity:** SEED-066#rename-with-spoken-title
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"unselected","assessment":"not-ready","reasons":["No approach selected yet: the story needs slice planning before execution."],"basis":{"document":"6b402909eca610dd07f5e08d00bf12fc10b4c16609091d4e97a6601387815b51"}}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/012-rename-with-spoken-title/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"6b402909eca610dd07f5e08d00bf12fc10b4c16609091d4e97a6601387815b51","plan":"689f293264e0b23e3075980ebb54775a05651de4e870fdffb0db61feecbbde73"}}
 ```
 
 **Goal:** A note author who can edit a note renames it by speaking instead of
