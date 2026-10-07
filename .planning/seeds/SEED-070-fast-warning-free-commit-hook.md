@@ -23,11 +23,12 @@ Faster, clean feedback should retain the confidence supplied by the checks.
 
 **Identity:** SEED-070#fast-warning-free-commit-hook
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"not-refined","approach":"unselected"}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/011-fast-warning-free-commit-hook/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"b54143d3aec650b033a76f426508c67f8f1a1606c5c60c68e06eaad50f8779a1","plan":"3c6ac6644c1e61a76e7a71cb8812062a0eee3f6e03be2aa9c4ca60385843957b"}}
 ```
 
 **Goal:** Donut contributors get ordinary local commit-hook feedback in under
-five seconds on average, with no tooling warnings during healthy runs.
+five seconds on average, with no tooling warnings during healthy runs, so
+frequent commits remain practical without weakening their quality gate.
 
 **Scope:** Optimize the existing pre-commit path, including environment
 startup, dependency verification, staged-source preparation, and affected
@@ -36,20 +37,71 @@ frontend checks against staged content, failure exit status, and the hook's
 check-only behavior: it leaves source files and the real Git index unchanged.
 Fix the causes of the observed warnings rather than hiding diagnostics;
 actionable failures must remain visible. CI-suite and product test-suite
-optimization are outside this item.
+optimization are outside this item. Preserve existing check coverage for
+affected components; any reuse of prior work must still validate the inputs
+that determine the current check result. Frontend source isolation remains
+the existing promise; extending staged-content isolation to other components
+or workspace dependencies is deferred.
+
+**Key examples:**
+
+- With installed dependencies matching the lockfile and a valid frontend
+  source change staged, invoking the installed commit hook outside Nix passes
+  without tooling warnings. Its full wall time contributes to the fixed
+  acceptance sample below, including environment entry and cleanup.
+- With valid frontend and backend changes staged together, the same hook
+  checks both affected components, passes without tooling warnings, and
+  contributes one mixed-component timing.
+- With a frontend type error in the index and an unstaged correction in the
+  working tree, the hook fails and shows the type error. With valid staged
+  frontend source and an unrelated invalid unstaged or untracked frontend
+  edit, the hook passes. These outcomes preserve the staged-content guarantee
+  already required by this story's scope.
+- After a successful frontend check, staging a new frontend lint or type
+  error causes the next hook invocation to fail visibly. A previous success
+  cannot validate different check inputs. Likewise, a violation of another
+  selected component's existing gate blocks the commit.
+- On either success or failure, the hook leaves source-file contents and the
+  real Git index as they were before invocation. Running inside an existing
+  Nix shell provides the same check outcomes.
 
 **Evaluation:**
 
 - Measure wall-clock time from hook invocation to exit, including Nix entry
-  when the contributor invokes a commit outside the development shell.
-- Demonstrate an arithmetic mean below five seconds across repeated,
-  representative ordinary local commits. Include frontend changes, other
-  affected components, and mixed-component changes; report the sample mix,
-  individual timings, environment, and mean. Also report the no-staged-change
-  baseline and behavior when already inside Nix. The exact sampling protocol
-  remains for refinement; a fast no-op alone does not satisfy the target.
+  and all preparation, checks, and cleanup. Use the installed hook's normal
+  entry point with actual staged source changes; bypassed launchers and traced
+  approximations cannot establish acceptance.
+- The acceptance environment is the owner's current macOS development
+  machine, outside Nix, with the project's tools available, Nix inputs already
+  provisioned, and dependencies installed and matching the lockfile. Record
+  the machine, OS, tool versions, revision, cache state, and background load.
+  The target is for this prepared local environment, not a guarantee for
+  arbitrary machines or first-time tool/dependency downloads.
+- Use a fixed, balanced sample of 40 healthy hook invocations: five distinct
+  staged changes in each of frontend, backend, CLI, MCP server, shared test
+  fixtures, root scripts/E2E, OpenAPI, and mixed frontend/backend. The frontend
+  cases include Vue and TypeScript source changes. Each case changes an input
+  checked by its selected component; repeated invocations of an identical
+  staged snapshot do not substitute for these cases. Establish the cases
+  before comparing the original and optimized hook, and use the same mix for
+  both. Preserve ordinary cache reuse between cases, including any misses
+  caused by their changed inputs.
+- Acceptance requires the arithmetic mean of those 40 full hook times to be
+  strictly below five seconds, with every run passing its existing gates and
+  producing no tooling warnings. Report every individual timing, the overall
+  mean, and each class's mean and range. There is no separate per-class time
+  ceiling in this story; class results keep slower paths visible. Retain slow
+  runs rather than selectively dropping them.
+- Report separately the no-staged-change baseline, the same classes when
+  already inside Nix, and one first invocation per class with reusable check
+  caches empty but tools/dependencies installed. Name which caches were reset.
+  These diagnostic runs do not contribute to the 40-run acceptance mean;
+  correctness and healthy-run warning requirements still apply. A fast no-op
+  or repeated cache hit alone does not satisfy the target.
 - Healthy runs produce neither `ERR_PNPM_UNSAFE_MODULES_DIR` nor the ensuing
-  dependency-install warning, and no replacement tooling warnings.
+  dependency-install warning, and no replacement tooling warnings. Include
+  Nix entry diagnostics in this assessment. Routine informational output is
+  allowed, and genuine setup/check failures retain actionable diagnostics.
 - Show that relevant lint/type errors still block commits and that unrelated
   unstaged/untracked frontend edits cannot make staged frontend checks pass
   or fail. Verify that checks leave the working tree and index unchanged.
@@ -154,13 +206,18 @@ typecheck or broadly suppressing warnings would not meet the scope.
 - **Safe stopping point:** The optimized hook independently provides fast,
   warning-free checks while preserving commit-gate behavior.
 
-## Ordering and Open Decisions
+## Ordering and Refinement Assumptions
 
 The owner explicitly placed this one story first in the product backlog on
 2026-10-07. Existing story priorities and the near-future direction stay intact.
-Refinement must establish the representative sample mix, repetition count,
-machine/dependency assumptions, and treatment/reporting of cold runs. No
-implementation approach or executable plan has been selected.
+The fixed sample, prepared-machine assumptions, and separate fresh-cache
+reporting above are the refinement defaults proposed in this session. They
+make the average reproducible without claiming historical commit proportions.
+The selected execution path is in
+[Fast, warning-free commit feedback](../slice-plans/011-fast-warning-free-commit-hook/PLAN.md).
+The prior observations establish a performance risk, not feasibility of the
+target; the plan's early probes establish the full baseline and warning
+conditions before dependent optimization.
 
 ## Breadcrumbs
 

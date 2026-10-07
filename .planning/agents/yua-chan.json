@@ -1,9 +1,0 @@
-{
-  "schemaVersion": 1,
-  "agent": "Yua-chan",
-  "email": "yua-chan@example.org",
-  "activity": "preparation",
-  "identity": "SEED-070#fast-warning-free-commit-hook",
-  "host": "codex",
-  "model": "gpt-6.1-sol"
-}
