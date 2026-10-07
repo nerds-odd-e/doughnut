@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 1,
+  "agent": "Mana-chan",
+  "email": "mana-chan@example.org",
+  "identity": "SEED-070#fast-warning-free-commit-hook",
+  "mode": "story-branch",
+  "branch": "claude/commit-with-trustworthy-checks-averaging-under-f",
+  "host": "claude"
+}
