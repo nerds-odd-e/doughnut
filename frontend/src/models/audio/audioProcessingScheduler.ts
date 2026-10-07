@@ -11,6 +11,10 @@ export interface AudioChunk {
   isMidSpeech: boolean
 }
 
+export interface AudioProcessingSchedulerOptions {
+  convertOnlyAtStop?: boolean
+}
+
 class AudioProcessingSchedulerImpl implements AudioProcessingScheduler {
   private readonly PROCESSOR_INTERVAL = 60 * 1000 // 60 seconds
 
@@ -21,7 +25,8 @@ class AudioProcessingSchedulerImpl implements AudioProcessingScheduler {
     protected readonly audioBuffer: AudioBuffer,
     private readonly processorCallback: (
       chunk: AudioChunk
-    ) => Promise<string | undefined>
+    ) => Promise<string | undefined>,
+    private readonly convertOnlyAtStop = false
   ) {}
 
   private startTimer(): void {
@@ -32,6 +37,7 @@ class AudioProcessingSchedulerImpl implements AudioProcessingScheduler {
 
   private async processAndCallback(isMidSpeech: boolean): Promise<void> {
     if (this.processing) return
+    if (isMidSpeech && this.convertOnlyAtStop) return
 
     this.processing = this.audioBuffer
       .processUnprocessedData(this.processorCallback, isMidSpeech)
@@ -45,7 +51,9 @@ class AudioProcessingSchedulerImpl implements AudioProcessingScheduler {
   }
 
   start(): void {
-    this.startTimer()
+    if (!this.convertOnlyAtStop) {
+      this.startTimer()
+    }
   }
 
   async stop(): Promise<File> {
@@ -78,12 +86,17 @@ class AudioProcessingSchedulerImpl implements AudioProcessingScheduler {
 
 export const wireAudioProcessingScheduler = (
   audioBuffer: AudioBuffer,
-  processorCallback: (chunk: AudioChunk) => Promise<string | undefined>
+  processorCallback: (chunk: AudioChunk) => Promise<string | undefined>,
+  options?: AudioProcessingSchedulerOptions
 ): AudioProcessingScheduler => {
+  const convertOnlyAtStop = options?.convertOnlyAtStop ?? false
   const scheduler = new AudioProcessingSchedulerImpl(
     audioBuffer,
-    processorCallback
+    processorCallback,
+    convertOnlyAtStop
   )
-  audioBuffer.setOnSilenceThresholdReached(() => scheduler.tryFlush())
+  if (!convertOnlyAtStop) {
+    audioBuffer.setOnSilenceThresholdReached(() => scheduler.tryFlush())
+  }
   return scheduler
 }

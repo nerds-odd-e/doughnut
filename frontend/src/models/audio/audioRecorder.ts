@@ -1,6 +1,7 @@
 import { type Ref, ref } from "vue"
 import {
   type AudioChunk,
+  type AudioProcessingSchedulerOptions,
   wireAudioProcessingScheduler,
 } from "./audioProcessingScheduler"
 import { createAudioReceiver } from "./audioReceiver"
@@ -16,13 +17,17 @@ export interface AudioRecorder {
   switchAudioDevice: (deviceId: string) => Promise<void>
 }
 
+export type AudioRecorderOptions = AudioProcessingSchedulerOptions
+
 export const createAudioRecorder = (
-  processorCallback: (chunk: AudioChunk) => Promise<string | undefined>
+  processorCallback: (chunk: AudioChunk) => Promise<string | undefined>,
+  options?: AudioRecorderOptions
 ): AudioRecorder => {
   const audioReceiver = createAudioReceiver()
   const audioProcessingScheduler = wireAudioProcessingScheduler(
     audioReceiver.getBuffer(),
-    processorCallback
+    processorCallback,
+    options
   )
   let isRecording: boolean = false
   const audioDevices: Ref<MediaDeviceInfo[]> = ref([])

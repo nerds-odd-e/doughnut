@@ -189,8 +189,12 @@ slice 3, which joins segments into a title with the same rule.
 
 ### 2. A recorder can be created to convert only at Stop
 Type: Structure
-Status: planned
-Proof: new cases in `tests/models/audio` for the scheduler or recorder with the option: the 60 s tick and the silence threshold cause no callback, `stop()` calls back once with `isMidSpeech: false`; existing audio model tests green.
+Status: done
+Proof: accepted — `convertOnlyAtStop` on `createAudioRecorder` / `wireAudioProcessingScheduler` skips timer and silence wiring; mid-speech `processAndCallback` also returns early. `audioProcessingScheduler.convertOnlyAtStop.spec.ts`: 60 s tick and silence cause no callback; Flush mid-speech does not convert; `stop()` once with `isMidSpeech: false`. `tests/models/audio` green; `vue-tsc --noEmit` green.
+```bash
+env -u NODE_ENV CURSOR_DEV=true nix develop -c pnpm -C frontend test tests/models/audio
+CURSOR_DEV=true nix develop -c pnpm -C frontend exec vue-tsc --noEmit
+```
 
 Change: `createAudioRecorder(callback, options?)` passes an option through
 `wireAudioProcessingScheduler` that leaves the timer unstarted and the
