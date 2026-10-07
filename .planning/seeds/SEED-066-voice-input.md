@@ -153,31 +153,162 @@ technical redesign, or speculative infrastructure.
 
 **Identity:** SEED-066#rename-with-spoken-title
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"not-refined","approach":"unselected"}
+{"schemaVersion":1,"refinement":"refined","approach":"unselected","assessment":"not-ready","reasons":["No approach selected yet: the story needs slice planning before execution."],"basis":{"document":"6b402909eca610dd07f5e08d00bf12fc10b4c16609091d4e97a6601387815b51"}}
 ```
 
-- **For / why:** Let an author explicitly name or rename an existing note by
-  speaking, with the same control they have when typing.
-- **Evaluation:** Dictate a replacement title, review or correct it, then save
-  through the normal rename rules. The title survives reload and the note body
-  remains unchanged, including when the note has inbound references.
-- **Evidence / learning:** No explicit voice-title control was discovered in
-  the existing title editor or Audio tools. Compare the simpler OS-dictation
-  workflow during refinement; its adequacy is unknown. New note already
-  provides Speak the title via `SpeakTitleControl`, `convertOnlyAtStop`,
-  `joinDictatedSegments`, and `audioChunkToText`
-  ([voice-input documentation](../../docs/voice-input.md#speaking-a-title-in-new-note));
-  refinement should decide replace-versus-join for an existing title (New note
-  joins after the first edit).
-- **Boundary:** Explicit author-controlled rename, preserving ordinary title
-  validation and reference-handling choices. It does not infer a title from body
-  speech or change the rules for linked notes.
-- **Effort hypothesis:** M — medium confidence; assumes short-title capture can
-  reuse the normal title-editing journey without a larger rename redesign.
-- **Depends on:** Existing title editing; spoken-title creation is independently
-  useful and is not a product prerequisite.
-- **Safe stopping point:** Authors can rename an existing note by speaking and
-  keep body content and normal reference handling intact.
+**Goal:** A note author who can edit a note renames it by speaking instead of
+typing, reviews or corrects the heard title, and it is saved by the same rules
+as a typed title: the note body stays as it was, and a note that other notes
+link to still asks how those links should change. This completes the
+"dictating titles" part of voice input after
+[Create a note using a spoken title](../../docs/voice-input.md#speaking-a-title-in-new-note)
+landed; it does not infer a title from body speech.
+
+**The user:** The same note author as the earlier voice stories, now on an
+existing note, perhaps on a phone, who finds its title wrong or missing and
+would rather say the new one than type it. A title is a few words, so they
+expect to speak once and see the whole new title.
+
+**What the author meets today (read from the code, 2026-10-07):** The note
+page shows the title as a heading the author edits in place when they may edit
+the note; readers who may not edit see plain text. A typed title is saved after
+a one-second pause or when the author leaves the field; Enter does nothing; a
+blank title is ignored; illegal path characters are replaced and warnings are
+shown. When other notes link to the note, typing instead shows a panel, "This
+note is linked from other notes. Choose how wiki links to this note should
+change:", with "Update visible reference text" and "Keep visible reference
+text"; nothing is saved until one is chosen, and leaving the title area
+discards the draft. Audio tools on the toolbar writes only to the body, and
+nothing on the note page offers to listen for a title.
+
+**Native control, as in New note:** The seed asked whether operating-system
+dictation is adequate for an existing note's title. The comparison recorded
+for New note applies unchanged: an author with OS dictation turned on can
+already speak into the title heading, but it is absent on many machines and
+browsers, is a second dictation with its own language setting beside Donut's
+own, and the product can neither name it nor help when it is missing. This
+refinement applies the owner's 2026-10-06 choice for New note to the existing
+note as well, so one voice journey with one set of words covers creating,
+renaming, and the body. That extension is this refinement's proposal, not a
+new owner decision; the owner can overrule it before planning.
+
+**Scope:**
+
+- **Required — speak the title on the note page:** When the author may edit
+  the note, the title offers one control named in words, "Speak the title",
+  the same control New note has. The author chooses it, allows the
+  microphone, speaks, and chooses Stop. The heard words arrive once, after
+  Stop, as one line, exactly as the transcription heard them, segments joined
+  as body passages are joined. Nothing appears while the author is still
+  speaking. Readers who may not edit the note are not offered the control.
+- **Required — the heard words replace the title:** Renaming means a
+  replacement, so the heard words become the whole title, whatever the field
+  held at Stop, including a title the author had started typing. They do not
+  join the old title: an existing title is the author's own, not an untouched
+  default, and "Old title New title" is never the rename they meant. The
+  author corrects the heard title by typing, or speaks again, which replaces
+  it again.
+- **Required — a spoken title is an ordinary title:** It goes through the
+  same illegal character replacement, warnings, blank-title refusal, and
+  saving as a typed title. For a note no other note links to, it is saved as
+  a typed title is, after the pause or on leaving the field, and the sidebar
+  and page show it as after typing. For a note other notes link to, the
+  heard title shows with the same reference panel, the author chooses how
+  the links change, and the rename and links are saved together; moving away
+  without choosing discards the heard title exactly as it discards a typed
+  one. After reload the saved title is what the author reviewed, and the body
+  is unchanged.
+- **Required — the state in words:** The control becomes Stop while
+  listening, and a status that assistive technology announces reads
+  "Recording. Speak now.", then "Turning your speech into text…" until the
+  words are in the title; once they are, the title itself is the result and
+  there is no status. When nothing was heard, it says "No speech was turned
+  into text." and the title is unchanged. Wording is the New note wording.
+- **Required — failure leaves the title alone:** When the microphone cannot
+  be used, "Could not use the microphone. Allow microphone access in your
+  browser, then try again." is shown as a problem and "Speak the title"
+  stays available. When the speech could not be turned into text, "Could not
+  turn your speech into text." is shown as a problem, the title is unchanged,
+  nothing is saved, and speaking again sends only the new recording. There
+  is no Retry control; speaking again is the retry.
+- **Keep:** Every title-editing behavior above that is not about speech is
+  unchanged, including undo of "edit title". Body dictation with Audio tools
+  still writes only to the body and never changes the title; speaking a
+  title never changes the body. New note's "Speak the title" is unchanged.
+- **Deferred, not promised:** Speaking a title from the sidebar, for a
+  folder, or in the book-reading block dialog; speaking while Audio tools is
+  recording the body (one recorder at a time is enough; what happens when
+  both are started is not promised either way); listening ending by itself
+  on silence; tidying the heard words, such as a closing full stop; choosing
+  the reference handling by voice; a microphone chooser or Write text now
+  for the title; keeping a failed recording for Retry; and observing
+  operating-system dictation or hardware capture, which stay gaps.
+- **No other rejection constraints:** Nothing else makes the product refuse
+  a rename the title editor accepts today.
+
+**Key examples:**
+
+1. **Rename a note nothing links to:** On the note "Orchard notes", which no
+   other note links to, the author chooses "Speak the title", allows the
+   microphone, says "Apple orchard care", and chooses Stop. The status says
+   the speech is being turned into text; then the title reads "Apple orchard
+   care" and is saved as a typed title is. The sidebar shows "Apple orchard
+   care"; after reload the title is "Apple orchard care" and the body is as
+   before.
+2. **Correct after speaking:** The title reads "Apple orchid care". The
+   author fixes "orchid" by typing; the corrected title is saved.
+3. **Speak again replaces:** The title reads "Apple orchard care". The author
+   chooses "Speak the title" again, says "Pear orchard care", and chooses
+   Stop. The title reads "Pear orchard care" only.
+4. **Rename a linked note:** The note "WikiLinks CI" is linked from
+   "WikiLinks Tech" as `[[WikiLinks CI]]`. The author speaks "WikiLinks CI
+   Renamed" and chooses Stop. The title reads "WikiLinks CI Renamed" and the
+   panel asks how wiki links to this note should change. The author chooses
+   "Keep visible reference text". The title is saved; "WikiLinks Tech" still
+   shows the link text "WikiLinks CI", which opens "WikiLinks CI Renamed".
+5. **Walk away from a linked rename:** As in example 4, but the author
+   clicks into the body without choosing. The heard title is discarded and
+   the title still reads "WikiLinks CI", as after an abandoned typed rename.
+6. **Nothing heard:** The author chooses "Speak the title", says nothing,
+   and chooses Stop. The status says no speech was turned into text; the
+   title still reads "Orchard notes"; nothing is saved.
+7. **Failure, then success:** The transcription fails at Stop. The message
+   says the speech could not be turned into text; the title is unchanged.
+   The author chooses "Speak the title" once more and says "Lighthouse
+   keepers". The title reads "Lighthouse keepers" only.
+8. **Reader without edit rights:** Someone viewing a note they may not edit
+   sees the title as text and no "Speak the title".
+9. **Body stays separate:** After renaming to "Lighthouse keepers", the
+   author dictates a paragraph with Audio tools; it goes to the body and the
+   title stays "Lighthouse keepers".
+
+**UI:** Words only; layout and exact wording are for execution and the
+owner's review. "Speak the title" sits with the title heading on the note
+page, where the heard title, its warnings, and the reference panel are
+reviewed and saved; placing it inside Audio tools was considered and set
+aside because it would separate the result from where it is reviewed. It
+becomes "Stop" while listening. Status wording is New note's, listed in the
+[voice-input documentation](../../docs/voice-input.md#speaking-a-title-in-new-note).
+
+- **Evidence / learning:** New note's "Speak the title" control already
+  listens, converts only at Stop, and hands over the heard segments; the
+  existing title editor accepts a proposed value through the same path typing
+  uses, which shows the reference panel when needed (code, 2026-10-07). The
+  linked-rename journey, including discarding on leaving, is exercised by the
+  existing wiki-link E2E scenarios, and New note's spoken title is exercised
+  by the record-live-audio scenarios, so both journeys have test support to
+  extend. Operating-system dictation in Donut remains unobserved.
+- **Effort hypothesis:** M — good confidence; assumes the New note control
+  can be placed with the existing title editor and feed it a replacement
+  value without a backend change or a rename redesign. The one point to
+  observe early is that choosing Stop inside the title area does not count as
+  leaving it for a linked note, so the heard title is not discarded before
+  the reference panel can be used.
+- **Depends on:** Existing title editing and the landed New note spoken
+  title. Not a product prerequisite for any other story.
+- **Safe stopping point:** Authors can rename an existing note by speaking,
+  with body content and reference handling intact, even if nothing else
+  about voice input changes.
 
 ## Ordering and Scope Reduction
 
@@ -214,11 +345,9 @@ cancelled. Optional one-time automatic title generation has no queued story.
 - The adequacy of OS dictation or external transcription for explicit title
   input: for New note the owner chose a native control on 2026-10-06 (recoverable
   at `d38952da4e9b635b567ddaf21ad444df537ee641:.planning/seeds/SEED-066-voice-input.md`);
-  still open for renaming an existing note. Optional one-time automatic title
-  generation stays deferred.
-- The interaction for explicit title dictation on an existing note; New note
-  speaking a title is described in
-  [voice-input documentation](../../docs/voice-input.md#speaking-a-title-in-new-note).
+  [Change an existing note's title by speaking](#rename-with-spoken-title)
+  applies the same choice as a refinement proposal the owner can overrule.
+  Optional one-time automatic title generation stays deferred.
 
 ## Breadcrumbs
 
