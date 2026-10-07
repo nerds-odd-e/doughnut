@@ -659,3 +659,24 @@ historical warning remedy has been established.
   `dashboard-territory.local-doughnut`.
 - Claim published on `origin/main` at `018dd21603f2b2014d6c292268dd7ffcc9dfb33a`
   (starting revision `075510bd7347b2cde5dd45467c28409e0070d936`).
+
+## Execution complete
+
+Product advice:
+- Story outcome met: 40-case mean 3.261 s (baseline 5.714 s), every healthy
+  run warning-free, gates blocking, source/index preserved. No correction
+  plan is needed for a defect.
+- Decision for the owner (cohesion residue): `scripts/quality_changed.sh`
+  lint routing now repeats each package's check command from the root
+  `cli:lint`, `mcp-server:lint`, `test-fixtures:lint` and `cy:lint` scripts
+  minus their leading install, so the hook and those scripts can drift.
+  Removing the embedded installs from the root scripts would give one owner
+  per check but changes what manual runs do; choose before any correction.
+- Wrap-up: `.agents/skills/linting_formating/SKILL.md` still says the cold
+  `vue-tsc` run adds roughly 15–20 s per frontend commit; the measured
+  frontend hook is ~7.6–8.7 s in total.
+- Pre-existing, unchanged, for later prioritization: a mixed commit stops at
+  the first failing component (backend before frontend), so the frontend half
+  is not reported in that run; the root `postinstall: syncpack fix` can run
+  during a repair install inside the hook (could write manifests; unobserved);
+  frontend `noDebugger` is `warn`, so a formatted `debugger` passes.

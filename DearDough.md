@@ -6,7 +6,7 @@ released response is not proof of effectiveness. Unknown provenance stays unknow
 [Response status](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/finding-names.md).
 Full pre-trim evidence: `8830c682704aac3bbb34bf9b1204da8feba042ca:DearDough.md`. Older narratives live in Git, not a second archive.
 
-- Highest allocated local number: 216. Removed local codes are never reused.
+- Highest allocated local number: 217. Removed local codes are never reused.
 
 ## ODF-110 — A readiness replay observed only the plan's named seam, not the rest of the slice's journey
 
@@ -502,3 +502,22 @@ Follow-up: Open, unqueued.
   - Evidence: `deliver --previously-published-base b86f649322 --target-ref refs/heads/claude/see-submitted-dictation-promptly` failed. The coordinator read `execution-increment-publication.mjs` (`remoteTip !== previouslyPublishedBase` makes `reconcileOnto` run; the guard at line 75 throws). A rerun with the full SHA was accepted as f50c7dcef6.
   - Observed effect: one failed call, nothing published, and three source-reading calls.
   - Inference: the usage text says only `--previously-published-base SHA`. Resolving the argument to a full SHA, or naming the cause in the error, would avoid the lookup. Qualified: one occurrence; earlier deliveries in this execution passed full SHAs from receipts.
+
+## DD-217 — Tooling slices sized at 5–8 minutes ran 10.5–12 minutes because real proof needed fresh disposable worktrees
+
+Plan sizing counted the code change but not the required real proof. Each
+real hook proof created and prepared a disposable worktree, then ran several
+real hook invocations. The slices converged with complete proof, so they were
+recorded as overruns rather than refined.
+
+Follow-up: Open, unqueued.
+
+### Occurrences
+- Execution: SEED-070#fast-warning-free-commit-hook / `.planning/slice-plans/011-fast-warning-free-commit-hook/PLAN.md` / f53bee8004
+  - Timestamp: 2026-10-07, about 21:20–22:25+09:00 (slices 1 and 6 delegations)
+  - Tool: Claude Code
+  - Model: claude-opus-5-5
+  - Open Dough release: unknown
+  - Evidence: slice 1 implementation agent took 628 s and slice 6 took 714 s by the host task duration (plan budget 5–8 min, hard limit 10). Slice 6 found a pre-existing lockfile rewrite during its real negative proof and fixed the hook too. Slices 4 and 7 with similar proof took about 5–6 min.
+  - Observed effect: two hard-limit overruns, recorded in the plan; no retry or revert.
+  - Inference: when a slice's proof needs a fresh prepared worktree and many real tool runs, sizing could count that setup separately. Qualified: one execution; the slice 6 overrun also included an unplanned defect fix.
