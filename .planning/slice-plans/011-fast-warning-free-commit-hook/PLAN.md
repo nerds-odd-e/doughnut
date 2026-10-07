@@ -216,7 +216,7 @@ not refined because the slice converged with complete proof.
 
 ### 2. Establish the current representative hook baseline
 Type: Behavior
-Status: planned
+Status: done
 Proof: `bash scripts/profiling/profile-commit-hook.sh baseline <local-evidence-directory>`;
 40 healthy cases, exact environment/inputs and diagnostic output retained.
 
@@ -229,6 +229,50 @@ Sizing: ~5 minutes of setup/analysis. The required 40 real checks may exceed
 10 minutes wall time; this is a focused-measurement exception because reducing
 the corpus changes the promised evaluation. Driver implementation is owned by
 slice 1, not hidden in this exception.
+
+Accepted baseline (2026-10-07, revision `f53bee8004`, Apple M4 Max 48 GiB,
+macOS 26.6.2 `25G83`, host bash 3.2.57, git 2.50.1, Nix 2.30.2; fixture Node
+v26.10.0, pnpm 11.28.5, OpenJDK 25.0.3; load 5.27→8.10, uncontrolled):
+`bash scripts/profiling/profile-commit-hook.sh baseline <job-tmp>/commit-hook-baseline`
+outside Nix. All 57 runs exit 0 with real tools; 0 preservation differences.
+No corpus fix was needed.
+
+| Class | Corpus timings (s) | Mean | Fresh-cache | Inside Nix |
+| --- | --- | --- | --- | --- |
+| frontend | 9.648 10.085 10.684 10.335 9.844 | 10.119 | 14.462 | 8.291 |
+| backend | 3.595 3.973 3.968 3.811 3.757 | 3.821 | 12.170 | 1.270 |
+| cli | 3.880 4.019 4.399 4.207 4.593 | 4.220 | 7.276 | 1.484 |
+| mcp-server | 3.776 4.962 5.139 4.174 4.629 | 4.536 | 4.796 | 1.529 |
+| test-fixtures | 3.652 3.967 4.123 4.154 3.958 | 3.971 | 5.943 | 1.394 |
+| root | 3.653 4.827 4.168 4.319 4.385 | 4.270 | 4.874 | 1.618 |
+| openapi | 3.172 3.515 3.847 3.731 3.963 | 3.646 | 3.823 | 0.961 |
+| mixed | 10.664 11.019 11.292 11.307 11.367 | 11.130 | 12.665 | 9.166 |
+
+Overall corpus mean **5.714 s**. No-component (`docs/nix.md`): 3.653 s.
+Fresh-cache reset `dist backend/build backend/.gradle`; the backend
+fresh-cache run also started a new Gradle daemon. Warnings: Nix's
+`warning: Git tree '<fixture>/checkout' is dirty` in every one of the 49
+outside-Nix hook runs and nothing else; inside-Nix hook output had none.
+`ERR_PNPM_UNSAFE_MODULES_DIR` and the install warning did not occur
+anywhere. Gradle's "Consider enabling configuration cache" is informational.
+Outside minus inside-Nix suggests ~2.5–3.0 s of Nix entry/runner startup per
+run; frontend costs ~8.3 s even inside Nix (Biome ~0.1 s, the rest vue-tsc
+plus pnpm/staged-copy/install overhead); inside Nix, non-frontend checks
+(1.0–1.6 s) include a redundant frozen-lockfile pnpm install.
+
+Negative examples for slices 6–8 (run in the driver fixture through the
+hook dispatch): (1) staged `debugger;` in `frontend/src/colors.ts`
+(`noDebugger: error`) → nonzero, Biome names the file; (2) staged
+`export const commitHookTypeProbe: string = true` in
+`frontend/src/utils/reservedReadmeTitles.ts` with unstaged `= "ok"` → nonzero,
+TS2322; (3) valid staged frontend-3 plus untracked
+`frontend/src/profileInvalidUntracked.ts` (`const n: number = "x"; debugger;`)
+and an invalid unstaged edit to `frontend/src/composables/modalTopAnchor.ts` →
+exit 0, untracked/unstaged state unchanged; (4) other gates: misformatted Java
+in `DonutApplication.java` (spotless), type error in `cli/src/terminalColumns.ts`,
+`debugger;` in `mcp-server/src/helpers.ts`, invalid `$ref` in
+`open_api_docs.yaml`, and mixed valid frontend + backend violation → nonzero.
+Slice 7 sequences reuse (1) and (2) as valid → error → repaired.
 
 ### 3. Prove current-definition environment reuse
 Type: Behavior
@@ -396,7 +440,15 @@ historical warning remedy has been established.
   `CHECK_CACHE_PATHS` (`dist backend/build backend/.gradle`); slice 7 adds its
   compiler-state location. Java/Redocly/vue-tsc validity of corpus edits is
   unproven with real tools until slice 2; an unhealthy case is fixed in the
-  corpus before the baseline is recorded. Expect 57 hook runs, ~10–20+ min.
+  corpus before the baseline is recorded (slice 2: all healthy). A full run
+  takes ~7 min (57 hook runs). The `warnings` column scans hook output only,
+  not the driver's own `nix-entry.log` for inside-Nix runs.
+- Simplest-alternative assessment (slice 2): inside-Nix class costs average
+  ~3.2 s across the eight classes, so removing environment-entry cost alone
+  leaves ~3.2 s plus whatever the reused entry costs (planning probe: 1.82 s
+  second reuse). That is near the 5 s line, with frontend/mixed (~8–9 s inside
+  Nix) dominating. Reassess after slices 4 and 6 whether slice 7's compiler
+  state is still needed before building it.
 
 ## Execution
 
