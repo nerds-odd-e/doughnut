@@ -394,7 +394,7 @@ an E2E run cannot run it on unformatted files.
   - Evidence: slice 1 implementer return: the first mocked-journey run failed on a Biome line-length error in `NoteToolbar.panels.spec.ts`; it was rewrapped by hand. The coordinator then told later implementers they may run `biome check --linter-enabled=false` on their files, and the slice 3 and slice 4 E2E runs passed first time.
   - Observed effect: one failed E2E run in slice 1; extra time not recorded.
   - Inference: a read-only format check of touched files before `cy:run` avoided a repeat without breaking the coordinator-only formatting rule. Qualified: the delegation prompt supplied it, not the guidance.
-- Execution: SEED-066#no-record-while-stopping / `.planning/slice-plans/010-keep-the-dictation-result-true-while-stop-finishes/PLAN.md` / 2c30afdd26
+- Execution: SEED-066#no-record-while-stopping / `b63b742f8a:.planning/slice-plans/010-keep-the-dictation-result-true-while-stop-finishes/PLAN.md` / 2c30afdd26
   - Timestamp: 2026-10-07T13:47:02+09:00 (SUT readiness failure in `sut.log`)
   - Tool: Claude Code
   - Model: claude-opus-5-5
@@ -462,7 +462,7 @@ built the result status on top of it.
   - Tool: Claude Code
   - Model: claude-opus-5-5
   - Open Dough release: 0.3.56 (execution-checkout VERSION)
-  - Evidence: slice 1 return "while Stop is still finishing, the main action already shows Record again", recorded in that plan's Learnings. At 9f8a52c7, `NoteAudioTools.vue` `startRecording` clears the passage saves, and the pending `stopRecording` `finally` overwrites `phase`. The correction is planned as `.planning/slice-plans/010-keep-the-dictation-result-true-while-stop-finishes/PLAN.md`.
+  - Evidence: slice 1 return "while Stop is still finishing, the main action already shows Record again", recorded in that plan's Learnings. At 9f8a52c7, `NoteAudioTools.vue` `startRecording` clears the passage saves, and the pending `stopRecording` `finally` overwrites `phase`. The correction was planned as `b63b742f8a:.planning/slice-plans/010-keep-the-dictation-result-true-while-stop-finishes/PLAN.md`.
   - Observed effect: none in use; the retrospective found it in the code. Pressing Record during "Turning your speech into text…" can report "No speech was turned into text." for added text, or hide Stop while recording.
   - Inference: proof acceptance reads named gaps against the goal. A named interim that later slices depend on needs the same reading when those slices are accepted. Qualified: one execution. In the same execution the coordinator did return slice 3's self-declared superseded-save gap for a same-slice fix.
 

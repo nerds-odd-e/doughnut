@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 1,
+  "identity": "SEED-066#no-record-while-stopping",
+  "title": "Keep the dictation result true while Stop finishes",
+  "completedAt": "2026-10-07T05:00:03.660Z",
+  "developer": "Terry Yin",
+  "agent": "Ai-chan",
+  "host": "claude"
+}

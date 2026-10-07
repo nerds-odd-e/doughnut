@@ -1,9 +1,0 @@
-{
-  "schemaVersion": 1,
-  "agent": "Ai-chan",
-  "email": "ai-chan@example.org",
-  "identity": "SEED-066#no-record-while-stopping",
-  "mode": "story-branch",
-  "branch": "claude/keep-the-dictation-result-true-while-stop-finish",
-  "host": "claude"
-}

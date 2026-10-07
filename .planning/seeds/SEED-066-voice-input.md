@@ -148,28 +148,6 @@ The accepted order is global priority; it does not require serial technical
 implementation of independent stories. No story authorizes a model choice,
 technical redesign, or speculative infrastructure.
 
-<a id="no-record-while-stopping"></a>
-### Keep the dictation result true while Stop finishes
-
-**Identity:** SEED-066#no-record-while-stopping
-```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/010-keep-the-dictation-result-true-while-stop-finishes/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"0e2fc18a0c59bac414e12b00e30403df0224c78015dc50ff33e6d1c1539e01ad","plan":"203e66e2a982bdf10faadfbd970784510571d442732832a6be98b20bd4cc37c5"}}
-```
-
-**Goal:** A retrospective correction of
-Complete a first dictation with understandable controls
-(SEED-066#understandable-first-dictation, recoverable at
-`0662bac730:.planning/seeds/SEED-066-voice-input.md`).
-A note author who presses Stop is told the true result of that recording.
-Pressing Record while Stop is still turning their speech into text must not
-reset what this recording wrote or replace the result status of a new
-recording.
-
-**Scope:** Record cannot be started while the panel says "Turning your speech
-into text…", during either Stop or Retry. It is available again once the
-result shows. The correction adds no feature promise. Plan:
-[010](../slice-plans/010-keep-the-dictation-result-true-while-stop-finishes/PLAN.md).
-
 <a id="create-with-spoken-title"></a>
 ### Create a note using a spoken title
 
