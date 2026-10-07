@@ -23,7 +23,7 @@ Faster, clean feedback should retain the confidence supplied by the checks.
 
 **Identity:** SEED-070#fast-warning-free-commit-hook
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/011-fast-warning-free-commit-hook/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"b54143d3aec650b033a76f426508c67f8f1a1606c5c60c68e06eaad50f8779a1","plan":"3c6ac6644c1e61a76e7a71cb8812062a0eee3f6e03be2aa9c4ca60385843957b"}}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/011-fast-warning-free-commit-hook/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"677afe0076fbddd9c25e78d63a6dfe1ac2fa3822274b3586361ff0b543e78d01","plan":"65eeb521358f44575e058909a5a0f6f97af1daf02f8de350577d1a66a750cd25"}}
 ```
 
 **Goal:** Donut contributors get ordinary local commit-hook feedback in under
@@ -64,6 +64,9 @@ or workspace dependencies is deferred.
 - On either success or failure, the hook leaves source-file contents and the
   real Git index as they were before invocation. Running inside an existing
   Nix shell provides the same check outcomes.
+- With only documentation staged, so that no component is selected, the hook
+  passes without tooling warnings, including Nix entry diagnostics. This
+  common commit shape is reported as a diagnostic, outside the 40-run sample.
 
 **Evaluation:**
 
@@ -92,9 +95,10 @@ or workspace dependencies is deferred.
   mean, and each class's mean and range. There is no separate per-class time
   ceiling in this story; class results keep slower paths visible. Retain slow
   runs rather than selectively dropping them.
-- Report separately the no-staged-change baseline, the same classes when
-  already inside Nix, and one first invocation per class with reusable check
-  caches empty but tools/dependencies installed. Name which caches were reset.
+- Report separately the no-component baseline (a staged documentation-only
+  change), one invocation per class when already inside Nix, and one first
+  invocation per class with reusable check caches empty but tools/dependencies
+  installed. Name which caches were reset.
   These diagnostic runs do not contribute to the 40-run acceptance mean;
   correctness and healthy-run warning requirements still apply. A fast no-op
   or repeated cache hit alone does not satisfy the target.

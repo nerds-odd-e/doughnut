@@ -5,8 +5,8 @@
 - Story: [Commit with trustworthy checks averaging under five seconds](../../seeds/SEED-070-fast-warning-free-commit-hook.md#fast-warning-free-commit-hook)
 - Identity: SEED-070#fast-warning-free-commit-hook
 - Preparation workspace: `/Users/terryyin/git/doughnut/.worktrees/commit-with-trustworthy-checks-averaging-under-f`
-- Branch: `codex/commit-with-trustworthy-checks-averaging-under-f`
-- Preparing agent: Yua-chan; established assignment revision `3a79e41cde21eab66c4a9c0f7cd2dda4fb95590b`.
+- Branch: `claude/commit-with-trustworthy-checks-averaging-under-f`
+- Preparing agent: Kirara-chan; established assignment revision `a9cfacda3477ddb106d842dccc62f17a73d90923`.
 - Publication target: `origin/main`; integration checkout: `/Users/terryyin/git/doughnut`.
 - Authority: the current request is planning only. This plan does not Take,
   execute, commit, publish, or release the preparation assignment.
@@ -22,8 +22,9 @@ preservation on success and failure.
 Follow the story's fixed sample: five distinct checked inputs in each of
 frontend, backend, CLI, MCP, shared fixtures, root scripts/E2E, OpenAPI, and
 mixed frontend/backend. Frontend samples include Vue and TypeScript. Report
-all 40 timings, the overall arithmetic mean, and class means/ranges. No-op,
-inside-Nix, and fresh-check-cache observations are separate diagnostics;
+all 40 timings, the overall arithmetic mean, and class means/ranges. The
+documentation-only no-component commit, one inside-Nix invocation per class,
+and one fresh-check-cache invocation per class are separate diagnostics;
 their correctness and healthy-run warning requirements still apply.
 
 Keep workspace-package reads from the working tree as they work today.
@@ -314,8 +315,9 @@ Type: Behavior
 Status: planned
 Proof: `bash scripts/profiling/profile-commit-hook.sh acceptance <local-evidence-directory>`
 on the same 40 input cases/environment as baseline, all warning-free and correct,
-overall mean strictly below five seconds; separate no-op, inside-Nix and named
-fresh-cache class diagnostics. Retain failures/slow samples and every timing.
+overall mean strictly below five seconds; separate documentation-only
+no-component, one-per-class inside-Nix and one-per-class named fresh-cache
+diagnostics. Retain failures/slow samples and every timing.
 
 Behavior: a contributor performs the representative ordinary staged changes
 → all existing affected gates run, failure examples remain blocking, files/index
