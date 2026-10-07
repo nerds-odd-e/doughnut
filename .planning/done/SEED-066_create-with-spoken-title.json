@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "identity": "SEED-066#create-with-spoken-title",
+  "title": "Create a note using a spoken title",
+  "completedAt": "2026-10-07T13:21:33.325Z",
+  "developer": "Terry Yin",
+  "agent": "Tsubomi-chan",
+  "host": "cursor",
+  "model": "auto"
+}
