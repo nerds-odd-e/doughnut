@@ -513,7 +513,7 @@ recorded as overruns rather than refined.
 Follow-up: Open, unqueued.
 
 ### Occurrences
-- Execution: SEED-070#fast-warning-free-commit-hook / `.planning/slice-plans/011-fast-warning-free-commit-hook/PLAN.md` / f53bee8004
+- Execution: SEED-070#fast-warning-free-commit-hook / `b1dab1d7ed:.planning/slice-plans/011-fast-warning-free-commit-hook/PLAN.md` / f53bee8004
   - Timestamp: 2026-10-07, about 21:20–22:25+09:00 (slices 1 and 6 delegations)
   - Tool: Claude Code
   - Model: claude-opus-5-5
