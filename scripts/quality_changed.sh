@@ -11,6 +11,7 @@ case "$MODE" in
     ;;
 esac
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(git rev-parse --show-toplevel)"
 cd "$REPO_ROOT"
 
@@ -76,32 +77,53 @@ while IFS= read -r file; do
   [[ -n "$file" ]] && select_components_for_file "$file"
 done <<< "$changed_files"
 
+# The borrowed copy reuses the checkout's installation, which setup_pnpm_deps has
+# just validated. pnpm's automatic verification would compare the copy's project
+# paths with the checkout's installation and try to reinstall it, so it is off for
+# this copy only.
 lint_frontend_index() {
-  pnpm --frozen-lockfile --silent recursive install
   index_copy="$(mktemp -d "${TMPDIR:-/tmp}/donut-frontend-index.XXXXXX")"
   trap 'rm -rf "$index_copy"' EXIT
   git checkout-index --all --prefix="$index_copy/"
   ln -s "$REPO_ROOT/node_modules" "$index_copy/node_modules"
   ln -s "$REPO_ROOT/frontend/node_modules" "$index_copy/frontend/node_modules"
-  pnpm -C "$index_copy/frontend" lint
+  pnpm_config_verify_deps_before_run=false pnpm -C "$index_copy/frontend" lint
 }
 
+# Lint checks reuse the one installation setup_pnpm_deps validates below, so
+# they call each package's check directly rather than its root script, which
+# installs first.
 run_quality_for_component() {
   case "$MODE:$1" in
+    *:openapi)
+      pnpm openapi:lint
+      ;;
     lint:frontend)
       lint_frontend_index
       ;;
-    *:root)
-      pnpm "cy:$MODE"
+    lint:mcp-server|lint:cli)
+      pnpm -C "$1" lint
       ;;
-    *:openapi)
-      pnpm openapi:lint
+    lint:test-fixtures)
+      pnpm -C packages/donut-test-fixtures lint
+      ;;
+    lint:root)
+      pnpm biome check .
+      ;;
+    format:root)
+      pnpm cy:format
       ;;
     *)
       pnpm "$1:$MODE"
       ;;
   esac
 }
+
+if [[ "$MODE" == lint ]] && [[ "$selected_components" =~ frontend|mcp-server|cli|test-fixtures|root|openapi ]]; then
+  source "$SCRIPT_DIR/dev_setup.sh"
+  log() { :; }
+  setup_pnpm_deps
+fi
 
 for component in backend frontend mcp-server cli test-fixtures root openapi; do
   if [[ " $selected_components " == *" $component "* ]]; then

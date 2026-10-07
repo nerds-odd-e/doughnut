@@ -26,7 +26,7 @@ git -C "$work" config user.name "Test User"
 mkdir -p "$work/scripts"
 cat >"$work/scripts/run.sh" <<'RUNNER'
 #!/usr/bin/env bash
-printf 'runner %s\n' "$*"
+printf 'runner %s (verify deps: %s)\n' "$*" "${pnpm_config_verify_deps_before_run:-default}"
 exit "${DONUT_TEST_LINT_EXIT:-0}"
 RUNNER
 chmod +x "$work/scripts/run.sh"
@@ -86,7 +86,7 @@ test-success-lints-without-changing-repository-state() {
   output="$(run-in-temporary-repository success)"
 
   @assert-equals \
-    $'runner pnpm lint:changed\nrepository unchanged' \
+    $'runner pnpm lint:changed (verify deps: false)\nrepository unchanged' \
     "$output"
 }
 
@@ -95,6 +95,6 @@ test-lint-failure-blocks-commit-without-changing-pending-work() {
   output="$(run-in-temporary-repository lint-failure)"
 
   @assert-equals \
-    $'runner pnpm lint:changed\ncommit blocked' \
+    $'runner pnpm lint:changed (verify deps: false)\ncommit blocked' \
     "$output"
 }

@@ -12,30 +12,42 @@ DONUT_TEST_DEV_SETUP_SH="${DONUT_TEST_REPO_ROOT}/scripts/dev_setup.sh"
 source "$(dirname "$0")/vendor/bach.sh"
 
 # Stand-in for the external pnpm binary, shared by the real-invocation probes
-# below: records every invocation and marks node_modules present after a
-# frozen-lockfile install, like real pnpm would, without touching the network
-# or the real package graph.
+# below: records every invocation and, after a frozen-lockfile install, leaves
+# the completed-install marker and each workspace project's node_modules like
+# real pnpm would, without touching the network or the real package graph.
+# DONUT_TEST_PNPM_FAIL makes the install fail with pnpm's lockfile message.
 write_fake_pnpm_stub() {
     local bin="$1"
     @mkdir -p "${bin}"
     @cat >"${bin}/pnpm" <<'FAKE_PNPM'
 #!/usr/bin/env bash
 echo "$*" >>"${DONUT_TEST_PNPM_LOG}"
+if [ -n "${DONUT_TEST_PNPM_FAIL:-}" ]; then
+    echo "ERR_PNPM_OUTDATED_LOCKFILE  Cannot install with \"frozen-lockfile\" because pnpm-lock.yaml is not up to date with app/package.json" >&2
+    exit 1
+fi
 if [ "$1" = "--frozen-lockfile" ]; then
     mkdir -p node_modules
+    : >node_modules/.modules.yaml
+    for project in $(awk '/^ *- / { print $2 }' pnpm-workspace.yaml); do
+        mkdir -p "${project}/node_modules"
+    done
 fi
 FAKE_PNPM
     @chmod +x "${bin}/pnpm"
 }
 
-# Common probe preamble shared by the real-invocation tests below: consumes
-# the fake-pnpm bin dir and real PATH ($1/$2), the repo root ($3), and the
-# disposable temp workspace ($4) as probe.sh positional args, seeds real
-# (empty) pnpm-lock.yaml / package.json / pnpm-workspace.yaml files, resets
-# the pnpm call log, and sources the real dev_setup.sh so setup_pnpm_deps is
-# ready to call. Each test appends its own precondition and assertions.
-write_probe_preamble() {
-    local probe="$1"
+# Real command-boundary proof of setup_pnpm_deps: a clean bash sources the real
+# dev_setup.sh in a disposable workspace (real pnpm-lock.yaml, package.json and
+# pnpm-workspace.yaml listing one project, `app`, that declares dependencies),
+# with only the external pnpm substituted. Runs the probe body given on stdin
+# and prints its output.
+run-dependency-probe() {
+    local work bin probe
+    work="$(@mktemp -d)"
+    bin="${work}/bin"
+    probe="${work}/probe.sh"
+    write_fake_pnpm_stub "${bin}"
     @cat >"${probe}" <<'PROBE'
 set -euo pipefail
 export PATH="$1:$2"
@@ -46,137 +58,118 @@ export DONUT_TEST_PNPM_LOG="$5"
 cd "${work}"
 : >pnpm-lock.yaml
 : >package.json
-: >pnpm-workspace.yaml
+printf 'packages:\n  - app\n' >pnpm-workspace.yaml
+mkdir -p app
+printf '{ "dependencies": {} }\n' >app/package.json
 : >"${DONUT_TEST_PNPM_LOG}"
 
 source "${repo_root}/scripts/shell_setup.sh"
 source "${repo_root}/scripts/dev_setup.sh"
 setup_logging >/dev/null
 PROBE
+    @cat >>"${probe}"
+    @real env -i "PATH=${DONUT_TEST_REAL_PATH}" \
+        "${DONUT_TEST_REAL_BASH}" "${probe}" \
+        "${bin}" "${DONUT_TEST_REAL_PATH}" "${DONUT_TEST_REPO_ROOT}" "${work}" "${work}/pnpm-calls.log" 2>&1
 }
 
-# setup_pnpm_deps must be callable on its own (slice 2: separate dependency
-# preparation from Biome restart/service startup). Real command-boundary
-# proof, not a simulation: a clean bash subprocess sources the real
-# dev_setup.sh against a real disposable temp "workspace" (real pnpm-lock.yaml
-# / package.json / fingerprint file), with only the external `pnpm` binary
-# substituted for a logging stub (per the plan's "subprocess substitutes only
-# for external tools" rule) so the test stays fast and offline. Asserts:
-# setup_pnpm_deps alone runs the frozen-lockfile install once, writes the
-# fingerprint, and — unlike setup_pnpm_and_biome — never touches Biome.
+# Installs once, records the fingerprint, skips the repeat, and never touches
+# the Biome daemon (unlike setup_pnpm_and_biome).
 test-setup-pnpm-deps-real-invocation-installs-once-then-skips-and-skips-biome() {
-    local work bin probe
-
-    work="$(@mktemp -d)"
-    bin="${work}/bin"
-    probe="${work}/probe.sh"
-    write_fake_pnpm_stub "${bin}"
-    write_probe_preamble "${probe}"
-
-    @cat >>"${probe}" <<'PROBE'
-
-setup_pnpm_deps >/dev/null
-first_calls="$(wc -l <"${DONUT_TEST_PNPM_LOG}" | tr -d ' ')"
-fingerprint_written="$([ -f .donut-pnpm-lock.sha256 ] && echo yes || echo no)"
-
-# Repeat: fingerprint unchanged and node_modules present -> no second install.
-setup_pnpm_deps >/dev/null
-second_calls="$(wc -l <"${DONUT_TEST_PNPM_LOG}" | tr -d ' ')"
-
-# setup_pnpm_deps alone must never touch the Biome daemon.
-biome_touched="no"
-grep -q biome "${DONUT_TEST_PNPM_LOG}" && biome_touched="yes"
-
-echo "first_calls=${first_calls} fingerprint=${fingerprint_written} second_calls=${second_calls} biome_touched=${biome_touched}"
-PROBE
-
     local result
-    result="$(@real env -i "PATH=${DONUT_TEST_REAL_PATH}" \
-        "${DONUT_TEST_REAL_BASH}" "${probe}" \
-        "${bin}" "${DONUT_TEST_REAL_PATH}" "${DONUT_TEST_REPO_ROOT}" "${work}" "${work}/pnpm-calls.log")"
-
-    @assert-equals "first_calls=1 fingerprint=yes second_calls=1 biome_touched=no" "${result}"
+    result="$(run-dependency-probe <<'PROBE'
+setup_pnpm_deps >/dev/null
+fingerprint="$([ -f .donut-pnpm-lock.sha256 ] && echo yes || echo no)"
+setup_pnpm_deps >/dev/null
+echo "calls=$(wc -l <"${DONUT_TEST_PNPM_LOG}" | tr -d ' ') fingerprint=${fingerprint} biome_touched=$(grep -q biome "${DONUT_TEST_PNPM_LOG}" && echo yes || echo no)"
+PROBE
+)"
+    @assert-equals "calls=1 fingerprint=yes biome_touched=no" "${result}"
 }
 
-# Interrupted/partial install: node_modules exists (as a prior install
-# process would leave it, since pnpm creates it before finishing) but no
-# fingerprint file was ever written -- the fingerprint is only written after
-# a *completed* install (`pnpm ... && donut_workspace_deps_fingerprint
-# >file`), so a killed/interrupted install never produces one. Proves
-# donut_needs_pnpm_install does not trust a merely-present node_modules
-# directory as evidence of a finished install: it must trigger a real
-# reinstall (observed via the fake pnpm's call log), not silently skip.
+# An install killed after linking but before the fingerprint was written is not
+# trusted: the fingerprint is only recorded after a completed install.
 test-setup-pnpm-deps-interrupted-install-missing-fingerprint-triggers-reinstall() {
-    local work bin probe
-
-    work="$(@mktemp -d)"
-    bin="${work}/bin"
-    probe="${work}/probe.sh"
-    write_fake_pnpm_stub "${bin}"
-    write_probe_preamble "${probe}"
-
-    @cat >>"${probe}" <<'PROBE'
-
-# Simulate an install killed after node_modules was created but before the
-# fingerprint was written.
-mkdir -p node_modules
-
-setup_pnpm_deps >/dev/null
-calls="$(wc -l <"${DONUT_TEST_PNPM_LOG}" | tr -d ' ')"
-fingerprint_written="$([ -f .donut-pnpm-lock.sha256 ] && echo yes || echo no)"
-
-echo "calls=${calls} fingerprint=${fingerprint_written}"
-PROBE
-
     local result
-    result="$(@real env -i "PATH=${DONUT_TEST_REAL_PATH}" \
-        "${DONUT_TEST_REAL_BASH}" "${probe}" \
-        "${bin}" "${DONUT_TEST_REAL_PATH}" "${DONUT_TEST_REPO_ROOT}" "${work}" "${work}/pnpm-calls.log")"
-
+    result="$(run-dependency-probe <<'PROBE'
+mkdir -p node_modules app/node_modules
+: >node_modules/.modules.yaml
+setup_pnpm_deps >/dev/null
+echo "calls=$(wc -l <"${DONUT_TEST_PNPM_LOG}" | tr -d ' ') fingerprint=$([ -f .donut-pnpm-lock.sha256 ] && echo yes || echo no)"
+PROBE
+)"
     @assert-equals "calls=1 fingerprint=yes" "${result}"
 }
 
-# Stale/mismatched fingerprint: node_modules and a fingerprint file both
-# exist, but the stored fingerprint was computed from different workspace
-# manifest content than what's on disk now (as if package.json/pnpm-lock.yaml
-# changed since the last completed install, e.g. a valid paired dependency
-# change or a manifest that drifted from the lockfile). Proves the mismatch
-# is not silently trusted: a real reinstall runs (observed via the fake
-# pnpm's call log, not just exit status) and the fingerprint is corrected to
-# match current content.
+# A fingerprint recorded from different dependency inputs triggers a reinstall
+# and is corrected to the current inputs.
 test-setup-pnpm-deps-stale-fingerprint-triggers-reinstall() {
-    local work bin probe
-
-    work="$(@mktemp -d)"
-    bin="${work}/bin"
-    probe="${work}/probe.sh"
-    write_fake_pnpm_stub "${bin}"
-    write_probe_preamble "${probe}"
-
-    @cat >>"${probe}" <<'PROBE'
-
-mkdir -p node_modules
-echo "stale-fingerprint-from-a-different-lockfile-state" >.donut-pnpm-lock.sha256
-
-current="$(donut_workspace_deps_fingerprint)"
-stored_before="$(cat .donut-pnpm-lock.sha256)"
-
-setup_pnpm_deps >/dev/null
-calls="$(wc -l <"${DONUT_TEST_PNPM_LOG}" | tr -d ' ')"
-stored_after="$(cat .donut-pnpm-lock.sha256)"
-
-mismatch_before="$([ "${stored_before}" != "${current}" ] && echo yes || echo no)"
-corrected_after="$([ "${stored_after}" = "${current}" ] && echo yes || echo no)"
-
-echo "calls=${calls} mismatch_before=${mismatch_before} corrected_after=${corrected_after}"
-PROBE
-
     local result
-    result="$(@real env -i "PATH=${DONUT_TEST_REAL_PATH}" \
-        "${DONUT_TEST_REAL_BASH}" "${probe}" \
-        "${bin}" "${DONUT_TEST_REAL_PATH}" "${DONUT_TEST_REPO_ROOT}" "${work}" "${work}/pnpm-calls.log")"
+    result="$(run-dependency-probe <<'PROBE'
+mkdir -p node_modules app/node_modules
+: >node_modules/.modules.yaml
+echo "stale-fingerprint-from-a-different-lockfile-state" >.donut-pnpm-lock.sha256
+setup_pnpm_deps >/dev/null
+echo "calls=$(wc -l <"${DONUT_TEST_PNPM_LOG}" | tr -d ' ') corrected=$([ "$(cat .donut-pnpm-lock.sha256)" = "$(donut_workspace_deps_fingerprint)" ] && echo yes || echo no)"
+PROBE
+)"
+    @assert-equals "calls=1 corrected=yes" "${result}"
+}
 
-    @assert-equals "calls=1 mismatch_before=yes corrected_after=yes" "${result}"
+# A workspace project's manifest is a dependency input even though the root
+# manifest and lockfile are unchanged.
+test-setup-pnpm-deps-changed-workspace-manifest-triggers-reinstall() {
+    local result
+    result="$(run-dependency-probe <<'PROBE'
+setup_pnpm_deps >/dev/null
+printf '{ "dependencies": { "left-pad": "1.0.0" } }\n' >app/package.json
+setup_pnpm_deps >/dev/null
+echo "installs=$(grep -c frozen-lockfile "${DONUT_TEST_PNPM_LOG}")"
+PROBE
+)"
+    @assert-equals "installs=2" "${result}"
+}
+
+# A different pnpm (resolved to a different executable path, as a new Nix store
+# version is) does not trust the installation made by the previous one.
+test-setup-pnpm-deps-changed-pnpm-triggers-reinstall() {
+    local result
+    result="$(run-dependency-probe <<'PROBE'
+setup_pnpm_deps >/dev/null
+mkdir -p "${work}/other-pnpm"
+cp "$1/pnpm" "${work}/other-pnpm/pnpm"
+PATH="${work}/other-pnpm:${PATH}" setup_pnpm_deps >/dev/null
+echo "installs=$(grep -c frozen-lockfile "${DONUT_TEST_PNPM_LOG}")"
+PROBE
+)"
+    @assert-equals "installs=2" "${result}"
+}
+
+# A workspace project that declares dependencies but lost its node_modules is
+# an incomplete installation, whatever the fingerprint says.
+test-setup-pnpm-deps-missing-project-modules-triggers-reinstall() {
+    local result
+    result="$(run-dependency-probe <<'PROBE'
+setup_pnpm_deps >/dev/null
+rm -rf app/node_modules
+setup_pnpm_deps >/dev/null
+echo "installs=$(grep -c frozen-lockfile "${DONUT_TEST_PNPM_LOG}") app_modules=$([ -d app/node_modules ] && echo yes || echo no)"
+PROBE
+)"
+    @assert-equals "installs=2 app_modules=yes" "${result}"
+}
+
+# A failed install propagates pnpm's own message and status and records no
+# fingerprint, so the next run tries again.
+test-setup-pnpm-deps-failed-install-is-visible-and-not-recorded() {
+    local result
+    result="$(run-dependency-probe <<'PROBE'
+status=0
+DONUT_TEST_PNPM_FAIL=1 setup_pnpm_deps >/dev/null || status=$?
+echo "status=${status} fingerprint=$([ -f .donut-pnpm-lock.sha256 ] && echo yes || echo no)"
+PROBE
+)"
+    @assert-equals $'ERR_PNPM_OUTDATED_LOCKFILE  Cannot install with "frozen-lockfile" because pnpm-lock.yaml is not up to date with app/package.json\nstatus=1 fingerprint=no' "${result}"
 }
 
 # start_detached must shield direnv from daemon FD inheritance (direnv/direnv#755):

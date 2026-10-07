@@ -17,44 +17,62 @@ start_detached() {
   "$@" </dev/null >>"${log_file}" 2>&1 3>&-
 }
 
-# Skip the pnpm install when direnv/nix runs the shell hook more than once per cd.
+# Skip the pnpm install when the workspace's current installation is complete and
+# was made from the same dependency inputs: the lockfile, root and workspace
+# manifests, workspace settings, and the Node/pnpm tools (identified by their
+# resolved executable paths, which carry their versions in the Nix store).
 DONUT_PNPM_FINGERPRINT_FILE="${DONUT_PNPM_FINGERPRINT_FILE:-.donut-pnpm-lock.sha256}"
+
+# Workspace projects listed under `packages:` in pnpm-workspace.yaml.
+donut_workspace_projects() {
+  awk '/^packages:/ { listed = 1; next } /^[^ ]/ { listed = 0 } listed && /^ *- / { sub(/^ *- */, ""); print }' "${PWD}/pnpm-workspace.yaml"
+}
 
 donut_workspace_deps_fingerprint() {
   if [ ! -f "${PWD}/pnpm-lock.yaml" ] || [ ! -f "${PWD}/package.json" ]; then
     return 1
   fi
-  if command -v shasum >/dev/null 2>&1; then
-    (cat "${PWD}/pnpm-lock.yaml" "${PWD}/package.json" "${PWD}/pnpm-workspace.yaml" 2>/dev/null) | shasum -a 256 | awk '{print $1}'
-  elif command -v sha256sum >/dev/null 2>&1; then
-    (cat "${PWD}/pnpm-lock.yaml" "${PWD}/package.json" "${PWD}/pnpm-workspace.yaml" 2>/dev/null) | sha256sum | awk '{print $1}'
-  else
-    cksum "${PWD}/pnpm-lock.yaml" "${PWD}/package.json" 2>/dev/null | cksum | awk '{print $1}'
-  fi
+  {
+    cat "${PWD}/pnpm-lock.yaml" "${PWD}/package.json" "${PWD}/pnpm-workspace.yaml"
+    for project in $(donut_workspace_projects); do
+      cat "${PWD}/${project}/package.json"
+    done
+    readlink -f "$(command -v node)" "$(command -v pnpm)"
+  } | git hash-object --stdin
+}
+
+# pnpm writes node_modules/.modules.yaml when it finishes linking, and gives every
+# workspace project that declares dependencies its own node_modules.
+donut_workspace_install_complete() {
+  [ -f "${PWD}/node_modules/.modules.yaml" ] || return 1
+  for project in $(donut_workspace_projects); do
+    if grep -qE '"(devD|d)ependencies"' "${PWD}/${project}/package.json"; then
+      [ -d "${PWD}/${project}/node_modules" ] || return 1
+    fi
+  done
 }
 
 donut_needs_pnpm_install() {
   local current
   [ "${DONUT_SHELL_HOOK_FORCE_PNPM:-}" = "1" ] && return 0
-  [ ! -d "${PWD}/node_modules" ] && return 0
+  donut_workspace_install_complete || return 0
   current="$(donut_workspace_deps_fingerprint)" || return 0
-  [ -z "${current}" ] && return 0
   [ ! -f "${PWD}/${DONUT_PNPM_FINGERPRINT_FILE}" ] && return 0
-  [ "$(cat "${PWD}/${DONUT_PNPM_FINGERPRINT_FILE}" 2>/dev/null)" != "${current}" ] && return 0
+  [ "$(cat "${PWD}/${DONUT_PNPM_FINGERPRINT_FILE}")" != "${current}" ] && return 0
   return 1
 }
 
 # Fingerprint-gated dependency install, callable on its own (no Biome patch,
 # no daemon restart). This is the one dependency-readiness owner; compose it
-# where only dependency preparation is needed.
+# where only dependency preparation is needed. The frozen-lockfile install never
+# rewrites pnpm-lock.yaml: a manifest the lockfile does not match fails visibly
+# with pnpm's ERR_PNPM_OUTDATED_LOCKFILE instead.
 setup_pnpm_deps() {
   log "Setting up PNPM..."
-  # pnpm is provided by the nix dev shell (flake.nix pins 11.15.1 under nodejs_26).
-  # Node 26 dropped bundled corepack, so we no longer activate pnpm via corepack.
   if donut_needs_pnpm_install; then
     pnpm --frozen-lockfile recursive install && donut_workspace_deps_fingerprint >"${PWD}/${DONUT_PNPM_FINGERPRINT_FILE}"
   else
-    log "Skipping pnpm install (workspace fingerprint unchanged). Set DONUT_SHELL_HOOK_FORCE_PNPM=1 to force."
+    log "Skipping pnpm install (workspace installation current). Set DONUT_SHELL_HOOK_FORCE_PNPM=1 to force."
   fi
 }
 

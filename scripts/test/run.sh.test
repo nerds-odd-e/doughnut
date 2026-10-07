@@ -1,84 +1,135 @@
 #!/usr/bin/env bash
 #
-# Tests for scripts/run.sh using Bach testing framework
-#
-# Note: Since run.sh uses 'exec', we test the logic by simulating
-# the conditional behavior rather than executing the actual script.
+# Tests for scripts/run.sh: invoke the real runner in a temporary repository,
+# substituting only the external `nix` executable, which records its arguments.
+
+DONUT_TEST_REAL_PATH="$PATH"
+DONUT_TEST_REAL_BASH="$(command -v bash)"
+DONUT_TEST_RUNNER="$(cd "$(dirname "$0")/.." && pwd)/run.sh"
 
 source "$(dirname "$0")/vendor/bach.sh"
 
-# Test: When nix is installed and not in nix shell
-# Expected: Export CURSOR_DEV=true and run nix develop -c
-test-run-with-nix-installed-not-in-shell() {
-    # Mock command -v to return success for nix
-    command() {
-        case "$*" in
-            "-v nix") return 0 ;;
-            *) /usr/bin/env command "$@" ;;
-        esac
-    }
-    
-    # Simulate the script's logic when nix is installed but not in shell
-    unset IN_NIX_SHELL
-    if command -v nix >/dev/null 2>&1; then
-        if [ -z "${IN_NIX_SHELL:-}" ]; then
-            export CURSOR_DEV=true
-            nix develop -c echo "test"
-        fi
-    fi
-}
-test-run-with-nix-installed-not-in-shell-assert() {
-    export CURSOR_DEV=true
-    nix develop -c echo test
+run-runner() {
+  local scenario="$1"
+
+  @real env -i \
+    "PATH=${DONUT_TEST_REAL_PATH}" \
+    "DONUT_TEST_RUNNER=${DONUT_TEST_RUNNER}" \
+    "DONUT_TEST_SCENARIO=${scenario}" \
+    "${DONUT_TEST_REAL_BASH}" <<'EOF'
+set -euo pipefail
+
+work="$(cd "$(mktemp -d)" && pwd -P)"
+trap 'rm -rf "$work"' EXIT
+
+repo="$work/repo"
+mkdir -p "$repo/scripts" "$repo/sub dir" "$work/bin"
+git -C "$repo" init -q
+cp "$DONUT_TEST_RUNNER" "$repo/scripts/run.sh"
+printf 'definition 1\n' >"$repo/flake.nix"
+printf 'lock 1\n' >"$repo/flake.lock"
+
+cat >"$work/bin/nix" <<'NIX'
+#!/usr/bin/env bash
+printf 'nix %s\n' "$*" | sed -e "s#$DONUT_TEST_WORK#WORK#g" >>"$DONUT_TEST_WORK/nix.log"
+if [[ "$*" == *" --profile "* ]]; then
+  [[ -z "${DONUT_TEST_POPULATE_FAIL:-}" ]] || { echo "error: undefined variable" >&2; exit 1; }
+  ln -s /nix/store/env "${@: -3:1}"
+  exit 0
+fi
+while [[ "$1" != -c ]]; do shift; done
+shift
+exec "$@"
+NIX
+chmod +x "$work/bin/nix"
+export DONUT_TEST_WORK="$work"
+
+runner() {
+  (cd "$repo/sub dir" && "$repo/scripts/run.sh" bash -c 'printf "%s|%s|%s|%s\n" "$PWD" "$1" "$2" "${CURSOR_DEV:-}"; exit "$3"' child "a b" '*' "${DONUT_TEST_CHILD_EXIT:-0}") \
+    | sed -e "s#$work#WORK#g"
 }
 
-# Test: When already in nix shell
-# Expected: Run command directly without nix prefix
-test-run-already-in-nix-shell() {
-    # Mock command -v to return success for nix
-    command() {
-        case "$*" in
-            "-v nix") return 0 ;;
-            *) /usr/bin/env command "$@" ;;
-        esac
-    }
-    
-    # Simulate the script's logic when already in nix shell
-    IN_NIX_SHELL="1"
-    if command -v nix >/dev/null 2>&1; then
-        if [ -z "${IN_NIX_SHELL:-}" ]; then
-            export CURSOR_DEV=true
-            nix develop -c echo "test"
-        else
-            echo "test"
-        fi
-    fi
-}
-test-run-already-in-nix-shell-assert() {
-    echo test
+show_nix_log() {
+  sed -E -e 's#donut-nix-env/[0-9a-f]{40}#donut-nix-env/KEY#g' "$work/nix.log"
+  rm -f "$work/nix.log"
 }
 
-# Test: When nix is not installed
-# Expected: Run command directly
-test-run-nix-not-installed() {
-    # Mock command -v to return failure for nix
-    command() {
-        case "$*" in
-            "-v nix") return 1 ;;
-            *) /usr/bin/env command "$@" ;;
-        esac
-    }
-    
-    # Simulate the script's logic when nix is not installed
-    if command -v nix >/dev/null 2>&1; then
-        # This branch shouldn't execute
-        export CURSOR_DEV=true
-        nix develop -c echo "test"
-    else
-        echo "test"
-    fi
-}
-test-run-nix-not-installed-assert() {
-    echo test
+case "$DONUT_TEST_SCENARIO" in
+  no-nix)
+    PATH="/usr/bin:/bin" runner
+    ;;
+  inside-nix)
+    PATH="$work/bin:$PATH" IN_NIX_SHELL=impure runner
+    [[ ! -e "$work/nix.log" ]] && echo "nix not called"
+    ;;
+  populate-then-reuse)
+    export PATH="$work/bin:$PATH"
+    runner
+    show_nix_log
+    runner
+    show_nix_log
+    printf 'snapshot: %s\n' "$(cat "$repo"/.git/donut-nix-env/*/flake/flake.nix)"
+    printf 'snapshot files: %s\n' "$(ls -A "$repo"/.git/donut-nix-env/*/flake | tr '\n' ' ')"
+    ;;
+  changed-definition)
+    export PATH="$work/bin:$PATH"
+    runner >/dev/null
+    first="$(ls "$repo/.git/donut-nix-env")"
+    rm -f "$work/nix.log"
+    printf 'definition 2\n' >"$repo/flake.nix"
+    runner >/dev/null
+    show_nix_log | grep -c -- '--profile'
+    second="$(ls "$repo/.git/donut-nix-env")"
+    [[ "$first" != "$second" ]] && echo "only the new definition is kept: $(ls "$repo/.git/donut-nix-env" | wc -l | tr -d ' ')"
+    ;;
+  populate-failure)
+    export PATH="$work/bin:$PATH"
+    set +e
+    DONUT_TEST_POPULATE_FAIL=1 runner 2>&1
+    echo "status $?"
+    set -e
+    show_nix_log
+    [[ ! -e "$repo"/.git/donut-nix-env/*/profile ]] && echo "no profile"
+    ;;
+  child-failure)
+    export PATH="$work/bin:$PATH"
+    set +e
+    DONUT_TEST_CHILD_EXIT=7 runner >/dev/null
+    echo "status $?"
+    ;;
+esac
+EOF
 }
 
+test-runs-directly-without-nix() {
+  @assert-equals 'WORK/repo/sub dir|a b|*|' "$(run-runner no-nix)"
+}
+
+test-runs-directly-inside-nix() {
+  @assert-equals $'WORK/repo/sub dir|a b|*|\nnix not called' "$(run-runner inside-nix)"
+}
+
+test-populates-recorded-environment-once-then-reuses-it() {
+  @assert-equals "WORK/repo/sub dir|a b|*|true
+nix develop path:WORK/repo/.git/donut-nix-env/KEY/flake --no-write-lock-file --profile WORK/repo/.git/donut-nix-env/KEY/profile -c true
+nix develop WORK/repo/.git/donut-nix-env/KEY/profile --inputs-from path:WORK/repo/.git/donut-nix-env/KEY/flake --option flake-registry  -c bash -c printf \"%s|%s|%s|%s\\n\" \"\$PWD\" \"\$1\" \"\$2\" \"\${CURSOR_DEV:-}\"; exit \"\$3\" child a b * 0
+WORK/repo/sub dir|a b|*|true
+nix develop WORK/repo/.git/donut-nix-env/KEY/profile --inputs-from path:WORK/repo/.git/donut-nix-env/KEY/flake --option flake-registry  -c bash -c printf \"%s|%s|%s|%s\\n\" \"\$PWD\" \"\$1\" \"\$2\" \"\${CURSOR_DEV:-}\"; exit \"\$3\" child a b * 0
+snapshot: definition 1
+snapshot files: flake.lock flake.nix " "$(run-runner populate-then-reuse)"
+}
+
+test-changed-definition-builds-a-new-environment() {
+  @assert-equals $'1\nonly the new definition is kept: 1' "$(run-runner changed-definition)"
+}
+
+test-populate-failure-is-visible-and-runs-nothing() {
+  @assert-equals "error: undefined variable
+status 1
+nix develop path:WORK/repo/.git/donut-nix-env/KEY/flake --no-write-lock-file --profile WORK/repo/.git/donut-nix-env/KEY/profile -c true
+no profile" "$(run-runner populate-failure)"
+}
+
+test-propagates-child-exit-status() {
+  @assert-equals 'status 7' "$(run-runner child-failure)"
+}

@@ -1,0 +1,104 @@
+#!/usr/bin/env bash
+#
+# Tests for scripts/profiling/profile-commit-hook.sh using the Bach testing
+# framework.
+#
+# Real command boundary: the driver runs with the host /bin/bash against a
+# disposable clone of this repository at HEAD, creates and prepares its own
+# linked worktree through the real scripts/worktree_setup.sh, and invokes the
+# real tracked hook, which enters the real scripts/run.sh. Only the external
+# `nix` and `pnpm` executables are substituted: `nix` runs its command
+# directly, `pnpm` records what the hook's check received. Timings are
+# recorded but not asserted.
+
+DONUT_TEST_REAL_PATH="$PATH"
+DONUT_TEST_REPO_ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
+DONUT_TEST_PROFILING="${DONUT_TEST_REPO_ROOT}/scripts/profiling"
+
+source "$(dirname "$0")/vendor/bach.sh"
+
+profile-in-disposable-clone() {
+  @real env -i \
+    "PATH=${DONUT_TEST_REAL_PATH}" \
+    "DONUT_TEST_REPO_ROOT=${DONUT_TEST_REPO_ROOT}" \
+    "DONUT_TEST_PROFILING=${DONUT_TEST_PROFILING}" \
+    /bin/bash <<'EOF'
+set -euo pipefail
+
+work="$(mktemp -d)"
+work="$(cd "$work" && pwd -P)"
+trap 'rm -rf "$work"' EXIT
+
+git clone -q --shared --no-checkout "$DONUT_TEST_REPO_ROOT" "$work/src"
+git -C "$work/src" checkout -q --detach "$(git -C "$DONUT_TEST_REPO_ROOT" rev-parse HEAD)"
+mkdir -p "$work/src/scripts/profiling"
+cp "$DONUT_TEST_PROFILING/profile-commit-hook.sh" "$DONUT_TEST_PROFILING/commit-hook-corpus.sh" "$work/src/scripts/profiling/"
+source_status="$(git -C "$work/src" status --porcelain)"
+
+mkdir "$work/bin"
+cat >"$work/bin/nix" <<'NIX'
+#!/usr/bin/env bash
+[ "$1" = --version ] && { echo "nix (substitute)"; exit 0; }
+while [ "$1" != -c ]; do shift; done
+shift
+IN_NIX_SHELL=impure exec "$@"
+NIX
+cat >"$work/bin/pnpm" <<'PNPM'
+#!/usr/bin/env bash
+[ "$1" = lint:changed ] || exit 0
+staged="$(git diff --cached --raw --no-abbrev | awk '{ print $6 ":" $4 }' | sort | tr '\n' ' ')"
+printf '%s\t%s\n' "$PWD" "$staged" >>"$PROFILE_TEST_LOG"
+echo "checked $staged"
+case "$staged" in *cli/src/commands/recall/recallMcqStageKeys.ts:*)
+  echo "WARN failing check" >&2
+  exit 3
+esac
+case "$staged" in *mcp-server/src/helpers.ts:*)
+  echo stray >stray-untracked.txt
+esac
+PNPM
+chmod +x "$work/bin/nix" "$work/bin/pnpm"
+
+evidence="$work/evidence"
+set +e
+PATH="$work/bin:$PATH" PROFILE_TEST_LOG="$work/pnpm.log" \
+  bash "$work/src/scripts/profiling/profile-commit-hook.sh" baseline "$evidence" >/dev/null 2>&1
+echo "driver exit: $?"
+set -e
+
+results="$evidence/results.tsv"
+fixture="$(sed -n 's/^fixture: //p' "$evidence/environment.txt")"
+
+echo "corpus per class: $(awk -F'\t' '$1 == "corpus" { print $3 }' "$results" | uniq -c | awk '{ printf "%s%s=%s", sep, $2, $1; sep = " " }')"
+echo "distinct corpus inputs: $(awk -F'\t' '$1 == "corpus" { print $8 }' "$results" | sort -u | wc -l | tr -d ' ')"
+echo "frontend kinds: $(awk -F'\t' '$1 == "corpus" && $3 == "frontend" { print $8 }' "$results" | grep -oE '\.(vue|ts):' | sort -u | tr -d '\n')"
+echo "hook calls: $(wc -l <"$work/pnpm.log" | tr -d ' ') in fixture: $(cut -f1 "$work/pnpm.log" | grep -cx "$fixture")"
+paste <(awk -F'\t' 'NR > 1 { gsub(",", " ", $8); print $8 " " }' "$results") <(cut -f2 "$work/pnpm.log") |
+  awk -F'\t' '$1 != $2 { bad++ } END { print "recorded inputs differing from hook-checked input: " bad + 0 }'
+echo "rows by section: $(awk -F'\t' 'NR > 1 { print $1 }' "$results" | uniq -c | awk '{ printf "%s%s=%s", sep, $2, $1; sep = " " }')"
+echo "failed run: $(awk -F'\t' '$2 == "cli-3" && $1 == "corpus" { print $5, $6, $7 }' "$results") $(grep -c "WARN failing check" "$evidence/corpus/cli-3/hook.stderr")"
+echo "changed-state run: $(awk -F'\t' '$2 == "mcp-server-2" && $1 == "corpus" { print $5, $7 }' "$results") $(grep -c 'stray-untracked.txt' "$evidence/corpus/mcp-server-2/preservation.diff")"
+echo "summary timings: $(grep '^timings:' "$evidence/summary.txt" | grep -o '=' | wc -l | tr -d ' ') classes: $(grep -c '^class .*: mean .* range ' "$evidence/summary.txt") mean: $(grep -c '^overall mean: ' "$evidence/summary.txt")"
+echo "worktrees left: $(git -C "$work/src" worktree list --porcelain | grep -c '^worktree ') fixture exists: $([ -e "$fixture" ] && echo yes || echo no) source unchanged: $([ "$(git -C "$work/src" status --porcelain)" = "$source_status" ] && echo yes || echo no)"
+EOF
+}
+
+test-profiles-every-corpus-case-through-the-installed-hook-and-cleans-up() {
+  local output
+  output="$(profile-in-disposable-clone)"
+
+  @assert-equals "$(@cat <<'EXPECTED'
+driver exit: 1
+corpus per class: frontend=5 backend=5 cli=5 mcp-server=5 test-fixtures=5 root=5 openapi=5 mixed=5
+distinct corpus inputs: 40
+frontend kinds: .ts:.vue:
+hook calls: 57 in fixture: 57
+recorded inputs differing from hook-checked input: 0
+rows by section: fresh-cache=8 corpus=40 inside-nix=8 no-component=1
+failed run: 3 1 yes 1
+changed-state run: 0 no 2
+summary timings: 40 classes: 8 mean: 1
+worktrees left: 1 fixture exists: no source unchanged: yes
+EXPECTED
+)" "$output"
+}
