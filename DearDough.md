@@ -394,6 +394,14 @@ an E2E run cannot run it on unformatted files.
   - Evidence: slice 1 implementer return: the first mocked-journey run failed on a Biome line-length error in `NoteToolbar.panels.spec.ts`; it was rewrapped by hand. The coordinator then told later implementers they may run `biome check --linter-enabled=false` on their files, and the slice 3 and slice 4 E2E runs passed first time.
   - Observed effect: one failed E2E run in slice 1; extra time not recorded.
   - Inference: a read-only format check of touched files before `cy:run` avoided a repeat without breaking the coordinator-only formatting rule. Qualified: the delegation prompt supplied it, not the guidance.
+- Execution: SEED-066#no-record-while-stopping / `.planning/slice-plans/010-keep-the-dictation-result-true-while-stop-finishes/PLAN.md` / 2c30afdd26
+  - Timestamp: 2026-10-07T13:47:02+09:00 (SUT readiness failure in `sut.log`)
+  - Tool: Claude Code
+  - Model: claude-opus-5-5
+  - Open Dough release: 0.3.57 (execution-checkout `.agents/skills/dough-update/VERSION`)
+  - Evidence: slice 1, implemented by the coordinator; first `pnpm cy:run --spec e2e_test/features/note_creation_and_update/record_live_audio.feature` stopped with "SUT readiness failed" because `frontend:sut` reported "Formatter would have printed the following content" for `NoteAudioTools.retry.spec.ts`; after `biome format --write` on the three touched frontend files the rerun passed (2 scenarios). The plan's proof commands did not mention it; the plan's Learnings now do.
+  - Observed effect: one failed E2E stack start and a log read before the rerun; about one minute.
+  - Inference: the third occurrence in three SEED-066 executions; the guidance or the agent map stating "format touched frontend files before `cy:run`" would remove it. Qualified: the coordinator, not a delegated implementer, hit it here.
 
 ## ODF-216 — Landing retired the execution workspace while its final slice still needed a continuation
 

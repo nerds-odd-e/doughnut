@@ -133,3 +133,11 @@ Record-disabled assertion and pass after it; the frontend audio command passed
 
 - The mocked journey's Vite dev server refuses to start while a changed file is
   not Biome-formatted; format changed files before running it.
+
+## Execution complete
+
+Product advice: no change to priorities. The correction closes the observed
+wrong result; the next SEED-066 stories (spoken titles) stay in their order.
+Unobserved hypothesis for later voice work: Record stays clickable while
+`startRecording` waits for microphone permission, so a quick second press
+might start twice; nothing in this execution shows that it happens.
