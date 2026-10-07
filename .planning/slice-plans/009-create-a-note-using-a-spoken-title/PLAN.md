@@ -263,3 +263,11 @@ the three outcomes.
 
 - Status/control wording still duplicated with `NoteAudioTools`; share after plan 008 lands (as planned Current decisions / Architecture).
 - CI observer: GitHub Actions `ci.yml` (display name `donut CI`), directory `/tmp/dough-ci-501/watch-0fnUY4`, target branch `cursor/create-a-note-using-a-spoken-title`.
+
+## Execution complete
+
+Product advice: Direction (“Audio tools, starting with voice input”) is aligned. No backlog edit from this review.
+
+1. Next queued voice story — `SEED-066#rename-with-spoken-title` should refine to reuse `SpeakTitleControl` / `convertOnlyAtStop` / `joinDictatedSegments` / `audioChunkToText`, and decide replace-vs-join for an existing title (create-note joins after the first edit).
+2. After plan 008 — share status/control wording with `NoteAudioTools` as already planned; do not open a separate story just for that.
+3. No change to backlog order from this execution: spoken create is done pending CI; rename remains the natural follow-on. Real-browser mic refusal and OS dictation stay documented gaps, not new backlog items unless the owner wants them.

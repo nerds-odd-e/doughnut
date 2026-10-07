@@ -137,6 +137,15 @@ Follow-up: Open, unqueued.
   - Observed effect: approximately four active refactor minutes, two new test files, and replacement proof of 27 mounted tests plus typecheck; production code stayed unchanged.
   - Inference: the numeric ceiling prompted a cohesive test split and extra proof. Consider test-file capacity while planning; net review value and token cost were not measured.
 
+- Execution: SEED-066#create-with-spoken-title / slice-plans/009-create-a-note-using-a-spoken-title / 201d79ed5d1e5705fd7c5ed3b7d82478120aa762
+  - Timestamp: 2026-10-07T21:35+09:00 through 2026-10-07T21:40:25+09:00 (slice 3 refactor through delivery commit)
+  - Tool: Cursor
+  - Model: unknown
+  - Open Dough release: 0.3.57
+  - Evidence: slice 3 refactor transcript `4b9de79e-592d-4b5f-8a50-27f203804051` (decision pass: "NoteNewForm is at 250 (not over). Splitting the docs…"; new `docs/voice-input-observations.md`); pre-slice `61a6c94885:docs/voice-input.md` was already 265 lines; commit `201d79ed5d` keeps a ~115-line product doc and moves ~170 observation lines aside, retargeting SEED-066 anchors.
+  - Observed effect: about ten refactor minutes plus observation-anchor retargeting for a small "Speaking a title in New note" section; product docs stay linked, no defect.
+  - Inference: same tip-over pattern on an already-oversized docs file that entered the diff; the ceiling forced relocating previously untouched observation notes rather than only adding the spoken-title section.
+
 ## ODF-190 — The plan prescribed production observations whose access route or log source did not exist, and whose results could not change the approach
 
 Former local code: DD-145.
