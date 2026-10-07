@@ -5,6 +5,7 @@ import {
   SearchController,
 } from "@generated/donut-backend-api/sdk.gen"
 import NoteNewForm from "@/components/notes/NoteNewForm.vue"
+import { createAudioRecorder } from "@/models/audio/audioRecorder"
 import type { ComponentPublicInstance } from "vue"
 import type { Router } from "vue-router"
 import { flushPromises, type VueWrapper } from "@vue/test-utils"
@@ -15,7 +16,7 @@ import {
   clickWikidataTitleAction,
   wikidataModal,
 } from "@tests/notes/wikidataAssociationDialogTestSupport"
-import { expect } from "vitest"
+import { expect, vi } from "vitest"
 
 export const noteNewFormRealm = makeMe.aNoteRealm.title("mythical").please()
 export const noteNewFormNote = noteNewFormRealm.note
@@ -97,6 +98,57 @@ export function speakTitleStatus(
 ): string | undefined {
   const status = wrapper.find(".speak-title-control [role='status']")
   return status.exists() ? status.text() : undefined
+}
+
+export async function speakTheTitle(
+  wrapper: VueWrapper<ComponentPublicInstance>
+) {
+  await findNoteNewFormButtonByText(wrapper, "Speak the title")!.trigger(
+    "click"
+  )
+  await flushPromises()
+}
+
+export async function stopSpeaking(
+  wrapper: VueWrapper<ComponentPublicInstance>
+) {
+  await findNoteNewFormButtonByText(wrapper, "Stop")!.trigger("click")
+  await flushPromises()
+}
+
+export async function speakAndStop(
+  wrapper: VueWrapper<ComponentPublicInstance>
+) {
+  await speakTheTitle(wrapper)
+  await stopSpeaking(wrapper)
+}
+
+export function isNoteNewFormSubmitDisabled(
+  wrapper: VueWrapper<ComponentPublicInstance>
+) {
+  return (wrapper.find('input[type="submit"]').element as HTMLInputElement)
+    .disabled
+}
+
+/** Hold Stop in converting until finishStop runs the processor callback. */
+export function holdSpeakTitleConvertingUntilFinished() {
+  const recorder = vi.mocked(createAudioRecorder).mock.results[0]!.value as {
+    stopRecording: ReturnType<typeof vi.fn>
+  }
+  const processAudio = vi.mocked(createAudioRecorder).mock.calls[0]![0]!
+  let finishStop!: () => void
+  recorder.stopRecording.mockImplementation(
+    () =>
+      new Promise<File>((resolve) => {
+        finishStop = () => {
+          processAudio({
+            data: new File([], "test.webm"),
+            isMidSpeech: false,
+          }).then(() => resolve(new File([], "test.webm")))
+        }
+      })
+  )
+  return { finishStop: () => finishStop() }
 }
 
 export function wikidataDialogIsOpen(): boolean {

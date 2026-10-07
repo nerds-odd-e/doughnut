@@ -225,8 +225,13 @@ recorder; slice 4 changes all four. The documentation gains
 
 ### 4. A spoken title is an ordinary title, and Submit waits for it
 Type: Behavior
-Status: planned
-Proof: mounted tests: "2026-10-06 " + segments → "2026-10-06 weekly review"; a typed title plus speech joins with one space; a segment containing `/` shows the fullwidth replacement and its warning; search results shown for the heard title; typing after speech then Submit sends the typed title; Submit disabled while listening and converting, enabled once the words are in; Enter in the title field while listening does not call the create request; unmount while listening calls `stopRecording`; frontend tests green.
+Status: done
+Proof: accepted — `titleAfterSpokenSegments` + PathNameEditor; `v-model:busy` gates Submit and `processForm`; unmount stops recorder. `NoteNewForm.spokenTitle`: pattern/typed join, illegal `/`, search, typed correction submit, Submit disabled listening/converting, Enter blocked, unmount `stopRecording`. `vue-tsc` green.
+```bash
+env -u NODE_ENV CURSOR_DEV=true nix develop -c pnpm -C frontend test tests/notes/NoteNewForm tests/notes/NoteNewButton
+CURSOR_DEV=true nix develop -c pnpm -C frontend exec vue-tsc --noEmit
+```
+
 
 Behavior: New note open with a title pattern or typed title → Speak the
 title → Stop → the heard segments join the end of the current title by the

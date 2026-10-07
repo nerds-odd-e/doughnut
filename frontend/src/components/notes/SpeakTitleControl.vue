@@ -13,7 +13,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from "vue"
+import { computed, onUnmounted, ref, watch } from "vue"
 import { audioChunkToText } from "@/composables/audioChunkToText"
 import {
   createAudioRecorder,
@@ -25,6 +25,8 @@ const emit = defineEmits<{
   heardSegments: [segments: string[]]
 }>()
 
+const titleSpeechBusy = defineModel<boolean>("busy", { default: false })
+
 const statusByPhase = {
   idle: "",
   listening: "Recording. Speak now.",
@@ -33,6 +35,10 @@ const statusByPhase = {
 
 const phase = ref<keyof typeof statusByPhase>("idle")
 const status = computed(() => statusByPhase[phase.value])
+
+watch(phase, (p) => {
+  titleSpeechBusy.value = p === "listening" || p === "converting"
+})
 
 let audioRecorder: AudioRecorder | undefined
 
@@ -68,4 +74,11 @@ const onControlClick = () => {
   }
   return startListening()
 }
+
+onUnmounted(() => {
+  if (!audioRecorder) return
+  const recorder = audioRecorder
+  audioRecorder = undefined
+  recorder.stopRecording()
+})
 </script>

@@ -33,10 +33,17 @@ now.", then "Turning your speech into text…" until Stop has finished; once the
 heard words are in the title field, there is no status. Listening ends only
 when the author chooses Stop; nothing appears in the title while they are still
 speaking. The recorder converts only at Stop. The response's segments are joined
-by the same CJK/space rule as body passages and replace an untouched default
-"Untitled" through the title editor's ordinary handling. The author reviews the
-title and chooses Submit as usual; the note is created once with that title.
-Body dictation on an existing note never changes the title.
+by the same CJK/space rule as body passages through the title editor's ordinary
+handling: they replace an untouched default "Untitled", and otherwise join the
+end of the title the author already has (including a title pattern the dialog
+opened with). Illegal characters are replaced and warnings shown as for typing.
+The search for existing notes runs for the heard title. The author may type
+corrections before Submit. While the dialog is listening or turning speech into
+text, Submit is not offered and Enter in the title field does nothing;
+afterwards Submit is offered again. Closing New note while listening stops the
+recorder. The author reviews the title and chooses Submit as usual; the note is
+created once with that title. Body dictation on an existing note never changes
+the title.
 
 ## Adding dictated text to a note
 

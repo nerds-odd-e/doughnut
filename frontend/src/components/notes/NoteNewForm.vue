@@ -40,6 +40,7 @@
             </PathNameEditor>
             <SpeakTitleControl
               class="mt-2"
+              v-model:busy="titleSpeechBusy"
               @heard-segments="onHeardTitleSegments"
             />
             <SearchResults
@@ -55,6 +56,7 @@
             type="submit"
             value="Submit"
             class="daisy-btn daisy-btn-primary mt-4"
+            :disabled="titleSpeechBusy"
           />
         </fieldset>
       </form>
@@ -77,19 +79,14 @@ import PathNameEditor from "./core/PathNameEditor.vue"
 import SpeakTitleControl from "./SpeakTitleControl.vue"
 import WikidataSearchByLabel from "./WikidataSearchByLabel.vue"
 import { useRouter } from "vue-router"
-import {
-  calculateNewTitle,
-  appendAliasToNoteContent,
-} from "@/utils/wikidataTitleActions"
-import { joinDictatedSegments } from "@/models/audio/joinDictatedSegments"
 import { useNoteStore } from "@/store/noteStore"
 import usePopups from "@/components/commons/Popups/usePopups"
+import { contentForNewNote, createNoteFromForm } from "./noteNewFormSubmit"
 import {
-  contentForNewNote,
-  contentWithWikidataFrontmatter,
-  createNoteFromForm,
-} from "./noteNewFormSubmit"
-import { initialNewNoteTitle } from "./noteNewFormTitle"
+  initialNewNoteTitle,
+  titleAfterSpokenSegments,
+} from "./noteNewFormTitle"
+import { applyWikidataEntryToNewNoteForm } from "./noteNewFormWikidata"
 import type { NoteCreationParentRelationship as ParentRelationship } from "@/utils/noteCreationParentRelationship"
 
 const router = useRouter()
@@ -158,15 +155,15 @@ const noteFormErrors = ref<{
   wikidataId: undefined,
 })
 const processing = ref(false)
+const titleSpeechBusy = ref(false)
 const hasTitleBeenEdited = ref(props.initialTitle !== undefined)
 const pathNameEditor = ref<{ applyExternalValue: (value: string) => void }>()
-
 const effectiveSearchKey = computed(() =>
   hasTitleBeenEdited.value ? newTitle.value : ""
 )
 
 const processForm = async () => {
-  if (processing.value) return
+  if (processing.value || titleSpeechBusy.value) return
   processing.value = true
   noteFormErrors.value.wikidataId = undefined
   noteFormErrors.value.newTitle = undefined
@@ -209,42 +206,23 @@ const processForm = async () => {
 const onSelectWikidataEntry = (
   selectedSuggestion: WikidataSearchEntity,
   titleAction?: "replace" | "append"
-) => {
-  wikidataIdSelection.value = selectedSuggestion.id ?? ""
-
-  if (titleAction === "append") {
-    const baseContent =
-      noteContentMarkdown.value ??
-      contentWithWikidataFrontmatter(wikidataIdSelection.value) ??
-      ""
-    const appended = appendAliasToNoteContent(
-      baseContent,
-      selectedSuggestion.label
-    )
-    if (appended !== null) {
-      noteContentMarkdown.value = appended
-    }
-    hasTitleBeenEdited.value = true
-    return
-  }
-
-  if (titleAction) {
-    newTitle.value = calculateNewTitle(
-      newTitle.value,
-      selectedSuggestion,
-      titleAction
-    )
-  } else {
-    newTitle.value = selectedSuggestion.label
-  }
-  hasTitleBeenEdited.value = true
-}
+) =>
+  applyWikidataEntryToNewNoteForm(selectedSuggestion, titleAction, {
+    wikidataIdSelection,
+    newTitle,
+    noteContentMarkdown,
+    hasTitleBeenEdited,
+  })
 
 const onTitleChange = () => {
   hasTitleBeenEdited.value = true
 }
-const onHeardTitleSegments = (segments: string[]) =>
-  pathNameEditor.value?.applyExternalValue(joinDictatedSegments("", segments))
+
+const onHeardTitleSegments = (segments: string[]) => {
+  pathNameEditor.value?.applyExternalValue(
+    titleAfterSpokenSegments(hasTitleBeenEdited.value, newTitle.value, segments)
+  )
+}
 </script>
 
 <style lang="sass" scoped src="./NoteNewForm.sass"></style>
