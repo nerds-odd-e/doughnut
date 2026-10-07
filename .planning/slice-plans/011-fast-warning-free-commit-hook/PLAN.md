@@ -276,7 +276,7 @@ Slice 7 sequences reuse (1) and (2) as valid → error → repaired.
 
 ### 3. Prove current-definition environment reuse
 Type: Behavior
-Status: planned
+Status: done
 Proof: owned disposable current/changed flake definitions, native-profile
 population/reuse, matching Node/pnpm/Java tools, bootstrap/registry provenance,
 visible failure, and the caller's working-directory/argument behavior.
@@ -290,6 +290,44 @@ slice 4; failure stops that dependent change and returns the approach to this
 plan. It does not install a candidate runner in a shared checkout.
 Sizing: ~5 minutes, one environment-fidelity probe; slow external Nix bootstrap
 is an external-wait exception, not an allowance for open-ended investigation.
+
+Accepted probe (2026-10-07, Nix 2.30.2, owned temp snapshots/profiles, no
+repo change): the definition is exactly `flake.nix` + `flake.lock` (the
+shellHook sources `./scripts/nix_shell_hook.sh` at runtime from the working
+directory, so hook-script edits need no rebuild).
+
+- Populate: `CURSOR_DEV=true nix develop "path:$SNAP" --no-write-lock-file --profile "$PROF" -c true`
+  → 2.56 s new, 2.62 s changed definition (prints a `building …donut-env.drv`
+  progress line), no warnings. A broken definition fails visibly (rc 1,
+  `undefined variable`) and writes no profile.
+- Consume: `CURSOR_DEV=true nix develop "$PROF" --inputs-from "path:$SNAP" --option flake-registry "" -c "$@"`
+  → 0.439–0.447 s over five runs, empty stderr, no downloads; child exit
+  status (7) propagates; caller cwd and arguments with spaces/quotes/globs
+  preserved. Clean-tree plain `nix develop -c true` is 0.67–0.69 s for
+  reference.
+- Registry fetch cause: `nix develop <profile>` evaluates
+  `flake:nixpkgs#bashInteractive` for the interactive bash and, with no flake,
+  resolves `nixpkgs` through the global registry (`--debug`: lookup →
+  `nixpkgs-unstable/nixexprs.tar.zst`, 38 MB), refetching per `tarball-ttl`
+  (1 h) — unpinned and occasionally 20–47 s. `--inputs-from path:<snapshot>`
+  pins it to the locked input; `--option flake-registry ""` avoids the global
+  registry. Registries disabled alone fall back to host bash 3.2, which fails
+  (syntax error, rc 2). Do not add `--offline`: a GC'd bashInteractive must
+  remain re-substitutable.
+- Fidelity: tool versions and `env | sort` identical to plain `nix develop`
+  (node v26.10.0, pnpm 11.28.5, openjdk 25.0.3, bash 5.3.9); the recorded
+  shellHook runs; under `CURSOR_DEV=true` it only sets shell/env vars and the
+  skills link (no install or services).
+- Invalidation key: sha256 of `flake.nix`+`flake.lock`; changed definition →
+  new env store path; unchanged → same. `--profile` registers an auto GC root
+  (do not rename the profile directory afterwards: it dangles the root).
+  Missing profile fails visibly (rc 1).
+- Concurrency: three simultaneous populates of one profile and four
+  simultaneous consumes all succeeded, no `database is busy`; Nix locks and
+  swaps the profile link atomically, so the link is the ready marker.
+- Gaps: dirty-tree plain-entry cost not separately measured (baseline
+  stands); first consume after a nixpkgs bump downloaded the pinned tarball
+  once (~5.5 s); post-GC behavior reasoned, not run.
 
 ### 4. Enter the current development environment without dirty-source warnings
 Type: Behavior
@@ -306,6 +344,11 @@ Implement the smallest native-profile reuse that slice 3 supports, in the
 existing runner ownership; preserve no-Nix and already-inside-Nix paths and
 the caller's working directory/arguments. Keep the general interactive shell
 on its existing path unless this result needs a shared change.
+Design from slice 3: in `scripts/run.sh`'s "Nix present, not inside Nix"
+branch, key per-worktree state by the definition hash, populate a profile
+from a physical snapshot of `flake.nix`/`flake.lock` when absent (the profile
+link is the ready marker; key-named directories avoid overwrites), then
+consume it with `--inputs-from path:<snapshot> --option flake-registry ""`.
 Sizing: 5–8 minutes; scrutinized as one environment-entry proof loop, with
 probe results already available. Interim hook still has dependency/typecheck
 costs, addressed by slices 6 and 7.
