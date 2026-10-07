@@ -534,7 +534,7 @@ type error or a formatter/error-level rule for frontend lint failures;
 
 ### 8. Demonstrate fast, clean ordinary commits across the fixed mix
 Type: Behavior
-Status: planned
+Status: done
 Proof: `bash scripts/profiling/profile-commit-hook.sh acceptance <local-evidence-directory>`
 on the same 40 input cases/environment as baseline, all warning-free and correct,
 overall mean strictly below five seconds; separate documentation-only
@@ -550,6 +550,41 @@ do not mark this slice done or silently relax scope. No additional optimization
 is prescribed until that observation warrants it.
 Sizing: ~5 minutes of setup/analysis; the fixed repeated acceptance and cold
 diagnostic checks have the same focused-measurement exception as slice 2.
+
+Accepted acceptance (2026-10-07T13:28Z, revision `66e23e1406`, same machine,
+OS, tools and 40-case corpus as baseline; load 7.01→9.72, busier than
+baseline): `bash scripts/profiling/profile-commit-hook.sh acceptance <job-tmp>/commit-hook-acceptance`
+outside Nix → driver exit 0; all 57 runs exit 0, 0 warnings, preserved.
+No `warn|ERR_PNPM|dirty` line in any hook output; Gradle's configuration-cache
+hint remains informational.
+
+| Class | Corpus timings (s) | Mean | Baseline | Fresh-cache | Inside Nix |
+| --- | --- | --- | --- | --- | --- |
+| frontend | 8.680 7.805 7.760 7.801 7.574 | 7.924 | 10.119 | 10.703 | 7.767 |
+| backend | 1.754 1.592 1.598 1.563 1.505 | 1.602 | 3.821 | 4.073 | 1.187 |
+| cli | 1.290 1.212 1.282 1.336 1.376 | 1.299 | 4.220 | 1.615 | 0.921 |
+| mcp-server | 1.348 1.318 1.504 1.492 1.447 | 1.422 | 4.536 | 1.271 | 0.921 |
+| test-fixtures | 1.281 1.230 1.227 1.235 1.250 | 1.245 | 3.971 | 1.530 | 0.939 |
+| root | 1.569 1.685 1.601 1.597 1.570 | 1.604 | 4.270 | 1.548 | 1.168 |
+| openapi | 1.456 1.500 1.499 1.452 1.479 | 1.477 | 3.646 | 1.686 | 1.112 |
+| mixed | 10.207 9.766 9.610 8.819 9.169 | 9.514 | 11.130 | 10.483 | 9.788 |
+
+**Overall mean 3.261 s** (baseline 5.714 s), strictly below 5 s.
+No-component docs-only: 1.025 s, warning-free including Nix entry (baseline
+3.653 s). Fresh-cache reset `dist backend/build backend/.gradle` (Gradle user
+home/daemon, pnpm store, Nix store and installed dependencies kept); the
+fixture's recorded Nix profile and pnpm install were built by the driver's
+`worktree_setup.sh` preparation, so no timed hook paid them. Outside minus
+inside Nix is now ~0.3–0.5 s per run (baseline ~2.5–3.0 s). Inside-Nix hook
+output clean (the driver's own `nix develop` entry log still shows the dirty
+warning; it is not hook output).
+
+Failure examples remain blocking: slices 6–7 accepted proof, plus a mixed
+negative (valid staged frontend + misformatted Java) → exit 1 with
+`spotlessJavaCheck` diagnostic, index unchanged; the dispatcher stops at the
+first failing component (backend runs first), unchanged from baseline, so the
+frontend half is not reported in that run. The commit is still blocked;
+healthy mixed commits check both components.
 
 ## Plan refinement
 
