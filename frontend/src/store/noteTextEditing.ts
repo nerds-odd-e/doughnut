@@ -1,6 +1,7 @@
 import type { NoteContentCompletion } from "@generated/donut-backend-api"
 import { changeOpenNoteContentDraft } from "@/composables/noteContentMutationBarrier"
 import { refreshSidebarStructuralListings } from "@/components/notes/sidebarStructuralRefresh"
+import { joinDictatedSegments } from "@/models/audio/joinDictatedSegments"
 import { updateTextContentRequest } from "./noteRequests"
 import type { NoteStore, TitleRenameReferenceHandling } from "./noteStore"
 
@@ -70,18 +71,7 @@ export default class NoteTextEditing {
     noteId: Donut.ID,
     segmentTexts: string[]
   ): Promise<{ saved: boolean | Promise<boolean> }> {
-    const japaneseOrChineseWriting =
-      /[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}\u30FC\u3000-\u303F\uFF00-\uFFEF]/u
-    const join = (text: string) =>
-      segmentTexts.reduce((body, segment) => {
-        const before = body.match(/.$/u)?.[0] ?? ""
-        const after = segment.match(/^./u)?.[0] ?? ""
-        return body === "" ||
-          /\s$/.test(body) ||
-          japaneseOrChineseWriting.test(before + after)
-          ? body + segment
-          : `${body} ${segment}`
-      }, text)
+    const join = (text: string) => joinDictatedSegments(text, segmentTexts)
     const draftSaved = changeOpenNoteContentDraft(noteId, join)
     if (draftSaved) return { saved: draftSaved }
 

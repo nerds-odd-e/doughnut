@@ -174,8 +174,12 @@ Commands (from the story worktree root):
 
 ### 1. The dictation join rule is one function used by the body
 Type: Structure
-Status: planned
-Proof: `NoteAudioTools.languageJoining` and `NoteAudioTools.preservation` green; a focused test of the extracted function with the documented examples (`私はPython` + `が好きです。`, `私はPython` + `is useful.`, empty base, whitespace-ending base).
+Status: done
+Proof: accepted — `joinDictatedSegments` in `frontend/src/models/audio/joinDictatedSegments.ts`; `appendDictatedText` delegates. Focused `tests/models/joinDictatedSegments.spec.ts` covers the documented examples; `NoteAudioTools.languageJoining` and `NoteAudioTools.preservation` green; `vue-tsc --noEmit` green.
+```bash
+env -u NODE_ENV CURSOR_DEV=true nix develop -c pnpm -C frontend test tests/notes/NoteAudioTools.languageJoining tests/notes/NoteAudioTools.preservation tests/models/joinDictatedSegments.spec.ts
+CURSOR_DEV=true nix develop -c pnpm -C frontend exec vue-tsc --noEmit
+```
 
 Change: the `join` closure in `appendDictatedText` becomes an exported
 function, for example `joinDictatedSegments(base, segments)` in
