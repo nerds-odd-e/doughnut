@@ -372,7 +372,7 @@ stderr); flipping between two definitions rebuilds each time (~2.6 s, cached).
 
 ### 5. Explain the borrowed-snapshot installation warning
 Type: Behavior
-Status: planned
+Status: done
 Proof: reproduce the real pnpm unsafe-modules/install diagnostic in owned
 stale/incomplete installation and borrowed-source fixture state; record the
 trigger, attempted operation, dependency state and actual check outcome.
@@ -386,6 +386,44 @@ premise; do not claim a remedy from an already-passing run. This probe may repai
 only its own installation and does not alter another checkout's modules.
 Sizing: ~5 minutes, one diagnostic reproduction loop; if it cannot be bounded
 within 10 minutes, retain evidence and reassess instead of continuing guesses.
+
+Accepted probe (real pnpm 11.28.5, owned disposable worktrees/copies, no repo
+change; another checkout's modules never touched):
+
+- Trigger: pnpm's automatic `verifyDepsBeforeRun` install for
+  `pnpm -C <copy>/frontend lint` in the borrowed copy. pnpm sets
+  `pnpm_config_verify_deps_before_run=false` for a script's children
+  (`createExtraEnv`), so the real hook (`run.sh pnpm lint:changed` →
+  `quality_changed.sh`) never verifies; the seed's historical command ran
+  `./scripts/run.sh bash scripts/quality_changed.sh lint` directly, which
+  verifies. Reproduced exactly that way (and with the copy outside the
+  checkout's store location): `ERR_PNPM_UNSAFE_MODULES_DIR … Refusing to remove
+  the modules directory at "<wt>/node_modules" …` then
+  `WARN The install that runs before scripts failed …`; Biome and vue-tsc
+  still ran, exit 0.
+- Mechanism: the copy's absolute project paths never match
+  `node_modules/.pnpm-workspace-state-v1.json`, so verification always
+  installs; when the copy's store location (derived from its path) differs
+  from `.modules.yaml`, the purge is refused (the warning). When the stores
+  match, the "successful" verification silently rewrites the borrowed
+  workspace state and relinks `frontend/node_modules/donut-test-fixtures` into
+  the temporary copy, breaking the checkout's install after cleanup (later
+  TS2307). Verification in a borrowed copy is never meaningful.
+- Facts pnpm checks (a replacement must keep): workspace-state settings
+  (mostly `pnpm-workspace.yaml`), configDependencies, project set
+  (names/versions), a modules dir per project with dependencies,
+  patches/pnpmfiles, manifest/lockfile changes against `node_modules/.pnpm/lock.yaml`,
+  and at install time layout version, store/virtual-store location and pnpm
+  version.
+- `setup_pnpm_deps` fingerprint gaps: workspace manifests (e.g.
+  `frontend/package.json`), pnpm/Node version, store location, completeness.
+  The frozen install covers the manifest gap by failing, but `--silent`
+  hides `ERR_PNPM_OUTDATED_LOCKFILE`. A deleted direct-dependency link is
+  noticed by neither (fails later as TS2307).
+- Redundant installs in the hook path: `quality_changed.sh`
+  `lint_frontend_index`'s `pnpm --frozen-lockfile --silent recursive install`,
+  and the cli/mcp-server/test-fixtures `*:lint` and root `cy:lint` scripts'
+  own installs, ~0.2–0.3 s each per selected component.
 
 ### 6. Validate one installation before checking borrowed staged source
 Type: Behavior
@@ -403,6 +441,14 @@ then compose it into the quality path. If automatic snapshot verification is
 disabled, scope that override to this verified borrowed context. Remove redundant
 installs only through this owner, preserving the normal check commands and
 failure semantics. Align touched package wrappers and existing caller guidance.
+From slice 5: scope `pnpm_config_verify_deps_before_run=false` (or the
+equivalent flag) explicitly to the borrowed-copy commands so every entry path
+(including direct `quality_changed.sh`) is safe; make the dependency owner's
+freshness cover workspace manifests and the pnpm/Node version so its single
+verified install can replace the per-component installs; keep install
+failures actionable (no `--silent` hiding `ERR_PNPM_OUTDATED_LOCKFILE`).
+Proof re-runs the slice-5 direct command and shows no warning and an
+unchanged borrowed installation.
 Sizing: 5–8 minutes, one dependency-readiness proof loop; the real warning
 condition and required freshness inputs must already be established in slice 5.
 Frontend performance remains provisional until slice 7.
