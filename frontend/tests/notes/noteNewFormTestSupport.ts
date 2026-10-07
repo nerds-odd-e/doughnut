@@ -85,6 +85,20 @@ export function noteTitleText(
     .innerText
 }
 
+export function findNoteNewFormButtonByText(
+  wrapper: VueWrapper<ComponentPublicInstance>,
+  text: string
+) {
+  return wrapper.findAll("button").find((button) => button.text() === text)
+}
+
+export function speakTitleStatus(
+  wrapper: VueWrapper<ComponentPublicInstance>
+): string | undefined {
+  const status = wrapper.find(".speak-title-control [role='status']")
+  return status.exists() ? status.text() : undefined
+}
+
 export function wikidataDialogIsOpen(): boolean {
   return wikidataModal() !== null
 }

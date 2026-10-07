@@ -1,6 +1,6 @@
 import { ref, type Ref } from "vue"
 import type { Note } from "@generated/donut-backend-api"
-import { AiAudioController } from "@generated/donut-backend-api/sdk.gen"
+import { audioChunkToText } from "@/composables/audioChunkToText"
 import type { AudioChunk } from "@/models/audio/audioProcessingScheduler"
 import { useNoteStore } from "@/store/noteStore"
 
@@ -30,22 +30,12 @@ export function useNoteAudioProcessing(
   ): Promise<string | undefined> => {
     isProcessing.value = true
     try {
-      const { data: response, error } = await AiAudioController.audioToText({
-        body: {
-          uploadAudioFile: chunk.data,
-          midSpeech: chunk.isMidSpeech,
-        },
-      })
-
-      if (error || !response) {
-        throw new Error("Failed to process audio")
-      }
+      const { segmentTexts, endTimestamp } = await audioChunkToText(chunk)
       if (errors.value?.conversion) {
         errors.value = undefined
       }
 
       try {
-        const segmentTexts = response.segmentTexts ?? []
         if (segmentTexts.length) {
           const { saved } = await noteStore.appendDictatedText(
             noteId,
@@ -59,7 +49,7 @@ export function useNoteAudioProcessing(
         return
       }
 
-      return response.endTimestamp
+      return endTimestamp
     } catch (error) {
       errors.value = {
         conversion:

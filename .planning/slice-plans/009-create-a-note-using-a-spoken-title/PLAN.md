@@ -203,8 +203,13 @@ nothing and behaves as today. Enables slice 3.
 
 ### 3. New note listens for the title and shows the heard words
 Type: Behavior
-Status: planned
-Proof: new scenario in `record_live_audio.feature` (open New note from the notebook page → "Speak the title" → `lecture.wav` → Stop → the Title field reads the stubbed transcript → Submit → the note exists with that title) with a `noteCreationForm` page-object extension; mounted `NoteNewForm` tests with the audio mocks for the control's names, the two statuses in an element with the status role, and no status once the words are in; frontend tests green. Sizing: one proof loop whose E2E scenario and component take longer than the 5-minute target; about 10 minutes is accepted because splitting would separate the scenario from the behavior it proves.
+Status: done
+Proof: accepted — `SpeakTitleControl` + `NoteNewForm` / `PathNameEditor.applyExternalValue`; shared `audioChunkToText`. Mounted `NoteNewForm.spokenTitle`: idle/listening names, statuses on `role="status"`, words then clear status. E2E `record_live_audio.feature` "Create a note by speaking the title". `NoteAudioTools.recording`/`status` green after mock/`audioChunkToText` extract. `vue-tsc` green. Docs: "Speaking a title in New note" in `docs/voice-input.md`.
+```bash
+env -u NODE_ENV CURSOR_DEV=true nix develop -c pnpm -C frontend test tests/notes/NoteNewForm tests/notes/NoteNewButton tests/models/audio tests/notes/NoteAudioTools.recording tests/notes/NoteAudioTools.status
+CURSOR_DEV=true nix develop -c pnpm -C frontend exec vue-tsc --noEmit
+CURSOR_DEV=true nix develop -c pnpm cy:run --spec e2e_test/features/note_creation_and_update/record_live_audio.feature
+```
 
 Behavior: New note open with the untouched "Untitled" → "Speak the title"
 → the control reads "Stop", the status says "Recording. Speak now." →

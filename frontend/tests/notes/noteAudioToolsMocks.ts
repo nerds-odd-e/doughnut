@@ -100,36 +100,71 @@ export function recorderWorkletMockExports() {
   }
 }
 
+function mockAudioRecorderMethods(
+  onStop?: (
+    callback: (chunk: {
+      data: File
+      isMidSpeech: boolean
+    }) => Promise<string | undefined>
+  ) => Promise<File>
+) {
+  return (
+    callback: (chunk: {
+      data: File
+      isMidSpeech: boolean
+    }) => Promise<string | undefined>
+  ) => ({
+    startRecording: vi.fn().mockImplementation(async () => {
+      mockMediaDevices.getUserMedia({ audio: true })
+      mockMediaStreamSource.connect(mockAudioWorkletNode)
+      mockAudioWorkletNode.connect(mockAudioContext.destination)
+    }),
+    stopRecording: vi.fn().mockImplementation(async () => {
+      if (onStop) {
+        return onStop(callback)
+      }
+      mockAudioWorkletNode.disconnect()
+      mockMediaStreamSource.disconnect()
+      mockMediaStop()
+      return new File([], "test.webm")
+    }),
+    getAudioData: vi.fn(() => 0),
+    tryFlush: vi.fn().mockResolvedValue(undefined),
+    hasUnconvertedAudio: vi.fn(() => false),
+    getAudioDevices: vi.fn().mockImplementation(() => {
+      mockMediaDevices.enumerateDevices()
+      return ref(mockDevices) as Ref<MediaDeviceInfo[]>
+    }),
+    getSelectedDevice: vi.fn(() => ref("device1")),
+    switchAudioDevice: vi.fn().mockImplementation(async (deviceId: string) => {
+      mockMediaDevices.getUserMedia({
+        audio: { deviceId: { exact: deviceId } },
+      })
+    }),
+  })
+}
+
 export function audioRecorderMockExports() {
   return {
-    createAudioRecorder: vi.fn(() => ({
-      startRecording: vi.fn().mockImplementation(async () => {
-        mockMediaDevices.getUserMedia({ audio: true })
-        mockMediaStreamSource.connect(mockAudioWorkletNode)
-        mockAudioWorkletNode.connect(mockAudioContext.destination)
-      }),
-      stopRecording: vi.fn().mockImplementation(async () => {
+    createAudioRecorder: vi.fn(mockAudioRecorderMethods()),
+  }
+}
+
+/** Invokes the processor callback at Stop (for title speech / convert-only-at-stop). */
+export function audioRecorderInvokingCallbackMockExports() {
+  return {
+    createAudioRecorder: vi.fn(
+      mockAudioRecorderMethods(async (callback) => {
+        await callback({
+          data: new File([], "test.webm"),
+          isMidSpeech: false,
+        })
         mockAudioWorkletNode.disconnect()
         mockMediaStreamSource.disconnect()
         mockMediaStop()
         return new File([], "test.webm")
-      }),
-      getAudioData: vi.fn(() => 0),
-      tryFlush: vi.fn().mockResolvedValue(undefined),
-      hasUnconvertedAudio: vi.fn(() => false),
-      getAudioDevices: vi.fn().mockImplementation(() => {
-        mockMediaDevices.enumerateDevices()
-        return ref(mockDevices) as Ref<MediaDeviceInfo[]>
-      }),
-      getSelectedDevice: vi.fn(() => ref("device1")),
-      switchAudioDevice: vi
-        .fn()
-        .mockImplementation(async (deviceId: string) => {
-          mockMediaDevices.getUserMedia({
-            audio: { deviceId: { exact: deviceId } },
-          })
-        }),
-    })),
+      })
+    ),
   }
 }
 

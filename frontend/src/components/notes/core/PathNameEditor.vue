@@ -190,6 +190,10 @@ onMounted(() => {
     selectAll: props.initialSelectAll,
   })
 })
+
+defineExpose({
+  applyExternalValue: onModelUpdate,
+})
 </script>
 
 <style scoped>

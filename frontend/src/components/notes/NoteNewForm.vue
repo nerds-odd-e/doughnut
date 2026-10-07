@@ -21,6 +21,7 @@
           />
           <div class="title-search-container">
             <PathNameEditor
+              ref="pathNameEditor"
               v-model="newTitle"
               :error-message="noteFormErrors.newTitle"
               autofocus
@@ -37,6 +38,10 @@
                 />
               </template>
             </PathNameEditor>
+            <SpeakTitleControl
+              class="mt-2"
+              @heard-segments="onHeardTitleSegments"
+            />
             <SearchResults
               :note-id="titleSearchScopeNote?.id"
               :input-search-key="effectiveSearchKey"
@@ -69,12 +74,14 @@ import SearchResults from "../search/SearchResults.vue"
 import FolderSelector from "./FolderSelector.vue"
 import NoteCreationParentRelationship from "./NoteCreationParentRelationship.vue"
 import PathNameEditor from "./core/PathNameEditor.vue"
+import SpeakTitleControl from "./SpeakTitleControl.vue"
 import WikidataSearchByLabel from "./WikidataSearchByLabel.vue"
 import { useRouter } from "vue-router"
 import {
   calculateNewTitle,
   appendAliasToNoteContent,
 } from "@/utils/wikidataTitleActions"
+import { joinDictatedSegments } from "@/models/audio/joinDictatedSegments"
 import { useNoteStore } from "@/store/noteStore"
 import usePopups from "@/components/commons/Popups/usePopups"
 import {
@@ -152,6 +159,7 @@ const noteFormErrors = ref<{
 })
 const processing = ref(false)
 const hasTitleBeenEdited = ref(props.initialTitle !== undefined)
+const pathNameEditor = ref<{ applyExternalValue: (value: string) => void }>()
 
 const effectiveSearchKey = computed(() =>
   hasTitleBeenEdited.value ? newTitle.value : ""
@@ -235,6 +243,8 @@ const onSelectWikidataEntry = (
 const onTitleChange = () => {
   hasTitleBeenEdited.value = true
 }
+const onHeardTitleSegments = (segments: string[]) =>
+  pathNameEditor.value?.applyExternalValue(joinDictatedSegments("", segments))
 </script>
 
 <style lang="sass" scoped src="./NoteNewForm.sass"></style>

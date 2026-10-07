@@ -5,6 +5,7 @@
 import { Given, Then, When } from '@badeball/cypress-cucumber-preprocessor'
 import start from '../start'
 import mock_services from '../start/mock_services'
+import noteCreationForm from '../start/pageObjects/forms/noteCreationForm'
 
 When(
   'I create a note titled {string} from note {string} with relationship {string}',
@@ -81,6 +82,15 @@ Given(
     start.testability().createTitleOnlyRootNote(notebook, title)
   }
 )
+
+When('I submit the new note', () => {
+  noteCreationForm.submit()
+})
+
+Then('I should see the note {string}', (title: string) => {
+  start.assumeNotePage(title)
+  start.testability().rememberUiCreatedNote(title)
+})
 
 Then('I should see that the note creation is not successful', () => {
   start.form.getField('Title').expectError('must not be blank')

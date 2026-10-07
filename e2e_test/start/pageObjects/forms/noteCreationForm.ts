@@ -17,6 +17,21 @@ const noteCreationForm = {
     })
   },
 
+  speakTheTitle() {
+    cy.findByRole('button', { name: 'Speak the title' }).click()
+    return this
+  },
+
+  stopSpeakingTheTitle() {
+    cy.findByRole('button', { name: 'Stop' }).click()
+    return this
+  },
+
+  expectTitle(title: string) {
+    form.getField('Title').shouldHaveValue(title)
+    return this
+  },
+
   selectParentRelationship(label: string) {
     cy.findByTestId('note-creation-parent-relationship')
       .contains('label', label)

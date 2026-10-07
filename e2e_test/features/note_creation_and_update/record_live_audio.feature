@@ -38,3 +38,13 @@ Feature: Record live audio onto a note
     Then I should be told my speech was added to my note
     And the note content on the current page should be "This is class 1. its talk about dada struct day."
     And the note "DS lecture/Data Structure Lecture" in Donut should have content "This is class 1. its talk about dada struct day."
+
+  Scenario: Create a note by speaking the title
+    Given the OpenAI transcription service will return the text "Photosynthesis in desert plants." when I stop
+    When I am creating a note in the notebook "DS lecture"
+    And I speak the title
+    And the browser records audio input from the microphone as in "lecture.wav"
+    And I stop speaking the title
+    Then the Title field should read "Photosynthesis in desert plants."
+    When I submit the new note
+    Then I should see the note "Photosynthesis in desert plants."

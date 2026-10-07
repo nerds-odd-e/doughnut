@@ -4,6 +4,7 @@
 
 import { Given, Then, When } from '@badeball/cypress-cucumber-preprocessor'
 import start, { mock_services } from '../start'
+import noteCreationForm from '../start/pageObjects/forms/noteCreationForm'
 
 Given('the browser is mocked to give permission to record audio', () => {
   return mock_services.browser.mockAudioRecording()
@@ -27,6 +28,18 @@ When(
 
 When('I stop recording audio', () => {
   start.assumeAudioTools().stopRecording()
+})
+
+When('I speak the title', () => {
+  noteCreationForm.speakTheTitle()
+})
+
+When('I stop speaking the title', () => {
+  noteCreationForm.stopSpeakingTheTitle()
+})
+
+Then('the Title field should read {string}', (title: string) => {
+  noteCreationForm.expectTitle(title)
 })
 
 Then('I should be told my speech was added to my note', () => {
