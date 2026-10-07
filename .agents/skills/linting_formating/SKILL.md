@@ -75,10 +75,14 @@ This runs:
   manifest change missing from `pnpm-lock.yaml` fails with
   `ERR_PNPM_OUTDATED_LOCKFILE` (run `pnpm install` and stage the lockfile).
   The frontend check reads the committed (index) content from a temporary copy,
-  so unrelated unstaged or untracked work does not affect it. The copy reuses the checkout's `node_modules`, so workspace
-  packages linked there (such as `donut-test-fixtures`) are still read from the
-  working tree; the cold `vue-tsc` run adds roughly 15–20 s per frontend commit.
-  Other components still check the working tree.
+  so unrelated unstaged or untracked work does not affect it. The copy reuses
+  the checkout's `node_modules`, so workspace packages linked there (such as
+  `donut-test-fixtures`) are still read from the working tree; its `vue-tsc`
+  run makes a frontend commit take roughly 8 s, other components about 1–2 s.
+  Other components still check the working tree. To measure the hook, run
+  `bash scripts/profiling/profile-commit-hook.sh baseline <evidence-dir>`
+  outside Nix: it times the fixed 40-change corpus in a disposable worktree
+  at the committed `HEAD`.
 - **Use `CURSOR_DEV=true nix develop -c pnpm lint:all`** for CI/CD validation only — it checks without fixing (plus a few script unit tests that format does not run).
 
 ## OpenAPI Linting
