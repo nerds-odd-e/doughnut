@@ -25,7 +25,7 @@ Their active evidence and priority assessment live in
 
 **Identity:** SEED-071#e2e-proof-before-final-formatting
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"unselected"}
+{"schemaVersion":1,"refinement":"refined","approach":"planless","assessment":"ready","reasons":[],"basis":{"document":"1e460f3e8343f4ce1817258beba34bc7294663d859a6f3af21a97494e23d8b1a"}}
 ```
 
 - **For / why:** Donut contributors get behavioral feedback from the ordinary
