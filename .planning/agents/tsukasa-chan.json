@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "agent": "Tsukasa-chan",
+  "email": "tsukasa-chan@example.org",
+  "identity": "SEED-071#e2e-proof-before-final-formatting",
+  "mode": "story-branch",
+  "branch": "claude/e2e-proof-before-final-formatting",
+  "host": "claude",
+  "model": "fable"
+}
