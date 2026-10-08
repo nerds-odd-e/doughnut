@@ -39,3 +39,17 @@ test('runSutServices starts run-p and writes stdout/stderr to the rotating write
   )
   assert.deepStrictEqual(writes, ['stdout line\n', 'stderr line\n'])
 })
+
+test('runSutServices starts the frontend dev server in development mode despite the shell NODE_ENV', () => {
+  const spawnCalls = []
+  runSutServices({
+    env: { NODE_ENV: 'production' },
+    spawnFn: (cmd, args, opts) => {
+      spawnCalls.push({ cmd, args, opts })
+      return makeMockChild()
+    },
+    logWriter: { write: () => undefined, close: () => undefined },
+  })
+
+  assert.strictEqual(spawnCalls[0].opts.env.NODE_ENV, 'development')
+})

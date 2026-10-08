@@ -15,6 +15,10 @@ export function runtimeTargetProcessEnv(target) {
   if (!target.built) {
     env.LOCAL_LB_VITE_UPSTREAM = `http://${HOST}:${target.vitePort}`
     env.FRONTEND_DEV_PORT = String(target.vitePort)
+    // The Vite dev server must run in development mode whatever NODE_ENV the
+    // invoking shell exports: under `production`, vite-plugin-checker exits the
+    // server on any Biome or type diagnostic instead of logging it.
+    env.NODE_ENV = 'development'
   }
   if (target.databaseUrl) {
     env.INPUT_DB_URL = target.databaseUrl

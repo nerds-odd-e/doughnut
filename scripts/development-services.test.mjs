@@ -71,3 +71,17 @@ test('runDevelopmentServices spawns Development group with target env and log', 
   )
   assert.deepEqual(writes, ['dev stdout\n', 'dev stderr\n'])
 })
+
+test('runDevelopmentServices starts the frontend dev server in development mode despite the shell NODE_ENV', () => {
+  const spawnCalls = []
+  runDevelopmentServices({
+    env: { NODE_ENV: 'production' },
+    spawnFn: (cmd, args, opts) => {
+      spawnCalls.push({ cmd, args, opts })
+      return makeMockChild()
+    },
+    logWriter: { write: () => undefined, close: () => undefined },
+  })
+
+  assert.equal(spawnCalls[0].opts.env.NODE_ENV, 'development')
+})
