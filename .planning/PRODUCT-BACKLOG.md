@@ -6,8 +6,6 @@ Audio tools, starting with voice input. Make voice input work reliably and easy 
 
 ## Taken
 
-- [Run Donut E2E proof before final formatting](seeds/SEED-071-reliable-project-feedback.md#e2e-proof-before-final-formatting) — SEED-071#e2e-proof-before-final-formatting
-
 ## Backlog list
 
 - [Deliver Donut removals under the project's deletion rule](seeds/SEED-071-reliable-project-feedback.md#removals-follow-project-rule) — SEED-071#removals-follow-project-rule
