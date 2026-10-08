@@ -1,9 +1,0 @@
-{
-  "schemaVersion": 1,
-  "agent": "Julia-chan",
-  "email": "julia-chan@example.org",
-  "activity": "preparation",
-  "identity": "SEED-071#e2e-proof-before-final-formatting",
-  "host": "claude",
-  "model": "fable"
-}
