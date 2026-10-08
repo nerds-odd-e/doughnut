@@ -378,40 +378,6 @@ note save, so the plain reading made a save failure reject too.
   - Observed effect: one extra implementation round; the rejected version would have let audio already joined to the note be sent and joined again after a save failure.
   - Inference: when a slice changes what a catch does, the plan could name which excluded paths that catch also covers. Qualified: one occurrence; the coordinator caught it at acceptance.
 
-## ODF-215 — E2E startup fails on unformatted files, but implementers are told not to format
-
-Former local code: DD-211.
-
-The execution wrap-up formats once, by the coordinator, after the refactor.
-The frontend dev server's checker (`frontend/vite.config.ts`, `checker({ biome: true })`)
-runs Biome when the E2E stack starts, so an implementer whose slice proof is
-an E2E run cannot run it on unformatted files.
-
-### Occurrences
-- Execution: SEED-066#recover-failed-transcription / `212e428968:.planning/slice-plans/005-recover-failed-transcription/PLAN.md` / ab773157bb
-  - Timestamp: unknown (slice 3, before commit 2026-10-05T14:58:50+09:00)
-  - Tool: Claude Code
-  - Open Dough release: 0.3.56 (execution-checkout VERSION, unchanged during execution)
-  - Evidence: slice 3 implementer learning, recorded in the plan's Learnings at ab773157bb: "E2E stack startup runs a Biome format check, so an unformatted frontend file stops `cy:run` before any scenario runs"; CLAUDE.md "implementers/refactorers run neither it nor standalone `lint:changed`".
-  - Observed effect: the slice 3 E2E proof was blocked until files were formatted; extra time not recorded.
-  - Inference: the rule and the project tooling conflict for any slice whose proof is an E2E run; the agent map or the slice delegation could say that formatting the touched files before `cy:run` is allowed. Qualified: one occurrence; how the implementer resolved it was not supplied.
-- Execution: SEED-066#understandable-first-dictation / `0662bac730:.planning/slice-plans/008-complete-a-first-dictation-with-understandable-controls/PLAN.md` / 31b9b7b7bb
-  - Timestamp: unknown (slice 1, before commit 2026-10-06T09:18:48+09:00)
-  - Tool: Claude Code
-  - Model: claude-opus-5-5
-  - Open Dough release: 0.3.56 (execution-checkout VERSION)
-  - Evidence: slice 1 implementer return: the first mocked-journey run failed on a Biome line-length error in `NoteToolbar.panels.spec.ts`; it was rewrapped by hand. The coordinator then told later implementers they may run `biome check --linter-enabled=false` on their files, and the slice 3 and slice 4 E2E runs passed first time.
-  - Observed effect: one failed E2E run in slice 1; extra time not recorded.
-  - Inference: a read-only format check of touched files before `cy:run` avoided a repeat without breaking the coordinator-only formatting rule. Qualified: the delegation prompt supplied it, not the guidance.
-- Execution: SEED-066#no-record-while-stopping / `b63b742f8a:.planning/slice-plans/010-keep-the-dictation-result-true-while-stop-finishes/PLAN.md` / 2c30afdd26
-  - Timestamp: 2026-10-07T13:47:02+09:00 (SUT readiness failure in `sut.log`)
-  - Tool: Claude Code
-  - Model: claude-opus-5-5
-  - Open Dough release: 0.3.57 (execution-checkout `.agents/skills/dough-update/VERSION`)
-  - Evidence: slice 1, implemented by the coordinator; first `pnpm cy:run --spec e2e_test/features/note_creation_and_update/record_live_audio.feature` stopped with "SUT readiness failed" because `frontend:sut` reported "Formatter would have printed the following content" for `NoteAudioTools.retry.spec.ts`; after `biome format --write` on the three touched frontend files the rerun passed (2 scenarios). The plan's proof commands did not mention it; the plan's Learnings now do.
-  - Observed effect: one failed E2E stack start and a log read before the rerun; about one minute.
-  - Inference: the third occurrence in three SEED-066 executions; the guidance or the agent map stating "format touched frontend files before `cy:run`" would remove it. Qualified: the coordinator, not a delegated implementer, hit it here.
-
 ## ODF-216 — Landing retired the execution workspace while its final slice still needed a continuation
 
 Former local code: DD-212.
