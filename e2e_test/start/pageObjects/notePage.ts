@@ -141,10 +141,10 @@ export const assumeNotePage = (
       this.toolbarButton(`undo ${undoType}`).click()
       cy.findByRole('button', { name: 'OK' }).click()
     },
-    chooseReferencedTitleSave: (
+    chooseReferencedTitleSave(
       choice: TitleRenameReferenceChoice,
       newTitle: string
-    ) => {
+    ) {
       cy.findByTestId('referenced-title-save-panel')
         .find(`[data-testid="${titleRenameReferenceSaveTestId[choice]}"]`)
         .click()
@@ -157,10 +157,10 @@ export const assumeNotePage = (
       testability().renameInjectedNoteTitleForNoteOnPage(newTitle)
       return this
     },
-    saveReferencedNoteTitle: (
+    saveReferencedNoteTitle(
       newTitle: string,
       choice: TitleRenameReferenceChoice
-    ) => {
+    ) {
       cy.get('#main-note-content').find('[role=title]').first().click()
       cy.clearFocusedText().type(newTitle)
       return this.chooseReferencedTitleSave(choice, newTitle)
