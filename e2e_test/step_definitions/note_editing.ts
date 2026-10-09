@@ -66,6 +66,15 @@ When(
   }
 )
 
+When(
+  'I keep visible reference text for the title {string}',
+  (newTitle: string) => {
+    start
+      .assumeNotePage()
+      .chooseReferencedTitleSave('KEEP_VISIBLE_TEXT', newTitle)
+  }
+)
+
 Given(
   'I update note {string} content to become {string}',
   (noteTopology: string, newContent: string) => {

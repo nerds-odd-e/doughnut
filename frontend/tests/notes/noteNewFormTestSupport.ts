@@ -1,28 +1,21 @@
 import {
-  AiAudioController,
   NoteController,
   NotebookController,
   NotebookFolderController,
   SearchController,
 } from "@generated/donut-backend-api/sdk.gen"
 import NoteNewForm from "@/components/notes/NoteNewForm.vue"
-import { createAudioRecorder } from "@/models/audio/audioRecorder"
 import type { ComponentPublicInstance } from "vue"
 import type { Router } from "vue-router"
 import { flushPromises, type VueWrapper } from "@vue/test-utils"
 import makeMe from "donut-test-fixtures/makeMe"
 import helper, { mockSdkService, wrapSdkResponse } from "@tests/helpers"
 import {
-  clearAudioHardwareMocks,
-  installAudioBrowserSpies,
-} from "@tests/notes/noteAudioToolsMocks"
-import { audioTextResponse } from "@tests/notes/noteAudioToolsTestSupport"
-import {
   clickWikidataSearchResult,
   clickWikidataTitleAction,
   wikidataModal,
 } from "@tests/notes/wikidataAssociationDialogTestSupport"
-import { afterEach, beforeEach, expect, vi } from "vitest"
+import { expect } from "vitest"
 
 export const noteNewFormRealm = makeMe.aNoteRealm.title("mythical").please()
 export const noteNewFormNote = noteNewFormRealm.note
@@ -92,99 +85,11 @@ export function noteTitleText(
     .innerText
 }
 
-export function findNoteNewFormButtonByText(
-  wrapper: VueWrapper<ComponentPublicInstance>,
-  text: string
-) {
-  return wrapper.findAll("button").find((button) => button.text() === text)
-}
-
-export function speakTitleStatusNode(
-  wrapper: VueWrapper<ComponentPublicInstance>
-) {
-  return wrapper.find(".speak-title-control [role='status']")
-}
-
-export function speakTitleStatus(
-  wrapper: VueWrapper<ComponentPublicInstance>
-): string | undefined {
-  const status = speakTitleStatusNode(wrapper)
-  return status.exists() ? status.text() : undefined
-}
-
-/** Shared timers, audio mocks, and default transcription for spoken-title specs. */
-export function useNoteNewFormSpokenTitleTestLifecycle(
-  defaultTranscript = "Photosynthesis in desert plants."
-) {
-  beforeEach(() => {
-    vi.useFakeTimers()
-    vi.resetAllMocks()
-    installAudioBrowserSpies()
-    clearAudioHardwareMocks()
-    mockSdkService(
-      AiAudioController,
-      "audioToText",
-      audioTextResponse(defaultTranscript)
-    )
-  })
-
-  afterEach(() => {
-    vi.restoreAllMocks()
-    vi.runOnlyPendingTimers()
-    vi.useRealTimers()
-    document.body.innerHTML = ""
-  })
-}
-
-export async function speakTheTitle(
-  wrapper: VueWrapper<ComponentPublicInstance>
-) {
-  await findNoteNewFormButtonByText(wrapper, "Speak the title")!.trigger(
-    "click"
-  )
-  await flushPromises()
-}
-
-export async function stopSpeaking(
-  wrapper: VueWrapper<ComponentPublicInstance>
-) {
-  await findNoteNewFormButtonByText(wrapper, "Stop")!.trigger("click")
-  await flushPromises()
-}
-
-export async function speakAndStop(
-  wrapper: VueWrapper<ComponentPublicInstance>
-) {
-  await speakTheTitle(wrapper)
-  await stopSpeaking(wrapper)
-}
-
 export function isNoteNewFormSubmitDisabled(
   wrapper: VueWrapper<ComponentPublicInstance>
 ) {
   return (wrapper.find('input[type="submit"]').element as HTMLInputElement)
     .disabled
-}
-
-/** Hold Stop in converting until finishStop runs the processor callback. */
-export function holdSpeakTitleConvertingUntilFinished() {
-  const recorder = vi.mocked(createAudioRecorder).mock.results[0]!.value as {
-    stopRecording: ReturnType<typeof vi.fn>
-  }
-  const processAudio = vi.mocked(createAudioRecorder).mock.calls[0]![0]!
-  let finishStop!: () => void
-  recorder.stopRecording.mockImplementation(
-    () =>
-      new Promise<File>((resolve) => {
-        finishStop = () => {
-          processAudio({
-            data: new File([], "test.webm"),
-            isMidSpeech: false,
-          }).then(() => resolve(new File([], "test.webm")))
-        }
-      })
-  )
-  return { finishStop: () => finishStop() }
 }
 
 export function wikidataDialogIsOpen(): boolean {

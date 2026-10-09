@@ -6,7 +6,7 @@ released response is not proof of effectiveness. Unknown provenance stays unknow
 [Response status](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/finding-names.md).
 Full pre-trim evidence: `8830c682704aac3bbb34bf9b1204da8feba042ca:DearDough.md`. Older narratives live in Git, not a second archive.
 
-- Highest allocated local number: 217. Removed local codes are never reused.
+- Highest allocated local number: 218. Removed local codes are never reused.
 
 Detailed retained observations are consolidated in the linked Open Dough
 record; headings and former local aliases preserve traceability. Review date:
@@ -220,3 +220,17 @@ The slice time bound is checked only at hand-back, so a delegated slice runs pas
 Follow-up: Open, unqueued.
 
 Evidence and response: [ODF-206](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/finding-names.md#odf-206).
+
+## DD-218 — A post-change refactor chained page-object helpers with arrow-function `this` and skipped the E2E path that uses that chain
+
+A cohesion edit rewrote typed referenced-title save to call `this.chooseReferencedTitleSave` from an arrow property on the note page object, then skipped E2E because the spoken Keep scenario still called the helper directly. Existing typed Keep/Update wiki-link scenarios failed in CI with `this` undefined.
+
+### Occurrences
+- Execution: SEED-066#rename-with-spoken-title
+  - Timestamp: 2026-10-10T07:50:00+09:00
+  - Tool: Cursor
+  - Model: unknown
+  - Open Dough release: 0.3.57
+  - Evidence: refactor agent `823365da-5587-41e8-8079-137bdc24f9b8` (reported skipping E2E after changing `saveReferencedNoteTitle` to `this.chooseReferencedTitleSave`); `ca98162b615cd38552770bd615720d3a05aead31:e2e_test/start/pageObjects/notePage.ts`; CI run https://github.com/nerds-odd-e/doughnut/actions/runs/38001567782 (`TypeError: Cannot read properties of undefined (reading 'chooseReferencedTitleSave')` on `wiki_link.feature` / `property_wiki_link.feature`)
+  - Observed effect: four note-topology E2E scenarios failed on the published slice-2 SHA while focused `record_live_audio.feature` proof stayed green
+  - Inference: arrow-property `this` is not the page object; proof that only exercises the direct helper call cannot validate the rewritten typed-save chain
