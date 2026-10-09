@@ -138,8 +138,9 @@ slice is required.
   wrapper already decides between autosave and the reference panel.
 - The control renders inside `NoteEditableTitle`'s slot, under the heading,
   only when not readonly. It stays `SpeakTitleControl` as New note uses it;
-  its `busy` model is bound but nothing on the note page needs to be held
-  while listening (there is no Submit).
+  the note page does not bind its optional `busy` model (there is no Submit
+  to hold). Shared spoken-title test helpers live in
+  `frontend/tests/notes/spokenTitleTestSupport.ts`.
 - After the heard words are in the title, focus the title editor so the
   author can correct by typing and so leaving the title area means the same
   as after typing. Do this through the existing focus helper, not a new
@@ -148,16 +149,33 @@ slice is required.
 - Documentation: one new section "Speaking a title on an existing note" in
   `docs/voice-input.md` after the New note section, in the same voice.
 
+## Execution resume
+
+- Mode: story-branch
+- Workspace: `/Users/terryyin/git/doughnut/.worktrees/change-an-existing-note-s-title-by-speaking`
+- Branch: `cursor/change-an-existing-note-s-title-by-speaking`
+- Agent: Nao-chan; publisher ID: `dashboard-territory.local-doughnut`
+- CI observer: `/tmp/dough-ci-501/watch-XW77Kl` (workflow `ci.yml`, target
+  branch `cursor/change-an-existing-note-s-title-by-speaking`)
+- Previously published base for next increment: update after each delivery
+  receipt (`publishedSha` / accepted SHA).
+
 ## Ordered slices
 
 ### 1. Rename an unlinked note by speaking
 Type: Behavior
-Status: planned
+Status: done
 Proof: E2E scenario "Rename a note by speaking the title" in
-`record_live_audio.feature` (mocked service); mounted
+`record_live_audio.feature` (mocked service; `@mockBrowserTime` + 1 minute
+tick so title autosave fires); mounted
 `NoteEditableTitle.spokenTitle.spec.ts` for replace-over-existing-title,
 typed correction after speaking, "Stop" and status while listening, and no
 control when readonly; typecheck.
+Accepted commands:
+`env -u NODE_ENV CURSOR_DEV=true nix develop -c pnpm frontend:test tests/notes/NoteEditableTitle.spokenTitle.spec.ts`
+(+ New note spoken-title specs after refactor support extract);
+`env -u NODE_ENV CURSOR_DEV=true nix develop -c pnpm -C frontend exec vue-tsc --noEmit`;
+`CURSOR_DEV=true nix develop -c pnpm cy:run --spec e2e_test/features/note_creation_and_update/record_live_audio.feature`.
 
 Behavior: an editable note page shows "Speak the title" with the heading →
 the author speaks and chooses Stop → the heard words replace the title, it is

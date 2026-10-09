@@ -5,8 +5,6 @@ import type { ComponentPublicInstance } from "vue"
 import { mockSdkService, wrapSdkResponse } from "@tests/helpers"
 import { audioTextResponse } from "@tests/notes/noteAudioToolsTestSupport"
 import {
-  findNoteNewFormButtonByText,
-  holdSpeakTitleConvertingUntilFinished,
   isNoteNewFormSubmitDisabled,
   mountNoteNewForm,
   notebookRootProps,
@@ -14,13 +12,17 @@ import {
   noteTitleText,
   setNoteNewFormTitle,
   setupNoteNewFormSdkMocks,
+  type NoteNewFormSdkSpies,
+} from "@tests/notes/noteNewFormTestSupport"
+import {
+  findSpeakTitleButtonByText,
+  holdSpeakTitleConvertingUntilFinished,
   speakAndStop,
   speakTheTitle,
   speakTitleStatus,
   stopSpeaking,
-  useNoteNewFormSpokenTitleTestLifecycle,
-  type NoteNewFormSdkSpies,
-} from "@tests/notes/noteNewFormTestSupport"
+  useSpokenTitleTestLifecycle,
+} from "@tests/notes/spokenTitleTestSupport"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 
 vi.mock("@/models/audio/recorderWorklet", async () => {
@@ -37,7 +39,7 @@ vi.mock("@/models/audio/audioRecorder", async () => {
   return audioRecorderInvokingCallbackMockExports()
 })
 
-useNoteNewFormSpokenTitleTestLifecycle()
+useSpokenTitleTestLifecycle()
 
 describe("NoteNewForm spoken title", () => {
   let wrapper: VueWrapper<ComponentPublicInstance>
@@ -54,15 +56,15 @@ describe("NoteNewForm spoken title", () => {
   it("names the control in words when idle and while listening", async () => {
     wrapper = mountNoteNewForm(notebookRootProps, { attachTo: document.body })
 
-    expect(findNoteNewFormButtonByText(wrapper, "Speak the title")).toBeTruthy()
-    expect(findNoteNewFormButtonByText(wrapper, "Stop")).toBeUndefined()
+    expect(findSpeakTitleButtonByText(wrapper, "Speak the title")).toBeTruthy()
+    expect(findSpeakTitleButtonByText(wrapper, "Stop")).toBeUndefined()
     expect(speakTitleStatus(wrapper)).toBeUndefined()
 
     await speakTheTitle(wrapper)
 
-    expect(findNoteNewFormButtonByText(wrapper, "Stop")).toBeTruthy()
+    expect(findSpeakTitleButtonByText(wrapper, "Stop")).toBeTruthy()
     expect(
-      findNoteNewFormButtonByText(wrapper, "Speak the title")
+      findSpeakTitleButtonByText(wrapper, "Speak the title")
     ).toBeUndefined()
     expect(speakTitleStatus(wrapper)).toBe("Recording. Speak now.")
     expect(vi.mocked(createAudioRecorder)).toHaveBeenCalledWith(
@@ -87,7 +89,7 @@ describe("NoteNewForm spoken title", () => {
 
     expect(noteTitleText(wrapper)).toBe("Photosynthesis in desert plants.")
     expect(speakTitleStatus(wrapper)).toBeUndefined()
-    expect(findNoteNewFormButtonByText(wrapper, "Speak the title")).toBeTruthy()
+    expect(findSpeakTitleButtonByText(wrapper, "Speak the title")).toBeTruthy()
   })
 
   it("joins heard segments onto a title pattern", async () => {
