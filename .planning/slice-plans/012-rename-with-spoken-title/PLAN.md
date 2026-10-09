@@ -157,8 +157,9 @@ slice is required.
 - Agent: Nao-chan; publisher ID: `dashboard-territory.local-doughnut`
 - CI observer: `/tmp/dough-ci-501/watch-XW77Kl` (workflow `ci.yml`, target
   branch `cursor/change-an-existing-note-s-title-by-speaking`)
-- Last accepted delivery: `ca98162b615cd38552770bd615720d3a05aead31`
-  (slice 2; prior slice 1 `548a284a4410bf3bf1eb2cb121b7751d88d582ab`).
+- Last accepted delivery: `07f888578ee96b7248e08ba202a5a252fe26ae8b`
+  (CI repair for typed page-object chaining; prior slice 3
+  `10834bc742d7475acfb550385c1b3ba79fe1f42d`).
 
 ## Ordered slices
 
@@ -219,3 +220,11 @@ Behavior: on the note page the author speaks and nothing is heard, or the
 conversion fails → the status says so, the title and saved state are
 unchanged → the author speaks again → only the new words replace the title.
 Adds the `docs/voice-input.md` section describing slices 1–3.
+
+## Execution complete
+
+Product advice: Spoken rename on the note page delivered as intended. The
+slice-2 page-object refactor broke typed Keep/Update wiki-link E2E via
+arrow-function `this`; that regression was repaired on
+`07f888578ee96b7248e08ba202a5a252fe26ae8b` (correction plan 013 marked done;
+DD-218 recorded). No other product follow-up; backlog order unchanged.
