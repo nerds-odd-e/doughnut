@@ -1,9 +1,0 @@
-{
-  "schemaVersion": 1,
-  "agent": "Kaoru-chan",
-  "email": "kaoru-chan@example.org",
-  "activity": "preparation",
-  "identity": "SEED-071#removals-follow-project-rule",
-  "host": "claude",
-  "model": "fable"
-}
