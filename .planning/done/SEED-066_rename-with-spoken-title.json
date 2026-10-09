@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "identity": "SEED-066#rename-with-spoken-title",
+  "title": "Change an existing note's title by speaking",
+  "completedAt": "2026-10-09T23:39:09.524Z",
+  "developer": "Terry Yin",
+  "agent": "Nao-chan",
+  "host": "cursor",
+  "model": "auto"
+}

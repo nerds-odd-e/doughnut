@@ -4,16 +4,19 @@
 
 - Story: [Restore typed referenced-title save in the note page object](../../seeds/SEED-066-voice-input.md#restore-typed-referenced-title-save)
 - Identity: SEED-066#restore-typed-referenced-title-save
-- Correction of: SEED-066#rename-with-spoken-title
+- Correction of: SEED-066#rename-with-spoken-title (spent predecessor recoverable
+  at `b4bb2f90a0d74a938dcadb98e8f279bbf09263e0:.planning/seeds/SEED-066-voice-input.md#rename-with-spoken-title`
+  and `b4bb2f90a0d74a938dcadb98e8f279bbf09263e0:.planning/slice-plans/012-rename-with-spoken-title/PLAN.md`)
 - Provenance: attributable commits `548a284a4410bf3bf1eb2cb121b7751d88d582ab`,
   `ca98162b615cd38552770bd615720d3a05aead31` (page-object extract + chaining),
   `10834bc742d7475acfb550385c1b3ba79fe1f42d`; CI failure on
   `ca98162b615cd38552770bd615720d3a05aead31`
   (https://github.com/nerds-odd-e/doughnut/actions/runs/38001567782).
+  Repair commit `07f888578ee96b7248e08ba202a5a252fe26ae8b` already on the
+  predecessor branch; verify after Take.
 - Preparation workspace: `/Users/terryyin/git/doughnut/.worktrees/change-an-existing-note-s-title-by-speaking`
 - Branch: `cursor/change-an-existing-note-s-title-by-speaking`
-- Authority: retrospective correction planning only. This plan does not Take,
-  execute, commit to trunk, publish, or release.
+- Authority: queued follow-up for later Take. This plan does not execute here.
 
 ## Goal and scope
 
@@ -92,18 +95,12 @@ No paid or state-changing observation required; no probe slice.
 
 ### 1. Fix typed referenced-title save chaining
 Type: Behavior
-Status: done
-Proof: Applied as owned CI repair on SHA
-`07f888578ee96b7248e08ba202a5a252fe26ae8b` during
-SEED-066#rename-with-spoken-title execution: both helpers converted to method
-shorthand; `wiki_link.feature` 11 passing;
-`record_live_audio.feature` 5 passing.
+Status: planned
+Proof: `wiki_link.feature` Keep and Update referenced-title scenarios green;
+`record_live_audio.feature` linked spoken Keep scenario still green.
+Predecessor CI repair `07f888578ee96b7248e08ba202a5a252fe26ae8b` may already
+contain the method-shorthand fix — confirm at Take before rewriting.
 
 Behavior: an author types a new title on a linked note and chooses Keep or
 Update visible reference text → the panel choice runs and the rename journey
 completes as before the page-object regression.
-
-## Execution complete
-
-Product advice: Applied as CI repair on the same story-branch execution that
-introduced the regression; no separate Take required.
