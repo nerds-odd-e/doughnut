@@ -10,6 +10,8 @@ import {
   installAudioBrowserSpies,
 } from "@tests/notes/noteAudioToolsMocks"
 import { audioTextResponse } from "@tests/notes/noteAudioToolsTestSupport"
+import { titleEditorEl } from "@tests/notes/noteTextContentTestSupport"
+import { flushReferencedTitleBlurDiscardCheck } from "@tests/notes/textContentWrapperTestSupport"
 import { afterEach, beforeEach, vi } from "vitest"
 
 export function findSpeakTitleButtonByText(
@@ -114,4 +116,13 @@ export function holdSpeakTitleConvertingUntilFinished() {
       })
   )
   return { finishStop: () => finishStop() }
+}
+
+/** Leave the title area so a linked rename can discard (same as typed). */
+export async function blurAwayFromSpokenTitle(
+  wrapper: VueWrapper<ComponentPublicInstance>
+) {
+  titleEditorEl(wrapper).blur()
+  await flushPromises()
+  await flushReferencedTitleBlurDiscardCheck()
 }

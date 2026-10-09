@@ -157,8 +157,9 @@ slice is required.
 - Agent: Nao-chan; publisher ID: `dashboard-territory.local-doughnut`
 - CI observer: `/tmp/dough-ci-501/watch-XW77Kl` (workflow `ci.yml`, target
   branch `cursor/change-an-existing-note-s-title-by-speaking`)
-- Previously published base for next increment: update after each delivery
-  receipt (`publishedSha` / accepted SHA).
+- Last accepted delivery: `548a284a4410bf3bf1eb2cb121b7751d88d582ab`
+  (slice 1; previously published base was
+  `d274ee6b2571f858684cbfad40fa63788af23e82`).
 
 ## Ordered slices
 
@@ -184,11 +185,18 @@ is unchanged; a reader without edit rights sees no control.
 
 ### 2. Rename a linked note by speaking
 Type: Behavior
-Status: planned
+Status: done
 Proof: E2E scenario "Rename a linked note by speaking the title, keeping
-visible reference text" in `record_live_audio.feature`; mounted spec through
-the real `TextContentWrapper` with inbound references for leave-to-discard
-after a spoken title; existing `TextContentWrapper.spec.ts` green.
+visible reference text" in `record_live_audio.feature` (Keep via
+`chooseReferencedTitleSave`); mounted
+`shows the reference panel for a spoken linked rename and discards when leaving without choosing`
+in `NoteEditableTitle.spokenTitle.spec.ts`; `TextContentWrapper.spec.ts` green.
+No product change — slice 1's update path already showed the panel when
+`hasInboundReferences` is true.
+Accepted commands:
+`env -u NODE_ENV CURSOR_DEV=true nix develop -c pnpm frontend:test tests/notes/NoteEditableTitle.spokenTitle.spec.ts tests/notes/TextContentWrapper.spec.ts`;
+`env -u NODE_ENV CURSOR_DEV=true nix develop -c pnpm -C frontend exec vue-tsc --noEmit`;
+`CURSOR_DEV=true nix develop -c pnpm cy:run --spec e2e_test/features/note_creation_and_update/record_live_audio.feature`.
 
 Behavior: a note other notes link to → the author speaks a new title and
 chooses Stop → the heard title shows with the reference panel and focus in the

@@ -7,6 +7,7 @@ import { settleScheduledAutofocus } from "@tests/helpers/focusTargetTestSupport"
 import { audioTextResponse } from "@tests/notes/noteAudioToolsTestSupport"
 import { noteTitleText } from "@tests/notes/noteNewFormTestSupport"
 import {
+  blurAwayFromSpokenTitle,
   findSpeakTitleButtonByText,
   mountNoteEditableTitle,
   speakAndStop,
@@ -19,6 +20,7 @@ import {
   mockedUpdateTitleCall,
   mockUpdateNoteTitle,
 } from "@tests/notes/noteTextContentTestSupport"
+import { referencedTitleSavePanelSelector } from "@tests/notes/textContentWrapperTestSupport"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 
 vi.mock("@/models/audio/recorderWorklet", async () => {
@@ -137,5 +139,27 @@ describe("NoteEditableTitle spoken title", () => {
       findSpeakTitleButtonByText(wrapper, "Speak the title")
     ).toBeUndefined()
     expect(noteTitleText(wrapper)).toBe("Orchard notes")
+  })
+
+  it("shows the reference panel for a spoken linked rename and discards when leaving without choosing", async () => {
+    const note = makeMe.aNote.title("WikiLinks CI").please()
+    wrapper = mountNoteEditableTitle({
+      noteTopology: note.noteTopology,
+      noteId: note.id,
+      hasInboundReferences: true,
+    })
+
+    await speakAndStop(wrapper)
+    await settleScheduledAutofocus()
+
+    expect(noteTitleText(wrapper)).toBe("Apple orchard care")
+    expect(wrapper.find(referencedTitleSavePanelSelector).exists()).toBe(true)
+    expect(mockedUpdateTitleCall).not.toHaveBeenCalled()
+
+    await blurAwayFromSpokenTitle(wrapper)
+
+    expect(noteTitleText(wrapper)).toBe("WikiLinks CI")
+    expect(wrapper.find(referencedTitleSavePanelSelector).exists()).toBe(false)
+    expect(mockedUpdateTitleCall).not.toHaveBeenCalled()
   })
 })
