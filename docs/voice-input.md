@@ -53,6 +53,22 @@ new recording's words reach the title. The author reviews the title and chooses
 Submit as usual; the note is created once with that title. Body dictation on an
 existing note never changes the title.
 
+## Speaking a title on an existing note
+
+On an editable note page, "Speak the title" sits with the title heading and
+behaves as in New note for listening, Stop, and status wording. The heard
+words replace the whole title (they do not join the end of what was there).
+The result is proposed through the same path as typing: a note nothing links
+to saves as a typed title does; a note other notes link to shows the
+reference panel and saves only when the author chooses how links should
+change, and leaving without choosing discards the heard title. The author may
+type corrections after speaking. When nothing was heard, or conversion at
+Stop fails, the status says so, the title is unchanged, and nothing is saved.
+Speaking again creates a fresh recorder so only the new recording's words
+replace the title. There is no Retry. Readers who may not edit the note see
+the title as text and are not offered the control. Body dictation with Audio
+tools still writes only to the body and never changes the title.
+
 ## Adding dictated text to a note
 
 Audio processing returns `segmentTexts`: the written transcription segments

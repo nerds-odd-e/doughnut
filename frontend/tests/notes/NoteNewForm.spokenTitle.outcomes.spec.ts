@@ -1,9 +1,6 @@
-import { AiAudioController } from "@generated/donut-backend-api/sdk.gen"
 import { createAudioRecorder } from "@/models/audio/audioRecorder"
 import type { VueWrapper } from "@vue/test-utils"
 import type { ComponentPublicInstance } from "vue"
-import { mockSdkService, wrapSdkError } from "@tests/helpers"
-import { audioTextResponse } from "@tests/notes/noteAudioToolsTestSupport"
 import {
   isNoteNewFormSubmitDisabled,
   mountNoteNewForm,
@@ -13,11 +10,14 @@ import {
 } from "@tests/notes/noteNewFormTestSupport"
 import {
   findSpeakTitleButtonByText,
+  mockAudioToTextFailThen,
+  mockAudioToTextWithNoSegments,
   speakAndStop,
   speakTheTitle,
   speakTitleStatus,
   speakTitleStatusNode,
   stopSpeaking,
+  stubSilentStopRecording,
   useSpokenTitleTestLifecycle,
 } from "@tests/notes/spokenTitleTestSupport"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
@@ -52,14 +52,7 @@ describe("NoteNewForm spoken title outcomes", () => {
   it("says nothing was heard after a silent recording that runs no conversion", async () => {
     wrapper = mountNoteNewForm(notebookRootProps, { attachTo: document.body })
     await speakTheTitle(wrapper)
-
-    const recorder = vi.mocked(createAudioRecorder).mock.results[0]!.value as {
-      stopRecording: ReturnType<typeof vi.fn>
-    }
-    recorder.stopRecording.mockImplementation(
-      async () => new File([], "test.webm")
-    )
-
+    stubSilentStopRecording()
     await stopSpeaking(wrapper)
 
     expect(speakTitleStatus(wrapper)).toBe("No speech was turned into text.")
@@ -68,7 +61,7 @@ describe("NoteNewForm spoken title outcomes", () => {
   })
 
   it("says nothing was heard when the response has no segments", async () => {
-    mockSdkService(AiAudioController, "audioToText", audioTextResponse([]))
+    mockAudioToTextWithNoSegments()
     wrapper = mountNoteNewForm(notebookRootProps, { attachTo: document.body })
 
     await speakAndStop(wrapper)
@@ -102,12 +95,7 @@ describe("NoteNewForm spoken title outcomes", () => {
   })
 
   it("explains a failed conversion, leaves the title alone, and speaks again with a fresh recorder", async () => {
-    const audioToTextMock = mockSdkService(
-      AiAudioController,
-      "audioToText",
-      audioTextResponse("only the second recording.")
-    )
-    audioToTextMock.mockResolvedValueOnce(wrapSdkError("API Error"))
+    mockAudioToTextFailThen("only the second recording.")
 
     wrapper = mountNoteNewForm(notebookRootProps, { attachTo: document.body })
     await speakAndStop(wrapper)

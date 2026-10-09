@@ -157,9 +157,8 @@ slice is required.
 - Agent: Nao-chan; publisher ID: `dashboard-territory.local-doughnut`
 - CI observer: `/tmp/dough-ci-501/watch-XW77Kl` (workflow `ci.yml`, target
   branch `cursor/change-an-existing-note-s-title-by-speaking`)
-- Last accepted delivery: `548a284a4410bf3bf1eb2cb121b7751d88d582ab`
-  (slice 1; previously published base was
-  `d274ee6b2571f858684cbfad40fa63788af23e82`).
+- Last accepted delivery: `ca98162b615cd38552770bd615720d3a05aead31`
+  (slice 2; prior slice 1 `548a284a4410bf3bf1eb2cb121b7751d88d582ab`).
 
 ## Ordered slices
 
@@ -206,10 +205,15 @@ the old title and hides the panel.
 
 ### 3. Failed or empty speech leaves the title alone; speaking again replaces
 Type: Behavior
-Status: planned
-Proof: mounted specs for nothing heard, failed conversion, and a following
-successful attempt (save spy untouched until then); documentation section
-added; the focused command set above green.
+Status: done
+Proof: mounted `NoteEditableTitle.spokenTitle.spec.ts` — nothing heard
+(silent stop), empty segments, fail-then-success with save spy untouched
+until success; `docs/voice-input.md` section "Speaking a title on an
+existing note"; focused command set green (editable + New note spoken-title
++ TextContentWrapper + vue-tsc + `record_live_audio.feature`).
+Shared outcome stubs: `stubSilentStopRecording`,
+`mockAudioToTextWithNoSegments`, `mockAudioToTextFailThen` in
+`spokenTitleTestSupport.ts`.
 
 Behavior: on the note page the author speaks and nothing is heard, or the
 conversion fails → the status says so, the title and saved state are

@@ -9,10 +9,14 @@ import { noteTitleText } from "@tests/notes/noteNewFormTestSupport"
 import {
   blurAwayFromSpokenTitle,
   findSpeakTitleButtonByText,
+  mockAudioToTextFailThen,
+  mockAudioToTextWithNoSegments,
   mountNoteEditableTitle,
   speakAndStop,
   speakTheTitle,
   speakTitleStatus,
+  stopSpeaking,
+  stubSilentStopRecording,
   useSpokenTitleTestLifecycle,
 } from "@tests/notes/spokenTitleTestSupport"
 import {
@@ -161,5 +165,63 @@ describe("NoteEditableTitle spoken title", () => {
     expect(noteTitleText(wrapper)).toBe("WikiLinks CI")
     expect(wrapper.find(referencedTitleSavePanelSelector).exists()).toBe(false)
     expect(mockedUpdateTitleCall).not.toHaveBeenCalled()
+  })
+
+  it("leaves the title and save alone when nothing was heard", async () => {
+    const note = makeMe.aNote.title("Orchard notes").please()
+    wrapper = mountNoteEditableTitle({
+      noteTopology: note.noteTopology,
+      noteId: note.id,
+    })
+
+    await speakTheTitle(wrapper)
+    stubSilentStopRecording()
+    await stopSpeaking(wrapper)
+
+    expect(speakTitleStatus(wrapper)).toBe("No speech was turned into text.")
+    expect(noteTitleText(wrapper)).toBe("Orchard notes")
+    expect(mockedUpdateTitleCall).not.toHaveBeenCalled()
+  })
+
+  it("leaves the title and save alone when the response has no segments", async () => {
+    mockAudioToTextWithNoSegments()
+    const note = makeMe.aNote.title("Orchard notes").please()
+    wrapper = mountNoteEditableTitle({
+      noteTopology: note.noteTopology,
+      noteId: note.id,
+    })
+
+    await speakAndStop(wrapper)
+
+    expect(speakTitleStatus(wrapper)).toBe("No speech was turned into text.")
+    expect(noteTitleText(wrapper)).toBe("Orchard notes")
+    expect(mockedUpdateTitleCall).not.toHaveBeenCalled()
+  })
+
+  it("leaves the title alone after a failed conversion, then replaces on the next speak", async () => {
+    mockAudioToTextFailThen("Lighthouse keepers")
+    const note = makeMe.aNote.title("Orchard notes").please()
+    wrapper = mountNoteEditableTitle({
+      noteTopology: note.noteTopology,
+      noteId: note.id,
+    })
+
+    await speakAndStop(wrapper)
+
+    expect(speakTitleStatus(wrapper)).toBe(
+      "Could not turn your speech into text."
+    )
+    expect(noteTitleText(wrapper)).toBe("Orchard notes")
+    expect(mockedUpdateTitleCall).not.toHaveBeenCalled()
+
+    await speakAndStop(wrapper)
+    vi.advanceTimersByTime(1000)
+    await flushPromises()
+
+    expect(noteTitleText(wrapper)).toBe("Lighthouse keepers")
+    expect(mockedUpdateTitleCall).toHaveBeenCalledWith({
+      path: { note: note.id },
+      body: { newTitle: "Lighthouse keepers" },
+    })
   })
 })

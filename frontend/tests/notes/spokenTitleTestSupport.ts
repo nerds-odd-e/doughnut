@@ -4,7 +4,7 @@ import { createAudioRecorder } from "@/models/audio/audioRecorder"
 import type { NoteTopology } from "@generated/donut-backend-api"
 import type { ComponentPublicInstance } from "vue"
 import { flushPromises, type VueWrapper } from "@vue/test-utils"
-import helper, { mockSdkService } from "@tests/helpers"
+import helper, { mockSdkService, wrapSdkError } from "@tests/helpers"
 import {
   clearAudioHardwareMocks,
   installAudioBrowserSpies,
@@ -97,11 +97,15 @@ export async function speakAndStop(
   await stopSpeaking(wrapper)
 }
 
-/** Hold Stop in converting until finishStop runs the processor callback. */
-export function holdSpeakTitleConvertingUntilFinished() {
-  const recorder = vi.mocked(createAudioRecorder).mock.results[0]!.value as {
+function latestMockedAudioRecorder() {
+  return vi.mocked(createAudioRecorder).mock.results[0]!.value as {
     stopRecording: ReturnType<typeof vi.fn>
   }
+}
+
+/** Hold Stop in converting until finishStop runs the processor callback. */
+export function holdSpeakTitleConvertingUntilFinished() {
+  const recorder = latestMockedAudioRecorder()
   const processAudio = vi.mocked(createAudioRecorder).mock.calls[0]![0]!
   let finishStop!: () => void
   recorder.stopRecording.mockImplementation(
@@ -116,6 +120,29 @@ export function holdSpeakTitleConvertingUntilFinished() {
       })
   )
   return { finishStop: () => finishStop() }
+}
+
+/** Stop without invoking the processor — silent recording, no conversion. */
+export function stubSilentStopRecording() {
+  latestMockedAudioRecorder().stopRecording.mockImplementation(
+    async () => new File([], "test.webm")
+  )
+}
+
+/** audioToText returns a response with no transcript segments. */
+export function mockAudioToTextWithNoSegments() {
+  return mockSdkService(AiAudioController, "audioToText", audioTextResponse([]))
+}
+
+/** First audioToText fails; later calls return the given transcript. */
+export function mockAudioToTextFailThen(transcript: string | string[]) {
+  const audioToTextMock = mockSdkService(
+    AiAudioController,
+    "audioToText",
+    audioTextResponse(transcript)
+  )
+  audioToTextMock.mockResolvedValueOnce(wrapSdkError("API Error"))
+  return audioToTextMock
 }
 
 /** Leave the title area so a linked rename can discard (same as typed). */
