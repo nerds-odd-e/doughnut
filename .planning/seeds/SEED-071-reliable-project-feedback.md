@@ -24,7 +24,7 @@ evidence and priority assessment live in
 
 **Identity:** SEED-071#removals-follow-project-rule
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"unselected"}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/013-removal-proof-in-guidance/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"ba380c50403600b1401b11abc1e519172188afba00457ee0f45c11674aea11eb","plan":"78ad645e191235de018b49e27acbd2d34b13ff76451a7b03a17b375ddc4c0722"}}
 ```
 
 - **For / why:** The Donut owner and contributors can delegate a removal
