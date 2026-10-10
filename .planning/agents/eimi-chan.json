@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 1,
+  "agent": "Eimi-chan",
+  "email": "eimi-chan@example.org",
+  "identity": "SEED-066#single-button-voice-input",
+  "mode": "story-branch",
+  "branch": "claude/record-voice-input-with-one-waveform-button",
+  "host": "claude"
+}
