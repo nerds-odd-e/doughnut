@@ -81,11 +81,12 @@ import WikidataSearchByLabel from "./WikidataSearchByLabel.vue"
 import { useRouter } from "vue-router"
 import { useNoteStore } from "@/store/noteStore"
 import usePopups from "@/components/commons/Popups/usePopups"
-import { contentForNewNote, createNoteFromForm } from "./noteNewFormSubmit"
 import {
-  initialNewNoteTitle,
-  titleAfterSpokenSegments,
-} from "./noteNewFormTitle"
+  dictatedInsertion,
+  joinDictatedSegments,
+} from "@/models/audio/joinDictatedSegments"
+import { contentForNewNote, createNoteFromForm } from "./noteNewFormSubmit"
+import { heardWordsReplaceTitle, initialNewNoteTitle } from "./noteNewFormTitle"
 import { applyWikidataEntryToNewNoteForm } from "./noteNewFormWikidata"
 import type { NoteCreationParentRelationship as ParentRelationship } from "@/utils/noteCreationParentRelationship"
 
@@ -157,7 +158,7 @@ const noteFormErrors = ref<{
 const processing = ref(false)
 const titleSpeechBusy = ref(false)
 const hasTitleBeenEdited = ref(props.initialTitle !== undefined)
-const pathNameEditor = ref<{ applyExternalValue: (value: string) => void }>()
+const pathNameEditor = ref<InstanceType<typeof PathNameEditor> | null>(null)
 const effectiveSearchKey = computed(() =>
   hasTitleBeenEdited.value ? newTitle.value : ""
 )
@@ -219,8 +220,12 @@ const onTitleChange = () => {
 }
 
 const onHeardTitleSegments = (segments: string[]) => {
-  pathNameEditor.value?.applyExternalValue(
-    titleAfterSpokenSegments(hasTitleBeenEdited.value, newTitle.value, segments)
+  if (heardWordsReplaceTitle(hasTitleBeenEdited.value, newTitle.value)) {
+    pathNameEditor.value?.replaceText(joinDictatedSegments("", segments))
+    return
+  }
+  pathNameEditor.value?.insertAtSelection((before, after) =>
+    dictatedInsertion(before, segments, after)
   )
 }
 </script>

@@ -91,28 +91,6 @@ describe("NoteNewForm spoken title", () => {
     expect(findSpeakTitleButtonByText(wrapper, "Speak the title")).toBeTruthy()
   })
 
-  it("joins heard segments onto a title pattern", async () => {
-    hearing("weekly review")
-    wrapper = mountNoteNewForm(
-      { ...notebookRootProps, initialTitle: "2026-10-06" },
-      { attachTo: document.body }
-    )
-
-    await speakAndStop(wrapper)
-
-    expect(noteTitleText(wrapper)).toBe("2026-10-06 weekly review")
-  })
-
-  it("joins heard segments onto a typed title with one space", async () => {
-    hearing("weekly review")
-    wrapper = mountNoteNewForm(notebookRootProps, { attachTo: document.body })
-    await setNoteNewFormTitle(wrapper, "Project")
-
-    await speakAndStop(wrapper)
-
-    expect(noteTitleText(wrapper)).toBe("Project weekly review")
-  })
-
   it("replaces illegal path characters and shows the warning for heard segments", async () => {
     hearing("a/b")
     wrapper = mountNoteNewForm(notebookRootProps, { attachTo: document.body })

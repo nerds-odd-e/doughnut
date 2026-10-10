@@ -232,7 +232,19 @@ until slice 4.
 
 ### 4. In New note, spoken words go where the caret or selection is
 Type: Behavior
-Status: planned
+Status: done
+Accepted proof: `NoteNewForm.spokenTitlePlacement.spec.ts` (five cases: the
+untouched default replaced with and without its selection, with focus and
+the caret at the end; a title pattern; a typed title; a caret inside a typed
+title with focus and caret offset); `NoteNewForm.spokenTitle.spec.ts` search
+and submit cases; after the refactor: `pnpm -C frontend build`, full
+`pnpm frontend:test` (332 files, 2104 tests), E2E `record_live_audio.feature`
+5 scenarios. `PathNameEditor` exposes `replaceText` (replace the whole
+title, focus it, caret at the end) for the untouched default and
+`insertAtSelection` otherwise; `heardWordsReplaceTitle` in
+`noteNewFormTitle.ts` holds the decision. Sweep reading:
+`grep -rn "titleAfterSpokenSegments" frontend e2e_test docs cli mcp-server backend .agents`
+returns nothing.
 Proof: `NoteNewForm.spokenTitle.spec.ts`: "replaces an untouched default
 title" (selection intact), "replaces an untouched default title after the
 selection was lost" (blur the editor and clear the selection first),
@@ -374,6 +386,21 @@ Reported: slice 3 — "Chromium only for all selection observations."
 Story clause: "the design must not depend on the browser keeping the selection"
 Disposition: proved by slice 2: `frontend/tests/components/form/SeamlessTextEditor.spec.ts` "inserts at the selection it remembered when focus left the editor", where the document selection is removed before the insertion
 
+### G12. A second speak in New note has no case
+Reported: slice 4 — "A second speak in New note after the default was replaced has no case."
+Story clause: "a caret at the end appends"
+Disposition: receiving slice 5
+
+### G13. New note without a caret, and an empty title, have no New note case
+Reported: slice 4 — "New note with no caret ever placed in an edited or pattern title (append) and with an empty title (fill) have no New note case."
+Story clause: "the words join the end of a nonempty title and fill an empty one"
+Disposition: proved by slice 3: `frontend/tests/notes/NoteEditableTitle.spokenTitlePlacement.spec.ts` "appends when the author never placed a caret", `frontend/tests/components/form/SeamlessTextEditor.spec.ts` "appends inserted text when no selection was ever placed" and the `dictatedInsertion` case "empty before and after"; New note calls the same editor operation with the same rule
+
+### G14. Replacing the whole title has no editor case of its own
+Reported: slice 4 — "`replaceText` has no direct `PathNameEditor.spec.ts` case; it is proved through the mounted New note cases, its only caller."
+Story clause: "After the words are placed, the title has focus and the caret sits after the inserted words"
+Disposition: proved by slice 4: `frontend/tests/notes/NoteNewForm.spokenTitlePlacement.spec.ts` "replaces an untouched default title" and "replaces an untouched default title after the selection was lost"
+
 ## Execution
 
 Story Branch Mode in `.worktrees/restore-title-styling-and-make-spoken-title-edit`
@@ -403,6 +430,10 @@ on `claude/restore-title-styling-and-make-spoken-title-edit`, published to
 - Insertion focuses the title itself, so New note needs no separate refocus;
   the untouched-"Untitled" path through `applyExternalValue` does not focus
   (slice 4).
+- `PathNameEditor`'s `applyExternalValue` became `replaceText`; New note's
+  spoken specs are three files (`NoteNewForm.spokenTitle.spec.ts`,
+  `.spokenTitlePlacement.spec.ts`, `.spokenTitle.outcomes.spec.ts`) and the
+  note page's two; slice 5 retargets all of them through the support file.
 - CI run 38091750938 failed `pnpm -C frontend build` on `1e5e7efa49`: the
   build's checker also runs plain `tsc`, which types every `*.vue` import
   through `tests/shims-vue.d.ts` and so sees no exposed members

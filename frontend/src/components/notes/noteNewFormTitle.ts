@@ -1,5 +1,3 @@
-import { joinDictatedSegments } from "@/models/audio/joinDictatedSegments"
-
 export const DEFAULT_NEW_NOTE_TITLE = "Untitled"
 
 export function initialNewNoteTitle(initialTitle?: string): string {
@@ -7,16 +5,10 @@ export function initialNewNoteTitle(initialTitle?: string): string {
   return initialTitle.endsWith(" ") ? initialTitle : `${initialTitle} `
 }
 
-/** Join heard segments onto the current title, replacing an untouched default. */
-export function titleAfterSpokenSegments(
+/** An untouched default is a placeholder: heard words replace it. Any other title takes them at its caret or selection. */
+export function heardWordsReplaceTitle(
   hasTitleBeenEdited: boolean,
-  currentTitle: string,
-  segments: readonly string[]
-): string {
-  const replaceUntouchedDefault =
-    !hasTitleBeenEdited && currentTitle === DEFAULT_NEW_NOTE_TITLE
-  return joinDictatedSegments(
-    replaceUntouchedDefault ? "" : currentTitle,
-    segments
-  )
+  currentTitle: string
+): boolean {
+  return !hasTitleBeenEdited && currentTitle === DEFAULT_NEW_NOTE_TITLE
 }

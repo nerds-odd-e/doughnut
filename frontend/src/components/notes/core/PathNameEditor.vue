@@ -48,9 +48,12 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref } from "vue"
+import { computed, nextTick, onMounted, ref } from "vue"
 import SeamlessTextEditor from "../../form/SeamlessTextEditor.vue"
-import { scheduleFocusTargetWithin } from "@/utils/focusTarget"
+import {
+  focusTargetWithin,
+  scheduleFocusTargetWithin,
+} from "@/utils/focusTarget"
 
 const FULLWIDTH_REPLACE: Record<string, string> = {
   "\\": "＼",
@@ -194,8 +197,14 @@ onMounted(() => {
   })
 })
 
+async function replaceText(raw: string) {
+  onModelUpdate(raw)
+  await nextTick()
+  focusTargetWithin(root.value)
+}
+
 defineExpose({
-  applyExternalValue: onModelUpdate,
+  replaceText,
   insertAtSelection: (compose: (before: string, after: string) => string) =>
     innerEditor.value?.insertAtSelection(compose),
 })

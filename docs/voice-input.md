@@ -44,12 +44,23 @@ listening. A status that assistive technology announces says "Recording. Speak
 now.", then "Turning your speech into text…" until Stop has finished; once the
 heard words are in the title field, there is no status. Listening ends only
 when the author chooses Stop; nothing appears in the title while they are still
-speaking. The recorder converts only at Stop. The response's segments are joined
-by the same CJK/space rule as body passages through the title editor's ordinary
-handling: they replace an untouched default "Untitled", and otherwise join the
-end of the title the author already has (including a title pattern the dialog
-opened with). Illegal characters are replaced and warnings shown as for typing.
-The search for existing notes runs for the heard title. The author may type
+speaking. The recorder converts only at Stop. An untouched default "Untitled"
+is a placeholder: the heard words replace it, whether or not it is still
+selected, for example after the author chose a folder first. Any other title,
+including a title pattern the dialog opened with and a title the author typed,
+takes the words where the author's caret or selection is, by the same rule as
+on an existing note: a selection is replaced, a caret takes the words at that
+place with the CJK/space rule of body passages on both sides, and a caret at
+the end appends. For example, the pattern "2026-10-06 " with its caret at the
+end and "weekly review" gives "2026-10-06 weekly review"; with the caret after
+"Project" in "Project review", "weekly" gives "Project weekly review". The
+target is the selection the title has while it has focus, or the one it had
+when focus left it. When the author has placed neither caret nor selection in
+such a title, the words join its end, and fill an empty title. Afterwards the
+title has focus and the caret sits after the heard words, so a typed
+correction continues from there. Illegal characters are replaced and warnings
+shown as for typing.
+The search for existing notes runs for the resulting title. The author may type
 corrections before Submit. While the dialog is listening or turning speech into
 text, Submit is not offered and Enter in the title field does nothing;
 afterwards Submit is offered again. Closing New note while listening stops the
