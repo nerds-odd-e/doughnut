@@ -7,7 +7,7 @@
   >
     <template #default="{ value, update, blur, errors }">
       <PathNameEditor
-        ref="pathNameEditorRoot"
+        ref="pathNameEditor"
         :model-value="value || ''"
         :error-message="errors.title"
         :readonly="readonly"
@@ -25,17 +25,16 @@
       <SpeakTitleControl
         v-if="!readonly"
         class="mt-2"
-        @heard-segments="onHeardTitleSegments(update, $event)"
+        @heard-segments="onHeardTitleSegments"
       />
     </template>
   </TextContentWrapper>
 </template>
 
 <script setup lang="ts">
-import { ref, type ComponentPublicInstance, type PropType } from "vue"
+import { ref, type PropType } from "vue"
 import type { NoteTopology } from "@generated/donut-backend-api"
-import { joinDictatedSegments } from "@/models/audio/joinDictatedSegments"
-import { scheduleFocusTargetWithin } from "@/utils/focusTarget"
+import { dictatedInsertion } from "@/models/audio/joinDictatedSegments"
 import SpeakTitleControl from "../SpeakTitleControl.vue"
 import TextContentWrapper from "./TextContentWrapper.vue"
 import PathNameEditor from "./PathNameEditor.vue"
@@ -47,14 +46,12 @@ defineProps({
   hasInboundReferences: { type: Boolean, default: false },
 })
 
-const pathNameEditorRoot = ref<ComponentPublicInstance | null>(null)
+const pathNameEditor = ref<InstanceType<typeof PathNameEditor> | null>(null)
 
-function onHeardTitleSegments(
-  update: (value: string) => void,
-  segments: string[]
-) {
-  update(joinDictatedSegments("", segments))
-  scheduleFocusTargetWithin(pathNameEditorRoot.value?.$el ?? null)
+function onHeardTitleSegments(segments: string[]) {
+  pathNameEditor.value?.insertAtSelection((before, after) =>
+    dictatedInsertion(before, segments, after)
+  )
 }
 </script>
 

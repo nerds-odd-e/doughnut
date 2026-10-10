@@ -51,6 +51,7 @@ Feature: Record live audio onto a note
   Scenario: Rename a note by speaking the title
     Given the OpenAI transcription service will return the text "Apple orchard care" when I stop
     When I visit note "Data Structure Lecture"
+    And I select the whole note title
     And I speak the title
     And the browser records audio input from the microphone as in "lecture.wav"
     And I stop speaking the title
@@ -75,6 +76,7 @@ Feature: Record live audio onto a note
       See [[WikiLinks CI]] for process.
       """
     And I route to the note "WikiLinks CI"
+    And I select the whole note title
     And I speak the title
     And the browser records audio input from the microphone as in "lecture.wav"
     And I stop speaking the title

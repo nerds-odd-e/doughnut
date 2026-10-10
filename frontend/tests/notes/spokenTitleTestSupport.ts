@@ -9,10 +9,11 @@ import {
   clearAudioHardwareMocks,
   installAudioBrowserSpies,
 } from "@tests/notes/noteVoiceInputButtonMocks"
+import { setCaretInEditor } from "@tests/components/form/seamlessTextEditorTestSupport"
 import { audioTextResponse } from "@tests/notes/noteVoiceInputButtonTestSupport"
 import { titleEditorEl } from "@tests/notes/noteTextContentTestSupport"
 import { flushReferencedTitleBlurDiscardCheck } from "@tests/notes/textContentWrapperTestSupport"
-import { afterEach, beforeEach, vi } from "vitest"
+import { afterEach, beforeEach, expect, vi } from "vitest"
 
 export function findSpeakTitleButtonByText(
   wrapper: VueWrapper<ComponentPublicInstance>,
@@ -52,6 +53,37 @@ export function speakTitleStatus(
   return status.exists() ? status.text() : undefined
 }
 
+/** The next conversions return this transcript. */
+export function hearing(transcript: string) {
+  mockSdkService(
+    AiAudioController,
+    "audioToText",
+    audioTextResponse(transcript)
+  )
+}
+
+export function placeCaretInTitle(
+  wrapper: VueWrapper<ComponentPublicInstance>,
+  start: number,
+  end = start
+) {
+  const title = titleEditorEl(wrapper)
+  title.focus()
+  setCaretInEditor(title, start, end)
+}
+
+export function selectWholeTitle(wrapper: VueWrapper<ComponentPublicInstance>) {
+  const title = titleEditorEl(wrapper)
+  title.focus()
+  window.getSelection()!.selectAllChildren(title)
+}
+
+export function titleCaretOffset() {
+  const range = window.getSelection()!.getRangeAt(0)
+  expect(range.collapsed).toBe(true)
+  return range.startOffset
+}
+
 /** Shared timers, audio mocks, and default transcription for spoken-title specs. */
 export function useSpokenTitleTestLifecycle(
   defaultTranscript = "Photosynthesis in desert plants."
@@ -61,11 +93,7 @@ export function useSpokenTitleTestLifecycle(
     vi.resetAllMocks()
     installAudioBrowserSpies()
     clearAudioHardwareMocks()
-    mockSdkService(
-      AiAudioController,
-      "audioToText",
-      audioTextResponse(defaultTranscript)
-    )
+    hearing(defaultTranscript)
   })
 
   afterEach(() => {

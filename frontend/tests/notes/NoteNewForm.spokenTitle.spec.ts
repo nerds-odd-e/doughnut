@@ -1,9 +1,7 @@
-import { AiAudioController } from "@generated/donut-backend-api/sdk.gen"
 import { createAudioRecorder } from "@/models/audio/audioRecorder"
 import { flushPromises, type VueWrapper } from "@vue/test-utils"
 import type { ComponentPublicInstance } from "vue"
-import { mockSdkService, wrapSdkResponse } from "@tests/helpers"
-import { audioTextResponse } from "@tests/notes/noteVoiceInputButtonTestSupport"
+import { wrapSdkResponse } from "@tests/helpers"
 import {
   isNoteNewFormSubmitDisabled,
   mountNoteNewForm,
@@ -16,6 +14,7 @@ import {
 } from "@tests/notes/noteNewFormTestSupport"
 import {
   findSpeakTitleButtonByText,
+  hearing,
   holdSpeakTitleConvertingUntilFinished,
   speakAndStop,
   speakTheTitle,
@@ -93,11 +92,7 @@ describe("NoteNewForm spoken title", () => {
   })
 
   it("joins heard segments onto a title pattern", async () => {
-    mockSdkService(
-      AiAudioController,
-      "audioToText",
-      audioTextResponse("weekly review")
-    )
+    hearing("weekly review")
     wrapper = mountNoteNewForm(
       { ...notebookRootProps, initialTitle: "2026-10-06" },
       { attachTo: document.body }
@@ -109,11 +104,7 @@ describe("NoteNewForm spoken title", () => {
   })
 
   it("joins heard segments onto a typed title with one space", async () => {
-    mockSdkService(
-      AiAudioController,
-      "audioToText",
-      audioTextResponse("weekly review")
-    )
+    hearing("weekly review")
     wrapper = mountNoteNewForm(notebookRootProps, { attachTo: document.body })
     await setNoteNewFormTitle(wrapper, "Project")
 
@@ -123,7 +114,7 @@ describe("NoteNewForm spoken title", () => {
   })
 
   it("replaces illegal path characters and shows the warning for heard segments", async () => {
-    mockSdkService(AiAudioController, "audioToText", audioTextResponse("a/b"))
+    hearing("a/b")
     wrapper = mountNoteNewForm(notebookRootProps, { attachTo: document.body })
 
     await speakAndStop(wrapper)

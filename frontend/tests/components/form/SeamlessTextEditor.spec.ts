@@ -11,6 +11,12 @@ import {
   setCaretInEditor,
 } from "./seamlessTextEditorTestSupport"
 
+function moveFocusToAButton() {
+  const button = document.createElement("button")
+  document.body.appendChild(button)
+  button.focus()
+}
+
 describe("SeamlessTextEditor", () => {
   let wrapper: VueWrapper
 
@@ -80,9 +86,7 @@ describe("SeamlessTextEditor", () => {
     const editor = editorEl(wrapper)
     await focusEditor(editor)
     setCaretInEditor(editor, 0, 7)
-    const button = document.createElement("button")
-    document.body.appendChild(button)
-    button.focus()
+    moveFocusToAButton()
     window.getSelection()?.removeAllRanges()
 
     await insertAtSelection(wrapper, () => "Garden")
@@ -109,6 +113,39 @@ describe("SeamlessTextEditor", () => {
     expect(wrapper.emitted()["update:modelValue"]?.at(-1)?.[0]).toBe(
       "Orchard[Orchard|]"
     )
+  })
+
+  it("appends inserted text after its text was replaced from outside", async () => {
+    wrapper = await mountSeamlessTextEditor(
+      "Orchard notes",
+      {},
+      { attachTo: document.body }
+    )
+    const editor = editorEl(wrapper)
+    await focusEditor(editor)
+    setCaretInEditor(editor, 7)
+    moveFocusToAButton()
+    await wrapper.setProps({ modelValue: "Pear tree" })
+
+    await insertAtSelection(wrapper, () => " care")
+
+    expect(editor.innerText).toBe("Pear tree care")
+  })
+
+  it("focuses the editor with the caret after the inserted text", async () => {
+    wrapper = await mountSeamlessTextEditor(
+      "Orchard",
+      {},
+      { attachTo: document.body }
+    )
+    const editor = editorEl(wrapper)
+
+    await insertAtSelection(wrapper, () => " notes")
+
+    expect(document.activeElement).toBe(editor)
+    const range = window.getSelection()?.getRangeAt(0)
+    expect(range?.collapsed).toBe(true)
+    expect(range?.startOffset).toBe(13)
   })
 
   it("submits the nearest form on Enter", async () => {

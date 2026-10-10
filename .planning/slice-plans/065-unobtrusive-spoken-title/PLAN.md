@@ -187,7 +187,18 @@ behaves as today.
 
 ### 3. On the note page, spoken words go where the caret or selection is
 Type: Behavior
-Status: planned
+Status: done
+Accepted proof: `NoteEditableTitle.spokenTitlePlacement.spec.ts` (seven
+placement cases, including "appends to another note's title after a caret
+was placed in the earlier one"); `NoteEditableTitle.spokenTitle.spec.ts`
+(typed correction, linked rename with a selection, failed conversion then
+placement); `SeamlessTextEditor.spec.ts` "appends inserted text after its
+text was replaced from outside" and "focuses the editor with the caret after
+the inserted text"; nine `dictatedInsertion` cases in
+`joinDictatedSegments.spec.ts`; full `pnpm frontend:test` (330 files, 2101
+tests); `pnpm -C frontend build` (plain `tsc`, `vue-tsc`, Biome) after the
+refactor; E2E `record_live_audio.feature` 5 scenarios with
+`I select the whole note title` in the two rename scenarios.
 Proof: `joinDictatedSegments.spec.ts`: `dictatedInsertion(before, segments, after)`
 cases: empty before; Latin before and after (one space each side); CJK on
 either side (no space); whitespace already present (no second space).
@@ -294,7 +305,10 @@ the E2E page object and the documentation. Stop-safe.
   dependence on the browser keeping the selection after a button click.
   The editor remembers the selection when it loses focus and after each
   insertion, not on `selectionchange`; a blur without a selection in the
-  editor keeps the earlier one.
+  editor keeps the earlier one. The live selection counts only while the
+  editor has focus, and the remembered one is forgotten when the title is
+  replaced by text the editor does not show (another note, a rewritten
+  save). The insertion itself gives the editor focus and places the caret.
 - Shared appearance, separate control: `SpeakTitleControl.vue` keeps its own
   stop-only recorder and becomes the small icon button using the body
   button's classes, icons and naming pattern; the body button's component
@@ -318,12 +332,12 @@ Disposition: no user cost "the note title reads as the note's heading again": th
 ### G3. Caret inside an attached title has no direct assertion
 Reported: slice 2 — "The current-selection path with a caret inside an attached editor has no direct assertion; slice 3's \"inserts between words\" will be the first."
 Story clause: "a caret inserts them there with the dictation joining rule applied on both sides"
-Disposition: receiving slice 3
+Disposition: proved by slice 3: `frontend/tests/notes/NoteEditableTitle.spokenTitlePlacement.spec.ts` "inserts between words"
 
 ### G4. Whole-title selection not asserted
 Reported: slice 2 — "A selection whose container is the editor element (the autofocus select-all of \"Untitled\") is handled by the range-based offsets, but this slice has no case for it"
 Story clause: "Replacing a whole authored title is done by selecting it all"
-Disposition: receiving slice 3
+Disposition: proved by slice 3: `frontend/tests/notes/NoteEditableTitle.spokenTitlePlacement.spec.ts` "replaces the whole selected title" and the E2E step `I select the whole note title"
 
 ### G5. Selection at blur on a real click not observed
 Reported: slice 2 — "Whether Chromium still has the selection in the editor when `blur` fires on a real mouse click on a button was not checked."
@@ -333,7 +347,7 @@ Disposition: receiving slice 5
 ### G6. Remembered selection survives a title changed from outside
 Reported: slice 2 — "Remembered offsets are clamped by `substring`, not reset, when the title changes from outside."
 Story clause: "When the author has placed neither caret nor selection in the title, the words join the end of a nonempty title"
-Disposition: receiving slice 3
+Disposition: proved by slice 3: `frontend/tests/notes/NoteEditableTitle.spokenTitlePlacement.spec.ts` "appends to another note's title after a caret was placed in the earlier one" and `frontend/tests/components/form/SeamlessTextEditor.spec.ts` "appends inserted text after its text was replaced from outside"
 
 ### G7. Insertion does not check readonly
 Reported: slice 2 — "`insertAtSelection` does not check `readonly`."
@@ -344,6 +358,21 @@ Disposition: receiving slice 5
 Reported: slice 2 — "the element-level-selection edge from item 1 has no test"
 Story clause: "Preserve everything else"
 Disposition: no user cost "puts the heard words where the author's caret or selection is": a whole-title selection is kept instead of dropped when the title is replaced by text of the same length, which is what a selection inside the text already did
+
+### G9. Title replaced from outside while it keeps focus
+Reported: slice 3 — "The browser collapses the live caret to the start of the new title, and since the focused live selection is the target, words would go to the start."
+Story clause: "When the author has placed neither caret nor selection in the title, the words join the end of a nonempty title"
+Disposition: no user cost "puts the heard words where the author's caret or selection is": the title has focus and shows its caret at the start, so the words go where the visible caret is; typing there behaves the same way
+
+### G10. A save response that rewrites the title has no case of its own
+Reported: slice 3 — "A save response that rewrites the title to different text. It goes through the same watcher, which the two G6 cases cover, but it has no case of its own."
+Story clause: "When the author has placed neither caret nor selection in the title, the words join the end of a nonempty title"
+Disposition: proved by slice 3: `frontend/tests/components/form/SeamlessTextEditor.spec.ts` "appends inserted text after its text was replaced from outside"; every outside replacement reaches the editor as a changed model value
+
+### G11. Selection observations in Chromium only
+Reported: slice 3 — "Chromium only for all selection observations."
+Story clause: "the design must not depend on the browser keeping the selection"
+Disposition: proved by slice 2: `frontend/tests/components/form/SeamlessTextEditor.spec.ts` "inserts at the selection it remembered when focus left the editor", where the document selection is removed before the insertion
 
 ## Execution
 
@@ -366,6 +395,14 @@ on `claude/restore-title-styling-and-make-spoken-title-edit`, published to
 - Slice 3 owes G6: a title replaced from outside (another note shown in the
   same mounted title, a save response) must not leave an earlier note's
   caret as the target.
+- Spoken-title specs share `hearing`, `placeCaretInTitle`, `selectWholeTitle`
+  and `titleCaretOffset` from `spokenTitleTestSupport.ts`; a spec focuses
+  the title before placing a caret, because an unfocused selection is not a
+  target. Tests reach `insertAtSelection` only through the helper in
+  `seamlessTextEditorTestSupport.ts`.
+- Insertion focuses the title itself, so New note needs no separate refocus;
+  the untouched-"Untitled" path through `applyExternalValue` does not focus
+  (slice 4).
 - CI run 38091750938 failed `pnpm -C frontend build` on `1e5e7efa49`: the
   build's checker also runs plain `tsc`, which types every `*.vue` import
   through `tests/shims-vue.d.ts` and so sees no exposed members

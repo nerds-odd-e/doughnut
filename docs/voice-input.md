@@ -69,17 +69,30 @@ existing note never changes the title.
 
 On an editable note page, "Speak the title" sits with the title heading and
 behaves as in New note for listening, Stop, and status wording. The heard
-words replace the whole title (they do not join the end of what was there).
-The result is proposed through the same path as typing: a note nothing links
-to saves as a typed title does; a note other notes link to shows the
-reference panel and saves only when the author chooses how links should
-change, and leaving without choosing discards the heard title. The author may
-type corrections after speaking. When nothing was heard, or conversion at
-Stop fails, the status says so, the title is unchanged, and nothing is saved.
-Speaking again creates a fresh recorder so only the new recording's words
-replace the title. There is no Retry. Readers who may not edit the note see
-the title as text and are not offered the control. Body dictation with Voice
-input still writes only to the body and never changes the title.
+words go where the author's caret or selection is in the title: a selection
+is replaced by them, and a caret takes them at that place. The CJK/space rule
+of body passages applies on both sides of the words: one space towards a
+neighbouring Latin-script character, none next to Japanese or Chinese
+writing, and no second space where whitespace is already present. For
+example, with the caret between "Orchard" and "notes", "harvest" gives
+"Orchard harvest notes"; with the caret at the end of "りんご園", "の手入れ"
+gives "りんご園の手入れ". The target is the selection the title has while it
+has focus, or the one it had when focus left it, so pressing the control does
+not lose it. When the author has placed neither caret nor selection in the
+title being shown, the words join its end, and fill an empty title. Replacing
+the whole title is done by selecting all of it and speaking. Afterwards the
+title has focus and the caret sits after the heard words, so a typed
+correction continues from there, and speaking again without moving the caret
+continues there too. The result is proposed through the same path as typing:
+a note nothing links to saves as a typed title does; a note other notes link
+to shows the reference panel and saves only when the author chooses how links
+should change, and leaving without choosing discards the heard words. When
+nothing was heard, or conversion at Stop fails, the status says so, the title
+is unchanged, and nothing is saved. Speaking again creates a fresh recorder so
+only the new recording's words reach the title. There is no Retry. Readers who
+may not edit the note see the title as text and are not offered the control.
+Body dictation with Voice input still writes only to the body and never
+changes the title.
 
 ## Adding dictated text to a note
 

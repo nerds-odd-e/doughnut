@@ -113,11 +113,12 @@ const insertAtSelection = (
   const el = editor.value
   if (!el) return
   const currentText = el.innerText || ""
-  const { start, end } = selectionOffsetsIn(el) ??
-    rememberedSelection ?? {
-      start: currentText.length,
-      end: currentText.length,
-    }
+  const { start, end } = (document.activeElement === el
+    ? selectionOffsetsIn(el)
+    : rememberedSelection) ?? {
+    start: currentText.length,
+    end: currentText.length,
+  }
   const before = currentText.substring(0, start)
   const after = currentText.substring(end)
   const inserted = compose(before, after)
@@ -130,6 +131,7 @@ const insertAtSelection = (
 
   nextTick(() => {
     if (editor.value) {
+      editor.value.focus()
       applyCaretOffsetsInSingleTextChild(editor.value, caret, caret)
     }
   })
@@ -164,7 +166,13 @@ const updateContent = (newValue: string) => {
 }
 
 // Keep the editor content in sync with external changes
-watch(() => props.modelValue, updateContent)
+watch(
+  () => props.modelValue,
+  (newValue) => {
+    if (editor.value?.innerText !== newValue) rememberedSelection = null
+    updateContent(newValue)
+  }
+)
 
 // Initialize content
 onMounted(() => {

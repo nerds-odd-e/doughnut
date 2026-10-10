@@ -165,6 +165,10 @@ export const assumeNotePage = (
       cy.clearFocusedText().type(newTitle)
       return this.chooseReferencedTitleSave(choice, newTitle)
     },
+    selectWholeTitle() {
+      cy.get(mainNoteHeadingTitleSelector).click().type('{selectall}')
+      return this
+    },
     voiceInput() {
       return voiceInputPage()
     },

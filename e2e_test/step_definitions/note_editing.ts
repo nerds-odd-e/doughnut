@@ -102,6 +102,10 @@ Then('I should see {string} in breadcrumb', (noteTitles: string) => {
   start.waitUntilAppIsNotBusy().assumeNotePage().expectBreadcrumb(noteTitles)
 })
 
+When('I select the whole note title', () => {
+  start.assumeNotePage().selectWholeTitle()
+})
+
 Then('the note title should be {string}', (title: string) => {
   start.assumeNotePage().expectNoteTitleDisplayed(title)
 })

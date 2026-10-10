@@ -1,10 +1,6 @@
-import { AiAudioController } from "@generated/donut-backend-api/sdk.gen"
 import { flushPromises, type VueWrapper } from "@vue/test-utils"
 import type { ComponentPublicInstance } from "vue"
 import makeMe from "donut-test-fixtures/makeMe"
-import { mockSdkService } from "@tests/helpers"
-import { settleScheduledAutofocus } from "@tests/helpers/focusTargetTestSupport"
-import { audioTextResponse } from "@tests/notes/noteVoiceInputButtonTestSupport"
 import { noteTitleText } from "@tests/notes/noteNewFormTestSupport"
 import {
   blurAwayFromSpokenTitle,
@@ -12,6 +8,7 @@ import {
   mockAudioToTextFailThen,
   mockAudioToTextWithNoSegments,
   mountNoteEditableTitle,
+  selectWholeTitle,
   speakAndStop,
   speakTheTitle,
   speakTitleStatus,
@@ -74,61 +71,18 @@ describe("NoteEditableTitle spoken title", () => {
     expect(speakTitleStatus(wrapper)).toBe("Recording. Speak now.")
   })
 
-  it("replaces an existing title with the heard words and focuses the title", async () => {
-    const note = makeMe.aNote.title("Orchard notes").please()
-    wrapper = mountNoteEditableTitle({
-      noteTopology: note.noteTopology,
-      noteId: note.id,
-    })
-
-    await speakAndStop(wrapper)
-    await settleScheduledAutofocus()
-
-    expect(noteTitleText(wrapper)).toBe("Apple orchard care")
-    expect(document.activeElement).toBe(
-      wrapper.find('[data-test="note-title"]').element
-    )
-
-    vi.advanceTimersByTime(1000)
-    await flushPromises()
-
-    expect(mockedUpdateTitleCall).toHaveBeenCalledWith({
-      path: { note: note.id },
-      body: { newTitle: "Apple orchard care" },
-    })
-  })
-
   it("keeps a typed correction after speaking", async () => {
     const note = makeMe.aNote.title("Orchard notes").please()
     wrapper = mountNoteEditableTitle({
       noteTopology: note.noteTopology,
       noteId: note.id,
     })
+    selectWholeTitle(wrapper)
 
     await speakAndStop(wrapper)
     await editTitle(wrapper, "Apple orchid care")
 
     expect(noteTitleText(wrapper)).toBe("Apple orchid care")
-  })
-
-  it("replaces the title again when speaking a second time", async () => {
-    const note = makeMe.aNote.title("Orchard notes").please()
-    wrapper = mountNoteEditableTitle({
-      noteTopology: note.noteTopology,
-      noteId: note.id,
-    })
-
-    await speakAndStop(wrapper)
-    expect(noteTitleText(wrapper)).toBe("Apple orchard care")
-
-    mockSdkService(
-      AiAudioController,
-      "audioToText",
-      audioTextResponse("Pear orchard care")
-    )
-    await speakAndStop(wrapper)
-
-    expect(noteTitleText(wrapper)).toBe("Pear orchard care")
   })
 
   it("does not offer Speak the title when readonly", () => {
@@ -153,8 +107,9 @@ describe("NoteEditableTitle spoken title", () => {
       hasInboundReferences: true,
     })
 
+    selectWholeTitle(wrapper)
+
     await speakAndStop(wrapper)
-    await settleScheduledAutofocus()
 
     expect(noteTitleText(wrapper)).toBe("Apple orchard care")
     expect(wrapper.find(referencedTitleSavePanelSelector).exists()).toBe(true)
@@ -198,7 +153,7 @@ describe("NoteEditableTitle spoken title", () => {
     expect(mockedUpdateTitleCall).not.toHaveBeenCalled()
   })
 
-  it("leaves the title alone after a failed conversion, then replaces on the next speak", async () => {
+  it("leaves the title alone after a failed conversion, then places the words on the next speak", async () => {
     mockAudioToTextFailThen("Lighthouse keepers")
     const note = makeMe.aNote.title("Orchard notes").please()
     wrapper = mountNoteEditableTitle({
@@ -218,10 +173,10 @@ describe("NoteEditableTitle spoken title", () => {
     vi.advanceTimersByTime(1000)
     await flushPromises()
 
-    expect(noteTitleText(wrapper)).toBe("Lighthouse keepers")
+    expect(noteTitleText(wrapper)).toBe("Orchard notes Lighthouse keepers")
     expect(mockedUpdateTitleCall).toHaveBeenCalledWith({
       path: { note: note.id },
-      body: { newTitle: "Lighthouse keepers" },
+      body: { newTitle: "Orchard notes Lighthouse keepers" },
     })
   })
 })

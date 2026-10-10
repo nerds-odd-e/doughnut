@@ -1,5 +1,8 @@
 import { describe, expect, it } from "vitest"
-import { joinDictatedSegments } from "@/models/audio/joinDictatedSegments"
+import {
+  dictatedInsertion,
+  joinDictatedSegments,
+} from "@/models/audio/joinDictatedSegments"
 
 describe("joinDictatedSegments", () => {
   it.each([
@@ -24,5 +27,75 @@ describe("joinDictatedSegments", () => {
     ],
   ])("%s", (_label, base, segments, joined) => {
     expect(joinDictatedSegments(base, segments)).toBe(joined)
+  })
+})
+
+describe("dictatedInsertion", () => {
+  it.each([
+    {
+      case: "empty before and after",
+      before: "",
+      segments: ["notes"],
+      after: "",
+      inserted: "notes",
+    },
+    {
+      case: "Latin before",
+      before: "Orchard",
+      segments: ["notes"],
+      after: "",
+      inserted: " notes",
+    },
+    {
+      case: "Latin before and after",
+      before: "Orchard",
+      segments: ["harvest"],
+      after: "notes",
+      inserted: " harvest ",
+    },
+    {
+      case: "Japanese before",
+      before: "りんご園",
+      segments: ["の手入れ"],
+      after: "",
+      inserted: "の手入れ",
+    },
+    {
+      case: "Japanese after",
+      before: "",
+      segments: ["りんご園"],
+      after: "の手入れ",
+      inserted: "りんご園",
+    },
+    {
+      case: "Japanese on both sides",
+      before: "りんご",
+      segments: ["園"],
+      after: "の手入れ",
+      inserted: "園",
+    },
+    {
+      case: "whitespace already before",
+      before: "Orchard ",
+      segments: ["harvest"],
+      after: "",
+      inserted: "harvest",
+    },
+    {
+      case: "whitespace already after",
+      before: "Orchard",
+      segments: ["harvest"],
+      after: " notes",
+      inserted: " harvest",
+    },
+    {
+      case: "several segments",
+      before: "Orchard",
+      segments: ["harvest", "day"],
+      after: "notes",
+      inserted: " harvest day ",
+    },
+  ])("$case", ({ before, segments, after, inserted }) => {
+    expect(dictatedInsertion(before, segments, after)).toBe(inserted)
   })
 })
