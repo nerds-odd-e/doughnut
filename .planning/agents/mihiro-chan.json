@@ -1,9 +1,0 @@
-{
-  "schemaVersion": 1,
-  "agent": "Mihiro-chan",
-  "email": "mihiro-chan@example.org",
-  "identity": "SEED-071#removals-follow-project-rule",
-  "mode": "story-branch",
-  "branch": "claude/deliver-donut-removals-under-the-project-s-delet",
-  "host": "claude"
-}
