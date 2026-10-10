@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 1,
+  "agent": "Nana-chan",
+  "email": "nana-chan@example.org",
+  "identity": "SEED-067#start-e2e-after-migrations",
+  "mode": "story-branch",
+  "branch": "claude/start-e2e-sessions-after-database-migration-comp",
+  "host": "claude"
+}
