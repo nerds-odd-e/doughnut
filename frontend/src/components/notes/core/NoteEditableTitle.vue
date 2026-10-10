@@ -17,16 +17,17 @@
         @blur="blur"
       >
         <template #title="{ bindings, editor }">
-          <h2 class="path-name-heading">
-            <component :is="editor" v-bind="bindings" />
-          </h2>
+          <div class="path-name-heading-line flex items-center gap-2">
+            <h2 class="path-name-heading flex-1 min-w-0">
+              <component :is="editor" v-bind="bindings" />
+            </h2>
+            <SpeakTitleControl
+              v-if="!readonly"
+              @heard-segments="onHeardTitleSegments"
+            />
+          </div>
         </template>
       </PathNameEditor>
-      <SpeakTitleControl
-        v-if="!readonly"
-        class="mt-2"
-        @heard-segments="onHeardTitleSegments"
-      />
     </template>
   </TextContentWrapper>
 </template>
@@ -56,10 +57,12 @@ function onHeardTitleSegments(segments: string[]) {
 </script>
 
 <style scoped>
+.path-name-heading-line {
+  margin-bottom: 10px;
+}
+
 h2.path-name-heading {
   font-size: 1.875rem;
   font-weight: 700;
-  margin-bottom: 10px;
-  width: 100%;
 }
 </style>

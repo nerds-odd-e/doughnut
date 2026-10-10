@@ -69,6 +69,19 @@ describe("NoteNewForm spoken title placement", () => {
     expect(titleCaretOffset()).toBe("Photosynthesis in desert plants.".length)
   })
 
+  it("appends after the words that replaced the default when speaking a second time", async () => {
+    hearing("Photosynthesis")
+    wrapper = mountNoteNewForm(notebookRootProps, { attachTo: document.body })
+    await settleScheduledAutofocus()
+    await speakAndStop(wrapper)
+
+    hearing("in desert plants")
+    await speakAndStop(wrapper)
+
+    expect(noteTitleText(wrapper)).toBe("Photosynthesis in desert plants")
+    expect(titleCaretOffset()).toBe("Photosynthesis in desert plants".length)
+  })
+
   it("joins heard segments onto a title pattern", async () => {
     hearing("weekly review")
     wrapper = mountNoteNewForm(

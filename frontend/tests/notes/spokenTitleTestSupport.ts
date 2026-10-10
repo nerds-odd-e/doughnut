@@ -15,11 +15,43 @@ import { titleEditorEl } from "@tests/notes/noteTextContentTestSupport"
 import { flushReferencedTitleBlurDiscardCheck } from "@tests/notes/textContentWrapperTestSupport"
 import { afterEach, beforeEach, expect, vi } from "vitest"
 
-export function findSpeakTitleButtonByText(
+/** The microphone button, found by the accessible name it has now. */
+export function speakTitleButton(
   wrapper: VueWrapper<ComponentPublicInstance>,
-  text: string
+  name: "Speak the title" | "Stop speaking the title"
 ) {
-  return wrapper.findAll("button").find((button) => button.text() === text)
+  return wrapper.find(`button[aria-label="${name}"]`)
+}
+
+/** The microphone button waits for a click to start listening. */
+export function expectIdleSpeakTitleButton(
+  wrapper: VueWrapper<ComponentPublicInstance>
+) {
+  const button = speakTitleButton(wrapper, "Speak the title")
+  expect(button.attributes("title")).toBe("Speak the title")
+  expect(button.attributes()).not.toHaveProperty("aria-pressed")
+  expect(button.attributes()).not.toHaveProperty("disabled")
+}
+
+/** The microphone button is highlighted and a click stops listening. */
+export function expectListeningSpeakTitleButton(
+  wrapper: VueWrapper<ComponentPublicInstance>
+) {
+  const button = speakTitleButton(wrapper, "Stop speaking the title")
+  expect(button.attributes("title")).toBe("Stop speaking the title")
+  expect(button.attributes("aria-pressed")).toBe("true")
+  expect(button.classes()).toEqual(
+    expect.arrayContaining(["daisy-btn-soft", "daisy-btn-primary"])
+  )
+}
+
+/** The microphone button is unavailable while speech becomes text. */
+export function expectConvertingSpeakTitleButton(
+  wrapper: VueWrapper<ComponentPublicInstance>
+) {
+  const button = speakTitleButton(wrapper, "Speak the title")
+  expect(button.attributes()).toHaveProperty("disabled")
+  expect(button.attributes()).not.toHaveProperty("aria-pressed")
 }
 
 export function mountNoteEditableTitle(options: {
@@ -38,19 +70,6 @@ export function mountNoteEditableTitle(options: {
       hasInboundReferences: options.hasInboundReferences ?? false,
     })
     .mount({ attachTo: document.body })
-}
-
-export function speakTitleStatusNode(
-  wrapper: VueWrapper<ComponentPublicInstance>
-) {
-  return wrapper.find(".speak-title-control [role='status']")
-}
-
-export function speakTitleStatus(
-  wrapper: VueWrapper<ComponentPublicInstance>
-): string | undefined {
-  const status = speakTitleStatusNode(wrapper)
-  return status.exists() ? status.text() : undefined
 }
 
 /** The next conversions return this transcript. */
@@ -100,21 +119,20 @@ export function useSpokenTitleTestLifecycle(
     vi.restoreAllMocks()
     vi.runOnlyPendingTimers()
     vi.useRealTimers()
-    document.body.innerHTML = ""
   })
 }
 
 export async function speakTheTitle(
   wrapper: VueWrapper<ComponentPublicInstance>
 ) {
-  await findSpeakTitleButtonByText(wrapper, "Speak the title")!.trigger("click")
+  await speakTitleButton(wrapper, "Speak the title").trigger("click")
   await flushPromises()
 }
 
 export async function stopSpeaking(
   wrapper: VueWrapper<ComponentPublicInstance>
 ) {
-  await findSpeakTitleButtonByText(wrapper, "Stop")!.trigger("click")
+  await speakTitleButton(wrapper, "Stop speaking the title").trigger("click")
   await flushPromises()
 }
 

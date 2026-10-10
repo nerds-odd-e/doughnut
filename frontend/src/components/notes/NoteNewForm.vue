@@ -30,6 +30,11 @@
               @update:model-value="onTitleChange"
             >
               <template #append>
+                <SpeakTitleControl
+                  joins-field
+                  v-model:busy="titleSpeechBusy"
+                  @heard-segments="onHeardTitleSegments"
+                />
                 <WikidataSearchByLabel
                   :search-key="newTitle"
                   v-model="wikidataIdSelection"
@@ -38,11 +43,6 @@
                 />
               </template>
             </PathNameEditor>
-            <SpeakTitleControl
-              class="mt-2"
-              v-model:busy="titleSpeechBusy"
-              @heard-segments="onHeardTitleSegments"
-            />
             <SearchResults
               :note-id="titleSearchScopeNote?.id"
               :input-search-key="effectiveSearchKey"

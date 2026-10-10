@@ -23,7 +23,7 @@ const noteCreationForm = {
   },
 
   stopSpeakingTheTitle() {
-    cy.findByRole('button', { name: 'Stop' }).click()
+    cy.findByRole('button', { name: 'Stop speaking the title' }).click()
     return this
   },
 

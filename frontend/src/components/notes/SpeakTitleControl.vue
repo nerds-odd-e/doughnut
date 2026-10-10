@@ -1,27 +1,43 @@
 <template>
-  <div class="speak-title-control flex flex-col gap-1 items-start">
-    <p v-if="status" role="status" :class="{ 'text-error': isProblem }">
-      {{ status }}
-    </p>
-    <button
-      type="button"
-      class="daisy-btn daisy-btn-sm"
-      :disabled="phase === 'converting'"
-      @click="onControlClick"
-    >
-      {{ phase === "listening" ? "Stop" : "Speak the title" }}
-    </button>
-  </div>
+  <button
+    type="button"
+    :class="buttonClass"
+    :title="name"
+    :aria-label="name"
+    :aria-pressed="phase === 'listening' || undefined"
+    :disabled="phase === 'converting'"
+    @click="onControlClick"
+  >
+    <LoaderCircle
+      v-if="phase === 'converting'"
+      class="w-6 h-6 animate-spin"
+      aria-hidden="true"
+    />
+    <Mic v-else class="w-6 h-6" aria-hidden="true" />
+  </button>
 </template>
 
 <script setup lang="ts">
 import { computed, onUnmounted, ref, watch } from "vue"
+import { LoaderCircle, Mic } from "@lucide/vue"
 import { audioChunkToText } from "@/composables/audioChunkToText"
+import { useToast } from "@/composables/useToast"
+import {
+  MICROPHONE_UNAVAILABLE_MESSAGE,
+  SPEECH_NOT_CONVERTED_MESSAGE,
+} from "@/composables/voiceInputFailureMessages"
 import {
   createAudioRecorder,
   type AudioRecorder,
 } from "@/models/audio/audioRecorder"
 import type { AudioChunk } from "@/models/audio/audioProcessingScheduler"
+import { fieldJoinAppendToggleButtonClass } from "@/utils/fieldJoinAppendButtonClass"
+import { toolbarToggleBtnClass } from "./widgets/noteToolbarButtonClasses"
+
+const { joinsField } = defineProps<{
+  /** Styled as a button appended to a field control in a `daisy-join`. */
+  joinsField?: boolean
+}>()
 
 const emit = defineEmits<{
   heardSegments: [segments: string[]]
@@ -29,45 +45,34 @@ const emit = defineEmits<{
 
 const titleSpeechBusy = defineModel<boolean>("busy", { default: false })
 
-const statusByPhase = {
-  idle: "",
-  listening: "Recording. Speak now.",
-  converting: "Turning your speech into text…",
-  nothingHeard: "No speech was turned into text.",
-  micUnavailable:
-    "Could not use the microphone. Allow microphone access in your browser, then try again.",
-  conversionFailed: "Could not turn your speech into text.",
-} as const
+const { showErrorToast } = useToast()
 
-const phase = ref<keyof typeof statusByPhase>("idle")
-const status = computed(() => statusByPhase[phase.value])
-const isProblem = computed(
-  () => phase.value === "micUnavailable" || phase.value === "conversionFailed"
+const phase = ref<"idle" | "listening" | "converting">("idle")
+
+const name = computed(() =>
+  phase.value === "listening" ? "Stop speaking the title" : "Speak the title"
 )
 
-watch(phase, (p) => {
-  titleSpeechBusy.value = p === "listening" || p === "converting"
+const buttonClass = computed(() => {
+  const listening = phase.value === "listening"
+  return joinsField
+    ? `${fieldJoinAppendToggleButtonClass(listening)} rounded-none`
+    : toolbarToggleBtnClass(listening)
 })
 
-const phaseAfterConversion = {
-  heard: "idle",
-  nothing: "nothingHeard",
-  failed: "conversionFailed",
-} as const
+watch(phase, (p) => {
+  titleSpeechBusy.value = p !== "idle"
+})
 
 let audioRecorder: AudioRecorder | undefined
-let conversionOutcome: keyof typeof phaseAfterConversion = "nothing"
 
 const processAudio = async (chunk: AudioChunk): Promise<string | undefined> => {
   try {
     const { segmentTexts, endTimestamp } = await audioChunkToText(chunk)
-    if (segmentTexts.length) {
-      emit("heardSegments", segmentTexts)
-      conversionOutcome = "heard"
-    }
+    if (segmentTexts.length) emit("heardSegments", segmentTexts)
     return endTimestamp
   } catch {
-    conversionOutcome = "failed"
+    showErrorToast(SPEECH_NOT_CONVERTED_MESSAGE)
     return undefined
   }
 }
@@ -80,18 +85,17 @@ const startListening = async () => {
     await audioRecorder.startRecording()
     phase.value = "listening"
   } catch {
-    phase.value = "micUnavailable"
     audioRecorder = undefined
+    showErrorToast(MICROPHONE_UNAVAILABLE_MESSAGE)
   }
 }
 
 const stopListening = async () => {
   phase.value = "converting"
-  conversionOutcome = "nothing"
   try {
     await audioRecorder?.stopRecording()
   } finally {
-    phase.value = phaseAfterConversion[conversionOutcome]
+    phase.value = "idle"
     audioRecorder = undefined
   }
 }

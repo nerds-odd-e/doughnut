@@ -2,6 +2,7 @@ import { ref, type Ref } from "vue"
 import type { Note } from "@generated/donut-backend-api"
 import { audioChunkToText } from "@/composables/audioChunkToText"
 import { useToast } from "@/composables/useToast"
+import { SPEECH_NOT_CONVERTED_MESSAGE } from "@/composables/voiceInputFailureMessages"
 import type { AudioChunk } from "@/models/audio/audioProcessingScheduler"
 import { useNoteStore } from "@/store/noteStore"
 
@@ -15,7 +16,7 @@ export function useNoteAudioProcessing(
   const lastConversionFailed = ref(false)
 
   const conversionFailure = (chunk: AudioChunk) => {
-    const failure = "Could not turn your speech into text."
+    const failure = SPEECH_NOT_CONVERTED_MESSAGE
     if (authorHasLeft.value) return failure
     if (chunk.isMidSpeech) return `${failure} Your recording is kept.`
     return `${failure} Your recording is kept until you leave this note; click Voice input to try again.`

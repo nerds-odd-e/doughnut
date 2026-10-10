@@ -2,6 +2,7 @@ import { computed, onBeforeUnmount, ref } from "vue"
 import type { Note } from "@generated/donut-backend-api"
 import { useNoteAudioProcessing } from "@/composables/useNoteAudioProcessing"
 import { useToast } from "@/composables/useToast"
+import { MICROPHONE_UNAVAILABLE_MESSAGE } from "@/composables/voiceInputFailureMessages"
 import { createAudioRecorder } from "@/models/audio/audioRecorder"
 import { createWakeLocker } from "@/models/wakeLocker"
 
@@ -36,9 +37,7 @@ export function useNoteVoiceInput(note: Note) {
       phase.value = "recording"
       voiceInputIsActive.value = true
     } catch {
-      showErrorToast(
-        "Could not use the microphone. Allow microphone access in your browser, then try again."
-      )
+      showErrorToast(MICROPHONE_UNAVAILABLE_MESSAGE)
       await wakeLocker.release()
     }
   }

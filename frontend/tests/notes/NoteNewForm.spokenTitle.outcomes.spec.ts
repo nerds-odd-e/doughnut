@@ -9,17 +9,21 @@ import {
   setupNoteNewFormSdkMocks,
 } from "@tests/notes/noteNewFormTestSupport"
 import {
-  findSpeakTitleButtonByText,
+  expectIdleSpeakTitleButton,
   mockAudioToTextFailThen,
   mockAudioToTextWithNoSegments,
   speakAndStop,
   speakTheTitle,
-  speakTitleStatus,
-  speakTitleStatusNode,
   stopSpeaking,
   stubSilentStopRecording,
   useSpokenTitleTestLifecycle,
 } from "@tests/notes/spokenTitleTestSupport"
+import {
+  noToastShown,
+  showToastsOnPage,
+  toastMessage,
+  toastShown,
+} from "@tests/helpers/toastTestSupport"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 
 vi.mock("@/models/audio/recorderWorklet", async () => {
@@ -37,6 +41,7 @@ vi.mock("@/models/audio/audioRecorder", async () => {
 })
 
 useSpokenTitleTestLifecycle()
+showToastsOnPage()
 
 describe("NoteNewForm spoken title outcomes", () => {
   let wrapper: VueWrapper<ComponentPublicInstance>
@@ -49,29 +54,31 @@ describe("NoteNewForm spoken title outcomes", () => {
     wrapper?.unmount()
   })
 
-  it("says nothing was heard after a silent recording that runs no conversion", async () => {
+  it("returns to idle without a message after a silent recording that runs no conversion", async () => {
     wrapper = mountNoteNewForm(notebookRootProps, { attachTo: document.body })
     await speakTheTitle(wrapper)
     stubSilentStopRecording()
     await stopSpeaking(wrapper)
 
-    expect(speakTitleStatus(wrapper)).toBe("No speech was turned into text.")
+    expectIdleSpeakTitleButton(wrapper)
+    await noToastShown()
     expect(noteTitleText(wrapper)).toBe("Untitled")
     expect(isNoteNewFormSubmitDisabled(wrapper)).toBe(false)
   })
 
-  it("says nothing was heard when the response has no segments", async () => {
+  it("returns to idle without a message when the response has no segments", async () => {
     mockAudioToTextWithNoSegments()
     wrapper = mountNoteNewForm(notebookRootProps, { attachTo: document.body })
 
     await speakAndStop(wrapper)
 
-    expect(speakTitleStatus(wrapper)).toBe("No speech was turned into text.")
+    expectIdleSpeakTitleButton(wrapper)
+    await noToastShown()
     expect(noteTitleText(wrapper)).toBe("Untitled")
     expect(isNoteNewFormSubmitDisabled(wrapper)).toBe(false)
   })
 
-  it("explains when the microphone cannot be used and keeps Speak the title", async () => {
+  it("explains a microphone that cannot be used and keeps the idle button", async () => {
     const createRecorder = vi.mocked(createAudioRecorder)
     const createRecorderImpl = createRecorder.getMockImplementation()!
     createRecorder.mockImplementationOnce((callback, options) => {
@@ -85,13 +92,11 @@ describe("NoteNewForm spoken title outcomes", () => {
     wrapper = mountNoteNewForm(notebookRootProps, { attachTo: document.body })
     await speakTheTitle(wrapper)
 
-    const status = speakTitleStatusNode(wrapper)
-    expect(status.text()).toBe(
+    expect(toastMessage(await toastShown("error"))).toBe(
       "Could not use the microphone. Allow microphone access in your browser, then try again."
     )
-    expect(status.classes()).toContain("text-error")
-    expect(findSpeakTitleButtonByText(wrapper, "Speak the title")).toBeTruthy()
-    expect(findSpeakTitleButtonByText(wrapper, "Stop")).toBeUndefined()
+    expectIdleSpeakTitleButton(wrapper)
+    expect(isNoteNewFormSubmitDisabled(wrapper)).toBe(false)
   })
 
   it("explains a failed conversion, leaves the title alone, and speaks again with a fresh recorder", async () => {
@@ -100,12 +105,12 @@ describe("NoteNewForm spoken title outcomes", () => {
     wrapper = mountNoteNewForm(notebookRootProps, { attachTo: document.body })
     await speakAndStop(wrapper)
 
-    const status = speakTitleStatusNode(wrapper)
-    expect(status.text()).toBe("Could not turn your speech into text.")
-    expect(status.classes()).toContain("text-error")
+    expect(toastMessage(await toastShown("error"))).toBe(
+      "Could not turn your speech into text."
+    )
     expect(noteTitleText(wrapper)).toBe("Untitled")
+    expectIdleSpeakTitleButton(wrapper)
     expect(isNoteNewFormSubmitDisabled(wrapper)).toBe(false)
-    expect(findSpeakTitleButtonByText(wrapper, "Retry")).toBeUndefined()
     expect(vi.mocked(createAudioRecorder)).toHaveBeenCalledTimes(1)
 
     await speakAndStop(wrapper)

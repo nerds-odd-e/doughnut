@@ -264,7 +264,32 @@ untouched default (the rule stays in `noteNewFormTitle.ts` as a decision
 
 ### 5. One small microphone button, no status line, errors in toasts
 Type: Behavior
-Status: planned
+Status: done
+Accepted proof: `NoteEditableTitle.spokenTitle.spec.ts` (idle then listening
+button at the end of the heading line, readonly without a button, nothing
+heard silent, failed conversion toast with title and caret unchanged then
+placement on the next speak); `NoteNewForm.spokenTitle.spec.ts` (button
+before the Wikidata button, converting unavailable, Submit and Enter rules,
+recorder stopped on unmount); `NoteNewForm.spokenTitle.outcomes.spec.ts`
+(silent, microphone refused toast, failed conversion toast, fresh recorder);
+`NoteNewForm.spokenTitlePlacement.spec.ts` second speak; after the refactor:
+`pnpm -C frontend build`, full `pnpm frontend:test` (332 files, 2105 tests),
+E2E `record_live_audio.feature` 5 scenarios; before it also `note_edit`,
+`note_creation`, `wikidata/note_create_with_wikidata_id` and
+`assimilation/edit_when_assimilating` (32 of 32). Held stack, Playwright
+Chromium, real mouse clicks: the title's selection is still inside it when
+its blur fires on a click of the button; "Orchard" selected then "Garden"
+heard gives "Garden notes" with the caret at 6; in New note a caret after
+"Project" then "weekly" gives "Project weekly review". Screenshots read: the
+button ends the heading line with nothing between the title and "Add
+property", and sits inside the New note field before the Wikidata button.
+Sweep reading over `frontend/src frontend/tests e2e_test docs cli mcp-server
+backend/src .agents .claude` for the removed status sentences,
+`speak-title-control`, `speakTitleStatus`, `findSpeakTitleButtonByText`,
+`titleAfterSpokenSegments` and the removed phase names returns nothing.
+The button is the `h2`'s sibling in one flex row, not inside the `h2`, so
+the heading's accessible name stays the title. The two failure sentences
+have one home, `voiceInputFailureMessages.ts`, shared with the body button.
 Proof: `spokenTitleTestSupport.ts` retargeted: find the button by accessible
 name ("Speak the title", "Stop speaking the title"), delete
 `speakTitleStatus`/`speakTitleStatusNode` and `findSpeakTitleButtonByText`.
@@ -354,7 +379,7 @@ Disposition: proved by slice 3: `frontend/tests/notes/NoteEditableTitle.spokenTi
 ### G5. Selection at blur on a real click not observed
 Reported: slice 2 — "Whether Chromium still has the selection in the editor when `blur` fires on a real mouse click on a button was not checked."
 Story clause: "The caret, or the selection, the author had when they pressed the button is the target even though the click moves focus."
-Disposition: receiving slice 5
+Disposition: proved by slice 5: held stack with real mouse clicks in Playwright Chromium, recorded in slice 5's accepted proof
 
 ### G6. Remembered selection survives a title changed from outside
 Reported: slice 2 — "Remembered offsets are clamped by `substring`, not reset, when the title changes from outside."
@@ -364,7 +389,7 @@ Disposition: proved by slice 3: `frontend/tests/notes/NoteEditableTitle.spokenTi
 ### G7. Insertion does not check readonly
 Reported: slice 2 — "`insertAtSelection` does not check `readonly`."
 Story clause: "Readers who may not edit the note are not offered the button."
-Disposition: receiving slice 5
+Disposition: proved by slice 5: `frontend/tests/notes/NoteEditableTitle.spokenTitle.spec.ts` "does not offer the microphone button when readonly"
 
 ### G8. Selection on the editor element now survives a same-length sync
 Reported: slice 2 — "the element-level-selection edge from item 1 has no test"
@@ -389,7 +414,7 @@ Disposition: proved by slice 2: `frontend/tests/components/form/SeamlessTextEdit
 ### G12. A second speak in New note has no case
 Reported: slice 4 — "A second speak in New note after the default was replaced has no case."
 Story clause: "a caret at the end appends"
-Disposition: receiving slice 5
+Disposition: proved by slice 5: `frontend/tests/notes/NoteNewForm.spokenTitlePlacement.spec.ts` "appends after the words that replaced the default when speaking a second time"
 
 ### G13. New note without a caret, and an empty title, have no New note case
 Reported: slice 4 — "New note with no caret ever placed in an edited or pattern title (append) and with an empty title (fill) have no New note case."
@@ -400,6 +425,26 @@ Disposition: proved by slice 3: `frontend/tests/notes/NoteEditableTitle.spokenTi
 Reported: slice 4 — "`replaceText` has no direct `PathNameEditor.spec.ts` case; it is proved through the mounted New note cases, its only caller."
 Story clause: "After the words are placed, the title has focus and the caret sits after the inserted words"
 Disposition: proved by slice 4: `frontend/tests/notes/NoteNewForm.spokenTitlePlacement.spec.ts` "replaces an untouched default title" and "replaces an untouched default title after the selection was lost"
+
+### G15. Converting and refused microphone asserted in New note only
+Reported: slice 5 — "Converting state and microphone-refused toast are asserted on New note only; nothing-heard and failed conversion on both. Same control in both places."
+Story clause: "(unavailable and visibly quiet, named "Speak the title")"
+Disposition: proved by slice 5: `frontend/tests/notes/NoteNewForm.spokenTitle.spec.ts` "is unavailable while converting, then puts heard words in the title and is idle" and `frontend/tests/notes/NoteNewForm.spokenTitle.outcomes.spec.ts` "explains a microphone that cannot be used and keeps the idle button"; the note page renders the same control
+
+### G16. Real click observed in Chromium only
+Reported: slice 5 — "Unobserved: Safari and Firefox; a real OpenAI conversion; a caret placed by a real mouse click in New note (keyboard was used)."
+Story clause: "the design must not depend on the browser keeping the selection"
+Disposition: proved by slice 2: `frontend/tests/components/form/SeamlessTextEditor.spec.ts` "inserts at the selection it remembered when focus left the editor"; a browser that keeps focus in the title on the click uses the live selection instead
+
+### G17. The button sits at the far right, under the toolbar's microphone
+Reported: slice 5 — "because the heading fills the row the button sits at the far right edge of the content column, not next to the title text, and it is the same icon as the toolbar's Voice input microphone directly above it. An author could confuse the two."
+Story clause: "at the end of the title line"
+Disposition: proved by slice 5: held-stack screenshot of the note page read by the coordinator; the placement is the story's, and the possible confusion with the toolbar microphone is reported to the owner as product advice
+
+### G18. Focus after a failed conversion
+Reported: slice 5 — "After a failed conversion, focus was on `body` (the button had been disabled while focused); the caret offsets in the title were unchanged."
+Story clause: "leaves the title alone"
+Disposition: no user cost "puts the heard words where the author's caret or selection is": the title and its remembered caret are unchanged, and the next speak places the words there, as `frontend/tests/notes/NoteEditableTitle.spokenTitle.spec.ts` "leaves the title and the caret alone after a failed conversion, then places the words there on the next speak" observes
 
 ## Execution
 
@@ -434,6 +479,10 @@ on `claude/restore-title-styling-and-make-spoken-title-edit`, published to
   spoken specs are three files (`NoteNewForm.spokenTitle.spec.ts`,
   `.spokenTitlePlacement.spec.ts`, `.spokenTitle.outcomes.spec.ts`) and the
   note page's two; slice 5 retargets all of them through the support file.
+- `showToastsOnPage()` in the shared spoken-title lifecycle made "submits
+  the title after typing a correction to the heard words" hang at
+  `flushPromises()`; cause not established. Only the two specs that assert
+  toasts call it.
 - CI run 38091750938 failed `pnpm -C frontend build` on `1e5e7efa49`: the
   build's checker also runs plain `tsc`, which types every `*.vue` import
   through `tests/shims-vue.d.ts` and so sees no exposed members

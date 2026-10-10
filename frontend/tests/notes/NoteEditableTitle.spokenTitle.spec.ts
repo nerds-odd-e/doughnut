@@ -4,16 +4,19 @@ import makeMe from "donut-test-fixtures/makeMe"
 import { noteTitleText } from "@tests/notes/noteNewFormTestSupport"
 import {
   blurAwayFromSpokenTitle,
-  findSpeakTitleButtonByText,
+  expectIdleSpeakTitleButton,
+  expectListeningSpeakTitleButton,
   mockAudioToTextFailThen,
   mockAudioToTextWithNoSegments,
   mountNoteEditableTitle,
+  placeCaretInTitle,
   selectWholeTitle,
   speakAndStop,
   speakTheTitle,
-  speakTitleStatus,
+  speakTitleButton,
   stopSpeaking,
   stubSilentStopRecording,
+  titleCaretOffset,
   useSpokenTitleTestLifecycle,
 } from "@tests/notes/spokenTitleTestSupport"
 import {
@@ -21,6 +24,12 @@ import {
   mockedUpdateTitleCall,
   mockUpdateNoteTitle,
 } from "@tests/notes/noteTextContentTestSupport"
+import {
+  noToastShown,
+  showToastsOnPage,
+  toastMessage,
+  toastShown,
+} from "@tests/helpers/toastTestSupport"
 import { referencedTitleSavePanelSelector } from "@tests/notes/textContentWrapperTestSupport"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 
@@ -39,6 +48,7 @@ vi.mock("@/models/audio/audioRecorder", async () => {
 })
 
 useSpokenTitleTestLifecycle("Apple orchard care")
+showToastsOnPage()
 
 describe("NoteEditableTitle spoken title", () => {
   let wrapper: VueWrapper<ComponentPublicInstance>
@@ -51,24 +61,27 @@ describe("NoteEditableTitle spoken title", () => {
     wrapper?.unmount()
   })
 
-  it("names the control Stop and shows recording status while listening", async () => {
+  it("is an idle microphone button at the end of the heading line, then a highlighted one while listening", async () => {
     const note = makeMe.aNote.title("Orchard notes").please()
     wrapper = mountNoteEditableTitle({
       noteTopology: note.noteTopology,
       noteId: note.id,
     })
 
-    expect(findSpeakTitleButtonByText(wrapper, "Speak the title")).toBeTruthy()
-    expect(findSpeakTitleButtonByText(wrapper, "Stop")).toBeUndefined()
-    expect(speakTitleStatus(wrapper)).toBeUndefined()
+    expectIdleSpeakTitleButton(wrapper)
+    const heading = wrapper.find("h2").element
+    const button = speakTitleButton(wrapper, "Speak the title").element
+    expect(heading.nextElementSibling).toBe(button)
+    expect(button.getBoundingClientRect().left).toBeGreaterThanOrEqual(
+      heading.getBoundingClientRect().right
+    )
+    expect(button.getBoundingClientRect().top).toBeLessThan(
+      heading.getBoundingClientRect().bottom
+    )
 
     await speakTheTitle(wrapper)
 
-    expect(findSpeakTitleButtonByText(wrapper, "Stop")).toBeTruthy()
-    expect(
-      findSpeakTitleButtonByText(wrapper, "Speak the title")
-    ).toBeUndefined()
-    expect(speakTitleStatus(wrapper)).toBe("Recording. Speak now.")
+    expectListeningSpeakTitleButton(wrapper)
   })
 
   it("keeps a typed correction after speaking", async () => {
@@ -85,7 +98,7 @@ describe("NoteEditableTitle spoken title", () => {
     expect(noteTitleText(wrapper)).toBe("Apple orchid care")
   })
 
-  it("does not offer Speak the title when readonly", () => {
+  it("does not offer the microphone button when readonly", () => {
     const note = makeMe.aNote.title("Orchard notes").please()
     wrapper = mountNoteEditableTitle({
       noteTopology: note.noteTopology,
@@ -93,9 +106,7 @@ describe("NoteEditableTitle spoken title", () => {
       readonly: true,
     })
 
-    expect(
-      findSpeakTitleButtonByText(wrapper, "Speak the title")
-    ).toBeUndefined()
+    expect(speakTitleButton(wrapper, "Speak the title").exists()).toBe(false)
     expect(noteTitleText(wrapper)).toBe("Orchard notes")
   })
 
@@ -133,7 +144,8 @@ describe("NoteEditableTitle spoken title", () => {
     stubSilentStopRecording()
     await stopSpeaking(wrapper)
 
-    expect(speakTitleStatus(wrapper)).toBe("No speech was turned into text.")
+    expectIdleSpeakTitleButton(wrapper)
+    await noToastShown()
     expect(noteTitleText(wrapper)).toBe("Orchard notes")
     expect(mockedUpdateTitleCall).not.toHaveBeenCalled()
   })
@@ -148,35 +160,39 @@ describe("NoteEditableTitle spoken title", () => {
 
     await speakAndStop(wrapper)
 
-    expect(speakTitleStatus(wrapper)).toBe("No speech was turned into text.")
+    expectIdleSpeakTitleButton(wrapper)
+    await noToastShown()
     expect(noteTitleText(wrapper)).toBe("Orchard notes")
     expect(mockedUpdateTitleCall).not.toHaveBeenCalled()
   })
 
-  it("leaves the title alone after a failed conversion, then places the words on the next speak", async () => {
+  it("leaves the title and the caret alone after a failed conversion, then places the words there on the next speak", async () => {
     mockAudioToTextFailThen("Lighthouse keepers")
     const note = makeMe.aNote.title("Orchard notes").please()
     wrapper = mountNoteEditableTitle({
       noteTopology: note.noteTopology,
       noteId: note.id,
     })
+    placeCaretInTitle(wrapper, "Orchard".length)
 
     await speakAndStop(wrapper)
 
-    expect(speakTitleStatus(wrapper)).toBe(
+    expect(toastMessage(await toastShown("error"))).toBe(
       "Could not turn your speech into text."
     )
+    expectIdleSpeakTitleButton(wrapper)
     expect(noteTitleText(wrapper)).toBe("Orchard notes")
+    expect(titleCaretOffset()).toBe("Orchard".length)
     expect(mockedUpdateTitleCall).not.toHaveBeenCalled()
 
     await speakAndStop(wrapper)
     vi.advanceTimersByTime(1000)
     await flushPromises()
 
-    expect(noteTitleText(wrapper)).toBe("Orchard notes Lighthouse keepers")
+    expect(noteTitleText(wrapper)).toBe("Orchard Lighthouse keepers notes")
     expect(mockedUpdateTitleCall).toHaveBeenCalledWith({
       path: { note: note.id },
-      body: { newTitle: "Orchard notes Lighthouse keepers" },
+      body: { newTitle: "Orchard Lighthouse keepers notes" },
     })
   })
 })

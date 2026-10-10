@@ -13,12 +13,14 @@ import {
   type NoteNewFormSdkSpies,
 } from "@tests/notes/noteNewFormTestSupport"
 import {
-  findSpeakTitleButtonByText,
+  expectConvertingSpeakTitleButton,
+  expectIdleSpeakTitleButton,
+  expectListeningSpeakTitleButton,
   hearing,
   holdSpeakTitleConvertingUntilFinished,
   speakAndStop,
   speakTheTitle,
-  speakTitleStatus,
+  speakTitleButton,
   stopSpeaking,
   useSpokenTitleTestLifecycle,
 } from "@tests/notes/spokenTitleTestSupport"
@@ -52,27 +54,24 @@ describe("NoteNewForm spoken title", () => {
     wrapper?.unmount()
   })
 
-  it("names the control in words when idle and while listening", async () => {
+  it("is an idle microphone button in the title field before the Wikidata button, then a highlighted one while listening", async () => {
     wrapper = mountNoteNewForm(notebookRootProps, { attachTo: document.body })
 
-    expect(findSpeakTitleButtonByText(wrapper, "Speak the title")).toBeTruthy()
-    expect(findSpeakTitleButtonByText(wrapper, "Stop")).toBeUndefined()
-    expect(speakTitleStatus(wrapper)).toBeUndefined()
+    expectIdleSpeakTitleButton(wrapper)
+    expect(
+      speakTitleButton(wrapper, "Speak the title").element.nextElementSibling
+    ).toBe(wrapper.find('button[aria-label="Wikidata Id"]').element)
 
     await speakTheTitle(wrapper)
 
-    expect(findSpeakTitleButtonByText(wrapper, "Stop")).toBeTruthy()
-    expect(
-      findSpeakTitleButtonByText(wrapper, "Speak the title")
-    ).toBeUndefined()
-    expect(speakTitleStatus(wrapper)).toBe("Recording. Speak now.")
+    expectListeningSpeakTitleButton(wrapper)
     expect(vi.mocked(createAudioRecorder)).toHaveBeenCalledWith(
       expect.any(Function),
       { convertOnlyAtStop: true }
     )
   })
 
-  it("announces converting, then puts heard words in the title and clears status", async () => {
+  it("is unavailable while converting, then puts heard words in the title and is idle", async () => {
     wrapper = mountNoteNewForm(notebookRootProps, { attachTo: document.body })
     await speakTheTitle(wrapper)
 
@@ -80,15 +79,14 @@ describe("NoteNewForm spoken title", () => {
 
     const stopClick = stopSpeaking(wrapper)
     await flushPromises()
-    expect(speakTitleStatus(wrapper)).toBe("Turning your speech into text…")
+    expectConvertingSpeakTitleButton(wrapper)
 
     finishStop()
     await stopClick
     await flushPromises()
 
     expect(noteTitleText(wrapper)).toBe("Photosynthesis in desert plants.")
-    expect(speakTitleStatus(wrapper)).toBeUndefined()
-    expect(findSpeakTitleButtonByText(wrapper, "Speak the title")).toBeTruthy()
+    expectIdleSpeakTitleButton(wrapper)
   })
 
   it("replaces illegal path characters and shows the warning for heard segments", async () => {
