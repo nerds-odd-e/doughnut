@@ -202,6 +202,7 @@ describe("NoteAudioTools content preservation", () => {
     await processAudio(dictation.wrapper)
     await expect(processAudio(dictation.wrapper)).rejects.toThrow()
     await processAudio(dictation.wrapper)
+    expect(dictation.wrapper.text()).toBe("Record")
     expect(dictation.updateContentMock).toHaveBeenLastCalledWith({
       path: { note: note.id },
       body: {

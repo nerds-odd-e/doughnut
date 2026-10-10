@@ -1,18 +1,17 @@
-import { AiAudioController } from "@generated/donut-backend-api/sdk.gen"
-import makeMe from "donut-test-fixtures/makeMe"
-import { mockSdkServiceWithImplementation } from "@tests/helpers"
 import {
   audioToolsVm,
-  dictationStatus,
   findButtonByText,
-  midSpeechChunk,
   mountNoteAudioTools,
-  processAudio,
   startRecording,
   stopRecording,
   useNoteAudioToolsTestLifecycle,
   type NoteAudioToolsWrapper,
 } from "@tests/notes/noteAudioToolsTestSupport"
+import {
+  showToastsOnPage,
+  toastMessage,
+  toastShown,
+} from "@tests/helpers/toastTestSupport"
 import { flushPromises } from "@vue/test-utils"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 
@@ -38,37 +37,32 @@ vi.mock("@/models/wakeLocker", async () => {
 })
 
 useNoteAudioToolsTestLifecycle()
+showToastsOnPage()
 
 describe("NoteAudioTools recording controls", () => {
   let wrapper: NoteAudioToolsWrapper
-  const note = makeMe.aNote.please()
 
   beforeEach(() => {
-    wrapper = mountNoteAudioTools(note)
+    wrapper = mountNoteAudioTools()
   })
 
   afterEach(() => {
     wrapper?.unmount()
   })
 
-  it("offers Record when ready, then Stop while recording, with the status announced", async () => {
-    expect(dictationStatus(wrapper)).toBe("Ready to record")
-    expect(findButtonByText(wrapper, "Record")).toBeTruthy()
-    expect(findButtonByText(wrapper, "Stop")).toBeUndefined()
-    expect(findButtonByText(wrapper, "Write text now")).toBeUndefined()
+  const buttonTexts = () =>
+    wrapper.findAll("button").map((button) => button.text())
+
+  it("offers only Record when ready, then Stop, Write text now and the microphone chooser while recording", async () => {
+    expect(wrapper.text()).toBe("Record")
 
     await startRecording(wrapper)
 
-    expect(dictationStatus(wrapper)).toBe("Recording. Speak now.")
-    expect(findButtonByText(wrapper, "Record")).toBeUndefined()
-    expect(findButtonByText(wrapper, "Stop")).toBeTruthy()
+    expect(buttonTexts()).toEqual(["Stop", "Write text now"])
     expect(wrapper.find(".device-select").exists()).toBe(true)
     expect(
       findButtonByText(wrapper, "Write text now")!.attributes("disabled")
     ).toBeUndefined()
-    expect(
-      findButtonByText(wrapper, "Save audio")!.attributes("disabled")
-    ).toBeDefined()
   })
 
   it("starts recording with wake lock and Web Audio connections", async () => {
@@ -133,6 +127,21 @@ describe("NoteAudioTools recording controls", () => {
     })
   })
 
+  it("toasts a microphone switch that fails and keeps recording", async () => {
+    await startRecording(wrapper)
+    audioToolsVm(wrapper).audioRecorder.switchAudioDevice.mockRejectedValueOnce(
+      new Error("Device gone")
+    )
+
+    await wrapper.find(".device-select").setValue("device2")
+    await flushPromises()
+
+    expect(toastMessage(await toastShown("error"))).toBe(
+      "Failed to switch audio device"
+    )
+    expect(buttonTexts()).toEqual(["Stop", "Write text now"])
+  })
+
   it("can start a second recording after stop", async () => {
     await startRecording(wrapper)
     await stopRecording(wrapper)
@@ -150,35 +159,19 @@ describe("NoteAudioTools recording controls", () => {
     expect(audioToolsVm(wrapper).audioRecorder.tryFlush).toHaveBeenCalled()
   })
 
-  it("disables Write text now during a conversion", async () => {
-    await startRecording(wrapper)
-    const writeNowButton = findButtonByText(wrapper, "Write text now")!
-
-    type AudioResponse = {
-      segmentTexts: string[]
-      endTimestamp: string
-    }
-    let resolveProcess!: (value: AudioResponse) => void
-    const processPromise = new Promise<AudioResponse>((resolve) => {
-      resolveProcess = resolve
-    })
-    mockSdkServiceWithImplementation(
-      AiAudioController,
-      "audioToText",
-      async () => await processPromise
+  it("explains a microphone that cannot be used and keeps Record available", async () => {
+    audioToolsVm(wrapper).audioRecorder.startRecording.mockRejectedValueOnce(
+      new Error("Permission denied")
     )
+    await startRecording(wrapper)
 
-    const processing = processAudio(wrapper, midSpeechChunk())
-    await flushPromises()
-    expect(writeNowButton.attributes("disabled")).toBeDefined()
+    expect(toastMessage(await toastShown("error"))).toBe(
+      "Could not use the microphone. Allow microphone access in your browser, then try again."
+    )
+    expect(wrapper.text()).toBe("Record")
 
-    resolveProcess({
-      segmentTexts: ["test"],
-      endTimestamp: "00:00:37,270",
-    })
-    await processing
-    await flushPromises()
-    expect(writeNowButton.attributes("disabled")).toBeFalsy()
+    await startRecording(wrapper)
+    expect(buttonTexts()).toEqual(["Stop", "Write text now"])
   })
 
   it("stops recording when unmounted while recording", async () => {
@@ -190,44 +183,5 @@ describe("NoteAudioTools recording controls", () => {
 
     expect(vm.isRecording).toBe(false)
     expect(vm.audioRecorder.stopRecording).toHaveBeenCalled()
-  })
-
-  it("enables Save audio after a recording produces a file", async () => {
-    const saveButton = findButtonByText(wrapper, "Save audio")!
-    expect(saveButton.attributes("disabled")).toBeDefined()
-
-    await startRecording(wrapper)
-    await stopRecording(wrapper)
-    audioToolsVm(wrapper).audioFile = new File([], "test.webm")
-    await wrapper.vm.$nextTick()
-
-    expect(saveButton.attributes("disabled")).toBeFalsy()
-  })
-
-  it("downloads audio via object URL when Save audio is clicked", async () => {
-    const { mockCreateObjectURL } = await import(
-      "@tests/notes/noteAudioToolsMocks"
-    )
-    const audioFile = new File([], "test.webm")
-    audioToolsVm(wrapper).audioFile = audioFile
-    await wrapper.vm.$nextTick()
-
-    const mockAppendChild = vi.spyOn(document.body, "appendChild")
-    const mockRemoveChild = vi.spyOn(document.body, "removeChild")
-    const mockClick = vi.spyOn(HTMLAnchorElement.prototype, "click")
-
-    await findButtonByText(wrapper, "Save audio")!.trigger("click")
-
-    expect(URL.createObjectURL).toHaveBeenCalledWith(audioFile)
-    expect(mockAppendChild).toHaveBeenCalled()
-    expect(mockClick).toHaveBeenCalled()
-    expect(mockRemoveChild).toHaveBeenCalled()
-    expect(URL.revokeObjectURL).toHaveBeenCalledWith(
-      mockCreateObjectURL(audioFile)
-    )
-
-    mockAppendChild.mockRestore()
-    mockRemoveChild.mockRestore()
-    mockClick.mockRestore()
   })
 })

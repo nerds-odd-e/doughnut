@@ -1,9 +1,0 @@
-{
-  "schemaVersion": 1,
-  "agent": "Airi-chan",
-  "email": "airi-chan@example.org",
-  "identity": "SEED-066#simplify-voice-input-feedback",
-  "mode": "story-branch",
-  "branch": "claude/simplify-voice-input-controls-and-feedback",
-  "host": "claude"
-}

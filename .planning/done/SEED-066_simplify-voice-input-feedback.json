@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 1,
+  "identity": "SEED-066#simplify-voice-input-feedback",
+  "title": "Simplify voice input controls and feedback",
+  "completedAt": "2026-10-10T12:02:51.430Z",
+  "developer": "Terry Yin",
+  "agent": "Airi-chan",
+  "host": "claude"
+}

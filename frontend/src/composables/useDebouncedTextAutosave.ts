@@ -47,14 +47,6 @@ export function useDebouncedTextAutosave(
   const isDirty = computed(() => hasUnsavedChanges())
 
   let persistChain: Promise<boolean> = Promise.resolve(true)
-  /** Newest proposal version whose value is known to be saved. */
-  let persistedVersion = 0
-
-  /** Version numbers above the saved one are reused afterwards, so their saves are forgotten. */
-  const returnToSavedVersion = () => {
-    version.value = savedVersion.value
-    persistedVersion = savedVersion.value
-  }
 
   const isCurrentProposal = (nextVersion: number) =>
     nextVersion === version.value
@@ -68,7 +60,6 @@ export function useDebouncedTextAutosave(
     }
     if (normalize(newValue) === normalize(lastSavedValue.value ?? "")) {
       savedVersion.value = nextVersion
-      persistedVersion = Math.max(persistedVersion, nextVersion)
       return true
     }
     if (options.beforePersist) {
@@ -83,7 +74,6 @@ export function useDebouncedTextAutosave(
     pendingSaveValues.add(newValue)
     try {
       await options.persist(newValue)
-      persistedVersion = Math.max(persistedVersion, nextVersion)
       if (isCurrentProposal(nextVersion)) {
         if (hasUnsavedChanges()) {
           lastSavedValue.value = newValue
@@ -119,7 +109,7 @@ export function useDebouncedTextAutosave(
     if (normalizedNewValue === normalizedLastSaved) {
       cancel()
       if (pendingSaveValues.size === 0) {
-        returnToSavedVersion()
+        version.value = savedVersion.value
         return
       }
       // In-flight write may still change the acknowledged value; keep the draft
@@ -140,20 +130,6 @@ export function useDebouncedTextAutosave(
     debouncedPersist.flush()
   }
 
-  /**
-   * Saves the draft now; resolves whether it, or a newer draft that replaced it
-   * before it was sent, was saved, even if the author has typed since.
-   */
-  const flushAndConfirmDraftSaved = async (): Promise<boolean> => {
-    const target = version.value
-    while (persistedVersion < target) {
-      if (version.value < target) return false
-      flush()
-      if (!(await persistChain)) return false
-    }
-    return true
-  }
-
   const flushAndWait = async (): Promise<boolean> => {
     flush()
     const saved = await persistChain
@@ -167,12 +143,12 @@ export function useDebouncedTextAutosave(
   const discardDraft = () => {
     errors.value = {}
     localValue.value = lastSavedValue.value ?? ""
-    returnToSavedVersion()
+    version.value = savedVersion.value
   }
 
   const replaceFromExternal = (newValue: string) => {
     cancel()
-    returnToSavedVersion()
+    version.value = savedVersion.value
     localValue.value = newValue
     lastSavedValue.value = newValue
   }
@@ -226,7 +202,6 @@ export function useDebouncedTextAutosave(
     hasUnsavedChanges,
     propose,
     flush,
-    flushAndConfirmDraftSaved,
     flushAndWait,
     cancel,
     discardDraft,

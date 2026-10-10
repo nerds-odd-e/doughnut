@@ -42,16 +42,9 @@ Then('the Title field should read {string}', (title: string) => {
   noteCreationForm.expectTitle(title)
 })
 
-Then('I should be told my speech was added to my note', () => {
-  start.assumeAudioTools().expectAddedToNote()
+Then('I should be offered Retry for my recording', () => {
+  start.assumeAudioTools().expectRetryOffered()
 })
-
-Then(
-  'I should be told my speech could not be turned into text, with Retry',
-  () => {
-    start.assumeAudioTools().expectConversionFailureWithRetry()
-  }
-)
 
 When('I retry converting my speech', () => {
   start.assumeAudioTools().retry()

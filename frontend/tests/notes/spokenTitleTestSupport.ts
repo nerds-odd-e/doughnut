@@ -110,12 +110,12 @@ export function holdSpeakTitleConvertingUntilFinished() {
   let finishStop!: () => void
   recorder.stopRecording.mockImplementation(
     () =>
-      new Promise<File>((resolve) => {
+      new Promise<void>((resolve) => {
         finishStop = () => {
           processAudio({
             data: new File([], "test.webm"),
             isMidSpeech: false,
-          }).then(() => resolve(new File([], "test.webm")))
+          }).then(() => resolve())
         }
       })
   )
@@ -125,7 +125,7 @@ export function holdSpeakTitleConvertingUntilFinished() {
 /** Stop without invoking the processor — silent recording, no conversion. */
 export function stubSilentStopRecording() {
   latestMockedAudioRecorder().stopRecording.mockImplementation(
-    async () => new File([], "test.webm")
+    async () => undefined
   )
 }
 

@@ -15,12 +15,19 @@ import {
   midSpeechChunk,
   audioTextResponse,
   mountNoteAudioTools,
+  findButtonByText,
   processAudio,
+  startRecording,
   useNoteAudioToolsTestLifecycle,
   type NoteAudioToolsWrapper,
 } from "@tests/notes/noteAudioToolsTestSupport"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import { flushPromises } from "@vue/test-utils"
+import {
+  showToastsOnPage,
+  toastMessage,
+  toastShown,
+} from "@tests/helpers/toastTestSupport"
 
 vi.mock("@/models/audio/recorderWorklet", async () => {
   const { recorderWorkletMockExports } = await import(
@@ -44,6 +51,7 @@ vi.mock("@/models/wakeLocker", async () => {
 })
 
 useNoteAudioToolsTestLifecycle()
+showToastsOnPage()
 
 describe("NoteAudioTools audio processing", () => {
   let wrapper: NoteAudioToolsWrapper
@@ -120,24 +128,20 @@ describe("NoteAudioTools audio processing", () => {
     })
   })
 
-  it("tells the author in plain words when a conversion fails, until one succeeds", async () => {
+  it("toasts a failed mid-speech conversion and keeps recording without Retry, the body as it was", async () => {
+    await startRecording(wrapper)
     audioToTextMock.mockResolvedValueOnce(wrapSdkError("API Error"))
-    await expect(processAudio(wrapper)).rejects.toThrow()
+    await expect(processAudio(wrapper, midSpeechChunk())).rejects.toThrow()
     await flushPromises()
 
-    const alert = wrapper.find(".daisy-alert")
-    expect(alert.text()).toBe(
+    expect(toastMessage(await toastShown("error"))).toBe(
       "Could not turn your speech into text. Your recording is kept."
     )
-    expect(alert.classes()).toContain("daisy-alert-error")
+    expect(findButtonByText(wrapper, "Stop")).toBeTruthy()
+    expect(findButtonByText(wrapper, "Retry")).toBeUndefined()
     expect(updateContentMock).not.toHaveBeenCalled()
     expect(noteStore.refOfNoteRealm(note.id).value?.note.content).toBe(
       "Original body."
     )
-
-    await processAudio(wrapper)
-    await flushPromises()
-
-    expect(wrapper.find(".daisy-alert").exists()).toBe(false)
   })
 })

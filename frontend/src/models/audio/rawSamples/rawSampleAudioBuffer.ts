@@ -75,10 +75,6 @@ class RawAudioBuffer implements AudioBuffer {
       : dataToProcess
   }
 
-  createFinalAudioFile(): File {
-    return createAudioFile(this.audioData, this.sampleRate, false)
-  }
-
   public setOnSilenceThresholdReached(callback: () => void): void {
     this.onSilenceThresholdReached = callback
   }
@@ -114,7 +110,7 @@ class RawAudioBuffer implements AudioBuffer {
     const startInternalIndex = this.lastProcessedInternalIndex
     const snapshotLength = this.audioData.length
 
-    const file = createAudioFile(dataToProcess, this.sampleRate, true)
+    const file = createAudioFile(dataToProcess, this.sampleRate)
     const timestamp = await processorCallback({ data: file, isMidSpeech })
 
     const processedSeconds = timestamp

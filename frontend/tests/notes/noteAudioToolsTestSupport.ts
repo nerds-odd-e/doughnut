@@ -26,8 +26,6 @@ export type NoteAudioToolsVm = {
     release: ReturnType<typeof vi.fn>
   }
   isRecording: boolean
-  audioFile: File | null
-  errors: Record<string, string> | null
   processAudio: (chunk: AudioChunk) => Promise<string | undefined>
 }
 
@@ -69,10 +67,6 @@ export function findButtonByText(wrapper: NoteAudioToolsWrapper, text: string) {
   return wrapper.findAll("button").find((button) => button.text() === text)
 }
 
-export function dictationStatus(wrapper: NoteAudioToolsWrapper) {
-  return wrapper.get('[role="status"]').text()
-}
-
 export function mountNoteAudioTools(
   note: Note = makeMe.aNote.please(),
   options?: { attachToBody?: boolean }
@@ -110,6 +104,5 @@ export function useNoteAudioToolsTestLifecycle() {
   afterEach(() => {
     vi.restoreAllMocks()
     vi.useRealTimers()
-    document.body.innerHTML = ""
   })
 }

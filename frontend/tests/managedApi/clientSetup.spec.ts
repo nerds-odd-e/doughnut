@@ -7,12 +7,11 @@ import {
 } from "@generated/donut-backend-api/sdk.gen"
 import { healthcheckPingBody, mockSdkService } from "@tests/helpers"
 import {
+  noToastShown,
   showToastsOnPage,
-  toastOnPage,
   toastShown,
   toastTimeout,
 } from "@tests/helpers/toastTestSupport"
-import { flushPromises } from "@vue/test-utils"
 import { page } from "vitest/browser"
 import {
   afterEach,
@@ -27,11 +26,6 @@ import createFetchMock from "vitest-fetch-mock"
 
 const fetchMock = createFetchMock(vi)
 fetchMock.enableMocks()
-
-const noToastShown = async () => {
-  await flushPromises()
-  expect(toastOnPage()).toBeNull()
-}
 
 describe("clientSetup", () => {
   const apiStatus: ApiStatus = { states: [] }

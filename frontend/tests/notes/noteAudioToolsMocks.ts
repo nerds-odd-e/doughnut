@@ -49,12 +49,6 @@ export const mockMediaDevices = {
   addEventListener: vi.fn(),
 }
 
-export const mockCreateObjectURL = vi.fn(
-  (blob: Blob | MediaSource) =>
-    `blob:${(blob as Blob).type || "unknown"}-mocked-url`
-)
-export const mockRevokeObjectURL = vi.fn()
-
 export function clearAudioHardwareMocks() {
   mockMediaStreamSource.connect.mockClear()
   mockMediaStreamSource.disconnect.mockClear()
@@ -65,8 +59,6 @@ export function clearAudioHardwareMocks() {
   mockMediaDevices.getUserMedia.mockClear()
   mockMediaDevices.enumerateDevices.mockClear()
   mockMediaStop.mockClear()
-  mockCreateObjectURL.mockClear()
-  mockRevokeObjectURL.mockClear()
 }
 
 export function installAudioBrowserSpies() {
@@ -81,8 +73,6 @@ export function installAudioBrowserSpies() {
     writable: true,
     configurable: true,
   })
-  vi.spyOn(URL, "createObjectURL").mockImplementation(mockCreateObjectURL)
-  vi.spyOn(URL, "revokeObjectURL").mockImplementation(mockRevokeObjectURL)
 
   const mockContext = {
     drawImage: vi.fn(),
@@ -106,7 +96,7 @@ function mockAudioRecorderMethods(
       data: File
       isMidSpeech: boolean
     }) => Promise<string | undefined>
-  ) => Promise<File>
+  ) => Promise<void>
 ) {
   return (
     callback: (chunk: {
@@ -126,7 +116,6 @@ function mockAudioRecorderMethods(
       mockAudioWorkletNode.disconnect()
       mockMediaStreamSource.disconnect()
       mockMediaStop()
-      return new File([], "test.webm")
     }),
     getAudioData: vi.fn(() => 0),
     tryFlush: vi.fn().mockResolvedValue(undefined),
@@ -162,7 +151,6 @@ export function audioRecorderInvokingCallbackMockExports() {
         mockAudioWorkletNode.disconnect()
         mockMediaStreamSource.disconnect()
         mockMediaStop()
-        return new File([], "test.webm")
       })
     ),
   }

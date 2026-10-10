@@ -5,7 +5,6 @@ export interface AudioBuffer {
     isMidSpeech?: boolean
   ) => Promise<void>
   setOnSilenceThresholdReached: (callback: () => void) => void
-  createFinalAudioFile(): File
 }
 
 export interface AudioReceiver {

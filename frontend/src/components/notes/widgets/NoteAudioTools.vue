@@ -5,16 +5,8 @@
       :audioRecorder="audioRecorder"
       :isRecording="isRecording"
     />
-    <div class="flex justify-center items-center gap-2 text-center mb-3">
-      <p role="status" :class="{ 'text-error': isProblem }">{{ status }}</p>
-      <button v-if="phase === 'notConverted'" class="daisy-btn daisy-btn-sm retry-button" @click="retry">Retry</button>
-    </div>
-    <div
-      v-if="errors && phase !== 'notConverted'"
-      class="daisy-alert"
-      :class="errors.conversion ? 'daisy-alert-error' : 'daisy-alert-info'"
-    >{{ errors.conversion ?? errors }}</div>
     <div class="button-group">
+      <button v-if="phase === 'notConverted'" class="daisy-btn labeled-action" @click="stopRecording">Retry</button>
       <button
         v-if="!isRecording"
         class="daisy-btn labeled-action"
@@ -42,20 +34,6 @@
         <button class="daisy-btn labeled-action" @click="audioRecorder.tryFlush()" :disabled="isProcessing">Write text now</button>
       </template>
     </div>
-    <div class="secondary-actions">
-      <button
-        @click="saveAudioLocally(audioFile as Blob)"
-        :disabled="isRecording || !audioFile"
-      >
-        <Download :size="18" />
-        Save audio
-      </button>
-      <FullScreen>
-        <div v-if="errors" class="fullscreen-error">
-          {{ Object.values(errors)[0] }}
-        </div>
-      </FullScreen>
-    </div>
   </section>
 </template>
 
@@ -63,41 +41,24 @@
 import { computed, onBeforeUnmount, ref, type PropType } from "vue"
 import { createAudioRecorder } from "../../../models/audio/audioRecorder"
 import { createWakeLocker } from "../../../models/wakeLocker"
-import { saveAudioLocally } from "@/models/audio/saveAudioLocally"
 import type { Note } from "@generated/donut-backend-api"
 import Waveform from "./Waveform.vue"
-import FullScreen from "@/components/common/FullScreen.vue"
 import { noteMoreOptionsTitles } from "./noteMoreOptionsTitles"
-import { Download, Mic, Square } from "@lucide/vue"
+import { Mic, Square } from "@lucide/vue"
 import { useNoteAudioProcessing } from "@/composables/useNoteAudioProcessing"
+import { useToast } from "@/composables/useToast"
 
 const { note } = defineProps({
   note: { type: Object as PropType<Note>, required: true },
 })
 
-const audioFile = ref<Blob | undefined>()
-const errors = ref<Record<string, string | undefined>>()
-const statusByPhase = {
-  ready: "Ready to record",
-  recording: "Recording. Speak now.",
-  stopping: "Turning your speech into text…",
-  added: "Added to your note.",
-  nothingAdded: "No speech was turned into text.",
-  notConverted:
-    "Could not turn your speech into text. Your recording is kept until you close Audio tools.",
-  micUnavailable:
-    "Could not use the microphone. Allow microphone access in your browser, then try again.",
-} as const
-const phase = ref<keyof typeof statusByPhase>("ready")
+const phase = ref<"ready" | "recording" | "stopping" | "notConverted">("ready")
 const isRecording = computed(() => phase.value === "recording")
-const status = computed(() => statusByPhase[phase.value])
-const isProblem = computed(
-  () => phase.value === "notConverted" || phase.value === "micUnavailable"
-)
 const wakeLocker = createWakeLocker()
+const { showErrorToast } = useToast()
 
-const { processAudio, isProcessing, startNewRecording, writtenResult } =
-  useNoteAudioProcessing(note, errors)
+const { processAudio, isProcessing, lastConversionFailed } =
+  useNoteAudioProcessing(note)
 
 const audioRecorder = createAudioRecorder(processAudio)
 const audioDevices = audioRecorder.getAudioDevices()
@@ -107,20 +68,20 @@ const onDeviceChange = async (event: Event) => {
   const deviceId = (event.target as HTMLSelectElement).value
   try {
     await audioRecorder.switchAudioDevice(deviceId)
-  } catch (error) {
-    errors.value = { devices: "Failed to switch audio device" }
+  } catch {
+    showErrorToast("Failed to switch audio device")
   }
 }
 
 const startRecording = async () => {
-  errors.value = undefined
-  startNewRecording()
   try {
     await wakeLocker.request()
     await audioRecorder.startRecording()
     phase.value = "recording"
-  } catch (error) {
-    phase.value = "micUnavailable"
+  } catch {
+    showErrorToast(
+      "Could not use the microphone. Allow microphone access in your browser, then try again."
+    )
     await wakeLocker.release()
   }
 }
@@ -128,21 +89,14 @@ const startRecording = async () => {
 const stopRecording = async () => {
   phase.value = "stopping"
   try {
-    audioFile.value = await audioRecorder.stopRecording()
+    await audioRecorder.stopRecording()
   } finally {
-    const written = await writtenResult()
-    if (errors.value?.conversion && audioRecorder.hasUnconvertedAudio()) {
-      phase.value = "notConverted"
-    } else {
-      phase.value = written === "notSaved" ? "ready" : written
-    }
+    phase.value =
+      lastConversionFailed.value && audioRecorder.hasUnconvertedAudio()
+        ? "notConverted"
+        : "ready"
     await wakeLocker.release()
   }
-}
-
-const retry = () => {
-  errors.value = undefined
-  return stopRecording()
 }
 
 onBeforeUnmount(() => {
@@ -183,8 +137,7 @@ onBeforeUnmount(() => {
   transform: scale(1.05);
 }
 
-.daisy-btn:disabled,
-.secondary-actions :deep(button:disabled) {
+.daisy-btn:disabled {
   background-color: #a0aec0;
   cursor: not-allowed;
 }
@@ -197,43 +150,6 @@ onBeforeUnmount(() => {
   .daisy-btn {
     padding: 8px;
   }
-}
-
-.retry-button {
-  border-radius: 8px;
-}
-
-.secondary-actions {
-  display: flex;
-  justify-content: center;
-  gap: 12px;
-  margin-top: 20px;
-}
-
-.secondary-actions :deep(button) {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 6px 14px;
-  border: none;
-  border-radius: 9999px;
-  background-color: #2d3748;
-  color: white;
-  font-size: 14px;
-  cursor: pointer;
-  transition: background-color 0.3s ease, transform 0.2s ease;
-}
-
-.secondary-actions :deep(button:hover:not(:disabled)) {
-  background-color: #4a5568;
-  transform: scale(1.05);
-}
-
-.fullscreen-error {
-  color: #fc8181;
-  font-size: 14px;
-  text-align: center;
-  max-width: 80%;
 }
 
 .device-select {

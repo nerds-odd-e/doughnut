@@ -6,7 +6,7 @@ released response is not proof of effectiveness. Unknown provenance stays unknow
 [Response status](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/finding-names.md).
 Full pre-trim evidence: `8830c682704aac3bbb34bf9b1204da8feba042ca:DearDough.md`. Older narratives live in Git, not a second archive.
 
-- Highest allocated local number: 220. Removed local codes are never reused.
+- Highest allocated local number: 221. Removed local codes are never reused.
 
 Detailed retained observations are consolidated in the linked Open Dough
 record; headings and former local aliases preserve traceability. Review date:
@@ -61,6 +61,16 @@ Follow-up: delivered, unreleased: [Observe decisive planning premises through th
 
 Evidence and response: [ODF-074](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/finding-names.md#odf-074).
 
+### Occurrences
+- Execution: SEED-066#simplify-voice-input-feedback (first implementation commit dd22b17de2)
+  - Timestamp: 2026-10-10T19:57:33+09:00
+  - Tool: Claude Code
+  - Model: claude-opus-5-5
+  - Open Dough release: 0.3.58
+  - Evidence: `6f6f3d32c9:.planning/slice-plans/063-simplify-voice-input-feedback/PLAN.md` slice 2 ("Delete … `noteAudioToolsSavedContentTestSupport.ts`"), slice 4 ("cut from `e2e_test/fixtures/harvard.wav` or `lecture.wav`", "2026-10-06 measurement"), slice 2 proof ("no toast"); slice 2, 3 and 4 agent returns in the execution conversation
+  - Observed effect: the test-support file named for deletion is imported by the preservation and language-joining specs, so the implementer kept it; neither fixture holds 60 s of speech (18.4 s and 3.1 s), so the probe looped one; the cited measurement is dated 2026-10-03 in the seed; "no toast" could not be observed in slice 2 because no panel code raised a toast until slice 3, so it moved there as a story obligation
+  - Inference: each premise was a one-command check at planning time (an import search, a duration read, a date read); none stopped a slice, and each cost a plan correction during delivery
+
 ## ODF-147 — An implementer reasoned that a new test would fail instead of running it red, and one of its tests could not fail
 
 Former local code: DD-127.
@@ -80,6 +90,16 @@ A formatter piped through tail returns the final pipeline stage's success, allow
 Follow-up: Open, unqueued.
 
 Evidence and response: [ODF-100](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/finding-names.md#odf-100).
+
+### Occurrences
+- Execution: SEED-066#simplify-voice-input-feedback (first implementation commit dd22b17de2)
+  - Timestamp: 2026-10-10T19:57:33+09:00
+  - Tool: Claude Code
+  - Model: claude-opus-5-5
+  - Open Dough release: 0.3.58
+  - Evidence: slice 1 implementation return in the execution conversation: "The exit code I captured was the pipe's, not `vue-tsc`'s, so the evidence is the empty output"; the coordinator's slice 2, 3 and 5 briefs give the type-check command with `; echo "exit=$?"`
+  - Observed effect: the coordinator accepted slice 1's type check on empty output without a rerun; later slices returned real exit codes once the brief spelled the command out
+  - Inference: the first brief asked for a type check "if the frontend has a quick one" without a literal command, so the agent chose the pipe
 
 ## ODF-152 — The file-size rule conflicted with an approved staged simplification and mechanical callers
 
@@ -130,6 +150,16 @@ Every small slice launches a fresh full refactor agent even when the accepted di
 Follow-up: Open, unqueued.
 
 Evidence and response: [ODF-141](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/finding-names.md#odf-141).
+
+### Occurrences
+- Execution: SEED-066#simplify-voice-input-feedback (first implementation commit dd22b17de2)
+  - Timestamp: 2026-10-10T19:57:33+09:00
+  - Tool: Claude Code
+  - Model: claude-opus-5-5
+  - Open Dough release: 0.3.58
+  - Evidence: refactor returns for slices 1 and 5 ("none — already clean", about 80,000 and 53,000 sub-agent tokens); refactor returns for slices 2 and 3 with edits (a spec over the file-size limit split, a duplicated `noToastShown` helper merged, an absence sentence removed from the doc)
+  - Observed effect: two of four refactor passes made no edit; slice 5's diff was one constant, two spec files and one doc line
+  - Inference: the two passes that edited found things the implementation returns had not, so the cost question is about the smallest slices only
 
 ## ODF-208 — The CI observer's worker exited without a terminal result, with no recorded cause
 
@@ -262,3 +292,17 @@ Plan 013's focused commands read each recorded story with a fixed line range (`s
   - Evidence: `618ee6f7cc:.planning/slice-plans/013-removal-proof-in-guidance/PLAN.md` "Focused commands" and premise row "Both recorded story shapes are recoverable with their anchors"; `git show 595e2eb5d9:.planning/seeds/SEED-066-voice-input.md | sed -n '198,202p'` (examples continue past line 200); coordinator's slice-2 extraction, first by line range, then by anchor after reading the file's tail
   - Observed effect: the coordinator's first two extractions ended mid-sentence; reading the tail caught it and one more extraction by anchor to the next heading gave the full story before any agent received it
   - Inference: a line range fixes the start that was observed and guesses the end; extracting from the anchor to the next anchor would not depend on that guess. Cost here was one extra tool call; unnoticed, the demonstration would have run on a story missing three examples
+
+## DD-221 — A slice plan linked its story without the `**Source:**` field, so the first story-obligation check refused
+
+Plan 063 as written by slice planning named its story as "Work item: … ([story](…))". The story-obligations script reads the selected story from a `**Source:**` link; with an empty obligation record it passes, so the missing field surfaced only when the first obligation was recorded.
+
+### Occurrences
+- Execution: SEED-066#simplify-voice-input-feedback (first implementation commit dd22b17de2)
+  - Timestamp: 2026-10-10T20:10:00+09:00
+  - Tool: Claude Code
+  - Model: claude-opus-5-5
+  - Open Dough release: 0.3.58
+  - Evidence: `6f6f3d32c9:.planning/slice-plans/063-simplify-voice-input-feedback/PLAN.md` lines 3–4; `story-obligations.mjs check --slice 2` result `{"reason":"missing-story-source"}` in the execution conversation; `.claude/skills/dough-story-refinement/references/planning.md` ("Its `**Source:**` link names the selected story section"); `list --slice 1` and `check --slice 1` both passed on the same plan
+  - Observed effect: slice 2's done transition was blocked until the coordinator rewrote the plan header during delivery; one extra plan edit and check
+  - Inference: the script validates the link only when an obligation exists, so a plan can pass delegation checks for every slice and still fail at the first recorded gap

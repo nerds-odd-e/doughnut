@@ -21,8 +21,7 @@ Feature: Record live audio onto a note
     When it is 2 minutes later in the browser
     Then the note content on the current page should be "This is class 1."
     When I stop recording audio
-    Then I should be told my speech was added to my note
-    And the note content on the current page should be "This is class 1. its talk about dada struct day."
+    Then the note content on the current page should be "This is class 1. its talk about dada struct day."
     And the note "DS lecture/Data Structure Lecture" in Donut should have content "This is class 1. its talk about dada struct day."
 
   @mockBrowserTime
@@ -32,11 +31,11 @@ Feature: Record live audio onto a note
     And the browser records audio input from the microphone as in "lecture.wav"
     When I stop recording audio
     Then the note content on the current page should be "This is class 1."
-    And I should be told my speech could not be turned into text, with Retry
+    And I should see an error toast containing "Could not turn your speech into text"
+    And I should be offered Retry for my recording
     Given the OpenAI transcription service now returns the text "its talk about dada struct day."
     When I retry converting my speech
-    Then I should be told my speech was added to my note
-    And the note content on the current page should be "This is class 1. its talk about dada struct day."
+    Then the note content on the current page should be "This is class 1. its talk about dada struct day."
     And the note "DS lecture/Data Structure Lecture" in Donut should have content "This is class 1. its talk about dada struct day."
 
   Scenario: Create a note by speaking the title
