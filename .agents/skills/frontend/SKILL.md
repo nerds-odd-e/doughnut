@@ -27,13 +27,20 @@ unless the user explicitly requests a visible browser.
 
 `frontend:test` runs Vitest only; `frontend/vitest.config.ts` disables
 typechecking there for speed. Passing behavioral tests alone is incomplete
-frontend proof: before accepting a frontend change, also require this
-typecheck to pass against the same working-tree content, including generated
+frontend proof: before accepting a frontend change, also require these
+typechecks to pass against the same working-tree content, including generated
 API types:
 
 ```bash
 CURSOR_DEV=true nix develop -c pnpm -C frontend exec vue-tsc --noEmit
+CURSOR_DEV=true nix develop -c pnpm -C frontend exec tsc --noEmit
 ```
+
+The build that CI runs (`pnpm -C frontend build`) checks with both. Plain
+`tsc` types every `*.vue` import through `frontend/tests/shims-vue.d.ts`, so
+it sees no exposed component members: a test reaches an exposed method
+through a helper that casts `wrapper.vm` structurally, never through
+`wrapper.vm.<method>` or `InstanceType<typeof Component>`.
 
 Reuse existing typecheck evidence from a `lint` or `build` run on
 identical content instead of repeating it. This requirement applies at proof
