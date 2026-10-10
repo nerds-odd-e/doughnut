@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 1,
+  "agent": "Maria-chan",
+  "email": "maria-chan@example.org",
+  "identity": "SEED-066#restore-typed-referenced-title-save",
+  "mode": "story-branch",
+  "branch": "claude/restore-typed-referenced-title-save-in-the-note",
+  "host": "claude"
+}
