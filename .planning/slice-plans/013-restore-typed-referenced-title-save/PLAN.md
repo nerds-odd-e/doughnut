@@ -95,7 +95,7 @@ No paid or state-changing observation required; no probe slice.
 
 ### 1. Fix typed referenced-title save chaining
 Type: Behavior
-Status: planned
+Status: done
 Proof: `wiki_link.feature` Keep and Update referenced-title scenarios green;
 `record_live_audio.feature` linked spoken Keep scenario still green.
 Predecessor CI repair `07f888578ee96b7248e08ba202a5a252fe26ae8b` may already
@@ -104,3 +104,31 @@ contain the method-shorthand fix — confirm at Take before rewriting.
 Behavior: an author types a new title on a linked note and chooses Keep or
 Update visible reference text → the panel choice runs and the rename journey
 completes as before the page-object regression.
+
+Accepted proof (2026-10-10, revision `5ee74ec76ed2b51ff24c8a1f9bf04a2054f67d15`):
+explained empty change. Predecessor repair
+`07f888578ee96b7248e08ba202a5a252fe26ae8b` is an ancestor of this branch;
+`notePage.ts` already defines `chooseReferencedTitleSave` and
+`saveReferencedNoteTitle` as method shorthand, so `this` is the page object.
+No product or test code changed in this execution, so no refactor pass ran.
+Every consumer of the typed and spoken steps passed:
+
+```sh
+CURSOR_DEV=true nix develop -c pnpm cy:run --spec e2e_test/features/note_topology/wiki_link.feature,e2e_test/features/note_topology/property_wiki_link.feature,e2e_test/features/note_creation_and_update/record_live_audio.feature
+CURSOR_DEV=true nix develop -c pnpm cy:run --spec e2e_test/features/cli/cli_notebook_web_note_renames.feature
+```
+
+- `wiki_link.feature` 11/11, including "Renaming a referenced note while
+  keeping visible reference text" and "… while updating visible reference text".
+- `property_wiki_link.feature` 11/11.
+- `record_live_audio.feature` 5/5, including "Rename a linked note by speaking
+  the title, keeping visible reference text".
+- `cli_notebook_web_note_renames.feature` 1/1.
+
+## Execution resume context
+
+- Mode: story-branch; workspace
+  `/Users/terryyin/git/doughnut/.worktrees/restore-typed-referenced-title-save-in-the-note`;
+  branch `claude/restore-typed-referenced-title-save-in-the-note`; remote
+  `origin`; target `main`.
+- Published claim: `5ee74ec76ed2b51ff24c8a1f9bf04a2054f67d15` on `main`.
