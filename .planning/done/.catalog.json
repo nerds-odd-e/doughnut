@@ -1,0 +1,54 @@
+{
+  "schemaVersion": 1,
+  "records": [
+    {
+      "fileName": "SEED-072_title-search-layout.json",
+      "identity": "SEED-072#title-search-layout",
+      "completedAt": "2026-10-10T09:20:38.099Z",
+      "blob": "7ba702fd96b73adf7a83c02bb0f1971b5d6a647a"
+    },
+    {
+      "fileName": "SEED-071_removals-follow-project-rule.json",
+      "identity": "SEED-071#removals-follow-project-rule",
+      "completedAt": "2026-10-10T05:43:06.122Z",
+      "blob": "f57783d0e50210c131b0832fb230a1b68ae7e737"
+    },
+    {
+      "fileName": "SEED-066_restore-typed-referenced-title-save.json",
+      "identity": "SEED-066#restore-typed-referenced-title-save",
+      "completedAt": "2026-10-10T04:46:54.915Z",
+      "blob": "48d650eea66752970732c43957bcb8f28938becf"
+    },
+    {
+      "fileName": "SEED-066_rename-with-spoken-title.json",
+      "identity": "SEED-066#rename-with-spoken-title",
+      "completedAt": "2026-10-09T23:39:09.524Z",
+      "blob": "f77dee667bd4758feef9fd344162fcaa0473596a"
+    },
+    {
+      "fileName": "SEED-071_e2e-proof-before-final-formatting.json",
+      "identity": "SEED-071#e2e-proof-before-final-formatting",
+      "completedAt": "2026-10-08T22:54:43.012Z",
+      "blob": "316a0b63e8a2f15a47da11a8a11d393f39c9e0aa"
+    },
+    {
+      "fileName": "SEED-070_fast-warning-free-commit-hook.json",
+      "identity": "SEED-070#fast-warning-free-commit-hook",
+      "completedAt": "2026-10-07T20:56:57.472Z",
+      "blob": "71512d898b07b26e2e58e72b0dd4ca0d694cd455"
+    },
+    {
+      "fileName": "SEED-066_create-with-spoken-title.json",
+      "identity": "SEED-066#create-with-spoken-title",
+      "completedAt": "2026-10-07T13:21:33.325Z",
+      "blob": "f626ab62658f2fae0f7f94c533cac528a53d2fa1"
+    },
+    {
+      "fileName": "SEED-066_no-record-while-stopping.json",
+      "identity": "SEED-066#no-record-while-stopping",
+      "completedAt": "2026-10-07T05:00:03.660Z",
+      "blob": "25bc8c4361250fb17001ea125afcee963e69e6de"
+    }
+  ],
+  "unreadable": []
+}

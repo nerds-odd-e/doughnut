@@ -44,6 +44,43 @@ describe("adding new note", () => {
     expect(sdkSpies.searchForRelationshipTargetWithinSpy).not.toHaveBeenCalled()
   })
 
+  it.each(["light", "dark"])(
+    "keeps title search within the %s form and Submit clickable",
+    async (theme) => {
+      wrapper = mountNoteNewForm(
+        { ...notebookRootProps, initialTitle: "2026-10-10" },
+        { attachTo: document.body }
+      )
+      const form = wrapper.element as HTMLElement
+      form.setAttribute("data-theme", theme)
+      form.classList.add("bg-base-100")
+      form.style.width = "640px"
+      vi.runOnlyPendingTimers()
+      await flushPromises()
+
+      expect(wrapper.text()).toContain("No matching notes found.")
+      const results = form.querySelector(".title-search-results") as HTMLElement
+      const submit = form.querySelector(
+        'input[type="submit"]'
+      ) as HTMLInputElement
+      const panelBounds = results.getBoundingClientRect()
+      const submitBounds = submit.getBoundingClientRect()
+      expect(panelBounds.bottom).toBeLessThanOrEqual(submitBounds.top)
+      expect(getComputedStyle(results).backgroundColor).toBe(
+        getComputedStyle(form).backgroundColor
+      )
+      expect(
+        document.elementFromPoint(
+          submitBounds.left + submitBounds.width / 2,
+          submitBounds.top + submitBounds.height / 2
+        )
+      ).toBe(submit)
+      submit.click()
+      await flushPromises()
+      expect(sdkSpies.mockedCreateNoteAtRoot).toHaveBeenCalled()
+    }
+  )
+
   it("searches for duplicate titles, including after returning to the default title", async () => {
     sdkSpies.searchForRelationshipTargetWithinSpy.mockResolvedValue(
       wrapSdkResponse([

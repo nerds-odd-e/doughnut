@@ -1,9 +1,0 @@
-{
-  "schemaVersion": 1,
-  "agent": "Aino-chan",
-  "email": "aino-chan@example.org",
-  "identity": "SEED-072#title-search-layout",
-  "mode": "story-branch",
-  "branch": "codex/title-search-layout",
-  "host": "codex"
-}

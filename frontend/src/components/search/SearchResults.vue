@@ -190,13 +190,12 @@ const hasVisibleResultsSection = computed(
 }
 
 .dropdown-style {
-  position: absolute;
+  position: relative;
   width: 100%;
-  background: white;
-  border: 1px solid #ddd;
+  background: var(--color-base-100);
+  border: 1px solid color-mix(in oklch, var(--color-base-content) 20%, transparent);
   border-radius: 0 0 4px 4px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  z-index: 1000;
 }
 
 .result-section {
