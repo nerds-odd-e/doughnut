@@ -17,10 +17,14 @@ import {
   resetNoteToolbarTestState,
 } from "@tests/notes/noteToolbarTestHelpers"
 import {
+  audioTextResponse,
+  mountNoteToolbarRecording,
+  moveNoteToolbarTo,
+} from "@tests/notes/noteVoiceInputButtonTestSupport"
+import {
   AiAudioController,
   TextContentController,
 } from "@generated/donut-backend-api/sdk.gen"
-import { createAudioRecorder } from "@/models/audio/audioRecorder"
 import { mockSdkService, wrapSdkError } from "@tests/helpers"
 import { describe, it, expect, afterEach, beforeEach, vi } from "vitest"
 import { type VueWrapper, flushPromises } from "@vue/test-utils"
@@ -84,35 +88,68 @@ describe("NoteToolbar Voice input on a narrow toolbar", () => {
     expect(overflowMenuItem(titles.voiceInput)).not.toBeNull()
   })
 
+  it("returns Voice input to overflow when the author moves to another note while recording", async () => {
+    wrapper = await mountNoteToolbar(makeMe.aNoteRealm.please())
+    await layoutNoteToolbar(wrapper, overflowTogglesNavWidth())
+    await openNoteToolbarOverflowMenu(wrapper)
+    overflowMenuItem(titles.voiceInput)!.click()
+    await flushPromises()
+
+    await moveNoteToolbarTo(wrapper, makeMe.aNoteRealm.please())
+
+    expect(noteToolbarAction(wrapper, noteVoiceInputTitles.stop).exists()).toBe(
+      false
+    )
+    expect(noteToolbarAction(wrapper, titles.voiceInput).isVisible()).toBe(
+      false
+    )
+    await openNoteToolbarOverflowMenu(wrapper)
+    expect(overflowMenuItem(titles.voiceInput)).not.toBeNull()
+  })
+
+  it("keeps the next note's recording pinned when the left note's last speech is added after it started", async () => {
+    const { wrapper: toolbar, recorder } = await mountNoteToolbarRecording(
+      makeMe.aNoteRealm.please()
+    )
+    wrapper = toolbar
+    await layoutNoteToolbar(wrapper, overflowTogglesNavWidth())
+    let addLastSpeech!: () => void
+    recorder.stopRecording.mockImplementation(
+      () => new Promise<void>((resolve) => (addLastSpeech = resolve))
+    )
+    await moveNoteToolbarTo(wrapper, makeMe.aNoteRealm.please())
+    await openNoteToolbarOverflowMenu(wrapper)
+    overflowMenuItem(titles.voiceInput)!.click()
+    await flushPromises()
+
+    addLastSpeech()
+    await flushPromises()
+
+    expect(
+      noteToolbarAction(wrapper, noteVoiceInputTitles.stop).isVisible()
+    ).toBe(true)
+  })
+
   describe("with a recording kept after a failed conversion at Stop", () => {
     let audioToText: ReturnType<typeof mockSdkService>
 
     beforeEach(async () => {
-      audioToText = mockSdkService(AiAudioController, "audioToText", {
-        segmentTexts: ["hello"],
-        endTimestamp: "00:00:01,000",
-      }).mockResolvedValueOnce(wrapSdkError("API Error"))
+      audioToText = mockSdkService(
+        AiAudioController,
+        "audioToText",
+        audioTextResponse("hello")
+      ).mockResolvedValueOnce(wrapSdkError("API Error"))
       mockSdkService(
         TextContentController,
         "updateNoteContent",
         makeMe.aNoteRealm.please()
       )
-      wrapper = await mountNoteToolbar(makeMe.aNoteRealm.please())
+      const recording = await mountNoteToolbarRecording(
+        makeMe.aNoteRealm.please()
+      )
+      wrapper = recording.wrapper
+      recording.recorder.hasUnconvertedAudio.mockReturnValue(true)
       await layoutNoteToolbar(wrapper, overflowTogglesNavWidth())
-      const recorderMock = vi.mocked(createAudioRecorder).mock
-      const convert = recorderMock.calls.at(-1)![0]
-      const recorder = vi.mocked(recorderMock.results.at(-1)!.value)
-      recorder.hasUnconvertedAudio.mockReturnValue(true)
-      recorder.stopRecording.mockImplementation(async () => {
-        await convert({
-          data: new File([], "test.webm"),
-          isMidSpeech: false,
-        }).catch(() => undefined)
-      })
-
-      await openNoteToolbarOverflowMenu(wrapper)
-      overflowMenuItem(titles.voiceInput)!.click()
-      await flushPromises()
       await noteToolbarAction(wrapper, noteVoiceInputTitles.stop).trigger(
         "click"
       )

@@ -166,28 +166,6 @@ describe("NoteVoiceInputButton content preservation", () => {
     }
   )
 
-  it("targets the originating note's current body after the prop changes", async () => {
-    const current = "Current stored body."
-    noteStore.refreshNoteRealm(
-      makeMe.aNoteRealm.id(note.id).content(current).please()
-    )
-    const destination = makeMe.aNoteRealm
-      .content(
-        "DESTINATION ORIGINAL: The violet umbrella stays on shelf seven."
-      )
-      .please()
-    noteStore.refreshNoteRealm(destination)
-    await dictation.wrapper.setProps({ note: destination.note })
-    await processAudio(dictation.wrapper)
-    expect(dictation.updateContentMock).toHaveBeenCalledExactlyOnceWith({
-      path: { note: note.id },
-      body: { content: `${current} text` },
-    })
-    expect(noteStore.refOfNoteRealm(destination.id).value?.note.content).toBe(
-      destination.note.content
-    )
-  })
-
   it("keeps appended content after an API error", async () => {
     dictation.audioToTextMock
       .mockResolvedValueOnce(

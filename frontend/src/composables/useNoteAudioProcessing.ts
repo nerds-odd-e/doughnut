@@ -1,15 +1,25 @@
-import { ref } from "vue"
+import { ref, type Ref } from "vue"
 import type { Note } from "@generated/donut-backend-api"
 import { audioChunkToText } from "@/composables/audioChunkToText"
 import { useToast } from "@/composables/useToast"
 import type { AudioChunk } from "@/models/audio/audioProcessingScheduler"
 import { useNoteStore } from "@/store/noteStore"
 
-export function useNoteAudioProcessing(note: Note) {
+export function useNoteAudioProcessing(
+  note: Note,
+  authorHasLeft: Ref<boolean>
+) {
   const noteStore = useNoteStore()
   const { showErrorToast } = useToast()
   const noteId = note.id
   const lastConversionFailed = ref(false)
+
+  const conversionFailure = (chunk: AudioChunk) => {
+    const failure = "Could not turn your speech into text."
+    if (authorHasLeft.value) return failure
+    if (chunk.isMidSpeech) return `${failure} Your recording is kept.`
+    return `${failure} Your recording is kept until you leave this note; click Voice input to try again.`
+  }
 
   const convert = async (chunk: AudioChunk) => {
     try {
@@ -18,11 +28,7 @@ export function useNoteAudioProcessing(note: Note) {
       return converted
     } catch (error) {
       lastConversionFailed.value = true
-      showErrorToast(
-        chunk.isMidSpeech
-          ? "Could not turn your speech into text. Your recording is kept."
-          : "Could not turn your speech into text. Your recording is kept until you leave this note; click Voice input to try again."
-      )
+      showErrorToast(conversionFailure(chunk))
       throw error
     }
   }

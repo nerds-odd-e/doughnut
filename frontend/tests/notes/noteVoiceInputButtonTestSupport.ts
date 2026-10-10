@@ -1,13 +1,20 @@
 import NoteVoiceInputButton from "@/components/notes/widgets/NoteVoiceInputButton.vue"
 import { noteVoiceInputTitles } from "@/components/notes/widgets/noteMoreOptionsTitles"
+import { createAudioRecorder } from "@/models/audio/audioRecorder"
 import type { AudioChunk } from "@/models/audio/audioProcessingScheduler"
-import type { Note } from "@generated/donut-backend-api"
+import { useNoteStore } from "@/store/noteStore"
+import type { Note, NoteRealm } from "@generated/donut-backend-api"
 import makeMe from "donut-test-fixtures/makeMe"
 import helper, { mockShowNote } from "@tests/helpers"
 import {
   clearAudioHardwareMocks,
   installAudioBrowserSpies,
 } from "@tests/notes/noteVoiceInputButtonMocks"
+import {
+  mountNoteToolbar,
+  noteToolbarAction,
+  noteToolbarProps,
+} from "@tests/notes/noteToolbarTestHelpers"
 import { flushPromises, type VueWrapper } from "@vue/test-utils"
 import { afterEach, beforeEach, expect, vi } from "vitest"
 import type { ComponentPublicInstance } from "vue"
@@ -106,6 +113,45 @@ export async function stopRecording(wrapper: NoteVoiceInputButtonWrapper) {
     .trigger("click")
   await flushPromises()
   await wrapper.vm.$nextTick()
+}
+
+/**
+ * A note toolbar whose Voice input is recording. Stopping the returned
+ * `recorder` converts the remaining audio.
+ */
+export async function mountNoteToolbarRecording(realm: NoteRealm) {
+  const wrapper = await mountNoteToolbar(realm)
+  useNoteStore().refreshNoteRealm(realm)
+  await noteToolbarAction(wrapper, noteVoiceInputTitles.start).trigger("click")
+  await flushPromises()
+  const recorderMock = vi.mocked(createAudioRecorder).mock
+  const convert = recorderMock.lastCall![0]
+  const recorder = vi.mocked(recorderMock.results.at(-1)!.value)
+  recorder.stopRecording.mockImplementation(async () => {
+    await convert(audioChunk()).catch(() => undefined)
+  })
+  return { wrapper, recorder }
+}
+
+/** The author moves from the toolbar's note to another note. */
+export async function moveNoteToolbarTo(wrapper: VueWrapper, realm: NoteRealm) {
+  useNoteStore().refreshNoteRealm(realm)
+  await wrapper.setProps(noteToolbarProps(realm))
+  await flushPromises()
+}
+
+/** The toolbar offers idle Voice input and nothing of a recording. */
+export function expectIdleVoiceInputInToolbar(wrapper: VueWrapper) {
+  expect(noteToolbarAction(wrapper, noteVoiceInputTitles.stop).exists()).toBe(
+    false
+  )
+  expect(noteToolbarAction(wrapper, noteVoiceInputTitles.retry).exists()).toBe(
+    false
+  )
+  const button = noteToolbarAction(wrapper, noteVoiceInputTitles.start)
+  expect(button.attributes()).not.toHaveProperty("disabled")
+  expect(button.attributes()).not.toHaveProperty("aria-pressed")
+  expect(button.classes()).not.toContain("daisy-btn-primary")
 }
 
 /** Shared lifecycle for NoteVoiceInputButton capability specs (call after vi.mock blocks). */

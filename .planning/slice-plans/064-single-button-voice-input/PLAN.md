@@ -229,7 +229,7 @@ today.
 
 ### 4. Leaving the note ends that note's dictation
 Type: Behavior
-Status: planned
+Status: done
 Proof: preservation spec "converts the remainder into the note the author
 left when the note changes" (the prop changes while recording → the
 recorder is stopped, the final chunk's text lands in the originating note's
@@ -277,7 +277,7 @@ Disposition: proved by slice 3: `frontend/tests/notes/NoteVoiceInputButton.retry
 ### G2. A recording follows the author to another note
 Reported: slice 2 — "Recording continues across a note change and writes to the originating note; the pressed button then shows on the other note (interim, slice 4)."
 Story clause: "A note's button never shows another note's recording."
-Disposition: receiving slice 4
+Disposition: proved by slice 4: `frontend/tests/notes/NoteToolbar.voiceInputLeavingNote.spec.ts` "converts the remainder into the note the author left" and `NoteToolbar.voiceInputOverflow.spec.ts` "returns Voice input to overflow when the author moves to another note while recording"
 
 ### G3. The waveform's look with a real microphone
 Reported: slice 2 — "The look of the waveform with a real microphone on a dev server is unobserved; the level scaling (×4, 8 bars, about 10 samples per second) is a guess."
@@ -287,17 +287,22 @@ Disposition: proved by slice 2: the coordinator viewed Chromium screenshots of t
 ### G4. A kept recording follows the author to another note
 Reported: slice 3 — "Interim until slice 4: because the kept state counts as active, the `voiceInputNoteId` watch (untouched) keeps a kept-recording button on screen after the author moves to another note in the same toolbar, and its retry writes to the originating note."
 Story clause: "leaving the note or reloading drops it"
-Disposition: receiving slice 4
+Disposition: proved by slice 4: `frontend/tests/notes/NoteToolbar.voiceInputLeavingNote.spec.ts` "drops a kept recording, and the button is idle"
 
 ### G5. The toast on leaving promises a retry
 Reported: slice 3 — "Interim until slice 4: a final conversion that fails while the toolbar unmounts toasts the "kept until you leave this note; click Voice input to try again" wording although nothing can be retried."
 Story clause: "If that final conversion fails, nothing is kept and the toast says"
-Disposition: receiving slice 4
+Disposition: proved by slice 4: `frontend/tests/notes/NoteToolbar.voiceInputLeavingNote.spec.ts` "toasts only that the speech was not turned into text when the final conversion on leaving fails, keeping nothing"
 
 ### G6. No new recording while one is kept
 Reported: slice 3 — "While a recording is kept, the button only retries, so the author cannot start a new recording on that note until the retry succeeds or they leave the note."
 Story clause: "on failure the toast shows again and"
 Disposition: no user cost "start and stop dictation from the one Voice input button in the note toolbar": the story gives the one button to the kept recording until its retry succeeds; an author who would rather start over leaves the note, which the story says drops the kept recording
+
+### G7. A mid-speech failure that lands after leaving
+Reported: slice 4 — "A mid-speech conversion still in flight when the author leaves, if it fails, also toasts the short sentence; this follows from the design and has no test of its own."
+Story clause: "If that final conversion fails, nothing is kept and the toast says"
+Disposition: no user cost "start and stop dictation from the one Voice input button in the note toolbar": once the author has left, nothing is kept whichever conversion failed, so the short sentence is the true one for both
 
 ## Learnings
 
@@ -347,3 +352,13 @@ Disposition: no user cost "start and stop dictation from the one Voice input but
 - The Stop toast says "click Voice input to try again" while the button is
   then named "Retry turning your speech into text"; the wording is the
   story's.
+- Slice 4 accepted proof: the whole frontend suite, `vue-tsc --noEmit`, and
+  the feature (5 scenarios). The button is keyed by the note's id, so moving
+  to another note and leaving the page both end dictation through the
+  unmount stop; `authorHasLeft` selects the short toast and keeps a late
+  stop from clearing `voiceInputIsActive` under the next note's recording
+  (`NoteToolbar.voiceInputOverflow.spec.ts` "keeps the next note's recording
+  pinned when the left note's last speech is added after it started").
+- `NoteVoiceInputButton.vue` exposes `wakeLocker` and `processAudio` only for
+  the `NoteVoiceInputButton.*` specs; `mountNoteToolbarRecording` with
+  `moveNoteToolbarTo` drives the toolbar-level cases without them.

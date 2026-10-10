@@ -5,7 +5,10 @@ import { useToast } from "@/composables/useToast"
 import { createAudioRecorder } from "@/models/audio/audioRecorder"
 import { createWakeLocker } from "@/models/wakeLocker"
 
-/** True while a recording runs, is being finished, or is kept for a retry. */
+/**
+ * True while the note on the page has a recording that runs, is being
+ * finished, or is kept for a retry.
+ */
 export const voiceInputIsActive = ref(false)
 
 export function useNoteVoiceInput(note: Note) {
@@ -17,7 +20,12 @@ export function useNoteVoiceInput(note: Note) {
   const wakeLocker = createWakeLocker()
   const { showErrorToast } = useToast()
 
-  const { processAudio, lastConversionFailed } = useNoteAudioProcessing(note)
+  const authorHasLeft = ref(false)
+
+  const { processAudio, lastConversionFailed } = useNoteAudioProcessing(
+    note,
+    authorHasLeft
+  )
 
   const audioRecorder = createAudioRecorder(processAudio)
 
@@ -44,16 +52,19 @@ export function useNoteVoiceInput(note: Note) {
         lastConversionFailed.value && audioRecorder.hasUnconvertedAudio()
           ? "notConverted"
           : "ready"
-      voiceInputIsActive.value = hasKeptRecording.value
+      if (!authorHasLeft.value) {
+        voiceInputIsActive.value = hasKeptRecording.value
+      }
       await wakeLocker.release()
     }
   }
 
   onBeforeUnmount(async () => {
+    authorHasLeft.value = true
+    voiceInputIsActive.value = false
     if (isRecording.value) {
       await stop()
     }
-    voiceInputIsActive.value = false
   })
 
   return {

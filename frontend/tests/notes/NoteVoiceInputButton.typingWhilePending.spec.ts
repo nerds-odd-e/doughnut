@@ -65,6 +65,7 @@ describe("NoteVoiceInputButton while the author types in the open body editor", 
   const {
     mountEditorAndVoiceInput,
     showInEditor,
+    whileRecordingIsLeft,
     dictate,
     whileAudioIsPending,
     savedContents,
@@ -209,7 +210,7 @@ describe("NoteVoiceInputButton while the author types in the open body editor", 
     )
     const noteB = makeMe.aNoteRealm.content("Note B body.").please()
 
-    await whileAudioIsPending(async () => {
+    await whileRecordingIsLeft(async () => {
       await setTextareaValue(wrapper, `${redBicycleBody}${typed}`)
       await blurTextarea(wrapper)
       await showInEditor(noteB)

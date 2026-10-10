@@ -82,7 +82,7 @@
       <NoteVoiceInputButton
         v-if="action.id === 'voiceInput'"
         v-show="showToolbarAction(action.id)"
-        :key="voiceInputNoteId"
+        :key="note.id"
         :ref="setVoiceInputButton"
         :note="note"
       />
@@ -138,7 +138,7 @@ import {
   toolbarToggleBtnClass,
 } from "./noteToolbarButtonClasses"
 import { useKeyboardShortcut } from "@/composables/useKeyboardShortcut"
-import { computed, ref, watch, type ComponentPublicInstance } from "vue"
+import { computed, ref, type ComponentPublicInstance } from "vue"
 
 const titles = noteMoreOptionsTitles
 
@@ -205,12 +205,6 @@ const setVoiceInputButton = (
     typeof NoteVoiceInputButton
   > | null
 }
-
-// An idle button follows the note on the page; a recording stays with its note.
-const voiceInputNoteId = ref(props.note.id)
-watch([() => props.note.id, voiceInputIsActive], ([id, active]) => {
-  if (!active) voiceInputNoteId.value = id
-})
 
 const onVoiceInputStart = () => {
   emit("start-voice-input")

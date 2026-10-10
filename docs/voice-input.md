@@ -24,8 +24,12 @@ kept recording: it is tinted as a warning, shows a retry arrow, and is named
 without the microphone; the button is unavailable with its spinner meanwhile.
 On success the text is added and the button is idle; on failure the toast
 shows again and the button keeps the recording. The kept recording lasts while
-the author stays on the note; reloading or leaving the note drops it. When
-recording cannot start, nothing is recorded, the
+the author stays on the note; reloading or leaving the note drops it. Leaving
+the note while recording, by moving to another note or another page, stops the
+recording and adds the remaining speech to the note the author left; the
+button of the note they arrive at is idle. When that last conversion fails,
+nothing is kept and the common error toast says only "Could not turn your
+speech into text." When recording cannot start, nothing is recorded, the
 common error toast says "Could not use the microphone. Allow microphone access
 in your browser, then try again.", and the button stays idle. When saving a
 passage fails, the save's own error toast shows and the button is idle.
@@ -104,7 +108,7 @@ including English and Korean, add one space. For example, `私はPython` plus
 `が好きです。` becomes `私はPythonが好きです。`, while `私はPython` plus
 `is useful.` becomes `私はPython is useful.`. Existing characters remain unchanged, and
 successive additions follow earlier additions once. Navigating to another note
-does not redirect the result. The normal content-edit undo restores the prior body.
+ends the dictation and does not redirect its result. The normal content-edit undo restores the prior body.
 
 Timed chunks (every 20 s) and pause flushes (after more than 3 s of silence, once per pause)
 are processed mid-speech. The 20-second timer
@@ -130,9 +134,10 @@ is kept." After a failed conversion at Stop, the author recovers the kept
 recording from the button's retry: the kept audio is converted again and its
 passage is added once. The kept recording lasts while the author stays on the
 note and is dropped by a reload or by leaving the note. A
-recording in progress continues when the author moves to another note, and its
-text still goes to the note it was started on; Voice input started on the
-other note afterwards dictates into that note.
+recording in progress stops when the author moves to another note or page, and
+its remaining speech is converted into the note it was started on; when that
+conversion fails its audio is dropped. Voice input started on the other note
+dictates into that note.
 The transcription service controls transcription quality. When a body editor for the note is
 open, the passage is joined to the end of that editor's draft, including
 unsaved typing, and that draft is saved right away; otherwise, including while
@@ -140,7 +145,10 @@ an image upload or note removal is pausing the editor, it is joined to the
 note's saved body.
 
 The mounted audio preservation tests assert exact saved content for long,
-empty, and whitespace-ending bodies, repeated additions, originating-note targeting, and undo. The
+empty, and whitespace-ending bodies, repeated additions, and undo. Mounted
+toolbar tests move to another note while recording and observe the remainder
+saved to the note left, an idle button, a dropped kept recording, and the
+toast of a failed last conversion. The
 mocked recording journey supplies a transcription and observes the original
 body, one space, and the transcription's text. A second mocked journey makes
 the transcription fail at Stop, observes the unchanged body and the error
