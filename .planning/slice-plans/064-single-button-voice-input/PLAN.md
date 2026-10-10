@@ -124,9 +124,12 @@ waveform from `audioRecorder.getAudioData()` as the strip does today.
 
 ### 1. The recording session is separable from the panel
 Type: Structure
-Status: planned
-Proof: the nine `NoteAudioTools` specs, `NoteToolbar.panels.spec.ts` and
-`record_live_audio.feature` stay green with the panel unchanged.
+Status: done
+Proof: the seven `NoteAudioTools` specs, `NoteToolbar.panels.spec.ts` and
+`record_live_audio.feature` stay green with the panel unchanged. Accepted:
+the baseline frontend command (25 files, 175 tests), `vue-tsc --noEmit`
+(exit 0) and the feature (5 scenarios) pass with no test or support file
+edited.
 
 Internal change: move the panel's phases, recorder, wake lock, `start`,
 `stop`, `hasKeptRecording`, `retry`, `tryFlush` and `switchAudioDevice`
@@ -266,4 +269,11 @@ unmount path stays as today. `docs/voice-input.md` states it. About 5 min.
 
 ## Learnings
 
-(none yet)
+- The session is `useNoteVoiceInput(note)` in
+  `frontend/src/composables/useNoteVoiceInput.ts`. It is one instance per
+  call, captures the note at call time and stops on unmount, so slice 2
+  shares the recording state with the toolbar pin by a prop, an emit or a
+  module-level ref, and slice 4 ends the session when the note changes.
+- The test support reads `wakeLocker` and `processAudio` from the mounted
+  component, so the panel exposes them with `defineExpose`; slice 2's button
+  keeps them reachable the same way or observes through the DOM and mocks.

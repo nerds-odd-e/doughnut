@@ -6,12 +6,12 @@
       :isRecording="isRecording"
     />
     <div class="button-group">
-      <button v-if="phase === 'notConverted'" class="daisy-btn labeled-action" @click="stopRecording">Retry</button>
+      <button v-if="hasKeptRecording" class="daisy-btn labeled-action" @click="retry">Retry</button>
       <button
         v-if="!isRecording"
         class="daisy-btn labeled-action"
         :disabled="phase === 'stopping'"
-        @click="startRecording"
+        @click="start"
       >
         <Mic :size="24" />
         Record
@@ -20,90 +20,53 @@
         <select
           class="device-select"
           :value="selectedDevice"
-          @change="onDeviceChange"
+          @change="switchAudioDevice(($event.target as HTMLSelectElement).value)"
           aria-label="Microphone"
         >
           <option v-for="device in audioDevices" :key="device.deviceId" :value="device.deviceId">
             {{ device.label || `Microphone ${device.deviceId.slice(0, 4)}...` }}
           </option>
         </select>
-        <button class="daisy-btn labeled-action" @click="stopRecording">
+        <button class="daisy-btn labeled-action" @click="stop">
           <Square :size="24" />
           Stop
         </button>
-        <button class="daisy-btn labeled-action" @click="audioRecorder.tryFlush()" :disabled="isProcessing">Write text now</button>
+        <button class="daisy-btn labeled-action" @click="tryFlush" :disabled="isProcessing">Write text now</button>
       </template>
     </div>
   </section>
 </template>
 
 <script setup lang="ts">
-import { computed, onBeforeUnmount, ref, type PropType } from "vue"
-import { createAudioRecorder } from "../../../models/audio/audioRecorder"
-import { createWakeLocker } from "../../../models/wakeLocker"
+import type { PropType } from "vue"
 import type { Note } from "@generated/donut-backend-api"
 import Waveform from "./Waveform.vue"
 import { noteMoreOptionsTitles } from "./noteMoreOptionsTitles"
 import { Mic, Square } from "@lucide/vue"
-import { useNoteAudioProcessing } from "@/composables/useNoteAudioProcessing"
-import { useToast } from "@/composables/useToast"
+import { useNoteVoiceInput } from "@/composables/useNoteVoiceInput"
 
 const { note } = defineProps({
   note: { type: Object as PropType<Note>, required: true },
 })
 
-const phase = ref<"ready" | "recording" | "stopping" | "notConverted">("ready")
-const isRecording = computed(() => phase.value === "recording")
-const wakeLocker = createWakeLocker()
-const { showErrorToast } = useToast()
+const {
+  phase,
+  isRecording,
+  hasKeptRecording,
+  isProcessing,
+  audioRecorder,
+  wakeLocker,
+  processAudio,
+  audioDevices,
+  selectedDevice,
+  start,
+  stop,
+  retry,
+  tryFlush,
+  switchAudioDevice,
+} = useNoteVoiceInput(note)
 
-const { processAudio, isProcessing, lastConversionFailed } =
-  useNoteAudioProcessing(note)
-
-const audioRecorder = createAudioRecorder(processAudio)
-const audioDevices = audioRecorder.getAudioDevices()
-const selectedDevice = audioRecorder.getSelectedDevice()
-
-const onDeviceChange = async (event: Event) => {
-  const deviceId = (event.target as HTMLSelectElement).value
-  try {
-    await audioRecorder.switchAudioDevice(deviceId)
-  } catch {
-    showErrorToast("Failed to switch audio device")
-  }
-}
-
-const startRecording = async () => {
-  try {
-    await wakeLocker.request()
-    await audioRecorder.startRecording()
-    phase.value = "recording"
-  } catch {
-    showErrorToast(
-      "Could not use the microphone. Allow microphone access in your browser, then try again."
-    )
-    await wakeLocker.release()
-  }
-}
-
-const stopRecording = async () => {
-  phase.value = "stopping"
-  try {
-    await audioRecorder.stopRecording()
-  } finally {
-    phase.value =
-      lastConversionFailed.value && audioRecorder.hasUnconvertedAudio()
-        ? "notConverted"
-        : "ready"
-    await wakeLocker.release()
-  }
-}
-
-onBeforeUnmount(() => {
-  if (isRecording.value) {
-    stopRecording()
-  }
-})
+defineExpose({ wakeLocker, processAudio })
 </script>
 
 <style scoped>
