@@ -19,10 +19,20 @@ startup supports the current voice-input work and other product development.
 
 ## Alternatives and Decision
 
-The reminder identifies two alternatives: have the runner wait for completed
-migration, or have the application healthcheck report not-ready until migration
-finishes. Terry owns this decision. Neither alternative has been selected;
-refinement should establish the intended readiness boundary before slice planning.
+**Terry's decision, 2026-10-11:** Application readiness belongs in the existing
+`/api/healthcheck`: return HTTP 503 while starting, then the existing HTTP 200
+response. The E2E runner keeps polling HTTP.
+
+The application owns its startup completion. Exposing that fact through the
+existing healthcheck gives E2E, Development, and production traffic checks the
+same signal. Runner-only migration waiting would repair E2E while leaving other
+consumers able to treat an application still migrating as ready; it would also
+make the runner interpret the application's migration lifecycle.
+
+Reuse Spring Boot's application availability. In the installed Boot 4.1.1,
+`ReadinessState.ACCEPTING_TRAFFIC` is published after synchronous
+`ApplicationReadyEvent` listeners finish, including Donut's Flyway listener.
+This avoids another migration-completion flag or schema-history polling loop.
 
 ## Story Decomposition
 
@@ -32,85 +42,153 @@ refinement should establish the intended readiness boundary before slice plannin
 
 **Identity:** SEED-067#start-e2e-after-migrations
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"unselected","assessment":"not-ready","reasons":["Terry must choose migration-aware runner readiness or healthcheck readiness gated on completed migration.","Execution approach and focused reproduction proof have not been selected."],"basis":{"document":"ebb9f5799e3ec3f85e43712f6af499b83566d8e54613e2646ae665a3d85e7c21"}}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/066-migration-aware-http-readiness/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"fef9b99bca7afa2076510dbc178f1b3e6cf7ddcb2a59cdf405c36a3d4aecee0b","plan":"bef93a384cda1ff158f5321ef76b7c94fef81ee45085f3fca9f059be924f88ae"}}
 ```
 
-**Goal:** For Donut contributors using a new worktree, the first E2E invocation
-waits for database migration to finish before resetting and seeding test data,
-so manual database recreation is unnecessary for an otherwise successful startup.
+**Goal:** For Donut contributors using a new worktree, the application's
+healthcheck reports readiness only after startup and database migration finish,
+so the first E2E invocation resets and seeds a complete schema without manual
+database recreation after an otherwise successful startup.
+
+**Slice plan:** [Migration-aware HTTP readiness](../slice-plans/066-migration-aware-http-readiness/PLAN.md).
 
 **Scope:**
 
-- Coordinate readiness and testability reset for `pnpm e2e:hold` and `pnpm cy:run`
-  when their isolated database is fresh.
-- Keep migration failure visible as startup failure; a failed migration cannot
-  produce a usable E2E session or a successful test run.
-- Preserve the runner's ownership and shutdown of its services and isolation
-  from other worktrees and the primary development database.
-- Automatic repair of databases already left partially migrated and reclamation
-  of other retired worktree databases are deferred.
+- **Application readiness:** In the web application's `e2e`, `dev`, and `prod`
+  profiles, `GET /api/healthcheck` returns HTTP 503 with a clear starting/not-ready
+  response while application startup is incomplete. This includes the interval
+  when HTTP is already reachable but the Flyway ready listener is still running.
+- **Ready response compatibility:** Once startup completes successfully, return
+  HTTP 200 with the existing text exactly: `OK. Active Profile: <profiles>.
+  Commit: <commit>`. Preserve profile and deployed-commit reporting and the
+  endpoint's existing access policy. The pending response must clearly represent
+  startup rather than advertise success: the current deployment probe recognizes
+  the `OK` body marker independently of the HTTP status.
+- **Existing consumers:** The local load balancer's `/__lb__/ready` and the E2E
+  runner consume the application's readiness signal. `pnpm e2e:hold` waits before
+  its testability reset and held-session announcement; `pnpm cy:run --spec
+  <feature>` waits before starting Cypress, whose setup resets test data. A
+  successful startup within the configured timeout needs no database recreation.
+- **Failure:** Let a startup/migration failure propagate visibly. The invocation
+  ends unsuccessfully using the runner's existing startup-failure and service-exit
+  handling, with its existing log diagnostics and owned-service cleanup.
+- **Environment ownership:** Preserve the E2E runner's disposable database,
+  service ownership, isolation, and shutdown. The shared healthcheck behavior
+  does not authorize testability operations on Production or Development data.
+- **Deferred promises:** Automatic repair of already partially migrated
+  databases, reclamation of other retired databases, changes to migration timing
+  or SQL, new operational probes, and startup/autohealing timeout changes.
 
-**Reported actual behavior and evidence:**
+**Architecture and consumer implications:**
 
-- Source: the owner-supplied reminder after spoken-title preparation landed on
-  `origin/main` at `7d062d701f32fe487152d6414792f6b9df095039` and its worktree
-  was removed.
-- The reminder reports that, in non-test profiles, Flyway runs on the
-  application-ready event after the healthcheck already answers. The E2E
-  runner's testability reset can consequently reach a fresh database during
-  migration.
-- Stopping that failed stack can leave the database partially migrated. A later
-  invocation refuses to rebuild it, requiring a manual drop and recreation.
-- This follow-up records the supplied observation; it has not reproduced the
-  race or repaired the runner. No original command transcript or failure log
-  was included in the reminder.
+- Use the application's existing Spring Boot availability state as the source
+  of readiness. The current Flyway listener is synchronous, so Boot does not
+  publish accepting-traffic readiness until migration returns successfully.
+- Keep the current HTTP readiness chain: application healthcheck → local load
+  balancer → runner. Preserve the runner's existing configurable timeout,
+  cancellation, and failure handling.
+- Production's load balancer, deployment verification, and VM autohealing also
+  use `/api/healthcheck`. Terry approved making these consumers wait for startup.
+  Autohealing's tracked configuration has a 300-second initial delay, then
+  30-second checks with three failures before recreation. This story retains
+  those limits; an unusually long startup is still bounded by operator policy.
+- Follow [ADR 0006 — Failure handling](../../docs/adrs/0006-failure-handling-accepted.md):
+  prevent premature success and propagate migration failure, without adding
+  recovery or retry merely to conceal startup failure.
+- Follow [ADR 0007 — Environments and isolation](../../docs/adrs/0007-environments-and-isolation-accepted.md):
+  readiness proof uses isolated disposable E2E or Unit Test resources; persistent
+  Production and Development data stay under their owners.
 
 **Key examples:**
 
-- A new worktree has an empty isolated database and migration is still running
-  when the application starts answering HTTP requests → `pnpm e2e:hold` waits
-  for completed migration, resets and seeds the database, and opens a usable
-  browser session without manual database recreation.
+- A new worktree has an empty isolated database; the HTTP listener is reachable
+  while migration is still running → `/api/healthcheck` reports HTTP 503 and a
+  starting response. The local load balancer also reports not-ready, so the E2E
+  invocation remains in its readiness wait.
+- That migration finishes successfully within the configured startup timeout
+  → `/api/healthcheck` returns HTTP 200 with the existing profile/commit text;
+  the local load balancer reports ready. `pnpm e2e:hold` then resets and seeds
+  the complete database and announces a usable held browser session.
 - Under the same delayed-migration setup → `pnpm cy:run --spec <feature>` waits
-  for completed migration before reset and runs the selected feature against
-  the fully migrated, seeded database.
-- Migration fails during startup → the invocation reports the migration/startup
-  failure and exits unsuccessfully instead of reporting a usable session or a
-  passing test run.
+  for readiness, then runs the selected feature successfully against the fully
+  migrated, seeded database without a manual drop/recreate.
+- A ready `dev` or `prod` application is checked → HTTP 200 still carries that
+  application's active profile and deployed commit in the current format.
+- Migration fails during startup → the invocation reports startup/service failure
+  and exits unsuccessfully with diagnostics; the stack never reaches the
+  successful readiness/session outcome.
 
-- **Evaluation:** Observe the real invocation boundary with a fresh database
-  and migration delayed past HTTP availability. Show the held session and the
-  selected Cypress run both reach their promised outcome, and retain focused
-  regression proof for the chosen readiness boundary.
-- **Value / learning:** Establish what readiness must mean before the runner
-  may reset test data, and remove manual recovery from ordinary first startup.
-- **Effort hypothesis:** S (30–60 minutes), low confidence until the readiness
-  decision and a deterministic reproduction establish the affected boundary.
+**Evidence and remaining verification:**
+
+- Original observation: the owner-supplied reminder after spoken-title preparation
+  landed at `7d062d701f32fe487152d6414792f6b9df095039`; it describes the fresh
+  database reset/migration race and manual recovery. No original failure log or
+  command transcript was supplied.
+- Refinement source reading at `846ddcb46e` (unchanged application/runner code in
+  the refinement workspace at preparation announcement `b833c8cdb5`):
+  `FlyWayFreeVersionIgnoreMigrationStrategyConfig` defers non-test migration;
+  `FlyWayFreeVersionRealMigration.actualMigration` repairs/migrates on the
+  highest-precedence synchronous ready listener. `HealthCheckController.ping`
+  currently returns its success text unconditionally. The local load balancer
+  accepts that endpoint's 2xx status, and `runOwnedE2eInvocation` waits on the
+  resulting readiness before entering the hold or Cypress session.
+- Framework source reading: the installed Spring Boot 4.1.1 sources archive's
+  `EventPublishingRunListener.ready` publishes `ApplicationReadyEvent` first,
+  then `ReadinessState.ACCEPTING_TRAFFIC`. This matches the
+  [official lifecycle documentation](https://docs.spring.io/spring-boot/reference/features/spring-application.html#features.spring-application.application-events-and-listeners).
+  No asynchronous application-event multicaster or async migration listener is
+  configured in the inspected application source.
+- Current proof: `HealthCheckControllerTest` checks the ready body's commit text,
+  not HTTP startup readiness. `NotebookGitStartupServicesProbeTest` exercises
+  the real migration ready listener and its ordering against a later consumer;
+  it does not observe concurrent HTTP requests during startup. Existing runner
+  tests cover HTTP 503 recognition, startup failure, cancellation, service exit,
+  and reset-before-held-announcement ordering.
+- Execution must first reproduce the early success through HTTP during a
+  controlled non-test-profile migration interval and retain regression proof of
+  the pending → ready response. The ordinary `test` profile migrates earlier,
+  so its ready-body test alone cannot establish the reported timing boundary.
+  A fresh isolated held session and selected Cypress feature still need
+  observation; this refinement did not start the application or run tests.
+
+- **Evaluation:** HTTP readiness stays pending until the real migration/startup
+  boundary completes; the held session and selected Cypress invocation then
+  reach their promised outcomes. Preserve ready-body compatibility and reuse
+  existing runner failure/ownership proof rather than duplicating it.
+- **Value / learning:** One truthful application readiness signal removes manual
+  recovery from ordinary first E2E startup and prevents other readiness consumers
+  from declaring startup complete during migration.
+- **Effort hypothesis:** S (30–60 minutes), medium confidence for the readiness
+  change; a deterministic non-test startup reproduction is the remaining sizing
+  uncertainty to resolve during slice planning.
 - **Depends on:** No blocking story dependency.
-- **Safe stopping point:** Reliable first startup is useful independently of
-  broader runner improvements; preserve service ownership and database isolation.
-
-**Remaining uncertainty / owner response:** Terry selects migration-aware
-readiness in the runner or application healthcheck readiness gated on completed
-migration. The implementation must first confirm the reported ordering with a
-reproduction and determine the focused proof for that choice.
+- **Safe stopping point:** The corrected healthcheck and its current consumers
+  deliver the outcome independently of broader runner or database recovery work.
 
 ## Ordering and Scope Reduction
 
-Queue this single bounded defect story first under dough-bug-fixing's
-remaining-work rule. Preserve the other queued story's order and scope.
+Keep this single bounded defect story first in the backlog. Preserve unrelated
+queue, Taken, and done records. Broader recovery or probe separation
+can be considered independently if later operational evidence warrants it.
 
 ## Open Decisions
 
-The readiness-boundary choice belongs to Terry, as recorded in the story above.
+No remaining product choice. The slice plan selects the execution approach and
+proof ownership; its first probe must reproduce HTTP success during the real
+migration interval before the dependent change. Planning does not authorize
+implementation.
 
 ## When to Surface
 
-Before the next fresh-worktree E2E startup or when refining this queued defect.
+Before the next fresh-worktree E2E startup or when planning this queued defect.
 
 ## Breadcrumbs
 
 - Owner-supplied readiness-race reminder associated with
-  [spoken-title preparation](SEED-066-voice-input.md#unobtrusive-selection-aware-spoken-title).
+  [spoken-title preparation at its observed revision](https://github.com/nerds-odd-e/doughnut/blob/7d062d701f32fe487152d6414792f6b9df095039/.planning/seeds/SEED-066-voice-input.md#unobtrusive-selection-aware-spoken-title).
 - [Isolated browser testing](../../docs/worktree-browser-tests.md).
 - [Disposable database retirement](../../docs/worktree-retire-databases.md).
+- Application readiness consumers: `scripts/local-lb.mjs`,
+  `scripts/dev-healthcheck.mjs`, `infra/gcp/scripts/create-lb-healthcheck.sh`,
+  `infra/gcp/scripts/app-instance-healthcheck.sh`, and
+  `infra/gcp/scripts/add-mig-autohealing.sh`.
