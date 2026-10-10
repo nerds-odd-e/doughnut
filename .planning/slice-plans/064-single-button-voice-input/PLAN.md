@@ -247,6 +247,19 @@ recording stops, the remaining speech is converted into the note they left,
 and the new note's button is idle; a kept recording does not follow. The
 unmount path stays as today. `docs/voice-input.md` states it. About 5 min.
 
+## Execution complete
+
+Product advice: no change to the queue. The next voice-input story (Speak
+the Title) can start from the compact body control as planned. Three points
+for the owner, none blocking: check the waveform's look with a real
+microphone, since it was judged only from screenshots fed a synthetic level;
+decide whether `docs/voice-input-observations.md` keeps its dated journey
+that used an author-requested conversion; and note that the Stop toast says
+"click Voice input to try again" while the button is then named "Retry
+turning your speech into text". The `NoteVoiceInputButton.*` specs still
+reach `wakeLocker` and `processAudio` through the component; moving them to
+the toolbar-level recorder helper is a test-cleanup candidate, not a defect.
+
 ## Current decisions
 
 - Button names: "Voice input" while idle and while finishing; "Stop voice
