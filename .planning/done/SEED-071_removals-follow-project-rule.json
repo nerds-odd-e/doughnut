@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 1,
+  "identity": "SEED-071#removals-follow-project-rule",
+  "title": "Deliver Donut removals under the project's deletion rule",
+  "completedAt": "2026-10-10T05:43:06.122Z",
+  "developer": "Terry Yin",
+  "agent": "Mihiro-chan",
+  "host": "claude"
+}

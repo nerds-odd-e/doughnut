@@ -31,6 +31,7 @@ Portable digest (details live in the cited skills — keep `AGENTS.md` and `CLAU
    - Delete it outright and transitively: the thing, its tests, and everything only it used (services, endpoints, DTOs, columns, helpers, fixtures, prompts, mocks, ratchet entries), repeated until nothing is orphaned. Shared code that other callers use stays.
    - Sweep the whole product: backend, frontend, CLI, MCP, docs, code comments, agent guidance, and generated artifacts read as if the thing never existed.
    - Leave no trace: no check that it is absent, no "never happens" test, no runtime guard against its return, no "no longer" or "used to" note. Git history is the record.
+   - Proof of a removal: the retained or replacement tests of the behavior that survives, plus a one-time sweep reading at acceptance (a search for the removed names over the product returns nothing), recorded in the plan as a reading, not as a test. Apart from that reading, the proof names nothing about the removed thing (`unit-testing` skill).
    - Every role: refinement and planning state a removal as deletion plus sweep, never as a promise that something will not happen; an implementer, refactor agent, or coordinator who meets a step that asks for a trace skips it and reports that; a retrospective treats a trace as a finding.
    - A refusal the product actively enforces (for example, a non-owner cannot edit a notebook) is not a removal; its tests stay.
 

@@ -30,8 +30,8 @@ match the installed files byte for byte.
 
 DD-205 concerns Donut's specific deletion-and-sweep convention in `AGENTS.md`
 and `CLAUDE.md`. Public refactor guidance retains negative assertions for actual
-promises. The queued story applies the local convention through project-owned
-handoffs; it does not change that public guidance.
+promises. The correction states the local convention in project-owned guidance;
+it does not change that public guidance.
 
 The expensive mock-reproduction framing (ODF-213), file-size rule, proof-selection,
 CI observer/delivery scripts, and coordinator authorization/acceptance lessons
@@ -45,10 +45,15 @@ corrections. DD-159's unsuccessful reproduction is not resolution evidence.
 
 <a id="local-removal-proof"></a>
 
-## Queued: Apply Donut’s removal rule from planning through delivery
+## Corrected, awaiting a real removal: Apply Donut’s removal rule from planning through delivery
 
-Story: [Deliver Donut removals under the project's deletion rule](.planning/seeds/SEED-071-reliable-project-feedback.md#removals-follow-project-rule)
-— SEED-071#removals-follow-project-rule.
+Correction (SEED-071#removals-follow-project-rule, `b96f234fb8`, 2026-10-10):
+principle 7 and the `unit-testing` skill state what proof a removal owns. In a
+one-time demonstration two fresh agents planned proof for both recorded shapes
+without observing the removed thing
+(`231b5e320d:.planning/slice-plans/013-removal-proof-in-guidance/PLAN.md`).
+That is one run per shape; the next real removal plan confirms or reopens this
+group.
 
 Recurrence of resolved Donut finding DD-202 (not the DD-202 that became ODF-208),
 whose correction put the removal rule in always-loaded agent guidance
@@ -56,13 +61,12 @@ whose correction put the removal rule in always-loaded agent guidance
 slice planning. Shared Open Dough guidance keeps absence assertions when absence
 is the promise; the rule is Donut’s, so the correction lands in Donut.
 
-Priority: first. Two distinct executions after the October 3 correction each
+Two distinct executions after the October 3 correction each
 wrote and removed a test or assertion, in addition to the earlier DD-202
 occurrence. The existing rule already addresses every role (`AGENTS.md:30–35`,
-unchanged since `18b99b6424`); its publication alone did not resolve the problem.
-The completed SEED-068 story is absent from both active backlog lists, so the
-recurrence has its own story. Its correction belongs in Donut-authored context
-and handoffs, rather than the installed public `dough-*` skills.
+unchanged from `18b99b6424` until the correction); its publication alone did not
+resolve the problem. The correction belongs in Donut-authored context, rather
+than the installed public `dough-*` skills.
 
 ### DD-205 — A plan's proof named an absence check that the project's removal rule forbids
 
