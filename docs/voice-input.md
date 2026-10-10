@@ -93,7 +93,7 @@ including English and Korean, add one space. For example, `私はPython` plus
 successive additions follow earlier additions once. Navigating to another note
 does not redirect the result. The normal content-edit undo restores the prior body.
 
-Timed chunks, pause flushes (after more than 3 s of silence, once per pause)
+Timed chunks (every 20 s), pause flushes (after more than 3 s of silence, once per pause)
 and Write text now clicks are processed mid-speech. Mid-speech processing never writes
 the last transcription segment, because it may be an unfinished sentence. The
 processed audio position advances to the end of the segment before it, and

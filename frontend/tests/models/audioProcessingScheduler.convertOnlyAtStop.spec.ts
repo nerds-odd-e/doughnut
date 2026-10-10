@@ -9,7 +9,7 @@ describe("AudioProcessingScheduler convertOnlyAtStop", () => {
     vi.useFakeTimers()
   })
 
-  it("does not call the processor on the 60 s tick", async () => {
+  it("does not call the processor on the 20 s tick", async () => {
     const mockCallback = vi.fn().mockResolvedValue(undefined)
     const { audioBuffer, scheduler } = createBufferAndScheduler(
       44100,
@@ -19,7 +19,7 @@ describe("AudioProcessingScheduler convertOnlyAtStop", () => {
 
     audioBuffer.receiveAudioData([oneSecondOfSound()])
     scheduler.start()
-    await vi.advanceTimersByTimeAsync(60 * 1000)
+    await vi.advanceTimersByTimeAsync(20 * 1000)
 
     expect(mockCallback).not.toHaveBeenCalled()
   })
@@ -65,7 +65,7 @@ describe("AudioProcessingScheduler convertOnlyAtStop", () => {
 
     audioBuffer.receiveAudioData([oneSecondOfSound()])
     scheduler.start()
-    await vi.advanceTimersByTimeAsync(60 * 1000)
+    await vi.advanceTimersByTimeAsync(20 * 1000)
     audioBuffer.receiveAudioData([new Float32Array(44100 * 3).fill(0)])
     await vi.advanceTimersByTimeAsync(0)
     await scheduler.stop()

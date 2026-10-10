@@ -16,7 +16,7 @@ export interface AudioProcessingSchedulerOptions {
 }
 
 class AudioProcessingSchedulerImpl implements AudioProcessingScheduler {
-  private readonly PROCESSOR_INTERVAL = 60 * 1000 // 60 seconds
+  private readonly PROCESSOR_INTERVAL = 20 * 1000 // 20 seconds
 
   private processorTimer: NodeJS.Timeout | null = null
   private processing: Promise<void> | null = null

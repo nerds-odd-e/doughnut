@@ -209,7 +209,7 @@ supports keeping today's cadence, slice 5 is removed and this plan says so.
 
 ### 5. Dictated text appears at the chosen cadence
 Type: Behavior
-Status: planned
+Status: done
 Proof: `audioProcessingScheduler.flush.spec.ts` and
 `audioProcessingScheduler.convertOnlyAtStop.spec.ts` tick the new interval
 (their "60 s tick" wording follows); `audioBuffer.spec.ts` if the silence
@@ -244,6 +244,11 @@ Disposition: proved by slice 3: frontend/tests/notes/NoteAudioTools.retry.spec.t
 Reported: slice 3 — "The save toast itself is untested at panel level"
 Story clause: "the common error toast reports the failed save; no raw error object is shown in the panel"
 Disposition: proved by slice 3: frontend/tests/managedApi/clientSetup.spec.ts "shows error toast for apiCallWithLoading wrapped calls" for the toast the body save raises, and frontend/tests/notes/NoteAudioTools.controlsDuringConversion.spec.ts "offers Record alone again when saving the dictated text fails" for the panel holding only Record
+
+### G5. Passages arriving every 20 seconds are observed at the scheduler
+Reported: slice 5 — "Untested at component level; covered only by the scheduler tick tests plus the unchanged preservation specs"
+Story clause: "Completed passages appear in the body at the chosen cadence, after existing content, and are saved."
+Disposition: proved by slice 5: frontend/tests/models/audioProcessingScheduler.flush.spec.ts "marks chunk as isMidSpeech when processing due to timer" observes the conversion at the 20 s tick, and frontend/tests/notes/NoteAudioTools.preservation.spec.ts observes each mid-speech conversion joining the body after existing content and being saved
 
 ## Current decisions
 
@@ -342,3 +347,11 @@ Disposition: proved by slice 3: frontend/tests/managedApi/clientSetup.spec.ts "s
   far; this happens today and a 20 s timer makes those ticks three times as
   frequent (five silent minutes: about 900 billable seconds today, about
   2,550 at 20 s).
+- Slice 5: the timer is 20 s (`PROCESSOR_INTERVAL`); Speak the Title
+  converts only at Stop and never reads it. Accepted proof:
+  `audioProcessingScheduler.flush.spec.ts` "marks chunk as isMidSpeech when
+  processing due to timer" and "keeps the timed conversion and Flush going
+  after the failure" fail at 60 s and pass at 20 s;
+  `env -u NODE_ENV CURSOR_DEV=true nix develop -c pnpm frontend:test tests/notes/NoteAudioTools tests/models tests/notes/NoteNewForm.spokenTitle tests/notes/NoteEditableTitle.spokenTitle`
+  (147 tests) and `record_live_audio.feature` (5 scenarios, feature
+  unchanged) pass.

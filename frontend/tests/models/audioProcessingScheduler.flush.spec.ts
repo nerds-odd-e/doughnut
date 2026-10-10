@@ -21,7 +21,7 @@ describe("AudioProcessingScheduler flush", () => {
 
     audioBuffer.receiveAudioData([new Float32Array([0.5, 0.4, 0.3, 0.2, 0.1])])
     scheduler.start()
-    vi.advanceTimersByTime(30 * 1000)
+    vi.advanceTimersByTime(10 * 1000)
     await scheduler.tryFlush()
 
     expect(mockCallback).toHaveBeenCalledTimes(1)
@@ -35,7 +35,7 @@ describe("AudioProcessingScheduler flush", () => {
     const { scheduler } = createBufferAndScheduler(44100, mockCallback)
 
     scheduler.start()
-    vi.advanceTimersByTime(65 * 1000)
+    vi.advanceTimersByTime(25 * 1000)
     mockCallback.mockClear()
     await scheduler.tryFlush()
 
@@ -51,7 +51,7 @@ describe("AudioProcessingScheduler flush", () => {
 
     audioBuffer.receiveAudioData([new Float32Array([0.5, 0.4, 0.3, 0.2, 0.1])])
     scheduler.start()
-    vi.advanceTimersByTime(60 * 1000)
+    vi.advanceTimersByTime(20 * 1000)
 
     expect(mockCallback).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -175,8 +175,8 @@ describe("AudioProcessingScheduler flush", () => {
 
       audioBuffer.receiveAudioData([oneSecondOfSound()])
       scheduler.start()
-      await vi.advanceTimersByTimeAsync(60 * 1000)
-      await vi.advanceTimersByTimeAsync(60 * 1000)
+      await vi.advanceTimersByTimeAsync(20 * 1000)
+      await vi.advanceTimersByTimeAsync(20 * 1000)
       audioBuffer.receiveAudioData([oneSecondOfSound()])
       await scheduler.tryFlush()
 
