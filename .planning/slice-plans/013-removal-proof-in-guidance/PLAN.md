@@ -188,3 +188,12 @@ Learnings:
   during the slice and "not kept as a test or check"; it did not call it a
   reading recorded at acceptance, a weaker match to the story's second example
   than the dictation table.
+
+## Execution complete
+
+Product advice: no backlog change. The demonstration is one run per recorded
+shape, so the next real removal plan is the evidence that settles whether the
+wording holds; if a planner again maps a deletion to an observation of the
+removed thing, treat that as a recurrence of DD-205 with this wording as the
+starting point. Story wrap-up closes the queued DD-205 group in
+`DonutRetrospectiveFindings.md`.

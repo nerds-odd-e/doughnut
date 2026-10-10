@@ -6,7 +6,7 @@ released response is not proof of effectiveness. Unknown provenance stays unknow
 [Response status](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/finding-names.md).
 Full pre-trim evidence: `8830c682704aac3bbb34bf9b1204da8feba042ca:DearDough.md`. Older narratives live in Git, not a second archive.
 
-- Highest allocated local number: 218. Removed local codes are never reused.
+- Highest allocated local number: 219. Removed local codes are never reused.
 
 Detailed retained observations are consolidated in the linked Open Dough
 record; headings and former local aliases preserve traceability. Review date:
@@ -234,3 +234,17 @@ A cohesion edit rewrote typed referenced-title save to call `this.chooseReferenc
   - Evidence: refactor agent `823365da-5587-41e8-8079-137bdc24f9b8` (reported skipping E2E after changing `saveReferencedNoteTitle` to `this.chooseReferencedTitleSave`); `ca98162b615cd38552770bd615720d3a05aead31:e2e_test/start/pageObjects/notePage.ts`; CI run https://github.com/nerds-odd-e/doughnut/actions/runs/38001567782 (`TypeError: Cannot read properties of undefined (reading 'chooseReferencedTitleSave')` on `wiki_link.feature` / `property_wiki_link.feature`)
   - Observed effect: four note-topology E2E scenarios failed on the published slice-2 SHA while focused `record_live_audio.feature` proof stayed green
   - Inference: arrow-property `this` is not the page object; proof that only exercises the direct helper call cannot validate the rewritten typed-save chain
+
+## DD-219 — A plan's literal focused command cut the source story text off before its last key examples
+
+Plan 013's focused commands read each recorded story with a fixed line range (`sed -n '151,200p'`). The dictation story at `595e2eb5d9` runs past line 200, so the range ends before its last three key examples, including the one removal example the demonstration existed to observe ("Advanced Options … no Processing Instructions field"). The plan's premise table recorded only the story's start line as observed.
+
+### Occurrences
+- Execution: SEED-071#removals-follow-project-rule
+  - Timestamp: 2026-10-10T14:15:00+09:00
+  - Tool: Claude Code
+  - Model: claude-opus-5-5
+  - Open Dough release: 0.3.57
+  - Evidence: `618ee6f7cc:.planning/slice-plans/013-removal-proof-in-guidance/PLAN.md` "Focused commands" and premise row "Both recorded story shapes are recoverable with their anchors"; `git show 595e2eb5d9:.planning/seeds/SEED-066-voice-input.md | sed -n '198,202p'` (examples continue past line 200); coordinator's slice-2 extraction, first by line range, then by anchor after reading the file's tail
+  - Observed effect: the coordinator's first two extractions ended mid-sentence; reading the tail caught it and one more extraction by anchor to the next heading gave the full story before any agent received it
+  - Inference: a line range fixes the start that was observed and guesses the end; extracting from the anchor to the next anchor would not depend on that guess. Cost here was one extra tool call; unnoticed, the demonstration would have run on a story missing three examples
