@@ -148,37 +148,6 @@ The accepted order is global priority; it does not require serial technical
 implementation of independent stories. No story authorizes a model choice,
 technical redesign, or speculative infrastructure.
 
-<a id="restore-typed-referenced-title-save"></a>
-### Restore typed referenced-title save in the note page object
-
-**Identity:** SEED-066#restore-typed-referenced-title-save
-```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/013-restore-typed-referenced-title-save/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"ffbbf2077e2d625473e1d35d70c31388f62f096b4f6a83b5f08c6cbb9f2de117","plan":"bb8679ab2059887bd049959f9f20a4012c0d8c222b2566912b8cfe645421560c"}}
-```
-
-**Goal:** Authors renaming a linked note by typing can again choose Keep or
-Update visible reference text through the existing E2E steps, so those
-wiki-link journeys pass. This corrects a page-object regression from speaking
-a title on an existing note (recoverable at
-`b4bb2f90a0d74a938dcadb98e8f279bbf09263e0:.planning/seeds/SEED-066-voice-input.md#rename-with-spoken-title`);
-it adds no spoken-title product promise.
-
-**Scope:**
-
-- **Required:** `saveReferencedNoteTitle` on the note page object invokes the
-  shared panel-save helper without relying on arrow-function `this`, so
-  steps that type a new title and choose Keep or Update work again.
-- **Keep:** Spoken "Speak the title" on the note page, New note spoken title,
-  and product reference-panel behavior stay as delivered.
-- **Deferred:** Broader page-object `this`/arrow cleanup beyond this helper.
-
-**Key examples:**
-
-1. **Typed Keep still works:** On a note linked from another note, the author
-   types a new title and chooses Keep visible reference text; the rename
-   saves and the linking note keeps its visible link text (existing
-   `wiki_link.feature` / `property_wiki_link.feature` scenarios).
-
 ## Ordering and Scope Reduction
 
 The owner accepted the nine-story order above on 2026-10-03. The product backlog
