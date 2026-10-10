@@ -155,7 +155,7 @@ promise has a named proof shape that is not an absence check.
 
 ### 2. A fresh agent writes surviving-behavior proof for both recorded removals
 Type: Behavior
-Status: planned
+Status: done
 Proof: two temporary proof tables, one per recorded shape, each read by the
 coordinator against the story's examples 1 and 2; the Learnings record the
 result in a sentence each; the temporary files are deleted.
@@ -166,3 +166,25 @@ and the executable-proof reference, then write a Goal and an Outside-in proof
 table → every row observes surviving or replacement behavior or is a
 one-time sweep reading; no row observes the removed thing. On a failure,
 apply the single revision decision above.
+
+Accepted 2026-10-10 at `b96f234fb8`: two fresh agents each read `CLAUDE.md`,
+the `unit-testing` skill, and the executable-proof reference, and wrote a Goal
+and proof table from the recorded story text against the product one commit
+before each recorded plan. The coordinator read both tables; the temporary
+files are deleted. No wording revision was needed.
+
+Learnings:
+
+- Dictation shape: every row named surviving behavior (`AiAudioControllerTests`
+  response text, `record_live_audio.feature` saved content, the retained
+  Advanced Options full-screen tests) or the removal row's one-time `git grep`
+  sweep reading "recorded in the plan as a reading and not as a test". No row
+  observed the rewrite or a client call; the two Processing Instructions tests
+  were listed as "deleted, not replaced".
+- PID-file shape: start, stop, and restart were proved from the process table
+  with the surviving tests; the "leftover `dev.pid` names PID 597" example got
+  "no fixture writes it and no assertion says it is ignored (principle 7;
+  unit-testing skill)". The removal row described the `dev.pid` search as used
+  during the slice and "not kept as a test or check"; it did not call it a
+  reading recorded at acceptance, a weaker match to the story's second example
+  than the dictation table.
