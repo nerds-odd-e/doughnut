@@ -134,9 +134,18 @@ question; slice 2 is the observation that settles it, so no probe precedes it.
 
 ### 1. Guidance names the proof a removal owns
 Type: Behavior
-Status: planned
+Status: done
 Proof: read the three files; the principle 7 `diff` between `AGENTS.md` and
 `CLAUDE.md` is empty; the `unit-testing` bullet sits in "Focused assertions".
+
+Accepted 2026-10-10: one added line in each of `AGENTS.md:34`, `CLAUDE.md:34`
+("Proof of a removal" bullet, citing the `unit-testing` skill) and
+`.agents/skills/unit-testing/SKILL.md:25`; the `diff` command printed nothing.
+
+Learning: the story's sentence "proof of a removal names nothing about the
+removed thing" contradicts the sweep reading beside it, which must name the
+removed names. The principle bullet reads "Apart from that reading, the proof
+names nothing about the removed thing".
 
 Behavior: a planner or test writer reads principle 7 or the `unit-testing`
 skill → the text says a removal's proof is the surviving or replacement

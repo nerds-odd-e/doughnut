@@ -22,6 +22,7 @@ A **"small test"** means: a fast, in-process unit test (JUnit, Vitest, Bach, …
 - **Canonical shape once.** Shared post-conditions belong in **one** test. Sibling scenarios assert only their delta.
 - **Different precondition ≠ re-assert unrelated post-condition.** If outcome X is clearly independent of what changed in the setup, do not repeat X.
 - Prefer asserting the **positive** signal over “not the other message/alert” when the positive already distinguishes the case.
+- When a change **removes** something, the tests are those of the behavior that survives or replaces it. Write no test, assertion, fixture, or mock that observes the removed thing (not called, absent, ignored). Rule: principle 7 in `AGENTS.md` / `CLAUDE.md`.
 - In loops (thresholds, retries, frame polls), assert the **loop result**, not the same intermediate outcome every iteration.
 
 ```java
