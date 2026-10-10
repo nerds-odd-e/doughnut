@@ -169,58 +169,176 @@ one-time removal sweep as an acceptance reading, following principle 7 in
 
 **Identity:** SEED-066#unobtrusive-selection-aware-spoken-title
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"unselected"}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/065-unobtrusive-spoken-title/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"14bafa66330619f581a19cbe663179daacfbdccaa2e1fd7550e001b2e1ca85f7","plan":"eec22a208f250c4b8e984d211d86480c878e37c30fd7f2732d2c6220fd2f0cab"}}
 ```
 
-**Goal:** For note authors, restore a visibly styled note title and make the
-rarely used Speak the Title feature compact and respectful of editing intent.
+**Goal:** For note authors on the web app, the note title reads as the
+note's heading again, and speaking a title becomes a small control at the
+end of the title that puts the heard words where the author's caret or
+selection is, on an existing note and in New note, so dictation never
+replaces a title the author did not choose to replace.
+
+**What was observed (2026-10-10, this worktree at `f6fa23a17e`, isolated
+stack, Chromium through Playwright; source read at the same revision):**
+
+- The title is 24 px at normal weight (400). Body paragraphs are 16 px at
+  normal weight; a body `##` heading is 24 px bold. The title is therefore
+  the same size as a body section heading but lighter, which is what reads
+  as ordinary content text. This is not a recent regression: the scoped rule
+  `font-size: 1.5rem; font-weight: 400` in `NoteEditableTitle.vue` dates
+  from the Tailwind migration (`ac2014f354`, 2024-12-07); before it the
+  title took Bootstrap's heading weight. The one-button story plan
+  (`064`) does not touch it.
+- Speak the title today is a text-labelled button under the title on the
+  note page and under the title field in New note, with a status line above
+  it while listening, converting, after nothing was heard, and after a
+  failure. On an existing note the heard words replace the whole title; in
+  New note they join the end of the current title and replace an untouched
+  default "Untitled".
+- The title editor is a single-text-node contenteditable
+  (`SeamlessTextEditor`). Its paste handler already inserts clipboard text at
+  the caret or over the selection and puts the caret after the pasted text.
+  No spoken path uses it yet.
+- Clicking Speak the title moves focus to the button, but the document
+  selection stays in the title: with "Orchard" selected in "Orchard notes",
+  the selection still read "Orchard" (offsets 0–7) after the click. New note
+  opens with "Untitled" focused and wholly selected. Observed in Chromium
+  only; Safari and Firefox remain a hypothesis, so the design must not
+  depend on the browser keeping the selection (see Architecture).
 
 **Scope:**
 
-- Investigate and restore the title's intended heading styling; the owner
-  reports that it currently looks like ordinary content text. The cause and
-  regression point are unverified.
-- Put a small Speak the Title button inline at the end of the title area,
-  keeping title readability and editing primary. Apply the compact treatment
-  to existing-note title editing and New note, where the shared control is
-  currently used.
-- Apply recognized speech according to the title's text selection or caret:
-  replace selected text, insert at the caret, and append when the caret is at
-  the end. Preserve the selection/caret intent when clicking the speech button
-  moves focus. Preserve surrounding title text.
-- For a title with no established caret/selection, refine the default before
-  implementation; the current implementation replaces the entire title.
-  Whole-title replacement should be available through selecting the whole
-  title. Do not silently infer replacement when the author placed the caret
-  at the end.
-- Preserve existing title validation, explicit inbound-reference rename
-  decisions, and persistence. Use common error toasts for exceptions and the
-  shared removal scope for UI/supporting code superseded by this redesign.
+- **Title styling.** The note title is bold and larger than a body section
+  heading, so it reads as the page heading above the content, in view and
+  while editing, on the note page for editors and readers alike. The exact
+  size is the implementer's choice (for example the app's `text-2xl` to
+  `text-3xl` with `font-bold`); the sidebar, note cards and other title
+  renderings are unchanged.
+- **One small control.** Speak the title is a small icon button, the same
+  compact size as the toolbar's icon buttons, at the end of the title line
+  on the note page and inside the New note title field before the Wikidata
+  button. It has three appearances the author can tell apart without
+  reading: idle (named "Speak the title"), listening (highlighted like the
+  toolbar's active toggles, named "Stop speaking the title"), and converting
+  (unavailable and visibly quiet, named "Speak the title"). The accessible
+  name says what a click does. There is no status line. Readers who may not
+  edit the note are not offered the button.
+- **Words go where the author's caret or selection is**, on the note page
+  and in New note alike. A selection is replaced by the heard words; a caret
+  inserts them there with the dictation joining rule applied on both sides
+  (one space in Latin scripts, none next to Japanese or Chinese writing); a
+  caret at the end appends. The caret, or the selection, the author had
+  when they pressed the button is the target even though the click moves
+  focus. After the words are placed, the title has focus and the caret sits
+  after the inserted words, so typing a correction continues naturally.
+- **No caret in the title.** When the author has placed neither caret nor
+  selection in the title, the words join the end of a nonempty title and
+  fill an empty one. In New note an untouched default "Untitled" is still
+  replaced: it is a placeholder, not an authored title, so this holds even
+  when the author clicked elsewhere first and lost the initial selection.
+  Replacing a whole authored title is done by selecting it all (triple
+  click or select all) and speaking.
+- **Errors in the common error toast**, as the body button uses: a refused
+  microphone keeps its existing wording; a failed conversion at Stop says
+  "Could not turn your speech into text." and leaves the title alone. A
+  recording in which nothing was heard returns the button to idle with the
+  title unchanged and no message, as the body button does. There is no
+  retry control; speaking again starts a fresh recording.
+- **Preserve everything else:** illegal-character replacement and the
+  existing warnings, the explicit reference choice and discard-on-leaving
+  for a title other notes link to, title autosave, Submit unavailable and
+  Enter inert in New note while listening or converting, the recorder
+  stopped when the dialog closes or the note page unmounts, the search for
+  existing notes with the resulting title, and body dictation untouched.
+- **Remove without trace**, under the removal scope above: the status line
+  and its wording, the text-labelled "Speak the title" and "Stop" buttons,
+  the New note join rule that this story's placement rule subsumes (keep
+  the untouched-default rule), their exclusive tests, test support, E2E
+  steps and page-object methods, and the two title sections of
+  `docs/voice-input.md`, which are rewritten for the new control.
+
+**UI:** On the note page the title line is the bold heading followed, on
+the same line, by the small microphone button; nothing sits between the
+title and "Add property" any more. In New note the title field keeps its
+bordered surface and the Wikidata button at its right end; the microphone
+button sits inside the field surface just before it. Listening highlights
+the button; converting greys it. Toasts appear where the app's other error
+toasts do. Icon, exact size and highlight styling are the implementer's
+choice within the toolbar's compact button size; the body voice button's
+appearances are the reference.
 
 **Key examples:**
 
-- A note is displayed or its title is edited → the title has the intended
-  heading typography and a small inline speech control.
-- The title is “Orchard” with the caret at the end; the author dictates
-  “notes” → the title becomes “Orchard notes”, preserving the original title.
-- In “Orchard notes”, the author selects “Orchard” and dictates “Garden” →
-  the title becomes “Garden notes”. Selecting the whole title instead replaces
-  the whole title with recognized speech.
-- The author places the caret between existing words and dictates → the
-  recognized words are inserted there with appropriate word spacing; title
-  text on both sides survives.
-- A referenced title is edited by speech → the existing explicit reference
-  choice and title-save behavior still apply.
+- A note "Orchard notes" is displayed → its title is bold and larger than
+  the body's "Pruning" section heading, and a small microphone button ends
+  the title line; no text button or status line is below it.
+- The title is "Orchard" and the author clicks at its end, then the
+  microphone; they say "notes" and click it again → the title is "Orchard
+  notes", the caret is after "notes", and the title is saved as a typed
+  title would be.
+- In "Orchard notes" the author selects "Orchard", speaks "Garden" and stops
+  → the title is "Garden notes".
+- In "Orchard notes" the author puts the caret between "Orchard" and
+  "notes", speaks "harvest" and stops → the title is "Orchard harvest
+  notes".
+- In "りんご園" the author puts the caret at the end, speaks "の手入れ" and
+  stops → the title is "りんご園の手入れ", with no space added.
+- The author selects the whole title and speaks "Pear orchard care" → the
+  title is "Pear orchard care".
+- The author never clicked into "Orchard notes" and speaks "today" → the
+  title is "Orchard notes today".
+- New note opens with "Untitled" selected; the author speaks "Photosynthesis
+  in desert plants" and stops → the title field reads "Photosynthesis in
+  desert plants", existing notes matching it are listed, and Submit creates
+  the note once with that title. The same happens when the author first
+  chose a folder and so lost the selection on "Untitled".
+- New note opened with the title pattern "2026-10-06 " and the author speaks
+  "weekly review" → the title reads "2026-10-06 weekly review".
+- A note other notes link to is renamed by speech → the reference panel
+  appears with the new title; choosing how links should change saves it,
+  leaving without choosing restores the old title.
+- The author clicks the microphone while listening and the conversion fails
+  → the common error toast says "Could not turn your speech into text."; the
+  title and the caret are as before; the button is idle.
+- The author speaks nothing and stops → the button returns to idle, the
+  title is unchanged, and no message appears.
+- Microphone access is refused → the common error toast explains how to
+  allow it; the button stays idle.
 
-**Refinement decision:** Agree the no-caret/no-selection default; recommended
-default is append to a nonempty title and fill an empty title. Confirm against
-the existing title editor's focus/selection behavior.
+**Architecture:** Placing text at the caret or selection, and restoring the
+caret afterwards, is the title editor's responsibility: the spoken words go
+through the same insertion the paste handler already performs in
+`SeamlessTextEditor`, so caret bookkeeping lives in one place and the New
+note form stops computing a joined title itself. The dictation joining rule
+generalizes from "join a segment onto a base" to "insert a segment between
+a before and an after" in `joinDictatedSegments`, one rule for body
+passages, title appends and mid-title inserts. The target selection must be
+captured before the click moves focus (for example on the button's
+`mousedown`, which the reference panel already prevents from stealing
+focus) or remembered from the editor's last selection, rather than read
+from the document after the click, because selection persistence across a
+button click was observed only in Chromium. The button's idle, listening
+and converting appearances are the same concept as the body's voice button
+(landed 2026-10-11): that component is bound to the body's recording
+session, so the title control keeps its own stop-only session and reuses
+the body button's classes, icons, naming pattern and toast rather than the
+component. No Accepted ADR constrains this story beyond ADR 0006 (failure
+handling): the toast is the deliberate business outcome of a failed
+conversion, with no retry or recovery machinery added.
 
-**Effort hypothesis:** M, medium confidence until styling and selection
-behavior are inspected.
+**Considered and excluded:** a status line in any form (the owner asked
+for a compact control; the accessible name carries the state in words and
+the appearance carries it visually, as the body button does, which
+supersedes the New note story's readable status line); a retry control for
+the title; a keyboard shortcut; voice title entry from the sidebar or for
+folders; changing how the sidebar or note cards render titles.
 
-**Safe stopping point:** Styled titles and compact, intentional title dictation
-remain useful independently of body dictation changes.
+**Effort hypothesis:** M, medium confidence. The styling is one rule; the
+control, the insertion rule and its tests span two surfaces, the E2E steps
+and the documentation.
+
+**Safe stopping point:** Styled titles and compact, intentional title
+dictation remain useful independently of body dictation changes.
 
 ## Ordering and Scope Reduction
 
@@ -279,6 +397,9 @@ No blocking dependency is inferred from shared recording code or that order.
   story, 2026-10-10; authorized capture directly on main, commit, and sync origin.
 - Owner's UX/UI refinement request for the one-button story, 2026-10-10,
   through the established Shunka-chan preparation.
+- Owner's investigate, UX/UI and architecture refinement request for the
+  title styling and spoken-title story, 2026-10-10, through the established
+  Hitomi-chan preparation; observation on this worktree's isolated stack.
 - Effort-band convention:
   [SEED-039](SEED-039-faster-ci-feedback.md#story-decomposition).
 - Later decomposition workflow:
