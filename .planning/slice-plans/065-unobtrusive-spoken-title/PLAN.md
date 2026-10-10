@@ -156,7 +156,15 @@ Stop-safe.
 
 ### 2. Inserting text at the caret or selection is one operation of the title editor
 Type: Structure
-Status: planned
+Status: done
+Accepted proof: `SeamlessTextEditor.spec.ts` "inserts at the selection it
+remembered when focus left the editor" and "appends inserted text when no
+selection was ever placed"; `PathNameEditor.spec.ts` "inserts text through
+the editor a title slot renders, sanitized as a typed title"; the paste case
+"at the caret" now mounts attached and asserts the exact text; full
+`pnpm frontend:test` (330 files, 2085 tests) and `vue-tsc --noEmit` after
+the refactor. A `#title` slot consumer reaches the operation through
+`PathNameEditor`'s exposed `insertAtSelection`.
 Proof: `SeamlessTextEditor.spec.ts` and `PathNameEditor.spec.ts` stay green,
 with one new editor case: focus the editor, set a selection, blur to a
 button, call the exposed insertion → the text replaces the remembered
@@ -284,6 +292,9 @@ the E2E page object and the documentation. Stop-safe.
 - The target range is the editor's own: the current selection when inside
   the editor, else the remembered last selection, else the end. No
   dependence on the browser keeping the selection after a button click.
+  The editor remembers the selection when it loses focus and after each
+  insertion, not on `selectionchange`; a blur without a selection in the
+  editor keeps the earlier one.
 - Shared appearance, separate control: `SpeakTitleControl.vue` keeps its own
   stop-only recorder and becomes the small icon button using the body
   button's classes, icons and naming pattern; the body button's component
@@ -304,6 +315,36 @@ Reported: slice 1 — "The product reading is Chromium only."
 Story clause: "The note title is bold and larger than a body section heading"
 Disposition: no user cost "the note title reads as the note's heading again": the change is two standard font declarations in one scoped rule, which no browser treats differently
 
+### G3. Caret inside an attached title has no direct assertion
+Reported: slice 2 — "The current-selection path with a caret inside an attached editor has no direct assertion; slice 3's \"inserts between words\" will be the first."
+Story clause: "a caret inserts them there with the dictation joining rule applied on both sides"
+Disposition: receiving slice 3
+
+### G4. Whole-title selection not asserted
+Reported: slice 2 — "A selection whose container is the editor element (the autofocus select-all of \"Untitled\") is handled by the range-based offsets, but this slice has no case for it"
+Story clause: "Replacing a whole authored title is done by selecting it all"
+Disposition: receiving slice 3
+
+### G5. Selection at blur on a real click not observed
+Reported: slice 2 — "Whether Chromium still has the selection in the editor when `blur` fires on a real mouse click on a button was not checked."
+Story clause: "The caret, or the selection, the author had when they pressed the button is the target even though the click moves focus."
+Disposition: receiving slice 5
+
+### G6. Remembered selection survives a title changed from outside
+Reported: slice 2 — "Remembered offsets are clamped by `substring`, not reset, when the title changes from outside."
+Story clause: "When the author has placed neither caret nor selection in the title, the words join the end of a nonempty title"
+Disposition: receiving slice 3
+
+### G7. Insertion does not check readonly
+Reported: slice 2 — "`insertAtSelection` does not check `readonly`."
+Story clause: "Readers who may not edit the note are not offered the button."
+Disposition: receiving slice 5
+
+### G8. Selection on the editor element now survives a same-length sync
+Reported: slice 2 — "the element-level-selection edge from item 1 has no test"
+Story clause: "Preserve everything else"
+Disposition: no user cost "puts the heard words where the author's caret or selection is": a whole-title selection is kept instead of dropped when the title is replaced by text of the same length, which is what a selection inside the text already did
+
 ## Execution
 
 Story Branch Mode in `.worktrees/restore-title-styling-and-make-spoken-title-edit`
@@ -319,5 +360,11 @@ on `claude/restore-title-styling-and-make-spoken-title-edit`, published to
   beside it; the run alone passed in full. That spec does not render the
   title. Cause not established beyond that; run the frontend suite without a
   held stack beside it.
+- After an insertion, a later insertion with no selection in the editor goes
+  to the caret the first one left, not to the end; "appends" holds only when
+  no selection was ever placed and nothing was inserted yet (slice 3 specs).
+- Slice 3 owes G6: a title replaced from outside (another note shown in the
+  same mounted title, a save response) must not leave an earlier note's
+  caret as the target.
 - The held stack's `/api/testability/inject_notes` seeds a note for a by-eye
   reading at `/n<id>` (slice 5).

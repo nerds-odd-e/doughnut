@@ -173,7 +173,10 @@ function onModelUpdate(raw: string) {
   emit("update:modelValue", value)
 }
 
+const innerEditor = ref<InstanceType<typeof SeamlessTextEditor> | null>(null)
+
 const seamlessBindings = computed(() => ({
+  ref: innerEditor,
   modelValue: props.modelValue,
   readonly: props.readonly,
   placeholder: props.placeholder,
@@ -193,6 +196,8 @@ onMounted(() => {
 
 defineExpose({
   applyExternalValue: onModelUpdate,
+  insertAtSelection: (compose: (before: string, after: string) => string) =>
+    innerEditor.value?.insertAtSelection(compose),
 })
 </script>
 

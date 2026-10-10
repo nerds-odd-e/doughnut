@@ -3,6 +3,7 @@ import { nextTick } from "vue"
 import {
   editorEl,
   focusEditor,
+  insertAtSelection,
   mountSeamlessTextEditor,
   PASTE_NO_UPDATE_CASES,
   PASTE_SUCCESS_CASES,
@@ -52,15 +53,12 @@ describe("SeamlessTextEditor", () => {
 
   it.each(PASTE_SUCCESS_CASES)(
     "pastes plain text ($case)",
-    async ({
-      initialValue,
-      caretOffset,
-      paste,
-      expected,
-      expectedContains,
-      pasteAfterClearingSelection,
-    }) => {
-      wrapper = await mountSeamlessTextEditor(initialValue)
+    async ({ initialValue, caretOffset, paste, expected }) => {
+      wrapper = await mountSeamlessTextEditor(
+        initialValue,
+        {},
+        { attachTo: document.body }
+      )
       const editor = editorEl(wrapper)
       await focusEditor(editor)
       if (caretOffset !== undefined) {
@@ -68,33 +66,50 @@ describe("SeamlessTextEditor", () => {
       }
       await pasteClipboard(editor, paste)
 
-      const emitted = wrapper.emitted()["update:modelValue"]
-      expect(emitted).toBeDefined()
-      expect(emitted?.length).toBeGreaterThan(0)
-      const finalText = emitted?.[emitted.length - 1]?.[0] as string
-      if (expected !== undefined) {
-        expect(finalText).toBe(expected)
-        expect(editor.innerText).toBe(expected)
-      } else {
-        for (const part of expectedContains ?? []) {
-          expect(finalText).toContain(part)
-          expect(editor.innerText).toContain(part)
-        }
-      }
-
-      if (pasteAfterClearingSelection !== undefined) {
-        const expectedAppendedText = `${editor.innerText}${pasteAfterClearingSelection}`
-        await pasteClipboard(editor, {
-          plain: pasteAfterClearingSelection,
-          clearSelection: true,
-        })
-        expect(wrapper.emitted()["update:modelValue"]?.at(-1)?.[0]).toBe(
-          expectedAppendedText
-        )
-        expect(editor.innerText).toBe(expectedAppendedText)
-      }
+      expect(wrapper.emitted()["update:modelValue"]?.at(-1)?.[0]).toBe(expected)
+      expect(editor.innerText).toBe(expected)
     }
   )
+
+  it("inserts at the selection it remembered when focus left the editor", async () => {
+    wrapper = await mountSeamlessTextEditor(
+      "Orchard notes",
+      {},
+      { attachTo: document.body }
+    )
+    const editor = editorEl(wrapper)
+    await focusEditor(editor)
+    setCaretInEditor(editor, 0, 7)
+    const button = document.createElement("button")
+    document.body.appendChild(button)
+    button.focus()
+    window.getSelection()?.removeAllRanges()
+
+    await insertAtSelection(wrapper, () => "Garden")
+
+    expect(wrapper.emitted()["update:modelValue"]?.at(-1)?.[0]).toBe(
+      "Garden notes"
+    )
+    expect(editor.innerText).toBe("Garden notes")
+    const range = window.getSelection()?.getRangeAt(0)
+    expect(range?.collapsed).toBe(true)
+    expect(range?.startContainer).toBe(editor.firstChild)
+    expect(range?.startOffset).toBe(6)
+  })
+
+  it("appends inserted text when no selection was ever placed", async () => {
+    wrapper = await mountSeamlessTextEditor(
+      "Orchard",
+      {},
+      { attachTo: document.body }
+    )
+
+    await insertAtSelection(wrapper, (before, after) => `[${before}|${after}]`)
+
+    expect(wrapper.emitted()["update:modelValue"]?.at(-1)?.[0]).toBe(
+      "Orchard[Orchard|]"
+    )
+  })
 
   it("submits the nearest form on Enter", async () => {
     const onSubmit = vi.fn((e: Event) => e.preventDefault())

@@ -31,14 +31,29 @@ export async function mountSeamlessTextEditor(
   return wrapper
 }
 
-export function setCaretInEditor(editor: HTMLElement, offset: number) {
+export function setCaretInEditor(
+  editor: HTMLElement,
+  offset: number,
+  endOffset = offset
+) {
   const textNode = editor.firstChild as Text
   const selection = window.getSelection()
   const range = document.createRange()
   range.setStart(textNode, offset)
-  range.setEnd(textNode, offset)
+  range.setEnd(textNode, endOffset)
   selection?.removeAllRanges()
   selection?.addRange(range)
+}
+
+export async function insertAtSelection(
+  wrapper: VueWrapper,
+  compose: (before: string, after: string) => string
+) {
+  ;(wrapper.vm as InstanceType<typeof SeamlessTextEditor>).insertAtSelection(
+    compose
+  )
+  await nextTick()
+  await flushPromises()
 }
 
 export async function focusEditor(editor: HTMLElement) {
@@ -49,16 +64,12 @@ export async function focusEditor(editor: HTMLElement) {
 type PasteClipboardOptions = {
   plain?: string
   html?: string
-  clearSelection?: boolean
 }
 
 export async function pasteClipboard(
   editor: HTMLElement,
   options: PasteClipboardOptions
 ) {
-  if (options.clearSelection) {
-    window.getSelection()?.removeAllRanges()
-  }
   const clipboardData = new DataTransfer()
   if (options.plain !== undefined) {
     clipboardData.setData("text/plain", options.plain)
@@ -82,9 +93,7 @@ type PasteSuccessCase = {
   initialValue: string
   caretOffset?: number
   paste: PasteClipboardOptions
-  expected?: string
-  expectedContains?: readonly string[]
-  pasteAfterClearingSelection?: string
+  expected: string
 }
 
 type PasteNoUpdateCase = {
@@ -122,11 +131,10 @@ export const PASTE_SUCCESS_CASES: PasteSuccessCase[] = [
     expected: "Bold text",
   },
   {
-    case: "at cursor position, then appends when selection is cleared",
+    case: "at the caret",
     initialValue: "existing text",
     caretOffset: 8,
     paste: { plain: " inserted" },
-    expectedContains: ["existing", "inserted", "text"] as const,
-    pasteAfterClearingSelection: " appended",
+    expected: "existing inserted text",
   },
 ]
