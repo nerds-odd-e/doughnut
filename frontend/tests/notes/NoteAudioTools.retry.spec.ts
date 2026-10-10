@@ -69,7 +69,6 @@ describe("NoteAudioTools Retry after a failed conversion", () => {
     recorder.hasUnconvertedAudio.mockReturnValue(true)
     recorder.stopRecording.mockImplementation(async () => {
       await processAudio(wrapper, audioChunk()).catch(() => undefined)
-      return new File([], "test.webm")
     })
   })
 
@@ -158,7 +157,6 @@ describe("NoteAudioTools Retry after a failed conversion", () => {
     recorder.stopRecording.mockImplementation(async () => {
       await new Promise<void>((resolve) => (finishRetry = resolve))
       await processAudio(wrapper, audioChunk())
-      return new File([], "test.webm")
     })
 
     await retryButton()!.trigger("click")

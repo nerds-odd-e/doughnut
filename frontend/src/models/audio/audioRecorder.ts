@@ -8,7 +8,7 @@ import { createAudioReceiver } from "./audioReceiver"
 
 export interface AudioRecorder {
   startRecording: () => Promise<void>
-  stopRecording: () => Promise<File>
+  stopRecording: () => Promise<void>
   getAudioData: () => number
   tryFlush: () => Promise<void>
   hasUnconvertedAudio: () => boolean
@@ -53,14 +53,14 @@ export const createAudioRecorder = (
       isRecording = true
     },
 
-    stopRecording: async function (): Promise<File> {
+    stopRecording: async function (): Promise<void> {
       isRecording = false
       audioReceiver.disconnect()
       if (mediaStream) {
         mediaStream.getTracks().forEach((track) => track.stop())
         mediaStream = null
       }
-      return audioProcessingScheduler.stop()
+      await audioProcessingScheduler.stop()
     },
 
     getAudioData: function (): number {

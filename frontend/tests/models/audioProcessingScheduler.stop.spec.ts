@@ -126,8 +126,7 @@ describe("AudioProcessingScheduler stop", () => {
     audioBuffer.receiveAudioData([oneSecondOfSound()])
     scheduler.start()
 
-    const recording = await scheduler.stop()
-    expect(recording.size).toBe(wavSizeOfSeconds(1))
+    await scheduler.stop()
     expect(audioBuffer.hasUnprocessedData()).toBe(true)
 
     audioBuffer.receiveAudioData([oneSecondOfSound()])
@@ -137,7 +136,7 @@ describe("AudioProcessingScheduler stop", () => {
     expect(sentFile(mockCallback, 1).size).toBe(wavSizeOfSeconds(2))
   })
 
-  it("stops with the whole recording when a conversion in progress fails", async () => {
+  it("converts the whole recording at Stop when a conversion in progress fails", async () => {
     let failProcessing: (() => void) | null = null
     const mockCallback = vi
       .fn()
@@ -159,7 +158,7 @@ describe("AudioProcessingScheduler stop", () => {
     failProcessing!()
 
     await flushPromise
-    expect((await stopPromise).size).toBe(wavSizeOfSeconds(1))
+    await stopPromise
     expect(sentFile(mockCallback, 1).size).toBe(wavSizeOfSeconds(1))
   })
   it("converts what is left once after repeated failing final conversions", async () => {

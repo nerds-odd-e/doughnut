@@ -42,20 +42,6 @@
         <button class="daisy-btn labeled-action" @click="audioRecorder.tryFlush()" :disabled="isProcessing">Write text now</button>
       </template>
     </div>
-    <div class="secondary-actions">
-      <button
-        @click="saveAudioLocally(audioFile as Blob)"
-        :disabled="isRecording || !audioFile"
-      >
-        <Download :size="18" />
-        Save audio
-      </button>
-      <FullScreen>
-        <div v-if="errors" class="fullscreen-error">
-          {{ Object.values(errors)[0] }}
-        </div>
-      </FullScreen>
-    </div>
   </section>
 </template>
 
@@ -63,19 +49,16 @@
 import { computed, onBeforeUnmount, ref, type PropType } from "vue"
 import { createAudioRecorder } from "../../../models/audio/audioRecorder"
 import { createWakeLocker } from "../../../models/wakeLocker"
-import { saveAudioLocally } from "@/models/audio/saveAudioLocally"
 import type { Note } from "@generated/donut-backend-api"
 import Waveform from "./Waveform.vue"
-import FullScreen from "@/components/common/FullScreen.vue"
 import { noteMoreOptionsTitles } from "./noteMoreOptionsTitles"
-import { Download, Mic, Square } from "@lucide/vue"
+import { Mic, Square } from "@lucide/vue"
 import { useNoteAudioProcessing } from "@/composables/useNoteAudioProcessing"
 
 const { note } = defineProps({
   note: { type: Object as PropType<Note>, required: true },
 })
 
-const audioFile = ref<Blob | undefined>()
 const errors = ref<Record<string, string | undefined>>()
 const statusByPhase = {
   ready: "Ready to record",
@@ -128,7 +111,7 @@ const startRecording = async () => {
 const stopRecording = async () => {
   phase.value = "stopping"
   try {
-    audioFile.value = await audioRecorder.stopRecording()
+    await audioRecorder.stopRecording()
   } finally {
     const written = await writtenResult()
     if (errors.value?.conversion && audioRecorder.hasUnconvertedAudio()) {
@@ -183,8 +166,7 @@ onBeforeUnmount(() => {
   transform: scale(1.05);
 }
 
-.daisy-btn:disabled,
-.secondary-actions :deep(button:disabled) {
+.daisy-btn:disabled {
   background-color: #a0aec0;
   cursor: not-allowed;
 }
@@ -201,39 +183,6 @@ onBeforeUnmount(() => {
 
 .retry-button {
   border-radius: 8px;
-}
-
-.secondary-actions {
-  display: flex;
-  justify-content: center;
-  gap: 12px;
-  margin-top: 20px;
-}
-
-.secondary-actions :deep(button) {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 6px 14px;
-  border: none;
-  border-radius: 9999px;
-  background-color: #2d3748;
-  color: white;
-  font-size: 14px;
-  cursor: pointer;
-  transition: background-color 0.3s ease, transform 0.2s ease;
-}
-
-.secondary-actions :deep(button:hover:not(:disabled)) {
-  background-color: #4a5568;
-  transform: scale(1.05);
-}
-
-.fullscreen-error {
-  color: #fc8181;
-  font-size: 14px;
-  text-align: center;
-  max-width: 80%;
 }
 
 .device-select {

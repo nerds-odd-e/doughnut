@@ -27,7 +27,7 @@ describe("AudioProcessingScheduler flush", () => {
     expect(mockCallback).toHaveBeenCalledTimes(1)
     const callArgument = mockCallback.mock.calls[0]?.[0] as AudioChunk
     expect(callArgument.data).toBeInstanceOf(File)
-    expect(callArgument.data.name).toMatch(/^recorded_audio_partial_.*\.wav$/)
+    expect(callArgument.data.name).toMatch(/^recorded_audio_.*\.wav$/)
   })
 
   it("does not call processorCallback on tryFlush if no new data", async () => {

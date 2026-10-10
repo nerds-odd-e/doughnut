@@ -57,16 +57,16 @@ describe("NoteAudioTools dictation status", () => {
   })
 
   it("says it is turning speech into text until Stop has finished", async () => {
-    let finishStop!: (file: File) => void
+    let finishStop!: () => void
     await startRecording(wrapper)
     audioToolsVm(wrapper).audioRecorder.stopRecording.mockImplementation(
-      () => new Promise<File>((resolve) => (finishStop = resolve))
+      () => new Promise<void>((resolve) => (finishStop = resolve))
     )
 
     await stopRecording(wrapper)
     expect(dictationStatus(wrapper)).toBe("Turning your speech into text…")
 
-    finishStop(new File([], "test.webm"))
+    finishStop()
     await flushPromises()
     expect(dictationStatus(wrapper)).toBe("No speech was turned into text.")
     expect(findButtonByText(wrapper, "Record")).toBeTruthy()
@@ -96,7 +96,6 @@ describe("NoteAudioTools dictation status", () => {
       audioToolsVm(wrapper).audioRecorder.stopRecording.mockImplementation(
         async () => {
           await processAudio(wrapper)
-          return new File([], "test.webm")
         }
       )
       mockSdkService(AiAudioController, "audioToText", {
@@ -141,9 +140,9 @@ describe("NoteAudioTools dictation status", () => {
       await processAudio(wrapper, midSpeechChunk())
       await flushPromises()
       const recorder = audioToolsVm(wrapper).audioRecorder
-      let finishStop!: (file: File) => void
+      let finishStop!: () => void
       recorder.stopRecording.mockImplementation(
-        () => new Promise<File>((resolve) => (finishStop = resolve))
+        () => new Promise<void>((resolve) => (finishStop = resolve))
       )
       await stopRecording(wrapper)
 
@@ -154,7 +153,7 @@ describe("NoteAudioTools dictation status", () => {
       expect(dictationStatus(wrapper)).toBe("Turning your speech into text…")
       expect(recorder.startRecording).toHaveBeenCalledTimes(1)
 
-      finishStop(new File([], "test.webm"))
+      finishStop()
       await flushPromises()
       expect(dictationStatus(wrapper)).toBe("Added to your note.")
       expect(

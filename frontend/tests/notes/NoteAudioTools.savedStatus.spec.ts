@@ -57,7 +57,6 @@ const stopConvertsOnePassage = (tools: NoteAudioToolsWrapper) => {
   audioToolsVm(tools).audioRecorder.stopRecording.mockImplementation(
     async () => {
       await processAudio(tools)
-      return new File([], "test.webm")
     }
   )
 }

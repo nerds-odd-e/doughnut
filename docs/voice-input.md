@@ -4,9 +4,7 @@ Authors open Audio tools on an existing note to Record, Stop, and after a
 failed conversion to Retry. The one main action is Record when ready and Stop
 while recording; only while recording, the microphone chooser (named
 "Microphone") and Write text now (converts what has been said so far,
-unavailable during a conversion) sit beside Stop. Below, set apart, Save audio
-downloads the last recording once one has produced a file, and Full screen
-shows the current error in a full-screen overlay. A status
+unavailable during a conversion) sit beside Stop. A status
 that assistive technology announces says "Ready to record", "Recording. Speak
 now." (a mid-speech conversion does not change it), or "Turning your speech
 into text…" until Stop has finished and the body holding the recording's

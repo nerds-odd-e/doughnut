@@ -108,7 +108,7 @@ API client and `NotebookSettings` use it.
 
 ### 1. The panel offers only recording controls
 Type: Behavior
-Status: planned
+Status: done
 Proof: `NoteAudioTools.recording.spec.ts`: idle shows Record only; recording
 shows Stop, Write text now and the microphone selector; no button named Save
 audio or Full screen anywhere in the spec. Delete
@@ -235,4 +235,13 @@ recorded decision.
 
 ## Learnings
 
-- (none yet)
+- Slice 1: the whole-recording file returned at Stop existed only for Save
+  audio, so `stopRecording`, the scheduler's `stop` and the buffer no longer
+  produce it, and conversion chunks are named `recorded_audio_<timestamp>.wav`.
+  `fullscreen-error` went with Full screen, so slice 3's sweep finds it
+  already absent. Accepted proof: `NoteAudioTools.recording.spec.ts` "offers
+  Record when ready, then Stop, Write text now and the microphone chooser
+  while recording, with the status announced" lists every panel button;
+  `env -u NODE_ENV CURSOR_DEV=true nix develop -c pnpm frontend:test tests/notes/NoteAudioTools tests/models tests/notes/NoteNewForm.spokenTitle tests/notes/NoteEditableTitle.spokenTitle`
+  passes. Sweep reading (2026-10-10): `FullScreen`, `saveAudioLocally`,
+  `Save audio`, `Full screen` return nothing over the product.

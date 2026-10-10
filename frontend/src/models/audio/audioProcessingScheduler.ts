@@ -2,7 +2,7 @@ import type { AudioBuffer } from "./audioReceiver"
 
 export interface AudioProcessingScheduler {
   start(): void
-  stop(): Promise<File>
+  stop(): Promise<void>
   tryFlush(): Promise<void>
 }
 
@@ -56,7 +56,7 @@ class AudioProcessingSchedulerImpl implements AudioProcessingScheduler {
     }
   }
 
-  async stop(): Promise<File> {
+  async stop(): Promise<void> {
     if (this.processorTimer) {
       clearInterval(this.processorTimer)
       this.processorTimer = null
@@ -71,8 +71,6 @@ class AudioProcessingSchedulerImpl implements AudioProcessingScheduler {
     if (this.audioBuffer.hasUnprocessedData()) {
       await this.processAndCallback(false)
     }
-
-    return this.audioBuffer.createFinalAudioFile()
   }
 
   async tryFlush(): Promise<void> {

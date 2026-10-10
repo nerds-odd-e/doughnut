@@ -26,7 +26,6 @@ export type NoteAudioToolsVm = {
     release: ReturnType<typeof vi.fn>
   }
   isRecording: boolean
-  audioFile: File | null
   errors: Record<string, string> | null
   processAudio: (chunk: AudioChunk) => Promise<string | undefined>
 }
