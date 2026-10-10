@@ -134,7 +134,13 @@ otherwise, in `NoteMoreOptionsActions.vue`) is the listening highlight; the
 
 ### 1. The note title reads as the heading
 Type: Behavior
-Status: planned
+Status: done
+Accepted proof: `frontend/tests/notes/NoteEditableTitle.heading.spec.ts`
+(editable and readonly cases, computed weight ≥ 700 and size > 24 px) in the
+full `env -u NODE_ENV CURSOR_DEV=true nix develop -c pnpm frontend:test`
+(330 files, 2082 tests) with `pnpm -C frontend exec vue-tsc --noEmit`; held
+stack reading in Chromium: title 30 px / 700, also while focused, against a
+body `##` heading at 24 px / 700. The rule is `1.875rem` / `700`.
 Proof: a case in `NoteEditableTitle.spokenTitle.spec.ts` (or a new
 `NoteEditableTitle.heading.spec.ts`) mounting an editable and a readonly
 title and asserting `getComputedStyle` of the heading: font weight ≥ 700 and
@@ -286,6 +292,32 @@ the E2E page object and the documentation. Stop-safe.
   existing assertions; no scenario is added.
 - The real-service feature is untouched (it has no title scenario).
 
+## Story obligations
+
+### G1. Reader's title not read in the product
+Reported: slice 1 — "The readonly title for a reader who may not edit (for example a bazaar or shared notebook) was not observed in the product."
+Story clause: "in view and while editing, on the note page for editors and readers alike"
+Disposition: proved by slice 1: `frontend/tests/notes/NoteEditableTitle.heading.spec.ts` readonly case; readers and editors render the same `h2` under the same scoped rule
+
+### G2. Product reading in Chromium only
+Reported: slice 1 — "The product reading is Chromium only."
+Story clause: "The note title is bold and larger than a body section heading"
+Disposition: no user cost "the note title reads as the note's heading again": the change is two standard font declarations in one scoped rule, which no browser treats differently
+
+## Execution
+
+Story Branch Mode in `.worktrees/restore-title-styling-and-make-spoken-title-edit`
+on `claude/restore-title-styling-and-make-spoken-title-edit`, published to
+`origin`; claim `624fd7f060` accepted on `main`. CI source: GitHub Actions
+`ci.yml` on the execution branch.
+
 ## Learnings
 
-(none yet)
+- One full frontend run failed once in
+  `RichMarkdownEditor.propertyListWikiLinks.spec.ts` ("Frame was detached",
+  5 s timeout) while a held stack, a Playwright script and the typecheck ran
+  beside it; the run alone passed in full. That spec does not render the
+  title. Cause not established beyond that; run the frontend suite without a
+  held stack beside it.
+- The held stack's `/api/testability/inject_notes` seeds a note for a by-eye
+  reading at `/n<id>` (slice 5).

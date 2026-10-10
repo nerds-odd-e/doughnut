@@ -60,8 +60,8 @@ function onHeardTitleSegments(
 
 <style scoped>
 h2.path-name-heading {
-  font-size: 1.5rem;
-  font-weight: 400;
+  font-size: 1.875rem;
+  font-weight: 700;
   margin-bottom: 10px;
   width: 100%;
 }
