@@ -205,7 +205,7 @@ recovery.
 
 ### 3. The button keeps a failed recording and retries it
 Type: Behavior
-Status: planned
+Status: done
 Proof: retry spec: a failed conversion at Stop toasts "Could not turn your
 speech into text. Your recording is kept until you leave this note; click
 Voice input to try again.", the button is enabled, named "Retry turning your
@@ -238,8 +238,8 @@ passage to the saved body of a note the author has left" keeps its
 assertion through that stop; a retry spec case: a kept recording is dropped
 when the note changes, and the button is idle; a case where the final
 conversion on leaving fails toasts "Could not turn your speech into text."
-with nothing kept. `NoteToolbar.overflow.spec.ts` or panels spec: the
-button is not pinned after the note changes. No E2E change (the mounted
+with nothing kept. `NoteToolbar.voiceInputOverflow.spec.ts`: the button is
+not pinned after the note changes. No E2E change (the mounted
 boundary observes the journey; North Star prefers mounted proof).
 
 Behavior: the author navigates to another note or page while recording →
@@ -272,7 +272,7 @@ unmount path stays as today. `docs/voice-input.md` states it. About 5 min.
 ### G1. A kept recording has no retry in the button
 Reported: slice 2 — "A kept recording has no retry control and no distinct appearance; it joins the next recording's first conversion (interim, slice 3)."
 Story clause: "Recovery after a failed conversion at Stop lives in the button"
-Disposition: receiving slice 3
+Disposition: proved by slice 3: `frontend/tests/notes/NoteVoiceInputButton.retry.spec.ts` (five tests: the Stop toast, the kept button's name and style, the retry without the microphone, unavailable while it runs, a failed retry), `NoteToolbar.voiceInputOverflow.spec.ts` group "with a recording kept after a failed conversion at Stop", and `record_live_audio.feature` scenario "Retry the kept recording from the Voice input button after the transcription failed"
 
 ### G2. A recording follows the author to another note
 Reported: slice 2 — "Recording continues across a note change and writes to the originating note; the pressed button then shows on the other note (interim, slice 4)."
@@ -283,6 +283,21 @@ Disposition: receiving slice 4
 Reported: slice 2 — "The look of the waveform with a real microphone on a dev server is unobserved; the level scaling (×4, 8 bars, about 10 samples per second) is a guess."
 Story clause: "its waveform moves as they speak and settles when they pause"
 Disposition: proved by slice 2: the coordinator viewed Chromium screenshots of the mounted button fed a synthetic level (a quiet dotted line in silence, bars of differing height while speaking, a dim spinner while finishing); how the bars scale to a real voice is left for the owner's eye and reported at completion
+
+### G4. A kept recording follows the author to another note
+Reported: slice 3 — "Interim until slice 4: because the kept state counts as active, the `voiceInputNoteId` watch (untouched) keeps a kept-recording button on screen after the author moves to another note in the same toolbar, and its retry writes to the originating note."
+Story clause: "leaving the note or reloading drops it"
+Disposition: receiving slice 4
+
+### G5. The toast on leaving promises a retry
+Reported: slice 3 — "Interim until slice 4: a final conversion that fails while the toolbar unmounts toasts the "kept until you leave this note; click Voice input to try again" wording although nothing can be retried."
+Story clause: "If that final conversion fails, nothing is kept and the toast says"
+Disposition: receiving slice 4
+
+### G6. No new recording while one is kept
+Reported: slice 3 — "While a recording is kept, the button only retries, so the author cannot start a new recording on that note until the retry succeeds or they leave the note."
+Story clause: "on failure the toast shows again and"
+Disposition: no user cost "start and stop dictation from the one Voice input button in the note toolbar": the story gives the one button to the kept recording until its retry succeeds; an author who would rather start over leaves the note, which the story says drops the kept recording
 
 ## Learnings
 
@@ -316,3 +331,19 @@ Disposition: proved by slice 2: the coordinator viewed Chromium screenshots of t
 - `docs/voice-input-observations.md` describes its dated journey as a
   "requested mid-speech conversion"; whether to keep that observation is the
   owner's decision.
+- Slice 3 accepted proof: `pnpm frontend:test tests/notes tests/composables
+  tests/models` (475 tests), `vue-tsc --noEmit`, and the feature (5
+  scenarios). The kept state keeps the button pinned and out of the menu:
+  `voiceInputIsActive` is true while a recording runs, is finishing, or is
+  kept, and unmount clears it.
+- The narrow-toolbar Voice input tests live in
+  `frontend/tests/notes/NoteToolbar.voiceInputOverflow.spec.ts`; its nested
+  group shows how to reach the mocked recorder from a mounted `NoteToolbar`.
+  `NoteToolbar.panels.spec.ts` is near the 250-line limit.
+- For slice 4: `stop()` sets the kept phase whenever the last conversion
+  failed and audio remains, also on unmount; the wording is chosen by
+  `chunk.isMidSpeech` in `useNoteAudioProcessing.convert`, so leaving needs
+  its own wording and must keep nothing.
+- The Stop toast says "click Voice input to try again" while the button is
+  then named "Retry turning your speech into text"; the wording is the
+  story's.

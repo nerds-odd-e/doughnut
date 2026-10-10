@@ -9,15 +9,23 @@ icon is a live waveform of the microphone's level (a still, quiet line in
 silence), and it is named "Stop voice input". An author with several
 microphones chooses one in the browser's own site settings; when the current
 microphone disconnects, recording switches to the first one available. While
-recording, and until the last speech has been added, the button stays in the
-toolbar even when it was started from the "more options" menu. Clicking the
+recording, and until the last speech has been added, a kept recording
+included, the button stays in the toolbar even when it was started from the
+"more options" menu. Clicking the
 active button stops capture; the button is then unavailable, showing a
 spinner and named "Voice input", until the last speech has been converted and
 its text added to the note, and then it is idle again. A recording in which no
 speech was recognized adds nothing to the note and shows no message. When a
 conversion at Stop failed and audio is still not converted, the common error
-toast says "Could not turn your speech into text. Your recording is kept." and
-the button is idle. When recording cannot start, nothing is recorded, the
+toast says "Could not turn your speech into text. Your recording is kept until
+you leave this note; click Voice input to try again." and the button holds the
+kept recording: it is tinted as a warning, shows a retry arrow, and is named
+"Retry turning your speech into text". Clicking it converts the kept recording
+without the microphone; the button is unavailable with its spinner meanwhile.
+On success the text is added and the button is idle; on failure the toast
+shows again and the button keeps the recording. The kept recording lasts while
+the author stays on the note; reloading or leaving the note drops it. When
+recording cannot start, nothing is recorded, the
 common error toast says "Could not use the microphone. Allow microphone access
 in your browser, then try again.", and the button stays idle. When saving a
 passage fails, the save's own error toast shows and the button is idle.
@@ -115,14 +123,13 @@ once written, is never revised: holding back the unfinished sentence replaces
 revising it. Audio that is entirely silent is not sent.
 A conversion that fails (an error answer or no answer) keeps its audio as
 not yet converted, and recording goes on. That audio is sent again, together
-with the later audio, with the next conversion: timed, pause, or Stop,
-including the first conversion of the next recording on the same note page.
-Text already written is not written again. Each failure, while recording or
-at Stop, shows the common error toast "Could not turn your speech into text.
-Your recording is kept." After a failed conversion at Stop, the author
-recovers the kept recording by starting and stopping Voice input again: the
-kept audio joins that recording's first conversion and its passage is added
-once. The kept recording does not survive a reload or leaving the note. A
+with the later audio, with the next conversion: timed, pause, or Stop.
+Text already written is not written again. A failure while recording shows
+the common error toast "Could not turn your speech into text. Your recording
+is kept." After a failed conversion at Stop, the author recovers the kept
+recording from the button's retry: the kept audio is converted again and its
+passage is added once. The kept recording lasts while the author stays on the
+note and is dropped by a reload or by leaving the note. A
 recording in progress continues when the author moves to another note, and its
 text still goes to the note it was started on; Voice input started on the
 other note afterwards dictates into that note.
@@ -137,8 +144,8 @@ empty, and whitespace-ending bodies, repeated additions, originating-note target
 mocked recording journey supplies a transcription and observes the original
 body, one space, and the transcription's text. A second mocked journey makes
 the transcription fail at Stop, observes the unchanged body and the error
-toast, then lets the transcription succeed and observes the next recording
-joining the passage once. Model tests with the real audio buffer cover kept
+toast, then lets the transcription succeed and observes the button's retry
+adding the passage once. Model tests with the real audio buffer cover kept
 audio across failures, and mounted tests cover the button's states. The
 real-OpenAI journey checks both its original text and
 the dictated passage.

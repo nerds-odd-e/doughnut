@@ -5,6 +5,8 @@ import {
   visibleToolbarActionButton,
 } from './noteToolbarOverflow'
 
+const retryTitle = 'Retry turning your speech into text'
+
 const voiceInputPage = () => {
   return {
     startRecording() {
@@ -14,6 +16,17 @@ const voiceInputPage = () => {
     },
     stopRecording() {
       visibleToolbarActionButton('Stop voice input').click()
+      noteToolbar()
+        .find(
+          `button[title="Voice input"]:enabled, button[title="${retryTitle}"]`,
+          { timeout: 30000 }
+        )
+        .should('exist')
+      waitUntilAppIsNotBusy()
+      return this
+    },
+    retryConvertingSpeech() {
+      visibleToolbarActionButton(retryTitle).click()
       noteToolbar()
         .find('button[title="Voice input"]', { timeout: 30000 })
         .should('be.enabled')

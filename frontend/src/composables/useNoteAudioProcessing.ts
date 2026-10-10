@@ -19,7 +19,9 @@ export function useNoteAudioProcessing(note: Note) {
     } catch (error) {
       lastConversionFailed.value = true
       showErrorToast(
-        "Could not turn your speech into text. Your recording is kept."
+        chunk.isMidSpeech
+          ? "Could not turn your speech into text. Your recording is kept."
+          : "Could not turn your speech into text. Your recording is kept until you leave this note; click Voice input to try again."
       )
       throw error
     }

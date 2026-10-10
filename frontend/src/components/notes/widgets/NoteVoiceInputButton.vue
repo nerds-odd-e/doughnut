@@ -1,12 +1,16 @@
 <template>
   <button
     type="button"
-    :class="toolbarToggleBtnClass(isRecording)"
+    :class="
+      hasKeptRecording
+        ? toolbarKeptRecordingBtnClass
+        : toolbarToggleBtnClass(isRecording)
+    "
     :title="name"
     :aria-label="name"
     :aria-pressed="isRecording || undefined"
     :disabled="phase === 'stopping'"
-    @click="isRecording ? stop() : start()"
+    @click="click"
   >
     <canvas
       v-if="isRecording"
@@ -21,6 +25,11 @@
       class="w-6 h-6 animate-spin"
       aria-hidden="true"
     />
+    <RotateCw
+      v-else-if="hasKeptRecording"
+      class="w-6 h-6"
+      aria-hidden="true"
+    />
     <Mic v-else class="w-6 h-6" aria-hidden="true" />
   </button>
 </template>
@@ -28,26 +37,39 @@
 <script setup lang="ts">
 import { computed, ref, watch } from "vue"
 import type { Note } from "@generated/donut-backend-api"
-import { LoaderCircle, Mic } from "@lucide/vue"
+import { LoaderCircle, Mic, RotateCw } from "@lucide/vue"
 import { useNoteVoiceInput } from "@/composables/useNoteVoiceInput"
 import { noteVoiceInputTitles } from "./noteMoreOptionsTitles"
-import { toolbarToggleBtnClass } from "./noteToolbarButtonClasses"
+import {
+  toolbarKeptRecordingBtnClass,
+  toolbarToggleBtnClass,
+} from "./noteToolbarButtonClasses"
 
 const { note } = defineProps<{ note: Note }>()
 
 const {
   phase,
   isRecording,
+  hasKeptRecording,
   audioRecorder,
   wakeLocker,
   processAudio,
   start,
   stop,
+  retry,
 } = useNoteVoiceInput(note)
 
-const name = computed(() =>
-  isRecording.value ? noteVoiceInputTitles.stop : noteVoiceInputTitles.start
-)
+const name = computed(() => {
+  if (isRecording.value) return noteVoiceInputTitles.stop
+  if (hasKeptRecording.value) return noteVoiceInputTitles.retry
+  return noteVoiceInputTitles.start
+})
+
+const click = () => {
+  if (isRecording.value) return stop()
+  if (hasKeptRecording.value) return retry()
+  return start()
+}
 
 const barWidth = 2
 const barStep = 3

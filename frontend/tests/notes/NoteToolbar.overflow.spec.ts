@@ -13,7 +13,6 @@ import {
 import {
   noteMoreOptionsTitles,
   noteToolbarEditTitles,
-  noteVoiceInputTitles,
 } from "@/components/notes/widgets/noteMoreOptionsTitles"
 import {
   mountNoteToolbar,
@@ -28,27 +27,6 @@ import { describe, it, expect, afterEach, beforeEach, vi } from "vitest"
 import { type VueWrapper, flushPromises } from "@vue/test-utils"
 
 const titles = noteMoreOptionsTitles
-
-vi.mock("@/models/audio/recorderWorklet", async () => {
-  const { recorderWorkletMockExports } = await import(
-    "@tests/notes/noteVoiceInputButtonMocks"
-  )
-  return recorderWorkletMockExports()
-})
-
-vi.mock("@/models/audio/audioRecorder", async () => {
-  const { audioRecorderMockExports } = await import(
-    "@tests/notes/noteVoiceInputButtonMocks"
-  )
-  return audioRecorderMockExports()
-})
-
-vi.mock("@/models/wakeLocker", async () => {
-  const { wakeLockerMockExports } = await import(
-    "@tests/notes/noteVoiceInputButtonMocks"
-  )
-  return wakeLockerMockExports()
-})
 
 describe("NoteToolbar more-options overflow", () => {
   // biome-ignore lint/suspicious/noExplicitAny: wrapper for testing
@@ -141,26 +119,6 @@ describe("NoteToolbar more-options overflow", () => {
     await flushPromises()
 
     expect(wrapper.emitted("edit-as-markdown")).toEqual([[true]])
-  })
-
-  it("pins Voice input on a narrow toolbar while recording then returns it to overflow when stopped", async () => {
-    wrapper = await mountNoteToolbar(makeMe.aNoteRealm.please())
-    await layoutNoteToolbar(wrapper, overflowTogglesNavWidth())
-
-    await openNoteToolbarOverflowMenu(wrapper)
-    overflowMenuItem(titles.voiceInput)!.click()
-    await flushPromises()
-
-    const stopButton = noteToolbarAction(wrapper, noteVoiceInputTitles.stop)
-    expect(stopButton.isVisible()).toBe(true)
-    expect(stopButton.attributes("aria-pressed")).toBe("true")
-    expect(document.querySelector("[data-dropdown-portal-panel]")).toBeNull()
-
-    await stopButton.trigger("click")
-    await flushPromises()
-
-    await openNoteToolbarOverflowMenu(wrapper)
-    expect(overflowMenuItem(titles.voiceInput)).not.toBeNull()
   })
 
   it("closes more options dialog when note id changes", async () => {

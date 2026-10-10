@@ -17,6 +17,7 @@ export const noteDeleteTitle = (trashed: boolean) =>
 export const noteVoiceInputTitles = {
   start: "Voice input",
   stop: "Stop voice input",
+  retry: "Retry turning your speech into text",
 } as const
 
 export const noteMoreOptionsTitles = {

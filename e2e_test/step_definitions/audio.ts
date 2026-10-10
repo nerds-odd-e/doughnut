@@ -30,6 +30,10 @@ When('I stop recording audio', () => {
   start.assumeNotePage().voiceInput().stopRecording()
 })
 
+When('I retry converting my speech', () => {
+  start.assumeNotePage().voiceInput().retryConvertingSpeech()
+})
+
 When('I speak the title', () => {
   noteCreationForm.speakTheTitle()
 })

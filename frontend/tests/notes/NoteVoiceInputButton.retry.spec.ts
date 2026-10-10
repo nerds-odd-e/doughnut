@@ -14,14 +14,19 @@ import {
   startRecording,
   stopRecording,
   useNoteVoiceInputTestLifecycle,
+  voiceInputButton,
   voiceInputVm,
   type NoteVoiceInputButtonWrapper,
 } from "@tests/notes/noteVoiceInputButtonTestSupport"
 import {
   showToastsOnPage,
   toastMessage,
+  toastMessagesOnPage,
   toastShown,
 } from "@tests/helpers/toastTestSupport"
+import { noteVoiceInputTitles } from "@/components/notes/widgets/noteMoreOptionsTitles"
+import { mockMediaDevices } from "@tests/notes/noteVoiceInputButtonMocks"
+import { flushPromises } from "@vue/test-utils"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 
 vi.mock("@/models/audio/recorderWorklet", async () => {
@@ -49,6 +54,8 @@ useNoteVoiceInputTestLifecycle()
 showToastsOnPage()
 
 describe("NoteVoiceInputButton after a failed conversion at Stop", () => {
+  const failedAtStop =
+    "Could not turn your speech into text. Your recording is kept until you leave this note; click Voice input to try again."
   let wrapper: NoteVoiceInputButtonWrapper
   let audioToText: ReturnType<typeof mockSdkService>
   let saveContent: ReturnType<typeof mockSdkService>
@@ -78,31 +85,95 @@ describe("NoteVoiceInputButton after a failed conversion at Stop", () => {
     wrapper?.unmount()
   })
 
-  const recordAndStop = async () => {
+  const failAtStop = async () => {
     await startRecording(wrapper)
     await stopRecording(wrapper)
   }
-
-  it("toasts that the recording is kept and returns to the idle button", async () => {
-    await recordAndStop()
-
-    expect(toastMessage(await toastShown("error"))).toBe(
-      "Could not turn your speech into text. Your recording is kept."
+  const retry = async () => {
+    await wrapper
+      .find(`button[aria-label="${noteVoiceInputTitles.retry}"]`)
+      .trigger("click")
+    await flushPromises()
+  }
+  const expectKeptRecordingButton = () => {
+    const button = voiceInputButton(wrapper)
+    expect(button.attributes("aria-label")).toBe(
+      "Retry turning your speech into text"
     )
-    expectIdleVoiceInputButton(wrapper)
+    expect(button.attributes("title")).toBe(
+      "Retry turning your speech into text"
+    )
+    expect(button.attributes()).not.toHaveProperty("disabled")
+    expect(button.attributes()).not.toHaveProperty("aria-pressed")
+    expect(button.classes()).toContain("daisy-btn-warning")
+    expect(button.classes()).not.toContain("daisy-btn-ghost")
+    expect(button.classes()).not.toContain("daisy-btn-primary")
+  }
+
+  it("toasts at Stop how to retry, and the button holds the kept recording", async () => {
+    await failAtStop()
+
+    expect(toastMessage(await toastShown("error"))).toBe(failedAtStop)
+    expectKeptRecordingButton()
     expect(saveContent).not.toHaveBeenCalled()
   })
 
-  it("turns the kept recording into text once with the next recording", async () => {
-    await recordAndStop()
-    audioToText.mockResolvedValue(wrapSdkResponse(audioTextResponse("hello")))
-
-    await recordAndStop()
+  it("leaves the idle button when nothing remains to convert", async () => {
+    voiceInputVm(wrapper).audioRecorder.hasUnconvertedAudio.mockReturnValue(
+      false
+    )
+    await failAtStop()
 
     expectIdleVoiceInputButton(wrapper)
+  })
+
+  it("turns the kept recording into text once without the microphone", async () => {
+    await failAtStop()
+    audioToText.mockResolvedValue(wrapSdkResponse(audioTextResponse("hello")))
+
+    await retry()
+
+    expectIdleVoiceInputButton(wrapper)
+    expect(mockMediaDevices.getUserMedia).toHaveBeenCalledTimes(1)
+    expect(audioToText).toHaveBeenCalledTimes(2)
     expect(saveContent).toHaveBeenCalledExactlyOnceWith({
       path: { note: realm.note.id },
       body: { content: "Original body. hello" },
     })
+  })
+
+  it("is unavailable while the retry runs", async () => {
+    await failAtStop()
+    audioToText.mockResolvedValue(wrapSdkResponse(audioTextResponse("hello")))
+    let finishRetry!: () => void
+    voiceInputVm(wrapper).audioRecorder.stopRecording.mockImplementation(
+      async () => {
+        await new Promise<void>((resolve) => (finishRetry = resolve))
+        await processAudio(wrapper, audioChunk())
+      }
+    )
+
+    await retry()
+
+    const button = voiceInputButton(wrapper)
+    expect(button.attributes()).toHaveProperty("disabled")
+    expect(button.attributes("aria-label")).toBe("Voice input")
+
+    finishRetry()
+    await flushPromises()
+    expectIdleVoiceInputButton(wrapper)
+  })
+
+  it("toasts again and keeps the recording when the retry fails", async () => {
+    await failAtStop()
+    await toastShown("error")
+
+    await retry()
+
+    await vi.waitFor(() =>
+      expect(toastMessagesOnPage()).toEqual([failedAtStop, failedAtStop])
+    )
+    expectKeptRecordingButton()
+    expect(saveContent).not.toHaveBeenCalled()
   })
 })
