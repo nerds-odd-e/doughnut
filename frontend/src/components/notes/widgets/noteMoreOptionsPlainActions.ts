@@ -17,11 +17,11 @@ export interface PlainNoteAction {
 
 export interface PlainNoteActionsInput {
   noteHasContent: boolean
-  isAudioOpen: boolean
+  isVoiceInputActive: boolean
   isAssimilationOpen: boolean
   deleteTitle: string
   onRefineOpen: () => void
-  onAudioToggle: () => void
+  onVoiceInputStart: () => void
   onAssimilationToggle: () => void
   deleteNote: () => void
 }
@@ -39,13 +39,13 @@ export const plainNoteActions = (
     pressed: false,
   },
   {
-    id: "audio",
-    title: noteMoreOptionsTitles.audio,
+    id: "voiceInput",
+    title: noteMoreOptionsTitles.voiceInput,
     icon: Mic,
-    onClick: input.onAudioToggle,
+    onClick: input.onVoiceInputStart,
     available: true,
     toggleable: true,
-    pressed: input.isAudioOpen,
+    pressed: input.isVoiceInputActive,
   },
   {
     id: "assimilation",

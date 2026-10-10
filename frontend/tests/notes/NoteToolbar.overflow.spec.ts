@@ -51,7 +51,7 @@ describe("NoteToolbar more-options overflow", () => {
     expect(noteToolbarAction(wrapper, titles.overflowMenu).exists()).toBe(false)
     expect(noteToolbarAction(wrapper, titles.export).exists()).toBe(true)
     expect(noteToolbarAction(wrapper, titles.mcqs).exists()).toBe(true)
-    expect(noteToolbarAction(wrapper, titles.audio).exists()).toBe(true)
+    expect(noteToolbarAction(wrapper, titles.voiceInput).isVisible()).toBe(true)
     expect(noteToolbarAction(wrapper, titles.assimilation).exists()).toBe(true)
     expect(noteToolbarAction(wrapper, titles.delete).exists()).toBe(true)
   })
@@ -64,7 +64,7 @@ describe("NoteToolbar more-options overflow", () => {
     expect(noteToolbarAction(wrapper, titles.delete).exists()).toBe(false)
     expect(noteToolbarAction(wrapper, titles.export).exists()).toBe(true)
     expect(noteToolbarAction(wrapper, titles.mcqs).exists()).toBe(true)
-    expect(noteToolbarAction(wrapper, titles.audio).exists()).toBe(true)
+    expect(noteToolbarAction(wrapper, titles.voiceInput).isVisible()).toBe(true)
     expect(noteToolbarAction(wrapper, titles.assimilation).exists()).toBe(true)
     expect(
       noteToolbarAction(wrapper, noteToolbarEditTitles.markdown).exists()
@@ -76,17 +76,19 @@ describe("NoteToolbar more-options overflow", () => {
     expect(overflowMenuItem(noteToolbarEditTitles.markdown)).toBeNull()
     expect(overflowMenuItem(titles.export)).toBeNull()
     expect(overflowMenuItem(titles.mcqs)).toBeNull()
-    expect(overflowMenuItem(titles.audio)).toBeNull()
+    expect(overflowMenuItem(titles.voiceInput)).toBeNull()
     expect(overflowMenuItem(titles.assimilation)).toBeNull()
   })
 
-  it("hides off-state assimilation then audio as the bar shrinks further", async () => {
+  it("hides off-state assimilation then idle voice input as the bar shrinks further", async () => {
     wrapper = await mountOverflowToolbar()
     await layoutNoteToolbar(wrapper, remainingMoreOptionsNavWidth(7) - 1)
 
     expect(noteToolbarAction(wrapper, titles.delete).exists()).toBe(false)
     expect(noteToolbarAction(wrapper, titles.assimilation).exists()).toBe(false)
-    expect(noteToolbarAction(wrapper, titles.audio).exists()).toBe(false)
+    expect(noteToolbarAction(wrapper, titles.voiceInput).isVisible()).toBe(
+      false
+    )
     expect(noteToolbarAction(wrapper, titles.mcqs).exists()).toBe(true)
     expect(noteToolbarAction(wrapper, titles.export).exists()).toBe(true)
   })
@@ -117,22 +119,6 @@ describe("NoteToolbar more-options overflow", () => {
     await flushPromises()
 
     expect(wrapper.emitted("edit-as-markdown")).toEqual([[true]])
-  })
-
-  it("pins audio on a narrow toolbar then returns it to overflow when turned off", async () => {
-    wrapper = await mountNoteToolbar(makeMe.aNoteRealm.please())
-    await layoutNoteToolbar(wrapper, overflowTogglesNavWidth())
-
-    await openNoteToolbarOverflowMenu(wrapper)
-    overflowMenuItem(titles.audio)!.click()
-    await flushPromises()
-    expect(noteToolbarAction(wrapper, titles.audio).exists()).toBe(true)
-
-    await noteToolbarAction(wrapper, titles.audio).trigger("click")
-    await flushPromises()
-
-    await openNoteToolbarOverflowMenu(wrapper)
-    expect(overflowMenuItem(titles.audio)).not.toBeNull()
   })
 
   it("closes more options dialog when note id changes", async () => {

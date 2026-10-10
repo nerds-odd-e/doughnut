@@ -14,6 +14,12 @@ export const noteDeleteTitles = {
 export const noteDeleteTitle = (trashed: boolean) =>
   trashed ? noteDeleteTitles.permanent : noteDeleteTitles.trash
 
+export const noteVoiceInputTitles = {
+  start: "Voice input",
+  stop: "Stop voice input",
+  retry: "Retry turning your speech into text",
+} as const
+
 export const noteMoreOptionsTitles = {
   new: "New note (n)",
   wiki: "Wiki link or relationship (Ctrl+Shift+F / Cmd+Shift+F)",
@@ -21,7 +27,7 @@ export const noteMoreOptionsTitles = {
   export: "Export... (e)",
   mcqs: "Questions for the note",
   refine: "Refine note",
-  audio: "Audio tools",
+  voiceInput: noteVoiceInputTitles.start,
   assimilation: "Assimilate",
   delete: noteDeleteTitles.trash,
   overflowMenu: "more options",
@@ -36,5 +42,6 @@ export const noteToolbarOverflowTitles = (
 ): readonly string[] => {
   if (id === "edit") return Object.values(noteToolbarEditTitles)
   if (id === "delete") return Object.values(noteDeleteTitles)
+  if (id === "voiceInput") return Object.values(noteVoiceInputTitles)
   return [noteMoreOptionsTitles[id]]
 }

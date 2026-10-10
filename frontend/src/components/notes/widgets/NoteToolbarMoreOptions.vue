@@ -1,5 +1,6 @@
 <template>
   <NoteMoreOptionsActions
+    ref="toolbarActionsRef"
     layout="toolbar"
     :omit="overflowedIds"
     v-bind="{ note }"
@@ -28,6 +29,7 @@
       @edit-as-markdown="emit('edit-as-markdown', $event)"
       @open-wiki="emit('open-wiki')"
       @open-new="emit('open-new')"
+      @start-voice-input="toolbarActionsRef?.startVoiceInput()"
     />
   </AutoCollapseDropdown>
 </template>
@@ -42,7 +44,7 @@ import {
   NOTE_TOOLBAR_MORE_OPTIONS_ORDER,
 } from "@/composables/noteToolbarOverflow"
 import { useAssimilationView } from "@/composables/useAssimilationView"
-import { useNoteToolbarPanel } from "@/composables/useNoteToolbarPanel"
+import { voiceInputIsActive } from "@/composables/useNoteVoiceInput"
 import NoteMoreOptionsActions from "./NoteMoreOptionsActions.vue"
 import NoteMoreOptionsForm from "./NoteMoreOptionsForm.vue"
 import {
@@ -69,16 +71,19 @@ const overflowDropdownRef = ref<InstanceType<
   typeof AutoCollapseDropdown
 > | null>(null)
 
+const toolbarActionsRef = ref<InstanceType<
+  typeof NoteMoreOptionsActions
+> | null>(null)
+
 const overflowedIds = ref<NoteMoreOptionsActionId[]>([])
 const cachedWidths: Partial<Record<NoteMoreOptionsActionId, number>> = {}
 let cachedOverflowButtonWidth = 0
 
-const { isAudioOpen } = useNoteToolbarPanel()
 const { isOpenForNote } = useAssimilationView()
 
 const pinnedIds = computed(() => {
   const ids: NoteMoreOptionsActionId[] = []
-  if (isAudioOpen.value) ids.push("audio")
+  if (voiceInputIsActive.value) ids.push("voiceInput")
   if (isOpenForNote(props.note.id)) ids.push("assimilation")
   return ids
 })

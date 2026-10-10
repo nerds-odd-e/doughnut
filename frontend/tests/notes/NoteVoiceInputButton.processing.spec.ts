@@ -14,13 +14,13 @@ import { useNoteStore } from "@/store/noteStore"
 import {
   midSpeechChunk,
   audioTextResponse,
-  mountNoteAudioTools,
-  findButtonByText,
+  mountNoteVoiceInputButton,
   processAudio,
   startRecording,
-  useNoteAudioToolsTestLifecycle,
-  type NoteAudioToolsWrapper,
-} from "@tests/notes/noteAudioToolsTestSupport"
+  useNoteVoiceInputTestLifecycle,
+  voiceInputButton,
+  type NoteVoiceInputButtonWrapper,
+} from "@tests/notes/noteVoiceInputButtonTestSupport"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import { flushPromises } from "@vue/test-utils"
 import {
@@ -31,30 +31,30 @@ import {
 
 vi.mock("@/models/audio/recorderWorklet", async () => {
   const { recorderWorkletMockExports } = await import(
-    "@tests/notes/noteAudioToolsMocks"
+    "@tests/notes/noteVoiceInputButtonMocks"
   )
   return recorderWorkletMockExports()
 })
 
 vi.mock("@/models/audio/audioRecorder", async () => {
   const { audioRecorderMockExports } = await import(
-    "@tests/notes/noteAudioToolsMocks"
+    "@tests/notes/noteVoiceInputButtonMocks"
   )
   return audioRecorderMockExports()
 })
 
 vi.mock("@/models/wakeLocker", async () => {
   const { wakeLockerMockExports } = await import(
-    "@tests/notes/noteAudioToolsMocks"
+    "@tests/notes/noteVoiceInputButtonMocks"
   )
   return wakeLockerMockExports()
 })
 
-useNoteAudioToolsTestLifecycle()
+useNoteVoiceInputTestLifecycle()
 showToastsOnPage()
 
-describe("NoteAudioTools audio processing", () => {
-  let wrapper: NoteAudioToolsWrapper
+describe("NoteVoiceInputButton audio processing", () => {
+  let wrapper: NoteVoiceInputButtonWrapper
   let audioToTextMock: ReturnType<typeof mockSdkService>
   let updateContentMock: ReturnType<typeof mockSdkService>
   const originalRealm = makeMe.aNoteRealm.content("Original body.").please()
@@ -66,7 +66,7 @@ describe("NoteAudioTools audio processing", () => {
       "audioToText",
       audioTextResponse("text")
     )
-    wrapper = mountNoteAudioTools(note)
+    wrapper = mountNoteVoiceInputButton(note)
     noteStore.refreshNoteRealm(originalRealm)
     updateContentMock = mockSdkServiceWithImplementation(
       TextContentController,
@@ -128,7 +128,7 @@ describe("NoteAudioTools audio processing", () => {
     })
   })
 
-  it("toasts a failed mid-speech conversion and keeps recording without Retry, the body as it was", async () => {
+  it("toasts a failed mid-speech conversion and keeps recording, the body as it was", async () => {
     await startRecording(wrapper)
     audioToTextMock.mockResolvedValueOnce(wrapSdkError("API Error"))
     await expect(processAudio(wrapper, midSpeechChunk())).rejects.toThrow()
@@ -137,8 +137,7 @@ describe("NoteAudioTools audio processing", () => {
     expect(toastMessage(await toastShown("error"))).toBe(
       "Could not turn your speech into text. Your recording is kept."
     )
-    expect(findButtonByText(wrapper, "Stop")).toBeTruthy()
-    expect(findButtonByText(wrapper, "Retry")).toBeUndefined()
+    expect(voiceInputButton(wrapper).attributes("aria-pressed")).toBe("true")
     expect(updateContentMock).not.toHaveBeenCalled()
     expect(noteStore.refOfNoteRealm(note.id).value?.note.content).toBe(
       "Original body."

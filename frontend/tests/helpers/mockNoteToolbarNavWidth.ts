@@ -182,7 +182,7 @@ export function deleteOverflowNavWidth() {
   return allMoreOptionsWidth - 1
 }
 
-/** Off-state audio and assimilation overflow (pin tests). */
+/** Idle voice input and off-state assimilation overflow (pin tests). */
 export function overflowTogglesNavWidth() {
   return remainingMoreOptionsNavWidth(2)
 }

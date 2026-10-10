@@ -1,40 +1,24 @@
-import { computed, ref } from "vue"
-import { useNoteToolbarPanel } from "./useNoteToolbarPanel"
+import { ref } from "vue"
 
 const targetNoteId = ref<number | null>(null)
+const showAssimilationPanel = ref(false)
 
 export function useAssimilationView() {
-  const { activePanel, close: closePanel } = useNoteToolbarPanel()
-
-  const showAssimilationPanel = computed(
-    () => activePanel.value === "assimilation"
-  )
-
   const isOpenForNote = (noteId: number) =>
     showAssimilationPanel.value && targetNoteId.value === noteId
 
-  const closeAssimilationPanelIfOpen = () => {
-    if (showAssimilationPanel.value) {
-      closePanel()
-    }
-  }
-
   const openForNote = (noteId: number) => {
     targetNoteId.value = noteId
-    activePanel.value = "assimilation"
+    showAssimilationPanel.value = true
   }
 
   const resetForNote = (noteId: number) => {
-    if (targetNoteId.value === noteId) {
-      activePanel.value = "assimilation"
-      return
-    }
-    closeAssimilationPanelIfOpen()
+    showAssimilationPanel.value = targetNoteId.value === noteId
   }
 
   const dismiss = () => {
     targetNoteId.value = null
-    closeAssimilationPanelIfOpen()
+    showAssimilationPanel.value = false
   }
 
   const toggle = (noteId: number) => {

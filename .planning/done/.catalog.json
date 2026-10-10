@@ -2,6 +2,12 @@
   "schemaVersion": 1,
   "records": [
     {
+      "fileName": "SEED-066_single-button-voice-input.json",
+      "identity": "SEED-066#single-button-voice-input",
+      "completedAt": "2026-10-10T21:40:00.528Z",
+      "blob": "27de2b4b7af98ad16be13fef317e4bd7d0743dd8"
+    },
+    {
       "fileName": "SEED-066_simplify-voice-input-feedback.json",
       "identity": "SEED-066#simplify-voice-input-feedback",
       "completedAt": "2026-10-10T12:02:51.430Z",

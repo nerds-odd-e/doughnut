@@ -1,24 +1,41 @@
 # Voice input
 
-Authors open Audio tools on an existing note to Record, Stop, and after a
-failed conversion to Retry. The one main action is Record when ready and Stop
-while recording; only while recording, the microphone chooser (named
-"Microphone") and Write text now (converts what has been said so far,
-unavailable during a conversion) sit beside Stop. The controls alone show
-the state of the recording. After Stop, Record is unavailable until the last
-speech has been converted and its text added to the note, then it is
-available again. A recording in which no speech was recognized adds nothing
-to the note, and Record is then the only control. When a conversion at Stop
-failed and audio is still not converted, the common error toast says "Could
-not turn your speech into text. Your recording is kept until you close Audio
-tools." and the panel offers Retry beside Record, which stays available. When
-recording cannot start, nothing is recorded, the common error toast says
-"Could not use the microphone. Allow microphone access in your browser, then
-try again.", and Record stays the main action. A microphone switch that fails
-shows the common error toast "Failed to switch audio device". When saving a
-passage fails, the save's own error toast shows and Record is available. Dictated
-text shows in an open body editor as soon as it joins. Dictation
-writes only to the note body.
+Authors dictate into an existing note's body with the one Voice input button
+in the note toolbar; on a narrow screen it is in the "more options" menu.
+Idle, the button shows a microphone and is named "Voice input".
+Clicking it starts capture from the browser's current default microphone at
+once: the button is highlighted like the toolbar's other active toggles, its
+icon is a live waveform of the microphone's level (a still, quiet line in
+silence), and it is named "Stop voice input". An author with several
+microphones chooses one in the browser's own site settings; when the current
+microphone disconnects, recording switches to the first one available. While
+recording, and until the last speech has been added, a kept recording
+included, the button stays in the toolbar even when it was started from the
+"more options" menu. Clicking the
+active button stops capture; the button is then unavailable, showing a
+spinner and named "Voice input", until the last speech has been converted and
+its text added to the note, and then it is idle again. A recording in which no
+speech was recognized adds nothing to the note and shows no message. When a
+conversion at Stop failed and audio is still not converted, the common error
+toast says "Could not turn your speech into text. Your recording is kept until
+you leave this note; click Voice input to try again." and the button holds the
+kept recording: it is tinted as a warning, shows a retry arrow, and is named
+"Retry turning your speech into text". Clicking it converts the kept recording
+without the microphone; the button is unavailable with its spinner meanwhile.
+On success the text is added and the button is idle; on failure the toast
+shows again and the button keeps the recording. The kept recording lasts while
+the author stays on the note; reloading or leaving the note drops it. Leaving
+the note while recording, by moving to another note or another page, stops the
+recording and adds the remaining speech to the note the author left; the
+button of the note they arrive at is idle. When that last conversion fails,
+nothing is kept and the common error toast says only "Could not turn your
+speech into text." When recording cannot start, nothing is recorded, the
+common error toast says "Could not use the microphone. Allow microphone access
+in your browser, then try again.", and the button stays idle. When saving a
+passage fails, the save's own error toast shows and the button is idle.
+Dictated text shows in an open body editor as soon as it joins. Dictation
+writes only to the note body. Readers who may not edit the note are not
+offered the button.
 
 ## Speaking a title in New note
 
@@ -61,15 +78,15 @@ type corrections after speaking. When nothing was heard, or conversion at
 Stop fails, the status says so, the title is unchanged, and nothing is saved.
 Speaking again creates a fresh recorder so only the new recording's words
 replace the title. There is no Retry. Readers who may not edit the note see
-the title as text and are not offered the control. Body dictation with Audio
-tools still writes only to the body and never changes the title.
+the title as text and are not offered the control. Body dictation with Voice
+input still writes only to the body and never changes the title.
 
 ## Adding dictated text to a note
 
 Audio processing returns `segmentTexts`: the written transcription segments
 for the uploaded chunk, in order. A mid-speech chunk is transcribed by
 `whisper-1` as SRT; each segment contains the lines after its timestamp line,
-with line breaks replaced by spaces. The conversion at Stop (and Retry) is
+with line breaks replaced by spaces. The conversion at Stop is
 transcribed by `gpt-4o-mini-transcribe` as plain text, which is faster, and
 its stripped text is the one segment. The client joins these
 segments to the note using the same rule as successive passages, then saves
@@ -91,10 +108,10 @@ including English and Korean, add one space. For example, `私はPython` plus
 `が好きです。` becomes `私はPythonが好きです。`, while `私はPython` plus
 `is useful.` becomes `私はPython is useful.`. Existing characters remain unchanged, and
 successive additions follow earlier additions once. Navigating to another note
-does not redirect the result. The normal content-edit undo restores the prior body.
+ends the dictation and does not redirect its result. The normal content-edit undo restores the prior body.
 
-Timed chunks (every 20 s), pause flushes (after more than 3 s of silence, once per pause)
-and Write text now clicks are processed mid-speech. The 20-second timer
+Timed chunks (every 20 s) and pause flushes (after more than 3 s of silence, once per pause)
+are processed mid-speech. The 20-second timer
 keeps the audio billed for mid-speech conversion within 1.5 times the recorded
 audio: the held segment sent again is about 3 to 5 seconds per chunk (about
 1.14 to 1.25 times, roughly $0.41 to $0.45 per dictated hour at $0.006 per
@@ -110,18 +127,17 @@ once written, is never revised: holding back the unfinished sentence replaces
 revising it. Audio that is entirely silent is not sent.
 A conversion that fails (an error answer or no answer) keeps its audio as
 not yet converted, and recording goes on. That audio is sent again, together
-with the later audio, with the next conversion: timed, pause, Write text now, or Stop,
-including the first conversion of a new recording in the same Audio tools.
-Text already written is not written again. Each failure while recording shows
+with the later audio, with the next conversion: timed, pause, or Stop.
+Text already written is not written again. A failure while recording shows
 the common error toast "Could not turn your speech into text. Your recording
-is kept."; there is no Retry while recording. After a failed conversion at
-Stop, while audio is still not converted, the panel offers Retry. Retry
-belongs to the recording it follows: it converts everything that remains as
-Stop does, nothing held back, joins the passage once, and then disappears;
-Record is unavailable meanwhile. A
-Retry that fails shows the toast again and leaves the body and Retry in place. Recovery
-lasts while Audio tools stays open; it does not survive a reload or closing
-Audio tools.
+is kept." After a failed conversion at Stop, the author recovers the kept
+recording from the button's retry: the kept audio is converted again and its
+passage is added once. The kept recording lasts while the author stays on the
+note and is dropped by a reload or by leaving the note. A
+recording in progress stops when the author moves to another note or page, and
+its remaining speech is converted into the note it was started on; when that
+conversion fails its audio is dropped. Voice input started on the other note
+dictates into that note.
 The transcription service controls transcription quality. When a body editor for the note is
 open, the passage is joined to the end of that editor's draft, including
 unsaved typing, and that draft is saved right away; otherwise, including while
@@ -129,14 +145,17 @@ an image upload or note removal is pausing the editor, it is joined to the
 note's saved body.
 
 The mounted audio preservation tests assert exact saved content for long,
-empty, and whitespace-ending bodies, repeated additions, originating-note targeting, and undo. The
+empty, and whitespace-ending bodies, repeated additions, and undo. Mounted
+toolbar tests move to another note while recording and observe the remainder
+saved to the note left, an idle button, a dropped kept recording, and the
+toast of a failed last conversion. The
 mocked recording journey supplies a transcription and observes the original
 body, one space, and the transcription's text. A second mocked journey makes
-the transcription fail at Stop, observes the unchanged body, the error toast
-and Retry, then lets the transcription succeed and
-observes Retry joining the passage once. Model
-tests with the real audio buffer cover kept audio across failures, and mounted tests cover when Retry is
-offered. The real-OpenAI journey checks both its original text and
+the transcription fail at Stop, observes the unchanged body and the error
+toast, then lets the transcription succeed and observes the button's retry
+adding the passage once. Model tests with the real audio buffer cover kept
+audio across failures, and mounted tests cover the button's states. The
+real-OpenAI journey checks both its original text and
 the dictated passage.
 
 

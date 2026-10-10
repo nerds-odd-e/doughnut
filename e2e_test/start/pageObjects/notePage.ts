@@ -1,10 +1,10 @@
 import { commonSenseSplit } from '../../support/string_util'
 import { waitUntilAppIsNotBusy } from '../pageBase'
 import testability from '../testability'
-import audioToolsPage from './audioToolsPage'
 import { sidebarChildNotePageMethods } from './sidebarChildNotePageMethods'
 import { noteMoreOptions } from './noteMoreOptionsForm'
 import { toolbarButton } from './toolbarButton'
+import voiceInputPage from './voiceInputPage'
 import { noteContentEditingMethods } from './noteContentEditingMethods'
 import { noteConversationAndQuestionMethods } from './noteConversationAndQuestionMethods'
 import {
@@ -165,9 +165,8 @@ export const assumeNotePage = (
       cy.clearFocusedText().type(newTitle)
       return this.chooseReferencedTitleSave(choice, newTitle)
     },
-    audioTools() {
-      noteMoreOptions().openAudioTools()
-      return audioToolsPage()
+    voiceInput() {
+      return voiceInputPage()
     },
     navigateToReference: (referenceTopic: string) => {
       cy.get('#main-note-content')

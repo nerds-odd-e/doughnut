@@ -7,7 +7,7 @@ import helper, { mockSdkService, productionRouterAt } from "@tests/helpers"
 import type RenderingHelper from "@tests/helpers/RenderingHelper"
 import type { Router } from "vue-router"
 import { useAssimilationView } from "@/composables/useAssimilationView"
-import { useNoteToolbarPanel } from "@/composables/useNoteToolbarPanel"
+import { voiceInputIsActive } from "@/composables/useNoteVoiceInput"
 import { noteMoreOptionsTitles } from "@/components/notes/widgets/noteMoreOptionsTitles"
 import type { ApiStatus } from "@/managedApi/ApiStatusHandler"
 import { setupGlobalClient } from "@/managedApi/clientSetup"
@@ -23,7 +23,7 @@ afterEach(() => {
 
 beforeEach(async () => {
   useAssimilationView().dismiss()
-  useNoteToolbarPanel().close()
+  voiceInputIsActive.value = false
   setupGlobalClient(apiStatus)
   mockSdkService(NoteController, "trashNote", undefined)
   router = await productionRouterAt({ name: "root" })
@@ -49,7 +49,9 @@ describe("NoteMoreOptionsForm", () => {
         wrapper.find(`button[title="${noteMoreOptionsTitles.mcqs}"]`).exists()
       ).toBe(true)
       expect(
-        wrapper.find(`button[title="${noteMoreOptionsTitles.audio}"]`).exists()
+        wrapper
+          .find(`button[title="${noteMoreOptionsTitles.voiceInput}"]`)
+          .exists()
       ).toBe(true)
       expect(
         wrapper
@@ -62,43 +64,27 @@ describe("NoteMoreOptionsForm", () => {
     })
   })
 
-  describe("audio tools toggle", () => {
-    it("opens the audio tools panel", async () => {
+  describe("voice input", () => {
+    const voiceInputItem = (wrapper: ReturnType<typeof renderer.mount>) =>
+      wrapper.find(`button[title="${noteMoreOptionsTitles.voiceInput}"]`)
+
+    it("starts voice input and closes the menu", async () => {
       const wrapper = renderer.withProps({ note }).mount()
-
       await flushPromises()
 
-      const audioButton = wrapper.find(
-        `button[title="${noteMoreOptionsTitles.audio}"]`
-      )
-      await audioButton.trigger("click")
-      await flushPromises()
+      await voiceInputItem(wrapper).trigger("click")
 
-      expect(useNoteToolbarPanel().isAudioOpen.value).toBe(true)
-    })
-
-    it("emits close-dialog when audio tools button is clicked", async () => {
-      const wrapper = renderer.withProps({ note }).mount()
-
-      await flushPromises()
-
-      const audioButton = wrapper.find(
-        `button[title="${noteMoreOptionsTitles.audio}"]`
-      )
-      await audioButton.trigger("click")
-
+      expect(wrapper.emitted()).toHaveProperty("start-voice-input")
       expect(wrapper.emitted()).toHaveProperty("close-dialog")
     })
 
-    it("omits audio from the menu when audio is already on", async () => {
-      useNoteToolbarPanel().toggleAudio()
+    it("omits Voice input from the menu while recording", async () => {
+      voiceInputIsActive.value = true
 
       const wrapper = renderer.withProps({ note }).mount()
       await flushPromises()
 
-      expect(
-        wrapper.find(`button[title="${noteMoreOptionsTitles.audio}"]`).exists()
-      ).toBe(false)
+      expect(voiceInputItem(wrapper).exists()).toBe(false)
     })
   })
 

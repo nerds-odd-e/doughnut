@@ -1,5 +1,4 @@
 import { waitUntilAppIsNotBusy } from '../pageBase'
-import { assumeAudioTools } from './audioToolsPage'
 import {
   assumeAssimilationPage,
   assimilationModesSelector,
@@ -10,7 +9,6 @@ import { clickToolbarOverflowAction, noteToolbar } from './noteToolbarOverflow'
 import { questionListPage } from './questionListPage'
 
 const titles = {
-  audio: 'Audio tools',
   assimilation: 'Assimilate',
   trash: 'Trash note (d)',
   permanentDelete: 'Permanently delete note (d)',
@@ -63,11 +61,6 @@ export const noteMoreOptions = () => {
     openQuestionList() {
       clickMoreOption(titles.questions)
       return questionListPage()
-    },
-    openAudioTools() {
-      clickMoreOption(titles.audio)
-      assumeAudioTools()
-      waitUntilAppIsNotBusy()
     },
     openAssimilationPanel() {
       // `assimilationModesSelector` also matches a note property's own

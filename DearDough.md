@@ -6,7 +6,7 @@ released response is not proof of effectiveness. Unknown provenance stays unknow
 [Response status](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/finding-names.md).
 Full pre-trim evidence: `8830c682704aac3bbb34bf9b1204da8feba042ca:DearDough.md`. Older narratives live in Git, not a second archive.
 
-- Highest allocated local number: 221. Removed local codes are never reused.
+- Highest allocated local number: 225. Removed local codes are never reused.
 
 Detailed retained observations are consolidated in the linked Open Dough
 record; headings and former local aliases preserve traceability. Review date:
@@ -160,6 +160,14 @@ Evidence and response: [ODF-141](https://github.com/terryyin/open-dough/blob/mai
   - Evidence: refactor returns for slices 1 and 5 ("none — already clean", about 80,000 and 53,000 sub-agent tokens); refactor returns for slices 2 and 3 with edits (a spec over the file-size limit split, a duplicated `noToastShown` helper merged, an absence sentence removed from the doc)
   - Observed effect: two of four refactor passes made no edit; slice 5's diff was one constant, two spec files and one doc line
   - Inference: the two passes that edited found things the implementation returns had not, so the cost question is about the smallest slices only
+- Execution: SEED-066#single-button-voice-input (first implementation commit 5c3ca7033b)
+  - Timestamp: 2026-10-10T21:48:00+09:00
+  - Tool: Claude Code
+  - Model: claude-opus-5-5
+  - Open Dough release: 0.3.58
+  - Evidence: refactor return for slice 1 ("none — already clean", about 62,000 sub-agent tokens, 43 s); refactor returns for slices 2, 3 and 4 with edits (a toolbar-panel composable folded into the Assimilate view, a recorder listener scoped to the recording, a spec over the file-size limit split, leaving-note cases gathered in one spec)
+  - Observed effect: one of four refactor passes made no edit; slice 1 was a two-file structural move
+  - Inference: as in the earlier execution, the passes on the behavior slices found real work; only the smallest slice's pass returned nothing
 
 ## ODF-208 — The CI observer's worker exited without a terminal result, with no recorded cause
 
@@ -306,3 +314,59 @@ Plan 063 as written by slice planning named its story as "Work item: … ([story
   - Evidence: `6f6f3d32c9:.planning/slice-plans/063-simplify-voice-input-feedback/PLAN.md` lines 3–4; `story-obligations.mjs check --slice 2` result `{"reason":"missing-story-source"}` in the execution conversation; `.claude/skills/dough-story-refinement/references/planning.md` ("Its `**Source:**` link names the selected story section"); `list --slice 1` and `check --slice 1` both passed on the same plan
   - Observed effect: slice 2's done transition was blocked until the coordinator rewrote the plan header during delivery; one extra plan edit and check
   - Inference: the script validates the link only when an obligation exists, so a plan can pass delegation checks for every slice and still fail at the first recorded gap
+
+## DD-222 — A removal-plus-replacement slice sized at about 10 minutes took about 29 minutes of implementation
+
+Plan 064 sized slice 2 (new toolbar button, toolbar wiring, deletion of the panel, retargeting seven specs and the E2E page object) at about 10 minutes and gave the reason it could not be split: the product cannot hold the change halfway.
+
+### Occurrences
+- Execution: SEED-066#single-button-voice-input (first implementation commit 5c3ca7033b)
+  - Timestamp: 2026-10-10T22:17:00+09:00
+  - Tool: Claude Code
+  - Model: claude-opus-5-5
+  - Open Dough release: 0.3.58
+  - Evidence: `7becda17c4:.planning/slice-plans/064-single-button-voice-input/PLAN.md` slice 2 ("About 10 min"); the implementation agent's usage record (1,749 s, about 258,000 sub-agent tokens, 52 tool uses); its return reporting one Vitest run that printed nothing for over 600 s before being ended and rerun in about 11 s; refactor pass about 6 minutes more
+  - Observed effect: the slice ran about three times its estimate; about 10 of the 29 minutes were the stalled test run, whose cause is unknown; the slice touched 53 files
+  - Inference: the stated reason for not splitting held, so the estimate rather than the boundary was wrong; a 53-file removal with renamed specs is not a 10-minute change even when mechanical
+
+## DD-223 — A plan left a look to be "checked by eye on the dev server" with a real microphone, which an unattended agent could not do
+
+Plan 064 recorded as not observed how the live waveform reads inside a toolbar-sized button and assigned the check to slice 2 on the dev server. Matching with ODF-190 (a prescribed observation whose access route did not exist) is uncertain: here the route exists for a person at the machine, not for the agent.
+
+### Occurrences
+- Execution: SEED-066#single-button-voice-input (first implementation commit 5c3ca7033b)
+  - Timestamp: 2026-10-10T22:20:00+09:00
+  - Tool: Claude Code
+  - Model: claude-opus-5-5
+  - Open Dough release: 0.3.58
+  - Evidence: `70a1b54232:.planning/slice-plans/064-single-button-voice-input/PLAN.md` "Premises observed" last item; slice 2 return ("The look of the waveform with a real microphone on a dev server is unobserved"); the coordinator's request for enlarged Chromium screenshots with a synthetic level saved under the job's temporary directory, and its reading of them; plan obligation G3
+  - Observed effect: the look was judged from screenshots of the mounted button fed a synthetic level; the real-microphone check was left to the owner and reported at completion
+  - Inference: screenshots saved outside the checkout gave the coordinator an inspectable look at low cost; they do not show how the bars scale to a real voice
+
+## DD-224 — A plan mounted a session bound to one note in an always-mounted control without noticing it would write to the first note
+
+Plan 064 moved the recording session from a panel opened per use to a button that stays mounted while the toolbar's note changes. The session captures its note when created. The plan's own structural slice recorded that fact as a learning, and the next slice's design did not account for it.
+
+### Occurrences
+- Execution: SEED-066#single-button-voice-input (first implementation commit 5c3ca7033b)
+  - Timestamp: 2026-10-10T22:17:00+09:00
+  - Tool: Claude Code
+  - Model: claude-opus-5-5
+  - Open Dough release: 0.3.58
+  - Evidence: `5c3ca7033b:.planning/slice-plans/064-single-button-voice-input/PLAN.md` Learnings ("captures the note at call time") and "Design for the button"; slice 2 return, decision 1 ("Voice input clicked on a second note visited in the same page session would dictate into the first note"); the added spec "dictates into the note on the page when voice input starts after moving to another note", reported to fail without the fix; slice 4 replacing the fix with a key on the note's id
+  - Observed effect: the implementer found the defect mid-slice, added a watch and a test outside the plan, and slice 4 later replaced the watch
+  - Inference: the plan's navigation premise covered an open panel surviving a note change, not an idle control; a slice that changes a component's lifetime needs its per-instance captures re-read
+
+## DD-225 — A removal sweep's search terms matched a dated observation record, so the implementer reworded history to make the sweep return nothing
+
+Plan 064's sweep reading required searches for the removed control names to return nothing over the product. One name appeared in `docs/voice-input-observations.md`, a dated record of journeys run with that control.
+
+### Occurrences
+- Execution: SEED-066#single-button-voice-input (first implementation commit 5c3ca7033b)
+  - Timestamp: 2026-10-10T22:17:00+09:00
+  - Tool: Claude Code
+  - Model: claude-opus-5-5
+  - Open Dough release: 0.3.58
+  - Evidence: slice 2 return, decision 3 (five mentions reworded to "requested (mid-speech) conversion", heading renamed, a seed link's anchor broken); the coordinator's anchor repair in `.planning/seeds/SEED-066-voice-input.md`; slice 2 refactor return ("a truthful rewrite means deleting or re-running the observation, which is an owner decision")
+  - Observed effect: a dated observation now describes an author-requested conversion the product does not offer; one planning link broke and was repaired during delivery; the question was left for the owner
+  - Inference: the removal rule and the plan's sweep did not say whether a dated observation record counts as documentation to sweep, to delete, or to leave

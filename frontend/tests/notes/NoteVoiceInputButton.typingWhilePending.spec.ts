@@ -3,11 +3,11 @@ import { useNoteStore } from "@/store/noteStore"
 import makeMe from "donut-test-fixtures/makeMe"
 import { advanceNoteContentSaveDebounce } from "@tests/helpers/noteContentDebounceTestSupport"
 import { holdNoteContentSave } from "@tests/notes/noteTextContentTestSupport"
-import { useNoteAudioToolsTestLifecycle } from "@tests/notes/noteAudioToolsTestSupport"
+import { useNoteVoiceInputTestLifecycle } from "@tests/notes/noteVoiceInputButtonTestSupport"
 import {
   dictatedPassage as passage,
   useBodyEditorWithHeldDictation,
-} from "@tests/notes/noteAudioToolsTypingTestSupport"
+} from "@tests/notes/noteVoiceInputButtonTypingTestSupport"
 import {
   blurTextarea,
   richQuillInstance,
@@ -19,33 +19,33 @@ import { describe, expect, it, vi } from "vitest"
 
 vi.mock("@/models/audio/recorderWorklet", async () => {
   const { recorderWorkletMockExports } = await import(
-    "@tests/notes/noteAudioToolsMocks"
+    "@tests/notes/noteVoiceInputButtonMocks"
   )
   return recorderWorkletMockExports()
 })
 
 vi.mock("@/models/audio/audioRecorder", async () => {
   const { audioRecorderMockExports } = await import(
-    "@tests/notes/noteAudioToolsMocks"
+    "@tests/notes/noteVoiceInputButtonMocks"
   )
   return audioRecorderMockExports()
 })
 
 vi.mock("@/models/wakeLocker", async () => {
   const { wakeLockerMockExports } = await import(
-    "@tests/notes/noteAudioToolsMocks"
+    "@tests/notes/noteVoiceInputButtonMocks"
   )
   return wakeLockerMockExports()
 })
 
-useNoteAudioToolsTestLifecycle()
+useNoteVoiceInputTestLifecycle()
 
 describe("Japanese dictation while the author edits the open body", () => {
-  const { mountEditorAndAudioTools, whileAudioIsPending, lastSavedContent } =
+  const { mountEditorAndVoiceInput, whileAudioIsPending, lastSavedContent } =
     useBodyEditorWithHeldDictation("果樹園は古いです。")
 
   it("joins the Japanese passage to the current draft without a space", async () => {
-    const { wrapper } = mountEditorAndAudioTools("鐘は毎時間鳴ります。", true)
+    const { wrapper } = mountEditorAndVoiceInput("鐘は毎時間鳴ります。", true)
 
     await whileAudioIsPending(async () => {
       await setTextareaValue(wrapper, "鐘は毎時間鳴ります。ベンチがあります。")
@@ -60,11 +60,12 @@ describe("Japanese dictation while the author edits the open body", () => {
   })
 })
 
-describe("NoteAudioTools while the author types in the open body editor", () => {
+describe("NoteVoiceInputButton while the author types in the open body editor", () => {
   const noteStore = useNoteStore()
   const {
-    mountEditorAndAudioTools,
+    mountEditorAndVoiceInput,
     showInEditor,
+    whileRecordingIsLeft,
     dictate,
     whileAudioIsPending,
     savedContents,
@@ -82,7 +83,7 @@ describe("NoteAudioTools while the author types in the open body editor", () => 
   const correctedGiftBody = giftBody.replace("from my sister", "for my sister")
 
   it("keeps typing at the end of the rich editor and saves the passage after it", async () => {
-    const { wrapper } = mountEditorAndAudioTools(redBicycleBody, false)
+    const { wrapper } = mountEditorAndVoiceInput(redBicycleBody, false)
     const quill = () => richQuillInstance(wrapper)
 
     await whileAudioIsPending(async () => {
@@ -95,7 +96,7 @@ describe("NoteAudioTools while the author types in the open body editor", () => 
   })
 
   it("keeps typing at the end of the Markdown editor and saves the passage after it", async () => {
-    const { wrapper } = mountEditorAndAudioTools(redBicycleBody, true)
+    const { wrapper } = mountEditorAndVoiceInput(redBicycleBody, true)
 
     await whileAudioIsPending(async () => {
       await setTextareaValue(wrapper, `${redBicycleBody}${typed}`)
@@ -108,7 +109,7 @@ describe("NoteAudioTools while the author types in the open body editor", () => 
   })
 
   it("keeps a correction in the middle and puts the passage at the end", async () => {
-    const { wrapper } = mountEditorAndAudioTools(giftBody, false)
+    const { wrapper } = mountEditorAndVoiceInput(giftBody, false)
     const quill = () => richQuillInstance(wrapper)
 
     await whileAudioIsPending(async () => {
@@ -123,7 +124,7 @@ describe("NoteAudioTools while the author types in the open body editor", () => 
 
   it("keeps the Markdown editor's caret where the author was typing", async () => {
     const caret = correctedGiftBody.indexOf("for my sister") + "for".length
-    const { wrapper } = mountEditorAndAudioTools(giftBody, true)
+    const { wrapper } = mountEditorAndVoiceInput(giftBody, true)
 
     await whileAudioIsPending(async () => {
       textareaEl(wrapper).focus()
@@ -138,7 +139,7 @@ describe("NoteAudioTools while the author types in the open body editor", () => 
 
   it("keeps the rich editor's caret where the author was typing", async () => {
     const caret = correctedGiftBody.indexOf("for my sister") + "for".length
-    const { wrapper } = mountEditorAndAudioTools(giftBody, false)
+    const { wrapper } = mountEditorAndVoiceInput(giftBody, false)
     const quill = () => richQuillInstance(wrapper)
 
     await whileAudioIsPending(async () => {
@@ -154,7 +155,7 @@ describe("NoteAudioTools while the author types in the open body editor", () => 
   })
 
   it("saves the passage as soon as it joins the open editor's draft", async () => {
-    mountEditorAndAudioTools(redBicycleBody, true)
+    mountEditorAndVoiceInput(redBicycleBody, true)
 
     await dictate()
 
@@ -162,7 +163,7 @@ describe("NoteAudioTools while the author types in the open body editor", () => 
   })
 
   it("keeps typing that was already saved and saves the passage after it once", async () => {
-    const { wrapper } = mountEditorAndAudioTools(redBicycleBody, true)
+    const { wrapper } = mountEditorAndVoiceInput(redBicycleBody, true)
 
     await whileAudioIsPending(async () => {
       await setTextareaValue(wrapper, `${redBicycleBody}${typed}`)
@@ -177,7 +178,7 @@ describe("NoteAudioTools while the author types in the open body editor", () => 
   })
 
   it("keeps typing whose save is still in flight and saves the passage after it once", async () => {
-    const { wrapper, note } = mountEditorAndAudioTools(redBicycleBody, true)
+    const { wrapper, note } = mountEditorAndVoiceInput(redBicycleBody, true)
     const releaseSave = holdNoteContentSave((saved) =>
       makeMe.aNoteRealm.id(note.id).content(saved).please()
     )
@@ -193,7 +194,7 @@ describe("NoteAudioTools while the author types in the open body editor", () => 
   })
 
   it("adds the passage to the saved body while a save-then-change pause holds the editor", async () => {
-    const { note } = mountEditorAndAudioTools(redBicycleBody, true)
+    const { note } = mountEditorAndVoiceInput(redBicycleBody, true)
 
     await whileAudioIsPending(async () => {
       await closeAndFlushNoteContentMutations(note.id)
@@ -203,13 +204,13 @@ describe("NoteAudioTools while the author types in the open body editor", () => 
   })
 
   it("adds the passage to the saved body of a note the author has left", async () => {
-    const { wrapper, note: noteA } = mountEditorAndAudioTools(
+    const { wrapper, note: noteA } = mountEditorAndVoiceInput(
       redBicycleBody,
       true
     )
     const noteB = makeMe.aNoteRealm.content("Note B body.").please()
 
-    await whileAudioIsPending(async () => {
+    await whileRecordingIsLeft(async () => {
       await setTextareaValue(wrapper, `${redBicycleBody}${typed}`)
       await blurTextarea(wrapper)
       await showInEditor(noteB)

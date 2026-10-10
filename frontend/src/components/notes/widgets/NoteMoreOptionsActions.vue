@@ -79,12 +79,19 @@
     </PopButton>
 
     <template v-for="action in plainActions" :key="action.id">
+      <NoteVoiceInputButton
+        v-if="action.id === 'voiceInput'"
+        v-show="showToolbarAction(action.id)"
+        :key="note.id"
+        :ref="setVoiceInputButton"
+        :note="note"
+      />
       <button
-        v-if="showToolbarAction(action.id) && action.available"
+        v-else-if="showToolbarAction(action.id) && action.available"
         type="button"
         :class="
           action.toggleable
-            ? [toolbarToggleBtnClass(action.pressed), { 'shrink-0': action.pressed }]
+            ? toolbarToggleBtnClass(action.pressed)
             : toolbarGhostBtnClass
         "
         :title="action.title"
@@ -113,26 +120,26 @@ import { MessageCircleQuestion, Upload } from "@lucide/vue"
 import NoteExportForm from "@/components/notes/core/NoteExportForm.vue"
 import RefineNoteModal from "@/components/recall/RefineNoteModal.vue"
 import { useAssimilationView } from "@/composables/useAssimilationView"
-import { useNoteToolbarPanel } from "@/composables/useNoteToolbarPanel"
+import { voiceInputIsActive } from "@/composables/useNoteVoiceInput"
 import { useNoteRemovalFlow } from "@/composables/useNoteRemovalFlow"
 import DropdownMenuActionButton from "@/components/commons/DropdownMenuActionButton.vue"
 import DropdownMenuItem from "@/components/commons/DropdownMenuItem.vue"
 import { dropdownMenuButtonClass } from "@/components/commons/dropdownMenuClasses"
 import NoteMoreOptionsYieldedItems from "./NoteMoreOptionsYieldedItems.vue"
+import NoteVoiceInputButton from "./NoteVoiceInputButton.vue"
 import {
   noteDeleteTitle,
   noteMoreOptionsTitles,
   type NoteMoreOptionsActionId,
 } from "./noteMoreOptionsTitles"
 import { plainNoteActions } from "./noteMoreOptionsPlainActions"
+import {
+  toolbarGhostBtnClass,
+  toolbarToggleBtnClass,
+} from "./noteToolbarButtonClasses"
 import { useKeyboardShortcut } from "@/composables/useKeyboardShortcut"
-import { computed, ref } from "vue"
+import { computed, ref, type ComponentPublicInstance } from "vue"
 
-const toolbarGhostBtnClass = "daisy-btn daisy-btn-ghost daisy-btn-sm"
-const toolbarToggleOnBtnClass =
-  "daisy-btn daisy-btn-sm daisy-btn-soft daisy-btn-primary"
-const toolbarToggleBtnClass = (pressed: boolean) =>
-  pressed ? toolbarToggleOnBtnClass : toolbarGhostBtnClass
 const titles = noteMoreOptionsTitles
 
 const props = withDefaults(
@@ -151,10 +158,10 @@ const emit = defineEmits<{
   (e: "edit-as-markdown", value: boolean): void
   (e: "open-wiki"): void
   (e: "open-new"): void
+  (e: "start-voice-input"): void
 }>()
 
 const { toggle, isOpenForNote } = useAssimilationView()
-const { isAudioOpen, toggleAudio } = useNoteToolbarPanel()
 const noteId = computed(() => props.note.id)
 const noteTitle = computed(() => props.note.noteTopology.title)
 const { trashNote, permanentlyDeleteNote, noteIsTrashed } = useNoteRemovalFlow(
@@ -188,10 +195,23 @@ const closeDialogIfMenu = () => {
   }
 }
 
-const onAudioToggle = () => {
-  toggleAudio()
+const voiceInputButton = ref<InstanceType<typeof NoteVoiceInputButton> | null>(
+  null
+)
+const setVoiceInputButton = (
+  button: Element | ComponentPublicInstance | null
+) => {
+  voiceInputButton.value = button as InstanceType<
+    typeof NoteVoiceInputButton
+  > | null
+}
+
+const onVoiceInputStart = () => {
+  emit("start-voice-input")
   closeDialogIfMenu()
 }
+
+defineExpose({ startVoiceInput: () => voiceInputButton.value?.start() })
 
 const onAssimilationToggle = () => {
   toggle(props.note.id)
@@ -206,11 +226,11 @@ const onRefineOpen = () => {
 const plainActions = computed(() =>
   plainNoteActions({
     noteHasContent: noteHasContent.value,
-    isAudioOpen: isAudioOpen.value,
+    isVoiceInputActive: voiceInputIsActive.value,
     isAssimilationOpen: isAssimilationOpen.value,
     deleteTitle: deleteTitle.value,
     onRefineOpen,
-    onAudioToggle,
+    onVoiceInputStart,
     onAssimilationToggle,
     deleteNote,
   })
