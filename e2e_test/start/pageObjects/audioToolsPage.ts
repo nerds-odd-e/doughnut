@@ -1,8 +1,5 @@
 import { waitUntilAppIsNotBusy } from '../pageBase'
 
-const conversionFailure =
-  'Could not turn your speech into text. Your recording is kept until you close Audio tools.'
-
 const audioToolsPanel = () => cy.findByRole('region', { name: 'Audio tools' })
 
 const audioToolsPage = () => {
@@ -24,9 +21,8 @@ const audioToolsPage = () => {
       waitUntilAppIsNotBusy()
       return this
     },
-    expectConversionFailureWithRetry() {
+    expectRetryOffered() {
       audioToolsPanel().within(() => {
-        cy.findByText(conversionFailure).should('be.visible')
         cy.findByRole('button', { name: 'Retry' }).should('not.be.disabled')
         cy.findByRole('button', { name: 'Record' }).should('be.visible')
       })

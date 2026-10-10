@@ -1,5 +1,6 @@
 import { createApp, nextTick } from "vue"
 import Toast, { useToast } from "vue-toastification"
+import { flushPromises } from "@vue/test-utils"
 import { beforeEach, expect, vi } from "vitest"
 
 let toastContainerMounted: Promise<void> | undefined
@@ -15,8 +16,10 @@ function mountToastContainerOnce() {
   return toastContainerMounted
 }
 
+const toastSelector = ".Vue-Toastification__toast"
+
 export const toastOnPage = () =>
-  document.querySelector<HTMLElement>(".Vue-Toastification__toast")
+  document.querySelector<HTMLElement>(toastSelector)
 
 /** Waits for a toast of the given type and returns it. */
 export async function toastShown(type: "error" | "warning") {
@@ -25,6 +28,20 @@ export async function toastShown(type: "error" | "warning") {
   expect(toast).toHaveClass(`Vue-Toastification__toast--${type}`)
   return toast
 }
+
+/** Lets a pending toast render, and observes that the page holds none. */
+export async function noToastShown() {
+  await flushPromises()
+  expect(toastOnPage()).toBeNull()
+}
+
+/** The words the toast shows, without its close button. */
+export const toastMessage = (toast: Element) =>
+  toast.querySelector(".Vue-Toastification__toast-body")?.textContent
+
+/** The words of every toast on the page. */
+export const toastMessagesOnPage = () =>
+  [...document.querySelectorAll(toastSelector)].map(toastMessage)
 
 /** How long the toast stays, e.g. "3000ms", read from its progress bar. */
 export const toastTimeout = (toast: HTMLElement) =>

@@ -149,7 +149,7 @@ Stop-safe: failures still appear inline until slice 3.
 
 ### 3. Problems reach the author through the common error toast
 Type: Behavior
-Status: planned
+Status: done
 Proof: `NoteAudioTools.retry.spec.ts` with `showToastsOnPage()`: a failed Stop
 conversion shows an error toast saying the speech could not be turned into
 text and the recording is kept until Audio tools closes, Retry appears, Record
@@ -228,12 +228,22 @@ recorded decision.
 ### G1. Silent Stop shows no toast
 Reported: slice 2 — "'No toast' for the silent Stop is not asserted."
 Story clause: "panel returns to idle with nothing added and no message"
-Disposition: receiving slice 3
+Disposition: proved by slice 3: frontend/tests/notes/NoteAudioTools.controlsDuringConversion.spec.ts "returns to Record alone, adding nothing, when Stop found no speech" observes `noToastShown()` with toasts on the page
 
 ### G2. Passage typed over while a save is in flight is saved by autosave
 Reported: slice 2 — "the newer draft holding the passage is now saved by the normal 1-second autosave debounce (or on blur or unmount) instead of immediately"
 Story clause: "the text is added and saved through the existing flow"
 Disposition: proved by slice 2: frontend/tests/notes/NoteAudioTools.typingWhilePending.spec.ts "keeps typing whose save is still in flight and saves the passage after it once" and "saves the passage as soon as it joins the open editor's draft"
+
+### G3. Repeated mid-speech failures each toast
+Reported: slice 3 — "Repeated toasts are only observed for Retry (below); the code has no suppression"
+Story clause: "Each failed mid-speech conversion raises its own toast"
+Disposition: proved by slice 3: frontend/tests/notes/NoteAudioTools.retry.spec.ts "toasts again and keeps Retry when Retry fails again" observes one toast per failed conversion through the single `convert` path in `useNoteAudioProcessing.ts` that mid-speech conversions also take, and NoteAudioTools.processing.spec.ts "toasts a failed mid-speech conversion and keeps recording without Retry, the body as it was" observes the mid-speech toast
+
+### G4. Failed save toast is observed at the shared client
+Reported: slice 3 — "The save toast itself is untested at panel level"
+Story clause: "the common error toast reports the failed save; no raw error object is shown in the panel"
+Disposition: proved by slice 3: frontend/tests/managedApi/clientSetup.spec.ts "shows error toast for apiCallWithLoading wrapped calls" for the toast the body save raises, and frontend/tests/notes/NoteAudioTools.controlsDuringConversion.spec.ts "offers Record alone again when saving the dictated text fails" for the panel holding only Record
 
 ## Current decisions
 
@@ -273,3 +283,17 @@ Disposition: proved by slice 2: frontend/tests/notes/NoteAudioTools.typingWhileP
   adding nothing, when Stop found no speech"; recording spec "offers only
   Record when ready, …"; whole `pnpm frontend:test` (2081 tests) and
   `record_live_audio.feature` (5 scenarios) pass.
+- Slice 3: the panel prints nothing; its phases are `ready | recording |
+  stopping | notConverted`, and Retry sits in the button row while
+  `notConverted`. A refused microphone leaves a pending Retry in place.
+  Mounted panel specs cannot observe the failed-save toast (the shared
+  client's status handler is not installed there); `clientSetup.spec.ts`
+  observes it. The preservation spec's "API error" is a conversion failure;
+  the save failure is in `controlsDuringConversion`. Accepted proof: retry,
+  processing, recording and controlsDuringConversion specs observe the toast
+  text with `toastShown("error")`;
+  `env -u NODE_ENV CURSOR_DEV=true nix develop -c pnpm frontend:test tests/notes/NoteAudioTools tests/models`
+  (124 tests) and `record_live_audio.feature` (5 scenarios, toast and Retry
+  in scenario 2) pass. Sweep reading (2026-10-10): `daisy-alert`,
+  `isProblem`, `problemByPhase`, `fullscreen-error`, `text-error` return
+  nothing in `NoteAudioTools.vue`.

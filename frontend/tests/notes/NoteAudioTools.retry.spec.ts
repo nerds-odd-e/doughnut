@@ -17,6 +17,12 @@ import {
   useNoteAudioToolsTestLifecycle,
   type NoteAudioToolsWrapper,
 } from "@tests/notes/noteAudioToolsTestSupport"
+import {
+  showToastsOnPage,
+  toastMessage,
+  toastMessagesOnPage,
+  toastShown,
+} from "@tests/helpers/toastTestSupport"
 import { flushPromises } from "@vue/test-utils"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 
@@ -42,6 +48,7 @@ vi.mock("@/models/wakeLocker", async () => {
 })
 
 useNoteAudioToolsTestLifecycle()
+showToastsOnPage()
 
 describe("NoteAudioTools Retry after a failed conversion", () => {
   const failedAtStop =
@@ -76,7 +83,6 @@ describe("NoteAudioTools Retry after a failed conversion", () => {
   })
 
   const retryButton = () => findButtonByText(wrapper, "Retry")
-  const problem = () => wrapper.get(".text-error")
   const failAtStop = async () => {
     await startRecording(wrapper)
     await stopRecording(wrapper)
@@ -100,27 +106,14 @@ describe("NoteAudioTools Retry after a failed conversion", () => {
     expect(unnamedControls()).toEqual([])
   })
 
-  it("keeps recording without Retry when a conversion fails mid-speech", async () => {
-    await startRecording(wrapper)
-    await expect(processAudio(wrapper, audioChunk())).rejects.toThrow()
-    await flushPromises()
-
-    expect(findButtonByText(wrapper, "Stop")).toBeTruthy()
-    expect(wrapper.find(".daisy-alert-error").text()).toBe(
-      "Could not turn your speech into text. Your recording is kept."
-    )
-    expect(retryButton()).toBeUndefined()
-  })
-
-  it("says at Stop that the recording is kept, with Retry beside it and Record available", async () => {
+  it("toasts at Stop that the recording is kept, and offers Retry and Record", async () => {
     await failAtStop()
 
-    expect(problem().text()).toBe(failedAtStop)
-    expect(retryButton()!.element.parentElement).toBe(
-      problem().element.parentElement
-    )
-    expect(findButtonByText(wrapper, "Record")).toBeTruthy()
-    expect(wrapper.find(".daisy-alert").exists()).toBe(false)
+    expect(toastMessage(await toastShown("error"))).toBe(failedAtStop)
+    expect(wrapper.text()).toBe("Retry Record")
+    expect(
+      findButtonByText(wrapper, "Record")!.attributes()
+    ).not.toHaveProperty("disabled")
     expect(saveContent).not.toHaveBeenCalled()
   })
 
@@ -172,8 +165,9 @@ describe("NoteAudioTools Retry after a failed conversion", () => {
     ).not.toHaveProperty("disabled")
   })
 
-  it("keeps the message and Retry when Retry fails again", async () => {
+  it("toasts again and keeps Retry when Retry fails again", async () => {
     await failAtStop()
+    await toastShown("error")
 
     await retryButton()!.trigger("click")
     await flushPromises()
@@ -181,7 +175,9 @@ describe("NoteAudioTools Retry after a failed conversion", () => {
     expect(
       audioToolsVm(wrapper).audioRecorder.stopRecording
     ).toHaveBeenCalledTimes(2)
-    expect(problem().text()).toBe(failedAtStop)
+    await vi.waitFor(() =>
+      expect(toastMessagesOnPage()).toEqual([failedAtStop, failedAtStop])
+    )
     expect(retryButton()).toBeTruthy()
     expect(saveContent).not.toHaveBeenCalled()
   })

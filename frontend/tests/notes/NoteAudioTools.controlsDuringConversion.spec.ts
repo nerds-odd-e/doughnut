@@ -21,6 +21,7 @@ import {
   useNoteAudioToolsTestLifecycle,
   type NoteAudioToolsWrapper,
 } from "@tests/notes/noteAudioToolsTestSupport"
+import { noToastShown, showToastsOnPage } from "@tests/helpers/toastTestSupport"
 import { flushPromises } from "@vue/test-utils"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 
@@ -46,6 +47,7 @@ vi.mock("@/models/wakeLocker", async () => {
 })
 
 useNoteAudioToolsTestLifecycle()
+showToastsOnPage()
 
 describe("NoteAudioTools controls during and after a conversion", () => {
   let wrapper: NoteAudioToolsWrapper
@@ -151,16 +153,17 @@ describe("NoteAudioTools controls during and after a conversion", () => {
     expect(wrapper.text()).toBe("Record")
     expect(recordButton().attributes()).not.toHaveProperty("disabled")
     expect(saveContent).not.toHaveBeenCalled()
+    await noToastShown()
   })
 
-  it("offers Record again when saving the dictated text fails", async () => {
+  it("offers Record alone again when saving the dictated text fails", async () => {
     saveContent.mockResolvedValue(wrapSdkError({ message: "save failed" }))
     await startRecording(wrapper)
     convertsTo(["hello"])
     stopConvertsTheRest()
     await stopRecording(wrapper)
 
-    expect(saveContent).toHaveBeenCalled()
+    expect(wrapper.text()).toBe("Record")
     expect(recordButton().attributes()).not.toHaveProperty("disabled")
   })
 })

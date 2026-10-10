@@ -26,7 +26,6 @@ export type NoteAudioToolsVm = {
     release: ReturnType<typeof vi.fn>
   }
   isRecording: boolean
-  errors: Record<string, string> | null
   processAudio: (chunk: AudioChunk) => Promise<string | undefined>
 }
 
@@ -105,6 +104,5 @@ export function useNoteAudioToolsTestLifecycle() {
   afterEach(() => {
     vi.restoreAllMocks()
     vi.useRealTimers()
-    document.body.innerHTML = ""
   })
 }

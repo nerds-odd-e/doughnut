@@ -7,6 +7,11 @@ import {
   useNoteAudioToolsTestLifecycle,
   type NoteAudioToolsWrapper,
 } from "@tests/notes/noteAudioToolsTestSupport"
+import {
+  showToastsOnPage,
+  toastMessage,
+  toastShown,
+} from "@tests/helpers/toastTestSupport"
 import { flushPromises } from "@vue/test-utils"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 
@@ -32,6 +37,7 @@ vi.mock("@/models/wakeLocker", async () => {
 })
 
 useNoteAudioToolsTestLifecycle()
+showToastsOnPage()
 
 describe("NoteAudioTools recording controls", () => {
   let wrapper: NoteAudioToolsWrapper
@@ -121,6 +127,21 @@ describe("NoteAudioTools recording controls", () => {
     })
   })
 
+  it("toasts a microphone switch that fails and keeps recording", async () => {
+    await startRecording(wrapper)
+    audioToolsVm(wrapper).audioRecorder.switchAudioDevice.mockRejectedValueOnce(
+      new Error("Device gone")
+    )
+
+    await wrapper.find(".device-select").setValue("device2")
+    await flushPromises()
+
+    expect(toastMessage(await toastShown("error"))).toBe(
+      "Failed to switch audio device"
+    )
+    expect(buttonTexts()).toEqual(["Stop", "Write text now"])
+  })
+
   it("can start a second recording after stop", async () => {
     await startRecording(wrapper)
     await stopRecording(wrapper)
@@ -144,10 +165,10 @@ describe("NoteAudioTools recording controls", () => {
     )
     await startRecording(wrapper)
 
-    expect(wrapper.get(".text-error").text()).toBe(
+    expect(toastMessage(await toastShown("error"))).toBe(
       "Could not use the microphone. Allow microphone access in your browser, then try again."
     )
-    expect(buttonTexts()).toEqual(["Record"])
+    expect(wrapper.text()).toBe("Record")
 
     await startRecording(wrapper)
     expect(buttonTexts()).toEqual(["Stop", "Write text now"])

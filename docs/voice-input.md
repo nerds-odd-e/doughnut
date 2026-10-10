@@ -9,13 +9,14 @@ the state of the recording. After Stop, Record is unavailable until the last
 speech has been converted and its text added to the note, then it is
 available again. A recording in which no speech was recognized adds nothing
 to the note, and Record is then the only control. When a conversion at Stop
-failed and audio is still not converted, the panel says, shown as a problem,
-"Could not turn your speech into text. Your recording is kept until you close
-Audio tools." with Retry beside it; Record stays available. When recording cannot start, nothing is recorded
-and the panel says, shown as a problem, "Could not use the microphone. Allow
-microphone access in your browser, then try again."; Record stays the main
-action, and a later Record that starts clears it. When saving a passage
-fails, the save error shows as usual and Record is available. Dictated
+failed and audio is still not converted, the common error toast says "Could
+not turn your speech into text. Your recording is kept until you close Audio
+tools." and the panel offers Retry beside Record, which stays available. When
+recording cannot start, nothing is recorded, the common error toast says
+"Could not use the microphone. Allow microphone access in your browser, then
+try again.", and Record stays the main action. A microphone switch that fails
+shows the common error toast "Failed to switch audio device". When saving a
+passage fails, the save's own error toast shows and Record is available. Dictated
 text shows in an open body editor as soon as it joins. Dictation
 writes only to the note body.
 
@@ -106,14 +107,14 @@ A conversion that fails (an error answer or no answer) keeps its audio as
 not yet converted, and recording goes on. That audio is sent again, together
 with the later audio, with the next conversion: timed, pause, Write text now, or Stop,
 including the first conversion of a new recording in the same Audio tools.
-Text already written is not written again. A failure while recording shows
-"Could not turn your speech into text. Your recording is kept." without Retry
-until a later conversion succeeds. After Stop, while audio is still not
-converted, the panel shows the failure message and Retry beside it. Retry
+Text already written is not written again. Each failure while recording shows
+the common error toast "Could not turn your speech into text. Your recording
+is kept."; there is no Retry while recording. After a failed conversion at
+Stop, while audio is still not converted, the panel offers Retry. Retry
 belongs to the recording it follows: it converts everything that remains as
 Stop does, nothing held back, joins the passage once, and then disappears;
 Record is unavailable meanwhile. A
-Retry that fails leaves the body, the message and Retry in place. Recovery
+Retry that fails shows the toast again and leaves the body and Retry in place. Recovery
 lasts while Audio tools stays open; it does not survive a reload or closing
 Audio tools.
 The transcription service controls transcription quality. When a body editor for the note is
@@ -126,8 +127,8 @@ The mounted audio preservation tests assert exact saved content for long,
 empty, and whitespace-ending bodies, repeated additions, originating-note targeting, and undo. The
 mocked recording journey supplies a transcription and observes the original
 body, one space, and the transcription's text. A second mocked journey makes
-the transcription fail at Stop, observes the unchanged body, the message
-with Retry and Record, then lets the transcription succeed and
+the transcription fail at Stop, observes the unchanged body, the error toast
+and Retry, then lets the transcription succeed and
 observes Retry joining the passage once. Model
 tests with the real audio buffer cover kept audio across failures, and mounted tests cover when Retry is
 offered. The real-OpenAI journey checks both its original text and

@@ -5,16 +5,8 @@
       :audioRecorder="audioRecorder"
       :isRecording="isRecording"
     />
-    <div v-if="problem" class="flex justify-center items-center gap-2 text-center mb-3">
-      <p class="text-error">{{ problem }}</p>
-      <button v-if="phase === 'notConverted'" class="daisy-btn daisy-btn-sm retry-button" @click="retry">Retry</button>
-    </div>
-    <div
-      v-if="errors && phase !== 'notConverted'"
-      class="daisy-alert"
-      :class="errors.conversion ? 'daisy-alert-error' : 'daisy-alert-info'"
-    >{{ errors.conversion ?? errors }}</div>
     <div class="button-group">
+      <button v-if="phase === 'notConverted'" class="daisy-btn labeled-action" @click="stopRecording">Retry</button>
       <button
         v-if="!isRecording"
         class="daisy-btn labeled-action"
@@ -54,30 +46,19 @@ import Waveform from "./Waveform.vue"
 import { noteMoreOptionsTitles } from "./noteMoreOptionsTitles"
 import { Mic, Square } from "@lucide/vue"
 import { useNoteAudioProcessing } from "@/composables/useNoteAudioProcessing"
+import { useToast } from "@/composables/useToast"
 
 const { note } = defineProps({
   note: { type: Object as PropType<Note>, required: true },
 })
 
-const errors = ref<Record<string, string | undefined>>()
-const problemByPhase = {
-  notConverted:
-    "Could not turn your speech into text. Your recording is kept until you close Audio tools.",
-  micUnavailable:
-    "Could not use the microphone. Allow microphone access in your browser, then try again.",
-} as const
-const phase = ref<
-  "ready" | "recording" | "stopping" | keyof typeof problemByPhase
->("ready")
+const phase = ref<"ready" | "recording" | "stopping" | "notConverted">("ready")
 const isRecording = computed(() => phase.value === "recording")
-const problem = computed(() =>
-  phase.value in problemByPhase
-    ? problemByPhase[phase.value as keyof typeof problemByPhase]
-    : undefined
-)
 const wakeLocker = createWakeLocker()
+const { showErrorToast } = useToast()
 
-const { processAudio, isProcessing } = useNoteAudioProcessing(note, errors)
+const { processAudio, isProcessing, lastConversionFailed } =
+  useNoteAudioProcessing(note)
 
 const audioRecorder = createAudioRecorder(processAudio)
 const audioDevices = audioRecorder.getAudioDevices()
@@ -87,19 +68,20 @@ const onDeviceChange = async (event: Event) => {
   const deviceId = (event.target as HTMLSelectElement).value
   try {
     await audioRecorder.switchAudioDevice(deviceId)
-  } catch (error) {
-    errors.value = { devices: "Failed to switch audio device" }
+  } catch {
+    showErrorToast("Failed to switch audio device")
   }
 }
 
 const startRecording = async () => {
-  errors.value = undefined
   try {
     await wakeLocker.request()
     await audioRecorder.startRecording()
     phase.value = "recording"
-  } catch (error) {
-    phase.value = "micUnavailable"
+  } catch {
+    showErrorToast(
+      "Could not use the microphone. Allow microphone access in your browser, then try again."
+    )
     await wakeLocker.release()
   }
 }
@@ -110,16 +92,11 @@ const stopRecording = async () => {
     await audioRecorder.stopRecording()
   } finally {
     phase.value =
-      errors.value?.conversion && audioRecorder.hasUnconvertedAudio()
+      lastConversionFailed.value && audioRecorder.hasUnconvertedAudio()
         ? "notConverted"
         : "ready"
     await wakeLocker.release()
   }
-}
-
-const retry = () => {
-  errors.value = undefined
-  return stopRecording()
 }
 
 onBeforeUnmount(() => {
@@ -173,10 +150,6 @@ onBeforeUnmount(() => {
   .daisy-btn {
     padding: 8px;
   }
-}
-
-.retry-button {
-  border-radius: 8px;
 }
 
 .device-select {
