@@ -180,12 +180,12 @@ without the cadence change.
 
 ### 4. Measure feedback latency against API cost and choose the cadence
 Type: Structure
-Status: planned
+Status: done
 Proof: a table in Learnings with, per chunk length (about 10 s, 20 s and 60 s
 of speech cut from `e2e_test/fixtures/harvard.wav` or `lecture.wav`), the
 median and slowest of three `whisper-1` SRT request times, the number of SRT
 segments, and the held-back last segment's length; then, per candidate
-cadence, time to first visible text, Stop-to-final text (from the 2026-10-06
+cadence, time to first visible text, Stop-to-final text (from the 2026-10-03
 measurement, unchanged), conversions per dictated minute, billable seconds
 per recorded minute (recorded audio plus the resubmitted tails), and cost per
 dictated hour at the prices above. The chosen cadence, its cost estimate and
@@ -257,7 +257,19 @@ Disposition: proved by slice 3: frontend/tests/managedApi/clientSetup.spec.ts "s
   the panel discards it as today.
 - No status live region replaces the removed one; the Record/Stop swap and the
   disabled Record during the final conversion carry the state.
-- Cadence: decided by slice 4; nothing changes before its record exists.
+- Cadence (2026-10-10, from slice 4's measurement; the owner confirmed the
+  budget of billable audio at most 1.5× recorded audio): a 20-second timer
+  with the 3-second pause flush, Write text now and the final conversion at
+  Stop unchanged; `whisper-1` SRT stays the mid-speech model and the
+  hold-back rule stays. Estimated cost during sustained speech: 1.14–1.25×
+  recorded audio, $0.41–0.45 per dictated hour, three conversions per
+  minute. Reason: it is the shortest timer backed by a direct measurement
+  (first text about 23 s into unbroken speech instead of about 66 s) and
+  keeps margin under the budget; 15 s was only interpolated and leaves a
+  long single-segment sentence less room; pause-only gives no text during
+  unbroken speech, and a threshold short enough to fire at every sentence
+  bills about 2×. Live transcription is not needed: chunks up to 20 s return
+  in 2.6–3.5 s, so text reaches the note about 6 s after a pause.
 
 ## Learnings
 
@@ -297,3 +309,36 @@ Disposition: proved by slice 3: frontend/tests/managedApi/clientSetup.spec.ts "s
   in scenario 2) pass. Sweep reading (2026-10-10): `daisy-alert`,
   `isProblem`, `problemByPhase`, `fullscreen-error`, `text-error` return
   nothing in `NoteAudioTools.vue`.
+- Slice 4 measurement (2026-10-10, `whisper-1` SRT through
+  `/api/audio/audio-to-text` with `midSpeech=true`, three requests per
+  length, 270 s submitted, about $0.027; `harvard.wav` looped because no
+  fixture holds 60 s of speech; the three responses per length were
+  identical):
+
+  | Chunk | Request times (s) | Median | Slowest | SRT segments | End of last written segment | Resubmitted tail |
+  | --- | --- | --- | --- | --- | --- | --- |
+  | 10 s | 3.29, 2.93, 2.59 | 2.93 | 3.29 | 3 | 7.08 s | 2.92 s |
+  | 20 s | 3.51, 3.26, 3.39 | 3.39 | 3.51 | 6 | 15.00 s | 5.00 s |
+  | 60 s | 3.74, 7.31, 5.55 | 5.55 | 7.31 | 20 | 59.48 s | 0.52 s |
+
+  The response holds only the written texts and the last written end time,
+  so the segment count is written texts plus one and the tail is chunk
+  length minus that end time (what the buffer sends again). Candidates, with
+  the tail taken as 2.8 s (mean) and 5.0 s (worst) whatever the timer:
+
+  | Candidate | First text in unbroken speech | Conversions per minute | Billable s per recorded minute | Ratio | Cost per dictated hour |
+  | --- | --- | --- | --- | --- | --- |
+  | 60 s timer + 3 s pause | 65.5 s | 1 | 62.8–65.0 | 1.05–1.08 | $0.38–0.39 |
+  | 20 s timer + 3 s pause | 23.4 s | 3 | 68.4–75.0 | 1.14–1.25 | $0.41–0.45 |
+  | 15 s timer + 3 s pause | about 18 s (interpolated) | 4 | 71.2–80.0 | 1.19–1.33 | $0.43–0.48 |
+  | pause-only, shorter threshold | none until a pause | one per pause | 60 × (1 + tail ÷ speech between pauses) | about 2 at one sentence per pause | about $0.72 |
+
+  Stop-to-final text is about 3.96 s (seed, 2026-10-03 responsiveness
+  baseline) under every candidate. Not measured: a 15 s chunk, a chunk ending
+  in 3 s of silence, a sentence returned as one segment longer than the
+  timer. Read from source, not measured: a chunk with one segment writes
+  nothing and is sent again whole with the next one, so during a long silence
+  after a pause each timer tick sends the held sentence plus all silence so
+  far; this happens today and a 20 s timer makes those ticks three times as
+  frequent (five silent minutes: about 900 billable seconds today, about
+  2,550 at 20 s).
