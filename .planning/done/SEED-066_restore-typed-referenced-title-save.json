@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 1,
+  "identity": "SEED-066#restore-typed-referenced-title-save",
+  "title": "Restore typed referenced-title save in the note page object",
+  "completedAt": "2026-10-10T04:46:54.915Z",
+  "developer": "Terry Yin",
+  "agent": "Maria-chan",
+  "host": "claude"
+}
