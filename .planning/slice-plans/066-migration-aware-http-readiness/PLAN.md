@@ -70,7 +70,7 @@ is evidence provenance. This plan grants no execution or publication authority.
 
 ### 1. Observe HTTP during the real migration interval
 Type: Behavior
-Status: planned
+Status: done
 Proof: reproduce the current premature HTTP 200 while a real Flyway migration
 call is blocked, then show 200 after release and completed startup. This is a
 baseline observation, not passing proof of the requested 503 behavior.
@@ -312,6 +312,52 @@ mapped, and required test/startup waits have explicit sizing exceptions. No
 blocking concern remains outside the permitted early probe. Readiness is recorded
 in the source story after reviewing this plan; it does not authorize execution.
 
+## Execution context
+
+Story Branch Mode in `.worktrees/start-e2e-sessions-after-database-migration-comp`,
+branch `claude/start-e2e-sessions-after-database-migration-comp`, remote `origin`,
+target `main`. The Take was accepted on `main` at `2f17bb1f1f`. Agent: Nana-chan.
+
 ## Learnings
 
-None from execution yet.
+### Slice 1: the early success is reproduced and the gate passes
+
+Observed at `2f17bb1f1f` with
+`unset SPRING_DATASOURCE_URL DB_URL SPRING_FLYWAY_URL; CURSOR_DEV=true nix develop -c pnpm backend:test:worktree --tests 'com.odde.donut.controllers.HealthCheckStartupReadinessTest'`
+(one test selected, passed). The probe starts `DonutApplication` on a real port
+with `--spring.profiles.active=e2e`, so the deferred strategy and
+`FlyWayFreeVersionRealMigration` run, and holds a real Flyway `BEFORE_MIGRATE`
+callback open. Database: `doughnut_wt_9b333ef56a6f404f8fd58e684563eda4_test`.
+
+- While the migration was held: `GET /api/healthcheck` returned 200
+  `OK. Active Profile: e2e. Commit: <commit>`; Boot readiness was
+  `REFUSING_TRAFFIC`.
+- After release: the same 200; readiness `ACCEPTING_TRAFFIC`.
+- Order: migration entered, healthcheck 200, migration completed, startup
+  completed, healthcheck 200.
+
+Every gate condition held, so slices 2-4 continue unchanged. The probe is kept
+uncommitted in the execution worktree as
+`backend/src/test/java/com/odde/donut/controllers/HealthCheckStartupReadinessTest.java`;
+slice 2 turns it into the retained pending-to-ready regression.
+
+Harness facts slice 2 relies on:
+
+- The profile must be the command-line argument `--spring.profiles.active=e2e`.
+  `.profiles("e2e")` adds to Gradle's `test` profile, and the early test
+  migration then runs before the web server exists.
+- Read the port from `WebServerInitializedEvent`. Asking the web server for its
+  port before it starts creates a default connector on 8080.
+- The callback holds `migrate()` open on an already-migrated database; it is a
+  real migration call, not a pending versioned migration.
+
+Full-stack route for slices 3 and 4, with no product or test code: put a
+`beforeMigrate.sql` in a temporary directory outside the checkout and start the
+runner with `SPRING_FLYWAY_LOCATIONS='classpath:db/migration,filesystem:<dir>'`.
+The file takes and releases a uniquely named MySQL lock
+(`SELECT GET_LOCK(...); SELECT RELEASE_LOCK(...);`) that a separate `mysql`
+session holds until release. Observed: a `SELECT SLEEP(4);` callback supplied
+this way delayed the same probe from 5.68s to 10.79s. Not yet observed: the
+named-lock hold and release, and the variable reaching the `bootRunE2E` JVM
+through `pnpm e2e:hold` / `pnpm cy:run`; slice 3 confirms both before relying
+on them.
