@@ -226,24 +226,3 @@ jobs:
         with:
           name: cypress-screenshots
           path: e2e_test/screenshots
-
-  Notify-on-failure:
-    name: Single Slack notification on CI failure
-    runs-on: ${{ vars.RUNNER }}
-    needs:
-      [
-        Lint-N-Backend-Generated-Types-For-Frontend,
-        Backend-unit-tests,
-        Frontend-unit-tests,
-        Other-unit-tests,
-        Package-artifacts,
-        E2E-tests,
-      ]
-    if: always() && contains(needs.*.result, 'failure')
-    steps:
-      - uses: actions/checkout@v7
-        with:
-          fetch-depth: 1
-      - uses: ./.github/notify_ci_failure
-        with:
-          slack_webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}

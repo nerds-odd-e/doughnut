@@ -57,11 +57,3 @@ jobs:
             --project=$PROJECT_ID \
             --zone=$ZONE
           exit 1
-
-      - name: Send Notification on Failure
-        if: failure()
-        uses: 8398a7/action-slack@v3
-        with:
-          status: ${{ job.status }}
-          text: "Donut MIG Status Check Failed. Please check the logs for more details."
-          webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}

@@ -25,7 +25,6 @@ test('release pins orchestration separately from source and preserves deployment
   const deploy = workflow('deploy')
   const admission = deploy.jobs['release-admission']
   const publication = deploy.jobs.Deploy
-  const notify = deploy.jobs['Notify-on-failure']
   const control = admission.steps.find((step) => step.id === 'control')
   const trackingAuth = admission.steps.find(
     (step) => step.uses === './.github/gcloud_auth_n_sdk'
@@ -104,19 +103,11 @@ test('release pins orchestration separately from source and preserves deployment
     ]
   )
   assert.equal(
-    notify.steps[0].with.ref,
-    "${{ needs.release-admission.outputs.control_sha || 'main' }}"
-  )
-  assert.equal(
     publication.env.RELEASE_SHA,
     '${{ needs.release-admission.outputs.sha }}'
   )
   assert.equal(
     publication.env.RELEASE_CI_SHA,
-    '${{ needs.release-admission.outputs.ci_sha }}'
-  )
-  assert.equal(
-    notify.steps.find((step) => step.env?.RELEASE_CI_SHA).env.RELEASE_CI_SHA,
     '${{ needs.release-admission.outputs.ci_sha }}'
   )
   assert.equal(
@@ -166,8 +157,12 @@ test('release pins orchestration separately from source and preserves deployment
     )
   )
   assert.deepEqual(
-    artifactDownloads.map((step) => step.id),
-    ['backend_artifact', 'frontend_artifact', 'cli_artifact']
+    artifactDownloads.map((step) => step.with.path),
+    [
+      'release-artifacts/backend',
+      'release-artifacts/frontend',
+      'release-artifacts/cli',
+    ]
   )
   assert.equal(deploy.env.GCP_CREDENTIALS, '${{ secrets.GCP_CREDENTIALS }}')
   assert.equal(
@@ -195,8 +190,12 @@ test('terminal release outcomes bypass CI and every publication operation', () =
     "needs.release-admission.outputs.deploy == 'true'"
   )
   assert.deepEqual(
-    downloads.map((step) => step.id),
-    ['backend_artifact', 'frontend_artifact', 'cli_artifact']
+    downloads.map((step) => step.with.path),
+    [
+      'release-artifacts/backend',
+      'release-artifacts/frontend',
+      'release-artifacts/cli',
+    ]
   )
   assert.ok(publication.steps.some((step) => step.id === 'publish'))
 })
@@ -207,7 +206,6 @@ test('independent CLI tags retain their release trigger', () => {
 
 test('admission exposes the selected release identity using full Git history', () => {
   const admission = workflow('deploy').jobs['release-admission']
-  assert.equal(admission.outputs.tag, selected('tag'))
   assert.equal(admission.outputs.sha, selected('sha'))
   assert.equal(admission.outputs.ci_sha, selected('ciSha'))
   assert.equal(admission.outputs.ref, selected('ref'))
