@@ -169,24 +169,57 @@ one-time removal sweep as an acceptance reading, following principle 7 in
 
 **Identity:** SEED-066#simplify-voice-input-feedback
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"unselected"}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/063-simplify-voice-input-feedback/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"4832be1b79e316353493b5cfb34fa5fd6f7b75ba822dbd6b046e8ee222226f6d","plan":"977d672824e05a476e02dffb2b06386935f1ac1be73903f333898ce583de62ba"}}
 ```
 
-**Goal:** For note authors, make everyday voice input quieter and simpler while
-getting spoken text into the note promptly at an affordable API cost.
+**Goal:** For note authors dictating into a note's body on the web app, make
+everyday voice input quieter and simpler: the author watches their words
+arrive in the note instead of reading status messages, hears about problems
+the same way as everywhere else in Donut, and gets spoken text into the note
+promptly at an affordable API cost.
+
+**The author's journey today (read from source on 2026-10-10, `ca792965c2`):**
+Audio tools opens from the note's More options. The panel shows a waveform,
+a status line, Record, a disabled Save audio and Full screen. Record swaps in
+a microphone selector, Stop and Write text now, and the status line says
+“Recording. Speak now.”. Text appears in the body after each conversion
+(a 60-second timer or a pause of about 3 seconds). After Stop, the status
+line reads “Turning your speech into text…”, then “Added to your note.”,
+“No speech was turned into text.” or a failure sentence, with Retry beside a
+failed conversion. Mid-speech conversion failures and raw save errors appear
+as an inline alert box; the microphone-permission failure replaces the status
+line. Full screen shows a black screen holding only the latest error text.
+Closing the panel while recording stops it and converts what was spoken.
 
 **Scope:**
 
 - Completely remove Save audio and Full screen, including their exclusively
   supporting code and tests under the removal scope above.
-- Remove normal-operation status messages, including ready, recording,
-  converting/saving, and saved/added messages. Preserve the internal state
-  needed to operate recording correctly.
-- Show problems through the existing common exception/error toast mechanism.
-  Remove the inline status/error message presentation and its exclusive
-  machinery. Preserve useful failure recovery without duplicating error UI.
-- Keep the current panel and surviving recording behavior for this story;
-  the next story owns the single-button interaction.
+- Remove the status line and every normal-operation message: ready,
+  recording, converting, added, and nothing added. A recording that produced
+  no recognizable speech ends quietly; the live waveform during recording is
+  the author's evidence that sound is being captured. Preserve the internal
+  recording phases needed to operate recording correctly.
+- Recording state stays perceivable from the controls alone: while idle the
+  panel offers Record; while recording it offers Stop, Write text now and the
+  microphone selector with a moving waveform; after Stop, Record stays
+  unavailable until the final text has been added, then returns.
+- Report every problem through the common error toast that the rest of Donut
+  uses for failed requests: microphone unavailable, a failed conversion
+  (mid-speech or at Stop), a failed microphone switch, and a failed save.
+  Remove the inline status/alert presentation and its exclusive machinery.
+  The toast explains what happened and, when applicable, that the recording
+  is kept until Audio tools is closed. Each failed mid-speech conversion
+  raises its own toast; its audio stays queued for the next conversion as
+  today.
+- Keep Retry as a panel control, not a message: it appears only while a
+  recording that failed to convert at Stop is kept, converts that kept
+  recording, and disappears once the text is added or the panel closes.
+  A recovery action inside the toast is rejected because the scope forbids
+  a second error UI; the shared toast stays message-only.
+- Keep the current panel, its waveform, microphone selector, Write text now,
+  and surviving recording behavior for this story; the next story owns the
+  single-button interaction and removes the panel.
 - Analyze feedback latency versus API cost before choosing processing cadence.
   Aim to show transcribed text as soon as an affordable pace allows. Recent
   unfinished speech may be revised if useful; preserve completed text, existing
@@ -195,30 +228,62 @@ getting spoken text into the note promptly at an affordable API cost.
 
 **Key examples:**
 
-- A note author records a passage and stops → the dictated text is added and
-  saved through the existing flow; routine operation is conveyed by the
-  working controls and resulting text.
-- Microphone access, transcription, or saving fails → the common error toast
-  explains the problem, and applicable existing recovery remains usable.
-- During sustained dictation or a pause → text appears at the selected
-  affordable cadence, preserving completed passages and preexisting content.
+- The panel is open and idle → it shows the waveform and Record only; no
+  text tells the author what to do.
+- The author clicks Record and speaks → Stop, Write text now and the
+  microphone selector appear and the waveform moves; nothing is written
+  about recording. Completed passages appear in the body at the chosen
+  cadence, after existing content, and are saved.
+- The author clicks Stop → Record is unavailable while the last speech is
+  converted; the text is added and saved through the existing flow, Record
+  returns, and no message announces the result. After reload the note holds
+  the existing content followed by the dictated passage.
+- The author stops a recording that held no recognizable speech → the
+  panel returns to idle with nothing added and no message.
+- Microphone access is refused → the common error toast explains that the
+  microphone could not be used and how to allow it; the panel stays idle with
+  Record available.
+- A mid-speech conversion fails → the common error toast reports it; recording
+  continues and the unconverted speech joins the next conversion.
+- The conversion at Stop fails → the common error toast says the speech could
+  not be turned into text and the recording is kept until Audio tools closes;
+  Retry appears in the panel. Clicking Retry converts the kept recording, the
+  text is added, and Retry disappears.
+- Saving the dictated text fails → the common error toast reports the failed
+  save; no raw error object is shown in the panel.
+- The author closes Audio tools while recording → recording stops and the
+  remaining speech is converted and saved as today.
 
-**Analysis to complete during refinement/planning:** Measure time to first
-visible text and Stop-to-final-text, API calls and billable audio per recorded
-minute, and the effect of resubmitted unfinished audio. Compare shorter bounded
-chunks, pause-triggered processing, and streaming only where justified by
-measured benefit and current provider pricing. Record the chosen cadence and
-cost estimate before implementation. The affordable budget, latency target,
-and any model choice remain to be established by that analysis.
+**Analysis to complete during planning:** Measure time to first visible text
+and Stop-to-final-text, API calls and billable audio per recorded minute, and
+the effect of resubmitted unfinished audio. Compare shorter bounded chunks,
+pause-triggered processing, and streaming only where justified by measured
+benefit and current provider pricing. From the author's side, the cadence
+decides how long the body stays unchanged while they keep talking; the
+constraint stays that written text is never revised and the last unfinished
+segment is held back. Record the chosen cadence and cost estimate before
+implementation. The affordable budget, latency target, and any model choice
+remain to be established by that analysis; the measurement needs the real
+transcription service, so plan it as an early probe slice.
 
 **Current source reading (2026-10-10, `ca792965c2`):**
 `audioProcessingScheduler.ts` uses a 60-second timer, pause-triggered flush,
 and final processing at Stop; `rawSampleAudioBuffer.ts` triggers after three
 seconds of silence. `AiAudioController` uses SRT transcription for mid-speech
 chunks and plain text at Stop, with `whisper-1` and
-`gpt-4o-mini-transcribe` respectively in `OtherAiServices`. This is source
-evidence, not a fresh latency measurement or cost estimate. The earlier
-responsiveness observations above remain historical evidence.
+`gpt-4o-mini-transcribe` respectively in `OtherAiServices`. Transcription
+requests bypass the shared loading/error wrapper, so their failures reach the
+common toast only through this story; body saves already go through the
+shared client. This is source evidence, not a fresh latency measurement or
+cost estimate. The earlier responsiveness observations above remain
+historical evidence.
+
+**Considered and excluded:** a message when no speech was recognized
+(normal operation; the waveform already shows capture), suppressing repeated
+mid-speech failure toasts (special-casing without a stated need), automatic
+retry of a failed Stop conversion (recovery stays an author decision), and
+any layout or component choice for the surviving panel (the next story
+replaces it).
 
 **Effort hypothesis:** L, low confidence until cadence/cost analysis bounds
 the work. Reassess size before execution.

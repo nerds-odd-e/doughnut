@@ -1,9 +1,0 @@
-{
-  "schemaVersion": 1,
-  "agent": "Rio-chan",
-  "email": "rio-chan@example.org",
-  "activity": "preparation",
-  "identity": "SEED-066#simplify-voice-input-feedback",
-  "host": "claude",
-  "model": "fable"
-}
