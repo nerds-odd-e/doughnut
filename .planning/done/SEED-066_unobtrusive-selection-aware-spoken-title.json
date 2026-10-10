@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 1,
+  "identity": "SEED-066#unobtrusive-selection-aware-spoken-title",
+  "title": "Restore title styling and make spoken title editing unobtrusive",
+  "completedAt": "2026-10-10T23:33:27.427Z",
+  "developer": "Terry Yin",
+  "agent": "Hibiki-chan",
+  "host": "claude"
+}

@@ -1,9 +1,0 @@
-{
-  "schemaVersion": 1,
-  "agent": "Hibiki-chan",
-  "email": "hibiki-chan@example.org",
-  "identity": "SEED-066#unobtrusive-selection-aware-spoken-title",
-  "mode": "story-branch",
-  "branch": "claude/restore-title-styling-and-make-spoken-title-edit",
-  "host": "claude"
-}

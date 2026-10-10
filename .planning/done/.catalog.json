@@ -2,6 +2,12 @@
   "schemaVersion": 1,
   "records": [
     {
+      "fileName": "SEED-066_unobtrusive-selection-aware-spoken-title.json",
+      "identity": "SEED-066#unobtrusive-selection-aware-spoken-title",
+      "completedAt": "2026-10-10T23:33:27.427Z",
+      "blob": "7b28ca62cdcfd46e311079161d7e6e9a6b2acc97"
+    },
+    {
       "fileName": "SEED-066_single-button-voice-input.json",
       "identity": "SEED-066#single-button-voice-input",
       "completedAt": "2026-10-10T21:40:00.528Z",
