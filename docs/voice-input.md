@@ -4,23 +4,19 @@ Authors open Audio tools on an existing note to Record, Stop, and after a
 failed conversion to Retry. The one main action is Record when ready and Stop
 while recording; only while recording, the microphone chooser (named
 "Microphone") and Write text now (converts what has been said so far,
-unavailable during a conversion) sit beside Stop. A status
-that assistive technology announces says "Ready to record", "Recording. Speak
-now." (a mid-speech conversion does not change it), or "Turning your speech
-into text…" until Stop has finished and the body holding the recording's
-passages has been saved; Record is unavailable while it says so. Then it
-says "Added to your note." when a passage of the recording was written and
-saved, or "No speech was turned into text." when it wrote nothing.
-When a conversion at Stop failed and audio is still
-not converted, it says, shown as a problem, "Could not turn your speech into
-text. Your recording is kept until you close Audio tools." with Retry beside
-it; Record stays available. When recording cannot start, nothing is recorded
-and it says, shown as a problem, "Could not use the microphone. Allow
+unavailable during a conversion) sit beside Stop. The controls alone show
+the state of the recording. After Stop, Record is unavailable until the last
+speech has been converted and its text added to the note, then it is
+available again. A recording in which no speech was recognized adds nothing
+to the note, and Record is then the only control. When a conversion at Stop
+failed and audio is still not converted, the panel says, shown as a problem,
+"Could not turn your speech into text. Your recording is kept until you close
+Audio tools." with Retry beside it; Record stays available. When recording cannot start, nothing is recorded
+and the panel says, shown as a problem, "Could not use the microphone. Allow
 microphone access in your browser, then try again."; Record stays the main
-action, and a later Record that starts clears it. When every save of the recording's passages
-failed (the save error shows as usual), it says "Ready to record". Dictated
-text shows in an open body editor as soon as it joins; typing after that does not hold back "Added to your note." once the body
-holding the passage is saved. Each Record starts counting afresh. Dictation
+action, and a later Record that starts clears it. When saving a passage
+fails, the save error shows as usual and Record is available. Dictated
+text shows in an open body editor as soon as it joins. Dictation
 writes only to the note body.
 
 ## Speaking a title in New note
@@ -113,10 +109,10 @@ including the first conversion of a new recording in the same Audio tools.
 Text already written is not written again. A failure while recording shows
 "Could not turn your speech into text. Your recording is kept." without Retry
 until a later conversion succeeds. After Stop, while audio is still not
-converted, the status shows the failure message and Retry beside it. Retry
-belongs to the recording it follows: the status says "Turning your speech
-into text…", Retry converts everything that remains as Stop does, nothing
-held back, joins the passage once, and then says "Added to your note.". A
+converted, the panel shows the failure message and Retry beside it. Retry
+belongs to the recording it follows: it converts everything that remains as
+Stop does, nothing held back, joins the passage once, and then disappears;
+Record is unavailable meanwhile. A
 Retry that fails leaves the body, the message and Retry in place. Recovery
 lasts while Audio tools stays open; it does not survive a reload or closing
 Audio tools.
@@ -130,9 +126,9 @@ The mounted audio preservation tests assert exact saved content for long,
 empty, and whitespace-ending bodies, repeated additions, originating-note targeting, and undo. The
 mocked recording journey supplies a transcription and observes the original
 body, one space, and the transcription's text. A second mocked journey makes
-the transcription fail at Stop, observes the unchanged body, the message in
-the status with Retry and Record, then lets the transcription succeed and
-observes "Added to your note." and Retry joining the passage once. Model
+the transcription fail at Stop, observes the unchanged body, the message
+with Retry and Record, then lets the transcription succeed and
+observes Retry joining the passage once. Model
 tests with the real audio buffer cover kept audio across failures, and mounted tests cover when Retry is
 offered. The real-OpenAI journey checks both its original text and
 the dictated passage.

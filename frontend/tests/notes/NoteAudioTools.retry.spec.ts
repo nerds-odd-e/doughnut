@@ -9,7 +9,6 @@ import {
   audioChunk,
   audioTextResponse,
   audioToolsVm,
-  dictationStatus,
   findButtonByText,
   mountNoteAudioTools,
   processAudio,
@@ -77,6 +76,7 @@ describe("NoteAudioTools Retry after a failed conversion", () => {
   })
 
   const retryButton = () => findButtonByText(wrapper, "Retry")
+  const problem = () => wrapper.get(".text-error")
   const failAtStop = async () => {
     await startRecording(wrapper)
     await stopRecording(wrapper)
@@ -96,7 +96,7 @@ describe("NoteAudioTools Retry after a failed conversion", () => {
     expect(wrapper.find("select").attributes("aria-label")).toBe("Microphone")
     expect(unnamedControls()).toEqual([])
     await stopRecording(wrapper)
-    expect(dictationStatus(wrapper)).toBe(failedAtStop)
+    expect(retryButton()).toBeTruthy()
     expect(unnamedControls()).toEqual([])
   })
 
@@ -105,7 +105,7 @@ describe("NoteAudioTools Retry after a failed conversion", () => {
     await expect(processAudio(wrapper, audioChunk())).rejects.toThrow()
     await flushPromises()
 
-    expect(dictationStatus(wrapper)).toBe("Recording. Speak now.")
+    expect(findButtonByText(wrapper, "Stop")).toBeTruthy()
     expect(wrapper.find(".daisy-alert-error").text()).toBe(
       "Could not turn your speech into text. Your recording is kept."
     )
@@ -115,9 +115,9 @@ describe("NoteAudioTools Retry after a failed conversion", () => {
   it("says at Stop that the recording is kept, with Retry beside it and Record available", async () => {
     await failAtStop()
 
-    expect(dictationStatus(wrapper)).toBe(failedAtStop)
+    expect(problem().text()).toBe(failedAtStop)
     expect(retryButton()!.element.parentElement).toBe(
-      wrapper.get('[role="status"]').element.parentElement
+      problem().element.parentElement
     )
     expect(findButtonByText(wrapper, "Record")).toBeTruthy()
     expect(wrapper.find(".daisy-alert").exists()).toBe(false)
@@ -133,15 +133,13 @@ describe("NoteAudioTools Retry after a failed conversion", () => {
     expect(retryButton()).toBeUndefined()
   })
 
-  it("turns the kept recording into text once and says it was added", async () => {
+  it("turns the kept recording into text once", async () => {
     await failAtStop()
     audioToText.mockResolvedValue(wrapSdkResponse(audioTextResponse("hello")))
 
     await retryButton()!.trigger("click")
-    expect(dictationStatus(wrapper)).toBe("Turning your speech into text…")
     await flushPromises()
 
-    expect(dictationStatus(wrapper)).toBe("Added to your note.")
     expect(retryButton()).toBeUndefined()
     expect(saveContent).toHaveBeenCalledExactlyOnceWith({
       path: { note: realm.note.id },
@@ -165,12 +163,10 @@ describe("NoteAudioTools Retry after a failed conversion", () => {
       "disabled"
     )
     await startRecording(wrapper)
-    expect(dictationStatus(wrapper)).toBe("Turning your speech into text…")
     expect(recorder.startRecording).toHaveBeenCalledTimes(1)
 
     finishRetry()
     await flushPromises()
-    expect(dictationStatus(wrapper)).toBe("Added to your note.")
     expect(
       findButtonByText(wrapper, "Record")!.attributes()
     ).not.toHaveProperty("disabled")
@@ -185,7 +181,7 @@ describe("NoteAudioTools Retry after a failed conversion", () => {
     expect(
       audioToolsVm(wrapper).audioRecorder.stopRecording
     ).toHaveBeenCalledTimes(2)
-    expect(dictationStatus(wrapper)).toBe(failedAtStop)
+    expect(problem().text()).toBe(failedAtStop)
     expect(retryButton()).toBeTruthy()
     expect(saveContent).not.toHaveBeenCalled()
   })

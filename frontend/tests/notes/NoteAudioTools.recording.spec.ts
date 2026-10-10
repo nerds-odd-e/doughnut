@@ -1,13 +1,7 @@
-import { AiAudioController } from "@generated/donut-backend-api/sdk.gen"
-import makeMe from "donut-test-fixtures/makeMe"
-import { mockSdkServiceWithImplementation } from "@tests/helpers"
 import {
   audioToolsVm,
-  dictationStatus,
   findButtonByText,
-  midSpeechChunk,
   mountNoteAudioTools,
-  processAudio,
   startRecording,
   stopRecording,
   useNoteAudioToolsTestLifecycle,
@@ -41,10 +35,9 @@ useNoteAudioToolsTestLifecycle()
 
 describe("NoteAudioTools recording controls", () => {
   let wrapper: NoteAudioToolsWrapper
-  const note = makeMe.aNote.please()
 
   beforeEach(() => {
-    wrapper = mountNoteAudioTools(note)
+    wrapper = mountNoteAudioTools()
   })
 
   afterEach(() => {
@@ -54,13 +47,11 @@ describe("NoteAudioTools recording controls", () => {
   const buttonTexts = () =>
     wrapper.findAll("button").map((button) => button.text())
 
-  it("offers Record when ready, then Stop, Write text now and the microphone chooser while recording, with the status announced", async () => {
-    expect(dictationStatus(wrapper)).toBe("Ready to record")
-    expect(buttonTexts()).toEqual(["Record"])
+  it("offers only Record when ready, then Stop, Write text now and the microphone chooser while recording", async () => {
+    expect(wrapper.text()).toBe("Record")
 
     await startRecording(wrapper)
 
-    expect(dictationStatus(wrapper)).toBe("Recording. Speak now.")
     expect(buttonTexts()).toEqual(["Stop", "Write text now"])
     expect(wrapper.find(".device-select").exists()).toBe(true)
     expect(
@@ -147,35 +138,19 @@ describe("NoteAudioTools recording controls", () => {
     expect(audioToolsVm(wrapper).audioRecorder.tryFlush).toHaveBeenCalled()
   })
 
-  it("disables Write text now during a conversion", async () => {
-    await startRecording(wrapper)
-    const writeNowButton = findButtonByText(wrapper, "Write text now")!
-
-    type AudioResponse = {
-      segmentTexts: string[]
-      endTimestamp: string
-    }
-    let resolveProcess!: (value: AudioResponse) => void
-    const processPromise = new Promise<AudioResponse>((resolve) => {
-      resolveProcess = resolve
-    })
-    mockSdkServiceWithImplementation(
-      AiAudioController,
-      "audioToText",
-      async () => await processPromise
+  it("explains a microphone that cannot be used and keeps Record available", async () => {
+    audioToolsVm(wrapper).audioRecorder.startRecording.mockRejectedValueOnce(
+      new Error("Permission denied")
     )
+    await startRecording(wrapper)
 
-    const processing = processAudio(wrapper, midSpeechChunk())
-    await flushPromises()
-    expect(writeNowButton.attributes("disabled")).toBeDefined()
+    expect(wrapper.get(".text-error").text()).toBe(
+      "Could not use the microphone. Allow microphone access in your browser, then try again."
+    )
+    expect(buttonTexts()).toEqual(["Record"])
 
-    resolveProcess({
-      segmentTexts: ["test"],
-      endTimestamp: "00:00:37,270",
-    })
-    await processing
-    await flushPromises()
-    expect(writeNowButton.attributes("disabled")).toBeFalsy()
+    await startRecording(wrapper)
+    expect(buttonTexts()).toEqual(["Stop", "Write text now"])
   })
 
   it("stops recording when unmounted while recording", async () => {

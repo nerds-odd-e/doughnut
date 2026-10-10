@@ -1,7 +1,8 @@
 # Simplify voice input controls and feedback
 
 Work item: **SEED-066#simplify-voice-input-feedback**
-([story](../../seeds/SEED-066-voice-input.md#simplify-voice-input-feedback)).
+
+**Source:** [story](../../seeds/SEED-066-voice-input.md#simplify-voice-input-feedback)
 
 ## Goal and scope
 
@@ -125,14 +126,14 @@ Stop-safe: the panel still records and converts as today.
 
 ### 2. Routine dictation shows no status; state lives in the controls
 Type: Behavior
-Status: planned
+Status: done
 Proof: `NoteAudioTools.recording.spec.ts`: no `role="status"` element; Record
 is disabled from Stop until the final text has been added, then enabled (the
 existing "tells the result of its recording when Record is pressed while Stop
 finishes" becomes this assertion); a Stop whose conversion returned no
 segments leaves the idle controls and no toast. Delete
-`NoteAudioTools.status.spec.ts`, `NoteAudioTools.savedStatus.spec.ts`,
-`noteAudioToolsSavedContentTestSupport.ts` and `dictationStatus`. E2E
+`NoteAudioTools.status.spec.ts`, `NoteAudioTools.savedStatus.spec.ts` and
+`dictationStatus`. E2E
 `record_live_audio.feature` scenario 1: drop "I should be told my speech was
 added to my note" (both scenarios); `audioToolsPage.stopRecording` waits for
 Record to be enabled instead of reading the status text; the content
@@ -156,6 +157,9 @@ is available; Retry converts the kept recording once, the passage joins, and
 Retry disappears; a Retry that fails again toasts again and keeps Retry; no
 Retry when nothing remains to convert. `NoteAudioTools.processing.spec.ts`: a
 failed mid-speech conversion toasts and recording continues without Retry.
+`NoteAudioTools.controlsDuringConversion.spec.ts` "returns to Record alone,
+adding nothing, when Stop found no speech" runs with `showToastsOnPage()` and observes that
+the page holds no toast (obligation G1).
 Microphone refused → error toast with the allow-access explanation and Record
 available (moved from the deleted status spec). Device switch failure → error
 toast. `NoteAudioTools.preservation.spec.ts` "keeps appended content after an
@@ -219,6 +223,18 @@ chosen interval or pause; the held-back last segment and written text are
 never revised; existing content survives. About 5 min. Depends on slice 4's
 recorded decision.
 
+## Story obligations
+
+### G1. Silent Stop shows no toast
+Reported: slice 2 — "'No toast' for the silent Stop is not asserted."
+Story clause: "panel returns to idle with nothing added and no message"
+Disposition: receiving slice 3
+
+### G2. Passage typed over while a save is in flight is saved by autosave
+Reported: slice 2 — "the newer draft holding the passage is now saved by the normal 1-second autosave debounce (or on blur or unmount) instead of immediately"
+Story clause: "the text is added and saved through the existing flow"
+Disposition: proved by slice 2: frontend/tests/notes/NoteAudioTools.typingWhilePending.spec.ts "keeps typing whose save is still in flight and saves the passage after it once" and "saves the passage as soon as it joins the open editor's draft"
+
 ## Current decisions
 
 - Toast wording reuses today's sentences: conversion failure "Could not turn
@@ -245,3 +261,15 @@ recorded decision.
   `env -u NODE_ENV CURSOR_DEV=true nix develop -c pnpm frontend:test tests/notes/NoteAudioTools tests/models tests/notes/NoteNewForm.spokenTitle tests/notes/NoteEditableTitle.spokenTitle`
   passes. Sweep reading (2026-10-10): `FullScreen`, `saveAudioLocally`,
   `Save audio`, `Full screen` return nothing over the product.
+- Slice 2: the confirmed-save machinery (`flushAndConfirmDraftSaved`,
+  `persistedVersion`, the `saved` return) existed only to word the result
+  message and went with it; an open editor saves the joined draft through
+  its ordinary flush. Until slice 3 the Stop-failure and microphone sentences
+  show in a `text-error` paragraph with Retry beside it.
+  `noteAudioToolsSavedContentTestSupport.ts` stays: the preservation and
+  language-joining specs use it. Accepted proof:
+  `NoteAudioTools.controlsDuringConversion.spec.ts` "keeps Record unavailable
+  from Stop until the last text has been added" and "returns to Record alone,
+  adding nothing, when Stop found no speech"; recording spec "offers only
+  Record when ready, …"; whole `pnpm frontend:test` (2081 tests) and
+  `record_live_audio.feature` (5 scenarios) pass.

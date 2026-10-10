@@ -5,8 +5,8 @@
       :audioRecorder="audioRecorder"
       :isRecording="isRecording"
     />
-    <div class="flex justify-center items-center gap-2 text-center mb-3">
-      <p role="status" :class="{ 'text-error': isProblem }">{{ status }}</p>
+    <div v-if="problem" class="flex justify-center items-center gap-2 text-center mb-3">
+      <p class="text-error">{{ problem }}</p>
       <button v-if="phase === 'notConverted'" class="daisy-btn daisy-btn-sm retry-button" @click="retry">Retry</button>
     </div>
     <div
@@ -60,27 +60,24 @@ const { note } = defineProps({
 })
 
 const errors = ref<Record<string, string | undefined>>()
-const statusByPhase = {
-  ready: "Ready to record",
-  recording: "Recording. Speak now.",
-  stopping: "Turning your speech into text…",
-  added: "Added to your note.",
-  nothingAdded: "No speech was turned into text.",
+const problemByPhase = {
   notConverted:
     "Could not turn your speech into text. Your recording is kept until you close Audio tools.",
   micUnavailable:
     "Could not use the microphone. Allow microphone access in your browser, then try again.",
 } as const
-const phase = ref<keyof typeof statusByPhase>("ready")
+const phase = ref<
+  "ready" | "recording" | "stopping" | keyof typeof problemByPhase
+>("ready")
 const isRecording = computed(() => phase.value === "recording")
-const status = computed(() => statusByPhase[phase.value])
-const isProblem = computed(
-  () => phase.value === "notConverted" || phase.value === "micUnavailable"
+const problem = computed(() =>
+  phase.value in problemByPhase
+    ? problemByPhase[phase.value as keyof typeof problemByPhase]
+    : undefined
 )
 const wakeLocker = createWakeLocker()
 
-const { processAudio, isProcessing, startNewRecording, writtenResult } =
-  useNoteAudioProcessing(note, errors)
+const { processAudio, isProcessing } = useNoteAudioProcessing(note, errors)
 
 const audioRecorder = createAudioRecorder(processAudio)
 const audioDevices = audioRecorder.getAudioDevices()
@@ -97,7 +94,6 @@ const onDeviceChange = async (event: Event) => {
 
 const startRecording = async () => {
   errors.value = undefined
-  startNewRecording()
   try {
     await wakeLocker.request()
     await audioRecorder.startRecording()
@@ -113,12 +109,10 @@ const stopRecording = async () => {
   try {
     await audioRecorder.stopRecording()
   } finally {
-    const written = await writtenResult()
-    if (errors.value?.conversion && audioRecorder.hasUnconvertedAudio()) {
-      phase.value = "notConverted"
-    } else {
-      phase.value = written === "notSaved" ? "ready" : written
-    }
+    phase.value =
+      errors.value?.conversion && audioRecorder.hasUnconvertedAudio()
+        ? "notConverted"
+        : "ready"
     await wakeLocker.release()
   }
 }
