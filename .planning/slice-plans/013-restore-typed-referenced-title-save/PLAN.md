@@ -132,3 +132,12 @@ CURSOR_DEV=true nix develop -c pnpm cy:run --spec e2e_test/features/cli/cli_note
   branch `claude/restore-typed-referenced-title-save-in-the-note`; remote
   `origin`; target `main`.
 - Published claim: `5ee74ec76ed2b51ff24c8a1f9bf04a2054f67d15` on `main`.
+- Plan evidence: `f8f718da651d033034ed4b420e4077634949ef53` accepted on
+  `refs/heads/claude/restore-typed-referenced-title-save-in-the-note`.
+
+## Execution complete
+
+Product advice: no change. The typed Keep and Update journeys work on this
+branch through the predecessor's repair; no product behavior or backlog
+priority is affected. The broader arrow-function cleanup of the note page
+object stays deferred as the story states.

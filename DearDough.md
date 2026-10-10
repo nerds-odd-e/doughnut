@@ -6,7 +6,7 @@ released response is not proof of effectiveness. Unknown provenance stays unknow
 [Response status](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/finding-names.md).
 Full pre-trim evidence: `8830c682704aac3bbb34bf9b1204da8feba042ca:DearDough.md`. Older narratives live in Git, not a second archive.
 
-- Highest allocated local number: 218. Removed local codes are never reused.
+- Highest allocated local number: 219. Removed local codes are never reused.
 
 Detailed retained observations are consolidated in the linked Open Dough
 record; headings and former local aliases preserve traceability. Review date:
@@ -234,3 +234,17 @@ A cohesion edit rewrote typed referenced-title save to call `this.chooseReferenc
   - Evidence: refactor agent `823365da-5587-41e8-8079-137bdc24f9b8` (reported skipping E2E after changing `saveReferencedNoteTitle` to `this.chooseReferencedTitleSave`); `ca98162b615cd38552770bd615720d3a05aead31:e2e_test/start/pageObjects/notePage.ts`; CI run https://github.com/nerds-odd-e/doughnut/actions/runs/38001567782 (`TypeError: Cannot read properties of undefined (reading 'chooseReferencedTitleSave')` on `wiki_link.feature` / `property_wiki_link.feature`)
   - Observed effect: four note-topology E2E scenarios failed on the published slice-2 SHA while focused `record_live_audio.feature` proof stayed green
   - Inference: arrow-property `this` is not the page object; proof that only exercises the direct helper call cannot validate the rewritten typed-save chain
+
+## DD-219 — A correction story was queued and Taken for a CI failure whose repair was already on the branch
+
+The retrospective of the spoken-title story planned a correction for the typed referenced-title save regression after the CI repair for it had been committed. The correction's plan noted the repair "may already contain" the fix, yet the story was still queued first and executed as its own story.
+
+### Occurrences
+- Execution: SEED-066#restore-typed-referenced-title-save
+  - Timestamp: 2026-10-10T08:38:32+09:00
+  - Tool: Claude Code
+  - Model: claude-opus-5-5
+  - Open Dough release: unknown
+  - Evidence: repair `07f888578ee96b7248e08ba202a5a252fe26ae8b` (08:07:20) precedes queue commit `b4bb2f90a0d74a938dcadb98e8f279bbf09263e0` (08:38:32); plan `.planning/slice-plans/013-restore-typed-referenced-title-save/PLAN.md` slice 1 "confirm at Take before rewriting"; plan evidence commit `f8f718da651d033034ed4b420e4077634949ef53` changes the plan only
+  - Observed effect: the execution took a claim, prepared a workspace, ran four E2E specs (28 scenarios, all green) and delivered no product or test change
+  - Inference: the E2E confirmation had value, but it could have closed the predecessor's repair without a separate story, claim, plan and wrap-up
