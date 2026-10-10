@@ -8,7 +8,7 @@ export const NOTE_TOOLBAR_MORE_OPTIONS_ORDER = [
   "export",
   "mcqs",
   "refine",
-  "audio",
+  "voiceInput",
   "assimilation",
   "delete",
 ] as const satisfies readonly NoteMoreOptionsActionId[]

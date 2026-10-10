@@ -19,7 +19,7 @@ makes it larger than the transcription service accepts has not been observed. An
 could sign in but did not activate Note/New notebook; localhost worked. That
 observation does not establish a human-click defect or its cause.
 
-## Dictating a passage with a pause and Write text now
+## Dictating a passage with a pause and a requested mid-speech conversion
 
 With an existing six-sentence paragraph, record this known passage at natural
 pace, retaining the eight-second pause after “yesterday”:
@@ -32,14 +32,15 @@ pace, retaining the eight-second pause after “yesterday”:
 > and a pencil.
 
 The macOS input was synthesized at 150 words/minute, mono 48 kHz, duration
-29.168 s. Record produced an intermediate paragraph; activate Write text now
-about 22 seconds into capture, continue until the source ends, then Stop.
+29.168 s. Record produced an intermediate paragraph; request a mid-speech
+conversion about 22 seconds into capture, continue until the source ends, then
+Stop.
 The preexisting paragraph survived every update and reload, but new content
 changed as follows:
 
 1. “The orchard contains apple trees, peach trees, and a small wooden bench.
    These facts are finished. The book that I bought yesterday.”
-2. Write text now replaced that paragraph with “After reading several reviews and
+2. The requested conversion replaced that paragraph with “After reading several reviews and
    comparing different editions, is a gift from my sister because she”.
 3. The final update replaced it with “She enjoys learning about the history
    of gardens. The meeting is on Friday afternoon. We should bring a notebook
@@ -52,12 +53,12 @@ The cause and frequency are unknown.
 
 The owner decided on 2026-10-03 to hold back the unfinished sentence rather
 than revise written text. With append and hold-back in place, the same
-passage at Development `1a981673` (Write text now at 23 s, Stop at 31 s) wrote:
+passage at Development `1a981673` (conversion requested at 23 s, Stop at 31 s) wrote:
 
 1. “The orchard contains apple trees, peach trees, and a small wooden bench.”
    The transcription also held “These facts are finished.”, and the
    “yesterday” segment was held back.
-2. Write text now: “The book that I bought yesterday after reading several reviews and
+2. Requested conversion: “The book that I bought yesterday after reading several reviews and
    comparing different editions”, with the next segment held back.
 3. Stop: “is a gift from my sister because she enjoys learning about the
    history of gardens. The meeting is on Friday afternoon. We should bring a

@@ -5,35 +5,35 @@ import {
   audioTextResponse,
   midSpeechChunk,
   processAudio,
-  useNoteAudioToolsTestLifecycle,
-} from "@tests/notes/noteAudioToolsTestSupport"
-import { useSavedBodyDictation } from "@tests/notes/noteAudioToolsSavedContentTestSupport"
+  useNoteVoiceInputTestLifecycle,
+} from "@tests/notes/noteVoiceInputButtonTestSupport"
+import { useSavedBodyDictation } from "@tests/notes/noteVoiceInputButtonSavedContentTestSupport"
 import { describe, expect, it, vi } from "vitest"
 
 vi.mock("@/models/audio/recorderWorklet", async () => {
   const { recorderWorkletMockExports } = await import(
-    "@tests/notes/noteAudioToolsMocks"
+    "@tests/notes/noteVoiceInputButtonMocks"
   )
   return recorderWorkletMockExports()
 })
 
 vi.mock("@/models/audio/audioRecorder", async () => {
   const { audioRecorderMockExports } = await import(
-    "@tests/notes/noteAudioToolsMocks"
+    "@tests/notes/noteVoiceInputButtonMocks"
   )
   return audioRecorderMockExports()
 })
 
 vi.mock("@/models/wakeLocker", async () => {
   const { wakeLockerMockExports } = await import(
-    "@tests/notes/noteAudioToolsMocks"
+    "@tests/notes/noteVoiceInputButtonMocks"
   )
   return wakeLockerMockExports()
 })
 
-useNoteAudioToolsTestLifecycle()
+useNoteVoiceInputTestLifecycle()
 
-describe("NoteAudioTools language joining", () => {
+describe("NoteVoiceInputButton language joining", () => {
   const dictation = useSavedBodyDictation()
   const { note, noteStore } = dictation
 

@@ -4,7 +4,7 @@ import {
 } from "@generated/donut-backend-api/sdk.gen"
 import type { NoteRealm } from "@generated/donut-backend-api"
 import NoteTextContent from "@/components/notes/core/NoteTextContent.vue"
-import NoteAudioTools from "@/components/notes/widgets/NoteAudioTools.vue"
+import NoteVoiceInputButton from "@/components/notes/widgets/NoteVoiceInputButton.vue"
 import { useNoteStore } from "@/store/noteStore"
 import makeMe from "donut-test-fixtures/makeMe"
 import helper, { mockSdkServiceWithImplementation } from "@tests/helpers"
@@ -12,8 +12,8 @@ import { advanceNoteContentSaveDebounce } from "@tests/helpers/noteContentDeboun
 import {
   audioTextResponse,
   processAudio,
-  type NoteAudioToolsWrapper,
-} from "@tests/notes/noteAudioToolsTestSupport"
+  type NoteVoiceInputButtonWrapper,
+} from "@tests/notes/noteVoiceInputButtonTestSupport"
 import { flushPromises } from "@vue/test-utils"
 import { afterEach, beforeEach } from "vitest"
 import { defineComponent, h, ref } from "vue"
@@ -21,14 +21,14 @@ import { defineComponent, h, ref } from "vue"
 export const dictatedPassage = "The orchard path leads down to the river."
 
 /**
- * Mounts the editable body editor beside NoteAudioTools, with the dictation
+ * Mounts the editable body editor beside NoteVoiceInputButton, with the dictation
  * request held until the test has typed. Call inside a describe block, after
- * useNoteAudioToolsTestLifecycle().
+ * useNoteVoiceInputTestLifecycle().
  */
 export function useBodyEditorWithHeldDictation(passage = dictatedPassage) {
   const noteStore = useNoteStore()
   const editorNoteId = ref(0)
-  let wrapper: NoteAudioToolsWrapper | undefined
+  let wrapper: NoteVoiceInputButtonWrapper | undefined
   let updateContentMock: ReturnType<typeof mockSdkServiceWithImplementation>
   let releaseAudio: () => void
 
@@ -59,7 +59,7 @@ export function useBodyEditorWithHeldDictation(passage = dictatedPassage) {
     wrapper?.unmount()
   })
 
-  function mountEditorAndAudioTools(body: string, asMarkdown: boolean) {
+  function mountEditorAndVoiceInput(body: string, asMarkdown: boolean) {
     const note = makeMe.aNoteRealm.content(body).please()
     editorNoteId.value = note.id
     const builder = helper
@@ -76,7 +76,7 @@ export function useBodyEditorWithHeldDictation(passage = dictatedPassage) {
                   asMarkdown,
                   wikiLinks: [],
                 }),
-                h(NoteAudioTools, { note: audioNote.value!.note }),
+                h(NoteVoiceInputButton, { note: audioNote.value!.note }),
               ])
           },
         })
@@ -99,7 +99,9 @@ export function useBodyEditorWithHeldDictation(passage = dictatedPassage) {
   async function dictate(whilePending?: () => Promise<void>) {
     await flushPromises()
     const processing = processAudio(
-      wrapper!.findComponent(NoteAudioTools) as NoteAudioToolsWrapper
+      wrapper!.findComponent(
+        NoteVoiceInputButton
+      ) as NoteVoiceInputButtonWrapper
     )
     await flushPromises()
     await whilePending?.()
@@ -126,7 +128,7 @@ export function useBodyEditorWithHeldDictation(passage = dictatedPassage) {
   }
 
   return {
-    mountEditorAndAudioTools,
+    mountEditorAndVoiceInput,
     showInEditor,
     dictate,
     whileAudioIsPending,

@@ -1,4 +1,5 @@
-import NoteAudioTools from "@/components/notes/widgets/NoteAudioTools.vue"
+import NoteVoiceInputButton from "@/components/notes/widgets/NoteVoiceInputButton.vue"
+import { noteVoiceInputTitles } from "@/components/notes/widgets/noteMoreOptionsTitles"
 import type { AudioChunk } from "@/models/audio/audioProcessingScheduler"
 import type { Note } from "@generated/donut-backend-api"
 import makeMe from "donut-test-fixtures/makeMe"
@@ -6,20 +7,19 @@ import helper, { mockShowNote } from "@tests/helpers"
 import {
   clearAudioHardwareMocks,
   installAudioBrowserSpies,
-} from "@tests/notes/noteAudioToolsMocks"
+} from "@tests/notes/noteVoiceInputButtonMocks"
 import { flushPromises, type VueWrapper } from "@vue/test-utils"
-import { afterEach, beforeEach, vi } from "vitest"
+import { afterEach, beforeEach, expect, vi } from "vitest"
 import type { ComponentPublicInstance } from "vue"
 
-export type NoteAudioToolsWrapper = VueWrapper<ComponentPublicInstance>
+export type NoteVoiceInputButtonWrapper = VueWrapper<ComponentPublicInstance>
 
-export type NoteAudioToolsVm = {
+export type NoteVoiceInputVm = {
   audioRecorder: {
     startRecording: ReturnType<typeof vi.fn>
     stopRecording: ReturnType<typeof vi.fn>
-    tryFlush: ReturnType<typeof vi.fn>
     hasUnconvertedAudio: ReturnType<typeof vi.fn>
-    switchAudioDevice: ReturnType<typeof vi.fn>
+    getAudioData: ReturnType<typeof vi.fn>
   }
   wakeLocker: {
     request: ReturnType<typeof vi.fn>
@@ -29,8 +29,10 @@ export type NoteAudioToolsVm = {
   processAudio: (chunk: AudioChunk) => Promise<string | undefined>
 }
 
-export function audioToolsVm(wrapper: NoteAudioToolsWrapper): NoteAudioToolsVm {
-  return wrapper.vm as unknown as NoteAudioToolsVm
+export function voiceInputVm(
+  wrapper: NoteVoiceInputButtonWrapper
+): NoteVoiceInputVm {
+  return wrapper.vm as unknown as NoteVoiceInputVm
 }
 
 export function audioChunk(
@@ -57,22 +59,32 @@ export function audioTextResponse(
 }
 
 export function processAudio(
-  wrapper: NoteAudioToolsWrapper,
+  wrapper: NoteVoiceInputButtonWrapper,
   chunk: AudioChunk = audioChunk()
 ) {
-  return audioToolsVm(wrapper).processAudio(chunk)
+  return voiceInputVm(wrapper).processAudio(chunk)
 }
 
-export function findButtonByText(wrapper: NoteAudioToolsWrapper, text: string) {
-  return wrapper.findAll("button").find((button) => button.text() === text)
+export function voiceInputButton(wrapper: NoteVoiceInputButtonWrapper) {
+  return wrapper.find("button")
 }
 
-export function mountNoteAudioTools(
+/** The button as an author finds it before and after a recording. */
+export function expectIdleVoiceInputButton(
+  wrapper: NoteVoiceInputButtonWrapper
+) {
+  const button = voiceInputButton(wrapper)
+  expect(button.attributes("aria-label")).toBe(noteVoiceInputTitles.start)
+  expect(button.attributes()).not.toHaveProperty("disabled")
+  expect(button.classes()).not.toContain("daisy-btn-primary")
+}
+
+export function mountNoteVoiceInputButton(
   note: Note = makeMe.aNote.please(),
   options?: { attachToBody?: boolean }
-): NoteAudioToolsWrapper {
+): NoteVoiceInputButtonWrapper {
   return helper
-    .component(NoteAudioTools)
+    .component(NoteVoiceInputButton)
     .withCleanStorage()
     .withProps({ note })
     .mount(
@@ -80,20 +92,24 @@ export function mountNoteAudioTools(
     )
 }
 
-export async function startRecording(wrapper: NoteAudioToolsWrapper) {
-  await findButtonByText(wrapper, "Record")!.trigger("click")
+export async function startRecording(wrapper: NoteVoiceInputButtonWrapper) {
+  await wrapper
+    .find(`button[aria-label="${noteVoiceInputTitles.start}"]`)
+    .trigger("click")
   await flushPromises()
   await wrapper.vm.$nextTick()
 }
 
-export async function stopRecording(wrapper: NoteAudioToolsWrapper) {
-  await findButtonByText(wrapper, "Stop")!.trigger("click")
+export async function stopRecording(wrapper: NoteVoiceInputButtonWrapper) {
+  await wrapper
+    .find(`button[aria-label="${noteVoiceInputTitles.stop}"]`)
+    .trigger("click")
   await flushPromises()
   await wrapper.vm.$nextTick()
 }
 
-/** Shared lifecycle for NoteAudioTools capability specs (call after vi.mock blocks). */
-export function useNoteAudioToolsTestLifecycle() {
+/** Shared lifecycle for NoteVoiceInputButton capability specs (call after vi.mock blocks). */
+export function useNoteVoiceInputTestLifecycle() {
   beforeEach(() => {
     vi.useFakeTimers()
     mockShowNote()

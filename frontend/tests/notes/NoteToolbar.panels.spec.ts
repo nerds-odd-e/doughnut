@@ -1,23 +1,29 @@
-import { NoteController } from "@generated/donut-backend-api/sdk.gen"
+import {
+  AiAudioController,
+  NoteController,
+  TextContentController,
+} from "@generated/donut-backend-api/sdk.gen"
 import makeMe from "donut-test-fixtures/makeMe"
 import helper, { mockSdkService, productionRouterAt } from "@tests/helpers"
 import {
   allMoreOptionsFitNavWidth,
   installMockResizeObserver,
   layoutNoteToolbar,
-  overflowTogglesNavWidth,
   restoreNoteToolbarWidthMocks,
 } from "@tests/helpers/mockNoteToolbarNavWidth"
 import NoteMoreOptionsForm from "@/components/notes/widgets/NoteMoreOptionsForm.vue"
-import { noteMoreOptionsTitles } from "@/components/notes/widgets/noteMoreOptionsTitles"
+import {
+  noteMoreOptionsTitles,
+  noteVoiceInputTitles,
+} from "@/components/notes/widgets/noteMoreOptionsTitles"
 import {
   mountNoteToolbar,
-  openNoteToolbarOverflowMenu,
-  overflowMenuItem,
+  noteToolbarAction,
+  noteToolbarProps,
   resetNoteToolbarTestState,
 } from "@tests/notes/noteToolbarTestHelpers"
 import { useAssimilationView } from "@/composables/useAssimilationView"
-import { useNoteToolbarPanel } from "@/composables/useNoteToolbarPanel"
+import { useNoteStore } from "@/store/noteStore"
 import {
   notePropertyLocation,
   noteShowLocation,
@@ -28,15 +34,33 @@ import { type VueWrapper, flushPromises } from "@vue/test-utils"
 
 const titles = noteMoreOptionsTitles
 
+vi.mock("@/models/audio/recorderWorklet", async () => {
+  const { recorderWorkletMockExports } = await import(
+    "@tests/notes/noteVoiceInputButtonMocks"
+  )
+  return recorderWorkletMockExports()
+})
+
+vi.mock("@/models/audio/audioRecorder", async () => {
+  const { audioRecorderMockExports } = await import(
+    "@tests/notes/noteVoiceInputButtonMocks"
+  )
+  return audioRecorderMockExports()
+})
+
+vi.mock("@/models/wakeLocker", async () => {
+  const { wakeLockerMockExports } = await import(
+    "@tests/notes/noteVoiceInputButtonMocks"
+  )
+  return wakeLockerMockExports()
+})
+
 describe("NoteToolbar panels", () => {
   // biome-ignore lint/suspicious/noExplicitAny: wrapper for testing
   let wrapper: VueWrapper<any>
   const noteRealm = makeMe.aNoteRealm.please()
   const panelShell = () =>
     wrapper.find('[data-testid="note-toolbar-panel-shell"]')
-  const assimilationModes = () =>
-    wrapper.find('[data-testid="note-assimilation-modes"]')
-  const audioTools = () => wrapper.find(`section[aria-label="${titles.audio}"]`)
 
   afterEach(() => {
     wrapper?.unmount()
@@ -77,45 +101,58 @@ describe("NoteToolbar panels", () => {
     expect(dialog.open).toBe(true)
   })
 
-  it("toggles the audio tools panel from the inline button and overflow menu", async () => {
+  it("starts and stops voice input from the inline button", async () => {
     wrapper = await mountNoteToolbar(noteRealm)
     await layoutNoteToolbar(wrapper, allMoreOptionsFitNavWidth())
 
-    const audioToolsButton = wrapper.find(`button[title="${titles.audio}"]`)
-    const expectAudioButtonPressed = (pressed: boolean) => {
-      expect(audioToolsButton.classes().includes("daisy-btn-soft")).toBe(
-        pressed
-      )
-      expect(audioToolsButton.classes().includes("daisy-btn-primary")).toBe(
-        pressed
-      )
-    }
-    expectAudioButtonPressed(false)
+    await noteToolbarAction(wrapper, noteVoiceInputTitles.start).trigger(
+      "click"
+    )
+    await flushPromises()
+
+    const stopButton = noteToolbarAction(wrapper, noteVoiceInputTitles.stop)
+    expect(stopButton.attributes("aria-pressed")).toBe("true")
+    expect(stopButton.classes()).toEqual(
+      expect.arrayContaining(["daisy-btn-soft", "daisy-btn-primary"])
+    )
     expect(panelShell().exists()).toBe(false)
 
-    await audioToolsButton.trigger("click")
+    await stopButton.trigger("click")
     await flushPromises()
 
-    expect(panelShell().exists()).toBe(true)
-    expect(useNoteToolbarPanel().isAudioOpen.value).toBe(true)
-    expectAudioButtonPressed(true)
-    expect(audioToolsButton.attributes("aria-pressed")).toBe("true")
+    const idleButton = noteToolbarAction(wrapper, noteVoiceInputTitles.start)
+    expect(idleButton.attributes()).not.toHaveProperty("aria-pressed")
+    expect(idleButton.classes()).not.toContain("daisy-btn-primary")
+  })
 
-    await audioToolsButton.trigger("click")
+  it("dictates into the note on the page when voice input starts after moving to another note", async () => {
+    const saveContent = mockSdkService(
+      TextContentController,
+      "updateNoteContent",
+      makeMe.aNoteRealm.please()
+    )
+    mockSdkService(AiAudioController, "audioToText", {
+      segmentTexts: ["hello"],
+      endTimestamp: "00:00:01,000",
+    })
+    const destination = makeMe.aNoteRealm.content("Destination.").please()
+    wrapper = await mountNoteToolbar(noteRealm)
+    useNoteStore().refreshNoteRealm(destination)
+    await wrapper.setProps(noteToolbarProps(destination))
     await flushPromises()
 
-    expect(panelShell().exists()).toBe(false)
-    expectAudioButtonPressed(false)
-    expect(audioToolsButton.attributes("aria-pressed")).toBe("false")
-
-    await layoutNoteToolbar(wrapper, overflowTogglesNavWidth())
-    await openNoteToolbarOverflowMenu(wrapper)
-    overflowMenuItem(titles.audio)!.click()
+    await noteToolbarAction(wrapper, noteVoiceInputTitles.start).trigger(
+      "click"
+    )
     await flushPromises()
+    const { createAudioRecorder } = await import("@/models/audio/audioRecorder")
+    const convert = vi.mocked(createAudioRecorder).mock.lastCall![0]
+    await convert({ data: new File([], "test.webm"), isMidSpeech: false })
 
-    expect(panelShell().exists()).toBe(true)
-    expect(useNoteToolbarPanel().isAudioOpen.value).toBe(true)
-    expect(document.querySelector("[data-dropdown-portal-panel]")).toBeNull()
+    expect(saveContent).toHaveBeenCalledExactlyOnceWith({
+      path: { note: destination.note.id },
+      body: { content: "Destination. hello" },
+    })
   })
 
   it("shows assimilation settings in the shared panel shell without a max-height cage", async () => {
@@ -133,24 +170,6 @@ describe("NoteToolbar panels", () => {
     await flushPromises()
 
     expect(panelShell().exists()).toBe(false)
-  })
-
-  it("hides assimilation when audio opens and vice versa", async () => {
-    wrapper = await mountNoteToolbar(noteRealm)
-    useAssimilationView().openForNote(noteRealm.note.id)
-    await flushPromises()
-
-    await wrapper.find(`button[title="${titles.audio}"]`).trigger("click")
-    await flushPromises()
-
-    expect(assimilationModes().exists()).toBe(false)
-    expect(audioTools().exists()).toBe(true)
-
-    useAssimilationView().openForNote(noteRealm.note.id)
-    await flushPromises()
-
-    expect(assimilationModes().exists()).toBe(true)
-    expect(audioTools().exists()).toBe(false)
   })
 
   describe("conversation", () => {

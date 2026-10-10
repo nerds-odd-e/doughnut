@@ -61,22 +61,6 @@ describe("AudioProcessingScheduler flush", () => {
     )
   })
 
-  it("marks chunk as isMidSpeech when the author flushes", async () => {
-    const mockCallback = vi.fn().mockResolvedValue(undefined)
-    const { audioBuffer, scheduler } = createBufferAndScheduler(
-      44100,
-      mockCallback
-    )
-
-    audioBuffer.receiveAudioData([new Float32Array(44100).fill(0.5)])
-    scheduler.start()
-    await scheduler.tryFlush()
-
-    expect(mockCallback).toHaveBeenCalledWith(
-      expect.objectContaining({ isMidSpeech: true })
-    )
-  })
-
   it("sends one isMidSpeech chunk for a pause, however long it lasts", async () => {
     const mockCallback = vi.fn().mockResolvedValue("00:00:00,500")
     const { audioBuffer, scheduler } = createBufferAndScheduler(

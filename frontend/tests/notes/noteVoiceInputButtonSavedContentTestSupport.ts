@@ -10,9 +10,9 @@ import {
 } from "@tests/helpers"
 import {
   audioTextResponse,
-  mountNoteAudioTools,
-  type NoteAudioToolsWrapper,
-} from "@tests/notes/noteAudioToolsTestSupport"
+  mountNoteVoiceInputButton,
+  type NoteVoiceInputButtonWrapper,
+} from "@tests/notes/noteVoiceInputButtonTestSupport"
 import { afterEach, beforeEach } from "vitest"
 
 /** Mounts dictation against a saved body, with content PATCH responses updating the store. */
@@ -20,7 +20,7 @@ export function useSavedBodyDictation(body = "") {
   const originalRealm = makeMe.aNoteRealm.content(body).please()
   const note = originalRealm.note
   const noteStore = useNoteStore()
-  let wrapper: NoteAudioToolsWrapper
+  let wrapper: NoteVoiceInputButtonWrapper
   let audioToTextMock: ReturnType<typeof mockSdkService>
   let updateContentMock: ReturnType<typeof mockSdkServiceWithImplementation>
 
@@ -30,7 +30,7 @@ export function useSavedBodyDictation(body = "") {
       "audioToText",
       audioTextResponse("text")
     )
-    wrapper = mountNoteAudioTools(note)
+    wrapper = mountNoteVoiceInputButton(note)
     noteStore.refreshNoteRealm(originalRealm)
     updateContentMock = mockSdkServiceWithImplementation(
       TextContentController,

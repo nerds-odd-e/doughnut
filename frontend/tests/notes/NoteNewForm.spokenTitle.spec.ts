@@ -3,7 +3,7 @@ import { createAudioRecorder } from "@/models/audio/audioRecorder"
 import { flushPromises, type VueWrapper } from "@vue/test-utils"
 import type { ComponentPublicInstance } from "vue"
 import { mockSdkService, wrapSdkResponse } from "@tests/helpers"
-import { audioTextResponse } from "@tests/notes/noteAudioToolsTestSupport"
+import { audioTextResponse } from "@tests/notes/noteVoiceInputButtonTestSupport"
 import {
   isNoteNewFormSubmitDisabled,
   mountNoteNewForm,
@@ -27,14 +27,14 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 
 vi.mock("@/models/audio/recorderWorklet", async () => {
   const { recorderWorkletMockExports } = await import(
-    "@tests/notes/noteAudioToolsMocks"
+    "@tests/notes/noteVoiceInputButtonMocks"
   )
   return recorderWorkletMockExports()
 })
 
 vi.mock("@/models/audio/audioRecorder", async () => {
   const { audioRecorderInvokingCallbackMockExports } = await import(
-    "@tests/notes/noteAudioToolsMocks"
+    "@tests/notes/noteVoiceInputButtonMocks"
   )
   return audioRecorderInvokingCallbackMockExports()
 })

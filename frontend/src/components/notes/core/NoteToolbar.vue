@@ -70,10 +70,9 @@
       />
     </div>
   </nav>
-  <NoteToolbarPanelShell v-if="!readonly && isPanelOpen">
-    <NoteAudioTools v-if="isAudioOpen" v-bind="{ note }" />
+  <NoteToolbarPanelShell v-if="!readonly && showAssimilationPanel">
     <AssimilationPanel
-      v-else-if="isOpenForNote(note.id)"
+      v-if="isOpenForNote(note.id)"
       :key="assimilationPanelKey"
       :note="note"
       @reload-needed="onAssimilationReloadNeeded"
@@ -92,10 +91,8 @@ import SvgSearchForWikiLinkOrRelationship from "../../svgs/SvgSearchForWikiLinkO
 import SearchForm from "../../wiki-link-or-relationship/SearchForm.vue"
 import PopButton from "@/components/commons/Popups/PopButton.vue"
 import { FileCode, LayoutTemplate, MessageCircle } from "@lucide/vue"
-import NoteAudioTools from "../widgets/NoteAudioTools.vue"
 import AssimilationPanel from "@/components/recall/AssimilationPanel.vue"
 import NoteToolbarPanelShell from "./NoteToolbarPanelShell.vue"
-import { useNoteToolbarPanel } from "@/composables/useNoteToolbarPanel"
 import { useAssimilationView } from "@/composables/useAssimilationView"
 import { useNoteStore } from "@/store/noteStore"
 import { useRoute, useRouter } from "vue-router"
@@ -131,8 +128,7 @@ const showRelocatedNewNote = computed(
   () => !sidebarOpened.value && props.readonly !== true
 )
 
-const { isAudioOpen, isPanelOpen } = useNoteToolbarPanel()
-const { isOpenForNote } = useAssimilationView()
+const { showAssimilationPanel, isOpenForNote } = useAssimilationView()
 const noteStore = useNoteStore()
 const assimilationPanelKey = ref(0)
 

@@ -11,51 +11,52 @@ import {
 import { useNoteStore } from "@/store/noteStore"
 import {
   audioTextResponse,
-  audioToolsVm,
-  findButtonByText,
+  expectIdleVoiceInputButton,
   midSpeechChunk,
-  mountNoteAudioTools,
+  mountNoteVoiceInputButton,
   processAudio,
   startRecording,
   stopRecording,
-  useNoteAudioToolsTestLifecycle,
-  type NoteAudioToolsWrapper,
-} from "@tests/notes/noteAudioToolsTestSupport"
+  useNoteVoiceInputTestLifecycle,
+  voiceInputButton,
+  voiceInputVm,
+  type NoteVoiceInputButtonWrapper,
+} from "@tests/notes/noteVoiceInputButtonTestSupport"
 import { noToastShown, showToastsOnPage } from "@tests/helpers/toastTestSupport"
 import { flushPromises } from "@vue/test-utils"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 
 vi.mock("@/models/audio/recorderWorklet", async () => {
   const { recorderWorkletMockExports } = await import(
-    "@tests/notes/noteAudioToolsMocks"
+    "@tests/notes/noteVoiceInputButtonMocks"
   )
   return recorderWorkletMockExports()
 })
 
 vi.mock("@/models/audio/audioRecorder", async () => {
   const { audioRecorderMockExports } = await import(
-    "@tests/notes/noteAudioToolsMocks"
+    "@tests/notes/noteVoiceInputButtonMocks"
   )
   return audioRecorderMockExports()
 })
 
 vi.mock("@/models/wakeLocker", async () => {
   const { wakeLockerMockExports } = await import(
-    "@tests/notes/noteAudioToolsMocks"
+    "@tests/notes/noteVoiceInputButtonMocks"
   )
   return wakeLockerMockExports()
 })
 
-useNoteAudioToolsTestLifecycle()
+useNoteVoiceInputTestLifecycle()
 showToastsOnPage()
 
-describe("NoteAudioTools controls during and after a conversion", () => {
-  let wrapper: NoteAudioToolsWrapper
+describe("NoteVoiceInputButton during and after a conversion", () => {
+  let wrapper: NoteVoiceInputButtonWrapper
   let saveContent: ReturnType<typeof mockSdkService>
   const realm = makeMe.aNoteRealm.please()
 
   beforeEach(() => {
-    wrapper = mountNoteAudioTools(realm.note)
+    wrapper = mountNoteVoiceInputButton(realm.note)
     useNoteStore().refreshNoteRealm(realm)
     saveContent = mockSdkService(
       TextContentController,
@@ -68,11 +69,7 @@ describe("NoteAudioTools controls during and after a conversion", () => {
     wrapper?.unmount()
   })
 
-  const buttonTexts = () =>
-    wrapper.findAll("button").map((button) => button.text())
-  const recorder = () => audioToolsVm(wrapper).audioRecorder
-  const recordButton = () => findButtonByText(wrapper, "Record")!
-  const writeNowButton = () => findButtonByText(wrapper, "Write text now")!
+  const recorder = () => voiceInputVm(wrapper).audioRecorder
 
   const convertsTo = (segmentTexts: string[]) =>
     mockSdkService(
@@ -101,21 +98,7 @@ describe("NoteAudioTools controls during and after a conversion", () => {
       await processAudio(wrapper)
     })
 
-  it("disables Write text now during a conversion", async () => {
-    await startRecording(wrapper)
-    const finishConversion = holdConversion("test")
-
-    const processing = processAudio(wrapper, midSpeechChunk())
-    await flushPromises()
-    expect(writeNowButton().attributes()).toHaveProperty("disabled")
-
-    finishConversion()
-    await processing
-    await flushPromises()
-    expect(writeNowButton().attributes()).not.toHaveProperty("disabled")
-  })
-
-  it("keeps Stop and Write text now when a mid-speech conversion finishes", async () => {
+  it("keeps recording when a mid-speech conversion finishes", async () => {
     convertsTo(["test"])
     await startRecording(wrapper)
 
@@ -123,47 +106,48 @@ describe("NoteAudioTools controls during and after a conversion", () => {
     await flushPromises()
 
     expect(saveContent).toHaveBeenCalled()
-    expect(buttonTexts()).toEqual(["Stop", "Write text now"])
+    expect(voiceInputButton(wrapper).attributes("aria-pressed")).toBe("true")
   })
 
-  it("keeps Record unavailable from Stop until the last text has been added", async () => {
+  it("keeps the button unavailable from Stop until the last text has been added", async () => {
     await startRecording(wrapper)
     const finishConversion = holdConversion("hello")
     stopConvertsTheRest()
     await stopRecording(wrapper)
 
-    expect(buttonTexts()).toEqual(["Record"])
-    expect(recordButton().attributes()).toHaveProperty("disabled")
-    await startRecording(wrapper)
+    const button = voiceInputButton(wrapper)
+    expect(button.attributes("aria-label")).toBe("Voice input")
+    expect(button.attributes()).toHaveProperty("disabled")
+    expect(button.attributes()).not.toHaveProperty("aria-pressed")
+    expect(button.classes()).not.toContain("daisy-btn-primary")
+    await button.trigger("click")
     expect(recorder().startRecording).toHaveBeenCalledTimes(1)
     expect(saveContent).not.toHaveBeenCalled()
 
     finishConversion()
     await flushPromises()
     expect(saveContent).toHaveBeenCalled()
-    expect(recordButton().attributes()).not.toHaveProperty("disabled")
+    expectIdleVoiceInputButton(wrapper)
   })
 
-  it("returns to Record alone, adding nothing, when Stop found no speech", async () => {
+  it("returns to idle, adding nothing, when Stop found no speech", async () => {
     await startRecording(wrapper)
     convertsTo([])
     stopConvertsTheRest()
     await stopRecording(wrapper)
 
-    expect(wrapper.text()).toBe("Record")
-    expect(recordButton().attributes()).not.toHaveProperty("disabled")
+    expectIdleVoiceInputButton(wrapper)
     expect(saveContent).not.toHaveBeenCalled()
     await noToastShown()
   })
 
-  it("offers Record alone again when saving the dictated text fails", async () => {
+  it("offers the idle button again when saving the dictated text fails", async () => {
     saveContent.mockResolvedValue(wrapSdkError({ message: "save failed" }))
     await startRecording(wrapper)
     convertsTo(["hello"])
     stopConvertsTheRest()
     await stopRecording(wrapper)
 
-    expect(wrapper.text()).toBe("Record")
-    expect(recordButton().attributes()).not.toHaveProperty("disabled")
+    expectIdleVoiceInputButton(wrapper)
   })
 })

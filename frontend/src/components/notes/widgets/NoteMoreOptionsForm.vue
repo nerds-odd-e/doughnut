@@ -9,6 +9,7 @@
       @edit-as-markdown="$emit('edit-as-markdown', $event)"
       @open-wiki="$emit('open-wiki')"
       @open-new="$emit('open-new')"
+      @start-voice-input="$emit('start-voice-input')"
     />
   </DropdownMenu>
 </template>
@@ -30,5 +31,6 @@ defineEmits<{
   (e: "edit-as-markdown", value: boolean): void
   (e: "open-wiki"): void
   (e: "open-new"): void
+  (e: "start-voice-input"): void
 }>()
 </script>

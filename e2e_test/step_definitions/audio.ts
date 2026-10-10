@@ -22,12 +22,12 @@ Given(
 When(
   'I start recording audio for the note {string}',
   (noteTopology: string) => {
-    start.jumpToNotePage(noteTopology).audioTools().startRecording()
+    start.jumpToNotePage(noteTopology).voiceInput().startRecording()
   }
 )
 
 When('I stop recording audio', () => {
-  start.assumeAudioTools().stopRecording()
+  start.assumeNotePage().voiceInput().stopRecording()
 })
 
 When('I speak the title', () => {
@@ -40,12 +40,4 @@ When('I stop speaking the title', () => {
 
 Then('the Title field should read {string}', (title: string) => {
   noteCreationForm.expectTitle(title)
-})
-
-Then('I should be offered Retry for my recording', () => {
-  start.assumeAudioTools().expectRetryOffered()
-})
-
-When('I retry converting my speech', () => {
-  start.assumeAudioTools().retry()
 })

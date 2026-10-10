@@ -4,7 +4,7 @@ import type { ComponentPublicInstance } from "vue"
 import makeMe from "donut-test-fixtures/makeMe"
 import { mockSdkService } from "@tests/helpers"
 import { settleScheduledAutofocus } from "@tests/helpers/focusTargetTestSupport"
-import { audioTextResponse } from "@tests/notes/noteAudioToolsTestSupport"
+import { audioTextResponse } from "@tests/notes/noteVoiceInputButtonTestSupport"
 import { noteTitleText } from "@tests/notes/noteNewFormTestSupport"
 import {
   blurAwayFromSpokenTitle,
@@ -29,14 +29,14 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 
 vi.mock("@/models/audio/recorderWorklet", async () => {
   const { recorderWorkletMockExports } = await import(
-    "@tests/notes/noteAudioToolsMocks"
+    "@tests/notes/noteVoiceInputButtonMocks"
   )
   return recorderWorkletMockExports()
 })
 
 vi.mock("@/models/audio/audioRecorder", async () => {
   const { audioRecorderInvokingCallbackMockExports } = await import(
-    "@tests/notes/noteAudioToolsMocks"
+    "@tests/notes/noteVoiceInputButtonMocks"
   )
   return audioRecorderInvokingCallbackMockExports()
 })

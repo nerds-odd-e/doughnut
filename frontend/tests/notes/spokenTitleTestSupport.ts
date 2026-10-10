@@ -8,8 +8,8 @@ import helper, { mockSdkService, wrapSdkError } from "@tests/helpers"
 import {
   clearAudioHardwareMocks,
   installAudioBrowserSpies,
-} from "@tests/notes/noteAudioToolsMocks"
-import { audioTextResponse } from "@tests/notes/noteAudioToolsTestSupport"
+} from "@tests/notes/noteVoiceInputButtonMocks"
+import { audioTextResponse } from "@tests/notes/noteVoiceInputButtonTestSupport"
 import { titleEditorEl } from "@tests/notes/noteTextContentTestSupport"
 import { flushReferencedTitleBlurDiscardCheck } from "@tests/notes/textContentWrapperTestSupport"
 import { afterEach, beforeEach, vi } from "vitest"

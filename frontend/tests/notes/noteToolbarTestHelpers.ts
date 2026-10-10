@@ -6,7 +6,7 @@ import makeMe from "donut-test-fixtures/makeMe"
 import helper, { mockSdkService } from "@tests/helpers"
 import { notebookSidebarClosedPlugin } from "@tests/helpers/notebookSidebarTestProvide"
 import { useAssimilationView } from "@/composables/useAssimilationView"
-import { useNoteToolbarPanel } from "@/composables/useNoteToolbarPanel"
+import { voiceInputIsActive } from "@/composables/useNoteVoiceInput"
 import type { Router } from "vue-router"
 import { flushPromises, type VueWrapper } from "@vue/test-utils"
 
@@ -29,7 +29,7 @@ export async function openNoteToolbarOverflowMenu(wrapper: VueWrapper) {
 
 export function resetNoteToolbarTestState() {
   useAssimilationView().dismiss()
-  useNoteToolbarPanel().close()
+  voiceInputIsActive.value = false
 }
 
 export function noteToolbarProps(

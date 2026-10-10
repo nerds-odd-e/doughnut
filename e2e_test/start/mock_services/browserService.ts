@@ -89,15 +89,6 @@ const browser = {
       getTracks: () => [mockTrack],
       getAudioTracks: () => [mockTrack],
     })
-    cy.stub(win.navigator.mediaDevices, 'enumerateDevices').resolves([
-      {
-        kind: 'audioinput',
-        deviceId: 'default',
-        label: 'Default microphone',
-        groupId: 'default',
-        toJSON: () => ({}),
-      } as MediaDeviceInfo,
-    ])
   },
 
   mockAudioRecording: function () {

@@ -1,4 +1,3 @@
-import { ref, type Ref } from "vue"
 import { vi } from "vitest"
 
 export const mockMediaStreamSource = {
@@ -27,11 +26,6 @@ export const mockAudioWorkletNode = {
 
 export const mockMediaStop = vi.fn()
 
-export const mockDevices = [
-  { deviceId: "device1", kind: "audioinput", label: "Microphone 1" },
-  { deviceId: "device2", kind: "audioinput", label: "Microphone 2" },
-]
-
 export const mockMediaDevices = {
   getUserMedia: vi.fn().mockImplementation(() =>
     Promise.resolve({
@@ -43,9 +37,6 @@ export const mockMediaDevices = {
       ],
     })
   ),
-  enumerateDevices: vi
-    .fn()
-    .mockImplementation(() => Promise.resolve(mockDevices)),
   addEventListener: vi.fn(),
 }
 
@@ -57,7 +48,6 @@ export function clearAudioHardwareMocks() {
   mockAudioWorkletNode.disconnect.mockClear()
   mockAudioWorkletNode.port.postMessage.mockClear()
   mockMediaDevices.getUserMedia.mockClear()
-  mockMediaDevices.enumerateDevices.mockClear()
   mockMediaStop.mockClear()
 }
 
@@ -75,7 +65,7 @@ export function installAudioBrowserSpies() {
   })
 
   const mockContext = {
-    drawImage: vi.fn(),
+    clearRect: vi.fn(),
     fillRect: vi.fn(),
     fillStyle: "",
   }
@@ -118,18 +108,7 @@ function mockAudioRecorderMethods(
       mockMediaStop()
     }),
     getAudioData: vi.fn(() => 0),
-    tryFlush: vi.fn().mockResolvedValue(undefined),
     hasUnconvertedAudio: vi.fn(() => false),
-    getAudioDevices: vi.fn().mockImplementation(() => {
-      mockMediaDevices.enumerateDevices()
-      return ref(mockDevices) as Ref<MediaDeviceInfo[]>
-    }),
-    getSelectedDevice: vi.fn(() => ref("device1")),
-    switchAudioDevice: vi.fn().mockImplementation(async (deviceId: string) => {
-      mockMediaDevices.getUserMedia({
-        audio: { deviceId: { exact: deviceId } },
-      })
-    }),
   })
 }
 

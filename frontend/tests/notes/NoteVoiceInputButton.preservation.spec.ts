@@ -7,35 +7,35 @@ import {
   audioTextResponse,
   midSpeechChunk,
   processAudio,
-  useNoteAudioToolsTestLifecycle,
-} from "@tests/notes/noteAudioToolsTestSupport"
-import { useSavedBodyDictation } from "@tests/notes/noteAudioToolsSavedContentTestSupport"
+  useNoteVoiceInputTestLifecycle,
+} from "@tests/notes/noteVoiceInputButtonTestSupport"
+import { useSavedBodyDictation } from "@tests/notes/noteVoiceInputButtonSavedContentTestSupport"
 import { describe, expect, it, vi } from "vitest"
 
 vi.mock("@/models/audio/recorderWorklet", async () => {
   const { recorderWorkletMockExports } = await import(
-    "@tests/notes/noteAudioToolsMocks"
+    "@tests/notes/noteVoiceInputButtonMocks"
   )
   return recorderWorkletMockExports()
 })
 
 vi.mock("@/models/audio/audioRecorder", async () => {
   const { audioRecorderMockExports } = await import(
-    "@tests/notes/noteAudioToolsMocks"
+    "@tests/notes/noteVoiceInputButtonMocks"
   )
   return audioRecorderMockExports()
 })
 
 vi.mock("@/models/wakeLocker", async () => {
   const { wakeLockerMockExports } = await import(
-    "@tests/notes/noteAudioToolsMocks"
+    "@tests/notes/noteVoiceInputButtonMocks"
   )
   return wakeLockerMockExports()
 })
 
-useNoteAudioToolsTestLifecycle()
+useNoteVoiceInputTestLifecycle()
 
-describe("NoteAudioTools content preservation", () => {
+describe("NoteVoiceInputButton content preservation", () => {
   const longBody = [
     "Original paragraph one: The museum opens at nine each morning. Our tickets are booked for Tuesday.",
     "Original paragraph two: The library holds maps of the northern coast. We marked each of the harbours and their walking routes on our paper copy.",
@@ -111,7 +111,7 @@ describe("NoteAudioTools content preservation", () => {
     expect(dictation.updateContentMock).not.toHaveBeenCalled()
   })
 
-  it("writes the timed chunk, Flush, and Stop passages once each, in order, one space apart", async () => {
+  it("writes two mid-speech passages and the Stop passage once each, in order, one space apart", async () => {
     dictation.audioToTextMock
       .mockResolvedValueOnce(
         wrapSdkResponse(audioTextResponse("The museum opens at nine."))
@@ -202,7 +202,6 @@ describe("NoteAudioTools content preservation", () => {
     await processAudio(dictation.wrapper)
     await expect(processAudio(dictation.wrapper)).rejects.toThrow()
     await processAudio(dictation.wrapper)
-    expect(dictation.wrapper.text()).toBe("Record")
     expect(dictation.updateContentMock).toHaveBeenLastCalledWith({
       path: { note: note.id },
       body: {

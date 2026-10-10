@@ -5,33 +5,27 @@ import { useToast } from "@/composables/useToast"
 import { createAudioRecorder } from "@/models/audio/audioRecorder"
 import { createWakeLocker } from "@/models/wakeLocker"
 
+/** True from the start of a recording until its last speech has been added. */
+export const voiceInputIsActive = ref(false)
+
 export function useNoteVoiceInput(note: Note) {
   const phase = ref<"ready" | "recording" | "stopping" | "notConverted">(
     "ready"
   )
   const isRecording = computed(() => phase.value === "recording")
-  const hasKeptRecording = computed(() => phase.value === "notConverted")
   const wakeLocker = createWakeLocker()
   const { showErrorToast } = useToast()
 
-  const { processAudio, isProcessing, lastConversionFailed } =
-    useNoteAudioProcessing(note)
+  const { processAudio, lastConversionFailed } = useNoteAudioProcessing(note)
 
   const audioRecorder = createAudioRecorder(processAudio)
-
-  const switchAudioDevice = async (deviceId: string) => {
-    try {
-      await audioRecorder.switchAudioDevice(deviceId)
-    } catch {
-      showErrorToast("Failed to switch audio device")
-    }
-  }
 
   const start = async () => {
     try {
       await wakeLocker.request()
       await audioRecorder.startRecording()
       phase.value = "recording"
+      voiceInputIsActive.value = true
     } catch {
       showErrorToast(
         "Could not use the microphone. Allow microphone access in your browser, then try again."
@@ -49,6 +43,7 @@ export function useNoteVoiceInput(note: Note) {
         lastConversionFailed.value && audioRecorder.hasUnconvertedAudio()
           ? "notConverted"
           : "ready"
+      voiceInputIsActive.value = false
       await wakeLocker.release()
     }
   }
@@ -62,17 +57,10 @@ export function useNoteVoiceInput(note: Note) {
   return {
     phase,
     isRecording,
-    hasKeptRecording,
-    isProcessing,
     audioRecorder,
     wakeLocker,
     processAudio,
-    audioDevices: audioRecorder.getAudioDevices(),
-    selectedDevice: audioRecorder.getSelectedDevice(),
     start,
     stop,
-    retry: stop,
-    tryFlush: () => audioRecorder.tryFlush(),
-    switchAudioDevice,
   }
 }

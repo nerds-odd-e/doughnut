@@ -14,7 +14,7 @@ const widths = {
   export: 40,
   mcqs: 40,
   refine: 40,
-  audio: 40,
+  voiceInput: 40,
   assimilation: 40,
   delete: 40,
 } as const
@@ -60,7 +60,7 @@ describe("computeNoteToolbarOverflow", () => {
     expect(overflow(remainingPlusOverflow(4))).toEqual([
       "delete",
       "assimilation",
-      "audio",
+      "voiceInput",
       "refine",
       "mcqs",
       "export",
@@ -68,7 +68,7 @@ describe("computeNoteToolbarOverflow", () => {
     expect(overflow(remainingPlusOverflow(3))).toEqual([
       "delete",
       "assimilation",
-      "audio",
+      "voiceInput",
       "refine",
       "mcqs",
       "export",
@@ -77,7 +77,7 @@ describe("computeNoteToolbarOverflow", () => {
     expect(overflow(remainingPlusOverflow(2))).toEqual([
       "delete",
       "assimilation",
-      "audio",
+      "voiceInput",
       "refine",
       "mcqs",
       "export",
@@ -87,7 +87,7 @@ describe("computeNoteToolbarOverflow", () => {
     expect(overflow(remainingPlusOverflow(1))).toEqual([
       "delete",
       "assimilation",
-      "audio",
+      "voiceInput",
       "refine",
       "mcqs",
       "export",
@@ -98,7 +98,7 @@ describe("computeNoteToolbarOverflow", () => {
     expect(overflow(remainingPlusOverflow(0))).toEqual([
       "delete",
       "assimilation",
-      "audio",
+      "voiceInput",
       "refine",
       "mcqs",
       "export",
@@ -112,14 +112,14 @@ describe("computeNoteToolbarOverflow", () => {
   it("never omits a pinned id and still hides from the right around it", () => {
     expect(overflow(remainingPlusOverflow(3), ["assimilation"])).toEqual([
       "delete",
-      "audio",
+      "voiceInput",
       "refine",
       "mcqs",
       "export",
       "edit",
       "conversation",
     ])
-    expect(overflow(remainingPlusOverflow(2), ["audio"])).toEqual([
+    expect(overflow(remainingPlusOverflow(2), ["voiceInput"])).toEqual([
       "delete",
       "assimilation",
       "refine",
@@ -132,7 +132,7 @@ describe("computeNoteToolbarOverflow", () => {
   })
 
   it("keeps pinned ids even when they overflow the available width", () => {
-    expect(overflow(0, ["audio"])).toEqual([
+    expect(overflow(0, ["voiceInput"])).toEqual([
       "delete",
       "assimilation",
       "refine",

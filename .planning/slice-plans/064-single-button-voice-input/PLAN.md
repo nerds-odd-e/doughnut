@@ -141,7 +141,7 @@ support. Enables slice 2, whose button renders the same session. About
 
 ### 2. One toolbar button starts and stops dictation; the panel is gone
 Type: Behavior
-Status: planned
+Status: done
 Proof: retarget `noteAudioToolsTestSupport.ts` to mount the button
 component and click it by its accessible name; rename the
 `NoteAudioTools.*.spec.ts` files and the three support files to the
@@ -267,6 +267,23 @@ unmount path stays as today. `docs/voice-input.md` states it. About 5 min.
   auto-switch keeps today's coverage (none beyond the recorder's own code).
 - The real-service feature changes only through the shared page object.
 
+## Story obligations
+
+### G1. A kept recording has no retry in the button
+Reported: slice 2 — "A kept recording has no retry control and no distinct appearance; it joins the next recording's first conversion (interim, slice 3)."
+Story clause: "Recovery after a failed conversion at Stop lives in the button"
+Disposition: receiving slice 3
+
+### G2. A recording follows the author to another note
+Reported: slice 2 — "Recording continues across a note change and writes to the originating note; the pressed button then shows on the other note (interim, slice 4)."
+Story clause: "A note's button never shows another note's recording."
+Disposition: receiving slice 4
+
+### G3. The waveform's look with a real microphone
+Reported: slice 2 — "The look of the waveform with a real microphone on a dev server is unobserved; the level scaling (×4, 8 bars, about 10 samples per second) is a guess."
+Story clause: "its waveform moves as they speak and settles when they pause"
+Disposition: proved by slice 2: the coordinator viewed Chromium screenshots of the mounted button fed a synthetic level (a quiet dotted line in silence, bars of differing height while speaking, a dim spinner while finishing); how the bars scale to a real voice is left for the owner's eye and reported at completion
+
 ## Learnings
 
 - The session is `useNoteVoiceInput(note)` in
@@ -277,3 +294,25 @@ unmount path stays as today. `docs/voice-input.md` states it. About 5 min.
 - The test support reads `wakeLocker` and `processAudio` from the mounted
   component, so the panel exposes them with `defineExpose`; slice 2's button
   keeps them reachable the same way or observes through the DOM and mocks.
+- Slice 2 accepted proof: the whole frontend suite (327 files, 2072 tests)
+  before refactoring and the focused rerun after it (34 files, 199 tests),
+  `vue-tsc --noEmit`, and `record_live_audio.feature` (5 scenarios); the
+  sweep reading returns nothing for the removed names outside `.planning`,
+  apart from a retrospective evidence quote in `DearDough.md`.
+- The button is always mounted, so `NoteMoreOptionsActions.vue` re-creates
+  it by `:key` for the note on the page while no recording is active (spec
+  "dictates into the note on the page when voice input starts after moving
+  to another note"). Slice 4 replaces that watch with the stop on leaving.
+- The toolbar pin and the menu omission read `voiceInputIsActive`, true from
+  the start of a recording until its last speech is added, so the finishing
+  button stays visible on a narrow toolbar. Slice 3 decides whether the kept
+  state pins too.
+- The Stop-failure wording lives in `useNoteAudioProcessing.convert`; slice 3
+  restores the `isMidSpeech` branch for it. The E2E `stopRecording()` waits
+  for the enabled button titled "Voice input", which a kept-state button
+  does not match.
+- `useNoteToolbarPanel` is folded into `useAssimilationView`; the recorder's
+  `devicechange` listener now lives from start to stop of a recording.
+- `docs/voice-input-observations.md` describes its dated journey as a
+  "requested mid-speech conversion"; whether to keep that observation is the
+  owner's decision.
