@@ -223,6 +223,26 @@ chosen interval or pause; the held-back last segment and written text are
 never revised; existing content survives. About 5 min. Depends on slice 4's
 recorded decision.
 
+## Execution complete
+
+Product advice: the story's outcome is delivered; three readings are worth a
+decision before or during the next voice input story.
+- Silence after speech: the sentence a pause ends is held back, so while the
+  author stays silent each 20-second tick sends that sentence plus all the
+  silence so far again (read from `rawSampleAudioBuffer.ts` and
+  `SRTProcessor`, not measured). It costs more the longer the silence lasts,
+  and a request that grows too large for the service would fail and toast at
+  every tick (hypothesis). Candidate follow-up: send nothing while no new
+  speech has arrived since the last conversion.
+- The sentence a pause ends appears only with the next speech or at Stop. The
+  author who pauses to read what they said does not see their last sentence.
+  This is the hold-back rule, not chunk latency; worth weighing in
+  SEED-066#single-button-voice-input.
+- Closing Audio tools while recording, when the last conversion fails, shows
+  "Your recording is kept until you close Audio tools." although the
+  recording is gone. The next story removes the panel and should reword this
+  toast with it.
+
 ## Story obligations
 
 ### G1. Silent Stop shows no toast
