@@ -94,7 +94,12 @@ successive additions follow earlier additions once. Navigating to another note
 does not redirect the result. The normal content-edit undo restores the prior body.
 
 Timed chunks (every 20 s), pause flushes (after more than 3 s of silence, once per pause)
-and Write text now clicks are processed mid-speech. Mid-speech processing never writes
+and Write text now clicks are processed mid-speech. The 20-second timer
+keeps the audio billed for mid-speech conversion within 1.5 times the recorded
+audio: the held segment sent again is about 3 to 5 seconds per chunk (about
+1.14 to 1.25 times, roughly $0.41 to $0.45 per dictated hour at $0.006 per
+minute), and a chunk of up to 20 seconds returns from the transcription
+service in about 3.5 seconds. Mid-speech processing never writes
 the last transcription segment, because it may be an unfinished sentence. The
 processed audio position advances to the end of the segment before it, and
 the held segment's audio is sent again with the next chunk, so appending a

@@ -430,6 +430,18 @@ No blocking dependency is inferred from shared recording code or that order.
   until the next chunk or Stop, and written text is never revised. Sentence
   recognition itself remains undecided.
 - Any distinct navigation problem left after source-content preservation fixes.
+- Silence after speech (read from `rawSampleAudioBuffer.ts` and
+  `SRTProcessor` on 2026-10-10, not measured): the sentence a pause ends is
+  held back, so while the author stays silent each 20-second tick sends that
+  sentence plus all the silence so far again. Whether to send nothing while
+  no new speech has arrived since the last conversion is undecided.
+- The sentence a pause ends appears only with the next speech or at Stop, so
+  an author who pauses to read what they said does not see their last
+  sentence. This follows from the hold-back rule, not from chunk latency;
+  weigh it in SEED-066#single-button-voice-input.
+- Closing Audio tools while recording, when the last conversion then fails,
+  shows "Your recording is kept until you close Audio tools." although the
+  recording is gone. Reword that toast when the panel is removed.
 - The adequacy of OS dictation or external transcription for explicit title
   input: for New note the owner chose a native control on 2026-10-06 (recoverable
   at `d38952da4e9b635b567ddaf21ad444df537ee641:.planning/seeds/SEED-066-voice-input.md`);
