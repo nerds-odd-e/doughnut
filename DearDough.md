@@ -6,7 +6,7 @@ released response is not proof of effectiveness. Unknown provenance stays unknow
 [Response status](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/finding-names.md).
 Full pre-trim evidence: `8830c682704aac3bbb34bf9b1204da8feba042ca:DearDough.md`. Older narratives live in Git, not a second archive.
 
-- Highest allocated local number: 225. Removed local codes are never reused.
+- Highest allocated local number: 227. Removed local codes are never reused.
 
 Detailed retained observations are consolidated in the linked Open Dough
 record; headings and former local aliases preserve traceability. Review date:
@@ -328,6 +328,14 @@ Plan 064 sized slice 2 (new toolbar button, toolbar wiring, deletion of the pane
   - Evidence: `7becda17c4:.planning/slice-plans/064-single-button-voice-input/PLAN.md` slice 2 ("About 10 min"); the implementation agent's usage record (1,749 s, about 258,000 sub-agent tokens, 52 tool uses); its return reporting one Vitest run that printed nothing for over 600 s before being ended and rerun in about 11 s; refactor pass about 6 minutes more
   - Observed effect: the slice ran about three times its estimate; about 10 of the 29 minutes were the stalled test run, whose cause is unknown; the slice touched 53 files
   - Inference: the stated reason for not splitting held, so the estimate rather than the boundary was wrong; a 53-file removal with renamed specs is not a 10-minute change even when mechanical
+- Execution: SEED-066#unobtrusive-selection-aware-spoken-title (first implementation commit 57a659f018)
+  - Timestamp: 2026-10-11T08:00:00+09:00
+  - Tool: Claude Code
+  - Model: claude-opus-5-5
+  - Open Dough release: 0.3.58
+  - Evidence: `7d062d701f:.planning/slice-plans/065-unobtrusive-spoken-title/PLAN.md` slice 5 ("About 8 min"); the implementation agent's usage record (787 s, about 175,000 sub-agent tokens, 44 tool uses) and its return ("roughly 25–30 minutes with the observations"); refactor pass about 2.5 minutes more
+  - Observed effect: the slice ran well over its estimate; it carried the control rewrite, two placements, five spec files, the E2E page object, two documentation sections, a held-stack real-click observation and three obligations received from earlier slices
+  - Inference: the estimate counted the code change only; the held-stack observation and the received obligations were known when the slice was delegated and were not added to it
 
 ## DD-223 — A plan left a look to be "checked by eye on the dev server" with a real microphone, which an unattended agent could not do
 
@@ -370,3 +378,31 @@ Plan 064's sweep reading required searches for the removed control names to retu
   - Evidence: slice 2 return, decision 3 (five mentions reworded to "requested (mid-speech) conversion", heading renamed, a seed link's anchor broken); the coordinator's anchor repair in `.planning/seeds/SEED-066-voice-input.md`; slice 2 refactor return ("a truthful rewrite means deleting or re-running the observation, which is an owner decision")
   - Observed effect: a dated observation now describes an author-requested conversion the product does not offer; one planning link broke and was repaired during delivery; the question was left for the owner
   - Inference: the removal rule and the plan's sweep did not say whether a dated observation record counts as documentation to sweep, to delete, or to leave
+
+## DD-226 — The documented frontend typecheck passed while the build's plain `tsc` failed, so CI caught a test-only type error
+
+The project's frontend proof rule names `vue-tsc --noEmit`. `pnpm -C frontend build` also runs plain `tsc` through the vite checker, which types every `*.vue` import through `tests/shims-vue.d.ts` and so sees no exposed component members.
+
+### Occurrences
+- Execution: SEED-066#unobtrusive-selection-aware-spoken-title (first implementation commit 57a659f018)
+  - Timestamp: 2026-10-11T07:45:00+09:00
+  - Tool: Claude Code
+  - Model: claude-opus-5-5
+  - Open Dough release: 0.3.58
+  - Evidence: slice 2 refactor return (replaced `as unknown as {…}` casts with `InstanceType<typeof SeamlessTextEditor>` and `wrapper.vm.insertAtSelection`, "typecheck clean"); CI run 38091750938 on `1e5e7efa49` (TS2722 in `seamlessTextEditorTestSupport.ts` and `PathNameEditor.spec.ts`, two jobs failed at the build step); repair `5e346c5791`; the repair agent's reading of `frontend/vite.config.ts` and `pnpm -C frontend exec tsc --noEmit` exiting 2 at the failed commit while `vue-tsc --noEmit` exited 0
+  - Observed effect: one failed CI run; slice 3's unfinished work was set aside and restored around a repair, a repair agent and a refactor agent ran; later slices added `pnpm -C frontend build` to their proof
+  - Inference: the proof rule in the `frontend` skill is narrower than the CI step it stands for; a refactor pass tidied a cast that was there for a reason no comment or rule stated
+
+## DD-227 — A slice plan asked for a test that the removed status line is absent, against the project's removal rule
+
+Plan 065 slice 5 listed "no `[role="status"]` anywhere" among its proof for removing the status line. The project's principle 7 forbids a check that a removed thing is absent.
+
+### Occurrences
+- Execution: SEED-066#unobtrusive-selection-aware-spoken-title (first implementation commit 57a659f018)
+  - Timestamp: 2026-10-11T08:00:00+09:00
+  - Tool: Claude Code
+  - Model: claude-opus-5-5
+  - Open Dough release: 0.3.58
+  - Evidence: `7d062d701f:.planning/slice-plans/065-unobtrusive-spoken-title/PLAN.md` slice 5 Proof; `CLAUDE.md` principle 7 ("no check that it is absent"); the coordinator's slice 5 brief ("principle 7 overrides that: do not add absence assertions"); slice 5 return, decision 2
+  - Observed effect: the coordinator caught it while writing the brief and the test was not written; the plan had passed slice planning and a readiness assessment with the instruction in it
+  - Inference: planning checked the removal as deletion plus sweep in its scope text but not in each slice's proof list

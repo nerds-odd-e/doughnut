@@ -327,6 +327,17 @@ styled as a field-join append button like the Wikidata one. About 8 min:
 the control, two placements, the spec retargeting through one support file,
 the E2E page object and the documentation. Stop-safe.
 
+## Execution complete
+
+Product advice: no correction is needed. One thing for the owner to look at
+on the note page: the title's microphone button sits at the far right of the
+heading line, directly under the toolbar's Voice input microphone, with the
+same icon. An author could take one for the other. If that happens in use,
+candidates are a different icon for the title button or placing it next to
+the title text instead of at the end of the row. The selection observations
+were made in Chromium only; Safari and Firefox rest on the editor's own
+remembered selection, which the specs prove without a browser-kept selection.
+
 ## Current decisions
 
 - Button names: "Speak the title" while idle and while converting; "Stop
