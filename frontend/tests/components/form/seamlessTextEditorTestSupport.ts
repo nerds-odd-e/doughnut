@@ -49,9 +49,12 @@ export async function insertAtSelection(
   wrapper: VueWrapper,
   compose: (before: string, after: string) => string
 ) {
-  ;(wrapper.vm as InstanceType<typeof SeamlessTextEditor>).insertAtSelection(
-    compose
-  )
+  const vm = wrapper.vm as unknown as {
+    insertAtSelection: (
+      compose: (before: string, after: string) => string
+    ) => void
+  }
+  vm.insertAtSelection(compose)
   await nextTick()
   await flushPromises()
 }

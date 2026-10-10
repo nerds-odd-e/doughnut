@@ -1,6 +1,7 @@
 import PathNameEditor from "@/components/notes/core/PathNameEditor.vue"
 import SeamlessTextEditor from "@/components/form/SeamlessTextEditor.vue"
 import { settleScheduledAutofocus } from "@tests/helpers/focusTargetTestSupport"
+import { insertAtSelection } from "@tests/components/form/seamlessTextEditorTestSupport"
 import { flushPromises, mount } from "@vue/test-utils"
 import { describe, expect, it } from "vitest"
 import { h, type Component } from "vue"
@@ -160,7 +161,7 @@ describe("PathNameEditor.vue", () => {
       },
     })
 
-    wrapper.vm.insertAtSelection(() => " a/b")
+    await insertAtSelection(wrapper, () => " a/b")
 
     expect(wrapper.emitted("update:modelValue")?.at(-1)?.[0]).toBe(
       "Orchard a／b"

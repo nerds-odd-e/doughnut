@@ -366,5 +366,12 @@ on `claude/restore-title-styling-and-make-spoken-title-edit`, published to
 - Slice 3 owes G6: a title replaced from outside (another note shown in the
   same mounted title, a save response) must not leave an earlier note's
   caret as the target.
+- CI run 38091750938 failed `pnpm -C frontend build` on `1e5e7efa49`: the
+  build's checker also runs plain `tsc`, which types every `*.vue` import
+  through `tests/shims-vue.d.ts` and so sees no exposed members
+  (TS2722 in two test files). `vue-tsc --noEmit` alone does not catch it.
+  Repaired in the test files with the cast other specs use. Frontend proof
+  for the remaining slices also runs
+  `env -u NODE_ENV CURSOR_DEV=true nix develop -c pnpm -C frontend exec tsc --noEmit`.
 - The held stack's `/api/testability/inject_notes` seeds a note for a by-eye
   reading at `/n<id>` (slice 5).
