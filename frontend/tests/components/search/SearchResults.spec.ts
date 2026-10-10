@@ -30,6 +30,35 @@ function mountDropdownWithinNoteFinding(
 }
 
 describe("SearchResults.vue", () => {
+  it.each(["light", "dark"])(
+    "renders compact title suggestions in the %s theme within the form flow",
+    async (theme) => {
+      mockSdkService(SearchController, "searchForRelationshipTarget", [])
+      const wrapper = mountSearchResults({
+        inputSearchKey: "2026-10-10",
+        isDropdown: true,
+      })
+      const panel = wrapper.element as HTMLElement
+      panel.setAttribute("data-theme", theme)
+      await waitForDebounce()
+
+      expect(wrapper.text()).toContain("No matching notes found.")
+      const surface = document.createElement("div")
+      surface.className = "bg-base-100"
+      panel.append(surface)
+      document.body.append(panel)
+      try {
+        expect(getComputedStyle(panel).backgroundColor).toBe(
+          getComputedStyle(surface).backgroundColor
+        )
+        expect(getComputedStyle(panel).position).toBe("relative")
+      } finally {
+        wrapper.unmount()
+        panel.remove()
+      }
+    }
+  )
+
   it("shows a loading indicator before results arrive", async () => {
     setupDelayedSearchMocks()
 
