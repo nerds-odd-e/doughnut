@@ -1,9 +1,0 @@
-{
-  "schemaVersion": 1,
-  "agent": "Shunka-chan",
-  "email": "shunka-chan@example.org",
-  "activity": "preparation",
-  "identity": "SEED-066#single-button-voice-input",
-  "host": "claude",
-  "model": "fable"
-}
