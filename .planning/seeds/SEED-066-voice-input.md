@@ -139,7 +139,7 @@ An empty-body UI baseline did succeed. Causes, frequency, the acceptable recent 
 
 The original nine-story decomposition is recoverable in Git history. On
 2026-10-10 the owner supplied three UI stories, in priority order, for the
-top of the product backlog; the first is delivered and the two below remain. These are non-executable story
+top of the product backlog; the first two are delivered and the one below remains. These are non-executable story
 records; capturing them does not start implementation.
 
 Effort bands are S = 30–60 minutes, M = 1–2 hours, and L = 2–4 hours, including
@@ -163,128 +163,6 @@ with positive tests; delete removed-feature tests instead of replacing them
 with negative assertions, absence checks, or runtime guards. Record the final
 one-time removal sweep as an acceptance reading, following principle 7 in
 `AGENTS.md`; Git history retains the removed implementation.
-
-<a id="single-button-voice-input"></a>
-### Record voice input with one waveform button
-
-**Identity:** SEED-066#single-button-voice-input
-```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/064-single-button-voice-input/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"f08b15b3d8fef7182708cd1efdc2b6c022362978bf165aabad7bfd2395d92607","plan":"7275acea3796af7e66bbf5078d88c9b0462865b27f43fd48dab7af8bb457ec39"}}
-```
-
-**Goal:** For note authors dictating into a note's body on the web app, start
-and stop dictation from the one Voice input button in the note toolbar, and
-see from that button alone that their voice is being captured, with no panel
-to open, read, or close.
-
-**The author's journey today (read from source on 2026-10-10,
-`140752249c`):** The note toolbar offers Audio tools among its icon buttons;
-on a narrow screen it sits in the "more options" menu. Choosing it opens a
-panel under the toolbar with a wide waveform strip and Record. Record swaps
-in a Microphone chooser, Stop and Write text now, and the strip scrolls the
-sound level. Text joins the body after each conversion. After Stop, Record is
-unavailable until the final text has been added. A failed conversion at Stop
-keeps the recording and offers Retry beside Record while the panel stays
-open. The panel stays open, and recording continues, when the author moves
-to another note; results still go to the originating note.
-
-**Scope:**
-
-- Voice input replaces Audio tools: the same toolbar position, the same place
-  in the "more options" menu on a narrow screen, named "Voice input". Clicking
-  it starts microphone capture and dictation at once. There is no panel.
-- While recording, the button is highlighted like the toolbar's other active
-  toggles, and its icon is a live waveform drawn from the microphone within
-  the button's existing size. Silence shows a still, quiet line: the highlight
-  says the microphone is on, the movement says it hears the author. The active
-  button stays in the toolbar rather than the "more options" menu, as the open
-  panel does today, so it is visible on a narrow screen even when dictation was
-  started from the menu.
-- Clicking the active button stops capture. Until the remaining speech has
-  been converted and added, the button is unavailable in a distinct finishing
-  appearance, neither idle nor live; then it returns to idle. The button's
-  accessible name says what a click does: start, stop, or retry.
-- Completely remove the panel, its waveform strip, Record, Stop, Write text
-  now, the Microphone chooser, Retry as a separate control, and their
-  exclusive code, tests, page objects and documentation under the removal
-  scope above. Capture uses the browser's current default microphone; an
-  author with several microphones chooses one through the browser's own site
-  settings. The automatic switch when the current microphone disconnects
-  stays: it is recording lifecycle, not a panel control.
-- Recovery after a failed conversion at Stop lives in the button: it shows a
-  kept-recording appearance, its name offers the retry, and clicking it
-  converts the kept recording without the microphone. On success the text is
-  added and the button returns to idle; on failure the toast shows again and
-  the button keeps the recording. The kept recording lasts while the author
-  stays on the note; leaving the note or reloading drops it. The toast at Stop
-  says "Could not turn your speech into text. Your recording is kept until you
-  leave this note; click Voice input to try again." The mid-speech toast stays
-  "Could not turn your speech into text. Your recording is kept."
-- Leaving the note while recording, by navigating to another note or page,
-  stops the recording and converts the remainder into the originating note,
-  as closing the panel does today. A note's button never shows another note's
-  recording. If that final conversion fails, nothing is kept and the toast says
-  only "Could not turn your speech into text."
-- Write text now has no replacement. The held-back last sentence appears with
-  the next speech or at Stop; an author who wants to read everything stops,
-  and one click starts again.
-- Preserve everything else: dictated-content preservation and joining,
-  saving, the processing cadence, final processing at Stop, no new recording
-  while finishing, the wake lock while recording, the common error toasts for
-  a refused microphone and a failed save, and readers who may not edit the
-  note are not offered the button.
-
-**UI:** One toolbar button with four appearances the author can tell apart
-without text: idle (a microphone icon, named "Voice input"), recording
-(highlighted, the icon replaced by the live waveform, named "Stop voice
-input"), finishing (unavailable and visibly quiet, named "Voice input"), and
-kept recording (visibly different from idle and recording, named "Retry
-turning your speech into text"). The layout, exact styling and icon are the
-implementer's choice within the toolbar's existing button size.
-
-**Key examples:**
-
-- An author with an editable note open clicks Voice input → the microphone
-  starts at once; the button is highlighted and its waveform moves as they
-  speak and settles when they pause; no panel opens and no message appears.
-- The author clicks the active button → capture stops; the button is
-  unavailable in its finishing appearance while the remaining speech is
-  converted, the text is added after the existing content and saved, and the
-  button returns to idle. After reload the note holds the existing content
-  followed by the dictated passage.
-- On a narrow screen Voice input is in the "more options" menu; the author
-  chooses it → recording starts, the menu closes, and the active waveform
-  button is in the toolbar; clicking it stops the recording.
-- The author speaks for longer than one processing cadence → completed
-  passages appear in the body while they keep speaking, as today, and the
-  final sentence arrives at Stop.
-- Microphone access is refused → the common error toast explains how to allow
-  it; the button stays idle.
-- A mid-speech conversion fails → the common error toast reports it;
-  recording continues and the unconverted speech joins the next conversion.
-- The conversion at Stop fails → the toast says the recording is kept and how
-  to retry; the button shows the kept recording. Clicking it converts the kept
-  recording without the microphone, the text is added, and the button returns
-  to idle. A retry that fails shows the toast again and keeps the recording.
-- The author navigates to another note while recording → recording stops and
-  the remaining speech is added to the note they left; the new note's button
-  is idle.
-- A recording holds no recognizable speech → the button returns to idle with
-  nothing added and no message.
-
-**Considered and excluded:** a retry action inside the toast (the shared
-toast stays message-only, as the preceding story decided); keeping a
-recording or a kept recording across navigation (background dictation across
-notes is not a selected capability); any replacement for Write text now; a
-microphone chooser elsewhere in the note page; a keyboard shortcut for voice
-input (none exists today and none was asked for).
-
-**Effort hypothesis:** M, medium confidence. The button states are small; the
-removal spans the panel, the waveform strip, their tests, the E2E page object
-and steps, and the voice-input documentation.
-
-**Safe stopping point:** Body voice input is usable from one compact control
-independently of improvements to title dictation.
 
 <a id="unobtrusive-selection-aware-spoken-title"></a>
 ### Restore title styling and make spoken title editing unobtrusive

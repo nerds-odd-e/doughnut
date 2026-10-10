@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 1,
+  "identity": "SEED-066#single-button-voice-input",
+  "title": "Record voice input with one waveform button",
+  "completedAt": "2026-10-10T21:40:00.528Z",
+  "developer": "Terry Yin",
+  "agent": "Eimi-chan",
+  "host": "claude"
+}
