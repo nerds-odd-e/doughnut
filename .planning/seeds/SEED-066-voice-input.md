@@ -137,10 +137,14 @@ An empty-body UI baseline did succeed. Causes, frequency, the acceptable recent 
 
 ## Story Decomposition
 
+The original nine-story decomposition is recoverable in Git history. On
+2026-10-10 the owner supplied the following three stories, in this priority
+order, for the top of the product backlog. These are non-executable story
+records; capturing them does not start implementation.
+
 Effort bands are S = 30–60 minutes, M = 1–2 hours, and L = 2–4 hours, including
-delivery, following this project's existing seed convention. The distribution
-is one S, four M, and four L. These are comparative hypotheses, not a delivery
-schedule. Refine or resplit any story likely to exceed L before execution.
+delivery. These are comparative hypotheses, not a delivery schedule. Refine or
+resplit any story likely to exceed L before execution.
 
 Every story is evaluated by the note author through the product. Preservation
 includes saved state after reload, rather than only a transient editor result.
@@ -148,9 +152,187 @@ The accepted order is global priority; it does not require serial technical
 implementation of independent stories. No story authorizes a model choice,
 technical redesign, or speculative infrastructure.
 
+### Removal scope for these stories
+
+Every removal below means deleting the feature and transitively deleting all
+code, styles, helpers, dependencies, fixtures, and tests used only by it. Keep
+shared code needed by surviving behavior. Sweep the whole product, including
+backend, frontend, CLI, MCP, documentation, agent guidance, and generated
+artifacts, for obsolete references. Verify surviving or replacement behavior
+with positive tests; delete removed-feature tests instead of replacing them
+with negative assertions, absence checks, or runtime guards. Record the final
+one-time removal sweep as an acceptance reading, following principle 7 in
+`AGENTS.md`; Git history retains the removed implementation.
+
+<a id="simplify-voice-input-feedback"></a>
+### Simplify voice input controls and feedback
+
+**Identity:** SEED-066#simplify-voice-input-feedback
+```json dough-story-state
+{"schemaVersion":1,"refinement":"refined","approach":"unselected"}
+```
+
+**Goal:** For note authors, make everyday voice input quieter and simpler while
+getting spoken text into the note promptly at an affordable API cost.
+
+**Scope:**
+
+- Completely remove Save audio and Full screen, including their exclusively
+  supporting code and tests under the removal scope above.
+- Remove normal-operation status messages, including ready, recording,
+  converting/saving, and saved/added messages. Preserve the internal state
+  needed to operate recording correctly.
+- Show problems through the existing common exception/error toast mechanism.
+  Remove the inline status/error message presentation and its exclusive
+  machinery. Preserve useful failure recovery without duplicating error UI.
+- Keep the current panel and surviving recording behavior for this story;
+  the next story owns the single-button interaction.
+- Analyze feedback latency versus API cost before choosing processing cadence.
+  Aim to show transcribed text as soon as an affordable pace allows. Recent
+  unfinished speech may be revised if useful; preserve completed text, existing
+  note content, and the author's intent. Here, the owner's “translation” means
+  spoken audio becoming text, without adding language translation.
+
+**Key examples:**
+
+- A note author records a passage and stops → the dictated text is added and
+  saved through the existing flow; routine operation is conveyed by the
+  working controls and resulting text.
+- Microphone access, transcription, or saving fails → the common error toast
+  explains the problem, and applicable existing recovery remains usable.
+- During sustained dictation or a pause → text appears at the selected
+  affordable cadence, preserving completed passages and preexisting content.
+
+**Analysis to complete during refinement/planning:** Measure time to first
+visible text and Stop-to-final-text, API calls and billable audio per recorded
+minute, and the effect of resubmitted unfinished audio. Compare shorter bounded
+chunks, pause-triggered processing, and streaming only where justified by
+measured benefit and current provider pricing. Record the chosen cadence and
+cost estimate before implementation. The affordable budget, latency target,
+and any model choice remain to be established by that analysis.
+
+**Current source reading (2026-10-10, `ca792965c2`):**
+`audioProcessingScheduler.ts` uses a 60-second timer, pause-triggered flush,
+and final processing at Stop; `rawSampleAudioBuffer.ts` triggers after three
+seconds of silence. `AiAudioController` uses SRT transcription for mid-speech
+chunks and plain text at Stop, with `whisper-1` and
+`gpt-4o-mini-transcribe` respectively in `OtherAiServices`. This is source
+evidence, not a fresh latency measurement or cost estimate. The earlier
+responsiveness observations above remain historical evidence.
+
+**Effort hypothesis:** L, low confidence until cadence/cost analysis bounds
+the work. Reassess size before execution.
+
+**Safe stopping point:** The simpler current panel remains useful even if the
+single-button redesign is deferred.
+
+<a id="single-button-voice-input"></a>
+### Record voice input with one waveform button
+
+**Identity:** SEED-066#single-button-voice-input
+```json dough-story-state
+{"schemaVersion":1,"refinement":"refined","approach":"unselected"}
+```
+
+**Goal:** For note authors, start and stop body dictation directly from one
+compact voice-input button with immediate visual feedback.
+
+**Scope:**
+
+- Replace the Audio tools concept with Voice input at the current button's
+  location. Clicking it immediately starts microphone capture and dictation.
+- Highlight the active SVG button and turn its icon into a waveform reacting
+  to live voice input within the button's existing size.
+- Clicking the same button again ends recording and completes the existing
+  text-processing and saving behavior.
+- Completely remove the Audio tools panel, its separate waveform display,
+  Record, Stop, Write text now, and other panel controls, and their exclusive
+  supporting code and tests under the removal scope above. Preserve recording
+  and processing responsibilities needed by the new interaction.
+- Preserve other behavior: dictated-content preservation, saving, final
+  processing at Stop, microphone lifecycle, and applicable failure recovery.
+  Use the common toast policy from the preceding story. Resolve how any
+  necessary recovery action remains reachable within the compact interaction
+  during refinement; do not silently remove recovery with its old control.
+
+**Key examples:**
+
+- An idle note author clicks Voice input once → recording starts immediately;
+  the button is highlighted and its waveform responds to the microphone.
+- The author clicks the active button → capture stops, remaining speech is
+  processed and saved, and the button returns to its idle appearance.
+- The author dictates after existing body text → the resulting note preserves
+  existing content and adds the new dictated passage as before.
+- Capture or conversion fails → the common toast reports the exception and
+  applicable recovery can be performed through the simplified interaction.
+
+**Effort hypothesis:** M, medium confidence; recovery interaction needs
+refinement. Queue order expresses incremental delivery, not a technical block.
+
+**Safe stopping point:** Body voice input is usable from one compact control
+independently of improvements to title dictation.
+
+<a id="unobtrusive-selection-aware-spoken-title"></a>
+### Restore title styling and make spoken title editing unobtrusive
+
+**Identity:** SEED-066#unobtrusive-selection-aware-spoken-title
+```json dough-story-state
+{"schemaVersion":1,"refinement":"refined","approach":"unselected"}
+```
+
+**Goal:** For note authors, restore a visibly styled note title and make the
+rarely used Speak the Title feature compact and respectful of editing intent.
+
+**Scope:**
+
+- Investigate and restore the title's intended heading styling; the owner
+  reports that it currently looks like ordinary content text. The cause and
+  regression point are unverified.
+- Put a small Speak the Title button inline at the end of the title area,
+  keeping title readability and editing primary. Apply the compact treatment
+  to existing-note title editing and New note, where the shared control is
+  currently used.
+- Apply recognized speech according to the title's text selection or caret:
+  replace selected text, insert at the caret, and append when the caret is at
+  the end. Preserve the selection/caret intent when clicking the speech button
+  moves focus. Preserve surrounding title text.
+- For a title with no established caret/selection, refine the default before
+  implementation; the current implementation replaces the entire title.
+  Whole-title replacement should be available through selecting the whole
+  title. Do not silently infer replacement when the author placed the caret
+  at the end.
+- Preserve existing title validation, explicit inbound-reference rename
+  decisions, and persistence. Use common error toasts for exceptions and the
+  shared removal scope for UI/supporting code superseded by this redesign.
+
+**Key examples:**
+
+- A note is displayed or its title is edited → the title has the intended
+  heading typography and a small inline speech control.
+- The title is “Orchard” with the caret at the end; the author dictates
+  “notes” → the title becomes “Orchard notes”, preserving the original title.
+- In “Orchard notes”, the author selects “Orchard” and dictates “Garden” →
+  the title becomes “Garden notes”. Selecting the whole title instead replaces
+  the whole title with recognized speech.
+- The author places the caret between existing words and dictates → the
+  recognized words are inserted there with appropriate word spacing; title
+  text on both sides survives.
+- A referenced title is edited by speech → the existing explicit reference
+  choice and title-save behavior still apply.
+
+**Refinement decision:** Agree the no-caret/no-selection default; recommended
+default is append to a nonempty title and fill an empty title. Confirm against
+the existing title editor's focus/selection behavior.
+
+**Effort hypothesis:** M, medium confidence until styling and selection
+behavior are inspected.
+
+**Safe stopping point:** Styled titles and compact, intentional title dictation
+remain useful independently of body dictation changes.
+
 ## Ordering and Scope Reduction
 
-The owner accepted the nine-story order above on 2026-10-03. The product backlog
+The owner accepted the original nine-story order on 2026-10-03. The product backlog
 owns their global priority. Preservation of existing content and completed speech
 comes first; title control is a small independent trust improvement. Concurrent
 editing and failure recovery extend reliability before responsiveness and the
@@ -164,6 +346,11 @@ across notes is not a selected capability.
 
 Keep remaining queued voice stories unless the owner later reduces scope.
 Optional one-time automatic title generation has no queued story.
+
+On 2026-10-10 the owner placed the three UI stories above at the top of the
+backlog in their stated order: simpler controls/feedback with cadence-cost
+analysis, one-button body dictation, then title styling and spoken editing.
+No blocking dependency is inferred from shared recording code or that order.
 
 ## Open Decisions for Later Work
 
@@ -190,6 +377,9 @@ Optional one-time automatic title generation has no queued story.
 - Owner's voice-input problem report, 2026-10-03, in this conversation.
 - Owner's acceptance of all nine proposed stories and their priority, with
   authorization to record them on main and sync origin, 2026-10-03.
+- Owner's three UI simplification stories, complete-removal requirements, and
+  request to include affordable transcription-feedback analysis in the first
+  story, 2026-10-10; authorized capture directly on main, commit, and sync origin.
 - Effort-band convention:
   [SEED-039](SEED-039-faster-ci-feedback.md#story-decomposition).
 - Later decomposition workflow:
