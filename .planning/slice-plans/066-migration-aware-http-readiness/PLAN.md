@@ -182,6 +182,18 @@ and browser/test waits are external-wait exceptions. Stop on a missing route,
 ownership ambiguity or failed promised outcome and refine before retrying.
 Stop-safe: accepted evidence is retained and owned services/resources settled.
 
+## Execution complete
+
+Product advice: no backlog change. Two observations for later stories in this
+seed, neither a defect of this one:
+
+- Retiring a worktree drops its E2E database but leaves the `doughnut` user's
+  two grant rows for that database name. The deferred reclamation promise is
+  the natural home if this is worth cleaning.
+- Two frontend browser tests failed once with `Frame was detached` while the
+  backend suite ran at the same time, and passed when run alone. No frontend
+  file had changed.
+
 ## Verification and delivery
 
 - Backend rules require **all** backend tests:
