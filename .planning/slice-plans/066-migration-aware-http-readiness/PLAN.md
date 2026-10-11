@@ -130,7 +130,7 @@ one truthful health signal works with existing consumers.
 
 ### 3. A fresh held session starts after migration and seeds usable data
 Type: Behavior
-Status: planned
+Status: done
 Proof: first `CURSOR_DEV=true nix develop -c pnpm e2e:hold` on the execution worktree's
 unallocated E2E database, with the test-only migration barrier established in
 slice 1. Capture actual backend `/api/healthcheck` and LB `/__lb__/ready` as 503
@@ -392,6 +392,53 @@ For slices 3 and 4: the dev-login page and the E2E login steps call the
 healthcheck and would see 503 before readiness. The runner's wait comes first,
 so check there first if a login step fails.
 
+### Slice 3: a fresh held session waits for the migration
+
+Observed at `f297a916c5` in the execution worktree, whose E2E database did not
+exist beforehand. No source change. Command:
+`SPRING_FLYWAY_LOCATIONS='classpath:db/migration,filesystem:<dir>/callbacks' SUT_TIMEOUT_MS=900000 CURSOR_DEV=true nix develop -c pnpm e2e:hold`,
+plus Tomcat's access log switched on through `SERVER_TOMCAT_ACCESSLOG_*`
+variables for the trace. Database
+`doughnut_e2e_wt_9b333ef56a6f404f8fd58e684563eda4`; backend 57152, Vite 57153,
+load balancer 57154.
+
+- Held (09:17:59 to 09:18:21): the schema held only `flyway_schema_history`;
+  backend `/api/healthcheck` returned 503 `Starting`; `/__lb__/ready` returned
+  503; the access log held only healthcheck 503 lines; no testability request;
+  the runner stayed at `Waiting for SUT to become healthy`.
+- Released at 09:18:21.755: 41 migrations applied by 09:18:22; first healthcheck
+  200 at 09:18:23.493; the only
+  `POST /api/testability/clean_db_and_reset_testability_settings` at
+  09:18:23.720; `E2E stack is ready and held` at 09:18:23.723.
+- Both readiness endpoints then returned 200, with
+  `OK. Active Profile: e2e. Commit: f297a916c5...`. Seeded users existed and
+  `old_learner` authenticated through the load balancer origin.
+- SIGINT to the runner exited 0; every owned process and all three ports were
+  gone; MySQL and other sessions' processes were untouched.
+- An ordinary `pnpm e2e:hold` without the callback then started, announced and
+  stopped the same way.
+- `test:sut-healthcheck` 17/17, `test:sut-start` 72/72,
+  `test:browser-worktree-isolation` 112/112.
+
+The retained log is `sut.log` in the execution worktree (lines 139 to 234 for
+the held run). This worktree's E2E database is now migrated, so slice 4 uses a
+separate fresh acceptance checkout.
+
+Barrier recipe that worked, for slice 4:
+
+1. In a temporary directory outside the checkout, write
+   `callbacks/beforeMigrate.sql` with `SELECT GET_LOCK('<unique>', 600);` and
+   `SELECT RELEASE_LOCK('<unique>');`.
+2. Hold the lock from a background root session:
+   `mysql -h127.0.0.1 -P3309 -uroot -N -n -e "select connection_id(), get_lock('<unique>',0); select sleep(3600);"`.
+   `mysql` is not on the plain PATH; use the Nix store binary.
+3. Start the runner with the two variables above.
+4. Detect the block in `information_schema.processlist` (state `User lock`).
+5. Release with `KILL <holder connection id>`.
+
+On a fresh database the callback fires after Flyway creates its history table
+and before any versioned migration.
+
 ## Story obligations
 
 ### G1. Ready dev and prod text is not requested over HTTP
@@ -413,3 +460,8 @@ Disposition: receiving slice 4
 Reported: slice 2 — "These are status-based production GCP configuration with no local suite."
 Story clause: "Terry approved making these consumers wait for startup."
 Disposition: excluded "new operational probes, and startup/autohealing timeout changes"
+
+### G5. Seeded login was requested with curl, not typed in a browser
+Reported: slice 3 — "Login was observed over real HTTP with curl through the LB, not by typing into the form in a browser."
+Story clause: "`pnpm e2e:hold` then resets and seeds the complete database and announces a usable held browser session."
+Disposition: proved by slice 3: through the load balancer origin, `/users/identify` returned the page, the dev-login page's own request (`GET /api/healthcheck` with Basic auth for `old_learner`) returned 200, and its session cookie alone then returned the `old_learner` user; recorded under "Slice 3" in Learnings.
