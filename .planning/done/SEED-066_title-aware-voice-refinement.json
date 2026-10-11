@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "identity": "SEED-066#title-aware-voice-refinement",
+  "title": "Refine dictated titles with title-aware wording and punctuation",
+  "completedAt": "2026-10-11T12:49:44.324Z",
+  "developer": "Terry Yin",
+  "agent": "Akiho-chan",
+  "host": "codex",
+  "model": "gpt-6.1-sol"
+}

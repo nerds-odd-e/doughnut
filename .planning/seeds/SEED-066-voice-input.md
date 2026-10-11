@@ -164,122 +164,6 @@ with negative assertions, absence checks, or runtime guards. Record the final
 one-time removal sweep as an acceptance reading, following principle 7 in
 `AGENTS.md`; Git history retains the removed implementation.
 
-<a id="title-aware-voice-refinement"></a>
-### Refine dictated titles with title-aware wording and punctuation
-
-**Identity:** SEED-066#title-aware-voice-refinement
-```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/068-title-aware-voice-refinement/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"fd0276ec093be1ebfa76c18a46456a6cb3fdd7edbe1a2aa83db6598da7ac1d8b","plan":"5562908e8aa8c5aa2442bada25feed9a2bd2cd5e8774e63fea64f889fb79f648"}}
-```
-
-**Goal:** For authors speaking a note title, produce wording and punctuation
-suited to a concise title while preserving their intended meaning and control
-over the existing title.
-
-**Scope:**
-
-- Tell the AI explicitly that the dictated text is for a note title, including
-  when it will be inserted into or replace a selected part of an existing title.
-- Ask for concise title wording while preserving the speaker's meaning and
-  substantive details. Concision is guidance for refining the dictated words,
-  not authority to truncate the title, impose a length limit, or discard ideas.
-- Ordinarily omit a sentence-ending period. Preserve appropriate punctuation,
-  including a question mark when the author speaks a question as the title;
-  do not apply a blanket punctuation-removal rule.
-- Keep existing title text outside the selected replacement range intact.
-  A caret insertion or partial selection does not authorize rewriting or
-  shortening the whole title.
-- Apply the title-aware instruction to supported title voice-input journeys,
-  including New note. Content dictation keeps its existing transcription behavior.
-  Toolbar targeting follows the current [voice-input behavior](../../docs/voice-input.md).
-
-**Key examples:**
-
-- Speak "Orchard harvest planning" as a whole title → a concise faithful title
-  such as "Orchard harvest planning", without an added terminal period.
-- Speak "Why do apples ripen unevenly?" as a title → retain the question and
-  its question mark.
-- Title "Spring orchard notes", select "Spring", dictate "Autumn" → refine
-  the spoken replacement as title text and save "Autumn orchard notes".
-- Title "Orchard notes", caret after "Orchard", dictate "harvest" → insert
-  title-appropriate words to produce "Orchard harvest notes"; preserve both
-  surrounding words. The spoken fragment need not become a standalone title.
-- In New note, speak "Orchard harvest planning" into the initial title, then
-  submit → the created note retains the refined title after reload.
-- Dictate "Autumn apple harvest planning for the north orchard after the
-  September frost" → retain the season, crop, location, and frost timing even
-  if the resulting title is longer than a typical title.
-
-**Investigation (2026-10-11):** Read in this story's prepared checkout at
-`96e85acfcfee1ec098d20323413b67484fc37079`; no application or paid model run.
-
-- Both [New note](../../frontend/src/components/notes/NoteNewForm.vue) and
-  [existing-title editing](../../frontend/src/components/notes/core/NoteEditableTitle.vue)
-  use [SpeakTitleControl](../../frontend/src/components/notes/SpeakTitleControl.vue),
-  which converts at Stop. The title editor owns insertion and saving separately
-  from transcription. This supports one title instruction for both journeys
-  without coupling this story to toolbar targeting.
-- [audioChunkToText](../../frontend/src/composables/audioChunkToText.ts) sends
-  only audio and `midSpeech`; [AudioUploadDTO](../../backend/src/main/java/com/odde/donut/controllers/dto/AudioUploadDTO.java)
-  carries no target-field intent. [AiAudioController](../../backend/src/main/java/com/odde/donut/controllers/AiAudioController.java)
-  selects mid-speech SRT or final text transcription. [OtherAiServices](../../backend/src/main/java/com/odde/donut/services/ai/OtherAiServices.java)
-  uses `gpt-4o-mini-transcribe` for final text; [OpenAiApiHandler](../../backend/src/main/java/com/odde/donut/services/openAiApis/OpenAiApiHandler.java)
-  supplies no prompt. There is no separate retouch call in this path. Historical
-  reports about retouch latency do not describe this checkout's implementation.
-- [OpenAI's transcription guidance](https://developers.openai.com/api/docs/guides/speech-to-text#prompting),
-  consulted on 2026-10-11, documents prompt support for that model, including
-  punctuation and formatting guidance. This establishes a supported mechanism,
-  not the quality of concise title wording on this story's speech examples.
-- **Unsettled hypothesis:** Guidance in the existing transcription request can
-  satisfy concision, punctuation, and detail preservation together. The cheapest
-  decisive observation is a bounded comparison on the same recordings with and
-  without title guidance, covering the examples above. Local response mocks can
-  verify instruction routing and insertion, but cannot settle model quality.
-  The current [real-service audio scenario](../../e2e_test/features/note_creation_and_update/record_live_audio_with_real_open_ai_service.feature)
-  exercises content, not these title examples. A paid evaluation needs separate
-  authorization; no model-quality or latency result is claimed here.
-
-**Architecture:**
-
-- Accepted initial direction: carry title intent through the existing audio API
-  and let the backend own the title instruction, first trying the existing
-  transcription request. Keep caret/selection application and ordinary title
-  saving in the editor. Treat the generated words as the insertion fragment,
-  not as a replacement for the entire existing title.
-- A separate text-refinement request would add a sequential service operation
-  and another failure point. Its necessity remains unproved; compare it only if
-  the bounded evaluation shows transcription guidance insufficient. No model
-  migration or numeric latency promise is part of this refinement.
-- [ADR 0005 — Web routes](../../docs/adrs/0005-web-routes-accepted.md)
-  keeps the HTTP contract under `/api` and described by OpenAPI; target intent
-  crosses that contract and its generated client. [ADR 0006 — Failure handling](../../docs/adrs/0006-failure-handling-accepted.md)
-  requires a business outcome for any new recovery: this story does not imply
-  silently accepting unrefined text after a new refinement operation fails.
-  Future runtime evaluation must use the isolated worktree environment under
-  [ADR 0007 — Environments and isolation](../../docs/adrs/0007-environments-and-isolation-accepted.md).
-  The index and these records agree on Accepted status; no conflict was found.
-
-**Decision (2026-10-11):** The owner accepted trying guidance in the existing
-transcription request first, with a bounded quality evaluation before choosing
-additional processing, and requested slice planning. The paid observation is
-an early probe; accepting this direction does not establish model quality.
-
-**Plan:** [Title-aware voice refinement](../slice-plans/068-title-aware-voice-refinement/PLAN.md).
-
-- **Evaluation:** Review saved spoken titles for ordinary phrases, questions,
-  partial edits, and detailed speech; verify title-appropriate wording preserves
-  meaning and the text outside the replacement range.
-- **Value / learning:** Spoken titles need less punctuation cleanup while the
-  author retains control of their wording and information.
-- **Effort hypothesis:** S (30–60 minutes), medium confidence; verify the
-  title instruction across the API and both title callers, with quality
-  evaluation needed before accepting a prompt-only approach. A separate
-  refinement operation would require reassessing this estimate.
-- **Depends on:** none; the existing spoken-title journey can receive the
-  instruction independently of toolbar targeting.
-- **Safe stopping point:** Title-aware refinement improves existing title
-  voice input independently of which control starts recording.
-
 ## Ordering and Scope Reduction
 
 The owner accepted the original nine-story order on 2026-10-03. The product backlog
@@ -301,9 +185,6 @@ On 2026-10-10 the owner placed the three UI stories at the top of the
 backlog in their stated order: simpler controls/feedback with cadence-cost
 analysis, one-button body dictation, then title styling and spoken editing.
 No blocking dependency is inferred from shared recording code or that order.
-
-On 2026-10-11 the owner queued title-aware voice refinement. The product
-backlog owns its priority; no blocking dependency is recorded.
 
 ## Open Decisions for Later Work
 
