@@ -170,7 +170,8 @@ Target 5–8 minutes; hard 10 except measured focused-test/stack wait.
 ### 6. Use the toolbar as the existing-note voice entry point
 
 Type: Behavior
-Status: planned
+Status: done
+Accepted execution proof: [JOURNEY-PROOF.md — Slice 6](JOURNEY-PROOF.md#slice-6).
 Proof: Full frontend suite, both typechecks, mocked-audio E2E feature; one-time
 product removal reading. Regenerate component inventory through Vite build.
 

@@ -18,16 +18,9 @@
         @blur="blur"
       >
         <template #title="{ bindings, editor }">
-          <div class="path-name-heading-line flex items-center gap-2">
-            <h2 class="path-name-heading relative flex-1 min-w-0">
-              <component :is="editor" v-bind="bindings" />
-            </h2>
-            <SpeakTitleControl
-              v-if="!readonly"
-              :key="noteId"
-              :voice-input="titleVoiceInput"
-            />
-          </div>
+          <h2 class="path-name-heading relative">
+            <component :is="editor" v-bind="bindings" />
+          </h2>
         </template>
       </PathNameEditor>
     </template>
@@ -35,49 +28,36 @@
 </template>
 
 <script setup lang="ts">
-import { computed, inject, onUnmounted, ref, watch, type PropType } from "vue"
+import { computed, inject, onUnmounted, ref, type PropType } from "vue"
 import type { NoteTopology } from "@generated/donut-backend-api"
-import {
-  noteTitleDictationKey,
-  useTitleDictation,
-  type TitleDictation,
-} from "@/composables/useTitleDictation"
-import SpeakTitleControl from "../SpeakTitleControl.vue"
+import { noteTitleDictationKey } from "@/composables/useTitleDictation"
 import TextContentWrapper from "./TextContentWrapper.vue"
 import PathNameEditor from "./PathNameEditor.vue"
 
-const props = defineProps({
+defineProps({
   noteTopology: { type: Object as PropType<NoteTopology>, required: true },
   noteId: { type: Number, required: true },
   readonly: { type: Boolean, default: true },
   hasInboundReferences: { type: Boolean, default: false },
-  titleDictation: { type: Object as PropType<TitleDictation>, required: false },
 })
 
 const pathNameEditor = ref<InstanceType<typeof PathNameEditor> | null>(null)
 
 const beginDictation = () => pathNameEditor.value!.beginDictation(false)
-const { voiceInput: titleVoiceInput, leave } =
-  props.titleDictation ?? useTitleDictation(beginDictation)
-
 const noteTitle = inject(noteTitleDictationKey, undefined)
 const retainTitleDraft = computed(
-  () => titleVoiceInput.busy.value || noteTitle?.hasTitleIntent.value === true
+  () =>
+    noteTitle?.dictation.busy.value === true ||
+    noteTitle?.hasTitleIntent.value === true
 )
 
 defineExpose({ beginDictation })
-onUnmounted(leave)
-
-// Moving to another note stops the listening and ends its session.
-watch(() => props.noteId, leave)
+onUnmounted(() => noteTitle?.dictation.leave())
 </script>
 
 <style scoped>
-.path-name-heading-line {
-  margin-bottom: 10px;
-}
-
 h2.path-name-heading {
+  margin-bottom: 10px;
   font-size: 1.875rem;
   font-weight: 700;
 }

@@ -18,11 +18,15 @@ import {
   selectWholeTitle,
   hearing,
   titleEditable,
+  titleCaretOffset,
+  expectTitleMarkerAfter,
   useSpokenTitleTestLifecycle,
 } from "@tests/notes/spokenTitleTestSupport"
 import {
   mockUpdateNoteTitle,
   mockedUpdateTitleCall,
+  editTitle,
+  titleEditorEl,
 } from "@tests/notes/noteTextContentTestSupport"
 import {
   audioTextResponse,
@@ -85,15 +89,20 @@ describe("Toolbar voice input with a focused title", () => {
     placeCaretInTitle(wrapper, 7)
     await start()
     expect(titleEditable(wrapper)).toBe("false")
-    expect(dictationMarker()).not.toBeNull()
+    expectTitleMarkerAfter(wrapper, 7)
     await stop()
     expect(noteTitleText(wrapper)).toBe("Orchard harvest notes")
     expect(titleEditable(wrapper)).toBe("true")
+    expect(document.activeElement).toBe(titleEditorEl(wrapper))
+    expect(titleCaretOffset()).toBe("Orchard harvest".length)
+    await editTitle(wrapper, "Orchard harvest correction notes")
     await vi.runOnlyPendingTimersAsync()
     await flushPromises()
     expect(mockedUpdateTitleCall).toHaveBeenCalledWith(
       expect.objectContaining({
-        body: expect.objectContaining({ newTitle: "Orchard harvest notes" }),
+        body: expect.objectContaining({
+          newTitle: "Orchard harvest correction notes",
+        }),
       })
     )
   })
@@ -102,8 +111,10 @@ describe("Toolbar voice input with a focused title", () => {
     placeCaretInTitle(wrapper, 0, 7)
     hearing("Garden")
     await start()
+    expectTitleMarkerAfter(wrapper, 7)
     await stop()
     expect(noteTitleText(wrapper)).toBe("Garden notes")
+    expect(titleCaretOffset()).toBe("Garden".length)
   })
 
   it("replaces the whole selected title", async () => {

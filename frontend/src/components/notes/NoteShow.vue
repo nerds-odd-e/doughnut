@@ -26,7 +26,6 @@
                   ref="noteTextContent"
                   v-bind="{
                     note: noteRealm.note,
-                    titleDictation,
                     asMarkdown,
                     readonly: readonly(noteRealm),
                     wikiLinks: noteRealm.wikiLinks ?? [],

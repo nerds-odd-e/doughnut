@@ -13,7 +13,6 @@ import { setCaretInEditor } from "@tests/components/form/seamlessTextEditorTestS
 import { audioTextResponse } from "@tests/notes/noteVoiceInputButtonTestSupport"
 import { expectDictationMarkerAt } from "@tests/notes/dictationMarkerTestSupport"
 import { titleEditorEl } from "@tests/notes/noteTextContentTestSupport"
-import { flushReferencedTitleBlurDiscardCheck } from "@tests/notes/textContentWrapperTestSupport"
 import { afterEach, beforeEach, expect, vi } from "vitest"
 
 /** The microphone button, found by the accessible name it has now. */
@@ -208,15 +207,6 @@ export function mockAudioToTextFailThen(transcript: string | string[]) {
   )
   audioToTextMock.mockResolvedValueOnce(wrapSdkError("API Error"))
   return audioToTextMock
-}
-
-/** Leave the title area so a linked rename can discard (same as typed). */
-export async function blurAwayFromSpokenTitle(
-  wrapper: VueWrapper<ComponentPublicInstance>
-) {
-  titleEditorEl(wrapper).blur()
-  await flushPromises()
-  await flushReferencedTitleBlurDiscardCheck()
 }
 
 /** Where the browser draws the title's text position `offset`. */

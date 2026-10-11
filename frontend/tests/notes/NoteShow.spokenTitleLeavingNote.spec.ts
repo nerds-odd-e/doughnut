@@ -8,16 +8,16 @@ import makeMe from "donut-test-fixtures/makeMe"
 import helper, { mockSdkService } from "@tests/helpers"
 import { noteTitleText } from "@tests/notes/noteNewFormTestSupport"
 import {
-  expectIdleSpeakTitleButton,
-  speakAndStop,
-  speakTheTitle,
-  stopSpeaking,
   placeCaretInTitle,
   titleEditable,
   useSpokenTitleTestLifecycle,
 } from "@tests/notes/spokenTitleTestSupport"
 import { dictationMarker } from "@tests/notes/dictationMarkerTestSupport"
 import { titleEditorEl } from "@tests/notes/noteTextContentTestSupport"
+import {
+  startVoiceInputByPointer,
+  stopVoiceInputWithFocus,
+} from "@tests/notes/noteVoiceInputButtonTestSupport"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 
 vi.mock("@/models/audio/recorderWorklet", async () => {
@@ -65,7 +65,8 @@ describe("Speaking a title when the author moves to another note", () => {
   })
 
   it("stops listening and leaves the title of the note they arrive at editable, with its own text and without focus", async () => {
-    await speakTheTitle(wrapper)
+    placeCaretInTitle(wrapper, 7)
+    await startVoiceInputByPointer(wrapper)
     expect(titleEditable(wrapper)).toBe("false")
     const recorder = vi.mocked(createAudioRecorder).mock.results.at(-1)!.value
 
@@ -75,36 +76,32 @@ describe("Speaking a title when the author moves to another note", () => {
     expect(titleEditable(wrapper)).toBe("true")
     expect(noteTitleText(wrapper)).toBe("Pear tree")
     expect(document.activeElement).not.toBe(titleEditorEl(wrapper))
-    expectIdleSpeakTitleButton(wrapper)
+    expect(
+      wrapper.find('button[aria-label="Voice input"]').attributes()
+    ).not.toHaveProperty("disabled")
   })
 
-  it("captures the title range before delayed microphone startup", async () => {
-    const createRecorder = vi.mocked(createAudioRecorder)
-    const implementation = createRecorder.getMockImplementation()!
-    let finishStartup!: () => void
-    createRecorder.mockImplementationOnce((callback, options) => {
-      const recorder = implementation(callback, options!)
-      vi.mocked(recorder.startRecording).mockImplementation(
-        () =>
-          new Promise<void>((resolve) => {
-            finishStartup = resolve
-          })
-      )
-      return recorder
-    })
+  it("ends title capture when the editing surface is minimized and starts fresh after restoration", async () => {
     placeCaretInTitle(wrapper, 7)
-    await speakTheTitle(wrapper)
-    placeCaretInTitle(wrapper, 0, 7)
-    finishStartup()
+    await startVoiceInputByPointer(wrapper)
+    const recorder = vi.mocked(createAudioRecorder).mock.results.at(-1)!.value
+
+    await wrapper.setProps({ isMinimized: true })
     await flushPromises()
 
-    await stopSpeaking(wrapper)
-
+    expect(recorder.stopRecording).toHaveBeenCalledTimes(1)
+    await wrapper.setProps({ isMinimized: false })
+    await flushPromises()
+    expect(titleEditable(wrapper)).toBe("true")
+    placeCaretInTitle(wrapper, 7)
+    await startVoiceInputByPointer(wrapper)
+    await stopVoiceInputWithFocus(wrapper)
     expect(noteTitleText(wrapper)).toBe("Orchard harvest notes")
   })
 
   it("clears the pending marker of the title they left", async () => {
-    await speakTheTitle(wrapper)
+    placeCaretInTitle(wrapper, 7)
+    await startVoiceInputByPointer(wrapper)
     expect(dictationMarker()).not.toBeNull()
 
     await show(destination)
@@ -113,10 +110,13 @@ describe("Speaking a title when the author moves to another note", () => {
   })
 
   it("speaks into the title of the note they arrive at afterwards", async () => {
-    await speakTheTitle(wrapper)
+    placeCaretInTitle(wrapper, 7)
+    await startVoiceInputByPointer(wrapper)
     await show(destination)
 
-    await speakAndStop(wrapper)
+    placeCaretInTitle(wrapper, 9)
+    await startVoiceInputByPointer(wrapper)
+    await stopVoiceInputWithFocus(wrapper)
 
     expect(noteTitleText(wrapper)).toBe("Pear tree harvest")
   })

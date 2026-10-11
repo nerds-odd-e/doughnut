@@ -57,3 +57,50 @@ Relevant HorizontalMenu/SidebarToolbar and title/content consumers passed.
 Approximately 9.5 active minutes plus measured proof waits. Independent refactor
 found no candidate; whitespace and coordinator formatting passed. E2E unchanged;
 slice 4 evidence retained. Final entry-point removal remains with slice 6.
+
+Published slice 5: `fd449bd98a902092044a792ac2bace5ed583fffe`, suffix base
+`b76e3428b07ac2747f024602d0bc0ed7c1630617`, same branch/observer, no replay.
+
+## Slice 6
+
+Existing-note title entry uses the toolbar. The title editor's injected-owner
+cleanup retains editing-surface departure: minimizing the conversation's note
+surface was red (recorder stop expected once, actual zero), then passes with
+fresh recording after restoration. Toolbar/departure specs retain marker
+geometry, restored caret/focus, typed correction, origin cleanup and fresh
+next-note title capture. Four exclusive presentation specs were deleted;
+overlapping placement/recovery survives at toolbar and New note boundaries.
+Current voice documents describe focus/portal, frozen session, reference saving
+and field-specific feedback/recovery.
+
+```sh
+CURSOR_DEV=true nix develop -c pnpm frontend:test
+CURSOR_DEV=true nix develop -c pnpm -C frontend exec vue-tsc --noEmit
+CURSOR_DEV=true nix develop -c pnpm -C frontend exec tsc --noEmit
+CURSOR_DEV=true nix develop -c pnpm -C frontend exec vite build --emptyOutDir
+CURSOR_DEV=true nix develop -c pnpm cy:run --spec e2e_test/features/note_creation_and_update/record_live_audio.feature
+CURSOR_DEV=true nix develop -c scripts/check_diff_whitespace.sh
+```
+
+Final full suite: 338 files / 2146 tests passed (129.46 s). Both typechecks and
+Vite build passed; component inventory regenerated with no diff. Five audio
+E2E scenarios passed before only the minimize correction; their visible-surface
+trajectories are unchanged. Initial full run had keyboard timeout/frame-detached
+failures in NewBookBlockTitleDialog and RichMarkdownEditor property-link cases;
+both passed final full run. Resource contention is unproven. Initial build's
+three wrapping differences and one whitespace error were mechanically fixed.
+Approximately nine active minutes plus measured verification/Nix wait.
+
+Refactor removed the unreachable title-control styling variant and its New note
+argument. Its sole surviving caller's classes/attributes/events are identical.
+`CURSOR_DEV=true nix develop -c pnpm frontend:test tests/notes/NoteNewForm.spokenTitle`
+passed 5 files / 31 tests; both typechecks and whitespace passed. Prior New note
+persistence E2E remains valid, supplemented by mounted presentation proof.
+Coordinator formatting passed with only mechanical changes.
+
+One-time product removal reading after refactoring:
+`rg -n --hidden 'NoteEditableTitle\.spokenTitle|path-name-heading-line|blurAwayFromSpokenTitle|joinsField|joins-field' . --glob '!.planning/**' --glob '!.git/**'`
+returned no matches in current indexed product, docs and hidden agent guidance.
+Read current microphone/heading descriptions across frontend/backend/CLI/MCP/docs,
+E2E and guidance; shared SpeakTitleControl remains for New note and inventory.
+Historical preparation/observation provenance is preserved in planning/Git.

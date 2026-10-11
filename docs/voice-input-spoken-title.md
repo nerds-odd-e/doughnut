@@ -59,46 +59,53 @@ conversion fails, the common error toast says "Could not turn your speech into
 text.", the title is unchanged, the button is idle, and Submit is offered.
 Speaking again creates a fresh recorder so only the new recording's words
 reach the title. The author reviews the title and chooses Submit as usual; the
-note is created once with that title. Body dictation on an existing note never
-changes the title.
+note is created once with that title.
 
 ## Speaking a title on an existing note
 
-On an editable note page, the same small microphone button ends the title
-heading's line, with the same names and the same idle, listening and
-converting appearances as in New note. The heard words go where the author's
-caret or selection is in the title when listening starts: a selection is
-replaced by them, and a caret takes them at that place. As in New note, the
-title is read-only from then until the session ends, so typing, pasting,
-clicking and selecting do not change it or move that place, and the pending
-marker sits right after that place, after the caret or after the end of the
-selection, until the session ends for any reason, moving to another note
-included. The CJK/space rule of body passages applies
-on both sides of the words: one space towards a
-neighbouring Latin-script character, none next to Japanese or Chinese
-writing, and no second space where whitespace is already present. For
-example, with the caret between "Orchard" and "notes", "harvest" gives
-"Orchard harvest notes"; with the caret at the end of "りんご園", "の手入れ"
-gives "りんご園の手入れ". The target is the selection the title has while it
-has focus, or the one it had when focus left it, so pressing the button does
-not lose it. When the author has placed neither caret nor selection in the
-title being shown, the words join its end, and fill an empty title. Replacing
-the whole title is done by selecting all of it and speaking. Afterwards the
-title has focus and the caret sits after the heard words, so a typed
-correction continues from there, and speaking again without moving the caret
-continues there too. The result is proposed through the same path as typing:
-a note nothing links to saves as a typed title does; a note other notes link
-to shows the reference panel and saves only when the author chooses how links
-should change, and leaving without choosing discards the heard words. When
-nothing was heard, the button returns to idle with no message; when the
-microphone cannot be used or the conversion fails, the common error toast
-says so in the same words as in New note. In each case the title is unchanged,
-editable, and nothing is saved; a microphone that cannot be used never makes
-the title read-only. Moving to another note while listening stops the
-recorder and ends the session: the heard words go to neither note, and the
-title of the note the author arrives at is editable, shows its own text, is
-not given focus, and has an idle button. Speaking again creates a fresh recorder so only the new
-recording's words reach the title. Readers who may not edit the note see the
-title as text and are not offered the button.
-Body dictation with Voice input still writes only to the body and never
-changes the title.
+Place a caret or selection in an editable title, then activate **Voice input**
+in the note toolbar. On narrow screens reach it through "more options".
+The title remains the destination while navigating through the toolbar with
+Tab, Enter or Space, or opening, closing and reopening its menu. Moving to the
+content editor or another unrelated destination clears that intent: the next
+fresh recording uses content. Opening a note and activating Voice input without
+first focusing its title also uses content.
+
+The field and insertion range are captured before microphone startup. Focus or
+selection changes during startup, listening or conversion do not redirect the
+session. Stop voice input finishes that same recording. Title speech converts
+only on Stop; nothing appears while listening. The title is read-only from
+startup until the session ends, and its pending marker shows the captured caret
+or the end of the selection. The marker is hidden from assistive technology,
+takes no clicks and is never title text; its dots stand still with reduced
+motion. During listening the toolbar button is highlighted, named "Stop voice
+input", and remains available in the toolbar even on a narrow screen. During
+startup and conversion it is disabled with a spinner, named "Voice input".
+
+A selection is replaced, including the whole title if selected. A caret inserts
+at that position, with the body passage joining rule on both sides: spaces
+between Latin-script words, direct joining beside Japanese or Chinese writing,
+and no extra space beside existing whitespace. "Orchard notes" with a caret
+after "Orchard" and "harvest" becomes "Orchard harvest notes". After success
+the title is editable with focus and the caret after the dictated words, so a
+typed correction or another recording continues there.
+
+The current typed title draft and selected range survive the toolbar journey
+and recording. The result follows ordinary title validation and saving: a note
+without inbound references saves normally; a linked title shows its reference
+panel and saves only after the author chooses how reference text should change.
+Leaving without that choice discards the proposed rename.
+
+When no words are returned, the title is unchanged and editing resumes without
+a message. Microphone startup failure restores editing and shows "Could not use
+the microphone. Allow microphone access in your browser, then try again."
+Conversion failure restores editing and shows "Could not turn your speech into
+text." The captured caret or selection is restored, and the author can type or
+start a fresh recording. Title recordings have no retained-audio retry; content
+retains its ongoing conversion and retry policies. A fresh recording chooses
+its field again from current editing intent.
+
+Moving to another note while title recording is active stops the recorder and
+ends its insertion session. Its speech writes to neither note. The destination
+note shows its own editable title and an idle toolbar, without taking title
+focus. Readers see the title as text; editable authors have the toolbar action.

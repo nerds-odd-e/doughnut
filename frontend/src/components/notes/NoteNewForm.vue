@@ -30,10 +30,7 @@
               @update:model-value="onTitleChange"
             >
               <template #append>
-                <SpeakTitleControl
-                  joins-field
-                  :voice-input="titleVoiceInput"
-                />
+                <SpeakTitleControl :voice-input="titleVoiceInput" />
                 <WikidataSearchByLabel
                   :search-key="newTitle"
                   v-model="wikidataIdSelection"

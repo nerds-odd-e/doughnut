@@ -1,7 +1,13 @@
 # Voice input
 
-Authors dictate into an existing note's body with the one Voice input button
-in the note toolbar; on a narrow screen it is in the "more options" menu.
+Authors use the Voice input button in the note toolbar to dictate into the
+focused title or, otherwise, the content. On narrow screens it is in the "more
+options" menu. Title intent survives keyboard navigation within the toolbar
+and its menu; moving to content or elsewhere clears it. The destination and
+insertion range are fixed before microphone startup and stay fixed until Stop
+and conversion finish. A fresh recording chooses its destination again.
+See [speaking a title](./voice-input-spoken-title.md) for title conversion,
+draft retention and reference-save choices. The content journey follows here.
 Idle, the button shows a microphone and is named "Voice input".
 Clicking it starts capture from the browser's current default microphone at
 once: the button is highlighted like the toolbar's other active toggles, its
@@ -56,14 +62,13 @@ The marker is drawn over the editor and is not text: it is not saved, copied,
 or exported, it takes no clicks, and it is hidden from assistive technology,
 since the button's name already tells the session's state. The Markdown editor
 shows no marker; there the button is the only sign of a running session.
-Dictation writes only to the note body. Readers who may
-not edit the note are not offered the button.
+Readers who may not edit the note are not offered the button.
 
 ## Speaking a title
 
-A small microphone button in the title field of New note, and at the end of
-the title heading of an editable note page, puts spoken words into the title:
-see [speaking a title](./voice-input-spoken-title.md).
+New note has a microphone button in its title field. Existing notes use the
+same toolbar Voice input action for title and content, chosen by editing
+intent: see [speaking a title](./voice-input-spoken-title.md).
 
 ## Adding dictated text to a note
 

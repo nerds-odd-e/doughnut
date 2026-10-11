@@ -22,12 +22,9 @@ import { computed } from "vue"
 import { LoaderCircle, Mic } from "@lucide/vue"
 import type { TitleVoiceInput } from "@/composables/useTitleVoiceInput"
 import { fieldJoinAppendToggleButtonClass } from "@/utils/fieldJoinAppendButtonClass"
-import { toolbarToggleBtnClass } from "./widgets/noteToolbarButtonClasses"
 
-const { joinsField, voiceInput } = defineProps<{
+const { voiceInput } = defineProps<{
   voiceInput: TitleVoiceInput
-  /** Styled as a button appended to a field control in a `daisy-join`. */
-  joinsField?: boolean
 }>()
 
 const { phase, onControlClick } = voiceInput
@@ -36,10 +33,8 @@ const name = computed(() =>
   phase.value === "listening" ? "Stop speaking the title" : "Speak the title"
 )
 
-const buttonClass = computed(() => {
-  const listening = phase.value === "listening"
-  return joinsField
-    ? `${fieldJoinAppendToggleButtonClass(listening)} rounded-none`
-    : toolbarToggleBtnClass(listening)
-})
+const buttonClass = computed(
+  () =>
+    `${fieldJoinAppendToggleButtonClass(phase.value === "listening")} rounded-none`
+)
 </script>
