@@ -56,9 +56,13 @@ when it is highlighted as a pressed toggle. After the author clicks it to
 stop, it is unavailable and shows a spinner, named "Speak the title", until
 the speech has become text; then it is idle again. Listening ends only when
 the author clicks the button; nothing appears in the title while they are
-still speaking. The recorder converts only at that click. An untouched
-default "Untitled" is a placeholder: the heard words replace it, whether or
-not it is still selected, for example after the author chose a folder first.
+still speaking. The recorder converts only at that click. From the moment
+listening starts until the session ends, the title is read-only: it takes no
+typing or pasting, and clicking or selecting in it does not move the place the
+words go to, which is fixed when listening starts. An untouched
+default "Untitled" is a placeholder: the whole of it is that place and the
+heard words replace it, whether or not it is still selected, for example after
+the author chose a folder first.
 Any other title, including a title pattern the dialog opened with and a title
 the author typed, takes the words where the author's caret or selection is,
 by the same rule as on an existing note: a selection is replaced, a caret
@@ -69,10 +73,12 @@ both sides, and a caret at the end appends. For example, the pattern
 "Project review", "weekly" gives "Project weekly review". The target is the
 selection the title has while it has focus, or the one it had when focus left
 it. When the author has placed neither caret nor selection in
-such a title, the words join its end, and fill an empty title. Afterwards the
-title has focus and the caret sits after the heard words, so a typed
-correction continues from there. Illegal characters are replaced and warnings
-shown as for typing.
+such a title, the words join its end, and fill an empty title. The session
+ends when the words have arrived, when nothing was heard, or when the
+conversion failed; the title is then editable again and has focus. After words
+arrived the caret sits after them, so a typed correction continues from there;
+otherwise the caret or selection is the one the session started with. Illegal
+characters are replaced and warnings shown as for typing.
 The search for existing notes runs for the resulting title. The author may type
 corrections before Submit. While the dialog is listening or turning speech into
 text, Submit is not offered and Enter in the title field does nothing;
@@ -81,7 +87,8 @@ recorder. When nothing was heard (a silent recording that runs no conversion, or
 a response of no segments), the button returns to idle with no message, the
 title is unchanged, and Submit is offered. When the microphone cannot be used,
 the common error toast says "Could not use the microphone. Allow microphone
-access in your browser, then try again." and the button stays idle. When the
+access in your browser, then try again.", the button stays idle, and the title
+is not made read-only. When the
 conversion fails, the common error toast says "Could not turn your speech into
 text.", the title is unchanged, the button is idle, and Submit is offered.
 Speaking again creates a fresh recorder so only the new recording's words
@@ -94,8 +101,10 @@ changes the title.
 On an editable note page, the same small microphone button ends the title
 heading's line, with the same names and the same idle, listening and
 converting appearances as in New note. The heard words go where the author's
-caret or selection is in the title: a selection is replaced by them, and a
-caret takes them at that place. The CJK/space rule of body passages applies
+caret or selection is in the title when listening starts: a selection is
+replaced by them, and a caret takes them at that place. As in New note, the
+title is read-only from then until the session ends, so typing, pasting,
+clicking and selecting do not change it or move that place. The CJK/space rule of body passages applies
 on both sides of the words: one space towards a
 neighbouring Latin-script character, none next to Japanese or Chinese
 writing, and no second space where whitespace is already present. For
@@ -114,8 +123,12 @@ to shows the reference panel and saves only when the author chooses how links
 should change, and leaving without choosing discards the heard words. When
 nothing was heard, the button returns to idle with no message; when the
 microphone cannot be used or the conversion fails, the common error toast
-says so in the same words as in New note. In each case the title is unchanged
-and nothing is saved. Speaking again creates a fresh recorder so only the new
+says so in the same words as in New note. In each case the title is unchanged,
+editable, and nothing is saved; a microphone that cannot be used never makes
+the title read-only. Moving to another note while listening stops the
+recorder and ends the session: the heard words go to neither note, and the
+title of the note the author arrives at is editable, shows its own text, is
+not given focus, and has an idle button. Speaking again creates a fresh recorder so only the new
 recording's words reach the title. Readers who may not edit the note see the
 title as text and are not offered the button.
 Body dictation with Voice input still writes only to the body and never

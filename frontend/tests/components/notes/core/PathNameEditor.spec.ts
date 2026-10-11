@@ -1,7 +1,7 @@
 import PathNameEditor from "@/components/notes/core/PathNameEditor.vue"
 import SeamlessTextEditor from "@/components/form/SeamlessTextEditor.vue"
 import { settleScheduledAutofocus } from "@tests/helpers/focusTargetTestSupport"
-import { insertAtSelection } from "@tests/components/form/seamlessTextEditorTestSupport"
+import { dictate } from "@tests/components/form/seamlessTextEditorTestSupport"
 import { flushPromises, mount } from "@vue/test-utils"
 import { describe, expect, it } from "vitest"
 import { h, type Component } from "vue"
@@ -147,7 +147,7 @@ describe("PathNameEditor.vue", () => {
     expect(wrapper.find(".text-warning").exists()).toBe(false)
   })
 
-  it("inserts text through the editor a title slot renders, sanitized as a typed title", async () => {
+  it("puts dictated text in the editor a title slot renders, sanitized as a typed title", async () => {
     const wrapper = mount(PathNameEditor, {
       props: { modelValue: "Orchard" },
       slots: {
@@ -161,7 +161,7 @@ describe("PathNameEditor.vue", () => {
       },
     })
 
-    await insertAtSelection(wrapper, () => " a/b")
+    await dictate(wrapper, ["a/b"])
 
     expect(wrapper.emitted("update:modelValue")?.at(-1)?.[0]).toBe(
       "Orchard a／b"

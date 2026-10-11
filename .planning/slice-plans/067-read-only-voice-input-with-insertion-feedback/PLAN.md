@@ -150,7 +150,7 @@ contract half replaced. Stop and reassess if it passes the L band.
 
 ### 2. The title keeps its target and takes no edits while being spoken
 Type: Behavior
-Status: planned
+Status: done
 Proof: mounted `NoteEditableTitle` and `NoteNewForm` spoken-title tests
 (read-only while busy, target fixed at start, placeholder as whole-title
 target, caret after the words); `record_live_audio.feature` title scenarios.
@@ -225,6 +225,25 @@ the session ends otherwise. Update `docs/voice-input.md`.
   e2e_test` for the removed test and helper names and the "unsaved typing" /
   "end of that editor's draft" wording returned nothing.
 
+- Slice 2: the title's target is the closure variable `target` (`{ start, end }`
+  character offsets) in `SeamlessTextEditor.beginDictation`; the title keeps one
+  text node, so a DOM `Range` at `target.end` on the editor's first child gives
+  the marker's rect. `DictationTarget` has no anchor accessor yet; slices 3 and
+  4 both need one. `SeamlessTextEditor.vue` has 9 lines of headroom, so the
+  marker lives outside it. `useTitleDictation` knows a title session's start
+  and its three endings (words landed, idle without words, `leave()` when the
+  page moves to another note); the marker clears at each. `end(true)` focuses
+  on `nextTick`, so tests flush before asserting focus or caret.
+- Slice 2 accepted proof: `NoteEditableTitle.spokenTitleReadOnly.spec.ts`,
+  `NoteNewForm.spokenTitleReadOnly.spec.ts`,
+  `NoteShow.spokenTitleLeavingNote.spec.ts`, the dictation cases in
+  `SeamlessTextEditor.spec.ts`, whole frontend suite, typechecks, and
+  `record_live_audio.feature` 5 of 5.
+- Slice 2 decision for the owner to confirm: when the page moves to another
+  note while a title is listening, the session ends and the words heard so far
+  are dropped; before, a reused title editor would have taken them into the
+  arriving note's title at the next Stop.
+
 ## Execution
 
 Story Branch Mode in
@@ -259,3 +278,28 @@ Disposition: no user cost "fix the place where the spoken text will land at the 
 Reported: slice 1 — "Session begins after the recorder starts, not at the click."
 Story clause: "When voice input starts, the target is the caret or selection the input has"
 Disposition: no user cost "fix the place where the spoken text will land at the moment they start": recording starting is the start of voice input, and it keeps a microphone that cannot start from locking the editor
+
+### G6. Edits to a locked title are observed through the read-only attribute
+Reported: slice 2 — "No real keystroke or mouse click is sent to the locked title."
+Story clause: "the targeted body editor or title takes no typing, pasting, or other edits"
+Disposition: proved by slice 2: `frontend/tests/notes/NoteEditableTitle.spokenTitleReadOnly.spec.ts` and `frontend/tests/components/form/SeamlessTextEditor.spec.ts` assert `contenteditable="false"` for the session in a real browser and a dispatched paste leaving the text unchanged
+
+### G7. Focus after nothing heard or a failed title conversion
+Reported: slice 2 — "The title gets focus with the starting caret/selection restored. In New note that re-selects the untouched `Untitled`. Only editability and the existing-note caret after a failure are asserted; focus in these two endings is not."
+Story clause: "When the last text has arrived, or nothing was heard, the indicator clears and editing resumes with the caret after the inserted words in both surfaces."
+Disposition: no user cost "fix the place where the spoken text will land at the moment they start": with no words inserted the title is unchanged and editable, and the caret is where the author left it
+
+### G8. A title turning read-only during its own session
+Reported: slice 2 — "An existing note turning read-only mid-session (control removed by `v-if`, same note) still has nothing ending the lock"
+Story clause: "From the start of voice input until its session ends, the targeted body editor or title takes no typing, pasting, or other edits"
+Disposition: no user cost "For note authors dictating into a note body or speaking a title": a note turns read-only only when the author signs out or loses edit rights, and that title takes no edits either way
+
+### G9. Title changed from outside during a New note session
+Reported: slice 2 — "Outside title changes during a New note session (for example a Wikidata pick replacing the title): the captured offsets then apply to the new text."
+Story clause: "The other field and the rest of the page stay as they are"
+Disposition: no user cost "fix the place where the spoken text will land at the moment they start": the author asked for that replacement during the session, and the heard words still join the title they chose
+
+### G10. Words heard before leaving a note are dropped from the title session
+Reported: slice 2 — "The words heard up to the move are **dropped**: they go to neither note."
+Story clause: "Leaving the note or closing New note while recording ends the session as today."
+Disposition: proved by slice 2: `frontend/tests/notes/NoteShow.spokenTitleLeavingNote.spec.ts` observes the session ended, the arriving title editable with its own text, and a later session speaking into it

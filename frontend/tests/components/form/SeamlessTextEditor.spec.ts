@@ -3,7 +3,8 @@ import { nextTick } from "vue"
 import {
   editorEl,
   focusEditor,
-  insertAtSelection,
+  beginDictation,
+  dictate,
   mountSeamlessTextEditor,
   PASTE_NO_UPDATE_CASES,
   PASTE_SUCCESS_CASES,
@@ -77,7 +78,7 @@ describe("SeamlessTextEditor", () => {
     }
   )
 
-  it("inserts at the selection it remembered when focus left the editor", async () => {
+  it("puts dictated text at the selection it remembered when focus left the editor", async () => {
     wrapper = await mountSeamlessTextEditor(
       "Orchard notes",
       {},
@@ -89,7 +90,7 @@ describe("SeamlessTextEditor", () => {
     moveFocusToAButton()
     window.getSelection()?.removeAllRanges()
 
-    await insertAtSelection(wrapper, () => "Garden")
+    await dictate(wrapper, ["Garden"])
 
     expect(wrapper.emitted()["update:modelValue"]?.at(-1)?.[0]).toBe(
       "Garden notes"
@@ -101,21 +102,21 @@ describe("SeamlessTextEditor", () => {
     expect(range?.startOffset).toBe(6)
   })
 
-  it("appends inserted text when no selection was ever placed", async () => {
+  it("appends dictated text when no selection was ever placed", async () => {
     wrapper = await mountSeamlessTextEditor(
       "Orchard",
       {},
       { attachTo: document.body }
     )
 
-    await insertAtSelection(wrapper, (before, after) => `[${before}|${after}]`)
+    await dictate(wrapper, ["notes"])
 
     expect(wrapper.emitted()["update:modelValue"]?.at(-1)?.[0]).toBe(
-      "Orchard[Orchard|]"
+      "Orchard notes"
     )
   })
 
-  it("appends inserted text after its text was replaced from outside", async () => {
+  it("appends dictated text after its text was replaced from outside", async () => {
     wrapper = await mountSeamlessTextEditor(
       "Orchard notes",
       {},
@@ -127,12 +128,12 @@ describe("SeamlessTextEditor", () => {
     moveFocusToAButton()
     await wrapper.setProps({ modelValue: "Pear tree" })
 
-    await insertAtSelection(wrapper, () => " care")
+    await dictate(wrapper, ["care"])
 
     expect(editor.innerText).toBe("Pear tree care")
   })
 
-  it("focuses the editor with the caret after the inserted text", async () => {
+  it("focuses the editor with the caret after the dictated text", async () => {
     wrapper = await mountSeamlessTextEditor(
       "Orchard",
       {},
@@ -140,12 +141,45 @@ describe("SeamlessTextEditor", () => {
     )
     const editor = editorEl(wrapper)
 
-    await insertAtSelection(wrapper, () => " notes")
+    await dictate(wrapper, ["notes"])
 
     expect(document.activeElement).toBe(editor)
     const range = window.getSelection()?.getRangeAt(0)
     expect(range?.collapsed).toBe(true)
     expect(range?.startOffset).toBe(13)
+  })
+
+  it("takes no edits or paste from the start of a dictation until it ends", async () => {
+    wrapper = await mountSeamlessTextEditor(
+      "Orchard",
+      {},
+      { attachTo: document.body }
+    )
+    const editor = editorEl(wrapper)
+
+    const target = beginDictation(wrapper)
+    await nextTick()
+    expect(editor.getAttribute("contenteditable")).toBe("false")
+    await pasteClipboard(editor, { plain: "pasted" })
+    expect(editor.innerText).toBe("Orchard")
+
+    target.end(false)
+    await nextTick()
+    expect(editor.getAttribute("contenteditable")).toBe("true")
+  })
+
+  it("replaces the whole text when all of it is the dictation target", async () => {
+    wrapper = await mountSeamlessTextEditor(
+      "Orchard notes",
+      {},
+      { attachTo: document.body }
+    )
+
+    beginDictation(wrapper, true).insert(["Pear tree"])
+
+    expect(wrapper.emitted()["update:modelValue"]?.at(-1)?.[0]).toBe(
+      "Pear tree"
+    )
   })
 
   it("submits the nearest form on Enter", async () => {

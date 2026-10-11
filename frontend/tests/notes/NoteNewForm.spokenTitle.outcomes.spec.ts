@@ -10,6 +10,7 @@ import {
 } from "@tests/notes/noteNewFormTestSupport"
 import {
   expectIdleSpeakTitleButton,
+  microphoneCannotStart,
   mockAudioToTextFailThen,
   mockAudioToTextWithNoSegments,
   speakAndStop,
@@ -79,15 +80,7 @@ describe("NoteNewForm spoken title outcomes", () => {
   })
 
   it("explains a microphone that cannot be used and keeps the idle button", async () => {
-    const createRecorder = vi.mocked(createAudioRecorder)
-    const createRecorderImpl = createRecorder.getMockImplementation()!
-    createRecorder.mockImplementationOnce((callback, options) => {
-      const recorder = createRecorderImpl(callback, options!)
-      vi.mocked(recorder.startRecording).mockRejectedValueOnce(
-        new Error("Permission denied")
-      )
-      return recorder
-    })
+    microphoneCannotStart()
 
     wrapper = mountNoteNewForm(notebookRootProps, { attachTo: document.body })
     await speakTheTitle(wrapper)

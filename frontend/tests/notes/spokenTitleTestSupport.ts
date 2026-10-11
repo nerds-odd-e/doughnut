@@ -97,6 +97,11 @@ export function selectWholeTitle(wrapper: VueWrapper<ComponentPublicInstance>) {
   window.getSelection()!.selectAllChildren(title)
 }
 
+/** "false" while the title takes no edits. */
+export function titleEditable(wrapper: VueWrapper<ComponentPublicInstance>) {
+  return titleEditorEl(wrapper).getAttribute("contenteditable")
+}
+
 export function titleCaretOffset() {
   const range = window.getSelection()!.getRangeAt(0)
   expect(range.collapsed).toBe(true)
@@ -166,6 +171,19 @@ export function holdSpeakTitleConvertingUntilFinished() {
       })
   )
   return { finishStop: () => finishStop() }
+}
+
+/** The next recorder fails to start. */
+export function microphoneCannotStart() {
+  const createRecorder = vi.mocked(createAudioRecorder)
+  const createRecorderImpl = createRecorder.getMockImplementation()!
+  createRecorder.mockImplementationOnce((callback, options) => {
+    const recorder = createRecorderImpl(callback, options!)
+    vi.mocked(recorder.startRecording).mockRejectedValueOnce(
+      new Error("Permission denied")
+    )
+    return recorder
+  })
 }
 
 /** Stop without invoking the processor — silent recording, no conversion. */

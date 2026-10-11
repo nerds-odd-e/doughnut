@@ -23,7 +23,9 @@
             </h2>
             <SpeakTitleControl
               v-if="!readonly"
-              @heard-segments="onHeardTitleSegments"
+              :key="noteId"
+              v-model:busy="titleSpeechBusy"
+              @heard-segments="insertHeardSegments"
             />
           </div>
         </template>
@@ -33,14 +35,14 @@
 </template>
 
 <script setup lang="ts">
-import { ref, type PropType } from "vue"
+import { ref, watch, type PropType } from "vue"
 import type { NoteTopology } from "@generated/donut-backend-api"
-import { dictatedInsertion } from "@/models/audio/joinDictatedSegments"
+import { useTitleDictation } from "@/composables/useTitleDictation"
 import SpeakTitleControl from "../SpeakTitleControl.vue"
 import TextContentWrapper from "./TextContentWrapper.vue"
 import PathNameEditor from "./PathNameEditor.vue"
 
-defineProps({
+const props = defineProps({
   noteTopology: { type: Object as PropType<NoteTopology>, required: true },
   noteId: { type: Number, required: true },
   readonly: { type: Boolean, default: true },
@@ -49,11 +51,14 @@ defineProps({
 
 const pathNameEditor = ref<InstanceType<typeof PathNameEditor> | null>(null)
 
-function onHeardTitleSegments(segments: string[]) {
-  pathNameEditor.value?.insertAtSelection((before, after) =>
-    dictatedInsertion(before, segments, after)
-  )
-}
+const {
+  busy: titleSpeechBusy,
+  insertHeardSegments,
+  leave,
+} = useTitleDictation(() => pathNameEditor.value!.beginDictation(false))
+
+// Moving to another note stops the listening and ends its session.
+watch(() => props.noteId, leave)
 </script>
 
 <style scoped>
