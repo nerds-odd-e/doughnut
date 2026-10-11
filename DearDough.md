@@ -490,6 +490,6 @@ Follow-up: Open, unqueued.
   - Timestamp: unknown
   - Tool: Codex
   - Open Dough release: unknown
-  - Evidence: CI run 38123730120/attempt 1 at f75da95cb40f; repair 8944c119e408; its CI-REPAIR.md records the temporary 1500ms getUserMedia experiment (unchanged helper 4 pass/1 fail, listening-state wait 5 pass, ordinary mocks 5 pass)
+  - Evidence: CI run 38123730120/attempt 1 at f75da95cb40f; repair 8944c119e408; `60328800d519e10be3fa16b69505641157417542:.planning/slice-plans/001-focus-aware-toolbar-voice-input/CI-REPAIR.md` records the temporary 1500ms getUserMedia experiment (unchanged helper 4 pass/1 fail, listening-state wait 5 pass, ordinary mocks 5 pass)
   - Observed effect: only New note creation failed; pending slice-3 work was paused/preserved/restored while the E2E helper was repaired and published
   - Inference: a visible insertion marker establishes the editing session, not external microphone readiness; changes in that timing need consumer proof with delayed device startup
