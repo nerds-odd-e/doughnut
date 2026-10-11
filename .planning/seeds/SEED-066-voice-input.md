@@ -142,6 +142,9 @@ The original nine-story decomposition is recoverable in Git history. On
 top of the product backlog; all three are delivered. These are non-executable story
 records; capturing them does not start implementation.
 
+On 2026-10-11 the owner added two stories: focus-aware toolbar voice input,
+then title-aware refinement of dictated words.
+
 Effort bands are S = 30–60 minutes, M = 1–2 hours, and L = 2–4 hours, including
 delivery. These are comparative hypotheses, not a delivery schedule. Refine or
 resplit any story likely to exceed L before execution.
@@ -164,6 +167,113 @@ with negative assertions, absence checks, or runtime guards. Record the final
 one-time removal sweep as an acceptance reading, following principle 7 in
 `AGENTS.md`; Git history retains the removed implementation.
 
+<a id="focus-aware-toolbar-voice-input"></a>
+### Dictate into the focused title or the content from the toolbar
+
+**Identity:** SEED-066#focus-aware-toolbar-voice-input
+```json dough-story-state
+{"schemaVersion":1,"refinement":"refined","approach":"unselected"}
+```
+
+**Goal:** For authors editing an existing note, use the toolbar microphone to
+dictate into the title when it has focus, or into the content otherwise, with
+the caret or selection determining where the words land.
+
+**Scope:**
+
+- Capture whether the title has focus immediately before the toolbar voice
+  input action. The toolbar click itself must preserve that targeting decision
+  and the title's caret or selection even if it moves browser focus.
+- With title focus, insert dictated words at the title caret, or replace only
+  the selected title text. Selecting the whole title permits replacing it all.
+  Preserve the rest of the title and save through the ordinary title path.
+- Otherwise, use the existing content voice-input journey and its insertion
+  rules. Previously focusing the title does not keep it as the target after
+  focus has moved elsewhere.
+- Keep the chosen field and insertion target for the session, including its
+  read-only behavior and pending insertion feedback.
+- Delete the separate microphone button/icon beside an existing note's title,
+  with its exclusively used code, styles, helpers, fixtures, and tests; apply
+  the product-wide removal sweep described above. Shared title dictation code
+  stays where the toolbar or New note still needs it.
+- New note's spoken-title journey and AI wording refinement are outside this
+  story's delivery scope; title-aware wording is the separate story below.
+
+**Key examples:**
+
+- Existing title "Orchard notes", caret after "Orchard": click toolbar Voice
+  input, dictate "harvest" → "Orchard harvest notes", saved after reload.
+- Existing title "Spring orchard notes", select "Spring": click toolbar Voice
+  input, dictate "Autumn" → "Autumn orchard notes"; the surrounding words stay.
+- Select the whole existing title, then dictate from the toolbar → the spoken
+  text becomes the title.
+- Focus the content editor after editing the title, then start toolbar Voice
+  input → words land at the content's insertion point and are saved there.
+- Open an existing note without focusing its title, then use toolbar Voice
+  input → the existing content dictation journey runs.
+
+- **Evaluation:** Use the toolbar with a title caret, a title selection, and
+  content focus; confirm the saved words land in the chosen field and position.
+- **Value / learning:** One familiar microphone action follows the author's
+  current editing intent.
+- **Effort hypothesis:** M (1–2 hours), medium confidence; focus capture and
+  shared session controls need examination before execution planning.
+- **Depends on:** none; title and content dictation already exist.
+- **Safe stopping point:** Toolbar targeting is useful with today's dictated
+  wording, independently of the title-specific AI instruction story.
+
+<a id="title-aware-voice-refinement"></a>
+### Refine dictated titles with title-aware wording and punctuation
+
+**Identity:** SEED-066#title-aware-voice-refinement
+```json dough-story-state
+{"schemaVersion":1,"refinement":"refined","approach":"unselected"}
+```
+
+**Goal:** For authors speaking a note title, produce wording and punctuation
+suited to a concise title while preserving their intended meaning and control
+over the existing title.
+
+**Scope:**
+
+- Tell the AI explicitly that the dictated text is for a note title, including
+  when it will be inserted into or replace a selected part of an existing title.
+- Ask for concise title wording while preserving the speaker's meaning and
+  substantive details. Concision is guidance for refining the dictated words,
+  not authority to truncate the title, impose a length limit, or discard ideas.
+- Ordinarily omit a sentence-ending period. Preserve appropriate punctuation,
+  including a question mark when the author speaks a question as the title;
+  do not apply a blanket punctuation-removal rule.
+- Keep existing title text outside the selected replacement range intact.
+  A caret insertion or partial selection does not authorize rewriting or
+  shortening the whole title.
+- Apply the title-aware instruction to supported title voice-input journeys,
+  including New note. Content dictation keeps its content-oriented instruction.
+  Toolbar targeting belongs to the separate story above.
+
+**Key examples:**
+
+- Speak "Orchard harvest planning" as a whole title → a concise faithful title
+  such as "Orchard harvest planning", without an added terminal period.
+- Speak "Why do apples ripen unevenly?" as a title → retain the question and
+  its question mark.
+- Title "Spring orchard notes", select "Spring", dictate "Autumn" → refine
+  the spoken replacement as title text and save "Autumn orchard notes".
+- Dictate a title with several meaningful details → preserve those details
+  even if the resulting title is longer than a typical title.
+
+- **Evaluation:** Review saved spoken titles for ordinary phrases, questions,
+  partial edits, and detailed speech; verify title-appropriate wording preserves
+  meaning and the text outside the replacement range.
+- **Value / learning:** Spoken titles need less punctuation cleanup while the
+  author retains control of their wording and information.
+- **Effort hypothesis:** S (30–60 minutes), medium confidence; verify the
+  current title refinement path before choosing the instruction change.
+- **Depends on:** none; the existing spoken-title journey can receive the
+  instruction independently of toolbar targeting.
+- **Safe stopping point:** Title-aware refinement improves existing title
+  voice input even if the toolbar targeting story is deferred.
+
 ## Ordering and Scope Reduction
 
 The owner accepted the original nine-story order on 2026-10-03. The product backlog
@@ -185,6 +295,10 @@ On 2026-10-10 the owner placed the three UI stories at the top of the
 backlog in their stated order: simpler controls/feedback with cadence-cost
 analysis, one-button body dictation, then title styling and spoken editing.
 No blocking dependency is inferred from shared recording code or that order.
+
+On 2026-10-11 the owner queued focus-aware toolbar voice input followed by
+title-aware voice refinement. They are independently valuable; their stated
+order does not create a blocking dependency.
 
 ## Open Decisions for Later Work
 
@@ -230,6 +344,10 @@ No blocking dependency is inferred from shared recording code or that order.
 
 ## Breadcrumbs
 
+- Owner's two-story request, 2026-10-11: remove the existing-title microphone
+  and route toolbar voice input by title focus; separately instruct the AI to
+  refine speech as a concise title with suitable punctuation, without authority
+  to truncate its content. Authorized capture directly on main and sync origin.
 - Owner's voice-input problem report, 2026-10-03, in this conversation.
 - Owner's acceptance of all nine proposed stories and their priority, with
   authorization to record them on main and sync origin, 2026-10-03.
