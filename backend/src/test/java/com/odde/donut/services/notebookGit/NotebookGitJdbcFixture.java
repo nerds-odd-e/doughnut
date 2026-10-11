@@ -1,6 +1,7 @@
 package com.odde.donut.services.notebookGit;
 
 import com.odde.donut.services.notebookGit.objectstore.JdbcNotebookGitRepository;
+import com.odde.donut.testability.UnitTestDatasource;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -29,9 +30,7 @@ public final class NotebookGitJdbcFixture implements AutoCloseable {
   public Connection openConnection() throws SQLException {
     String url = System.getenv("SPRING_DATASOURCE_URL");
     if (url == null || url.isBlank()) {
-      url =
-          "jdbc:mysql://127.0.0.1:3309/doughnut_test"
-              + "?connectionTimeZone=UTC&forceConnectionTimeZoneToSession=true";
+      url = UnitTestDatasource.DEFAULT_URL;
     }
     Connection connection = DriverManager.getConnection(url, "doughnut", "doughnut");
     openConnections.add(connection);

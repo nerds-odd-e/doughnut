@@ -6,7 +6,7 @@ released response is not proof of effectiveness. Unknown provenance stays unknow
 [Response status](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/finding-names.md).
 Full pre-trim evidence: `8830c682704aac3bbb34bf9b1204da8feba042ca:DearDough.md`. Older narratives live in Git, not a second archive.
 
-- Highest allocated local number: 227. Removed local codes are never reused.
+- Highest allocated local number: 230. Removed local codes are never reused.
 
 Detailed retained observations are consolidated in the linked Open Dough
 record; headings and former local aliases preserve traceability. Review date:
@@ -406,3 +406,45 @@ Plan 065 slice 5 listed "no `[role="status"]` anywhere" among its proof for remo
   - Evidence: `7d062d701f:.planning/slice-plans/065-unobtrusive-spoken-title/PLAN.md` slice 5 Proof; `CLAUDE.md` principle 7 ("no check that it is absent"); the coordinator's slice 5 brief ("principle 7 overrides that: do not add absence assertions"); slice 5 return, decision 2
   - Observed effect: the coordinator caught it while writing the brief and the test was not written; the plan had passed slice planning and a readiness assessment with the instruction in it
   - Inference: planning checked the removal as deletion plus sweep in its scope text but not in each slice's proof list
+
+## DD-228 — A plan's observation slice said to remove its scratch changes while the next slice said to keep its test
+
+Plan 066 slice 1 was stop-safe by "record learning and remove scratch changes; no product change ships", and slice 2 said "Retain the real HTTP startup regression from slice 1". The plan did not say where the probe test lives between the two deliveries.
+
+### Occurrences
+- Execution: SEED-067#start-e2e-after-migrations (first implementation commit f297a916c5)
+  - Timestamp: 2026-10-11T09:05:00+09:00
+  - Tool: Claude Code
+  - Model: claude-opus-5-5
+  - Open Dough release: 0.3.58
+  - Evidence: `1a654d0999:.planning/slice-plans/066-migration-aware-http-readiness/PLAN.md` slices 1 and 2; slice 1 brief ("Leave the harness test in the working tree, uncommitted"); commit `0a7ca0a799` (plan only) while `HealthCheckStartupReadinessTest.java` stayed untracked until `f297a916c5`
+  - Observed effect: the coordinator chose to publish a plan-only commit and carry the passing baseline test untracked into slice 2; nothing was lost, and slice 2 reused it without rebuilding
+  - Inference: a test that asserts the defect cannot be committed, so an observation slice followed by its fix has no stated hand-over; an interruption between the two deliveries would have left the only copy in an untracked file
+
+## DD-229 — Slices that only observe or record had no change for the refactor step, and the coordinator skipped it without guidance
+
+Plan 066 slices 1, 3 and 4 delivered only plan records. Slice wrap-up lists a fresh post-change-refactor agent as step 1 of every delivery and names no case with nothing to refactor.
+
+### Occurrences
+- Execution: SEED-067#start-e2e-after-migrations (first implementation commit f297a916c5)
+  - Timestamp: 2026-10-11T09:20:00+09:00
+  - Tool: Claude Code
+  - Model: claude-opus-5-5
+  - Open Dough release: 0.3.58
+  - Evidence: `.claude/skills/dough-execute-plan/references/wrap-up.md` "Deliver the change" step 1; commits `0a7ca0a799`, `fe3a14172b`, `af62c7cd0a` (each one file, the plan); one refactor agent ran, for `f297a916c5`
+  - Observed effect: three deliveries skipped the refactor agent on the coordinator's own judgment; the one refactor that ran found and removed a triplicated datasource URL
+  - Inference: spawning a refactor agent for a plan-only commit would have cost a full agent run for no possible finding; the guidance leaves that as an unstated deviation
+
+## DD-230 — An environment-only Flyway callback with a MySQL named lock held a real startup migration open for full-stack proof
+
+To observe the runner during a migration, the execution supplied `beforeMigrate.sql` through `SPRING_FLYWAY_LOCATIONS` from a directory outside the checkout; the file waited on a named lock that a separate session held and released. No product or test code and no delay option was added.
+
+### Occurrences
+- Execution: SEED-067#start-e2e-after-migrations (first implementation commit f297a916c5)
+  - Timestamp: 2026-10-11T09:18:00+09:00
+  - Tool: Claude Code
+  - Model: claude-opus-5-5
+  - Open Dough release: 0.3.58
+  - Evidence: plan 066 Learnings "Slice 3" and "Slice 4" at `af62c7cd0a`; `sut.log` lines 148 to 234 in the execution worktree (`Executing SQL callback: beforeMigrate`, `Successfully applied 41 migrations`)
+  - Observed effect: both `pnpm e2e:hold` and `pnpm cy:run` were observed returning 503 during the held migration and resetting test data only after the first 200; each slice took about five minutes including startup
+  - Inference: useful practice: a timing fault was proved at the real boundary with a release barrier instead of a sleep or a stand-in response; it depends on the runner passing its environment to the backend, which was confirmed with `ps eww`

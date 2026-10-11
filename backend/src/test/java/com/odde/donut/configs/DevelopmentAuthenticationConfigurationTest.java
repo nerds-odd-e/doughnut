@@ -13,6 +13,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.odde.donut.testability.UnitTestDatasource;
 import jakarta.servlet.http.Cookie;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
@@ -32,8 +33,7 @@ import org.springframework.test.web.servlet.ResultActions;
 
 @SpringBootTest(
     webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
-    properties =
-        "spring.datasource.url=${SPRING_DATASOURCE_URL:jdbc:mysql://127.0.0.1:3309/doughnut_test?connectionTimeZone=UTC&forceConnectionTimeZoneToSession=true}")
+    properties = UnitTestDatasource.URL_PROPERTY)
 @AutoConfigureMockMvc
 @ActiveProfiles("dev")
 class DevelopmentAuthenticationConfigurationTest {

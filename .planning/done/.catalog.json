@@ -2,6 +2,12 @@
   "schemaVersion": 1,
   "records": [
     {
+      "fileName": "SEED-067_start-e2e-after-migrations.json",
+      "identity": "SEED-067#start-e2e-after-migrations",
+      "completedAt": "2026-10-11T00:42:04.641Z",
+      "blob": "daf5bb5515fdec18a1a1cbbd963c06c1598ccdbc"
+    },
+    {
       "fileName": "SEED-066_unobtrusive-selection-aware-spoken-title.json",
       "identity": "SEED-066#unobtrusive-selection-aware-spoken-title",
       "completedAt": "2026-10-10T23:33:27.427Z",

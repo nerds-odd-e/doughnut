@@ -156,6 +156,23 @@ test_retries_then_succeeds_when_stale_commit_then_match() {
 	rm -rf "$work"
 }
 
+test_retries_then_succeeds_when_starting_then_ready() {
+	local work fake_bin curl_count
+	work=$(mktemp -d)
+	trap 'rm -rf "$work"' EXIT
+	fake_bin="$work/fakebin"
+	write_fake_curl "$fake_bin" "Starting" "$(healthcheck_body "$TEST_GIT_SHA")"
+	export CURL_LOG="$work/curl.log"
+	: >"$CURL_LOG"
+	export GITHUB_SHA="$TEST_GIT_SHA"
+	export HEALTHCHECK_RETRY_COUNT=2
+	run_healthcheck "$fake_bin"
+	curl_count=$(grep -c '^curl ' "$work/curl.log")
+	[[ "$curl_count" == "2" ]] || fail "expected 2 curls (retry while starting); got $curl_count"
+	trap - EXIT
+	rm -rf "$work"
+}
+
 test_fails_when_github_sha_unset() {
 	local work fake_bin
 	work=$(mktemp -d)
@@ -198,6 +215,7 @@ main() {
 	test_fails_when_ok_but_commit_does_not_match
 	test_fails_when_ok_but_commit_missing
 	test_retries_then_succeeds_when_stale_commit_then_match
+	test_retries_then_succeeds_when_starting_then_ready
 	test_fails_when_github_sha_unset
 	test_fails_when_response_never_ok
 	echo "ok app-instance-healthcheck.sh tests"
