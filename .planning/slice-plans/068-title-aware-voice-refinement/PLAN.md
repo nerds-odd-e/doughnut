@@ -21,6 +21,21 @@ No additional permanent real-service audio E2E scenario is planned.
 
 ## Workspace and decisions
 
+- Execution established 2026-10-11: Akiho-chan, publisher
+  `dashboard-territory.local-doughnut`, Story Branch Mode; owned execution
+  checkout is the named worktree below, integration/default checkout is
+  `/Users/terryyin/git/doughnut`, remote trunk `origin/main`, increment target
+  `origin/codex/refine-dictated-titles-with-title-aware-wording`.
+  Claim/base `32b131f18e779989c8f7e2651cb482c3485269f1`, execution starting
+  revision `67a193879089732f7093db75f9b27cd1321da76f`.
+  Changed-since-readiness indication retained: toolbar targeting has landed;
+  use its actual supported title caller. Existing scope and Ready still apply.
+  Existing planning authority permits refining remaining work on an overrun.
+  Checkout setup and `./scripts/run.sh pnpm exec biome --version` succeeded.
+  CI source GitHub Actions, verified selector `ci.yml`; Codex observer
+  coordinator `akiho-title`, directory `/tmp/dough-ci-501/watch-4QRYW9`,
+  PID `7600`, yielded cell `3`, session `98491`, observing the execution
+  branch from this checkout. The claim's trunk CI is unobserved.
 - Reuse `/Users/terryyin/git/doughnut/.worktrees/refine-dictated-titles-with-title-aware-wording`,
   branch `codex/refine-dictated-titles-with-title-aware-wording`, preparation
   Rina-chan, starting revision `96e85acfcfee1ec098d20323413b67484fc37079`.
@@ -77,43 +92,16 @@ CLI and MCP have no production audio-conversion caller in the inspected tree.
 
 ## Observations and remaining premises
 
-All observations below were made in the named checkout on 2026-10-11. Reading
-the current call chain establishes its design only; it is not a quality result.
-
-- Ran `CURSOR_DEV=true nix develop -c pnpm frontend:test tests/notes/NoteEditableTitle.spokenTitlePlacement.spec.ts tests/notes/NoteNewForm.spokenTitlePlacement.spec.ts tests/notes/NoteNewForm.spokenTitle.spec.ts`:
-  21/21 passed. Temporarily replaced `SpeakTitleControl`'s `heardSegments` emit
-  with a no-op and ran the same command: 16 failed, including caret, selection,
-  default-title replacement, and rendered transcription. Restored the exact
-  source and reran: 21/21 passed (3.34 seconds Vitest time).
-  These tests discriminate insertion through the real editor with an external
-  API mock. They do not establish model quality or database persistence.
-- The New note test that types a correction before submitting passed even with
-  delivery disabled. It proves typed submission, not spoken-title persistence;
-  slice 3 owns a direct speech-to-submit observation instead.
-- Ran `CURSOR_DEV=true nix develop -c pnpm frontend:test tests/notes/NoteVoiceInputButton.processing.spec.ts`:
-  4/4 passed (2.88 seconds Vitest time), including the exact content request,
-  end timestamp, and originating-realm processing. This is a baseline, not proof
-  that a future contract change preserves content.
-- Executed the unpaid runner prefix with `CURSOR_DEV=true nix develop -c node
-  --input-type=module`, importing `resolveInvocationCheckout`, `resolveSpecs`,
-  `worktreeIsolationApplies`, and `runE2eHold` from their repository modules.
-  `resolveInvocationCheckout({checkoutRoot:process.cwd(),isIsolatedCheckoutFn:worktreeIsolationApplies})`
-  returned `isolated: true`. `resolveSpecs(['--spec',
-  'e2e_test/features/note_creation_and_update/record_live_audio.feature'],
-  process.cwd(),true)` admitted the private OpenAI mock route. The analogous
-  real-service feature selection refused. `runE2eHold` imported successfully.
-  This reaches selection only: provisioning, credentials, authenticated audio
-  upload, and real title results remain slice 1's state-changing/paid probe.
-- Provider documentation and source inspection support prompt transport, but
-  actual wording quality remains unobserved. Slice 1 must settle it before
-  dependent implementation. Saved-state E2E results also remain unobserved;
-  slice 1 validates the disposable runtime route, slice 3 owns their acceptance.
+Historical preparation observations and execution resume context are retained
+in [EVIDENCE.md](EVIDENCE.md). Their proof boundaries remain those stated there;
+the ordered slices below own the remaining observations.
 
 ## Ordered slices
 
 ### 1. Evaluate faithful title wording in one transcription request
 Type: Behavior
-Status: planned
+Status: done
+Accepted proof: [bounded paid comparison](EVIDENCE.md#slice-1-paid-comparison), ten HTTP 200 uploads; provider restored and owned stack stopped.
 Proof: A bounded audio comparison reports actual returned words against the
 source examples; failure stops slices 2 and 3.
 
@@ -238,3 +226,20 @@ separate slice-refinement pass is not needed: the boundaries, proof owners, and
 test/wait exceptions are explicit. The unpaid route stops at provisioning and
 paid access; these are bounded by slice 1, whose failure stops all dependent
 work. No other slice-specific planning concern was identified.
+
+## Story obligations
+
+### G1. Paid quality probe awaits authorization
+Reported: slice 1 — "Model quality, authenticated runtime operation, and isolated provisioning remain unobserved."
+Story clause: "The paid observation is an early probe"
+Disposition: proved by slice 1: EVIDENCE.md#slice-1-paid-comparison
+
+### G2. Saved title and content regression observations follow activation
+Reported: slice 1 — "Actual insertion and persistence belong to slice 3 and were not observed here; content regression remains unobserved."
+Story clause: "Apply the title-aware instruction to supported title voice-input journeys, including New note. Content dictation keeps its existing transcription behavior."
+Disposition: receiving slice 3
+
+### G3. Bounded probe limits
+Reported: slice 1 — "One synthetic voice and one sample per example; both requests capitalize Harvest; no arbitrary-human-audio or latency guarantee was observed."
+Story clause: "For authors speaking a note title, produce wording and punctuation suited to a concise title while preserving their intended meaning and control over the existing title."
+Disposition: no user cost "For authors speaking a note title, produce wording and punctuation suited to a concise title while preserving their intended meaning and control over the existing title.": accepted proof is a bounded example comparison; Harvest preserves the dictated word and meaning, no exact casing rule or general reliability/latency guarantee is promised. Slice 3 still owns insertion and preservation.
