@@ -5095,6 +5095,8 @@ components:
           format: binary
         midSpeech:
           type: boolean
+        titleIntent:
+          type: boolean
     TextFromAudioWithCallInfo:
       type: object
       properties:

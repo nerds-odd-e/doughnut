@@ -39,7 +39,10 @@ class AiAudioController {
       textFromAudioWithCallInfo.setEndTimestamp(processedResult.getEndTimestamp());
     } else {
       textFromAudioWithCallInfo.setSegmentTexts(
-          List.of(otherAiServices.getTextTranscription(filename, bytes).strip()));
+          List.of(
+              otherAiServices
+                  .getTextTranscription(filename, bytes, audioFile.isTitleIntent())
+                  .strip()));
     }
     return textFromAudioWithCallInfo;
   }

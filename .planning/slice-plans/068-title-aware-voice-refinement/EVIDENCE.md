@@ -108,3 +108,42 @@ Held session `81979` ended on Ctrl-C with exit 0, runtime owner absent.
 Fresh refactor agent split historical observations into this file; no product
 edits or invalidated probe proof, whitespace check passed, no tests needed.
 Coordinator selective format passed (planning-only no-op).
+
+## Slice 2 contract and consumers
+
+Slice 1 published `76aec3c8e1641bb5779f5f2c6b3b4136229a7f29` on the
+execution branch, suffix base `32b131f18e779989c8f7e2651cb482c3485269f1`;
+managed delivery reused the recorded observer. Slice 2 adds optional boolean
+`titleIntent`, default false, through real multipart binding to final-text
+transcription. OtherAiServices owns the accepted instruction; the existing
+provider accepts optional prompt. SRT and response shape stay intact.
+
+Terminal passes in this worktree:
+
+```sh
+CURSOR_DEV=true nix develop -c pnpm generateTypeScript
+CURSOR_DEV=true nix develop -c pnpm backend:test_only
+CURSOR_DEV=true nix develop -c pnpm frontend:test
+CURSOR_DEV=true nix develop -c pnpm -C frontend exec vue-tsc --noEmit
+CURSOR_DEV=true nix develop -c pnpm -C frontend exec tsc --noEmit
+CURSOR_DEV=true nix develop -c pnpm openapi:lint
+```
+
+Generation precedes backend tests to satisfy RobotsTests YAML synchronization.
+SDK 4.80 prompt setter accepts String, so transport uses Optional.ifPresent.
+Full backend passed, AiAudioControllerTests XML: 12 cases, zero failures/errors.
+Real MockMvc/external OpenAI capture in titleIntentAsksForFaithfulTitleFragmentWording
+observes true field binding and full accepted instruction. stopAsksTheFastModelForPlainText
+and midSpeechAsksWhisperForSrt observe omitted-intent model, response format and
+empty prompt. stopWritesTheWholeTranscriptionAsOneSegmentWithoutEndTimestamp
+and midSpeechWritesTheTranscriptionOfAllButTheLastSegment prove retained results.
+RobotsTests.openApiDocsMatchCommittedYaml passed.
+Frontend: 338 files, 2146 cases passed, including body exact omitted-intent
+request in NoteVoiceInputButton.processing.spec.ts and supported title callers.
+Both typechecks prove existing callers accept generated titleIntent?: boolean.
+Consumer search across backend/frontend/CLI/MCP/packages/E2E found only shared
+frontend production audio calls; no CLI/MCP conversion caller. E2E mock remains
+compatible; activation and persisted observations stay with slice 3 (G2).
+Coordinator inspected handwritten diffs, generated optional contract, controller
+XML and body request assertion. Fresh refactor: already clean, no edits/tests;
+whitespace check passed. Selective format passed with no semantic change.

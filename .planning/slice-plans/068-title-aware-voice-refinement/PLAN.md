@@ -136,7 +136,8 @@ the candidate must satisfy the examples, not manufacture an improvement claim.
 
 ### 2. Carry title intent through the existing conversion boundary
 Type: Structure
-Status: planned
+Status: done
+Accepted proof: [contract and consumers](EVIDENCE.md#slice-2-contract-and-consumers).
 Proof: Real multipart controller tests capture the selected provider request;
 legacy content responses remain green in the full backend suite.
 
@@ -150,9 +151,9 @@ this slice. Preserve the response shape, SRT continuation, and save ownership.
   the title provider request and assert the behavior-bearing instruction once;
   preserve the ordinary final-text and mid-speech cases with realistic input.
   Provider responses are mocked here; quality evidence belongs to slice 1.
-- Run `CURSOR_DEV=true nix develop -c pnpm backend:test_only` (all backend
-  unit tests, required by the backend skill), then
-  `CURSOR_DEV=true nix develop -c pnpm generateTypeScript`. Generated files
+- Run `CURSOR_DEV=true nix develop -c pnpm generateTypeScript` before
+  `CURSOR_DEV=true nix develop -c pnpm backend:test_only` so the generated
+  YAML matches the changed DTO for `RobotsTests`. Generated files
   are regenerated, never hand-edited. Prove the generated optional contract
   accepts existing callers through the frontend typechecks listed below.
 - Safe stop: current UI behavior is unchanged and all callers still compile;

@@ -21,4 +21,6 @@ public class AudioUploadDTO {
   private MultipartFile uploadAudioFile;
 
   private boolean midSpeech;
+
+  private boolean titleIntent;
 }

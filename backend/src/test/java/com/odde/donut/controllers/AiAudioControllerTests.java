@@ -78,6 +78,32 @@ class AiAudioControllerTests extends ControllerTestBase {
       assertThat(params.getValue().model().asString(), equalTo("gpt-4o-mini-transcribe"));
       assertThat(
           params.getValue().responseFormat(), equalTo(Optional.of(AudioResponseFormat.TEXT)));
+      assertThat(params.getValue().prompt(), equalTo(Optional.empty()));
+    }
+
+    @Test
+    void titleIntentAsksForFaithfulTitleFragmentWording() throws Exception {
+      var params = mockTranscriptionResponse("Why do apples ripen unevenly?");
+
+      mockMvc
+          .perform(
+              multipart("/api/audio/audio-to-text")
+                  .file(
+                      new MockMultipartFile(
+                          "uploadAudioFile", "title.wav", "audio/wav", "test".getBytes()))
+                  .param("midSpeech", "false")
+                  .param("titleIntent", "true"))
+          .andExpect(status().isOk());
+
+      assertThat(
+          params.getValue().prompt(),
+          equalTo(
+              Optional.of(
+                  "Transcribe the spoken words as a note title or title fragment. "
+                      + "Use concise, faithful wording; preserve the speaker's meaning and every substantive detail. "
+                      + "Omit an ordinary sentence-ending period, but retain appropriate punctuation, "
+                      + "including a question mark for a question. "
+                      + "Return only the dictated title fragment; do not invent or rewrite surrounding title text.")));
     }
 
     @Test
@@ -106,6 +132,7 @@ class AiAudioControllerTests extends ControllerTestBase {
 
       assertThat(params.getValue().model().asString(), equalTo("whisper-1"));
       assertThat(params.getValue().responseFormat(), equalTo(Optional.of(AudioResponseFormat.SRT)));
+      assertThat(params.getValue().prompt(), equalTo(Optional.empty()));
     }
 
     @Test
