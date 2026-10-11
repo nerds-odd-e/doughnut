@@ -189,6 +189,25 @@ Behavior: a title session begins → the same marker appears after the title's
 target, using the selection's DOM rect → it disappears when the words land or
 the session ends otherwise. Update `docs/voice-input.md`.
 
+## Execution complete
+
+Product advice:
+
+- Owner decision needed: inserting a link from the link dialog still writes
+  into a body editor during a voice-input session
+  (`NoteEditableContent.vue` inserter), which can shift where the dictated text
+  lands. The story says the editor takes no "other edits"; whether such an
+  insert is refused, held until the session ends, or allowed with the place
+  following it is not decided. Found by reading, not run.
+- Owner confirmation asked for two choices made during execution: words heard
+  before the page moves to another note are dropped from a title session, and
+  the marker's backing patch covers about one character of the text after it.
+- Two candidates outside this story, neither queued: the paste-choice bar may
+  be placed from container-relative Quill bounds, and the two rename scenarios
+  in `record_live_audio.feature` can deliver audio before the recorder has
+  started.
+- No change to the order of the remaining voice-input stories.
+
 ## Current decisions
 
 - One dictation-target contract (begin → handle with insert, anchor, end) on
