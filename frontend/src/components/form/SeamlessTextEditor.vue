@@ -18,6 +18,7 @@
 import { ref, watch, onMounted, nextTick } from "vue"
 import type { DictationTarget } from "@/models/audio/dictationTarget"
 import { dictatedInsertion } from "@/models/audio/joinDictatedSegments"
+import { withMarkerAfterTextOffset } from "./textDictationMarker"
 
 const props = defineProps({
   modelValue: { type: String, required: true },
@@ -147,13 +148,13 @@ const focusWithSelection = ({ start, end }: SelectionOffsets) =>
     }
   })
 
-/** The selection, the end of the text, or the whole text becomes a dictation target and the editor takes no edits until it ends. */
+/** The selection, the end of the text, or the whole text becomes a dictation target and the editor takes no edits until it ends; a marker shows the place meanwhile. */
 const beginDictation = (wholeText: boolean): DictationTarget => {
   let target = wholeText
     ? { start: 0, end: (editor.value!.innerText || "").length }
     : selectionOrEnd()
   dictating.value = true
-  return {
+  const session: DictationTarget = {
     insert: (segments) => {
       target = replaceRange(target, (before, after) =>
         dictatedInsertion(before, segments, after)
@@ -164,6 +165,7 @@ const beginDictation = (wholeText: boolean): DictationTarget => {
       if (placeCaret) focusWithSelection(target)
     },
   }
+  return withMarkerAfterTextOffset(session, editor.value!, () => target.end)
 }
 
 defineExpose({ beginDictation })

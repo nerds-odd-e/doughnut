@@ -18,7 +18,7 @@
       >
         <template #title="{ bindings, editor }">
           <div class="path-name-heading-line flex items-center gap-2">
-            <h2 class="path-name-heading flex-1 min-w-0">
+            <h2 class="path-name-heading relative flex-1 min-w-0">
               <component :is="editor" v-bind="bindings" />
             </h2>
             <SpeakTitleControl

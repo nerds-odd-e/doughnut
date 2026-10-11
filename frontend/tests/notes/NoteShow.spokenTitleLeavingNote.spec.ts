@@ -14,6 +14,7 @@ import {
   titleEditable,
   useSpokenTitleTestLifecycle,
 } from "@tests/notes/spokenTitleTestSupport"
+import { dictationMarker } from "@tests/notes/dictationMarkerTestSupport"
 import { titleEditorEl } from "@tests/notes/noteTextContentTestSupport"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 
@@ -73,6 +74,15 @@ describe("Speaking a title when the author moves to another note", () => {
     expect(noteTitleText(wrapper)).toBe("Pear tree")
     expect(document.activeElement).not.toBe(titleEditorEl(wrapper))
     expectIdleSpeakTitleButton(wrapper)
+  })
+
+  it("clears the pending marker of the title they left", async () => {
+    await speakTheTitle(wrapper)
+    expect(dictationMarker()).not.toBeNull()
+
+    await show(destination)
+
+    expect(dictationMarker()).toBeNull()
   })
 
   it("speaks into the title of the note they arrive at afterwards", async () => {

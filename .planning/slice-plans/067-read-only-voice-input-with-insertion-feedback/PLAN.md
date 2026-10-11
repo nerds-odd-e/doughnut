@@ -179,7 +179,7 @@ no marker (deferred). Update `docs/voice-input.md`.
 
 ### 4. A pending marker shows where the spoken title will land
 Type: Behavior
-Status: planned
+Status: done
 Proof: mounted spoken-title tests on an existing note and in New note (marker
 after the caret, after the selection, after `Untitled`; gone when the words
 land or the session fails); E2E "Create a note by speaking the title" sees the
@@ -263,6 +263,24 @@ the session ends otherwise. Update `docs/voice-input.md`.
   the marker spec). The paste-choice bar may be placed from container-relative
   numbers; not run, not changed here.
 
+- Slice 4: the title's marker is `withMarkerAfterTextOffset` in
+  `frontend/src/components/form/textDictationMarker.ts`, hosted on the
+  positioned element around the title editor. The title sections of the
+  documentation moved to `docs/voice-input-spoken-title.md` to keep
+  `docs/voice-input.md` within the file-size limit.
+- Slice 4 accepted proof: `NoteEditableTitle.spokenTitleMarker.spec.ts` (with
+  the reduced-motion observation through `cdp()` media emulation),
+  `NoteNewForm.spokenTitleMarker.spec.ts`,
+  `NoteShow.spokenTitleLeavingNote.spec.ts`, whole frontend suite (339 files,
+  2149 tests), typechecks, and `record_live_audio.feature` 5 of 5 with "Create
+  a note by speaking the title" seeing the marker while listening and not
+  after.
+- Slice 4 finding outside this story: one early run of "Create a note by
+  speaking the title" failed when the audio step ran before the recorder had
+  started (`deliverAudioToWorklet`); the scenario now waits for the marker
+  first. The two rename scenarios still go from the Speak click straight to
+  the audio step and keep that exposure.
+
 ## Execution
 
 Story Branch Mode in
@@ -326,7 +344,7 @@ Disposition: proved by slice 2: `frontend/tests/notes/NoteShow.spokenTitleLeavin
 ### G11. Reduced-motion stillness has no observation
 Reported: slice 3 — "Reduced motion: `motion-reduce:animate-none` on each dot. **Not tested** (no media emulation in the suite)."
 Story clause: "it stands still when the author prefers reduced motion"
-Disposition: receiving slice 4
+Disposition: proved by slice 4: `frontend/tests/notes/NoteEditableTitle.spokenTitleMarker.spec.ts`, "has dots that pulse, and stand still under that preference", reads the dots' computed animation with and without the emulated preference
 
 ### G12. Repositioning on a width change is not observed
 Reported: slice 3 — "The `ResizeObserver` reposition on width change is untested."
@@ -334,7 +352,7 @@ Story clause: "After each arriving passage it follows to the end of that passage
 Disposition: no user cost "show that place with inline pending feedback until the text has arrived": the story asks the marker to follow arriving passages, which is proved; following a resized window is an addition whose absence would cost only a marker a little off until the next passage
 
 ### G13. The marker is kept out of copied text by construction
-Reported: slice 3 — "\"Never part of copied text\" is by construction only (no characters, `select-none`); no copy test."
+Reported: slice 3 — "Never part of copied text is by construction only (no characters, `select-none`); no copy test."
 Story clause: "It is temporary feedback: never saved, never part of copied or exported text."
 Disposition: proved by slice 3: `frontend/src/components/form/dictationMarker.ts` builds a marker with no characters outside `.ql-editor`, and `frontend/tests/notes/NoteVoiceInputButton.pendingMarker.spec.ts` asserts the editor text and saved content exact while it shows
 
@@ -352,3 +370,13 @@ Disposition: no user cost "show that place with inline pending feedback until th
 Reported: slice 3 — "They sit on a small rounded patch of `bg-base-100` so they stay readable over the following text; the patch covers roughly one character width of that text during the session."
 Story clause: "The indicator marks the exact insertion location inside the text, in the text's own style"
 Disposition: no user cost "show that place with inline pending feedback until the text has arrived": an overlay cannot push text aside without becoming editor content, the covered character returns when the session ends, and the dots take the text's colour and line height
+
+### G17. An emptied title's marker settles one frame late
+Reported: slice 4 — "The marker is placed before Vue applies the read-only attribute, so it is about 10px low until the host's `ResizeObserver` fires on the next frame."
+Story clause: "An animated indicator sits immediately after the target"
+Disposition: proved by slice 4: `frontend/tests/notes/NoteNewForm.spokenTitleMarker.spec.ts`, "sits where the first character of a title the author emptied will be drawn, leaving it empty", observes the settled position
+
+### G18. Title markers are not observed in the rename journeys
+Reported: slice 4 — "Title markers on the two E2E rename scenarios."
+Story clause: "Speak the title → the title takes no typing and the indicator sits after"
+Disposition: proved by slice 4: `frontend/tests/notes/NoteEditableTitle.spokenTitleMarker.spec.ts` observes the existing-note marker's position, both endings, and the saved title in a real browser

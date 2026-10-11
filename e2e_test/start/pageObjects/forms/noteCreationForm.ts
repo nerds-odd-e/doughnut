@@ -1,5 +1,8 @@
 import { form, submittableForm } from '../../forms'
 import { assumeAssociateWikidataDialog } from '../associateWikidataDialog'
+import { arrivalMarker } from '../dictationArrivalMarker'
+
+const newNoteForm = () => cy.findByTestId('note-new-form')
 
 const noteCreationForm = {
   submit() {
@@ -24,6 +27,16 @@ const noteCreationForm = {
 
   stopSpeakingTheTitle() {
     cy.findByRole('button', { name: 'Stop speaking the title' }).click()
+    return this
+  },
+
+  expectArrivalPlaceMarkedInTitle() {
+    newNoteForm().find(arrivalMarker).should('be.visible')
+    return this
+  },
+
+  expectNoArrivalPlaceMarkedInTitle() {
+    newNoteForm().find(arrivalMarker).should('not.exist')
     return this
   },
 

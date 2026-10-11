@@ -1,4 +1,5 @@
 import { waitUntilAppIsNotBusy } from '../pageBase'
+import { arrivalMarker } from './dictationArrivalMarker'
 import {
   clickToolbarOverflowAction,
   noteToolbar,
@@ -6,8 +7,6 @@ import {
 } from './noteToolbarOverflow'
 
 const retryTitle = 'Retry turning your speech into text'
-
-const arrivalMarker = '[data-testid="dictation-marker"]'
 
 const voiceInputPage = () => {
   return {

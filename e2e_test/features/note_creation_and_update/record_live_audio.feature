@@ -43,9 +43,11 @@ Feature: Record live audio onto a note
     Given the OpenAI transcription service will return the text "Photosynthesis in desert plants." when I stop
     When I am creating a note in the notebook "DS lecture"
     And I speak the title
-    And the browser records audio input from the microphone as in "lecture.wav"
+    Then the place where my spoken title will arrive should be marked in the Title field
+    When the browser records audio input from the microphone as in "lecture.wav"
     And I stop speaking the title
     Then the Title field should read "Photosynthesis in desert plants."
+    And no place should be marked in the Title field
     When I submit the new note
     Then I should see the note "Photosynthesis in desert plants."
 

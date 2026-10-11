@@ -9,7 +9,7 @@
       <div
         class="path-name-editor-join-editor daisy-join-item donut-field-control-surface flex flex-1 min-w-0 items-center px-3 py-2"
       >
-        <div class="w-full min-w-0">
+        <div class="relative w-full min-w-0">
           <slot name="title" :bindings="seamlessBindings" :editor="SeamlessTextEditor">
             <SeamlessTextEditor v-bind="seamlessBindings" />
           </slot>

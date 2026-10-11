@@ -53,6 +53,17 @@ When('I stop speaking the title', () => {
   noteCreationForm.stopSpeakingTheTitle()
 })
 
+Then(
+  'the place where my spoken title will arrive should be marked in the Title field',
+  () => {
+    noteCreationForm.expectArrivalPlaceMarkedInTitle()
+  }
+)
+
+Then('no place should be marked in the Title field', () => {
+  noteCreationForm.expectNoArrivalPlaceMarkedInTitle()
+})
+
 Then('the Title field should read {string}', (title: string) => {
   noteCreationForm.expectTitle(title)
 })
