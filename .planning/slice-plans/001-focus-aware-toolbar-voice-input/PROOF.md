@@ -46,7 +46,7 @@ claimed existing behavior. Future tests must drive actual focus transitions,
 not preseed a target or mock in-process session routing. No unobserved external
 premise or early probe is needed for this approach.
 
-## Outside-in proof ownership
+## Original outside-in proof ownership (before refinement)
 
 Use mounted `NoteShow` with real toolbar, title/content editors, dropdown and
 store for routing proof; mock only allowed device boundaries and backend HTTP.
@@ -116,3 +116,20 @@ departure, destination text/editability and the next recording. No product
 refactor edits invalidated proof. Whitespace check and selective formatting
 passed. Hardware capture is outside this plan; toolbar persistence belongs to
 slice 2. Startup target capture remains slice 2.
+
+Published slice 1: `a3a2bb2bdec58f3720063d4be74f72ebc77de0e7` accepted on
+`origin/codex/dictate-into-the-focused-title-or-the-content-fr`, with suffix
+base `c69216321ab713b1566725628164b9064331ad52`, no replay. Managed delivery
+reused `/tmp/dough-ci-501/watch-DeZNG8`; CI remains asynchronous.
+
+## Current proof ownership after refinement
+
+Slice 2 preserves shared title behavior and delayed startup capture. Slice 3
+owns clean title caret/partial/whole insertion, frozen session, next content
+choice and persisted caret reload. Slice 4 owns typed linked draft/save choice,
+all title recovery/read-only/marker/accessibility/reduced-motion observations
+through the toolbar, and persisted linked rename/reference reload. Slice 5 owns
+keyboard/overflow, unrelated focus, draft/start failure through navigation and
+narrow active Stop. Slice 6 owns the single existing-note entry point, surviving
+New note/body journeys and one-time deletion sweep. The original table above
+is provenance; these current owners and the plan govern execution.

@@ -172,7 +172,7 @@ one-time removal sweep as an acceptance reading, following principle 7 in
 
 **Identity:** SEED-066#focus-aware-toolbar-voice-input
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/001-focus-aware-toolbar-voice-input/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"8e15fa6c00a082fd3e35d00d000470954f39dcf70323348e355c7c2975608953","plan":"1870198d7db24100a81b5b93889d5547e0d504dfcee1dc94c6c22630c7f10ea3"}}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/001-focus-aware-toolbar-voice-input/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"8e15fa6c00a082fd3e35d00d000470954f39dcf70323348e355c7c2975608953","plan":"311673ec9729ccddc508be6c1fadd172170b7e31936292a60a20099f7e64d851"}}
 ```
 
 **Goal:** For authors editing an existing note, use the toolbar microphone to

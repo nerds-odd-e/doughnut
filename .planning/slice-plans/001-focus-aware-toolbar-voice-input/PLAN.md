@@ -54,30 +54,7 @@ Keep the destination rule independent of how the action is reached: pointer,
 keyboard, or the portaled overflow menu. Existing Stop and content Retry operate
 their active journey rather than making a new title/content choice.
 
-PFE covered frontend editors/toolbar/recording/saving, tests/E2E support, docs and CLI/MCP/API:
-
-| Responsibility | Existing solution and decision |
-| --- | --- |
-| Caret/selection insertion, joining, locking, marker and caret restoration | Reuse `DictationTarget`, `SeamlessTextEditor.beginDictation`, `PathNameEditor`, and `useTitleDictation`. Do not create another title-string splice or selection model. |
-| Title recording and conversion on Stop | Modularize the lifecycle currently inside `SpeakTitleControl` so the current control and the toolbar can invoke the same title-session owner. Keep New note on the same behavior. |
-| Content recording, mutation admission and retry | Reuse `useNoteVoiceInput`, `useNoteAudioProcessing`, and `noteContentMutationBarrier`; content retry retains its existing insertion rules. These are body-specific policies, not a reason to route titles through body saving. |
-| Title validation and persistence | Reuse `NoteEditableTitle` → `PathNameEditor` → `TextContentWrapper` → note store. Preserve explicit reference handling and ordinary normalization. Extend draft lifetime only for the authorized toolbar journey/session. |
-| Toolbar access and active control | Extend `NoteToolbarMoreOptions` / `NoteMoreOptionsActions` / `NoteVoiceInputButton`; retain active-action pinning and the real dropdown's focus lifecycle. |
-| Choosing the focused field | Gap: the toolbar currently starts only content recording. Connect the title editor and toolbar through the existing note-page ownership boundary; avoid an app-wide editor registry or a second transcription service. |
-
-The cumulative design is one targeting rule plus the existing field-specific
-recording policies. Slice boundaries below are delivery steps, not separate
-recognizers or permanent implementations. Sharing the title lifecycle is
-immediately required by the next slice, not speculative infrastructure.
-
-Applicable Accepted decisions (index and in-file status agree):
-
-- [ADR 0002 — Git-native Portable notebook tree synchronization](../../../docs/adrs/0002-git-native-portable-notebook-synchronization-accepted.md): use ordinary accepted title/content writes, preserving the publication boundary.
-- [ADR 0004 — OKF-compatible notebook Markdown](../../../docs/adrs/0004-okf-compatible-notebook-markdown-accepted.md#titles-filenames-body): preserve ordinary title/name semantics and normalization.
-- [ADR 0005 — Web routes](../../../docs/adrs/0005-web-routes-accepted.md): navigation proof uses production named routes and existing page objects.
-- [ADR 0006 — Failure handling](../../../docs/adrs/0006-failure-handling-accepted.md#usage): preserve deliberate microphone/conversion feedback and recovery; add no generic swallowed failures.
-- [ADR 0007 — Environments and isolation](../../../docs/adrs/0007-environments-and-isolation-accepted.md): use this worktree's disposable E2E allocation.
-- [North Star: One real-service audio test](../../NORTH-STAR.md#one-real-service-audio-test): new E2E coverage uses mocked OpenAI services. No paid observation is required.
+Existing-solution decisions and Accepted ADR constraints remain in [CONTEXT.md](CONTEXT.md).
 
 ## Proof
 
@@ -89,12 +66,12 @@ retain the original evidence and the owning slice for each promise.
 ### G1. Capture before microphone startup
 Reported: slice 1 — "Startup still establishes insertion only after successful microphone startup, as before."
 Story clause: "Capture whether the title has focus immediately before the toolbar voice input action."
-Disposition: receiving slice 2
+Disposition: receiving slice 3
 
 ### G2. Persist the toolbar title journey
 Reported: slice 1 — "These observations prove mounted behavior and request payloads, not hardware capture or persisted reload."
 Story clause: "click toolbar Voice input, dictate "harvest" → "Orchard harvest notes", saved after reload."
-Disposition: receiving slice 2
+Disposition: receiving slice 3
 
 ## Ordered slices
 
@@ -116,104 +93,102 @@ Run the focused baseline command in observation 3 and frontend typechecks.
 This is safe to stop with all existing controls unchanged. Target ~5 minutes
 including focused proof and cleanup; no further preparatory framework.
 
-### 2. Dictate into the title from the toolbar
+### 2. Own the existing title session at the note-page boundary
+
+Type: Structure
+Status: planned
+Proof: Retained title/New note/departure suites and both typechecks preserve
+conversion on Stop, insertion, cleanup, read-only/marker and recovery.
+
+Place the existing single title session where the note page can share it with
+its toolbar, retaining the existing title control. Capture the insertion range
+synchronously when starting, before microphone startup, using `DictationTarget`;
+failed startup restores editing. Do not add another recorder, splice algorithm
+or app-wide registry. This only enables slice 3's immediate toolbar consumer.
+Use existing mounted title observations and one delayed-start title case to
+observe the captured range. Target ~5 minutes; hard 10 except measured proof wait.
+
+### 3. Dictate into a clean title from the visible toolbar
 
 Type: Behavior
 Status: planned
-Proof: New mounted `NoteShow` targeting cases, adapted title session/recovery
-cases, and updated mocked-audio E2E title scenarios reach the real toolbar.
+Proof: Mounted `NoteShow` real toolbar/editor/store plus mocked-audio caret E2E
+and reload; both typechecks. Reuse the parked red examples in [ATTEMPT.md](ATTEMPT.md).
 
-Behavior: An editable existing title with a caret or selection → activate the
-visible toolbar Voice input action → title speech inserts at that captured
-position on Stop, preserving surrounding text and the ordinary save path.
-Otherwise start the existing content journey. Freeze the field and range
-before pointer focus transfer and asynchronous microphone startup; a failed
-startup leaves the author's draft editable. Stop continues the captured
-session even if focus moved. Preserve feedback, conversion policy, navigation
-cleanup, and content Retry. A new recording evaluates focus again.
+A clean existing title caret/partial/whole selection → visible toolbar Voice
+input → Stop inserts at the frozen range with ordinary saving. Pointer focus
+transfer and delayed startup do not redirect it; read-only/marker and finishing
+feedback remain attached to the title. Stop continues that session after focus
+moves; a new content-focused or initially unfocused recording chooses content.
+Both current controls share the active title owner. Keyboard/overflow journey
+and typed referenced drafts remain owned by slices 4–5; do not claim them here.
+Use actual focus transitions, no target preseed/in-process mocks. Extend only
+the clean-title E2E case to “Orchard harvest notes” with reload; retain body and
+New note scenarios. Run focused baseline + new page spec, E2E feature and both
+typechecks. New cases must be observed red before implementation.
+Target 5–8 minutes; hard 10 except measured focused-test/stack wait.
 
-Integrate referenced-title draft lifetime with this journey: the toolbar is
-outside the current title wrapper, so preserve a typed draft while starting,
-recording, and stopping; then let the author make the existing reference-save
-choice. Leaving that editing journey normally still uses the existing discard
-behavior. Test a draft containing typed changes as well as a clean saved title.
-
-Extend `record_live_audio.feature`'s existing-note cases to toolbar actions
-without changing New note steps. Use a title caret example ("Orchard notes" +
-"harvest" → "Orchard harvest notes") and the linked-title save choice, with
-explicit reload and resulting title/reference assertions. Keep whole and
-partial selection variations in mounted proof. The existing body scenarios
-continue to prove persisted content and retry.
-
-Run observation 3's focused command plus the new note-page spec, observation 4's
-E2E command, and frontend typechecks. Verify each new case red before its
-implementation and green afterward; do not substitute test setup for routing.
-
-Interim behavior: the separate title control remains available; keyboard and
-overflow title activation are completed in slice 3. Both visible controls use
-the same active title lifecycle, so they cannot create overlapping recordings.
-Slice 4 removes the redundant control. Target 5–8 minutes of implementation,
-focused verification and cleanup, scrutinized because of referenced-title blur;
-slice 1 removes the recording extraction from this step. Only measured focused
-test/stack wait may extend beyond 10 minutes; implementation overrun triggers
-finer decomposition before continuing.
-
-### 3. Keep title intent while reaching the toolbar action
+### 4. Preserve the typed referenced-title draft and recovery
 
 Type: Behavior
 Status: planned
-Proof: Mounted note-page keyboard/overflow scenarios with the real dropdown,
-selection and typed referenced-title draft; observe final title/save choice and
-the next content session rather than an internal target flag.
+Proof: Mounted direct toolbar draft/save-choice/recovery cases and linked rename
+E2E with reload, plus baseline consumer suites and both typechecks.
 
-Behavior: Select "Spring" in "Spring orchard notes" → reach Voice input by
-keyboard through the toolbar or through its "more options" menu, speak
-"Autumn", Stop → "Autumn orchard notes". Enter/Space activation and pointer
-opening of overflow share the same target rule. The dropdown's portaled panel
-belongs to that journey; opening/closing it must not clear or redirect title
-intent. Preserve the current typed draft and selection during that transition
-and through a microphone-start failure. Keep the active Stop action reachable
-on a narrow toolbar.
+Typed referenced-title draft + selection → direct toolbar start/Stop → preserve
+surrounding typed text and show ordinary explicit reference-save choice. Failed
+microphone startup, silent speech, empty response and failed conversion restore
+editing and preserve the draft; a fresh recording succeeds. Conversion keeps
+read-only/marker/finishing feedback until words arrive, with accessible control
+and reduced-motion marker behavior. Leaving the journey normally retains the
+existing discard rule. Extend the linked E2E toolbar case with explicit choice,
+reload and visible reference assertion; New note/body/retry remain preserved.
+Add red cases first; reuse existing title feedback rules through the actual
+note-page toolbar. No title retry/retained audio or wording/cadence changes.
+Target 5–8 minutes; hard 10 except measured focused-test/stack wait.
 
-Moving focus to content or another unrelated destination before starting clears
-title intent. Later activation then follows existing content insertion rules.
-Moving to a different note also starts with that note's own intent. Extend the
-same routing model from slice 2, not a keyboard-specific recorder or cache.
-
-Run the new navigation spec, observation 3's focused command, and frontend
-typechecks. Verify the new navigation cases fail before the behavior is added.
-Safe stopping point: all supported toolbar routes work; slice 4 only completes
-the single-control outcome and cleanup. Target ~5 minutes, up to 8 after
-scrutiny for real focus and portal transitions; apply the same hard-limit rule.
-
-### 4. Use the toolbar as the existing-note voice entry point
+### 5. Keep title intent while reaching the toolbar action
 
 Type: Behavior
 Status: planned
-Proof: All retained toolbar title/content and New note journeys pass, including
-the focused mocked-audio E2E feature. Complete the one-time removal reading.
+Proof: Real mounted focus/keyboard/portaled overflow transitions, typed linked
+ draft and failed-start recovery; next content session, baseline + typechecks.
 
-Behavior: An author on an editable existing note uses the toolbar for either
-field; New note still offers its spoken-title control. Delete the separate
-existing-title microphone and recursively remove everything exclusive to it.
-Move surviving title behavior coverage to the actual toolbar boundary; delete
-tests of the removed presentation. Preserve New note's shared control/session,
-fixtures and behavior. Do not add tests or guards asserting the old control is
-absent.
+Select “Spring” in “Spring orchard notes” → reach Voice input by keyboard or
+more options → Enter/Space or pointer activation → Stop yields “Autumn orchard
+notes”. One targeting rule owns all routes. Preserve draft/range through menu
+open/close and startup failure; pin active Stop in a narrow toolbar. Content or
+unrelated focus clears intent; another note has its own intent. Observe new
+cases red first, then final title/save-choice and next content session, without
+an internal target assertion. Safe stop: all supported toolbar routes work.
+Target 5–8 minutes; hard 10 except measured focused-test/stack wait.
 
-Sweep backend, frontend, CLI, MCP, docs, comments, guidance and generated
-artifacts for obsolete existing-title-control references. Update
-`docs/voice-input.md` and `docs/voice-input-spoken-title.md` to describe the final
-focus rule, toolbar journey and field-specific feedback; remove obsolete
-descriptions rather than retaining historical notes. Shared New note names
-remain valid. Record a one-time search/read result for the actual deleted
-exclusive symbols and obsolete descriptions as acceptance reading, not a test.
+### 6. Use the toolbar as the existing-note voice entry point
 
-Run the full frontend suite (shared control and test-helper consumers span New
-note, note page and toolbar), frontend typechecks, and observation 4's E2E
-command. If component inventory changes, regenerate it with the frontend skill's
-Vite build command. Target ~5 minutes plus measured verification wait; no new
-behavior or subsystem refactor is hidden in cleanup.
+Type: Behavior
+Status: planned
+Proof: Full frontend suite, both typechecks, mocked-audio E2E feature; one-time
+product removal reading. Regenerate component inventory through Vite build.
+
+Delete the separate existing-title microphone and recursively delete exclusive
+code/styles/helpers/fixtures/tests. Retain New note's spoken-title control and
+shared behavior. Move surviving title coverage to the actual toolbar boundary;
+no tests/guards asserting the removed control's absence. Sweep backend/frontend,
+CLI/MCP/docs/comments/guidance/generated artifacts for deleted exclusive symbols
+and obsolete descriptions. Update `docs/voice-input.md` and
+`docs/voice-input-spoken-title.md` with final focus/toolbar/field feedback rules.
+Record the sweep as a reading. No new behavior hides in cleanup. Target ~5
+minutes plus measured proof wait; hard 10 for implementation/cleanup.
+
+## Refinement decision
+
+Original slice 2 stopped before production edits; its red spec and sizing
+failure are retained in [ATTEMPT.md](ATTEMPT.md). Six total slices replace the
+original four. The single title session and one destination rule remain the
+cumulative design. Separate ownership/capture, clean-title use, referenced-draft
+policy, toolbar navigation and removal each have one proof loop. Slice 1 stays
+delivered. No source scope, ADR or North Star decision changed. Execution can
+resume after publishing this refinement; the existing Taken claim is retained.
 
 ## Verification and delivery gates
 
