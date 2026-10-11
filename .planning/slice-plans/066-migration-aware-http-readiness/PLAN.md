@@ -104,7 +104,7 @@ Stop-safe: record learning and remove scratch changes; no product change ships.
 
 ### 2. The application reports startup readiness through HTTP
 Type: Behavior
-Status: planned
+Status: done
 Proof: slice 1's actual HTTP pending → ready case fails with unconditional
 success and passes with the readiness gate; ordinary ready HTTP cases preserve
 status, text, profile, commit and access. Run all backend tests and affected
@@ -361,3 +361,55 @@ this way delayed the same probe from 5.68s to 10.79s. Not yet observed: the
 named-lock hold and release, and the variable reaching the `bootRunE2E` JVM
 through `pnpm e2e:hold` / `pnpm cy:run`; slice 3 confirms both before relying
 on them.
+
+### Slice 2: the healthcheck follows Boot readiness
+
+`HealthCheckController.ping()` returns 503 `Starting` until
+`ApplicationAvailability` reports `ACCEPTING_TRAFFIC`, then 200 with the
+unchanged text. Accepted proof on the delivered content:
+
+- `HealthCheckStartupReadinessTest` over real HTTP with the `e2e` profile: 503
+  `Starting` while the migration is held, 200 ready text after startup, in the
+  order migration entered, healthcheck 503, migration completed, startup
+  completed, healthcheck 200. Before the controller change it failed with
+  `Expected: is <503> but: was <200>`.
+- `HealthCheckControllerTest` through MockMvc with no credentials: 200 and the
+  exact `OK. Active Profile: test. Commit: <build commit>`. The shared test
+  context is really in `ACCEPTING_TRAFFIC`; no readiness mock was needed.
+- `CURSOR_DEV=true nix develop -c pnpm backend:test_only`: 2736 tests, 0
+  failures. Frontend tests (2105), both frontend typechecks,
+  `test:sut-healthcheck` (17), `test:sut-start` (72),
+  `test:browser-worktree-isolation` (112), `scripts/dev-healthcheck.test.mjs`
+  (4), `test:development-stack` (18) and both infra shell tests passed.
+- `pnpm generateTypeScript` produced no diff: `ping` stays a 200 string
+  response and the 503 is not declared in OpenAPI.
+
+The refactor pass gave the Unit Test datasource URL one test-support home,
+`com.odde.donut.testability.UnitTestDatasource`, used by the readiness probe,
+`DevelopmentAuthenticationConfigurationTest` and `NotebookGitJdbcFixture`.
+
+For slices 3 and 4: the dev-login page and the E2E login steps call the
+healthcheck and would see 503 before readiness. The runner's wait comes first,
+so check there first if a login step fails.
+
+## Story obligations
+
+### G1. Ready dev and prod text is not requested over HTTP
+Reported: slice 2 — "dev/prod ready text is not exercised over HTTP."
+Story clause: "A ready `dev` or `prod` application is checked → HTTP 200 still carries that application's active profile and deployed commit in the current format."
+Disposition: proved by slice 2: `HealthCheckController.ping()` builds the text from the active profiles and the build commit for every profile; `HealthCheckControllerTest` (`test`) and `HealthCheckStartupReadinessTest` (`e2e`) observe that one path over HTTP, and `scripts/dev-healthcheck.test.mjs` plus the frontend sign-in specs read `dev` and `prod` bodies.
+
+### G2. Production anonymous access is not requested in a test
+Reported: slice 2 — "Production anonymous access is not exercised."
+Story clause: "Preserve profile and deployed-commit reporting and the endpoint's existing access policy."
+Disposition: proved by slice 2: the delivered change leaves every security configuration untouched, including the `/api/healthcheck` rule in `ProductionConfiguration`, and both HTTP tests request the endpoint without credentials.
+
+### G3. Cypress login consumers of the healthcheck were not run
+Reported: slice 2 — "These are Cypress full-stack consumers; they run after readiness and belong to slices 3–4."
+Story clause: "`pnpm cy:run --spec <feature>` waits for readiness, then runs the selected feature successfully against the fully migrated, seeded database without a manual drop/recreate."
+Disposition: receiving slice 4
+
+### G4. Production health-check configuration has no local suite
+Reported: slice 2 — "These are status-based production GCP configuration with no local suite."
+Story clause: "Terry approved making these consumers wait for startup."
+Disposition: excluded "new operational probes, and startup/autohealing timeout changes"

@@ -73,6 +73,11 @@ on an allocated port does not establish a healthy owning stack. Inspect retained
 logs with `pnpm logs:tail sut` after a failed invocation. Invalid or ambiguous
 ownership fails visibly; retrying never authorizes killing listeners by port.
 
+The application's `GET /api/healthcheck` answers 503 with the body `Starting`
+until startup, including the database migration, completes. After that it
+answers 200 with `OK. Active Profile: <profiles>. Commit: <commit>`. The runner
+waits for that 200 through the local load balancer before it resets test data.
+
 ## Focused Cypress run
 
 Pass comma-separated feature paths to `pnpm cy:run --spec` to run several
