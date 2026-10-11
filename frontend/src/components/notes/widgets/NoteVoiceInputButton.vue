@@ -9,11 +9,12 @@
     :title="name"
     :aria-label="name"
     :aria-pressed="isRecording || undefined"
-    :disabled="phase === 'stopping'"
+    :disabled="finishing"
+    @pointerdown="preserveTitleFocus"
     @click="click"
   >
     <canvas
-      v-if="isRecording"
+      v-if="isRecording && !titleRecording"
       ref="levelCanvas"
       class="w-6 h-6"
       width="24"
@@ -21,7 +22,7 @@
       aria-hidden="true"
     />
     <LoaderCircle
-      v-else-if="phase === 'stopping'"
+      v-else-if="finishing"
       class="w-6 h-6 animate-spin"
       aria-hidden="true"
     />
@@ -35,10 +36,11 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, watch } from "vue"
+import { computed, inject, ref, watch } from "vue"
 import type { Note } from "@generated/donut-backend-api"
 import { LoaderCircle, Mic, RotateCw } from "@lucide/vue"
 import { useNoteVoiceInput } from "@/composables/useNoteVoiceInput"
+import { noteTitleDictationKey } from "@/composables/useTitleDictation"
 import { noteVoiceInputTitles } from "./noteMoreOptionsTitles"
 import {
   toolbarKeptRecordingBtnClass,
@@ -49,15 +51,36 @@ const { note } = defineProps<{ note: Note }>()
 
 const {
   phase,
-  isRecording,
+  isRecording: contentRecording,
   hasKeptRecording,
   audioRecorder,
   wakeLocker,
   processAudio,
-  start,
+  start: startContent,
   stop,
   retry,
 } = useNoteVoiceInput(note)
+
+const title = inject(noteTitleDictationKey, undefined)
+const titleRecording = computed(
+  () => title?.dictation.voiceInput.phase.value === "listening"
+)
+const isRecording = computed(
+  () => titleRecording.value || contentRecording.value
+)
+const finishing = computed(
+  () =>
+    phase.value === "stopping" ||
+    (title?.dictation.busy.value === true && !titleRecording.value)
+)
+const preserveTitleFocus = (event: PointerEvent) => {
+  if (!isRecording.value && !hasKeptRecording.value && title?.hasFocus())
+    event.preventDefault()
+}
+const start = () =>
+  title?.hasFocus()
+    ? title.dictation.voiceInput.startListening()
+    : startContent()
 
 const name = computed(() => {
   if (isRecording.value) return noteVoiceInputTitles.stop
@@ -66,6 +89,7 @@ const name = computed(() => {
 })
 
 const click = () => {
+  if (titleRecording.value) return title!.dictation.voiceInput.stopListening()
   if (isRecording.value) return stop()
   if (hasKeptRecording.value) return retry()
   return start()

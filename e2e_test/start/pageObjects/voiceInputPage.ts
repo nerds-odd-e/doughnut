@@ -10,6 +10,11 @@ const retryTitle = 'Retry turning your speech into text'
 
 const voiceInputPage = () => {
   return {
+    startRecordingFromVisibleToolbar() {
+      visibleToolbarActionButton('Voice input').click()
+      visibleToolbarActionButton('Stop voice input').should('be.visible')
+      return this
+    },
     startRecording() {
       clickToolbarOverflowAction('Voice input')
       visibleToolbarActionButton('Stop voice input').should('be.visible')

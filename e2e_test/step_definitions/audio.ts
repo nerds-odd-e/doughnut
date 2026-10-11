@@ -26,6 +26,10 @@ When(
   }
 )
 
+When('I start voice input from the visible toolbar', () => {
+  start.assumeNotePage().voiceInput().startRecordingFromVisibleToolbar()
+})
+
 When('I stop recording audio', () => {
   start.assumeNotePage().voiceInput().stopRecording()
 })

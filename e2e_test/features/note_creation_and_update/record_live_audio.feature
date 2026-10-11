@@ -52,22 +52,20 @@ Feature: Record live audio onto a note
     Then I should see the note "Photosynthesis in desert plants."
 
   @mockBrowserTime
-  Scenario: Rename a note by speaking the title
-    Given the OpenAI transcription service will return the text "Apple orchard care" when I stop
-    When I visit note "Data Structure Lecture"
-    And I select the whole note title
-    And I speak the title
+  Scenario: Insert spoken words at the title caret from the toolbar
+    Given I have a notebook "Orchard" with a note "Orchard notes" and content "This is class 1."
+    And the OpenAI transcription service will return the text "harvest" when I stop
+    When I visit note "Orchard notes"
+    And I place the note title caret after "Orchard"
+    And I start voice input from the visible toolbar
     And the browser records audio input from the microphone as in "lecture.wav"
-    And I stop speaking the title
-    Then the note title should be "Apple orchard care"
+    And I stop recording audio
+    Then the note title should be "Orchard harvest notes"
     When it is 1 minutes later in the browser
-    Then I should see the note tree in the sidebar
-      | note-title         |
-      | Apple orchard care |
-    When I track the current note title as "Apple orchard care"
-    And I visit note "Apple orchard care"
-    Then the note title should be "Apple orchard care"
-    And the note "DS lecture/Apple orchard care" in Donut should have content "This is class 1."
+    And I track the current note title as "Orchard harvest notes"
+    And I reload the current page for note "Orchard harvest notes"
+    Then the note title should be "Orchard harvest notes"
+    And the note "Orchard/Orchard harvest notes" in Donut should have content "This is class 1."
 
   Scenario: Rename a linked note by speaking the title, keeping visible reference text
     Given I have a notebook "WikiLinks Speak NB" with notes:

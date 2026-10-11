@@ -66,12 +66,12 @@ retain the original evidence and the owning slice for each promise.
 ### G1. Capture before microphone startup
 Reported: slice 1 — "Startup still establishes insertion only after successful microphone startup, as before."
 Story clause: "Capture whether the title has focus immediately before the toolbar voice input action."
-Disposition: receiving slice 3
+Disposition: proved by slice 3: mounted delayed-start toolbar case captures the title caret before microphone startup and moved focus.
 
 ### G2. Persist the toolbar title journey
 Reported: slice 1 — "These observations prove mounted behavior and request payloads, not hardware capture or persisted reload."
 Story clause: "click toolbar Voice input, dictate "harvest" → "Orchard harvest notes", saved after reload."
-Disposition: receiving slice 3
+Disposition: proved by slice 3: clean toolbar caret E2E saves “Orchard harvest notes” and observes it after reload.
 
 ## Ordered slices
 
@@ -112,7 +112,8 @@ observe the captured range. Target ~5 minutes; hard 10 except measured proof wai
 ### 3. Dictate into a clean title from the visible toolbar
 
 Type: Behavior
-Status: planned
+Status: done
+Accepted execution proof: [PROOF.md — Slice 3](PROOF.md#slice-3).
 Proof: Mounted `NoteShow` real toolbar/editor/store plus mocked-audio caret E2E
 and reload; both typechecks. Reuse the parked red examples in [ATTEMPT.md](ATTEMPT.md).
 
@@ -184,7 +185,7 @@ minutes plus measured proof wait; hard 10 for implementation/cleanup.
 ## CI repair
 
 [New note startup readiness](CI-REPAIR.md) records the owned failure and repair;
-slice 3 remains planned while its preserved work awaits restoration.
+slice 3 was restored without conflicts after the repair was published.
 
 ## Refinement decision
 
@@ -227,5 +228,4 @@ Scrutinize work over five; at ten minutes stop and finer-decompose unless the
 recorded excess is focused-test or external wait. Record elapsed time and the
 failed sizing assumption; preserve compatible work. Scope changes return to
 the owner instead of silently dropping a promise. Keep execution, retrospective,
-and wrap-up records under the ordinary lifecycle; this plan has no done slices
-or execution-complete claim.
+and wrap-up records under the ordinary lifecycle.

@@ -102,6 +102,10 @@ Then('I should see {string} in breadcrumb', (noteTitles: string) => {
   start.waitUntilAppIsNotBusy().assumeNotePage().expectBreadcrumb(noteTitles)
 })
 
+When('I place the note title caret after {string}', (text: string) => {
+  start.assumeNotePage().placeTitleCaretAfter(text)
+})
+
 When('I select the whole note title', () => {
   start.assumeNotePage().selectWholeTitle()
 })

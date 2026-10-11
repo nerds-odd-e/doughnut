@@ -1,5 +1,5 @@
 <template>
-  <div class="note-show-container flex flex-col h-full">
+  <div ref="root" class="note-show-container flex flex-col h-full">
     <NoteRealmLoader v-bind="{ noteId }">
       <template #default="{ noteRealm }">
         <ContentLoader v-if="!noteRealm" />
@@ -75,7 +75,7 @@
 </template>
 
 <script setup lang="ts">
-import { inject, ref, toRef, watch, type Ref } from "vue"
+import { inject, provide, ref, toRef, watch, type Ref } from "vue"
 import ContentLoader from "@/components/commons/ContentLoader.vue"
 import NoteRealmLoader from "./NoteRealmLoader.vue"
 import type { NoteRealm, User } from "@generated/donut-backend-api"
@@ -88,7 +88,10 @@ import NoteUnresolvedWikiLinkModal from "./NoteUnresolvedWikiLinkModal.vue"
 import type { DeadWikiLinkPayload } from "@/utils/wikiLinkMarkup"
 import { isNoteRealmInTrash } from "@/utils/folderTrash"
 import { provideMemoryTrackerActions } from "@/composables/useMemoryTrackerActions"
-import { useTitleDictation } from "@/composables/useTitleDictation"
+import {
+  noteTitleDictationKey,
+  useTitleDictation,
+} from "@/composables/useTitleDictation"
 import { isReservedReadmeNoteTitle } from "@/utils/reservedReadmeTitles"
 
 const props = defineProps({
@@ -98,10 +101,17 @@ const props = defineProps({
 
 provideMemoryTrackerActions(toRef(() => props.noteId))
 
+const root = ref<HTMLElement | null>(null)
 const noteTextContent = ref<InstanceType<typeof NoteTextContent> | null>(null)
 const titleDictation = useTitleDictation(() =>
   noteTextContent.value!.beginTitleDictation()
 )
+provide(noteTitleDictationKey, {
+  dictation: titleDictation,
+  hasFocus: () =>
+    root.value?.querySelector('[data-test="note-title"]') ===
+    document.activeElement,
+})
 watch(() => props.noteId, titleDictation.leave)
 
 const currentUser = inject<Ref<User | undefined>>("currentUser")

@@ -166,3 +166,38 @@ an unused empty callback default; coordinator removed that default (the sole
 production caller supplies the callback), repeated formatting successfully,
 and reran both typechecks on the final API. No behavior proof was invalidated.
 Toolbar target choice/persisted reload remain with slice 3.
+
+Published slice 2: `f75da95cb40fda4c5bb9579ddb5ae22bbb1eec9f`, same story
+branch/observer, suffix base `852e0b02de71128b2fe0f0e4f5153afb6cbe8b78`, no replay.
+Final API typechecks and formatter both passed before commit.
+
+## Slice 3
+
+The actual note-page toolbar shares the title session. Mounted
+`NoteShow.toolbarTitleVoiceInput.spec.ts` observes caret/partial/whole selection,
+ordinary save payload, marker/read-only state, held conversion, moved focus and
+fresh content sessions. Four initial title cases failed before implementation;
+retained-content and held-conversion observations were added after that change.
+The delayed-start case holds only external microphone startup and proves the
+captured caret survives focus transfer. G1 is proved at that boundary.
+
+```sh
+CURSOR_DEV=true nix develop -c pnpm frontend:test tests/notes/NoteShow.toolbarTitleVoiceInput.spec.ts tests/notes/NoteEditableTitle tests/notes/NoteNewForm.spokenTitle tests/notes/NoteShow.spokenTitleLeavingNote.spec.ts tests/notes/NoteVoiceInputButton tests/notes/NoteToolbar.voiceInput tests/notes/TextContentWrapper.spec.ts
+CURSOR_DEV=true nix develop -c pnpm -C frontend exec vue-tsc --noEmit
+CURSOR_DEV=true nix develop -c pnpm -C frontend exec tsc --noEmit
+CURSOR_DEV=true nix develop -c pnpm cy:run --spec e2e_test/features/note_creation_and_update/record_live_audio.feature
+```
+
+24 files / 152 tests, both typechecks, and 5 E2E scenarios passed. The clean
+caret scenario uses actual pointer focus and toolbar recording, then observes
+“Orchard harvest notes” and retained content after explicit reload, proving G2.
+Approximately ten active minutes plus measured proof/stack wait. Independent
+refactor found no candidates; whitespace check passed. Coordinator formatting
+made mechanical changes only. Typed linked drafts/recovery, keyboard/overflow
+and separate-control deletion remain with slices 4–6.
+
+Owned CI repair published `8944c119e408a8e913445e640aa49b7275d4564c`
+from slice-2 suffix base. Slice-3 work was preserved and restored without conflict.
+Frontend proofs and clean-toolbar E2E retain unchanged boundaries; the repaired
+New note readiness helper and unchanged linked scenario passed at repair base.
+These are per-boundary proof reuse, not a claim of a combined-tree E2E run.

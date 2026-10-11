@@ -1,4 +1,4 @@
-import { onUnmounted, watch } from "vue"
+import { onUnmounted, watch, type InjectionKey } from "vue"
 import type { DictationTarget } from "@/models/audio/dictationTarget"
 import { useTitleVoiceInput } from "./useTitleVoiceInput"
 
@@ -38,3 +38,8 @@ export function useTitleDictation(begin: () => DictationTarget) {
 }
 
 export type TitleDictation = ReturnType<typeof useTitleDictation>
+
+export const noteTitleDictationKey: InjectionKey<{
+  dictation: TitleDictation
+  hasFocus: () => boolean
+}> = Symbol("noteTitleDictation")
