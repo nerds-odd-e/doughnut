@@ -181,6 +181,11 @@ and obsolete descriptions. Update `docs/voice-input.md` and
 Record the sweep as a reading. No new behavior hides in cleanup. Target ~5
 minutes plus measured proof wait; hard 10 for implementation/cleanup.
 
+## CI repair
+
+[New note startup readiness](CI-REPAIR.md) records the owned failure and repair;
+slice 3 remains planned while its preserved work awaits restoration.
+
 ## Refinement decision
 
 Original slice 2 stopped before production edits; its red spec and sizing

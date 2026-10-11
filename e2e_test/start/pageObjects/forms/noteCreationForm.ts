@@ -22,6 +22,9 @@ const noteCreationForm = {
 
   speakTheTitle() {
     cy.findByRole('button', { name: 'Speak the title' }).click()
+    cy.findByRole('button', { name: 'Stop speaking the title' }).should(
+      'be.enabled'
+    )
     return this
   },
 
