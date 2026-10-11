@@ -5,6 +5,24 @@ page. Dictating into a note's body, the pending marker's appearance, the
 CJK/space rule of body passages, and the tests of all of these are described
 in [voice input](./voice-input.md).
 
+## Title wording and conversion
+
+Both title journeys send optional title intent through the existing audio API.
+The backend supplies one title instruction to the final transcription request,
+using `gpt-4o-mini-transcribe`; the response remains the dictated fragment.
+The instruction asks for concise, faithful wording, preserves every substantive
+detail, omits an ordinary sentence-ending period, and retains appropriate
+punctuation, including a question mark for a question. It supplies no title
+length cap and gives no authority to rewrite the surrounding title. The editor
+applies the returned fragment at its captured caret or replacement range and
+uses ordinary title saving. No additional refinement request is made.
+
+Ordinary name handling maps ASCII `?` to the fullwidth question mark `？`, as
+it does for path separators, so a spoken question retains its punctuation and
+can be saved under the portable name rules. The author can review and correct
+the returned wording. Content requests omit title intent and keep their existing
+transcription behavior.
+
 ## Speaking a title in New note
 
 In New note, a small microphone button inside the title field, just before

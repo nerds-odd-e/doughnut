@@ -83,7 +83,7 @@ once per response. Nothing is left out, added, or reworded. Audio responses do n
 use the conversation tool's `NoteContentCompletion`, which continues to
 replace complete note content.
 
-The audio request carries only the audio and the mid-speech flag. The client
+Content audio requests carry only the audio and the mid-speech flag. The client
 retains the originating note id, and each returned segment is added
 deterministically to that note, at the session's place in an open body editor
 or else at the end of its current store body, loading its realm when
