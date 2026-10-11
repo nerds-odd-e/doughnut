@@ -2,6 +2,12 @@
   "schemaVersion": 1,
   "records": [
     {
+      "fileName": "SEED-066_focus-aware-toolbar-voice-input.json",
+      "identity": "SEED-066#focus-aware-toolbar-voice-input",
+      "completedAt": "2026-10-11T09:13:44.552Z",
+      "blob": "1cdfe9a942821f2bc1d6ee8a06799d078fb79568"
+    },
+    {
       "fileName": "SEED-066_read-only-voice-input-with-insertion-feedback.json",
       "identity": "SEED-066#read-only-voice-input-with-insertion-feedback",
       "completedAt": "2026-10-11T03:20:24.901Z",

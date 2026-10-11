@@ -142,9 +142,6 @@ The original nine-story decomposition is recoverable in Git history. On
 top of the product backlog; all three are delivered. These are non-executable story
 records; capturing them does not start implementation.
 
-On 2026-10-11 the owner added two stories: focus-aware toolbar voice input,
-then title-aware refinement of dictated words.
-
 Effort bands are S = 30–60 minutes, M = 1–2 hours, and L = 2–4 hours, including
 delivery. These are comparative hypotheses, not a delivery schedule. Refine or
 resplit any story likely to exceed L before execution.
@@ -166,103 +163,6 @@ with positive tests; delete removed-feature tests instead of replacing them
 with negative assertions, absence checks, or runtime guards. Record the final
 one-time removal sweep as an acceptance reading, following principle 7 in
 `AGENTS.md`; Git history retains the removed implementation.
-
-<a id="focus-aware-toolbar-voice-input"></a>
-### Dictate into the focused title or the content from the toolbar
-
-**Identity:** SEED-066#focus-aware-toolbar-voice-input
-```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/001-focus-aware-toolbar-voice-input/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"8e15fa6c00a082fd3e35d00d000470954f39dcf70323348e355c7c2975608953","plan":"311673ec9729ccddc508be6c1fadd172170b7e31936292a60a20099f7e64d851"}}
-```
-
-**Goal:** For authors editing an existing note, use the toolbar microphone to
-dictate into the title when it has focus, or into the content otherwise, with
-the caret or selection determining where the words land.
-
-**Scope:**
-
-- Capture whether the title has focus immediately before the toolbar voice
-  input action. The toolbar click itself must preserve that targeting decision
-  and the title's caret or selection even if it moves browser focus.
-- With title focus, insert dictated words at the title caret, or replace only
-  the selected title text. Selecting the whole title permits replacing it all.
-  Preserve the rest of the title and save through the ordinary title path.
-- Otherwise, use the existing content voice-input journey and its insertion
-  rules. Previously focusing the title does not keep it as the target after
-  focus has moved to content or elsewhere outside the toolbar journey.
-- Preserve title intent and its caret or selection while reaching Voice input
-  through keyboard navigation within the toolbar or its "more options" menu.
-  Moving to content or another unrelated destination clears that intent.
-- Keep the chosen field and insertion target for the session, including its
-  read-only behavior and pending insertion feedback. Moving the caret or focus
-  after recording starts does not redirect that recording. Stop finishes the
-  same session; a fresh recording chooses its target again.
-- Preserve the chosen field's existing conversion and recovery behavior:
-  title speech converts on Stop; content keeps its ongoing conversion and
-  retained-recording retry journey. Changing title conversion cadence or
-  adding title recording recovery is deferred.
-- Preserve ordinary title saving, including the explicit reference-handling
-  choice for a title linked from other notes. Reaching the toolbar and stopping
-  title dictation must preserve the current title draft and selected range so
-  the author can finish dictating and make that save choice.
-- Delete the separate microphone button/icon beside an existing note's title,
-  with its exclusively used code, styles, helpers, fixtures, and tests; apply
-  the product-wide removal sweep described above. Shared title dictation code
-  stays where the toolbar or New note still needs it.
-- New note's spoken-title journey and AI wording refinement are outside this
-  story's delivery scope; title-aware wording is the separate story below.
-
-**Key examples:**
-
-- Existing title "Orchard notes", caret after "Orchard": click toolbar Voice
-  input, dictate "harvest" → "Orchard harvest notes", saved after reload.
-- Existing title "Spring orchard notes", select "Spring": click toolbar Voice
-  input, dictate "Autumn" → "Autumn orchard notes"; the surrounding words stay.
-- Select the whole existing title, then dictate from the toolbar → the spoken
-  text becomes the title.
-- Focus the content editor after editing the title, then start toolbar Voice
-  input → words land at the content's insertion point and are saved there.
-- Open an existing note without focusing its title, then use toolbar Voice
-  input → the existing content dictation journey runs.
-- Select "Spring" in "Spring orchard notes", move through the toolbar by
-  keyboard or open "more options", then activate Voice input and dictate
-  "Autumn" → "Autumn orchard notes". Moving to content before reaching the
-  toolbar instead sends the next recording to content.
-- Start title dictation at the caret after "Orchard", then move focus before
-  stopping → the words still land at that captured title position. Once the
-  session finishes, focusing content and starting again targets content.
-- Dictate into a title linked from other notes → review the resulting title,
-  choose how visible reference text should change using the ordinary save
-  choice, then reload → the chosen title is saved.
-- Start title dictation successfully → the title is read-only and its pending
-  marker shows the insertion position through listening and conversion. Stop
-  and receive words → the title becomes editable with the caret after them.
-- The microphone cannot start, or title conversion returns no words or fails
-  → retain the title text and restore editing; show the existing error feedback
-  for a microphone or conversion failure. The author can correct by typing or
-  start a fresh recording.
-
-**UI:** The author places a title caret or selection, activates toolbar Voice
-input, speaks, and uses that same control to stop. Otherwise the same action
-starts the content journey. Keep the existing recording, finishing, and field
-insertion feedback, including accessible control names and reduced-motion
-behavior. The insertion marker indicates the captured destination; moving focus
-during a recording does not move it. After title conversion, ordinary title
-editing and any required reference-save choice resume. No new target picker or
-layout redesign is needed for the accepted focus rule.
-
-**Decision (owner, 2026-10-11):** Preserve title intent through toolbar keyboard
-and overflow-menu navigation; clear it on moving to content or elsewhere.
-
-- **Evaluation:** Use the toolbar with a title caret, a title selection, and
-  content focus; confirm the saved words land in the chosen field and position.
-- **Value / learning:** One familiar microphone action follows the author's
-  current editing intent.
-- **Effort hypothesis:** M (1–2 hours), medium confidence; focus capture and
-  shared session controls need examination before execution planning.
-- **Depends on:** none; title and content dictation already exist.
-- **Safe stopping point:** Toolbar targeting is useful with today's dictated
-  wording, independently of the title-specific AI instruction story.
 
 <a id="title-aware-voice-refinement"></a>
 ### Refine dictated titles with title-aware wording and punctuation
@@ -291,7 +191,7 @@ over the existing title.
   shortening the whole title.
 - Apply the title-aware instruction to supported title voice-input journeys,
   including New note. Content dictation keeps its existing transcription behavior.
-  Toolbar targeting belongs to the separate story above.
+  Toolbar targeting follows the current [voice-input behavior](../../docs/voice-input.md).
 
 **Key examples:**
 
@@ -378,7 +278,7 @@ an early probe; accepting this direction does not establish model quality.
 - **Depends on:** none; the existing spoken-title journey can receive the
   instruction independently of toolbar targeting.
 - **Safe stopping point:** Title-aware refinement improves existing title
-  voice input even if the toolbar targeting story is deferred.
+  voice input independently of which control starts recording.
 
 ## Ordering and Scope Reduction
 
@@ -402,9 +302,8 @@ backlog in their stated order: simpler controls/feedback with cadence-cost
 analysis, one-button body dictation, then title styling and spoken editing.
 No blocking dependency is inferred from shared recording code or that order.
 
-On 2026-10-11 the owner queued focus-aware toolbar voice input followed by
-title-aware voice refinement. They are independently valuable; their stated
-order does not create a blocking dependency.
+On 2026-10-11 the owner queued title-aware voice refinement. The product
+backlog owns its priority; no blocking dependency is recorded.
 
 ## Open Decisions for Later Work
 
