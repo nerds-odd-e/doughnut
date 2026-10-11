@@ -7,6 +7,8 @@ import {
 
 const retryTitle = 'Retry turning your speech into text'
 
+const arrivalMarker = '[data-testid="dictation-marker"]'
+
 const voiceInputPage = () => {
   return {
     startRecording() {
@@ -31,6 +33,14 @@ const voiceInputPage = () => {
         .find('button[title="Voice input"]', { timeout: 30000 })
         .should('be.enabled')
       waitUntilAppIsNotBusy()
+      return this
+    },
+    expectArrivalPlaceMarkedInNoteContent() {
+      cy.get(arrivalMarker).should('be.visible')
+      return this
+    },
+    expectNoArrivalPlaceMarked() {
+      cy.get(arrivalMarker).should('not.exist')
       return this
     },
   }

@@ -8,6 +8,11 @@ export type DictationTarget = {
   end: (placeCaret: boolean) => void
 }
 
+/** A dictation target that reports where its next text will arrive: the place right after its caret, selection, or last inserted text, in viewport coordinates. */
+export type AnchoredDictationTarget = DictationTarget & {
+  anchorRect: () => { left: number; top: number; height: number }
+}
+
 /** The end of a text whose input is not editable to begin with. */
 export const endOfTextDictationTarget = (
   text: () => string,

@@ -20,8 +20,10 @@ Feature: Record live audio onto a note
     And the browser records audio input from the microphone as in "lecture.wav"
     When it is 2 minutes later in the browser
     Then the note content on the current page should be "This is class 1."
+    And the place where my speech will arrive should be marked in the note content
     When I stop recording audio
     Then the note content on the current page should be "This is class 1. its talk about dada struct day."
+    And no place should be marked for arriving speech
     And the note "DS lecture/Data Structure Lecture" in Donut should have content "This is class 1. its talk about dada struct day."
 
   @mockBrowserTime

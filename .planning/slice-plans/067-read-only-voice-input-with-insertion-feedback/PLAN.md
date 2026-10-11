@@ -165,7 +165,7 @@ target choice. Update `docs/voice-input.md`.
 
 ### 3. A pending marker shows where body text will arrive
 Type: Behavior
-Status: planned
+Status: done
 Proof: mounted real-browser tests comparing the marker's position with
 `getBounds(anchor)` and observing it follow a passage and clear at Stop,
 failure, nothing heard, and through a retry; the lone-segment E2E scenario
@@ -244,6 +244,25 @@ the session ends otherwise. Update `docs/voice-input.md`.
   are dropped; before, a reused title editor would have taken them into the
   arriving note's title at the next Stop.
 
+- Slice 3: the marker is `withDictationMarker(target, host)` in
+  `frontend/src/components/form/dictationMarker.ts`; it decorates an
+  `AnchoredDictationTarget` (`anchorRect()` in viewport coordinates) and needs a
+  positioned `host` that Vue does not patch foreign children out of. The title
+  target adds `anchorRect` from a collapsed DOM `Range` at `target.end` and
+  wraps itself the same way; a collapsed range in an empty title can return a
+  zero rect. Body and title markers share `data-testid="dictation-marker"`, so
+  a title E2E step scopes its query to the title or the New note form. Position
+  assertions use `toBeCloseTo(expected, 1)`.
+- Slice 3 accepted proof: `NoteVoiceInputButton.pendingMarker.spec.ts` (7
+  tests), whole frontend suite, typechecks, and `record_live_audio.feature` 5
+  of 5 with the lone-segment scenario seeing the marker while recording and
+  not after Stop.
+- Slice 3 finding outside this story: `QuillEditor.pasteInsertionViewportRect`
+  and `pasteChoicePosition.ts` describe Quill's `getBounds()` as
+  viewport-relative, while Quill 2 measures from its container (confirmed by
+  the marker spec). The paste-choice bar may be placed from container-relative
+  numbers; not run, not changed here.
+
 ## Execution
 
 Story Branch Mode in
@@ -303,3 +322,33 @@ Disposition: no user cost "fix the place where the spoken text will land at the 
 Reported: slice 2 — "The words heard up to the move are **dropped**: they go to neither note."
 Story clause: "Leaving the note or closing New note while recording ends the session as today."
 Disposition: proved by slice 2: `frontend/tests/notes/NoteShow.spokenTitleLeavingNote.spec.ts` observes the session ended, the arriving title editable with its own text, and a later session speaking into it
+
+### G11. Reduced-motion stillness has no observation
+Reported: slice 3 — "Reduced motion: `motion-reduce:animate-none` on each dot. **Not tested** (no media emulation in the suite)."
+Story clause: "it stands still when the author prefers reduced motion"
+Disposition: receiving slice 4
+
+### G12. Repositioning on a width change is not observed
+Reported: slice 3 — "The `ResizeObserver` reposition on width change is untested."
+Story clause: "After each arriving passage it follows to the end of that passage."
+Disposition: no user cost "show that place with inline pending feedback until the text has arrived": the story asks the marker to follow arriving passages, which is proved; following a resized window is an addition whose absence would cost only a marker a little off until the next passage
+
+### G13. The marker is kept out of copied text by construction
+Reported: slice 3 — "\"Never part of copied text\" is by construction only (no characters, `select-none`); no copy test."
+Story clause: "It is temporary feedback: never saved, never part of copied or exported text."
+Disposition: proved by slice 3: `frontend/src/components/form/dictationMarker.ts` builds a marker with no characters outside `.ql-editor`, and `frontend/tests/notes/NoteVoiceInputButton.pendingMarker.spec.ts` asserts the editor text and saved content exact while it shows
+
+### G14. No marker in a rich editor that cannot edit the body
+Reported: slice 3 — "A rich editor that cannot edit the body (unparsable frontmatter, content it cannot keep, image upload in progress) uses the end-of-text target and shows no marker."
+Story clause: "An animated indicator sits immediately after the target"
+Disposition: no user cost "show that place with inline pending feedback until the text has arrived": that editor has no caret to mark and cannot show the body as saved, so the words join the end of the saved body as before and the button stays the feedback
+
+### G15. Marker when the author switches editors during a session
+Reported: slice 3 — "Switching rich to Markdown mid-session removes the marker with the unmounted editor; switching Markdown to rich shows it at the new target. Neither is tested."
+Story clause: "The inline indicator inside the Markdown editor, a plain text area."
+Disposition: no user cost "show that place with inline pending feedback until the text has arrived": the marker shows wherever a rich editor holds the session's place and never in the Markdown editor, which is the story's rule for each editor
+
+### G16. The marker covers about one character of the following text
+Reported: slice 3 — "They sit on a small rounded patch of `bg-base-100` so they stay readable over the following text; the patch covers roughly one character width of that text during the session."
+Story clause: "The indicator marks the exact insertion location inside the text, in the text's own style"
+Disposition: no user cost "show that place with inline pending feedback until the text has arrived": an overlay cannot push text aside without becoming editor content, the covered character returns when the session ends, and the dots take the text's colour and line height

@@ -44,7 +44,19 @@ conversion at Stop failed; the editor is then editable again, with focus and
 the caret after the dictated text. Retrying a kept recording is a session of
 its own: the editor is read-only again and the text goes where the caret or
 selection is at the retry click. When recording cannot start, the editor is
-not made read-only. Dictation writes only to the note body. Readers who may
+not made read-only. In the rich editor a pending marker, three softly pulsing
+dots the size of the text on a small patch of the page's background, sits
+right after that place for the whole session: after the caret, or after the
+end of a selection the words will replace. It follows to the end of each
+passage that arrives, stays while the button shows its spinner after Stop and
+during a retry, and is gone when the session ends, a failed conversion,
+nothing heard, and leaving the note included. It is not shown when recording
+cannot start. The dots stand still for an author who prefers reduced motion.
+The marker is drawn over the editor and is not text: it is not saved, copied,
+or exported, it takes no clicks, and it is hidden from assistive technology,
+since the button's name already tells the session's state. The Markdown editor
+shows no marker; there the button is the only sign of a running session.
+Dictation writes only to the note body. Readers who may
 not edit the note are not offered the button.
 
 ## Speaking a title in New note
@@ -209,12 +221,16 @@ The mounted audio preservation tests assert exact saved content for long,
 empty, and whitespace-ending bodies, repeated additions, and undo. Mounted
 tests of both body editors with the toolbar button place a caret or a
 selection and observe the read-only editor, the text at that place, the caret
-after it, and the retry's own place. Mounted toolbar tests move to another
+after it, and the retry's own place. Mounted tests of the rich editor
+compare the marker's drawn position with the editor's own measure of that
+place at the start, after a passage, during the conversion of Stop, and during
+a retry, and observe it gone at each ending and absent in the Markdown editor. Mounted toolbar tests move to another
 note while recording and observe the remainder
 saved to the note left, an idle button, a dropped kept recording, and the
 toast of a failed last conversion. The
 mocked recording journey supplies a transcription and observes the original
-body, one space, and the transcription's text. A second mocked journey makes
+body, one space, and the transcription's text. It also sees the marker
+while recording and not after Stop. A second mocked journey makes
 the transcription fail at Stop, observes the unchanged body and the error
 toast, then lets the transcription succeed and observes the button's retry
 adding the passage once. Model tests with the real audio buffer cover kept
