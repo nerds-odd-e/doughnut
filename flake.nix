@@ -46,19 +46,48 @@
 
         # Node 26 removed bundled corepack, and nixpkgs has no corepack_26.
         # Provide pnpm directly instead: pin the exact version from package.json's
-        # `packageManager`/`engines` (11.28.5) and run it under nodejs-slim_26 so the
+        # `packageManager`/`engines` (12.12.0) and run it under nodejs-slim_26 so the
         # engine check passes. See scripts/dev_setup.sh (no longer calls corepack).
         #
-        # To bump the version: set `version` below, set `hash = lib.fakeHash;`,
-        # then run `nix build '.#devShells.aarch64-darwin.default' --no-link` and
-        # copy the real hash from the "got:" line of the mismatch error into `hash`.
-        # (Alternatively: `nix store prefetch-file <url>` prints the SRI hash directly.)
-        pnpmPkg = (pkgs.pnpm.override { nodejs-slim = pkgs.nodejs-slim_26; }).overrideAttrs (_: rec {
-          version = "11.28.5";
+        # To bump the version: follow .agents/skills/pnpm-12-upgrade/SKILL.md.
+        # pnpm 12's npm package is a launcher; the real program is a native binary
+        # in @pnpm/exe.<target>, which the sandboxed build cannot download itself.
+        pnpmExeTarget = {
+          aarch64-darwin = "darwin-arm64";
+          x86_64-darwin = "darwin-x64";
+          x86_64-linux = "linux-x64";
+          aarch64-linux = "linux-arm64";
+        }.${system};
+        pnpmExeHashes = {
+          darwin-arm64 = "sha256-gbPoGkEGeaR3bbLjUISTBFm8oCdHfdS2mgtNtKVt9uY=";
+          darwin-x64 = "sha256-+Z+GmeDuCiTPXsdCeSyB3sgswPNczwU4vdmGGj9rlUQ=";
+          linux-x64 = "sha256-m+xnxulX+K1jmPvKJvpb0tv2PlVYUWDmMk11oZbIFLw=";
+          linux-arm64 = "sha256-kGGL1j4yPjGidnF8XASNl7UJ/aoQlSglYQKqIirBDnE=";
+        };
+        pnpmPkg = (pkgs.pnpm.override { nodejs-slim = pkgs.nodejs-slim_26; }).overrideAttrs (old: rec {
+          version = "12.12.0";
           src = pkgs.fetchurl {
             url = "https://registry.npmjs.org/pnpm/-/pnpm-${version}.tgz";
-            hash = "sha256-HvTkR6aHE2VgZPPxdMD0RxmWCgQ6P+IpkWnQjPHb+O4=";
+            hash = "sha256-BVWXIjo8Kz5DGY34kUK1rkHDgm0cnPOs1dgQhebVwEo=";
           };
+          exeSrc = pkgs.fetchurl {
+            url = "https://registry.npmjs.org/@pnpm/exe.${pnpmExeTarget}/-/exe.${pnpmExeTarget}-${version}.tgz";
+            hash = pnpmExeHashes.${pnpmExeTarget};
+          };
+          nativeBuildInputs = old.nativeBuildInputs ++ lib.optionals stdenv.isLinux [ pkgs.autoPatchelfHook ];
+          buildInputs = old.buildInputs ++ lib.optionals stdenv.isLinux [ stdenv.cc.cc.lib ];
+          postUnpack = ''
+            tar xzf $exeSrc -O package/pnpm > package/pnpm
+            chmod +x package/pnpm
+          '';
+          installPhase = ''
+            runHook preInstall
+            install -d $out/{bin,libexec}
+            cp -R . $out/libexec/pnpm
+            for b in pnpm pn pnpx pnx; do ln -s $out/libexec/pnpm/$b $out/bin/$b; done
+            runHook postInstall
+          '';
+          postInstall = lib.replaceStrings [ "node $out/bin/pnpm" ] [ "$out/bin/pnpm" ] old.postInstall;
         });
 
         basePackages = with pkgs; [
