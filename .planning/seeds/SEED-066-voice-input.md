@@ -142,6 +142,8 @@ The original nine-story decomposition is recoverable in Git history. On
 top of the product backlog; all three are delivered. These are non-executable story
 records; capturing them does not start implementation.
 
+On 2026-10-11 the owner added the story below at the top of the product backlog.
+
 Effort bands are S = 30–60 minutes, M = 1–2 hours, and L = 2–4 hours, including
 delivery. These are comparative hypotheses, not a delivery schedule. Refine or
 resplit any story likely to exceed L before execution.
@@ -164,6 +166,58 @@ with negative assertions, absence checks, or runtime guards. Record the final
 one-time removal sweep as an acceptance reading, following principle 7 in
 `AGENTS.md`; Git history retains the removed implementation.
 
+<a id="read-only-voice-input-with-insertion-feedback"></a>
+### Show where voice text will arrive while keeping its input read-only
+
+**Identity:** SEED-066#read-only-voice-input-with-insertion-feedback
+```json dough-story-state
+{"schemaVersion":1,"refinement":"refined","approach":"unselected","assessment":"not-ready","reasons":["Select an execution approach and prepare the slice plan before implementation."],"basis":{"document":"9e453c6e413819d70cac0f202632f7b3b4a2188624664e05422e99803a462f00"}}
+```
+
+**Goal:** For note authors dictating a body or title, keep the insertion point
+stable and make it clear where the upcoming transcription will appear.
+
+**Scope:**
+
+- Make the active rich text editor or title input read-only from the start of
+  voice input until recording and any pending transcription have finished.
+- Show an animated pending indicator at the saved insertion point, such as an
+  animated ellipsis. Keep the indicator visible while spoken text is awaited,
+  including processing after recording stops.
+- Insert the resulting text at that location through the existing voice-input
+  behavior. The indicator is temporary UI feedback and is not saved as content.
+- Restore editing and clear the indicator when the session finishes. A cancelled
+  or failed session also releases the input and clears its pending indicator.
+
+**Key examples:**
+
+- With the caret between two passages in the note body, start voice input: the
+  editor becomes read-only and an animated indicator appears between those
+  passages. When transcription arrives, its text appears at that insertion point.
+- With the caret inside a title, start voice input: the title input becomes
+  read-only and shows the same pending feedback at that location. Spoken text is
+  applied through the existing title voice-input behavior.
+- Stop recording while transcription is pending: the input stays read-only and
+  the indicator remains until the result has been applied, then editing resumes.
+- Cancel the session or encounter a transcription failure: the pending feedback
+  clears and the author can edit the field again.
+
+**UI:** The animation marks the actual insertion location, rather than only a
+general recording control. Animated ellipsis is the owner's example; the exact
+visual treatment can be chosen during implementation.
+
+- **Evaluation:** Dictate into a body and a title from a visible caret position;
+  observe read-only editing and inline pending feedback through recording and
+  processing, then confirm editing resumes and the saved content contains the
+  resulting text.
+- **Value / learning:** Authors can anticipate where spoken text will land while
+  pending voice input keeps its insertion target stable.
+- **Effort hypothesis:** M (1–2 hours), medium confidence; both input surfaces
+  need inline feedback tied to the existing voice-session lifecycle.
+- **Depends on:** none; both body and title voice-input journeys are delivered.
+- **Safe stopping point:** Both current voice-input journeys provide clear pending
+  feedback and restore ordinary editing independently of later audio improvements.
+
 ## Ordering and Scope Reduction
 
 The owner accepted the original nine-story order on 2026-10-03. The product backlog
@@ -185,6 +239,9 @@ On 2026-10-10 the owner placed the three UI stories at the top of the
 backlog in their stated order: simpler controls/feedback with cadence-cost
 analysis, one-button body dictation, then title styling and spoken editing.
 No blocking dependency is inferred from shared recording code or that order.
+
+On 2026-10-11 the owner prioritized read-only voice input with insertion-point
+feedback above the remaining queued work.
 
 ## Open Decisions for Later Work
 
@@ -212,6 +269,10 @@ No blocking dependency is inferred from shared recording code or that order.
   Optional one-time automatic title generation stays deferred.
 
 ## Breadcrumbs
+
+- Owner's request for read-only body/title voice input and an animated indicator
+  at the insertion point, 2026-10-11; authorized capture at the top of the backlog
+  directly on main and sync with origin.
 
 - Owner's voice-input problem report, 2026-10-03, in this conversation.
 - Owner's acceptance of all nine proposed stories and their priority, with
