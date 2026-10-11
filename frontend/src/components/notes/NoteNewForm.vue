@@ -32,8 +32,7 @@
               <template #append>
                 <SpeakTitleControl
                   joins-field
-                  v-model:busy="titleSpeechBusy"
-                  @heard-segments="insertHeardSegments"
+                  :voice-input="titleVoiceInput"
                 />
                 <WikidataSearchByLabel
                   :search-key="newTitle"
@@ -158,11 +157,12 @@ const noteFormErrors = ref<{
 const processing = ref(false)
 const hasTitleBeenEdited = ref(props.initialTitle !== undefined)
 const pathNameEditor = ref<InstanceType<typeof PathNameEditor> | null>(null)
-const { busy: titleSpeechBusy, insertHeardSegments } = useTitleDictation(() =>
-  pathNameEditor.value!.beginDictation(
-    wholeTitleIsDictationTarget(hasTitleBeenEdited.value, newTitle.value)
+const { busy: titleSpeechBusy, voiceInput: titleVoiceInput } =
+  useTitleDictation(() =>
+    pathNameEditor.value!.beginDictation(
+      wholeTitleIsDictationTarget(hasTitleBeenEdited.value, newTitle.value)
+    )
   )
-)
 const effectiveSearchKey = computed(() =>
   hasTitleBeenEdited.value ? newTitle.value : ""
 )

@@ -1,10 +1,12 @@
-import { ref, watch } from "vue"
+import { watch } from "vue"
 import type { DictationTarget } from "@/models/audio/dictationTarget"
+import { useTitleVoiceInput } from "./useTitleVoiceInput"
 
-/** One dictation session for a title: it begins when the Speak the title control becomes busy and ends when the control is idle again, or when the author leaves the title. */
+/** One title recording and insertion session, shared by its controls. */
 export function useTitleDictation(begin: () => DictationTarget) {
-  const busy = ref(false)
   let session: DictationTarget | undefined
+  const voiceInput = useTitleVoiceInput((segments) => session!.insert(segments))
+  const { busy } = voiceInput
 
   const end = (placeCaret: boolean) => {
     session?.end(placeCaret)
@@ -18,11 +20,11 @@ export function useTitleDictation(begin: () => DictationTarget) {
 
   return {
     busy,
-    insertHeardSegments: (segments: string[]) => session!.insert(segments),
+    voiceInput,
     /** Ends the session without moving focus. */
     leave: () => {
       end(false)
-      busy.value = false
+      voiceInput.leave()
     },
   }
 }

@@ -24,8 +24,7 @@
             <SpeakTitleControl
               v-if="!readonly"
               :key="noteId"
-              v-model:busy="titleSpeechBusy"
-              @heard-segments="insertHeardSegments"
+              :voice-input="titleVoiceInput"
             />
           </div>
         </template>
@@ -51,11 +50,9 @@ const props = defineProps({
 
 const pathNameEditor = ref<InstanceType<typeof PathNameEditor> | null>(null)
 
-const {
-  busy: titleSpeechBusy,
-  insertHeardSegments,
-  leave,
-} = useTitleDictation(() => pathNameEditor.value!.beginDictation(false))
+const { voiceInput: titleVoiceInput, leave } = useTitleDictation(() =>
+  pathNameEditor.value!.beginDictation(false)
+)
 
 // Moving to another note stops the listening and ends its session.
 watch(() => props.noteId, leave)
