@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 1,
+  "identity": "SEED-066#read-only-voice-input-with-insertion-feedback",
+  "title": "Show where voice text will arrive while keeping its input read-only",
+  "completedAt": "2026-10-11T03:20:24.901Z",
+  "developer": "Terry Yin",
+  "agent": "Anri-chan",
+  "host": "claude"
+}

@@ -104,7 +104,7 @@ describe("noteStore", () => {
     })
   })
 
-  describe("appendDictatedText", () => {
+  describe("addDictatedText", () => {
     it("loads the original body before appending when the note is absent", async () => {
       const original = makeMe.aNoteRealm.content("Original body.").please()
       const showNoteSpy = mockSdkService(NoteController, "showNote", original)
@@ -114,7 +114,7 @@ describe("noteStore", () => {
         original
       )
 
-      await noteStore.appendDictatedText(original.id, ["New passage."])
+      await noteStore.addDictatedText(original.id, ["New passage."])
 
       expect(showNoteSpy).toHaveBeenCalledWith({ path: { note: original.id } })
       expect(updateContentSpy).toHaveBeenCalledWith({

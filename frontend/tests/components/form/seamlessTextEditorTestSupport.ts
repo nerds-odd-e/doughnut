@@ -1,4 +1,5 @@
 import SeamlessTextEditor from "@/components/form/SeamlessTextEditor.vue"
+import type { DictationTarget } from "@/models/audio/dictationTarget"
 import { flushPromises, type VueWrapper } from "@vue/test-utils"
 import { nextTick } from "vue"
 import helper from "@tests/helpers"
@@ -45,16 +46,21 @@ export function setCaretInEditor(
   selection?.addRange(range)
 }
 
-export async function insertAtSelection(
+export function beginDictation(
   wrapper: VueWrapper,
-  compose: (before: string, after: string) => string
-) {
+  wholeText = false
+): DictationTarget {
   const vm = wrapper.vm as unknown as {
-    insertAtSelection: (
-      compose: (before: string, after: string) => string
-    ) => void
+    beginDictation: (wholeText: boolean) => DictationTarget
   }
-  vm.insertAtSelection(compose)
+  return vm.beginDictation(wholeText)
+}
+
+/** One whole dictation session that hears the given segments. */
+export async function dictate(wrapper: VueWrapper, segments: string[]) {
+  const target = beginDictation(wrapper)
+  target.insert(segments)
+  target.end(true)
   await nextTick()
   await flushPromises()
 }

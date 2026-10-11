@@ -1,9 +1,0 @@
-{
-  "schemaVersion": 1,
-  "agent": "Anri-chan",
-  "email": "anri-chan@example.org",
-  "identity": "SEED-066#read-only-voice-input-with-insertion-feedback",
-  "mode": "story-branch",
-  "branch": "claude/show-where-voice-text-will-arrive-while-keeping",
-  "host": "claude"
-}

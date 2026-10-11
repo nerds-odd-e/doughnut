@@ -6,7 +6,7 @@
     :aria-labelledby="ariaLabelledby"
     :aria-label="ariaLabel"
     :data-placeholder="placeholder || undefined"
-    :contenteditable="!readonly"
+    :contenteditable="!readonly && !dictating"
     @input="onInput"
     @blur="onBlur"
     @keydown.enter.prevent="onEnter"
@@ -16,6 +16,9 @@
 
 <script setup lang="ts">
 import { ref, watch, onMounted, nextTick } from "vue"
+import type { DictationTarget } from "@/models/audio/dictationTarget"
+import { dictatedInsertion } from "@/models/audio/joinDictatedSegments"
+import { withMarkerAfterTextOffset } from "./textDictationMarker"
 
 const props = defineProps({
   modelValue: { type: String, required: true },
@@ -28,6 +31,7 @@ const props = defineProps({
 
 const emits = defineEmits(["update:modelValue", "blur"])
 const editor = ref<HTMLElement | null>(null)
+const dictating = ref(false)
 
 function applyCaretOffsetsInSingleTextChild(
   el: HTMLElement,
@@ -92,7 +96,7 @@ const onEnter = (event: KeyboardEvent) => {
 }
 
 const onPaste = (event: ClipboardEvent) => {
-  if (props.readonly || !editor.value) {
+  if (props.readonly || dictating.value || !editor.value) {
     return
   }
 
@@ -104,21 +108,26 @@ const onPaste = (event: ClipboardEvent) => {
     return
   }
 
-  insertAtSelection(() => plainText)
+  focusWithSelection(replaceRange(selectionOrEnd(), () => plainText))
 }
 
-const insertAtSelection = (
+/** The selection the editor has while focused, or had when focus left it, or else the end of its text. */
+const selectionOrEnd = (): SelectionOffsets => {
+  const el = editor.value!
+  const end = (el.innerText || "").length
+  return (
+    (document.activeElement === el
+      ? selectionOffsetsIn(el)
+      : rememberedSelection) ?? { start: end, end }
+  )
+}
+
+/** Puts the composed text in place of the range and returns the caret after it. */
+const replaceRange = (
+  { start, end }: SelectionOffsets,
   compose: (before: string, after: string) => string
-) => {
-  const el = editor.value
-  if (!el) return
-  const currentText = el.innerText || ""
-  const { start, end } = (document.activeElement === el
-    ? selectionOffsetsIn(el)
-    : rememberedSelection) ?? {
-    start: currentText.length,
-    end: currentText.length,
-  }
+): SelectionOffsets => {
+  const currentText = editor.value!.innerText || ""
   const before = currentText.substring(0, start)
   const after = currentText.substring(end)
   const inserted = compose(before, after)
@@ -128,16 +137,38 @@ const insertAtSelection = (
 
   updateContent(newText)
   emits("update:modelValue", newText)
+  return rememberedSelection
+}
 
+const focusWithSelection = ({ start, end }: SelectionOffsets) =>
   nextTick(() => {
     if (editor.value) {
       editor.value.focus()
-      applyCaretOffsetsInSingleTextChild(editor.value, caret, caret)
+      applyCaretOffsetsInSingleTextChild(editor.value, start, end)
     }
   })
+
+/** The selection, the end of the text, or the whole text becomes a dictation target and the editor takes no edits until it ends; a marker shows the place meanwhile. */
+const beginDictation = (wholeText: boolean): DictationTarget => {
+  let target = wholeText
+    ? { start: 0, end: (editor.value!.innerText || "").length }
+    : selectionOrEnd()
+  dictating.value = true
+  const session: DictationTarget = {
+    insert: (segments) => {
+      target = replaceRange(target, (before, after) =>
+        dictatedInsertion(before, segments, after)
+      )
+    },
+    end: (placeCaret) => {
+      dictating.value = false
+      if (placeCaret) focusWithSelection(target)
+    },
+  }
+  return withMarkerAfterTextOffset(session, editor.value!, () => target.end)
 }
 
-defineExpose({ insertAtSelection })
+defineExpose({ beginDictation })
 
 const updateContent = (newValue: string) => {
   if (!editor.value) return

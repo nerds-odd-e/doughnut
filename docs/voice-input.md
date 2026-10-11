@@ -33,83 +33,37 @@ speech into text." When recording cannot start, nothing is recorded, the
 common error toast says "Could not use the microphone. Allow microphone access
 in your browser, then try again.", and the button stays idle. When saving a
 passage fails, the save's own error toast shows and the button is idle.
-Dictated text shows in an open body editor as soon as it joins. Dictation
-writes only to the note body. Readers who may not edit the note are not
-offered the button.
+When a body editor is open, the text goes where the author's caret or
+selection was when they clicked Voice input, or where it was when focus left
+the editor; with neither, to the end of the body. From that click until the
+session ends the body editor is read-only: it takes no typing or pasting, and
+clicking or selecting in it does not move the place the text goes to. Each
+passage shows there as soon as it arrives, after the one before. The session
+ends when the last text has arrived, when nothing was heard, or when the
+conversion at Stop failed; the editor is then editable again, with focus and
+the caret after the dictated text. Retrying a kept recording is a session of
+its own: the editor is read-only again and the text goes where the caret or
+selection is at the retry click. When recording cannot start, the editor is
+not made read-only. In the rich editor a pending marker, three softly pulsing
+dots the size of the text on a small patch of the page's background, sits
+right after that place for the whole session: after the caret, or after the
+end of a selection the words will replace. It follows to the end of each
+passage that arrives, stays while the button shows its spinner after Stop and
+during a retry, and is gone when the session ends, a failed conversion,
+nothing heard, and leaving the note included. It is not shown when recording
+cannot start. The dots stand still for an author who prefers reduced motion.
+The marker is drawn over the editor and is not text: it is not saved, copied,
+or exported, it takes no clicks, and it is hidden from assistive technology,
+since the button's name already tells the session's state. The Markdown editor
+shows no marker; there the button is the only sign of a running session.
+Dictation writes only to the note body. Readers who may
+not edit the note are not offered the button.
 
-## Speaking a title in New note
+## Speaking a title
 
-In New note, a small microphone button inside the title field, just before
-the Wikidata button, listens for a title. It is named for what a click does:
-"Speak the title" while idle, and "Stop speaking the title" while listening,
-when it is highlighted as a pressed toggle. After the author clicks it to
-stop, it is unavailable and shows a spinner, named "Speak the title", until
-the speech has become text; then it is idle again. Listening ends only when
-the author clicks the button; nothing appears in the title while they are
-still speaking. The recorder converts only at that click. An untouched
-default "Untitled" is a placeholder: the heard words replace it, whether or
-not it is still selected, for example after the author chose a folder first.
-Any other title, including a title pattern the dialog opened with and a title
-the author typed, takes the words where the author's caret or selection is,
-by the same rule as on an existing note: a selection is replaced, a caret
-takes the words at that place with the CJK/space rule of body passages on
-both sides, and a caret at the end appends. For example, the pattern
-"2026-10-06 " with its caret at the end and "weekly review" gives
-"2026-10-06 weekly review"; with the caret after "Project" in
-"Project review", "weekly" gives "Project weekly review". The target is the
-selection the title has while it has focus, or the one it had when focus left
-it. When the author has placed neither caret nor selection in
-such a title, the words join its end, and fill an empty title. Afterwards the
-title has focus and the caret sits after the heard words, so a typed
-correction continues from there. Illegal characters are replaced and warnings
-shown as for typing.
-The search for existing notes runs for the resulting title. The author may type
-corrections before Submit. While the dialog is listening or turning speech into
-text, Submit is not offered and Enter in the title field does nothing;
-afterwards Submit is offered again. Closing New note while listening stops the
-recorder. When nothing was heard (a silent recording that runs no conversion, or
-a response of no segments), the button returns to idle with no message, the
-title is unchanged, and Submit is offered. When the microphone cannot be used,
-the common error toast says "Could not use the microphone. Allow microphone
-access in your browser, then try again." and the button stays idle. When the
-conversion fails, the common error toast says "Could not turn your speech into
-text.", the title is unchanged, the button is idle, and Submit is offered.
-Speaking again creates a fresh recorder so only the new recording's words
-reach the title. The author reviews the title and chooses Submit as usual; the
-note is created once with that title. Body dictation on an existing note never
-changes the title.
-
-## Speaking a title on an existing note
-
-On an editable note page, the same small microphone button ends the title
-heading's line, with the same names and the same idle, listening and
-converting appearances as in New note. The heard words go where the author's
-caret or selection is in the title: a selection is replaced by them, and a
-caret takes them at that place. The CJK/space rule of body passages applies
-on both sides of the words: one space towards a
-neighbouring Latin-script character, none next to Japanese or Chinese
-writing, and no second space where whitespace is already present. For
-example, with the caret between "Orchard" and "notes", "harvest" gives
-"Orchard harvest notes"; with the caret at the end of "りんご園", "の手入れ"
-gives "りんご園の手入れ". The target is the selection the title has while it
-has focus, or the one it had when focus left it, so pressing the button does
-not lose it. When the author has placed neither caret nor selection in the
-title being shown, the words join its end, and fill an empty title. Replacing
-the whole title is done by selecting all of it and speaking. Afterwards the
-title has focus and the caret sits after the heard words, so a typed
-correction continues from there, and speaking again without moving the caret
-continues there too. The result is proposed through the same path as typing:
-a note nothing links to saves as a typed title does; a note other notes link
-to shows the reference panel and saves only when the author chooses how links
-should change, and leaving without choosing discards the heard words. When
-nothing was heard, the button returns to idle with no message; when the
-microphone cannot be used or the conversion fails, the common error toast
-says so in the same words as in New note. In each case the title is unchanged
-and nothing is saved. Speaking again creates a fresh recorder so only the new
-recording's words reach the title. Readers who may not edit the note see the
-title as text and are not offered the button.
-Body dictation with Voice input still writes only to the body and never
-changes the title.
+A small microphone button in the title field of New note, and at the end of
+the title heading of an editable note page, puts spoken words into the title:
+see [speaking a title](./voice-input-spoken-title.md).
 
 ## Adding dictated text to a note
 
@@ -125,10 +79,11 @@ use the conversation tool's `NoteContentCompletion`, which continues to
 replace complete note content.
 
 The audio request carries only the audio and the mid-speech flag. The client
-retains the originating note id, and each returned segment is appended
-deterministically to that note's current store body, loading its realm when
+retains the originating note id, and each returned segment is added
+deterministically to that note, at the session's place in an open body editor
+or else at the end of its current store body, loading its realm when
 absent, and saved through the ordinary content PATCH. One join rule
-serves both the saved body and an open editor's draft, successive passages,
+serves both the saved body and an open editor, successive passages,
 and segments within a passage. An empty body becomes the segment alone;
 after existing whitespace the segment joins directly. Otherwise the client
 looks at the two characters on either side of the join. If either is
@@ -169,18 +124,38 @@ its remaining speech is converted into the note it was started on; when that
 conversion fails its audio is dropped. Voice input started on the other note
 dictates into that note.
 The transcription service controls transcription quality. When a body editor for the note is
-open, the passage is joined to the end of that editor's draft, including
-unsaved typing, and that draft is saved right away; otherwise, including while
-an image upload or note removal is pausing the editor, it is joined to the
-note's saved body.
+open, the rich editor or the Markdown editor, the passage is put at the
+session's place in that editor and saved right away: a selection is replaced
+by the first passage, a caret takes it at that place, and the join rule
+applies on both sides of the passage as it does for a spoken title. A rich
+editor that cannot edit the body takes the passage at the end of the body.
+When the author switches between the rich and the Markdown editor during a
+session, it goes on in the editor they switched to, at the caret that editor
+last had or else at the end of the body.
+Otherwise, including while an image upload or note removal is pausing the
+editor, and for the remaining speech of a note the author left, the passage is
+joined to the end of the note's saved body.
 
 The mounted audio preservation tests assert exact saved content for long,
 empty, and whitespace-ending bodies, repeated additions, and undo. Mounted
-toolbar tests move to another note while recording and observe the remainder
+tests of both body editors with the toolbar button place a caret or a
+selection and observe the read-only editor, the text at that place, the caret
+after it, and the retry's own place. Mounted tests of the rich editor
+compare the marker's drawn position with the editor's own measure of that
+place at the start, after a passage, during the conversion of Stop, and during
+a retry, and observe it gone at each ending and absent in the Markdown editor.
+Mounted tests of both titles compare the marker's drawn position with the
+browser's own measure of the text position after the caret, the selection, the
+untouched "Untitled", and in an emptied title, and observe it gone at each
+ending; one of them emulates the reduced-motion preference and observes the
+dots pulsing without it and still with it. Mounted toolbar tests move to another
+note while recording and observe the remainder
 saved to the note left, an idle button, a dropped kept recording, and the
 toast of a failed last conversion. The
 mocked recording journey supplies a transcription and observes the original
-body, one space, and the transcription's text. A second mocked journey makes
+body, one space, and the transcription's text. It also sees the marker
+while recording and not after Stop. The mocked New note journey sees the
+title's marker while listening and not after the words arrived. A second mocked journey makes
 the transcription fail at Stop, observes the unchanged body and the error
 toast, then lets the transcription succeed and observes the button's retry
 adding the passage once. Model tests with the real audio buffer cover kept

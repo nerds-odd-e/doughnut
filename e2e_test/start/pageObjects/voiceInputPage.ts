@@ -1,4 +1,5 @@
 import { waitUntilAppIsNotBusy } from '../pageBase'
+import { arrivalMarker } from './dictationArrivalMarker'
 import {
   clickToolbarOverflowAction,
   noteToolbar,
@@ -31,6 +32,14 @@ const voiceInputPage = () => {
         .find('button[title="Voice input"]', { timeout: 30000 })
         .should('be.enabled')
       waitUntilAppIsNotBusy()
+      return this
+    },
+    expectArrivalPlaceMarkedInNoteContent() {
+      cy.get(arrivalMarker).should('be.visible')
+      return this
+    },
+    expectNoArrivalPlaceMarked() {
+      cy.get(arrivalMarker).should('not.exist')
       return this
     },
   }

@@ -5,8 +5,8 @@ export function initialNewNoteTitle(initialTitle?: string): string {
   return initialTitle.endsWith(" ") ? initialTitle : `${initialTitle} `
 }
 
-/** An untouched default is a placeholder: heard words replace it. Any other title takes them at its caret or selection. */
-export function heardWordsReplaceTitle(
+/** An untouched default is a placeholder: the whole of it is the target heard words replace. Any other title takes them at its caret or selection. */
+export function wholeTitleIsDictationTarget(
   hasTitleBeenEdited: boolean,
   currentTitle: string
 ): boolean {

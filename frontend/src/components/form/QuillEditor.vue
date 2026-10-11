@@ -26,6 +26,7 @@ import {
   toPasteChoiceAnchorRect,
   type PasteChoiceAnchorRect,
 } from "@/composables/pasteChoicePosition"
+import { quillDictationTarget } from "./quillDictationTarget"
 
 registerDonutQuillBlots()
 
@@ -194,6 +195,8 @@ function insertTextAtCursor(text: string) {
   return true
 }
 
+const beginDictation = () => quillDictationTarget(quill.value!, lastRange.value)
+
 /** Swaps the span a rich paste inserted (`context.range.index` for
  * `context.insertedLength` characters) back to `text`, via a single Delta
  * retain/delete/insert so undo history and the `text-change` listener above
@@ -223,6 +226,7 @@ function pasteInsertionViewportRect(range: {
 
 defineExpose({
   insertTextAtCursor,
+  beginDictation,
   replacePastedRange,
   pasteInsertionViewportRect,
 })

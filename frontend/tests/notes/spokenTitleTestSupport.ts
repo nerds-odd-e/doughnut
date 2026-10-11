@@ -11,6 +11,7 @@ import {
 } from "@tests/notes/noteVoiceInputButtonMocks"
 import { setCaretInEditor } from "@tests/components/form/seamlessTextEditorTestSupport"
 import { audioTextResponse } from "@tests/notes/noteVoiceInputButtonTestSupport"
+import { expectDictationMarkerAt } from "@tests/notes/dictationMarkerTestSupport"
 import { titleEditorEl } from "@tests/notes/noteTextContentTestSupport"
 import { flushReferencedTitleBlurDiscardCheck } from "@tests/notes/textContentWrapperTestSupport"
 import { afterEach, beforeEach, expect, vi } from "vitest"
@@ -97,6 +98,11 @@ export function selectWholeTitle(wrapper: VueWrapper<ComponentPublicInstance>) {
   window.getSelection()!.selectAllChildren(title)
 }
 
+/** "false" while the title takes no edits. */
+export function titleEditable(wrapper: VueWrapper<ComponentPublicInstance>) {
+  return titleEditorEl(wrapper).getAttribute("contenteditable")
+}
+
 export function titleCaretOffset() {
   const range = window.getSelection()!.getRangeAt(0)
   expect(range.collapsed).toBe(true)
@@ -168,6 +174,19 @@ export function holdSpeakTitleConvertingUntilFinished() {
   return { finishStop: () => finishStop() }
 }
 
+/** The next recorder fails to start. */
+export function microphoneCannotStart() {
+  const createRecorder = vi.mocked(createAudioRecorder)
+  const createRecorderImpl = createRecorder.getMockImplementation()!
+  createRecorder.mockImplementationOnce((callback, options) => {
+    const recorder = createRecorderImpl(callback, options!)
+    vi.mocked(recorder.startRecording).mockRejectedValueOnce(
+      new Error("Permission denied")
+    )
+    return recorder
+  })
+}
+
 /** Stop without invoking the processor — silent recording, no conversion. */
 export function stubSilentStopRecording() {
   latestMockedAudioRecorder().stopRecording.mockImplementation(
@@ -198,4 +217,22 @@ export async function blurAwayFromSpokenTitle(
   titleEditorEl(wrapper).blur()
   await flushPromises()
   await flushReferencedTitleBlurDiscardCheck()
+}
+
+/** Where the browser draws the title's text position `offset`. */
+export function titleTextPlace(
+  wrapper: VueWrapper<ComponentPublicInstance>,
+  offset: number
+) {
+  const place = document.createRange()
+  place.setStart(titleEditorEl(wrapper).firstChild!, offset)
+  return place.getBoundingClientRect()
+}
+
+/** The marker is drawn right after the title's text position `offset`. */
+export function expectTitleMarkerAfter(
+  wrapper: VueWrapper<ComponentPublicInstance>,
+  offset: number
+) {
+  expectDictationMarkerAt(titleTextPlace(wrapper, offset))
 }

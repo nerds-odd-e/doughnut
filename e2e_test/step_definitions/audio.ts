@@ -34,12 +34,34 @@ When('I retry converting my speech', () => {
   start.assumeNotePage().voiceInput().retryConvertingSpeech()
 })
 
+Then(
+  'the place where my speech will arrive should be marked in the note content',
+  () => {
+    start.assumeNotePage().voiceInput().expectArrivalPlaceMarkedInNoteContent()
+  }
+)
+
+Then('no place should be marked for arriving speech', () => {
+  start.assumeNotePage().voiceInput().expectNoArrivalPlaceMarked()
+})
+
 When('I speak the title', () => {
   noteCreationForm.speakTheTitle()
 })
 
 When('I stop speaking the title', () => {
   noteCreationForm.stopSpeakingTheTitle()
+})
+
+Then(
+  'the place where my spoken title will arrive should be marked in the Title field',
+  () => {
+    noteCreationForm.expectArrivalPlaceMarkedInTitle()
+  }
+)
+
+Then('no place should be marked in the Title field', () => {
+  noteCreationForm.expectNoArrivalPlaceMarkedInTitle()
 })
 
 Then('the Title field should read {string}', (title: string) => {

@@ -61,6 +61,7 @@ import {
   type PropertyRow,
 } from "@/utils/noteContentFrontmatter"
 import type { DeadWikiLinkPayload } from "@/utils/wikiLinkMarkup"
+import { endOfTextDictationTarget } from "@/models/audio/dictationTarget"
 
 const quillRef = ref<InstanceType<typeof QuillEditor> | null>(null)
 
@@ -215,6 +216,15 @@ function insertTextAtCursor(text: string) {
   }
 }
 
+/** A body this editor cannot edit takes dictation at the end of its Markdown. */
+const beginDictation = () =>
+  effectiveReadonly.value
+    ? endOfTextDictationTarget(
+        () => props.modelValue ?? "",
+        (markdown) => emits("update:modelValue", markdown)
+      )
+    : quillRef.value!.beginDictation()
+
 function replacePastedRange(context: QuillPasteContext, text: string) {
   quillRef.value?.replacePastedRange(context, text)
 }
@@ -230,6 +240,7 @@ function addWikiLinkAsProperty(text: string) {
 defineExpose({
   insertMarkdownAtEnd,
   insertTextAtCursor,
+  beginDictation,
   addWikiLinkAsProperty,
   replacePastedRange,
   pasteInsertionViewportRect,

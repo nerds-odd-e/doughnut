@@ -33,7 +33,7 @@
                 <SpeakTitleControl
                   joins-field
                   v-model:busy="titleSpeechBusy"
-                  @heard-segments="onHeardTitleSegments"
+                  @heard-segments="insertHeardSegments"
                 />
                 <WikidataSearchByLabel
                   :search-key="newTitle"
@@ -81,12 +81,12 @@ import WikidataSearchByLabel from "./WikidataSearchByLabel.vue"
 import { useRouter } from "vue-router"
 import { useNoteStore } from "@/store/noteStore"
 import usePopups from "@/components/commons/Popups/usePopups"
-import {
-  dictatedInsertion,
-  joinDictatedSegments,
-} from "@/models/audio/joinDictatedSegments"
+import { useTitleDictation } from "@/composables/useTitleDictation"
 import { contentForNewNote, createNoteFromForm } from "./noteNewFormSubmit"
-import { heardWordsReplaceTitle, initialNewNoteTitle } from "./noteNewFormTitle"
+import {
+  initialNewNoteTitle,
+  wholeTitleIsDictationTarget,
+} from "./noteNewFormTitle"
 import { applyWikidataEntryToNewNoteForm } from "./noteNewFormWikidata"
 import type { NoteCreationParentRelationship as ParentRelationship } from "@/utils/noteCreationParentRelationship"
 
@@ -156,9 +156,13 @@ const noteFormErrors = ref<{
   wikidataId: undefined,
 })
 const processing = ref(false)
-const titleSpeechBusy = ref(false)
 const hasTitleBeenEdited = ref(props.initialTitle !== undefined)
 const pathNameEditor = ref<InstanceType<typeof PathNameEditor> | null>(null)
+const { busy: titleSpeechBusy, insertHeardSegments } = useTitleDictation(() =>
+  pathNameEditor.value!.beginDictation(
+    wholeTitleIsDictationTarget(hasTitleBeenEdited.value, newTitle.value)
+  )
+)
 const effectiveSearchKey = computed(() =>
   hasTitleBeenEdited.value ? newTitle.value : ""
 )
@@ -217,16 +221,6 @@ const onSelectWikidataEntry = (
 
 const onTitleChange = () => {
   hasTitleBeenEdited.value = true
-}
-
-const onHeardTitleSegments = (segments: string[]) => {
-  if (heardWordsReplaceTitle(hasTitleBeenEdited.value, newTitle.value)) {
-    pathNameEditor.value?.replaceText(joinDictatedSegments("", segments))
-    return
-  }
-  pathNameEditor.value?.insertAtSelection((before, after) =>
-    dictatedInsertion(before, segments, after)
-  )
 }
 </script>
 

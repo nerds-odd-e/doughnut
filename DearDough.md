@@ -6,7 +6,7 @@ released response is not proof of effectiveness. Unknown provenance stays unknow
 [Response status](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/finding-names.md).
 Full pre-trim evidence: `8830c682704aac3bbb34bf9b1204da8feba042ca:DearDough.md`. Older narratives live in Git, not a second archive.
 
-- Highest allocated local number: 230. Removed local codes are never reused.
+- Highest allocated local number: 231. Removed local codes are never reused.
 
 Detailed retained observations are consolidated in the linked Open Dough
 record; headings and former local aliases preserve traceability. Review date:
@@ -364,6 +364,14 @@ Plan 064 moved the recording session from a panel opened per use to a button tha
   - Evidence: `5c3ca7033b:.planning/slice-plans/064-single-button-voice-input/PLAN.md` Learnings ("captures the note at call time") and "Design for the button"; slice 2 return, decision 1 ("Voice input clicked on a second note visited in the same page session would dictate into the first note"); the added spec "dictates into the note on the page when voice input starts after moving to another note", reported to fail without the fix; slice 4 replacing the fix with a key on the note's id
   - Observed effect: the implementer found the defect mid-slice, added a watch and a test outside the plan, and slice 4 later replaced the watch
   - Inference: the plan's navigation premise covered an open panel surviving a note change, not an idle control; a slice that changes a component's lifetime needs its per-instance captures re-read
+- Execution: SEED-066#read-only-voice-input-with-insertion-feedback (first implementation commit 7557329339)
+  - Timestamp: 2026-10-11T11:15:00+09:00
+  - Tool: Claude Code
+  - Model: claude-opus-5-5
+  - Open Dough release: 0.3.58
+  - Evidence: plan 067 slice 2 and its proof table at `783d3f96cd` (no observation for leaving the note while a title is listening); slice 2 return, second round ("moving to another existing note while listening left that note's title locked"); `frontend/tests/notes/NoteShow.spokenTitleLeavingNote.spec.ts` at `f4bba8d679`, reported to fail before the fix; plan 067 obligation G10 at `e87920d731`
+  - Observed effect: the title's read-only lock stayed on the title editor reused for the next note; the coordinator asked for the observation after reading `NoteShow.vue` for keys, and the implementer keyed the speak control on the note's id and ended the session on a note change
+  - Inference: same lifetime question as the first occurrence, on the title this time; the plan reused the `busy` signal without asking what ends it when the page moves between cached notes
 
 ## DD-225 — A removal sweep's search terms matched a dated observation record, so the implementer reworded history to make the sweep return nothing
 
@@ -448,3 +456,17 @@ To observe the runner during a migration, the execution supplied `beforeMigrate.
   - Evidence: plan 066 Learnings "Slice 3" and "Slice 4" at `af62c7cd0a`; `sut.log` lines 148 to 234 in the execution worktree (`Executing SQL callback: beforeMigrate`, `Successfully applied 41 migrations`)
   - Observed effect: both `pnpm e2e:hold` and `pnpm cy:run` were observed returning 503 during the held migration and resetting test data only after the first 200; each slice took about five minutes including startup
   - Inference: useful practice: a timing fault was proved at the real boundary with a release barrier instead of a sleep or a stand-in response; it depends on the runner passing its environment to the backend, which was confirmed with `ps eww`
+
+## DD-231 — A plan's proof table left out endings the story states, and implementers returned the slices complete with those endings untested
+
+The story lists how a voice-input session ends or never starts: the microphone cannot start, nothing was heard, leaving the note. Plan 067's proof table named the landing place, the read-only state, failure and retry, but not those endings. Each implementer delivered the table and listed the endings as untested in a complete report.
+
+### Occurrences
+- Execution: SEED-066#read-only-voice-input-with-insertion-feedback (first implementation commit 7557329339)
+  - Timestamp: 2026-10-11T11:00:00+09:00
+  - Tool: Claude Code
+  - Model: claude-opus-5-5
+  - Open Dough release: 0.3.58
+  - Evidence: plan 067 "Outside-in proof ownership" at `783d3f96cd`; slice 1 first return, "Not covered by a test" (microphone cannot start, nothing heard with an editor open, Quill re-enabled on leaving); the three tests added in the second round at `7557329339`; the DD-224 occurrence of this execution for the title
+  - Observed effect: slices 1 and 2 each needed a second implementation round after the coordinator compared the return with the story's Scope; the body endings already held, and the title ending was a real defect
+  - Inference: the delegation carried the proof table as the promise list; carrying the story's session-end list beside it would likely have saved both rounds
