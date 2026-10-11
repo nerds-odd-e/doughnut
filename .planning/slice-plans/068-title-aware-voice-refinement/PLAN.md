@@ -234,3 +234,9 @@ Disposition: no user cost "For authors speaking a note title, produce wording an
 Reported: slice 3 — "New note submit HTTP400 from NoteCreationDTO Pattern rejects ASCII '?'; frontend leaves it."
 Story clause: "Review saved spoken titles for ordinary phrases, questions, partial edits, and detailed speech"
 Disposition: proved by slice 3: EVIDENCE.md#slice-3-title-journeys-and-persistence
+
+## Execution complete
+
+Product advice: Keep the current voice-input priorities; no corrective story or
+new architectural direction is needed. Assimilate title guidance and fullwidth
+question punctuation into lasting spoken-title documentation during wrap-up.

@@ -226,3 +226,23 @@ typechecks passed; whitespace check passed. Existing E2E boundaries were
 unchanged by those edits. Selective formatter passed; reviewed mechanical
 formatting introduces no semantic changes. G2 and G4 are proved by this slice.
 Previous accepted publication: f7dfae9e25307064497edc7379eb502318dc6479.
+
+## Execution retrospective
+
+Original contract and execution-ready plan recovered at claim 32b131f18;
+76aec3c8 is paid-premise evidence, f7dfae9e is contract/provider transport,
+f2ece77e is title activation/persistence. The aggregate range is uncontaminated;
+starting claim and prior toolbar sibling are provenance, not implementation.
+All slices delivered; discovery-driven question normalization and generation
+ordering preserve the original scope. No remaining outcome/architecture/test
+correction identified. One prompt owner and shared title caller retain normal
+editor insertion/save ownership; body uses the unchanged omitted-intent route.
+Whole-suite assessment retained real audio smoke, mounted placement/lifecycle
+variations, controller transport and integrated save/reload journeys; detailed
+variations stay mounted rather than adding paid E2E. E2E exposed question-save
+failure during development; restored discriminating mutations prove unit gates.
+Enabled process review used available coordinator/agent returns: required paid
+authorization and question-save stop were observed; no actionable new finding.
+Product advice is in the completion record. General speech reliability, casing,
+latency and standalone E2E typecheck limitations remain as stated above.
+CI remains pending for story-branch publication f2ece77e while review completes.
