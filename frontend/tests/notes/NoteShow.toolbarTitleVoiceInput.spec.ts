@@ -24,7 +24,11 @@ import {
   mockUpdateNoteTitle,
   mockedUpdateTitleCall,
 } from "@tests/notes/noteTextContentTestSupport"
-import { audioTextResponse } from "@tests/notes/noteVoiceInputButtonTestSupport"
+import {
+  audioTextResponse,
+  startVoiceInputByPointer,
+  stopVoiceInputWithFocus,
+} from "@tests/notes/noteVoiceInputButtonTestSupport"
 import { dictationMarker } from "@tests/notes/dictationMarkerTestSupport"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 
@@ -74,26 +78,8 @@ describe("Toolbar voice input with a focused title", () => {
   })
   afterEach(() => wrapper.unmount())
 
-  async function start() {
-    const button = wrapper.find('button[aria-label="Voice input"]')
-      .element as HTMLButtonElement
-    // Dispatching alone has no browser default: model pointer focus unless prevented.
-    const event = new PointerEvent("pointerdown", {
-      bubbles: true,
-      cancelable: true,
-    })
-    button.dispatchEvent(event)
-    if (!event.defaultPrevented) button.focus()
-    button.click()
-    await flushPromises()
-  }
-  async function stop() {
-    const button = wrapper.find('button[aria-label="Stop voice input"]')
-      .element as HTMLButtonElement
-    button.focus()
-    button.click()
-    await flushPromises()
-  }
+  const start = () => startVoiceInputByPointer(wrapper)
+  const stop = () => stopVoiceInputWithFocus(wrapper)
 
   it("inserts at the title caret, saves normally and restores editing after Stop", async () => {
     placeCaretInTitle(wrapper, 7)

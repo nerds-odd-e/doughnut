@@ -115,6 +115,31 @@ export async function stopRecording(wrapper: NoteVoiceInputButtonWrapper) {
   await wrapper.vm.$nextTick()
 }
 
+/** Model the pointer's default focus transfer unless the control prevents it. */
+export async function startVoiceInputByPointer(wrapper: VueWrapper) {
+  const button = wrapper.find(
+    `button[aria-label="${noteVoiceInputTitles.start}"]`
+  ).element as HTMLButtonElement
+  const event = new PointerEvent("pointerdown", {
+    bubbles: true,
+    cancelable: true,
+  })
+  button.dispatchEvent(event)
+  if (!event.defaultPrevented) button.focus()
+  button.click()
+  await flushPromises()
+}
+
+/** Stop through the toolbar after focus has moved onto its active control. */
+export async function stopVoiceInputWithFocus(wrapper: VueWrapper) {
+  const button = wrapper.find(
+    `button[aria-label="${noteVoiceInputTitles.stop}"]`
+  ).element as HTMLButtonElement
+  button.focus()
+  button.click()
+  await flushPromises()
+}
+
 /**
  * A note toolbar whose Voice input is recording. Stopping the returned
  * `recorder` converts the remaining audio.

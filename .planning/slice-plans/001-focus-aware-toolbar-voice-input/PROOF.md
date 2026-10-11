@@ -201,3 +201,31 @@ from slice-2 suffix base. Slice-3 work was preserved and restored without confli
 Frontend proofs and clean-toolbar E2E retain unchanged boundaries; the repaired
 New note readiness helper and unchanged linked scenario passed at repair base.
 These are per-boundary proof reuse, not a claim of a combined-tree E2E run.
+
+Published slice 3: `d82ffb11d91c102d5dc356b94e00186fd59498fd`, suffix base
+`8944c119e408a8e913445e640aa49b7275d4564c`, same branch/observer, no replay.
+
+## Slice 4
+
+Mounted `NoteShow.toolbarTitleDraft.spec.ts` types a referenced draft, selects
+Spring, starts the actual toolbar and holds conversion through the double-rAF
+blur check. Red lost the draft to the saved title; green retains it until words
+produce Autumn orchard notes, then saves with explicit Keep visible text.
+Four failure variants retain draft/editability and permit fresh recording;
+actionable toasts, ordinary departure discard and reduced-motion marker pass.
+
+```sh
+CURSOR_DEV=true nix develop -c pnpm frontend:test tests/notes/NoteShow.toolbarTitleVoiceInput.spec.ts tests/notes/NoteShow.toolbarTitleDraft.spec.ts tests/notes/NoteEditableTitle tests/notes/NoteNewForm.spokenTitle tests/notes/NoteShow.spokenTitleLeavingNote.spec.ts tests/notes/NoteVoiceInputButton tests/notes/NoteToolbar.voiceInput tests/notes/TextContentWrapper.spec.ts tests/notes/NoteTextContent tests/notes/NoteContextReader.spec.ts tests/components/notes/NoteTextContentUndo.spec.ts tests/components/form/SeamlessTextEditor.spec.ts tests/components/notes/core/PathNameEditor.spec.ts
+CURSOR_DEV=true nix develop -c pnpm frontend:test tests/notes/NoteEditableContent
+CURSOR_DEV=true nix develop -c pnpm -C frontend exec vue-tsc --noEmit
+CURSOR_DEV=true nix develop -c pnpm -C frontend exec tsc --noEmit
+CURSOR_DEV=true nix develop -c pnpm cy:run --spec e2e_test/features/note_creation_and_update/record_live_audio.feature
+```
+
+32 files / 210 tests plus content consumers 7 files / 50 tests passed; both
+typechecks and E2E 5 scenarios passed. Linked toolbar rename uses ordinary choice,
+reload, retained visible wiki-link text and opens the renamed note. New note,
+clean caret/reload, body and Retry pass. Approximately 8–9 active minutes plus
+measured proof/stack wait. Refactor consolidated duplicate pointer/Stop actions
+in existing test support; reran the two page specs (14 tests) and both typechecks.
+Production/E2E boundaries unchanged. Whitespace and coordinator formatting pass.

@@ -67,7 +67,7 @@ Feature: Record live audio onto a note
     Then the note title should be "Orchard harvest notes"
     And the note "Orchard/Orchard harvest notes" in Donut should have content "This is class 1."
 
-  Scenario: Rename a linked note by speaking the title, keeping visible reference text
+  Scenario: Rename a linked note from the toolbar, keeping visible reference text
     Given I have a notebook "WikiLinks Speak NB" with notes:
       | Title          | Folder         |
       | WikiLinks Tech | WikiLinks Root |
@@ -79,12 +79,14 @@ Feature: Record live audio onto a note
       """
     And I route to the note "WikiLinks CI"
     And I select the whole note title
-    And I speak the title
+    And I start voice input from the visible toolbar
     And the browser records audio input from the microphone as in "lecture.wav"
-    And I stop speaking the title
+    And I stop recording audio
     Then the note title should be "WikiLinks CI Renamed"
     When I keep visible reference text for the title "WikiLinks CI Renamed"
-    And I route to the note "WikiLinks Tech"
+    And I reload the current page for note "WikiLinks CI Renamed"
+    Then the note title should be "WikiLinks CI Renamed"
+    When I route to the note "WikiLinks Tech"
     Then I should see the note content rendered as:
       | Kind      | Text           |
       | wiki link | WikiLinks CI   |

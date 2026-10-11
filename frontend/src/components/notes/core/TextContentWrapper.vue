@@ -76,6 +76,7 @@ const props = defineProps({
     required: false,
   },
   titleRenameNeedsExplicitReferenceChoice: { type: Boolean, default: false },
+  retainTitleDraft: { type: Boolean, default: false },
   noteId: { type: Number, required: true },
   beforeSaveContent: {
     type: Function as PropType<
@@ -201,7 +202,12 @@ const onBlur = () => {
 const scheduleReferencedTitleBlurDiscardCheck = (root: HTMLElement) => {
   requestAnimationFrame(() => {
     requestAnimationFrame(() => {
-      if (!needsExplicitReferencedTitleSave() || !hasUnsavedChanges()) return
+      if (
+        props.retainTitleDraft ||
+        !needsExplicitReferencedTitleSave() ||
+        !hasUnsavedChanges()
+      )
+        return
       const focused = document.activeElement
       if (focused instanceof Node && root.contains(focused)) return
       discardDraft()

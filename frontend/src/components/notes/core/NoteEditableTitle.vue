@@ -4,6 +4,7 @@
     field="edit title"
     :title-rename-needs-explicit-reference-choice="hasInboundReferences"
     :note-id="noteId"
+    :retain-title-draft="titleVoiceInput.busy.value"
   >
     <template #default="{ value, update, blur, errors }">
       <PathNameEditor
