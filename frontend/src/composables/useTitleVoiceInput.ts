@@ -26,7 +26,10 @@ export function useTitleVoiceInput(
     const recorder = createAudioRecorder(
       async (chunk) => {
         try {
-          const { segmentTexts, endTimestamp } = await audioChunkToText(chunk)
+          const { segmentTexts, endTimestamp } = await audioChunkToText(
+            chunk,
+            true
+          )
           if (audioRecorder === recorder && segmentTexts.length) {
             heardSegments(segmentTexts)
           }

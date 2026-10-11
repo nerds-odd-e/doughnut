@@ -165,22 +165,25 @@ export const assumeNotePage = (
       cy.clearFocusedText().type(newTitle)
       return this.chooseReferencedTitleSave(choice, newTitle)
     },
-    placeTitleCaretAfter(text: string) {
+    selectWholeTitle() {
+      cy.get(mainNoteHeadingTitleSelector).click().type('{selectall}')
+      return this
+    },
+    selectTitleWords(text: string) {
       cy.get(mainNoteHeadingTitleSelector).then(($title) => {
         const title = $title[0]!
-        expect(title.textContent).to.contain(text)
+        const offset = title.textContent!.indexOf(text)
+        expect(offset, `Title contains selected words ${text}`).to.be.at.least(
+          0
+        )
         title.focus()
         const range = title.ownerDocument.createRange()
-        range.setStart(title.firstChild!, text.length)
-        range.collapse(true)
+        range.setStart(title.firstChild!, offset)
+        range.setEnd(title.firstChild!, offset + text.length)
         const selection = title.ownerDocument.defaultView!.getSelection()!
         selection.removeAllRanges()
         selection.addRange(range)
       })
-      return this
-    },
-    selectWholeTitle() {
-      cy.get(mainNoteHeadingTitleSelector).click().type('{selectall}')
       return this
     },
     voiceInput() {

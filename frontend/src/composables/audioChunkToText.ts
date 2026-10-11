@@ -2,7 +2,10 @@ import { AiAudioController } from "@generated/donut-backend-api/sdk.gen"
 import type { AudioChunk } from "@/models/audio/audioProcessingScheduler"
 
 /** Transcribe one recorder chunk; throws when the request fails. */
-export async function audioChunkToText(chunk: AudioChunk): Promise<{
+export async function audioChunkToText(
+  chunk: AudioChunk,
+  titleIntent?: boolean
+): Promise<{
   segmentTexts: string[]
   endTimestamp: string | undefined
 }> {
@@ -10,6 +13,7 @@ export async function audioChunkToText(chunk: AudioChunk): Promise<{
     body: {
       uploadAudioFile: chunk.data,
       midSpeech: chunk.isMidSpeech,
+      ...(titleIntent === undefined ? {} : { titleIntent }),
     },
   })
   if (error || !response) {

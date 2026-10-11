@@ -1,4 +1,5 @@
 import { createAudioRecorder } from "@/models/audio/audioRecorder"
+import { AiAudioController } from "@generated/donut-backend-api/sdk.gen"
 import { flushPromises, type VueWrapper } from "@vue/test-utils"
 import type { ComponentPublicInstance } from "vue"
 import { wrapSdkResponse } from "@tests/helpers"
@@ -99,6 +100,33 @@ describe("NoteNewForm spoken title", () => {
     expect(wrapper.text()).toContain(
       "'/' is not a legal name, and it has been replaced with the fullwidth '／'"
     )
+  })
+
+  it.each([
+    ["Where do migratory birds sleep?", "Where do migratory birds sleep？"],
+    [
+      "Managing a community orchard through late spring frosts while preserving pollinator habitat and the volunteers’ harvest records",
+      "Managing a community orchard through late spring frosts while preserving pollinator habitat and the volunteers’ harvest records",
+    ],
+  ])("submits the dictated title directly: %s", async (title, savedTitle) => {
+    hearing(title)
+    wrapper = mountNoteNewForm(notebookRootProps, { attachTo: document.body })
+    await speakAndStop(wrapper)
+    expect(AiAudioController.audioToText).toHaveBeenCalledExactlyOnceWith({
+      body: {
+        uploadAudioFile: expect.any(File),
+        midSpeech: false,
+        titleIntent: true,
+      },
+    })
+    expect(noteTitleText(wrapper)).toBe(savedTitle)
+    vi.clearAllTimers()
+    await wrapper.find('[data-testid="note-new-form"]').trigger("submit")
+    await flushPromises()
+    expect(sdkSpies.mockedCreateNoteAtRoot).toHaveBeenCalledWith({
+      path: { notebook: notebookRootProps.notebookId },
+      body: expect.objectContaining({ newTitle: savedTitle }),
+    })
   })
 
   it("searches for existing notes with the heard title", async () => {

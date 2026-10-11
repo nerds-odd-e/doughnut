@@ -21,21 +21,7 @@ No additional permanent real-service audio E2E scenario is planned.
 
 ## Workspace and decisions
 
-- Execution established 2026-10-11: Akiho-chan, publisher
-  `dashboard-territory.local-doughnut`, Story Branch Mode; owned execution
-  checkout is the named worktree below, integration/default checkout is
-  `/Users/terryyin/git/doughnut`, remote trunk `origin/main`, increment target
-  `origin/codex/refine-dictated-titles-with-title-aware-wording`.
-  Claim/base `32b131f18e779989c8f7e2651cb482c3485269f1`, execution starting
-  revision `67a193879089732f7093db75f9b27cd1321da76f`.
-  Changed-since-readiness indication retained: toolbar targeting has landed;
-  use its actual supported title caller. Existing scope and Ready still apply.
-  Existing planning authority permits refining remaining work on an overrun.
-  Checkout setup and `./scripts/run.sh pnpm exec biome --version` succeeded.
-  CI source GitHub Actions, verified selector `ci.yml`; Codex observer
-  coordinator `akiho-title`, directory `/tmp/dough-ci-501/watch-4QRYW9`,
-  PID `7600`, yielded cell `3`, session `98491`, observing the execution
-  branch from this checkout. The claim's trunk CI is unobserved.
+- Established execution identity, setup, and CI binding: [execution context](EVIDENCE.md#execution-context).
 - Reuse `/Users/terryyin/git/doughnut/.worktrees/refine-dictated-titles-with-title-aware-wording`,
   branch `codex/refine-dictated-titles-with-title-aware-wording`, preparation
   Rina-chan, starting revision `96e85acfcfee1ec098d20323413b67484fc37079`.
@@ -50,6 +36,8 @@ No additional permanent real-service audio E2E scenario is planned.
   content behavior for callers that omit it. The backend owns the instruction;
   regenerate the OpenAPI document and client. Keep the current response shape
   and final-transcription model for this first approach.
+  Questions retain punctuation; ordinary path-name handling maps provider ASCII
+  `?` to fullwidth `？`, following the existing backend normalizer.
 - [ADR 0005 — Web routes](../../../docs/adrs/0005-web-routes-accepted.md)
   governs `/api` and OpenAPI; [ADR 0006 — Failure handling](../../../docs/adrs/0006-failure-handling-accepted.md)
   governs deliberate recovery; [ADR 0007 — Environments and isolation](../../../docs/adrs/0007-environments-and-isolation-accepted.md)
@@ -163,7 +151,8 @@ this slice. Preserve the response shape, SRT continuation, and save ownership.
 
 ### 3. Apply title guidance in both spoken-title journeys
 Type: Behavior
-Status: planned
+Status: done
+Accepted proof: [title journeys and persistence](EVIDENCE.md#slice-3-title-journeys-and-persistence).
 Proof: Mounted callers prove title intent and insertion; request-sensitive
 mocked E2E proves saved titles and unchanged content after reload.
 
@@ -220,13 +209,9 @@ exception applies. Do not split the shared title rule into per-example handlers.
 
 ## Plan review
 
-The sequence isolates the paid premise, then one necessary conversion-contract
-Structure immediately before the cohesive UI Behavior. No independent product
-outcome, speculative framework, or duplicate prompt owner is included. A
-separate slice-refinement pass is not needed: the boundaries, proof owners, and
-test/wait exceptions are explicit. The unpaid route stops at provisioning and
-paid access; these are bounded by slice 1, whose failure stops all dependent
-work. No other slice-specific planning concern was identified.
+The sequence isolates the paid premise, contract Structure, and cohesive UI
+Behavior. Slice 3 discovered missing frontend question-mark normalization;
+reuse ordinary name handling and retain saved question punctuation.
 
 ## Story obligations
 
@@ -238,9 +223,14 @@ Disposition: proved by slice 1: EVIDENCE.md#slice-1-paid-comparison
 ### G2. Saved title and content regression observations follow activation
 Reported: slice 1 — "Actual insertion and persistence belong to slice 3 and were not observed here; content regression remains unobserved."
 Story clause: "Apply the title-aware instruction to supported title voice-input journeys, including New note. Content dictation keeps its existing transcription behavior."
-Disposition: receiving slice 3
+Disposition: proved by slice 3: EVIDENCE.md#slice-3-title-journeys-and-persistence
 
 ### G3. Bounded probe limits
 Reported: slice 1 — "One synthetic voice and one sample per example; both requests capitalize Harvest; no arbitrary-human-audio or latency guarantee was observed."
 Story clause: "For authors speaking a note title, produce wording and punctuation suited to a concise title while preserving their intended meaning and control over the existing title."
 Disposition: no user cost "For authors speaking a note title, produce wording and punctuation suited to a concise title while preserving their intended meaning and control over the existing title.": accepted proof is a bounded example comparison; Harvest preserves the dictated word and meaning, no exact casing rule or general reliability/latency guarantee is promised. Slice 3 still owns insertion and preservation.
+
+### G4. Saved question punctuation
+Reported: slice 3 — "New note submit HTTP400 from NoteCreationDTO Pattern rejects ASCII '?'; frontend leaves it."
+Story clause: "Review saved spoken titles for ordinary phrases, questions, partial edits, and detailed speech"
+Disposition: proved by slice 3: EVIDENCE.md#slice-3-title-journeys-and-persistence

@@ -25,7 +25,6 @@ import {
 import {
   mockUpdateNoteTitle,
   mockedUpdateTitleCall,
-  editTitle,
   titleEditorEl,
 } from "@tests/notes/noteTextContentTestSupport"
 import {
@@ -95,17 +94,47 @@ describe("Toolbar voice input with a focused title", () => {
     expect(titleEditable(wrapper)).toBe("true")
     expect(document.activeElement).toBe(titleEditorEl(wrapper))
     expect(titleCaretOffset()).toBe("Orchard harvest".length)
-    await editTitle(wrapper, "Orchard harvest correction notes")
     await vi.runOnlyPendingTimersAsync()
     await flushPromises()
     expect(mockedUpdateTitleCall).toHaveBeenCalledWith(
       expect.objectContaining({
         body: expect.objectContaining({
-          newTitle: "Orchard harvest correction notes",
+          newTitle: "Orchard harvest notes",
         }),
       })
     )
   })
+
+  it.each([
+    ["Where do migratory birds sleep?", "Where do migratory birds sleep？"],
+    [
+      "Managing a community orchard through late spring frosts while preserving pollinator habitat and the volunteers’ harvest records",
+      "Managing a community orchard through late spring frosts while preserving pollinator habitat and the volunteers’ harvest records",
+    ],
+  ])(
+    "requests title guidance and saves the returned title with ordinary name handling: %s",
+    async (title, savedTitle) => {
+      hearing(title)
+      selectWholeTitle(wrapper)
+      await start()
+      await stop()
+      expect(AiAudioController.audioToText).toHaveBeenCalledExactlyOnceWith({
+        body: {
+          uploadAudioFile: expect.any(File),
+          midSpeech: false,
+          titleIntent: true,
+        },
+      })
+      expect(noteTitleText(wrapper)).toBe(savedTitle)
+      await vi.runOnlyPendingTimersAsync()
+      await flushPromises()
+      expect(mockedUpdateTitleCall).toHaveBeenCalledWith(
+        expect.objectContaining({
+          body: expect.objectContaining({ newTitle: savedTitle }),
+        })
+      )
+    }
+  )
 
   it("replaces only the selected title text", async () => {
     placeCaretInTitle(wrapper, 0, 7)

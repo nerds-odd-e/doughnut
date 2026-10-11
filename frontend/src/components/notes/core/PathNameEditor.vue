@@ -56,6 +56,7 @@ const FULLWIDTH_REPLACE: Record<string, string> = {
   "\\": "＼",
   "/": "／",
   ":": "：",
+  "?": "？",
 }
 
 const LINK_BREAK_CHARS = "#^[]"

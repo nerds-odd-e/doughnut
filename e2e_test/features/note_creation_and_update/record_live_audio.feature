@@ -25,6 +25,8 @@ Feature: Record live audio onto a note
     Then the note content on the current page should be "This is class 1. its talk about dada struct day."
     And no place should be marked for arriving speech
     And the note "DS lecture/Data Structure Lecture" in Donut should have content "This is class 1. its talk about dada struct day."
+    When I reload the current page for note "Data Structure Lecture"
+    Then the note content on the current page should be "This is class 1. its talk about dada struct day."
 
   @mockBrowserTime
   Scenario: Retry the kept recording from the Voice input button after the transcription failed
@@ -40,32 +42,34 @@ Feature: Record live audio onto a note
     And the note "DS lecture/Data Structure Lecture" in Donut should have content "This is class 1. its talk about dada struct day."
 
   Scenario: Create a note by speaking the title
-    Given the OpenAI transcription service will return the text "Photosynthesis in desert plants." when I stop
+    Given the OpenAI transcription service will return the title "Where do migratory birds sleep?" for title-guided speech
     When I am creating a note in the notebook "DS lecture"
     And I speak the title
     Then the place where my spoken title will arrive should be marked in the Title field
     When the browser records audio input from the microphone as in "lecture.wav"
     And I stop speaking the title
-    Then the Title field should read "Photosynthesis in desert plants."
+    Then the Title field should read "Where do migratory birds sleep？"
     And no place should be marked in the Title field
     When I submit the new note
-    Then I should see the note "Photosynthesis in desert plants."
+    Then I should see the note "Where do migratory birds sleep？"
+    When I reload the current page for note "Where do migratory birds sleep？"
+    Then the note title should be "Where do migratory birds sleep？"
 
   @mockBrowserTime
-  Scenario: Insert spoken words at the title caret from the toolbar
-    Given I have a notebook "Orchard" with a note "Orchard notes" and content "This is class 1."
-    And the OpenAI transcription service will return the text "harvest" when I stop
-    When I visit note "Orchard notes"
-    And I place the note title caret after "Orchard"
+  Scenario: Replace selected title words from the toolbar and retain the surrounding title
+    Given I have a notebook "Orchard" with a note "Community Orchard notes" and content "This is class 1."
+    And the OpenAI transcription service will return the title "Garden" for title-guided speech
+    When I visit note "Community Orchard notes"
+    And I select the note title words "Orchard"
     And I start voice input from the visible toolbar
     And the browser records audio input from the microphone as in "lecture.wav"
     And I stop recording audio
-    Then the note title should be "Orchard harvest notes"
+    Then the note title should be "Community Garden notes"
     When it is 1 minutes later in the browser
-    And I track the current note title as "Orchard harvest notes"
-    And I reload the current page for note "Orchard harvest notes"
-    Then the note title should be "Orchard harvest notes"
-    And the note "Orchard/Orchard harvest notes" in Donut should have content "This is class 1."
+    And I track the current note title as "Community Garden notes"
+    And I reload the current page for note "Community Garden notes"
+    Then the note title should be "Community Garden notes"
+    And the note "Orchard/Community Garden notes" in Donut should have content "This is class 1."
 
   Scenario: Rename a linked note from the toolbar, keeping visible reference text
     Given I have a notebook "WikiLinks Speak NB" with notes:

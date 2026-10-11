@@ -147,3 +147,82 @@ compatible; activation and persisted observations stay with slice 3 (G2).
 Coordinator inspected handwritten diffs, generated optional contract, controller
 XML and body request assertion. Fresh refactor: already clean, no edits/tests;
 whitespace check passed. Selective format passed with no semantic change.
+
+## Slice 3 question-save discovery
+
+The first E2E run passed body reload, partial selected-title save/reload, retry,
+and linked rename, but New note question submission returned HTTP 400.
+NoteUpdateTitleDTO inherits NOTE_TITLE_REGEXP prohibiting ASCII `?`;
+PathNameEditor only mapped backslash/slash/colon. The provider and editor
+retained the question punctuation, so mocks were not its cause.
+Coordinator selected the existing normal-name solution: backend
+DisplayNamePathSeparators.normalizeNoteTitle/toFullwidthOrSpace already maps
+ASCII `?` to fullwidth `？`. Extend the existing frontend normalizer to the
+same mark; retain question semantics/punctuation and backend name constraint.
+Do not claim raw ASCII persistence or add title-only punctuation stripping.
+This is necessary repair at the existing title naming seam, no new provider
+operation, backend rejection change, or architectural exception.
+
+## Execution context
+
+- Execution established 2026-10-11: Akiho-chan, publisher
+  `dashboard-territory.local-doughnut`, Story Branch Mode; owned execution
+  checkout is the named worktree below, integration/default checkout is
+  `/Users/terryyin/git/doughnut`, remote trunk `origin/main`, increment target
+  `origin/codex/refine-dictated-titles-with-title-aware-wording`.
+  Claim/base `32b131f18e779989c8f7e2651cb482c3485269f1`, execution starting
+  revision `67a193879089732f7093db75f9b27cd1321da76f`.
+  Changed-since-readiness indication retained: toolbar targeting has landed;
+  use its actual supported title caller. Existing scope and Ready still apply.
+  Existing planning authority permits refining remaining work on an overrun.
+  Checkout setup and `./scripts/run.sh pnpm exec biome --version` succeeded.
+  CI source GitHub Actions, verified selector `ci.yml`; Codex observer
+  coordinator `akiho-title`, directory `/tmp/dough-ci-501/watch-4QRYW9`,
+  PID `7600`, yielded cell `3`, session `98491`, observing the execution
+  branch from this checkout. The claim's trunk CI is unobserved.
+
+## Slice 3 title journeys and persistence
+
+Shared useTitleVoiceInput sends titleIntent true; body calls omit intent.
+PathNameEditor uses ordinary fullwidth question-mark normalization, preserving
+question punctuation and the existing backend name constraint. Mounted New note
+and toolbar tests assert literal question/detailed wording, the actual request,
+and direct submit/debounced saving. Caret and partial selection cases retain
+surrounding words. Provider-sensitive mocked E2E proves New note question
+save/reload, selected-title replacement/reload, and body content reload;
+retry and linked rename remain covered. Synthetic output is not quality proof.
+
+Terminal passes in the execution checkout:
+
+```sh
+CURSOR_DEV=true nix develop -c pnpm frontend:test
+CURSOR_DEV=true nix develop -c pnpm -C frontend exec vue-tsc --noEmit
+CURSOR_DEV=true nix develop -c pnpm -C frontend exec tsc --noEmit
+CURSOR_DEV=true nix develop -c pnpm cy:run --spec e2e_test/features/note_creation_and_update/record_live_audio.feature
+```
+
+Full frontend: 338 files, 2151 cases; selected E2E: all 5 scenarios. Logs:
+/tmp/title-full-frontend-normalized.log and /tmp/title-e2e-normalized.log.
+Final focused title placement, toolbar, New note and body: 30/30 cases.
+Mutation observations, restored byte-exact before passing:
+missing title intent: 4 failures/15 passes; missing question normalization:
+2 failures/17 passes; disabled heardSegments insertion: 19 failures/7 passes.
+Logs: /tmp/title-intent-mutation.log, /tmp/title-question-normalization-mutation.log,
+/tmp/title-insertion-mutation.log, /tmp/title-final-focused.log.
+
+Optional standalone E2E tsc invocation found 130 unique diagnostics identical
+to the published baseline after location normalization, zero introduced.
+Required frontend typechecks and the actual E2E gate passed. Comparison logs:
+/tmp/title-e2e-candidate-typecheck.log and /tmp/title-e2e-baseline-typecheck.log.
+No extra paid calls. Active implementation about 8 minutes; suite waits excluded.
+
+Coordinator inspected production, mounted tests, E2E and terminal logs. Fresh
+post-change refactor made expected spoken/saved values literal and removed the
+orphan caret step/page-object helper. One-time whole-product search for
+placeTitleCaretAfter and its Gherkin wording returned no references; retained
+caret tests and persisted partial replacement prove the surviving behavior.
+After refactor, invalidated two title files: 19/19 cases and both frontend
+typechecks passed; whitespace check passed. Existing E2E boundaries were
+unchanged by those edits. Selective formatter passed; reviewed mechanical
+formatting introduces no semantic changes. G2 and G4 are proved by this slice.
+Previous accepted publication: f7dfae9e25307064497edc7379eb502318dc6479.

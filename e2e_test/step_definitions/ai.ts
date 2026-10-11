@@ -127,6 +127,13 @@ Given('the OpenAI transcription service fails', () => {
 })
 
 Given(
+  'the OpenAI transcription service will return the title {string} for title-guided speech',
+  (transcript: string) => {
+    mock_services.openAi().stubTitleTranscription(transcript)
+  }
+)
+
+Given(
   'the OpenAI transcription service now returns the text {string}',
   (transcript: string) => {
     mock_services.openAi().replaceTranscriptionFailureWithTranscript(transcript)

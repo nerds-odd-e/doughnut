@@ -131,6 +131,18 @@ const openAiService = (
       )
     },
 
+    stubTitleTranscription(transcript: string) {
+      return serviceMocker.mockWithPredicates(
+        [
+          transcriptionPredicate().withBody(
+            'Transcribe the spoken words as a note title or title fragment\\.'
+          ),
+        ],
+        [transcript],
+        transcriptHeaders
+      )
+    },
+
     stubTranscriptionFailure() {
       return serviceMocker.stubPosterWithError500Response(transcriptionPath, {})
     },

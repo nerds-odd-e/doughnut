@@ -12,12 +12,16 @@ const voiceInputPage = () => {
   return {
     startRecordingFromVisibleToolbar() {
       visibleToolbarActionButton('Voice input').click()
-      visibleToolbarActionButton('Stop voice input').should('be.visible')
+      visibleToolbarActionButton('Stop voice input')
+        .should('be.visible')
+        .and('be.enabled')
       return this
     },
     startRecording() {
       clickToolbarOverflowAction('Voice input')
-      visibleToolbarActionButton('Stop voice input').should('be.visible')
+      visibleToolbarActionButton('Stop voice input')
+        .should('be.visible')
+        .and('be.enabled')
       return this
     },
     stopRecording() {

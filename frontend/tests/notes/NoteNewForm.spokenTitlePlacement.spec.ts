@@ -120,4 +120,17 @@ describe("NoteNewForm spoken title placement", () => {
     expect(document.activeElement).toBe(titleEditorEl(wrapper))
     expect(titleCaretOffset()).toBe("Project weekly".length)
   })
+
+  it("replaces selected words while retaining the surrounding title", async () => {
+    hearing("harvest")
+    wrapper = mountNoteNewForm(notebookRootProps, { attachTo: document.body })
+    await settleScheduledAutofocus()
+    await setNoteNewFormTitle(wrapper, "Autumn orchard notes")
+    placeCaretInTitle(wrapper, 7, 14)
+
+    await speakAndStop(wrapper)
+
+    expect(noteTitleText(wrapper)).toBe("Autumn harvest notes")
+    expect(titleCaretOffset()).toBe("Autumn harvest".length)
+  })
 })
