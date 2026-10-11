@@ -6,7 +6,7 @@ released response is not proof of effectiveness. Unknown provenance stays unknow
 [Response status](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/finding-names.md).
 Full pre-trim evidence: `8830c682704aac3bbb34bf9b1204da8feba042ca:DearDough.md`. Older narratives live in Git, not a second archive.
 
-- Highest allocated local number: 231. Removed local codes are never reused.
+- Highest allocated local number: 232. Removed local codes are never reused.
 
 Detailed retained observations are consolidated in the linked Open Dough
 record; headings and former local aliases preserve traceability. Review date:
@@ -168,6 +168,14 @@ Evidence and response: [ODF-141](https://github.com/terryyin/open-dough/blob/mai
   - Evidence: refactor return for slice 1 ("none — already clean", about 62,000 sub-agent tokens, 43 s); refactor returns for slices 2, 3 and 4 with edits (a toolbar-panel composable folded into the Assimilate view, a recorder listener scoped to the recording, a spec over the file-size limit split, leaving-note cases gathered in one spec)
   - Observed effect: one of four refactor passes made no edit; slice 1 was a two-file structural move
   - Inference: as in the earlier execution, the passes on the behavior slices found real work; only the smallest slice's pass returned nothing
+
+- Execution: SEED-066#focus-aware-toolbar-voice-input (first implementation commit a3a2bb2bdec5)
+  - Timestamp: unknown
+  - Tool: Codex
+  - Open Dough release: unknown
+  - Evidence: refactor returns for slices 2, 3 and 5, and CI readiness repair; slices 3, 5 and repair reported approximately 4, 3 and 2 active minutes with no edits
+  - Observed effect: four of seven independent refactor passes returned no edits; the other three split planning evidence, consolidated duplicate test interactions, and deleted an unreachable presentation variant
+  - Inference: the three timed no-edit passes total about nine reported active minutes; review also found useful changes, so these observations support investigating proportionate review rather than skipping all independent review
 
 ## ODF-208 — The CI observer's worker exited without a terminal result, with no recorded cause
 
@@ -470,3 +478,18 @@ The story lists how a voice-input session ends or never starts: the microphone c
   - Evidence: plan 067 "Outside-in proof ownership" at `783d3f96cd`; slice 1 first return, "Not covered by a test" (microphone cannot start, nothing heard with an editor open, Quill re-enabled on leaving); the three tests added in the second round at `7557329339`; the DD-224 occurrence of this execution for the title
   - Observed effect: slices 1 and 2 each needed a second implementation round after the coordinator compared the return with the story's Scope; the body endings already held, and the title ending was a real defect
   - Inference: the delegation carried the proof table as the promise list; carrying the story's session-end list beside it would likely have saved both rounds
+
+## DD-232 — A title insertion marker became visible before microphone readiness, so cached E2E audio reached the previous recorder
+
+Synchronous title-range capture moved the pending marker before asynchronous microphone startup. The New note E2E action used that marker as readiness and returned before the new recorder connected. CI lost the transcript; waiting for the enabled listening control fixed the boundary.
+
+Follow-up: Open, unqueued.
+
+### Occurrences
+- Execution: SEED-066#focus-aware-toolbar-voice-input (first implementation commit a3a2bb2bdec5)
+  - Timestamp: unknown
+  - Tool: Codex
+  - Open Dough release: unknown
+  - Evidence: CI run 38123730120/attempt 1 at f75da95cb40f; repair 8944c119e408; its CI-REPAIR.md records the temporary 1500ms getUserMedia experiment (unchanged helper 4 pass/1 fail, listening-state wait 5 pass, ordinary mocks 5 pass)
+  - Observed effect: only New note creation failed; pending slice-3 work was paused/preserved/restored while the E2E helper was repaired and published
+  - Inference: a visible insertion marker establishes the editing session, not external microphone readiness; changes in that timing need consumer proof with delayed device startup

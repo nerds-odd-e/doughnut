@@ -104,3 +104,31 @@ returned no matches in current indexed product, docs and hidden agent guidance.
 Read current microphone/heading descriptions across frontend/backend/CLI/MCP/docs,
 E2E and guidance; shared SpeakTitleControl remains for New note and inventory.
 Historical preparation/observation provenance is preserved in planning/Git.
+
+## Execution retrospective
+
+Published slice 6: `147d425b24fe27ff8fb130575910857b2bbddaa6`, suffix base
+`fd449bd98a902092044a792ac2bace5ed583fffe`, same branch/observer, no replay.
+Planned execution recovered earliest four-slice contract at c69216321ab7 and
+approved evidence-led refinement to six at 852e0b02de71. Eight related commits
+are an uncontaminated suffix: a3a2bb2bdec5 (shared lifecycle), 852e0b02de71
+(planning provenance), f75da95cb40f (note ownership/capture), 8944c119e408 (owned
+CI readiness repair), d82ffb11d91c (clean toolbar), b76e3428b07a (draft/recovery),
+fd449bd98a90 (navigation), 147d425b24fe (entry-point removal). No sibling work
+is attributed. All six slices satisfy inspected proof and accepted publication.
+
+Aggregate review traced field-specific conversion, editor insertion/selection,
+reference/save ownership, note/field departure, actual toolbar/portal routing,
+New note and body consumers, and current voice documentation. Existing Accepted
+ADR constraints and mocked-audio North Star align; no architectural conflict,
+product defect, residue or correction plan was found. Mounted red cases drove
+behavior; adapted E2E journeys establish saving/reload. Whole audio suite review
+retains New note, body/retry and one real-service scenario, with placement and
+failure detail owned by mounted tests. Local evidence has the declared per-boundary
+E2E reuse; final CI remains pending for completion, not counted as passed.
+
+Process review used actual coordinator/agent returns and proof/CI records.
+DearDough.md records new DD-232 and another ODF-141 occurrence, 495 physical
+lines; no retention or threshold warning. Product queue/direction review recommends
+no change: the next title-aware story already accommodates the shared caller.
+No source, backlog or follow-up correction was edited.

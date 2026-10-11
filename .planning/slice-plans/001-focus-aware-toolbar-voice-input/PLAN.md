@@ -185,6 +185,14 @@ and obsolete descriptions. Update `docs/voice-input.md` and
 Record the sweep as a reading. No new behavior hides in cleanup. Target ~5
 minutes plus measured proof wait; hard 10 for implementation/cleanup.
 
+## Execution complete
+
+Product advice: Keep the queued title-aware voice refinement story next. Its
+existing caller-reconciliation step already anticipates the toolbar lifecycle;
+no priority or scope change is recommended. Outcome review found no correction.
+Process review recorded DD-232 and another ODF-141 occurrence in DearDough.md.
+Accepted review scope and publication are retained in [JOURNEY-PROOF.md](JOURNEY-PROOF.md#execution-retrospective).
+
 ## CI repair
 
 [New note startup readiness](CI-REPAIR.md) records the owned failure and repair;
