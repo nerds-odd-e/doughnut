@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 1,
+  "identity": "SEED-067#start-e2e-after-migrations",
+  "title": "Start E2E sessions after database migration completes",
+  "completedAt": "2026-10-11T00:42:04.641Z",
+  "developer": "Terry Yin",
+  "agent": "Nana-chan",
+  "host": "claude"
+}
