@@ -158,7 +158,7 @@ only this invocation's owned services.
 
 ### 4. A fresh Cypress invocation waits and completes its selected feature
 Type: Behavior
-Status: planned
+Status: done
 Proof: in a separately owned fresh acceptance checkout of the same validated
 revision, run `CURSOR_DEV=true nix develop -c pnpm cy:run --spec
 e2e_test/features/notebooks/notebook_creation.feature`. Use the same test-only
@@ -439,6 +439,34 @@ Barrier recipe that worked, for slice 4:
 On a fresh database the callback fires after Flyway creates its history table
 and before any versioned migration.
 
+### Slice 4: a fresh Cypress invocation waits for the migration
+
+Observed at `fe3a14172b` (same product content as `f297a916c5`) in an owned
+acceptance checkout, `.worktrees/seed-067-cypress-acceptance`, which had no
+allocation or database beforehand. No source change. Command: the slice 3
+barrier and access-log variables with
+`CURSOR_DEV=true nix develop -c pnpm cy:run --spec e2e_test/features/notebooks/notebook_creation.feature`.
+Database `doughnut_e2e_wt_ab35ba7fe120462f9f5c92dcef60906b`; backend 60364,
+Vite 60366, load balancer 60367.
+
+- Held (09:23:06 to 09:23:25): the schema held only `flyway_schema_history`;
+  backend `/api/healthcheck` returned 503 `Starting`; `/__lb__/ready` returned
+  503; nine healthcheck 503 lines and no testability request in the access
+  log; no Cypress process; the runner stayed at
+  `Waiting for SUT to become healthy`.
+- Released at 09:23:25.58: 41 migrations applied by 09:23:26; first healthcheck
+  200 at 09:23:28.326; `SUT healthy after 13 poll(s)` then Cypress
+  `(Run Starting)`; first testability reset at 09:23:38.548.
+- `Notebook creation`: 3 passing, 0 failing, exit 0. Every owned process and
+  all three ports were gone and the lock directory was removed. No manual
+  database step.
+- The same command without the barrier then passed 3 of 3 with exit 0, and
+  `e2e_test/features/users/new_user.feature` passed 1 of 1.
+- `pnpm worktree:retire` dropped that checkout's E2E database after its idle
+  check; the database list matched the snapshot taken before the slice, and the
+  execution worktree's two databases were intact. The acceptance checkout and
+  the temporary directories were removed.
+
 ## Story obligations
 
 ### G1. Ready dev and prod text is not requested over HTTP
@@ -454,7 +482,7 @@ Disposition: proved by slice 2: the delivered change leaves every security confi
 ### G3. Cypress login consumers of the healthcheck were not run
 Reported: slice 2 — "These are Cypress full-stack consumers; they run after readiness and belong to slices 3–4."
 Story clause: "`pnpm cy:run --spec <feature>` waits for readiness, then runs the selected feature successfully against the fully migrated, seeded database without a manual drop/recreate."
-Disposition: receiving slice 4
+Disposition: proved by slice 4: `notebook_creation.feature` logs in through `e2e_test/step_definitions/user.ts` `I am logged in as an existing user` and `loginActions.establishSessionAs` (the Basic-auth healthcheck ping) and passed 3 of 3 in the held-migration run; the dev-login step `I identify myself as a new user` passed in `e2e_test/features/users/new_user.feature`; recorded under "Slice 4" in Learnings.
 
 ### G4. Production health-check configuration has no local suite
 Reported: slice 2 — "These are status-based production GCP configuration with no local suite."
@@ -465,3 +493,13 @@ Disposition: excluded "new operational probes, and startup/autohealing timeout c
 Reported: slice 3 — "Login was observed over real HTTP with curl through the LB, not by typing into the form in a browser."
 Story clause: "`pnpm e2e:hold` then resets and seeds the complete database and announces a usable held browser session."
 Disposition: proved by slice 3: through the load balancer origin, `/users/identify` returned the page, the dev-login page's own request (`GET /api/healthcheck` with Basic auth for `old_learner`) returned 200, and its session cookie alone then returned the `old_learner` user; recorded under "Slice 3" in Learnings.
+
+### G6. The dev-login step ran only after migration, and one circles feature was not run
+Reported: slice 4 — "The dev-login step was observed only in an ordinary run after migration, not in the barrier run."
+Story clause: "`pnpm cy:run --spec <feature>` waits for readiness, then runs the selected feature successfully against the fully migrated, seeded database without a manual drop/recreate."
+Disposition: proved by slice 4: the runner's readiness wait is the same for every spec and was observed holding Cypress back in the barrier run; the step itself passed in `new_user.feature`, and `creating_circles.feature` uses that same step.
+
+### G7. Retirement leaves grant rows for the dropped database
+Reported: slice 4 — "The retirement command leaves two `mysql.db` grant rows for user `doughnut` on the dropped `doughnut_e2e_wt_ab35ba7fe120462f9f5c92dcef60906b` (hosts `127.0.0.1` and `localhost`)."
+Story clause: "Preserve the E2E runner's disposable database, service ownership, isolation, and shutdown."
+Disposition: excluded "reclamation of other retired databases"
