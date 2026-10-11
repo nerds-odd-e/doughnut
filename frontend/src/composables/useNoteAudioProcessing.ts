@@ -40,7 +40,7 @@ export function useNoteAudioProcessing(
     const { segmentTexts, endTimestamp } = await convert(chunk)
     try {
       if (segmentTexts.length) {
-        await noteStore.appendDictatedText(noteId, segmentTexts)
+        await noteStore.addDictatedText(noteId, segmentTexts)
       }
     } catch {
       // The failed save has shown its own toast; its audio is converted.

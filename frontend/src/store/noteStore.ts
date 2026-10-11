@@ -136,8 +136,8 @@ class NoteStore extends StorageImplementation {
     return this.textEditing.completeContent(noteId, value)
   }
 
-  appendDictatedText(noteId: Donut.ID, segmentTexts: string[]) {
-    return this.textEditing.appendDictatedText(noteId, segmentTexts)
+  addDictatedText(noteId: Donut.ID, segmentTexts: string[]) {
+    return this.textEditing.addDictatedText(noteId, segmentTexts)
   }
 
   async uploadNoteImage(noteId: Donut.ID, file: File) {

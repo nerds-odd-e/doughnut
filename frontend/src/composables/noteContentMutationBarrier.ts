@@ -1,12 +1,17 @@
+import { onUnmounted, watch } from "vue"
+import type { DictationTarget } from "@/models/audio/dictationTarget"
+
 type OpenNoteContentEditor = {
+  /** Saves the draft right away. */
+  flush: () => void
   flushAndWait: () => Promise<boolean>
-  /** Changes the draft and saves it right away. */
-  changeDraft: (change: (draft: string) => string) => void
+  beginDictation: () => DictationTarget
 }
 
 type NoteMutationState = {
   admissionOpen: boolean
   editor?: OpenNoteContentEditor
+  dictation?: DictationTarget
 }
 
 const noteMutations = new Map<number, NoteMutationState>()
@@ -19,7 +24,7 @@ function stateFor(noteId: number): NoteMutationState {
   return created
 }
 
-export function registerOpenNoteContentEditor(
+function registerOpenNoteContentEditor(
   noteId: number,
   editor: OpenNoteContentEditor
 ): () => void {
@@ -28,6 +33,8 @@ export function registerOpenNoteContentEditor(
   return () => {
     if (state.editor === editor) {
       state.editor = undefined
+      state.dictation?.end(false)
+      state.dictation = undefined
     }
     if (!state.editor) {
       noteMutations.delete(noteId)
@@ -35,15 +42,53 @@ export function registerOpenNoteContentEditor(
   }
 }
 
-/** Changes the open body editor's draft for the note and saves it; false when none is open or admission is closed. */
-export function changeOpenNoteContentDraft(
+/** Keeps the component's body editor registered as the open one of the note it shows. */
+export function useOpenNoteContentEditor(
+  noteId: () => number,
+  editor: OpenNoteContentEditor
+): void {
+  let unregister: (() => void) | undefined
+  watch(
+    noteId,
+    (id) => {
+      unregister?.()
+      unregister = registerOpenNoteContentEditor(id, editor)
+    },
+    { immediate: true }
+  )
+  onUnmounted(() => unregister?.())
+}
+
+/** Begins a dictation session in the note's open body editor, when one is open; its insertions are saved right away. */
+export function beginOpenNoteContentDictation(noteId: number): void {
+  const state = noteMutations.get(noteId)
+  if (!state?.editor) return
+  const editor = state.editor
+  const target = editor.beginDictation()
+  state.dictation = {
+    insert: (segments) => {
+      target.insert(segments)
+      editor.flush()
+    },
+    end: target.end,
+  }
+}
+
+/** Puts the segments at the session's target and saves them; false when no session is open in an editor or admission is closed. */
+export function insertDictationInOpenNoteContent(
   noteId: number,
-  change: (draft: string) => string
+  segments: readonly string[]
 ): boolean {
   const state = noteMutations.get(noteId)
-  if (!state?.editor || !state.admissionOpen) return false
-  state.editor.changeDraft(change)
+  if (!state?.dictation || !state.admissionOpen) return false
+  state.dictation.insert(segments)
   return true
+}
+
+export function endOpenNoteContentDictation(noteId: number): void {
+  const state = noteMutations.get(noteId)
+  state?.dictation?.end(true)
+  if (state) state.dictation = undefined
 }
 
 export function noteContentMutationAdmissionIsOpen(noteId: number): boolean {

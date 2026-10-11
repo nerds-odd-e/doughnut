@@ -1,5 +1,5 @@
 import type { NoteContentCompletion } from "@generated/donut-backend-api"
-import { changeOpenNoteContentDraft } from "@/composables/noteContentMutationBarrier"
+import { insertDictationInOpenNoteContent } from "@/composables/noteContentMutationBarrier"
 import { refreshSidebarStructuralListings } from "@/components/notes/sidebarStructuralRefresh"
 import { joinDictatedSegments } from "@/models/audio/joinDictatedSegments"
 import { updateTextContentRequest } from "./noteRequests"
@@ -66,16 +66,15 @@ export default class NoteTextEditing {
     await this.updateTextField(noteId, "edit content", value.content)
   }
 
-  /** Joins the passage to the body. An open body editor saves its changed draft; without one the save happens here, and its failure throws. */
-  async appendDictatedText(noteId: Donut.ID, segmentTexts: string[]) {
-    const join = (text: string) => joinDictatedSegments(text, segmentTexts)
-    if (changeOpenNoteContentDraft(noteId, join)) return
+  /** Adds the passage to the body. A dictation session in an open body editor takes it at its target and saves it; otherwise it joins the end of the saved body here, and a failed save throws. */
+  async addDictatedText(noteId: Donut.ID, segmentTexts: string[]) {
+    if (insertDictationInOpenNoteContent(noteId, segmentTexts)) return
 
     const realm = await this.store.getOrLoadNoteRealm(noteId)
     await this.updateTextField(
       noteId,
       "edit content",
-      join(realm.note.content ?? "")
+      joinDictatedSegments(realm.note.content ?? "", segmentTexts)
     )
   }
 }

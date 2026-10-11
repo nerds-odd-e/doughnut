@@ -124,7 +124,7 @@ publication authority.
 
 ### 1. Body dictation lands at the author's insertion point in a read-only editor
 Type: Behavior
-Status: planned
+Status: done
 Proof: mounted rich-editor and Markdown-editor tests with the toolbar button
 and mocked audio (caret between passages, selection replaced, no caret → end,
 read-only while pending, selection change ignored, retry at the new caret,
@@ -201,3 +201,61 @@ the session ends otherwise. Update `docs/voice-input.md`.
   content.
 - Retry begins a new session at the caret at the retry click.
 - Remainder after leaving the note keeps the saved-body end join.
+- The dictation-target contract is `DictationTarget` (`insert`, `end(placeCaret)`)
+  in `frontend/src/models/audio/dictationTarget.ts`. The rich editor's target is
+  `quillDictationTarget.ts`; the body's editor choice and Markdown target are
+  `useBodyEditorDictation.ts`; the open-editor session lives in
+  `noteContentMutationBarrier.ts` (begin, insert with immediate save, end).
+- A body session begins once the recorder has started, so a microphone that
+  cannot start locks nothing. Leaving the note ends the session without moving
+  focus (`end(false)`).
+
+## Learnings
+
+- Slice 1: `TextContentWrapper.vue`, `NoteEditableContent.vue`, and
+  `RichMarkdownEditor.vue` sit at the 250-line limit. The marker's anchor
+  belongs in `quillDictationTarget.ts` and `useBodyEditorDictation.ts`; the
+  anchor today is a closure variable in `quillDictationTarget`, and the
+  Markdown and end-of-text targets have none to report.
+- Slice 1 accepted proof: `NoteVoiceInputButton.insertionPoint.spec.ts` (where
+  text lands, saved content), `NoteVoiceInputButton.readOnlyEditor.spec.ts`
+  (read-only session, session end, retry), whole frontend suite, both
+  typechecks, and `record_live_audio.feature` 5 of 5, all on the delivered
+  code. Removal sweep reading over `frontend/src frontend/tests docs .agents
+  e2e_test` for the removed test and helper names and the "unsaved typing" /
+  "end of that editor's draft" wording returned nothing.
+
+## Execution
+
+Story Branch Mode in
+`/Users/terryyin/git/doughnut/.worktrees/show-where-voice-text-will-arrive-while-keeping`
+on `claude/show-where-voice-text-will-arrive-while-keeping`; claim published on
+`origin/main` at `783d3f96cd19a2fcdab03355f31008c1e033164d`. Increments publish
+to the remote execution branch. CI source: GitHub Actions on that branch.
+
+## Story obligations
+
+### G1. Edits during a session are observed through the read-only attribute
+Reported: slice 1 — "Real keystrokes, paste, or mouse clicks during a session; only the read-only attribute and a programmatic selection change are observed."
+Story clause: "the targeted body editor or title takes no typing, pasting, or other edits"
+Disposition: proved by slice 1: `frontend/tests/notes/NoteVoiceInputButton.readOnlyEditor.spec.ts` asserts `contenteditable="false"` and `readOnly` for the whole session in a real browser, which is the browser's own refusal of typing and pasting
+
+### G2. A CJK selection is replaced in the Markdown editor only
+Reported: slice 1 — "A CJK selection replaced in the rich editor (Latin only there; the rule itself is in `joinDictatedSegments.spec.ts`)."
+Story clause: "The words join with the CJK/space rule the title uses on both sides"
+Disposition: proved by slice 1: both editors compose through `dictatedInsertion`; `frontend/tests/notes/NoteVoiceInputButton.insertionPoint.spec.ts` observes the Latin selection in the rich editor and the Japanese selection in the Markdown editor
+
+### G3. The session outlives a Voice input button that unmounts on the same note
+Reported: slice 1 — "The voice button unmounting while the editor stays on the same note: the session then runs until that Stop finishes and focuses the editor."
+Story clause: "Stop while conversion is pending → the input stays read-only with the indicator until the text has arrived, then editing resumes."
+Disposition: no user cost "fix the place where the spoken text will land at the moment they start": the unmounting button stops the recording, so the session ends as it does at Stop and editing resumes
+
+### G4. Switching editors during a session
+Reported: slice 1 — "Switching rich/Markdown during a session continues at the end of the new editor, read-only."
+Story clause: "Clicks and caret moves after the start do not move the target."
+Disposition: no user cost "fix the place where the spoken text will land at the moment they start": the editor that held the target is gone after the switch, so the text is kept, saved, and shown in the editor now open, at that editor's last caret or its end, as `docs/voice-input.md` states
+
+### G5. The target is taken when recording has started
+Reported: slice 1 — "Session begins after the recorder starts, not at the click."
+Story clause: "When voice input starts, the target is the caret or selection the input has"
+Disposition: no user cost "fix the place where the spoken text will land at the moment they start": recording starting is the start of voice input, and it keeps a microphone that cannot start from locking the editor

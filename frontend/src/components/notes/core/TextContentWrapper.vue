@@ -35,15 +35,16 @@
 
 <script setup lang="ts">
 import type { PropType } from "vue"
-import { computed, onUnmounted, ref, toRef, watch } from "vue"
+import { computed, ref, toRef } from "vue"
 import type { TitleRenameReferenceHandling } from "@/store/noteStore"
 import { useNoteStore } from "@/store/noteStore"
 import { useDebouncedTextAutosave } from "@/composables/useDebouncedTextAutosave"
 import { normalizeNoteContent } from "@/utils/normalizeNoteContent"
 import { hasNewWikiLinkTexts } from "@/utils/noteContentWikiLinks"
+import type { DictationTarget } from "@/models/audio/dictationTarget"
 import {
   noteContentMutationAdmissionIsOpen,
-  registerOpenNoteContentEditor,
+  useOpenNoteContentEditor,
 } from "@/composables/noteContentMutationBarrier"
 
 const noteStore = useNoteStore()
@@ -80,6 +81,10 @@ const props = defineProps({
     type: Function as PropType<
       (lastSaved: string, newValue: string) => Promise<boolean>
     >,
+    required: false,
+  },
+  beginDictation: {
+    type: Function as PropType<() => DictationTarget>,
     required: false,
   },
 })
@@ -148,24 +153,12 @@ const {
   markSaved,
 } = autosave
 
-let unregisterContentEditor: (() => void) | undefined
-
 if (props.field === "edit content") {
-  watch(
-    () => props.noteId,
-    (noteId) => {
-      unregisterContentEditor?.()
-      unregisterContentEditor = registerOpenNoteContentEditor(noteId, {
-        flushAndWait,
-        changeDraft: (change) => {
-          onUpdate(change(localValue.value))
-          flush()
-        },
-      })
-    },
-    { immediate: true }
-  )
-  onUnmounted(() => unregisterContentEditor?.())
+  useOpenNoteContentEditor(() => props.noteId, {
+    flush,
+    flushAndWait,
+    beginDictation: () => props.beginDictation!(),
+  })
 }
 
 const showReferencedTitleSavePanel = computed(

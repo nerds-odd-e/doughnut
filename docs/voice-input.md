@@ -33,9 +33,19 @@ speech into text." When recording cannot start, nothing is recorded, the
 common error toast says "Could not use the microphone. Allow microphone access
 in your browser, then try again.", and the button stays idle. When saving a
 passage fails, the save's own error toast shows and the button is idle.
-Dictated text shows in an open body editor as soon as it joins. Dictation
-writes only to the note body. Readers who may not edit the note are not
-offered the button.
+When a body editor is open, the text goes where the author's caret or
+selection was when they clicked Voice input, or where it was when focus left
+the editor; with neither, to the end of the body. From that click until the
+session ends the body editor is read-only: it takes no typing or pasting, and
+clicking or selecting in it does not move the place the text goes to. Each
+passage shows there as soon as it arrives, after the one before. The session
+ends when the last text has arrived, when nothing was heard, or when the
+conversion at Stop failed; the editor is then editable again, with focus and
+the caret after the dictated text. Retrying a kept recording is a session of
+its own: the editor is read-only again and the text goes where the caret or
+selection is at the retry click. When recording cannot start, the editor is
+not made read-only. Dictation writes only to the note body. Readers who may
+not edit the note are not offered the button.
 
 ## Speaking a title in New note
 
@@ -125,10 +135,11 @@ use the conversation tool's `NoteContentCompletion`, which continues to
 replace complete note content.
 
 The audio request carries only the audio and the mid-speech flag. The client
-retains the originating note id, and each returned segment is appended
-deterministically to that note's current store body, loading its realm when
+retains the originating note id, and each returned segment is added
+deterministically to that note, at the session's place in an open body editor
+or else at the end of its current store body, loading its realm when
 absent, and saved through the ordinary content PATCH. One join rule
-serves both the saved body and an open editor's draft, successive passages,
+serves both the saved body and an open editor, successive passages,
 and segments within a passage. An empty body becomes the segment alone;
 after existing whitespace the segment joins directly. Otherwise the client
 looks at the two characters on either side of the join. If either is
@@ -169,14 +180,24 @@ its remaining speech is converted into the note it was started on; when that
 conversion fails its audio is dropped. Voice input started on the other note
 dictates into that note.
 The transcription service controls transcription quality. When a body editor for the note is
-open, the passage is joined to the end of that editor's draft, including
-unsaved typing, and that draft is saved right away; otherwise, including while
-an image upload or note removal is pausing the editor, it is joined to the
-note's saved body.
+open, the rich editor or the Markdown editor, the passage is put at the
+session's place in that editor and saved right away: a selection is replaced
+by the first passage, a caret takes it at that place, and the join rule
+applies on both sides of the passage as it does for a spoken title. A rich
+editor that cannot edit the body takes the passage at the end of the body.
+When the author switches between the rich and the Markdown editor during a
+session, it goes on in the editor they switched to, at the caret that editor
+last had or else at the end of the body.
+Otherwise, including while an image upload or note removal is pausing the
+editor, and for the remaining speech of a note the author left, the passage is
+joined to the end of the note's saved body.
 
 The mounted audio preservation tests assert exact saved content for long,
 empty, and whitespace-ending bodies, repeated additions, and undo. Mounted
-toolbar tests move to another note while recording and observe the remainder
+tests of both body editors with the toolbar button place a caret or a
+selection and observe the read-only editor, the text at that place, the caret
+after it, and the retry's own place. Mounted toolbar tests move to another
+note while recording and observe the remainder
 saved to the note left, an idle button, a dropped kept recording, and the
 toast of a failed last conversion. The
 mocked recording journey supplies a transcription and observes the original

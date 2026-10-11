@@ -76,9 +76,9 @@ lines were handled, a short remainder of near-silent audio sent at Stop was
 transcribed as “You” and appended. Speech models are known to invent such
 words from near-silence; it has not been observed since hold-back.
 
-## Typing while audio processing is pending
+## Existing content can be truncated during a navigation journey
 
-Save two recognizable paragraphs and a distinct spoken addition:
+Prepare a source note with five saved paragraphs:
 
 > Original paragraph one: The museum opens at nine each morning. Our tickets
 > are booked for Tuesday.
@@ -86,27 +86,10 @@ Save two recognizable paragraphs and a distinct spoken addition:
 > Original paragraph two: The blue notebook contains the garden measurements.
 > Keep the oak tree map beside it.
 >
-> The lighthouse keeper painted the front door bright yellow. Tomorrow we
-> will bring fresh oranges to the beach.
-
-Start the longer orchard passage. When its first real audio request is pending,
-focus the body editor and type at the end:
-
-> MANUAL EDIT: Keep this red bicycle sentence.
-
-When the result arrives, the typed sentence stays visible and the orchard
-passage follows it. A correction made elsewhere in the body, such as changing
-"from" to "for", also stays, and the passage still goes at the end. The caret
-stays where the author was typing. The draft with the passage is saved as
-soon as the passage joins it, so both originals, the lighthouse addition, the
-typed sentence and the passage are saved once each. The mounted
-typing-while-pending tests cover the rich and Markdown editors.
-
-## Existing content can be truncated during a navigation journey
-
-Prepare a source note with five saved paragraphs: the two originals above,
-the manual sentence prefixed to the lighthouse paragraph, then:
-
+> MANUAL EDIT: Keep this red bicycle sentence. The lighthouse keeper painted
+> the front door bright yellow. Tomorrow we will bring fresh oranges to the
+> beach.
+>
 > After reading several reviews and comparing different editions, is a gift
 > from my sister because she enjoys learning about the history of gardens.
 >

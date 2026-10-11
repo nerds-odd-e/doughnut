@@ -5,6 +5,7 @@
       field="edit content"
       :note-id="noteId"
       :before-save-content="beforeSaveContent"
+      :begin-dictation="beginDictation"
     >
       <template #default="{ value, update, blur }">
         <TextArea
@@ -79,6 +80,7 @@ import {
   parseNoteContentMarkdown,
 } from "@/utils/noteContentFrontmatter"
 import type { DeadWikiLinkPayload } from "@/utils/wikiLinkMarkup"
+import { useBodyEditorDictation } from "@/composables/useBodyEditorDictation"
 
 const emit = defineEmits<{
   deadWikiLinkClick: [payload: DeadWikiLinkPayload]
@@ -164,10 +166,13 @@ function caretOffsetForEmptyPropertyYamlKey(markdown: string): number | null {
 /** Tracks the last known textarea cursor position for markdown editor. */
 const textareaSelection = ref<{ start: number; end: number } | null>(null)
 
-function captureTextareaSelection() {
-  const textarea = textareaRef.value?.$el?.querySelector(
+const markdownTextarea = () =>
+  textareaRef.value?.$el?.querySelector(
     "textarea"
   ) as HTMLTextAreaElement | null
+
+function captureTextareaSelection() {
+  const textarea = markdownTextarea()
   if (textarea) {
     textareaSelection.value = {
       start: textarea.selectionStart,
@@ -176,12 +181,17 @@ function captureTextareaSelection() {
   }
 }
 
+const beginDictation = useBodyEditorDictation({
+  asMarkdown: () => props.asMarkdown,
+  markdownTextarea: () => markdownTextarea()!,
+  textareaSelection,
+  beginRichDictation: () => richEditorRef.value!.beginDictation(),
+})
+
 onMounted(() => {
   registerInserter((text: string) => {
     if (props.asMarkdown) {
-      const textarea = textareaRef.value?.$el?.querySelector(
-        "textarea"
-      ) as HTMLTextAreaElement | null
+      const textarea = markdownTextarea()
       if (textarea) {
         const start = textareaSelection.value?.start ?? textarea.value.length
         const end = textareaSelection.value?.end ?? textarea.value.length
@@ -212,9 +222,7 @@ onMounted(() => {
       const composed = appendWikiLinkPropertyRow(props.noteContent ?? "", text)
       if (composed === undefined) return
       if (props.asMarkdown) {
-        const textarea = textareaRef.value?.$el?.querySelector(
-          "textarea"
-        ) as HTMLTextAreaElement | null
+        const textarea = markdownTextarea()
         if (!textarea) return
         textarea.value = composed
         textarea.dispatchEvent(new Event("input", { bubbles: true }))

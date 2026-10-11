@@ -1,5 +1,9 @@
 import { computed, onBeforeUnmount, ref } from "vue"
 import type { Note } from "@generated/donut-backend-api"
+import {
+  beginOpenNoteContentDictation,
+  endOpenNoteContentDictation,
+} from "@/composables/noteContentMutationBarrier"
 import { useNoteAudioProcessing } from "@/composables/useNoteAudioProcessing"
 import { useToast } from "@/composables/useToast"
 import { MICROPHONE_UNAVAILABLE_MESSAGE } from "@/composables/voiceInputFailureMessages"
@@ -34,6 +38,7 @@ export function useNoteVoiceInput(note: Note) {
     try {
       await wakeLocker.request()
       await audioRecorder.startRecording()
+      beginOpenNoteContentDictation(note.id)
       phase.value = "recording"
       voiceInputIsActive.value = true
     } catch {
@@ -47,6 +52,7 @@ export function useNoteVoiceInput(note: Note) {
     try {
       await audioRecorder.stopRecording()
     } finally {
+      endOpenNoteContentDictation(note.id)
       phase.value =
         lastConversionFailed.value && audioRecorder.hasUnconvertedAudio()
           ? "notConverted"
@@ -56,6 +62,11 @@ export function useNoteVoiceInput(note: Note) {
       }
       await wakeLocker.release()
     }
+  }
+
+  const retry = () => {
+    beginOpenNoteContentDictation(note.id)
+    return stop()
   }
 
   onBeforeUnmount(async () => {
@@ -75,6 +86,6 @@ export function useNoteVoiceInput(note: Note) {
     processAudio,
     start,
     stop,
-    retry: stop,
+    retry,
   }
 }
