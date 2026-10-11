@@ -1,7 +1,7 @@
 import NewBookBlockTitleDialog from "@/components/book-reading/NewBookBlockTitleDialog.vue"
 import helper from "@tests/helpers"
 import { userEvent } from "vitest/browser"
-import { describe, expect, it } from "vitest"
+import { describe, expect, it, vi } from "vitest"
 
 describe("NewBookBlockTitleDialog", () => {
   const openDialog = async () => {
@@ -39,7 +39,8 @@ describe("NewBookBlockTitleDialog", () => {
 
     await userEvent.keyboard("{Escape}")
 
-    expect(wrapper.emitted("cancel")).toHaveLength(1)
+    // native dialog `close` is dispatched in a later task than the keypress
+    await vi.waitFor(() => expect(wrapper.emitted("cancel")).toHaveLength(1))
     expect(wrapper.emitted("confirm")).toBeUndefined()
     wrapper.unmount()
   })
