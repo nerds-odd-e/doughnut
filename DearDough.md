@@ -369,7 +369,7 @@ Plan 064 moved the recording session from a panel opened per use to a button tha
   - Tool: Claude Code
   - Model: claude-opus-5-5
   - Open Dough release: 0.3.58
-  - Evidence: plan 067 slice 2 and its proof table at `783d3f96cd` (no observation for leaving the note while a title is listening); slice 2 return, second round ("moving to another existing note while listening left that note's title locked"); `frontend/tests/notes/NoteShow.spokenTitleLeavingNote.spec.ts` at `f4bba8d679`, reported to fail before the fix; plan 067 obligation G10
+  - Evidence: plan 067 slice 2 and its proof table at `783d3f96cd` (no observation for leaving the note while a title is listening); slice 2 return, second round ("moving to another existing note while listening left that note's title locked"); `frontend/tests/notes/NoteShow.spokenTitleLeavingNote.spec.ts` at `f4bba8d679`, reported to fail before the fix; plan 067 obligation G10 at `e87920d731`
   - Observed effect: the title's read-only lock stayed on the title editor reused for the next note; the coordinator asked for the observation after reading `NoteShow.vue` for keys, and the implementer keyed the speak control on the note's id and ended the session on a note change
   - Inference: same lifetime question as the first occurrence, on the title this time; the plan reused the `busy` signal without asking what ends it when the page moves between cached notes
 

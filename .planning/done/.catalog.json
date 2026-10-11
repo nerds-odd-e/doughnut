@@ -2,6 +2,12 @@
   "schemaVersion": 1,
   "records": [
     {
+      "fileName": "SEED-066_read-only-voice-input-with-insertion-feedback.json",
+      "identity": "SEED-066#read-only-voice-input-with-insertion-feedback",
+      "completedAt": "2026-10-11T03:20:24.901Z",
+      "blob": "c2937ce3606c225207bdccd8c7f483e75c8f3a2e"
+    },
+    {
       "fileName": "SEED-067_start-e2e-after-migrations.json",
       "identity": "SEED-067#start-e2e-after-migrations",
       "completedAt": "2026-10-11T00:42:04.641Z",

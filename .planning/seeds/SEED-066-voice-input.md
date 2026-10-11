@@ -142,8 +142,6 @@ The original nine-story decomposition is recoverable in Git history. On
 top of the product backlog; all three are delivered. These are non-executable story
 records; capturing them does not start implementation.
 
-On 2026-10-11 the owner added the story below at the top of the product backlog.
-
 Effort bands are S = 30–60 minutes, M = 1–2 hours, and L = 2–4 hours, including
 delivery. These are comparative hypotheses, not a delivery schedule. Refine or
 resplit any story likely to exceed L before execution.
@@ -166,140 +164,6 @@ with negative assertions, absence checks, or runtime guards. Record the final
 one-time removal sweep as an acceptance reading, following principle 7 in
 `AGENTS.md`; Git history retains the removed implementation.
 
-<a id="read-only-voice-input-with-insertion-feedback"></a>
-### Show where voice text will arrive while keeping its input read-only
-
-**Identity:** SEED-066#read-only-voice-input-with-insertion-feedback
-```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/067-read-only-voice-input-with-insertion-feedback/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"9eb5612540ab1b515ece593b747c9890c69dcc77074e2470a95e5431dccee5bc","plan":"773b5c7ff66a720c86ff8a19730052d5d969f3b563e0963130ae808356a7daa3"}}
-```
-
-**Goal:** For note authors dictating into a note body or speaking a title,
-fix the place where the spoken text will land at the moment they start, and
-show that place with inline pending feedback until the text has arrived, so
-they watch the right spot instead of guessing where the result went.
-
-**User and context (UX/UI examination, 2026-10-11):** The author edits an
-existing note or fills in New note. They place the caret or a selection, press
-the microphone button (Voice input in the toolbar for the body, Speak the
-title beside the title), speak, press it again to stop, and wait. Today the
-button is the only feedback. Body dictation joins the end of the body whatever
-the caret, and the author may keep typing into the same editor meanwhile, so
-they look for the result in the wrong place and the two kinds of input mix.
-The title already takes the words at the caret or selection. Read from
-[voice-input documentation](../../docs/voice-input.md) and the editor code on
-2026-10-11; not observed in the browser.
-
-**Scope:**
-
-Required behavior:
-
-- **Insertion point.** When voice input starts, the target is the caret or
-  selection the input has, or had when focus left it; with neither, the end of
-  the text. An untouched "Untitled" title in New note stays a placeholder that
-  the heard words replace. Clicks and caret moves after the start do not move
-  the target.
-- **Body text lands at the insertion point**, no longer at the end of the
-  body, in both the rich editor and the Markdown editor. The words join with
-  the CJK/space rule the title uses on both sides, and a selection is replaced
-  by them as in the title. Each passage of one session lands where the
-  previous one ended, so mid-speech passages that arrive while recording build
-  up in place. Titles still convert only at Stop.
-- **Read-only.** From the start of voice input until its session ends, the
-  targeted body editor or title takes no typing, pasting, or other edits;
-  selecting and copying its text still work. The other field and the rest of
-  the page stay as they are; body and title voice input remain independent.
-- **Pending indicator.** An animated indicator sits immediately after the
-  target (the caret, or the end of the selection or placeholder to be
-  replaced) in the rich editor and in the title, from the start through
-  recording, the conversion after Stop, and a retry conversion, until the
-  session's last text has arrived. After each arriving passage it follows to
-  the end of that passage. It is temporary feedback: never saved, never part of
-  copied or exported text.
-- **Session end.** When the last text has arrived, or nothing was heard, the
-  indicator clears and editing resumes with the caret after the inserted words
-  in both surfaces. When a conversion fails and the error toast shows, the
-  indicator clears and editing resumes; the kept body recording stays on the
-  button as today. Leaving the note or closing New note while recording ends
-  the session as today.
-- **Retry of a kept body recording is a session of its own.** It takes the
-  target at the moment of the retry click, makes the editor read-only, and
-  shows the indicator there until its text arrives or it fails again.
-- **Microphone cannot start:** nothing becomes read-only and no indicator
-  shows; the existing toast is the only feedback.
-
-Removed with this story, deleted outright with a product-wide sweep and no
-trace: typing into the open body editor while a passage is pending, its tests
-and support helpers, and the documented end-of-body join for an open editor.
-
-Deferred promises (not built or verified here):
-
-- The inline indicator inside the Markdown editor, a plain text area. That
-  editor is read-only and takes the words at the caret like the rich editor;
-  the toolbar button stays its only pending feedback.
-- Where the remainder lands when the author leaves the note while recording:
-  it keeps joining the end of that note's saved body, as today, since the
-  editor that held the target is gone.
-- Any change to the buttons, their names, the toasts, or title generation.
-
-Boundary assumptions:
-
-- No cancel control exists and none is added; Stop, leaving the note, and
-  closing New note remain the ways out.
-- Normal content undo restores the body before a session's insertion, as today.
-
-**Key examples:**
-
-- Body, caret between two passages, rich editor: start Voice input → the
-  editor takes no typing and an animated indicator appears between the
-  passages. A mid-speech passage arrives → it appears there and the indicator
-  moves after it. Stop → the remaining text follows it, the indicator clears,
-  and the caret sits after the dictated text. After reload the body has the
-  dictated text between the two passages.
-- Body, page just opened, no caret placed: Voice input → the indicator appears
-  at the end of the body and the text joins the end.
-- Body, during recording the author clicks into another paragraph and types →
-  nothing changes; the text still lands at the original point when it arrives.
-- Title "Orchard notes" on an existing note, caret after "Orchard": Speak the
-  title → the title takes no typing and the indicator sits after "Orchard".
-  Stop, "harvest" heard → "Orchard harvest notes", indicator gone, caret after
-  "harvest", saved through the existing title path.
-- New note, untouched "Untitled": Speak the title → the indicator sits after
-  "Untitled". Stop → the heard words replace "Untitled" and the indicator is
-  gone.
-- Stop while conversion is pending → the input stays read-only with the
-  indicator until the text has arrived, then editing resumes.
-- Body conversion fails at Stop → the error toast shows, the indicator clears,
-  editing resumes, and the button offers retry. The author corrects a sentence
-  and leaves the caret there, then clicks retry → the editor is read-only
-  again with the indicator at that caret, and the kept recording's text lands
-  there.
-- Nothing heard → the indicator clears, nothing is inserted, no message.
-
-**UI:** Words only; no layout or component is chosen here. The indicator marks
-the exact insertion location inside the text, in the text's own style, with an
-animated ellipsis as the owner's example; it stands still when the author
-prefers reduced motion. The read-only input keeps its ordinary appearance; the
-indicator and the active button are the only signs that voice input is
-running. The indicator is decorative to assistive technology, since the
-button names already announce the session's state.
-
-- **Evaluation:** Dictate into a body (rich editor) and a title from a visible
-  caret position; observe read-only editing and inline pending feedback through
-  recording and processing, then confirm editing resumes with the caret after
-  the words and the saved content holds the text at that place.
-- **Value / learning:** Authors can anticipate where spoken text will land
-  while pending voice input keeps its insertion target stable.
-- **Effort hypothesis:** L (2–4 hours), medium confidence; revised from M on
-  2026-10-11 because body text moves from end-of-body to caret insertion in
-  two editors, three surfaces become read-only with an inline indicator in two
-  of them, and the typing-while-pending behavior is removed with its tests.
-  Resplit before execution if planning shows more than the L band.
-- **Depends on:** none; both body and title voice-input journeys are delivered.
-- **Safe stopping point:** Both current voice-input journeys provide clear
-  pending feedback and restore ordinary editing independently of later audio
-  improvements.
-
 ## Ordering and Scope Reduction
 
 The owner accepted the original nine-story order on 2026-10-03. The product backlog
@@ -321,9 +185,6 @@ On 2026-10-10 the owner placed the three UI stories at the top of the
 backlog in their stated order: simpler controls/feedback with cadence-cost
 analysis, one-button body dictation, then title styling and spoken editing.
 No blocking dependency is inferred from shared recording code or that order.
-
-On 2026-10-11 the owner prioritized read-only voice input with insertion-point
-feedback above the remaining queued work.
 
 ## Open Decisions for Later Work
 
@@ -349,15 +210,25 @@ feedback above the remaining queued work.
   speaking a title on an existing note used the same native control (recoverable
   at `b4bb2f90a0d74a938dcadb98e8f279bbf09263e0:.planning/seeds/SEED-066-voice-input.md#rename-with-spoken-title`).
   Optional one-time automatic title generation stays deferred.
+- Inserting a link from the link dialog writes into a body editor that voice
+  input has made read-only (`NoteEditableContent.vue` inserter; read from the
+  code on 2026-10-11, not run), which can shift where the dictated text lands.
+  Whether such an insert is refused, held until the session ends, or allowed
+  with the place following it is undecided.
+- When the page moves to another note while a title is being spoken, the
+  session ends and the words heard so far are dropped. Whether the note left
+  should receive them is not confirmed by the owner.
+- The pending marker's backing patch covers about one character of the text
+  after the target for the length of a session. The owner has not confirmed
+  that look.
+- Not run, found on 2026-10-11: the paste-choice bar may be placed from Quill
+  bounds measured from the editor's container while the code treats them as
+  viewport coordinates (`QuillEditor.pasteInsertionViewportRect`,
+  `pasteChoicePosition.ts`); and the two rename scenarios in
+  `record_live_audio.feature` can deliver audio before the recorder has
+  started.
 
 ## Breadcrumbs
-
-- Owner's UX/UI refinement request for the read-only voice input and
-  insertion-feedback story, 2026-10-11, through the established Honoka-chan
-  preparation; current behavior read from documentation and code.
-- Owner's request for read-only body/title voice input and an animated indicator
-  at the insertion point, 2026-10-11; authorized capture at the top of the backlog
-  directly on main and sync with origin.
 
 - Owner's voice-input problem report, 2026-10-03, in this conversation.
 - Owner's acceptance of all nine proposed stories and their priority, with
