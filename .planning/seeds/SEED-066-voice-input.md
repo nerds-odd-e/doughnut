@@ -172,7 +172,7 @@ one-time removal sweep as an acceptance reading, following principle 7 in
 
 **Identity:** SEED-066#focus-aware-toolbar-voice-input
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"unselected"}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/001-focus-aware-toolbar-voice-input/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"8e15fa6c00a082fd3e35d00d000470954f39dcf70323348e355c7c2975608953","plan":"1870198d7db24100a81b5b93889d5547e0d504dfcee1dc94c6c22630c7f10ea3"}}
 ```
 
 **Goal:** For authors editing an existing note, use the toolbar microphone to
@@ -189,9 +189,22 @@ the caret or selection determining where the words land.
   Preserve the rest of the title and save through the ordinary title path.
 - Otherwise, use the existing content voice-input journey and its insertion
   rules. Previously focusing the title does not keep it as the target after
-  focus has moved elsewhere.
+  focus has moved to content or elsewhere outside the toolbar journey.
+- Preserve title intent and its caret or selection while reaching Voice input
+  through keyboard navigation within the toolbar or its "more options" menu.
+  Moving to content or another unrelated destination clears that intent.
 - Keep the chosen field and insertion target for the session, including its
-  read-only behavior and pending insertion feedback.
+  read-only behavior and pending insertion feedback. Moving the caret or focus
+  after recording starts does not redirect that recording. Stop finishes the
+  same session; a fresh recording chooses its target again.
+- Preserve the chosen field's existing conversion and recovery behavior:
+  title speech converts on Stop; content keeps its ongoing conversion and
+  retained-recording retry journey. Changing title conversion cadence or
+  adding title recording recovery is deferred.
+- Preserve ordinary title saving, including the explicit reference-handling
+  choice for a title linked from other notes. Reaching the toolbar and stopping
+  title dictation must preserve the current title draft and selected range so
+  the author can finish dictating and make that save choice.
 - Delete the separate microphone button/icon beside an existing note's title,
   with its exclusively used code, styles, helpers, fixtures, and tests; apply
   the product-wide removal sweep described above. Shared title dictation code
@@ -211,6 +224,35 @@ the caret or selection determining where the words land.
   input → words land at the content's insertion point and are saved there.
 - Open an existing note without focusing its title, then use toolbar Voice
   input → the existing content dictation journey runs.
+- Select "Spring" in "Spring orchard notes", move through the toolbar by
+  keyboard or open "more options", then activate Voice input and dictate
+  "Autumn" → "Autumn orchard notes". Moving to content before reaching the
+  toolbar instead sends the next recording to content.
+- Start title dictation at the caret after "Orchard", then move focus before
+  stopping → the words still land at that captured title position. Once the
+  session finishes, focusing content and starting again targets content.
+- Dictate into a title linked from other notes → review the resulting title,
+  choose how visible reference text should change using the ordinary save
+  choice, then reload → the chosen title is saved.
+- Start title dictation successfully → the title is read-only and its pending
+  marker shows the insertion position through listening and conversion. Stop
+  and receive words → the title becomes editable with the caret after them.
+- The microphone cannot start, or title conversion returns no words or fails
+  → retain the title text and restore editing; show the existing error feedback
+  for a microphone or conversion failure. The author can correct by typing or
+  start a fresh recording.
+
+**UI:** The author places a title caret or selection, activates toolbar Voice
+input, speaks, and uses that same control to stop. Otherwise the same action
+starts the content journey. Keep the existing recording, finishing, and field
+insertion feedback, including accessible control names and reduced-motion
+behavior. The insertion marker indicates the captured destination; moving focus
+during a recording does not move it. After title conversion, ordinary title
+editing and any required reference-save choice resume. No new target picker or
+layout redesign is needed for the accepted focus rule.
+
+**Decision (owner, 2026-10-11):** Preserve title intent through toolbar keyboard
+and overflow-menu navigation; clear it on moving to content or elsewhere.
 
 - **Evaluation:** Use the toolbar with a title caret, a title selection, and
   content focus; confirm the saved words land in the chosen field and position.
