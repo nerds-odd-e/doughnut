@@ -5,7 +5,7 @@
     :title="name"
     :aria-label="name"
     :aria-pressed="phase === 'listening' || undefined"
-    :disabled="phase === 'converting'"
+    :disabled="phase === 'starting' || phase === 'converting'"
     @click="onControlClick"
   >
     <LoaderCircle

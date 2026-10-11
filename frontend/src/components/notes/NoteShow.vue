@@ -22,8 +22,10 @@
             >
               <div id="main-note-content" class="flex flex-col w-full">
                 <NoteTextContent
+                  ref="noteTextContent"
                   v-bind="{
                     note: noteRealm.note,
+                    titleDictation,
                     asMarkdown,
                     readonly: readonly(noteRealm),
                     wikiLinks: noteRealm.wikiLinks ?? [],
@@ -86,6 +88,7 @@ import NoteUnresolvedWikiLinkModal from "./NoteUnresolvedWikiLinkModal.vue"
 import type { DeadWikiLinkPayload } from "@/utils/wikiLinkMarkup"
 import { isNoteRealmInTrash } from "@/utils/folderTrash"
 import { provideMemoryTrackerActions } from "@/composables/useMemoryTrackerActions"
+import { useTitleDictation } from "@/composables/useTitleDictation"
 import { isReservedReadmeNoteTitle } from "@/utils/reservedReadmeTitles"
 
 const props = defineProps({
@@ -94,6 +97,12 @@ const props = defineProps({
 })
 
 provideMemoryTrackerActions(toRef(() => props.noteId))
+
+const noteTextContent = ref<InstanceType<typeof NoteTextContent> | null>(null)
+const titleDictation = useTitleDictation(() =>
+  noteTextContent.value!.beginTitleDictation()
+)
+watch(() => props.noteId, titleDictation.leave)
 
 const currentUser = inject<Ref<User | undefined>>("currentUser")
 const readonly = (noteRealm: NoteRealm) =>

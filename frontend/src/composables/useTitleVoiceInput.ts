@@ -12,14 +12,17 @@ import {
 
 /** Title speech converts on Stop; the editor owns where the words are inserted. */
 export function useTitleVoiceInput(
-  heardSegments: (segments: string[]) => void
+  heardSegments: (segments: string[]) => void,
+  beforeStart: () => void
 ) {
   const { showErrorToast } = useToast()
-  const phase = ref<"idle" | "listening" | "converting">("idle")
+  const phase = ref<"idle" | "starting" | "listening" | "converting">("idle")
   const busy = computed(() => phase.value !== "idle")
   let audioRecorder: AudioRecorder | undefined
 
   const startListening = async () => {
+    beforeStart()
+    phase.value = "starting"
     const recorder = createAudioRecorder(
       async (chunk) => {
         try {
@@ -40,8 +43,11 @@ export function useTitleVoiceInput(
       await recorder.startRecording()
       if (audioRecorder === recorder) phase.value = "listening"
     } catch {
-      audioRecorder = undefined
-      showErrorToast(MICROPHONE_UNAVAILABLE_MESSAGE)
+      if (audioRecorder === recorder) {
+        audioRecorder = undefined
+        phase.value = "idle"
+        showErrorToast(MICROPHONE_UNAVAILABLE_MESSAGE)
+      }
     }
   }
 

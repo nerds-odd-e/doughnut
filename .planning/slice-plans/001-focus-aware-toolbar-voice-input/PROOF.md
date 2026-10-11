@@ -133,3 +133,36 @@ keyboard/overflow, unrelated focus, draft/start failure through navigation and
 narrow active Stop. Slice 6 owns the single existing-note entry point, surviving
 New note/body journeys and one-time deletion sweep. The original table above
 is provenance; these current owners and the plan govern execution.
+
+Refinement published: `852e0b02de71128b2fe0f0e4f5153afb6cbe8b78`, same story
+branch and observer, suffix base `a3a2bb2bdec58f3720063d4be74f72ebc77de0e7`, no
+replay. Readiness was reassessed ready against the revised plan and unchanged
+story. Attempt spec parked; no unfinished executable test remained.
+
+## Slice 2
+
+`NoteShow` owns one title session passed through `NoteTextContent` to the title
+editor; its existing `DictationTarget` operation captures synchronously before
+microphone startup. Standalone/reader consumers and New note keep their local
+owner. Starting locks editing and disables the existing title control; failed
+startup restores editing. Delayed-start test in
+`NoteShow.spokenTitleLeavingNote.spec.ts` observed red (selection changed the
+result to “harvest notes”) then green (“Orchard harvest notes” from captured
+caret 7), with only external recorder startup held. Approximately five active
+minutes plus measured Nix/proof wait. Independent refactor found no candidates.
+
+```sh
+CURSOR_DEV=true nix develop -c pnpm frontend:test tests/notes/NoteEditableTitle tests/notes/NoteNewForm.spokenTitle tests/notes/NoteShow.spokenTitleLeavingNote.spec.ts tests/notes/NoteVoiceInputButton tests/notes/NoteToolbar.voiceInput tests/notes/TextContentWrapper.spec.ts
+CURSOR_DEV=true nix develop -c pnpm frontend:test tests/notes/NoteTextContent tests/notes/NoteContextReader.spec.ts tests/components/notes/NoteTextContentUndo.spec.ts
+CURSOR_DEV=true nix develop -c pnpm -C frontend exec vue-tsc --noEmit
+CURSOR_DEV=true nix develop -c pnpm -C frontend exec tsc --noEmit
+```
+
+23 files / 145 tests and additional consumer 5 files / 19 tests passed. The
+consumer sweep found `NoteContextReader` using the standalone fallback; inspected
+read-only rendering and ordinary title save/validation assertions. Both
+implementation typechecks passed. Whitespace check passed. Formatter rejected
+an unused empty callback default; coordinator removed that default (the sole
+production caller supplies the callback), repeated formatting successfully,
+and reran both typechecks on the final API. No behavior proof was invalidated.
+Toolbar target choice/persisted reload remain with slice 3.

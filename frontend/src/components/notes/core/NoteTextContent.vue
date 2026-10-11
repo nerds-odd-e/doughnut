@@ -7,11 +7,13 @@
     This note is in trash
   </div>
   <NoteEditableTitle
+    ref="titleEditor"
     v-bind="{
       noteTopology: note.noteTopology,
       noteId: note.id,
       readonly,
       hasInboundReferences,
+      titleDictation,
     }"
   />
   <div
@@ -35,10 +37,11 @@
 </template>
 
 <script setup lang="ts">
-import { type PropType } from "vue"
+import { ref, type PropType } from "vue"
 import type { Note, WikiLink } from "@generated/donut-backend-api"
 import NoteEditableTitle from "./NoteEditableTitle.vue"
 import NoteEditableContent from "./NoteEditableContent.vue"
+import type { TitleDictation } from "@/composables/useTitleDictation"
 import type { DeadWikiLinkPayload } from "@/utils/wikiLinkMarkup"
 
 defineProps({
@@ -49,7 +52,13 @@ defineProps({
   isReadmeContext: { type: Boolean, default: false },
   hasInboundReferences: { type: Boolean, default: false },
   trashed: { type: Boolean, default: false },
+  titleDictation: { type: Object as PropType<TitleDictation>, required: false },
 })
 
 defineEmits<{ deadWikiLinkClick: [payload: DeadWikiLinkPayload] }>()
+
+const titleEditor = ref<InstanceType<typeof NoteEditableTitle> | null>(null)
+defineExpose({
+  beginTitleDictation: () => titleEditor.value!.beginDictation(),
+})
 </script>

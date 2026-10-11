@@ -96,7 +96,8 @@ including focused proof and cleanup; no further preparatory framework.
 ### 2. Own the existing title session at the note-page boundary
 
 Type: Structure
-Status: planned
+Status: done
+Accepted execution proof: [PROOF.md — Slice 2](PROOF.md#slice-2).
 Proof: Retained title/New note/departure suites and both typechecks preserve
 conversion on Stop, insertion, cleanup, read-only/marker and recovery.
 

@@ -34,9 +34,12 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch, type PropType } from "vue"
+import { onUnmounted, ref, watch, type PropType } from "vue"
 import type { NoteTopology } from "@generated/donut-backend-api"
-import { useTitleDictation } from "@/composables/useTitleDictation"
+import {
+  useTitleDictation,
+  type TitleDictation,
+} from "@/composables/useTitleDictation"
 import SpeakTitleControl from "../SpeakTitleControl.vue"
 import TextContentWrapper from "./TextContentWrapper.vue"
 import PathNameEditor from "./PathNameEditor.vue"
@@ -46,13 +49,17 @@ const props = defineProps({
   noteId: { type: Number, required: true },
   readonly: { type: Boolean, default: true },
   hasInboundReferences: { type: Boolean, default: false },
+  titleDictation: { type: Object as PropType<TitleDictation>, required: false },
 })
 
 const pathNameEditor = ref<InstanceType<typeof PathNameEditor> | null>(null)
 
-const { voiceInput: titleVoiceInput, leave } = useTitleDictation(() =>
-  pathNameEditor.value!.beginDictation(false)
-)
+const beginDictation = () => pathNameEditor.value!.beginDictation(false)
+const { voiceInput: titleVoiceInput, leave } =
+  props.titleDictation ?? useTitleDictation(beginDictation)
+
+defineExpose({ beginDictation })
+onUnmounted(leave)
 
 // Moving to another note stops the listening and ends its session.
 watch(() => props.noteId, leave)

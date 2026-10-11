@@ -11,6 +11,8 @@ import {
   expectIdleSpeakTitleButton,
   speakAndStop,
   speakTheTitle,
+  stopSpeaking,
+  placeCaretInTitle,
   titleEditable,
   useSpokenTitleTestLifecycle,
 } from "@tests/notes/spokenTitleTestSupport"
@@ -74,6 +76,31 @@ describe("Speaking a title when the author moves to another note", () => {
     expect(noteTitleText(wrapper)).toBe("Pear tree")
     expect(document.activeElement).not.toBe(titleEditorEl(wrapper))
     expectIdleSpeakTitleButton(wrapper)
+  })
+
+  it("captures the title range before delayed microphone startup", async () => {
+    const createRecorder = vi.mocked(createAudioRecorder)
+    const implementation = createRecorder.getMockImplementation()!
+    let finishStartup!: () => void
+    createRecorder.mockImplementationOnce((callback, options) => {
+      const recorder = implementation(callback, options!)
+      vi.mocked(recorder.startRecording).mockImplementation(
+        () =>
+          new Promise<void>((resolve) => {
+            finishStartup = resolve
+          })
+      )
+      return recorder
+    })
+    placeCaretInTitle(wrapper, 7)
+    await speakTheTitle(wrapper)
+    placeCaretInTitle(wrapper, 0, 7)
+    finishStartup()
+    await flushPromises()
+
+    await stopSpeaking(wrapper)
+
+    expect(noteTitleText(wrapper)).toBe("Orchard harvest notes")
   })
 
   it("clears the pending marker of the title they left", async () => {
