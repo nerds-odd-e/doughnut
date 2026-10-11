@@ -134,7 +134,7 @@ Target 5–8 minutes; hard 10 except measured focused-test/stack wait.
 
 Type: Behavior
 Status: done
-Accepted execution proof: [PROOF.md — Slice 4](PROOF.md#slice-4).
+Accepted execution proof: [JOURNEY-PROOF.md — Slice 4](JOURNEY-PROOF.md#slice-4).
 Proof: Mounted direct toolbar draft/save-choice/recovery cases and linked rename
 E2E with reload, plus baseline consumer suites and both typechecks.
 
@@ -153,7 +153,8 @@ Target 5–8 minutes; hard 10 except measured focused-test/stack wait.
 ### 5. Keep title intent while reaching the toolbar action
 
 Type: Behavior
-Status: planned
+Status: done
+Accepted execution proof: [JOURNEY-PROOF.md — Slice 5](JOURNEY-PROOF.md#slice-5).
 Proof: Real mounted focus/keyboard/portaled overflow transitions, typed linked
  draft and failed-start recovery; next content session, baseline + typechecks.
 

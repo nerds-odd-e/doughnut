@@ -13,6 +13,7 @@
 
 <script setup lang="ts">
 import { provide, ref, useId } from "vue"
+import { dropdownPortalPanelSelector } from "@/composables/dropdownPortalContext"
 import { useAutoCollapseDetails } from "@/composables/useAutoCollapseDetails"
 import {
   dropdownPortalContextKey,
@@ -53,5 +54,11 @@ const onToggle = (event: Event) => {
   open.value = (event.target as HTMLDetailsElement).open
 }
 
-defineExpose({ closeDropdown })
+defineExpose({
+  closeDropdown,
+  containsFocusTarget: (target: Node) =>
+    detailsRef.value?.contains(target) === true ||
+    (target instanceof Element &&
+      target.closest(dropdownPortalPanelSelector(portalId)) != null),
+})
 </script>

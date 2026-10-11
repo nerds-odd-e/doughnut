@@ -37,13 +37,14 @@
 <script setup lang="ts">
 import type { Note } from "@generated/donut-backend-api"
 import { MoreHorizontal } from "@lucide/vue"
-import { computed, nextTick, ref, watch } from "vue"
+import { computed, inject, nextTick, ref, watch } from "vue"
 import AutoCollapseDropdown from "@/components/commons/AutoCollapseDropdown.vue"
 import {
   computeNoteToolbarOverflow,
   NOTE_TOOLBAR_MORE_OPTIONS_ORDER,
 } from "@/composables/noteToolbarOverflow"
 import { useAssimilationView } from "@/composables/useAssimilationView"
+import { noteTitleDictationKey } from "@/composables/useTitleDictation"
 import { voiceInputIsActive } from "@/composables/useNoteVoiceInput"
 import NoteMoreOptionsActions from "./NoteMoreOptionsActions.vue"
 import NoteMoreOptionsForm from "./NoteMoreOptionsForm.vue"
@@ -81,9 +82,12 @@ let cachedOverflowButtonWidth = 0
 
 const { isOpenForNote } = useAssimilationView()
 
+const title = inject(noteTitleDictationKey, undefined)
+
 const pinnedIds = computed(() => {
   const ids: NoteMoreOptionsActionId[] = []
-  if (voiceInputIsActive.value) ids.push("voiceInput")
+  if (voiceInputIsActive.value || title?.dictation.busy.value)
+    ids.push("voiceInput")
   if (isOpenForNote(props.note.id)) ids.push("assimilation")
   return ids
 })
@@ -92,7 +96,11 @@ const closeOverflowMenu = () => {
   overflowDropdownRef.value?.closeDropdown()
 }
 
-defineExpose({ closeOverflowMenu })
+defineExpose({
+  closeOverflowMenu,
+  containsFocusTarget: (target: Node) =>
+    overflowDropdownRef.value?.containsFocusTarget(target) === true,
+})
 
 const controlByTitle = (root: ParentNode, title: string) => {
   for (const el of root.querySelectorAll("[title]")) {

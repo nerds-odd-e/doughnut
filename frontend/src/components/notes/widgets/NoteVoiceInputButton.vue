@@ -74,11 +74,15 @@ const finishing = computed(
     (title?.dictation.busy.value === true && !titleRecording.value)
 )
 const preserveTitleFocus = (event: PointerEvent) => {
-  if (!isRecording.value && !hasKeptRecording.value && title?.hasFocus())
+  if (
+    !isRecording.value &&
+    !hasKeptRecording.value &&
+    title?.hasTitleIntent.value
+  )
     event.preventDefault()
 }
 const start = () =>
-  title?.hasFocus()
+  title?.hasTitleIntent.value
     ? title.dictation.voiceInput.startListening()
     : startContent()
 

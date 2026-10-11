@@ -146,6 +146,11 @@ const newNoteButtonRef = ref<InstanceType<typeof NoteCreationNewButton> | null>(
 const moreOptionsRef = ref<InstanceType<typeof NoteToolbarMoreOptions> | null>(
   null
 )
+defineExpose({
+  containsFocusTarget: (target: Node) =>
+    toolbarNavRef.value?.contains(target) === true ||
+    moreOptionsRef.value?.containsFocusTarget(target) === true,
+})
 const overflowedIds = ref<NoteMoreOptionsActionId[]>([])
 const editOverflowed = computed(() => overflowedIds.value.includes("edit"))
 const conversationOverflowed = computed(() =>

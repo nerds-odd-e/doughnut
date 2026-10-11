@@ -4,7 +4,7 @@
     field="edit title"
     :title-rename-needs-explicit-reference-choice="hasInboundReferences"
     :note-id="noteId"
-    :retain-title-draft="titleVoiceInput.busy.value"
+    :retain-title-draft="retainTitleDraft"
   >
     <template #default="{ value, update, blur, errors }">
       <PathNameEditor
@@ -35,9 +35,10 @@
 </template>
 
 <script setup lang="ts">
-import { onUnmounted, ref, watch, type PropType } from "vue"
+import { computed, inject, onUnmounted, ref, watch, type PropType } from "vue"
 import type { NoteTopology } from "@generated/donut-backend-api"
 import {
+  noteTitleDictationKey,
   useTitleDictation,
   type TitleDictation,
 } from "@/composables/useTitleDictation"
@@ -58,6 +59,11 @@ const pathNameEditor = ref<InstanceType<typeof PathNameEditor> | null>(null)
 const beginDictation = () => pathNameEditor.value!.beginDictation(false)
 const { voiceInput: titleVoiceInput, leave } =
   props.titleDictation ?? useTitleDictation(beginDictation)
+
+const noteTitle = inject(noteTitleDictationKey, undefined)
+const retainTitleDraft = computed(
+  () => titleVoiceInput.busy.value || noteTitle?.hasTitleIntent.value === true
+)
 
 defineExpose({ beginDictation })
 onUnmounted(leave)

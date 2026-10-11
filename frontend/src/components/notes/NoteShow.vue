@@ -7,6 +7,7 @@
           <template v-if="!isMinimized">
             <NoteToolbar
               v-if="currentUser"
+              ref="toolbar"
               v-bind="{
                 note: noteRealm.note,
                 notebookId: noteRealm.notebookRealm.notebook.id,
@@ -75,7 +76,16 @@
 </template>
 
 <script setup lang="ts">
-import { inject, provide, ref, toRef, watch, type Ref } from "vue"
+import {
+  inject,
+  onMounted,
+  onUnmounted,
+  provide,
+  ref,
+  toRef,
+  watch,
+  type Ref,
+} from "vue"
 import ContentLoader from "@/components/commons/ContentLoader.vue"
 import NoteRealmLoader from "./NoteRealmLoader.vue"
 import type { NoteRealm, User } from "@generated/donut-backend-api"
@@ -106,13 +116,38 @@ const noteTextContent = ref<InstanceType<typeof NoteTextContent> | null>(null)
 const titleDictation = useTitleDictation(() =>
   noteTextContent.value!.beginTitleDictation()
 )
-provide(noteTitleDictationKey, {
-  dictation: titleDictation,
-  hasFocus: () =>
-    root.value?.querySelector('[data-test="note-title"]') ===
-    document.activeElement,
+const toolbar = ref<InstanceType<typeof NoteToolbar> | null>(null)
+const hasTitleIntent = ref(false)
+const updateTitleIntent = (target: EventTarget | null) => {
+  if (
+    target instanceof Node &&
+    target === root.value?.querySelector('[data-test="note-title"]')
+  ) {
+    hasTitleIntent.value = true
+  } else if (
+    !(target instanceof Node && toolbar.value?.containsFocusTarget(target))
+  ) {
+    hasTitleIntent.value = false
+  }
+}
+const onFocusIn = (event: FocusEvent) => updateTitleIntent(event.target)
+const onFocusOut = (event: FocusEvent) => updateTitleIntent(event.relatedTarget)
+onMounted(() => {
+  document.addEventListener("focusin", onFocusIn)
+  document.addEventListener("focusout", onFocusOut)
 })
-watch(() => props.noteId, titleDictation.leave)
+onUnmounted(() => {
+  document.removeEventListener("focusin", onFocusIn)
+  document.removeEventListener("focusout", onFocusOut)
+})
+provide(noteTitleDictationKey, { dictation: titleDictation, hasTitleIntent })
+watch(
+  () => props.noteId,
+  () => {
+    hasTitleIntent.value = false
+    titleDictation.leave()
+  }
+)
 
 const currentUser = inject<Ref<User | undefined>>("currentUser")
 const readonly = (noteRealm: NoteRealm) =>
