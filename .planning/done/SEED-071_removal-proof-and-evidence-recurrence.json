@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "identity": "SEED-071#removal-proof-and-evidence-recurrence",
+  "title": "Make Donut removal handoffs preserve valid proof and truthful evidence",
+  "completedAt": "2026-10-12T01:42:09.609Z",
+  "developer": "Terry Yin",
+  "agent": "Sola-chan",
+  "host": "codex",
+  "model": "gpt-6.1-sol"
+}

@@ -21,19 +21,11 @@ and [refactor checks](https://github.com/terryyin/open-dough/blob/v0.3.60/src/sk
 match that release. Public refactor guidance retains negative assertions when
 absence is the actual promise and defers to project test style. Donut’s
 principle 7 and `unit-testing` skill supply the stricter removal convention.
-The queued work therefore belongs in Donut-authored guidance and evidence
-handling; it does not change public `dough-*` skills.
 
 | Group | Distinct recorded executions | Impact and disposition |
 | --- | --- | --- |
-| Donut removal proof and evidence handling | Four after the October 3 correction, including two after the October 10 correction; plus original DD-202 | Repeated invalid proof handoffs; one altered dated observation and broken link. One recurrence story queued first. |
 | MinerU venv recovery | One | About 28 minutes of mixed environment and stack work; recovery remains unqueued. |
 | Stale Development classes | One; later probes healthy | Failed start, unknown cause; unqueued, not confirmed resolved. |
-
-Only the first group has repeated post-correction evidence and an unresolved
-disposition for dated observation records encountered by a removal sweep. The one-off environment findings do not
-justify a second highest-priority story. The backlog’s voice-input direction
-stays unchanged; the recurring group directly arose during voice-input work.
 
 Shared findings retained in DearDough include changed-boundary proof acceptance
 (DD-218; public wrap-up step 2), decisive planning premises (DD-224; public
@@ -41,92 +33,6 @@ Shared findings retained in DearDough include changed-boundary proof acceptance
 observation/delivery. Their remaining claims concern the shared workflow, not
 an unrepaired Donut helper or voice-control defect. Successful local practice
 is separated below from open problems and has no backlog entry.
-
-<a id="local-removal-proof"></a>
-
-## Queued first: Apply Donut’s removal convention to proof and dated evidence
-
-Follow-up: [Make Donut removal handoffs preserve valid proof and truthful evidence](.planning/seeds/SEED-071-reliable-project-feedback.md#removal-proof-and-evidence-recurrence)
-— SEED-071#removal-proof-and-evidence-recurrence.
-
-The earlier SEED-071#removals-follow-project-rule completed on 2026-10-10 and
-is not active in either backlog list. Its correction `b96f234fb8` (14:25 +09:00)
-stated removal proof in principle 7 and the `unit-testing` skill; a one-time
-demonstration passed for two earlier shapes
-(`231b5e320d:.planning/slice-plans/013-removal-proof-in-guidance/PLAN.md`).
-That demonstration was not evidence of later real-plan compliance.
-
-DD-225 occurred that evening (22:17 +09:00). DD-227’s plan was created at
-`7d062d701f` on October 11 at 06:56 +09:00 and caught during execution at
-08:00. Both follow the correction. DD-227 reopens the proof-handoff problem;
-DD-225 adds the local sweep’s handling of dated evidence to the same group.
-The new recurrence story preserves the predecessor’s done record.
-
-DD-205 already followed an earlier correction of Donut DD-202 (not the DD-202
-that became ODF-208): `18b99b6424` and `52460a4077` put the local convention in
-always-loaded guidance on October 3. Its two later executions each wrote and
-removed proof. Guidance publication and isolated demonstrations have therefore
-not yet established effectiveness on real removals.
-
-### DD-205 — A plan's proof named an absence check that the project's removal rule forbids
-
-A removal slice's proof listed "no Responses API call is made" for the deleted
-model rewrite. CLAUDE.md principle 7 says a removal leaves no check that the
-removed thing is absent, so the check was written by one agent and deleted by
-the next.
-
-#### Occurrences
-
-- Execution: SEED-066#keep-every-transcribed-sentence / `9ad1cedcc0:.planning/slice-plans/008-keep-every-transcribed-sentence/PLAN.md` / d68937a0d2
-  - Timestamp: 2026-10-04 (slice 2 implementation and refactor, before b233c0e7f3)
-  - Tool: Claude Code
-  - Model: claude-opus-5-5
-  - Open Dough release: 0.3.56 (execution-checkout VERSION, unchanged during execution)
-  - Evidence: plan 008 slice 2 Proof "no Responses API call is made"; the slice 2 implementer added `verify(officialClient, never()).responses()` to `AiAudioControllerTests`; the refactor report removed it citing principle 7; the coordinator recorded the drop in the plan (b233c0e7f3).
-  - Observed effect: one assertion written and removed, and a plan proof item the delivered tests do not carry. Small cost.
-  - Inference: when planning a removal, check each proof item against the removal rule; prove the replacement behavior instead of the absence. Qualified: one execution.
-- Execution: SEED-069#reliable-development-stack-lifecycle / `404892b54af9d40804a0309c8bd92204d41c3e7d:.planning/slice-plans/006-stop-and-restart-development-stack/PLAN.md` / 62035934b9
-  - Timestamp: 2026-10-05, slice 3 before the 14:54+09:00 commit
-  - Tool: Claude Code
-  - Model: claude-opus-5-5
-  - Open Dough release: unknown
-  - Evidence: plan proof row 10 prescribed writing a leftover `dev.pid` holding the test process's PID. The test was run red, then green, and deleted once no code read that file; the coordinator's Learnings explicitly cite principle 7. The existing free-primary start test carries the replacement outcome.
-  - Observed effect: another test written and deleted during one slice; the plan's prescribed permanent proof did not survive.
-  - Inference: third recorded occurrence of the same Donut planning gap; use the replacement start behavior as retained proof.
-
-### DD-225 — A removal sweep's search terms matched a dated observation record, so the implementer reworded history to make the sweep return nothing
-
-Plan 064's sweep reading required searches for the removed control names to return nothing over the product. One name appeared in `docs/voice-input-observations.md`, a dated record of journeys run with that control.
-
-#### Occurrences
-- Execution: SEED-066#single-button-voice-input (first implementation commit 5c3ca7033b)
-  - Timestamp: 2026-10-10T22:17:00+09:00
-  - Tool: Claude Code
-  - Model: claude-opus-5-5
-  - Open Dough release: 0.3.58
-  - Evidence: slice 2 return, decision 3 (five mentions reworded to "requested (mid-speech) conversion", heading renamed, a seed link's anchor broken); the coordinator's anchor repair in `.planning/seeds/SEED-066-voice-input.md`; slice 2 refactor return ("a truthful rewrite means deleting or re-running the observation, which is an owner decision")
-  - Observed effect: a dated observation now describes an author-requested conversion the product does not offer; one planning link broke and was repaired during delivery; the question was left for the owner
-  - Inference: the removal rule and the plan's sweep did not say whether a dated observation record counts as documentation to sweep, to delete, or to leave
-
-Current qualification (2026-10-12): the observation document explicitly dates
-its evidence to October 3 and says it is not a guarantee about later revisions.
-“Requested conversion” can describe the original action. The recorded concern
-is unresolved evidence disposition and anchor churn, not confirmed falsification
-of the observations or a claim that the current product offers that action.
-
-### DD-227 — A slice plan asked for a test that the removed status line is absent, against the project's removal rule
-
-Plan 065 slice 5 listed "no `[role="status"]` anywhere" among its proof for removing the status line. The project's principle 7 forbids a check that a removed thing is absent.
-
-#### Occurrences
-- Execution: SEED-066#unobtrusive-selection-aware-spoken-title (first implementation commit 57a659f018)
-  - Timestamp: 2026-10-11T08:00:00+09:00
-  - Tool: Claude Code
-  - Model: claude-opus-5-5
-  - Open Dough release: 0.3.58
-  - Evidence: `7d062d701f:.planning/slice-plans/065-unobtrusive-spoken-title/PLAN.md` slice 5 Proof; `CLAUDE.md` principle 7 ("no check that it is absent"); the coordinator's slice 5 brief ("principle 7 overrides that: do not add absence assertions"); slice 5 return, decision 2
-  - Observed effect: the coordinator caught it while writing the brief and the test was not written; the plan had passed slice planning and a readiness assessment with the instruction in it
-  - Inference: planning checked the removal as deletion plus sweep in its scope text but not in each slice's proof list
 
 ## Open, not queued: Rebuilding a stale MinerU virtual environment
 

@@ -2,6 +2,12 @@
   "schemaVersion": 1,
   "records": [
     {
+      "fileName": "SEED-071_removal-proof-and-evidence-recurrence.json",
+      "identity": "SEED-071#removal-proof-and-evidence-recurrence",
+      "completedAt": "2026-10-12T01:42:09.609Z",
+      "blob": "0744f7e042777d7e6f61ac777772c1ac6466810a"
+    },
+    {
       "fileName": "SEED-066_title-aware-voice-refinement.json",
       "identity": "SEED-066#title-aware-voice-refinement",
       "completedAt": "2026-10-11T12:49:44.324Z",
