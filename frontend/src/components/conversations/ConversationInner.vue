@@ -179,7 +179,7 @@ const practiceRequest =
 
 const canCheckDistinction = computed(
   () =>
-    conversation.subject?.recallPrompt &&
+    conversation.subject?.recallPrompt?.mcq &&
     currentConversationMessages.value?.some((message) => !message.sender)
 )
 

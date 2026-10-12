@@ -38,7 +38,7 @@
     v-model:open="showRefineNoteModal"
     :note="note"
     :question-context="questionContext"
-    :review-clarification="reviewClarification"
+    :review-clarification="reviewClarification && questionContext !== undefined"
   />
 </template>
 

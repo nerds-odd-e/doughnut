@@ -156,13 +156,13 @@ Proof: The [runtime baseline](CONSUMER-BASELINE-OBSERVATIONS.md#nested-dismissal
 ### 14. Preserve truthful context for retained MCQ and spelling conversations
 
 Type: Behavior
-Status: planned
+Status: done
 
 Sizing: about five active minutes; hard ten, excluding required suite waits. Actual MCQ context governs the new UI practice action and reviewed handoff; the existing spelling request owner is preserved.
 
 Behavior: A real MCQ supplies the validated guide, optional check and reviewed selected-answer handoff. A supported spelling conversation retains its ordinary user-history request and authorized ordinary refinement flow. The new MCQ-specific UI actions use actual MCQ context; ordinary conversation remains available.
 
-Proof: The [spelling refinement baseline](CONSUMER-BASELINE-OBSERVATIONS.md#spelling-refinement) consumes a clarification-only DTO; the [actual controller export](CONSUMER-BASELINE-OBSERVATIONS.md#actual-spelling-conversation-export) settles the existing ordinary spelling request as user history only. Positively observe corrected ordinary spelling refinement plus the MCQ explanation → optional check → feedback action and original stem/choices/selected answer/final reviewed clarification at the mounted consuming boundary. Reuse unchanged controller export/MCQ request proof; backend request applicability is not a reproduced defect. Preserve exact validated MCQ guide; no paid calls, new spelling source context or model-quality promise. Run frontend suite and both typechecks; backend suite/generation only if those boundaries change. Proof names retained behavior, not inapplicable artifacts' absence.
+Proof: The [spelling refinement baseline](CONSUMER-BASELINE-OBSERVATIONS.md#spelling-refinement) consumed a clarification-only DTO; the [actual controller export](CONSUMER-BASELINE-OBSERVATIONS.md#actual-spelling-conversation-export) establishes unchanged ordinary spelling user history. Accepted `MemoryTrackerPageView.spellingRefinement` now drives actual spelling history → help → ordinary composer send → persisted learner text → immediate authorized refinement, consuming exact ordinary `{path, signal}` generation options and displaying the layout. Existing mounted MCQ practice and reviewed handoff still observe explanation/check/response/feedback and original stem/choices/selected answer/final clarification. `CURSOR_DEV=true nix develop -c pnpm frontend:test`: 345 files / 2,164 tests; focused spelling one file / one test and both typechecks pass. Fresh refactor: none — already clean, proof unchanged. Four active minutes excluding suite waits; single formatter passed. One-time applicability reading confirms two shared UI owners and retained ordinary refinement consumers. Backend/export, generated API and exact validated guide are unchanged; their accepted proof is reused. No paid calls or broader spelling quality promise.
 
 ## Preparation assessment for remaining consumers
 
@@ -237,7 +237,7 @@ Disposition: proved by slice 13: RecallPage.privateHelp.spec.ts actual nested na
 ### G9. Retained spelling refinement receives an incomplete MCQ context (retrospective of slice 11)
 Reported: slice 11 — "Spelling help enables clarification review without an MCQ and sends a clarification-only DTO described as an answered MCQ."
 Story clause: "Ordinary authorized refinement remains available."
-Disposition: receiving slice 14
+Disposition: proved by slice 14: MemoryTrackerPageView.spellingRefinement.spec.ts actual spelling history/help sends and renders an ordinary persisted message then immediately consumes the ordinary authorized refinement request; retained MCQ practice and reviewed-context handoff tests pass
 
 ### G10. Ordinary spelling export supplies user history only (preparation for slice 14)
 Reported: slice 14 — "The valid spelling conversation export contains only the learner's user message; the current subject-note resolver supplies no note/developer context."
