@@ -121,7 +121,7 @@ describe("AnsweredQuestionComponent", () => {
 
       const modal = document.querySelector('[data-test="refine-note-modal"]')
       expect(modal).not.toBeNull()
-      expect(modal!.classList.contains("daisy-modal-open")).toBe(true)
+      expect(modal!.closest("dialog")!.open).toBe(true)
       expect(
         document.querySelector('[data-test-id="refinement-layout-empty"]')
       ).not.toBeNull()

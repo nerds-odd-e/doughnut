@@ -140,20 +140,18 @@ Sizing: about five active minutes; hard ten, excluding required suite waits. One
 
 Behavior: Successfully fetching visible stored messages acknowledges them through the existing backend read rule and updates the common unread store. Fetch failure does not acknowledge unseen messages. Existing audience rules and unrelated unread replies remain authoritative.
 
-Proof: The [runtime baseline](CONSUMER-BASELINE-OBSERVATIONS.md#read-acknowledgement) observes rendered reply 75 staying unread with no read call. Drive retained fetch and AI stream completion → persisted refetch → read HTTP response → updated unread store, retaining unrelated unread messages. Cover actual Message Center and NoteConversation consumers through the shared owner, and failed-fetch behavior. Existing controller read/privacy proof remains applicable. Run frontend suite and both typechecks; do not duplicate page/modal read rules.
-
-Accepted: `ConversationInner` owns successful fetch → read HTTP → authoritative unread-store replacement; `RecallPage.privateHelp`, `RecallPage.practice` and `ConversationReading` observe stored replies, SSE completion, actual Message Center/NoteConversation and failed fetch retaining unread replies. Full frontend suite: 344 files / 2,161 tests; both typechecks pass. Initial setup/import and unmocked-request failures were corrected before the passing rerun. Fresh refactor: none — already clean, proof unchanged. Active work eight–nine minutes excluding verification waits; single formatter passed. One-time product reading found zero obsolete fetched-event relay consumers; no permanent removal assertion was added.
+Proof: The [runtime baseline](CONSUMER-BASELINE-OBSERVATIONS.md#read-acknowledgement) observes reply 75 staying unread. Accepted `ConversationInner` successful fetch → read HTTP → authoritative unread-store replacement is observed by `RecallPage.privateHelp`, `RecallPage.practice` and `ConversationReading`: stored replies, SSE completion, actual Message Center/NoteConversation, unrelated unread retention and failed-fetch preservation. `CURSOR_DEV=true nix develop -c pnpm frontend:test`: 344 files / 2,161 tests; both frontend typechecks pass. Initial setup/import and unmocked-request failures were corrected before the passing rerun. Fresh refactor: none — already clean, proof unchanged. Active work eight–nine minutes excluding verification waits; single formatter passed. One-time product reading found zero obsolete fetched-event relay consumers; no permanent removal assertion was added. Existing controller read/privacy proof remains applicable.
 
 ### 13. Dismiss refinement while retaining contextual help
 
 Type: Behavior
-Status: planned
+Status: done
 
 Sizing: about five active minutes; hard ten, excluding required suite waits. One top-dialog dismissal rule at the existing modal owner.
 
 Behavior: Escape dismisses the active refinement dialog while contextual help remains open; subsequently closing help preserves recall/history state and returns focus. Standalone refinement close/extraction stays usable.
 
-Proof: The [runtime baseline](CONSUMER-BASELINE-OBSERVATIONS.md#nested-dismissal) observes two open dialogs → Escape → neither dialog retained. Extend that real-parent journey to observe child-only dismissal, retained conversation/answer/progress/route, and eventual invoker-focus restoration. Retain ordinary refinement close/extraction and loading-modal dismissal behavior: drive actual extraction controls/API to close the real dialog, rather than emitting a child event or checking wrapper CSS. Run frontend suite and both typechecks; do not add a competing Escape owner.
+Proof: The [runtime baseline](CONSUMER-BASELINE-OBSERVATIONS.md#nested-dismissal) observes both dialogs closing. Accepted `RecallPage.privateHelp` now drives actual answer → help → refinement → child Escape, observes child detachment and retained conversation/answer, then parent Escape preserving queue/progress/route/focus. `RefineNoteModal.extractNote.close` drives actual checkbox/preview/Create API, distinct created-note navigation and native host closure; loading cancellation retains the host and retry. `CURSOR_DEV=true nix develop -c pnpm frontend:test`: 344 files / 2,163 tests; final strengthened assertions: two files / five tests; both final typechecks pass. `pnpm cy:run --spec e2e_test/features/assimilation/note_refinement.feature` under Nix passed all four scenarios and retired its runner. Initial focused capitalization mismatch was corrected. Fresh refactor: none — already clean, all proof unchanged. Seven active minutes excluding waits; single formatter passed. One-time consumer reading found no refinement marker selectors coupled to Daisy open classes; shared Daisy helpers retain book/admin/loading callers.
 
 ### 14. Preserve truthful context for retained MCQ and spelling conversations
 
@@ -234,7 +232,7 @@ Disposition: proved by slice 12: RecallPage.privateHelp.spec.ts, RecallPage.prac
 ### G8. Nested refinement Escape closes contextual help (retrospective of slices 8/11)
 Reported: slice 11 — "The raw refinement dialog is outside modalStack; Escape pops contextual help and discards both dialogs."
 Story clause: "Returning to recall preserves the learner's progress."
-Disposition: receiving slice 13
+Disposition: proved by slice 13: RecallPage.privateHelp.spec.ts actual nested native child Escape retains help and later parent Escape preserves answer, queue, progress, route and focus; RefineNoteModal.extractNote.close.spec.ts actual extraction/create closes native host and loading cancellation retains retry
 
 ### G9. Retained spelling refinement receives an incomplete MCQ context (retrospective of slice 11)
 Reported: slice 11 — "Spelling help enables clarification review without an MCQ and sends a clarification-only DTO described as an answered MCQ."

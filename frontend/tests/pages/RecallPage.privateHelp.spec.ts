@@ -1,6 +1,7 @@
 import {
   ConversationMessageController,
   MemoryTrackerController,
+  NoteController,
   RecallPromptController,
 } from "@generated/donut-backend-api/sdk.gen"
 import { messageCenter } from "@/store/messageCenter"
@@ -17,7 +18,7 @@ import {
 
 const ctx = useRecallPageSpecContext()
 
-it.each(["conversation close", "Escape"])(
+it.each(["conversation close", "Escape", "nested refinement then Escape"])(
   "returns from private help through %s to the actual answered attempt and recall queue",
   async (closeMethod) => {
     const prompt = makeMe.aRecallPrompt
@@ -25,7 +26,12 @@ it.each(["conversation close", "Escape"])(
       .withQuestionStem("What does correlation establish?")
       .withChoices(["Association", "Causation"])
       .please()
+    const noteRealm = makeMe.aNoteRealm
+      .content("Correlation expresses association.")
+      .please()
+    mockSdkService(NoteController, "showNote", noteRealm)
     const answered = makeMe.anAnsweredQuestion
+      .withNote(noteRealm.note)
       .withId(prompt.id)
       .withMemoryTrackerId(123)
       .withMcq(
@@ -95,7 +101,32 @@ it.each(["conversation close", "Escape"])(
     expect(dialog.querySelector(".is-selected")?.textContent).toContain(
       "Causation"
     )
-    if (closeMethod === "Escape") {
+    if (closeMethod === "nested refinement then Escape") {
+      dialog
+        .querySelector<HTMLButtonElement>(
+          '[data-test="open-refine-note-modal"]'
+        )!
+        .click()
+      await flushPromises()
+      const refinement = document
+        .querySelector('[data-test="refine-note-modal"]')!
+        .closest("dialog")!
+      expect(refinement.open).toBe(true)
+      document.dispatchEvent(
+        new KeyboardEvent("keydown", { key: "Escape", bubbles: true })
+      )
+      await flushPromises()
+      expect(refinement.isConnected).toBe(false)
+      expect(dialog.open).toBe(true)
+      expect(dialog.textContent).toContain(reply.message)
+      expect(dialog.querySelector(".is-selected")?.textContent).toContain(
+        "Causation"
+      )
+    }
+    if (
+      closeMethod === "Escape" ||
+      closeMethod === "nested refinement then Escape"
+    ) {
       document.dispatchEvent(
         new KeyboardEvent("keydown", { key: "Escape", bubbles: true })
       )

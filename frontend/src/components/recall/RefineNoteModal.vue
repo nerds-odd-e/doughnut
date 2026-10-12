@@ -1,15 +1,9 @@
 <template>
-  <Teleport to="body">
-    <dialog
-      ref="dialogRef"
-      class="daisy-modal"
-      :class="{ 'daisy-modal-open': open }"
-      data-test="refine-note-modal"
-      @close="close"
-    >
-      <div class="daisy-modal-box max-w-4xl max-h-[90vh] overflow-y-auto">
-        <h3 v-if="open" class="font-bold text-lg mb-3">Refine note</h3>
-        <div v-if="open && reviewClarification && !refinementStarted">
+  <Modal v-if="open" :show-close-button="false" @close_request="close">
+    <template #body>
+      <div data-test="refine-note-modal">
+        <h3 class="font-bold text-lg mb-3">Refine note</h3>
+        <div v-if="reviewClarification && !refinementStarted">
           <label for="refinement-clarification" class="block mb-2">
             Clarification to carry into refinement
           </label>
@@ -29,14 +23,14 @@
           </button>
         </div>
         <NoteRefinement
-          v-if="open && (!reviewClarification || refinementStarted)"
+          v-if="!reviewClarification || refinementStarted"
           :key="note.id"
           :note="note"
           :question-context="refinementQuestionContext"
           @content-updated="emit('contentUpdated')"
           @extracted="close"
         />
-        <div v-if="open" class="daisy-modal-action mt-4">
+        <div class="daisy-modal-action mt-4">
           <button
             type="button"
             class="daisy-btn"
@@ -47,11 +41,8 @@
           </button>
         </div>
       </div>
-      <form method="dialog" class="daisy-modal-backdrop">
-        <button type="button" @click="close">close</button>
-      </form>
-    </dialog>
-  </Teleport>
+    </template>
+  </Modal>
 </template>
 
 <script setup lang="ts">
@@ -59,8 +50,8 @@ import type {
   Note,
   NoteRefinementQuestionContextDto,
 } from "@generated/donut-backend-api"
-import { useDaisyDialog } from "@/composables/useDaisyDialog"
-import { computed, ref, toRef, watch } from "vue"
+import Modal from "@/components/commons/Modal.vue"
+import { computed, ref, watch } from "vue"
 import NoteRefinement from "./NoteRefinement.vue"
 
 const props = defineProps<{
@@ -75,7 +66,6 @@ const emit = defineEmits<{
   contentUpdated: []
 }>()
 
-const dialogRef = ref<HTMLDialogElement | null>(null)
 const clarification = ref("")
 const carriedClarification = ref<string>()
 const refinementStarted = computed(
@@ -100,7 +90,6 @@ watch(
     }
   }
 )
-useDaisyDialog(toRef(props, "open"), dialogRef)
 
 watch(
   () => props.note.id,
