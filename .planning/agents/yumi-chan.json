@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 1,
+  "agent": "Yumi-chan",
+  "email": "yumi-chan@example.org",
+  "identity": "SEED-066#unified-voice-input-control",
+  "mode": "story-branch",
+  "branch": "claude/use-one-reactive-voice-input-button-for-note-tit",
+  "host": "claude"
+}
