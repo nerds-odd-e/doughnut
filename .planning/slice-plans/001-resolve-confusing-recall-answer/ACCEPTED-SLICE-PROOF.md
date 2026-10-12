@@ -160,3 +160,14 @@ On 2026-10-12, the later private-audience slice 5 accumulated 10–11 active min
 
 The smallest authorized outcome remains private explanation/practice with later reading and recall return. Audience-only delivery without the inbox suffix would abandon its planned observation. Reuse the common incoming-message predicate and existing labels, rather than introducing per-help rules or a notification resource. The source, scope, queue and architectural direction are unchanged; the unrelated fixture and inbox overruns are preserved, not erased by splitting.
 
+
+## Resumed consumer review
+
+The automatic retrospective resumed only affected consumer conclusions on 2026-10-12 at `7c4702116cf568825c4b1b82012127d516e0e932`; the original review, process occurrences and architectural conclusions remain unchanged. Related published revisions added to its retained manifest:
+
+- `fbd065c91599606112ca41496eb67edb42003119`: preparation, dated actual baselines and existing process findings.
+- `b841084cdada9d23b8622f21f057d8dda3521e23`: shared read lifecycle across actual conversation viewers.
+- `bba07df1a6bb3afb96de8f40ed1e5c677a12a58c`: nested dismissal and reached extraction/loading/E2E consumers.
+- `7c4702116cf568825c4b1b82012127d516e0e932`: truthful MCQ/spelling UI context.
+
+Read acknowledgement, child-only dismissal and ordinary spelling refinement are closed by the inspected surviving-behavior proofs in slices 12–14. Latest frontend proof is 345 files / 2,164 tests plus both typechecks; four existing refinement E2E scenarios passed. Unchanged backend/generator proof remains applicable. Mounted tests mock HTTP, Escape uses a browser DOM keyboard event, and model-quality observations remain illustrative with no lasting-mastery inference. No new correction, backlog change or duplicate process occurrence was warranted. The coordinator retains the exact publication target/observer and owns the final CI operation.
