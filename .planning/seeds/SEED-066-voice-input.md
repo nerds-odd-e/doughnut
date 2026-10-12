@@ -161,6 +161,49 @@ with negative assertions, absence checks, or runtime guards. Record the final
 one-time removal sweep as an acceptance reading, following principle 7 in
 `AGENTS.md`; Git history retains the removed implementation.
 
+<a id="unified-voice-input-control"></a>
+
+### Use one reactive voice-input button for note titles and content
+
+**Identity:** SEED-066#unified-voice-input-control
+```json dough-story-state
+{"schemaVersion":1,"refinement":"not-refined","approach":"unselected"}
+```
+
+- **For / why:** Note authors get the same recognizable recording control and
+  live feedback when speaking a new note's title, updating an existing title,
+  or dictating note content.
+- **Reported behavior:** On 2026-10-12 the owner reported that content dictation
+  turns its button into a waveform that responds to speech, while creating a
+  note by speaking its title and updating a title do not show that feedback.
+  Whether those title journeys already share a button was uncertain.
+- **Scope:** Use the same shared button and waveform implementation across all
+  three journeys, with consistent appearance and recording-state feedback.
+  Delete duplicate control implementations and their exclusive dependencies;
+  keep target-specific title and content application behavior cohesive with
+  their respective editors. Preserve the existing focus-based choice between
+  title and content dictation, title refinement, and content preservation.
+- **Evaluation:** Start speaking in each of the three journeys. The control
+  shows the same waveform and responds to changing voice levels. Stop and
+  complete dictation; the spoken text reaches the intended title or content,
+  and the control returns to its appropriate idle state. Evaluate the shared
+  control's surviving states through the product. Separately perform a one-time
+  acceptance reading across the product for deleted duplicate control names and
+  their exclusive dependents; record that sweep as a reading, not a test.
+- **Code-reading evidence:** Main at `5d6307f63d`, read on 2026-10-12:
+  `NoteVoiceInputButton.vue` handles existing-note title and content targeting,
+  but renders its level canvas only for content recording. `NoteNewForm.vue`
+  uses `SpeakTitleControl.vue`, a separate button with a microphone and a
+  conversion spinner. These readings support the report; recording behavior
+  was not run during capture.
+- **Value / learning:** Make recording understandable across note authoring and
+  keep future feedback changes in one implementation.
+- **Effort hypothesis:** S–M, low confidence until the shared control boundary
+  and access to live title-recording levels are checked during refinement.
+- **Depends on:** No blocking story dependency established.
+- **Safe stopping point:** Consistent voice controls stand alone while each
+  editor retains its existing text-application behavior.
+
 ## Ordering and Scope Reduction
 
 The owner accepted the original nine-story order on 2026-10-03. The product backlog
@@ -182,6 +225,10 @@ On 2026-10-10 the owner placed the three UI stories at the top of the
 backlog in their stated order: simpler controls/feedback with cadence-cost
 analysis, one-button body dictation, then title styling and spoken editing.
 No blocking dependency is inferred from shared recording code or that order.
+
+On 2026-10-12 the owner placed the shared reactive voice-input control story
+first, followed by the mobile toolbar layout and spelling-cloze repair stories.
+This capture authorizes backlog maintenance only.
 
 ## Open Decisions for Later Work
 
@@ -227,6 +274,11 @@ No blocking dependency is inferred from shared recording code or that order.
 
 ## Breadcrumbs
 
+- Owner's three-story request, 2026-10-12: unify the voice button and reactive
+  waveform across title creation, title editing, and content dictation; give
+  the mobile toolbar full width with one row and a visible options menu; mask
+  the spelling answer before a trailing parenthesized title qualifier.
+  Authorized capture at the top of the backlog directly on main and sync origin.
 - Owner's two-story request, 2026-10-11: remove the existing-title microphone
   and route toolbar voice input by title focus; separately instruct the AI to
   refine speech as a concise title with suitable punctuation, without authority

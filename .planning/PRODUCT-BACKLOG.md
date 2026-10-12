@@ -10,6 +10,9 @@ Make deliberately captured knowledge more useful through learning and refinement
 
 ## Backlog list
 
+- [Use one reactive voice-input button for note titles and content](seeds/SEED-066-voice-input.md#unified-voice-input-control) — SEED-066#unified-voice-input-control
+- [Keep the mobile note toolbar on one full-width row with a visible options menu](seeds/SEED-075-mobile-note-toolbar.md#story-1) — SEED-075#story-1
+- [Mask the spelling answer before a trailing parenthesized title qualifier](seeds/SEED-076-parenthesized-title-spelling-cloze.md#story-1) — SEED-076#story-1
 - [Save a useful chat clarification as a reviewed note correction](seeds/SEED-073-learning-refinement-and-retrieval.md#story-2) — SEED-073#story-2
 - [Generate focus-note questions with relevant supporting passages](seeds/SEED-007-per-concept-prompt-splitting-single-note-qg.md#story-1) — SEED-007#story-1
 - [Decide whether an acceptance-test review procedure benefits from Donut notes](seeds/SEED-074-knowledge-to-capability.md#story-1) — SEED-074#story-1
