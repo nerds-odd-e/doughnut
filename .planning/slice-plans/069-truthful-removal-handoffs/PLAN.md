@@ -118,7 +118,7 @@ the approved evidence cleanup remains explicitly owned by slice 2.
 
 ### 2. Retained voice evidence stays truthful through a real removal handoff
 Type: Behavior
-Status: planned
+Status: done
 Proof: retained navigation and responsiveness observations keep their dates,
 revision qualifications, input meaning, results, limitations, and working
 links. Compare those facts with the execution base, read the resulting document
@@ -157,6 +157,11 @@ splitting them would leave dangling or misleading evidence. At 10 minutes,
 apply the repository overrun rule before continuing. Stop-safe when all affected
 links and independently retained observations are coherent in the same commit.
 
+Accepted: [real handoff evidence](EVIDENCE.md#slice-2-real-evidence-removal-handoff)
+compares the retained facts and all four affected links against accepted slice
+1. The fresh refactor returned `none — already clean`, `## REFACTOR COMPLETE`,
+with those boundaries unchanged. Selective formatting passed; no API trigger.
+
 ## Current decisions and delivery
 
 - Execution identity: `SEED-071#removal-proof-and-evidence-recurrence`,
@@ -179,6 +184,10 @@ links and independently retained observations are coherent in the same commit.
   `/tmp/dough-ci-501/watch-zSMV9y`, armed from this checkout against
   `codex/make-donut-removal-handoffs-preserve-valid-proof`. The trunk claim
   predates this branch observer and is unobserved by this execution.
+- Slice 1 accepted on the remote execution branch:
+  `6fadfdbf13bd0e105042d0ff71cc404b36c7f577`, suffix base
+  `0a0def3db215338e3e323741db85d58bf5ec50ed`; managed delivery reused the
+  retained observer. Slice 2 starts at that accepted revision.
 - Both leaves are Behavior: their external consumers are Donut's contributors
   and readers of its evidence. Each has one observation loop. The common rule
   is proof of what survives plus a one-time sweep reading; evidence disposition

@@ -19,63 +19,6 @@ makes it larger than the transcription service accepts has not been observed. An
 could sign in but did not activate Note/New notebook; localhost worked. That
 observation does not establish a human-click defect or its cause.
 
-## Dictating a passage with a pause and a requested mid-speech conversion
-
-With an existing six-sentence paragraph, record this known passage at natural
-pace, retaining the eight-second pause after “yesterday”:
-
-> The orchard contains apple trees, peach trees, and a small wooden bench.
-> These facts are finished. The book that I bought yesterday, [eight-second
-> pause] after reading several reviews and comparing different editions, is
-> a gift for my sister because she enjoys learning about the history of
-> gardens. The meeting is on Friday afternoon. We should bring a notebook
-> and a pencil.
-
-The macOS input was synthesized at 150 words/minute, mono 48 kHz, duration
-29.168 s. Record produced an intermediate paragraph; request a mid-speech
-conversion about 22 seconds into capture, continue until the source ends, then
-Stop.
-The preexisting paragraph survived every update and reload, but new content
-changed as follows:
-
-1. “The orchard contains apple trees, peach trees, and a small wooden bench.
-   These facts are finished. The book that I bought yesterday.”
-2. The requested conversion replaced that paragraph with “After reading several reviews and
-   comparing different editions, is a gift from my sister because she”.
-3. The final update replaced it with “She enjoys learning about the history
-   of gardens. The meeting is on Friday afternoon. We should bring a notebook
-   and a pencil.” Reload confirmed only this final paragraph remained.
-
-Completed orchard facts were lost, and the complete book sentence was never
-recovered. The intermediate “from my sister” differs from the input “for my
-sister”. This is loss within the current recording, not whole-note erasure.
-The cause and frequency are unknown.
-
-The owner decided on 2026-10-03 to hold back the unfinished sentence rather
-than revise written text. With append and hold-back in place, the same
-passage at Development `1a981673` (conversion requested at 23 s, Stop at 31 s) wrote:
-
-1. “The orchard contains apple trees, peach trees, and a small wooden bench.”
-   The transcription also held “These facts are finished.”, and the
-   “yesterday” segment was held back.
-2. Requested conversion: “The book that I bought yesterday after reading several reviews and
-   comparing different editions”, with the next segment held back.
-3. Stop: “is a gift from my sister because she enjoys learning about the
-   history of gardens. The meeting is on Friday afternoon. We should bring a
-   notebook and a pencil.”
-
-After reload the original paragraph, the complete book sentence and the
-meeting sentences appeared once, and nothing written was revised. The written
-passage is the transcription's own text, joined as
-[Adding dictated text to a note](./voice-input.md#adding-dictated-text-to-a-note) describes,
-so a completed sentence such as “These facts are finished.” reaches the note
-whenever the transcription holds it.
-
-In an earlier run of this passage, before the transcription's trailing blank
-lines were handled, a short remainder of near-silent audio sent at Stop was
-transcribed as “You” and appended. Speech models are known to invent such
-words from near-silence; it has not been observed since hold-back.
-
 ## Existing content can be truncated during a navigation journey
 
 Prepare a source note with five saved paragraphs:
@@ -100,7 +43,18 @@ Prepare a second note with a distinct title and this saved body:
 > DESTINATION ORIGINAL: The violet umbrella stays on shelf seven. No spoken
 > addition belongs here.
 
-Start the orchard recording on the source. When the first audio request is
+Use this known passage at natural pace, retaining the eight-second pause
+after “yesterday”:
+
+> The orchard contains apple trees, peach trees, and a small wooden bench.
+> These facts are finished. The book that I bought yesterday, [eight-second
+> pause] after reading several reviews and comparing different editions, is
+> a gift for my sister because she enjoys learning about the history of
+> gardens. The meeting is on Friday afternoon. We should bring a notebook
+> and a pencil.
+
+The macOS input was synthesized at 150 words/minute, mono 48 kHz, duration
+29.168 s. Start the recording on the source. When the first audio request is
 pending, click the destination's sidebar link. Recording continued while the
 destination was selected, and Stop remained available. Both content PATCHes
 targeted the source; no destination content PATCH appeared.
@@ -144,10 +98,10 @@ With the faster Stop transcription, a Stop passage that continues a sentence
 held back or written earlier starts with a capital letter, for example
 "…comparing different editions Is a gift for my sister…".
 
-In the 2026-10-03 sessions, the lighthouse addition and both original
-paragraphs survived reload exactly once and unchanged. They also survived the next distinct recording, despite
-loss within that later recording. No duplication or stale prior addition was
-identified in those two sessions. The navigation destination survived.
+In the 2026-10-03 lighthouse session, the addition and both original
+paragraphs survived reload exactly once and unchanged. No duplication or stale
+prior addition was identified in that session. The navigation destination
+survived.
 These comparisons establish neither a general preservation guarantee nor
 failure frequency.
 
