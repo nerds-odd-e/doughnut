@@ -17,6 +17,7 @@ import {
   placeCaretInTitle,
   selectWholeTitle,
   hearing,
+  holdMicrophoneStartup,
   titleEditable,
   titleCaretOffset,
   expectTitleMarkerAfter,
@@ -105,6 +106,18 @@ describe("Toolbar voice input with a focused title", () => {
     )
   })
 
+  it("draws the title recording's level in the highlighted Stop button", async () => {
+    placeCaretInTitle(wrapper, 7)
+    await start()
+    const titleRecorder = vi
+      .mocked(createAudioRecorder)
+      .mock.results.at(-1)!.value
+    const button = wrapper.find('button[aria-label="Stop voice input"]')
+    expect(button.attributes("aria-pressed")).toBe("true")
+    expect(button.find("canvas").exists()).toBe(true)
+    expect(titleRecorder.getAudioData).toHaveBeenCalled()
+  })
+
   it.each([
     ["Where do migratory birds sleep?", "Where do migratory birds sleep？"],
     [
@@ -187,32 +200,25 @@ describe("Toolbar voice input with a focused title", () => {
     placeCaretInTitle(wrapper, 7)
     await start()
     await stop()
-    expect(
-      wrapper.find('button[aria-label="Voice input"]').attributes()
-    ).toHaveProperty("disabled")
+    const button = wrapper.find('button[aria-label="Voice input"]')
+    expect(button.attributes()).toHaveProperty("disabled")
+    expect(button.find(".animate-spin").exists()).toBe(true)
     expect(titleEditable(wrapper)).toBe("false")
     expect(dictationMarker()).not.toBeNull()
     finish()
     await flushPromises()
     expect(noteTitleText(wrapper)).toBe("Orchard harvest notes")
+    expect(button.attributes()).not.toHaveProperty("disabled")
+    expect(button.find(".animate-spin").exists()).toBe(false)
   })
 
   it("captures the caret before delayed microphone startup and moved focus", async () => {
-    const createRecorder = vi.mocked(createAudioRecorder)
-    const implementation = createRecorder.getMockImplementation()!
-    let finishStartup!: () => void
-    createRecorder.mockImplementationOnce((callback, options) => {
-      const recorder = implementation(callback, options!)
-      vi.mocked(recorder.startRecording).mockImplementation(
-        () =>
-          new Promise<void>((resolve) => {
-            finishStartup = resolve
-          })
-      )
-      return recorder
-    })
+    const { finishStartup } = holdMicrophoneStartup()
     placeCaretInTitle(wrapper, 7)
     await start()
+    const button = wrapper.find('button[aria-label="Voice input"]')
+    expect(button.attributes()).toHaveProperty("disabled")
+    expect(button.find(".animate-spin").exists()).toBe(true)
     const otherButton = wrapper.find(
       'button[aria-label="Edit as markdown (m)"]'
     ).element as HTMLElement

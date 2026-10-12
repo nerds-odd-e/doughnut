@@ -11,15 +11,15 @@ import { createAudioRecorder } from "@/models/audio/audioRecorder"
 import { createWakeLocker } from "@/models/wakeLocker"
 
 /**
- * True while the note on the page has a recording that runs, is being
- * finished, or is kept for a retry.
+ * True while the note on the page has a recording that starts, runs, is
+ * being finished, or is kept for a retry.
  */
 export const voiceInputIsActive = ref(false)
 
 export function useNoteVoiceInput(note: Note) {
-  const phase = ref<"ready" | "recording" | "stopping" | "notConverted">(
-    "ready"
-  )
+  const phase = ref<
+    "ready" | "starting" | "recording" | "stopping" | "notConverted"
+  >("ready")
   const isRecording = computed(() => phase.value === "recording")
   const hasKeptRecording = computed(() => phase.value === "notConverted")
   const wakeLocker = createWakeLocker()
@@ -35,13 +35,18 @@ export function useNoteVoiceInput(note: Note) {
   const audioRecorder = createAudioRecorder(processAudio)
 
   const start = async () => {
+    phase.value = "starting"
+    voiceInputIsActive.value = true
     try {
       await wakeLocker.request()
       await audioRecorder.startRecording()
       beginOpenNoteContentDictation(note.id)
       phase.value = "recording"
-      voiceInputIsActive.value = true
     } catch {
+      phase.value = "ready"
+      if (!authorHasLeft.value) {
+        voiceInputIsActive.value = false
+      }
       showErrorToast(MICROPHONE_UNAVAILABLE_MESSAGE)
       await wakeLocker.release()
     }

@@ -161,6 +161,37 @@ with negative assertions, absence checks, or runtime guards. Record the final
 one-time removal sweep as an acceptance reading, following principle 7 in
 `AGENTS.md`; Git history retains the removed implementation.
 
+<a id="recording-started-after-leaving"></a>
+
+### Stop a content recording that starts after the author has left the note
+
+**Identity:** SEED-066#recording-started-after-leaving
+```json dough-story-state
+{"schemaVersion":1,"refinement":"not-refined","approach":"unselected"}
+```
+
+- **Goal:** A note author who clicks "Voice input" for content and leaves the
+  note before the microphone is ready is not recorded afterwards. Leaving the
+  note ends voice input, whether the microphone was already recording or was
+  still starting.
+- **Expected:** After the author leaves the note, no recording runs for it,
+  the microphone is released, and the screen wake lock is released.
+- **Reported actual (hypothesis, read on 2026-10-12 at `d2ec267d7c`, not
+  run):** In `useNoteVoiceInput.ts`, leaving stops the recording only when it
+  is already recording. When the author leaves while the microphone is still
+  starting, for example while the browser asks for microphone permission,
+  startup can finish afterwards: the recording then starts, with nothing left
+  to stop it, and the wake lock stays held.
+- **First question:** Does this happen in the product? Reproduce it with a
+  mounted spec that holds microphone startup, leaves the note, then lets
+  startup finish. Repair only a confirmed violation.
+- **Scope — kept as it is:** leaving while recording, which already stops and
+  converts; title recordings, which already end when the author leaves.
+- **Remaining uncertainty:** whether the browser keeps the microphone open in
+  this case on real hardware; what should happen to speech captured between
+  startup finishing and the stop.
+- **Effort hypothesis:** S.
+
 ## Ordering and Scope Reduction
 
 The owner accepted the original nine-story order on 2026-10-03. The product backlog
@@ -182,6 +213,10 @@ On 2026-10-10 the owner placed the three UI stories at the top of the
 backlog in their stated order: simpler controls/feedback with cadence-cost
 analysis, one-button body dictation, then title styling and spoken editing.
 No blocking dependency is inferred from shared recording code or that order.
+
+On 2026-10-12 the owner placed the shared reactive voice-input control story
+first, followed by the mobile toolbar layout and spelling-cloze repair stories.
+This capture authorizes backlog maintenance only.
 
 ## Open Decisions for Later Work
 
@@ -227,6 +262,15 @@ No blocking dependency is inferred from shared recording code or that order.
 
 ## Breadcrumbs
 
+- Owner's investigate, UX/UI and architecture refinement request for the
+  shared voice-input button story, 2026-10-12, through the established
+  Kirara-chan preparation; the owner chose the New note names and the common
+  startup state in that session.
+- Owner's three-story request, 2026-10-12: unify the voice button and reactive
+  waveform across title creation, title editing, and content dictation; give
+  the mobile toolbar full width with one row and a visible options menu; mask
+  the spelling answer before a trailing parenthesized title qualifier.
+  Authorized capture at the top of the backlog directly on main and sync origin.
 - Owner's two-story request, 2026-10-11: remove the existing-title microphone
   and route toolbar voice input by title focus; separately instruct the AI to
   refine speech as a concise title with suitable punctuation, without authority

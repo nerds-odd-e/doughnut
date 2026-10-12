@@ -26,11 +26,15 @@ transcription behavior.
 ## Speaking a title in New note
 
 In New note, a small microphone button inside the title field, just before
-the Wikidata button, listens for a title. It is named for what a click does:
-"Speak the title" while idle, and "Stop speaking the title" while listening,
-when it is highlighted as a pressed toggle. After the author clicks it to
-stop, it is unavailable and shows a spinner, named "Speak the title", until
-the speech has become text; then it is idle again. Listening ends only when
+the Wikidata button, listens for a title. It is the same button as the
+toolbar's Voice input, with its own names and the title field's frame. Idle,
+it shows a microphone and is named "Speak the title". After a click it is
+unavailable and shows a spinner, still named "Speak the title", until the
+microphone is ready. While listening it is highlighted as a pressed toggle,
+shows a waveform that follows the level of the recording, and is named "Stop
+speaking the title". After the author clicks it to stop, it is unavailable
+and shows a spinner, named "Speak the title", until the speech has become
+text; then it is idle again. Listening ends only when
 the author clicks the button; nothing appears in the title while they are
 still speaking. The recorder converts only at that click. From the moment
 listening starts until the session ends, the title is read-only: it takes no
@@ -71,7 +75,7 @@ recorder. When nothing was heard (a silent recording that runs no conversion, or
 a response of no segments), the button returns to idle with no message, the
 title is unchanged, and Submit is offered. When the microphone cannot be used,
 the common error toast says "Could not use the microphone. Allow microphone
-access in your browser, then try again.", the button stays idle, and the title
+access in your browser, then try again.", the button is idle, and the title
 is not made read-only. When the
 conversion fails, the common error toast says "Could not turn your speech into
 text.", the title is unchanged, the button is idle, and Submit is offered.
@@ -97,8 +101,9 @@ startup until the session ends, and its pending marker shows the captured caret
 or the end of the selection. The marker is hidden from assistive technology,
 takes no clicks and is never title text; its dots stand still with reduced
 motion. During listening the toolbar button is highlighted, named "Stop voice
-input", and remains available in the toolbar even on a narrow screen. During
-startup and conversion it is disabled with a spinner, named "Voice input".
+input", shows a waveform that follows the level of the title recording, and
+remains available in the toolbar even on a narrow screen. During startup and
+conversion it is disabled with a spinner, named "Voice input".
 
 A selection is replaced, including the whole title if selected. A caret inserts
 at that position, with the body passage joining rule on both sides: spaces
