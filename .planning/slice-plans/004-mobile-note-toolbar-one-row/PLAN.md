@@ -127,7 +127,7 @@ with one row throughout.
 ### 2. More options menu opens inside the screen
 
 Type: Behavior
-Status: planned
+Status: done
 Proof: The real-layout toolbar test at 320px and 390px opens More options and
 asserts the menu's left edge is at or right of the screen's left edge, its
 right edge at or left of the screen's right edge, and that clicking Trash note
@@ -159,6 +159,12 @@ selecting Trash note starts the same action as the toolbar button.
 - Real-layout setup for slice 2: `mountToolbarInNotebookColumnAt(width)` in
   `tests/notes/NoteToolbar.realLayout.spec.ts`; `mountNoteToolbar` accepts
   `attachTo`.
+- After slice 1 the More options menu at 390px already opened inside the
+  screen (45px to 325px), so only the 320px case fails without the placement
+  change (left −5px before, 8px to 288px after).
+- `frontend/src/composables/pasteChoicePosition.ts` keeps its own floating
+  element inside the viewport with its own margin; the two rules stay
+  separate because they serve different surfaces and anchors.
 
 ## Story obligations
 
@@ -171,3 +177,23 @@ Disposition: proved by slice 1: coordinator measurement on 2026-10-12 of the too
 Reported: slice 1 — "Only 390, 414 and 640px are exercised. The plan's 300–560px sweep was not repeated."
 Story clause: "The row stays single at every width in between."
 Disposition: proved by slice 1: the button row in `frontend/src/components/notes/core/NoteToolbar.vue` is a non-wrapping flex line, so no width can produce a second row; `tests/notes/NoteToolbar.realLayout.spec.ts` "keeps every control on one row as a phone-wide screen widens and narrows" observes it at 390px, 414px and 390px again
+
+### G3. On-screen placement is observed only for More options
+Reported: slice 2 — "The on-screen behavior is observed only for More options; other menus are covered only by their existing tests staying green."
+Story clause: "This story commits to verifying it only for More options."
+Disposition: excluded "This story commits to verifying it only for More options."
+
+### G4. The above-the-button case had no example
+Reported: slice 2 — "The `top` (opens above) case shares the same code but has no new example; only bottom-end is exercised."
+Story clause: "keeping a menu inside the screen is a property of the shared menu placement"
+Disposition: proved by slice 2: `tests/composables/useDropdownPortalPosition.spec.ts` "keeps a panel wider than the space right of its button inside the screen" places a panel above a button at the screen's right edge and observes its left position held inside the right edge
+
+### G5. The trash action is observed up to its confirmation
+Reported: slice 2 — "The test stops at the pending confirmation and does not confirm the trash."
+Story clause: "selecting Trash note starts the same trash action as the toolbar button"
+Disposition: proved by slice 2: `tests/notes/NoteToolbar.realLayout.spec.ts` "opens more options inside a %ipx-wide screen with a selectable action" clicks Trash note in the menu and observes the pending confirmation `Confirm to trash "Dummy Title"?`, the start of the trash action
+
+### G6. A menu wider than the screen is not kept inside the right edge
+Reported: slice 2 — "A menu wider than the screen minus 16px would keep its left edge at 8px and overflow on the right; this is not tested."
+Story clause: "the opened More options menu lies fully inside the screen's left and right edges"
+Disposition: no user cost "can read and select each action that moved into More options": the More options menu is 280px wide and fits with its margins on the narrowest screen the story names, 320px (measured 8px to 288px)

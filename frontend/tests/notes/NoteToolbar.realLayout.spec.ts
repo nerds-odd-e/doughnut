@@ -5,8 +5,11 @@ import {
 } from "@/components/notes/widgets/noteMoreOptionsTitles"
 import { NOTE_TOOLBAR_MORE_OPTIONS_ORDER } from "@/composables/noteToolbarOverflow"
 import { notebookSidebarClosedPlugin } from "@tests/helpers/notebookSidebarTestProvide"
+import { onlyPendingPopup } from "@tests/helpers/popupStackTestSupport"
 import {
   mountNoteToolbar,
+  openNoteToolbarOverflowMenu,
+  overflowMenuItem,
   resetNoteToolbarTestState,
 } from "@tests/notes/noteToolbarTestHelpers"
 import type { VueWrapper } from "@vue/test-utils"
@@ -89,4 +92,30 @@ describe("NoteToolbar in the notebook page column", () => {
     await vi.waitFor(() => expect(visibleTitles()).toHaveLength(10))
     expect(visibleTitles()).not.toContain(titles.overflowMenu)
   })
+
+  it.each([320, 390])(
+    "opens more options inside a %ipx-wide screen with a selectable action",
+    async (width) => {
+      wrapper = await mountToolbarInNotebookColumnAt(width)
+      await vi.waitFor(() =>
+        expect(visibleTitles()).toContain(titles.overflowMenu)
+      )
+
+      await openNoteToolbarOverflowMenu(wrapper)
+
+      const menu = () =>
+        overflowMenuItem(titles.delete)!
+          .closest("[data-dropdown-portal-panel]")!
+          .getBoundingClientRect()
+      await vi.waitFor(() => {
+        expect(menu().left).toBeGreaterThanOrEqual(0)
+        expect(menu().right).toBeLessThanOrEqual(width)
+      })
+
+      await page.elementLocator(overflowMenuItem(titles.delete)!).click()
+      expect(onlyPendingPopup()?.message).toBe(
+        'Confirm to trash "Dummy Title"?'
+      )
+    }
+  )
 })
