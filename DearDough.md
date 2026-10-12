@@ -51,6 +51,15 @@ Former local code: DD-135. A formatter piped through tail returns the final pipe
 
 Former local code: DD-138. An absolute changed-file size check conflicts with an approved staged decomposition and mechanical edits to pre-existing oversized callers. Open, unqueued. [Evidence and response](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/finding-names.md#odf-152).
 
+### Occurrences
+- Execution: SEED-073#story-1 (first implementation commit 1fbe48e0253d79d77e0440566183b15711c8e70d)
+  - Timestamp: 2026-10-12T06:19:02.414Z
+  - Tool: Codex
+  - Open Dough release: unknown
+  - Evidence: native session 01a12eac-0634-72d3-90e6-a210b2ac5e3f, probe_record_refactor return; original PLAN at claim 5d6307f63d was 442 lines and the failed-model evidence made it 762; current refactor-checks required every checked file be at most 250 lines
+  - Observed effect: the evidence-only refactor stopped for a size/scope decision despite preserving required failed-run provenance; subsequent planning evidence was split into linked documents
+  - Inference: the universal file ceiling conflicted with an execution plan that explicitly required retained observation inputs/results; the recorded stop cost about four active minutes, while total restructure cost was not measured
+
 <a id="odf-189"></a>
 
 ## ODF-189 — Small additions force unrelated size extractions
@@ -80,6 +89,15 @@ Former local code: DD-176. Every small slice launches a fresh full refactor agen
 ## ODF-208 — Observer worker exits without a recorded cause
 
 Former local code: DD-202. The CI observer's worker exits mid-execution without a terminal result or a reported transport error, ending notification coverage. Open, unqueued. [Evidence and response](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/finding-names.md#odf-208).
+
+### Occurrences
+- Execution: SEED-073#story-1 (first implementation commit 1fbe48e0253d79d77e0440566183b15711c8e70d)
+  - Timestamp: 2026-10-12T06:24:56.989Z
+  - Tool: Codex
+  - Open Dough release: unknown
+  - Evidence: same native session, terminal receipt for /tmp/dough-ci-501/watch-zxDjUz; second lost-worker receipt at 2026-10-12T07:06:33.914Z for watch-yetWr2; reason: CI observer worker exited without recording a normal terminal result
+  - Observed effect: both retained streams reported coverage lost and pending CI unobserved, with zero recorded/delivered/unread events; the coordinator stopped those terminal streams and recovered exact owned coverage with watch-MBgKyY
+  - Inference: the receipts establish lost notification coverage but do not establish why workers exited; recovery required observer ownership checks, not a Git publication repeat
 
 <a id="odf-213"></a>
 
@@ -177,3 +195,11 @@ The coordinator combined complete execution references and an unbounded tool-met
   - Evidence: dashboard launch fb81e2c8-229c-473e-ba0c-0df74a951f5e, first two startup functions.exec responses on 2026-10-12 reported 20,868 and 20,631 original output tokens and truncation; subsequent calls retrieved the plan, seed, and individual execution references again before slice 1 delegation
   - Observed effect: the startup outputs did not expose all requested context; additional targeted reads were needed
   - Inference: limiting each read to the next execution boundary and bounding metadata discovery would avoid this duplication; no elapsed-time or total-token saving was measured
+
+- Execution: SEED-073#story-1 (first implementation commit 1fbe48e0253d79d77e0440566183b15711c8e70d)
+  - Timestamp: 2026-10-12T05:53:20.104Z
+  - Tool: Codex
+  - Open Dough release: unknown
+  - Evidence: same native session, first startup functions.exec response reported 31647 original output tokens and truncation; subsequent bounded calls reread execution plan/source/contracts before delegation. The retrospective also initially batched full skill/plan/history reads into truncated 14632- and 20729-token responses and then retrieved focused passages.
+  - Observed effect: requested context was not fully exposed and targeted retrieval had to be repeated in startup and review
+  - Inference: next-boundary reads and bounded output would avoid this recorded duplication; no elapsed-time or total-token saving was measured

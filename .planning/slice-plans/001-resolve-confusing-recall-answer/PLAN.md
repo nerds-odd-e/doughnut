@@ -51,6 +51,9 @@ No new North Star topic or ADR is warranted for this bounded reuse. Future gradi
 | A note problem can reach existing refinement with relevant context under author permission | 11 | Mounted handoff supplies selected answer and reviewed clarification; AiController request capture observes those values at the refinement model boundary; existing ordinary refinement remains available |
 | Suspected question ambiguity is examined and retained without presenting conversation as formal adjudication | 2, 9 | Ambiguity rubric and persisted reasoning/disagreement exchange; formal post-answer action is owned by story 6 |
 | Evidence stays private/server-side, and source uncertainty is not portrayed as learner failure | 5, 9, 11 | Access refusal and explicit refinement payload boundaries; request contract and real model ambiguity case; no new Portable-content store or auto-write path |
+| Reading visible messages clears unread state through one owner | 12 | Mounted help, Message Center and NoteConversation fetch/stream completion consume the read response and update the same store |
+| Refinement dismissal retains contextual help and recall state | 13 | Real parent with nested native dialogs observes child Escape dismissal then parent close/focus |
+| Spelling refinement stays ordinary; MCQ handoff remains truthful | 14 | Positive spelling history/help/refinement consuming request and preserved reviewed MCQ request |
 
 These are surviving behavior and active authorization-refusal proofs. No removal or permanent absence-check project is part of this plan. Existing tests are extended at their real boundaries, not copied into tests of internal helpers.
 
@@ -66,124 +69,104 @@ Slice statuses record accepted execution proof; publication receipts remain in t
 
 Type: Structure
 Status: done
-
-Sizing: at most five minutes active fixture/setup work; external startup waits remain separate. Reuse the inspected setup rather than repeat it.
-
-Change: Stage the exact proposed guidance temporarily, establish the existing isolated held-app route, and bind the two fixed MCQs to owned trackers. Answer both through the actual answer controller. This immediately enables slice 2; add no production fixture service or practice state.
-
-Proof: The recorded route reaches readiness; exported conversation requests consume the original answered correlation and ambiguous-even-number fixtures. Preserve the actual Answer/RecallLog/tracker baseline and restore the temporary patch before delivery. [First-run setup](REAL-MODEL-OBSERVATION.md#route-and-setup) and [follow-up setup](PRACTICE-FOLLOWUP-OBSERVATION.md#route-and-starting-context) supply inspectable commands, allocation and inputs; coordinator judges reuse.
+Proof: Accepted behavior, sizing and consuming evidence remain at [slice 1](ACCEPTED-SLICE-PROOF.md#slice-1); its proof boundary is unchanged.
 
 ### 2. Validate explanation, correction and ambiguity
 
 Type: Behavior
 Status: done
-
-Sizing: at most five minutes active transcript/rubric work; model waits are separate.
-
-Behavior: Given the fixed answered attempts and learner reasoning, the real conversation reply explains the causal distinction, adapts to corrected interpretation, and examines both defensible answers to the ambiguous even-number question.
-
-Proof: The original c1/c2 and a1–a3 [transcript](REAL-MODEL-TRANSCRIPT.md) and [rubric](REAL-MODEL-OBSERVATION.md#rubric-and-retained-limits) retain their exact original guidance/revision. The follow-up changes only the practice directive, so these explanation/ambiguity observations remain compatible within that boundary; they were not rerun under revised guidance. No efficacy inference. Failed/unavailable quality stops dependent slices 3–11.
+Proof: Accepted behavior, sizing and consuming evidence remain at [slice 2](ACCEPTED-SLICE-PROOF.md#slice-2); its proof boundary is unchanged.
 
 ### 3. Validate ordinary changed practice and response feedback
 
 Type: Behavior
 Status: done
-
-Sizing: at most five minutes active practice protocol/rubric work; model waits are separate. Reuse the two already observed replies.
-
-Behavior: After an explanation, a requested changed example is an ordinary assistant message, withholds the key/reasoning until the learner responds, then gives feedback on that actual response and retains the exchange without changing the original Grade.
-
-Proof: [Follow-up evidence](PRACTICE-FOLLOWUP-OBSERVATION.md) records the exact revised guidance, actual c3 question → c4 learner answer → feedback, later controller message reads and byte-identical Answer/RecallLog/tracker snapshots. Its four seeded c1/c2 messages are starting context only. Coordinator accepted the consuming export, actual question/response/feedback controller reads and unchanged snapshots; G1 is proved here; mounted interaction remains with slices 8–10. Failed/unavailable quality stops production slices 4–11.
-
-The isolated paid route is `CURSOR_DEV=true nix develop -c pnpm e2e:hold --paid-openai`, using the existing conversation flow and manual-testing skill. Both runs were explicitly authorized; six original plus two follow-up AI replies exhaust the eight-reply cap. No further paid call is authorized. Preserve all failed-run evidence and use compatible observations; do not repeat them. Temporary guidance is restored; slice 9 installs the exact base plus ordinary-text practice directive. A material later prompt change needs its relevant authorized real-service observation, without waiving the cap or quality premise.
+Proof: Accepted behavior, sizing and consuming evidence remain at [slice 3](ACCEPTED-SLICE-PROOF.md#slice-3); its proof boundary is unchanged.
 
 ### 4. Name conversation access ownership coherently
 
 Type: Structure
 Status: done
-
-Sizing: about five minutes plus measured required verification/API generation.
-
-Change: Express ownership of conversation access independently of its subject through the existing Ownership association. Preserve the physical column and all existing audience values. Update the callers, builders and generated public contract together. This immediately enables slice 5; introduce no new visibility resource or schema.
-
-Proof: Existing start/message/listing/menu/AI/export controller behavior remains green; regenerate the API if its public property changes and verify affected frontend types. Inspect consumers of the old field and partner labels, including generated types; use one existing access model rather than a parallel predicate. Accepted: `pnpm generateTypeScript`, full `pnpm backend:test_only` (2737 tests; 0 failures/errors, 2 skips), full headless `pnpm frontend:test` (338 files/2151 tests), both frontend `vue-tsc --noEmit`/`tsc --noEmit` and `pnpm openapi:lint`, all under `CURSOR_DEV=true nix develop -c`. Inspected the unchanged audience assertion in `ConversationStartControllerTest.StartConversationAboutRecallPrompt.setsRecallPromptAsSubject`, access/list JPQL, authorization getter and generated property. One-time consumer reading found no old camel/method consumers outside historical planning; the physical FK remains unchanged.
+Proof: Accepted behavior, sizing and consuming evidence remain at [slice 4](ACCEPTED-SLICE-PROOF.md#slice-4); its proof boundary is unchanged.
 
 ### 5. Protect access to the learner's private attempt help
 
 Type: Behavior
 Status: done
-
-Sizing: about five active minutes to restore scoped audience/entry changes and one confidentiality proof loop, plus the required backend suite. Reuse the parked prototype without restoring its label/unread-reply suffix.
-
-Behavior: Given an answered prompt owned by the learner, starting help assigns their personal access ownership. The learner reads and replies; notebook authorship or membership grants neither direct access nor discovery. Existing shared conversations retain their audience.
-
-Proof: Accepted actual creation, subject/messages, send, export, AI request, mark-read authorization, inbox listing and unread exclusion for learner, author and another circle member in `PrivateRecallConversationControllerTest` (25 cases). Another learner's prompt is refused; legacy shared reads/replies remain. Unread confidentiality uses the learner's stored non-null reasoning, so null-sender filtering cannot conceal a leak. Full `CURSOR_DEV=true nix develop -c pnpm backend:test_only` passed after independent refactor: 2762 tests, no failures/errors, 2 skips. Recall subject assignment is now independent of access assignment; the fixture builder explicitly retains legacy notebook audiences. Positive incoming-AI unread and truthful labels remain with slice 6; this actual prefix has fresh proof, unlike the [parked prototype](PRIVATE-ACCESS-PROTOTYPE-OBSERVATION.md).
+Proof: Accepted behavior, sizing and consuming evidence remain at [slice 5](ACCEPTED-SLICE-PROOF.md#slice-5); its proof boundary is unchanged.
 
 ### 6. Recognize private help and incoming replies in the inbox
 
 Type: Behavior
 Status: done
-
-Sizing: about five active minutes to restore the scoped inbox changes and one list/menu/read proof loop, plus the required backend suite.
-
-Behavior: For the learner's private recall conversation, the inbox identifies its private audience. An actual stored incoming AI reply appears unread to its authorized learner until they mark it read; other notebook participants still cannot discover it. Existing shared/personal conversations keep truthful participant labels.
-
-Proof: Accepted `PrivateRecallConversationControllerTest.learnerRequestsAndReadsAnAiReply`: actual streamed reply with only OpenAI mocked → persisted message → UserController unread menu → mark-read → empty menu. Author/member assistant discovery is refused; list observations distinguish private help and legacy circle/two-person labels. The common predicate includes null-sender AI replies with the same audience rule; existing human unread/read tests pass. Full `CURSOR_DEV=true nix develop -c pnpm backend:test_only` passed after independent test refactor: 2766 tests, no failures/errors, 2 skips, including all 29 private cases. G5/G6 are proved here. No second visibility or notification owner.
+Proof: Accepted behavior, sizing and consuming evidence remain at [slice 6](ACCEPTED-SLICE-PROOF.md#slice-6); its proof boundary is unchanged.
 
 ### 7. Continue the same private attempt discussion
 
 Type: Behavior
 Status: done
-
-Sizing: 5–8 minutes including repeat/overlapping-request handling and the required backend suite; reuse and creation are one identity-consistency rule.
-
-Behavior: Starting help again for the same attempt finds the learner's compatible private conversation and retained messages. An existing shared thread is not misrepresented or repurposed. A different attempt has its own discussion.
-
-Proof: Accepted six `RecallConversationContinuationControllerTest` cases: repeated start after flush/clear retains identity/messages, distinct attempts differ, oldest compatible personal thread is reused, and legacy circle/author/other-initiator threads retain their access. `RecallConversationConcurrentStartControllerTest` queues two actual controller requests behind a held prompt lock; release returns one identity and one stored conversation. The service owns locking before compatible lookup/creation; no registry. Full `CURSOR_DEV=true nix develop -c pnpm backend:test_only` passed after shared concurrency-support refactor: 2773 tests, no failures/errors, 2 skips. Earlier constructor compilation and detached-user fixture failures were corrected before this final proof; active implementation 8–9 minutes excludes suite waits.
+Proof: Accepted behavior, sizing and consuming evidence remain at [slice 7](ACCEPTED-SLICE-PROOF.md#slice-7); its proof boundary is unchanged.
 
 ### 8. Open contextual help and return to the same recall
 
 Type: Behavior
 Status: done
-
-Sizing: 5–8 minutes including mounted proof/typechecks; one shared entry journey.
-
-Behavior: From an answered MCQ or a particular history item, the learner opens clearly labelled private help with the original attempt visible. Closing it returns focus and preserves the underlying recall/history position. Multiple history items each target their own attempt.
-
-Proof: Accepted `RecallPage.privateHelp.spec.ts`: actual second-choice click and answer HTTP response → matching private-help Modal → original question/selected answer → dialog close or Escape → same answer/progress/queue/named route and invoker focus. `MemoryTrackerPageView.privateHelp.spec.ts` opens two distinct history attempts and preserves their cards/focus; real conversation/answer rendering and native Modal run with only HTTP mocked. Retained Message Center subjects pass. Full headless `CURSOR_DEV=true nix develop -c pnpm frontend:test` passed (340 files/2154 tests), with both frontend `vue-tsc --noEmit` and `tsc --noEmit`; independent refactor found no edits. G2 is proved by this same-parent journey; active implementation about eight minutes excludes verification waits.
+Proof: Accepted behavior, sizing and consuming evidence remain at [slice 8](ACCEPTED-SLICE-PROOF.md#slice-8); its proof boundary is unchanged.
 
 ### 9. Explain the learner's reasoning and accept clarification
 
 Type: Behavior
 Status: done
-
-Sizing: about five minutes of change plus backend/frontend verification.
-
-Behavior: The learner can request an explanation immediately or provide why a choice seemed right. The reply addresses that reasoning and the original attempt; the learner can correct a tentative interpretation in a further turn.
-
-Proof: Installed recall-only guidance at `ConversationAiRequestBuilder`; coordinator compared its Java text-block content byte-for-byte with the validated 1859-character protocol. `RecallConversationReasoningControllerTest` captures original stem/choices/key/selected index/result/focus/rationale separately from changed current note content, and persisted reasoning/reply/correction roles after DB reload. `ConversationInner.reasoning.spec.ts` drives neutral explanation, free reasoning and disagreement through HTTP/SSE completion, then remounts all six stored messages. Full Nix-prefixed backend suite passed (2775 tests, no failures/errors, 2 skips), headless frontend suite passed (341 files/2155 tests), and both frontend typechecks passed. Independent refactor found no edits. Formatting changed an explicit undefined mock return to void; the commit hook caught its type error. Returning the saved message, reformatting, and fresh full frontend/typechecks passed before commit. Teaching quality remains with slices 2/3; no further paid calls or material prompt change.
+Proof: Accepted behavior, sizing and consuming evidence remain at [slice 9](ACCEPTED-SLICE-PROOF.md#slice-9); its proof boundary is unchanged.
 
 ### 10. Check the distinction without another Grade
 
 Type: Behavior
 Status: done
-
-Sizing: about five minutes of change plus joined-flow verification.
-
-Behavior: After an explanation, an explicit optional check asks one changed example about the same distinction. The learner responds before feedback, can discuss it further or leave, and can later reopen the question/response/ feedback exchange. Their original Grade, tracker and schedule stay authoritative.
-
-Proof: Accepted `RecallPage.practice.spec.ts`: real choice/answer → explanation → exact optional check request → question → learner reasoning → feedback → close/reopen six HTTP stored messages, same selected answer/progress/queue and one answer submission. `RecallConversationPracticeControllerTest` drives the actual original answer and DB message loop, reloads six messages/roles, and compares unchanged Answer id/choice/outcome/correctness, RecallLog ids/Grades/answer ids and tracker stability/difficulty/last/next/count. Full Nix-prefixed backend suite passed (2776 tests, no failures/errors, 2 skips), headless frontend suite passed (342 files/2156 tests), both frontend typechecks passed; independent refactor found no edits. The slice 3 real model rubric owns quality/withholding; practice uses ordinary messages and preserves installed guidance.
+Proof: Accepted behavior, sizing and consuming evidence remain at [slice 10](ACCEPTED-SLICE-PROOF.md#slice-10); its proof boundary is unchanged.
 
 ### 11. Carry a useful clarification into authorized refinement
 
 Type: Behavior
 Status: done
+Proof: Accepted behavior, sizing and consuming evidence remain at [slice 11](ACCEPTED-SLICE-PROOF.md#slice-11); its proof boundary is unchanged.
 
-Sizing: 5–8 minutes; one contract change across its UI and AI consumer.
+### 12. Acknowledge messages read through every conversation viewer
 
-Behavior: When the learner wants to refine a note they may edit, the existing refinement receives the original selected answer and a clarification the learner explicitly chooses to carry, along with the existing question/focus context. Existing previews and author permissions govern the resulting content changes.
+Type: Behavior
+Status: planned
 
-Proof: Accepted `ConversationComponent.refinement.spec.ts`: real parent shows a blank review before generation, learner revises text twice, confirmation sends exactly the final clarification and original selected choice/question/focus to refinement. Direct answered-question refinement remains immediate; readonly entry is refused. `AiControllerNoteRefinementTest` captures selected-answer text and reviewed clarification at the model boundary; actual subscriber reads through NoteController but cannot refine. Nix generation, full backend (2777 tests, no failures/errors, 2 skips), headless frontend (343 files/2158 tests), both frontend typechecks and OpenAPI lint passed. Independent refactor derives phase from confirmed text; its focused mounted rerun passed 5 tests and both typechecks. No private transcript is copied into the payload; existing permissions/previews govern content changes. No sharing or story 2 proposal work.
+Sizing: about five active minutes; hard ten, excluding required suite waits. One read-success owner covers contextual help, Message Center and direct NoteConversation consumers.
+
+Behavior: Successfully fetching visible stored messages acknowledges them through the existing backend read rule and updates the common unread store. Fetch failure does not acknowledge unseen messages. Existing audience rules and unrelated unread replies remain authoritative.
+
+Proof: The [runtime baseline](CONSUMER-BASELINE-OBSERVATIONS.md#read-acknowledgement) observes rendered reply 75 staying unread with no read call. Drive retained fetch and AI stream completion → persisted refetch → read HTTP response → updated unread store, retaining unrelated unread messages. Cover actual Message Center and NoteConversation consumers through the shared owner, and failed-fetch behavior. Existing controller read/privacy proof remains applicable. Run frontend suite and both typechecks; do not duplicate page/modal read rules.
+
+### 13. Dismiss refinement while retaining contextual help
+
+Type: Behavior
+Status: planned
+
+Sizing: about five active minutes; hard ten, excluding required suite waits. One top-dialog dismissal rule at the existing modal owner.
+
+Behavior: Escape dismisses the active refinement dialog while contextual help remains open; subsequently closing help preserves recall/history state and returns focus. Standalone refinement close/extraction stays usable.
+
+Proof: The [runtime baseline](CONSUMER-BASELINE-OBSERVATIONS.md#nested-dismissal) observes two open dialogs → Escape → neither dialog retained. Extend that real-parent journey to observe child-only dismissal, retained conversation/answer/progress/route, and eventual invoker-focus restoration. Retain ordinary refinement close/extraction and loading-modal dismissal behavior: drive actual extraction controls/API to close the real dialog, rather than emitting a child event or checking wrapper CSS. Run frontend suite and both typechecks; do not add a competing Escape owner.
+
+### 14. Preserve truthful context for retained MCQ and spelling conversations
+
+Type: Behavior
+Status: planned
+
+Sizing: about five active minutes; hard ten, excluding required suite waits. Actual MCQ context governs the new UI practice action and reviewed handoff; the existing spelling request owner is preserved.
+
+Behavior: A real MCQ supplies the validated guide, optional check and reviewed selected-answer handoff. A supported spelling conversation retains its ordinary user-history request and authorized ordinary refinement flow. The new MCQ-specific UI actions use actual MCQ context; ordinary conversation remains available.
+
+Proof: The [spelling refinement baseline](CONSUMER-BASELINE-OBSERVATIONS.md#spelling-refinement) consumes a clarification-only DTO; the [actual controller export](CONSUMER-BASELINE-OBSERVATIONS.md#actual-spelling-conversation-export) settles the existing ordinary spelling request as user history only. Positively observe corrected ordinary spelling refinement plus the MCQ explanation → optional check → feedback action and original stem/choices/selected answer/final reviewed clarification at the mounted consuming boundary. Reuse unchanged controller export/MCQ request proof; backend request applicability is not a reproduced defect. Preserve exact validated MCQ guide; no paid calls, new spelling source context or model-quality promise. Run frontend suite and both typechecks; backend suite/generation only if those boundaries change. Proof names retained behavior, not inapplicable artifacts' absence.
+
+## Preparation assessment for remaining consumers
+
+The coordinator accepted four [actual baselines](CONSUMER-BASELINE-OBSERVATIONS.md) at `5c6243073aa710c6d39db0decc44fc0dfa3ba017`: contextual unread state, nested Escape, spelling refinement and controller export. They settle the cheap runtime premises and correct the earlier MCQ-guide reach inference; the initial console-log setup failure remains separately recorded. Correction proof, including actual Message Center/NoteConversation consumers, remains with 12–14. Scope, source, claim, accepted 1–11 evidence and quality protocol are unchanged; no remaining preparation concern was identified.
 
 ## Verification and delivery
 
@@ -192,20 +175,14 @@ Follow the repository's unit-testing, backend/frontend, generated-API and E2E sk
 - Backend slices: `CURSOR_DEV=true nix develop -c pnpm backend:test_only`; the backend skill requires the complete backend suite, not a selected class.
 - Frontend iteration: focused `pnpm frontend:test <specs>` under the same Nix prefix; before accepting changes, run the frontend suite and both `pnpm -C frontend exec vue-tsc --noEmit` and `pnpm -C frontend exec tsc --noEmit`, per the frontend skill. Reuse identical accepted typecheck evidence rather than rerunning it without a change.
 - Public contract changes: `CURSOR_DEV=true nix develop -c pnpm generateTypeScript`; never hand-edit generated files. Added/removed Vue components require the frontend skill's Vite build to refresh `components.d.ts`.
+- Acceptance reading for any removed event relays/wrapper: sweep the product once for removed names and classify retained shared callers; record this separately from positive read/dismissal/refinement tests, without a permanent absence test.
 - Execution delivery follows AGENTS.md: Jidoka, fresh post-change-refactor agent, API generation when needed, coordinator's single `./scripts/run.sh pnpm format:changed`, plan update, independent check-only commit hook, commit and authorized push. This plan supplies no execution mode or publication claim.
 
 ## Current decisions and learnings
 
-On 2026-10-12, original slice 1 accumulated about 10–11 minutes active work: roughly seven for the first setup/observation and 3–4 for practice recovery. Fixture preparation, route recovery and two quality loops disproved its five-minute setup/rubric premise and crossed the ten-minute hard limit; external startup/model waits are separate. Attempt-owned Java was restored and both holds shut down before refinement. Split that leaf into setup Structure (1), explanation/ambiguity (2), and practice (3); retain original production leaves 2–8 as 4–10. The common ordinary-transcript/access design and source scope are unchanged; no new exception, responsibility, or story split is justified.
+Review on 2026-10-12 at `5c6243073aa710c6d39db0decc44fc0dfa3ba017` found joined consumers missing from accepted proof: contextual unread acknowledgement, nested refinement Escape, and spelling refinement receiving a clarification-only MCQ context. The coordinator retained this active execution and authorized leaves 12–14 before final handoff. A provisional unqueued follow-up draft/SEED-073#story-8 was removed only from attempt-owned paths and superseded by this decision; no new identity, queue item or execution was retained. Slices 1–11 keep their accepted evidence; no completion record exists. CI remains pending under the retained observer.
 
-- Keep the L-sized story: accepted slices 1–4 delivered isolated setup, compatible model proof and coherent access naming. The remaining common transcript/audience model is understood. This separate access/inbox overrun justifies one bounded split; no numeric repeated-overrun threshold is supplied. Eleven leaves do not add scope or machinery.
-- Slices 2 and 3 have accepted quality proof. Preserve it; any material later prompt change still needs relevant authorized real-service observation.
-- Adding dedicated practice cards, mastery state, or author sharing changes this sizing premise. Return to story refinement and consider the vertical split "understand privately and resume" / "verify understanding with a follow-up" if needed; do not enlarge the plan silently.
-- The later contest/repair candidates are unqueued and unplanned. Their unresolved verdict authority and historical reach do not hold this story's scope open.
-
-On 2026-10-12, the later private-audience slice 5 accumulated 10–11 active minutes across eight access consumers, proof writing and the existing unread defect. The [parked complete prototype](PRIVATE-ACCESS-PROTOTYPE-OBSERVATION.md) passed 2763 backend tests (0 failures/errors, 2 skips), but its overrun prevents acceptance/delivery. The coordinator parked only six attempt-owned paths and restored clean published `98996efafdb7847e36602aa5e477fe70d8d33255` before this refinement. Split confidentiality into slice 5 and the cohesive inbox label/incoming-reply loop into slice 6; previous remaining slices 6–10 become 7–11. No privacy channel is deferred. G5/G6 honestly own the unread/label suffix; each restored prefix needs current proof.
-
-The smallest authorized outcome remains private explanation/practice with later reading and recall return. Audience-only delivery without the inbox suffix would abandon its planned observation. Reuse the common incoming-message predicate and existing labels, rather than introducing per-help rules or a notification resource. The source, scope, queue and architectural direction are unchanged; the unrelated fixture and inbox overruns are preserved, not erased by splitting.
+Earlier sizing decisions, both bounded overrun refinements, restored prototypes and retained architectural limits remain in [accepted execution history](ACCEPTED-SLICE-PROOF.md#earlier-execution-refinements). Their dates, revisions and failed/partial-proof limits are unchanged; leaves 12–14 add only the existing consumers needed for the same outcome.
 
 ## Execution observation: real-model gate
 
@@ -246,3 +223,23 @@ Disposition: proved by slice 6: PrivateRecallConversationControllerTest.learnerR
 Reported: slice 5 — "The private-access prefix retains existing partner labels; explicit private-help labelling remains for the inbox slice."
 Story clause: "From the answered MCQ, request help with the original attempt visible and the conversation audience clear."
 Disposition: proved by slice 6: PrivateRecallConversationControllerTest list-controller observations distinguish private help from legacy circle and two-person participant labels
+
+### G7. Contextual reading leaves retained replies unread (retrospective of slices 6/8)
+Reported: slice 8 — "The contextual help entry does not consume conversation-fetched, so visible stored replies remain unread."
+Story clause: "Retain the explanation and practice exchange for later reading."
+Disposition: receiving slice 12
+
+### G8. Nested refinement Escape closes contextual help (retrospective of slices 8/11)
+Reported: slice 11 — "The raw refinement dialog is outside modalStack; Escape pops contextual help and discards both dialogs."
+Story clause: "Returning to recall preserves the learner's progress."
+Disposition: receiving slice 13
+
+### G9. Retained spelling refinement receives an incomplete MCQ context (retrospective of slice 11)
+Reported: slice 11 — "Spelling help enables clarification review without an MCQ and sends a clarification-only DTO described as an answered MCQ."
+Story clause: "Ordinary authorized refinement remains available."
+Disposition: receiving slice 14
+
+### G10. Ordinary spelling export supplies user history only (preparation for slice 14)
+Reported: slice 14 — "The valid spelling conversation export contains only the learner's user message; the current subject-note resolver supplies no note/developer context."
+Story clause: "A learner confused by an answered MCQ can understand the disputed distinction, try applying it, and return to recall without having to reconstruct the attempt or immediately reorganize the note."
+Disposition: no user cost "A learner confused by an answered MCQ can understand the disputed distinction, try applying it, and return to recall without having to reconstruct the attempt or immediately reorganize the note.": the selected outcome concerns an answered MCQ. The observed ordinary spelling request is existing behavior, preserved by this execution; broader spelling source/model quality is outside that outcome. This does not waive slice 14's positive ordinary spelling refinement compatibility proof or add a new teaching-quality obligation.
