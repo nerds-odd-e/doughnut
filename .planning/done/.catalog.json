@@ -2,6 +2,12 @@
   "schemaVersion": 1,
   "records": [
     {
+      "fileName": "SEED-075_story-1.json",
+      "identity": "SEED-075#story-1",
+      "completedAt": "2026-10-12T12:28:02.156Z",
+      "blob": "4766391127bf48d51679f45e4818e08631f4c8df"
+    },
+    {
       "fileName": "SEED-071_removal-proof-and-evidence-recurrence.json",
       "identity": "SEED-071#removal-proof-and-evidence-recurrence",
       "completedAt": "2026-10-12T01:42:09.609Z",

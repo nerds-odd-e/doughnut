@@ -8,7 +8,6 @@ Make deliberately captured knowledge more useful through learning and refinement
 
 - [Resolve a confusing recall answer with an explanation and a follow-up check](seeds/SEED-073-learning-refinement-and-retrieval.md#story-1) — SEED-073#story-1 ([plan](slice-plans/001-resolve-confusing-recall-answer/PLAN.md))
 - [Use one reactive voice-input button for note titles and content](seeds/SEED-066-voice-input.md#unified-voice-input-control) — SEED-066#unified-voice-input-control ([plan](slice-plans/002-shared-voice-input-button/PLAN.md))
-- [Keep the mobile note toolbar on one full-width row with a visible options menu](seeds/SEED-075-mobile-note-toolbar.md#story-1) — SEED-075#story-1 ([plan](slice-plans/004-mobile-note-toolbar-one-row/PLAN.md))
 
 ## Backlog list
 

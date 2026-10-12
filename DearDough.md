@@ -210,6 +210,6 @@ The plan recorded each symptom only on unchanged code. Slice 2's proof named the
   - Tool: Claude Code
   - Model: claude-opus-5-5
   - Open Dough release: 0.3.60
-  - Evidence: `.planning/slice-plans/004-mobile-note-toolbar-one-row/PLAN.md` settled premises (390px menu at left −206px on unchanged code) and slice 2 proof; slice 2 implementation return measured 45px to 325px at 390px before its change and −5px at 320px
+  - Evidence: `.planning/slice-plans/004-mobile-note-toolbar-one-row/PLAN.md` at 011af9ee1eb95af54fe65df5c1d2ff06821e8de2, settled premises (390px menu at left −206px on unchanged code) and slice 2 proof; slice 2 implementation return measured 45px to 325px at 390px before its change and −5px at 320px
   - Observed effect: one of the two planned real-layout menu cases does not discriminate the slice's change; the 320px case does
   - Inference: observing the later slice's symptom with the earlier slice's temporary edit applied would have shown which example carries the proof
