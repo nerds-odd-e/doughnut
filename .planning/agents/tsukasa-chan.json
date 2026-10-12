@@ -1,9 +1,0 @@
-{
-  "schemaVersion": 1,
-  "agent": "Tsukasa-chan",
-  "email": "tsukasa-chan@example.org",
-  "identity": "SEED-076#story-1",
-  "mode": "story-branch",
-  "branch": "claude/mask-the-spelling-answer-before-a-trailing-paren",
-  "host": "claude"
-}

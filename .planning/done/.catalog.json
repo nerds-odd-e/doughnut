@@ -2,6 +2,12 @@
   "schemaVersion": 1,
   "records": [
     {
+      "fileName": "SEED-076_story-1.json",
+      "identity": "SEED-076#story-1",
+      "completedAt": "2026-10-12T12:28:20.232Z",
+      "blob": "3d5e462308e5cf9b3133dd34fb501599a542ffa5"
+    },
+    {
       "fileName": "SEED-066_unified-voice-input-control.json",
       "identity": "SEED-066#unified-voice-input-control",
       "completedAt": "2026-10-12T12:28:05.521Z",

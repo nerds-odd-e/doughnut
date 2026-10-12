@@ -7,7 +7,6 @@ Make deliberately captured knowledge more useful through learning and refinement
 ## Taken
 
 - [Resolve a confusing recall answer with an explanation and a follow-up check](seeds/SEED-073-learning-refinement-and-retrieval.md#story-1) — SEED-073#story-1 ([plan](slice-plans/001-resolve-confusing-recall-answer/PLAN.md))
-- [Mask the spelling answer before a trailing parenthesized title qualifier](seeds/SEED-076-parenthesized-title-spelling-cloze.md#story-1) — SEED-076#story-1 ([plan](slice-plans/003-mask-spelling-answer-before-title-qualifier/PLAN.md))
 
 ## Backlog list
 
