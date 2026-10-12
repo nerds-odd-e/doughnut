@@ -215,6 +215,13 @@ Content recording gains a starting state; the body editor still becomes
 read-only only once the microphone has started. `docs/voice-input.md`
 describes the startup state.
 
+## Execution complete
+
+Product advice: consider a small bug story for leaving a note while the
+content microphone is still starting: the recording can start after the
+author has left, with nothing to stop it (read from `useNoteVoiceInput.ts`,
+not run; obligation G1). No correction to this story is needed.
+
 ## Story obligations
 
 ### G1. Leaving the note while the content microphone starts

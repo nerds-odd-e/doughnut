@@ -5,7 +5,7 @@ responses under observation live in the [watch list](https://github.com/terryyin
 Detailed observations, original releases and qualified inferences are retained
 in the linked Open Dough catalog. Unknown execution provenance remains unknown.
 
-- Highest allocated local number: 233. Removed numbers are never reused.
+- Highest allocated local number: 234. Removed numbers are never reused.
 - Full source recovery before this cleanup: `0a8878e98be76b8e92203515d8f4719489b24169:DearDough.md`.
 - Project-owned findings remain in [Donut Retrospective Findings](DonutRetrospectiveFindings.md); their ownership review is unchanged.
 
@@ -177,3 +177,17 @@ The coordinator combined complete execution references and an unbounded tool-met
   - Evidence: dashboard launch fb81e2c8-229c-473e-ba0c-0df74a951f5e, first two startup functions.exec responses on 2026-10-12 reported 20,868 and 20,631 original output tokens and truncation; subsequent calls retrieved the plan, seed, and individual execution references again before slice 1 delegation
   - Observed effect: the startup outputs did not expose all requested context; additional targeted reads were needed
   - Inference: limiting each read to the next execution boundary and bounding metadata discovery would avoid this duplication; no elapsed-time or total-token saving was measured
+
+## DD-234 — No obligation disposition fits an earlier defect the story leaves unchanged
+
+An implementation return named a defect that existed before the story and that the story neither caused nor promised to fix. Story-obligation recording requires exactly one disposition for every named gap, and none describes "earlier defect, unchanged, reported onward": the coordinator recorded `no user cost`, whose wording says the gap costs the user nothing, although the defect itself does cost the user.
+
+### Occurrences
+- Execution: SEED-066#unified-voice-input-control (first implementation commit 94e79abf8aa8d658ceafead7ea6c0560e21c2349)
+  - Timestamp: 2026-10-12T17:30:00+09:00
+  - Tool: Claude Code
+  - Model: claude-opus-5-5
+  - Open Dough release: 0.3.60
+  - Evidence: plan `.planning/slice-plans/002-shared-voice-input-button/PLAN.md`, obligation G1 at d2ec267d7ca48409058eb1c546fb115fafd8ba07; slice 4 return quoted there; `story-obligations.mjs check --slice 4` accepted the entry
+  - Observed effect: the record's disposition reason had to explain that "no cost" means no cost added by this story; the defect reaches the owner only through the final report and product advice
+  - Inference: one occurrence; whether a separate disposition is needed or the existing wording should cover this case is undecided
