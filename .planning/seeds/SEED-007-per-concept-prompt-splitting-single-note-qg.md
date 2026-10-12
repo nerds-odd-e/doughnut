@@ -3,11 +3,80 @@ id: SEED-007
 status: dormant
 planted: 2026-08-21
 planted_during: focus-note retrieval exploration for OKF / LLM Wiki
-trigger_when: when QG quality plateaus, or when redesigning the retrieval→prompt pipeline (FocusContextMarkdownRenderer / question-generation prompt)
+updated: 2026-10-12
+trigger_when: improving question-context quality under the learning and retrieval epic, or when QG quality plateaus
 scope: medium
 ---
 
-# SEED-007: Per-concept prompt splitting for single-note QG
+# SEED-007: Improve supporting context for single-note recall questions
+
+## Current Direction
+
+On 2026-10-12 the owner requested concrete backlog stories from the OpenKB
+implementation assessment and reuse of existing seeds. This seed now owns the
+question-context story within the
+[learning/refinement and retrieval epic](SEED-073-learning-refinement-and-retrieval.md).
+Per-concept splitting, summarization, task-aware candidate selection, and
+passage selection are alternatives to evaluate, not chosen implementations.
+
+The assessment read main at `e851a7682d` without running model-quality
+comparisons. Question generation already uses shared focus context, property
+focus, author instructions, and a focus-note grounding rule. Candidate selection
+does not receive the intended task; related-note content is prefix-truncated.
+Current code budgets 2,000 approximate combined content tokens, up to 1,500 for
+the focus note and 200 per related note. The older research/design descriptions
+below describe their dated investigation, not current budget measurements.
+
+## Story Decomposition
+
+Effort bands follow [SEED-039](SEED-039-faster-ci-feedback.md#story-decomposition):
+S = 30–60 minutes, M = 1–2 hours, L = 2–4 hours, including delivery.
+
+<a id="story-1"></a>
+
+### Generate focus-note questions with relevant supporting passages
+
+**Identity:** SEED-007#story-1
+```json dough-story-state
+{"schemaVersion":1,"refinement":"not-refined","approach":"unselected"}
+```
+
+- **For / why:** A learner gets an answerable question about the focus note
+  whose distractors and qualifications use the relevant surrounding knowledge.
+- **Scope:** Choose a small set of real weak or ambiguous questions. Establish
+  the current result and whether each miss concerns candidate selection,
+  excerpt selection, or generation. Compare the smallest task-aware context
+  change against that baseline and retain only an evidenced improvement.
+  Keep the focus note as the learning target and ordinary token/cost limits
+  explicit. Do not require a summarizer, a new model, per-link calls, or embeddings.
+- **Evaluation:** A related note contains the useful distinction beyond its
+  initial excerpt. The generated question uses that distinction to avoid an
+  ambiguous distractor while keeping the correct answer grounded in the focus
+  note. Also include an irrelevant nearby note to detect unnecessary context.
+  The owner compares answerability, ambiguity, target fidelity, latency, and
+  cost on the same cases; model self-evaluation alone is insufficient.
+- **Value / learning:** Improve an existing daily learning outcome and identify
+  whether graph selection or evidence presentation is the limiting factor.
+- **Effort hypothesis:** L, low confidence until cases are selected. Bound the
+  first comparison; resplit before execution if evaluation and a useful retained
+  improvement cannot fit. An inconclusive experiment is recorded honestly and
+  does not establish that the improvement story is complete.
+- **Depends on:** No new story; existing generation, graph retrieval, context
+  exports, and contest behavior suffice. General search and query are not
+  prerequisites.
+- **Safe stopping point:** A measured improvement can stand alone in question
+  generation. If no candidate helps, preserve the baseline and evidence for
+  an owner decision rather than shipping unmeasured complexity.
+
+## Ordering and Open Decisions
+
+This follows the epic's two learning/refinement stories in global priority.
+Select actual question cases, human evaluation criteria, and acceptable added
+latency/cost at refinement. No experiment or implementation is authorized by
+this decomposition record. Preserve the research below as hypotheses and
+provenance; its reported external results do not establish benefit for Donut.
+
+## Original Exploration — 2026-08-21
 
 ## Why This Matters
 
