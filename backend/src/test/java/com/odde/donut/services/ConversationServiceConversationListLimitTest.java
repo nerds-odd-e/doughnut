@@ -7,6 +7,7 @@ import static org.mockito.Mockito.when;
 import com.odde.donut.entities.User;
 import com.odde.donut.entities.repositories.ConversationMessageRepository;
 import com.odde.donut.entities.repositories.ConversationRepository;
+import com.odde.donut.entities.repositories.RecallPromptRepository;
 import com.odde.donut.testability.TestabilitySettings;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -25,7 +26,8 @@ class ConversationServiceConversationListLimitTest {
         new ConversationService(
             mock(TestabilitySettings.class),
             conversationRepository,
-            mock(ConversationMessageRepository.class));
+            mock(ConversationMessageRepository.class),
+            mock(RecallPromptRepository.class));
   }
 
   @Test

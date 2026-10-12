@@ -1,6 +1,8 @@
 package com.odde.donut.controllers;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static com.odde.donut.controllers.ConcurrentControllerTestSupport.assertQueued;
+import static com.odde.donut.controllers.ConcurrentControllerTestSupport.await;
+import static com.odde.donut.controllers.ConcurrentControllerTestSupport.inIsolatedRequest;
 
 import com.odde.donut.controllers.currentUser.CurrentUser;
 import com.odde.donut.entities.User;
@@ -11,13 +13,9 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
-import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.support.TransactionTemplate;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
 
 /**
  * Shared worker lifecycle, bounded coordination, and per-worker request/authorization setup for
@@ -90,41 +88,6 @@ final class NotebookGitConcurrentWriterTestSupport {
       releaseBinding.countDown();
       executor.shutdownNow();
       executor.awaitTermination(10, TimeUnit.SECONDS);
-    }
-  }
-
-  /**
-   * Wraps {@code task} so the worker thread gets a fresh servlet request and its own thread-local
-   * current-user slot set to {@code ownerUser}, then clears both in {@code finally}. Each worker
-   * receives an independent holder even when representing the same owner.
-   */
-  static <T> Callable<T> inIsolatedRequest(
-      CurrentUser currentUser, User ownerUser, Callable<T> task) {
-    return () -> {
-      RequestContextHolder.setRequestAttributes(
-          new ServletRequestAttributes(new MockHttpServletRequest()));
-      currentUser.setUser(ownerUser);
-      try {
-        return task.call();
-      } finally {
-        RequestContextHolder.resetRequestAttributes();
-        currentUser.setUser(null);
-      }
-    };
-  }
-
-  static void assertQueued(Future<?> writer) {
-    assertThrows(TimeoutException.class, () -> writer.get(250, TimeUnit.MILLISECONDS));
-  }
-
-  static void await(CountDownLatch latch) {
-    try {
-      if (!latch.await(10, TimeUnit.SECONDS)) {
-        throw new AssertionError("Timed out waiting for test coordination");
-      }
-    } catch (InterruptedException exception) {
-      Thread.currentThread().interrupt();
-      throw new RuntimeException(exception);
     }
   }
 

@@ -9,6 +9,7 @@ import com.odde.donut.entities.RecallPrompt;
 import com.odde.donut.entities.User;
 import com.odde.donut.entities.repositories.ConversationMessageRepository;
 import com.odde.donut.entities.repositories.ConversationRepository;
+import com.odde.donut.entities.repositories.RecallPromptRepository;
 import com.odde.donut.testability.TestabilitySettings;
 import java.sql.Timestamp;
 import java.util.List;
@@ -17,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
 @Service
@@ -25,6 +27,7 @@ public class ConversationService {
   private final TestabilitySettings testabilitySettings;
   private final ConversationRepository conversationRepository;
   private final ConversationMessageRepository conversationMessageRepository;
+  private final RecallPromptRepository recallPromptRepository;
 
   private Conversation initializeConversation(User initiator) {
     Conversation conversation = new Conversation();
@@ -32,13 +35,21 @@ public class ConversationService {
     return conversation;
   }
 
+  @Transactional
   public Conversation startConversationAboutRecallPrompt(
       RecallPrompt recallPrompt, User initiator) {
-    Conversation conversation = initializeConversation(initiator);
-    conversation.setRecallPrompt(recallPrompt);
-    conversation.setAccessOwnership(initiator.getOwnership());
-    conversationRepository.save(conversation);
-    return conversation;
+    RecallPrompt lockedPrompt =
+        recallPromptRepository.findByIdForUpdate(recallPrompt.getId()).orElseThrow();
+    return conversationRepository
+        .findFirstBySubject_RecallPromptAndConversationInitiatorAndAccessOwnershipOrderByIdAsc(
+            lockedPrompt, initiator, initiator.getOwnership())
+        .orElseGet(
+            () -> {
+              Conversation conversation = initializeConversation(initiator);
+              conversation.setRecallPrompt(lockedPrompt);
+              conversation.setAccessOwnership(initiator.getOwnership());
+              return conversationRepository.save(conversation);
+            });
   }
 
   public Conversation startConversationOfNote(Note note, User initiator, String message) {

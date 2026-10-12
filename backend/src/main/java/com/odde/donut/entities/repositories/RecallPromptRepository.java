@@ -2,14 +2,20 @@ package com.odde.donut.entities.repositories;
 
 import com.odde.donut.entities.RecallPrompt;
 import com.odde.donut.services.RecallAnswerRow;
+import jakarta.persistence.LockModeType;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.Optional;
+import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 
 public interface RecallPromptRepository extends CrudRepository<RecallPrompt, Integer> {
+
+  @Lock(LockModeType.PESSIMISTIC_WRITE)
+  @Query("SELECT prompt FROM RecallPrompt prompt WHERE prompt.id = :id")
+  Optional<RecallPrompt> findByIdForUpdate(@Param("id") Integer id);
 
   String unansweredByMemoryTrackerFrom =
       " FROM recall_prompt rp "

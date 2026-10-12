@@ -133,13 +133,13 @@ Proof: Accepted `PrivateRecallConversationControllerTest.learnerRequestsAndReads
 ### 7. Continue the same private attempt discussion
 
 Type: Behavior
-Status: planned
+Status: done
 
 Sizing: 5–8 minutes including repeat/overlapping-request handling and the required backend suite; reuse and creation are one identity-consistency rule.
 
 Behavior: Starting help again for the same attempt finds the learner's compatible private conversation and retained messages. An existing shared thread is not misrepresented or repurposed. A different attempt has its own discussion.
 
-Proof: Start-controller fixtures contain private and legacy shared threads; repeated start/reload observes the same private identity and messages and retained shared access. Observe the actual create/reuse operation, including overlapping requests if the chosen implementation admits duplicate creation. Resolve that at the existing transactional owner, without a second conversation registry.
+Proof: Accepted six `RecallConversationContinuationControllerTest` cases: repeated start after flush/clear retains identity/messages, distinct attempts differ, oldest compatible personal thread is reused, and legacy circle/author/other-initiator threads retain their access. `RecallConversationConcurrentStartControllerTest` queues two actual controller requests behind a held prompt lock; release returns one identity and one stored conversation. The service owns locking before compatible lookup/creation; no registry. Full `CURSOR_DEV=true nix develop -c pnpm backend:test_only` passed after shared concurrency-support refactor: 2773 tests, no failures/errors, 2 skips. Earlier constructor compilation and detached-user fixture failures were corrected before this final proof; active implementation 8–9 minutes excludes suite waits.
 
 ### 8. Open contextual help and return to the same recall
 

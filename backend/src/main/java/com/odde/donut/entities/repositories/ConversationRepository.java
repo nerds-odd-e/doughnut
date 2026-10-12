@@ -2,8 +2,11 @@ package com.odde.donut.entities.repositories;
 
 import com.odde.donut.entities.Conversation;
 import com.odde.donut.entities.ConversationMessage;
+import com.odde.donut.entities.Ownership;
+import com.odde.donut.entities.RecallPrompt;
 import com.odde.donut.entities.User;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
@@ -11,9 +14,13 @@ import org.springframework.data.repository.query.Param;
 
 public interface ConversationRepository extends CrudRepository<Conversation, Integer> {
 
+  Optional<Conversation>
+      findFirstBySubject_RecallPromptAndConversationInitiatorAndAccessOwnershipOrderByIdAsc(
+          RecallPrompt recallPrompt, User initiator, Ownership accessOwnership);
+
   @Query("SELECT c FROM Conversation c WHERE c.subject.recallPrompt IN :recallPrompts")
   List<Conversation> findBySubjectRecallPromptIn(
-      @Param("recallPrompts") List<com.odde.donut.entities.RecallPrompt> recallPrompts);
+      @Param("recallPrompts") List<RecallPrompt> recallPrompts);
 
   String USER_CONVERSATION_CONDITION =
       "c.accessOwnership.user = :user "
