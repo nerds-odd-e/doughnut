@@ -88,7 +88,6 @@ import { contentForNewNote, createNoteFromForm } from "./noteNewFormSubmit"
 import {
   initialNewNoteTitle,
   speakTitleButtonClass,
-  speakTitleButtonState,
   speakTitleNames,
   wholeTitleIsDictationTarget,
 } from "./noteNewFormTitle"
@@ -169,9 +168,7 @@ const { busy: titleSpeechBusy, voiceInput: titleVoiceInput } =
       wholeTitleIsDictationTarget(hasTitleBeenEdited.value, newTitle.value)
     )
   )
-const speakTitleState = computed(() =>
-  speakTitleButtonState(titleVoiceInput.phase.value)
-)
+const speakTitleState = titleVoiceInput.buttonState
 const onSpeakTitleClick = () =>
   speakTitleState.value === "recording"
     ? titleVoiceInput.stopListening()

@@ -40,16 +40,16 @@ const {
 } = useNoteVoiceInput(note)
 
 const title = inject(noteTitleDictationKey, undefined)
-const titleRecording = computed(
-  () => title?.dictation.voiceInput.phase.value === "listening"
-)
+const titleState = computed(() => title?.dictation.voiceInput.buttonState.value)
+const titleRecording = computed(() => titleState.value === "recording")
 const isRecording = computed(
   () => titleRecording.value || contentRecording.value
 )
-const finishing = computed(
+const startingOrFinishing = computed(
   () =>
+    phase.value === "starting" ||
     phase.value === "stopping" ||
-    (title?.dictation.busy.value === true && !titleRecording.value)
+    titleState.value === "busy"
 )
 const preserveTitleFocus = (event: PointerEvent) => {
   if (
@@ -66,7 +66,7 @@ const start = () =>
 
 const state = computed(() => {
   if (isRecording.value) return "recording"
-  if (finishing.value) return "busy"
+  if (startingOrFinishing.value) return "busy"
   if (hasKeptRecording.value) return "keptRecording"
   return "idle"
 })

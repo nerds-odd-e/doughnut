@@ -21,17 +21,9 @@ export const speakTitleNames = {
   stop: "Stop speaking the title",
 } as const
 
-/** What the title field's microphone button shows in each phase of a title recording. */
-export function speakTitleButtonState(
-  phase: TitleDictation["voiceInput"]["phase"]["value"]
-) {
-  if (phase === "listening") return "recording"
-  return phase === "idle" ? "idle" : "busy"
-}
-
 /** The title field's frame for the microphone button: highlighted while recording. */
 export function speakTitleButtonClass(
-  state: ReturnType<typeof speakTitleButtonState>
+  state: TitleDictation["voiceInput"]["buttonState"]["value"]
 ) {
   return `${
     state === "recording"
