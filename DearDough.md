@@ -5,7 +5,7 @@ responses under observation live in the [watch list](https://github.com/terryyin
 Detailed observations, original releases and qualified inferences are retained
 in the linked Open Dough catalog. Unknown execution provenance remains unknown.
 
-- Highest allocated local number: 235. Removed numbers are never reused.
+- Highest allocated local number: 236. Removed numbers are never reused.
 - Full source recovery before this cleanup: `0a8878e98be76b8e92203515d8f4719489b24169:DearDough.md`.
 - Project-owned findings remain in [Donut Retrospective Findings](DonutRetrospectiveFindings.md); their ownership review is unchanged.
 
@@ -213,3 +213,17 @@ The plan recorded each symptom only on unchanged code. Slice 2's proof named the
   - Evidence: `.planning/slice-plans/004-mobile-note-toolbar-one-row/PLAN.md` at 011af9ee1eb95af54fe65df5c1d2ff06821e8de2, settled premises (390px menu at left −206px on unchanged code) and slice 2 proof; slice 2 implementation return measured 45px to 325px at 390px before its change and −5px at 320px
   - Observed effect: one of the two planned real-layout menu cases does not discriminate the slice's change; the 320px case does
   - Inference: observing the later slice's symptom with the earlier slice's temporary edit applied would have shown which example carries the proof
+
+## DD-236 — No obligation disposition fits an earlier defect the story leaves unchanged
+
+An implementation return named a defect that existed before the story and that the story neither caused nor promised to fix. Story-obligation recording requires exactly one disposition for every named gap, and none describes "earlier defect, unchanged, reported onward": the coordinator recorded `no user cost`, whose wording says the gap costs the user nothing, although the defect itself does cost the user.
+
+### Occurrences
+- Execution: SEED-066#unified-voice-input-control (first implementation commit 94e79abf8aa8d658ceafead7ea6c0560e21c2349)
+  - Timestamp: 2026-10-12T17:30:00+09:00
+  - Tool: Claude Code
+  - Model: claude-opus-5-5
+  - Open Dough release: 0.3.60
+  - Evidence: `git show 6f73d976d5c36e91ba78d414b1487f2cf2204ce5:.planning/slice-plans/002-shared-voice-input-button/PLAN.md`, obligation G1; slice 4 return quoted there; `story-obligations.mjs check --slice 4` accepted the entry
+  - Observed effect: the record's disposition reason had to explain that "no cost" means no cost added by this story; the defect reaches the owner only through the final report and product advice
+  - Inference: one occurrence; whether a separate disposition is needed or the existing wording should cover this case is undecided

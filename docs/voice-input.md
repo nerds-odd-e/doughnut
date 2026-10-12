@@ -9,64 +9,69 @@ and conversion finish. A fresh recording chooses its destination again.
 See [speaking a title](./voice-input-spoken-title.md) for title conversion,
 draft retention and reference-save choices. The content journey follows here.
 Idle, the button shows a microphone and is named "Voice input".
-Clicking it starts capture from the browser's current default microphone at
-once: the button is highlighted like the toolbar's other active toggles, its
-icon is a live waveform of the microphone's level (a still, quiet line in
-silence), and it is named "Stop voice input". An author with several
-microphones chooses one in the browser's own site settings; when the current
-microphone disconnects, recording switches to the first one available. While
-recording, and until the last speech has been added, a kept recording
-included, the button stays in the toolbar even when it was started from the
-"more options" menu. Clicking the
-active button stops capture; the button is then unavailable, showing a
-spinner and named "Voice input", until the last speech has been converted and
-its text added to the note, and then it is idle again. A recording in which no
-speech was recognized adds nothing to the note and shows no message. When a
-conversion at Stop failed and audio is still not converted, the common error
-toast says "Could not turn your speech into text. Your recording is kept until
-you leave this note; click Voice input to try again." and the button holds the
-kept recording: it is tinted as a warning, shows a retry arrow, and is named
-"Retry turning your speech into text". Clicking it converts the kept recording
-without the microphone; the button is unavailable with its spinner meanwhile.
-On success the text is added and the button is idle; on failure the toast
-shows again and the button keeps the recording. The kept recording lasts while
-the author stays on the note; reloading or leaving the note drops it. Leaving
-the note while recording, by moving to another note or another page, stops the
-recording and adds the remaining speech to the note the author left; the
-button of the note they arrive at is idle. When that last conversion fails,
-nothing is kept and the common error toast says only "Could not turn your
-speech into text." When recording cannot start, nothing is recorded, the
-common error toast says "Could not use the microphone. Allow microphone access
-in your browser, then try again.", and the button stays idle. When saving a
-passage fails, the save's own error toast shows and the button is idle.
-When a body editor is open, the text goes where the author's caret or
-selection was when they clicked Voice input, or where it was when focus left
-the editor; with neither, to the end of the body. From that click until the
-session ends the body editor is read-only: it takes no typing or pasting, and
-clicking or selecting in it does not move the place the text goes to. Each
-passage shows there as soon as it arrives, after the one before. The session
-ends when the last text has arrived, when nothing was heard, or when the
-conversion at Stop failed; the editor is then editable again, with focus and
-the caret after the dictated text. Retrying a kept recording is a session of
-its own: the editor is read-only again and the text goes where the caret or
-selection is at the retry click. When recording cannot start, the editor is
-not made read-only. In the rich editor a pending marker, three softly pulsing
-dots the size of the text on a small patch of the page's background, sits
-right after that place for the whole session: after the caret, or after the
-end of a selection the words will replace. It follows to the end of each
-passage that arrives, stays while the button shows its spinner after Stop and
-during a retry, and is gone when the session ends, a failed conversion,
-nothing heard, and leaving the note included. It is not shown when recording
-cannot start. The dots stand still for an author who prefers reduced motion.
-The marker is drawn over the editor and is not text: it is not saved, copied,
-or exported, it takes no clicks, and it is hidden from assistive technology,
-since the button's name already tells the session's state. The Markdown editor
-shows no marker; there the button is the only sign of a running session.
-Readers who may not edit the note are not offered the button.
+Clicking it starts the browser's current default microphone; until the
+microphone is ready the button is unavailable, showing a spinner and still
+named "Voice input". Capture then begins: the button is highlighted like the
+toolbar's other active toggles, its icon is a live waveform of the
+microphone's level (a still, quiet line in silence), and it is named "Stop
+voice input". An author with several microphones chooses one in the browser's
+own site settings; when the current microphone disconnects, recording switches
+to the first one available. While the microphone starts, while recording, and
+until the last speech has been added, a kept recording included, the button
+stays in the toolbar even when it was started from the "more options" menu.
+Clicking the active button stops capture; the button is then unavailable,
+showing a spinner and named "Voice input", until the last speech has been
+converted and its text added to the note, and then it is idle again. A
+recording in which no speech was recognized adds nothing to the note and shows
+no message. When a conversion at Stop failed and audio is still not converted,
+the common error toast says "Could not turn your speech into text. Your
+recording is kept until you leave this note; click Voice input to try again."
+and the button holds the kept recording: it is tinted as a warning, shows a
+retry arrow, and is named "Retry turning your speech into text". Clicking it
+converts the kept recording without the microphone; the button is unavailable
+with its spinner meanwhile. On success the text is added and the button is
+idle; on failure the toast shows again and the button keeps the recording. The
+kept recording lasts while the author stays on the note; reloading or leaving
+the note drops it. Leaving the note while recording, by moving to another note
+or another page, stops the recording and adds the remaining speech to the note
+the author left; the button of the note they arrive at is idle. When that last
+conversion fails, nothing is kept and the common error toast says only "Could
+not turn your speech into text." When recording cannot start, nothing is
+recorded, the common error toast says "Could not use the microphone. Allow
+microphone access in your browser, then try again.", the button is idle again,
+and the body editor stays editable. When saving a passage fails, the save's
+own error toast shows and the button is idle. When a body editor is open, the
+text goes where the author's caret or selection was when they clicked Voice
+input, or where it was when focus left the editor; with neither, to the end of
+the body. From the moment the microphone is ready until the session ends the
+body editor is read-only: it takes no typing or pasting, and clicking or
+selecting in it does not move the place the text goes to. Each passage shows
+there as soon as it arrives, after the one before. The session ends when the
+last text has arrived, when nothing was heard, or when the conversion at Stop
+failed; the editor is then editable again, with focus and the caret after the
+dictated text. Retrying a kept recording is a session of its own: the editor
+is read-only again and the text goes where the caret or selection is at the
+retry click. When recording cannot start, the editor is not made read-only. In
+the rich editor a pending marker, three softly pulsing dots the size of the
+text on a small patch of the page's background, sits right after that place
+for the whole session: after the caret, or after the end of a selection the
+words will replace. It follows to the end of each passage that arrives, stays
+while the button shows its spinner after Stop and during a retry, and is gone
+when the session ends, a failed conversion, nothing heard, and leaving the
+note included. It is not shown when recording cannot start. The dots stand
+still for an author who prefers reduced motion. The marker is drawn over the
+editor and is not text: it is not saved, copied, or exported, it takes no
+clicks, and it is hidden from assistive technology, since the button's name
+already tells the session's state. The Markdown editor shows no marker; there
+the button is the only sign of a running session. Readers who may not edit the
+note are not offered the button.
 
 ## Speaking a title
 
-New note has a microphone button in its title field. Existing notes use the
+New note has a microphone button in its title field, named "Speak the title"
+and, while listening, "Stop speaking the title". It shows the same faces as
+the toolbar button: a spinner while the microphone starts and while speech
+becomes text, and a live waveform while listening. Existing notes use the
 same toolbar Voice input action for title and content, chosen by editing
 intent: see [speaking a title](./voice-input-spoken-title.md).
 
