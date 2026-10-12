@@ -188,6 +188,6 @@ An implementation return named a defect that existed before the story and that t
   - Tool: Claude Code
   - Model: claude-opus-5-5
   - Open Dough release: 0.3.60
-  - Evidence: plan `.planning/slice-plans/002-shared-voice-input-button/PLAN.md`, obligation G1 at d2ec267d7ca48409058eb1c546fb115fafd8ba07; slice 4 return quoted there; `story-obligations.mjs check --slice 4` accepted the entry
+  - Evidence: `git show 6f73d976d5c36e91ba78d414b1487f2cf2204ce5:.planning/slice-plans/002-shared-voice-input-button/PLAN.md`, obligation G1; slice 4 return quoted there; `story-obligations.mjs check --slice 4` accepted the entry
   - Observed effect: the record's disposition reason had to explain that "no cost" means no cost added by this story; the defect reaches the owner only through the final report and product advice
   - Inference: one occurrence; whether a separate disposition is needed or the existing wording should cover this case is undecided

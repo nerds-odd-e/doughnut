@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 1,
+  "identity": "SEED-066#unified-voice-input-control",
+  "title": "Use one reactive voice-input button for note titles and content",
+  "completedAt": "2026-10-12T12:28:05.521Z",
+  "developer": "Terry Yin",
+  "agent": "Yumi-chan",
+  "host": "claude"
+}
