@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 1,
+  "agent": "Julia-chan",
+  "email": "julia-chan@example.org",
+  "identity": "SEED-075#story-1",
+  "mode": "story-branch",
+  "branch": "claude/keep-the-mobile-note-toolbar-on-one-full-width-r",
+  "host": "claude"
+}
