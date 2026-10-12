@@ -1,6 +1,6 @@
 # DearDough Process Findings
 
-Retained material shared-process findings, reviewed 2026-10-09. Only an explicit
+Retained material shared-process findings, ownership reviewed 2026-10-12. Only an explicit
 queued follow-up is planned work; other entries are open and unqueued. A retained
 released response is not proof of effectiveness. Unknown provenance stays unknown.
 [Response status](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/finding-names.md).
@@ -9,8 +9,9 @@ Full pre-trim evidence: `8830c682704aac3bbb34bf9b1204da8feba042ca:DearDough.md`.
 - Highest allocated local number: 232. Removed local codes are never reused.
 
 Detailed retained observations are consolidated in the linked Open Dough
-record; headings and former local aliases preserve traceability. Review date:
-2026-10-09 (Asia/Tokyo).
+record; headings and former local aliases preserve traceability. Project-specific
+findings and their priority assessment live in
+[Donut Retrospective Findings](DonutRetrospectiveFindings.md).
 
 ## ODF-110 — A readiness replay observed only the plan's named seam, not the rest of the slice's journey
 
@@ -381,48 +382,6 @@ Plan 064 moved the recording session from a panel opened per use to a button tha
   - Observed effect: the title's read-only lock stayed on the title editor reused for the next note; the coordinator asked for the observation after reading `NoteShow.vue` for keys, and the implementer keyed the speak control on the note's id and ended the session on a note change
   - Inference: same lifetime question as the first occurrence, on the title this time; the plan reused the `busy` signal without asking what ends it when the page moves between cached notes
 
-## DD-225 — A removal sweep's search terms matched a dated observation record, so the implementer reworded history to make the sweep return nothing
-
-Plan 064's sweep reading required searches for the removed control names to return nothing over the product. One name appeared in `docs/voice-input-observations.md`, a dated record of journeys run with that control.
-
-### Occurrences
-- Execution: SEED-066#single-button-voice-input (first implementation commit 5c3ca7033b)
-  - Timestamp: 2026-10-10T22:17:00+09:00
-  - Tool: Claude Code
-  - Model: claude-opus-5-5
-  - Open Dough release: 0.3.58
-  - Evidence: slice 2 return, decision 3 (five mentions reworded to "requested (mid-speech) conversion", heading renamed, a seed link's anchor broken); the coordinator's anchor repair in `.planning/seeds/SEED-066-voice-input.md`; slice 2 refactor return ("a truthful rewrite means deleting or re-running the observation, which is an owner decision")
-  - Observed effect: a dated observation now describes an author-requested conversion the product does not offer; one planning link broke and was repaired during delivery; the question was left for the owner
-  - Inference: the removal rule and the plan's sweep did not say whether a dated observation record counts as documentation to sweep, to delete, or to leave
-
-## DD-226 — The documented frontend typecheck passed while the build's plain `tsc` failed, so CI caught a test-only type error
-
-The project's frontend proof rule names `vue-tsc --noEmit`. `pnpm -C frontend build` also runs plain `tsc` through the vite checker, which types every `*.vue` import through `tests/shims-vue.d.ts` and so sees no exposed component members.
-
-### Occurrences
-- Execution: SEED-066#unobtrusive-selection-aware-spoken-title (first implementation commit 57a659f018)
-  - Timestamp: 2026-10-11T07:45:00+09:00
-  - Tool: Claude Code
-  - Model: claude-opus-5-5
-  - Open Dough release: 0.3.58
-  - Evidence: slice 2 refactor return (replaced `as unknown as {…}` casts with `InstanceType<typeof SeamlessTextEditor>` and `wrapper.vm.insertAtSelection`, "typecheck clean"); CI run 38091750938 on `1e5e7efa49` (TS2722 in `seamlessTextEditorTestSupport.ts` and `PathNameEditor.spec.ts`, two jobs failed at the build step); repair `5e346c5791`; the repair agent's reading of `frontend/vite.config.ts` and `pnpm -C frontend exec tsc --noEmit` exiting 2 at the failed commit while `vue-tsc --noEmit` exited 0
-  - Observed effect: one failed CI run; slice 3's unfinished work was set aside and restored around a repair, a repair agent and a refactor agent ran; later slices added `pnpm -C frontend build` to their proof
-  - Inference: the proof rule in the `frontend` skill is narrower than the CI step it stands for; a refactor pass tidied a cast that was there for a reason no comment or rule stated
-
-## DD-227 — A slice plan asked for a test that the removed status line is absent, against the project's removal rule
-
-Plan 065 slice 5 listed "no `[role="status"]` anywhere" among its proof for removing the status line. The project's principle 7 forbids a check that a removed thing is absent.
-
-### Occurrences
-- Execution: SEED-066#unobtrusive-selection-aware-spoken-title (first implementation commit 57a659f018)
-  - Timestamp: 2026-10-11T08:00:00+09:00
-  - Tool: Claude Code
-  - Model: claude-opus-5-5
-  - Open Dough release: 0.3.58
-  - Evidence: `7d062d701f:.planning/slice-plans/065-unobtrusive-spoken-title/PLAN.md` slice 5 Proof; `CLAUDE.md` principle 7 ("no check that it is absent"); the coordinator's slice 5 brief ("principle 7 overrides that: do not add absence assertions"); slice 5 return, decision 2
-  - Observed effect: the coordinator caught it while writing the brief and the test was not written; the plan had passed slice planning and a readiness assessment with the instruction in it
-  - Inference: planning checked the removal as deletion plus sweep in its scope text but not in each slice's proof list
-
 ## DD-228 — A plan's observation slice said to remove its scratch changes while the next slice said to keep its test
 
 Plan 066 slice 1 was stop-safe by "record learning and remove scratch changes; no product change ships", and slice 2 said "Retain the real HTTP startup regression from slice 1". The plan did not say where the probe test lives between the two deliveries.
@@ -451,20 +410,6 @@ Plan 066 slices 1, 3 and 4 delivered only plan records. Slice wrap-up lists a fr
   - Observed effect: three deliveries skipped the refactor agent on the coordinator's own judgment; the one refactor that ran found and removed a triplicated datasource URL
   - Inference: spawning a refactor agent for a plan-only commit would have cost a full agent run for no possible finding; the guidance leaves that as an unstated deviation
 
-## DD-230 — An environment-only Flyway callback with a MySQL named lock held a real startup migration open for full-stack proof
-
-To observe the runner during a migration, the execution supplied `beforeMigrate.sql` through `SPRING_FLYWAY_LOCATIONS` from a directory outside the checkout; the file waited on a named lock that a separate session held and released. No product or test code and no delay option was added.
-
-### Occurrences
-- Execution: SEED-067#start-e2e-after-migrations (first implementation commit f297a916c5)
-  - Timestamp: 2026-10-11T09:18:00+09:00
-  - Tool: Claude Code
-  - Model: claude-opus-5-5
-  - Open Dough release: 0.3.58
-  - Evidence: plan 066 Learnings "Slice 3" and "Slice 4" at `af62c7cd0a`; `sut.log` lines 148 to 234 in the execution worktree (`Executing SQL callback: beforeMigrate`, `Successfully applied 41 migrations`)
-  - Observed effect: both `pnpm e2e:hold` and `pnpm cy:run` were observed returning 503 during the held migration and resetting test data only after the first 200; each slice took about five minutes including startup
-  - Inference: useful practice: a timing fault was proved at the real boundary with a release barrier instead of a sleep or a stand-in response; it depends on the runner passing its environment to the backend, which was confirmed with `ps eww`
-
 ## DD-231 — A plan's proof table left out endings the story states, and implementers returned the slices complete with those endings untested
 
 The story lists how a voice-input session ends or never starts: the microphone cannot start, nothing was heard, leaving the note. Plan 067's proof table named the landing place, the read-only state, failure and retry, but not those endings. Each implementer delivered the table and listed the endings as untested in a complete report.
@@ -478,18 +423,3 @@ The story lists how a voice-input session ends or never starts: the microphone c
   - Evidence: plan 067 "Outside-in proof ownership" at `783d3f96cd`; slice 1 first return, "Not covered by a test" (microphone cannot start, nothing heard with an editor open, Quill re-enabled on leaving); the three tests added in the second round at `7557329339`; the DD-224 occurrence of this execution for the title
   - Observed effect: slices 1 and 2 each needed a second implementation round after the coordinator compared the return with the story's Scope; the body endings already held, and the title ending was a real defect
   - Inference: the delegation carried the proof table as the promise list; carrying the story's session-end list beside it would likely have saved both rounds
-
-## DD-232 — A title insertion marker became visible before microphone readiness, so cached E2E audio reached the previous recorder
-
-Synchronous title-range capture moved the pending marker before asynchronous microphone startup. The New note E2E action used that marker as readiness and returned before the new recorder connected. CI lost the transcript; waiting for the enabled listening control fixed the boundary.
-
-Follow-up: Open, unqueued.
-
-### Occurrences
-- Execution: SEED-066#focus-aware-toolbar-voice-input (first implementation commit a3a2bb2bdec5)
-  - Timestamp: unknown
-  - Tool: Codex
-  - Open Dough release: unknown
-  - Evidence: CI run 38123730120/attempt 1 at f75da95cb40f; repair 8944c119e408; `60328800d519e10be3fa16b69505641157417542:.planning/slice-plans/001-focus-aware-toolbar-voice-input/CI-REPAIR.md` records the temporary 1500ms getUserMedia experiment (unchanged helper 4 pass/1 fail, listening-state wait 5 pass, ordinary mocks 5 pass)
-  - Observed effect: only New note creation failed; pending slice-3 work was paused/preserved/restored while the E2E helper was repaired and published
-  - Inference: a visible insertion marker establishes the editing session, not external microphone readiness; changes in that timing need consumer proof with delayed device startup

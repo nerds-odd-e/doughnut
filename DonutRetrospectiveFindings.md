@@ -4,69 +4,69 @@ Findings specific to Donut’s product, repository tooling, or local conventions
 Findings about shared Open Dough skills, supporting guidelines, and skill scripts
 remain in [DearDough.md](DearDough.md), including those observed in this project.
 Existing finding identifiers and occurrence evidence are preserved when moved.
-Resolved findings are removed; Git history keeps their evidence.
+Resolved problems are removed; Git history keeps their evidence.
 
-A finding is Donut’s when its correction lands in Donut’s product, scripts, or
-Donut-authored skills and `.agents/agent-map.md`; Donut details that only
-illustrate a shared lesson stay in DearDough as occurrence evidence.
-
-Groups are ordered by priority: impact first, then recurrence, with unknown
-causes and one-off environment repair below repeatedly blocked feedback.
-Ownership and current resolution evidence reviewed 2026-10-09 at `d4481ac31e`.
+A finding is Donut’s when the remaining problem concerns Donut’s product,
+scripts, or Donut-authored guidance. A repaired product incident alone does not
+establish a defect in published Open Dough guidance. Shared planning, proof
+acceptance, and delivery failures remain in DearDough when the observation
+concerns those responsibilities, even after their product symptom is repaired.
 
 ## Ownership and priority assessment
 
-Compared the installed skills with published Open Dough `v0.3.57`
-(`e3c5fa0a61e4743ed6a16331755ddd2d1e2a399b`) in the source checkout. The
-[execution wrap-up](https://github.com/terryyin/open-dough/blob/v0.3.57/src/skills/dough-execute-plan/references/wrap-up.md)
-and [refactor checks](https://github.com/terryyin/open-dough/blob/v0.3.57/src/skills/dough-post-change-refactor/references/refactor-checks.md)
-match the installed files byte for byte.
+Reviewed 2026-10-12 against Donut `8ac439b16b` and published Open Dough
+`v0.3.60` (`e72ed2aaea475c7fbe8427a5c66bc877dda51275`). The installed
+[execution wrap-up](https://github.com/terryyin/open-dough/blob/v0.3.60/src/skills/dough-execute-plan/references/wrap-up.md)
+and [refactor checks](https://github.com/terryyin/open-dough/blob/v0.3.60/src/skills/dough-post-change-refactor/references/refactor-checks.md)
+match that release. Public refactor guidance retains negative assertions when
+absence is the actual promise and defers to project test style. Donut’s
+principle 7 and `unit-testing` skill supply the stricter removal convention.
+The queued work therefore belongs in Donut-authored guidance and evidence
+handling; it does not change public `dough-*` skills.
 
 | Group | Distinct recorded executions | Impact and disposition |
 | --- | --- | --- |
-| Donut removal-proof churn | 2 after the correction, plus the original DD-202 | Repeated proof written and deleted despite the local rule; queue as a recurrence. |
-| MinerU venv recovery | 1 | Mixed environment/stack cost of about 28 minutes; venv remainder unqueued. |
-| Stale Development classes | 1; later probes healthy | A failed start, cause unknown; retain unqueued, not confirmed resolved. |
+| Donut removal proof and evidence handling | Four after the October 3 correction, including two after the October 10 correction; plus original DD-202 | Repeated invalid proof handoffs; one altered dated observation and broken link. One recurrence story queued first. |
+| MinerU venv recovery | One | About 28 minutes of mixed environment and stack work; recovery remains unqueued. |
+| Stale Development classes | One; later probes healthy | Failed start, unknown cause; unqueued, not confirmed resolved. |
 
-DD-205 concerns Donut's specific deletion-and-sweep convention in `AGENTS.md`
-and `CLAUDE.md`. Public refactor guidance retains negative assertions for actual
-promises. The correction states the local convention in project-owned guidance;
-it does not change that public guidance.
+Only the first group has repeated post-correction evidence and an unresolved
+disposition for dated observation records encountered by a removal sweep. The one-off environment findings do not
+justify a second highest-priority story. The backlog’s voice-input direction
+stays unchanged; the recurring group directly arose during voice-input work.
 
-The expensive mock-reproduction framing (ODF-213), file-size rule, proof-selection,
-CI observer/delivery scripts, and coordinator authorization/acceptance lessons
-remain shared findings in DearDough. In particular, fixing the dictation race
-from DD-214 does not prove its coordinator-acceptance lesson resolved.
-
-No complete finding retained in the project file has a confirmed durable
-resolution in this pass. Earlier closed held-stack and Development-lifecycle
-groups stay removed; current `e2e:hold` and `dev:stop` commands confirm those
-corrections. DD-159's unsuccessful reproduction is not resolution evidence.
+Shared findings retained in DearDough include changed-boundary proof acceptance
+(DD-218; public wrap-up step 2), decisive planning premises (DD-224; public
+`dough-slice-planning`), proof-table coverage, sizing, file-size rules, and CI
+observation/delivery. Their remaining claims concern the shared workflow, not
+an unrepaired Donut helper or voice-control defect. Successful local practice
+is separated below from open problems and has no backlog entry.
 
 <a id="local-removal-proof"></a>
 
-## Corrected, awaiting a real removal: Apply Donut’s removal rule from planning through delivery
+## Queued first: Apply Donut’s removal convention to proof and dated evidence
 
-Correction (SEED-071#removals-follow-project-rule, `b96f234fb8`, 2026-10-10):
-principle 7 and the `unit-testing` skill state what proof a removal owns. In a
-one-time demonstration two fresh agents planned proof for both recorded shapes
-without observing the removed thing
+Follow-up: [Make Donut removal handoffs preserve valid proof and truthful evidence](.planning/seeds/SEED-071-reliable-project-feedback.md#removal-proof-and-evidence-recurrence)
+— SEED-071#removal-proof-and-evidence-recurrence.
+
+The earlier SEED-071#removals-follow-project-rule completed on 2026-10-10 and
+is not active in either backlog list. Its correction `b96f234fb8` (14:25 +09:00)
+stated removal proof in principle 7 and the `unit-testing` skill; a one-time
+demonstration passed for two earlier shapes
 (`231b5e320d:.planning/slice-plans/013-removal-proof-in-guidance/PLAN.md`).
-That is one run per shape; the next real removal plan confirms or reopens this
-group.
+That demonstration was not evidence of later real-plan compliance.
 
-Recurrence of resolved Donut finding DD-202 (not the DD-202 that became ODF-208),
-whose correction put the removal rule in always-loaded agent guidance
-(`CLAUDE.md` principle 7, `18b99b6424` and `52460a4077`, 2026-10-03). DD-205 happened the next day, so that correction did not reach
-slice planning. Shared Open Dough guidance keeps absence assertions when absence
-is the promise; the rule is Donut’s, so the correction lands in Donut.
+DD-225 occurred that evening (22:17 +09:00). DD-227’s plan was created at
+`7d062d701f` on October 11 at 06:56 +09:00 and caught during execution at
+08:00. Both follow the correction. DD-227 reopens the proof-handoff problem;
+DD-225 adds the local sweep’s handling of dated evidence to the same group.
+The new recurrence story preserves the predecessor’s done record.
 
-Two distinct executions after the October 3 correction each
-wrote and removed a test or assertion, in addition to the earlier DD-202
-occurrence. The existing rule already addresses every role (`AGENTS.md:30–35`,
-unchanged from `18b99b6424` until the correction); its publication alone did not
-resolve the problem. The correction belongs in Donut-authored context, rather
-than the installed public `dough-*` skills.
+DD-205 already followed an earlier correction of Donut DD-202 (not the DD-202
+that became ODF-208): `18b99b6424` and `52460a4077` put the local convention in
+always-loaded guidance on October 3. Its two later executions each wrote and
+removed proof. Guidance publication and isolated demonstrations have therefore
+not yet established effectiveness on real removals.
 
 ### DD-205 — A plan's proof named an absence check that the project's removal rule forbids
 
@@ -93,6 +93,40 @@ the next.
   - Evidence: plan proof row 10 prescribed writing a leftover `dev.pid` holding the test process's PID. The test was run red, then green, and deleted once no code read that file; the coordinator's Learnings explicitly cite principle 7. The existing free-primary start test carries the replacement outcome.
   - Observed effect: another test written and deleted during one slice; the plan's prescribed permanent proof did not survive.
   - Inference: third recorded occurrence of the same Donut planning gap; use the replacement start behavior as retained proof.
+
+### DD-225 — A removal sweep's search terms matched a dated observation record, so the implementer reworded history to make the sweep return nothing
+
+Plan 064's sweep reading required searches for the removed control names to return nothing over the product. One name appeared in `docs/voice-input-observations.md`, a dated record of journeys run with that control.
+
+#### Occurrences
+- Execution: SEED-066#single-button-voice-input (first implementation commit 5c3ca7033b)
+  - Timestamp: 2026-10-10T22:17:00+09:00
+  - Tool: Claude Code
+  - Model: claude-opus-5-5
+  - Open Dough release: 0.3.58
+  - Evidence: slice 2 return, decision 3 (five mentions reworded to "requested (mid-speech) conversion", heading renamed, a seed link's anchor broken); the coordinator's anchor repair in `.planning/seeds/SEED-066-voice-input.md`; slice 2 refactor return ("a truthful rewrite means deleting or re-running the observation, which is an owner decision")
+  - Observed effect: a dated observation now describes an author-requested conversion the product does not offer; one planning link broke and was repaired during delivery; the question was left for the owner
+  - Inference: the removal rule and the plan's sweep did not say whether a dated observation record counts as documentation to sweep, to delete, or to leave
+
+Current qualification (2026-10-12): the observation document explicitly dates
+its evidence to October 3 and says it is not a guarantee about later revisions.
+“Requested conversion” can describe the original action. The recorded concern
+is unresolved evidence disposition and anchor churn, not confirmed falsification
+of the observations or a claim that the current product offers that action.
+
+### DD-227 — A slice plan asked for a test that the removed status line is absent, against the project's removal rule
+
+Plan 065 slice 5 listed "no `[role="status"]` anywhere" among its proof for removing the status line. The project's principle 7 forbids a check that a removed thing is absent.
+
+#### Occurrences
+- Execution: SEED-066#unobtrusive-selection-aware-spoken-title (first implementation commit 57a659f018)
+  - Timestamp: 2026-10-11T08:00:00+09:00
+  - Tool: Claude Code
+  - Model: claude-opus-5-5
+  - Open Dough release: 0.3.58
+  - Evidence: `7d062d701f:.planning/slice-plans/065-unobtrusive-spoken-title/PLAN.md` slice 5 Proof; `CLAUDE.md` principle 7 ("no check that it is absent"); the coordinator's slice 5 brief ("principle 7 overrides that: do not add absence assertions"); slice 5 return, decision 2
+  - Observed effect: the coordinator caught it while writing the brief and the test was not written; the plan had passed slice planning and a readiness assessment with the instruction in it
+  - Inference: planning checked the removal as deletion plus sweep in its scope text but not in each slice's proof list
 
 ## Open, not queued: Rebuilding a stale MinerU virtual environment
 
@@ -127,6 +161,25 @@ PDFs through the CLI.
   - Observed effect: one failed start and a short diagnosis before the UAT setup could continue.
   - Inference: the Development start's incremental build did not drop classes whose sources were deleted. Qualified: cause not investigated further.
 - Investigation (2026-10-03, SEED-067#stacks-survive-other-builds slice 2): not reproduced. In the default checkout, a compiled `@Service` and its injecting consumer were deleted with the stack stopped, then `pnpm dev` started healthy and Gradle removed the stale class; the same held with a concurrent `classes --rerun-tasks` build and with a build-cache restore. Linked-worktree probes also removed the classes. No writer found; the cause remains unknown. Owner decides whether to keep watching or drop.
+
+## Useful project practice (not an open problem)
+
+The following is a successful Donut-specific observation technique. It is not
+an unresolved defect and contributes neither to issue frequency nor priority.
+
+### DD-230 — An environment-only Flyway callback with a MySQL named lock held a real startup migration open for full-stack proof
+
+To observe the runner during a migration, the execution supplied `beforeMigrate.sql` through `SPRING_FLYWAY_LOCATIONS` from a directory outside the checkout; the file waited on a named lock that a separate session held and released. No product or test code and no delay option was added.
+
+#### Occurrences
+- Execution: SEED-067#start-e2e-after-migrations (first implementation commit f297a916c5)
+  - Timestamp: 2026-10-11T09:18:00+09:00
+  - Tool: Claude Code
+  - Model: claude-opus-5-5
+  - Open Dough release: 0.3.58
+  - Evidence: plan 066 Learnings "Slice 3" and "Slice 4" at `af62c7cd0a`; `sut.log` lines 148 to 234 in the execution worktree (`Executing SQL callback: beforeMigrate`, `Successfully applied 41 migrations`)
+  - Observed effect: both `pnpm e2e:hold` and `pnpm cy:run` were observed returning 503 during the held migration and resetting test data only after the first 200; each slice took about five minutes including startup
+  - Inference: useful practice: a timing fault was proved at the real boundary with a release barrier instead of a sleep or a stand-in response; it depends on the runner passing its environment to the backend, which was confirmed with `ps eww`
 
 ## Reopening
 
