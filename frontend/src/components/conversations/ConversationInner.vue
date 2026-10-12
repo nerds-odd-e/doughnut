@@ -14,6 +14,13 @@
   >
     <template #header-actions>
       <slot name="header-actions" />
+      <button
+        v-if="canCheckDistinction"
+        class="daisy-btn daisy-btn-sm daisy-btn-outline"
+        @click="handleSendMessageAndInviteAI(practiceRequest)"
+      >
+        Check this distinction
+      </button>
     </template>
     <template #messages v-if="currentConversationMessages !== undefined">
       <div
@@ -159,6 +166,15 @@ watch(() => conversation, fetchConversationMessages)
 
 const handleSendMessageAndInviteAI = (message: string) =>
   handleSendMessage(message, true)
+
+const practiceRequest =
+  "Give me one different, related practice question. Wait for my answer before explaining it."
+
+const canCheckDistinction = computed(
+  () =>
+    conversation.subject?.recallPrompt &&
+    currentConversationMessages.value?.some((message) => !message.sender)
+)
 
 const defaultQuestions = [
   "Please explain the question and answer to me.",

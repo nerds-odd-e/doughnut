@@ -166,13 +166,13 @@ Proof: Installed recall-only guidance at `ConversationAiRequestBuilder`; coordin
 ### 10. Check the distinction without another Grade
 
 Type: Behavior
-Status: planned
+Status: done
 
 Sizing: about five minutes of change plus joined-flow verification.
 
 Behavior: After an explanation, an explicit optional check asks one changed example about the same distinction. The learner responds before feedback, can discuss it further or leave, and can later reopen the question/response/ feedback exchange. Their original Grade, tracker and schedule stay authoritative.
 
-Proof: Mounted conversation/recall parent drives explanation → check request → question → learner response → feedback → close/reopen, with scripted HTTP/model responses only for interaction proof. Controller message-loop proof reloads the transcript from storage and observes the same original Answer/RecallLog and tracker state across practice. The real model rubric in slice 3 owns question quality and answer withholding. Practice uses ordinary messages, not the recall answer endpoint, a regenerated prompt, or a structured exercise state machine.
+Proof: Accepted `RecallPage.practice.spec.ts`: real choice/answer → explanation → exact optional check request → question → learner reasoning → feedback → close/reopen six HTTP stored messages, same selected answer/progress/queue and one answer submission. `RecallConversationPracticeControllerTest` drives the actual original answer and DB message loop, reloads six messages/roles, and compares unchanged Answer id/choice/outcome/correctness, RecallLog ids/Grades/answer ids and tracker stability/difficulty/last/next/count. Full Nix-prefixed backend suite passed (2776 tests, no failures/errors, 2 skips), headless frontend suite passed (342 files/2156 tests), both frontend typechecks passed; independent refactor found no edits. The slice 3 real model rubric owns quality/withholding; practice uses ordinary messages and preserves installed guidance.
 
 ### 11. Carry a useful clarification into authorized refinement
 
