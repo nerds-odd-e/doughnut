@@ -109,7 +109,7 @@ The temporary test and edits were removed afterwards.
 ### 1. Toolbar controls stay on one row
 
 Type: Behavior
-Status: planned
+Status: done
 Proof: A new real-layout toolbar test at 390px asserts every visible toolbar
 control shares one top and the last is More options; at 414px Questions for
 the note is on the bar, and back at 390px it is not; at 640px all ten actions
@@ -151,4 +151,23 @@ selecting Trash note starts the same action as the toolbar button.
 
 ## Learnings
 
-None yet.
+- `daisy-btn-group` carries no styles in the installed daisyUI, so the button
+  row's layout comes only from its utility classes (`flex flex-1 min-w-0`).
+- The fit measurement reads the button row itself: `NoteToolbar.vue` passes
+  the row element to `NoteToolbarMoreOptions.vue`, and
+  `tests/helpers/mockNoteToolbarNavWidth.ts` sets its fixed width on that row.
+- Real-layout setup for slice 2: `mountToolbarInNotebookColumnAt(width)` in
+  `tests/notes/NoteToolbar.realLayout.spec.ts`; `mountNoteToolbar` accepts
+  `attachTo`.
+
+## Story obligations
+
+### G1. Toolbar look when every action fits was not compared
+Reported: slice 1 — "The 'everything fits' look is covered only by the 640px test (ten actions, no More options); I did not compare it visually or pixel-wise with the previous rendering."
+Story clause: "the toolbar when every action fits"
+Disposition: proved by slice 1: coordinator measurement on 2026-10-12 of the toolbar and its ten controls at 640px in the real-layout mount, with and without the row's layout classes — every left, top, width and height identical; `tests/notes/NoteToolbar.realLayout.spec.ts` "shows all ten actions and no more options at 640px"
+
+### G2. Only 390px, 414px and 640px are exercised
+Reported: slice 1 — "Only 390, 414 and 640px are exercised. The plan's 300–560px sweep was not repeated."
+Story clause: "The row stays single at every width in between."
+Disposition: proved by slice 1: the button row in `frontend/src/components/notes/core/NoteToolbar.vue` is a non-wrapping flex line, so no width can produce a second row; `tests/notes/NoteToolbar.realLayout.spec.ts` "keeps every control on one row as a phone-wide screen widens and narrows" observes it at 390px, 414px and 390px again

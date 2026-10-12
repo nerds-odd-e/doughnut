@@ -56,7 +56,7 @@ import {
 
 const props = defineProps<{
   note: Note
-  toolbarNav: HTMLElement | null
+  buttonRow: HTMLElement | null
   asMarkdown?: boolean
   hasNewNote?: boolean
 }>()
@@ -116,20 +116,18 @@ const sameIds = (
   left.length === right.length && left.every((id, index) => id === right[index])
 
 const measureAndCompute = () => {
-  const nav = props.toolbarNav
-  if (!nav) return
-  const group = nav.querySelector(".daisy-btn-group")
-  if (!(group instanceof HTMLElement)) return
+  const row = props.buttonRow
+  if (!row) return
 
   for (const id of NOTE_TOOLBAR_MORE_OPTIONS_ORDER) {
     const el = noteToolbarOverflowTitles(id)
-      .map((title) => controlByTitle(group, title))
+      .map((title) => controlByTitle(row, title))
       .find((found) => found !== null)
     const width = el?.offsetWidth ?? 0
     if (width > 0) cachedWidths[id] = width
   }
 
-  const overflowEl = controlByTitle(group, noteMoreOptionsTitles.overflowMenu)
+  const overflowEl = controlByTitle(row, noteMoreOptionsTitles.overflowMenu)
   const overflowWidth = overflowEl?.offsetWidth ?? 0
   if (overflowWidth > 0) cachedOverflowButtonWidth = overflowWidth
 
@@ -140,7 +138,7 @@ const measureAndCompute = () => {
     pinnedIds: pinnedIds.value,
     widthById: cachedWidths,
     overflowButtonWidth: cachedOverflowButtonWidth,
-    availableWidth: nav.clientWidth,
+    availableWidth: row.clientWidth,
   })
   if (!sameIds(overflowedIds.value, nextOverflowedIds)) {
     overflowedIds.value = nextOverflowedIds
@@ -160,7 +158,7 @@ const scheduleUpdate = () => {
 }
 
 watch(
-  () => props.toolbarNav,
+  () => props.buttonRow,
   (el, _, onCleanup) => {
     if (!el) return
     scheduleUpdate()
