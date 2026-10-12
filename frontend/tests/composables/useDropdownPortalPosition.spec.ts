@@ -61,11 +61,31 @@ describe("dropdownPortalPlacement", () => {
 
     it("places panel below and right-aligned for bottom end", () => {
       expect(
+        computeDropdownPortalStyle(anchor, 100, 120, {
+          side: "bottom",
+          align: "end",
+        })
+      ).toEqual({ top: "240px", left: "40px" })
+    })
+
+    it("keeps a panel wider than the space left of its button inside the screen", () => {
+      expect(
         computeDropdownPortalStyle(anchor, 200, 120, {
           side: "bottom",
           align: "end",
         })
-      ).toEqual({ top: "240px", left: "-60px" })
+      ).toEqual({ top: "240px", left: "8px" })
+    })
+
+    it("keeps a panel wider than the space right of its button inside the screen", () => {
+      const screenWidth = document.documentElement.clientWidth
+      const anchorNearRightEdge = new DOMRect(screenWidth - 40, 200, 40, 32)
+      expect(
+        computeDropdownPortalStyle(anchorNearRightEdge, 200, 120, {
+          side: "top",
+          align: "start",
+        })
+      ).toEqual({ top: "72px", left: `${screenWidth - 208}px` })
     })
 
     it("places panel above for top start", () => {

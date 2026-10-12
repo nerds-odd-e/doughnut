@@ -5,7 +5,7 @@ responses under observation live in the [watch list](https://github.com/terryyin
 Detailed observations, original releases and qualified inferences are retained
 in the linked Open Dough catalog. Unknown execution provenance remains unknown.
 
-- Highest allocated local number: 233. Removed numbers are never reused.
+- Highest allocated local number: 235. Removed numbers are never reused.
 - Full source recovery before this cleanup: `0a8878e98be76b8e92203515d8f4719489b24169:DearDough.md`.
 - Project-owned findings remain in [Donut Retrospective Findings](DonutRetrospectiveFindings.md); their ownership review is unchanged.
 
@@ -177,3 +177,39 @@ The coordinator combined complete execution references and an unbounded tool-met
   - Evidence: dashboard launch fb81e2c8-229c-473e-ba0c-0df74a951f5e, first two startup functions.exec responses on 2026-10-12 reported 20,868 and 20,631 original output tokens and truncation; subsequent calls retrieved the plan, seed, and individual execution references again before slice 1 delegation
   - Observed effect: the startup outputs did not expose all requested context; additional targeted reads were needed
   - Inference: limiting each read to the next execution boundary and bounding metadata discovery would avoid this duplication; no elapsed-time or total-token saving was measured
+- Execution: SEED-075#story-1 (first implementation commit 723e69c4835c9124e3387ecc999559ec0bbac95d)
+  - Timestamp: unknown
+  - Tool: Claude Code
+  - Model: claude-opus-5-5
+  - Open Dough release: 0.3.60
+  - Evidence: dashboard launch 1c7f003f-4c5f-49e6-92f2-404ce5e48cf8 on 2026-10-12; two startup Bash reads that concatenated whole execution references returned "Output too large" (30.5KB and 32.2KB) with a 2KB preview, and each was then read again in full through a second call before slice 1 delegation
+  - Observed effect: about 1,700 lines of references were loaded before a two-slice execution, two of the reads twice
+  - Inference: reading only the passages the next boundary needed would have avoided the second calls; no token or time saving was measured
+
+## DD-234 — A comparison of empty captures was printed as a match
+
+During proof acceptance the coordinator compared two captured measurements with `diff ... && echo SAME`. The output filter had matched nothing, so both captures were empty and the command printed `SAME`. The coordinator noticed the empty files and repeated the measurement; a third attempt was needed because the test command ran from the wrong directory. An agent execution deviation, not missing workflow guidance.
+
+### Occurrences
+- Execution: SEED-075#story-1 (first implementation commit 723e69c4835c9124e3387ecc999559ec0bbac95d)
+  - Timestamp: unknown
+  - Tool: Claude Code
+  - Model: claude-opus-5-5
+  - Open Dough release: 0.3.60
+  - Evidence: dashboard launch 1c7f003f-4c5f-49e6-92f2-404ce5e48cf8 on 2026-10-12, slice 1 proof acceptance; four Bash runs of a temporary toolbar-position spec, the first two printing `SAME` for two 0-line captures, the third failing with `Command "frontend:test" not found`, the fourth showing identical control positions before and after the change
+  - Observed effect: three extra measurement runs; the story obligation G1 was accepted only on the fourth, non-empty comparison
+  - Inference: asserting that a capture is non-empty before comparing it would have exposed the first failure at once
+
+## DD-235 — A later slice's failing example was already cured by the earlier slice
+
+The plan recorded each symptom only on unchanged code. Slice 2's proof named the More options menu off screen at 390px and at 320px, but slice 1's corrected measurement already put the 390px menu inside the screen, so the 390px case passes with and without slice 2's change. Possibly related to ODF-074; the premise here was observed, only not re-observed after the earlier planned change.
+
+### Occurrences
+- Execution: SEED-075#story-1 (first implementation commit 723e69c4835c9124e3387ecc999559ec0bbac95d)
+  - Timestamp: unknown
+  - Tool: Claude Code
+  - Model: claude-opus-5-5
+  - Open Dough release: 0.3.60
+  - Evidence: `.planning/slice-plans/004-mobile-note-toolbar-one-row/PLAN.md` at 011af9ee1eb95af54fe65df5c1d2ff06821e8de2, settled premises (390px menu at left −206px on unchanged code) and slice 2 proof; slice 2 implementation return measured 45px to 325px at 390px before its change and −5px at 320px
+  - Observed effect: one of the two planned real-layout menu cases does not discriminate the slice's change; the 320px case does
+  - Inference: observing the later slice's symptom with the earlier slice's temporary edit applied would have shown which example carries the proof
