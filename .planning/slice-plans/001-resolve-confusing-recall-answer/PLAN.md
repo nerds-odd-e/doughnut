@@ -155,13 +155,13 @@ Proof: Accepted `RecallPage.privateHelp.spec.ts`: actual second-choice click and
 ### 9. Explain the learner's reasoning and accept clarification
 
 Type: Behavior
-Status: planned
+Status: done
 
 Sizing: about five minutes of change plus backend/frontend verification.
 
 Behavior: The learner can request an explanation immediately or provide why a choice seemed right. The reply addresses that reasoning and the original attempt; the learner can correct a tentative interpretation in a further turn.
 
-Proof: Install the guidance observed in slices 2 and 3 at the existing recall conversation request owner. Controller request capture proves original question, selected answer, tested focus, rationale, current note context and actual learner message reach the external boundary. A mounted conversation exercises both the explanation shortcut and free reasoning/disagreement through ordinary send/reply. Persisted replies survive reload. Guidance distinguishes uncertain evidence from learner failure. Any material prompt change from the retained observations repeats its relevant real-service observation; keyword assertions alone prove no teaching quality.
+Proof: Installed recall-only guidance at `ConversationAiRequestBuilder`; coordinator compared its Java text-block content byte-for-byte with the validated 1859-character protocol. `RecallConversationReasoningControllerTest` captures original stem/choices/key/selected index/result/focus/rationale separately from changed current note content, and persisted reasoning/reply/correction roles after DB reload. `ConversationInner.reasoning.spec.ts` drives neutral explanation, free reasoning and disagreement through HTTP/SSE completion, then remounts all six stored messages. Full Nix-prefixed backend suite passed (2775 tests, no failures/errors, 2 skips), headless frontend suite passed (341 files/2155 tests), and both frontend typechecks passed. Independent refactor found no edits. Formatting changed an explicit undefined mock return to void; the commit hook caught its type error. Returning the saved message, reformatting, and fresh full frontend/typechecks passed before commit. Teaching quality remains with slices 2/3; no further paid calls or material prompt change.
 
 ### 10. Check the distinction without another Grade
 

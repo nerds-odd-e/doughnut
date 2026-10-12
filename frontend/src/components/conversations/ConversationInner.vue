@@ -161,9 +161,9 @@ const handleSendMessageAndInviteAI = (message: string) =>
   handleSendMessage(message, true)
 
 const defaultQuestions = [
+  "Please explain the question and answer to me.",
   "Why is my answer wrong?",
   "I think the question is wrong. Please check.",
-  "Please explain the question and answer to me.",
   "Why are other choices incorrect?",
 ]
 
