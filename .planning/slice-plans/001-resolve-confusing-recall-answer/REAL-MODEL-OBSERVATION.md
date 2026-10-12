@@ -132,7 +132,7 @@ The complete six-reply transcript and exact returned tool arguments are retained
 - Practice-response feedback: unobserved. c4 was skipped because an ordinary question did not exist to answer. Mocked responses cannot fill that gap.
 - Ambiguity: passed. a1/a2 recognize both 2 and 4 as even and examine the objection without insisting the learner forgot.
 - Uncertainty and Grade: a3 distinguishes the flawed question/key from the learner's reasoning. Actual Answer, RecallLog and tracker snapshots before and after all turns match. This is not full practice-loop proof.
-- This was one illustrative HTTP observation, not representative-user, efficacy, or mounted-UI evidence. Mounted interaction was assigned to original slices 5–7 (refined slices 7–9).
+- This was one illustrative HTTP observation, not representative-user, efficacy, or mounted-UI evidence. Mounted interaction was assigned to original slices 5–7 (current slices 8–10).
 
 Active probe work was about seven minutes, exceeding the five-minute target because setup/fixture work required more than anticipated, but under the 10-minute hard limit. Startup/model waits were recorded separately. Both holds reached terminal shutdown; the successful hold ended with exit 0, its lock released and owned app processes stopped. The exact probe patch was restored. No permanent product code was changed.
 

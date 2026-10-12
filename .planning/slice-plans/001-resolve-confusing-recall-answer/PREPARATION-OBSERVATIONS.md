@@ -22,7 +22,7 @@ Inspected owners and observation locations: `ConversationMessageController`, `Co
 
 ### Existing refinement consumer
 
-A further full backend run passed with 2738 tests, zero failures/errors, two skipped in 51s. Its additional contest probe and limitations are retained with their owning [story 6](../../seeds/SEED-073-learning-refinement-and-retrieval.md#story-6). That run also passed `AiControllerNoteRefinementTest.GenerateRefinementSuggestions.shouldAppendQuestionLedGuidanceWhenQuestionContextProvided`. Its capture of the consumed mocked Responses request observes stem, choices, correct answer and tested focus. This establishes the existing question-context route. Selected answer and reviewed clarification are new behavior in original slice 8 (refined slice 10). Neither observation establishes quality of the external model's judgment.
+A further full backend run passed with 2738 tests, zero failures/errors, two skipped in 51s. Its additional contest probe and limitations are retained with their owning [story 6](../../seeds/SEED-073-learning-refinement-and-retrieval.md#story-6). That run also passed `AiControllerNoteRefinementTest.GenerateRefinementSuggestions.shouldAppendQuestionLedGuidanceWhenQuestionContextProvided`. Its capture of the consumed mocked Responses request observes stem, choices, correct answer and tested focus. This establishes the existing question-context route. Selected answer and reviewed clarification are new behavior in original slice 8 (current slice 11). Neither observation establishes quality of the external model's judgment.
 
 ### Frontend routes and proof discrimination
 
@@ -38,7 +38,7 @@ Discrimination command:
 CURSOR_DEV=true nix develop -c pnpm frontend:test tests/toolbars/MainMenu.resume.spec.ts tests/pages/RecallPage.dueQueue.spec.ts tests/pages/MessageCenterPage.subject.spec.ts
 ```
 
-Temporary removal of recall-subject rendering, reset of the catch-up queue index, and removal of Resume's route push produced three expected failures (16 other tests passed, 5.28s): the question stem disappeared, the queue lost its preserved repeated tracker, and Resume remained on `root`. All mutations were restored. This settles those reused component contracts and the local runner; it does not prove a full Message Center round trip. The queue test owns its KeepAlive wrapper. Original slice 5 (refined slice 7) instead proves the new contextual open/close journey from its real parent, and original slice 7 (refined slice 9) proves the joined learning loop.
+Temporary removal of recall-subject rendering, reset of the catch-up queue index, and removal of Resume's route push produced three expected failures (16 other tests passed, 5.28s): the question stem disappeared, the queue lost its preserved repeated tracker, and Resume remained on `root`. All mutations were restored. This settles those reused component contracts and the local runner; it does not prove a full Message Center round trip. The queue test owns its KeepAlive wrapper. Original slice 5 (current slice 8) instead proves the new contextual open/close journey from its real parent, and original slice 7 (current slice 10) proves the joined learning loop.
 
 ### Premises bounded by the early probe
 

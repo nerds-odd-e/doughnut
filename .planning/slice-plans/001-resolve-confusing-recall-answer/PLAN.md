@@ -42,14 +42,15 @@ No new North Star topic or ADR is warranted for this bounded reuse. Future gradi
 
 | Promise from the source | Owner | Observable proof |
 | --- | --- | --- |
-| Explanation addresses the chosen distractor and supplied reasoning; learner can correct a tentative interpretation | 2, 8 | Real model transcript rubric in the early probe; controller captures the consumed AI request; mounted conversation sends reasoning and disagreement and shows returned replies |
-| Private help is for the attempt owner; notebook owner/circle membership does not grant it | 5 | Controller creation, direct reads/messages/send/AI/export and inbox/unread observations for learner, notebook owner and another member; retained legacy shared access proves compatibility |
-| Same-attempt continuation and retained exchange | 6, 9 | Repeated start returns the compatible thread; shared older thread retains its audience; DB reload returns question, practice answer and feedback |
-| Clear entry from answer/history, original context, optional reasoning, easy return to unchanged recall progress | 7 | Mounted real recall/history parent with backend HTTP mocked opens help for the selected attempt; two history items have distinct controls; closing restores the same answer/session and focus |
-| Related practice waits for response, then gives feedback; original Grade and schedule remain authoritative | 3, 9 | Real transcript rubric plus controller message loop with actual pre/post tracker and RecallLog; mounted explicit check action, response, feedback and close/reopen journey |
-| A note problem can reach existing refinement with relevant context under author permission | 10 | Mounted handoff supplies selected answer and reviewed clarification; AiController request capture observes those values at the refinement model boundary; existing ordinary refinement remains available |
-| Suspected question ambiguity is examined and retained without presenting conversation as formal adjudication | 2, 8 | Ambiguity rubric and persisted reasoning/disagreement exchange; formal post-answer action is owned by story 6 |
-| Evidence stays private/server-side, and source uncertainty is not portrayed as learner failure | 5, 8, 10 | Access refusal and explicit refinement payload boundaries; request contract and real model ambiguity case; no new Portable-content store or auto-write path |
+| Explanation addresses the chosen distractor and supplied reasoning; learner can correct a tentative interpretation | 2, 9 | Real model transcript rubric in the early probe; controller captures the consumed AI request; mounted conversation sends reasoning and disagreement and shows returned replies |
+| Private help is for the attempt owner; notebook owner/circle membership does not grant it | 5 | Controller creation, direct subject/messages/send/AI/export/mark-read authorization and inbox/unread exclusion for learner, notebook owner and another member; retained legacy shared access proves compatibility |
+| Private help is identifiable for later reading; incoming replies remain unread until marked read | 6 | List-controller audience labels plus actual streamed assistant-message persistence, UserController unread menu and mark-read, retaining existing human-message behavior |
+| Same-attempt continuation and retained exchange | 7, 10 | Repeated start returns the compatible thread; shared older thread retains its audience; DB reload returns question, practice answer and feedback |
+| Clear entry from answer/history, original context, optional reasoning, easy return to unchanged recall progress | 8 | Mounted real recall/history parent with backend HTTP mocked opens help for the selected attempt; two history items have distinct controls; closing restores the same answer/session and focus |
+| Related practice waits for response, then gives feedback; original Grade and schedule remain authoritative | 3, 10 | Real transcript rubric plus controller message loop with actual pre/post tracker and RecallLog; mounted explicit check action, response, feedback and close/reopen journey |
+| A note problem can reach existing refinement with relevant context under author permission | 11 | Mounted handoff supplies selected answer and reviewed clarification; AiController request capture observes those values at the refinement model boundary; existing ordinary refinement remains available |
+| Suspected question ambiguity is examined and retained without presenting conversation as formal adjudication | 2, 9 | Ambiguity rubric and persisted reasoning/disagreement exchange; formal post-answer action is owned by story 6 |
+| Evidence stays private/server-side, and source uncertainty is not portrayed as learner failure | 5, 9, 11 | Access refusal and explicit refinement payload boundaries; request contract and real model ambiguity case; no new Portable-content store or auto-write path |
 
 These are surviving behavior and active authorization-refusal proofs. No removal or permanent absence-check project is part of this plan. Existing tests are extended at their real boundaries, not copied into tests of internal helpers.
 
@@ -64,7 +65,6 @@ Slice statuses record accepted execution proof; publication receipts remain in t
 ### 1. Prepare fixed answered attempts in the isolated route
 
 Type: Structure
-
 Status: done
 
 Sizing: at most five minutes active fixture/setup work; external startup waits remain separate. Reuse the inspected setup rather than repeat it.
@@ -76,33 +76,30 @@ Proof: The recorded route reaches readiness; exported conversation requests cons
 ### 2. Validate explanation, correction and ambiguity
 
 Type: Behavior
-
 Status: done
 
 Sizing: at most five minutes active transcript/rubric work; model waits are separate.
 
 Behavior: Given the fixed answered attempts and learner reasoning, the real conversation reply explains the causal distinction, adapts to corrected interpretation, and examines both defensible answers to the ambiguous even-number question.
 
-Proof: The original c1/c2 and a1–a3 [transcript](REAL-MODEL-TRANSCRIPT.md) and [rubric](REAL-MODEL-OBSERVATION.md#rubric-and-retained-limits) retain their exact original guidance/revision. The follow-up changes only the practice directive, so these explanation/ambiguity observations remain compatible within that boundary; they were not rerun under revised guidance. No efficacy inference. Failed/unavailable quality stops dependent slices 3–10.
+Proof: The original c1/c2 and a1–a3 [transcript](REAL-MODEL-TRANSCRIPT.md) and [rubric](REAL-MODEL-OBSERVATION.md#rubric-and-retained-limits) retain their exact original guidance/revision. The follow-up changes only the practice directive, so these explanation/ambiguity observations remain compatible within that boundary; they were not rerun under revised guidance. No efficacy inference. Failed/unavailable quality stops dependent slices 3–11.
 
 ### 3. Validate ordinary changed practice and response feedback
 
 Type: Behavior
-
 Status: done
 
 Sizing: at most five minutes active practice protocol/rubric work; model waits are separate. Reuse the two already observed replies.
 
 Behavior: After an explanation, a requested changed example is an ordinary assistant message, withholds the key/reasoning until the learner responds, then gives feedback on that actual response and retains the exchange without changing the original Grade.
 
-Proof: [Follow-up evidence](PRACTICE-FOLLOWUP-OBSERVATION.md) records the exact revised guidance, actual c3 question → c4 learner answer → feedback, later controller message reads and byte-identical Answer/RecallLog/tracker snapshots. Its four seeded c1/c2 messages are starting context only. Coordinator accepted the consuming export, actual question/response/feedback controller reads and unchanged snapshots; G1 is proved here; mounted interaction remains with slices 7–9. Failed/unavailable quality stops production slices 4–10.
+Proof: [Follow-up evidence](PRACTICE-FOLLOWUP-OBSERVATION.md) records the exact revised guidance, actual c3 question → c4 learner answer → feedback, later controller message reads and byte-identical Answer/RecallLog/tracker snapshots. Its four seeded c1/c2 messages are starting context only. Coordinator accepted the consuming export, actual question/response/feedback controller reads and unchanged snapshots; G1 is proved here; mounted interaction remains with slices 8–10. Failed/unavailable quality stops production slices 4–11.
 
-The isolated paid route is `CURSOR_DEV=true nix develop -c pnpm e2e:hold --paid-openai`, using the existing conversation flow and manual-testing skill. Both runs were explicitly authorized; six original plus two follow-up AI replies exhaust the eight-reply cap. No further paid call is authorized. Preserve all failed-run evidence and use compatible observations; do not repeat them. Temporary guidance is restored; slice 8 installs the exact base plus ordinary-text practice directive. A material later prompt change needs its relevant authorized real-service observation, without waiving the cap or quality premise.
+The isolated paid route is `CURSOR_DEV=true nix develop -c pnpm e2e:hold --paid-openai`, using the existing conversation flow and manual-testing skill. Both runs were explicitly authorized; six original plus two follow-up AI replies exhaust the eight-reply cap. No further paid call is authorized. Preserve all failed-run evidence and use compatible observations; do not repeat them. Temporary guidance is restored; slice 9 installs the exact base plus ordinary-text practice directive. A material later prompt change needs its relevant authorized real-service observation, without waiving the cap or quality premise.
 
 ### 4. Name conversation access ownership coherently
 
 Type: Structure
-
 Status: done
 
 Sizing: about five minutes plus measured required verification/API generation.
@@ -111,22 +108,31 @@ Change: Express ownership of conversation access independently of its subject th
 
 Proof: Existing start/message/listing/menu/AI/export controller behavior remains green; regenerate the API if its public property changes and verify affected frontend types. Inspect consumers of the old field and partner labels, including generated types; use one existing access model rather than a parallel predicate. Accepted: `pnpm generateTypeScript`, full `pnpm backend:test_only` (2737 tests; 0 failures/errors, 2 skips), full headless `pnpm frontend:test` (338 files/2151 tests), both frontend `vue-tsc --noEmit`/`tsc --noEmit` and `pnpm openapi:lint`, all under `CURSOR_DEV=true nix develop -c`. Inspected the unchanged audience assertion in `ConversationStartControllerTest.StartConversationAboutRecallPrompt.setsRecallPromptAsSubject`, access/list JPQL, authorization getter and generated property. One-time consumer reading found no old camel/method consumers outside historical planning; the physical FK remains unchanged.
 
-### 5. Open help with the learner's private audience
+### 5. Protect access to the learner's private attempt help
 
 Type: Behavior
-
 Status: planned
 
-Sizing: 5–8 minutes including the backend suite; one cohesive access rule.
+Sizing: about five active minutes to restore scoped audience/entry changes and one confidentiality proof loop, plus the required backend suite. Reuse the parked prototype without restoring its label/unread-reply suffix.
 
-Behavior: Given an answered prompt owned by the learner, starting help creates a conversation under their personal access ownership. The learner can read and reply; note authorship/circle membership alone gives no access. Existing shared conversations retain their participants and ordinary behavior.
+Behavior: Given an answered prompt owned by the learner, starting help assigns their personal access ownership. The learner reads and replies; notebook authorship or membership grants neither direct access nor discovery. Existing shared conversations retain their audience.
 
-Proof: Controller tests create a shared-note learner fixture and exercise creation, direct subject/messages, sending, export, AI request, inbox and unread consumers of the common access rule. Another user's prompt cannot be used to create a private copy of their learning evidence. Keep one canonical refusal shape and assert only each channel's observable delta. Retained shared-thread access is compatibility proof. Adjust participant labels to identify personal help truthfully. These consumers belong together: no private entry ships with a discoverable/readable alternate path.
+Proof: Exercise actual creation, subject/messages, send, export, AI request, mark-read authorization, inbox listing and unread exclusion for learner, author and another circle member. Refuse creating help from another learner's prompt; retain legacy shared reads/replies. One canonical refusal shape plus each channel's delta proves the common access rule. For unread confidentiality use a stored non-null learner message against unauthorized actors, so existing null-sender filtering cannot conceal a leak. Positive incoming-AI unread and truthful private labels belong to slice 6. Fresh tests must prove this actual prefix; the [complete prototype](PRIVATE-ACCESS-PROTOTYPE-OBSERVATION.md) is reusable evidence, not verified restored code.
 
-### 6. Continue the same private attempt discussion
+### 6. Recognize private help and incoming replies in the inbox
 
 Type: Behavior
+Status: planned
 
+Sizing: about five active minutes to restore the scoped inbox changes and one list/menu/read proof loop, plus the required backend suite.
+
+Behavior: For the learner's private recall conversation, the inbox identifies its private audience. An actual stored incoming AI reply appears unread to its authorized learner until they mark it read; other notebook participants still cannot discover it. Existing shared/personal conversations keep truthful participant labels.
+
+Proof: Drive the real streamed reply with only OpenAI mocked, then observe the persisted reply, actual UserController menu and mark-read result. List-controller observations distinguish private help from legacy shared/personal audience labels. Correct the common incoming-message predicate to include null-sender AI replies while retaining existing human-message/read semantics and the same access predicate. G5/G6 are receiving obligations: until this slice, ordinary messages remain readable but the existing unread predicate excludes AI replies and the existing partner-label behavior remains. No second visibility rule or notification subsystem. Prove the actual restored suffix, not only the complete earlier prototype.
+
+### 7. Continue the same private attempt discussion
+
+Type: Behavior
 Status: planned
 
 Sizing: 5–8 minutes including repeat/overlapping-request handling and the required backend suite; reuse and creation are one identity-consistency rule.
@@ -135,10 +141,9 @@ Behavior: Starting help again for the same attempt finds the learner's compatibl
 
 Proof: Start-controller fixtures contain private and legacy shared threads; repeated start/reload observes the same private identity and messages and retained shared access. Observe the actual create/reuse operation, including overlapping requests if the chosen implementation admits duplicate creation. Resolve that at the existing transactional owner, without a second conversation registry.
 
-### 7. Open contextual help and return to the same recall
+### 8. Open contextual help and return to the same recall
 
 Type: Behavior
-
 Status: planned
 
 Sizing: 5–8 minutes including mounted proof/typechecks; one shared entry journey.
@@ -147,10 +152,9 @@ Behavior: From an answered MCQ or a particular history item, the learner opens c
 
 Proof: Mounted real parent pages/components use real conversation content and mock only HTTP. Observe chosen prompt ID, original question/selected answer, audience label, distinct history controls, and preserved current answer/queue after close. Reuse Modal and existing answer display; keep the same interaction keyboard-operable and give it a useful accessible name. Message Center subject rendering continues to work. A fixture that pre-supplies restored state is not proof of restoration; drive open and close in the same mounted parent.
 
-### 8. Explain the learner's reasoning and accept clarification
+### 9. Explain the learner's reasoning and accept clarification
 
 Type: Behavior
-
 Status: planned
 
 Sizing: about five minutes of change plus backend/frontend verification.
@@ -159,10 +163,9 @@ Behavior: The learner can request an explanation immediately or provide why a ch
 
 Proof: Install the guidance observed in slices 2 and 3 at the existing recall conversation request owner. Controller request capture proves original question, selected answer, tested focus, rationale, current note context and actual learner message reach the external boundary. A mounted conversation exercises both the explanation shortcut and free reasoning/disagreement through ordinary send/reply. Persisted replies survive reload. Guidance distinguishes uncertain evidence from learner failure. Any material prompt change from the retained observations repeats its relevant real-service observation; keyword assertions alone prove no teaching quality.
 
-### 9. Check the distinction without another Grade
+### 10. Check the distinction without another Grade
 
 Type: Behavior
-
 Status: planned
 
 Sizing: about five minutes of change plus joined-flow verification.
@@ -171,10 +174,9 @@ Behavior: After an explanation, an explicit optional check asks one changed exam
 
 Proof: Mounted conversation/recall parent drives explanation → check request → question → learner response → feedback → close/reopen, with scripted HTTP/model responses only for interaction proof. Controller message-loop proof reloads the transcript from storage and observes the same original Answer/RecallLog and tracker state across practice. The real model rubric in slice 3 owns question quality and answer withholding. Practice uses ordinary messages, not the recall answer endpoint, a regenerated prompt, or a structured exercise state machine.
 
-### 10. Carry a useful clarification into authorized refinement
+### 11. Carry a useful clarification into authorized refinement
 
 Type: Behavior
-
 Status: planned
 
 Sizing: 5–8 minutes; one contract change across its UI and AI consumer.
@@ -196,11 +198,14 @@ Follow the repository's unit-testing, backend/frontend, generated-API and E2E sk
 
 On 2026-10-12, original slice 1 accumulated about 10–11 minutes active work: roughly seven for the first setup/observation and 3–4 for practice recovery. Fixture preparation, route recovery and two quality loops disproved its five-minute setup/rubric premise and crossed the ten-minute hard limit; external startup/model waits are separate. Attempt-owned Java was restored and both holds shut down before refinement. Split that leaf into setup Structure (1), explanation/ambiguity (2), and practice (3); retain original production leaves 2–8 as 4–10. The common ordinary-transcript/access design and source scope are unchanged; no new exception, responsibility, or story split is justified.
 
-- Keep the core as one L-sized story because privacy, reasoning, transcript continuity and an ordinary practice turn form one usable loop. The ten leaves separate a bounded early probe, necessary structure and cohesive externally observable increments; they are not new product stories.
-- Slices 2 and 3 retain the early quality stop; the observed protocol correction needs coordinator acceptance before production work. Do not spend the rest of the story building a polished surface around an unvalidated explanation/check protocol.
+- Keep the L-sized story: accepted slices 1–4 delivered isolated setup, compatible model proof and coherent access naming. The remaining common transcript/audience model is understood. This separate access/inbox overrun justifies one bounded split; no numeric repeated-overrun threshold is supplied. Eleven leaves do not add scope or machinery.
+- Slices 2 and 3 have accepted quality proof. Preserve it; any material later prompt change still needs relevant authorized real-service observation.
 - Adding dedicated practice cards, mastery state, or author sharing changes this sizing premise. Return to story refinement and consider the vertical split "understand privately and resume" / "verify understanding with a follow-up" if needed; do not enlarge the plan silently.
 - The later contest/repair candidates are unqueued and unplanned. Their unresolved verdict authority and historical reach do not hold this story's scope open.
-- No application changes were made during preparation. The observed local backend/frontend contracts do not establish long-term learning efficacy.
+
+On 2026-10-12, the later private-audience slice 5 accumulated 10–11 active minutes across eight access consumers, proof writing and the existing unread defect. The [parked complete prototype](PRIVATE-ACCESS-PROTOTYPE-OBSERVATION.md) passed 2763 backend tests (0 failures/errors, 2 skips), but its overrun prevents acceptance/delivery. The coordinator parked only six attempt-owned paths and restored clean published `98996efafdb7847e36602aa5e477fe70d8d33255` before this refinement. Split confidentiality into slice 5 and the cohesive inbox label/incoming-reply loop into slice 6; previous remaining slices 6–10 become 7–11. No privacy channel is deferred. G5/G6 honestly own the unread/label suffix; each restored prefix needs current proof.
+
+The smallest authorized outcome remains private explanation/practice with later reading and recall return. Audience-only delivery without the inbox suffix would abandon its planned observation. Reuse the common incoming-message predicate and existing labels, rather than introducing per-help rules or a notification resource. The source, scope, queue and architectural direction are unchanged; the unrelated fixture and inbox overruns are preserved, not erased by splitting.
 
 ## Execution observation: real-model gate
 
@@ -220,7 +225,7 @@ Disposition: proved by slice 3: PRACTICE-FOLLOWUP-OBSERVATION.md, actual c3/c4 c
 ### G2. Mounted interaction remains unobserved by this probe (first reported in original slice 1)
 Reported: slice 1 — "HTTP evidence proves the returned payload and missing persistence; UI rendering was not inspected."
 Story clause: "Returning to recall preserves the learner's progress."
-Disposition: receiving slice 7
+Disposition: receiving slice 8
 
 ### G3. Illustrative observation has no efficacy inference (reported in original slice 1)
 Reported: slice 1 — "Illustrative fixed cases, one run; no representative learner or efficacy claim"
@@ -231,3 +236,13 @@ Disposition: no user cost "A learner confused by an answered MCQ can understand 
 Reported: slice 1 — "Startup first attempt cache packing failed during concurrent watcher/bootRun output; second sequentially precompiled start passed"
 Story clause: "A learner confused by an answered MCQ can understand the disputed distinction, try applying it, and return to recall without having to reconstruct the attempt or immediately reorganize the note."
 Disposition: no user cost "A learner confused by an answered MCQ can understand the disputed distinction, try applying it, and return to recall without having to reconstruct the attempt or immediately reorganize the note.": the held app reached owned readiness for the observation; a permanent development-runner repair is outside this product outcome, and the uncertain cause grants no waiver of future setup or proof.
+
+### G5. Incoming AI replies are omitted from unread messages (reported in pre-refinement slice 5)
+Reported: slice 5 — "unread JPQL has cm.sender != :user, which excludes null-sender AI replies"
+Story clause: "Retain the explanation and practice exchange for later reading."
+Disposition: receiving slice 6
+
+### G6. Explicit private audience label awaits the inbox suffix (reported in pre-refinement slice 5)
+Reported: slice 5 — "The private-access prefix retains existing partner labels; explicit private-help labelling remains for the inbox slice."
+Story clause: "From the answered MCQ, request help with the original attempt visible and the conversation audience clear."
+Disposition: receiving slice 6

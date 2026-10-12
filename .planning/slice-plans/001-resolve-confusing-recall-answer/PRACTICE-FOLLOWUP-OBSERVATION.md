@@ -113,7 +113,7 @@ Your response shows a clear understanding of the distinction between correlation
 
 ## Persisted turns and Grade baseline
 
-The c3 GET returned six messages: four seeded messages, learner request id 5 and new ordinary assistant question id 6 (`2026-10-12T06:43:36.652Z`). The c4 GET returned eight, adding actual learner answer id 7 and assistant feedback id 8 (`2026-10-12T06:43:57.728Z`). SSE text matches the corresponding stored question and feedback. Export before c4 consumed the persisted question and actual learner response. The new question, response and feedback survived subsequent real controller reads; mounted close/reopen is still slice 9 proof.
+The c3 GET returned six messages: four seeded messages, learner request id 5 and new ordinary assistant question id 6 (`2026-10-12T06:43:36.652Z`). The c4 GET returned eight, adding actual learner answer id 7 and assistant feedback id 8 (`2026-10-12T06:43:57.728Z`). SSE text matches the corresponding stored question and feedback. Export before c4 consumed the persisted question and actual learner response. The new question, response and feedback survived subsequent real controller reads; mounted close/reopen is still slice 10 proof.
 
 The following is the actual before-practice snapshot (Nix wrapper line retained). The after-practice snapshot was byte-identical; this comparison covers the fresh answered fixtures within this follow-up, not continuity across the held-runner fixture reset.
 
@@ -137,7 +137,7 @@ id	result	created_at	updated_at	choice_index	thinking_time_ms	spelling_answer	ou
 - Feedback: passed. c4 evaluates actual choice 2, addresses rain as a plausible common cause and choice 3 as a hypothesis exceeding the observation, and explains the need for causal evidence.
 - Retention and Grade: passed at HTTP/storage boundaries for the three new turns; actual Answer, RecallLog and MemoryTracker fields match before/after. Feedback describes this response without certifying lasting mastery.
 - Earlier explanation/ambiguity observations retain their original guidance/revision and illustrative-case limitations. The practice-only directive leaves their reasoning contract unchanged; compatibility is bounded, not evidence of another run.
-- Browser rendering, accessible interaction, privacy and mounted return/reopen were not observed. Refined slices 5–9 retain their production and mounted proof; this evidence does not substitute for them.
+- Browser rendering, accessible interaction, privacy and mounted return/reopen were not observed. Current slices 5–10 retain their production and mounted proof; this evidence does not substitute for them.
 - Two new replies on one illustrative fixed case establish neither representative-user success nor learning efficacy. All eight authorized replies are consumed. A materially changed future candidate requires separate authorization and relevant quality proof.
 
 Follow-up active setup/observation was about 3–4 minutes, with external startup/model waits separate. Together with the original roughly seven active minutes, original slice 1 crossed the ten-minute hard limit. [PLAN.md](PLAN.md#current-decisions-and-learnings) owns the consequent split; no timing exception erases that overrun. Owned held runner 63322 reached terminal exit 0 after Ctrl-C and released its allocation; the exact temporary Java guidance patch was restored after shutdown. No permanent product change was made.
