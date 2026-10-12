@@ -1,4 +1,5 @@
 import AiReplyEventSource from "@/managedApi/AiReplyEventSource"
+import { messageCenter } from "@/store/messageCenter"
 import { useRecallData } from "@/composables/useRecallData"
 import type { ConversationMessage } from "@generated/donut-backend-api"
 import {
@@ -61,6 +62,13 @@ it("retains an optional practice exchange and returns to the original answered r
     .forAnsweredQuestion(answered)
     .please()
   const transcript: ConversationMessage[] = []
+  const unrelated = { id: 76, message: "A reply in another discussion." }
+  messageCenter.unreadMessages = [unrelated]
+  const acknowledge = mockSdkServiceWithImplementation(
+    ConversationMessageController,
+    "markConversationAsRead",
+    () => [unrelated]
+  )
   mockSdkService(MemoryTrackerController, "getRecallPrompt", prompt)
   mockSdkService(MemoryTrackerController, "getThresholdExceeded", {
     thresholdExceeded: false,
@@ -121,9 +129,16 @@ it("retains an optional practice exchange and returns to the original answered r
   const finishReply = async (message: string) => {
     simulateAiResponse(message)
     await flushPromises()
-    transcript.push({ id: transcript.length + 1, message })
+    const savedReply = { id: transcript.length + 1, message }
+    transcript.push(savedReply)
+    messageCenter.unreadMessages = [savedReply, unrelated]
+    acknowledge.mockClear()
     getLastInstance()!.onMessageCallback("done", "")
     await flushPromises()
+    expect(acknowledge).toHaveBeenCalledWith({
+      path: { conversationId: conversation.id },
+    })
+    expect(messageCenter.unreadMessages).toEqual([unrelated])
     expect(
       dialog.querySelectorAll(".ai-assistant").item(transcript.length / 2 - 1)
         .textContent

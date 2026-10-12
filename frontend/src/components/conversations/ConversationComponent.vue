@@ -24,7 +24,6 @@
           user,
           isMaximized
         }"
-        @conversation-fetched="emit('conversation-fetched', $event)"
         @conversation-changed="handleConversationChange"
         @close-dialog="handleCloseDialog"
         @toggle-maximize="isMaximized = !isMaximized"
@@ -65,7 +64,6 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits<{
-  (e: "conversation-fetched", conversationId: number): void
   (e: "conversation-changed", conversationId: number): void
   (e: "close-dialog"): void
 }>()

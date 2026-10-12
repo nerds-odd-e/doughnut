@@ -134,13 +134,15 @@ Proof: Accepted behavior, sizing and consuming evidence remain at [slice 11](ACC
 ### 12. Acknowledge messages read through every conversation viewer
 
 Type: Behavior
-Status: planned
+Status: done
 
 Sizing: about five active minutes; hard ten, excluding required suite waits. One read-success owner covers contextual help, Message Center and direct NoteConversation consumers.
 
 Behavior: Successfully fetching visible stored messages acknowledges them through the existing backend read rule and updates the common unread store. Fetch failure does not acknowledge unseen messages. Existing audience rules and unrelated unread replies remain authoritative.
 
 Proof: The [runtime baseline](CONSUMER-BASELINE-OBSERVATIONS.md#read-acknowledgement) observes rendered reply 75 staying unread with no read call. Drive retained fetch and AI stream completion → persisted refetch → read HTTP response → updated unread store, retaining unrelated unread messages. Cover actual Message Center and NoteConversation consumers through the shared owner, and failed-fetch behavior. Existing controller read/privacy proof remains applicable. Run frontend suite and both typechecks; do not duplicate page/modal read rules.
+
+Accepted: `ConversationInner` owns successful fetch → read HTTP → authoritative unread-store replacement; `RecallPage.privateHelp`, `RecallPage.practice` and `ConversationReading` observe stored replies, SSE completion, actual Message Center/NoteConversation and failed fetch retaining unread replies. Full frontend suite: 344 files / 2,161 tests; both typechecks pass. Initial setup/import and unmocked-request failures were corrected before the passing rerun. Fresh refactor: none — already clean, proof unchanged. Active work eight–nine minutes excluding verification waits; single formatter passed. One-time product reading found zero obsolete fetched-event relay consumers; no permanent removal assertion was added.
 
 ### 13. Dismiss refinement while retaining contextual help
 
@@ -227,7 +229,7 @@ Disposition: proved by slice 6: PrivateRecallConversationControllerTest list-con
 ### G7. Contextual reading leaves retained replies unread (retrospective of slices 6/8)
 Reported: slice 8 — "The contextual help entry does not consume conversation-fetched, so visible stored replies remain unread."
 Story clause: "Retain the explanation and practice exchange for later reading."
-Disposition: receiving slice 12
+Disposition: proved by slice 12: RecallPage.privateHelp.spec.ts, RecallPage.practice.spec.ts and ConversationReading.spec.ts actual successful visible fetch/SSE persisted refetch consume read HTTP and update the common store while retaining unrelated unread replies; failed fetch preserves unread state
 
 ### G8. Nested refinement Escape closes contextual help (retrospective of slices 8/11)
 Reported: slice 11 — "The raw refinement dialog is outside modalStack; Escape pops contextual help and discards both dialogs."

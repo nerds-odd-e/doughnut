@@ -3,6 +3,7 @@ import {
   MemoryTrackerController,
   RecallPromptController,
 } from "@generated/donut-backend-api/sdk.gen"
+import { messageCenter } from "@/store/messageCenter"
 import { useRecallData } from "@/composables/useRecallData"
 import makeMe from "donut-test-fixtures/makeMe"
 import { mockSdkService } from "@tests/helpers"
@@ -48,7 +49,17 @@ it.each(["conversation close", "Escape"])(
       "startConversationAboutRecallPrompt",
       conversation
     )
-    mockSdkService(ConversationMessageController, "getConversationMessages", [])
+    const reply = { id: 75, message: "Association alone does not prove cause." }
+    const unrelated = { id: 76, message: "A reply in another discussion." }
+    messageCenter.unreadMessages = [reply, unrelated]
+    mockSdkService(ConversationMessageController, "getConversationMessages", [
+      reply,
+    ])
+    const markRead = mockSdkService(
+      ConversationMessageController,
+      "markConversationAsRead",
+      [unrelated]
+    )
     ctx.renderer.withCurrentUser(makeMe.aUser.please())
     givenRecallQueue(createMemoryTrackerLite(123), createMemoryTrackerLite(456))
     const wrapper = await ctx.mountPage({ attachTo: document.body })
@@ -73,6 +84,11 @@ it.each(["conversation close", "Escape"])(
       expect.objectContaining({ path: { recallPrompt: prompt.id } })
     )
     const dialog = document.querySelector<HTMLDialogElement>("dialog")!
+    expect(dialog.textContent).toContain(reply.message)
+    expect(markRead).toHaveBeenCalledWith({
+      path: { conversationId: conversation.id },
+    })
+    expect(messageCenter.unreadMessages).toEqual([unrelated])
     expect(dialog.open).toBe(true)
     expect(dialog.textContent).toContain("Private recall help")
     expect(dialog.textContent).toContain(prompt.mcq!.questionStem)

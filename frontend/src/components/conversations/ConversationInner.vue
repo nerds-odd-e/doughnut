@@ -76,6 +76,7 @@
 import { ref, onMounted, watch, computed } from "vue"
 import { ConversationMessageController } from "@generated/donut-backend-api/sdk.gen"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
+import { messageCenter } from "@/store/messageCenter"
 import type {
   User,
   ConversationMessage,
@@ -96,8 +97,7 @@ const { conversation, user, initialAiReply, isMaximized } = defineProps<{
   isMaximized?: boolean
 }>()
 
-const emit = defineEmits<{
-  (e: "conversation-fetched", conversationId: number): void
+defineEmits<{
   (e: "close-dialog"): void
   (e: "conversation-changed", conversationId: number): void
   (e: "new-conversation"): void
@@ -124,16 +124,23 @@ const formatMessage = (message: string) => message.replace(/^"|"$/g, "").trim()
 const isCurrentUser = (id: number): boolean => id === user?.id
 
 const fetchConversationMessages = async () => {
-  if (!conversation.id) return
+  const conversationId = conversation.id
+  if (!conversationId) return
 
   const { data: messages, error } =
     await ConversationMessageController.getConversationMessages({
-      path: { conversationId: conversation.id },
+      path: { conversationId },
     })
   if (!error) {
-    currentConversationMessages.value = messages!
+    currentConversationMessages.value = messages
+    const { data: unreadMessages, error: readError } =
+      await ConversationMessageController.markConversationAsRead({
+        path: { conversationId },
+      })
+    if (!readError) {
+      messageCenter.unreadMessages = unreadMessages!
+    }
   }
-  emit("conversation-fetched", conversation.id)
 }
 
 const handleSendMessage = async (

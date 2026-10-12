@@ -43,6 +43,7 @@ describe("ConversationInner", () => {
   let replyToConversationSpy: ReturnType<typeof mockSdkService>
 
   beforeEach(() => {
+    mockSdkService(ConversationMessageController, "markConversationAsRead", [])
     window.HTMLElement.prototype.scrollIntoView = vi.fn()
     mockShowNote()
     replyToConversationSpy = mockSdkService(

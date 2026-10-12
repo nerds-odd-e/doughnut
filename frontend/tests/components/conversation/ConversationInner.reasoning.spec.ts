@@ -2,7 +2,10 @@ import ConversationInner from "@/components/conversations/ConversationInner.vue"
 import AiReplyEventSource from "@/managedApi/AiReplyEventSource"
 import type { ConversationMessage } from "@generated/donut-backend-api"
 import { ConversationMessageController } from "@generated/donut-backend-api/sdk.gen"
-import helper, { mockSdkServiceWithImplementation } from "@tests/helpers"
+import helper, {
+  mockSdkService,
+  mockSdkServiceWithImplementation,
+} from "@tests/helpers"
 import {
   getLastInstance,
   resetInstance,
@@ -21,6 +24,7 @@ vi.mock("@/managedApi/AiReplyEventSource", async () => {
 
 describe("Recall conversation reasoning", () => {
   beforeEach(() => {
+    mockSdkService(ConversationMessageController, "markConversationAsRead", [])
     resetInstance()
     window.HTMLElement.prototype.scrollIntoView = vi.fn()
     vi.spyOn(AiReplyEventSource.prototype, "start").mockImplementation(vi.fn())
