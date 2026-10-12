@@ -83,7 +83,7 @@ separate from the retained proof above.
 
 ### 1. Removal briefs carry the proof of surviving behavior
 Type: Behavior
-Status: planned
+Status: done
 Proof: a one-time review of the mixed-change example demonstrates that the
 proof table, slice Proof, and implementation brief agree on button states,
 error feedback, and the active read-only boundary. Record the reviewed input,
@@ -106,6 +106,11 @@ owner. Do not invent a blanket exception to the removal rule.
 Use the historical plan named above as the challenging input. This reading
 must exercise individual proof items, not merely restate its scope paragraph.
 The next slice consumes the resulting rule in an actual delivery.
+
+Accepted: [historical proof-item review](EVIDENCE.md#slice-1-historical-proof-item-review)
+at the claim base plus the slice 1 diff. The independent refactor returned
+`none — already clean`, `## REFACTOR COMPLETE`, with all accepted boundaries
+unchanged. Coordinator selective formatting passed; no generator was triggered.
 
 Sizing: about 5 minutes for editing and the focused reading, plus normal
 delivery overhead. Stop-safe: the clarified guidance is usable independently;
@@ -154,6 +159,26 @@ links and independently retained observations are coherent in the same commit.
 
 ## Current decisions and delivery
 
+- Execution identity: `SEED-071#removal-proof-and-evidence-recurrence`,
+  publisher `dashboard-territory.local-doughnut`, agent Sola-chan; established
+  owned linked worktree
+  `/Users/terryyin/git/doughnut/.worktrees/make-donut-removal-handoffs-preserve-valid-proof`,
+  branch `codex/make-donut-removal-handoffs-preserve-valid-proof`, Story Branch
+  Mode. No integration checkout was supplied. Remote `origin`, trunk `main`;
+  increments target the recorded remote execution branch.
+  Starting revision `c0e0f4efeb4ef99f14eb0050394756335d32a4d8`; accepted claim
+  `0a0def3db215338e3e323741db85d58bf5ec50ed` confirmed on remote trunk and
+  execution branch. Preserve existing planning authority for overruns.
+- Checkout preparation: `./scripts/run.sh bash scripts/worktree_setup.sh`
+  succeeded with the checkout's current locked installation; applicable
+  `./scripts/run.sh pnpm diff:check` passed. The installed pre-commit hook
+  calls check-only `./scripts/run.sh pnpm lint:changed`.
+- CI: GitHub Actions `nerds-odd-e/doughnut`, verified `ci.yml` (`donut CI`),
+  push-triggered for the execution branch. Codex observer coordinator
+  `sola-removal-071`, cell `9`, session `23430`, PID `67362`, directory
+  `/tmp/dough-ci-501/watch-zSMV9y`, armed from this checkout against
+  `codex/make-donut-removal-handoffs-preserve-valid-proof`. The trunk claim
+  predates this branch observer and is unobserved by this execution.
 - Both leaves are Behavior: their external consumers are Donut's contributors
   and readers of its evidence. Each has one observation loop. The common rule
   is proof of what survives plus a one-time sweep reading; evidence disposition
@@ -177,4 +202,5 @@ links and independently retained observations are coherent in the same commit.
 
 ## Learnings
 
-None beyond the preparation observations above.
+The [handoff evidence](EVIDENCE.md) records the historical review and this
+story's actual implementation, independent refactor, and acceptance boundaries.
