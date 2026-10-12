@@ -22,7 +22,7 @@ A **"small test"** means: a fast, in-process unit test (JUnit, Vitest, Bach, …
 - **Canonical shape once.** Shared post-conditions belong in **one** test. Sibling scenarios assert only their delta.
 - **Different precondition ≠ re-assert unrelated post-condition.** If outcome X is clearly independent of what changed in the setup, do not repeat X.
 - Prefer asserting the **positive** signal over “not the other message/alert” when the positive already distinguishes the case.
-- When a change **removes** something, the tests are those of the behavior that survives or replaces it. Write no test, assertion, fixture, or mock that observes the removed thing (not called, absent, ignored). Rule: principle 7 in `AGENTS.md` / `CLAUDE.md`.
+- When a change **removes** something, the tests are those of the behavior that survives or replaces it. Write no test, assertion, fixture, or mock that observes the removed thing (not called, absent, ignored). Apply [removal proof](#removal-proof) to each proof item. Rule: principle 7 in `AGENTS.md` / `CLAUDE.md`.
 - In loops (thresholds, retries, frame polls), assert the **loop result**, not the same intermediate outcome every iteration.
 
 ```java
@@ -43,6 +43,31 @@ expect(wrapper.findAll('[data-testid^="wiki-link-or-relationship-to-matched-note
 // ✅
 expect(wrapper.findAll('[data-testid^="wiki-link-or-relationship-to-matched-note-"]')).toHaveLength(0)
 ```
+
+## Removal proof
+
+For a mixed change, inspect the individual assertions and observations in the
+proof table, slice Proof, and implementation brief. A scope statement about
+removal does not make a contradictory proof item acceptable.
+
+- **Surviving or replacement behavior:** retain the proof of button states,
+  error feedback, and other promised outcomes, and carry it through all three
+  handoff forms. A negative assertion can prove a surviving business outcome,
+  such as silent completion; classify by what it establishes, not its syntax.
+- **Actively enforced refusal:** retain its rejection proof, including a
+  read-only user's unavailable editing control. This establishes authorization
+  behavior the product still promises.
+- **Removed behavior or interface:** delete its assertions and the fixtures,
+  helpers, and mocks used only by them. Do not replace them with assertions
+  that it is absent, not called, or ignored.
+- **Sweep:** record the one-time acceptance search and classified result as a
+  reading in the plan, separately from surviving-behavior proof. Create no
+  permanent absence test or checker.
+
+The coordinator corrects inherited contradictions before delegation. An
+implementer or refactorer encountering one skips and reports that item while
+preserving valid proof; accepting a removal must not discard its surviving
+behavior's tests.
 
 ## Destructive operations (hard deletes, delete migrations)
 

@@ -5,7 +5,7 @@ responses under observation live in the [watch list](https://github.com/terryyin
 Detailed observations, original releases and qualified inferences are retained
 in the linked Open Dough catalog. Unknown execution provenance remains unknown.
 
-- Highest allocated local number: 232. Removed numbers are never reused.
+- Highest allocated local number: 233. Removed numbers are never reused.
 - Full source recovery before this cleanup: `0a8878e98be76b8e92203515d8f4719489b24169:DearDough.md`.
 - Project-owned findings remain in [Donut Retrospective Findings](DonutRetrospectiveFindings.md); their ownership review is unchanged.
 
@@ -164,3 +164,16 @@ Former local code: DD-229. A measurement plan assigns record/prototype work to t
 ## ODF-247 — Plan proof omits promised session endings
 
 Former local code: DD-231. A slice proof table omits explicit story end conditions, so implementers return it complete while listing those conditions untested; the coordinator needs second rounds to compare with the full story. Open, unqueued. [Evidence and response](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/finding-names.md#odf-247).
+
+## DD-233 — Broad startup reads exceeded the response budget and forced repeated retrieval
+
+The coordinator combined complete execution references and an unbounded tool-metadata listing, then batched another large context read. Both responses were truncated before first-slice delegation, so authoritative passages had to be retrieved again. The targeted-retrieval guidance already applied; this records an agent execution deviation rather than missing workflow guidance.
+
+### Occurrences
+- Execution: SEED-071#removal-proof-and-evidence-recurrence (first implementation commit 6fadfdbf13bd0e105042d0ff71cc404b36c7f577)
+  - Timestamp: unknown
+  - Tool: Codex
+  - Open Dough release: 0.3.60
+  - Evidence: dashboard launch fb81e2c8-229c-473e-ba0c-0df74a951f5e, first two startup functions.exec responses on 2026-10-12 reported 20,868 and 20,631 original output tokens and truncation; subsequent calls retrieved the plan, seed, and individual execution references again before slice 1 delegation
+  - Observed effect: the startup outputs did not expose all requested context; additional targeted reads were needed
+  - Inference: limiting each read to the next execution boundary and bounding metadata discovery would avoid this duplication; no elapsed-time or total-token saving was measured
