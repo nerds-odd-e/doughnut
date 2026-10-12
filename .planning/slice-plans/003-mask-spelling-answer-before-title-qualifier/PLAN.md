@@ -102,6 +102,12 @@ Work in this slice:
   and `[...] day is a hot weather`, and the `NoteTitleTest` case expects both
   fragments, whole title first, under a name that says so.
 
+## Execution complete
+
+Product advice: no backlog change. The review found no correction to plan.
+Full-width and nested parenthesized qualifiers stay deferred in the seed, as
+the story states.
+
 ## Current decisions
 
 - The shared list is `NoteTitle.getTitleFragments`; the masking-only name went

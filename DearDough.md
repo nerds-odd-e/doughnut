@@ -5,7 +5,7 @@ responses under observation live in the [watch list](https://github.com/terryyin
 Detailed observations, original releases and qualified inferences are retained
 in the linked Open Dough catalog. Unknown execution provenance remains unknown.
 
-- Highest allocated local number: 233. Removed numbers are never reused.
+- Highest allocated local number: 234. Removed numbers are never reused.
 - Full source recovery before this cleanup: `0a8878e98be76b8e92203515d8f4719489b24169:DearDough.md`.
 - Project-owned findings remain in [Donut Retrospective Findings](DonutRetrospectiveFindings.md); their ownership review is unchanged.
 
@@ -177,3 +177,17 @@ The coordinator combined complete execution references and an unbounded tool-met
   - Evidence: dashboard launch fb81e2c8-229c-473e-ba0c-0df74a951f5e, first two startup functions.exec responses on 2026-10-12 reported 20,868 and 20,631 original output tokens and truncation; subsequent calls retrieved the plan, seed, and individual execution references again before slice 1 delegation
   - Observed effect: the startup outputs did not expose all requested context; additional targeted reads were needed
   - Inference: limiting each read to the next execution boundary and bounding metadata discovery would avoid this duplication; no elapsed-time or total-token saving was measured
+
+## DD-234 — Defect noticed in a refactor return is repaired by the coordinator after the refactor pass
+
+A slice made one fragment list serve both answer matching and masking. Neither the plan's settled premises nor the implementation return covered a title with no text before its qualifier. The refactor return listed that shape as an "observation, not acted on". The coordinator then wrote a failing test, confirmed the defect, and changed production code itself after the refactor pass, with focused suites rerun but no fresh implementation or refactor pass and no full-suite rerun. The fix also changed one accepted answer for that title shape without an owner decision.
+
+### Occurrences
+- Execution: SEED-076#story-1 (first implementation commit 0e2fc686d5b008166c1ababdc8cb1c602448cfb7)
+  - Timestamp: 2026-10-12T17:20:00+09:00 (approximate, from the session clock)
+  - Tool: Claude Code
+  - Model: claude-opus-5-5
+  - Open Dough release: unknown
+  - Evidence: plan `.planning/slice-plans/003-mask-spelling-answer-before-title-qualifier/PLAN.md` Current decisions; test `spellingQuestionLeavesClueReadableWhenNoTitleTextPrecedesTheQualifier` failed before the guard with every word boundary masked for title `~(phase transition)`; refactor return section "Observation, not acted on"
+  - Observed effect: the defect was caught before publication, by the coordinator rather than by planned proof; the post-refactor edit had no independent refactor review
+  - Inference: when a rule is widened from matching to masking, checking the degenerate inputs of the shared value (empty fragment) in the plan's premises would have placed this in the implementation pass; generality is unverified from one occurrence
