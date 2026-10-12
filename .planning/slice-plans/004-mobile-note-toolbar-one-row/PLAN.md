@@ -143,6 +143,12 @@ Behavior: 320px-wide screen with actions in More options → the author opens
 More options → the whole menu is inside the screen's left and right edges and
 selecting Trash note starts the same action as the toolbar button.
 
+## Execution complete
+
+Product advice: no backlog change. Menus that open to the side of their
+button, and menus taller than the screen, are still not kept on screen; the
+story defers the tall-menu case and there is no report of either.
+
 ## Current decisions
 
 - The toolbar keeps the page's side margins (owner, 2026-10-12).
