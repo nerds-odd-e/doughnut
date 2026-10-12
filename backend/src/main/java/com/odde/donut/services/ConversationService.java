@@ -75,6 +75,11 @@ public class ConversationService {
       return initiator.getName();
     }
     Ownership ownership = conversation.getAccessOwnership();
+    if (conversation.getSubject().getRecallPrompt() != null
+        && ownership != null
+        && Objects.equals(ownership.getUser(), initiator)) {
+      return "Private recall help";
+    }
     if (ownership != null && ownership.getCircle() != null) {
       return ownership.getCircle().getName();
     }

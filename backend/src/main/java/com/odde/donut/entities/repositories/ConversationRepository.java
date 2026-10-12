@@ -37,7 +37,7 @@ public interface ConversationRepository extends CrudRepository<Conversation, Int
           + "WHERE ("
           + USER_CONVERSATION_CONDITION
           + ") "
-          + "AND cm.sender != :user "
+          + "AND (cm.sender IS NULL OR cm.sender != :user) "
           + "AND cm.readByReceiver IS NOT TRUE")
   List<ConversationMessage> findUnreadMessagesByUser(@Param("user") User user);
 }

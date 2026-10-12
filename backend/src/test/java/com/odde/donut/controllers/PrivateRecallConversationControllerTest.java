@@ -54,11 +54,8 @@ class PrivateRecallConversationControllerTest extends ConversationMessageControl
     author = makeMe.aUser().please();
     circleMember = makeMe.aUser().please();
     circle = makeMe.aCircle().hasMember(author).hasMember(learner).hasMember(circleMember).please();
-    Note note =
-        makeMe
-            .aNote()
-            .notebook(makeMe.aNotebook().creatorAndOwner(author).owner(circle).please())
-            .please();
+    var notebook = makeMe.aNotebook().creatorAndOwner(author).owner(circle).please();
+    Note note = makeMe.aNote().notebook(notebook).please();
     prompt =
         makeMe
             .aRecallPrompt()
@@ -107,16 +104,19 @@ class PrivateRecallConversationControllerTest extends ConversationMessageControl
     assertThat(
         controller.getConversationMessages(conversation).getLast().getMessage(),
         equalTo("The distinction"));
-    controller.markConversationAsRead(conversation);
-    makeMe.refresh(conversation);
-    assertThat(conversation.getConversationMessages().getLast().getReadByReceiver(), equalTo(true));
+    assertThat(
+        userController.getMenuData("Asia/Tokyo").getUnreadMessages(),
+        contains(conversation.getConversationMessages().getLast()));
+    assertThat(controller.markConversationAsRead(conversation), empty());
+    assertThat(userController.getMenuData("Asia/Tokyo").getUnreadMessages(), empty());
   }
 
   @Test
-  void learnerFindsHelpInTheirInbox() {
+  void learnerFindsTruthfullyLabelledHelpInTheirInbox() {
     var item = controller.getConversationsOfCurrentUser().getFirst();
 
     assertThat(item.id(), equalTo(conversation.getId()));
+    assertThat(item.partnerName(), equalTo("Private recall help"));
   }
 
   @Test
@@ -183,6 +183,19 @@ class PrivateRecallConversationControllerTest extends ConversationMessageControl
 
   @ParameterizedTest
   @EnumSource(OtherParticipant.class)
+  void notebookParticipantsCannotDiscoverPrivateAssistantMessages(OtherParticipant participant)
+      throws Exception {
+    new OpenAiResponseStreamMocker(officialClient)
+        .withMessage("Private explanation")
+        .mockStreamResponse();
+    controller.getAiReply(conversation);
+    currentUser.setUser(participant == OtherParticipant.AUTHOR ? author : circleMember);
+
+    assertThat(userController.getMenuData("Asia/Tokyo").getUnreadMessages(), empty());
+  }
+
+  @ParameterizedTest
+  @EnumSource(OtherParticipant.class)
   void notebookParticipantsCannotCopyAnotherLearnersAttempt(OtherParticipant participant) {
     currentUser.setUser(participant == OtherParticipant.AUTHOR ? author : circleMember);
 
@@ -193,7 +206,7 @@ class PrivateRecallConversationControllerTest extends ConversationMessageControl
 
   @ParameterizedTest
   @EnumSource(OtherParticipant.class)
-  void legacySharedHelpKeepsItsParticipants(OtherParticipant participant) throws Exception {
+  void legacySharedHelpKeepsItsParticipantsAndLabel(OtherParticipant participant) throws Exception {
     Conversation shared = makeMe.aConversation().forARecallPrompt(prompt).from(learner).please();
     currentUser.setUser(participant == OtherParticipant.AUTHOR ? author : circleMember);
 
@@ -201,5 +214,38 @@ class PrivateRecallConversationControllerTest extends ConversationMessageControl
     assertThat(
         controller.replyToConversation("Shared discussion", shared).getSender(),
         equalTo(currentUser.getUser()));
+    assertThat(
+        controller.getConversationsOfCurrentUser().getFirst().partnerName(),
+        equalTo(learner.getName()));
+  }
+
+  @Test
+  void learnerFindsLegacyCircleHelpWithItsSharedAudienceLabel() {
+    Conversation shared = makeMe.aConversation().forARecallPrompt(prompt).from(learner).please();
+
+    assertThat(inboxPartnerName(shared), equalTo(circle.getName()));
+  }
+
+  @Test
+  void legacyPersonalNotebookHelpKeepsItsOtherParticipantLabel() {
+    Note note = makeMe.aNote().notebookOwnedBy(author).please();
+    RecallPrompt otherPrompt =
+        makeMe
+            .aRecallPrompt()
+            .forMemoryTracker(makeMe.aMemoryTrackerFor(note).by(learner).please())
+            .withMcqForNote(note)
+            .please();
+    Conversation shared =
+        makeMe.aConversation().forARecallPrompt(otherPrompt).from(learner).please();
+
+    assertThat(inboxPartnerName(shared), equalTo(author.getName()));
+  }
+
+  private String inboxPartnerName(Conversation target) {
+    return controller.getConversationsOfCurrentUser().stream()
+        .filter(item -> item.id().equals(target.getId()))
+        .findFirst()
+        .orElseThrow()
+        .partnerName();
   }
 }

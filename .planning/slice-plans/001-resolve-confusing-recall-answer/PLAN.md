@@ -122,13 +122,13 @@ Proof: Accepted actual creation, subject/messages, send, export, AI request, mar
 ### 6. Recognize private help and incoming replies in the inbox
 
 Type: Behavior
-Status: planned
+Status: done
 
 Sizing: about five active minutes to restore the scoped inbox changes and one list/menu/read proof loop, plus the required backend suite.
 
 Behavior: For the learner's private recall conversation, the inbox identifies its private audience. An actual stored incoming AI reply appears unread to its authorized learner until they mark it read; other notebook participants still cannot discover it. Existing shared/personal conversations keep truthful participant labels.
 
-Proof: Drive the real streamed reply with only OpenAI mocked, then observe the persisted reply, actual UserController menu and mark-read result. List-controller observations distinguish private help from legacy shared/personal audience labels. Correct the common incoming-message predicate to include null-sender AI replies while retaining existing human-message/read semantics and the same access predicate. G5/G6 are receiving obligations: until this slice, ordinary messages remain readable but the existing unread predicate excludes AI replies and the existing partner-label behavior remains. No second visibility rule or notification subsystem. Prove the actual restored suffix, not only the complete earlier prototype.
+Proof: Accepted `PrivateRecallConversationControllerTest.learnerRequestsAndReadsAnAiReply`: actual streamed reply with only OpenAI mocked → persisted message → UserController unread menu → mark-read → empty menu. Author/member assistant discovery is refused; list observations distinguish private help and legacy circle/two-person labels. The common predicate includes null-sender AI replies with the same audience rule; existing human unread/read tests pass. Full `CURSOR_DEV=true nix develop -c pnpm backend:test_only` passed after independent test refactor: 2766 tests, no failures/errors, 2 skips, including all 29 private cases. G5/G6 are proved here. No second visibility or notification owner.
 
 ### 7. Continue the same private attempt discussion
 
@@ -240,9 +240,9 @@ Disposition: no user cost "A learner confused by an answered MCQ can understand 
 ### G5. Incoming AI replies are omitted from unread messages (reported in pre-refinement slice 5)
 Reported: slice 5 — "unread JPQL has cm.sender != :user, which excludes null-sender AI replies"
 Story clause: "Retain the explanation and practice exchange for later reading."
-Disposition: receiving slice 6
+Disposition: proved by slice 6: PrivateRecallConversationControllerTest.learnerRequestsAndReadsAnAiReply, persisted AI reply in UserController menu followed by mark-read and empty menu; author/member assistant discovery refused
 
 ### G6. Explicit private audience label awaits the inbox suffix (reported in pre-refinement slice 5)
 Reported: slice 5 — "The private-access prefix retains existing partner labels; explicit private-help labelling remains for the inbox slice."
 Story clause: "From the answered MCQ, request help with the original attempt visible and the conversation audience clear."
-Disposition: receiving slice 6
+Disposition: proved by slice 6: PrivateRecallConversationControllerTest list-controller observations distinguish private help from legacy circle and two-person participant labels
