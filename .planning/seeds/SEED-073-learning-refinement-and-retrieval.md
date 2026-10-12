@@ -98,7 +98,7 @@ Each story records its preparation state below.
 
 **Identity:** SEED-073#story-1
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/001-resolve-confusing-recall-answer/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"03132ee9b2502f336784ad1a011c739ea7609ae35ec679ecc3b1e9752dfc5843","plan":"3a667909224d954ea96a0ccdce632bb8dccc5c6429add2e9054aade9b096bd31"}}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/001-resolve-confusing-recall-answer/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"03132ee9b2502f336784ad1a011c739ea7609ae35ec679ecc3b1e9752dfc5843","plan":"69fc01e81347098aa0f9e204afaf540ecf53e19fe41b1afce6ce624a00020d9e"}}
 ```
 
 #### Goal
