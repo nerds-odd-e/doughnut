@@ -32,7 +32,7 @@ cause.
 
 **Identity:** SEED-076#story-1
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/002-mask-spelling-answer-before-title-qualifier/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"96271312318b81f05ff3390b1d083db2e8e7bcba7989a2cfcb117c1f45196890","plan":"d8978ee5c8e98c054801cba9bee8fe22b7fbec067dd5e7d616d5402db57e628f"}}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/003-mask-spelling-answer-before-title-qualifier/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"96271312318b81f05ff3390b1d083db2e8e7bcba7989a2cfcb117c1f45196890","plan":"d8978ee5c8e98c054801cba9bee8fe22b7fbec067dd5e7d616d5402db57e628f"}}
 ```
 
 - **Goal:** A learner answering a spelling question for a note whose title
