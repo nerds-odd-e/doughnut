@@ -37,7 +37,7 @@ const { state, readLevel, names } = defineProps<{
   state: "idle" | "busy" | "recording" | "keptRecording"
   /** The live level of the running recording; the waveform is drawn from it. */
   readLevel: () => number
-  names: { start: string; stop: string; retry: string }
+  names: { start: string; stop: string; retry?: string }
 }>()
 
 const emit = defineEmits<{ click: [] }>()

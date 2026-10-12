@@ -17,6 +17,7 @@ import {
   placeCaretInTitle,
   selectWholeTitle,
   hearing,
+  holdMicrophoneStartup,
   titleEditable,
   titleCaretOffset,
   expectTitleMarkerAfter,
@@ -212,19 +213,7 @@ describe("Toolbar voice input with a focused title", () => {
   })
 
   it("captures the caret before delayed microphone startup and moved focus", async () => {
-    const createRecorder = vi.mocked(createAudioRecorder)
-    const implementation = createRecorder.getMockImplementation()!
-    let finishStartup!: () => void
-    createRecorder.mockImplementationOnce((callback, options) => {
-      const recorder = implementation(callback, options!)
-      vi.mocked(recorder.startRecording).mockImplementation(
-        () =>
-          new Promise<void>((resolve) => {
-            finishStartup = resolve
-          })
-      )
-      return recorder
-    })
+    const { finishStartup } = holdMicrophoneStartup()
     placeCaretInTitle(wrapper, 7)
     await start()
     const button = wrapper.find('button[aria-label="Voice input"]')

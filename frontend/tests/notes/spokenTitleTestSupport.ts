@@ -43,15 +43,17 @@ export function expectListeningSpeakTitleButton(
   expect(button.classes()).toEqual(
     expect.arrayContaining(["daisy-btn-soft", "daisy-btn-primary"])
   )
+  expect(button.find("canvas").exists()).toBe(true)
 }
 
-/** The microphone button is unavailable while speech becomes text. */
-export function expectConvertingSpeakTitleButton(
+/** The button shows a spinner and is unavailable while the microphone starts or speech becomes text. */
+export function expectBusySpeakTitleButton(
   wrapper: VueWrapper<ComponentPublicInstance>
 ) {
   const button = speakTitleButton(wrapper, "Speak the title")
   expect(button.attributes()).toHaveProperty("disabled")
   expect(button.attributes()).not.toHaveProperty("aria-pressed")
+  expect(button.find(".animate-spin").exists()).toBe(true)
 }
 
 export function mountNoteEditableTitle(options: {
@@ -171,6 +173,24 @@ export function holdSpeakTitleConvertingUntilFinished() {
       })
   )
   return { finishStop: () => finishStop() }
+}
+
+/** The next recorder's microphone is not ready until finishStartup runs. */
+export function holdMicrophoneStartup() {
+  const createRecorder = vi.mocked(createAudioRecorder)
+  const createRecorderImpl = createRecorder.getMockImplementation()!
+  let finishStartup!: () => void
+  createRecorder.mockImplementationOnce((callback, options) => {
+    const recorder = createRecorderImpl(callback, options!)
+    vi.mocked(recorder.startRecording).mockImplementation(
+      () =>
+        new Promise<void>((resolve) => {
+          finishStartup = resolve
+        })
+    )
+    return recorder
+  })
+  return { finishStartup: () => finishStartup() }
 }
 
 /** The next recorder fails to start. */

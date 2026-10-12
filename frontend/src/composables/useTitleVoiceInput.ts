@@ -84,9 +84,5 @@ export function useTitleVoiceInput(
     leave,
     /** The live level of the recording that is listening. */
     readLevel: () => audioRecorder!.getAudioData(),
-    onControlClick: () =>
-      phase.value === "listening" ? stopListening() : startListening(),
   }
 }
-
-export type TitleVoiceInput = ReturnType<typeof useTitleVoiceInput>

@@ -66,7 +66,10 @@ Readers who may not edit the note are not offered the button.
 
 ## Speaking a title
 
-New note has a microphone button in its title field. Existing notes use the
+New note has a microphone button in its title field, named "Speak the title"
+and, while listening, "Stop speaking the title". It shows the same faces as
+the toolbar button: a spinner while the microphone starts and while speech
+becomes text, and a live waveform while listening. Existing notes use the
 same toolbar Voice input action for title and content, chosen by editing
 intent: see [speaking a title](./voice-input-spoken-title.md).
 
