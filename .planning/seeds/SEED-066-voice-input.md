@@ -167,39 +167,109 @@ one-time removal sweep as an acceptance reading, following principle 7 in
 
 **Identity:** SEED-066#unified-voice-input-control
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"not-refined","approach":"unselected"}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/002-shared-voice-input-button/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"e93ffca4910ac9b2d8b84f9f8fca905cc22e5f82d119806c7f2ea4d3c675a9e5","plan":"0d8a118f702f9fd893dd5fc864a2c30d632202117614478b0916ff6e4418f191"}}
 ```
 
-- **For / why:** Note authors get the same recognizable recording control and
-  live feedback when speaking a new note's title, updating an existing title,
-  or dictating note content.
+- **Goal:** A note author who speaks a new note's title, an existing note's
+  title, or a note's content sees the same button behave the same way: it
+  shows that the click was taken, then a live waveform that moves with their
+  voice while it records, then that their speech is being turned into text.
+  This serves the seed's aim of voice input that is easy to understand, and
+  keeps later changes to recording feedback in one implementation.
 - **Reported behavior:** On 2026-10-12 the owner reported that content dictation
   turns its button into a waveform that responds to speech, while creating a
   note by speaking its title and updating a title do not show that feedback.
   Whether those title journeys already share a button was uncertain.
-- **Scope:** Use the same shared button and waveform implementation across all
-  three journeys, with consistent appearance and recording-state feedback.
-  Delete duplicate control implementations and their exclusive dependencies;
-  keep target-specific title and content application behavior cohesive with
-  their respective editors. Preserve the existing focus-based choice between
-  title and content dictation, title refinement, and content preservation.
-- **Evaluation:** Start speaking in each of the three journeys. The control
-  shows the same waveform and responds to changing voice levels. Stop and
-  complete dictation; the spoken text reaches the intended title or content,
-  and the control returns to its appropriate idle state. Evaluate the shared
-  control's surviving states through the product. Separately perform a one-time
-  acceptance reading across the product for deleted duplicate control names and
-  their exclusive dependents; record that sweep as a reading, not a test.
-- **Code-reading evidence:** Main at `5d6307f63d`, read on 2026-10-12:
-  `NoteVoiceInputButton.vue` handles existing-note title and content targeting,
-  but renders its level canvas only for content recording. `NoteNewForm.vue`
-  uses `SpeakTitleControl.vue`, a separate button with a microphone and a
-  conversion spinner. These readings support the report; recording behavior
-  was not run during capture.
-- **Value / learning:** Make recording understandable across note authoring and
-  keep future feedback changes in one implementation.
-- **Effort hypothesis:** S–M, low confidence until the shared control boundary
-  and access to live title-recording levels are checked during refinement.
+- **Scope — required:**
+  - One shared button implementation serves the New note title field and the
+    note toolbar. It has four faces, the same size in both places: a
+    microphone when idle; a spinner, unavailable, while the microphone starts
+    and again from Stop until the last speech has become text; a live waveform
+    on a highlighted, pressed button while recording; and the retry arrow with
+    its warning tint while a content recording is kept.
+  - The waveform shows in all three journeys and is drawn from the microphone
+    level of the recording that is running. In silence it is a still, quiet
+    line, as in content dictation today.
+  - Startup looks the same in all three (owner decision, 2026-10-12): from the
+    click until the microphone is ready the button is unavailable and shows
+    the spinner. Content dictation gains this state; today its button stays
+    idle and clickable during startup.
+  - Names stay with the place (owner decision, 2026-10-12): in New note
+    "Speak the title" and "Stop speaking the title"; in the toolbar
+    "Voice input", "Stop voice input" and "Retry turning your speech into
+    text". While unavailable the button carries its idle name, as today.
+  - Each place keeps its own frame: in New note the button stays inside the
+    title field, before the Wikidata button, at the field's height; in the
+    toolbar it stays a toolbar button.
+  - Delete `SpeakTitleControl.vue` and everything only it used. Record the
+    one-time sweep for the deleted names as an acceptance reading.
+  - `docs/voice-input.md` and `docs/voice-input-spoken-title.md` describe the
+    button as it then is.
+- **Scope — kept as it is:** the choice between title and content by title
+  focus; where the words go and the read-only field during a session; the
+  pending marker; title speech turning into text only at Stop; title wording
+  refinement; content preservation, joining and retry; the error toasts; the
+  toolbar button staying in the toolbar while a session runs on a narrow
+  screen; Submit unavailable in New note during a session.
+- **Scope — not promised:** a retry for title recordings; a different look
+  for the waveform; a reduced-motion version of the waveform; choosing a
+  microphone; any change to transcription or its timing.
+- **Key examples:**
+  - *New note.* The title field shows a microphone named "Speak the title".
+    The author clicks it → the button is unavailable with a spinner until the
+    microphone is ready → it is highlighted, named "Stop speaking the title",
+    and its waveform rises and falls with the author's voice and lies still
+    when they pause. They click it → spinner, unavailable → the words are in
+    the title and the microphone is back.
+  - *Existing title.* The caret is in the title. The author clicks
+    "Voice input" in the toolbar → spinner, unavailable → highlighted
+    waveform, named "Stop voice input", moving with their voice (today it
+    shows a microphone that does not move). They click it → spinner → the
+    words are at the caret and the button is idle.
+  - *Content.* The title is not focused. The author clicks "Voice input" →
+    spinner, unavailable, until the microphone is ready (today: an idle
+    button that takes another click) → the waveform as today. Stop behaves as
+    today.
+  - *Microphone refused, any of the three.* The author clicks the button →
+    spinner → the error toast "Could not use the microphone…" shows, the
+    button is an idle microphone again, and nothing was made read-only.
+  - *Failed conversion at Stop.* For content the button shows the retry arrow
+    with the warning tint, as today. For either title it returns to the idle
+    microphone and the title is unchanged, as today.
+- **Evaluation:** The owner starts speaking in each of the three journeys, on
+  a real microphone, and sees the same startup spinner, the same waveform
+  following their voice, and the same spinner after Stop; the spoken text
+  reaches the intended title or content. The sweep for the deleted control's
+  names over the product is a reading, not a test.
+- **Evidence, read on 2026-10-12 at `5a80de7bda`, not run:**
+  - *Facts.* The three journeys use two buttons. `NoteNewForm.vue` uses
+    `SpeakTitleControl.vue` (microphone, spinner; no waveform). The toolbar's
+    `NoteVoiceInputButton.vue` serves both the existing title and content,
+    and leaves the waveform out for title recordings because it reads the
+    level from the content recorder only. No recorded decision asked for that
+    (commit `d82ffb11d9`).
+  - *Settled premise.* The live level is available while a title is recorded:
+    title and content recording both use `createAudioRecorder`, whose
+    `getAudioData` reads the microphone receiver directly, whether or not
+    conversion waits for Stop (`audioRecorder.ts`,
+    `audioProcessingScheduler.ts`). `useTitleVoiceInput.ts` holds its recorder
+    privately, so the shared button needs it handed over.
+  - *Startup today.* Toolbar title: unavailable with a spinner. New note:
+    unavailable with a microphone. Content: no startup state.
+  - *Still a hypothesis.* A second click on the content button during startup
+    may open the microphone twice; read from `useNoteVoiceInput.ts`, not run.
+    The startup state this story adds removes the second click either way.
+  - *Not observed.* The waveform on real hardware in the title journeys; the
+    owner's evaluation covers it.
+- **Architecture:** The button owns only what the author sees and the click;
+  it is told the recording's state and where to read its level. Title and
+  content recording keep their own rules and stay with their editors. Title
+  recording must now give out its live level, and content recording gains a
+  starting state. No Accepted ADR (0000–0007, read on 2026-10-12) governs
+  this front-end structure and none is contradicted; the failure toasts are
+  unchanged.
+- **Effort hypothesis:** M. The premise that made the earlier estimate
+  uncertain is settled.
 - **Depends on:** No blocking story dependency established.
 - **Safe stopping point:** Consistent voice controls stand alone while each
   editor retains its existing text-application behavior.
@@ -274,6 +344,10 @@ This capture authorizes backlog maintenance only.
 
 ## Breadcrumbs
 
+- Owner's investigate, UX/UI and architecture refinement request for the
+  shared voice-input button story, 2026-10-12, through the established
+  Kirara-chan preparation; the owner chose the New note names and the common
+  startup state in that session.
 - Owner's three-story request, 2026-10-12: unify the voice button and reactive
   waveform across title creation, title editing, and content dictation; give
   the mobile toolbar full width with one row and a visible options menu; mask
