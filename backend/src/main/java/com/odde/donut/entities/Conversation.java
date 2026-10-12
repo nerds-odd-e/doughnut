@@ -22,7 +22,7 @@ public class Conversation extends EntityIdentifiedByIdOnly {
 
   @ManyToOne
   @JoinColumn(name = "subject_ownership_id", referencedColumnName = "id")
-  Ownership subjectOwnership;
+  Ownership accessOwnership;
 
   @ManyToOne
   @Setter
@@ -41,13 +41,13 @@ public class Conversation extends EntityIdentifiedByIdOnly {
   @JsonIgnore
   public void setNote(Note note) {
     this.subject.setNote(note);
-    this.subjectOwnership = note.getNotebook().getOwnership();
+    this.accessOwnership = note.getNotebook().getOwnership();
   }
 
   @JsonIgnore
   public void setRecallPrompt(RecallPrompt recallPrompt) {
     this.subject.setRecallPrompt(recallPrompt);
-    this.subjectOwnership = recallPrompt.getNotebook().getOwnership();
+    this.accessOwnership = recallPrompt.getNotebook().getOwnership();
   }
 
   @JsonIgnore

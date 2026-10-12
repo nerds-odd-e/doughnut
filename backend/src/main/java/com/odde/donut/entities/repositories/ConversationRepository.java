@@ -16,8 +16,8 @@ public interface ConversationRepository extends CrudRepository<Conversation, Int
       @Param("recallPrompts") List<com.odde.donut.entities.RecallPrompt> recallPrompts);
 
   String USER_CONVERSATION_CONDITION =
-      "c.subjectOwnership.user = :user "
-          + "OR c.subjectOwnership IN (SELECT o FROM Ownership o JOIN o.circle.members mem WHERE mem = :user) "
+      "c.accessOwnership.user = :user "
+          + "OR c.accessOwnership IN (SELECT o FROM Ownership o JOIN o.circle.members mem WHERE mem = :user) "
           + "OR c.conversationInitiator = :user";
 
   @Query(
@@ -28,7 +28,7 @@ public interface ConversationRepository extends CrudRepository<Conversation, Int
           + " "
           + "GROUP BY c "
           + "ORDER BY MAX(m.createdAt) DESC, c.createdAt DESC")
-  List<Conversation> findByUserInSubjectOwnershipOrConversationInitiator(
+  List<Conversation> findByUserInAccessOwnershipOrConversationInitiator(
       @Param("user") User user, Pageable pageable);
 
   @Query(

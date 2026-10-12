@@ -49,13 +49,13 @@ public class ConversationService {
   }
 
   public List<Conversation> conversationRelatedToUser(User user) {
-    return conversationRepository.findByUserInSubjectOwnershipOrConversationInitiator(
+    return conversationRepository.findByUserInAccessOwnershipOrConversationInitiator(
         user, Pageable.unpaged());
   }
 
   public List<ConversationListItem> conversationListForUser(User user) {
     return conversationRepository
-        .findByUserInSubjectOwnershipOrConversationInitiator(user, PageRequest.of(0, 50))
+        .findByUserInAccessOwnershipOrConversationInitiator(user, PageRequest.of(0, 50))
         .stream()
         .map(conversation -> toListItem(conversation, user))
         .toList();
@@ -73,7 +73,7 @@ public class ConversationService {
     if (initiator != null && !Objects.equals(initiator.getId(), currentUser.getId())) {
       return initiator.getName();
     }
-    Ownership ownership = conversation.getSubjectOwnership();
+    Ownership ownership = conversation.getAccessOwnership();
     if (ownership != null && ownership.getCircle() != null) {
       return ownership.getCircle().getName();
     }

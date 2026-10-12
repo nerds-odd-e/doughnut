@@ -32,13 +32,12 @@ class ConversationServiceConversationListLimitTest {
   void shouldRequestAtMostFiftyConversations() {
     User user = new User();
     PageRequest firstPage = PageRequest.of(0, 50);
-    when(conversationRepository.findByUserInSubjectOwnershipOrConversationInitiator(
-            user, firstPage))
+    when(conversationRepository.findByUserInAccessOwnershipOrConversationInitiator(user, firstPage))
         .thenReturn(List.of());
 
     conversationService.conversationListForUser(user);
 
     verify(conversationRepository)
-        .findByUserInSubjectOwnershipOrConversationInitiator(user, firstPage);
+        .findByUserInAccessOwnershipOrConversationInitiator(user, firstPage);
   }
 }

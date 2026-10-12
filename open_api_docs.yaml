@@ -5046,7 +5046,7 @@ components:
           format: int32
         subject:
           $ref: "#/components/schemas/ConversationSubject"
-        subjectOwnership:
+        accessOwnership:
           $ref: "#/components/schemas/Ownership"
         conversationInitiator:
           $ref: "#/components/schemas/User"

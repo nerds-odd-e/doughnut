@@ -68,7 +68,7 @@ class ConversationStartControllerTest extends ConversationMessageControllerTestB
 
       assertThat(conversation.getSubject().getRecallPrompt(), equalTo(recallPrompt));
       assertThat(
-          conversation.getSubjectOwnership(), equalTo(recallPrompt.getNotebook().getOwnership()));
+          conversation.getAccessOwnership(), equalTo(recallPrompt.getNotebook().getOwnership()));
     }
   }
 }

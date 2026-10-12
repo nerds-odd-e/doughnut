@@ -18,7 +18,7 @@ This plan includes usable entry, same-attempt continuation, private access, reas
 
 ## Architectural approach and existing solutions
 
-One conversation owns the exchange; its subject identifies the attempt and its access ownership identifies its audience. Existing `Ownership` already supports a person's personal ownership independently of a notebook. Clarify the Java/API concept currently called `subjectOwnership`, retain its physical FK mapping and stored values, and assign new help to the initiating learner's personal ownership. There is no schema migration or separate help-mode flag.
+One conversation owns the exchange; its subject identifies the attempt and its access ownership identifies its audience. Existing `Ownership` already supports a person's personal ownership independently of a notebook. The Java/API concept `accessOwnership` names access independently of subject, retaining its physical FK mapping and stored values. New help will use the initiating learner's personal ownership. There is no schema migration or separate help-mode flag.
 
 Authorize help creation through the prompt's MemoryTracker owner, not merely note readability. Continue a conversation for the same prompt and initiator only when its access ownership is that initiator's personal ownership. An old own-note conversation with that audience is compatible; an old shared thread remains shared. Existing authorization, listing, unread and message owners then enforce one audience rule. Repeated entry uses that same thread; this is not a universal one-conversation-per-note rule.
 
@@ -103,13 +103,13 @@ The isolated paid route is `CURSOR_DEV=true nix develop -c pnpm e2e:hold --paid-
 
 Type: Structure
 
-Status: planned
+Status: done
 
 Sizing: about five minutes plus measured required verification/API generation.
 
 Change: Express ownership of conversation access independently of its subject through the existing Ownership association. Preserve the physical column and all existing audience values. Update the callers, builders and generated public contract together. This immediately enables slice 5; introduce no new visibility resource or schema.
 
-Proof: Existing start/message/listing/menu/AI/export controller behavior remains green; regenerate the API if its public property changes and verify affected frontend types. Inspect consumers of the old field and partner labels, including generated types; use one existing access model rather than a parallel predicate.
+Proof: Existing start/message/listing/menu/AI/export controller behavior remains green; regenerate the API if its public property changes and verify affected frontend types. Inspect consumers of the old field and partner labels, including generated types; use one existing access model rather than a parallel predicate. Accepted: `pnpm generateTypeScript`, full `pnpm backend:test_only` (2737 tests; 0 failures/errors, 2 skips), full headless `pnpm frontend:test` (338 files/2151 tests), both frontend `vue-tsc --noEmit`/`tsc --noEmit` and `pnpm openapi:lint`, all under `CURSOR_DEV=true nix develop -c`. Inspected the unchanged audience assertion in `ConversationStartControllerTest.StartConversationAboutRecallPrompt.setsRecallPromptAsSubject`, access/list JPQL, authorization getter and generated property. One-time consumer reading found no old camel/method consumers outside historical planning; the physical FK remains unchanged.
 
 ### 5. Open help with the learner's private audience
 

@@ -750,7 +750,7 @@ export type SseEmitter = {
 export type Conversation = {
     id: number;
     subject?: ConversationSubject;
-    subjectOwnership?: Ownership;
+    accessOwnership?: Ownership;
     conversationInitiator?: User;
     createdAt: string;
     updatedAt: string;
