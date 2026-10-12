@@ -5205,6 +5205,13 @@ components:
           type: integer
           format: int32
           description: "Zero-based index of the correct choice, when known"
+        selectedChoiceIndex:
+          type: integer
+          format: int32
+          description: "Zero-based index of the learner's selected choice, when known"
+        clarification:
+          type: string
+          description: Optional clarification explicitly reviewed by the learner
         testedFocus:
           type: string
           description: Optional description of what the question was testing

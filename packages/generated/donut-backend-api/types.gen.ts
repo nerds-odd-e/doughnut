@@ -836,6 +836,14 @@ export type NoteRefinementQuestionContextDto = {
      */
     correctAnswerIndex?: number;
     /**
+     * Zero-based index of the learner's selected choice, when known
+     */
+    selectedChoiceIndex?: number;
+    /**
+     * Optional clarification explicitly reviewed by the learner
+     */
+    clarification?: string;
+    /**
      * Optional description of what the question was testing
      */
     testedFocus?: string;

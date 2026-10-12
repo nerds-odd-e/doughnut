@@ -8,7 +8,7 @@
         :memory-tracker-id="answeredQuestion.memoryTrackerId"
       />
       <button
-        v-if="noteHasContent"
+        v-if="canRefineNote"
         type="button"
         data-test="open-refine-note-modal"
         class="daisy-btn daisy-btn-neutral mt-4"
@@ -34,10 +34,11 @@
     :recall-prompt-id="answeredQuestion.id"
   />
   <RefineNoteModal
-    v-if="noteHasContent && note"
+    v-if="canRefineNote && note"
     v-model:open="showRefineNoteModal"
     :note="note"
     :question-context="questionContext"
+    :review-clarification="reviewClarification"
   />
 </template>
 
@@ -45,10 +46,12 @@
 import type {
   AnsweredQuestion,
   Note,
+  NoteRealm,
   NoteRefinementQuestionContextDto,
+  User,
 } from "@generated/donut-backend-api"
-import type { PropType } from "vue"
-import { computed, ref } from "vue"
+import type { PropType, Ref } from "vue"
+import { computed, inject, ref } from "vue"
 import QuestionDisplay from "./QuestionDisplay.vue"
 import ConversationButton from "./ConversationButton.vue"
 import NoteUnderQuestion from "./NoteUnderQuestion.vue"
@@ -67,19 +70,27 @@ const props = defineProps({
     type: Boolean,
     required: true,
   },
+  reviewClarification: Boolean,
 })
 
 const noteStore = useNoteStore()
+const currentUser = inject<Ref<User | undefined>>("currentUser")
 const showRefineNoteModal = ref(false)
 
-const note = computed<Note | undefined>(() => {
+const noteRealm = computed<NoteRealm | undefined>(() => {
   const recalled = props.answeredQuestion.recalledNote
   if (!recalled) return undefined
   return noteStore.getNoteRealmRefAndLoadWhenNeeded(recalled.noteTopology.id)
-    .value?.note
+    .value
 })
 
-const noteHasContent = computed(() => hasNoteContent(note.value?.content))
+const note = computed<Note | undefined>(() => noteRealm.value?.note)
+const canRefineNote = computed(
+  () =>
+    Boolean(currentUser?.value) &&
+    noteRealm.value?.notebookRealm.readonly !== true &&
+    hasNoteContent(note.value?.content)
+)
 
 const questionContext = computed<NoteRefinementQuestionContextDto | undefined>(
   () => {
@@ -89,6 +100,7 @@ const questionContext = computed<NoteRefinementQuestionContextDto | undefined>(
       stem: mcq.questionStem,
       choices: mcq.responseChoices,
       correctAnswerIndex: mcq.correctAnswerIndex,
+      selectedChoiceIndex: props.answeredQuestion.answer?.choiceIndex,
       testedFocus: mcq.testedFocus,
     }
   }

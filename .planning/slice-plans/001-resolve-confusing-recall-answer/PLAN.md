@@ -177,13 +177,13 @@ Proof: Accepted `RecallPage.practice.spec.ts`: real choice/answer → explanatio
 ### 11. Carry a useful clarification into authorized refinement
 
 Type: Behavior
-Status: planned
+Status: done
 
 Sizing: 5–8 minutes; one contract change across its UI and AI consumer.
 
 Behavior: When the learner wants to refine a note they may edit, the existing refinement receives the original selected answer and a clarification the learner explicitly chooses to carry, along with the existing question/focus context. Existing previews and author permissions govern the resulting content changes.
 
-Proof: Mounted handoff observes the reviewed clarification and selected answer in the actual refinement request; AiController-level capture reaches the refinement model boundary with those values. Retain direct refinement with its ordinary question context and existing permission proof. Regenerate the API for a changed DTO. Do not automatically include the whole private transcript, implement sharing, or repair proposal acceptance/decision storage owned by story 2.
+Proof: Accepted `ConversationComponent.refinement.spec.ts`: real parent shows a blank review before generation, learner revises text twice, confirmation sends exactly the final clarification and original selected choice/question/focus to refinement. Direct answered-question refinement remains immediate; readonly entry is refused. `AiControllerNoteRefinementTest` captures selected-answer text and reviewed clarification at the model boundary; actual subscriber reads through NoteController but cannot refine. Nix generation, full backend (2777 tests, no failures/errors, 2 skips), headless frontend (343 files/2158 tests), both frontend typechecks and OpenAPI lint passed. Independent refactor derives phase from confirmed text; its focused mounted rerun passed 5 tests and both typechecks. No private transcript is copied into the payload; existing permissions/previews govern content changes. No sharing or story 2 proposal work.
 
 ## Verification and delivery
 

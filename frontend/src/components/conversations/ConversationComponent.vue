@@ -11,6 +11,7 @@
         v-bind="{
           answeredQuestion: conversation.subject.recallPrompt,
           conversationButton: false,
+          reviewClarification: true,
         }"
       />
     </div>
