@@ -10,8 +10,8 @@ Make deliberately captured knowledge more useful through learning and refinement
 
 ## Backlog list
 
-- [Stop a content recording that starts after the author has left the note](seeds/SEED-066-voice-input.md#recording-started-after-leaving) — SEED-066#recording-started-after-leaving
 - [Save a useful chat clarification as a reviewed note correction](seeds/SEED-073-learning-refinement-and-retrieval.md#story-2) — SEED-073#story-2
+- [Stop a content recording that starts after the author has left the note](seeds/SEED-066-voice-input.md#recording-started-after-leaving) — SEED-066#recording-started-after-leaving
 - [Generate focus-note questions with relevant supporting passages](seeds/SEED-007-per-concept-prompt-splitting-single-note-qg.md#story-1) — SEED-007#story-1
 - [Decide whether an acceptance-test review procedure benefits from Donut notes](seeds/SEED-074-knowledge-to-capability.md#story-1) — SEED-074#story-1
 - [Find a note from wording remembered in its body](seeds/SEED-073-learning-refinement-and-retrieval.md#story-3) — SEED-073#story-3
