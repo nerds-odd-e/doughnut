@@ -32,32 +32,64 @@ cause.
 
 **Identity:** SEED-076#story-1
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"not-refined","approach":"unselected"}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/002-mask-spelling-answer-before-title-qualifier/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"96271312318b81f05ff3390b1d083db2e8e7bcba7989a2cfcb117c1f45196890","plan":"d8978ee5c8e98c054801cba9bee8fe22b7fbec067dd5e7d616d5402db57e628f"}}
 ```
 
-- **For / why:** A learner answering a spelling question for a qualified title
-  recalls the intended term from a properly masked clue.
-- **Scope:** Reproduce the reported question-generation mismatch and repair a
-  confirmed discrepancy. Mask occurrences in the question content of the
-  spelling target before a trailing parenthesized qualifier, including the
-  owner's trailing-whitespace example. Preserve the accepted answer and the
-  ordinary masking behavior for titles without such a qualifier.
-- **Evaluation:** Use the exact title `Deposition (phase transition) ` and
-  content containing `deposition`. Generate a spelling question: occurrences
-  of `deposition` appear as cloze masks, with the surrounding clue readable.
-  Answering `deposition` remains correct. Include ordinary unqualified-title
-  masking as retained behavior.
-- **Code-reading evidence:** Main at `5d6307f63d`, read on 2026-10-12:
-  `NoteTitle.matchesForRecall` accepts a title without its final round-
-  parenthesized content, including trailing whitespace, while
-  `getClozeTitleFragments` returns only the whole-title fragment. This supports
-  the reported inconsistency; generated questions were not run during capture.
+- **Goal:** A learner answering a spelling question for a note whose title
+  ends with a parenthesized qualifier recalls the term from a clue that hides
+  it. Today the clue shows the very text the question accepts as the answer,
+  so the question tests nothing.
+- **Scope:**
+  - The spelling question hides, in the note content, every text the question
+    accepts as the title answer. For a title ending with a round-parenthesized
+    qualifier that is the whole title and the title without that qualifier.
+  - The text before the qualifier is hidden the same way an unqualified title
+    with that text is hidden: whole-word, case-insensitive, with the existing
+    partial-match and pronunciation masks, alias masking, and wiki-link
+    handling unchanged.
+  - Which answers are accepted does not change, and the authored title is not
+    changed.
+  - The qualifier's own text stays readable in the clue. It is not an accepted
+    answer (`cat(animal)` rejects `animal`), so hiding it would only remove
+    clue.
+  - Deferred: other title shapes that answer matching does not already accept
+    without their qualifier, such as full-width or nested parentheses, and the
+    spelling-match follow-ons in
+    [SEED-001](SEED-001-mcq-fuzzy-notebook-title-spelling-match.md). This
+    delivery does not build or verify them.
+- **Key examples:**
+  - Title `Deposition (phase transition) ` (with the trailing space), content
+    `In physics, deposition is when gas becomes solid. Deposition skips
+    liquid.` → the spelling question shows `In physics, [...] is when gas
+    becomes solid. [...] skips liquid.`; answering `deposition` is correct.
+  - Title `cat(animal)`, content `A cat is an animal. See cat(animal).` → both
+    `cat` and `cat(animal)` are hidden; `animal` in `is an animal` stays
+    readable.
+  - Title `Deposition` (no qualifier), same content as the first example → the
+    two occurrences are hidden exactly as today.
+- **Observed mismatch:** In this workspace at `c845f2d72c` on 2026-10-12, a
+  scratch spelling-question test (reverted afterwards) generated the first
+  example's question with the stem unmasked: `In physics, deposition is when
+  gas becomes solid. Deposition skips liquid.` The same content under the
+  title `Deposition` produced two `[...]` masks. Command: `pnpm
+  backend:test:worktree --tests
+  '*RecallPromptSpellingStemMaskingControllerTest'`.
+- **History:** `cf134e8b25` (2026-09-17) made the whole title the single value
+  for both answer matching and masking, removing the earlier qualifier
+  handling from both. `2f32fe9557` (2026-09-21) restored accepting the answer
+  without the trailing qualifier and left masking on the whole title only.
+  `NoteTitle.matchesForRecall` and `NoteTitle.getClozeTitleFragments` have
+  disagreed since then. One existing test and the javadoc on `NoteTitle`
+  state the whole-title-only masking and conflict with this story:
+  `NoteTitleTest`
+  `clozeTitleFragments_treatsTrailingBracketAsLiteralTitleText`. `ClozeDescriptionTest`
+  `clozeTreatsBracketedTitleAsLiteralTextNotASeparateQualifier` states the
+  readable qualifier and stays.
 - **Value / learning:** Restore useful spelling recall for titles with
-  disambiguating qualifiers and establish the regression at the observable
-  question-generation boundary.
-- **Effort hypothesis:** S (30–60 minutes including delivery), medium confidence
-  from the code reading; runtime reproduction and related masking cases still
-  need verification.
+  disambiguating qualifiers.
+- **Effort hypothesis:** S (under 30 minutes including delivery), high
+  confidence: the mismatch is reproduced and sits in one class with one
+  masking consumer, `Note.createMaskedContentForRecall`.
 - **Depends on:** No blocking story dependency established.
 - **Safe stopping point:** Qualified-title spelling questions are useful
   independently of toolbar and voice-control work.
@@ -70,9 +102,8 @@ This is non-executable story input.
 
 ## Open Decisions
 
-Confirm the mismatch through generated spelling-question content during
-refinement. Keep broader title parsing and fuzzy-match follow-ons in their
-existing homes.
+None. Broader title parsing and fuzzy-match follow-ons stay in their existing
+homes.
 
 ## When to Surface
 
