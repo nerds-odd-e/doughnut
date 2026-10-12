@@ -6,9 +6,10 @@ Make deliberately captured knowledge more useful through learning and refinement
 
 ## Taken
 
+- [Resolve a confusing recall answer with an explanation and a follow-up check](seeds/SEED-073-learning-refinement-and-retrieval.md#story-1) — SEED-073#story-1 ([plan](slice-plans/001-resolve-confusing-recall-answer/PLAN.md))
+
 ## Backlog list
 
-- [Resolve a confusing recall answer with an explanation and a follow-up check](seeds/SEED-073-learning-refinement-and-retrieval.md#story-1) — SEED-073#story-1
 - [Save a useful chat clarification as a reviewed note correction](seeds/SEED-073-learning-refinement-and-retrieval.md#story-2) — SEED-073#story-2
 - [Generate focus-note questions with relevant supporting passages](seeds/SEED-007-per-concept-prompt-splitting-single-note-qg.md#story-1) — SEED-007#story-1
 - [Decide whether an acceptance-test review procedure benefits from Donut notes](seeds/SEED-074-knowledge-to-capability.md#story-1) — SEED-074#story-1

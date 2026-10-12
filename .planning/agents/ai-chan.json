@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "agent": "Ai-chan",
+  "email": "ai-chan@example.org",
+  "identity": "SEED-073#story-1",
+  "mode": "story-branch",
+  "branch": "codex/resolve-a-confusing-recall-answer-with-an-explan",
+  "host": "codex",
+  "model": "gpt-6.1-sol"
+}
