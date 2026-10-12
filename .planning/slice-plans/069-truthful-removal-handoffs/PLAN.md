@@ -188,6 +188,9 @@ with those boundaries unchanged. Selective formatting passed; no API trigger.
   `6fadfdbf13bd0e105042d0ff71cc404b36c7f577`, suffix base
   `0a0def3db215338e3e323741db85d58bf5ec50ed`; managed delivery reused the
   retained observer. Slice 2 starts at that accepted revision.
+- Slice 2 accepted on the same branch:
+  `35d0b08a944b52061c19a828eeac85fe79890cd8`, suffix base
+  `6fadfdbf13bd0e105042d0ff71cc404b36c7f577`; the same observer was reused.
 - Both leaves are Behavior: their external consumers are Donut's contributors
   and readers of its evidence. Each has one observation loop. The common rule
   is proof of what survives plus a one-time sweep reading; evidence disposition
@@ -213,3 +216,10 @@ with those boundaries unchanged. Selective formatting passed; no API trigger.
 
 The [handoff evidence](EVIDENCE.md) records the historical review and this
 story's actual implementation, independent refactor, and acceptance boundaries.
+
+## Execution complete
+
+Product advice: no new product backlog work recommended. Story Wrap Up can
+reconcile the existing local findings and spent history against the bounded
+historical review and real handoff evidence; universal future compliance and
+fresh runtime behavior remain outside the demonstrated outcome.

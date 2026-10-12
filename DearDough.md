@@ -6,7 +6,7 @@ released response is not proof of effectiveness. Unknown provenance stays unknow
 [Response status](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/finding-names.md).
 Full pre-trim evidence: `8830c682704aac3bbb34bf9b1204da8feba042ca:DearDough.md`. Older narratives live in Git, not a second archive.
 
-- Highest allocated local number: 232. Removed local codes are never reused.
+- Highest allocated local number: 233. Removed local codes are never reused.
 
 Detailed retained observations are consolidated in the linked Open Dough
 record; headings and former local aliases preserve traceability. Project-specific
@@ -423,3 +423,16 @@ The story lists how a voice-input session ends or never starts: the microphone c
   - Evidence: plan 067 "Outside-in proof ownership" at `783d3f96cd`; slice 1 first return, "Not covered by a test" (microphone cannot start, nothing heard with an editor open, Quill re-enabled on leaving); the three tests added in the second round at `7557329339`; the DD-224 occurrence of this execution for the title
   - Observed effect: slices 1 and 2 each needed a second implementation round after the coordinator compared the return with the story's Scope; the body endings already held, and the title ending was a real defect
   - Inference: the delegation carried the proof table as the promise list; carrying the story's session-end list beside it would likely have saved both rounds
+
+## DD-233 — Broad startup reads exceeded the response budget and forced repeated retrieval
+
+The coordinator combined complete execution references and an unbounded tool-metadata listing, then batched another large context read. Both responses were truncated before first-slice delegation, so authoritative passages had to be retrieved again. The targeted-retrieval guidance already applied; this records an agent execution deviation rather than missing workflow guidance.
+
+### Occurrences
+- Execution: SEED-071#removal-proof-and-evidence-recurrence (first implementation commit 6fadfdbf13bd0e105042d0ff71cc404b36c7f577)
+  - Timestamp: unknown
+  - Tool: Codex
+  - Open Dough release: 0.3.60
+  - Evidence: dashboard launch fb81e2c8-229c-473e-ba0c-0df74a951f5e, first two startup functions.exec responses on 2026-10-12 reported 20,868 and 20,631 original output tokens and truncation; subsequent calls retrieved the plan, seed, and individual execution references again before slice 1 delegation
+  - Observed effect: the startup outputs did not expose all requested context; additional targeted reads were needed
+  - Inference: limiting each read to the next execution boundary and bounding metadata discovery would avoid this duplication; no elapsed-time or total-token saving was measured
