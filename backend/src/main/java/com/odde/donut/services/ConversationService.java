@@ -36,6 +36,7 @@ public class ConversationService {
       RecallPrompt recallPrompt, User initiator) {
     Conversation conversation = initializeConversation(initiator);
     conversation.setRecallPrompt(recallPrompt);
+    conversation.setAccessOwnership(initiator.getOwnership());
     conversationRepository.save(conversation);
     return conversation;
   }

@@ -8,6 +8,7 @@ import com.odde.donut.entities.Conversation;
 import com.odde.donut.entities.MemoryTracker;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.RecallPrompt;
+import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -55,20 +56,19 @@ class ConversationStartControllerTest extends ConversationMessageControllerTestB
     }
 
     @Test
-    void startsConversationAsCurrentUser() {
+    void startsConversationAsCurrentUser() throws UnexpectedNoAccessRightException {
       Conversation conversation = controller.startConversationAboutRecallPrompt(recallPrompt);
 
       assertThat(conversation.getConversationInitiator(), equalTo(currentUser.getUser()));
     }
 
     @Test
-    void setsRecallPromptAsSubject() {
+    void setsRecallPromptAsSubject() throws UnexpectedNoAccessRightException {
       Conversation conversation = controller.startConversationAboutRecallPrompt(recallPrompt);
       makeMe.refresh(conversation);
 
       assertThat(conversation.getSubject().getRecallPrompt(), equalTo(recallPrompt));
-      assertThat(
-          conversation.getAccessOwnership(), equalTo(recallPrompt.getNotebook().getOwnership()));
+      assertThat(conversation.getAccessOwnership(), equalTo(currentUser.getUser().getOwnership()));
     }
   }
 }

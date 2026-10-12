@@ -38,6 +38,7 @@ public class ConversationBuilder extends EntityBuilder<Conversation> {
 
   public ConversationBuilder forARecallPrompt(RecallPrompt recallPrompt) {
     this.entity.setRecallPrompt(recallPrompt);
+    this.entity.setAccessOwnership(recallPrompt.getNotebook().getOwnership());
     return this;
   }
 }

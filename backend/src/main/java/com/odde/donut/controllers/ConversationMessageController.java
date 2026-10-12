@@ -162,7 +162,9 @@ public class ConversationMessageController {
 
   @PostMapping("/recall-prompt/{recallPrompt}")
   public Conversation startConversationAboutRecallPrompt(
-      @PathVariable("recallPrompt") @Schema(type = "integer") RecallPrompt recallPrompt) {
+      @PathVariable("recallPrompt") @Schema(type = "integer") RecallPrompt recallPrompt)
+      throws UnexpectedNoAccessRightException {
+    authorizationService.assertReadAuthorization(recallPrompt.requireMemoryTracker());
     return conversationService.startConversationAboutRecallPrompt(
         recallPrompt, authorizationService.getCurrentUser());
   }

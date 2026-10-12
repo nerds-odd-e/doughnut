@@ -111,13 +111,13 @@ Proof: Existing start/message/listing/menu/AI/export controller behavior remains
 ### 5. Protect access to the learner's private attempt help
 
 Type: Behavior
-Status: planned
+Status: done
 
 Sizing: about five active minutes to restore scoped audience/entry changes and one confidentiality proof loop, plus the required backend suite. Reuse the parked prototype without restoring its label/unread-reply suffix.
 
 Behavior: Given an answered prompt owned by the learner, starting help assigns their personal access ownership. The learner reads and replies; notebook authorship or membership grants neither direct access nor discovery. Existing shared conversations retain their audience.
 
-Proof: Exercise actual creation, subject/messages, send, export, AI request, mark-read authorization, inbox listing and unread exclusion for learner, author and another circle member. Refuse creating help from another learner's prompt; retain legacy shared reads/replies. One canonical refusal shape plus each channel's delta proves the common access rule. For unread confidentiality use a stored non-null learner message against unauthorized actors, so existing null-sender filtering cannot conceal a leak. Positive incoming-AI unread and truthful private labels belong to slice 6. Fresh tests must prove this actual prefix; the [complete prototype](PRIVATE-ACCESS-PROTOTYPE-OBSERVATION.md) is reusable evidence, not verified restored code.
+Proof: Accepted actual creation, subject/messages, send, export, AI request, mark-read authorization, inbox listing and unread exclusion for learner, author and another circle member in `PrivateRecallConversationControllerTest` (25 cases). Another learner's prompt is refused; legacy shared reads/replies remain. Unread confidentiality uses the learner's stored non-null reasoning, so null-sender filtering cannot conceal a leak. Full `CURSOR_DEV=true nix develop -c pnpm backend:test_only` passed after independent refactor: 2762 tests, no failures/errors, 2 skips. Recall subject assignment is now independent of access assignment; the fixture builder explicitly retains legacy notebook audiences. Positive incoming-AI unread and truthful labels remain with slice 6; this actual prefix has fresh proof, unlike the [parked prototype](PRIVATE-ACCESS-PROTOTYPE-OBSERVATION.md).
 
 ### 6. Recognize private help and incoming replies in the inbox
 

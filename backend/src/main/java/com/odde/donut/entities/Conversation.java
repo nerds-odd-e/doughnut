@@ -21,6 +21,7 @@ public class Conversation extends EntityIdentifiedByIdOnly {
   @Embedded private ConversationSubject subject = new ConversationSubject();
 
   @ManyToOne
+  @Setter
   @JoinColumn(name = "subject_ownership_id", referencedColumnName = "id")
   Ownership accessOwnership;
 
@@ -47,7 +48,6 @@ public class Conversation extends EntityIdentifiedByIdOnly {
   @JsonIgnore
   public void setRecallPrompt(RecallPrompt recallPrompt) {
     this.subject.setRecallPrompt(recallPrompt);
-    this.accessOwnership = recallPrompt.getNotebook().getOwnership();
   }
 
   @JsonIgnore
