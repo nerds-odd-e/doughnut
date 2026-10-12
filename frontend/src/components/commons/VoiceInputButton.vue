@@ -8,7 +8,7 @@
     @click="emit('click')"
   >
     <canvas
-      v-if="state === 'recording' && readLevel"
+      v-if="state === 'recording'"
       ref="levelCanvas"
       class="w-6 h-6"
       width="24"
@@ -36,7 +36,7 @@ import { LoaderCircle, Mic, RotateCw } from "@lucide/vue"
 const { state, readLevel, names } = defineProps<{
   state: "idle" | "busy" | "recording" | "keptRecording"
   /** The live level of the running recording; the waveform is drawn from it. */
-  readLevel?: () => number
+  readLevel: () => number
   names: { start: string; stop: string; retry: string }
 }>()
 
@@ -61,7 +61,7 @@ const drawLevels = () => {
   const ctx = canvas?.getContext("2d")
   if (!canvas || !ctx) return
 
-  const level = Math.min(1, Math.abs(readLevel!()) * 4)
+  const level = Math.min(1, Math.abs(readLevel()) * 4)
   if (frame % framesPerBar === 0) {
     levels = [...levels, level].slice(-Math.floor(canvas.width / barStep))
   }

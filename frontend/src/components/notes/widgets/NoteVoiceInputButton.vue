@@ -6,7 +6,7 @@
         : toolbarToggleBtnClass(isRecording)
     "
     :state="state"
-    :read-level="titleRecording ? undefined : readContentLevel"
+    :read-level="readLevel"
     :names="noteVoiceInputTitles"
     @pointerdown="preserveTitleFocus"
     @click="click"
@@ -70,7 +70,10 @@ const state = computed(() => {
   if (hasKeptRecording.value) return "keptRecording"
   return "idle"
 })
-const readContentLevel = () => audioRecorder.getAudioData()
+const readLevel = () =>
+  titleRecording.value
+    ? title!.dictation.voiceInput.readLevel()
+    : audioRecorder.getAudioData()
 
 const click = () => {
   if (titleRecording.value) return title!.dictation.voiceInput.stopListening()

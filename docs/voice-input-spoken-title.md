@@ -97,8 +97,9 @@ startup until the session ends, and its pending marker shows the captured caret
 or the end of the selection. The marker is hidden from assistive technology,
 takes no clicks and is never title text; its dots stand still with reduced
 motion. During listening the toolbar button is highlighted, named "Stop voice
-input", and remains available in the toolbar even on a narrow screen. During
-startup and conversion it is disabled with a spinner, named "Voice input".
+input", shows a waveform that follows the level of the title recording, and
+remains available in the toolbar even on a narrow screen. During startup and
+conversion it is disabled with a spinner, named "Voice input".
 
 A selection is replaced, including the whole title if selected. A caret inserts
 at that position, with the body passage joining rule on both sides: spaces
