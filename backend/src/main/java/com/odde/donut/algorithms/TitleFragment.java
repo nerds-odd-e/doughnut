@@ -70,9 +70,6 @@ record TitleFragment(boolean suffixMarker, String stem) {
 
   static List<TitleFragment> mergeSortedLongestFirst(
       List<TitleFragment> titleFragments, List<TitleFragment> additionalFragments) {
-    if (additionalFragments.isEmpty()) {
-      return titleFragments;
-    }
     List<TitleFragment> merged = new ArrayList<>(titleFragments);
     merged.addAll(additionalFragments);
     return sortedLongestFirst(merged);

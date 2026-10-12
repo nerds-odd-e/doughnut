@@ -10,29 +10,29 @@ class NoteTitleTest {
   @Test
   void fullwidth_slash_is_literal_title_text() {
     NoteTitle noteTitle = new NoteTitle("colour／hue／／tone");
-    assertThat(noteTitle.getClozeTitleFragments().getFirst().stem(), equalTo("colour／hue／／tone"));
+    assertThat(noteTitle.getTitleFragments().getFirst().stem(), equalTo("colour／hue／／tone"));
   }
 
   @Test
-  void clozeTitleFragments_treatsTrailingBracketAsLiteralTitleText() {
+  void titleFragments_wholeTitleFirstThenTextBeforeTrailingBracket() {
     NoteTitle noteTitle = new NoteTitle("cat(animal)");
     assertThat(
-        noteTitle.getClozeTitleFragments().stream().map(TitleFragment::stem).toList(),
-        contains("cat(animal)"));
+        noteTitle.getTitleFragments().stream().map(TitleFragment::stem).toList(),
+        contains("cat(animal)", "cat"));
   }
 
   @Test
-  void clozeTitleFragments_treatsLaterTildeAsLiteralTitleText() {
+  void titleFragments_treatsLaterTildeAsLiteralTitleText() {
     NoteTitle noteTitle = new NoteTitle("word／~logical");
     assertThat(
-        noteTitle.getClozeTitleFragments().stream().map(TitleFragment::stem).toList(),
+        noteTitle.getTitleFragments().stream().map(TitleFragment::stem).toList(),
         contains("word／~logical"));
   }
 
   @Test
-  void clozeTitleFragments_fullwidthTildeMarkerStaysInPrimary() {
+  void titleFragments_fullwidthTildeMarkerStaysInPrimary() {
     NoteTitle noteTitle = new NoteTitle("～によると／によれば");
-    assertThat(noteTitle.getClozeTitleFragments().getFirst().stem(), equalTo("によると／によれば"));
+    assertThat(noteTitle.getTitleFragments().getFirst().stem(), equalTo("によると／によれば"));
   }
 
   @Test

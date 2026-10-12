@@ -20,16 +20,15 @@ spelling-match follow-ons are not built or verified here.
 
 `NoteTitle` already owns both sides: `matchesForRecall` (accepts the whole
 title and the title without its final round-parenthesized content) and
-`getClozeTitleFragments` (returns only the whole title). The fix gives
+its cloze fragment list (only the whole title). The fix gives
 `NoteTitle` one list of title fragments, whole title first and then the text
 before the qualifier, and both methods read it. Matching becomes "any fragment
 matches the answer"; masking gets the same fragments. This removes the second
 rule instead of adding a masking special case.
 
-The whole title stays first in the list. `TitleFragment.mergeSortedLongestFirst`
-returns the title fragments in the given order when a note has no aliases, and
-the longer fragment must be replaced first so `cat(animal)` in content is
-hidden as one mask.
+The longer fragment must be replaced first so `cat(animal)` in content is
+hidden as one mask. `TitleFragment.mergeSortedLongestFirst` owns that order: it
+always sorts, with or without aliases.
 
 `Note.createMaskedContentForRecall` is the only production consumer of the
 masking fragments. No ADR or North Star topic governs this choice.
@@ -41,7 +40,8 @@ masking fragments. No ADR or North Star topic governs this choice.
 | Title `Deposition (phase transition) ` hides both `deposition` occurrences; the rest of the clue stays readable | New test in `RecallPromptSpellingStemMaskingControllerTest` on the generated `SpellingQuestion` stem | 1 |
 | Title `cat(animal)` hides `cat` and `cat(animal)`; `animal` in `is an animal` stays readable | Same test class, generated stem | 1 |
 | Unqualified title masked as today | Existing `ClozeDescriptionTest` rows and `RecallPromptSpellingStemMaskingControllerTest` tests stay green | 1 |
-| Accepted answers unchanged, `deposition` and `cat` accepted, `animal` rejected | Existing `NoteControllerVerifySpellingTests` rows stay green | 1 |
+| Accepted answers unchanged, `deposition` and `cat` accepted, `animal` rejected | Existing `NoteControllerVerifySpellingTests` rows stay green, plus a row for `Deposition (phase transition) ` answered `deposition` | 1 |
+| A title with no text before its qualifier leaves the clue readable | `RecallPromptSpellingStemMaskingControllerTest` `spellingQuestionLeavesClueReadableWhenNoTitleTextPrecedesTheQualifier` | 1 |
 
 ## Settled premises
 
@@ -80,7 +80,7 @@ reverted afterwards.
 
 ### 1. Spelling question hides the title text before a trailing qualifier
 Type: Behavior
-Status: planned
+Status: done
 Proof: New `RecallPromptSpellingStemMaskingControllerTest` tests for the two
 qualified-title key examples fail before the change and pass after it. Then
 `pnpm backend:test:worktree --tests 'com.odde.donut.algorithms.*'` and
@@ -104,6 +104,12 @@ Work in this slice:
 
 ## Current decisions
 
+- The shared list is `NoteTitle.getTitleFragments`; the masking-only name went
+  when answer matching started reading it.
+- A title with no text before its qualifier, such as `~(phase transition)`,
+  gets no second fragment. An empty fragment turned the whole clue into masks
+  (observed at the generated stem before the guard). Such a title therefore no
+  longer accepts an empty answer.
 - The qualifier's own text is not hidden; it is not an accepted answer.
 - No frontend, CLI, MCP, API, or schema change: the stem is produced by the
   backend and the DTO shape is unchanged, so no API generation is needed.
