@@ -188,6 +188,6 @@ A slice made one fragment list serve both answer matching and masking. Neither t
   - Tool: Claude Code
   - Model: claude-opus-5-5
   - Open Dough release: unknown
-  - Evidence: plan `.planning/slice-plans/003-mask-spelling-answer-before-title-qualifier/PLAN.md` Current decisions; test `spellingQuestionLeavesClueReadableWhenNoTitleTextPrecedesTheQualifier` failed before the guard with every word boundary masked for title `~(phase transition)`; refactor return section "Observation, not acted on"
+  - Evidence: plan `3972c2dbcc346016b0ca5e2c807d96f4ee71e0d5:.planning/slice-plans/003-mask-spelling-answer-before-title-qualifier/PLAN.md` Current decisions; test `spellingQuestionLeavesClueReadableWhenNoTitleTextPrecedesTheQualifier` failed before the guard with every word boundary masked for title `~(phase transition)`; refactor return section "Observation, not acted on"
   - Observed effect: the defect was caught before publication, by the coordinator rather than by planned proof; the post-refactor edit had no independent refactor review
   - Inference: when a rule is widened from matching to masking, checking the degenerate inputs of the shared value (empty fragment) in the plan's premises would have placed this in the implementation pass; generality is unverified from one occurrence
