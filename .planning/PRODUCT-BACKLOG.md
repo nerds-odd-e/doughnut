@@ -6,8 +6,6 @@ Make deliberately captured knowledge more useful through learning and refinement
 
 ## Taken
 
-- [Resolve a confusing recall answer with an explanation and a follow-up check](seeds/SEED-073-learning-refinement-and-retrieval.md#story-1) — SEED-073#story-1 ([plan](slice-plans/001-resolve-confusing-recall-answer/PLAN.md))
-
 ## Backlog list
 
 - [Save a useful chat clarification as a reviewed note correction](seeds/SEED-073-learning-refinement-and-retrieval.md#story-2) — SEED-073#story-2
