@@ -37,7 +37,7 @@ the layout shared by all notebook pages, and does not address the cause.
 
 **Identity:** SEED-075#story-1
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/002-mobile-note-toolbar-one-row/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"c60c7f325ef89ab78d7ea84f4e07bbc5880856fcc7e049562484a0d5dd5388ac","plan":"2aedf2e8a64c098c50d4a57df51cc7087baacac9cb9bf5c936fb6a3132c751d8"}}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/004-mobile-note-toolbar-one-row/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"c60c7f325ef89ab78d7ea84f4e07bbc5880856fcc7e049562484a0d5dd5388ac","plan":"2aedf2e8a64c098c50d4a57df51cc7087baacac9cb9bf5c936fb6a3132c751d8"}}
 ```
 
 - **Goal:** A note author on a phone, or in any narrow note column, sees
