@@ -66,6 +66,7 @@ const props = defineProps<{
 const emit = defineEmits<{
   (e: "conversation-fetched", conversationId: number): void
   (e: "conversation-changed", conversationId: number): void
+  (e: "close-dialog"): void
 }>()
 
 const router = useRouter()
@@ -98,6 +99,8 @@ const handleCloseDialog = () => {
   const noteTopology = props.conversation.subject?.note?.noteTopology
   if (noteTopology) {
     router.push(noteShowLocation(noteTopology.id))
+  } else {
+    emit("close-dialog")
   }
 }
 </script>

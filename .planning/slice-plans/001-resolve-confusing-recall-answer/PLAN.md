@@ -144,13 +144,13 @@ Proof: Accepted six `RecallConversationContinuationControllerTest` cases: repeat
 ### 8. Open contextual help and return to the same recall
 
 Type: Behavior
-Status: planned
+Status: done
 
 Sizing: 5–8 minutes including mounted proof/typechecks; one shared entry journey.
 
 Behavior: From an answered MCQ or a particular history item, the learner opens clearly labelled private help with the original attempt visible. Closing it returns focus and preserves the underlying recall/history position. Multiple history items each target their own attempt.
 
-Proof: Mounted real parent pages/components use real conversation content and mock only HTTP. Observe chosen prompt ID, original question/selected answer, audience label, distinct history controls, and preserved current answer/queue after close. Reuse Modal and existing answer display; keep the same interaction keyboard-operable and give it a useful accessible name. Message Center subject rendering continues to work. A fixture that pre-supplies restored state is not proof of restoration; drive open and close in the same mounted parent.
+Proof: Accepted `RecallPage.privateHelp.spec.ts`: actual second-choice click and answer HTTP response → matching private-help Modal → original question/selected answer → dialog close or Escape → same answer/progress/queue/named route and invoker focus. `MemoryTrackerPageView.privateHelp.spec.ts` opens two distinct history attempts and preserves their cards/focus; real conversation/answer rendering and native Modal run with only HTTP mocked. Retained Message Center subjects pass. Full headless `CURSOR_DEV=true nix develop -c pnpm frontend:test` passed (340 files/2154 tests), with both frontend `vue-tsc --noEmit` and `tsc --noEmit`; independent refactor found no edits. G2 is proved by this same-parent journey; active implementation about eight minutes excludes verification waits.
 
 ### 9. Explain the learner's reasoning and accept clarification
 
@@ -225,7 +225,7 @@ Disposition: proved by slice 3: PRACTICE-FOLLOWUP-OBSERVATION.md, actual c3/c4 c
 ### G2. Mounted interaction remains unobserved by this probe (first reported in original slice 1)
 Reported: slice 1 — "HTTP evidence proves the returned payload and missing persistence; UI rendering was not inspected."
 Story clause: "Returning to recall preserves the learner's progress."
-Disposition: receiving slice 8
+Disposition: proved by slice 8: RecallPage.privateHelp.spec.ts actual answer/open/close and Escape preserve rendered answer, progress, queue, route and focus in the same mounted parent
 
 ### G3. Illustrative observation has no efficacy inference (reported in original slice 1)
 Reported: slice 1 — "Illustrative fixed cases, one run; no representative learner or efficacy claim"
