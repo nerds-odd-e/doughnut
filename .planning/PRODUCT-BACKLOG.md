@@ -6,8 +6,6 @@ Make deliberately captured knowledge more useful through learning and refinement
 
 ## Taken
 
-- [Resolve a disputed wrong mark after the learner confirms question ambiguity](seeds/SEED-073-learning-refinement-and-retrieval.md#story-7) — SEED-073#story-7 ([plan](slice-plans/070-learner-confirmed-ambiguous-exclusion/PLAN.md))
-
 ## Backlog list
 
 - [Require a reason when a learner excludes an ambiguous attempt](seeds/SEED-073-learning-refinement-and-retrieval.md#story-8) — SEED-073#story-8

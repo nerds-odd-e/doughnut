@@ -141,7 +141,7 @@ Former local code: DD-217. Former local code: DD-222. The slice time bound is ch
   - Tool: Claude Code
   - Model: claude-opus-5-5
   - Open Dough release: unknown
-  - Evidence: implementation task durations reported by the host for plan `.planning/slice-plans/070-learner-confirmed-ambiguous-exclusion/PLAN.md`: slice 1 about 6 min, slice 3 about 7 min, slice 4 about 10 min, slice 5 about 8 min, slice 9 about 8 min, slice 10 about 8 min plus about 9 min after a return, against a 5-minute target and a 10-minute hard limit; each ran the whole backend suite one to three times at 1–2.5 min per run
+  - Evidence: implementation task durations reported by the host for plan `21d5534381:.planning/slice-plans/070-learner-confirmed-ambiguous-exclusion/PLAN.md`: slice 1 about 6 min, slice 3 about 7 min, slice 4 about 10 min, slice 5 about 8 min, slice 9 about 8 min, slice 10 about 8 min plus about 9 min after a return, against a 5-minute target and a 10-minute hard limit; each ran the whole backend suite one to three times at 1–2.5 min per run
   - Observed effect: every return was accepted at hand-back without re-sizing; no slice was stopped
   - Inference: the whole-suite proof command alone uses a large share of a 5-minute slice here, so the bound may not fit backend slices in this project; not measured against a split alternative
 
@@ -317,6 +317,6 @@ A late slice changed where the schedule rebuild starts. The coordinator's brief 
   - Tool: Claude Code
   - Model: claude-opus-5-5
   - Open Dough release: unknown
-  - Evidence: `56cb8aa44c:backend/src/main/java/com/odde/donut/services/MemoryTrackerService.java` lines 110–112 and `entities/MemoryTrackerReplay.java`; slice 10 return "Untested behaviors: Two exclusions on one tracker, in either order", recorded as covered in obligation G19; slice 11 of `.planning/slice-plans/070-learner-confirmed-ambiguous-exclusion/PLAN.md`
+  - Evidence: `56cb8aa44c:backend/src/main/java/com/odde/donut/services/MemoryTrackerService.java` lines 110–112 and `entities/MemoryTrackerReplay.java`; slice 10 return "Untested behaviors: Two exclusions on one tracker, in either order", recorded as covered in obligation G19; slice 11 of `21d5534381:.planning/slice-plans/070-learner-confirmed-ambiguous-exclusion/PLAN.md`
   - Observed effect: the defect was delivered on the story branch; the owner authorized its repair in the same execution as slice 11
   - Inference: the return named the untested case and the coordinator dispositioned it as proved by reasoning about a shared loop; requiring an observation when a rule change touches an idempotence promise would have caught it; one occurrence. The aggregate review by a fresh reader is a practice that worked here

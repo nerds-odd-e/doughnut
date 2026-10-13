@@ -2,6 +2,12 @@
   "schemaVersion": 1,
   "records": [
     {
+      "fileName": "SEED-073_story-7.json",
+      "identity": "SEED-073#story-7",
+      "completedAt": "2026-10-13T21:50:12.770Z",
+      "blob": "d4e1e7c83dd07e8266da64b04ef9f09eb5209a70"
+    },
+    {
       "fileName": "SEED-073_manual-language-learner-evaluation.json",
       "identity": "SEED-073#manual-language-learner-evaluation",
       "completedAt": "2026-10-13T01:44:50.153Z",
