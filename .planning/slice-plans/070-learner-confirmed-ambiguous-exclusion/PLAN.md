@@ -434,7 +434,22 @@ overrun rule. Stop-safe: the journey and its documentation are complete.
 
 ### 10. Exclusion keeps the state the tracker held before the excluded attempt
 Type: Behavior
-Status: planned
+Status: done
+Accepted proof (2026-10-13): `CURSOR_DEV=true nix develop -c pnpm backend:test_only`
+→ BUILD SUCCESSFUL, 2804 tests, 0 failures; after refactoring the
+`RecallPrompt*` controller classes, `MemoryTrackerRecallHistoryRetrievabilityTest`,
+and `MemoryTrackerRebuildFromRecallHistoryTest` reran green (97 tests);
+`pnpm cy:run --spec e2e_test/features/recall/ambiguous_question_exclusion.feature`
+→ 1 passing. Observations in
+`RecallPromptExcludeAsAmbiguousKeepsEarlierStateControllerTest`:
+`theTrackerHoldsAgainTheStateItHadBeforeTheExcludedAttempt` (a),
+`aLaterGradeIsAppliedToTheStateHeldBeforeTheExcludedAttempt` (b),
+`anExcludedAttemptWithoutCachedStateRebuildsFromANewTracker` (d),
+`aLaterGradeCountsItsElapsedTimeFromTheLoggedGradeBeforeTheExcludedAttempt`
+(the last recall comes from the earlier logged Grade; it fails with that
+lookup disabled), and `anAttemptWithoutARecallLogIsExcludedAndChangesNoSchedule`.
+The rule lives in `MemoryTrackerReplay.rebuildWithout`, reached through
+`MemoryTracker.rebuildWithout(excluded, history)`.
 Proof: controller tests on the exclusion operation in
 `RecallPromptExcludeAsAmbiguousControllerTest`: (a) a tracker whose stability,
 difficulty, and last recall were set without recall logs, then AGAIN at t1,
@@ -511,9 +526,9 @@ was accepted on `main`.
   context in setup detaches the current user.
 - A migration slice proves with `pnpm backend:verify` (test-DB migration plus
   the whole suite) in place of `backend:test_only`.
-- `MemoryTracker.rebuildFrom` trusts the caller's order and realigns the passed
-  logs in place, so the caller supplies ascending `recordedAt` (id as the
-  tie-break) and saves tracker and logs. The existing ordered query,
+- Replay trusts the caller's order and realigns the passed logs in place, so
+  the caller supplies ascending `recordedAt` (id as the tie-break) and saves
+  tracker and logs. The existing ordered query,
   `findAllByMemoryTracker_IdOrderByRecordedAtDescIdDesc`, is descending.
   `RecallLog.getAnswer()` reaches the attempt and its `excludedAt`.
 - `MemoryTracker.java` is at 247 of 250 lines; additions there need room.
@@ -578,7 +593,7 @@ Disposition: proved by slice 9: `ambiguous_question_exclusion.feature`, where th
 ### G4. Replay discards tracker state that RecallLog does not hold
 Reported: slice 3 — "A tracker whose current stability did not come from RecallLog rows (for example test fixtures built with `stabilityAndNextRecallAt(200)` and no logs) becomes New on exclusion."
 Story clause: "Confirmation is not a new Grade, does not award GOOD, and does not reset or recreate the tracker."
-Disposition: receiving slice 10
+Disposition: proved by slice 10: `RecallPromptExcludeAsAmbiguousKeepsEarlierStateControllerTest.theTrackerHoldsAgainTheStateItHadBeforeTheExcludedAttempt`
 
 ### G5. An excluded attempt still counts as recall activity
 Reported: slice 4 — "an excluded attempt still counts as recall activity for the silent-window due time. I treated that as activity, not evaluation, and did not change it."
@@ -644,3 +659,13 @@ Disposition: no user cost "its learning effects are corrected": the corrected du
 Reported: slice 8 — "Message Center: untested. It updates by construction through `ConversationComponent`; no Message Center spec drives a confirmation."
 Story clause: "Reopening the attempt or its help shows the same decision and explains its actual consequences."
 Disposition: no user cost "the attempt is visibly excluded from evaluation": the Message Center renders the subject through the same `ConversationComponent` whose update `ConversationComponent.exclusion.spec.ts` observes
+
+### G18. The restored last recall and due time are derived
+Reported: slice 10 — "Due time is derived, not stored: it differs from the true pre-attempt due time wherever that was not \"last recall + interval(stability), with the strictly-future fallback\"."
+Story clause: "Keep the scheduling state the tracker held just before the excluded attempt, including state earned through grades that no recall event records."
+Disposition: owner changed "The owner chose to start the rebuild from the memory state cached on the excluded attempt's own recall event and to apply the later valid events to it."
+
+### G19. Confusion and repeated exclusions are unobserved from a kept state
+Reported: slice 10 — "Confusion logs before or after the excluded attempt under the new start state (the entity test covers Confusion replay only from New)."
+Story clause: "Preserve subsequent Grades and Confusion; align affected cached readouts with the corrected history."
+Disposition: proved by slice 10: both start states feed the one replay loop in `MemoryTrackerReplay`, whose Confusion handling `MemoryTrackerRebuildFromRecallHistoryTest.rebuildingWithoutAnAttemptThatHoldsNoCachedStateReproducesIncrementalScheduling` observes, and later Grades from a kept state are observed by `aLaterGradeIsAppliedToTheStateHeldBeforeTheExcludedAttempt`

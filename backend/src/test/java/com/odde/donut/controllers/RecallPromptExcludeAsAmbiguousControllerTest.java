@@ -11,7 +11,6 @@ import com.odde.donut.entities.MemoryTracker;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.RecallLog;
 import com.odde.donut.entities.RecallPrompt;
-import com.odde.donut.entities.repositories.RecallLogRepository;
 import com.odde.donut.exceptions.QuestionAnswerException;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.donut.services.UserService;
@@ -23,7 +22,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 class RecallPromptExcludeAsAmbiguousControllerTest extends RecallPromptControllerTestBase {
-  @Autowired RecallLogRepository recallLogRepository;
   @Autowired UserService userService;
 
   Note note;
@@ -129,7 +127,8 @@ class RecallPromptExcludeAsAmbiguousControllerTest extends RecallPromptControlle
             .map(MemoryTracker::getId)
             .toList(),
         contains(tracker.getId()));
-    assertThat(persistedLogs().stream().map(RecallLog::getGrade).toList(), contains(Grade.AGAIN));
+    assertThat(
+        persistedLogs(tracker).stream().map(RecallLog::getGrade).toList(), contains(Grade.AGAIN));
   }
 
   @Test
@@ -138,7 +137,7 @@ class RecallPromptExcludeAsAmbiguousControllerTest extends RecallPromptControlle
     Timestamp recalledAt = makeMe.aTimestamp().of(1, 20).please();
     testabilitySettings.timeTravelTo(recalledAt);
     memoryTrackerController.markAsRecalled(tracker, Grade.GOOD);
-    List<Object> excludedLogBefore = cachedOn(persistedLogs().get(0));
+    List<Object> excludedLogBefore = cachedOn(persistedLogs(tracker).get(0));
     testabilitySettings.timeTravelTo(excludedAt);
     MemoryTracker gradedOnce =
         makeMe.aMemoryTrackerFor(note).assimilatedAt(assimilatedAt).inMemoryPlease();
@@ -154,7 +153,7 @@ class RecallPromptExcludeAsAmbiguousControllerTest extends RecallPromptControlle
     assertThat((double) tracker.getDifficulty(), closeTo(gradedOnce.getDifficulty(), 1e-4));
     assertThat(tracker.getLastRecalledAt(), equalTo(gradedOnce.getLastRecalledAt()));
     assertThat(tracker.getNextRecallAt(), equalTo(gradedOnce.getNextRecallAt()));
-    List<RecallLog> logs = persistedLogs();
+    List<RecallLog> logs = persistedLogs(tracker);
     assertThat(logs.stream().map(RecallLog::getGrade).toList(), contains(Grade.AGAIN, Grade.GOOD));
     assertThat(cachedOn(logs.get(0)), equalTo(excludedLogBefore));
     assertThat(cachedOn(logs.get(1)), equalTo(cachedOn(onlyLog)));
@@ -173,14 +172,6 @@ class RecallPromptExcludeAsAmbiguousControllerTest extends RecallPromptControlle
     assertThat(persistedScheduleAndHistory(), equalTo(afterFirst));
   }
 
-  private List<RecallLog> persistedLogs() {
-    makeMe.entityPersister.flush();
-    List<RecallLog> logs =
-        recallLogRepository.findAllByMemoryTracker_IdOrderByRecordedAtAscIdAsc(tracker.getId());
-    logs.forEach(makeMe::refresh);
-    return logs;
-  }
-
   private List<Object> cachedOn(RecallLog log) {
     return Arrays.asList(
         log.getElapsedHours(),
@@ -196,6 +187,6 @@ class RecallPromptExcludeAsAmbiguousControllerTest extends RecallPromptControlle
         tracker.getDifficulty(),
         tracker.getLastRecalledAt(),
         tracker.getNextRecallAt(),
-        persistedLogs().stream().map(log -> List.of(log.getId(), cachedOn(log))).toList());
+        persistedLogs(tracker).stream().map(log -> List.of(log.getId(), cachedOn(log))).toList());
   }
 }

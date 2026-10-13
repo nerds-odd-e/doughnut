@@ -31,6 +31,17 @@ class MemoryTrackerRebuildFromRecallHistoryTest extends MemoryTrackerRecallSched
     return makeMe.aMemoryTrackerFor(note).by(user).assimilatedAt(assimilatedAt).inMemoryPlease();
   }
 
+  RecallLog anExcludedAttemptWithoutCachedState(MemoryTracker tracker, int hoursAfterAssimilation) {
+    Answer answer = new Answer();
+    answer.excludeAsAmbiguous("both tenses fit", hoursAfterAssimilation(hoursAfterAssimilation));
+    return makeMe
+        .aRecallLogFor(tracker)
+        .recordedAt(hoursAfterAssimilation(hoursAfterAssimilation))
+        .grade(Grade.AGAIN)
+        .answer(answer)
+        .inMemoryPlease();
+  }
+
   Timestamp hoursAfterAssimilation(int hours) {
     return TimestampOperations.addHoursToTimestamp(assimilatedAt, hours);
   }
@@ -50,7 +61,7 @@ class MemoryTrackerRebuildFromRecallHistoryTest extends MemoryTrackerRecallSched
   }
 
   @Test
-  void replayingTheRecallHistoryReproducesIncrementalScheduling() {
+  void rebuildingWithoutAnAttemptThatHoldsNoCachedStateReproducesIncrementalScheduling() {
     recordIncrementally(5, Grade.AGAIN);
     recordIncrementally(30, Grade.GOOD);
     recordIncrementally(40, null);
@@ -66,8 +77,11 @@ class MemoryTrackerRebuildFromRecallHistoryTest extends MemoryTrackerRecallSched
                         .grade(log.getGrade())
                         .inMemoryPlease())
             .toList();
+    RecallLog excluded = anExcludedAttemptWithoutCachedState(rebuilt, 20);
+    List<RecallLog> history = new ArrayList<>(replayedLogs);
+    history.add(1, excluded);
 
-    rebuilt.rebuildFrom(replayedLogs);
+    rebuilt.rebuildWithout(excluded, history);
 
     assertThat(rebuilt.getStability(), equalTo(incremental.getStability()));
     assertThat(rebuilt.getDifficulty(), equalTo(incremental.getDifficulty()));
@@ -81,11 +95,12 @@ class MemoryTrackerRebuildFromRecallHistoryTest extends MemoryTrackerRecallSched
   }
 
   @Test
-  void aTrackerRebuiltFromNoHistoryIsNewAndDueAtAssimilation() {
+  void aTrackerLeftWithNoValidHistoryIsNewAndDueAtAssimilation() {
     MemoryTracker tracker = aNewTracker();
-    tracker.applyGrade(hoursAfterAssimilation(5), Grade.GOOD);
+    RecallLog excluded = anExcludedAttemptWithoutCachedState(tracker, 5);
+    tracker.applyGrade(excluded.getRecordedAt(), excluded.getGrade());
 
-    tracker.rebuildFrom(List.of());
+    tracker.rebuildWithout(excluded, List.of(excluded));
 
     assertThat(tracker.getStability(), equalTo(NEW_STABILITY_HOURS));
     assertThat(tracker.getDifficulty(), nullValue());

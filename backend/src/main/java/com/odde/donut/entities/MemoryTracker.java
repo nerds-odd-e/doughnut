@@ -222,8 +222,8 @@ public class MemoryTracker extends EntityIdentifiedByIdOnly {
     setNextRecallAt(projected.after(existingDue) ? existingDue : projected);
   }
 
-  public void rebuildFrom(List<RecallLog> chronological) {
-    MemoryTrackerReplay.rebuild(this, chronological);
+  public void rebuildWithout(RecallLog excluded, List<RecallLog> history) {
+    MemoryTrackerReplay.rebuildWithout(this, excluded, history);
   }
 
   @JsonIgnore

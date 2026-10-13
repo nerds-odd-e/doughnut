@@ -109,20 +109,23 @@ public class MemoryTrackerService {
     }
     answer.excludeAsAmbiguous(reason, currentUTCTimestamp);
     entityPersister.save(answer);
-    rebuildFromValidHistory(recallPrompt.requireMemoryTracker());
+    rebuildWithout(answer, recallPrompt.requireMemoryTracker());
     return recallPrompt;
   }
 
-  private void rebuildFromValidHistory(MemoryTracker memoryTracker) {
-    List<RecallLog> validEvents =
-        recallLogRepository
-            .findAllByMemoryTracker_IdOrderByRecordedAtAscIdAsc(memoryTracker.getId())
-            .stream()
-            .filter(RecallLog::isValidEvent)
-            .toList();
-    memoryTracker.rebuildFrom(validEvents);
-    validEvents.forEach(entityPersister::save);
-    entityPersister.save(memoryTracker);
+  private void rebuildWithout(Answer excluded, MemoryTracker memoryTracker) {
+    List<RecallLog> history =
+        recallLogRepository.findAllByMemoryTracker_IdOrderByRecordedAtAscIdAsc(
+            memoryTracker.getId());
+    history.stream()
+        .filter(log -> excluded.equals(log.getAnswer()))
+        .findFirst()
+        .ifPresent(
+            attempt -> {
+              memoryTracker.rebuildWithout(attempt, history);
+              history.forEach(entityPersister::save);
+              entityPersister.save(memoryTracker);
+            });
   }
 
   /** Persist a graded recall log, or CONFUSION when {@code grade} is null. */
