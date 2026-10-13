@@ -4,7 +4,7 @@
     @accept="handleAccept"
     @cancel="handleCancel"
     @skip="handleSkip"
-    :hideAccept="suggestion.suggestionType === 'unknown'"
+    :hideAccept="!canAccept"
     :hideSkip="isExclusion"
     :acceptLabel="isExclusion ? 'Confirm' : undefined"
     :cancelLabel="isExclusion ? 'Decline' : undefined"
@@ -55,6 +55,13 @@ const isProcessing = ref(false)
 const isExclusion = computed(
   () => props.suggestion.suggestionType === "exclusion"
 )
+
+const canAccept = computed(() => {
+  if (props.suggestion.suggestionType === "exclusion") {
+    return Boolean(props.suggestion.content.reason?.trim())
+  }
+  return props.suggestion.suggestionType !== "unknown"
+})
 
 const suggestionTitle = computed(() => {
   switch (props.suggestion?.suggestionType) {

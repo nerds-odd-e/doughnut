@@ -6,8 +6,6 @@ Make deliberately captured knowledge more useful through learning and refinement
 
 ## Taken
 
-- [Require a reason when a learner excludes an ambiguous attempt](seeds/SEED-073-learning-refinement-and-retrieval.md#story-8) — SEED-073#story-8 ([plan](slice-plans/001-ambiguous-exclusion-reason/PLAN.md))
-
 ## Backlog list
 
 - [Keep private recall help controls in view for long conversations](seeds/SEED-073-learning-refinement-and-retrieval.md#story-9) — SEED-073#story-9

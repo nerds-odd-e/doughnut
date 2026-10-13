@@ -19,6 +19,9 @@ import java.util.Arrays;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 
 class RecallPromptExcludeAsAmbiguousControllerTest extends RecallPromptControllerTestBase {
@@ -57,18 +60,41 @@ class RecallPromptExcludeAsAmbiguousControllerTest extends RecallPromptControlle
     assertThat(answer.getCorrect(), is(false));
   }
 
-  @Test
-  void repeatingReturnsTheFirstDecision() throws UnexpectedNoAccessRightException {
+  @ParameterizedTest
+  @NullSource
+  @ValueSource(strings = {"", "   ", "\t\n"})
+  void refusesANewExclusionWithoutAReason(String reason) {
+    List<Object> before = persistedScheduleAndHistory();
+
+    assertThrows(
+        QuestionAnswerException.class,
+        () -> controller.excludeAsAmbiguous(recallPrompt, ambiguousExclusion(reason)));
+
+    Answer answer = makeMe.refresh(recallPrompt.getAnswer());
+    assertThat(answer.getExcludedAt(), nullValue());
+    assertThat(answer.getExclusionReason(), nullValue());
+    assertThat(persistedScheduleAndHistory(), equalTo(before));
+  }
+
+  @ParameterizedTest
+  @NullSource
+  @ValueSource(strings = {"", "   ", "\t\n", "another reason"})
+  void repeatingReturnsTheFirstDecisionAndPreservesScheduleAndHistory(String reason)
+      throws UnexpectedNoAccessRightException {
+    testabilitySettings.timeTravelTo(makeMe.aTimestamp().of(1, 20).please());
+    memoryTrackerController.markAsRecalled(tracker, Grade.GOOD);
+    testabilitySettings.timeTravelTo(excludedAt);
     controller.excludeAsAmbiguous(recallPrompt, ambiguousExclusion("both tenses fit"));
+    List<Object> afterFirst = persistedScheduleAndHistory();
     testabilitySettings.timeTravelTo(makeMe.aTimestamp().of(3, 8).please());
 
     Answer answer =
-        controller
-            .excludeAsAmbiguous(recallPrompt, ambiguousExclusion("another reason"))
-            .getAnswer();
+        controller.excludeAsAmbiguous(recallPrompt, ambiguousExclusion(reason)).getAnswer();
 
+    makeMe.refresh(answer);
     assertThat(answer.getExcludedAt(), equalTo(excludedAt));
     assertThat(answer.getExclusionReason(), equalTo("both tenses fit"));
+    assertThat(persistedScheduleAndHistory(), equalTo(afterFirst));
   }
 
   @Test
@@ -157,19 +183,6 @@ class RecallPromptExcludeAsAmbiguousControllerTest extends RecallPromptControlle
     assertThat(logs.stream().map(RecallLog::getGrade).toList(), contains(Grade.AGAIN, Grade.GOOD));
     assertThat(cachedOn(logs.get(0)), equalTo(excludedLogBefore));
     assertThat(cachedOn(logs.get(1)), equalTo(cachedOn(onlyLog)));
-  }
-
-  @Test
-  void repeatingChangesNeitherTheScheduleNorTheHistory() throws UnexpectedNoAccessRightException {
-    testabilitySettings.timeTravelTo(makeMe.aTimestamp().of(1, 20).please());
-    memoryTrackerController.markAsRecalled(tracker, Grade.GOOD);
-    controller.excludeAsAmbiguous(recallPrompt, ambiguousExclusion("both tenses fit"));
-    List<Object> afterFirst = persistedScheduleAndHistory();
-    testabilitySettings.timeTravelTo(makeMe.aTimestamp().of(3, 8).please());
-
-    controller.excludeAsAmbiguous(recallPrompt, ambiguousExclusion("another reason"));
-
-    assertThat(persistedScheduleAndHistory(), equalTo(afterFirst));
   }
 
   private List<Object> cachedOn(RecallLog log) {

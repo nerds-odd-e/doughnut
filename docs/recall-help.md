@@ -28,12 +28,16 @@ proposes this only for genuine ambiguity, not for an option that is
 grammatical but has the wrong meaning, and only in private help for a
 multiple-choice attempt. A proposal changes nothing. The help dialog shows it
 as "Proposed correction: exclude this attempt as an ambiguous question" with
-the reason and the choices Confirm and Decline.
+the reason and the choices Confirm and Decline. A proposal without a nonblank
+reason offers only Decline; declining dismisses it without an exclusion request.
 
 Only the learner who owns the attempt can confirm. Declining leaves the
 result and the schedule as they were. Confirming records the exclusion time
-and the reason on the attempt. Confirming again returns the same decision and
-writes nothing new.
+and the reason on the attempt. A new exclusion requires a nonblank reason;
+missing, null, empty, or whitespace-only reasons are refused before the attempt
+or its schedule changes. Confirming again returns the first reason and time,
+even if the newly supplied reason is missing or different, and writes nothing
+new.
 
 The evidence stays. The question, the selected answer, the original mark, the
 recall log with its Grade, and the help conversation that led to the decision
