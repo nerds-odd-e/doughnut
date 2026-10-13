@@ -106,6 +106,10 @@ coordinator `nao-story8-2fd471d5`, stream directory
 bound to this checkout and the remote execution branch. The trunk claim's CI
 is unobserved; this observer owns subsequent branch deliveries.
 
+Accepted branch delivery: slice 1 `772eb5c68e8175056fb2e96110a02363ee3c98ce`,
+suffix base `171cdbab862392ee90028f25f85de91424c17426`; no reconciliation,
+observer reused and revision registered. This is the next increment's base.
+
 ## Ordered slices
 
 ### 1. Refuse a new exclusion without its reason
@@ -155,7 +159,7 @@ generation trigger changed.
 
 ### 2. Keep reasonless help proposals declineable
 Type: Behavior
-Status: planned
+Status: done
 Proof: Mounted malformed/valid proposal cases and full
 `CURSOR_DEV=true nix develop -c pnpm frontend:test`, plus
 `CURSOR_DEV=true nix develop -c pnpm -C frontend exec vue-tsc --noEmit` and
@@ -177,6 +181,24 @@ no Structure slice is justified. Apply the same ten-minute stop rule.
 
 Safe stopping point: the entire story is available through the existing help
 and exclusion flow, with no dependency on the deferred product decisions.
+
+Accepted proof (2026-10-14):
+`CURSOR_DEV=true nix develop -c pnpm frontend:test` exited zero: 350 files /
+2,192 tests passed in 45.34s. Both
+`CURSOR_DEV=true nix develop -c pnpm -C frontend exec vue-tsc --noEmit` and
+`CURSOR_DEV=true nix develop -c pnpm -C frontend exec tsc --noEmit` exited zero
+against the same final frontend content. Inspected mounted
+`AiResponse.exclusionProposal.spec.ts`: `beforeEach` supplies the answered
+conversation and external SDK/event-source mocks; `showProposal` streams split
+JSON through the real response handling. Four malformed cases assert no
+Confirm, click real Decline, observe dismissal and no exclusion request.
+Valid cases observe rendered reason and the unchanged reason-bearing request.
+Inspected confirmation consumers in `ConversationComponent.exclusion.spec.ts`,
+`RecallPage.privateHelp.spec.ts`, `MemoryTrackerPage.privateHelp.spec.ts`, and
+`MemoryTrackerPageView.history.spec.ts`; full-suite results cover them and the
+other proposal kinds. Fresh refactor found no edits, so accepted proof stayed
+valid; whitespace passed. Formatting succeeded once with no fixes. G1 is
+resolved by these mounted observations. No API generation trigger changed.
 
 ## Verification and delivery requirements
 
@@ -207,9 +229,14 @@ The backend-first interim interaction is explicit and has slice 2 as its owner.
 ### G1. Reasonless proposal controls
 Reported: slice 1 — "Malformed Help proposals can display Confirm until slice 2, while the backend safely rejects them."
 Story clause: "A tutor proposal that carries no reason cannot be confirmed in help; the learner can still decline it."
-Disposition: interim until slices 2
+Disposition: proved by slice 2: `AiResponse.exclusionProposal.spec.ts` — `offers only decline for a proposal with reason %j` streams each malformed proposal, observes no Confirm, clicks Decline, observes dismissal and no exclusion API request; full frontend suite passed.
 
 ### G2. Observation boundaries
 Reported: slice 1 — "Direct controller tests exercise null reasons; no HTTP-binding or manual-browser proof is claimed."
 Story clause: "A learner who excludes an attempt as an ambiguous question always keeps the reason for that decision."
 Disposition: no user cost "A learner who excludes an attempt as an ambiguous question always keeps the reason for that decision.": the real controller/service/entity/database boundary proves the rule; the request shape and binding remain unchanged, and mounted frontend proof belongs to slice 2. No manual or separate HTTP-binding observation is a promised proof item.
+
+### G3. Tutor-quality observation
+Reported: slice 2 — "No manual-browser or real-model observation claimed."
+Story clause: "A learner who excludes an attempt as an ambiguous question always keeps the reason for that decision."
+Disposition: no user cost "A learner who excludes an attempt as an ambiguous question always keeps the reason for that decision.": unchanged tutor quality is outside this rule; malformed and valid proposals exercise the real mounted handling with the external stream mocked, alongside real backend decision proof.

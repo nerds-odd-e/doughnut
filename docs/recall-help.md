@@ -28,7 +28,8 @@ proposes this only for genuine ambiguity, not for an option that is
 grammatical but has the wrong meaning, and only in private help for a
 multiple-choice attempt. A proposal changes nothing. The help dialog shows it
 as "Proposed correction: exclude this attempt as an ambiguous question" with
-the reason and the choices Confirm and Decline.
+the reason and the choices Confirm and Decline. A proposal without a nonblank
+reason offers only Decline; declining dismisses it without an exclusion request.
 
 Only the learner who owns the attempt can confirm. Declining leaves the
 result and the schedule as they were. Confirming records the exclusion time
