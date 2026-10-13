@@ -95,7 +95,7 @@ When('I contest the MCQ', () => {
 Given('OpenAI will reply below for user messages:', (data: DataTable) => {
   fetchOpenAiMockIsolationProof().then((proof) => {
     const rows = data.hashes().map((row) => {
-      if (!proof) {
+      if (!proof || row.tool) {
         return row
       }
       return {

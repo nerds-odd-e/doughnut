@@ -129,6 +129,7 @@ slice 9 proves the journey with a mocked proposal.
 | After confirmation the help subject, the recall page entry, and the memory tracker page reflect the exclusion without reopening | 8: ConversationComponent spec; 9 for the pages |
 | Wrong answer → help → proposal → confirm → excluded label, corrected next recall time, recall history shows the decision | 9: mocked-OpenAI E2E scenario |
 | Declined proposal leaves result and schedule intact | 7 (no call), 5 (instruction: never imply a correction happened) |
+| The scheduling state held before the excluded attempt is kept, including state no recall log records | 10: controller tests comparing persisted state with the pre-attempt state and an independently graded tracker |
 
 Meaning-specific misconception feedback (the driving example) is tutor
 judgement under the slice 5 instruction; it has no automated proof, as the
@@ -397,7 +398,13 @@ Sizing: about 6 minutes. Stop-safe: all surfaces coherent.
 
 ### 9. The whole journey runs end to end, and recall help documents it
 Type: Behavior
-Status: planned
+Status: done
+Accepted proof (2026-10-13): `CURSOR_DEV=true nix develop -c pnpm cy:run --spec e2e_test/features/recall/ambiguous_question_exclusion.feature,e2e_test/features/ai_generated_content/note_content_completion.feature,e2e_test/features/messages/conversation_about_a_note.feature`
+→ 4 of 4 scenarios passing; the `isolated-cypress*` and `e2e-runner` script
+tests → 104 pass. The journey observes the proposal and its reason, Confirm,
+the page's excluded notice, the history item excluded beside `AGAIN`, "Next
+Recall Time" equal to "Assimilated Time", and the excluded notice in reopened
+help. The reopen is an in-app visit to the memory tracker page and its help.
 Proof: new `e2e_test/features/recall/ambiguous_question_exclusion.feature`
 (mocked OpenAI): assimilated note, generated question "Choose the
 grammatically correct completion: I ___ in Tokyo" with key "used to live",
@@ -423,13 +430,50 @@ readouts, and deferrals.
 Sizing: about 10 minutes, scrutinized: mock, page object, scenario, and
 documentation are one journey proof; splitting leaves either an unprovable
 scenario or an undocumented behavior. At 10 minutes apply the repository
-overrun rule. Stop-safe: the story is complete.
+overrun rule. Stop-safe: the journey and its documentation are complete.
+
+### 10. Exclusion keeps the state the tracker held before the excluded attempt
+Type: Behavior
+Status: planned
+Proof: controller tests on the exclusion operation in
+`RecallPromptExcludeAsAmbiguousControllerTest`: (a) a tracker whose stability,
+difficulty, and last recall were set without recall logs, then AGAIN at t1,
+then exclude → stability, difficulty, `lastRecalledAt`, and `nextRecallAt`
+equal what the tracker held before t1, read from persisted state; (b) the
+same tracker with AGAIN at t1 and GOOD at t2, then exclude t1 → the state
+equals an independent tracker that started from the pre-t1 state and received
+only GOOD at t2, and the t2 log's cached columns equal that tracker's; (c) the
+existing tests for a New tracker, a later Grade, and repeating stay green;
+(d) an excluded attempt whose log has no cached state rebuilds from a New
+tracker over all valid logs. `docs/recall-help.md` describes the rule. The
+E2E journey stays green.
+
+Behavior: the attempt is excluded → replay starts from the memory state
+cached on that attempt's own recall log (`stabilityBefore`,
+`difficultyBefore`, and the last recall it implies) and applies the valid
+events recorded after it, at their original times → state earned before the
+attempt, logged or not, is kept.
+
+Give `MemoryTracker.rebuildFrom` (or `MemoryTrackerReplay`) the starting
+state instead of always resetting to New; the last recall before the attempt
+is the latest earlier valid Grade log's time, or the log's time minus its
+`elapsedHours` when no such log exists, or none for a tracker that was New;
+the due time before the attempt follows from that state through
+`calculateNextRecallAt`. Keep one replay owner and the one valid-event rule.
+
+Sizing: about 8 minutes, scrutinized: one rule change with its proof and one
+documentation paragraph. Stop-safe: the story is complete.
 
 ## Current decisions and delivery
 
 - Exclusion lives on the attempt (`answer`), the RecallLog row stays, and one
   "valid scheduling event" rule serves replay and every readout. No RecallLog
   flag, no second versioning, no undo.
+- Owner decision (2026-10-13): replay starts from the memory state cached on
+  the excluded attempt's own recall log and applies the later valid events;
+  a log without cached state keeps the rebuild from a New tracker. ADR 0003
+  calls the cached columns a cache and "not a new source of truth"; whether
+  the ADR needs a note for this use is the owner's to decide.
 - Replay follows ADR 0003: original event times, whole-hour elapsed time, the
   current FSRS profile, cached columns realigned to what replay produces.
   Confusion events are replayed in order because `adjustForConfusion` reads
@@ -475,13 +519,17 @@ was accepted on `main`.
 - `MemoryTracker.java` is at 247 of 250 lines; additions there need room.
 - Persisted `FLOAT` stability and difficulty come back at about six
   significant digits; tests compare them to in-memory values with a tolerance.
-- Open owner decision (2026-10-13): replay keeps only state that RecallLog
-  holds. RecallLog writing began 2026-08-17 (`0843cbd3ee`, with backfills of
+- Observation behind the 2026-10-13 owner decision: a replay from New keeps
+  only state that RecallLog holds. RecallLog writing began 2026-08-17 (`0843cbd3ee`, with backfills of
   prompt answers and Tutor scores in `6ddf35275e` and `59e3e4a282`), so a
   tracker whose stability was earned through earlier unlogged grades would be
   rebuilt from a partial history when one of its attempts is excluded. ADR 0003
   states the state "can be rebuilt from RecallLog"; whether production
-  trackers satisfy that is unobserved. Obligation G4 keeps this open.
+  trackers satisfy that is unobserved. Slice 10 owns obligation G4.
+- `scripts/isolated-cypress-openai-mock.test.mjs` asserts the size of the
+  OpenAI-mock feature inventory and no package script runs it.
+- The recall page holds more than one `dialog` while help is open; E2E page
+  objects select the help dialog by its title.
 - The stats query's end bound is exclusive, so an attempt answered at exactly
   the current clock enters stats only after the clock advances.
 - `ControllerTestBase` holds the shared request builders `choiceAnswer` and
@@ -525,12 +573,12 @@ Disposition: proved by slice 4: `MemoryTrackerShowControllerTest` `recallCountOm
 ### G3. Route, request body, and serialized fields unobserved over HTTP
 Reported: slice 1 — "HTTP request binding of the `{reason}` JSON body and the route string: the controller is called directly, as in the neighbouring tests."
 Story clause: "The learner confirms → the attempt reads “Excluded — ambiguous question,” is not counted as failed or successful recall"
-Disposition: receiving slice 9
+Disposition: proved by slice 9: `ambiguous_question_exclusion.feature`, where the Confirm click sends the real request and the reason and original mark are read back from the recall page and the memory tracker page
 
 ### G4. Replay discards tracker state that RecallLog does not hold
 Reported: slice 3 — "A tracker whose current stability did not come from RecallLog rows (for example test fixtures built with `stabilityAndNextRecallAt(200)` and no logs) becomes New on exclusion."
 Story clause: "Confirmation is not a new Grade, does not award GOOD, and does not reset or recreate the tracker."
-Disposition: interim until slices 9
+Disposition: receiving slice 10
 
 ### G5. An excluded attempt still counts as recall activity
 Reported: slice 4 — "an excluded attempt still counts as recall activity for the silent-window due time. I treated that as activity, not evaluation, and did not change it."
@@ -565,7 +613,7 @@ Disposition: no user cost "the original evidence remains inspectable": the excha
 ### G11. A history item without its prompt would show a bare AGAIN
 Reported: slice 6 — "A log-only history item (no paired prompt) for an excluded answer would show bare AGAIN."
 Story clause: "Reopening shows both the original mark and the learner-confirmed correction."
-Disposition: receiving slice 9
+Disposition: proved by slice 9: `ambiguous_question_exclusion.feature` step "the recall history should show the "AGAIN" attempt as excluded" (`memoryTrackerRecallHistory.expectExcludedAttemptWithOutcome`)
 
 ### G12. A declined proposal leaves no record
 Reported: slice 7 — "A decline leaves no persisted or displayed mark; it differs from an accepted correction only by the absence of the excluded state."
@@ -585,7 +633,7 @@ Disposition: proved by slice 8: `ConversationComponent.exclusion.spec.ts`, `Reca
 ### G15. Reopening an already excluded attempt is unobserved in the browser
 Reported: slice 8 — "Reopening an already-excluded attempt on the recall page / help panel from persisted data: untested here, left to slice 9."
 Story clause: "Reopening the attempt or its help shows the same decision and explains its actual consequences."
-Disposition: receiving slice 9
+Disposition: proved by slice 9: `ambiguous_question_exclusion.feature` step "private recall help for that attempt should still show it as excluded", after a fresh load of the memory tracker page
 
 ### G16. The open recall session keeps its due queue
 Reported: slice 8 — "The recall page only replaces the displayed entry; it does not reload the due queue or progress counts after an exclusion."

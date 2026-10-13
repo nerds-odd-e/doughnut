@@ -304,6 +304,8 @@ This restores trust without claiming a successful recall that was not demonstrat
 - Exclude that invalid attempt from evaluation and derived recall readouts.
   Recompute the existing tracker's current scheduling state from the remaining
   valid history, using the original event times and the current FSRS policy.
+  Keep the scheduling state the tracker held just before the excluded attempt,
+  including state earned through grades that no recall event records.
   Preserve subsequent Grades and Confusion; align affected cached readouts with
   the corrected history. With no remaining valid scheduling event, the same
   tracker is due as an ungraded tracker. Corrected due work can already be overdue.
@@ -386,6 +388,12 @@ This restores trust without claiming a successful recall that was not demonstrat
   goal, scope, and examples unchanged; the exclusion is recorded on the
   learner's attempt, and the schedule is rebuilt by replaying the remaining
   RecallLog events, as the slice plan settles. Implementation is later work.
+- **Owner decision, 2026-10-13:** Execution observed that recall events have
+  been recorded only since 2026-08-17, so a rebuild from a new tracker would
+  drop stability earned earlier. The owner chose to start the rebuild from the
+  memory state cached on the excluded attempt's own recall event and to apply
+  the later valid events to it. An event without cached state keeps the
+  rebuild from a new tracker.
 
 **Observation provenance:** The 2026-10-13 manual session used ten real
 `gpt-6.1-sol` replies in an isolated E2E browser at product revision
