@@ -294,7 +294,7 @@ post-answer journey, model adjudication quality, or scoring repair.
 
 **Identity:** SEED-073#story-8
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"unselected"}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/001-ambiguous-exclusion-reason/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"8edde2a757c7445bae6eabf35d54a6f433922a46ab7e79607f4426dcb937594e","plan":"25061f5539bf74f053a4a16801693af1774dd40c8fbaaa5c64cffd569858c759"}}
 ```
 
 **Goal:** A learner who excludes an attempt as an ambiguous question always
@@ -303,9 +303,9 @@ recorded without a reason stays unexplained wherever the attempt is shown.
 
 **Scope:**
 
-- Excluding an attempt requires a reason that is not blank. The operation
-  refuses a missing or blank reason and changes nothing: no exclusion, no
-  schedule change.
+- A new exclusion requires a reason that is not blank. Missing, null, empty,
+  and whitespace-only reasons are refused before recording the decision or
+  changing the schedule.
 - A tutor proposal that carries no reason cannot be confirmed in help; the
   learner can still decline it.
 - An attempt that is already excluded keeps its recorded reason. Confirming
@@ -317,10 +317,14 @@ recorded without a reason stays unexplained wherever the attempt is shown.
 - The tutor proposes exclusion with the reason "Both completions are
   grammatical." and the learner confirms → the attempt is excluded and shows
   that reason.
-- A proposal arrives with no reason → help shows no way to confirm it, and
-  the attempt keeps its wrong mark and schedule.
+- A proposal arrives with a missing, empty, or whitespace-only reason → help
+  shows no way to confirm it; Decline still dismisses the proposal, and the
+  attempt keeps its wrong mark and schedule.
 - The exclusion operation is called directly with a blank reason → it is
   refused, and the attempt and its tracker are unchanged.
+- An excluded attempt is confirmed again with a missing or different reason →
+  the original reason and confirmation time are returned; the schedule and
+  recall history remain as they were after the first confirmation.
 
 **Open decisions (owner, not in scope until decided):**
 
