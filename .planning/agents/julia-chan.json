@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "agent": "Julia-chan",
+  "email": "julia-chan@example.org",
+  "identity": "SEED-066#recording-started-after-leaving",
+  "mode": "story-branch",
+  "branch": "codex/stop-a-content-recording-that-starts-after-the-a",
+  "host": "codex",
+  "model": "gpt-6.1-sol"
+}
