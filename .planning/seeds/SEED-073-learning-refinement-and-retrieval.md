@@ -273,45 +273,133 @@ post-answer journey, model adjudication quality, or scoring repair.
 
 <a id="story-7"></a>
 
-### Repair an invalid recall attempt's learning effects while retaining its history
+### Resolve a disputed wrong mark after the learner confirms question ambiguity
 
 **Identity:** SEED-073#story-7
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"not-refined","approach":"unselected"}
+{"schemaVersion":1,"refinement":"refined","approach":"unselected"}
 ```
 
-- **For / why:** A learner should not carry misleading recall readouts or a
-  schedule caused by a question accepted as invalid.
-- **Scope:** The owner accepted the direction of excluding an invalid attempt
-  from evaluation while retaining its evidence, rather than automatically
-  awarding a successful Grade. Make the correction attributable and apply it
-  coherently to affected readouts and current scheduling state under ADR 0003.
-  Do not reset/recreate the memory tracker or append a compensating GOOD.
-- **Evaluation:** An incorrect answer has already produced AGAIN. After the
-  question is accepted as invalid and correction is authorized, the learner
-  can inspect the original attempt and its correction, and the next recall and
-  readouts agree with the chosen correction policy. Repeating the same correction
-  does not become another learning event. A later Grade is a decisive case for
-  policy refinement, not grounds for a guessed implementation restriction.
-- **Value / learning:** Preserve trust in learning history and scheduling when
-  question quality, rather than demonstrated recall, caused the result.
-- **Effort hypothesis:** Larger than L until authority and historical reach are
-  settled; low confidence. This is an unselected follow-up requiring further
-  decomposition before any executable plan, not a commitment to one large build.
-- **Depends on:** An attributable accepted invalidity decision. Story 6 is the
-  preferred supplier, but refinement must establish any genuine blocking
-  implementation dependency rather than deriving it from order alone.
-- **Safe stopping point:** Corrected scheduling and readouts remain explainable
-  from retained history; deferred adaptive tutoring or retrieval adds no dependency.
-- **Open decisions:** Who authorizes correction; latest and historical attempts;
-  subsequent Grades, Confusion, and cached readouts; personal versus other
-  attempts on the same MCQ; and the durable ADR 0003 policy interpretation.
-  The accepted direction does not silently answer these. This candidate is not queued.
+**Goal:** A learner whose answer was marked wrong can resolve that result when
+private recall help identifies an ambiguous question. After the learner confirms
+the proposed correction, the attempt is visibly excluded from evaluation, its
+learning effects are corrected, and the original evidence remains inspectable.
+This restores trust without claiming a successful recall that was not demonstrated.
+
+**Scope:**
+
+- Start from one answered MCQ and its private help conversation. The tutor can
+  propose that the wording did not support a unique answer, explaining the
+  defensible interpretation using the original question, selected answer, and
+  available evidence. The proposal identifies that particular attempt.
+- Let the learner review and confirm or decline the proposal. The learner's
+  confirmation authorizes the personal correction; conversational agreement or
+  a tutor statement alone changes no result. A separate AI contest verdict is
+  not required for this personal decision.
+- On confirmation, replace the unresolved wrong-mark presentation with an
+  explicit excluded-as-ambiguous result. Retain the original question, selected
+  answer, marked outcome and Grade, together with the correction's reason,
+  confirming learner, time, and originating exchange. Reopening the attempt
+  or its help shows the same decision and explains its actual consequences.
+- Exclude that invalid attempt from evaluation and derived recall readouts.
+  Recompute the existing tracker's current scheduling state from the remaining
+  valid history, using the original event times and the current FSRS policy.
+  Preserve subsequent Grades and Confusion; align affected cached readouts with
+  the corrected history. With no remaining valid scheduling event, the same
+  tracker is due as an ungraded tracker. Corrected due work can already be overdue.
+- Preserve the original event as evidence. Confirmation is not a new Grade,
+  does not award GOOD, and does not reset or recreate the tracker. Repeating
+  confirmation or reopening the decision does not add another learning event.
+- Confirmation authorizes only this learner's attempt. It grants no authority
+  over another learner's history, shared-question invalidation, or authored
+  note content. A declined proposal leaves the result and schedule intact and
+  remains distinguishable from an accepted correction.
+
+**Key examples:**
+
+- A learner answers “Choose the grammatically correct completion: I ___ in
+  Tokyo” with “am used to living”; the key is “used to live,” so the app records
+  AGAIN. Private help explains that both are grammatical and proposes exclusion
+  with that reason. The learner confirms → the attempt reads “Excluded —
+  ambiguous question,” is not counted as failed or successful recall, and the
+  due time and recall readouts reflect the remaining valid history. Reopening
+  shows both the original mark and the learner-confirmed correction.
+- The same proposal is declined, or the learner only reads the explanation →
+  the original wrong mark and scheduling effects remain. The tutor does not
+  imply that a correction has already happened.
+- Another valid Grade is recorded before the learner confirms the ambiguity
+  proposal → correction excludes the disputed attempt and preserves the later
+  Grade at its original time. The current schedule and affected readouts agree
+  with that corrected history, rather than restoring an old snapshot over the
+  later recall. Repeating confirmation gives the same resolved result.
+- The source clearly says that driving on the left feels normal now, and the
+  learner selects “used to drive” instead of “is used to driving” → ordinary
+  misconception feedback explains the different meanings; a grammatical option
+  alone is not evidence that this meaning-specific question is ambiguous.
+- Two learners answered the same MCQ → one learner's confirmed correction
+  changes only their attempt and derived learning state. Their private reasoning
+  is not exposed to the other learner or copied into the note.
+
+**Value and decomposition:**
+
+- **Valuable:** The learner can settle an unfair recorded failure, rather than
+  receive reassurance beside an unchanged penalty. The correction remains useful
+  even if note refinement and every later epic story are deferred.
+- **Visible:** The learner evaluates the proposal, resolved mark, retained
+  explanation, recall history, and next due time through the product.
+- **Vertical:** One confirmed decision connects private help to the original
+  attempt, persisted history, derived readouts, and scheduling. A label change
+  that leaves an invalid failure effective is not this story's stopping point.
+- **Strongest smaller alternative:** Tutor reassurance already explains the
+  ambiguity but leaves the wrong mark and its learning effects unresolved.
+  Manually recording GOOD would invent successful recall and another event.
+  A personal, confirmed exclusion resolves the observed difficulty without a
+  general appeals queue or a note correction.
+- **Learning question:** Can learners understand and trust an excluded result
+  when they can inspect why it changed and how it affects future recall?
+
+**Boundaries and preparation:**
+
+- Reuse private recall help, attempt ownership, and the existing tracker and
+  history. Story 6 retains the broader formal-contest responsibility; its
+  verdict workflow is not a blocking prerequisite for learner-confirmed personal
+  exclusion. Story 2 remains the separate authored-note correction outcome.
+- Shared-MCQ adjudication, regenerating or editing questions, undoing a
+  confirmed correction, correcting several attempts together, spelling
+  disputes, and authoring note changes are deferred promises. These examples
+  do not impose a latest-attempt-only gate or another historical cutoff.
+- Preserve [ADR 0003](../../docs/adrs/0003-spaced-repetition-scheduling-policy-accepted.md):
+  original Grade evidence, whole-hour elapsed-time semantics, retained event
+  attribution, and coherent current state and cached readouts. Slice planning
+  must settle the durable invalid-attempt interpretation against this ADR before
+  dependent execution; this refinement does not amend an Accepted ADR.
+- **Effort hypothesis:** L (2–4 hours), low confidence. Authority and the
+  correction rule are now explicit; recomputation and readout coverage still
+  need sizing during slice planning. Resplit if that coherent outcome exceeds L,
+  retaining an independently useful correction rather than technical-layer stories.
+- **Safe stopping point:** One confirmed personal ambiguity correction is
+  inspectable and consistently excluded from evaluation and scheduling, while
+  the original learning evidence and every remaining valid event survive.
+- **Refinement decision, 2026-10-13:** The owner prioritized this outcome ahead
+  of note refinement and chose learner confirmation of the tutor's proposal.
+  This pass ends with the refined story and backlog priority; slice planning
+  and implementation are later work.
+
+**Observation provenance:** The 2026-10-13 manual session used ten real
+`gpt-6.1-sol` replies in an isolated E2E browser at product revision
+`871aea594bff4aedf46e26a86eb1f6e8166d5f66`. In the Tokyo example, the tutor
+recognized the ambiguity from “Why is my answer wrong?” without a leading hint,
+but the answer remained red and persisted grading and scheduling state were
+unchanged. The full dated inputs, actions, dialogue, and limitations are retained
+in [the before-cleanup observation revision](https://github.com/nerds-odd-e/doughnut/blob/d88a5237d6dbd5f3f67493e781bb5ee6c46e0e3c/.planning/seeds/SEED-073-learning-refinement-and-retrieval.md#manual-language-learner-evaluation).
+This is agent-simulated learner evidence, not measured human comprehension,
+retention, or representative model reliability.
 
 ## Ordering and Scope Reduction
 
 The backlog owns global priority. Within this epic: resolve an actual learning
-difficulty, retain a useful correction, improve question evidence through
+difficulty, resolve a learner-confirmed ambiguous wrong mark, retain a useful
+note correction, improve question evidence through
 SEED-007, then improve body search, external-agent evidence access, and cited
 comparison. This order favors immediate learning value before broader query
 machinery; it does not impose serial technical dependencies.
@@ -323,8 +411,9 @@ checkout and is neither a supplier nor a consumer blocking this epic.
 
 ## Open Decisions
 
-- Select real confusing-question cases with the owner during refinement;
-  no failure diagnosis or retrieval-quality gain has yet been measured.
+- The private-help manual session supplies a concrete ambiguous-question case
+  for story 7. Select further real learner cases during evaluation; human
+  comprehension, retention, and retrieval-quality gains remain unmeasured.
 - Define how long proposal decisions and their private conversation evidence
   should remain available, using existing deletion/ownership rules.
 - Agree practical latency and cost expectations for retrieval/query evaluation.
