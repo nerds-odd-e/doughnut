@@ -103,7 +103,7 @@ decision. No removal sweep is needed.
 
 ### 1. Leaving cancels a pending content recording
 Type: Behavior
-Status: planned
+Status: done
 Proof: the mapped mounted scenarios above; `./scripts/run.sh pnpm frontend:test tests/notes`,
 `./scripts/run.sh pnpm -C frontend exec vue-tsc --noEmit`, and
 `./scripts/run.sh pnpm -C frontend exec tsc --noEmit` on the final implementation.
@@ -130,10 +130,49 @@ and refine unless the only remaining time is a stated required-check wait.
 Stop-safe: the complete cancellation rule and preserved recording behavior
 ship together, with no interim product state.
 
+Accepted proof (2026-10-13):
+- `./scripts/run.sh pnpm frontend:test tests/notes`: 71 files / 388 tests passed
+  in 13.39 seconds. At the mounted toolbar boundary,
+  `NoteToolbar.voiceInputStartupCancellation.spec.ts` supplies deferred browser
+  acquisition promises and non-silent worklet samples through `audioGraph`.
+  Its microphone/initialization cases observe track Stop, graph disconnection,
+  wake-lock release, discarded audio through no transcription/save, and an idle
+  destination. Its wake-lock case observes late release and a usable destination
+  recording. Its concurrent-destination case observes a visible pinned Stop,
+  independent resource lifetimes, and exactly the destination's content save.
+  `NoteToolbar.voiceInputLeavingNote.spec.ts` retains origin-note final save and
+  failure feedback; all title, retry, toolbar and editing consumers ran.
+- `./scripts/run.sh pnpm -C frontend exec vue-tsc --noEmit`: terminal exit 0.
+- `./scripts/run.sh pnpm -C frontend exec tsc --noEmit`: terminal exit 0.
+  Both checks apply to the final implementation and browser-spy types.
+- Coordinator inspected `useNoteVoiceInput.ts`, the real recorder/wake locker,
+  the complete new spec and its setup/assertions, existing departure tests, and
+  activity consumers. Independent refactor returned `none — already clean`
+  with `## REFACTOR COMPLETE`; unchanged proof was retained without rerunning.
+- `scripts/check_diff_whitespace.sh` passed in refactoring;
+  `./scripts/run.sh pnpm format:changed` succeeded once. It changed only test
+  formatting. No API generation trigger changed.
+- Implementation active elapsed approximately 6.5 minutes; independent
+  refactoring approximately 1 minute, within the scrutinized estimate.
+
 ## Current decisions and delivery
 
-- Execute only under a later explicit execution instruction. This preparation
-  neither takes the story nor delivers the scratch candidate.
+- Execution authorized on 2026-10-13 through `dough-execute-plan`.
+- Established identity: `SEED-066#recording-started-after-leaving`, publisher
+  `dashboard-territory.local-doughnut`, agent `Julia-chan`; Story Branch Mode,
+  workspace `/Users/terryyin/git/doughnut/.worktrees/stop-a-content-recording-that-starts-after-the-a`,
+  branch `codex/stop-a-content-recording-that-starts-after-the-a`, remote
+  `origin`, trunk `main`. Published claim/candidate
+  `6619ce2ee1552df8e535fbe96b8a0c0d168fc47d`, starting revision
+  `598a2d614199c699b119f8304567f590f550c1b8`.
+- Checkout setup succeeded with `./scripts/run.sh bash scripts/worktree_setup.sh`
+  against the current locked dependencies; applicable command
+  `./scripts/run.sh pnpm -C frontend exec vitest --version` succeeded.
+- Replanning within the understood outcome remains authorized if the stated
+  hard boundary is reached. No source promise or evaluation may be weakened.
+- CI source: GitHub Actions, verified workflow `ci.yml` (`donut CI`, id
+  `5208694`), observing the authorized remote execution branch. The established
+  claim on trunk remains unobserved by this branch observer.
 - Follow AGENTS.md execution wrap-up: Jidoka, fresh
   `dough-post-change-refactor` agent, API generation only if signatures change,
   coordinator `./scripts/run.sh pnpm format:changed` once, update plan evidence,
@@ -151,3 +190,10 @@ The defect is reproduced at more than microphone permission: asynchronous
 audio initialization and wake-lock acquisition share the same departure rule.
 The discard decision can stay in the existing content-session owner while
 retaining recorder cleanup and established-recording conversion.
+
+## Story obligations
+
+### G1. Browser-boundary proof limits
+Reported: slice 1 — "Actual hardware indicators, permission UI, and live transcription services remain outside this planned browser-boundary proof."
+Story clause: "After the author leaves the note, no recording runs for it, the microphone is released, and the screen wake lock is released."
+Disposition: no user cost "After the author leaves the note, no recording runs for it, the microphone is released, and the screen wake lock is released.": The mounted tests exercise the real application lifecycle and observe Stop, graph disconnection, and wake-lock release at the browser resource boundaries. Physical indicators and live-service quality add no application lifecycle promise to this bounded cancellation change; their observations were also explicitly limited in the source investigation.

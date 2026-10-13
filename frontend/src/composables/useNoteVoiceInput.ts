@@ -26,29 +26,45 @@ export function useNoteVoiceInput(note: Note) {
   const { showErrorToast } = useToast()
 
   const authorHasLeft = ref(false)
+  let startupCancelled = false
 
   const { processAudio, lastConversionFailed } = useNoteAudioProcessing(
     note,
     authorHasLeft
   )
 
-  const audioRecorder = createAudioRecorder(processAudio)
+  const audioRecorder = createAudioRecorder(async (chunk) => {
+    if (startupCancelled) return
+    return processAudio(chunk)
+  })
 
   const start = async () => {
     phase.value = "starting"
     voiceInputIsActive.value = true
     try {
       await wakeLocker.request()
+      if (startupCancelled) return
       await audioRecorder.startRecording()
+      if (startupCancelled) return
       beginOpenNoteContentDictation(note.id)
       phase.value = "recording"
     } catch {
+      if (startupCancelled) return
       phase.value = "ready"
       if (!authorHasLeft.value) {
         voiceInputIsActive.value = false
       }
       showErrorToast(MICROPHONE_UNAVAILABLE_MESSAGE)
       await wakeLocker.release()
+    } finally {
+      if (startupCancelled) {
+        try {
+          await audioRecorder.stopRecording()
+        } finally {
+          phase.value = "ready"
+          await wakeLocker.release()
+        }
+      }
     }
   }
 
@@ -75,6 +91,7 @@ export function useNoteVoiceInput(note: Note) {
   }
 
   onBeforeUnmount(async () => {
+    startupCancelled = phase.value === "starting"
     authorHasLeft.value = true
     voiceInputIsActive.value = false
     if (isRecording.value) {
