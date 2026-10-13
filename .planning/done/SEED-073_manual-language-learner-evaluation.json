@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 1,
+  "identity": "SEED-073#manual-language-learner-evaluation",
+  "title": "Evaluate private recall help as a language learner",
+  "completedAt": "2026-10-13T01:44:50.153Z",
+  "developer": "Terry Yin",
+  "agent": "Kirara-chan",
+  "host": "codex"
+}

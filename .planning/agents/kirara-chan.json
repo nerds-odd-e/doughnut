@@ -1,9 +1,0 @@
-{
-  "schemaVersion": 1,
-  "agent": "Kirara-chan",
-  "email": "kirara-chan@example.org",
-  "identity": "SEED-073#manual-language-learner-evaluation",
-  "mode": "story-branch",
-  "branch": "codex/manual-language-recall-help",
-  "host": "codex"
-}
