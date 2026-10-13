@@ -10,6 +10,7 @@ Make deliberately captured knowledge more useful through learning and refinement
 
 ## Backlog list
 
+- [Require a reason when a learner excludes an ambiguous attempt](seeds/SEED-073-learning-refinement-and-retrieval.md#story-8) — SEED-073#story-8
 - [Save a useful chat clarification as a reviewed note correction](seeds/SEED-073-learning-refinement-and-retrieval.md#story-2) — SEED-073#story-2
 - [Stop a content recording that starts after the author has left the note](seeds/SEED-066-voice-input.md#recording-started-after-leaving) — SEED-066#recording-started-after-leaving
 - [Generate focus-note questions with relevant supporting passages](seeds/SEED-007-per-concept-prompt-splitting-single-note-qg.md#story-1) — SEED-007#story-1

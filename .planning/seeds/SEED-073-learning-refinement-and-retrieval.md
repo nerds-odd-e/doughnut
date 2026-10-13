@@ -405,6 +405,57 @@ in [the before-cleanup observation revision](https://github.com/nerds-odd-e/doug
 This is agent-simulated learner evidence, not measured human comprehension,
 retention, or representative model reliability.
 
+<a id="story-8"></a>
+
+### Require a reason when a learner excludes an ambiguous attempt
+
+**Identity:** SEED-073#story-8
+```json dough-story-state
+{"schemaVersion":1,"refinement":"refined","approach":"unselected"}
+```
+
+**Goal:** A learner who excludes an attempt as an ambiguous question always
+keeps the reason for that decision. An exclusion cannot be undone, so one
+recorded without a reason stays unexplained wherever the attempt is shown.
+
+**Scope:**
+
+- Excluding an attempt requires a reason that is not blank. The operation
+  refuses a missing or blank reason and changes nothing: no exclusion, no
+  schedule change.
+- A tutor proposal that carries no reason cannot be confirmed in help; the
+  learner can still decline it.
+- An attempt that is already excluded keeps its recorded reason. Confirming
+  it again returns that decision whatever reason is sent.
+- Commissioned learning sessions need no exclusion; nothing changes there.
+
+**Key examples:**
+
+- The tutor proposes exclusion with the reason "Both completions are
+  grammatical." and the learner confirms → the attempt is excluded and shows
+  that reason.
+- A proposal arrives with no reason → help shows no way to confirm it, and
+  the attempt keeps its wrong mark and schedule.
+- The exclusion operation is called directly with a blank reason → it is
+  refused, and the attempt and its tracker are unchanged.
+
+**Open decisions (owner, not in scope until decided):**
+
+- Whether an attempt marked correct can be excluded. The operation accepts
+  one today; only the tutor instruction keeps proposals to wrong marks.
+- Whether a recall-prompt conversation with an audience beyond its learner
+  should show the exclusion reason or offer the proposal. It is unchecked
+  whether any such conversation exists.
+- Whether a day whose only answer was excluded keeps its place in the review
+  calendar and streak. Recall statistics leave an excluded attempt out
+  entirely today.
+
+**Boundaries:** The exclusion behavior is described in
+[recall help](../../docs/recall-help.md#learner-confirmed-ambiguity-exclusion)
+and stays as it is apart from the required reason.
+
+- **Effort hypothesis:** S (about 30 minutes), high confidence.
+
 ## Ordering and Scope Reduction
 
 The backlog owns global priority. Within this epic: resolve an actual learning
