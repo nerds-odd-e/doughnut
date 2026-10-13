@@ -2,6 +2,12 @@
   "schemaVersion": 1,
   "records": [
     {
+      "fileName": "SEED-073_manual-ambiguity-exclusion-evaluation.json",
+      "identity": "SEED-073#manual-ambiguity-exclusion-evaluation",
+      "completedAt": "2026-10-13T22:41:06.101Z",
+      "blob": "241b27760be7e9ede2b18f8f3b0b7cfd8ae7e4f2"
+    },
+    {
       "fileName": "SEED-073_story-7.json",
       "identity": "SEED-073#story-7",
       "completedAt": "2026-10-13T21:50:12.770Z",

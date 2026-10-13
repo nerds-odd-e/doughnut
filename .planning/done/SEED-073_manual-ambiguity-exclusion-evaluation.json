@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 1,
+  "identity": "SEED-073#manual-ambiguity-exclusion-evaluation",
+  "title": "Manually evaluate learner-confirmed ambiguous-question exclusion",
+  "completedAt": "2026-10-13T22:41:06.101Z",
+  "developer": "Terry Yin",
+  "agent": "Kaoru-chan",
+  "host": "codex"
+}
