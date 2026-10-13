@@ -15,6 +15,7 @@
         :conversation="conversation"
         :user="user"
         @close-dialog="closeHelp"
+        @attempt-excluded="$emit('attempt-excluded', $event)"
       />
     </template>
   </Modal>
@@ -23,7 +24,11 @@
 <script setup lang="ts">
 import { inject, nextTick, ref, type Ref } from "vue"
 import { MessageCircle } from "@lucide/vue"
-import type { Conversation, User } from "@generated/donut-backend-api"
+import type {
+  AnsweredQuestion,
+  Conversation,
+  User,
+} from "@generated/donut-backend-api"
 import { ConversationMessageController } from "@generated/donut-backend-api/sdk.gen"
 import Modal from "@/components/commons/Modal.vue"
 import ConversationComponent from "@/components/conversations/ConversationComponent.vue"
@@ -31,6 +36,10 @@ import { apiCallWithLoading } from "@/managedApi/clientSetup"
 
 const props = defineProps<{
   recallPromptId: number
+}>()
+
+defineEmits<{
+  (e: "attempt-excluded", answeredQuestion: AnsweredQuestion): void
 }>()
 
 const user = inject<Ref<User | undefined>>("currentUser")

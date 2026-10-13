@@ -65,6 +65,7 @@
         :aiReplyTrigger="aiReplyTrigger"
         @ai-response-done="onAiResponseDone"
         @scroll-to="scrollIndex = $event"
+        @attempt-excluded="$emit('attempt-excluded', $event)"
       />
 
       <ScrollTo :scrollTrigger="currentConversationMessages.length + scrollIndex" />
@@ -78,6 +79,7 @@ import { ConversationMessageController } from "@generated/donut-backend-api/sdk.
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import { messageCenter } from "@/store/messageCenter"
 import type {
+  AnsweredQuestion,
   User,
   ConversationMessage,
   Conversation,
@@ -102,6 +104,7 @@ defineEmits<{
   (e: "conversation-changed", conversationId: number): void
   (e: "new-conversation"): void
   (e: "toggle-maximize"): void
+  (e: "attempt-excluded", answeredQuestion: AnsweredQuestion): void
 }>()
 
 const currentConversationMessages = ref<ConversationMessage[] | undefined>(

@@ -20,7 +20,11 @@
 
 <script setup lang="ts">
 import { computed, ref } from "vue"
-import type { NoteContentCompletion, Note } from "@generated/donut-backend-api"
+import type {
+  AnsweredQuestion,
+  NoteContentCompletion,
+  Note,
+} from "@generated/donut-backend-api"
 import type { ToolCallResult } from "@/models/aiReplyState"
 import AcceptRejectButtons from "@/components/commons/AcceptRejectButtons.vue"
 import markdownizer from "../form/markdownizer"
@@ -43,6 +47,7 @@ const props = defineProps<{
 const emit = defineEmits<{
   (e: "resolved", result: ToolCallResult): void
   (e: "rejected", error: Error): void
+  (e: "attempt-excluded", answeredQuestion: AnsweredQuestion): void
 }>()
 
 const isProcessing = ref(false)
@@ -127,13 +132,14 @@ const handleAccept = async () => {
       }
       case "exclusion": {
         const reason = props.suggestion.content.reason
-        const { error } = await apiCallWithLoading(() =>
+        const { data, error } = await apiCallWithLoading(() =>
           RecallPromptController.excludeAsAmbiguous({
             path: { recallPrompt: props.recallPromptId! },
             body: { reason },
           })
         )
         if (error) throw new Error("Failed to exclude this attempt")
+        emit("attempt-excluded", data!)
         break
       }
     }

@@ -2,13 +2,21 @@ import AiResponse from "@/components/conversations/AiResponse.vue"
 import { resetNoteStore } from "@/store/noteStore"
 import { useNoteStore } from "@/store/noteStore"
 import makeMe from "donut-test-fixtures/makeMe"
-import helper, { mockShowNote } from "@tests/helpers"
+import helper, { mockSdkService, mockShowNote } from "@tests/helpers"
 import {
   getLastInstance,
   resetInstance,
 } from "@tests/helpers/aiReplyEventSourceTracker"
 import { flushPromises } from "@vue/test-utils"
+import { vi } from "vitest"
+import AiReplyEventSource from "@/managedApi/AiReplyEventSource"
+import {
+  ConversationMessageController,
+  RecallPromptController,
+} from "@generated/donut-backend-api/sdk.gen"
 import type {
+  AmbiguousQuestionExclusionProposal,
+  AnsweredQuestion,
   Conversation,
   Note,
   NoteRealm,
@@ -127,22 +135,56 @@ export const submitAiReply = async (
   await flushPromises()
 }
 
+const simulateToolCall = async (chunks: object[]) => {
+  const instance = getLastInstance()
+  if (!instance) {
+    throw new Error("No AiReplyEventSource instance available")
+  }
+  for (const chunk of chunks) {
+    instance.onMessageCallback("chat.completion.chunk", JSON.stringify(chunk))
+    await flushPromises()
+  }
+}
+
 export const submitMessageAndSimulateToolCall = async (
   wrapper: ReturnType<typeof mountAiResponse>,
   toolCallChunks: ReturnType<typeof createToolCallChunk> | object
 ) => {
   await submitAiReply(wrapper)
-  const instance = getLastInstance()
-  if (!instance) {
-    throw new Error("No AiReplyEventSource instance available")
-  }
-  const chunks = Array.isArray(toolCallChunks)
-    ? toolCallChunks
-    : [toolCallChunks]
-  for (const chunk of chunks) {
-    instance.onMessageCallback("chat.completion.chunk", JSON.stringify(chunk))
+  await simulateToolCall(
+    Array.isArray(toolCallChunks) ? toolCallChunks : [toolCallChunks]
+  )
+}
+
+/**
+ * In the open recall help conversation attached to the document: the learner
+ * asks, the tutor proposes the exclusion, and the learner confirms it. The
+ * confirmation answers with `excludedAttempt`.
+ */
+export const confirmTutorExclusionProposal = async (
+  excludedAttempt: AnsweredQuestion
+) => {
+  const clickButton = async (label: string) => {
+    ;[...document.querySelectorAll("button")]
+      .find((button) => button.textContent?.trim() === label)!
+      .click()
     await flushPromises()
   }
+  mockSdkService(
+    ConversationMessageController,
+    "replyToConversation",
+    undefined
+  )
+  mockSdkService(RecallPromptController, "excludeAsAmbiguous", excludedAttempt)
+  vi.spyOn(AiReplyEventSource.prototype, "start").mockImplementation(vi.fn())
+
+  await clickButton("Why is my answer wrong?")
+  await simulateToolCall(
+    createToolCallChunk("AmbiguousQuestionExclusionProposal", <
+      AmbiguousQuestionExclusionProposal
+    >{ reason: excludedAttempt.answer!.exclusionReason })
+  )
+  await clickButton("Confirm")
 }
 
 export function useAiResponseMount() {

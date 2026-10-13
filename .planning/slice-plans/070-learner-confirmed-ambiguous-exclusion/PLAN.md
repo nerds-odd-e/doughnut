@@ -367,7 +367,16 @@ only on reopen until slice 8, an interim state slice 8 replaces.
 
 ### 8. Confirmation updates the open surfaces
 Type: Behavior
-Status: planned
+Status: done
+Accepted proof (2026-10-13): `env -u NODE_ENV CURSOR_DEV=true nix develop -c pnpm frontend:test tests/components/conversation tests/components/recall tests/pages/RecallPage tests/pages/MemoryTrackerPage tests/pages/MessageCenterPage tests/pages/NoteShowPageConversation.spec.ts`
+→ 67 files, 318 tests passed; after test-support refactoring
+`tests/components/conversation` with the two private-help page specs reran
+green (12 files, 47 tests); `vue-tsc --noEmit` and `tsc --noEmit` exit 0.
+Observations, each starting from a plain wrong attempt:
+`ConversationComponent.exclusion.spec.ts`, `RecallPage.privateHelp.spec.ts`
+"shows the answered attempt as excluded once the learner confirms the tutor's
+proposal in private help", and `MemoryTrackerPage.privateHelp.spec.ts`. The
+result travels as one `attempt-excluded` event up the emit chain.
 Proof: `ConversationComponent` spec with a recall-prompt subject: after the
 proposal is confirmed the subject panel shows the excluded result without
 refetching the conversation. The recall page entry and the memory tracker page
@@ -495,6 +504,11 @@ was accepted on `main`.
   `ConversationInner` → `ConversationComponent` → `ConversationButton`.
 - The suggestion flow reports nothing back to the tutor within a stream; a
   later request sees a confirmed exclusion through the attempt record.
+- After Confirm the help dialog stays open, and the page behind it shows its
+  own `[data-test="excluded-attempt"]` notice; the dialog is teleported to
+  `body`, so an E2E selector scopes to the dialog or to the page.
+- `confirmTutorExclusionProposal` in `aiResponseTestSupport.ts` drives the
+  proposal and the confirmation in mounted specs.
 
 ## Story obligations
 
@@ -541,7 +555,7 @@ Disposition: excluded "Shared-MCQ adjudication, regenerating or editing question
 ### G9. Recall page and help panel unobserved for the excluded shape
 Reported: slice 6 — "Recall page (`AnsweredQuestionComponent`): not observed directly for the excluded shape."
 Story clause: "Reopening the attempt or its help shows the same decision and explains its actual consequences."
-Disposition: receiving slice 8
+Disposition: proved by slice 8: `ConversationComponent.exclusion.spec.ts` (help subject panel) and `RecallPage.privateHelp.spec.ts` "shows the answered attempt as excluded once the learner confirms the tutor's proposal in private help"
 
 ### G10. The notice does not link to the originating exchange
 Reported: slice 6 — "It does not link to the originating exchange."
@@ -566,4 +580,19 @@ Disposition: no user cost "After the learner confirms the proposed correction": 
 ### G14. Open surfaces refresh only on reopen
 Reported: slice 7 — "after Confirm, the help subject panel, recall page and memory tracker page still show the old result until reopened."
 Story clause: "On confirmation, replace the unresolved wrong-mark presentation with an explicit excluded-as-ambiguous result."
-Disposition: receiving slice 8
+Disposition: proved by slice 8: `ConversationComponent.exclusion.spec.ts`, `RecallPage.privateHelp.spec.ts`, and `MemoryTrackerPage.privateHelp.spec.ts`
+
+### G15. Reopening an already excluded attempt is unobserved in the browser
+Reported: slice 8 — "Reopening an already-excluded attempt on the recall page / help panel from persisted data: untested here, left to slice 9."
+Story clause: "Reopening the attempt or its help shows the same decision and explains its actual consequences."
+Disposition: receiving slice 9
+
+### G16. The open recall session keeps its due queue
+Reported: slice 8 — "The recall page only replaces the displayed entry; it does not reload the due queue or progress counts after an exclusion."
+Story clause: "Corrected due work can already be overdue."
+Disposition: no user cost "its learning effects are corrected": the corrected due time is persisted when the learner confirms, and the recall page reads due work from the server on its next load, as it does after any other schedule change made outside the queue
+
+### G17. The Message Center has no confirmation spec
+Reported: slice 8 — "Message Center: untested. It updates by construction through `ConversationComponent`; no Message Center spec drives a confirmation."
+Story clause: "Reopening the attempt or its help shows the same decision and explains its actual consequences."
+Disposition: no user cost "the attempt is visibly excluded from evaluation": the Message Center renders the subject through the same `ConversationComponent` whose update `ConversationComponent.exclusion.spec.ts` observes

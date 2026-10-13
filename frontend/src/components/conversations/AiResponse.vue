@@ -21,6 +21,7 @@
       :recall-prompt-id="conversation.subject?.recallPrompt?.id"
       @resolved="handleToolCallResolved"
       @rejected="handleToolCallRejected"
+      @attempt-excluded="emit('attempt-excluded', $event)"
     />
   </div>
 
@@ -36,7 +37,10 @@
 
 <script setup lang="ts">
 import { ref, computed, watch } from "vue"
-import type { Conversation } from "@generated/donut-backend-api"
+import type {
+  AnsweredQuestion,
+  Conversation,
+} from "@generated/donut-backend-api"
 import type { ToolCallResult } from "@/models/aiReplyState"
 import { Bot } from "@lucide/vue"
 import markdownizer from "../form/markdownizer"
@@ -57,6 +61,7 @@ const { conversation, aiReplyTrigger } = defineProps<{
 const emit = defineEmits<{
   (e: "ai-response-done"): void
   (e: "scroll-to", scrollIndex: number): void
+  (e: "attempt-excluded", answeredQuestion: AnsweredQuestion): void
 }>()
 
 const markdowntToHtml = (content?: string) =>
