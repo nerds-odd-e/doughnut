@@ -367,6 +367,17 @@ checkout and is neither a supplier nor a consumer blocking this epic.
   provenance remain later decisions. Detailed contest and invalid-question
   correction policies are owned by story 6.
 
+**Learner-confirmed ambiguity exclusion (owner decisions, deferred):**
+
+- Whether an attempt marked correct can be excluded. The operation accepts
+  one today; only the tutor instruction keeps proposals to wrong marks.
+- Whether a recall-prompt conversation with an audience beyond its learner
+  should show the exclusion reason or offer the proposal. It is unchecked
+  whether any such conversation exists.
+- Whether a day whose only answer was excluded keeps its place in the review
+  calendar and streak. Recall statistics leave an excluded attempt out
+  entirely today.
+
 ## When to Surface
 
 When choosing work for the new learning-to-refinement and knowledge-quality
