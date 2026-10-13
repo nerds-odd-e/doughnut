@@ -9,6 +9,21 @@ scope: large
 
 # SEED-073: Improve knowledge through learning, refinement, and retrieval
 
+<a id="manual-ambiguity-exclusion-evaluation"></a>
+
+### Manually evaluate learner-confirmed ambiguous-question exclusion
+
+**Identity:** SEED-073#manual-ambiguity-exclusion-evaluation
+```json dough-story-state
+{"schemaVersion":1,"refinement":"refined","approach":"unselected"}
+```
+
+**Goal:** Observe the completed story “Resolve a disputed wrong mark after the learner confirms question ambiguity” through its promised product surfaces within the owner's 60-minute budget on 2026-10-14.
+
+**Scope:** Manual observation only. Cover proposal, confirmation, decline, persistence across recall/help/history, retained evidence, scheduling and evaluation readouts, subsequent valid reviews, and personal ownership. Use the completed story recovered from Git and current `docs/recall-help.md` as the oracle. Report discrepancies, unresolved expectations, improvements, or material coverage gaps; make no product repairs. Preparation, breadth, depth, and confirmation/cleanup are budgeted at 12/23/15/10 minutes.
+
+**Known uncertainty:** The tutor proposal depends on an external model; use existing supported isolated setup and distinguish deterministic product evidence from real-model observations.
+
 ## Epic Outcome
 
 For people learning from deliberately authored Donut notes, a confusing recall

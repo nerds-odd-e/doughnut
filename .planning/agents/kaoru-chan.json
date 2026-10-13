@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 1,
+  "agent": "Kaoru-chan",
+  "email": "kaoru-chan@example.org",
+  "identity": "SEED-073#manual-ambiguity-exclusion-evaluation",
+  "mode": "story-branch",
+  "branch": "codex/manual-ambiguity-exclusion-20261014",
+  "host": "codex"
+}
