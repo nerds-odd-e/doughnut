@@ -175,7 +175,7 @@ test('the registry admits exactly the assessed OpenAI-mock inventory and each de
   // The registry (`APPROVED_ISOLATED_CYPRESS_SPECS` exposed via
   // `SUPPORTED_ISOLATED_CYPRESS_SPECS`) is the single authority for which
   // specs require a private OpenAI mock — not a parallel inventory list.
-  // The assessed inventory is 11 files (one representative plus the 10
+  // The assessed inventory is 12 files (one representative plus the 11
   // remaining active OpenAI-mock features admitted through
   // `ACTIVE_OPEN_AI_MOCK_SPECS`); every admitted OpenAI-mock spec must
   // declare `requiresPrivateOpenAiMock: true`.
@@ -185,8 +185,8 @@ test('the registry admits exactly the assessed OpenAI-mock inventory and each de
   )
   assert.equal(
     openAiMockSpecs.length,
-    11,
-    'assessed OpenAI-mock inventory is 11 files admitted by the registry'
+    12,
+    'assessed OpenAI-mock inventory is 12 files admitted by the registry'
   )
   // A mixed OpenAI-mock + application batch unions to a mock requirement.
   const mixed = assertSupportedIsolatedCypressSpecs([

@@ -88,6 +88,7 @@ Use this for endpoint lookup; open `sdk.gen.ts` or `types.gen.ts` only for exact
 ## Recall Prompt Controller
 
 - `regenerate`: POST `/api/recall-prompts/{recallPrompt}/regenerate` -> `RegenerateResponse` (request: `RegenerateData`; path: recallPrompt; body: QuestionContestResult; response body: RecallPrompt)
+- `excludeAsAmbiguous`: POST `/api/recall-prompts/{recallPrompt}/exclude-as-ambiguous` -> `ExcludeAsAmbiguousResponse` (request: `ExcludeAsAmbiguousData`; path: recallPrompt; body: AmbiguousExclusionDto; response body: AnsweredQuestion)
 - `contest`: POST `/api/recall-prompts/{recallPrompt}/contest` -> `ContestResponse` (request: `ContestData`; path: recallPrompt; response body: QuestionContestResult)
 - `answer`: POST `/api/recall-prompts/{recallPrompt}/answer` -> `AnswerResponse` (request: `AnswerData`; path: recallPrompt; body: AnswerDto; response body: AnsweredQuestion)
 - `answerSpelling`: POST `/api/recall-prompts/{recallPrompt}/answer-spelling` -> `AnswerSpellingResponse` (request: `AnswerSpellingData`; path: recallPrompt; body: AnswerSpellingDto; response body: AnsweredQuestion)

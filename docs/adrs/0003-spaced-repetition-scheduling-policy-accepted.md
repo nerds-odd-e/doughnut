@@ -3,6 +3,7 @@
 **Status:** Accepted  
 **Date:** 2026-08-05  
 **Decision makers:** Terry Yin
+**Amended:** 2026-10-14 (recall history: excluded attempts)
 **Consulted:** None
 
 ## Context
@@ -146,7 +147,8 @@ more specific answer.
 
 A memory tracker carries current Stability, Difficulty, and due time, updated
 transactionally with each scheduling event so due work is a direct query. The
-state can be rebuilt from RecallLog; due-work queries do not replay the log.
+state can be rebuilt from RecallLog when RecallLog holds the tracker's whole
+history; due-work queries do not replay the log.
 Removed trackers retain history; deleted trackers are outside reconstruction.
 
 A RecallLog row may also cache the Stability, Difficulty, and Retrievability
@@ -158,6 +160,11 @@ of truth: RecallLog's Grades and Confusion remain the record, and the cached
 columns must never diverge from what replay would produce. If the FSRS profile
 ever changes, existing cached columns describe scheduling as it was, not as it
 would be recomputed.
+
+A RecallLog row whose attempt the learner excluded stays as evidence but is
+not a scheduling event. RecallLog does not hold every tracker's whole history,
+so a rebuild after an exclusion starts from the state cached on the excluded
+row and replays the valid events after it.
 
 A prompt event remains attributable to its Answer. A Grade from just review or
 Tutor Feedback need not have an Answer.

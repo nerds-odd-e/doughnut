@@ -5,7 +5,7 @@ responses under observation live in the [watch list](https://github.com/terryyin
 Detailed observations, original releases and qualified inferences are retained
 in the linked Open Dough catalog. Unknown execution provenance remains unknown.
 
-- Highest allocated local number: 237. Removed numbers are never reused.
+- Highest allocated local number: 240. Removed numbers are never reused.
 - Full source recovery before this cleanup: `0a8878e98be76b8e92203515d8f4719489b24169:DearDough.md`.
 - Project-owned findings remain in [Donut Retrospective Findings](DonutRetrospectiveFindings.md); their ownership review is unchanged.
 
@@ -134,6 +134,16 @@ Former local code: DD-216. An abbreviated published-base SHA is accepted as an a
 ## ODF-206 — Over-budget slice not stopped
 
 Former local code: DD-217. Former local code: DD-222. The slice time bound is checked only at hand-back, so a delegated slice runs past it and is accepted or extended without re-sizing. Open, unqueued. [Evidence and response](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/finding-names.md#odf-206).
+
+### Occurrences
+- Execution: SEED-073#story-7 (first implementation commit 016eabb474a20a6dfe0e4311cab21d27a57dab0f)
+  - Timestamp: 2026-10-13T20:35:00+09:00 (approximate, from the slice 4 commit time; the returns span 19:56–21:44)
+  - Tool: Claude Code
+  - Model: claude-opus-5-5
+  - Open Dough release: unknown
+  - Evidence: implementation task durations reported by the host for plan `21d5534381:.planning/slice-plans/070-learner-confirmed-ambiguous-exclusion/PLAN.md`: slice 1 about 6 min, slice 3 about 7 min, slice 4 about 10 min, slice 5 about 8 min, slice 9 about 8 min, slice 10 about 8 min plus about 9 min after a return, against a 5-minute target and a 10-minute hard limit; each ran the whole backend suite one to three times at 1–2.5 min per run
+  - Observed effect: every return was accepted at hand-back without re-sizing; no slice was stopped
+  - Inference: the whole-suite proof command alone uses a large share of a 5-minute slice here, so the bound may not fit backend slices in this project; not measured against a split alternative
 
 <a id="odf-217"></a>
 
@@ -276,3 +286,45 @@ A slice made one fragment list serve both answer matching and masking. Neither t
   - Evidence: plan `3972c2dbcc346016b0ca5e2c807d96f4ee71e0d5:.planning/slice-plans/003-mask-spelling-answer-before-title-qualifier/PLAN.md` Current decisions; test `spellingQuestionLeavesClueReadableWhenNoTitleTextPrecedesTheQualifier` failed before the guard with every word boundary masked for title `~(phase transition)`; refactor return section "Observation, not acted on"
   - Observed effect: the defect was caught before publication, by the coordinator rather than by planned proof; the post-refactor edit had no independent refactor review
   - Inference: when a rule is widened from matching to masking, checking the degenerate inputs of the shared value (empty fragment) in the plan's premises would have placed this in the implementation pass; generality is unverified from one occurrence
+
+## DD-238 — A plan took an ADR's rebuild statement as a fact about stored history
+
+The plan settled schedule correction as a replay of recall logs from a new tracker, citing the ADR sentence that tracker state "can be rebuilt from RecallLog". Git history showed that recall-log writing began weeks before, so older trackers hold state no log records. Planning did not check when the logs began. An implementation return raised it at the third slice; the owner then chose a different starting state, which added a slice and replaced the replay entry point written two slices earlier. Related to ODF-074 (unverified planning premises); whether it is the same problem is uncertain, since this premise came from an accepted decision record and not from a code reading.
+
+### Occurrences
+- Execution: SEED-073#story-7 (first implementation commit 016eabb474a20a6dfe0e4311cab21d27a57dab0f)
+  - Timestamp: 2026-10-13T20:15:00+09:00 (approximate, from the slice 3 return before commit 30e66c92c8)
+  - Tool: Claude Code
+  - Model: claude-opus-5-5
+  - Open Dough release: unknown
+  - Evidence: plan `d6f2e17d54:.planning/slice-plans/070-learner-confirmed-ambiguous-exclusion/PLAN.md` "Existing owners and observed premises" first bullet; `git log -S'recall_log' -- backend/src/main/resources/db/migration` (commits `0843cbd3ee`, `6ddf35275e`, `59e3e4a282`, 2026-08-17); slice 3 return "Replay discards state that is not in the logs"; slice 10 in the plan at `56cb8aa44c`
+  - Observed effect: one owner decision during execution, one added slice, `MemoryTracker.rebuildFrom` replaced by `rebuildWithout`, and the documentation paragraph rewritten
+  - Inference: asking "since when does this record exist, and what did it miss before" when a plan rebuilds state from a record would have placed the decision in refinement; one occurrence
+
+## DD-239 — No obligation disposition fits a gap that waits for an owner decision
+
+An implementation return named a gap whose resolution was the owner's to choose. Story-obligation recording requires exactly one disposition, and none says "open until the owner decides". The coordinator recorded `interim until slices 9`, naming the last planned slice only so the completion check would hold it open, although that slice had nothing to do with the gap. Several limitation reports were also recorded as `no user cost` with a reason explaining a small cost. Related to DD-236.
+
+### Occurrences
+- Execution: SEED-073#story-7 (first implementation commit 016eabb474a20a6dfe0e4311cab21d27a57dab0f)
+  - Timestamp: 2026-10-13T20:20:00+09:00 (approximate, from commit 30e66c92c8)
+  - Tool: Claude Code
+  - Model: claude-opus-5-5
+  - Open Dough release: unknown
+  - Evidence: `git show 30e66c92c8:.planning/slice-plans/070-learner-confirmed-ambiguous-exclusion/PLAN.md` obligation G4; the same plan at `56cb8aa44c` obligations G13 and G16; `story-obligations.mjs check` accepted each
+  - Observed effect: the record's disposition did not say what kept the gap open; the reason lived in the plan's Learnings
+  - Inference: one occurrence of the owner-decision case; a disposition for a pending decision is undecided
+
+## DD-240 — A cross-slice defect passed every slice acceptance and was found by an aggregate review
+
+A late slice changed where the schedule rebuild starts. The coordinator's brief for that slice stated that repeating a confirmation stays stable because the excluded log's cached state is never rewritten, and the slice's repeat test used one exclusion only. With two excluded attempts on one tracker, a repeated confirmation of the later one restores the earlier one's effect. Slice proof acceptance and the refactor pass both accepted the change. An independent read-only review of the whole delivered change, run during the retrospective, found it.
+
+### Occurrences
+- Execution: SEED-073#story-7 (first implementation commit 016eabb474a20a6dfe0e4311cab21d27a57dab0f)
+  - Timestamp: 2026-10-13T21:55:00+09:00 (approximate, from the review return after commit 56cb8aa44c)
+  - Tool: Claude Code
+  - Model: claude-opus-5-5
+  - Open Dough release: unknown
+  - Evidence: `56cb8aa44c:backend/src/main/java/com/odde/donut/services/MemoryTrackerService.java` lines 110–112 and `entities/MemoryTrackerReplay.java`; slice 10 return "Untested behaviors: Two exclusions on one tracker, in either order", recorded as covered in obligation G19; slice 11 of `21d5534381:.planning/slice-plans/070-learner-confirmed-ambiguous-exclusion/PLAN.md`
+  - Observed effect: the defect was delivered on the story branch; the owner authorized its repair in the same execution as slice 11
+  - Inference: the return named the untested case and the coordinator dispositioned it as proved by reasoning about a shared loop; requiring an observation when a rule change touches an idempotence promise would have caught it; one occurrence. The aggregate review by a fresh reader is a practice that worked here

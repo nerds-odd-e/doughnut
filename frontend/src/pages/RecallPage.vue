@@ -44,6 +44,7 @@
       <AnsweredQuestionComponent
         v-if="currentAnsweredQuestion"
         v-bind="{ answeredQuestion: currentAnsweredQuestion, conversationButton: true }"
+        @attempt-excluded="showExcludedAttempt"
       />
       <AnsweredSpellingQuestion
         v-if="currentAnsweredSpelling"
@@ -172,6 +173,11 @@ const currentAnsweredSpelling = computed(() => {
   if (!result) return undefined
   return result?.questionType === "SPELLING" ? result : undefined
 })
+
+const showExcludedAttempt = (answeredQuestion: AnsweredQuestion) => {
+  previousAnsweredQuestions.value[previousAnsweredQuestionCursor.value!] =
+    answeredQuestion
+}
 
 const finished = computed(() => previousAnsweredQuestions.value.length)
 

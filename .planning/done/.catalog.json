@@ -2,6 +2,12 @@
   "schemaVersion": 1,
   "records": [
     {
+      "fileName": "SEED-073_story-7.json",
+      "identity": "SEED-073#story-7",
+      "completedAt": "2026-10-13T21:50:12.770Z",
+      "blob": "d4e1e7c83dd07e8266da64b04ef9f09eb5209a70"
+    },
+    {
       "fileName": "SEED-066_recording-started-after-leaving.json",
       "identity": "SEED-066#recording-started-after-leaving",
       "completedAt": "2026-10-13T11:35:18.168Z",

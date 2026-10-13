@@ -98,13 +98,8 @@ public class MemoryTracker extends EntityIdentifiedByIdOnly {
 
   @JsonProperty
   public Integer getRecallCount() {
-    int count = 0;
-    for (RecallLog log : recallLogs) {
-      if (!log.isConfusion()) {
-        count++;
-      }
-    }
-    return count;
+    return (int)
+        recallLogs.stream().filter(log -> !log.isConfusion() && log.isValidEvent()).count();
   }
 
   public void addRecallLog(RecallLog recallLog) {
@@ -225,6 +220,10 @@ public class MemoryTracker extends EntityIdentifiedByIdOnly {
             getStability(), getDifficulty(), elapsedHoursUntil(currentUTCTimestamp)));
     Timestamp projected = calculateNextRecallAt();
     setNextRecallAt(projected.after(existingDue) ? existingDue : projected);
+  }
+
+  public void rebuildWithout(RecallLog excluded, List<RecallLog> history) {
+    MemoryTrackerReplay.rebuildWithout(this, excluded, history);
   }
 
   @JsonIgnore

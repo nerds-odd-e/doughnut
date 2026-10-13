@@ -16,6 +16,7 @@
             'is-correct': isOptionCorrect(index),
             'is-incorrect': !isOptionCorrect(index),
             'is-selected': isSelectedOption(index),
+            'is-excluded': excluded,
           }
         ]"
         @click.once="submitAnswer({ choiceIndex: index })"
@@ -46,6 +47,7 @@ export default defineComponent({
     },
     correctChoiceIndex: Number,
     answerChoiceIndex: Number,
+    excluded: Boolean,
     disabled: Boolean,
   },
   emits: ["answer"],
@@ -91,6 +93,8 @@ export default defineComponent({
 
 .is-selected:not(.is-correct)
   font-weight: bold
+
+.is-selected:not(.is-correct):not(.is-excluded)
   background-color: hsl(0, 84%, 60%) !important
   color: white !important
   border: 2px solid hsl(0, 84%, 50%) !important

@@ -1,4 +1,7 @@
-import type { NoteContentCompletion } from "@generated/donut-backend-api"
+import type {
+  AmbiguousQuestionExclusionProposal,
+  NoteContentCompletion,
+} from "@generated/donut-backend-api"
 import type { ToolCallResult } from "./aiReplyState"
 import type { NoteStore } from "@/store/noteStore"
 
@@ -16,6 +19,11 @@ interface TitleSuggestion extends BaseSuggestion {
   content: string
 }
 
+interface ExclusionSuggestion extends BaseSuggestion {
+  suggestionType: "exclusion"
+  content: AmbiguousQuestionExclusionProposal
+}
+
 interface UnknownSuggestion extends BaseSuggestion {
   suggestionType: "unknown"
   content: { rawJson: string; functionName: string }
@@ -24,6 +32,7 @@ interface UnknownSuggestion extends BaseSuggestion {
 export type Suggestion =
   | CompletionSuggestion
   | TitleSuggestion
+  | ExclusionSuggestion
   | UnknownSuggestion
 
 export interface SuggestionContext {

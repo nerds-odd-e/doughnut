@@ -5,6 +5,9 @@
     @cancel="handleCancel"
     @skip="handleSkip"
     :hideAccept="suggestion.suggestionType === 'unknown'"
+    :hideSkip="isExclusion"
+    :acceptLabel="isExclusion ? 'Confirm' : undefined"
+    :cancelLabel="isExclusion ? 'Decline' : undefined"
   >
     <template #title>
       {{ suggestionTitle }}
@@ -17,7 +20,11 @@
 
 <script setup lang="ts">
 import { computed, ref } from "vue"
-import type { NoteContentCompletion, Note } from "@generated/donut-backend-api"
+import type {
+  AnsweredQuestion,
+  NoteContentCompletion,
+  Note,
+} from "@generated/donut-backend-api"
 import type { ToolCallResult } from "@/models/aiReplyState"
 import AcceptRejectButtons from "@/components/commons/AcceptRejectButtons.vue"
 import markdownizer from "../form/markdownizer"
@@ -25,6 +32,8 @@ import { RICH_CONTENT_PROSE } from "@/constants/richContentProse"
 import type { Suggestion } from "@/models/suggestions"
 import { useNoteStore } from "@/store/noteStore"
 import { useToast } from "@/composables/useToast"
+import { RecallPromptController } from "@generated/donut-backend-api/sdk.gen"
+import { apiCallWithLoading } from "@/managedApi/clientSetup"
 
 const noteStore = useNoteStore()
 const { showErrorToast } = useToast()
@@ -32,14 +41,20 @@ const { showErrorToast } = useToast()
 const props = defineProps<{
   suggestion: Suggestion
   note?: Note
+  recallPromptId?: number
 }>()
 
 const emit = defineEmits<{
   (e: "resolved", result: ToolCallResult): void
   (e: "rejected", error: Error): void
+  (e: "attempt-excluded", answeredQuestion: AnsweredQuestion): void
 }>()
 
 const isProcessing = ref(false)
+
+const isExclusion = computed(
+  () => props.suggestion.suggestionType === "exclusion"
+)
 
 const suggestionTitle = computed(() => {
   switch (props.suggestion?.suggestionType) {
@@ -47,6 +62,8 @@ const suggestionTitle = computed(() => {
       return "Suggested completion:"
     case "title":
       return "Suggested title:"
+    case "exclusion":
+      return "Proposed correction: exclude this attempt as an ambiguous question"
     case "unknown":
       return `Unknown tool call: ${
         // biome-ignore lint/suspicious/noExplicitAny: Type is dynamically determined at runtime
@@ -63,6 +80,8 @@ const suggestionContentClass = computed(() => {
       return `completion-text ${RICH_CONTENT_PROSE}`
     case "title":
       return "title-suggestion"
+    case "exclusion":
+      return "exclusion-reason"
     case "unknown":
       return "unknown-request"
     default:
@@ -86,6 +105,8 @@ const formattedContent = computed(() => {
       )
     case "title":
       return props.suggestion.content
+    case "exclusion":
+      return markdownizer.markdownToHtml(props.suggestion.content.reason)
     case "unknown":
       return `<pre>${(props.suggestion.content as { rawJson: string }).rawJson}</pre>`
     default:
@@ -94,19 +115,31 @@ const formattedContent = computed(() => {
 })
 
 const handleAccept = async () => {
-  if (!props.suggestion || !props.note) return
+  if (!props.suggestion || (!isExclusion.value && !props.note)) return
 
   try {
     isProcessing.value = true
     switch (props.suggestion.suggestionType) {
       case "completion": {
         const content = props.suggestion.content
-        await noteStore.completeContent(props.note.id, content)
+        await noteStore.completeContent(props.note!.id, content)
         break
       }
       case "title": {
         const content = props.suggestion.content
-        await noteStore.updateTextField(props.note.id, "edit title", content)
+        await noteStore.updateTextField(props.note!.id, "edit title", content)
+        break
+      }
+      case "exclusion": {
+        const reason = props.suggestion.content.reason
+        const { data, error } = await apiCallWithLoading(() =>
+          RecallPromptController.excludeAsAmbiguous({
+            path: { recallPrompt: props.recallPromptId! },
+            body: { reason },
+          })
+        )
+        if (error) throw new Error("Failed to exclude this attempt")
+        emit("attempt-excluded", data!)
         break
       }
     }

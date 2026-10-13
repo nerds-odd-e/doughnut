@@ -9,14 +9,68 @@ import { useRecallData } from "@/composables/useRecallData"
 import makeMe from "donut-test-fixtures/makeMe"
 import { mockSdkService } from "@tests/helpers"
 import { flushPromises } from "@vue/test-utils"
-import { expect, it } from "vitest"
+import { expect, it, vi } from "vitest"
+import { confirmTutorExclusionProposal } from "../components/conversation/aiResponseTestSupport"
 import {
   createMemoryTrackerLite,
   givenRecallQueue,
   useRecallPageSpecContext,
 } from "./recallPageTestSupport"
 
+vi.mock("@/managedApi/AiReplyEventSource", async () => {
+  const { aiReplyEventSourceTrackingMock } = await import(
+    "../components/conversation/aiReplyEventSourceTrackingMock"
+  )
+  return aiReplyEventSourceTrackingMock()
+})
+
 const ctx = useRecallPageSpecContext()
+
+it("shows the answered attempt as excluded once the learner confirms the tutor's proposal in private help", async () => {
+  const reason = "Two choices fit the stem equally well"
+  const prompt = makeMe.aRecallPrompt
+    .withQuestionStem("What does correlation establish?")
+    .withChoices(["Association", "Causation"])
+    .please()
+  const answered = makeMe.anAnsweredQuestion
+    .withId(prompt.id)
+    .answerCorrect(false)
+    .please()
+  mockSdkService(MemoryTrackerController, "getRecallPrompt", prompt)
+  mockSdkService(MemoryTrackerController, "getThresholdExceeded", {
+    thresholdExceeded: false,
+  })
+  mockSdkService(RecallPromptController, "answer", answered)
+  mockSdkService(
+    ConversationMessageController,
+    "startConversationAboutRecallPrompt",
+    makeMe.aConversation.forAnsweredQuestion(answered).please()
+  )
+  mockSdkService(ConversationMessageController, "getConversationMessages", [])
+  mockSdkService(ConversationMessageController, "markConversationAsRead", [])
+  ctx.renderer.withCurrentUser(makeMe.aUser.please())
+  givenRecallQueue(createMemoryTrackerLite(123), createMemoryTrackerLite(456))
+  const wrapper = await ctx.mountPage({ attachTo: document.body })
+  await wrapper.findAll("li.choice button")[1]!.trigger("click")
+  await flushPromises()
+  await wrapper
+    .findAll("button")
+    .find((button) => button.text() === "Get private help")!
+    .trigger("click")
+  await flushPromises()
+
+  await confirmTutorExclusionProposal(
+    makeMe.anAnsweredQuestion
+      .withId(answered.id)
+      .excludedAsAmbiguous(reason, "2026-10-13T08:00:00Z")
+      .please()
+  )
+
+  expect(wrapper.find('[data-test="excluded-attempt"]').text()).toContain(
+    reason
+  )
+  expect(document.querySelector("dialog")!.open).toBe(true)
+})
 
 it.each(["conversation close", "Escape", "nested refinement then Escape"])(
   "returns from private help through %s to the actual answered attempt and recall queue",

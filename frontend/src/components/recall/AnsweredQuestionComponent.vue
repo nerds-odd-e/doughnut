@@ -32,6 +32,7 @@
   <ConversationButton
     v-if="conversationButton"
     :recall-prompt-id="answeredQuestion.id"
+    @attempt-excluded="$emit('attempt-excluded', $event)"
   />
   <RefineNoteModal
     v-if="canRefineNote && note"
@@ -72,6 +73,10 @@ const props = defineProps({
   },
   reviewClarification: Boolean,
 })
+
+defineEmits<{
+  (e: "attempt-excluded", answeredQuestion: AnsweredQuestion): void
+}>()
 
 const noteStore = useNoteStore()
 const currentUser = inject<Ref<User | undefined>>("currentUser")
