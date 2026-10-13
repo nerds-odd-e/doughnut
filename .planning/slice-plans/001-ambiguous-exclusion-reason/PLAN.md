@@ -84,11 +84,33 @@ on either. Raw command output stayed outside the repository.
 | A missing/blank proposal cannot be confirmed but can be declined | 2 | Mounted `AiResponse` streams each malformed proposal, observes unavailable Confirm and usable Decline, dismisses it, and checks the exclusion API was not invoked. This is proof of an actively enforced refusal. |
 | Existing ownership, readouts, commissioned grading and other proposal kinds retain their behavior | 1 / 2 | Full backend and frontend suites cover consumers identified above; do not add absence tests for out-of-scope behavior. |
 
+## Execution context
+
+Established 2026-10-14: SEED-073#story-8, publisher
+`dashboard-territory.local-doughnut`, agent Nao-chan. Story Branch Mode uses
+`/Users/terryyin/git/doughnut/.worktrees/require-a-reason-when-a-learner-excludes-an-ambi`
+and branch `codex/require-a-reason-when-a-learner-excludes-an-ambi`; this is the
+owned reused execution checkout, with no integration checkout supplied.
+Remote `origin`, eventual trunk `main`; increments publish to the remote
+execution branch. Published claim/base: `171cdbab862392ee90028f25f85de91424c17426`;
+starting revision: `e62fd69628118b96ad8077ad055d437006a2d63f`.
+The project worktree setup succeeded, followed by
+`CURSOR_DEV=true nix develop -c pnpm -C frontend exec tsc --noEmit` (exit zero).
+Existing planning authority allows refinement if an attempt overruns; retain
+the slices' ten-minute limit and required-verification-wait exception.
+
+CI: GitHub Actions `nerds-odd-e/doughnut`, verified selector `ci.yml`, display
+name `donut CI`, push-triggered on the execution branch. Codex observer:
+coordinator `nao-story8-2fd471d5`, stream directory
+`/tmp/dough-ci-501/watch-mDzYOr`, PID 19779, session 5328, yielded cell 13,
+bound to this checkout and the remote execution branch. The trunk claim's CI
+is unobserved; this observer owns subsequent branch deliveries.
+
 ## Ordered slices
 
 ### 1. Refuse a new exclusion without its reason
 Type: Behavior
-Status: planned
+Status: done
 Proof: Controller refusal and retry examples above; full
 `CURSOR_DEV=true nix develop -c pnpm backend:test_only`.
 
@@ -112,6 +134,24 @@ remaining time is solely an already-running required verification wait.
 Safe stopping point: the API prevents unexplained new decisions. Until slice 2,
 a malformed proposal can still display Confirm and receive the existing API
 error; it changes no learning state. Slice 2 replaces that interim interaction.
+
+Accepted proof (2026-10-14):
+`CURSOR_DEV=true nix develop -c pnpm backend:test_only` exited zero: 2,814
+tests, zero failures/errors, two skipped; all 15 exclusion-controller cases
+passed. Inspected `RecallPromptExcludeAsAmbiguousControllerTest.setup` answers
+an owned MCQ through the real controller. `refusesANewExclusionWithoutAReason`
+observes the business exception, refreshed empty exclusion fields, and identical
+persisted tracker/log snapshots for null, empty, spaces, and tab/newline.
+`repeatingReturnsTheFirstDecisionAndPreservesScheduleAndHistory` confirms once,
+advances time, retries with each malformed/different reason, and observes the
+first reason/time plus unchanged persisted schedule/history. Existing valid
+decision, replay, original-mark, and authorization examples remained green.
+The guard in `Answer.excludeAsAmbiguous` follows the first-decision check and
+precedes both writes; the service saves/rebuilds only for a new decision.
+Full-suite consumers matched the preparation survey. Implementation took about
+five minutes. Fresh refactor returned `none — already clean`, no proof changes
+or reruns; whitespace check passed. Selective formatting succeeded once. No API
+generation trigger changed.
 
 ### 2. Keep reasonless help proposals declineable
 Type: Behavior
@@ -161,3 +201,15 @@ mapped high-level proof, and observed implementation/test routes. The cumulative
 design is one first-decision rule with matching help controls; there is no new
 representation, speculative structure, or unresolved slice-specific concern.
 The backend-first interim interaction is explicit and has slice 2 as its owner.
+
+## Story obligations
+
+### G1. Reasonless proposal controls
+Reported: slice 1 — "Malformed Help proposals can display Confirm until slice 2, while the backend safely rejects them."
+Story clause: "A tutor proposal that carries no reason cannot be confirmed in help; the learner can still decline it."
+Disposition: interim until slices 2
+
+### G2. Observation boundaries
+Reported: slice 1 — "Direct controller tests exercise null reasons; no HTTP-binding or manual-browser proof is claimed."
+Story clause: "A learner who excludes an attempt as an ambiguous question always keeps the reason for that decision."
+Disposition: no user cost "A learner who excludes an attempt as an ambiguous question always keeps the reason for that decision.": the real controller/service/entity/database boundary proves the rule; the request shape and binding remain unchanged, and mounted frontend proof belongs to slice 2. No manual or separate HTTP-binding observation is a promised proof item.

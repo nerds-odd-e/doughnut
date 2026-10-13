@@ -105,6 +105,9 @@ public class Answer extends EntityIdentifiedByIdOnly {
     if (isExcludedAsAmbiguous()) {
       return false;
     }
+    if (reason == null || reason.isBlank()) {
+      throw new QuestionAnswerException("An ambiguity exclusion requires a reason");
+    }
     excludedAt = currentUTCTimestamp;
     exclusionReason = reason;
     return true;
