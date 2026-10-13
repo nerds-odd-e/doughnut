@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "identity": "SEED-066#recording-started-after-leaving",
+  "title": "Stop a content recording that starts after the author has left the note",
+  "completedAt": "2026-10-13T11:35:18.168Z",
+  "developer": "Terry Yin",
+  "agent": "Julia-chan",
+  "host": "codex",
+  "model": "gpt-6.1-sol"
+}

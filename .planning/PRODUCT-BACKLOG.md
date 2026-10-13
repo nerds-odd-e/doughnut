@@ -7,7 +7,6 @@ Make deliberately captured knowledge more useful through learning and refinement
 ## Taken
 
 - [Resolve a disputed wrong mark after the learner confirms question ambiguity](seeds/SEED-073-learning-refinement-and-retrieval.md#story-7) — SEED-073#story-7 ([plan](slice-plans/070-learner-confirmed-ambiguous-exclusion/PLAN.md))
-- [Stop a content recording that starts after the author has left the note](seeds/SEED-066-voice-input.md#recording-started-after-leaving) — SEED-066#recording-started-after-leaving ([plan](slice-plans/071-content-voice-startup-cancellation/PLAN.md))
 
 ## Backlog list
 

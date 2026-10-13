@@ -2,6 +2,12 @@
   "schemaVersion": 1,
   "records": [
     {
+      "fileName": "SEED-066_recording-started-after-leaving.json",
+      "identity": "SEED-066#recording-started-after-leaving",
+      "completedAt": "2026-10-13T11:35:18.168Z",
+      "blob": "c68ce8bd14e49888fb1048ac3911556e90a03a56"
+    },
+    {
       "fileName": "SEED-073_manual-language-learner-evaluation.json",
       "identity": "SEED-073#manual-language-learner-evaluation",
       "completedAt": "2026-10-13T01:44:50.153Z",
