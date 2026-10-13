@@ -144,6 +144,14 @@ export const createAiReplyStates = (
                   content: newTitle,
                   toolCallId: toolCall.id || "synthetic",
                 })
+              } else if (
+                functionName === "AmbiguousQuestionExclusionProposal"
+              ) {
+                await context.handleSuggestion({
+                  suggestionType: "exclusion",
+                  content: JSON.parse(functionArgs),
+                  toolCallId: toolCall.id || "synthetic",
+                })
               } else {
                 await context.handleSuggestion({
                   suggestionType: "unknown",

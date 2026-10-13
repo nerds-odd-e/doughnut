@@ -338,7 +338,14 @@ Sizing: about 5 minutes. Stop-safe: data written by slice 1 is readable.
 
 ### 7. The learner confirms or declines the proposal in private help
 Type: Behavior
-Status: planned
+Status: done
+Accepted proof (2026-10-13): `env -u NODE_ENV CURSOR_DEV=true nix develop -c pnpm frontend:test tests/components/conversation`
+→ 9 files, 41 tests passed, including the three tests of
+`AiResponse.exclusionProposal.spec.ts`; before refactoring the same change
+passed `tests/models` and the private-help, practice, and message-center page
+specs (23 files, 123 tests); `vue-tsc --noEmit` and `tsc --noEmit` exit 0.
+The suggestion shows the title below with the reason in `.exclusion-reason`
+and the buttons "Confirm" and "Decline", with no Skip.
 Proof: `AiResponse.exclusionProposal.spec.ts` beside the title and completion
 specs: a mounted help conversation for a recall prompt receives an
 `AmbiguousQuestionExclusionProposal` tool call → the suggestion shows the
@@ -482,6 +489,12 @@ was accepted on `main`.
   computed styles.
 - `AnsweredQuestionPage.expectMCQAnswerToBeIncorrect` asserts classes that an
   excluded attempt keeps, so the E2E journey needs its own excluded assertion.
+- The confirmation's returned `AnsweredQuestion` is the `data` of the
+  `apiCallWithLoading` call in the `exclusion` case of `handleAccept` in
+  `ToolCallHandler.vue`; the path upward is `ToolCallHandler` → `AiResponse` →
+  `ConversationInner` → `ConversationComponent` → `ConversationButton`.
+- The suggestion flow reports nothing back to the tutor within a stream; a
+  later request sees a confirmed exclusion through the attempt record.
 
 ## Story obligations
 
@@ -513,7 +526,7 @@ Disposition: no user cost "the attempt is visibly excluded from evaluation": the
 ### G6. The proposal shows as an unknown suggestion
 Reported: slice 5 — "Until slice 7 the proposal shows as an \"unknown\" suggestion in the UI."
 Story clause: "Let the learner review and confirm or decline the proposal."
-Disposition: receiving slice 7
+Disposition: proved by slice 7: `AiResponse.exclusionProposal.spec.ts` tests "shows the proposed correction with its reason", "excludes the attempt when the learner confirms", and "leaves the attempt as it was when the learner declines"
 
 ### G7. Tutor judgement is unmeasured
 Reported: slice 5 — "Tutor judgement is unmeasured: whether the model proposes only for genuine ambiguity, emits a single call, or respects \"do not propose again\" rests on wording alone."
@@ -539,3 +552,18 @@ Disposition: no user cost "the original evidence remains inspectable": the excha
 Reported: slice 6 — "A log-only history item (no paired prompt) for an excluded answer would show bare AGAIN."
 Story clause: "Reopening shows both the original mark and the learner-confirmed correction."
 Disposition: receiving slice 9
+
+### G12. A declined proposal leaves no record
+Reported: slice 7 — "A decline leaves no persisted or displayed mark; it differs from an accepted correction only by the absence of the excluded state."
+Story clause: "A declined proposal leaves the result and schedule intact and remains distinguishable from an accepted correction."
+Disposition: no user cost "the attempt is visibly excluded from evaluation": after a decline the attempt keeps its original wrong mark and after a confirmation it reads as excluded, so the two outcomes read differently wherever the attempt is shown
+
+### G13. A failed confirmation closes the proposal
+Reported: slice 7 — "The learner cannot retry from the same proposal."
+Story clause: "On confirmation, replace the unresolved wrong-mark presentation with an explicit excluded-as-ambiguous result."
+Disposition: no user cost "After the learner confirms the proposed correction": a failed call changes nothing, shows the error, and leaves the wrong mark in place, as a failed title or completion suggestion does; the learner can ask the tutor again
+
+### G14. Open surfaces refresh only on reopen
+Reported: slice 7 — "after Confirm, the help subject panel, recall page and memory tracker page still show the old result until reopened."
+Story clause: "On confirmation, replace the unresolved wrong-mark presentation with an explicit excluded-as-ambiguous result."
+Disposition: receiving slice 8

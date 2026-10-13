@@ -18,6 +18,7 @@
       v-if="currentSuggestion"
       :suggestion="currentSuggestion"
       :note="currentNote"
+      :recall-prompt-id="conversation.subject?.recallPrompt?.id"
       @resolved="handleToolCallResolved"
       @rejected="handleToolCallRejected"
     />
