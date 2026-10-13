@@ -6,6 +6,8 @@ Make deliberately captured knowledge more useful through learning and refinement
 
 ## Taken
 
+- [Evaluate private recall help as a language learner](seeds/SEED-073-learning-refinement-and-retrieval.md#manual-language-learner-evaluation) — SEED-073#manual-language-learner-evaluation
+
 ## Backlog list
 
 - [Save a useful chat clarification as a reviewed note correction](seeds/SEED-073-learning-refinement-and-retrieval.md#story-2) — SEED-073#story-2

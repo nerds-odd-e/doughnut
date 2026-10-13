@@ -351,3 +351,23 @@ concrete evaluation cases.
   and [remote MCP hosting seed](SEED-002-host-mcp-over-https.md).
 - SEED-055 concerns file-serving API cleanup and SEED-001 concerns a different
   fuzzy spelling-match behavior; neither is duplicated or reprioritized here.
+
+<a id="manual-language-learner-evaluation"></a>
+
+### Evaluate private recall help as a language learner
+
+**Identity:** SEED-073#manual-language-learner-evaluation
+```json dough-story-state
+{"schemaVersion":1,"refinement":"refined","approach":"unselected"}
+```
+
+**Goal:** Observe whether private recall help resolves a language learner's
+specific confusion, especially after an incorrect follow-up answer and an
+ambiguous question.
+
+Scope: A 45-minute manual session authorized on 2026-10-13, using an isolated
+E2E app and real OpenAI replies with `gpt-6.1-sol`, capped at ten replies.
+Observe explanation, incorrect practice feedback, continued misunderstanding,
+ambiguity, saved continuation, and return to recall. Evaluate pedagogical
+usefulness from a simulated learner perspective; this establishes no actual
+human learning or retention claim. Report findings without product repair.
