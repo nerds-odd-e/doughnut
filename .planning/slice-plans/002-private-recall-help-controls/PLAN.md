@@ -122,6 +122,12 @@ outcome. Scrutinize an overrun beyond 5 minutes; above 10 minutes stop and
 replan unless only a stated test/external wait remains (AGENTS.md). The story's
 30–60 minute estimate includes independent refactoring and delivery overhead.
 
+## Execution complete
+
+Product advice: No additional product work is recommended. The local presentation
+change fulfills the story and preserves existing learning/refinement boundaries;
+keep the current backlog order and the story's deferred promises.
+
 ## Story obligations
 
 ### G1. Browser observation scope
@@ -155,6 +161,22 @@ push through authorized execution delivery. No manual-testing or paid-model
 gate is added. Reassess consumers if implementation changes shared defaults.
 
 ## Current decisions and learnings
+
+### Retrospective
+
+- Reviewed delivered implementation `f85c5eb53b25464823db8f6f413fc66af84d94b5`
+  against the execution-ready plan at `f884b96714131d631e608504d71d418edf3ae906`
+  and selected story. The intervening claim is execution provenance.
+  No product finding, architectural drift, or correction plan is needed.
+- Modal owns containment; ConversationButton selects it and retains focus return;
+  conversation data, access, exclusion, and scheduling remain with existing owners.
+  ADR 0002, 0003, and 0007 boundaries remain intact. Browser geometry adds unique
+  page-level proof; existing ambiguity-exclusion E2E remains integration proof.
+- Process review enabled by project configuration: recorded this execution's
+  repeated truncated startup retrieval under existing `DD-233` in `DearDough.md`
+  (346 physical lines). Agent implementation/refactor stayed within their budgets.
+- CI on the accepted story-branch revision is pending during review;
+  the retained observer and completion operation own its final verdict.
 
 ### Accepted slice proof and delivery preparation
 
@@ -194,6 +216,9 @@ gate is added. Reassess consumers if implementation changes shared defaults.
   by the established start and confirmed on the remote execution branch.
   Starting revision `f884b96714131d631e608504d71d418edf3ae906`.
   Increment target is that execution branch on `origin`.
+  Accepted implementation `f85c5eb53b25464823db8f6f413fc66af84d94b5` extends
+  claim `eeedbbdb1949da9148ead5284a370ac751e59607` without reconciliation;
+  managed delivery reused this coordinator's observer.
 - Checkout setup: `CURSOR_DEV=true nix develop -c bash scripts/worktree_setup.sh`
   passed against the current locked installation; applicable command
   `CURSOR_DEV=true nix develop -c pnpm -C frontend exec vue-tsc --noEmit`

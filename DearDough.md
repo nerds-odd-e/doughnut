@@ -239,6 +239,14 @@ The coordinator combined complete execution references and an unbounded tool-met
   - Observed effect: requested authoritative context was partly omitted and required repeated retrieval before the backend slice
   - Inference: bounding each batch to the next execution boundary would avoid this recurrence; no total-token or elapsed-time saving was measured
 
+- Execution: SEED-073#story-9 (first implementation commit f85c5eb53b25464823db8f6f413fc66af84d94b5)
+  - Timestamp: unknown
+  - Tool: Codex
+  - Open Dough release: unknown
+  - Evidence: dashboard launch 30f2c821-5b09-4325-bb0e-32cb142d76bb on 2026-10-14; startup functions.exec batches reported 10,992 and 29,925 original output tokens with truncation, followed by bounded retrieval of execution, CI, publication, and proof references before delegation
+  - Observed effect: requested authoritative passages were omitted and had to be retrieved again before the one-slice implementation
+  - Inference: smaller next-boundary batches would avoid the repeated reads; no elapsed-time or total-token saving was measured
+
 ## DD-234 — A comparison of empty captures was printed as a match
 
 During proof acceptance the coordinator compared two captured measurements with `diff ... && echo SAME`. The output filter had matched nothing, so both captures were empty and the command printed `SAME`. The coordinator noticed the empty files and repeated the measurement; a third attempt was needed because the test command ran from the wrong directory. An agent execution deviation, not missing workflow guidance.
