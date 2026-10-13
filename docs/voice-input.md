@@ -128,8 +128,13 @@ the common error toast "Could not turn your speech into text. Your recording
 is kept." After a failed conversion at Stop, the author recovers the kept
 recording from the button's retry: the kept audio is converted again and its
 passage is added once. The kept recording lasts while the author stays on the
-note and is dropped by a reload or by leaving the note. A
-recording in progress stops when the author moves to another note or page, and
+note and is dropped by a reload or by leaving the note. Leaving while content
+Voice input is starting cancels that attempt. When pending microphone, audio
+initialization, or wake-lock acquisition settles, its resources are released
+and any late audio is discarded without transcription or a content change.
+Cleanup belongs to that session and leaves another note's voice control and
+recording available. A recording in progress stops when the author moves to
+another note or page, and
 its remaining speech is converted into the note it was started on; when that
 conversion fails its audio is dropped. Voice input started on the other note
 dictates into that note.
