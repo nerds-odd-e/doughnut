@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 1,
+  "agent": "Tsubomi-chan",
+  "email": "tsubomi-chan@example.org",
+  "identity": "SEED-073#story-7",
+  "mode": "story-branch",
+  "branch": "claude/resolve-a-disputed-wrong-mark-after-the-learner",
+  "host": "claude"
+}
