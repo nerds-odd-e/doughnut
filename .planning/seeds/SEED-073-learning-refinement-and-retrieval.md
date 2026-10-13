@@ -328,6 +328,50 @@ and stays as it is apart from the required reason.
 
 - **Effort hypothesis:** S (about 30 minutes), high confidence.
 
+<a id="story-9"></a>
+
+### Keep private recall help controls in view for long conversations
+
+**Identity:** SEED-073#story-9
+```json dough-story-state
+{"schemaVersion":1,"refinement":"not-refined","approach":"unselected"}
+```
+
+- **For / why:** A learner reading a long private recall-help conversation can
+  identify the dialog and close it without first scrolling back to find its
+  controls.
+- **Goal:** The help heading and Close control stay visible while the learner
+  reads a long conversation or ambiguity-exclusion reason.
+- **Scope:** Bound the private recall-help dialog to the available viewport
+  while keeping its question, reason, and conversation readable by scrolling.
+  Opening, reopening, receiving a long reply, and confirming an ambiguity
+  exclusion keep the heading and Close control in view. Closing returns the
+  learner to the same recall attempt with its existing progress and focus.
+- **Key examples:** Open help with a long reason and several exchanges at a
+  1728×963 desktop viewport → the heading and Close control are visible, and
+  all content can be read. Scroll through the conversation or confirm the
+  proposed exclusion → Close remains available. Close and reopen the same
+  conversation → its controls remain visible and the learner can continue.
+- **Evidence, 2026-10-14:** Bounded manual testing of learner-confirmed ambiguity
+  exclusion observed Close at y=-157 after confirmation and y=-793 when
+  reopening a longer exchange at 1728×963. Scrolling upward recovered it at
+  y=74; Escape closed help and restored focus to Get private help. This was a
+  usability opportunity, with no established root cause. The observation used
+  product base `2587fb27cb95699d70ed053af1aacdfa32095194`; the held app reported
+  revision `458b2ea204ff8fe11c9a037e71c46582f42c5fc0`.
+  [Dated inputs, actions, results, and limitations](https://github.com/nerds-odd-e/doughnut/blob/2537f7aca24505f4e4b63e4bb62f2be5888b9911/.planning/seeds/SEED-073-learning-refinement-and-retrieval.md#manual-ambiguity-exclusion-evaluation)
+  retain the full provenance. In that revision, `confirmed-help.jpg` under
+  `.planning/manual-testing-evidence/manual-ambiguity-exclusion-20261014/`
+  shows clipping; `reopened-help-clipped.jpg` shows the recovered view after
+  upward scrolling. This is agent-simulated learner evidence from one desktop
+  viewport; other viewport behavior remains unobserved.
+- **Effort hypothesis:** S (30–60 minutes), medium confidence until the dialog
+  layout and scroll behavior are inspected during refinement.
+- **Depends on:** No new story; the existing private recall-help dialog supplies
+  the journey to improve.
+- **Safe stopping point:** Learners can read and close long help conversations
+  through visible controls.
+
 ## Ordering and Scope Reduction
 
 The backlog owns global priority. Within this epic: resolve an actual learning
