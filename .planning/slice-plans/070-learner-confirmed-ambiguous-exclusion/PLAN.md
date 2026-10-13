@@ -310,7 +310,14 @@ replaces.
 
 ### 6. An excluded attempt reads as excluded wherever it is shown
 Type: Behavior
-Status: planned
+Status: done
+Accepted proof (2026-10-13): `env -u NODE_ENV CURSOR_DEV=true nix develop -c pnpm frontend:test tests/components/recall tests/pages/MemoryTrackerPageView.history.spec.ts tests/pages/MemoryTrackerPageView.privateHelp.spec.ts tests/pages/RecallPage.privateHelp.spec.ts tests/pages/RecallPage.practice.spec.ts tests/pages/RecallPage.answering.spec.ts tests/pages/MessageCenterPage.subject.spec.ts tests/components/conversation`
+→ 53 files, 241 tests passed; `vue-tsc --noEmit` and `tsc --noEmit` exit 0.
+Observations: `QuestionDisplay.spec.ts` "an attempt excluded as an ambiguous
+question" (three tests) and `MemoryTrackerPageView.history.spec.ts` "shows an
+excluded attempt as excluded beside its AGAIN log". The rule lives in
+`QuestionDisplay.vue` (`data-test="excluded-attempt"`); `QuestionChoices.vue`
+drops the wrong-answer colour through its `excluded` prop.
 Proof: `QuestionDisplay` spec: an answer with `excludedAt` and
 `exclusionReason` renders "Excluded — ambiguous question", the reason, the
 time, and "originally marked incorrect", with the selected choice not styled
@@ -470,6 +477,11 @@ was accepted on `main`.
   in the generated API types; the function name on the wire is the same.
 - `ConversationMessageControllerTestBase.lastRequestSentToAi()` captures the
   request sent to the mocked AI client.
+- `makeMe.anAnsweredQuestion.excludedAsAmbiguous(reason, excludedAtIso)` builds
+  the excluded shape; mounting with `attachTo: document.body` gives real
+  computed styles.
+- `AnsweredQuestionPage.expectMCQAnswerToBeIncorrect` asserts classes that an
+  excluded attempt keeps, so the E2E journey needs its own excluded assertion.
 
 ## Story obligations
 
@@ -507,3 +519,23 @@ Disposition: receiving slice 7
 Reported: slice 5 — "Tutor judgement is unmeasured: whether the model proposes only for genuine ambiguity, emits a single call, or respects \"do not propose again\" rests on wording alone."
 Story clause: "This is agent-simulated learner evidence, not measured human comprehension, retention, or representative model reliability."
 Disposition: no user cost "private recall help identifies an ambiguous question": a proposal changes nothing until the learner confirms it, so an unsuitable proposal costs the learner one declined suggestion
+
+### G8. Spelling attempts have no excluded reading
+Reported: slice 6 — "`RecallHistory.vue` spelling branch: shows a \"Result: Incorrect/Correct\" badge with no excluded reading."
+Story clause: "Start from one answered MCQ and its private help conversation."
+Disposition: excluded "Shared-MCQ adjudication, regenerating or editing questions, undoing a confirmed correction, correcting several attempts together, spelling disputes, and authoring note changes are deferred promises."
+
+### G9. Recall page and help panel unobserved for the excluded shape
+Reported: slice 6 — "Recall page (`AnsweredQuestionComponent`): not observed directly for the excluded shape."
+Story clause: "Reopening the attempt or its help shows the same decision and explains its actual consequences."
+Disposition: receiving slice 8
+
+### G10. The notice does not link to the originating exchange
+Reported: slice 6 — "It does not link to the originating exchange."
+Story clause: "Retain the original question, selected answer, marked outcome and Grade, together with the correction's reason, confirming learner, time, and originating exchange."
+Disposition: no user cost "the original evidence remains inspectable": the exchange is the attempt's persisted private help conversation, which the same answered question and history item already open through their help button
+
+### G11. A history item without its prompt would show a bare AGAIN
+Reported: slice 6 — "A log-only history item (no paired prompt) for an excluded answer would show bare AGAIN."
+Story clause: "Reopening shows both the original mark and the learner-confirmed correction."
+Disposition: receiving slice 9

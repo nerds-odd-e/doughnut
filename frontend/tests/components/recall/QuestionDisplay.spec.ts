@@ -129,4 +129,62 @@ describe("QuestionDisplay", () => {
 
     expect(wrapper.find("[data-test='question-ai-notes']").exists()).toBe(false)
   })
+
+  describe("an attempt excluded as an ambiguous question", () => {
+    const excludedAt = "2026-10-13T08:30:00Z"
+    const mountAnswered = (answer: Answer) =>
+      helper
+        .component(QuestionDisplay)
+        .withProps({
+          questionStem: "I ___ in Tokyo",
+          responseChoices: ["used to live", "am used to living"],
+          correctChoiceIndex: 0,
+          answer,
+        })
+        .mount({ attachTo: document.body })
+    const excludedAnswer = () =>
+      makeMe.anAnsweredQuestion
+        .withChoiceIndex(1)
+        .excludedAsAmbiguous("Both completions are grammatical.", excludedAt)
+        .please().answer
+    const selectedBackground = (wrapper: ReturnType<typeof mountAnswered>) =>
+      getComputedStyle(wrapper.find(".is-selected").element).backgroundColor
+
+    it("reads as excluded with the reason, the time, and the original mark", () => {
+      const wrapper = mountAnswered(excludedAnswer())
+
+      const notice = wrapper.find("[data-test='excluded-attempt']").text()
+      expect(notice).toContain("Excluded — ambiguous question")
+      expect(notice).toContain("Both completions are grammatical.")
+      expect(notice).toContain(new Date(excludedAt).toLocaleString())
+      expect(notice).toContain("originally marked incorrect")
+      wrapper.unmount()
+    })
+
+    it("keeps the selected answer and the key without the wrong-answer styling", () => {
+      const unresolved = mountAnswered({
+        id: 1,
+        correct: false,
+        choiceIndex: 1,
+      })
+      const wrongBackground = selectedBackground(unresolved)
+      unresolved.unmount()
+
+      const wrapper = mountAnswered(excludedAnswer())
+
+      expect(wrapper.find(".is-selected").text()).toBe("am used to living")
+      expect(selectedBackground(wrapper)).not.toBe(wrongBackground)
+      expect(wrapper.find(".is-correct").text()).toBe("used to live")
+      wrapper.unmount()
+    })
+
+    it("names an originally correct mark", () => {
+      const wrapper = mountAnswered({ ...excludedAnswer(), correct: true })
+
+      expect(wrapper.find("[data-test='excluded-attempt']").text()).toContain(
+        "originally marked correct"
+      )
+      wrapper.unmount()
+    })
+  })
 })
