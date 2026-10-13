@@ -164,19 +164,32 @@ gate is added. Reassess consumers if implementation changes shared defaults.
 
 ### Retrospective
 
-- Reviewed delivered implementation `f85c5eb53b25464823db8f6f413fc66af84d94b5`
-  against the execution-ready plan at `f884b96714131d631e608504d71d418edf3ae906`
-  and selected story. The intervening claim is execution provenance.
-  No product finding, architectural drift, or correction plan is needed.
-- Modal owns containment; ConversationButton selects it and retains focus return;
-  conversation data, access, exclusion, and scheduling remain with existing owners.
-  ADR 0002, 0003, and 0007 boundaries remain intact. Browser geometry adds unique
-  page-level proof; existing ambiguity-exclusion E2E remains integration proof.
-- Process review enabled by project configuration: recorded this execution's
-  repeated truncated startup retrieval under existing `DD-233` in `DearDough.md`
-  (346 physical lines). Agent implementation/refactor stayed within their budgets.
-- CI on the accepted story-branch revision is pending during review;
-  the retained observer and completion operation own its final verdict.
+- Reviewed implementation `f85c5eb53b25464823db8f6f413fc66af84d94b5` against
+  the ready plan at `f884b96714131d631e608504d71d418edf3ae906` and story.
+  Local containment preserves ADR 0002/0003/0007 boundaries; geometry adds
+  unique page proof alongside existing ambiguity-exclusion E2E integration.
+- Process review recorded DD-233 and DD-248 in DearDough. CI exposed a shared
+  dismissal-name collision, repaired below; no correction plan or changed advice.
+
+### CI repair
+
+- Runs `38485019305/1` and `38485210312/1` each failed seven Wikidata scenarios:
+  the new outer name Close collided with the existing footer Close in
+  `associateWikidataDialog.ts`. Exact logs showed the same ambiguous button lookup.
+- The outer control is now Close modal. A real mounted Wikidata dialog test
+  clicks that named control beside the footer and observes one emitted close.
+  Private-help geometry uses the same name and retains all observations.
+- Red at completion revision `335fdb1d94d7d7f2516f361ba28ff43b2e8efe20`:
+  `CURSOR_DEV=true nix develop -c pnpm frontend:test tests/notes/WikidataAssociationDialog.search.spec.ts`
+  exited 1 (8 passed / 1 failed), because the named outer dismissal was missing.
+- Green: `CURSOR_DEV=true nix develop -c pnpm frontend:test tests/notes/WikidataAssociationDialog.search.spec.ts tests/pages/RecallPage.privateHelp.spec.ts`
+  passed 15 tests in 12.03s. Full frontend passed 350 files / 2,195 tests in
+  46.45s; both literal typecheck commands below passed on the repaired content.
+- `CURSOR_DEV=true nix develop -c pnpm cy:run --spec 'e2e_test/features/wikidata/associate_wikidata.feature,e2e_test/features/wikidata/associate_wikidata_location_entries.feature,e2e_test/features/wikidata/associate_wikidata_person_entries.feature,e2e_test/features/wikidata/note_create_with_wikidata_id.feature'`
+  exited 0: four specs / ten scenarios, 37s, isolated wrapper-owned state.
+- Fresh refactor: already clean, proof unchanged; coordinator formatter passed
+  once for this repair. Slice remains done. The failed completion receipt retained
+  the observer. Repair base is published completion revision `335fdb1d94d7d7f2516f361ba28ff43b2e8efe20`.
 
 ### Accepted slice proof and delivery preparation
 
@@ -231,11 +244,7 @@ gate is added. Reassess consumers if implementation changes shared defaults.
   The startup claim on trunk has `pendingCi: unobserved`; this stream covers
   subsequent story-branch deliveries.
 
-- One containment rule owns all content growth; no separate handling for a
-  reason, streaming reply, or reopening.
 - Keep persistent identity/dismissal separate from scrollable reading content.
   Do not promise a pinned composer or every conversation-toolbar action.
 - No Structure slice, new architectural topic, ADR exception, or new product
   dependency is needed.
-- Slice-plan refinement was not needed: one bounded outcome has mapped proof,
-  a discriminating observed remedy, and no unresolved slice-specific concern.

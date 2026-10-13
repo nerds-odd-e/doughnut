@@ -21,7 +21,9 @@ export async function settleScrolling(dialog: HTMLDialogElement) {
 
 export function expectPrivateHelpControlsInView(dialog: HTMLDialogElement) {
   const heading = dialog.querySelector<HTMLElement>("h2")!
-  const close = dialog.querySelector<HTMLButtonElement>('[aria-label="Close"]')!
+  const close = dialog.querySelector<HTMLButtonElement>(
+    '[aria-label="Close modal"]'
+  )!
   for (const element of [heading, close]) {
     const bounds = element.getBoundingClientRect()
     expect(bounds.width).toBeGreaterThan(0)

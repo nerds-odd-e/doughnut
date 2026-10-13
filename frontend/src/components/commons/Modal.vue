@@ -18,7 +18,7 @@
         <button
           v-if="showCloseButton"
           class="close-button"
-          aria-label="Close"
+          aria-label="Close modal"
           @click="$emit('close_request')"
         >
           <X class="w-6 h-6" />
