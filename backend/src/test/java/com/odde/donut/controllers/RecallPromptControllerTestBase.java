@@ -1,6 +1,5 @@
 package com.odde.donut.controllers;
 
-import com.odde.donut.controllers.dto.AnswerDTO;
 import com.odde.donut.controllers.dto.AnswerSpellingDTO;
 import com.odde.donut.controllers.dto.Randomization;
 import com.odde.donut.entities.MemoryTracker;
@@ -56,12 +55,6 @@ abstract class RecallPromptControllerTestBase extends ControllerTestBase {
 
   MemoryTracker memoryTrackerOwnedByAnotherUser() {
     return makeMe.aMemoryTrackerBy(makeMe.aUser().please()).please();
-  }
-
-  AnswerDTO choiceAnswer(int choiceIndex) {
-    AnswerDTO dto = new AnswerDTO();
-    dto.setChoiceIndex(choiceIndex);
-    return dto;
   }
 
   AnswerSpellingDTO spellingAnswer(String answer) {

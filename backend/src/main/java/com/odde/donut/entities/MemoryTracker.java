@@ -98,7 +98,8 @@ public class MemoryTracker extends EntityIdentifiedByIdOnly {
 
   @JsonProperty
   public Integer getRecallCount() {
-    return (int) recallLogs.stream().filter(log -> !log.isConfusion()).count();
+    return (int)
+        recallLogs.stream().filter(log -> !log.isConfusion() && log.isValidEvent()).count();
   }
 
   public void addRecallLog(RecallLog recallLog) {

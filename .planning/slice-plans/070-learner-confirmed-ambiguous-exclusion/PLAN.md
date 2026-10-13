@@ -233,7 +233,16 @@ effect.
 
 ### 4. Excluded attempts leave evaluation readouts
 Type: Behavior
-Status: planned
+Status: done
+Accepted proof (2026-10-13): `CURSOR_DEV=true nix develop -c pnpm backend:test_only`
+→ BUILD SUCCESSFUL, 2796 tests, 0 failures; after test-helper refactoring the
+`RecallPrompt*`, `MemoryTracker*`, and `UserRecallStatsControllerTest`
+controller classes reran green (186 tests). Observations:
+`MemoryTrackerShowControllerTest` `recallCountOmitsAnExcludedAttemptAndKeepsOrdinaryRecalls`,
+`MemoryTrackerThresholdControllerTest.anExcludedAgainDoesNotCountTowardThreshold`,
+`RecallStatsExcludedAttemptIsNotAReviewTest`, and
+`UserRecallStatsControllerTest.anAttemptExcludedAsAmbiguousIsNotAReview`
+(the query projects the exclusion).
 Proof: `MemoryTrackerShowControllerTest` (or the recall-history test base):
 `recallCount` omits a log whose answer is excluded;
 `MemoryTrackerThresholdControllerTest`: an excluded AGAIN does not count toward
@@ -438,6 +447,11 @@ was accepted on `main`.
   rebuilt from a partial history when one of its attempts is excluded. ADR 0003
   states the state "can be rebuilt from RecallLog"; whether production
   trackers satisfy that is unobserved. Obligation G4 keeps this open.
+- The stats query's end bound is exclusive, so an attempt answered at exactly
+  the current clock enters stats only after the clock advances.
+- `ControllerTestBase` holds the shared request builders `choiceAnswer` and
+  `ambiguousExclusion`; `MemoryTrackerControllerTestBase.answerWronglyThenExcludeAsAmbiguous`
+  produces an excluded attempt through the real operations.
 
 ## Story obligations
 
@@ -449,7 +463,7 @@ Disposition: proved by slice 3: `RecallPromptExcludeAsAmbiguousControllerTest` t
 ### G2. Excluded attempt still counted in readouts
 Reported: slice 1 — "the exclusion is recorded without schedule recomputation or readout changes (slices 3 and 4), as the plan states."
 Story clause: "Exclude that invalid attempt from evaluation and derived recall readouts."
-Disposition: receiving slice 4
+Disposition: proved by slice 4: `MemoryTrackerShowControllerTest` `recallCountOmitsAnExcludedAttemptAndKeepsOrdinaryRecalls`, `MemoryTrackerThresholdControllerTest.anExcludedAgainDoesNotCountTowardThreshold`, `UserRecallStatsControllerTest.anAttemptExcludedAsAmbiguousIsNotAReview`
 
 ### G3. Route, request body, and serialized fields unobserved over HTTP
 Reported: slice 1 — "HTTP request binding of the `{reason}` JSON body and the route string: the controller is called directly, as in the neighbouring tests."
@@ -460,3 +474,8 @@ Disposition: receiving slice 9
 Reported: slice 3 — "A tracker whose current stability did not come from RecallLog rows (for example test fixtures built with `stabilityAndNextRecallAt(200)` and no logs) becomes New on exclusion."
 Story clause: "Confirmation is not a new Grade, does not award GOOD, and does not reset or recreate the tracker."
 Disposition: interim until slices 9
+
+### G5. An excluded attempt still counts as recall activity
+Reported: slice 4 — "an excluded attempt still counts as recall activity for the silent-window due time. I treated that as activity, not evaluation, and did not change it."
+Story clause: "Exclude that invalid attempt from evaluation and derived recall readouts."
+Disposition: no user cost "the attempt is visibly excluded from evaluation": the learner did answer at that time, and the activity readers (`findAnsweredRecallPromptsInTimeRange`, `findUserIdsWithAnsweredRecallsInTimeRange`) use only answer times, never correctness or Grades

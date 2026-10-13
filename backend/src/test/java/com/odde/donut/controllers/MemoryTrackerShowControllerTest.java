@@ -5,6 +5,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import com.odde.donut.entities.Grade;
 import com.odde.donut.entities.MemoryTracker;
 import com.odde.donut.entities.MemoryTrackerType;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
@@ -52,11 +53,29 @@ class MemoryTrackerShowControllerTest extends MemoryTrackerControllerTestBase {
     }
 
     @Test
+    void recallCountOmitsAnExcludedAttemptAndKeepsOrdinaryRecalls()
+        throws UnexpectedNoAccessRightException {
+      answerWronglyThenExcludeAsAmbiguous(tracker, tracker.getNote());
+      controller.markAsRecalled(tracker, Grade.GOOD);
+
+      MemoryTracker shown = controller.showMemoryTracker(reloaded(tracker));
+
+      assertThat(shown.getRecallCount(), equalTo(1));
+      assertThat(controller.getRecallHistory(shown).size(), equalTo(2));
+    }
+
+    @Test
     void shouldNotBeAbleToSeeOthers() {
       tracker = makeMe.aMemoryTrackerBy(makeMe.aUser().please()).please();
       assertThrows(
           UnexpectedNoAccessRightException.class, () -> controller.showMemoryTracker(tracker));
     }
+  }
+
+  private MemoryTracker reloaded(MemoryTracker stored) {
+    Integer id = stored.getId();
+    makeMe.entityPersister.flushAndClear();
+    return makeMe.entityPersister.find(MemoryTracker.class, id);
   }
 
   @Nested
@@ -73,12 +92,6 @@ class MemoryTrackerShowControllerTest extends MemoryTrackerControllerTestBase {
       MemoryTracker stored = makeMe.aMemoryTrackerFor(ownedNote()).please();
 
       assertThat(reloaded(stored).getDifficulty(), nullValue());
-    }
-
-    private MemoryTracker reloaded(MemoryTracker stored) {
-      Integer id = stored.getId();
-      makeMe.entityPersister.flushAndClear();
-      return makeMe.entityPersister.find(MemoryTracker.class, id);
     }
   }
 }

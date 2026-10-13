@@ -4,7 +4,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import com.odde.donut.controllers.dto.AmbiguousExclusionDTO;
 import com.odde.donut.entities.Answer;
 import com.odde.donut.entities.Fsrs;
 import com.odde.donut.entities.Grade;
@@ -50,7 +49,9 @@ class RecallPromptExcludeAsAmbiguousControllerTest extends RecallPromptControlle
   @Test
   void recordsTheExclusionAndKeepsTheOriginalMark() throws UnexpectedNoAccessRightException {
     Answer answer =
-        controller.excludeAsAmbiguous(recallPrompt, exclusion("both tenses fit")).getAnswer();
+        controller
+            .excludeAsAmbiguous(recallPrompt, ambiguousExclusion("both tenses fit"))
+            .getAnswer();
 
     makeMe.refresh(answer);
     assertThat(answer.getExcludedAt(), equalTo(excludedAt));
@@ -60,11 +61,13 @@ class RecallPromptExcludeAsAmbiguousControllerTest extends RecallPromptControlle
 
   @Test
   void repeatingReturnsTheFirstDecision() throws UnexpectedNoAccessRightException {
-    controller.excludeAsAmbiguous(recallPrompt, exclusion("both tenses fit"));
+    controller.excludeAsAmbiguous(recallPrompt, ambiguousExclusion("both tenses fit"));
     testabilitySettings.timeTravelTo(makeMe.aTimestamp().of(3, 8).please());
 
     Answer answer =
-        controller.excludeAsAmbiguous(recallPrompt, exclusion("another reason")).getAnswer();
+        controller
+            .excludeAsAmbiguous(recallPrompt, ambiguousExclusion("another reason"))
+            .getAnswer();
 
     assertThat(answer.getExcludedAt(), equalTo(excludedAt));
     assertThat(answer.getExclusionReason(), equalTo("both tenses fit"));
@@ -81,7 +84,7 @@ class RecallPromptExcludeAsAmbiguousControllerTest extends RecallPromptControlle
             .answerChoiceIndex(1)
             .please();
 
-    controller.excludeAsAmbiguous(recallPrompt, exclusion("both tenses fit"));
+    controller.excludeAsAmbiguous(recallPrompt, ambiguousExclusion("both tenses fit"));
 
     assertThat(makeMe.refresh(othersPrompt.getAnswer()).getExcludedAt(), nullValue());
   }
@@ -99,7 +102,7 @@ class RecallPromptExcludeAsAmbiguousControllerTest extends RecallPromptControlle
 
     assertThrows(
         UnexpectedNoAccessRightException.class,
-        () -> controller.excludeAsAmbiguous(othersPrompt, exclusion("both tenses fit")));
+        () -> controller.excludeAsAmbiguous(othersPrompt, ambiguousExclusion("both tenses fit")));
   }
 
   @Test
@@ -108,13 +111,13 @@ class RecallPromptExcludeAsAmbiguousControllerTest extends RecallPromptControlle
 
     assertThrows(
         QuestionAnswerException.class,
-        () -> controller.excludeAsAmbiguous(unanswered, exclusion("both tenses fit")));
+        () -> controller.excludeAsAmbiguous(unanswered, ambiguousExclusion("both tenses fit")));
   }
 
   @Test
   void anAttemptWithNoOtherHistoryLeavesTheSameTrackerNewAndDueAtAssimilation()
       throws UnexpectedNoAccessRightException {
-    controller.excludeAsAmbiguous(recallPrompt, exclusion("both tenses fit"));
+    controller.excludeAsAmbiguous(recallPrompt, ambiguousExclusion("both tenses fit"));
 
     makeMe.refresh(tracker);
     assertThat(tracker.getStability(), equalTo(Fsrs.NEW_STABILITY_HOURS));
@@ -144,7 +147,7 @@ class RecallPromptExcludeAsAmbiguousControllerTest extends RecallPromptControlle
     onlyLog.recordStateBefore(gradedOnce);
     gradedOnce.applyGrade(recalledAt, Grade.GOOD);
 
-    controller.excludeAsAmbiguous(recallPrompt, exclusion("both tenses fit"));
+    controller.excludeAsAmbiguous(recallPrompt, ambiguousExclusion("both tenses fit"));
 
     makeMe.refresh(tracker);
     assertThat((double) tracker.getStability(), closeTo(gradedOnce.getStability(), 1e-4));
@@ -161,11 +164,11 @@ class RecallPromptExcludeAsAmbiguousControllerTest extends RecallPromptControlle
   void repeatingChangesNeitherTheScheduleNorTheHistory() throws UnexpectedNoAccessRightException {
     testabilitySettings.timeTravelTo(makeMe.aTimestamp().of(1, 20).please());
     memoryTrackerController.markAsRecalled(tracker, Grade.GOOD);
-    controller.excludeAsAmbiguous(recallPrompt, exclusion("both tenses fit"));
+    controller.excludeAsAmbiguous(recallPrompt, ambiguousExclusion("both tenses fit"));
     List<Object> afterFirst = persistedScheduleAndHistory();
     testabilitySettings.timeTravelTo(makeMe.aTimestamp().of(3, 8).please());
 
-    controller.excludeAsAmbiguous(recallPrompt, exclusion("another reason"));
+    controller.excludeAsAmbiguous(recallPrompt, ambiguousExclusion("another reason"));
 
     assertThat(persistedScheduleAndHistory(), equalTo(afterFirst));
   }
@@ -194,11 +197,5 @@ class RecallPromptExcludeAsAmbiguousControllerTest extends RecallPromptControlle
         tracker.getLastRecalledAt(),
         tracker.getNextRecallAt(),
         persistedLogs().stream().map(log -> List.of(log.getId(), cachedOn(log))).toList());
-  }
-
-  private AmbiguousExclusionDTO exclusion(String reason) {
-    AmbiguousExclusionDTO dto = new AmbiguousExclusionDTO();
-    dto.setReason(reason);
-    return dto;
   }
 }
