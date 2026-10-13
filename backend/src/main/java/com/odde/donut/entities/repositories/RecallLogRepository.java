@@ -10,6 +10,8 @@ import org.springframework.data.repository.query.Param;
 public interface RecallLogRepository extends CrudRepository<RecallLog, Integer> {
   List<RecallLog> findAllByMemoryTracker_IdOrderByRecordedAtDescIdDesc(Integer memoryTrackerId);
 
+  List<RecallLog> findAllByMemoryTracker_IdOrderByRecordedAtAscIdAsc(Integer memoryTrackerId);
+
   @Query(
       """
       SELECT rl

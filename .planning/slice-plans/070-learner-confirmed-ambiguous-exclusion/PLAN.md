@@ -201,7 +201,15 @@ Sizing: about 6 minutes. Stop-safe: no caller yet.
 
 ### 3. Confirmation recomputes the schedule from the remaining valid history
 Type: Behavior
-Status: planned
+Status: done
+Accepted proof (2026-10-13): `CURSOR_DEV=true nix develop -c pnpm backend:test_only`
+→ BUILD SUCCESSFUL, 2791 tests, 0 failures. In
+`RecallPromptExcludeAsAmbiguousControllerTest`:
+`anAttemptWithNoOtherHistoryLeavesTheSameTrackerNewAndDueAtAssimilation` (a),
+`aLaterGradeIsRescheduledAsIfTheExcludedAttemptHadNotHappened` (b, against an
+in-memory tracker graded GOOD once), and
+`repeatingChangesNeitherTheScheduleNorTheHistory` (c), all read from persisted
+state. The valid-event rule is `RecallLog.isValidEvent()`.
 Proof: controller tests on the slice 1 operation: (a) AGAIN at t1 only, then
 exclude → the tracker is New and due at its assimilation time, the AGAIN log
 still exists, the log count is unchanged, and the tracker id is the same;
@@ -421,13 +429,22 @@ was accepted on `main`.
   `findAllByMemoryTracker_IdOrderByRecordedAtDescIdDesc`, is descending.
   `RecallLog.getAnswer()` reaches the attempt and its `excludedAt`.
 - `MemoryTracker.java` is at 247 of 250 lines; additions there need room.
+- Persisted `FLOAT` stability and difficulty come back at about six
+  significant digits; tests compare them to in-memory values with a tolerance.
+- Open owner decision (2026-10-13): replay keeps only state that RecallLog
+  holds. RecallLog writing began 2026-08-17 (`0843cbd3ee`, with backfills of
+  prompt answers and Tutor scores in `6ddf35275e` and `59e3e4a282`), so a
+  tracker whose stability was earned through earlier unlogged grades would be
+  rebuilt from a partial history when one of its attempts is excluded. ADR 0003
+  states the state "can be rebuilt from RecallLog"; whether production
+  trackers satisfy that is unobserved. Obligation G4 keeps this open.
 
 ## Story obligations
 
 ### G1. Exclusion recorded without schedule recomputation
 Reported: slice 1 — "the exclusion is recorded without schedule recomputation or readout changes (slices 3 and 4), as the plan states."
 Story clause: "Recompute the existing tracker's current scheduling state from the remaining valid history, using the original event times and the current FSRS policy."
-Disposition: receiving slice 3
+Disposition: proved by slice 3: `RecallPromptExcludeAsAmbiguousControllerTest` tests `anAttemptWithNoOtherHistoryLeavesTheSameTrackerNewAndDueAtAssimilation` and `aLaterGradeIsRescheduledAsIfTheExcludedAttemptHadNotHappened`
 
 ### G2. Excluded attempt still counted in readouts
 Reported: slice 1 — "the exclusion is recorded without schedule recomputation or readout changes (slices 3 and 4), as the plan states."
@@ -438,3 +455,8 @@ Disposition: receiving slice 4
 Reported: slice 1 — "HTTP request binding of the `{reason}` JSON body and the route string: the controller is called directly, as in the neighbouring tests."
 Story clause: "The learner confirms → the attempt reads “Excluded — ambiguous question,” is not counted as failed or successful recall"
 Disposition: receiving slice 9
+
+### G4. Replay discards tracker state that RecallLog does not hold
+Reported: slice 3 — "A tracker whose current stability did not come from RecallLog rows (for example test fixtures built with `stabilityAndNextRecallAt(200)` and no logs) becomes New on exclusion."
+Story clause: "Confirmation is not a new Grade, does not award GOOD, and does not reset or recreate the tracker."
+Disposition: interim until slices 9

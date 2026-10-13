@@ -91,6 +91,12 @@ public class RecallLog extends EntityIdentifiedByIdOnly {
     retrievability = tracker.retrievabilityAt(recordedAt);
   }
 
+  /** An event counts for scheduling and readouts unless its attempt was excluded. */
+  @JsonIgnore
+  public boolean isValidEvent() {
+    return answer == null || answer.getExcludedAt() == null;
+  }
+
   @JsonIgnore
   public boolean isConfusion() {
     return grade == null;
