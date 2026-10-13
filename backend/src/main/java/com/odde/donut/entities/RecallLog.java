@@ -94,7 +94,7 @@ public class RecallLog extends EntityIdentifiedByIdOnly {
   /** An event counts for scheduling and readouts unless its attempt was excluded. */
   @JsonIgnore
   public boolean isValidEvent() {
-    return answer == null || answer.getExcludedAt() == null;
+    return answer == null || !answer.isExcludedAsAmbiguous();
   }
 
   @JsonIgnore

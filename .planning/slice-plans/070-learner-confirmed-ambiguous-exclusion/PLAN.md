@@ -265,7 +265,19 @@ history.
 
 ### 5. The tutor can propose excluding an ambiguous MCQ attempt in private help
 Type: Behavior
-Status: planned
+Status: done
+Accepted proof (2026-10-13): `CURSOR_DEV=true nix develop -c pnpm backend:test_only`
+→ BUILD SUCCESSFUL, 2799 tests, 0 failures; frontend `vue-tsc --noEmit` and
+`tsc --noEmit` exit 0 against the regenerated types; after refactoring, the
+`RecallConversation*`, `RecallPromptExcludeAsAmbiguous*`, `MemoryTracker*`,
+`RecallStats*`, and `RecallPromptAnswer*` classes reran green (312 tests).
+Observations in `RecallConversationExclusionProposalControllerTest`:
+`offersTheProposalToolForAnMcqAttemptAndSaysOnlyTheLearnerConfirms`,
+`doesNotOfferTheProposalToolInANoteConversation`, and
+`tellsTheTutorThatTheAttemptIsAlreadyExcludedAndWhy`. The tool is added for
+any recall-prompt subject: `ConversationMessageController.getAiReply` already
+refuses a subject without an MCQ before the request is built. The attempt
+record carries `attemptExcludedAsAmbiguous: {reason}`.
 Proof: a request-capture test beside `RecallConversationReasoningControllerTest`:
 for an MCQ recall-prompt conversation the sent `ResponseCreateParams` tools
 include `AmbiguousQuestionExclusionProposal`, the recall-prompt developer
@@ -452,6 +464,12 @@ was accepted on `main`.
 - `ControllerTestBase` holds the shared request builders `choiceAnswer` and
   `ambiguousExclusion`; `MemoryTrackerControllerTestBase.answerWronglyThenExcludeAsAmbiguous`
   produces an excluded attempt through the real operations.
+- `Answer.isExcludedAsAmbiguous()` is the Java question for the exclusion fact;
+  `RecallLog.isValidEvent()` and the tutor's attempt record read it.
+- The frontend type is `AmbiguousQuestionExclusionProposal` (`{ reason: string }`)
+  in the generated API types; the function name on the wire is the same.
+- `ConversationMessageControllerTestBase.lastRequestSentToAi()` captures the
+  request sent to the mocked AI client.
 
 ## Story obligations
 
@@ -479,3 +497,13 @@ Disposition: interim until slices 9
 Reported: slice 4 — "an excluded attempt still counts as recall activity for the silent-window due time. I treated that as activity, not evaluation, and did not change it."
 Story clause: "Exclude that invalid attempt from evaluation and derived recall readouts."
 Disposition: no user cost "the attempt is visibly excluded from evaluation": the learner did answer at that time, and the activity readers (`findAnsweredRecallPromptsInTimeRange`, `findUserIdsWithAnsweredRecallsInTimeRange`) use only answer times, never correctness or Grades
+
+### G6. The proposal shows as an unknown suggestion
+Reported: slice 5 — "Until slice 7 the proposal shows as an \"unknown\" suggestion in the UI."
+Story clause: "Let the learner review and confirm or decline the proposal."
+Disposition: receiving slice 7
+
+### G7. Tutor judgement is unmeasured
+Reported: slice 5 — "Tutor judgement is unmeasured: whether the model proposes only for genuine ambiguity, emits a single call, or respects \"do not propose again\" rests on wording alone."
+Story clause: "This is agent-simulated learner evidence, not measured human comprehension, retention, or representative model reliability."
+Disposition: no user cost "private recall help identifies an ambiguous question": a proposal changes nothing until the learner confirms it, so an unsuitable proposal costs the learner one declined suggestion

@@ -4,8 +4,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
-import static org.mockito.Mockito.atLeastOnce;
-import static org.mockito.Mockito.verify;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -16,13 +14,11 @@ import com.odde.donut.entities.Note;
 import com.odde.donut.entities.RecallPrompt;
 import com.odde.donut.testability.OpenAiResponseStreamMocker;
 import com.openai.models.responses.EasyInputMessage;
-import com.openai.models.responses.ResponseCreateParams;
 import com.openai.models.responses.ResponseInputItem;
 import jakarta.persistence.EntityManager;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 
 class RecallConversationReasoningControllerTest extends ConversationMessageControllerTestBase {
@@ -141,10 +137,7 @@ class RecallConversationReasoningControllerTest extends ConversationMessageContr
   }
 
   private List<ResponseInputItem> sentInput() {
-    ArgumentCaptor<ResponseCreateParams> captor =
-        ArgumentCaptor.forClass(ResponseCreateParams.class);
-    verify(officialClient.async().responses(), atLeastOnce()).createStreaming(captor.capture());
-    return captor.getValue().input().flatMap(i -> i.response()).orElseThrow();
+    return lastRequestSentToAi().input().flatMap(i -> i.response()).orElseThrow();
   }
 
   private EasyInputMessage message(List<ResponseInputItem> input, int index) {

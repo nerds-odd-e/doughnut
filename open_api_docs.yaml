@@ -6217,6 +6217,13 @@ components:
           type: string
         propertyValue:
           type: string
+    AmbiguousQuestionExclusionProposal:
+      type: object
+      properties:
+        reason:
+          type: string
+      required:
+      - reason
     DummyForGeneratingTypes:
       type: object
       properties:
@@ -6224,6 +6231,8 @@ components:
           $ref: "#/components/schemas/NoteContentCompletion"
         titleReplacement:
           $ref: "#/components/schemas/TitleReplacement"
+        ambiguousQuestionExclusionProposal:
+          $ref: "#/components/schemas/AmbiguousQuestionExclusionProposal"
     NoteContentCompletion:
       type: object
       properties:

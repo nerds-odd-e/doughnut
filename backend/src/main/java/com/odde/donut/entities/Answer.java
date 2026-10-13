@@ -95,8 +95,13 @@ public class Answer extends EntityIdentifiedByIdOnly {
     return null;
   }
 
+  @JsonIgnore
+  public boolean isExcludedAsAmbiguous() {
+    return excludedAt != null;
+  }
+
   public void excludeAsAmbiguous(String reason, Timestamp currentUTCTimestamp) {
-    if (excludedAt != null) {
+    if (isExcludedAsAmbiguous()) {
       return;
     }
     excludedAt = currentUTCTimestamp;

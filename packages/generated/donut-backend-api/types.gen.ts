@@ -1329,9 +1329,14 @@ export type AssimilationNextUnitDto = {
     propertyValue?: string;
 };
 
+export type AmbiguousQuestionExclusionProposal = {
+    reason: string;
+};
+
 export type DummyForGeneratingTypes = {
     noteContentCompletion?: NoteContentCompletion;
     titleReplacement?: TitleReplacement;
+    ambiguousQuestionExclusionProposal?: AmbiguousQuestionExclusionProposal;
 };
 
 export type NoteContentCompletion = {

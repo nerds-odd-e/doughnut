@@ -73,6 +73,11 @@ public class RecallPrompt extends EntityIdentifiedByIdOnly {
       if (markedCorrect != null) {
         questionDetails.put("userAnswerWasMarkedAs", markedCorrect ? "correct" : "incorrect");
       }
+      if (answer.isExcludedAsAmbiguous()) {
+        questionDetails
+            .putObject("attemptExcludedAsAmbiguous")
+            .put("reason", answer.getExclusionReason());
+      }
     }
     return questionDetails.toPrettyString();
   }
