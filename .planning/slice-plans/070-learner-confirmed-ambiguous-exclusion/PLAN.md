@@ -527,6 +527,30 @@ owner.
 
 Sizing: about 6 minutes. Stop-safe: the story is complete.
 
+## Execution complete
+
+Product advice: the retrospective's independent review of `56cb8aa44c` found
+one defect, repaired as slice 11, and left these choices with the owner.
+
+- Confirmation accepts a blank reason: a proposal whose tool call carries no
+  reason can be confirmed and is then recorded without one, and no undo
+  exists. Decide whether a reason is required.
+- The operation accepts an attempt marked correct; only the tutor instruction
+  keeps proposals to wrong marks. Decide whether that should be refused.
+- The proposal tool and the stored reason follow the recall-prompt
+  conversation's audience. Whether any recall-prompt conversation has an
+  audience beyond its learner was not checked; if one does, that audience
+  sees the reason.
+- An excluded attempt leaves recall statistics entirely, so a day whose only
+  answer was excluded loses its calendar and streak day. Decide whether that
+  day should stay.
+- ADR 0003 calls the cached memory state on a recall log a cache and "not a
+  new source of truth"; exclusion now starts its replay from that state. The
+  ADR may want a note.
+- Whether learners understand and trust the excluded result, and whether the
+  tutor proposes only for genuine ambiguity, remain unmeasured with real
+  learners.
+
 ## Current decisions and delivery
 
 - Exclusion lives on the attempt (`answer`), the RecallLog row stays, and one
