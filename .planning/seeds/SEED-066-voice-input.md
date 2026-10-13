@@ -167,7 +167,7 @@ one-time removal sweep as an acceptance reading, following principle 7 in
 
 **Identity:** SEED-066#recording-started-after-leaving
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"not-refined","approach":"unselected"}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/071-content-voice-startup-cancellation/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"50e60f2c928a0944f75d7140065e0860444990249a81ccff5b71f913d38053ee","plan":"6afbd0f0487288e36c6683ebab3c9afad27559e3eb1eb344dd74004470ff446a"}}
 ```
 
 - **Goal:** A note author who clicks "Voice input" for content and leaves the
@@ -176,20 +176,59 @@ one-time removal sweep as an acceptance reading, following principle 7 in
   still starting.
 - **Expected:** After the author leaves the note, no recording runs for it,
   the microphone is released, and the screen wake lock is released.
-- **Reported actual (hypothesis, read on 2026-10-12 at `d2ec267d7c`, not
-  run):** In `useNoteVoiceInput.ts`, leaving stops the recording only when it
-  is already recording. When the author leaves while the microphone is still
-  starting, for example while the browser asks for microphone permission,
-  startup can finish afterwards: the recording then starts, with nothing left
-  to stop it, and the wake lock stays held.
-- **First question:** Does this happen in the product? Reproduce it with a
-  mounted spec that holds microphone startup, leaves the note, then lets
-  startup finish. Repair only a confirmed violation.
-- **Scope — kept as it is:** leaving while recording, which already stops and
-  converts; title recordings, which already end when the author leaves.
-- **Remaining uncertainty:** whether the browser keeps the microphone open in
-  this case on real hardware; what should happen to speech captured between
-  startup finishing and the stop.
+- **Scope:** End a pending content-dictation attempt when its author leaves
+  the note, including when microphone permission or audio initialization is
+  pending. Discard any audio captured by a startup completed after departure;
+  release resources that arrive after departure. Keep the destination
+  note's voice control available for its own session. Preserve the existing
+  stop-and-convert behavior for content recording already underway on departure.
+  Title-dictation changes, background dictation, and new recording controls are
+  deferred promises; this story adds no rejection rule for those capabilities.
+- **Key examples:**
+  - Content Voice input is starting → the author moves to another note before
+    microphone access resolves → the late stream is stopped and the old wake
+    lock is released; any late audio is discarded without conversion or a
+    content change, and the destination's control is idle and available.
+  - Microphone access has resolved but audio initialization is pending → the
+    author leaves → completing initialization still ends the old attempt and
+    releases its resources and discards its audio.
+  - Content dictation is already recording → the author leaves → Stop still
+    converts the remainder into the original note, as today.
+- **Owner decision (2026-10-13):** Accepted the recommendation to discard audio
+  from startup completed after departure. Leaving cancels the pending attempt;
+  content recordings already underway still stop and save. Converting late
+  audio was considered and excluded because it would change content after the
+  author had cancelled the attempt.
+- **Investigation (2026-10-13):** At
+  `0e1736fdbf89509c852cb5b0323ac5cf7f8fc314` in the owned
+  `stop-a-content-recording-that-starts-after-the-a` worktree, a disposable
+  mounted `NoteToolbar` spec clicked Voice input, held either `getUserMedia`
+  or `AudioWorklet.addModule`, changed to a different note through toolbar props,
+  then released the held promise. The real `useNoteVoiceInput`, audio recorder,
+  receiver, and scheduler ran; browser audio hardware and wake-lock boundaries
+  were stand-ins. Both cases connected the audio source once after departure,
+  called track Stop zero times, and called wake-lock Release zero times. The
+  destination toolbar was idle and enabled. The literal command was
+  `CURSOR_DEV=true nix develop -c pnpm frontend:test tests/notes/VoiceStartupObservation.spec.ts`;
+  the two tests failed on both expected cleanup assertions (four failures).
+  An initial harness run failed because its constructor stand-ins were not
+  constructible and is not reproduction evidence; the rerun corrected them.
+  The scratch spec was removed after observation; no product code changed.
+  This confirms the application cleanup defect originally hypothesized from
+  `d2ec267d7c` on 2026-10-12. Hardware microphone indicators, actual permission
+  UI, captured speech, and backend conversion were not exercised.
+- **Architecture:** Pending startup and its later resources remain owned by
+  the departed content session until cleanup; the current page's activity must
+  belong to its own session. The existing recorder Stop flushes audio;
+  cancellation must discard late audio instead of sending it for conversion.
+  This is local lifecycle work, with no new service or API implied.
+  [ADR 0006 — Failure handling](../../docs/adrs/0006-failure-handling-accepted.md)
+  constrains any new exception handling to a deliberate outcome; cancellation
+  does not justify general exception suppression.
+  [ADR 0007 — Environments and isolation](../../docs/adrs/0007-environments-and-isolation-accepted.md)
+  applies to observations; this reproduction used headless browser tests and
+  touched no persistent application data. No conflict was found. Actual hardware
+  resource behavior remains unobserved, not a new hardware-testing commitment.
 - **Effort hypothesis:** S.
 
 ## Ordering and Scope Reduction
