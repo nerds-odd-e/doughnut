@@ -213,6 +213,14 @@ The coordinator combined complete execution references and an unbounded tool-met
   - Observed effect: about 1,700 lines of references were loaded before a two-slice execution, two of the reads twice
   - Inference: reading only the passages the next boundary needed would have avoided the second calls; no token or time saving was measured
 
+- Execution: SEED-066#recording-started-after-leaving (first implementation commit 73df78e01d3b042269d2425fc02614d66580c5d1)
+  - Timestamp: unknown
+  - Tool: Codex
+  - Open Dough release: 0.3.60
+  - Evidence: dashboard launch fa643aec-2e9b-4491-b92d-050e64775ddb on 2026-10-13; the first two startup functions.exec responses reported 15,995 and 20,390 original output tokens with truncation, and a later pre-delegation batch reported 14,495 with truncation; subsequent bounded calls retrieved the affected plan, source and execution references again
+  - Observed effect: several requested authoritative passages were omitted from initial output and needed repeated retrieval before delegation
+  - Inference: smaller batches limited to the next execution boundary would avoid this recurrence; no elapsed-time or total-token saving was measured
+
 ## DD-234 — A comparison of empty captures was printed as a match
 
 During proof acceptance the coordinator compared two captured measurements with `diff ... && echo SAME`. The output filter had matched nothing, so both captures were empty and the command printed `SAME`. The coordinator noticed the empty files and repeated the measurement; a third attempt was needed because the test command ran from the wrong directory. An agent execution deviation, not missing workflow guidance.

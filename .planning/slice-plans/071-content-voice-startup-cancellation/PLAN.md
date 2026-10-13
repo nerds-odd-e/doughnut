@@ -183,6 +183,27 @@ Accepted proof (2026-10-13):
 - No slice-plan refinement pass is needed: one bounded behavior slice owns
   all proof, and the observed candidate requires no shared-contract change.
   No remaining slice-specific concern was identified in this review.
+- Slice publication accepted: `73df78e01d3b042269d2425fc02614d66580c5d1` on
+  `origin` / `refs/heads/codex/stop-a-content-recording-that-starts-after-the-a`,
+  suffix base `6619ce2ee1552df8e535fbe96b8a0c0d168fc47d`, with no rewrite.
+
+## Execution complete
+
+Product advice: No backlog change. The bounded cancellation restores the
+author's control over content capture; existing voice stories and current
+knowledge-refinement priorities remain appropriate.
+
+Retrospective: reviewed the original executable plan at
+`598a2d614199c699b119f8304567f590f550c1b8`, selected source, attributable
+implementation `73df78e01d3b042269d2425fc02614d66580c5d1`, current owners and
+consumers, and accepted proof. The claim is provenance, not implementation.
+No product defect, ADR conflict, refactoring residue, or proof gap was found.
+The existing audio E2E journeys retain integration/persistence proof; the new
+acquisition timing cases appropriately use fast mounted tests. No correction
+plan is needed. Process review is enabled and records one recurrence of
+DD-233 in `DearDough.md` (oversized startup reads required targeted retrieval).
+CI remains pending on the registered implementation revision; review conclusions
+remain conditional on its applicable result until completion observation.
 
 ## Learnings
 
