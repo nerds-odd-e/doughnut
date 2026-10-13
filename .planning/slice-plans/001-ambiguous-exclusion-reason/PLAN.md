@@ -109,6 +109,7 @@ is unobserved; this observer owns subsequent branch deliveries.
 Accepted branch delivery: slice 1 `772eb5c68e8175056fb2e96110a02363ee3c98ce`,
 suffix base `171cdbab862392ee90028f25f85de91424c17426`; no reconciliation,
 observer reused and revision registered. This is the next increment's base.
+Slice 2 accepted `88bf1c05f9e213e4ea7a007c8f1a507773a4b6a7`, suffix base `772eb5c68e8175056fb2e96110a02363ee3c98ce`, same branch/observer, no reconciliation. This is the completion-record increment's base.
 
 ## Ordered slices
 
@@ -199,6 +200,12 @@ Inspected confirmation consumers in `ConversationComponent.exclusion.spec.ts`,
 other proposal kinds. Fresh refactor found no edits, so accepted proof stayed
 valid; whitespace passed. Formatting succeeded once with no fixes. G1 is
 resolved by these mounted observations. No API generation trigger changed.
+
+## Execution complete
+
+Product advice: No new product work or priority change. Existing ambiguity-exclusion owner decisions and the separately Taken manual-evaluation mission remain with their owners.
+
+Retrospective: original plan/source and accepted implementation commits `772eb5c68e8175056fb2e96110a02363ee3c98ce` and `88bf1c05f9e213e4ea7a007c8f1a507773a4b6a7` satisfy story 8; claim/preparation are provenance, and neighbouring manual-evaluation work is unrelated. No product, architecture, refactoring, or coverage correction found. Accepted ADRs 0002/0003/0006 and current North Star are consistent with the existing decision/service/proposal responsibilities. E2E did not drive this change; the existing valid-exclusion journey remains useful integration proof, while the new rule variations belong at controller and mounted boundaries. No E2E/manual/real-model run is claimed locally. Process review used this conversation and agent returns; DD-233 gained one occurrence (338 physical lines, no size warning). CI for the final implementation revision remains pending at review return, with the retained observer owning completion.
 
 ## Verification and delivery requirements
 
