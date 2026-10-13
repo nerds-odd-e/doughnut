@@ -9,38 +9,6 @@ scope: large
 
 # SEED-073: Improve knowledge through learning, refinement, and retrieval
 
-<a id="manual-ambiguity-exclusion-evaluation"></a>
-
-### Manually evaluate learner-confirmed ambiguous-question exclusion
-
-**Identity:** SEED-073#manual-ambiguity-exclusion-evaluation
-```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"unselected"}
-```
-
-**Goal:** Observe the completed story “Resolve a disputed wrong mark after the learner confirms question ambiguity” through its promised product surfaces within the owner's 60-minute budget on 2026-10-14.
-
-**Scope:** Manual observation only. Cover proposal, confirmation, decline, persistence across recall/help/history, retained evidence, scheduling and evaluation readouts, subsequent valid reviews, and personal ownership. Use the completed story recovered from Git and current `docs/recall-help.md` as the oracle. Report discrepancies, unresolved expectations, improvements, or material coverage gaps; make no product repairs. Preparation, breadth, depth, and confirmation/cleanup are budgeted at 12/23/15/10 minutes.
-
-**Known uncertainty:** The tutor proposal depends on an external model; use existing supported isolated setup and distinguish deterministic product evidence from real-model observations.
-
-**Observed outcome, 2026-10-14:** Bounded manual observation completed without product repairs. These findings are reporting outcomes, not authority to implement a change.
-
-- **Evidence-retention discrepancy:** The recovered story at `21d5534381` promises an inspectable originating exchange, and `docs/recall-help.md` says the help conversation that led to the decision remains. The tutor proposal is visible before confirmation. After confirmation and reopening in Messages, the transcript has only the learner's question for that exchange; `/api/conversation/4/messages`, `/5/messages`, and their exports have no assistant/tool entry for the proposal. The exact reason survives on the attempt's current subject banner. Reproduce by answering the grammar-only Tokyo question with “am used to living”, asking “Why is my answer wrong? Can this wrong mark be corrected?”, observing the proposal, confirming, and reopening from Messages or exporting. Evidence: `sparse-proposal-visible.jpg`, `saved-exchange-without-proposal.jpg`, `sparse-proposed.json`, `sparse-confirmed.json`, and `export-replay.json` below.
-- **Usability improvement:** At the normal 1728×963 desktop viewport, a long reason/transcript opens help with its heading and Close button above the viewport. Close was at y=-157 after confirmation and y=-793 on reopening the longer exchange. Scrolling upward recovered it at y=74; Escape also closed help and restored focus. This is not a functional block. `confirmed-help.jpg` shows clipping; `reopened-help-clipped.jpg` shows the view recovered by scrolling.
-
-**Coverage:** Browser and public HTTP observations covered explanation/proposal without confirmation; Confirm and Decline; recall/help/history and Messages persistence; neutral selected-choice colour; original question, selected answer, original AGAIN, and log retention; scheduling, statistics and failure counts; personal ownership; later GOOD and Confusion; repeated confirmation after later learning; earned state without earlier logs; missing cached state; and an answered attempt without a log. Existing testability endpoints and disposable SQL fixtures established the starting states. No permanent tests or product code were changed.
-
-The new-tracker exclusion kept one AGAIN log and returned tracker 4 to stability 0, recall count 0, and its assimilation due time; its recall statistics returned to the empty baseline. Decline left tracker 3 and history equal across persisted GET snapshots. Excluding an older attempt preserved later GOOD: tracker 1 and an independent control both reached stability 175, difficulty 2.11121, count 2, and due `2026-10-22T07:21:00Z`; the later log realigned from elapsed hours 23 to 24 and stability-before 18 to 55. Repeating confirmation after later valid learning left persisted tracker/history/statistics identical and retained the original reason and time. Foreign confirmation, private help creation/fetch, messages, and history returned 403; the peer's conversation lists exposed none of the owner's private reasoning, and their same-question attempt remained graded. Authored note content remained unchanged.
-
-The legacy fixture with stability 55 and difficulty 2.1181 but no earlier logs returned to its prior schedule. Clearing only a disputed log's cached state rebuilt the two surviving GOOD events to the independent control's state. An answered attempt seeded without a log recorded exclusion and left its tracker identical. Of six wrong attempts, excluding one reduced failure and recall counts from 6 to 5, review totals from 8 to 7, and thinking time by 3000ms. Later Confusion came from real accidental-match spelling answers against the MCQ's target note: exclusion preserved its time and answer attribution and realigned its cache. Owner and control both reached stability 115, difficulty 2.11121, count 2, last recall `2026-10-15T00:21:00Z`, and due `2026-10-19T19:21:00Z`. The tutor recognized genuine ambiguity with only the original sparse note, rejected the meaning-specific challenge, and explained that exclusion counts as neither failed nor successful recall.
-
-**Provenance and limitations:** Observation began 2026-10-14 07:08 JST on product base `2587fb27cb95699d70ed053af1aacdfa32095194`; the held app reported claim revision `458b2ea204ff8fe11c9a037e71c46582f42c5fc0`. The session created `/Users/terryyin/git/doughnut/.worktrees/manual-ambiguity-exclusion-20261014`, branch `codex/manual-ambiguity-exclusion-20261014`, from that base. Origin/integration is `/Users/terryyin/git/doughnut`; target is `origin` / `main`. Isolated E2E origin was `http://127.0.0.1:61706`, schema `doughnut_e2e_wt_82885bf3a0674e04a6663e8507ffd6d0`, with seeded `old_learner` and `another_old_learner` accounts and simulated dates through 2026-10-15. Two starts failed on incomplete concurrent build output; a normal Gradle classes rebuild allowed the supported hold to start. The held stack and relay stopped normally.
-
-The owner authorized at most ten real OpenAI calls and corrected the model to `gpt-6.1-sol`. Seven tutor requests were counted and capped by a temporary relay; three calls were reserved conservatively for initial question generation/evaluation setup. No further real-model requests were made. This is agent-simulated learner evidence, not measured human comprehension or representative model reliability. Pace/calibration had limited small-sample signals; returned structures and exclusion deltas were inspected without a population-level estimate.
-
-Raw dated inputs, requests, tutor dialogue, snapshots, exports, and screenshots are under `.planning/manual-testing-evidence/manual-ambiguity-exclusion-20261014/` in the recoverable before-cleanup revision. Temporary harnesses were removed. Ordinary closure removes this spent source and evidence from the current tree; Git retains their provenance.
-
 ## Epic Outcome
 
 For people learning from deliberately authored Donut notes, a confusing recall
