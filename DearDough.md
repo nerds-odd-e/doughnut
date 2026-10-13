@@ -5,7 +5,7 @@ responses under observation live in the [watch list](https://github.com/terryyin
 Detailed observations, original releases and qualified inferences are retained
 in the linked Open Dough catalog. Unknown execution provenance remains unknown.
 
-- Highest allocated local number: 240. Removed numbers are never reused.
+- Highest allocated local number: 248. Removed numbers are never reused.
 - Full source recovery before this cleanup: `0a8878e98be76b8e92203515d8f4719489b24169:DearDough.md`.
 - Project-owned findings remain in [Donut Retrospective Findings](DonutRetrospectiveFindings.md); their ownership review is unchanged.
 
@@ -239,6 +239,14 @@ The coordinator combined complete execution references and an unbounded tool-met
   - Observed effect: requested authoritative context was partly omitted and required repeated retrieval before the backend slice
   - Inference: bounding each batch to the next execution boundary would avoid this recurrence; no total-token or elapsed-time saving was measured
 
+- Execution: SEED-073#story-9 (first implementation commit f85c5eb53b25464823db8f6f413fc66af84d94b5)
+  - Timestamp: unknown
+  - Tool: Codex
+  - Open Dough release: unknown
+  - Evidence: dashboard launch 30f2c821-5b09-4325-bb0e-32cb142d76bb on 2026-10-14; startup functions.exec batches reported 10,992 and 29,925 original output tokens with truncation, followed by bounded retrieval of execution, CI, publication, and proof references before delegation
+  - Observed effect: requested authoritative passages were omitted and had to be retrieved again before the one-slice implementation
+  - Inference: smaller next-boundary batches would avoid the repeated reads; no elapsed-time or total-token saving was measured
+
 ## DD-234 — A comparison of empty captures was printed as a match
 
 During proof acceptance the coordinator compared two captured measurements with `diff ... && echo SAME`. The output filter had matched nothing, so both captures were empty and the command printed `SAME`. The coordinator noticed the empty files and repeated the measurement; a third attempt was needed because the test command ran from the wrong directory. An agent execution deviation, not missing workflow guidance.
@@ -336,3 +344,16 @@ A late slice changed where the schedule rebuild starts. The coordinator's brief 
   - Evidence: `56cb8aa44c:backend/src/main/java/com/odde/donut/services/MemoryTrackerService.java` lines 110–112 and `entities/MemoryTrackerReplay.java`; slice 10 return "Untested behaviors: Two exclusions on one tracker, in either order", recorded as covered in obligation G19; slice 11 of `21d5534381:.planning/slice-plans/070-learner-confirmed-ambiguous-exclusion/PLAN.md`
   - Observed effect: the defect was delivered on the story branch; the owner authorized its repair in the same execution as slice 11
   - Inference: the return named the untested case and the coordinator dispositioned it as proved by reasoning about a shared loop; requiring an observation when a rule change touches an idempotence promise would have caught it; one occurrence. The aggregate review by a fresh reader is a practice that worked here
+
+## DD-248 — Shared accessible-name consumers were missed before delivery
+
+Adding the accessible name Close to the shared modal's outer dismissal collided with an existing footer Close. Frontend consumer proof passed, but the label search did not include the Wikidata E2E footer queries before publication. CI exposed seven ambiguous-button failures across four features. The outer dismissal was repaired to Close modal and the original E2E consumers passed unchanged.
+
+### Occurrences
+- Execution: SEED-073#story-9 (first implementation commit f85c5eb53b25464823db8f6f413fc66af84d94b5)
+  - Timestamp: 2026-10-13T23:38:33.5652122Z
+  - Tool: Codex
+  - Open Dough release: unknown
+  - Evidence: CI run 38485019305 attempt 1 job 115596456163 and run 38485210312 attempt 1 job 115597071740; associateWikidataDialog.ts lines 48 and 63 query button name Close; repair return records red mounted-dialog proof and four unchanged E2E features passing ten scenarios
+  - Observed effect: a shared rendered-name change was published with consumers that had not been selected; two CI runs failed before the owned repair
+  - Inference: whole-product searches for the newly introduced accessible name, including existing text-derived names, would have exposed the collision before publication; one occurrence

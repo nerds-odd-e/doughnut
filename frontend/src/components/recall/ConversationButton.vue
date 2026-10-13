@@ -8,7 +8,7 @@
     <MessageCircle class="w-5 h-5" />
     Get private help
   </button>
-  <Modal v-if="conversation && user" @close_request="closeHelp">
+  <Modal v-if="conversation && user" scroll-body @close_request="closeHelp">
     <template #header><h2>Private recall help</h2></template>
     <template #body>
       <ConversationComponent
