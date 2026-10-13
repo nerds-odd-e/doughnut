@@ -277,7 +277,7 @@ post-answer journey, model adjudication quality, or scoring repair.
 
 **Identity:** SEED-073#story-7
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"unselected"}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/070-learner-confirmed-ambiguous-exclusion/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"caaf46c5660855e30e3bc41bdebf5bf287fbaf26e9a70ca948fd786d15006df8","plan":"708aaac6dbe4b7f90641514a0c15fd01056656e669e2057c8a1553c965d6352c"}}
 ```
 
 **Goal:** A learner whose answer was marked wrong can resolve that result when
@@ -382,8 +382,10 @@ This restores trust without claiming a successful recall that was not demonstrat
   the original learning evidence and every remaining valid event survive.
 - **Refinement decision, 2026-10-13:** The owner prioritized this outcome ahead
   of note refinement and chose learner confirmation of the tutor's proposal.
-  This pass ends with the refined story and backlog priority; slice planning
-  and implementation are later work.
+  The same day's preparation re-read the story against the code and kept its
+  goal, scope, and examples unchanged; the exclusion is recorded on the
+  learner's attempt, and the schedule is rebuilt by replaying the remaining
+  RecallLog events, as the slice plan settles. Implementation is later work.
 
 **Observation provenance:** The 2026-10-13 manual session used ten real
 `gpt-6.1-sol` replies in an isolated E2E browser at product revision
