@@ -7,7 +7,6 @@ Make deliberately captured knowledge more useful through learning and refinement
 ## Taken
 
 - [Manually evaluate learner-confirmed ambiguous-question exclusion](seeds/SEED-073-learning-refinement-and-retrieval.md#manual-ambiguity-exclusion-evaluation) — SEED-073#manual-ambiguity-exclusion-evaluation
-- [Require a reason when a learner excludes an ambiguous attempt](seeds/SEED-073-learning-refinement-and-retrieval.md#story-8) — SEED-073#story-8 ([plan](slice-plans/001-ambiguous-exclusion-reason/PLAN.md))
 
 ## Backlog list
 

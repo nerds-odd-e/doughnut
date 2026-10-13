@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "identity": "SEED-073#story-8",
+  "title": "Require a reason when a learner excludes an ambiguous attempt",
+  "completedAt": "2026-10-13T23:09:04.748Z",
+  "developer": "Terry Yin",
+  "agent": "Nao-chan",
+  "host": "codex",
+  "model": "gpt-6.1-sol"
+}

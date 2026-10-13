@@ -288,61 +288,6 @@ values corrected the probe without changing product code. Scratch files were
 removed. This establishes the existing API mechanism, not a working user-facing
 post-answer journey, model adjudication quality, or scoring repair.
 
-<a id="story-8"></a>
-
-### Require a reason when a learner excludes an ambiguous attempt
-
-**Identity:** SEED-073#story-8
-```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/001-ambiguous-exclusion-reason/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"8edde2a757c7445bae6eabf35d54a6f433922a46ab7e79607f4426dcb937594e","plan":"25061f5539bf74f053a4a16801693af1774dd40c8fbaaa5c64cffd569858c759"}}
-```
-
-**Goal:** A learner who excludes an attempt as an ambiguous question always
-keeps the reason for that decision. An exclusion cannot be undone, so one
-recorded without a reason stays unexplained wherever the attempt is shown.
-
-**Scope:**
-
-- A new exclusion requires a reason that is not blank. Missing, null, empty,
-  and whitespace-only reasons are refused before recording the decision or
-  changing the schedule.
-- A tutor proposal that carries no reason cannot be confirmed in help; the
-  learner can still decline it.
-- An attempt that is already excluded keeps its recorded reason. Confirming
-  it again returns that decision whatever reason is sent.
-- Commissioned learning sessions need no exclusion; nothing changes there.
-
-**Key examples:**
-
-- The tutor proposes exclusion with the reason "Both completions are
-  grammatical." and the learner confirms → the attempt is excluded and shows
-  that reason.
-- A proposal arrives with a missing, empty, or whitespace-only reason → help
-  shows no way to confirm it; Decline still dismisses the proposal, and the
-  attempt keeps its wrong mark and schedule.
-- The exclusion operation is called directly with a blank reason → it is
-  refused, and the attempt and its tracker are unchanged.
-- An excluded attempt is confirmed again with a missing or different reason →
-  the original reason and confirmation time are returned; the schedule and
-  recall history remain as they were after the first confirmation.
-
-**Open decisions (owner, not in scope until decided):**
-
-- Whether an attempt marked correct can be excluded. The operation accepts
-  one today; only the tutor instruction keeps proposals to wrong marks.
-- Whether a recall-prompt conversation with an audience beyond its learner
-  should show the exclusion reason or offer the proposal. It is unchecked
-  whether any such conversation exists.
-- Whether a day whose only answer was excluded keeps its place in the review
-  calendar and streak. Recall statistics leave an excluded attempt out
-  entirely today.
-
-**Boundaries:** The exclusion behavior is described in
-[recall help](../../docs/recall-help.md#learner-confirmed-ambiguity-exclusion)
-and stays as it is apart from the required reason.
-
-- **Effort hypothesis:** S (about 30 minutes), high confidence.
-
 ## Ordering and Scope Reduction
 
 The backlog owns global priority. Within this epic: resolve an actual learning
