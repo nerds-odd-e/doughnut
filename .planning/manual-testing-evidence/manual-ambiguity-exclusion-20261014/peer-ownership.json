@@ -1,0 +1,121 @@
+{
+  "prompt": {
+    "id": 5,
+    "mcq": {
+      "id": 1,
+      "correctAnswerIndex": null,
+      "contextSeed": null,
+      "testedFocus": null,
+      "validationRationale": null,
+      "questionStem": "Choose the grammatically correct completion: I ___ in Tokyo",
+      "responseChoices": ["used to live", "am used to living"]
+    },
+    "notebook": {
+      "id": 1,
+      "notebookSettings": {
+        "skipMemoryTrackingEntirely": false
+      },
+      "creatorId": "old_learner",
+      "name": "English ambiguity manual",
+      "circle": null,
+      "description": null,
+      "createdAt": "2026-10-13T22:14:02.000Z",
+      "updatedAt": "2026-10-13T22:14:02.000Z",
+      "readmeContent": null
+    },
+    "spellingQuestion": null
+  },
+  "answer": {
+    "answer": {
+      "awayCount": null,
+      "awayMs": null,
+      "choiceIndex": 1,
+      "correct": false,
+      "detourCount": null,
+      "detourMs": null,
+      "excludedAt": null,
+      "exclusionReason": null,
+      "id": 2,
+      "idleMs": null,
+      "matchedNoteId": null,
+      "outcome": null,
+      "spellingAnswer": null,
+      "thinkingTimeMs": 3000
+    },
+    "id": 5,
+    "matchedNotes": null,
+    "mcq": {
+      "id": 1,
+      "correctAnswerIndex": 0,
+      "contextSeed": null,
+      "testedFocus": null,
+      "validationRationale": null,
+      "questionStem": "Choose the grammatically correct completion: I ___ in Tokyo",
+      "responseChoices": ["used to live", "am used to living"]
+    },
+    "memoryTrackerId": 5,
+    "questionType": "MCQ",
+    "recalledNote": {
+      "ancestorFolders": [],
+      "noteTopology": {
+        "createdAt": "2026-10-13T22:14:02.000Z",
+        "id": 1,
+        "title": "Tokyo completion",
+        "updatedAt": "2026-10-13T22:14:02.000Z"
+      },
+      "notebookId": 1,
+      "propertyKey": null,
+      "propertyValue": null
+    }
+  },
+  "tracker": {
+    "id": 5,
+    "note": {
+      "noteTopology": {
+        "createdAt": "2026-10-13T22:14:02.000Z",
+        "id": 1,
+        "title": "Tokyo completion",
+        "updatedAt": "2026-10-13T22:14:02.000Z"
+      },
+      "content": "\"I used to live in Tokyo\" means I lived there in the past. \"I am used to living in Tokyo\" means living in Tokyo feels normal now. Both expressions are grammatical, but express different meanings.",
+      "id": 1
+    },
+    "lastRecalledAt": "2026-10-13T23:16:44.000Z",
+    "nextRecallAt": "2026-10-14T04:16:44.000Z",
+    "assimilatedAt": "2026-10-13T23:16:44.000Z",
+    "stability": 5,
+    "difficulty": 6.4133,
+    "removedFromTracking": false,
+    "type": "UNDERSTANDING",
+    "propertyKey": "",
+    "recallCount": 1,
+    "recalledNote": {
+      "ancestorFolders": [],
+      "noteTopology": {
+        "createdAt": "2026-10-13T22:14:02.000Z",
+        "id": 1,
+        "title": "Tokyo completion",
+        "updatedAt": "2026-10-13T22:14:02.000Z"
+      },
+      "notebookId": 1,
+      "propertyKey": null,
+      "propertyValue": null
+    },
+    "latestTutorFeedbackGrade": null,
+    "spelling": false,
+    "propertyValue": ""
+  },
+  "ownerConfirm": {
+    "status": 403,
+    "data": ""
+  },
+  "ownerHelp": {
+    "status": 403,
+    "data": ""
+  },
+  "ownerHelpMessages": {
+    "status": 403,
+    "data": ""
+  },
+  "visibleConversations": []
+}

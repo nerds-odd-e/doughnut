@@ -1,0 +1,109 @@
+{
+  "tracker": {
+    "id": 3,
+    "note": {
+      "noteTopology": {
+        "createdAt": "2026-10-13T22:14:02.000Z",
+        "id": 3,
+        "title": "Declined Tokyo completion",
+        "updatedAt": "2026-10-13T22:14:02.000Z"
+      },
+      "content": "\"I used to live in Tokyo\" describes a past habit. \"I am used to living in Tokyo\" describes present familiarity. Both completions are grammatical.",
+      "id": 3
+    },
+    "lastRecalledAt": "2026-10-15T00:21:00.000Z",
+    "nextRecallAt": "2026-10-15T05:21:00.000Z",
+    "assimilatedAt": "2026-10-11T13:14:02.000Z",
+    "stability": 5,
+    "difficulty": 6.4133,
+    "removedFromTracking": false,
+    "type": "UNDERSTANDING",
+    "propertyKey": "",
+    "recallCount": 1,
+    "recalledNote": {
+      "ancestorFolders": [],
+      "noteTopology": {
+        "createdAt": "2026-10-13T22:14:02.000Z",
+        "id": 3,
+        "title": "Declined Tokyo completion",
+        "updatedAt": "2026-10-13T22:14:02.000Z"
+      },
+      "notebookId": 1,
+      "propertyKey": null,
+      "propertyValue": null
+    },
+    "latestTutorFeedbackGrade": null,
+    "spelling": false,
+    "propertyValue": ""
+  },
+  "history": [
+    {
+      "recallLog": {
+        "id": 9,
+        "recordedAt": "2026-10-15T00:21:00.107Z",
+        "elapsedHours": 0,
+        "productOutcome": "AGAIN",
+        "tutorFeedback": null,
+        "memoryTrackerId": 3,
+        "answerId": 5,
+        "difficultyBefore": null,
+        "retrievability": null,
+        "stabilityBefore": 0
+      },
+      "recallPrompt": {
+        "answer": {
+          "awayCount": 0,
+          "awayMs": 0,
+          "choiceIndex": 1,
+          "correct": false,
+          "detourCount": 0,
+          "detourMs": 0,
+          "excludedAt": null,
+          "exclusionReason": null,
+          "id": 5,
+          "idleMs": 0,
+          "matchedNoteId": null,
+          "outcome": null,
+          "spellingAnswer": null,
+          "thinkingTimeMs": 77971
+        },
+        "answerTime": "2026-10-15T00:21:00.000Z",
+        "id": 3,
+        "isContested": false,
+        "mcq": {
+          "id": 3,
+          "correctAnswerIndex": 0,
+          "contextSeed": null,
+          "testedFocus": null,
+          "validationRationale": null,
+          "questionStem": "Choose the grammatically correct completion: I ___ in Tokyo",
+          "responseChoices": ["used to live", "am used to living"]
+        },
+        "questionGeneratedTime": "2026-10-13T13:15:12.625Z",
+        "questionType": "MCQ"
+      }
+    }
+  ],
+  "messages": [
+    {
+      "message": "\"Both options make grammatical sentences, and the question asks only for a grammatical completion. Can you propose correcting this wrong mark?\"",
+      "sender": {
+        "admin": false,
+        "dailyAssimilationCount": 15,
+        "dailyProbeEnabled": false,
+        "externalIdentifier": "old_learner",
+        "healthRemoveEmptyFoldersDefault": false,
+        "id": 1,
+        "name": "Old Learner",
+        "ownership": {
+          "circle": null,
+          "id": 1,
+          "ownerName": "Old Learner"
+        }
+      },
+      "readByReceiver": false,
+      "createdAt": "2026-10-15T00:21:00.107Z",
+      "id": 8
+    }
+  ]
+}

@@ -1,0 +1,282 @@
+{
+  "later": {
+    "id": 4,
+    "note": {
+      "noteTopology": {
+        "createdAt": "2026-10-13T22:14:02.000Z",
+        "id": 1,
+        "title": "Tokyo completion",
+        "updatedAt": "2026-10-13T22:14:02.000Z"
+      },
+      "content": "\"I used to live in Tokyo\" means I lived there in the past. \"I am used to living in Tokyo\" means living in Tokyo feels normal now. Both expressions are grammatical, but express different meanings.",
+      "id": 1
+    },
+    "lastRecalledAt": "2026-10-15T00:21:00.107Z",
+    "nextRecallAt": "2026-10-17T07:21:00.107Z",
+    "assimilatedAt": "2026-10-11T13:14:02.000Z",
+    "stability": 55,
+    "difficulty": 2.118104,
+    "removedFromTracking": false,
+    "type": "UNDERSTANDING",
+    "propertyKey": "",
+    "recallCount": 1,
+    "recalledNote": {
+      "ancestorFolders": [],
+      "noteTopology": {
+        "createdAt": "2026-10-13T22:14:02.000Z",
+        "id": 1,
+        "title": "Tokyo completion",
+        "updatedAt": "2026-10-13T22:14:02.000Z"
+      },
+      "notebookId": 1,
+      "propertyKey": null,
+      "propertyValue": null
+    },
+    "latestTutorFeedbackGrade": null,
+    "spelling": false,
+    "propertyValue": ""
+  },
+  "before": [
+    {
+      "recallLog": {
+        "id": 10,
+        "recordedAt": "2026-10-15T00:21:00.107Z",
+        "elapsedHours": 0,
+        "productOutcome": "GOOD",
+        "tutorFeedback": null,
+        "memoryTrackerId": 4,
+        "answerId": null,
+        "difficultyBefore": null,
+        "retrievability": null,
+        "stabilityBefore": 0
+      },
+      "recallPrompt": null
+    },
+    {
+      "recallLog": {
+        "id": 1,
+        "recordedAt": "2026-10-13T22:14:02.611Z",
+        "elapsedHours": 0,
+        "productOutcome": "AGAIN",
+        "tutorFeedback": null,
+        "memoryTrackerId": 4,
+        "answerId": 1,
+        "difficultyBefore": null,
+        "retrievability": null,
+        "stabilityBefore": 0
+      },
+      "recallPrompt": {
+        "answer": {
+          "awayCount": 0,
+          "awayMs": 0,
+          "choiceIndex": 1,
+          "correct": false,
+          "detourCount": 0,
+          "detourMs": 0,
+          "excludedAt": "2026-10-13T23:16:44.000Z",
+          "exclusionReason": "The question asks only for a grammatically correct completion of “I ___ in Tokyo.” Your selected answer, “am used to living,” produces a grammatical sentence meaning that living in Tokyo feels familiar or normal now. “Used to live” is also grammatical, but describes living there in the past. The available note explicitly confirms that both expressions are grammatical. Because the question supplies no intended meaning that distinguishes them, it does not support a unique correct answer, and your choice is defensible.",
+          "id": 1,
+          "idleMs": 0,
+          "matchedNoteId": null,
+          "outcome": null,
+          "spellingAnswer": null,
+          "thinkingTimeMs": 3343
+        },
+        "answerTime": "2026-10-13T22:14:03.000Z",
+        "id": 1,
+        "isContested": false,
+        "mcq": {
+          "id": 1,
+          "correctAnswerIndex": 0,
+          "contextSeed": null,
+          "testedFocus": null,
+          "validationRationale": null,
+          "questionStem": "Choose the grammatically correct completion: I ___ in Tokyo",
+          "responseChoices": ["used to live", "am used to living"]
+        },
+        "questionGeneratedTime": "2026-10-13T22:14:38.469Z",
+        "questionType": "MCQ"
+      }
+    }
+  ],
+  "response": {
+    "answer": {
+      "awayCount": 0,
+      "awayMs": 0,
+      "choiceIndex": 1,
+      "correct": false,
+      "detourCount": 0,
+      "detourMs": 0,
+      "excludedAt": "2026-10-13T23:16:44.000Z",
+      "exclusionReason": "The question asks only for a grammatically correct completion of “I ___ in Tokyo.” Your selected answer, “am used to living,” produces a grammatical sentence meaning that living in Tokyo feels familiar or normal now. “Used to live” is also grammatical, but describes living there in the past. The available note explicitly confirms that both expressions are grammatical. Because the question supplies no intended meaning that distinguishes them, it does not support a unique correct answer, and your choice is defensible.",
+      "id": 1,
+      "idleMs": 0,
+      "matchedNoteId": null,
+      "outcome": null,
+      "spellingAnswer": null,
+      "thinkingTimeMs": 3343
+    },
+    "id": 1,
+    "matchedNotes": null,
+    "mcq": {
+      "id": 1,
+      "correctAnswerIndex": 0,
+      "contextSeed": null,
+      "testedFocus": null,
+      "validationRationale": null,
+      "questionStem": "Choose the grammatically correct completion: I ___ in Tokyo",
+      "responseChoices": ["used to live", "am used to living"]
+    },
+    "memoryTrackerId": 4,
+    "questionType": "MCQ",
+    "recalledNote": {
+      "ancestorFolders": [],
+      "noteTopology": {
+        "createdAt": "2026-10-13T22:14:02.000Z",
+        "id": 1,
+        "title": "Tokyo completion",
+        "updatedAt": "2026-10-13T22:14:02.000Z"
+      },
+      "notebookId": 1,
+      "propertyKey": null,
+      "propertyValue": null
+    }
+  },
+  "after": {
+    "id": 4,
+    "note": {
+      "noteTopology": {
+        "createdAt": "2026-10-13T22:14:02.000Z",
+        "id": 1,
+        "title": "Tokyo completion",
+        "updatedAt": "2026-10-13T22:14:02.000Z"
+      },
+      "content": "\"I used to live in Tokyo\" means I lived there in the past. \"I am used to living in Tokyo\" means living in Tokyo feels normal now. Both expressions are grammatical, but express different meanings.",
+      "id": 1
+    },
+    "lastRecalledAt": "2026-10-15T00:21:00.000Z",
+    "nextRecallAt": "2026-10-17T07:21:00.000Z",
+    "assimilatedAt": "2026-10-11T13:14:02.000Z",
+    "stability": 55,
+    "difficulty": 2.1181,
+    "removedFromTracking": false,
+    "type": "UNDERSTANDING",
+    "propertyKey": "",
+    "recallCount": 1,
+    "recalledNote": {
+      "ancestorFolders": [],
+      "noteTopology": {
+        "createdAt": "2026-10-13T22:14:02.000Z",
+        "id": 1,
+        "title": "Tokyo completion",
+        "updatedAt": "2026-10-13T22:14:02.000Z"
+      },
+      "notebookId": 1,
+      "propertyKey": null,
+      "propertyValue": null
+    },
+    "latestTutorFeedbackGrade": null,
+    "spelling": false,
+    "propertyValue": ""
+  },
+  "history": [
+    {
+      "recallLog": {
+        "id": 10,
+        "recordedAt": "2026-10-15T00:21:00.107Z",
+        "elapsedHours": 0,
+        "productOutcome": "GOOD",
+        "tutorFeedback": null,
+        "memoryTrackerId": 4,
+        "answerId": null,
+        "difficultyBefore": null,
+        "retrievability": null,
+        "stabilityBefore": 0
+      },
+      "recallPrompt": null
+    },
+    {
+      "recallLog": {
+        "id": 1,
+        "recordedAt": "2026-10-13T22:14:02.611Z",
+        "elapsedHours": 0,
+        "productOutcome": "AGAIN",
+        "tutorFeedback": null,
+        "memoryTrackerId": 4,
+        "answerId": 1,
+        "difficultyBefore": null,
+        "retrievability": null,
+        "stabilityBefore": 0
+      },
+      "recallPrompt": {
+        "answer": {
+          "awayCount": 0,
+          "awayMs": 0,
+          "choiceIndex": 1,
+          "correct": false,
+          "detourCount": 0,
+          "detourMs": 0,
+          "excludedAt": "2026-10-13T23:16:44.000Z",
+          "exclusionReason": "The question asks only for a grammatically correct completion of “I ___ in Tokyo.” Your selected answer, “am used to living,” produces a grammatical sentence meaning that living in Tokyo feels familiar or normal now. “Used to live” is also grammatical, but describes living there in the past. The available note explicitly confirms that both expressions are grammatical. Because the question supplies no intended meaning that distinguishes them, it does not support a unique correct answer, and your choice is defensible.",
+          "id": 1,
+          "idleMs": 0,
+          "matchedNoteId": null,
+          "outcome": null,
+          "spellingAnswer": null,
+          "thinkingTimeMs": 3343
+        },
+        "answerTime": "2026-10-13T22:14:03.000Z",
+        "id": 1,
+        "isContested": false,
+        "mcq": {
+          "id": 1,
+          "correctAnswerIndex": 0,
+          "contextSeed": null,
+          "testedFocus": null,
+          "validationRationale": null,
+          "questionStem": "Choose the grammatically correct completion: I ___ in Tokyo",
+          "responseChoices": ["used to live", "am used to living"]
+        },
+        "questionGeneratedTime": "2026-10-13T22:14:38.469Z",
+        "questionType": "MCQ"
+      }
+    }
+  ],
+  "peer": {
+    "id": 5,
+    "note": {
+      "noteTopology": {
+        "createdAt": "2026-10-13T22:14:02.000Z",
+        "id": 1,
+        "title": "Tokyo completion",
+        "updatedAt": "2026-10-13T22:14:02.000Z"
+      },
+      "content": "\"I used to live in Tokyo\" means I lived there in the past. \"I am used to living in Tokyo\" means living in Tokyo feels normal now. Both expressions are grammatical, but express different meanings.",
+      "id": 1
+    },
+    "lastRecalledAt": "2026-10-13T23:16:44.000Z",
+    "nextRecallAt": "2026-10-14T04:16:44.000Z",
+    "assimilatedAt": "2026-10-13T23:16:44.000Z",
+    "stability": 5,
+    "difficulty": 6.4133,
+    "removedFromTracking": false,
+    "type": "UNDERSTANDING",
+    "propertyKey": "",
+    "recallCount": 1,
+    "recalledNote": {
+      "ancestorFolders": [],
+      "noteTopology": {
+        "createdAt": "2026-10-13T22:14:02.000Z",
+        "id": 1,
+        "title": "Tokyo completion",
+        "updatedAt": "2026-10-13T22:14:02.000Z"
+      },
+      "notebookId": 1,
+      "propertyKey": null,
+      "propertyValue": null
+    },
+    "latestTutorFeedbackGrade": null,
+    "spelling": false,
+    "propertyValue": ""
+  }
+}

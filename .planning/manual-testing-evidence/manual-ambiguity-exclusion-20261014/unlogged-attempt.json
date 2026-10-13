@@ -1,0 +1,120 @@
+{
+  "before": {
+    "id": 8,
+    "note": {
+      "noteTopology": {
+        "createdAt": "2026-10-15T00:21:00.000Z",
+        "id": 6,
+        "title": "Legacy Tokyo state",
+        "updatedAt": "2026-10-15T00:21:00.000Z"
+      },
+      "content": "Both used to live and am used to living are grammatical completions.",
+      "id": 6
+    },
+    "lastRecalledAt": "2026-10-14T00:21:00.000Z",
+    "nextRecallAt": "2026-10-16T07:21:00.000Z",
+    "assimilatedAt": "2026-10-10T15:21:00.000Z",
+    "stability": 55,
+    "difficulty": 2.1181,
+    "removedFromTracking": false,
+    "type": "UNDERSTANDING",
+    "propertyKey": "",
+    "recallCount": 0,
+    "recalledNote": {
+      "ancestorFolders": [],
+      "noteTopology": {
+        "createdAt": "2026-10-15T00:21:00.000Z",
+        "id": 6,
+        "title": "Legacy Tokyo state",
+        "updatedAt": "2026-10-15T00:21:00.000Z"
+      },
+      "notebookId": 3,
+      "propertyKey": null,
+      "propertyValue": null
+    },
+    "latestTutorFeedbackGrade": null,
+    "spelling": false,
+    "propertyValue": ""
+  },
+  "response": {
+    "answer": {
+      "awayCount": null,
+      "awayMs": null,
+      "choiceIndex": 1,
+      "correct": null,
+      "detourCount": null,
+      "detourMs": null,
+      "excludedAt": "2026-10-15T00:21:00.107Z",
+      "exclusionReason": "Both options are grammatical completions without a specified meaning.",
+      "id": 14,
+      "idleMs": null,
+      "matchedNoteId": null,
+      "outcome": null,
+      "spellingAnswer": null,
+      "thinkingTimeMs": 3000
+    },
+    "id": 14,
+    "matchedNotes": null,
+    "mcq": {
+      "id": 7,
+      "correctAnswerIndex": 0,
+      "contextSeed": null,
+      "testedFocus": null,
+      "validationRationale": null,
+      "questionStem": "Choose the grammatically correct completion: I ___ in Tokyo",
+      "responseChoices": ["used to live", "am used to living"]
+    },
+    "memoryTrackerId": 8,
+    "questionType": "MCQ",
+    "recalledNote": {
+      "ancestorFolders": [],
+      "noteTopology": {
+        "createdAt": "2026-10-15T00:21:00.000Z",
+        "id": 6,
+        "title": "Legacy Tokyo state",
+        "updatedAt": "2026-10-15T00:21:00.000Z"
+      },
+      "notebookId": 3,
+      "propertyKey": null,
+      "propertyValue": null
+    }
+  },
+  "after": {
+    "id": 8,
+    "note": {
+      "noteTopology": {
+        "createdAt": "2026-10-15T00:21:00.000Z",
+        "id": 6,
+        "title": "Legacy Tokyo state",
+        "updatedAt": "2026-10-15T00:21:00.000Z"
+      },
+      "content": "Both used to live and am used to living are grammatical completions.",
+      "id": 6
+    },
+    "lastRecalledAt": "2026-10-14T00:21:00.000Z",
+    "nextRecallAt": "2026-10-16T07:21:00.000Z",
+    "assimilatedAt": "2026-10-10T15:21:00.000Z",
+    "stability": 55,
+    "difficulty": 2.1181,
+    "removedFromTracking": false,
+    "type": "UNDERSTANDING",
+    "propertyKey": "",
+    "recallCount": 0,
+    "recalledNote": {
+      "ancestorFolders": [],
+      "noteTopology": {
+        "createdAt": "2026-10-15T00:21:00.000Z",
+        "id": 6,
+        "title": "Legacy Tokyo state",
+        "updatedAt": "2026-10-15T00:21:00.000Z"
+      },
+      "notebookId": 3,
+      "propertyKey": null,
+      "propertyValue": null
+    },
+    "latestTutorFeedbackGrade": null,
+    "spelling": false,
+    "propertyValue": ""
+  },
+  "fixture": "Answered MCQ linked to legacy tracker, with no RecallLog, seeded directly in the disposable database."
+}

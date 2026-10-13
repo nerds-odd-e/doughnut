@@ -1,0 +1,281 @@
+{
+  "legacyBefore": {
+    "tracker": {
+      "id": 8,
+      "note": {
+        "noteTopology": {
+          "createdAt": "2026-10-15T00:21:00.000Z",
+          "id": 6,
+          "title": "Legacy Tokyo state",
+          "updatedAt": "2026-10-15T00:21:00.000Z"
+        },
+        "content": "Both used to live and am used to living are grammatical completions.",
+        "id": 6
+      },
+      "lastRecalledAt": "2026-10-14T00:21:00.000Z",
+      "nextRecallAt": "2026-10-16T07:21:00.000Z",
+      "assimilatedAt": "2026-10-10T15:21:00.000Z",
+      "stability": 55,
+      "difficulty": 2.1181,
+      "removedFromTracking": false,
+      "type": "UNDERSTANDING",
+      "propertyKey": "",
+      "recallCount": 0,
+      "recalledNote": {
+        "ancestorFolders": [],
+        "noteTopology": {
+          "createdAt": "2026-10-15T00:21:00.000Z",
+          "id": 6,
+          "title": "Legacy Tokyo state",
+          "updatedAt": "2026-10-15T00:21:00.000Z"
+        },
+        "notebookId": 3,
+        "propertyKey": null,
+        "propertyValue": null
+      },
+      "latestTutorFeedbackGrade": null,
+      "spelling": false,
+      "propertyValue": ""
+    },
+    "history": [
+      {
+        "recallLog": null,
+        "recallPrompt": {
+          "answer": null,
+          "answerTime": null,
+          "id": 7,
+          "isContested": false,
+          "mcq": {
+            "id": 7,
+            "correctAnswerIndex": null,
+            "contextSeed": null,
+            "testedFocus": null,
+            "validationRationale": null,
+            "questionStem": "Choose the grammatically correct completion: I ___ in Tokyo",
+            "responseChoices": ["used to live", "am used to living"]
+          },
+          "questionGeneratedTime": "2026-10-13T13:29:39.128Z",
+          "questionType": "MCQ"
+        }
+      }
+    ]
+  },
+  "legacyAnswer": {
+    "answer": {
+      "awayCount": null,
+      "awayMs": null,
+      "choiceIndex": 1,
+      "correct": false,
+      "detourCount": null,
+      "detourMs": null,
+      "excludedAt": null,
+      "exclusionReason": null,
+      "id": 7,
+      "idleMs": null,
+      "matchedNoteId": null,
+      "outcome": null,
+      "spellingAnswer": null,
+      "thinkingTimeMs": 3000
+    },
+    "id": 7,
+    "matchedNotes": null,
+    "mcq": {
+      "id": 7,
+      "correctAnswerIndex": 0,
+      "contextSeed": null,
+      "testedFocus": null,
+      "validationRationale": null,
+      "questionStem": "Choose the grammatically correct completion: I ___ in Tokyo",
+      "responseChoices": ["used to live", "am used to living"]
+    },
+    "memoryTrackerId": 8,
+    "questionType": "MCQ",
+    "recalledNote": {
+      "ancestorFolders": [],
+      "noteTopology": {
+        "createdAt": "2026-10-15T00:21:00.000Z",
+        "id": 6,
+        "title": "Legacy Tokyo state",
+        "updatedAt": "2026-10-15T00:21:00.000Z"
+      },
+      "notebookId": 3,
+      "propertyKey": null,
+      "propertyValue": null
+    }
+  },
+  "legacyWrong": {
+    "tracker": {
+      "id": 8,
+      "note": {
+        "noteTopology": {
+          "createdAt": "2026-10-15T00:21:00.000Z",
+          "id": 6,
+          "title": "Legacy Tokyo state",
+          "updatedAt": "2026-10-15T00:21:00.000Z"
+        },
+        "content": "Both used to live and am used to living are grammatical completions.",
+        "id": 6
+      },
+      "lastRecalledAt": "2026-10-15T00:21:00.000Z",
+      "nextRecallAt": "2026-10-15T14:21:00.000Z",
+      "assimilatedAt": "2026-10-10T15:21:00.000Z",
+      "stability": 14,
+      "difficulty": 7.3945,
+      "removedFromTracking": false,
+      "type": "UNDERSTANDING",
+      "propertyKey": "",
+      "recallCount": 1,
+      "recalledNote": {
+        "ancestorFolders": [],
+        "noteTopology": {
+          "createdAt": "2026-10-15T00:21:00.000Z",
+          "id": 6,
+          "title": "Legacy Tokyo state",
+          "updatedAt": "2026-10-15T00:21:00.000Z"
+        },
+        "notebookId": 3,
+        "propertyKey": null,
+        "propertyValue": null
+      },
+      "latestTutorFeedbackGrade": null,
+      "spelling": false,
+      "propertyValue": ""
+    },
+    "history": [
+      {
+        "recallLog": {
+          "id": 12,
+          "recordedAt": "2026-10-15T00:21:00.107Z",
+          "elapsedHours": 24,
+          "productOutcome": "AGAIN",
+          "tutorFeedback": null,
+          "memoryTrackerId": 8,
+          "answerId": 7,
+          "difficultyBefore": 2.1181,
+          "retrievability": 0.9465659410176293,
+          "stabilityBefore": 55
+        },
+        "recallPrompt": {
+          "answer": {
+            "awayCount": null,
+            "awayMs": null,
+            "choiceIndex": 1,
+            "correct": false,
+            "detourCount": null,
+            "detourMs": null,
+            "excludedAt": null,
+            "exclusionReason": null,
+            "id": 7,
+            "idleMs": null,
+            "matchedNoteId": null,
+            "outcome": null,
+            "spellingAnswer": null,
+            "thinkingTimeMs": 3000
+          },
+          "answerTime": "2026-10-15T00:21:00.000Z",
+          "id": 7,
+          "isContested": false,
+          "mcq": {
+            "id": 7,
+            "correctAnswerIndex": 0,
+            "contextSeed": null,
+            "testedFocus": null,
+            "validationRationale": null,
+            "questionStem": "Choose the grammatically correct completion: I ___ in Tokyo",
+            "responseChoices": ["used to live", "am used to living"]
+          },
+          "questionGeneratedTime": "2026-10-13T13:29:39.128Z",
+          "questionType": "MCQ"
+        }
+      }
+    ]
+  },
+  "legacyAfter": {
+    "tracker": {
+      "id": 8,
+      "note": {
+        "noteTopology": {
+          "createdAt": "2026-10-15T00:21:00.000Z",
+          "id": 6,
+          "title": "Legacy Tokyo state",
+          "updatedAt": "2026-10-15T00:21:00.000Z"
+        },
+        "content": "Both used to live and am used to living are grammatical completions.",
+        "id": 6
+      },
+      "lastRecalledAt": "2026-10-14T00:21:00.000Z",
+      "nextRecallAt": "2026-10-16T07:21:00.000Z",
+      "assimilatedAt": "2026-10-10T15:21:00.000Z",
+      "stability": 55,
+      "difficulty": 2.1181,
+      "removedFromTracking": false,
+      "type": "UNDERSTANDING",
+      "propertyKey": "",
+      "recallCount": 0,
+      "recalledNote": {
+        "ancestorFolders": [],
+        "noteTopology": {
+          "createdAt": "2026-10-15T00:21:00.000Z",
+          "id": 6,
+          "title": "Legacy Tokyo state",
+          "updatedAt": "2026-10-15T00:21:00.000Z"
+        },
+        "notebookId": 3,
+        "propertyKey": null,
+        "propertyValue": null
+      },
+      "latestTutorFeedbackGrade": null,
+      "spelling": false,
+      "propertyValue": ""
+    },
+    "history": [
+      {
+        "recallLog": {
+          "id": 12,
+          "recordedAt": "2026-10-15T00:21:00.107Z",
+          "elapsedHours": 24,
+          "productOutcome": "AGAIN",
+          "tutorFeedback": null,
+          "memoryTrackerId": 8,
+          "answerId": 7,
+          "difficultyBefore": 2.1181,
+          "retrievability": 0.9465659410176293,
+          "stabilityBefore": 55
+        },
+        "recallPrompt": {
+          "answer": {
+            "awayCount": null,
+            "awayMs": null,
+            "choiceIndex": 1,
+            "correct": false,
+            "detourCount": null,
+            "detourMs": null,
+            "excludedAt": "2026-10-15T00:21:00.000Z",
+            "exclusionReason": "Both completions are grammatical; no meaning is specified.",
+            "id": 7,
+            "idleMs": null,
+            "matchedNoteId": null,
+            "outcome": null,
+            "spellingAnswer": null,
+            "thinkingTimeMs": 3000
+          },
+          "answerTime": "2026-10-15T00:21:00.000Z",
+          "id": 7,
+          "isContested": false,
+          "mcq": {
+            "id": 7,
+            "correctAnswerIndex": 0,
+            "contextSeed": null,
+            "testedFocus": null,
+            "validationRationale": null,
+            "questionStem": "Choose the grammatically correct completion: I ___ in Tokyo",
+            "responseChoices": ["used to live", "am used to living"]
+          },
+          "questionGeneratedTime": "2026-10-13T13:29:39.128Z",
+          "questionType": "MCQ"
+        }
+      }
+    ]
+  },
+  "fixture": "Disposable legacy tracker seeded with earned stability 55, difficulty 2.1181, earlier last recall and due time, with no earlier RecallLog rows."
+}

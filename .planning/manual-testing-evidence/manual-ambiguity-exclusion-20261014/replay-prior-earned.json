@@ -1,0 +1,76 @@
+{
+  "prior": {
+    "id": 1,
+    "note": {
+      "noteTopology": {
+        "createdAt": "2026-10-13T22:14:02.000Z",
+        "id": 4,
+        "title": "History replay Tokyo",
+        "updatedAt": "2026-10-13T22:14:02.000Z"
+      },
+      "content": "Both \"used to live\" and \"am used to living\" are grammatical completions of \"I ___ in Tokyo\". They mean different things.",
+      "id": 4
+    },
+    "lastRecalledAt": "2026-10-14T00:19:16.189Z",
+    "nextRecallAt": "2026-10-16T07:19:16.189Z",
+    "assimilatedAt": "2026-10-11T13:14:02.000Z",
+    "stability": 55,
+    "difficulty": 2.118104,
+    "removedFromTracking": false,
+    "type": "UNDERSTANDING",
+    "propertyKey": "",
+    "recallCount": 1,
+    "recalledNote": {
+      "ancestorFolders": [],
+      "noteTopology": {
+        "createdAt": "2026-10-13T22:14:02.000Z",
+        "id": 4,
+        "title": "History replay Tokyo",
+        "updatedAt": "2026-10-13T22:14:02.000Z"
+      },
+      "notebookId": 1,
+      "propertyKey": null,
+      "propertyValue": null
+    },
+    "latestTutorFeedbackGrade": null,
+    "spelling": false,
+    "propertyValue": ""
+  },
+  "history": [
+    {
+      "recallLog": {
+        "id": 3,
+        "recordedAt": "2026-10-14T00:19:16.189Z",
+        "elapsedHours": 0,
+        "productOutcome": "GOOD",
+        "tutorFeedback": null,
+        "memoryTrackerId": 1,
+        "answerId": null,
+        "difficultyBefore": null,
+        "retrievability": null,
+        "stabilityBefore": 0
+      },
+      "recallPrompt": null
+    },
+    {
+      "recallLog": null,
+      "recallPrompt": {
+        "answer": null,
+        "answerTime": null,
+        "id": 4,
+        "isContested": false,
+        "mcq": {
+          "id": 4,
+          "correctAnswerIndex": null,
+          "contextSeed": null,
+          "testedFocus": null,
+          "validationRationale": null,
+          "questionStem": "Choose the grammatically correct completion: I ___ in Tokyo",
+          "responseChoices": ["used to live", "am used to living"]
+        },
+        "questionGeneratedTime": "2026-10-13T13:15:12.625Z",
+        "questionType": "MCQ"
+      }
+    }
+  ]
+}
