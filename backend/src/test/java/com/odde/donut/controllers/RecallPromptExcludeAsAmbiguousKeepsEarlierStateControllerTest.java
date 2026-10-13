@@ -12,6 +12,9 @@ import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.donut.testability.builders.MemoryTrackerBuilder;
 import jakarta.persistence.EntityManager;
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,12 +56,8 @@ class RecallPromptExcludeAsAmbiguousKeepsEarlierStateControllerTest
 
     controller.excludeAsAmbiguous(recallPrompt, ambiguousExclusion("both tenses fit"));
 
-    makeMe.refresh(tracker);
-    assertThat((double) tracker.getStability(), closeTo(200.0, 1e-4));
-    assertThat((double) tracker.getDifficulty(), closeTo(6.0, 1e-4));
     assertThat(lastRecalledAtBefore, equalTo(assimilatedAt));
-    assertThat(tracker.getLastRecalledAt(), equalTo(lastRecalledAtBefore));
-    assertThat(tracker.getNextRecallAt(), equalTo(nextRecallAtBefore));
+    assertTrackerHoldsTheFixtureStateDueAt(nextRecallAtBefore);
   }
 
   @Test
@@ -123,11 +122,87 @@ class RecallPromptExcludeAsAmbiguousKeepsEarlierStateControllerTest
 
     assertThat(makeMe.refresh(answeredWithoutLog.getAnswer()).getExcludedAt(), notNullValue());
     assertThat(persistedLogs(tracker), empty());
+    assertTrackerHoldsTheFixtureStateDueAt(nextRecallAtBefore);
+  }
+
+  @Test
+  void excludingTwoAttemptsLaterOneFirstLeavesTheStateHeldBeforeBoth()
+      throws UnexpectedNoAccessRightException {
+    Timestamp nextRecallAtBefore = tracker.getNextRecallAt();
+    RecallPrompt laterPrompt = answerWronglyTwice();
+
+    excludeInOrder(laterPrompt, recallPrompt);
+
+    assertTrackerHoldsTheFixtureStateDueAt(nextRecallAtBefore);
+  }
+
+  @Test
+  void excludingTwoAttemptsEarlierOneFirstLeavesTheStateHeldBeforeBoth()
+      throws UnexpectedNoAccessRightException {
+    Timestamp nextRecallAtBefore = tracker.getNextRecallAt();
+    RecallPrompt laterPrompt = answerWronglyTwice();
+
+    excludeInOrder(recallPrompt, laterPrompt);
+
+    assertTrackerHoldsTheFixtureStateDueAt(nextRecallAtBefore);
+  }
+
+  @Test
+  void confirmingAnExcludedAttemptAgainLeavesTheScheduleAsItIs()
+      throws UnexpectedNoAccessRightException {
+    RecallPrompt laterPrompt = answerWronglyTwice();
+    excludeInOrder(laterPrompt, recallPrompt);
+    List<Object> scheduleBefore = persistedSchedule();
+
+    controller.excludeAsAmbiguous(laterPrompt, ambiguousExclusion("asked again"));
+
+    assertThat(persistedSchedule(), equalTo(scheduleBefore));
+  }
+
+  /** Answers {@code recallPrompt} wrongly, then a later prompt on the same tracker, returned. */
+  private RecallPrompt answerWronglyTwice() throws UnexpectedNoAccessRightException {
+    controller.answer(recallPrompt, choiceAnswer(1));
+    testabilitySettings.timeTravelTo(makeMe.aTimestamp().of(2, 8).please());
+    RecallPrompt laterPrompt = mcqPrompt(tracker, note);
+    controller.answer(laterPrompt, choiceAnswer(1));
+    return laterPrompt;
+  }
+
+  private void excludeInOrder(RecallPrompt first, RecallPrompt second)
+      throws UnexpectedNoAccessRightException {
+    controller.excludeAsAmbiguous(first, ambiguousExclusion("both tenses fit"));
+    controller.excludeAsAmbiguous(second, ambiguousExclusion("both tenses fit"));
+  }
+
+  private void assertTrackerHoldsTheFixtureStateDueAt(Timestamp nextRecallAt) {
     makeMe.refresh(tracker);
     assertThat((double) tracker.getStability(), closeTo(200.0, 1e-4));
     assertThat((double) tracker.getDifficulty(), closeTo(6.0, 1e-4));
     assertThat(tracker.getLastRecalledAt(), equalTo(assimilatedAt));
-    assertThat(tracker.getNextRecallAt(), equalTo(nextRecallAtBefore));
+    assertThat(tracker.getNextRecallAt(), equalTo(nextRecallAt));
+  }
+
+  /** The tracker's scheduling state and each log's cached state, as the database holds them. */
+  private List<Object> persistedSchedule() {
+    List<RecallLog> logs = persistedLogs(tracker);
+    makeMe.refresh(tracker);
+    List<Object> schedule =
+        new ArrayList<>(
+            Arrays.asList(
+                tracker.getStability(),
+                tracker.getDifficulty(),
+                tracker.getLastRecalledAt(),
+                tracker.getNextRecallAt()));
+    logs.forEach(
+        log ->
+            schedule.addAll(
+                Arrays.asList(
+                    log.getId(),
+                    log.getStabilityBefore(),
+                    log.getDifficultyBefore(),
+                    log.getRetrievability(),
+                    log.getElapsedHours())));
+    return schedule;
   }
 
   private Timestamp minutesAfter(Timestamp timestamp, int minutes) {

@@ -100,12 +100,14 @@ public class Answer extends EntityIdentifiedByIdOnly {
     return excludedAt != null;
   }
 
-  public void excludeAsAmbiguous(String reason, Timestamp currentUTCTimestamp) {
+  /** Records the exclusion unless one is already recorded; tells whether this call recorded it. */
+  public boolean excludeAsAmbiguous(String reason, Timestamp currentUTCTimestamp) {
     if (isExcludedAsAmbiguous()) {
-      return;
+      return false;
     }
     excludedAt = currentUTCTimestamp;
     exclusionReason = reason;
+    return true;
   }
 
   public void addRecallLog(RecallLog recallLog) {

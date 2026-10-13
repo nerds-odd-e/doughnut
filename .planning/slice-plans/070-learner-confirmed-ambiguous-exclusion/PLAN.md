@@ -129,6 +129,7 @@ slice 9 proves the journey with a mocked proposal.
 | After confirmation the help subject, the recall page entry, and the memory tracker page reflect the exclusion without reopening | 8: ConversationComponent spec; 9 for the pages |
 | Wrong answer → help → proposal → confirm → excluded label, corrected next recall time, recall history shows the decision | 9: mocked-OpenAI E2E scenario |
 | Declined proposal leaves result and schedule intact | 7 (no call), 5 (instruction: never imply a correction happened) |
+| Confirming an already excluded attempt again changes neither the schedule nor any recall log, including after another attempt on the same tracker was excluded in between | 11: controller test with two excluded attempts on one tracker |
 | The scheduling state held before the excluded attempt is kept, including state no recall log records | 10: controller tests comparing persisted state with the pre-attempt state and an independently graded tracker |
 
 Meaning-specific misconception feedback (the driving example) is tutor
@@ -477,7 +478,54 @@ the due time before the attempt follows from that state through
 `calculateNextRecallAt`. Keep one replay owner and the one valid-event rule.
 
 Sizing: about 8 minutes, scrutinized: one rule change with its proof and one
-documentation paragraph. Stop-safe: the story is complete.
+documentation paragraph. Stop-safe: the kept-state rule is complete.
+
+### 11. A repeated confirmation leaves the schedule as it is
+Type: Behavior
+Status: done
+Accepted proof (2026-10-13): the new test failed before the change with the
+tracker back at stability 26.0 and difficulty 8.67046 in place of 200.0 and
+6.0; after it, `CURSOR_DEV=true nix develop -c pnpm backend:test_only` →
+BUILD SUCCESSFUL, 2806 tests, 0 failures, and with the earlier-first test
+added, `pnpm backend:test_only --tests 'com.odde.donut.controllers.RecallPromptExcludeAsAmbiguousKeepsEarlierStateControllerTest'`
+→ 8 tests, 0 failures. Observations:
+`confirmingAnExcludedAttemptAgainLeavesTheScheduleAsItIs`,
+`excludingTwoAttemptsLaterOneFirstLeavesTheStateHeldBeforeBoth`, and
+`excludingTwoAttemptsEarlierOneFirstLeavesTheStateHeldBeforeBoth`.
+`Answer.excludeAsAmbiguous` reports whether this call recorded the exclusion,
+and the service saves and rebuilds only then. `pnpm generateTypeScript` left
+the API description unchanged.
+Proof: a controller test beside
+`RecallPromptExcludeAsAmbiguousKeepsEarlierStateControllerTest`: one tracker
+with a wrong answer A at t1 and a wrong answer B at t2 (two prompts, real
+`answer` operations), exclude B, exclude A, capture the persisted tracker
+state and logs, confirm B again → persisted stability, difficulty,
+`lastRecalledAt`, `nextRecallAt`, and each log's cached columns equal the
+captured ones; the test fails before the change. `docs/recall-help.md` names
+the readouts an excluded attempt leaves, including the review calendar and
+streak, and the ones that still read it; a reading against
+`RecallStatsService.aggregateRows` and
+`RecallService.getPreviouslyAnsweredRecallPrompts` confirms each statement.
+The existing exclusion tests stay green.
+
+Behavior: an attempt is already excluded → the learner or the tutor's
+proposal confirms it again → the first decision is returned and nothing is
+rebuilt or saved.
+
+Source: the execution retrospective's review of `56cb8aa44c` on 2026-10-13.
+`Answer.excludeAsAmbiguous` keeps the first decision, but
+`MemoryTrackerService.excludeAsAmbiguous` rebuilt on every call, and replay
+realigns cached state only on valid logs: after excluding B and then A, B's
+cached state still described the tracker after A, so confirming B again
+restored A's effect. Recall help said an excluded attempt "still counts as
+recall activity", while recall statistics omit it from the review calendar,
+streak, time spent, reviews today, and pace. The owner authorized this repair
+in the same execution.
+
+Rebuild only when this call records the exclusion; keep the decision in one
+owner.
+
+Sizing: about 6 minutes. Stop-safe: the story is complete.
 
 ## Current decisions and delivery
 
@@ -572,6 +620,9 @@ was accepted on `main`.
   `body`, so an E2E selector scopes to the dialog or to the page.
 - `confirmTutorExclusionProposal` in `aiResponseTestSupport.ts` drives the
   proposal and the confirmation in mounted specs.
+- Replay realigns cached state only on valid logs, so an excluded log's cached
+  state can describe a tracker that still included another excluded attempt.
+  No path rebuilds from an already excluded attempt.
 
 ## Story obligations
 
@@ -665,7 +716,12 @@ Reported: slice 10 — "Due time is derived, not stored: it differs from the tru
 Story clause: "Keep the scheduling state the tracker held just before the excluded attempt, including state earned through grades that no recall event records."
 Disposition: owner changed "The owner chose to start the rebuild from the memory state cached on the excluded attempt's own recall event and to apply the later valid events to it."
 
-### G19. Confusion and repeated exclusions are unobserved from a kept state
+### G19. Confusion is unobserved from a kept state
 Reported: slice 10 — "Confusion logs before or after the excluded attempt under the new start state (the entity test covers Confusion replay only from New)."
 Story clause: "Preserve subsequent Grades and Confusion; align affected cached readouts with the corrected history."
 Disposition: proved by slice 10: both start states feed the one replay loop in `MemoryTrackerReplay`, whose Confusion handling `MemoryTrackerRebuildFromRecallHistoryTest.rebuildingWithoutAnAttemptThatHoldsNoCachedStateReproducesIncrementalScheduling` observes, and later Grades from a kept state are observed by `aLaterGradeIsAppliedToTheStateHeldBeforeTheExcludedAttempt`
+
+### G20. Two exclusions on one tracker are unobserved
+Reported: slice 10 — "Two exclusions on one tracker, in either order."
+Story clause: "Repeating confirmation gives the same resolved result."
+Disposition: proved by slice 11: `RecallPromptExcludeAsAmbiguousKeepsEarlierStateControllerTest` tests `excludingTwoAttemptsLaterOneFirstLeavesTheStateHeldBeforeBoth`, `excludingTwoAttemptsEarlierOneFirstLeavesTheStateHeldBeforeBoth`, and `confirmingAnExcludedAttemptAgainLeavesTheScheduleAsItIs`

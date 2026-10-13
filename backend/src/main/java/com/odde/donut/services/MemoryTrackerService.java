@@ -107,9 +107,10 @@ public class MemoryTrackerService {
     if (answer == null) {
       throw new QuestionAnswerException("The question is not answered");
     }
-    answer.excludeAsAmbiguous(reason, currentUTCTimestamp);
-    entityPersister.save(answer);
-    rebuildWithout(answer, recallPrompt.requireMemoryTracker());
+    if (answer.excludeAsAmbiguous(reason, currentUTCTimestamp)) {
+      entityPersister.save(answer);
+      rebuildWithout(answer, recallPrompt.requireMemoryTracker());
+    }
     return recallPrompt;
   }
 

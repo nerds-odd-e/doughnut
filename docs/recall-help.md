@@ -63,10 +63,10 @@ replaying all the tracker's valid events from a new tracker. An attempt that
 has no recall log changes no schedule: the exclusion is recorded and the
 tracker stays as it is.
 
-An excluded attempt is left out of evaluation readouts: the tracker's recall
-count, the frequent-failure warning, and recall statistics (retention,
-accuracy, and calibration). It still counts as recall activity at the time the
-learner answered.
+An excluded attempt is left out of the tracker's recall count, the
+frequent-failure warning, and recall statistics: the review calendar, the
+streak, reviews today, time spent, pace, retention, accuracy, and calibration.
+It stays in the recall session's list of answered questions.
 
 After confirmation the help dialog stays open and the page behind it shows the
 excluded result and the corrected schedule at once. The assistant sees the
