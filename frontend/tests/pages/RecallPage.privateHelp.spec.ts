@@ -11,6 +11,7 @@ import { mockSdkService } from "@tests/helpers"
 import { flushPromises } from "@vue/test-utils"
 import { expect, it, vi } from "vitest"
 import { confirmTutorExclusionProposal } from "../components/conversation/aiResponseTestSupport"
+import { privateHelpGeometryCases } from "./privateHelpGeometryCases"
 import {
   createMemoryTrackerLite,
   givenRecallQueue,
@@ -25,6 +26,8 @@ vi.mock("@/managedApi/AiReplyEventSource", async () => {
 })
 
 const ctx = useRecallPageSpecContext()
+
+privateHelpGeometryCases(ctx)
 
 it("shows the answered attempt as excluded once the learner confirms the tutor's proposal in private help", async () => {
   const reason = "Two choices fit the stem equally well"

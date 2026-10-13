@@ -84,6 +84,12 @@ contest verdict is a separate decision.
 
 ## Reading and returning
 
+Private recall help keeps its heading and named Close control visible while the
+question, selected answer, exclusion reason, and conversation scroll within the
+available viewport. Long replies and reopened conversations can be read in both
+directions. Close or Escape returns to the same attempt and recall progress,
+with focus on Get private help.
+
 A successful visible conversation fetch acknowledges reading and replaces the
 shared unread state with the server's result. Contextual help, Messages, and
 direct note conversations share this behavior. A failed fetch preserves the

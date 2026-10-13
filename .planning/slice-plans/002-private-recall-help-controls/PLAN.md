@@ -98,7 +98,7 @@ Production implementation and durable regression tests remain to be written.
 
 ### 1. Read long private help with visible dismissal
 Type: Behavior
-Status: planned
+Status: done
 Proof: All rows in the proof table; complete frontend suite and both frontend
 typechecks on the final content.
 
@@ -121,6 +121,13 @@ proof loop; splitting by viewport, CSS, or tests creates no safe useful partial
 outcome. Scrutinize an overrun beyond 5 minutes; above 10 minutes stop and
 replan unless only a stated test/external wait remains (AGENTS.md). The story's
 30–60 minute estimate includes independent refactoring and delivery overhead.
+
+## Story obligations
+
+### G1. Browser observation scope
+Reported: slice 1 — "Observations use headless Chromium and mocked HTTP/SSE with synthetic long content."
+Story clause: "A learner reading a long private recall-help conversation can identify and close help without scrolling back to find its controls, then continue the same recall attempt."
+Disposition: no user cost "A learner reading a long private recall-help conversation can identify and close help without scrolling back to find its controls, then continue the same recall attempt.": real rendering and scrolling prove the presentation journey; unchanged backend behavior and real-model quality are not inferred from the mocks.
 
 ## Verification and delivery
 
@@ -148,6 +155,56 @@ push through authorized execution delivery. No manual-testing or paid-model
 gate is added. Reassess consumers if implementation changes shared defaults.
 
 ## Current decisions and learnings
+
+### Accepted slice proof and delivery preparation
+
+- Implementation took about four minutes. `Modal.scrollBody` owns the bounded
+  panel and scrolling body; ConversationButton opts in. Heading and named Close
+  stay outside the body. API and component generation triggers are unchanged.
+- Inspected `privateHelpGeometryCases.ts` at the mounted RecallPage boundary:
+  both viewports cover opening, learner-confirmed long exclusion reason,
+  streamed long reply, persistent Close, preserved focus/progress/queue, and
+  reopening the original conversation ID with three stored exchanges.
+  `privateHelpGeometryTestSupport.ts` observes settled rectangles and center
+  hit targets, plus first/last text ranges inside all clipping ancestors for
+  question, selected answer, reason, and transcript. Viewports are restored.
+- `CURSOR_DEV=true nix develop -c pnpm frontend:test` passed: 350 files,
+  2,194 tests, 40.13s. Existing Close/Escape/nested-refinement and exclusion
+  observations remain; the suite covers shared modal/conversation consumers.
+- Independent refactoring extracted geometry observations and consolidated
+  attempt-context reading without changing product code, fixtures, or assertions.
+  On that content, `CURSOR_DEV=true nix develop -c pnpm frontend:test tests/pages/RecallPage.privateHelp.spec.ts`
+  passed all six tests in 10.79s. Both
+  `CURSOR_DEV=true nix develop -c pnpm -C frontend exec vue-tsc --noEmit` and
+  `CURSOR_DEV=true nix develop -c pnpm -C frontend exec tsc --noEmit` passed.
+  Unchanged consumers retain the accepted full-suite evidence.
+- Refactor returned `REFACTOR COMPLETE`; whitespace check passed.
+  Coordinator `./scripts/run.sh pnpm format:changed` passed once, mechanically
+  formatting the two new test modules. No remaining slice or proof gap.
+
+### Execution context
+
+- Mode: story-branch; identity `SEED-073#story-9`; publisher
+  `dashboard-territory.local-doughnut`; assigned agent Mihiro-chan.
+- Execution checkout:
+  `/Users/terryyin/git/doughnut/.worktrees/keep-private-recall-help-controls-in-view-for-lo`;
+  branch `codex/keep-private-recall-help-controls-in-view-for-lo`.
+  Reused the established linked workspace; no integration-checkout mutation.
+- Claim `eeedbbdb1949da9148ead5284a370ac751e59607` accepted on `origin/main`
+  by the established start and confirmed on the remote execution branch.
+  Starting revision `f884b96714131d631e608504d71d418edf3ae906`.
+  Increment target is that execution branch on `origin`.
+- Checkout setup: `CURSOR_DEV=true nix develop -c bash scripts/worktree_setup.sh`
+  passed against the current locked installation; applicable command
+  `CURSOR_DEV=true nix develop -c pnpm -C frontend exec vue-tsc --noEmit`
+  passed before implementation. The commit hook is check-only `lint:changed`.
+- Replanning permission: preserve existing planned-execution authority.
+- CI: GitHub `nerds-odd-e/doughnut`, verified `ci.yml` (`donut CI`),
+  execution branch target; coordinator `mihiro-story-9`.
+  Codex stream cell `9`, session `91477`, directory
+  `/tmp/dough-ci-501/watch-3hHaik`, PID `76970`.
+  The startup claim on trunk has `pendingCi: unobserved`; this stream covers
+  subsequent story-branch deliveries.
 
 - One containment rule owns all content growth; no separate handling for a
   reason, streaming reply, or reopening.
