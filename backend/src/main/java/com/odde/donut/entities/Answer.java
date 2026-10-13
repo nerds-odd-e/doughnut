@@ -68,6 +68,12 @@ public class Answer extends EntityIdentifiedByIdOnly {
   @Setter
   private AnswerOutcome outcome;
 
+  @Column(name = "excluded_at")
+  private Timestamp excludedAt;
+
+  @Column(name = "exclusion_reason")
+  private String exclusionReason;
+
   @JsonProperty
   public Boolean getCorrect() {
     Boolean fromOutcome = correctFrom(outcome, null);
@@ -87,6 +93,14 @@ public class Answer extends EntityIdentifiedByIdOnly {
       }
     }
     return null;
+  }
+
+  public void excludeAsAmbiguous(String reason, Timestamp currentUTCTimestamp) {
+    if (excludedAt != null) {
+      return;
+    }
+    excludedAt = currentUTCTimestamp;
+    exclusionReason = reason;
   }
 
   public void addRecallLog(RecallLog recallLog) {

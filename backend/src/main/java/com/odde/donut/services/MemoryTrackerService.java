@@ -16,6 +16,7 @@ import com.odde.donut.entities.repositories.ConversationRepository;
 import com.odde.donut.entities.repositories.MemoryTrackerRepository;
 import com.odde.donut.entities.repositories.RecallLogRepository;
 import com.odde.donut.entities.repositories.RecallPromptRepository;
+import com.odde.donut.exceptions.QuestionAnswerException;
 import com.odde.donut.factoryServices.EntityPersister;
 import java.sql.Timestamp;
 import java.util.List;
@@ -98,6 +99,17 @@ public class MemoryTrackerService {
       return isThresholdExceeded(memoryTracker, currentUTCTimestamp);
     }
     return false;
+  }
+
+  public RecallPrompt excludeAsAmbiguous(
+      RecallPrompt recallPrompt, String reason, Timestamp currentUTCTimestamp) {
+    Answer answer = recallPrompt.getAnswer();
+    if (answer == null) {
+      throw new QuestionAnswerException("The question is not answered");
+    }
+    answer.excludeAsAmbiguous(reason, currentUTCTimestamp);
+    entityPersister.save(answer);
+    return recallPrompt;
   }
 
   /** Persist a graded recall log, or CONFUSION when {@code grade} is null. */

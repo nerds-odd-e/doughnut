@@ -138,7 +138,13 @@ seed's observation provenance already states.
 
 ### 1. Exclude an answered attempt as ambiguous through the recall-prompt API
 Type: Behavior
-Status: planned
+Status: done
+Accepted proof (2026-10-13): `CURSOR_DEV=true nix develop -c pnpm backend:verify`
+→ BUILD SUCCESSFUL, 2786 tests, 0 failures; the five tests of
+`RecallPromptExcludeAsAmbiguousControllerTest` observe each promise below
+through `RecallPromptController.excludeAsAmbiguous`. The decision lives in
+`MemoryTrackerService.excludeAsAmbiguous`; an unanswered prompt is refused with
+`QuestionAnswerException`.
 Proof: `RecallPromptExcludeAsAmbiguousControllerTest`: an owner excludes an
 answered MCQ prompt with a reason → the returned `AnsweredQuestion.answer`
 carries `excludedAt`, `exclusionReason`, and the original `correct=false`;
@@ -387,6 +393,36 @@ overrun rule. Stop-safe: the story is complete.
 - Spelling attempts, other learners' prompts, and note content are untouched
   by design; no guard code is added for them.
 
+## Execution
+
+Story Branch Mode in
+`/Users/terryyin/git/doughnut/.worktrees/resolve-a-disputed-wrong-mark-after-the-learner`
+on `claude/resolve-a-disputed-wrong-mark-after-the-learner`, publishing to
+`origin` (trunk `main`). The claim `d3343096807098127dd596c0596b9ad66ae89c4e`
+was accepted on `main`.
+
 ## Learnings
 
-None beyond the preparation observations above.
+- Controller tests for this operation reuse `recallPrompt.requireMemoryTracker()`:
+  a second tracker for the same user and note violates
+  `uq_memory_tracker_user_note_type_property`, and clearing the persistence
+  context in setup detaches the current user.
+- A migration slice proves with `pnpm backend:verify` (test-DB migration plus
+  the whole suite) in place of `backend:test_only`.
+
+## Story obligations
+
+### G1. Exclusion recorded without schedule recomputation
+Reported: slice 1 — "the exclusion is recorded without schedule recomputation or readout changes (slices 3 and 4), as the plan states."
+Story clause: "Recompute the existing tracker's current scheduling state from the remaining valid history, using the original event times and the current FSRS policy."
+Disposition: receiving slice 3
+
+### G2. Excluded attempt still counted in readouts
+Reported: slice 1 — "the exclusion is recorded without schedule recomputation or readout changes (slices 3 and 4), as the plan states."
+Story clause: "Exclude that invalid attempt from evaluation and derived recall readouts."
+Disposition: receiving slice 4
+
+### G3. Route, request body, and serialized fields unobserved over HTTP
+Reported: slice 1 — "HTTP request binding of the `{reason}` JSON body and the route string: the controller is called directly, as in the neighbouring tests."
+Story clause: "The learner confirms → the attempt reads “Excluded — ambiguous question,” is not counted as failed or successful recall"
+Disposition: receiving slice 9

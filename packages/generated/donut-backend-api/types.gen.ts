@@ -306,14 +306,8 @@ export type SpellingQuestion = {
     notebook?: Notebook;
 };
 
-export type AnswerDto = {
-    choiceIndex?: number;
-    thinkingTimeMs?: number;
-    awayMs?: number;
-    awayCount?: number;
-    detourMs?: number;
-    detourCount?: number;
-    idleMs?: number;
+export type AmbiguousExclusionDto = {
+    reason?: string;
 };
 
 export type Answer = {
@@ -329,6 +323,8 @@ export type Answer = {
     idleMs?: number;
     matchedNoteId?: number;
     outcome?: 'ACCIDENTAL_MATCH' | 'OVERLAP';
+    excludedAt?: string;
+    exclusionReason?: string;
 };
 
 export type AnsweredQuestion = {
@@ -347,6 +343,16 @@ export type RecalledNote = {
     ancestorFolders?: Array<FolderTrailSegment>;
     propertyKey?: string;
     propertyValue?: string;
+};
+
+export type AnswerDto = {
+    choiceIndex?: number;
+    thinkingTimeMs?: number;
+    awayMs?: number;
+    awayCount?: number;
+    detourMs?: number;
+    detourCount?: number;
+    idleMs?: number;
 };
 
 export type AnswerSpellingDto = {
@@ -2005,6 +2011,24 @@ export type RegenerateResponses = {
 };
 
 export type RegenerateResponse = RegenerateResponses[keyof RegenerateResponses];
+
+export type ExcludeAsAmbiguousData = {
+    body: AmbiguousExclusionDto;
+    path: {
+        recallPrompt: number;
+    };
+    query?: never;
+    url: '/api/recall-prompts/{recallPrompt}/exclude-as-ambiguous';
+};
+
+export type ExcludeAsAmbiguousResponses = {
+    /**
+     * OK
+     */
+    200: AnsweredQuestion;
+};
+
+export type ExcludeAsAmbiguousResponse = ExcludeAsAmbiguousResponses[keyof ExcludeAsAmbiguousResponses];
 
 export type ContestData = {
     body?: never;

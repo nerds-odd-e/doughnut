@@ -726,6 +726,30 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/RecallPrompt"
+  /api/recall-prompts/{recallPrompt}/exclude-as-ambiguous:
+    post:
+      tags:
+      - recall-prompt-controller
+      operationId: excludeAsAmbiguous
+      parameters:
+      - name: recallPrompt
+        in: path
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AmbiguousExclusionDTO"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/AnsweredQuestion"
   /api/recall-prompts/{recallPrompt}/contest:
     post:
       tags:
@@ -4195,30 +4219,11 @@ components:
           type: string
         notebook:
           $ref: "#/components/schemas/Notebook"
-    AnswerDTO:
+    AmbiguousExclusionDTO:
       type: object
       properties:
-        choiceIndex:
-          type: integer
-          format: int32
-        thinkingTimeMs:
-          type: integer
-          format: int32
-        awayMs:
-          type: integer
-          format: int32
-        awayCount:
-          type: integer
-          format: int32
-        detourMs:
-          type: integer
-          format: int32
-        detourCount:
-          type: integer
-          format: int32
-        idleMs:
-          type: integer
-          format: int32
+        reason:
+          type: string
     Answer:
       type: object
       properties:
@@ -4258,6 +4263,11 @@ components:
           enum:
           - ACCIDENTAL_MATCH
           - OVERLAP
+        excludedAt:
+          type: string
+          format: date-time
+        exclusionReason:
+          type: string
       required:
       - id
     AnsweredQuestion:
@@ -4309,6 +4319,30 @@ components:
       required:
       - noteTopology
       - notebookId
+    AnswerDTO:
+      type: object
+      properties:
+        choiceIndex:
+          type: integer
+          format: int32
+        thinkingTimeMs:
+          type: integer
+          format: int32
+        awayMs:
+          type: integer
+          format: int32
+        awayCount:
+          type: integer
+          format: int32
+        detourMs:
+          type: integer
+          format: int32
+        detourCount:
+          type: integer
+          format: int32
+        idleMs:
+          type: integer
+          format: int32
     AnswerSpellingDTO:
       type: object
       properties:
