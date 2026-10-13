@@ -172,7 +172,13 @@ reads the new fields yet.
 
 ### 2. Rebuild a memory tracker's state by replaying its recall history
 Type: Structure
-Status: planned
+Status: done
+Accepted proof (2026-10-13): `CURSOR_DEV=true nix develop -c pnpm backend:test_only`
+→ BUILD SUCCESSFUL, 2788 tests, 0 failures;
+`MemoryTrackerRebuildFromRecallHistoryTest` observes both promises below.
+`RecallLog.recordStateBefore(tracker)` is the only writer of the cached
+columns and reads the log's own `recordedAt`; `MemoryTracker.rebuildFrom`
+delegates to `MemoryTrackerReplay`.
 Proof: an entity-level test in `backend/src/test/java/com/odde/donut/entities`
 builds a tracker, applies AGAIN, GOOD, Confusion, and HARD incrementally at
 chosen hours (persisting logs as `MemoryTrackerService.persistRecallLog`
@@ -409,6 +415,12 @@ was accepted on `main`.
   context in setup detaches the current user.
 - A migration slice proves with `pnpm backend:verify` (test-DB migration plus
   the whole suite) in place of `backend:test_only`.
+- `MemoryTracker.rebuildFrom` trusts the caller's order and realigns the passed
+  logs in place, so the caller supplies ascending `recordedAt` (id as the
+  tie-break) and saves tracker and logs. The existing ordered query,
+  `findAllByMemoryTracker_IdOrderByRecordedAtDescIdDesc`, is descending.
+  `RecallLog.getAnswer()` reaches the attempt and its `excludedAt`.
+- `MemoryTracker.java` is at 247 of 250 lines; additions there need room.
 
 ## Story obligations
 

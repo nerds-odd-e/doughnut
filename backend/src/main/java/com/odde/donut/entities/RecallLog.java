@@ -73,18 +73,23 @@ public class RecallLog extends EntityIdentifiedByIdOnly {
 
   @Column(name = "stability_before")
   @Getter
-  @Setter
   private Float stabilityBefore;
 
   @Column(name = "difficulty_before")
   @Getter
-  @Setter
   private Float difficultyBefore;
 
   @Column(name = "retrievability")
   @Getter
-  @Setter
   private Double retrievability;
+
+  /** Caches the memory state that {@code tracker} holds just before this event is applied. */
+  public void recordStateBefore(MemoryTracker tracker) {
+    elapsedHours = (int) tracker.elapsedHoursUntil(recordedAt);
+    stabilityBefore = tracker.getStability();
+    difficultyBefore = tracker.getDifficulty();
+    retrievability = tracker.retrievabilityAt(recordedAt);
+  }
 
   @JsonIgnore
   public boolean isConfusion() {
