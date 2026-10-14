@@ -437,9 +437,13 @@ assertions and its full backend rerun (same passing counts). Generated/frontend
 proof remains valid. Coordinator selective formatting passed. Server body proof
 is complete; browser acceptance and title application retain later ownership.
 
+Accepted atomic-body revision: `7211cc43252e39f8e92e1d46b4030321eb38b434`
+on the execution branch, suffix base `295589e9f1631ba6a0687ad8ea0ef037140e5e2c`;
+CI observation reused.
+
 ### 6. Accept an edited body and reopen its confirmed result
 Type: Behavior
-Status: planned
+Status: done
 Proof: Extend `e2e_test/features/messages/conversation_about_a_note.feature` with
 a mocked body suggestion → edited review → accept → open changed note → reopen
 accepted review journey. Mounted recall conversation drives the same operation
@@ -452,6 +456,33 @@ a lost response is recovered by reading/retrying the same proposal identity.
 Keep ordinary text, exclusion proposals, and standalone completion consumers
 working. Update `docs/recall-help.md` with the enduring reviewed-correction behavior.
 Estimate: 6–9 minutes plus runner startup wait.
+
+Execution evidence (2026-10-14): body Accept submits reviewed text and retained
+base through the atomic operation. Only confirmed server dispositions render;
+accepted value/revision remain inspectable after reopening and later edits.
+Same-route Open note refreshes the existing note store; a failed read preserves
+the accepted receipt. Inspected `ConversationInner.acceptCorrections.spec.ts`
+deferred confirmation, actual request identity/base, named navigation and close,
+later-edit reopening, same-ID lost-response retry, accepted read failure and
+readonly MCQ controls. Full `CURSOR_DEV=true nix develop -c pnpm frontend:test`
+passed: 352 files, 2,199 tests; both frontend typechecks passed on final content.
+`CURSOR_DEV=true nix develop -c pnpm cy:run --spec e2e_test/features/messages/conversation_about_a_note.feature,e2e_test/features/ai_generated_content/note_content_completion.feature`
+passed both specs/four scenarios at isolated origin 63203 and the same E2E schema,
+with runner-owned mocked OpenAI and real Donut acceptance. Both edited-body
+Accept/Open changed note/reopen confirmed journeys passed; pending close/reopen,
+unavailable AI and ordinary conversation/export remain covered. Initial fixture
+failures came from ordinary-reply stub precedence and a raw Markdown assumption;
+scoped the ordinary table to its scenario and observed the reviewed paragraph
+within the complete normalized receipt, then reran both features successfully.
+Enduring behavior is in `docs/recall-help.md#reviewed-note-corrections`.
+Independent refactor extracted the message bubble, preserving DOM/API/adjacency,
+and separated correction/refinement doc headings. Its conversation suite passed
+12 files/50 tests including all acceptance cases; both typechecks passed.
+Declaration-only Vite generation passed; after coordinator formatting, ordinary
+`CURSOR_DEV=true nix develop -c pnpm -C frontend exec vite build --emptyOutDir`
+passed including the checker. Other accepted boundaries remained unchanged.
+Body UI obligations are fulfilled; title controls and explicit stale recovery
+retain slices 7 and 8.
 
 ### 7. Apply reviewed title corrections through ordinary rename rules
 Type: Behavior
@@ -506,7 +537,7 @@ Disposition: proved by slice 3: note_content_completion.feature pending review/e
 ### G5. Existing generated-content acceptance journey
 Reported: slice 3 — "The final accepted correction journey remains an explicit interim obligation for slice 6"
 Story clause: "The author explicitly accepts or declines it; discussion and proposal generation alone do not change the note."
-Disposition: receiving slice 6
+Disposition: proved by slice 6: both mocked OpenAI Cypress features pass edited review/Accept/Open changed note/reopen retained receipt using the real acceptance API
 
 ### G6. Atomic acceptance operation
 Reported: slice 4 — "Acceptance remains slices 5–7."

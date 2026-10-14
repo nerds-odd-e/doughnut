@@ -168,3 +168,20 @@ Then(
     start.assumeConversationAboutNotePage().expectReviewedContent(content)
   }
 )
+
+When('I accept the reviewed content correction', () => {
+  start.assumeConversationAboutNotePage().acceptContentCorrection()
+})
+
+Then(
+  'the accepted content correction should retain {string}',
+  (content: string) => {
+    start
+      .assumeConversationAboutNotePage()
+      .expectAcceptedContentCorrection(content)
+  }
+)
+
+When('I open the corrected note', () => {
+  start.assumeConversationAboutNotePage().openCorrectionNote()
+})

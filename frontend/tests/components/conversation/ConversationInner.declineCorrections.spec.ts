@@ -48,7 +48,10 @@ it.each([noteConversation, recallConversation])(
     const wrapper = mountConversation(conversation)
     await flushPromises()
     const review = wrapper.find('[data-testid="conversation-note-correction"]')
-    await review.find("button").trigger("click")
+    await review
+      .findAll("button")
+      .find((button) => button.text() === "Decline")!
+      .trigger("click")
     expect(review.text()).toContain("Pending review")
     expect(decline).toHaveBeenCalledWith({ path: { correctionId: body.id } })
     confirm!(wrapSdkResponse(declined))
@@ -86,14 +89,20 @@ it("preserves edited input and offers retry when decline fails", async () => {
   await flushPromises()
   const review = wrapper.find('[data-testid="conversation-note-correction"]')
   await review.find("textarea").setValue("My review stays here")
-  await review.find("button").trigger("click")
+  await review
+    .findAll("button")
+    .find((button) => button.text() === "Decline")!
+    .trigger("click")
   await flushPromises()
   expect(review.text()).toContain("Could not decline. Try again.")
   expect(review.text()).toContain("Pending review")
   expect((review.find("textarea").element as HTMLTextAreaElement).value).toBe(
     "My review stays here"
   )
-  await review.find("button").trigger("click")
+  await review
+    .findAll("button")
+    .find((button) => button.text() === "Decline")!
+    .trigger("click")
   await flushPromises()
   expect(review.text()).toContain("Declined")
   wrapper.unmount()
@@ -109,7 +118,10 @@ it("lets a conversation participant decline under readonly note access", async (
   const wrapper = mountConversation(recallConversation)
   await flushPromises()
   const review = wrapper.find('[data-testid="conversation-note-correction"]')
-  await review.find("button").trigger("click")
+  await review
+    .findAll("button")
+    .find((button) => button.text() === "Decline")!
+    .trigger("click")
   await flushPromises()
   expect(review.text()).toContain("Declined")
   wrapper.unmount()

@@ -98,6 +98,24 @@ unread state.
 The shared modal stack lets the learner close a child refinement and return to
 help. Closing help preserves recall progress and returns focus to its opener.
 
+## Reviewed note corrections
+
+A content correction appears beside the exchange that proposed it, with the
+subject note, reason, current content, and editable proposed content. A note
+author can explicitly Accept the reviewed wording or Decline the proposal.
+Closing without deciding keeps the stored proposal pending; unsent editor
+changes are discarded when the conversation is reopened. Readers can decline
+a proposal under the conversation's existing access rules, while acceptance
+requires ordinary note edit rights.
+
+Acceptance publishes the reviewed body and retains its confirmed decision,
+reviewed wording, and Git revision together. Open note shows the subject note.
+Reopening the conversation keeps that original receipt, even after a later
+ordinary note edit. Failed or lost responses preserve the current input;
+retrying the same proposal recovers its recorded decision without publishing
+the correction again. Private discussion, reasons, and decisions stay in the
+conversation and do not change the recall attempt or schedule.
+
 ## Reviewed refinement
 
 Note refinement uses existing edit rights. For a multiple-choice conversation,

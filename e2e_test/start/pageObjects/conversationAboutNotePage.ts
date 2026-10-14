@@ -105,6 +105,39 @@ export class ConversationAboutNotePage {
     return this
   }
 
+  acceptContentCorrection() {
+    cy.get('[data-testid="conversation-note-correction"]').within(() => {
+      cy.findByRole('button', { name: 'Accept', exact: true }).click()
+    })
+    waitUntilAppIsNotBusy()
+    return this
+  }
+
+  expectAcceptedContentCorrection(content: string) {
+    cy.get('[data-testid="conversation-note-correction"]').within(() => {
+      cy.findByText('Accepted', { exact: true }).should('be.visible')
+      cy.get('[data-testid="accepted-reviewed-content"]')
+        .contains('p', content)
+        .should(($review) => {
+          expect($review.text().trim(), 'retained reviewed paragraph').to.equal(
+            content
+          )
+        })
+      cy.contains('Accepted revision:')
+        .invoke('text')
+        .should('match', /Accepted revision: [0-9a-f]{40}/)
+    })
+    return this
+  }
+
+  openCorrectionNote() {
+    cy.get('[data-testid="conversation-note-correction"]').within(() => {
+      cy.findByRole('button', { name: 'Open note', exact: true }).click()
+    })
+    waitUntilAppIsNotBusy()
+    return this
+  }
+
   exportConversation() {
     cy.get('.status-bar').should('not.exist')
     cy.findByRole('button', { name: 'Export conversation' }).click()

@@ -28,45 +28,14 @@
         :key="conversationMessage.id"
         class="mb-3"
       >
-      <div class="flex"
-        :class="{ 'justify-end': isCurrentUser(conversationMessage.sender?.id || 0) }"
-      >
-        <div
-          v-if="!isCurrentUser(conversationMessage.sender?.id || 0)"
-          class="message-avatar me-2"
-          :title="conversationMessage.sender?.name || 'AI Assistant'"
-        >
-          <template v-if="conversationMessage.sender?.id === undefined">
-            <Bot class="w-8 h-8" />
-          </template>
-          <template v-else>
-            <UserIcon class="w-8 h-8" />
-          </template>
-        </div>
-
-        <div
-          class="daisy-card py-2 px-3"
-          :class="[
-            isCurrentUser(conversationMessage.sender?.id || 0)
-              ? 'bg-primary text-primary-content'
-              : 'bg-base-200',
-            conversationMessage.sender?.id === undefined ? 'ai-assistant' : '',
-          ]"
-        >
-          <pre v-if="isCurrentUser(conversationMessage.sender?.id || 0)" class="user-message">{{ formatMessage(conversationMessage.message) }}</pre>
-          <div
-            v-else
-            :class="RICH_CONTENT_PROSE"
-            v-html="markdowntToHtml(formatMessage(conversationMessage.message))"
-          />
-        </div>
-      </div>
+        <ConversationMessageBubble :message="conversationMessage" :user="user" />
       <ConversationNoteCorrectionReview
         v-for="correction in corrections.filter((item) => item.sourceMessageId === conversationMessage.id)"
         :key="correction.id"
         :correction="correction"
         :user="user"
         @decided="onCorrectionDecided"
+        @open-note="$emit('close-dialog')"
       />
       </div>
 
@@ -95,12 +64,10 @@ import type {
   Conversation,
   ConversationNoteCorrection,
 } from "@generated/donut-backend-api"
-import { Bot, User as UserIcon } from "@lucide/vue"
 import ScrollTo from "@/components/commons/ScrollTo.vue"
+import ConversationMessageBubble from "./ConversationMessageBubble.vue"
 import ConversationNoteCorrectionReview from "./ConversationNoteCorrectionReview.vue"
 import ConversationTemplate from "./ConversationTemplate.vue"
-import markdownizer from "../form/markdownizer"
-import { RICH_CONTENT_PROSE } from "@/constants/richContentProse"
 
 const { conversation, user, initialAiReply, isMaximized } = defineProps<{
   conversation: Conversation
@@ -138,13 +105,6 @@ const scrollIndex = ref(0)
 const onAiResponseDone = () => {
   fetchConversationMessages()
 }
-
-const markdowntToHtml = (content?: string) =>
-  markdownizer.markdownToHtml(content)
-
-const formatMessage = (message: string) => message.replace(/^"|"$/g, "").trim()
-
-const isCurrentUser = (id: number): boolean => id === user?.id
 
 const fetchConversationMessages = async () => {
   const conversationId = conversation.id
@@ -228,23 +188,3 @@ const showDefaultMessages = computed(
       currentConversationMessages.value.length === 0)
 )
 </script>
-
-<style scoped>
-@reference "@/assets/daisyui.css";
-
-.message-avatar {
-  width: 32px;
-  height: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.user-message {
-  margin: 0;
-  white-space: pre-wrap;
-  word-wrap: break-word;
-  font-family: inherit;
-}
-
-</style>

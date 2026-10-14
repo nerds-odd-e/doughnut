@@ -14,7 +14,7 @@ Feature: Reviewing generated note content
     When I request to complete the content for the note "Taipei"
     Then I should see a notification of a bad request
 
-  Scenario: Reviewing and reopening a pending note content correction
+  Scenario: Reviewing and accepting a note content correction
     Given OpenAI will reply below for user messages:
       | user message                      | response type   | assistant reply                       |
       | Please complete the note content. | requires action | {"content": "It is a vigorous city.", "reason": "Completes the city description."} |
@@ -29,3 +29,10 @@ Feature: Reviewing generated note content
     Then the note content on the current page should be "It is a"
     When I start a conversation about this note
     Then I should see this run's pending content correction
+    When I revise the pending content correction to "Taipei is a lively city."
+    And I accept the reviewed content correction
+    Then the accepted content correction should retain "Taipei is a lively city."
+    When I open the corrected note
+    Then the note content on the current page should be "Taipei is a lively city."
+    When I start a conversation about this note
+    Then the accepted content correction should retain "Taipei is a lively city."

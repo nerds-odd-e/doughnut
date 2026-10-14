@@ -60,6 +60,20 @@ class ConversationNoteCorrectionBuilder extends Builder<ConversationNoteCorrecti
     return this
   }
 
+  acceptedBy(
+    user: User,
+    reviewedValue: string,
+    acceptedRevision: string,
+    decidedAt: string
+  ) {
+    this.data.decision = 'ACCEPTED'
+    this.data.decidedBy = user
+    this.data.decidedAt = decidedAt
+    this.data.reviewedValue = reviewedValue
+    this.data.acceptedRevision = acceptedRevision
+    return this
+  }
+
   do() {
     return this.data
   }

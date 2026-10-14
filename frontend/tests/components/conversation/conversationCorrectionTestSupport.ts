@@ -5,6 +5,7 @@ import helper, { mockSdkService, mockShowNote } from "@tests/helpers"
 import { resetInstance } from "@tests/helpers/aiReplyEventSourceTracker"
 import makeMe from "donut-test-fixtures/makeMe"
 import { vi } from "vitest"
+import type { Router } from "vue-router"
 
 export const user = makeMe.aUser.please()
 export const realm = makeMe.aNoteRealm
@@ -48,10 +49,14 @@ export const setupCorrections = () => {
   mockSdkService(ConversationMessageController, "markConversationAsRead", [])
 }
 
-export const mountConversation = (conversation = noteConversation) =>
+export const mountConversation = (
+  conversation = noteConversation,
+  router?: Router
+) =>
   helper
     .component(ConversationInner)
     .withCleanStorage()
+    .withRouter(router)
     .withCurrentUser(user)
     .withProps({ conversation, user })
     .mount()
