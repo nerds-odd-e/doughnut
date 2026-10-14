@@ -1,8 +1,6 @@
 import AiResponse from "@/components/conversations/AiResponse.vue"
-import { resetNoteStore } from "@/store/noteStore"
-import { useNoteStore } from "@/store/noteStore"
 import makeMe from "donut-test-fixtures/makeMe"
-import helper, { mockSdkService, mockShowNote } from "@tests/helpers"
+import helper, { mockSdkService } from "@tests/helpers"
 import {
   getLastInstance,
   resetInstance,
@@ -18,8 +16,6 @@ import type {
   AmbiguousQuestionExclusionProposal,
   AnsweredQuestion,
   Conversation,
-  Note,
-  NoteRealm,
 } from "@generated/donut-backend-api"
 
 export const simulateAiResponse = (content = "## I'm ChatGPT") => {
@@ -105,22 +101,6 @@ export const createToolCallChunk = (functionName: string, args: object) => {
   ]
 }
 
-export type AiResponseFixture = {
-  note: Note
-  noteRealm: NoteRealm
-  conversation: Conversation
-}
-
-export const setupAiResponseFixture = (content?: string): AiResponseFixture => {
-  const noteRealm =
-    content === undefined
-      ? makeMe.aNoteRealm.please()
-      : makeMe.aNoteRealm.content(content).please()
-  const note = noteRealm.note
-  const conversation = makeMe.aConversation.forANote(note).please()
-  return { note, noteRealm, conversation }
-}
-
 export const mountAiResponse = (conversation: Conversation) =>
   helper
     .component(AiResponse)
@@ -188,50 +168,22 @@ export const confirmTutorExclusionProposal = async (
 }
 
 export function useAiResponseMount() {
-  const noteStore = useNoteStore()
-  let note: Note
-  let noteRealm: NoteRealm
-  let conversation: Conversation
   let wrapper: ReturnType<typeof mountAiResponse>
 
-  const beforeEachMount = (content?: string) => {
-    resetNoteStore()
+  const beforeEachMount = () => {
     resetInstance()
-    mockShowNote()
-
-    const fixture = setupAiResponseFixture(content)
-    note = fixture.note
-    noteRealm = fixture.noteRealm
-    conversation = fixture.conversation
-    wrapper = mountAiResponse(conversation)
+    wrapper = mountAiResponse(makeMe.aConversation.please())
   }
 
   const afterEachReset = () => {
     resetInstance()
   }
 
-  const refreshNoteContent = (content: string) => {
-    noteRealm = makeMe.aNoteRealm.id(note.id).content(content).please()
-    note = noteRealm.note
-    noteStore.refreshNoteRealm(noteRealm)
-  }
-
   return {
     get wrapper() {
       return wrapper
     },
-    get note() {
-      return note
-    },
-    get noteRealm() {
-      return noteRealm
-    },
-    get conversation() {
-      return conversation
-    },
-    noteStore,
     beforeEachMount,
     afterEachReset,
-    refreshNoteContent,
   }
 }

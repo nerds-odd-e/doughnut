@@ -23,4 +23,7 @@ public class TitleReplacement {
           + Note.MAX_TITLE_LENGTH)
   @JsonProperty(required = true)
   public String newTitle;
+
+  @JsonPropertyDescription("Why this title correction helps the user.")
+  public String reason;
 }

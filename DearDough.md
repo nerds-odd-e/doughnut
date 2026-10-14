@@ -5,7 +5,7 @@ responses under observation live in the [watch list](https://github.com/terryyin
 Detailed observations, original releases and qualified inferences are retained
 in the linked Open Dough catalog. Unknown execution provenance remains unknown.
 
-- Highest allocated local number: 248. Removed numbers are never reused.
+- Highest allocated local number: 249. Removed numbers are never reused.
 - Full source recovery before this cleanup: `0a8878e98be76b8e92203515d8f4719489b24169:DearDough.md`.
 - Project-owned findings remain in [Donut Retrospective Findings](DonutRetrospectiveFindings.md); their ownership review is unchanged.
 
@@ -144,6 +144,14 @@ Former local code: DD-217. Former local code: DD-222. The slice time bound is ch
   - Evidence: implementation task durations reported by the host for plan `21d5534381:.planning/slice-plans/070-learner-confirmed-ambiguous-exclusion/PLAN.md`: slice 1 about 6 min, slice 3 about 7 min, slice 4 about 10 min, slice 5 about 8 min, slice 9 about 8 min, slice 10 about 8 min plus about 9 min after a return, against a 5-minute target and a 10-minute hard limit; each ran the whole backend suite one to three times at 1–2.5 min per run
   - Observed effect: every return was accepted at hand-back without re-sizing; no slice was stopped
   - Inference: the whole-suite proof command alone uses a large share of a 5-minute slice here, so the bound may not fit backend slices in this project; not measured against a split alternative
+
+- Execution: SEED-073#story-2 (first implementation commit 4347f39efdfd932c7bf5ffec578809bbc5c5dee4)
+  - Timestamp: unknown
+  - Tool: Codex
+  - Open Dough release: unknown
+  - Evidence: dashboard launch 21113129-0d3b-45bd-af3b-2dc6b9f95a31 on 2026-10-14; accept_title and refactor_title returned about 9 and 4 active minutes; stale_review and refactor_stale about 9 and 4; initial_review and refactor_initial about 8 and 3. The source PLAN at `6767cf279b7050860d1ef91019b3f42de2d4c0b1:.planning/slice-plans/003-reviewed-conversation-note-corrections/PLAN.md` includes implementation, proof and local cleanup under a 10-minute active bound.
+  - Observed effect: coordinator budgets were enforced per implementation/refactor agent; the serial estimates total about 13, 13 and 11 active minutes for those leaves, excluding reported test waits. Slice 9 was added before extending slice 8 implementation, but the complete leaf was not timed as one operation.
+  - Inference: reserve the mandatory independent refactor cost inside the leaf budget and track a single clock. These are self-reported estimates, not reconstructed exact timings; detailed earlier agent history is unavailable in the current review.
 
 <a id="odf-217"></a>
 
@@ -357,3 +365,16 @@ Adding the accessible name Close to the shared modal's outer dismissal collided 
   - Evidence: CI run 38485019305 attempt 1 job 115596456163 and run 38485210312 attempt 1 job 115597071740; associateWikidataDialog.ts lines 48 and 63 query button name Close; repair return records red mounted-dialog proof and four unchanged E2E features passing ten scenarios
   - Observed effect: a shared rendered-name change was published with consumers that had not been selected; two CI runs failed before the owned repair
   - Inference: whole-product searches for the newly introduced accessible name, including existing text-derived names, would have exposed the collision before publication; one occurrence
+
+## DD-249 — Full verification started before the intended edits settled
+
+Implementation launched required whole-suite checks while intended test or template edits were still changing. The completed result then needed a final run against the settled source. This records an agent sequencing deviation, not missing workflow guidance; later reruns caused by a newly discovered behavior gap remain necessary proof.
+
+### Occurrences
+- Execution: SEED-073#story-2 (first implementation commit 4347f39efdfd932c7bf5ffec578809bbc5c5dee4)
+  - Timestamp: unknown
+  - Tool: Codex
+  - Open Dough release: unknown
+  - Evidence: dashboard launch 21113129-0d3b-45bd-af3b-2dc6b9f95a31 on 2026-10-14; stale_review reported 2,850 backend tests passed, then a 2,851-test full rerun because the queued snapshot case was added after compile. initial_review reported a full frontend/typecheck run racing the pre-fix template, followed by final checks after the template correction. Slice 8 and slice 9 observations remain recoverable at `6767cf279b7050860d1ef91019b3f42de2d4c0b1:.planning/slice-plans/003-reviewed-conversation-note-corrections/PLAN.md`.
+  - Observed effect: one additional full backend run was needed for the late intended test, and the premature frontend/typecheck results could not validate the final source.
+  - Inference: finish the intended edits and focused red/green loop before launching the full required selection. No elapsed-time saving was measured; the later overlapping-read correction and its rerun are excluded from this sequencing finding.

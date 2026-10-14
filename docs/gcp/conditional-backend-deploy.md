@@ -26,6 +26,22 @@ the selected successful ancestor's available artifacts without rebuilding.
 
 ## Release application versions
 
+### Conversation-correction schema prerequisite
+
+Flyway runs on `ApplicationReadyEvent`, after the instance can serve requests.
+Before releasing code that reads `conversation_note_correction`, the release
+operator must release the compatible schema change separately and verify that
+Flyway version `300000354` succeeded on the target database. Then release the
+dependent code through the normal application release workflow.
+
+The schema-only source checkpoint is
+`4347f39efdfd932c7bf5ffec578809bbc5c5dee4`, containing
+[`V300000354__create_conversation_note_correction.sql`](../../backend/src/main/resources/db/migration/V300000354__create_conversation_note_correction.sql).
+The selected schema-only release source must meet the same main CI and artifact
+admission requirements below. Release operators own target migration verification.
+
+### Select and publish a version
+
 1. Choose exact commits on `main` and use increasing, immutable application
    versions. Multiple release tags may overlap. One non-canceling production
    concurrency group lets the active publication finish; a surviving queued tag

@@ -181,3 +181,11 @@ describe("ConversationInner", () => {
     })
   })
 })
+
+beforeEach(() => {
+  mockSdkService(
+    ConversationMessageController,
+    "getConversationCorrections",
+    []
+  )
+})

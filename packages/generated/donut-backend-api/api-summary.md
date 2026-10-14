@@ -199,10 +199,14 @@ Use this for endpoint lookup; open `sdk.gen.ts` or `types.gen.ts` only for exact
 - `startConversationAboutRecallPrompt`: POST `/api/conversation/recall-prompt/{recallPrompt}` -> `StartConversationAboutRecallPromptResponse` (request: `StartConversationAboutRecallPromptData`; path: recallPrompt; response body: Conversation)
 - `getConversationsAboutNote`: GET `/api/conversation/note/{note}` -> `GetConversationsAboutNoteResponse` (request: `GetConversationsAboutNoteData`; path: note; response body: Array<Conversation>)
 - `startConversationAboutNote`: POST `/api/conversation/note/{note}` -> `StartConversationAboutNoteResponse` (request: `StartConversationAboutNoteData`; path: note; body: string; response body: Conversation)
+- `declineCorrection`: POST `/api/conversation/corrections/{correctionId}/decline` -> `DeclineCorrectionResponse` (request: `DeclineCorrectionData`; path: correctionId; response body: ConversationNoteCorrection)
+- `acceptCorrection`: POST `/api/conversation/corrections/{correctionId}/accept` -> `AcceptCorrectionResponse` (request: `AcceptCorrectionData`; path: correctionId; body: ConversationCorrectionAcceptance; response body: ConversationNoteCorrection)
 - `markConversationAsRead`: PATCH `/api/conversation/{conversationId}/read` -> `MarkConversationAsReadResponse` (request: `MarkConversationAsReadData`; path: conversationId; response body: Array<ConversationMessage>)
 - `getConversation`: GET `/api/conversation/{conversationId}` -> `GetConversationResponse` (request: `GetConversationData`; path: conversationId; response body: Conversation)
 - `getConversationMessages`: GET `/api/conversation/{conversationId}/messages` -> `GetConversationMessagesResponse` (request: `GetConversationMessagesData`; path: conversationId; response body: Array<ConversationMessage>)
 - `exportConversation`: GET `/api/conversation/{conversationId}/export` -> `ExportConversationResponse` (request: `ExportConversationData`; path: conversationId; response body: Record<string, unknown>)
+- `getConversationCorrections`: GET `/api/conversation/{conversationId}/corrections` -> `GetConversationCorrectionsResponse` (request: `GetConversationCorrectionsData`; path: conversationId; response body: Array<ConversationNoteCorrection>)
+- `loadCurrentReview`: GET `/api/conversation/corrections/{correctionId}/current-review` -> `LoadCurrentReviewResponse` (request: `LoadCurrentReviewData`; path: correctionId; response body: ConversationCorrectionReview)
 - `getConversationsOfCurrentUser`: GET `/api/conversation/all` -> `GetConversationsOfCurrentUserResponse` (request: none; response body: Array<ConversationListItem>)
 
 ## Circle Controller

@@ -127,3 +127,11 @@ describe("Recall conversation reasoning", () => {
     wrapper.unmount()
   })
 })
+
+beforeEach(() => {
+  mockSdkService(
+    ConversationMessageController,
+    "getConversationCorrections",
+    []
+  )
+})

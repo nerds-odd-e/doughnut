@@ -54,3 +54,11 @@ it("shows the subject attempt as excluded once the learner confirms the tutor's 
   expect(excluded.text()).toContain("Excluded — ambiguous question")
   expect(excluded.text()).toContain(reason)
 })
+
+beforeEach(() => {
+  mockSdkService(
+    ConversationMessageController,
+    "getConversationCorrections",
+    []
+  )
+})

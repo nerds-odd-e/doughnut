@@ -124,3 +124,11 @@ it("continues spelling history help into ordinary authorized note refinement", a
   })
   expect(screen.getByText("Refinement layout:")).toBeDefined()
 })
+
+beforeEach(() => {
+  mockSdkService(
+    ConversationMessageController,
+    "getConversationCorrections",
+    []
+  )
+})

@@ -767,6 +767,29 @@ export type ConversationSubject = {
     recallPrompt?: AnsweredQuestion;
 };
 
+export type ConversationNoteCorrection = {
+    id: number;
+    note?: Note;
+    responseId?: string;
+    toolCallId?: string;
+    field?: 'CONTENT' | 'TITLE';
+    proposedValue?: string;
+    reason?: string;
+    baseRevision?: string;
+    decision?: 'PENDING' | 'DECLINED' | 'ACCEPTED';
+    reviewedValue?: string;
+    decidedBy?: User;
+    decidedAt?: string;
+    acceptedRevision?: string;
+    sourceMessageId?: number;
+};
+
+export type ConversationCorrectionAcceptance = {
+    reviewedValue: string;
+    baseRevision?: string;
+    referenceHandling?: 'UPDATE_VISIBLE_TEXT' | 'KEEP_VISIBLE_TEXT';
+};
+
 export type CircleJoiningByInvitation = {
     invitationCode: string;
 };
@@ -1300,6 +1323,11 @@ export type DailyProbeTodayDto = {
     completed: boolean;
 };
 
+export type ConversationCorrectionReview = {
+    noteRealm?: NoteRealm;
+    baseRevision?: string;
+};
+
 export type ConversationListItem = {
     id: number;
     subject: string;
@@ -1341,10 +1369,12 @@ export type DummyForGeneratingTypes = {
 
 export type NoteContentCompletion = {
     content: string;
+    reason?: string;
 };
 
 export type TitleReplacement = {
     newTitle: string;
+    reason?: string;
 };
 
 export type UserForListing = {
@@ -2824,6 +2854,42 @@ export type StartConversationAboutNoteResponses = {
 
 export type StartConversationAboutNoteResponse = StartConversationAboutNoteResponses[keyof StartConversationAboutNoteResponses];
 
+export type DeclineCorrectionData = {
+    body?: never;
+    path: {
+        correctionId: number;
+    };
+    query?: never;
+    url: '/api/conversation/corrections/{correctionId}/decline';
+};
+
+export type DeclineCorrectionResponses = {
+    /**
+     * OK
+     */
+    200: ConversationNoteCorrection;
+};
+
+export type DeclineCorrectionResponse = DeclineCorrectionResponses[keyof DeclineCorrectionResponses];
+
+export type AcceptCorrectionData = {
+    body: ConversationCorrectionAcceptance;
+    path: {
+        correctionId: number;
+    };
+    query?: never;
+    url: '/api/conversation/corrections/{correctionId}/accept';
+};
+
+export type AcceptCorrectionResponses = {
+    /**
+     * OK
+     */
+    200: ConversationNoteCorrection;
+};
+
+export type AcceptCorrectionResponse = AcceptCorrectionResponses[keyof AcceptCorrectionResponses];
+
 export type IndexData = {
     body?: never;
     path?: never;
@@ -4263,6 +4329,42 @@ export type ExportConversationResponses = {
 };
 
 export type ExportConversationResponse = ExportConversationResponses[keyof ExportConversationResponses];
+
+export type GetConversationCorrectionsData = {
+    body?: never;
+    path: {
+        conversationId: number;
+    };
+    query?: never;
+    url: '/api/conversation/{conversationId}/corrections';
+};
+
+export type GetConversationCorrectionsResponses = {
+    /**
+     * OK
+     */
+    200: Array<ConversationNoteCorrection>;
+};
+
+export type GetConversationCorrectionsResponse = GetConversationCorrectionsResponses[keyof GetConversationCorrectionsResponses];
+
+export type LoadCurrentReviewData = {
+    body?: never;
+    path: {
+        correctionId: number;
+    };
+    query?: never;
+    url: '/api/conversation/corrections/{correctionId}/current-review';
+};
+
+export type LoadCurrentReviewResponses = {
+    /**
+     * OK
+     */
+    200: ConversationCorrectionReview;
+};
+
+export type LoadCurrentReviewResponse = LoadCurrentReviewResponses[keyof LoadCurrentReviewResponses];
 
 export type GetConversationsOfCurrentUserData = {
     body?: never;

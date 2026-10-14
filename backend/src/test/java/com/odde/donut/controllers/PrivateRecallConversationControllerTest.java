@@ -35,6 +35,7 @@ class PrivateRecallConversationControllerTest extends ConversationMessageControl
 
   enum Channel {
     MESSAGES,
+    CORRECTIONS,
     SEND,
     EXPORT,
     AI_REPLY,
@@ -119,23 +120,16 @@ class PrivateRecallConversationControllerTest extends ConversationMessageControl
     assertThat(item.partnerName(), equalTo("Private recall help"));
   }
 
-  @Test
-  void authorCannotReadPrivateHelp() {
-    currentUser.setUser(author);
+  @ParameterizedTest
+  @EnumSource(OtherParticipant.class)
+  void notebookParticipantsCannotReadPrivateHelp(OtherParticipant participant) {
+    currentUser.setUser(participant == OtherParticipant.AUTHOR ? author : circleMember);
 
     UnexpectedNoAccessRightException exception =
         assertThrows(
             UnexpectedNoAccessRightException.class, () -> controller.getConversation(conversation));
 
     assertThat(exception.getMessage(), equalTo("It seems you cannot access this page."));
-  }
-
-  @Test
-  void circleMemberCannotReadPrivateHelp() {
-    currentUser.setUser(circleMember);
-
-    assertThrows(
-        UnexpectedNoAccessRightException.class, () -> controller.getConversation(conversation));
   }
 
   static Stream<Arguments> privateChannels() {
@@ -155,6 +149,7 @@ class PrivateRecallConversationControllerTest extends ConversationMessageControl
         () -> {
           switch (channel) {
             case MESSAGES -> controller.getConversationMessages(conversation);
+            case CORRECTIONS -> controller.getConversationCorrections(conversation);
             case SEND -> controller.replyToConversation("Hi", conversation);
             case EXPORT -> controller.exportConversation(conversation);
             case AI_REPLY -> controller.getAiReply(conversation);

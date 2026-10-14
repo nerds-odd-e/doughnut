@@ -16,6 +16,7 @@ erDiagram
     circle ||--o{ circle_user : "circle_id ON DELETE CASCADE"
     circle ||--o{ ownership : "circle_id ON DELETE CASCADE"
     conversation ||--o{ conversation_message : "conversation_id ON DELETE CASCADE"
+    conversation_message ||--o{ conversation_note_correction : "source_message_id ON DELETE CASCADE"
     folder ||--o{ folder : "parent_folder_id ON DELETE RESTRICT"
     folder ||--o{ "note" : "folder_id ON DELETE RESTRICT"
     folder ||--o{ notebook_attachment : "folder_id ON DELETE RESTRICT"
@@ -26,6 +27,7 @@ erDiagram
     "note" ||--o{ assimilation_sequence_skip : "note_id ON DELETE CASCADE"
     "note" ||--o{ authored_note_reference : "source_note_id ON DELETE CASCADE"
     "note" ||--o{ conversation : "note_id ON DELETE CASCADE"
+    "note" ||--o{ conversation_note_correction : "note_id ON DELETE CASCADE"
     "note" ||--o{ mcq : "note_id ON DELETE CASCADE"
     "note" ||--o{ memory_tracker : "note_id ON DELETE CASCADE"
     "note" ||--o{ note_alias_index : "note_id ON DELETE CASCADE"
@@ -53,6 +55,7 @@ erDiagram
     "user" ||--o{ circle_user : "user_id ON DELETE CASCADE"
     "user" ||--o{ conversation : "conversation_initiator_id ON DELETE NO ACTION"
     "user" ||--o{ conversation_message : "sender ON DELETE CASCADE"
+    "user" ||--o{ conversation_note_correction : "decided_by ON DELETE SET NULL"
     "user" ||--o{ daily_probe : "user_id ON DELETE CASCADE"
     "user" ||--o{ memory_tracker : "user_id ON DELETE CASCADE"
     "user" ||--o{ note_creator : "user_id ON DELETE CASCADE"
@@ -128,6 +131,12 @@ erDiagram
         int id PK
         int conversation_id FK
         int sender FK
+    }
+    conversation_note_correction {
+        int id PK
+        int source_message_id FK
+        int note_id FK
+        int decided_by FK
     }
     daily_probe {
         int id PK

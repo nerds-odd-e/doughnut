@@ -95,3 +95,11 @@ it("shows the history attempt as excluded and the corrected next recall time onc
   )
   expect(document.querySelector("dialog")!.open).toBe(true)
 })
+
+beforeEach(() => {
+  mockSdkService(
+    ConversationMessageController,
+    "getConversationCorrections",
+    []
+  )
+})

@@ -201,3 +201,11 @@ it.each(["conversation close", "Escape", "nested refinement then Escape"])(
     expect(document.activeElement).toBe(entry.element)
   }
 )
+
+beforeEach(() => {
+  mockSdkService(
+    ConversationMessageController,
+    "getConversationCorrections",
+    []
+  )
+})

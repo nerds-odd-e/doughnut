@@ -163,6 +163,7 @@ class NotebookGitDeletionThenRecreationControllerTest extends NotebookGitControl
               .please();
           makeMe
               .aConversation()
+              .withNoteCorrection()
               .forANote(noteRepository.findById(note.getId()).orElseThrow())
               .please();
         });

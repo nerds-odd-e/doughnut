@@ -108,3 +108,11 @@ it("retains unread replies when fetching a note conversation fails", async () =>
   expect(messageCenter.unreadMessages).toEqual([reply, unrelated])
   wrapper.unmount()
 })
+
+beforeEach(() => {
+  mockSdkService(
+    ConversationMessageController,
+    "getConversationCorrections",
+    []
+  )
+})

@@ -34,7 +34,11 @@ class NoteControllerPermanentDeleteTests extends NoteDependentRowsControllerTest
         .forMemoryTracker(makeMe.aMemoryTrackerFor(cells).please())
         .withMcqForNote(cells)
         .please();
-    makeMe.aConversationMessage(makeMe.aConversation().forANote(cells).please()).please();
+    makeMe
+        .aConversationNoteCorrection(
+            makeMe.aConversationMessage(makeMe.aConversation().forANote(cells).please()).please())
+        .acceptedBy(currentUser.getUser())
+        .please();
     Note peer = makeMe.aNote("Atoms").folder(trashedBiology).please();
     Note referrer = makeMe.aNote("Referrer").underSameNotebookAs(cells).please();
     authorReferencingContent(referrer, REFERRER_CONTENT);

@@ -3,11 +3,13 @@ package com.odde.donut.services;
 import com.odde.donut.controllers.dto.ConversationListItem;
 import com.odde.donut.entities.Conversation;
 import com.odde.donut.entities.ConversationMessage;
+import com.odde.donut.entities.ConversationNoteCorrection;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Ownership;
 import com.odde.donut.entities.RecallPrompt;
 import com.odde.donut.entities.User;
 import com.odde.donut.entities.repositories.ConversationMessageRepository;
+import com.odde.donut.entities.repositories.ConversationNoteCorrectionRepository;
 import com.odde.donut.entities.repositories.ConversationRepository;
 import com.odde.donut.entities.repositories.RecallPromptRepository;
 import com.odde.donut.testability.TestabilitySettings;
@@ -28,6 +30,7 @@ public class ConversationService {
   private final ConversationRepository conversationRepository;
   private final ConversationMessageRepository conversationMessageRepository;
   private final RecallPromptRepository recallPromptRepository;
+  private final ConversationNoteCorrectionRepository correctionRepository;
 
   private Conversation initializeConversation(User initiator) {
     Conversation conversation = new Conversation();
@@ -111,6 +114,35 @@ public class ConversationService {
     conversationMessage.setCreatedAt(currentUTCTimestamp);
 
     return conversationMessageRepository.save(conversationMessage);
+  }
+
+  @Transactional
+  public void retainAiReply(
+      Conversation conversation, String content, List<ConversationNoteCorrection> corrections) {
+    if (!content.isEmpty() || !corrections.isEmpty()) {
+      ConversationMessage assistant = addMessageToConversation(conversation, null, content);
+      corrections.forEach(correction -> correction.setSourceMessage(assistant));
+    }
+    correctionRepository.saveAll(corrections);
+  }
+
+  public List<ConversationNoteCorrection> getCorrections(Conversation conversation) {
+    return correctionRepository.findBySourceMessage_ConversationOrderByIdAsc(conversation);
+  }
+
+  public ConversationNoteCorrection getCorrectionForUpdate(Integer id) {
+    return correctionRepository.findByIdForUpdate(id).orElseThrow();
+  }
+
+  public ConversationNoteCorrection declineCorrection(
+      ConversationNoteCorrection correction, User participant) {
+    if (correction.getDecision() == ConversationNoteCorrection.Decision.PENDING) {
+      correction.setDecision(ConversationNoteCorrection.Decision.DECLINED);
+      correction.setDecidedBy(participant);
+      correction.setDecidedAt(testabilitySettings.getCurrentUTCTimestamp());
+      correctionRepository.save(correction);
+    }
+    return correction;
   }
 
   public void markConversationAsRead(Conversation conversation, User user) {

@@ -17,7 +17,6 @@
     <ToolCallHandler
       v-if="currentSuggestion"
       :suggestion="currentSuggestion"
-      :note="currentNote"
       :recall-prompt-id="conversation.subject?.recallPrompt?.id"
       @resolved="handleToolCallResolved"
       @rejected="handleToolCallRejected"
@@ -78,7 +77,9 @@ const toolCallResolver = ref<{
   reject: (error: Error) => void
 } | null>(null)
 
-const currentSuggestion = ref<Suggestion | undefined>()
+const currentSuggestion = ref<
+  Extract<Suggestion, { suggestionType: "exclusion" | "unknown" }> | undefined
+>()
 
 const scrollIndex = computed(
   () =>
@@ -109,6 +110,12 @@ const createAiActionContext = (): AiActionContext => ({
     currentAiReply.value = undefined
   },
   async handleSuggestion(suggestion: Suggestion) {
+    if (
+      suggestion.suggestionType === "completion" ||
+      suggestion.suggestionType === "title"
+    ) {
+      return { status: "pending" }
+    }
     currentSuggestion.value = suggestion
     return new Promise<ToolCallResult>((resolve, reject) => {
       toolCallResolver.value = { resolve, reject }
@@ -130,8 +137,6 @@ const handleToolCallRejected = (error: Error) => {
   toolCallResolver.value?.reject(error)
   clearToolCallState()
 }
-
-const currentNote = computed(() => conversation.subject?.note)
 
 const getAiReply = async () => {
   const states = createAiReplyStates(createAiActionContext())
@@ -187,36 +192,4 @@ watch(
   border-radius: 0.25rem;
 }
 
-.user-message {
-  margin: 0;
-  white-space: pre-wrap;
-  word-wrap: break-word;
-  font-family: inherit;
-}
-
-.completion-text {
-  font-style: italic;
-  color: #666;
-}
-
-.title-suggestion {
-  font-style: italic;
-  color: #666;
-  font-weight: bold;
-}
-
-.unknown-request {
-  font-family: monospace;
-  background-color: #f8f9fa;
-  padding: 0.5rem;
-  border-radius: 0.25rem;
-  white-space: pre-wrap;
-  word-wrap: break-word;
-}
-
-.unknown-request pre {
-  white-space: pre-wrap;
-  word-wrap: break-word;
-  margin: 0;
-}
 </style>

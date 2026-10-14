@@ -98,6 +98,37 @@ unread state.
 The shared modal stack lets the learner close a child refinement and return to
 help. Closing help preserves recall progress and returns focus to its opener.
 
+## Reviewed note corrections
+
+A content or title correction appears beside the exchange that proposed it, with
+the subject note, reason, current value, and editable proposed value. A note
+author can explicitly Accept the reviewed wording or Decline the proposal.
+Closing without deciding keeps the stored proposal pending; unsent editor
+changes are discarded when the conversation is reopened. Readers can decline
+a proposal under the conversation's existing access rules, while acceptance
+requires ordinary note edit rights.
+
+Acceptance publishes the reviewed content or title and retains its confirmed decision,
+reviewed wording, and Git revision together. Open note shows the subject note.
+Reopening the conversation keeps that original receipt, even after a later
+ordinary note edit. Failed or lost responses preserve the current input;
+retrying the same proposal recovers its recorded decision without publishing
+the correction again. Private discussion, reasons, and decisions stay in the
+conversation and do not change the recall attempt or schedule. Title acceptance
+uses ordinary title validation. When renaming a linked note, choose whether to
+update or keep visible wiki reference text before accepting.
+
+Accept becomes available after the current note loads. If that read fails,
+retry loading current content; your edited wording stays available. The review
+keeps the content it loaded while you decide what to submit.
+
+If another edit advances the notebook while a correction is pending, Accept
+refuses the stale review and keeps your edited wording. Choose **Load current
+content** to see the current note and renew the review's base. Your wording
+stays in the editor; inspect it against the current note, then choose **Accept**
+again. A failed refresh keeps the previous base and your input so you can retry.
+The original proposal and explanation remain available throughout review.
+
 ## Reviewed refinement
 
 Note refinement uses existing edit rights. For a multiple-choice conversation,

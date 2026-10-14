@@ -100,3 +100,11 @@ describe("Recall help refinement handoff", () => {
     expect(screen.getByText("Refinement layout:")).toBeDefined()
   })
 })
+
+beforeEach(() => {
+  mockSdkService(
+    ConversationMessageController,
+    "getConversationCorrections",
+    []
+  )
+})
