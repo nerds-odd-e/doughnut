@@ -6,8 +6,6 @@ Make deliberately captured knowledge more useful through learning and refinement
 
 ## Taken
 
-- [Observe reviewed conversation note corrections](seeds/SEED-073-learning-refinement-and-retrieval.md#manual-reviewed-correction-evaluation) — SEED-073#manual-reviewed-correction-evaluation
-
 ## Backlog list
 
 - [Generate focus-note questions with relevant supporting passages](seeds/SEED-007-per-concept-prompt-splitting-single-note-qg.md#story-1) — SEED-007#story-1

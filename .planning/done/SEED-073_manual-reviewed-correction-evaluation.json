@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 1,
+  "identity": "SEED-073#manual-reviewed-correction-evaluation",
+  "title": "Observe reviewed conversation note corrections",
+  "completedAt": "2026-10-14T11:39:51.339Z",
+  "developer": "Terry Yin",
+  "agent": "Shunka-chan",
+  "host": "codex"
+}

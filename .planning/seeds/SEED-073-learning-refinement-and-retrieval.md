@@ -253,31 +253,6 @@ external-agent access. Keep the existing workflows usable at every stopping
 point. The separately queued capability experiment can use a current notebook
 checkout and is neither a supplier nor a consumer blocking this epic.
 
-<a id="manual-reviewed-correction-evaluation"></a>
-
-### Observe reviewed conversation note corrections
-
-**Identity:** SEED-073#manual-reviewed-correction-evaluation
-```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"unselected"}
-```
-
-**Goal:** Observe the delivered “Save a useful chat clarification as a reviewed note correction” journeys within the owner's 30-minute manual-testing budget.
-
-**Scope:** Manual observation only. Recover the completed story from Git and current recall help; cover direct-note and MCQ content/title proposals, pending/declined/accepted decisions, durable receipts, stale-review recovery, and existing audience/edit rights. No diagnosis, product repair, or permanent test changes. Record material coverage gaps when time or supported setup prevents observation.
-
-**Known expectations:** Explicit reviewed acceptance publishes the exact wording with a stable revision receipt; proposals, decline, and closing preserve authored content. Stale or failed reviews preserve input and permit explicit recovery. Private review evidence and recall state retain their existing ownership and meaning.
-
-**Session plan:** Preparation 7 minutes; breadth 10 minutes; selective depth 8 minutes; confirmation and cleanup 5 minutes. Prioritize unintended publication, lost wording, durable receipts, and stale review. Use isolated held E2E services with deterministic model replies when supported.
-
-**Observed outcome (2026-10-14):** Bounded browser and public-HTTP observation found one title-refresh discrepancy. Expected: after accepting a reviewed title, the visible subject-note title is consistent. Actual: the heading and wiki links use the accepted title, while the sidebar keeps the previous title across in-app navigation until a full reload. Reproduced with both reference-handling choices: “Japan geography” → “Japan prefectures — reviewed”, then “Japan prefectures — reviewed” → “Japan’s 47 prefectures”. The screenshot `manual-correction-sidebar.jpg` below shows the second mismatch. Reload refreshed the sidebar. No diagnosis or repair was performed.
-
-**Coverage:** Direct-note body and title reviews; current and proposed values, reasons and originating messages; edited acceptance; pending state across closing (unsent edits discarded); durable decline; ordinary invalid-title refusal preserving input; both wiki-reference choices; stale title acceptance refusal after an ordinary body edit, draft preservation, explicit current-note reload and renewed acceptance; original body receipt after later editing and renaming; MCQ-help content acceptance and Messages reopening; Open note; failed browser save preserving input; browser retry recovering an independently recorded acceptance with the original revision. Public HTTP snapshots showed unchanged MCQ answer, recall history, tracker identity, stability, difficulty, recall count, last-recall and due times. A foreign learner received 403 for private conversation, messages, corrections and current review. With the owner's explicit local-fixture permission, a subscribed read-only learner could discuss and decline, while acceptance returned 403.
-
-**Evidence:** Browser-visible accepted body revisions were `ff2ba6d0ae2e9fba9ed6b24f76527416d9be3667` (direct note) and `52bfcaa9dd22ae3a4664599c2309e7f27809207e` (MCQ help). The latter stayed the same on browser retry. Dated persisted before/after snapshots, the accepted receipt, and screenshots are in `.planning/manual-testing-evidence/manual-reviewed-correction/` in this recoverable revision.
-
-**Provenance and limitations:** Session started 2026-10-14 20:18 JST at product base `5fe875a590549806a42441fa2e721358c02fb5c6`; app health reported E2E profile and tracking claim `1a4ae86bd234f9181d14a0a70fed00bbc0d102e3`. Created owned workspace `/Users/terryyin/git/doughnut/.worktrees/manual-reviewed-correction`, branch `codex/manual-reviewed-correction`; origin/integration `/Users/terryyin/git/doughnut`; target `origin/main`. Origin `http://127.0.0.1:59036`, isolated schema `doughnut_e2e_wt_fc4f10a05f624237b6a9ab1b161cccf2`; seeded `old_learner` and `another_old_learner`. Supported held E2E services and the repository's private Mountebank lifecycle supplied deterministic Responses tool streams. A restart supplied a dummy SDK key; testability injected notes/MCQ and a disposable SQL prompt tied MCQ 1 to tracker 1. The missing-key request and the initial MCQ-generation/mock mismatch were setup failures, not acceptance failures. Browser networking was blocked only for correction 4 acceptance to observe failure, then restored; a public-API acceptance followed by browser retry represented recovery after an unobserved response. No real model calls, model-quality assessment, production data, product changes, or permanent tests. Failed current-note loading/retry was not exercised.
-
 The backlog owns global priority. Within this epic: resolve an actual learning
 difficulty, retain a useful note correction, improve question evidence through
 SEED-007, then improve body search, external-agent evidence access, and cited
