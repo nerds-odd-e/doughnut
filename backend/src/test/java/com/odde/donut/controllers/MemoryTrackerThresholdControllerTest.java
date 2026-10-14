@@ -62,20 +62,6 @@ class MemoryTrackerThresholdControllerTest extends MemoryTrackerControllerTestBa
   }
 
   @Test
-  void anExcludedAgainDoesNotCountTowardThreshold() throws UnexpectedNoAccessRightException {
-    Note note = ownedNote();
-    MemoryTracker tracker = ownedTracker(note);
-    Timestamp day1 = makeMe.aTimestamp().of(1, 8).fromShanghai().please();
-    addRecallLogs(tracker, Grade.AGAIN, 4, day1);
-    testabilitySettings.timeTravelTo(day1);
-    answerWronglyThenExcludeAsAmbiguous(tracker, note);
-
-    var result = controller.getThresholdExceeded(tracker);
-    assertThat(result.wrongCount(), equalTo(4));
-    assertThat(result.thresholdExceeded(), equalTo(false));
-  }
-
-  @Test
   void againLogsOlderThanFourteenDaysDoNotCount() throws UnexpectedNoAccessRightException {
     MemoryTracker tracker = ownedTracker();
     Timestamp now = makeMe.aTimestamp().of(15, 8).fromShanghai().please();

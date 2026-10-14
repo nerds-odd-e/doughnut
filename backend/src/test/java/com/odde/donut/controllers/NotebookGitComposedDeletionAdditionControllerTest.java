@@ -72,7 +72,6 @@ class NotebookGitComposedDeletionAdditionControllerTest extends NotebookGitContr
               .please();
           makeMe
               .aConversation()
-              .withNoteCorrection()
               .forANote(noteRepository.findById(deleted.getId()).orElseThrow())
               .please();
           makeMe.authorReferencingContent(

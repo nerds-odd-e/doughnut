@@ -1,22 +1,19 @@
 package com.odde.donut.controllers;
 
+import com.odde.donut.controllers.dto.AnswerDTO;
 import com.odde.donut.controllers.dto.AnswerSpellingDTO;
 import com.odde.donut.controllers.dto.Randomization;
 import com.odde.donut.entities.MemoryTracker;
 import com.odde.donut.entities.Note;
-import com.odde.donut.entities.RecallLog;
 import com.odde.donut.entities.RecallPrompt;
-import com.odde.donut.entities.repositories.RecallLogRepository;
 import com.odde.donut.services.ai.QuestionEvaluation;
 import com.odde.donut.testability.OpenAiStructuredResponseMock;
-import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 
 abstract class RecallPromptControllerTestBase extends ControllerTestBase {
   @Autowired RecallPromptController controller;
   @Autowired MemoryTrackerController memoryTrackerController;
-  @Autowired RecallLogRepository recallLogRepository;
 
   OpenAiStructuredResponseMock openAiStructuredResponseMock;
 
@@ -61,13 +58,10 @@ abstract class RecallPromptControllerTestBase extends ControllerTestBase {
     return makeMe.aMemoryTrackerBy(makeMe.aUser().please()).please();
   }
 
-  /** The tracker's recall logs as the database holds them, oldest first. */
-  List<RecallLog> persistedLogs(MemoryTracker tracker) {
-    makeMe.entityPersister.flush();
-    List<RecallLog> logs =
-        recallLogRepository.findAllByMemoryTracker_IdOrderByRecordedAtAscIdAsc(tracker.getId());
-    logs.forEach(makeMe::refresh);
-    return logs;
+  AnswerDTO choiceAnswer(int choiceIndex) {
+    AnswerDTO dto = new AnswerDTO();
+    dto.setChoiceIndex(choiceIndex);
+    return dto;
   }
 
   AnswerSpellingDTO spellingAnswer(String answer) {

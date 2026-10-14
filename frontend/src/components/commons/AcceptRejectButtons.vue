@@ -13,10 +13,9 @@
         @click="$emit('accept')"
         :disabled="disabled"
       >
-        {{ acceptLabel }}
+        Accept
       </button>
       <button
-        v-if="!hideSkip"
         class="daisy-btn daisy-btn-outline daisy-btn-secondary daisy-btn-sm"
         @click="$emit('skip')"
         :disabled="disabled"
@@ -28,19 +27,16 @@
         @click="$emit('cancel')"
         :disabled="disabled"
       >
-        {{ cancelLabel }}
+        Cancel
       </button>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-const { acceptLabel = "Accept", cancelLabel = "Cancel" } = defineProps<{
+defineProps<{
   disabled?: boolean
   hideAccept?: boolean
-  hideSkip?: boolean
-  acceptLabel?: string
-  cancelLabel?: string
 }>()
 
 defineEmits<{

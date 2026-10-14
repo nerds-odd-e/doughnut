@@ -7,7 +7,6 @@ import com.odde.donut.entities.DisplayName;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.User;
 import com.odde.donut.entities.repositories.NoteRepository;
-import com.odde.donut.entities.repositories.NotebookGitBindingRepository;
 import com.odde.donut.exceptions.ApiException;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.donut.factoryServices.EntityPersister;
@@ -36,7 +35,6 @@ public class WebNoteEditService {
   private final NoteReferenceService noteReferenceService;
   private final WikiLinkRewriteService wikiLinkRewriteService;
   private final NoteTitleNameRule noteTitleNameRule;
-  private final NotebookGitBindingRepository bindingRepository;
 
   public WebNoteEditService(
       AcceptedWebChangeService acceptedWebChangeService,
@@ -46,8 +44,7 @@ public class WebNoteEditService {
       EntityPersister entityPersister,
       NoteReferenceService noteReferenceService,
       WikiLinkRewriteService wikiLinkRewriteService,
-      NoteTitleNameRule noteTitleNameRule,
-      NotebookGitBindingRepository bindingRepository) {
+      NoteTitleNameRule noteTitleNameRule) {
     this.acceptedWebChangeService = acceptedWebChangeService;
     this.noteRepository = noteRepository;
     this.authorizationService = authorizationService;
@@ -56,40 +53,10 @@ public class WebNoteEditService {
     this.noteReferenceService = noteReferenceService;
     this.wikiLinkRewriteService = wikiLinkRewriteService;
     this.noteTitleNameRule = noteTitleNameRule;
-    this.bindingRepository = bindingRepository;
   }
 
   public Note saveTitle(
       Integer noteId, Integer notebookId, NoteUpdateTitleDTO titleDTO, Timestamp updatedAt)
-      throws UnexpectedNoAccessRightException {
-    return editTitle(
-        noteId, notebookId, titleDTO, note -> renameTitle(note, titleDTO, updatedAt), updatedAt);
-  }
-
-  public Note saveReviewedTitle(
-      Integer noteId,
-      Integer notebookId,
-      NoteUpdateTitleDTO titleDTO,
-      String expectedRevision,
-      Timestamp updatedAt)
-      throws UnexpectedNoAccessRightException {
-    return editTitle(
-        noteId,
-        notebookId,
-        titleDTO,
-        note -> {
-          requireReviewedRevision(notebookId, expectedRevision);
-          renameTitle(note, titleDTO, updatedAt);
-        },
-        updatedAt);
-  }
-
-  private Note editTitle(
-      Integer noteId,
-      Integer notebookId,
-      NoteUpdateTitleDTO titleDTO,
-      Consumer<Note> mutation,
-      Timestamp updatedAt)
       throws UnexpectedNoAccessRightException {
     Set<Integer> notebookIds =
         titleDTO.getReferenceHandling() == null
@@ -100,7 +67,7 @@ public class WebNoteEditService {
         noteId,
         notebookId,
         notebookIds,
-        mutation,
+        note -> renameTitle(note, titleDTO, updatedAt),
         note -> "Edit note title: " + note.getTitle(),
         updatedAt);
   }
@@ -145,36 +112,6 @@ public class WebNoteEditService {
         note -> authoredNoteDocumentPersistence.persist(note, document, updatedAt),
         note -> "Edit note content: " + note.getTitle(),
         updatedAt);
-  }
-
-  public Note saveReviewedContent(
-      Integer noteId,
-      Integer notebookId,
-      AuthoredNoteDocument document,
-      String expectedRevision,
-      Timestamp updatedAt)
-      throws UnexpectedNoAccessRightException {
-    return edit(
-        noteId,
-        notebookId,
-        note -> {
-          requireReviewedRevision(notebookId, expectedRevision);
-          authoredNoteDocumentPersistence.persist(note, document, updatedAt);
-        },
-        note -> "Edit note content: " + note.getTitle(),
-        updatedAt);
-  }
-
-  private void requireReviewedRevision(Integer notebookId, String expectedRevision) {
-    String currentRevision =
-        bindingRepository
-            .findByNotebook_Id(notebookId)
-            .map(binding -> binding.getAcceptedGitObjectId())
-            .orElse(null);
-    if (!Objects.equals(currentRevision, expectedRevision)) {
-      throw new ResponseStatusException(
-          HttpStatus.CONFLICT, "This review is stale. Load the current note and review again.");
-    }
   }
 
   public Note edit(

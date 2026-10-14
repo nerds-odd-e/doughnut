@@ -79,18 +79,6 @@ const assumeMemoryTrackerPage = () => {
       )
       return assumeMemoryTrackerPage()
     },
-    expectNextRecallAtAssimilationTime() {
-      expectMemoryTrackerPage()
-      labeledPair('Assimilated Time:', 'Next Recall Time:').then(
-        ({ first: assimilatedTime, second: nextRecallTime }) => {
-          expect(
-            nextRecallTime,
-            `Expected Next Recall Time (${nextRecallTime}) to equal Assimilated Time (${assimilatedTime})`
-          ).to.equal(assimilatedTime)
-        }
-      )
-      return assumeMemoryTrackerPage()
-    },
     expectStability(stability: number) {
       expectMemoryTrackerPage()
       expectLabeledValue('Stability:', String(stability))

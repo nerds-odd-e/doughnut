@@ -1,6 +1,6 @@
 @usingMockedOpenAiService
-Feature: Reviewing generated note content
-  As a note author, I want to inspect and edit a generated correction in its conversation.
+Feature: Note content completion
+  As a learner, I want to complete note content with OpenAI so I can finish drafting faster.
 
   Background:
     Given I am logged in as an existing user
@@ -14,25 +14,14 @@ Feature: Reviewing generated note content
     When I request to complete the content for the note "Taipei"
     Then I should see a notification of a bad request
 
-  Scenario: Reviewing and accepting a note content correction
+  Scenario: Accepting a suggested note content completion
     Given OpenAI will reply below for user messages:
       | user message                      | response type   | assistant reply                       |
-      | Please complete the note content. | requires action | {"content": "It is a vigorous city.", "reason": "Completes the city description."} |
+      | Please complete the note content. | requires action | {"content": "It is a vigorous city."} |
     When I request to complete the content for the note "Taipei"
-    Then I should see this run's pending content correction
+    Then I should see the suggested completion
     And my OpenAI mock still records only my request marker
     And I keep my OpenAI mock configured across the other worktree's mock reset
     Then my OpenAI mock still records only my request marker
-    When I revise the pending content correction to "Taipei is a lively city."
-    Then the pending content correction should contain "Taipei is a lively city."
-    When I close the conversation
-    Then the note content on the current page should be "It is a"
-    When I start a conversation about this note
-    Then I should see this run's pending content correction
-    When I revise the pending content correction to "Taipei is a lively city."
-    And I accept the reviewed content correction
-    Then the accepted content correction should retain "Taipei is a lively city."
-    When I open the corrected note
-    Then the note content on the current page should be "Taipei is a lively city."
-    When I start a conversation about this note
-    Then the accepted content correction should retain "Taipei is a lively city."
+    When I accept the suggested completion
+    Then the note content on the current page should be this run's OpenAI mock suggestion

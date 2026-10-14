@@ -113,10 +113,9 @@ export function flushMockResizeObserver() {
   }
 }
 
-function setNoteToolbarButtonRowWidth(wrapper: VueWrapper, width: number) {
-  const buttonRow = wrapper.find("[data-note-toolbar] .daisy-btn-group")
-    .element as HTMLElement
-  Object.defineProperty(buttonRow, "clientWidth", {
+function setNoteToolbarNavWidth(wrapper: VueWrapper, width: number) {
+  const nav = wrapper.find("[data-note-toolbar]").element as HTMLElement
+  Object.defineProperty(nav, "clientWidth", {
     configurable: true,
     get: () => width,
   })
@@ -135,7 +134,7 @@ export function setNoteToolbarMeasuredLayout(
     actionWidths: options.actionWidths ?? {},
     overflowWidth: options.overflowWidth ?? noteToolbarOverflowButtonWidth,
   }
-  setNoteToolbarButtonRowWidth(wrapper, options.navWidth)
+  setNoteToolbarNavWidth(wrapper, options.navWidth)
 }
 
 export async function layoutNoteToolbar(wrapper: VueWrapper, navWidth: number) {

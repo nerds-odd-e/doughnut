@@ -12,7 +12,8 @@
       data-testid="referenced-title-save-panel"
     >
       <p class="text-sm opacity-80">
-        {{ TITLE_RENAME_REFERENCE_PROMPT }}
+        This note is linked from other notes. Choose how wiki links to this note
+        should change:
       </p>
       <div class="flex flex-wrap gap-2">
         <button
@@ -46,12 +47,24 @@ import {
   useOpenNoteContentEditor,
 } from "@/composables/noteContentMutationBarrier"
 
-import {
-  TITLE_RENAME_REFERENCE_PROMPT,
-  TITLE_RENAME_REFERENCE_SAVE_OPTIONS,
-} from "./titleRenameReferenceChoices"
-
 const noteStore = useNoteStore()
+
+const TITLE_RENAME_REFERENCE_SAVE_OPTIONS: {
+  value: TitleRenameReferenceHandling
+  label: string
+  testid: string
+}[] = [
+  {
+    value: "UPDATE_VISIBLE_TEXT",
+    label: "Update visible reference text",
+    testid: "referenced-title-save-update-visible-text",
+  },
+  {
+    value: "KEEP_VISIBLE_TEXT",
+    label: "Keep visible reference text",
+    testid: "referenced-title-save-keep-visible-text",
+  },
+]
 
 const props = defineProps({
   field: {

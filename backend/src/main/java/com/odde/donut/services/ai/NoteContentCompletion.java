@@ -3,6 +3,7 @@ package com.odde.donut.services.ai;
 import com.fasterxml.jackson.annotation.JsonClassDescription;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
+import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 
 @JsonClassDescription(
@@ -15,17 +16,11 @@ import lombok.NoArgsConstructor;
     modifications. Only modify or add the parts that the user specifically requested to change.
     """)
 @NoArgsConstructor
+@AllArgsConstructor
 public class NoteContentCompletion {
 
   @JsonPropertyDescription(
       "The complete new content text that will replace the current note's content.")
   @JsonProperty(required = true)
   public String content;
-
-  @JsonPropertyDescription("Why this correction helps the user, grounded in the conversation.")
-  public String reason;
-
-  public NoteContentCompletion(String content) {
-    this.content = content;
-  }
 }

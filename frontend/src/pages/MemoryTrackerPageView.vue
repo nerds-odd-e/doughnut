@@ -43,10 +43,7 @@
         v-bind="recalledNoteUnderQuestionProps(memoryTracker.recalledNote)"
       />
     </div>
-    <RecallHistory
-      :items="recallHistory"
-      @attempt-excluded="emit('refresh')"
-    />
+    <RecallHistory :items="recallHistory" />
   </div>
 </template>
 

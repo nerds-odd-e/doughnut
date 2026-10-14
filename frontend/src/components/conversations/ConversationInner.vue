@@ -14,29 +14,43 @@
   >
     <template #header-actions>
       <slot name="header-actions" />
-      <button
-        v-if="canCheckDistinction"
-        class="daisy-btn daisy-btn-sm daisy-btn-outline"
-        @click="handleSendMessageAndInviteAI(practiceRequest)"
-      >
-        Check this distinction
-      </button>
     </template>
     <template #messages v-if="currentConversationMessages !== undefined">
       <div
         v-for="conversationMessage in currentConversationMessages"
         :key="conversationMessage.id"
-        class="mb-3"
+        class="flex mb-3"
+        :class="{ 'justify-end': isCurrentUser(conversationMessage.sender?.id || 0) }"
       >
-        <ConversationMessageBubble :message="conversationMessage" :user="user" />
-      <ConversationNoteCorrectionReview
-        v-for="correction in corrections.filter((item) => item.sourceMessageId === conversationMessage.id)"
-        :key="correction.id"
-        :correction="correction"
-        :user="user"
-        @decided="onCorrectionDecided"
-        @open-note="$emit('close-dialog')"
-      />
+        <div
+          v-if="!isCurrentUser(conversationMessage.sender?.id || 0)"
+          class="message-avatar me-2"
+          :title="conversationMessage.sender?.name || 'AI Assistant'"
+        >
+          <template v-if="conversationMessage.sender?.id === undefined">
+            <Bot class="w-8 h-8" />
+          </template>
+          <template v-else>
+            <UserIcon class="w-8 h-8" />
+          </template>
+        </div>
+
+        <div
+          class="daisy-card py-2 px-3"
+          :class="[
+            isCurrentUser(conversationMessage.sender?.id || 0)
+              ? 'bg-primary text-primary-content'
+              : 'bg-base-200',
+            conversationMessage.sender?.id === undefined ? 'ai-assistant' : '',
+          ]"
+        >
+          <pre v-if="isCurrentUser(conversationMessage.sender?.id || 0)" class="user-message">{{ formatMessage(conversationMessage.message) }}</pre>
+          <div
+            v-else
+            :class="RICH_CONTENT_PROSE"
+            v-html="markdowntToHtml(formatMessage(conversationMessage.message))"
+          />
+        </div>
       </div>
 
       <AiResponse
@@ -44,7 +58,6 @@
         :aiReplyTrigger="aiReplyTrigger"
         @ai-response-done="onAiResponseDone"
         @scroll-to="scrollIndex = $event"
-        @attempt-excluded="$emit('attempt-excluded', $event)"
       />
 
       <ScrollTo :scrollTrigger="currentConversationMessages.length + scrollIndex" />
@@ -56,18 +69,16 @@
 import { ref, onMounted, watch, computed } from "vue"
 import { ConversationMessageController } from "@generated/donut-backend-api/sdk.gen"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
-import { messageCenter } from "@/store/messageCenter"
 import type {
-  AnsweredQuestion,
   User,
   ConversationMessage,
   Conversation,
-  ConversationNoteCorrection,
 } from "@generated/donut-backend-api"
+import { Bot, User as UserIcon } from "@lucide/vue"
 import ScrollTo from "@/components/commons/ScrollTo.vue"
-import ConversationMessageBubble from "./ConversationMessageBubble.vue"
-import ConversationNoteCorrectionReview from "./ConversationNoteCorrectionReview.vue"
 import ConversationTemplate from "./ConversationTemplate.vue"
+import markdownizer from "../form/markdownizer"
+import { RICH_CONTENT_PROSE } from "@/constants/richContentProse"
 
 const { conversation, user, initialAiReply, isMaximized } = defineProps<{
   conversation: Conversation
@@ -78,25 +89,17 @@ const { conversation, user, initialAiReply, isMaximized } = defineProps<{
   isMaximized?: boolean
 }>()
 
-defineEmits<{
+const emit = defineEmits<{
+  (e: "conversation-fetched", conversationId: number): void
   (e: "close-dialog"): void
   (e: "conversation-changed", conversationId: number): void
   (e: "new-conversation"): void
   (e: "toggle-maximize"): void
-  (e: "attempt-excluded", answeredQuestion: AnsweredQuestion): void
 }>()
 
 const currentConversationMessages = ref<ConversationMessage[] | undefined>(
   undefined
 )
-
-const corrections = ref<ConversationNoteCorrection[]>([])
-
-const onCorrectionDecided = (correction: ConversationNoteCorrection) => {
-  corrections.value = corrections.value.map((stored) =>
-    stored.id === correction.id ? correction : stored
-  )
-}
 
 const aiReplyTrigger = ref(0)
 
@@ -106,32 +109,24 @@ const onAiResponseDone = () => {
   fetchConversationMessages()
 }
 
-const fetchConversationMessages = async () => {
-  const conversationId = conversation.id
-  if (!conversationId) return
+const markdowntToHtml = (content?: string) =>
+  markdownizer.markdownToHtml(content)
 
-  const [messageResult, correctionResult] = await Promise.all([
-    ConversationMessageController.getConversationMessages({
-      path: { conversationId },
-    }),
-    ConversationMessageController.getConversationCorrections({
-      path: { conversationId },
-    }),
-  ])
-  if (!correctionResult.error) {
-    corrections.value = correctionResult.data!
-  }
-  const { data: messages, error } = messageResult
+const formatMessage = (message: string) => message.replace(/^"|"$/g, "").trim()
+
+const isCurrentUser = (id: number): boolean => id === user?.id
+
+const fetchConversationMessages = async () => {
+  if (!conversation.id) return
+
+  const { data: messages, error } =
+    await ConversationMessageController.getConversationMessages({
+      path: { conversationId: conversation.id },
+    })
   if (!error) {
-    currentConversationMessages.value = messages
-    const { data: unreadMessages, error: readError } =
-      await ConversationMessageController.markConversationAsRead({
-        path: { conversationId },
-      })
-    if (!readError) {
-      messageCenter.unreadMessages = unreadMessages!
-    }
+    currentConversationMessages.value = messages!
   }
+  emit("conversation-fetched", conversation.id)
 }
 
 const handleSendMessage = async (
@@ -165,19 +160,10 @@ watch(() => conversation, fetchConversationMessages)
 const handleSendMessageAndInviteAI = (message: string) =>
   handleSendMessage(message, true)
 
-const practiceRequest =
-  "Give me one different, related practice question. Wait for my answer before explaining it."
-
-const canCheckDistinction = computed(
-  () =>
-    conversation.subject?.recallPrompt?.mcq &&
-    currentConversationMessages.value?.some((message) => !message.sender)
-)
-
 const defaultQuestions = [
-  "Please explain the question and answer to me.",
   "Why is my answer wrong?",
   "I think the question is wrong. Please check.",
+  "Please explain the question and answer to me.",
   "Why are other choices incorrect?",
 ]
 
@@ -188,3 +174,37 @@ const showDefaultMessages = computed(
       currentConversationMessages.value.length === 0)
 )
 </script>
+
+<style scoped>
+@reference "@/assets/daisyui.css";
+
+.message-avatar {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.user-message {
+  margin: 0;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  font-family: inherit;
+}
+
+.unknown-request {
+  font-family: monospace;
+  @apply bg-base-200;
+  padding: 0.5rem;
+  border-radius: 0.25rem;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+.unknown-request pre {
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  margin: 0;
+}
+</style>

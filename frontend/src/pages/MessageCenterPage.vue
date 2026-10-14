@@ -40,6 +40,7 @@
               v-if="currentConversation && user"
               :conversation="currentConversation"
               :user="user"
+              @conversation-fetched="handleConversationFetched"
               @conversation-changed="handleConversationChanged"
             />
             <div v-else class="no-conversation-message">
@@ -66,6 +67,7 @@ import type {
   ConversationListItem,
   User,
 } from "@generated/donut-backend-api"
+import { messageCenter } from "@/store/messageCenter"
 import { useRouter } from "vue-router"
 
 const props = defineProps({
@@ -111,6 +113,16 @@ const fetchData = async () => {
     } else {
       currentConversation.value = null
     }
+  }
+}
+
+const handleConversationFetched = async (conversationId: number) => {
+  const { data: unreadMessages, error } =
+    await ConversationMessageController.markConversationAsRead({
+      path: { conversationId },
+    })
+  if (!error) {
+    messageCenter.unreadMessages = unreadMessages!
   }
 }
 

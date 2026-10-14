@@ -54,7 +54,6 @@ const ACTIVE_OPEN_AI_MOCK_SPECS = [
   'e2e_test/features/messages/conversation_about_a_note.feature',
   'e2e_test/features/note_creation_and_update/record_live_audio.feature',
   'e2e_test/features/recall/recall_quiz_ai_question.feature',
-  'e2e_test/features/recall/ambiguous_question_exclusion.feature',
   'e2e_test/features/user_admin/manage_ai_models.feature',
   'e2e_test/features/recall/property_memory_tracker.feature',
   'e2e_test/features/note_creation_and_update/mcq_management.feature',

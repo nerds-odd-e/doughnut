@@ -4,10 +4,7 @@
     data-note-toolbar
     :class="[noteChromeToolbarNavClass, 'relative z-20']"
   >
-    <div
-      ref="buttonRowRef"
-      class="daisy-btn-group daisy-btn-group-sm flex flex-1 min-w-0"
-    >
+    <div class="daisy-btn-group daisy-btn-group-sm">
       <NoteCreationNewButton
         v-if="showRelocatedNewNote"
         v-show="!newOverflowed"
@@ -63,7 +60,7 @@
         v-if="!readonly"
         ref="moreOptionsRef"
         :note="note"
-        :button-row="buttonRowRef"
+        :toolbar-nav="toolbarNavRef"
         :as-markdown="asMarkdown"
         :has-new-note="showRelocatedNewNote"
         @overflowed-ids="overflowedIds = $event"
@@ -140,7 +137,6 @@ const onAssimilationReloadNeeded = async () => {
   assimilationPanelKey.value += 1
 }
 const toolbarNavRef = ref<HTMLElement | null>(null)
-const buttonRowRef = ref<HTMLElement | null>(null)
 const wikiLinkOrRelationshipPopButtonRef = ref<InstanceType<
   typeof PopButton
 > | null>(null)

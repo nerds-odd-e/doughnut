@@ -3,15 +3,12 @@ package com.odde.donut.services;
 import com.odde.donut.controllers.dto.ConversationListItem;
 import com.odde.donut.entities.Conversation;
 import com.odde.donut.entities.ConversationMessage;
-import com.odde.donut.entities.ConversationNoteCorrection;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.Ownership;
 import com.odde.donut.entities.RecallPrompt;
 import com.odde.donut.entities.User;
 import com.odde.donut.entities.repositories.ConversationMessageRepository;
-import com.odde.donut.entities.repositories.ConversationNoteCorrectionRepository;
 import com.odde.donut.entities.repositories.ConversationRepository;
-import com.odde.donut.entities.repositories.RecallPromptRepository;
 import com.odde.donut.testability.TestabilitySettings;
 import java.sql.Timestamp;
 import java.util.List;
@@ -20,7 +17,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
 @Service
@@ -29,8 +25,6 @@ public class ConversationService {
   private final TestabilitySettings testabilitySettings;
   private final ConversationRepository conversationRepository;
   private final ConversationMessageRepository conversationMessageRepository;
-  private final RecallPromptRepository recallPromptRepository;
-  private final ConversationNoteCorrectionRepository correctionRepository;
 
   private Conversation initializeConversation(User initiator) {
     Conversation conversation = new Conversation();
@@ -38,21 +32,12 @@ public class ConversationService {
     return conversation;
   }
 
-  @Transactional
   public Conversation startConversationAboutRecallPrompt(
       RecallPrompt recallPrompt, User initiator) {
-    RecallPrompt lockedPrompt =
-        recallPromptRepository.findByIdForUpdate(recallPrompt.getId()).orElseThrow();
-    return conversationRepository
-        .findFirstBySubject_RecallPromptAndConversationInitiatorAndAccessOwnershipOrderByIdAsc(
-            lockedPrompt, initiator, initiator.getOwnership())
-        .orElseGet(
-            () -> {
-              Conversation conversation = initializeConversation(initiator);
-              conversation.setRecallPrompt(lockedPrompt);
-              conversation.setAccessOwnership(initiator.getOwnership());
-              return conversationRepository.save(conversation);
-            });
+    Conversation conversation = initializeConversation(initiator);
+    conversation.setRecallPrompt(recallPrompt);
+    conversationRepository.save(conversation);
+    return conversation;
   }
 
   public Conversation startConversationOfNote(Note note, User initiator, String message) {
@@ -64,13 +49,13 @@ public class ConversationService {
   }
 
   public List<Conversation> conversationRelatedToUser(User user) {
-    return conversationRepository.findByUserInAccessOwnershipOrConversationInitiator(
+    return conversationRepository.findByUserInSubjectOwnershipOrConversationInitiator(
         user, Pageable.unpaged());
   }
 
   public List<ConversationListItem> conversationListForUser(User user) {
     return conversationRepository
-        .findByUserInAccessOwnershipOrConversationInitiator(user, PageRequest.of(0, 50))
+        .findByUserInSubjectOwnershipOrConversationInitiator(user, PageRequest.of(0, 50))
         .stream()
         .map(conversation -> toListItem(conversation, user))
         .toList();
@@ -88,12 +73,7 @@ public class ConversationService {
     if (initiator != null && !Objects.equals(initiator.getId(), currentUser.getId())) {
       return initiator.getName();
     }
-    Ownership ownership = conversation.getAccessOwnership();
-    if (conversation.getSubject().getRecallPrompt() != null
-        && ownership != null
-        && Objects.equals(ownership.getUser(), initiator)) {
-      return "Private recall help";
-    }
+    Ownership ownership = conversation.getSubjectOwnership();
     if (ownership != null && ownership.getCircle() != null) {
       return ownership.getCircle().getName();
     }
@@ -114,35 +94,6 @@ public class ConversationService {
     conversationMessage.setCreatedAt(currentUTCTimestamp);
 
     return conversationMessageRepository.save(conversationMessage);
-  }
-
-  @Transactional
-  public void retainAiReply(
-      Conversation conversation, String content, List<ConversationNoteCorrection> corrections) {
-    if (!content.isEmpty() || !corrections.isEmpty()) {
-      ConversationMessage assistant = addMessageToConversation(conversation, null, content);
-      corrections.forEach(correction -> correction.setSourceMessage(assistant));
-    }
-    correctionRepository.saveAll(corrections);
-  }
-
-  public List<ConversationNoteCorrection> getCorrections(Conversation conversation) {
-    return correctionRepository.findBySourceMessage_ConversationOrderByIdAsc(conversation);
-  }
-
-  public ConversationNoteCorrection getCorrectionForUpdate(Integer id) {
-    return correctionRepository.findByIdForUpdate(id).orElseThrow();
-  }
-
-  public ConversationNoteCorrection declineCorrection(
-      ConversationNoteCorrection correction, User participant) {
-    if (correction.getDecision() == ConversationNoteCorrection.Decision.PENDING) {
-      correction.setDecision(ConversationNoteCorrection.Decision.DECLINED);
-      correction.setDecidedBy(participant);
-      correction.setDecidedAt(testabilitySettings.getCurrentUTCTimestamp());
-      correctionRepository.save(correction);
-    }
-    return correction;
   }
 
   public void markConversationAsRead(Conversation conversation, User user) {

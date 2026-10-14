@@ -9,14 +9,12 @@ import com.odde.donut.entities.Grade;
 import com.odde.donut.entities.MemoryTracker;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.RecallPrompt;
-import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
 import java.sql.Timestamp;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 
 abstract class MemoryTrackerControllerTestBase extends ControllerTestBase {
   @Autowired MemoryTrackerController controller;
-  @Autowired RecallPromptController recallPromptController;
 
   @BeforeEach
   void setupCurrentUser() {
@@ -42,13 +40,6 @@ abstract class MemoryTrackerControllerTestBase extends ControllerTestBase {
         .forMemoryTracker(tracker)
         .answerChoiceIndex(0)
         .please();
-  }
-
-  void answerWronglyThenExcludeAsAmbiguous(MemoryTracker tracker, Note note)
-      throws UnexpectedNoAccessRightException {
-    RecallPrompt prompt = promptFor(tracker, note);
-    recallPromptController.answer(prompt, choiceAnswer(1));
-    recallPromptController.excludeAsAmbiguous(prompt, ambiguousExclusion("both tenses fit"));
   }
 
   void assertConversationHasNoRecallPrompt(Conversation conversation) {

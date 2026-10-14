@@ -16,7 +16,6 @@ import com.odde.donut.entities.repositories.ConversationRepository;
 import com.odde.donut.entities.repositories.MemoryTrackerRepository;
 import com.odde.donut.entities.repositories.RecallLogRepository;
 import com.odde.donut.entities.repositories.RecallPromptRepository;
-import com.odde.donut.exceptions.QuestionAnswerException;
 import com.odde.donut.factoryServices.EntityPersister;
 import java.sql.Timestamp;
 import java.util.List;
@@ -101,34 +100,6 @@ public class MemoryTrackerService {
     return false;
   }
 
-  public RecallPrompt excludeAsAmbiguous(
-      RecallPrompt recallPrompt, String reason, Timestamp currentUTCTimestamp) {
-    Answer answer = recallPrompt.getAnswer();
-    if (answer == null) {
-      throw new QuestionAnswerException("The question is not answered");
-    }
-    if (answer.excludeAsAmbiguous(reason, currentUTCTimestamp)) {
-      entityPersister.save(answer);
-      rebuildWithout(answer, recallPrompt.requireMemoryTracker());
-    }
-    return recallPrompt;
-  }
-
-  private void rebuildWithout(Answer excluded, MemoryTracker memoryTracker) {
-    List<RecallLog> history =
-        recallLogRepository.findAllByMemoryTracker_IdOrderByRecordedAtAscIdAsc(
-            memoryTracker.getId());
-    history.stream()
-        .filter(log -> excluded.equals(log.getAnswer()))
-        .findFirst()
-        .ifPresent(
-            attempt -> {
-              memoryTracker.rebuildWithout(attempt, history);
-              history.forEach(entityPersister::save);
-              entityPersister.save(memoryTracker);
-            });
-  }
-
   /** Persist a graded recall log, or CONFUSION when {@code grade} is null. */
   void persistRecallLog(
       MemoryTracker memoryTracker,
@@ -139,7 +110,10 @@ public class MemoryTrackerService {
     RecallLog recallLog = new RecallLog();
     recallLog.setMemoryTracker(memoryTracker);
     recallLog.setRecordedAt(recordedAt);
-    recallLog.recordStateBefore(memoryTracker);
+    recallLog.setElapsedHours((int) memoryTracker.elapsedHoursUntil(recordedAt));
+    recallLog.setStabilityBefore(memoryTracker.getStability());
+    recallLog.setDifficultyBefore(memoryTracker.getDifficulty());
+    recallLog.setRetrievability(memoryTracker.retrievabilityAt(recordedAt));
     recallLog.setGrade(grade);
     recallLog.setAnswer(answer);
     recallLog.setTutorFeedback(tutorFeedback);

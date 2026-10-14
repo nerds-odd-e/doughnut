@@ -68,15 +68,15 @@ const refineNoteButtonTitle = 'Refine note'
 
 export function openRefineNoteModalIfNeeded() {
   cy.get('body').then(($body) => {
-    if ($body.find('dialog[open] [data-test="refine-note-modal"]').length > 0) {
+    if (
+      $body.find('[data-test="refine-note-modal"].daisy-modal-open').length > 0
+    ) {
       waitUntilAppIsNotBusy()
       return
     }
     clickToolbarOverflowAction(refineNoteButtonTitle)
+    cy.get('[data-test="refine-note-modal"].daisy-modal-open').should('exist')
     waitUntilAppIsNotBusy()
-    cy.get('[data-test="refine-note-modal"]')
-      .closest('dialog')
-      .should('have.prop', 'open', true)
   })
 }
 

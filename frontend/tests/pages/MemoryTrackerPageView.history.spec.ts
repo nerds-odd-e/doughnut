@@ -118,30 +118,4 @@ describe("MemoryTrackerPageView recall history", () => {
     expect(cards[0]!.text()).toContain("GOOD")
     expect(cards[0]!.text()).toContain("Paired question")
   })
-
-  it("shows an excluded attempt as excluded beside its AGAIN log", async () => {
-    const wrapper = await mountMemoryTrackerPageViewReady({
-      recallHistory: [
-        makeMe.aRecallHistoryItem
-          .recallLog(makeMe.aRecallLog.productOutcome("AGAIN").please())
-          .recallPrompt(
-            makeMe.aRecallPromptHistoryItem
-              .withAnswer(
-                makeMe.anAnsweredQuestion
-                  .excludedAsAmbiguous(
-                    "Both completions are grammatical.",
-                    "2026-10-13T08:30:00Z"
-                  )
-                  .please().answer
-              )
-              .please()
-          )
-          .please(),
-      ],
-    })
-
-    const card = wrapper.find('[data-testid="recall-history-item"]')
-    expect(card.find('[data-testid="recall-log"]').text()).toContain("AGAIN")
-    expect(card.text()).toContain("Excluded — ambiguous question")
-  })
 })

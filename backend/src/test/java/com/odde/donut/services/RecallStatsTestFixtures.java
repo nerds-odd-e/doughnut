@@ -65,18 +65,12 @@ final class RecallStatsTestFixtures {
         promptAt != null ? promptAt : answerAt,
         memoryTrackerId,
         retrievability,
-        questionType,
-        null);
+        questionType);
   }
 
   static RecallAnswerRow overlapAnswered(Timestamp answerAt) {
     return new RecallAnswerRow(
-        answerAt, AnswerOutcome.OVERLAP, null, null, answerAt, null, null, QuestionType.MCQ, null);
-  }
-
-  static RecallAnswerRow excludedAnswered(Timestamp answerAt, Timestamp excludedAt) {
-    return new RecallAnswerRow(
-        answerAt, null, Grade.AGAIN, 5000, answerAt, null, 0.9, QuestionType.MCQ, excludedAt);
+        answerAt, AnswerOutcome.OVERLAP, null, null, answerAt, null, null, QuestionType.MCQ);
   }
 
   static Timestamp utc(int day, int hour) {

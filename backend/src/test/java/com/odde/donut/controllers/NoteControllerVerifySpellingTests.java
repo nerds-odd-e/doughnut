@@ -40,7 +40,6 @@ class NoteControllerVerifySpellingTests extends ControllerTestBase {
     "cat(animal), cat(animal), true",
     "cat(animal), cat, true",
     "cat (animal), cat, true",
-    "'Deposition (phase transition) ', deposition, true",
     "煩う(接尾辞), 煩う, true",
     "cat(animal), animal, false",
     "~logical, logical, true",

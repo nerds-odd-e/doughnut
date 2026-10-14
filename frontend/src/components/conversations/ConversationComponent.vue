@@ -7,11 +7,10 @@
     >
       <NoteContextReader v-if="subjectNoteId" :note-id="subjectNoteId" />
       <AnsweredQuestionComponent
-        v-else-if="subjectAnsweredQuestion"
+        v-else-if="conversation.subject?.recallPrompt"
         v-bind="{
-          answeredQuestion: subjectAnsweredQuestion,
+          answeredQuestion: conversation.subject.recallPrompt,
           conversationButton: false,
-          reviewClarification: true,
         }"
       />
     </div>
@@ -24,10 +23,10 @@
           user,
           isMaximized
         }"
+        @conversation-fetched="emit('conversation-fetched', $event)"
         @conversation-changed="handleConversationChange"
         @close-dialog="handleCloseDialog"
         @toggle-maximize="isMaximized = !isMaximized"
-        @attempt-excluded="handleAttemptExcluded"
       >
         <template #header-actions v-if="subjectNoteId">
           <PopButton
@@ -48,11 +47,7 @@
 </template>
 
 <script setup lang="ts">
-import type {
-  AnsweredQuestion,
-  User,
-  Conversation,
-} from "@generated/donut-backend-api"
+import type { User, Conversation } from "@generated/donut-backend-api"
 import NoteContextReader from "@/components/notes/NoteContextReader.vue"
 import AnsweredQuestionComponent from "@/components/recall/AnsweredQuestionComponent.vue"
 import PopButton from "@/components/commons/Popups/PopButton.vue"
@@ -69,27 +64,14 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits<{
+  (e: "conversation-fetched", conversationId: number): void
   (e: "conversation-changed", conversationId: number): void
-  (e: "close-dialog"): void
-  (e: "attempt-excluded", answeredQuestion: AnsweredQuestion): void
 }>()
 
 const router = useRouter()
 const conversations = ref<Conversation[]>([])
 const isMaximized = ref(false)
 const subjectNoteId = computed(() => props.conversation.subject?.note?.id)
-const excludedAttempt = ref<AnsweredQuestion>()
-const subjectAnsweredQuestion = computed(() => {
-  const subject = props.conversation.subject?.recallPrompt
-  return excludedAttempt.value?.id === subject?.id
-    ? excludedAttempt.value
-    : subject
-})
-
-const handleAttemptExcluded = (answeredQuestion: AnsweredQuestion) => {
-  excludedAttempt.value = answeredQuestion
-  emit("attempt-excluded", answeredQuestion)
-}
 
 onMounted(async () => {
   if (subjectNoteId.value) {
@@ -116,8 +98,6 @@ const handleCloseDialog = () => {
   const noteTopology = props.conversation.subject?.note?.noteTopology
   if (noteTopology) {
     router.push(noteShowLocation(noteTopology.id))
-  } else {
-    emit("close-dialog")
   }
 }
 </script>

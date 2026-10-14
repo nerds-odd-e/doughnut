@@ -1,7 +1,5 @@
 package com.odde.donut.controllers;
 
-import com.odde.donut.controllers.dto.AmbiguousExclusionDTO;
-import com.odde.donut.controllers.dto.AnswerDTO;
 import com.odde.donut.controllers.dto.NoteTrashDTO;
 import com.odde.donut.controllers.dto.NoteTrashReferenceHandling;
 import com.odde.donut.controllers.dto.NoteTrashUndoDTO;
@@ -49,18 +47,6 @@ public abstract class ControllerTestBase extends SpringTestBase {
   protected NoteUpdateTitleDTO titleDto(String newTitle) {
     NoteUpdateTitleDTO dto = new NoteUpdateTitleDTO();
     dto.setNewTitle(newTitle);
-    return dto;
-  }
-
-  protected AnswerDTO choiceAnswer(int choiceIndex) {
-    AnswerDTO dto = new AnswerDTO();
-    dto.setChoiceIndex(choiceIndex);
-    return dto;
-  }
-
-  protected AmbiguousExclusionDTO ambiguousExclusion(String reason) {
-    AmbiguousExclusionDTO dto = new AmbiguousExclusionDTO();
-    dto.setReason(reason);
     return dto;
   }
 }
