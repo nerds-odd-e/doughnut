@@ -767,6 +767,23 @@ export type ConversationSubject = {
     recallPrompt?: AnsweredQuestion;
 };
 
+export type ConversationNoteCorrection = {
+    id: number;
+    note?: Note;
+    responseId?: string;
+    toolCallId?: string;
+    field?: 'CONTENT' | 'TITLE';
+    proposedValue?: string;
+    reason?: string;
+    baseRevision?: string;
+    decision?: 'PENDING' | 'DECLINED' | 'ACCEPTED';
+    reviewedValue?: string;
+    decidedBy?: User;
+    decidedAt?: string;
+    acceptedRevision?: string;
+    sourceMessageId?: number;
+};
+
 export type CircleJoiningByInvitation = {
     invitationCode: string;
 };
@@ -1298,23 +1315,6 @@ export type GithubIssue = {
 
 export type DailyProbeTodayDto = {
     completed: boolean;
-};
-
-export type ConversationNoteCorrection = {
-    id: number;
-    note?: Note;
-    responseId?: string;
-    toolCallId?: string;
-    field?: 'CONTENT' | 'TITLE';
-    proposedValue?: string;
-    reason?: string;
-    baseRevision?: string;
-    decision?: 'PENDING' | 'DECLINED' | 'ACCEPTED';
-    reviewedValue?: string;
-    decidedBy?: User;
-    decidedAt?: string;
-    acceptedRevision?: string;
-    sourceMessageId?: number;
 };
 
 export type ConversationListItem = {
@@ -2842,6 +2842,24 @@ export type StartConversationAboutNoteResponses = {
 };
 
 export type StartConversationAboutNoteResponse = StartConversationAboutNoteResponses[keyof StartConversationAboutNoteResponses];
+
+export type DeclineCorrectionData = {
+    body?: never;
+    path: {
+        correctionId: number;
+    };
+    query?: never;
+    url: '/api/conversation/corrections/{correctionId}/decline';
+};
+
+export type DeclineCorrectionResponses = {
+    /**
+     * OK
+     */
+    200: ConversationNoteCorrection;
+};
+
+export type DeclineCorrectionResponse = DeclineCorrectionResponses[keyof DeclineCorrectionResponses];
 
 export type IndexData = {
     body?: never;

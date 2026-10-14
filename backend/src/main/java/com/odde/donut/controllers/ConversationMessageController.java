@@ -118,6 +118,16 @@ public class ConversationMessageController {
     return conversationService.getCorrections(conversation);
   }
 
+  @PostMapping("/corrections/{correctionId}/decline")
+  @Transactional
+  public ConversationNoteCorrection declineCorrection(@PathVariable Integer correctionId)
+      throws UnexpectedNoAccessRightException {
+    ConversationNoteCorrection correction =
+        conversationService.getCorrectionForUpdate(correctionId);
+    authorizationService.assertAuthorization(correction.getSourceMessage().getConversation());
+    return conversationService.declineCorrection(correction, authorizationService.getCurrentUser());
+  }
+
   @GetMapping(value = "/{conversationId}/export", produces = "application/json")
   @org.springframework.web.bind.annotation.ResponseBody
   public Map<String, Object> exportConversation(

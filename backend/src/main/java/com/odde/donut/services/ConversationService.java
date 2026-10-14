@@ -130,6 +130,21 @@ public class ConversationService {
     return correctionRepository.findBySourceMessage_ConversationOrderByIdAsc(conversation);
   }
 
+  public ConversationNoteCorrection getCorrectionForUpdate(Integer id) {
+    return correctionRepository.findByIdForUpdate(id).orElseThrow();
+  }
+
+  public ConversationNoteCorrection declineCorrection(
+      ConversationNoteCorrection correction, User participant) {
+    if (correction.getDecision() == ConversationNoteCorrection.Decision.PENDING) {
+      correction.setDecision(ConversationNoteCorrection.Decision.DECLINED);
+      correction.setDecidedBy(participant);
+      correction.setDecidedAt(testabilitySettings.getCurrentUTCTimestamp());
+      correctionRepository.save(correction);
+    }
+    return correction;
+  }
+
   public void markConversationAsRead(Conversation conversation, User user) {
     conversation
         .getConversationMessages()

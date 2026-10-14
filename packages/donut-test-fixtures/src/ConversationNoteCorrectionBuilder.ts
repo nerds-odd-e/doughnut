@@ -1,6 +1,7 @@
 import type {
   ConversationNoteCorrection,
   Note,
+  User,
 } from '@generated/donut-backend-api'
 import Builder from './Builder'
 import generateId from './generateId'
@@ -18,6 +19,11 @@ class ConversationNoteCorrectionBuilder extends Builder<ConversationNoteCorrecti
     reason: 'Makes the distinction explicit',
     baseRevision: 'a'.repeat(40),
     decision: 'PENDING',
+  }
+
+  id(id: number) {
+    this.data.id = id
+    return this
   }
 
   forNote(note: Note) {
@@ -44,6 +50,13 @@ class ConversationNoteCorrectionBuilder extends Builder<ConversationNoteCorrecti
 
   reason(value: string) {
     this.data.reason = value
+    return this
+  }
+
+  declinedBy(user: User, decidedAt: string) {
+    this.data.decision = 'DECLINED'
+    this.data.decidedBy = user
+    this.data.decidedAt = decidedAt
     return this
   }
 

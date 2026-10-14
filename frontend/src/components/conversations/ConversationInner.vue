@@ -66,6 +66,7 @@
         :key="correction.id"
         :correction="correction"
         :user="user"
+        @decided="onCorrectionDecided"
       />
       </div>
 
@@ -123,6 +124,12 @@ const currentConversationMessages = ref<ConversationMessage[] | undefined>(
 )
 
 const corrections = ref<ConversationNoteCorrection[]>([])
+
+const onCorrectionDecided = (correction: ConversationNoteCorrection) => {
+  corrections.value = corrections.value.map((stored) =>
+    stored.id === correction.id ? correction : stored
+  )
+}
 
 const aiReplyTrigger = ref(0)
 

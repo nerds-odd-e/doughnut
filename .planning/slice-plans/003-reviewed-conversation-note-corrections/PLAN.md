@@ -346,9 +346,13 @@ No product matches remain. Dated planning baseline provenance stays intact.
 Replacement mounted/Cypress review and retained exclusion/unknown/standalone
 completion proof establish the surviving behavior; the sweep is a reading.
 
+Accepted pending-review revision: `c27d2aaf2b1b75a7fa82c7bd85477dfa11471a05`
+on the execution branch, suffix base `bcbc4c55b8924a0ef0310e1dea30535b6afb6ced`;
+CI observation reused.
+
 ### 4. Retain an explicit decline
 Type: Behavior
-Status: planned
+Status: done
 Proof: The author declines through the controller, rereads the same declined
 proposal, and authored content stays unchanged. Mounted review reflects the
 server result after reopening; closing without a decision keeps it pending.
@@ -357,6 +361,27 @@ Add the decline transition and its UI action to the same proposal. Enforce
 conversation access and retain the deciding participant; keep pending state
 on a failed decision request. Repeated decline returns the retained result.
 Estimate: 5–7 minutes.
+
+Execution evidence (2026-10-14): controller decline locks the proposal, authorizes
+its conversation, and records participant/time only while pending; completed
+dispositions are returned unchanged. Inspected
+`ConversationMessageControllerTest.DeclineCorrection` fresh flush/clear/controller
+read retains proposal/source/reason and original note content, plus retry by
+another authorized participant, completed acceptance, and authorization/login
+refusals. The initial retry fixture selected notebook creator rather than the
+conversation ownership user; corrected that audience precondition.
+`CURSOR_DEV=true nix develop -c pnpm backend:test_only` passed: 2,829 tests,
+zero failures/errors, two skipped, five decline cases, same isolated unit schema.
+`pnpm generateTypeScript`, full `pnpm frontend:test` (350 files, 2,194 tests),
+both frontend typechecks and `pnpm openapi:lint` passed through the Nix wrapper.
+UI uses confirmed server results; mounted decline cases cover direct/MCQ reopen,
+failure/input preservation/retry, and readonly participant decline.
+Independent refactor split pending/decline specs, shared their setup in
+`conversationCorrectionTestSupport.ts`, and added `id`/`declinedBy` makeMe
+operations. Inspected moved observations in
+`ConversationInner.declineCorrections.spec.ts`; its two-spec replacement command
+passed all nine mounted cases, with both typechecks. Backend, generated, other
+frontend and Cypress boundaries remained unchanged. Coordinator formatting passed.
 
 ### 5. Publish a reviewed body correction and its decision atomically
 Type: Behavior
@@ -451,6 +476,11 @@ Disposition: proved by slice 3: note_content_completion.feature pending review/e
 Reported: slice 3 — "The final accepted correction journey remains an explicit interim obligation for slice 6"
 Story clause: "The author explicitly accepts or declines it; discussion and proposal generation alone do not change the note."
 Disposition: receiving slice 6
+
+### G6. Atomic acceptance operation
+Reported: slice 4 — "Acceptance remains slices 5–7."
+Story clause: "The saved correction and its accepted decision must agree."
+Disposition: receiving slice 5
 
 ## Verification and delivery
 

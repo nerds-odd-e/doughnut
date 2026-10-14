@@ -1,16 +1,22 @@
-import AiReplyEventSource from "@/managedApi/AiReplyEventSource"
 import { ConversationMessageController } from "@generated/donut-backend-api/sdk.gen"
-import ConversationInner from "@/components/conversations/ConversationInner.vue"
 import MessageCenterPage from "@/pages/MessageCenterPage.vue"
 import helper, { mockSdkService, mockShowNote } from "@tests/helpers"
 import { flushPromises } from "@vue/test-utils"
 import makeMe from "donut-test-fixtures/makeMe"
 import { beforeEach, expect, it, vi } from "vitest"
-import {
-  getLastInstance,
-  resetInstance,
-} from "@tests/helpers/aiReplyEventSourceTracker"
+import { getLastInstance } from "@tests/helpers/aiReplyEventSourceTracker"
 import { createToolCallChunk } from "./aiResponseTestSupport"
+
+import {
+  body,
+  exchange,
+  mountConversation,
+  noteConversation,
+  realm,
+  recallConversation,
+  setupCorrections,
+  user,
+} from "./conversationCorrectionTestSupport"
 
 vi.mock("@/managedApi/AiReplyEventSource", async () => {
   const { aiReplyEventSourceTrackingMock } = await import(
@@ -19,44 +25,7 @@ vi.mock("@/managedApi/AiReplyEventSource", async () => {
   return aiReplyEventSourceTrackingMock()
 })
 
-const user = makeMe.aUser.please()
-const realm = makeMe.aNoteRealm
-  .title("Causation")
-  .content("**Current distinction**")
-  .please()
-const exchange = { id: 73, message: "An example explains this distinction." }
-const noteConversation = makeMe.aConversation.forANote(realm.note).please()
-const recallConversation = makeMe.aConversation
-  .forAnsweredQuestion(makeMe.anAnsweredQuestion.withNote(realm.note).please())
-  .please()
-const body = makeMe.aConversationNoteCorrection
-  .forNote(realm.note)
-  .fromMessage(exchange.id)
-  .content("**Proposed distinction**")
-  .reason("Add a common-cause example.")
-  .please()
-
-beforeEach(() => {
-  resetInstance()
-  vi.spyOn(AiReplyEventSource.prototype, "start").mockImplementation(vi.fn())
-  window.HTMLElement.prototype.scrollIntoView = vi.fn()
-  mockShowNote(realm)
-  mockSdkService(ConversationMessageController, "getConversationMessages", [
-    exchange,
-  ])
-  mockSdkService(ConversationMessageController, "getConversationCorrections", [
-    body,
-  ])
-  mockSdkService(ConversationMessageController, "markConversationAsRead", [])
-})
-
-const mountConversation = (conversation = noteConversation) =>
-  helper
-    .component(ConversationInner)
-    .withCleanStorage()
-    .withCurrentUser(user)
-    .withProps({ conversation, user })
-    .mount()
+beforeEach(setupCorrections)
 
 it.each([noteConversation, recallConversation])(
   "reopens the stored pending body review and discards unsent editing",
