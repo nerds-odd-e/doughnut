@@ -787,6 +787,7 @@ export type ConversationNoteCorrection = {
 export type ConversationCorrectionAcceptance = {
     reviewedValue: string;
     baseRevision?: string;
+    referenceHandling?: 'UPDATE_VISIBLE_TEXT' | 'KEEP_VISIBLE_TEXT';
 };
 
 export type CircleJoiningByInvitation = {

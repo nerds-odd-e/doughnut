@@ -5215,6 +5215,11 @@ components:
           type: string
         baseRevision:
           type: string
+        referenceHandling:
+          type: string
+          enum:
+          - UPDATE_VISIBLE_TEXT
+          - KEEP_VISIBLE_TEXT
       required:
       - reviewedValue
     CircleJoiningByInvitation:

@@ -100,21 +100,23 @@ help. Closing help preserves recall progress and returns focus to its opener.
 
 ## Reviewed note corrections
 
-A content correction appears beside the exchange that proposed it, with the
-subject note, reason, current content, and editable proposed content. A note
+A content or title correction appears beside the exchange that proposed it, with
+the subject note, reason, current value, and editable proposed value. A note
 author can explicitly Accept the reviewed wording or Decline the proposal.
 Closing without deciding keeps the stored proposal pending; unsent editor
 changes are discarded when the conversation is reopened. Readers can decline
 a proposal under the conversation's existing access rules, while acceptance
 requires ordinary note edit rights.
 
-Acceptance publishes the reviewed body and retains its confirmed decision,
+Acceptance publishes the reviewed content or title and retains its confirmed decision,
 reviewed wording, and Git revision together. Open note shows the subject note.
 Reopening the conversation keeps that original receipt, even after a later
 ordinary note edit. Failed or lost responses preserve the current input;
 retrying the same proposal recovers its recorded decision without publishing
 the correction again. Private discussion, reasons, and decisions stay in the
-conversation and do not change the recall attempt or schedule.
+conversation and do not change the recall attempt or schedule. Title acceptance
+uses ordinary title validation. For a linked note, choose whether to update or
+keep visible wiki reference text before accepting.
 
 ## Reviewed refinement
 

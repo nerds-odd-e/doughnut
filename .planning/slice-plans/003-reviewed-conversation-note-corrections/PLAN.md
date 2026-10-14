@@ -484,9 +484,13 @@ passed including the checker. Other accepted boundaries remained unchanged.
 Body UI obligations are fulfilled; title controls and explicit stale recovery
 retain slices 7 and 8.
 
+Accepted body-UI revision: `86d4963852ddb5ae42faa3ae22ea0f6883a519e2`
+on the execution branch, suffix base `7211cc43252e39f8e92e1d46b4030321eb38b434`;
+CI observation reused.
+
 ### 7. Apply reviewed title corrections through ordinary rename rules
 Type: Behavior
-Status: planned
+Status: done
 Proof: Controller acceptance and Git reload show the reviewed title on the same
 note identity, with the retained decision/revision. Mounted conversation renders
 and edits a title proposal; existing title/reference-validation tests cover its
@@ -497,6 +501,33 @@ Delegate to ordinary title handling, including its reference-handling decision
 when applicable; do not invent a second rename policy or silently rewrite other
 notes. Enable title acceptance only with this slice. The body path remains green.
 Estimate: 5–8 minutes.
+
+Execution evidence (2026-10-14): title acceptance uses the ordinary annotated
+title DTO and rename/reference owner with sorted notebook locks, sharing the
+reviewed-base refusal with body acceptance. The normalized title, decision and
+actual Git head are retained atomically. Inspected seven
+`ConversationCorrectionTitleAcceptanceControllerTest` cases: committed fixtures
+and fresh reads for direct-note/MCQ identity, downloaded renamed Markdown/head,
+retry receipt, ordinary title refusals and both wiki-reference policies.
+Inspected five `ConversationInner.acceptTitleCorrections.spec.ts` mounted cases:
+edited title/base payload, confirmed receipt, required explicit reference choices,
+and actionable validation feedback preserving input. Existing body/decline and
+ordinary title/reference consumers remained covered. API generation and OpenAPI
+lint passed. Full `CURSOR_DEV=true nix develop -c pnpm backend:test_only` passed:
+2,846 tests, zero failures/errors, two skipped in the established isolated schema.
+Full `CURSOR_DEV=true nix develop -c pnpm frontend:test` passed: 353 files,
+2,204 tests. After the same-title UI adjustment, the conversation and ordinary
+title-editor selection passed 15 files/67 tests, and both frontend typechecks
+passed. The initial invalid-title fixture assumed `_trash` was reserved;
+using the ordinary reserved `README` example repaired the fixture and the
+full backend rerun passed. The generated enum type uses the existing store alias.
+Independent refactor shared the reference-choice prompt and local display
+predicate, parsing errors once; the same 15-file/67-test selection, both
+typechecks and whitespace check passed. Backend/Git observations stayed unchanged.
+Coordinator selective formatting passed. Enduring docs include title review.
+One-time reading of the product for the replaced body-only refusal literal
+returned no occurrences; this was a sweep reading, not an absence test.
+G3 is discharged by the retained decline/body controls and this title control.
 
 ### 8. Recover from a stale review without losing current input
 Type: Behavior
@@ -527,7 +558,7 @@ Disposition: proved by slice 3: ConversationInner.corrections.spec.ts mounted pr
 ### G3. Confirmed decision controls
 Reported: slice 2 — "no browser review, decision, or acceptance UI was wired here."
 Story clause: "The author explicitly accepts or declines it; discussion and proposal generation alone do not change the note."
-Disposition: interim until slices 3, 4, 6, 7
+Disposition: proved by slice 7: ConversationInner.acceptTitleCorrections.spec.ts explicit edited-title confirmation and reference choice, with retained slice 4 decline and slice 6 body confirmation proof
 
 ### G4. Existing Cypress conversation consumer
 Reported: slice 3 — "The Cypress completion consumer still reads the retired conversation UI."

@@ -28,6 +28,12 @@ public class ConversationNoteCorrectionBuilder extends EntityBuilder<Conversatio
     return this;
   }
 
+  public ConversationNoteCorrectionBuilder title(String proposedTitle) {
+    entity.setField(ConversationNoteCorrection.Field.TITLE);
+    entity.setProposedValue(proposedTitle);
+    return this;
+  }
+
   public ConversationNoteCorrectionBuilder acceptedBy(User reviewer) {
     entity.setDecision(ConversationNoteCorrection.Decision.ACCEPTED);
     entity.setDecidedBy(reviewer);

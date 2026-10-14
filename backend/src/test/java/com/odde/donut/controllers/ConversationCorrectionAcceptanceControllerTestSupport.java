@@ -38,6 +38,10 @@ abstract class ConversationCorrectionAcceptanceControllerTestSupport
   }
 
   Review fixture(boolean mcq) throws Exception {
+    return fixture(mcq, false);
+  }
+
+  Review fixture(boolean mcq, boolean title) throws Exception {
     Notebook notebook = createGitBackedNotebook();
     fixtureReview =
         inCommittedTransaction(
@@ -74,8 +78,9 @@ abstract class ConversationCorrectionAcceptanceControllerTestSupport
                       .aConversationMessage(exchange)
                       .message("private exchange evidence")
                       .please();
-              ConversationNoteCorrection proposal =
-                  makeMe.aConversationNoteCorrection(source).baseRevision(base).please();
+              var builder = makeMe.aConversationNoteCorrection(source).baseRevision(base);
+              if (title) builder.title("Proposed title");
+              ConversationNoteCorrection proposal = builder.please();
               return new Review(
                   notebook,
                   note.getId(),

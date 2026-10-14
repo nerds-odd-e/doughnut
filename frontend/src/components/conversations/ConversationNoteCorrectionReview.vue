@@ -14,7 +14,14 @@
           <template v-if="correction.decision === 'PENDING' && user && !noteRealm.notebookRealm.readonly">
             <TextInput v-if="correction.field === 'TITLE'" v-model="reviewedValue" :scope-name="`correction-${correction.id}`" field="proposedTitle" />
             <TextArea v-else v-model="reviewedValue" :scope-name="`correction-${correction.id}`" field="proposedContent" />
-            <button v-if="correction.field === 'CONTENT'" class="daisy-btn daisy-btn-primary mt-2" :disabled="deciding" @click="accept">Accept</button>
+            <label v-if="requiresReferenceHandling(noteRealm)" class="block mt-2">
+              {{ TITLE_RENAME_REFERENCE_PROMPT }}
+              <select v-model="referenceHandling" class="daisy-select block" aria-label="Wiki reference handling">
+                <option value="">Choose reference handling</option>
+                <option v-for="option in TITLE_RENAME_REFERENCE_SAVE_OPTIONS" :key="option.value" :value="option.value">{{ option.label }}</option>
+              </select>
+            </label>
+            <button class="daisy-btn daisy-btn-primary mt-2" :disabled="deciding || (requiresReferenceHandling(noteRealm) && !referenceHandling)" @click="accept">Accept</button>
           </template>
           <template v-else>
             <h4>Proposed {{ correction.field === 'TITLE' ? 'title' : 'content' }}</h4>
@@ -42,9 +49,15 @@ import { ref } from "vue"
 import { useRouter } from "vue-router"
 import type {
   ConversationNoteCorrection,
+  NoteRealm,
   User,
 } from "@generated/donut-backend-api"
 import { ConversationMessageController } from "@generated/donut-backend-api/sdk.gen"
+import {
+  TITLE_RENAME_REFERENCE_PROMPT,
+  TITLE_RENAME_REFERENCE_SAVE_OPTIONS,
+} from "@/components/notes/core/titleRenameReferenceChoices"
+import { toOpenApiError } from "@/managedApi/openApiError"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import NoteRealmLoader from "@/components/notes/NoteRealmLoader.vue"
 import ContentLoader from "@/components/commons/ContentLoader.vue"
@@ -52,7 +65,10 @@ import TextInput from "@/components/form/TextInput.vue"
 import TextArea from "@/components/form/TextArea.vue"
 import markdownizer from "@/components/form/markdownizer"
 import { RICH_CONTENT_PROSE } from "@/constants/richContentProse"
-import { useNoteStore } from "@/store/noteStore"
+import {
+  useNoteStore,
+  type TitleRenameReferenceHandling,
+} from "@/store/noteStore"
 import { noteShowLocation } from "@/routes/noteShowLocation"
 
 const props = defineProps<{
@@ -66,9 +82,15 @@ const emit = defineEmits<{
 const router = useRouter()
 const noteStore = useNoteStore()
 const reviewedValue = ref(props.correction.proposedValue ?? "")
+const referenceHandling = ref<TitleRenameReferenceHandling | "">("")
 const deciding = ref(false)
 const decisionFailure = ref("")
 const noteRefreshFailed = ref(false)
+
+const requiresReferenceHandling = (noteRealm: NoteRealm) =>
+  props.correction.field === "TITLE" &&
+  reviewedValue.value !== noteRealm.note.noteTopology.title &&
+  (noteRealm.references?.length ?? 0) > 0
 
 const refreshNote = async () => {
   try {
@@ -87,12 +109,18 @@ const accept = async () => {
       body: {
         reviewedValue: reviewedValue.value,
         baseRevision: props.correction.baseRevision,
+        ...(referenceHandling.value
+          ? { referenceHandling: referenceHandling.value }
+          : {}),
       },
     })
   )
   deciding.value = false
+  const errors = error ? toOpenApiError(error).errors : undefined
   decisionFailure.value = error
-    ? "Could not confirm acceptance. Try again to recover this review's decision."
+    ? errors?.newTitle ||
+      errors?.referenceHandling ||
+      "Could not confirm acceptance. Try again to recover this review's decision."
     : ""
   if (!error) {
     emit("decided", correction!)

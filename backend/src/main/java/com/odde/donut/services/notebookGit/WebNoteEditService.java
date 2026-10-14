@@ -62,6 +62,35 @@ public class WebNoteEditService {
   public Note saveTitle(
       Integer noteId, Integer notebookId, NoteUpdateTitleDTO titleDTO, Timestamp updatedAt)
       throws UnexpectedNoAccessRightException {
+    return editTitle(
+        noteId, notebookId, titleDTO, note -> renameTitle(note, titleDTO, updatedAt), updatedAt);
+  }
+
+  public Note saveReviewedTitle(
+      Integer noteId,
+      Integer notebookId,
+      NoteUpdateTitleDTO titleDTO,
+      String expectedRevision,
+      Timestamp updatedAt)
+      throws UnexpectedNoAccessRightException {
+    return editTitle(
+        noteId,
+        notebookId,
+        titleDTO,
+        note -> {
+          requireReviewedRevision(notebookId, expectedRevision);
+          renameTitle(note, titleDTO, updatedAt);
+        },
+        updatedAt);
+  }
+
+  private Note editTitle(
+      Integer noteId,
+      Integer notebookId,
+      NoteUpdateTitleDTO titleDTO,
+      Consumer<Note> mutation,
+      Timestamp updatedAt)
+      throws UnexpectedNoAccessRightException {
     Set<Integer> notebookIds =
         titleDTO.getReferenceHandling() == null
             ? Set.of(notebookId)
@@ -71,7 +100,7 @@ public class WebNoteEditService {
         noteId,
         notebookId,
         notebookIds,
-        note -> renameTitle(note, titleDTO, updatedAt),
+        mutation,
         note -> "Edit note title: " + note.getTitle(),
         updatedAt);
   }
@@ -129,20 +158,23 @@ public class WebNoteEditService {
         noteId,
         notebookId,
         note -> {
-          String currentRevision =
-              bindingRepository
-                  .findByNotebook_Id(notebookId)
-                  .map(binding -> binding.getAcceptedGitObjectId())
-                  .orElse(null);
-          if (!Objects.equals(currentRevision, expectedRevision)) {
-            throw new ResponseStatusException(
-                HttpStatus.CONFLICT,
-                "This review is stale. Load the current note and review again.");
-          }
+          requireReviewedRevision(notebookId, expectedRevision);
           authoredNoteDocumentPersistence.persist(note, document, updatedAt);
         },
         note -> "Edit note content: " + note.getTitle(),
         updatedAt);
+  }
+
+  private void requireReviewedRevision(Integer notebookId, String expectedRevision) {
+    String currentRevision =
+        bindingRepository
+            .findByNotebook_Id(notebookId)
+            .map(binding -> binding.getAcceptedGitObjectId())
+            .orElse(null);
+    if (!Objects.equals(currentRevision, expectedRevision)) {
+      throw new ResponseStatusException(
+          HttpStatus.CONFLICT, "This review is stale. Load the current note and review again.");
+    }
   }
 
   public Note edit(
