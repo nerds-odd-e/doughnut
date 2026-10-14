@@ -78,10 +78,13 @@ reusable procedure is retained only when that decision is keep.
   recorded per run.
 - **Output:** a dated evidence record (note list and commit, proposals,
   answer keys, procedure revision, model, prompts, raw outputs, scores,
-  latency, cost) and a keep/change/stop recommendation with reasons, applying
-  the decision rule agreed below. On keep, the procedure is saved as a note in
-  the owner's notebook under the existing Markdown profile; otherwise it stays
-  in the evidence record only.
+  latency, cost) and a keep/change/stop recommendation with reasons under the
+  owner's decision rule (2026-10-14): keep when the procedure condition beats
+  notes-attached on at least two of the three proposals and is worse on none;
+  stop when notes-attached equals or beats it; change when the result is mixed
+  and the owner can name what to adjust. On keep, the procedure is saved as a
+  note in the owner's notebook under the existing Markdown profile; otherwise
+  it stays in the evidence record only.
 
 **Scope — deferred promises** (not built or verified here): repeated runs or
 further models for statistical confidence; other review tasks; packaging the
@@ -137,12 +140,6 @@ keeps learning data out of Portable content).
 2. **Review cases.** The three proposals and their answer keys. Recommended:
    reuse real proposals from past training or review work, anonymized, with
    the answer keys written before any run.
-3. **Decision rule and acceptable added effort.** Recommended: keep when the
-   procedure condition beats notes-attached on at least two of the three
-   proposals and is worse on none; stop when notes-attached equals or beats it;
-   change when the result is mixed and the owner can name what to adjust.
-   Confirm or replace this rule, and confirm the owner's notebook as the home
-   of a kept procedure.
 
 - **Value / learning:** Distinguish the benefit of the knowledge itself from
   the benefit of compiling it into a working method.
@@ -160,8 +157,8 @@ keeps learning data out of Portable content).
 - Do not publish private learning history with knowledge exports. A saved
   artifact inside a Donut notebook follows the existing Markdown profile;
   external skill packaging is a derived output, not another notebook format.
-- No numeric quality gain has been assumed; the story's own open decisions
-  settle its rubric and decision rule.
+- No numeric quality gain has been assumed; the story's decision rule is a
+  blind, case-by-case comparison, not a measured gain.
 
 ## Ordering and Scope Reduction
 
