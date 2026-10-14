@@ -92,62 +92,6 @@ S = 30–60 minutes, M = 1–2 hours, L = 2–4 hours, including delivery, follo
 hypotheses. Refine or resplit work likely to exceed L before execution.
 Each story records its preparation state below.
 
-<a id="reviewed-title-sidebar-refresh"></a>
-
-### Show the accepted note title in the sidebar immediately
-
-**Identity:** SEED-073#reviewed-title-sidebar-refresh
-```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/001-reviewed-title-sidebar-refresh/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"e02ec2a8d0a8a65aae68d26dc7ac92d4d9819981da06f0f709a764955acf7dbf","plan":"3a2253d30db6748185fd2bd63286d364e30c92287139dc50a2c611e230500cc2"}}
-```
-
-**Goal:** A note author who accepts a reviewed title correction can immediately
-recognize the renamed note in the sidebar and navigate to it using its accepted
-title.
-
-**Scope:** Keep the sidebar's visible note title consistent with the confirmed
-title correction in the current view and during subsequent in-app navigation.
-Cover both wiki-reference handling choices while preserving their ordinary
-visible-reference behavior, title validation, and retained correction receipts.
-
-**Key examples:**
-
-1. Accept a correction from “Japan geography” to “Japan prefectures — reviewed”
-   with **Update visible reference text**. The note heading, sidebar entry, and
-   updated wiki-reference text show the accepted title without reloading.
-2. Accept another correction to “Japan’s 47 prefectures” with **Keep visible
-   reference text**. The heading and sidebar immediately show the new title;
-   existing wiki-reference text follows the selected keep behavior.
-3. Navigate to a related note and back after either acceptance. The sidebar
-   continues to identify the corrected note by its accepted title.
-
-**Observed discrepancy and provenance:** Manual browser observation on
-2026-10-14, within the 20:18–20:48 JST session, ran product base
-`5fe875a590549806a42441fa2e721358c02fb5c6`; the isolated E2E application
-reported tracking revision `1a4ae86bd234f9181d14a0a70fed00bbc0d102e3`.
-With deterministic model proposals, both accepted title corrections updated the
-heading and applied the chosen wiki-reference behavior, but the sidebar kept
-the previous title across in-app navigation. A full reload refreshed it.
-The session did not diagnose or repair the cause. The dated observation record
-and screenshot remain recoverable at
-`b9e69ee4facbe4f40041826ff649dafad92e5b95`:
-[observation](https://github.com/nerds-odd-e/doughnut/blob/b9e69ee4facbe4f40041826ff649dafad92e5b95/.planning/seeds/SEED-073-learning-refinement-and-retrieval.md#manual-reviewed-correction-evaluation)
-and
-[sidebar evidence](https://github.com/nerds-odd-e/doughnut/blob/b9e69ee4facbe4f40041826ff649dafad92e5b95/.planning/manual-testing-evidence/manual-reviewed-correction/manual-correction-sidebar.jpg).
-
-**Refinement reading (2026-10-14, at `d2365e495b`):** Code reading only, not a
-rerun. An ordinary title edit refreshes the note and then invalidates the
-sidebar's cached folder listings. Accepting a reviewed correction only reloads
-the note, so the cached listing keeps the old title until a full reload. No
-change to the correction review, note store, or sidebar code landed between
-the observed base and this reading.
-
-**Deferred:** Refreshing the sidebar for title changes made outside this
-browser session.
-
-**Effort hypothesis:** S (30–60 minutes), high confidence. No prerequisite
-story is established.
-
 ### Generate focus-note questions with relevant supporting passages
 
 The canonical story is [SEED-007#story-1](SEED-007-per-concept-prompt-splitting-single-note-qg.md#story-1).

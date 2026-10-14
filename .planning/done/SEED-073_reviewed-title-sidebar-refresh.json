@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 1,
+  "identity": "SEED-073#reviewed-title-sidebar-refresh",
+  "title": "Show the accepted note title in the sidebar immediately",
+  "completedAt": "2026-10-14T12:27:21.883Z",
+  "developer": "Terry Yin",
+  "agent": "Hibiki-chan",
+  "host": "claude"
+}
