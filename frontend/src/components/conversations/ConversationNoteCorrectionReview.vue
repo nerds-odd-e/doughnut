@@ -79,6 +79,7 @@ import {
   type TitleRenameReferenceHandling,
 } from "@/store/noteStore"
 import { noteShowLocation } from "@/routes/noteShowLocation"
+import { refreshSidebarStructuralListings } from "@/components/notes/sidebarStructuralRefresh"
 
 const CURRENT_NOTE_LOAD_FAILURE =
   "Could not load the current note. Your review is kept. Try again."
@@ -173,7 +174,10 @@ const accept = async () => {
       : ""
   if (!error) {
     emit("decided", correction!)
-    if (correction!.decision === "ACCEPTED") await refreshNote()
+    if (correction!.decision === "ACCEPTED") {
+      if (correction!.field === "TITLE") refreshSidebarStructuralListings()
+      await refreshNote()
+    }
   }
 }
 

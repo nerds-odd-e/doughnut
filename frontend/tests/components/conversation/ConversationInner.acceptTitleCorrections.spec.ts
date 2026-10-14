@@ -3,6 +3,7 @@ import { mockSdkService, mockShowNote, wrapSdkError } from "@tests/helpers"
 import { flushPromises } from "@vue/test-utils"
 import makeMe from "donut-test-fixtures/makeMe"
 import { beforeEach, expect, it, vi } from "vitest"
+import { sidebarStructuralRefreshKey } from "@/components/notes/sidebarStructuralRefresh"
 import {
   exchange,
   mountConversation,
@@ -27,41 +28,43 @@ const proposal = () =>
     .title("Proposed title")
     .please()
 
+const acceptReviewedTitle = async (
+  conversation: Parameters<typeof mountConversation>[0]
+) => {
+  const title = proposal()
+  mockSdkService(ConversationMessageController, "getConversationCorrections", [
+    title,
+  ])
+  const receipt = makeMe.aConversationNoteCorrection
+    .id(title.id)
+    .forNote(realm.note)
+    .fromMessage(exchange.id)
+    .title(title.proposedValue!)
+    .acceptedBy(user, "Reviewed title", "b".repeat(40), "2026-10-14T03:00:00Z")
+    .please()
+  const accept = mockSdkService(
+    ConversationMessageController,
+    "acceptCorrection",
+    receipt
+  )
+  const wrapper = mountConversation(conversation)
+  await flushPromises()
+  const review = wrapper.find('[data-testid="conversation-note-correction"]')
+  await review.find("input").setValue("Reviewed title")
+  const sidebarRefreshesBefore = sidebarStructuralRefreshKey.value
+  await review
+    .findAll("button")
+    .find((button) => button.text() === "Accept")!
+    .trigger("click")
+  await flushPromises()
+  return { title, receipt, accept, wrapper, review, sidebarRefreshesBefore }
+}
+
 it.each([noteConversation, recallConversation])(
   "accepts an explicitly edited title and retains the confirmed wording and revision",
   async (conversation) => {
-    const title = proposal()
-    mockSdkService(
-      ConversationMessageController,
-      "getConversationCorrections",
-      [title]
-    )
-    const receipt = makeMe.aConversationNoteCorrection
-      .id(title.id)
-      .forNote(realm.note)
-      .fromMessage(exchange.id)
-      .title(title.proposedValue!)
-      .acceptedBy(
-        user,
-        "Reviewed title",
-        "b".repeat(40),
-        "2026-10-14T03:00:00Z"
-      )
-      .please()
-    const accept = mockSdkService(
-      ConversationMessageController,
-      "acceptCorrection",
-      receipt
-    )
-    const wrapper = mountConversation(conversation)
-    await flushPromises()
-    const review = wrapper.find('[data-testid="conversation-note-correction"]')
-    await review.find("input").setValue("Reviewed title")
-    await review
-      .findAll("button")
-      .find((button) => button.text() === "Accept")!
-      .trigger("click")
-    await flushPromises()
+    const { title, receipt, accept, wrapper, review } =
+      await acceptReviewedTitle(conversation)
     expect(accept).toHaveBeenCalledWith({
       path: { correctionId: title.id },
       body: {
@@ -73,6 +76,16 @@ it.each([noteConversation, recallConversation])(
     expect(review.text()).toContain(
       `Accepted revision: ${receipt.acceptedRevision}`
     )
+    wrapper.unmount()
+  }
+)
+
+it.each([noteConversation, recallConversation])(
+  "refreshes the sidebar listings after accepting a title correction",
+  async (conversation) => {
+    const { wrapper, sidebarRefreshesBefore } =
+      await acceptReviewedTitle(conversation)
+    expect(sidebarStructuralRefreshKey.value).toBe(sidebarRefreshesBefore + 1)
     wrapper.unmount()
   }
 )

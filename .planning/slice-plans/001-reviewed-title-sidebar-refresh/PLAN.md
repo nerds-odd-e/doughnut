@@ -61,7 +61,7 @@ unset. No backend change is planned, so no broader local check is needed.
 ### 1. Accepted title corrections refresh the sidebar
 
 Type: Behavior
-Status: planned
+Status: done
 Proof: the new case in `ConversationInner.acceptTitleCorrections.spec.ts`,
 run with both `noteConversation` and `recallConversation`, fails before the
 change and passes after it. Existing cases in that file and
@@ -71,6 +71,15 @@ Behavior: an author reviews a title correction in a conversation → accepts it
 → the sidebar listing refresh is triggered, so the sidebar shows the accepted
 title now and on later navigation.
 
+Accepted proof: the case "refreshes the sidebar listings after accepting a
+title correction" in `ConversationInner.acceptTitleCorrections.spec.ts`, for
+`noteConversation` and `recallConversation`, failed before the change (2 of 2,
+`expected +0 to be 1`) and passes after. Its setup (pending title proposal,
+accepted receipt, typing, and the Accept click) is shared with the existing
+explicit-acceptance case through the spec's `acceptReviewedTitle` helper. The
+conversation specs (64 of 64), `SidebarFolderListingReload.spec.ts` (4 of 4),
+and `vue-tsc --noEmit` pass.
+
 ## Current decisions
 
 - Refresh the sidebar only when the accepted correction is a `TITLE`
@@ -79,3 +88,8 @@ title now and on later navigation.
 - Keep the rule "a confirmed title change refreshes the sidebar" next to the
   ordinary title edit if the post-change refactor finds a clean shared home in
   the note store. Do not build a general change-notification mechanism.
+- Learning: no shared note-store home fits. The rule already lives in
+  `refreshSidebarStructuralListings()` (`sidebarStructuralRefresh.ts`), and
+  each title-change path calls it in one line. Moving it into `loadNoteRealm`
+  would refresh the sidebar on every note load, so the call stays in
+  `ConversationNoteCorrectionReview.vue`.
