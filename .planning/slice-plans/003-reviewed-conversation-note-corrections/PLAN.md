@@ -167,6 +167,26 @@ with their owners.
 
 ## Ordered slices
 
+Execution: story-branch in
+`/Users/terryyin/git/doughnut/.worktrees/save-a-useful-chat-clarification-as-a-reviewed-n`,
+branch `codex/save-a-useful-chat-clarification-as-a-reviewed-n`, agent Rio-chan,
+publisher `dashboard-territory.local-doughnut`. Originating and execution checkout
+are this workspace; no integration checkout is supplied. Authorized remote is
+`origin`, trunk `main`; increments publish to the execution branch.
+Established claim/base: `f9b14b6f0f1824ad8e6fdd5dc65ba860941edd4c`;
+starting revision: `9cc7652609b055a208e53a84d374f034a149cf8f`.
+Replanning is allowed within the selected story under the existing plan's
+overrun rule. Checkout setup `./scripts/run.sh bash scripts/worktree_setup.sh`
+and `CURSOR_DEV=true nix develop -c pnpm -C frontend exec tsc --noEmit` passed
+on 2026-10-14. The shared pre-commit hook checks staged components without
+mutation through `./scripts/run.sh pnpm lint:changed`.
+
+CI observer: GitHub Actions `nerds-odd-e/doughnut`, workflow `ci.yml` (verified
+`donut CI`), target `codex/save-a-useful-chat-clarification-as-a-reviewed-n`,
+coordinator `rio-story-2`, directory `/tmp/dough-ci-501/watch-ubDtkr`, PID 11074,
+session 67431, yielded cell 9, armed from this execution checkout. The claim on
+trunk is unobserved; this observer covers branch increments and owned repairs.
+
 Each slice includes implementation, its proof, and local cleanup. Target roughly
 five minutes; estimates below are hypotheses including ordinary focused checks.
 The 6–9 minute leaves were scrutinized: their extra scope is the one stated
@@ -178,7 +198,7 @@ one controller supplies the focused observation. No whole-product E2E gate is ad
 
 ### 1. Prepare storage for conversation correction evidence
 Type: Structure
-Status: planned
+Status: done
 Proof: Fresh/upgrade migration succeeds; existing conversation and deletion
 behavior remains green in `pnpm backend:verify`; regenerated ERD shows deliberate
 FK lifetimes. This enables slice 2 immediately.
@@ -197,6 +217,26 @@ completion on the target environment, then release the dependent code separately
 This is a release constraint, not authority to deploy from preparation or a
 claim that production already has the schema. Development on isolated migrated
 test databases can continue. Preserve the schema revision in execution evidence.
+
+Execution evidence (2026-10-14): private `ConversationNoteCorrection` evidence
+and migration `V300000354` added without runtime proposal reads. Source-message
+and subject-note delete edges cascade; reviewer deletion sets its reference null.
+`CURSOR_DEV=true nix develop -c pnpm backend:verify` passed: 2,814 tests,
+zero failures/errors, two skipped, isolated schema
+`doughnut_wt_a98a02cb445540b68fd7742fd49b8403_test`. Migration initially exposed
+signed FK IDs; matching existing unsigned IDs corrected it. Compilation then
+required the builder's `beforeCreate` hook; the final command passed after repair.
+Inspected controller deletion observations: `NoteControllerPermanentDeleteTests`,
+`NotebookFolderPermanentDeleteControllerTest` and their correction-inclusive
+`dependentCounts`; `MemoryTrackerDeleteControllerTest`; Git deletion, rollback,
+retry, recreation and copy publication consumers with `.withNoteCorrection()`.
+Their terminal XML results and `DeletableEntityFkClosureTest` passed.
+`CURSOR_DEV=true nix develop -c env DONUT_ERD_SCHEMA=doughnut_wt_a98a02cb445540b68fd7742fd49b8403_test pnpm export:database-erd`
+passed and generated all three FK lifetimes. Independent refactor: already
+clean; no edits or proof reruns. Canonical PLAN and generated ERD retained despite
+the generic 250-line check to preserve their source/layout owners. Coordinator
+selective formatting passed. Schema-only commit is the deployment checkpoint;
+its accepted SHA will be retained with the next increment.
 
 ### 2. Retain generated corrections with their originating exchange
 Type: Behavior
@@ -307,6 +347,13 @@ Finish the explicit current-content/rereview interaction. Keep the original
 proposal and origin inspectable while the author decides what to submit against
 current content. No automatic merge, silent retry, or second proposal lifecycle.
 Update enduring recovery documentation in the same increment. Estimate: 5–7 minutes.
+
+## Story obligations
+
+### G1. Durable proposal capture and reads
+Reported: slice 1 — "No runtime proposal reads or API changes were added; their proof belongs to slice 2."
+Story clause: "Retain the proposal and its decision with the conversation."
+Disposition: receiving slice 2
 
 ## Verification and delivery
 

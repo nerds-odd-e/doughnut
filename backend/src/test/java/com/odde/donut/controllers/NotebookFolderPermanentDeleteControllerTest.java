@@ -100,6 +100,11 @@ class NotebookFolderPermanentDeleteControllerTest extends NoteDependentRowsContr
   private Note trackedNoteIn(Folder folder, String title) {
     Note note = makeMe.aNote(title).folder(folder).please();
     makeMe.aMemoryTrackerFor(note).please();
+    makeMe
+        .aConversationNoteCorrection(
+            makeMe.aConversationMessage(makeMe.aConversation().forANote(note).please()).please())
+        .acceptedBy(currentUser.getUser())
+        .please();
     return note;
   }
 

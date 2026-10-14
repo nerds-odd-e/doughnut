@@ -179,6 +179,11 @@ public class MakeMe extends MakeMeWithoutDB {
     return new ConversationMessageBuilder(conversation, this);
   }
 
+  public ConversationNoteCorrectionBuilder aConversationNoteCorrection(
+      ConversationMessage sourceMessage) {
+    return new ConversationNoteCorrectionBuilder(sourceMessage, this);
+  }
+
   public QuestionGenerationBatchBuilder aQuestionGenerationBatch() {
     return new QuestionGenerationBatchBuilder(this);
   }
