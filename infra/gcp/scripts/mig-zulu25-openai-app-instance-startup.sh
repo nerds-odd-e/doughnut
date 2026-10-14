@@ -106,7 +106,7 @@ export GITHUB_FOR_ISSUES_API_TOKEN=$(curl "https://secretmanager.googleapis.com/
   --header "x-goog-user-project: ${PROJECTID}" |
   jq -r ".payload.data" | base64 --decode)
 
-export OPENAI_API_TOKEN=$(curl "https://secretmanager.googleapis.com/v1/projects/${PROJECTID}/secrets/openai_api_token/versions/1:access" \
+export OPENAI_API_TOKEN=$(curl "https://secretmanager.googleapis.com/v1/projects/${PROJECTID}/secrets/openai_api_token/versions/latest:access" \
   --request "GET" \
   --header "authorization: Bearer ${ACCESS_TOKEN}" \
   --header "content-type: application/json" \
