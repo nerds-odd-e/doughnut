@@ -253,6 +253,34 @@ external-agent access. Keep the existing workflows usable at every stopping
 point. The separately queued capability experiment can use a current notebook
 checkout and is neither a supplier nor a consumer blocking this epic.
 
+<a id="manual-reviewed-correction-evaluation"></a>
+
+### Observe reviewed conversation note corrections
+
+**Identity:** SEED-073#manual-reviewed-correction-evaluation
+```json dough-story-state
+{"schemaVersion":1,"refinement":"refined","approach":"unselected"}
+```
+
+**Goal:** Observe the delivered “Save a useful chat clarification as a reviewed note correction” journeys within the owner's 30-minute manual-testing budget.
+
+**Scope:** Manual observation only. Recover the completed story from Git and current recall help; cover direct-note and MCQ content/title proposals, pending/declined/accepted decisions, durable receipts, stale-review recovery, and existing audience/edit rights. No diagnosis, product repair, or permanent test changes. Record material coverage gaps when time or supported setup prevents observation.
+
+**Known expectations:** Explicit reviewed acceptance publishes the exact wording with a stable revision receipt; proposals, decline, and closing preserve authored content. Stale or failed reviews preserve input and permit explicit recovery. Private review evidence and recall state retain their existing ownership and meaning.
+
+**Session plan:** Preparation 7 minutes; breadth 10 minutes; selective depth 8 minutes; confirmation and cleanup 5 minutes. Prioritize unintended publication, lost wording, durable receipts, and stale review. Use isolated held E2E services with deterministic model replies when supported.
+
+The backlog owns global priority. Within this epic: resolve an actual learning
+difficulty, retain a useful note correction, improve question evidence through
+SEED-007, then improve body search, external-agent evidence access, and cited
+comparison. This order favors immediate learning value before broader query
+machinery; it does not impose serial technical dependencies.
+
+Drop or defer broader comparison first if capacity is tight, then expanded
+external-agent access. Keep the existing workflows usable at every stopping
+point. The separately queued capability experiment can use a current notebook
+checkout and is neither a supplier nor a consumer blocking this epic.
+
 ## Open Decisions
 
 - Select real learner cases during evaluation; human comprehension,
