@@ -253,17 +253,6 @@ external-agent access. Keep the existing workflows usable at every stopping
 point. The separately queued capability experiment can use a current notebook
 checkout and is neither a supplier nor a consumer blocking this epic.
 
-The backlog owns global priority. Within this epic: resolve an actual learning
-difficulty, retain a useful note correction, improve question evidence through
-SEED-007, then improve body search, external-agent evidence access, and cited
-comparison. This order favors immediate learning value before broader query
-machinery; it does not impose serial technical dependencies.
-
-Drop or defer broader comparison first if capacity is tight, then expanded
-external-agent access. Keep the existing workflows usable at every stopping
-point. The separately queued capability experiment can use a current notebook
-checkout and is neither a supplier nor a consumer blocking this epic.
-
 ## Open Decisions
 
 - Select real learner cases during evaluation; human comprehension,
