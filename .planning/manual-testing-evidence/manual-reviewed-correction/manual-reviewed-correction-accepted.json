@@ -1,0 +1,38 @@
+{
+  "acceptedRevision": "52bfcaa9dd22ae3a4664599c2309e7f27809207e",
+  "baseRevision": "d0d83d7dc32cd8ed3543d79a54064e3395f02fed",
+  "decidedAt": "2026-10-14T11:33:17.117Z",
+  "decidedBy": {
+    "admin": false,
+    "dailyAssimilationCount": 15,
+    "dailyProbeEnabled": false,
+    "externalIdentifier": "old_learner",
+    "healthRemoveEmptyFoldersDefault": false,
+    "id": 1,
+    "name": "Old Learner",
+    "ownership": {
+      "circle": null,
+      "id": 1,
+      "ownerName": "Old Learner"
+    }
+  },
+  "decision": "ACCEPTED",
+  "field": "CONTENT",
+  "id": 4,
+  "note": {
+    "noteTopology": {
+      "createdAt": "2026-10-14T11:25:16.000Z",
+      "id": 1,
+      "title": "Correlation and causation",
+      "updatedAt": "2026-10-14T11:33:17.117Z"
+    },
+    "content": "---\ntype: Note\n---\nCorrelation alone does not establish causation. A common cause, such as hot weather, can increase both ice cream sales and swimming accidents.",
+    "id": 1
+  },
+  "proposedValue": "Correlation alone does not establish causation. Hot weather can increase both ice cream sales and swimming accidents.",
+  "reason": "Retains the common-cause clarification from this recall discussion.",
+  "responseId": "4233fd0e-bae8-4e15-9bc4-31515725030c",
+  "reviewedValue": "---\ntype: Note\n---\nCorrelation alone does not establish causation. A common cause, such as hot weather, can increase both ice cream sales and swimming accidents.",
+  "sourceMessageId": 8,
+  "toolCallId": "call-mock"
+}
