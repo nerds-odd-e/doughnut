@@ -21,7 +21,6 @@ import {
   mountNoteToolbarRecording,
   moveNoteToolbarTo,
 } from "@tests/notes/noteVoiceInputButtonTestSupport"
-import { holdMicrophoneStartup } from "@tests/notes/spokenTitleTestSupport"
 import {
   AiAudioController,
   TextContentController,
@@ -87,23 +86,6 @@ describe("NoteToolbar Voice input on a narrow toolbar", () => {
 
     await openNoteToolbarOverflowMenu(wrapper)
     expect(overflowMenuItem(titles.voiceInput)).not.toBeNull()
-  })
-
-  it("shows Voice input in the toolbar, not the menu, while the microphone starts", async () => {
-    holdMicrophoneStartup()
-    wrapper = await mountNoteToolbar(makeMe.aNoteRealm.please())
-    await layoutNoteToolbar(wrapper, overflowTogglesNavWidth())
-
-    await openNoteToolbarOverflowMenu(wrapper)
-    overflowMenuItem(titles.voiceInput)!.click()
-    await flushPromises()
-
-    const button = noteToolbarAction(wrapper, titles.voiceInput)
-    expect(button.isVisible()).toBe(true)
-    expect(button.attributes()).toHaveProperty("disabled")
-    expect(button.find(".animate-spin").exists()).toBe(true)
-    await openNoteToolbarOverflowMenu(wrapper)
-    expect(overflowMenuItem(titles.voiceInput)).toBeNull()
   })
 
   it("returns Voice input to overflow when the author moves to another note while recording", async () => {

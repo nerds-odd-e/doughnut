@@ -27,7 +27,7 @@
     "@inkjs/ui": "2.0.0",
     "chalk": "6.0.1",
     "donut-api": "workspace:*",
-    "markdansi": "0.3.5",
+    "markdansi": "0.3.4",
     "react": "^19.3.0",
     "string-width": "8.3.0",
     "turndown": "^7.2.4",
@@ -35,7 +35,7 @@
     "yoga-layout": "~3.2.1"
   },
   "devDependencies": {
-    "@types/node": "26.6.5",
+    "@types/node": "26.6.4",
     "@types/react": "^19.3.0",
     "donut-test-fixtures": "workspace:*",
     "esbuild": "0.28.2",
@@ -44,6 +44,6 @@
     "tsx": "4.23.15",
     "typescript": "6.0.3",
     "vitest": "5.0.3",
-    "zod": "4.6.6"
+    "zod": "4.6.5"
   }
 }

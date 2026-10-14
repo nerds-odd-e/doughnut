@@ -1,5 +1,4 @@
 import { flushPromises } from "@vue/test-utils"
-import { screen } from "@testing-library/vue"
 import { wrapSdkResponse } from "@tests/helpers"
 import {
   mockWikidataSearchResult,
@@ -45,15 +44,6 @@ describe("WikidataAssociationDialog search and input", () => {
     )?.click()
     await flushPromises()
     expect(dialog.emitted("close")).toBeTruthy()
-  })
-
-  it("dismisses through the named modal control beside the footer Close", async () => {
-    const dialog = mountDialog("test")
-    await flushPromises()
-    expect(screen.getByText("Close", { selector: "button" })).toBeTruthy()
-    screen.getByLabelText("Close modal").click()
-    await flushPromises()
-    expect(dialog.emitted("close")).toHaveLength(1)
   })
 
   it("shows loading state when searching", async () => {

@@ -22,7 +22,6 @@ class AnsweredQuestionBuilder extends Builder<AnsweredQuestion> {
   private answerToUse?: Answer
   private notebookIdToUse = generateId()
   private matchedNotesToUse?: NoteTopology[]
-  private exclusionToUse?: Pick<Answer, 'excludedAt' | 'exclusionReason'>
 
   withNote(note: Note): this {
     this.noteToUse = note
@@ -103,13 +102,6 @@ class AnsweredQuestionBuilder extends Builder<AnsweredQuestion> {
     return this
   }
 
-  /** A wrong MCQ answer the learner confirmed as an ambiguous question. */
-  excludedAsAmbiguous(exclusionReason: string, excludedAt: string): this {
-    this.isCorrect = false
-    this.exclusionToUse = { excludedAt, exclusionReason }
-    return this
-  }
-
   fromMcqHistoryItem(
     pending: RecallPromptHistoryItem,
     note: Note,
@@ -129,17 +121,15 @@ class AnsweredQuestionBuilder extends Builder<AnsweredQuestion> {
 
   do(): AnsweredQuestion {
     const note = this.noteToUse ?? makeMe.aNote.please()
-    const answer = {
-      ...(this.answerToUse ??
-        ({
-          id: generateId(),
-          correct: this.isCorrect,
-          ...(this.choiceIndexToUse !== undefined && {
-            choiceIndex: this.choiceIndexToUse,
-          }),
-        } as Answer)),
-      ...this.exclusionToUse,
-    }
+    const answer =
+      this.answerToUse ??
+      ({
+        id: generateId(),
+        correct: this.isCorrect,
+        ...(this.choiceIndexToUse !== undefined && {
+          choiceIndex: this.choiceIndexToUse,
+        }),
+      } as Answer)
     const mcq =
       this.questionType === 'MCQ'
         ? (this.mcqToUse ?? makeMe.anMcq.please())

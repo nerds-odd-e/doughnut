@@ -38,11 +38,14 @@ const formField = (label: string) => {
       return self
     },
     shouldHaveValue(value: string) {
-      inputElement(label).should(($el) => {
-        const actual = $el.is('input, textarea, select, button')
-          ? $el.val()
-          : $el.text().trim()
-        expect(actual).to.eq(value)
+      inputElement(label).then(($input) => {
+        if (isContentEditable($input)) {
+          cy.wrap($input).should(($el) => {
+            expect($el.text().trim()).to.eq(value)
+          })
+        } else {
+          cy.wrap($input).should('have.value', value)
+        }
       })
       return self
     },

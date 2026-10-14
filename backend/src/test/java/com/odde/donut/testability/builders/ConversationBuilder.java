@@ -6,8 +6,6 @@ import com.odde.donut.testability.MakeMe;
 import java.sql.Timestamp;
 
 public class ConversationBuilder extends EntityBuilder<Conversation> {
-  private boolean withNoteCorrection;
-
   public ConversationBuilder(MakeMe makeMe) {
     super(makeMe, new Conversation());
   }
@@ -21,20 +19,6 @@ public class ConversationBuilder extends EntityBuilder<Conversation> {
     if (this.entity.getConversationInitiator() == null) {
       entity.setConversationInitiator(makeMe.aUser().please(needPersist));
     }
-  }
-
-  @Override
-  protected void afterCreate(boolean needPersist) {
-    if (withNoteCorrection) {
-      makeMe
-          .aConversationNoteCorrection(makeMe.aConversationMessage(entity).please(needPersist))
-          .please(needPersist);
-    }
-  }
-
-  public ConversationBuilder withNoteCorrection() {
-    withNoteCorrection = true;
-    return this;
   }
 
   public ConversationBuilder forANote(Note note) {
@@ -54,7 +38,6 @@ public class ConversationBuilder extends EntityBuilder<Conversation> {
 
   public ConversationBuilder forARecallPrompt(RecallPrompt recallPrompt) {
     this.entity.setRecallPrompt(recallPrompt);
-    this.entity.setAccessOwnership(recallPrompt.getNotebook().getOwnership());
     return this;
   }
 }

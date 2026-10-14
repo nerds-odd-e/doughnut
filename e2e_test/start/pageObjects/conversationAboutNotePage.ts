@@ -80,59 +80,23 @@ export class ConversationAboutNotePage {
     return this
   }
 
-  expectPendingContentCorrection(content: string) {
-    cy.get('[data-testid="conversation-note-correction"]')
-      .should('have.length', 1)
+  shouldShowCompletion() {
+    cy.findByRole('dialog')
+      .should('be.visible')
       .within(() => {
-        cy.findByText('Pending review').should('be.visible')
-        cy.findByText('Completes the city description.').should('be.visible')
-        cy.findByLabelText('Proposed Content').should('have.value', content)
+        cy.get('.completion-text').should(($el) => {
+          expect(
+            $el.is(':visible'),
+            'Expected suggested note content completion to be visible'
+          ).to.be.true
+        })
       })
     return this
   }
 
-  revisePendingContentCorrection(content: string) {
-    cy.get('[data-testid="conversation-note-correction"]').within(() => {
-      cy.findByLabelText('Proposed Content').clear().type(content, { delay: 0 })
-    })
-    return this
-  }
-
-  expectReviewedContent(content: string) {
-    cy.get('[data-testid="conversation-note-correction"]').within(() => {
-      cy.findByLabelText('Proposed Content').should('have.value', content)
-    })
-    return this
-  }
-
-  acceptContentCorrection() {
-    cy.get('[data-testid="conversation-note-correction"]').within(() => {
-      cy.findByRole('button', { name: 'Accept', exact: true }).click()
-    })
-    waitUntilAppIsNotBusy()
-    return this
-  }
-
-  expectAcceptedContentCorrection(content: string) {
-    cy.get('[data-testid="conversation-note-correction"]').within(() => {
-      cy.findByText('Accepted', { exact: true }).should('be.visible')
-      cy.get('[data-testid="accepted-reviewed-content"]')
-        .contains('p', content)
-        .should(($review) => {
-          expect($review.text().trim(), 'retained reviewed paragraph').to.equal(
-            content
-          )
-        })
-      cy.contains('Accepted revision:')
-        .invoke('text')
-        .should('match', /Accepted revision: [0-9a-f]{40}/)
-    })
-    return this
-  }
-
-  openCorrectionNote() {
-    cy.get('[data-testid="conversation-note-correction"]').within(() => {
-      cy.findByRole('button', { name: 'Open note', exact: true }).click()
+  acceptCompletion() {
+    cy.findByRole('dialog').within(() => {
+      cy.findByRole('button', { name: 'Accept' }).click()
     })
     waitUntilAppIsNotBusy()
     return this

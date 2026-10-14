@@ -34,7 +34,6 @@ import org.springframework.web.server.ResponseStatusException;
 
 class AiControllerNoteRefinementTest extends ControllerTestBase {
   @Autowired AiController controller;
-  @Autowired NoteController noteController;
 
   OpenAiStructuredResponseMock openAiStructuredResponseMock;
   Note testNote;
@@ -115,8 +114,6 @@ class AiControllerNoteRefinementTest extends ControllerTestBase {
       questionContext.setStem("What is the capital of France?");
       questionContext.setChoices(List.of("Paris", "London", "Berlin"));
       questionContext.setCorrectAnswerIndex(0);
-      questionContext.setSelectedChoiceIndex(1);
-      questionContext.setClarification("I confused the French capital with the UK capital.");
       questionContext.setTestedFocus("capital city");
 
       controller.generateRefinementSuggestions(testNote, questionContext);
@@ -130,9 +127,6 @@ class AiControllerNoteRefinementTest extends ControllerTestBase {
           .contains("What is the capital of France?")
           .contains("Choices:\nParis\nLondon\nBerlin")
           .contains("Correct answer: Paris")
-          .contains("Learner's selected answer: London")
-          .contains(
-              "Learner-reviewed clarification: I confused the French capital with the UK capital.")
           .doesNotContain("Correct answer index")
           .contains("Tested focus: capital city")
           .contains("Set ledToQuestion=true")
@@ -179,23 +173,6 @@ class AiControllerNoteRefinementTest extends ControllerTestBase {
         validatorLogger.detachAppender(logAppender);
         validatorLogger.setLevel(originalLevel);
       }
-    }
-
-    @Test
-    void subscriberMayReadButCannotRefineAnotherUsersNote()
-        throws UnexpectedNoAccessRightException {
-      Note sharedNote = makeMe.aNote().notebookOwnedBy(makeMe.aUser().please()).please();
-      makeMe.aBazaarNotebook(sharedNote.getNotebook()).please();
-      makeMe
-          .aSubscription()
-          .forUser(currentUser.getUser())
-          .forNotebook(sharedNote.getNotebook())
-          .please();
-
-      assertThat(noteController.showNote(sharedNote).getId()).isEqualTo(sharedNote.getId());
-      assertThrows(
-          UnexpectedNoAccessRightException.class,
-          () -> controller.generateRefinementSuggestions(sharedNote, null));
     }
 
     @Test

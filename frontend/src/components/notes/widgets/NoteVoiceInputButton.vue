@@ -1,22 +1,44 @@
 <template>
-  <VoiceInputButton
+  <button
+    type="button"
     :class="
       hasKeptRecording
         ? toolbarKeptRecordingBtnClass
         : toolbarToggleBtnClass(isRecording)
     "
-    :state="state"
-    :read-level="readLevel"
-    :names="noteVoiceInputTitles"
+    :title="name"
+    :aria-label="name"
+    :aria-pressed="isRecording || undefined"
+    :disabled="finishing"
     @pointerdown="preserveTitleFocus"
     @click="click"
-  />
+  >
+    <canvas
+      v-if="isRecording && !titleRecording"
+      ref="levelCanvas"
+      class="w-6 h-6"
+      width="24"
+      height="24"
+      aria-hidden="true"
+    />
+    <LoaderCircle
+      v-else-if="finishing"
+      class="w-6 h-6 animate-spin"
+      aria-hidden="true"
+    />
+    <RotateCw
+      v-else-if="hasKeptRecording"
+      class="w-6 h-6"
+      aria-hidden="true"
+    />
+    <Mic v-else class="w-6 h-6" aria-hidden="true" />
+  </button>
 </template>
 
 <script setup lang="ts">
-import { computed, inject } from "vue"
+import { computed, inject, ref, watch } from "vue"
 import type { Note } from "@generated/donut-backend-api"
-import VoiceInputButton from "@/components/commons/VoiceInputButton.vue"
+import { LoaderCircle, Mic, RotateCw } from "@lucide/vue"
 import { useNoteVoiceInput } from "@/composables/useNoteVoiceInput"
 import { noteTitleDictationKey } from "@/composables/useTitleDictation"
 import { noteVoiceInputTitles } from "./noteMoreOptionsTitles"
@@ -40,16 +62,16 @@ const {
 } = useNoteVoiceInput(note)
 
 const title = inject(noteTitleDictationKey, undefined)
-const titleState = computed(() => title?.dictation.voiceInput.buttonState.value)
-const titleRecording = computed(() => titleState.value === "recording")
+const titleRecording = computed(
+  () => title?.dictation.voiceInput.phase.value === "listening"
+)
 const isRecording = computed(
   () => titleRecording.value || contentRecording.value
 )
-const startingOrFinishing = computed(
+const finishing = computed(
   () =>
-    phase.value === "starting" ||
     phase.value === "stopping" ||
-    titleState.value === "busy"
+    (title?.dictation.busy.value === true && !titleRecording.value)
 )
 const preserveTitleFocus = (event: PointerEvent) => {
   if (
@@ -64,16 +86,11 @@ const start = () =>
     ? title.dictation.voiceInput.startListening()
     : startContent()
 
-const state = computed(() => {
-  if (isRecording.value) return "recording"
-  if (startingOrFinishing.value) return "busy"
-  if (hasKeptRecording.value) return "keptRecording"
-  return "idle"
+const name = computed(() => {
+  if (isRecording.value) return noteVoiceInputTitles.stop
+  if (hasKeptRecording.value) return noteVoiceInputTitles.retry
+  return noteVoiceInputTitles.start
 })
-const readLevel = () =>
-  titleRecording.value
-    ? title!.dictation.voiceInput.readLevel()
-    : audioRecorder.getAudioData()
 
 const click = () => {
   if (titleRecording.value) return title!.dictation.voiceInput.stopListening()
@@ -81,6 +98,48 @@ const click = () => {
   if (hasKeptRecording.value) return retry()
   return start()
 }
+
+const barWidth = 2
+const barStep = 3
+const framesPerBar = 6
+const levelCanvas = ref<HTMLCanvasElement | null>(null)
+let levels: number[] = []
+let frame = 0
+let animationId = 0
+
+const drawLevels = () => {
+  const canvas = levelCanvas.value
+  const ctx = canvas?.getContext("2d")
+  if (!canvas || !ctx) return
+
+  const level = Math.min(1, Math.abs(audioRecorder.getAudioData()) * 4)
+  if (frame % framesPerBar === 0) {
+    levels = [...levels, level].slice(-Math.floor(canvas.width / barStep))
+  }
+  frame += 1
+
+  ctx.clearRect(0, 0, canvas.width, canvas.height)
+  ctx.fillStyle = getComputedStyle(canvas).color
+  const firstX = canvas.width - levels.length * barStep
+  levels.forEach((barLevel, index) => {
+    const height = Math.max(barWidth, barLevel * canvas.height)
+    ctx.fillRect(
+      firstX + index * barStep,
+      (canvas.height - height) / 2,
+      barWidth,
+      height
+    )
+  })
+
+  animationId = requestAnimationFrame(drawLevels)
+}
+
+watch(levelCanvas, (canvas) => {
+  cancelAnimationFrame(animationId)
+  levels = []
+  frame = 0
+  if (canvas) drawLevels()
+})
 
 defineExpose({ start, wakeLocker, processAudio })
 </script>

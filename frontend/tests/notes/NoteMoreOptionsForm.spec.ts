@@ -90,9 +90,7 @@ describe("NoteMoreOptionsForm", () => {
 
   describe("refine note action", () => {
     it("opens the refine note modal and closes the menu when clicked", async () => {
-      const wrapper = renderer
-        .withProps({ note })
-        .mount({ attachTo: document.body })
+      const wrapper = renderer.withProps({ note }).mount()
 
       await flushPromises()
 
@@ -103,7 +101,7 @@ describe("NoteMoreOptionsForm", () => {
       await flushPromises()
 
       const modalEl = document.querySelector('[data-test="refine-note-modal"]')
-      expect(modalEl?.closest("dialog")?.open).toBe(true)
+      expect(modalEl?.classList.contains("daisy-modal-open")).toBe(true)
       expect(wrapper.emitted()).toHaveProperty("close-dialog")
     })
   })

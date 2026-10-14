@@ -14,11 +14,10 @@ import {
   type NoteNewFormSdkSpies,
 } from "@tests/notes/noteNewFormTestSupport"
 import {
-  expectBusySpeakTitleButton,
+  expectConvertingSpeakTitleButton,
   expectIdleSpeakTitleButton,
   expectListeningSpeakTitleButton,
   hearing,
-  holdMicrophoneStartup,
   holdSpeakTitleConvertingUntilFinished,
   speakAndStop,
   speakTheTitle,
@@ -56,18 +55,13 @@ describe("NoteNewForm spoken title", () => {
     wrapper?.unmount()
   })
 
-  it("is an idle microphone button in the title field before the Wikidata button, then a highlighted waveform of the recording's level while listening", async () => {
+  it("is an idle microphone button in the title field before the Wikidata button, then a highlighted one while listening", async () => {
     wrapper = mountNoteNewForm(notebookRootProps, { attachTo: document.body })
 
     expectIdleSpeakTitleButton(wrapper)
-    const idleButton = speakTitleButton(wrapper, "Speak the title").element
-    expect(idleButton.nextElementSibling).toBe(
-      wrapper.find('button[aria-label="Wikidata Id"]').element
-    )
-    expect(idleButton.getBoundingClientRect().height).toBe(
-      wrapper.find(".path-name-editor-join").element.getBoundingClientRect()
-        .height
-    )
+    expect(
+      speakTitleButton(wrapper, "Speak the title").element.nextElementSibling
+    ).toBe(wrapper.find('button[aria-label="Wikidata Id"]').element)
 
     await speakTheTitle(wrapper)
 
@@ -76,21 +70,6 @@ describe("NoteNewForm spoken title", () => {
       expect.any(Function),
       { convertOnlyAtStop: true }
     )
-    expect(
-      vi.mocked(createAudioRecorder).mock.results[0]!.value.getAudioData
-    ).toHaveBeenCalled()
-  })
-
-  it("is unavailable with a spinner until the microphone is ready", async () => {
-    const { finishStartup } = holdMicrophoneStartup()
-    wrapper = mountNoteNewForm(notebookRootProps, { attachTo: document.body })
-
-    await speakTheTitle(wrapper)
-    expectBusySpeakTitleButton(wrapper)
-
-    finishStartup()
-    await flushPromises()
-    expectListeningSpeakTitleButton(wrapper)
   })
 
   it("is unavailable while converting, then puts heard words in the title and is idle", async () => {
@@ -101,7 +80,7 @@ describe("NoteNewForm spoken title", () => {
 
     const stopClick = stopSpeaking(wrapper)
     await flushPromises()
-    expectBusySpeakTitleButton(wrapper)
+    expectConvertingSpeakTitleButton(wrapper)
 
     finishStop()
     await stopClick

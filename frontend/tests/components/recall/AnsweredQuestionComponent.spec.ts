@@ -66,7 +66,6 @@ describe("AnsweredQuestionComponent", () => {
         .please()
       const chain = helper
         .component(AnsweredQuestionComponent)
-        .withCurrentUser(makeMe.aUser.please())
         .withRouter()
         .withCleanStorage()
       useNoteStore().refreshNoteRealm(noteRealm)
@@ -98,11 +97,9 @@ describe("AnsweredQuestionComponent", () => {
       const answeredQuestion = makeMe.anAnsweredQuestion
         .withNote(noteRealm.note)
         .withMcq(mcq)
-        .withChoiceIndex(1)
         .please()
       const chain = helper
         .component(AnsweredQuestionComponent)
-        .withCurrentUser(makeMe.aUser.please())
         .withRouter()
         .withCleanStorage()
       useNoteStore().refreshNoteRealm(noteRealm)
@@ -121,7 +118,7 @@ describe("AnsweredQuestionComponent", () => {
 
       const modal = document.querySelector('[data-test="refine-note-modal"]')
       expect(modal).not.toBeNull()
-      expect(modal!.closest("dialog")!.open).toBe(true)
+      expect(modal!.classList.contains("daisy-modal-open")).toBe(true)
       expect(
         document.querySelector('[data-test-id="refinement-layout-empty"]')
       ).not.toBeNull()
@@ -132,7 +129,6 @@ describe("AnsweredQuestionComponent", () => {
             stem: "What is the capital of France?",
             choices: ["Paris", "London", "Berlin"],
             correctAnswerIndex: 0,
-            selectedChoiceIndex: 1,
             testedFocus: "capital city",
           },
         })
@@ -146,17 +142,6 @@ describe("AnsweredQuestionComponent", () => {
       await flushPromises()
 
       expect(wrapper.text()).toContain("View Memory Tracker")
-      expect(
-        wrapper.find('[data-test="open-refine-note-modal"]').exists()
-      ).toBe(false)
-    })
-
-    it("prevents refinement of a readonly recalled note", async () => {
-      wrapper = mountWithSeededNote(
-        makeMe.aNoteRealm.content("Shared note content").readonly().please()
-      )
-      await flushPromises()
-
       expect(
         wrapper.find('[data-test="open-refine-note-modal"]').exists()
       ).toBe(false)

@@ -20,15 +20,14 @@ public record RecallAnswerRow(
     Timestamp promptCreatedAt,
     Integer memoryTrackerId,
     Double retrievability,
-    QuestionType questionType,
-    Timestamp excludedAt) {
+    QuestionType questionType) {
 
   boolean correct() {
     return Boolean.TRUE.equals(Answer.correctFrom(answerOutcome, grade));
   }
 
   boolean countsAsReview() {
-    return answerOutcome != AnswerOutcome.OVERLAP && excludedAt == null;
+    return answerOutcome != AnswerOutcome.OVERLAP;
   }
 
   /**

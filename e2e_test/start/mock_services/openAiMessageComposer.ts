@@ -4,8 +4,7 @@ function sseDataLine(obj: unknown): string {
 
 export function buildResponsesStreamEvent(
   message: string,
-  responseType?: 'requires action' | 'message delta & complete',
-  toolName = 'NoteContentCompletion'
+  responseType?: 'requires action' | 'message delta & complete'
 ): string {
   const chunks: string[] = []
   let seq = 0
@@ -27,7 +26,7 @@ export function buildResponsesStreamEvent(
           type: 'function_call',
           id: fcItemId,
           call_id: callId,
-          name: toolName,
+          name: 'NoteContentCompletion',
           arguments: '',
         },
       })
@@ -66,7 +65,7 @@ export function buildResponsesStreamEvent(
     chunks.push(
       sseDataLine({
         type: 'response.function_call_arguments.done',
-        name: toolName,
+        name: 'NoteContentCompletion',
         item_id: fcItemId,
         output_index: 0,
         sequence_number: nextSeq(),

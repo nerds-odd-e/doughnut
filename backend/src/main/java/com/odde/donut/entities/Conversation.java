@@ -15,16 +15,14 @@ import lombok.Setter;
 @Table(name = "conversation")
 public class Conversation extends EntityIdentifiedByIdOnly {
   @OneToMany(mappedBy = "conversation", fetch = FetchType.LAZY)
-  @OrderBy("id ASC")
   @JsonIgnore
   List<ConversationMessage> conversationMessages = new ArrayList<>();
 
   @Embedded private ConversationSubject subject = new ConversationSubject();
 
   @ManyToOne
-  @Setter
   @JoinColumn(name = "subject_ownership_id", referencedColumnName = "id")
-  Ownership accessOwnership;
+  Ownership subjectOwnership;
 
   @ManyToOne
   @Setter
@@ -43,12 +41,13 @@ public class Conversation extends EntityIdentifiedByIdOnly {
   @JsonIgnore
   public void setNote(Note note) {
     this.subject.setNote(note);
-    this.accessOwnership = note.getNotebook().getOwnership();
+    this.subjectOwnership = note.getNotebook().getOwnership();
   }
 
   @JsonIgnore
   public void setRecallPrompt(RecallPrompt recallPrompt) {
     this.subject.setRecallPrompt(recallPrompt);
+    this.subjectOwnership = recallPrompt.getNotebook().getOwnership();
   }
 
   @JsonIgnore

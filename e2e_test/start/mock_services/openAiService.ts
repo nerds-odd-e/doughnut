@@ -91,10 +91,7 @@ const openAiService = (
       const responses = messages.map((row) =>
         buildResponsesStreamEvent(
           row['assistant reply']!,
-          row['response type'] as
-            | 'requires action'
-            | 'message delta & complete',
-          row.tool
+          row['response type'] as 'requires action' | 'message delta & complete'
         )
       )
 

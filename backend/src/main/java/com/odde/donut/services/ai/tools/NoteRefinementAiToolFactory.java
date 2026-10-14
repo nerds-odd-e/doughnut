@@ -64,19 +64,6 @@ final class NoteRefinementAiToolFactory {
           .append(nullToEmpty(choices.get(questionContext.getCorrectAnswerIndex())))
           .append('\n');
     }
-    if (questionContext.getSelectedChoiceIndex() != null) {
-      questionBlock
-          .append("Learner's selected answer: ")
-          .append(nullToEmpty(choices.get(questionContext.getSelectedChoiceIndex())))
-          .append('\n');
-    }
-    if (questionContext.getClarification() != null
-        && !questionContext.getClarification().isBlank()) {
-      questionBlock
-          .append("Learner-reviewed clarification: ")
-          .append(questionContext.getClarification())
-          .append('\n');
-    }
     if (questionContext.getTestedFocus() != null && !questionContext.getTestedFocus().isBlank()) {
       questionBlock.append("Tested focus: ").append(questionContext.getTestedFocus()).append('\n');
     }

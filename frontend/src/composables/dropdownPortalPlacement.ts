@@ -91,22 +91,6 @@ function crossAxisPosition(
   return align === "end" ? anchorEnd - size : anchorStart
 }
 
-function leftInsideScreen(
-  anchorRect: DOMRect,
-  panelWidth: number,
-  align: "start" | "end"
-): number {
-  const gap = DROPDOWN_PORTAL_GAP_PX
-  const left = crossAxisPosition(
-    anchorRect.left,
-    anchorRect.right,
-    panelWidth,
-    align
-  )
-  const rightmost = document.documentElement.clientWidth - panelWidth - gap
-  return Math.max(gap, Math.min(left, rightmost))
-}
-
 export function computeDropdownPortalStyle(
   anchorRect: DOMRect,
   panelWidth: number,
@@ -130,12 +114,12 @@ export function computeDropdownPortalStyle(
     case "top":
       return {
         top: `${anchorRect.top - panelHeight - gap}px`,
-        left: `${leftInsideScreen(anchorRect, panelWidth, align)}px`,
+        left: `${crossAxisPosition(anchorRect.left, anchorRect.right, panelWidth, align)}px`,
       }
     default:
       return {
         top: `${anchorRect.bottom + gap}px`,
-        left: `${leftInsideScreen(anchorRect, panelWidth, align)}px`,
+        left: `${crossAxisPosition(anchorRect.left, anchorRect.right, panelWidth, align)}px`,
       }
   }
 }

@@ -77,29 +77,6 @@ describe("NoteVoiceInputButton recording", () => {
     expect(voiceInputButton(wrapper).find("canvas").exists()).toBe(false)
   })
 
-  it("is unavailable with a spinner until the microphone is ready, then draws the waveform", async () => {
-    let finishStartup!: () => void
-    recorder().startRecording.mockImplementationOnce(
-      () => new Promise<void>((resolve) => (finishStartup = resolve))
-    )
-
-    await startRecording(wrapper)
-
-    const button = voiceInputButton(wrapper)
-    expect(button.attributes("aria-label")).toBe("Voice input")
-    expect(button.attributes()).toHaveProperty("disabled")
-    expect(button.find(".animate-spin").exists()).toBe(true)
-    button.element.click()
-    expect(recorder().startRecording).toHaveBeenCalledTimes(1)
-
-    finishStartup()
-    await flushPromises()
-
-    expect(button.attributes("aria-label")).toBe("Stop voice input")
-    expect(button.attributes("aria-pressed")).toBe("true")
-    expect(button.find("canvas").exists()).toBe(true)
-  })
-
   it("starts recording with wake lock and Web Audio connections", async () => {
     const {
       mockMediaDevices,
@@ -153,7 +130,6 @@ describe("NoteVoiceInputButton recording", () => {
       "Could not use the microphone. Allow microphone access in your browser, then try again."
     )
     expectIdleVoiceInputButton(wrapper)
-    expect(voiceInputButton(wrapper).find(".animate-spin").exists()).toBe(false)
 
     await startRecording(wrapper)
     expect(voiceInputButton(wrapper).attributes("aria-pressed")).toBe("true")

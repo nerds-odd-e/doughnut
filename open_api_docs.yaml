@@ -726,30 +726,6 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/RecallPrompt"
-  /api/recall-prompts/{recallPrompt}/exclude-as-ambiguous:
-    post:
-      tags:
-      - recall-prompt-controller
-      operationId: excludeAsAmbiguous
-      parameters:
-      - name: recallPrompt
-        in: path
-        required: true
-        schema:
-          type: integer
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/AmbiguousExclusionDTO"
-        required: true
-      responses:
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/AnsweredQuestion"
   /api/recall-prompts/{recallPrompt}/contest:
     post:
       tags:
@@ -1715,50 +1691,6 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/Conversation"
-  /api/conversation/corrections/{correctionId}/decline:
-    post:
-      tags:
-      - conversation-message-controller
-      operationId: declineCorrection
-      parameters:
-      - name: correctionId
-        in: path
-        required: true
-        schema:
-          type: integer
-          format: int32
-      responses:
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/ConversationNoteCorrection"
-  /api/conversation/corrections/{correctionId}/accept:
-    post:
-      tags:
-      - conversation-message-controller
-      operationId: acceptCorrection
-      parameters:
-      - name: correctionId
-        in: path
-        required: true
-        schema:
-          type: integer
-          format: int32
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/ConversationCorrectionAcceptance"
-        required: true
-      responses:
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/ConversationNoteCorrection"
   /api/circles:
     get:
       tags:
@@ -3433,45 +3365,6 @@ paths:
               schema:
                 type: object
                 additionalProperties: {}
-  /api/conversation/{conversationId}/corrections:
-    get:
-      tags:
-      - conversation-message-controller
-      operationId: getConversationCorrections
-      parameters:
-      - name: conversationId
-        in: path
-        required: true
-        schema:
-          type: integer
-      responses:
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/ConversationNoteCorrection"
-  /api/conversation/corrections/{correctionId}/current-review:
-    get:
-      tags:
-      - conversation-message-controller
-      operationId: loadCurrentReview
-      parameters:
-      - name: correctionId
-        in: path
-        required: true
-        schema:
-          type: integer
-          format: int32
-      responses:
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/ConversationCorrectionReview"
   /api/conversation/all:
     get:
       tags:
@@ -4302,11 +4195,30 @@ components:
           type: string
         notebook:
           $ref: "#/components/schemas/Notebook"
-    AmbiguousExclusionDTO:
+    AnswerDTO:
       type: object
       properties:
-        reason:
-          type: string
+        choiceIndex:
+          type: integer
+          format: int32
+        thinkingTimeMs:
+          type: integer
+          format: int32
+        awayMs:
+          type: integer
+          format: int32
+        awayCount:
+          type: integer
+          format: int32
+        detourMs:
+          type: integer
+          format: int32
+        detourCount:
+          type: integer
+          format: int32
+        idleMs:
+          type: integer
+          format: int32
     Answer:
       type: object
       properties:
@@ -4346,11 +4258,6 @@ components:
           enum:
           - ACCIDENTAL_MATCH
           - OVERLAP
-        excludedAt:
-          type: string
-          format: date-time
-        exclusionReason:
-          type: string
       required:
       - id
     AnsweredQuestion:
@@ -4402,30 +4309,6 @@ components:
       required:
       - noteTopology
       - notebookId
-    AnswerDTO:
-      type: object
-      properties:
-        choiceIndex:
-          type: integer
-          format: int32
-        thinkingTimeMs:
-          type: integer
-          format: int32
-        awayMs:
-          type: integer
-          format: int32
-        awayCount:
-          type: integer
-          format: int32
-        detourMs:
-          type: integer
-          format: int32
-        detourCount:
-          type: integer
-          format: int32
-        idleMs:
-          type: integer
-          format: int32
     AnswerSpellingDTO:
       type: object
       properties:
@@ -5163,7 +5046,7 @@ components:
           format: int32
         subject:
           $ref: "#/components/schemas/ConversationSubject"
-        accessOwnership:
+        subjectOwnership:
           $ref: "#/components/schemas/Ownership"
         conversationInitiator:
           $ref: "#/components/schemas/User"
@@ -5184,63 +5067,6 @@ components:
           $ref: "#/components/schemas/Note"
         recallPrompt:
           $ref: "#/components/schemas/AnsweredQuestion"
-    ConversationNoteCorrection:
-      type: object
-      properties:
-        id:
-          type: integer
-          format: int32
-        note:
-          $ref: "#/components/schemas/Note"
-        responseId:
-          type: string
-        toolCallId:
-          type: string
-        field:
-          type: string
-          enum:
-          - CONTENT
-          - TITLE
-        proposedValue:
-          type: string
-        reason:
-          type: string
-        baseRevision:
-          type: string
-        decision:
-          type: string
-          enum:
-          - PENDING
-          - DECLINED
-          - ACCEPTED
-        reviewedValue:
-          type: string
-        decidedBy:
-          $ref: "#/components/schemas/User"
-        decidedAt:
-          type: string
-          format: date-time
-        acceptedRevision:
-          type: string
-        sourceMessageId:
-          type: integer
-          format: int32
-      required:
-      - id
-    ConversationCorrectionAcceptance:
-      type: object
-      properties:
-        reviewedValue:
-          type: string
-        baseRevision:
-          type: string
-        referenceHandling:
-          type: string
-          enum:
-          - UPDATE_VISIBLE_TEXT
-          - KEEP_VISIBLE_TEXT
-      required:
-      - reviewedValue
     CircleJoiningByInvitation:
       type: object
       properties:
@@ -5379,13 +5205,6 @@ components:
           type: integer
           format: int32
           description: "Zero-based index of the correct choice, when known"
-        selectedChoiceIndex:
-          type: integer
-          format: int32
-          description: "Zero-based index of the learner's selected choice, when known"
-        clarification:
-          type: string
-          description: Optional clarification explicitly reviewed by the learner
         testedFocus:
           type: string
           description: Optional description of what the question was testing
@@ -6300,13 +6119,6 @@ components:
           type: boolean
       required:
       - completed
-    ConversationCorrectionReview:
-      type: object
-      properties:
-        noteRealm:
-          $ref: "#/components/schemas/NoteRealm"
-        baseRevision:
-          type: string
     ConversationListItem:
       type: object
       properties:
@@ -6364,13 +6176,6 @@ components:
           type: string
         propertyValue:
           type: string
-    AmbiguousQuestionExclusionProposal:
-      type: object
-      properties:
-        reason:
-          type: string
-      required:
-      - reason
     DummyForGeneratingTypes:
       type: object
       properties:
@@ -6378,14 +6183,10 @@ components:
           $ref: "#/components/schemas/NoteContentCompletion"
         titleReplacement:
           $ref: "#/components/schemas/TitleReplacement"
-        ambiguousQuestionExclusionProposal:
-          $ref: "#/components/schemas/AmbiguousQuestionExclusionProposal"
     NoteContentCompletion:
       type: object
       properties:
         content:
-          type: string
-        reason:
           type: string
       required:
       - content
@@ -6396,8 +6197,6 @@ components:
           type: string
           maxLength: 150
           minLength: 1
-        reason:
-          type: string
       required:
       - newTitle
     UserForListing:

@@ -14,7 +14,7 @@ import java.util.Map;
 /**
  * Standardized Poisson-binomial residual comparing today's observed correctness against each
  * answer's <em>recalibrated</em> recall probability p̂ — raw FSRS retrievability (persisted on
- * {@code RecallLog.retrievability} by {@code RecallLog#recordStateBefore}) run through a
+ * {@code RecallLog.retrievability} by {@code MemoryTrackerService#persistRecallLog}) run through a
  * per-learner, per-{@code RecallPrompt.questionType} {@link RecallGuessingFloorFitter} 3PL fit
  * ({@code p̂ = γ + (1−γ)·σ(α + β·logit(retrievability))}, γ fitted rather than assumed — see slice
  * 20) on the trailing 180 days, so a scheduler that is systematically over- or under-confident for

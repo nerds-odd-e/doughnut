@@ -1,7 +1,6 @@
 package com.odde.donut.controllers;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.odde.donut.controllers.dto.AmbiguousExclusionDTO;
 import com.odde.donut.controllers.dto.AnswerDTO;
 import com.odde.donut.controllers.dto.AnswerSpellingDTO;
 import com.odde.donut.controllers.dto.AnsweredQuestion;
@@ -89,18 +88,6 @@ class RecallPromptController {
             authorizationService.getCurrentUser(),
             testabilitySettings.getCurrentUTCTimestamp());
     return AnsweredQuestion.from(result.recallPrompt(), result.matchedNotes());
-  }
-
-  @PostMapping("/{recallPrompt}/exclude-as-ambiguous")
-  @Transactional
-  public AnsweredQuestion excludeAsAmbiguous(
-      @PathVariable("recallPrompt") @Schema(type = "integer") RecallPrompt recallPrompt,
-      @RequestBody AmbiguousExclusionDTO exclusion)
-      throws UnexpectedNoAccessRightException {
-    assertCanMutateRecallPrompt(recallPrompt);
-    return AnsweredQuestion.from(
-        memoryTrackerService.excludeAsAmbiguous(
-            recallPrompt, exclusion.getReason(), testabilitySettings.getCurrentUTCTimestamp()));
   }
 
   private void assertCanMutateRecallPrompt(RecallPrompt recallPrompt)

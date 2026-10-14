@@ -13,7 +13,6 @@ import BazaarNotebooksBuilder from './BazaarNotebooksBuilder'
 import CircleBuilder from './CircleBuilder'
 import CircleNoteBuilder from './CircleNoteBuilder'
 import ConversationBuilder from './ConversationBuilder'
-import ConversationNoteCorrectionBuilder from './ConversationNoteCorrectionBuilder'
 import ConversationListItemBuilder from './ConversationListItemBuilder'
 import DueMemoryTrackersBuilder from './DueMemoryTrackersBuilder'
 import FolderBuilder from './FolderBuilder'
@@ -163,10 +162,6 @@ class MakeMe {
 
   static get aConversation(): ConversationBuilder {
     return new ConversationBuilder()
-  }
-
-  static get aConversationNoteCorrection() {
-    return new ConversationNoteCorrectionBuilder()
   }
 
   static get aConversationListItem(): ConversationListItemBuilder {

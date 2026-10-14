@@ -107,45 +107,4 @@ class RecallPromptSpellingStemMaskingControllerTest extends RecallPromptControll
     assertThat(question.getStem(), containsString("<mark"));
     assertThat(question.getStem(), not(containsString("logical.")));
   }
-
-  @Test
-  void spellingQuestionMasksTitleTextBeforeTrailingQualifier() {
-    makeMe
-        .theNote(answerNote)
-        .title("Deposition (phase transition) ")
-        .content("In physics, deposition is when gas becomes solid. Deposition skips liquid.")
-        .please();
-
-    SpellingQuestion question = spellingPrompt(memoryTracker).getSpellingQuestion();
-
-    assertThat(
-        stemWithoutMarkTags(question),
-        equalTo("In physics, [...] is when gas becomes solid. [...] skips liquid."));
-  }
-
-  @Test
-  void spellingQuestionMasksWholeQualifiedTitleAsOneMaskAndKeepsQualifierTextReadable() {
-    makeMe
-        .theNote(answerNote)
-        .title("cat(animal)")
-        .content("A cat is an animal. See cat(animal).")
-        .please();
-
-    SpellingQuestion question = spellingPrompt(memoryTracker).getSpellingQuestion();
-
-    assertThat(stemWithoutMarkTags(question), equalTo("A [...] is an animal. See [...]."));
-  }
-
-  @Test
-  void spellingQuestionLeavesClueReadableWhenNoTitleTextPrecedesTheQualifier() {
-    makeMe.theNote(answerNote).title("~(phase transition)").content("Gas becomes solid.").please();
-
-    SpellingQuestion question = spellingPrompt(memoryTracker).getSpellingQuestion();
-
-    assertThat(stemWithoutMarkTags(question), equalTo("Gas becomes solid."));
-  }
-
-  private static String stemWithoutMarkTags(SpellingQuestion question) {
-    return question.getStem().replaceAll("</?mark[^>]*>", "");
-  }
 }

@@ -51,8 +51,7 @@ abstract class NoteDependentRowsControllerTestBase extends NotebookControllerTes
         countRecallPromptsByNoteId(note.getId()),
         countRowsByNoteId("mcq", note.getId()),
         countRowsByNoteId("conversation", note.getId()),
-        countConversationMessagesByNoteId(note.getId()),
-        countRowsByNoteId("conversation_note_correction", note.getId()));
+        countConversationMessagesByNoteId(note.getId()));
   }
 
   /** Snapshot of the complete note-dependent row counts used by deletion/retry proofs. */
@@ -61,10 +60,9 @@ abstract class NoteDependentRowsControllerTestBase extends NotebookControllerTes
       long recallPrompt,
       long mcq,
       long conversation,
-      long conversationMessage,
-      long conversationNoteCorrection) {
+      long conversationMessage) {
     static DependentCounts allAbsent() {
-      return new DependentCounts(0, 0, 0, 0, 0, 0);
+      return new DependentCounts(0, 0, 0, 0, 0);
     }
   }
 }

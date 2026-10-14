@@ -12,13 +12,11 @@
           sidebarStyle,
           'bg-base-200',
           { 'modal-panel--no-close': !showCloseButton },
-          { 'modal-panel--scroll-body': scrollBody },
         ]"
       >
         <button
           v-if="showCloseButton"
           class="close-button"
-          aria-label="Close modal"
           @click="$emit('close_request')"
         >
           <X class="w-6 h-6" />
@@ -53,8 +51,6 @@ interface Props {
   showCloseButton?: boolean
   /** When false, a route replace does not dismiss (e.g. a dialog bound to the location). */
   closeOnRouteChange?: boolean
-  /** Keep the heading and Close visible while the body scrolls. */
-  scrollBody?: boolean
 }
 const props = withDefaults(defineProps<Props>(), {
   showCloseButton: true,
@@ -161,23 +157,6 @@ dialog.modal-align-top .modal-panel-wrapper {
     position: initial;
     margin: 0;
     padding: 0;
-  }
-}
-
-.modal-panel--scroll-body {
-  display: flex;
-  flex-direction: column;
-  height: calc(100dvh - 40px);
-  overflow: clip;
-
-  .modal-header {
-    flex-shrink: 0;
-  }
-
-  .modal-body {
-    flex: 1;
-    min-height: 0;
-    overflow: auto;
   }
 }
 

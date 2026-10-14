@@ -62,7 +62,6 @@ class NotebookGitDeletionPublicationControllerTest extends NotebookGitController
               .please();
           makeMe
               .aConversation()
-              .withNoteCorrection()
               .forANote(noteRepository.findById(deletedA.getId()).orElseThrow())
               .please();
         });
@@ -72,7 +71,6 @@ class NotebookGitDeletionPublicationControllerTest extends NotebookGitController
         () -> {
           makeMe
               .aConversation()
-              .withNoteCorrection()
               .forANote(noteRepository.findById(deletedB.getId()).orElseThrow())
               .please();
         });

@@ -43,7 +43,6 @@ describe("ConversationInner", () => {
   let replyToConversationSpy: ReturnType<typeof mockSdkService>
 
   beforeEach(() => {
-    mockSdkService(ConversationMessageController, "markConversationAsRead", [])
     window.HTMLElement.prototype.scrollIntoView = vi.fn()
     mockShowNote()
     replyToConversationSpy = mockSdkService(
@@ -155,9 +154,7 @@ describe("ConversationInner", () => {
 
       const defaultButtons = wrapper.findAll(".default-message-button")
       expect(defaultButtons).toHaveLength(4)
-      expect(defaultButtons[0].text()).toBe(
-        "Please explain the question and answer to me."
-      )
+      expect(defaultButtons[0].text()).toBe("Why is my answer wrong?")
     })
 
     it("doesn't show default messages for non-recall conversations", async () => {
@@ -176,16 +173,8 @@ describe("ConversationInner", () => {
 
       expect(replyToConversationSpy).toHaveBeenCalledWith({
         path: { conversationId: wrapper.props("conversation").id },
-        body: "Please explain the question and answer to me.",
+        body: "Why is my answer wrong?",
       })
     })
   })
-})
-
-beforeEach(() => {
-  mockSdkService(
-    ConversationMessageController,
-    "getConversationCorrections",
-    []
-  )
 })

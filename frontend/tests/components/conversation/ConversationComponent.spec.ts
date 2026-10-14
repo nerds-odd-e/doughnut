@@ -69,11 +69,3 @@ describe("ConversationComponent", () => {
     expect(wrapper.find(".subject-container").exists()).toBe(true)
   })
 })
-
-beforeEach(() => {
-  mockSdkService(
-    ConversationMessageController,
-    "getConversationCorrections",
-    []
-  )
-})

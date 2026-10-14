@@ -7,10 +7,6 @@ defineProps<{
   items: RecallHistoryItem[]
 }>()
 
-defineEmits<{
-  (e: "attempt-excluded"): void
-}>()
-
 const formatThinkingTime = (ms: number): string => {
   if (ms < 1000) {
     return `${ms}ms`
@@ -174,7 +170,6 @@ const historyItemKey = (item: RecallHistoryItem, index: number) => {
           <ConversationButton
             v-if="item.recallPrompt.answer"
             :recall-prompt-id="item.recallPrompt.id"
-            @attempt-excluded="$emit('attempt-excluded')"
           />
         </template>
       </div>

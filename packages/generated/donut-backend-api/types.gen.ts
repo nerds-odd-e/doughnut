@@ -306,8 +306,14 @@ export type SpellingQuestion = {
     notebook?: Notebook;
 };
 
-export type AmbiguousExclusionDto = {
-    reason?: string;
+export type AnswerDto = {
+    choiceIndex?: number;
+    thinkingTimeMs?: number;
+    awayMs?: number;
+    awayCount?: number;
+    detourMs?: number;
+    detourCount?: number;
+    idleMs?: number;
 };
 
 export type Answer = {
@@ -323,8 +329,6 @@ export type Answer = {
     idleMs?: number;
     matchedNoteId?: number;
     outcome?: 'ACCIDENTAL_MATCH' | 'OVERLAP';
-    excludedAt?: string;
-    exclusionReason?: string;
 };
 
 export type AnsweredQuestion = {
@@ -343,16 +347,6 @@ export type RecalledNote = {
     ancestorFolders?: Array<FolderTrailSegment>;
     propertyKey?: string;
     propertyValue?: string;
-};
-
-export type AnswerDto = {
-    choiceIndex?: number;
-    thinkingTimeMs?: number;
-    awayMs?: number;
-    awayCount?: number;
-    detourMs?: number;
-    detourCount?: number;
-    idleMs?: number;
 };
 
 export type AnswerSpellingDto = {
@@ -756,7 +750,7 @@ export type SseEmitter = {
 export type Conversation = {
     id: number;
     subject?: ConversationSubject;
-    accessOwnership?: Ownership;
+    subjectOwnership?: Ownership;
     conversationInitiator?: User;
     createdAt: string;
     updatedAt: string;
@@ -765,29 +759,6 @@ export type Conversation = {
 export type ConversationSubject = {
     note?: Note;
     recallPrompt?: AnsweredQuestion;
-};
-
-export type ConversationNoteCorrection = {
-    id: number;
-    note?: Note;
-    responseId?: string;
-    toolCallId?: string;
-    field?: 'CONTENT' | 'TITLE';
-    proposedValue?: string;
-    reason?: string;
-    baseRevision?: string;
-    decision?: 'PENDING' | 'DECLINED' | 'ACCEPTED';
-    reviewedValue?: string;
-    decidedBy?: User;
-    decidedAt?: string;
-    acceptedRevision?: string;
-    sourceMessageId?: number;
-};
-
-export type ConversationCorrectionAcceptance = {
-    reviewedValue: string;
-    baseRevision?: string;
-    referenceHandling?: 'UPDATE_VISIBLE_TEXT' | 'KEEP_VISIBLE_TEXT';
 };
 
 export type CircleJoiningByInvitation = {
@@ -864,14 +835,6 @@ export type NoteRefinementQuestionContextDto = {
      * Zero-based index of the correct choice, when known
      */
     correctAnswerIndex?: number;
-    /**
-     * Zero-based index of the learner's selected choice, when known
-     */
-    selectedChoiceIndex?: number;
-    /**
-     * Optional clarification explicitly reviewed by the learner
-     */
-    clarification?: string;
     /**
      * Optional description of what the question was testing
      */
@@ -1323,11 +1286,6 @@ export type DailyProbeTodayDto = {
     completed: boolean;
 };
 
-export type ConversationCorrectionReview = {
-    noteRealm?: NoteRealm;
-    baseRevision?: string;
-};
-
 export type ConversationListItem = {
     id: number;
     subject: string;
@@ -1357,24 +1315,17 @@ export type AssimilationNextUnitDto = {
     propertyValue?: string;
 };
 
-export type AmbiguousQuestionExclusionProposal = {
-    reason: string;
-};
-
 export type DummyForGeneratingTypes = {
     noteContentCompletion?: NoteContentCompletion;
     titleReplacement?: TitleReplacement;
-    ambiguousQuestionExclusionProposal?: AmbiguousQuestionExclusionProposal;
 };
 
 export type NoteContentCompletion = {
     content: string;
-    reason?: string;
 };
 
 export type TitleReplacement = {
     newTitle: string;
-    reason?: string;
 };
 
 export type UserForListing = {
@@ -2046,24 +1997,6 @@ export type RegenerateResponses = {
 };
 
 export type RegenerateResponse = RegenerateResponses[keyof RegenerateResponses];
-
-export type ExcludeAsAmbiguousData = {
-    body: AmbiguousExclusionDto;
-    path: {
-        recallPrompt: number;
-    };
-    query?: never;
-    url: '/api/recall-prompts/{recallPrompt}/exclude-as-ambiguous';
-};
-
-export type ExcludeAsAmbiguousResponses = {
-    /**
-     * OK
-     */
-    200: AnsweredQuestion;
-};
-
-export type ExcludeAsAmbiguousResponse = ExcludeAsAmbiguousResponses[keyof ExcludeAsAmbiguousResponses];
 
 export type ContestData = {
     body?: never;
@@ -2853,42 +2786,6 @@ export type StartConversationAboutNoteResponses = {
 };
 
 export type StartConversationAboutNoteResponse = StartConversationAboutNoteResponses[keyof StartConversationAboutNoteResponses];
-
-export type DeclineCorrectionData = {
-    body?: never;
-    path: {
-        correctionId: number;
-    };
-    query?: never;
-    url: '/api/conversation/corrections/{correctionId}/decline';
-};
-
-export type DeclineCorrectionResponses = {
-    /**
-     * OK
-     */
-    200: ConversationNoteCorrection;
-};
-
-export type DeclineCorrectionResponse = DeclineCorrectionResponses[keyof DeclineCorrectionResponses];
-
-export type AcceptCorrectionData = {
-    body: ConversationCorrectionAcceptance;
-    path: {
-        correctionId: number;
-    };
-    query?: never;
-    url: '/api/conversation/corrections/{correctionId}/accept';
-};
-
-export type AcceptCorrectionResponses = {
-    /**
-     * OK
-     */
-    200: ConversationNoteCorrection;
-};
-
-export type AcceptCorrectionResponse = AcceptCorrectionResponses[keyof AcceptCorrectionResponses];
 
 export type IndexData = {
     body?: never;
@@ -4329,42 +4226,6 @@ export type ExportConversationResponses = {
 };
 
 export type ExportConversationResponse = ExportConversationResponses[keyof ExportConversationResponses];
-
-export type GetConversationCorrectionsData = {
-    body?: never;
-    path: {
-        conversationId: number;
-    };
-    query?: never;
-    url: '/api/conversation/{conversationId}/corrections';
-};
-
-export type GetConversationCorrectionsResponses = {
-    /**
-     * OK
-     */
-    200: Array<ConversationNoteCorrection>;
-};
-
-export type GetConversationCorrectionsResponse = GetConversationCorrectionsResponses[keyof GetConversationCorrectionsResponses];
-
-export type LoadCurrentReviewData = {
-    body?: never;
-    path: {
-        correctionId: number;
-    };
-    query?: never;
-    url: '/api/conversation/corrections/{correctionId}/current-review';
-};
-
-export type LoadCurrentReviewResponses = {
-    /**
-     * OK
-     */
-    200: ConversationCorrectionReview;
-};
-
-export type LoadCurrentReviewResponse = LoadCurrentReviewResponses[keyof LoadCurrentReviewResponses];
 
 export type GetConversationsOfCurrentUserData = {
     body?: never;

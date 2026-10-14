@@ -4,10 +4,7 @@
     @accept="handleAccept"
     @cancel="handleCancel"
     @skip="handleSkip"
-    :hideAccept="!canAccept"
-    :hideSkip="isExclusion"
-    :acceptLabel="isExclusion ? 'Confirm' : undefined"
-    :cancelLabel="isExclusion ? 'Decline' : undefined"
+    :hideAccept="suggestion.suggestionType === 'unknown'"
   >
     <template #title>
       {{ suggestionTitle }}
@@ -20,81 +17,99 @@
 
 <script setup lang="ts">
 import { computed, ref } from "vue"
-import type { AnsweredQuestion } from "@generated/donut-backend-api"
+import type { NoteContentCompletion, Note } from "@generated/donut-backend-api"
 import type { ToolCallResult } from "@/models/aiReplyState"
 import AcceptRejectButtons from "@/components/commons/AcceptRejectButtons.vue"
 import markdownizer from "../form/markdownizer"
+import { RICH_CONTENT_PROSE } from "@/constants/richContentProse"
 import type { Suggestion } from "@/models/suggestions"
+import { useNoteStore } from "@/store/noteStore"
 import { useToast } from "@/composables/useToast"
-import { RecallPromptController } from "@generated/donut-backend-api/sdk.gen"
-import { apiCallWithLoading } from "@/managedApi/clientSetup"
 
+const noteStore = useNoteStore()
 const { showErrorToast } = useToast()
 
 const props = defineProps<{
-  suggestion: Extract<Suggestion, { suggestionType: "exclusion" | "unknown" }>
-  recallPromptId?: number
+  suggestion: Suggestion
+  note?: Note
 }>()
 
 const emit = defineEmits<{
   (e: "resolved", result: ToolCallResult): void
   (e: "rejected", error: Error): void
-  (e: "attempt-excluded", answeredQuestion: AnsweredQuestion): void
 }>()
 
 const isProcessing = ref(false)
 
-const isExclusion = computed(
-  () => props.suggestion.suggestionType === "exclusion"
-)
-
-const canAccept = computed(
-  () =>
-    props.suggestion.suggestionType === "exclusion" &&
-    Boolean(props.suggestion.content.reason?.trim())
-)
-
 const suggestionTitle = computed(() => {
-  switch (props.suggestion.suggestionType) {
-    case "exclusion":
-      return "Proposed correction: exclude this attempt as an ambiguous question"
+  switch (props.suggestion?.suggestionType) {
+    case "completion":
+      return "Suggested completion:"
+    case "title":
+      return "Suggested title:"
     case "unknown":
-      return `Unknown tool call: ${props.suggestion.content.functionName}`
+      return `Unknown tool call: ${
+        // biome-ignore lint/suspicious/noExplicitAny: Type is dynamically determined at runtime
+        (props.suggestion.content as any).functionName
+      }`
+    default:
+      return ""
   }
 })
 
 const suggestionContentClass = computed(() => {
-  switch (props.suggestion.suggestionType) {
-    case "exclusion":
-      return "exclusion-reason"
+  switch (props.suggestion?.suggestionType) {
+    case "completion":
+      return `completion-text ${RICH_CONTENT_PROSE}`
+    case "title":
+      return "title-suggestion"
     case "unknown":
       return "unknown-request"
+    default:
+      return ""
   }
 })
 
+const formatCompletionSuggestion = (completion: NoteContentCompletion) => {
+  if (!completion.content) return ""
+
+  return completion.content
+}
+
 const formattedContent = computed(() => {
+  if (!props.suggestion) return ""
+
   switch (props.suggestion.suggestionType) {
-    case "exclusion":
-      return markdownizer.markdownToHtml(props.suggestion.content.reason)
+    case "completion":
+      return markdownizer.markdownToHtml(
+        formatCompletionSuggestion(props.suggestion.content)
+      )
+    case "title":
+      return props.suggestion.content
     case "unknown":
-      return `<pre>${props.suggestion.content.rawJson}</pre>`
+      return `<pre>${(props.suggestion.content as { rawJson: string }).rawJson}</pre>`
+    default:
+      return ""
   }
 })
 
 const handleAccept = async () => {
-  if (props.suggestion.suggestionType !== "exclusion") return
+  if (!props.suggestion || !props.note) return
 
   try {
     isProcessing.value = true
-    const reason = props.suggestion.content.reason
-    const { data, error } = await apiCallWithLoading(() =>
-      RecallPromptController.excludeAsAmbiguous({
-        path: { recallPrompt: props.recallPromptId! },
-        body: { reason },
-      })
-    )
-    if (error) throw new Error("Failed to exclude this attempt")
-    emit("attempt-excluded", data!)
+    switch (props.suggestion.suggestionType) {
+      case "completion": {
+        const content = props.suggestion.content
+        await noteStore.completeContent(props.note.id, content)
+        break
+      }
+      case "title": {
+        const content = props.suggestion.content
+        await noteStore.updateTextField(props.note.id, "edit title", content)
+        break
+      }
+    }
     emit("resolved", { status: "accepted" })
   } catch (error) {
     const errorMessage =
@@ -116,7 +131,16 @@ const handleSkip = () => {
 </script>
 
 <style scoped>
+.completion-text {
+  font-style: italic;
+  color: #666;
+}
 
+.title-suggestion {
+  font-style: italic;
+  color: #666;
+  font-weight: bold;
+}
 
 .unknown-request {
   font-family: monospace;
