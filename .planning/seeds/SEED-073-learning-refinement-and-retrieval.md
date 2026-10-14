@@ -98,7 +98,7 @@ Each story records its preparation state below.
 
 **Identity:** SEED-073#reviewed-title-sidebar-refresh
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"not-refined","approach":"unselected"}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/001-reviewed-title-sidebar-refresh/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"e02ec2a8d0a8a65aae68d26dc7ac92d4d9819981da06f0f709a764955acf7dbf","plan":"3a2253d30db6748185fd2bd63286d364e30c92287139dc50a2c611e230500cc2"}}
 ```
 
 **Goal:** A note author who accepts a reviewed title correction can immediately
@@ -135,8 +135,18 @@ and screenshot remain recoverable at
 and
 [sidebar evidence](https://github.com/nerds-odd-e/doughnut/blob/b9e69ee4facbe4f40041826ff649dafad92e5b95/.planning/manual-testing-evidence/manual-reviewed-correction/manual-correction-sidebar.jpg).
 
-**Effort hypothesis:** S (30–60 minutes), medium confidence; refine before
-execution. No prerequisite story is established.
+**Refinement reading (2026-10-14, at `d2365e495b`):** Code reading only, not a
+rerun. An ordinary title edit refreshes the note and then invalidates the
+sidebar's cached folder listings. Accepting a reviewed correction only reloads
+the note, so the cached listing keeps the old title until a full reload. No
+change to the correction review, note store, or sidebar code landed between
+the observed base and this reading.
+
+**Deferred:** Refreshing the sidebar for title changes made outside this
+browser session.
+
+**Effort hypothesis:** S (30–60 minutes), high confidence. No prerequisite
+story is established.
 
 ### Generate focus-note questions with relevant supporting passages
 
