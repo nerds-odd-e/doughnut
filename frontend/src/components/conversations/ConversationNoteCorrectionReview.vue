@@ -4,14 +4,16 @@
     <p>{{ correction.note?.noteTopology.title }}</p>
     <p class="daisy-badge">{{ correction.decision === 'PENDING' ? 'Pending review' : correction.decision === 'DECLINED' ? 'Declined' : 'Accepted' }}</p>
     <div :class="RICH_CONTENT_PROSE" v-html="markdownizer.markdownToHtml(correction.reason)" />
-    <NoteRealmLoader v-if="correction.note" :note-id="correction.note.id">
-      <template #default="{ noteRealm }">
-        <ContentLoader v-if="!noteRealm" />
-        <template v-else>
+    <NoteRealmLoader v-if="correction.note" :note-id="correction.note.id" recover-load-failure @loaded="observedNoteRealm = $event">
+      <template #default="{ fresh, loading, loadFailed, reload }">
+        <ContentLoader v-if="loading" />
+        <p v-if="loadFailed" class="text-error">{{ CURRENT_NOTE_LOAD_FAILURE }}</p>
+        <button v-if="loadFailed" class="daisy-btn daisy-btn-outline mt-2" @click="reload">Retry loading current content</button>
+        <template v-if="observedNoteRealm">
           <h4>Current {{ correction.field === 'TITLE' ? 'title' : 'content' }}</h4>
-          <p v-if="correction.field === 'TITLE'">{{ noteRealm.note.noteTopology.title }}</p>
-          <div v-else :class="RICH_CONTENT_PROSE" v-html="markdownizer.markdownToHtml(noteRealm.note.content)" />
-          <template v-if="correction.decision === 'PENDING' && user && !noteRealm.notebookRealm.readonly">
+          <p v-if="correction.field === 'TITLE'">{{ observedNoteRealm.note.noteTopology.title }}</p>
+          <div v-else :class="RICH_CONTENT_PROSE" v-html="markdownizer.markdownToHtml(observedNoteRealm.note.content)" />
+          <template v-if="correction.decision === 'PENDING' && user && !observedNoteRealm.notebookRealm.readonly">
             <details>
               <summary>Original proposal</summary>
               <p v-if="correction.field === 'TITLE'">{{ correction.proposedValue }}</p>
@@ -19,7 +21,7 @@
             </details>
             <TextInput v-if="correction.field === 'TITLE'" v-model="reviewedValue" :scope-name="`correction-${correction.id}`" field="proposedTitle" />
             <TextArea v-else v-model="reviewedValue" :scope-name="`correction-${correction.id}`" field="proposedContent" />
-            <label v-if="requiresReferenceHandling(noteRealm)" class="block mt-2">
+            <label v-if="requiresReferenceHandling(observedNoteRealm)" class="block mt-2">
               {{ TITLE_RENAME_REFERENCE_PROMPT }}
               <select v-model="referenceHandling" class="daisy-select block" aria-label="Wiki reference handling">
                 <option value="">Choose reference handling</option>
@@ -27,7 +29,7 @@
               </select>
             </label>
             <button v-if="staleReview" class="daisy-btn daisy-btn-outline mt-2" :disabled="deciding || refreshingReview" @click="loadCurrentReview">Load current content</button>
-            <button class="daisy-btn daisy-btn-primary mt-2" :disabled="deciding || refreshingReview || (requiresReferenceHandling(noteRealm) && !referenceHandling)" @click="accept">Accept</button>
+            <button class="daisy-btn daisy-btn-primary mt-2" :disabled="!fresh || deciding || refreshingReview || (requiresReferenceHandling(observedNoteRealm) && !referenceHandling)" @click="accept">Accept</button>
           </template>
           <template v-else>
             <h4>Proposed {{ correction.field === 'TITLE' ? 'title' : 'content' }}</h4>
@@ -52,7 +54,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue"
+import { ref, shallowRef } from "vue"
 import { useRouter } from "vue-router"
 import type {
   ConversationNoteCorrection,
@@ -78,6 +80,9 @@ import {
 } from "@/store/noteStore"
 import { noteShowLocation } from "@/routes/noteShowLocation"
 
+const CURRENT_NOTE_LOAD_FAILURE =
+  "Could not load the current note. Your review is kept. Try again."
+
 const props = defineProps<{
   correction: ConversationNoteCorrection
   user: User
@@ -88,6 +93,11 @@ const emit = defineEmits<{
 }>()
 const router = useRouter()
 const noteStore = useNoteStore()
+const observedNoteRealm = shallowRef(
+  props.correction.note
+    ? noteStore.refOfNoteRealm(props.correction.note.id).value
+    : undefined
+)
 const reviewedValue = ref(props.correction.proposedValue ?? "")
 const reviewedBase = ref(props.correction.baseRevision)
 const staleReview = ref(false)
@@ -105,7 +115,9 @@ const requiresReferenceHandling = (noteRealm: NoteRealm) =>
 
 const refreshNote = async () => {
   try {
-    await noteStore.loadNoteRealm(props.correction.note!.id)
+    observedNoteRealm.value = await noteStore.loadNoteRealm(
+      props.correction.note!.id
+    )
     noteRefreshFailed.value = false
   } catch {
     noteRefreshFailed.value = true
@@ -120,10 +132,9 @@ const loadCurrentReview = async () => {
     })
   )
   refreshingReview.value = false
-  reviewRefreshFailure.value = error
-    ? "Could not load the current note. Your review is kept. Try again."
-    : ""
+  reviewRefreshFailure.value = error ? CURRENT_NOTE_LOAD_FAILURE : ""
   if (!error) {
+    observedNoteRealm.value = currentReview!.noteRealm!
     noteStore.refreshNoteRealm(currentReview!.noteRealm!)
     reviewedBase.value = currentReview!.baseRevision
     staleReview.value = false

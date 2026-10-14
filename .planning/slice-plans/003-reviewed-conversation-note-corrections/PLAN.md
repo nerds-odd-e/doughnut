@@ -578,9 +578,13 @@ selective formatting passed; enduring recovery docs were updated.
 Initial cached-content acceptance is explicitly unproved here and assigned to
 G7/slice 9; this increment completes explicit rereview recovery only.
 
+Accepted recovery revision: `2a66bd77331f289d5cb030c12c686b1e8bbf80b0`
+on the execution branch, suffix base `c50d6689425171252e45f894c68bc55e6cd57243`;
+CI observation reused.
+
 ### 9. Wait for fresh current content before initial acceptance
 Type: Behavior
-Status: planned
+Status: done
 Proof: Mounted conversation begins with an older cached note and a deferred fresh
 read. The review cannot accept until the read succeeds and the fresh content is
 shown; a failed read keeps acceptance unavailable and permits retry without
@@ -592,6 +596,33 @@ fresh-read contract. Retain the proposal base until explicit rereview. Cached
 content may help reading but cannot authorize overwriting unseen content.
 Estimate: 3–5 active minutes. This remains the same review/version safety rule,
 with its own initial-read proof loop; it adds no product scope.
+
+Execution evidence (2026-10-14): the loader exposes read progress, successful
+freshness and explicit retry, with recoverable failure opted into by review.
+Its successful-read event supplies the review's observed realm. That view is
+updated by its own fresh read, explicit paired rereview or accepted-note refresh;
+an older overlapping response may replace the shared cache without replacing
+the displayed review. Accept remains unavailable before initial freshness and
+after a failed initial read; retry keeps the draft and original proposal base.
+Inspected four `ConversationInner.initialCorrectionReview.spec.ts` mounted
+observations: no-cache loading, cached older content/deferred fresh read and
+explicit original-base acceptance, failure/retry with retained draft, and an
+actual older HTTP read finishing after the review's own read. The last case
+observes old data in the shared cache while the review still shows its fresh
+read and sends the original proposal base. Initial red proof failed at enabled
+Accept on cached data. A template adjacency error was repaired before final
+proof. The response-order gap found in acceptance was corrected in the same
+attempt, about eight cumulative implementation minutes.
+Final `CURSOR_DEV=true nix develop -c pnpm frontend:test` passed: 355 files,
+2,211 tests; both frontend typechecks passed. Initial/stale selection passed
+two files/seven tests. NoteShow and NoteContextReader retain their existing
+live-cache display and default loud failures; their full-suite proof passed.
+Existing Cypress SDK calls, labels, scoped receipt selectors and app-busy
+barriers are unchanged; prior integrated proof remains applicable. No API or
+component registration changed. Independent refactor consolidated the repeated
+read-failure feedback; the same two-file/seven-test selection, both typechecks
+and whitespace check passed. Backend and ordinary-loader evidence remained
+unchanged. Coordinator selective formatting passed. G7 is fulfilled.
 
 ## Story obligations
 
@@ -628,7 +659,7 @@ Disposition: proved by slice 5: ConversationCorrectionAcceptanceControllerTest c
 ### G7. Initial review needs fresh current content
 Reported: slice 8 — "NoteRealmLoader exposes cached content immediately while loading; Review can enable initial Accept from cached A while proposal base is B."
 Story clause: "Do not merge or overwrite unseen accepted work."
-Disposition: receiving slice 9
+Disposition: proved by slice 9: ConversationInner.initialCorrectionReview.spec.ts cached/deferred fresh-read gating, failed-read retry and older overlapping HTTP response with retained observed content and original-base acceptance
 
 ## Verification and delivery
 
