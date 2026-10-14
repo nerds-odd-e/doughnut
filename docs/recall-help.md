@@ -115,8 +115,12 @@ ordinary note edit. Failed or lost responses preserve the current input;
 retrying the same proposal recovers its recorded decision without publishing
 the correction again. Private discussion, reasons, and decisions stay in the
 conversation and do not change the recall attempt or schedule. Title acceptance
-uses ordinary title validation. For a linked note, choose whether to update or
-keep visible wiki reference text before accepting.
+uses ordinary title validation. When renaming a linked note, choose whether to
+update or keep visible wiki reference text before accepting.
+
+Accept becomes available after the current note loads. If that read fails,
+retry loading current content; your edited wording stays available. The review
+keeps the content it loaded while you decide what to submit.
 
 If another edit advances the notebook while a correction is pending, Accept
 refuses the stale review and keeps your edited wording. Choose **Load current

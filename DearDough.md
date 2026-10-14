@@ -149,7 +149,7 @@ Former local code: DD-217. Former local code: DD-222. The slice time bound is ch
   - Timestamp: unknown
   - Tool: Codex
   - Open Dough release: unknown
-  - Evidence: dashboard launch 21113129-0d3b-45bd-af3b-2dc6b9f95a31 on 2026-10-14; accept_title and refactor_title returned about 9 and 4 active minutes; stale_review and refactor_stale about 9 and 4; initial_review and refactor_initial about 8 and 3. The source PLAN includes implementation, proof and local cleanup under a 10-minute active bound.
+  - Evidence: dashboard launch 21113129-0d3b-45bd-af3b-2dc6b9f95a31 on 2026-10-14; accept_title and refactor_title returned about 9 and 4 active minutes; stale_review and refactor_stale about 9 and 4; initial_review and refactor_initial about 8 and 3. The source PLAN at `6767cf279b7050860d1ef91019b3f42de2d4c0b1:.planning/slice-plans/003-reviewed-conversation-note-corrections/PLAN.md` includes implementation, proof and local cleanup under a 10-minute active bound.
   - Observed effect: coordinator budgets were enforced per implementation/refactor agent; the serial estimates total about 13, 13 and 11 active minutes for those leaves, excluding reported test waits. Slice 9 was added before extending slice 8 implementation, but the complete leaf was not timed as one operation.
   - Inference: reserve the mandatory independent refactor cost inside the leaf budget and track a single clock. These are self-reported estimates, not reconstructed exact timings; detailed earlier agent history is unavailable in the current review.
 
@@ -375,6 +375,6 @@ Implementation launched required whole-suite checks while intended test or templ
   - Timestamp: unknown
   - Tool: Codex
   - Open Dough release: unknown
-  - Evidence: dashboard launch 21113129-0d3b-45bd-af3b-2dc6b9f95a31 on 2026-10-14; stale_review reported 2,850 backend tests passed, then a 2,851-test full rerun because the queued snapshot case was added after compile. initial_review reported a full frontend/typecheck run racing the pre-fix template, followed by final checks after the template correction. PLAN slice 8 and slice 9 retain the final observations.
+  - Evidence: dashboard launch 21113129-0d3b-45bd-af3b-2dc6b9f95a31 on 2026-10-14; stale_review reported 2,850 backend tests passed, then a 2,851-test full rerun because the queued snapshot case was added after compile. initial_review reported a full frontend/typecheck run racing the pre-fix template, followed by final checks after the template correction. Slice 8 and slice 9 observations remain recoverable at `6767cf279b7050860d1ef91019b3f42de2d4c0b1:.planning/slice-plans/003-reviewed-conversation-note-corrections/PLAN.md`.
   - Observed effect: one additional full backend run was needed for the late intended test, and the premature frontend/typecheck results could not validate the final source.
   - Inference: finish the intended edits and focused red/green loop before launching the full required selection. No elapsed-time saving was measured; the later overlapping-read correction and its rerun are excluded from this sequencing finding.
