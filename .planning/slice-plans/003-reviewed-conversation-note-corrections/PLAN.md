@@ -624,6 +624,30 @@ read-failure feedback; the same two-file/seven-test selection, both typechecks
 and whitespace check passed. Backend and ordinary-loader evidence remained
 unchanged. Coordinator selective formatting passed. G7 is fulfilled.
 
+Accepted initial-read revision: `1d6272516e44d97ae0942b425de2d6e9f3e24e96`
+on the execution branch, suffix base `2a66bd77331f289d5cb030c12c686b1e8bbf80b0`;
+CI observation reused.
+
+## Execution complete
+
+Product advice: Keep the current backlog order. No further product correction
+was identified for this story. Triage the existing real-audio CI assertion
+separately and preserve the schema-first release checkpoint. Aggregate review
+covered the nine attributable published implementation revisions from the
+established claim through `1d6272516e44d97ae0942b425de2d6e9f3e24e96`;
+there were no intervening unrelated commits. The original eight-slice plan and
+source contract remain the provenance; slice 9 closes the observed initial-read
+safety gap without changing scope. One conversation lifecycle uses ordinary
+note validation/reference rules and the existing accepted-change owner, aligned
+with North Star and Accepted ADRs 0001, 0002, 0006 and 0007. Controller committed
+transaction/Git proof, mounted recovery/read-timing proof and retained integrated
+Cypress journeys cover the outcome; E2E did not drive the detailed variations.
+No suite-cleanup correction was identified. Process findings were recorded in
+DearDough.md (ODF-206 occurrence and DD-249, 380 physical lines); earlier raw
+agent history is unavailable, limiting process conclusions. Applicable CI
+remains pending under `/tmp/dough-ci-501/watch-ubDtkr` on the execution branch
+until the coordinator's completion receipt; no CI success is claimed here.
+
 ## Story obligations
 
 ### G1. Durable proposal capture and reads
