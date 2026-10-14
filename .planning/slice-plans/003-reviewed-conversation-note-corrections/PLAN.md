@@ -238,9 +238,14 @@ the generic 250-line check to preserve their source/layout owners. Coordinator
 selective formatting passed. Schema-only commit is the deployment checkpoint;
 its accepted SHA will be retained with the next increment.
 
+Accepted schema-only revision: `4347f39efdfd932c7bf5ffec578809bbc5c5dee4`
+on `origin/codex/save-a-useful-chat-clarification-as-a-reviewed-n`, suffix base
+`f9b14b6f0f1824ad8e6fdd5dc65ba860941edd4c`, CI observation reused. This is the
+schema-first deployment checkpoint; no application release was performed.
+
 ### 2. Retain generated corrections with their originating exchange
 Type: Behavior
-Status: planned
+Status: done
 Proof: From the conversation controller, stream fragmented note-tool arguments,
 then fresh-read the stored proposal with reason, source exchange and resolved
 subject/base. Exercise note and MCQ subjects; conversation authorization governs
@@ -255,6 +260,29 @@ Safe boundary: authenticated API readers can inspect durable pending proposals;
 the existing browser suggestion display remains until slice 3 replaces that
 presentation. This boundary isolates stream-completion/persistence risk before
 adding browser review, and does not claim story completion.
+
+Execution evidence (2026-10-14): complete fragmented body/title tools are retained
+with one originating assistant message, accompanying explanation, reason,
+request-time resolved subject/base and response-scoped call identity. Ordered
+conversation reads preserve the preceding request. Controller correction reads
+use existing conversation authorization. Inspected
+`ConversationAiReplyControllerTest.retainsFragmentedCorrectionAgainstTheRequestSubjectAndBase`
+(body/title × direct/MCQ) flush/clear and reread, including a base advanced during
+response; other cases cover repeated mock call IDs, empty recall start, exclusion
+explanation, and read refusal. Private recall CORRECTIONS authorization cases
+passed. `CURSOR_DEV=true nix develop -c pnpm backend:test_only` passed on final
+content: 2,824 tests, zero failures/errors, two skipped, same isolated schema as
+slice 1. Two initial compile-only fixture/constructor issues were corrected.
+`CURSOR_DEV=true nix develop -c pnpm generateTypeScript` passed; full
+`CURSOR_DEV=true nix develop -c pnpm frontend:test` passed (350 files, 2,195 tests),
+and both frontend `vue-tsc --noEmit` / `tsc --noEmit` and `pnpm openapi:lint`
+passed with the Nix wrapper. Shared streaming, title/unknown/exclusion,
+standalone completion, Messages and recall consumers were included.
+Independent refactor consolidated private-help participant variants; inspected
+test setup/assertions and its full backend rerun confirmed 31 private-recall
+cases, retaining the capture/generation/frontend proof unchanged. Coordinator
+selective formatting passed. Browser review and decisions retain their later
+slice ownership below.
 
 ### 3. Review and reopen a pending correction in the conversation
 Type: Behavior
@@ -353,7 +381,17 @@ Update enduring recovery documentation in the same increment. Estimate: 5–7 mi
 ### G1. Durable proposal capture and reads
 Reported: slice 1 — "No runtime proposal reads or API changes were added; their proof belongs to slice 2."
 Story clause: "Retain the proposal and its decision with the conversation."
-Disposition: receiving slice 2
+Disposition: proved by slice 2: ConversationAiReplyControllerTest.retainsFragmentedCorrectionAgainstTheRequestSubjectAndBase fresh controller proposal read
+
+### G2. Conversation presentation
+Reported: slice 2 — "Durable browser review belongs to slice 3"
+Story clause: "Show an editable correction within the conversation, with the subject note, reason, and originating exchange."
+Disposition: receiving slice 3
+
+### G3. Confirmed decision controls
+Reported: slice 2 — "no browser review, decision, or acceptance UI was wired here."
+Story clause: "The author explicitly accepts or declines it; discussion and proposal generation alone do not change the note."
+Disposition: interim until slices 3, 4, 6, 7
 
 ## Verification and delivery
 

@@ -27,6 +27,10 @@ public class ConversationNoteCorrection extends EntityIdentifiedByIdOnly {
   @JsonIgnore
   private ConversationMessage sourceMessage;
 
+  public Integer getSourceMessageId() {
+    return sourceMessage.getId();
+  }
+
   @ManyToOne
   @JoinColumn(name = "note_id", nullable = false)
   private Note note;

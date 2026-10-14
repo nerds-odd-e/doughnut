@@ -1300,6 +1300,23 @@ export type DailyProbeTodayDto = {
     completed: boolean;
 };
 
+export type ConversationNoteCorrection = {
+    id: number;
+    note?: Note;
+    responseId?: string;
+    toolCallId?: string;
+    field?: 'CONTENT' | 'TITLE';
+    proposedValue?: string;
+    reason?: string;
+    baseRevision?: string;
+    decision?: 'PENDING' | 'DECLINED' | 'ACCEPTED';
+    reviewedValue?: string;
+    decidedBy?: User;
+    decidedAt?: string;
+    acceptedRevision?: string;
+    sourceMessageId?: number;
+};
+
 export type ConversationListItem = {
     id: number;
     subject: string;
@@ -1341,10 +1358,12 @@ export type DummyForGeneratingTypes = {
 
 export type NoteContentCompletion = {
     content: string;
+    reason?: string;
 };
 
 export type TitleReplacement = {
     newTitle: string;
+    reason?: string;
 };
 
 export type UserForListing = {
@@ -4263,6 +4282,24 @@ export type ExportConversationResponses = {
 };
 
 export type ExportConversationResponse = ExportConversationResponses[keyof ExportConversationResponses];
+
+export type GetConversationCorrectionsData = {
+    body?: never;
+    path: {
+        conversationId: number;
+    };
+    query?: never;
+    url: '/api/conversation/{conversationId}/corrections';
+};
+
+export type GetConversationCorrectionsResponses = {
+    /**
+     * OK
+     */
+    200: Array<ConversationNoteCorrection>;
+};
+
+export type GetConversationCorrectionsResponse = GetConversationCorrectionsResponses[keyof GetConversationCorrectionsResponses];
 
 export type GetConversationsOfCurrentUserData = {
     body?: never;

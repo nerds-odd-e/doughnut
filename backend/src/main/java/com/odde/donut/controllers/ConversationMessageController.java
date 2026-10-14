@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.donut.controllers.dto.ConversationListItem;
 import com.odde.donut.entities.Conversation;
 import com.odde.donut.entities.ConversationMessage;
+import com.odde.donut.entities.ConversationNoteCorrection;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.RecallPrompt;
 import com.odde.donut.exceptions.OpenAiNotAvailableException;
@@ -107,6 +108,14 @@ public class ConversationMessageController {
       throws UnexpectedNoAccessRightException {
     authorizationService.assertAuthorization(conversation);
     return conversation.getConversationMessages();
+  }
+
+  @GetMapping("/{conversationId}/corrections")
+  public List<ConversationNoteCorrection> getConversationCorrections(
+      @PathVariable("conversationId") @Schema(type = "integer") Conversation conversation)
+      throws UnexpectedNoAccessRightException {
+    authorizationService.assertAuthorization(conversation);
+    return conversationService.getCorrections(conversation);
   }
 
   @GetMapping(value = "/{conversationId}/export", produces = "application/json")

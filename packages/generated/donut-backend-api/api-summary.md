@@ -203,6 +203,7 @@ Use this for endpoint lookup; open `sdk.gen.ts` or `types.gen.ts` only for exact
 - `getConversation`: GET `/api/conversation/{conversationId}` -> `GetConversationResponse` (request: `GetConversationData`; path: conversationId; response body: Conversation)
 - `getConversationMessages`: GET `/api/conversation/{conversationId}/messages` -> `GetConversationMessagesResponse` (request: `GetConversationMessagesData`; path: conversationId; response body: Array<ConversationMessage>)
 - `exportConversation`: GET `/api/conversation/{conversationId}/export` -> `ExportConversationResponse` (request: `ExportConversationData`; path: conversationId; response body: Record<string, unknown>)
+- `getConversationCorrections`: GET `/api/conversation/{conversationId}/corrections` -> `GetConversationCorrectionsResponse` (request: `GetConversationCorrectionsData`; path: conversationId; response body: Array<ConversationNoteCorrection>)
 - `getConversationsOfCurrentUser`: GET `/api/conversation/all` -> `GetConversationsOfCurrentUserResponse` (request: none; response body: Array<ConversationListItem>)
 
 ## Circle Controller

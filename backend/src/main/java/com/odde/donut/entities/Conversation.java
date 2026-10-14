@@ -15,6 +15,7 @@ import lombok.Setter;
 @Table(name = "conversation")
 public class Conversation extends EntityIdentifiedByIdOnly {
   @OneToMany(mappedBy = "conversation", fetch = FetchType.LAZY)
+  @OrderBy("id ASC")
   @JsonIgnore
   List<ConversationMessage> conversationMessages = new ArrayList<>();
 
