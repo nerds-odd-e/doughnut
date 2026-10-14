@@ -98,7 +98,7 @@ Each story records its preparation state below.
 
 **Identity:** SEED-073#story-2
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/003-reviewed-conversation-note-corrections/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"d65e4c951598e94aa39cc2bf8a2a732a23a7f7b1f0a1fcd07779c56934ddd081","plan":"ee67fe1576c09e75136b72be1b4b68c41a4f22f95f539a445b4fc79f5f77b0b5"}}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/003-reviewed-conversation-note-corrections/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"d65e4c951598e94aa39cc2bf8a2a732a23a7f7b1f0a1fcd07779c56934ddd081","plan":"6a37391e09582a68c102d8ffa9a279ba2a850e01bd83c702c55992c95d4e7af2"}}
 ```
 
 **Goal:** A note author who has found a useful clarification while discussing

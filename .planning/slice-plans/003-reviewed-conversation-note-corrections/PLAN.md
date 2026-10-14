@@ -145,6 +145,7 @@ prove the workflow. No improvement in live-model quality is claimed.
 | Reviewed acceptance and Open note work from note and MCQ conversations | 6 | Mocked-service Cypress journey plus mounted MCQ dialog, changed note and reopened accepted review; actual Git result from slice 5 |
 | Title corrections reuse the same lifecycle and ordinary rename validation | 7 | Controller title acceptance/Git and mounted edited-title decision; existing referenced-title consumer coverage |
 | Stale review refuses overwrite, preserves input and permits explicit rereview | 5 refusal, 8 recovery | Controller newer-head conflict; mounted refresh/current-base/accept and transient request failure |
+| Initial review waits for fresh current content before accepting | 9 | Mounted cached older realm plus deferred fresh read; acceptance becomes available only after the fresh value is shown |
 | Audience and edit rights hold; private transcript stays outside Git; recall identity/history/schedule preserved | 2 reads, 4 decline, 5 acceptance, 6 UI | Real controller authorization scenarios and Git content; original recall state before/after accepted correction; mounted readonly view |
 | Later note changes do not change an earlier decision/reference | 5 persistence, 6 rendering | Accept, ordinary edit, reload decision; render original reviewed text/reference |
 
@@ -529,9 +530,13 @@ One-time reading of the product for the replaced body-only refusal literal
 returned no occurrences; this was a sweep reading, not an absence test.
 G3 is discharged by the retained decline/body controls and this title control.
 
+Accepted title revision: `c50d6689425171252e45f894c68bc55e6cd57243`
+on the execution branch, suffix base `86d4963852ddb5ae42faa3ae22ea0f6883a519e2`;
+CI observation reused.
+
 ### 8. Recover from a stale review without losing current input
 Type: Behavior
-Status: planned
+Status: done
 Proof: Mounted author review meets the stale response already proved in slice 5;
 its edited text remains, current accepted content is loaded, and only a new
 explicit acceptance sends the refreshed reviewed base. A failed refresh keeps the
@@ -542,6 +547,51 @@ Finish the explicit current-content/rereview interaction. Keep the original
 proposal and origin inspectable while the author decides what to submit against
 current content. No automatic merge, silent retry, or second proposal lifecycle.
 Update enduring recovery documentation in the same increment. Estimate: 5–7 minutes.
+
+Execution evidence (2026-10-14): the current-review endpoint authorizes the
+conversation and current note read, locks correction then notebook binding,
+refreshes the managed subject and returns its NoteRealm with accepted head.
+It refuses a subject that moved notebooks while acquiring that lock.
+Inspected five `ConversationCorrectionReviewControllerTest` cases: direct/MCQ
+current snapshots with pending disposition, queued ordinary author publication
+before the snapshot lock, and separate conversation/read permissions. The
+existing stale `ConversationCorrectionAcceptanceControllerTest` now uses that
+real endpoint before publishing and retaining the explicitly rereviewed base.
+Mounted `ConversationInner.staleCorrections.spec.ts` observes delayed body/title
+refresh preserving the draft and source, then a second explicit Accept carrying
+the fresh base; failed refresh preserves the draft and previous base.
+`CURSOR_DEV=true nix develop -c pnpm generateTypeScript` and OpenAPI lint passed.
+Final full `CURSOR_DEV=true nix develop -c pnpm backend:test_only` passed:
+2,851 tests, zero failures/errors, two skipped in the established isolated schema.
+The final run includes the queued snapshot case added after the first compile.
+Full `CURSOR_DEV=true nix develop -c pnpm frontend:test` passed: 354 files,
+2,207 tests; both frontend typechecks passed. Generated optional data/response
+types were corrected through ordinary contract assertions and optional status.
+Independent refactor kept original-proposal details in the editable pending
+branch, retaining the visible proposal in completed/readonly views. Its mounted
+selection actually ran three files/12 tests, then corrected two mistaken file
+names and ran the remaining two files/10 tests; all five required consumers,
+both typechecks and whitespace passed. Backend/API proof remained unchanged.
+Existing Cypress selectors scope the accepted receipt and editor, whose flow
+is unchanged; slice 6 integrated evidence remains applicable. Coordinator
+selective formatting passed; enduring recovery docs were updated.
+Initial cached-content acceptance is explicitly unproved here and assigned to
+G7/slice 9; this increment completes explicit rereview recovery only.
+
+### 9. Wait for fresh current content before initial acceptance
+Type: Behavior
+Status: planned
+Proof: Mounted conversation begins with an older cached note and a deferred fresh
+read. The review cannot accept until the read succeeds and the fresh content is
+shown; a failed read keeps acceptance unavailable and permits retry without
+losing the draft. Ordinary loader consumers remain covered.
+
+Expose initial read progress through the existing NoteRealmLoader slot and use
+it to gate this review's acceptance, or use an equivalent existing loader-owned
+fresh-read contract. Retain the proposal base until explicit rereview. Cached
+content may help reading but cannot authorize overwriting unseen content.
+Estimate: 3–5 active minutes. This remains the same review/version safety rule,
+with its own initial-read proof loop; it adds no product scope.
 
 ## Story obligations
 
@@ -574,6 +624,11 @@ Disposition: proved by slice 6: both mocked OpenAI Cypress features pass edited 
 Reported: slice 4 — "Acceptance remains slices 5–7."
 Story clause: "The saved correction and its accepted decision must agree."
 Disposition: proved by slice 5: ConversationCorrectionAcceptanceControllerTest committed receipt/Git, rollback, stale, authorization and queued-decision observations
+
+### G7. Initial review needs fresh current content
+Reported: slice 8 — "NoteRealmLoader exposes cached content immediately while loading; Review can enable initial Accept from cached A while proposal base is B."
+Story clause: "Do not merge or overwrite unseen accepted work."
+Disposition: receiving slice 9
 
 ## Verification and delivery
 
@@ -624,3 +679,14 @@ integration risks, retained cohesive decisions, and mapped their interim UI
 obligations to the immediate consuming slices. No remaining slice-specific
 concern was identified in this review. Estimates remain hypotheses, and the
 recorded release checkpoint is not a claim of production readiness.
+
+Execution refinement (2026-10-14): slice 8 reached about nine active minutes
+with explicit recovery and its terminal proof complete. Acceptance inspection
+then exposed a separate initial-read gap: the ordinary loader renders its cached
+realm while a fresh request is pending. The recovery proof remains compatible;
+continuing initial-load implementation in that attempt would exceed the hard
+limit. Retain slices 1–8 and add bounded slice 9 with G7 ownership. No attempt
+edits were discarded and no over-limit implementation was continued. The
+cumulative model still has one proposal lifecycle, current-note read owner and
+accepted-change owner. Nine slices need no story resplit; source scope, North
+Star and ADR constraints remain unchanged.

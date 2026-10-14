@@ -3453,6 +3453,25 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/ConversationNoteCorrection"
+  /api/conversation/corrections/{correctionId}/current-review:
+    get:
+      tags:
+      - conversation-message-controller
+      operationId: loadCurrentReview
+      parameters:
+      - name: correctionId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ConversationCorrectionReview"
   /api/conversation/all:
     get:
       tags:
@@ -6281,6 +6300,13 @@ components:
           type: boolean
       required:
       - completed
+    ConversationCorrectionReview:
+      type: object
+      properties:
+        noteRealm:
+          $ref: "#/components/schemas/NoteRealm"
+        baseRevision:
+          type: string
     ConversationListItem:
       type: object
       properties:

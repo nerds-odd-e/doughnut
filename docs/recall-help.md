@@ -118,6 +118,13 @@ conversation and do not change the recall attempt or schedule. Title acceptance
 uses ordinary title validation. For a linked note, choose whether to update or
 keep visible wiki reference text before accepting.
 
+If another edit advances the notebook while a correction is pending, Accept
+refuses the stale review and keeps your edited wording. Choose **Load current
+content** to see the current note and renew the review's base. Your wording
+stays in the editor; inspect it against the current note, then choose **Accept**
+again. A failed refresh keeps the previous base and your input so you can retry.
+The original proposal and explanation remain available throughout review.
+
 ## Reviewed refinement
 
 Note refinement uses existing edit rights. For a multiple-choice conversation,

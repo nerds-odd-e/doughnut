@@ -1323,6 +1323,11 @@ export type DailyProbeTodayDto = {
     completed: boolean;
 };
 
+export type ConversationCorrectionReview = {
+    noteRealm?: NoteRealm;
+    baseRevision?: string;
+};
+
 export type ConversationListItem = {
     id: number;
     subject: string;
@@ -4342,6 +4347,24 @@ export type GetConversationCorrectionsResponses = {
 };
 
 export type GetConversationCorrectionsResponse = GetConversationCorrectionsResponses[keyof GetConversationCorrectionsResponses];
+
+export type LoadCurrentReviewData = {
+    body?: never;
+    path: {
+        correctionId: number;
+    };
+    query?: never;
+    url: '/api/conversation/corrections/{correctionId}/current-review';
+};
+
+export type LoadCurrentReviewResponses = {
+    /**
+     * OK
+     */
+    200: ConversationCorrectionReview;
+};
+
+export type LoadCurrentReviewResponse = LoadCurrentReviewResponses[keyof LoadCurrentReviewResponses];
 
 export type GetConversationsOfCurrentUserData = {
     body?: never;

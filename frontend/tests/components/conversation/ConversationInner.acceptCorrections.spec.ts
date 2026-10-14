@@ -90,7 +90,9 @@ it.each([noteConversation, recallConversation])(
     expect(
       review.find('[data-testid="accepted-reviewed-content"]').text()
     ).toBe("Reviewed distinction")
-    expect(review.find("strong").text()).toBe("Reviewed distinction")
+    expect(
+      review.find('[data-testid="accepted-reviewed-content"] strong').text()
+    ).toBe("Reviewed distinction")
     await review
       .findAll("button")
       .find((button) => button.text() === "Open note")!

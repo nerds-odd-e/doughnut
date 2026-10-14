@@ -63,7 +63,12 @@ class ConversationCorrectionAcceptanceControllerTest
     assertThat(
         downloadHistory(review.notebook(), "Subject.md").contentsNewestFirst().getFirst(),
         is(content("ordinary edit")));
-    String currentBase = reloadCommittedBinding(review.notebook().getId()).getAcceptedGitObjectId();
+    var currentReview = conversationController.loadCurrentReview(review.correctionId());
+    assertThat(currentReview.noteRealm().getNote().getContent(), is(content("ordinary edit")));
+    String currentBase = currentReview.baseRevision();
+    assertThat(
+        currentBase,
+        is(reloadCommittedBinding(review.notebook().getId()).getAcceptedGitObjectId()));
     accept(review, content("reviewed wording"), currentBase);
     assertThat(reread(review).getReviewedValue(), is(content("reviewed wording")));
     assertThat(reread(review).getBaseRevision(), is(currentBase));

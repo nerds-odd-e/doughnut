@@ -12,6 +12,11 @@
           <p v-if="correction.field === 'TITLE'">{{ noteRealm.note.noteTopology.title }}</p>
           <div v-else :class="RICH_CONTENT_PROSE" v-html="markdownizer.markdownToHtml(noteRealm.note.content)" />
           <template v-if="correction.decision === 'PENDING' && user && !noteRealm.notebookRealm.readonly">
+            <details>
+              <summary>Original proposal</summary>
+              <p v-if="correction.field === 'TITLE'">{{ correction.proposedValue }}</p>
+              <div v-else :class="RICH_CONTENT_PROSE" v-html="markdownizer.markdownToHtml(correction.proposedValue)" />
+            </details>
             <TextInput v-if="correction.field === 'TITLE'" v-model="reviewedValue" :scope-name="`correction-${correction.id}`" field="proposedTitle" />
             <TextArea v-else v-model="reviewedValue" :scope-name="`correction-${correction.id}`" field="proposedContent" />
             <label v-if="requiresReferenceHandling(noteRealm)" class="block mt-2">
@@ -21,7 +26,8 @@
                 <option v-for="option in TITLE_RENAME_REFERENCE_SAVE_OPTIONS" :key="option.value" :value="option.value">{{ option.label }}</option>
               </select>
             </label>
-            <button class="daisy-btn daisy-btn-primary mt-2" :disabled="deciding || (requiresReferenceHandling(noteRealm) && !referenceHandling)" @click="accept">Accept</button>
+            <button v-if="staleReview" class="daisy-btn daisy-btn-outline mt-2" :disabled="deciding || refreshingReview" @click="loadCurrentReview">Load current content</button>
+            <button class="daisy-btn daisy-btn-primary mt-2" :disabled="deciding || refreshingReview || (requiresReferenceHandling(noteRealm) && !referenceHandling)" @click="accept">Accept</button>
           </template>
           <template v-else>
             <h4>Proposed {{ correction.field === 'TITLE' ? 'title' : 'content' }}</h4>
@@ -39,6 +45,7 @@
       <button v-if="correction.note" class="daisy-btn daisy-btn-outline mt-2" @click="openNote">Open note</button>
     </template>
     <button v-if="user && correction.decision === 'PENDING'" class="daisy-btn daisy-btn-outline mt-2" :disabled="deciding" @click="decline">Decline</button>
+    <p v-if="reviewRefreshFailure" class="text-error">{{ reviewRefreshFailure }}</p>
     <p v-if="decisionFailure" class="text-error">{{ decisionFailure }}</p>
     <p v-if="noteRefreshFailed" class="text-error">The correction is accepted. Could not reload the note. Open the note to try again.</p>
   </section>
@@ -82,6 +89,10 @@ const emit = defineEmits<{
 const router = useRouter()
 const noteStore = useNoteStore()
 const reviewedValue = ref(props.correction.proposedValue ?? "")
+const reviewedBase = ref(props.correction.baseRevision)
+const staleReview = ref(false)
+const refreshingReview = ref(false)
+const reviewRefreshFailure = ref("")
 const referenceHandling = ref<TitleRenameReferenceHandling | "">("")
 const deciding = ref(false)
 const decisionFailure = ref("")
@@ -101,14 +112,38 @@ const refreshNote = async () => {
   }
 }
 
+const loadCurrentReview = async () => {
+  refreshingReview.value = true
+  const { data: currentReview, error } = await apiCallWithLoading(() =>
+    ConversationMessageController.loadCurrentReview({
+      path: { correctionId: props.correction.id },
+    })
+  )
+  refreshingReview.value = false
+  reviewRefreshFailure.value = error
+    ? "Could not load the current note. Your review is kept. Try again."
+    : ""
+  if (!error) {
+    noteStore.refreshNoteRealm(currentReview!.noteRealm!)
+    reviewedBase.value = currentReview!.baseRevision
+    staleReview.value = false
+    decisionFailure.value =
+      "Current note loaded. Review your wording, then choose Accept."
+  }
+}
+
 const accept = async () => {
   deciding.value = true
-  const { data: correction, error } = await apiCallWithLoading(() =>
+  const {
+    data: correction,
+    error,
+    response,
+  } = await apiCallWithLoading(() =>
     ConversationMessageController.acceptCorrection({
       path: { correctionId: props.correction.id },
       body: {
         reviewedValue: reviewedValue.value,
-        baseRevision: props.correction.baseRevision,
+        baseRevision: reviewedBase.value,
         ...(referenceHandling.value
           ? { referenceHandling: referenceHandling.value }
           : {}),
@@ -117,11 +152,14 @@ const accept = async () => {
   )
   deciding.value = false
   const errors = error ? toOpenApiError(error).errors : undefined
-  decisionFailure.value = error
-    ? errors?.newTitle ||
-      errors?.referenceHandling ||
-      "Could not confirm acceptance. Try again to recover this review's decision."
-    : ""
+  staleReview.value = !!error && response?.status === 409
+  decisionFailure.value = staleReview.value
+    ? "This review is stale. Load the current note and review again."
+    : error
+      ? errors?.newTitle ||
+        errors?.referenceHandling ||
+        "Could not confirm acceptance. Try again to recover this review's decision."
+      : ""
   if (!error) {
     emit("decided", correction!)
     if (correction!.decision === "ACCEPTED") await refreshNote()
