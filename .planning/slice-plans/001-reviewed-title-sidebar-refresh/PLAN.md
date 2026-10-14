@@ -93,3 +93,10 @@ and `vue-tsc --noEmit` pass.
   each title-change path calls it in one line. Moving it into `loadNoteRealm`
   would refresh the sidebar on every note load, so the call stays in
   `ConversationNoteCorrectionReview.vue`.
+
+## Execution complete
+
+Product advice: no change. The fix reuses the single sidebar refresh rule that
+other title and structure changes already call. Refreshing the sidebar for
+title changes made outside this browser session stays deferred, as the seed
+records.
