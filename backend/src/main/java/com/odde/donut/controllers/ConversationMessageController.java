@@ -2,6 +2,7 @@ package com.odde.donut.controllers;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.odde.donut.controllers.dto.ConversationCorrectionAcceptance;
 import com.odde.donut.controllers.dto.ConversationListItem;
 import com.odde.donut.entities.Conversation;
 import com.odde.donut.entities.ConversationMessage;
@@ -12,10 +13,12 @@ import com.odde.donut.exceptions.OpenAiNotAvailableException;
 import com.odde.donut.exceptions.OpenAiUnauthorizedException;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.donut.services.AuthorizationService;
+import com.odde.donut.services.ConversationCorrectionAcceptanceService;
 import com.odde.donut.services.ConversationService;
 import com.odde.donut.services.ai.NoteConversationAiReplyService;
 import com.openai.models.responses.ResponseCreateParams;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.Valid;
 import java.util.List;
 import java.util.Map;
 import org.apache.coyote.BadRequestException;
@@ -30,16 +33,19 @@ public class ConversationMessageController {
   private final NoteConversationAiReplyService noteConversationAiReplyService;
   private final AuthorizationService authorizationService;
   private final ObjectMapper objectMapper;
+  private final ConversationCorrectionAcceptanceService correctionAcceptanceService;
 
   public ConversationMessageController(
       ConversationService conversationService,
       NoteConversationAiReplyService noteConversationAiReplyService,
       AuthorizationService authorizationService,
-      ObjectMapper objectMapper) {
+      ObjectMapper objectMapper,
+      ConversationCorrectionAcceptanceService correctionAcceptanceService) {
     this.conversationService = conversationService;
     this.noteConversationAiReplyService = noteConversationAiReplyService;
     this.authorizationService = authorizationService;
     this.objectMapper = objectMapper;
+    this.correctionAcceptanceService = correctionAcceptanceService;
   }
 
   @PostMapping("/note/{note}")
@@ -126,6 +132,14 @@ public class ConversationMessageController {
         conversationService.getCorrectionForUpdate(correctionId);
     authorizationService.assertAuthorization(correction.getSourceMessage().getConversation());
     return conversationService.declineCorrection(correction, authorizationService.getCurrentUser());
+  }
+
+  @PostMapping("/corrections/{correctionId}/accept")
+  public ConversationNoteCorrection acceptCorrection(
+      @PathVariable Integer correctionId,
+      @Valid @RequestBody ConversationCorrectionAcceptance review)
+      throws UnexpectedNoAccessRightException {
+    return correctionAcceptanceService.accept(correctionId, review);
   }
 
   @GetMapping(value = "/{conversationId}/export", produces = "application/json")

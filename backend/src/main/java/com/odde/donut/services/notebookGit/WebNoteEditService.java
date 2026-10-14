@@ -7,6 +7,7 @@ import com.odde.donut.entities.DisplayName;
 import com.odde.donut.entities.Note;
 import com.odde.donut.entities.User;
 import com.odde.donut.entities.repositories.NoteRepository;
+import com.odde.donut.entities.repositories.NotebookGitBindingRepository;
 import com.odde.donut.exceptions.ApiException;
 import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.donut.factoryServices.EntityPersister;
@@ -35,6 +36,7 @@ public class WebNoteEditService {
   private final NoteReferenceService noteReferenceService;
   private final WikiLinkRewriteService wikiLinkRewriteService;
   private final NoteTitleNameRule noteTitleNameRule;
+  private final NotebookGitBindingRepository bindingRepository;
 
   public WebNoteEditService(
       AcceptedWebChangeService acceptedWebChangeService,
@@ -44,7 +46,8 @@ public class WebNoteEditService {
       EntityPersister entityPersister,
       NoteReferenceService noteReferenceService,
       WikiLinkRewriteService wikiLinkRewriteService,
-      NoteTitleNameRule noteTitleNameRule) {
+      NoteTitleNameRule noteTitleNameRule,
+      NotebookGitBindingRepository bindingRepository) {
     this.acceptedWebChangeService = acceptedWebChangeService;
     this.noteRepository = noteRepository;
     this.authorizationService = authorizationService;
@@ -53,6 +56,7 @@ public class WebNoteEditService {
     this.noteReferenceService = noteReferenceService;
     this.wikiLinkRewriteService = wikiLinkRewriteService;
     this.noteTitleNameRule = noteTitleNameRule;
+    this.bindingRepository = bindingRepository;
   }
 
   public Note saveTitle(
@@ -110,6 +114,33 @@ public class WebNoteEditService {
         noteId,
         notebookId,
         note -> authoredNoteDocumentPersistence.persist(note, document, updatedAt),
+        note -> "Edit note content: " + note.getTitle(),
+        updatedAt);
+  }
+
+  public Note saveReviewedContent(
+      Integer noteId,
+      Integer notebookId,
+      AuthoredNoteDocument document,
+      String expectedRevision,
+      Timestamp updatedAt)
+      throws UnexpectedNoAccessRightException {
+    return edit(
+        noteId,
+        notebookId,
+        note -> {
+          String currentRevision =
+              bindingRepository
+                  .findByNotebook_Id(notebookId)
+                  .map(binding -> binding.getAcceptedGitObjectId())
+                  .orElse(null);
+          if (!Objects.equals(currentRevision, expectedRevision)) {
+            throw new ResponseStatusException(
+                HttpStatus.CONFLICT,
+                "This review is stale. Load the current note and review again.");
+          }
+          authoredNoteDocumentPersistence.persist(note, document, updatedAt);
+        },
         note -> "Edit note content: " + note.getTitle(),
         updatedAt);
   }

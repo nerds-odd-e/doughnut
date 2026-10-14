@@ -1734,6 +1734,31 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ConversationNoteCorrection"
+  /api/conversation/corrections/{correctionId}/accept:
+    post:
+      tags:
+      - conversation-message-controller
+      operationId: acceptCorrection
+      parameters:
+      - name: correctionId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ConversationCorrectionAcceptance"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ConversationNoteCorrection"
   /api/circles:
     get:
       tags:
@@ -5183,6 +5208,15 @@ components:
           format: int32
       required:
       - id
+    ConversationCorrectionAcceptance:
+      type: object
+      properties:
+        reviewedValue:
+          type: string
+        baseRevision:
+          type: string
+      required:
+      - reviewedValue
     CircleJoiningByInvitation:
       type: object
       properties:

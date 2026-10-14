@@ -383,9 +383,13 @@ operations. Inspected moved observations in
 passed all nine mounted cases, with both typechecks. Backend, generated, other
 frontend and Cypress boundaries remained unchanged. Coordinator formatting passed.
 
+Accepted decline revision: `295589e9f1631ba6a0687ad8ea0ef037140e5e2c`
+on the execution branch, suffix base `c27d2aaf2b1b75a7fa82c7bd85477dfa11471a05`;
+CI observation reused.
+
 ### 5. Publish a reviewed body correction and its decision atomically
 Type: Behavior
-Status: planned
+Status: done
 Proof: A real controller acceptance followed by a fresh transaction and downloaded
 Git bundle yields the edited body and exactly its retained revision/decision.
 Prove stale-base refusal, unauthorized acceptance refusal, rollback on failed
@@ -405,6 +409,33 @@ Safe boundary: the authenticated API offers safe publication, while the browser
 review remains pending/declinable until slice 6. This isolates the atomicity and
 retry risk and its real-database proof from UI wiring. This is not a claim that the
 complete author journey is delivered yet.
+
+Execution evidence (2026-10-14): serializable acceptance locks the correction,
+authorizes the conversation and resolves its current subject. Reviewed content
+uses ordinary authored validation and `WebNoteEditService.saveReviewedContent`;
+the base check runs inside the existing locked publication operation. The outer
+transaction retains normalized reviewed value, actual reviewed base, reviewer,
+time and resulting binding head. Completed decisions return their durable receipt.
+Inspected all ten `ConversationCorrectionAcceptanceControllerTest` scenarios and
+their committed test support (`NOT_SUPPORTED`, independent fixture/read transactions).
+Direct/MCQ receipt equals downloaded Git head and exact Markdown; tracker identity,
+counts, history, schedule, stability/difficulty and prompt/MCQ/answer stay equal.
+Exact exported Markdown contains only reviewed authored content. Other cases prove
+stale refusal/explicit new-base acceptance, separate audience/edit authorization,
+late binding failure rollback/retry, receipts after later ordinary publication,
+completed decline, queued real concurrent decisions and unchanged-content head reuse.
+Successful rereview retains its actual requested base. Initial test runs exposed
+detached fixture ownership and MCQ conversation/prompt cleanup issues; repaired
+managed-state setup and complete owned cleanup, respecting answer cascade.
+Final `CURSOR_DEV=true nix develop -c pnpm backend:test_only` passed: 2,839 tests,
+zero failures/errors, two skipped; ten acceptance cases passed on the isolated
+unit schema. `pnpm generateTypeScript`, full `pnpm frontend:test` (351 files,
+2,194 tests), both frontend typechecks and `pnpm openapi:lint` passed with Nix.
+Independent refactor extracted committed fixtures into
+`ConversationCorrectionAcceptanceControllerTestSupport`; inspected unchanged
+assertions and its full backend rerun (same passing counts). Generated/frontend
+proof remains valid. Coordinator selective formatting passed. Server body proof
+is complete; browser acceptance and title application retain later ownership.
 
 ### 6. Accept an edited body and reopen its confirmed result
 Type: Behavior
@@ -480,7 +511,7 @@ Disposition: receiving slice 6
 ### G6. Atomic acceptance operation
 Reported: slice 4 — "Acceptance remains slices 5–7."
 Story clause: "The saved correction and its accepted decision must agree."
-Disposition: receiving slice 5
+Disposition: proved by slice 5: ConversationCorrectionAcceptanceControllerTest committed receipt/Git, rollback, stale, authorization and queued-decision observations
 
 ## Verification and delivery
 

@@ -784,6 +784,11 @@ export type ConversationNoteCorrection = {
     sourceMessageId?: number;
 };
 
+export type ConversationCorrectionAcceptance = {
+    reviewedValue: string;
+    baseRevision?: string;
+};
+
 export type CircleJoiningByInvitation = {
     invitationCode: string;
 };
@@ -2860,6 +2865,24 @@ export type DeclineCorrectionResponses = {
 };
 
 export type DeclineCorrectionResponse = DeclineCorrectionResponses[keyof DeclineCorrectionResponses];
+
+export type AcceptCorrectionData = {
+    body: ConversationCorrectionAcceptance;
+    path: {
+        correctionId: number;
+    };
+    query?: never;
+    url: '/api/conversation/corrections/{correctionId}/accept';
+};
+
+export type AcceptCorrectionResponses = {
+    /**
+     * OK
+     */
+    200: ConversationNoteCorrection;
+};
+
+export type AcceptCorrectionResponse = AcceptCorrectionResponses[keyof AcceptCorrectionResponses];
 
 export type IndexData = {
     body?: never;

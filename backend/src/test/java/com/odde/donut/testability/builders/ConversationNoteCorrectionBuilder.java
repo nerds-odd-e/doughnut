@@ -23,6 +23,11 @@ public class ConversationNoteCorrectionBuilder extends EntityBuilder<Conversatio
   @Override
   protected void beforeCreate(boolean needPersist) {}
 
+  public ConversationNoteCorrectionBuilder baseRevision(String revision) {
+    entity.setBaseRevision(revision);
+    return this;
+  }
+
   public ConversationNoteCorrectionBuilder acceptedBy(User reviewer) {
     entity.setDecision(ConversationNoteCorrection.Decision.ACCEPTED);
     entity.setDecidedBy(reviewer);

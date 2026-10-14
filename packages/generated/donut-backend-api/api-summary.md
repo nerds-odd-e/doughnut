@@ -200,6 +200,7 @@ Use this for endpoint lookup; open `sdk.gen.ts` or `types.gen.ts` only for exact
 - `getConversationsAboutNote`: GET `/api/conversation/note/{note}` -> `GetConversationsAboutNoteResponse` (request: `GetConversationsAboutNoteData`; path: note; response body: Array<Conversation>)
 - `startConversationAboutNote`: POST `/api/conversation/note/{note}` -> `StartConversationAboutNoteResponse` (request: `StartConversationAboutNoteData`; path: note; body: string; response body: Conversation)
 - `declineCorrection`: POST `/api/conversation/corrections/{correctionId}/decline` -> `DeclineCorrectionResponse` (request: `DeclineCorrectionData`; path: correctionId; response body: ConversationNoteCorrection)
+- `acceptCorrection`: POST `/api/conversation/corrections/{correctionId}/accept` -> `AcceptCorrectionResponse` (request: `AcceptCorrectionData`; path: correctionId; body: ConversationCorrectionAcceptance; response body: ConversationNoteCorrection)
 - `markConversationAsRead`: PATCH `/api/conversation/{conversationId}/read` -> `MarkConversationAsReadResponse` (request: `MarkConversationAsReadData`; path: conversationId; response body: Array<ConversationMessage>)
 - `getConversation`: GET `/api/conversation/{conversationId}` -> `GetConversationResponse` (request: `GetConversationData`; path: conversationId; response body: Conversation)
 - `getConversationMessages`: GET `/api/conversation/{conversationId}/messages` -> `GetConversationMessagesResponse` (request: `GetConversationMessagesData`; path: conversationId; response body: Array<ConversationMessage>)
