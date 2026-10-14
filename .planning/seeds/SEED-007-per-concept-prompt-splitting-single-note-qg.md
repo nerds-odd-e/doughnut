@@ -3,7 +3,7 @@ id: SEED-007
 status: dormant
 planted: 2026-08-21
 planted_during: focus-note retrieval exploration for OKF / LLM Wiki
-updated: 2026-10-12
+updated: 2026-10-14
 trigger_when: improving question-context quality under the learning and retrieval epic, or when QG quality plateaus
 scope: medium
 ---
@@ -41,7 +41,7 @@ S = 30–60 minutes, M = 1–2 hours, L = 2–4 hours, including delivery.
 {"schemaVersion":1,"refinement":"not-refined","approach":"unselected"}
 ```
 
-- **For / why:** A learner gets an answerable question about the focus note
+- **Goal:** A learner gets an answerable question about the focus note
   whose distractors and qualifications use the relevant surrounding knowledge.
 - **Scope:** Choose a small set of real weak or ambiguous questions. Establish
   the current result and whether each miss concerns candidate selection,
@@ -67,6 +67,109 @@ S = 30–60 minutes, M = 1–2 hours, L = 2–4 hours, including delivery.
 - **Safe stopping point:** A measured improvement can stand alone in question
   generation. If no candidate helps, preserve the baseline and evidence for
   an owner decision rather than shipping unmeasured complexity.
+
+#### Refinement draft — 2026-10-14
+
+The owner requested retaining and landing this unfinished draft, with the
+needed evaluation inputs to follow later. Refinement remains incomplete and
+the approach unselected; no slice plan, experiment, or implementation is
+authorized by this draft.
+
+**Observed basis.** Read the following code at
+`039066b2b051cc9b4ca0bedc94572e6788bc33e4`; no application, model-quality
+comparison, or timing measurement was run:
+
+- `FocusContextRelatedNoteMaterializer.materialize` prefix-truncates related
+  note content to 200 approximate tokens. A qualification beyond that prefix
+  cannot reach generation through that excerpt.
+- `FocusContextRetrievalService.retrieve` uses graph relationships and sampled
+  folder peers without an intended-task input. Focus content is capped at
+  1,500 approximate tokens within a combined content budget of 2,000.
+- `QuestionGenerationRequestBuilder` subtracts author-instruction and
+  property-focus tokens from that content budget. These are approximate
+  content limits, not a cap on the complete request or monetary cost. Its
+  request assembly is shared by generation, batch generation, and evaluation.
+- `McqController.export` exposes the generation request for an authorized
+  note. `AiToolFactory` already requires focus-note grounding and standalone
+  questions; the learner cannot see the supplied context.
+- `ContestableQuestion.vue` already offers contest feedback and replacement
+  after an accepted contest. The proposed improvement uses this existing
+  learner interaction; no additional interaction has been selected.
+
+These observations establish a plausible excerpt-selection gap, not that it
+causes the owner's weak questions or that a different excerpt improves them.
+
+**Alternatives and recommendation (proposed).** Diagnose the selected real
+cases first; compare the cheapest change that addresses the observed miss.
+
+| Candidate | Learner effect | System consequence and limit |
+| --- | --- | --- |
+| Existing context with adjusted generation instructions | Could improve question wording using evidence already supplied | Smallest change; cannot recover an omitted passage |
+| Select relevant source passages from candidate notes | Could avoid ambiguous distractors without another learner step | Could fit the existing budget; a selected passage can omit essential context |
+| Rank candidate notes for the question task | Could bring a missing useful note into context | Changes candidate selection; does not by itself repair prefix truncation |
+| Summarize context or generate per linked concept | Could incorporate more surrounding knowledge | Adds model work, cost, and latency; can shift the target away from the focus note |
+
+The provisional first candidate is source-passage selection when the useful
+note is already selected but its useful distinction is omitted. This borrows
+an editor's evidence brief: the focus note supplies the claim being tested,
+related notes supply quoted qualifications, and a short brief selects evidence
+for the question writer. The analogy breaks when the qualification depends
+on broader context; selecting a short quotation can itself mislead. The
+analogy supplies a candidate, not evidence of benefit.
+
+**Key examples to ground in real cases (illustrative, not observations).**
+
+- A focus note supports the correct answer and a selected related note has a
+  useful distinction beyond its initial excerpt → generate a question → the
+  distinction helps avoid an ambiguous distractor, while the learner can
+  answer from knowledge of the focus note.
+- The same case also has an irrelevant nearby note → generate a question →
+  the question remains about the focus note and its choices remain
+  unambiguous. The example does not require rejecting every irrelevant note
+  at retrieval time.
+- The useful distinction is already in the request → a weak question still
+  occurs → classify the miss as generation-related before choosing a
+  retrieval change. A relevant note missing from the request instead calls
+  for investigation of candidate selection.
+
+**Proposed comparison and deferred promises.** Start with the current model,
+one generation call, and the existing context budget; the owner has not yet
+selected these comparison limits. Compare baseline and candidate on the same
+real cases, with the owner judging answerability, ambiguity, and focus-note
+fidelity and reviewing measured latency and token/cost usage. Agree the
+acceptance threshold and repetitions before the comparison. Additional model
+calls, new models, embeddings, a new learner control, and general search
+improvements are not delivery commitments. These are deferred promises, not
+new product rejection rules. Existing note access rules and focus-note
+grounding remain constraints.
+
+**Architecture.** Keep the bounded shared focus-context concept from
+[ADR 0001 — Ubiquitous language](../../docs/adrs/0001-ubiquitous-language.md#focus-context),
+including the distinction between an MCQ and a recall prompt. A task-aware
+selection responsibility must account for the current shared generation and
+evaluation assembly and other context consumers; no separate context model
+has been selected. Preserve visible failure handling under
+[ADR 0006 — Failure handling](../../docs/adrs/0006-failure-handling-accepted.md),
+and use isolated disposable environments for comparisons under
+[ADR 0007 — Environments and isolation](../../docs/adrs/0007-environments-and-isolation-accepted.md).
+No conflict was found for these proposed directions. ADR 0001's index and
+in-file status both say Accepted despite its filename lacking the usual
+`-accepted` suffix; no status change is implied.
+
+**Inputs needed from the owner before completing refinement.**
+
+1. Supply 2–3 real weak or ambiguous questions with their focus and supporting
+   notes, or an accessible notebook/export location. Illustrative cases above
+   cannot substitute for this evidence. Use the supplied cases to distinguish
+   candidate-selection, excerpt-selection, and generation misses.
+2. Confirm or revise the proposed call/model/context limits, acceptable added
+   latency/cost, and human comparison acceptance criteria. The recommendation
+   is to begin within existing call and context limits, but no answer is
+   assumed from permission to land this draft.
+
+Once those inputs settle the examples and comparison, finish refinement and
+continue into slice planning. An inconclusive result remains evidence for an
+owner decision, not completion of the improvement story.
 
 ## Ordering and Open Decisions
 
