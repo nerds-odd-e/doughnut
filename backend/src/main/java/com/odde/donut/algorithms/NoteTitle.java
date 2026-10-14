@@ -5,9 +5,10 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * The whole title text is one literal cloze fragment. Recall matching additionally accepts the
- * title without its final round-parenthesized content. A {@code ~}/{@code 〜}/{@code ～} marker at
- * the actual beginning still marks a suffix fragment.
+ * A title has one list of fragments: the whole title text as one literal fragment, then, when the
+ * title ends with round-parenthesized content, the text before it if any. Recall matching accepts
+ * an answer that matches any fragment, and cloze masking hides every fragment. A {@code ~}/{@code
+ * 〜}/{@code ～} marker at the actual beginning still marks a suffix fragment.
  */
 public class NoteTitle {
 
@@ -21,19 +22,19 @@ public class NoteTitle {
   }
 
   public boolean matchesForRecall(String answer) {
-    if (titleFragment().matches(answer)) {
-      return true;
-    }
+    return getTitleFragments().stream().anyMatch(fragment -> fragment.matches(answer));
+  }
+
+  public List<TitleFragment> getTitleFragments() {
+    TitleFragment wholeTitle = TitleFragment.from(rawTitle);
     Matcher matcher = TITLE_WITH_TRAILING_PARENTHESIZED_CONTENT.matcher(rawTitle);
-    return matcher.matches() && TitleFragment.from(matcher.group(1)).matches(answer);
-  }
-
-  /** Title fragments for cloze masking. */
-  public List<TitleFragment> getClozeTitleFragments() {
-    return List.of(titleFragment());
-  }
-
-  private TitleFragment titleFragment() {
-    return TitleFragment.from(rawTitle);
+    if (!matcher.matches()) {
+      return List.of(wholeTitle);
+    }
+    TitleFragment beforeQualifier = TitleFragment.from(matcher.group(1));
+    if (beforeQualifier.stem().isEmpty()) {
+      return List.of(wholeTitle);
+    }
+    return List.of(wholeTitle, beforeQualifier);
   }
 }

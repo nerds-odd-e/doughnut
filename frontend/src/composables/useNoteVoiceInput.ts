@@ -11,39 +11,60 @@ import { createAudioRecorder } from "@/models/audio/audioRecorder"
 import { createWakeLocker } from "@/models/wakeLocker"
 
 /**
- * True while the note on the page has a recording that runs, is being
- * finished, or is kept for a retry.
+ * True while the note on the page has a recording that starts, runs, is
+ * being finished, or is kept for a retry.
  */
 export const voiceInputIsActive = ref(false)
 
 export function useNoteVoiceInput(note: Note) {
-  const phase = ref<"ready" | "recording" | "stopping" | "notConverted">(
-    "ready"
-  )
+  const phase = ref<
+    "ready" | "starting" | "recording" | "stopping" | "notConverted"
+  >("ready")
   const isRecording = computed(() => phase.value === "recording")
   const hasKeptRecording = computed(() => phase.value === "notConverted")
   const wakeLocker = createWakeLocker()
   const { showErrorToast } = useToast()
 
   const authorHasLeft = ref(false)
+  let startupCancelled = false
 
   const { processAudio, lastConversionFailed } = useNoteAudioProcessing(
     note,
     authorHasLeft
   )
 
-  const audioRecorder = createAudioRecorder(processAudio)
+  const audioRecorder = createAudioRecorder(async (chunk) => {
+    if (startupCancelled) return
+    return processAudio(chunk)
+  })
 
   const start = async () => {
+    phase.value = "starting"
+    voiceInputIsActive.value = true
     try {
       await wakeLocker.request()
+      if (startupCancelled) return
       await audioRecorder.startRecording()
+      if (startupCancelled) return
       beginOpenNoteContentDictation(note.id)
       phase.value = "recording"
-      voiceInputIsActive.value = true
     } catch {
+      if (startupCancelled) return
+      phase.value = "ready"
+      if (!authorHasLeft.value) {
+        voiceInputIsActive.value = false
+      }
       showErrorToast(MICROPHONE_UNAVAILABLE_MESSAGE)
       await wakeLocker.release()
+    } finally {
+      if (startupCancelled) {
+        try {
+          await audioRecorder.stopRecording()
+        } finally {
+          phase.value = "ready"
+          await wakeLocker.release()
+        }
+      }
     }
   }
 
@@ -70,6 +91,7 @@ export function useNoteVoiceInput(note: Note) {
   }
 
   onBeforeUnmount(async () => {
+    startupCancelled = phase.value === "starting"
     authorHasLeft.value = true
     voiceInputIsActive.value = false
     if (isRecording.value) {

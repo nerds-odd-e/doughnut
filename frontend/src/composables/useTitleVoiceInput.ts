@@ -18,6 +18,11 @@ export function useTitleVoiceInput(
   const { showErrorToast } = useToast()
   const phase = ref<"idle" | "starting" | "listening" | "converting">("idle")
   const busy = computed(() => phase.value !== "idle")
+  /** What the microphone button shows in each phase of a title recording. */
+  const buttonState = computed(() => {
+    if (phase.value === "listening") return "recording"
+    return phase.value === "idle" ? "idle" : "busy"
+  })
   let audioRecorder: AudioRecorder | undefined
 
   const startListening = async () => {
@@ -77,14 +82,12 @@ export function useTitleVoiceInput(
   onUnmounted(leave)
 
   return {
-    phase,
+    buttonState,
     busy,
     startListening,
     stopListening,
     leave,
-    onControlClick: () =>
-      phase.value === "listening" ? stopListening() : startListening(),
+    /** The live level of the recording that is listening. */
+    readLevel: () => audioRecorder!.getAudioData(),
   }
 }
-
-export type TitleVoiceInput = ReturnType<typeof useTitleVoiceInput>

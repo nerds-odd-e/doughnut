@@ -95,13 +95,16 @@ When('I contest the MCQ', () => {
 Given('OpenAI will reply below for user messages:', (data: DataTable) => {
   fetchOpenAiMockIsolationProof().then((proof) => {
     const rows = data.hashes().map((row) => {
-      if (!proof) {
+      if (!proof || row.tool) {
         return row
       }
       return {
         ...row,
         'user message': `${row['user message']} ${proof.requestMarker}`,
-        'assistant reply': JSON.stringify({ content: proof.suggestion }),
+        'assistant reply': JSON.stringify({
+          content: proof.suggestion,
+          reason: 'Completes the city description.',
+        }),
       }
     })
     mock_services.openAi().stubConversationAiReplyStream(rows)
@@ -140,20 +143,45 @@ Given(
   }
 )
 
-Then('I should see the suggested completion', () => {
-  start.assumeConversationAboutNotePage().shouldShowCompletion()
+Then("I should see this run's pending content correction", () => {
+  fetchOpenAiMockIsolationProof().then((proof) => {
+    start
+      .assumeConversationAboutNotePage()
+      .expectPendingContentCorrection(
+        proof?.suggestion ?? 'It is a vigorous city.'
+      )
+  })
 })
 
-When('I accept the suggested completion', () => {
-  start.assumeConversationAboutNotePage().acceptCompletion()
+When(
+  'I revise the pending content correction to {string}',
+  (content: string) => {
+    start
+      .assumeConversationAboutNotePage()
+      .revisePendingContentCorrection(content)
+  }
+)
+
+Then(
+  'the pending content correction should contain {string}',
+  (content: string) => {
+    start.assumeConversationAboutNotePage().expectReviewedContent(content)
+  }
+)
+
+When('I accept the reviewed content correction', () => {
+  start.assumeConversationAboutNotePage().acceptContentCorrection()
 })
 
 Then(
-  "the note content on the current page should be this run's OpenAI mock suggestion",
-  () => {
-    fetchOpenAiMockIsolationProof().then((proof) => {
-      const content = proof?.suggestion ?? 'It is a vigorous city.'
-      start.assumeNotePage().findNoteContent(content)
-    })
+  'the accepted content correction should retain {string}',
+  (content: string) => {
+    start
+      .assumeConversationAboutNotePage()
+      .expectAcceptedContentCorrection(content)
   }
 )
+
+When('I open the corrected note', () => {
+  start.assumeConversationAboutNotePage().openCorrectionNote()
+})

@@ -182,6 +182,7 @@ class NotebookGitCopyIdentityControllerTest extends NotebookGitControllerTestBas
           Conversation conversation =
               makeMe
                   .aConversation()
+                  .withNoteCorrection()
                   .forANote(reloadedOriginal)
                   .from(currentUser.getUser())
                   .please();

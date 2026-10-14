@@ -56,6 +56,7 @@ class NotebookGitDeletionPublicationRetryControllerTest extends NotebookGitContr
               .please();
           makeMe
               .aConversation()
+              .withNoteCorrection()
               .forANote(noteRepository.findById(target.getId()).orElseThrow())
               .please();
         });
