@@ -1,17 +1,21 @@
 import AiResponse from "@/components/conversations/AiResponse.vue"
-import { resetNoteStore } from "@/store/noteStore"
-import { useNoteStore } from "@/store/noteStore"
 import makeMe from "donut-test-fixtures/makeMe"
-import helper, { mockShowNote } from "@tests/helpers"
+import helper, { mockSdkService } from "@tests/helpers"
 import {
   getLastInstance,
   resetInstance,
 } from "@tests/helpers/aiReplyEventSourceTracker"
 import { flushPromises } from "@vue/test-utils"
+import { vi } from "vitest"
+import AiReplyEventSource from "@/managedApi/AiReplyEventSource"
+import {
+  ConversationMessageController,
+  RecallPromptController,
+} from "@generated/donut-backend-api/sdk.gen"
 import type {
+  AmbiguousQuestionExclusionProposal,
+  AnsweredQuestion,
   Conversation,
-  Note,
-  NoteRealm,
 } from "@generated/donut-backend-api"
 
 export const simulateAiResponse = (content = "## I'm ChatGPT") => {
@@ -97,22 +101,6 @@ export const createToolCallChunk = (functionName: string, args: object) => {
   ]
 }
 
-export type AiResponseFixture = {
-  note: Note
-  noteRealm: NoteRealm
-  conversation: Conversation
-}
-
-export const setupAiResponseFixture = (content?: string): AiResponseFixture => {
-  const noteRealm =
-    content === undefined
-      ? makeMe.aNoteRealm.please()
-      : makeMe.aNoteRealm.content(content).please()
-  const note = noteRealm.note
-  const conversation = makeMe.aConversation.forANote(note).please()
-  return { note, noteRealm, conversation }
-}
-
 export const mountAiResponse = (conversation: Conversation) =>
   helper
     .component(AiResponse)
@@ -127,69 +115,75 @@ export const submitAiReply = async (
   await flushPromises()
 }
 
-export const submitMessageAndSimulateToolCall = async (
-  wrapper: ReturnType<typeof mountAiResponse>,
-  toolCallChunks: ReturnType<typeof createToolCallChunk> | object
-) => {
-  await submitAiReply(wrapper)
+const simulateToolCall = async (chunks: object[]) => {
   const instance = getLastInstance()
   if (!instance) {
     throw new Error("No AiReplyEventSource instance available")
   }
-  const chunks = Array.isArray(toolCallChunks)
-    ? toolCallChunks
-    : [toolCallChunks]
   for (const chunk of chunks) {
     instance.onMessageCallback("chat.completion.chunk", JSON.stringify(chunk))
     await flushPromises()
   }
 }
 
+export const submitMessageAndSimulateToolCall = async (
+  wrapper: ReturnType<typeof mountAiResponse>,
+  toolCallChunks: ReturnType<typeof createToolCallChunk> | object
+) => {
+  await submitAiReply(wrapper)
+  await simulateToolCall(
+    Array.isArray(toolCallChunks) ? toolCallChunks : [toolCallChunks]
+  )
+}
+
+/**
+ * In the open recall help conversation attached to the document: the learner
+ * asks, the tutor proposes the exclusion, and the learner confirms it. The
+ * confirmation answers with `excludedAttempt`.
+ */
+export const confirmTutorExclusionProposal = async (
+  excludedAttempt: AnsweredQuestion
+) => {
+  const clickButton = async (label: string) => {
+    ;[...document.querySelectorAll("button")]
+      .find((button) => button.textContent?.trim() === label)!
+      .click()
+    await flushPromises()
+  }
+  mockSdkService(
+    ConversationMessageController,
+    "replyToConversation",
+    undefined
+  )
+  mockSdkService(RecallPromptController, "excludeAsAmbiguous", excludedAttempt)
+  vi.spyOn(AiReplyEventSource.prototype, "start").mockImplementation(vi.fn())
+
+  await clickButton("Why is my answer wrong?")
+  await simulateToolCall(
+    createToolCallChunk("AmbiguousQuestionExclusionProposal", <
+      AmbiguousQuestionExclusionProposal
+    >{ reason: excludedAttempt.answer!.exclusionReason })
+  )
+  await clickButton("Confirm")
+}
+
 export function useAiResponseMount() {
-  const noteStore = useNoteStore()
-  let note: Note
-  let noteRealm: NoteRealm
-  let conversation: Conversation
   let wrapper: ReturnType<typeof mountAiResponse>
 
-  const beforeEachMount = (content?: string) => {
-    resetNoteStore()
+  const beforeEachMount = () => {
     resetInstance()
-    mockShowNote()
-
-    const fixture = setupAiResponseFixture(content)
-    note = fixture.note
-    noteRealm = fixture.noteRealm
-    conversation = fixture.conversation
-    wrapper = mountAiResponse(conversation)
+    wrapper = mountAiResponse(makeMe.aConversation.please())
   }
 
   const afterEachReset = () => {
     resetInstance()
   }
 
-  const refreshNoteContent = (content: string) => {
-    noteRealm = makeMe.aNoteRealm.id(note.id).content(content).please()
-    note = noteRealm.note
-    noteStore.refreshNoteRealm(noteRealm)
-  }
-
   return {
     get wrapper() {
       return wrapper
     },
-    get note() {
-      return note
-    },
-    get noteRealm() {
-      return noteRealm
-    },
-    get conversation() {
-      return conversation
-    },
-    noteStore,
     beforeEachMount,
     afterEachReset,
-    refreshNoteContent,
   }
 }

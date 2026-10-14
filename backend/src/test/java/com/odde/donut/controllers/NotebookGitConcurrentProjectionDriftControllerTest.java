@@ -75,7 +75,7 @@ class NotebookGitConcurrentProjectionDriftControllerTest extends NotebookGitCont
     try {
       Future<?> writer =
           executor.submit(
-              NotebookGitConcurrentWriterTestSupport.inIsolatedRequest(
+              ConcurrentControllerTestSupport.inIsolatedRequest(
                   currentUser,
                   owner,
                   () -> {
@@ -87,22 +87,22 @@ class NotebookGitConcurrentProjectionDriftControllerTest extends NotebookGitCont
                           applyWebChange(webChange, notebook.getId(), note.getId());
                           entityManager.flush();
                           writeFlushed.countDown();
-                          NotebookGitConcurrentWriterTestSupport.await(releaseWriter);
+                          ConcurrentControllerTestSupport.await(releaseWriter);
                         });
                     return null;
                   }));
 
-      NotebookGitConcurrentWriterTestSupport.await(writeFlushed);
+      ConcurrentControllerTestSupport.await(writeFlushed);
       Future<String> publishing =
           executor.submit(
-              NotebookGitConcurrentWriterTestSupport.inIsolatedRequest(
+              ConcurrentControllerTestSupport.inIsolatedRequest(
                   currentUser,
                   owner,
                   () ->
                       controller.publishNotebookGitProposal(
                           notebook.getId(), binding.getAcceptedGitObjectId(), proposal)));
 
-      NotebookGitConcurrentWriterTestSupport.assertQueued(publishing);
+      ConcurrentControllerTestSupport.assertQueued(publishing);
       releaseWriter.countDown();
       writer.get(10, TimeUnit.SECONDS);
 

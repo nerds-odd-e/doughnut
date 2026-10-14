@@ -20,6 +20,7 @@ public final class ResponseStreamToLegacyChatChunkMapper {
   private String activeToolName;
   private String activeToolCallId;
   private boolean toolCallOpened;
+  private long activeToolIndex;
 
   public ResponseStreamToLegacyChatChunkMapper(ObjectMapper objectMapper) {
     this.objectMapper = objectMapper;
@@ -48,7 +49,8 @@ public final class ResponseStreamToLegacyChatChunkMapper {
       if (item.isFunctionCall()) {
         ResponseFunctionToolCall fc = item.asFunctionCall();
         activeToolName = fc.name();
-        activeToolCallId = fc.id().orElse(fc.callId());
+        activeToolCallId = fc.callId();
+        activeToolIndex = event.asOutputItemAdded().outputIndex();
         toolCallOpened = false;
       }
     } else if (event.isFunctionCallArgumentsDelta()) {
@@ -96,7 +98,7 @@ public final class ResponseStreamToLegacyChatChunkMapper {
     function.put("arguments", argumentsFragment);
 
     ObjectNode toolCall = objectMapper.createObjectNode();
-    toolCall.put("index", 0);
+    toolCall.put("index", activeToolIndex);
     toolCall.put("type", "function");
     toolCall.set("function", function);
     if (includeMeta && activeToolCallId != null) {

@@ -86,6 +86,7 @@ class NotebookGitComposedRangePublicationAtomicControllerTest
               .please();
           makeMe
               .aConversation()
+              .withNoteCorrection()
               .forANote(noteRepository.findById(deleted.getId()).orElseThrow())
               .please();
         });

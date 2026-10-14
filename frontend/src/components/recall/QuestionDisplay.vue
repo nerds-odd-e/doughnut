@@ -2,11 +2,26 @@
   <div class="quiz-instruction relative max-w-6xl mx-auto" data-test="question-section">
     <InactiveRecallMask :show="isActiveQuestion && isPaused" />
     <QuestionStem :stem="questionStem" />
+    <div
+      v-if="answer?.excludedAt"
+      class="mt-4 border border-base-300 rounded-lg p-4 bg-base-200/40 text-sm space-y-1"
+      data-test="excluded-attempt"
+    >
+      <p class="font-semibold">Excluded — ambiguous question</p>
+      <p class="whitespace-pre-wrap">{{ answer.exclusionReason }}</p>
+      <p>
+        You confirmed this on
+        {{ new Date(answer.excludedAt).toLocaleString() }}; originally marked
+        {{ answer.correct ? "correct" : "incorrect" }}. This attempt is not
+        counted as failed or successful recall.
+      </p>
+    </div>
     <QuestionChoices
       v-if="responseChoices"
       :choices="responseChoices"
       :correct-choice-index="correctChoiceIndex"
       :answer-choice-index="answer?.choiceIndex"
+      :excluded="!!answer?.excludedAt"
       :disabled="disabled"
       @answer="submitAnswer($event)"
     />

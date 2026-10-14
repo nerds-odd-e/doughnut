@@ -14,7 +14,9 @@ import com.odde.donut.controllers.dto.RecallStatsDTO;
 import com.odde.donut.controllers.dto.RecallStatsDTO.DailyProbeDay;
 import com.odde.donut.entities.MemoryTracker;
 import com.odde.donut.entities.Note;
+import com.odde.donut.entities.RecallPrompt;
 import com.odde.donut.entities.User;
+import com.odde.donut.exceptions.UnexpectedNoAccessRightException;
 import java.sql.Timestamp;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -25,6 +27,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 class UserRecallStatsControllerTest extends ControllerTestBase {
   @Autowired UserController controller;
+  @Autowired RecallPromptController recallPromptController;
 
   @BeforeEach
   void setup() {
@@ -139,6 +142,25 @@ class UserRecallStatsControllerTest extends ControllerTestBase {
 
     assertThat(
         controller.getRecallStats("Asia/Shanghai").getTotals().getReviewsToday(), equalTo(1));
+  }
+
+  @Test
+  void anAttemptExcludedAsAmbiguousIsNotAReview() throws UnexpectedNoAccessRightException {
+    testabilitySettings.timeTravelTo(makeMe.aTimestamp().of(9, 10).please());
+    Note note = makeMe.aNote().notebookOwnedBy(currentUser.getUser()).please();
+    RecallPrompt prompt =
+        makeMe
+            .aRecallPrompt()
+            .withMcqForNote(note)
+            .forMemoryTracker(makeMe.aMemoryTrackerFor(note).please())
+            .please();
+    recallPromptController.answer(prompt, choiceAnswer(1));
+    testabilitySettings.timeTravelTo(makeMe.aTimestamp().of(10, 12).please());
+    assertThat(controller.getRecallStats("UTC").getTotals().getTotalReviews365(), equalTo(1));
+
+    recallPromptController.excludeAsAmbiguous(prompt, ambiguousExclusion("both tenses fit"));
+
+    assertThat(controller.getRecallStats("UTC").getTotals().getTotalReviews365(), equalTo(0));
   }
 
   @Test

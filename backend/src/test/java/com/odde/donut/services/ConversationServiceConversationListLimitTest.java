@@ -6,7 +6,9 @@ import static org.mockito.Mockito.when;
 
 import com.odde.donut.entities.User;
 import com.odde.donut.entities.repositories.ConversationMessageRepository;
+import com.odde.donut.entities.repositories.ConversationNoteCorrectionRepository;
 import com.odde.donut.entities.repositories.ConversationRepository;
+import com.odde.donut.entities.repositories.RecallPromptRepository;
 import com.odde.donut.testability.TestabilitySettings;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -25,20 +27,21 @@ class ConversationServiceConversationListLimitTest {
         new ConversationService(
             mock(TestabilitySettings.class),
             conversationRepository,
-            mock(ConversationMessageRepository.class));
+            mock(ConversationMessageRepository.class),
+            mock(RecallPromptRepository.class),
+            mock(ConversationNoteCorrectionRepository.class));
   }
 
   @Test
   void shouldRequestAtMostFiftyConversations() {
     User user = new User();
     PageRequest firstPage = PageRequest.of(0, 50);
-    when(conversationRepository.findByUserInSubjectOwnershipOrConversationInitiator(
-            user, firstPage))
+    when(conversationRepository.findByUserInAccessOwnershipOrConversationInitiator(user, firstPage))
         .thenReturn(List.of());
 
     conversationService.conversationListForUser(user);
 
     verify(conversationRepository)
-        .findByUserInSubjectOwnershipOrConversationInitiator(user, firstPage);
+        .findByUserInAccessOwnershipOrConversationInitiator(user, firstPage);
   }
 }

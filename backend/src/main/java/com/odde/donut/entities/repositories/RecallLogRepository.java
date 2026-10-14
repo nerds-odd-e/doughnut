@@ -10,6 +10,8 @@ import org.springframework.data.repository.query.Param;
 public interface RecallLogRepository extends CrudRepository<RecallLog, Integer> {
   List<RecallLog> findAllByMemoryTracker_IdOrderByRecordedAtDescIdDesc(Integer memoryTrackerId);
 
+  List<RecallLog> findAllByMemoryTracker_IdOrderByRecordedAtAscIdAsc(Integer memoryTrackerId);
+
   @Query(
       """
       SELECT rl
@@ -24,9 +26,10 @@ public interface RecallLogRepository extends CrudRepository<RecallLog, Integer> 
   @Query(
       """
       SELECT COUNT(rl)
-      FROM RecallLog rl
+      FROM RecallLog rl LEFT JOIN rl.answer a
       WHERE rl.memoryTracker.id = :memoryTrackerId
         AND rl.grade = com.odde.donut.entities.Grade.AGAIN
+        AND a.excludedAt IS NULL
         AND rl.recordedAt >= :since
       """)
   int countAgainOutcomesSinceForMemoryTracker(

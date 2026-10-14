@@ -1,6 +1,14 @@
 import { waitUntilAppIsNotBusy } from '../pageBase'
 import { expectAccidentalMatchRevealForNotes } from './answeredQuestionAccidentalMatch'
 import { assumeMemoryTrackerPage } from './memoryTrackerPage'
+import {
+  EXCLUDED_ATTEMPT_NOTICE,
+  expectExcludedAsAmbiguous,
+} from './excludedAttemptNotice'
+import {
+  openPrivateRecallHelp,
+  outsidePrivateRecallHelp,
+} from './privateRecallHelp'
 
 const assumeAnsweredQuestionPage = () => {
   cy.get('body').should('be.visible')
@@ -23,6 +31,17 @@ const assumeAnsweredQuestionPage = () => {
       })
       cy.get('.is-correct').should('exist')
       return self
+    },
+    expectAttemptExcludedAsAmbiguous(reason: string) {
+      expectExcludedAsAmbiguous(
+        outsidePrivateRecallHelp(EXCLUDED_ATTEMPT_NOTICE),
+        reason,
+        'answered question'
+      )
+      return self
+    },
+    getPrivateHelp() {
+      return openPrivateRecallHelp()
     },
     expectSpellingAnswerToBeIncorrect(answer: string) {
       cy.findByText(`Your answer \`${answer}\` is incorrect.`).should('exist')

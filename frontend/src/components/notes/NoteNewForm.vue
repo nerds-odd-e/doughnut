@@ -30,7 +30,13 @@
               @update:model-value="onTitleChange"
             >
               <template #append>
-                <SpeakTitleControl :voice-input="titleVoiceInput" />
+                <VoiceInputButton
+                  :class="speakTitleButtonClass(speakTitleState)"
+                  :state="speakTitleState"
+                  :read-level="titleVoiceInput.readLevel"
+                  :names="speakTitleNames"
+                  @click="onSpeakTitleClick"
+                />
                 <WikidataSearchByLabel
                   :search-key="newTitle"
                   v-model="wikidataIdSelection"
@@ -72,15 +78,17 @@ import SearchResults from "../search/SearchResults.vue"
 import FolderSelector from "./FolderSelector.vue"
 import NoteCreationParentRelationship from "./NoteCreationParentRelationship.vue"
 import PathNameEditor from "./core/PathNameEditor.vue"
-import SpeakTitleControl from "./SpeakTitleControl.vue"
 import WikidataSearchByLabel from "./WikidataSearchByLabel.vue"
 import { useRouter } from "vue-router"
 import { useNoteStore } from "@/store/noteStore"
 import usePopups from "@/components/commons/Popups/usePopups"
+import VoiceInputButton from "@/components/commons/VoiceInputButton.vue"
 import { useTitleDictation } from "@/composables/useTitleDictation"
 import { contentForNewNote, createNoteFromForm } from "./noteNewFormSubmit"
 import {
   initialNewNoteTitle,
+  speakTitleButtonClass,
+  speakTitleNames,
   wholeTitleIsDictationTarget,
 } from "./noteNewFormTitle"
 import { applyWikidataEntryToNewNoteForm } from "./noteNewFormWikidata"
@@ -160,6 +168,11 @@ const { busy: titleSpeechBusy, voiceInput: titleVoiceInput } =
       wholeTitleIsDictationTarget(hasTitleBeenEdited.value, newTitle.value)
     )
   )
+const speakTitleState = titleVoiceInput.buttonState
+const onSpeakTitleClick = () =>
+  speakTitleState.value === "recording"
+    ? titleVoiceInput.stopListening()
+    : titleVoiceInput.startListening()
 const effectiveSearchKey = computed(() =>
   hasTitleBeenEdited.value ? newTitle.value : ""
 )

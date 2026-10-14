@@ -1,69 +1,65 @@
 <template>
   <button
-    class="conversation-button"
-    title="Start a conversation about this question"
+    ref="helpButton"
+    type="button"
+    class="daisy-btn daisy-btn-outline daisy-btn-primary my-4"
     @click="startConversation"
   >
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      stroke-width="2"
-      stroke-linecap="round"
-      stroke-linejoin="round"
-    >
-      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
-    </svg>
+    <MessageCircle class="w-5 h-5" />
+    Get private help
   </button>
+  <Modal v-if="conversation && user" scroll-body @close_request="closeHelp">
+    <template #header><h2>Private recall help</h2></template>
+    <template #body>
+      <ConversationComponent
+        :conversation="conversation"
+        :user="user"
+        @close-dialog="closeHelp"
+        @attempt-excluded="$emit('attempt-excluded', $event)"
+      />
+    </template>
+  </Modal>
 </template>
 
 <script setup lang="ts">
-import { useRouter } from "vue-router"
+import { inject, nextTick, ref, type Ref } from "vue"
+import { MessageCircle } from "@lucide/vue"
+import type {
+  AnsweredQuestion,
+  Conversation,
+  User,
+} from "@generated/donut-backend-api"
 import { ConversationMessageController } from "@generated/donut-backend-api/sdk.gen"
+import Modal from "@/components/commons/Modal.vue"
+import ConversationComponent from "@/components/conversations/ConversationComponent.vue"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 
 const props = defineProps<{
   recallPromptId: number
 }>()
 
-const router = useRouter()
+defineEmits<{
+  (e: "attempt-excluded", answeredQuestion: AnsweredQuestion): void
+}>()
+
+const user = inject<Ref<User | undefined>>("currentUser")
+const conversation = ref<Conversation>()
+const helpButton = ref<HTMLButtonElement>()
 
 const startConversation = async () => {
-  const { data: conversation, error } = await apiCallWithLoading(() =>
+  const { data, error } = await apiCallWithLoading(() =>
     ConversationMessageController.startConversationAboutRecallPrompt({
       path: { recallPrompt: props.recallPromptId },
     })
   )
   if (!error) {
-    await router.push({
-      name: "messageCenter",
-      params: { conversationId: conversation!.id },
-    })
+    conversation.value = data
   }
 }
+
+const closeHelp = async () => {
+  conversation.value = undefined
+  await nextTick()
+  helpButton.value?.focus()
+}
 </script>
-
-<style lang="sass" scoped>
-.conversation-button
-  position: fixed
-  bottom: 20px
-  right: 20px
-  width: 48px
-  height: 48px
-  border-radius: 50%
-  background-color: #4CAF50
-  color: white
-  border: none
-  cursor: pointer
-  display: flex
-  align-items: center
-  justify-content: center
-  box-shadow: 0 2px 5px rgba(0,0,0,0.2)
-  transition: background-color 0.3s
-
-  &:hover
-    background-color: #45a049
-</style>
