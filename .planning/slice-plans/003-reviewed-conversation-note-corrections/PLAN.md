@@ -284,9 +284,24 @@ cases, retaining the capture/generation/frontend proof unchanged. Coordinator
 selective formatting passed. Browser review and decisions retain their later
 slice ownership below.
 
+Accepted capture revision: `bcbc4c55b8924a0ef0310e1dea30535b6afb6ced`
+on the same execution branch, suffix base `4347f39efdfd932c7bf5ffec578809bbc5c5dee4`;
+CI observation reused.
+
+CI observation: capture revision run `38495944351`, attempt 1, job
+`115631600434` failed `record_live_audio_with_real_open_ai_service.feature`:
+expected English `Please be quiet.`, observed retained note text
+`Let's start请保持安静。`. Diagnostic and bounded log inspection establish a
+real assertion failure in the unchanged audio transcription path
+(`AiAudioController` → `OtherAiServices` → `OpenAiApiHandler.getTranscription`).
+The claim-to-capture diff leaves those owners, fixture and feature unchanged;
+conversation Responses mapping is a separate API path. This is an unowned
+audio-test defect, not an infrastructure excuse or a passed CI result. No
+repair or rerun was initiated; independent story implementation continues.
+
 ### 3. Review and reopen a pending correction in the conversation
 Type: Behavior
-Status: planned
+Status: done
 Proof: Mounted conversation receives stored body/title proposals, renders subject,
 reason and exchange, edits the value, closes and reopens to the stored pending
 proposal. Cover Messages and recall consumers through the conversation suite.
@@ -296,6 +311,40 @@ current/proposed values and explicit pending state. Reuse existing author/read-o
 information. Until slices 6/7, the new review does not expose body/title acceptance; ordinary
 note editing remains usable. This visible pending review is useful before a
 publication decision. Estimate: 5–8 minutes.
+
+Execution evidence (2026-10-14): stored reviews render beside their source
+assistant message with note, reason, current and editable proposed body/title,
+and pending state. `NoteRealm.notebookRealm.readonly` governs editing. Inspected
+`ConversationInner.corrections.spec.ts` mounted direct/MCQ close/remount, title in
+Messages, readonly rendering, and stream-completion/follow-up observations.
+Stable proposal keys preserve unsent input while the view stays open; remount
+restores stored proposal text. Full `CURSOR_DEV=true nix develop -c pnpm frontend:test`
+passed (350 files, 2,190 tests); both frontend typechecks passed. Explicit empty
+correction-read fixtures repaired the affected existing conversation consumers.
+Independent refactor simplified exclusion/unknown handlers, removed orphan CSS,
+and corrected form field IDs; its focused three-file conversation command passed
+16 tests, with both typechecks. Unchanged full-suite proof covers other consumers.
+The whole-product sweep found the existing Cypress completion consumer; returned
+it to implementation before acceptance. Its current scenario now proves pending
+review → edit → close → original authored content → reopened stored proposal.
+`CURSOR_DEV=true nix develop -c pnpm cy:run --spec e2e_test/features/ai_generated_content/note_content_completion.feature,e2e_test/features/messages/conversation_about_a_note.feature`
+passed: two specs, three scenarios, origin `http://127.0.0.1:63203`, isolated
+`doughnut_e2e_wt_a98a02cb445540b68fd7742fd49b8403`, runner-owned mocked OpenAI.
+Unavailable-AI and ordinary stream/follow-up/export also passed. A fresh final
+refactor found no further edits; accepted proof remained unchanged.
+Declaration generation initially used `env VITEST=1` to defer checker formatting;
+after coordinator selective formatting, ordinary
+`CURSOR_DEV=true nix develop -c pnpm -C frontend exec vite build --emptyOutDir`
+passed including its checker, closing that limitation.
+
+Removal reading at acceptance: searched product sources, tests, fixtures, CLI,
+MCP, E2E, docs and guidance for retired `formatCompletionSuggestion`,
+`Suggested completion:`, `Suggested title:`, `completion-text`, `title-suggestion`,
+`refreshNoteContent`, `AiResponseFixture`, `setupAiResponseFixture`,
+`shouldShowCompletion`, `acceptCompletion` and their obsolete step phrases.
+No product matches remain. Dated planning baseline provenance stays intact.
+Replacement mounted/Cypress review and retained exclusion/unknown/standalone
+completion proof establish the surviving behavior; the sweep is a reading.
 
 ### 4. Retain an explicit decline
 Type: Behavior
@@ -386,12 +435,22 @@ Disposition: proved by slice 2: ConversationAiReplyControllerTest.retainsFragmen
 ### G2. Conversation presentation
 Reported: slice 2 — "Durable browser review belongs to slice 3"
 Story clause: "Show an editable correction within the conversation, with the subject note, reason, and originating exchange."
-Disposition: receiving slice 3
+Disposition: proved by slice 3: ConversationInner.corrections.spec.ts mounted proposal review, title Messages and reopened direct/MCQ views
 
 ### G3. Confirmed decision controls
 Reported: slice 2 — "no browser review, decision, or acceptance UI was wired here."
 Story clause: "The author explicitly accepts or declines it; discussion and proposal generation alone do not change the note."
 Disposition: interim until slices 3, 4, 6, 7
+
+### G4. Existing Cypress conversation consumer
+Reported: slice 3 — "The Cypress completion consumer still reads the retired conversation UI."
+Story clause: "Show an editable correction within the conversation, with the subject note, reason, and originating exchange."
+Disposition: proved by slice 3: note_content_completion.feature pending review/edit/close/reopen and conversation_about_a_note.feature, 3 scenarios passed
+
+### G5. Existing generated-content acceptance journey
+Reported: slice 3 — "The final accepted correction journey remains an explicit interim obligation for slice 6"
+Story clause: "The author explicitly accepts or declines it; discussion and proposal generation alone do not change the note."
+Disposition: receiving slice 6
 
 ## Verification and delivery
 

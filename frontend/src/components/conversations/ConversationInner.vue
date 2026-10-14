@@ -26,7 +26,9 @@
       <div
         v-for="conversationMessage in currentConversationMessages"
         :key="conversationMessage.id"
-        class="flex mb-3"
+        class="mb-3"
+      >
+      <div class="flex"
         :class="{ 'justify-end': isCurrentUser(conversationMessage.sender?.id || 0) }"
       >
         <div
@@ -59,6 +61,13 @@
           />
         </div>
       </div>
+      <ConversationNoteCorrectionReview
+        v-for="correction in corrections.filter((item) => item.sourceMessageId === conversationMessage.id)"
+        :key="correction.id"
+        :correction="correction"
+        :user="user"
+      />
+      </div>
 
       <AiResponse
         :conversation="conversation"
@@ -83,9 +92,11 @@ import type {
   User,
   ConversationMessage,
   Conversation,
+  ConversationNoteCorrection,
 } from "@generated/donut-backend-api"
 import { Bot, User as UserIcon } from "@lucide/vue"
 import ScrollTo from "@/components/commons/ScrollTo.vue"
+import ConversationNoteCorrectionReview from "./ConversationNoteCorrectionReview.vue"
 import ConversationTemplate from "./ConversationTemplate.vue"
 import markdownizer from "../form/markdownizer"
 import { RICH_CONTENT_PROSE } from "@/constants/richContentProse"
@@ -111,6 +122,8 @@ const currentConversationMessages = ref<ConversationMessage[] | undefined>(
   undefined
 )
 
+const corrections = ref<ConversationNoteCorrection[]>([])
+
 const aiReplyTrigger = ref(0)
 
 const scrollIndex = ref(0)
@@ -130,10 +143,18 @@ const fetchConversationMessages = async () => {
   const conversationId = conversation.id
   if (!conversationId) return
 
-  const { data: messages, error } =
-    await ConversationMessageController.getConversationMessages({
+  const [messageResult, correctionResult] = await Promise.all([
+    ConversationMessageController.getConversationMessages({
       path: { conversationId },
-    })
+    }),
+    ConversationMessageController.getConversationCorrections({
+      path: { conversationId },
+    }),
+  ])
+  if (!correctionResult.error) {
+    corrections.value = correctionResult.data!
+  }
+  const { data: messages, error } = messageResult
   if (!error) {
     currentConversationMessages.value = messages
     const { data: unreadMessages, error: readError } =
@@ -219,18 +240,4 @@ const showDefaultMessages = computed(
   font-family: inherit;
 }
 
-.unknown-request {
-  font-family: monospace;
-  @apply bg-base-200;
-  padding: 0.5rem;
-  border-radius: 0.25rem;
-  white-space: pre-wrap;
-  word-wrap: break-word;
-}
-
-.unknown-request pre {
-  white-space: pre-wrap;
-  word-wrap: break-word;
-  margin: 0;
-}
 </style>

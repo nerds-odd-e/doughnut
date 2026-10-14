@@ -80,25 +80,28 @@ export class ConversationAboutNotePage {
     return this
   }
 
-  shouldShowCompletion() {
-    cy.findByRole('dialog')
-      .should('be.visible')
+  expectPendingContentCorrection(content: string) {
+    cy.get('[data-testid="conversation-note-correction"]')
+      .should('have.length', 1)
       .within(() => {
-        cy.get('.completion-text').should(($el) => {
-          expect(
-            $el.is(':visible'),
-            'Expected suggested note content completion to be visible'
-          ).to.be.true
-        })
+        cy.findByText('Pending review').should('be.visible')
+        cy.findByText('Completes the city description.').should('be.visible')
+        cy.findByLabelText('Proposed Content').should('have.value', content)
       })
     return this
   }
 
-  acceptCompletion() {
-    cy.findByRole('dialog').within(() => {
-      cy.findByRole('button', { name: 'Accept' }).click()
+  revisePendingContentCorrection(content: string) {
+    cy.get('[data-testid="conversation-note-correction"]').within(() => {
+      cy.findByLabelText('Proposed Content').clear().type(content, { delay: 0 })
     })
-    waitUntilAppIsNotBusy()
+    return this
+  }
+
+  expectReviewedContent(content: string) {
+    cy.get('[data-testid="conversation-note-correction"]').within(() => {
+      cy.findByLabelText('Proposed Content').should('have.value', content)
+    })
     return this
   }
 

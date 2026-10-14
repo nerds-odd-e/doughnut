@@ -183,3 +183,11 @@ describe("NoteConversation", () => {
     expect(mockStart).toHaveBeenCalled()
   })
 })
+
+beforeEach(() => {
+  mockSdkService(
+    ConversationMessageController,
+    "getConversationCorrections",
+    []
+  )
+})

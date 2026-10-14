@@ -187,3 +187,11 @@ describe("MessageCenterPage reading the selected conversation's subject", () => 
     wrapper.unmount()
   })
 })
+
+beforeEach(() => {
+  mockSdkService(
+    ConversationMessageController,
+    "getConversationCorrections",
+    []
+  )
+})

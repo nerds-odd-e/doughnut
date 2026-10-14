@@ -84,3 +84,11 @@ it("opens each history attempt in its own contextual private help and restores i
     expect(cards[index]!.text()).toContain(attempt.mcq!.questionStem)
   }
 })
+
+beforeEach(() => {
+  mockSdkService(
+    ConversationMessageController,
+    "getConversationCorrections",
+    []
+  )
+})
