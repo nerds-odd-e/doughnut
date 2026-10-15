@@ -17,7 +17,7 @@ plugins {
   id 'org.springframework.boot' version '4.1.1'
   // Spotless for the code style
   id "com.diffplug.spotless" version "8.10.4"
-  id "io.github.ben-manes.versions" version "0.65.0"
+  id "io.github.ben-manes.versions" version "0.66.0"
 }
 
 apply plugin: 'io.spring.dependency-management'
@@ -79,14 +79,14 @@ dependencies {
   implementation 'org.springframework.boot:spring-boot-starter-websocket'
   implementation 'org.springframework.boot:spring-boot-starter-data-redis'
   implementation 'org.springframework.boot:spring-boot-starter-flyway'
-  implementation 'org.flywaydb:flyway-mysql'
+  implementation 'org.flywaydb:flyway-mysql:12.11.0'
   implementation 'org.springframework.boot:spring-boot-starter-session-jdbc'
   implementation 'io.micrometer:micrometer-core'
   implementation 'org.springframework.boot:spring-boot-starter-validation'
   implementation 'org.springframework.boot:spring-boot-starter-security'
   implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
   implementation 'org.springdoc:springdoc-openapi-starter-webmvc-api:3.1.1'
-  implementation 'com.openai:openai-java:4.80.0'
+  implementation 'com.openai:openai-java:4.81.0'
   implementation 'org.yaml:snakeyaml:2.7'
   // RxJava2 for Flowable streaming support
   implementation 'io.reactivex.rxjava2:rxjava:2.2.21'
