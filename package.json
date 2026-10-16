@@ -106,7 +106,7 @@
     "@types/cypress-cucumber-preprocessor": "^4.0.5",
     "@types/jquery": "^3.5",
     "@types/node": "26.6.5",
-    "cypress": "16.1.1",
+    "cypress": "16.2.0",
     "cypress-file-upload": "^5.0.8",
     "github_action_sound": "^1.1.0",
     "got": "16.1.0",
