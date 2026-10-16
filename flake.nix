@@ -46,7 +46,7 @@
 
         # Node 26 removed bundled corepack, and nixpkgs has no corepack_26.
         # Provide pnpm directly instead: pin the exact version from package.json's
-        # `packageManager`/`engines` (12.13.0) and run it under nodejs-slim_26 so the
+        # `packageManager`/`engines` (12.14.0) and run it under nodejs-slim_26 so the
         # engine check passes. See scripts/dev_setup.sh (no longer calls corepack).
         #
         # To bump the version: follow .agents/skills/pnpm-12-upgrade/SKILL.md.
@@ -59,16 +59,16 @@
           aarch64-linux = "linux-arm64";
         }.${system};
         pnpmExeHashes = {
-          darwin-arm64 = "sha256-XqRq2vmtQo64S2fWwfWpEj7293AAzwrTEKla3U/OUUk=";
-          darwin-x64 = "sha256-aADQHHI32ECK32zR6o2s5g9sWIhjAGryMVssmK+bUEE=";
-          linux-x64 = "sha256-kufx2Au37L4sivFid9LRoVYqfSYhGZ4456D2l7eVQXU=";
-          linux-arm64 = "sha256-NRoizIiC0WdUj/jdU2CwVhx5EZdIXN41Rii7aW9Ni7A=";
+          darwin-arm64 = "sha256-BhNpIMnMytT2FbsIDgVNmsCG/t/DJJe9h6iSt6RYb28=";
+          darwin-x64 = "sha256-T+WqbAujAT+K77HMI908VPcnKBS+SwJ1601qmNd2niY=";
+          linux-x64 = "sha256-HemO0uliEROwiHsGMitGHvud9z2RP8HRUQObELcRekE=";
+          linux-arm64 = "sha256-58okIk62JqAygo7FhMZ5A60vOJkRuEnQCe1woZ9w2NM=";
         };
         pnpmPkg = (pkgs.pnpm.override { nodejs-slim = pkgs.nodejs-slim_26; }).overrideAttrs (old: rec {
-          version = "12.13.0";
+          version = "12.14.0";
           src = pkgs.fetchurl {
             url = "https://registry.npmjs.org/pnpm/-/pnpm-${version}.tgz";
-            hash = "sha256-Sq7jkUAtL8byrrMOqbXgCA5SkQIXNKfGvrBIaizC2nw=";
+            hash = "sha256-6iBuNUdL+HvpVkqFynDtHI69xF2lWq+wo78J0bppsXk=";
           };
           exeSrc = pkgs.fetchurl {
             url = "https://registry.npmjs.org/@pnpm/exe.${pnpmExeTarget}/-/exe.${pnpmExeTarget}-${version}.tgz";
