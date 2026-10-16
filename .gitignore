@@ -169,3 +169,6 @@ dev.log.*
 /.worktrees/
 # CocoIndex Code (ccc)
 /.cocoindex_code/
+
+# repowise owner-digest key (local)
+.repowise/events.key
