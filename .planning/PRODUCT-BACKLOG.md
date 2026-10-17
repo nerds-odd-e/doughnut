@@ -6,8 +6,6 @@ Make deliberately captured knowledge more useful through learning and refinement
 
 ## Taken
 
-- [Let an external agent inspect several candidate notes and cite its evidence](seeds/SEED-073-learning-refinement-and-retrieval.md#story-4) — SEED-073#story-4 ([plan](slice-plans/071-agent-note-candidates-and-cited-reads/PLAN.md))
-
 ## Backlog list
 
 - [Generate focus-note questions with relevant supporting passages](seeds/SEED-007-per-concept-prompt-splitting-single-note-qg.md#story-1) — SEED-007#story-1

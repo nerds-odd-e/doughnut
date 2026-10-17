@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "identity": "SEED-073#story-4",
+  "title": "Let an external agent inspect several candidate notes and cite its evidence",
+  "completedAt": "2026-10-17T05:07:11.599Z",
+  "developer": "Terry Yin",
+  "agent": "Nana-chan",
+  "host": "claude",
+  "model": "opus"
+}
