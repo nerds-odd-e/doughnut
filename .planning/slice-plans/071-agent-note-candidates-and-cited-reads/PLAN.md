@@ -231,3 +231,13 @@ Disposition: proved by slice 3: `AttributedNoteContentControllerTests.aNotebookW
 - Slice 3: the MCP e2e reuses an existing gitignored
   `mcp-server/dist/mcp-server.bundle.mjs`; run `pnpm mcp-server:bundle` before
   a local e2e run after MCP tool changes, or it reports "Unknown tool".
+
+## Execution complete
+
+Product advice: no correction needed; the delivered tools meet every key
+example. One local test-support trap is worth a small story for wrap-up to
+weigh: the MCP e2e task `bundleMcpServer` (`e2e_test/config/mcpClientTasks.ts`)
+reuses any existing `mcp-server/dist/mcp-server.bundle.mjs`, so a local run
+after an MCP tool change tests stale code ("Unknown tool" here; a silent false
+pass is possible when only behavior changes). CI builds a fresh bundle and is
+unaffected. Rebuilding on every run is the likely fix if its time cost is small.

@@ -255,6 +255,15 @@ The coordinator combined complete execution references and an unbounded tool-met
   - Observed effect: requested authoritative passages were omitted and had to be retrieved again before the one-slice implementation
   - Inference: smaller next-boundary batches would avoid the repeated reads; no elapsed-time or total-token saving was measured
 
+- Execution: SEED-073#story-4 (first implementation commit 6c6eab31cd93e307606a8adad93e18fa456ffcf7)
+  - Timestamp: unknown
+  - Tool: Claude Code
+  - Model: claude-opus-5-5
+  - Open Dough release: 0.3.63
+  - Evidence: dashboard launch b9d6a365-b9b2-4bd5-beae-6f6a6fb8852f on 2026-10-17; a startup Bash read concatenating four whole execution references returned "Output too large" (49.5KB, 2KB preview) and was then read in full from the persisted file; a second batch of five references (52KB) was written to a scratch file and read whole before slice 1 delegation
+  - Observed effect: about 1,300 lines of references were loaded before the first delegation, the first batch twice
+  - Inference: reading only the passages the next boundary needed would have avoided the second read; no token or time saving was measured
+
 ## DD-234 — A comparison of empty captures was printed as a match
 
 During proof acceptance the coordinator compared two captured measurements with `diff ... && echo SAME`. The output filter had matched nothing, so both captures were empty and the command printed `SAME`. The coordinator noticed the empty files and repeated the measurement; a third attempt was needed because the test command ran from the wrong directory. An agent execution deviation, not missing workflow guidance.
