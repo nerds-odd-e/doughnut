@@ -157,5 +157,5 @@ For IntelliJ IDE you need to go to the general settings/tools/GitHub Copilot/MCP
 
 ## Available Tools
 
-- `find_most_relevant_note` - Search for the single most relevant note for a query
+- `list_note_candidates` - List every note whose title or alias matches a query, with notebook and folder to tell candidates apart
 - `get_note_graph` - Fetch graph context for a note by ID and token limit

@@ -14,7 +14,7 @@ const NoteIdParamsSchema = z.object({
   noteId: z
     .number()
     .describe(
-      "Numeric ID of the note to explore. Obtain this from 'find_most_relevant_note' results or user-provided ID."
+      "Numeric ID of the note to explore. Obtain this from a 'list_note_candidates' candidate or user-provided ID."
     ),
   tokenLimit: z
     .number()
@@ -57,14 +57,14 @@ Use cases:
 - Inspect how a note connects to the rest of the notebook before answering questions about it.
 - After search, pull bounded context around a candidate note without loading the whole notebook.
 
-You MUST obtain a valid note ID first using 'find_most_relevant_note' unless the user explicitly provides a numeric note ID.
+You MUST obtain a valid note ID first using 'list_note_candidates' unless the user explicitly provides a numeric note ID.
 You MUST provide a valid token limit (combined budget for focus plus related note bodies). Example choices:
 1. Short focus note and a large context window → higher limit (e.g., 5000).
 2. Long focus note or a small context window → lower limit (e.g., 500); a large focus body consumes budget before related notes are included.
 
 Navigation pattern:
-1. Use 'find_most_relevant_note' to find relevant notes
-2. Extract note ID from search results
+1. Use 'list_note_candidates' to list matching notes
+2. Pick a candidate and take its noteId
 3. Use this tool to load focus context around that note
 4. Follow **outgoingLinks** / **relatedNotes** titles for deeper exploration if needed`,
   NoteIdParamsSchema

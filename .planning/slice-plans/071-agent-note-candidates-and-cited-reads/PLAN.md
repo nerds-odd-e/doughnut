@@ -93,7 +93,19 @@ Observed on 2026-10-17 in this workspace at `0ed49423da`:
 ### 1. Agents list the note candidates for a search text
 
 Type: Behavior
-Status: planned
+Status: done
+Accepted proof (2026-10-17): `pnpm mcp-server:test` 6 files / 15 tests pass
+(`list-note-candidates.test.ts`: order and equal titles, container hits left
+out, `No matching notes.` for no hits and container-only hits; `server.test.ts`
+registry); `mcp_services.feature` 6 passing, including "AI agent lists every
+matching note as a candidate" (`Functional, Functional analysis`, exact
+first) and the token-limit outline on the first candidate id. The
+`@mcpIsolationProof` scenario's expected text changed to `No matching notes.`
+but was not run here (tag-excluded without rendezvous parameters). Sweep
+reading: `find_most_relevant_note`, `findMostRelevantNote`, and
+`No relevant note found` appear nowhere outside `.planning`. The tool is
+`list_note_candidates`; its description points to `get_note_graph` and
+slice 3 adds `read_note` to it.
 Proof: new unit cases in `mcp-server/tests/tools/` for the candidate tool
 (several hits pass through in order with id, title, notebook, folder,
 distance; two equal titles stay distinct; container hits are left out; empty
@@ -175,4 +187,5 @@ backend's error as tool error text and no content.
 
 ## Learnings
 
-None yet.
+- Slice 1: the e2e page-object search action is `listNoteCandidates`;
+  candidate assertions use the step "the note candidates should be {string}".

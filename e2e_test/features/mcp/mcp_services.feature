@@ -24,7 +24,7 @@ Feature: MCP (Model Context Protocol) Services
     Then the graph response should contain this worktree's MCP isolation focus note
     And the graph response should not contain the other worktree's MCP isolation marker
     When AI agent searches for the other worktree's MCP isolation marker
-    Then the response should contain "No relevant note found."
+    Then the response should contain "No matching notes."
     When the MCP client disconnects
     Then the spawned MCP server process has exited
 
@@ -33,10 +33,17 @@ Feature: MCP (Model Context Protocol) Services
     Then the response should contain "<note_title>"
 
     Examples:
-      | search_term     | note_title              |
-      | Object Oriented | Object Oriented         |
-      | Functional      | Functional              |
-      | Fiona           | No relevant note found. |
+      | search_term     | note_title         |
+      | Object Oriented | Object Oriented    |
+      | Functional      | Functional         |
+      | Fiona           | No matching notes. |
+
+  Scenario: AI agent lists every matching note as a candidate
+    Given I have a notebook "Maths" with notes:
+      | Title               | Folder   |
+      | Functional analysis | Analysis |
+    When AI agent searches for relevant notes using MCP tool with the term "Functional"
+    Then the note candidates should be "Functional, Functional analysis"
 
   Scenario Outline: AI agent respects token limits when retrieving a note graph
     When AI agent searches for relevant notes using MCP tool with the term "Functional"

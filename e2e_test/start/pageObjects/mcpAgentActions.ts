@@ -35,22 +35,13 @@ export const mcpAgentActions = () => {
       return this
     },
 
-    searchForNote(searchTerm: string) {
-      return this.callTool('find_most_relevant_note', { query: searchTerm })
+    listNoteCandidates(searchTerm: string) {
+      return this.callTool('list_note_candidates', { query: searchTerm })
     },
 
     getNoteGraphFromLastSearch(tokenLimit: number) {
       getResponseText('@MCPApiResponse').then((responseText) => {
-        const searchResult = JSON.parse(responseText)
-        const noteTopology = searchResult.noteTopology
-
-        if (!(noteTopology && noteTopology.id)) {
-          throw new Error(
-            `Expected MCP search result with noteTopology.id, but found: ${responseText}`
-          )
-        }
-
-        const noteId = noteTopology.id
+        const noteId = JSON.parse(responseText)[0].noteId
 
         cy.task('callMcpToolWithParams', {
           apiName: 'get_note_graph',
@@ -73,15 +64,11 @@ export const mcpAgentActions = () => {
       return this
     },
 
-    expectSearchResultIncludesNoteTitle(noteTitle: string) {
-      cy.get('@MCPApiResponse').then((response) => {
-        const actualResponse = response as unknown as ApiResponse
-        const texts = actualResponse.content.map((item) => item.text)
-        const found = texts.some((text) => text.includes(noteTitle))
+    expectCandidateTitles(titles: string[]) {
+      getResponseText('@MCPApiResponse').then((responseText) => {
         expect(
-          found,
-          `Expected MCP search results to include note title "${noteTitle}", but found: ${JSON.stringify(texts)}`
-        ).to.be.true
+          JSON.parse(responseText).map((c: { title: string }) => c.title)
+        ).to.deep.equal(titles)
       })
       return this
     },

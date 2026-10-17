@@ -82,7 +82,7 @@ Then("the MCP client used this checkout's isolated origin", () => {
 
 When("AI agent searches for this worktree's MCP isolation marker", () => {
   requireMcpIsolationProof().then((params) => {
-    start.mcpAgentActions().searchForNote(params.own)
+    start.mcpAgentActions().listNoteCandidates(params.own)
   })
 })
 
@@ -112,7 +112,7 @@ Then(
 
 When("AI agent searches for the other worktree's MCP isolation marker", () => {
   requireMcpIsolationProof().then((params) => {
-    start.mcpAgentActions().searchForNote(params.foreign)
+    start.mcpAgentActions().listNoteCandidates(params.foreign)
   })
 })
 
@@ -137,7 +137,7 @@ When('AI agent calls the {string} MCP tool', (apiName: string) => {
 When(
   'AI agent searches for relevant notes using MCP tool with the term {string}',
   (searchTerm: string) => {
-    start.mcpAgentActions().searchForNote(searchTerm)
+    start.mcpAgentActions().listNoteCandidates(searchTerm)
   }
 )
 
@@ -145,12 +145,9 @@ Then('the response should contain {string}', (expectedResponse: string) => {
   start.mcpAgentActions().expectResponseContains(expectedResponse)
 })
 
-Then(
-  'the search results should include a note with the title {string}',
-  (noteTitle: string) => {
-    start.mcpAgentActions().expectSearchResultIncludesNoteTitle(noteTitle)
-  }
-)
+Then('the note candidates should be {string}', (titles: string) => {
+  start.mcpAgentActions().expectCandidateTitles(titles.split(', '))
+})
 
 Then(
   'the graph response should contain the focus note {string}',
