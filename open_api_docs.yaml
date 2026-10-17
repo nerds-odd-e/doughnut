@@ -2870,6 +2870,24 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/AuthoredPortablePath"
+  /api/notes/{note}/attributed-content:
+    get:
+      tags:
+      - attributed-note-content-controller
+      operationId: getAttributedContent
+      parameters:
+      - name: note
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/AttributedNoteContent"
   /api/notes/{note}/ai-context-markdown:
     get:
       tags:
@@ -5965,6 +5983,33 @@ components:
           type: string
       required:
       - portablePath
+    AttributedNoteContent:
+      type: object
+      properties:
+        noteId:
+          type: integer
+          format: int32
+        title:
+          type: string
+        notebookName:
+          type: string
+        folderPath:
+          type: string
+        content:
+          type: string
+        updatedAt:
+          type: string
+          format: date-time
+        acceptedRevision:
+          type: string
+          description: The notebook's accepted Git commit id when the note was read;
+            null when the notebook has no Git binding.
+      required:
+      - folderPath
+      - noteId
+      - notebookName
+      - title
+      - updatedAt
     NoteAiContextMarkdown:
       type: object
       properties:

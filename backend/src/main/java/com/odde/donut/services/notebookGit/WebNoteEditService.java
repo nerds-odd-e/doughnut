@@ -166,11 +166,7 @@ public class WebNoteEditService {
   }
 
   private void requireReviewedRevision(Integer notebookId, String expectedRevision) {
-    String currentRevision =
-        bindingRepository
-            .findByNotebook_Id(notebookId)
-            .map(binding -> binding.getAcceptedGitObjectId())
-            .orElse(null);
+    String currentRevision = bindingRepository.findAcceptedRevision(notebookId);
     if (!Objects.equals(currentRevision, expectedRevision)) {
       throw new ResponseStatusException(
           HttpStatus.CONFLICT, "This review is stale. Load the current note and review again.");

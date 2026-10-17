@@ -6,7 +6,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.donut.entities.Conversation;
 import com.odde.donut.entities.ConversationNoteCorrection;
 import com.odde.donut.entities.Note;
-import com.odde.donut.entities.NotebookGitBinding;
 import com.odde.donut.entities.repositories.NotebookGitBindingRepository;
 import com.odde.donut.exceptions.OpenAiUnauthorizedException;
 import com.odde.donut.services.ConversationService;
@@ -45,11 +44,7 @@ public class NoteConversationAiReplyService {
       Conversation conversation, ConversationService conversationService)
       throws OpenAiUnauthorizedException {
     Note subject = conversation.getSubjectNote();
-    String baseRevision =
-        bindingRepository
-            .findByNotebook_Id(subject.getNotebook().getId())
-            .map(NotebookGitBinding::getAcceptedGitObjectId)
-            .orElse(null);
+    String baseRevision = bindingRepository.findAcceptedRevision(subject.getNotebook().getId());
     String responseId = UUID.randomUUID().toString();
     ResponseCreateParams request = buildResponseCreateParams(conversation);
     Flowable<String> stream = openAiApiHandler.streamResponseAsLegacyChatChunks(request);

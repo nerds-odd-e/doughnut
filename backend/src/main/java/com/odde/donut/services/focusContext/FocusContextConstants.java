@@ -56,7 +56,7 @@ public class FocusContextConstants {
   }
 
   /** A note's {@code folderPath}: outermost folder name first, joined by {@code " / "}. */
-  static String folderPathOf(Note note) {
+  public static String folderPathOf(Note note) {
     return String.join(" / ", note.folderNamesFromRoot());
   }
 

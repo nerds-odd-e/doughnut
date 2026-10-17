@@ -1174,6 +1174,19 @@ export type AuthoredPortablePath = {
     portablePath: string;
 };
 
+export type AttributedNoteContent = {
+    noteId: number;
+    title: string;
+    notebookName: string;
+    folderPath: string;
+    content?: string;
+    updatedAt: string;
+    /**
+     * The notebook's accepted Git commit id when the note was read; null when the notebook has no Git binding.
+     */
+    acceptedRevision?: string;
+};
+
 export type NoteAiContextMarkdown = {
     markdown?: string;
 };
@@ -3805,6 +3818,24 @@ export type AuthoredPortablePathResponses = {
 };
 
 export type AuthoredPortablePathResponse = AuthoredPortablePathResponses[keyof AuthoredPortablePathResponses];
+
+export type GetAttributedContentData = {
+    body?: never;
+    path: {
+        note: number;
+    };
+    query?: never;
+    url: '/api/notes/{note}/attributed-content';
+};
+
+export type GetAttributedContentResponses = {
+    /**
+     * OK
+     */
+    200: AttributedNoteContent;
+};
+
+export type GetAttributedContentResponse = GetAttributedContentResponses[keyof GetAttributedContentResponses];
 
 export type GetAiContextMarkdownData = {
     body?: never;

@@ -132,7 +132,21 @@ one in full.
 ### 2. A note read carries its source attribution over HTTP
 
 Type: Behavior
-Status: planned
+Status: done
+Accepted proof (2026-10-17): `AttributedNoteContentControllerTests` 4/4
+(`readsTheNoteWithItsSourceAttribution` record equality with folder path
+`Mechanics / Energy` and revision equal to the binding head, 40-hex;
+`aContentEditInTheNotebookChangesTheRevisionOfALaterRead`;
+`refusesANoteTheUserCannotRead`; `aNotebookWithoutGitBindingReadsWithoutRevision`);
+`RobotsTests` 2/2; callers of the consolidated lookup green
+(`ConversationCorrectionAcceptanceControllerTest`,
+`ConversationCorrectionTitleAcceptanceControllerTest`,
+`ConversationMessageControllerTest`, `ConversationAiReplyControllerTest`,
+`TextContentControllerUpdateNoteContentTests`); `pnpm mcp-server:test` and
+frontend `vue-tsc --noEmit` green after regeneration. The endpoint lives in
+`AttributedNoteContentController` (`NoteController` was over the file-size
+limit), so the generated SDK operation is
+`AttributedNoteContentController.getAttributedContent`.
 Proof: a new `NoteController` test class: the read returns note id, title,
 notebook name, folder path, content, updated time, and an accepted revision
 equal to the binding head; after `TextContentController.updateNoteContent`
@@ -189,3 +203,6 @@ backend's error as tool error text and no content.
 
 - Slice 1: the e2e page-object search action is `listNoteCandidates`;
   candidate assertions use the step "the note candidates should be {string}".
+- Slice 2: the accepted-revision lookup has one owner,
+  `NotebookGitBindingRepository.findAcceptedRevision`; the locked read in
+  `ConversationCorrectionReviewService` stays separate.

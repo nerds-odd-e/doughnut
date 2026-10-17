@@ -280,6 +280,10 @@ Use this for endpoint lookup; open `sdk.gen.ts` or `types.gen.ts` only for exact
 
 - `showNoteImage`: GET `/api/notes/{note}/image` -> `ShowNoteImageResponse` (request: `ShowNoteImageData`; path: note; query: path; response body: string)
 
+## Attributed Note Content Controller
+
+- `getAttributedContent`: GET `/api/notes/{note}/attributed-content` -> `GetAttributedContentResponse` (request: `GetAttributedContentData`; path: note; response body: AttributedNoteContent)
+
 ## Notebook Attachment Controller
 
 - `getAttachmentPage`: GET `/api/notebooks/{notebook}/attachments/{attachment}` -> `GetAttachmentPageResponse` (request: `GetAttachmentPageData`; path: notebook, attachment; response body: NotebookAttachmentRealm)

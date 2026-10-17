@@ -99,10 +99,7 @@ public class ConversationCorrectionAcceptanceService {
     correction.setDecidedBy(authorizationService.getCurrentUser());
     correction.setDecidedAt(decidedAt);
     correction.setAcceptedRevision(
-        bindingRepository
-            .findByNotebook_Id(saved.getNotebook().getId())
-            .map(binding -> binding.getAcceptedGitObjectId())
-            .orElse(null));
+        bindingRepository.findAcceptedRevision(saved.getNotebook().getId()));
     return correction;
   }
 }
