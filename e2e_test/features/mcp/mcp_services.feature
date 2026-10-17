@@ -56,3 +56,15 @@ Feature: MCP (Model Context Protocol) Services
       | token_limit | sibling_inclusion |
       | 10          | not contain       |
       | 1000        | contain           |
+
+  Scenario: AI agent reads a candidate note and cites its notebook revision
+    Given note "Functional" has content:
+      """
+      Pure functions
+      """
+    When AI agent searches for relevant notes using MCP tool with the term "Functional"
+    And AI agent reads the first candidate note
+    Then the read note content should contain "Pure functions" with an accepted revision to cite
+    When I update note "Functional" with content "Functions without side effects"
+    And AI agent reads the first candidate note
+    Then the read note should cite a different accepted revision

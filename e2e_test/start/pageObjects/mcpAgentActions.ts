@@ -15,6 +15,29 @@ const getResponseText = (alias: string) => {
   })
 }
 
+const callToolOnFirstCandidate = (
+  apiName: string,
+  params: Record<string, unknown>,
+  alias: string
+) => {
+  getResponseText('@MCPApiResponse').then((responseText) => {
+    const noteId = JSON.parse(responseText)[0].noteId
+    cy.task('callMcpToolWithParams', {
+      apiName,
+      params: { noteId, ...params },
+    }).then((response) => {
+      cy.wrap(response).as(alias)
+    })
+  })
+}
+
+const getReadRevision = () =>
+  getResponseText('@MCPReadResponse').then((responseText) => {
+    const { acceptedRevision } = JSON.parse(responseText)
+    expect(acceptedRevision).to.match(/^[0-9a-f]{40}$/)
+    return acceptedRevision as string
+  })
+
 export const mcpAgentActions = () => {
   return {
     connect() {
@@ -40,16 +63,16 @@ export const mcpAgentActions = () => {
     },
 
     getNoteGraphFromLastSearch(tokenLimit: number) {
-      getResponseText('@MCPApiResponse').then((responseText) => {
-        const noteId = JSON.parse(responseText)[0].noteId
+      callToolOnFirstCandidate(
+        'get_note_graph',
+        { tokenLimit },
+        'MCPGraphResponse'
+      )
+      return this
+    },
 
-        cy.task('callMcpToolWithParams', {
-          apiName: 'get_note_graph',
-          params: { noteId, tokenLimit },
-        }).then((graphResponse) => {
-          cy.wrap(graphResponse).as('MCPGraphResponse')
-        })
-      })
+    readNoteFromLastSearch() {
+      callToolOnFirstCandidate('read_note', {}, 'MCPReadResponse')
       return this
     },
 
@@ -69,6 +92,29 @@ export const mcpAgentActions = () => {
         expect(
           JSON.parse(responseText).map((c: { title: string }) => c.title)
         ).to.deep.equal(titles)
+      })
+      return this
+    },
+
+    expectReadContentContains(content: string) {
+      getResponseText('@MCPReadResponse').then((responseText) => {
+        expect(JSON.parse(responseText).content).to.contain(content)
+      })
+      return this
+    },
+
+    rememberReadRevision() {
+      getReadRevision().then((acceptedRevision) => {
+        cy.wrap(acceptedRevision).as('citedRevision')
+      })
+      return this
+    },
+
+    expectReadRevisionDiffersFromCited() {
+      cy.get<string>('@citedRevision').then((citedRevision) => {
+        getReadRevision().then((acceptedRevision) => {
+          expect(acceptedRevision).to.not.equal(citedRevision)
+        })
       })
       return this
     },

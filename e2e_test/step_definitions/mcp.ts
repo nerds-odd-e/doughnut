@@ -174,3 +174,21 @@ Then(
     start.mcpAgentActions().expectGraphNotContains(unexpectedText)
   }
 )
+
+When('AI agent reads the first candidate note', () => {
+  start.mcpAgentActions().readNoteFromLastSearch()
+})
+
+Then(
+  'the read note content should contain {string} with an accepted revision to cite',
+  (content: string) => {
+    start
+      .mcpAgentActions()
+      .expectReadContentContains(content)
+      .rememberReadRevision()
+  }
+)
+
+Then('the read note should cite a different accepted revision', () => {
+  start.mcpAgentActions().expectReadRevisionDiffersFromCited()
+})

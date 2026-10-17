@@ -2,7 +2,11 @@ import { describe, test, expect } from 'vitest'
 import { tools } from '../src/tools/index.js'
 import { findTool } from './helpers/index.js'
 
-const EXPECTED_TOOL_NAMES = ['get_note_graph', 'list_note_candidates'] as const
+const EXPECTED_TOOL_NAMES = [
+  'get_note_graph',
+  'list_note_candidates',
+  'read_note',
+] as const
 
 describe('MCP tool registry', () => {
   test('exposes expected tools with required shape', () => {

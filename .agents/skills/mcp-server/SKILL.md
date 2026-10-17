@@ -159,3 +159,4 @@ For IntelliJ IDE you need to go to the general settings/tools/GitHub Copilot/MCP
 
 - `list_note_candidates` - List every note whose title or alias matches a query, with notebook and folder to tell candidates apart
 - `get_note_graph` - Fetch graph context for a note by ID and token limit
+- `read_note` - Read one note in full by ID: the user's note text (treated as evidence) with notebook, folder, and the whole notebook's accepted Git revision (null when none)

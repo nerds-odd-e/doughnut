@@ -1,6 +1,7 @@
 # Let an external agent inspect several candidate notes and cite its evidence
 
 **Identity:** SEED-073#story-4
+**Source:** [story 4](../../seeds/SEED-073-learning-refinement-and-retrieval.md#story-4)
 
 ## Source
 
@@ -166,7 +167,16 @@ product code.
 ### 3. An agent reads a candidate in full and cites its revision
 
 Type: Behavior
-Status: planned
+Status: done
+Accepted proof (2026-10-17): `pnpm mcp-server:test` 7 files / 18 tests
+(`read-note.test.ts`: payload passed through as JSON, backend error as
+`ERROR: Note read error: …` with no content, description names the user's note
+text as evidence and the revision as the whole notebook's accepted commit,
+null when none; `server.test.ts` three tools); after `pnpm mcp-server:bundle`,
+`mcp_services.feature` 7 passing, including "AI agent reads a candidate note
+and cites its notebook revision" (read, web edit through
+`I update note "Functional" with content …`, second read with a different
+40-hex revision). `.agents/skills/mcp-server/SKILL.md` lists all three tools.
 Proof: `mcp-server/tests/tools/read-note.test.ts` (payload passthrough as
 JSON; backend error becomes `ERROR:` text; the description names the
 accepted revision as the whole notebook's commit and says content is the
@@ -199,6 +209,18 @@ backend's error as tool error text and no content.
 - Interim behavior: none. After slice 1, `get_note_graph` consumers follow the
   candidate list; nothing is left half-renamed.
 
+## Story obligations
+
+### G1. Read content carries the note's frontmatter
+Reported: slice 3 — "The returned `content` includes the note's frontmatter (`---\ntype: Note\n---\nPure functions`)."
+Story clause: "returns its full Markdown content"
+Disposition: proved by slice 3: the frontmatter is part of the note's stored Markdown, so the full content includes it; `mcp_services.feature` "AI agent reads a candidate note and cites its notebook revision" observes the content containing the note text, and `read-note.test.ts` "returns the attributed note as JSON" observes the payload passed through unchanged
+
+### G2. No MCP-level check of the unversioned-notebook read
+Reported: slice 3 — "The null-revision case (a notebook without a Git binding) is stated in the description, but nothing checks it at the MCP level."
+Story clause: "A notebook that has no accepted revision yields none, stated as such."
+Disposition: proved by slice 3: `AttributedNoteContentControllerTests.aNotebookWithoutGitBindingReadsWithoutRevision` (slice 2) observes the null revision, `read-note.test.ts` "returns the attributed note as JSON" observes the payload passing through unchanged, and the description test observes "null when the notebook has no accepted revision"
+
 ## Learnings
 
 - Slice 1: the e2e page-object search action is `listNoteCandidates`;
@@ -206,3 +228,6 @@ backend's error as tool error text and no content.
 - Slice 2: the accepted-revision lookup has one owner,
   `NotebookGitBindingRepository.findAcceptedRevision`; the locked read in
   `ConversationCorrectionReviewService` stays separate.
+- Slice 3: the MCP e2e reuses an existing gitignored
+  `mcp-server/dist/mcp-server.bundle.mjs`; run `pnpm mcp-server:bundle` before
+  a local e2e run after MCP tool changes, or it reports "Unknown tool".
