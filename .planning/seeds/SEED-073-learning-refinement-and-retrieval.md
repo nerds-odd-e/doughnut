@@ -41,8 +41,9 @@ tests, and Accepted ADRs. It did not run the app or measure model quality:
 - A shared bounded focus context already serves question generation, chat,
   automation, exports, and the graph API. Task information does not guide
   candidate selection. Related-note bodies are truncated to short prefixes.
-- Search matches titles and aliases. MCP returns one matching note's metadata,
-  then offers graph context; it does not expose a candidate list or body search.
+- Search matches titles and aliases. MCP lists those matches as candidates
+  with notebook and folder, reads a chosen note in full with its notebook's
+  accepted revision, and offers graph context; it does not search note bodies.
 - Git preserves accepted notebook content; recall history preserves learner
   events. Neither alone records the diagnosis, proposal decision, and learning
   follow-up as one resolved difficulty.

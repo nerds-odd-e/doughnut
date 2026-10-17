@@ -26,6 +26,7 @@ principle 7 and `unit-testing` skill supply the stricter removal convention.
 | --- | --- | --- |
 | MinerU venv recovery | One | About 28 minutes of mixed environment and stack work; recovery remains unqueued. |
 | Stale Development classes | One; later probes healthy | Failed start, unknown cause; unqueued, not confirmed resolved. |
+| Stale local MCP bundle in E2E | One | One failed local E2E run and a rebuild; CI unaffected; unqueued. |
 
 Shared findings retained in DearDough include changed-boundary proof acceptance
 (DD-218; public wrap-up step 2), decisive planning premises (DD-224; public
@@ -67,6 +68,19 @@ PDFs through the CLI.
   - Observed effect: one failed start and a short diagnosis before the UAT setup could continue.
   - Inference: the Development start's incremental build did not drop classes whose sources were deleted. Qualified: cause not investigated further.
 - Investigation (2026-10-03, SEED-067#stacks-survive-other-builds slice 2): not reproduced. In the default checkout, a compiled `@Service` and its injecting consumer were deleted with the stack stopped, then `pnpm dev` started healthy and Gradle removed the stale class; the same held with a concurrent `classes --rerun-tasks` build and with a build-cache restore. Linked-worktree probes also removed the classes. No writer found; the cause remains unknown. Owner decides whether to keep watching or drop.
+
+## Open, not queued: Local MCP E2E reuses a stale server bundle
+
+### DD-250 — A local MCP E2E run exercised an MCP server bundle built before the tool change
+
+`bundleMcpServer` in `e2e_test/config/mcpClientTasks.ts` returns early when `mcp-server/dist/mcp-server.bundle.mjs` exists, so the `@BundleFirstAndTerminateMCPServerWhenTeardown` feature runs whatever bundle an earlier run left. CI builds a fresh bundle and is unaffected.
+
+#### Occurrences
+
+- Execution: SEED-073#story-4 (first implementation commit 6c6eab31cd93e307606a8adad93e18fa456ffcf7); Timestamp: unknown (2026-10-17, slice 3); Tool: Claude Code; Model: claude-opus-5-5; Open Dough release: 0.3.63.
+  - Evidence: slice 3 implementation report: `mcp_services.feature` failed with "MCP error -32603: Unknown tool" for the new `read_note` until `pnpm mcp-server:bundle` was run; plan 071 Learnings "Slice 3" at `1a852ab455`.
+  - Observed effect: one failed local E2E run and a manual rebuild before the slice proof passed.
+  - Inference: a run after a behavior-only MCP change could pass against old code without notice. Rebuilding on every run is the likely fix if its time cost is small; not measured.
 
 ## Useful project practice (not an open problem)
 

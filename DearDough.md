@@ -5,7 +5,7 @@ responses under observation live in the [watch list](https://github.com/terryyin
 Detailed observations, original releases and qualified inferences are retained
 in the linked Open Dough catalog. Unknown execution provenance remains unknown.
 
-- Highest allocated local number: 249. Removed numbers are never reused.
+- Highest allocated local number: 250. Removed numbers are never reused.
 - Full source recovery before this cleanup: `0a8878e98be76b8e92203515d8f4719489b24169:DearDough.md`.
 - Project-owned findings remain in [Donut Retrospective Findings](DonutRetrospectiveFindings.md); their ownership review is unchanged.
 
