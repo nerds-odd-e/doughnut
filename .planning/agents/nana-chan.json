@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "agent": "Nana-chan",
+  "email": "nana-chan@example.org",
+  "identity": "SEED-073#story-4",
+  "mode": "story-branch",
+  "branch": "claude/let-an-external-agent-inspect-several-candidate",
+  "host": "claude",
+  "model": "opus"
+}
