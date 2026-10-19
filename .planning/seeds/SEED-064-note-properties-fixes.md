@@ -9,6 +9,45 @@ scope: medium
 
 # SEED-064: Make note properties comfortable on an iPad, operable on a phone, and smaller in code
 
+## Story Decomposition
+
+<a id="story-7"></a>
+
+### Expand a list property into a single list of clickable values
+
+**Identity:** SEED-064#story-7
+```json dough-story-state
+{"schemaVersion":1,"refinement":"not-refined","approach":"unselected"}
+```
+
+- **Goal:** A learner inspecting a list-valued note property can read and follow
+  its linked notes directly from the expanded list, with each value shown once.
+- **Scope:** Expanding the property replaces the compact value list beside the
+  key with the detailed list below it. Keep the key and collapse control visible.
+  Make the value/title on the left of each expanded item a clickable note link,
+  retaining its authored label and destination. Keep each item's tracker link,
+  learning status and existing actions alongside that item. Collapsing restores
+  the compact value links beside the key. Retain list order and plain-text values
+  in mixed lists. Delete the redundant expanded-state value rendering and any
+  code used only by it; reconcile affected documentation and use a one-time
+  acceptance reading to sweep its dependent references.
+- **Evaluation:** A note has an `example of` property containing four note
+  links, as in the owner's screenshot. Expand it: the detailed items show the
+  four clickable note labels in order alongside their tracker details. Follow
+  an item's label to its linked note. Collapse the property: the compact row
+  again provides those note links beside `example of`. A mixed list retains
+  its plain-text entries in their authored positions.
+- **Value / learning:** Reduces repeated content and makes navigation available
+  where the learner is already reading the per-value details, especially on iPad.
+- **Effort hypothesis:** S (30–60 minutes), medium confidence; presentation and
+  link reuse, subject to refinement of existing expanded-item rendering.
+- **Depends on:** None.
+- **Safe stopping point:** The expanded list supports note navigation and the
+  existing per-value learning actions independently of other properties work.
+- **Source:** Owner request and attached iPad screenshot, 2026-10-20. The
+  expanded `example of` property shows four compact links beside the key and
+  repeats those values below as `[[…]]` labels with `View tracker` links.
+
 ## Unselected owner choices
 
 - **Findings left out by the owner** (low value for the effort, or not reproduced):
