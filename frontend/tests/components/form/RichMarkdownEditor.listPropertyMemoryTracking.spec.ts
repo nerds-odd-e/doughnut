@@ -58,7 +58,10 @@ Workshop body.`
     ).toEqual(["Assimilate [[run]]", "Assimilate [[past tense]]"])
     expect(
       wrapper.find(`${listRowSelector} [data-property-value="[[run]]"]`).text()
-    ).toContain("[[run]]")
+    ).toContain("run")
+    expect(
+      wrapper.find(`${listRowSelector} [data-property-value="[[run]]"]`).text()
+    ).not.toContain("[[")
     expect(
       wrapper.findAll(`${listRowSelector} [data-test="skip"]`)
     ).toHaveLength(1)

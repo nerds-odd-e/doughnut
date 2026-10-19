@@ -112,7 +112,10 @@
       :property-key="modelValue.key"
       :property-value="modelValue.value"
       :note-id="noteId"
+      :wiki-links="wikiLinks"
+      :last-saved-markdown="lastSavedMarkdown"
       @remove="emit('remove')"
+      @dead-wiki-link-click="emit('dead-wiki-link-click', $event)"
     />
   </div>
 </template>

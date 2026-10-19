@@ -15,7 +15,15 @@
         class="text-right text-sm font-medium"
         :data-test="`mode-label-${row.mode}`"
       >
-        {{ row.label }}
+        <RichFrontmatterListPropertyValue
+          v-if="row.propertyValue !== undefined"
+          :value="listPropertyValue([row.propertyValue])"
+          :property-key="propertyKey"
+          :wiki-links="wikiLinks"
+          :last-saved-markdown="lastSavedMarkdown"
+          @dead-wiki-link-click="emit('deadWikiLinkClick', $event)"
+        />
+        <template v-else>{{ row.label }}</template>
       </span>
       <div
         class="flex min-w-0 items-center gap-2"
@@ -87,9 +95,12 @@
 </template>
 
 <script setup lang="ts">
-import type { MemoryTracker } from "@generated/donut-backend-api"
+import type { MemoryTracker, WikiLink } from "@generated/donut-backend-api"
 import { computed } from "vue"
+import RichFrontmatterListPropertyValue from "@/components/form/RichFrontmatterListPropertyValue.vue"
 import type { AssimilateEvent } from "@/composables/useAssimilateUnit"
+import { listPropertyValue } from "@/utils/noteProperties"
+import type { DeadWikiLinkPayload } from "@/utils/wikiLinkMarkup"
 import {
   noteLevelTrackerOfType,
   type MemoryTrackerType,
@@ -104,6 +115,8 @@ const props = withDefaults(
     disabled?: boolean
     skippedFromAssimilationSequence?: boolean
     size?: "default" | "sm"
+    wikiLinks?: WikiLink[]
+    lastSavedMarkdown?: string
   }>(),
   {
     trackers: () => [],
@@ -115,10 +128,11 @@ const props = withDefaults(
   }
 )
 
-defineEmits<{
+const emit = defineEmits<{
   assimilate: [request: AssimilateEvent]
   skip: []
   returnToSequence: []
+  deadWikiLinkClick: [payload: DeadWikiLinkPayload]
 }>()
 
 const modeLabels: Record<MemoryTrackerType, string> = {

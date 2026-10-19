@@ -43,9 +43,12 @@
       :skipped-from-assimilation-sequence="
         isSkippedFromAssimilationSequence(noteRecallInfo, propertyKey)
       "
+      :wiki-links="wikiLinks"
+      :last-saved-markdown="lastSavedMarkdown"
       @assimilate="assimilate"
       @skip="skip({ propertyKey })"
       @return-to-sequence="returnToSequence({ propertyKey })"
+      @dead-wiki-link-click="emit('deadWikiLinkClick', $event)"
     />
   </div>
 </template>
@@ -67,6 +70,8 @@ import {
 } from "@/utils/noteContentPropertyKeys"
 import { isWellFormedWholeWikiLinkItem } from "@/utils/authoredLinkMarkup"
 import { useNoteStore } from "@/store/noteStore"
+import type { WikiLink } from "@generated/donut-backend-api"
+import type { DeadWikiLinkPayload } from "@/utils/wikiLinkMarkup"
 import {
   scalarStringFromPropertyValue,
   type PropertyValue,
@@ -76,10 +81,13 @@ const props = defineProps<{
   propertyKey: string
   propertyValue: PropertyValue
   noteId?: number
+  wikiLinks?: WikiLink[]
+  lastSavedMarkdown?: string
 }>()
 
 const emit = defineEmits<{
   remove: []
+  deadWikiLinkClick: [payload: DeadWikiLinkPayload]
 }>()
 
 const {

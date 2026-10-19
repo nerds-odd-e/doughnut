@@ -77,9 +77,16 @@ integration responsibilities.
 ### 1. Follow expanded property item labels
 
 Type: Behavior
-Status: planned
+Status: done
 Proof: Detailed-item label/navigation/recovery proof and retained learning
 controls, using the owning specs above and the acceptance commands below.
+Accepted 2026-10-20: early isolated E2E probe passed 26/26 before edits;
+detailed-item click/keyboard/pending/dead tests in
+`RichMarkdownEditor.propertyListWikiLinks.spec.ts`, retained
+`RichMarkdownEditor.listPropertyMemoryTracking.spec.ts`; full frontend suite
+355 files/2215 tests and both typechecks passed. Refactor reused the existing
+`listPropertyValue` factory; its focused rerun (4 files/25 tests) and both
+typechecks passed.
 
 Behavior: Given an expanded list item with a resolved authored wiki label, follow
 that label to its named note or property destination while the item's tracker

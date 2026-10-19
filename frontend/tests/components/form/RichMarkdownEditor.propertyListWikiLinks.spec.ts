@@ -99,8 +99,8 @@ Body`
     })
     await expandPropertyPanel(wrapper, propertyRowSelector("topics"))
     expectPropertyPanelOpen(wrapper.get(propertyRowSelector("topics")).element)
-    const link = propertyRowListValue(wrapper, "topics").get(
-      "a.donut-wiki-link"
+    const link = wrapper.get(
+      `${propertyRowSelector("topics")} [data-testid="rich-note-property-panel"] a.donut-wiki-link`
     )
     expect(link.text()).toBe("lunar topic")
     expect(link.attributes("href")).toBe(notePropertyHref(42, "a part of"))
@@ -108,6 +108,53 @@ Body`
     await flushPromises()
     expect(wrapper.vm.$router.currentRoute.value).toMatchObject(
       notePropertyLocation(42, "a part of")
+    )
+  })
+
+  it("activates an expanded list wiki link with the keyboard", async () => {
+    const markdown = '---\ntopics: ["[[Grammar]]", "practice"]\n---\n\nBody'
+    const wrapper = await h.mountEditor(markdown, {
+      lastSavedMarkdown: markdown,
+      wikiLinks: [wikiLinkFromAuthoredToken("Grammar", 42)],
+      route: noteShowLocation(99),
+      noteId: 99,
+      attachToBody: true,
+    })
+    await expandPropertyPanel(wrapper, propertyRowSelector("topics"))
+    const link = wrapper.get(
+      `${propertyRowSelector("topics")} [data-testid="rich-note-property-panel"] a.donut-wiki-link`
+    ).element as HTMLAnchorElement
+    expect(link.textContent).toBe("Grammar")
+    link.focus()
+    expect(document.activeElement).toBe(link)
+    await userEvent.keyboard("{Enter}")
+    await flushPromises()
+    expect(wrapper.vm.$router.currentRoute.value).toMatchObject(
+      noteShowLocation(42)
+    )
+  })
+
+  it("keeps pending expanded links inert and forwards dead expanded recovery", async () => {
+    const markdown =
+      '---\ntopics: ["[[Missing|shown]]", "[[New]]"]\n---\n\nBody'
+    const wrapper = await h.mountEditor(markdown, {
+      lastSavedMarkdown: '---\ntopics: ["[[Missing|shown]]"]\n---\n\nBody',
+      route: notePropertyLocation(99, "topics"),
+      noteId: 99,
+    })
+    await expandPropertyPanel(wrapper, propertyRowSelector("topics"))
+    const panel = `${propertyRowSelector("topics")} [data-testid="rich-note-property-panel"]`
+    await wrapper.get(`${panel} a.pending-wiki-link`).trigger("click")
+    expect(wrapper.emitted("deadWikiLinkClick")).toBeUndefined()
+    expect(wrapper.vm.$router.currentRoute.value).toMatchObject(
+      notePropertyLocation(99, "topics")
+    )
+    await wrapper.get(`${panel} a.dead-wiki-link`).trigger("click")
+    expect(wrapper.emitted("deadWikiLinkClick")?.[0]).toEqual([
+      { portablePath: "Missing", displayText: "shown" },
+    ])
+    expect(wrapper.vm.$router.currentRoute.value).toMatchObject(
+      notePropertyLocation(99, "topics")
     )
   })
 
