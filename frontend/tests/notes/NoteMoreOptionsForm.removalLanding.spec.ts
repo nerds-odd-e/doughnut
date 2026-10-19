@@ -21,7 +21,7 @@ import {
   mockSdkServiceWithImplementation,
   testFolderStub,
 } from "@tests/helpers"
-import { afterEach, describe, expect, it, vi } from "vitest"
+import { beforeEach, describe, expect, it, vi } from "vitest"
 
 setupNoteMoreOptionsTrashFormTests()
 
@@ -98,7 +98,7 @@ describe("where the person lands once a note is removed", () => {
     noteTopologies: realms.map((r) => r.note.noteTopology),
   })
 
-  afterEach(() => localStorage.removeItem(PEER_SORT_STORAGE_KEY))
+  beforeEach(() => localStorage.removeItem(PEER_SORT_STORAGE_KEY))
 
   describe.each([
     { removal: "trashing", remove: trash },

@@ -73,7 +73,7 @@ dependencies {
   implementation platform('com.google.cloud:libraries-bom:26.90.0')
   implementation 'com.google.cloud:google-cloud-storage:2.75.0'
   implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-  implementation 'com.fasterxml.jackson.datatype:jackson-datatype-hibernate7:2.22.3'
+  implementation 'com.fasterxml.jackson.datatype:jackson-datatype-hibernate7:2.22.4'
   implementation 'tools.jackson.datatype:jackson-datatype-hibernate7'
   implementation 'org.springframework.boot:spring-boot-starter-web'
   implementation 'org.springframework.boot:spring-boot-starter-websocket'
@@ -86,7 +86,7 @@ dependencies {
   implementation 'org.springframework.boot:spring-boot-starter-security'
   implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
   implementation 'org.springdoc:springdoc-openapi-starter-webmvc-api:3.1.1'
-  implementation 'com.openai:openai-java:4.81.0'
+  implementation 'com.openai:openai-java:4.86.0'
   implementation 'org.yaml:snakeyaml:2.7'
   // RxJava2 for Flowable streaming support
   implementation 'io.reactivex.rxjava2:rxjava:2.2.21'
