@@ -107,9 +107,16 @@ the ten-minute cap. Compact/detail duplication remains until slice 3.
 ### 2. Read the complete authored list in detail
 
 Type: Behavior
-Status: planned
+Status: done
 Proof: Authored item sequence and URL actions in the mounted editor, saved and
 no-note-ID contexts, plus retained value-specific learning proof.
+Accepted 2026-10-20: authored-order fixture (linked, URL, repeated, blank and
+260-character values) in `RichMarkdownEditor.listPropertyMemoryTracking.spec.ts`
+observes the detailed sequence, URL action, shared tracker identity for repeats
+and one key-wide Skip in saved and no-note-ID contexts; full frontend suite
+355 files/2216 tests and both typechecks passed on final content. Refactor
+hoisted the authored/eligible row derivation in `AssimilationModes` and named
+the panel's saved-note projection; focused rerun and typechecks passed.
 
 Behavior: Given a list containing linked and plain values, including repeated
 and long authored occurrences, expand it and read those occurrences in order

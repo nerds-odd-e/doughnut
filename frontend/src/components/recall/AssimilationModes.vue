@@ -112,6 +112,8 @@ const props = withDefaults(
     trackers?: MemoryTracker[]
     propertyKey?: string
     propertyValues?: readonly string[]
+    authoredPropertyValues?: readonly string[]
+    showLearningControls?: boolean
     disabled?: boolean
     skippedFromAssimilationSequence?: boolean
     size?: "default" | "sm"
@@ -122,6 +124,8 @@ const props = withDefaults(
     trackers: () => [],
     propertyKey: undefined,
     propertyValues: undefined,
+    authoredPropertyValues: undefined,
+    showLearningControls: true,
     disabled: false,
     skippedFromAssimilationSequence: false,
     size: "default",
@@ -165,19 +169,31 @@ function assimilatePayloadFor(
   }
 }
 
-function unitRow(mode: MemoryTrackerType, propertyValue?: string) {
-  const tracker = noteLevelTrackerOfType(
-    props.trackers,
-    mode,
-    props.propertyKey,
-    propertyValue
-  )
+function unitRow(
+  mode: MemoryTrackerType,
+  propertyValue?: string,
+  learning: { eligible: boolean; firstOccurrence: boolean } = {
+    eligible: true,
+    firstOccurrence: true,
+  }
+) {
+  const tracker = learning.eligible
+    ? noteLevelTrackerOfType(
+        props.trackers,
+        mode,
+        props.propertyKey,
+        propertyValue
+      )
+    : undefined
   return {
     key: `${mode}:${propertyValue ?? ""}`,
     mode,
     propertyValue,
     label: propertyValue ?? modeLabels[mode],
-    assimilable: true,
+    assimilable:
+      props.showLearningControls &&
+      learning.eligible &&
+      learning.firstOccurrence,
     assimilateLabel:
       propertyValue === undefined
         ? `Assimilate as ${modeLabels[mode]}`
@@ -195,7 +211,10 @@ function unitRow(mode: MemoryTrackerType, propertyValue?: string) {
     statusTitle: tracker
       ? `Recalled ${tracker.recallCount ?? 0} times`
       : undefined,
-    showSkipAffordance: mode === "UNDERSTANDING" && !props.propertyValues,
+    showSkipAffordance:
+      mode === "UNDERSTANDING" &&
+      propertyValue === undefined &&
+      props.showLearningControls,
   }
 }
 
@@ -211,11 +230,21 @@ function keySkipRow() {
   }
 }
 
-const rows = computed(() =>
-  props.allowedModes.flatMap((mode) => {
-    if (!props.propertyValues) return [unitRow(mode)]
-    const valueRows = props.propertyValues.map((value) => unitRow(mode, value))
-    return mode === "UNDERSTANDING" ? [...valueRows, keySkipRow()] : valueRows
+const rows = computed(() => {
+  const displayValues = props.authoredPropertyValues ?? props.propertyValues
+  if (!displayValues) return props.allowedModes.map((mode) => unitRow(mode))
+  const eligibleValues = new Set(props.propertyValues ?? displayValues)
+  return props.allowedModes.flatMap((mode) => {
+    const valueRows = displayValues.map((value, index) => ({
+      ...unitRow(mode, value, {
+        eligible: eligibleValues.has(value),
+        firstOccurrence: displayValues.indexOf(value) === index,
+      }),
+      key: `${mode}:${index}:${value}`,
+    }))
+    return mode === "UNDERSTANDING" && props.showLearningControls
+      ? [...valueRows, keySkipRow()]
+      : valueRows
   })
-)
+})
 </script>

@@ -33,12 +33,17 @@
       </span>
     </template>
     <AssimilationModes
-      v-if="noteId && !isNoteLevelPropertyKey(propertyKey)"
+      v-if="
+        !isNoteLevelPropertyKey(propertyKey) &&
+        (hasSavedNote || authoredListValues !== undefined)
+      "
       size="sm"
       :allowed-modes="allowedModes"
-      :trackers="noteRecallInfo?.memoryTrackers"
+      :trackers="hasSavedNote ? noteRecallInfo?.memoryTrackers : undefined"
       :property-key="propertyKey"
       :property-values="assimilableListValues(propertyValue)"
+      :authored-property-values="authoredListValues"
+      :show-learning-controls="hasSavedNote"
       :disabled="assimilatingPropertyKey === propertyKey"
       :skipped-from-assimilation-sequence="
         isSkippedFromAssimilationSequence(noteRecallInfo, propertyKey)
@@ -111,6 +116,12 @@ const reifyRefusal = computed(() => {
     return "Only a property whose value is a link to a note can be reified"
   return undefined
 })
+
+const hasSavedNote = computed(() => !!props.noteId)
+
+const authoredListValues = computed(() =>
+  props.propertyValue.kind === "list" ? props.propertyValue.items : undefined
+)
 
 const allowedModes: MemoryTrackerType[] = ["UNDERSTANDING"]
 </script>
