@@ -26,7 +26,18 @@ principle 7 and `unit-testing` skill supply the stricter removal convention.
 | --- | --- | --- |
 | MinerU venv recovery | One | About 28 minutes of mixed environment and stack work; recovery remains unqueued. |
 | Stale Development classes | One; later probes healthy | Failed start, unknown cause; unqueued, not confirmed resolved. |
-| Stale local MCP bundle in E2E | One | One failed local E2E run and a rebuild; CI unaffected; unqueued. |
+| Stale local MCP bundle in E2E | One | One failed local E2E run and a rebuild; CI unaffected; queued as SEED-077#story-1. |
+
+The 2026-10-20 selection at Donut `64583a0036` prioritizes the local MCP
+proof gap: `bundleMcpServer` still accepts a bundle solely because it exists,
+so an MCP change could be checked against earlier code without a failure.
+This is Donut's E2E adapter responsibility, independent of the shared proof
+workflow. [SEED-077#story-1](.planning/seeds/SEED-077-current-mcp-e2e-bundle.md#story-1)
+is queued first to restore useful feedback for ongoing MCP and retrieval work;
+it does not implement the repair. The single MinerU recovery remains below
+the current learning/refinement direction, which excludes bulk ingestion.
+The stale Development-class cause remains unestablished after the healthy
+probes below, so no specific remedy is selected for it.
 
 Shared findings retained in DearDough include changed-boundary proof acceptance
 (DD-218; public wrap-up step 2), decisive planning premises (DD-224; public
@@ -69,11 +80,18 @@ PDFs through the CLI.
   - Inference: the Development start's incremental build did not drop classes whose sources were deleted. Qualified: cause not investigated further.
 - Investigation (2026-10-03, SEED-067#stacks-survive-other-builds slice 2): not reproduced. In the default checkout, a compiled `@Service` and its injecting consumer were deleted with the stack stopped, then `pnpm dev` started healthy and Gradle removed the stale class; the same held with a concurrent `classes --rerun-tasks` build and with a build-cache restore. Linked-worktree probes also removed the classes. No writer found; the cause remains unknown. Owner decides whether to keep watching or drop.
 
-## Open, not queued: Local MCP E2E reuses a stale server bundle
+## Open, queued: Local MCP E2E reuses a stale server bundle
+
+<a id="dd-250"></a>
 
 ### DD-250 — A local MCP E2E run exercised an MCP server bundle built before the tool change
 
 `bundleMcpServer` in `e2e_test/config/mcpClientTasks.ts` returns early when `mcp-server/dist/mcp-server.bundle.mjs` exists, so the `@BundleFirstAndTerminateMCPServerWhenTeardown` feature runs whatever bundle an earlier run left. CI builds a fresh bundle and is unaffected.
+
+Response: [SEED-077#story-1](.planning/seeds/SEED-077-current-mcp-e2e-bundle.md#story-1)
+is queued, not resolved. The source at `64583a0036` retains the existence-only
+reuse path. Adoption and a current-source E2E result are still required;
+the source rereview adds no occurrence.
 
 #### Occurrences
 
