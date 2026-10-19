@@ -8,11 +8,17 @@ import { wikiLinkFromAuthoredToken } from "@/utils/wikiLinkMarkup"
 import { vi } from "vitest"
 import { userEvent } from "vitest/browser"
 import {
+  collapsePropertyPanel,
   expandPropertyPanel,
+  expectPropertyPanelClosed,
   expectPropertyPanelOpen,
   propertyRowListValue,
   propertyRowSelector,
 } from "./propertiesTestDom"
+import {
+  clickCancel,
+  propertyValueDialogEl,
+} from "./propertyValueDialogTestDom"
 import { createRichMarkdownEditorTestHarness } from "./richMarkdownEditorTestHarness"
 
 describe("RichMarkdownEditor property list wiki links", () => {
@@ -108,6 +114,47 @@ Body`
     await flushPromises()
     expect(wrapper.vm.$router.currentRoute.value).toMatchObject(
       notePropertyLocation(42, "a part of")
+    )
+  })
+
+  it("switches between detailed and compact values, keeping Edit usable while expanded", async () => {
+    const markdown = '---\ntopics: ["[[Grammar]]", "practice"]\n---\n\nBody'
+    const wrapper = await h.mountEditor(markdown, {
+      lastSavedMarkdown: markdown,
+      wikiLinks: [wikiLinkFromAuthoredToken("Grammar", 42)],
+      route: noteShowLocation(99),
+      noteId: 99,
+    })
+    const rowSelector = propertyRowSelector("topics")
+    await expandPropertyPanel(wrapper, rowSelector)
+    const panel = `${rowSelector} [data-testid="rich-note-property-panel"]`
+    expect(
+      wrapper
+        .findAll(`${panel} [data-property-value]`)
+        .map((row) =>
+          row.find('[data-test="mode-label-UNDERSTANDING"]').text().trim()
+        )
+    ).toEqual(["Grammar", "practice"])
+
+    await wrapper
+      .find(
+        `${rowSelector} [data-testid="rich-note-property-value-dialog-open"]`
+      )
+      .trigger("click")
+    await flushPromises()
+    expect(propertyValueDialogEl()).not.toBeNull()
+    clickCancel()
+    await flushPromises()
+    expect(propertyValueDialogEl()).toBeNull()
+    await collapsePropertyPanel(wrapper, rowSelector)
+    expectPropertyPanelClosed(wrapper.get(rowSelector).element)
+    const link = propertyRowListValue(wrapper, "topics")
+      .findAll("a.donut-wiki-link")
+      .find((a) => a.text() === "Grammar")!
+    ;(link.element as HTMLAnchorElement).click()
+    await flushPromises()
+    expect(wrapper.vm.$router.currentRoute.value).toMatchObject(
+      noteShowLocation(42)
     )
   })
 

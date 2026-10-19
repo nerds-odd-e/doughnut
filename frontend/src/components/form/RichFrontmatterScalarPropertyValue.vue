@@ -1,7 +1,7 @@
 <template>
   <div class="min-w-0" :class="rowLayoutClass">
     <div
-      v-if="isListValue"
+      v-if="isListValue && !expanded"
       class="min-w-0 flex-1"
       data-testid="rich-note-property-row-value-input"
     >
@@ -15,7 +15,7 @@
       />
     </div>
     <div
-      v-else
+      v-else-if="!isListValue"
       :class="valueFieldWrapperClass"
       @pointerdown="onValuePointerDown"
     >
@@ -88,6 +88,7 @@ const props = defineProps<{
   lastSavedMarkdown?: string
   rowIndex: number
   draft?: boolean
+  expanded?: boolean
 }>()
 
 const emit = defineEmits<{

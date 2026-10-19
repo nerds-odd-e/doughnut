@@ -65,6 +65,7 @@
           :last-saved-markdown="lastSavedMarkdown"
           :row-index="idx"
           :draft="draft"
+          :expanded="isFocused"
           @update:model-value="onValueUpdate"
           @update:property-value="onPropertyValueUpdate"
           @focus="emit('row-focus')"

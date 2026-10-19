@@ -134,10 +134,16 @@ Compact/detail duplication remains until slice 3.
 ### 3. Switch between compact and detailed property values
 
 Type: Behavior
-Status: planned
+Status: done
 Proof: Expand → open Edit → collapse → compact-link navigation at the mounted
 editor, retained layout/E2E consumers, maintained documentation, and the
 separate acceptance reading below.
+Accepted 2026-10-20: transition test in
+`RichMarkdownEditor.propertyListWikiLinks.spec.ts`; full frontend suite
+355 files/2217 tests, both typechecks, and the isolated E2E batch (26/26)
+passed. `docs/note-content-saving.md` reconciled for compact versus detailed
+placement. Refactor corrected the read-only wording in that section and kept
+the spec within its size limit; its rerun passed (9 tests).
 
 Behavior: Given a stored list property, expand it to use its complete detailed
 list with the key, collapse control and Edit available; collapse restores the
@@ -182,7 +188,14 @@ frontend-only plan.
 After slice 3, read the active expanded row/panel and compact branch, then sweep
 the whole product for identifiers, fixtures, helpers and documentation used
 only by the deleted rendering. Use `rg` for the identifiers actually retired;
-record the literal search and classified result here during execution. Delete
+record the literal search and classified result here during execution.
+Execution reading 2026-10-20: `rg -n 'rich-note-property-row-list-value|RichFrontmatterListPropertyValue|compactDisplayForPropertyValue'`
+and `rg -n 'expanded'` over the two row components, searched across
+`frontend/src frontend/tests e2e_test docs`. Classified result: no identifier
+was retired — the deleted expanded-state rendering was one use of the shared
+list renderer, whose component, test id and display util all serve surviving
+compact-on-collapse, read-only, detailed-panel and value-dialog behavior, so
+there were no exclusive dependents to delete. Delete
 exclusive dependents transitively and reconcile current consumers. Preserve
 dated source evidence with its provenance, including the owner's screenshot
 description. This is a one-time reading, separate from surviving-behavior proof;
