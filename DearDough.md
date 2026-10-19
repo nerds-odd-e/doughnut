@@ -7,6 +7,7 @@ in the linked Open Dough catalog. Unknown execution provenance remains unknown.
 
 - Highest allocated local number: 250. Removed numbers are never reused.
 - Full source recovery before this cleanup: `0a8878e98be76b8e92203515d8f4719489b24169:DearDough.md`.
+- Full source recovery before name adoption and compaction: `234f141b41332715edd5e4384a425bcb8f26e718:DearDough.md`; complete supplied evidence retained in Open Dough `dbe36711c0e4ff9421bc28afc53cb7477203e704:docs/maintainer/findings/`.
 - Project-owned findings remain in [Donut Retrospective Findings](DonutRetrospectiveFindings.md); their ownership review is unchanged.
 
 <a id="odf-110"></a>
@@ -51,15 +52,6 @@ Former local code: DD-135. A formatter piped through tail returns the final pipe
 
 Former local code: DD-138. An absolute changed-file size check conflicts with an approved staged decomposition and mechanical edits to pre-existing oversized callers. Open, unqueued. [Evidence and response](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/finding-names.md#odf-152).
 
-### Occurrences
-- Execution: SEED-073#story-1 (first implementation commit 1fbe48e0253d79d77e0440566183b15711c8e70d)
-  - Timestamp: 2026-10-12T06:19:02.414Z
-  - Tool: Codex
-  - Open Dough release: unknown
-  - Evidence: native session 01a12eac-0634-72d3-90e6-a210b2ac5e3f, probe_record_refactor return; original PLAN at claim 5d6307f63d was 442 lines and the failed-model evidence made it 762; current refactor-checks required every checked file be at most 250 lines
-  - Observed effect: the evidence-only refactor stopped for a size/scope decision despite preserving required failed-run provenance; subsequent planning evidence was split into linked documents
-  - Inference: the universal file ceiling conflicted with an execution plan that explicitly required retained observation inputs/results; the recorded stop cost about four active minutes, while total restructure cost was not measured
-
 <a id="odf-189"></a>
 
 ## ODF-189 — Small additions force unrelated size extractions
@@ -89,15 +81,6 @@ Former local code: DD-176. Every small slice launches a fresh full refactor agen
 ## ODF-208 — Observer worker exits without a recorded cause
 
 Former local code: DD-202. The CI observer's worker exits mid-execution without a terminal result or a reported transport error, ending notification coverage. Open, unqueued. [Evidence and response](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/finding-names.md#odf-208).
-
-### Occurrences
-- Execution: SEED-073#story-1 (first implementation commit 1fbe48e0253d79d77e0440566183b15711c8e70d)
-  - Timestamp: 2026-10-12T06:24:56.989Z
-  - Tool: Codex
-  - Open Dough release: unknown
-  - Evidence: same native session, terminal receipt for /tmp/dough-ci-501/watch-zxDjUz; second lost-worker receipt at 2026-10-12T07:06:33.914Z for watch-yetWr2; reason: CI observer worker exited without recording a normal terminal result
-  - Observed effect: both retained streams reported coverage lost and pending CI unobserved, with zero recorded/delivered/unread events; the coordinator stopped those terminal streams and recovered exact owned coverage with watch-MBgKyY
-  - Inference: the receipts establish lost notification coverage but do not establish why workers exited; recovery required observer ownership checks, not a Git publication repeat
 
 <a id="odf-213"></a>
 
@@ -134,24 +117,6 @@ Former local code: DD-216. An abbreviated published-base SHA is accepted as an a
 ## ODF-206 — Over-budget slice not stopped
 
 Former local code: DD-217. Former local code: DD-222. The slice time bound is checked only at hand-back, so a delegated slice runs past it and is accepted or extended without re-sizing. Open, unqueued. [Evidence and response](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/finding-names.md#odf-206).
-
-### Occurrences
-- Execution: SEED-073#story-7 (first implementation commit 016eabb474a20a6dfe0e4311cab21d27a57dab0f)
-  - Timestamp: 2026-10-13T20:35:00+09:00 (approximate, from the slice 4 commit time; the returns span 19:56–21:44)
-  - Tool: Claude Code
-  - Model: claude-opus-5-5
-  - Open Dough release: unknown
-  - Evidence: implementation task durations reported by the host for plan `21d5534381:.planning/slice-plans/070-learner-confirmed-ambiguous-exclusion/PLAN.md`: slice 1 about 6 min, slice 3 about 7 min, slice 4 about 10 min, slice 5 about 8 min, slice 9 about 8 min, slice 10 about 8 min plus about 9 min after a return, against a 5-minute target and a 10-minute hard limit; each ran the whole backend suite one to three times at 1–2.5 min per run
-  - Observed effect: every return was accepted at hand-back without re-sizing; no slice was stopped
-  - Inference: the whole-suite proof command alone uses a large share of a 5-minute slice here, so the bound may not fit backend slices in this project; not measured against a split alternative
-
-- Execution: SEED-073#story-2 (first implementation commit 4347f39efdfd932c7bf5ffec578809bbc5c5dee4)
-  - Timestamp: unknown
-  - Tool: Codex
-  - Open Dough release: unknown
-  - Evidence: dashboard launch 21113129-0d3b-45bd-af3b-2dc6b9f95a31 on 2026-10-14; accept_title and refactor_title returned about 9 and 4 active minutes; stale_review and refactor_stale about 9 and 4; initial_review and refactor_initial about 8 and 3. The source PLAN at `6767cf279b7050860d1ef91019b3f42de2d4c0b1:.planning/slice-plans/003-reviewed-conversation-note-corrections/PLAN.md` includes implementation, proof and local cleanup under a 10-minute active bound.
-  - Observed effect: coordinator budgets were enforced per implementation/refactor agent; the serial estimates total about 13, 13 and 11 active minutes for those leaves, excluding reported test waits. Slice 9 was added before extending slice 8 implementation, but the complete leaf was not timed as one operation.
-  - Inference: reserve the mandatory independent refactor cost inside the leaf budget and track a single clock. These are self-reported estimates, not reconstructed exact timings; detailed earlier agent history is unavailable in the current review.
 
 <a id="odf-217"></a>
 
@@ -201,189 +166,62 @@ Former local code: DD-229. A measurement plan assigns record/prototype work to t
 
 Former local code: DD-231. A slice proof table omits explicit story end conditions, so implementers return it complete while listing those conditions untested; the coordinator needs second rounds to compare with the full story. Open, unqueued. [Evidence and response](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/finding-names.md#odf-247).
 
-## DD-233 — Broad startup reads exceeded the response budget and forced repeated retrieval
+<a id="odf-264"></a>
 
-The coordinator combined complete execution references and an unbounded tool-metadata listing, then batched another large context read. Both responses were truncated before first-slice delegation, so authoritative passages had to be retrieved again. The targeted-retrieval guidance already applied; this records an agent execution deviation rather than missing workflow guidance.
+## ODF-264 — Broad startup reads exceeded the response budget and forced repeated retrieval
 
-### Occurrences
-- Execution: SEED-071#removal-proof-and-evidence-recurrence (first implementation commit 6fadfdbf13bd0e105042d0ff71cc404b36c7f577)
-  - Timestamp: unknown
-  - Tool: Codex
-  - Open Dough release: 0.3.60
-  - Evidence: dashboard launch fb81e2c8-229c-473e-ba0c-0df74a951f5e, first two startup functions.exec responses on 2026-10-12 reported 20,868 and 20,631 original output tokens and truncation; subsequent calls retrieved the plan, seed, and individual execution references again before slice 1 delegation
-  - Observed effect: the startup outputs did not expose all requested context; additional targeted reads were needed
-  - Inference: limiting each read to the next execution boundary and bounding metadata discovery would avoid this duplication; no elapsed-time or total-token saving was measured
+Former local code: DD-233. Broad whole-reference and metadata batches exceeded the response budget and truncated required context before delegation, forcing repeated retrieval despite existing targeted-reading guidance. Seven distinct recorded executions; savings are unmeasured. This agent deviation is distinct from ODF-158’s required-reference cost. Open, unqueued. [Evidence and response](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/findings/ODF-264.md).
 
-- Execution: SEED-073#story-1 (first implementation commit 1fbe48e0253d79d77e0440566183b15711c8e70d)
-  - Timestamp: 2026-10-12T05:53:20.104Z
-  - Tool: Codex
-  - Open Dough release: unknown
-  - Evidence: same native session, first startup functions.exec response reported 31647 original output tokens and truncation; subsequent bounded calls reread execution plan/source/contracts before delegation. The retrospective also initially batched full skill/plan/history reads into truncated 14632- and 20729-token responses and then retrieved focused passages.
-  - Observed effect: requested context was not fully exposed and targeted retrieval had to be repeated in startup and review
-  - Inference: next-boundary reads and bounded output would avoid this recorded duplication; no elapsed-time or total-token saving was measured
+<a id="odf-265"></a>
 
-- Execution: SEED-075#story-1 (first implementation commit 723e69c4835c9124e3387ecc999559ec0bbac95d)
-  - Timestamp: unknown
-  - Tool: Claude Code
-  - Model: claude-opus-5-5
-  - Open Dough release: 0.3.60
-  - Evidence: dashboard launch 1c7f003f-4c5f-49e6-92f2-404ce5e48cf8 on 2026-10-12; two startup Bash reads that concatenated whole execution references returned "Output too large" (30.5KB and 32.2KB) with a 2KB preview, and each was then read again in full through a second call before slice 1 delegation
-  - Observed effect: about 1,700 lines of references were loaded before a two-slice execution, two of the reads twice
-  - Inference: reading only the passages the next boundary needed would have avoided the second calls; no token or time saving was measured
+## ODF-265 — A comparison of empty captures was printed as a match
 
-- Execution: SEED-066#recording-started-after-leaving (first implementation commit 73df78e01d3b042269d2425fc02614d66580c5d1)
-  - Timestamp: unknown
-  - Tool: Codex
-  - Open Dough release: 0.3.60
-  - Evidence: dashboard launch fa643aec-2e9b-4491-b92d-050e64775ddb on 2026-10-13; the first two startup functions.exec responses reported 15,995 and 20,390 original output tokens with truncation, and a later pre-delegation batch reported 14,495 with truncation; subsequent bounded calls retrieved the affected plan, source and execution references again
-  - Observed effect: several requested authoritative passages were omitted from initial output and needed repeated retrieval before delegation
-  - Inference: smaller batches limited to the next execution boundary would avoid this recurrence; no elapsed-time or total-token saving was measured
+Former local code: DD-234. A proof comparison printed SAME because both filtered measurement captures were empty. The coordinator noticed and reran it; accepted proof came from the fourth, non-empty comparison. One SEED-075#story-1 execution, also represented by ODF-264 and ODF-266. Open, unqueued. [Evidence and response](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/findings/ODF-265.md).
 
-- Execution: SEED-073#story-8 (first implementation commit 772eb5c68e8175056fb2e96110a02363ee3c98ce)
-  - Timestamp: unknown
-  - Tool: Codex
-  - Open Dough release: unknown
-  - Evidence: dashboard launch 2fd471d5-c6fe-4895-933a-386b67b29a02 on 2026-10-14; the first startup functions.exec response reported 10,283 original output tokens and truncation, followed by a batched execution-reference response reporting 22,002 original output tokens and truncation; subsequent bounded calls reread CI monitoring, runtime, publication, execution-decision, and wrap-up passages before delegation
-  - Observed effect: requested authoritative context was partly omitted and required repeated retrieval before the backend slice
-  - Inference: bounding each batch to the next execution boundary would avoid this recurrence; no total-token or elapsed-time saving was measured
+<a id="odf-266"></a>
 
-- Execution: SEED-073#story-9 (first implementation commit f85c5eb53b25464823db8f6f413fc66af84d94b5)
-  - Timestamp: unknown
-  - Tool: Codex
-  - Open Dough release: unknown
-  - Evidence: dashboard launch 30f2c821-5b09-4325-bb0e-32cb142d76bb on 2026-10-14; startup functions.exec batches reported 10,992 and 29,925 original output tokens with truncation, followed by bounded retrieval of execution, CI, publication, and proof references before delegation
-  - Observed effect: requested authoritative passages were omitted and had to be retrieved again before the one-slice implementation
-  - Inference: smaller next-boundary batches would avoid the repeated reads; no elapsed-time or total-token saving was measured
+## ODF-266 — A later slice's failing example was already cured by the earlier slice
 
-- Execution: SEED-073#story-4 (first implementation commit 6c6eab31cd93e307606a8adad93e18fa456ffcf7)
-  - Timestamp: unknown
-  - Tool: Claude Code
-  - Model: claude-opus-5-5
-  - Open Dough release: 0.3.63
-  - Evidence: dashboard launch b9d6a365-b9b2-4bd5-beae-6f6a6fb8852f on 2026-10-17; a startup Bash read concatenating four whole execution references returned "Output too large" (49.5KB, 2KB preview) and was then read in full from the persisted file; a second batch of five references (52KB) was written to a scratch file and read whole before slice 1 delegation
-  - Observed effect: about 1,300 lines of references were loaded before the first delegation, the first batch twice
-  - Inference: reading only the passages the next boundary needed would have avoided the second read; no token or time saving was measured
+Former local code: DD-235. Planning observed later-slice symptoms only on unchanged code; an earlier slice already cured the 390px menu case, so that case did not discriminate the later edit. The 320px case still did. One SEED-075#story-1 execution, shared with ODF-264 and ODF-265; the relationship to ODF-187 and ODF-074 remains uncertain. Open, unqueued. [Evidence and response](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/findings/ODF-266.md).
 
-## DD-234 — A comparison of empty captures was printed as a match
+<a id="odf-267"></a>
 
-During proof acceptance the coordinator compared two captured measurements with `diff ... && echo SAME`. The output filter had matched nothing, so both captures were empty and the command printed `SAME`. The coordinator noticed the empty files and repeated the measurement; a third attempt was needed because the test command ran from the wrong directory. An agent execution deviation, not missing workflow guidance.
+## ODF-267 — No obligation disposition fits an earlier defect the story leaves unchanged
 
-### Occurrences
-- Execution: SEED-075#story-1 (first implementation commit 723e69c4835c9124e3387ecc999559ec0bbac95d)
-  - Timestamp: unknown
-  - Tool: Claude Code
-  - Model: claude-opus-5-5
-  - Open Dough release: 0.3.60
-  - Evidence: dashboard launch 1c7f003f-4c5f-49e6-92f2-404ce5e48cf8 on 2026-10-12, slice 1 proof acceptance; four Bash runs of a temporary toolbar-position spec, the first two printing `SAME` for two 0-line captures, the third failing with `Command "frontend:test" not found`, the fourth showing identical control positions before and after the change
-  - Observed effect: three extra measurement runs; the story obligation G1 was accepted only on the fourth, non-empty comparison
-  - Inference: asserting that a capture is non-empty before comparing it would have exposed the first failure at once
+Former local code: DD-236. The required obligation vocabulary had no truthful disposition for an earlier defect left unchanged by the story. The coordinator used no user cost, then qualified that the defect still costs the user. One 0.3.60 execution; this vocabulary gap is distinct from ODF-223’s unsupported path judgment and ODF-270’s pending-decision case. Open, unqueued. [Evidence and response](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/findings/ODF-267.md).
 
-## DD-235 — A later slice's failing example was already cured by the earlier slice
+<a id="odf-268"></a>
 
-The plan recorded each symptom only on unchanged code. Slice 2's proof named the More options menu off screen at 390px and at 320px, but slice 1's corrected measurement already put the 390px menu inside the screen, so the 390px case passes with and without slice 2's change. Possibly related to ODF-074; the premise here was observed, only not re-observed after the earlier planned change.
+## ODF-268 — Defect noticed in a refactor return is repaired by the coordinator after the refactor pass
 
-### Occurrences
-- Execution: SEED-075#story-1 (first implementation commit 723e69c4835c9124e3387ecc999559ec0bbac95d)
-  - Timestamp: unknown
-  - Tool: Claude Code
-  - Model: claude-opus-5-5
-  - Open Dough release: 0.3.60
-  - Evidence: `.planning/slice-plans/004-mobile-note-toolbar-one-row/PLAN.md` at 011af9ee1eb95af54fe65df5c1d2ff06821e8de2, settled premises (390px menu at left −206px on unchanged code) and slice 2 proof; slice 2 implementation return measured 45px to 325px at 390px before its change and −5px at 320px
-  - Observed effect: one of the two planned real-layout menu cases does not discriminate the slice's change; the 320px case does
-  - Inference: observing the later slice's symptom with the earlier slice's temporary edit applied would have shown which example carries the proof
+Former local code: DD-237. A refactor return named an unhandled empty-title-fragment case; the coordinator then wrote red proof and changed behavior after the refactor, without a fresh independent pass or full-suite rerun, and changed one accepted answer without an owner decision. Caught before publication. One execution, release unknown; relationship to ODF-219 remains uncertain. Open, unqueued. [Evidence and response](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/findings/ODF-268.md).
 
-## DD-236 — No obligation disposition fits an earlier defect the story leaves unchanged
+<a id="odf-269"></a>
 
-An implementation return named a defect that existed before the story and that the story neither caused nor promised to fix. Story-obligation recording requires exactly one disposition for every named gap, and none describes "earlier defect, unchanged, reported onward": the coordinator recorded `no user cost`, whose wording says the gap costs the user nothing, although the defect itself does cost the user.
+## ODF-269 — A plan took an ADR's rebuild statement as a fact about stored history
 
-### Occurrences
-- Execution: SEED-066#unified-voice-input-control (first implementation commit 94e79abf8aa8d658ceafead7ea6c0560e21c2349)
-  - Timestamp: 2026-10-12T17:30:00+09:00
-  - Tool: Claude Code
-  - Model: claude-opus-5-5
-  - Open Dough release: 0.3.60
-  - Evidence: `git show 6f73d976d5c36e91ba78d414b1487f2cf2204ce5:.planning/slice-plans/002-shared-voice-input-button/PLAN.md`, obligation G1; slice 4 return quoted there; `story-obligations.mjs check --slice 4` accepted the entry
-  - Observed effect: the record's disposition reason had to explain that "no cost" means no cost added by this story; the defect reaches the owner only through the final report and product advice
-  - Inference: one occurrence; whether a separate disposition is needed or the existing wording should cover this case is undecided
+Former local code: DD-238. Planning treated an ADR’s rebuild-from-logs statement as proof of complete historical coverage. Older state predated log writing; the owner changed the starting-state decision during execution, adding a slice and replacing an entry point already written. One SEED-073#story-7 execution, release unknown; relationship to ODF-074 remains uncertain. Open, unqueued. [Evidence and response](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/findings/ODF-269.md).
 
-## DD-237 — Defect noticed in a refactor return is repaired by the coordinator after the refactor pass
+<a id="odf-270"></a>
 
-A slice made one fragment list serve both answer matching and masking. Neither the plan's settled premises nor the implementation return covered a title with no text before its qualifier. The refactor return listed that shape as an "observation, not acted on". The coordinator then wrote a failing test, confirmed the defect, and changed production code itself after the refactor pass, with focused suites rerun but no fresh implementation or refactor pass and no full-suite rerun. The fix also changed one accepted answer for that title shape without an owner decision.
+## ODF-270 — No obligation disposition fits a gap that waits for an owner decision
 
-### Occurrences
-- Execution: SEED-076#story-1 (first implementation commit 0e2fc686d5b008166c1ababdc8cb1c602448cfb7)
-  - Timestamp: 2026-10-12T17:20:00+09:00 (approximate, from the session clock)
-  - Tool: Claude Code
-  - Model: claude-opus-5-5
-  - Open Dough release: unknown
-  - Evidence: plan `3972c2dbcc346016b0ca5e2c807d96f4ee71e0d5:.planning/slice-plans/003-mask-spelling-answer-before-title-qualifier/PLAN.md` Current decisions; test `spellingQuestionLeavesClueReadableWhenNoTitleTextPrecedesTheQualifier` failed before the guard with every word boundary masked for title `~(phase transition)`; refactor return section "Observation, not acted on"
-  - Observed effect: the defect was caught before publication, by the coordinator rather than by planned proof; the post-refactor edit had no independent refactor review
-  - Inference: when a rule is widened from matching to masking, checking the degenerate inputs of the shared value (empty fragment) in the plan's premises would have placed this in the implementation pass; generality is unverified from one occurrence
+Former local code: DD-239. The required obligation vocabulary could not keep a gap open for an owner decision. The coordinator used interim until the last slice despite that slice having no responsibility for it; other no-user-cost labels needed cost qualifications. Related to former DD-236 (ODF-267), with a distinct pending-decision problem. One SEED-073#story-7 execution, release unknown. Open, unqueued. [Evidence and response](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/findings/ODF-270.md).
 
-## DD-238 — A plan took an ADR's rebuild statement as a fact about stored history
+<a id="odf-271"></a>
 
-The plan settled schedule correction as a replay of recall logs from a new tracker, citing the ADR sentence that tracker state "can be rebuilt from RecallLog". Git history showed that recall-log writing began weeks before, so older trackers hold state no log records. Planning did not check when the logs began. An implementation return raised it at the third slice; the owner then chose a different starting state, which added a slice and replaced the replay entry point written two slices earlier. Related to ODF-074 (unverified planning premises); whether it is the same problem is uncertain, since this premise came from an accepted decision record and not from a code reading.
+## ODF-271 — A cross-slice defect passed every slice acceptance and was found by an aggregate review
 
-### Occurrences
-- Execution: SEED-073#story-7 (first implementation commit 016eabb474a20a6dfe0e4311cab21d27a57dab0f)
-  - Timestamp: 2026-10-13T20:15:00+09:00 (approximate, from the slice 3 return before commit 30e66c92c8)
-  - Tool: Claude Code
-  - Model: claude-opus-5-5
-  - Open Dough release: unknown
-  - Evidence: plan `d6f2e17d54:.planning/slice-plans/070-learner-confirmed-ambiguous-exclusion/PLAN.md` "Existing owners and observed premises" first bullet; `git log -S'recall_log' -- backend/src/main/resources/db/migration` (commits `0843cbd3ee`, `6ddf35275e`, `59e3e4a282`, 2026-08-17); slice 3 return "Replay discards state that is not in the logs"; slice 10 in the plan at `56cb8aa44c`
-  - Observed effect: one owner decision during execution, one added slice, `MemoryTracker.rebuildFrom` replaced by `rebuildWithout`, and the documentation paragraph rewritten
-  - Inference: asking "since when does this record exist, and what did it miss before" when a plan rebuilds state from a record would have placed the decision in refinement; one occurrence
+Former local code: DD-240. Acceptance reasoned that a repeat confirmation stayed stable despite the return naming two exclusions on one tracker as untested. Their interaction restored an earlier excluded attempt’s effect. An independent aggregate review found the branch defect and the owner authorized slice 11’s repair. One SEED-073#story-7 execution, release unknown; relationship to ODF-223 remains uncertain. Open, unqueued. [Evidence and response](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/findings/ODF-271.md).
 
-## DD-239 — No obligation disposition fits a gap that waits for an owner decision
+<a id="odf-272"></a>
 
-An implementation return named a gap whose resolution was the owner's to choose. Story-obligation recording requires exactly one disposition, and none says "open until the owner decides". The coordinator recorded `interim until slices 9`, naming the last planned slice only so the completion check would hold it open, although that slice had nothing to do with the gap. Several limitation reports were also recorded as `no user cost` with a reason explaining a small cost. Related to DD-236.
+## ODF-272 — Shared accessible-name consumers were missed before delivery
 
-### Occurrences
-- Execution: SEED-073#story-7 (first implementation commit 016eabb474a20a6dfe0e4311cab21d27a57dab0f)
-  - Timestamp: 2026-10-13T20:20:00+09:00 (approximate, from commit 30e66c92c8)
-  - Tool: Claude Code
-  - Model: claude-opus-5-5
-  - Open Dough release: unknown
-  - Evidence: `git show 30e66c92c8:.planning/slice-plans/070-learner-confirmed-ambiguous-exclusion/PLAN.md` obligation G4; the same plan at `56cb8aa44c` obligations G13 and G16; `story-obligations.mjs check` accepted each
-  - Observed effect: the record's disposition did not say what kept the gap open; the reason lived in the plan's Learnings
-  - Inference: one occurrence of the owner-decision case; a disposition for a pending decision is undecided
+Former local code: DD-248. Naming a shared modal’s outer dismissal Close collided with an existing footer Close. Selected frontend proof passed while seven ambiguous-button failures across four E2E features escaped to two CI runs. The outer dismissal was repaired to Close modal and existing E2E consumers passed unchanged. One SEED-073#story-9 execution, release unknown; relationships to ODF-150 and ODF-107 remain uncertain. The product repair does not establish shared prevention. Open, unqueued. [Evidence and response](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/findings/ODF-272.md).
 
-## DD-240 — A cross-slice defect passed every slice acceptance and was found by an aggregate review
+<a id="odf-273"></a>
 
-A late slice changed where the schedule rebuild starts. The coordinator's brief for that slice stated that repeating a confirmation stays stable because the excluded log's cached state is never rewritten, and the slice's repeat test used one exclusion only. With two excluded attempts on one tracker, a repeated confirmation of the later one restores the earlier one's effect. Slice proof acceptance and the refactor pass both accepted the change. An independent read-only review of the whole delivered change, run during the retrospective, found it.
+## ODF-273 — Full verification started before the intended edits settled
 
-### Occurrences
-- Execution: SEED-073#story-7 (first implementation commit 016eabb474a20a6dfe0e4311cab21d27a57dab0f)
-  - Timestamp: 2026-10-13T21:55:00+09:00 (approximate, from the review return after commit 56cb8aa44c)
-  - Tool: Claude Code
-  - Model: claude-opus-5-5
-  - Open Dough release: unknown
-  - Evidence: `56cb8aa44c:backend/src/main/java/com/odde/donut/services/MemoryTrackerService.java` lines 110–112 and `entities/MemoryTrackerReplay.java`; slice 10 return "Untested behaviors: Two exclusions on one tracker, in either order", recorded as covered in obligation G19; slice 11 of `21d5534381:.planning/slice-plans/070-learner-confirmed-ambiguous-exclusion/PLAN.md`
-  - Observed effect: the defect was delivered on the story branch; the owner authorized its repair in the same execution as slice 11
-  - Inference: the return named the untested case and the coordinator dispositioned it as proved by reasoning about a shared loop; requiring an observation when a rule change touches an idempotence promise would have caught it; one occurrence. The aggregate review by a fresh reader is a practice that worked here
-
-## DD-248 — Shared accessible-name consumers were missed before delivery
-
-Adding the accessible name Close to the shared modal's outer dismissal collided with an existing footer Close. Frontend consumer proof passed, but the label search did not include the Wikidata E2E footer queries before publication. CI exposed seven ambiguous-button failures across four features. The outer dismissal was repaired to Close modal and the original E2E consumers passed unchanged.
-
-### Occurrences
-- Execution: SEED-073#story-9 (first implementation commit f85c5eb53b25464823db8f6f413fc66af84d94b5)
-  - Timestamp: 2026-10-13T23:38:33.5652122Z
-  - Tool: Codex
-  - Open Dough release: unknown
-  - Evidence: CI run 38485019305 attempt 1 job 115596456163 and run 38485210312 attempt 1 job 115597071740; associateWikidataDialog.ts lines 48 and 63 query button name Close; repair return records red mounted-dialog proof and four unchanged E2E features passing ten scenarios
-  - Observed effect: a shared rendered-name change was published with consumers that had not been selected; two CI runs failed before the owned repair
-  - Inference: whole-product searches for the newly introduced accessible name, including existing text-derived names, would have exposed the collision before publication; one occurrence
-
-## DD-249 — Full verification started before the intended edits settled
-
-Implementation launched required whole-suite checks while intended test or template edits were still changing. The completed result then needed a final run against the settled source. This records an agent sequencing deviation, not missing workflow guidance; later reruns caused by a newly discovered behavior gap remain necessary proof.
-
-### Occurrences
-- Execution: SEED-073#story-2 (first implementation commit 4347f39efdfd932c7bf5ffec578809bbc5c5dee4)
-  - Timestamp: unknown
-  - Tool: Codex
-  - Open Dough release: unknown
-  - Evidence: dashboard launch 21113129-0d3b-45bd-af3b-2dc6b9f95a31 on 2026-10-14; stale_review reported 2,850 backend tests passed, then a 2,851-test full rerun because the queued snapshot case was added after compile. initial_review reported a full frontend/typecheck run racing the pre-fix template, followed by final checks after the template correction. Slice 8 and slice 9 observations remain recoverable at `6767cf279b7050860d1ef91019b3f42de2d4c0b1:.planning/slice-plans/003-reviewed-conversation-note-corrections/PLAN.md`.
-  - Observed effect: one additional full backend run was needed for the late intended test, and the premature frontend/typecheck results could not validate the final source.
-  - Inference: finish the intended edits and focused red/green loop before launching the full required selection. No elapsed-time saving was measured; the later overlapping-read correction and its rerun are excluded from this sequencing finding.
+Former local code: DD-249. Required whole-suite verification began while intended test or template edits were still changing, requiring another run on settled source. One SEED-073#story-2 execution reports an extra full backend run and premature frontend/typecheck results. This sequencing deviation excludes necessary reruns after newly discovered gaps and differs from ODF-225’s repair-stash invalidation. Open, unqueued. [Evidence and response](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/findings/ODF-273.md).
