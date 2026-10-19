@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "agent": "Anri-chan",
+  "email": "anri-chan@example.org",
+  "identity": "SEED-064#story-7",
+  "mode": "story-branch",
+  "branch": "cursor/expand-a-list-property-into-a-single-list-of-cli",
+  "host": "cursor",
+  "model": "auto"
+}
