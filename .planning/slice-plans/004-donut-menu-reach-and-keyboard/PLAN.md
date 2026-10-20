@@ -265,3 +265,7 @@ owns Resume availability and first position, while `DonutMenu.spec` keeps
 choosing Resume; `GlobalBar.spec` keeps launcher placement as one test over
 signed-in and signed-out. No observation is lost; list any assertion dropped
 as a duplicate with the test that still covers it in the slice's acceptance.
+
+## Execution complete
+
+Product advice: no change to backlog priorities; SEED-078#story-2 (search inside the Donut menu) is unaffected by this correction. The one real-service audio E2E scenario (`record_live_audio_with_real_open_ai_service.feature`) once returned a Chinese transcription of English speech (CI run 39363989869); wrap-up may consider whether that test should pin the transcription language. `frontend/tests/pages/BookReadingPage.spec.ts` (287 lines) exceeds the 250-line test guidance and is a candidate for a cohesive split.
