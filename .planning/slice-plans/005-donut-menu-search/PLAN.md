@@ -236,6 +236,15 @@ search → the panel ends within the window and scrolls, keeping the field and
 results reachable; wide windows stay anchored below the launcher. Story
 scope: panel fits the window.
 
+## Execution complete
+
+Product advice: no change to backlog order; SEED-078 story-3 and story-4 stay
+queued. The learning hypothesis (a search field at the bottom of the panel is
+as easy to find as the bar's magnifier was) awaits the owner's observation in
+use, not new work. Wrap-up carries forward that plan 004 (SEED-078#correction-1)
+edits the same panel and test support: whichever lands second reruns the Tab
+order case in `DonutMenu.search.spec.ts` and `DonutMenu.layout.spec.ts`.
+
 ## Story obligations
 
 ### G1. History pick entering search is untested

@@ -5,7 +5,7 @@ responses under observation live in the [watch list](https://github.com/terryyin
 Detailed observations, original releases and qualified inferences are retained
 in the linked Open Dough catalog. Unknown execution provenance remains unknown.
 
-- Highest allocated local number: 253. Removed numbers are never reused.
+- Highest allocated local number: 254. Removed numbers are never reused.
 - Full source recovery before this cleanup: `0a8878e98be76b8e92203515d8f4719489b24169:DearDough.md`.
 - Full source recovery before name adoption and compaction: `234f141b41332715edd5e4384a425bcb8f26e718:DearDough.md`; complete supplied evidence retained in Open Dough `dbe36711c0e4ff9421bc28afc53cb7477203e704:docs/maintainer/findings/`.
 - Project-owned findings remain in [Donut Retrospective Findings](DonutRetrospectiveFindings.md); their ownership review is unchanged.
@@ -273,3 +273,19 @@ When the always-visible menu was replaced by a panel that is rendered only while
   - Evidence: CI run 39354041674 attempt 1 on 448d6fd, `recall/browse_answer_and_notes_while_recalling.feature` "Unable to find a label with the text of: Resume"; repaired in 0202d4a (`e2e_test/start/pageObjects/recallPage.ts`).
   - Observed effect: one CI failure and one repair cycle (stash, repair agent, refactor pass, publication).
   - Inference: the search covered the helpers being retargeted, but not every lookup of the moved control's accessible names. The relationship to ODF-272 (shared accessible-name consumers missed) is likely but unconfirmed.
+
+<a id="dd-254"></a>
+
+## DD-254 — A planned removal sweep promised an empty reading for a term that already matched retained code
+
+The plan's acceptance sweep for a removed control listed `dialog\[open\]` among the removed names and promised the search "returns nothing". At the planning revision that term already matched seven lines in code the story keeps (toolbar search dialog specs and a refine-note modal check). The sweep could never come back empty, so the implementer had to judge the term too broad and record an amended reading at acceptance.
+
+### Occurrences
+- Execution: SEED-078#story-2 (`.planning/slice-plans/005-donut-menu-search/PLAN.md`, first implementation commit b94786fa6a)
+  - Timestamp: 2026-10-20T12:12:14+09:00
+  - Tool: Claude Code
+  - Model: claude-opus-5-5
+  - Open Dough release: 0.3.66
+  - Evidence: slice 4 Proof in the plan at 9d4ad6c321 lists `dialog\[open\]` in the sweep that "returns nothing"; `git grep 'dialog\[open\]' 2c6a1ef05d` (preparation revision) shows seven hits outside the removed `expectClosed`, in `SearchDialog.navigation.spec.ts` and `assimilationPage/shared.ts`; the slice 4 Accepted note in commit 95473a8e63 records that the term "was too broad".
+  - Observed effect: the sweep reading was narrowed at acceptance. The cost was one judgement and one plan note; no defect.
+  - Inference: the planning premise check confirmed who called the removed helper but did not run the sweep pattern itself. This is probably related to ODF-074 (premises not checked before planning), but the match is uncertain: here the unchecked premise was a sweep term, not a caller or host fact.
