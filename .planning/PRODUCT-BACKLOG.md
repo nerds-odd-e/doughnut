@@ -6,8 +6,6 @@ Make deliberately captured knowledge more useful through learning and refinement
 
 ## Taken
 
-- [Expand a list property into a single list of clickable values](seeds/SEED-064-note-properties-fixes.md#story-7) — SEED-064#story-7 ([plan](slice-plans/001-expanded-property-values/PLAN.md))
-
 ## Backlog list
 
 - [Generate focus-note questions with relevant supporting passages](seeds/SEED-007-per-concept-prompt-splitting-single-note-qg.md#story-1) — SEED-007#story-1

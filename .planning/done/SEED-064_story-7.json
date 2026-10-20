@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "identity": "SEED-064#story-7",
+  "title": "Expand a list property into a single list of clickable values",
+  "completedAt": "2026-10-20T00:49:52.691Z",
+  "developer": "Terry Yin",
+  "agent": "Anri-chan",
+  "host": "cursor",
+  "model": "auto"
+}
