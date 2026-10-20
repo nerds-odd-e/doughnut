@@ -1,9 +1,0 @@
-{
-  "schemaVersion": 1,
-  "agent": "Tsubomi-chan",
-  "email": "tsubomi-chan@example.org",
-  "identity": "SEED-078#story-4",
-  "mode": "story-branch",
-  "branch": "claude/read-and-edit-complete-property-values-comfortab",
-  "host": "claude"
-}
