@@ -20,15 +20,6 @@
         />
       </button>
       <div
-        v-if="currentNotebookRealm && isMdOrLarger"
-        class="flex-1 min-w-12 max-w-[40%] flex items-center"
-      >
-        <NotebookLocation
-          :notebook-realm="currentNotebookRealm"
-          :ancestor-folders="breadcrumbFolders"
-        />
-      </div>
-      <div
         ref="pageBarTarget"
         class="contents"
       />
@@ -48,7 +39,7 @@
       <SidebarDrawer
         v-model:opened="sidebarOpened"
         :is-md-or-larger="isMdOrLarger"
-        class="bg-base-200 w-72 transition-all ease-in-out flex flex-col overflow-x-visible"
+        class="bg-base-200 w-72 shrink-0 transition-all ease-in-out flex flex-col overflow-x-visible"
       >
         <Sidebar
           v-if="currentNotebookId != null"
@@ -58,11 +49,24 @@
           :notebook-readonly="currentNotebookRealm?.readonly === true"
           :active-folder-realm="activeFolderRealm"
           :breadcrumb-folders="breadcrumbFolders"
-        />
+        >
+          <template #location>
+            <NotebookLocation
+              v-if="currentNotebookRealm && isMdOrLarger && sidebarOpened"
+              :notebook-realm="currentNotebookRealm"
+              :ancestor-folders="breadcrumbFolders"
+            />
+          </template>
+        </Sidebar>
       </SidebarDrawer>
       <main
         class="flex-1 px-4 container mx-auto overflow-y-auto"
       >
+        <NotebookLocation
+          v-if="currentNotebookRealm && isMdOrLarger && !sidebarOpened"
+          :notebook-realm="currentNotebookRealm"
+          :ancestor-folders="breadcrumbFolders"
+        />
         <nav
           v-if="showRelocatedNoteCreationInMainColumn && currentNotebookId != null"
           :class="[noteChromeToolbarNavClass, 'overflow-visible mb-2']"

@@ -10,6 +10,7 @@
       :active-folder-realm="activeFolderRealm"
       :breadcrumb-folders="breadcrumbFolders"
     />
+    <slot name="location" />
     <div
       ref="treeScrollRef"
       class="sidebar-tree-scroll overflow-y-auto flex-1 min-h-0"

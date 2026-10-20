@@ -176,7 +176,7 @@ coordinator's required selective formatter.
 
 ### 2. Keep location stable with docked or hidden contents
 Type: Behavior
-Status: planned
+Status: done
 
 Behavior: With contents docked, scrolling the populated tree leaves the location
 header visible above it; navigating or sorting keeps the active row discoverable.
@@ -197,6 +197,19 @@ and verify minimal reveal as well as the location rectangle during scrolling.
 Sizing: 5–8 minutes including proof/cleanup. One responsive ownership rule covers
 docked and hidden states; splitting them would temporarily strand location when
 the sidebar closes. The independent toolbar alignment belongs to slice 4.
+
+Accepted 2026-10-21: the workspace supplies location through Sidebar's slot
+outside its scrollport, or above main when hidden. `NotebookWorkspaceContentsLocation`
+uses 40 real rows at 768/1280 and observes fixed location geometry, full active
+row after navigation/sorting, less-than-one-row reveal for a half-clipped row,
+ancestor navigation through the main fallback and pending same-notebook context.
+Context's notebook-text width assertion and inspected `sidebar-location-*-active-tree.png`
+screenshots resolve G1. The focused command passed 68 tests in 16 files:
+`CURSOR_DEV=true nix develop -c pnpm frontend:test tests/layouts/NotebookWorkspaceContext.spec.ts tests/layouts/NotebookWorkspaceLocation.spec.ts tests/layouts/NotebookWorkspaceContentsLocation.spec.ts tests/layouts/NotebookWorkspaceHeader.spec.ts tests/layouts/NotebookWorkspaceHeader.dictation.spec.ts tests/notes/NoteToolbar.overflow.spec.ts tests/notes/sidebar`.
+Both required typechecks passed. Independent refactoring made no edits and
+identified the shared fixture's assimilation consumer; the additional command
+`CURSOR_DEV=true nix develop -c pnpm frontend:test tests/layouts/NotebookWorkspaceAssimilation.spec.ts`
+passed seven tests before delivery. Coordinator selective formatting passed.
 
 ### 3. Navigate from location inside the phone contents drawer
 Type: Behavior
@@ -306,6 +319,10 @@ CI source: GitHub Actions `nerds-odd-e/doughnut`, verified selector `ci.yml`
 Observer: coordinator `aino-sidebar-44097ed9`, directory
 `/tmp/dough-ci-501/watch-gMU34E`, PID 27009, stream session 56944, yielded cell 11.
 The startup claim's trunk CI is unobserved by this branch observer.
+Slice 1 accepted on the remote story branch at
+`9ee121fdfad67f4aeab513c8bc09e960c17939c0`, suffix base
+`f2a1dbf31d687376e64f9e1568e477d8ed230669`; observation reused this stream.
+The post-format slice-1 Vite build passed with generated declarations intact.
 
 - The owner already selected the Sidebar header design; no new product decision
   is pending. Complete-name disclosure and responsive location are required.
@@ -325,9 +342,14 @@ The startup claim's trunk CI is unobserved by this branch observer.
 ### G1. Compact notebook identity at the dock breakpoint
 Reported: slice 1 — "At 768 compact in current old bar allocation shrinks to icon + 'Frui…', hiding notebook text."
 Story clause: "Show notebook identity above the folder trail as in the approved design."
-Disposition: receiving slice 2
+Disposition: proved by slice 2: NotebookWorkspaceContext.spec.ts "shows notebook identity" asserts rendered text width above 180px at 768/1280; inspected sidebar-location-768-active-tree.png shows readable notebook identity above the tree.
 
 ### G2. Activate retained realm destinations through the disclosure
 Reported: slice 1 — "Activating circle/Bazaar realm links was not newly exercised by this delegated unit-test command."
 Story clause: "Preserve notebook-root and ancestor-folder navigation, including circle or Bazaar context where applicable."
 Disposition: receiving slice 4
+
+### G3. Shared mount helper assimilation consumer
+Reported: slice 2 — "NotebookWorkspaceAssimilation.spec.ts consumes the modified mount helper and observes navigation/property-panel visibility; it was outside the supplied command."
+Story clause: "retain the independent sidebar toggle, and preserve the active navigation control."
+Disposition: proved by slice 2: NotebookWorkspaceAssimilation.spec.ts passed seven tests with the changed viewport-bounded mount helper; active navigation and property-panel visibility observations remain valid.

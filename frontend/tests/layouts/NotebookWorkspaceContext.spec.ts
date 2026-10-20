@@ -7,7 +7,6 @@ import {
   chooseFromMore,
   clickPageBarCommand,
   commandsSitInPageBar,
-  noteCommandEls,
   pageBarCommand,
   pageBarEl,
 } from "./notebookWorkspaceHeaderTestSupport"
@@ -83,18 +82,21 @@ describe("Notebook workspace folder context", () => {
   )
 
   it.each([768, 1280])(
-    "shows a long trail in the bar before the commands at %ipx while tools keep their space",
+    "shows notebook identity above the docked tree at %ipx while tools keep their space",
     async (width) => {
       ;({ wrapper } = await mountDeepNote(width))
 
       await vi.waitFor(() => {
         const context = rect(notebookLocationControl())
         const bar = rect(pageBarEl())
-        expect(context.top).toBeGreaterThanOrEqual(bar.top)
-        expect(context.bottom).toBeLessThanOrEqual(bar.bottom)
-        expect(context.right).toBeLessThanOrEqual(
-          rect(noteCommandEls()[0]!).left
+        expect(context.top).toBeGreaterThanOrEqual(bar.bottom)
+        expect(context.bottom).toBeLessThanOrEqual(
+          rect(document.querySelector(".sidebar-tree-scroll")!).top
         )
+        expect(contentsPane().contains(notebookLocationControl())).toBe(true)
+        const notebookName =
+          notebookLocationControl().querySelector(".truncate")!
+        expect(rect(notebookName).width).toBeGreaterThan(180)
         expect(toolsFitInBar(width)).toBe(true)
       })
     }
