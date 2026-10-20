@@ -11,6 +11,7 @@ Make deliberately captured knowledge more useful through learning and refinement
 
 ## Backlog list
 
+- [Refresh recall at half-day rollover and choose whether to start the daily probe](seeds/SEED-079-half-day-recall-refresh.md#story-1) — SEED-079#story-1
 - [Focus on note content while revealing details when needed](seeds/SEED-078-cohesive-note-workspace.md#story-5) — SEED-078#story-5
 - [Generate focus-note questions with relevant supporting passages](seeds/SEED-007-per-concept-prompt-splitting-single-note-qg.md#story-1) — SEED-007#story-1
 - [Decide whether an acceptance-test review procedure benefits from Donut notes](seeds/SEED-074-knowledge-to-capability.md#story-1) — SEED-074#story-1
