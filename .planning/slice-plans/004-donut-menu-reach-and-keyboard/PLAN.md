@@ -7,10 +7,12 @@
 ## Source and provenance
 
 Bounded correction handed off by the execution retrospective of
-[SEED-078#story-1](../../seeds/SEED-078-cohesive-note-workspace.md#story-1),
-executed through [plan 003](../003-donut-command-center/PLAN.md) in commits
+SEED-078#story-1 (`.planning/seeds/SEED-078-cohesive-note-workspace.md#story-1`
+at commit `e1b635a22b`), executed through plan 003
+(`.planning/slice-plans/003-donut-command-center/PLAN.md` at commit
+`e1b635a22b`) in commits
 `15b6077`, `9fbfd1f`, `e4227c4`, `448d6fd`, and `0202d4a` (claim `74e9a1b`).
-The original promises are the story 1 section of the seed. This correction
+The original promises are that story 1 section, recoverable at `e1b635a22b`. This correction
 adds no feature promise.
 
 ## Goal and scope
