@@ -7,6 +7,10 @@ import makeMe from "donut-test-fixtures/makeMe"
 import { mockSdkService } from "@tests/helpers"
 import { settleScheduledAutofocus } from "@tests/helpers/focusTargetTestSupport"
 import { advanceSearchDebounce } from "@tests/helpers/searchDebounceTestSupport"
+import {
+  resetSearchKeyHistory,
+  seedLocalSearchKeyHistory,
+} from "@tests/helpers/searchKeyHistoryTestSupport"
 import { noteShowLocation } from "@/routes/noteShowLocation"
 import { flushPromises } from "@vue/test-utils"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
@@ -78,6 +82,7 @@ describe("Donut menu search", () => {
     afterEach(() => {
       vi.runOnlyPendingTimers()
       vi.useRealTimers()
+      resetSearchKeyHistory()
     })
 
     it("shows Matches, and the panel stays open across scope toggles and list switches", async () => {
@@ -101,6 +106,35 @@ describe("Donut menu search", () => {
 
       expect(panel()).not.toBeNull()
       expect(recentHeading()).toBeInTheDocument()
+    })
+
+    it("enters search from a picked history key, keeping the panel open", async () => {
+      seedLocalSearchKeyHistory(["newer", "older"])
+      const searchForRelationshipTarget = mockSdkService(
+        SearchController,
+        "searchForRelationshipTarget",
+        [
+          {
+            hitKind: "NOTE" as const,
+            noteSearchResult: makeMe.aNoteSearchResult.title("Older").please(),
+          },
+        ]
+      )
+      await openDonutMenu()
+      await fireEvent.click(screen.getByTestId("search-key-history-trigger"))
+      await flushPromises()
+      await fireEvent.click(screen.getByTestId("search-key-history-item-1"))
+      await advanceSearchDebounce()
+
+      expect(searchField()).toHaveValue("older")
+      expect(panel()).not.toBeNull()
+      expect(searchForRelationshipTarget).toHaveBeenCalledWith(
+        expect.objectContaining({
+          body: expect.objectContaining({ searchKey: "older" }),
+        })
+      )
+      expect(screen.getByText("Search result")).toBeInTheDocument()
+      expect(screen.getByText("Older")).toBeInTheDocument()
     })
 
     it("opens a Matches title and closes the panel", async () => {

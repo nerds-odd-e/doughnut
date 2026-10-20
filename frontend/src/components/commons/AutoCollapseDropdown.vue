@@ -2,6 +2,7 @@
   <details
     ref="detailsRef"
     data-auto-collapse-dropdown
+    :data-dropdown-portal-owner="portalId"
     :class="{ 'daisy-dropdown-open': open }"
     v-bind="$attrs"
     @click="onClick"
@@ -13,10 +14,10 @@
 
 <script setup lang="ts">
 import { provide, ref, useId } from "vue"
-import { dropdownPortalPanelSelector } from "@/composables/dropdownPortalContext"
 import { useAutoCollapseDetails } from "@/composables/useAutoCollapseDetails"
 import {
   dropdownPortalContextKey,
+  dropdownPortalPanelSelector,
   type DropdownPortalContext,
 } from "@/composables/dropdownPortalContext"
 

@@ -115,7 +115,10 @@ Take.
   the key is left to the dialog untouched (story boundary assumption).
 - The shared outside-click rule in `useAutoCollapseDetails` treats a click
   inside a portaled panel whose owning dropdown is inside this details as
-  inside. Implemented once in the composable, not as a Donut-menu case.
+  inside. Implemented once in the composable, not as a Donut-menu case: each
+  `AutoCollapseDropdown` marks its details `data-dropdown-portal-owner=<portalId>`
+  beside the panel's `data-dropdown-portal-for`, both read through
+  `dropdownPortalContext.ts`.
 - The panel gets a max height of the window below the bar with vertical
   scrolling; the phone sheet and wide anchoring rules stay.
 - The bar's `PopButton`, its `SearchForm` import, `searchNotePopButtonRef`,
@@ -214,7 +217,7 @@ repeated until nothing is orphaned.
 
 ### 5. Picking a history key keeps the panel open
 Type: Behavior
-Status: planned
+Status: done
 Proof: `tests/composables/useAutoCollapseDetails.spec.ts` new case: a click inside a portaled panel owned by a dropdown nested in the details does not close it, while a click in an unrelated portaled panel still does (fails first); `DonutMenu.search.spec.ts`: open the history control, pick a seeded key → the field reads it, the panel stays open, and Matches for it appear (fails first). `tests/wiki-link-or-relationship/SearchDialog.searchKeyHistory.spec.ts` green; typecheck.
 
 Behavior: search entered → press the history control and pick a key → the
@@ -236,7 +239,7 @@ scope: panel fits the window.
 ### G1. History pick entering search is untested
 Reported: slice 1 — "The history-pick route to entering search has no test in this slice."
 Story clause: "Picking a history key, toggling a scope control, or switching Matches/Recent keeps the panel open"
-Disposition: receiving slice 5
+Disposition: proved by slice 5: `DonutMenu.search.spec.ts` "enters search from a picked history key, keeping the panel open" opens the panel without focusing the field, picks "older", and observes the field value, the open panel, the search call for "older", and the Matches hit
 
 ### G3. Touch primer on the bar's search button is untested
 Reported: slice 3 — "The deleted touch-primer case checked that tapping the bar's search button focuses the soft-keyboard primer straight away, then the field. No new test takes this over"

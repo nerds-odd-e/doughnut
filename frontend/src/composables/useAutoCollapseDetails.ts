@@ -1,6 +1,7 @@
 import { onMounted, onUnmounted, type Ref } from "vue"
 import {
-  dropdownPortalPanelSelector,
+  dropdownPortalOwnerSelector,
+  enclosingPortalPanelId,
   eventClickTarget,
 } from "./dropdownPortalContext"
 
@@ -21,12 +22,14 @@ export function useAutoCollapseDetails(
     return targetModal != null && targetModal !== ownModal
   }
 
+  /** Its own portaled panel, or one whose owning dropdown sits inside this details. */
   const isInsidePortaledPanel = (target: EventTarget | null) => {
-    if (portalId == null) return false
+    const panelFor = enclosingPortalPanelId(eventClickTarget(target))
+    if (panelFor === undefined) return false
     return (
-      eventClickTarget(target)?.closest(
-        dropdownPortalPanelSelector(portalId)
-      ) != null
+      panelFor === portalId ||
+      detailsRef.value?.querySelector(dropdownPortalOwnerSelector(panelFor)) !=
+        null
     )
   }
 
