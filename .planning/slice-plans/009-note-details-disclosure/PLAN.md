@@ -150,8 +150,17 @@ Size hypothesis: 4–5 minutes.
 
 ### 5. Read the note in a quiet, bounded column
 Type: Behavior
-Status: planned
+Status: done
 Proof: Slice 5 rows in the proof table; notes suite below; documentation and the removal reading.
+
+Accepted: focused browser command passed 106 files / 605 tests and both
+typechecks passed. `NoteTextContent.readingLayout.spec.ts` observes actual
+375/1440px geometry, 17px/1.55 typography, bounded long text, a complete date
+and unfinished cue beside truncated keys, and muted details in both themes.
+Local `note_property_layout.feature` passed all 12 scenarios. Independent
+refactoring removed redundant local CSS supplied by shared styles and reran
+the five layout tests green; unaffected proof remains valid. Documentation
+describes the current disclosure and measure. Selective formatting passed.
 
 Behavior: At phone width the surface has comfortable side margins, roughly
 17px body text with 1.5–1.6 line spacing, and no sideways scroll; in a wide
@@ -200,6 +209,17 @@ delivery. Every leaf was reviewed for independent outcomes, proof ownership,
 and cumulative design: slice 1 is the only Structure leaf and sits directly
 before the Behavior it enables. No slice-plan refinement is needed; no
 remaining blocking concern was identified.
+
+## Removal acceptance reading
+
+2026-10-20, base `f6ba658ab7bd80016b3aec89b17683184d1bb5f2` plus slice 5:
+`git ls-files -co --exclude-standard -z | xargs -0 rg -n -e 'NoteRecentUpdateIndicator' -e 'note-recent-update-indicator' -e 'toLocalDateString' -e 'Created:' -e 'Last updated:'`.
+This reading covered all tracked and unignored new product, tests, docs,
+agent guidance, and generated files. Removed names matched only dated seed/
+preparation evidence and active plan removal instructions, retained until
+ordinary closure. `Created:` remains in the replacement disclosure and an
+unrelated failure-report field. No active consumer or old bottom dates block
+remains; no absence test was added.
 
 ## Story obligations
 

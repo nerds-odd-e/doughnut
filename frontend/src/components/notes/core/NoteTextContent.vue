@@ -19,18 +19,19 @@
   <button
     type="button"
     data-testid="note-details-toggle"
-    class="daisy-btn daisy-btn-ghost daisy-btn-sm mb-2 h-auto min-h-8 pointer-coarse:min-h-11 text-base-content/60 justify-start text-left font-normal"
+    class="note-details-toggle daisy-btn daisy-btn-ghost daisy-btn-sm mb-2 h-auto min-h-8 pointer-coarse:min-h-11 text-base-content/60 justify-start text-left font-normal"
     :aria-expanded="revealed"
     @click="revealed = !revealed"
   >
     <ChevronDown v-if="revealed" class="size-4 shrink-0" aria-hidden="true" />
     <ChevronRight v-else class="size-4 shrink-0" aria-hidden="true" />
-    <span v-if="propertyKeys.length || !readonly" data-testid="note-property-summary">
+    <span v-if="propertyKeys.length || !readonly" data-testid="note-property-summary" class="note-property-summary">
       {{ propertyKeys.length ? `Properties: ${propertyKeys.join(', ')}` : 'No properties' }}
     </span>
-    <span v-if="unfinishedEdit?.()" data-testid="note-details-unfinished-edit">Unfinished property edit</span>
+    <span v-if="unfinishedEdit?.()" data-testid="note-details-unfinished-edit" class="shrink-0">Unfinished edit</span>
     <span
       data-testid="note-updated-at"
+      class="shrink-0"
       :data-freshness="freshness"
       :style="{ opacity: freshness / 100 }"
     >
@@ -127,3 +128,39 @@ defineExpose({
   beginTitleDictation: () => titleEditor.value!.beginDictation(),
 })
 </script>
+
+<style scoped lang="scss">
+.note-reading-surface {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 48rem;
+  min-width: 0;
+  margin-inline: auto;
+  padding: 1rem;
+  overflow-wrap: anywhere;
+}
+
+.note-details-toggle {
+  display: flex;
+  flex-wrap: nowrap;
+  width: 100%;
+  gap: 0.375rem;
+  padding-inline: 0;
+  font-size: 0.75rem;
+  white-space: nowrap;
+}
+
+.note-property-summary {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.note-content :deep(.ql-editor) {
+  font-size: 1.0625rem;
+  padding-inline: 0;
+  line-height: 1.55;
+  overflow-wrap: anywhere;
+}
+
+</style>
