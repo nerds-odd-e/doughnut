@@ -61,7 +61,9 @@
       </div>
     </template>
   </GlobalBar>
+  <ContentLoader v-if="catalogItems === undefined" />
   <main
+    v-else
     class="container mx-auto px-4 py-6"
     :class="
       notebooksLayout === 'grid' ? 'max-w-7xl' : 'max-w-3xl'
@@ -145,7 +147,7 @@
 
 <script setup lang="ts">
 import type { PropType } from "vue"
-import { computed, onMounted, ref } from "vue"
+import { computed, ref, watch } from "vue"
 import { LayoutGrid, List, Search, X } from "@lucide/vue"
 import type {
   Notebook,
@@ -163,11 +165,13 @@ import { filterNotebookCatalogItems } from "@/components/notebook/filterNotebook
 import GlobalBar from "@/components/toolbars/GlobalBar.vue"
 import AutoCollapseDropdown from "@/components/commons/AutoCollapseDropdown.vue"
 import PeerSortDropdownMenu from "@/components/commons/PeerSortDropdownMenu.vue"
+import ContentLoader from "@/components/commons/ContentLoader.vue"
 
 const props = defineProps({
+  // Undefined while the catalog loads.
   catalogItems: {
     type: Array as PropType<NotebookCatalogEntry[]>,
-    required: true,
+    required: false,
   },
   subscriptions: {
     type: Array as PropType<SubscriptionForNotebooksListing[]>,
@@ -205,7 +209,7 @@ const filterInputRef = ref<HTMLInputElement | null>(null)
 const filteredCatalogItems = computed(() =>
   sortNotebookCatalogByPeerSpec(
     filterNotebookCatalogItems(
-      props.catalogItems,
+      props.catalogItems ?? [],
       filterText.value.trim().toLowerCase()
     ),
     peerSortSpec.value
@@ -216,9 +220,6 @@ const clearFilter = () => {
   filterText.value = ""
 }
 
-onMounted(() => {
-  if (props.catalogItems.length > 0) {
-    filterInputRef.value?.focus()
-  }
-})
+// The filter appears once a non-empty catalog has loaded.
+watch(filterInputRef, (input) => input?.focus())
 </script>

@@ -2,10 +2,17 @@ import BookReadingPdf from "@/components/book-reading/BookReadingPdf.vue"
 import GlobalApiLoadingModal from "@tests/helpers/GlobalApiLoadingModal"
 import helper from "@tests/helpers"
 import makeMe from "donut-test-fixtures/makeMe"
-import { defineComponent } from "vue"
+import { bookReadingBarTargetKey } from "@/composables/bookReadingBarTarget"
+import { type App, defineComponent, ref } from "vue"
+
+// Stands in for the book reader, which hosts the reading view's book controls in its page bar.
+const bookReaderBarPlugin = {
+  install(app: App) {
+    app.provide(bookReadingBarTargetKey, ref(document.createElement("div")))
+  },
+}
 
 export const bookReadingPdfStubs = {
-  GlobalBar: { template: "<div><slot /></div>" },
   PdfBookViewer: { template: '<div data-testid="pdf-stub" />' },
   ReadingControlPanel: true,
   CurrentBlockNavigationBar: true,
@@ -31,6 +38,7 @@ export function mountBookReadingPdf(contentProps: BookReadingPdfProps) {
   return helper
     .component(BookReadingPdf)
     .withRouter()
+    .withPlugin(bookReaderBarPlugin)
     .withProps(contentProps)
     .mount({
       global: {
@@ -59,6 +67,7 @@ export function mountBookReadingWithGlobalModal(
   return helper
     .component(Host)
     .withRouter()
+    .withPlugin(bookReaderBarPlugin)
     .withProps({ contentProps })
     .mount({
       global: {

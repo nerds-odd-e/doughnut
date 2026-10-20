@@ -8,7 +8,11 @@ import {
   clickBookBlockAndExpectSelection,
   emitViewportAndSettleCurrentBlock,
 } from "./bookReadingPageInteractionTestSupport"
-import { donutMenuLaunchersIn } from "@tests/toolbars/donutMenuTestSupport"
+import {
+  donutMenuLaunchersIn,
+  donutMenuPanelIn,
+  openDonutMenuIn,
+} from "@tests/toolbars/donutMenuTestSupport"
 import { spyOnScrollToBookNavTarget } from "./bookReadingPagePdfViewerTestSupport"
 import {
   type BookReadingPageWrapper,
@@ -115,6 +119,32 @@ describe("BookReadingPage", () => {
         true
       )
       expect(wrapper.find(".daisy-loading-spinner").exists()).toBe(false)
+      expect(donutMenuLaunchersIn(wrapper)).toHaveLength(1)
+    })
+
+    it("keeps the Donut menu open when the book file finishes loading", async () => {
+      stubGetBookPlain(notebookId)
+      let resolveFetch!: (r: Response) => void
+      vi.spyOn(globalThis, "fetch").mockImplementation(
+        () =>
+          new Promise<Response>((resolve) => {
+            resolveFetch = resolve
+          })
+      )
+      const wrapper = mountBookReadingPage(notebookId)
+      await flushPromises()
+      await openDonutMenuIn(wrapper)
+      expect(donutMenuPanelIn(wrapper).exists()).toBe(true)
+
+      resolveFetch(
+        new Response(getTopMathsPdfBytes().slice(0), {
+          status: 200,
+          headers: { "Content-Type": "application/pdf" },
+        })
+      )
+      await waitForPdfViewer(wrapper)
+
+      expect(donutMenuPanelIn(wrapper).exists()).toBe(true)
       expect(donutMenuLaunchersIn(wrapper)).toHaveLength(1)
     })
 

@@ -3,12 +3,17 @@ import { beforeEach, describe, expect, it, vi } from "vitest"
 import makeMe from "donut-test-fixtures/makeMe"
 import helper, { wrapSdkError } from "@tests/helpers"
 import { NotebookController } from "@generated/donut-backend-api/sdk.gen"
-import { donutMenuLaunchersIn } from "@tests/toolbars/donutMenuTestSupport"
+import {
+  donutMenuLaunchersIn,
+  donutMenuPanelIn,
+  openDonutMenuIn,
+} from "@tests/toolbars/donutMenuTestSupport"
 import { fireEvent, screen } from "@testing-library/vue"
 import { flushPromises } from "@vue/test-utils"
 import {
   clearNotebooksPageStorage,
   mockMyNotebooks,
+  mockMyNotebooksLoading,
   mountNotebooksPage,
 } from "./notebooksPageTestSupport"
 
@@ -28,6 +33,20 @@ describe("Notebooks Page", () => {
       new Promise(() => undefined) as never
     )
     const wrapper = await mountNotebooksPage()
+    expect(donutMenuLaunchersIn(wrapper)).toHaveLength(1)
+  })
+
+  it("keeps the Donut menu open when the catalog finishes loading", async () => {
+    const finishLoading = mockMyNotebooksLoading({ notebooks: [] })
+    const wrapper = await mountNotebooksPage()
+    await openDonutMenuIn(wrapper)
+    expect(donutMenuPanelIn(wrapper).exists()).toBe(true)
+
+    finishLoading()
+    await flushPromises()
+
+    expect(wrapper.get("h1").text()).toBe("Notebooks")
+    expect(donutMenuPanelIn(wrapper).exists()).toBe(true)
     expect(donutMenuLaunchersIn(wrapper)).toHaveLength(1)
   })
 

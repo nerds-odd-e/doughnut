@@ -1,11 +1,6 @@
 <template>
-  <!-- Until the catalog loads, its view, which carries the bar with the catalog controls, is absent. -->
-  <template v-if="catalogItems === undefined">
-    <GlobalBar />
-    <ContentLoader />
-  </template>
   <NotebooksPageView
-    v-else-if="user !== undefined"
+    v-if="user !== undefined"
     :catalog-items="catalogItems"
     :subscriptions="subscriptions ?? []"
     :user="user"
@@ -19,8 +14,6 @@ import { inject, onMounted, type Ref } from "vue"
 import type { User } from "@generated/donut-backend-api"
 import { useNotebookCatalog } from "@/composables/useNotebookCatalog"
 import NotebooksPageView from "./NotebooksPageView.vue"
-import ContentLoader from "@/components/commons/ContentLoader.vue"
-import GlobalBar from "@/components/toolbars/GlobalBar.vue"
 
 const user = inject<Ref<User | undefined>>("currentUser")
 const { catalogItems, subscriptions, fetchData, handleNotebookUpdated } =

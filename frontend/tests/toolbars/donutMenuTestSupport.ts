@@ -38,6 +38,14 @@ export const launcher = () => screen.getByRole("button", { name: "Donut menu" })
 export const donutMenuLaunchersIn = (wrapper: Pick<VueWrapper, "findAll">) =>
   wrapper.findAll('[role="button"][aria-label="Donut menu"]')
 
+export const donutMenuPanelIn = (wrapper: Pick<VueWrapper, "find">) =>
+  wrapper.find('[role="region"][aria-label="Donut menu panel"]')
+
+export const openDonutMenuIn = async (wrapper: Pick<VueWrapper, "findAll">) => {
+  await donutMenuLaunchersIn(wrapper)[0]!.trigger("click")
+  await flushPromises()
+}
+
 export const pressLauncher = async () => {
   await fireEvent.click(launcher())
   await flushPromises()

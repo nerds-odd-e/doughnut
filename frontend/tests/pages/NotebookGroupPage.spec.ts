@@ -3,8 +3,15 @@ import { describe, expect, it } from "vitest"
 import makeMe from "donut-test-fixtures/makeMe"
 import helper from "@tests/helpers"
 import { flushPromises } from "@vue/test-utils"
-import { donutMenuLaunchersIn } from "@tests/toolbars/donutMenuTestSupport"
-import { mockMyNotebooks } from "./notebooksPageTestSupport"
+import {
+  donutMenuLaunchersIn,
+  donutMenuPanelIn,
+  openDonutMenuIn,
+} from "@tests/toolbars/donutMenuTestSupport"
+import {
+  mockMyNotebooks,
+  mockMyNotebooksLoading,
+} from "./notebooksPageTestSupport"
 
 const mountGroupPage = async (groupId: number) => {
   const wrapper = helper
@@ -33,6 +40,30 @@ describe("Notebook group page", () => {
     const wrapper = await mountGroupPage(7)
 
     expect(wrapper.get("h1").text()).toBe("Languages")
+    expect(donutMenuLaunchersIn(wrapper)).toHaveLength(1)
+  })
+
+  it("keeps the Donut menu open when the group finishes loading", async () => {
+    const member = makeMe.aNotebook.please()
+    const finishLoading = mockMyNotebooksLoading({
+      notebooks: [{ notebook: member }],
+      catalogItems: [
+        makeMe.notebookCatalogGroup
+          .id(7)
+          .name("Languages")
+          .membersFromNotebooks([member])
+          .please(),
+      ],
+    })
+    const wrapper = await mountGroupPage(7)
+    await openDonutMenuIn(wrapper)
+    expect(donutMenuPanelIn(wrapper).exists()).toBe(true)
+
+    finishLoading()
+    await flushPromises()
+
+    expect(wrapper.get("h1").text()).toBe("Languages")
+    expect(donutMenuPanelIn(wrapper).exists()).toBe(true)
     expect(donutMenuLaunchersIn(wrapper)).toHaveLength(1)
   })
 

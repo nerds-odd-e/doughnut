@@ -1,6 +1,10 @@
 <template>
-  <!-- Until a book is ready its reading shell, which carries the bar with the book's own controls, is absent. -->
-  <GlobalBar v-if="!bootstrap" />
+  <GlobalBar>
+    <div
+      ref="barTarget"
+      class="contents"
+    />
+  </GlobalBar>
   <template v-if="book">
     <div
       v-if="fileLoading"
@@ -45,6 +49,8 @@ import BookReadingPdf from "@/components/book-reading/BookReadingPdf.vue"
 import ContentLoader from "@/components/commons/ContentLoader.vue"
 import GlobalBar from "@/components/toolbars/GlobalBar.vue"
 import { useBookReadingBootstrap } from "@/composables/useBookReadingBootstrap"
+import { bookReadingBarTargetKey } from "@/composables/bookReadingBarTarget"
+import { provide, ref } from "vue"
 
 const props = defineProps({
   notebookId: { type: Number, required: true },
@@ -52,4 +58,7 @@ const props = defineProps({
 
 const { book, fileLoading, fileError, bootstrap, mergeBookIntoBootstrap } =
   useBookReadingBootstrap(props.notebookId)
+
+const barTarget = ref<HTMLElement | null>(null)
+provide(bookReadingBarTargetKey, barTarget)
 </script>

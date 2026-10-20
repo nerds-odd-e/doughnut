@@ -1,33 +1,12 @@
 <template>
-  <!-- Until the group is found, its view, which carries the bar with the catalog controls, is absent. -->
-  <GlobalBar v-if="resolvedGroup === undefined" />
-  <ContentLoader v-if="catalogItems === undefined" />
   <NotebookGroupPageView
-    v-else-if="user !== undefined && resolvedGroup !== undefined"
+    v-if="user !== undefined"
     :group="resolvedGroup"
     :subscriptions="subscriptions ?? []"
     :user="user"
     @notebook-updated="handleNotebookUpdated"
     @refresh="fetchData"
   />
-  <main
-    v-else-if="user !== undefined"
-    class="container mx-auto max-w-3xl px-4 py-6"
-  >
-    <div
-      class="rounded-box border border-dashed border-base-300 bg-base-200/30 px-6 py-10 text-center"
-    >
-      <p class="m-0 text-base text-base-content/70">
-        This notebook group could not be found.
-      </p>
-      <router-link
-        :to="{ name: 'notebooks' }"
-        class="daisy-btn daisy-btn-link daisy-btn-sm mt-3 inline-block"
-      >
-        Back to Notebooks
-      </router-link>
-    </div>
-  </main>
 </template>
 
 <script setup lang="ts">
@@ -37,8 +16,6 @@ import type {
   User,
 } from "@generated/donut-backend-api"
 import { useNotebookCatalog } from "@/composables/useNotebookCatalog"
-import ContentLoader from "@/components/commons/ContentLoader.vue"
-import GlobalBar from "@/components/toolbars/GlobalBar.vue"
 import NotebookGroupPageView from "./NotebookGroupPageView.vue"
 
 const props = defineProps<{
@@ -49,17 +26,20 @@ const user = inject<Ref<User | undefined>>("currentUser")
 const { catalogItems, subscriptions, fetchData, handleNotebookUpdated } =
   useNotebookCatalog()
 
-const resolvedGroup = computed((): NotebookCatalogGroupItem | undefined => {
-  const items = catalogItems.value
-  if (!items || Number.isNaN(props.groupId)) {
-    return undefined
+const resolvedGroup = computed(
+  (): NotebookCatalogGroupItem | null | undefined => {
+    const items = catalogItems.value
+    if (!items) {
+      return undefined
+    }
+    return (
+      items.find(
+        (i): i is NotebookCatalogGroupItem =>
+          i.type === "notebookGroup" && i.id === props.groupId
+      ) ?? null
+    )
   }
-  const found = items.find(
-    (i): i is NotebookCatalogGroupItem =>
-      i.type === "notebookGroup" && i.id === props.groupId
-  )
-  return found
-})
+)
 
 onMounted(() => {
   fetchData()
