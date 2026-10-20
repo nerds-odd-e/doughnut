@@ -11,7 +11,7 @@ import {
 import { runDevRestart } from './dev-restart.mjs'
 import { runDevStart } from './dev-start.mjs'
 import {
-  allocateFreePort,
+  allocateFreePorts,
   closeServer,
   isPidAlive,
   isTcpListening,
@@ -72,6 +72,7 @@ test('a port held by another process makes restart refuse to start and leaves th
   const checkout = makePrimaryCheckout(t)
   const { server, port } = await listenTcp()
   t.after(() => closeServer(server))
+  const [vitePort, lbListenPort] = await allocateFreePorts(2)
   const spawn = makeStartSpy()
 
   await assert.rejects(
@@ -79,8 +80,8 @@ test('a port held by another process makes restart refuse to start and leaves th
       checkoutRoot: checkout.root,
       runtimeTarget: targetFor(checkout.root, {
         backendPort: port,
-        vitePort: await allocateFreePort(),
-        lbListenPort: await allocateFreePort(),
+        vitePort,
+        lbListenPort,
       }),
       runDevStartFn: (options) =>
         runDevStart({ ...options, spawnFn: spawn.spawnFn }),

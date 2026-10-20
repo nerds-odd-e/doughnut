@@ -13,7 +13,7 @@ import {
   writeStaleOwnerLock,
 } from './backend-test-worktree-lock-fixtures.mjs'
 import {
-  allocateFreePort,
+  allocateFreePorts,
   closeServer,
   isPidAlive,
   isTcpListening,
@@ -172,10 +172,9 @@ test('stale unverifiable SUT owner record refuses without reclaiming', async (t)
 
 test('foreign recorded listener refuses and leaves the listener alive', async (t) => {
   const checkout = makeLinkedWorktreeCheckout(t)
-  const vitePort = await allocateFreePort()
-  const lbListenPort = await allocateFreePort()
   const listener = await listenTcp()
   t.after(() => closeServer(listener.server))
+  const [vitePort, lbListenPort] = await allocateFreePorts(2)
   writeIsolatedConfig(checkout.root, {
     id: 'wt_a7c2',
     e2e: {

@@ -1,7 +1,7 @@
 import { BUILT_RUNTIME_TARGET } from './e2e-runner-lifetime-fixtures.mjs'
 import assert from 'node:assert/strict'
 import { test } from 'node:test'
-import { allocateFreePort } from './sut-isolated-fixtures.mjs'
+import { allocateFreePorts } from './sut-isolated-fixtures.mjs'
 import { sutServiceArgs } from './sut-services.mjs'
 import {
   healthEndpoints,
@@ -91,8 +91,7 @@ test('built target launch data: foreign-listener refusal skips the Vite port', a
   // A foreign listener on the Vite port must NOT trigger refusal for a built
   // target (the Vite port is not used). A foreign listener on the LB port
   // still must.
-  const freeVite = await allocateFreePort()
-  const freeLb = await allocateFreePort()
+  const [freeVite, freeLb] = await allocateFreePorts(2)
   const builtTarget = {
     backendPort: 9081,
     vitePort: freeVite,

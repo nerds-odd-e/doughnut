@@ -4,7 +4,7 @@ import { existsSync } from 'node:fs'
 import { test } from 'node:test'
 import { makePrimaryCheckout } from './backend-test-worktree-linked-fixtures.mjs'
 import {
-  allocateFreePort,
+  allocateFreePorts,
   closeServer,
   isPidAlive,
   listenTcp,
@@ -80,8 +80,7 @@ test('built-asset batch: foreign listener on the Vite port does NOT refuse (buil
   // real canonical ports.
   const foreignVite = await listenTcp()
   t.after(() => closeServer(foreignVite.server))
-  const freeBackend = await allocateFreePort()
-  const freeLb = await allocateFreePort()
+  const [freeBackend, freeLb] = await allocateFreePorts(2)
   const runtimeTarget = {
     backendPort: freeBackend,
     vitePort: foreignVite.port,

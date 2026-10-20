@@ -4,7 +4,7 @@ import { test } from 'node:test'
 import { makePrimaryCheckout } from './backend-test-worktree-linked-fixtures.mjs'
 import { runSutHealthcheck } from './sut-healthcheck.mjs'
 import {
-  allocateFreePort,
+  allocateFreePorts,
   closeServer,
   completeIsolatedConfig,
   isTcpListening,
@@ -88,19 +88,12 @@ test('isolated health fails when a recorded endpoint listener is outside the app
       const foreignListener = await listen()
       t.after(() => closeServer(foreignListener.server))
 
+      const [backendPort, vitePort, lbListenPort] = await allocateFreePorts(3)
       const ports = {
-        backendPort:
-          foreign === 'backend'
-            ? foreignListener.port
-            : await allocateFreePort(),
-        vitePort:
-          foreign === 'frontend vite'
-            ? foreignListener.port
-            : await allocateFreePort(),
+        backendPort: foreign === 'backend' ? foreignListener.port : backendPort,
+        vitePort: foreign === 'frontend vite' ? foreignListener.port : vitePort,
         lbListenPort:
-          foreign === 'local LB'
-            ? foreignListener.port
-            : await allocateFreePort(),
+          foreign === 'local LB' ? foreignListener.port : lbListenPort,
       }
 
       writeIsolatedE2ePorts(checkout.root, ports)
@@ -120,11 +113,8 @@ test('isolated health fails when a recorded endpoint listener is outside the app
 
 test('isolated health passes when recorded listeners belong to the application group', async (t) => {
   const checkout = makePrimaryCheckout(t)
-  const ports = {
-    backendPort: await allocateFreePort(),
-    vitePort: await allocateFreePort(),
-    lbListenPort: await allocateFreePort(),
-  }
+  const [backendPort, vitePort, lbListenPort] = await allocateFreePorts(3)
+  const ports = { backendPort, vitePort, lbListenPort }
   writeIsolatedE2ePorts(checkout.root, ports)
   await startOwnedListeningOwner(t, checkout.root, ports)
   const health = await runSutHealthcheck({
@@ -148,11 +138,8 @@ test('isolated health passes when recorded listeners belong to the application g
 
 test('isolated health passes when a listener is outside PGID but under the application tree', async (t) => {
   const checkout = makePrimaryCheckout(t)
-  const ports = {
-    backendPort: await allocateFreePort(),
-    vitePort: await allocateFreePort(),
-    lbListenPort: await allocateFreePort(),
-  }
+  const [backendPort, vitePort, lbListenPort] = await allocateFreePorts(3)
+  const ports = { backendPort, vitePort, lbListenPort }
   writeIsolatedE2ePorts(checkout.root, ports)
 
   const owner = await claimSutOwnership(checkout.root)

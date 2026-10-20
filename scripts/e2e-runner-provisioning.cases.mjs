@@ -3,7 +3,7 @@ import assert from 'node:assert/strict'
 import { test } from 'node:test'
 import { makePrimaryCheckout } from './backend-test-worktree-linked-fixtures.mjs'
 import {
-  allocateFreePort,
+  allocateFreePorts,
   closeServer,
   listenTcp,
   writeIsolatedConfig,
@@ -47,8 +47,7 @@ test('primary checkout regression guard: foreign listener on a canonical port st
   const checkout = makePrimaryCheckout(t)
   const foreignListener = await listenTcp()
   t.after(() => closeServer(foreignListener.server))
-  const freeBackend = await allocateFreePort()
-  const freeVite = await allocateFreePort()
+  const [freeBackend, freeVite] = await allocateFreePorts(2)
   const runtimeTarget = {
     backendPort: freeBackend,
     vitePort: freeVite,

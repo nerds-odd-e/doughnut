@@ -149,6 +149,13 @@ before acceptance. Slice 4 runs its feature with
 (external-wait exception: the disposable stack boot). Hosted CI remains the
 broader E2E proof after publication.
 
+## CI repairs
+
+- Run 39361802870 (slice 2 revision `6a5765ab`): `scripts/sut-isolated-health.test.mjs`
+  failed when sequential `allocateFreePort()` calls returned a repeated port.
+  Repaired with `allocateFreePorts(count)` in `scripts/sut-isolated-fixtures.mjs`,
+  used by every multi-port script test; slice 3 stayed paused meanwhile.
+
 ## Ordered slices
 
 ### 1. The Donut menu panel holds the global search and opens quietly

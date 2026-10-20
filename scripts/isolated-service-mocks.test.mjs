@@ -23,6 +23,7 @@ import {
 import { getListenerPids, processGroupId } from './sut-listener-pids.mjs'
 import {
   allocateFreePort,
+  allocateFreePorts,
   closeServer,
   listenHttpReady,
 } from './sut-isolated-fixtures.mjs'
@@ -183,8 +184,7 @@ test('foreign serving endpoint refuses two-service startup before mutation', asy
   const foreign = await listenForeignReadyTrackingMutations()
   t.after(() => closeServer(foreign.server))
 
-  const managementPort = await allocateFreePort()
-  const otherServingPort = await allocateFreePort()
+  const [managementPort, otherServingPort] = await allocateFreePorts(2)
 
   await assert.rejects(
     () =>
