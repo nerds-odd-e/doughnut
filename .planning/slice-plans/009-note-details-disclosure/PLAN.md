@@ -198,6 +198,15 @@ implement or execute this sequence in preparation.
 
 ## Current decisions and review
 
+CI repair at slice 3's delivery boundary: run `39388493180`, attempt 1, on
+`89a2bb85d151f827b64e6b3e769ab4f6f8eea4ef` found the direct relationship
+edit helper. The existing scoped reveal helper repairs that consumer.
+`env -u NODE_ENV CURSOR_DEV=true nix develop -c pnpm cy:run --spec
+e2e_test/features/relationships/relationship_edit_and_remove.feature` first
+reproduced 4 passing / 1 inaccessible relation-control failure, then passed
+all 5 scenarios after the repair. Independent refactoring required no edits.
+Slice 3's completed changes and proof were preserved during repair.
+
 Execution 2026-10-20: established claim `cb6eb20ba6b29f0d096cdd0c27c17a31aec456a7`
 on `origin/main`; publisher `dashboard-territory.local-doughnut`, agent
 Kaoru-chan. Story Branch Mode uses the owned checkout
@@ -224,3 +233,10 @@ delivery. Every leaf was reviewed for independent outcomes, proof ownership,
 and cumulative design: slice 1 is the only Structure leaf and sits directly
 before the Behavior it enables. No slice-plan refinement is needed; no
 remaining blocking concern was identified.
+
+## Story obligations
+
+### G1. Relationship editing reaches hidden property controls
+Reported: slice 2 — "The relationship edit helper reached a property control without revealing note details."
+Story clause: "how properties are edited"
+Disposition: proved by slice 2: `noteRelationshipMethods.changeRelationType` now reveals the scoped section; `relationship_edit_and_remove.feature` reproduces the failure before repair and passes all five retained scenarios after repair.
