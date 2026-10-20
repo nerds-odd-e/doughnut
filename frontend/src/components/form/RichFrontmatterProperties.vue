@@ -79,13 +79,13 @@
 <script setup lang="ts">
 import { Plus } from "@lucide/vue"
 import { isEqual } from "es-toolkit"
-import { computed, inject, provide, ref, useId, watch } from "vue"
+import { computed, provide, ref, useId, watch } from "vue"
 import RichFrontmatterPropertyList from "@/components/form/RichFrontmatterPropertyList.vue"
 import RichFrontmatterPropertyNotFound from "@/components/form/RichFrontmatterPropertyNotFound.vue"
 import { richFrontmatterIsReadmeContextKey } from "@/components/form/richFrontmatterProvide"
 import WikidataAssociationDialog from "@/components/notes/WikidataAssociationDialog.vue"
 import type { WikiLink } from "@generated/donut-backend-api"
-import { noteDetailsDisclosureKey } from "@/composables/noteDetailsDisclosure"
+import { useNoteDetailsDisclosure } from "@/composables/noteDetailsDisclosure"
 import { useRichFrontmatterPropertyEditing } from "@/composables/useRichFrontmatterPropertyEditing"
 import { useWikidataPropertyDialog } from "@/composables/useWikidataPropertyDialog"
 import {
@@ -117,7 +117,9 @@ const emits = defineEmits<{
 }>()
 
 const isInteractionLocked = computed(() => props.interactionLocked ?? false)
-const detailsDisclosure = inject(noteDetailsDisclosureKey, undefined)
+const detailsDisclosure = useNoteDetailsDisclosure(
+  () => insertOpen.value || !!validationMessage.value
+)
 const detailsRevealed = computed(
   () => detailsDisclosure?.revealed.value ?? true
 )

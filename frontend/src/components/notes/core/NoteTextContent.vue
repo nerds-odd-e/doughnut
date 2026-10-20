@@ -28,6 +28,7 @@
     <span v-if="propertyKeys.length || !readonly" data-testid="note-property-summary">
       {{ propertyKeys.length ? `Properties: ${propertyKeys.join(', ')}` : 'No properties' }}
     </span>
+    <span v-if="unfinishedEdit?.()" data-testid="note-details-unfinished-edit">Unfinished property edit</span>
     <span
       data-testid="note-updated-at"
       :data-freshness="freshness"
@@ -87,6 +88,7 @@ const props = defineProps({
 defineEmits<{ deadWikiLinkClick: [payload: DeadWikiLinkPayload] }>()
 
 const revealed = ref(false)
+const unfinishedEdit = ref<() => boolean>()
 const propertyKeys = computed(() => {
   const parsed = parseNoteContentMarkdown(props.note.content ?? "")
   return parsed.ok ? Object.keys(parsed.properties) : []
@@ -116,6 +118,7 @@ watch(
 )
 provide(noteDetailsDisclosureKey, {
   revealed,
+  unfinishedEdit,
   noteId: computed(() => props.note.id),
 })
 

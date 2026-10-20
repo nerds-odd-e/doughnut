@@ -83,6 +83,7 @@ import {
   parseNoteContentMarkdown,
 } from "@/utils/noteContentFrontmatter"
 import type { DeadWikiLinkPayload } from "@/utils/wikiLinkMarkup"
+import { useNoteDetailsDisclosure } from "@/composables/noteDetailsDisclosure"
 import { useBodyEditorDictation } from "@/composables/useBodyEditorDictation"
 
 const emit = defineEmits<{
@@ -126,6 +127,7 @@ async function beforeSaveContent(
   return true
 }
 
+const detailsDisclosure = useNoteDetailsDisclosure()
 const rootRef = ref<HTMLElement | null>(null)
 const textareaRef = ref<InstanceType<typeof TextArea> | null>(null)
 const richEditorRef = ref<InstanceType<typeof RichMarkdownEditor> | null>(null)
@@ -207,12 +209,7 @@ onMounted(() => {
         })
       }
     } else {
-      // Queue a microtask so we fire after the current synchronous call stack
-      // but before macrotasks (requestAnimationFrame / setTimeout). This gives
-      // Vue time to flush dialog-teardown DOM updates while still keeping the
-      // component state intact for the insertion.
-      // insertTextAtCursor uses the last known Quill cursor when available
-      // (note was in edit mode); otherwise falls back to insertMarkdownAtEnd.
+      // Wait for dialog teardown; insertion uses the last Quill cursor or body end.
       queueMicrotask(() => {
         richEditorRef.value?.insertTextAtCursor(text)
       })
@@ -224,6 +221,7 @@ onMounted(() => {
     insert: (text: string) => {
       const composed = appendWikiLinkPropertyRow(props.noteContent ?? "", text)
       if (composed === undefined) return
+      if (detailsDisclosure) detailsDisclosure.revealed.value = true
       if (props.asMarkdown) {
         const textarea = markdownTextarea()
         if (!textarea) return

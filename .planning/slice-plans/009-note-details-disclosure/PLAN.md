@@ -127,8 +127,16 @@ Size hypothesis: 4–6 minutes.
 
 ### 4. Keep an unfinished property edit discoverable across the disclosure
 Type: Behavior
-Status: planned
+Status: done
 Proof: Slice 4 rows in the proof table; rich-editor and notes suites below.
+
+Accepted: `NoteTextContent.detailsEditing.spec.ts` drives real page storage
+for draft/validation survival, completion updating the compact key summary,
+and rich/Markdown property insertion revealing and saving the row. The focused
+browser command passed 105 files / 600 tests; both typechecks passed.
+Independent refactoring centralized the remaining disclosure consumer and
+reran that proof green. Selective formatting passed. Only required verification
+extended beyond the implementation checkpoint.
 
 Behavior: With a draft or validation message in the section, collapsing shows
 an unfinished-edit cue on the compact line; revealing shows the draft and
