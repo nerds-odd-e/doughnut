@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "identity": "SEED-078#story-5",
+  "title": "Focus on note content while revealing details when needed",
+  "completedAt": "2026-10-20T08:28:59.078Z",
+  "developer": "Terry Yin",
+  "agent": "Kaoru-chan",
+  "host": "codex",
+  "model": "gpt-6.1-sol"
+}

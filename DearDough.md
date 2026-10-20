@@ -182,6 +182,15 @@ Former local code: DD-231. A slice proof table omits explicit story end conditio
 
 Former local code: DD-233. Broad whole-reference and metadata batches exceeded the response budget and truncated required context before delegation, forcing repeated retrieval despite existing targeted-reading guidance. Seven distinct recorded executions; savings are unmeasured. This agent deviation is distinct from ODF-158’s required-reference cost. Open, unqueued. [Evidence and response](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/findings/ODF-264.md).
 
+### Occurrences
+- Execution: SEED-078#story-5 (first implementation `8d30de7ea31644d7e4f6131cf25a36a0e7f47b18`; completed plan recoverable at `522f3f9f72:.planning/slice-plans/009-note-details-disclosure/PLAN.md`)
+  - Timestamp: unknown
+  - Tool: Codex
+  - Open Dough release: unknown
+  - Evidence: launch `58389715-75a6-443c-a76f-ee05304b0705` startup tool results reported truncated batches of 22,999 and 21,377 original tokens; focused reference reads followed before delegation on 2026-10-20.
+  - Observed effect: two oversized batches left required context truncated and caused repeated retrieval.
+  - Inference: the coordinator batched too many whole references despite the targeted-retrieval guidance; token savings are unmeasured.
+
 <a id="odf-265"></a>
 
 ## ODF-265 — A comparison of empty captures was printed as a match
@@ -268,6 +277,14 @@ The plan required implementers to run the Vite build so `components.d.ts` is reg
   - Observed effect: one implementer proof was reported red and accepted on reasoning until the coordinator reran it; no defect escaped.
   - Inference: the shared rule that implementers do not format conflicts with any project proof command that also checks formatting. The timestamp is approximate.
 
+- Execution: SEED-078#story-5 (first implementation `8d30de7ea31644d7e4f6131cf25a36a0e7f47b18`; completed plan recoverable at `522f3f9f72:.planning/slice-plans/009-note-details-disclosure/PLAN.md`)
+  - Timestamp: unknown
+  - Tool: Codex
+  - Open Dough release: unknown
+  - Evidence: the slice 3 return on 2026-10-20 reports the required Vite build initially failed on Biome line-wrapping/blank-line checks; ordinary source-layout corrections were made manually and the build then passed, regenerating declarations in `4b9d3792f7eb85999269e2a892ce763c00adf130`.
+  - Observed effect: a repeated build was needed before proof acceptance; no defect escaped and the implementer ran no formatter command.
+  - Inference: required generation/build proof checks formatting before the coordinator-owned formatting stage, leaving the same scheduling friction with a different local recovery.
+
 <a id="dd-253"></a>
 
 ## DD-253 — Retargeting E2E page objects missed a direct label lookup of a moved control
@@ -283,6 +300,14 @@ When the always-visible menu was replaced by a panel that is rendered only while
   - Evidence: CI run 39354041674 attempt 1 on 448d6fd, `recall/browse_answer_and_notes_while_recalling.feature` "Unable to find a label with the text of: Resume"; repaired in 0202d4a (`e2e_test/start/pageObjects/recallPage.ts`).
   - Observed effect: one CI failure and one repair cycle (stash, repair agent, refactor pass, publication).
   - Inference: the search covered the helpers being retargeted, but not every lookup of the moved control's accessible names. The relationship to ODF-272 (shared accessible-name consumers missed) is likely but unconfirmed.
+
+- Execution: SEED-078#story-5 (first implementation `8d30de7ea31644d7e4f6131cf25a36a0e7f47b18`; completed plan recoverable at `522f3f9f72:.planning/slice-plans/009-note-details-disclosure/PLAN.md`)
+  - Timestamp: 2026-10-20T07:48:59.3032550Z
+  - Tool: Codex
+  - Open Dough release: unknown
+  - Evidence: CI run `39388493180`, attempt 1, job `118514031615` on `89a2bb85d151f827b64e6b3e769ab4f6f8eea4ef` failed to find the accessible Relation Type button in a hidden property row. The trace had centered on named property helpers and missed `noteRelationshipMethods.changeRelationType`. Repair `df295a0d862a27dd6ce6d39eaf44b70133748536` uses the existing reveal helper; the real relationship feature reproduced 4 passing/1 failure before it and passed all 5 afterward.
+  - Observed effect: one CI failure and one isolated stash/repair/refactor/publication/restore cycle interrupted the completed date slice; all pending work was preserved.
+  - Inference: helper-name searches did not cover every direct lookup of controls newly hidden behind the disclosure. The later global property-selector sweep found no further unreconciled direct consumer.
 
 <a id="dd-254"></a>
 

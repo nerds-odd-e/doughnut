@@ -14,6 +14,7 @@
       @dead-wiki-link-click="$emit('deadWikiLinkClick', $event)"
       @image-upload-state="imageUploadInProgress = $event"
     />
+    <slot name="after-properties" />
     <p v-if="hasNestedMetadata" class="mb-3 text-sm">
       Edit metadata in Markdown.
     </p>

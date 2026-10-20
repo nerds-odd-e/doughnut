@@ -6,8 +6,6 @@ Make deliberately captured knowledge more useful through learning and refinement
 
 ## Taken
 
-- [Focus on note content while revealing details when needed](seeds/SEED-078-cohesive-note-workspace.md#story-5) — SEED-078#story-5 ([plan](slice-plans/009-note-details-disclosure/PLAN.md))
-
 ## Backlog list
 
 - [Generate focus-note questions with relevant supporting passages](seeds/SEED-007-per-concept-prompt-splitting-single-note-qg.md#story-1) — SEED-007#story-1

@@ -1,7 +1,7 @@
 import { waitUntilAppIsNotBusy } from '../pageBase'
 import { switchToRichContentIfNeeded } from './noteContentEditingMethods'
 import {
-  findNoteContentRegion,
+  revealNoteDetails,
   richNotePropertyPanelToggleTestId,
   richNotePropertyRow,
 } from './notePageContentRegion'
@@ -22,7 +22,7 @@ const openPropertyPanelIfClosed = () => {
 // editor).
 const withPropertyPanel = (key: string, fn: () => void) => {
   switchToRichContentIfNeeded()
-  findNoteContentRegion().within(() => {
+  revealNoteDetails().within(() => {
     cy.get(richNotePropertyRow(key)).within(() => {
       openPropertyPanelIfClosed()
       fn()

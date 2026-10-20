@@ -36,21 +36,6 @@
                   @dead-wiki-link-click="onDeadWikiLinkClick"
                 />
                 <ShowImage :note="noteRealm.note" />
-                <NoteRecentUpdateIndicator
-                  v-bind="{
-                    id: noteRealm.id,
-                    updatedAt: noteRealm.note.noteTopology.updatedAt,
-                  }"
-                >
-                  <p>
-                    <span class="mr-3">
-                      Created: {{ toLocalDateString(noteRealm.note.noteTopology.createdAt) }}
-                    </span>
-                    <span>
-                      Last updated: {{ toLocalDateString(noteRealm.note.noteTopology.updatedAt) }}
-                    </span>
-                  </p>
-                </NoteRecentUpdateIndicator>
                 <NoteReferences
                   :note-topologies="noteRealm.references ?? []"
                 />
@@ -92,7 +77,6 @@ import NoteTextContent from "./core/NoteTextContent.vue"
 import NoteReferences from "./NoteReferences.vue"
 import ShowImage from "./widgets/ShowImage.vue"
 import NoteToolbar from "./core/NoteToolbar.vue"
-import NoteRecentUpdateIndicator from "./NoteRecentUpdateIndicator.vue"
 import NoteUnresolvedWikiLinkModal from "./NoteUnresolvedWikiLinkModal.vue"
 import type { DeadWikiLinkPayload } from "@/utils/wikiLinkMarkup"
 import { isNoteRealmInTrash } from "@/utils/folderTrash"
@@ -173,9 +157,6 @@ watch(
     pendingDeadWikiLink.value = null
   }
 )
-
-const toLocalDateString = (date: string | undefined) =>
-  date ? new Date(date).toLocaleDateString() : ""
 </script>
 <style scoped>
 .note-show-container {

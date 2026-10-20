@@ -94,7 +94,7 @@ const emit = defineEmits<{
 
 const rowClientIds = usePropertyRowClientIds(propertyRows)
 const { isFocusedProperty, setPropertyRowRef, togglePropertyPanel } =
-  useFocusedNoteProperty()
+  useFocusedNoteProperty(() => propertyRows.value.map((row) => row.key))
 
 const rowKeyInputId = (idx: number) => `${props.headingId}-row-${idx}-key`
 const rowKeyPresetListId = (idx: number) =>

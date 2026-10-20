@@ -8,6 +8,7 @@ import testability from '../testability'
 import {
   expectRichNotePropertyRowFocused,
   findNoteContentRegion,
+  revealNoteDetails,
   richNotePropertyPanel,
   richNotePropertyPanelToggle,
   richNotePropertyRow,
@@ -42,14 +43,14 @@ function expectAtCompiledNoteLocation(
 export const notePropertyLocationMethods = () => ({
   openRichNotePropertyPanel(key: string) {
     this.switchToRichContent()
-    findNoteContentRegion().within(() => {
+    revealNoteDetails().within(() => {
       cy.get(richNotePropertyRow(key)).find(richNotePropertyPanelToggle).click()
     })
     return this
   },
   closeRichNotePropertyPanel() {
     this.switchToRichContent()
-    findNoteContentRegion().within(() => {
+    revealNoteDetails().within(() => {
       cy.get(`${richNotePropertyPanelToggle}[aria-expanded="true"]`).click({
         force: true,
       })
