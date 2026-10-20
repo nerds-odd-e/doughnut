@@ -6,10 +6,9 @@ Make deliberately captured knowledge more useful through learning and refinement
 
 ## Taken
 
-- [Open a quiet Donut command center consistently on every screen](seeds/SEED-078-cohesive-note-workspace.md#story-1) — SEED-078#story-1 ([plan](slice-plans/003-donut-command-center/PLAN.md))
-
 ## Backlog list
 
+- [Reach and operate the Donut menu from every screen state](seeds/SEED-078-cohesive-note-workspace.md#correction-1) — SEED-078#correction-1
 - [Find and open notes from search inside the Donut menu](seeds/SEED-078-cohesive-note-workspace.md#story-2) — SEED-078#story-2
 - [Use note actions and folder context from one adaptive top bar](seeds/SEED-078-cohesive-note-workspace.md#story-3) — SEED-078#story-3
 - [Read and edit complete property values comfortably in narrow windows](seeds/SEED-078-cohesive-note-workspace.md#story-4) — SEED-078#story-4

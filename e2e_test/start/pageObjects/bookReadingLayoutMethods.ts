@@ -3,12 +3,10 @@ import {
   type BookLayoutRow,
   bookBlockRowByTitle,
   bookBlockRows,
+  bookLayoutAside,
+  bookLayoutToggle,
   ensureOnBookReadingPage,
-  expectFullyOnScreen,
 } from './bookReadingShared'
-
-const bookLayoutToggle = () => cy.findByRole('button', { name: 'Book layout' })
-const bookLayoutAside = '[data-testid="book-reading-book-layout-aside"]'
 
 export const bookReadingLayoutMethods = () => ({
   expectBookLayoutRows(expected: BookLayoutRow[]) {
@@ -36,7 +34,7 @@ export const bookReadingLayoutMethods = () => ({
     ensureOnBookReadingPage()
     bookLayoutToggle().then(($toggle) => {
       if ($toggle.attr('aria-expanded') === 'false') {
-        this.clickBookLayoutToggle()
+        bookLayoutToggle().click()
       }
     })
     cy.get('[data-testid="book-reading-page"]').then(($page) => {
@@ -179,41 +177,6 @@ export const bookReadingLayoutMethods = () => ({
     bookBlockRows()
       .filter('[data-current-block="true"]')
       .should('have.length', 1)
-    return this
-  },
-  /** A real (not forced) click, so it fails when something covers the toggle. */
-  clickBookLayoutToggle() {
-    ensureOnBookReadingPage()
-    bookLayoutToggle().click()
-    return this
-  },
-  expectBookLayoutOpen() {
-    bookLayoutToggle().should('have.attr', 'aria-expanded', 'true')
-    cy.get(bookLayoutAside).should('be.visible')
-    expectFullyOnScreen(bookLayoutAside)
-    return this
-  },
-  expectBookLayoutClosed() {
-    bookLayoutToggle().should('have.attr', 'aria-expanded', 'false')
-    return this
-  },
-  expectBookLayoutBelowMainMenu() {
-    cy.get('.main-menu').then(($menu) => {
-      const menuBottom = $menu[0]!.getBoundingClientRect().bottom
-      cy.get(bookLayoutAside).should(($aside) => {
-        expect(
-          $aside[0]!.getBoundingClientRect().top,
-          'book layout top'
-        ).to.be.at.least(menuBottom)
-      })
-    })
-    return this
-  },
-  /** Tap the page beside the open phone drawer. */
-  tapOutsideBookLayout() {
-    cy.window().then((win) => {
-      cy.get('body').click(win.innerWidth - 10, win.innerHeight / 2)
-    })
     return this
   },
   setBookReadingViewport(width: number, height: number) {

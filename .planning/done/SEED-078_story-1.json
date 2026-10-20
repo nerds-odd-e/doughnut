@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "identity": "SEED-078#story-1",
+  "title": "Open a quiet Donut command center consistently on every screen",
+  "completedAt": "2026-10-20T02:01:32.268Z",
+  "developer": "Terry Yin",
+  "agent": "Akiho-chan",
+  "host": "claude",
+  "model": "opus"
+}

@@ -1,9 +1,13 @@
-import { waitUntilAppIsNotBusy } from '../pageBase'
+import router from '../router'
+import {
+  donutMenuLauncher,
+  openDonutMenu,
+  pageBar,
+  waitUntilAppIsNotBusy,
+} from '../pageBase'
 import { form } from '../forms'
 import { navigateToNotebooksPage } from './notebooksPage'
 import { assumeAdminDashboardPage } from './adminPages/adminDashboardPage'
-import { messageCenterIndicator } from './messageCenterIndicator'
-import { manageAccessTokensPage } from './manageAccessTokensPage'
 
 const userSettingsForm = () => {
   const dailyProbeField = () => form.getField('Daily probe')
@@ -39,7 +43,48 @@ const userSettingsForm = () => {
 
 export const assumeUserSettingsPage = () => userSettingsForm()
 
-export const mainMenu = () => {
+/** Opens the Donut menu panel in the app, staying on the current page. */
+export const donutMenuPanel = () => {
+  router().openApp()
+  openDonutMenu()
+  return {
+    expectFullWidthSheetBelowPageBar() {
+      pageBar().then(($bar) => {
+        const barBottom = $bar[0]!.getBoundingClientRect().bottom
+        cy.window().then((win) => {
+          openDonutMenu().should(($panel) => {
+            const panel = $panel[0]!.getBoundingClientRect()
+            expect(panel.top, 'panel top').to.be.at.least(barBottom - 1)
+            expect(panel.left, 'panel left').to.be.at.most(1)
+            expect(panel.right, 'panel right').to.be.at.least(
+              win.innerWidth - 1
+            )
+          })
+        })
+      })
+      return this
+    },
+    expectAnchoredBelowLauncher() {
+      donutMenuLauncher().then(($launcher) => {
+        const launcher = $launcher[0]!.getBoundingClientRect()
+        cy.window().then((win) => {
+          openDonutMenu().should(($panel) => {
+            const panel = $panel[0]!.getBoundingClientRect()
+            expect(panel.top, 'panel top').to.be.at.least(launcher.bottom - 1)
+            expect(
+              Math.abs(panel.left - launcher.left),
+              'panel left from launcher left'
+            ).to.be.at.most(4)
+            expect(panel.width, 'panel width').to.be.lessThan(win.innerWidth)
+          })
+        })
+      })
+      return this
+    },
+  }
+}
+
+export const donutMenu = () => {
   navigateToNotebooksPage()
 
   return {
@@ -47,7 +92,7 @@ export const mainMenu = () => {
       return this.userOptions().adminDashboard()
     },
     userOptions() {
-      cy.findByRole('button', { name: 'Account' }).click()
+      openDonutMenu().findByRole('button', { name: 'Account' }).click()
       return {
         adminDashboard() {
           cy.findByText('Admin Dashboard').click({ force: true })
@@ -69,20 +114,7 @@ export const mainMenu = () => {
             ...userSettingsForm(),
           }
         },
-
-        logout() {
-          cy.findByRole('button', { name: 'Logout' }).click({ force: true })
-        },
-        manageAccessTokens() {
-          cy.findByRole('link', { name: 'Manage Access Tokens' }).click({
-            force: true,
-          })
-          return manageAccessTokensPage()
-        },
       }
-    },
-    myMessageCenter() {
-      return messageCenterIndicator().go()
     },
   }
 }

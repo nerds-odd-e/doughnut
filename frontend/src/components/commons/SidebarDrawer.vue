@@ -30,11 +30,11 @@ defineProps<{ isMdOrLarger: boolean }>()
 </script>
 
 <style scoped lang="scss">
-@use "@/assets/menu-variables.scss" as *;
+@use "@/assets/page-bar.scss" as *;
 
 .sidebar-drawer,
 .sidebar-drawer-backdrop {
-  top: calc(#{$main-menu-height-mobile} + env(safe-area-inset-top, 0px));
+  top: calc(#{$page-bar-height} + env(safe-area-inset-top, 0px));
 }
 
 .sidebar-drawer {

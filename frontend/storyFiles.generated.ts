@@ -7,11 +7,9 @@ import * as _story_3 from "@/components/recall/AnsweredQuestionComponent.stories
 import * as _story_4 from "@/components/recall/AssimilationPanel.stories"
 import * as _story_5 from "@/components/recall/NoteUnderQuestion.stories"
 import * as _story_6 from "@/components/recall/QuestionDisplay.stories"
-import * as _story_7 from "@/components/toolbars/HorizontalMenu.stories"
-import * as _story_8 from "@/components/toolbars/MainMenu.stories"
-import * as _story_9 from "@/pages/MemoryTrackerPageView.stories"
-import * as _story_10 from "@/pages/NotebookPageView.stories"
-import * as _story_11 from "@/pages/NotebooksPage.stories"
+import * as _story_7 from "@/pages/MemoryTrackerPageView.stories"
+import * as _story_8 from "@/pages/NotebookPageView.stories"
+import * as _story_9 from "@/pages/NotebooksPage.stories"
 
 export const storyFiles = [
   { filePath: "components/commons/DiffView.stories.ts", storyFile: _story_0 },
@@ -21,9 +19,7 @@ export const storyFiles = [
   { filePath: "components/recall/AssimilationPanel.stories.ts", storyFile: _story_4 },
   { filePath: "components/recall/NoteUnderQuestion.stories.ts", storyFile: _story_5 },
   { filePath: "components/recall/QuestionDisplay.stories.ts", storyFile: _story_6 },
-  { filePath: "components/toolbars/HorizontalMenu.stories.ts", storyFile: _story_7 },
-  { filePath: "components/toolbars/MainMenu.stories.ts", storyFile: _story_8 },
-  { filePath: "pages/MemoryTrackerPageView.stories.ts", storyFile: _story_9 },
-  { filePath: "pages/NotebookPageView.stories.ts", storyFile: _story_10 },
-  { filePath: "pages/NotebooksPage.stories.ts", storyFile: _story_11 },
+  { filePath: "pages/MemoryTrackerPageView.stories.ts", storyFile: _story_7 },
+  { filePath: "pages/NotebookPageView.stories.ts", storyFile: _story_8 },
+  { filePath: "pages/NotebooksPage.stories.ts", storyFile: _story_9 },
 ]

@@ -40,8 +40,10 @@
     <a
       v-else-if="isNavigationActionItem(name) && !hasDropdown"
       :aria-label="label"
+      tabindex="0"
       class="flex flex-col items-center"
       @click.prevent="onActionClick"
+      @keydown.enter.prevent="onActionClick"
     >
       <div class="icon-container">
         <component :is="icon" :size="24" />

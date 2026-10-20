@@ -1,5 +1,4 @@
 import { useAutoCollapseDetails } from "@/composables/useAutoCollapseDetails"
-import { DROPDOWN_PORTAL_PANEL_ATTR } from "@/composables/dropdownPortalContext"
 import { mount } from "@vue/test-utils"
 import { defineComponent, ref } from "vue"
 import { afterEach, describe, expect, it } from "vitest"
@@ -34,7 +33,6 @@ describe("useAutoCollapseDetails", () => {
     expect(details.open).toBe(true)
 
     const portaledPanel = document.createElement("ul")
-    portaledPanel.setAttribute(DROPDOWN_PORTAL_PANEL_ATTR, "")
     portaledPanel.setAttribute("data-dropdown-portal-for", "test-portal-id")
     const menuButton = document.createElement("button")
     menuButton.type = "button"

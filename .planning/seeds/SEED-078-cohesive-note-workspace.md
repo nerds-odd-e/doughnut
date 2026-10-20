@@ -129,129 +129,30 @@ hour during refinement and resplit around a useful user outcome before
 execution. Do not make separate platform models or technical-only stories to
 force the estimate. This seed authorizes no implementation or slice plan.
 
-<a id="story-1"></a>
+<a id="correction-1"></a>
 
-### Open a quiet Donut command center consistently on every screen
+### Reach and operate the Donut menu from every screen state
 
-**Identity:** SEED-078#story-1
+**Identity:** SEED-078#correction-1
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/003-donut-command-center/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"fca560fd21bd9f768fe5b205f4859d920293ab31d5a7eb8f020cedb892400aeb","plan":"e108ca5e4f6c4afca8684669ef7ccfe66be3776e96200ba4462efbeab03f47cd"}}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/004-donut-menu-reach-and-keyboard/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"bd92da166b802cf4c953d3dbb0914ea1caa52c07c1df33b5fdcfaa14dc9801c3","plan":"01f127ed3964ccd03deaa408f97d1d01cddc459f8cd0ce1e1f4d835f693c73e4"}}
 ```
 
-- **Goal:** Authors and learners find Donut's app commands in one place
-  whether they use a phone, an iPad, or a desktop window, so moving between
-  devices stops costing them a second navigation arrangement. The observable
-  outcome is one launcher and one command panel at every width; the broader
-  cohesive workspace stays with the sibling stories.
-- **Scope:**
-  - Required: one quiet launcher button labelled "Donut menu", marked by a
-    book glyph that is visibly distinct from the Note destination's icon,
-    sits at the leading end of the shared page bar on every screen that has
-    that bar, at every window width, signed in or signed out. The workspace
-    no longer reserves a side column or a fixed top-left region for
-    navigation.
-  - Required: the launcher opens one command panel over the workspace. For a
-    signed-in user it lists, in the existing order, Resume (only while recall
-    is paused with loaded trackers, with its to-repeat count), Note,
-    Assimilate (with its due count and title), Recall (with its to-repeat
-    count and diligent styling), Circles, Bazaar, and Messages (with its
-    unread count), marks the destination that matches the current route the
-    same way at every width, and groups the existing account actions under
-    Account: Admin Dashboard for admins, Recent, Settings for the user,
-    Manage Access Tokens, and Logout. The existing "Donut by" attribution
-    link to odd-e stays in the panel as a quiet footer.
-  - Required: choosing a destination or action does what it does today
-    (named-route navigation, Resume, next Assimilation, Logout) and closes
-    the panel. Pressing the launcher again, tapping or clicking outside,
-    choosing nothing and pressing Escape, or a route change closes it. The
-    panel is reachable by keyboard: the launcher is a focusable button and
-    the panel's items are focusable in order.
-  - Required: a signed-out visitor sees the same launcher; the panel offers
-    the existing sign-in action. Opening the panel on the home page behaves
-    like everywhere else; the home page body keeps its own welcome flow.
-  - Required: counts, Resume availability, the menu-data fetch at sign-in,
-    and the recall-window catch-up keep their current data and timing. They
-    stay alive while the panel is closed.
-  - Required: page-specific bar controls keep working beside the launcher:
-    the notebook contents toggle and breadcrumb, the recall progress bar, the
-    Book layout toggle and book title, global search with Ctrl/Cmd+F, and
-    Undo. Drawers and safe-area offsets use the one shared header-height
-    rule the seed contract names.
-  - Removal: the two replaced presentations (the wide-window vertical
-    sidebar and the narrow-window collapsing horizontal menu) and everything
-    only they used are deleted, including their stories, tests, test
-    support, and layout variables; the product reads as if one launcher
-    always existed. Acceptance records the one-time sweep as a reading.
-  - Deferred, not rejected: global search inside the panel (story 2); note
-    actions in the bar (story 3); any count or indicator on the launcher
-    itself; an always-visible active-destination indicator while the panel
-    is closed; a keyboard shortcut that opens the panel; any change to the
-    home page welcome flow. Showing public destinations such as Bazaar to a
-    signed-out visitor is naturally supported and not committed.
-  - No rejection constraint was found; the current access rules (admin-only
-    dashboard, signed-in-only destinations) already govern what the panel
-    lists.
-- **Key examples:**
-  - Phone width, a note open, recall paused by viewing a last answered
-    question with trackers loaded → tap the launcher → the panel lists Resume
-    first with the to-repeat count and marks Note as active; tap Resume → the
-    recall page resumes at the current tracker and the panel is closed.
-  - Desktop width, the same note → the launcher is at the same bar position
-    with the same glyph; open it and choose Messages → the message center
-    opens, the panel closes, and reopening marks Messages active.
-  - Desktop width with the panel closed → narrow the window to phone width →
-    the launcher stays where it was, no side column remains, and opening it
-    shows the same items with the same counts and active marking.
-  - Three due assimilations and twelve to recall → open the panel → Assimilate
-    shows 3 and Recall shows 12; choose Assimilate → the next note opens with
-    its Assimilation view and reopening shows 2.
-  - Signed-out visitor on Bazaar at any width → the launcher is present; open
-    it and choose Sign in → the existing login flow starts.
-  - Panel open over a note → tap outside it (or press Escape) → the panel
-    closes, nothing navigated, and the note's own controls respond to the
-    next tap.
-  - Home page, signed in → the launcher opens the same panel; choosing Recall
-    opens the recall page.
-- **UI:** The launcher is the first control of the shared bar, at the same
-  position on every screen. The panel opens over the page content, anchored
-  near the launcher on wide windows and as a full-width sheet below the bar
-  on narrow windows; width changes the panel's size, not its contents or
-  order. Items keep their icon, label, and count; the active destination is
-  highlighted; Account expands its grouped actions in place. The launcher
-  shows no count. Resume, when present, is the first item so the paused
-  learner reaches it in two taps from any screen.
-- **Architecture:** The panel is presentation only. Navigation items, counts,
-  active state, Resume availability, the sign-in menu-data fetch, and the
-  recall catch-up timer are app-shell responsibilities that outlive the
-  panel's open state, so they stay in the shell and the panel renders them.
-  Destinations keep named-route navigation and note-route-family active state
-  under [ADR 0005](../../docs/adrs/0005-web-routes-accepted.md); the launcher
-  is the Donut menu, not the domain entity **Book** of
-  [ADR 0001](../../docs/adrs/0001-ubiquitous-language.md). Replacing the
-  reserved side column and fixed top-left menu with a bar control is the
-  layout change stories 2 and 3 build on; no new decision record is needed.
-- **Investigation (2026-10-20, read at `f72443698e`):** Facts: one item
-  source feeds both current presentations; the wide presentation applies
-  above 1024px and the narrow one at or below it; both hide destinations on
-  the home page; both show only the key-shaped sign-in control when signed
-  out; the shared page bar exists on every signed-in screen, with the recall
-  bar present while that page is active; the narrow presentation already
-  closes on outside click, focus loss, and route change; the Note
-  destination already uses a book glyph. Remaining hypothesis, settled only
-  by use: a quiet launcher without an always-visible active item is as easy
-  to find as the current destinations. No product runtime was started.
-- **Value / learning:** Tests discoverability of the shared command center
-  and removes the large-screen/small-screen navigation change as a user burden.
-- **Effort hypothesis:** M, 60–90 minutes, medium confidence. Refinement
-  found the work reuses the item source, actions, and account menu intact, but
-  replaces two presentations, the app-shell layout offsets, their seven unit
-  specs with support files, two Storybook stories, and the E2E menu page
-  objects. No smaller boundary keeps a useful outcome: the value is the
-  single arrangement itself. The owner may still resplit before execution.
-- **Depends on:** No blocking supplier story established.
-- **Safe stopping point:** Consistent command access is useful even if search,
-  note-toolbar relocation, and detail presentation stay unchanged. Existing
-  workflows and page controls must work independently at this stopping point.
+- **Goal:** Authors, learners, and visitors reach and operate the Donut menu
+  wherever they had navigation before story 1, by mouse and keyboard, with
+  Account expanding its grouped actions in place, and the menu's tests identify
+  it unambiguously without redundant cost. Bounded retrospective correction of
+  story 1 (`.planning/seeds/SEED-078-cohesive-note-workspace.md#story-1` at
+  commit e1b635a22b); it adds no feature promise.
+- **Scope:** Give the page bar to the screen states that lost it (Daily probe
+  and its retry, book loading and load failure, notebook catalog failure and
+  a missing notebook group); expand Account inside the panel; make the sign-in
+  action and the action items keyboard operable and closing; give the panel
+  its own test identity; move the panel layout checks to browser-mode unit
+  proof; remove leftover residue and overlapping assertions. Story 1's
+  promises, deferrals, and named-route navigation stay as they are.
+- **Plan:** [004 Donut menu reach and keyboard](../slice-plans/004-donut-menu-reach-and-keyboard/PLAN.md)
+  holds the source, findings, proof, and slices.
 
 <a id="story-2"></a>
 

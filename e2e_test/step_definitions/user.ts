@@ -85,7 +85,7 @@ Then(
 Then(
   'my display name {string} is shown in the account menu',
   (name: string) => {
-    start.mainMenu().userOptions().userSettingsButton(name)
+    start.donutMenu().userOptions().userSettingsButton(name)
   }
 )
 
@@ -100,7 +100,7 @@ Then("I haven't login", () => {
 })
 
 const userSettings = () =>
-  start.mainMenu().userOptions().userSettings('Old Learner')
+  start.donutMenu().userOptions().userSettings('Old Learner')
 
 When('I change my display name to {string}', (name: string) => {
   userSettings().changeName(name)

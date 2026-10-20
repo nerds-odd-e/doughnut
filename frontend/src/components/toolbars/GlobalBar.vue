@@ -1,5 +1,6 @@
 <template>
   <nav class="daisy-navbar max-w-full flex justify-between relative">
+    <DonutMenu :user="user" />
     <div class="flex flex-1 overflow-x-auto">
       <slot />
     </div>
@@ -29,6 +30,7 @@ import type { Ref } from "vue"
 import type { User } from "@generated/donut-backend-api"
 import { inject, ref } from "vue"
 import { Search } from "@lucide/vue"
+import DonutMenu from "@/components/toolbars/DonutMenu.vue"
 import PopButton from "@/components/commons/Popups/PopButton.vue"
 import SearchForm from "@/components/wiki-link-or-relationship/SearchForm.vue"
 import { useKeyboardShortcut } from "@/composables/useKeyboardShortcut"
@@ -45,21 +47,10 @@ useKeyboardShortcut("note-search", openNoteSearch, () => !!user?.value)
 </script>
 
 <style scoped lang="scss">
-@use "@/assets/menu-variables.scss" as *;
+@use "@/assets/page-bar.scss" as *;
 
-@media (max-width: 1024px) {
-  .daisy-navbar {
-    padding-left: $collapsed-menu-width-tablet;
-    height: $main-menu-height-tablet;
-    min-height: $main-menu-height-tablet;
-  }
-}
-
-@media (max-width: 768px) {
-  .daisy-navbar {
-    padding-left: $collapsed-menu-width-mobile;
-    height: $main-menu-height-mobile;
-    min-height: $main-menu-height-mobile;
-  }
+.daisy-navbar {
+  height: $page-bar-height;
+  min-height: $page-bar-height;
 }
 </style>

@@ -1,4 +1,7 @@
-import type { MemoryTrackerLite } from "@generated/donut-backend-api"
+import type {
+  ConversationMessage,
+  MemoryTrackerLite,
+} from "@generated/donut-backend-api"
 import { vi } from "vitest"
 
 export const memoryTrackerLitesStub = (n: number): MemoryTrackerLite[] =>
@@ -18,7 +21,7 @@ export const defaultMenuData = {
     currentRecallWindowEndAt: "",
     totalAssimilatedCount: 0,
   },
-  unreadMessages: [],
+  unreadMessages: [] as ConversationMessage[],
 }
 
 export const createMenuData = (

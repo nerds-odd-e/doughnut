@@ -41,6 +41,11 @@ export function epubHostViewportIntersectsMarker(
   return hOverlap > 0 && wOverlap > 0
 }
 
+export const bookLayoutToggle = () =>
+  cy.findByRole('button', { name: 'Book layout' })
+
+export const bookLayoutAside = '[data-testid="book-reading-book-layout-aside"]'
+
 export const bookBlockRows = () =>
   cy
     .get('[data-testid="book-reading-book-layout"]')
