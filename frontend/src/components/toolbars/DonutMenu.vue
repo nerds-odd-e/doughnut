@@ -1,4 +1,15 @@
 <template>
+  <div class="flex items-center flex-none">
+    <NavigationItem
+      v-if="user && activeItem"
+      v-bind="activeItem"
+      :name="isNavigationActionItem(activeItem.name) ? activeItem.name : undefined"
+      :expanded="dropdownRef?.open"
+      @click.stop
+      @toggle="dropdownRef?.openDropdown()"
+      @resumeRecall="resumeRecall"
+      @goToNextAssimilation="goToNextAssimilation"
+    />
   <AutoCollapseDropdown
     ref="dropdownRef"
     v-slot="{ open }"
@@ -10,7 +21,7 @@
       title="Donut menu"
       class="daisy-btn daisy-btn-ghost list-none cursor-pointer"
     >
-      <BookMarked class="w-6 h-6" aria-hidden="true" />
+      <component :is="user && activeItem ? ChevronDown : BookMarked" class="w-6 h-6" aria-hidden="true" />
     </summary>
     <div
       v-if="open"
@@ -61,6 +72,7 @@
       </div>
     </div>
   </AutoCollapseDropdown>
+  </div>
   <Modal
     v-if="searchOpen"
     :show-close-button="false"
@@ -77,12 +89,13 @@
 
 <script setup lang="ts">
 import type { User } from "@generated/donut-backend-api"
-import { onMounted, onUnmounted, ref, watch } from "vue"
+import { computed, onMounted, onUnmounted, ref, watch } from "vue"
 import { useRoute } from "vue-router"
-import { BookMarked, Search } from "@lucide/vue"
+import { BookMarked, ChevronDown, Search } from "@lucide/vue"
 import AutoCollapseDropdown from "@/components/commons/AutoCollapseDropdown.vue"
 import Modal from "@/components/commons/Modal.vue"
 import NavigationItem from "@/components/navigation/NavigationItem.vue"
+import { isNavigationActionItem } from "@/components/navigation/navigationActionItems"
 import AccountMenuItem from "@/components/toolbars/AccountMenuItem.vue"
 import LoginButton from "@/components/toolbars/LoginButton.vue"
 import SearchForNoteAndFolder from "@/components/search/SearchForNoteAndFolder.vue"
@@ -110,6 +123,9 @@ const openIntoSearch = () => {
 useKeyboardShortcut("note-search", openIntoSearch, () => !!props.user)
 
 const { upperNavItems, lowerNavItems } = useNavigationItems()
+const activeItem = computed(() =>
+  [...upperNavItems.value, ...lowerNavItems.value].find((item) => item.isActive)
+)
 const { resumeRecall } = useResumeRecall()
 const { goToNextAssimilation } = useGoToNextAssimilation()
 

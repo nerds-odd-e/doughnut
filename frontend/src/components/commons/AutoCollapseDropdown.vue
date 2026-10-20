@@ -55,6 +55,7 @@ const onToggle = (event: Event) => {
 }
 
 defineExpose({
+  open,
   openDropdown: () => setOpen(true),
   closeDropdown,
   containsFocusTarget: (target: Node) =>

@@ -166,8 +166,16 @@ When('I resume recalling', () => {
   start.recall().resumeRecall()
 })
 
+When('I remember the current recall question', () => {
+  start.recall().assumeRecallPage().rememberCurrentQuestion()
+})
+
+When('I review my last recall answer', () => {
+  start.assumeAnsweredQuestionPage().goToLastAnsweredQuestion()
+})
+
 Then('I should be back to the current question', () => {
-  start.recall().assumeRecallPage().expectCurrentQuestion()
+  start.recall().assumeRecallPage().expectRememberedQuestion()
 })
 
 Then('I should be asked {string}', (expectedQuestionStem: string) => {

@@ -165,3 +165,60 @@ Candidate over slice 1 `ac60f83ff17e67c1a4fe25e6f3fc00813a07fdb2`:
 - Caller trace and one-time removal reading are recorded in PROOF.md, separately
   from behavioral proof. No component or API generation trigger applies.
   Implementation remains uncommitted for independent refactoring and delivery.
+
+### Slice 3 implementation observation — 2026-10-20
+
+Candidate over slice 2 `39503b5d1da3d55f2d7b23f8e62693d7c8fc68ff`:
+
+- `DonutMenu` selects the first active item from the existing combined
+  `useNavigationItems` lists. Its compact `NavigationItem` retains the existing
+  icon, label, badges and styling. Ordinary contexts open the existing popup;
+  action names preserve the existing Resume and next-assimilation owners.
+  The adjacent chevron independently opens the menu, with the existing fallback
+  icon and signed-out Login entry retained. Navigation eligibility is unchanged,
+  including the paused loaded queue-end boundary.
+- The mounted activity fixtures cover Note, Recall, Circles, Bazaar and Messages,
+  ordinary activation, fallback, direct green Resume with diligent count, and
+  independent menu opening. Existing destination and signed-out tests remain.
+  Popup Resume queries are scoped to the panel, retaining an unambiguous compact
+  action. The shared dropdown exposes its existing open state so the compact
+  ordinary control reports its actual expanded state.
+- The first run revealed the compact sibling's opening click immediately
+  reaching the dropdown's document outside-click handler; stop that click at
+  the compact control. Subsequent synthetic-click iterations raced native
+  details toggle scheduling. Real browser `userEvent.click` observes completed
+  interaction, and the final complete affected run passed all cases. Disposable
+  trace instrumentation was removed before the final proof.
+- `CURSOR_DEV=true nix develop -c pnpm frontend:test tests/toolbars tests/pages/RecallPage.spec.ts tests/pages/RecallPage.answering.spec.ts tests/pages/RecallPage.spelling.spec.ts tests/pages/NotebooksPage.spec.ts tests/pages/NotebookGroupPage.spec.ts tests/pages/BookReadingPage.spec.ts tests/composables/useAutoCollapseDetails.spec.ts`
+  passed 168 tests in 25 files. The page consumers of
+  `donutMenuLaunchersIn` keep the independent accessible menu opener. Recall
+  progress aggregate text still passes with the compact activity present.
+- `CURSOR_DEV=true nix develop -c pnpm frontend:test tests/composables/useRecallData.spec.ts`
+  passed 6 tests, retaining the existing resume owner's spelling keyboard focus
+  preparation. Both `CURSOR_DEV=true nix develop -c pnpm -C frontend exec vue-tsc --noEmit`
+  and `CURSOR_DEV=true nix develop -c pnpm -C frontend exec tsc --noEmit` passed
+  against the final frontend candidate.
+- The recall page object now clicks the compact Resume in the shared page bar.
+  The journey reveals and remembers the real current question text and progress,
+  reopens the last answered question through the existing UI, browses medical,
+  resumes directly, and compares the restored question and progress. The test
+  supplies neither the current index nor the expected question through store
+  setup. The isolated Cypress wrapper owns the local stack and teardown at
+  `http://127.0.0.1:50012`; no paid service is required.
+- `CURSOR_DEV=true nix develop -c pnpm cy:run --spec e2e_test/features/recall/browse_answer_and_notes_while_recalling.feature`
+  passed both scenarios against the final journey, including the answered-cursor
+  browse-away and exact saved-question/progress comparison; wrapper exit 0.
+- No component or API generation trigger applies. Native iPad software-keyboard
+  behavior remains unverified under the owner's acceptance update. Changes are
+  uncommitted pending independent refactoring and coordinator delivery.
+- Proof acceptance found the Daily probe's ordinary-question entry sharing
+  `expectCurrentQuestion`. Retained that generic visible-question assertion for
+  `daily_probe.ts` and named the continuity comparison
+  `expectRememberedQuestion`. A whole-E2E caller reading confirms the generic
+  method has only the Daily probe caller, the remembered method only the recall
+  continuity caller, and `rememberCurrentQuestion` only its explicit capture
+  step. Daily probe requires no saved-question aliases.
+- `CURSOR_DEV=true nix develop -c pnpm cy:run --spec e2e_test/features/recall/browse_answer_and_notes_while_recalling.feature,e2e_test/features/recall/daily_probe.feature`
+  passed all 5 scenarios after that correction: 2 continuity/tracker scenarios
+  and 3 Daily probe scenarios, wrapper exit 0. Both assertion contracts are
+  exercised against the final E2E content.

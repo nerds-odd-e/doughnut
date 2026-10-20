@@ -23,6 +23,9 @@ Feature: Browse answers and notes while recalling
     When I visit recall for a due recall prompt on day 2
     And I type my answer "riot"
     Then I should see that my spelling answer "riot" is incorrect
+    When I resume recalling
+    And I remember the current recall question
+    And I review my last recall answer
     When I visit note "medical"
     Then I should be able to resume recalling
     When I resume recalling

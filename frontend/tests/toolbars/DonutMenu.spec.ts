@@ -12,6 +12,7 @@ import type { RouteLocationRaw } from "vue-router"
 import { memoryTrackerLitesStub } from "./menuDataMocks"
 import {
   expectPanelClosed,
+  donutMenuPanel,
   navItemOf,
   openDonutMenu,
   panelItemLabels,
@@ -91,7 +92,9 @@ describe("Donut menu panel", () => {
     setToRepeat(memoryTrackerLitesStub(5))
     await openDonutMenu()
 
-    await fireEvent.click(screen.getByLabelText("Resume"))
+    await fireEvent.click(
+      donutMenuPanel().querySelector('[aria-label="Resume"]')!
+    )
     await flushPromises()
 
     expect(router.currentRoute.value.name).toBe("recall")

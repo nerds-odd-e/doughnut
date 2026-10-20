@@ -19,27 +19,21 @@ needed. Counts and recall eligibility retain their existing domain rules.
 
 ## Architecture and reuse
 
-- `useNavigationItems` owns navigation identity, precedence and counts;
-  `NavigationItem` and `navigationActionItems` already distinguish context
-  from direct actions. Recover first-active selection from historical
-  `HorizontalMenu.vue` at `e4227c46a0fb8fcc2185769bb0ab9974588288aa`,
-  using today's popup and shared header. Keep one classifier.
-- `useResumeRecall` owns resume intent and spelling keyboard preparation;
-  `RecallPage` consumes the intent. `useGoToNextAssimilation` owns next-unit
-  loading, counts, messages, and note/property destinations. Call those owners.
-- Change the existing assimilation presentation concept (`useAssimilationView`
-  and its note/property presentation consumers) to expose the current visible
-  activity to navigation. Reuse actual presentation eligibility and disclosure
-  state. Merely being on `noteProperty`, mounting a panel hidden by `v-show`,
-  or having a saved target note is insufficient. Do not add a parallel
-  sequence-origin flag or duplicate property parsing in the menu.
-- Reuse `SearchForNoteAndFolder`, `Modal`, `primeSoftKeyboard`, the focus
-  directive, and the `note-search` shortcut. One dialog owner and opening
-  operation serve both menu targets and the shortcut. The relationship
-  `SearchForm` requires a note and is not the global-search entry.
-- Keep note actions, their active state, and their measurements with
-  `NoteToolbar`/`NoteToolbarMoreOptions`; adjust allocation/alignment in
-  `GlobalBar` and the existing command row without moving their ownership.
+- `useNavigationItems` owns identity, precedence and counts; `NavigationItem` and
+  `navigationActionItems` distinguish context from direct actions. Recover first-active
+  selection from `HorizontalMenu.vue` at `e4227c46a0fb8fcc2185769bb0ab9974588288aa`
+  using today's popup/header and the existing classifier.
+- Call `useResumeRecall` for intent/spelling keyboard preparation consumed by `RecallPage`,
+  and `useGoToNextAssimilation` for next-unit loading, counts, messages and destinations.
+- Extend `useAssimilationView` and its note/property presentation consumers to expose
+  current visible activity to navigation. Reuse eligibility/disclosure state: a property
+  route, `v-show`-hidden panel or saved target alone is insufficient. No parallel
+  sequence-origin flag or duplicate menu property parsing.
+- Reuse `SearchForNoteAndFolder`, `Modal`, `primeSoftKeyboard`, the focus directive and
+  `note-search` shortcut. One dialog/opening operation serves both menu targets and the
+  shortcut. Relationship `SearchForm` needs a note and is not the global-search entry.
+- Keep note actions, state and measurements with `NoteToolbar`/`NoteToolbarMoreOptions`;
+  adjust allocation/alignment in `GlobalBar` and the existing command row.
 
 Applicable Accepted decisions:
 [ADR 0001 — domain vocabulary](../../../docs/adrs/0001-ubiquitous-language.md#assimilation),
@@ -51,10 +45,9 @@ context reaching the existing navigation model.
 
 ## Proof and premises
 
-The [proof ownership and consumer trace](PROOF.md) define required
-observations and the slice-2 removal reading. The [preparation evidence](EVIDENCE.md)
-preserves dated baselines and the owner's revised native input acceptance. Both are
-part of this executable plan.
+The [proof and consumer trace](PROOF.md) own observations and the slice-2 removal
+reading; [evidence](EVIDENCE.md) retains dated baselines and revised native input
+acceptance. Both belong to this executable plan.
 
 ## Ordered slices
 
@@ -90,7 +83,7 @@ leave its observation unrun.
 
 ### 3. Recognize the current activity and resume recall directly
 Type: Behavior
-Status: planned
+Status: done
 Proof: Compact context, fallback, signed-out/menu tests and real recall continuity,
 including `browse_answer_and_notes_while_recalling.feature`.
 
@@ -169,50 +162,43 @@ CURSOR_DEV=true nix develop -c pnpm cy:run --spec e2e_test/features/note_view/se
 CURSOR_DEV=true nix develop -c pnpm cy:run --spec e2e_test/features/recall/browse_answer_and_notes_while_recalling.feature
 ```
 
-Add the new context and touch specs to their owning command. Run the affected
-page/consumer suites in [PROOF.md](PROOF.md) when their shared control changes; reuse
-valid evidence for unchanged boundaries. Typechecks are required by the
-frontend skill at acceptance, including generated types. Component additions
-or deletions require the Vite build to regenerate `frontend/components.d.ts`.
-No API generation is expected; use its normal workflow if a real contract
-change becomes necessary. No full backend or paid-service run is required.
+Include context/touch specs and affected page consumers from [PROOF.md](PROOF.md).
+Reuse valid proof for unchanged boundaries. Require both frontend typechecks,
+including generated types; component additions/deletions require the Vite build
+to regenerate `frontend/components.d.ts`. Regenerate APIs only for a contract
+change. No full backend or paid-service run is required.
 
 The active slice requests bounded manual visual observation using
 `dough-manual-testing` at the listed widths. Native iPad keyboard behavior stays
 unverified by owner decision. Save setup, screenshots/results and limitations through
 the normal execution evidence, never claim unobserved OS behavior.
 
-Each execution slice includes Jidoka, a fresh `dough-post-change-refactor`
-agent, coordinator-only `./scripts/run.sh pnpm format:changed` once, plan update,
-agent commit with check-only hook, push and owned CI follow-up under
-`dough-execute-plan`. These are execution gates, not permission to implement
-from this preparation. Local proof precedes publication.
+Each slice requires Jidoka, a fresh `dough-post-change-refactor` agent,
+coordinator-only `./scripts/run.sh pnpm format:changed` once, plan update, agent commit
+with check-only hook, push and owned CI follow-up under `dough-execute-plan`.
+These are delivery gates; local proof precedes publication.
 
-The sequence uses one navigation model, one assimilation-presentation concept,
-one search dialog and existing command ownership; it adds no per-slice product
-abstractions. Each slice is safely useful before the following one, with the
-search interim explicitly assigned. Target roughly five minutes; scrutinize
-longer work, and stop/redecompose at ten minutes unless the stated external
-test/device wait applies. Do not use that exception for growing implementation.
+The sequence retains one navigation model, assimilation-presentation concept,
+search dialog and existing command ownership. Each slice is independently useful;
+the search interim is explicitly assigned. Target roughly five minutes,
+scrutinize longer work, and stop/redecompose at ten minutes. The stated external
+test/device wait exceptions do not permit growing implementation.
 
 ## Current decisions and learnings
 
-Slices 1–2 accepted: shared dialog and both launchers, 195 affected tests,
-final toolbar/typechecks, six Cypress search scenarios, and independent refactoring.
+Slices 1–3 accepted: search launchers and compact activity/direct Resume; shared
+search, 168 navigation/page/dropdown tests, typechecks, six search and five recall/probe Cypress scenarios.
 Native input is unverified under the owner's decision; see [evidence](EVIDENCE.md).
 
 - The owner's property-context choice is settled; no sequence-origin policy.
 - Actual visible learning presentation, not property route or mounted DOM,
   is the shared context. Details disclosure uses `v-show`.
-- Existing shortcut assertions do not distinguish menu search from a dialog;
-  add that observation before accepting the move.
-- Existing Resume route/intention checks alone do not establish continued
-  question/cursor behavior; the real recall journey owns that observation.
-- Search-presentation deletion and retained search behavior have different
-  proof ownership; keep the one-time sweep separate.
-- Preparation review found no unresolved slice-boundary or cumulative-design
-  concern after these cuts. An additional slice-plan-refinement pass is not
-  needed; native device evidence is unverified and no longer blocks execution.
+- Shortcut proof observes the actual dialog; Resume continuity observes the real
+  question/cursor journey. Routes and intent alone do not prove continuity.
+- Search deletion uses a separate one-time reading from retained behavior proof.
+- Preparation found no unresolved slice-boundary/cumulative-design concern;
+  no further refinement pass is needed. Native input remains unverified and
+  does not block execution.
 
 ## Story obligations
 
@@ -225,6 +211,11 @@ Disposition: owner changed "Native iPad software-keyboard observation is not an 
 Reported: slice 1 — "Embedded menu search remains as slice 2’s interim obligation."
 Story clause: "Remove the embedded-menu search presentation and transitively unused presentation-only code; shared search capabilities remain reusable."
 Disposition: proved by slice 2: DonutMenu.search.spec.ts dialog journeys, DonutMenu.search.touch.spec.ts focus sequence, search_note.feature six passing scenarios, and PROOF.md separate removal reading
+
+### G3. Recall question assertion consumer
+Reported: slice 3 — "The changed shared method now requires @currentRecallQuestion and @currentRecallProgress, which would break that journey."
+Story clause: "Preserve the other existing navigation destinations, fallback, and signed-out entry behavior."
+Disposition: proved by slice 3: recallPage.ts retains expectCurrentQuestion for daily_probe.ts and uses expectRememberedQuestion only for continuity; both Cypress features passed all five scenarios
 
 ## Execution context
 
