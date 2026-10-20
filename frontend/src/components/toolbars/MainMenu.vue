@@ -20,20 +20,15 @@
 <script setup lang="ts">
 import type { User } from "@generated/donut-backend-api"
 import type { PropType } from "vue"
-import { UserController } from "@generated/donut-backend-api/sdk.gen"
-import { watch, computed, onUnmounted } from "vue"
-import { useAssimilationCount } from "@/composables/useAssimilationCount"
-import timezoneParam from "@/managedApi/window/timezoneParam"
-import { useRecallData } from "@/composables/useRecallData"
-import { useRecallCatchUp } from "@/composables/useRecallCatchUp"
+import { computed } from "vue"
 import { useNavigationItems } from "@/composables/useNavigationItems"
-import { messageCenter } from "@/store/messageCenter"
 import { useBreakpoint } from "@/composables/useBreakpoint"
+import { logout } from "@/managedApi/window/logout"
 import { useRoute } from "vue-router"
 import VerticalMenu from "@/components/toolbars/VerticalMenu.vue"
 import HorizontalMenu from "@/components/toolbars/HorizontalMenu.vue"
 
-const props = defineProps({
+defineProps({
   user: { type: Object as PropType<User>, required: false },
 })
 
@@ -41,75 +36,4 @@ const route = useRoute()
 const { isLgOrLarger } = useBreakpoint()
 const { upperNavItems, lowerNavItems } = useNavigationItems()
 const isHomePage = computed(() => route.name === "home")
-
-const { applyAssimilationCountDto } = useAssimilationCount()
-const {
-  toRepeat,
-  currentRecallWindowEndAt,
-  setToRepeat,
-  setDueCommissioned,
-  setCurrentRecallWindowEndAt,
-  setTotalAssimilatedCount,
-} = useRecallData()
-
-const fetchMenuData = async () => {
-  const { data: menuData, error } = await UserController.getMenuData({
-    query: { timezone: timezoneParam() },
-  })
-  if (!error && menuData) {
-    applyAssimilationCountDto(menuData.assimilationCount)
-    if (menuData.recallStatus) {
-      if ((toRepeat.value?.length ?? 0) === 0) {
-        setToRepeat(menuData.recallStatus.toRepeat)
-      }
-      setDueCommissioned(menuData.recallStatus.dueCommissioned)
-      if (!currentRecallWindowEndAt.value) {
-        setCurrentRecallWindowEndAt(
-          menuData.recallStatus.currentRecallWindowEndAt
-        )
-      }
-      setTotalAssimilatedCount(menuData.recallStatus.totalAssimilatedCount)
-    }
-    if (menuData.unreadMessages !== undefined) {
-      messageCenter.unreadMessages = menuData.unreadMessages
-    }
-  }
-}
-
-watch(
-  () => props.user,
-  () => {
-    if (props.user) {
-      fetchMenuData()
-    }
-  },
-  { immediate: true }
-)
-
-// Tolerates a browser clock slightly ahead of the server.
-const recallWindowEndMarginMs = 5000
-const { catchUpDueRecalls } = useRecallCatchUp()
-let recallCatchUpTimer: ReturnType<typeof setTimeout> | undefined
-
-watch(
-  currentRecallWindowEndAt,
-  (endAt) => {
-    clearTimeout(recallCatchUpTimer)
-    if (!endAt) return
-    recallCatchUpTimer = setTimeout(
-      catchUpDueRecalls,
-      new Date(endAt).getTime() - Date.now() + recallWindowEndMarginMs
-    )
-  },
-  { immediate: true }
-)
-
-onUnmounted(() => clearTimeout(recallCatchUpTimer))
-
-const logout = async () => {
-  await fetch("/logout", {
-    method: "POST",
-  })
-  window.location.href = "/bazaar"
-}
 </script>

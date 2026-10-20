@@ -97,7 +97,7 @@ Hosted CI remains the broader E2E proof after publication.
 
 ### 1. App shell keeps menu counts and recall catch-up without a menu presentation
 Type: Structure
-Status: planned
+Status: done
 Proof: `MainMenu.spec`, `MainMenu.recall.spec`, `MainMenu.resume.spec` green through a harness that mounts the new shell composable beside `MainMenu`; `tests/toolbars` green; typecheck.
 
 Internal change: move the sign-in menu-data fetch, the recall-window
@@ -105,6 +105,15 @@ catch-up timer, and logout out of `MainMenu.vue` into one composable that
 `DonutApp.vue` calls once per app; `MainMenu` keeps rendering the two current
 presentations from the stores. External behavior is unchanged. Enables slice
 2, whose launcher lives in the per-page bar and must not own that lifecycle.
+
+Accepted: `useSignedInMenuData(user)` (fetch and catch-up timer) is called
+once by `DonutApp.vue`; `logout` became the module function
+`managedApi/window/logout.ts`, which the slice 2 launcher imports directly.
+`mountMainMenu` in `tests/toolbars/mainMenuTestSupport.ts` mounts the
+composable beside `MainMenu`. `env -u NODE_ENV CURSOR_DEV=true nix develop -c
+pnpm frontend:test tests/toolbars tests/DonutApp` (repo root): 15 files, 96
+tests green; `pnpm -C frontend exec vue-tsc --noEmit` clean. Slice 2 re-homes
+these observations onto the launcher harness.
 
 ### 2. The Donut menu launcher opens the command panel from the page bar
 Type: Behavior
@@ -157,3 +166,11 @@ the panel offers the existing sign-in action, which starts the login flow;
   execution. Slice 3 exceeds the five-minute target because the replacement
   must land atomically to keep one navigation and green CI; no platform or
   layer split is permitted by the seed.
+
+## Story obligations
+
+### G1. Logout's real request and redirect stay unobserved
+Reported: slice 1 — "No spec runs the real `fetch(\"/logout\")` and redirect, and none did before."
+Story clause: "choosing a destination or action does what it does today"
+Disposition: no user cost "Authors and learners find Donut's app commands in one place": the logout request and redirect moved verbatim into `managedApi/window/logout.ts` and were never observed before; `AccountMenuItem.spec` still observes Logout calling it.
+

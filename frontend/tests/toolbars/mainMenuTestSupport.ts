@@ -1,11 +1,13 @@
 import { UserController } from "@generated/donut-backend-api/sdk.gen"
 import MainMenu from "@/components/toolbars/MainMenu.vue"
+import { useSignedInMenuData } from "@/composables/useSignedInMenuData"
 import type { User } from "@generated/donut-backend-api"
 import { fireEvent, screen } from "@testing-library/vue"
 import makeMe from "donut-test-fixtures/makeMe"
 import helper, { mockSdkService, productionRouterAt } from "@tests/helpers"
 import { resetRecallData } from "@tests/helpers/recallDataTestSupport"
 import { beforeEach, afterEach, vi } from "vitest"
+import { defineComponent, h, type PropType, toRef } from "vue"
 import type { Router } from "vue-router"
 import { defaultMenuData } from "./mainMenuMocks"
 
@@ -34,8 +36,21 @@ export const expandMenuIfNeeded = async () => {
   }
 }
 
+// Mounts the main menu beside the app-shell menu data, as DonutApp does.
+const MainMenuInAppShell = defineComponent({
+  props: { user: { type: Object as PropType<User>, required: false } },
+  setup(props) {
+    useSignedInMenuData(toRef(props, "user"))
+    return () => h(MainMenu, { user: props.user })
+  },
+})
+
 export const mountMainMenu = () =>
-  helper.component(MainMenu).withProps({ user }).withRouter(router).render()
+  helper
+    .component(MainMenuInAppShell)
+    .withProps({ user })
+    .withRouter(router)
+    .render()
 
 export const renderComponent = async () => {
   const result = mountMainMenu()

@@ -21,6 +21,7 @@ import MainMenu from "./components/toolbars/MainMenu.vue"
 import SoftKeyboardPrimer from "./components/commons/SoftKeyboardPrimer.vue"
 import FrontendUpdateReminder from "./components/commons/FrontendUpdateReminder.vue"
 import { useFeatureToggle } from "./composables/useFeatureToggle"
+import { useSignedInMenuData } from "./composables/useSignedInMenuData"
 import { migrateSearchKeyHistory } from "./utils/searchKeyHistory"
 
 migrateSearchKeyHistory()
@@ -32,6 +33,7 @@ const apiStatus: Ref<ApiStatus> = ref({
 setupGlobalClient(apiStatus.value)
 const user = ref<User | undefined>()
 provide("currentUser", user)
+useSignedInMenuData(user)
 const blockingApiState = computed(() =>
   currentBlockingApiState(apiStatus.value)
 )
