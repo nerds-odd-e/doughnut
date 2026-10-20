@@ -2,20 +2,7 @@ import {
   computeDropdownPortalStyle,
   parseDropdownPlacementFromDetails,
 } from "@/composables/dropdownPortalPlacement"
-import { describe, expect, it, afterEach, vi } from "vitest"
-
-function mockMatchMedia(matchesLg: boolean) {
-  return vi.spyOn(window, "matchMedia").mockImplementation((query) => ({
-    matches: matchesLg && query === "(min-width: 1024px)",
-    media: query,
-    onchange: null,
-    addListener: vi.fn(),
-    removeListener: vi.fn(),
-    addEventListener: vi.fn(),
-    removeEventListener: vi.fn(),
-    dispatchEvent: vi.fn(),
-  }))
-}
+import { describe, expect, it } from "vitest"
 
 describe("dropdownPortalPlacement", () => {
   describe("parseDropdownPlacementFromDetails", () => {
@@ -104,38 +91,6 @@ describe("dropdownPortalPlacement", () => {
           align: "start",
         })
       ).toEqual({ top: "200px", left: "148px" })
-    })
-  })
-})
-
-describe("parseDropdownPlacementFromDetails responsive classes", () => {
-  let matchMediaSpy: ReturnType<typeof vi.spyOn> | undefined
-
-  afterEach(() => {
-    matchMediaSpy?.mockRestore()
-  })
-
-  it("prefers lg:daisy-dropdown-right at large viewport for account nav", () => {
-    matchMediaSpy = mockMatchMedia(true)
-
-    const details = document.createElement("details")
-    details.className =
-      "daisy-dropdown daisy-dropdown-bottom daisy-dropdown-end lg:daisy-dropdown-top lg:daisy-dropdown-right"
-    expect(parseDropdownPlacementFromDetails(details)).toEqual({
-      side: "right",
-      align: "end",
-    })
-  })
-
-  it("uses base bottom placement below large viewport", () => {
-    matchMediaSpy = mockMatchMedia(false)
-
-    const details = document.createElement("details")
-    details.className =
-      "daisy-dropdown daisy-dropdown-bottom daisy-dropdown-end lg:daisy-dropdown-top lg:daisy-dropdown-right"
-    expect(parseDropdownPlacementFromDetails(details)).toEqual({
-      side: "bottom",
-      align: "end",
     })
   })
 })

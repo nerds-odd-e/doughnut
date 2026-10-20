@@ -218,7 +218,8 @@ sweep reading: `git grep -n -E "donutMenuPanel|expectFullWidthSheetBelowPageBar|
 
 ### 6. Account expands its grouped actions in place
 Type: Behavior
-Status: planned
+Status: done
+Accepted: `DonutMenu.layout.spec.ts` admin Account actions within the panel at 390 and 1200 (failed first: list past the panel bottom at 390, −53px at 1200); `AccountMenuItem.spec` `aria-expanded` toggle; `DonutMenu.spec` "closes when the account destination already shown is chosen" (failed before the account list emitted `choose`); `tests/toolbars tests/composables/useDropdownPortalPosition.spec.ts` green; vue-tsc clean; E2E `show_failure_report` 3/3 without `{ force: true }`, `user_profile` 3/3. Account's actions render in a full-width row inside the panel and any choice closes the panel through `@choose`. Sweep reading (2026-10-20, before the slice 6 commit): `hasDropdown|has-dropdown|lg:daisy-dropdown|lgOnly|LG_MEDIA_QUERY|account nav` returns nothing.
 Proof: `DonutMenu.layout.spec.ts` for an admin at 390 and 1200: after pressing Account, Admin Dashboard, Recent, Settings, Manage Access Tokens, and Logout all lie within the panel's bounds (fails first: −60px at 1200); `DonutMenu.spec` account-group tests and `AccountMenuItem.spec` green through the disclosure (`aria-expanded` toggles); `useDropdownPortalPosition.spec` green after deleting its account-nav case; E2E `testability/show_failure_report.feature` with `{ force: true }` removed from `donutMenu.ts`, and `users/user_profile.feature`; typecheck; sweep reading.
 
 Behavior: signed in at any width with the panel open → press Account → its

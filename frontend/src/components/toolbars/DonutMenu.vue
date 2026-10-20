@@ -31,10 +31,7 @@
             @goToNextAssimilation="goToNextAssimilation"
           />
         </li>
-        <AccountMenuItem
-          :user="user"
-          :logout="chooseLogout"
-        />
+        <AccountMenuItem :user="user" :logout="logout" @choose="close" />
       </ul>
       <LoginButton v-else />
       <div class="flex items-center justify-end gap-2 pt-2 text-sm">
@@ -71,11 +68,6 @@ const close = () => dropdownRef.value?.closeDropdown()
 const { upperNavItems, lowerNavItems } = useNavigationItems()
 const { resumeRecall } = useResumeRecall()
 const { goToNextAssimilation } = useGoToNextAssimilation()
-
-const chooseLogout = () => {
-  logout()
-  close()
-}
 
 const route = useRoute()
 watch(() => route.fullPath, close)

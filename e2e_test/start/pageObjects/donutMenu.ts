@@ -48,7 +48,7 @@ export const donutMenu = () => {
       openDonutMenu().findByRole('button', { name: 'Account' }).click()
       return {
         adminDashboard() {
-          cy.findByText('Admin Dashboard').click({ force: true })
+          cy.findByText('Admin Dashboard').click()
           return assumeAdminDashboardPage()
         },
 

@@ -174,6 +174,18 @@ describe("Donut menu panel", () => {
       expectPanelClosed()
     })
 
+    it("closes when the account destination already shown is chosen", async () => {
+      await router.push({ name: "settingsAccessTokens" })
+      await flushPromises()
+      await openDonutMenu()
+      await fireEvent.click(screen.getByLabelText("Account"))
+      await flushPromises()
+      await fireEvent.click(screen.getByText("Manage Access Tokens"))
+      await flushPromises()
+
+      expectPanelClosed()
+    })
+
     it("logs out and closes when Logout is chosen", async () => {
       await openDonutMenu()
       await fireEvent.click(screen.getByLabelText("Account"))

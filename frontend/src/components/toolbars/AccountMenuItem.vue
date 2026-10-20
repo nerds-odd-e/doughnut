@@ -3,68 +3,65 @@
     <NavigationItem
       label="Account"
       :icon="UserIcon"
-      :has-dropdown="true"
+      :expanded="expanded"
       :is-active="false"
+      @toggle="expanded = !expanded"
+    />
+  </li>
+  <li v-if="expanded" class="col-span-4">
+    <ul
+      class="daisy-menu w-full p-0 text-neutral-content"
+      @click="emit('choose')"
     >
-      <template #dropdown="{ closeDropdown }">
-        <DropdownMenu>
-          <DropdownMenuItem v-if="user?.admin">
-            <router-link
-              :to="{ name: 'adminDashboard' }"
-              :class="dropdownMenuButtonClass"
-              @click="closeDropdown"
-            >
-              Admin Dashboard
-            </router-link>
-          </DropdownMenuItem>
-          <DropdownMenuItem>
-            <router-link
-              :to="{ name: 'settingsRecent' }"
-              :class="dropdownMenuButtonClass"
-              @click="closeDropdown"
-            >
-              <CircleCheck class="shrink-0" :size="20" aria-hidden="true" />
-              <span>Recent...</span>
-            </router-link>
-          </DropdownMenuItem>
-          <DropdownMenuItem>
-            <router-link
-              :to="{ name: 'settingsGeneral' }"
-              :class="dropdownMenuButtonClass"
-              @click="closeDropdown"
-            >
-              {{ settingsTitle }}
-            </router-link>
-          </DropdownMenuItem>
-          <DropdownMenuItem>
-            <router-link
-              :to="{ name: 'settingsAccessTokens' }"
-              :class="dropdownMenuButtonClass"
-              @click="closeDropdown"
-            >
-              Manage Access Tokens
-            </router-link>
-          </DropdownMenuItem>
-          <DropdownMenuItem>
-            <DropdownMenuActionButton
-              title="Logout"
-              @click="onLogout(closeDropdown)"
-            />
-          </DropdownMenuItem>
-        </DropdownMenu>
-      </template>
-    </NavigationItem>
+      <li v-if="user?.admin" :class="dropdownMenuItemClass">
+        <router-link
+          :to="{ name: 'adminDashboard' }"
+          :class="dropdownMenuButtonClass"
+        >
+          Admin Dashboard
+        </router-link>
+      </li>
+      <li :class="dropdownMenuItemClass">
+        <router-link
+          :to="{ name: 'settingsRecent' }"
+          :class="dropdownMenuButtonClass"
+        >
+          <CircleCheck class="shrink-0" :size="20" aria-hidden="true" />
+          <span>Recent...</span>
+        </router-link>
+      </li>
+      <li :class="dropdownMenuItemClass">
+        <router-link
+          :to="{ name: 'settingsGeneral' }"
+          :class="dropdownMenuButtonClass"
+        >
+          {{ settingsTitle }}
+        </router-link>
+      </li>
+      <li :class="dropdownMenuItemClass">
+        <router-link
+          :to="{ name: 'settingsAccessTokens' }"
+          :class="dropdownMenuButtonClass"
+        >
+          Manage Access Tokens
+        </router-link>
+      </li>
+      <li :class="dropdownMenuItemClass">
+        <DropdownMenuActionButton title="Logout" @click="logout" />
+      </li>
+    </ul>
   </li>
 </template>
 
 <script setup lang="ts">
 import type { User } from "@generated/donut-backend-api"
-import { computed, type PropType } from "vue"
+import { computed, type PropType, ref } from "vue"
 import NavigationItem from "@/components/navigation/NavigationItem.vue"
-import DropdownMenu from "@/components/commons/DropdownMenu.vue"
 import DropdownMenuActionButton from "@/components/commons/DropdownMenuActionButton.vue"
-import DropdownMenuItem from "@/components/commons/DropdownMenuItem.vue"
-import { dropdownMenuButtonClass } from "@/components/commons/dropdownMenuClasses"
+import {
+  dropdownMenuButtonClass,
+  dropdownMenuItemClass,
+} from "@/components/commons/dropdownMenuClasses"
 import { CircleCheck, User as UserIcon } from "@lucide/vue"
 
 const props = defineProps({
@@ -72,10 +69,9 @@ const props = defineProps({
   logout: { type: Function as PropType<() => void>, required: true },
 })
 
-const settingsTitle = computed(() => `Settings for ${props.user.name}`)
+const emit = defineEmits<{ (e: "choose"): void }>()
 
-const onLogout = (closeDropdown: () => void) => {
-  props.logout()
-  closeDropdown()
-}
+const expanded = ref(false)
+
+const settingsTitle = computed(() => `Settings for ${props.user.name}`)
 </script>

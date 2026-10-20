@@ -25,4 +25,19 @@ describe("AccountMenuItem", () => {
     await fireEvent.click(screen.getByTitle("Logout"))
     expect(logout).toHaveBeenCalledOnce()
   })
+
+  it("shows its actions while expanded and hides them when pressed again", async () => {
+    renderAccountMenuItem()
+    const account = screen.getByRole("button", { name: "Account" })
+    expect(account).toHaveAttribute("aria-expanded", "false")
+    expect(screen.queryByTitle("Logout")).toBeNull()
+
+    await fireEvent.click(account)
+    expect(account).toHaveAttribute("aria-expanded", "true")
+    expect(screen.getByTitle("Logout")).toBeInTheDocument()
+
+    await fireEvent.click(account)
+    expect(account).toHaveAttribute("aria-expanded", "false")
+    expect(screen.queryByTitle("Logout")).toBeNull()
+  })
 })
