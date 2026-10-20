@@ -1,9 +1,0 @@
-{
-  "schemaVersion": 1,
-  "agent": "Julia-chan",
-  "email": "julia-chan@example.org",
-  "identity": "SEED-079#story-1",
-  "mode": "story-branch",
-  "branch": "claude/refresh-recall-at-half-day-rollover-and-choose-w",
-  "host": "claude"
-}

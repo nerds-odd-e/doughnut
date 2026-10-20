@@ -329,11 +329,11 @@ The plan's acceptance sweep for a removed control listed `dialog\[open\]` among 
 The refined story decided how the midnight Daily probe re-offer interrupts recall (mid-question or paused), and the plan's slice 3 said "clear the held choice and re-check". Neither considered a learner already doing the probe trials at midnight. The first slice 3 return cleared the choice unconditionally, so the Start/Skip screen would have replaced running trials and discarded the run. The implementer listed the case under gaps; the coordinator returned it before acceptance with a keep-running rule and two discriminating cases.
 
 ### Occurrences
-- Execution: SEED-079#story-1 (plan `.planning/slice-plans/008-half-day-recall-refresh/PLAN.md`, first implementation commit a94c83841f)
+- Execution: SEED-079#story-1 (plan recoverable as `b179d7199a:.planning/slice-plans/008-half-day-recall-refresh/PLAN.md`, first implementation commit a94c83841f)
   - Timestamp: 2026-10-20T15:24:36+09:00
   - Tool: Claude Code
   - Model: claude-opus-5-5
   - Open Dough release: 0.3.66
-  - Evidence: plan slice 3 text "clear the held choice and re-check"; story obligation G5 in the plan at eeab453cdc; `RecallPage.dailyProbeRollover.spec.ts` "keeps Daily probe trials running when the new day arrives during them" (failed on the first return).
+  - Evidence: plan slice 3 text "clear the held choice and re-check"; story obligation G5 in the plan at eeab453cdc (reverted to the simple rule in b179d7199a); `RecallPage.dailyProbeRollover.spec.ts` "keeps Daily probe trials running when the new day arrives during them" (failed on the first return).
   - Observed effect: one extra implementation round of about 4 minutes, which the owner then reverted the same day, calling the case an extreme edge case and asking for the simplest rule. No defect delivered.
   - Inference: when a rule resets held state on a time boundary, refinement should list every state that can hold at that moment, including the activity the rule offers. Requiring implementers to list untested states made the miss visible, but the coordinator should have asked whether the edge case mattered before adding a rule for it.

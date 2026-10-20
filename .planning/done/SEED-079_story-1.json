@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 1,
+  "identity": "SEED-079#story-1",
+  "title": "Refresh recall at half-day rollover and choose whether to start the daily probe",
+  "completedAt": "2026-10-20T07:26:10.034Z",
+  "developer": "Terry Yin",
+  "agent": "Julia-chan",
+  "host": "claude"
+}
