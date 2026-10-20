@@ -8,7 +8,7 @@ import {
   supportedConfig,
 } from './isolated-cypress-test-helpers.mjs'
 import {
-  allocateFreePort,
+  allocateFreePorts,
   closeServer,
   isTcpListening,
   listenHttpReady,
@@ -21,11 +21,8 @@ test('foreign ready listeners refuse Cypress setup before reset and stay alive',
   const checkout = makePrimaryCheckout(t)
   const foreign = await listenHttpReady()
   t.after(() => closeServer(foreign.server))
-  const ports = {
-    backendPort: await allocateFreePort(),
-    vitePort: await allocateFreePort(),
-    lbListenPort: foreign.port,
-  }
+  const [backendPort, vitePort] = await allocateFreePorts(2)
+  const ports = { backendPort, vitePort, lbListenPort: foreign.port }
   writeIsolatedE2ePorts(checkout.root, ports)
   const origin = isolatedBrowserOrigin(ports)
   await startOwnedListeningOwner(t, checkout.root, {
@@ -46,11 +43,8 @@ test('foreign ready listeners refuse Cypress setup before reset and stay alive',
 
 test('healthy owned allocation passes Cypress setup through real healthcheck', async (t) => {
   const checkout = makePrimaryCheckout(t)
-  const ports = {
-    backendPort: await allocateFreePort(),
-    vitePort: await allocateFreePort(),
-    lbListenPort: await allocateFreePort(),
-  }
+  const [backendPort, vitePort, lbListenPort] = await allocateFreePorts(3)
+  const ports = { backendPort, vitePort, lbListenPort }
   writeIsolatedE2ePorts(checkout.root, ports)
   const origin = isolatedBrowserOrigin(ports)
   await startOwnedListeningOwner(t, checkout.root, ports)

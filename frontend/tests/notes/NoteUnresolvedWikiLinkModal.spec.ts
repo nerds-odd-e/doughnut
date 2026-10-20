@@ -6,8 +6,8 @@ import {
 import NoteUnresolvedWikiLinkModal from "@/components/notes/NoteUnresolvedWikiLinkModal.vue"
 import type { DeadWikiLinkPayload } from "@/utils/wikiLinkMarkup"
 import { mockCoarsePointer } from "@tests/helpers/mockCoarsePointer"
+import { focusDirective } from "@/utils/focusTarget"
 import {
-  focusDirective,
   modalBodyStub,
   mountSoftKeyboardPrimer,
   softKeyboardPrimerElement,

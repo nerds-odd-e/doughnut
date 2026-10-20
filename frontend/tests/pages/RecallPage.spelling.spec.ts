@@ -8,7 +8,7 @@ import type { AnsweredQuestion } from "@generated/donut-backend-api"
 import { noteShowLocation } from "@/routes/noteShowLocation"
 import makeMe from "donut-test-fixtures/makeMe"
 import { mockSdkService, wrapSdkResponse } from "@tests/helpers"
-import { focusDirective } from "@tests/helpers/softKeyboardPrimerTestSupport"
+import { focusDirective } from "@/utils/focusTarget"
 import {
   captureRequestAnimationFrame,
   flushCapturedAnimationFrames,

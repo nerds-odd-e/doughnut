@@ -10,7 +10,7 @@ import {
 } from './dev-stack-fixtures.mjs'
 import { runDevStart } from './dev-start.mjs'
 import {
-  allocateFreePort,
+  allocateFreePorts,
   closeServer,
   identityOnlyConfig,
   isPidAlive,
@@ -78,8 +78,7 @@ test('occupied Development port refuses without terminating the listener', async
   const checkout = makePrimaryCheckout(t)
   const { server, port } = await listenTcp()
   t.after(() => closeServer(server))
-  const vitePort = await allocateFreePort()
-  const lbListenPort = await allocateFreePort()
+  const [vitePort, lbListenPort] = await allocateFreePorts(2)
   const spawn = makeStartSpy()
   await assert.rejects(
     runDevStart({

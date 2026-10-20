@@ -1,6 +1,7 @@
 <template>
   <details
     ref="detailsRef"
+    :data-dropdown-portal-owner="portalId"
     :class="{ 'daisy-dropdown-open': open }"
     v-bind="$attrs"
     @click="onClick"
@@ -12,10 +13,10 @@
 
 <script setup lang="ts">
 import { provide, ref, useId } from "vue"
-import { dropdownPortalPanelSelector } from "@/composables/dropdownPortalContext"
 import { useAutoCollapseDetails } from "@/composables/useAutoCollapseDetails"
 import {
   dropdownPortalContextKey,
+  dropdownPortalPanelSelector,
   type DropdownPortalContext,
 } from "@/composables/dropdownPortalContext"
 
@@ -54,6 +55,7 @@ const onToggle = (event: Event) => {
 }
 
 defineExpose({
+  openDropdown: () => setOpen(true),
   closeDropdown,
   containsFocusTarget: (target: Node) =>
     detailsRef.value?.contains(target) === true ||

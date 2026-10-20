@@ -1,38 +1,14 @@
-import {
-  NoteController,
-  SearchController,
-} from "@generated/donut-backend-api/sdk.gen"
 import GlobalBar from "@/components/toolbars/GlobalBar.vue"
-import SoftKeyboardPrimer from "@/components/commons/SoftKeyboardPrimer.vue"
 import type { User } from "@generated/donut-backend-api"
 import type NoteUndo from "@/store/noteUndo"
 import { resetNoteStore } from "@/store/noteStore"
-import {
-  scheduleFocusTargetWithin,
-  softKeyboardPrimerId,
-} from "@/utils/focusTarget"
-import { mockCoarsePointer } from "@tests/helpers/mockCoarsePointer"
 import { screen } from "@testing-library/vue"
-import { mount } from "@vue/test-utils"
 import makeMe from "donut-test-fixtures/makeMe"
-import helper, { mockSdkService, productionRouterAt } from "@tests/helpers"
-import { beforeEach, vi, describe, it, expect, afterEach } from "vitest"
-import { flushPromises } from "@vue/test-utils"
-import { defineComponent, h, nextTick, provide, ref } from "vue"
+import helper from "@tests/helpers"
+import { beforeEach, vi, describe, it, expect } from "vitest"
+import { defineComponent, h, provide, ref } from "vue"
 
-function dispatchNoteSearchShortcut(modifiers: KeyboardEventInit) {
-  document.dispatchEvent(
-    new KeyboardEvent("keydown", {
-      key: "f",
-      code: "KeyF",
-      bubbles: true,
-      cancelable: true,
-      ...modifiers,
-    })
-  )
-}
-
-function renderGlobalBarWithSearchShortcut(loggedInUser?: User) {
+function renderGlobalBar(loggedInUser?: User) {
   const userRef = ref(loggedInUser)
   const Harness = defineComponent({
     setup() {
@@ -46,22 +22,12 @@ function renderGlobalBarWithSearchShortcut(loggedInUser?: User) {
 describe("global bar", () => {
   let noteEditingHistory: NoteUndo
   let user: User
-  let matchMediaSpy: ReturnType<typeof vi.spyOn> | undefined
 
   beforeEach(() => {
     vi.clearAllMocks()
-    // Mock services used by SearchResults (used by LinkNoteDialog in GlobalBar)
-    mockSdkService(NoteController, "getRecentNotes", [])
-    mockSdkService(SearchController, "searchForRelationshipTarget", [])
-    mockSdkService(SearchController, "searchForRelationshipTargetWithin", [])
     user = makeMe.aUser.please()
     const storage = resetNoteStore()
     noteEditingHistory = storage.noteUndo
-  })
-
-  afterEach(() => {
-    matchMediaSpy?.mockRestore()
-    matchMediaSpy = undefined
   })
 
   it.each([
@@ -70,7 +36,7 @@ describe("global bar", () => {
   ])(
     "puts the Donut menu launcher first in the bar when $state",
     async ({ signedIn }) => {
-      renderGlobalBarWithSearchShortcut(signedIn ? user : undefined)
+      renderGlobalBar(signedIn ? user : undefined)
 
       const firstControl = document
         .querySelector("nav")!
@@ -93,67 +59,5 @@ describe("global bar", () => {
     helper.component(GlobalBar).withCurrentUser(user).withRouter().render()
 
     expect(await screen.findByTitle("undo trash note")).not.toBeDisabled()
-  })
-
-  it.each([
-    { label: "Ctrl+F", modifiers: { ctrlKey: true } },
-    { label: "Cmd+F", modifiers: { metaKey: true } },
-  ])("opens note search on $label when logged in", async ({ modifiers }) => {
-    renderGlobalBarWithSearchShortcut(user)
-    expect(screen.queryByPlaceholderText("Search")).toBeNull()
-    dispatchNoteSearchShortcut(modifiers)
-    expect(await screen.findByPlaceholderText("Search")).toBeInTheDocument()
-  })
-
-  it("does not open note search on Ctrl+Shift+F when logged in", async () => {
-    renderGlobalBarWithSearchShortcut(user)
-    dispatchNoteSearchShortcut({ ctrlKey: true, shiftKey: true })
-    expect(screen.queryByPlaceholderText("Search")).toBeNull()
-  })
-
-  it("does not open note search on Ctrl+F when logged out", async () => {
-    renderGlobalBarWithSearchShortcut()
-    expect(screen.queryByPlaceholderText("Search")).toBeNull()
-    dispatchNoteSearchShortcut({ ctrlKey: true })
-    expect(screen.queryByPlaceholderText("Search")).toBeNull()
-  })
-
-  it("focuses primer synchronously when search button is tapped on touch device", async () => {
-    matchMediaSpy = mockCoarsePointer(true)
-
-    const router = await productionRouterAt({ name: "root" })
-    const GlobalBarWithPrimer = defineComponent({
-      components: { SoftKeyboardPrimer, GlobalBar },
-      template: "<SoftKeyboardPrimer /><GlobalBar />",
-    })
-
-    mount(GlobalBarWithPrimer, {
-      global: {
-        plugins: [router],
-        provide: { currentUser: ref(user) },
-        directives: {
-          focus: {
-            mounted(el: HTMLElement) {
-              el.setAttribute("data-autofocus", "true")
-              scheduleFocusTargetWithin(el)
-            },
-          },
-        },
-      },
-      attachTo: document.body,
-    })
-
-    const searchButton = screen.getByTitle("Search note (Ctrl+F / Cmd+F)")
-    searchButton.click()
-
-    expect(document.activeElement).toBe(
-      document.getElementById(softKeyboardPrimerId)
-    )
-
-    const searchInput = await screen.findByPlaceholderText("Search")
-    await flushPromises()
-    await nextTick()
-    await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()))
-    expect(document.activeElement).toBe(searchInput)
   })
 })

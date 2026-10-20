@@ -23,6 +23,7 @@ import {
   setupSearchFormSdkMocks,
 } from "./wiki-link-or-relationship/searchDialogTestSupport"
 import { cleanup, fireEvent, screen } from "@testing-library/vue"
+import makeMe from "donut-test-fixtures/makeMe"
 import { flushPromises } from "@vue/test-utils"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 
@@ -70,7 +71,7 @@ describe("DonutApp search history migration", () => {
   async function reopenHistory() {
     cleanup()
     teardownGlobalClientForTesting()
-    await renderSearchForm({ note: null })
+    await renderSearchForm({ note: makeMe.aNote.please() })
     await openSearchKeyHistoryDropdown()
     return historyItems()
   }

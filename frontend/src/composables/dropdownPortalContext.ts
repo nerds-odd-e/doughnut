@@ -9,8 +9,25 @@ export type DropdownPortalContext = {
 export const dropdownPortalContextKey: InjectionKey<DropdownPortalContext> =
   Symbol("dropdownPortalContext")
 
+const portalPanelForAttribute = "data-dropdown-portal-for"
+
 export function dropdownPortalPanelSelector(portalId: string): string {
-  return `[data-dropdown-portal-for="${CSS.escape(portalId)}"]`
+  return `[${portalPanelForAttribute}="${CSS.escape(portalId)}"]`
+}
+
+/** The portal id of the portaled panel containing `element`, if any. */
+export function enclosingPortalPanelId(
+  element: Element | null
+): string | undefined {
+  return (
+    element
+      ?.closest(`[${portalPanelForAttribute}]`)
+      ?.getAttribute(portalPanelForAttribute) ?? undefined
+  )
+}
+
+export function dropdownPortalOwnerSelector(portalId: string): string {
+  return `[data-dropdown-portal-owner="${CSS.escape(portalId)}"]`
 }
 
 /**

@@ -9,19 +9,19 @@ import { commonSenseSplit } from '../support/string_util'
 
 When('I start searching notes', () => {
   start.navigateToNotebooksPage()
-  start.assumeNotePage().toolbarButton('search note').click()
+  start.donutMenuPanel().startSearching()
 })
 
 When('I search from the current note', () => {
-  start.assumeNotePage().toolbarButton('search note').click()
+  start.donutMenuPanel().startSearching()
 })
 
 When('I open the search result {string}', (title: string) => {
   start.assumeNoteTargetSearchDialog().openResult(title)
 })
 
-Then('the note search dialog should be closed', () => {
-  start.assumeNoteTargetSearchDialog().expectClosed()
+Then('the Donut menu should be closed', () => {
+  start.expectDonutMenuClosed()
 })
 
 Then(

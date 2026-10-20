@@ -1,5 +1,7 @@
+import { NoteController } from "@generated/donut-backend-api/sdk.gen"
 import GlobalBar from "@/components/toolbars/GlobalBar.vue"
-import helper from "@tests/helpers"
+import { focusDirective } from "@/utils/focusTarget"
+import helper, { mockSdkService } from "@tests/helpers"
 import { fireEvent, screen } from "@testing-library/vue"
 import makeMe from "donut-test-fixtures/makeMe"
 import { flushPromises } from "@vue/test-utils"
@@ -11,21 +13,29 @@ import {
   launcher,
   pressLauncher,
   router,
+  searchField,
   setupDonutMenuTests,
   user,
 } from "./donutMenuTestSupport"
 
-async function openDonutMenuInPageBarAt(width: number, menuUser = user) {
+async function openDonutMenuInPageBarAt(
+  width: number,
+  { height = 800, menuUser = user } = {}
+) {
   const original = server.config.browser.viewport
   onTestFinished(() => page.viewport(original.width, original.height))
-  await page.viewport(width, 800)
+  await page.viewport(width, height)
   const PageBar = defineComponent({
     setup() {
       provide("currentUser", ref(menuUser))
       return () => h(GlobalBar)
     },
   })
-  helper.component(PageBar).withRealRouter(router).render()
+  helper
+    .component(PageBar)
+    .withDirective("focus", focusDirective)
+    .withRealRouter(router)
+    .render()
   await flushPromises()
   await pressLauncher()
   return donutMenuPanel().getBoundingClientRect()
@@ -55,7 +65,9 @@ describe("Donut menu panel layout", () => {
   it.each([390, 1200])(
     "keeps the account actions inside the panel at %ipx",
     async (width) => {
-      await openDonutMenuInPageBarAt(width, makeMe.aUser.admin(true).please())
+      await openDonutMenuInPageBarAt(width, {
+        menuUser: makeMe.aUser.admin(true).please(),
+      })
       await fireEvent.click(screen.getByLabelText("Account"))
       await flushPromises()
       const panel = donutMenuPanel().getBoundingClientRect()
@@ -75,4 +87,29 @@ describe("Donut menu panel layout", () => {
       }
     }
   )
+
+  it("fits a short window and scrolls, keeping the search field reachable", async () => {
+    mockSdkService(
+      NoteController,
+      "getRecentNotes",
+      Array.from({ length: 12 }, (_, i) =>
+        makeMe.aNoteSearchResult.title(`Recent ${i}`).please()
+      )
+    )
+    await openDonutMenuInPageBarAt(390, { height: 500 })
+    await fireEvent.focus(searchField())
+    await flushPromises()
+
+    const sheet = donutMenuPanel()
+    expect(sheet.getBoundingClientRect().bottom).toBeLessThanOrEqual(
+      window.innerHeight
+    )
+    expect(sheet.scrollHeight).toBeGreaterThan(sheet.clientHeight)
+
+    searchField().scrollIntoView()
+    const field = searchField().getBoundingClientRect()
+    const box = sheet.getBoundingClientRect()
+    expect(field.top).toBeGreaterThanOrEqual(box.top)
+    expect(field.bottom).toBeLessThanOrEqual(box.bottom)
+  })
 })

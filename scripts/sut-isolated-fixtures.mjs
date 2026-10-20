@@ -120,10 +120,16 @@ export function listenHttpReady(body = 'ready') {
 
 export { closeListeningServer as closeServer }
 
+/** Holds every port open until all are allocated, so the ports are distinct. */
+export async function allocateFreePorts(count) {
+  const held = []
+  for (let i = 0; i < count; i++) held.push(await listenTcp())
+  await Promise.all(held.map(({ server }) => closeListeningServer(server)))
+  return held.map(({ port }) => port)
+}
+
 export async function allocateFreePort() {
-  const temporary = await listenTcp()
-  const { port } = temporary
-  await closeListeningServer(temporary.server)
+  const [port] = await allocateFreePorts(1)
   return port
 }
 

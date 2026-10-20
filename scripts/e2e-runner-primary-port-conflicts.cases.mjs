@@ -4,6 +4,7 @@ import { test } from 'node:test'
 import { makePrimaryCheckout } from './backend-test-worktree-linked-fixtures.mjs'
 import {
   allocateFreePort,
+  allocateFreePorts,
   closeServer,
   listenTcp,
 } from './sut-isolated-fixtures.mjs'
@@ -25,8 +26,7 @@ test('primary batch: foreign listener on a canonical application port refuses wi
   // ports (5173/5174/9081) that may be in use in the developer environment.
   const foreignListener = await listenTcp()
   t.after(() => closeServer(foreignListener.server))
-  const freeBackend = await allocateFreePort()
-  const freeVite = await allocateFreePort()
+  const [freeBackend, freeVite] = await allocateFreePorts(2)
   const runtimeTarget = {
     backendPort: freeBackend,
     vitePort: freeVite,

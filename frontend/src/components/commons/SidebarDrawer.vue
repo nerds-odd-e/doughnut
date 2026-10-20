@@ -34,7 +34,7 @@ defineProps<{ isMdOrLarger: boolean }>()
 
 .sidebar-drawer,
 .sidebar-drawer-backdrop {
-  top: calc(#{$page-bar-height} + env(safe-area-inset-top, 0px));
+  top: $page-bar-bottom;
 }
 
 .sidebar-drawer {

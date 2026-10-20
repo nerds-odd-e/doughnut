@@ -1,3 +1,4 @@
+import router from '../router'
 import { openDonutMenu, waitUntilAppIsNotBusy } from '../pageBase'
 import { form } from '../forms'
 import { navigateToNotebooksPage } from './notebooksPage'
@@ -36,6 +37,18 @@ const userSettingsForm = () => {
 }
 
 export const assumeUserSettingsPage = () => userSettingsForm()
+
+/** Opens the Donut menu panel in the app, staying on the current page. */
+export const donutMenuPanel = () => {
+  router().openApp()
+  openDonutMenu()
+  return {
+    startSearching() {
+      openDonutMenu().findByPlaceholderText('Search').click()
+      return this
+    },
+  }
+}
 
 export const donutMenu = () => {
   navigateToNotebooksPage()

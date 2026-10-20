@@ -6,8 +6,6 @@ Make deliberately captured knowledge more useful through learning and refinement
 
 ## Taken
 
-- [Find and open notes from search inside the Donut menu](seeds/SEED-078-cohesive-note-workspace.md#story-2) — SEED-078#story-2 ([plan](slice-plans/005-donut-menu-search/PLAN.md))
-
 ## Backlog list
 
 - [Use note actions and folder context from one adaptive top bar](seeds/SEED-078-cohesive-note-workspace.md#story-3) — SEED-078#story-3

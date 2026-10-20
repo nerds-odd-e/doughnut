@@ -63,12 +63,8 @@ function confirmChosenNoteAction(buttonName: string) {
 export const assumeNoteTargetSearchDialog = () => {
   return {
     openResult(title: string) {
-      cy.contains('dialog .search-result-item-title a', title).click()
+      cy.contains('.search-result-item-title a', title).click()
       waitUntilAppIsNotBusy()
-      return this
-    },
-    expectClosed() {
-      cy.get('dialog[open]').should('not.exist')
       return this
     },
     findTarget(target: string) {

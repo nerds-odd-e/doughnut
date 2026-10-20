@@ -85,7 +85,7 @@ export async function typeInSearch(input: HTMLElement, value: string) {
 
 export async function renderSearchForm(
   props: {
-    note?: Note | null
+    note: Note
     deadWikiLinkPayload?: {
       portablePath: string
       displayText: string

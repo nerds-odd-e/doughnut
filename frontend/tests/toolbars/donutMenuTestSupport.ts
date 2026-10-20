@@ -6,6 +6,7 @@ import { fireEvent, screen, within } from "@testing-library/vue"
 import makeMe from "donut-test-fixtures/makeMe"
 import helper, { mockSdkService, productionRouterAt } from "@tests/helpers"
 import { resetRecallData } from "@tests/helpers/recallDataTestSupport"
+import { focusDirective } from "@/utils/focusTarget"
 import { flushPromises, type VueWrapper } from "@vue/test-utils"
 import { beforeEach, afterEach, expect, vi } from "vitest"
 import { defineComponent, h, type PropType, toRef } from "vue"
@@ -29,6 +30,7 @@ export const mountDonutMenu = (menuUser: User | null = user) =>
   helper
     .component(DonutMenuInAppShell)
     .withProps({ user: menuUser ?? undefined })
+    .withDirective("focus", focusDirective)
     .withRealRouter(router)
     .render()
 
@@ -69,6 +71,10 @@ export const panelItemLabels = () =>
 
 export const expectPanelClosed = () =>
   expect(screen.queryByRole("region", panelIdentity)).toBeNull()
+
+export const searchField = () => screen.getByPlaceholderText("Search")
+
+export const recentHeading = () => screen.queryByText("Recently updated notes")
 
 export const navItemOf = (label: string) =>
   within(donutMenuPanel()).getByLabelText(label).closest(".nav-item")

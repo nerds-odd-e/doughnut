@@ -3,7 +3,7 @@
   <SearchForNoteAndFolder
     v-if="!selectedSearchResult && !targetSearchResult"
     v-bind="{
-      noteId: note?.id,
+      noteId: note.id,
       notebookId: notebookId,
       modalCloser,
       initialSearchKey: deadWikiLinkPayload?.displayText,
@@ -11,9 +11,10 @@
     @selected="selectedSearchResult = $event"
     @move-under-folder="moveUnderFolder($event)"
     @move-to-notebook-root="moveToNotebookRoot($event)"
+    @navigate="modalCloser?.()"
   />
   <WikiLinkOrRelationshipChoice
-    v-if="selectedSearchResult && !targetSearchResult && note"
+    v-if="selectedSearchResult && !targetSearchResult"
     :target-note-topology="selectedSearchResult.noteTopology"
     :insert-wiki-link-as-property-available="insertWikiLinkAsPropertyAvailable"
     :dead-wiki-link-display-text="deadWikiLinkPayload?.displayText"
@@ -24,7 +25,7 @@
     @go-back="selectedSearchResult = undefined"
   />
   <AddRelationshipFinalize
-    v-if="targetSearchResult && note"
+    v-if="targetSearchResult"
     v-bind="{ targetSearchResult, note }"
     @success="$emit('closeDialog')"
     @go-back="targetSearchResult = undefined"
@@ -57,7 +58,7 @@ const insertWikiLinkAsPropertyAvailable = computed(() =>
 )
 
 const { note, modalCloser, deadWikiLinkPayload } = defineProps<{
-  note?: Note
+  note: Note
   modalCloser?: () => void
   deadWikiLinkPayload?: DeadWikiLinkPayload
 }>()
@@ -69,9 +70,7 @@ const emit = defineEmits<{
 const selectedSearchResult = ref<NoteSearchResult | undefined>(undefined)
 const targetSearchResult = ref<NoteSearchResult | undefined>(undefined)
 
-const noteRealm = computed(() =>
-  note ? noteStore.refOfNoteRealm(note.id).value : undefined
-)
+const noteRealm = computed(() => noteStore.refOfNoteRealm(note.id).value)
 const notebookId = computed(() => noteRealm.value?.notebookRealm.notebook.id)
 
 async function closeDialogThen(run: () => void | Promise<void>) {
@@ -81,7 +80,7 @@ async function closeDialogThen(run: () => void | Promise<void>) {
 }
 
 async function insertAuthoredWikiLink(insertFn: (linkText: string) => void) {
-  if (!selectedSearchResult.value || !note) return
+  if (!selectedSearchResult.value) return
   const destination = selectedSearchResult.value
   const linkText = await authoredWikiLinkTokenForInsert(
     note.id,
@@ -100,7 +99,7 @@ async function onInsertWikiLinkAsProperty() {
 }
 
 async function onDeadWikiLinkToNote() {
-  if (!selectedSearchResult.value || !note || !deadWikiLinkPayload) return
+  if (!selectedSearchResult.value || !deadWikiLinkPayload) return
   const destination = selectedSearchResult.value
   const originalToken = wikiLinkTokenFromDecodedParts(
     deadWikiLinkPayload.portablePath,
@@ -125,7 +124,7 @@ async function moveUnderFolder(targetFolderId: number) {
   if (!(await popups.confirm("Move note into this folder?"))) {
     return
   }
-  await noteStore.moveNote(note!.id, { folderId: targetFolderId })
+  await noteStore.moveNote(note.id, { folderId: targetFolderId })
   emit("closeDialog")
 }
 
@@ -133,7 +132,7 @@ async function moveToNotebookRoot(targetNotebookId: number) {
   if (!(await popups.confirm("Move note to this notebook's root?"))) {
     return
   }
-  await noteStore.moveNote(note!.id, { notebookId: targetNotebookId })
+  await noteStore.moveNote(note.id, { notebookId: targetNotebookId })
   emit("closeDialog")
 }
 </script>

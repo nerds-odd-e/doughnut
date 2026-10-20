@@ -1,10 +1,9 @@
 import { SearchController } from "@generated/donut-backend-api/sdk.gen"
-import SearchForm from "@/components/wiki-link-or-relationship/SearchForm.vue"
 import { SEARCH_KEY_HISTORY_KEY } from "@/utils/searchKeyHistory"
 import { cleanup, fireEvent, screen } from "@testing-library/vue"
 import { flushPromises } from "@vue/test-utils"
 import MakeMe from "donut-test-fixtures/makeMe"
-import helper, { mockSdkService } from "@tests/helpers"
+import { mockSdkService } from "@tests/helpers"
 import { advanceSearchDebounce } from "@tests/helpers/searchDebounceTestSupport"
 import {
   seedSearchKeyHistory,
@@ -30,15 +29,8 @@ describe("SearchForm search key history", () => {
   setupSearchDialogTests()
 
   it("shows empty message when cookie has no entries", async () => {
-    helper
-      .component(SearchForm)
-      .withCleanStorage()
-      .withProps({ note: null })
-      .render()
-    await flushPromises()
-    screen.getByPlaceholderText("Search")
-    fireEvent.click(screen.getByTestId("search-key-history-trigger"))
-    await flushPromises()
+    await renderSearchForm({ note: MakeMe.aNote.please() })
+    await openSearchKeyHistoryDropdown()
     expect(screen.getByText("No search history yet")).toBeInTheDocument()
   })
 
@@ -46,7 +38,7 @@ describe("SearchForm search key history", () => {
     "ignores malformed history %s",
     async (encoded) => {
       seedEncodedSearchKeyHistory(encoded)
-      await renderSearchForm({ note: null })
+      await renderSearchForm({ note: MakeMe.aNote.please() })
       await openSearchKeyHistoryDropdown()
       expect(screen.getByText("No search history yet")).toBeInTheDocument()
     }
@@ -54,7 +46,7 @@ describe("SearchForm search key history", () => {
 
   it("lists only string entries from stored history", async () => {
     seedSearchKeyHistory(["newer", null, 42, "older"])
-    await renderSearchForm({ note: null })
+    await renderSearchForm({ note: MakeMe.aNote.please() })
     await openSearchKeyHistoryDropdown()
     expect(historyItems()).toEqual(["newer", "older"])
   })
@@ -202,7 +194,7 @@ describe("SearchForm search key history", () => {
       expect(screen.getByText("Hit")).toBeInTheDocument()
       vi.restoreAllMocks()
       cleanup()
-      await renderSearchForm({ note: null })
+      await renderSearchForm({ note: MakeMe.aNote.please() })
       await openSearchKeyHistoryDropdown()
       expect(historyItems()).toEqual(["new", "legacy"])
     })

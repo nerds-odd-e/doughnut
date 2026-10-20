@@ -9,7 +9,8 @@
         v-model="inputSearchKey"
         placeholder="Search"
         hide-label
-        v-focus
+        v-focus="!quiet"
+        @focus="entered = true"
         @keydown="onSearchDialogKeydown"
       >
         <template #input_prepend>
@@ -90,6 +91,7 @@
       </button>
     </div>
     <SearchResults
+      v-if="entered"
       v-bind="{
         noteId,
         inputSearchKey,
@@ -98,7 +100,7 @@
       v-model:all-my-notebooks-and-subscriptions="allMyNotebooksAndSubscriptions"
       v-model:all-my-circles="allMyCircles"
       @keydown="onSearchDialogKeydown"
-      @navigate="modalCloser?.()"
+      @navigate="emit('navigate')"
     >
       <template v-if="noteId" #button="{ noteSearchResult }">
         <button
@@ -150,19 +152,22 @@ import DropdownMenu from "@/components/commons/DropdownMenu.vue"
 import DropdownMenuItem from "@/components/commons/DropdownMenuItem.vue"
 import { dropdownMenuButtonMultilineClass } from "@/components/commons/dropdownMenuClasses"
 
-const { initialSearchKey } = defineProps<{
+const { initialSearchKey, quiet } = defineProps<{
   noteId?: number
   notebookId?: number
   /** When set, shows a square close control after the search scope toggles. */
   modalCloser?: () => void
   /** Pre-fills the search field (e.g. dead wiki link display text). */
   initialSearchKey?: string
+  /** Leaves focus alone on mount and shows results only once search is entered (field focus or a history pick). */
+  quiet?: boolean
 }>()
 
 const emit = defineEmits<{
   (e: "selected", noteSearchResult: NoteSearchResult): void
   (e: "moveUnderFolder", folderId: number): void
   (e: "moveToNotebookRoot", targetNotebookId: number): void
+  (e: "navigate"): void
 }>()
 
 const rootRef = ref<HTMLElement | null>(null)
@@ -171,6 +176,8 @@ const searchInputRef = ref<InstanceType<typeof TextInput> | null>(null)
 const inputSearchKey = ref(initialSearchKey ?? "")
 const allMyNotebooksAndSubscriptions = ref(true)
 const allMyCircles = ref(false)
+
+const entered = ref(!quiet)
 
 const historyKeys = ref<string[]>([])
 
@@ -183,6 +190,7 @@ function onHistoryToggle(event: Event) {
 
 function pickHistoryKey(key: string, closeDropdown: () => void) {
   inputSearchKey.value = key
+  entered.value = true
   closeDropdown()
 }
 

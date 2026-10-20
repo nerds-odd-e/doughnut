@@ -103,18 +103,15 @@ describe("SearchForm", () => {
     })
   })
 
-  it("Search at the top level with no note", async () => {
-    await renderSearchForm({ note: null })
-    expect(titleEl("All notebooks")).toBeDisabled()
-  })
-
   describe("keyboard navigation", () => {
     async function renderSearchWithRecentNotes(count: number) {
       const recentNotes = Array.from({ length: count }, (_, i) =>
         MakeMe.aNoteSearchResult.title(`Recent Note ${i + 1}`).please()
       )
       mockSdkService(NoteController, "getRecentNotes", recentNotes)
-      const searchInput = await renderSearchForm({ note: null })
+      const searchInput = await renderSearchForm({
+        note: MakeMe.aNote.please(),
+      })
       expect(allSearchResultItems().length).toBeGreaterThanOrEqual(count)
       return searchInput
     }

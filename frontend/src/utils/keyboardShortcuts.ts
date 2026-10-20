@@ -12,6 +12,7 @@ type KeyMatcher = (e: KeyboardEvent) => boolean
 
 type ShortcutBinding = {
   matches: KeyMatcher
+  guardModal: boolean
   guardEditable: boolean
 }
 
@@ -29,26 +30,32 @@ function ctrlCmdKeyF(e: KeyboardEvent, shift: boolean): boolean {
 const bindings: Record<ShortcutAction, ShortcutBinding> = {
   "note-new": {
     matches: (e) => plainLetterKey(e, "KeyN"),
+    guardModal: true,
     guardEditable: true,
   },
   "note-toggle-edit-mode": {
     matches: (e) => plainLetterKey(e, "KeyM"),
+    guardModal: true,
     guardEditable: true,
   },
   "note-export": {
     matches: (e) => plainLetterKey(e, "KeyE"),
+    guardModal: true,
     guardEditable: true,
   },
   "note-trash": {
     matches: (e) => plainLetterKey(e, "KeyD"),
+    guardModal: true,
     guardEditable: true,
   },
   "note-search": {
     matches: (e) => ctrlCmdKeyF(e, false),
+    guardModal: true,
     guardEditable: false,
   },
   "wiki-link-or-relationship": {
     matches: (e) => ctrlCmdKeyF(e, true),
+    guardModal: false,
     guardEditable: false,
   },
 }
@@ -67,14 +74,12 @@ function isEditableTarget(target: EventTarget | null): boolean {
 function onDocumentKeydownCapture(e: KeyboardEvent): void {
   for (const action of Object.keys(bindings) as ShortcutAction[]) {
     const binding = bindings[action]
-    if (binding.guardEditable) {
-      if (hasOpenModal()) continue
-      if (
-        isEditableTarget(e.target) ||
-        isEditableTarget(document.activeElement)
-      ) {
-        continue
-      }
+    if (binding.guardModal && hasOpenModal()) continue
+    if (
+      binding.guardEditable &&
+      (isEditableTarget(e.target) || isEditableTarget(document.activeElement))
+    ) {
+      continue
     }
     if (!binding.matches(e)) continue
     const stack = handlerStacks.get(action)

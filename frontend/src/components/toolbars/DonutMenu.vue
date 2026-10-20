@@ -33,6 +33,13 @@
         </li>
         <AccountMenuItem :user="user" :logout="logout" @choose="close" />
       </ul>
+      <SearchForNoteAndFolder
+        v-if="user"
+        ref="searchRef"
+        class="pt-2"
+        quiet
+        @navigate="close"
+      />
       <LoginButton v-else />
       <div class="flex items-center justify-end gap-2 pt-2 text-sm">
         <router-link to="/" class="text-neutral-400 no-underline">
@@ -48,22 +55,33 @@
 
 <script setup lang="ts">
 import type { User } from "@generated/donut-backend-api"
-import { onMounted, onUnmounted, ref, watch } from "vue"
+import { nextTick, onMounted, onUnmounted, ref, watch } from "vue"
 import { useRoute } from "vue-router"
 import { BookMarked } from "@lucide/vue"
 import AutoCollapseDropdown from "@/components/commons/AutoCollapseDropdown.vue"
 import NavigationItem from "@/components/navigation/NavigationItem.vue"
 import AccountMenuItem from "@/components/toolbars/AccountMenuItem.vue"
 import LoginButton from "@/components/toolbars/LoginButton.vue"
+import SearchForNoteAndFolder from "@/components/search/SearchForNoteAndFolder.vue"
 import { useNavigationItems } from "@/composables/useNavigationItems"
 import { useResumeRecall } from "@/composables/useResumeRecall"
 import { useGoToNextAssimilation } from "@/composables/useGoToNextAssimilation"
+import { useKeyboardShortcut } from "@/composables/useKeyboardShortcut"
+import { scheduleFocusTargetWithin } from "@/utils/focusTarget"
 import { logout } from "@/managedApi/window/logout"
 
-defineProps<{ user?: User }>()
+const props = defineProps<{ user?: User }>()
 
 const dropdownRef = ref<InstanceType<typeof AutoCollapseDropdown> | null>(null)
 const close = () => dropdownRef.value?.closeDropdown()
+
+const searchRef = ref<InstanceType<typeof SearchForNoteAndFolder> | null>(null)
+const openIntoSearch = async () => {
+  dropdownRef.value?.openDropdown()
+  await nextTick()
+  scheduleFocusTargetWithin(searchRef.value?.$el)
+}
+useKeyboardShortcut("note-search", openIntoSearch, () => !!props.user)
 
 const { upperNavItems, lowerNavItems } = useNavigationItems()
 const { resumeRecall } = useResumeRecall()
@@ -80,9 +98,13 @@ onUnmounted(() => document.removeEventListener("keydown", closeOnEscape))
 </script>
 
 <style scoped lang="scss">
+@use "@/assets/page-bar.scss" as *;
+
 .donut-menu > .daisy-dropdown-content {
   width: max-content;
   max-width: calc(100vw - 2rem);
+  max-height: calc(100dvh - #{$page-bar-bottom});
+  overflow-y: auto;
 }
 
 @media (max-width: 640px) {

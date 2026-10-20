@@ -7,7 +7,7 @@ import routes from "./routes/routes"
 import "./assets/daisyui.css"
 import "./assets/dirty-indicator.css"
 import DonutAppVue from "./DonutApp.vue"
-import { scheduleFocusTargetWithin } from "./utils/focusTarget"
+import { focusDirective } from "./utils/focusTarget"
 
 const router = createRouter({
   history: createWebHistory("/"),
@@ -36,11 +36,6 @@ app.use(Toast, {
   rtl: false,
 })
 
-app.directive("focus", {
-  mounted(el) {
-    el.setAttribute("data-autofocus", "true")
-    scheduleFocusTargetWithin(el)
-  },
-})
+app.directive("focus", focusDirective)
 
 app.mount("#app")

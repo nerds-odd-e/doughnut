@@ -29,6 +29,10 @@ export const openDonutMenu = () => {
   return cy.get(donutMenuPanel)
 }
 
+/** Asserts the Donut menu panel is closed. */
+export const expectDonutMenuClosed = () =>
+  cy.get(donutMenuPanel).should('not.exist')
+
 /** Runs `fn` on the Donut menu item titled `title`, opening the app and the panel first, and closes the panel afterwards when `fn` left it open. */
 export const withinDonutMenuItem = (
   title: string,

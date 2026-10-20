@@ -91,6 +91,43 @@ describe("useAutoCollapseDetails", () => {
     wrapper.unmount()
   })
 
+  it("treats a click in a portaled panel owned by a nested dropdown as inside", async () => {
+    const Harness = defineComponent({
+      setup() {
+        const detailsRef = ref<HTMLDetailsElement | null>(null)
+        useAutoCollapseDetails(detailsRef, undefined, "outer-portal-id")
+        return { detailsRef }
+      },
+      template: `
+        <details ref="detailsRef" open>
+          <summary>Trigger</summary>
+          <details data-dropdown-portal-owner="nested-portal-id" />
+        </details>
+      `,
+    })
+
+    const wrapper = mount(Harness, { attachTo: document.body })
+    const details = wrapper.find("details").element as HTMLDetailsElement
+    const clickInPanelFor = (portalId: string) => {
+      const panel = document.createElement("ul")
+      panel.setAttribute("data-dropdown-portal-for", portalId)
+      const item = document.createElement("button")
+      item.type = "button"
+      panel.append(item)
+      document.body.append(panel)
+      item.dispatchEvent(
+        new MouseEvent("click", { bubbles: true, cancelable: true })
+      )
+    }
+
+    clickInPanelFor("nested-portal-id")
+    expect(details.open).toBe(true)
+
+    clickInPanelFor("unrelated-portal-id")
+    expect(details.open).toBe(false)
+    wrapper.unmount()
+  })
+
   it("closes when click target is outside details and portaled panel", async () => {
     const Harness = defineComponent({
       setup() {
