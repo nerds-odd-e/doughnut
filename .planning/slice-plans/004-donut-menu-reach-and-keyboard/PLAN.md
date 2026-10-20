@@ -231,7 +231,8 @@ reading: `git grep -n -E "hasDropdown|has-dropdown|lg:daisy-dropdown|lgOnly|LG_M
 
 ### 7. Every panel item is keyboard operable and closes the panel
 Type: Behavior
-Status: planned
+Status: done
+Accepted: `DonutMenu.signedOut.spec` Tab reaches "Login via Github" and Enter starts login; `DonutMenu.keyboard.spec` (split from `DonutMenu.spec`) Space on Assimilate goes to the next note and Enter on Assimilate with no more notes closes the panel (all three failed first); `HomePage.welcome.spec` welcome Assimilate reaches the next note (green before the element change); `tests/toolbars tests/pages/HomePage tests/DonutApp.searchHistoryMigration.spec.ts` 104/104; vue-tsc clean. `NavigationItem` action and disclosure items share one native button branch; `LoginButton` is a native button.
 Proof: `DonutMenu.signedOut.spec` Tab from the launcher reaches "Login via Github" and Enter starts the login flow (fails first); `DonutMenu.spec` Space on Assimilate calls `next` (fails first), Enter on Assimilate with no next note closes the panel (fails first), and the existing focus-order and Resume tests stay green; a home-page test, added and green before the element change, presses the welcome section's Assimilate item and reaches the next note (`HomeWelcomeSection` shares `NavigationItem` and has no such test today); typecheck.
 
 Behavior: panel open → Tab through its items, then press Enter or Space on

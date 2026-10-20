@@ -1,7 +1,12 @@
+import { AssimilationController } from "@generated/donut-backend-api/sdk.gen"
 import HomePage from "@/pages/HomePage.vue"
+import { noteShowLocation } from "@/routes/noteShowLocation"
+import { screen } from "@testing-library/vue"
 import makeMe from "donut-test-fixtures/makeMe"
-import helper from "@tests/helpers"
+import helper, { mockSdkService, productionRouterAt } from "@tests/helpers"
+import { flushPromises } from "@vue/test-utils"
 import { describe, expect, it } from "vitest"
+import { userEvent } from "vitest/browser"
 
 describe("HomePage welcome copy", () => {
   it("describes capture, assimilate, and recall", () => {
@@ -35,5 +40,20 @@ describe("HomePage welcome copy", () => {
 
     expect(wrapper.find(".flow-path").attributes("d")).toBeUndefined()
     wrapper.unmount()
+  })
+
+  it("goes to the next note to assimilate from the welcome's Assimilate item", async () => {
+    mockSdkService(AssimilationController, "next", { nextUnit: { noteId: 7 } })
+    const router = await productionRouterAt({ name: "root" })
+    helper
+      .component(HomePage)
+      .withRealRouter(router)
+      .withCurrentUser(makeMe.aUser.please())
+      .render()
+
+    await userEvent.click(screen.getByLabelText("Assimilate"))
+    await flushPromises()
+
+    expect(router.currentRoute.value).toMatchObject(noteShowLocation(7))
   })
 })

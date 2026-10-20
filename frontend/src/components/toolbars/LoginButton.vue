@@ -1,11 +1,12 @@
 <template>
-  <KeyRound
-    role="button"
+  <button
+    type="button"
     aria-label="Login via Github"
     class="login cursor-pointer"
-    :size="30"
     @click="login"
-  />
+  >
+    <KeyRound :size="30" />
+  </button>
 </template>
 
 <script lang="ts">

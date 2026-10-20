@@ -37,13 +37,13 @@
       <span class="label">{{ label }}</span>
       <AssimilationMenuProgress v-if="name === 'assimilate'" />
     </router-link>
-    <a
-      v-else-if="isNavigationActionItem(name)"
+    <button
+      v-else
+      type="button"
       :aria-label="label"
-      tabindex="0"
-      class="flex flex-col items-center"
-      @click.prevent="onActionClick"
-      @keydown.enter.prevent="onActionClick"
+      :aria-expanded="isNavigationActionItem(name) ? undefined : expanded"
+      class="flex flex-col items-center w-full cursor-pointer"
+      @click="onClick"
     >
       <div class="icon-container">
         <component :is="icon" :size="24" />
@@ -53,20 +53,6 @@
       </div>
       <span class="label">{{ label }}</span>
       <AssimilationMenuProgress v-if="name === 'assimilate'" />
-    </a>
-
-    <button
-      v-else
-      type="button"
-      :aria-label="label"
-      :aria-expanded="expanded"
-      class="flex flex-col items-center w-full cursor-pointer"
-      @click="emit('toggle')"
-    >
-      <div class="icon-container">
-        <component :is="icon" :size="24" />
-      </div>
-      <span class="label">{{ label }}</span>
     </button>
   </div>
 </template>
@@ -84,11 +70,13 @@ const emit = defineEmits<{
   (e: "toggle"): void
 }>()
 
-const onActionClick = () => {
+const onClick = () => {
   if (name === "resumeRecall") {
     emit("resumeRecall")
   } else if (name === "assimilate") {
     emit("goToNextAssimilation")
+  } else {
+    emit("toggle")
   }
 }
 </script>

@@ -15,7 +15,6 @@ import type { RouteLocationRaw } from "vue-router"
 import { createMenuData, memoryTrackerLitesStub } from "./menuDataMocks"
 import {
   expectPanelClosed,
-  launcher,
   navItemOf,
   openDonutMenu,
   panelItemLabels,
@@ -234,18 +233,5 @@ describe("Donut menu panel", () => {
       await flushPromises()
       expectPanelClosed()
     })
-  })
-
-  it("is reachable by keyboard: the launcher is a focusable button and items follow in order", async () => {
-    await openDonutMenu()
-    launcher().focus()
-    expect(document.activeElement).toBe(launcher())
-
-    const reached: (string | null)[] = []
-    for (const _ of panelItemLabels()) {
-      await userEvent.tab()
-      reached.push(document.activeElement!.getAttribute("aria-label"))
-    }
-    expect(reached).toEqual(panelItemLabels())
   })
 })
