@@ -227,3 +227,9 @@ Candidate over slice 2 `39503b5d1da3d55f2d7b23f8e62693d7c8fc68ff`:
 
 [Dated implementation, observation and caller evidence](EVIDENCE-ASSIMILATION.md)
 continues this evidence without truncating its original provenance.
+
+## Command group alignment candidate — 2026-10-20
+
+[Dated header implementation, geometry and regression evidence](EVIDENCE-HEADER.md)
+continues this evidence, including the coordinator's completed visual observation
+on the combined candidate after the compact-control CI repair.

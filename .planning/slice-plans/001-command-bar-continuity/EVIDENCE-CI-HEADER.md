@@ -38,3 +38,9 @@ record `/var/folders/65/16p4k5qj42qg7l46k2j0nhj40000gn/T/dough-ci-repair-stash-O
 OID `0cd6cd115f2f2bb3bcd4c9f43d3b39eb90717bbd`. All writers and the owned held
 stack were quiescent first; implementation touched no stashed slice-5 files.
 Repair delivery and exact restoration precede continued slice-5 acceptance.
+
+Repair `ddd19a5e330d0f21bc52f50cf2f9f482cc9b0eee` was accepted on the execution
+branch and registered on the retained observer. Exact sanctioned restoration
+returned `resumed`, `applied: true`, and dropped only the recorded owned entry.
+Slice 5 resumed with combined geometry/typechecks and repeated visual acceptance;
+earlier partial 1280/768 observations are not reused for the changed allocation.

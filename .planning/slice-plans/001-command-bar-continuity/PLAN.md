@@ -45,9 +45,8 @@ context reaching the existing navigation model.
 
 ## Proof and premises
 
-The [proof and consumer trace](PROOF.md) own observations and the slice-2 removal
-reading; [evidence](EVIDENCE.md) retains dated baselines and revised native input
-acceptance. Both belong to this executable plan.
+The [proof and consumer trace](PROOF.md) own observations and the slice-2 removal reading;
+[evidence](EVIDENCE.md) retains dated baselines and revised native input acceptance.
 
 ## Ordered slices
 
@@ -119,7 +118,7 @@ refine this slice around the newly evidenced responsibility before continuing.
 
 ### 5. Align and distinguish the command groups
 Type: Behavior
-Status: planned
+Status: done
 Proof: Workspace header geometry, overflow and busy/open-operation retention,
 plus bounded phone/iPad/desktop visual observation.
 
@@ -147,10 +146,9 @@ final combined visual acceptance, not unrelated layout work.
 
 ## Verification and delivery
 
-Follow `AGENTS.md`, `unit-testing`, `frontend`, the matching frontend rules,
-and `e2e-authoring` for changed Cypress consumers. Use the whole affected
-toolbar suite (the observed run took 7 seconds), not a hand-picked subset
-that hides shared helper failures:
+Follow `AGENTS.md`, `unit-testing`, `frontend`, matching frontend rules, and
+`e2e-authoring` for changed Cypress consumers. Use the whole affected toolbar suite
+(observed: 7 seconds) so shared helper failures remain visible:
 
 ```sh
 CURSOR_DEV=true nix develop -c pnpm frontend:test tests/toolbars
@@ -162,48 +160,42 @@ CURSOR_DEV=true nix develop -c pnpm cy:run --spec e2e_test/features/note_view/se
 CURSOR_DEV=true nix develop -c pnpm cy:run --spec e2e_test/features/recall/browse_answer_and_notes_while_recalling.feature
 ```
 
-Include context/touch specs and affected page consumers from [PROOF.md](PROOF.md).
-Reuse valid proof for unchanged boundaries. Require both frontend typechecks,
-including generated types; component additions/deletions require the Vite build
-to regenerate `frontend/components.d.ts`. Regenerate APIs only for a contract
-change. No full backend or paid-service run is required.
+Include context/touch specs and affected page consumers from [PROOF.md](PROOF.md);
+reuse valid proof for unchanged boundaries. Both typechecks include generated types.
+Component additions/deletions require Vite to regenerate `frontend/components.d.ts`;
+API contract changes require API regeneration. No full backend or paid-service run is required.
 
-The active slice requests bounded manual visual observation using
-`dough-manual-testing` at the listed widths. Native iPad keyboard behavior stays
-unverified by owner decision. Save setup, screenshots/results and limitations through
-the normal execution evidence, never claim unobserved OS behavior.
+Use `dough-manual-testing` for bounded visual observation at the listed widths;
+retain setup, screenshots/results and limitations in the execution evidence.
+Native iPad keyboard behavior stays unverified by owner decision.
 
 Each slice requires Jidoka, a fresh `dough-post-change-refactor` agent,
 coordinator-only `./scripts/run.sh pnpm format:changed` once, plan update, agent commit
 with check-only hook, push and owned CI follow-up under `dough-execute-plan`.
 These are delivery gates; local proof precedes publication.
 
-The sequence retains one navigation model, assimilation-presentation concept,
-search dialog and existing command ownership. Each slice is independently useful;
-the search interim is explicitly assigned. Target roughly five minutes,
-scrutinize longer work, and stop/redecompose at ten minutes. The stated external
-test/device wait exceptions do not permit growing implementation.
+Target roughly five minutes per slice; scrutinize longer work and
+stop/redecompose at ten minutes. External test/device wait exceptions
+do not permit growing implementation.
 
 ## Current decisions and learnings
 
-Slices 1–4 accepted: search, compact activity/Resume, and visible note/property
-assimilation. Routed presentation proof and 214 affected tests pass with typechecks;
-prior search/recall journeys remain valid. Independent refactoring completed.
-Native input is unverified under the owner's decision; see [evidence](EVIDENCE.md).
+Slices 1–4 accepted: search, compact activity/Resume, visible note/property assimilation.
+Routed presentation proof, 214 affected tests and typechecks pass; prior search/recall
+journeys remain valid. Independent refactoring completed. Native input remains
+unverified under the owner's decision; see [evidence](EVIDENCE.md).
 
 CI repair: compact activity preserves pinned recording/open controls at 320px;
 157 tests and typechecks pass after reproducing the failure. See [CI evidence](EVIDENCE-CI-HEADER.md).
-Slice 5 remains planned; its candidate is safely stashed until repair publication.
+Slice 5 accepted: 162 tests, both typechecks, and Chrome observation at all four
+widths pass on the combined candidate. Independent refactoring found no product edits.
 
-- The owner's property-context choice is settled; no sequence-origin policy.
-- Actual visible learning presentation, not property route or mounted DOM,
-  is the shared context. Details disclosure uses `v-show`.
-- Shortcut proof observes the actual dialog; Resume continuity observes the real
-  question/cursor journey. Routes and intent alone do not prove continuity.
+- Visible learning presentation is the shared context; property route or mounted
+  DOM alone is insufficient. Details disclosure uses `v-show`; no sequence-origin policy.
+- Shortcut proof observes the dialog; Resume proof observes the question/cursor journey.
 - Search deletion uses a separate one-time reading from retained behavior proof.
-- Preparation found no unresolved slice-boundary/cumulative-design concern;
-  no further refinement pass is needed. Native input remains unverified and
-  does not block execution.
+- Preparation found no unresolved slice-boundary/cumulative-design concern or
+  need for further refinement. Native input remains unverified and non-blocking.
 
 ## Story obligations
 
@@ -222,21 +214,24 @@ Reported: slice 3 — "The changed shared method now requires @currentRecallQues
 Story clause: "Preserve the other existing navigation destinations, fallback, and signed-out entry behavior."
 Disposition: proved by slice 3: recallPage.ts retains expectCurrentQuestion for daily_probe.ts and uses expectRememberedQuestion only for continuity; both Cypress features passed all five scenarios
 
+### G4. Header visual acceptance
+Reported: slice 5 — "Bounded visual observation of alignment and both separators at 320/390/768/1280 px remains with the coordinator."
+Story clause: "Add subtle dividers between navigation and note-command groups and below the command bar to distinguish controls from content."
+Disposition: proved by slice 5: coordinator Chrome screenshots/AX at 320/390/768/1280 with active assimilation, EVIDENCE-HEADER.md visual observation after the compact-control repair
+
 ## Execution context
 
 - Identity: `SEED-080#story-1`; publisher `dashboard-territory.local-doughnut`;
-  assigned agent Maria-chan; established start reused.
+  Maria-chan; established start reused.
 - Execution/originating checkout: `/Users/terryyin/git/doughnut/.worktrees/recover-active-navigation-and-finish-command-bar`;
   owned linked worktree, branch `codex/recover-active-navigation-and-finish-command-bar`.
-  Story Branch Mode publishes increments to the same branch on `origin`;
-  final integration target is `origin/main`. Default checkout is
-  `/Users/terryyin/git/doughnut` and is not this execution's edit location.
+  Story Branch Mode publishes increments there on `origin`, targeting `origin/main`.
+  Default checkout `/Users/terryyin/git/doughnut` is not this execution's edit location.
 - Starting revision `99588521d53b64053b8cb7d1f7e43c1452480f42`;
-  accepted claim / initial published base and candidate
-  `c02920b649348640cdb8dab5b6d91ca1bd04e6c9`.
-  Remote branch confirmed; claim CI on trunk is unobserved.
-- Checkout setup `./scripts/run.sh bash scripts/worktree_setup.sh` succeeded;
-  its locked workspace installation was current. Applicable command
+  accepted claim / initial base and candidate `c02920b649348640cdb8dab5b6d91ca1bd04e6c9`.
+  Remote branch confirmed; claim CI on trunk unobserved.
+- Setup `./scripts/run.sh bash scripts/worktree_setup.sh` succeeded with current locked dependencies.
+  Applicable command
   `CURSOR_DEV=true nix develop -c pnpm frontend:test tests/toolbars/DonutMenu.searchShortcut.spec.ts`
   passed 6 baseline cases. Hook: check-only `./scripts/run.sh pnpm lint:changed`.
 - Replanning retains existing authority and the stated budgets/exceptions.

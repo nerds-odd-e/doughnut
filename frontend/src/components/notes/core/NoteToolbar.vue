@@ -11,7 +11,7 @@
   >
     <div
       ref="buttonRowRef"
-      class="daisy-btn-group daisy-btn-group-sm flex flex-1 min-w-0"
+      class="daisy-btn-group daisy-btn-group-sm flex flex-1 min-w-0 justify-end"
     >
       <NoteCreationNewButton
         v-if="showRelocatedNewNote"
