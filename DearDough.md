@@ -1,6 +1,6 @@
 # DearDough Process Findings
 
-Reviewed 2026-10-12 (Asia/Tokyo). Active shared-process findings only; released
+Reviewed 2026-10-21 (Asia/Tokyo). Active shared-process findings only; released
 responses under observation live in the [watch list](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/near-term-watch-list.md).
 Detailed observations, original releases and qualified inferences are retained
 in the linked Open Dough catalog. Unknown execution provenance remains unknown.
@@ -8,206 +8,170 @@ in the linked Open Dough catalog. Unknown execution provenance remains unknown.
 - Highest allocated local number: 274. Removed numbers are never reused.
 - Full source recovery before this cleanup: `0a8878e98be76b8e92203515d8f4719489b24169:DearDough.md`.
 - Full source recovery before name adoption and compaction: `234f141b41332715edd5e4384a425bcb8f26e718:DearDough.md`; complete supplied evidence retained in Open Dough `dbe36711c0e4ff9421bc28afc53cb7477203e704:docs/maintainer/findings/`.
-- Project-owned findings remain in [Donut Retrospective Findings](DonutRetrospectiveFindings.md); their ownership review is unchanged.
+- Project-owned findings and their current assessment remain in [Donut Retrospective Findings](DonutRetrospectiveFindings.md).
+- Full source recovery before this adoption and compaction: `9e98f0874d9519997be4579a5fe4edde8997f496:DearDough.md`; newly supplied evidence is retained in Open Dough `341293c09f1115b8ad3412fc6da63679ce563457:docs/maintainer/findings/`.
 
 <a id="odf-110"></a>
 
 ## ODF-110 — Incomplete readiness replays
 
-Former local code: DD-109. Former local code: DD-163. Former local code: DD-168. Former local code: DD-171. Former local code: DD-207. A replay resolves the named readiness seam without exercising the rest of the slice's promised journey, leaving a later operation to force a scope stop. Open after verified later recurrence; not resolved. [Evidence and response](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/finding-names.md#odf-110).
+Former local code: DD-109. Former local code: DD-163. Former local code: DD-168. Former local code: DD-171. Former local code: DD-207. A replay resolves the named readiness seam without exercising the rest of the slice's promised journey, leaving a later operation to force a scope stop. Open after verified later recurrence; not resolved. [Evidence and response](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/findings/ODF-110.md).
 
 <a id="odf-121"></a>
 
 ## ODF-121 — Transient transport failure ends observation
 
-Former local code: DD-115. A reported GitHub transport failure ends observation and leaves later revisions without notification coverage. Open, unqueued. [Evidence and response](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/finding-names.md#odf-121).
+Former local code: DD-115. A reported GitHub transport failure ends observation and leaves later revisions without notification coverage. Open, unqueued. [Evidence and response](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/findings/ODF-121.md).
 
 <a id="odf-106"></a>
 
 ## ODF-106 — Colliding plan numbers
 
-Former local code: DD-118. Concurrent unpublished plan allocation produces two quick plans with the same numeric selector, making a number-only execution request ambiguous. Open, unqueued. [Evidence and response](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/finding-names.md#odf-106).
+Former local code: DD-118. Concurrent unpublished plan allocation produces two quick plans with the same numeric selector, making a number-only execution request ambiguous. Open, unqueued. [Evidence and response](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/findings/ODF-106.md).
 
 <a id="odf-074"></a>
 
 ## ODF-074 — Unverified planning premises
 
-Former local code: DD-126. Former local code: DD-130. Former local code: DD-134. Former local code: DD-139. Former local code: DD-147. Former local code: DD-162. Former local code: DD-167. Former local code: DD-209. Concrete only-caller and host-state premises enter a plan without inspection, forcing a changed decision or stopped implementation when checked. Open after verified later recurrence; not resolved. [Evidence and response](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/finding-names.md#odf-074).
+Former local code: DD-126. Former local code: DD-130. Former local code: DD-134. Former local code: DD-139. Former local code: DD-147. Former local code: DD-162. Former local code: DD-167. Former local code: DD-209. Concrete only-caller and host-state premises enter a plan without inspection, forcing a changed decision or stopped implementation when checked. Open after verified later recurrence; not resolved. [Evidence and response](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/findings/ODF-074.md).
 
 <a id="odf-147"></a>
 
 ## ODF-147 — Reasoned red proof leaves ineffective tests
 
-Former local code: DD-127. An agent reasons that new tests would fail instead of observing them against pre-change behavior; round-trip or wrong-boundary tests can pass without the fix. Open, unqueued. [Evidence and response](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/finding-names.md#odf-147).
+Former local code: DD-127. An agent reasons that new tests would fail instead of observing them against pre-change behavior; round-trip or wrong-boundary tests can pass without the fix. Open, unqueued. [Evidence and response](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/findings/ODF-147.md).
 
 <a id="odf-100"></a>
 
 ## ODF-100 — Masked formatter failure
 
-Former local code: DD-135. A formatter piped through tail returns the final pipeline stage's success, allowing subsequent delivery steps after formatter failure. Open, unqueued. [Evidence and response](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/finding-names.md#odf-100).
+Former local code: DD-135. A formatter piped through tail returns the final pipeline stage's success, allowing subsequent delivery steps after formatter failure. Open, unqueued. [Evidence and response](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/findings/ODF-100.md).
 
 <a id="odf-152"></a>
 
 ## ODF-152 — File-size gate conflicts with approved intermediate scope
 
-Former local code: DD-138. An absolute changed-file size check conflicts with an approved staged decomposition and mechanical edits to pre-existing oversized callers. Open, unqueued. [Evidence and response](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/finding-names.md#odf-152).
+Former local code: DD-138. An absolute changed-file size check conflicts with an approved staged decomposition and mechanical edits to pre-existing oversized callers. Open, unqueued. [Evidence and response](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/findings/ODF-152.md).
 
 <a id="odf-189"></a>
 
 ## ODF-189 — Small additions force unrelated size extractions
 
-Former local code: DD-144. A small addition crosses the numeric file-size ceiling and triggers relocation and re-proof of a substantial previously untouched responsibility. Open, unqueued. [Evidence and response](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/finding-names.md#odf-189).
-
-### Occurrences
-- Execution: SEED-080#story-1 (first implementation `ac60f83ff17e67c1a4fe25e6f3fc00813a07fdb2`)
-  - Timestamp: unknown
-  - Tool: Codex
-  - Open Dough release: unknown
-  - Evidence: on 2026-10-20, the refactor file-size gate moved 138 lines of story constraints and dated observations into `.planning/seeds/SEED-080-command-bar-context.md` (published `ac60f83ff17e67c1a4fe25e6f3fc00813a07fdb2`); the slice 5 pass then compacted a 251-line plan to 240 (`c8523d0428e88b1da203a6f935decf7c1a888b26`).
-  - Observed effect: multiple documentation splits/compactions were required while product behavior and its accepted proof remained unchanged.
-  - Inference: the same absolute ceiling reaches temporary planning records; this occurrence concerns document churn, not a demonstrated product-code extraction cost.
+Former local code: DD-144. A small addition crosses the numeric file-size ceiling and triggers relocation and re-proof of a substantial previously untouched responsibility. Open, unqueued. [Evidence and response](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/findings/ODF-189.md).
 
 <a id="odf-190"></a>
 
 ## ODF-190 — Planned observation route is unavailable
 
-Former local code: DD-145. Planning names an observation route or log source that is not available to the executing project, causing owner probing or loss of the intended proof. Released response; watch start unknown. [Evidence and response](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/finding-names.md#odf-190).
+Former local code: DD-145. Planning names an observation route or log source that is not available to the executing project, causing owner probing or loss of the intended proof. Released response; watch start unknown. [Evidence and response](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/findings/ODF-190.md).
 
 <a id="odf-195"></a>
 
 ## ODF-195 — Pre-existing size overrun handled inconsistently
 
-Former local code: DD-160. Two refactor passes within one story treat barely touched, already oversized files differently, forcing an unrelated extraction in one and retaining another. Open, unqueued. [Evidence and response](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/finding-names.md#odf-195).
+Former local code: DD-160. Two refactor passes within one story treat barely touched, already oversized files differently, forcing an unrelated extraction in one and retaining another. Open, unqueued. [Evidence and response](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/findings/ODF-195.md).
 
 <a id="odf-141"></a>
 
 ## ODF-141 — Fixed refactor cost on small accepted slices
 
-Former local code: DD-176. Every small slice launches a fresh full refactor agent even when the accepted diff needs no further changes, creating substantial repeated cost. Open, unqueued. [Evidence and response](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/finding-names.md#odf-141).
-
-### Occurrences
-- Execution: SEED-080#story-1 (first implementation `ac60f83ff17e67c1a4fe25e6f3fc00813a07fdb2`)
-  - Timestamp: unknown
-  - Tool: Codex
-  - Open Dough release: unknown
-  - Evidence: independent `refactor_header_repair`, `refactor_header_alignment`, and `refactor_menu_spacing` returns on 2026-10-20 reported no product/test candidate and approximately 4, 8, and 5 minutes active review respectively; accepted source changes are in `ddd19a5e330d0f21bc52f50cf2f9f482cc9b0eee`, `c8523d0428e88b1da203a6f935decf7c1a888b26`, and `d241265ffc4add55964c7bd6c1906700940114ca`.
-  - Observed effect: each small change required another fresh review; two passes changed evidence summaries only, and no product/test refactor was needed.
-  - Inference: these are agent-reported approximate times, not independent timing measurements. The reviews checked real consumers and retained proof, so the record supports fixed cost, not that all review was wasted.
+Former local code: DD-176. Every small slice launches a fresh full refactor agent even when the accepted diff needs no further changes, creating substantial repeated cost. Open, unqueued. [Evidence and response](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/findings/ODF-141.md).
 
 <a id="odf-208"></a>
 
 ## ODF-208 — Observer worker exits without a recorded cause
 
-Former local code: DD-202. The CI observer's worker exits mid-execution without a terminal result or a reported transport error, ending notification coverage. Open, unqueued. [Evidence and response](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/finding-names.md#odf-208).
+Former local code: DD-202. The CI observer's worker exits mid-execution without a terminal result or a reported transport error, ending notification coverage. Open, unqueued. [Evidence and response](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/findings/ODF-208.md).
 
 <a id="odf-213"></a>
 
 ## ODF-213 — Refinement reproduces a test mechanism already forbidden
 
-Former local code: DD-204. Refinement makes reproducing a flaky mock the prerequisite for a remedy although the project’s existing rules already forbid that mock. Open, unqueued. [Evidence and response](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/finding-names.md#odf-213).
+Former local code: DD-204. Refinement makes reproducing a flaky mock the prerequisite for a remedy although the project’s existing rules already forbid that mock. Open, unqueued. [Evidence and response](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/findings/ODF-213.md).
 
 <a id="odf-214"></a>
 
 ## ODF-214 — A planned real observation loses a contract distinction
 
-Former local code: DD-206. Replacing captured router push/replace calls with current-location proof cannot distinguish the behaviors the story promises to preserve. Open, unqueued. [Evidence and response](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/finding-names.md#odf-214).
+Former local code: DD-206. Replacing captured router push/replace calls with current-location proof cannot distinguish the behaviors the story promises to preserve. Open, unqueued. [Evidence and response](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/findings/ODF-214.md).
 
 <a id="odf-216"></a>
 
 ## ODF-216 — Landing retires a workspace with a remaining continuation
 
-Former local code: DD-212. Explicitly authorized landing removes an execution workspace while the Taken story still has a final real-stack check and wrap-up owed. Open, unqueued. [Evidence and response](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/finding-names.md#odf-216).
+Former local code: DD-212. Explicitly authorized landing removes an execution workspace while the Taken story still has a final real-stack check and wrap-up owed. Open, unqueued. [Evidence and response](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/findings/ODF-216.md).
 
 <a id="odf-185"></a>
 
 ## ODF-185 — Reported story gap filed as a learning
 
-Former local code: DD-214. A reported preservation gap or provisional behavior is accepted as a learning without checking the whole story and the later slices that depend on it. Released response; watch start unknown. [Evidence and response](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/finding-names.md#odf-185).
+Former local code: DD-214. A reported preservation gap or provisional behavior is accepted as a learning without checking the whole story and the later slices that depend on it. Released response; watch start unknown. [Evidence and response](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/findings/ODF-185.md).
 
 <a id="odf-142"></a>
 
 ## ODF-142 — Abbreviated delivery SHAs produce misleading refusals
 
-Former local code: DD-216. An abbreviated published-base SHA is accepted as an argument but compared without normalization, causing misleading delivery refusal and fallback publication without observation. Open, unqueued. [Evidence and response](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/finding-names.md#odf-142).
+Former local code: DD-216. An abbreviated published-base SHA is accepted as an argument but compared without normalization, causing misleading delivery refusal and fallback publication without observation. Open, unqueued. [Evidence and response](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/findings/ODF-142.md).
 
 <a id="odf-206"></a>
 
 ## ODF-206 — Over-budget slice not stopped
 
-Former local code: DD-217. Former local code: DD-222. The slice time bound is checked only at hand-back, so a delegated slice runs past it and is accepted or extended without re-sizing. Open, unqueued. [Evidence and response](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/finding-names.md#odf-206).
-
-### Occurrences
-- Execution: SEED-078#story-3 (plan recoverable at `3022ecdf62:.planning/slice-plans/006-adaptive-note-header/PLAN.md`, first implementation commit 7d122c9938)
-  - Timestamp: 2026-10-20T14:13:39+09:00
-  - Tool: Claude Code
-  - Model: claude-opus-5-5
-  - Open Dough release: 0.3.66
-  - Evidence: slice 2 sized 7–9 minutes with "Stop and finer-decompose if it exceeds ten minutes"; the first implementation return took about 10 minutes of agent wall time (including a whole-suite run), and the proof-gap return about 6 more; slice commit e0cf54a34a.
-  - Observed effect: the slice was accepted at about 16 minutes without re-sizing; the extra round found and fixed a real defect, so the overrun delivered value.
-  - Inference: wall time includes whole-suite verification, which the sizing hypothesis may not count; the bound was not checked mid-run.
+Former local code: DD-217. Former local code: DD-222. The slice time bound is checked only at hand-back, so a delegated slice runs past it and is accepted or extended without re-sizing. Open, unqueued. [Evidence and response](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/findings/ODF-206.md).
 
 <a id="odf-217"></a>
 
 ## ODF-217 — Unverified refactor proof effects
 
-Former local code: DD-218. A refactor misclassifies or omits the proof effects of a change, leaving reached consumers unrun; some returns incorrectly call changed behavior identical or type-only. Open, unqueued. [Evidence and response](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/finding-names.md#odf-217).
+Former local code: DD-218. A refactor misclassifies or omits the proof effects of a change, leaving reached consumers unrun; some returns incorrectly call changed behavior identical or type-only. Open, unqueued. [Evidence and response](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/findings/ODF-217.md).
 
 <a id="odf-242"></a>
 
 ## ODF-242 — Correction queued after its repair already exists
 
-Former local code: DD-219. Retrospective queues and takes a full correction story despite its exact repair already being committed on the same branch, producing a claim, workspace, plan and wrap-up but no product/test change. Open, unqueued. [Evidence and response](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/finding-names.md#odf-242).
+Former local code: DD-219. Retrospective queues and takes a full correction story despite its exact repair already being committed on the same branch, producing a claim, workspace, plan and wrap-up but no product/test change. Open, unqueued. [Evidence and response](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/findings/ODF-242.md).
 
 <a id="odf-243"></a>
 
 ## ODF-243 — Missing story source is validated only after a gap
 
-Former local code: DD-221. A plan without the mandatory Source link passes story-obligation list/check while its record is empty, then the first real obligation unexpectedly blocks delivery. Open, unqueued. [Evidence and response](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/finding-names.md#odf-243).
+Former local code: DD-221. A plan without the mandatory Source link passes story-obligation list/check while its record is empty, then the first real obligation unexpectedly blocks delivery. Open, unqueued. [Evidence and response](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/findings/ODF-243.md).
 
 <a id="odf-244"></a>
 
 ## ODF-244 — Real microphone proof is assigned without an agent access route
 
-Former local code: DD-223. A plan assigns a real-microphone visual observation to an unattended agent, then replaces it with synthetic screenshots and leaves the real-input check to the owner. Open, unqueued. [Evidence and response](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/finding-names.md#odf-244).
+Former local code: DD-223. A plan assigns a real-microphone visual observation to an unattended agent, then replaces it with synthetic screenshots and leaves the real-input check to the owner. Open, unqueued. [Evidence and response](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/findings/ODF-244.md).
 
 <a id="odf-245"></a>
 
 ## ODF-245 — Component lifetime changes miss captured state
 
-Former local code: DD-224. Planning moves or reuses a session-owning component across note changes without reconciling its per-instance captures and termination, causing stale note targeting or a retained title lock. Open, unqueued. [Evidence and response](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/finding-names.md#odf-245).
+Former local code: DD-224. Planning moves or reuses a session-owning component across note changes without reconciling its per-instance captures and termination, causing stale note targeting or a retained title lock. Open, unqueued. [Evidence and response](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/findings/ODF-245.md).
 
 <a id="odf-246"></a>
 
 ## ODF-246 — Observation-to-fix slices contradict scratch retention
 
-Former local code: DD-228. An observation slice instructs scratch removal while the next slice requires its regression test, leaving the only passing baseline test untracked between deliveries. Open, unqueued. [Evidence and response](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/finding-names.md#odf-246).
+Former local code: DD-228. An observation slice instructs scratch removal while the next slice requires its regression test, leaving the only passing baseline test untracked between deliveries. Open, unqueued. [Evidence and response](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/findings/ODF-246.md).
 
 <a id="odf-180"></a>
 
 ## ODF-180 — Measurement-slice delivery ownership is unclear
 
-Former local code: DD-229. A measurement plan assigns record/prototype work to the coordinator while execution guidance still requires fresh implementation and refactor passes, producing case-by-case deviations. Open, unqueued. [Evidence and response](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/finding-names.md#odf-180).
+Former local code: DD-229. A measurement plan assigns record/prototype work to the coordinator while execution guidance still requires fresh implementation and refactor passes, producing case-by-case deviations. Open, unqueued. [Evidence and response](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/findings/ODF-180.md).
 
 <a id="odf-247"></a>
 
 ## ODF-247 — Plan proof omits promised session endings
 
-Former local code: DD-231. A slice proof table omits explicit story end conditions, so implementers return it complete while listing those conditions untested; the coordinator needs second rounds to compare with the full story. Open, unqueued. [Evidence and response](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/finding-names.md#odf-247).
+Former local code: DD-231. A slice proof table omits explicit story end conditions, so implementers return it complete while listing those conditions untested; the coordinator needs second rounds to compare with the full story. Open, unqueued. [Evidence and response](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/findings/ODF-247.md).
 
 <a id="odf-264"></a>
 
 ## ODF-264 — Broad startup reads exceeded the response budget and forced repeated retrieval
 
-Former local code: DD-233. Broad whole-reference and metadata batches exceeded the response budget and truncated required context before delegation, forcing repeated retrieval despite existing targeted-reading guidance. Seven distinct recorded executions; savings are unmeasured. This agent deviation is distinct from ODF-158’s required-reference cost. Open, unqueued. [Evidence and response](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/findings/ODF-264.md).
-
-### Occurrences
-- Execution: SEED-078#story-5 (first implementation `8d30de7ea31644d7e4f6131cf25a36a0e7f47b18`; completed plan recoverable at `522f3f9f72:.planning/slice-plans/009-note-details-disclosure/PLAN.md`)
-  - Timestamp: unknown
-  - Tool: Codex
-  - Open Dough release: unknown
-  - Evidence: launch `58389715-75a6-443c-a76f-ee05304b0705` startup tool results reported truncated batches of 22,999 and 21,377 original tokens; focused reference reads followed before delegation on 2026-10-20.
-  - Observed effect: two oversized batches left required context truncated and caused repeated retrieval.
-  - Inference: the coordinator batched too many whole references despite the targeted-retrieval guidance; token savings are unmeasured.
+Former local code: DD-233. Broad whole-reference and metadata batches exceeded the response budget and truncated required context before delegation, forcing repeated retrieval despite existing targeted-reading guidance. Execution provenance and counts remain with the linked evidence owner; savings are unmeasured. This agent deviation is distinct from ODF-158’s required-reference cost. Open, unqueued. [Evidence and response](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/findings/ODF-264.md).
 
 <a id="odf-265"></a>
 
@@ -263,161 +227,74 @@ Former local code: DD-248. Naming a shared modal’s outer dismissal Close colli
 
 Former local code: DD-249. Required whole-suite verification began while intended test or template edits were still changing, requiring another run on settled source. One SEED-073#story-2 execution reports an extra full backend run and premature frontend/typecheck results. This sequencing deviation excludes necessary reruns after newly discovered gaps and differs from ODF-225’s repair-stash invalidation. Open, unqueued. [Evidence and response](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/findings/ODF-273.md).
 
+<a id="odf-308"></a>
+
 <a id="dd-251"></a>
 
-## DD-251 — A plan removed the only remaining sign-in control before moving it
+## ODF-308 — A plan removed the only remaining sign-in control before moving it
 
-Slice planning ordered the removal of the old menus before the slice that moves the visitor's sign-in control into the new launcher. Those menus were the only place a visitor could sign in, so after the removal commit visitors would have had no sign-in until the next commit, and the signed-out E2E journeys might have failed on the story branch. The coordinator's destructive later-outcome check found the conflict before delegation and reordered the slices. Planning and readiness review had not found it.
+Former local code: DD-251. A plan removed the sole sign-in route one slice before its replacement. One SEED-078#story-1 execution on 0.3.66; corrected before implementation at the cost of one plan edit. Open, unqueued; relationship to ODF-210 remains qualified. [Evidence and current response](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/findings/ODF-308.md).
 
-### Occurrences
-- Execution: SEED-078#story-1 (`.planning/slice-plans/003-donut-command-center/PLAN.md`, first implementation commit 15b6077ccd)
-  - Timestamp: 2026-10-20T10:30:00+09:00
-  - Tool: Claude Code
-  - Model: claude-opus-5-5
-  - Open Dough release: 0.3.66
-  - Evidence: the plan at f46a068 lists slice 3 "delete … VerticalMenu, HorizontalMenu" before slice 4 "`LoginButton` renders inside the panel and nowhere else"; `LoginButton` was used only by `HorizontalMenu.vue:17` and `VerticalMenu.vue:26`; the reorder was recorded in the plan's Current decisions in commit e4227c4.
-  - Observed effect: the plan was corrected during execution before any implementation; the cost was one plan edit.
-  - Inference: the planning premise check covered who consumed what was being removed, but not which user paths lived only in it. The timestamp is approximate, within the execution session.
+<a id="odf-309"></a>
 
 <a id="dd-252"></a>
 
-## DD-252 — Required build proof fails on formatting that implementers may not run
+## ODF-309 — Required build proof fails on formatting that implementers may not run
 
-The plan required implementers to run the Vite build so `components.d.ts` is regenerated. Donut's build runs a Biome format check, but delegation forbids implementers from formatting, because the coordinator runs `format:changed` later. The slice 2 implementer therefore returned with the build failing on line-wrapping only, and build proof was confirmed only after the coordinator's formatting pass.
+Former local code: DD-252. Required build/generation proof checks formatting before coordinator-owned formatting, producing red proof or manual layout repair before that stage. Two SEED-078 executions (story-1 and story-5), first on 0.3.66 and second release unknown; repeated builds, no escaped defect. Distinct from ODF-285’s observed formatter-ownership violation. Open, unqueued. [Evidence and current response](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/findings/ODF-309.md).
 
-### Occurrences
-- Execution: SEED-078#story-1 (`.planning/slice-plans/003-donut-command-center/PLAN.md`, first implementation commit 15b6077ccd)
-  - Timestamp: 2026-10-20T10:10:00+09:00
-  - Tool: Claude Code
-  - Model: claude-opus-5-5
-  - Open Dough release: 0.3.66
-  - Evidence: the slice 2 return says `pnpm -C frontend build` "exits 1, but only on the build's built-in Biome formatter check of three spec files"; the coordinator then ran `format:changed` ("Fixed 3 files") and the build.
-  - Observed effect: one implementer proof was reported red and accepted on reasoning until the coordinator reran it; no defect escaped.
-  - Inference: the shared rule that implementers do not format conflicts with any project proof command that also checks formatting. The timestamp is approximate.
-
-- Execution: SEED-078#story-5 (first implementation `8d30de7ea31644d7e4f6131cf25a36a0e7f47b18`; completed plan recoverable at `522f3f9f72:.planning/slice-plans/009-note-details-disclosure/PLAN.md`)
-  - Timestamp: unknown
-  - Tool: Codex
-  - Open Dough release: unknown
-  - Evidence: the slice 3 return on 2026-10-20 reports the required Vite build initially failed on Biome line-wrapping/blank-line checks; ordinary source-layout corrections were made manually and the build then passed, regenerating declarations in `4b9d3792f7eb85999269e2a892ce763c00adf130`.
-  - Observed effect: a repeated build was needed before proof acceptance; no defect escaped and the implementer ran no formatter command.
-  - Inference: required generation/build proof checks formatting before the coordinator-owned formatting stage, leaving the same scheduling friction with a different local recovery.
+<a id="odf-310"></a>
 
 <a id="dd-253"></a>
 
-## DD-253 — Retargeting E2E page objects missed a direct label lookup of a moved control
+## ODF-310 — Retargeting E2E page objects missed a direct label lookup of a moved control
 
-When the always-visible menu was replaced by a panel that is rendered only while open, E2E callers were found by the names of the page-object helpers being retargeted. A separate direct `cy.findByLabelText('Resume')` in the recall page object was not one of those helpers, so it was missed. Local E2E for the named features and helper callers passed, and the one failure escaped to hosted CI.
+Former local code: DD-253. Helper-name searches missed direct accessible-label lookups of newly hidden controls. Two SEED-078 executions (story-1 and story-5), also represented by ODF-309, each needed a CI repair; first reports 0.3.66, second release unknown. Product repairs do not establish shared prevention. Relationships to ODF-150 and ODF-272 remain uncertain. Open, unqueued. [Evidence and current response](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/findings/ODF-310.md).
 
-### Occurrences
-- Execution: SEED-078#story-1 (`.planning/slice-plans/003-donut-command-center/PLAN.md`, first implementation commit 15b6077ccd)
-  - Timestamp: 2026-10-20T10:36:11+09:00
-  - Tool: Claude Code
-  - Model: claude-opus-5-5
-  - Open Dough release: 0.3.66
-  - Evidence: CI run 39354041674 attempt 1 on 448d6fd, `recall/browse_answer_and_notes_while_recalling.feature` "Unable to find a label with the text of: Resume"; repaired in 0202d4a (`e2e_test/start/pageObjects/recallPage.ts`).
-  - Observed effect: one CI failure and one repair cycle (stash, repair agent, refactor pass, publication).
-  - Inference: the search covered the helpers being retargeted, but not every lookup of the moved control's accessible names. The relationship to ODF-272 (shared accessible-name consumers missed) is likely but unconfirmed.
-
-- Execution: SEED-078#story-5 (first implementation `8d30de7ea31644d7e4f6131cf25a36a0e7f47b18`; completed plan recoverable at `522f3f9f72:.planning/slice-plans/009-note-details-disclosure/PLAN.md`)
-  - Timestamp: 2026-10-20T07:48:59.3032550Z
-  - Tool: Codex
-  - Open Dough release: unknown
-  - Evidence: CI run `39388493180`, attempt 1, job `118514031615` on `89a2bb85d151f827b64e6b3e769ab4f6f8eea4ef` failed to find the accessible Relation Type button in a hidden property row. The trace had centered on named property helpers and missed `noteRelationshipMethods.changeRelationType`. Repair `df295a0d862a27dd6ce6d39eaf44b70133748536` uses the existing reveal helper; the real relationship feature reproduced 4 passing/1 failure before it and passed all 5 afterward.
-  - Observed effect: one CI failure and one isolated stash/repair/refactor/publication/restore cycle interrupted the completed date slice; all pending work was preserved.
-  - Inference: helper-name searches did not cover every direct lookup of controls newly hidden behind the disclosure. The later global property-selector sweep found no further unreconciled direct consumer.
+<a id="odf-311"></a>
 
 <a id="dd-254"></a>
 
-## DD-254 — A deviation from a recorded plan decision was accepted as a placement choice and lost the decision's purpose
+## ODF-311 — A deviation from a recorded plan decision was accepted as a placement choice and lost the decision's purpose
 
-The plan decided that each page renders one page bar outside its loading and error gates, with only page-specific contents conditional. The slice 3 implementer instead rendered a temporary bar while loading that a different bar replaced once loaded, and asked the coordinator to accept or reject that shape. The coordinator accepted it as a routine placement choice and then offered the same shape to slice 4. Each slice's proof checked that a launcher existed in each state, not that it kept working across the change from loading to loaded. When loading finished, the bar was replaced and a panel opened during loading closed.
+Former local code: DD-254. Acceptance treated a deviation from an explicit stable-component placement decision as routine layout; per-state presence proof missed losing an open panel when loading completed. One SEED-078#correction-1 execution on 0.3.66; CI failure and repair, about 25 minutes with a red tip. Product repair 484ce25 does not prove shared acceptance prevention. Relationships to ODF-245 and ODF-290 remain qualified. Open, unqueued. [Evidence and current response](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/findings/ODF-311.md).
 
-### Occurrences
-- Execution: SEED-078#correction-1 (plan recoverable at `413c7f4f0e:.planning/slice-plans/004-donut-menu-reach-and-keyboard/PLAN.md`, first implementation commit b664e2afc9)
-  - Timestamp: 2026-10-20T11:43:50+09:00
-  - Tool: Claude Code
-  - Model: claude-opus-5-5
-  - Open Dough release: 0.3.66
-  - Evidence: plan "Current decisions" (one `GlobalBar` outside the gates); slice 3 commit 333642b (`<GlobalBar v-if="!bootstrap" />`) and slice 4 commit 7ec9e67; slice 5 local E2E and CI run 39360839469 on 7ec9e67 (`assimilation_walkthrough`, 5 scenarios: "Expected to find element: `[role=\"region\"][aria-label=\"Donut menu panel\"]`"); repaired in 484ce25 with "keeps the Donut menu open when … finishes loading" tests that failed on 7ec9e67.
-  - Observed effect: one CI failure, one repair cycle (stash, repair agent, a coordinator decision for book reading, refactor pass, publication), and a red trunk-bound branch tip for about 25 minutes.
-  - Inference: the decision text did not state why one bar instance mattered, and acceptance treated a deviation from a recorded decision as routine placement, not as a change to that decision whose purpose needed checking. The timestamp is the slice 3 commit time.
+<a id="odf-312"></a>
 
 <a id="dd-255"></a>
 
-## DD-255 — Asking the refactor pass to verify one named promise caught a regression that slice proof missed
+## ODF-312 — Asking the refactor pass to verify one named promise caught a regression that slice proof missed
 
-For slice 6, the coordinator asked the refactor agent to confirm, read-only unless broken, that choosing an Account action still closes the panel, including a link to the page already shown. Before slice 6, the Account list was teleported outside the panel, so every action counted as an outside click and closed it by accident; no test observed the same-page case. Moving the list inside the panel broke that case. The refactor agent added a test that failed and made the list emit a close.
+Former local code: DD-255. A named promise check caught a same-page Account-action closure regression previously masked by incidental outside-click behavior. Useful successful practice: fixed before delivery in an approximately ten-minute refactor pass. The refactor agent also added behavior beyond its normal role, a qualified concern related to ODF-268. Same SEED-078#correction-1 execution as ODF-311, on 0.3.66; do not count the successful check as an escaped defect. Retained, unqueued. [Evidence and current response](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/findings/ODF-312.md).
 
-### Occurrences
-- Execution: SEED-078#correction-1 (plan recoverable at `413c7f4f0e:.planning/slice-plans/004-donut-menu-reach-and-keyboard/PLAN.md`, first implementation commit b664e2afc9)
-  - Timestamp: 2026-10-20T12:16:59+09:00
-  - Tool: Claude Code
-  - Model: claude-opus-5-5
-  - Open Dough release: 0.3.66
-  - Evidence: slice 6 commit 25ec462, `DonutMenu.spec.ts` "closes when the account destination already shown is chosen" (failed 20/21 against the slice 6 implementation), `AccountMenuItem.vue` `@choose`.
-  - Observed effect: the regression was fixed before delivery at the cost of one refactor pass of about 10 minutes.
-  - Inference: a useful practice when a promise was previously kept only by a side effect of the structure being removed. The fix added behavior inside the refactor pass, which the refactor contract does not normally do (compare ODF-268); the timestamp is the slice 6 commit time.
+<a id="odf-313"></a>
 
 <a id="dd-256"></a>
 
-## DD-256 — A planned removal sweep promised an empty reading for a term that already matched retained code
+## ODF-313 — A planned removal sweep promised an empty reading for a term that already matched retained code
 
-The plan's acceptance sweep for a removed control listed `dialog\[open\]` among the removed names and promised the search "returns nothing". At the planning revision that term already matched seven lines in code the story keeps (toolbar search dialog specs and a refine-note modal check). The sweep could never come back empty, so the implementer had to judge the term too broad and record an amended reading at acceptance.
+Former local code: DD-256. A planned empty removal sweep used a pattern that already matched retained code. One SEED-078#story-2 execution on 0.3.66; narrowed acceptance reading, one judgment and plan note, no defect. Relationship to ODF-074 remains uncertain. Open, unqueued. [Evidence and current response](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/findings/ODF-313.md).
 
-### Occurrences
-- Execution: SEED-078#story-2 (plan recoverable as `02cb6a9d5f:.planning/slice-plans/005-donut-menu-search/PLAN.md`, first implementation commit b94786fa6a)
-  - Timestamp: 2026-10-20T12:12:14+09:00
-  - Tool: Claude Code
-  - Model: claude-opus-5-5
-  - Open Dough release: 0.3.66
-  - Evidence: slice 4 Proof in the plan at 9d4ad6c321 lists `dialog\[open\]` in the sweep that "returns nothing"; `git grep 'dialog\[open\]' 2c6a1ef05d` (preparation revision) shows seven hits outside the removed `expectClosed`, in `SearchDialog.navigation.spec.ts` and `assimilationPage/shared.ts`; the slice 4 Accepted note in commit 95473a8e63 records that the term "was too broad".
-  - Observed effect: the sweep reading was narrowed at acceptance. The cost was one judgement and one plan note; no defect.
-  - Inference: the planning premise check confirmed who called the removed helper but did not run the sweep pattern itself. This is probably related to ODF-074 (premises not checked before planning), but the match is uncertain: here the unchecked premise was a sweep term, not a caller or host fact.
+<a id="odf-314"></a>
 
 <a id="dd-257"></a>
 
-## DD-257 — An implementation return omitted plan-owned proof rows listed in its delegation, and the returned rows found a defect
+## ODF-314 — An implementation return omitted plan-owned proof rows listed in its delegation, and the returned rows found a defect
 
-The slice 2 delegation named every plan proof row, including direct reachability of voice starting/converting/Retry at narrow width and Assimilate plus recording fitting together. The first return reported them as untested gaps while presenting the slice as done. The coordinator returned them for the same slice; the new fit test showed More off-screen (right edge 362px at a 320px window) and the implementer fixed the header flex sizing.
+Former local code: DD-257. An implementation return omitted proof rows already named by both plan and delegation. Coordinator comparison returned the gap; missing proof then caught header overflow before delivery, adding about six implementation minutes. One SEED-078#story-3 execution on 0.3.66, shared with ODF-206. Distinct from ODF-247’s omission in the plan itself. Open, unqueued. [Evidence and current response](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/findings/ODF-314.md).
 
-### Occurrences
-- Execution: SEED-078#story-3 (plan recoverable at `3022ecdf62:.planning/slice-plans/006-adaptive-note-header/PLAN.md`, first implementation commit 7d122c9938)
-  - Timestamp: 2026-10-20T14:13:39+09:00
-  - Tool: Claude Code
-  - Model: claude-opus-5-5
-  - Open Dough release: 0.3.66
-  - Evidence: plan proof-table row "startup/conversion/retry controls stay directly reachable; simultaneous voice and Assimilate fit"; `frontend/tests/layouts/NotebookWorkspaceHeader.dictation.spec.ts` "fits an open Assimilate, a recording Stop, and More in the bar together"; slice 2 Accepted note in commit e0cf54a34a.
-  - Observed effect: a user-visible overflow defect was caught before delivery at the cost of one extra implementation round of about 6 minutes.
-  - Inference: proof acceptance against the plan's proof rows, rather than the return's own coverage list, was the decisive practice; the implementer may have stopped at its own time budget (compare ODF-206).
+<a id="odf-315"></a>
 
 <a id="dd-258"></a>
 
-## DD-258 — A rollover rule left the probe's own running state unconsidered and was caught from the implementer's gap list
+## ODF-315 — A rollover rule left the probe's own running state unconsidered and was caught from the implementer's gap list
 
-The refined story decided how the midnight Daily probe re-offer interrupts recall (mid-question or paused), and the plan's slice 3 said "clear the held choice and re-check". Neither considered a learner already doing the probe trials at midnight. The first slice 3 return cleared the choice unconditionally, so the Start/Skip screen would have replaced running trials and discarded the run. The implementer listed the case under gaps; the coordinator returned it before acceptance with a keep-running rule and two discriminating cases.
+Former local code: DD-258. A rollover rule omitted the offered probe already running; the implementer disclosed the gap and the coordinator added a rule before asking whether the owner wanted it. One SEED-079#story-1 execution on 0.3.66; about four extra minutes, then the owner reverted the rule that day as an extreme edge case. No delivered defect established; the owner’s simple-rule decision does not authorize restoring the extension. Retained, unqueued. [Evidence and current response](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/findings/ODF-315.md).
 
-### Occurrences
-- Execution: SEED-079#story-1 (plan recoverable as `b179d7199a:.planning/slice-plans/008-half-day-recall-refresh/PLAN.md`, first implementation commit a94c83841f)
-  - Timestamp: 2026-10-20T15:24:36+09:00
-  - Tool: Claude Code
-  - Model: claude-opus-5-5
-  - Open Dough release: 0.3.66
-  - Evidence: plan slice 3 text "clear the held choice and re-check"; story obligation G5 in the plan at eeab453cdc (reverted to the simple rule in b179d7199a); `RecallPage.dailyProbeRollover.spec.ts` "keeps Daily probe trials running when the new day arrives during them" (failed on the first return).
-  - Observed effect: one extra implementation round of about 4 minutes, which the owner then reverted the same day, calling the case an extreme edge case and asking for the simplest rule. No defect delivered.
-  - Inference: when a rule resets held state on a time boundary, refinement should list every state that can hold at that moment, including the activity the rule offers. Requiring implementers to list untested states made the miss visible, but the coordinator should have asked whether the edge case mattered before adding a rule for it.
+<a id="odf-316"></a>
 
 <a id="dd-274"></a>
 
-## DD-274 — Consumer discovery treats execution evidence as canonical work
+## ODF-316 — Consumer discovery treats execution evidence as canonical work
 
-Supplier discovery scans every planning Markdown file with an `**Identity:**` line as a potential canonical home. Supporting evidence and proof records use that line for provenance, so one real story is reported as multiple canonical homes. A separate non-story evidence anchor is also reported as an unreadable story. No current dependency agreements were present, but discovery could not give a clean result without additional inspection.
-
-### Occurrences
-- Execution: SEED-080#story-1 (first implementation `ac60f83ff17e67c1a4fe25e6f3fc00813a07fdb2`)
-  - Timestamp: unknown
-  - Tool: Codex
-  - Open Dough release: unknown
-  - Evidence: `product-backlog.mjs discover-consumers --file .planning/PRODUCT-BACKLOG.md --supplier-identity SEED-080#story-1` on 2026-10-20 returned no consumers plus duplicate-home and `SEED-066-voice-input.md#manual-discovery-findings` problems. `product-backlog-dependency-consumers.mjs` scans identity lines and all anchors. The records under `01c7dc0f2cc02f92e670d38e9df5237792fd3538:.planning/slice-plans/001-command-bar-continuity/` carry this identity and remain recoverable there. A whole `.planning` Markdown search found no `dough-story-dependencies` blocks. After ordinary spent-record cleanup, discovery retained only the unrelated SEED-066 warning.
-  - Observed effect: closure needed source inspection to distinguish supporting records from live consumers. Unrelated SEED-066 evidence was preserved; no dependency was silently satisfied.
-  - Inference: discovery's candidate grammar is broader than canonical-home grammar. The relationship to other discovery/readiness findings is unconfirmed; Open Dough maintainers can review the boundary.
+Former local code: DD-274. Consumer discovery treated execution-evidence Identity lines and non-story anchors as canonical work, producing duplicate-home and unreadable-story warnings. One SEED-080#story-1 execution, release unknown; source inspection found no current dependency agreements and preserved unrelated SEED-066 evidence. No dependency was silently satisfied. Relationship to other discovery/readiness findings remains uncertain. Open, unqueued. [Evidence and current response](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/findings/ODF-316.md).
