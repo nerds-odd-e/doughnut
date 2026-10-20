@@ -158,7 +158,8 @@ remains the broader E2E proof after publication.
 
 ### 1. The Donut menu panel has its own test identity
 Type: Structure
-Status: planned
+Status: done
+Accepted: `tests/toolbars` 79/79 (failed first at `panelItemLabels` before the product change); vue-tsc clean; E2E `message_center_with_unread_message_count` 6/6, `user_profile` 3/3, `show_failure_report` 3/3. Scoped rules now use `.donut-menu > .daisy-dropdown-content`; E2E `pageBase.ts` uses one `[role="region"][aria-label="Donut menu panel"]` selector, so the Recall and Assimilate page objects reach the panel through the same proven helpers.
 Proof: `tests/toolbars` green with `donutMenuTestSupport.ts` finding the panel by role `region` and name "Donut menu panel"; E2E `messages/message_center_with_unread_message_count.feature`, `users/user_profile.feature`, `testability/show_failure_report.feature` green through `pageBase.ts` using the same identity; typecheck.
 
 Internal change: the panel element gets `role="region"` and

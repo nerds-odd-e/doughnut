@@ -46,13 +46,15 @@ export const openDonutMenu = async (menuUser?: User | null) => {
   return result
 }
 
+const panelIdentity = { name: "Donut menu panel" }
+
 export const panelItemLabels = () =>
-  Array.from(document.querySelectorAll(".donut-menu-panel .nav-item")).map(
-    (el) => el.querySelector("[aria-label]")?.getAttribute("aria-label")
-  )
+  Array.from(
+    screen.getByRole("region", panelIdentity).querySelectorAll(".nav-item")
+  ).map((el) => el.querySelector("[aria-label]")?.getAttribute("aria-label"))
 
 export const expectPanelClosed = () =>
-  expect(document.querySelector(".donut-menu-panel")).toBeNull()
+  expect(screen.queryByRole("region", panelIdentity)).toBeNull()
 
 export const navItemOf = (label: string) =>
   screen.getByLabelText(label).closest(".nav-item")
