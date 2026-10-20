@@ -11,6 +11,7 @@
     @selected="selectedSearchResult = $event"
     @move-under-folder="moveUnderFolder($event)"
     @move-to-notebook-root="moveToNotebookRoot($event)"
+    @navigate="modalCloser?.()"
   />
   <WikiLinkOrRelationshipChoice
     v-if="selectedSearchResult && !targetSearchResult && note"

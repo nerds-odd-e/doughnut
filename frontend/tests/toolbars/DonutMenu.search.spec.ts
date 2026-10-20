@@ -7,14 +7,19 @@ import makeMe from "donut-test-fixtures/makeMe"
 import { mockSdkService } from "@tests/helpers"
 import { settleScheduledAutofocus } from "@tests/helpers/focusTargetTestSupport"
 import { advanceSearchDebounce } from "@tests/helpers/searchDebounceTestSupport"
+import { noteShowLocation } from "@/routes/noteShowLocation"
 import { flushPromises } from "@vue/test-utils"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
+import { userEvent } from "vitest/browser"
 import {
   launcher,
   mountDonutMenu,
+  expectPanelClosed,
   openDonutMenu,
   panel,
+  panelItemLabels,
   pressLauncher,
+  router,
   setupDonutMenuTests,
 } from "./donutMenuTestSupport"
 
@@ -33,11 +38,13 @@ const enterSearch = async () => {
   await flushPromises()
 }
 
+const resultLink = (title: string) => screen.getByText(title).closest("a")!
+
 describe("Donut menu search", () => {
+  const recentOne = makeMe.aNoteSearchResult.title("Recent one").please()
+
   beforeEach(() => {
-    mockSdkService(NoteController, "getRecentNotes", [
-      makeMe.aNoteSearchResult.title("Recent one").please(),
-    ])
+    mockSdkService(NoteController, "getRecentNotes", [recentOne])
   })
 
   it("opens quietly with the search field after Account and before the footer", async () => {
@@ -96,6 +103,82 @@ describe("Donut menu search", () => {
       expect(panel()).not.toBeNull()
       expect(recentHeading()).toBeInTheDocument()
     })
+
+    it("opens a Matches title and closes the panel", async () => {
+      const sedation = makeMe.aNoteSearchResult.title("Sedation").please()
+      mockSdkService(SearchController, "searchForRelationshipTarget", [
+        { hitKind: "NOTE" as const, noteSearchResult: sedation },
+      ])
+      await openDonutMenu()
+      await enterSearch()
+      await fireEvent.update(searchField(), "Sed")
+      await advanceSearchDebounce()
+
+      await fireEvent.click(resultLink("Sedation"))
+      await flushPromises()
+
+      expect(router.currentRoute.value.fullPath).toBe(
+        router.resolve(noteShowLocation(sedation.noteTopology.id)).fullPath
+      )
+      expectPanelClosed()
+    })
+  })
+
+  it("reaches the field by Tab after the panel items", async () => {
+    await openDonutMenu()
+    launcher().focus()
+    for (const _ of panelItemLabels()) await userEvent.tab()
+    await userEvent.tab()
+
+    expect(document.activeElement).toBe(searchField())
+  })
+
+  it("moves from the field into the results with ArrowDown and back with ArrowUp, and Enter opens", async () => {
+    await openDonutMenu()
+    searchField().focus()
+    await flushPromises()
+
+    await userEvent.keyboard("{ArrowDown}")
+    expect(document.activeElement).toBe(resultLink("Recent one"))
+    await userEvent.keyboard("{ArrowUp}")
+    expect(document.activeElement).toBe(searchField())
+
+    await userEvent.keyboard("{ArrowDown}")
+    await userEvent.keyboard("{Enter}")
+    await flushPromises()
+
+    expect(router.currentRoute.value.fullPath).toBe(
+      router.resolve(noteShowLocation(recentOne.noteTopology.id)).fullPath
+    )
+    expectPanelClosed()
+  })
+
+  it("closes without a route change when Enter opens the note already open", async () => {
+    await router.push(noteShowLocation(recentOne.noteTopology.id))
+    const currentRoute = router.currentRoute.value
+    await openDonutMenu()
+    await enterSearch()
+
+    resultLink("Recent one").focus()
+    await userEvent.keyboard("{Enter}")
+    await flushPromises()
+
+    expect(router.currentRoute.value).toBe(currentRoute)
+    expectPanelClosed()
+  })
+
+  it("stays open for a modified result click", async () => {
+    await openDonutMenu()
+    await enterSearch()
+    const link = resultLink("Recent one")
+    link.addEventListener("click", (event) => event.preventDefault(), {
+      once: true,
+    })
+
+    await fireEvent.click(link, { ctrlKey: true })
+    await flushPromises()
+
+    expect(panel()).not.toBeNull()
   })
 
   it("offers no search to a visitor", async () => {

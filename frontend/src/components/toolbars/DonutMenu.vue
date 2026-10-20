@@ -34,7 +34,12 @@
           :logout="chooseLogout"
         />
       </ul>
-      <SearchForNoteAndFolder v-if="user" class="pt-2" quiet />
+      <SearchForNoteAndFolder
+        v-if="user"
+        class="pt-2"
+        quiet
+        @navigate="close"
+      />
       <LoginButton v-else />
       <div class="flex items-center justify-end gap-2 pt-2 text-sm">
         <router-link to="/" class="text-neutral-400 no-underline">

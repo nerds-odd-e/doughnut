@@ -95,9 +95,11 @@ Take.
 
 - The panel renders `SearchForNoteAndFolder` directly (no note, no
   notebook), not `SearchForm`: without a note the wrapper adds nothing. The
-  form gains an opt-out of autofocus and a `navigate` emit for the panel to
-  close on; `modalCloser` keeps its meaning for the modal callers, so the
-  toolbar, folder, and wiki-link flows are untouched.
+  form gains an opt-out of autofocus and passes `SearchResults`' `navigate`
+  on as its own emit; each container closes itself on it (`DonutMenu` via
+  `close`, `SearchForm` via `modalCloser`), and `modalCloser` inside the form
+  only controls its Close button. Toolbar, folder, and wiki-link flows keep
+  their behavior.
 - "Search entered" is state for one open, held by `SearchForNoteAndFolder`
   behind its `quiet` prop (the panel content remounts on every open, so it
   clears when the panel closes): set by field focus or a history pick; the
@@ -162,7 +164,7 @@ closes. Story examples: phone open, scope toggle.
 
 ### 2. A result opens its destination and closes the panel
 Type: Behavior
-Status: planned
+Status: done
 Proof: `DonutMenu.search.spec.ts`: a plain click on a Matches title routes to `noteShowLocation` and the panel is closed (fails first: the panel stays open only via route watch, so prove the current-note case too); Enter on the current note's Recent entry leaves the route unchanged and closes the panel (fails first); a Ctrl-click keeps the panel open; from the field, ArrowDown focuses the first result, ArrowUp returns, Enter opens; Tab from the last panel item reaches the field. Typecheck.
 
 Behavior: search entered with results → choose a result by click or Enter →
@@ -223,4 +225,4 @@ Disposition: receiving slice 5
 ### G2. Real Tab order into the field is untested
 Reported: slice 1 — "Tab-into-field is only covered through the focus event; real Tab order is slice 2's proof."
 Story clause: "Tab reaches the field after the panel items"
-Disposition: receiving slice 2
+Disposition: proved by slice 2: `DonutMenu.search.spec.ts` "reaches the field by Tab after the panel items" presses real `userEvent.tab()` from the launcher through the panel items and observes the field focused

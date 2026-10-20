@@ -100,7 +100,7 @@
       v-model:all-my-notebooks-and-subscriptions="allMyNotebooksAndSubscriptions"
       v-model:all-my-circles="allMyCircles"
       @keydown="onSearchDialogKeydown"
-      @navigate="modalCloser?.()"
+      @navigate="emit('navigate')"
     >
       <template v-if="noteId" #button="{ noteSearchResult }">
         <button
@@ -167,6 +167,7 @@ const emit = defineEmits<{
   (e: "selected", noteSearchResult: NoteSearchResult): void
   (e: "moveUnderFolder", folderId: number): void
   (e: "moveToNotebookRoot", targetNotebookId: number): void
+  (e: "navigate"): void
 }>()
 
 const rootRef = ref<HTMLElement | null>(null)
