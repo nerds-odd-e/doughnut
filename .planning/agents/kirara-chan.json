@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "agent": "Kirara-chan",
+  "email": "kirara-chan@example.org",
+  "identity": "SEED-078#story-3",
+  "mode": "story-branch",
+  "branch": "claude/use-note-actions-and-folder-context-from-one-ada",
+  "host": "claude",
+  "model": "opus"
+}

@@ -6,9 +6,10 @@ Make deliberately captured knowledge more useful through learning and refinement
 
 ## Taken
 
+- [Use note actions and folder context from one adaptive top bar](seeds/SEED-078-cohesive-note-workspace.md#story-3) — SEED-078#story-3 ([plan](slice-plans/006-adaptive-note-header/PLAN.md))
+
 ## Backlog list
 
-- [Use note actions and folder context from one adaptive top bar](seeds/SEED-078-cohesive-note-workspace.md#story-3) — SEED-078#story-3
 - [Read and edit complete property values comfortably in narrow windows](seeds/SEED-078-cohesive-note-workspace.md#story-4) — SEED-078#story-4
 - [Focus on note content while revealing details when needed](seeds/SEED-078-cohesive-note-workspace.md#story-5) — SEED-078#story-5
 - [Generate focus-note questions with relevant supporting passages](seeds/SEED-007-per-concept-prompt-splitting-single-note-qg.md#story-1) — SEED-007#story-1
