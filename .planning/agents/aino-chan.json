@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "agent": "Aino-chan",
+  "email": "aino-chan@example.org",
+  "identity": "SEED-080#story-2",
+  "mode": "story-branch",
+  "branch": "codex/navigate-from-a-stable-sidebar-breadcrumb-with-a",
+  "host": "codex",
+  "model": "gpt-6.1-sol"
+}
