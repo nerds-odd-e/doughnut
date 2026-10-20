@@ -8,10 +8,10 @@ Make deliberately captured knowledge more useful through learning and refinement
 
 - [Use note actions and folder context from one adaptive top bar](seeds/SEED-078-cohesive-note-workspace.md#story-3) — SEED-078#story-3 ([plan](slice-plans/006-adaptive-note-header/PLAN.md))
 - [Read and edit complete property values comfortably in narrow windows](seeds/SEED-078-cohesive-note-workspace.md#story-4) — SEED-078#story-4 ([plan](slice-plans/007-readable-property-values/PLAN.md))
+- [Refresh recall at half-day rollover and choose whether to start the daily probe](seeds/SEED-079-half-day-recall-refresh.md#story-1) — SEED-079#story-1 ([plan](slice-plans/008-half-day-recall-refresh/PLAN.md))
 
 ## Backlog list
 
-- [Refresh recall at half-day rollover and choose whether to start the daily probe](seeds/SEED-079-half-day-recall-refresh.md#story-1) — SEED-079#story-1
 - [Focus on note content while revealing details when needed](seeds/SEED-078-cohesive-note-workspace.md#story-5) — SEED-078#story-5
 - [Generate focus-note questions with relevant supporting passages](seeds/SEED-007-per-concept-prompt-splitting-single-note-qg.md#story-1) — SEED-007#story-1
 - [Decide whether an acceptance-test review procedure benefits from Donut notes](seeds/SEED-074-knowledge-to-capability.md#story-1) — SEED-074#story-1
