@@ -64,6 +64,17 @@ describe("global bar", () => {
     matchMediaSpy = undefined
   })
 
+  it("puts the Donut menu launcher first in the bar when signed in", async () => {
+    helper.component(GlobalBar).withCurrentUser(user).withRouter().render()
+
+    const firstControl = document
+      .querySelector("nav")!
+      .querySelector("button, summary, a, input")
+    expect(firstControl).toBe(
+      screen.getByRole("button", { name: "Donut menu" })
+    )
+  })
+
   it("hides undo when there is nothing to undo", async () => {
     helper.component(GlobalBar).withCurrentUser(user).withRouter().render()
 

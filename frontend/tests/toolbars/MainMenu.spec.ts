@@ -9,7 +9,7 @@ import { mockSdkService } from "@tests/helpers"
 import { flushPromises } from "@vue/test-utils"
 import { describe, it, expect, vi } from "vitest"
 import type { RouteLocationRaw } from "vue-router"
-import { createMenuData } from "./mainMenuMocks"
+import { createMenuData } from "./menuDataMocks"
 import {
   createMatchMediaSpy,
   expectNavLinkPrimary,
@@ -21,7 +21,7 @@ import {
 } from "./mainMenuTestSupport"
 
 vi.mock("@/managedApi/AiReplyEventSource", async () => {
-  const { aiReplyEventSourceMockExports } = await import("./mainMenuMocks")
+  const { aiReplyEventSourceMockExports } = await import("./menuDataMocks")
   return aiReplyEventSourceMockExports()
 })
 

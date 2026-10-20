@@ -2,7 +2,7 @@ import { useRecallData } from "@/composables/useRecallData"
 import { fireEvent } from "@testing-library/vue"
 import { flushPromises } from "@vue/test-utils"
 import { beforeEach, describe, it, expect, vi } from "vitest"
-import { memoryTrackerLitesStub } from "./mainMenuMocks"
+import { memoryTrackerLitesStub } from "./menuDataMocks"
 import {
   createMatchMediaSpy,
   mountMainMenu,
@@ -12,7 +12,7 @@ import {
 } from "./mainMenuTestSupport"
 
 vi.mock("@/managedApi/AiReplyEventSource", async () => {
-  const { aiReplyEventSourceMockExports } = await import("./mainMenuMocks")
+  const { aiReplyEventSourceMockExports } = await import("./menuDataMocks")
   return aiReplyEventSourceMockExports()
 })
 

@@ -1,5 +1,6 @@
 <template>
   <nav class="daisy-navbar max-w-full flex justify-between relative">
+    <DonutMenu v-if="user" :user="user" />
     <div class="flex flex-1 overflow-x-auto">
       <slot />
     </div>
@@ -29,6 +30,7 @@ import type { Ref } from "vue"
 import type { User } from "@generated/donut-backend-api"
 import { inject, ref } from "vue"
 import { Search } from "@lucide/vue"
+import DonutMenu from "@/components/toolbars/DonutMenu.vue"
 import PopButton from "@/components/commons/Popups/PopButton.vue"
 import SearchForm from "@/components/wiki-link-or-relationship/SearchForm.vue"
 import { useKeyboardShortcut } from "@/composables/useKeyboardShortcut"

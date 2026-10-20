@@ -84,7 +84,7 @@ always-visible active item is as easy to find as the current destinations.
 | Counts, Resume availability, menu-data fetch at sign-in, and recall catch-up keep their data and timing while no panel is open | Slice 1: the three `MainMenu` specs run through a harness that mounts the shell composable with `MainMenu`, observing the same counts, Resume navigation, and Assimilate navigation. Slice 2 re-homes those observations to the launcher spec. |
 | Launcher at the leading end of the page bar opens a panel listing Resume (when paused), Note, Assimilate, Recall, Circles, Bazaar, Messages with counts and active marking, Account group, attribution | Slice 2: launcher unit spec with mocked `getMenuData`: press "Donut menu" → items in order with counts; active route marks its destination; Resume first when recall is paused with trackers and navigates to recall; Assimilate navigates to the next note; Account reveals Admin Dashboard (admin only), Recent, Settings for the user, Manage Access Tokens, Logout; "Donut by" present. `GlobalBar.spec`: the launcher is the first control. |
 | Choosing, launcher press, outside tap, Escape, and route change close the panel; keyboard reachable | Slice 2: launcher unit spec for each closing trigger and for the launcher being a focusable button. |
-| Same launcher and panel at every width, no side column or fixed region, drawer uses the shared header-height rule, home page behaves the same | Slice 3: `DonutApp`, `GlobalBar`, `SidebarDrawer` layout change; E2E page objects open the panel and scope to it; the five named features plus book reading pass; one new phone-width scenario (`I am on a window 390 * 844`) opens the launcher and chooses a destination; book-reading layout asserts below the page bar. Home page: launcher spec with route `home` lists the destinations. |
+| Same launcher and panel at every width, no side column or fixed region, drawer uses the shared header-height rule, home page behaves the same | Slice 3: `DonutApp`, `GlobalBar`, `SidebarDrawer` layout change; E2E page objects open the panel and scope to it; the five named features plus book reading pass; one new phone-width scenario (`I am on a window 390 * 844`) opens the launcher and chooses a destination; book-reading layout asserts below the page bar. Home page: launcher spec at the home route (`root`) lists the destinations. |
 | Signed-out visitor reaches sign-in from the same launcher | Slice 4: launcher spec without a user: press "Donut menu" → the sign-in action is listed and triggers the existing login flow. E2E `I haven't login` journeys continue through the key-shaped sign-in control relocated into the panel. |
 | Replaced presentations leave no trace | Slice 3 acceptance reading: a search over the product for `VerticalMenu`, `HorizontalMenu`, `useBreakpoint`, `collapsed-menu-width`, `main-menu-height`, `main-menu-width`, `Toggle menu`, `is-expanded`, and `.main-menu` returns nothing. Recorded as a reading, not a test. |
 
@@ -117,7 +117,7 @@ these observations onto the launcher harness.
 
 ### 2. The Donut menu launcher opens the command panel from the page bar
 Type: Behavior
-Status: planned
+Status: done
 Proof: new launcher spec under `frontend/tests/toolbars/` covering the item list with counts and active marking, Resume and Assimilate actions, Account actions, attribution, and every closing trigger; `GlobalBar.spec` for launcher placement; typecheck; Vite build for `components.d.ts`.
 
 Behavior: signed in on any screen with the page bar → press the "Donut
@@ -131,16 +131,27 @@ launcher and items are keyboard focusable. Built from `AutoCollapseDropdown`,
 presentations stay mounted until slice 3 removes them, so E2E keeps passing
 through `.main-menu`; the signed-out bar slot renders nothing until slice 4.
 
+Accepted: `DonutMenu.vue` (BookMarked glyph, panel rendered only while
+open) is the first child of `GlobalBar`'s nav; `NavigationItem`'s action
+anchor gained `tabindex="0"` and Enter so Resume and Assimilate are keyboard
+reachable. Proof: `DonutMenu.spec`, `DonutMenu.counts.spec`,
+`DonutMenu.resume.spec` (harness `donutMenuTestSupport.ts`, fixtures
+`menuDataMocks.ts`) carry every MainMenu spec observation except the
+horizontal-collapse behaviors slice 3 deletes; `GlobalBar.spec` asserts the
+launcher first. `tests/toolbars` 15 files/122 tests, full frontend suite
+2254 tests, typecheck, and Vite build green.
+
 ### 3. One navigation arrangement at every width and on every screen
 Type: Behavior
 Status: planned
-Proof: E2E features `messages/message_center_with_unread_message_count`, `recall/property_memory_tracker`, `relationships/reify_property`, `learning_session/commissioned_learning_session`, `users/user_profile`, and the book-reading feature that asserts the layout below the bar, through page objects that open the panel; one new phone-width scenario choosing a destination from the launcher; launcher spec at route `home`; `tests/toolbars` green; typecheck; Vite build; sweep reading.
+Proof: E2E features `messages/message_center_with_unread_message_count`, `recall/property_memory_tracker`, `relationships/reify_property`, `learning_session/commissioned_learning_session`, `users/user_profile`, and the book-reading feature that asserts the layout below the bar, through page objects that open the panel; one new phone-width scenario choosing a destination from the launcher; launcher spec at the home route (`root`); `tests/toolbars` green; typecheck; Vite build; sweep reading.
 
 Behavior: at any window width, including after resizing, and on the home
 page → the same launcher sits at the same bar position with no side column
 or fixed top-left region, and opening it shows the same contents. Delete
 `MainMenu.vue`'s switcher, `VerticalMenu`, `HorizontalMenu`, `useBreakpoint`,
-their specs, support files, and Storybook stories, the `.main-menu` wrapper
+their specs, `mainMenuTestSupport.ts`, and Storybook stories (keep
+`menuDataMocks.ts`, which the launcher specs use), the `.main-menu` wrapper
 and its layout rules in `DonutApp.vue`, the bar padding in `GlobalBar.vue`,
 and the menu-only variables; keep one shared header-height rule for the
 drawer and safe-area offsets. Retarget `withinMainMenuItem`,
@@ -173,4 +184,24 @@ the panel offers the existing sign-in action, which starts the login flow;
 Reported: slice 1 — "No spec runs the real `fetch(\"/logout\")` and redirect, and none did before."
 Story clause: "choosing a destination or action does what it does today"
 Disposition: no user cost "Authors and learners find Donut's app commands in one place": the logout request and redirect moved verbatim into `managedApi/window/logout.ts` and were never observed before; `AccountMenuItem.spec` still observes Logout calling it.
+
+### G2. Signed-out page bar shows no launcher
+Reported: slice 2 — "Signed out, the launcher slot renders nothing (slice 4)."
+Story clause: "a signed-out visitor sees the same launcher; the panel offers the existing sign-in action"
+Disposition: receiving slice 4
+
+### G3. Narrow-window bar keeps the old menu's padding
+Reported: slice 2 — "While the old presentations remain, at 1024px and below the bar still has the padding left for HorizontalMenu, so the launcher sits after that region."
+Story clause: "The workspace no longer reserves a side column or a fixed top-left region for navigation."
+Disposition: receiving slice 3
+
+### G4. Panel sheet and anchoring are not asserted
+Reported: slice 2 — "The narrow-window full-width sheet and the wide-window anchoring are CSS only and not asserted in unit tests"
+Story clause: "anchored near the launcher on wide windows and as a full-width sheet below the bar on narrow windows"
+Disposition: receiving slice 3
+
+### G5. Account list after the panel closes
+Reported: slice 2 — "If the Account sub-dropdown is open and the user clicks blank space inside its portaled list, the outer panel closes and that list may stay floating until the next click."
+Story clause: "tapping or clicking outside, choosing nothing and pressing Escape, or a route change closes it"
+Disposition: no user cost "Authors and learners find Donut's app commands in one place": the Account list is teleported from inside the panel's `v-if` subtree, so closing the panel unmounts it; no floating list remains.
 

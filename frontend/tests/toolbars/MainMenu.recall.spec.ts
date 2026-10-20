@@ -7,7 +7,7 @@ import { screen } from "@testing-library/vue"
 import { mockSdkService } from "@tests/helpers"
 import { flushPromises } from "@vue/test-utils"
 import { describe, it, expect, vi, afterEach } from "vitest"
-import { createMenuData, memoryTrackerLitesStub } from "./mainMenuMocks"
+import { createMenuData, memoryTrackerLitesStub } from "./menuDataMocks"
 import {
   mountMainMenu,
   renderComponent,
@@ -15,7 +15,7 @@ import {
 } from "./mainMenuTestSupport"
 
 vi.mock("@/managedApi/AiReplyEventSource", async () => {
-  const { aiReplyEventSourceMockExports } = await import("./mainMenuMocks")
+  const { aiReplyEventSourceMockExports } = await import("./menuDataMocks")
   return aiReplyEventSourceMockExports()
 })
 

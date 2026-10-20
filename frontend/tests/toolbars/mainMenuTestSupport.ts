@@ -9,7 +9,7 @@ import { resetRecallData } from "@tests/helpers/recallDataTestSupport"
 import { beforeEach, afterEach, vi } from "vitest"
 import { defineComponent, h, type PropType, toRef } from "vue"
 import type { Router } from "vue-router"
-import { defaultMenuData } from "./mainMenuMocks"
+import { defaultMenuData } from "./menuDataMocks"
 
 export let router: Router
 export let user: User
