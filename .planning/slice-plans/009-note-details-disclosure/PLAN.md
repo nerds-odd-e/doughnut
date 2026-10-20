@@ -173,6 +173,12 @@ removal reading. Safe stop: completes the source's outcome.
 
 Size hypothesis: 4–6 minutes.
 
+## Execution complete
+
+Product advice: no new backlog work; retain the current priorities and the
+source's deferred preferences. Aggregate review found no product correction;
+supported process occurrences are recorded in DearDough.md.
+
 ## Verification and delivery
 
 [Focused commands and accepted observations](PROOF.md) retain the literal

@@ -1,5 +1,28 @@
 # Note details execution proof
 
+## Aggregate retrospective
+
+Reviewed the original execution-ready story/plan at claim `cb6eb20ba6` and
+the uncontaminated published range through `522f3f9f72`: implementation
+`8d30de7ea3`, `89a2bb85d1`, `4b9d3792f7`, `f6ba658ab7`, `522f3f9f72`, and
+owned CI repair `df295a0d86`. No sibling work is attributed. Original intent,
+all five outcomes, retained property/save/route journeys, current whole-product
+ownership and Accepted ADRs 0001/0004/0005/0007 agree with the aggregate code,
+tests, and maintained docs. No product defect, refactoring residue, or justified
+test-cleanup correction remains. The new proof uses real mounted surfaces;
+existing E2E journeys supply integration proof rather than driving the initial
+implementation. Headless geometry does not establish real-device comfort.
+
+Process review used coordinator history and the concrete implementation/
+refactor returns. Existing findings ODF-264, DD-252, DD-253 gained one occurrence
+each in DearDough.md (374 physical lines, below the warning threshold): oversized
+startup reads, generation/format scheduling, and the missed direct relationship
+control consumer. These are process proposals, not new product work. Product
+advice is no change to the backlog; remembered disclosure and relative dates
+remain deferred without user evidence. No correction plan was created.
+Applicable CI remained pending on the retained branch observer at review;
+the completion operation owns its final verdict and shutdown.
+
 ## Mounted property rows
 
 Accepted: `env -u NODE_ENV CURSOR_DEV=true nix develop -c pnpm frontend:test
