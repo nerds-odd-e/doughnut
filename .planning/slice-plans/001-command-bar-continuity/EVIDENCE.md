@@ -233,3 +233,8 @@ continues this evidence without truncating its original provenance.
 [Dated header implementation, geometry and regression evidence](EVIDENCE-HEADER.md)
 continues this evidence, including the coordinator's completed visual observation
 on the combined candidate after the compact-control CI repair.
+
+## Spacious menu candidate — 2026-10-20
+
+[Dated menu spacing, short-window keyboard and consumer evidence](EVIDENCE-MENU.md)
+continues this evidence, including the coordinator's completed visual observation.

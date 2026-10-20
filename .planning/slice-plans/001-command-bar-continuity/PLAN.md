@@ -132,7 +132,7 @@ Target 4–6 minutes; no sidebar-toolbar relocation or breadcrumb redesign.
 
 ### 6. Keep a spacious menu reachable on narrow and short screens
 Type: Behavior
-Status: planned
+Status: done
 Proof: Panel geometry/scroll/keyboard reachability and bounded visual observation
 of spacing, footer separation and group boundaries with final controls.
 
@@ -180,9 +180,9 @@ do not permit growing implementation.
 
 ## Current decisions and learnings
 
-Slices 1–4 accepted: search, compact activity/Resume, visible note/property assimilation.
-Routed presentation proof, 214 affected tests and typechecks pass; prior search/recall
-journeys remain valid. Independent refactoring completed. Native input remains
+All six slices accepted: search, activity/Resume, visible assimilation, alignment
+and menu spacing. Final 171 tests and both typechecks pass; prior search/recall
+journeys and four-width/short-window visual observations remain valid. Native input remains
 unverified under the owner's decision; see [evidence](EVIDENCE.md).
 
 CI repair: compact activity preserves pinned recording/open controls at 320px;
@@ -218,6 +218,11 @@ Disposition: proved by slice 3: recallPage.ts retains expectCurrentQuestion for 
 Reported: slice 5 — "Bounded visual observation of alignment and both separators at 320/390/768/1280 px remains with the coordinator."
 Story clause: "Add subtle dividers between navigation and note-command groups and below the command bar to distinguish controls from content."
 Disposition: proved by slice 5: coordinator Chrome screenshots/AX at 320/390/768/1280 with active assimilation, EVIDENCE-HEADER.md visual observation after the compact-control repair
+
+### G5. Menu visual acceptance
+Reported: slice 6 — "Remaining required observation: your bounded Chrome visual acceptance at the four widths, including expanded Account in a short window."
+Story clause: "Navigation, search launcher, and footer have comfortable separation; overflow remains reachable."
+Disposition: proved by slice 6: coordinator Chrome screenshots at 320/390/768/1280 and 320x260 expanded Account, Tab traversal and scroll to footer; EVIDENCE-MENU.md
 
 ## Execution context
 

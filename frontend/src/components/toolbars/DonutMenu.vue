@@ -28,9 +28,9 @@
       v-if="open"
       role="region"
       aria-label="Donut menu panel"
-      class="daisy-dropdown-content z-50 bg-neutral rounded-box shadow-lg p-2"
+      class="daisy-dropdown-content z-50 bg-neutral rounded-box shadow-lg p-3 sm:p-4"
     >
-      <ul v-if="user" class="grid grid-cols-4 gap-2">
+      <ul v-if="user" class="menu-navigation grid grid-cols-4 gap-x-1 gap-y-3">
         <li
           v-for="item in [...upperNavItems, ...lowerNavItems]"
           :key="item.name"
@@ -45,7 +45,7 @@
         </li>
         <AccountMenuItem :user="user" :logout="logout" @choose="close" />
       </ul>
-      <div v-if="user" class="flex items-center gap-2 pt-2">
+      <div v-if="user" class="flex items-center gap-2 pt-4">
         <button
           type="button"
           aria-label="Open search"
@@ -63,7 +63,7 @@
         </button>
       </div>
       <LoginButton v-else />
-      <div class="flex items-center justify-end gap-2 pt-2 text-sm">
+      <div class="flex items-center justify-end gap-2 pt-6 text-sm">
         <router-link to="/" class="text-neutral-400 no-underline">
           Donut by
         </router-link>
@@ -146,6 +146,10 @@ onUnmounted(() => document.removeEventListener("keydown", closeOnEscape))
 .search-launcher:focus-visible {
   outline: 2px solid currentColor;
   outline-offset: 2px;
+}
+
+.menu-navigation :deep(.nav-item) {
+  padding: 0.5rem 0.25rem;
 }
 
 .donut-menu > .daisy-dropdown-content {
