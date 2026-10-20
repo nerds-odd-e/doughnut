@@ -1,44 +1,24 @@
-import { NotebookFolderController } from "@generated/donut-backend-api/sdk.gen"
 import { noteMoreOptionsTitles } from "@/components/notes/widgets/noteMoreOptionsTitles"
 import { useAssimilationView } from "@/composables/useAssimilationView"
-import { useNoteStore } from "@/store/noteStore"
-import makeMe from "donut-test-fixtures/makeMe"
-import { mockSdkService } from "@tests/helpers"
 import { flushPromises, type VueWrapper } from "@vue/test-utils"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import { page } from "vitest/browser"
 import {
-  atViewportWidth,
   chooseFromMore,
   clickPageBarCommand,
   commandsSitInPageBar,
-  mountNotebookWorkspace,
   noteCommandEls,
   pageBarCommand,
   pageBarEl,
 } from "./notebookWorkspaceHeaderTestSupport"
 
+import {
+  innerFolder,
+  mountDeepNote,
+  notebookLocationControl,
+} from "./notebookWorkspaceContextTestSupport"
+
 const titles = noteMoreOptionsTitles
-const longNotebook = "An exceptionally long notebook name about orchards"
-const parentFolder = {
-  id: 501,
-  name: "Fruit trees of the north",
-}
-const innerFolder = {
-  id: 502,
-  name: "Apples pears and quinces grown on dwarfing rootstocks",
-}
-
-function deepNote() {
-  return makeMe.aNoteRealm
-    .title("Orchard")
-    .notebookName(longNotebook)
-    .ancestorFolders([parentFolder, innerFolder])
-    .please()
-}
-
-const contextEl = () =>
-  document.querySelector<HTMLElement>(".daisy-breadcrumbs")!
 const rect = (el: Element) => el.getBoundingClientRect()
 const undoEl = () => document.querySelector('[title="undo edit title"]')!
 const contentsToggle = () =>
@@ -46,15 +26,6 @@ const contentsToggle = () =>
     '[aria-label="Show sidebar"], [aria-label="Hide sidebar"]'
   )!
 const contentsPane = () => document.querySelector("aside")!
-
-async function mountDeepNote(width: number) {
-  await atViewportWidth(width)
-  const realm = deepNote()
-  const mounted = await mountNotebookWorkspace([realm])
-  useNoteStore().noteUndo.addEditingToUndoHistory(realm.id, "edit title", "Old")
-  await flushPromises()
-  return { ...mounted, realm }
-}
 
 /** Visible note commands (including More) and Undo all inside the bar and the window. */
 function toolsFitInBar(width: number) {
@@ -95,8 +66,8 @@ describe("Notebook workspace folder context", () => {
       }
 
       await vi.waitFor(() => {
-        const context = rect(contextEl())
-        expect(pageBarEl().contains(contextEl())).toBe(false)
+        const context = rect(notebookLocationControl())
+        expect(pageBarEl().contains(notebookLocationControl())).toBe(false)
         expect(context.top).toBeGreaterThanOrEqual(rect(pageBarEl()).bottom)
         expect(context.bottom).toBeLessThanOrEqual(
           rect(document.querySelector("#main-note-content")!).top
@@ -117,7 +88,7 @@ describe("Notebook workspace folder context", () => {
       ;({ wrapper } = await mountDeepNote(width))
 
       await vi.waitFor(() => {
-        const context = rect(contextEl())
+        const context = rect(notebookLocationControl())
         const bar = rect(pageBarEl())
         expect(context.top).toBeGreaterThanOrEqual(bar.top)
         expect(context.bottom).toBeLessThanOrEqual(bar.bottom)
@@ -128,37 +99,6 @@ describe("Notebook workspace folder context", () => {
       })
     }
   )
-
-  it("scrolls the narrow trail to a parent folder and opens it by its link", async () => {
-    const mounted = await mountDeepNote(320)
-    const { router, realm } = mounted
-    wrapper = mounted.wrapper
-    const folderRealm = makeMe.aFolderRealm
-      .folder(parentFolder.id, parentFolder.name)
-      .please()
-    folderRealm.notebookRealm = realm.notebookRealm
-    mockSdkService(NotebookFolderController, "getFolderPage", folderRealm)
-
-    const link = [...contextEl().querySelectorAll("a")].find((a) =>
-      a.textContent?.includes(parentFolder.name)
-    )!
-    link.scrollIntoView({ inline: "center" })
-    await page.elementLocator(link).click()
-    await flushPromises()
-
-    await vi.waitFor(() => {
-      expect(router.currentRoute.value.name).toBe("folderPage")
-      expect(router.currentRoute.value.params.folderId).toBe(
-        String(parentFolder.id)
-      )
-      expect(document.querySelector("[data-note-toolbar]")).toBeNull()
-      expect(
-        document.querySelector(
-          '[data-note-sidebar-toolbar] [title="New folder"]'
-        )
-      ).not.toBeNull()
-    })
-  })
 
   it("opens contents as a drawer from the bar's bottom on a phone", async () => {
     ;({ wrapper } = await mountDeepNote(390))

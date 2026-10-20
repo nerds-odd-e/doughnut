@@ -23,7 +23,7 @@
         v-if="currentNotebookRealm && isMdOrLarger"
         class="flex-1 min-w-12 max-w-[40%] flex items-center"
       >
-        <BreadcrumbWithCircle
+        <NotebookLocation
           :notebook-realm="currentNotebookRealm"
           :ancestor-folders="breadcrumbFolders"
         />
@@ -37,7 +37,7 @@
       v-if="currentNotebookRealm && !isMdOrLarger"
       class="flex-none px-4 border-b border-base-300"
     >
-      <BreadcrumbWithCircle
+      <NotebookLocation
         :notebook-realm="currentNotebookRealm"
         :ancestor-folders="breadcrumbFolders"
       />
@@ -101,7 +101,7 @@ import type {
 import { PanelLeft, PanelLeftClose } from "@lucide/vue"
 import GlobalBar from "@/components/toolbars/GlobalBar.vue"
 import SidebarDrawer from "@/components/commons/SidebarDrawer.vue"
-import BreadcrumbWithCircle from "@/components/toolbars/BreadcrumbWithCircle.vue"
+import NotebookLocation from "@/components/toolbars/NotebookLocation.vue"
 import Sidebar from "@/components/notes/Sidebar.vue"
 import NoteCreationNewButton from "@/components/notes/NoteCreationNewButton.vue"
 import { noteChromeToolbarNavClass } from "@/components/notes/noteChromeToolbarNavClass"

@@ -2,6 +2,7 @@
   <Teleport to="body">
     <dialog
       ref="dialogRef"
+      :aria-label="ariaLabel"
       class="modal-mask text-base-content"
       :class="{ 'modal-align-top': stableTopAnchored }"
       @cancel.prevent
@@ -47,6 +48,7 @@ import { provideModalTopAnchor } from "@/composables/modalTopAnchor"
 
 // Props
 interface Props {
+  ariaLabel?: string
   sidebar?: "left" | "right"
   isPopup?: boolean
   /** When false, the overlay X is omitted (e.g. in-dialog close control). */

@@ -94,11 +94,17 @@ export const assumeNotePage = (
       cy.findByRole('button', { name: 'expand children' }).click()
     },
     expectBreadcrumb: (items: string) => {
-      cy.get('.daisy-breadcrumbs').within(() =>
+      cy.findByLabelText('Open notebook location').click()
+      cy.get(
+        'dialog[aria-label="Notebook location"] .daisy-breadcrumbs'
+      ).within(() =>
         commonSenseSplit(items, ', ').forEach((noteTopology: string) =>
-          cy.findByText(noteTopology)
+          cy.findByText(noteTopology).should('be.visible')
         )
       )
+      cy.get(
+        'dialog[aria-label="Notebook location"] [aria-label="Close modal"]'
+      ).click()
     },
     findNoteContent: (expected: string, timeout?: number) => {
       const normalized = expected.replace(/\\n/g, '\n')

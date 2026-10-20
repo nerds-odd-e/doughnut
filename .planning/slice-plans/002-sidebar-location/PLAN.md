@@ -126,7 +126,7 @@ a sweep.
 
 ### 1. Reach complete named location from a compact header
 Type: Behavior
-Status: planned
+Status: done
 
 Behavior: Given a current notebook resource with a short, long or deep path,
 the author sees notebook identity above a compact folder trail, opens its
@@ -152,6 +152,27 @@ is one disclosure/navigation loop across data variations, not separate route
 handlers. Scrutinized above the 5-minute target: splitting out UI scaffolding
 would leave an unused component. E2E startup/runtime is a stated external-wait
 exception; never waive its acceptance result.
+
+Accepted 2026-10-21: `NotebookLocation` uses the existing shared breadcrumb
+inside the labeled standard modal. `NotebookWorkspaceLocation.spec.ts` observes
+parent/root destinations, note-property/attachment realms, keyboard opening,
+full-name bounds and 44px targets, Escape/Close focus return at 320/768/1280.
+`NotebookWorkspaceContext.spec.ts` retains layout/creation proof. Initial full
+focused command selected context, Breadcrumb, NoteContextReader,
+AnsweredSpellingQuestionAccidentalMatchNoteContext, MessageCenterPage.subject
+and Modal: 35 tests passed. After the independent test-only split, both workspace
+specs passed 16 tests; unchanged consumer proof remains applicable. Both
+`pnpm -C frontend exec vue-tsc --noEmit` and `tsc --noEmit` passed through Nix.
+The plan's exact isolated Bazaar/circle command passed all seven scenarios,
+observing visible realm context and permissions through disclosure. Final
+realm destination activation remains G2. Inspected ignored screenshots
+`frontend/vitest-test-results/sidebar-location-*.png`: full disclosed names
+fit at all three widths; G1 owns the compact 768px limit. Initial screenshot
+output failed Vite's allowed-directory check; the corrected ignored path passed.
+Independent refactoring split the overlength test into context/location/shared
+fixture files; production boundaries stayed unchanged. Vite generated the new
+declarations; its first exit was pending Biome formatting, resolved by the
+coordinator's required selective formatter.
 
 ### 2. Keep location stable with docked or hidden contents
 Type: Behavior
@@ -219,7 +240,9 @@ Proof: Proof-table rows 6–7 and final visual review. Run full workspace header
 context, sidebar, `NoteToolbar.overflow`, and affected navigation tests. Exercise
 both creation controls and sorting through their relocated surface, including
 read-only/signed-out access. Verify final divider, baselines, clipping and
-right-edge alignment on phone, iPad and desktop. Perform the separate removal
+right-edge alignment on phone, iPad and desktop. Complete final realm-link
+integration by activating circle and Bazaar destinations through the disclosure
+and observing the resulting named routes (G2). Perform the separate removal
 reading after final code/refactor.
 
 Sizing: 5–8 minutes including focused proof/cleanup. The retained action owners
@@ -264,6 +287,26 @@ dough-execute-plan. Preparation does not run that execution pipeline.
 
 ## Current decisions and review
 
+Execution resumed 2026-10-21 in Story Branch Mode for `SEED-080#story-2`.
+Owned execution/originating checkout:
+`/Users/terryyin/git/doughnut/.worktrees/navigate-from-a-stable-sidebar-breadcrumb-with-a`,
+branch `codex/navigate-from-a-stable-sidebar-breadcrumb-with-a`; default integration
+checkout `/Users/terryyin/git/doughnut`; remote `origin`, trunk `main`.
+Publisher `dashboard-territory.local-doughnut`, agent Aino-chan; accepted claim
+`f2a1dbf31d687376e64f9e1568e477d8ed230669`, starting revision
+`4d44b2eb279eeff338be0331c02322aad173dd80`. Established start reused without
+another Take. Changed-since-readiness indication retained; scope still aligns.
+Existing planned refinement authority applies to overruns. Checkout preparation
+`./scripts/run.sh bash scripts/worktree_setup.sh` and
+`CURSOR_DEV=true nix develop -c pnpm -C frontend exec tsc --noEmit` passed.
+The installed pre-commit hook is check-only `pnpm lint:changed`.
+
+CI source: GitHub Actions `nerds-odd-e/doughnut`, verified selector `ci.yml`
+(display name `donut CI`), target `codex/navigate-from-a-stable-sidebar-breadcrumb-with-a`.
+Observer: coordinator `aino-sidebar-44097ed9`, directory
+`/tmp/dough-ci-501/watch-gMU34E`, PID 27009, stream session 56944, yielded cell 11.
+The startup claim's trunk CI is unobserved by this branch observer.
+
 - The owner already selected the Sidebar header design; no new product decision
   is pending. Complete-name disclosure and responsive location are required.
 - Four Behavior slices evolve one location model and retain existing action/tree
@@ -276,3 +319,15 @@ dough-execute-plan. Preparation does not run that execution pipeline.
 - Execution must reconcile any shared-header changes landed by story 1 while
   preserving both stories' outcomes. The scratch implementation is not retained
   or prescribed as final code.
+
+## Story obligations
+
+### G1. Compact notebook identity at the dock breakpoint
+Reported: slice 1 — "At 768 compact in current old bar allocation shrinks to icon + 'Frui…', hiding notebook text."
+Story clause: "Show notebook identity above the folder trail as in the approved design."
+Disposition: receiving slice 2
+
+### G2. Activate retained realm destinations through the disclosure
+Reported: slice 1 — "Activating circle/Bazaar realm links was not newly exercised by this delegated unit-test command."
+Story clause: "Preserve notebook-root and ancestor-folder navigation, including circle or Bazaar context where applicable."
+Disposition: receiving slice 4
