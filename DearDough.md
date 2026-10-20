@@ -5,7 +5,7 @@ responses under observation live in the [watch list](https://github.com/terryyin
 Detailed observations, original releases and qualified inferences are retained
 in the linked Open Dough catalog. Unknown execution provenance remains unknown.
 
-- Highest allocated local number: 257. Removed numbers are never reused.
+- Highest allocated local number: 258. Removed numbers are never reused.
 - Full source recovery before this cleanup: `0a8878e98be76b8e92203515d8f4719489b24169:DearDough.md`.
 - Full source recovery before name adoption and compaction: `234f141b41332715edd5e4384a425bcb8f26e718:DearDough.md`; complete supplied evidence retained in Open Dough `dbe36711c0e4ff9421bc28afc53cb7477203e704:docs/maintainer/findings/`.
 - Project-owned findings remain in [Donut Retrospective Findings](DonutRetrospectiveFindings.md); their ownership review is unchanged.
@@ -347,3 +347,19 @@ The slice 2 delegation named every plan proof row, including direct reachability
   - Evidence: plan proof-table row "startup/conversion/retry controls stay directly reachable; simultaneous voice and Assimilate fit"; `frontend/tests/layouts/NotebookWorkspaceHeader.dictation.spec.ts` "fits an open Assimilate, a recording Stop, and More in the bar together"; slice 2 Accepted note in commit e0cf54a34a.
   - Observed effect: a user-visible overflow defect was caught before delivery at the cost of one extra implementation round of about 6 minutes.
   - Inference: proof acceptance against the plan's proof rows, rather than the return's own coverage list, was the decisive practice; the implementer may have stopped at its own time budget (compare ODF-206).
+
+<a id="dd-258"></a>
+
+## DD-258 — A rollover rule left the probe's own running state unconsidered and was caught from the implementer's gap list
+
+The refined story decided how the midnight Daily probe re-offer interrupts recall (mid-question or paused), and the plan's slice 3 said "clear the held choice and re-check". Neither considered a learner already doing the probe trials at midnight. The first slice 3 return cleared the choice unconditionally, so the Start/Skip screen would have replaced running trials and discarded the run. The implementer listed the case under gaps; the coordinator returned it before acceptance with a keep-running rule and two discriminating cases.
+
+### Occurrences
+- Execution: SEED-079#story-1 (plan recoverable as `b179d7199a:.planning/slice-plans/008-half-day-recall-refresh/PLAN.md`, first implementation commit a94c83841f)
+  - Timestamp: 2026-10-20T15:24:36+09:00
+  - Tool: Claude Code
+  - Model: claude-opus-5-5
+  - Open Dough release: 0.3.66
+  - Evidence: plan slice 3 text "clear the held choice and re-check"; story obligation G5 in the plan at eeab453cdc (reverted to the simple rule in b179d7199a); `RecallPage.dailyProbeRollover.spec.ts` "keeps Daily probe trials running when the new day arrives during them" (failed on the first return).
+  - Observed effect: one extra implementation round of about 4 minutes, which the owner then reverted the same day, calling the case an extreme edge case and asking for the simplest rule. No defect delivered.
+  - Inference: when a rule resets held state on a time boundary, refinement should list every state that can hold at that moment, including the activity the rule offers. Requiring implementers to list untested states made the miss visible, but the coordinator should have asked whether the edge case mattered before adding a rule for it.

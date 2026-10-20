@@ -1,4 +1,5 @@
 import { useRecallData } from "@/composables/useRecallData"
+import { DAILY_PROBE_INSTRUCTION } from "@/models/dailyProbe"
 import { DailyProbeController } from "@generated/donut-backend-api/sdk.gen"
 import type { AnsweredQuestion } from "@generated/donut-backend-api"
 import makeMe from "donut-test-fixtures/makeMe"
@@ -93,13 +94,60 @@ describe("RecallPage Daily probe entry", () => {
   const showsRecallPrompt = (
     wrapper: Awaited<ReturnType<typeof mountRecall>>
   ) => wrapper.findComponent({ name: "RecallPromptCard" }).exists()
+  const showsEntry = (wrapper: Awaited<ReturnType<typeof mountRecall>>) =>
+    wrapper.find('[data-testid="daily-probe-entry"]').exists()
+  const showsProgressBar = (wrapper: Awaited<ReturnType<typeof mountRecall>>) =>
+    wrapper.findComponent({ name: "RecallProgressBar" }).exists()
+  const choose = async (
+    wrapper: Awaited<ReturnType<typeof mountRecall>>,
+    choice: "start" | "skip"
+  ) => {
+    await wrapper.find(`[data-testid="daily-probe-${choice}"]`).trigger("click")
+    await flushPromises()
+  }
 
-  it("shows Daily probe instead of the quiz when the learner has opted in", async () => {
+  it("asks to start or skip Daily probe before any trial or quiz when the learner has opted in", async () => {
     const wrapper = await mountRecall(true)
 
+    expect(showsEntry(wrapper)).toBe(true)
+    expect(wrapper.find('[data-testid="daily-probe-instruction"]').text()).toBe(
+      DAILY_PROBE_INSTRUCTION
+    )
+    expect(showsDailyProbe(wrapper)).toBe(false)
+    expect(showsRecallPrompt(wrapper)).toBe(false)
+    expect(showsProgressBar(wrapper)).toBe(false)
+    expect(donutMenuLaunchersIn(wrapper)).toHaveLength(1)
+  })
+
+  it("starts Daily probe trials on Start", async () => {
+    const wrapper = await mountRecall(true)
+    await choose(wrapper, "start")
+
+    expect(showsEntry(wrapper)).toBe(false)
     expect(showsDailyProbe(wrapper)).toBe(true)
     expect(showsRecallPrompt(wrapper)).toBe(false)
-    expect(donutMenuLaunchersIn(wrapper)).toHaveLength(1)
+  })
+
+  it("shows ordinary recall with the progress bar on Skip", async () => {
+    const wrapper = await mountRecall(true)
+    await choose(wrapper, "skip")
+
+    expect(showsEntry(wrapper)).toBe(false)
+    expect(showsDailyProbe(wrapper)).toBe(false)
+    expect(showsRecallPrompt(wrapper)).toBe(true)
+    expect(showsProgressBar(wrapper)).toBe(true)
+  })
+
+  it("asks again on a fresh page after Skip while Daily probe is still due", async () => {
+    const skipped = await mountRecall(true)
+    await choose(skipped, "skip")
+    skipped.unmount()
+
+    const fresh = ctx.renderer.mount()
+    await flushPromises()
+
+    expect(showsEntry(fresh)).toBe(true)
+    expect(showsRecallPrompt(fresh)).toBe(false)
   })
 
   it("loads ordinary recall when Daily probe is off", async () => {
@@ -128,6 +176,7 @@ describe("RecallPage Daily probe entry", () => {
     expect(
       wrapper.find('[data-testid="daily-probe-offer-retry"]').exists()
     ).toBe(true)
+    expect(showsEntry(wrapper)).toBe(false)
     expect(showsDailyProbe(wrapper)).toBe(false)
     expect(showsRecallPrompt(wrapper)).toBe(false)
     expect(donutMenuLaunchersIn(wrapper)).toHaveLength(1)
@@ -149,6 +198,6 @@ describe("RecallPage Daily probe entry", () => {
     await flushPromises()
 
     expect(getToday).toHaveBeenCalledTimes(2)
-    expect(showsDailyProbe(wrapper)).toBe(true)
+    expect(showsEntry(wrapper)).toBe(true)
   })
 })

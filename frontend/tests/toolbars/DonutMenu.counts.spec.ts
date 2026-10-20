@@ -1,19 +1,16 @@
-import {
-  RecallsController,
-  UserController,
-} from "@generated/donut-backend-api/sdk.gen"
+import { UserController } from "@generated/donut-backend-api/sdk.gen"
 import { useRecallData } from "@/composables/useRecallData"
 import timezoneParam from "@/managedApi/window/timezoneParam"
 import { screen } from "@testing-library/vue"
 import { mockSdkService } from "@tests/helpers"
 import { flushPromises } from "@vue/test-utils"
-import { afterEach, describe, it, expect, vi } from "vitest"
+import { describe, it, expect, vi } from "vitest"
 import { createMenuData, memoryTrackerLitesStub } from "./menuDataMocks"
 import {
   mountDonutMenu,
   navItemOf,
   openDonutMenu,
-  pressLauncher,
+  recallCountOf,
   setupDonutMenuTests,
   user,
 } from "./donutMenuTestSupport"
@@ -42,9 +39,6 @@ function mockAssimilationCount(
     })
   )
 }
-
-const recallCountOf = (label: string) =>
-  navItemOf(label)?.querySelector(".recall-count")
 
 describe("Donut menu assimilation count", () => {
   it("shows the due count titled with due today and total unassimilated", async () => {
@@ -166,67 +160,4 @@ describe("Donut menu recall count", () => {
       ).toBe(diligentMode)
     }
   )
-
-  describe("when the recall window ends", () => {
-    const windowEndAt = "2026-09-29T12:00:00Z"
-
-    afterEach(() => {
-      vi.useRealTimers()
-    })
-
-    it("catches up due recalls once while the panel is closed", async () => {
-      vi.useFakeTimers({ toFake: ["setTimeout", "clearTimeout", "Date"] })
-      vi.setSystemTime("2026-09-29T11:00:00Z")
-      mockSdkService(
-        UserController,
-        "getMenuData",
-        createMenuData({
-          recallStatus: {
-            toRepeat: memoryTrackerLitesStub(1),
-            currentRecallWindowEndAt: windowEndAt,
-            totalAssimilatedCount: 0,
-          },
-        })
-      )
-      const recalling = mockSdkService(RecallsController, "recalling", {
-        toRepeat: memoryTrackerLitesStub(2),
-        currentRecallWindowEndAt: windowEndAt,
-        totalAssimilatedCount: 0,
-      })
-
-      mountDonutMenu()
-      await flushPromises()
-      await vi.advanceTimersByTimeAsync(59 * 60 * 1000)
-      expect(recalling).not.toHaveBeenCalled()
-
-      await vi.advanceTimersByTimeAsync(2 * 60 * 1000)
-      await flushPromises()
-      await pressLauncher()
-      expect(recallCountOf("Recall")).toHaveTextContent("2")
-
-      await vi.advanceTimersByTimeAsync(24 * 60 * 60 * 1000)
-      expect(recalling).toHaveBeenCalledTimes(1)
-    })
-  })
-})
-
-describe("Donut menu unread message count", () => {
-  it("shows the unread message count on Messages", async () => {
-    mockSdkService(
-      UserController,
-      "getMenuData",
-      createMenuData({
-        unreadMessages: [
-          { id: 1, message: "first" },
-          { id: 2, message: "second" },
-        ],
-      })
-    )
-
-    await openDonutMenu()
-
-    expect(
-      navItemOf("Messages")?.querySelector(".unread-count")
-    ).toHaveTextContent("2")
-  })
 })

@@ -1,14 +1,23 @@
 import type { User } from "@generated/donut-backend-api"
 import { DailyProbeController } from "@generated/donut-backend-api/sdk.gen"
+import { useRecallData } from "@/composables/useRecallData"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import timezoneParam from "@/managedApi/window/timezoneParam"
 import { computed, ref, watch, type Ref } from "vue"
+
+// A half-day window ends at local noon or midnight; its last instant is on the
+// local day the window belongs to.
+const localDayOfWindowEndingAt = (endAt: string) =>
+  new Date(new Date(endAt).getTime() - 1).toLocaleDateString("en-CA", {
+    timeZone: timezoneParam(),
+  })
 
 export function useDailyProbeOffer(
   currentUser: Ref<User | undefined> | undefined
 ) {
   const completedToday = ref<boolean | undefined>(undefined)
   const offerCheckFailed = ref(false)
+  const entryChoice = ref<"start" | "skip" | undefined>(undefined)
   const enabled = computed(() => !!currentUser?.value?.dailyProbeEnabled)
 
   const checkOffer = async () => {
@@ -35,19 +44,48 @@ export function useDailyProbeOffer(
     { immediate: true }
   )
 
-  const showDailyProbe = computed(
+  const probeDue = computed(
     () => enabled.value && completedToday.value === false
   )
+  const showDailyProbeEntry = computed(
+    () => probeDue.value && entryChoice.value === undefined
+  )
+  const showDailyProbe = computed(
+    () => probeDue.value && entryChoice.value === "start"
+  )
   const showOrdinaryRecall = computed(
-    () => !enabled.value || completedToday.value === true
+    () =>
+      !enabled.value ||
+      completedToday.value === true ||
+      entryChoice.value === "skip"
   )
   const showOfferRetry = computed(() => enabled.value && offerCheckFailed.value)
 
+  const { currentRecallWindowEndAt } = useRecallData()
+  watch(currentRecallWindowEndAt, async (endAt, previousEndAt) => {
+    if (
+      !endAt ||
+      !previousEndAt ||
+      localDayOfWindowEndingAt(endAt) ===
+        localDayOfWindowEndingAt(previousEndAt)
+    )
+      return
+    entryChoice.value = undefined
+    await checkOffer()
+  })
+
   return {
+    showDailyProbeEntry,
     showDailyProbe,
     showOrdinaryRecall,
     showOfferRetry,
     checkOffer,
+    startDailyProbe: () => {
+      entryChoice.value = "start"
+    },
+    skipDailyProbe: () => {
+      entryChoice.value = "skip"
+    },
     markDailyProbeFinished: () => {
       completedToday.value = true
     },
