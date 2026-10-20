@@ -73,6 +73,14 @@ describe("Donut menu Resume availability", () => {
       shouldShow: false,
     },
     {
+      description: "paused with loaded trackers at the queue end",
+      routeName: "notebooks",
+      isRecallPaused: true,
+      currentIndex: 5,
+      toRepeat: memoryTrackerLitesStub(5),
+      shouldShow: true,
+    },
+    {
       description: "currentIndex past everything to repeat",
       routeName: "notebooks",
       isRecallPaused: false,

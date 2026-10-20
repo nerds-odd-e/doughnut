@@ -2,6 +2,7 @@
   <div
     class="nav-item text-neutral-content rounded-lg px-2"
     :class="{
+      'nav-item-compact': compact,
       'text-primary bg-primary/10': isActive && !isNavigationActionItem(name) && !nonClickable,
       'resume-recall-active': name === 'resumeRecall' && isActive,
       'hover:bg-base-content/5': !isActive && !nonClickable,
@@ -96,6 +97,15 @@ const onClick = () => {
 .nav-item a {
   text-decoration: none;
   color: inherit;
+}
+
+.nav-item-compact > * {
+  min-height: 40px;
+  justify-content: center;
+}
+
+.nav-item-compact .label {
+  display: none;
 }
 
 .icon-container {

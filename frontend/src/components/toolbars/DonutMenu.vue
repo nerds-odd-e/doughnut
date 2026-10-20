@@ -1,4 +1,16 @@
 <template>
+  <div class="flex items-center flex-none">
+    <NavigationItem
+      v-if="user && activeItem"
+      v-bind="activeItem"
+      compact
+      :name="isNavigationActionItem(activeItem.name) ? activeItem.name : undefined"
+      :expanded="dropdownRef?.open"
+      @click.stop
+      @toggle="dropdownRef?.openDropdown()"
+      @resumeRecall="resumeRecall"
+      @goToNextAssimilation="goToNextAssimilation"
+    />
   <AutoCollapseDropdown
     ref="dropdownRef"
     v-slot="{ open }"
@@ -10,15 +22,15 @@
       title="Donut menu"
       class="daisy-btn daisy-btn-ghost list-none cursor-pointer"
     >
-      <BookMarked class="w-6 h-6" aria-hidden="true" />
+      <component :is="user && activeItem ? ChevronDown : BookMarked" class="w-6 h-6" aria-hidden="true" />
     </summary>
     <div
       v-if="open"
       role="region"
       aria-label="Donut menu panel"
-      class="daisy-dropdown-content z-50 bg-neutral rounded-box shadow-lg p-2"
+      class="daisy-dropdown-content z-50 bg-neutral rounded-box shadow-lg p-3 sm:p-4"
     >
-      <ul v-if="user" class="grid grid-cols-4 gap-2">
+      <ul v-if="user" class="menu-navigation grid grid-cols-4 gap-x-1 gap-y-3">
         <li
           v-for="item in [...upperNavItems, ...lowerNavItems]"
           :key="item.name"
@@ -33,15 +45,25 @@
         </li>
         <AccountMenuItem :user="user" :logout="logout" @choose="close" />
       </ul>
-      <SearchForNoteAndFolder
-        v-if="user"
-        ref="searchRef"
-        class="pt-2"
-        quiet
-        @navigate="close"
-      />
+      <div v-if="user" class="flex items-center gap-2 pt-4">
+        <button
+          type="button"
+          aria-label="Open search"
+          class="search-launcher daisy-input flex-1 min-w-0 bg-base-100"
+          @click="openIntoSearch"
+        />
+        <button
+          type="button"
+          aria-label="Search"
+          title="Search"
+          class="search-launcher daisy-btn daisy-btn-square"
+          @click="openIntoSearch"
+        >
+          <Search class="w-6 h-6" aria-hidden="true" />
+        </button>
+      </div>
       <LoginButton v-else />
-      <div class="flex items-center justify-end gap-2 pt-2 text-sm">
+      <div class="flex items-center justify-end gap-2 pt-6 text-sm">
         <router-link to="/" class="text-neutral-400 no-underline">
           Donut by
         </router-link>
@@ -51,15 +73,30 @@
       </div>
     </div>
   </AutoCollapseDropdown>
+  </div>
+  <Modal
+    v-if="searchOpen"
+    :show-close-button="false"
+    @close_request="closeSearch"
+  >
+    <template #body>
+      <SearchForNoteAndFolder
+        :modal-closer="closeSearch"
+        @navigate="closeSearch"
+      />
+    </template>
+  </Modal>
 </template>
 
 <script setup lang="ts">
 import type { User } from "@generated/donut-backend-api"
-import { nextTick, onMounted, onUnmounted, ref, watch } from "vue"
+import { computed, onMounted, onUnmounted, ref, watch } from "vue"
 import { useRoute } from "vue-router"
-import { BookMarked } from "@lucide/vue"
+import { BookMarked, ChevronDown, Search } from "@lucide/vue"
 import AutoCollapseDropdown from "@/components/commons/AutoCollapseDropdown.vue"
+import Modal from "@/components/commons/Modal.vue"
 import NavigationItem from "@/components/navigation/NavigationItem.vue"
+import { isNavigationActionItem } from "@/components/navigation/navigationActionItems"
 import AccountMenuItem from "@/components/toolbars/AccountMenuItem.vue"
 import LoginButton from "@/components/toolbars/LoginButton.vue"
 import SearchForNoteAndFolder from "@/components/search/SearchForNoteAndFolder.vue"
@@ -67,7 +104,7 @@ import { useNavigationItems } from "@/composables/useNavigationItems"
 import { useResumeRecall } from "@/composables/useResumeRecall"
 import { useGoToNextAssimilation } from "@/composables/useGoToNextAssimilation"
 import { useKeyboardShortcut } from "@/composables/useKeyboardShortcut"
-import { scheduleFocusTargetWithin } from "@/utils/focusTarget"
+import { primeSoftKeyboard } from "@/utils/focusTarget"
 import { logout } from "@/managedApi/window/logout"
 
 const props = defineProps<{ user?: User }>()
@@ -75,15 +112,21 @@ const props = defineProps<{ user?: User }>()
 const dropdownRef = ref<InstanceType<typeof AutoCollapseDropdown> | null>(null)
 const close = () => dropdownRef.value?.closeDropdown()
 
-const searchRef = ref<InstanceType<typeof SearchForNoteAndFolder> | null>(null)
-const openIntoSearch = async () => {
-  dropdownRef.value?.openDropdown()
-  await nextTick()
-  scheduleFocusTargetWithin(searchRef.value?.$el)
+const searchOpen = ref(false)
+const closeSearch = () => {
+  searchOpen.value = false
+}
+const openIntoSearch = () => {
+  primeSoftKeyboard()
+  close()
+  searchOpen.value = true
 }
 useKeyboardShortcut("note-search", openIntoSearch, () => !!props.user)
 
 const { upperNavItems, lowerNavItems } = useNavigationItems()
+const activeItem = computed(() =>
+  [...upperNavItems.value, ...lowerNavItems.value].find((item) => item.isActive)
+)
 const { resumeRecall } = useResumeRecall()
 const { goToNextAssimilation } = useGoToNextAssimilation()
 
@@ -99,6 +142,15 @@ onUnmounted(() => document.removeEventListener("keydown", closeOnEscape))
 
 <style scoped lang="scss">
 @use "@/assets/page-bar.scss" as *;
+
+.search-launcher:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+}
+
+.menu-navigation :deep(.nav-item) {
+  padding: 0.5rem 0.25rem;
+}
 
 .donut-menu > .daisy-dropdown-content {
   width: max-content;

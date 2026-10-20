@@ -1,6 +1,10 @@
 import { RecallsController } from '@generated/donut-backend-api/sdk.gen'
 import { commonSenseSplit } from 'support/string_util'
-import { waitUntilAppIsNotBusy, withinDonutMenuItem } from '../pageBase'
+import {
+  pageBar,
+  waitUntilAppIsNotBusy,
+  withinDonutMenuItem,
+} from '../pageBase'
 import router from '../router'
 import { assumeQuestionPage } from './QuizQuestionPage'
 import { recallDailyProbeMethods } from './recallDailyProbeMethods'
@@ -155,9 +159,40 @@ const recallPage = () => {
       cy.findByText(noteTitle, { selector: 'h2 *' })
       return this
     },
+    rememberCurrentQuestion() {
+      waitUntilAppIsNotBusy()
+      assumeQuestionPage()
+        .getQuestionSection()
+        .should('be.visible')
+        .invoke('text')
+        .then((text) => {
+          expect(text.trim(), 'current recall question text').not.to.equal('')
+          cy.wrap(text.trim()).as('currentRecallQuestion')
+        })
+      cy.get('.progress-bar').first().invoke('text').as('currentRecallProgress')
+      return this
+    },
     expectCurrentQuestion() {
       waitUntilAppIsNotBusy()
       assumeQuestionPage().getQuestionSection().should('be.visible')
+      return this
+    },
+    expectRememberedQuestion() {
+      waitUntilAppIsNotBusy()
+      cy.get<string>('@currentRecallQuestion').then((question) => {
+        assumeQuestionPage()
+          .getQuestionSection()
+          .should('be.visible')
+          .invoke('text')
+          .should((text) => {
+            expect(text.trim(), 'preserved current recall question').to.equal(
+              question
+            )
+          })
+      })
+      cy.get<string>('@currentRecallProgress').then((progress) => {
+        cy.get('.progress-bar').first().should('have.text', progress)
+      })
       return this
     },
   }
@@ -186,15 +221,11 @@ export const recall = () => {
       return this
     },
     expectResumeAvailable() {
-      withinDonutMenuItem('Resume', ($el) => {
-        $el.should('exist')
-      })
+      pageBar().findByRole('button', { name: 'Resume' }).should('be.visible')
       return this
     },
     resumeRecall() {
-      withinDonutMenuItem('Resume', ($el) => {
-        $el.click()
-      })
+      pageBar().findByRole('button', { name: 'Resume' }).click()
       waitUntilAppIsNotBusy()
       // Flush Vue remount timeouts under cy.clock() so the restored question is clickable.
       cy.tick(1)

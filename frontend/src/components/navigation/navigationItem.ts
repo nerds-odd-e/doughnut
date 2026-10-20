@@ -10,4 +10,5 @@ export type NavigationItemProps = {
   badgeTitle?: string
   expanded?: boolean
   nonClickable?: boolean
+  compact?: boolean
 }

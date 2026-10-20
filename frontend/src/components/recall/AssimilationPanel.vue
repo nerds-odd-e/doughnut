@@ -28,6 +28,7 @@ import type { Note } from "@generated/donut-backend-api"
 import NoteAssimilationModes from "./NoteAssimilationModes.vue"
 import SpellingVerificationPopup from "./SpellingVerificationPopup.vue"
 import { provide, toRef } from "vue"
+import { useAssimilationView } from "@/composables/useAssimilationView"
 import type { AssimilateEvent } from "@/composables/useAssimilateUnit"
 import {
   memoryTrackerActionsKey,
@@ -39,6 +40,8 @@ import {
 const { note } = defineProps<{
   note: Note
 }>()
+
+useAssimilationView().trackPresentation(() => note.id)
 
 const emit = defineEmits<{
   (e: "reloadNeeded"): void

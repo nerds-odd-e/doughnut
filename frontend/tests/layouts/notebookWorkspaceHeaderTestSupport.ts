@@ -82,6 +82,16 @@ export function noteCommandEls() {
 
 export const visibleCommandTitles = () => noteCommandEls().map((el) => el.title)
 
+/** Commands use the right edge of the area allocated to the note toolbar. */
+export function commandRightGap() {
+  const toolbar = document.querySelector<HTMLElement>("[data-note-toolbar]")!
+  const commands = noteCommandEls()
+  return (
+    toolbar.getBoundingClientRect().right -
+    commands[commands.length - 1]!.getBoundingClientRect().right
+  )
+}
+
 /** Whether every visible note command sits inside the page bar's row. */
 export function commandsSitInPageBar(viewportWidth: number) {
   const bar = pageBarEl().getBoundingClientRect()

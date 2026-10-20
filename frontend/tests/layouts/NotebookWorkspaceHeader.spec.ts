@@ -25,6 +25,7 @@ import {
   atViewportWidth,
   chooseFromMore,
   clickPageBarCommand,
+  commandRightGap,
   commandsSitInPageBar,
   mountNotebookWorkspace,
   noteCommandTitlesInOrder,
@@ -58,6 +59,7 @@ describe("Notebook workspace header", () => {
       await vi.waitFor(() => {
         expect(visibleCommandTitles().length).toBeGreaterThan(0)
         expect(commandsSitInPageBar(width)).toBe(true)
+        expect(Math.abs(commandRightGap())).toBeLessThanOrEqual(1)
       })
       const visible = visibleCommandTitles()
       expect(visible).toEqual(
@@ -108,12 +110,24 @@ describe("Notebook workspace header", () => {
     expect(settings()?.closest(".note-show-container")).not.toBeNull()
     expect(pageBarEl().contains(settings())).toBe(false)
 
-    await page.viewport(1280, 700)
-    await vi.waitFor(() => expect(commandsSitInPageBar(1280)).toBe(true))
-    expect(
-      pageBarCommand(titles.assimilation)?.getAttribute("aria-pressed")
-    ).toBe("true")
-    expect(settings()).not.toBeNull()
+    for (const width of [390, 768, 1280, 320]) {
+      await page.viewport(width, 700)
+      await vi.waitFor(() => {
+        expect(commandsSitInPageBar(width)).toBe(true)
+        expect(Math.abs(commandRightGap())).toBeLessThanOrEqual(1)
+        expect(
+          pageBarCommand(titles.assimilation)?.getAttribute("aria-pressed")
+        ).toBe("true")
+        expect(
+          pageBarEl().querySelector('[aria-label="Assimilate"]')
+        ).not.toBeNull()
+        const visible = visibleCommandTitles()
+        expect(visible).toEqual(
+          noteCommandTitlesInOrder.filter((title) => visible.includes(title))
+        )
+      })
+      expect(settings()?.checkVisibility()).toBe(true)
+    }
   })
 
   it("keeps Conversation but no editing commands for a read-only note", async () => {

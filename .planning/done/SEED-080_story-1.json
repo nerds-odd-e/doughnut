@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "identity": "SEED-080#story-1",
+  "title": "Recover active navigation and finish command-bar interactions",
+  "completedAt": "2026-10-20T14:43:11.981Z",
+  "developer": "Terry Yin",
+  "agent": "Maria-chan",
+  "host": "codex",
+  "model": "gpt-6.1-sol"
+}
