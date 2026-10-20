@@ -1,6 +1,6 @@
 <template>
   <div
-    class="grid grid-cols-[max-content_minmax(0,1fr)] items-center gap-x-2 gap-y-2"
+    class="grid grid-cols-[minmax(0,auto)_minmax(max-content,1fr)] items-center gap-x-2 gap-y-2"
     data-testid="assimilation-modes"
   >
     <div

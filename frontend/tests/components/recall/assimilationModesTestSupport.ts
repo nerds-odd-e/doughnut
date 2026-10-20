@@ -1,8 +1,11 @@
 import AssimilationModes from "@/components/recall/AssimilationModes.vue"
 import helper from "@tests/helpers"
 
-export function mountModes(props: Record<string, unknown>) {
-  return helper.component(AssimilationModes).withProps(props).mount()
+export function mountModes(
+  props: Record<string, unknown>,
+  options: Record<string, unknown> = {}
+) {
+  return helper.component(AssimilationModes).withProps(props).mount(options)
 }
 
 export function assimilateButton(

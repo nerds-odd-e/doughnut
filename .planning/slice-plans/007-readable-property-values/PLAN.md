@@ -181,7 +181,7 @@ before 10 minutes, preserving the unfinished proof if the hypothesis fails.
 
 ### 2. Read expanded list values with their learning actions
 Type: Behavior
-Status: planned
+Status: done
 Proof: Slice 2 rows in the proof table; rich-editor and shared assimilation suites, frontend typechecks.
 
 Behavior: Expand a mixed list containing repeated and long values, read each
@@ -195,6 +195,16 @@ expanded-list model. Prove actual link and learning activation alongside
 geometry, then remove replaced exclusive styling.
 Safe stop: list reading and operations work independently of the remaining
 idle/focus presentation polish in slice 3.
+
+Accepted proof: list values wrap (`wrap-anywhere`, no `truncate`);
+`AssimilationModes` grid is `minmax(0,auto)_minmax(max-content,1fr)` so long
+labels wrap while actions keep their width. New
+`RichMarkdownEditor.listPropertyLayout.spec.ts` (shared helpers in
+`propertyLayoutTestSupport.ts`) observes expanded order with repeated/empty
+items, geometry, collapse + Edit, link route, shared tracker and assimilate
+request; fail-before 9/21 on the original CSS. Focused run 27 files / 204
+tests, both typechecks, and `property_wiki_link`, `property_memory_tracker`,
+`note_property_layout` features 26/26 passed.
 
 Size hypothesis: 5–8 minutes. The shared detailed-list/learning boundary is
 one proof loop; independent compact/full representations would add risk.
@@ -271,3 +281,8 @@ identified; final interaction/design acceptance remains execution's work.
 Reported: slice 1 — "If the editor is narrower than about 448px at such a viewport (a sidebar could do this), the draft row now wraps and the list could cover the draft value."
 Story clause: "Labels and controls stay reachable as space narrows"
 Disposition: receiving slice 3
+
+### G2. Wrapped labels in note-level assimilation modes proven only for short labels
+Reported: slice 2 — "Wrapped labels in note-level `AssimilationModes` (outside the property panel) are only proven for short labels, i.e. that the column layout is unchanged."
+Story clause: "inspecting note properties on a phone, iPad,"
+Disposition: no user cost "inspecting note properties on a phone, iPad,": note-level rows label fixed assimilation mode names, never authored values, so only short labels reach that consumer; `AssimilationModes.presentation.spec.ts` "aligns actions in one column after the labels…" proves its layout is unchanged.
