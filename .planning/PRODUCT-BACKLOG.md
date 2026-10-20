@@ -6,8 +6,6 @@ Make deliberately captured knowledge more useful through learning and refinement
 
 ## Taken
 
-- [Recover active navigation and finish command-bar interactions](seeds/SEED-080-command-bar-reconciliation.md#story-1) — SEED-080#story-1 ([plan](slice-plans/001-command-bar-continuity/PLAN.md))
-
 ## Backlog list
 
 - [Navigate from a stable sidebar breadcrumb with aligned tools](seeds/SEED-080-command-bar-reconciliation.md#story-2) — SEED-080#story-2

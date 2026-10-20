@@ -63,7 +63,7 @@ Former local code: DD-144. A small addition crosses the numeric file-size ceilin
   - Timestamp: unknown
   - Tool: Codex
   - Open Dough release: unknown
-  - Evidence: on 2026-10-20, the refactor file-size gate moved 138 lines of story constraints and dated observations into `SEED-080-command-bar-context.md` (published `ac60f83ff17e67c1a4fe25e6f3fc00813a07fdb2`); the slice 5 pass then compacted a 251-line plan to 240 (`c8523d0428e88b1da203a6f935decf7c1a888b26`).
+  - Evidence: on 2026-10-20, the refactor file-size gate moved 138 lines of story constraints and dated observations into `.planning/seeds/SEED-080-command-bar-context.md` (published `ac60f83ff17e67c1a4fe25e6f3fc00813a07fdb2`); the slice 5 pass then compacted a 251-line plan to 240 (`c8523d0428e88b1da203a6f935decf7c1a888b26`).
   - Observed effect: multiple documentation splits/compactions were required while product behavior and its accepted proof remained unchanged.
   - Inference: the same absolute ceiling reaches temporary planning records; this occurrence concerns document churn, not a demonstrated product-code extraction cost.
 
@@ -418,6 +418,6 @@ Supplier discovery scans every planning Markdown file with an `**Identity:**` li
   - Timestamp: unknown
   - Tool: Codex
   - Open Dough release: unknown
-  - Evidence: `product-backlog.mjs discover-consumers --file .planning/PRODUCT-BACKLOG.md --supplier-identity SEED-080#story-1` on 2026-10-20 returned no consumers plus duplicate-home and `SEED-066-voice-input.md#manual-discovery-findings` problems. `product-backlog-dependency-consumers.mjs` scans identity lines and all anchors; `EVIDENCE.md`, `PROOF.md` and the slice evidence records at `d241265ffc4add55964c7bd6c1906700940114ca` carry this identity. A whole `.planning` Markdown search found no `dough-story-dependencies` blocks.
+  - Evidence: `product-backlog.mjs discover-consumers --file .planning/PRODUCT-BACKLOG.md --supplier-identity SEED-080#story-1` on 2026-10-20 returned no consumers plus duplicate-home and `SEED-066-voice-input.md#manual-discovery-findings` problems. `product-backlog-dependency-consumers.mjs` scans identity lines and all anchors. The records under `01c7dc0f2cc02f92e670d38e9df5237792fd3538:.planning/slice-plans/001-command-bar-continuity/` carry this identity and remain recoverable there. A whole `.planning` Markdown search found no `dough-story-dependencies` blocks. After ordinary spent-record cleanup, discovery retained only the unrelated SEED-066 warning.
   - Observed effect: closure needed source inspection to distinguish supporting records from live consumers. Unrelated SEED-066 evidence was preserved; no dependency was silently satisfied.
   - Inference: discovery's candidate grammar is broader than canonical-home grammar. The relationship to other discovery/readiness findings is unconfirmed; Open Dough maintainers can review the boundary.
