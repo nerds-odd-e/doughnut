@@ -6,7 +6,6 @@ Make deliberately captured knowledge more useful through learning and refinement
 
 ## Taken
 
-- [Exercise current MCP source in local E2E runs](seeds/SEED-077-current-mcp-e2e-bundle.md#story-1) — SEED-077#story-1 ([plan](slice-plans/002-current-mcp-e2e-source/PLAN.md))
 - [Open a quiet Donut command center consistently on every screen](seeds/SEED-078-cohesive-note-workspace.md#story-1) — SEED-078#story-1 ([plan](slice-plans/003-donut-command-center/PLAN.md))
 
 ## Backlog list

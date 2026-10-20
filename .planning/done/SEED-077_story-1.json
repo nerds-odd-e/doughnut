@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "identity": "SEED-077#story-1",
+  "title": "Exercise current MCP source in local E2E runs",
+  "completedAt": "2026-10-20T00:50:48.014Z",
+  "developer": "Terry Yin",
+  "agent": "Rina-chan",
+  "host": "cursor",
+  "model": "auto"
+}
