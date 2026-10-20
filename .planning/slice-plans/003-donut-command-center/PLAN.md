@@ -69,7 +69,7 @@ scratch edits were made; the worktree held only the seed change.
 | Premise and consuming operation | Literal observation | Result and consequence |
 | --- | --- | --- |
 | The toolbar unit specs are green and cheap, so re-homing and replacing them is bounded | `env -u NODE_ENV CURSOR_DEV=true nix develop -c pnpm frontend:test tests/toolbars` | 12 files, 81 tests passed in 7.0s (13s wall). `MainMenu.spec`, `MainMenu.recall.spec`, `MainMenu.resume.spec` mount `MainMenu` with a mocked `getMenuData` and observe counts, Resume, Assimilate navigation; `HorizontalMenu.spec` and `VerticalMenu.spec` test the replaced presentations. |
-| The E2E menu page objects are driven by named features the runner admits locally | Read `withinMainMenuItem` callers: `messageCenterIndicator`, `recall().expectCount`, `assimilation().expectAssimilationNavBadge`, `mainMenu().userOptions()`, `expectBookLayoutBelowMainMenu`. Step texts map to `messages/message_center_with_unread_message_count.feature`, `recall/property_memory_tracker.feature`, `relationships/reify_property.feature`, `learning_session/commissioned_learning_session.feature`, `users/user_profile.feature`, and book reading. `CURSOR_DEV=true nix develop -c node --input-type=module -e '…assertSupportedIsolatedCypressSpecs(["e2e_test/features/messages/message_center_with_unread_message_count.feature"])'` | `{"requiresPrivateOpenAiMock":false,"requiresPrivateWikidataMock":false}`. The full run starts the stack and mutates disposable data; it is slice 3's early probe. All page objects locate items inside `.main-menu`, visible without opening at the 1200px default viewport; after replacement they must open the panel first. |
+| The E2E menu page objects are driven by named features the runner admits locally | Read `withinMainMenuItem` callers: `messageCenterIndicator`, `recall().expectCount`, `assimilation().expectAssimilationNavBadge`, `mainMenu().userOptions()`, `expectBookLayoutBelowMainMenu`. Step texts map to `messages/message_center_with_unread_message_count.feature`, `recall/property_memory_tracker.feature`, `relationships/reify_property.feature`, `learning_session/commissioned_learning_session.feature`, `users/user_profile.feature`, and book reading. `CURSOR_DEV=true nix develop -c node --input-type=module -e '…assertSupportedIsolatedCypressSpecs(["e2e_test/features/messages/message_center_with_unread_message_count.feature"])'` | `{"requiresPrivateOpenAiMock":false,"requiresPrivateWikidataMock":false}`. The full run starts the stack and mutates disposable data; it is slice 4's early probe. All page objects locate items inside `.main-menu`, visible without opening at the 1200px default viewport; after replacement they must open the panel first. |
 | The 1024px switcher is the only consumer of `useBreakpoint`, and the fixed-region padding has no other consumer | Searched `useBreakpoint`, `collapsed-menu-width`, `main-menu-height`, `main-menu-width` across `frontend/src` | One consumer (`MainMenu.vue`); variables consumed by `DonutApp`, `GlobalBar`, `SidebarDrawer`, `HorizontalMenu` only. They go with the replaced presentations, except the drawer offset, which becomes the shared header-height rule. |
 | Every signed-in screen renders the shared page bar | Read `GlobalBar`/`ContainerPage`/`NotebookSidebarLayout`/`BookReadingShell` consumers in `frontend/src/pages` | All signed-in screens render it; `RecallPage` shows it while active under KeepAlive. The test-only login page has no bar and no signed-in user. |
 | The current narrow menu already closes on route change, outside click, and focus loss | Read `HorizontalMenu.vue` | Confirmed; the panel keeps route-change and outside-click closing and adds Escape. |
@@ -84,9 +84,9 @@ always-visible active item is as easy to find as the current destinations.
 | Counts, Resume availability, menu-data fetch at sign-in, and recall catch-up keep their data and timing while no panel is open | Slice 1: the three `MainMenu` specs run through a harness that mounts the shell composable with `MainMenu`, observing the same counts, Resume navigation, and Assimilate navigation. Slice 2 re-homes those observations to the launcher spec. |
 | Launcher at the leading end of the page bar opens a panel listing Resume (when paused), Note, Assimilate, Recall, Circles, Bazaar, Messages with counts and active marking, Account group, attribution | Slice 2: launcher unit spec with mocked `getMenuData`: press "Donut menu" → items in order with counts; active route marks its destination; Resume first when recall is paused with trackers and navigates to recall; Assimilate navigates to the next note; Account reveals Admin Dashboard (admin only), Recent, Settings for the user, Manage Access Tokens, Logout; "Donut by" present. `GlobalBar.spec`: the launcher is the first control. |
 | Choosing, launcher press, outside tap, Escape, and route change close the panel; keyboard reachable | Slice 2: launcher unit spec for each closing trigger and for the launcher being a focusable button. |
-| Same launcher and panel at every width, no side column or fixed region, drawer uses the shared header-height rule, home page behaves the same | Slice 3: `DonutApp`, `GlobalBar`, `SidebarDrawer` layout change; E2E page objects open the panel and scope to it; the five named features plus book reading pass; one new phone-width scenario (`I am on a window 390 * 844`) opens the launcher and chooses a destination; book-reading layout asserts below the page bar. Home page: launcher spec at the home route (`root`) lists the destinations. |
-| Signed-out visitor reaches sign-in from the same launcher | Slice 4: launcher spec without a user: press "Donut menu" → the sign-in action is listed and triggers the existing login flow. E2E `I haven't login` journeys continue through the key-shaped sign-in control relocated into the panel. |
-| Replaced presentations leave no trace | Slice 3 acceptance reading: a search over the product for `VerticalMenu`, `HorizontalMenu`, `useBreakpoint`, `collapsed-menu-width`, `main-menu-height`, `main-menu-width`, `Toggle menu`, `is-expanded`, and `.main-menu` returns nothing. Recorded as a reading, not a test. |
+| Same launcher and panel at every width, no side column or fixed region, drawer uses the shared header-height rule, home page behaves the same | Slice 4: `DonutApp`, `GlobalBar`, `SidebarDrawer` layout change; E2E page objects open the panel and scope to it; the five named features plus book reading pass; one new phone-width scenario (`I am on a window 390 * 844`) opens the launcher and chooses a destination; book-reading layout asserts below the page bar. Home page: launcher spec at the home route (`root`) lists the destinations. |
+| Signed-out visitor reaches sign-in from the same launcher | Slice 3: launcher spec without a user: press "Donut menu" → the sign-in action is listed and triggers the existing login flow. E2E `I haven't login` journeys continue through the key-shaped sign-in control relocated into the panel. |
+| Replaced presentations leave no trace | Slice 4 acceptance reading: a search over the product for `VerticalMenu`, `HorizontalMenu`, `useBreakpoint`, `collapsed-menu-width`, `main-menu-height`, `main-menu-width`, `Toggle menu`, `is-expanded`, and `.main-menu` returns nothing. Recorded as a reading, not a test. |
 
 Frontend proof at each slice: the focused Vitest files, then the `frontend`
 skill's typecheck before acceptance. After adding or deleting a component, run
@@ -128,8 +128,8 @@ provides in order with counts and active marking, the Account group, and the
 the launcher, an outside tap, Escape, and a route change close it; the
 launcher and items are keyboard focusable. Built from `AutoCollapseDropdown`,
 `NavigationItem`, and `AccountMenuItem`. Interim: the two existing
-presentations stay mounted until slice 3 removes them, so E2E keeps passing
-through `.main-menu`; the signed-out bar slot renders nothing until slice 4.
+presentations stay mounted until slice 4 removes them, so E2E keeps passing
+through `.main-menu`; the signed-out bar slot renders nothing until slice 3.
 
 Accepted: `DonutMenu.vue` (BookMarked glyph, panel rendered only while
 open) is the first child of `GlobalBar`'s nav; `NavigationItem`'s action
@@ -137,11 +137,28 @@ anchor gained `tabindex="0"` and Enter so Resume and Assimilate are keyboard
 reachable. Proof: `DonutMenu.spec`, `DonutMenu.counts.spec`,
 `DonutMenu.resume.spec` (harness `donutMenuTestSupport.ts`, fixtures
 `menuDataMocks.ts`) carry every MainMenu spec observation except the
-horizontal-collapse behaviors slice 3 deletes; `GlobalBar.spec` asserts the
+horizontal-collapse behaviors slice 4 deletes; `GlobalBar.spec` asserts the
 launcher first. `tests/toolbars` 15 files/122 tests, full frontend suite
 2254 tests, typecheck, and Vite build green.
 
-### 3. One navigation arrangement at every width and on every screen
+### 3. Signed-out visitors reach sign-in through the same launcher
+Type: Behavior
+Status: done
+Proof: launcher spec without a user lists the sign-in action and pressing it starts the existing login flow; `GlobalBar.spec` shows the launcher without a user; any E2E feature that signs out and back in through the bar.
+
+Behavior: signed out on any screen with the page bar → press "Donut menu" →
+the panel offers the existing sign-in action, which starts the login flow;
+`LoginButton` renders inside the panel; until slice 4 removes them the old
+presentations also still show it.
+
+Accepted: `GlobalBar` always renders `DonutMenu`; signed out, its panel holds
+only `LoginButton` and the attribution (no public destinations).
+`DonutMenu.signedOut.spec` observes the sign-in action and its
+`/users/identify` redirect; `GlobalBar.spec` observes the launcher without a
+user. Full frontend suite 2257 tests and typecheck green. Signed-out screens
+with the bar: home and Bazaar. No E2E step selects the sign-in control.
+
+### 4. One navigation arrangement at every width and on every screen
 Type: Behavior
 Status: planned
 Proof: E2E features `messages/message_center_with_unread_message_count`, `recall/property_memory_tracker`, `relationships/reify_property`, `learning_session/commissioned_learning_session`, `users/user_profile`, and the book-reading feature that asserts the layout below the bar, through page objects that open the panel; one new phone-width scenario choosing a destination from the launcher; launcher spec at the home route (`root`); `tests/toolbars` green; typecheck; Vite build; sweep reading.
@@ -159,24 +176,20 @@ drawer and safe-area offsets. Retarget `withinMainMenuItem`,
 scope to the panel. Run the named features first as the early probe; a
 failure there changes this slice before the sweep.
 
-### 4. Signed-out visitors reach sign-in through the same launcher
-Type: Behavior
-Status: planned
-Proof: launcher spec without a user lists the sign-in action and pressing it starts the existing login flow; `GlobalBar.spec` shows the launcher without a user; any E2E feature that signs out and back in through the bar.
-
-Behavior: signed out on any screen with the page bar → press "Donut menu" →
-the panel offers the existing sign-in action, which starts the login flow;
-`LoginButton` renders inside the panel and nowhere else.
-
 ## Current decisions
 
 - One launcher component owns the panel; the shell composable owns menu data.
   No per-width component, no second item source, no count on the launcher.
-- Slices 2 and 3 replace the presentations in two commits only to isolate the
+- Slices 2 and 4 replace the presentations in two commits only to isolate the
   component risk from the layout and E2E retarget risk; both run in this
-  execution. Slice 3 exceeds the five-minute target because the replacement
+  execution. Slice 4 exceeds the five-minute target because the replacement
   must land atomically to keep one navigation and green CI; no platform or
   layer split is permitted by the seed.
+- Signed-out sign-in (slice 3) precedes removing the old presentations
+  (slice 4): the old presentations hold the only visitor sign-in control, so
+  removing them first would leave visitors without sign-in between commits
+  and break the signed-out E2E journeys. Found by the destructive
+  later-outcome check before slice 3 delegation; the original order was stale.
 
 ## Story obligations
 
@@ -188,20 +201,19 @@ Disposition: no user cost "Authors and learners find Donut's app commands in one
 ### G2. Signed-out page bar shows no launcher
 Reported: slice 2 — "Signed out, the launcher slot renders nothing (slice 4)."
 Story clause: "a signed-out visitor sees the same launcher; the panel offers the existing sign-in action"
-Disposition: receiving slice 4
+Disposition: proved by slice 3: `DonutMenu.signedOut.spec` "offers only the sign-in action and the attribution" and "starts the login flow when the sign-in action is pressed"; `GlobalBar.spec` "puts the Donut menu launcher in the bar when signed out".
 
 ### G3. Narrow-window bar keeps the old menu's padding
 Reported: slice 2 — "While the old presentations remain, at 1024px and below the bar still has the padding left for HorizontalMenu, so the launcher sits after that region."
 Story clause: "The workspace no longer reserves a side column or a fixed top-left region for navigation."
-Disposition: receiving slice 3
+Disposition: receiving slice 4
 
 ### G4. Panel sheet and anchoring are not asserted
 Reported: slice 2 — "The narrow-window full-width sheet and the wide-window anchoring are CSS only and not asserted in unit tests"
 Story clause: "anchored near the launcher on wide windows and as a full-width sheet below the bar on narrow windows"
-Disposition: receiving slice 3
+Disposition: receiving slice 4
 
 ### G5. Account list after the panel closes
 Reported: slice 2 — "If the Account sub-dropdown is open and the user clicks blank space inside its portaled list, the outer panel closes and that list may stay floating until the next click."
 Story clause: "tapping or clicking outside, choosing nothing and pressing Escape, or a route change closes it"
 Disposition: no user cost "Authors and learners find Donut's app commands in one place": the Account list is teleported from inside the panel's `v-if` subtree, so closing the panel unmounts it; no floating list remains.
-

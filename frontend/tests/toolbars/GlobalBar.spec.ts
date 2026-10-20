@@ -75,6 +75,14 @@ describe("global bar", () => {
     )
   })
 
+  it("puts the Donut menu launcher in the bar when signed out", async () => {
+    renderGlobalBarWithSearchShortcut()
+
+    expect(
+      screen.getByRole("button", { name: "Donut menu" })
+    ).toBeInTheDocument()
+  })
+
   it("hides undo when there is nothing to undo", async () => {
     helper.component(GlobalBar).withCurrentUser(user).withRouter().render()
 

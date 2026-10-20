@@ -1,6 +1,6 @@
 <template>
   <nav class="daisy-navbar max-w-full flex justify-between relative">
-    <DonutMenu v-if="user" :user="user" />
+    <DonutMenu :user="user" />
     <div class="flex flex-1 overflow-x-auto">
       <slot />
     </div>

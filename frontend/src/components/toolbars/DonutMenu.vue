@@ -16,7 +16,7 @@
       v-if="open"
       class="donut-menu-panel daisy-dropdown-content z-50 bg-neutral rounded-box shadow-lg p-2"
     >
-      <ul class="grid grid-cols-4 gap-2">
+      <ul v-if="user" class="grid grid-cols-4 gap-2">
         <li
           v-for="item in [...upperNavItems, ...lowerNavItems]"
           :key="item.name"
@@ -34,6 +34,7 @@
           :logout="chooseLogout"
         />
       </ul>
+      <LoginButton v-else />
       <div class="flex items-center justify-end gap-2 pt-2 text-sm">
         <router-link to="/" class="text-neutral-400 no-underline">
           Donut by
@@ -54,12 +55,13 @@ import { BookMarked } from "@lucide/vue"
 import AutoCollapseDropdown from "@/components/commons/AutoCollapseDropdown.vue"
 import NavigationItem from "@/components/navigation/NavigationItem.vue"
 import AccountMenuItem from "@/components/toolbars/AccountMenuItem.vue"
+import LoginButton from "@/components/toolbars/LoginButton.vue"
 import { useNavigationItems } from "@/composables/useNavigationItems"
 import { useResumeRecall } from "@/composables/useResumeRecall"
 import { useGoToNextAssimilation } from "@/composables/useGoToNextAssimilation"
 import { logout } from "@/managedApi/window/logout"
 
-defineProps<{ user: User }>()
+defineProps<{ user?: User }>()
 
 const dropdownRef = ref<InstanceType<typeof AutoCollapseDropdown> | null>(null)
 const close = () => dropdownRef.value?.closeDropdown()

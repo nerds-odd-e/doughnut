@@ -17,17 +17,18 @@ export let user: User
 
 // Mounts the launcher beside the app-shell menu data, as DonutApp and GlobalBar do.
 const DonutMenuInAppShell = defineComponent({
-  props: { user: { type: Object as PropType<User>, required: true } },
+  props: { user: { type: Object as PropType<User>, required: false } },
   setup(props) {
     useSignedInMenuData(toRef(props, "user"))
     return () => h(DonutMenu, { user: props.user })
   },
 })
 
-export const mountDonutMenu = (menuUser: User = user) =>
+// Pass null to mount for a signed-out visitor.
+export const mountDonutMenu = (menuUser: User | null = user) =>
   helper
     .component(DonutMenuInAppShell)
-    .withProps({ user: menuUser })
+    .withProps({ user: menuUser ?? undefined })
     .withRealRouter(router)
     .render()
 
@@ -38,7 +39,7 @@ export const pressLauncher = async () => {
   await flushPromises()
 }
 
-export const openDonutMenu = async (menuUser?: User) => {
+export const openDonutMenu = async (menuUser?: User | null) => {
   const result = mountDonutMenu(menuUser)
   await flushPromises()
   await pressLauncher()
