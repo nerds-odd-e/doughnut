@@ -191,6 +191,10 @@ assimilation. Routed presentation proof and 214 affected tests pass with typeche
 prior search/recall journeys remain valid. Independent refactoring completed.
 Native input is unverified under the owner's decision; see [evidence](EVIDENCE.md).
 
+CI repair: compact activity preserves pinned recording/open controls at 320px;
+157 tests and typechecks pass after reproducing the failure. See [CI evidence](EVIDENCE-CI-HEADER.md).
+Slice 5 remains planned; its candidate is safely stashed until repair publication.
+
 - The owner's property-context choice is settled; no sequence-origin policy.
 - Actual visible learning presentation, not property route or mounted DOM,
   is the shared context. Details disclosure uses `v-show`.

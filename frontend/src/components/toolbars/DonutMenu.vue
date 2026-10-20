@@ -3,6 +3,7 @@
     <NavigationItem
       v-if="user && activeItem"
       v-bind="activeItem"
+      compact
       :name="isNavigationActionItem(activeItem.name) ? activeItem.name : undefined"
       :expanded="dropdownRef?.open"
       @click.stop
