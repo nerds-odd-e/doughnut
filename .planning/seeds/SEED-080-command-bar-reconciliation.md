@@ -43,7 +43,7 @@ This seed is non-executable planning input.
 
 **Identity:** SEED-080#story-1
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"unselected"}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/001-command-bar-continuity/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"39af8a73e36aa807e32491cf5a9f762b5507bf22bf82ba8be1201287c3a4176e","plan":"4f9dc607f858f383636315d4d475606c84aadef401873234eadafb91d276474f"}}
 ```
 
 **Goal:** A signed-in author can identify the current activity, resume an
@@ -58,7 +58,10 @@ command menu, consistently on phones, iPads, and desktop windows.
   visible caption is optional. Use Note for notebook/note browsing, Recall
   for recall, and Assimilate when actively assimilating. Reconcile that last
   context with today’s note/property assimilation presentation rather than
-  reviving an obsolete route. Preserve the other existing navigation
+  reviving an obsolete route. An open property-learning panel identifies
+  Assimilate whether entered directly or through the assimilation sequence;
+  derive this from the current presentation, without sequence-origin state.
+  Preserve the other existing navigation
   destinations, fallback, and signed-out entry behavior.
 - Preserve the existing Resume precedence, green active background, badge
   semantics, and exact paused/progress eligibility rules. Activating Resume
@@ -98,6 +101,8 @@ unfinished assimilation priority across unrelated routes is deferred.
 | --- | --- |
 | Browse a notebook or note, then activate the Note context control | The existing Note icon identifies the context; the popup opens with the normal destinations. |
 | Enter the current assimilation presentation or recall page | The context identifies Assimilate or Recall using the existing icon/count semantics; an eligible Resume still takes precedence. |
+| Open a property's learning panel directly, or arrive there through the assimilation sequence | Both entries identify Assimilate and offer the existing next-assimilation action. Closing that learning presentation restores the ordinary page context, unless Resume is eligible. |
+| View a missing property, a read-only property, or a property whose panel has no learning presentation | The ordinary Note context identifies browsing; a property URL alone does not imply Assimilate. |
 | Pause on an answered recall question with loaded trackers, then browse a note | A green Resume control takes priority over Note. Activate it to continue the existing recall session at its preserved cursor. |
 | Leave recall after progressing beyond the first item with remaining work | Resume remains directly actionable; the adjacent menu opener independently opens navigation. |
 | Leave the first item unpaused, finish the unpaused queue, or pause without loaded trackers | The ordinary active-page context is shown according to the historical eligibility rules. A paused cursor with loaded trackers follows its existing rule even when the remaining-count branch differs. |
@@ -105,7 +110,7 @@ unfinished assimilation priority across unrelated routes is deferred.
 | Resize a note from desktop to iPad to phone with an active toolbar operation | Commands stay right-aligned and accessible through existing adaptive overflow, with busy/open controls retained and visible group/content boundaries. |
 | Open the menu on an iPad or short phone viewport | Navigation, search launcher, and footer have comfortable separation; overflow remains reachable. |
 
-**Implementation cohesion:** Keep navigation identity, activity precedence,
+**Architecture:** Keep navigation identity, activity precedence,
 counts, and action classification in the existing shared navigation model.
 Reconcile its presentation in the compact launcher and popup; do not create a
 second route/state classifier or parallel recall/assimilation flags. Preserve
@@ -113,6 +118,35 @@ the ownership of note actions and their state when changing header alignment.
 Use one common search-dialog entry path for both launcher targets and the
 keyboard shortcut. Follow the existing vocabulary and accepted architectural
 decisions; this story adds no new persisted domain model.
+
+Use the named note/property locations and shared note route family from
+[ADR 0005](../../docs/adrs/0005-web-routes-accepted.md). Opening a property
+is already a resource location, not a new assimilation route.
+[ADR 0001](../../docs/adrs/0001-ubiquitous-language.md#assimilation)
+distinguishes the assimilation sequence from assimilating on a note; that
+distinction does not itself decide the navigation label. Reuse the existing
+next-assimilation and resume actions, including their loading, completion,
+and focus behavior, under
+[ADR 0006](../../docs/adrs/0006-failure-handling-accepted.md#usage).
+No conflict with these Accepted decisions was found. The ADR index and
+in-file statuses agree; ADR 0001 has a filename hygiene mismatch (no
+`-accepted` suffix), which does not change its Accepted status.
+
+**UI:** The primary control identifies the current activity and performs its
+existing action where applicable. Its independent menu opener remains
+keyboard and touch reachable. In the popup, both the empty search-shaped
+target and its adjacent search button announce that they open search; input
+begins in the dialog. Reuse the common dialog's close/Escape behavior and
+search-result navigation, including selection of the note already open.
+These are interaction requirements, not a new layout choice.
+
+**Decision — current property activity:** On 2026-10-20 Terry accepted the
+recommendation to use the visible property-learning panel as context,
+including direct entry. Identical learning presentations have the same
+navigation identity and direct action. A property route alone is
+insufficient: missing, read-only, and non-learning property presentations
+also use that route family. Reuse the presentation's actual eligibility and
+lifetime; no separate sequence-origin state is needed.
 
 **Evaluation:** Outside-in component/interaction evidence for active context,
 direct Resume and independent menu opening, and the shared search journey;
@@ -130,6 +164,56 @@ Assimilation context reconciliation is the main sizing uncertainty.
 **Safe stopping point:** Active navigation, direct recall continuity, and
 common search work within the deployed popup/header layout independently of
 any later sidebar or breadcrumb redesign.
+
+**Investigation evidence — 2026-10-20:** Observed in the established
+preparation workspace
+`/Users/terryyin/git/doughnut/.worktrees/recover-active-navigation-and-finish-command-bar`,
+at `c64063489126d137d32fb7f4ab3027a26756dd1f`, using headless Chromium and
+the real frontend with mocked backend HTTP responses. These are preparation
+observations, not implementation acceptance.
+
+- Current source/history confirms the historical first-active-item selection
+  and action classification in `HorizontalMenu.vue` at
+  `e4227c46a0fb8fcc2185769bb0ab9974588288aa`. Current `DonutMenu.vue` shows
+  a fixed icon, while `useNavigationItems` retains Resume eligibility and
+  precedence. The existing model is the reuse owner.
+- `CURSOR_DEV=true nix develop -c pnpm frontend:test tests/toolbars/DonutMenu.resume.spec.ts tests/toolbars/DonutMenu.search.spec.ts tests/layouts/NotebookWorkspaceHeader.spec.ts tests/composables/useGoToNextAssimilation.spec.ts`
+  passed 34 tests. The inspected setups exercise paused/progress eligibility,
+  search history/scopes/result navigation, adaptive commands, and next-unit
+  note/property destinations. They do not prove the proposed compact
+  controls or an iPad software keyboard.
+- A disposable `commandBarPreparationProbe.spec.ts`, run with
+  `CURSOR_DEV=true nix develop -c pnpm frontend:test tests/toolbars/commandBarPreparationProbe.spec.ts`,
+  reproduced the missing compact Resume: with a paused recall and five
+  loaded trackers, the closed menu rendered only the fixed launcher.
+  A second case mounted `SearchForNoteAndFolder` in the real `Modal`,
+  supplied a recent note through `NoteController.getRecentNotes`, opened
+  the dialog, observed focus on Search, and selected the current note.
+  It passed, including dialog closure without changing the current note.
+  This settles reuse of the general search component in that dialog; it
+  does not prove the future launcher's wiring or touch keyboard behavior.
+- `CURSOR_DEV=true nix develop -c pnpm frontend:test tests/layouts/commandBarGeometryPreparationProbe.spec.ts tests/components/form/RichMarkdownEditor.propertyLocation.spec.ts tests/components/form/RichMarkdownEditor.propertyMemoryTracking.spec.ts`
+  passed the 16 existing property tests. They exercise direct property
+  entry, existing/read-only/specialized/missing properties, and assimilation
+  from the property panel. The disposable geometry case mounted the real
+  notebook workspace at 1280 × 700 with a note and measured 352.5 px
+  between the last visible command and the available toolbar's right edge,
+  failing its right-alignment assertion.
+- A scratch `justify-end` on the existing note-command row made that
+  geometry assertion pass. The same run,
+  `CURSOR_DEV=true nix develop -c pnpm frontend:test tests/layouts/commandBarGeometryPreparationProbe.spec.ts tests/layouts/NotebookWorkspaceHeader.spec.ts tests/notes/NoteToolbar.overflow.spec.ts`,
+  passed all 16 cases, including resizing and active-panel retention.
+  The header suite emitted a ResizeObserver-loop notification in both the
+  original and scratch runs. This observation supports changing alignment
+  within the existing measured allocation; it does not settle the width
+  taken by the future context control or visual spacing acceptance.
+- Both disposable probes and the scratch production edit were removed.
+  `git diff --exit-code -- frontend` passed before this evidence write.
+  No product changes remain. At the end of this observation, native iPad
+  keyboard behavior and final menu spacing/dividers were unverified, and
+  the property-context choice awaited the owner. The decision above settles
+  that choice; code presence and Chromium focus do not settle native iPad
+  keyboard behavior.
 
 <a id="story-2"></a>
 
@@ -279,8 +363,9 @@ it, as requested. Keep each story’s own scope independently evaluable.
 
 ## Open Decisions
 
-None. The owner selected the Sidebar header design and deletion of the
-separate scroll-dependent ancestor display.
+None. The owner accepted current property-learning presentation as Assimilate
+context for the first story, and selected the Sidebar header design and
+deletion of the separate scroll-dependent ancestor display for the second.
 
 ## When to Surface
 
