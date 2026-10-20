@@ -57,6 +57,10 @@ export const panel = () => document.querySelector(".donut-menu-panel")
 
 export const expectPanelClosed = () => expect(panel()).toBeNull()
 
+export const searchField = () => screen.getByPlaceholderText("Search")
+
+export const recentHeading = () => screen.queryByText("Recently updated notes")
+
 export const navItemOf = (label: string) =>
   screen.getByLabelText(label).closest(".nav-item")
 

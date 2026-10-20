@@ -19,7 +19,9 @@ import {
   panel,
   panelItemLabels,
   pressLauncher,
+  recentHeading,
   router,
+  searchField,
   setupDonutMenuTests,
 } from "./donutMenuTestSupport"
 
@@ -29,9 +31,6 @@ vi.mock("@/managedApi/AiReplyEventSource", async () => {
 })
 
 setupDonutMenuTests()
-
-const searchField = () => screen.getByPlaceholderText("Search")
-const recentHeading = () => screen.queryByText("Recently updated notes")
 
 const enterSearch = async () => {
   await fireEvent.focus(searchField())

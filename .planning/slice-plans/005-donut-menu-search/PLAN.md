@@ -108,9 +108,11 @@ Take.
   `v-focus="!quiet"`; the single `focusDirective` in `utils/focusTarget.ts`
   honours `false` and is what tests mount. No other search state moves.
 - The `note-search` registration moves from `GlobalBar` to `DonutMenu`,
-  guarded by the signed-in user as today. It opens the dropdown and
-  schedules focus into the field; `hasOpenModal()` makes it a no-op while a
-  modal dialog is open (story boundary assumption).
+  guarded by the signed-in user as today. It opens the dropdown
+  (`AutoCollapseDropdown.openDropdown`) and schedules focus into the field.
+  The shortcut registry now carries `guardModal` separately from
+  `guardEditable`; `note-search` sets `guardModal`, so behind a modal dialog
+  the key is left to the dialog untouched (story boundary assumption).
 - The shared outside-click rule in `useAutoCollapseDetails` treats a click
   inside a portaled panel whose owning dropdown is inside this details as
   inside. Implemented once in the composable, not as a Donut-menu case.
@@ -133,7 +135,7 @@ Take.
 | --- | --- |
 | Panel holds the search surface after Account, before the footer; quiet open; results only once entered; scope toggle and list switch keep it open | Slice 1: `tests/toolbars/DonutMenu.search.spec.ts` |
 | A result opens its destination and closes the panel, including the current note; modified click keeps it open; ArrowDown/ArrowUp/Enter and Tab order | Slice 2: same spec |
-| Ctrl/Cmd+F opens into search focused; focuses the field when already open; Shift and signed-out cases; no-op behind a modal | Slice 3: same spec, moved from `GlobalBar.spec` |
+| Ctrl/Cmd+F opens into search focused; focuses the field when already open; Shift and signed-out cases; no-op behind a modal | Slice 3: `tests/toolbars/DonutMenu.searchShortcut.spec.ts`, moved from `GlobalBar.spec` |
 | The bar's search control is gone and E2E search journeys run through the panel | Slice 4: `GlobalBar.spec` green without search cases; E2E `note_view/search_note.feature` green; sweep reading |
 | Picking a history key keeps the panel open | Slice 5: `tests/composables/useAutoCollapseDetails.spec.ts` nested-portal case and `DonutMenu.search.spec.ts` history case |
 | Panel fits a short window; phone sheet and wide anchoring unchanged | Slice 6: browser-mode layout spec at 390×500 and the existing 390/1200 cases |
@@ -181,8 +183,8 @@ desktop Ctrl+F journey's ending, current note, Tab/Arrow keys.
 
 ### 3. Ctrl/Cmd+F opens the Donut menu into search
 Type: Behavior
-Status: planned
-Proof: `DonutMenu.search.spec.ts`: dispatching Ctrl+F and Cmd+F keydown with the panel closed opens it with the field focused and Recent listed (fails first); with the panel open and focus on the launcher it focuses the field; Ctrl+Shift+F and a signed-out mount do nothing; with a `Modal` mounted the panel stays closed. `GlobalBar.spec` shortcut and touch-primer cases deleted as this spec takes their observations; `GlobalBar.spec` green; typecheck.
+Status: done
+Proof: `DonutMenu.searchShortcut.spec.ts` (split from `DonutMenu.search.spec.ts` for size): dispatching Ctrl+F and Cmd+F keydown with the panel closed opens it with the field focused and Recent listed (fails first); with the panel open and focus on the launcher it focuses the field; Ctrl+Shift+F and a signed-out mount do nothing; with a `Modal` mounted the panel stays closed. `GlobalBar.spec` shortcut and touch-primer cases deleted as this spec takes their observations; `GlobalBar.spec` green; typecheck.
 
 Behavior: signed in, panel closed → Ctrl/Cmd+F → the panel is open into
 search with the field focused and the browser's find suppressed; already
@@ -228,6 +230,11 @@ scope: panel fits the window.
 Reported: slice 1 — "The history-pick route to entering search has no test in this slice."
 Story clause: "Picking a history key, toggling a scope control, or switching Matches/Recent keeps the panel open"
 Disposition: receiving slice 5
+
+### G3. Touch primer on the bar's search button is untested
+Reported: slice 3 — "The deleted touch-primer case checked that tapping the bar's search button focuses the soft-keyboard primer straight away, then the field. No new test takes this over"
+Story clause: "its touch primer handling"
+Disposition: no user cost "so the page bar no longer carries a second, persistent search control competing for space": the bar button's primer code is unchanged until slice 4 deletes the button with it, and the panel needs no primer because the learner's own tap focuses the field
 
 ### G2. Real Tab order into the field is untested
 Reported: slice 1 — "Tab-into-field is only covered through the focus event; real Tab order is slice 2's proof."

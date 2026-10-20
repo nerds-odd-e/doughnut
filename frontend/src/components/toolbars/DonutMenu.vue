@@ -36,6 +36,7 @@
       </ul>
       <SearchForNoteAndFolder
         v-if="user"
+        ref="searchRef"
         class="pt-2"
         quiet
         @navigate="close"
@@ -55,7 +56,7 @@
 
 <script setup lang="ts">
 import type { User } from "@generated/donut-backend-api"
-import { onMounted, onUnmounted, ref, watch } from "vue"
+import { nextTick, onMounted, onUnmounted, ref, watch } from "vue"
 import { useRoute } from "vue-router"
 import { BookMarked } from "@lucide/vue"
 import AutoCollapseDropdown from "@/components/commons/AutoCollapseDropdown.vue"
@@ -66,12 +67,22 @@ import SearchForNoteAndFolder from "@/components/search/SearchForNoteAndFolder.v
 import { useNavigationItems } from "@/composables/useNavigationItems"
 import { useResumeRecall } from "@/composables/useResumeRecall"
 import { useGoToNextAssimilation } from "@/composables/useGoToNextAssimilation"
+import { useKeyboardShortcut } from "@/composables/useKeyboardShortcut"
+import { scheduleFocusTargetWithin } from "@/utils/focusTarget"
 import { logout } from "@/managedApi/window/logout"
 
-defineProps<{ user?: User }>()
+const props = defineProps<{ user?: User }>()
 
 const dropdownRef = ref<InstanceType<typeof AutoCollapseDropdown> | null>(null)
 const close = () => dropdownRef.value?.closeDropdown()
+
+const searchRef = ref<InstanceType<typeof SearchForNoteAndFolder> | null>(null)
+const openIntoSearch = async () => {
+  dropdownRef.value?.openDropdown()
+  await nextTick()
+  scheduleFocusTargetWithin(searchRef.value?.$el)
+}
+useKeyboardShortcut("note-search", openIntoSearch, () => !!props.user)
 
 const { upperNavItems, lowerNavItems } = useNavigationItems()
 const { resumeRecall } = useResumeRecall()

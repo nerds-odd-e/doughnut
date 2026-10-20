@@ -8,7 +8,6 @@
       <slot name="right" />
       <PopButton
         v-if="user"
-        ref="searchNotePopButtonRef"
         aria-label="search note"
         title="Search note (Ctrl+F / Cmd+F)"
         :show-close-button="false"
@@ -28,22 +27,13 @@
 <script setup lang="ts">
 import type { Ref } from "vue"
 import type { User } from "@generated/donut-backend-api"
-import { inject, ref } from "vue"
+import { inject } from "vue"
 import { Search } from "@lucide/vue"
 import DonutMenu from "@/components/toolbars/DonutMenu.vue"
 import PopButton from "@/components/commons/Popups/PopButton.vue"
 import SearchForm from "@/components/wiki-link-or-relationship/SearchForm.vue"
-import { useKeyboardShortcut } from "@/composables/useKeyboardShortcut"
 
 const user = inject<Ref<User | undefined>>("currentUser")
-
-const searchNotePopButtonRef = ref<InstanceType<typeof PopButton> | null>(null)
-
-const openNoteSearch = () => {
-  searchNotePopButtonRef.value?.openDialog()
-}
-
-useKeyboardShortcut("note-search", openNoteSearch, () => !!user?.value)
 </script>
 
 <style scoped lang="scss">
