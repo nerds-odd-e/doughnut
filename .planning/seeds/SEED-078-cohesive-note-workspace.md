@@ -160,30 +160,150 @@ force the estimate. This seed authorizes no implementation or slice plan.
 
 **Identity:** SEED-078#story-2
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"not-refined","approach":"unselected"}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/005-donut-menu-search/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"37e7383d53ec1e7517e5db53ff770c318173d69b5a68a3a4e136ed971e4dc5ef","plan":"ef467dc8db5bf6ae6b2c7a834fdef2ee24c89d7fcec2276dfc61c2a44b7bed16"}}
 ```
 
-- **For / why:** A learner can use one familiar command center to find the
-  next note without a separate persistent search control competing for space.
-- **Outcome and boundary:** The actual existing global search surface lives
-  inside the command menu, including results and opening a selected note.
-  Preserve current search history, scope controls, access rules, keyboard
-  navigation, and Ctrl/Cmd+F. Opening the menu on touch leaves the keyboard
-  closed; explicitly entering search focuses it with the current touch-focus
-  behavior. Note-local Wiki link or relationship search retains its own meaning.
-  This changes search placement, not matching, ranking, scope policy, or APIs.
-- **Evaluation:** With the menu closed, Ctrl/Cmd+F opens it directly into
-  global search; a matching result opens its existing note destination. On a
-  phone, opening the menu exposes app commands without covering them with the
-  keyboard, while tapping Search permits typing and selecting a result.
-- **Value / learning:** Delivers the approved combined command/search journey
-  while preserving the search people already know.
-- **Effort hypothesis:** S, 30–45 minutes, medium confidence; assumes the
-  existing global form and result navigation can be reused with explicit
-  focus intent instead of a second search implementation.
+- **Goal:** A signed-in learner finds and opens the next note from the Donut
+  menu they already use for every app destination, so the page bar no longer
+  carries a second, persistent search control competing for space. The
+  observable outcome is the existing global note search, with its results,
+  living inside the Donut menu panel at every width; the shared note bar and
+  content presentation stay with the sibling stories.
+- **Scope:**
+  - Required: the Donut menu panel, for a signed-in user, contains the
+    existing global search surface after the destinations and Account: the
+    search field (placeholder "Search"), the search history control, the
+    "All notebooks" and "All My Circles" scope controls, and the results
+    (Recent notes before a key is typed, Matches once one is, with the
+    Matches/Recent switch). Matching, ranking, scope policy, history
+    recording, access rules, and the search and recent-notes APIs are
+    unchanged.
+  - Required: the panel opens quietly. Opening it from the launcher, by tap
+    or click at any width, lists the commands and the search field without
+    moving focus into the field, so a phone keeps its keyboard closed and
+    the commands uncovered. The results region appears only once the learner
+    enters search: focusing the field by tap, click, or Tab, picking a
+    history key, or opening with the shortcut. It then stays until the panel
+    closes. Tapping the field opens the phone keyboard through the learner's
+    own tap; no primer focus is needed.
+  - Required: with the panel closed, Ctrl/Cmd+F while signed in opens the
+    panel directly into search with the field focused and the browser's own
+    find suppressed, as the shortcut does today; with the panel already
+    open it focuses the field. Ctrl/Cmd+Shift+F stays the note-local Wiki
+    link or relationship search of the note toolbar, and the shortcut stays
+    inactive when signed out.
+  - Required: a result opens its existing destination (note, folder, or
+    notebook named route) and closes the panel, including when the chosen
+    note is the one already open; a modified click (new tab) keeps the panel
+    open, as the dialog does today. Picking a history key, toggling a scope
+    control, or switching Matches/Recent keeps the panel open; the current
+    closing triggers (launcher, outside tap or click, Escape, route change)
+    keep working with the search surface present.
+  - Required: keyboard journeys survive: Tab reaches the field after the
+    panel items; ArrowDown moves from the field into the results and
+    ArrowUp returns; Enter on a result opens it.
+  - Required: the panel fits the window: on a phone with the keyboard open
+    or on a short window the panel scrolls within the space below the bar so
+    the field and results stay reachable; on a wide window it stays anchored
+    below the launcher.
+  - Removal: the page bar's separate "search note" control, its shortcut
+    registration in the bar, its touch primer handling, and everything only
+    they used (bar search tests, the E2E step path through the toolbar
+    button, dialog-closed assertions) are deleted; the E2E search journeys
+    continue through the Donut menu. Acceptance records the one-time sweep
+    as a reading.
+  - Deferred, not rejected: a Search item or count on the launcher; a route
+    or query that records search being open; a dedicated phone layout for
+    the search surface; search for a signed-out visitor; changes to the
+    note-local search in the note toolbar, folder search, or wiki-link
+    flows, which share the search components and must keep working.
+  - Boundary assumption: while a modal dialog is open, the Donut menu is
+    unreachable (the dialog owns the top layer and the page is inert), so
+    Ctrl/Cmd+F then leaves the dialog alone instead of opening a hidden
+    panel. No rejection constraint was found.
+  - Boundary assumption: [correction-1](#correction-1) is executing in a
+    sibling worktree on the same panel file and test support (panel identity
+    by role "region" and name "Donut menu panel", Account disclosure,
+    keyboard items). Execution starts from the trunk of that moment and
+    reconciles ordinarily; this is shared ownership, not a dependency.
+- **Key examples:**
+  - Desktop, a note open, panel closed → press Ctrl+F (Cmd+F on macOS) →
+    the panel opens with the field focused and Recent notes listed; type
+    "Sed" → Matches lists Sedation and Sedative; press ArrowDown then Enter
+    on Sedative → Sedative opens and the panel is closed.
+  - Phone, a note open → tap the launcher → the panel lists the
+    destinations, Account, and the search field; the keyboard stays closed
+    and no results are shown; tap the field → the keyboard opens and Recent
+    notes appear; type "pam" → Pam, Diazepam, Lorazepam, Clonazepam; tap Pam
+    → Pam opens and the panel is closed.
+  - Panel open into search with results → press the history control and
+    pick "older" → the field reads "older", the panel stays open, and
+    Matches for "older" appear.
+  - Search entered with "Sedation" in Recent, Sedation already open → press
+    Enter on the Sedation result → the route is unchanged and the panel is
+    closed.
+  - Panel open into search → press Escape → the panel is closed; press
+    Ctrl/Cmd+F again → it reopens into search with the field focused.
+  - Desktop, panel open into search, Tab from the last Account action →
+    the field is focused; ArrowDown enters the results; ArrowUp returns.
+  - Signed-out visitor → the panel offers sign-in only and Ctrl/Cmd+F does
+    nothing.
+  - Note toolbar, Ctrl/Cmd+Shift+F → the Wiki link or relationship search
+    dialog opens as today, unchanged.
+- **UI:** The search surface is the panel's last section, after the
+  destinations and Account and before the "Donut by" footer, in the same
+  order at every width: a row with the history control, the field, and the
+  scope toggles, then the results region once search is entered. Width
+  changes the panel's size, not the contents or order. Considered and not
+  chosen: always listing Recent notes on every open (it makes every trip to
+  Recall or Messages carry a five-note list and a fetch), and a Search item
+  that switches the panel into a search mode (one more tap and a return
+  path). The field itself is the quiet entry; its focus is the learner's
+  explicit intent.
+- **Architecture:** The Donut menu, an app-shell control, owns opening,
+  closing, and the "open into search" focus intent, including the
+  Ctrl/Cmd+F registration that moves from the bar's search button to the
+  menu. Search key, scope, history, results, and result navigation stay with
+  the existing search components; no second search state or presentation
+  model is added. Result destinations keep named-route navigation under
+  [ADR 0005](../../docs/adrs/0005-web-routes-accepted.md); search being
+  open is transient chrome and gets no route or query. "All notebooks" keeps
+  its [ADR 0001](../../docs/adrs/0001-ubiquitous-language.md) meaning of
+  catalog-wide search. One shared consequence: the dropdown's outside-click
+  closing must treat a click inside a panel portaled from a nested dropdown
+  (the history list) as inside, a rule of the shared auto-collapse
+  behavior rather than a Donut-menu special case. No new decision record is
+  needed.
+- **Investigation (2026-10-20, read at `2c6a1ef05d`):** Facts: the global
+  search is a page-bar button (signed-in only) opening a modal with the
+  shared search form and no note; Ctrl/Cmd+F is the bar's `note-search`
+  registration, unguarded by editable targets, and Ctrl/Cmd+Shift+F is the
+  toolbar's note-local search; tapping the bar button primes a hidden input
+  on coarse-pointer devices so the field's autofocus keeps the phone
+  keyboard; result title links navigate by named route and emit a close,
+  which modified clicks skip; the panel is a details-based dropdown that
+  closes on outside click, Escape, route change, and the launcher. Settled
+  by a scratch browser-mode spec mounting the search form inside such a
+  dropdown (deleted after the run): the history list teleports outside the
+  panel and picking a key closed the panel, and Recent notes rendered as
+  soon as the form mounted. No product runtime was started; no product file
+  was edited. Remaining hypothesis, settled only by use: a search field at
+  the bottom of the panel is as easy to find as the bar's magnifier was.
+- **Value / learning:** Delivers the approved combined command and search
+  journey while keeping the search people already know, and tests whether
+  one quiet panel can carry both commands and a working search on a phone.
+- **Effort hypothesis:** S, 45–60 minutes, medium confidence. Refinement
+  found the search form, results, history, scope controls, keyboard
+  navigation, and shortcut binding reuse intact; the work is relocation,
+  the entered-search disclosure, the nested-dropdown closing rule, panel
+  scrolling, the bar control's removal, and retargeting the E2E search
+  steps and bar tests. No smaller boundary keeps a useful outcome: a
+  half-moved search would leave two controls. Reconciling with correction-1
+  is the sizing risk.
 - **Depends on:** No blocking supplier story established. The existing menu
   and search already support this journey; reconcile their common direction
-  with story 1 through ordinary shared ownership, not an invented wait.
+  with story 1 and correction-1 through ordinary shared ownership, not an
+  invented wait.
 - **Safe stopping point:** Search within the command menu is usable even if
   note tools and property presentation are unchanged. Current result access,
   touch focus, and keyboard journeys must survive this story on their own.
