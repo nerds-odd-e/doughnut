@@ -9,7 +9,9 @@ export function scalarPropertyValue(value: string): PropertyValue {
   return { kind: "scalar", value }
 }
 
-export function listPropertyValue(items: readonly string[]): PropertyValue {
+export function listPropertyValue(
+  items: readonly string[]
+): Extract<PropertyValue, { kind: "list" }> {
   return { kind: "list", items }
 }
 

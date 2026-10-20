@@ -7,6 +7,7 @@ import makeMe from "donut-test-fixtures/makeMe"
 import { mockSdkService, wrapSdkResponse } from "@tests/helpers"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import { noteShowLocation } from "@/routes/noteShowLocation"
+import { wikiLinkFromAuthoredToken } from "@/utils/wikiLinkMarkup"
 import { expandPropertyPanel, propertyRowSelector } from "./propertiesTestDom"
 import { createRichMarkdownEditorTestHarness } from "./richMarkdownEditorTestHarness"
 
@@ -58,10 +59,109 @@ Workshop body.`
     ).toEqual(["Assimilate [[run]]", "Assimilate [[past tense]]"])
     expect(
       wrapper.find(`${listRowSelector} [data-property-value="[[run]]"]`).text()
-    ).toContain("[[run]]")
+    ).toContain("run")
+    expect(
+      wrapper.find(`${listRowSelector} [data-property-value="[[run]]"]`).text()
+    ).not.toContain("[[")
     expect(
       wrapper.findAll(`${listRowSelector} [data-test="skip"]`)
     ).toHaveLength(1)
+  })
+
+  it("reads the complete authored list in order in detail, with and without a saved note", async () => {
+    const longValue = "x".repeat(260)
+    const authoredMarkdown = `---
+url:
+  - "[[Grammar]]"
+  - "https://example.com/path"
+  - "practice"
+  - "practice"
+  - ""
+  - "${longValue}"
+---
+
+Body`
+    const expectedSequence = [
+      "Grammar",
+      "https://example.com/path",
+      "practice",
+      "practice",
+      "",
+      longValue,
+    ]
+    const urlRowSelector = propertyRowSelector("url")
+    const detailedRows = (wrapper: Awaited<ReturnType<typeof h.mountEditor>>) =>
+      wrapper.findAll(
+        `${urlRowSelector} [data-testid="rich-note-property-panel"] [data-property-value]`
+      )
+    const detailedLabels = (
+      wrapper: Awaited<ReturnType<typeof h.mountEditor>>
+    ) =>
+      detailedRows(wrapper).map((row) =>
+        row.find('[data-test="mode-label-UNDERSTANDING"]').text().trim()
+      )
+    const practiceTracker = makeMe.aMemoryTracker
+      .id(77)
+      .withPropertyKey("url", "practice")
+      .please()
+    getNoteInfoSpy.mockResolvedValue(
+      wrapSdkResponse(
+        makeMe.aNoteRecallInfo.memoryTrackers([practiceTracker]).please()
+      )
+    )
+    const wrapper = await h.mountEditor(authoredMarkdown, {
+      noteId,
+      route: noteShowLocation(noteId),
+      wikiLinks: [wikiLinkFromAuthoredToken("Grammar", 42)],
+      lastSavedMarkdown: authoredMarkdown,
+    })
+    await expandPropertyPanel(wrapper, urlRowSelector)
+
+    const rows = detailedRows(wrapper)
+    expect(detailedLabels(wrapper)).toEqual(expectedSequence)
+    expect(
+      rows[1]!
+        .find('[data-testid="rich-note-property-external-link"]')
+        .attributes("aria-label")
+    ).toBe("Open URL in new tab")
+    const practiceTrackerLocations = [rows[2]!, rows[3]!].map((row) =>
+      row
+        .find('[data-test="assimilation-status-UNDERSTANDING"]')
+        .attributes("href")
+    )
+    expect(new Set(practiceTrackerLocations).size).toBe(1)
+    expect(practiceTrackerLocations[0]).toContain("77")
+    expect(
+      wrapper
+        .findAll(
+          `${urlRowSelector} [data-testid="rich-note-property-panel"] [data-test="assimilate-UNDERSTANDING"]`
+        )
+        .map((b) => b.attributes("aria-label"))
+    ).toEqual(["Assimilate [[Grammar]]", "Assimilate https://example.com/path"])
+    expect(
+      wrapper.findAll(
+        `${urlRowSelector} [data-testid="rich-note-property-panel"] [data-test="skip"]`
+      )
+    ).toHaveLength(1)
+
+    const unsavedWrapper = await h.mountEditor(authoredMarkdown, {
+      route: noteShowLocation(99),
+      wikiLinks: [wikiLinkFromAuthoredToken("Grammar", 42)],
+      lastSavedMarkdown: authoredMarkdown,
+    })
+    await expandPropertyPanel(unsavedWrapper, urlRowSelector)
+    const unsavedRows = detailedRows(unsavedWrapper)
+    expect(detailedLabels(unsavedWrapper)).toEqual(expectedSequence)
+    expect(
+      unsavedRows[1]!
+        .find('[data-testid="rich-note-property-external-link"]')
+        .exists()
+    ).toBe(true)
+    expect(
+      unsavedWrapper.findAll(
+        `${urlRowSelector} [data-testid="rich-note-property-panel"] [data-test="assimilate-UNDERSTANDING"]`
+      )
+    ).toHaveLength(0)
   })
 
   it("assimilates one value and keeps the other offered", async () => {

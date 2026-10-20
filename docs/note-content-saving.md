@@ -58,11 +58,17 @@ panel and server-side property writes change only the affected entry's lines,
 so comments, key order, quoting and flow lists elsewhere stay as written, but
 each side makes its own edit.
 
-Each wiki-link element in a property list can be followed independently from
-the row, with its chevron panel closed or open, including in read-only views.
-Mixed lists preserve plain-text elements and their order. Wiki links retain
-their authored display labels, note or property destinations, and pending/dead
-status; URL properties retain external links for non-wiki URL elements.
+In an editable view, a stored list property beside its key is compact when
+its chevron panel is closed and detailed when the panel is open: the
+detailed list in the panel shows each authored item in order, and collapsing
+restores the compact links beside the key. The key, panel toggle and
+value-dialog Edit control stay available whether the panel is open or
+closed. Read-only views show the compact list beside the key. Each
+wiki-link element in a property list can be followed
+independently from its active placement. Mixed lists preserve plain-text
+elements and their order. Wiki links retain their authored display labels,
+note or property destinations, and pending/dead status; URL properties
+retain external links for non-wiki URL elements.
 
 Add property opens one local draft at the end of the shared property list and
 focuses its key. Selecting Add property again focuses the same draft. Add, or

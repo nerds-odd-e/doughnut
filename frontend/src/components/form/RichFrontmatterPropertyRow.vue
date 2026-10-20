@@ -65,6 +65,7 @@
           :last-saved-markdown="lastSavedMarkdown"
           :row-index="idx"
           :draft="draft"
+          :expanded="isFocused"
           @update:model-value="onValueUpdate"
           @update:property-value="onPropertyValueUpdate"
           @focus="emit('row-focus')"
@@ -112,7 +113,10 @@
       :property-key="modelValue.key"
       :property-value="modelValue.value"
       :note-id="noteId"
+      :wiki-links="wikiLinks"
+      :last-saved-markdown="lastSavedMarkdown"
       @remove="emit('remove')"
+      @dead-wiki-link-click="emit('dead-wiki-link-click', $event)"
     />
   </div>
 </template>

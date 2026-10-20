@@ -15,7 +15,15 @@
         class="text-right text-sm font-medium"
         :data-test="`mode-label-${row.mode}`"
       >
-        {{ row.label }}
+        <RichFrontmatterListPropertyValue
+          v-if="row.propertyValue !== undefined"
+          :value="listPropertyValue([row.propertyValue])"
+          :property-key="propertyKey"
+          :wiki-links="wikiLinks"
+          :last-saved-markdown="lastSavedMarkdown"
+          @dead-wiki-link-click="emit('deadWikiLinkClick', $event)"
+        />
+        <template v-else>{{ row.label }}</template>
       </span>
       <div
         class="flex min-w-0 items-center gap-2"
@@ -87,9 +95,12 @@
 </template>
 
 <script setup lang="ts">
-import type { MemoryTracker } from "@generated/donut-backend-api"
+import type { MemoryTracker, WikiLink } from "@generated/donut-backend-api"
 import { computed } from "vue"
+import RichFrontmatterListPropertyValue from "@/components/form/RichFrontmatterListPropertyValue.vue"
 import type { AssimilateEvent } from "@/composables/useAssimilateUnit"
+import { listPropertyValue } from "@/utils/noteProperties"
+import type { DeadWikiLinkPayload } from "@/utils/wikiLinkMarkup"
 import {
   noteLevelTrackerOfType,
   type MemoryTrackerType,
@@ -101,24 +112,31 @@ const props = withDefaults(
     trackers?: MemoryTracker[]
     propertyKey?: string
     propertyValues?: readonly string[]
+    authoredPropertyValues?: readonly string[]
+    showLearningControls?: boolean
     disabled?: boolean
     skippedFromAssimilationSequence?: boolean
     size?: "default" | "sm"
+    wikiLinks?: WikiLink[]
+    lastSavedMarkdown?: string
   }>(),
   {
     trackers: () => [],
     propertyKey: undefined,
     propertyValues: undefined,
+    authoredPropertyValues: undefined,
+    showLearningControls: true,
     disabled: false,
     skippedFromAssimilationSequence: false,
     size: "default",
   }
 )
 
-defineEmits<{
+const emit = defineEmits<{
   assimilate: [request: AssimilateEvent]
   skip: []
   returnToSequence: []
+  deadWikiLinkClick: [payload: DeadWikiLinkPayload]
 }>()
 
 const modeLabels: Record<MemoryTrackerType, string> = {
@@ -151,19 +169,31 @@ function assimilatePayloadFor(
   }
 }
 
-function unitRow(mode: MemoryTrackerType, propertyValue?: string) {
-  const tracker = noteLevelTrackerOfType(
-    props.trackers,
-    mode,
-    props.propertyKey,
-    propertyValue
-  )
+function unitRow(
+  mode: MemoryTrackerType,
+  propertyValue?: string,
+  learning: { eligible: boolean; firstOccurrence: boolean } = {
+    eligible: true,
+    firstOccurrence: true,
+  }
+) {
+  const tracker = learning.eligible
+    ? noteLevelTrackerOfType(
+        props.trackers,
+        mode,
+        props.propertyKey,
+        propertyValue
+      )
+    : undefined
   return {
     key: `${mode}:${propertyValue ?? ""}`,
     mode,
     propertyValue,
     label: propertyValue ?? modeLabels[mode],
-    assimilable: true,
+    assimilable:
+      props.showLearningControls &&
+      learning.eligible &&
+      learning.firstOccurrence,
     assimilateLabel:
       propertyValue === undefined
         ? `Assimilate as ${modeLabels[mode]}`
@@ -181,7 +211,10 @@ function unitRow(mode: MemoryTrackerType, propertyValue?: string) {
     statusTitle: tracker
       ? `Recalled ${tracker.recallCount ?? 0} times`
       : undefined,
-    showSkipAffordance: mode === "UNDERSTANDING" && !props.propertyValues,
+    showSkipAffordance:
+      mode === "UNDERSTANDING" &&
+      propertyValue === undefined &&
+      props.showLearningControls,
   }
 }
 
@@ -197,11 +230,21 @@ function keySkipRow() {
   }
 }
 
-const rows = computed(() =>
-  props.allowedModes.flatMap((mode) => {
-    if (!props.propertyValues) return [unitRow(mode)]
-    const valueRows = props.propertyValues.map((value) => unitRow(mode, value))
-    return mode === "UNDERSTANDING" ? [...valueRows, keySkipRow()] : valueRows
+const rows = computed(() => {
+  const displayValues = props.authoredPropertyValues ?? props.propertyValues
+  if (!displayValues) return props.allowedModes.map((mode) => unitRow(mode))
+  const eligibleValues = new Set(props.propertyValues ?? displayValues)
+  return props.allowedModes.flatMap((mode) => {
+    const valueRows = displayValues.map((value, index) => ({
+      ...unitRow(mode, value, {
+        eligible: eligibleValues.has(value),
+        firstOccurrence: displayValues.indexOf(value) === index,
+      }),
+      key: `${mode}:${index}:${value}`,
+    }))
+    return mode === "UNDERSTANDING" && props.showLearningControls
+      ? [...valueRows, keySkipRow()]
+      : valueRows
   })
-)
+})
 </script>
