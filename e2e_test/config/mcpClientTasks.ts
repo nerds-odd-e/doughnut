@@ -1,4 +1,3 @@
-import { existsSync } from 'node:fs'
 import { join } from 'node:path'
 import mcpClient from '../support/mcp_client'
 import { CLI_E2E_PNPM_SPAWN_ENV, runShellCommandSync } from './cliE2eRepo'
@@ -37,10 +36,6 @@ export function mcpClientTasks(repoRoot: string) {
     },
     async bundleMcpServer() {
       const mcpServerDir = join(repoRoot, 'mcp-server')
-      const bundlePath = join(mcpServerDir, 'dist', 'mcp-server.bundle.mjs')
-      if (existsSync(bundlePath)) {
-        return true
-      }
       try {
         runShellCommandSync('pnpm bundle', {
           cwd: mcpServerDir,

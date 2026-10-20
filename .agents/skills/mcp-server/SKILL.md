@@ -47,7 +47,7 @@ Run this command to build the mcp server:
 CURSOR_DEV=true nix develop -c pnpm mcp-server:bundle
 ```
 
-Note: Rebuild the bundle before running the e2e `mcp_services.feature`.
+Note: The E2E `mcp_services.feature` preparation task (`bundleMcpServer`) rebuilds the bundle from current source automatically before the client connects; the standalone build command above is for IDE/client use.
 
 ### Running Unit Tests
 

@@ -88,10 +88,29 @@ regression coverage; do not introduce another test framework.
 ### 1. Prepare current MCP source before the E2E client connects
 
 Type: Behavior
-Status: planned
+Status: done
 Proof: Task-boundary current-artifact regression, normal MCP feature with old,
 missing and current bundle preconditions, bounded build-failure observation,
 and retained client teardown proof as mapped above.
+
+Execution evidence (2026-10-20, execution checkout at published claim
+`32381066ad`): baseline early probe built a stale-marker bundle with source
+restored — the Fiona empty-search scenario failed expecting
+`No matching notes.` and observed the stale marker (6 passing, 1 failing),
+proving the stale route, not infrastructure failure. After the change:
+`pnpm -C cli exec tsx --test ../e2e_test/config/mcpClientTasks.test.ts ../e2e_test/support/mcp_client.test.ts`
+passed 2/2 (new regression also shown failing against the baseline adapter in
+a separate temporary checkout: `first-value` vs expected `second-value`);
+`pnpm test:browser-worktree-isolation` passed (112 node tests + the wired tsx
+test), so CI reaches the regression via `lint:all`; the normal
+`pnpm cy:run --spec e2e_test/features/mcp/mcp_services.feature` passed 7/7
+with a stale bundle present and again with the bundle missing. Bounded
+build-failure observation with invalid scratch TypeScript and a usable bundle
+failed at `bundleMcpServer` before any tool result; source was restored and
+the bundle rebuilt. All scratch edits were reverted. Learning: the CI wiring
+extends the pre-existing `test:browser-worktree-isolation` E2E-infra test
+bucket (already host to an `e2e_test/config` test and reached via `lint:all`);
+renaming that bucket is not part of this slice.
 
 Behavior: Given current MCP source and any existing bundle state, run the normal
 MCP E2E feature; preparation builds that source before connection and the client
@@ -146,6 +165,14 @@ At acceptance, read the remaining task and sweep product code, tests and current
 guidance for identifiers or advice used only by the deleted bundle-existence
 shortcut. Remove exclusive dependents transitively. Record the literal `rg`
 search and classified result here, separately from the surviving-behavior proof.
+
+Acceptance reading (2026-10-20): `rg -n "existsSync|Rebuild the bundle before|bundlePath" e2e_test/config/mcpClientTasks.ts .agents/skills/mcp-server/SKILL.md`
+returned no matches (exit 1). The refactor sweep over `e2e_test/config`,
+`e2e_test/support`, `e2e_test/step_definitions`, the MCP skill,
+`mcp-server/package.json` and `package.json` classified remaining hits as the
+surviving spawn guard in `mcp_client.ts`, the build outfile, the hook's
+`bundleMcpServer` registration and the updated guidance — no remnant of the
+deleted shortcut.
 Preserve the seed's dated incident and observation evidence with its original
 provenance. Add no permanent absence assertion, runtime guard or checker for the
 deleted shortcut.
