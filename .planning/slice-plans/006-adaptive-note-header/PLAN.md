@@ -213,7 +213,16 @@ minutes; do not postpone a lost editing or access promise to slice 3.
 
 ### 3. Reach folder context while note tools retain their space
 Type: Behavior
-Status: planned
+Status: done
+Accepted (2026-10-20): NotebookSidebarLayout renders the existing
+BreadcrumbWithCircle in the bar's bounded region at `isMdOrLarger`, otherwise
+in a content line between GlobalBar and the content row. Real-layout proof in
+`frontend/tests/layouts/NotebookWorkspaceContext.spec.ts` (10 tests: trail
+placement and tool fit at 320/390/767/768/1280, parent link → `folderPage`,
+drawer at bar bottom, docked toggle, New note folder context from sidebar and
+note tools). Whole frontend suite 362 files / 2269 tests passed before a
+test-only refactor; `tests/layouts` 3 files / 25 tests passed after it; both
+typechecks exit 0. No identifier was removed in this slice.
 Proof: the long-ancestry and contents/creation/page-context observations above
 at 320/390, either side of 768, and 1280px; current breadcrumb/sidebar and
 affected notebook, folder, attachment, property/conversation, Recall, and Book
@@ -278,17 +287,17 @@ Book path and of the final notebook layout remains with its owning slices.
 ### G1. Pinned tools against a long ancestry trail are unproved
 Reported: slice 2 — "no test that pinned tools keep space against a long trail."
 Story clause: "Long context yields space to these controls and More rather than pushing them outside the window."
-Disposition: receiving slice 3
+Disposition: proved by slice 3: `frontend/tests/layouts/NotebookWorkspaceContext.spec.ts` "shows a long trail below the bar and above the note at $width px while tools keep their space" (320/390/767, Assimilate on, More, commands and Undo inside bar and window) and "shows a long trail in the bar before the commands at %ipx while tools keep their space" (768/1280).
 
 ### G2. Narrow context stays inside the bar
 Reported: slice 2 — "The breadcrumb's narrow width is now at least 3rem and scrollable in the bar."
 Story clause: "narrow windows show that context immediately below the bar, above the note."
-Disposition: interim until slices 3
+Disposition: proved by slice 3: `frontend/tests/layouts/NotebookWorkspaceContext.spec.ts` "shows a long trail below the bar and above the note at $width px while tools keep their space" asserts the trail is outside the bar, below its bottom and above `#main-note-content`.
 
 ### G3. Leaving the layout releases controls without a test
 Reported: slice 2 — "Leaving the layout releases the controls through ordinary unmount, but there is no test for it."
 Story clause: "Folder, attachment, property, Recall, and Book-reading contexts retain their appropriate controls."
-Disposition: receiving slice 3
+Disposition: proved by slice 3: `frontend/tests/layouts/NotebookWorkspaceContext.spec.ts` "scrolls the narrow trail to a parent folder and opens it by its link" leaves the note for the folder page, with no `[data-note-toolbar]` and the folder's New folder control present; Recall, Book, attachment, and property/Conversation page controls observed by their retained specs in the 362-file / 2269-test whole-suite run, with GlobalBar unchanged.
 
 ### G4. Export's dialog not exercised from the bar
 Reported: slice 2 — "The overflow-action proof uses Edit (editor result). Export's dialog was not exercised."
@@ -299,3 +308,18 @@ Disposition: proved by slice 2: `frontend/tests/layouts/NotebookWorkspaceHeader.
 Reported: slice 2 — "Conversion and retry are proved for body dictation only."
 Story clause: "Recording, starting, converting, and retrying voice input, and an open Assimilate control, keep their existing direct access and active states."
 Disposition: proved by slice 2: direct access is a property of the bar control, observed for converting and Retry in `frontend/tests/layouts/NotebookWorkspaceHeader.dictation.spec.ts` "keeps the converting voice input in the bar until the text arrives" and "offers Retry in the bar after a failed conversion…"; title-target insertion is observed in that file's title-caret test and retained `NoteShow.toolbarTitleVoiceInput.spec.ts`.
+
+### G6. ResizeObserver loop notice while crossing the breakpoint
+Reported: slice 3 — "stderr logs `ResizeObserver loop completed with undelivered notifications`."
+Story clause: "use the existing measured overflow rule against the space actually available in the header."
+Disposition: no user cost "leaving more space for the authored note": the browser notice reports deferred observer delivery when the trail moves across 768px; the next frame re-measures, and the same test then observes the commands inside the bar at 1280px with editor mode retained.
+
+### G7. Open narrow drawer covers the compact ancestry line
+Reported: slice 3 — "On narrow windows, the open drawer covers the context line, because it starts at the bar's bottom as the slice asks."
+Story clause: "Drawer positioning and safe-area offsets use the shared bar-height rule."
+Disposition: no user cost "leaving more space for the authored note": the drawer is a temporary overlay starting at the shared bar bottom as the story requires; it lists the notebook's folders, and closing it reveals the ancestry line again, observed in "opens contents as a drawer from the bar's bottom on a phone".
+
+### G8. Parent folder in the navigation test has a short name
+Reported: slice 3 — "the parent folder's name is kept short (\"Fruit trees of the north\") so a click on the link's centre lands on screen."
+Story clause: "A long trail can scroll horizontally within its own region so parent links stay reachable."
+Disposition: proved by slice 3: in "scrolls the narrow trail to a parent folder and opens it by its link" the long notebook and inner folder names make the trail overflow at 320px; the parent link is scrolled into view within the trail and its real router-link opens `folderPage` 501.

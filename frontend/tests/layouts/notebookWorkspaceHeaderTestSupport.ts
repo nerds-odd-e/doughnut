@@ -51,7 +51,7 @@ export async function mountNotebookWorkspace(
   const router = await productionRouterAt(location)
   const wrapper = helper
     .component(App)
-    .withRouter(router)
+    .withRealRouter(router)
     .withRoutedPages()
     .withCleanStorage()
     .withCurrentUser(makeMe.aUser.please())
