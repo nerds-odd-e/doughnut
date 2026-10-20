@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 1,
+  "agent": "Yua-chan",
+  "email": "yua-chan@example.org",
+  "identity": "SEED-078#story-2",
+  "mode": "story-branch",
+  "branch": "claude/find-and-open-notes-from-search-inside-the-donut",
+  "host": "claude"
+}
