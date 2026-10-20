@@ -1,4 +1,5 @@
 <template>
+  <!-- Only the command row shows in the page bar; this note still owns its commands and their state. -->
   <Teleport
     :to="pageBarTarget"
     :disabled="!pageBarTarget"
