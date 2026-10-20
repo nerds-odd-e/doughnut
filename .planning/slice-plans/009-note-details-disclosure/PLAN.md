@@ -16,16 +16,16 @@ margins, and wide-window measure. The source's Goal, Scope, Key examples, UI
 sketch, trade-off defaults, and Architecture apply.
 
 Deferred: remembering the disclosure across notes or visits, relative-time
-wording, a disclosure for the readme page editors, property row and editor
-restyling (story 4, plan 007), new metadata or settings. Existing property
-validation and access rules are the only rejection constraints.
+wording, a disclosure for the readme page editors, further property row and
+editor restyling, new metadata or settings. Existing property validation and
+access rules are the only rejection constraints.
 
 Preparation is planning only: no Take or execution is authorized. Observed
-checkout: this worktree at `aeb5452823` (seed refinement commit) on
-2026-10-20; trunk fetched at `deb065d8dc` by the assignment start. Execution
-starts from current trunk and reconciles shared changes normally. Story 4
-(plan 007) is queued ahead without a dependency: whichever lands first, the
-other reconciles inside the revealed section.
+checkout: this worktree on 2026-10-20, first at `aeb5452823` (seed refinement
+commit, before story 4 landed) and again after reconciliation onto trunk
+`deb065d8dc`, which contains story 4's completed readable property rows.
+Execution starts from current trunk and reconciles shared changes normally.
+There is no blocking supplier.
 
 ## Existing solutions and architectural decisions
 
@@ -58,8 +58,12 @@ or dates.
 - The expanded-panel chevron in `RichFrontmatterPropertyRow` (button with
   `aria-expanded`) and the existing coarse-pointer 44px selector are the
   product's disclosure and touch conventions; follow them for the new
-  control. `NotebookHealthFindings` uses a daisy collapse for a different
-  purpose; not reused.
+  control. Touch proof uses a `*.touch.spec.ts` file, which the
+  `chromium-touch` instance in `frontend/vitest.config.ts` runs with real
+  coarse-pointer emulation, and geometry checks follow
+  `.agents/skills/frontend-testing/SKILL.md` "Layout and Pointer Tests".
+  `NotebookHealthFindings` uses a daisy collapse for a different purpose;
+  not reused.
 - Date formatting: `AssimilationModes.formatNextRecallAt` already uses
   `toLocaleDateString(undefined, {...})` with a spelled month. Use the same
   API with `year: "numeric"`; no date library.
@@ -96,7 +100,7 @@ presentation responsibility.
 | Premise / consuming operation | Observation and result | Consequence |
 | --- | --- | --- |
 | A hidden-but-mounted section keeps body composition intact; an unmounted one drops the frontmatter | Traced `RichMarkdownEditor.composeBodyMarkdown` → `frontmatterPropertiesRef.value?.getPropertyRows() ?? []` → `composeNoteContentInPlace`, whose `parsed.ok && rows.length === 0` branch composes from no rows (`noteContentInPlaceEdit.ts:36`). | Slice 1 hides rows without unmounting and owns a discriminating proof: a body edit while rows are hidden keeps the frontmatter. |
-| The focused frontend browser command runs here and the affected suites are green before any change | Ran in this worktree at `aeb5452823` on 2026-10-20: `env -u NODE_ENV CURSOR_DEV=true nix develop -c pnpm frontend:test tests/notes/NoteShow.spec.ts tests/notes/NoteContextReader.spec.ts tests/components/form/RichMarkdownEditor.frontmatter.spec.ts tests/components/form/RichMarkdownEditor.propertyLocation.spec.ts tests/notes/NoteEditableContent.spec.ts tests/pages/RecallPage.justReview.spec.ts tests/pages/NoteShowPage.imageUpload.spec.ts` passed 7 files / 52 tests in 13.96s (Chromium). No product change was made. | Slice proof uses the same command family and files; this baseline is not acceptance of later changes. |
+| The focused frontend browser command runs here and the affected suites are green before any change | Ran in this worktree at `aeb5452823` on 2026-10-20: `env -u NODE_ENV CURSOR_DEV=true nix develop -c pnpm frontend:test tests/notes/NoteShow.spec.ts tests/notes/NoteContextReader.spec.ts tests/components/form/RichMarkdownEditor.frontmatter.spec.ts tests/components/form/RichMarkdownEditor.propertyLocation.spec.ts tests/notes/NoteEditableContent.spec.ts tests/pages/RecallPage.justReview.spec.ts tests/pages/NoteShowPage.imageUpload.spec.ts` passed 7 files / 52 tests in 13.96s (Chromium); rerun on the reconciled tree at trunk `deb065d8dc` (with story 4's rows) passed 7 files / 52 tests in 4.20s. No product change was made. | Slice proof uses the same command family and files; this baseline is not acceptance of later changes. |
 | Consumers of the freshness colour | `e2e_test/start/pageObjects/noteRecentUpdate.ts` reads `.note-recent-update-indicator` CSS `color` and compares the first channel; `frontend/tests/notes/NoteShow.spec.ts` pins exact RGB per age. No other consumer. | Slice 3 replaces both observations with the retained ordering (newer note more prominent) on the new line. |
 | End-to-end property journeys reach rows right after visiting a note | Twelve features use property steps; ten steps visit a note (not a property location) first. Page objects reaching rows: `noteRichPropertyMethods.ts` (18 region scopes), `notePropertyLayoutMethods.ts` (6), `notePropertyLocationMethods.ts` (5, route-driven), `noteRichPropertyAssimilationMethods.ts` (1), `assimilationPage/shared.ts`, `step_definitions/note_property.ts`. | Slice 2 adds one reveal helper in `notePageContentRegion.ts` and calls it from the methods that reach rows on a note location; route-driven methods rely on the route reveal. |
 | Unit consumers that reach rows through the note surface | `NoteContextReader.spec.ts` asserts `wrapper.text()` contains property values (a whole-container text check that hidden rows would still satisfy); `NoteShowPage.imageUpload.spec.ts` adds an image property through the page; `RecallPage.justReview.spec.ts` reaches a property through `notePropertyLocation`. Specs mounting `RichMarkdownEditor` or `NoteEditableContent` directly have no provider and stay revealed. | Slice 2 reconciles the first two to reveal and observe visible content; the third is covered by the route reveal. |
@@ -112,7 +116,7 @@ the browser's layout (`checkVisibility`/client rectangles), not DOM text.
 | Source promise | Owner | Observable proof |
 | --- | --- | --- |
 | Collapsed rows stay mounted; body edit keeps frontmatter; hosts without an owner stay revealed | 1 | New `NoteTextContent.detailsDisclosure.spec.ts` first case: with the section hidden, a body edit emits Markdown that still contains the authored frontmatter. Existing `RichMarkdownEditor.frontmatter.spec.ts` stays green for the readme/direct host. |
-| Compact line on opening (keys in order, no-properties wording, updated date); reveal shows rows, Add property, read-only display; collapse restores; no save on toggle | 2 | Same spec: writable and read-only notes, keys visible and rows not visible on mount; after reveal rows visible; after collapse hidden; the content-save spy was not called. Toggle has `aria-expanded`, works by keyboard, coarse-pointer height ≥ 44px. |
+| Compact line on opening (keys in order, no-properties wording, updated date); reveal shows rows, Add property, read-only display; collapse restores; no save on toggle | 2 | Same spec: writable and read-only notes, keys visible and rows not visible on mount; after reveal rows visible; after collapse hidden; the content-save spy was not called. Toggle has `aria-expanded` and works by keyboard. A `NoteTextContent.detailsDisclosure.touch.spec.ts` case observes the control at least 44px high under the coarse-pointer instance. |
 | Property location reveals and focuses the row; stale key shows not-found without revealing | 2 | Existing `RichMarkdownEditor.propertyLocation.spec.ts` and `RecallPage.justReview.spec.ts` extended to assert the focused row is visible; new case: stale key → notice visible, rows hidden. E2E `note_property.feature` keeps passing through the route reveal. |
 | Existing property journeys from a note location | 2 | Reconciled page objects; `note_property_layout.feature`, `note_edit.feature`, `property_wiki_link.feature`, `reify_property.feature`, `property_memory_tracker.feature`, `note_frontmatter_image.feature` run in hosted CI after publication; locally the reconciled unit consumers (`NoteContextReader.spec.ts`, `NoteShowPage.imageUpload.spec.ts`). |
 | Unambiguous dates; created only when revealed; freshness ordering theme-aware | 3 | Spec cases: updated date text contains the spelled month and four-digit year and no `/`; created date absent while compact and present when revealed; two notes (hour-old, year-old) yield a strictly more prominent updated line for the recent one, observed through a numeric freshness attribute or computed opacity, in light and dark theme. E2E `noteRecentUpdate.ts` reconciled to that observation; `NoteShow.spec.ts` RGB cases deleted. |
