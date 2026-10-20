@@ -22,12 +22,13 @@ conditions, never the result the example claims to establish.
 
 ### Consumer trace and removal reading
 
-The search move reaches `donutMenuTestSupport.searchField`, search/keyboard/
-shortcut/layout specs, `e2e_test/start/pageObjects/donutMenu.ts:startSearching`,
-the search step definitions, and `search_note.feature`. The E2E helper currently
-looks for an input inside the open menu. Update the entry and closure assertions
-to observe the dialog; a closed menu alone does not prove search completion.
-Keep result/scoping/duplicate-title consumers on shared search.
+The search entry uses `donutMenuTestSupport.searchLauncher` / `openMenuSearch`;
+`searchField` queries the real dialog. Search/shortcut/keyboard/layout specs
+observe the launchers or dialog according to their responsibility.
+`e2e_test/start/pageObjects/donutMenu.ts:startSearching` activates Open search
+and observes the focused dialog input; search steps and `search_note.feature`
+observe dialog completion plus the current note content. Result/scoping/
+duplicate-title consumers stay on shared search.
 
 The context control reaches `donutMenuLaunchersIn`, `GlobalBar.spec.ts`, routed
 notebook/book pages, recall progress aggregate text, and
@@ -52,3 +53,25 @@ original provenance. Record this as a reading here, separate from proof; add
 no permanent absence checker. Regenerate component declarations if component
 files change.
 
+
+### Slice 2 acceptance reading — 2026-10-20
+
+Traced every `SearchForNoteAndFolder` caller: the menu's common Modal and
+relationship `SearchForm` retain shared search; the popup's embedded instance
+was the only `quiet` caller. Deleted that presentation, its `quiet` prop,
+`entered` state/focus/history gating, and the obsolete menu-close-only E2E step
+and exclusively exported helper. Dialog search/history/results, scopes and
+relationship/dead-link entry remain. No component file was added or deleted,
+so component declarations need no regeneration.
+
+One-time whole-product reading used `rg -n --hidden -g '!node_modules/**'
+-g '!.git/**' -g '!.planning/**'` over `.` with exact retired prop/gate/call
+forms and instructions: `quiet\??: boolean`, `v-focus="!quiet"`,
+`v-if="entered"`, `entered\.value`, `@focus="entered`,
+`opens quietly with the search field`, `the Donut menu should be closed`, and
+`expectDonutMenuClosed`. It returned no matches (exit 1), spanning frontend,
+E2E, backend, CLI, MCP, docs, guidance and generated artifacts. Earlier broad
+name reading classified unrelated words (Git `--quiet`, ordinary prose and
+fixtures) as shared/unrelated. `.planning` retains the original dated
+observations and source/removal decisions for execution review. This is a
+reading, separate from surviving-journey and authorization proof.

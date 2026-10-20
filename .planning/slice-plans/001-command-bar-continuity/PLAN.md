@@ -45,10 +45,9 @@ Applicable Accepted decisions:
 [ADR 0001 — domain vocabulary](../../../docs/adrs/0001-ubiquitous-language.md#assimilation),
 [ADR 0005 — named locations and note route family](../../../docs/adrs/0005-web-routes-accepted.md),
 and [ADR 0006 — failure handling](../../../docs/adrs/0006-failure-handling-accepted.md#usage).
-No conflict or exception. Existing
-[North Star](../../NORTH-STAR.md) topics require no change for this local
-presentation work. PFE found suitable owners above; the missing integration
-is visible assimilation context reaching the existing navigation model.
+No conflict or exception. [North Star](../../NORTH-STAR.md) needs no change.
+PFE found suitable owners above; the missing integration is visible assimilation
+context reaching the existing navigation model.
 
 ## Proof and premises
 
@@ -77,7 +76,7 @@ owner-device access/wait is an explicit external-wait exception.
 
 ### 2. Open that search dialog from the popup menu
 Type: Behavior
-Status: planned
+Status: done
 Proof: Both launcher targets, keyboard/touch access, dialog result journeys,
 shared-search regression checks, `search_note.feature`, and separate removal reading.
 
@@ -198,9 +197,9 @@ test/device wait applies. Do not use that exception for growing implementation.
 
 ## Current decisions and learnings
 
-Slice 1 accepted: 194 toolbar/shared-search tests and both typechecks passed;
-10 shortcut cases passed again after probe removal. Native input is unverified
-under the owner's decision. Independent refactor completed; see [evidence](EVIDENCE.md).
+Slices 1–2 accepted: shared dialog and both launchers, 195 affected tests,
+final toolbar/typechecks, six Cypress search scenarios, and independent refactoring.
+Native input is unverified under the owner's decision; see [evidence](EVIDENCE.md).
 
 - The owner's property-context choice is settled; no sequence-origin policy.
 - Actual visible learning presentation, not property route or mounted DOM,
@@ -225,7 +224,7 @@ Disposition: owner changed "Native iPad software-keyboard observation is not an 
 ### G2. Search presentation interim
 Reported: slice 1 — "Embedded menu search remains as slice 2’s interim obligation."
 Story clause: "Remove the embedded-menu search presentation and transitively unused presentation-only code; shared search capabilities remain reusable."
-Disposition: interim until slices 2
+Disposition: proved by slice 2: DonutMenu.search.spec.ts dialog journeys, DonutMenu.search.touch.spec.ts focus sequence, search_note.feature six passing scenarios, and PROOF.md separate removal reading
 
 ## Execution context
 
@@ -237,7 +236,7 @@ Disposition: interim until slices 2
   final integration target is `origin/main`. Default checkout is
   `/Users/terryyin/git/doughnut` and is not this execution's edit location.
 - Starting revision `99588521d53b64053b8cb7d1f7e43c1452480f42`;
-  accepted claim / previously published base / initial candidate
+  accepted claim / initial published base and candidate
   `c02920b649348640cdb8dab5b6d91ca1bd04e6c9`.
   Remote branch confirmed; claim CI on trunk is unobserved.
 - Checkout setup `./scripts/run.sh bash scripts/worktree_setup.sh` succeeded;

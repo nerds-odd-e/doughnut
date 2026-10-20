@@ -129,3 +129,39 @@ preparation. Removed the disposable probe button, restoring the exact previously
 tested product candidate. The completed product refactor and 194-test/typecheck
 proof remain applicable. No additional owner observation is required to proceed.
 
+
+### Slice 2 implementation observation — 2026-10-20
+
+Candidate over slice 1 `ac60f83ff17e67c1a4fe25e6f3fc00813a07fdb2`:
+
+- Both popup targets are actual buttons, labelled Open search and Search,
+  calling the existing `openIntoSearch`. Keyboard Tab/Enter/Space reaches the
+  empty field-shaped launcher with a visible outline, then the focused common
+  dialog. Mounted tests observe Recent, history, Matches, scope/list switches,
+  current-note selection, keyboard traversal and modified clicks in that dialog.
+  Signed-out search remains an enforced authorization boundary.
+- `DonutMenu.search.touch.spec.ts` mounts the actual shared primer and observes
+  its focus event synchronously during each launcher click under real Chromium
+  coarse-pointer emulation, then observes the real dialog input's focus.
+  Native iPad keyboard behavior remains unverified under the owner's decision.
+- `CURSOR_DEV=true nix develop -c pnpm frontend:test tests/toolbars tests/components/search tests/wiki-link-or-relationship tests/notes/NoteUnresolvedWikiLinkModal.spec.ts`
+  passed 195 tests in 26 files. After restoring the explicit signed-out launcher
+  refusal assertion, `CURSOR_DEV=true nix develop -c pnpm frontend:test tests/toolbars`
+  passed 111 tests in 17 files; shared-search production code was unchanged.
+- `CURSOR_DEV=true nix develop -c pnpm -C frontend exec vue-tsc --noEmit`
+  and `CURSOR_DEV=true nix develop -c pnpm -C frontend exec tsc --noEmit`
+  both passed against final frontend content.
+- `CURSOR_DEV=true nix develop -c pnpm cy:run --spec e2e_test/features/note_view/search_note.feature`
+  passed all 6 scenarios in the isolated stack at `http://127.0.0.1:50012`;
+  the wrapper reached terminal exit 0 and owns teardown. Same-note Recent and
+  Matches selection both close the actual dialog and reveal content; title
+  matching, ordering and duplicate feedback pass. The subsequently deleted
+  exclusively unused menu-close helper/export had no caller in this run.
+- Initial migrated unit proof found two test setup gaps: the history journey
+  had not activated its new launcher, and result-key traversal ran before
+  scheduled modal autofocus settled. Actual launcher activation and the normal
+  autofocus settling helper resolved those gaps; the complete affected suites
+  then passed. No production behavior workaround was needed.
+- Caller trace and one-time removal reading are recorded in PROOF.md, separately
+  from behavioral proof. No component or API generation trigger applies.
+  Implementation remains uncommitted for independent refactoring and delivery.

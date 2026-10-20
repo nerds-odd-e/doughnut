@@ -6,6 +6,7 @@ import { fireEvent, screen, within } from "@testing-library/vue"
 import makeMe from "donut-test-fixtures/makeMe"
 import helper, { mockSdkService, productionRouterAt } from "@tests/helpers"
 import { resetRecallData } from "@tests/helpers/recallDataTestSupport"
+import { settleScheduledAutofocus } from "@tests/helpers/focusTargetTestSupport"
 import { focusDirective } from "@/utils/focusTarget"
 import { flushPromises, type VueWrapper } from "@vue/test-utils"
 import { beforeEach, afterEach, expect, vi } from "vitest"
@@ -72,7 +73,17 @@ export const panelItemLabels = () =>
 export const expectPanelClosed = () =>
   expect(screen.queryByRole("region", panelIdentity)).toBeNull()
 
-export const searchField = () => screen.getByPlaceholderText("Search")
+export const searchLauncher = () => screen.getByLabelText("Open search")
+
+export const openMenuSearch = async () => {
+  await fireEvent.click(searchLauncher())
+  await settleScheduledAutofocus()
+}
+
+export const searchDialog = () => document.querySelector("dialog")!
+
+export const searchField = () =>
+  searchDialog().querySelector<HTMLInputElement>('input[placeholder="Search"]')!
 
 export const recentHeading = () => screen.queryByText("Recently updated notes")
 

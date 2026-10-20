@@ -1,7 +1,6 @@
-import { NoteController } from "@generated/donut-backend-api/sdk.gen"
 import GlobalBar from "@/components/toolbars/GlobalBar.vue"
 import { focusDirective } from "@/utils/focusTarget"
-import helper, { mockSdkService } from "@tests/helpers"
+import helper from "@tests/helpers"
 import { fireEvent, screen } from "@testing-library/vue"
 import makeMe from "donut-test-fixtures/makeMe"
 import { flushPromises } from "@vue/test-utils"
@@ -13,7 +12,7 @@ import {
   launcher,
   pressLauncher,
   router,
-  searchField,
+  searchLauncher,
   setupDonutMenuTests,
   user,
 } from "./donutMenuTestSupport"
@@ -88,16 +87,9 @@ describe("Donut menu panel layout", () => {
     }
   )
 
-  it("fits a short window and scrolls, keeping the search field reachable", async () => {
-    mockSdkService(
-      NoteController,
-      "getRecentNotes",
-      Array.from({ length: 12 }, (_, i) =>
-        makeMe.aNoteSearchResult.title(`Recent ${i}`).please()
-      )
-    )
-    await openDonutMenuInPageBarAt(390, { height: 500 })
-    await fireEvent.focus(searchField())
+  it("fits a short window and scrolls, keeping the search launcher reachable", async () => {
+    await openDonutMenuInPageBarAt(390, { height: 260 })
+    await fireEvent.click(screen.getByLabelText("Account"))
     await flushPromises()
 
     const sheet = donutMenuPanel()
@@ -106,8 +98,8 @@ describe("Donut menu panel layout", () => {
     )
     expect(sheet.scrollHeight).toBeGreaterThan(sheet.clientHeight)
 
-    searchField().scrollIntoView()
-    const field = searchField().getBoundingClientRect()
+    searchLauncher().scrollIntoView()
+    const field = searchLauncher().getBoundingClientRect()
     const box = sheet.getBoundingClientRect()
     expect(field.top).toBeGreaterThanOrEqual(box.top)
     expect(field.bottom).toBeLessThanOrEqual(box.bottom)

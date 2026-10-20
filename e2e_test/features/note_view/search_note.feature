@@ -22,7 +22,7 @@ Feature: Search notes
     When I route to the note "Sedation"
     And I search from the current note
     And I open the search result "Sedation"
-    Then the Donut menu should be closed
+    Then the search dialog should be closed
     And the note content on the current page should be "Put to sleep"
 
   @mockBrowserTime
@@ -31,7 +31,7 @@ Feature: Search notes
     And I search from the current note
     And I search for "Sedation" in all notebooks
     And I open the search result "Sedation"
-    Then the Donut menu should be closed
+    Then the search dialog should be closed
     And the note content on the current page should be "Put to sleep"
 
   @mockBrowserTime

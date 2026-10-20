@@ -20,8 +20,8 @@ When('I open the search result {string}', (title: string) => {
   start.assumeNoteTargetSearchDialog().openResult(title)
 })
 
-Then('the Donut menu should be closed', () => {
-  start.expectDonutMenuClosed()
+Then('the search dialog should be closed', () => {
+  start.assumeNoteTargetSearchDialog().expectClosed()
 })
 
 Then(

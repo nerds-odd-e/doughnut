@@ -17,16 +17,17 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import { userEvent } from "vitest/browser"
 import {
   launcher,
-  mountDonutMenu,
   expectPanelClosed,
   openDonutMenu,
   donutMenuPanel,
   panelItemLabels,
-  pressLauncher,
   recentHeading,
   router,
   searchField,
   setupDonutMenuTests,
+  searchLauncher,
+  openMenuSearch,
+  searchDialog,
 } from "./donutMenuTestSupport"
 
 vi.mock("@/managedApi/AiReplyEventSource", async () => {
@@ -36,10 +37,7 @@ vi.mock("@/managedApi/AiReplyEventSource", async () => {
 
 setupDonutMenuTests()
 
-const enterSearch = async () => {
-  await fireEvent.focus(searchField())
-  await flushPromises()
-}
+const enterSearch = openMenuSearch
 
 const resultLink = (title: string) => screen.getByText(title).closest("a")!
 
@@ -50,32 +48,29 @@ describe("Donut menu search", () => {
     mockSdkService(NoteController, "getRecentNotes", [recentOne])
   })
 
-  it("opens quietly with the search field after Account and before the footer", async () => {
-    mountDonutMenu()
-    await flushPromises()
-    launcher().focus()
-    await pressLauncher()
-    await settleScheduledAutofocus()
+  it.each(["Open search", "Search"])(
+    "opens focused search from %s",
+    async (label) => {
+      await openDonutMenu()
+      const target = screen.getByLabelText(label)
+      expect(target.tagName).toBe("BUTTON")
+      expect(donutMenuPanel()).toContainElement(target)
+      expect(
+        screen.getByLabelText("Account").compareDocumentPosition(target)
+      ).toBe(Node.DOCUMENT_POSITION_FOLLOWING)
+      expect(target.compareDocumentPosition(screen.getByText("Donut by"))).toBe(
+        Node.DOCUMENT_POSITION_FOLLOWING
+      )
 
-    const field = searchField()
-    expect(donutMenuPanel()).toContainElement(field)
-    expect(
-      screen.getByLabelText("Account").compareDocumentPosition(field)
-    ).toBe(Node.DOCUMENT_POSITION_FOLLOWING)
-    expect(field.compareDocumentPosition(screen.getByText("Donut by"))).toBe(
-      Node.DOCUMENT_POSITION_FOLLOWING
-    )
-    expect(document.activeElement).not.toBe(field)
-    expect(recentHeading()).toBeNull()
-  })
+      await fireEvent.click(target)
+      await settleScheduledAutofocus()
 
-  it("shows Recent notes once the field is focused", async () => {
-    await openDonutMenu()
-    await enterSearch()
-
-    expect(recentHeading()).toBeInTheDocument()
-    expect(screen.getByText("Recent one")).toBeInTheDocument()
-  })
+      expectPanelClosed()
+      expect(searchDialog().open).toBe(true)
+      expect(document.activeElement).toBe(searchField())
+      expect(screen.getByText("Recent one")).toBeInTheDocument()
+    }
+  )
 
   describe("with a key typed", () => {
     beforeEach(() => vi.useFakeTimers())
@@ -85,7 +80,7 @@ describe("Donut menu search", () => {
       resetSearchKeyHistory()
     })
 
-    it("shows Matches, and the panel stays open across scope toggles and list switches", async () => {
+    it("shows Matches, and the dialog stays open across scope toggles and list switches", async () => {
       mockSdkService(SearchController, "searchForRelationshipTarget", [
         {
           hitKind: "NOTE" as const,
@@ -104,11 +99,11 @@ describe("Donut menu search", () => {
       await fireEvent.click(screen.getByTestId("search-list-mode-recent"))
       await flushPromises()
 
-      expect(donutMenuPanel()).toBeInTheDocument()
+      expect(searchDialog().open).toBe(true)
       expect(recentHeading()).toBeInTheDocument()
     })
 
-    it("enters search from a picked history key, keeping the panel open", async () => {
+    it("enters search from a picked history key, keeping the dialog open", async () => {
       seedLocalSearchKeyHistory(["newer", "older"])
       const searchForRelationshipTarget = mockSdkService(
         SearchController,
@@ -121,13 +116,14 @@ describe("Donut menu search", () => {
         ]
       )
       await openDonutMenu()
+      await enterSearch()
       await fireEvent.click(screen.getByTestId("search-key-history-trigger"))
       await flushPromises()
       await fireEvent.click(screen.getByTestId("search-key-history-item-1"))
       await advanceSearchDebounce()
 
       expect(searchField()).toHaveValue("older")
-      expect(donutMenuPanel()).toBeInTheDocument()
+      expect(searchDialog().open).toBe(true)
       expect(searchForRelationshipTarget).toHaveBeenCalledWith(
         expect.objectContaining({
           body: expect.objectContaining({ searchKey: "older" }),
@@ -137,7 +133,7 @@ describe("Donut menu search", () => {
       expect(screen.getByText("Older")).toBeInTheDocument()
     })
 
-    it("opens a Matches title and closes the panel", async () => {
+    it("opens a Matches title and closes the dialog", async () => {
       const sedation = makeMe.aNoteSearchResult.title("Sedation").please()
       mockSdkService(SearchController, "searchForRelationshipTarget", [
         { hitKind: "NOTE" as const, noteSearchResult: sedation },
@@ -153,31 +149,39 @@ describe("Donut menu search", () => {
       expect(router.currentRoute.value.fullPath).toBe(
         router.resolve(noteShowLocation(sedation.noteTopology.id)).fullPath
       )
-      expectPanelClosed()
+      expect(searchDialog()).toBeNull()
     })
   })
 
-  it("reaches the field by Tab after the panel items", async () => {
+  it("opens search by keyboard after the panel items", async () => {
     await openDonutMenu()
     launcher().focus()
     for (const _ of panelItemLabels()) await userEvent.tab()
     await userEvent.tab()
 
+    expect(document.activeElement).toBe(searchLauncher())
+    expect(getComputedStyle(searchLauncher()).outlineStyle).toBe("solid")
+    await userEvent.keyboard("{Enter}")
+    await settleScheduledAutofocus()
     expect(document.activeElement).toBe(searchField())
   })
 
-  it("reaches the field by Tab from the last Account action", async () => {
+  it("opens search by keyboard from the last Account action", async () => {
     await openDonutMenu()
     await fireEvent.click(screen.getByLabelText("Account"))
     await flushPromises()
     screen.getByTitle("Logout").focus()
     await userEvent.tab()
 
+    expect(document.activeElement).toBe(searchLauncher())
+    await userEvent.keyboard(" ")
+    await settleScheduledAutofocus()
     expect(document.activeElement).toBe(searchField())
   })
 
   it("moves from the field into the results with ArrowDown and back with ArrowUp, and Enter opens", async () => {
     await openDonutMenu()
+    await enterSearch()
     searchField().focus()
     await flushPromises()
 
@@ -193,7 +197,7 @@ describe("Donut menu search", () => {
     expect(router.currentRoute.value.fullPath).toBe(
       router.resolve(noteShowLocation(recentOne.noteTopology.id)).fullPath
     )
-    expectPanelClosed()
+    expect(searchDialog()).toBeNull()
   })
 
   it("closes without a route change when Enter opens the note already open", async () => {
@@ -207,7 +211,7 @@ describe("Donut menu search", () => {
     await flushPromises()
 
     expect(router.currentRoute.value).toBe(currentRoute)
-    expectPanelClosed()
+    expect(searchDialog()).toBeNull()
   })
 
   it("stays open for a modified result click", async () => {
@@ -221,18 +225,19 @@ describe("Donut menu search", () => {
     await fireEvent.click(link, { ctrlKey: true })
     await flushPromises()
 
-    expect(donutMenuPanel()).toBeInTheDocument()
+    expect(searchDialog().open).toBe(true)
   })
 
   it("searches all notebooks, with that scope fixed on", async () => {
     await openDonutMenu()
+    await enterSearch()
     const allNotebooks = screen.getByLabelText("All notebooks")
     expect(allNotebooks).toHaveClass("text-primary")
     expect(allNotebooks).toBeDisabled()
   })
-
-  it("offers no search to a visitor", async () => {
+  it("reserves search launchers for signed-in authors", async () => {
     await openDonutMenu(null)
-    expect(screen.queryByPlaceholderText("Search")).toBeNull()
+    expect(screen.queryByLabelText("Open search")).toBeNull()
+    expect(screen.queryByLabelText("Search")).toBeNull()
   })
 })

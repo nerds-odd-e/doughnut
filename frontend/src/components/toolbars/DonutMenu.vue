@@ -33,12 +33,23 @@
         </li>
         <AccountMenuItem :user="user" :logout="logout" @choose="close" />
       </ul>
-      <SearchForNoteAndFolder
-        v-if="user"
-        class="pt-2"
-        quiet
-        @navigate="close"
-      />
+      <div v-if="user" class="flex items-center gap-2 pt-2">
+        <button
+          type="button"
+          aria-label="Open search"
+          class="search-launcher daisy-input flex-1 min-w-0 bg-base-100"
+          @click="openIntoSearch"
+        />
+        <button
+          type="button"
+          aria-label="Search"
+          title="Search"
+          class="search-launcher daisy-btn daisy-btn-square"
+          @click="openIntoSearch"
+        >
+          <Search class="w-6 h-6" aria-hidden="true" />
+        </button>
+      </div>
       <LoginButton v-else />
       <div class="flex items-center justify-end gap-2 pt-2 text-sm">
         <router-link to="/" class="text-neutral-400 no-underline">
@@ -68,7 +79,7 @@
 import type { User } from "@generated/donut-backend-api"
 import { onMounted, onUnmounted, ref, watch } from "vue"
 import { useRoute } from "vue-router"
-import { BookMarked } from "@lucide/vue"
+import { BookMarked, Search } from "@lucide/vue"
 import AutoCollapseDropdown from "@/components/commons/AutoCollapseDropdown.vue"
 import Modal from "@/components/commons/Modal.vue"
 import NavigationItem from "@/components/navigation/NavigationItem.vue"
@@ -114,6 +125,11 @@ onUnmounted(() => document.removeEventListener("keydown", closeOnEscape))
 
 <style scoped lang="scss">
 @use "@/assets/page-bar.scss" as *;
+
+.search-launcher:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+}
 
 .donut-menu > .daisy-dropdown-content {
   width: max-content;

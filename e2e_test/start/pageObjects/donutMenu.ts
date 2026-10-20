@@ -44,7 +44,10 @@ export const donutMenuPanel = () => {
   openDonutMenu()
   return {
     startSearching() {
-      openDonutMenu().findByPlaceholderText('Search').click()
+      openDonutMenu().findByRole('button', { name: 'Open search' }).click()
+      cy.get('dialog[open]')
+        .findByPlaceholderText('Search')
+        .should('be.focused')
       return this
     },
   }
