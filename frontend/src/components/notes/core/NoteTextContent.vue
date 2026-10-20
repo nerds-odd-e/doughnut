@@ -36,7 +36,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref, type PropType } from "vue"
+import { provide, ref, type PropType } from "vue"
+import { noteDetailsDisclosureKey } from "@/composables/noteDetailsDisclosure"
 import type { Note, WikiLink } from "@generated/donut-backend-api"
 import NoteEditableTitle from "./NoteEditableTitle.vue"
 import NoteEditableContent from "./NoteEditableContent.vue"
@@ -53,6 +54,8 @@ defineProps({
 })
 
 defineEmits<{ deadWikiLinkClick: [payload: DeadWikiLinkPayload] }>()
+
+provide(noteDetailsDisclosureKey, { revealed: ref(true) })
 
 const titleEditor = ref<InstanceType<typeof NoteEditableTitle> | null>(null)
 defineExpose({
