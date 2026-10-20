@@ -253,6 +253,30 @@ force the estimate. This seed authorizes no implementation or slice plan.
   note-toolbar relocation, and detail presentation stay unchanged. Existing
   workflows and page controls must work independently at this stopping point.
 
+<a id="correction-1"></a>
+
+### Reach and operate the Donut menu from every screen state
+
+**Identity:** SEED-078#correction-1
+```json dough-story-state
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/004-donut-menu-reach-and-keyboard/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"bd92da166b802cf4c953d3dbb0914ea1caa52c07c1df33b5fdcfaa14dc9801c3","plan":"01f127ed3964ccd03deaa408f97d1d01cddc459f8cd0ce1e1f4d835f693c73e4"}}
+```
+
+- **Goal:** Authors, learners, and visitors reach and operate the Donut menu
+  wherever they had navigation before story 1, by mouse and keyboard, with
+  Account expanding its grouped actions in place, and the menu's tests identify
+  it unambiguously without redundant cost. Bounded retrospective correction of
+  [story 1](#story-1); it adds no feature promise.
+- **Scope:** Give the page bar to the screen states that lost it (Daily probe
+  and its retry, book loading and load failure, notebook catalog failure and
+  a missing notebook group); expand Account inside the panel; make the sign-in
+  action and the action items keyboard operable and closing; give the panel
+  its own test identity; move the panel layout checks to browser-mode unit
+  proof; remove leftover residue and overlapping assertions. Story 1's
+  promises, deferrals, and named-route navigation stay as they are.
+- **Plan:** [004 Donut menu reach and keyboard](../slice-plans/004-donut-menu-reach-and-keyboard/PLAN.md)
+  holds the source, findings, proof, and slices.
+
 <a id="story-2"></a>
 
 ### Find and open notes from search inside the Donut menu

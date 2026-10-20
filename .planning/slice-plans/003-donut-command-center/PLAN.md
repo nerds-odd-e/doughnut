@@ -232,3 +232,15 @@ Disposition: proved by slice 4: `message_center_with_unread_message_count.featur
 Reported: slice 2 — "If the Account sub-dropdown is open and the user clicks blank space inside its portaled list, the outer panel closes and that list may stay floating until the next click."
 Story clause: "tapping or clicking outside, choosing nothing and pressing Escape, or a route change closes it"
 Disposition: no user cost "Authors and learners find Donut's app commands in one place": the Account list is teleported from inside the panel's `v-if` subtree, so closing the panel unmounts it; no floating list remains.
+
+## Execution complete
+
+Product advice: queue the correction SEED-078#correction-1
+(`../004-donut-menu-reach-and-keyboard/PLAN.md`) ahead of SEED-078 stories 2
+and 3, since both build on the panel. It restores the Donut menu on the
+daily probe, book loading and error, and failed notebook pages, makes
+Account expand in place, and completes keyboard use. The story's Assimilate
+example ("reopening shows 2") describes counts that drop only after
+assimilating; its wording, not the product, needs a review at wrap-up. The
+remaining hypothesis, that a quiet launcher is as easy to find as always-visible
+destinations, is still settled only by use.

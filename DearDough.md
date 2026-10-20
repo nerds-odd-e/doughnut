@@ -5,7 +5,7 @@ responses under observation live in the [watch list](https://github.com/terryyin
 Detailed observations, original releases and qualified inferences are retained
 in the linked Open Dough catalog. Unknown execution provenance remains unknown.
 
-- Highest allocated local number: 250. Removed numbers are never reused.
+- Highest allocated local number: 253. Removed numbers are never reused.
 - Full source recovery before this cleanup: `0a8878e98be76b8e92203515d8f4719489b24169:DearDough.md`.
 - Full source recovery before name adoption and compaction: `234f141b41332715edd5e4384a425bcb8f26e718:DearDough.md`; complete supplied evidence retained in Open Dough `dbe36711c0e4ff9421bc28afc53cb7477203e704:docs/maintainer/findings/`.
 - Project-owned findings remain in [Donut Retrospective Findings](DonutRetrospectiveFindings.md); their ownership review is unchanged.
@@ -225,3 +225,51 @@ Former local code: DD-248. Naming a shared modal’s outer dismissal Close colli
 ## ODF-273 — Full verification started before the intended edits settled
 
 Former local code: DD-249. Required whole-suite verification began while intended test or template edits were still changing, requiring another run on settled source. One SEED-073#story-2 execution reports an extra full backend run and premature frontend/typecheck results. This sequencing deviation excludes necessary reruns after newly discovered gaps and differs from ODF-225’s repair-stash invalidation. Open, unqueued. [Evidence and response](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/findings/ODF-273.md).
+
+<a id="dd-251"></a>
+
+## DD-251 — A plan removed the only remaining sign-in control before moving it
+
+Slice planning ordered the removal of the old menus before the slice that moves the visitor's sign-in control into the new launcher. Those menus were the only place a visitor could sign in, so after the removal commit visitors would have had no sign-in until the next commit, and the signed-out E2E journeys might have failed on the story branch. The coordinator's destructive later-outcome check found the conflict before delegation and reordered the slices. Planning and readiness review had not found it.
+
+### Occurrences
+- Execution: SEED-078#story-1 (`.planning/slice-plans/003-donut-command-center/PLAN.md`, first implementation commit 15b6077ccd)
+  - Timestamp: 2026-10-20T10:30:00+09:00
+  - Tool: Claude Code
+  - Model: claude-opus-5-5
+  - Open Dough release: 0.3.66
+  - Evidence: the plan at f46a068 lists slice 3 "delete … VerticalMenu, HorizontalMenu" before slice 4 "`LoginButton` renders inside the panel and nowhere else"; `LoginButton` was used only by `HorizontalMenu.vue:17` and `VerticalMenu.vue:26`; the reorder was recorded in the plan's Current decisions in commit e4227c4.
+  - Observed effect: the plan was corrected during execution before any implementation; the cost was one plan edit.
+  - Inference: the planning premise check covered who consumed what was being removed, but not which user paths lived only in it. The timestamp is approximate, within the execution session.
+
+<a id="dd-252"></a>
+
+## DD-252 — Required build proof fails on formatting that implementers may not run
+
+The plan required implementers to run the Vite build so `components.d.ts` is regenerated. Donut's build runs a Biome format check, but delegation forbids implementers from formatting, because the coordinator runs `format:changed` later. The slice 2 implementer therefore returned with the build failing on line-wrapping only, and build proof was confirmed only after the coordinator's formatting pass.
+
+### Occurrences
+- Execution: SEED-078#story-1 (`.planning/slice-plans/003-donut-command-center/PLAN.md`, first implementation commit 15b6077ccd)
+  - Timestamp: 2026-10-20T10:10:00+09:00
+  - Tool: Claude Code
+  - Model: claude-opus-5-5
+  - Open Dough release: 0.3.66
+  - Evidence: the slice 2 return says `pnpm -C frontend build` "exits 1, but only on the build's built-in Biome formatter check of three spec files"; the coordinator then ran `format:changed` ("Fixed 3 files") and the build.
+  - Observed effect: one implementer proof was reported red and accepted on reasoning until the coordinator reran it; no defect escaped.
+  - Inference: the shared rule that implementers do not format conflicts with any project proof command that also checks formatting. The timestamp is approximate.
+
+<a id="dd-253"></a>
+
+## DD-253 — Retargeting E2E page objects missed a direct label lookup of a moved control
+
+When the always-visible menu was replaced by a panel that is rendered only while open, E2E callers were found by the names of the page-object helpers being retargeted. A separate direct `cy.findByLabelText('Resume')` in the recall page object was not one of those helpers, so it was missed. Local E2E for the named features and helper callers passed, and the one failure escaped to hosted CI.
+
+### Occurrences
+- Execution: SEED-078#story-1 (`.planning/slice-plans/003-donut-command-center/PLAN.md`, first implementation commit 15b6077ccd)
+  - Timestamp: 2026-10-20T10:36:11+09:00
+  - Tool: Claude Code
+  - Model: claude-opus-5-5
+  - Open Dough release: 0.3.66
+  - Evidence: CI run 39354041674 attempt 1 on 448d6fd, `recall/browse_answer_and_notes_while_recalling.feature` "Unable to find a label with the text of: Resume"; repaired in 0202d4a (`e2e_test/start/pageObjects/recallPage.ts`).
+  - Observed effect: one CI failure and one repair cycle (stash, repair agent, refactor pass, publication).
+  - Inference: the search covered the helpers being retargeted, but not every lookup of the moved control's accessible names. The relationship to ODF-272 (shared accessible-name consumers missed) is likely but unconfirmed.
