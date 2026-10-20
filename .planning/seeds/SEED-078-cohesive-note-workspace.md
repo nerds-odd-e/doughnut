@@ -129,126 +129,6 @@ hour during refinement and resplit around a useful user outcome before
 execution. Do not make separate platform models or technical-only stories to
 force the estimate. This seed authorizes no implementation or slice plan.
 
-<a id="story-3"></a>
-
-### Use note actions and folder context from one adaptive top bar
-
-**Identity:** SEED-078#story-3
-```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/006-adaptive-note-header/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"e4be2d3043ba6aba27b2e6cb9ced98d2b4d256ad76e5742ec39be3f8f50b78a9","plan":"9bc71d46cd39df5410ae0fa21ce05055215fa24448e76663b3baac2f835353e0"}}
-```
-
-- **Goal:** A note reader or author uses navigation, folder contents, and
-  the current note's tools from one predictable top bar on phone, tablet,
-  and desktop, leaving more space for the authored note. The outcome is the
-  approved shared arrangement, with the existing commands and note state.
-- **Scope:**
-  - Required: place the active note's existing command row in the common
-    top bar, after the distinct Donut menu and contents controls and before
-    global Undo. Preserve command order, labels, shortcuts, availability,
-    and permission rules. Conversation and Export keep their existing
-    meanings; this delivery adds no command.
-  - Required: use the existing measured overflow rule against the space
-    actually available in the header. Trailing commands remain operable in
-    the accessible More menu. Recording, starting, converting, and retrying
-    voice input, and an open Assimilate control, keep their existing direct
-    access and active states. Long context yields space to these controls
-    and More rather than pushing them outside the window.
-  - Required: wide windows show notebook/folder ancestry before the note
-    commands in the bar; narrow windows show that context immediately below
-    the bar, above the note. Reuse the existing ancestry links, including
-    notebook, parent folders, and Circle or Bazaar when applicable. A long
-    trail can scroll horizontally within its own region so parent links
-    stay reachable.
-  - Required: the contents control operates the same independent open
-    state, as a docked pane on wide windows and a drawer on narrow ones.
-    New note remains in the sidebar while it is open, in the note tools
-    when it is closed on a writable note, and in its current main-column
-    creation context on other writable notebook pages. Folder creation and
-    sorting stay with folder contents. Drawer positioning and safe-area
-    offsets use the shared bar-height rule.
-  - Required: moving controls and resizing preserve the current editor
-    mode, drafts, title selection/dictation intent, body insertion target,
-    and note-owned Assimilation content. That content stays below the bar
-    with the note. Switching notes and maximizing Conversation retain the
-    current note lifecycle; note/property navigation keeps the same route
-    family and conversation query.
-  - Required: Undo acts on the latest global history operation, including
-    another note, with its existing confirmation and destination. Folder,
-    attachment, property, Recall, and Book-reading contexts retain their
-    appropriate controls. Signed-in read-only notes keep their permitted
-    tools; writable commands remain subject to the existing access rule.
-  - Removal: replace the separate note action-bar presentation and delete
-    everything used only by that presentation; reconcile product and test
-    consumers. Acceptance records a one-time product sweep as a reading.
-    Proof exercises the surviving commands, navigation, and editing.
-  - Deferred, not rejected: command-center search relocation (story 2),
-    property layout and disclosure (stories 4–5), new commands, alternate
-    editor or metadata models, and changes to history or learning policy.
-    No new rejection constraint is introduced.
-- **Key examples:**
-  - Writable note, sidebar closed, phone window → open More and choose
-    Export or Edit → the existing action works from the shared header;
-    widen and narrow the window → the command order and editor mode survive.
-  - Title caret after “Orchard”, voice input started from the header →
-    narrow the window while recording, then Stop → the highlighted control
-    stays reachable and speech is inserted at that title caret and saved.
-    Focus the body for the next recording → speech goes into the body.
-  - Assimilate open on the current note → resize → its active control stays
-    in the bar and its settings stay with the note below it.
-  - Note in a deeply nested folder with long names → narrow the window →
-    ancestry appears below the bar; scroll its trail and select a parent →
-    that folder opens through its existing named route, with note tools
-    having stayed reachable before navigation.
-  - Writable note → toggle contents open, then closed → New note is usable
-    in the sidebar, then in the note tools, using the same folder creation
-    context. At phone width the same toggle opens a drawer; at wide width
-    it opens the docked pane.
-  - Note A open, latest history entry is a change to note B → press Undo
-    and confirm → the change to B is undone and its existing destination
-    opens; the operation is not reinterpreted as an edit to A.
-  - Open a focused property with Conversation, then switch to a folder,
-    attachment, Recall, or Book reading → the property/conversation route
-    state and each destination's page controls behave as before. A
-    read-only note offers its permitted Conversation action with the
-    existing editing restriction.
-- **UI:** Follow the shared wide/narrow arrangement above. The compact
-  ancestry line is part of the content area below the fixed-height bar;
-  it does not become another action bar. The Donut menu and contents toggle
-  stay distinct, Undo stays at the trailing edge, and the note tools use
-  the middle space. Keep the full authored title and inline editing.
-- **Architecture:** The note owns command behavior and editing/dictation
-  state even when its controls render in the layout's header. Reuse the
-  existing toolbar, overflow calculation, sidebar state, breadcrumbs, and
-  global history; do not copy those responsibilities into a header store.
-  Preserve the vocabulary of [ADR 0001](../../docs/adrs/0001-ubiquitous-language.md),
-  authored content under [ADR 0004](../../docs/adrs/0004-okf-compatible-notebook-markdown-accepted.md),
-  and named-route/property continuity under [ADR 0005](../../docs/adrs/0005-web-routes-accepted.md).
-- **Investigation (2026-10-20, `ad2a592d06` in this preparation worktree):**
-  A disposable browser-mode harness mounted the real NoteShow and GlobalBar.
-  A scratch relocation of only the toolbar navigation through Vue Teleport
-  retained NoteShow ownership. Eleven checks passed: the ten current
-  toolbar/title dictation scenarios (one extended to narrow to 320px during
-  recording and widen before Stop), plus selecting Assimilate through the
-  bounded phone overflow menu and observing its settings with the note.
-  Disabling the relocation made the header-placement observation fail
-  (Stop ended at 87px while the bar ended at 55px). The scratch edits and
-  spec were reverted before recording. This establishes a viable placement
-  approach, not final layout acceptance or manual device usability evidence.
-- **Value / learning:** Delivers the main approved space saving and tests
-  whether one ownership model supports both compact and wide workspaces.
-- **Effort hypothesis:** S target, 45–60 minutes, medium confidence after
-  the placement/dictation observation. The remaining work is a control
-  placement seam, shared header sizing and ancestry, and affected-consumer
-  proof. Reassess the story boundary if execution invalidates the hour-long
-  hypothesis; the scratch result is not a timing guarantee.
-- **Depends on:** No blocking supplier story established. Existing shell,
-  context, and note tools suffice; common code alone is not a prerequisite.
-- **Safe stopping point:** One usable note bar stands alone, with current
-  search and detail UI if later work is cancelled. Preserve editing, learning,
-  access, and the other pages' controls within this increment, not as repairs
-  delegated to a later story.
-
 <a id="story-4"></a>
 
 ### Read and edit complete property values comfortably in narrow windows
@@ -430,9 +310,8 @@ execution. Do not disguise an overrun as another layer or platform story.
 No unresolved parent framing or priority decision remains: the owner approved
 the UI direction and asked for these bounded stories at the top of the queue.
 Individual stories still need refinement and an execution-approach choice.
-In particular, story 3's integration cost is an explicit sizing uncertainty,
-not a measured claim that it fits an hour. No implementation, timing run,
-manual-testing session, or executable plan is authorized by this decomposition.
+No implementation, timing run, manual-testing session, or executable plan is
+authorized by this decomposition.
 
 ## When to Surface
 

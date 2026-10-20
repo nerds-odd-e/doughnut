@@ -54,7 +54,6 @@ type NoteToolbarMountOptions = {
     ReturnType<typeof helper.component<typeof NoteToolbar>>["withPlugin"]
   >[0]
   propsOverrides?: Record<string, unknown>
-  attachTo?: HTMLElement
 }
 
 export async function mountNoteToolbar(
@@ -75,7 +74,7 @@ export async function mountNoteToolbar(
   }
 
   const wrapper = builder.mount({
-    attachTo: options.attachTo ?? document.body,
+    attachTo: document.body,
   })
   await flushPromises()
   return wrapper

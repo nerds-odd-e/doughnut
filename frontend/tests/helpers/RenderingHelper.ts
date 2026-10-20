@@ -4,7 +4,14 @@ import type { User } from "@generated/donut-backend-api"
 import { render } from "@testing-library/vue"
 import { mount } from "@vue/test-utils"
 import { merge } from "es-toolkit"
-import { ref, type Component, type DefineComponent, type Ref } from "vue"
+import { pageBarTargetKey } from "@/composables/pageBarTarget"
+import {
+  ref,
+  type App,
+  type Component,
+  type DefineComponent,
+  type Ref,
+} from "vue"
 import type { RouteLocationRaw, Router } from "vue-router"
 import { createRouter, createWebHistory } from "vue-router"
 
@@ -40,6 +47,8 @@ class RenderingHelper<T = DefineComponent> {
 
   private global
 
+  private pageBarTarget = ref<HTMLElement | null>(null)
+
   constructor(comp: T) {
     this.comp = comp
     const stubs: Record<string, boolean | Component> = {
@@ -49,8 +58,17 @@ class RenderingHelper<T = DefineComponent> {
         template: `<a class="router-link" :to='JSON.stringify(to)' href="#"><slot/></a>`,
       },
     }
+    const pageBarTarget = this.pageBarTarget
     this.global = {
-      plugins: [],
+      // A component mounted on its own has no page bar unless the test
+      // supplies one; page-bar controls then stay where they render.
+      plugins: [
+        {
+          install(app: App) {
+            app.provide(pageBarTargetKey, pageBarTarget)
+          },
+        },
+      ],
       directives: {
         // eslint-disable-next-line @typescript-eslint/no-empty-function
         focus() {
@@ -89,6 +107,12 @@ class RenderingHelper<T = DefineComponent> {
   /** Renders the routed page inside `<router-view>` instead of a stub. */
   withRoutedPages() {
     delete this.global.stubs["router-view"]
+    return this
+  }
+
+  /** Stands in for the page that hosts page-bar controls at `target`. */
+  withPageBarTarget(target: HTMLElement) {
+    this.pageBarTarget.value = target
     return this
   }
 

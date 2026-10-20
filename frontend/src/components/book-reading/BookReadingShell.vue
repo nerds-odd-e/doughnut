@@ -123,7 +123,7 @@ import ReadingControlPanel from "@/components/book-reading/ReadingControlPanel.v
 import ReadingOverlayDock from "@/components/book-reading/ReadingOverlayDock.vue"
 import type { BookReadingSession } from "@/composables/useBookReadingSession"
 import { useSidebarDrawer } from "@/composables/useSidebarDrawer"
-import { bookReadingBarTargetKey } from "@/composables/bookReadingBarTarget"
+import { pageBarTargetKey } from "@/composables/pageBarTarget"
 import { inject, onMounted, onUnmounted } from "vue"
 
 /**
@@ -146,7 +146,7 @@ const emit = defineEmits<{
 }>()
 
 const bookReadingBookLayoutPanelId = "book-reading-book-layout-panel"
-const barTarget = inject(bookReadingBarTargetKey)!
+const barTarget = inject(pageBarTargetKey)!
 
 const {
   notebookId,
