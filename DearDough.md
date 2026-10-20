@@ -281,7 +281,7 @@ When the always-visible menu was replaced by a panel that is rendered only while
 The plan's acceptance sweep for a removed control listed `dialog\[open\]` among the removed names and promised the search "returns nothing". At the planning revision that term already matched seven lines in code the story keeps (toolbar search dialog specs and a refine-note modal check). The sweep could never come back empty, so the implementer had to judge the term too broad and record an amended reading at acceptance.
 
 ### Occurrences
-- Execution: SEED-078#story-2 (`.planning/slice-plans/005-donut-menu-search/PLAN.md`, first implementation commit b94786fa6a)
+- Execution: SEED-078#story-2 (plan recoverable as `02cb6a9d5f:.planning/slice-plans/005-donut-menu-search/PLAN.md`, first implementation commit b94786fa6a)
   - Timestamp: 2026-10-20T12:12:14+09:00
   - Tool: Claude Code
   - Model: claude-opus-5-5
