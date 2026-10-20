@@ -11,8 +11,7 @@ export const waitUntilAppIsNotBusy = () => {
 const donutMenuPanel = '[role="region"][aria-label="Donut menu panel"]'
 
 /** The Donut menu launcher button at the start of the page bar. */
-export const donutMenuLauncher = () =>
-  cy.findByRole('button', { name: 'Donut menu' })
+const donutMenuLauncher = () => cy.findByRole('button', { name: 'Donut menu' })
 
 /** The shared page bar, which starts with the Donut menu launcher. */
 export const pageBar = () => donutMenuLauncher().closest('nav')

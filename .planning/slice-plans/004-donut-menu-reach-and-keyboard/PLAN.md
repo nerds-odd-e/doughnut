@@ -203,7 +203,8 @@ present; the loaded views keep their titles and controls in the bar.
 
 ### 5. Panel sheet and anchoring are proven in browser-mode unit tests
 Type: Structure
-Status: planned
+Status: done
+Accepted: `DonutMenu.layout.spec.ts` 2/2 (phone case failed with the media query disabled in a reverted scratch edit); `tests/toolbars` 81/81; vue-tsc clean; E2E `message_center_with_unread_message_count` 4/4 after the removal. Sweep reading (2026-10-20, before the slice 5 commit): matches only surviving names — the `donutMenuPanel` selector constant in `pageBase.ts` and the unit helpers `donutMenuPanel`/`donutMenuPanelIn` for the existing panel, and `.agents/skills/e2e-authoring/SKILL.md:151` ("page objects that start from the Donut menu use" `withinDonutMenuItem`); none refers to the removed page object, steps, or scenarios.
 Proof: new `frontend/tests/toolbars/DonutMenu.layout.spec.ts` (mounts `GlobalBar` with a user; `page.viewport` 390: panel top ≥ bar bottom and spans the window width; 1200: panel top ≥ launcher bottom, left within 4px of the launcher, narrower than the window) green; then the two E2E scenarios removed and `message_center_with_unread_message_count.feature` green; sweep reading.
 
 Internal change: replaces the E2E layout checks with the unit proof first,

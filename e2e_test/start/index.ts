@@ -24,17 +24,10 @@ import { assumeBazaarPage, navigateToBazaar } from './pageObjects/bazaarPage'
 import { assumeCirclePage, navigateToCircle } from './pageObjects/circlePage'
 import { assumeHomePage, visitHomePage } from './pageObjects/homePage'
 import { assumeConversationAboutNotePage } from './pageObjects/conversationAboutNotePage'
-import {
-  assumeUserSettingsPage,
-  donutMenu,
-  donutMenuPanel,
-} from './pageObjects/donutMenu'
+import { assumeUserSettingsPage, donutMenu } from './pageObjects/donutMenu'
 import { mcpAgentActions } from './pageObjects/mcpAgentActions'
 import { messageCenterIndicator } from './pageObjects/messageCenterIndicator'
-import {
-  assumeMessageCenterPage,
-  navigateToMessageCenter,
-} from './pageObjects/messageCenterPage'
+import { navigateToMessageCenter } from './pageObjects/messageCenterPage'
 import {
   navigateToNotebookPage,
   navigateToNotebooksPage,
@@ -64,12 +57,10 @@ const start = {
   assumeUserSettingsPage,
   visitHomePage,
   assumeConversationAboutNotePage,
-  assumeMessageCenterPage,
   assumeNotePage,
   assumeNoteTargetSearchDialog,
   assumeQuestionPage,
   donutMenu,
-  donutMenuPanel,
   mcpAgentActions,
   messageCenterIndicator,
   assumeBazaarPage,
