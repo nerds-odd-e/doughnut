@@ -47,6 +47,18 @@ const recallCountOf = (label: string) =>
   navItemOf(label)?.querySelector(".recall-count")
 
 describe("Donut menu assimilation count", () => {
+  it("shows the due count titled with due today and total unassimilated", async () => {
+    mockAssimilationCount(3, 0, 128)
+    await openDonutMenu()
+
+    const dueCount = navItemOf("Assimilate")?.querySelector(".due-count")
+    expect(dueCount).toHaveAttribute(
+      "title",
+      "3 due today, 128 total unassimilated"
+    )
+    expect(dueCount).toHaveTextContent("3")
+  })
+
   it("shows no due badge when nothing is due", async () => {
     mockAssimilationCount(0, 0, 128)
     await openDonutMenu()
@@ -195,5 +207,26 @@ describe("Donut menu recall count", () => {
       await vi.advanceTimersByTimeAsync(24 * 60 * 60 * 1000)
       expect(recalling).toHaveBeenCalledTimes(1)
     })
+  })
+})
+
+describe("Donut menu unread message count", () => {
+  it("shows the unread message count on Messages", async () => {
+    mockSdkService(
+      UserController,
+      "getMenuData",
+      createMenuData({
+        unreadMessages: [
+          { id: 1, message: "first" },
+          { id: 2, message: "second" },
+        ],
+      })
+    )
+
+    await openDonutMenu()
+
+    expect(
+      navItemOf("Messages")?.querySelector(".unread-count")
+    ).toHaveTextContent("2")
   })
 })

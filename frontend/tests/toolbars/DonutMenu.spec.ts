@@ -1,7 +1,4 @@
-import {
-  AssimilationController,
-  UserController,
-} from "@generated/donut-backend-api/sdk.gen"
+import { AssimilationController } from "@generated/donut-backend-api/sdk.gen"
 import { useRecallData } from "@/composables/useRecallData"
 import { logout } from "@/managedApi/window/logout"
 import { noteShowLocation } from "@/routes/noteShowLocation"
@@ -12,7 +9,7 @@ import { flushPromises } from "@vue/test-utils"
 import { describe, it, expect, vi } from "vitest"
 import { userEvent } from "vitest/browser"
 import type { RouteLocationRaw } from "vue-router"
-import { createMenuData, memoryTrackerLitesStub } from "./menuDataMocks"
+import { memoryTrackerLitesStub } from "./menuDataMocks"
 import {
   expectPanelClosed,
   navItemOf,
@@ -33,28 +30,7 @@ vi.mock("@/managedApi/window/logout", () => ({ logout: vi.fn() }))
 setupDonutMenuTests()
 
 describe("Donut menu panel", () => {
-  it("lists the destinations in order with their counts, the account group, and the attribution", async () => {
-    mockSdkService(
-      UserController,
-      "getMenuData",
-      createMenuData({
-        assimilationCount: {
-          dueCount: 3,
-          assimilatedCountOfTheDay: 0,
-          totalUnassimilatedCount: 128,
-        },
-        recallStatus: {
-          toRepeat: memoryTrackerLitesStub(12),
-          currentRecallWindowEndAt: "",
-          totalAssimilatedCount: 0,
-        },
-        unreadMessages: [
-          { id: 1, message: "first" },
-          { id: 2, message: "second" },
-        ],
-      })
-    )
-
+  it("lists the destinations in order ending with Account, and the attribution", async () => {
     await openDonutMenu()
 
     expect(panelItemLabels()).toEqual([
@@ -66,18 +42,6 @@ describe("Donut menu panel", () => {
       "Messages",
       "Account",
     ])
-    expect(
-      navItemOf("Assimilate")?.querySelector(".due-count")
-    ).toHaveAttribute("title", "3 due today, 128 total unassimilated")
-    expect(
-      navItemOf("Assimilate")?.querySelector(".due-count")
-    ).toHaveTextContent("3")
-    expect(
-      navItemOf("Recall")?.querySelector(".recall-count")
-    ).toHaveTextContent("12")
-    expect(
-      navItemOf("Messages")?.querySelector(".unread-count")
-    ).toHaveTextContent("2")
     expect(screen.getByText("Donut by")).toBeInTheDocument()
   })
 
@@ -121,14 +85,11 @@ describe("Donut menu panel", () => {
     expectPanelClosed()
   })
 
-  it("lists Resume first while recall is paused and resumes recall when chosen", async () => {
+  it("resumes recall and closes when Resume is chosen", async () => {
     const { setIsRecallPaused, setToRepeat } = useRecallData()
     setIsRecallPaused(true)
     setToRepeat(memoryTrackerLitesStub(5))
     await openDonutMenu()
-
-    expect(panelItemLabels()[0]).toBe("Resume")
-    expect(navItemOf("Resume")).toHaveClass("resume-recall-active")
 
     await fireEvent.click(screen.getByLabelText("Resume"))
     await flushPromises()

@@ -232,7 +232,7 @@ reading: `git grep -n -E "hasDropdown|has-dropdown|lg:daisy-dropdown|lgOnly|LG_M
 ### 7. Every panel item is keyboard operable and closes the panel
 Type: Behavior
 Status: done
-Accepted: `DonutMenu.signedOut.spec` Tab reaches "Login via Github" and Enter starts login; `DonutMenu.keyboard.spec` (split from `DonutMenu.spec`) Space on Assimilate goes to the next note and Enter on Assimilate with no more notes closes the panel (all three failed first); `HomePage.welcome.spec` welcome Assimilate reaches the next note (green before the element change); `tests/toolbars tests/pages/HomePage tests/DonutApp.searchHistoryMigration.spec.ts` 104/104; vue-tsc clean. `NavigationItem` action and disclosure items share one native button branch; `LoginButton` is a native button.
+Accepted: `DonutMenu.signedOut.spec` Tab reaches "Login via Github" and Enter starts login; `DonutMenu.keyboard.spec` (split from `DonutMenu.spec`) Space on Assimilate goes to the next note and Enter on Assimilate with no more notes closes the panel (all three failed first); `HomePage.welcome.spec` welcome Assimilate reaches the next note (green before the element change); `tests/toolbars tests/pages/HomePage tests/DonutApp.searchHistoryMigration.spec.ts` 104/104; vue-tsc clean. `NavigationItem` action and disclosure items share one native button branch; `LoginButton` is a native button. CI run 39363989869 on 29333c5 failed only `record_live_audio_with_real_open_ai` ("Append live recording transcription with real OpenAI"): the real OpenAI transcription returned "請安靜" for the English "Please be quiet.". No change in this execution touches audio or transcription, and the same feature passed on 25ec462; disposition: external model output variation, not owned or repaired here.
 Proof: `DonutMenu.signedOut.spec` Tab from the launcher reaches "Login via Github" and Enter starts the login flow (fails first); `DonutMenu.spec` Space on Assimilate calls `next` (fails first), Enter on Assimilate with no next note closes the panel (fails first), and the existing focus-order and Resume tests stay green; a home-page test, added and green before the element change, presses the welcome section's Assimilate item and reaches the next note (`HomeWelcomeSection` shares `NavigationItem` and has no such test today); typecheck.
 
 Behavior: panel open → Tab through its items, then press Enter or Space on
@@ -251,7 +251,8 @@ specs no longer stand alone for it.
 
 ### 9. Leftover marker and overlapping Donut menu assertions are removed
 Type: Structure
-Status: planned
+Status: done
+Accepted: `tests/toolbars tests/notes` 479/479; vue-tsc clean; `NoteToolbar.overflow.spec` finds the overflow `details` through its "more options" control (fails with the note change removed). Moved: Assimilate due title and count, and Messages unread count, from the `DonutMenu.spec` list test to `DonutMenu.counts.spec`; `resume-recall-active` from the `DonutMenu.spec` Resume test to `DonutMenu.resume.spec`. Dropped as duplicates: the list test's Recall count (still in `DonutMenu.counts.spec` "shows the to-repeat count on Recall" and "decreases the count as recall progresses"); the Resume test's "Resume first" (still in `DonutMenu.resume.spec` first test); `GlobalBar.spec` signed-out presence (now the stronger "launcher first" `it.each` case). Sweep reading (2026-10-20, before the slice 9 commit): `git grep -n "data-auto-collapse-dropdown" -- frontend` returns nothing.
 Proof: `NoteToolbar.overflow.spec` green selecting the overflow `details` without the marker; `tests/toolbars` and `tests/notes` green; surviving coverage named below; typecheck; sweep reading `git grep -n "data-auto-collapse-dropdown" -- frontend` returns nothing.
 
 Internal change: delete `data-auto-collapse-dropdown` from

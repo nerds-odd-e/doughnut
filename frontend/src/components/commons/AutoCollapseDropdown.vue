@@ -1,7 +1,6 @@
 <template>
   <details
     ref="detailsRef"
-    data-auto-collapse-dropdown
     :class="{ 'daisy-dropdown-open': open }"
     v-bind="$attrs"
     @click="onClick"

@@ -3,6 +3,7 @@ import { flushPromises } from "@vue/test-utils"
 import { describe, it, expect, vi } from "vitest"
 import { memoryTrackerLitesStub } from "./menuDataMocks"
 import {
+  navItemOf,
   openDonutMenu,
   panelItemLabels,
   router,
@@ -17,12 +18,13 @@ vi.mock("@/managedApi/AiReplyEventSource", async () => {
 setupDonutMenuTests()
 
 describe("Donut menu Resume availability", () => {
-  it("drops Resume once recall is no longer paused", async () => {
+  it("lists Resume first and highlighted while recall is paused, and drops it once recall is no longer paused", async () => {
     const { setIsRecallPaused, setToRepeat } = useRecallData()
     setIsRecallPaused(true)
     setToRepeat(memoryTrackerLitesStub(5))
     await openDonutMenu()
     expect(panelItemLabels()[0]).toBe("Resume")
+    expect(navItemOf("Resume")).toHaveClass("resume-recall-active")
 
     setIsRecallPaused(false)
     await flushPromises()
