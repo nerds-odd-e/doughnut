@@ -182,7 +182,8 @@ Retry; ordinary recall still shows the progress bar in that bar.
 
 ### 3. Book reading keeps the Donut menu while loading and on failure
 Type: Behavior
-Status: planned
+Status: done
+Accepted: `BookReadingPage.spec.ts` asserts one launcher while loading, on a file 404, when `getBook` fails (all failed first), and exactly one once the PDF loads; `tests/components/book-reading tests/pages/BookReading tests/pages/RecallPage tests/toolbars` green; vue-tsc clean. `BookReader` renders a plain `GlobalBar` until the bootstrap exists, then `BookReadingShell`'s bar takes over (one bar at a time, no lifting of the shell's layout-drawer state). Page specs share `donutMenuLaunchersIn(wrapper)` from `donutMenuTestSupport.ts`.
 Proof: `tests/pages/BookReadingPage.spec.ts` "loading the book file" tests assert the "Donut menu" button while loading, on a book-file 404, and when `getBook` fails (fail first); loaded EPUB/PDF tests stay green; typecheck.
 
 Behavior: opening a notebook's book → while it loads, when the file fails,

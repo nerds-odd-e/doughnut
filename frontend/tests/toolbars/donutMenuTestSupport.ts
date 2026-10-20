@@ -6,7 +6,7 @@ import { fireEvent, screen } from "@testing-library/vue"
 import makeMe from "donut-test-fixtures/makeMe"
 import helper, { mockSdkService, productionRouterAt } from "@tests/helpers"
 import { resetRecallData } from "@tests/helpers/recallDataTestSupport"
-import { flushPromises } from "@vue/test-utils"
+import { flushPromises, type VueWrapper } from "@vue/test-utils"
 import { beforeEach, afterEach, expect, vi } from "vitest"
 import { defineComponent, h, type PropType, toRef } from "vue"
 import type { Router } from "vue-router"
@@ -33,6 +33,10 @@ export const mountDonutMenu = (menuUser: User | null = user) =>
     .render()
 
 export const launcher = () => screen.getByRole("button", { name: "Donut menu" })
+
+// For page specs mounted with Vue Test Utils rather than Testing Library.
+export const donutMenuLaunchersIn = (wrapper: Pick<VueWrapper, "findAll">) =>
+  wrapper.findAll('[role="button"][aria-label="Donut menu"]')
 
 export const pressLauncher = async () => {
   await fireEvent.click(launcher())

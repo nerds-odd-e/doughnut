@@ -6,6 +6,7 @@ import { mockSdkService, wrapSdkError, wrapSdkResponse } from "@tests/helpers"
 import { flushPromises } from "@vue/test-utils"
 import { describe, expect, it } from "vitest"
 import { ref } from "vue"
+import { donutMenuLaunchersIn } from "@tests/toolbars/donutMenuTestSupport"
 import {
   createMemoryTrackerLite,
   givenRecallQueue,
@@ -92,16 +93,13 @@ describe("RecallPage Daily probe entry", () => {
   const showsRecallPrompt = (
     wrapper: Awaited<ReturnType<typeof mountRecall>>
   ) => wrapper.findComponent({ name: "RecallPromptCard" }).exists()
-  const showsDonutMenuLauncher = (
-    wrapper: Awaited<ReturnType<typeof mountRecall>>
-  ) => wrapper.find('[role="button"][aria-label="Donut menu"]').exists()
 
   it("shows Daily probe instead of the quiz when the learner has opted in", async () => {
     const wrapper = await mountRecall(true)
 
     expect(showsDailyProbe(wrapper)).toBe(true)
     expect(showsRecallPrompt(wrapper)).toBe(false)
-    expect(showsDonutMenuLauncher(wrapper)).toBe(true)
+    expect(donutMenuLaunchersIn(wrapper)).toHaveLength(1)
   })
 
   it("loads ordinary recall when Daily probe is off", async () => {
@@ -132,7 +130,7 @@ describe("RecallPage Daily probe entry", () => {
     ).toBe(true)
     expect(showsDailyProbe(wrapper)).toBe(false)
     expect(showsRecallPrompt(wrapper)).toBe(false)
-    expect(showsDonutMenuLauncher(wrapper)).toBe(true)
+    expect(donutMenuLaunchersIn(wrapper)).toHaveLength(1)
   })
 
   it("offers Daily probe after retry succeeds with today's run still due", async () => {
