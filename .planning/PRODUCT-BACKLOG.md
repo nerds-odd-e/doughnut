@@ -11,6 +11,11 @@ Make deliberately captured knowledge more useful through learning and refinement
 
 ## Backlog list
 
+- [Open a quiet Donut command center consistently on every screen](seeds/SEED-078-cohesive-note-workspace.md#story-1) — SEED-078#story-1
+- [Find and open notes from search inside the Donut menu](seeds/SEED-078-cohesive-note-workspace.md#story-2) — SEED-078#story-2
+- [Use note actions and folder context from one adaptive top bar](seeds/SEED-078-cohesive-note-workspace.md#story-3) — SEED-078#story-3
+- [Read and edit complete property values comfortably in narrow windows](seeds/SEED-078-cohesive-note-workspace.md#story-4) — SEED-078#story-4
+- [Focus on note content while revealing details when needed](seeds/SEED-078-cohesive-note-workspace.md#story-5) — SEED-078#story-5
 - [Generate focus-note questions with relevant supporting passages](seeds/SEED-007-per-concept-prompt-splitting-single-note-qg.md#story-1) — SEED-007#story-1
 - [Decide whether an acceptance-test review procedure benefits from Donut notes](seeds/SEED-074-knowledge-to-capability.md#story-1) — SEED-074#story-1
 - [Find a note from wording remembered in its body](seeds/SEED-073-learning-refinement-and-retrieval.md#story-3) — SEED-073#story-3
