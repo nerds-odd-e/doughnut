@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 1,
+  "agent": "Nao-chan",
+  "email": "nao-chan@example.org",
+  "activity": "preparation",
+  "identity": "SEED-080#story-1",
+  "host": "codex",
+  "model": "gpt-6-astra"
+}
