@@ -6,6 +6,7 @@ import { fireEvent, screen } from "@testing-library/vue"
 import makeMe from "donut-test-fixtures/makeMe"
 import helper, { mockSdkService, productionRouterAt } from "@tests/helpers"
 import { resetRecallData } from "@tests/helpers/recallDataTestSupport"
+import { focusDirective } from "@/utils/focusTarget"
 import { flushPromises } from "@vue/test-utils"
 import { beforeEach, afterEach, expect, vi } from "vitest"
 import { defineComponent, h, type PropType, toRef } from "vue"
@@ -29,6 +30,7 @@ export const mountDonutMenu = (menuUser: User | null = user) =>
   helper
     .component(DonutMenuInAppShell)
     .withProps({ user: menuUser ?? undefined })
+    .withDirective("focus", focusDirective)
     .withRealRouter(router)
     .render()
 
@@ -51,8 +53,9 @@ export const panelItemLabels = () =>
     (el) => el.querySelector("[aria-label]")?.getAttribute("aria-label")
   )
 
-export const expectPanelClosed = () =>
-  expect(document.querySelector(".donut-menu-panel")).toBeNull()
+export const panel = () => document.querySelector(".donut-menu-panel")
+
+export const expectPanelClosed = () => expect(panel()).toBeNull()
 
 export const navItemOf = (label: string) =>
   screen.getByLabelText(label).closest(".nav-item")

@@ -34,6 +34,7 @@
           :logout="chooseLogout"
         />
       </ul>
+      <SearchForNoteAndFolder v-if="user" class="pt-2" quiet />
       <LoginButton v-else />
       <div class="flex items-center justify-end gap-2 pt-2 text-sm">
         <router-link to="/" class="text-neutral-400 no-underline">
@@ -56,6 +57,7 @@ import AutoCollapseDropdown from "@/components/commons/AutoCollapseDropdown.vue"
 import NavigationItem from "@/components/navigation/NavigationItem.vue"
 import AccountMenuItem from "@/components/toolbars/AccountMenuItem.vue"
 import LoginButton from "@/components/toolbars/LoginButton.vue"
+import SearchForNoteAndFolder from "@/components/search/SearchForNoteAndFolder.vue"
 import { useNavigationItems } from "@/composables/useNavigationItems"
 import { useResumeRecall } from "@/composables/useResumeRecall"
 import { useGoToNextAssimilation } from "@/composables/useGoToNextAssimilation"

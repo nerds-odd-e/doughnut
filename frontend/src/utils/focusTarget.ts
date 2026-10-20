@@ -1,4 +1,4 @@
-import { nextTick } from "vue"
+import { type Directive, nextTick } from "vue"
 
 const preferredFocusableSelector = [
   "input:not([type='hidden']):not([type='file']):not([disabled])",
@@ -135,4 +135,13 @@ export function scheduleFocusAutofocusTargetWithin(element: Element | null) {
   scheduleFocus(() => {
     focusAutofocusTargetWithin(element)
   })
+}
+
+/** The app-wide `v-focus`: autofocuses the element's focus target on mount unless bound to `false`. */
+export const focusDirective: Directive<HTMLElement, boolean | undefined> = {
+  mounted(el, binding) {
+    if (binding.value === false) return
+    el.setAttribute("data-autofocus", "true")
+    scheduleFocusTargetWithin(el)
+  },
 }

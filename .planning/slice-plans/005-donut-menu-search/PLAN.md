@@ -98,9 +98,13 @@ Take.
   form gains an opt-out of autofocus and a `navigate` emit for the panel to
   close on; `modalCloser` keeps its meaning for the modal callers, so the
   toolbar, folder, and wiki-link flows are untouched.
-- "Search entered" is panel-local state for one open: set by field focus,
-  a history pick, or the shortcut; cleared when the panel closes. The
-  results region renders only while it is set. No other search state moves.
+- "Search entered" is state for one open, held by `SearchForNoteAndFolder`
+  behind its `quiet` prop (the panel content remounts on every open, so it
+  clears when the panel closes): set by field focus or a history pick; the
+  shortcut enters it by focusing the field. The results region renders only
+  while it is set. `quiet` also opts out of autofocus through
+  `v-focus="!quiet"`; the single `focusDirective` in `utils/focusTarget.ts`
+  honours `false` and is what tests mount. No other search state moves.
 - The `note-search` registration moves from `GlobalBar` to `DonutMenu`,
   guarded by the signed-in user as today. It opens the dropdown and
   schedules focus into the field; `hasOpenModal()` makes it a no-op while a
@@ -147,7 +151,7 @@ broader E2E proof after publication.
 
 ### 1. The Donut menu panel holds the global search and opens quietly
 Type: Behavior
-Status: planned
+Status: done
 Proof: new `frontend/tests/toolbars/DonutMenu.search.spec.ts` (mounting through `donutMenuTestSupport`): after the launcher click the field is in the panel after the Account item and before "Donut by", `document.activeElement` is not the field, and no result section is rendered (fails first: focus lands in the field and Recent shows); clicking the field shows Recent notes; typing "Sed" with the search mock shows Matches; toggling "All My Circles" and switching to Recent keep the panel open; a visitor sees no field. `tests/wiki-link-or-relationship` and `tests/components/search` stay green; typecheck.
 
 Behavior: signed in, panel closed → press the launcher at any width → the
@@ -208,3 +212,15 @@ Behavior: phone with the keyboard open, or any short window, panel open into
 search → the panel ends within the window and scrolls, keeping the field and
 results reachable; wide windows stay anchored below the launcher. Story
 scope: panel fits the window.
+
+## Story obligations
+
+### G1. History pick entering search is untested
+Reported: slice 1 — "The history-pick route to entering search has no test in this slice."
+Story clause: "Picking a history key, toggling a scope control, or switching Matches/Recent keeps the panel open"
+Disposition: receiving slice 5
+
+### G2. Real Tab order into the field is untested
+Reported: slice 1 — "Tab-into-field is only covered through the focus event; real Tab order is slice 2's proof."
+Story clause: "Tab reaches the field after the panel items"
+Disposition: receiving slice 2

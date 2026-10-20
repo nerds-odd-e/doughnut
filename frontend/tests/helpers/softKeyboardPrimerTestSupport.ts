@@ -1,19 +1,8 @@
 import SoftKeyboardPrimer from "@/components/commons/SoftKeyboardPrimer.vue"
-import {
-  scheduleFocusTargetWithin,
-  softKeyboardPrimerId,
-} from "@/utils/focusTarget"
+import { softKeyboardPrimerId } from "@/utils/focusTarget"
 import { advanceAnimationFrame } from "@tests/helpers/focusTargetTestSupport"
 import { mount } from "@vue/test-utils"
 import { expect } from "vitest"
-
-/** Mirrors production `v-focus` for mounted-component tests. */
-export const focusDirective = {
-  mounted(el: HTMLElement) {
-    el.setAttribute("data-autofocus", "true")
-    scheduleFocusTargetWithin(el)
-  },
-}
 
 export function mountSoftKeyboardPrimer() {
   mount(SoftKeyboardPrimer, { attachTo: document.body })

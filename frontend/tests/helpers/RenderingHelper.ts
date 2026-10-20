@@ -102,6 +102,11 @@ class RenderingHelper<T = DefineComponent> {
     return this
   }
 
+  withDirective(name: string, directive: unknown) {
+    this.global.directives = { ...this.global.directives, [name]: directive }
+    return this
+  }
+
   withPlugin(plugin: unknown) {
     this.global.plugins = [...this.global.plugins, plugin]
     return this
