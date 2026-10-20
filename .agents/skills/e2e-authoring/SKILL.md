@@ -148,8 +148,8 @@ Use page objects with a fluent interface: methods perform an action and return t
   `noteShowHref`. Page objects and steps do not call `cy.visit` with SPA path
   strings (`scripts/check_e2e_spa_visit_gate.sh` in CI).
 - Signing in only establishes the session; it does not open the app. The first
-  `router().push` opens it, page objects that start from the main menu use
-  `withinMainMenuItem` (which calls `router().openApp()`), and a re-login
+  `router().push` opens it, page objects that start from the Donut menu use
+  `withinDonutMenuItem` (which calls `router().openApp()`), and a re-login
   reloads an app the scenario already opened. A scenario that never touches the
   web UI pays no page load.
 

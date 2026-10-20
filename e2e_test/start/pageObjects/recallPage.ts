@@ -1,6 +1,6 @@
 import { RecallsController } from '@generated/donut-backend-api/sdk.gen'
 import { commonSenseSplit } from 'support/string_util'
-import { waitUntilAppIsNotBusy, withinMainMenuItem } from '../pageBase'
+import { waitUntilAppIsNotBusy, withinDonutMenuItem } from '../pageBase'
 import router from '../router'
 import { assumeQuestionPage } from './QuizQuestionPage'
 import { recallDailyProbeMethods } from './recallDailyProbeMethods'
@@ -163,13 +163,13 @@ const recallPage = () => {
   }
 }
 export const recall = () => {
-  const getRecallListItemInSidebar = (
+  const getRecallInDonutMenu = (
     fn: ($el: Cypress.Chainable<JQuery<HTMLElement>>) => void
-  ) => withinMainMenuItem('Recall', fn)
+  ) => withinDonutMenuItem('Recall', fn)
 
   return {
     expectCount(numberOfNotes: number) {
-      getRecallListItemInSidebar(($el) => {
+      getRecallInDonutMenu(($el) => {
         if (numberOfNotes === 0) {
           $el.get('.recall-count').should('not.exist')
         } else {
@@ -207,7 +207,7 @@ export const recall = () => {
     },
     navigateToRecallPage() {
       router().push('root')
-      getRecallListItemInSidebar(($el) => {
+      getRecallInDonutMenu(($el) => {
         $el.click()
       })
       waitUntilAppIsNotBusy()

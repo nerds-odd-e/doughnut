@@ -86,6 +86,12 @@ class RenderingHelper<T = DefineComponent> {
     return this.withRouter(router)
   }
 
+  /** Renders the routed page inside `<router-view>` instead of a stub. */
+  withRoutedPages() {
+    delete this.global.stubs["router-view"]
+    return this
+  }
+
   withCurrentUser(user: User) {
     this.global.provide.currentUser = ref(user)
     return this

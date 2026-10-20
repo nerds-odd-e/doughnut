@@ -17,7 +17,6 @@ import {
   TestabilityRestController,
 } from "@generated/donut-backend-api/sdk.gen"
 import getEnvironment from "./managedApi/window/getEnvironment"
-import MainMenu from "./components/toolbars/MainMenu.vue"
 import SoftKeyboardPrimer from "./components/commons/SoftKeyboardPrimer.vue"
 import FrontendUpdateReminder from "./components/commons/FrontendUpdateReminder.vue"
 import { useFeatureToggle } from "./composables/useFeatureToggle"
@@ -82,22 +81,15 @@ onMounted(async () => {
         : undefined
     "
   />
-  <div class="flex bg-base-100 text-base-content app-container">
-    <div class="main-menu flex bg-neutral text-neutral-content z-[10000]">
-      <MainMenu
-        :user="user"
-      />
-    </div>
-    <div class="flex flex-col flex-grow overflow-y-auto overflow-x-hidden main-content">
-      <UserNewRegisterPage v-if="newUser" @update-user="user = $event" />
-      <template v-else-if="userLoaded">
-        <router-view v-slot="{ Component }">
-          <KeepAlive :include="['RecallPage']">
-            <component :is="Component" />
-          </KeepAlive>
-        </router-view>
-      </template>
-    </div>
+  <div class="flex flex-col overflow-y-auto overflow-x-hidden bg-base-100 text-base-content app-container">
+    <UserNewRegisterPage v-if="newUser" @update-user="user = $event" />
+    <template v-else-if="userLoaded">
+      <router-view v-slot="{ Component }">
+        <KeepAlive :include="['RecallPage']">
+          <component :is="Component" />
+        </KeepAlive>
+      </router-view>
+    </template>
   </div>
   <TestMenu
     v-if="environment === 'testing'"
@@ -108,71 +100,8 @@ onMounted(async () => {
 </template>
 
 <style scoped lang="scss">
-@use "@/assets/menu-variables.scss" as *;
-
 .app-container {
-  height: 100vh; // Default to viewport height for desktop (vertical menu)
+  height: 100vh;
   height: 100dvh; // Dynamic viewport height for mobile devices
-  display: flex;
-  overflow: hidden; // Prevent scrolling on desktop
-}
-
-.main-menu {
-  height: 100%;
-  width: $main-menu-width;
-  position: fixed; // Sticky for vertical menu on desktop
-  flex-shrink: 0;
-  z-index: 10000;
-  overflow: visible;
-}
-
-.main-content {
-  margin-left: $main-menu-width;
-  height: 100%;
-  min-width: 0;
-  flex: 1;
-  overflow-y: auto; // Only content area scrolls on desktop
-}
-
-@media (max-width: 1024px) {
-  .app-container {
-    height: 100vh; // Keep fixed height for proper page height calculations
-    height: 100dvh; // Dynamic viewport height for mobile devices
-    flex-direction: column;
-    overflow: hidden; // Prevent container scrolling
-  }
-
-  .main-menu {
-    position: fixed; // Fixed at top, always visible
-    top: 0;
-    left: 0;
-    width: auto;
-    height: $main-menu-height-tablet;
-    align-self: flex-start; // Align to left, not full width
-    z-index: 200;
-    background-color: transparent; // Remove parent background so menu-wrapper background shows
-  }
-
-  .main-content {
-    margin-left: 0;
-    width: 100%;
-    min-width: 0;
-    height: 100%; // Full height for proper page calculations
-    overflow-y: auto; // Allow content area to scroll independently
-  }
-}
-
-@media (max-width: 768px) {
-  .main-menu {
-    height: $main-menu-height-mobile;
-    background-color: transparent; // Remove parent background so menu-wrapper background shows
-  }
-
-  .main-content {
-    width: 100%;
-    min-width: 0;
-    height: 100%; // Full height for proper page calculations
-    overflow-y: auto; // Allow content area to scroll independently
-  }
 }
 </style>

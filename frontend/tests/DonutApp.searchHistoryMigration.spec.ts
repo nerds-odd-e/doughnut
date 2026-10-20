@@ -5,7 +5,11 @@ import {
   CurrentUserInfoController,
   TestabilityRestController,
 } from "@generated/donut-backend-api/sdk.gen"
-import helper, { mockSdkService, wrapSdkResponse } from "@tests/helpers"
+import helper, {
+  mockSdkService,
+  productionRouterAt,
+  wrapSdkResponse,
+} from "@tests/helpers"
 import {
   resetSearchKeyHistory,
   seedEncodedSearchKeyHistory,
@@ -18,7 +22,7 @@ import {
   renderSearchForm,
   setupSearchFormSdkMocks,
 } from "./wiki-link-or-relationship/searchDialogTestSupport"
-import { cleanup, screen } from "@testing-library/vue"
+import { cleanup, fireEvent, screen } from "@testing-library/vue"
 import { flushPromises } from "@vue/test-utils"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 
@@ -48,7 +52,15 @@ describe("DonutApp search history migration", () => {
       cookieAtCurrentUserRequest = document.cookie
       return Promise.resolve(wrapSdkResponse({}))
     })
-    helper.component(DonutApp).withRouter().render()
+    helper
+      .component(DonutApp)
+      .withRealRouter(await productionRouterAt({ name: "root" }))
+      .withRoutedPages()
+      .render()
+    await flushPromises()
+    await fireEvent.click(
+      await screen.findByRole("button", { name: "Donut menu" })
+    )
     await flushPromises()
     expect(screen.getByLabelText("Login via Github")).toBeVisible()
     expect(cookieAtCurrentUserRequest).toBeDefined()

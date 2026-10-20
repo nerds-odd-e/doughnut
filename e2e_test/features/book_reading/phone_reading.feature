@@ -34,7 +34,7 @@ Feature: Reading a book on a phone
     And I open the book attached to notebook "Refactoring read"
     When I tap the Book layout toggle
     Then the book layout should be open
-    And the book layout should be below the main menu
+    And the book layout should be below the page bar
 
   Scenario: Choosing a book block closes the book layout and moves the book there
     Given I have a notebook "Refactoring read"

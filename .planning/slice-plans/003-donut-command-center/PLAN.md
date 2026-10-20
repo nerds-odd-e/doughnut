@@ -160,7 +160,7 @@ with the bar: home and Bazaar. No E2E step selects the sign-in control.
 
 ### 4. One navigation arrangement at every width and on every screen
 Type: Behavior
-Status: planned
+Status: done
 Proof: E2E features `messages/message_center_with_unread_message_count`, `recall/property_memory_tracker`, `relationships/reify_property`, `learning_session/commissioned_learning_session`, `users/user_profile`, and the book-reading feature that asserts the layout below the bar, through page objects that open the panel; one new phone-width scenario choosing a destination from the launcher; launcher spec at the home route (`root`); `tests/toolbars` green; typecheck; Vite build; sweep reading.
 
 Behavior: at any window width, including after resizing, and on the home
@@ -175,6 +175,18 @@ drawer and safe-area offsets. Retarget `withinMainMenuItem`,
 `mainMenu().userOptions()`, and `expectBookLayoutBelowMainMenu` to open and
 scope to the panel. Run the named features first as the early probe; a
 failure there changes this slice before the sweep.
+
+Accepted: the shell is one scrolling column; `assets/page-bar.scss`
+(`$page-bar-height: 55px`, now the bar height at every width) sizes
+`GlobalBar` and offsets `SidebarDrawer`. E2E page objects open and scope to
+the panel (`withinDonutMenuItem`, `donutMenu()`, `donutMenuPanel()`).
+Proof: full frontend suite 2211 tests, typecheck, Vite build; E2E 31/31
+(named features, phone reading, signed-out features), 73/73 other callers,
+and after refactor 28/28 (phone_reading, message_center incl. the phone
+sheet and wide-anchoring scenarios, user_profile, show_failure_report,
+book_browsing). Sweep reading (2026-10-20): `git grep -n -I -E
+"VerticalMenu|HorizontalMenu|useBreakpoint|collapsed-menu-width|main-menu-height|main-menu-width|Toggle menu|is-expanded|\.main-menu|MainMenu|mainMenu|main menu|menu-variables|isWithinAutoCollapseDropdownTree"
+-- . ':!.planning'` returned nothing.
 
 ## Current decisions
 
@@ -206,12 +218,12 @@ Disposition: proved by slice 3: `DonutMenu.signedOut.spec` "offers only the sign
 ### G3. Narrow-window bar keeps the old menu's padding
 Reported: slice 2 — "While the old presentations remain, at 1024px and below the bar still has the padding left for HorizontalMenu, so the launcher sits after that region."
 Story clause: "The workspace no longer reserves a side column or a fixed top-left region for navigation."
-Disposition: receiving slice 4
+Disposition: proved by slice 4: `DonutApp.vue` and `GlobalBar.vue` hold no menu column, region, or padding; E2E `phone_reading.feature` "Open the book layout on a phone" asserts the book layout below the page bar, and the phone scenario in `message_center_with_unread_message_count.feature` opens the launcher at 390 * 844.
 
 ### G4. Panel sheet and anchoring are not asserted
 Reported: slice 2 — "The narrow-window full-width sheet and the wide-window anchoring are CSS only and not asserted in unit tests"
 Story clause: "anchored near the launcher on wide windows and as a full-width sheet below the bar on narrow windows"
-Disposition: receiving slice 4
+Disposition: proved by slice 4: `message_center_with_unread_message_count.feature` scenarios "On a phone, the Donut menu opens as a sheet below the page bar and takes me to the message center" (`donutMenuPanel().expectFullWidthSheetBelowPageBar()`) and "On a wide window, the Donut menu opens anchored below its launcher" (`expectAnchoredBelowLauncher()`).
 
 ### G5. Account list after the panel closes
 Reported: slice 2 — "If the Account sub-dropdown is open and the user clicks blank space inside its portaled list, the outer panel closes and that list may stay floating until the next click."

@@ -1,18 +1,18 @@
 import { assumeMessageCenterPage } from './messageCenterPage'
-import { waitUntilAppIsNotBusy, withinMainMenuItem } from '../pageBase'
+import { waitUntilAppIsNotBusy, withinDonutMenuItem } from '../pageBase'
 
 export function waitForMenuDataUnreadCount() {
   cy.intercept('GET', '**/api/user/menu-data**').as('menuDataForUnreadCount')
 }
 
 export function messageCenterIndicator() {
-  const getMessageInSidebar = (
+  const getMessagesInDonutMenu = (
     fn: ($el: Cypress.Chainable<JQuery<HTMLElement>>) => void
-  ) => withinMainMenuItem('Messages', fn)
+  ) => withinDonutMenuItem('Messages', fn)
 
   return {
     expectCount(unreadMessageCount: number) {
-      getMessageInSidebar(($el) => {
+      getMessagesInDonutMenu(($el) => {
         $el
           .findByText(`${unreadMessageCount}`, { selector: '.unread-count' })
           .should(($badge) => {
@@ -25,13 +25,13 @@ export function messageCenterIndicator() {
       return this
     },
     expectNoCount() {
-      getMessageInSidebar(($el) => {
+      getMessagesInDonutMenu(($el) => {
         $el.get('.unread-count').should('not.exist')
       })
       return this
     },
     go() {
-      getMessageInSidebar(($el) => {
+      getMessagesInDonutMenu(($el) => {
         $el.click()
       })
       waitUntilAppIsNotBusy()

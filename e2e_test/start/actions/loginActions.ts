@@ -1,5 +1,5 @@
 import { waitUntilAppIsNotBusy } from '../pageBase'
-import { mainMenu } from '../pageObjects/mainMenu'
+import { donutMenu } from '../pageObjects/donutMenu'
 import router from '../router'
 import { HealthCheckController } from '@generated/donut-backend-api/sdk.gen'
 
@@ -60,7 +60,7 @@ export const loginActions = {
 
   goToAdminDashboard() {
     cy.reload()
-    return mainMenu().adminDashboard()
+    return donutMenu().adminDashboard()
   },
 
   loginAsAdminAndGoToAdminDashboard() {

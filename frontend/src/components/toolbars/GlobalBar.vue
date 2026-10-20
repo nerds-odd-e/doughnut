@@ -47,21 +47,10 @@ useKeyboardShortcut("note-search", openNoteSearch, () => !!user?.value)
 </script>
 
 <style scoped lang="scss">
-@use "@/assets/menu-variables.scss" as *;
+@use "@/assets/page-bar.scss" as *;
 
-@media (max-width: 1024px) {
-  .daisy-navbar {
-    padding-left: $collapsed-menu-width-tablet;
-    height: $main-menu-height-tablet;
-    min-height: $main-menu-height-tablet;
-  }
-}
-
-@media (max-width: 768px) {
-  .daisy-navbar {
-    padding-left: $collapsed-menu-width-mobile;
-    height: $main-menu-height-mobile;
-    min-height: $main-menu-height-mobile;
-  }
+.daisy-navbar {
+  height: $page-bar-height;
+  min-height: $page-bar-height;
 }
 </style>

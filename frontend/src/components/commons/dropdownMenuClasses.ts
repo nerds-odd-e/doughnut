@@ -1,6 +1,6 @@
 export type DropdownMenuSize = "narrow" | "wide" | "history"
 
-/** Above main menu (10000). Inside modal dialogs the panel teleports into the dialog top layer. */
+/** Above page overlays such as the Donut menu panel. Inside modal dialogs the panel teleports into the dialog top layer. */
 export const dropdownMenuPortalZIndexClass = "z-[10001]"
 
 const dropdownMenuPanelBaseClass = `daisy-dropdown-content daisy-menu bg-base-100 rounded-box p-2 shadow ${dropdownMenuPortalZIndexClass}`

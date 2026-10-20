@@ -1,6 +1,6 @@
 import { UserController } from '@generated/donut-backend-api/sdk.gen'
 import type { MenuDataDto } from '@generated/donut-backend-api'
-import { waitUntilAppIsNotBusy, withinMainMenuItem } from '../../pageBase'
+import { waitUntilAppIsNotBusy, withinDonutMenuItem } from '../../pageBase'
 import {
   assimilationDueFromTriple,
   assimilationToastMessages,
@@ -8,12 +8,12 @@ import {
 } from './shared'
 
 export const assimilation = () => {
-  const getAssimilateListItemInSidebar = (
+  const getAssimilateInDonutMenu = (
     fn: ($el: Cypress.Chainable<JQuery<HTMLElement>>) => void
-  ) => withinMainMenuItem('Assimilate', fn)
+  ) => withinDonutMenuItem('Assimilate', fn)
 
-  const clickAssimilateListItemInSidebar = () => {
-    getAssimilateListItemInSidebar(($el) => {
+  const clickAssimilateInDonutMenu = () => {
+    getAssimilateInDonutMenu(($el) => {
       $el.click()
     })
   }
@@ -21,7 +21,7 @@ export const assimilation = () => {
   return {
     expectAssimilationNavBadge(dueOverTotal: string) {
       const [due, total] = dueOverTotal.split('/')
-      getAssimilateListItemInSidebar(($el) => {
+      getAssimilateInDonutMenu(($el) => {
         $el
           .findByText(due!, { selector: '.due-count' })
           .should(
@@ -46,7 +46,7 @@ export const assimilation = () => {
       return this
     },
     startAssimilationFromMenu() {
-      clickAssimilateListItemInSidebar()
+      clickAssimilateInDonutMenu()
       waitUntilAppIsNotBusy()
       return this
     },
@@ -60,7 +60,7 @@ export const assimilation = () => {
         }
       ).as('nextAssimilation')
 
-      clickAssimilateListItemInSidebar()
+      clickAssimilateInDonutMenu()
       cy.get('.loading-modal-mask', { timeout: 10000 }).should('be.visible')
       cy.contains('p.loading-message', 'Loading next note...').should(
         'be.visible'
@@ -78,7 +78,7 @@ export const assimilation = () => {
       return this
     },
     expectAssimilationMenuProgress() {
-      getAssimilateListItemInSidebar(($el) => {
+      getAssimilateInDonutMenu(($el) => {
         $el
           .find('[data-testid="assimilation-menu-progress"]')
           .should('be.visible')
