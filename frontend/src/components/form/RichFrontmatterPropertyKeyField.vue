@@ -1,11 +1,11 @@
 <template>
-  <div class="relative" @focusout="onFocusOut">
+  <div @focusout="onFocusOut">
     <input
       :id="inputId"
       :value="modelValue"
       type="text"
       autocapitalize="off"
-      class="daisy-input daisy-input-sm w-full min-w-[8rem] text-ellipsis"
+      class="daisy-input daisy-input-sm daisy-input-ghost w-full text-ellipsis"
       :aria-label="label"
       :aria-expanded="presetPanelOpen"
       :aria-controls="presetPanelOpen ? listId : undefined"

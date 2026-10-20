@@ -70,14 +70,25 @@ elements and their order. Wiki links retain their authored display labels,
 note or property destinations, and pending/dead status; URL properties
 retain external links for non-wiki URL elements.
 
+Property values wrap within the available width instead of scrolling or
+truncating: long prose, link labels, URLs and unbroken text stay fully
+visible, and when a row is narrow its value moves to its own line below the
+key. Detailed list items and their learning rows wrap the same way while their
+actions keep their width. Idle key and value fields have no border, so rows
+read as note details; the focused field shows an outline, including when
+reached by keyboard. Key presets open below the key field in the row's own
+flow, so they never cover the value or a specialized control. On touch
+devices (coarse pointer) property buttons and fields are at least 44 px high;
+with a fine pointer they stay compact. Resizing the window keeps an entered
+draft and its focus.
+
 Add property opens one local draft at the end of the shared property list and
 focuses its key. Selecting Add property again focuses the same draft. Add, or
 Enter in the value field, accepts a complete draft once; Enter in the key field
 moves focus to its value. Leaving a draft field saves nothing. Add with a blank
 key or value (after trimming) names the missing fields beside the draft and
 preserves the entered text. Cancel drops the draft and its message without
-saving; reopening starts empty. Add and Cancel are at least 44 px high on touch
-devices.
+saving; reopening starts empty.
 
 Drafts reuse the stored row's key presets and value displays, including wiki
 links, URL links, image upload and Wikidata association. Drafts have Add and

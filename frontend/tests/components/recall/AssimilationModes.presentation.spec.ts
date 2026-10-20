@@ -42,13 +42,25 @@ describe("AssimilationModes presentation", () => {
     expect(assimilateButton(wrapper, "COMMISSIONED")).toBeNull()
   })
 
-  it("uses equal-height grid rows and keeps compact rows compact", () => {
-    const wrapper = mountModes({
-      allowedModes: ["UNDERSTANDING", "SPELLING", "COMMISSIONED"],
-    })
+  it("aligns actions in one column after the labels, with equal-height rows, and keeps compact rows compact", () => {
+    const modes = ["UNDERSTANDING", "SPELLING", "COMMISSIONED"]
+    const wrapper = mountModes(
+      { allowedModes: modes },
+      { attachTo: document.body }
+    )
 
-    expect(wrapper.classes()).toContain("grid-cols-[max-content_minmax(0,1fr)]")
-    for (const mode of ["UNDERSTANDING", "SPELLING", "COMMISSIONED"]) {
+    const labelRights = modes.map(
+      (mode) =>
+        wrapper.element
+          .querySelector(`[data-test="mode-label-${mode}"]`)!
+          .getBoundingClientRect().right
+    )
+    const actionLefts = modes.map(
+      (mode) => actionSlot(wrapper, mode)!.getBoundingClientRect().left
+    )
+    expect(new Set(actionLefts).size).toBe(1)
+    expect(Math.max(...labelRights)).toBeLessThanOrEqual(actionLefts[0]!)
+    for (const mode of modes) {
       const row = wrapper.element.querySelector(
         `[data-test="assimilation-mode-row-${mode}"]`
       )
@@ -57,6 +69,7 @@ describe("AssimilationModes presentation", () => {
       expect(actionSlot(wrapper, mode)?.classList).toContain("min-h-12")
     }
 
+    wrapper.unmount()
     const compactWrapper = mountModes({
       allowedModes: ["UNDERSTANDING"],
       size: "sm",

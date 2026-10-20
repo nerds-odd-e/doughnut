@@ -11,7 +11,7 @@
     <input
       ref="valueInputRef"
       type="text"
-      class="daisy-input daisy-input-sm w-full"
+      class="daisy-input daisy-input-sm daisy-input-ghost w-full"
       :class="valueWrapperClass"
       :value="modelValue"
       :title="modelValue.trim()"

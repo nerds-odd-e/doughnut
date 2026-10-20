@@ -129,128 +129,6 @@ hour during refinement and resplit around a useful user outcome before
 execution. Do not make separate platform models or technical-only stories to
 force the estimate. This seed authorizes no implementation or slice plan.
 
-<a id="story-4"></a>
-
-### Read and edit complete property values comfortably in narrow windows
-
-**Identity:** SEED-078#story-4
-```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/007-readable-property-values/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"213d9e3c79b3c024ce9ffcce10e9531f676f9efe9cee68c936af8b46a480e448","plan":"be0c560ac316333e85d5b6ff03f1d5aa4a00b91a9710c657c64f6ec514b9c357"}}
-```
-
-- **Goal:** A learner or author inspecting note properties on a phone, iPad,
-  or narrow desktop window can read complete values, follow their links, and
-  use the existing editors comfortably. This fixes cramped property reading
-  independently of header changes or detail disclosure.
-- **Scope:**
-  - Required: expanded property content uses legible labels and complete
-    values that wrap or stack with available space. Long prose, link labels,
-    URLs, and unbroken values remain readable without horizontal panning of
-    the property section. Wide windows retain a readable arrangement.
-  - Required: retain the existing compact/expanded list journey. An open
-    property panel shows each authored list item in order, including repeated
-    values, with its existing per-value learning controls. Closing it restores
-    the compact value presentation; read-only properties remain readable and
-    followable under their existing access rule.
-  - Required: keep key editing, inline scalar editing, and the existing
-    scalar/list value dialog, their commit/cancel and validation behavior,
-    presets, and specialized image, URL, relation, and Wikidata controls.
-    Labels and controls stay reachable as space narrows; resizing must not
-    discard entered text. Reduce form-like borders while idle and make
-    editing and keyboard focus clear. Provide comfortable touch areas for
-    property actions, using the existing 44px touch-target convention.
-  - Required: preserve authored keys, values, ordering, wiki display labels,
-    resolved note/property destinations, pending/dead-link behavior, read-only
-    authorization, and learning identities. Existing rejection constraints
-    come from property validation and access rules; this story adds none.
-  - Deferred, not rejected: whole-section disclosure, timestamps and body
-    hierarchy (story 5), new property operations, a replacement editor or
-    metadata model, new learning policy, and a dialog-only reading workflow.
-    Existing list-dialog text fields keep their ordinary editing behavior;
-    this story does not redesign that dialog.
-  - Delete replaced layout rules and their exclusive consumers outright;
-    reconcile shared consumers. Record a one-time acceptance sweep as a
-    reading, with behavioral proof of the retained reading/editing journeys.
-- **Key examples:**
-  - A writable note contains a long prose scalar and a long labeled wiki link
-    → read properties in a narrow window → values wrap into visible lines;
-    follow the link → its actual note or property destination opens. Inline
-    edit the scalar and commit → the ordinary authored value is saved.
-  - A list contains a link, plain text twice, an empty authored item, and a
-    long unbroken value → expand its panel → every authored item remains in
-    order and readable; the repeated item keeps the existing shared tracker
-    identity and first-occurrence assimilation behavior. Follow a resolved
-    item or use its learning control → the current operation still applies
-    to that value. Collapse → compact links and Edit remain usable.
-  - Open the existing list editor on a phone → reorder repeated values and
-    save a valid change → authored order is committed. Cancel a later edit
-    → the saved value remains; submit invalid input → the existing feedback
-    and correction path remain reachable.
-  - Begin editing a property → narrow and widen the window → the draft and
-    keyboard focus remain usable. Idle rows look like readable note details;
-    focusing a field makes the edit affordance visible. Property actions
-    retain comfortable touch targets.
-  - A read-only viewer inspects the same long properties → the full display
-    and resolved links remain usable, with the existing editing restriction.
-    A saved unresolved link and a newly entered unresolved link retain their
-    different recovery/pending behavior.
-- **UI and system trade-off:** Continue the approved inline, wrapping
-  direction. Values may take more vertical space, keeping reading and actions
-  together; presentation changes leave authored data, editor state, route
-  resolution, and learning ownership with their existing owners. No new user
-  decision is needed for this already approved direction.
-- **Alternatives considered (Explore + Borrow):**
-  - Existing workaround: open the value dialog or pan a field. This reuses
-    editing but adds a step to reading and does not solve the expanded
-    learning list's overflow.
-  - Read-first view with a separate edit mode: quiet reading is plausible,
-    but it introduces a new interaction/state transition and changes the
-    approved inline-editing experience. Deferred.
-  - Recommended within the approved scope: borrow document reflow. Authored
-    properties correspond to ordered document entries; available width
-    changes their line breaks, not content or identity. Let values consume
-    vertical space and keep their actions reachable. The analogy stops at
-    interaction: links, editable fields, and learning controls need explicit
-    focus and activation proof. The browser observation below, rather than
-    the analogy, supports feasibility.
-- **Architecture:** Change the existing property presentation, keeping one
-  authored frontmatter model and one rendering/learning path per value.
-  `RichMarkdownEditor` already owns editing and validation;
-  `WikiLinkToken`/the scalar field own link interaction; the expanded panel
-  consumes the shared `AssimilationModes` rows. Preserve these responsibilities
-  and reconcile shared note-level consumers if their presentation changes.
-  Follow [ADR 0004](../../docs/adrs/0004-okf-compatible-notebook-markdown-accepted.md)
-  for authored content and
-  [ADR 0005](../../docs/adrs/0005-web-routes-accepted.md) for named note/property
-  destinations. No new API, persistence boundary, or ADR is needed.
-- **Investigation (2026-10-20, `4535beaeb57a2dd617c90f964ddf452a300fbd03`):**
-  In this preparation worktree, a disposable headless Chromium harness mounted
-  the real rich editor. It reproduced scalar horizontal overflow at 320px
-  (1426px scroll width in a 24px field) and expanded-list panel overflow.
-  Temporary reflow styles made complete values fit at 320/768/1280px, retained
-  duplicate list display, emitted an inline edit, and followed a labeled link
-  to its property destination; a read-only link also worked at 320px.
-  Disabling reflow failed all three width checks. Five probe cases and 32
-  existing link, learning, dialog, validation, row-editing and read-only cases
-  passed together. Scratch files/styles were removed before recording.
-  This establishes feasibility and the failure signal, not final design,
-  device usability, touch-keyboard behavior, or acceptance of an implementation.
-  A further two-case probe observed real coarse-pointer controls at least
-  44px high and retained scalar text/focus during resizing; the restored
-  editor/assimilation baseline passed 186 tests. Details are in the plan.
-- **Value / learning:** Fixes clipped-value reading without waiting for
-  navigation changes or a default disclosure preference.
-- **Effort hypothesis:** S, 40–60 minutes, medium confidence after the local
-  reflow observation. Reuse existing editors and list/learning ownership;
-  reassess the story boundary if execution invalidates the one-hour hypothesis.
-- **Depends on:** No blocking supplier story. SEED-064#story-7 is completed
-  ([completion record](../done/SEED-064_story-7.json)); its expanded-list journey
-  is present and documented in
-  [Rich property editing](../../docs/note-content-saving.md#rich-property-editing).
-  Preserve it through ordinary reconciliation, without duplicating navigation.
-- **Safe stopping point:** Readable, operable expanded properties stand alone
-  while all detail sections remain expanded and the current header remains.
-
 <a id="story-5"></a>
 
 ### Focus on note content while revealing details when needed
@@ -270,7 +148,7 @@ force the estimate. This seed authorizes no implementation or slice plan.
   theme-aware hierarchy to this reading surface. Keep the exact authored
   title, including any date prefix, and existing inline editing. Disclosure
   must preserve an in-progress property edit and make validation feedback
-  discoverable. Property row/editor redesign belongs to story 4.
+  discoverable. Keep the existing property row and editor presentation.
 - **Evaluation:** Open a note with several properties: its compact summary
   leaves the title and body prominent. Reveal properties and timestamps to
   inspect the same values and dates, then continue inline editing. An authored
@@ -299,7 +177,7 @@ Taken work and the relative order of unrelated queued stories stay unchanged.
 
 Each story retains useful value if later stories are cancelled; shared
 conceptual ownership and ordinary reconciliation avoid artificial supplier
-dependencies. Story 5 is first to drop for scope reduction, then story 4; retain
+dependencies. Story 5 is first to drop for scope reduction; retain
 the selected command-center/search and shared-header outcomes as the core.
 If early use challenges menu discoverability or refinement invalidates the
 hour-long sizing hypothesis, return to that story's boundary before planning

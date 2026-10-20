@@ -195,6 +195,12 @@ wrapper.findComponent(MyButton)
 wrapper.find("[data-testid='my-component']")
 ```
 
+## Layout and Pointer Tests
+
+- Prove that text is visible with geometry: `scrollWidth <= clientWidth`, and range or element rectangles inside their row. Checking `textContent` alone misses clipped text.
+- Browser specs use production CSS. Set the container width, or call `page.viewport` for breakpoint (`sm:`) behavior; the default viewport is 414px wide.
+- Name a spec `*.touch.spec.ts` when it needs a real coarse pointer. The `chromium-touch` browser instance in `vitest.config.ts` runs those files with touch emulation, so `(pointer: coarse)` matches. Do not substitute a `matchMedia` stub.
+
 ## Deterministic Tests
 
 - Tests must always execute the same way.

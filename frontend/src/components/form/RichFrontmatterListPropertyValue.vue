@@ -1,14 +1,14 @@
 <template>
   <span
     v-if="!showUrlLinks && !showWikiLinks"
-    class="block min-w-0 truncate text-sm text-base-content/90"
+    class="block min-w-0 wrap-anywhere text-sm text-base-content/90"
     :title="title"
     data-testid="rich-note-property-row-list-value"
     >{{ compactDisplayForPropertyValue(value) }}</span
   >
   <span
     v-else
-    class="rich-content-wiki-links inline-flex min-w-0 max-w-full flex-wrap items-center text-sm text-base-content/90"
+    class="rich-content-wiki-links inline-flex min-w-0 max-w-full flex-wrap items-center wrap-anywhere text-sm text-base-content/90"
     :title="title"
     data-testid="rich-note-property-row-list-value"
   >
@@ -22,7 +22,7 @@
         @dead-wiki-link-click="emit('deadWikiLinkClick', $event)"
       />
       <span v-else class="inline-flex min-w-0 max-w-full items-center gap-1">
-        <span class="truncate">{{ item }}</span>
+        <span class="min-w-0">{{ item }}</span>
         <RichFrontmatterPropertyExternalLink
           v-if="showUrlLinks && item.trim()"
           kind="url"
