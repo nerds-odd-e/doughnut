@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "identity": "SEED-078#story-3",
+  "title": "Use note actions and folder context from one adaptive top bar",
+  "completedAt": "2026-10-20T05:54:28.600Z",
+  "developer": "Terry Yin",
+  "agent": "Kirara-chan",
+  "host": "claude",
+  "model": "opus"
+}

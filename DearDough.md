@@ -119,7 +119,7 @@ Former local code: DD-216. An abbreviated published-base SHA is accepted as an a
 Former local code: DD-217. Former local code: DD-222. The slice time bound is checked only at hand-back, so a delegated slice runs past it and is accepted or extended without re-sizing. Open, unqueued. [Evidence and response](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/finding-names.md#odf-206).
 
 ### Occurrences
-- Execution: SEED-078#story-3 (plan `.planning/slice-plans/006-adaptive-note-header/PLAN.md`, first implementation commit 7d122c9938)
+- Execution: SEED-078#story-3 (plan recoverable at `3022ecdf62:.planning/slice-plans/006-adaptive-note-header/PLAN.md`, first implementation commit 7d122c9938)
   - Timestamp: 2026-10-20T14:13:39+09:00
   - Tool: Claude Code
   - Model: claude-opus-5-5
@@ -339,7 +339,7 @@ The plan's acceptance sweep for a removed control listed `dialog\[open\]` among 
 The slice 2 delegation named every plan proof row, including direct reachability of voice starting/converting/Retry at narrow width and Assimilate plus recording fitting together. The first return reported them as untested gaps while presenting the slice as done. The coordinator returned them for the same slice; the new fit test showed More off-screen (right edge 362px at a 320px window) and the implementer fixed the header flex sizing.
 
 ### Occurrences
-- Execution: SEED-078#story-3 (plan `.planning/slice-plans/006-adaptive-note-header/PLAN.md`, first implementation commit 7d122c9938)
+- Execution: SEED-078#story-3 (plan recoverable at `3022ecdf62:.planning/slice-plans/006-adaptive-note-header/PLAN.md`, first implementation commit 7d122c9938)
   - Timestamp: 2026-10-20T14:13:39+09:00
   - Tool: Claude Code
   - Model: claude-opus-5-5
