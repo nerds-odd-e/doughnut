@@ -104,9 +104,13 @@ onUnmounted(() => document.removeEventListener("keydown", closeOnEscape))
 </script>
 
 <style scoped lang="scss">
+@use "@/assets/page-bar.scss" as *;
+
 .donut-menu-panel {
   width: max-content;
   max-width: calc(100vw - 2rem);
+  max-height: calc(100dvh - #{$page-bar-bottom});
+  overflow-y: auto;
 }
 
 @media (max-width: 640px) {

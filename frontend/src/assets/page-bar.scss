@@ -1,2 +1,4 @@
-// The shared page bar height; drawers below the bar offset by it.
+// The shared page bar height.
 $page-bar-height: 55px;
+// Where the page bar ends; content below the bar starts here.
+$page-bar-bottom: calc(#{$page-bar-height} + env(safe-area-inset-top, 0px));

@@ -120,7 +120,9 @@ Take.
   beside the panel's `data-dropdown-portal-for`, both read through
   `dropdownPortalContext.ts`.
 - The panel gets a max height of the window below the bar with vertical
-  scrolling; the phone sheet and wide anchoring rules stay.
+  scrolling; the phone sheet and wide anchoring rules stay. "Below the bar"
+  is `$page-bar-bottom` in `assets/page-bar.scss` (bar height plus the top
+  safe-area inset), shared with `SidebarDrawer`.
 - The bar's `PopButton`, its `SearchForm` import, `searchNotePopButtonRef`,
   `openNoteSearch`, the `useKeyboardShortcut` call, and the `Search` icon
   import leave `GlobalBar.vue`; `GlobalBar.spec` keeps only launcher and
@@ -226,7 +228,7 @@ example: history pick.
 
 ### 6. The panel fits a short window
 Type: Behavior
-Status: planned
+Status: done
 Proof: browser-mode layout spec (extend `DonutMenu.layout.spec.ts` when plan 004 has landed it, else create it) at `page.viewport(390, 500)` with search entered and results: the panel's bottom is within the window and its content scrolls (`scrollHeight > clientHeight`) with the field reachable by `scrollIntoView` (fails first); the 390 phone-sheet and 1200 anchored cases stay green. Typecheck.
 
 Behavior: phone with the keyboard open, or any short window, panel open into
@@ -250,3 +252,8 @@ Disposition: no user cost "so the page bar no longer carries a second, persisten
 Reported: slice 1 — "Tab-into-field is only covered through the focus event; real Tab order is slice 2's proof."
 Story clause: "Tab reaches the field after the panel items"
 Disposition: proved by slice 2: `DonutMenu.search.spec.ts` "reaches the field by Tab after the panel items" presses real `userEvent.tab()` from the launcher through the panel items and observes the field focused
+
+### G4. A non-zero top safe-area inset is untested
+Reported: slice 6 — "Nothing tests a non-zero safe-area inset. Browser tests and E2E cannot simulate `env(safe-area-inset-top)`, so the notch fix itself is not observed by any test."
+Story clause: "on a phone with the keyboard open or on a short window the panel scrolls within the space below the bar"
+Disposition: no user cost "living inside the Donut menu panel at every width": the panel's max height uses the same `$page-bar-bottom` expression that already places `SidebarDrawer` below the bar on notched phones, and the 390×500 layout spec proves the scroll-within-window behavior with the inset at zero
