@@ -133,7 +133,10 @@ describe("NoteToolbar more-options overflow", () => {
     await wrapper.setProps(noteToolbarProps(makeMe.aNoteRealm.please()))
     await flushPromises()
 
-    const details = wrapper.find("[data-auto-collapse-dropdown]")
-    expect((details.element as HTMLDetailsElement).open).toBe(false)
+    const details = noteToolbarAction(
+      wrapper,
+      noteMoreOptionsTitles.overflowMenu
+    ).element.closest("details")
+    expect(details?.open).toBe(false)
   })
 })

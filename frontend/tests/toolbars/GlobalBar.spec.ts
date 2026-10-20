@@ -64,24 +64,22 @@ describe("global bar", () => {
     matchMediaSpy = undefined
   })
 
-  it("puts the Donut menu launcher first in the bar when signed in", async () => {
-    helper.component(GlobalBar).withCurrentUser(user).withRouter().render()
+  it.each([
+    { state: "signed in", signedIn: true },
+    { state: "signed out", signedIn: false },
+  ])(
+    "puts the Donut menu launcher first in the bar when $state",
+    async ({ signedIn }) => {
+      renderGlobalBarWithSearchShortcut(signedIn ? user : undefined)
 
-    const firstControl = document
-      .querySelector("nav")!
-      .querySelector("button, summary, a, input")
-    expect(firstControl).toBe(
-      screen.getByRole("button", { name: "Donut menu" })
-    )
-  })
-
-  it("puts the Donut menu launcher in the bar when signed out", async () => {
-    renderGlobalBarWithSearchShortcut()
-
-    expect(
-      screen.getByRole("button", { name: "Donut menu" })
-    ).toBeInTheDocument()
-  })
+      const firstControl = document
+        .querySelector("nav")!
+        .querySelector("button, summary, a, input")
+      expect(firstControl).toBe(
+        screen.getByRole("button", { name: "Donut menu" })
+      )
+    }
+  )
 
   it("hides undo when there is nothing to undo", async () => {
     helper.component(GlobalBar).withCurrentUser(user).withRouter().render()

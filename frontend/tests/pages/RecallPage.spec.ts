@@ -6,6 +6,7 @@ import { mockSdkService, wrapSdkError, wrapSdkResponse } from "@tests/helpers"
 import { flushPromises } from "@vue/test-utils"
 import { describe, expect, it } from "vitest"
 import { ref } from "vue"
+import { donutMenuLaunchersIn } from "@tests/toolbars/donutMenuTestSupport"
 import {
   createMemoryTrackerLite,
   givenRecallQueue,
@@ -98,6 +99,7 @@ describe("RecallPage Daily probe entry", () => {
 
     expect(showsDailyProbe(wrapper)).toBe(true)
     expect(showsRecallPrompt(wrapper)).toBe(false)
+    expect(donutMenuLaunchersIn(wrapper)).toHaveLength(1)
   })
 
   it("loads ordinary recall when Daily probe is off", async () => {
@@ -128,6 +130,7 @@ describe("RecallPage Daily probe entry", () => {
     ).toBe(true)
     expect(showsDailyProbe(wrapper)).toBe(false)
     expect(showsRecallPrompt(wrapper)).toBe(false)
+    expect(donutMenuLaunchersIn(wrapper)).toHaveLength(1)
   })
 
   it("offers Daily probe after retry succeeds with today's run still due", async () => {

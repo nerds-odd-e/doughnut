@@ -1,6 +1,6 @@
 import PdfBookViewer from "@/components/book-reading/PdfBookViewer.vue"
 import { NotebookBooksController } from "@generated/donut-backend-api/sdk.gen"
-import { mockSdkService } from "@tests/helpers"
+import { mockSdkService, wrapSdkError } from "@tests/helpers"
 import makeMe from "donut-test-fixtures/makeMe"
 import { flushPromises } from "@vue/test-utils"
 import { beforeAll, beforeEach, describe, expect, it, vi } from "vitest"
@@ -8,6 +8,11 @@ import {
   clickBookBlockAndExpectSelection,
   emitViewportAndSettleCurrentBlock,
 } from "./bookReadingPageInteractionTestSupport"
+import {
+  donutMenuLaunchersIn,
+  donutMenuPanelIn,
+  openDonutMenuIn,
+} from "@tests/toolbars/donutMenuTestSupport"
 import { spyOnScrollToBookNavTarget } from "./bookReadingPagePdfViewerTestSupport"
 import {
   type BookReadingPageWrapper,
@@ -67,6 +72,18 @@ describe("BookReadingPage", () => {
       expect(wrapper.find('[data-testid="pdf-book-viewer"]').exists()).toBe(
         false
       )
+      expect(donutMenuLaunchersIn(wrapper)).toHaveLength(1)
+    })
+
+    it("keeps the Donut menu when the book cannot be fetched", async () => {
+      vi.spyOn(NotebookBooksController, "getBook").mockResolvedValue(
+        wrapSdkError("not found")
+      )
+
+      const wrapper = mountBookReadingPage(notebookId)
+      await flushPromises()
+
+      expect(donutMenuLaunchersIn(wrapper)).toHaveLength(1)
     })
 
     it("shows loading indicator while PDF is loading, hides it after render", async () => {
@@ -87,6 +104,7 @@ describe("BookReadingPage", () => {
       expect(wrapper.find('[data-testid="pdf-book-viewer"]').exists()).toBe(
         false
       )
+      expect(donutMenuLaunchersIn(wrapper)).toHaveLength(1)
 
       resolveFetch(
         new Response(getTopMathsPdfBytes().slice(0), {
@@ -101,6 +119,33 @@ describe("BookReadingPage", () => {
         true
       )
       expect(wrapper.find(".daisy-loading-spinner").exists()).toBe(false)
+      expect(donutMenuLaunchersIn(wrapper)).toHaveLength(1)
+    })
+
+    it("keeps the Donut menu open when the book file finishes loading", async () => {
+      stubGetBookPlain(notebookId)
+      let resolveFetch!: (r: Response) => void
+      vi.spyOn(globalThis, "fetch").mockImplementation(
+        () =>
+          new Promise<Response>((resolve) => {
+            resolveFetch = resolve
+          })
+      )
+      const wrapper = mountBookReadingPage(notebookId)
+      await flushPromises()
+      await openDonutMenuIn(wrapper)
+      expect(donutMenuPanelIn(wrapper).exists()).toBe(true)
+
+      resolveFetch(
+        new Response(getTopMathsPdfBytes().slice(0), {
+          status: 200,
+          headers: { "Content-Type": "application/pdf" },
+        })
+      )
+      await waitForPdfViewer(wrapper)
+
+      expect(donutMenuPanelIn(wrapper).exists()).toBe(true)
+      expect(donutMenuLaunchersIn(wrapper)).toHaveLength(1)
     })
 
     it("loads EPUB into viewer with book title in bar, no PDF viewer", async () => {

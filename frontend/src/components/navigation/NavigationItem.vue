@@ -23,7 +23,7 @@
       <AssimilationMenuProgress v-if="name === 'assimilate'" />
     </div>
     <router-link
-      v-else-if="name && !hasDropdown && !isNavigationActionItem(name)"
+      v-else-if="name && !isNavigationActionItem(name)"
       :to="{ name: name }"
       :aria-label="label"
       class="flex flex-col items-center"
@@ -37,13 +37,13 @@
       <span class="label">{{ label }}</span>
       <AssimilationMenuProgress v-if="name === 'assimilate'" />
     </router-link>
-    <a
-      v-else-if="isNavigationActionItem(name) && !hasDropdown"
+    <button
+      v-else
+      type="button"
       :aria-label="label"
-      tabindex="0"
-      class="flex flex-col items-center"
-      @click.prevent="onActionClick"
-      @keydown.enter.prevent="onActionClick"
+      :aria-expanded="isNavigationActionItem(name) ? undefined : expanded"
+      class="flex flex-col items-center w-full cursor-pointer"
+      @click="onClick"
     >
       <div class="icon-container">
         <component :is="icon" :size="24" />
@@ -53,36 +53,11 @@
       </div>
       <span class="label">{{ label }}</span>
       <AssimilationMenuProgress v-if="name === 'assimilate'" />
-    </a>
-
-    <AutoCollapseDropdown
-      v-if="hasDropdown && !nonClickable"
-      v-slot="{ closeDropdown }"
-      class="daisy-dropdown daisy-dropdown-bottom daisy-dropdown-end lg:daisy-dropdown-top lg:daisy-dropdown-right overflow-visible"
-    >
-      <summary
-        tabindex="0"
-        role="button"
-        class="flex flex-col items-center cursor-pointer list-none"
-        :aria-label="label"
-      >
-        <div class="icon-container">
-          <component :is="icon" :size="24" />
-          <div v-if="badge" :class="badgeClass" :title="badgeTitle">
-            {{ badge }}
-          </div>
-        </div>
-        <span class="label">{{ label }}</span>
-        <AssimilationMenuProgress v-if="name === 'assimilate'" />
-      </summary>
-
-      <slot name="dropdown" :closeDropdown="closeDropdown"></slot>
-    </AutoCollapseDropdown>
+    </button>
   </div>
 </template>
 
 <script setup lang="ts">
-import AutoCollapseDropdown from "@/components/commons/AutoCollapseDropdown.vue"
 import AssimilationMenuProgress from "@/components/navigation/AssimilationMenuProgress.vue"
 import { isNavigationActionItem } from "@/components/navigation/navigationActionItems"
 import type { NavigationItemProps } from "@/components/navigation/navigationItem"
@@ -92,13 +67,16 @@ const { name } = defineProps<NavigationItemProps>()
 const emit = defineEmits<{
   (e: "resumeRecall"): void
   (e: "goToNextAssimilation"): void
+  (e: "toggle"): void
 }>()
 
-const onActionClick = () => {
+const onClick = () => {
   if (name === "resumeRecall") {
     emit("resumeRecall")
   } else if (name === "assimilate") {
     emit("goToNextAssimilation")
+  } else {
+    emit("toggle")
   }
 }
 </script>
@@ -164,12 +142,5 @@ const onActionClick = () => {
 
 .label {
   font-size: 0.8rem;
-}
-
-summary::marker {
-  display: none;
-}
-summary::-webkit-details-marker {
-  display: none;
 }
 </style>

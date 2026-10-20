@@ -26,7 +26,7 @@ function withinConversationList(fn: () => void) {
   cy.get('.message-center-container').within(fn)
 }
 
-export const assumeMessageCenterPage = () => {
+const assumeMessageCenterPage = () => {
   cy.findByText('Message Center').should('be.visible')
 
   return {

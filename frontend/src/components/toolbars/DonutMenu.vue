@@ -14,7 +14,9 @@
     </summary>
     <div
       v-if="open"
-      class="donut-menu-panel daisy-dropdown-content z-50 bg-neutral rounded-box shadow-lg p-2"
+      role="region"
+      aria-label="Donut menu panel"
+      class="daisy-dropdown-content z-50 bg-neutral rounded-box shadow-lg p-2"
     >
       <ul v-if="user" class="grid grid-cols-4 gap-2">
         <li
@@ -29,10 +31,7 @@
             @goToNextAssimilation="goToNextAssimilation"
           />
         </li>
-        <AccountMenuItem
-          :user="user"
-          :logout="chooseLogout"
-        />
+        <AccountMenuItem :user="user" :logout="logout" @choose="close" />
       </ul>
       <LoginButton v-else />
       <div class="flex items-center justify-end gap-2 pt-2 text-sm">
@@ -70,11 +69,6 @@ const { upperNavItems, lowerNavItems } = useNavigationItems()
 const { resumeRecall } = useResumeRecall()
 const { goToNextAssimilation } = useGoToNextAssimilation()
 
-const chooseLogout = () => {
-  logout()
-  close()
-}
-
 const route = useRoute()
 watch(() => route.fullPath, close)
 
@@ -86,7 +80,7 @@ onUnmounted(() => document.removeEventListener("keydown", closeOnEscape))
 </script>
 
 <style scoped lang="scss">
-.donut-menu-panel {
+.donut-menu > .daisy-dropdown-content {
   width: max-content;
   max-width: calc(100vw - 2rem);
 }
@@ -96,7 +90,7 @@ onUnmounted(() => document.removeEventListener("keydown", closeOnEscape))
     position: static;
   }
 
-  .donut-menu-panel {
+  .donut-menu > .daisy-dropdown-content {
     left: 0;
     right: 0;
     width: auto;

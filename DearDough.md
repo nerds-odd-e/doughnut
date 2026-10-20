@@ -5,7 +5,7 @@ responses under observation live in the [watch list](https://github.com/terryyin
 Detailed observations, original releases and qualified inferences are retained
 in the linked Open Dough catalog. Unknown execution provenance remains unknown.
 
-- Highest allocated local number: 253. Removed numbers are never reused.
+- Highest allocated local number: 255. Removed numbers are never reused.
 - Full source recovery before this cleanup: `0a8878e98be76b8e92203515d8f4719489b24169:DearDough.md`.
 - Full source recovery before name adoption and compaction: `234f141b41332715edd5e4384a425bcb8f26e718:DearDough.md`; complete supplied evidence retained in Open Dough `dbe36711c0e4ff9421bc28afc53cb7477203e704:docs/maintainer/findings/`.
 - Project-owned findings remain in [Donut Retrospective Findings](DonutRetrospectiveFindings.md); their ownership review is unchanged.
@@ -273,3 +273,35 @@ When the always-visible menu was replaced by a panel that is rendered only while
   - Evidence: CI run 39354041674 attempt 1 on 448d6fd, `recall/browse_answer_and_notes_while_recalling.feature` "Unable to find a label with the text of: Resume"; repaired in 0202d4a (`e2e_test/start/pageObjects/recallPage.ts`).
   - Observed effect: one CI failure and one repair cycle (stash, repair agent, refactor pass, publication).
   - Inference: the search covered the helpers being retargeted, but not every lookup of the moved control's accessible names. The relationship to ODF-272 (shared accessible-name consumers missed) is likely but unconfirmed.
+
+<a id="dd-254"></a>
+
+## DD-254 — A deviation from a recorded plan decision was accepted as a placement choice and lost the decision's purpose
+
+The plan decided that each page renders one page bar outside its loading and error gates, with only page-specific contents conditional. The slice 3 implementer instead rendered a temporary bar while loading that a different bar replaced once loaded, and asked the coordinator to accept or reject that shape. The coordinator accepted it as a routine placement choice and then offered the same shape to slice 4. Each slice's proof checked that a launcher existed in each state, not that it kept working across the change from loading to loaded. When loading finished, the bar was replaced and a panel opened during loading closed.
+
+### Occurrences
+- Execution: SEED-078#correction-1 (plan recoverable at `413c7f4f0e:.planning/slice-plans/004-donut-menu-reach-and-keyboard/PLAN.md`, first implementation commit b664e2afc9)
+  - Timestamp: 2026-10-20T11:43:50+09:00
+  - Tool: Claude Code
+  - Model: claude-opus-5-5
+  - Open Dough release: 0.3.66
+  - Evidence: plan "Current decisions" (one `GlobalBar` outside the gates); slice 3 commit 333642b (`<GlobalBar v-if="!bootstrap" />`) and slice 4 commit 7ec9e67; slice 5 local E2E and CI run 39360839469 on 7ec9e67 (`assimilation_walkthrough`, 5 scenarios: "Expected to find element: `[role=\"region\"][aria-label=\"Donut menu panel\"]`"); repaired in 484ce25 with "keeps the Donut menu open when … finishes loading" tests that failed on 7ec9e67.
+  - Observed effect: one CI failure, one repair cycle (stash, repair agent, a coordinator decision for book reading, refactor pass, publication), and a red trunk-bound branch tip for about 25 minutes.
+  - Inference: the decision text did not state why one bar instance mattered, and acceptance treated a deviation from a recorded decision as routine placement, not as a change to that decision whose purpose needed checking. The timestamp is the slice 3 commit time.
+
+<a id="dd-255"></a>
+
+## DD-255 — Asking the refactor pass to verify one named promise caught a regression that slice proof missed
+
+For slice 6, the coordinator asked the refactor agent to confirm, read-only unless broken, that choosing an Account action still closes the panel, including a link to the page already shown. Before slice 6, the Account list was teleported outside the panel, so every action counted as an outside click and closed it by accident; no test observed the same-page case. Moving the list inside the panel broke that case. The refactor agent added a test that failed and made the list emit a close.
+
+### Occurrences
+- Execution: SEED-078#correction-1 (plan recoverable at `413c7f4f0e:.planning/slice-plans/004-donut-menu-reach-and-keyboard/PLAN.md`, first implementation commit b664e2afc9)
+  - Timestamp: 2026-10-20T12:16:59+09:00
+  - Tool: Claude Code
+  - Model: claude-opus-5-5
+  - Open Dough release: 0.3.66
+  - Evidence: slice 6 commit 25ec462, `DonutMenu.spec.ts` "closes when the account destination already shown is chosen" (failed 20/21 against the slice 6 implementation), `AccountMenuItem.vue` `@choose`.
+  - Observed effect: the regression was fixed before delivery at the cost of one refactor pass of about 10 minutes.
+  - Inference: a useful practice when a promise was previously kept only by a side effect of the structure being removed. The fix added behavior inside the refactor pass, which the refactor contract does not normally do (compare ODF-268); the timestamp is the slice 6 commit time.

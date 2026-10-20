@@ -9,7 +9,7 @@
   >
     {{ currentBlockLiveText }}
   </div>
-  <GlobalBar>
+  <Teleport :to="barTarget">
     <BookLayoutToggleButton
       v-model:opened="bookLayoutOpened"
       :panel-id="bookReadingBookLayoutPanelId"
@@ -32,7 +32,7 @@
     <slot name="bar-end">
       <span class="ml-auto shrink-0" aria-hidden="true" />
     </slot>
-  </GlobalBar>
+  </Teleport>
   <BookReadingBookLayout
     v-model:opened="bookLayoutOpened"
     :panel-id="bookReadingBookLayoutPanelId"
@@ -121,16 +121,16 @@ import BookReadingBookLayout from "@/components/book-reading/BookReadingBookLayo
 import CurrentBlockNavigationBar from "@/components/book-reading/CurrentBlockNavigationBar.vue"
 import ReadingControlPanel from "@/components/book-reading/ReadingControlPanel.vue"
 import ReadingOverlayDock from "@/components/book-reading/ReadingOverlayDock.vue"
-import GlobalBar from "@/components/toolbars/GlobalBar.vue"
 import type { BookReadingSession } from "@/composables/useBookReadingSession"
 import { useSidebarDrawer } from "@/composables/useSidebarDrawer"
-import { onMounted, onUnmounted } from "vue"
+import { bookReadingBarTargetKey } from "@/composables/bookReadingBarTarget"
+import { inject, onMounted, onUnmounted } from "vue"
 
 /**
  * The reading view both formats share, bound to one reading session. `format` keeps each
  * format's current markup: PDF's live announcement, load error, and framed pane; EPUB's
  * title test id. Reorganizing and the "Now reading" bar are wired only when the session
- * allows reorganizing.
+ * allows reorganizing. Its book controls go into the book reader's page bar.
  */
 
 const props = defineProps<{
@@ -146,6 +146,7 @@ const emit = defineEmits<{
 }>()
 
 const bookReadingBookLayoutPanelId = "book-reading-book-layout-panel"
+const barTarget = inject(bookReadingBarTargetKey)!
 
 const {
   notebookId,

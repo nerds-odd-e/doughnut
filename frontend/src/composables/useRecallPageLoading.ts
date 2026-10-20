@@ -45,7 +45,7 @@ export function useRecallPageLoading(options: {
   } = options
 
   const { catchUpDueRecalls } = useRecallCatchUp()
-  const isProgressBarVisible = ref(true)
+  const isGlobalBarVisible = ref(true)
   const isLoadingMore = ref(false)
 
   const applyDueList = (response: DueMemoryTrackers, dueInDays?: number) => {
@@ -111,16 +111,16 @@ export function useRecallPageLoading(options: {
   })
 
   onActivated(() => {
-    isProgressBarVisible.value = true
+    isGlobalBarVisible.value = true
     catchUpDueRecalls()
   })
 
   onDeactivated(() => {
-    isProgressBarVisible.value = false
+    isGlobalBarVisible.value = false
   })
 
   return {
-    isProgressBarVisible,
+    isGlobalBarVisible,
     isLoadingMore,
     loadMore,
   }

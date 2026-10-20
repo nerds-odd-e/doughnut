@@ -1,5 +1,4 @@
-import { assumeMessageCenterPage } from './messageCenterPage'
-import { waitUntilAppIsNotBusy, withinDonutMenuItem } from '../pageBase'
+import { withinDonutMenuItem } from '../pageBase'
 
 export function waitForMenuDataUnreadCount() {
   cy.intercept('GET', '**/api/user/menu-data**').as('menuDataForUnreadCount')
@@ -29,13 +28,6 @@ export function messageCenterIndicator() {
         $el.get('.unread-count').should('not.exist')
       })
       return this
-    },
-    go() {
-      getMessagesInDonutMenu(($el) => {
-        $el.click()
-      })
-      waitUntilAppIsNotBusy()
-      return assumeMessageCenterPage()
     },
   }
 }

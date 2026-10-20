@@ -1,7 +1,5 @@
 const DROPDOWN_PORTAL_GAP_PX = 8
 
-const LG_MEDIA_QUERY = "(min-width: 1024px)"
-
 export type DropdownPortalSide = "top" | "bottom" | "left" | "right"
 
 export type DropdownPortalPlacement = {
@@ -16,57 +14,10 @@ function detailsHasClass(
   return details.classList.contains(className)
 }
 
-function detailsHasPlacementClass(
-  details: HTMLDetailsElement,
-  name: "top" | "bottom" | "start" | "end" | "left" | "right",
-  options?: { lgOnly?: boolean; baseOnly?: boolean }
-): boolean {
-  const baseClass = `daisy-dropdown-${name}`
-  const lgClass = `lg:${baseClass}`
-
-  if (options?.lgOnly) {
-    return (
-      window.matchMedia(LG_MEDIA_QUERY).matches &&
-      detailsHasClass(details, lgClass)
-    )
-  }
-
-  if (options?.baseOnly) {
-    return detailsHasClass(details, baseClass)
-  }
-
-  if (detailsHasClass(details, baseClass)) return true
-  return (
-    window.matchMedia(LG_MEDIA_QUERY).matches &&
-    detailsHasClass(details, lgClass)
-  )
-}
-
 function resolveSide(details: HTMLDetailsElement): DropdownPortalSide {
-  if (window.matchMedia(LG_MEDIA_QUERY).matches) {
-    if (detailsHasPlacementClass(details, "right", { lgOnly: true })) {
-      return "right"
-    }
-    if (detailsHasPlacementClass(details, "left", { lgOnly: true })) {
-      return "left"
-    }
-    if (detailsHasPlacementClass(details, "top", { lgOnly: true })) {
-      return "top"
-    }
-    if (detailsHasPlacementClass(details, "bottom", { lgOnly: true })) {
-      return "bottom"
-    }
-  }
-
-  if (detailsHasPlacementClass(details, "right", { baseOnly: true })) {
-    return "right"
-  }
-  if (detailsHasPlacementClass(details, "left", { baseOnly: true })) {
-    return "left"
-  }
-  if (detailsHasPlacementClass(details, "top", { baseOnly: true })) {
-    return "top"
-  }
+  if (detailsHasClass(details, "daisy-dropdown-right")) return "right"
+  if (detailsHasClass(details, "daisy-dropdown-left")) return "left"
+  if (detailsHasClass(details, "daisy-dropdown-top")) return "top"
   return "bottom"
 }
 
@@ -78,7 +29,7 @@ export function parseDropdownPlacementFromDetails(
   }
 
   const side = resolveSide(details)
-  const align = detailsHasPlacementClass(details, "end") ? "end" : "start"
+  const align = detailsHasClass(details, "daisy-dropdown-end") ? "end" : "start"
   return { side, align }
 }
 

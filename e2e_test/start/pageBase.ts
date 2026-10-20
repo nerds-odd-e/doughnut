@@ -8,11 +8,10 @@ export const waitUntilAppIsNotBusy = () => {
   cy.get('[data-app-busy]', { timeout: 30000 }).should('not.exist')
 }
 
-const donutMenuPanel = '.donut-menu-panel'
+const donutMenuPanel = '[role="region"][aria-label="Donut menu panel"]'
 
 /** The Donut menu launcher button at the start of the page bar. */
-export const donutMenuLauncher = () =>
-  cy.findByRole('button', { name: 'Donut menu' })
+const donutMenuLauncher = () => cy.findByRole('button', { name: 'Donut menu' })
 
 /** The shared page bar, which starts with the Donut menu launcher. */
 export const pageBar = () => donutMenuLauncher().closest('nav')

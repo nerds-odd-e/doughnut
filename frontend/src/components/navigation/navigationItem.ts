@@ -8,6 +8,6 @@ export type NavigationItemProps = {
   badge?: number | string
   badgeClass?: string
   badgeTitle?: string
-  hasDropdown?: boolean
+  expanded?: boolean
   nonClickable?: boolean
 }
