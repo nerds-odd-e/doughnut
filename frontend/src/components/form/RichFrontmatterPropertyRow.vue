@@ -27,7 +27,7 @@
     </template>
     <div
       v-else
-      :class="draft ? 'grid grid-cols-[minmax(8rem,auto)_minmax(0,1fr)_auto] gap-x-4 items-center' : 'grid grid-cols-[auto_minmax(8rem,auto)_minmax(0,1fr)] gap-x-4 items-center'"
+      class="flex flex-wrap items-center gap-x-4 gap-y-1"
     >
       <button
         v-if="!draft"
@@ -42,7 +42,7 @@
         <ChevronDown v-else class="h-4 w-4" aria-hidden="true" />
       </button>
       <RichFrontmatterPropertyKeyField
-        class="min-w-[8rem]"
+        class="min-w-[8rem] max-w-80 flex-[1_1_8rem]"
         :model-value="modelValue.key"
         :input-id="keyInputId"
         :list-id="presetListId"
@@ -56,7 +56,7 @@
         @enter="draft && focusValue()"
         @select="focusValue"
       />
-      <div ref="valueAreaRef" class="min-w-0">
+      <div ref="valueAreaRef" class="min-w-0 flex-[999_1_12rem]">
         <RichFrontmatterScalarPropertyValue
           v-if="isTextCapablePropertyRow(modelValue) || (draft && !isImagePropertyKey(modelValue.key) && !isWikidataIdPropertyKey(modelValue.key))"
           :model-value="scalarValue"
@@ -103,7 +103,7 @@
           @edit="emit('wikidata-dialog-open')"
         />
       </div>
-      <div v-if="draft" class="flex items-center gap-2">
+      <div v-if="draft" class="flex shrink-0 items-center gap-2">
         <button type="button" class="daisy-btn daisy-btn-sm daisy-btn-primary" data-testid="rich-note-property-row-add" @click="emit('add')">Add</button>
         <button type="button" class="daisy-btn daisy-btn-sm daisy-btn-ghost" aria-label="Cancel adding property" data-testid="rich-note-property-row-cancel" @click="emit('cancel')"><X class="h-4 w-4" aria-hidden="true" /></button>
       </div>

@@ -154,10 +154,10 @@ defineExpose({
 
 <style scoped>
 .property-value-field {
+  display: block;
   outline: none;
-  white-space: nowrap;
-  overflow-x: auto;
-  overflow-y: hidden;
+  white-space: normal;
+  overflow-wrap: anywhere;
   line-height: 1.375rem;
 }
 

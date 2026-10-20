@@ -149,7 +149,7 @@ absence tests or broad assertions that forbid a CSS utility everywhere.
 
 ### 1. Read and edit wrapping scalar properties
 Type: Behavior
-Status: planned
+Status: done
 Proof: Slice 1 rows in the proof table; rich-editor suite below and frontend typechecks.
 
 Behavior: A note reader/author opens long scalar and linked properties in a
@@ -163,6 +163,16 @@ specialized fields and scalar interaction semantics. Add discriminating
 mounted geometry proof and reconcile affected shared row consumers together.
 Safe stop: scalar reading/editing improves; detailed-list layout remains for
 slice 2, with existing operations intact.
+
+Accepted proof: `PropertyValueField` wraps (`white-space: normal`,
+`overflow-wrap: anywhere`); editable rows are one wrapping flex row (value
+moves to its own line when narrow). New
+`RichMarkdownEditor.propertyLayout.spec.ts` (9 cases: editable/read-only
+geometry at 320/768/1280px, labelled link to `notePropertyLocation(42, "a part
+of")`, long inline edit committed on Enter) fails 4/9 on the original CSS.
+Focused editor + AssimilationModes run 27 files / 195 tests, both
+typechecks, and `note_property_layout.feature` 12/12 passed. Read-only rows
+already wrapped; their cases preserve rather than discriminate.
 
 Size hypothesis: 5–8 minutes including focused proof and local cleanup. Above
 the 5-minute target because editable/read-only paths share one row-sizing
@@ -254,3 +264,10 @@ it is a hypothesis, not a measurement. Every leaf was reviewed for independent
 outcomes, proof ownership and cumulative design. No preparatory Structure leaf
 or further slice-plan refinement is needed. No remaining blocking concern was
 identified; final interaction/design acceptance remains execution's work.
+
+## Story obligations
+
+### G1. Key presets may cover a wrapped draft value in a narrow editor at a wide viewport
+Reported: slice 1 — "If the editor is narrower than about 448px at such a viewport (a sidebar could do this), the draft row now wraps and the list could cover the draft value."
+Story clause: "Labels and controls stay reachable as space narrows"
+Disposition: receiving slice 3
