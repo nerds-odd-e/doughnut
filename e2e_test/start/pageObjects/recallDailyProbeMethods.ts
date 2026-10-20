@@ -19,14 +19,23 @@ function respondToEachDailyProbeTrial(respond: (side: DailyProbeSide) => void) {
 
 export const recallDailyProbeMethods = () => ({
   expectDailyProbeInstruction() {
-    cy.get('[data-testid="daily-probe"]').should(
+    cy.get('[data-testid="daily-probe-instruction"]').should(
       'contain',
       DAILY_PROBE_INSTRUCTION
     )
     return this
   },
   expectNoDailyProbeInstruction() {
-    cy.get('[data-testid="daily-probe"]').should('not.exist')
+    cy.get('[data-testid="daily-probe-instruction"]').should('not.exist')
+    return this
+  },
+  startDailyProbe() {
+    cy.findByRole('button', { name: 'Start' }).click()
+    return this
+  },
+  skipDailyProbe() {
+    cy.findByRole('button', { name: 'Skip' }).click()
+    waitUntilAppIsNotBusy()
     return this
   },
   completeDailyProbe() {

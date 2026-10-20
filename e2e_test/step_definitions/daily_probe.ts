@@ -13,6 +13,22 @@ Then('I should not see the Daily probe instruction', () => {
   start.recall().assumeRecallPage().expectNoDailyProbeInstruction()
 })
 
+When('I start the Daily probe', () => {
+  start.recall().assumeRecallPage().startDailyProbe()
+})
+
+When('I skip the Daily probe', () => {
+  start.recall().assumeRecallPage().skipDailyProbe()
+})
+
+When('I return to recall from the menu', () => {
+  start.recall().navigateToRecallPage()
+})
+
+When('I reload the recall page', () => {
+  cy.reload()
+})
+
 When('I complete the Daily probe', () => {
   start.recall().assumeRecallPage().completeDailyProbe()
 })

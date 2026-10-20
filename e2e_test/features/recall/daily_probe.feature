@@ -15,7 +15,8 @@ Feature: Daily probe
     Given Daily probe is on
     When I visit recall
     Then I should see the Daily probe instruction
-    When I complete the Daily probe
+    When I start the Daily probe
+    And I complete the Daily probe
     Then I should see Daily probe speed "4.00"
     And I should see Daily probe accuracy "100%"
     And I should see Daily probe lapses "0"
@@ -26,3 +27,16 @@ Feature: Daily probe
     When I visit recall
     Then I should not see the Daily probe instruction
     And I should see ordinary recall
+
+  Scenario: Opted-in learner skips the probe for the rest of the page's life
+    Given Daily probe is on
+    When I visit recall
+    Then I should see the Daily probe instruction
+    When I skip the Daily probe
+    Then I should see ordinary recall
+    When I jump to the note page of "Note 2"
+    And I return to recall from the menu
+    Then I should not see the Daily probe instruction
+    And I should see ordinary recall
+    When I reload the recall page
+    Then I should see the Daily probe instruction

@@ -138,8 +138,10 @@ Size hypothesis: about 5 minutes including the two new cases.
 
 ### 2. Choose Start or Skip at the daily-probe entry
 Type: Behavior
-Status: planned
+Status: done
 Proof: Slice 2 rows in the proof table; `RecallPage.spec.ts`, `daily_probe.feature`, frontend typechecks.
+
+Accepted proof (2026-10-20): `env -u NODE_ENV CURSOR_DEV=true nix develop -c pnpm -C frontend test tests/pages/RecallPage.spec.ts tests/components/recall/DailyProbe.spec.ts tests/toolbars/DonutMenu.recallWindowEnd.spec.ts` passed 30/30 ("RecallPage Daily probe entry" cases failed on the pre-change gate); both typechecks clean; `CURSOR_DEV=true nix develop -c pnpm cy:run --spec e2e_test/features/recall/daily_probe.feature,e2e_test/features/recall/spaced_repetition.feature` passed 6/6, including "Opted-in learner skips the probe for the rest of the page's life". Learning: the held choice is one ref, `entryChoice`, in `useDailyProbeOffer`; slice 3 resets it and calls `checkOffer`. The E2E instruction selector is `daily-probe-instruction`, rendered by both the entry screen and `DailyProbe`.
 
 Behavior: An opted-in learner with the probe due arrives at recall → the
 full-screen entry shows the instruction with Start and Skip and waits → Start
@@ -184,6 +186,16 @@ Disposition: no user cost "gets the current half-day's recall trackers and quest
 Reported: slice 1 — "If the catch-up response returns the same window end as before, every later visible event while past that end sends another request."
 Story clause: "one request when the boundary passes, none before it, none repeated within the same half-day"
 Disposition: no user cost "gets the current half-day's recall trackers and questions without reloading the page": every due-recall response carries the current window's end, which is after the clock once the boundary passed, so the next visible event is before the stored end and sends nothing; a failed request leaves the old end and the next visible event retries, which is the wanted catch-up.
+
+### G3. Noon after Skip has no specific observation
+Reported: slice 2 — "\"Noon passes after Skip, still no entry\" (the second half of example 5) has no specific test."
+Story clause: "the noon boundary does not ask again"
+Disposition: receiving slice 3
+
+### G4. The entry screen's layout was not visually checked
+Reported: slice 2 — "No visual or manual check of the entry screen's layout was done."
+Story clause: "The entry screen occupies the same area the probe trials use today"
+Disposition: no user cost "chooses to start it or skip it before recall questions": the entry renders in the gate's slot where `DailyProbe` renders, with the bar slot hidden until ordinary recall (`showOrdinaryRecall`); the E2E scenarios find and click Start and Skip in the real browser.
 
 ## Verification and delivery
 

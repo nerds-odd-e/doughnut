@@ -9,6 +9,7 @@ export function useDailyProbeOffer(
 ) {
   const completedToday = ref<boolean | undefined>(undefined)
   const offerCheckFailed = ref(false)
+  const entryChoice = ref<"start" | "skip" | undefined>(undefined)
   const enabled = computed(() => !!currentUser?.value?.dailyProbeEnabled)
 
   const checkOffer = async () => {
@@ -35,19 +36,35 @@ export function useDailyProbeOffer(
     { immediate: true }
   )
 
-  const showDailyProbe = computed(
+  const probeDue = computed(
     () => enabled.value && completedToday.value === false
   )
+  const showDailyProbeEntry = computed(
+    () => probeDue.value && entryChoice.value === undefined
+  )
+  const showDailyProbe = computed(
+    () => probeDue.value && entryChoice.value === "start"
+  )
   const showOrdinaryRecall = computed(
-    () => !enabled.value || completedToday.value === true
+    () =>
+      !enabled.value ||
+      completedToday.value === true ||
+      entryChoice.value === "skip"
   )
   const showOfferRetry = computed(() => enabled.value && offerCheckFailed.value)
 
   return {
+    showDailyProbeEntry,
     showDailyProbe,
     showOrdinaryRecall,
     showOfferRetry,
     checkOffer,
+    startDailyProbe: () => {
+      entryChoice.value = "start"
+    },
+    skipDailyProbe: () => {
+      entryChoice.value = "skip"
+    },
     markDailyProbeFinished: () => {
       completedToday.value = true
     },
