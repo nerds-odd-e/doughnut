@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "agent": "Akiho-chan",
+  "email": "akiho-chan@example.org",
+  "identity": "SEED-078#story-1",
+  "mode": "story-branch",
+  "branch": "claude/open-a-quiet-donut-command-center-consistently-o",
+  "host": "claude",
+  "model": "opus"
+}

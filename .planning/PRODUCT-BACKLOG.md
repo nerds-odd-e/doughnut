@@ -8,10 +8,10 @@ Make deliberately captured knowledge more useful through learning and refinement
 
 - [Expand a list property into a single list of clickable values](seeds/SEED-064-note-properties-fixes.md#story-7) — SEED-064#story-7 ([plan](slice-plans/001-expanded-property-values/PLAN.md))
 - [Exercise current MCP source in local E2E runs](seeds/SEED-077-current-mcp-e2e-bundle.md#story-1) — SEED-077#story-1 ([plan](slice-plans/002-current-mcp-e2e-source/PLAN.md))
+- [Open a quiet Donut command center consistently on every screen](seeds/SEED-078-cohesive-note-workspace.md#story-1) — SEED-078#story-1 ([plan](slice-plans/003-donut-command-center/PLAN.md))
 
 ## Backlog list
 
-- [Open a quiet Donut command center consistently on every screen](seeds/SEED-078-cohesive-note-workspace.md#story-1) — SEED-078#story-1
 - [Find and open notes from search inside the Donut menu](seeds/SEED-078-cohesive-note-workspace.md#story-2) — SEED-078#story-2
 - [Use note actions and folder context from one adaptive top bar](seeds/SEED-078-cohesive-note-workspace.md#story-3) — SEED-078#story-3
 - [Read and edit complete property values comfortably in narrow windows](seeds/SEED-078-cohesive-note-workspace.md#story-4) — SEED-078#story-4
