@@ -187,6 +187,9 @@ sheet and wide-anchoring scenarios, user_profile, show_failure_report,
 book_browsing). Sweep reading (2026-10-20): `git grep -n -I -E
 "VerticalMenu|HorizontalMenu|useBreakpoint|collapsed-menu-width|main-menu-height|main-menu-width|Toggle menu|is-expanded|\.main-menu|MainMenu|mainMenu|main menu|menu-variables|isWithinAutoCollapseDropdownTree"
 -- . ':!.planning'` returned nothing.
+CI repair (run 39354041674): `recall().expectResumeAvailable()` and
+`resumeRecall()` now open the panel through `withinDonutMenuItem`;
+`recall/browse_answer_and_notes_while_recalling.feature` 2/2 locally.
 
 ## Current decisions
 

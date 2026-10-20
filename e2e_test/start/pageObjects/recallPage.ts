@@ -186,11 +186,15 @@ export const recall = () => {
       return this
     },
     expectResumeAvailable() {
-      cy.findByLabelText('Resume').should('exist')
+      withinDonutMenuItem('Resume', ($el) => {
+        $el.should('exist')
+      })
       return this
     },
     resumeRecall() {
-      cy.findByLabelText('Resume').click()
+      withinDonutMenuItem('Resume', ($el) => {
+        $el.click()
+      })
       waitUntilAppIsNotBusy()
       // Flush Vue remount timeouts under cy.clock() so the restored question is clickable.
       cy.tick(1)
