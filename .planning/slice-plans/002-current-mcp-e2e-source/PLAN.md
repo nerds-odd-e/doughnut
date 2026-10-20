@@ -137,6 +137,16 @@ and the bounded repeated feature runs are the focused-test waiting exception to
 the ten-minute cap. If implementation itself exceeds ten minutes, stop and refine
 from the actual learning before continuing; do not split by files or test layers.
 
+## Execution complete
+
+Product advice: No new product work follows from this execution — close
+SEED-077#story-1 on the strength of the delivered unconditional-rebuild rule,
+and let future MCP tool changes rely on the local E2E result as
+current-source evidence without reopening freshness policy unless bundle cost
+materially changes. Retrospective findings: none; process review was
+unavailable to the retrospective agent (no agent history beyond the invoking
+prompt), so no process findings were recorded.
+
 ## Verification and delivery
 
 Use the runner-owned stack in accordance with AGENTS.md and the agent map:
