@@ -135,26 +135,119 @@ force the estimate. This seed authorizes no implementation or slice plan.
 
 **Identity:** SEED-078#story-1
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"not-refined","approach":"unselected"}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/003-donut-command-center/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"fca560fd21bd9f768fe5b205f4859d920293ab31d5a7eb8f020cedb892400aeb","plan":"e108ca5e4f6c4afca8684669ef7ccfe66be3776e96200ba4462efbeab03f47cd"}}
 ```
 
-- **For / why:** Authors and learners can find their frequent app commands in
-  the same place when moving between a phone, iPad, and desktop.
-- **Outcome and boundary:** One persistent, quiet book launcher opens a clear
-  command panel across sizes, carrying the existing destinations, active
-  selection, counts, Resume behavior, sign-in/account actions, and closing
-  behavior. The panel overlays the workspace. Existing page-specific context
-  and controls remain usable, including Recall and Book reading. Search
-  embedding and joining the note toolbar are separate stories.
-- **Evaluation:** From a note on a phone or desktop, open Donut's menu and
-  resume the current learning workflow or select Note; the selected workflow
-  and its current counts remain correct. Resize the window and use the same
-  launcher. A signed-out visitor can still reach sign-in.
+- **Goal:** Authors and learners find Donut's app commands in one place
+  whether they use a phone, an iPad, or a desktop window, so moving between
+  devices stops costing them a second navigation arrangement. The observable
+  outcome is one launcher and one command panel at every width; the broader
+  cohesive workspace stays with the sibling stories.
+- **Scope:**
+  - Required: one quiet launcher button labelled "Donut menu", marked by a
+    book glyph that is visibly distinct from the Note destination's icon,
+    sits at the leading end of the shared page bar on every screen that has
+    that bar, at every window width, signed in or signed out. The workspace
+    no longer reserves a side column or a fixed top-left region for
+    navigation.
+  - Required: the launcher opens one command panel over the workspace. For a
+    signed-in user it lists, in the existing order, Resume (only while recall
+    is paused with loaded trackers, with its to-repeat count), Note,
+    Assimilate (with its due count and title), Recall (with its to-repeat
+    count and diligent styling), Circles, Bazaar, and Messages (with its
+    unread count), marks the destination that matches the current route the
+    same way at every width, and groups the existing account actions under
+    Account: Admin Dashboard for admins, Recent, Settings for the user,
+    Manage Access Tokens, and Logout. The existing "Donut by" attribution
+    link to odd-e stays in the panel as a quiet footer.
+  - Required: choosing a destination or action does what it does today
+    (named-route navigation, Resume, next Assimilation, Logout) and closes
+    the panel. Pressing the launcher again, tapping or clicking outside,
+    choosing nothing and pressing Escape, or a route change closes it. The
+    panel is reachable by keyboard: the launcher is a focusable button and
+    the panel's items are focusable in order.
+  - Required: a signed-out visitor sees the same launcher; the panel offers
+    the existing sign-in action. Opening the panel on the home page behaves
+    like everywhere else; the home page body keeps its own welcome flow.
+  - Required: counts, Resume availability, the menu-data fetch at sign-in,
+    and the recall-window catch-up keep their current data and timing. They
+    stay alive while the panel is closed.
+  - Required: page-specific bar controls keep working beside the launcher:
+    the notebook contents toggle and breadcrumb, the recall progress bar, the
+    Book layout toggle and book title, global search with Ctrl/Cmd+F, and
+    Undo. Drawers and safe-area offsets use the one shared header-height
+    rule the seed contract names.
+  - Removal: the two replaced presentations (the wide-window vertical
+    sidebar and the narrow-window collapsing horizontal menu) and everything
+    only they used are deleted, including their stories, tests, test
+    support, and layout variables; the product reads as if one launcher
+    always existed. Acceptance records the one-time sweep as a reading.
+  - Deferred, not rejected: global search inside the panel (story 2); note
+    actions in the bar (story 3); any count or indicator on the launcher
+    itself; an always-visible active-destination indicator while the panel
+    is closed; a keyboard shortcut that opens the panel; any change to the
+    home page welcome flow. Showing public destinations such as Bazaar to a
+    signed-out visitor is naturally supported and not committed.
+  - No rejection constraint was found; the current access rules (admin-only
+    dashboard, signed-in-only destinations) already govern what the panel
+    lists.
+- **Key examples:**
+  - Phone width, a note open, recall paused by viewing a last answered
+    question with trackers loaded → tap the launcher → the panel lists Resume
+    first with the to-repeat count and marks Note as active; tap Resume → the
+    recall page resumes at the current tracker and the panel is closed.
+  - Desktop width, the same note → the launcher is at the same bar position
+    with the same glyph; open it and choose Messages → the message center
+    opens, the panel closes, and reopening marks Messages active.
+  - Desktop width with the panel closed → narrow the window to phone width →
+    the launcher stays where it was, no side column remains, and opening it
+    shows the same items with the same counts and active marking.
+  - Three due assimilations and twelve to recall → open the panel → Assimilate
+    shows 3 and Recall shows 12; choose Assimilate → the next note opens with
+    its Assimilation view and reopening shows 2.
+  - Signed-out visitor on Bazaar at any width → the launcher is present; open
+    it and choose Sign in → the existing login flow starts.
+  - Panel open over a note → tap outside it (or press Escape) → the panel
+    closes, nothing navigated, and the note's own controls respond to the
+    next tap.
+  - Home page, signed in → the launcher opens the same panel; choosing Recall
+    opens the recall page.
+- **UI:** The launcher is the first control of the shared bar, at the same
+  position on every screen. The panel opens over the page content, anchored
+  near the launcher on wide windows and as a full-width sheet below the bar
+  on narrow windows; width changes the panel's size, not its contents or
+  order. Items keep their icon, label, and count; the active destination is
+  highlighted; Account expands its grouped actions in place. The launcher
+  shows no count. Resume, when present, is the first item so the paused
+  learner reaches it in two taps from any screen.
+- **Architecture:** The panel is presentation only. Navigation items, counts,
+  active state, Resume availability, the sign-in menu-data fetch, and the
+  recall catch-up timer are app-shell responsibilities that outlive the
+  panel's open state, so they stay in the shell and the panel renders them.
+  Destinations keep named-route navigation and note-route-family active state
+  under [ADR 0005](../../docs/adrs/0005-web-routes-accepted.md); the launcher
+  is the Donut menu, not the domain entity **Book** of
+  [ADR 0001](../../docs/adrs/0001-ubiquitous-language.md). Replacing the
+  reserved side column and fixed top-left menu with a bar control is the
+  layout change stories 2 and 3 build on; no new decision record is needed.
+- **Investigation (2026-10-20, read at `f72443698e`):** Facts: one item
+  source feeds both current presentations; the wide presentation applies
+  above 1024px and the narrow one at or below it; both hide destinations on
+  the home page; both show only the key-shaped sign-in control when signed
+  out; the shared page bar exists on every signed-in screen, with the recall
+  bar present while that page is active; the narrow presentation already
+  closes on outside click, focus loss, and route change; the Note
+  destination already uses a book glyph. Remaining hypothesis, settled only
+  by use: a quiet launcher without an always-visible active item is as easy
+  to find as the current destinations. No product runtime was started.
 - **Value / learning:** Tests discoverability of the shared command center
   and removes the large-screen/small-screen navigation change as a user burden.
-- **Effort hypothesis:** S, 45–60 minutes, medium confidence; assumes reuse
-  of current navigation actions, data, and account behavior, with presentation
-  reconciliation rather than a navigation or authentication rewrite.
+- **Effort hypothesis:** M, 60–90 minutes, medium confidence. Refinement
+  found the work reuses the item source, actions, and account menu intact, but
+  replaces two presentations, the app-shell layout offsets, their seven unit
+  specs with support files, two Storybook stories, and the E2E menu page
+  objects. No smaller boundary keeps a useful outcome: the value is the
+  single arrangement itself. The owner may still resplit before execution.
 - **Depends on:** No blocking supplier story established.
 - **Safe stopping point:** Consistent command access is useful even if search,
   note-toolbar relocation, and detail presentation stay unchanged. Existing
