@@ -119,28 +119,49 @@ describe("Notebook workspace location", () => {
     }
   )
 
-  it("navigates to notebook root and keeps useful identity with an empty trail", async () => {
-    const mounted = await mountDeepNote(768)
-    wrapper = mounted.wrapper
-    mockSdkService(NotebookController, "get", mounted.realm.notebookRealm)
-    await page.elementLocator(notebookLocationControl()).click()
-    await page.elementLocator(document.querySelector("dialog a")!).click()
-    await flushPromises()
-    expect(mounted.router.currentRoute.value.name).toBe("notebookPage")
-    expect(mounted.router.currentRoute.value.params.notebookId).toBe(
-      String(mounted.realm.notebookRealm.notebook.id)
-    )
-    expect(notebookLocationControl().textContent).toContain(longNotebook)
-    await page.elementLocator(notebookLocationControl()).click()
-    expect(
-      [...document.querySelectorAll("dialog a")].map((link) =>
-        link.textContent?.trim()
+  it.each([320, 768])(
+    "navigates to notebook root and keeps useful identity with an empty trail at %ipx",
+    async (width) => {
+      const mounted = await mountDeepNote(width)
+      wrapper = mounted.wrapper
+      mockSdkService(NotebookController, "get", mounted.realm.notebookRealm)
+      await page.elementLocator(notebookLocationControl()).click()
+      await page.elementLocator(document.querySelector("dialog a")!).click()
+      await flushPromises()
+      expect(mounted.router.currentRoute.value.name).toBe("notebookPage")
+      expect(mounted.router.currentRoute.value.params.notebookId).toBe(
+        String(mounted.realm.notebookRealm.notebook.id)
       )
-    ).toEqual([longNotebook])
-    await page.screenshot({
-      path: "../../vitest-test-results/sidebar-location-root.png",
-    })
-  })
+      if (width < 768) {
+        await page
+          .elementLocator(
+            document.querySelector('[aria-label="Show sidebar"]')!
+          )
+          .click()
+        await flushPromises()
+      }
+      expect(
+        document.querySelector("aside")!.contains(notebookLocationControl())
+      ).toBe(true)
+      expect(notebookLocationControl().textContent).toContain(longNotebook)
+      expect(rect(notebookLocationControl()).height).toBeGreaterThanOrEqual(44)
+      expect(notebookLocationControl().scrollWidth).toBeLessThanOrEqual(
+        notebookLocationControl().clientWidth
+      )
+      await page.elementLocator(notebookLocationControl()).click()
+      expect(
+        [...document.querySelectorAll("dialog a")].map((link) =>
+          link.textContent?.trim()
+        )
+      ).toEqual([longNotebook])
+      const rootLink = document.querySelector<HTMLAnchorElement>("dialog a")!
+      expect(rect(rootLink).right).toBeLessThanOrEqual(width)
+      expect(rootLink.scrollWidth).toBeLessThanOrEqual(rootLink.clientWidth)
+      await page.screenshot({
+        path: `../../vitest-test-results/sidebar-location-${width}-root.png`,
+      })
+    }
+  )
 
   it("retains folder context on a focused property route", async () => {
     await atViewportWidth(768)

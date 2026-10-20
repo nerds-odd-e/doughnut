@@ -9,7 +9,6 @@ import makeMe from "donut-test-fixtures/makeMe"
 import {
   mockSdkService,
   mockSdkServiceWithImplementation,
-  testFolderStub,
 } from "@tests/helpers"
 import { resetPeerSortStorage } from "@tests/notes/sidebar/sidebarTestSupport"
 import { flushPromises, type VueWrapper } from "@vue/test-utils"
@@ -20,10 +19,9 @@ import {
   mountNotebookWorkspace,
 } from "./notebookWorkspaceHeaderTestSupport"
 import {
-  deepNote,
-  innerFolder,
   parentFolder,
   notebookLocationControl,
+  populatedNotebook,
 } from "./notebookWorkspaceContextTestSupport"
 
 const rect = (element: Element) => element.getBoundingClientRect()
@@ -62,31 +60,11 @@ describe("Notebook workspace contents location", () => {
   })
   async function mountPopulated(width: number) {
     await atViewportWidth(width)
-    const notebook = deepNote().notebookRealm.notebook
-    const notes = Array.from({ length: 40 }, (_, i) =>
-      makeMe.aNoteRealm
-        .title(`Note ${String(i + 1).padStart(2, "0")}`)
-        .inNotebook(notebook.id, notebook.name)
-        .ancestorFolders([parentFolder, innerFolder])
-        .please()
-    )
+    const { notes, folderListings } = populatedNotebook()
     const mounted = await mountNotebookWorkspace(
       notes,
       noteShowLocation(notes[29]!.id),
-      {
-        undefined: {
-          noteTopologies: [],
-          folders: [testFolderStub(parentFolder.id, parentFolder.name)],
-        },
-        [parentFolder.id]: {
-          noteTopologies: [],
-          folders: [testFolderStub(innerFolder.id, innerFolder.name)],
-        },
-        [innerFolder.id]: {
-          noteTopologies: notes.map((note) => note.note.noteTopology),
-          folders: [],
-        },
-      }
+      folderListings
     )
     wrapper = mounted.wrapper
     await vi.waitFor(async () => {

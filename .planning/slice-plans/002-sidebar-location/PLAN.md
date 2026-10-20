@@ -213,7 +213,7 @@ passed seven tests before delivery. Coordinator selective formatting passed.
 
 ### 3. Navigate from location inside the phone contents drawer
 Type: Behavior
-Status: planned
+Status: done
 
 Behavior: On a phone, open contents from the familiar main controls, use contents
 commands and the stable location above its independently scrolling tree, and
@@ -231,6 +231,22 @@ active note action. Retain the existing mobile route-navigation check.
 
 Sizing: About 5 minutes including focused proof and cleanup; a single
 open/navigate/close drawer journey.
+
+Accepted 2026-10-21: location follows the existing drawer's opened state at
+all widths; the hidden phone fallback lives above main content. Phone workspace
+tests at 320/390 observe populated independent tree scrolling, fixed location,
+contents command access and actual descending sort, keyboard full-name ancestry
+navigation, and existing drawer-close behavior. Entered note-editor text survives
+drawer toggles and 767/768/767 resizing. Root navigation/disclosure is parameterized
+at 320/768. Inspected ignored phone-drawer and phone-root screenshots match these
+observations. Command through Nix `pnpm frontend:test` with Context, Location,
+ContentsLocation, PhoneLocation, Header, Header.dictation, NoteToolbar.overflow
+and the full sidebar directory passed 72 tests in 17 files. Both required
+typechecks passed. Independent refactoring shared the populated notebook fixture;
+the ContentsLocation/PhoneLocation rerun passed seven tests and both typechecks
+passed afterward. Coordinator formatting passed. Initial title-selector and
+note-to-folder drawer-close expectations were corrected to match actual product
+controls and the retained route policy; no product workaround was added.
 
 ### 4. Align contents actions with the adaptive note toolbar
 Type: Behavior
@@ -323,6 +339,9 @@ Slice 1 accepted on the remote story branch at
 `9ee121fdfad67f4aeab513c8bc09e960c17939c0`, suffix base
 `f2a1dbf31d687376e64f9e1568e477d8ed230669`; observation reused this stream.
 The post-format slice-1 Vite build passed with generated declarations intact.
+Slice 2 accepted on the remote story branch at
+`bef45f8b52e5bf92af3a84155468f6dcb42c11af`, suffix base
+`9ee121fdfad67f4aeab513c8bc09e960c17939c0`; observation reused this stream.
 
 - The owner already selected the Sidebar header design; no new product decision
   is pending. Complete-name disclosure and responsive location are required.

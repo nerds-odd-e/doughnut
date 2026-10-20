@@ -1,5 +1,6 @@
 import { useNoteStore } from "@/store/noteStore"
 import makeMe from "donut-test-fixtures/makeMe"
+import { testFolderStub } from "@tests/helpers"
 import { flushPromises } from "@vue/test-utils"
 import {
   atViewportWidth,
@@ -22,6 +23,34 @@ export function deepNote() {
     .notebookName(longNotebook)
     .ancestorFolders([parentFolder, innerFolder])
     .please()
+}
+
+export function populatedNotebook(noteTitlePrefix = "Note") {
+  const notebook = deepNote().notebookRealm.notebook
+  const notes = Array.from({ length: 40 }, (_, i) =>
+    makeMe.aNoteRealm
+      .title(`${noteTitlePrefix} ${String(i + 1).padStart(2, "0")}`)
+      .inNotebook(notebook.id, notebook.name)
+      .ancestorFolders([parentFolder, innerFolder])
+      .please()
+  )
+  return {
+    notes,
+    folderListings: {
+      undefined: {
+        noteTopologies: [],
+        folders: [testFolderStub(parentFolder.id, parentFolder.name)],
+      },
+      [parentFolder.id]: {
+        noteTopologies: [],
+        folders: [testFolderStub(innerFolder.id, innerFolder.name)],
+      },
+      [innerFolder.id]: {
+        noteTopologies: notes.map((note) => note.note.noteTopology),
+        folders: [],
+      },
+    },
+  }
 }
 
 export const notebookLocationControl = () =>

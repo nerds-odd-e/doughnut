@@ -25,15 +25,6 @@
       />
     </GlobalBar>
     <div
-      v-if="currentNotebookRealm && !isMdOrLarger"
-      class="flex-none px-4 border-b border-base-300"
-    >
-      <NotebookLocation
-        :notebook-realm="currentNotebookRealm"
-        :ancestor-folders="breadcrumbFolders"
-      />
-    </div>
-    <div
       class="h-full relative flex flex-1 min-h-0"
     >
       <SidebarDrawer
@@ -52,7 +43,7 @@
         >
           <template #location>
             <NotebookLocation
-              v-if="currentNotebookRealm && isMdOrLarger && sidebarOpened"
+              v-if="currentNotebookRealm && sidebarOpened"
               :notebook-realm="currentNotebookRealm"
               :ancestor-folders="breadcrumbFolders"
             />
@@ -63,7 +54,7 @@
         class="flex-1 px-4 container mx-auto overflow-y-auto"
       >
         <NotebookLocation
-          v-if="currentNotebookRealm && isMdOrLarger && !sidebarOpened"
+          v-if="currentNotebookRealm && !sidebarOpened"
           :notebook-realm="currentNotebookRealm"
           :ancestor-folders="breadcrumbFolders"
         />
