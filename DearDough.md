@@ -209,6 +209,14 @@ Former local code: DD-233. Broad whole-reference and metadata batches exceeded t
   - Observed effect: two oversized batches left required context truncated and caused repeated retrieval.
   - Inference: the coordinator batched too many whole references despite the targeted-retrieval guidance; token savings are unmeasured.
 
+- Execution: SEED-080#story-2 (first implementation `9ee121fdfad67f4aeab513c8bc09e960c17939c0`)
+  - Timestamp: unknown
+  - Tool: Codex
+  - Open Dough release: unknown
+  - Evidence: dashboard launch `44097ed9-4344-48fc-950b-8c5b02b793fb`, startup on 2026-10-21; batched tool results reported truncation at 15,551 and 31,805 original tokens before focused reference reads recovered the required passages.
+  - Observed effect: two oversized startup batches forced repeated retrieval before first-slice delegation.
+  - Inference: the coordinator repeated the known broad-read deviation; savings are unmeasured.
+
 <a id="odf-265"></a>
 
 ## ODF-265 — A comparison of empty captures was printed as a match
@@ -302,6 +310,14 @@ The plan required implementers to run the Vite build so `components.d.ts` is reg
   - Evidence: the slice 3 return on 2026-10-20 reports the required Vite build initially failed on Biome line-wrapping/blank-line checks; ordinary source-layout corrections were made manually and the build then passed, regenerating declarations in `4b9d3792f7eb85999269e2a892ce763c00adf130`.
   - Observed effect: a repeated build was needed before proof acceptance; no defect escaped and the implementer ran no formatter command.
   - Inference: required generation/build proof checks formatting before the coordinator-owned formatting stage, leaving the same scheduling friction with a different local recovery.
+
+- Execution: SEED-080#story-2 (first implementation `9ee121fdfad67f4aeab513c8bc09e960c17939c0`)
+  - Timestamp: unknown
+  - Tool: Codex
+  - Open Dough release: unknown
+  - Evidence: slice 1's required `pnpm -C frontend exec vite build --emptyOutDir` generated declarations but exited 1 on pending Biome formatting; after the coordinator's `format:changed`, the same build passed. Retained observations: `821fbd9ac795f37c0ab06aebe602425cdaa2696d:.planning/slice-plans/002-sidebar-location/EVIDENCE.md#slice-1`.
+  - Observed effect: the prescribed build/formatter ordering required a second build before delivery; no failing build was represented as passing.
+  - Inference: this repeats the generation-versus-formatting scheduling friction; no measured cost is claimed.
 
 <a id="dd-253"></a>
 

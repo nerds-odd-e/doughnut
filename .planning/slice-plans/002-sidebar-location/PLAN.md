@@ -198,6 +198,10 @@ unless only the documented test/external wait remains.
 
 Accepted proof: [slice 4 observations](EVIDENCE.md#slice-4).
 
+## Execution complete
+
+Product advice: No additional product work recommended; retain the existing backlog order.
+
 ## Verification and delivery gates
 
 Apply the [focused commands and delivery gates](EVIDENCE.md#verification-and-delivery-gates) to affected surfaces.

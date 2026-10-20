@@ -2,6 +2,15 @@
 
 Retained evidence for [the active plan](PLAN.md), SEED-080#story-2.
 
+## Retained proof commands
+
+Each command ran through the checkout's Nix environment and reached the passing terminal result recorded below. Fixtures supply starting realms/listings; production components/router establish the observed behavior.
+
+- Shared disclosure/context consumers, 35 tests: `CURSOR_DEV=true nix develop -c pnpm frontend:test tests/layouts/NotebookWorkspaceContext.spec.ts tests/toolbars/Breadcrumb.spec.ts tests/notes/NoteContextReader.spec.ts tests/components/recall/AnsweredSpellingQuestionAccidentalMatchNoteContext.spec.ts tests/pages/MessageCenterPage.subject.spec.ts tests/commons/Modal.spec.ts`
+- Broad final behavior and retained route/tree/toolbar consumers, 166 tests: `CURSOR_DEV=true nix develop -c pnpm frontend:test tests/layouts/NotebookWorkspaceContext.spec.ts tests/layouts/NotebookWorkspaceLocation.spec.ts tests/layouts/NotebookWorkspaceContentsLocation.spec.ts tests/layouts/NotebookWorkspacePhoneLocation.spec.ts tests/layouts/NotebookWorkspaceHeader.spec.ts tests/layouts/NotebookWorkspaceHeader.dictation.spec.ts tests/layouts/NotebookWorkspaceAssimilation.spec.ts tests/layouts/NotebookWorkspaceToolbarGeometry.spec.ts tests/layouts/NotebookWorkspaceCreation.spec.ts tests/notes/NoteToolbar.overflow.spec.ts tests/notes/sidebar tests/routes tests/toolbars/GlobalBar.spec.ts tests/toolbars/DonutMenu.layout.spec.ts tests/toolbars/DonutMenu.activity.spec.ts`
+- Current split realm destinations/creation/location/geometry, 26 tests: `CURSOR_DEV=true nix develop -c pnpm frontend:test tests/layouts/NotebookWorkspaceRealmNavigation.spec.ts tests/layouts/NotebookWorkspaceToolbarGeometry.spec.ts tests/layouts/NotebookWorkspaceLocation.spec.ts tests/layouts/NotebookWorkspaceCreation.spec.ts`
+- After pane-width refactoring, 80 tests: `CURSOR_DEV=true nix develop -c pnpm frontend:test tests/layouts/NotebookWorkspaceContext.spec.ts tests/layouts/NotebookWorkspaceLocation.spec.ts tests/layouts/NotebookWorkspaceContentsLocation.spec.ts tests/layouts/NotebookWorkspacePhoneLocation.spec.ts tests/layouts/NotebookWorkspaceHeader.spec.ts tests/layouts/NotebookWorkspaceHeader.dictation.spec.ts tests/layouts/NotebookWorkspaceAssimilation.spec.ts tests/layouts/NotebookWorkspaceToolbarGeometry.spec.ts tests/layouts/NotebookWorkspaceCreation.spec.ts tests/toolbars/GlobalBar.spec.ts tests/toolbars/DonutMenu.layout.spec.ts`
+
 ## Preparation observations and decisive premises
 
 All observations below were made on 2026-10-20 in
@@ -201,6 +210,10 @@ The post-format slice-1 Vite build passed with generated declarations intact.
 Slice 2 accepted on the remote story branch at
 `bef45f8b52e5bf92af3a84155468f6dcb42c11af`, suffix base
 `9ee121fdfad67f4aeab513c8bc09e960c17939c0`; observation reused this stream.
+Slice 3 accepted at `7368d0237052fdd784380f620ef6caeb9d577dd6`, suffix base
+`bef45f8b52e5bf92af3a84155468f6dcb42c11af`; slice 4 accepted at
+`821fbd9ac795f37c0ab06aebe602425cdaa2696d`, suffix base
+`7368d0237052fdd784380f620ef6caeb9d577dd6`. Both reused this story-branch observer.
 
 ## Preparation decisions
 
