@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "agent": "Maria-chan",
+  "email": "maria-chan@example.org",
+  "identity": "SEED-080#story-1",
+  "mode": "story-branch",
+  "branch": "codex/recover-active-navigation-and-finish-command-bar",
+  "host": "codex",
+  "model": "gpt-6.1-sol"
+}
