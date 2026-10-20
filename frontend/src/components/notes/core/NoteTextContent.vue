@@ -21,12 +21,20 @@
     data-testid="note-details-toggle"
     class="daisy-btn daisy-btn-ghost daisy-btn-sm mb-2 h-auto min-h-8 pointer-coarse:min-h-11 text-base-content/60 justify-start text-left font-normal"
     :aria-expanded="revealed"
-    :aria-controls="panelId"
     @click="revealed = !revealed"
   >
     <ChevronDown v-if="revealed" class="size-4 shrink-0" aria-hidden="true" />
     <ChevronRight v-else class="size-4 shrink-0" aria-hidden="true" />
-    {{ propertyKeys.length ? `Properties: ${propertyKeys.join(', ')}` : 'No properties' }}
+    <span v-if="propertyKeys.length || !readonly" data-testid="note-property-summary">
+      {{ propertyKeys.length ? `Properties: ${propertyKeys.join(', ')}` : 'No properties' }}
+    </span>
+    <span
+      data-testid="note-updated-at"
+      :data-freshness="freshness"
+      :style="{ opacity: freshness / 100 }"
+    >
+      Updated: <time :datetime="note.noteTopology.updatedAt">{{ formatDate(note.noteTopology.updatedAt) }}</time>
+    </span>
   </button>
   <div
     role="region"
@@ -44,13 +52,20 @@
         isReadmeContext,
       }"
       @dead-wiki-link-click="$emit('deadWikiLinkClick', $event)"
-    />
+    >
+      <template #after-properties>
+        <dl v-show="revealed" data-testid="note-detail-dates" class="mb-3 text-sm text-base-content/60">
+          <div class="flex gap-1"><dt>Created:</dt><dd><time :datetime="note.noteTopology.createdAt">{{ formatDate(note.noteTopology.createdAt) }}</time></dd></div>
+          <div class="flex gap-1"><dt>Updated:</dt><dd><time :datetime="note.noteTopology.updatedAt">{{ formatDate(note.noteTopology.updatedAt) }}</time></dd></div>
+        </dl>
+      </template>
+    </NoteEditableContent>
   </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed, provide, ref, useId, watch, type PropType } from "vue"
+import { computed, provide, ref, watch, type PropType } from "vue"
 import { ChevronDown, ChevronRight } from "@lucide/vue"
 import { parseNoteContentMarkdown } from "@/utils/noteContentFrontmatter"
 import { noteDetailsDisclosureKey } from "@/composables/noteDetailsDisclosure"
@@ -72,10 +87,25 @@ const props = defineProps({
 defineEmits<{ deadWikiLinkClick: [payload: DeadWikiLinkPayload] }>()
 
 const revealed = ref(false)
-const panelId = useId()
 const propertyKeys = computed(() => {
   const parsed = parseNoteContentMarkdown(props.note.content ?? "")
   return parsed.ok ? Object.keys(parsed.properties) : []
+})
+const formatDate = (date: string | undefined) =>
+  date
+    ? new Date(date).toLocaleDateString(undefined, {
+        day: "numeric",
+        month: "long",
+        year: "numeric",
+      })
+    : ""
+const freshness = computed(() => {
+  const ageInHours = Math.max(
+    0,
+    (Date.now() - new Date(props.note.noteTopology.updatedAt!).getTime()) /
+      (1000 * 60 * 60)
+  )
+  return Math.round(100 - Math.min(15, Math.sqrt(ageInHours)) * 3)
 })
 watch(
   () => props.note.id,
@@ -86,7 +116,6 @@ watch(
 )
 provide(noteDetailsDisclosureKey, {
   revealed,
-  panelId,
   noteId: computed(() => props.note.id),
 })
 

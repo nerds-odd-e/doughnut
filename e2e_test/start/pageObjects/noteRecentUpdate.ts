@@ -1,10 +1,6 @@
 import { navigationActions } from '../actions/navigationActions'
 import { waitUntilAppIsNotBusy } from '../pageBase'
 
-function firstRgbChannel(cssColor: string): number {
-  return parseInt(cssColor.match(/\d+/)?.[0] ?? '', 10)
-}
-
 function expectRecentUpdateRelation(
   left: string,
   right: string,
@@ -12,25 +8,25 @@ function expectRecentUpdateRelation(
 ) {
   waitUntilAppIsNotBusy()
   navigationActions.jumpToNotePage(left)
-  cy.get('.note-recent-update-indicator')
-    .invoke('css', 'color')
-    .then((leftColor) => {
-      const leftChannel = firstRgbChannel(String(leftColor))
+  cy.get('[data-testid="note-updated-at"]')
+    .invoke('attr', 'data-freshness')
+    .then((leftFreshness) => {
+      const leftEmphasis = Number(leftFreshness)
       navigationActions.jumpToNotePage(right)
-      cy.get('.note-recent-update-indicator')
-        .invoke('css', 'color')
-        .then((rightColor) => {
-          const rightChannel = firstRgbChannel(String(rightColor))
+      cy.get('[data-testid="note-updated-at"]')
+        .invoke('attr', 'data-freshness')
+        .then((rightFreshness) => {
+          const rightEmphasis = Number(rightFreshness)
           if (expectation === 'newer') {
             expect(
-              leftChannel,
-              `Expected "${left}" to appear newer than "${right}" (higher freshness channel), but left=${leftChannel}, right=${rightChannel}`
-            ).to.be.greaterThan(rightChannel)
+              leftEmphasis,
+              `Expected "${left}" to appear newer than "${right}" (greater date emphasis), but left=${leftEmphasis}, right=${rightEmphasis}`
+            ).to.be.greaterThan(rightEmphasis)
           } else {
             expect(
-              leftChannel,
-              `Expected "${left}" to appear as recent as "${right}" (same freshness channel), but left=${leftChannel}, right=${rightChannel}`
-            ).to.equal(rightChannel)
+              leftEmphasis,
+              `Expected "${left}" to appear as recent as "${right}" (same date emphasis), but left=${leftEmphasis}, right=${rightEmphasis}`
+            ).to.equal(rightEmphasis)
           }
         })
     })

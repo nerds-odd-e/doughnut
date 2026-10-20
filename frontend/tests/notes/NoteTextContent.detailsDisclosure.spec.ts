@@ -69,7 +69,9 @@ it.each([false, true])(
       "2026-05-15 Trip notes"
     )
     const toggle = wrapper.get('[data-testid="note-details-toggle"]')
-    expect(toggle.text()).toBe("Properties: source, topic")
+    expect(wrapper.get('[data-testid="note-property-summary"]').text()).toBe(
+      "Properties: source, topic"
+    )
     expect(toggle.attributes("aria-expanded")).toBe("false")
     const rows = wrapper.findAll('[data-testid="rich-note-property-row"]')
     expect(rows).toHaveLength(2)
@@ -104,7 +106,7 @@ it("keeps the compact line in Markdown mode and resets on another note", async (
     note: makeMe.aNote.content("Body only.").please(),
     asMarkdown: true,
   })
-  expect(wrapper.get('[data-testid="note-details-toggle"]').text()).toBe(
+  expect(wrapper.get('[data-testid="note-property-summary"]').text()).toBe(
     "No properties"
   )
   expect(
