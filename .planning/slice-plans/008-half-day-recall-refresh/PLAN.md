@@ -159,8 +159,10 @@ the unit and E2E proof of one screen belong to one loop; reassess before 10.
 
 ### 3. Re-offer the daily probe when the catch-up enters a new day
 Type: Behavior
-Status: planned
+Status: done
 Proof: Slice 3 rows in the proof table; `RecallPage.spec.ts`, one E2E rollover scenario, frontend typechecks.
+
+Accepted proof (2026-10-20): `env -u NODE_ENV CURSOR_DEV=true nix develop -c pnpm -C frontend test tests/pages/RecallPage.spec.ts tests/pages/RecallPage.dailyProbeRollover.spec.ts tests/components/recall/DailyProbe.spec.ts tests/toolbars/DonutMenu.recallWindowEnd.spec.ts tests/toolbars/DonutMenu.counts.spec.ts` passed 49/49; both typechecks clean; the E2E command passed 7/7, including "Opted-in learner is asked again when the tab stays open into the next day". Learning: a window's local day is the date of its last instant (end − 1 ms), because the afternoon window ends at the next local midnight. Trials already running when the new day arrives keep going (G5). `DailyProbeGate` needed no change: the recall position lives in `RecallPage`, so Skip returns to the same question.
 
 Behavior: Probe on and today's probe completed or skipped, tab open → the
 boundary catch-up moves the recall window into a new local day → the probe is
@@ -190,12 +192,22 @@ Disposition: no user cost "gets the current half-day's recall trackers and quest
 ### G3. Noon after Skip has no specific observation
 Reported: slice 2 — "\"Noon passes after Skip, still no entry\" (the second half of example 5) has no specific test."
 Story clause: "the noon boundary does not ask again"
-Disposition: receiving slice 3
+Disposition: proved by slice 3: `frontend/tests/pages/RecallPage.dailyProbeRollover.spec.ts` "does not ask again at noon, even after Skip" (skip, catch-up within the same local day → one `getDailyProbeToday` call, no entry screen); it fails under the naive end-date rule.
 
 ### G4. The entry screen's layout was not visually checked
 Reported: slice 2 — "No visual or manual check of the entry screen's layout was done."
 Story clause: "The entry screen occupies the same area the probe trials use today"
 Disposition: no user cost "chooses to start it or skip it before recall questions": the entry renders in the gate's slot where `DailyProbe` renders, with the bar slot hidden until ordinary recall (`showOrdinaryRecall`); the E2E scenarios find and click Start and Skip in the real browser.
+
+### G5. Trials running at midnight are not interrupted
+Reported: slice 3 — "If the learner has pressed Start and is still doing the trials when the new-day catch-up lands, the choice is cleared."
+Story clause: "If it is due, show the full-screen entry screen in place of the recall content, before any further recall question."
+Disposition: proved by slice 3: coordinator decision to keep a running probe (the story names only recall content and questions); `RecallPage.dailyProbeRollover.spec.ts` "keeps Daily probe trials running when the new day arrives during them" and "asks to start or skip on the new day after completing Daily probe the day before".
+
+### G6. Untested rollover edges: same window end, failed new-day check, daylight-saving day
+Reported: slice 3 — "No test covers a failed new-day check. It would show the existing Retry screen."
+Story clause: "A failed probe check keeps the existing Retry screen."
+Disposition: no user cost "when a new local day makes the daily probe due, the learner is offered it": the new-day check is the same `checkOffer` whose failure sets the Retry flag already covered by the RecallPage retry cases; an unchanged window end is not a new day; the day rule compares calendar dates in the learner's zone, so a daylight-saving shift does not change which date a window belongs to.
 
 ## Verification and delivery
 

@@ -1,8 +1,16 @@
 import type { User } from "@generated/donut-backend-api"
 import { DailyProbeController } from "@generated/donut-backend-api/sdk.gen"
+import { useRecallData } from "@/composables/useRecallData"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import timezoneParam from "@/managedApi/window/timezoneParam"
 import { computed, ref, watch, type Ref } from "vue"
+
+// A half-day window ends at local noon or midnight; its last instant is on the
+// local day the window belongs to.
+const localDayOfWindowEndingAt = (endAt: string) =>
+  new Date(new Date(endAt).getTime() - 1).toLocaleDateString("en-CA", {
+    timeZone: timezoneParam(),
+  })
 
 export function useDailyProbeOffer(
   currentUser: Ref<User | undefined> | undefined
@@ -52,6 +60,20 @@ export function useDailyProbeOffer(
       entryChoice.value === "skip"
   )
   const showOfferRetry = computed(() => enabled.value && offerCheckFailed.value)
+
+  const { currentRecallWindowEndAt } = useRecallData()
+  watch(currentRecallWindowEndAt, async (endAt, previousEndAt) => {
+    if (
+      !endAt ||
+      !previousEndAt ||
+      localDayOfWindowEndingAt(endAt) ===
+        localDayOfWindowEndingAt(previousEndAt)
+    )
+      return
+    // Trials already running at midnight go on; any other choice is for the old day.
+    if (!showDailyProbe.value) entryChoice.value = undefined
+    await checkOffer()
+  })
 
   return {
     showDailyProbeEntry,

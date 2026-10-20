@@ -40,3 +40,12 @@ Feature: Daily probe
     And I should see ordinary recall
     When I reload the recall page
     Then I should see the Daily probe instruction
+
+  Scenario: Opted-in learner is asked again when the tab stays open into the next day
+    Given Daily probe is on
+    When I visit recall
+    And I skip the Daily probe
+    Then I should see ordinary recall
+    Given It's day 2
+    When it is 1440 minutes later in the browser
+    Then I should see the Daily probe instruction
