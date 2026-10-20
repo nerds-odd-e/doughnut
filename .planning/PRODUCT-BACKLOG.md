@@ -7,7 +7,6 @@ Make deliberately captured knowledge more useful through learning and refinement
 ## Taken
 
 - [Refresh recall at half-day rollover and choose whether to start the daily probe](seeds/SEED-079-half-day-recall-refresh.md#story-1) — SEED-079#story-1 ([plan](slice-plans/008-half-day-recall-refresh/PLAN.md))
-- [Focus on note content while revealing details when needed](seeds/SEED-078-cohesive-note-workspace.md#story-5) — SEED-078#story-5 ([plan](slice-plans/009-note-details-disclosure/PLAN.md))
 
 ## Backlog list
 
