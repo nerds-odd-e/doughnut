@@ -35,7 +35,6 @@
       </ul>
       <SearchForNoteAndFolder
         v-if="user"
-        ref="searchRef"
         class="pt-2"
         quiet
         @navigate="close"
@@ -51,14 +50,27 @@
       </div>
     </div>
   </AutoCollapseDropdown>
+  <Modal
+    v-if="searchOpen"
+    :show-close-button="false"
+    @close_request="closeSearch"
+  >
+    <template #body>
+      <SearchForNoteAndFolder
+        :modal-closer="closeSearch"
+        @navigate="closeSearch"
+      />
+    </template>
+  </Modal>
 </template>
 
 <script setup lang="ts">
 import type { User } from "@generated/donut-backend-api"
-import { nextTick, onMounted, onUnmounted, ref, watch } from "vue"
+import { onMounted, onUnmounted, ref, watch } from "vue"
 import { useRoute } from "vue-router"
 import { BookMarked } from "@lucide/vue"
 import AutoCollapseDropdown from "@/components/commons/AutoCollapseDropdown.vue"
+import Modal from "@/components/commons/Modal.vue"
 import NavigationItem from "@/components/navigation/NavigationItem.vue"
 import AccountMenuItem from "@/components/toolbars/AccountMenuItem.vue"
 import LoginButton from "@/components/toolbars/LoginButton.vue"
@@ -67,7 +79,7 @@ import { useNavigationItems } from "@/composables/useNavigationItems"
 import { useResumeRecall } from "@/composables/useResumeRecall"
 import { useGoToNextAssimilation } from "@/composables/useGoToNextAssimilation"
 import { useKeyboardShortcut } from "@/composables/useKeyboardShortcut"
-import { scheduleFocusTargetWithin } from "@/utils/focusTarget"
+import { primeSoftKeyboard } from "@/utils/focusTarget"
 import { logout } from "@/managedApi/window/logout"
 
 const props = defineProps<{ user?: User }>()
@@ -75,11 +87,14 @@ const props = defineProps<{ user?: User }>()
 const dropdownRef = ref<InstanceType<typeof AutoCollapseDropdown> | null>(null)
 const close = () => dropdownRef.value?.closeDropdown()
 
-const searchRef = ref<InstanceType<typeof SearchForNoteAndFolder> | null>(null)
-const openIntoSearch = async () => {
-  dropdownRef.value?.openDropdown()
-  await nextTick()
-  scheduleFocusTargetWithin(searchRef.value?.$el)
+const searchOpen = ref(false)
+const closeSearch = () => {
+  searchOpen.value = false
+}
+const openIntoSearch = () => {
+  primeSoftKeyboard()
+  close()
+  searchOpen.value = true
 }
 useKeyboardShortcut("note-search", openIntoSearch, () => !!props.user)
 

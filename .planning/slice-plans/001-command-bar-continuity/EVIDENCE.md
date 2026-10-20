@@ -1,0 +1,131 @@
+# Command-bar continuity preparation evidence
+
+**Identity:** SEED-080#story-1
+**Plan:** [Command-bar continuity](PLAN.md)
+
+## Premises and preparation observations
+
+Checkout: `/Users/terryyin/git/doughnut/.worktrees/recover-active-navigation-and-finish-command-bar`.
+Base: `c64063489126d137d32fb7f4ab3027a26756dd1f`.
+The seed's dated investigation preserves literal commands, setup, results and
+limits for the 34 navigation/search/header/next-unit tests, 16 property tests,
+the reproduced missing compact Resume, modal search reuse and same-note close,
+and the 352.5 px right-alignment gap. A scratch alignment change discriminated
+the geometry check and passed 15 retained header/overflow cases.
+
+Additional observations on 2026-10-20, at that same base:
+
+- A scratch `DonutMenu` replaced embedded search with two buttons opening one
+  real `Modal`/`SearchForNoteAndFolder`; the existing shortcut used the same
+  operation. A temporary coarse-pointer test mounted the real keyboard primer,
+  activated each button, observed primer then input focus and Recent notes,
+  and closed the dialog. Both cases passed.
+- `CURSOR_DEV=true nix develop -c pnpm frontend:test tests/toolbars tests/layouts/propertyActivityPreparationProbe.spec.ts`
+  ran that scratch candidate: 96 passed, 12 failed. All 12 failures were the
+  11 embedded-search entry assumptions in `DonutMenu.search.spec.ts` and the
+  search-input short-menu case in `DonutMenu.layout.spec.ts`. This identifies
+  concrete consumers to migrate; no failed test was accepted as product proof.
+  The 6 shortcut cases passed even after the presentation changed, confirming
+  that they need the explicit dialog assertion specified in [PROOF.md](PROOF.md#outside-in-proof-ownership).
+- In the same run, a real routed note with `topic: training` at
+  `noteProperty` showed its learning controls, hid them when note details
+  were collapsed, showed them again on reveal, and returned to ordinary note
+  routing. The panel remains mounted while hidden: use disclosure state,
+  not mount lifetime, for current activity.
+- Removing the scratch opener's `primeSoftKeyboard()` call and running
+  `CURSOR_DEV=true nix develop -c pnpm frontend:test tests/toolbars/searchPreparationProbe.touch.spec.ts`
+  failed both cases at the primer observation. That proof discriminates the
+  focus preparation, but Chromium touch emulation cannot prove an iPad OS
+  keyboard. All scratch product and probe files were removed and
+  `git diff --exit-code -- frontend` passed before this plan write.
+- With original product code restored,
+  `CURSOR_DEV=true nix develop -c pnpm cy:run --spec e2e_test/features/note_view/search_note.feature`
+  passed all 6 scenarios in this checkout's isolated stack. It reached
+  authenticated same-note Recent/Matches navigation, title search/ranking and
+  duplicate-title feedback. This establishes the local proof route and
+  baseline; slice 2 must run it again through the new entry and dialog-close
+  observation.
+- `CURSOR_DEV=true nix develop -c pnpm cy:run --spec e2e_test/features/recall/browse_answer_and_notes_while_recalling.feature`
+  passed both scenarios on restored product code: browse away during a
+  spelling recall and return to the current question, and remove/revive a
+  tracker. The current Resume helper enters through the popup. Slice 3
+  changes that trigger to the compact control and retains the observed
+  question outcome; this baseline does not prove the proposed compact click.
+
+Native iPad keyboard behavior is the remaining owner-device premise. Its cheap
+focus path has been observed above. Slice 1 owns the permitted early native
+probe: with the candidate common dialog reachable on an iPad, tap its entry,
+observe the software keyboard, type a search and open a result. Use the isolated
+unpaid stack described in `docs/worktree-browser-tests.md`; the developer owns
+access to the device. In slice 1 a disposable local tap trigger can invoke the
+same opening operation; remove it before delivery, and in slice 2 repeat on
+both final menu targets. Failure or unavailable device evidence stops acceptance
+of that touch promise and dependent launcher completion, and requires a plan
+update; independent navigation/layout slices may proceed. Do not substitute
+Chromium input focus or a screenshot of an empty dialog for keyboard operation.
+
+## Execution observation — 2026-10-20
+
+Slice 1 candidate, on established claim `c02920b649348640cdb8dab5b6d91ca1bd04e6c9`:
+
+- `DonutMenu.vue` owns the common `Modal`/`SearchForNoteAndFolder` and one
+  `openIntoSearch` operation that synchronously primes the keyboard, closes the
+  menu, and opens the dialog. The embedded menu search remains pending slice 2.
+- `DonutMenu.searchShortcut.spec.ts` observes actual open dialog and input focus
+  for Ctrl/Cmd+F, entry while menu-open, Escape/Close teardown, and real result
+  clicks for new/current notes. Visitor and existing-dialog boundaries remain.
+  Fixture data supplies only backend search results; real router, focus and Modal
+  establish the outcome.
+- `CURSOR_DEV=true nix develop -c pnpm frontend:test tests/toolbars/DonutMenu.searchShortcut.spec.ts`
+  passed 10 tests. `CURSOR_DEV=true nix develop -c pnpm frontend:test tests/toolbars tests/components/search tests/wiki-link-or-relationship tests/notes/NoteUnresolvedWikiLinkModal.spec.ts`
+  passed 194 tests in 25 files. `CURSOR_DEV=true nix develop -c pnpm -C frontend exec vue-tsc --noEmit`
+  and `CURSOR_DEV=true nix develop -c pnpm -C frontend exec tsc --noEmit` both passed.
+- Fresh post-change refactor found the product change already clean. It split
+  this evidence and PROOF.md from PLAN.md without changing product/test code;
+  accepted automated proof stays valid. Whitespace check passed.
+- Only after automated proof, a marked disposable “Native search probe” button
+  was added to call that same operation. Remove the marked comment/button in
+  `DonutMenu.vue` before delivery, returning to the exact automated candidate.
+- `CURSOR_DEV=true nix develop -c pnpm e2e:hold` owns the unpaid isolated stack,
+  browser origin `http://127.0.0.1:50012`, LAN `http://192.168.33.5:50012`.
+  Session `52361` remains held for owner-device observation. Test account
+  `old_learner` / `password` has notebook “Search probe” and note “Keyboard sample”.
+  A local Chrome probe observed the common focused dialog and search result;
+  this supplies no native OS keyboard evidence.
+- Requested owner observation: on iPad open `/users/identify`, sign in, tap
+  “Native search probe”, observe software keyboard, type “Keyboard”, and open
+  “Keyboard sample”; retain iPadOS/browser version and result. No observation
+  has been received. Native input and dependent launcher acceptance stay open.
+- No slice is marked done; no increment has been committed or pushed.
+
+### LAN login setup correction — 2026-10-20
+
+The owner reported login failing at the LAN HTTP URL. The stack was healthy;
+Basic authentication returned HTTP 200 but `Set-Cookie` included `Secure`.
+The application's default cookie configuration requires HTTPS, so the LAN HTTP
+browser cannot retain the authenticated session. The earlier loopback Chrome
+observation did not establish iPad/LAN authentication. No product login change
+is part of this story.
+
+Stopped the original owned hold runner (PID 45286) with SIGINT and observed
+terminal exit 0. Restarted this isolated unpaid stack only with
+`SERVER_SERVLET_SESSION_COOKIE_SECURE=false CURSOR_DEV=true nix develop -c pnpm e2e:hold`;
+session `41600` supersedes `52361`, retaining the same allocated ports/database.
+The hold reset test data; recreated “Search probe” / “Keyboard sample”. Verified
+the LAN login has a session cookie without `Secure`, and a cookie-only follow-up
+to `/api/user/current-user-info` identifies `old_learner`. A real Chrome login
+through `http://192.168.33.5:50012/users/identify` reached “Welcome Old Learner”
+and successfully created the sample content. Native iPad keyboard proof remains
+pending; the temporary runtime override does not alter source configuration.
+
+### Owner acceptance update — 2026-10-20
+
+Terry tested desktop Chrome successfully and instructed: “Please proceed without
+depending on me.” Native software-keyboard testing is unavailable for now. This
+supersedes the native device acceptance prerequisite above, as recorded in the
+source story's native input decision. Native iPad keyboard behavior remains
+unverified; retain automated coarse-pointer focus checks and synchronous keyboard
+preparation. Removed the disposable probe button, restoring the exact previously
+tested product candidate. The completed product refactor and 194-test/typecheck
+proof remain applicable. No additional owner observation is required to proceed.
+

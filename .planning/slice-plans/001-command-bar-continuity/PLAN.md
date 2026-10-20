@@ -12,7 +12,7 @@ signed-out behavior, adaptive note commands, and shared search capabilities.
 The owner accepted visible property-learning presentation as Assimilate context
 on 2026-10-20, regardless of entry path.
 
-This is preparation only; execution needs a separate instruction. Sidebar
+Execution was authorized on 2026-10-20 through `dough-execute-plan`. Sidebar
 toolbar relocation, breadcrumbs, note-reading layout, and off-route assimilation
 priority remain deferred. No API, persistence, or scheduling-policy change is
 needed. Counts and recall eligibility retain their existing domain rules.
@@ -50,130 +50,27 @@ No conflict or exception. Existing
 presentation work. PFE found suitable owners above; the missing integration
 is visible assimilation context reaching the existing navigation model.
 
-## Outside-in proof ownership
+## Proof and premises
 
-All browser unit proof mounts real components/routes and mocks only backend
-HTTP or existing allowed device boundaries. Fixture state supplies starting
-conditions, never the result the example claims to establish.
-
-| Promise | Slice | Observable proof |
-| --- | --- | --- |
-| Ctrl/Cmd+F opens focused common global search; existing dialog and signed-out shortcut rules survive | 1 | Extend `DonutMenu.searchShortcut.spec.ts`: actual open dialog and focused input, both keys, menu-open entry, Escape/close, existing-modal and signed-out boundaries. Current shortcut tests alone do not distinguish a menu input from a dialog. |
-| Both search-shaped targets close the popup and open that same dialog; truthful button semantics, focus indicator and touch preparation | 2 (native probe starts in 1) | Mounted menu keyboard/pointer interactions; coarse-pointer browser test observes primer focus followed by real dialog input focus. Native iPad observation below owns actual software-keyboard visibility and typing. |
-| Recent/matching notes and folders, history, scope/list choices, keyboard result traversal, modified clicks and same-note selection retain their journey | 1–2 | Move the surviving `DonutMenu.search.spec.ts` scenarios to the dialog entry; retain `SearchResults*`, `SearchDialog.*`, and `NoteUnresolvedWikiLinkModal` coverage for shared consumers. Selecting the current note closes the dialog and exposes its content. Run `search_note.feature` after updating its entry helper. |
-| Collapsed activity icon, applicable badges, ordinary-context menu opening, other destinations, fallback and signed-out entry | 3 | Mounted `DonutMenu`/`GlobalBar` and routed page fixtures: Note/Recall/Circles/Bazaar/Messages, no-active fallback, signed-out Login, counts and diligent styling. Assert the visible control's accessible identity and activation, not wrapper DOM. |
-| Resume precedence, green state, exact paused/progress boundaries, direct action, preserved current question and independent menu opening | 3 | Extend menu Resume/count/keyboard cases, including paused loaded trackers at queue end. Start an actual recall journey, browse away, click the compact Resume, and observe the current question. Existing `RecallPage.answering` setup that sets `shouldResumeRecall` directly does not prove this click. Extend/run `browse_answer_and_notes_while_recalling.feature` through the compact action; spelling focus stays covered at the entry. |
-| Current note/property assimilation, either property entry, visibility lifetime and next-unit destinations | 4 | Routed workspace tests open/close note assimilation and property learning, hide/reveal details, switch notes or leave the note family, and activate next assimilation. Observe icon/count/action and returned note/property; include ordinary missing/read-only/non-learning property browsing and Resume precedence. |
-| Right alignment, order, measured overflow, pinned busy/open actions and group/content dividers | 5 | Extend `NotebookWorkspaceHeader` geometry at 320/390/768/1280 px; retained overflow and voice-input startup/recording tests plus actual active-panel resize. Inspect visible separators in bounded visual checks. |
-| Spacious menu, footer separation and all commands reachable at narrow/short sizes | 6 | `DonutMenu.layout` measures panel containment and scroll reachability with expanded Account at 320/390/768/1280 px and short height; visual observation assesses padding, row separation and footer gap. |
-
-### Consumer trace and removal reading
-
-The search move reaches `donutMenuTestSupport.searchField`, search/keyboard/
-shortcut/layout specs, `e2e_test/start/pageObjects/donutMenu.ts:startSearching`,
-the search step definitions, and `search_note.feature`. The E2E helper currently
-looks for an input inside the open menu. Update the entry and closure assertions
-to observe the dialog; a closed menu alone does not prove search completion.
-Keep result/scoping/duplicate-title consumers on shared search.
-
-The context control reaches `donutMenuLaunchersIn`, `GlobalBar.spec.ts`, routed
-notebook/book pages, recall progress aggregate text, and
-`e2e_test/start/pageBase.ts` plus assimilation/recall/message helpers. Preserve
-an explicit accessible menu opener and scope activity queries to the compact
-control or popup so repeated labels do not make them ambiguous.
-
-Deletion belongs to slice 2: embedded-menu search presentation, its exclusively
-used quiet/entered gating if the final caller trace confirms exclusivity, and
-dependent tests/helpers/styles/declarations. Preserve search history, global
-scope, result lists, keyboard navigation and relationship/dead-link consumers.
-Correct the inherited assertions per purpose: move surviving search journeys
-into the dialog, retain real authorization boundaries, delete assertions whose
-only subject is the retired presentation. Do not replace them with absence
-tests.
-
-At slice 2 acceptance, perform a one-time whole-product search for the exact
-retired identifiers/call forms and embedded-search instructions discovered in
-the diff, including frontend, E2E, backend, CLI, MCP, docs, guidance and generated
-artifacts. Classify shared names and preserve dated observations with their
-original provenance. Record this as a reading here, separate from proof; add
-no permanent absence checker. Regenerate component declarations if component
-files change.
-
-## Premises and preparation observations
-
-Checkout: `/Users/terryyin/git/doughnut/.worktrees/recover-active-navigation-and-finish-command-bar`.
-Base: `c64063489126d137d32fb7f4ab3027a26756dd1f`.
-The seed's dated investigation preserves literal commands, setup, results and
-limits for the 34 navigation/search/header/next-unit tests, 16 property tests,
-the reproduced missing compact Resume, modal search reuse and same-note close,
-and the 352.5 px right-alignment gap. A scratch alignment change discriminated
-the geometry check and passed 15 retained header/overflow cases.
-
-Additional observations on 2026-10-20, at that same base:
-
-- A scratch `DonutMenu` replaced embedded search with two buttons opening one
-  real `Modal`/`SearchForNoteAndFolder`; the existing shortcut used the same
-  operation. A temporary coarse-pointer test mounted the real keyboard primer,
-  activated each button, observed primer then input focus and Recent notes,
-  and closed the dialog. Both cases passed.
-- `CURSOR_DEV=true nix develop -c pnpm frontend:test tests/toolbars tests/layouts/propertyActivityPreparationProbe.spec.ts`
-  ran that scratch candidate: 96 passed, 12 failed. All 12 failures were the
-  11 embedded-search entry assumptions in `DonutMenu.search.spec.ts` and the
-  search-input short-menu case in `DonutMenu.layout.spec.ts`. This identifies
-  concrete consumers to migrate; no failed test was accepted as product proof.
-  The 6 shortcut cases passed even after the presentation changed, confirming
-  that they need the explicit dialog assertion specified above.
-- In the same run, a real routed note with `topic: training` at
-  `noteProperty` showed its learning controls, hid them when note details
-  were collapsed, showed them again on reveal, and returned to ordinary note
-  routing. The panel remains mounted while hidden: use disclosure state,
-  not mount lifetime, for current activity.
-- Removing the scratch opener's `primeSoftKeyboard()` call and running
-  `CURSOR_DEV=true nix develop -c pnpm frontend:test tests/toolbars/searchPreparationProbe.touch.spec.ts`
-  failed both cases at the primer observation. That proof discriminates the
-  focus preparation, but Chromium touch emulation cannot prove an iPad OS
-  keyboard. All scratch product and probe files were removed and
-  `git diff --exit-code -- frontend` passed before this plan write.
-- With original product code restored,
-  `CURSOR_DEV=true nix develop -c pnpm cy:run --spec e2e_test/features/note_view/search_note.feature`
-  passed all 6 scenarios in this checkout's isolated stack. It reached
-  authenticated same-note Recent/Matches navigation, title search/ranking and
-  duplicate-title feedback. This establishes the local proof route and
-  baseline; slice 2 must run it again through the new entry and dialog-close
-  observation.
-- `CURSOR_DEV=true nix develop -c pnpm cy:run --spec e2e_test/features/recall/browse_answer_and_notes_while_recalling.feature`
-  passed both scenarios on restored product code: browse away during a
-  spelling recall and return to the current question, and remove/revive a
-  tracker. The current Resume helper enters through the popup. Slice 3
-  changes that trigger to the compact control and retains the observed
-  question outcome; this baseline does not prove the proposed compact click.
-
-Native iPad keyboard behavior is the remaining owner-device premise. Its cheap
-focus path has been observed above. Slice 1 owns the permitted early native
-probe: with the candidate common dialog reachable on an iPad, tap its entry,
-observe the software keyboard, type a search and open a result. Use the isolated
-unpaid stack described in `docs/worktree-browser-tests.md`; the developer owns
-access to the device. In slice 1 a disposable local tap trigger can invoke the
-same opening operation; remove it before delivery, and in slice 2 repeat on
-both final menu targets. Failure or unavailable device evidence stops acceptance
-of that touch promise and dependent launcher completion, and requires a plan
-update; independent navigation/layout slices may proceed. Do not substitute
-Chromium input focus or a screenshot of an empty dialog for keyboard operation.
+The [proof ownership and consumer trace](PROOF.md) define required
+observations and the slice-2 removal reading. The [preparation evidence](EVIDENCE.md)
+preserves dated baselines and the owner's revised native input acceptance. Both are
+part of this executable plan.
 
 ## Ordered slices
 
 ### 1. Open focused global search in the common dialog
 Type: Behavior
-Status: planned
-Proof: Shortcut/dialog/search cases in the proof table; early native input probe.
+Status: done
+Proof: Shortcut/dialog/search cases in the proof table; native input is unverified.
 
 Behavior: Signed in on any supported page → press Ctrl/Cmd+F → the common
 global search dialog opens focused, offers the existing search journey, and
 closes through its normal controls or result navigation.
 
 Use one opening operation and retain synchronous touch focus preparation for
-the menu entries delivered next. Establish the native input route before
-broadening dependent search work. Interim: menu search keeps its current
+the menu entries delivered next. The owner waived native input observation as an
+acceptance dependency. Interim: menu search keeps its current
 presentation until slice 2; record that interim obligation during execution,
 owned by slice 2. Target 5–8 minutes of local work including focused checks;
 owner-device access/wait is an explicit external-wait exception.
@@ -274,7 +171,7 @@ CURSOR_DEV=true nix develop -c pnpm cy:run --spec e2e_test/features/recall/brows
 ```
 
 Add the new context and touch specs to their owning command. Run the affected
-page/consumer suites identified above when their shared control changes; reuse
+page/consumer suites in [PROOF.md](PROOF.md) when their shared control changes; reuse
 valid evidence for unchanged boundaries. Typechecks are required by the
 frontend skill at acceptance, including generated types. Component additions
 or deletions require the Vite build to regenerate `frontend/components.d.ts`.
@@ -282,8 +179,8 @@ No API generation is expected; use its normal workflow if a real contract
 change becomes necessary. No full backend or paid-service run is required.
 
 The active slice requests bounded manual visual observation using
-`dough-manual-testing` at the listed widths; native iPad input has the separate
-early probe. Save observed setup, screenshots/results and limitations through
+`dough-manual-testing` at the listed widths. Native iPad keyboard behavior stays
+unverified by owner decision. Save setup, screenshots/results and limitations through
 the normal execution evidence, never claim unobserved OS behavior.
 
 Each execution slice includes Jidoka, a fresh `dough-post-change-refactor`
@@ -301,6 +198,10 @@ test/device wait applies. Do not use that exception for growing implementation.
 
 ## Current decisions and learnings
 
+Slice 1 accepted: 194 toolbar/shared-search tests and both typechecks passed;
+10 shortcut cases passed again after probe removal. Native input is unverified
+under the owner's decision. Independent refactor completed; see [evidence](EVIDENCE.md).
+
 - The owner's property-context choice is settled; no sequence-origin policy.
 - Actual visible learning presentation, not property route or mounted DOM,
   is the shared context. Details disclosure uses `v-show`.
@@ -312,4 +213,39 @@ test/device wait applies. Do not use that exception for growing implementation.
   proof ownership; keep the one-time sweep separate.
 - Preparation review found no unresolved slice-boundary or cumulative-design
   concern after these cuts. An additional slice-plan-refinement pass is not
-  needed; the native device premise is explicitly bounded by the early probe.
+  needed; native device evidence is unverified and no longer blocks execution.
+
+## Story obligations
+
+### G1. Native iPad keyboard observation
+Reported: slice 1 — "Native OS keyboard behavior remains unverified."
+Story clause: "Touch activation supports entering text with the software keyboard."
+Disposition: owner changed "Native iPad software-keyboard observation is not an acceptance prerequisite"
+
+### G2. Search presentation interim
+Reported: slice 1 — "Embedded menu search remains as slice 2’s interim obligation."
+Story clause: "Remove the embedded-menu search presentation and transitively unused presentation-only code; shared search capabilities remain reusable."
+Disposition: interim until slices 2
+
+## Execution context
+
+- Identity: `SEED-080#story-1`; publisher `dashboard-territory.local-doughnut`;
+  assigned agent Maria-chan; established start reused.
+- Execution/originating checkout: `/Users/terryyin/git/doughnut/.worktrees/recover-active-navigation-and-finish-command-bar`;
+  owned linked worktree, branch `codex/recover-active-navigation-and-finish-command-bar`.
+  Story Branch Mode publishes increments to the same branch on `origin`;
+  final integration target is `origin/main`. Default checkout is
+  `/Users/terryyin/git/doughnut` and is not this execution's edit location.
+- Starting revision `99588521d53b64053b8cb7d1f7e43c1452480f42`;
+  accepted claim / previously published base / initial candidate
+  `c02920b649348640cdb8dab5b6d91ca1bd04e6c9`.
+  Remote branch confirmed; claim CI on trunk is unobserved.
+- Checkout setup `./scripts/run.sh bash scripts/worktree_setup.sh` succeeded;
+  its locked workspace installation was current. Applicable command
+  `CURSOR_DEV=true nix develop -c pnpm frontend:test tests/toolbars/DonutMenu.searchShortcut.spec.ts`
+  passed 6 baseline cases. Hook: check-only `./scripts/run.sh pnpm lint:changed`.
+- Replanning retains existing authority and the stated budgets/exceptions.
+- CI: GitHub Actions `nerds-odd-e/doughnut`, verified `ci.yml` / `donut CI`;
+  target branch `codex/recover-active-navigation-and-finish-command-bar`.
+  Codex coordinator `maria-command-bar`, live observer `/tmp/dough-ci-501/watch-5lMwJV`,
+  PID `7412`, PTY `86137`, yielded cell `51`; prior observer stopped cleanly.
