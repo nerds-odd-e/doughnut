@@ -87,8 +87,20 @@ Size hypothesis: 4–5 minutes including the discriminating body-edit proof.
 
 ### 2. Open a note on its compact details line and reveal the properties
 Type: Behavior
-Status: planned
+Status: done
 Proof: Slice 2 rows in the proof table; rich-editor, notes, and pages suites below; reconciled page objects.
+
+Accepted: the focused browser command below passed 103 files / 596 tests,
+including the real coarse-pointer 44px observation, both typechecks passed,
+and local Cypress passed 54 scenarios across the seven property, layout,
+wiki-link, editing, reification, memory-tracker, and image features named in
+preparation. The same public control now drives the hidden-body-save test.
+Valid route arrivals, stale-key notice, collapse on a property route, and
+same-key arrival after another note's reset are observed at the note surface.
+Independent refactoring moved repeated test helpers without changing their
+actions/assertions; accepted proof remains valid. Selective formatting passed.
+Budget exception: one isolated E2E startup plus 2:56 of consumer journeys
+extends verification beyond the 10-minute implementation checkpoint.
 
 Behavior: A reader opens a writable or read-only note → the title, then one
 quiet line with the property keys in authored order (or the no-properties

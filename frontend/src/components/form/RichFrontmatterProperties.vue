@@ -3,6 +3,7 @@
     :property-keys="propertyRows.map((row) => row.key)"
   />
   <section
+    :id="detailsDisclosure?.panelId"
     v-if="showSection"
     v-show="detailsRevealed"
     class="mb-3 pointer-coarse:[&_.daisy-btn-sm]:min-h-11 pointer-coarse:[&_.daisy-input-sm]:min-h-11"

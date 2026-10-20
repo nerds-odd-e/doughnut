@@ -1,6 +1,5 @@
 import { NoteController } from "@generated/donut-backend-api/sdk.gen"
 import { mockSdkService } from "@tests/helpers"
-import type { VueWrapper } from "@vue/test-utils"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import {
   notePropertyLocation,
@@ -22,6 +21,7 @@ import {
   propertyRowSelector,
 } from "./propertiesTestDom"
 import { createRichMarkdownEditorTestHarness } from "./richMarkdownEditorTestHarness"
+import { focusedFlag, spyOnRouter } from "./propertyLocationTestSupport"
 
 describe("RichMarkdownEditor property location", () => {
   const h = createRichMarkdownEditorTestHarness()
@@ -44,21 +44,6 @@ Body.`
     h.cleanup()
   })
 
-  function spyOnRouter(wrapper: VueWrapper) {
-    const router = wrapper.vm.$router
-    return {
-      router,
-      replaceSpy: vi.spyOn(router, "replace"),
-      pushSpy: vi.spyOn(router, "push"),
-    }
-  }
-
-  function focusedFlag(wrapper: VueWrapper, key: string) {
-    return wrapper
-      .find(propertyRowSelector(key))
-      .attributes("data-property-focused")
-  }
-
   describe("visiting noteProperty", () => {
     it("focuses the row, scrolls it into view, and opens its property panel", async () => {
       const scrollSpy = vi.spyOn(HTMLElement.prototype, "scrollIntoView")
@@ -68,6 +53,7 @@ Body.`
       })
 
       const topic = wrapper.find(topicRow)
+      expect((topic.element as HTMLElement).checkVisibility()).toBe(true)
       expect(focusedFlag(wrapper, "topic")).toBe("true")
       expect(topic.classes()).toContain("bg-primary/10")
       expectPropertyPanelOpen(topic.element)
@@ -90,6 +76,7 @@ Body.`
       })
 
       const topic = wrapper.find(topicRow)
+      expect((topic.element as HTMLElement).checkVisibility()).toBe(true)
       expect(focusedFlag(wrapper, "topic")).toBe("true")
       expect(topic.classes()).toContain("bg-primary/10")
       expect(topic.text()).toContain("training")

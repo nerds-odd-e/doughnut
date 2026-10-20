@@ -44,6 +44,10 @@ async function editBodyAsMarkdownThenReturnToRich(content: string) {
 }
 
 async function chooseImage() {
+  ;(
+    document.querySelector('[data-testid="note-details-toggle"]') as HTMLElement
+  ).click()
+  await flushPromises()
   const input = document.querySelector(
     '[data-testid="rich-note-image-property-file-input"]'
   ) as HTMLInputElement

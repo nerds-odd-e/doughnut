@@ -1,7 +1,8 @@
 import { waitUntilAppIsNotBusy } from '../pageBase'
 import {
   confirmPropertyMemoryTrackerChange,
-  findNoteContentRegion,
+  focusNoteBody,
+  revealNoteDetails,
   richNotePropertyPanelToggleTestId,
   richNotePropertyRow,
 } from './notePageContentRegion'
@@ -9,7 +10,7 @@ import { assumeAssociateWikidataDialog } from './associateWikidataDialog'
 
 export const noteRichPropertyMethods = () => ({
   addRichNoteProperty(key: string, value: string) {
-    findNoteContentRegion().within(() => {
+    revealNoteDetails().within(() => {
       cy.findByRole('button', { name: 'Add property' }).click()
       cy.get('[data-property-draft="true"]')
         .findByTestId('rich-note-property-row-key-input')
@@ -21,13 +22,11 @@ export const noteRichPropertyMethods = () => ({
         .type(value, { parseSpecialCharSequences: false })
       cy.findByTestId('rich-note-property-row-add').click()
     })
-    findNoteContentRegion().within(() => {
-      cy.get('.ql-editor[contenteditable="true"]').first().click()
-    })
+    focusNoteBody()
     return this.flushPendingContentSave()
   },
   addRichNotePropertyFromPreset(key: string, value: string) {
-    findNoteContentRegion().within(() => {
+    revealNoteDetails().within(() => {
       cy.findByRole('button', { name: 'Add property' }).click()
       cy.get(
         `[data-testid="rich-note-property-key-preset-option"][data-preset-key="${key}"]`
@@ -38,13 +37,11 @@ export const noteRichPropertyMethods = () => ({
         .type(value, { parseSpecialCharSequences: false })
       cy.findByTestId('rich-note-property-row-add').click()
     })
-    findNoteContentRegion().within(() => {
-      cy.get('.ql-editor[contenteditable="true"]').first().click()
-    })
+    focusNoteBody()
     return this.flushPendingContentSave()
   },
   expectRichNotePropertyList(key: string, values: string[]) {
-    findNoteContentRegion().within(() => {
+    revealNoteDetails().within(() => {
       cy.get(richNotePropertyRow(key))
         .find('[data-testid="rich-note-property-row-list-value"]')
         .should('have.attr', 'title', values.join('\n'))
@@ -52,7 +49,7 @@ export const noteRichPropertyMethods = () => ({
     return this
   },
   startAddingRichNoteProperty(key: string) {
-    findNoteContentRegion().within(() => {
+    revealNoteDetails().within(() => {
       cy.findByRole('button', { name: 'Add property' }).click()
       cy.get('[data-property-draft="true"]')
         .findByTestId('rich-note-property-row-key-input')
@@ -62,7 +59,7 @@ export const noteRichPropertyMethods = () => ({
     return this
   },
   typeInRichNotePropertyKey(key: string, text: string) {
-    findNoteContentRegion().within(() => {
+    revealNoteDetails().within(() => {
       cy.get(richNotePropertyRow(key))
         .find('[data-testid="rich-note-property-row-key-input"]')
         .clear()
@@ -71,7 +68,7 @@ export const noteRichPropertyMethods = () => ({
     return this
   },
   uploadRichNoteImagePropertyFromFixture(fixtureRelativePath: string) {
-    findNoteContentRegion().within(() => {
+    revealNoteDetails().within(() => {
       cy.findByRole('button', { name: 'Add property' }).click()
       cy.get('[data-property-draft="true"]')
         .findByTestId('rich-note-property-row-key-input')
@@ -90,7 +87,7 @@ export const noteRichPropertyMethods = () => ({
     return this
   },
   expectRichNotePropertyDisplayed(key: string, value: string) {
-    findNoteContentRegion().within(() => {
+    revealNoteDetails().within(() => {
       cy.contains('h4', 'Properties')
       cy.get(richNotePropertyRow(key)).within(() => {
         cy.get('[data-testid="rich-note-property-row-key-input"]').should(
@@ -98,8 +95,7 @@ export const noteRichPropertyMethods = () => ({
           key
         )
         const keyNorm = key.trim().toLowerCase()
-        const isWikidata = keyNorm === 'wikidata_id' || keyNorm === 'wikidataid'
-        if (isWikidata) {
+        if (keyNorm === 'wikidata_id' || keyNorm === 'wikidataid') {
           cy.contains('.font-mono', value).should('exist')
         } else if (keyNorm === 'image') {
           cy.get('[data-testid="rich-note-property-row-value-input"]').should(
@@ -118,14 +114,14 @@ export const noteRichPropertyMethods = () => ({
     return this
   },
   expectRichNotePropertyAbsent(key: string) {
-    findNoteContentRegion().within(() => {
+    revealNoteDetails().within(() => {
       cy.get(richNotePropertyRow(key)).should('not.exist')
     })
     return this
   },
   reifyRichNoteProperty(key: string) {
     this.openRichNotePropertyPanel(key)
-    findNoteContentRegion().within(() => {
+    revealNoteDetails().within(() => {
       cy.get(richNotePropertyRow(key))
         .findByRole('button', { name: `Reify note property ${key}` })
         .click()
@@ -135,7 +131,7 @@ export const noteRichPropertyMethods = () => ({
   },
   removeRichNoteProperty(key: string) {
     this.switchToRichContent()
-    findNoteContentRegion().within(() => {
+    revealNoteDetails().within(() => {
       cy.get(richNotePropertyRow(key)).within(() => {
         cy.findByTestId(richNotePropertyPanelToggleTestId).then(($toggle) => {
           if ($toggle.attr('aria-expanded') !== 'true') {
@@ -150,7 +146,7 @@ export const noteRichPropertyMethods = () => ({
   },
   renameFocusedRichNotePropertyKey(oldKey: string, newKey: string) {
     this.switchToRichContent()
-    findNoteContentRegion().within(() => {
+    revealNoteDetails().within(() => {
       cy.get(richNotePropertyRow(oldKey), { timeout: 15000 }).within(() => {
         cy.get('[data-testid="rich-note-property-row-key-input"]')
           .focus({ force: true })
@@ -164,9 +160,8 @@ export const noteRichPropertyMethods = () => ({
     return this
   },
   editRichNoteProperty(oldKey: string, newKey: string, newValue: string) {
-    // Edit value before key: changing the key updates `data-property-key` on the row,
-    // which breaks a single `.within()` chain that queries by `oldKey` then touches both inputs.
-    findNoteContentRegion().within(() => {
+    // Edit value before key so a row queried by oldKey remains stable.
+    revealNoteDetails().within(() => {
       cy.contains('h4', 'Properties')
       cy.get(richNotePropertyRow(oldKey), { timeout: 15000 }).within(() => {
         cy.get('[data-testid="rich-note-property-row-value-input"]')
@@ -175,7 +170,7 @@ export const noteRichPropertyMethods = () => ({
           .blur()
       })
     })
-    findNoteContentRegion().within(() => {
+    revealNoteDetails().within(() => {
       cy.get(richNotePropertyRow(oldKey), { timeout: 15000 }).within(() => {
         cy.get('[data-testid="rich-note-property-row-key-input"]')
           .clear()
@@ -184,14 +179,12 @@ export const noteRichPropertyMethods = () => ({
       })
     })
     waitUntilAppIsNotBusy()
-    findNoteContentRegion().within(() => {
-      cy.get('.ql-editor[contenteditable="true"]').first().click()
-    })
+    focusNoteBody()
     return this.flushPendingContentSave()
   },
   expectWikidataBrowseLinkOpensUrl(expectedUrl: string) {
     this.switchToRichContent()
-    findNoteContentRegion().within(() => {
+    revealNoteDetails().within(() => {
       cy.get('[data-testid="rich-note-property-row"]')
         .filter((_, row) => {
           const key = row.getAttribute('data-property-key')?.toLowerCase()
@@ -207,8 +200,7 @@ export const noteRichPropertyMethods = () => ({
               focus: cy.stub(),
             }
             cy.stub(win, 'open').as('open').returns(popupWindowStub)
-            // Overflow on `.note-content-wrapper` can report the scroll parent as
-            // covering this control; same force pattern as other property-row clicks.
+            // Overflow can cover this control; force matches other property clicks.
             cy.wrap($btn).click({ force: true })
             cy.get('@open').should('have.been.called')
             cy.wrap(() => popupWindowStub.location.href)
@@ -229,7 +221,7 @@ export const noteRichPropertyMethods = () => ({
   },
   associateWikidataDialog() {
     this.switchToRichContent()
-    findNoteContentRegion().within(() => {
+    revealNoteDetails().within(() => {
       cy.root().then(($region) => {
         const editBtn = $region.find(
           '[data-testid="rich-note-wikidata-property-edit"]'

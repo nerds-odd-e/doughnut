@@ -85,10 +85,15 @@ describe("RecallPage Just review", () => {
     )
     givenRecallQueue(createMemoryTrackerLite(123))
 
-    const wrapper = await ctx.mountPage()
+    const wrapper = await ctx.mountPage({ attachTo: document.body })
 
     const context = wrapper.find('article[aria-label="Note context"]')
     expect(context.text()).toContain("Inciting rebellion.")
+    expect(
+      (
+        context.find('[data-property-key="color"]').element as HTMLElement
+      ).checkVisibility()
+    ).toBe(true)
     expect(
       context
         .find('[data-property-key="color"]')

@@ -40,6 +40,10 @@ Inciting rebellion against authority.`)
 
     const wrapper = await mountReader(noteRealm)
 
+    await wrapper.get('[data-testid="note-details-toggle"]').trigger("click")
+    const row = wrapper.get('[data-property-key="topic"]')
+      .element as HTMLElement
+    expect(row.checkVisibility()).toBe(true)
     const text = wrapper.text()
     for (const expected of [
       "Sedition",
