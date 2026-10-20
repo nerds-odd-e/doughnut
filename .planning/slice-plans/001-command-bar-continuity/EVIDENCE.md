@@ -222,3 +222,8 @@ Candidate over slice 2 `39503b5d1da3d55f2d7b23f8e62693d7c8fc68ff`:
   passed all 5 scenarios after that correction: 2 continuity/tracker scenarios
   and 3 Daily probe scenarios, wrapper exit 0. Both assertion contracts are
   exercised against the final E2E content.
+
+## Assimilation presentation candidate — 2026-10-20
+
+[Dated implementation, observation and caller evidence](EVIDENCE-ASSIMILATION.md)
+continues this evidence without truncating its original provenance.

@@ -101,7 +101,7 @@ recall Cypress runtime may need the same external-wait exception.
 
 ### 4. Identify the currently presented assimilation activity
 Type: Behavior
-Status: planned
+Status: done
 Proof: Routed note/property presentation and next-unit observations in the table.
 
 Behavior: Open note assimilation or a property-learning panel by either entry
@@ -186,8 +186,9 @@ test/device wait exceptions do not permit growing implementation.
 
 ## Current decisions and learnings
 
-Slices 1–3 accepted: search launchers and compact activity/direct Resume; shared
-search, 168 navigation/page/dropdown tests, typechecks, six search and five recall/probe Cypress scenarios.
+Slices 1–4 accepted: search, compact activity/Resume, and visible note/property
+assimilation. Routed presentation proof and 214 affected tests pass with typechecks;
+prior search/recall journeys remain valid. Independent refactoring completed.
 Native input is unverified under the owner's decision; see [evidence](EVIDENCE.md).
 
 - The owner's property-context choice is settled; no sequence-origin policy.

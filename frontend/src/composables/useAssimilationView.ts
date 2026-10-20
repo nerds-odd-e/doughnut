@@ -1,9 +1,34 @@
-import { ref } from "vue"
+import {
+  computed,
+  onScopeDispose,
+  ref,
+  shallowReactive,
+  toValue,
+  type MaybeRefOrGetter,
+} from "vue"
 
 const targetNoteId = ref<number | null>(null)
 const showAssimilationPanel = ref(false)
 
+const presentations = shallowReactive(
+  new Set<MaybeRefOrGetter<number | undefined>>()
+)
+
 export function useAssimilationView() {
+  const trackPresentation = (
+    noteId: MaybeRefOrGetter<number | undefined>,
+    visible: MaybeRefOrGetter<boolean> = true
+  ) => {
+    const presentedNote = computed(() =>
+      toValue(visible) ? toValue(noteId) : undefined
+    )
+    presentations.add(presentedNote)
+    onScopeDispose(() => presentations.delete(presentedNote))
+  }
+
+  const isPresentedForNote = (noteId: number) =>
+    [...presentations].some((presentation) => toValue(presentation) === noteId)
+
   const isOpenForNote = (noteId: number) =>
     showAssimilationPanel.value && targetNoteId.value === noteId
 
@@ -30,6 +55,8 @@ export function useAssimilationView() {
   }
 
   return {
+    trackPresentation,
+    isPresentedForNote,
     showAssimilationPanel,
     targetNoteId,
     isOpenForNote,

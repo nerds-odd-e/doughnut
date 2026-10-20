@@ -6,7 +6,11 @@ import {
   useAssimilationCount,
 } from "@/composables/useAssimilationCount"
 import { useRecallData } from "@/composables/useRecallData"
-import { isNoteRouteFamily } from "@/routes/noteRouteFamily"
+import { useAssimilationView } from "@/composables/useAssimilationView"
+import {
+  isNoteRouteFamily,
+  noteRouteFamilyNoteId,
+} from "@/routes/noteRouteFamily"
 import {
   BookText,
   CalendarCheck,
@@ -29,7 +33,12 @@ export function useNavigationItems() {
     diligentMode,
   } = useRecallData()
 
+  const { isPresentedForNote } = useAssimilationView()
+
   const upperNavItems = computed(() => {
+    const assimilating = isPresentedForNote(
+      Number(noteRouteFamilyNoteId(route))
+    )
     const due = dueCount.value ?? 0
     const totalUnassimilated = totalUnassimilatedCount.value ?? 0
     const baseItems = [
@@ -38,13 +47,15 @@ export function useNavigationItems() {
         label: "Note",
         icon: BookText,
         isActive:
-          [
+          !assimilating &&
+          ([
             "notebooks",
             "notebookGroup",
             "notebookPage",
             "folderPage",
             "bookReading",
-          ].includes(route.name as string) || isNoteRouteFamily(route),
+          ].includes(route.name as string) ||
+            isNoteRouteFamily(route)),
       },
       {
         name: "assimilate",
@@ -53,7 +64,7 @@ export function useNavigationItems() {
         badge: due > 0 ? abbreviateCount(due) : undefined,
         badgeTitle: assimilationBadgeTitle(due, totalUnassimilated),
         badgeClass: "due-count",
-        isActive: false,
+        isActive: assimilating,
       },
       {
         name: "recall",
