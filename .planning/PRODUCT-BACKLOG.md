@@ -7,7 +7,6 @@ Make deliberately captured knowledge more useful through learning and refinement
 ## Taken
 
 - [Expand a list property into a single list of clickable values](seeds/SEED-064-note-properties-fixes.md#story-7) — SEED-064#story-7 ([plan](slice-plans/001-expanded-property-values/PLAN.md))
-- [Exercise current MCP source in local E2E runs](seeds/SEED-077-current-mcp-e2e-bundle.md#story-1) — SEED-077#story-1 ([plan](slice-plans/002-current-mcp-e2e-source/PLAN.md))
 
 ## Backlog list
 
