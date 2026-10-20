@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "agent": "Rina-chan",
+  "email": "rina-chan@example.org",
+  "identity": "SEED-077#story-1",
+  "mode": "story-branch",
+  "branch": "cursor/exercise-current-mcp-source-in-local-e2e-runs",
+  "host": "cursor",
+  "model": "auto"
+}

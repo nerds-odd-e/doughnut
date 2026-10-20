@@ -7,10 +7,10 @@ Make deliberately captured knowledge more useful through learning and refinement
 ## Taken
 
 - [Expand a list property into a single list of clickable values](seeds/SEED-064-note-properties-fixes.md#story-7) — SEED-064#story-7 ([plan](slice-plans/001-expanded-property-values/PLAN.md))
+- [Exercise current MCP source in local E2E runs](seeds/SEED-077-current-mcp-e2e-bundle.md#story-1) — SEED-077#story-1 ([plan](slice-plans/002-current-mcp-e2e-source/PLAN.md))
 
 ## Backlog list
 
-- [Exercise current MCP source in local E2E runs](seeds/SEED-077-current-mcp-e2e-bundle.md#story-1) — SEED-077#story-1
 - [Generate focus-note questions with relevant supporting passages](seeds/SEED-007-per-concept-prompt-splitting-single-note-qg.md#story-1) — SEED-007#story-1
 - [Decide whether an acceptance-test review procedure benefits from Donut notes](seeds/SEED-074-knowledge-to-capability.md#story-1) — SEED-074#story-1
 - [Find a note from wording remembered in its body](seeds/SEED-073-learning-refinement-and-retrieval.md#story-3) — SEED-073#story-3
