@@ -1,8 +1,12 @@
 <template>
+  <Teleport
+    :to="pageBarTarget"
+    :disabled="!pageBarTarget"
+  >
   <nav
     ref="toolbarNavRef"
     data-note-toolbar
-    :class="[noteChromeToolbarNavClass, 'relative z-20']"
+    class="flex flex-auto min-w-0 items-center relative z-20"
   >
     <div
       ref="buttonRowRef"
@@ -73,6 +77,7 @@
       />
     </div>
   </nav>
+  </Teleport>
   <NoteToolbarPanelShell v-if="!readonly && showAssimilationPanel">
     <AssimilationPanel
       v-if="isOpenForNote(note.id)"
@@ -84,7 +89,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, watch } from "vue"
+import { computed, inject, ref, watch } from "vue"
 import type {
   FolderTrailSegment,
   Note,
@@ -100,7 +105,7 @@ import { useAssimilationView } from "@/composables/useAssimilationView"
 import { useNoteStore } from "@/store/noteStore"
 import { useRoute, useRouter } from "vue-router"
 import NoteToolbarMoreOptions from "../widgets/NoteToolbarMoreOptions.vue"
-import { noteChromeToolbarNavClass } from "../noteChromeToolbarNavClass"
+import { pageBarTargetKey } from "@/composables/pageBarTarget"
 import { currentRouteSettingConversation } from "@/routes/noteShowLocation"
 import NoteCreationNewButton from "../NoteCreationNewButton.vue"
 import { useNotebookSidebarOpened } from "@/composables/notebookSidebarOpened"
@@ -125,6 +130,7 @@ const props = withDefaults(
   { breadcrumbFolders: () => [] }
 )
 
+const pageBarTarget = inject(pageBarTargetKey)!
 const sidebarOpened = useNotebookSidebarOpened()
 
 const showRelocatedNewNote = computed(

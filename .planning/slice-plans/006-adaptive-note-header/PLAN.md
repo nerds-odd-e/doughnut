@@ -174,7 +174,19 @@ the change is one key/module responsibility and its consumers.
 
 ### 2. Operate the current note from the shared top bar
 Type: Behavior
-Status: planned
+Status: done
+Accepted (2026-10-20): NotebookSidebarLayout provides `pageBarTargetKey`;
+NoteToolbar teleports only `nav[data-note-toolbar]` there. Real-layout proof
+in `frontend/tests/layouts/NotebookWorkspaceHeader.spec.ts` (bar membership at
+320/390/768/1280, overflow Edit + resize, Assimilate, read-only, property
+Conversation/maximize, note switching, global Undo of another note) and
+`NotebookWorkspaceHeader.dictation.spec.ts` (title caret then body, starting,
+converting, Retry, Assimilate + recording + More fit at 320). The fit test
+exposed More off-screen at 320px; fixed by letting the breadcrumb region
+yield (`flex-1 min-w-12 max-w-[40%]`) and the command row start from its own
+width (`flex-auto`). Whole frontend suite 361 files / 2260 tests passed; both
+typechecks exit 0. Sweep reading: `grep -rn "realLayout\|mountToolbarInNotebookColumnAt\|bookReaderBarPlugin" --exclude-dir=node_modules --exclude-dir=.git .`
+hits only this plan's proof-table provenance.
 Proof: integrated header geometry/overflow, editing/dictation, Assimilation,
 permission/route, lifecycle, and global Undo observations owned above, plus
 the affected toolbar and note-page suites. The geometric assertion fails
@@ -260,3 +272,30 @@ The ownership risk has a discriminating browser observation. Trunk's newly
 landed Book control placement supplies an existing primitive to modularize,
 rather than a second header model. Runtime acceptance of that reconciled
 Book path and of the final notebook layout remains with its owning slices.
+
+## Story obligations
+
+### G1. Pinned tools against a long ancestry trail are unproved
+Reported: slice 2 — "no test that pinned tools keep space against a long trail."
+Story clause: "Long context yields space to these controls and More rather than pushing them outside the window."
+Disposition: receiving slice 3
+
+### G2. Narrow context stays inside the bar
+Reported: slice 2 — "The breadcrumb's narrow width is now at least 3rem and scrollable in the bar."
+Story clause: "narrow windows show that context immediately below the bar, above the note."
+Disposition: interim until slices 3
+
+### G3. Leaving the layout releases controls without a test
+Reported: slice 2 — "Leaving the layout releases the controls through ordinary unmount, but there is no test for it."
+Story clause: "Folder, attachment, property, Recall, and Book-reading contexts retain their appropriate controls."
+Disposition: receiving slice 3
+
+### G4. Export's dialog not exercised from the bar
+Reported: slice 2 — "The overflow-action proof uses Edit (editor result). Export's dialog was not exercised."
+Story clause: "open More and choose Export or Edit → the existing action works from the shared header"
+Disposition: proved by slice 2: `frontend/tests/layouts/NotebookWorkspaceHeader.spec.ts` "selects an overflow action at phone width and keeps its editor mode while widening" chooses Edit from More in the bar; Export uses the same More menu items, whose actions are unchanged and covered by the retained NoteToolbar overflow specs.
+
+### G5. Conversion and retry proved for body dictation only
+Reported: slice 2 — "Conversion and retry are proved for body dictation only."
+Story clause: "Recording, starting, converting, and retrying voice input, and an open Assimilate control, keep their existing direct access and active states."
+Disposition: proved by slice 2: direct access is a property of the bar control, observed for converting and Retry in `frontend/tests/layouts/NotebookWorkspaceHeader.dictation.spec.ts` "keeps the converting voice input in the bar until the text arrives" and "offers Retry in the bar after a failed conversion…"; title-target insertion is observed in that file's title-caret test and retained `NoteShow.toolbarTitleVoiceInput.spec.ts`.

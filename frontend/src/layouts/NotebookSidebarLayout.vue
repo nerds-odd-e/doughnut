@@ -19,10 +19,18 @@
           aria-hidden="true"
         />
       </button>
-      <BreadcrumbWithCircle
+      <div
         v-if="currentNotebookRealm"
-        :notebook-realm="currentNotebookRealm"
-        :ancestor-folders="breadcrumbFolders"
+        class="flex-1 min-w-12 max-w-[40%] flex items-center"
+      >
+        <BreadcrumbWithCircle
+          :notebook-realm="currentNotebookRealm"
+          :ancestor-folders="breadcrumbFolders"
+        />
+      </div>
+      <div
+        ref="pageBarTarget"
+        class="contents"
       />
     </GlobalBar>
     <div
@@ -74,7 +82,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, inject, ref, watch, type Ref } from "vue"
+import { computed, inject, provide, ref, watch, type Ref } from "vue"
 import { RouterView, useRoute } from "vue-router"
 import type {
   FolderTrailSegment,
@@ -94,8 +102,11 @@ import { useNotebookSidebarDrawer } from "@/composables/useNotebookSidebarDrawer
 import { useNotebookSidebarRouteRealms } from "@/composables/useNotebookSidebarRouteRealms"
 import { useRelocatedNoteCreationInMainColumn } from "@/composables/useRelocatedNoteCreationInMainColumn"
 import { useSidebarCreationReadonly } from "@/composables/useSidebarCreationReadonly"
+import { pageBarTargetKey } from "@/composables/pageBarTarget"
 
 const route = useRoute()
+const pageBarTarget = ref<HTMLElement | null>(null)
+provide(pageBarTargetKey, pageBarTarget)
 const noteStore = useNoteStore()
 const currentUser = inject<Ref<User | undefined>>("currentUser")
 
