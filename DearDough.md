@@ -5,7 +5,7 @@ responses under observation live in the [watch list](https://github.com/terryyin
 Detailed observations, original releases and qualified inferences are retained
 in the linked Open Dough catalog. Unknown execution provenance remains unknown.
 
-- Highest allocated local number: 258. Removed numbers are never reused.
+- Highest allocated local number: 274. Removed numbers are never reused.
 - Full source recovery before this cleanup: `0a8878e98be76b8e92203515d8f4719489b24169:DearDough.md`.
 - Full source recovery before name adoption and compaction: `234f141b41332715edd5e4384a425bcb8f26e718:DearDough.md`; complete supplied evidence retained in Open Dough `dbe36711c0e4ff9421bc28afc53cb7477203e704:docs/maintainer/findings/`.
 - Project-owned findings remain in [Donut Retrospective Findings](DonutRetrospectiveFindings.md); their ownership review is unchanged.
@@ -58,6 +58,15 @@ Former local code: DD-138. An absolute changed-file size check conflicts with an
 
 Former local code: DD-144. A small addition crosses the numeric file-size ceiling and triggers relocation and re-proof of a substantial previously untouched responsibility. Open, unqueued. [Evidence and response](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/finding-names.md#odf-189).
 
+### Occurrences
+- Execution: SEED-080#story-1 (first implementation `ac60f83ff17e67c1a4fe25e6f3fc00813a07fdb2`)
+  - Timestamp: unknown
+  - Tool: Codex
+  - Open Dough release: unknown
+  - Evidence: on 2026-10-20, the refactor file-size gate moved 138 lines of story constraints and dated observations into `SEED-080-command-bar-context.md` (published `ac60f83ff17e67c1a4fe25e6f3fc00813a07fdb2`); the slice 5 pass then compacted a 251-line plan to 240 (`c8523d0428e88b1da203a6f935decf7c1a888b26`).
+  - Observed effect: multiple documentation splits/compactions were required while product behavior and its accepted proof remained unchanged.
+  - Inference: the same absolute ceiling reaches temporary planning records; this occurrence concerns document churn, not a demonstrated product-code extraction cost.
+
 <a id="odf-190"></a>
 
 ## ODF-190 — Planned observation route is unavailable
@@ -75,6 +84,15 @@ Former local code: DD-160. Two refactor passes within one story treat barely tou
 ## ODF-141 — Fixed refactor cost on small accepted slices
 
 Former local code: DD-176. Every small slice launches a fresh full refactor agent even when the accepted diff needs no further changes, creating substantial repeated cost. Open, unqueued. [Evidence and response](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/finding-names.md#odf-141).
+
+### Occurrences
+- Execution: SEED-080#story-1 (first implementation `ac60f83ff17e67c1a4fe25e6f3fc00813a07fdb2`)
+  - Timestamp: unknown
+  - Tool: Codex
+  - Open Dough release: unknown
+  - Evidence: independent `refactor_header_repair`, `refactor_header_alignment`, and `refactor_menu_spacing` returns on 2026-10-20 reported no product/test candidate and approximately 4, 8, and 5 minutes active review respectively; accepted source changes are in `ddd19a5e330d0f21bc52f50cf2f9f482cc9b0eee`, `c8523d0428e88b1da203a6f935decf7c1a888b26`, and `d241265ffc4add55964c7bd6c1906700940114ca`.
+  - Observed effect: each small change required another fresh review; two passes changed evidence summaries only, and no product/test refactor was needed.
+  - Inference: these are agent-reported approximate times, not independent timing measurements. The reviews checked real consumers and retained proof, so the record supports fixed cost, not that all review was wasted.
 
 <a id="odf-208"></a>
 
@@ -388,3 +406,18 @@ The refined story decided how the midnight Daily probe re-offer interrupts recal
   - Evidence: plan slice 3 text "clear the held choice and re-check"; story obligation G5 in the plan at eeab453cdc (reverted to the simple rule in b179d7199a); `RecallPage.dailyProbeRollover.spec.ts` "keeps Daily probe trials running when the new day arrives during them" (failed on the first return).
   - Observed effect: one extra implementation round of about 4 minutes, which the owner then reverted the same day, calling the case an extreme edge case and asking for the simplest rule. No defect delivered.
   - Inference: when a rule resets held state on a time boundary, refinement should list every state that can hold at that moment, including the activity the rule offers. Requiring implementers to list untested states made the miss visible, but the coordinator should have asked whether the edge case mattered before adding a rule for it.
+
+<a id="dd-274"></a>
+
+## DD-274 — Consumer discovery treats execution evidence as canonical work
+
+Supplier discovery scans every planning Markdown file with an `**Identity:**` line as a potential canonical home. Supporting evidence and proof records use that line for provenance, so one real story is reported as multiple canonical homes. A separate non-story evidence anchor is also reported as an unreadable story. No current dependency agreements were present, but discovery could not give a clean result without additional inspection.
+
+### Occurrences
+- Execution: SEED-080#story-1 (first implementation `ac60f83ff17e67c1a4fe25e6f3fc00813a07fdb2`)
+  - Timestamp: unknown
+  - Tool: Codex
+  - Open Dough release: unknown
+  - Evidence: `product-backlog.mjs discover-consumers --file .planning/PRODUCT-BACKLOG.md --supplier-identity SEED-080#story-1` on 2026-10-20 returned no consumers plus duplicate-home and `SEED-066-voice-input.md#manual-discovery-findings` problems. `product-backlog-dependency-consumers.mjs` scans identity lines and all anchors; `EVIDENCE.md`, `PROOF.md` and the slice evidence records at `d241265ffc4add55964c7bd6c1906700940114ca` carry this identity. A whole `.planning` Markdown search found no `dough-story-dependencies` blocks.
+  - Observed effect: closure needed source inspection to distinguish supporting records from live consumers. Unrelated SEED-066 evidence was preserved; no dependency was silently satisfied.
+  - Inference: discovery's candidate grammar is broader than canonical-home grammar. The relationship to other discovery/readiness findings is unconfirmed; Open Dough maintainers can review the boundary.

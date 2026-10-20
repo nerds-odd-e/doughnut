@@ -144,6 +144,10 @@ Extend layout checks using the final search launchers and account contents;
 keep the footer's extra vertical gap. Target 4–6 minutes. This slice owns
 final combined visual acceptance, not unrelated layout work.
 
+## Execution complete
+
+Product advice: Keep the queued sidebar location story next; no new product work or correction is needed.
+
 ## Verification and delivery
 
 Follow `AGENTS.md`, `unit-testing`, `frontend`, matching frontend rules, and
