@@ -1,6 +1,7 @@
 <template>
-  <div class="flex flex-col h-full">
-    <GlobalBar>
+  <div class="notebook-workspace flex flex-col h-full">
+    <GlobalBar :docked-contents="sidebarOpened && isMdOrLarger">
+      <template #navigation>
       <button
         type="button"
         class="daisy-btn daisy-btn-sm daisy-btn-ghost"
@@ -19,6 +20,8 @@
           aria-hidden="true"
         />
       </button>
+      <div ref="contentsBarTarget" class="contents" />
+      </template>
       <div
         ref="pageBarTarget"
         class="contents"
@@ -30,7 +33,7 @@
       <SidebarDrawer
         v-model:opened="sidebarOpened"
         :is-md-or-larger="isMdOrLarger"
-        class="bg-base-200 w-72 shrink-0 transition-all ease-in-out flex flex-col overflow-x-visible"
+        class="bg-base-200 w-[var(--notebook-sidebar-width)] shrink-0 transition-all ease-in-out flex flex-col overflow-x-visible"
       >
         <Sidebar
           v-if="currentNotebookId != null"
@@ -40,6 +43,7 @@
           :notebook-readonly="currentNotebookRealm?.readonly === true"
           :active-folder-realm="activeFolderRealm"
           :breadcrumb-folders="breadcrumbFolders"
+          :toolbar-target="sidebarOpened && isMdOrLarger ? contentsBarTarget : null"
         >
           <template #location>
             <NotebookLocation
@@ -109,6 +113,7 @@ import { useSidebarCreationReadonly } from "@/composables/useSidebarCreationRead
 import { pageBarTargetKey } from "@/composables/pageBarTarget"
 
 const route = useRoute()
+const contentsBarTarget = ref<HTMLElement | null>(null)
 const pageBarTarget = ref<HTMLElement | null>(null)
 provide(pageBarTargetKey, pageBarTarget)
 const noteStore = useNoteStore()
@@ -173,6 +178,10 @@ const showRelocatedNoteCreationInMainColumn =
 </script>
 
 <style scoped>
+.notebook-workspace {
+  --notebook-sidebar-width: 18rem;
+}
+
 main {
   max-height: 100%;
 }

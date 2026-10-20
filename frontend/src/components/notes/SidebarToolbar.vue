@@ -1,6 +1,6 @@
 <template>
   <nav
-    :class="[noteChromeToolbarNavClass, 'overflow-visible']"
+    :class="[noteChromeToolbarNavClass, 'overflow-visible w-auto shrink-0 min-h-0 p-0']"
     data-note-sidebar-toolbar
   >
     <div
@@ -85,3 +85,10 @@ function selectSort(spec: PeerSortSpec, closeDropdown: () => void) {
   closeDropdown()
 }
 </script>
+
+<style scoped>
+:deep(.daisy-btn) {
+  width: 2.75rem;
+  padding-inline: 0;
+}
+</style>

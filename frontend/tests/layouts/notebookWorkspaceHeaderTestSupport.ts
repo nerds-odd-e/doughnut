@@ -124,3 +124,14 @@ export async function chooseFromMore(title: string) {
   await page.elementLocator(overflowMenuItem(title)!).click()
   await flushPromises()
 }
+
+export async function toggleWorkspaceContents() {
+  await page
+    .elementLocator(
+      document.querySelector(
+        '[aria-label="Show sidebar"], [aria-label="Hide sidebar"]'
+      )!
+    )
+    .click()
+  await flushPromises()
+}

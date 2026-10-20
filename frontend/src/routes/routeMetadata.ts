@@ -98,7 +98,9 @@ export const routeMetadata: RouteMetadata[] = [
   {
     path: "/circles/:circleId",
     name: "circleShow",
-    props: true,
+    props: (route: RouteLocation) => ({
+      circleId: Number(route.params.circleId),
+    }),
     meta: { useNoteStorageAccessor: true },
   },
   {
