@@ -1,7 +1,9 @@
 import NotebooksPage from "@/pages/NotebooksPage.vue"
-import { beforeEach, describe, expect, it } from "vitest"
+import { beforeEach, describe, expect, it, vi } from "vitest"
 import makeMe from "donut-test-fixtures/makeMe"
-import helper from "@tests/helpers"
+import helper, { wrapSdkError } from "@tests/helpers"
+import { NotebookController } from "@generated/donut-backend-api/sdk.gen"
+import { donutMenuLaunchersIn } from "@tests/toolbars/donutMenuTestSupport"
 import { fireEvent, screen } from "@testing-library/vue"
 import { flushPromises } from "@vue/test-utils"
 import {
@@ -19,6 +21,28 @@ describe("Notebooks Page", () => {
     mockMyNotebooks({ notebooks: [] })
     const wrapper = await mountNotebooksPage()
     expect(wrapper.get("h1").text()).toBe("Notebooks")
+  })
+
+  it("keeps the Donut menu while the catalog loads", async () => {
+    vi.spyOn(NotebookController, "myNotebooks").mockReturnValue(
+      new Promise(() => undefined) as never
+    )
+    const wrapper = await mountNotebooksPage()
+    expect(donutMenuLaunchersIn(wrapper)).toHaveLength(1)
+  })
+
+  it("keeps the Donut menu when the catalog cannot be fetched", async () => {
+    vi.spyOn(NotebookController, "myNotebooks").mockResolvedValue(
+      wrapSdkError("server error")
+    )
+    const wrapper = await mountNotebooksPage()
+    expect(donutMenuLaunchersIn(wrapper)).toHaveLength(1)
+  })
+
+  it("keeps one Donut menu beside the loaded Notebooks heading", async () => {
+    mockMyNotebooks({ notebooks: [] })
+    const wrapper = await mountNotebooksPage()
+    expect(donutMenuLaunchersIn(wrapper)).toHaveLength(1)
   })
 
   it("fetch API to be called ONCE", async () => {

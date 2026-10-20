@@ -1,4 +1,6 @@
 <template>
+  <!-- Until the group is found, its view, which carries the bar with the catalog controls, is absent. -->
+  <GlobalBar v-if="resolvedGroup === undefined" />
   <ContentLoader v-if="catalogItems === undefined" />
   <NotebookGroupPageView
     v-else-if="user !== undefined && resolvedGroup !== undefined"
@@ -36,6 +38,7 @@ import type {
 } from "@generated/donut-backend-api"
 import { useNotebookCatalog } from "@/composables/useNotebookCatalog"
 import ContentLoader from "@/components/commons/ContentLoader.vue"
+import GlobalBar from "@/components/toolbars/GlobalBar.vue"
 import NotebookGroupPageView from "./NotebookGroupPageView.vue"
 
 const props = defineProps<{

@@ -193,7 +193,8 @@ and book title.
 
 ### 4. Notebook catalog failure and a missing group keep the Donut menu
 Type: Behavior
-Status: planned
+Status: done
+Accepted: `NotebooksPage.spec.ts` (loading, fetch error, loaded heading) and new `NotebookGroupPage.spec.ts` (loaded group, not found) each assert exactly one launcher; loading, failure, and missing tests failed first; `tests/pages/Notebook` green; vue-tsc clean. Same plain-bar-until-loaded shape as slice 3; the loaded views keep their own bars.
 Proof: `tests/pages/NotebooksPage.spec.ts` asserts the "Donut menu" button when `myNotebooks` fails and while loading; a NotebookGroupPage test asserts it beside "This notebook group could not be found." (fail first); typecheck.
 
 Behavior: the notebooks list or a notebook group page whose catalog is
