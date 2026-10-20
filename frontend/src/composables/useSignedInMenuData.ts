@@ -1,6 +1,6 @@
 import type { User } from "@generated/donut-backend-api"
 import { UserController } from "@generated/donut-backend-api/sdk.gen"
-import { onUnmounted, watch, type Ref } from "vue"
+import { onMounted, onUnmounted, watch, type Ref } from "vue"
 import { useAssimilationCount } from "@/composables/useAssimilationCount"
 import { useRecallCatchUp } from "@/composables/useRecallCatchUp"
 import { useRecallData } from "@/composables/useRecallData"
@@ -9,6 +9,8 @@ import { messageCenter } from "@/store/messageCenter"
 
 // Tolerates a browser clock slightly ahead of the server.
 const recallWindowEndMarginMs = 5000
+const recallCatchUpAt = (windowEndAt: string) =>
+  new Date(windowEndAt).getTime() + recallWindowEndMarginMs
 
 export function useSignedInMenuData(user: Ref<User | undefined>) {
   const { applyAssimilationCountDto } = useAssimilationCount()
@@ -65,11 +67,29 @@ export function useSignedInMenuData(user: Ref<User | undefined>) {
       if (!endAt) return
       recallCatchUpTimer = setTimeout(
         catchUpDueRecalls,
-        new Date(endAt).getTime() - Date.now() + recallWindowEndMarginMs
+        recallCatchUpAt(endAt) - Date.now()
       )
     },
     { immediate: true }
   )
 
-  onUnmounted(() => clearTimeout(recallCatchUpTimer))
+  const catchUpIfWindowEnded = () => {
+    const endAt = currentRecallWindowEndAt.value
+    if (
+      document.visibilityState === "visible" &&
+      endAt &&
+      Date.now() > recallCatchUpAt(endAt)
+    ) {
+      clearTimeout(recallCatchUpTimer)
+      catchUpDueRecalls()
+    }
+  }
+
+  onMounted(() =>
+    document.addEventListener("visibilitychange", catchUpIfWindowEnded)
+  )
+  onUnmounted(() => {
+    clearTimeout(recallCatchUpTimer)
+    document.removeEventListener("visibilitychange", catchUpIfWindowEnded)
+  })
 }

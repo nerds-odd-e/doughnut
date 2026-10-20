@@ -79,6 +79,9 @@ export const recentHeading = () => screen.queryByText("Recently updated notes")
 export const navItemOf = (label: string) =>
   within(donutMenuPanel()).getByLabelText(label).closest(".nav-item")
 
+export const recallCountOf = (label: string) =>
+  navItemOf(label)?.querySelector(".recall-count")
+
 export function setupDonutMenuTests() {
   beforeEach(async () => {
     vi.clearAllMocks()

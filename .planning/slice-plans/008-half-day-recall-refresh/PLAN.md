@@ -101,8 +101,8 @@ env -u NODE_ENV CURSOR_DEV=true nix develop -c pnpm -C frontend test tests/pages
 
 | Source promise | Owner | Observable proof |
 | --- | --- | --- |
-| Boundary timer retained: one request after the boundary, none before, none repeated | 1 | Existing `DonutMenu.counts.spec.ts` window-end case stays green. |
-| Tab visible after the boundary without the timer firing → one catch-up; visible before the boundary → none (example 2) | 1 | New `DonutMenu.counts.spec.ts` cases: system time past the window end, `visibilitychange` → `recalling` once and count updated; before the end → no call. |
+| Boundary timer retained: one request after the boundary, none before, none repeated | 1 | Existing `DonutMenu.recallWindowEnd.spec.ts` window-end case stays green. |
+| Tab visible after the boundary without the timer firing → one catch-up; visible before the boundary → none (example 2) | 1 | New `DonutMenu.recallWindowEnd.spec.ts` cases: system time past the window end, `visibilitychange` → `recalling` once and count updated; before the end → no call. |
 | Entry screen shows instruction, Start, Skip, and waits; Start begins trials; ordinary visit uses it (examples 3, 7) | 2 | `RecallPage.spec.ts` probe-entry cases: entry visible, no `DailyProbe` and no `RecallPromptCard` until a choice; Start renders `DailyProbe`. E2E `daily_probe.feature`: existing scenario gains "I start the Daily probe" before the trials. |
 | Skip → recall questions immediately with the progress bar back; in-app navigation and reload semantics (examples 4, 5, 6) | 2 | `RecallPage.spec.ts`: Skip renders `RecallPromptCard` and the progress bar; a fresh mount asks again. E2E `daily_probe.feature` new scenario: skip, see ordinary recall, visit a note and recall again without the entry, reload and see the entry again. |
 | Catch-up into a new day re-offers the probe; noon does not; after Skip a later day asks again (examples 3, 5, 8) | 3 | `RecallPage.spec.ts`: window end moves to a new local day → `getDailyProbeToday` called again and the entry shows; window end moves within the same day → no call; skipped then new day → entry again. E2E `spaced_repetition.feature` or `daily_probe.feature`: probe done on day 1, day 2 in backend, 1440 minutes later in the browser → the entry screen appears. |
@@ -119,8 +119,10 @@ instruction" stays valid because the entry screen shows the instruction.
 
 ### 1. Catch up when the tab becomes visible after the boundary
 Type: Behavior
-Status: planned
-Proof: Slice 1 rows in the proof table; `DonutMenu.counts.spec.ts` and frontend typechecks.
+Status: done
+Proof: Slice 1 rows in the proof table; `DonutMenu.recallWindowEnd.spec.ts` and frontend typechecks.
+
+Accepted proof (2026-10-20): `env -u NODE_ENV CURSOR_DEV=true nix develop -c pnpm -C frontend test tests/toolbars/DonutMenu.counts.spec.ts tests/toolbars/DonutMenu.recallWindowEnd.spec.ts tests/pages/RecallPage.spec.ts tests/DonutApp.menuData.spec.ts tests/DonutApp.frontendUpdateReminder.spec.ts` passed 30/30; both typechecks clean. The visible-after-end case failed on the pre-change composable. Learning: the window-end cases moved to `tests/toolbars/DonutMenu.recallWindowEnd.spec.ts` (counts spec was over the size limit); `recallCountOf` now lives in `donutMenuTestSupport.ts`.
 
 Behavior: A signed-in learner's tab is hidden or asleep while the half-day
 boundary passes and the timer does not fire → the tab becomes visible → one
@@ -171,12 +173,24 @@ stop: completes the source's outcome.
 Size hypothesis: 5–8 minutes including the E2E rollover scenario; one proof
 loop over the shared day rule. Reassess before 10.
 
+## Story obligations
+
+### G1. Listener removal on unmount is untested
+Reported: slice 1 — "No test checks that the listener is removed on unmount; it is only there by implementation."
+Story clause: "including after the tab slept across the boundary"
+Disposition: no user cost "gets the current half-day's recall trackers and questions without reloading the page": the menu data composable lives in the app shell for the page's whole life, so no unmount happens while the learner uses the page.
+
+### G2. A same-window-end response would allow another request on a later visible event
+Reported: slice 1 — "If the catch-up response returns the same window end as before, every later visible event while past that end sends another request."
+Story clause: "one request when the boundary passes, none before it, none repeated within the same half-day"
+Disposition: no user cost "gets the current half-day's recall trackers and questions without reloading the page": every due-recall response carries the current window's end, which is after the clock once the boundary passed, so the next visible event is before the stored end and sends nothing; a failed request leaves the old end and the next visible event retries, which is the wanted catch-up.
+
 ## Verification and delivery
 
 Focused commands:
 
 ```sh
-env -u NODE_ENV CURSOR_DEV=true nix develop -c pnpm -C frontend test tests/pages/RecallPage.spec.ts tests/toolbars/DonutMenu.counts.spec.ts tests/components/recall/DailyProbe.spec.ts
+env -u NODE_ENV CURSOR_DEV=true nix develop -c pnpm -C frontend test tests/pages/RecallPage.spec.ts tests/toolbars/DonutMenu.recallWindowEnd.spec.ts tests/components/recall/DailyProbe.spec.ts
 CURSOR_DEV=true nix develop -c pnpm -C frontend exec vue-tsc --noEmit
 CURSOR_DEV=true nix develop -c pnpm -C frontend exec tsc --noEmit
 CURSOR_DEV=true nix develop -c pnpm cy:run --spec e2e_test/features/recall/daily_probe.feature,e2e_test/features/recall/spaced_repetition.feature
