@@ -244,3 +244,11 @@ The roughly one-hour story estimate includes refactoring, typechecks and
 delivery; it is a hypothesis. Every leaf was reviewed for independent
 outcomes, proof ownership and cumulative design. No preparatory Structure leaf
 or slice-plan refinement is needed. No remaining blocking concern was found.
+
+## Execution complete
+
+Product advice: no new story. At wrap-up, ask the owner to confirm two
+behaviors the source leaves open: the midnight entry screen appears right away
+mid-question (the Open Decision assumption, now delivered), and probe trials
+already running at midnight keep going (G5, a coordinator decision). Record
+both in the story's knowledge, or queue a change if the owner prefers otherwise.

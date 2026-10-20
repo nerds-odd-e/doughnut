@@ -5,7 +5,7 @@ responses under observation live in the [watch list](https://github.com/terryyin
 Detailed observations, original releases and qualified inferences are retained
 in the linked Open Dough catalog. Unknown execution provenance remains unknown.
 
-- Highest allocated local number: 256. Removed numbers are never reused.
+- Highest allocated local number: 257. Removed numbers are never reused.
 - Full source recovery before this cleanup: `0a8878e98be76b8e92203515d8f4719489b24169:DearDough.md`.
 - Full source recovery before name adoption and compaction: `234f141b41332715edd5e4384a425bcb8f26e718:DearDough.md`; complete supplied evidence retained in Open Dough `dbe36711c0e4ff9421bc28afc53cb7477203e704:docs/maintainer/findings/`.
 - Project-owned findings remain in [Donut Retrospective Findings](DonutRetrospectiveFindings.md); their ownership review is unchanged.
@@ -321,3 +321,19 @@ The plan's acceptance sweep for a removed control listed `dialog\[open\]` among 
   - Evidence: slice 4 Proof in the plan at 9d4ad6c321 lists `dialog\[open\]` in the sweep that "returns nothing"; `git grep 'dialog\[open\]' 2c6a1ef05d` (preparation revision) shows seven hits outside the removed `expectClosed`, in `SearchDialog.navigation.spec.ts` and `assimilationPage/shared.ts`; the slice 4 Accepted note in commit 95473a8e63 records that the term "was too broad".
   - Observed effect: the sweep reading was narrowed at acceptance. The cost was one judgement and one plan note; no defect.
   - Inference: the planning premise check confirmed who called the removed helper but did not run the sweep pattern itself. This is probably related to ODF-074 (premises not checked before planning), but the match is uncertain: here the unchecked premise was a sweep term, not a caller or host fact.
+
+<a id="dd-257"></a>
+
+## DD-257 — A rollover rule left the probe's own running state unconsidered and was caught from the implementer's gap list
+
+The refined story decided how the midnight Daily probe re-offer interrupts recall (mid-question or paused), and the plan's slice 3 said "clear the held choice and re-check". Neither considered a learner already doing the probe trials at midnight. The first slice 3 return cleared the choice unconditionally, so the Start/Skip screen would have replaced running trials and discarded the run. The implementer listed the case under gaps; the coordinator returned it before acceptance with a keep-running rule and two discriminating cases.
+
+### Occurrences
+- Execution: SEED-079#story-1 (plan `.planning/slice-plans/008-half-day-recall-refresh/PLAN.md`, first implementation commit a94c83841f)
+  - Timestamp: 2026-10-20T15:24:36+09:00
+  - Tool: Claude Code
+  - Model: claude-opus-5-5
+  - Open Dough release: 0.3.66
+  - Evidence: plan slice 3 text "clear the held choice and re-check"; story obligation G5 in the plan at eeab453cdc; `RecallPage.dailyProbeRollover.spec.ts` "keeps Daily probe trials running when the new day arrives during them" (failed on the first return).
+  - Observed effect: one extra implementation round of about 4 minutes; no defect delivered. The keep-running choice is a coordinator decision the story does not record.
+  - Inference: when a rule resets held state on a time boundary, refinement should list every state that can hold at that moment, including the activity the rule offers. Requiring implementers to list untested states made the miss visible.
