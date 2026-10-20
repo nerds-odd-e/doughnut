@@ -6,8 +6,6 @@ Make deliberately captured knowledge more useful through learning and refinement
 
 ## Taken
 
-- [Reach and operate the Donut menu from every screen state](seeds/SEED-078-cohesive-note-workspace.md#correction-1) — SEED-078#correction-1 ([plan](slice-plans/004-donut-menu-reach-and-keyboard/PLAN.md))
-
 ## Backlog list
 
 - [Find and open notes from search inside the Donut menu](seeds/SEED-078-cohesive-note-workspace.md#story-2) — SEED-078#story-2

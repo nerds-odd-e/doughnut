@@ -281,7 +281,7 @@ When the always-visible menu was replaced by a panel that is rendered only while
 The plan decided that each page renders one page bar outside its loading and error gates, with only page-specific contents conditional. The slice 3 implementer instead rendered a temporary bar while loading that a different bar replaced once loaded, and asked the coordinator to accept or reject that shape. The coordinator accepted it as a routine placement choice and then offered the same shape to slice 4. Each slice's proof checked that a launcher existed in each state, not that it kept working across the change from loading to loaded. When loading finished, the bar was replaced and a panel opened during loading closed.
 
 ### Occurrences
-- Execution: SEED-078#correction-1 (`.planning/slice-plans/004-donut-menu-reach-and-keyboard/PLAN.md`, first implementation commit b664e2afc9)
+- Execution: SEED-078#correction-1 (plan recoverable at `413c7f4f0e:.planning/slice-plans/004-donut-menu-reach-and-keyboard/PLAN.md`, first implementation commit b664e2afc9)
   - Timestamp: 2026-10-20T11:43:50+09:00
   - Tool: Claude Code
   - Model: claude-opus-5-5
@@ -297,7 +297,7 @@ The plan decided that each page renders one page bar outside its loading and err
 For slice 6, the coordinator asked the refactor agent to confirm, read-only unless broken, that choosing an Account action still closes the panel, including a link to the page already shown. Before slice 6, the Account list was teleported outside the panel, so every action counted as an outside click and closed it by accident; no test observed the same-page case. Moving the list inside the panel broke that case. The refactor agent added a test that failed and made the list emit a close.
 
 ### Occurrences
-- Execution: SEED-078#correction-1 (`.planning/slice-plans/004-donut-menu-reach-and-keyboard/PLAN.md`, first implementation commit b664e2afc9)
+- Execution: SEED-078#correction-1 (plan recoverable at `413c7f4f0e:.planning/slice-plans/004-donut-menu-reach-and-keyboard/PLAN.md`, first implementation commit b664e2afc9)
   - Timestamp: 2026-10-20T12:16:59+09:00
   - Tool: Claude Code
   - Model: claude-opus-5-5

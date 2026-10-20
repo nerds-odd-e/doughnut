@@ -1,9 +1,0 @@
-{
-  "schemaVersion": 1,
-  "agent": "Yuma-chan",
-  "email": "yuma-chan@example.org",
-  "identity": "SEED-078#correction-1",
-  "mode": "story-branch",
-  "branch": "claude/reach-and-operate-the-donut-menu-from-every-scre",
-  "host": "claude"
-}
