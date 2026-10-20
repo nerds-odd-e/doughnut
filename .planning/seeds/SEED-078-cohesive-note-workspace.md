@@ -135,7 +135,7 @@ force the estimate. This seed authorizes no implementation or slice plan.
 
 **Identity:** SEED-078#story-5
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"unselected"}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/009-note-details-disclosure/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"fecb692c07f4ddedd71fe57d84627fbf9ec198e9d1e497cb14ef1f30ad076b31","plan":"62845445d938028e0e0f872cd6132d19ae981fadaecc5a655615044b103ed333"}}
 ```
 
 - **Goal:** A reader opening a note on a phone, iPad, or desktop window
