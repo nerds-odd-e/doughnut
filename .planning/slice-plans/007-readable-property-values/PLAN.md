@@ -245,6 +245,13 @@ Size hypothesis: 5–8 minutes including the focused interaction proof. Shared
 focus/target styling and its editing feedback are one outcome. Use the observed Playwright context for pointer proof; retain ordinary
 non-touch proof in the normal run.
 
+## Execution complete
+
+Product advice: no reprioritization. SEED-078#story-5 can build on wrapping
+property rows and quiet idle fields. Mounted touch-emulated proof now overlaps
+the touch-height, compact-pointer and preset scenarios of
+`note_property_layout.feature`; consider them as a test-optimization candidate.
+
 ## Verification and delivery
 
 Focused browser command (use the new layout filename under the same prefix):
