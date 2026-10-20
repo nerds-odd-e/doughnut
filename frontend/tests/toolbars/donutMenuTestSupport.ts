@@ -2,7 +2,7 @@ import { UserController } from "@generated/donut-backend-api/sdk.gen"
 import DonutMenu from "@/components/toolbars/DonutMenu.vue"
 import { useSignedInMenuData } from "@/composables/useSignedInMenuData"
 import type { User } from "@generated/donut-backend-api"
-import { fireEvent, screen } from "@testing-library/vue"
+import { fireEvent, screen, within } from "@testing-library/vue"
 import makeMe from "donut-test-fixtures/makeMe"
 import helper, { mockSdkService, productionRouterAt } from "@tests/helpers"
 import { resetRecallData } from "@tests/helpers/recallDataTestSupport"
@@ -71,7 +71,7 @@ export const expectPanelClosed = () =>
   expect(screen.queryByRole("region", panelIdentity)).toBeNull()
 
 export const navItemOf = (label: string) =>
-  screen.getByLabelText(label).closest(".nav-item")
+  within(donutMenuPanel()).getByLabelText(label).closest(".nav-item")
 
 export function setupDonutMenuTests() {
   beforeEach(async () => {

@@ -241,7 +241,8 @@ panel closes, including when the action does not navigate.
 
 ### 8. The app shell's menu-data fetch is observed through DonutApp
 Type: Structure
-Status: planned
+Status: done
+Accepted: `frontend/tests/DonutApp.menuData.spec.ts` sees the Recall count 12 inside the panel after signing in through `currentUserInfo` (failed with `useSignedInMenuData(user)` commented out, reverted); `tests/toolbars` green; vue-tsc clean. `navItemOf` in `donutMenuTestSupport.ts` now looks inside the panel.
 Proof: a DonutApp spec (in `frontend/tests/`, beside the existing DonutApp specs) returns a user from `currentUserInfo`, mocks `getMenuData` with counts, renders the routed home page, presses the launcher, and sees the Recall count; it fails with the `useSignedInMenuData` call removed from `DonutApp.vue` in a scratch edit; `tests/toolbars` green.
 
 Internal change: test-only. Adds the missing observation of the shell wiring
