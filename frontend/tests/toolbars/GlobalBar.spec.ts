@@ -1,14 +1,10 @@
-import {
-  NoteController,
-  SearchController,
-} from "@generated/donut-backend-api/sdk.gen"
 import GlobalBar from "@/components/toolbars/GlobalBar.vue"
 import type { User } from "@generated/donut-backend-api"
 import type NoteUndo from "@/store/noteUndo"
 import { resetNoteStore } from "@/store/noteStore"
 import { screen } from "@testing-library/vue"
 import makeMe from "donut-test-fixtures/makeMe"
-import helper, { mockSdkService } from "@tests/helpers"
+import helper from "@tests/helpers"
 import { beforeEach, vi, describe, it, expect } from "vitest"
 import { defineComponent, h, provide, ref } from "vue"
 
@@ -29,10 +25,6 @@ describe("global bar", () => {
 
   beforeEach(() => {
     vi.clearAllMocks()
-    // Mock services used by SearchResults (used by LinkNoteDialog in GlobalBar)
-    mockSdkService(NoteController, "getRecentNotes", [])
-    mockSdkService(SearchController, "searchForRelationshipTarget", [])
-    mockSdkService(SearchController, "searchForRelationshipTargetWithin", [])
     user = makeMe.aUser.please()
     const storage = resetNoteStore()
     noteEditingHistory = storage.noteUndo

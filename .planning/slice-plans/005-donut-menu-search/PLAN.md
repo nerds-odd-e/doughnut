@@ -195,7 +195,14 @@ Escape then Ctrl+F, visitor, Ctrl/Cmd+Shift+F.
 
 ### 4. The page bar's search control is removed and E2E search runs through the panel
 Type: Behavior
-Status: planned
+Status: done
+Accepted (2026-10-20, uncommitted candidate on `c6256e03`): `search_note.feature`
+6/6 green; frontend toolbars/search suites 178 green; typecheck clean. Sweep
+reading: `git grep -n -E "search note|Search note \(Ctrl|searchNotePopButtonRef|openNoteSearch|note search dialog should be closed" -- . ':!.planning'`
+printed nothing; the planned `dialog\[open\]` term was too broad (it matches
+the toolbar popup specs and the refine-note modal, which stay). `SearchForm`'s
+no-note path went with the bar control: `note` is required and the no-note
+"All notebooks fixed on" observation lives in `DonutMenu.search.spec.ts`.
 Proof: `GlobalBar.spec` green with the search button, `SearchForm` import, and primer harness gone; `tests/toolbars` green; E2E `e2e_test/features/note_view/search_note.feature` green through the retargeted steps (the two opening steps open the Donut menu and focus the field; the closed check observes the panel); typecheck; sweep reading `git grep -n -E "search note|Search note \(Ctrl|searchNotePopButtonRef|openNoteSearch|note search dialog should be closed|dialog\[open\]" -- . ':!.planning'` returns nothing.
 
 Behavior: signed in on any screen → the page bar shows the launcher, page

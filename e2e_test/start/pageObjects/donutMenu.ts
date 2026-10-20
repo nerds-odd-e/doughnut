@@ -48,6 +48,10 @@ export const donutMenuPanel = () => {
   router().openApp()
   openDonutMenu()
   return {
+    startSearching() {
+      openDonutMenu().findByPlaceholderText('Search').click()
+      return this
+    },
     expectFullWidthSheetBelowPageBar() {
       pageBar().then(($bar) => {
         const barBottom = $bar[0]!.getBoundingClientRect().bottom

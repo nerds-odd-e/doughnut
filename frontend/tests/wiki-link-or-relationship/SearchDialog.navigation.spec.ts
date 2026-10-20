@@ -2,7 +2,6 @@ import {
   NoteController,
   SearchController,
 } from "@generated/donut-backend-api/sdk.gen"
-import type { Note } from "@generated/donut-backend-api"
 import PopButton from "@/components/commons/Popups/PopButton.vue"
 import usePopups from "@/components/commons/Popups/usePopups"
 import SearchForm from "@/components/wiki-link-or-relationship/SearchForm.vue"
@@ -34,7 +33,7 @@ const SearchPopup = defineComponent({
 describe("Search popup result navigation", () => {
   setupSearchDialogTests()
 
-  async function openSearch(note?: Note) {
+  async function openSearch() {
     const current = makeMe.aNoteSearchResult.title("当前笔记").please()
     const other = makeMe.aNoteSearchResult.title("Another note").please()
     mockSdkService(NoteController, "getRecentNotes", [current, other])
@@ -44,7 +43,7 @@ describe("Search popup result navigation", () => {
     })
     await router.push(noteShowLocation(current.noteTopology.id))
     render(SearchPopup, {
-      props: { note },
+      props: { note: makeMe.aNote.please() },
       global: { plugins: [router], directives: { focus: () => undefined } },
     })
     await fireEvent.click(screen.getByText("Search"))
@@ -103,7 +102,7 @@ describe("Search popup result navigation", () => {
   })
 
   it("keeps the choice panel open after Use this note", async () => {
-    await openSearch(makeMe.aNote.please())
+    await openSearch()
     const row = screen.getByText("Another note").closest("li")!
     await fireEvent.click(row.querySelector("button")!)
     await flushPromises()
@@ -115,7 +114,7 @@ describe("Search popup result navigation", () => {
     mockSdkService(SearchController, "searchForRelationshipTargetWithin", [
       makeFolderHit(42, "Archive"),
     ])
-    await openSearch(makeMe.aNote.please())
+    await openSearch()
     await fireEvent.update(screen.getByPlaceholderText("Search"), "Archive")
     await fireEvent.click(await screen.findByText("Move Under"))
     await flushPromises()

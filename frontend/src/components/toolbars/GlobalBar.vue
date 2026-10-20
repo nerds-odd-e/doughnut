@@ -6,19 +6,6 @@
     </div>
     <div class="daisy-join daisy-join-horizontal flex-none">
       <slot name="right" />
-      <PopButton
-        v-if="user"
-        aria-label="search note"
-        title="Search note (Ctrl+F / Cmd+F)"
-        :show-close-button="false"
-      >
-        <template #button_face>
-          <Search class="w-6 h-6" />
-        </template>
-        <template #default="{ closer }">
-          <SearchForm :modal-closer="closer" @close-dialog="closer" />
-        </template>
-      </PopButton>
       <NoteUndoButton />
     </div>
   </nav>
@@ -28,10 +15,7 @@
 import type { Ref } from "vue"
 import type { User } from "@generated/donut-backend-api"
 import { inject } from "vue"
-import { Search } from "@lucide/vue"
 import DonutMenu from "@/components/toolbars/DonutMenu.vue"
-import PopButton from "@/components/commons/Popups/PopButton.vue"
-import SearchForm from "@/components/wiki-link-or-relationship/SearchForm.vue"
 
 const user = inject<Ref<User | undefined>>("currentUser")
 </script>

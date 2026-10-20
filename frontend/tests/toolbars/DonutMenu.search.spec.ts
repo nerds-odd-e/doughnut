@@ -180,6 +180,13 @@ describe("Donut menu search", () => {
     expect(panel()).not.toBeNull()
   })
 
+  it("searches all notebooks, with that scope fixed on", async () => {
+    await openDonutMenu()
+    const allNotebooks = screen.getByLabelText("All notebooks")
+    expect(allNotebooks).toHaveClass("text-primary")
+    expect(allNotebooks).toBeDisabled()
+  })
+
   it("offers no search to a visitor", async () => {
     await openDonutMenu(null)
     expect(screen.queryByPlaceholderText("Search")).toBeNull()
