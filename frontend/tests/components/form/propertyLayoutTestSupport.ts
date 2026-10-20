@@ -3,6 +3,7 @@ import { wikiLinkFromAuthoredToken } from "@/utils/wikiLinkMarkup"
 import { flushPromises, type VueWrapper } from "@vue/test-utils"
 import { propertyRowSelector } from "./propertiesTestDom"
 import type { createRichMarkdownEditorTestHarness } from "./richMarkdownEditorTestHarness"
+import { page, server } from "vitest/browser"
 
 export const longKey = "a_remarkably_long_property_key_for_narrow_windows"
 export const prose =
@@ -105,4 +106,23 @@ export function expectLegibleWholeValueInRow(
 ) {
   expectWholeTextVisibleInRow(row, value, editor)
   expect(rect(value).width).toBeGreaterThanOrEqual(rect(row).width / 2)
+}
+
+export const DRAFT = '[data-property-draft="true"]'
+export const KEY_INPUT = '[data-testid="rich-note-property-row-key-input"]'
+export const VALUE_INPUT = '[data-testid="rich-note-property-row-value-input"]'
+export const PRESET_LIST = '[data-testid="rich-note-property-key-preset-list"]'
+
+export async function atViewport(width: number, height = 800) {
+  const original = server.config.browser.viewport
+  onTestFinished(() => page.viewport(original.width, original.height))
+  await page.viewport(width, height)
+}
+
+export function interactiveControls(root: Element): HTMLElement[] {
+  return Array.from(
+    root.querySelectorAll<HTMLElement>(
+      'button, input:not([type="file"]), [role="textbox"]'
+    )
+  )
 }

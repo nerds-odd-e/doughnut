@@ -27,7 +27,7 @@
     </template>
     <div
       v-else
-      class="flex flex-wrap items-center gap-x-4 gap-y-1"
+      class="flex flex-wrap items-start gap-x-4 gap-y-1"
     >
       <button
         v-if="!draft"

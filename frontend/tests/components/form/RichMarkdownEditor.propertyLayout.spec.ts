@@ -5,12 +5,14 @@ import {
   expectInside,
   expectLegibleWholeValueInRow,
   expectWholeTextVisibleInRow,
+  KEY_INPUT,
   mountAtWidth,
   propertyKeys,
   prose,
   rect,
   row,
   unbroken,
+  VALUE_INPUT,
   widths,
 } from "./propertyLayoutTestSupport"
 import { createRichMarkdownEditorTestHarness } from "./richMarkdownEditorTestHarness"
@@ -30,17 +32,10 @@ describe("RichMarkdownEditor property layout", () => {
         const r = row(wrapper, key)
         expectLegibleWholeValueInRow(
           r,
-          r.querySelector(
-            '[data-testid="rich-note-property-row-value-input"]'
-          )!,
+          r.querySelector(VALUE_INPUT)!,
           wrapper.element
         )
-        expectInside(
-          rect(
-            r.querySelector('[data-testid="rich-note-property-row-key-input"]')!
-          ),
-          rect(r)
-        )
+        expectInside(rect(r.querySelector(KEY_INPUT)!), rect(r))
       }
     })
 
@@ -78,7 +73,7 @@ describe("RichMarkdownEditor property layout", () => {
     const wrapper = await mountAtWidth(h, 320)
     const r = row(wrapper, "identifier")
     const field = wrapper.find(
-      `${propertyRowSelector("identifier")} [data-testid="rich-note-property-row-value-input"]`
+      `${propertyRowSelector("identifier")} ${VALUE_INPUT}`
     )
     const edited = `${prose} ${unbroken}`
 

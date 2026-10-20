@@ -22,6 +22,16 @@ const isCI = process.env.CI === "true"
 
 const repoRoot = fileURLToPath(new URL("..", import.meta.url))
 
+const testExcludes = [
+  "packages/template/*",
+  "node_modules/**/*.spec.js",
+  "node_modules/**/*.test.js",
+  "node_modules/**/test.js",
+  "**/setupVitest.ts",
+  "**/setup*.ts",
+]
+const touchSpecs = "./**/*.touch.spec.ts"
+
 const config = defineConfig({
   server: {
     fs: {
@@ -84,20 +94,23 @@ const config = defineConfig({
     reporters: isCI ? ["default", orchestratorGcReporter()] : ["default"],
     setupFiles: ["./tests/setupVitest.ts"],
     include: ["./**/*.spec.{ts,tsx}"],
-    exclude: [
-      "packages/template/*",
-      "node_modules/**/*.spec.js",
-      "node_modules/**/*.test.js",
-      "node_modules/**/test.js",
-      "**/setupVitest.ts",
-      "**/setup*.ts",
-    ],
+    exclude: [...testExcludes, touchSpecs],
     browser: {
       enabled: true,
       headless: true,
       provider: playwright(),
       screenshotDirectory: "vitest-test-results",
-      instances: [{ browser: "chromium" }],
+      instances: [
+        { browser: "chromium" },
+        // Touch specs run with real touch emulation, so `(pointer: coarse)` matches.
+        {
+          browser: "chromium",
+          name: "chromium-touch",
+          include: [touchSpecs],
+          exclude: testExcludes,
+          provider: playwright({ contextOptions: { hasTouch: true } }),
+        },
+      ],
     },
     // Disable coverage collection during tests (not needed for unit tests)
     coverage: {

@@ -23,6 +23,7 @@ import {
   rect,
   row,
   unbroken,
+  VALUE_INPUT,
   widths,
 } from "./propertyLayoutTestSupport"
 import { createRichMarkdownEditorTestHarness } from "./richMarkdownEditorTestHarness"
@@ -100,7 +101,7 @@ describe("RichMarkdownEditor list property layout", () => {
 
       expectLegibleWholeValueInRow(
         r,
-        r.querySelector('[data-testid="rich-note-property-row-value-input"]')!,
+        r.querySelector(VALUE_INPUT)!,
         wrapper.element
       )
       expectInside(

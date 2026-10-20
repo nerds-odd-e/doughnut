@@ -213,7 +213,7 @@ irreducible focused-check wait remains.
 
 ### 3. Edit properties with clear, reachable controls
 Type: Behavior
-Status: planned
+Status: done
 Proof: Slice 3 rows in the proof table; rich-editor and shared assimilation suites, frontend typechecks.
 
 Behavior: On a narrow touch window, start or resume a property edit, use its
@@ -228,6 +228,18 @@ specialized control, and keep the existing dialog operations reachable.
 Update the maintained rich-property presentation documentation for the final
 behavior, without duplicating workflow history.
 Safe stop: this completes the source's presentation and interaction outcome.
+
+Accepted proof: idle fields use `daisy-input-ghost` and the scalar field no
+longer suppresses the focus outline; key presets sit in the row's flow (G1);
+the row aligns `items-start`. A `chromium-touch` Vitest browser instance with
+`hasTouch` runs `*.touch.spec.ts`. New `propertyEditingLayout`,
+`propertyValueDialogNarrow` and `propertyTouchTargets.touch` specs observe
+idle/focus styles, compact fine-pointer and 44px coarse-pointer controls,
+draft text and focus across resizing, narrow validation, preset bounds and
+dialog reorder/save/cancel; idle-border and preset-overlap cases failed
+before. Focused run 31 files / 214 tests, full frontend run 365 files / 2277
+tests, both typechecks, and `note_property_layout.feature` 12/12 (after
+refactor) passed. `docs/note-content-saving.md` describes the final behavior.
 
 Size hypothesis: 5–8 minutes including the focused interaction proof. Shared
 focus/target styling and its editing feedback are one outcome. Use the observed Playwright context for pointer proof; retain ordinary
@@ -280,9 +292,19 @@ identified; final interaction/design acceptance remains execution's work.
 ### G1. Key presets may cover a wrapped draft value in a narrow editor at a wide viewport
 Reported: slice 1 — "If the editor is narrower than about 448px at such a viewport (a sidebar could do this), the draft row now wraps and the list could cover the draft value."
 Story clause: "Labels and controls stay reachable as space narrows"
-Disposition: receiving slice 3
+Disposition: proved by slice 3: `RichMarkdownEditor.propertyEditingLayout.spec.ts` "keeps key presets clear of the draft value in a narrow editor at a wide viewport" (1280px viewport, 320px editor; failed before the in-flow preset list) and `note_property_layout.feature` preset scenarios.
 
 ### G2. Wrapped labels in note-level assimilation modes proven only for short labels
 Reported: slice 2 — "Wrapped labels in note-level `AssimilationModes` (outside the property panel) are only proven for short labels, i.e. that the column layout is unchanged."
 Story clause: "inspecting note properties on a phone, iPad,"
 Disposition: no user cost "inspecting note properties on a phone, iPad,": note-level rows label fixed assimilation mode names, never authored values, so only short labels reach that consumer; `AssimilationModes.presentation.spec.ts` "aligns actions in one column after the labels…" proves its layout is unchanged.
+
+### G3. Wikidata and relation controls not checked against the preset list
+Reported: slice 3 — "Wikidata and relation specialized controls were not checked for overlap. Only the image Choose button and the scalar value were."
+Story clause: "Labels and controls stay reachable as space narrows"
+Disposition: no user cost "use the existing editors comfortably": the preset list is now in normal flow under the key field, so it pushes every later sibling in the row down rather than overlaying it; the specialized control's position does not depend on its kind, as the image and scalar cases in `RichMarkdownEditor.propertyEditingLayout.spec.ts` show.
+
+### G4. Real phone and iPad soft-keyboard behaviour not observed
+Reported: slice 3 — "Real iPhone/iPad soft-keyboard behaviour (not inferable from headless Chromium)."
+Story clause: "use the existing editors comfortably"
+Disposition: no user cost "use the existing editors comfortably": the story changes only presentation CSS; `PropertyValueField`'s pointerdown/focus handling for soft keyboards is unchanged, and draft text and focus surviving a resize are proved in `RichMarkdownEditor.propertyEditingLayout.spec.ts`.

@@ -2,7 +2,7 @@
   <div
     ref="root"
     tabindex="0"
-    class="property-value-field rich-content-wiki-links daisy-input daisy-input-sm w-full min-h-0 py-1 px-3 leading-normal"
+    class="property-value-field rich-content-wiki-links daisy-input daisy-input-sm daisy-input-ghost w-full min-h-0 py-1 px-3 leading-normal"
     :class="{ 'daisy-input-disabled': readonly }"
     :contenteditable="!readonly"
     role="textbox"
@@ -155,7 +155,6 @@ defineExpose({
 <style scoped>
 .property-value-field {
   display: block;
-  outline: none;
   white-space: normal;
   overflow-wrap: anywhere;
   line-height: 1.375rem;
