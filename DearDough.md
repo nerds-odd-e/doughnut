@@ -335,5 +335,5 @@ The refined story decided how the midnight Daily probe re-offer interrupts recal
   - Model: claude-opus-5-5
   - Open Dough release: 0.3.66
   - Evidence: plan slice 3 text "clear the held choice and re-check"; story obligation G5 in the plan at eeab453cdc; `RecallPage.dailyProbeRollover.spec.ts` "keeps Daily probe trials running when the new day arrives during them" (failed on the first return).
-  - Observed effect: one extra implementation round of about 4 minutes; no defect delivered. The keep-running choice is a coordinator decision the story does not record.
-  - Inference: when a rule resets held state on a time boundary, refinement should list every state that can hold at that moment, including the activity the rule offers. Requiring implementers to list untested states made the miss visible.
+  - Observed effect: one extra implementation round of about 4 minutes, which the owner then reverted the same day, calling the case an extreme edge case and asking for the simplest rule. No defect delivered.
+  - Inference: when a rule resets held state on a time boundary, refinement should list every state that can hold at that moment, including the activity the rule offers. Requiring implementers to list untested states made the miss visible, but the coordinator should have asked whether the edge case mattered before adding a rule for it.

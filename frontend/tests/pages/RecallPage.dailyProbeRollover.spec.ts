@@ -118,17 +118,6 @@ describe("RecallPage Daily probe when the catch-up enters a new day", () => {
     )
   })
 
-  it("keeps Daily probe trials running when the new day arrives during them", async () => {
-    getToday.mockResolvedValue(wrapSdkResponse({ completed: false }))
-    const wrapper = await mountRecallWithWindowEnd(day1MidnightEnd)
-    await choose(wrapper, "start")
-
-    await catchUpTo(day2NoonEnd, false)
-
-    expect(showsDailyProbe(wrapper)).toBe(true)
-    expect(showsEntry(wrapper)).toBe(false)
-  })
-
   it("asks to start or skip on the new day after completing Daily probe the day before", async () => {
     getToday.mockResolvedValue(wrapSdkResponse({ completed: false }))
     const wrapper = await mountRecallWithWindowEnd(day1MidnightEnd)

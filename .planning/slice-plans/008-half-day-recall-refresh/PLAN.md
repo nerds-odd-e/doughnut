@@ -162,7 +162,7 @@ Type: Behavior
 Status: done
 Proof: Slice 3 rows in the proof table; `RecallPage.spec.ts`, one E2E rollover scenario, frontend typechecks.
 
-Accepted proof (2026-10-20): `env -u NODE_ENV CURSOR_DEV=true nix develop -c pnpm -C frontend test tests/pages/RecallPage.spec.ts tests/pages/RecallPage.dailyProbeRollover.spec.ts tests/components/recall/DailyProbe.spec.ts tests/toolbars/DonutMenu.recallWindowEnd.spec.ts tests/toolbars/DonutMenu.counts.spec.ts` passed 49/49; both typechecks clean; the E2E command passed 7/7, including "Opted-in learner is asked again when the tab stays open into the next day". Learning: a window's local day is the date of its last instant (end − 1 ms), because the afternoon window ends at the next local midnight. Trials already running when the new day arrives keep going (G5). `DailyProbeGate` needed no change: the recall position lives in `RecallPage`, so Skip returns to the same question.
+Accepted proof (2026-10-20): `env -u NODE_ENV CURSOR_DEV=true nix develop -c pnpm -C frontend test tests/pages/RecallPage.spec.ts tests/pages/RecallPage.dailyProbeRollover.spec.ts tests/components/recall/DailyProbe.spec.ts tests/toolbars/DonutMenu.recallWindowEnd.spec.ts tests/toolbars/DonutMenu.counts.spec.ts` passed 49/49; both typechecks clean; the E2E command passed 7/7, including "Opted-in learner is asked again when the tab stays open into the next day". Learning: a window's local day is the date of its last instant (end − 1 ms), because the afternoon window ends at the next local midnight. A new day always clears the held choice, including running trials (G5, owner's choice of the simplest rule). `DailyProbeGate` needed no change: the recall position lives in `RecallPage`, so Skip returns to the same question.
 
 Behavior: Probe on and today's probe completed or skipped, tab open → the
 boundary catch-up moves the recall window into a new local day → the probe is
@@ -199,10 +199,10 @@ Reported: slice 2 — "No visual or manual check of the entry screen's layout wa
 Story clause: "The entry screen occupies the same area the probe trials use today"
 Disposition: no user cost "chooses to start it or skip it before recall questions": the entry renders in the gate's slot where `DailyProbe` renders, with the bar slot hidden until ordinary recall (`showOrdinaryRecall`); the E2E scenarios find and click Start and Skip in the real browser.
 
-### G5. Trials running at midnight are not interrupted
+### G5. Trials running at midnight are replaced by the entry screen
 Reported: slice 3 — "If the learner has pressed Start and is still doing the trials when the new-day catch-up lands, the choice is cleared."
 Story clause: "If it is due, show the full-screen entry screen in place of the recall content, before any further recall question."
-Disposition: proved by slice 3: coordinator decision to keep a running probe (the story names only recall content and questions); `RecallPage.dailyProbeRollover.spec.ts` "keeps Daily probe trials running when the new day arrives during them" and "asks to start or skip on the new day after completing Daily probe the day before".
+Disposition: no user cost "when a new local day makes the daily probe due, the learner is offered it": on 2026-10-20 the owner called this an extreme edge case and chose the simplest behavior, so a new day always clears the held choice and the entry screen replaces running trials.
 
 ### G6. Untested rollover edges: same window end, failed new-day check, daylight-saving day
 Reported: slice 3 — "No test covers a failed new-day check. It would show the existing Retry screen."
@@ -247,8 +247,6 @@ or slice-plan refinement is needed. No remaining blocking concern was found.
 
 ## Execution complete
 
-Product advice: no new story. At wrap-up, ask the owner to confirm two
-behaviors the source leaves open: the midnight entry screen appears right away
-mid-question (the Open Decision assumption, now delivered), and probe trials
-already running at midnight keep going (G5, a coordinator decision). Record
-both in the story's knowledge, or queue a change if the owner prefers otherwise.
+Product advice: no new story. At wrap-up, record in the story's knowledge that
+the midnight entry screen appears right away, even mid-question or during
+running trials; the owner chose this simplest rule on 2026-10-20.

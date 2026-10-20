@@ -70,8 +70,7 @@ export function useDailyProbeOffer(
         localDayOfWindowEndingAt(previousEndAt)
     )
       return
-    // Trials already running at midnight go on; any other choice is for the old day.
-    if (!showDailyProbe.value) entryChoice.value = undefined
+    entryChoice.value = undefined
     await checkOffer()
   })
 
