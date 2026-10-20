@@ -15,6 +15,7 @@ const {
 </script>
 
 <template>
+  <slot name="bar" :ordinary-recall="showOrdinaryRecall" />
   <DailyProbe
     v-if="showDailyProbe"
     @complete="markDailyProbeFinished"

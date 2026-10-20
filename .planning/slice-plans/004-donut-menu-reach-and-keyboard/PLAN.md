@@ -172,7 +172,8 @@ relies on.
 
 ### 2. Recall keeps the Donut menu during the Daily probe and its retry
 Type: Behavior
-Status: planned
+Status: done
+Accepted: `RecallPage.spec.ts` probe and Retry tests assert the launcher (failed with the product change reversed); `tests/pages/RecallPage* tests/components/recall tests/toolbars` green; vue-tsc clean. `DailyProbeGate` exposes a `bar` slot with `ordinary-recall`; the bar stays gated only by the KeepAlive-active flag (`isGlobalBarVisible`), which keeps a hidden cached page's search shortcut unregistered.
 Proof: `tests/pages/RecallPage.spec.ts` "RecallPage Daily probe entry" tests assert the "Donut menu" button while the probe shows and while Retry shows (fail first); the existing ordinary-recall and KeepAlive tests stay green; typecheck.
 
 Behavior: Daily probe opted in, or today's probe check failed → open the

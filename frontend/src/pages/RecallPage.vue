@@ -1,31 +1,34 @@
 <template>
   <div ref="recallPageRoot" class="recall-page h-full flex flex-col">
     <DailyProbeGate>
-    <GlobalBar
-      v-if="isProgressBarVisible"
-      :class="[
-        previousAnsweredQuestionCursor !== undefined ? 'repeat-paused' : '',
-        treadmillMode ? 'treadmill-mode' : '',
-      ]"
-    >
-      <RecallProgressBar
-        v-bind="{
-          finished,
-          toRepeatCount,
-          previousAnsweredQuestionCursor,
-          canMoveToEnd: toRepeatCount > 0 && currentIndex < (toRepeat?.length ?? 0) - 1,
-          currentIndex,
-          totalAssimilatedCount: totalAssimilatedCount ?? 0,
-          diligentMode: diligentMode,
-          previousAnsweredQuestions,
-          potentialLearningSessions,
-        }"
-        @view-last-answered-question="viewLastAnsweredQuestion($event)"
-        @move-to-end="moveMemoryTrackerToEnd($event)"
-        @treadmill-mode-changed="handleTreadmillModeChanged"
+    <template #bar="{ ordinaryRecall }">
+      <GlobalBar
+        v-if="isGlobalBarVisible"
+        :class="[
+          previousAnsweredQuestionCursor !== undefined ? 'repeat-paused' : '',
+          treadmillMode ? 'treadmill-mode' : '',
+        ]"
       >
-      </RecallProgressBar>
-    </GlobalBar>
+        <RecallProgressBar
+          v-if="ordinaryRecall"
+          v-bind="{
+            finished,
+            toRepeatCount,
+            previousAnsweredQuestionCursor,
+            canMoveToEnd: toRepeatCount > 0 && currentIndex < (toRepeat?.length ?? 0) - 1,
+            currentIndex,
+            totalAssimilatedCount: totalAssimilatedCount ?? 0,
+            diligentMode: diligentMode,
+            previousAnsweredQuestions,
+            potentialLearningSessions,
+          }"
+          @view-last-answered-question="viewLastAnsweredQuestion($event)"
+          @move-to-end="moveMemoryTrackerToEnd($event)"
+          @treadmill-mode-changed="handleTreadmillModeChanged"
+        >
+        </RecallProgressBar>
+      </GlobalBar>
+    </template>
 
     <div class="flex-1 min-h-0 overflow-y-auto">
     <template v-if="toRepeat != undefined">
@@ -213,7 +216,7 @@ watch(
   }
 )
 
-const { isProgressBarVisible, isLoadingMore, loadMore } = useRecallPageLoading({
+const { isGlobalBarVisible, isLoadingMore, loadMore } = useRecallPageLoading({
   currentIndex,
   previousAnsweredQuestions,
   dueRecallsRefreshNonce,
