@@ -244,6 +244,14 @@ boundary and proof loop; no separate platform model is justified. Stop and
 finer-decompose above ten minutes, or revisit the story if the one-hour
 hypothesis fails.
 
+## Execution complete
+
+Product advice: no change to priorities. The shared top bar now carries note
+commands and folder context, so SEED-078's remaining property-layout stories
+can build on one header owner. The narrow drawer overlaying the compact
+ancestry line (G7) and touch usability were not checked on a physical phone;
+a short manual check is worthwhile before relying on that arrangement.
+
 ## Verification and delivery
 
 Follow `AGENTS.md` and the frontend, frontend-component, frontend-testing,

@@ -5,7 +5,7 @@ responses under observation live in the [watch list](https://github.com/terryyin
 Detailed observations, original releases and qualified inferences are retained
 in the linked Open Dough catalog. Unknown execution provenance remains unknown.
 
-- Highest allocated local number: 256. Removed numbers are never reused.
+- Highest allocated local number: 257. Removed numbers are never reused.
 - Full source recovery before this cleanup: `0a8878e98be76b8e92203515d8f4719489b24169:DearDough.md`.
 - Full source recovery before name adoption and compaction: `234f141b41332715edd5e4384a425bcb8f26e718:DearDough.md`; complete supplied evidence retained in Open Dough `dbe36711c0e4ff9421bc28afc53cb7477203e704:docs/maintainer/findings/`.
 - Project-owned findings remain in [Donut Retrospective Findings](DonutRetrospectiveFindings.md); their ownership review is unchanged.
@@ -117,6 +117,16 @@ Former local code: DD-216. An abbreviated published-base SHA is accepted as an a
 ## ODF-206 — Over-budget slice not stopped
 
 Former local code: DD-217. Former local code: DD-222. The slice time bound is checked only at hand-back, so a delegated slice runs past it and is accepted or extended without re-sizing. Open, unqueued. [Evidence and response](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/finding-names.md#odf-206).
+
+### Occurrences
+- Execution: SEED-078#story-3 (plan `.planning/slice-plans/006-adaptive-note-header/PLAN.md`, first implementation commit 7d122c9938)
+  - Timestamp: 2026-10-20T14:13:39+09:00
+  - Tool: Claude Code
+  - Model: claude-opus-5-5
+  - Open Dough release: 0.3.66
+  - Evidence: slice 2 sized 7–9 minutes with "Stop and finer-decompose if it exceeds ten minutes"; the first implementation return took about 10 minutes of agent wall time (including a whole-suite run), and the proof-gap return about 6 more; slice commit e0cf54a34a.
+  - Observed effect: the slice was accepted at about 16 minutes without re-sizing; the extra round found and fixed a real defect, so the overrun delivered value.
+  - Inference: wall time includes whole-suite verification, which the sizing hypothesis may not count; the bound was not checked mid-run.
 
 <a id="odf-217"></a>
 
@@ -321,3 +331,19 @@ The plan's acceptance sweep for a removed control listed `dialog\[open\]` among 
   - Evidence: slice 4 Proof in the plan at 9d4ad6c321 lists `dialog\[open\]` in the sweep that "returns nothing"; `git grep 'dialog\[open\]' 2c6a1ef05d` (preparation revision) shows seven hits outside the removed `expectClosed`, in `SearchDialog.navigation.spec.ts` and `assimilationPage/shared.ts`; the slice 4 Accepted note in commit 95473a8e63 records that the term "was too broad".
   - Observed effect: the sweep reading was narrowed at acceptance. The cost was one judgement and one plan note; no defect.
   - Inference: the planning premise check confirmed who called the removed helper but did not run the sweep pattern itself. This is probably related to ODF-074 (premises not checked before planning), but the match is uncertain: here the unchecked premise was a sweep term, not a caller or host fact.
+
+<a id="dd-257"></a>
+
+## DD-257 — An implementation return omitted plan-owned proof rows listed in its delegation, and the returned rows found a defect
+
+The slice 2 delegation named every plan proof row, including direct reachability of voice starting/converting/Retry at narrow width and Assimilate plus recording fitting together. The first return reported them as untested gaps while presenting the slice as done. The coordinator returned them for the same slice; the new fit test showed More off-screen (right edge 362px at a 320px window) and the implementer fixed the header flex sizing.
+
+### Occurrences
+- Execution: SEED-078#story-3 (plan `.planning/slice-plans/006-adaptive-note-header/PLAN.md`, first implementation commit 7d122c9938)
+  - Timestamp: 2026-10-20T14:13:39+09:00
+  - Tool: Claude Code
+  - Model: claude-opus-5-5
+  - Open Dough release: 0.3.66
+  - Evidence: plan proof-table row "startup/conversion/retry controls stay directly reachable; simultaneous voice and Assimilate fit"; `frontend/tests/layouts/NotebookWorkspaceHeader.dictation.spec.ts` "fits an open Assimilate, a recording Stop, and More in the bar together"; slice 2 Accepted note in commit e0cf54a34a.
+  - Observed effect: a user-visible overflow defect was caught before delivery at the cost of one extra implementation round of about 6 minutes.
+  - Inference: proof acceptance against the plan's proof rows, rather than the return's own coverage list, was the decisive practice; the implementer may have stopped at its own time budget (compare ODF-206).
