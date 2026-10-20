@@ -49,7 +49,7 @@ import BookReadingPdf from "@/components/book-reading/BookReadingPdf.vue"
 import ContentLoader from "@/components/commons/ContentLoader.vue"
 import GlobalBar from "@/components/toolbars/GlobalBar.vue"
 import { useBookReadingBootstrap } from "@/composables/useBookReadingBootstrap"
-import { bookReadingBarTargetKey } from "@/composables/bookReadingBarTarget"
+import { pageBarTargetKey } from "@/composables/pageBarTarget"
 import { provide, ref } from "vue"
 
 const props = defineProps({
@@ -60,5 +60,5 @@ const { book, fileLoading, fileError, bootstrap, mergeBookIntoBootstrap } =
   useBookReadingBootstrap(props.notebookId)
 
 const barTarget = ref<HTMLElement | null>(null)
-provide(bookReadingBarTargetKey, barTarget)
+provide(pageBarTargetKey, barTarget)
 </script>

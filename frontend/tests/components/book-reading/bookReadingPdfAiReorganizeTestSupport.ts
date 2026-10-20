@@ -2,13 +2,13 @@ import BookReadingPdf from "@/components/book-reading/BookReadingPdf.vue"
 import GlobalApiLoadingModal from "@tests/helpers/GlobalApiLoadingModal"
 import helper from "@tests/helpers"
 import makeMe from "donut-test-fixtures/makeMe"
-import { bookReadingBarTargetKey } from "@/composables/bookReadingBarTarget"
+import { pageBarTargetKey } from "@/composables/pageBarTarget"
 import { type App, defineComponent, ref } from "vue"
 
 // Stands in for the book reader, which hosts the reading view's book controls in its page bar.
 const bookReaderBarPlugin = {
   install(app: App) {
-    app.provide(bookReadingBarTargetKey, ref(document.createElement("div")))
+    app.provide(pageBarTargetKey, ref(document.createElement("div")))
   },
 }
 

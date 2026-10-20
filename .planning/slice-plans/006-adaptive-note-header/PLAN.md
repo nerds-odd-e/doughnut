@@ -150,7 +150,14 @@ dated observation provenance in planning until ordinary wrap-up.
 
 ### 1. Page-bar placement preserves page-owned control lifecycles
 Type: Structure
-Status: planned
+Status: done
+Accepted (2026-10-20): `frontend/src/composables/pageBarTarget.ts` exports
+`pageBarTargetKey`; BookReader provides it, BookReadingShell injects it, and
+the PDF AI-reorganize fixture provides it. `env -u NODE_ENV CURSOR_DEV=true nix
+develop -c pnpm frontend:test tests/pages/BookReadingPage
+tests/components/book-reading` passed 13 files / 85 tests; both typechecks
+exit 0. Sweep reading: `grep -rn -i bookReadingBarTarget --exclude-dir=node_modules --exclude-dir=.git .`
+hits only this plan's dated evidence.
 Proof: Book page loading, failure, and reading controls remain operable through
 the existing high-level specs after the target key/module and all providers,
 injections, and fixture imports are reconciled. Run the affected Book page and
