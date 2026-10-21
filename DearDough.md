@@ -173,6 +173,8 @@ Former local code: DD-231. A slice proof table omits explicit story end conditio
 
 Former local code: DD-233. Broad whole-reference and metadata batches exceeded the response budget and truncated required context before delegation, forcing repeated retrieval despite existing targeted-reading guidance. Execution provenance and counts remain with the linked evidence owner; savings are unmeasured. This agent deviation is distinct from ODF-158’s required-reference cost. Open, unqueued. [Evidence and response](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/findings/ODF-264.md).
 
+### Occurrences
+
 - Execution: SEED-080#story-2 (first implementation `9ee121fdfad67f4aeab513c8bc09e960c17939c0`)
   - Timestamp: unknown
   - Tool: Codex
@@ -251,7 +253,7 @@ Former local code: DD-251. A plan removed the sole sign-in route one slice befor
 
 Former local code: DD-252. Required build/generation proof checks formatting before coordinator-owned formatting, producing red proof or manual layout repair before that stage. Two SEED-078 executions (story-1 and story-5), first on 0.3.66 and second release unknown; repeated builds, no escaped defect. Distinct from ODF-285’s observed formatter-ownership violation. Open, unqueued. [Evidence and current response](https://github.com/terryyin/open-dough/blob/main/docs/maintainer/findings/ODF-309.md).
 
-<a id="odf-310"></a>
+### Occurrences
 
 - Execution: SEED-080#story-2 (first implementation `9ee121fdfad67f4aeab513c8bc09e960c17939c0`)
   - Timestamp: unknown
@@ -260,6 +262,8 @@ Former local code: DD-252. Required build/generation proof checks formatting bef
   - Evidence: slice 1's required `pnpm -C frontend exec vite build --emptyOutDir` generated declarations but exited 1 on pending Biome formatting; after the coordinator's `format:changed`, the same build passed. Retained observations: `821fbd9ac795f37c0ab06aebe602425cdaa2696d:.planning/slice-plans/002-sidebar-location/EVIDENCE.md#slice-1`.
   - Observed effect: the prescribed build/formatter ordering required a second build before delivery; no failing build was represented as passing.
   - Inference: this repeats the generation-versus-formatting scheduling friction; no measured cost is claimed.
+
+<a id="odf-310"></a>
 
 <a id="dd-253"></a>
 
