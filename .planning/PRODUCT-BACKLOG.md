@@ -6,9 +6,10 @@ Make deliberately captured knowledge more useful through learning and refinement
 
 ## Taken
 
+- [Retry a failed recall-question load or choose self-review explicitly](seeds/SEED-081-recover-recall-request-failures.md#story-2) — SEED-081#story-2 ([plan](slice-plans/002-recover-recall-question/PLAN.md))
+
 ## Backlog list
 
-- [Retry a failed recall-question load or choose self-review explicitly](seeds/SEED-081-recover-recall-request-failures.md#story-2) — SEED-081#story-2
 - [Generate focus-note questions with relevant supporting passages](seeds/SEED-007-per-concept-prompt-splitting-single-note-qg.md#story-1) — SEED-007#story-1
 - [Decide whether an acceptance-test review procedure benefits from Donut notes](seeds/SEED-074-knowledge-to-capability.md#story-1) — SEED-074#story-1
 - [Find a note from wording remembered in its body](seeds/SEED-073-learning-refinement-and-retrieval.md#story-3) — SEED-073#story-3
