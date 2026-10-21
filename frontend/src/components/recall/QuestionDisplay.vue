@@ -20,7 +20,7 @@
       v-if="responseChoices"
       :choices="responseChoices"
       :correct-choice-index="correctChoiceIndex"
-      :answer-choice-index="answer?.choiceIndex"
+      :answer-choice-index="answer?.choiceIndex ?? selectedChoiceIndex"
       :excluded="!!answer?.excludedAt"
       :disabled="disabled"
       @answer="submitAnswer($event)"
@@ -68,6 +68,7 @@ const props = defineProps({
     required: true,
   },
   correctChoiceIndex: Number,
+  selectedChoiceIndex: Number,
   answer: Object as PropType<Answer>,
   disabled: Boolean,
   testedFocus: String,

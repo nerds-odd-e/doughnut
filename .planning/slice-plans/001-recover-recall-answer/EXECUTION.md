@@ -116,3 +116,45 @@ OBSERVATIONS.md remain with their provenance. This is a reading,
 not a permanent absence test. After a capacity interruption before structural
 edits, coordinator checked worktree/index/local and remote HEAD, found no new
 commits, and reestablished the all-backend pass before refactoring resumed.
+
+## Slice 3 accepted evidence
+
+Independent source-only reviewer `/root/source_review_3` received original story
+clauses only and returned 48 individual commitments, examples and exclusions;
+actual launch and return are retained in the conversation. At the MCQ failure
+trigger, the source expects the same prompt/choice/timing/session position,
+uncertainty feedback and deliberate repeatable recovery within the mounted page.
+`RecallPage.answerRecovery.spec.ts` observes that journey through actual choice
+and Retry controls: repeated failures keep First question, neutral selected input
+and progress 0/2; five seconds causes no automatic call; each deliberate Retry
+sends exactly the first full DTO including all timing fields. Pending repeated
+Retry clicks and other-choice clicks produce no duplicate request. Correct and
+wrong accepted results display the original selected mark and history with
+progress 1/2. Actual Move to end while either initial submission or recovery is
+pending displays Next question; a delayed old reply leaves it at progress 0/2.
+The production owner captures one payload, guards pending actions, and ignores
+unmounted/changed-prompt completions before emitting the existing continuation.
+G1 is proved. No page reload, automatic resubmission or new queue owner is needed.
+
+The real persisted first-answer, original creation time/mark/timing and single
+Grade/log/schedule effects remain accepted from slice 2. Spelling server outcomes,
+current-access reveal data and Confusion are owned by slice 4; spelling input,
+repeatable recovery, overlap's distinct attempt and reveal/action continuations
+by slice 5. Original exclusions and ownership/grading rules are unchanged.
+
+Commands: `CURSOR_DEV=true nix develop -c pnpm frontend:test tests/pages/RecallPage.answerRecovery.spec.ts tests/components/recall/RecallPromptComponent.spec.ts`
+(8 tests passed); `CURSOR_DEV=true nix develop -c pnpm frontend:test`
+(384 files, 2,389 tests passed, 71.54s);
+`CURSOR_DEV=true nix develop -c pnpm -C frontend exec vue-tsc --noEmit` and
+`CURSOR_DEV=true nix develop -c pnpm -C frontend exec tsc --noEmit` (both passed).
+The final type-only success assertion leaves runtime code unchanged from that
+full-suite candidate. Active implementation approximately 8–9 minutes, excluding
+suite waits. An initial test clone hit Vue's proxy; scalar payload snapshots and
+the shallow retained DTO resolved that fixture failure before final proof.
+
+Inspected consumer path: QuestionChoices → QuestionDisplay → RecallPromptComponent
+→ ContestableQuestion → RecallPromptCard → RecallPage/useRecallAnswerHandling,
+plus accepted reveal/history. Full frontend proof covers those consumers.
+The one-time whole-product old-alert reading found no live matches; the popup
+dependency and obsolete synthetic retry test were deleted. This is a reading,
+separate from the retained-input/recovery proof. No API/component generation.

@@ -14,7 +14,7 @@
           'disabled:opacity-65 transition-colors',
           {
             'is-correct': isOptionCorrect(index),
-            'is-incorrect': !isOptionCorrect(index),
+            'is-incorrect': correctChoiceIndex !== undefined && !isOptionCorrect(index),
             'is-selected': isSelectedOption(index),
             'is-excluded': excluded,
           }
@@ -91,10 +91,11 @@ export default defineComponent({
   color: white !important
   border: 2px solid hsl(142, 76%, 28%) !important
 
-.is-selected:not(.is-correct)
+.is-selected
   font-weight: bold
+  outline: 2px solid var(--color-primary)
 
-.is-selected:not(.is-correct):not(.is-excluded)
+.is-selected.is-incorrect:not(.is-excluded)
   background-color: hsl(0, 84%, 60%) !important
   color: white !important
   border: 2px solid hsl(0, 84%, 50%) !important

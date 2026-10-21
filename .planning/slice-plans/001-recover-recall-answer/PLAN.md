@@ -143,7 +143,7 @@ replaced in slice 3. This is a safe stopping point for the API contract.
 
 ### 3. Recover a multiple-choice submission from the current recall page
 Type: Behavior
-Status: planned
+Status: done
 Proof: Mounted RecallPage MCQ control-to-result cases from the proof table;
 frontend suite and both typechecks.
 
@@ -242,4 +242,4 @@ observed during preparation. No person-owned product decision is pending.
 ### G1. MCQ recovery needs its deliberate web action
 Reported: slice 2 — "Coordinator inspected the existing RecallPromptComponent error path; the backend's new recovery result still needs the planned retained-input Retry journey on the current page."
 Story clause: "Explain that submission could not be confirmed and offer a deliberate recovery action."
-Disposition: receiving slice 3
+Disposition: proved by slice 3: frontend/tests/pages/RecallPage.answerRecovery.spec.ts drives choice and Retry controls through repeated failures, retained submission, correct/wrong reveal/history and once-only progress; pending/navigation cases preserve the current attempt.
