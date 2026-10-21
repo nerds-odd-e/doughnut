@@ -180,6 +180,10 @@ their drafts, validation feedback and saved values available.
   At >5 minutes reassess; at >10 minutes of substantive work stop and refine the
   remaining boundary with the actual evidence under AGENTS.md's sizing rule.
 
+## Execution complete
+
+Product advice: no change. The restored property rows and footer dates meet the story as specified. The retrospective found no implementation defect, residue or test-cost finding needing a correction; process finding DD-320 is recorded in `DearDough.md`.
+
 ## Story obligations
 
 ### G1. Header disclosure hidden for read-only notes without properties (first reported in slice 1)

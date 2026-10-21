@@ -5,7 +5,7 @@ responses under observation live in the [watch list](https://github.com/terryyin
 Detailed observations, original releases and qualified inferences are retained
 in the linked Open Dough catalog. Unknown execution provenance remains unknown.
 
-- Highest allocated local number: 319. Removed numbers are never reused.
+- Highest allocated local number: 320. Removed numbers are never reused.
 - Full source recovery before this cleanup: `0a8878e98be76b8e92203515d8f4719489b24169:DearDough.md`.
 - Full source recovery before name adoption and compaction: `234f141b41332715edd5e4384a425bcb8f26e718:DearDough.md`; complete supplied evidence retained in Open Dough `dbe36711c0e4ff9421bc28afc53cb7477203e704:docs/maintainer/findings/`.
 - Project-owned findings and their current assessment remain in [Donut Retrospective Findings](DonutRetrospectiveFindings.md).
@@ -351,3 +351,17 @@ A question-load failure changed from immediate self-review to deliberate Self-re
   - Evidence: [CI run 39583877557, attempt 1](https://github.com/nerds-odd-e/doughnut/actions/runs/39583877557), job 119167858550; first-slice plan's E2E consumer assumption at `07606012773257fbb71ba09491cc96907e127b6a:.planning/slice-plans/002-recover-recall-question/PLAN.md`; repair `e46d23deacb110a1cd861519810c311b5faeddbd`.
   - Observed effect: browse/resume, Daily probe and scheduling produced seven missing-question/note failures. Local untouched-HEAD probe reproduction had 0/3 passing; after explicit choices and preservation of existing assertions, the three-feature batch passed 9/9. Slice 2 was safely paused, saved and restored around the published repair.
   - Inference: source compatibility must include changed UI journey preconditions even when the transport API is unchanged; incidence and savings outside this execution are unmeasured.
+
+## DD-320 — A late guarded-delivery failure leaves the caller-written plan update applied
+
+Guarded fresh delivery runs the caller-supplied plan/status operation before its staged-whitespace check. When that later check failed, the plan was already marked done, so retrying with the same non-idempotent update would have refused. The coordinator made its ad-hoc update script idempotent before retrying. The whitespace defect itself, a trailing blank line left by deleting a scoped style block, escaped the implementation and refactor returns and the selective formatter. In the next slice the refactor pass ran `git diff --check` and caught the same kind of residue. Qualified one-off; no delivered defect.
+
+### Occurrences
+- Execution: SEED-082#story-1 (first implementation `d5b50a822c2bcdae717ad9b819c907187c37ef1d`)
+  - Timestamp: unknown
+  - Tool: Claude Code
+  - Model: claude-opus-5-5
+  - Open Dough release: 0.3.67
+  - Evidence: on 2026-10-21 the slice 1 `execution-increment-delivery.mjs fresh` attempt returned `preparation-failed`, operation `staged whitespace`, `frontend/src/components/notes/NoteTimestamps.vue:46: new blank line at EOF`, after the plan's slice 1 status had already changed; the retry with an idempotent update published `d5b50a822c`. The slice 2 refactor return reported `git diff --check HEAD` clean after removing a similar trailing blank line.
+  - Observed effect: one failed delivery attempt, an edit to the coordinator's update script, and a retry; no proof rerun was needed.
+  - Inference: callers write plan-update operations themselves, so their retry safety depends on the caller; running `git diff --check` in implementation or refactor returns would surface such residue earlier. Savings beyond this execution are unmeasured.
