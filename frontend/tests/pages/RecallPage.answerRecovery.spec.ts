@@ -10,6 +10,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest"
 import {
   createMemoryTrackerLite,
   givenRecallQueue,
+  moveCurrentRecallToEnd,
   useRecallPageSpecContext,
 } from "./recallPageTestSupport"
 
@@ -167,14 +168,7 @@ describe("RecallPage MCQ answer recovery", () => {
         await retry(wrapper).trigger("click")
         await flushPromises()
       }
-      await wrapper.find(".progress-bar").trigger("click")
-      await flushPromises()
-      const moveToEnd = document.body.querySelector<HTMLButtonElement>(
-        'button[title="Move to end of list"]'
-      )!
-      expect(moveToEnd.disabled).toBe(false)
-      moveToEnd.click()
-      await flushPromises()
+      await moveCurrentRecallToEnd(wrapper)
       expect(wrapper.text()).toContain("Next question")
       finish(wrapSdkResponse(acceptedAnswer(true)))
       await flushPromises()

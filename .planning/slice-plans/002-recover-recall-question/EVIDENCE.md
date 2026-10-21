@@ -122,3 +122,52 @@ unchanged imports/count/time-travel typing (HEAD and candidate each 229 diagnost
 Cypress proof, and no broad type remediation was attempted. Slice 2 was paused
 and saved through ci-repair-stash before repair and is restored only after
 accepted repair publication. G3 is proved by the final repaired journeys.
+
+
+## Slice 2 acceptance
+
+Fresh source-only `/root/source_promises_2` received only the original complete
+Goal/Scope/exclusions/examples/UI with no history and no file access. Its actual
+launch and returned individual commitments are retained in the conversation.
+Compared original triggers with actual product and assertions:
+
+- Current MCQ generation failure → inline Retry and Self-review; Retry → pending
+  inline loader, then same-tracker question or recoverable repeated failure.
+  RecallPage.questionRecovery.spec.ts first journey observes three tracker-1
+  requests through failure/retry/failure/retry/success, duplicate pending clicks
+  yielding one request, progress 0/2, and zero answer/grade calls.
+- Pending Retry + Move to end → another current question remains usable.
+  Parameterized success/error journey observes Question 2 and 0/2 before and
+  after late completion, then revisits tracker 1 via the same page controls
+  and observes its own question or Retry. No late result targets the new card.
+- Future prefetch failure → current question/choices remain usable; reaching
+  failed tracker → its own Retry → its question. Final page journey observes
+  these transitions, tracker-2 retry path and unchanged progress. Foreground
+  requests retain apiCallWithLoading; background prefetch uses direct SDK.
+- Controller failure then success/reload → same due time, RecallLog state,
+  unanswered persisted prompt and reuse. The named backend regression flushes
+  and refreshes real persisted entities; it mocks only OpenAI generation.
+- Explicit Self-review/context/Good/Again and one-grade continuation remain
+  covered by slice 1's unchanged assertions and the full suite. Spelling input,
+  prefetched input retention, per-attempt invalidation, overlap explanation,
+  fresh prompt/focus/specific-answer journey and spelling persistence remain G2.
+  Access/error behavior, backend API and grading policy remain unchanged.
+  All original deferred promises remain outside this change.
+
+Red: `CURSOR_DEV=true nix develop -c pnpm frontend:test tests/pages/RecallPage.questionRecovery.spec.ts`
+failed on missing Retry before implementation. Focused questionRecovery+Card
+command passed 12 tests. Final `CURSOR_DEV=true nix develop -c pnpm frontend:test`
+passed 387 files/2401 tests (79.14s). Both frontend typechecks named in slice 1
+passed. `CURSOR_DEV=true nix develop -c pnpm backend:test_only` passed (test 73s,
+worktree migration 42s), including the controller regression with zero XML
+failures/errors. Runtime DB `doughnut_wt_dae038e397854c188d64ae36bb2863c1_test`.
+Initial frontend spy-argument typing errors were corrected before final proof.
+Active implementation about 3 minutes (agent estimate), verification waits
+excluded. Independent refactor consolidated Move-to-end DOM navigation into
+recallPageTestSupport.ts for question recovery, MCQ/spelling submission recovery
+and queue progress. Coordinator inspected unchanged observing assertions.
+`CURSOR_DEV=true nix develop -c pnpm frontend:test tests/pages/RecallPage.questionRecovery.spec.ts tests/pages/RecallPage.answerRecovery.spec.ts tests/pages/RecallPage.spellingRecovery.spec.ts tests/pages/RecallPage.queueProgress.spec.ts`
+passed 20 tests; both frontend typechecks passed. Other accepted proof stayed
+compatible. CI repair e46d23deacb110a1cd861519810c311b5faeddbd changed only E2E and
+records; slice-2 saved work restored cleanly before this refactor.
+G1 is proved; G2 still belongs to slice 3. Preparation basis is not renewed.

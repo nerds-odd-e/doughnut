@@ -127,7 +127,8 @@ CI source is GitHub Actions, verified selector `ci.yml` (display name `donut CI`
 which runs on branch pushes. Observer coordinator `eimi-story-2`, directory
 `/tmp/dough-ci-501/watch-xb0ZSP`, PID `55116`, session `46925`, yielded cell `9`,
 is bound to this checkout and the execution branch. The earlier trunk claim is
-unobserved by this branch observer. Increments use managed delivery on this stream.
+unobserved by this branch observer. Increments use managed delivery on this stream. Slice 1 was accepted on the
+execution branch at `07606012773257fbb71ba09491cc96907e127b6a`.
 
 ## Ordered slices
 
@@ -150,7 +151,7 @@ Retry arrives in slice 2. This is an accepted delivery trade-off.
 
 ### 2. Retry the current or prefetched MCQ question
 Type: Behavior
-Status: planned
+Status: done
 Proof: MCQ retry, repeated failure, prefetch/navigation and learning-state rows.
 
 Behavior: the current MCQ load has failed → Retry loads for that tracker →
@@ -224,7 +225,7 @@ bounded repair. Readiness records preparation judgment, not execution authority.
 ### G1. MCQ Retry and request-isolation promises remain after slice 1
 Reported: slice 1 — "Retry, repeated failure, pending/late-result isolation and MCQ persistence regressions remain for slice 2."
 Story clause: "Offer deliberate Retry on the same tracker and session position, including after a repeated failure."
-Disposition: receiving slice 2
+Disposition: proved by slice 2: RecallPage.questionRecovery.spec.ts repeated failure, pending and navigation journeys; MemoryTrackerRecallPromptControllerTest.failedThenSuccessfulMcqLoadingPreservesLearningState
 
 ### G2. Spelling question recovery and persistence remain after slice 1
 Reported: slice 1 — "Spelling fetch consolidation, failed-load and OVERLAP recovery, input preservation, attempt ownership and persistence regressions remain for slice 3."

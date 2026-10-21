@@ -6,7 +6,10 @@ import type {
 import { mockSdkService, wrapSdkError, wrapSdkResponse } from "@tests/helpers"
 import { flushPromises } from "@vue/test-utils"
 import { beforeEach, describe, expect, it, vi } from "vitest"
-import { useRecallPageSpecContext } from "./recallPageTestSupport"
+import {
+  moveCurrentRecallToEnd,
+  useRecallPageSpecContext,
+} from "./recallPageTestSupport"
 import {
   givenSpellingRecoveryQueue,
   input,
@@ -128,14 +131,7 @@ describe("RecallPage spelling submission recovery", () => {
         await retry(wrapper).trigger("click")
         await flushPromises()
       }
-      await wrapper.find(".progress-bar").trigger("click")
-      await flushPromises()
-      const move = document.body.querySelector<HTMLButtonElement>(
-        'button[title="Move to end of list"]'
-      )!
-      expect(move.disabled).toBe(false)
-      move.click()
-      await flushPromises()
+      await moveCurrentRecallToEnd(wrapper)
       expect(wrapper.text()).toContain("Next spelling question")
       finish(wrapSdkResponse(result(true)))
       await flushPromises()

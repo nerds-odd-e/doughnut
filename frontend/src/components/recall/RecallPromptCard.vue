@@ -25,6 +25,11 @@
         <div v-else-if="currentRecallPromptLoad.status === 'failed'">
           <p>We couldn't load this question.</p>
           <button
+            class="daisy-btn daisy-btn-primary mt-4"
+            data-testid="retry-question"
+            @click="retryRecallPrompt(currentMemoryTrackerId!)"
+          >Retry</button>
+          <button
             class="daisy-btn daisy-btn-secondary mt-4"
             data-testid="self-review"
             @click="selfReviewTrackerIds.add(currentMemoryTrackerId!)"
@@ -80,7 +85,8 @@ const emit = defineEmits<{
   (e: "just-reviewed", result: undefined): void
 }>()
 
-const { recallPromptLoads, fetchRecallPrompts } = useRecallPromptFetching(props)
+const { recallPromptLoads, fetchRecallPrompts, retryRecallPrompt } =
+  useRecallPromptFetching(props)
 const selfReviewTrackerIds = ref(new Set<number>())
 
 // Computed properties with better naming

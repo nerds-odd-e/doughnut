@@ -17,17 +17,31 @@ export function useRecallPromptFetching(props: {
   eagerFetchCount: number
 }) {
   const recallPromptLoads = ref<Record<number, RecallPromptLoad>>({})
-  const fetching = ref(false)
+
+  const loadRecallPrompt = async (
+    memoryTrackerId: number,
+    foreground: boolean
+  ) => {
+    if (recallPromptLoads.value[memoryTrackerId]?.status === "loading") return
+    recallPromptLoads.value[memoryTrackerId] = { status: "loading" }
+    const request = () =>
+      MemoryTrackerController.getRecallPrompt({
+        path: { memoryTracker: memoryTrackerId },
+      })
+    const { data: recallPrompt, error } = await (foreground
+      ? apiCallWithLoading(request)
+      : request())
+    recallPromptLoads.value[memoryTrackerId] = error
+      ? { status: "failed" }
+      : { status: "loaded", recallPrompt: recallPrompt! }
+  }
 
   const fetchNextRecallPrompts = async () => {
-    for (
-      let index = props.currentIndex;
-      index < props.currentIndex + props.eagerFetchCount;
-      index++
-    ) {
-      const memoryTracker = props.memoryTrackers?.[index]
-      if (memoryTracker === undefined) break
-
+    const trackers = props.memoryTrackers.slice(
+      props.currentIndex,
+      props.currentIndex + props.eagerFetchCount
+    )
+    for (const [offset, memoryTracker] of trackers.entries()) {
       const memoryTrackerId = memoryTracker.memoryTrackerId
 
       const previousLoad = recallPromptLoads.value[memoryTrackerId]
@@ -37,43 +51,18 @@ export function useRecallPromptFetching(props: {
       )
         continue
 
-      recallPromptLoads.value[memoryTrackerId] = { status: "loading" }
-      const { data: recallPrompt, error } = await apiCallWithLoading(() =>
-        MemoryTrackerController.getRecallPrompt({
-          path: { memoryTracker: memoryTrackerId },
-        })
-      )
-      if (!error) {
-        recallPromptLoads.value[memoryTrackerId] = {
-          status: "loaded",
-          recallPrompt: recallPrompt!,
-        }
-      } else {
-        recallPromptLoads.value[memoryTrackerId] = { status: "failed" }
-      }
+      await loadRecallPrompt(memoryTrackerId, offset === 0)
     }
   }
 
-  let queuedFetch = false
-
-  const fetchRecallPrompts = async () => {
-    if (fetching.value) {
-      queuedFetch = true
-      return
-    }
-    fetching.value = true
-    try {
-      do {
-        queuedFetch = false
-        await fetchNextRecallPrompts()
-      } while (queuedFetch)
-    } finally {
-      fetching.value = false
-    }
+  const retryRecallPrompt = (memoryTrackerId: number) => {
+    if (recallPromptLoads.value[memoryTrackerId]?.status !== "failed") return
+    return loadRecallPrompt(memoryTrackerId, true)
   }
 
   return {
     recallPromptLoads,
-    fetchRecallPrompts,
+    fetchRecallPrompts: fetchNextRecallPrompts,
+    retryRecallPrompt,
   }
 }
