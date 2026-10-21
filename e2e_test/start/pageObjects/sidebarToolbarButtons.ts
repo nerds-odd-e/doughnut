@@ -20,10 +20,14 @@ export const sidebarToolbarButton = (
 
 export const sidebarAddNoteButton = () =>
   sidebarToolbarButton(() =>
-    cy.get('aside [data-testid="note-creation-new-button"] button')
+    cy.get(
+      '[data-note-sidebar-toolbar] [data-testid="note-creation-new-button"] button'
+    )
   )
 
 export const sidebarAddFolderButton = () =>
   sidebarToolbarButton(() =>
-    cy.get('aside').findByRole('button', { name: 'New folder' })
+    cy
+      .get('[data-note-sidebar-toolbar]')
+      .findByRole('button', { name: 'New folder' })
   )

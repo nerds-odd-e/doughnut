@@ -3,6 +3,7 @@
     data-note-sidebar-root
     class="flex flex-col flex-1 min-h-0 overflow-x-visible"
   >
+    <Teleport :to="toolbarTarget ?? 'body'" :disabled="!toolbarTarget">
     <SidebarToolbar
       v-if="!sidebarReadonly"
       :notebook-id="notebookId"
@@ -10,6 +11,8 @@
       :active-folder-realm="activeFolderRealm"
       :breadcrumb-folders="breadcrumbFolders"
     />
+    </Teleport>
+    <slot name="location" />
     <div
       ref="treeScrollRef"
       class="sidebar-tree-scroll overflow-y-auto flex-1 min-h-0"
@@ -50,6 +53,7 @@ const props = withDefaults(
     notebookReadonly?: boolean
     /** Set on folder page for active-folder toolbar/tree scope */
     activeFolderRealm?: FolderRealm
+    toolbarTarget?: HTMLElement | null
     breadcrumbFolders?: FolderTrailSegment[]
   }>(),
   { breadcrumbFolders: () => [] }

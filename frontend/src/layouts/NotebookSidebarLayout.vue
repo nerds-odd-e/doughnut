@@ -1,6 +1,7 @@
 <template>
-  <div class="flex flex-col h-full">
-    <GlobalBar>
+  <div class="notebook-workspace flex flex-col h-full">
+    <GlobalBar :docked-contents="sidebarOpened && isMdOrLarger">
+      <template #navigation>
       <button
         type="button"
         class="daisy-btn daisy-btn-sm daisy-btn-ghost"
@@ -19,36 +20,20 @@
           aria-hidden="true"
         />
       </button>
-      <div
-        v-if="currentNotebookRealm && isMdOrLarger"
-        class="flex-1 min-w-12 max-w-[40%] flex items-center"
-      >
-        <BreadcrumbWithCircle
-          :notebook-realm="currentNotebookRealm"
-          :ancestor-folders="breadcrumbFolders"
-        />
-      </div>
+      <div ref="contentsBarTarget" class="contents" />
+      </template>
       <div
         ref="pageBarTarget"
         class="contents"
       />
     </GlobalBar>
     <div
-      v-if="currentNotebookRealm && !isMdOrLarger"
-      class="flex-none px-4 border-b border-base-300"
-    >
-      <BreadcrumbWithCircle
-        :notebook-realm="currentNotebookRealm"
-        :ancestor-folders="breadcrumbFolders"
-      />
-    </div>
-    <div
       class="h-full relative flex flex-1 min-h-0"
     >
       <SidebarDrawer
         v-model:opened="sidebarOpened"
         :is-md-or-larger="isMdOrLarger"
-        class="bg-base-200 w-72 transition-all ease-in-out flex flex-col overflow-x-visible"
+        class="bg-base-200 w-[var(--notebook-sidebar-width)] shrink-0 transition-all ease-in-out flex flex-col overflow-x-visible"
       >
         <Sidebar
           v-if="currentNotebookId != null"
@@ -58,11 +43,25 @@
           :notebook-readonly="currentNotebookRealm?.readonly === true"
           :active-folder-realm="activeFolderRealm"
           :breadcrumb-folders="breadcrumbFolders"
-        />
+          :toolbar-target="sidebarOpened && isMdOrLarger ? contentsBarTarget : null"
+        >
+          <template #location>
+            <NotebookLocation
+              v-if="currentNotebookRealm && sidebarOpened"
+              :notebook-realm="currentNotebookRealm"
+              :ancestor-folders="breadcrumbFolders"
+            />
+          </template>
+        </Sidebar>
       </SidebarDrawer>
       <main
         class="flex-1 px-4 container mx-auto overflow-y-auto"
       >
+        <NotebookLocation
+          v-if="currentNotebookRealm && !sidebarOpened"
+          :notebook-realm="currentNotebookRealm"
+          :ancestor-folders="breadcrumbFolders"
+        />
         <nav
           v-if="showRelocatedNoteCreationInMainColumn && currentNotebookId != null"
           :class="[noteChromeToolbarNavClass, 'overflow-visible mb-2']"
@@ -101,7 +100,7 @@ import type {
 import { PanelLeft, PanelLeftClose } from "@lucide/vue"
 import GlobalBar from "@/components/toolbars/GlobalBar.vue"
 import SidebarDrawer from "@/components/commons/SidebarDrawer.vue"
-import BreadcrumbWithCircle from "@/components/toolbars/BreadcrumbWithCircle.vue"
+import NotebookLocation from "@/components/toolbars/NotebookLocation.vue"
 import Sidebar from "@/components/notes/Sidebar.vue"
 import NoteCreationNewButton from "@/components/notes/NoteCreationNewButton.vue"
 import { noteChromeToolbarNavClass } from "@/components/notes/noteChromeToolbarNavClass"
@@ -114,6 +113,7 @@ import { useSidebarCreationReadonly } from "@/composables/useSidebarCreationRead
 import { pageBarTargetKey } from "@/composables/pageBarTarget"
 
 const route = useRoute()
+const contentsBarTarget = ref<HTMLElement | null>(null)
 const pageBarTarget = ref<HTMLElement | null>(null)
 provide(pageBarTargetKey, pageBarTarget)
 const noteStore = useNoteStore()
@@ -178,6 +178,10 @@ const showRelocatedNoteCreationInMainColumn =
 </script>
 
 <style scoped>
+.notebook-workspace {
+  --notebook-sidebar-width: 18rem;
+}
+
 main {
   max-height: 100%;
 }

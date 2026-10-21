@@ -1,5 +1,5 @@
 import { NoteController } from "@generated/donut-backend-api/sdk.gen"
-import type { NoteRealm } from "@generated/donut-backend-api"
+import type { FolderListing, NoteRealm } from "@generated/donut-backend-api"
 import { noteShowLocation } from "@/routes/noteShowLocation"
 import {
   noteMoreOptionsTitles,
@@ -38,7 +38,8 @@ export async function atViewportWidth(width: number) {
  */
 export async function mountNotebookWorkspace(
   noteRealms: NoteRealm[],
-  location: RouteLocationRaw = noteShowLocation(noteRealms[0]!.id)
+  location: RouteLocationRaw = noteShowLocation(noteRealms[0]!.id),
+  folderListings: Record<string, FolderListing> = {}
 ): Promise<{
   wrapper: VueWrapper
   router: Awaited<ReturnType<typeof productionRouterAt>>
@@ -46,7 +47,7 @@ export async function mountNotebookWorkspace(
   invalidateSidebarListingCache()
   mockShowNoteForRealms(noteRealms)
   mockNotebookGetForNoteRealm(noteRealms[0]!)
-  stubNotebookFolderListings({})
+  stubNotebookFolderListings(folderListings)
   mockSdkService(NoteController, "getNoteInfo", makeMe.aNoteRecallInfo.please())
   const router = await productionRouterAt(location)
   const wrapper = helper
@@ -56,6 +57,7 @@ export async function mountNotebookWorkspace(
     .withCleanStorage()
     .withCurrentUser(makeMe.aUser.please())
     .mount({ attachTo: document.body })
+  ;(wrapper.element as HTMLElement).style.height = `${window.innerHeight}px`
   await flushPromises()
   return { wrapper, router }
 }
@@ -120,5 +122,16 @@ export async function clickPageBarCommand(title: string) {
 export async function chooseFromMore(title: string) {
   await clickPageBarCommand(noteMoreOptionsTitles.overflowMenu)
   await page.elementLocator(overflowMenuItem(title)!).click()
+  await flushPromises()
+}
+
+export async function toggleWorkspaceContents() {
+  await page
+    .elementLocator(
+      document.querySelector(
+        '[aria-label="Show sidebar"], [aria-label="Hide sidebar"]'
+      )!
+    )
+    .click()
   await flushPromises()
 }

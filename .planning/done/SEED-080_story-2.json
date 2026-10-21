@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "identity": "SEED-080#story-2",
+  "title": "Navigate from a stable sidebar breadcrumb with aligned tools",
+  "completedAt": "2026-10-21T05:41:45.328Z",
+  "developer": "Terry Yin",
+  "agent": "Aino-chan",
+  "host": "codex",
+  "model": "gpt-6.1-sol"
+}

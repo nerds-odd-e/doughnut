@@ -1,7 +1,10 @@
 <template>
   <nav class="daisy-navbar max-w-full flex justify-between relative">
-    <DonutMenu :user="user" />
-    <div class="flex flex-1 min-w-0 overflow-x-auto border-l border-base-300 ml-1 pl-1">
+    <div class="flex items-center shrink-0" :class="{ 'docked-contents': dockedContents }">
+      <DonutMenu :user="user" />
+      <slot name="navigation" />
+    </div>
+    <div class="flex flex-1 min-w-0 overflow-x-auto border-l border-base-300 pl-1" :class="{ 'ml-1': !dockedContents }">
       <slot />
     </div>
     <div class="daisy-join daisy-join-horizontal flex-none">
@@ -17,11 +20,17 @@ import type { User } from "@generated/donut-backend-api"
 import { inject } from "vue"
 import DonutMenu from "@/components/toolbars/DonutMenu.vue"
 
+defineProps<{ dockedContents?: boolean }>()
+
 const user = inject<Ref<User | undefined>>("currentUser")
 </script>
 
 <style scoped lang="scss">
 @use "@/assets/page-bar.scss" as *;
+
+.docked-contents {
+  width: calc(var(--notebook-sidebar-width) - 0.5rem);
+}
 
 .daisy-navbar {
   height: $page-bar-height;

@@ -40,6 +40,7 @@ import {
   commandsSitInPageBar,
   mountNotebookWorkspace,
   pageBarCommand,
+  toggleWorkspaceContents,
 } from "./notebookWorkspaceHeaderTestSupport"
 
 const titles = noteMoreOptionsTitles
@@ -100,12 +101,14 @@ describe("Notebook workspace header dictation", () => {
     await flushPromises()
   }
 
-  it("dictates into the title caret from the bar while narrowing, then the next recording goes to the body", async () => {
+  it("dictates into the title caret from the bar while toggling contents and narrowing, then the next recording goes to the body", async () => {
     await mountAt(1280)
     placeCaretInTitle(wrapper, 7)
     await startVoiceInputByPointer(wrapper)
 
     await page.viewport(320, 700)
+    await toggleWorkspaceContents()
+    await toggleWorkspaceContents()
     await vi.waitFor(() => {
       expect(pageBarCommand(noteVoiceInputTitles.stop)).not.toBeNull()
       expect(commandsSitInPageBar(320)).toBe(true)
