@@ -6,8 +6,6 @@ Make deliberately captured knowledge more useful through learning and refinement
 
 ## Taken
 
-- [Restore visible note properties and bottom timestamps](seeds/SEED-082-visible-note-properties.md#story-1) — SEED-082#story-1 ([plan](slice-plans/003-visible-note-properties/PLAN.md))
-
 ## Backlog list
 
 - [Generate focus-note questions with relevant supporting passages](seeds/SEED-007-per-concept-prompt-splitting-single-note-qg.md#story-1) — SEED-007#story-1
