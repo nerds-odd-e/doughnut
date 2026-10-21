@@ -37,7 +37,7 @@ This seed is non-executable planning input.
 
 **Identity:** SEED-082#story-1
 ```json dough-story-state
-{"schemaVersion":1,"refinement":"refined","approach":"unselected"}
+{"schemaVersion":1,"refinement":"refined","approach":"planned","plan":"../slice-plans/003-visible-note-properties/PLAN.md","assessment":"ready","reasons":[],"basis":{"document":"5ec7d097e6f78a720724f3a0065f19b809f7eacbed78003333fad8cf97ca4b4c","plan":"474f2bfbfe9bf135188dd66042a57562f553b355290b6f0b04b9d942f3a51360"}}
 ```
 
 **Goal:** A note reader or author can immediately read and work with the
@@ -50,13 +50,19 @@ the content, as before the details-disclosure change.
   above the note body for editable and read-only views. Preserve the existing
   rich/Markdown representations: rich mode presents property rows, and raw
   Markdown keeps its frontmatter editing. Existing empty-property behavior
-  and Add property availability follow the current permissions.
+  and Add property availability follow the current permissions: an editable
+  note with valid empty frontmatter offers Add property; a read-only empty
+  note proceeds directly to its body. A reader can read existing values;
+  an author uses the current row controls to change them.
 - Restore Created and Last updated to the note footer after the body and
   displayed images, before references, reconciling the historical footer
   presentation with current code. Use the existing note timestamps and
   localized date formatting; keep the metadata readable and separate from
   the property editor. Preserve the scope of surfaces that displayed footer
-  metadata before this change.
+  metadata before this change: the full note view, including its read-only
+  and raw-Markdown modes. Use the labels Created and Last updated. Preserve
+  the existing recency emphasis while keeping both dates readable; these
+  dates are note metadata, not editable frontmatter fields.
 - Delete the whole-section collapse/expand control, property-summary strip,
   shared disclosure state, and transitively exclusive wiring, styling,
   helpers, date-only slot forwarding, and test/E2E reveal support. Delete the
@@ -93,7 +99,9 @@ to authored titles or note content are deferred.
 | --- | --- |
 | Open an editable or read-only note with scalar and list properties | The property rows are directly readable above the body, using the retained wrapping/layout and appropriate editing permissions. |
 | Add or edit a property, then encounter validation or save successfully | The current draft/error or saved value stays directly available through the existing editing flow. |
+| Open an editable empty note, choose Add property, enter a key but omit its required value, then correct it | The author sees the validation beside the draft, keeps the entered key, and can complete the save using the same controls. |
 | Use an existing property location or property learning action | The correct property receives its existing focus or learning controls using the current navigation contract. |
+| Follow a location naming a missing property | The note and its existing properties remain readable, with the current explicit missing-property feedback. |
 | Read a note containing body text and an image | Created / Last updated appear below the content and image, before references, with the note’s actual timestamps. |
 | Switch between rich mode and raw Markdown, or resize to a phone | The established property representation remains usable and the footer remains below the content; retained row layout and reading improvements still apply. |
 
@@ -104,6 +112,14 @@ flag or a second preference. Keep the footer’s timestamp presentation separate
 from property editing, and preserve existing focus/learning ownership while
 deleting their disclosure-specific branches. Recover the relevant historical
 presentation without reverting unrelated improvements wholesale.
+
+The architecture examination found no new cross-cutting responsibility or
+decision. [ADR 0004 — OKF-compatible notebook Markdown profile](../../docs/adrs/0004-okf-compatible-notebook-markdown-accepted.md)
+keeps authored frontmatter intact; [ADR 0005 — Web routes](../../docs/adrs/0005-web-routes-accepted.md)
+keeps property identity and panel navigation on the existing named locations,
+including missing-property feedback. The restoration follows both without
+an exception or new API/storage contract. The shared reading surface remains
+usable in context readers without expanding the historical footer's scope.
 
 **Evaluation:** Reuse and, where necessary, adapt proof of the surviving
 property reading/editing, validation, existing focus/learning, footer dates,
