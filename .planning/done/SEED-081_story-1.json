@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "identity": "SEED-081#story-1",
+  "title": "Recover a recall answer after a failed or lost submission response",
+  "completedAt": "2026-10-21T08:01:52.721Z",
+  "developer": "Terry Yin",
+  "agent": "Airi-chan",
+  "host": "codex",
+  "model": "gpt-6.1-sol"
+}

@@ -27,16 +27,9 @@ principle 7 and `unit-testing` skill supply the stricter removal convention.
 | MinerU venv recovery | One | About 28 minutes of mixed environment and stack work; recovery remains unqueued. |
 | Stale Development classes | One; later probes healthy | Failed start, unknown cause; unqueued, not confirmed resolved. |
 
-The earlier 2026-10-21 local-log selection at Donut `55007dab3d` queued no
-new stories. The owner's subsequent product reassessment at
-`b46b36c9c1abdd6e31802b7ec2dac14330b583cb` also read the current backlog and
-canonical candidates, recent completed-story reviews, and relevant recall
-source/tests. It selects two new leading product stories: recover a failed or
-lost answer response, then retry a failed question load or explicitly choose
-existing self-review. Both preserve learning history and the current direction;
-the existing four queued stories retain their order and Taken remains empty.
-These source-backed assessments establish failure paths, not live occurrence
-counts, frequency or measured cost. The formal contest candidate
+The question-load assessment below is source-backed, not a record of live
+occurrences. Its production frequency and cost remain unknown. The formal
+contest candidate
 [SEED-073#story-6](.planning/seeds/SEED-073-learning-refinement-and-retrieval.md#story-6)
 remains unqueued with its policy decisions intact.
 
@@ -53,44 +46,6 @@ an unrepaired Donut helper or voice-control defect. Successful local practice
 is separated below from open problems and has no backlog entry.
 
 ## Queued product improvements: Recall request recovery
-
-### DD-317 — A failed or lost answer response has no complete recovery journey
-
-**Current source assessment:** At Donut
-`b46b36c9c1abdd6e31802b7ec2dac14330b583cb`,
-`frontend/src/components/recall/SpellingQuestionDisplay.vue` sets `submitted`
-before emitting the answer and disables Answer. Its parent
-`RecallPromptCard.vue:onSpellingAnswer` reacts only on success and provides no
-failure completion that restores submission. A rejected answer request therefore
-leaves that mounted spelling attempt unable to submit again.
-
-For multiple choice, `RecallPromptComponent.vue:submitAnswer` re-enables input
-on an API error; its existing `RecallPromptComponent.spec.ts` test "allows
-retrying on API error" proves the mocked fail-then-success path only.
-`AnswerService.createAnswerForQuestion` calls `Answer.buildAnswer`, which
-rejects an existing answer with "The question is already answered" before
-scheduling. Consequently, when an answer commits and its response is lost,
-retrying the current operation cannot recover the stored result. This prevents
-a duplicate answer, but leaves the learner without a complete in-place recovery.
-The spelling grading path likewise rejects an existing answer
-(`services/SpellingRecallGrading.java`).
-
-**Ownership / limits:** Donut owns these UI/API states and learning effects.
-This is separate from shared proof and delivery processes. These are current
-source/test observations, not reproduced live incidents; production occurrence
-count, transport conditions and frequency remain unknown. Existing overlap
-spelling retry concerns a returned learning outcome, not a failed request, and
-does not cover this seam. No active story covers it.
-
-**Queued response:** [Recover a recall answer after a failed or lost submission
-response](.planning/seeds/SEED-081-recover-recall-request-failures.md#story-1)
-(`SEED-081#story-1`). Preserve the original attempt and learning history, recover
-a recorded result after response loss, and allow deliberate retry when the
-attempt was not recorded. Not resolved; implementation and adoption are pending.
-**Evaluation:** Inject a failure before acceptance and a response loss after
-acceptance for both answer formats. Recover through the same card; inspect the
-persisted answer, recall logs and schedule to establish one set of effects and
-unchanged session position until a real result is recovered.
 
 ### DD-318 — A failed question load falls through to an unintended recall surface
 
